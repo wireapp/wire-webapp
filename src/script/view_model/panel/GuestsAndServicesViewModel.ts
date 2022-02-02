@@ -45,6 +45,7 @@ export class GuestsAndServicesViewModel extends BasePanelViewModel {
   isTeamOnly: ko.PureComputed<boolean>;
   hasAccessCode: ko.PureComputed<boolean>;
   isGuestEnabled: ko.PureComputed<boolean>;
+  isServicesEnabled: ko.PureComputed<boolean>;
   isGuestLinkEnabled: ko.PureComputed<boolean>;
   showLinkOptions: ko.PureComputed<boolean>;
   brandName: string;
@@ -70,6 +71,7 @@ export class GuestsAndServicesViewModel extends BasePanelViewModel {
     this.isTeamOnly = ko.pureComputed(() => this.activeConversation()?.isTeamOnly());
     this.hasAccessCode = ko.pureComputed(() => (this.isGuestRoom() ? !!this.activeConversation().accessCode() : false));
     this.isGuestEnabled = ko.pureComputed(() => !this.isTeamOnly());
+    this.isServicesEnabled = ko.pureComputed(() => this.activeConversation()?.isServicesRoom());
     this.isGuestLinkEnabled = ko.pureComputed(() => this.teamState.isGuestLinkEnabled());
     this.showLinkOptions = ko.pureComputed(() => this.isGuestEnabled());
 
@@ -122,32 +124,30 @@ export class GuestsAndServicesViewModel extends BasePanelViewModel {
   toggleAccessState = async (isTogglingGuest: boolean): Promise<void> => {
     const conversationEntity = this.activeConversation();
     if (conversationEntity.inTeam()) {
-      const hasGuest = conversationEntity.hasGuest();
-      const hasService = conversationEntity.hasService();
       let newAccessState: ACCESS_STATE;
 
       if (
-        (this.isTeamOnly() && isTogglingGuest && hasService) ||
-        (!this.isTeamOnly() && !isTogglingGuest && !hasService)
+        (this.isTeamOnly() && isTogglingGuest && this.isServicesEnabled) ||
+        (!this.isTeamOnly() && !isTogglingGuest && !this.isServicesEnabled)
       ) {
         newAccessState = ACCESS_STATE.TEAM.GUESTS_SERVICES;
       }
 
       if (
-        (this.isTeamOnly() && isTogglingGuest && !hasService) ||
-        (!this.isTeamOnly() && !isTogglingGuest && hasService)
+        (this.isTeamOnly() && isTogglingGuest && !this.isServicesEnabled) ||
+        (!this.isTeamOnly() && !isTogglingGuest && this.isServicesEnabled)
       ) {
         newAccessState = ACCESS_STATE.TEAM.GUEST_ROOM;
       }
       if (
-        (this.isTeamOnly() && !isTogglingGuest && hasService) ||
-        (!this.isTeamOnly() && isTogglingGuest && !hasService)
+        (this.isTeamOnly() && !isTogglingGuest && this.isServicesEnabled) ||
+        (!this.isTeamOnly() && isTogglingGuest && !this.isServicesEnabled)
       ) {
         newAccessState = ACCESS_STATE.TEAM.TEAM_ONLY;
       }
       if (
-        (this.isTeamOnly() && !isTogglingGuest && !hasService) ||
-        (!this.isTeamOnly() && isTogglingGuest && hasService)
+        (this.isTeamOnly() && !isTogglingGuest && !this.isServicesEnabled) ||
+        (!this.isTeamOnly() && isTogglingGuest && this.isServicesEnabled)
       ) {
         newAccessState = ACCESS_STATE.TEAM.SERVICES;
       }
@@ -159,8 +159,9 @@ export class GuestsAndServicesViewModel extends BasePanelViewModel {
           this.requestOngoing(false);
         }
       };
+      const hasGuestOrServices = conversationEntity.hasGuest() || conversationEntity.hasService();
 
-      if (this.isTeamOnly() && !hasGuest && !hasService) {
+      if (this.isTeamOnly() || !hasGuestOrServices) {
         return changeAccessState();
       }
 

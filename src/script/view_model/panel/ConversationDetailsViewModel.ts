@@ -62,6 +62,7 @@ export class ConversationDetailsViewModel extends BasePanelViewModel {
   isActivatedAccount: ko.PureComputed<boolean>;
   isTeam: ko.PureComputed<boolean>;
   isTeamOnly: ko.PureComputed<boolean>;
+  isServicesRoom: ko.PureComputed<boolean>;
   serviceParticipants: ko.ObservableArray<ServiceEntity>;
   userParticipants: ko.ObservableArray<User>;
   showAllUsersCount: ko.Observable<number>;
@@ -88,6 +89,7 @@ export class ConversationDetailsViewModel extends BasePanelViewModel {
   participantsUserText: ko.PureComputed<string>;
   participantsServiceText: ko.PureComputed<string>;
   guestOptionsText: ko.PureComputed<string>;
+  servicesOptionsText: ko.PureComputed<string>;
   notificationStatusText: ko.PureComputed<string>;
   timedMessagesText: ko.PureComputed<string>;
   addPeopleTooltip: ko.PureComputed<string>;
@@ -123,7 +125,7 @@ export class ConversationDetailsViewModel extends BasePanelViewModel {
     this.isTeam = this.teamState.isTeam;
 
     this.isTeamOnly = ko.pureComputed(() => this.activeConversation()?.isTeamOnly());
-
+    this.isServicesRoom = ko.pureComputed(() => this.activeConversation()?.isServicesRoom());
     this.serviceParticipants = ko.observableArray();
     this.userParticipants = ko.observableArray();
     this.showAllUsersCount = ko.observable(0);
@@ -256,6 +258,10 @@ export class ConversationDetailsViewModel extends BasePanelViewModel {
 
     this.guestOptionsText = ko.pureComputed(() => {
       return this.isTeamOnly() ? t('conversationDetailsGuestsOff') : t('conversationDetailsGuestsOn');
+    });
+
+    this.servicesOptionsText = ko.pureComputed(() => {
+      return this.isServicesRoom() ? t('conversationDetailsGuestsOff') : t('conversationDetailsGuestsOn');
     });
 
     this.notificationStatusText = ko.pureComputed(() => {

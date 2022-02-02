@@ -183,17 +183,20 @@ export class GroupCreationViewModel {
         ? ACCESS_STATE.TEAM.SERVICES
         : this.isGuestRoom() && !this.isServicesRoom()
         ? ACCESS_STATE.TEAM.TEAM_ONLY
+        : !this.isGuestRoom() && !this.isServicesRoom()
+        ? ACCESS_STATE.TEAM.GUEST_ROOM
         : ACCESS_STATE.TEAM.GUESTS_SERVICES;
-
     this.accessState(accessState);
   };
 
   readonly clickOnToggleServicesMode = (): void => {
     const accessState =
       this.isGuestRoom() && this.isServicesRoom()
-        ? ACCESS_STATE.TEAM.TEAM_ONLY
-        : !this.isGuestRoom() && this.isServicesRoom()
         ? ACCESS_STATE.TEAM.GUEST_ROOM
+        : !this.isGuestRoom() && this.isServicesRoom()
+        ? ACCESS_STATE.TEAM.TEAM_ONLY
+        : !this.isGuestRoom() && !this.isServicesRoom()
+        ? ACCESS_STATE.TEAM.SERVICES
         : ACCESS_STATE.TEAM.GUESTS_SERVICES;
 
     this.accessState(accessState);
