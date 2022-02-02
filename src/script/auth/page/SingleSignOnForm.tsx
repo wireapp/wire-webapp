@@ -204,7 +204,6 @@ const SingleSignOnForm = ({
         history.push(ROUTE.HISTORY_INFO);
       }
     } catch (error) {
-      console.info('bardia error', error);
       setIsLoading(false);
       switch (error.label) {
         case BackendError.LABEL.TOO_MANY_CLIENTS: {
