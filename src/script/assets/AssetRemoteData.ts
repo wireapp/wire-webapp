@@ -19,17 +19,13 @@
 
 import ko from 'knockout';
 
-export type AssetUrlData = AssetUrlDataVersion1 | AssetUrlDataVersion2 | AssetUrlDataVersion3 | AssetUrlDataVersion4;
+export type AssetUrlData = AssetUrlDataVersion1 | AssetUrlDataVersion2 | AssetUrlDataVersion3;
 
 export interface AssetUrlDataVersion3 {
   assetKey: string;
   assetToken: string;
   forceCaching: boolean;
   version: 3;
-}
-export interface AssetUrlDataVersion4 extends Omit<AssetUrlDataVersion3, 'version'> {
-  assetDomain: string;
-  version: 4;
 }
 
 export interface AssetUrlDataVersion2 {
@@ -49,37 +45,18 @@ export interface AssetUrlDataVersion1 {
 export class AssetRemoteData {
   public cancelDownload: () => void;
   public readonly downloadProgress: ko.Observable<number>;
+  public readonly identifier?: string;
+  public readonly otrKey?: Uint8Array;
+  public readonly sha256?: Uint8Array;
+  public readonly urlData?: AssetUrlData;
 
-  constructor(
-    public readonly identifier: string,
-    public readonly urlData: AssetUrlData,
-    public readonly otrKey?: Uint8Array,
-    public readonly sha256?: Uint8Array,
-  ) {
-    this.downloadProgress = ko.observable(0);
+  constructor(identifier: string, urlData: AssetUrlData, otrKey?: Uint8Array, sha256Checksum?: Uint8Array) {
+    this.identifier = identifier;
+    this.otrKey = otrKey;
+    this.sha256 = sha256Checksum;
+    this.urlData = urlData;
+    this.downloadProgress = ko.observable();
     this.cancelDownload = () => {};
-  }
-
-  static v4(
-    assetKey: string,
-    assetDomain: string,
-    otrKey?: Uint8Array,
-    sha256?: Uint8Array,
-    assetToken?: string,
-    forceCaching: boolean = false,
-  ) {
-    return new AssetRemoteData(
-      assetKey,
-      {
-        assetDomain,
-        assetKey,
-        assetToken,
-        forceCaching,
-        version: 4,
-      },
-      otrKey,
-      sha256,
-    );
   }
 
   static v3(
@@ -88,7 +65,7 @@ export class AssetRemoteData {
     sha256?: Uint8Array,
     assetToken?: string,
     forceCaching: boolean = false,
-  ) {
+  ): AssetRemoteData {
     return new AssetRemoteData(
       assetKey,
       {
@@ -108,7 +85,7 @@ export class AssetRemoteData {
     otrKey: Uint8Array,
     sha256: Uint8Array,
     forceCaching: boolean = false,
-  ) {
+  ): AssetRemoteData {
     return new AssetRemoteData(
       `${conversationId}${assetId}`,
       {
@@ -122,7 +99,7 @@ export class AssetRemoteData {
     );
   }
 
-  static v1(conversationId: string, assetId: string, forceCaching: boolean = false) {
+  static v1(conversationId: string, assetId: string, forceCaching: boolean = false): AssetRemoteData {
     return new AssetRemoteData(`${conversationId}${assetId}`, {
       assetId,
       conversationId,

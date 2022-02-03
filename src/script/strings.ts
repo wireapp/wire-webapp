@@ -1,4 +1,3 @@
-import {BackendClientError} from './error/BackendClientError';
 /*
  * Wire
  * Copyright (C) 2018 Wire Swiss GmbH
@@ -318,10 +317,6 @@ export const acceptNewsModalStrings = defineMessages({
 });
 
 export const unsupportedStrings = defineMessages({
-  desktopOnlyMessage: {
-    defaultMessage: 'Please use {brandName} on your desktop app instead.',
-    id: 'unsupported.desktopOnlyMessage',
-  },
   headlineBrowser: {
     defaultMessage: 'This browser is not supported.',
     id: 'unsupported.headlineBrowser',
@@ -461,11 +456,6 @@ export const errorHandlerStrings = defineMessages({
   [BackendError.LABEL.BLACKLISTED_PHONE]: {
     defaultMessage: 'This phone number is not allowed',
     id: 'BackendError.LABEL.BLACKLISTED_PHONE',
-  },
-  [BackendClientError.LABEL.DOMAIN_BLOCKED_FOR_REGISTRATION]: {
-    defaultMessage:
-      'You can’t create this account as your email domain is intentionally blocked. Please ask your team admin to invite you via email.',
-    id: 'BackendErrorLabel.DOMAIN_BLOCKED_FOR_REGISTRATION',
   },
   [BackendError.LABEL.INVALID_CODE]: {
     defaultMessage: 'Invalid code, or maximum attempts exceeded. Please retry, or request another code.',

@@ -21,7 +21,7 @@ import React from 'react';
 import Icon from 'Components/Icon';
 import {CallMessage as CallMessageEntity} from '../../entity/message/CallMessage';
 
-import {registerReactComponent, useKoSubscribableChildren} from 'Util/ComponentUtil';
+import {registerReactComponent, useKoSubscribable} from 'Util/ComponentUtil';
 import MessageTime from './MessageTime';
 
 export interface CallMessageProps {
@@ -29,11 +29,9 @@ export interface CallMessageProps {
 }
 
 const CallMessage: React.FC<CallMessageProps> = ({message}) => {
-  const {caption, unsafeSenderName, timestamp} = useKoSubscribableChildren(message, [
-    'caption',
-    'unsafeSenderName',
-    'timestamp',
-  ]);
+  const unsafeSenderName = useKoSubscribable(message.unsafeSenderName);
+  const caption = useKoSubscribable(message.caption);
+  const timestamp = useKoSubscribable(message.timestamp);
 
   const isCompleted = message.wasCompleted();
 

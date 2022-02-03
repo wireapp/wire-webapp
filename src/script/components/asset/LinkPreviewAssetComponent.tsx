@@ -23,13 +23,14 @@ import cx from 'classnames';
 import {safeWindowOpen} from 'Util/SanitizationUtil';
 import {cleanURL} from 'Util/UrlUtil';
 import {isTweetUrl} from 'Util/ValidationUtil';
-import {registerReactComponent, useKoSubscribableChildren} from 'Util/ComponentUtil';
+import {registerReactComponent, useKoSubscribable} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 
 import Image from '../Image';
 import AssetHeader from './AssetHeader';
 import type {ContentMessage} from '../../entity/message/ContentMessage';
 import type {Text} from '../../entity/message/Text';
+import {LinkPreviewMetaDataType} from '../../links/LinkPreviewMetaDataType';
 
 export interface LinkPreviewAssetProps {
   /** Does the asset have a visible header? */
@@ -38,15 +39,13 @@ export interface LinkPreviewAssetProps {
 }
 
 const LinkPreviewAssetComponent: React.FC<LinkPreviewAssetProps> = ({header = false, message}) => {
-  const {
-    previews: [preview],
-  } = useKoSubscribableChildren(message.getFirstAsset() as Text, ['previews']);
+  const [preview] = (message.getFirstAsset() as Text).previews();
 
-  const isTypeTweet = !!preview?.tweet;
+  const isTypeTweet = preview?.meta_data_type === LinkPreviewMetaDataType.TWEET;
   const isTweet = isTypeTweet && isTweetUrl(preview?.url);
-  const author = isTweet ? preview.tweet?.author?.substring(0, 20) : '';
-  const previewImage = preview?.image;
-  const {isObfuscated} = useKoSubscribableChildren(message, ['isObfuscated']);
+  const author = isTweet ? preview?.meta_data?.author?.substring(0, 20) : '';
+  const previewImage = useKoSubscribable(preview?.image_resource);
+  const isObfuscated = useKoSubscribable(message.isObfuscated);
 
   const onClick = () => {
     if (!message.isExpired()) {

@@ -35,6 +35,12 @@ import {MediaType} from './MediaType';
 import {NoAudioInputError} from '../error/NoAudioInputError';
 import Warnings from '../view_model/WarningsContainer';
 
+declare global {
+  interface MediaDevices {
+    getDisplayMedia: any;
+  }
+}
+
 export class MediaStreamHandler {
   static get CONFIG() {
     return {PERMISSION_HINT_DELAY: 200};
@@ -116,7 +122,7 @@ export class MediaStreamHandler {
     return shouldCheckPermissions ? checkPermissionStates(permissionTypes) : true;
   }
 
-  releaseTracksFromStream(mediaStream: MediaStream, mediaType?: MediaType): void {
+  releaseTracksFromStream(mediaStream: MediaStream, mediaType: MediaType): void {
     const mediaStreamTracks = this.getMediaTracks(mediaStream, mediaType);
 
     mediaStreamTracks.forEach((mediaStreamTrack: MediaStreamTrack) => {

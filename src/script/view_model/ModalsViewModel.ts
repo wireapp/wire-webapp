@@ -29,7 +29,7 @@ import {formatLocale} from 'Util/TimeUtil';
 import {onEscKey, offEscKey, isEnterKey, isSpaceKey} from 'Util/KeyboardUtil';
 
 import {Config} from '../Config';
-import {ClientNotificationData} from '../notification/PreferenceNotificationRepository';
+import type {ClientEntity} from '../client/ClientEntity';
 
 interface Content {
   checkboxLabel: string;
@@ -63,7 +63,7 @@ export interface ModalOptions {
   close?: Function;
   closeOnConfirm?: boolean;
   /** Content needed for visualization on modal */
-  data?: ClientNotificationData[] | boolean;
+  data?: ClientEntity[] | boolean;
   hideSecondary?: boolean;
   /** Set to `true` to disable autoclose behavior */
   preventClose?: boolean;
@@ -219,7 +219,7 @@ export class ModalsViewModel {
         content.primaryAction = {...primaryAction, text: t('modalAcknowledgeAction')};
         content.secondaryAction = {...secondaryAction, text: t('modalAccountNewDevicesSecondary')};
         content.messageText = t('modalAccountNewDevicesMessage');
-        const deviceList = (data as ClientNotificationData[])
+        const deviceList = (data as unknown as ClientEntity[])
           .map(device => {
             const deviceTime = formatLocale(device.time || new Date(), 'PP, p');
             const deviceModel = `${t('modalAccountNewDevicesFrom')} ${escape(device.model)}`;

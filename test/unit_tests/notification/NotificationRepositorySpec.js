@@ -338,7 +338,9 @@ describe('NotificationRepository', () => {
     });
 
     it('filters content and ping messages when user is "busy"', () => {
-      spyOn(testFactory.notification_repository['selfUser'](), 'availability').and.returnValue(Availability.Type.BUSY);
+      spyOn(testFactory.notification_repository, 'selfUser').and.callFake(() => {
+        return {...testFactory.user_repository['userState'].self(), availability: () => Availability.Type.BUSY};
+      });
       testFactory.notification_repository.permissionState(PermissionStatusState.GRANTED);
 
       const ignoredMessages = Object.entries(allMessageTypes)
@@ -355,7 +357,9 @@ describe('NotificationRepository', () => {
     });
 
     it('allows mentions, calls and composite when user is "busy"', () => {
-      spyOn(testFactory.notification_repository['selfUser'](), 'availability').and.returnValue(Availability.Type.BUSY);
+      spyOn(testFactory.notification_repository, 'selfUser').and.callFake(() => {
+        return {...testFactory.user_repository['userState'].self(), availability: () => Availability.Type.BUSY};
+      });
       testFactory.notification_repository.permissionState(PermissionStatusState.GRANTED);
 
       const notifiedMessages = Object.entries(allMessageTypes)
@@ -750,14 +754,14 @@ describe('NotificationRepository', () => {
     let conversationEntity;
     let messageEntity;
 
-    const userId = {domain: '', id: createRandomUuid()};
+    const userId = createRandomUuid();
     const shouldNotifyInConversation = NotificationRepository.shouldNotifyInConversation;
 
     function generateTextAsset(selfMentioned = false) {
-      const mentionId = selfMentioned ? userId.id : createRandomUuid();
+      const mentionId = selfMentioned ? userId : createRandomUuid();
 
       const textEntity = new Text(createRandomUuid(), '@Gregor can you take a look?');
-      const mentionEntity = new MentionEntity(0, 7, mentionId, userId.domain);
+      const mentionEntity = new MentionEntity(0, 7, mentionId);
       textEntity.mentions([mentionEntity]);
 
       return textEntity;
@@ -810,7 +814,7 @@ describe('NotificationRepository', () => {
     it('returns the correct value for self replies', () => {
       messageEntity.addAsset(generateTextAsset());
 
-      const quoteEntity = new QuoteEntity({messageId: createRandomUuid(), userId: userId.id});
+      const quoteEntity = new QuoteEntity({messageId: createRandomUuid(), userId});
       messageEntity.quote(quoteEntity);
 
       conversationEntity.mutedState(NOTIFICATION_STATE.MENTIONS_AND_REPLIES);

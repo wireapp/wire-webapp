@@ -25,7 +25,7 @@ import Icon from 'Components/Icon';
 import React, {useEffect, useMemo, useState} from 'react';
 import {TeamState} from '../../team/TeamState';
 import {container} from 'tsyringe';
-import {useKoSubscribableChildren} from 'Util/ComponentUtil';
+import {useKoSubscribable, useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 import type {Call} from '../../calling/Call';
 import type {Participant} from '../../calling/Participant';
@@ -146,8 +146,9 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
   const {videoInput: currentCameraDevice} = useKoSubscribableChildren(mediaDevicesHandler.currentDeviceId, [
     DeviceTypes.VIDEO_INPUT,
   ]);
+  const switchCameraSource = (call: Call, deviceId: string) => switchCameraInput(call, deviceId);
   const minimize = () => multitasking.isMinimized(true);
-  const {videoInput} = useKoSubscribableChildren(mediaDevicesHandler.availableDevices, [DeviceTypes.VIDEO_INPUT]);
+  const videoInput = useKoSubscribable(mediaDevicesHandler.availableDevices.videoInput);
   const showToggleVideo =
     isVideoCallingEnabled &&
     (call.initialType === CALL_TYPE.VIDEO ||
@@ -263,7 +264,7 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
                     `}
                     currentDevice={currentCameraDevice}
                     devices={availableCameras}
-                    onChooseDevice={deviceId => switchCameraInput(call, deviceId)}
+                    onChooseDevice={deviceId => switchCameraSource(call, deviceId)}
                   />
                 ) : (
                   <div className="video-controls__button__label">{t('videoCallOverlayCamera')}</div>

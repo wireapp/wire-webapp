@@ -216,14 +216,6 @@ export class MediaDevicesHandler {
    * @returns Resolves with all MediaDevices when the list has been updated
    */
   refreshMediaDevices(): Promise<MediaDeviceInfo[]> {
-    const setDevices = (type: DeviceTypes, devices: MediaDeviceInfo[]): void => {
-      this.availableDevices[type](devices);
-      const currentId = this.currentDeviceId[type];
-      if (!devices.some(d => d.deviceId === currentId())) {
-        currentId(devices[0]?.deviceId);
-      }
-    };
-
     return navigator.mediaDevices
       .enumerateDevices()
       .catch(error => {
@@ -236,9 +228,9 @@ export class MediaDevicesHandler {
         if (mediaDevices) {
           const filteredDevices = this.filterMediaDevices(mediaDevices);
 
-          setDevices(DeviceTypes.AUDIO_INPUT, filteredDevices.microphones);
-          setDevices(DeviceTypes.AUDIO_OUTPUT, filteredDevices.speakers);
-          setDevices(DeviceTypes.VIDEO_INPUT, filteredDevices.cameras);
+          this.availableDevices.audioInput.push(...filteredDevices.microphones);
+          this.availableDevices.audioOutput.push(...filteredDevices.speakers);
+          this.availableDevices.videoInput.push(...filteredDevices.cameras);
 
           this.logger.info('Updated MediaDevice list', mediaDevices);
           return mediaDevices;

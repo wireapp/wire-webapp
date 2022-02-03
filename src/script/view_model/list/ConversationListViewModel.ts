@@ -54,7 +54,6 @@ import type {PreferenceNotificationRepository} from '../../notification/Preferen
 import type {PropertiesRepository} from '../../properties/PropertiesRepository';
 import type {User} from '../../entity/User';
 import {createNavigate} from '../../router/routerBindings';
-import {QualifiedId} from '@wireapp/api-client/src/user';
 
 export class ConversationListViewModel {
   readonly startTooltip: string;
@@ -254,12 +253,12 @@ export class ConversationListViewModel {
     this.contentViewModel.switchContent(ContentViewModel.STATE.CONNECTION_REQUESTS);
   };
 
-  readonly hasJoinableCall = (conversationId: QualifiedId): boolean => {
+  readonly hasJoinableCall = (conversationId: string): boolean => {
     const call = this.callingRepository.findCall(conversationId);
     if (!call) {
       return false;
     }
-    const conversation = this.conversationState.findConversation(conversationId);
+    const conversation = this.conversationState.findConversation({domain: '', id: conversationId});
     return (
       !conversation.removed_from_conversation() &&
       call.state() === CALL_STATE.INCOMING &&

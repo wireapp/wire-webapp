@@ -20,7 +20,7 @@
 import React, {useEffect, useState} from 'react';
 import {useFadingScrollbar} from '../../ui/fadingScrollbar';
 import {container} from 'tsyringe';
-import {registerReactComponent, useKoSubscribableChildren} from 'Util/ComponentUtil';
+import {registerReactComponent, useKoSubscribable, useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 import {formatDuration} from 'Util/TimeUtil';
 import useEffectRef from 'Util/useEffectRef';
@@ -49,7 +49,7 @@ const TimedMessagesPanel: React.FC<TimedMessagesPanelProps> = ({onClose, onGoBac
   const [scrollbarRef, setScrollbarRef] = useEffectRef<HTMLDivElement>();
   useFadingScrollbar(scrollbarRef);
 
-  const {activeConversation} = useKoSubscribableChildren(conversationState, ['activeConversation']);
+  const activeConversation = useKoSubscribable(conversationState.activeConversation);
   const {globalMessageTimer} = useKoSubscribableChildren(activeConversation, ['globalMessageTimer']);
 
   useEffect(() => {

@@ -345,6 +345,7 @@ export class ClientRepository {
    * @param updateClients Automatically update the clients
    * @returns Resolves with an array of client entities
    */
+  // TODO(Federation): A function that receives "QualifiedId" objects should always return a qualified client map
   async getClientsByQualifiedUserIds(
     userIds: QualifiedId[],
     updateClients: boolean,
@@ -356,11 +357,11 @@ export class ClientRepository {
       Object.entries(qualifiedUserClientsMap).map(([domain, userClientMap]) =>
         Promise.all(
           Object.entries(userClientMap).map(async ([userId, clients]) => {
-            const isSelfClient = matchQualifiedIds({domain, id: userId}, this.selfUser().qualifiedId);
             clientEntityMap[domain] ||= {};
             clientEntityMap[domain][userId] = updateClients
               ? await this.updateClientsOfUserById({domain, id: userId}, clients, true)
-              : ClientMapper.mapClients(clients, isSelfClient, domain);
+              : // TODO(Federation): Check if `isSelfClient` is needed here
+                ClientMapper.mapClients(clients, false, domain);
           }),
         ),
       ),
@@ -374,10 +375,10 @@ export class ClientRepository {
     await Promise.all(
       userIds.map(async userId => {
         const clients = await this.clientService.getClientsByUserId(userId.id);
-        const isSelfClient = userId.id === this.selfUser().id;
         clientEntityMap[userId.id] = updateClients
           ? await this.updateClientsOfUserById(userId, clients, true)
-          : ClientMapper.mapClients(clients, isSelfClient, null);
+          : // TODO(Federation): Check if `isSelfClient` is needed here
+            ClientMapper.mapClients(clients, false, null);
       }),
     );
 

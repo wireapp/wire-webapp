@@ -17,7 +17,8 @@
  *
  */
 
-import {ProgressCallback} from '@wireapp/api-client/src/http/';
+import {ProgressCallback, RequestCancelable} from '@wireapp/api-client/src/http/';
+import {AssetOptions, AssetUploadData} from '@wireapp/api-client/src/asset/';
 import {singleton, container} from 'tsyringe';
 import {legacyAsset, assetV3, isValidApiPath} from 'Util/ValidationUtil';
 
@@ -60,6 +61,14 @@ export class AssetService {
     const assetTokenParam = assetToken ? `&asset_token=${encodeURIComponent(assetToken)}` : '';
     const cachingParam = forceCaching ? '&forceCaching=true' : '';
     return `${url}?access_token=${this.apiClient['accessTokenStore'].accessToken?.access_token}${assetTokenParam}${cachingParam}`;
+  }
+
+  uploadFile(
+    asset: Uint8Array,
+    options: AssetOptions,
+    onProgress?: ProgressCallback,
+  ): Promise<RequestCancelable<AssetUploadData>> {
+    return this.apiClient.asset.api.postAsset(asset, options, onProgress);
   }
 
   async downloadAssetV1(

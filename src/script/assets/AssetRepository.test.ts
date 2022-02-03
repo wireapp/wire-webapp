@@ -28,19 +28,14 @@ import {AssetRepository, AssetUploadOptions} from './AssetRepository';
 import {EventMapper} from '../conversation/EventMapper';
 import {AssetService} from './AssetService';
 import {APIClient} from '../service/APIClientSingleton';
-import {Core} from '../service/CoreSingleton';
-import {container} from 'tsyringe';
 
 describe('AssetRepository', () => {
   let assetRepository: AssetRepository;
   const messageId = createRandomUuid();
   const file = new Blob();
   const options = {} as AssetUploadOptions;
-  let core: Core;
 
   beforeEach(() => {
-    core = container.resolve(Core);
-    core.initServices({} as any);
     const mockedAPIClient = {
       asset: {
         api: {
@@ -53,7 +48,7 @@ describe('AssetRepository', () => {
         },
       },
     } as unknown as APIClient;
-    assetRepository = new AssetRepository(new AssetService(mockedAPIClient), core);
+    assetRepository = new AssetRepository(new AssetService(mockedAPIClient));
   });
 
   describe('load unencrypted v1 asset', () => {
@@ -191,24 +186,46 @@ describe('AssetRepository', () => {
     await expect(assetRepository.generateAssetUrl(asset_et.resource())).rejects.toThrow(ValidationUtilError);
   });
 
-  it('keeps track of current uploads and removes it once finished', async () => {
-    spyOn(core.service!.asset, 'uploadAsset').and.callFake(() => {
-      expect(assetRepository.getNumberOfOngoingUploads()).toBe(1);
-      return Promise.resolve({
-        cancel: null,
-        response: Promise.resolve({
-          key: '',
-          token: '',
-        } as AssetUploadData),
-      });
-    });
+  it('keeps track of current uploads', async () => {
+    const assetServiceSpy = {
+      uploadFile: jest.fn().mockImplementation(() => {
+        expect(assetRepo.getNumberOfOngoingUploads()).toBe(1);
 
-    await assetRepository.uploadFile(file, messageId, options);
-    expect(assetRepository.getNumberOfOngoingUploads()).toBe(0);
+        return Promise.resolve({
+          cancel: null,
+          response: Promise.resolve({
+            key: '',
+            token: '',
+          } as AssetUploadData),
+        });
+      }),
+    } as unknown as AssetService;
+    const assetRepo = new AssetRepository(assetServiceSpy);
+
+    await assetRepo.uploadFile(messageId, file, options, false);
   });
 
-  it('removes cancelled uploads and cancels upload', () => {
-    spyOn(core.service!.asset, 'uploadAsset').and.callFake(() => {
+  it('removes finished uploads', async () => {
+    const assetServiceSpy: Partial<AssetService> = {
+      uploadFile: jest.fn().mockImplementation(() => {
+        expect(assetRepo.getNumberOfOngoingUploads()).toBe(1);
+        return Promise.resolve({
+          cancel: () => {},
+          response: Promise.resolve({
+            key: '3-',
+            token: 'token',
+          } as AssetUploadData),
+        });
+      }),
+    };
+    const assetRepo = new AssetRepository(assetServiceSpy as unknown as AssetService);
+
+    await assetRepo.uploadFile(messageId, file, options, false);
+    expect(assetRepo.getNumberOfOngoingUploads()).toBe(0);
+  });
+
+  it('removes cancelled uploads and cancels upload', async () => {
+    spyOn(assetRepository['assetService'], 'uploadFile').and.callFake(() => {
       expect(assetRepository.getNumberOfOngoingUploads()).toBe(1);
       return Promise.resolve({
         cancel: null,
@@ -219,15 +236,14 @@ describe('AssetRepository', () => {
       });
     });
 
-    const uploadedPromise = assetRepository.uploadFile(file, messageId, options);
+    await assetRepository.uploadFile(messageId, file, options, false);
 
     assetRepository.cancelUpload(messageId);
     expect(assetRepository.getNumberOfOngoingUploads()).toBe(0);
-    return uploadedPromise;
   });
 
   it('updates the upload progress while the file is being uploaded', async () => {
-    spyOn(core.service!.asset, 'uploadAsset').and.callFake((_asset, _options, callback) => {
+    spyOn(assetRepository['assetService'], 'uploadFile').and.callFake((_asset, _options, callback) => {
       const uploadProgress = assetRepository.getUploadProgress(messageId);
 
       callback(0.1);
@@ -238,6 +254,7 @@ describe('AssetRepository', () => {
 
       callback(1);
       expect(uploadProgress()).toBe(100);
+
       return Promise.resolve({
         cancel: null,
         response: Promise.resolve({
@@ -246,6 +263,7 @@ describe('AssetRepository', () => {
         } as AssetUploadData),
       });
     });
-    await assetRepository.uploadFile(file, messageId, options);
+
+    await assetRepository.uploadFile(messageId, file, options, false);
   });
 });

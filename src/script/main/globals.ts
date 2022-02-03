@@ -39,7 +39,7 @@ import 'Components/toggle/GuestModeToggle';
 import 'Components/icons';
 import 'Components/Image';
 import 'Components/toggle/InfoToggle';
-import '../page/preferences/avPreferences/InputLevel';
+import '../page/preferences/InputLevel';
 import 'Components/calling/FullscreenVideoCall';
 import 'Components/list/ConversationListCallingCell';
 import 'Components/list/ConversationListCell';
@@ -101,7 +101,6 @@ declare global {
           ENABLE_ACCOUNT_REGISTRATION_ACCEPT_TERMS_AND_PRIVACY_POLICY: boolean;
           ENABLE_DEBUG: boolean;
           ENABLE_DOMAIN_DISCOVERY: boolean;
-          ENABLE_ENFORCE_DESKTOP_APPLICATION_ONLY: boolean;
           ENABLE_FEDERATION: boolean;
           ENABLE_MEDIA_EMBEDS: boolean;
           ENABLE_PHONE_LOGIN: boolean;

@@ -24,7 +24,6 @@ import {escape} from 'underscore';
 
 import {replaceInRange} from './StringUtil';
 
-import {QualifiedId} from '@wireapp/api-client/src/user';
 import type {MentionEntity} from '../message/MentionEntity';
 
 interface MentionText {
@@ -95,7 +94,7 @@ function modifyMarkdownLinks(markdown: string): string {
 
 markdownit.normalizeLinkText = text => text;
 
-export const renderMessage = (message: string, selfId: QualifiedId | null, mentionEntities: MentionEntity[] = []) => {
+export const renderMessage = (message: string, selfId: string, mentionEntities: MentionEntity[] = []) => {
   const createMentionHash = (mention: MentionEntity) => `@@${window.btoa(JSON.stringify(mention)).replace(/=/g, '')}`;
   const renderMention = (mentionData: MentionText) => {
     const elementClasses = mentionData.isSelfMentioned ? ' self-mention' : '';
@@ -122,7 +121,7 @@ export const renderMessage = (message: string, selfId: QualifiedId | null, menti
       const mentionKey = createMentionHash(mention);
       mentionTexts[mentionKey] = {
         domain: mention.domain,
-        isSelfMentioned: !!selfId && mention.targetsUser(selfId),
+        isSelfMentioned: mention.targetsUser(selfId),
         text: mentionText,
         userId: mention.userId,
       };
@@ -220,7 +219,7 @@ export const renderMessage = (message: string, selfId: QualifiedId | null, menti
 };
 
 export const getRenderedTextContent = (text: string): string => {
-  const renderedMessage = renderMessage(text, {domain: '', id: ''});
+  const renderedMessage = renderMessage(text, '');
   const messageWithLinebreaks = renderedMessage.replace(/<br>/g, '\n');
   const strippedMessage = messageWithLinebreaks.replace(/<.+?>/g, '');
   return markdownit.utils.unescapeAll(strippedMessage);

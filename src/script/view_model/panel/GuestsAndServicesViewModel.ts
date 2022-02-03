@@ -20,7 +20,6 @@
 import ko from 'knockout';
 import {amplify} from 'amplify';
 import {WebAppEvents} from '@wireapp/webapp-events';
-import {container} from 'tsyringe';
 
 import {Logger, getLogger} from 'Util/Logger';
 import {copyText} from 'Util/ClipboardUtil';
@@ -32,11 +31,8 @@ import {ModalsViewModel} from '../ModalsViewModel';
 import {ACCESS_STATE} from '../../conversation/AccessState';
 import type {ConversationStateHandler} from '../../conversation/ConversationStateHandler';
 import type {Conversation} from '../../entity/Conversation';
-import {TeamState} from '../../team/TeamState';
 
 export class GuestsAndServicesViewModel extends BasePanelViewModel {
-  private readonly teamState: TeamState;
-
   stateHandler: ConversationStateHandler;
   logger: Logger;
   isLinkCopied: ko.Observable<boolean>;
@@ -45,7 +41,6 @@ export class GuestsAndServicesViewModel extends BasePanelViewModel {
   isTeamOnly: ko.PureComputed<boolean>;
   hasAccessCode: ko.PureComputed<boolean>;
   isGuestEnabled: ko.PureComputed<boolean>;
-  isGuestLinkEnabled: ko.PureComputed<boolean>;
   showLinkOptions: ko.PureComputed<boolean>;
   brandName: string;
 
@@ -57,7 +52,6 @@ export class GuestsAndServicesViewModel extends BasePanelViewModel {
 
   constructor(params: PanelViewModelProps) {
     super(params);
-    this.teamState = container.resolve(TeamState);
 
     this.stateHandler = params.repositories.conversation.stateHandler;
 
@@ -70,7 +64,6 @@ export class GuestsAndServicesViewModel extends BasePanelViewModel {
     this.isTeamOnly = ko.pureComputed(() => this.activeConversation()?.isTeamOnly());
     this.hasAccessCode = ko.pureComputed(() => (this.isGuestRoom() ? !!this.activeConversation().accessCode() : false));
     this.isGuestEnabled = ko.pureComputed(() => !this.isTeamOnly());
-    this.isGuestLinkEnabled = ko.pureComputed(() => this.teamState.isGuestLinkEnabled());
     this.showLinkOptions = ko.pureComputed(() => this.isGuestEnabled());
 
     this.activeConversation.subscribe(conversationEntity => this._updateCode(this.isVisible(), conversationEntity));
@@ -153,11 +146,7 @@ export class GuestsAndServicesViewModel extends BasePanelViewModel {
   };
 
   async _updateCode(isVisible: boolean, conversationEntity: Conversation): Promise<void> {
-    const updateCode =
-      conversationEntity &&
-      conversationEntity.isGuestRoom() &&
-      !conversationEntity.accessCode() &&
-      this.isGuestLinkEnabled();
+    const updateCode = conversationEntity && conversationEntity.isGuestRoom() && !conversationEntity.accessCode();
     if (isVisible && updateCode) {
       this.requestOngoing(true);
       await this.stateHandler.getAccessCode(conversationEntity);

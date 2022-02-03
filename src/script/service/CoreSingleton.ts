@@ -19,12 +19,11 @@
 
 import {Account} from '@wireapp/core';
 import {container, singleton} from 'tsyringe';
-import {Config} from '../Config';
 import {APIClient} from './APIClientSingleton';
 
 @singleton()
 export class Core extends Account {
   constructor(apiClient = container.resolve(APIClient)) {
-    super(apiClient, undefined, {useQualifiedIds: Config.getConfig().FEATURE.ENABLE_FEDERATION});
+    super(apiClient);
   }
 }

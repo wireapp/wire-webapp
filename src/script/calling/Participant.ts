@@ -21,8 +21,6 @@ import {VIDEO_STATE} from '@wireapp/avs';
 import ko from 'knockout';
 
 import {User} from '../entity/User';
-import {matchQualifiedIds} from 'Util/QualifiedId';
-import {QualifiedId} from '@wireapp/api-client/src/user';
 
 export type UserId = string;
 export type ClientId = string;
@@ -65,8 +63,8 @@ export class Participant {
     this.isSendingVideo = ko.observable(false);
   }
 
-  readonly doesMatchIds = (userId: QualifiedId, clientId: ClientId): boolean =>
-    matchQualifiedIds(userId, this.user.qualifiedId) && clientId === this.clientId;
+  readonly doesMatchIds = (userId: UserId, clientId: ClientId): boolean =>
+    userId === this.user.id && clientId === this.clientId;
 
   setAudioStream(audioStream: MediaStream, stopTracks: boolean): void {
     this.releaseStream(this.audioStream(), stopTracks);

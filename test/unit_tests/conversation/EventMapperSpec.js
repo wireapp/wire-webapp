@@ -228,8 +228,8 @@ describe('Event Mapper', () => {
       };
 
       return event_mapper.mapJsonEvent(event, conversation_et).then(messageEntity => {
-        expect(messageEntity.getFirstAsset().width).toBe(`${event.data.info.width}px`);
-        expect(messageEntity.getFirstAsset().height).toBe(`${event.data.info.height}px`);
+        expect(messageEntity.getFirstAsset().width).toBe(event.data.info.width);
+        expect(messageEntity.getFirstAsset().height).toBe(event.data.info.height);
         expect(messageEntity.getFirstAsset().file_size).toBe(event.data.content_length);
         expect(messageEntity.getFirstAsset().file_type).toBe(event.data.content_type);
         expect(messageEntity.getFirstAsset().type).toBe(AssetType.IMAGE);

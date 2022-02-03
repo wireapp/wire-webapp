@@ -24,7 +24,6 @@ import {Runtime} from '@wireapp/commons';
 import {hasURLParameter} from '../../util/urlUtil';
 import type {ThunkAction} from '../reducer';
 import {RuntimeActionCreator} from './creator/';
-import * as RuntimeSelector from '../../module/selector/RuntimeSelector';
 
 export class RuntimeAction {
   checkSupportedBrowser = (): ThunkAction<void> => {
@@ -34,10 +33,7 @@ export class RuntimeAction {
       };
       const pwaAware = hasURLParameter(QUERY_KEY.PWA_AWARE);
       const isPwaEnabled = getConfig().URL.MOBILE_BASE && pwaAware && isPwaSupportedBrowser();
-      if (
-        (!RuntimeSelector.hasToUseDesktopApplication(getState()) && Runtime.isWebappSupportedBrowser()) ||
-        isPwaEnabled
-      ) {
+      if (Runtime.isWebappSupportedBrowser() || isPwaEnabled) {
         dispatch(RuntimeActionCreator.confirmSupportedBrowser());
       }
     };

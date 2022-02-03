@@ -18,9 +18,10 @@
  */
 
 import React, {Fragment} from 'react';
+import ko from 'knockout';
 import cx from 'classnames';
 
-import {registerReactComponent, useKoSubscribableChildren} from 'Util/ComponentUtil';
+import {registerReactComponent, useKoSubscribable} from 'Util/ComponentUtil';
 import Avatar, {AVATAR_SIZE} from 'Components/Avatar';
 import {UserlistMode} from 'Components/userList';
 import {t} from 'Util/LocalizerUtil';
@@ -36,6 +37,7 @@ import {Participant} from '../../calling/Participant';
 import AvailabilityState from 'Components/AvailabilityState';
 import ParticipantMicOnIcon from 'Components/calling/ParticipantMicOnIcon';
 import Icon from 'Components/Icon';
+import {Availability} from '@wireapp/protocol-messaging';
 import useEffectRef from 'Util/useEffectRef';
 
 export interface ParticipantItemProps extends React.HTMLProps<HTMLDivElement> {
@@ -87,43 +89,36 @@ const ParticipantItem: React.FC<ParticipantItemProps> = ({
   const hasUsernameInfo = isUser && !hideInfo && !hasCustomInfo && !isTemporaryGuest;
   const isOthersMode = mode === UserlistMode.OTHERS;
 
-  const {
-    is_verified: isVerified,
-    isDirectGuest,
-    availability,
-    expirationText,
-    name: participantName,
-  } = useKoSubscribableChildren(
-    // We need to make TS believe that this is a User, otherwise it will complain about
-    // the fields in the array that don't exist on ServiceEntity
-    participant as User,
-    participant instanceof User ? ['isDirectGuest', 'is_verified', 'availability', 'expirationText', 'name'] : ['name'],
+  const isFederated = participant instanceof User && participant.isFederated;
+  const isGuest = participant instanceof User && !isFederated && useKoSubscribable(participant.isGuest);
+  const isVerified = useKoSubscribable((participant as User).is_verified ?? ko.observable(false));
+  const availability = useKoSubscribable((participant as User).availability ?? ko.observable<Availability.Type>());
+
+  const participantName = useKoSubscribable(
+    isUser ? (participant as User).name : ko.observable((participant as ServiceEntity).name),
+  );
+  const callParticipantSharesCamera = useKoSubscribable(callParticipant?.sharesCamera ?? ko.observable(false));
+  const callParticipantSharesScreen = useKoSubscribable(callParticipant?.sharesScreen ?? ko.observable(false));
+  const callParticipantIsActivelySpeaking = useKoSubscribable(
+    callParticipant?.isActivelySpeaking ?? ko.observable(false),
   );
 
-  const isFederated = participant instanceof User && participant.isFederated;
+  const callParticipantIsMuted = useKoSubscribable(callParticipant ? callParticipant.isMuted : ko.observable());
 
-  const {sharesCamera, sharesScreen, isActivelySpeaking, isMuted} = useKoSubscribableChildren(callParticipant, [
-    'sharesCamera',
-    'sharesScreen',
-    'isActivelySpeaking',
-    'isMuted',
-  ]);
+  let contentInfo: ko.Observable;
+  if (hasCustomInfo) {
+    contentInfo = ko.observable(customInfo);
+  } else if (hideInfo) {
+    contentInfo = ko.observable('');
+  } else if (isService) {
+    contentInfo = ko.observable((participant as ServiceEntity).summary);
+  } else if (isTemporaryGuest) {
+    contentInfo = (participant as User).expirationText;
+  } else {
+    contentInfo = ko.observable((participant as User).handle);
+  }
 
-  const contentInfoText = (() => {
-    if (hasCustomInfo) {
-      return customInfo;
-    }
-    if (hideInfo) {
-      return '';
-    }
-    if (isService) {
-      return (participant as ServiceEntity).summary;
-    }
-    if (isTemporaryGuest) {
-      return expirationText;
-    }
-    return (participant as User).handle;
-  })();
+  const contentInfoText = useKoSubscribable(contentInfo);
 
   return (
     <div
@@ -131,6 +126,7 @@ const ParticipantItem: React.FC<ParticipantItemProps> = ({
         highlighted,
         'no-interaction': noInteraction,
         'no-underline': noUnderline,
+        'show-arrow': showArrow,
       })}
       onContextMenu={onContextMenu}
     >
@@ -196,7 +192,7 @@ const ParticipantItem: React.FC<ParticipantItemProps> = ({
               )}
             </div>
 
-            {!isOthersMode && isDirectGuest && (
+            {!isOthersMode && isGuest && (
               <span
                 className="guest-icon with-tooltip with-tooltip--external"
                 data-tooltip={t('conversationGuestIndicator')}
@@ -226,19 +222,21 @@ const ParticipantItem: React.FC<ParticipantItemProps> = ({
 
             {callParticipant && (
               <>
-                {sharesScreen && <Icon.Screenshare className="screenshare-icon" data-uie-name="status-screenshare" />}
+                {callParticipantSharesScreen && (
+                  <Icon.Screenshare className="screenshare-icon" data-uie-name="status-screenshare" />
+                )}
 
-                {sharesCamera && <Icon.Camera className="camera-icon" data-uie-name="status-video" />}
+                {callParticipantSharesCamera && <Icon.Camera className="camera-icon" data-uie-name="status-video" />}
 
-                {!isMuted && (
+                {!callParticipantIsMuted && (
                   <ParticipantMicOnIcon
                     className="participant-mic-on-icon"
-                    isActive={isActivelySpeaking}
-                    data-uie-name={isActivelySpeaking ? 'status-active-speaking' : 'status-audio-on'}
+                    isActive={callParticipantIsActivelySpeaking}
+                    data-uie-name={callParticipantIsActivelySpeaking ? 'status-active-speaking' : 'status-audio-on'}
                   />
                 )}
 
-                {isMuted && (
+                {callParticipantIsMuted && (
                   <Icon.MicOff
                     className="mic-off-icon"
                     data-uie-name="status-audio-off"
@@ -254,7 +252,8 @@ const ParticipantItem: React.FC<ParticipantItemProps> = ({
                 data-uie-name="status-selected"
               />
             )}
-            {showArrow && <Icon.Disclose className="disclose-icon" />}
+
+            <Icon.Disclose className="disclose-icon" />
           </>
         )}
       </div>
@@ -266,6 +265,6 @@ export default ParticipantItem;
 
 registerReactComponent<ParticipantItemProps>('participant-item', {
   bindings:
-    'badge, callParticipant, showArrow, highlighted, noInteraction, noUnderline, canSelect, customInfo: ko.unwrap(customInfo), external: ko.unwrap(external), hideInfo, isSelected: ko.unwrap(isSelected), isSelfVerified: ko.unwrap(isSelfVerified), mode, participant, selfInTeam',
+    'badge, callParticipant, showArrow, highlighted, noInteraction, noUnderline, canSelect, customInfo, external: ko.unwrap(external), hideInfo, isSelected: ko.unwrap(isSelected), isSelfVerified: ko.unwrap(isSelfVerified), mode, participant, selfInTeam',
   component: ParticipantItem,
 });
