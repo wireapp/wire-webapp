@@ -22,6 +22,7 @@ import cx from 'classnames';
 
 import {registerReactComponent} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
+import {createRandomUuid} from 'Util/util';
 
 export interface ServicesToggleProps {
   extendedInfo?: string;
@@ -31,6 +32,7 @@ export interface ServicesToggleProps {
 }
 
 const ServicesToggle: React.FC<ServicesToggleProps> = ({extendedInfo, isChecked, isDisabled, setIsChecked}) => {
+  const uuid = React.useMemo(() => createRandomUuid(), []);
   return (
     <>
       <div className="info-toggle__row">
@@ -43,15 +45,15 @@ const ServicesToggle: React.FC<ServicesToggleProps> = ({extendedInfo, isChecked,
           <input
             className="slider-input"
             type="checkbox"
-            name="toggle"
-            id="toggle"
+            name="toggler"
+            id={uuid}
             onChange={(event: React.ChangeEvent<HTMLInputElement>) => setIsChecked(event.target.checked)}
             checked={isChecked}
             data-uie-name="allow-services-input"
           />
           <label
             className="button-label"
-            htmlFor="toggle"
+            htmlFor={uuid}
             data-uie-name="do-allow-services"
             data-uie-value={isChecked ? 'checked' : 'unchecked'}
           />
@@ -69,5 +71,5 @@ export default ServicesToggle;
 registerReactComponent('services-toggle', {
   component: ServicesToggle,
   template:
-    '<div class="services-toggle" data-bind="react: {isChecked: ko.unwrap(isChecked), isDisabled: ko.unwrap(isDisabled), setIsChecked: onToggle, extendedInfo }"></div>',
+    '<div class="services-toggle" data-bind="react: {isChecked: ko.unwrap(isChecked), isDisabled: ko.unwrap(isDisabled), setIsChecked: onToggler, extendedInfo }"></div>',
 });

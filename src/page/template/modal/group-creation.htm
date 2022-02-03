@@ -38,8 +38,8 @@
         <div class="group-creation__error" data-bind="text: nameError, visible: nameError().length" data-uie-name="error-group-name"></div>
         <!-- ko if: isTeam -->
           <div class="modal__info" data-bind="text: t('groupSizeInfo', maxSize)" data-uie-name="status-group-size-info"></div>
-          <guest-mode-toggle class="modal-style" params="isChecked: isGuestRoom, onToggle: clickOnToggleGuestMode, extendedInfo: true"></guest-mode-toggle>
-          <services-toggle class="modal-style" params="isChecked: isServicesRoom, onToggle: clickOnToggleServicesMode, extendedInfo: true"></services-toggle>
+          <guest-mode-toggle class="modal-style" params="isChecked: isGuestEnabled(), onToggle: clickOnToggleGuestMode, extendedInfo: true"></guest-mode-toggle>
+          <services-toggle class="modal-style" params="isChecked: isServicesEnabled(), onToggle: clickOnToggleServicesMode, extendedInfo: true"></services-toggle>
           <info-toggle class="modal-style" params="
             dataUieName: 'read-receipts',
             info: t('readReceiptsToogleInfo'),

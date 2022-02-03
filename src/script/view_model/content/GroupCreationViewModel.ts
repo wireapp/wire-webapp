@@ -50,9 +50,11 @@ export class GroupCreationViewModel {
   participantsInput: ko.Observable<string>;
   accessState: ko.Observable<TEAM>;
   isGuestRoom: ko.PureComputed<boolean>;
+  isGuestEnabled: ko.PureComputed<boolean>;
   isTeamOnly: ko.PureComputed<boolean>;
   isGuestAndServicesRoom: ko.PureComputed<boolean>;
   isServicesRoom: ko.PureComputed<boolean>;
+  isServicesEnabled: ko.PureComputed<boolean>;
   enableReadReceipts: ko.Observable<boolean>;
   contacts: ko.PureComputed<User[]>;
   participantsActionText: ko.PureComputed<string>;
@@ -92,13 +94,18 @@ export class GroupCreationViewModel {
     this.selectedContacts = ko.observableArray([]);
     this.showContacts = ko.observable(false);
     this.participantsInput = ko.observable('');
-    this.accessState = ko.observable(ACCESS_STATE.TEAM.GUEST_ROOM);
+    this.accessState = ko.observable(ACCESS_STATE.TEAM.TEAM_ONLY);
+
     this.isServicesRoom = ko.pureComputed(() => this.accessState() === ACCESS_STATE.TEAM.SERVICES);
     this.isGuestAndServicesRoom = ko.pureComputed(() => this.accessState() === ACCESS_STATE.TEAM.GUESTS_SERVICES);
     this.isGuestRoom = ko.pureComputed(() => this.accessState() === ACCESS_STATE.TEAM.GUEST_ROOM);
     this.isTeamOnly = ko.pureComputed(() => this.accessState() === ACCESS_STATE.TEAM.TEAM_ONLY);
-    this.isGuestRoom.subscribe((isGuestRoom: boolean) => {
-      if (!isGuestRoom) {
+
+    this.isGuestEnabled = ko.pureComputed(() => this.isGuestRoom() || this.isGuestAndServicesRoom());
+    this.isServicesEnabled = ko.pureComputed(() => this.isServicesRoom() || this.isGuestAndServicesRoom());
+
+    this.isGuestEnabled.subscribe((isGuestEnabled: boolean) => {
+      if (!isGuestEnabled) {
         this.selectedContacts.remove((userEntity: User) => !userEntity.isTeamMember());
       }
     });
@@ -111,7 +118,7 @@ export class GroupCreationViewModel {
           return this.userState.connectedUsers();
         }
 
-        if (this.isGuestRoom()) {
+        if (this.isGuestEnabled()) {
           return this.teamState.teamUsers();
         }
 
@@ -175,28 +182,42 @@ export class GroupCreationViewModel {
     this.isShown(false);
   };
 
-  readonly clickOnToggleGuestMode = (): void => {
-    const accessState = this.isGuestRoom()
-      ? ACCESS_STATE.TEAM.TEAM_ONLY
-      : this.isServicesRoom()
-      ? ACCESS_STATE.TEAM.GUESTS_SERVICES
-      : this.isGuestAndServicesRoom()
-      ? ACCESS_STATE.TEAM.SERVICES
-      : ACCESS_STATE.TEAM.GUEST_ROOM;
-
-    this.accessState(accessState);
-  };
-
   readonly clickOnToggleServicesMode = (): void => {
-    const accessState = this.isGuestRoom()
-      ? ACCESS_STATE.TEAM.GUESTS_SERVICES
-      : this.isServicesRoom()
-      ? ACCESS_STATE.TEAM.TEAM_ONLY
-      : this.isGuestAndServicesRoom()
-      ? ACCESS_STATE.TEAM.GUEST_ROOM
-      : ACCESS_STATE.TEAM.SERVICES;
+    let newAccessState: TEAM;
 
-    this.accessState(accessState);
+    if (this.isGuestRoom()) {
+      newAccessState = ACCESS_STATE.TEAM.GUESTS_SERVICES;
+    }
+
+    if (this.isGuestAndServicesRoom()) {
+      newAccessState = ACCESS_STATE.TEAM.GUEST_ROOM;
+    }
+    if (this.isServicesRoom()) {
+      newAccessState = ACCESS_STATE.TEAM.TEAM_ONLY;
+    }
+    if (this.isTeamOnly()) {
+      newAccessState = ACCESS_STATE.TEAM.SERVICES;
+    }
+
+    this.accessState(newAccessState);
+  };
+  readonly clickOnToggleGuestMode = (): void => {
+    let newAccessState: TEAM;
+
+    if (this.isServicesRoom()) {
+      newAccessState = ACCESS_STATE.TEAM.GUESTS_SERVICES;
+    }
+    if (this.isTeamOnly()) {
+      newAccessState = ACCESS_STATE.TEAM.GUEST_ROOM;
+    }
+    if (this.isGuestRoom()) {
+      newAccessState = ACCESS_STATE.TEAM.TEAM_ONLY;
+    }
+    if (this.isGuestAndServicesRoom()) {
+      newAccessState = ACCESS_STATE.TEAM.SERVICES;
+    }
+
+    this.accessState(newAccessState);
   };
 
   clickOnCreate = async (): Promise<void> => {
@@ -254,6 +275,6 @@ export class GroupCreationViewModel {
     this.participantsInput('');
     this.selectedContacts([]);
     this.state(GroupCreationViewModel.STATE.DEFAULT);
-    this.accessState(ACCESS_STATE.TEAM.GUEST_ROOM);
+    this.accessState(ACCESS_STATE.TEAM.GUESTS_SERVICES);
   };
 }
