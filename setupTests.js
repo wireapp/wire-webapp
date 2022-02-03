@@ -77,3 +77,6 @@ window.wire = {
 };
 
 window.z = {userPermission: {}};
+
+const testLib = require('@testing-library/react');
+testLib.configure({testIdAttribute: 'data-uie-name'});

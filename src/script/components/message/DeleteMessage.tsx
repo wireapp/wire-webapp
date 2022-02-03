@@ -20,7 +20,7 @@
 import React from 'react';
 import {DeleteMessage as DeleteMessageEntity} from '../../entity/message/DeleteMessage';
 
-import {registerReactComponent, useKoSubscribable} from 'Util/ComponentUtil';
+import {registerReactComponent, useKoSubscribableChildren} from 'Util/ComponentUtil';
 import Avatar, {AVATAR_SIZE} from 'Components/Avatar';
 import {User} from 'src/script/entity/User';
 import MessageTime from './MessageTime';
@@ -33,8 +33,7 @@ export interface DeleteMessageProps {
 }
 
 const DeleteMessage: React.FC<DeleteMessageProps> = ({message, onClickAvatar}) => {
-  const unsafeSenderName = useKoSubscribable(message.unsafeSenderName);
-  const user = useKoSubscribable(message.user);
+  const {unsafeSenderName, user} = useKoSubscribableChildren(message, ['unsafeSenderName', 'user']);
 
   const formattedDeletionTime = t(
     'conversationDeleteTimestamp',

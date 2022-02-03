@@ -30,7 +30,7 @@ describe('AssetCrypto', () => {
   });
 
   // This test conforms to the following testing standards:
-  // @SF.Messages @TSFI.RESTfulAPI
+  // @SF.Messages @TSFI.RESTfulAPI @S0.2 @S0.3
   it('should not decrypt when hash is missing', async () => {
     const bytes = new Uint8Array(16);
     window.crypto.getRandomValues(bytes);
@@ -40,7 +40,7 @@ describe('AssetCrypto', () => {
   });
 
   // This test conforms to the following testing standards:
-  // @SF.Messages @TSFI.RESTfulAPI
+  // @SF.Messages @TSFI.RESTfulAPI @S0.2 @S0.3
   it('should not decrypt when hash is an empty array', async () => {
     const bytes = new Uint8Array(16);
     window.crypto.getRandomValues(bytes);

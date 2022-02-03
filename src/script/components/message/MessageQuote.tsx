@@ -25,6 +25,7 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 import {isBeforeToday, formatDateNumeral, formatTimeShort} from 'Util/TimeUtil';
 import {includesOnlyEmojis} from 'Util/EmojiUtil';
 
+import {QualifiedId} from '@wireapp/api-client/src/user';
 import {QuoteEntity} from '../../message/QuoteEntity';
 import {ConversationError} from '../../error/ConversationError';
 import type {Conversation} from '../../entity/Conversation';
@@ -49,7 +50,7 @@ export interface QuoteProps {
   handleClickOnMessage: (message: ContentMessage, event: React.MouseEvent) => boolean;
   messageRepository: MessageRepository;
   quote: QuoteEntity;
-  selfId: string;
+  selfId: QualifiedId;
   showDetail: (message: ContentMessage, event: React.MouseEvent) => void;
   showUserDetails: (user: User) => void;
 }
@@ -69,14 +70,14 @@ const Quote: React.FC<QuoteProps> = ({
 
   useEffect(() => {
     const handleQuoteDeleted = (messageId: string) => {
-      if (quotedMessage.id === messageId) {
+      if (quotedMessage?.id === messageId) {
         setError(QuoteEntity.ERROR.MESSAGE_NOT_FOUND);
         setQuotedMessage(undefined);
       }
     };
 
     const handleQuoteUpdated = (originalMessageId: string, messageEntity: ContentMessage) => {
-      if (quotedMessage.id === originalMessageId) {
+      if (quotedMessage?.id === originalMessageId) {
         setQuotedMessage(messageEntity);
       }
     };
@@ -95,7 +96,7 @@ const Quote: React.FC<QuoteProps> = ({
       messageRepository
         .getMessageInConversationById(conversation, quote.messageId, true, true)
         .then(message => {
-          setQuotedMessage(message);
+          setQuotedMessage(message as ContentMessage);
         })
         .catch(error => {
           if (error.type === ConversationError.TYPE.MESSAGE_NOT_FOUND) {
@@ -132,7 +133,7 @@ interface QuotedMessageProps {
   focusMessage: (id: string) => void;
   handleClickOnMessage: (message: ContentMessage | Text, event: React.MouseEvent) => boolean;
   quotedMessage: ContentMessage;
-  selfId: string;
+  selfId: QualifiedId;
   showDetail: (message: ContentMessage, event: React.MouseEvent) => void;
   showUserDetails: (user: User) => void;
 }

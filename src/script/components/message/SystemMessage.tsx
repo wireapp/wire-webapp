@@ -17,27 +17,26 @@
  *
  */
 
-import ko from 'knockout';
 import React from 'react';
 import Icon from 'Components/Icon';
 
-import {registerReactComponent, useKoSubscribable} from 'Util/ComponentUtil';
+import {registerReactComponent, useKoSubscribableChildren} from 'Util/ComponentUtil';
 import MessageTime from './MessageTime';
 import {SystemMessageType} from '../../message/SystemMessageType';
 import {RenameMessage} from '../../entity/message/RenameMessage';
 import {MessageTimerUpdateMessage} from '../../entity/message/MessageTimerUpdateMessage';
 import {ReceiptModeUpdateMessage} from '../../entity/message/ReceiptModeUpdateMessage';
 import {DeleteConversationMessage} from '../../entity/message/DeleteConversationMessage';
-
 export interface SystemMessageProps {
   message: DeleteConversationMessage | MessageTimerUpdateMessage | ReceiptModeUpdateMessage | RenameMessage;
 }
 
 const SystemMessage: React.FC<SystemMessageProps> = ({message}) => {
-  const unsafeSenderName = useKoSubscribable(message.unsafeSenderName);
-  const subscribableCaption = ko.isSubscribable(message.caption) ? message.caption : ko.observable(message.caption);
-  const messageCaption = useKoSubscribable(subscribableCaption);
-  const timestamp = useKoSubscribable(message.timestamp);
+  const {unsafeSenderName, timestamp, caption} = useKoSubscribableChildren(message, [
+    'unsafeSenderName',
+    'timestamp',
+    'caption',
+  ]);
 
   // Only set for RenameMessage, MemberMessage has a different super_type
   const messageName = (message as RenameMessage).name;
@@ -53,7 +52,7 @@ const SystemMessage: React.FC<SystemMessageProps> = ({message}) => {
         <div className="message-header-label">
           <span className="message-header-label__multiline">
             <span className="message-header-sender-name">{unsafeSenderName}</span>
-            <span className="ellipsis">{messageCaption}</span>
+            <span className="ellipsis">{caption}</span>
           </span>
           <hr className="message-header-line" />
         </div>

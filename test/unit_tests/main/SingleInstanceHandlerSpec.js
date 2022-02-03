@@ -29,13 +29,9 @@ describe('SingleInstanceHandler', () => {
       spyOn(Cookies, 'set').and.returnValue(undefined);
       const result = singleInstanceHandler.registerInstance(instanceId);
 
-      expect(Cookies.set).toHaveBeenCalledWith(
-        'app_opened',
-        {appInstanceId: instanceId},
-        {
-          sameSite: 'Lax',
-        },
-      );
+      expect(Cookies.set).toHaveBeenCalledWith('app_opened', JSON.stringify({appInstanceId: instanceId}), {
+        sameSite: 'Lax',
+      });
       expect(result).toBe(true);
     });
 
@@ -66,7 +62,7 @@ describe('SingleInstanceHandler', () => {
     it('deregister current instance and stops interval if the instance id matches the registered instance', () => {
       const singleInstanceHandler = new SingleInstanceHandler(() => {});
       const instanceId = 'instance-id-12';
-      spyOn(Cookies, 'getJSON').and.returnValue({appInstanceId: instanceId});
+      spyOn(Cookies, 'get').and.returnValue(JSON.stringify({appInstanceId: instanceId}));
       spyOn(Cookies, 'remove').and.returnValue(undefined);
       spyOn(window, 'clearInterval').and.returnValue(undefined);
       spyOn(window, 'setInterval').and.returnValue(12);
@@ -81,7 +77,7 @@ describe('SingleInstanceHandler', () => {
     it('does not deregister current instance if instance ids do not match', () => {
       const singleInstanceHandler = new SingleInstanceHandler();
       const instanceId = 'instance-id-12';
-      spyOn(Cookies, 'getJSON').and.returnValue({appInstanceId: 'other-instance-id'});
+      spyOn(Cookies, 'get').and.returnValue(JSON.stringify({appInstanceId: 'other-instance-id'}));
       spyOn(Cookies, 'remove').and.returnValue(undefined);
       singleInstanceHandler.instanceId = instanceId;
 
@@ -93,7 +89,7 @@ describe('SingleInstanceHandler', () => {
     it('forces deregistration even if ids do not match', () => {
       const singleInstanceHandler = new SingleInstanceHandler();
       const instanceId = 'instance-id-12';
-      spyOn(Cookies, 'getJSON').and.returnValue({appInstanceId: 'other-instance-id'});
+      spyOn(Cookies, 'get').and.returnValue(JSON.stringify({appInstanceId: 'other-instance-id'}));
       spyOn(Cookies, 'remove').and.returnValue(undefined);
       singleInstanceHandler.instanceId = instanceId;
 

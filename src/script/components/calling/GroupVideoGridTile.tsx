@@ -28,11 +28,12 @@ import Video from './Video';
 import ParticipantMicOnIcon from './ParticipantMicOnIcon';
 import type {Participant} from '../../calling/Participant';
 import Avatar, {AVATAR_SIZE} from 'Components/Avatar';
+import {QualifiedId} from '@wireapp/api-client/src/user';
 
 export interface GroupVideoGridTileProps {
   isMaximized: boolean;
   minimized: boolean;
-  onParticipantDoubleClick: (userId: string, clientId: string) => void;
+  onParticipantDoubleClick: (userId: QualifiedId, clientId: string) => void;
   participant: Participant;
   participantCount: number;
   selfParticipant: Participant;
@@ -66,7 +67,7 @@ const GroupVideoGridTile: React.FC<GroupVideoGridTileProps> = ({
       css={{position: 'relative'}}
       data-user-id={participant?.user.id}
       className="group-video-grid__element"
-      onDoubleClick={() => onParticipantDoubleClick(participant?.user.id, participant?.clientId)}
+      onDoubleClick={() => onParticipantDoubleClick(participant?.user.qualifiedId, participant?.clientId)}
     >
       {hasActiveVideo ? (
         <Video

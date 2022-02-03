@@ -25,6 +25,7 @@ import {getUserName} from 'Util/SanitizationUtil';
 import {TIME_IN_MILLIS, formatDurationCaption, formatTimeShort, formatDateNumeral, fromUnixTime} from 'Util/TimeUtil';
 import {t} from 'Util/LocalizerUtil';
 
+import {QualifiedId} from '@wireapp/api-client/src/user';
 import {AssetTransferState} from '../../assets/AssetTransferState';
 import {AssetType} from '../../assets/AssetType';
 import {EphemeralStatusType} from '../../message/EphemeralStatusType';
@@ -148,6 +149,10 @@ export class Message {
     });
 
     this.accent_color = ko.pureComputed(() => `accent-color-${this.user().accent_id()}`);
+  }
+
+  public get qualifiedFrom(): QualifiedId {
+    return {domain: this.fromDomain || '', id: this.from};
   }
 
   readonly displayTimestampShort = (): string => {

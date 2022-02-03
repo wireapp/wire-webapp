@@ -555,7 +555,7 @@ export class MessageListViewModel {
   };
 
   readonly handleClickOnMessage = (messageEntity: ContentMessage | Text, event: MouseEvent): boolean => {
-    if (event.which === 3) {
+    if (event.button === 2) {
       // Default browser behavior on right click
       return true;
     }
@@ -563,6 +563,7 @@ export class MessageListViewModel {
     const emailTarget = (event.target as HTMLElement).closest<HTMLAnchorElement>('[data-email-link]');
     if (emailTarget) {
       safeMailOpen(emailTarget.href);
+      event.preventDefault();
       return false;
     }
 
@@ -581,6 +582,7 @@ export class MessageListViewModel {
           title: t('modalOpenLinkTitle'),
         },
       });
+      event.preventDefault();
       return false;
     }
 

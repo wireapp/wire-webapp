@@ -21,7 +21,6 @@ import {LegalHoldMemberStatus} from '@wireapp/api-client/src/team/legalhold/';
 import {amplify} from 'amplify';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 import ko from 'knockout';
-import {WebAppEvents} from '@wireapp/webapp-events';
 import {container} from 'tsyringe';
 
 import {UserDevicesState, makeUserDevicesHistory} from 'Components/UserDevices';
@@ -183,7 +182,6 @@ export class LegalHoldModalViewModel {
       this.skipShowUsers(true);
       selfUser.hasPendingLegalHold(false);
       await this.clientRepository.updateClientsForSelf();
-      amplify.publish(WebAppEvents.USER.CLIENT_ADDED, selfUser.qualifiedId);
     } catch ({code, message}) {
       switch (code) {
         case HTTP_STATUS.BAD_REQUEST: {

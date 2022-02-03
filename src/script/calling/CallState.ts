@@ -24,6 +24,8 @@ import {STATE as CALL_STATE} from '@wireapp/avs';
 import {CallViewTab} from '../view_model/CallingViewModel';
 import {Config} from '../Config';
 import type {ElectronDesktopCapturerSource} from '../media/MediaDevicesHandler';
+import {matchQualifiedIds} from 'Util/QualifiedId';
+import {QualifiedId} from '@wireapp/api-client/src/user';
 
 export enum MuteState {
   NOT_MUTED,
@@ -35,22 +37,19 @@ export enum MuteState {
 @singleton()
 export class CallState {
   public readonly activeCalls: ko.ObservableArray<Call> = ko.observableArray();
-  public readonly muteState: ko.Observable<MuteState> = ko.observable(MuteState.NOT_MUTED);
-  public readonly acceptedVersionWarnings: ko.ObservableArray<string> = ko.observableArray<string>();
+  public readonly acceptedVersionWarnings: ko.ObservableArray<QualifiedId> = ko.observableArray<QualifiedId>();
   public readonly cbrEncoding: ko.Observable<number> = ko.observable(
     Config.getConfig().FEATURE.ENFORCE_CONSTANT_BITRATE ? 1 : 0,
   );
   public readonly videoSpeakersActiveTab: ko.Observable<string> = ko.observable(CallViewTab.ALL);
   readonly selectableScreens: ko.Observable<ElectronDesktopCapturerSource[]> = ko.observable([]);
   readonly selectableWindows: ko.Observable<ElectronDesktopCapturerSource[]> = ko.observable([]);
-  public readonly isMuted: ko.PureComputed<boolean>;
   public readonly joinedCall: ko.PureComputed<Call | undefined>;
   public readonly activeCallViewTab: ko.Observable<string> = ko.observable(CallViewTab.ALL);
   readonly isChoosingScreen: ko.PureComputed<boolean>;
   readonly isSpeakersViewActive: ko.PureComputed<boolean>;
 
   constructor() {
-    this.isMuted = ko.pureComputed(() => this.muteState() !== MuteState.NOT_MUTED);
     this.joinedCall = ko.pureComputed(() => this.activeCalls().find(call => call.state() === CALL_STATE.MEDIA_ESTAB));
     this.isChoosingScreen = ko.pureComputed(
       () => this.selectableScreens().length > 0 || this.selectableWindows().length > 0,
@@ -58,7 +57,9 @@ export class CallState {
 
     this.activeCalls.subscribe(activeCalls => {
       const activeCallIds = activeCalls.map(call => call.conversationId);
-      this.acceptedVersionWarnings.remove(acceptedId => !activeCallIds.includes(acceptedId));
+      this.acceptedVersionWarnings.remove(
+        acceptedId => !activeCallIds.some(callId => matchQualifiedIds(acceptedId, callId)),
+      );
     });
     this.isSpeakersViewActive = ko.pureComputed(() => this.activeCallViewTab() === CallViewTab.SPEAKERS);
 
@@ -66,6 +67,4 @@ export class CallState {
       () => this.selectableScreens().length > 0 || this.selectableWindows().length > 0,
     );
   }
-
-  updateMuteState = (newState: MuteState) => this.muteState(newState);
 }

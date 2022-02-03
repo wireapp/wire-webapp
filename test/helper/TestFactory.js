@@ -53,7 +53,6 @@ import {ConversationService} from 'src/script/conversation/ConversationService';
 import {ConversationRepository} from 'src/script/conversation/ConversationRepository';
 import {MessageRepository} from 'src/script/conversation/MessageRepository';
 import {SelfService} from 'src/script/self/SelfService';
-import {LinkPreviewRepository} from 'src/script/links/LinkPreviewRepository';
 import {PropertiesRepository} from 'src/script/properties/PropertiesRepository';
 import {PropertiesService} from 'src/script/properties/PropertiesService';
 import {MessageSender} from 'src/script/message/MessageSender';
@@ -287,8 +286,6 @@ export class TestFactory {
 
     this.propertyRepository = new PropertiesRepository(new PropertiesService(), new SelfService());
 
-    const assetRepository = new AssetRepository(new AssetService());
-
     /** @type {ConversationRepository} */
     this.conversation_repository = null;
     const conversationState = new ConversationState(
@@ -303,7 +300,6 @@ export class TestFactory {
     clientState.currentClient(clientEntity);
 
     this.message_repository = new MessageRepository(
-      this.client_repository,
       () => this.conversation_repository,
       this.cryptography_repository,
       this.event_repository,
@@ -311,12 +307,9 @@ export class TestFactory {
       this.propertyRepository,
       serverTimeHandler,
       this.user_repository,
-      this.conversation_service,
-      new LinkPreviewRepository(assetRepository, this.propertyRepository),
       this.assetRepository,
       this.user_repository['userState'],
       this.team_repository['teamState'],
-      conversationState,
       clientState,
     );
     this.conversation_repository = new ConversationRepository(

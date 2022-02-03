@@ -57,7 +57,6 @@ import type {TeamRepository} from '../team/TeamRepository';
 import type {User} from '../entity/User';
 import type {UserRepository} from '../user/UserRepository';
 import type {AuthRepository} from '../auth/AuthRepository';
-import type {BroadcastRepository} from '../broadcast/BroadcastRepository';
 import type {EventTrackingRepository} from '../tracking/EventTrackingRepository';
 import type {MessageRepository} from '../conversation/MessageRepository';
 import {UserState} from '../user/UserState';
@@ -68,7 +67,6 @@ export interface ViewModelRepositories {
   audio: AudioRepository;
   auth: AuthRepository;
   backup: BackupRepository;
-  broadcast: BroadcastRepository;
   calling: CallingRepository;
   client: ClientRepository;
   connection: ConnectionRepository;

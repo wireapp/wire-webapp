@@ -18,26 +18,24 @@
  */
 
 import ko from 'knockout';
-import {Asset} from '@wireapp/protocol-messaging';
 import {LegalHoldStatus} from '@wireapp/protocol-messaging';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
-import {AssetOptions, AssetRetentionPolicy, AssetUploadData} from '@wireapp/api-client/src/asset/';
+import {AssetOptions, AssetRetentionPolicy} from '@wireapp/api-client/src/asset/';
 import {singleton, container} from 'tsyringe';
 
 import {Logger, getLogger} from 'Util/Logger';
 import {loadFileBuffer, loadImage, downloadBlob} from 'Util/util';
 import {WebWorker} from 'Util/worker';
-import {ValidationUtilError} from 'Util/ValidationUtil';
 
 import {AssetService} from './AssetService';
 import {Conversation} from '../entity/Conversation';
-import {PROTO_MESSAGE_TYPE} from '../cryptography/ProtoMessageType';
-import {encryptAesAsset, EncryptedAsset, decryptAesAsset} from './AssetCrypto';
+import {decryptAesAsset} from './AssetCrypto';
 import {AssetRemoteData} from './AssetRemoteData';
 import {getAssetUrl, setAssetUrl} from './AssetURLCache';
 import type {User} from '../entity/User';
 import {FileAsset} from '../entity/message/FileAsset';
 import {AssetTransferState} from './AssetTransferState';
+import {Core} from '../service/CoreSingleton';
 
 export interface CompressedImage {
   compressedBytes: Uint8Array;
@@ -45,6 +43,7 @@ export interface CompressedImage {
 }
 
 export interface AssetUploadOptions extends AssetOptions {
+  domain?: string;
   expectsReadConfirmation: boolean;
   legalHoldStatus?: LegalHoldStatus;
 }
@@ -60,8 +59,15 @@ export class AssetRepository {
   readonly uploadCancelTokens: {[messageId: string]: () => void} = {};
   logger: Logger;
 
-  constructor(private readonly assetService = container.resolve(AssetService)) {
+  constructor(
+    private readonly assetService = container.resolve(AssetService),
+    private readonly core = container.resolve(Core),
+  ) {
     this.logger = getLogger('AssetRepository');
+  }
+
+  get assetCoreService() {
+    return this.core.service!.asset;
   }
 
   async getObjectUrl(asset: AssetRemoteData): Promise<string | undefined> {
@@ -130,53 +136,12 @@ export class AssetRepository {
     }
   }
 
-  private async loadBuffer(asset: AssetRemoteData): Promise<{
-    buffer: ArrayBuffer;
-    mimeType: string;
-  }> {
-    try {
-      switch (asset.urlData.version) {
-        case 3: {
-          const request = await this.assetService.downloadAssetV3(
-            asset.urlData.assetKey,
-            asset.urlData.assetToken,
-            asset.urlData.forceCaching,
-            progress => asset.downloadProgress(progress * 100),
-          );
-          asset.cancelDownload = request.cancel;
-          return await request.response;
-        }
-        case 2: {
-          const request = await this.assetService.downloadAssetV2(
-            asset.urlData.assetId,
-            asset.urlData.conversationId,
-            asset.urlData.forceCaching,
-            progress => asset.downloadProgress(progress),
-          );
-          asset.cancelDownload = request.cancel;
-          return await request.response;
-        }
-        case 1: {
-          const request = await this.assetService.downloadAssetV1(
-            asset.urlData.assetId,
-            asset.urlData.conversationId,
-            asset.urlData.forceCaching,
-            progress => asset.downloadProgress(progress),
-          );
-          asset.cancelDownload = request.cancel;
-          return await request.response;
-        }
-        default:
-          throw Error('Cannot map URL data.');
-      }
-    } catch (error) {
-      const isValidationUtilError = error instanceof ValidationUtilError;
-      const message = isValidationUtilError
-        ? `Failed to validate an asset URL (loadBuffer): ${error.message}`
-        : `Failed to load asset: ${error.message || error}`;
-      this.logger.error(message);
-      throw error;
-    }
+  private loadBuffer(asset: AssetRemoteData) {
+    const request = this.core.service!.asset.downloadAsset(asset.urlData, fraction => {
+      asset.downloadProgress(fraction * 100);
+    });
+    asset.cancelDownload = request.cancel;
+    return request.response;
   }
 
   public async download(asset: AssetRemoteData, fileName: string) {
@@ -206,13 +171,13 @@ export class AssetRepository {
     }
   }
 
-  async uploadProfileImage(image: Blob | File): Promise<{
-    mediumImageKey: string;
-    previewImageKey: string;
+  async uploadProfileImage(image: Blob): Promise<{
+    mediumImageKey: {domain?: string; key: string};
+    previewImageKey: {domain?: string; key: string};
   }> {
-    const [{compressedBytes: previewImageBytes}, {compressedBytes: mediumImageBytes}] = await Promise.all([
-      this.compressImageWithWorker(image),
-      this.compressImageWithWorker(image, true),
+    const [{compressedBytes: previewImage}, {compressedBytes: mediumImage}] = await Promise.all([
+      this.compressImage(image),
+      this.compressImage(image, true),
     ]);
 
     const options: AssetUploadOptions = {
@@ -221,22 +186,15 @@ export class AssetRepository {
       retention: AssetRetentionPolicy.ETERNAL,
     };
 
-    const previewPictureUpload = await this.assetService.uploadFile(previewImageBytes, options);
-    const uploadedPreviewPicture = await previewPictureUpload.response;
+    const [previewImageKey, mediumImageKey] = await Promise.all([
+      this.assetCoreService.uploadRawAsset(previewImage, options).response,
+      this.assetCoreService.uploadRawAsset(mediumImage, options).response,
+    ]);
 
-    const mediumPictureUpload = await this.assetService.uploadFile(mediumImageBytes, options);
-    const mediumPicture = await mediumPictureUpload.response;
-
-    return {
-      mediumImageKey: uploadedPreviewPicture.key,
-      previewImageKey: mediumPicture.key,
-    };
+    return {mediumImageKey, previewImageKey};
   }
 
-  private async compressImageWithWorker(
-    image: File | Blob,
-    useProfileImageSize: boolean = false,
-  ): Promise<CompressedImage> {
+  private async compressImage(image: Blob, useProfileImageSize: boolean = false): Promise<CompressedImage> {
     const skipCompression = image.type === 'image/gif';
     const buffer = await loadFileBuffer(image);
     let compressedBytes: ArrayBuffer;
@@ -264,73 +222,39 @@ export class AssetRepository {
     return isEternal ? AssetRetentionPolicy.ETERNAL : AssetRetentionPolicy.PERSISTENT;
   }
 
-  private buildProtoAsset(
-    encryptedAsset: EncryptedAsset,
-    uploadedAsset: AssetUploadData,
-    options: AssetUploadOptions,
-  ): Asset {
-    const assetRemoteData = new Asset.RemoteData({
-      assetId: uploadedAsset.key,
-      assetToken: uploadedAsset.token,
-      otrKey: new Uint8Array(encryptedAsset.keyBytes),
-      sha256: new Uint8Array(encryptedAsset.sha256),
-    });
-    const protoAsset = new Asset({
-      [PROTO_MESSAGE_TYPE.ASSET_UPLOADED]: assetRemoteData,
-      [PROTO_MESSAGE_TYPE.EXPECTS_READ_CONFIRMATION]: options.expectsReadConfirmation,
-      [PROTO_MESSAGE_TYPE.LEGAL_HOLD_STATUS]: options.legalHoldStatus,
-    });
-    return protoAsset;
-  }
-
-  private attachImageData(protoAsset: Asset, imageMeta: CompressedImage, imageType: string): Asset {
-    const {compressedImage, compressedBytes} = imageMeta;
-    const imageMetaData = new Asset.ImageMetaData({
-      height: compressedImage.height,
-      width: compressedImage.width,
-    });
-    const imageAsset = new Asset.Original({
-      image: imageMetaData,
-      mimeType: imageType,
-      size: compressedBytes.length,
-    });
-    protoAsset[PROTO_MESSAGE_TYPE.ASSET_ORIGINAL] = imageAsset;
-    return protoAsset;
-  }
-
-  async uploadFile(messageId: string, file: Blob, options: AssetUploadOptions, isImage: boolean): Promise<Asset> {
-    const bytes = (await loadFileBuffer(file)) as ArrayBuffer;
-    const encryptedAsset = await encryptAesAsset(bytes);
-
+  /**
+   * Uploads a file to the backend
+   *
+   * @param file The raw content of the file to upload
+   * @param messageId The message the file is associated with
+   * @param options
+   * @param onCancel? Will be called if the upload has been canceled
+   */
+  async uploadFile(file: Blob, messageId: string, options: AssetUploadOptions, onCancel?: () => void) {
+    const bytes = await loadFileBuffer(file);
     const progressObservable = ko.observable(0);
     this.uploadProgressQueue.push({messageId, progress: progressObservable});
 
-    const request = await this.assetService.uploadFile(
-      new Uint8Array(encryptedAsset.cipherText),
+    const request = await this.assetCoreService.uploadAsset(
+      Buffer.from(bytes),
       {
+        domain: options.domain,
         public: options.public,
         retention: options.retention,
       },
-      (fraction: number) => {
+      fraction => {
         const percentage = fraction * 100;
         progressObservable(percentage);
       },
     );
-    this.uploadCancelTokens[messageId] = request.cancel;
+    this.uploadCancelTokens[messageId] = () => {
+      request.cancel();
+      onCancel?.();
+    };
 
-    return request.response
-      .then(async uploadedAsset => {
-        const protoAsset = this.buildProtoAsset(encryptedAsset, uploadedAsset, options);
-        if (isImage === true) {
-          const imageMeta = await this.compressImageWithWorker(file);
-          return this.attachImageData(protoAsset, imageMeta, file.type);
-        }
-        return protoAsset;
-      })
-      .then(asset => {
-        this.removeFromUploadQueue(messageId);
-        return asset;
-      });
+    const response = await request.response;
+    this.removeFromUploadQueue(messageId);
+    return response;
   }
 
   cancelUpload(messageId: string): void {
@@ -346,10 +270,7 @@ export class AssetRepository {
   }
 
   getUploadProgress(messageId: string): ko.PureComputed<number> {
-    return ko.pureComputed(() => {
-      const uploadStatus = this.findUploadStatus(messageId);
-      return uploadStatus ? uploadStatus.progress() : -1;
-    });
+    return ko.pureComputed(() => this.findUploadStatus(messageId)?.progress() ?? -1);
   }
 
   private findUploadStatus(messageId: string): UploadStatus {

@@ -20,7 +20,7 @@
 import {User} from '../../../entity/User';
 import {AssetRepository} from '../../../assets/AssetRepository';
 import Avatar, {AVATAR_SIZE} from 'Components/Avatar';
-import {useKoSubscribable} from 'Util/ComponentUtil';
+import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {useEffect, useState} from 'react';
 import {ConnectionStatus} from '@wireapp/api-client/src/connection';
 import React from 'react';
@@ -32,8 +32,7 @@ export interface TopContactProps {
 }
 
 const TopContact: React.FC<TopContactProps> = ({assetRepository, user, clickOnUser}) => {
-  const name = useKoSubscribable(user.name);
-  const connection = useKoSubscribable(user.connection);
+  const {name, connection} = useKoSubscribableChildren(user, ['name', 'connection']);
   const [connectionStatus, setConnectionStatus] = useState<ConnectionStatus>();
 
   useEffect(() => {

@@ -35,7 +35,9 @@ export const mapProfileAssets = (userId: string, assets: APIClientUserAsset[]): 
   return assets
     .filter(asset => asset.type === 'image')
     .reduce((mappedAssets, asset) => {
-      const assetRemoteData = AssetRemoteData.v3(asset.key, new Uint8Array());
+      const assetRemoteData = asset.domain
+        ? AssetRemoteData.v4(asset.key, asset.domain, new Uint8Array())
+        : AssetRemoteData.v3(asset.key, new Uint8Array());
       return !sizeMap[asset.size] ? mappedAssets : {...mappedAssets, [sizeMap[asset.size]]: assetRemoteData};
     }, {});
 };

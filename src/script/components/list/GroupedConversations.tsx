@@ -36,6 +36,7 @@ import {ConversationState} from '../../conversation/ConversationState';
 import {registerReactComponent, useKoSubscribableChildren} from 'Util/ComponentUtil';
 import GroupedConversationsFolder from './GroupedConversationsFolder';
 import {CallState} from '../../calling/CallState';
+import {QualifiedId} from '@wireapp/api-client/src/user';
 
 const useLabels = (conversationLabelRepository: ConversationLabelRepository) => {
   const {labels: conversationLabels} = useKoSubscribableChildren(conversationLabelRepository, ['labels']);
@@ -57,7 +58,7 @@ export interface GroupedConversationsProps {
   conversationRepository: ConversationRepository;
   conversationState: ConversationState;
   expandedFolders: string[];
-  hasJoinableCall: (conversationId: string) => boolean;
+  hasJoinableCall: (conversationId: QualifiedId) => boolean;
   isSelectedConversation: (conversationEntity: Conversation) => boolean;
   isVisibleFunc: (top: number, bottom: number) => boolean;
   listViewModel: ListViewModel;

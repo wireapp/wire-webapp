@@ -46,6 +46,8 @@ import type {Call} from '../calling/Call';
 import {RECEIPT_MODE} from '@wireapp/api-client/src/conversation/data';
 import {ConversationRecord} from '../storage/record/ConversationRecord';
 import {LegalHoldModalViewModel} from '../view_model/content/LegalHoldModalViewModel';
+import {CallMessage} from './message/CallMessage';
+import {PingMessage} from './message/PingMessage';
 import {container} from 'tsyringe';
 import {TeamState} from '../team/TeamState';
 import {matchQualifiedIds} from 'Util/QualifiedId';
@@ -53,9 +55,9 @@ import {matchQualifiedIds} from 'Util/QualifiedId';
 interface UnreadState {
   allEvents: Message[];
   allMessages: ContentMessage[];
-  calls: ContentMessage[];
+  calls: CallMessage[];
   otherMessages: ContentMessage[];
-  pings: ContentMessage[];
+  pings: PingMessage[];
   selfMentions: ContentMessage[];
   selfReplies: ContentMessage[];
 }
@@ -191,7 +193,11 @@ export class Conversation {
     this.isGuest = ko.observable(false);
     this.isManaged = false;
 
-    this.inTeam = ko.pureComputed(() => this.team_id && !this.isGuest());
+    this.inTeam = ko.pureComputed(() => {
+      const isSameTeam = this.selfUser()?.teamId === this.team_id;
+      const isSameDomain = !this.isFederated() || this.domain === this.selfUser().domain;
+      return this.team_id && isSameTeam && !this.isGuest() && isSameDomain;
+    });
     this.isGuestRoom = ko.pureComputed(() => this.accessState() === ACCESS_STATE.TEAM.GUEST_ROOM);
     this.isTeamOnly = ko.pureComputed(() => this.accessState() === ACCESS_STATE.TEAM.TEAM_ONLY);
     this.withAllTeamMembers = ko.observable(false);
@@ -401,7 +407,9 @@ export class Conversation {
           const isPing = messageEntity.isPing();
           const isMessage = messageEntity.isContent();
           const isSelfMentioned =
-            isMessage && this.selfUser() && (messageEntity as ContentMessage).isUserMentioned(this.selfUser().id);
+            isMessage &&
+            this.selfUser() &&
+            (messageEntity as ContentMessage).isUserMentioned(this.selfUser().qualifiedId);
           const isSelfQuoted =
             isMessage && this.selfUser() && (messageEntity as ContentMessage).isUserQuoted(this.selfUser().id);
 
@@ -414,9 +422,9 @@ export class Conversation {
           } else if (isSelfQuoted) {
             unreadState.selfReplies.push(messageEntity as ContentMessage);
           } else if (isMissedCall) {
-            unreadState.calls.push(messageEntity as ContentMessage);
+            unreadState.calls.push(messageEntity);
           } else if (isPing) {
-            unreadState.pings.push(messageEntity as ContentMessage);
+            unreadState.pings.push(messageEntity);
           } else if (isMessage) {
             unreadState.otherMessages.push(messageEntity as ContentMessage);
           }
@@ -503,7 +511,7 @@ export class Conversation {
   }
 
   get qualifiedId(): QualifiedId {
-    return {domain: this.domain, id: this.id};
+    return {domain: this.isFederated() ? this.domain : '', id: this.id};
   }
 
   private hasInitializedUsers() {
@@ -675,7 +683,20 @@ export class Conversation {
 
   getLastKnownTimestamp(currentTimestamp?: number): number {
     const last_known_timestamp = Math.max(this.last_server_timestamp(), this.last_event_timestamp());
-    return last_known_timestamp || currentTimestamp;
+    return last_known_timestamp ?? currentTimestamp;
+  }
+
+  /**
+   * Return the next timestamp that can be used to inject a message right after the last message that is not a message currently being sent
+   */
+  getNextTimestamp(): number {
+    const sentMessages = this.messages().filter(message => message?.status() !== StatusType.SENDING);
+    if (sentMessages.length === 0) {
+      return this.getLastKnownTimestamp() + 1;
+    }
+    const lastMessageTimestamp = sentMessages[sentMessages.length - 1].timestamp();
+    // The next timestamp can never be before the last known timestamp, so we need to take the max between the last message and the last known server timestamp
+    return Math.max(lastMessageTimestamp, this.getLastKnownTimestamp()) + 1;
   }
 
   getLatestTimestamp(currentTimestamp: number): number {

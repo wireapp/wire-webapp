@@ -40,17 +40,16 @@ export const MessageTimerButton: React.FC<MessageTimerButtonProps> = ({
   conversation,
   teamState = container.resolve(TeamState),
 }) => {
-  const {messageTimer, hasGlobalMessageTimer, isFederated} = useKoSubscribableChildren(conversation, [
+  const {messageTimer, hasGlobalMessageTimer} = useKoSubscribableChildren(conversation, [
     'messageTimer',
     'hasGlobalMessageTimer',
-    'isFederated',
   ]);
   const {isSelfDeletingMessagesEnabled, isSelfDeletingMessagesEnforced} = useKoSubscribableChildren(teamState, [
     'isSelfDeletingMessagesEnabled',
     'isSelfDeletingMessagesEnforced',
   ]);
   const hasMessageTimer = !!messageTimer;
-  const isTimerDisabled = isSelfDeletingMessagesEnforced || hasGlobalMessageTimer || isFederated;
+  const isTimerDisabled = isSelfDeletingMessagesEnforced || hasGlobalMessageTimer;
   const duration = hasMessageTimer ? formatDuration(messageTimer) : ({} as DurationUnit);
 
   // Click on ephemeral button
