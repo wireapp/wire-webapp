@@ -21,17 +21,17 @@ import React from 'react';
 import cx from 'classnames';
 import {container} from 'tsyringe';
 
-import AssetHeader from 'Components/asset/AssetHeader';
+import AssetHeader from './AssetHeader';
 import RestrictedFile from 'Components/asset/RestrictedFile';
-import AssetLoader from 'Components/asset/AssetLoader';
+import AssetLoader from './AssetLoader';
 import {formatBytes, getFileExtension, trimFileExtension} from 'Util/util';
 import {t} from 'Util/LocalizerUtil';
-import {registerReactComponent, useKoSubscribableChildren} from 'Util/ComponentUtil';
+import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 
-import type {FileAsset} from '../../entity/message/FileAsset';
-import type {ContentMessage} from '../../entity/message/ContentMessage';
-import {AssetTransferState} from '../../assets/AssetTransferState';
-import {TeamState} from '../../team/TeamState';
+import type {FileAsset} from '../../../../entity/message/FileAsset';
+import type {ContentMessage} from '../../../../entity/message/ContentMessage';
+import {AssetTransferState} from '../../../../assets/AssetTransferState';
+import {TeamState} from '../../../../team/TeamState';
 import {useAssetTransfer} from './AbstractAssetTransferStateTracker';
 
 export interface FileAssetProps {
@@ -128,8 +128,3 @@ const FileAssetComponent: React.FC<FileAssetProps> = ({
 };
 
 export default FileAssetComponent;
-
-registerReactComponent('file-asset', {
-  component: FileAssetComponent,
-  template: '<div data-bind="react: {hasHeader: header, message: ko.unwrap(message)}"></div>',
-});

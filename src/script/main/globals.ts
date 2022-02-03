@@ -28,12 +28,7 @@ import type {NotificationService} from '../event/NotificationService';
 import '../Config';
 
 import '../page/AccentColorPicker';
-import 'Components/asset/AssetHeader';
-import 'Components/asset/controls/AudioSeekBar';
-import 'Components/asset/controls/MediaButton';
-import 'Components/asset/controls/SeekBar';
 import 'Components/CopyToClipboard';
-import 'Components/message/EphemeralTimer';
 import '../page/start-ui/GroupList';
 import 'Components/toggle/BaseToggle';
 import 'Components/icons';

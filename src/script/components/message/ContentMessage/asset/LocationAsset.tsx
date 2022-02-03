@@ -20,10 +20,9 @@
 import React from 'react';
 
 import {getMapsUrl} from 'Util/LocationUtil';
-import {registerReactComponent} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 
-import type {Location} from '../../entity/message/Location';
+import type {Location} from '../../../../entity/message/Location';
 
 export interface LocationAssetProps {
   asset: Location;
@@ -53,8 +52,3 @@ const LocationAsset: React.FC<LocationAssetProps> = ({asset}) => {
 };
 
 export default LocationAsset;
-
-registerReactComponent('location-asset', {
-  component: LocationAsset,
-  template: '<div class="location-asset" data-bind="react: {asset}"></div>',
-});

@@ -18,10 +18,10 @@
  */
 
 import React from 'react';
-import {registerReactComponent, useKoSubscribableChildren} from 'Util/ComponentUtil';
+import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {noop} from 'Util/util';
 import classNames from 'classnames';
-import type {CompositeMessage} from '../../entity/message/CompositeMessage';
+import type {CompositeMessage} from '../../../../entity/message/CompositeMessage';
 import Icon from 'Components/Icon';
 
 export interface MessageButtonProps {
@@ -74,8 +74,3 @@ const MessageButton: React.FC<MessageButtonProps> = ({id, label, message, onClic
 };
 
 export default MessageButton;
-
-registerReactComponent('message-button', {
-  component: MessageButton,
-  template: '<span data-bind="react: {message: ko.unwrap(message), id, label, onClick}"></span>',
-});

@@ -23,13 +23,13 @@ import cx from 'classnames';
 import {safeWindowOpen} from 'Util/SanitizationUtil';
 import {cleanURL} from 'Util/UrlUtil';
 import {isTweetUrl} from 'Util/ValidationUtil';
-import {registerReactComponent, useKoSubscribableChildren} from 'Util/ComponentUtil';
+import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 
-import Image from '../Image';
+import Image from 'Components/Image';
 import AssetHeader from './AssetHeader';
-import type {ContentMessage} from '../../entity/message/ContentMessage';
-import type {Text} from '../../entity/message/Text';
+import type {ContentMessage} from '../../../../entity/message/ContentMessage';
+import type {Text} from '../../../../entity/message/Text';
 
 export interface LinkPreviewAssetProps {
   /** Does the asset have a visible header? */
@@ -120,8 +120,3 @@ const LinkPreviewAssetComponent: React.FC<LinkPreviewAssetProps> = ({header = fa
 };
 
 export default LinkPreviewAssetComponent;
-
-registerReactComponent('link-preview-asset', {
-  bindings: 'header, message: ko.unwrap(message)',
-  component: LinkPreviewAssetComponent,
-});

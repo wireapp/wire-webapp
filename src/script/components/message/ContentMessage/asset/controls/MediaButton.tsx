@@ -18,10 +18,10 @@
  */
 
 import cx from 'classnames';
-import AssetLoader from 'Components/asset/AssetLoader';
+import AssetLoader from '../AssetLoader';
 import React, {useEffect, useState} from 'react';
-import type {FileAsset} from '../../../entity/message/FileAsset';
-import {AssetTransferState} from '../../../assets/AssetTransferState';
+import type {FileAsset} from '../../../../../entity/message/FileAsset';
+import {AssetTransferState} from '../../../../../assets/AssetTransferState';
 import {noop} from 'Util/util';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 

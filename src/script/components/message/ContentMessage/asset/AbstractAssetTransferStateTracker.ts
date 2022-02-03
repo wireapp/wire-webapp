@@ -21,11 +21,11 @@ import {container} from 'tsyringe';
 import {useEffect, useState} from 'react';
 
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
-import {AssetTransferState} from '../../assets/AssetTransferState';
-import {AssetRepository} from '../../assets/AssetRepository';
-import {ContentMessage} from '../../entity/message/ContentMessage';
-import {FileAsset} from '../../entity/message/FileAsset';
-import {AssetRemoteData} from '../../assets/AssetRemoteData';
+import {AssetTransferState} from '../../../../assets/AssetTransferState';
+import {AssetRepository} from '../../../../assets/AssetRepository';
+import {ContentMessage} from '../../../../entity/message/ContentMessage';
+import {FileAsset} from '../../../../entity/message/FileAsset';
+import {AssetRemoteData} from '../../../../assets/AssetRemoteData';
 
 export const useAssetTransfer = (message: ContentMessage, assetRepository = container.resolve(AssetRepository)) => {
   const asset = message?.getFirstAsset() as FileAsset;

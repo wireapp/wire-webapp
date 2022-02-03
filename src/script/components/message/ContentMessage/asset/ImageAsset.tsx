@@ -22,16 +22,16 @@ import React, {useEffect, useState} from 'react';
 import {container} from 'tsyringe';
 import cx from 'classnames';
 
-import {registerReactComponent, useKoSubscribableChildren} from 'Util/ComponentUtil';
+import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import useEffectRef from 'Util/useEffectRef';
 
-import {Config} from '../../Config';
-import {ContentMessage} from '../../entity/message/ContentMessage';
-import {MediumImage} from '../../entity/message/MediumImage';
-import {TeamState} from '../../team/TeamState';
+import {Config} from '../../../../Config';
+import {ContentMessage} from '../../../../entity/message/ContentMessage';
+import {MediumImage} from '../../../../entity/message/MediumImage';
+import {TeamState} from '../../../../team/TeamState';
 import AssetLoader from './AssetLoader';
-import RestrictedImage from './RestrictedImage';
-import {useViewPortObserver} from '../../ui/viewportObserver';
+import RestrictedImage from 'Components/asset/RestrictedImage';
+import {useViewPortObserver} from '../../../../ui/viewportObserver';
 import {useAssetTransfer} from './AbstractAssetTransferStateTracker';
 
 export interface ImageAssetProps {
@@ -120,8 +120,3 @@ const ImageAsset: React.FC<ImageAssetProps> = ({asset, message, onClick, teamSta
 };
 
 export default ImageAsset;
-
-registerReactComponent('image-asset', {
-  component: ImageAsset,
-  template: '<div data-bind="react: {asset, message, onClick}"></div>',
-});

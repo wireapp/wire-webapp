@@ -26,21 +26,21 @@ import {isBeforeToday, formatDateNumeral, formatTimeShort} from 'Util/TimeUtil';
 import {includesOnlyEmojis} from 'Util/EmojiUtil';
 
 import {QualifiedId} from '@wireapp/api-client/src/user';
-import {QuoteEntity} from '../../message/QuoteEntity';
-import {ConversationError} from '../../error/ConversationError';
-import type {Conversation} from '../../entity/Conversation';
-import type {ContentMessage} from '../../entity/message/ContentMessage';
-import type {User} from '../../entity/User';
-import type {MessageRepository} from '../../conversation/MessageRepository';
-import {registerReactComponent, useKoSubscribableChildren} from 'Util/ComponentUtil';
+import {QuoteEntity} from '../../../message/QuoteEntity';
+import {ConversationError} from '../../../error/ConversationError';
+import type {Conversation} from '../../../entity/Conversation';
+import type {ContentMessage} from '../../../entity/message/ContentMessage';
+import type {User} from '../../../entity/User';
+import type {MessageRepository} from '../../../conversation/MessageRepository';
+import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {useEffect, useState} from 'react';
 import Image from 'Components/Image';
 import Icon from 'Components/Icon';
 import {t} from 'Util/LocalizerUtil';
-import VideoAsset from 'Components/asset/VideoAsset';
-import AudioAsset from 'Components/asset/AudioAsset';
-import FileAssetComponent from 'Components/asset/FileAssetComponent';
-import LocationAsset from 'Components/asset/LocationAsset';
+import VideoAsset from './asset/VideoAsset';
+import AudioAsset from './asset/AudioAsset';
+import FileAssetComponent from './asset/FileAssetComponent';
+import LocationAsset from './asset/LocationAsset';
 import useEffectRef from 'Util/useEffectRef';
 import {Text} from 'src/script/entity/message/Text';
 
@@ -276,9 +276,3 @@ const QuotedMessage: React.FC<QuotedMessageProps> = ({
 };
 
 export default Quote;
-
-registerReactComponent('message-quote', {
-  bindings:
-    'message: ko.unwrap(message), quote: ko.unwrap(quote), selfId: ko.unwrap(selfId), conversation: ko.unwrap(conversation), messageRepository, showDetail, focusMessage, handleClickOnMessage, showUserDetails',
-  component: Quote,
-});

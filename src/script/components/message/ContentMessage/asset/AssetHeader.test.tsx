@@ -21,8 +21,8 @@ import TestPage from 'Util/test/TestPage';
 import {createRandomUuid} from 'Util/util';
 import * as TimeUtil from 'Util/TimeUtil';
 
-import {Message} from '../../entity/message/Message';
-import {User} from '../../entity/User';
+import {Message} from '../../../../entity/message/Message';
+import {User} from '../../../../entity/User';
 import AssetHeader, {AssetHeaderProps} from './AssetHeader';
 
 class AssetHeaderPage extends TestPage<AssetHeaderProps> {

@@ -43,17 +43,6 @@ import {AssetRepository} from '../assets/AssetRepository';
 import type {MessageRepository} from '../conversation/MessageRepository';
 import {TeamState} from '../team/TeamState';
 
-import './asset/AudioAsset';
-import './asset/RestrictedAudio';
-import './asset/FileAssetComponent';
-import './asset/ImageAsset';
-import './asset/RestrictedImage';
-import './asset/LinkPreviewAssetComponent';
-import './asset/LocationAsset';
-import './asset/VideoAsset';
-import './asset/RestrictedFile';
-import './asset/RestrictedVideo';
-import './asset/MessageButton';
 import './message/VerificationMessage';
 import './message/CallMessage';
 import './message/CallTimeoutMessage';
@@ -66,9 +55,7 @@ import './message/SystemMessage';
 import './message/MemberMessage';
 import './message/ReadReceiptStatus';
 import './message/PingMessage';
-import './message/MessageFooterLike';
-import './message/MessageLike';
-import './message/MessageQuote';
+import './message/ContentMessage';
 
 interface MessageParams {
   actionsViewModel: ActionsViewModel;
@@ -84,7 +71,7 @@ interface MessageParams {
   onClickImage: (message: ContentMessage, event: UIEvent) => void;
   onClickInvitePeople: () => void;
   onClickLikes: (view: MessageListViewModel) => void;
-  onClickMessage: (message: ContentMessage, event: Event) => boolean;
+  onClickMessage: (message: ContentMessage, event: Event) => void;
   onClickParticipants: (participants: User[]) => void;
   onClickReceipts: (view: Message) => void;
   onClickResetSession: (messageError: DecryptErrorMessage) => void;
@@ -117,7 +104,7 @@ class Message {
   onClickImage: (message: ContentMessage, event: UIEvent) => void;
   onClickInvitePeople: () => void;
   onClickLikes: (view: MessageListViewModel) => void;
-  onClickMessage: (message: ContentMessage, event: Event) => boolean;
+  onClickMessage: (message: ContentMessage, event: Event) => void;
   onClickParticipants: (participants: User[]) => void;
   onClickReceipts: (view: Message) => void;
   onClickResetSession: (messageError: DecryptErrorMessage) => void;
@@ -310,117 +297,21 @@ class Message {
   }
 }
 
-// If this is not explicitly defined as string,
-// TS will define this as the string's content.
-const receiptStatusTemplate: string = `
-  <read-receipt-status params="
-    message: message,
-    is1to1Conversation: conversation().is1to1,
-    isLastDeliveredMessage: isLastDeliveredMessage,
-    onClickReceipts: onClickReceipts,
-  "></read-receipt-status>
-`;
-
-const normalTemplate: string = `
-  <!-- ko if: shouldShowAvatar -->
-    <div class="message-header">
-      <div class="message-header-icon">
-        <participant-avatar class="cursor-pointer" params="participant: message.user, onAvatarClick: onClickAvatar, avatarSize: AVATAR_SIZE.X_SMALL"></participant-avatar>
-      </div>
-      <div class="message-header-label">
-        <span class="message-header-label-sender" data-bind='css: message.accent_color(), text: message.headerSenderName()' data-uie-name="sender-name"></span>
-        <!-- ko if: message.user().isService -->
-          <service-icon class="message-header-icon-service"></service-icon>
-        <!-- /ko -->
-        <!-- ko if: message.user().isExternal() -->
-          <external-icon class="message-header-icon-external with-tooltip with-tooltip--external" data-bind="attr: {'data-tooltip': t('rolePartner')}" data-uie-name="sender-external"></external-icon>
-        <!-- /ko -->
-        <!-- ko if: message.user().isFederated -->
-          <federation-icon class="message-header-icon-guest with-tooltip with-tooltip--external" data-bind="attr: {'data-tooltip': message.user().handle}" data-uie-name="sender-federated"></federation-icon>
-        <!-- /ko -->
-        <!-- ko if: message.user().isDirectGuest() -->
-          <guest-icon class="message-header-icon-guest with-tooltip with-tooltip--external" data-bind="attr: {'data-tooltip': t('conversationGuestIndicator')}" data-uie-name="sender-guest"></guest-icon>
-        <!-- /ko -->
-        <!-- ko if: message.was_edited() -->
-          <span class="message-header-label-icon icon-edit" data-bind="attr: {title: message.displayEditedTimestamp()}"></span>
-        <!-- /ko -->
-      </div>
-    </div>
-  <!-- /ko -->
-  <!-- ko if: message.quote() -->
-    <message-quote params="
-        conversation: conversation,
-        quote: message.quote(),
-        selfId: selfId,
-        messageRepository: messageRepository,
-        showDetail: onClickImage,
-        focusMessage: onClickTimestamp,
-        handleClickOnMessage: onClickMessage,
-        showUserDetails: onClickAvatar,
-      "></message-quote>
-  <!-- /ko -->
-
-  <div class="message-body" data-bind="attr: {'title': message.ephemeral_caption()}">
-    <!-- ko if: message.ephemeral_status() === EphemeralStatusType.ACTIVE -->
-      <ephemeral-timer class="message-ephemeral-timer" params="message: message"></ephemeral-timer>
-    <!-- /ko -->
-
-    <!-- ko foreach: {data: message.assets, as: 'asset', noChildContext: true} -->
-      <!-- ko if: asset.isImage() -->
-        <image-asset params="asset: asset, message: message, onClick: onClickImage"></image-asset>
-      <!-- /ko -->
-      <!-- ko if: asset.isText() -->
-        <!-- ko if: asset.should_render_text -->
-          <div class="text" data-bind="html: asset.render(selfId(), accentColor()), event: {mousedown: (data, event) => onClickMessage(asset, event)}, css: {'text-large': includesOnlyEmojis(asset.text), 'text-foreground': message.status() === StatusType.SENDING, 'ephemeral-message-obfuscated': message.isObfuscated()}" dir="auto"></div>
-        <!-- /ko -->
-        <!-- ko foreach: asset.previews() -->
-          <link-preview-asset class="message-asset" params="message: $parent.message"></link-preview-asset>
-        <!-- /ko -->
-      <!-- /ko -->
-      <!-- ko if: asset.isVideo() -->
-        <video-asset class="message-asset" data-bind="css: {'ephemeral-asset-expired icon-movie': message.isObfuscated()}" params="message: message"></video-asset>
-      <!-- /ko -->
-      <!-- ko if: asset.isAudio() -->
-        <audio-asset data-bind="css: {'ephemeral-asset-expired': message.isObfuscated()}" params="message: message, className: 'message-asset'"></audio-asset>
-      <!-- /ko -->
-      <!-- ko if: asset.isFile() -->
-        <file-asset class="message-asset" data-bind="css: {'ephemeral-asset-expired icon-file': message.isObfuscated()}" params="message: message"></file-asset>
-      <!-- /ko -->
-      <!-- ko if: asset.isLocation() -->
-        <location-asset params="asset: asset"></location-asset>
-      <!-- /ko -->
-      <!-- ko if: asset.isButton() -->
-        <message-button params="onClick: () => clickButton(message, asset.id), label: asset.text, id: asset.id, message: message"></message-button>
-      <!-- /ko -->
-    <!-- /ko -->
-
-    <!-- ko if: !message.other_likes().length && message.isReactable() -->
-        <message-like class="message-body-like" params="className: 'message-body-like-icon like-button message-show-on-hover', message: message, onLike: onLike"></message-like>
-    <!-- /ko -->
-
-    <div class="message-body-actions">
-      <!-- ko if: contextMenuEntries().length > 0 -->
-        <span class="context-menu icon-more font-size-xs" data-bind="click: (data, event) => showContextMenu(event)"></span>
-      <!-- /ko -->
-      <!-- ko if: message.ephemeral_status() === EphemeralStatusType.ACTIVE -->
-        <time class="time" data-bind="text: message.displayTimestampShort(), attr: {'data-timestamp': message.timestamp, 'data-uie-uid': message.id, 'title': message.ephemeral_caption()}, showAllTimestamps"></time>
-      <!-- /ko -->
-      <!-- ko ifnot: message.ephemeral_status() === EphemeralStatusType.ACTIVE -->
-        <time class="time with-tooltip with-tooltip--top with-tooltip--time" data-bind="text: message.displayTimestampShort(), attr: {'data-timestamp': message.timestamp, 'data-uie-uid': message.id, 'data-tooltip': message.displayTimestampLong()}, showAllTimestamps"></time>
-      <!-- /ko -->
-      ${receiptStatusTemplate}
-    </div>
-
-  </div>
-  <!-- ko if: message.other_likes().length -->
-    <message-footer-like params="message: message, is1to1Conversation: conversation().is1to1(), onLike: onLike, onClickLikes: onClickLikes"></message-footer-like>
-  <!-- /ko -->
-  `;
-
 ko.components.register('message', {
   template: `
     <!-- ko if: message.super_type === 'normal' -->
-      ${normalTemplate}
+      <text-message params="
+        message: message,
+        conversation: conversation,
+        selfId: selfId,
+        isLastDeliveredMessage: isLastDeliveredMessage,
+        onLike: onLike,
+        onClickMessage: onClickMessage,
+        onClickTimestamp: onClickTimestamp,
+        onClickLikes: onClickLikes,
+        onClickButton: clickButton,
+        shouldShowAvatar: shouldShowAvatar,
+      "></text-message>
     <!-- /ko -->
     <!-- ko if: message.super_type === 'missed' -->
       <missed-message></missed-message>

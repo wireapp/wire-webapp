@@ -18,18 +18,18 @@
  */
 
 import React, {useEffect, useState} from 'react';
-import {TeamState} from '../../team/TeamState';
+import {TeamState} from '../../../../team/TeamState';
 import {container} from 'tsyringe';
 import cx from 'classnames';
 
 import {getLogger} from 'Util/Logger';
 import {formatSeconds} from 'Util/TimeUtil';
 
-import {AssetTransferState} from '../../assets/AssetTransferState';
-import type {ContentMessage} from '../../entity/message/ContentMessage';
-import type {FileAsset} from '../../entity/message/FileAsset';
+import {AssetTransferState} from '../../../../assets/AssetTransferState';
+import type {ContentMessage} from '../../../../entity/message/ContentMessage';
+import type {FileAsset} from '../../../../entity/message/FileAsset';
 
-import RestrictedAudio from './RestrictedAudio';
+import RestrictedAudio from 'Components/asset/RestrictedAudio';
 import SeekBar from './controls/SeekBar';
 import AudioSeekBar from './controls/AudioSeekBar';
 import AssetHeader from './AssetHeader';
@@ -38,7 +38,7 @@ import MediaButton from './controls/MediaButton';
 import Icon from 'Components/Icon';
 import useEffectRef from 'Util/useEffectRef';
 import {useAssetTransfer} from './AbstractAssetTransferStateTracker';
-import {registerReactComponent, useKoSubscribableChildren} from 'Util/ComponentUtil';
+import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 
 const logger = getLogger('AudioAssetComponent');
 
@@ -148,8 +148,3 @@ const AudioAsset: React.FC<AudioAssetProps> = ({
 };
 
 export default AudioAsset;
-
-registerReactComponent<AudioAssetProps>('audio-asset', {
-  bindings: 'hasHeader: header, className, message: ko.unwrap(message)',
-  component: AudioAsset,
-});

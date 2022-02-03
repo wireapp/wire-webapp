@@ -19,8 +19,7 @@
 
 import React from 'react';
 
-import {registerReactComponent} from 'Util/ComponentUtil';
-import Icon from '../Icon';
+import Icon from '../../../Icon';
 
 export interface AssetLoaderProps {
   large?: boolean;
@@ -58,8 +57,3 @@ const AssetLoader: React.FC<AssetLoaderProps> = ({large, loadProgress, onCancel}
 };
 
 export default AssetLoader;
-
-registerReactComponent('asset-loader', {
-  component: AssetLoader,
-  template: '<div data-bind="react: {large, loadProgress: ko.unwrap(loadProgress), onCancel}"></div>',
-});
