@@ -50,7 +50,6 @@ import {UserRepository} from '../user/UserRepository';
 import {serverTimeHandler} from '../time/serverTimeHandler';
 import {CallingRepository} from '../calling/CallingRepository';
 import {BackupRepository} from '../backup/BackupRepository';
-import {BroadcastRepository} from '../broadcast/BroadcastRepository';
 import {NotificationRepository} from '../notification/NotificationRepository';
 import {IntegrationRepository} from '../integration/IntegrationRepository';
 import {IntegrationService} from '../integration/IntegrationService';
@@ -80,7 +79,6 @@ import {WindowHandler} from '../ui/WindowHandler';
 import {Router} from '../router/Router';
 import {initRouterBindings} from '../router/routerBindings';
 
-import '../page/message-list/mentionSuggestions';
 import './globals';
 
 import {ReceiptsMiddleware} from '../event/preprocessor/ReceiptsMiddleware';
@@ -97,10 +95,8 @@ import {ContentViewModel} from '../view_model/ContentViewModel';
 import AppLock from '../page/AppLock';
 import {CacheRepository} from '../cache/CacheRepository';
 import {SelfService} from '../self/SelfService';
-import {BroadcastService} from '../broadcast/BroadcastService';
 import {PropertiesRepository} from '../properties/PropertiesRepository';
 import {PropertiesService} from '../properties/PropertiesService';
-import {LinkPreviewRepository} from '../links/LinkPreviewRepository';
 import {AssetService} from '../assets/AssetService';
 import {UserService} from '../user/UserService';
 import {AudioRepository} from '../audio/AudioRepository';
@@ -260,7 +256,6 @@ class App {
     repositories.team = new TeamRepository(new TeamService(), repositories.user, repositories.asset);
 
     repositories.message = new MessageRepository(
-      repositories.client,
       /*
        * FIXME there is a cyclic dependency between message and conversation repos.
        * MessageRepository should NOT depend upon ConversationRepository.
@@ -273,8 +268,6 @@ class App {
       repositories.properties,
       serverTimeHandler,
       repositories.user,
-      this.service.conversation,
-      new LinkPreviewRepository(repositories.asset, repositories.properties),
       repositories.asset,
     );
 
@@ -302,13 +295,6 @@ class App {
       readReceiptMiddleware.processEvent.bind(readReceiptMiddleware),
     ]);
     repositories.backup = new BackupRepository(new BackupService(), repositories.conversation);
-    repositories.broadcast = new BroadcastRepository(
-      new BroadcastService(),
-      repositories.client,
-      repositories.message,
-      repositories.cryptography,
-      sendingMessageQueue,
-    );
     repositories.calling = new CallingRepository(
       repositories.message,
       repositories.event,
@@ -904,6 +890,11 @@ $(async () => {
   exposeWrapperGlobals();
   const appContainer = document.getElementById('wire-main');
   if (appContainer) {
+    const enforceDesktopApplication =
+      Config.getConfig().FEATURE.ENABLE_ENFORCE_DESKTOP_APPLICATION_ONLY && !Runtime.isDesktopApp();
+    if (enforceDesktopApplication) {
+      doRedirect(SIGN_OUT_REASON.APP_INIT);
+    }
     const shouldPersist = loadValue<boolean>(StorageKey.AUTH.PERSIST);
     if (shouldPersist === undefined) {
       doRedirect(SIGN_OUT_REASON.NOT_SIGNED_IN);

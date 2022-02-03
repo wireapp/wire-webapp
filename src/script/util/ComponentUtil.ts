@@ -64,22 +64,6 @@ export function registerReactComponent<Props>(
   }
 }
 
-export const useKoSubscribableCallback = <T = any>(
-  observable: ko.Subscribable<T>,
-  callback: (newValue: T) => void,
-): void => {
-  useEffect(() => {
-    const subscription = observable.subscribe(newValue => callback(newValue));
-    return () => subscription.dispose();
-  }, [observable]);
-};
-
-export const useKoSubscribable = <T = any>(observable: ko.Subscribable<T>, defaultValue?: T): T => {
-  const [value, setValue] = useState<T>(observable() ?? defaultValue);
-  useKoSubscribableCallback(observable, newValue => setValue(newValue));
-  return value;
-};
-
 type Subscribables<T> = {
   [Key in keyof T]: T[Key] extends ko.Subscribable ? T[Key] : never;
 };
@@ -113,27 +97,5 @@ export const useKoSubscribableChildren = <
     return () => subscriptions.forEach(subscription => subscription?.dispose());
   }, [parent]);
 
-  return state;
-};
-
-export const useKoSubscribableMap = <C extends keyof Subscribables<P>, P extends Partial<Record<C, ko.Subscribable>>>(
-  parents: P[],
-  child: C,
-): Unwrapped<P[C]>[] => {
-  const getValues = (roots: P[]): Unwrapped<P[C]>[] =>
-    roots.reduce((acc, root) => [...acc, root?.[child]?.()], [] as Unwrapped<P[C]>[]);
-
-  const [state, setState] = useState<Unwrapped<P[C]>[]>();
-
-  useEffect(() => {
-    setState(getValues(parents));
-    const subscriptions = parents.map(parent => {
-      return parent?.[child]?.subscribe(() => {
-        setState(getValues(parents));
-      });
-    });
-
-    return () => subscriptions.forEach(subscription => subscription?.dispose());
-  }, [parents]);
   return state;
 };

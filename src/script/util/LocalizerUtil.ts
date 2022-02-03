@@ -18,6 +18,7 @@
  */
 
 import {escape} from 'underscore';
+import en from 'I18n/en-US.json';
 
 import type {User} from '../entity/User';
 import {getSelfName} from './SanitizationUtil';
@@ -125,8 +126,10 @@ export const setStrings = (newStrings: typeof strings): void => {
   strings = newStrings;
 };
 
+export type StringIdentifer = keyof typeof en | '';
+
 export function t(
-  identifier: string,
+  identifier: StringIdentifer,
   substitutions?: Substitutes,
   dangerousSubstitutions?: Record<string, string>,
   skipEscape: boolean = false,

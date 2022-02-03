@@ -77,16 +77,18 @@ const ConversationListCallingCell: React.FC<CallingCellProps> = ({
   const [scrollbarRef, setScrollbarRef] = useEffectRef<HTMLDivElement>();
   useFadingScrollbar(scrollbarRef);
 
-  const {reason, state, isCbrEnabled, startedAt, participants, maximizedParticipant} = useKoSubscribableChildren(call, [
-    'reason',
-    'state',
-    'isCbrEnabled',
-    'startedAt',
-    'participants',
-    'maximizedParticipant',
-    'pages',
-    'currentPage',
-  ]);
+  const {reason, state, isCbrEnabled, startedAt, participants, maximizedParticipant, muteState} =
+    useKoSubscribableChildren(call, [
+      'reason',
+      'state',
+      'isCbrEnabled',
+      'startedAt',
+      'participants',
+      'maximizedParticipant',
+      'pages',
+      'currentPage',
+      'muteState',
+    ]);
   const {
     isGroup,
     participating_user_ets: userEts,
@@ -104,11 +106,8 @@ const ConversationListCallingCell: React.FC<CallingCellProps> = ({
   const {isMinimized} = useKoSubscribableChildren(multitasking, ['isMinimized']);
   const {isVideoCallingEnabled} = useKoSubscribableChildren(teamState, ['isVideoCallingEnabled']);
 
-  const {isMuted, muteState, activeCallViewTab} = useKoSubscribableChildren(callState, [
-    'isMuted',
-    'muteState',
-    'activeCallViewTab',
-  ]);
+  const {activeCallViewTab} = useKoSubscribableChildren(callState, ['activeCallViewTab']);
+  const isMuted = muteState !== MuteState.NOT_MUTED;
 
   const isStillOngoing = reason === CALL_REASON.STILL_ONGOING;
   const isDeclined = [CALL_REASON.STILL_ONGOING, CALL_REASON.ANSWERED_ELSEWHERE].includes(reason);
@@ -149,7 +148,7 @@ const ConversationListCallingCell: React.FC<CallingCellProps> = ({
 
     const muteParticipant = {
       click: () =>
-        callingRepository.sendModeratorMute(conversation.id, {[participant.user.id]: [participant.clientId]}),
+        callingRepository.sendModeratorMute(conversation.qualifiedId, {[participant.user.id]: [participant.clientId]}),
       icon: 'mic-off-icon',
       identifier: `moderator-mute-participant`,
       isDisabled: participant.isMuted(),
@@ -164,7 +163,7 @@ const ConversationListCallingCell: React.FC<CallingCellProps> = ({
             acc[user.id] = [...(acc[user.id] || []), clientId];
             return acc;
           }, {} as Record<UserId, ClientId[]>);
-        callingRepository.sendModeratorMute(conversation.id, recipients);
+        callingRepository.sendModeratorMute(conversation.qualifiedId, recipients);
       },
       icon: 'mic-off-icon',
       identifier: 'moderator-mute-others',
@@ -291,6 +290,7 @@ const ConversationListCallingCell: React.FC<CallingCellProps> = ({
                     data-uie-name="do-toggle-mute"
                     data-uie-value={isMuted ? 'active' : 'inactive'}
                     title={t('videoCallOverlayMicrophone')}
+                    disabled={isConnecting}
                   >
                     {isMuted ? <Icon.MicOff className="small-icon" /> : <Icon.MicOn className="small-icon" />}
                   </button>

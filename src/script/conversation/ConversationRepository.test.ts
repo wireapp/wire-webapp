@@ -27,7 +27,6 @@ import {RECEIPT_MODE} from '@wireapp/api-client/src/conversation/data';
 import {ClientClassification} from '@wireapp/api-client/src/client/';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 import {createRandomUuid} from 'Util/util';
-import {LegalHoldStatus} from '@wireapp/protocol-messaging';
 import {Conversation} from 'src/script/entity/Conversation';
 import {User} from 'src/script/entity/User';
 import {Message} from 'src/script/entity/message/Message';
@@ -120,103 +119,6 @@ describe('ConversationRepository', () => {
     storage_service.clearStores();
     (jQuery as any).ajax.restore();
     testFactory.conversation_repository['conversationState'].conversations.removeAll();
-  });
-
-  describe('checkLegalHoldStatus', () => {
-    it('injects legal hold system messages when user A discovers that user B is on legal hold when receiving a message from user B for the very first time', async () => {
-      const selfUser = UserGenerator.getRandomUser();
-      const conversationPartner = UserGenerator.getRandomUser();
-      testFactory.user_repository['userState'].users.push(conversationPartner);
-
-      const conversationJsonFromBackend: Partial<ConversationDatabaseData> = {
-        accessModes: [CONVERSATION_ACCESS.INVITE],
-        accessRole: CONVERSATION_ACCESS_ROLE.ACTIVATED,
-        archived_state: false,
-        archived_timestamp: 0,
-        creator: conversationPartner.id,
-        id: createRandomUuid(),
-        last_event_timestamp: 3,
-        last_server_timestamp: 3,
-        message_timer: null,
-        muted_state: 0,
-        muted_timestamp: 0,
-        name: null,
-        others: [conversationPartner.id],
-        receipt_mode: null,
-        status: ConversationStatus.CURRENT_MEMBER,
-        team_id: createRandomUuid(),
-        type: CONVERSATION_TYPE.REGULAR,
-      };
-
-      const [conversationEntity] = ConversationMapper.mapConversations([conversationJsonFromBackend as any]);
-      conversationEntity.participating_user_ets.push(conversationPartner);
-      conversationEntity.selfUser(selfUser);
-      spyOn(testFactory.conversation_repository['userState'], 'self').and.returnValue(selfUser);
-
-      expect(conversationEntity['hasInitializedUsers']()).toBe(true);
-      expect(conversationEntity.hasLegalHold()).toBe(false);
-      expect(conversationEntity.participating_user_ets().length).toBe(1);
-
-      const eventJson: EventRecord = {
-        conversation: conversationEntity.id,
-        data: {
-          content: 'Decrypted message content',
-          expects_read_confirmation: false,
-          legal_hold_status: LegalHoldStatus.ENABLED,
-          mentions: [],
-          previews: [],
-          quote: null,
-        },
-        from: conversationPartner.id,
-        from_client_id: 'd9c78d7f6b18b0b3',
-        id: createRandomUuid(),
-        primary_key: '3',
-        time: new Date().toISOString(),
-        type: ClientEvent.CONVERSATION.MESSAGE_ADD,
-      };
-
-      spyOn(testFactory.conversation_repository['conversation_service'], 'postEncryptedMessage').and.callFake(() => {
-        const missingClientsError: any = new Error('Fake missing client error');
-        missingClientsError.deleted = {};
-        missingClientsError.missing = {
-          [conversationPartner.id]: ['1e66e04948938c2c', '53761bec3f10a6d9', 'a9c8c385737b14fe'],
-        };
-        missingClientsError.redundant = {};
-        missingClientsError.time = new Date().toISOString();
-        return Promise.reject(missingClientsError);
-      });
-
-      spyOn(testFactory.client_service, 'getClientsByUserId').and.returnValue(
-        Promise.resolve([
-          {
-            [eventJson.id]: [
-              {
-                class: ClientClassification.DESKTOP,
-                id: '1e66e04948938c2c',
-              },
-              {
-                class: ClientClassification.LEGAL_HOLD,
-                id: '53761bec3f10a6d9',
-              },
-              {
-                class: ClientClassification.DESKTOP,
-                id: 'a9c8c385737b14fe',
-              },
-            ],
-          },
-        ]),
-      );
-
-      const injectLegalHoldMessageSpy = spyOn(testFactory.conversation_repository, 'injectLegalHoldMessage');
-      await testFactory.conversation_repository['saveConversation'](conversationEntity);
-      await testFactory.conversation_repository['checkLegalHoldStatus'](conversationEntity, eventJson as any);
-
-      expect(injectLegalHoldMessageSpy).toHaveBeenCalledWith(
-        expect.objectContaining({
-          legalHoldStatus: LegalHoldStatus.ENABLED,
-        }),
-      );
-    });
   });
 
   describe('filtered_conversations', () => {
@@ -1213,18 +1115,6 @@ describe('ConversationRepository', () => {
           expect(user_ets.length).toBe(3);
           expect(testFactory.conversation_repository['conversationState'].conversations().length).toBe(4);
         });
-    });
-
-    it('should generate a user-client-map including users with clients', () => {
-      const [, dudes] = testFactory.conversation_repository['conversationState'].conversations();
-      const user_ets = dudes.participating_user_ets();
-
-      return testFactory.message_repository.createRecipients({domain: '', id: dudes.id}).then(recipients => {
-        expect(Object.keys(recipients).length).toBe(2);
-        expect(recipients[bob.id].length).toBe(2);
-        expect(recipients[john.id].length).toBe(1);
-        expect(user_ets.length).toBe(2);
-      });
     });
   });
 

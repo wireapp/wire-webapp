@@ -17,7 +17,7 @@
  *
  */
 
-import * as faker from 'faker';
+import faker from '@faker-js/faker';
 import type {User as APIClientUser} from '@wireapp/api-client/src/user/';
 import {UserAssetType} from '@wireapp/api-client/src/user/';
 

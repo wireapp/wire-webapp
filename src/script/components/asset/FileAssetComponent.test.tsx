@@ -39,7 +39,7 @@ describe('FileAssetComponent', () => {
   function mockContentMessage(): ContentMessage {
     const asset = new FileAsset();
     asset.file_name = 'test-file.log';
-    asset.file_size = '10485760';
+    asset.file_size = 10485760;
 
     const message = new ContentMessage();
     message.addAsset(asset);

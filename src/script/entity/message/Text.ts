@@ -21,8 +21,9 @@ import ko from 'knockout';
 
 import {renderMessage} from 'Util/messageRenderer';
 
+import {QualifiedId} from '@wireapp/api-client/src/user';
 import {AssetType} from '../../assets/AssetType';
-import {containsOnlyLink} from '../../links/LinkPreviewHelpers';
+import {containsOnlyLink} from '../../conversation/linkPreviews/helpers';
 import {mediaParser} from '../../media/MediaParser';
 import type {MentionEntity} from '../../message/MentionEntity';
 import {Asset} from './Asset';
@@ -53,12 +54,12 @@ export class Text extends Asset {
   }
 
   // Process text before rendering it
-  render(selfId: string, themeColor?: string): string {
+  render(selfId: QualifiedId, themeColor?: string): string {
     const message = renderMessage(this.text, selfId, this.mentions());
     return !this.previews().length ? mediaParser.renderMediaEmbeds(message, themeColor) : message;
   }
 
-  isUserMentioned(userId: string): boolean {
+  isUserMentioned(userId: QualifiedId): boolean {
     return this.mentions().some(mentionEntity => mentionEntity.targetsUser(userId));
   }
 }

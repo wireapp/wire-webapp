@@ -23,7 +23,7 @@ import {amplify} from 'amplify';
 import ko from 'knockout';
 import {container} from 'tsyringe';
 
-import {t} from 'Util/LocalizerUtil';
+import {StringIdentifer, t} from 'Util/LocalizerUtil';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 
 import {ConversationVerificationState} from '../../conversation/ConversationVerificationState';
@@ -39,6 +39,7 @@ import {ConversationState} from '../../conversation/ConversationState';
 import {CallState} from '../../calling/CallState';
 import {TeamState} from '../../team/TeamState';
 import {ConversationFilter} from '../../conversation/ConversationFilter';
+import {matchQualifiedIds} from 'Util/QualifiedId';
 
 // Parent: ContentViewModel
 export function generateWarningBadgeKey({
@@ -51,7 +52,7 @@ export function generateWarningBadgeKey({
   hasFederated?: boolean;
   hasGuest?: boolean;
   hasService?: boolean;
-}): string {
+}): StringIdentifer {
   const baseKey = 'guestRoomConversationBadge';
   const extras = [];
   if (hasGuest && !hasExternal && !hasService && !hasFederated) {
@@ -72,7 +73,7 @@ export function generateWarningBadgeKey({
   if (!extras.length) {
     return '';
   }
-  return `${baseKey}${extras.join('And')}`;
+  return `${baseKey}${extras.join('And')}` as StringIdentifer;
 }
 
 export class TitleBarViewModel {
@@ -120,11 +121,13 @@ export class TitleBarViewModel {
 
     this.hasCall = ko.pureComputed(() => {
       const hasEntities = this.conversationEntity() && !!this.callState.joinedCall();
-      return hasEntities ? this.conversationEntity().id === this.callState.joinedCall().conversationId : false;
+      return hasEntities
+        ? matchQualifiedIds(this.conversationEntity().qualifiedId, this.callState.joinedCall().conversationId)
+        : false;
     });
 
     this.badgeLabelCopy = ko.pureComputed(() => {
-      if (this.conversationEntity().is1to1()) {
+      if (this.conversationEntity().is1to1() || this.conversationEntity().isRequest()) {
         return '';
       }
       const hasExternal = this.conversationEntity().hasExternal();
@@ -180,7 +183,7 @@ export class TitleBarViewModel {
 
   private readonly _startCall = (conversationEntity: Conversation, callType: CALL_TYPE): void => {
     const convType = conversationEntity.isGroup() ? CONV_TYPE.GROUP : CONV_TYPE.ONEONONE;
-    this.callingRepository.startCall(conversationEntity.id, convType, callType);
+    this.callingRepository.startCall(conversationEntity.qualifiedId, convType, callType);
   };
 
   readonly clickOnDetails = (): void => {

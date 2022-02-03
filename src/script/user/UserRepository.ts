@@ -18,7 +18,7 @@
  */
 
 import {amplify} from 'amplify';
-import {Availability, GenericMessage} from '@wireapp/protocol-messaging';
+import {Availability} from '@wireapp/protocol-messaging';
 import {ConsentType, Self as APIClientSelf} from '@wireapp/api-client/src/self/';
 import {container} from 'tsyringe';
 import {flatten} from 'underscore';
@@ -45,7 +45,7 @@ import type {User as APIClientUser, QualifiedHandle} from '@wireapp/api-client/s
 import {chunk, partition} from 'Util/ArrayUtil';
 import {t} from 'Util/LocalizerUtil';
 import {Logger, getLogger} from 'Util/Logger';
-import {createRandomUuid, loadUrlBlob} from 'Util/util';
+import {loadUrlBlob} from 'Util/util';
 import {isAxiosError, isBackendError, isQualifiedId} from 'Util/TypePredicateUtil';
 
 import {AssetRepository} from '../assets/AssetRepository';
@@ -56,10 +56,9 @@ import {Config} from '../Config';
 import {ConsentValue} from './ConsentValue';
 import {createSuggestions} from './UserHandleGenerator';
 import {EventRepository} from '../event/EventRepository';
-import {GENERIC_MESSAGE_TYPE} from '../cryptography/GenericMessageType';
 import {LegalHoldModalViewModel} from '../view_model/content/LegalHoldModalViewModel';
 import {mapProfileAssetsV1} from '../assets/AssetMapper';
-import {protoFromType, valueFromType} from './AvailabilityMapper';
+import {valueFromType} from './AvailabilityMapper';
 import {showAvailabilityModal} from './AvailabilityModal';
 import {SIGN_OUT_REASON} from '../auth/SignOutReason';
 import {UNSPLASH_URL} from '../externalRoute';
@@ -316,13 +315,13 @@ export class UserRepository {
    *
    * TODO(SRP): Split up method because it does not follow the single-responsibility principle
    *
-   * @returns Resolves with `true` when a client has been added
+   * @returns Resolves with the new client entity when a client has been added
    */
   addClientToUser = async (
     userId: QualifiedId,
     clientPayload: PublicClient | AddedClient | ClientEntity,
     publishClient: boolean = false,
-  ): Promise<boolean> => {
+  ): Promise<ClientEntity | undefined> => {
     const userEntity = await this.getUserById(userId);
     const clientEntity =
       clientPayload instanceof ClientEntity
@@ -332,34 +331,37 @@ export class UserRepository {
     if (wasClientAdded) {
       await this.clientRepository.saveClientInDb(userId, clientEntity.toJson());
       if (clientEntity.isLegalHold()) {
-        amplify.publish(WebAppEvents.USER.LEGAL_HOLD_ACTIVATED, userId);
         const isSelfUser = userId.id === this.userState.self().id;
         if (isSelfUser) {
           amplify.publish(LegalHoldModalViewModel.SHOW_DETAILS);
         }
-      } else if (publishClient) {
+      }
+      if (publishClient) {
         amplify.publish(WebAppEvents.USER.CLIENT_ADDED, userId, clientEntity);
       }
+      return clientEntity;
     }
-    return wasClientAdded;
+    return undefined;
   };
 
   /**
    * Will sync all the clients of the users given with the backend and add the missing ones.
    * @param userIds - The users which clients should be updated
-   * @return true if one or many clients were added to one or many users
+   * @return resolves with all the client entities that were added
    */
-  async updateMissingUsersClients(userIds: QualifiedId[]): Promise<boolean> {
+  async updateMissingUsersClients(userIds: QualifiedId[]): Promise<ClientEntity[]> {
     const clients = await this.getClientsByUsers(userIds, false);
     const users = flattenUserClientsQualifiedIds<ClientEntity>(clients);
-    const addedUsers = await Promise.all(
-      users.map(async ({userId, clients}) => {
-        return (await Promise.all(clients.map(client => this.addClientToUser(userId, client, true)))).some(
-          wasAdded => wasAdded === true,
-        );
-      }),
+    const addedClients = flatten(
+      await Promise.all(
+        users.map(async ({userId, clients}) => {
+          return (await Promise.all(clients.map(client => this.addClientToUser(userId, client, true)))).filter(
+            client => !!client,
+          );
+        }),
+      ),
     );
-    return addedUsers.some(wasAdded => wasAdded === true);
+    return addedClients;
   }
 
   /**
@@ -367,11 +369,12 @@ export class UserRepository {
    * @deprecated
    * TODO(Federation): This code cannot be used with federation and will be replaced with our core.
    */
-  removeClientFromUser = async (userId: QualifiedId, clientId: string): Promise<void> => {
+  removeClientFromUser = async (userId: QualifiedId, clientId: string) => {
     await this.clientRepository.removeClient(userId, clientId);
     const userEntity = await this.getUserById(userId);
     userEntity.removeClient(clientId);
     amplify.publish(WebAppEvents.USER.CLIENT_REMOVED, userId, clientId);
+    return userEntity;
   };
 
   /**
@@ -396,25 +399,6 @@ export class UserRepository {
     } else {
       this.logger.log(`Availability was again set to '${newAvailabilityValue}'`);
     }
-
-    const protoAvailability = new Availability({type: protoFromType(availability)});
-    const genericMessage = new GenericMessage({
-      [GENERIC_MESSAGE_TYPE.AVAILABILITY]: protoAvailability,
-      messageId: createRandomUuid(),
-    });
-
-    const sortedUsers = this.userState
-      .directlyConnectedUsers()
-      // TMP the `filter` can be removed when message broadcast works on federated backends
-      .filter(user => !user.isFederated)
-      .sort(({id: idA}, {id: idB}) => idA.localeCompare(idB, undefined, {sensitivity: 'base'}));
-    const [members, other] = partition(sortedUsers, user => user.isTeamMember());
-    const recipients = [this.userState.self(), ...members, ...other].slice(
-      0,
-      UserRepository.CONFIG.MAXIMUM_TEAM_SIZE_BROADCAST,
-    );
-
-    amplify.publish(WebAppEvents.BROADCAST.SEND_MESSAGE, {genericMessage, recipients});
   };
 
   private onLegalHoldRequestCanceled(eventJson: UserLegalHoldDisableEvent): void {
@@ -631,7 +615,7 @@ export class UserRepository {
     return this.userService.getUser(userId);
   }
 
-  getUserListFromBackend(userIds: string[]): Promise<APIClientUser[]> {
+  getUserListFromBackend(userIds: string[] | QualifiedId[]): Promise<APIClientUser[]> {
     return this.userService.getUsers(userIds);
   }
 
@@ -817,13 +801,14 @@ export class UserRepository {
    */
   async changePicture(picture: Blob): Promise<User> {
     try {
+      const selfUser = this.userState.self();
       const {previewImageKey, mediumImageKey} = await this.assetRepository.uploadProfileImage(picture);
       const assets: APIClientUserAsset[] = [
-        {key: previewImageKey, size: APIClientUserAssetType.PREVIEW, type: 'image'},
-        {key: mediumImageKey, size: APIClientUserAssetType.COMPLETE, type: 'image'},
+        {domain: previewImageKey.domain, key: previewImageKey.key, size: APIClientUserAssetType.PREVIEW, type: 'image'},
+        {domain: mediumImageKey.domain, key: mediumImageKey.key, size: APIClientUserAssetType.COMPLETE, type: 'image'},
       ];
       await this.selfService.putSelf({assets, picture: []} as any);
-      return await this.userUpdate({user: {assets, id: this.userState.self().id}});
+      return await this.userUpdate({user: {assets, id: selfUser.id}});
     } catch (error) {
       throw new Error(`Error during profile image upload: ${error.message || error.code || error}`);
     }

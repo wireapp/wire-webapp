@@ -37,7 +37,7 @@ export class ServiceEntity {
   description: string;
   id: string;
   mediumPictureResource: ko.Observable<AssetRemoteData>;
-  name: string;
+  name: ko.Observable<string>;
   previewPictureResource: ko.Observable<AssetRemoteData>;
   providerId: string;
   providerName: ko.Observable<string>;
@@ -50,7 +50,7 @@ export class ServiceEntity {
 
     this.id = id;
     this.description = description;
-    this.name = name;
+    this.name = ko.observable(name);
     this.providerId = providerId;
     this.providerName = ko.observable(' ');
     this.summary = summary;

@@ -164,7 +164,7 @@ export class MediaConstraintsHandler {
     }
   }
 
-  private getAudioStreamConstraints(mediaDeviceId: string = ''): MediaTrackConstraints {
+  private getAudioStreamConstraints(mediaDeviceId: string = ''): MediaTrackConstraints & {autoGainControl: boolean} {
     const requireExactMediaDevice = mediaDeviceId && mediaDeviceId !== MediaConstraintsHandler.CONFIG.DEFAULT_DEVICE_ID;
     return requireExactMediaDevice
       ? {autoGainControl: this.getAgcPreference(), deviceId: {exact: mediaDeviceId}}
@@ -182,8 +182,6 @@ export class MediaConstraintsHandler {
     } else {
       streamConstraints.facingMode = MediaConstraintsHandler.CONFIG.CONSTRAINTS.VIDEO.PREFERRED_FACING_MODE;
     }
-
-    streamConstraints.autoGainControl = this.getAgcPreference();
 
     return streamConstraints;
   }

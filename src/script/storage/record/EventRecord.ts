@@ -28,6 +28,7 @@ export interface ReadReceipt {
 }
 
 export interface AssetRecord {
+  domain?: string;
   key?: string;
   otr_key: Uint8Array;
   sha256: Uint8Array;

@@ -25,8 +25,8 @@ import {APIClient} from '../service/APIClientSingleton';
 export class SearchService {
   constructor(private readonly apiClient = container.resolve(APIClient)) {}
 
-  async getContacts(query: string, numberOfRequestedUser: number): Promise<SearchResult> {
-    const request = await this.apiClient.user.api.getSearchContacts(query, numberOfRequestedUser);
+  async getContacts(query: string, numberOfRequestedUser: number, domain?: string): Promise<SearchResult> {
+    const request = await this.apiClient.user.api.getSearchContacts(query, numberOfRequestedUser, domain);
     return request.response;
   }
 }

@@ -36,10 +36,12 @@ export class TeamState {
   public readonly supportsLegalHold: ko.Observable<boolean>;
   public readonly teamName: ko.PureComputed<string>;
   public readonly teamFeatures: ko.Observable<FeatureList>;
+  public readonly classifiedDomains: ko.PureComputed<string[] | undefined>;
   public readonly isConferenceCallingEnabled: ko.PureComputed<boolean>;
   public readonly isFileSharingSendingEnabled: ko.PureComputed<boolean>;
   public readonly isFileSharingReceivingEnabled: ko.PureComputed<boolean>;
   public readonly isVideoCallingEnabled: ko.PureComputed<boolean>;
+  public readonly isGuestLinkEnabled: ko.PureComputed<boolean>;
   public readonly isSelfDeletingMessagesEnabled: ko.PureComputed<boolean>;
   public readonly isSelfDeletingMessagesEnforced: ko.PureComputed<boolean>;
   public readonly getEnforcedSelfDeletingMessagesTimeout: ko.PureComputed<SelfDeletingTimeout>;
@@ -90,6 +92,12 @@ export class TeamState {
       return status ? status === FeatureStatus.ENABLED : true;
     });
 
+    this.classifiedDomains = ko.pureComputed(() => {
+      return this.teamFeatures()?.classifiedDomains.status === FeatureStatus.ENABLED
+        ? this.teamFeatures().classifiedDomains.config.domains
+        : undefined;
+    });
+
     this.isSelfDeletingMessagesEnabled = ko.pureComputed(
       () => this.teamFeatures()?.selfDeletingMessages?.status === FeatureStatus.ENABLED,
     );
@@ -112,6 +120,9 @@ export class TeamState {
     this.isAppLockEnforced = ko.pureComputed(() => this.teamFeatures()?.appLock?.config?.enforceAppLock);
     this.appLockInactivityTimeoutSecs = ko.pureComputed(
       () => this.teamFeatures()?.appLock?.config?.inactivityTimeoutSecs,
+    );
+    this.isGuestLinkEnabled = ko.pureComputed(
+      () => this.teamFeatures()?.conversationGuestLinks?.status === FeatureStatus.ENABLED,
     );
   }
 

@@ -261,24 +261,20 @@ export class PropertiesRepository {
     }
   }
 
-  updateProperty(key: string, value: any): Promise<void> | void {
+  async updateProperty(key: string, value: any): Promise<void> {
+    this.setProperty(key, value);
     switch (key) {
       case PropertiesRepository.CONFIG.WIRE_RECEIPT_MODE.key:
         if (value === RECEIPT_MODE.OFF) {
           return this.propertiesService.deletePropertiesByKey(key);
         }
         return this.propertiesService.putPropertiesByKey(key, value);
-        break;
       case PropertiesRepository.CONFIG.WIRE_MARKETING_CONSENT.key:
-        return this.selfService
-          .putSelfConsent(ConsentType.MARKETING, value, `Webapp ${Environment.version(false)}`)
-          .then(() => {
-            if (value === ConsentValue.NOT_GIVEN) {
-              return this.propertiesService.deletePropertiesByKey(key);
-            }
-            return this.propertiesService.putPropertiesByKey(key, value);
-          });
-        break;
+        await this.selfService.putSelfConsent(ConsentType.MARKETING, value, `Webapp ${Environment.version(false)}`);
+        if (value === ConsentValue.NOT_GIVEN) {
+          return this.propertiesService.deletePropertiesByKey(key);
+        }
+        return this.propertiesService.putPropertiesByKey(key, value);
     }
   }
 

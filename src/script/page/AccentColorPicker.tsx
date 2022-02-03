@@ -33,7 +33,7 @@ export interface AccentColorPickerProps {
 const AccentColorPicker: React.FunctionComponent<AccentColorPickerProps> = ({user, doSetAccentColor}) => {
   return (
     <span
-      className="preferences-account-accent-color preferences-section-account-space-before"
+      className="preferences-account-accent-color"
       css={{
         display: 'inline-flex',
         height: 24,
