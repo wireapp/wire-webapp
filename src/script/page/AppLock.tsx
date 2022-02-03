@@ -15,7 +15,7 @@ import {SIGN_OUT_REASON} from '../auth/SignOutReason';
 import {ClientState} from '../client/ClientState';
 import {AppLockState} from '../user/AppLockState';
 import {AppLockRepository} from '../user/AppLockRepository';
-import {useKoSubscribableChildren} from 'Util/ComponentUtil';
+import {useKoSubscribable} from 'Util/ComponentUtil';
 
 export enum APPLOCK_STATE {
   FORGOT = 'applock.forgot',
@@ -57,10 +57,8 @@ const AppLock: React.FC<AppLockProps> = ({
   const [setupPassphrase, setSetupPassphrase] = useState('');
   const [inactivityTimeoutId, setInactivityTimeoutId] = useState<number>();
   const [scheduledTimeoutId, setScheduledTimeoutId] = useState<number>();
-  const {isAppLockActivated, isAppLockEnabled} = useKoSubscribableChildren(appLockState, [
-    'isAppLockActivated',
-    'isAppLockEnabled',
-  ]);
+  const isAppLockActivated = useKoSubscribable(appLockState.isAppLockActivated);
+  const isAppLockEnabled = useKoSubscribable(appLockState.isAppLockEnabled);
 
   const focusElement = (input: HTMLInputElement) => setTimeout(() => input?.focus());
   const forceFocus = ({target}: React.FocusEvent<HTMLInputElement>) => focusElement(target);

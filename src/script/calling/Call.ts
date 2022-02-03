@@ -23,28 +23,29 @@ import ko from 'knockout';
 import {chunk, getDifference, partition} from 'Util/ArrayUtil';
 import {sortUsersByPriority} from 'Util/StringUtil';
 import {CALL_MESSAGE_TYPE} from './enum/CallMessageType';
-import type {Participant, ClientId} from './Participant';
+import type {Participant, UserId, ClientId} from './Participant';
 import type {MediaDevicesHandler} from '../media/MediaDevicesHandler';
 import {Config} from '../Config';
-import {QualifiedId} from '@wireapp/api-client/src/user';
-import {matchQualifiedIds} from 'Util/QualifiedId';
-import {MuteState} from './CallState';
 
-export type SerializedConversationId = string;
+export type ConversationId = string;
 
 const NUMBER_OF_PARTICIPANTS_IN_ONE_PAGE = 9;
 
 interface ActiveSpeaker {
-  clientId: string;
-  levelNow: number;
-  userId: QualifiedId;
+  audio_level: number;
+  audio_level_now: number;
+  clientid: string;
+  userid: string;
+}
+
+interface ActiveSpeakers {
+  audio_levels: ActiveSpeaker[];
 }
 
 export class Call {
   public readonly reason: ko.Observable<number | undefined> = ko.observable();
   public readonly startedAt: ko.Observable<number | undefined> = ko.observable();
   public readonly state: ko.Observable<CALL_STATE> = ko.observable(CALL_STATE.UNKNOWN);
-  public readonly muteState: ko.Observable<MuteState> = ko.observable(MuteState.NOT_MUTED);
   public readonly participants: ko.ObservableArray<Participant>;
   public readonly selfClientId: ClientId;
   public readonly initialType: CALL_TYPE;
@@ -74,13 +75,12 @@ export class Call {
   activeAudioOutput: string;
 
   constructor(
-    public readonly initiator: QualifiedId,
-    public readonly conversationId: QualifiedId,
+    public readonly initiator: UserId,
+    public readonly conversationId: ConversationId,
     public readonly conversationType: CONV_TYPE,
     private readonly selfParticipant: Participant,
     callType: CALL_TYPE,
     private readonly mediaDevicesHandler: MediaDevicesHandler,
-    isMuted: boolean = false,
   ) {
     this.initialType = callType;
     this.selfClientId = selfParticipant?.clientId;
@@ -91,7 +91,6 @@ export class Call {
       this.updateAudioStreamsSink();
     });
     this.maximizedParticipant = ko.observable(null);
-    this.muteState(isMuted ? MuteState.SELF_MUTED : MuteState.NOT_MUTED);
   }
 
   get hasWorkingAudioInput(): boolean {
@@ -158,10 +157,10 @@ export class Call {
     }
   }
 
-  setActiveSpeakers(audioLevels: ActiveSpeaker[]): void {
+  setActiveSpeakers({audio_levels}: ActiveSpeakers): void {
     // Make sure that every participant only has one entry in the list.
-    const uniqueAudioLevels = audioLevels.reduce((acc, curr) => {
-      if (!acc.some(({clientId, userId}) => matchQualifiedIds(userId, curr.userId) && clientId === curr.clientId)) {
+    const uniqueAudioLevels = audio_levels.reduce((acc, curr) => {
+      if (!acc.some(({clientid, userid}) => userid === curr.userid && clientid === curr.clientid)) {
         acc.push(curr);
       }
       return acc;
@@ -169,15 +168,15 @@ export class Call {
 
     // Update activeSpeaking status on the participants based on their `audio_level_now`.
     this.participants().forEach(participant => {
-      const match = uniqueAudioLevels.find(({userId, clientId}) => participant.doesMatchIds(userId, clientId));
-      const audioLevelNow = match?.levelNow ?? 0;
+      const match = uniqueAudioLevels.find(({userid, clientid}) => participant.doesMatchIds(userid, clientid));
+      const audioLevelNow = match?.audio_level_now ?? 0;
       participant.isActivelySpeaking(audioLevelNow > 0);
     });
 
     // Get the corresponding participants for the entries in ActiveSpeakers in the incoming order.
     const activeSpeakers = uniqueAudioLevels
       // Get the participants.
-      .map(({userId, clientId}) => this.getParticipant(userId, clientId))
+      .map(({userid, clientid}) => this.getParticipant(userid, clientid))
       // Limit them to 4.
       .slice(0, 4)
       // Sort them by name
@@ -199,7 +198,7 @@ export class Call {
     this.updatePages();
   }
 
-  getParticipant(userId: QualifiedId, clientId: ClientId): Participant | undefined {
+  getParticipant(userId: UserId, clientId: ClientId): Participant | undefined {
     return this.participants().find(participant => participant.doesMatchIds(userId, clientId));
   }
 
@@ -209,7 +208,6 @@ export class Call {
 
   removeParticipant(participant: Participant): void {
     this.participants.remove(participant);
-    this.activeSpeakers.remove(participant);
     this.updatePages();
   }
 

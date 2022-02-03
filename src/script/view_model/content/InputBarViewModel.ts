@@ -27,7 +27,6 @@ import ko from 'knockout';
 import {afterRender, formatBytes} from 'Util/util';
 import {allowsAllFiles, hasAllowedExtension, getFileExtensionOrName} from 'Util/FileTypeUtil';
 import {AVATAR_SIZE} from 'Components/Avatar';
-import 'Components/input/ClassifiedBar';
 import {KEY, isFunctionKey, insertAtCaret} from 'Util/KeyboardUtil';
 import {renderMessage} from 'Util/messageRenderer';
 import {t} from 'Util/LocalizerUtil';
@@ -47,7 +46,7 @@ import {FileAsset} from '../../entity/message/FileAsset';
 import {MediumImage} from '../../entity/message/MediumImage';
 import {MentionEntity} from '../../message/MentionEntity';
 import {MessageHasher} from '../../message/MessageHasher';
-import {MessageRepository, OutgoingQuote} from '../../conversation/MessageRepository';
+import {MessageRepository} from '../../conversation/MessageRepository';
 import {ModalsViewModel} from '../ModalsViewModel';
 import {QuoteEntity} from '../../message/QuoteEntity';
 import {SearchRepository} from '../../search/SearchRepository';
@@ -59,7 +58,6 @@ import {Text} from '../../entity/message/Text';
 import {User} from '../../entity/User';
 import {UserState} from '../../user/UserState';
 import {TeamState} from '../../team/TeamState';
-import '../../page/message-list/MentionSuggestions';
 
 interface DraftMessage {
   mentions: MentionEntity[];
@@ -102,7 +100,6 @@ export class InputBarViewModel {
   readonly richTextInput: ko.PureComputed<string>;
   readonly inputPlaceholder: ko.PureComputed<string>;
   readonly showGiphyButton: ko.PureComputed<boolean>;
-  readonly classifiedDomains: ko.PureComputed<string[]>;
   readonly isFileSharingSendingEnabled: ko.PureComputed<boolean>;
   readonly pingTooltip: string;
   readonly hasLocalEphemeralTimer: ko.PureComputed<boolean>;
@@ -112,6 +109,7 @@ export class InputBarViewModel {
   /** MIME types and file extensions are accepted */
   readonly acceptedImageTypes: string;
   readonly allowedFileTypes: string;
+  readonly disableControls: ko.PureComputed<boolean>;
 
   static get CONFIG() {
     return {
@@ -152,7 +150,6 @@ export class InputBarViewModel {
     this.replyMessageEntity = ko.observable();
 
     this.isFileSharingSendingEnabled = this.teamState.isFileSharingSendingEnabled;
-    this.classifiedDomains = this.teamState.classifiedDomains;
 
     const handleRepliedMessageDeleted = (messageId: string) => {
       if (this.replyMessageEntity()?.id === messageId) {
@@ -340,6 +337,9 @@ export class InputBarViewModel {
         !conversationEntity.hasGlobalMessageTimer()
       );
     });
+
+    // TODO(Federation): For Federation playground builds we disable every other activity than sending plain text messages
+    this.disableControls = ko.pureComputed(() => this.conversationEntity()?.isFederated());
 
     this.conversationEntity.subscribe(this.loadInitialStateForConversation);
     this.draftMessage.subscribe(message => {
@@ -822,7 +822,7 @@ export class InputBarViewModel {
     });
   };
 
-  private readonly _generateQuote = (replyMessageEntity: ContentMessage): Promise<OutgoingQuote | undefined> => {
+  private readonly _generateQuote = (replyMessageEntity: ContentMessage): Promise<QuoteEntity | undefined> => {
     return !replyMessageEntity
       ? Promise.resolve(undefined)
       : this.eventRepository.eventService

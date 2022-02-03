@@ -265,23 +265,10 @@ describe('renderMessage', () => {
 
       // eslint-disable-next-line jest/valid-title
       it(testCase, () => {
-        const result = renderMessage(text, {domain: '', id: 'self-id'}, mentionEntities);
+        const result = renderMessage(text, 'self-id', mentionEntities);
 
         expect(result).toEqual(expected);
       });
-    });
-
-    it('does not try to match mention to self id if no userId given', () => {
-      const expected =
-        'hey <span class="message-mention" data-uie-name="label-other-mention" data-user-id="pain-id"><span class="mention-at-sign">@</span>user</span>';
-      const mentions = [{length: 5, startIndex: 4, userId: 'pain-id'}];
-      const mentionEntities = mentions.map(mention => {
-        const mentionEntity = new MentionEntity(mention.startIndex, mention.length, mention.userId);
-        return mentionEntity;
-      });
-      const result = renderMessage('hey @user', null, mentionEntities);
-
-      expect(result).toEqual(expected);
     });
   });
 });

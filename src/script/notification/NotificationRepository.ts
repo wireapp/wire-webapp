@@ -223,7 +223,7 @@ export class NotificationRepository {
     }
 
     const isUserBusy = this.selfUser().availability() === Availability.Type.BUSY;
-    const isSelfMentionOrReply = messageEntity.isContent() && messageEntity.isUserTargeted(this.selfUser().qualifiedId);
+    const isSelfMentionOrReply = messageEntity.isContent() && messageEntity.isUserTargeted(this.selfUser().id);
     const isCallMessage = messageEntity.super_type === SuperType.CALL;
 
     if (isUserBusy && !isSelfMentionOrReply && !isCallMessage && !isComposite) {
@@ -231,11 +231,7 @@ export class NotificationRepository {
     }
 
     const notifyInConversation = conversationEntity
-      ? NotificationRepository.shouldNotifyInConversation(
-          conversationEntity,
-          messageEntity,
-          this.selfUser().qualifiedId,
-        )
+      ? NotificationRepository.shouldNotifyInConversation(conversationEntity, messageEntity, this.selfUser().id)
       : true;
 
     if (notifyInConversation) {
@@ -309,7 +305,7 @@ export class NotificationRepository {
         if (assetEntity.isText()) {
           let notificationText;
 
-          if (assetEntity.isUserMentioned(this.selfUser().qualifiedId)) {
+          if (assetEntity.isUserMentioned(this.selfUser().id)) {
             notificationText = t('notificationMention', assetEntity.text, {}, true);
           } else if (messageEntity.isUserQuoted(this.selfUser().id)) {
             notificationText = t('notificationReply', assetEntity.text, {}, true);
@@ -427,7 +423,7 @@ export class NotificationRepository {
    */
   private createBodyObfuscated(messageEntity: ContentMessage): string {
     if (messageEntity.isContent()) {
-      const isSelfMentioned = messageEntity.isUserMentioned(this.selfUser().qualifiedId);
+      const isSelfMentioned = messageEntity.isUserMentioned(this.selfUser().id);
 
       if (isSelfMentioned) {
         return t('notificationObfuscatedMention');
@@ -493,7 +489,7 @@ export class NotificationRepository {
         return createBodyMessageTimerUpdate();
       }
       case SystemMessageType.CONVERSATION_DELETE: {
-        return (messageEntity as DeleteConversationMessage).caption();
+        return (messageEntity as DeleteConversationMessage).caption;
       }
     }
   }
@@ -651,7 +647,7 @@ export class NotificationRepository {
     const conversationId = this.getConversationId(connectionEntity, conversationEntity);
 
     const containsSelfMention =
-      messageEntity.isContent() && (messageEntity as ContentMessage).isUserMentioned(this.selfUser().qualifiedId);
+      messageEntity.isContent() && (messageEntity as ContentMessage).isUserMentioned(this.selfUser().id);
     if (containsSelfMention) {
       const showOptions = {exposeMessage: messageEntity, openFirstSelfMention: true};
       return () => amplify.publish(WebAppEvents.CONVERSATION.SHOW, conversationEntity, showOptions);
@@ -892,7 +888,7 @@ export class NotificationRepository {
   static shouldNotifyInConversation(
     conversationEntity: Conversation,
     messageEntity: ContentMessage,
-    userId: QualifiedId,
+    userId: string,
   ): boolean {
     if (messageEntity.isComposite()) {
       return true;

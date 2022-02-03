@@ -20,7 +20,7 @@
 import React from 'react';
 import Icon from 'Components/Icon';
 import {DecryptErrorMessage as DecryptErrorMessageEntity} from '../../entity/message/DecryptErrorMessage';
-import {registerReactComponent, useKoSubscribableChildren} from 'Util/ComponentUtil';
+import {registerReactComponent, useKoSubscribable} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 import DeviceId from 'Components/DeviceId';
 
@@ -30,12 +30,10 @@ export interface DecryptErrorMessageProps {
 }
 
 const DecryptErrorMessage: React.FC<DecryptErrorMessageProps> = ({message, onClickResetSession}) => {
-  const {
-    is_resetting_session: isResettingSession,
-    is_recoverable: isRecoverable,
-    link,
-    htmlCaption,
-  } = useKoSubscribableChildren(message, ['is_resetting_session', 'is_recoverable', 'link', 'htmlCaption']);
+  const isRecoverable = useKoSubscribable(message.is_recoverable);
+  const isResettingSession = useKoSubscribable(message.is_resetting_session);
+  const link = useKoSubscribable(message.link);
+  const htmlCaption = useKoSubscribable(message.htmlCaption);
 
   return (
     <div data-uie-name="element-message-decrypt-error">

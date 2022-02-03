@@ -34,6 +34,8 @@ export function bindHtml(htmlStr: string, context = {}): Promise<HTMLDivElement>
   knockoutRoot.innerHTML = htmlStr; // eslint-disable-line no-unsanitized/property
   ko.applyBindings(context, knockoutRoot);
   return new Promise(resolve => {
-    setTimeout(() => resolve(knockoutRoot), 0);
+    setImmediate(() => {
+      resolve(knockoutRoot);
+    });
   });
 }

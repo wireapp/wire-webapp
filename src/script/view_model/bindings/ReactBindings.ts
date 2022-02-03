@@ -41,32 +41,29 @@ const reactWrappers = new Map<Comment, ReactWrapper>();
 
 ko.bindingHandlers.react = {
   init(element, valueAccessor, _allBindings, _viewModel, context) {
-    ko.utils.domNodeDisposal.addDisposeCallback(element, () => {
-      // Allow react to clean up after the element is removed from the DOM.
-      // This is needed to prevent memory leaks, as it calls all useEffect return functions and such.
-      if (element.nodeType !== Node.COMMENT_NODE) {
-        ReactDOM.unmountComponentAtNode(element);
-      }
-
-      reactWrappers.delete(element);
-    });
-
-    const reactWrapper = React.createElement(ReactWrapper, {
-      component: context.$component.reactComponent,
-      componentProps: valueAccessor(),
-    });
-
     if (element.nodeType === Node.COMMENT_NODE) {
+      const props = valueAccessor();
       const fragment = document.createDocumentFragment();
+      const reactWrapper = React.createElement(ReactWrapper, {
+        component: context.$component.reactComponent,
+        componentProps: props,
+      });
       reactWrappers.set(element, ReactDOM.render(reactWrapper, fragment));
       ko.virtualElements.setDomNodeChildren(element, [fragment]);
-    } else {
-      reactWrappers.set(element, ReactDOM.render(reactWrapper, element));
+      ko.utils.domNodeDisposal.addDisposeCallback(element, () => {
+        reactWrappers.delete(element);
+      });
     }
     return {controlsDescendantBindings: true};
   },
-  update(element, valueAccessor) {
-    reactWrappers.get(element)?.setState(valueAccessor());
+  update(element, valueAccessor, _allBindings, _viewModel, context) {
+    const props = valueAccessor();
+    if (reactWrappers.has(element)) {
+      reactWrappers.get(element).setState(props);
+      return;
+    }
+    const reactElement = React.createElement(context.$component.reactComponent, props);
+    ReactDOM.render(reactElement, element);
   },
 };
 

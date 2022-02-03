@@ -57,8 +57,7 @@ export class CookieAction {
   getCookie = (name: string, asJSON: boolean = false): ThunkAction => {
     return async (dispatch, getState, {cookieStore}) => {
       try {
-        const value = cookieStore.get(name);
-        const cookie = value && asJSON ? JSON.parse(value) : value;
+        const cookie = asJSON ? cookieStore.getJSON(name) : cookieStore.get(name);
         const previousCookie: object = CookieSelector.getCookies(getState())[name];
         const isCookieModified = JSON.stringify(previousCookie) !== JSON.stringify(cookie);
         if (isCookieModified) {
@@ -98,7 +97,7 @@ export class CookieAction {
   setCookie = (name: string, value: object): ThunkAction => {
     return async (dispatch, getState, {cookieStore}) => {
       try {
-        cookieStore.set(name, JSON.stringify(value));
+        cookieStore.set(name, value);
         dispatch(CookieActionCreator.successfulSetCookie({name}));
       } catch (error) {
         dispatch(CookieActionCreator.failedSetCookie(error));
@@ -110,7 +109,7 @@ export class CookieAction {
     return async (dispatch, getState, {cookieStore}) => {
       try {
         if (!cookieStore.get(name)) {
-          cookieStore.set(name, JSON.stringify(value));
+          cookieStore.set(name, value);
           const cookie = cookieStore.get(name);
           dispatch(CookieActionCreator.successfulSetCookie({cookie, name}));
         }

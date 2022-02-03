@@ -39,7 +39,7 @@ export class FileAsset extends Asset {
   public readonly downloadProgress: ko.PureComputed<number | undefined>;
   public readonly cancelDownload: () => void;
   public file_name: string;
-  public file_size: number;
+  public file_size: string;
   public meta: Partial<AssetMetaData>;
   public readonly status: ko.Observable<AssetTransferState>;
   public readonly upload_failed_reason: ko.Observable<ProtobufAsset.NotUploaded>;
@@ -55,7 +55,7 @@ export class FileAsset extends Asset {
     this.status = ko.observable();
 
     this.file_name = '';
-    this.file_size = 0;
+    this.file_size = '';
     this.file_type = '';
 
     // contains asset meta data as object

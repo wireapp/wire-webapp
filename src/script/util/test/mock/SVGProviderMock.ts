@@ -25,7 +25,7 @@ const mockSVG = parser.parseFromString(
   'image/svg+xml',
 );
 
-const mockFileList = fs
+const fileList = fs
   .readdirSync(path.resolve(__dirname, '../../../../../resource/image/icon'))
   .filter(file => file.endsWith('.svg'))
   .reduce((list, file: string) => {
@@ -33,4 +33,4 @@ const mockFileList = fs
     return Object.assign(list, {[iconName]: mockSVG});
   }, {});
 
-jest.mock('../../../auth/util/SVGProvider', () => mockFileList);
+jest.mock('../../../auth/util/SVGProvider', () => fileList);

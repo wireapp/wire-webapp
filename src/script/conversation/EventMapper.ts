@@ -18,7 +18,7 @@
  */
 
 import {CONVERSATION_EVENT, ConversationEvent} from '@wireapp/api-client/src/event/';
-import {LinkPreview, Mention} from '@wireapp/protocol-messaging';
+import {LinkPreview, ITweet, Mention} from '@wireapp/protocol-messaging';
 
 import {getLogger, Logger} from 'Util/Logger';
 import {t} from 'Util/LocalizerUtil';
@@ -61,10 +61,10 @@ import type {Conversation} from '../entity/Conversation';
 import type {Message} from '../entity/message/Message';
 import type {Asset} from '../entity/message/Asset';
 import type {Text as TextAsset} from '../entity/message/Text';
-import {LinkPreview as LinkPreviewEntity, LinkPreviewData} from '../entity/message/LinkPreview';
+import type {LinkPreviewMetaDataType} from '../links/LinkPreviewMetaDataType';
+import {LinkPreview as LinkPreviewEntity} from '../entity/message/LinkPreview';
 import {CallingTimeoutMessage} from '../entity/message/CallingTimeoutMessage';
 import {MemberJoinEvent, MemberLeaveEvent, TeamMemberLeaveEvent} from './EventBuilder';
-import {AssetData} from '../cryptography/CryptographyMapper';
 
 // Event Mapper to convert all server side JSON events into core entities.
 export class EventMapper {
@@ -154,12 +154,9 @@ export class EventMapper {
         }
       }
 
-      const {preview_id, preview_key, preview_domain, preview_otr_key, preview_sha256, preview_token} =
-        eventData as AssetData;
+      const {preview_id, preview_key, preview_otr_key, preview_sha256, preview_token} = eventData;
       if (preview_otr_key) {
-        const remoteDataPreview = preview_domain
-          ? AssetRemoteData.v4(preview_key, preview_domain, preview_otr_key, preview_sha256, preview_token, true)
-          : preview_key
+        const remoteDataPreview = preview_key
           ? AssetRemoteData.v3(preview_key, preview_otr_key, preview_sha256, preview_token, true)
           : AssetRemoteData.v2(event.conversation, preview_id, preview_otr_key, preview_sha256, true);
         (asset as FileAsset).preview_resource(remoteDataPreview);
@@ -729,21 +726,16 @@ export class EventMapper {
     }
 
     // Remote data - full
-    const {key, otr_key, sha256, token, domain} = eventData as AssetData;
-    const remoteData = domain
-      ? AssetRemoteData.v4(key, domain, otr_key, sha256, token)
-      : key
+    const {key, otr_key, sha256, token} = eventData;
+    const remoteData = key
       ? AssetRemoteData.v3(key, otr_key, sha256, token)
       : AssetRemoteData.v2(conversationId, id, otr_key, sha256);
     assetEntity.original_resource(remoteData);
 
     // Remote data - preview
-    const {preview_id, preview_key, preview_domain, preview_otr_key, preview_sha256, preview_token} =
-      eventData as AssetData;
+    const {preview_id, preview_key, preview_otr_key, preview_sha256, preview_token} = eventData;
     if (preview_otr_key) {
-      const remoteDataPreview = preview_domain
-        ? AssetRemoteData.v4(preview_key, preview_domain, preview_otr_key, preview_sha256, preview_token, true)
-        : key
+      const remoteDataPreview = preview_key
         ? AssetRemoteData.v3(preview_key, preview_otr_key, preview_sha256, preview_token, true)
         : AssetRemoteData.v2(conversationId, preview_id, preview_otr_key, preview_sha256, true);
       assetEntity.preview_resource(remoteDataPreview);
@@ -760,7 +752,7 @@ export class EventMapper {
    * @param event Asset data received as JSON
    * @returns Medium image asset entity
    */
-  private _mapAssetImage(event: EventRecord<AssetData>) {
+  private _mapAssetImage(event: EventRecord) {
     const {data: eventData, conversation: conversationId} = event;
     const {content_length, content_type, id: assetId, info} = eventData;
     const assetEntity = new MediumImage(assetId);
@@ -770,19 +762,17 @@ export class EventMapper {
     assetEntity.ratio = +assetEntity.height / +assetEntity.width;
 
     if (info) {
-      assetEntity.width = `${info.width}px`;
-      assetEntity.height = `${info.height}px`;
+      assetEntity.width = info.width;
+      assetEntity.height = info.height;
     }
 
-    const {key, otr_key, sha256, token, domain} = eventData;
+    const {key, otr_key, sha256, token} = eventData;
 
     if (!otr_key || !sha256) {
       return assetEntity;
     }
 
-    const remoteData = domain
-      ? AssetRemoteData.v4(key, domain, otr_key, sha256, token, true)
-      : key
+    const remoteData = key
       ? AssetRemoteData.v3(key, otr_key, sha256, token, true)
       : AssetRemoteData.v2(conversationId, assetId, otr_key, sha256, true);
 
@@ -798,17 +788,18 @@ export class EventMapper {
    */
   private _mapAssetLinkPreview(linkPreview: LinkPreview): LinkPreviewEntity | void {
     if (linkPreview) {
-      const {image, title, url, tweet} = linkPreview;
+      const {image, title, url} = linkPreview;
       const {image: article_image, title: article_title} = linkPreview.article || {};
 
-      const linkPreviewData: LinkPreviewData = {
-        title: title || article_title || '',
-        tweet: tweet ?? undefined,
-        url: url,
-      };
+      const meta_data: LinkPreviewMetaDataType = linkPreview.metaData || (linkPreview as any).meta_data;
+
+      const linkPreviewEntity = new LinkPreviewEntity(title || article_title, url);
+      linkPreviewEntity.meta_data_type = meta_data;
+      linkPreviewEntity.meta_data = linkPreview[meta_data] as ITweet;
+
       const previewImage = image || article_image;
       if (previewImage && previewImage.uploaded) {
-        const {assetId: assetKey, assetToken, assetDomain} = previewImage.uploaded;
+        const {assetId: assetKey, assetToken} = previewImage.uploaded;
 
         if (assetKey) {
           let {otrKey, sha256} = previewImage.uploaded;
@@ -816,14 +807,11 @@ export class EventMapper {
           otrKey = new Uint8Array(otrKey);
           sha256 = new Uint8Array(sha256);
 
-          const remoteData = assetDomain
-            ? AssetRemoteData.v4(assetKey, assetDomain, otrKey, sha256, assetToken, true)
-            : AssetRemoteData.v3(assetKey, otrKey, sha256, assetToken, true);
-          linkPreviewData.image = remoteData;
+          linkPreviewEntity.image_resource(AssetRemoteData.v3(assetKey, otrKey, sha256, assetToken, true));
         }
       }
 
-      return new LinkPreviewEntity(linkPreviewData);
+      return linkPreviewEntity;
     }
   }
 

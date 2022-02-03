@@ -54,9 +54,9 @@ import VerifyEmailLink from './VerifyEmailLink';
 import VerifyPhoneCode from './VerifyPhoneCode';
 import CustomEnvironmentRedirect from './CustomEnvironmentRedirect';
 
-interface RootProps {}
+interface Props extends React.HTMLProps<HTMLDivElement> {}
 
-const Root: React.FC<RootProps & ConnectedProps & DispatchProps> = ({
+const Root = ({
   isAuthenticated,
   language,
   isFetchingSSOSettings,
@@ -64,7 +64,7 @@ const Root: React.FC<RootProps & ConnectedProps & DispatchProps> = ({
   safelyRemoveCookie,
   stopPolling,
   doGetSSOSettings,
-}) => {
+}: Props & ConnectedProps & DispatchProps) => {
   useEffect(() => {
     startPolling();
     window.onbeforeunload = () => {

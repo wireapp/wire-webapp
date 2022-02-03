@@ -17,31 +17,29 @@
  *
  */
 
+import {amplify} from 'amplify';
+import {WebAppEvents} from '@wireapp/webapp-events';
 import {container} from 'tsyringe';
-import {useEffect, useState} from 'react';
 
-import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {AssetTransferState} from '../../assets/AssetTransferState';
 import {AssetRepository} from '../../assets/AssetRepository';
 import {ContentMessage} from '../../entity/message/ContentMessage';
 import {FileAsset} from '../../entity/message/FileAsset';
-import {AssetRemoteData} from '../../assets/AssetRemoteData';
+import {useMemo} from 'react';
+import {useKoSubscribable, useKoSubscribableChildren} from 'Util/ComponentUtil';
+import {AssetRemoteData} from 'src/script/assets/AssetRemoteData';
 
 export const useAssetTransfer = (message: ContentMessage, assetRepository = container.resolve(AssetRepository)) => {
-  const asset = message?.getFirstAsset() as FileAsset;
-  const [uploadProgress, setUploadProgress] = useState<number>();
-  useEffect(() => {
-    const progressSubscribable = assetRepository.getUploadProgress(message?.id);
-    setUploadProgress(progressSubscribable());
-    const subscription = progressSubscribable.subscribe(value => setUploadProgress(value));
-    return () => {
-      subscription.dispose();
-    };
-  }, [message]);
+  const asset = useMemo(() => message?.getFirstAsset() as FileAsset, [message]);
+  const uploadProgressComputed = useMemo(() => assetRepository.getUploadProgress(message?.id), [message]);
+  const uploadProgress = useKoSubscribable(uploadProgressComputed);
   const {status} = useKoSubscribableChildren(asset, ['status']);
   const transferState = uploadProgress > -1 ? AssetTransferState.UPLOADING : status;
   return {
-    cancelUpload: () => assetRepository.cancelUpload(message.id),
+    cancelUpload: () => {
+      assetRepository.cancelUpload(message.id);
+      amplify.publish(WebAppEvents.CONVERSATION.ASSET.CANCEL, message.id);
+    },
     downloadAsset: (asset: FileAsset) => assetRepository.downloadFile(asset),
     isDownloading: transferState === AssetTransferState.DOWNLOADING,
     isUploaded: transferState === AssetTransferState.UPLOADED,

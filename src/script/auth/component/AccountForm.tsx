@@ -109,7 +109,6 @@ const AccountForm = ({account, ...props}: Props & ConnectedProps & DispatchProps
       if (error && error.label) {
         switch (error.label) {
           case BackendError.AUTH_ERRORS.BLACKLISTED_EMAIL:
-          case BackendError.AUTH_ERRORS.DOMAIN_BLOCKED_FOR_REGISTRATION:
           case BackendError.AUTH_ERRORS.INVALID_EMAIL:
           case BackendError.AUTH_ERRORS.KEY_EXISTS: {
             inputs.email.current.setCustomValidity(error.label);

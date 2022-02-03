@@ -29,6 +29,14 @@ import {AudioPlayingType} from './AudioPlayingType';
 import {AudioState} from './AudioState';
 import {AudioType} from './AudioType';
 
+declare global {
+  interface Navigator {
+    mediaSession: {
+      setActionHandler: Function;
+    };
+  }
+}
+
 enum AUDIO_PLAY_PERMISSION {
   ALLOWED = 0,
   DISALLOWED_BY_MUTE_STATE = 3,

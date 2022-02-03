@@ -27,7 +27,7 @@ import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 
 import {Call} from '../../calling/Call';
 import {CallingRepository} from '../../calling/CallingRepository';
-import {CallState, MuteState} from '../../calling/CallState';
+import {CallState} from '../../calling/CallState';
 import {Participant} from '../../calling/Participant';
 import {useVideoGrid} from '../../calling/videoGridHandler';
 import {ConversationState} from '../../conversation/ConversationState';
@@ -57,22 +57,20 @@ const CallingContainer: React.FC<CallingContainerProps> = ({
   conversationState = container.resolve(ConversationState),
 }) => {
   const {isMinimized} = useKoSubscribableChildren(multitasking, ['isMinimized']);
-  const {activeCallViewTab, joinedCall, selectableScreens, selectableWindows, isChoosingScreen} =
+  const {isMuted, muteState, activeCallViewTab, joinedCall, selectableScreens, selectableWindows, isChoosingScreen} =
     useKoSubscribableChildren(callState, [
+      'muteState',
+      'isMuted',
       'activeCallViewTab',
       'joinedCall',
       'selectableScreens',
       'selectableWindows',
       'isChoosingScreen',
     ]);
-
-  const {
-    maximizedParticipant,
-    state: currentCallState,
-    muteState,
-  } = useKoSubscribableChildren(joinedCall, ['maximizedParticipant', 'state', 'muteState']);
-
-  const isMuted = muteState !== MuteState.NOT_MUTED;
+  const {maximizedParticipant, state: currentCallState} = useKoSubscribableChildren(joinedCall, [
+    'maximizedParticipant',
+    'state',
+  ]);
 
   useEffect(() => {
     if (currentCallState === CALL_STATE.MEDIA_ESTAB && joinedCall.initialType === CALL_TYPE.VIDEO) {
@@ -117,7 +115,6 @@ const CallingContainer: React.FC<CallingContainerProps> = ({
 
   const switchCameraInput = (call: Call, deviceId: string) => {
     mediaDevicesHandler.currentDeviceId.videoInput(deviceId);
-    callingRepository.refreshVideoInput();
   };
 
   const toggleCamera = (call: Call) => {
@@ -160,7 +157,7 @@ const CallingContainer: React.FC<CallingContainerProps> = ({
     });
   };
 
-  const conversation = joinedCall && conversationState.findConversation(joinedCall.conversationId);
+  const conversation = conversationState.findConversation({domain: '', id: joinedCall?.conversationId});
   if (!joinedCall || !conversation || conversation.removed_from_conversation()) {
     return null;
   }
@@ -169,11 +166,11 @@ const CallingContainer: React.FC<CallingContainerProps> = ({
     <Fragment>
       {!isMinimized && !!videoGrid?.grid.length && (
         <FullscreenVideoCall
-          key={joinedCall.conversationId.id}
+          key={joinedCall.conversationId}
           videoGrid={videoGrid}
           call={joinedCall}
           activeCallViewTab={activeCallViewTab}
-          conversation={getConversationById(joinedCall.conversationId)}
+          conversation={getConversationById({domain: '', id: joinedCall.conversationId})}
           multitasking={multitasking}
           canShareScreen={callingRepository.supportsScreenSharing}
           maximizedParticipant={maximizedParticipant}

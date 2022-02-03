@@ -31,6 +31,7 @@ import {VerificationMessageType} from '../message/VerificationMessageType';
 import type {ClientEntity} from '../client/ClientEntity';
 import type {Conversation} from '../entity/Conversation';
 import type {EventRepository} from '../event/EventRepository';
+import type {ServerTimeHandler} from '../time/serverTimeHandler';
 import {UserState} from '../user/UserState';
 import {ConversationState} from './ConversationState';
 import {matchQualifiedIds} from 'Util/QualifiedId';
@@ -40,6 +41,7 @@ export class ConversationVerificationStateHandler {
 
   constructor(
     private readonly eventRepository: EventRepository,
+    private readonly serverTimeHandler: ServerTimeHandler,
     private readonly userState = container.resolve(UserState),
     private readonly conversationState = container.resolve(ConversationState),
   ) {
@@ -133,8 +135,16 @@ export class ConversationVerificationStateHandler {
    */
   private checkChangeToVerified(conversationEntity: Conversation): boolean {
     if (this.willChangeToVerified(conversationEntity)) {
-      const allVerifiedEvent = EventBuilder.buildAllVerified(conversationEntity);
+      const currentTimestamp = this.serverTimeHandler.toServerTimestamp();
+      const allVerifiedEvent = EventBuilder.buildAllVerified(conversationEntity, currentTimestamp);
       this.eventRepository.injectEvent(allVerifiedEvent as EventRecord);
+
+      amplify.publish(
+        WebAppEvents.CONVERSATION.VERIFICATION_STATE_CHANGED,
+        conversationEntity.participating_user_ids(),
+        true,
+      );
+
       return true;
     }
 
@@ -172,7 +182,8 @@ export class ConversationVerificationStateHandler {
         throw new Error('Conversation degraded without affected users');
       }
 
-      const event = EventBuilder.buildDegraded(conversationEntity, userIds, type);
+      const currentTimestamp = this.serverTimeHandler.toServerTimestamp();
+      const event = EventBuilder.buildDegraded(conversationEntity, userIds, type, currentTimestamp);
       this.eventRepository.injectEvent(event as EventRecord);
 
       return true;

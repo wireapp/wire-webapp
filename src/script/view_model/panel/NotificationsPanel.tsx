@@ -22,7 +22,7 @@ import {container} from 'tsyringe';
 
 import {t} from 'Util/LocalizerUtil';
 import useEffectRef from 'Util/useEffectRef';
-import {registerReactComponent, useKoSubscribableChildren} from 'Util/ComponentUtil';
+import {registerReactComponent, useKoSubscribable, useKoSubscribableChildren} from 'Util/ComponentUtil';
 
 import {useFadingScrollbar} from '../../ui/fadingScrollbar';
 import {NOTIFICATION_STATE, getNotificationText} from '../../conversation/NotificationSetting';
@@ -43,7 +43,7 @@ const NotificationsPanel: React.FC<NotificationsPanelProps> = ({
   repositories,
   conversationState = container.resolve(ConversationState),
 }) => {
-  const {activeConversation} = useKoSubscribableChildren(conversationState, ['activeConversation']);
+  const activeConversation = useKoSubscribable(conversationState.activeConversation);
   const {notificationState} = useKoSubscribableChildren(activeConversation, ['notificationState']);
 
   const [scrollbarRef, setScrollbarRef] = useEffectRef<HTMLDivElement>();

@@ -143,10 +143,10 @@ export const loadImage = function (blob: Blob): Promise<HTMLImageElement> {
   });
 };
 
-export const loadFileBuffer = (file: Blob | File): Promise<ArrayBuffer> => {
+export const loadFileBuffer = (file: Blob | File): Promise<string | ArrayBuffer> => {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
-    reader.onload = () => resolve(reader.result as ArrayBuffer);
+    reader.onload = () => resolve(reader.result);
     reader.onerror = reject;
     reader.readAsArrayBuffer(file);
   });

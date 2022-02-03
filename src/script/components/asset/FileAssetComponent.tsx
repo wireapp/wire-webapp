@@ -54,7 +54,7 @@ const FileAssetComponent: React.FC<FileAssetProps> = ({
 
   const fileName = trimFileExtension(asset.file_name);
   const fileExtension = getFileExtension(asset.file_name);
-  const formattedFileSize = formatBytes(asset.file_size);
+  const formattedFileSize = formatBytes(parseInt(asset.file_size, 10));
 
   // This is a hack since we don't have a FileAsset available before it's
   // uploaded completely we have to check if there is upload progress to

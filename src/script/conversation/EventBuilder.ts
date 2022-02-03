@@ -57,8 +57,6 @@ export interface CallingEvent {
   content: CallEntity;
   conversation: string;
   from: string;
-  qualified_conversation?: QualifiedId;
-  qualified_from?: QualifiedId;
   sender: string;
   time?: string;
   type: CALL;
@@ -214,7 +212,7 @@ export const EventBuilder = {
     };
   },
 
-  buildAllVerified(conversationEntity: Conversation): AllVerifiedEvent {
+  buildAllVerified(conversationEntity: Conversation, currentTimestamp: number): AllVerifiedEvent {
     return {
       ...buildQualifiedId(conversationEntity),
       data: {
@@ -222,7 +220,7 @@ export const EventBuilder = {
       },
       from: conversationEntity.selfUser().id,
       id: createRandomUuid(),
-      time: new Date(conversationEntity.getNextTimestamp()).toISOString(),
+      time: conversationEntity.getNextIsoDate(currentTimestamp),
       type: ClientEvent.CONVERSATION.VERIFICATION,
     };
   },
@@ -248,7 +246,6 @@ export const EventBuilder = {
       content: callMessage,
       conversation: conversationEntity.id,
       from: userId,
-      qualified_conversation: conversationEntity.qualifiedId,
       sender: clientId,
       type: ClientEvent.CALL.E_CALL,
     };
@@ -275,6 +272,7 @@ export const EventBuilder = {
     conversationEntity: Conversation,
     userIds: QualifiedId[],
     type: VerificationMessageType,
+    currentTimestamp: number,
   ): DegradedMessageEvent {
     return {
       ...buildQualifiedId(conversationEntity),
@@ -284,7 +282,7 @@ export const EventBuilder = {
       },
       from: conversationEntity.selfUser().id,
       id: createRandomUuid(),
-      time: new Date(conversationEntity.getNextTimestamp()).toISOString(),
+      time: conversationEntity.getNextIsoDate(currentTimestamp),
       type: ClientEvent.CONVERSATION.VERIFICATION,
     };
   },
@@ -378,7 +376,7 @@ export const EventBuilder = {
   buildLegalHoldMessage(
     conversationId: QualifiedId,
     userId: QualifiedId,
-    timestamp: number,
+    timestamp: number | string,
     legalHoldStatus: LegalHoldStatus,
     beforeMessage?: boolean,
   ): LegalHoldMessageEvent {
@@ -391,7 +389,7 @@ export const EventBuilder = {
       id: createRandomUuid(),
       qualified_conversation: conversationId,
       qualified_from: userId,
-      time: new Date(timestamp + (beforeMessage ? -1 : 0)).toISOString(),
+      time: new Date(new Date(timestamp).getTime() + (beforeMessage ? -1 : 1)).toISOString(),
       type: ClientEvent.CONVERSATION.LEGAL_HOLD_UPDATE,
     };
   },
@@ -494,16 +492,15 @@ export const EventBuilder = {
 
   buildVoiceChannelActivate(
     conversation: QualifiedId,
-    userId: QualifiedId,
+    userId: string,
     time: string,
     protocolVersion: number,
   ): VoiceChannelActivateEvent {
     return {
       ...buildQualifiedId(conversation),
-      from: userId.id,
+      from: userId,
       id: createRandomUuid(),
       protocol_version: protocolVersion,
-      qualified_from: userId,
       time,
       type: ClientEvent.CONVERSATION.VOICE_CHANNEL_ACTIVATE,
     };
@@ -511,7 +508,7 @@ export const EventBuilder = {
 
   buildVoiceChannelDeactivate(
     conversation: QualifiedId,
-    userId: QualifiedId,
+    userId: string,
     duration: number,
     reason: AVS_REASON,
     time: string,
@@ -523,10 +520,9 @@ export const EventBuilder = {
         duration,
         reason,
       },
-      from: userId.id,
+      from: userId,
       id: createRandomUuid(),
       protocol_version: protocolVersion,
-      qualified_from: userId,
       time,
       type: ClientEvent.CONVERSATION.VOICE_CHANNEL_DEACTIVATE,
     };

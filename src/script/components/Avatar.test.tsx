@@ -71,7 +71,7 @@ describe('Avatar', () => {
 
   it('renders service avatar', () => {
     const participant = new ServiceEntity({id: 'id'});
-    participant.name('Anton Bertha');
+    participant.name = 'Anton Bertha';
 
     const participantAvatar = new AvatarPage({
       participant,

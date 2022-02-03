@@ -49,7 +49,7 @@ describe('ServiceAvatar', () => {
 
   it('does not show initials', async () => {
     const service = new ServiceEntity({id: 'id'});
-    service.name('Anton Bertha');
+    service.name = 'Anton Bertha';
 
     const serviceAvatar = new ServiceAvatarPage({
       avatarSize: AVATAR_SIZE.LARGE,
@@ -61,7 +61,7 @@ describe('ServiceAvatar', () => {
 
   it('does not show avatar badge', async () => {
     const service = new ServiceEntity({id: 'id'});
-    service.name('Anton Bertha');
+    service.name = 'Anton Bertha';
 
     const serviceAvatar = new ServiceAvatarPage({
       avatarSize: AVATAR_SIZE.LARGE,

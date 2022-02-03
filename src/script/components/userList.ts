@@ -35,7 +35,6 @@ import 'Components/list/ParticipantItem';
 import {UserState} from '../user/UserState';
 import {ConversationState} from '../conversation/ConversationState';
 import {TeamState} from '../team/TeamState';
-import {debounce} from 'underscore';
 
 export enum UserlistMode {
   COMPACT = 'UserlistMode.COMPACT',
@@ -197,7 +196,7 @@ ko.components.register('user-list', {
      * Try to load additional members from the backend.
      * This is needed for large teams (>= 2000 members)
      */
-    const fetchMembersFromBackend = debounce(async (query: string, isHandle: boolean, ignoreMembers: User[]) => {
+    async function fetchMembersFromBackend(query: string, isHandle: boolean, ignoreMembers: User[]) {
       const resultUsers = await searchRepository.searchByName(query, isHandle);
       const selfTeamId = userState.self().teamId;
       const foundMembers = resultUsers.filter(user => user.teamId === selfTeamId);
@@ -207,7 +206,7 @@ ko.components.register('user-list', {
       // We shouldn't show any members that have the 'external' role and are not already locally known.
       const nonExternalMembers = await teamRepository.filterExternals(uniqueMembers);
       remoteTeamMembers(nonExternalMembers);
-    }, 300);
+    }
 
     // Filter all list items if a filter is provided
     const filteredUserEntities = ko.pureComputed(() => {

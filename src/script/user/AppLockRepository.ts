@@ -43,9 +43,6 @@ export class AppLockRepository {
     if (hasPassphrase) {
       this.startPassphraseObserver();
     }
-
-    this.appLockState.isAppLockDisabledOnTeam.subscribe(this.handleDisabledOnTeam);
-    this.handleDisabledOnTeam(this.appLockState.isAppLockDisabledOnTeam());
   }
 
   getStoredPassphrase = (): string => window.localStorage.getItem(this.getPassphraseStorageKey());
@@ -56,13 +53,6 @@ export class AppLockRepository {
     const storageKey = this.getPassphraseStorageKey();
     if (key === storageKey) {
       window.localStorage.setItem(storageKey, oldValue);
-    }
-  };
-
-  private readonly handleDisabledOnTeam = (isDisabled: boolean): void => {
-    if (isDisabled) {
-      this.setEnabled(false);
-      this.removeCode();
     }
   };
 
