@@ -26,6 +26,7 @@ import {
   DefaultConversationRoleName,
   CONVERSATION_ACCESS,
   CONVERSATION_ACCESS_ROLE,
+  ACCESS_ROLE_V2,
   CONVERSATION_TYPE,
 } from '@wireapp/api-client/src/conversation';
 
@@ -64,6 +65,7 @@ export type ConversationDatabaseData = ConversationRecord &
   Partial<ConversationBackendData> & {
     accessModes: CONVERSATION_ACCESS[];
     accessRole: CONVERSATION_ACCESS_ROLE;
+    accessRoleV2: ACCESS_ROLE_V2[];
     roles: {[userId: string]: DefaultConversationRoleName | string};
     status: ConversationStatus;
     team_id: string;
@@ -247,8 +249,9 @@ export class ConversationMapper {
     // Access related data
     const accessModes = conversationData.accessModes || conversationData.access;
     const accessRole = conversationData.accessRole || conversationData.access_role;
-    if (accessModes && accessRole) {
-      ConversationMapper.mapAccessState(conversationEntity, accessModes, accessRole);
+    const accessRoleV2 = conversationData.accessRoleV2 || conversationData.access_role_v2;
+    if (accessModes && (accessRole || accessRoleV2)) {
+      ConversationMapper.mapAccessState(conversationEntity, accessModes, accessRole, accessRoleV2);
     }
 
     conversationEntity.receiptMode(conversationData.receipt_mode);
@@ -272,13 +275,25 @@ export class ConversationMapper {
           localConversations.find(conversationId => matchQualifiedIds(conversationId, remoteConversationId)) ||
           (remoteConversationId as ConversationDatabaseData);
 
-        const {access, access_role, creator, members, message_timer, qualified_id, receipt_mode, name, team, type} =
-          remoteConversationData;
+        const {
+          access,
+          access_role,
+          access_role_v2,
+          creator,
+          members,
+          message_timer,
+          qualified_id,
+          receipt_mode,
+          name,
+          team,
+          type,
+        } = remoteConversationData;
         const {others: othersStates, self: selfState} = members;
 
         const updates: Partial<ConversationDatabaseData> = {
           accessModes: access,
           accessRole: access_role,
+          accessRoleV2: access_role_v2,
           creator,
           domain: qualified_id?.domain,
           message_timer,
@@ -377,14 +392,15 @@ export class ConversationMapper {
   static mapAccessState(
     conversationEntity: Conversation,
     accessModes: CONVERSATION_ACCESS[],
-    accessRole: CONVERSATION_ACCESS_ROLE,
+    accessRole?: CONVERSATION_ACCESS_ROLE,
+    accessRoleV2?: ACCESS_ROLE_V2[],
   ): typeof ACCESS_STATE {
     if (conversationEntity.team_id) {
       if (conversationEntity.is1to1()) {
         return conversationEntity.accessState(ACCESS_STATE.TEAM.ONE2ONE);
       }
 
-      const isTeamRole = accessRole === CONVERSATION_ACCESS_ROLE.TEAM;
+      const isTeamRole = accessRoleV2 === [ACCESS_ROLE_V2.TEAM_MEMBER] || accessRole === CONVERSATION_ACCESS_ROLE.TEAM;
 
       const includesInviteMode = accessModes.includes(CONVERSATION_ACCESS.INVITE);
       const isInviteModeOnly = includesInviteMode && accessModes.length === 1;
@@ -394,14 +410,25 @@ export class ConversationMapper {
         return conversationEntity.accessState(ACCESS_STATE.TEAM.TEAM_ONLY);
       }
 
-      const isNonVerifiedRole = accessRole === CONVERSATION_ACCESS_ROLE.NON_ACTIVATED;
+      const isActivatedMode =
+        accessRoleV2 === [ACCESS_ROLE_V2.TEAM_MEMBER, ACCESS_ROLE_V2.NON_TEAM_MEMBER, ACCESS_ROLE_V2.GUEST] ||
+        accessRole === CONVERSATION_ACCESS_ROLE.ACTIVATED;
+
+      if (isActivatedMode) {
+        return conversationEntity.accessState(ACCESS_STATE.TEAM.GUEST_ROOM);
+      }
+      const isNonVerifiedRole =
+        accessRoleV2 ===
+          [ACCESS_ROLE_V2.TEAM_MEMBER, ACCESS_ROLE_V2.NON_TEAM_MEMBER, ACCESS_ROLE_V2.GUEST, ACCESS_ROLE_V2.SERVICE] ||
+        accessRole === CONVERSATION_ACCESS_ROLE.NON_ACTIVATED;
 
       const includesCodeMode = accessModes.includes(CONVERSATION_ACCESS.CODE);
       const isExpectedModes = includesCodeMode && includesInviteMode && accessModes.length === 2;
 
       const isGuestRoomMode = isNonVerifiedRole && isExpectedModes;
+
       return isGuestRoomMode
-        ? conversationEntity.accessState(ACCESS_STATE.TEAM.GUEST_ROOM)
+        ? conversationEntity.accessState(ACCESS_STATE.TEAM.GUESTS_SERVICES)
         : conversationEntity.accessState(ACCESS_STATE.TEAM.LEGACY);
     }
 

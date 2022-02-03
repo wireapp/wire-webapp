@@ -42,6 +42,7 @@ export class GuestsAndServicesViewModel extends BasePanelViewModel {
   isLinkCopied: ko.Observable<boolean>;
   requestOngoing: ko.Observable<boolean>;
   isGuestRoom: ko.PureComputed<boolean>;
+  isGuestAndServicesRoom: ko.PureComputed<boolean>;
   isTeamOnly: ko.PureComputed<boolean>;
   hasAccessCode: ko.PureComputed<boolean>;
   isGuestEnabled: ko.PureComputed<boolean>;
@@ -68,6 +69,7 @@ export class GuestsAndServicesViewModel extends BasePanelViewModel {
     this.requestOngoing = ko.observable(false);
 
     this.isGuestRoom = ko.pureComputed(() => this.activeConversation()?.isGuestRoom());
+    this.isGuestAndServicesRoom = ko.pureComputed(() => this.activeConversation()?.isGuestAndServicesRoom());
     this.isTeamOnly = ko.pureComputed(() => this.activeConversation()?.isTeamOnly());
     this.hasAccessCode = ko.pureComputed(() => (this.isGuestRoom() ? !!this.activeConversation().accessCode() : false));
     this.isGuestEnabled = ko.pureComputed(() => !this.isTeamOnly());
@@ -121,41 +123,74 @@ export class GuestsAndServicesViewModel extends BasePanelViewModel {
     });
   };
 
-  toggleAccessState = async (isTogglingGuest: boolean): Promise<void> => {
+  toggleAccessState = async (): Promise<void> => {
     const conversationEntity = this.activeConversation();
     if (conversationEntity.inTeam()) {
       let newAccessState: ACCESS_STATE;
 
-      if (
-        (this.isTeamOnly() && isTogglingGuest && this.isServicesEnabled) ||
-        (!this.isTeamOnly() && !isTogglingGuest && !this.isServicesEnabled)
-      ) {
+      if (this.isServicesEnabled()) {
+        newAccessState = ACCESS_STATE.TEAM.GUESTS_SERVICES;
+      }
+      if (this.isTeamOnly()) {
+        newAccessState = ACCESS_STATE.TEAM.GUEST_ROOM;
+      }
+      if (this.isGuestRoom()) {
+        newAccessState = ACCESS_STATE.TEAM.TEAM_ONLY;
+      }
+      if (this.isGuestAndServicesRoom()) {
+        newAccessState = ACCESS_STATE.TEAM.SERVICES;
+      }
+      const changeAccessState = async (): Promise<void> => {
+        if (!this.requestOngoing()) {
+          this.requestOngoing(true);
+          await this.stateHandler.changeAccessState(conversationEntity, newAccessState, true);
+          this.requestOngoing(false);
+        }
+      };
+
+      const hasGuestOrServices = conversationEntity.hasGuest() || conversationEntity.hasService();
+
+      if (this.isTeamOnly() || !hasGuestOrServices) {
+        return changeAccessState();
+      }
+
+      amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.CONFIRM, {
+        preventClose: true,
+        primaryAction: {
+          action: changeAccessState,
+          text: t('modalConversationRemoveAction'),
+        },
+        text: {
+          message: t('modalConversationRemoveGuestsMessage'),
+          title: t('modalConversationRemoveGuestsAndServicesHeadline'),
+        },
+      });
+    }
+  };
+
+  toggleServiceAccessState = async (): Promise<void> => {
+    const conversationEntity = this.activeConversation();
+    if (conversationEntity.inTeam()) {
+      let newAccessState: ACCESS_STATE;
+
+      if (this.isGuestRoom()) {
         newAccessState = ACCESS_STATE.TEAM.GUESTS_SERVICES;
       }
 
-      if (
-        (this.isTeamOnly() && isTogglingGuest && !this.isServicesEnabled) ||
-        (!this.isTeamOnly() && !isTogglingGuest && this.isServicesEnabled)
-      ) {
+      if (this.isGuestAndServicesRoom()) {
         newAccessState = ACCESS_STATE.TEAM.GUEST_ROOM;
       }
-      if (
-        (this.isTeamOnly() && !isTogglingGuest && this.isServicesEnabled) ||
-        (!this.isTeamOnly() && isTogglingGuest && !this.isServicesEnabled)
-      ) {
+      if (this.isServicesEnabled()) {
         newAccessState = ACCESS_STATE.TEAM.TEAM_ONLY;
       }
-      if (
-        (this.isTeamOnly() && !isTogglingGuest && !this.isServicesEnabled) ||
-        (!this.isTeamOnly() && isTogglingGuest && this.isServicesEnabled)
-      ) {
+      if (this.isTeamOnly()) {
         newAccessState = ACCESS_STATE.TEAM.SERVICES;
       }
 
       const changeAccessState = async (): Promise<void> => {
         if (!this.requestOngoing()) {
           this.requestOngoing(true);
-          await this.stateHandler.changeAccessState(conversationEntity, newAccessState, isTogglingGuest);
+          await this.stateHandler.changeAccessState(conversationEntity, newAccessState, false);
           this.requestOngoing(false);
         }
       };
@@ -172,9 +207,7 @@ export class GuestsAndServicesViewModel extends BasePanelViewModel {
           text: t('modalConversationRemoveAction'),
         },
         text: {
-          message: isTogglingGuest
-            ? t('modalConversationRemoveGuestsMessage')
-            : t('modalConversationRemoveServicesMessage'),
+          message: t('modalConversationRemoveServicesMessage'),
           title: t('modalConversationRemoveGuestsAndServicesHeadline'),
         },
       });

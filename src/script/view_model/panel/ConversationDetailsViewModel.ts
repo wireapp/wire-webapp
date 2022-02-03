@@ -261,7 +261,7 @@ export class ConversationDetailsViewModel extends BasePanelViewModel {
     });
 
     this.servicesOptionsText = ko.pureComputed(() => {
-      return this.isServicesRoom() ? t('conversationDetailsGuestsOff') : t('conversationDetailsGuestsOn');
+      return this.isServicesRoom() ? t('conversationDetailsGuestsOn') : t('conversationDetailsGuestsOff');
     });
 
     this.notificationStatusText = ko.pureComputed(() => {

@@ -50,6 +50,8 @@ export class GroupCreationViewModel {
   participantsInput: ko.Observable<string>;
   accessState: ko.Observable<TEAM>;
   isGuestRoom: ko.PureComputed<boolean>;
+  isTeamOnly: ko.PureComputed<boolean>;
+  isGuestAndServicesRoom: ko.PureComputed<boolean>;
   isServicesRoom: ko.PureComputed<boolean>;
   enableReadReceipts: ko.Observable<boolean>;
   contacts: ko.PureComputed<User[]>;
@@ -90,15 +92,11 @@ export class GroupCreationViewModel {
     this.selectedContacts = ko.observableArray([]);
     this.showContacts = ko.observable(false);
     this.participantsInput = ko.observable('');
-    this.accessState = ko.observable(ACCESS_STATE.TEAM.GUESTS_SERVICES);
-    this.isServicesRoom = ko.pureComputed(
-      () =>
-        this.accessState() === ACCESS_STATE.TEAM.SERVICES || this.accessState() === ACCESS_STATE.TEAM.GUESTS_SERVICES,
-    );
-    this.isGuestRoom = ko.pureComputed(
-      () =>
-        this.accessState() === ACCESS_STATE.TEAM.GUEST_ROOM || this.accessState() === ACCESS_STATE.TEAM.GUESTS_SERVICES,
-    );
+    this.accessState = ko.observable(ACCESS_STATE.TEAM.GUEST_ROOM);
+    this.isServicesRoom = ko.pureComputed(() => this.accessState() === ACCESS_STATE.TEAM.SERVICES);
+    this.isGuestAndServicesRoom = ko.pureComputed(() => this.accessState() === ACCESS_STATE.TEAM.GUESTS_SERVICES);
+    this.isGuestRoom = ko.pureComputed(() => this.accessState() === ACCESS_STATE.TEAM.GUEST_ROOM);
+    this.isTeamOnly = ko.pureComputed(() => this.accessState() === ACCESS_STATE.TEAM.TEAM_ONLY);
     this.isGuestRoom.subscribe((isGuestRoom: boolean) => {
       if (!isGuestRoom) {
         this.selectedContacts.remove((userEntity: User) => !userEntity.isTeamMember());
@@ -178,26 +176,25 @@ export class GroupCreationViewModel {
   };
 
   readonly clickOnToggleGuestMode = (): void => {
-    const accessState =
-      this.isGuestRoom() && this.isServicesRoom()
-        ? ACCESS_STATE.TEAM.SERVICES
-        : this.isGuestRoom() && !this.isServicesRoom()
-        ? ACCESS_STATE.TEAM.TEAM_ONLY
-        : !this.isGuestRoom() && !this.isServicesRoom()
-        ? ACCESS_STATE.TEAM.GUEST_ROOM
-        : ACCESS_STATE.TEAM.GUESTS_SERVICES;
+    const accessState = this.isGuestRoom()
+      ? ACCESS_STATE.TEAM.TEAM_ONLY
+      : this.isServicesRoom()
+      ? ACCESS_STATE.TEAM.GUESTS_SERVICES
+      : this.isGuestAndServicesRoom()
+      ? ACCESS_STATE.TEAM.SERVICES
+      : ACCESS_STATE.TEAM.GUEST_ROOM;
+
     this.accessState(accessState);
   };
 
   readonly clickOnToggleServicesMode = (): void => {
-    const accessState =
-      this.isGuestRoom() && this.isServicesRoom()
-        ? ACCESS_STATE.TEAM.GUEST_ROOM
-        : !this.isGuestRoom() && this.isServicesRoom()
-        ? ACCESS_STATE.TEAM.TEAM_ONLY
-        : !this.isGuestRoom() && !this.isServicesRoom()
-        ? ACCESS_STATE.TEAM.SERVICES
-        : ACCESS_STATE.TEAM.GUESTS_SERVICES;
+    const accessState = this.isGuestRoom()
+      ? ACCESS_STATE.TEAM.GUESTS_SERVICES
+      : this.isServicesRoom()
+      ? ACCESS_STATE.TEAM.TEAM_ONLY
+      : this.isGuestAndServicesRoom()
+      ? ACCESS_STATE.TEAM.GUEST_ROOM
+      : ACCESS_STATE.TEAM.SERVICES;
 
     this.accessState(accessState);
   };
@@ -257,6 +254,6 @@ export class GroupCreationViewModel {
     this.participantsInput('');
     this.selectedContacts([]);
     this.state(GroupCreationViewModel.STATE.DEFAULT);
-    this.accessState(ACCESS_STATE.TEAM.GUESTS_SERVICES);
+    this.accessState(ACCESS_STATE.TEAM.GUEST_ROOM);
   };
 }

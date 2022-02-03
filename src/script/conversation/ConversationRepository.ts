@@ -36,8 +36,8 @@ import {
 
 import {
   DefaultConversationRoleName as DefaultRole,
-  CONVERSATION_ACCESS_ROLE,
   CONVERSATION_ACCESS,
+  ACCESS_ROLE_V2,
   CONVERSATION_TYPE,
   NewConversation,
   Conversation as BackendConversation,
@@ -423,19 +423,33 @@ export class ConversationRepository {
           case ACCESS_STATE.TEAM.GUEST_ROOM:
             accessPayload = {
               access: [CONVERSATION_ACCESS.INVITE, CONVERSATION_ACCESS.CODE],
-              access_role: CONVERSATION_ACCESS_ROLE.NON_ACTIVATED,
+              access_role_v2: [ACCESS_ROLE_V2.GUEST, ACCESS_ROLE_V2.NON_TEAM_MEMBER, ACCESS_ROLE_V2.TEAM_MEMBER],
             };
             break;
           case ACCESS_STATE.TEAM.TEAM_ONLY:
             accessPayload = {
               access: [CONVERSATION_ACCESS.INVITE],
-              access_role: CONVERSATION_ACCESS_ROLE.TEAM,
+              access_role_v2: [ACCESS_ROLE_V2.TEAM_MEMBER],
             };
             break;
-          default:
+          case ACCESS_STATE.TEAM.GUESTS_SERVICES:
+            accessPayload = {
+              access: [CONVERSATION_ACCESS.INVITE, CONVERSATION_ACCESS.CODE],
+              access_role_v2: [
+                ACCESS_ROLE_V2.GUEST,
+                ACCESS_ROLE_V2.NON_TEAM_MEMBER,
+                ACCESS_ROLE_V2.TEAM_MEMBER,
+                ACCESS_ROLE_V2.SERVICE,
+              ],
+            };
+            break;
+          case ACCESS_STATE.TEAM.SERVICES:
+            accessPayload = {
+              access: [CONVERSATION_ACCESS.INVITE],
+              access_role_v2: [ACCESS_ROLE_V2.TEAM_MEMBER, ACCESS_ROLE_V2.SERVICE],
+            };
             break;
         }
-
         if (accessPayload) {
           payload = {...payload, ...accessPayload};
         }
@@ -472,7 +486,7 @@ export class ConversationRepository {
    */
   public createGuestRoom(): Promise<Conversation | undefined> {
     const groupName = t('guestRoomConversationName');
-    return this.createGroupConversation([], groupName, ACCESS_STATE.TEAM.GUEST_ROOM);
+    return this.createGroupConversation([], groupName, ACCESS_STATE.TEAM.GUESTS_SERVICES);
   }
 
   /**

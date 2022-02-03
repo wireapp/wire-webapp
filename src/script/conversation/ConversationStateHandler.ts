@@ -18,7 +18,7 @@
  */
 
 import {CONVERSATION_ACCESS, ACCESS_ROLE_V2, ConversationCode} from '@wireapp/api-client/src/conversation/';
-import {ConversationAccessUpdateData} from '@wireapp/api-client/src/conversation/data/';
+import {ConversationAccessUpdateData, ConversationAccessV2UpdateData} from '@wireapp/api-client/src/conversation/data/';
 import {CONVERSATION_EVENT} from '@wireapp/api-client/src/event/';
 import {amplify} from 'amplify';
 import {WebAppEvents} from '@wireapp/webapp-events';
@@ -90,6 +90,7 @@ export class ConversationStateHandler extends AbstractConversationEventHandler {
         if (accessModes && accessRole) {
           try {
             await this.conversationService.putConversationAccess(conversationEntity.id, accessModes, accessRole);
+
             conversationEntity.accessState(accessState);
 
             if (accessState === ACCESS_STATE.TEAM.TEAM_ONLY || accessState === ACCESS_STATE.TEAM.SERVICES) {
@@ -171,10 +172,10 @@ export class ConversationStateHandler extends AbstractConversationEventHandler {
 
   private _mapConversationAccessState(
     conversationEntity: Conversation,
-    eventJson: ConversationEvent<ConversationAccessUpdateData>,
+    eventJson: ConversationEvent<Partial<ConversationAccessV2UpdateData & ConversationAccessUpdateData>>,
   ): void {
-    const {access: accessModes, access_role: accessRole} = eventJson.data;
-    ConversationMapper.mapAccessState(conversationEntity, accessModes, accessRole);
+    const {access: accessModes, ...roles} = eventJson.data;
+    ConversationMapper.mapAccessState(conversationEntity, accessModes, roles?.access_role, roles?.access_role_v2);
   }
 
   private _resetConversationAccessCode(conversationEntity: Conversation): void {
