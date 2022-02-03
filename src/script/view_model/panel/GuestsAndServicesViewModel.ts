@@ -47,6 +47,7 @@ export class GuestsAndServicesViewModel extends BasePanelViewModel {
   hasAccessCode: ko.PureComputed<boolean>;
   isGuestEnabled: ko.PureComputed<boolean>;
   isServicesEnabled: ko.PureComputed<boolean>;
+  isServicesRoom: ko.PureComputed<boolean>;
   isGuestLinkEnabled: ko.PureComputed<boolean>;
   showLinkOptions: ko.PureComputed<boolean>;
   brandName: string;
@@ -71,8 +72,11 @@ export class GuestsAndServicesViewModel extends BasePanelViewModel {
     this.isGuestRoom = ko.pureComputed(() => this.activeConversation()?.isGuestRoom());
     this.isGuestAndServicesRoom = ko.pureComputed(() => this.activeConversation()?.isGuestAndServicesRoom());
     this.isTeamOnly = ko.pureComputed(() => this.activeConversation()?.isTeamOnly());
+    this.isServicesRoom = ko.pureComputed(() => this.activeConversation()?.isServicesRoom());
     this.isGuestEnabled = ko.pureComputed(() => this.isGuestRoom() || this.isGuestAndServicesRoom());
-    this.isServicesEnabled = ko.pureComputed(() => this.activeConversation()?.isServicesRoom());
+    this.isServicesEnabled = ko.pureComputed(
+      () => this.activeConversation()?.isServicesRoom() || this.activeConversation()?.isGuestAndServicesRoom(),
+    );
 
     this.hasAccessCode = ko.pureComputed(() => (this.isGuestRoom() ? !!this.activeConversation().accessCode() : false));
     this.isGuestLinkEnabled = ko.pureComputed(() => this.teamState.isGuestLinkEnabled());
@@ -129,7 +133,7 @@ export class GuestsAndServicesViewModel extends BasePanelViewModel {
     if (conversationEntity.inTeam()) {
       let newAccessState: ACCESS_STATE;
 
-      if (this.isServicesEnabled()) {
+      if (this.isServicesRoom()) {
         newAccessState = ACCESS_STATE.TEAM.GUESTS_SERVICES;
       }
       if (this.isTeamOnly()) {
@@ -182,7 +186,7 @@ export class GuestsAndServicesViewModel extends BasePanelViewModel {
       if (this.isGuestAndServicesRoom()) {
         newAccessState = ACCESS_STATE.TEAM.GUEST_ROOM;
       }
-      if (this.isServicesEnabled()) {
+      if (this.isServicesRoom()) {
         newAccessState = ACCESS_STATE.TEAM.TEAM_ONLY;
       }
       if (this.isTeamOnly()) {
