@@ -170,7 +170,7 @@ export class Conversation {
 
     this.logger = getLogger(`Conversation (${this.id})`);
 
-    this.accessState = ko.observable(ACCESS_STATE.OTHER.UNKNOWN);
+    this.accessState = ko.observable();
     this.accessCode = ko.observable();
     this.creator = undefined;
     this.name = ko.observable();

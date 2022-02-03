@@ -71,9 +71,10 @@ export class GuestsAndServicesViewModel extends BasePanelViewModel {
     this.isGuestRoom = ko.pureComputed(() => this.activeConversation()?.isGuestRoom());
     this.isGuestAndServicesRoom = ko.pureComputed(() => this.activeConversation()?.isGuestAndServicesRoom());
     this.isTeamOnly = ko.pureComputed(() => this.activeConversation()?.isTeamOnly());
-    this.hasAccessCode = ko.pureComputed(() => (this.isGuestRoom() ? !!this.activeConversation().accessCode() : false));
-    this.isGuestEnabled = ko.pureComputed(() => !this.isTeamOnly());
+    this.isGuestEnabled = ko.pureComputed(() => this.isGuestRoom() || this.isGuestAndServicesRoom());
     this.isServicesEnabled = ko.pureComputed(() => this.activeConversation()?.isServicesRoom());
+
+    this.hasAccessCode = ko.pureComputed(() => (this.isGuestRoom() ? !!this.activeConversation().accessCode() : false));
     this.isGuestLinkEnabled = ko.pureComputed(() => this.teamState.isGuestLinkEnabled());
     this.showLinkOptions = ko.pureComputed(() => this.isGuestEnabled());
 
@@ -123,7 +124,7 @@ export class GuestsAndServicesViewModel extends BasePanelViewModel {
     });
   };
 
-  toggleAccessState = async (): Promise<void> => {
+  toggleGuestAccessState = async (): Promise<void> => {
     const conversationEntity = this.activeConversation();
     if (conversationEntity.inTeam()) {
       let newAccessState: ACCESS_STATE;
@@ -140,6 +141,7 @@ export class GuestsAndServicesViewModel extends BasePanelViewModel {
       if (this.isGuestAndServicesRoom()) {
         newAccessState = ACCESS_STATE.TEAM.SERVICES;
       }
+
       const changeAccessState = async (): Promise<void> => {
         if (!this.requestOngoing()) {
           this.requestOngoing(true);

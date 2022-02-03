@@ -124,8 +124,12 @@ export class ConversationDetailsViewModel extends BasePanelViewModel {
     this.isActivatedAccount = this.userState.isActivatedAccount;
     this.isTeam = this.teamState.isTeam;
 
-    this.isTeamOnly = ko.pureComputed(() => this.activeConversation()?.isTeamOnly());
-    this.isServicesRoom = ko.pureComputed(() => this.activeConversation()?.isServicesRoom());
+    this.isTeamOnly = ko.pureComputed(
+      () => this.activeConversation()?.isTeamOnly() || this.activeConversation()?.isServicesRoom(),
+    );
+    this.isServicesRoom = ko.pureComputed(
+      () => this.activeConversation()?.isServicesRoom() || this.activeConversation()?.isGuestAndServicesRoom(),
+    );
     this.serviceParticipants = ko.observableArray();
     this.userParticipants = ko.observableArray();
     this.showAllUsersCount = ko.observable(0);
