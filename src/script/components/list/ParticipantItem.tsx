@@ -266,6 +266,6 @@ export default ParticipantItem;
 
 registerReactComponent<ParticipantItemProps>('participant-item', {
   bindings:
-    'badge, callParticipant, showArrow, highlighted, noInteraction, noUnderline, canSelect, customInfo, external: ko.unwrap(external), hideInfo, isSelected: ko.unwrap(isSelected), isSelfVerified: ko.unwrap(isSelfVerified), mode, participant, selfInTeam',
+    'badge, callParticipant, showArrow, highlighted, noInteraction, noUnderline, canSelect, customInfo: ko.unwrap(customInfo), external: ko.unwrap(external), hideInfo, isSelected: ko.unwrap(isSelected), isSelfVerified: ko.unwrap(isSelfVerified), mode, participant, selfInTeam',
   component: ParticipantItem,
 });
