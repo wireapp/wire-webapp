@@ -60,7 +60,7 @@ const ServicesToggle: React.FC<ServicesToggleProps> = ({extendedInfo, isChecked,
         </div>
       </div>
       <div className="info-toggle__details" data-uie-name="status-guest-toggle">
-        {extendedInfo ? t('guestRoomToggleInfoExtended') : t('guestRoomToggleInfo')}
+        {extendedInfo ? t('servicesRoomToggleInfoExtended') : t('servicesRoomToggleInfo')}
       </div>
     </>
   );
@@ -71,5 +71,5 @@ export default ServicesToggle;
 registerReactComponent('services-toggle', {
   component: ServicesToggle,
   template:
-    '<div class="services-toggle" data-bind="react: {isChecked: ko.unwrap(isChecked), isDisabled: ko.unwrap(isDisabled), setIsChecked: onToggler, extendedInfo }"></div>',
+    '<div class="services-toggle" data-bind="react: {isChecked: ko.unwrap(isChecked), isDisabled: ko.unwrap(isDisabled), setIsChecked: onToggle, extendedInfo }"></div>',
 });
