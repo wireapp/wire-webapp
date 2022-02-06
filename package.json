@@ -60,7 +60,7 @@
     "@babel/preset-typescript": "7.16.7",
     "@emotion/babel-preset-css-prop": "10.2.1",
     "@faker-js/faker": "6.0.0-alpha.5",
-    "@formatjs/cli": "4.8.1",
+    "@formatjs/cli": "4.8.2",
     "@hot-loader/react-dom": "16.14.0",
     "@testing-library/react": "12.1.2",
     "@testing-library/react-hooks": "7.0.2",
