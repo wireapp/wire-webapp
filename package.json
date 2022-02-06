@@ -143,7 +143,7 @@
     "jest": "27.4.7",
     "jsdom-worker": "0.2.1",
     "less": "3.13.1",
-    "lint-staged": "12.3.2",
+    "lint-staged": "12.3.3",
     "load-grunt-tasks": "5.1.0",
     "node-fetch": "2.6.7",
     "node-sass": "7.0.1",
