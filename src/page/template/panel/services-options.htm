@@ -19,9 +19,9 @@
   </div>
   <div class="panel__content" data-bind="fadingscrollbar">
     <div class="guest-options__content">
-      <services-toggle
-        params="isChecked: isServicesEnabled(), onToggle: toggleServiceAccessState, isDisabled: requestOngoing"
-      ></services-toggle>
+      <base-toggle
+        params="isChecked: isServicesEnabled(), onToggle: toggleServiceAccessState, isDisabled: requestOngoing, infoText: t('servicesRoomToggleInfo'), toggleName: t('servicesOptionsTitle')"
+      ></base-toggle>
     </div>
   </div>
   <!-- /ko -->

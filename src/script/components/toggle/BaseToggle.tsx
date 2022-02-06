@@ -21,20 +21,32 @@ import React from 'react';
 import cx from 'classnames';
 
 import {registerReactComponent} from 'Util/ComponentUtil';
-import {t} from 'Util/LocalizerUtil';
+import {createRandomUuid} from 'Util/util';
 
-export interface GuestModeToggleProps {
+export interface BaseToggleProps {
   extendedInfo?: string;
+  extendedInfoText?: string;
+  infoText?: string;
   isChecked: boolean;
   isDisabled?: boolean;
   setIsChecked: (isChecked: boolean) => void;
+  toggleName?: string;
 }
 
-const GuestModeToggle: React.FC<GuestModeToggleProps> = ({extendedInfo, isChecked, isDisabled, setIsChecked}) => {
+const BaseToggle: React.FC<BaseToggleProps> = ({
+  extendedInfo,
+  isChecked,
+  isDisabled,
+  setIsChecked,
+  extendedInfoText,
+  toggleName,
+  infoText,
+}) => {
+  const uuid = React.useMemo(() => createRandomUuid(), []);
   return (
     <>
       <div className="info-toggle__row">
-        <div>{t('guestRoomToggleName')}</div>
+        <div>{toggleName}</div>
         <div
           className={cx('slider', {
             disabled: isDisabled,
@@ -43,31 +55,31 @@ const GuestModeToggle: React.FC<GuestModeToggleProps> = ({extendedInfo, isChecke
           <input
             className="slider-input"
             type="checkbox"
-            name="toggle"
-            id="toggle"
+            name="toggler"
+            id={uuid}
             onChange={(event: React.ChangeEvent<HTMLInputElement>) => setIsChecked(event.target.checked)}
             checked={isChecked}
-            data-uie-name="allow-guest-input"
+            data-uie-name={`allow-${toggleName.toLowerCase()}-input`}
           />
           <label
             className="button-label"
-            htmlFor="toggle"
-            data-uie-name="do-allow-guests"
+            htmlFor={uuid}
+            data-uie-name={`do-allow-${toggleName.toLowerCase()}`}
             data-uie-value={isChecked ? 'checked' : 'unchecked'}
           />
         </div>
       </div>
       <div className="info-toggle__details" data-uie-name="status-guest-toggle">
-        {extendedInfo ? t('guestRoomToggleInfoExtended') : t('guestRoomToggleInfo')}
+        {extendedInfo ? extendedInfoText : infoText}
       </div>
     </>
   );
 };
 
-export default GuestModeToggle;
+export default BaseToggle;
 
-registerReactComponent('guest-mode-toggle', {
-  component: GuestModeToggle,
+registerReactComponent('base-toggle', {
+  component: BaseToggle,
   template:
-    '<div class="guest-mode-toggle" data-bind="react: {isChecked: ko.unwrap(isChecked), isDisabled: ko.unwrap(isDisabled), setIsChecked: onToggle, extendedInfo}"></div>',
+    '<div class="base-toggle" data-bind="react: {isChecked: ko.unwrap(isChecked), isDisabled: ko.unwrap(isDisabled), setIsChecked: onToggle, extendedInfo }"></div>',
 });

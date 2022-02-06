@@ -7,7 +7,9 @@
     </div>
     <div class="panel__content" data-bind="fadingscrollbar">
       <div class="guest-options__content">
-        <guest-mode-toggle params="isChecked: isGuestEnabled(), onToggle: toggleGuestAccessState, isDisabled: requestOngoing"></guest-mode-toggle>
+        <base-toggle
+        params="isChecked: isGuestEnabled(), onToggle: toggleGuestAccessState, isDisabled: requestOngoing, infoText: t('guestRoomToggleInfo'), toggleName: t('guestOptionsTitle')"
+      ></base-toggle>
       </div>
       <!-- ko if: showLinkOptions() -->
         <div class="guest-options__info panel__info-text">
