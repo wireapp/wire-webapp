@@ -400,7 +400,19 @@ export class ConversationMapper {
         return conversationEntity.accessState(ACCESS_STATE.TEAM.ONE2ONE);
       }
 
-      const isTeamRole = accessRoleV2 === [ACCESS_ROLE_V2.TEAM_MEMBER] || accessRole === CONVERSATION_ACCESS_ROLE.TEAM;
+      if (accessRoleV2.includes(ACCESS_ROLE_V2.TEAM_MEMBER)) {
+        if (accessRoleV2.includes(ACCESS_ROLE_V2.GUEST) || accessRoleV2.includes(ACCESS_ROLE_V2.NON_TEAM_MEMBER)) {
+          if (accessRoleV2.includes(ACCESS_ROLE_V2.SERVICE)) {
+            return conversationEntity.accessState(ACCESS_STATE.TEAM.GUESTS_SERVICES);
+          }
+          return conversationEntity.accessState(ACCESS_STATE.TEAM.GUEST_ROOM);
+        } else if (accessRoleV2.includes(ACCESS_ROLE_V2.SERVICE)) {
+          return conversationEntity.accessState(ACCESS_STATE.TEAM.SERVICES);
+        }
+        return conversationEntity.accessState(ACCESS_STATE.TEAM.TEAM_ONLY);
+      }
+
+      const isTeamRole = accessRole === CONVERSATION_ACCESS_ROLE.TEAM;
 
       const includesInviteMode = accessModes.includes(CONVERSATION_ACCESS.INVITE);
       const isInviteModeOnly = includesInviteMode && accessModes.length === 1;
@@ -410,23 +422,16 @@ export class ConversationMapper {
         return conversationEntity.accessState(ACCESS_STATE.TEAM.TEAM_ONLY);
       }
 
-      const isActivatedMode =
-        accessRoleV2 === [ACCESS_ROLE_V2.TEAM_MEMBER, ACCESS_ROLE_V2.NON_TEAM_MEMBER, ACCESS_ROLE_V2.GUEST] ||
-        accessRole === CONVERSATION_ACCESS_ROLE.ACTIVATED;
-
-      if (isActivatedMode) {
+      const isVerifiedRole = accessRole === CONVERSATION_ACCESS_ROLE.ACTIVATED;
+      if (isVerifiedRole) {
         return conversationEntity.accessState(ACCESS_STATE.TEAM.GUEST_ROOM);
       }
-      const isNonVerifiedRole =
-        accessRoleV2 ===
-          [ACCESS_ROLE_V2.TEAM_MEMBER, ACCESS_ROLE_V2.NON_TEAM_MEMBER, ACCESS_ROLE_V2.GUEST, ACCESS_ROLE_V2.SERVICE] ||
-        accessRole === CONVERSATION_ACCESS_ROLE.NON_ACTIVATED;
+      const isNonVerifiedRole = accessRole === CONVERSATION_ACCESS_ROLE.NON_ACTIVATED;
 
       const includesCodeMode = accessModes.includes(CONVERSATION_ACCESS.CODE);
       const isExpectedModes = includesCodeMode && includesInviteMode && accessModes.length === 2;
 
       const isGuestRoomMode = isNonVerifiedRole && isExpectedModes;
-
       return isGuestRoomMode
         ? conversationEntity.accessState(ACCESS_STATE.TEAM.GUESTS_SERVICES)
         : conversationEntity.accessState(ACCESS_STATE.TEAM.LEGACY);
