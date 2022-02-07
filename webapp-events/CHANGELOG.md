@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.12.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/webapp-events/compare/@wireapp/webapp-events@0.11.3...@wireapp/webapp-events@0.12.0) (2022-02-07)
+
+
+### Features
+
+* **webapp-events:** Add sso events for desktop app ([#4222](https://github.com/wireapp/wire-web-packages/tree/main/packages/webapp-events/issues/4222)) ([7662df3](https://github.com/wireapp/wire-web-packages/tree/main/packages/webapp-events/commit/7662df305ccf0e83293445588e088b2d84e4292b))
+
+
+
+
+
 ## [0.11.3](https://github.com/wireapp/wire-web-packages/tree/main/packages/webapp-events/compare/@wireapp/webapp-events@0.11.2...@wireapp/webapp-events@0.11.3) (2021-08-30)
 
 **Note:** Version bump only for package @wireapp/webapp-events
