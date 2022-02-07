@@ -20,7 +20,7 @@
 import React from 'react';
 
 import {QualifiedId} from '@wireapp/api-client/src/user';
-import {registerReactComponent} from 'Util/ComponentUtil';
+import {registerReactComponent, useKoSubscribableChildren} from 'Util/ComponentUtil';
 
 import {Message} from 'src/script/entity/message/Message';
 import {Conversation} from 'src/script/entity/Conversation';
@@ -54,6 +54,8 @@ import MessageTime from '../MessageTime';
 import {ContextMenuEntry, showContextMenu} from '../../../ui/ContextMenu';
 import Icon from 'Components/Icon';
 import {t} from 'Util/LocalizerUtil';
+import {StatusType} from '../../../message/StatusType';
+import {includesOnlyEmojis} from 'Util/EmojiUtil';
 
 export interface TextMessageProps {
   contextMenuEntries: ContextMenuEntry[];
@@ -66,7 +68,7 @@ export interface TextMessageProps {
   onClickButton?: (message: ContentMessage, assetId: string) => void;
   onClickImage?: () => void;
   onClickLikes?: () => void;
-  onClickMessage?: () => void;
+  onClickMessage: (message: ContentMessage | Text, event: React.MouseEvent) => void;
   onClickReceipts?: (view: {message: Message}) => void;
   onClickTimestamp?: () => void;
   onLike?: () => void;
@@ -80,23 +82,28 @@ const ContentAsset = ({
   message,
   selfId,
   onClickImage,
+  onClickMessage,
   onClickButton,
 }: {
   asset: Asset;
   message: ContentMessage;
   onClickButton: (message: ContentMessage, assetId: string) => void;
   onClickImage: () => void;
+  onClickMessage: (message: ContentMessage | Text, event: React.MouseEvent) => void;
   selfId: QualifiedId;
 }) => {
+  const {isObfuscated} = useKoSubscribableChildren(message, ['isObfuscated']);
   switch (asset.type) {
     case AssetType.TEXT:
       return (
         <>
           {(asset as Text).should_render_text() && (
             <div
-              className="text"
+              className={`text ${includesOnlyEmojis((asset as Text).text) ? 'text-large' : ''} ${
+                message.status() === StatusType.SENDING ? 'text-foreground' : ''
+              } ${isObfuscated ? 'ephemeral-message-obfuscated' : ''}`}
               dangerouslySetInnerHTML={{__html: (asset as Text).render(selfId, message.accent_color())}}
-              data-bind="html: asset.render(selfId(), accentColor()), event: {mousedown: (data, event) => onClickMessage(asset, event)}, css: {'text-large': includesOnlyEmojis(asset.text), 'text-foreground': message.status() === StatusType.SENDING, 'ephemeral-message-obfuscated': message.isObfuscated()}"
+              onClick={event => onClickMessage(asset as Text, event)}
               dir="auto"
             ></div>
           )}
@@ -110,21 +117,21 @@ const ContentAsset = ({
     case AssetType.FILE:
       if ((asset as FileAsset).isFile()) {
         return (
-          <div className={`message-asset ${message.isObfuscated() && 'ephemeral-asset-expired icon-file'}`}>
+          <div className={`message-asset ${isObfuscated && 'ephemeral-asset-expired icon-file'}`}>
             <FileAssetComponent message={message} />
           </div>
         );
       }
       if ((asset as FileAsset).isAudio()) {
         return (
-          <div className={`message-asset ${message.isObfuscated() && 'ephemeral-asset-expired'}`}>
+          <div className={`message-asset ${isObfuscated && 'ephemeral-asset-expired'}`}>
             <AudioAssetComponent message={message} />
           </div>
         );
       }
       if ((asset as FileAsset).isVideo()) {
         return (
-          <div className={`message-asset ${message.isObfuscated() && 'ephemeral-asset-expired icon-movie'}`}>
+          <div className={`message-asset ${isObfuscated && 'ephemeral-asset-expired icon-movie'}`}>
             <VideoAssetComponent message={message} />
           </div>
         );
@@ -163,14 +170,11 @@ const TextMessage: React.FC<TextMessageProps> = ({
   onClickButton,
   onLike,
 }) => {
-  /*
-  const {unsafeSenderName, caption, timestamp, ephemeral_caption, isObfuscated} = useKoSubscribableChildren(message, [
-    'unsafeSenderName',
+  const {headerSenderName, timestamp, ephemeral_caption} = useKoSubscribableChildren(message, [
+    'headerSenderName',
     'timestamp',
     'ephemeral_caption',
-    'isObfuscated',
   ]);
-  */
 
   const avatarSection = shouldShowAvatar ? (
     <div className="message-header">
@@ -179,7 +183,7 @@ const TextMessage: React.FC<TextMessageProps> = ({
       </div>
       <div className="message-header-label">
         <span className={`message-header-label-sender ${message.accent_color()}`} data-uie-name="sender-name">
-          {message.headerSenderName()}
+          {headerSenderName}
         </span>
         {message.user().isService && (
           <span className="message-header-icon-service">
@@ -235,7 +239,7 @@ const TextMessage: React.FC<TextMessageProps> = ({
           showUserDetails={onClickAvatar}
         />
       )}
-      <div className="message-body" title={message.ephemeral_caption()}>
+      <div className="message-body" title={ephemeral_caption}>
         {message.ephemeral_status() === EphemeralStatusType.ACTIVE && (
           <div className="message-ephemeral-timer">
             <EphemeralTimer message={message} />
@@ -250,6 +254,7 @@ const TextMessage: React.FC<TextMessageProps> = ({
             selfId={selfId}
             onClickButton={onClickButton}
             onClickImage={onClickImage}
+            onClickMessage={onClickMessage}
           />
         ))}
 
@@ -274,15 +279,15 @@ const TextMessage: React.FC<TextMessageProps> = ({
             <time
               className="time"
               data-uie-uid={message.id}
-              title={message.ephemeral_caption()}
-              data-timestamp={message.timestamp}
+              title={ephemeral_caption}
+              data-timestamp={timestamp}
               data-bind="showAllTimestamps"
             >
               {message.displayTimestampShort()}
             </time>
           )}
           {message.ephemeral_status() !== EphemeralStatusType.ACTIVE && (
-            <MessageTime data-uie-uid={message.id} timestamp={message.timestamp()}>
+            <MessageTime data-uie-uid={message.id} timestamp={timestamp}>
               {message.displayTimestampShort()}
             </MessageTime>
           )}
