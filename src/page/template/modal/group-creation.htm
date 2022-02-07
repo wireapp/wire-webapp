@@ -41,10 +41,10 @@
       <!-- ko if: isTeam -->
         <div class="modal__info" data-bind="text: t('groupSizeInfo', maxSize)" data-uie-name="status-group-size-info"></div>
         <base-toggle class="modal-style"
-        params="isChecked: isGuestEnabled(), onToggle: clickOnToggleGuestMode, isDisabled: requestOngoing, extendedInfo: true, extendedInfoText: t('guestRoomToggleInfoExtended'), infoText: t('guestRoomToggleInfo'), toggleName: t('guestOptionsTitle')"
+        params="isChecked: isGuestEnabled(), onToggle: clickOnToggleGuestMode, extendedInfo: true, extendedInfoText: t('guestRoomToggleInfoExtended'), infoText: t('guestRoomToggleInfo'), toggleName: t('guestOptionsTitle')"
       ></base-toggle>
           <base-toggle class="modal-style"
-          params="isChecked: isServicesEnabled(), onToggle: clickOnToggleServicesMode, isDisabled: requestOngoing, extendedInfo: true, extendedInfoText: t('servicesRoomToggleInfoExtended'), infoText: t('servicesRoomToggleInfo'), toggleName: t('servicesOptionsTitle')"
+          params="isChecked: isServicesEnabled(), onToggle: clickOnToggleServicesMode, extendedInfo: true, extendedInfoText: t('servicesRoomToggleInfoExtended'), infoText: t('servicesRoomToggleInfo'), toggleName: t('servicesOptionsTitle')"
         ></base-toggle>
           <info-toggle class="modal-style" params="
             dataUieName: 'read-receipts',
