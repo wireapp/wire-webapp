@@ -23,7 +23,7 @@ import TestPage from 'Util/test/TestPage';
 import {viewportObserver} from 'src/script/ui/viewportObserver';
 import {ContentMessage} from 'src/script/entity/message/ContentMessage';
 import {MediumImage} from 'src/script/entity/message/MediumImage';
-import ImageAsset, {ImageAssetProps} from 'src/script/components/asset/ImageAsset';
+import ImageAsset, {ImageAssetProps} from './ImageAsset';
 import {container} from 'tsyringe';
 import {AssetRepository} from 'src/script/assets/AssetRepository';
 import {AssetRemoteData} from 'src/script/assets/AssetRemoteData';

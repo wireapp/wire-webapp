@@ -52,6 +52,8 @@ import {Button} from 'src/script/entity/message/Button';
 import {CompositeMessage} from 'src/script/entity/message/CompositeMessage';
 import MessageTime from '../MessageTime';
 import {ContextMenuEntry, showContextMenu} from '../../../ui/ContextMenu';
+import Icon from 'Components/Icon';
+import {t} from 'Util/LocalizerUtil';
 
 export interface TextMessageProps {
   contextMenuEntries: ContextMenuEntry[];
@@ -65,10 +67,10 @@ export interface TextMessageProps {
   onClickImage?: () => void;
   onClickLikes?: () => void;
   onClickMessage?: () => void;
-  quotedMessage?: ContentMessage;
   onClickReceipts?: (view: {message: Message}) => void;
   onClickTimestamp?: () => void;
   onLike?: () => void;
+  quotedMessage?: ContentMessage;
   selfId: QualifiedId;
   shouldShowAvatar: boolean;
 }
@@ -179,23 +181,41 @@ const TextMessage: React.FC<TextMessageProps> = ({
         <span className={`message-header-label-sender ${message.accent_color()}`} data-uie-name="sender-name">
           {message.headerSenderName()}
         </span>
-        {/*
-        <!-- ko if: message.user().isService -->
-          <service-icon className="message-header-icon-service"></service-icon>
-        <!-- /ko -->
-        <!-- ko if: message.user().isExternal() -->
-          <external-icon className="message-header-icon-external with-tooltip with-tooltip--external" data-bind="attr: {'data-tooltip': t('rolePartner')}" data-uie-name="sender-external"></external-icon>
-        <!-- /ko -->
-        <!-- ko if: message.user().isFederated -->
-          <federation-icon className="message-header-icon-guest with-tooltip with-tooltip--external" data-bind="attr: {'data-tooltip': message.user().handle}" data-uie-name="sender-federated"></federation-icon>
-        <!-- /ko -->
-        <!-- ko if: message.user().isDirectGuest() -->
-          <guest-icon className="message-header-icon-guest with-tooltip with-tooltip--external" data-bind="attr: {'data-tooltip': t('conversationGuestIndicator')}" data-uie-name="sender-guest"></guest-icon>
-        <!-- /ko -->
-        <!-- ko if: message.was_edited() -->
-          <span className="message-header-label-icon icon-edit" data-bind="attr: {title: message.displayEditedTimestamp()}"></span>
-        <!-- /ko -->
-        */}
+        {message.user().isService && (
+          <span className="message-header-icon-service">
+            <Icon.Service />
+          </span>
+        )}
+        {message.user().isExternal() && (
+          <span
+            className="message-header-icon-external with-tooltip with-tooltip--external"
+            data-tooltip={t('rolePartner')}
+            data-uie-name="sender-external"
+          >
+            <Icon.External />
+          </span>
+        )}
+        {message.user().isFederated && (
+          <span
+            className="message-header-icon-guest with-tooltip with-tooltip--external"
+            data-tooltip={message.user().handle}
+            data-uie-name="sender-federated"
+          >
+            <Icon.Federation />
+          </span>
+        )}
+        {message.user().isDirectGuest() && (
+          <span
+            className="message-header-icon-guest with-tooltip with-tooltip--external"
+            data-tooltip={t('conversationGuestIndicator')}
+            data-uie-name="sender-guest"
+          >
+            <Icon.Guest />
+          </span>
+        )}
+        {message.was_edited() && (
+          <span className="message-header-label-icon icon-edit" title={message.displayEditedTimestamp()}></span>
+        )}
       </div>
     </div>
   ) : null;
