@@ -19,13 +19,14 @@
 
 import React from 'react';
 import TextMessage, {TextMessageProps} from './index';
-import {render} from '@testing-library/react';
+import {render, waitFor} from '@testing-library/react';
 import {ContentMessage} from '../../../entity/message/ContentMessage';
 import {Conversation} from '../../../entity/Conversation';
 import {createRandomUuid} from '../../../util/util';
 import {Text} from '../../../entity/message/Text';
 import {User} from '../../../entity/User';
 import {LinkPreview} from 'src/script/entity/message/LinkPreview';
+import {QuoteEntity} from 'src/script/message/QuoteEntity';
 
 describe('message', () => {
   let defaultParams: TextMessageProps;
@@ -66,5 +67,22 @@ describe('message', () => {
 
     const {getByText} = render(<TextMessage {...defaultParams} />);
     expect(getByText(linkPreview.title)).not.toBe(null);
+  });
+
+  it('displays a quoted message', async () => {
+    const quotedMessage = new ContentMessage(createRandomUuid());
+    const quoteText = 'I am a quote';
+    const quoteAsset = new Text('', textValue);
+    spyOn(quoteAsset, 'render').and.returnValue(`<span>${quoteText}</span>`);
+    quotedMessage.assets.push(quoteAsset);
+    const findMessage = () => Promise.resolve(quotedMessage);
+
+    const message = new ContentMessage();
+    message.user(new User(createRandomUuid()));
+    message.quote(new QuoteEntity({messageId: quotedMessage.id, userId: ''}));
+
+    const {getByText} = render(<TextMessage {...defaultParams} message={message} findMessage={findMessage} />);
+    await waitFor(() => getByText(quoteText));
+    expect(getByText(quoteText)).not.toBe(null);
   });
 });
