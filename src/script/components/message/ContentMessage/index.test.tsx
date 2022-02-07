@@ -17,45 +17,45 @@
  *
  */
 
-import ko from 'knockout';
-import TestPage from 'Util/test/TestPage';
-import {PingMessage as PingMessageEntity} from 'src/script/entity/message/PingMessage';
-import PingMessage, {PingMessageProps} from '../PingMessage';
+import React from 'react';
+import TextMessage, {TextMessageProps} from './index';
+import {render} from '@testing-library/react';
+import {ContentMessage} from '../../../entity/message/ContentMessage';
+import {Conversation} from '../../../entity/Conversation';
+import {createRandomUuid} from '../../../util/util';
+import {Text} from '../../../entity/message/Text';
+import {User} from '../../../entity/User';
 
-class PingMessagePage extends TestPage<PingMessageProps> {
-  constructor(props?: PingMessageProps) {
-    super(PingMessage, props);
-  }
+describe('message', () => {
+  let defaultParams: TextMessageProps;
+  const textValue = 'hello';
 
-  getPingMessage = () => this.get('[data-uie-name="element-message-ping"]');
-  getPingMessageText = () => this.get('[data-uie-name="element-message-ping-text"]');
-}
+  beforeEach(() => {
+    const message = new ContentMessage();
+    message.user(new User(createRandomUuid()));
+    const textAsset = new Text('', textValue);
+    spyOn(textAsset, 'render').and.returnValue(`<span>${textValue}</span>`);
+    message.assets.push(textAsset);
 
-const createPingMessage = (partialPingMessage: Partial<PingMessageEntity>) => {
-  const callMessage: Partial<PingMessageEntity> = {
-    caption: ko.pureComputed(() => ''),
-    readReceipts: ko.observableArray([]),
-    timestamp: ko.observable(Date.now()),
-    unsafeSenderName: ko.pureComputed(() => ''),
-    ...partialPingMessage,
-  };
-  return callMessage as PingMessageEntity;
-};
-
-describe('PingMessage', () => {
-  it('shows sender name and caption', async () => {
-    const caption = 'caption';
-    const sender = 'sender';
-    const pingMessagePage = new PingMessagePage({
-      is1to1Conversation: false,
+    defaultParams = {
+      contextMenuEntries: [],
+      conversation: new Conversation(),
+      findMessage: jest.fn(),
       isLastDeliveredMessage: false,
-      message: createPingMessage({
-        caption: ko.pureComputed(() => 'caption'),
-        unsafeSenderName: ko.pureComputed(() => 'sender'),
-      }),
-    });
+      message,
+      onClickAvatar: jest.fn(),
+      onClickLikes: jest.fn(),
+      onClickMessage: jest.fn(),
+      onClickReceipts: jest.fn(),
+      onClickTimestamp: jest.fn(),
+      onLike: jest.fn(),
+      selfId: {domain: '', id: createRandomUuid()},
+      shouldShowAvatar: true,
+    };
+  });
 
-    expect(pingMessagePage.getPingMessage().exists()).toBe(true);
-    expect(pingMessagePage.getPingMessageText().text()).toBe(`${sender}${caption}`);
+  it('displays a message', () => {
+    const {getByText} = render(<TextMessage {...defaultParams} />);
+    expect(getByText(textValue)).toBeDefined();
   });
 });
