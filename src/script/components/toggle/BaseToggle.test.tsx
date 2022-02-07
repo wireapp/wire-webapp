@@ -19,19 +19,19 @@
 
 import TestPage from 'Util/test/TestPage';
 
-import GuestModeToggle, {GuestModeToggleProps} from './GuestModeToggle';
+import BaseToggle, {BaseToggleProps} from './BaseToggle';
 
-class GuestModePage extends TestPage<GuestModeToggleProps> {
-  constructor(props?: GuestModeToggleProps) {
-    super(GuestModeToggle, props);
+class BasePage extends TestPage<BaseToggleProps> {
+  constructor(props?: BaseToggleProps) {
+    super(BaseToggle, props);
   }
 
-  getInput = () => this.get('input[data-uie-name="allow-guest-input"]');
+  getInput = () => this.get('input[data-uie-name="allow-toggle-input"]');
 
   changeInputValue = (value: boolean) => this.changeCheckboxValue(this.getInput(), value);
 }
 
-describe('GuestModeToggle', () => {
+describe('BaseToggle', () => {
   it('toggles check property', async () => {
     let isChecked = false;
     const props = {
@@ -42,8 +42,8 @@ describe('GuestModeToggle', () => {
       },
     };
 
-    const guestTogglePage = new GuestModePage(props);
-    guestTogglePage.changeInputValue(!isChecked);
+    const baseTogglePage = new BasePage(props);
+    baseTogglePage.changeInputValue(!isChecked);
     expect(isChecked).toBe(true);
   });
 });

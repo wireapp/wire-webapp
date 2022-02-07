@@ -33,13 +33,15 @@ export interface BaseToggleProps {
   toggleName?: string;
 }
 
+const defaultToggleName = 'toggle';
+
 const BaseToggle: React.FC<BaseToggleProps> = ({
   extendedInfo,
   isChecked,
   isDisabled,
   setIsChecked,
   extendedInfoText,
-  toggleName,
+  toggleName = defaultToggleName,
   infoText,
 }) => {
   const uuid = React.useMemo(() => createRandomUuid(), []);
@@ -59,12 +61,12 @@ const BaseToggle: React.FC<BaseToggleProps> = ({
             id={uuid}
             onChange={(event: React.ChangeEvent<HTMLInputElement>) => setIsChecked(event.target.checked)}
             checked={isChecked}
-            data-uie-name={`allow-${toggleName.toLowerCase()}-input`}
+            data-uie-name={`allow-${toggleName?.toLowerCase()}-input`}
           />
           <label
             className="button-label"
             htmlFor={uuid}
-            data-uie-name={`do-allow-${toggleName.toLowerCase()}`}
+            data-uie-name={`do-allow-${toggleName?.toLowerCase()}`}
             data-uie-value={isChecked ? 'checked' : 'unchecked'}
           />
         </div>
