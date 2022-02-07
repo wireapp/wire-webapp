@@ -261,11 +261,11 @@ export class ConversationDetailsViewModel extends BasePanelViewModel {
     });
 
     this.guestOptionsText = ko.pureComputed(() => {
-      return this.isTeamOnly() ? t('conversationDetailsGuestsOff') : t('conversationDetailsGuestsOn');
+      return this.isTeamOnly() ? t('conversationDetailsOff') : t('conversationDetailsOn');
     });
 
     this.servicesOptionsText = ko.pureComputed(() => {
-      return this.isServicesRoom() ? t('conversationDetailsGuestsOn') : t('conversationDetailsGuestsOff');
+      return this.isServicesRoom() ? t('conversationDetailsOn') : t('conversationDetailsOff');
     });
 
     this.notificationStatusText = ko.pureComputed(() => {
