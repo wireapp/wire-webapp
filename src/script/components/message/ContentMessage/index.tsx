@@ -50,9 +50,13 @@ import EphemeralTimer from '../EphemeralTimer';
 import {AssetType} from '../../../assets/AssetType';
 import {Button} from 'src/script/entity/message/Button';
 import {CompositeMessage} from 'src/script/entity/message/CompositeMessage';
+import MessageTime from '../MessageTime';
+import {ContextMenuEntry, showContextMenu} from '../../../ui/ContextMenu';
 
 export interface TextMessageProps {
+  contextMenuEntries: ContextMenuEntry[];
   conversation: Conversation;
+  findMessage: (conversation: Conversation, messageId: string) => Promise<ContentMessage | undefined>;
   focusMessage?: () => void;
   isLastDeliveredMessage: boolean;
   message: ContentMessage;
@@ -61,6 +65,7 @@ export interface TextMessageProps {
   onClickImage?: () => void;
   onClickLikes?: () => void;
   onClickMessage?: () => void;
+  quotedMessage?: ContentMessage;
   onClickReceipts?: (view: {message: Message}) => void;
   onClickTimestamp?: () => void;
   onLike?: () => void;
@@ -142,9 +147,11 @@ const ContentAsset = ({
 const TextMessage: React.FC<TextMessageProps> = ({
   conversation,
   message,
+  findMessage,
   selfId,
   shouldShowAvatar,
   isLastDeliveredMessage,
+  contextMenuEntries,
   onClickReceipts,
   onClickAvatar,
   onClickImage,
@@ -201,7 +208,7 @@ const TextMessage: React.FC<TextMessageProps> = ({
           conversation={conversation}
           quote={message.quote()}
           selfId={selfId}
-          messageRepository={null}
+          findMessage={findMessage}
           showDetail={onClickImage}
           focusMessage={onClickTimestamp}
           handleClickOnMessage={onClickMessage}
@@ -237,17 +244,28 @@ const TextMessage: React.FC<TextMessageProps> = ({
         )}
 
         <div className="message-body-actions">
-          {/*
-      <!-- ko if: contextMenuEntries().length > 0 -->
-        <span class="context-menu icon-more font-size-xs" data-bind="click: (data, event) => showContextMenu(event)"></span>
-      <!-- /ko -->
-      <!-- ko if: message.ephemeral_status() === EphemeralStatusType.ACTIVE -->
-        <time class="time" data-bind="text: message.displayTimestampShort(), attr: {'data-timestamp': message.timestamp, 'data-uie-uid': message.id, 'title': message.ephemeral_caption()}, showAllTimestamps"></time>
-      <!-- /ko -->
-      <!-- ko ifnot: message.ephemeral_status() === EphemeralStatusType.ACTIVE -->
-        <time class="time with-tooltip with-tooltip--top with-tooltip--time" data-bind="text: message.displayTimestampShort(), attr: {'data-timestamp': message.timestamp, 'data-uie-uid': message.id, 'data-tooltip': message.displayTimestampLong()}, showAllTimestamps"></time>
-      <!-- /ko -->
-        */}
+          {contextMenuEntries.length > 0 && (
+            <span
+              className="context-menu icon-more font-size-xs"
+              onClick={event => showContextMenu(event, contextMenuEntries, 'message-options-menu')}
+            ></span>
+          )}
+          {message.ephemeral_status() === EphemeralStatusType.ACTIVE && (
+            <time
+              className="time"
+              data-uie-uid={message.id}
+              title={message.ephemeral_caption()}
+              data-timestamp={message.timestamp}
+              data-bind="showAllTimestamps"
+            >
+              {message.displayTimestampShort()}
+            </time>
+          )}
+          {message.ephemeral_status() !== EphemeralStatusType.ACTIVE && (
+            <MessageTime data-uie-uid={message.id} timestamp={message.timestamp()}>
+              {message.displayTimestampShort()}
+            </MessageTime>
+          )}
           <ReadReceiptStatus
             message={message}
             is1to1Conversation={conversation.is1to1()}
@@ -275,9 +293,12 @@ registerReactComponent('text-message', {
   bindings: `message: ko.unwrap(message),
     conversation: ko.unwrap(conversation),
     selfId: selfId,
+    contextMenuEntries: ko.unwrap(contextMenuEntries),
+    findMessage: findMessage,
     isLastDeliveredMessage: ko.unwrap(isLastDeliveredMessage),
     onClickReceipts: onClickReceipts,
     onLike: onLike,
+    onClickAvatar: onClickAvatar,
     onClickMessage: onClickMessage,
     onClickTimestamp: onClickTimestamp,
     onClickLikes: onClickLikes,

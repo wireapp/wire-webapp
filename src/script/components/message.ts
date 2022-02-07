@@ -28,7 +28,7 @@ import {includesOnlyEmojis} from 'Util/EmojiUtil';
 import {QualifiedId} from '@wireapp/api-client/src/user';
 
 import {EphemeralStatusType} from '../message/EphemeralStatusType';
-import {showContextMenu as showContext, ContextMenuEntry} from '../ui/ContextMenu';
+import {ContextMenuEntry} from '../ui/ContextMenu';
 import type {ContentMessage} from '../entity/message/ContentMessage';
 import type {CompositeMessage} from '../entity/message/CompositeMessage';
 import {StatusType} from '../message/StatusType';
@@ -99,6 +99,7 @@ class Message {
   isLastDeliveredMessage: ko.Observable<boolean>;
   isSelfTemporaryGuest: ko.Observable<boolean>;
   message: ContentMessage;
+  findMessage: (conversation: Conversation, messageId: string) => Promise<ContentMessage | undefined>;
   onClickAvatar: (user: User) => void;
   onClickCancelRequest: (message: ContentMessage) => void;
   onClickImage: (message: ContentMessage, event: UIEvent) => void;
@@ -171,6 +172,9 @@ class Message {
     this.onClickResetSession = onClickResetSession;
     this.onClickCancelRequest = onClickCancelRequest;
     this.onLike = onLike;
+    this.findMessage = (conversation: Conversation, messageId: string) => {
+      return messageRepository.getMessageInConversationById(conversation, messageId, true, true);
+    };
     this.includesOnlyEmojis = includesOnlyEmojis;
     this.AVATAR_SIZE = AVATAR_SIZE;
 
@@ -290,11 +294,6 @@ class Message {
       this.messageRepository.sendButtonAction(this.conversation(), message, buttonId);
     }
   }
-
-  showContextMenu(event: MouseEvent) {
-    const entries = this.contextMenuEntries();
-    showContext(event, entries, 'message-options-menu');
-  }
 }
 
 ko.components.register('message', {
@@ -302,6 +301,7 @@ ko.components.register('message', {
     <!-- ko if: message.super_type === 'normal' -->
       <text-message params="
         message: message,
+        findMessage: findMessage,
         conversation: conversation,
         selfId: selfId,
         isLastDeliveredMessage: isLastDeliveredMessage,
@@ -310,7 +310,9 @@ ko.components.register('message', {
         onClickTimestamp: onClickTimestamp,
         onClickLikes: onClickLikes,
         onClickButton: clickButton,
+        onClickAvatar: onClickAvatar,
         shouldShowAvatar: shouldShowAvatar,
+        contextMenuEntries: contextMenuEntries,
       "></text-message>
     <!-- /ko -->
     <!-- ko if: message.super_type === 'missed' -->

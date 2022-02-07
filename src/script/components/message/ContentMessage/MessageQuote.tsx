@@ -31,7 +31,6 @@ import {ConversationError} from '../../../error/ConversationError';
 import type {Conversation} from '../../../entity/Conversation';
 import type {ContentMessage} from '../../../entity/message/ContentMessage';
 import type {User} from '../../../entity/User';
-import type {MessageRepository} from '../../../conversation/MessageRepository';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {useEffect, useState} from 'react';
 import Image from 'Components/Image';
@@ -46,9 +45,9 @@ import {Text} from 'src/script/entity/message/Text';
 
 export interface QuoteProps {
   conversation: Conversation;
+  findMessage: (conversation: Conversation, messageId: string) => Promise<ContentMessage | undefined>;
   focusMessage: (id: string) => void;
-  handleClickOnMessage: (message: ContentMessage, event: React.MouseEvent) => boolean;
-  messageRepository: MessageRepository;
+  handleClickOnMessage: (message: ContentMessage, event: React.MouseEvent) => void;
   quote: QuoteEntity;
   selfId: QualifiedId;
   showDetail: (message: ContentMessage, event: React.MouseEvent) => void;
@@ -57,7 +56,7 @@ export interface QuoteProps {
 
 const Quote: React.FC<QuoteProps> = ({
   conversation,
-  messageRepository,
+  findMessage,
   focusMessage,
   handleClickOnMessage,
   quote,
@@ -93,8 +92,7 @@ const Quote: React.FC<QuoteProps> = ({
 
   useEffect(() => {
     if (!error && quote.messageId) {
-      messageRepository
-        .getMessageInConversationById(conversation, quote.messageId, true, true)
+      findMessage(conversation, quote.messageId)
         .then(message => {
           setQuotedMessage(message as ContentMessage);
         })
@@ -131,7 +129,7 @@ const Quote: React.FC<QuoteProps> = ({
 
 interface QuotedMessageProps {
   focusMessage: (id: string) => void;
-  handleClickOnMessage: (message: ContentMessage | Text, event: React.MouseEvent) => boolean;
+  handleClickOnMessage: (message: ContentMessage | Text, event: React.MouseEvent) => void;
   quotedMessage: ContentMessage;
   selfId: QualifiedId;
   showDetail: (message: ContentMessage, event: React.MouseEvent) => void;
