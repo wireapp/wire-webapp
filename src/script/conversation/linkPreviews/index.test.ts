@@ -42,7 +42,7 @@ describe('linkPreviews', () => {
     type: 'article',
   };
   beforeEach(() => (window.openGraphAsync = url => Promise.resolve({...mockOgResult, url})));
-  afterEach(() => (window.openGraphAsync = undefined));
+  afterEach((): void => (window.openGraphAsync = undefined));
 
   describe('getLinkPreviewFromString', () => {
     it('does nothing if openGraphAsync is not defined on window', async () => {

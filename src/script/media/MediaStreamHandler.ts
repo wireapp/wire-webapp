@@ -35,12 +35,6 @@ import {MediaType} from './MediaType';
 import {NoAudioInputError} from '../error/NoAudioInputError';
 import Warnings from '../view_model/WarningsContainer';
 
-declare global {
-  interface MediaDevices {
-    getDisplayMedia: any;
-  }
-}
-
 export class MediaStreamHandler {
   static get CONFIG() {
     return {PERMISSION_HINT_DELAY: 200};

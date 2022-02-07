@@ -207,6 +207,8 @@
   "conversationAssetUploadFailed": "Hochladen fehlgeschlagen",
   "conversationAssetUploading": "Hochladen…",
   "conversationAudioAssetRestricted": "Empfang von Audiodateien ist verboten",
+  "conversationClassified": "Sicherheitslevel: VS-NfD",
+  "conversationNotClassified": "Sicherheitslevel: Nicht eingestuft",
   "conversationConnectionAccepted": "Hinzugefügt",
   "conversationConnectionBlocked": "Blockiert",
   "conversationConnectionCancelRequest": "Kontaktanfrage abbrechen",

@@ -18,16 +18,7 @@
  */
 
 import {amplify} from 'amplify';
-import {
-  Asset,
-  Confirmation,
-  External,
-  GenericMessage,
-  LastRead,
-  LegalHoldStatus,
-  Asset as ProtobufAsset,
-  DataTransfer,
-} from '@wireapp/protocol-messaging';
+import {Asset, Confirmation, GenericMessage, Availability} from '@wireapp/protocol-messaging';
 import {
   ReactionType,
   MessageSendingCallbacks,
@@ -38,7 +29,6 @@ import {
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 import {
   ClientMismatch,
-  NewOTRMessage,
   QualifiedUserClients,
   MessageSendingStatus,
   UserClients,
@@ -59,14 +49,12 @@ import {container} from 'tsyringe';
 
 import {Logger, getLogger} from 'Util/Logger';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
-import {Declension, joinNames, replaceLink, t} from 'Util/LocalizerUtil';
-import {getDifference} from 'Util/ArrayUtil';
-import {arrayToBase64, createRandomUuid, loadUrlBlob} from 'Util/util';
+import {Declension, joinNames, t} from 'Util/LocalizerUtil';
+import {createRandomUuid, loadUrlBlob} from 'Util/util';
 import {areMentionsDifferent, isTextDifferent} from 'Util/messageComparator';
 import {capitalizeFirstChar} from 'Util/StringUtil';
 import {roundLogarithmic} from 'Util/NumberUtil';
 
-import {encryptAesAsset} from '../assets/AssetCrypto';
 import {GENERIC_MESSAGE_TYPE} from '../cryptography/GenericMessageType';
 import {PROTO_MESSAGE_TYPE} from '../cryptography/ProtoMessageType';
 import {EventTypeHandling} from '../event/EventTypeHandling';
@@ -76,23 +64,18 @@ import {EventBuilder} from '../conversation/EventBuilder';
 import {Conversation} from '../entity/Conversation';
 import {Message} from '../entity/message/Message';
 import * as trackingHelpers from '../tracking/Helpers';
-import {EventInfoEntity} from './EventInfoEntity';
 import {EventMapper} from './EventMapper';
 import {ConversationVerificationState} from './ConversationVerificationState';
-import {ClientMismatchHandler} from './ClientMismatchHandler';
 import {buildMetadata, isVideo, isImage, isAudio, ImageMetadata} from '../assets/AssetMetaDataBuilder';
 import {AssetTransferState} from '../assets/AssetTransferState';
 import {ModalOptions, ModalsViewModel} from '../view_model/ModalsViewModel';
 import {AudioType} from '../audio/AudioType';
 import {EventName} from '../tracking/EventName';
 import {StatusType} from '../message/StatusType';
-import {BackendClientError} from '../error/BackendClientError';
 import {showLegalHoldWarningModal} from '../legal-hold/LegalHoldWarning';
 import {ConversationError} from '../error/ConversationError';
 import {Segmentation} from '../tracking/Segmentation';
-import {ConversationService} from './ConversationService';
 import {AssetRepository} from '../assets/AssetRepository';
-import {ClientRepository} from '../client/ClientRepository';
 import {CryptographyRepository} from '../cryptography/CryptographyRepository';
 import {ConversationRepository} from './ConversationRepository';
 import {getLinkPreviewFromString} from './linkPreviews';
@@ -109,18 +92,23 @@ import {FileAsset} from '../entity/message/FileAsset';
 import type {EventRecord} from '../storage';
 import {UserState} from '../user/UserState';
 import {TeamState} from '../team/TeamState';
-import {ConversationState} from './ConversationState';
 import {ClientState} from '../client/ClientState';
 import {UserType} from '../tracking/attribute';
-import {isBackendError, isQualifiedUserClientEntityMap} from 'Util/TypePredicateUtil';
 import {matchQualifiedIds} from 'Util/QualifiedId';
-import {BackendErrorLabel} from '@wireapp/api-client/src/http';
-import {Config} from '../Config';
 import {Core} from '../service/CoreSingleton';
 import {OtrMessage} from '@wireapp/core/src/main/conversation/message/OtrMessage';
 import {User} from '../entity/User';
 import {isQualifiedUserClients, isUserClients} from '@wireapp/core/src/main/util';
 import {PROPERTIES_TYPE} from '../properties/PropertiesType';
+import {findDeletedClients} from './ClientMismatchUtil';
+import {protoFromType} from '../user/AvailabilityMapper';
+import {partition} from 'underscore';
+
+export interface MessageSendingOptions {
+  /** Send native push notification for message. Default is `true`. */
+  nativePush?: boolean;
+  recipients?: QualifiedId[] | QualifiedUserClients | UserClients;
+}
 
 export enum CONSENT_TYPE {
   INCOMING_CALL = 'incoming_call',
@@ -133,10 +121,13 @@ export type ContributedSegmentations = Record<string, number | string | boolean 
 
 type ClientMismatchHandlerFn = (
   mismatch: Partial<ClientMismatch> | Partial<MessageSendingStatus>,
-  conversationId?: QualifiedId,
+  conversation?: Conversation,
   silent?: boolean,
   consentType?: CONSENT_TYPE,
 ) => Promise<boolean>;
+
+/** A Quote that is meant to be sent in a message (and thus needs to have a valid hash) */
+export type OutgoingQuote = QuoteEntity & {hash: Uint8Array};
 
 type TextMessagePayload = {
   conversation: Conversation;
@@ -144,20 +135,22 @@ type TextMessagePayload = {
   mentions?: MentionEntity[];
   message: string;
   messageId?: string;
-  quote?: QuoteEntity;
+  quote?: OutgoingQuote;
 };
 type EditMessagePayload = TextMessagePayload & {originalMessageId: string};
+
+/** A message that has already been stored in DB and has a primary key */
+type StoredMessage = Message & {primary_key: string};
+type StoredContentMessage = ContentMessage & {primary_key: string};
 
 export class MessageRepository {
   private readonly logger: Logger;
   private readonly eventService: EventService;
   private readonly event_mapper: EventMapper;
-  public readonly clientMismatchHandler: ClientMismatchHandler;
   private isBlockingNotificationHandling: boolean;
   private onClientMismatch?: ClientMismatchHandlerFn;
 
   constructor(
-    private readonly clientRepository: ClientRepository,
     private readonly conversationRepositoryProvider: () => ConversationRepository,
     private readonly cryptography_repository: CryptographyRepository,
     private readonly eventRepository: EventRepository,
@@ -165,11 +158,9 @@ export class MessageRepository {
     private readonly propertyRepository: PropertiesRepository,
     private readonly serverTimeHandler: ServerTimeHandler,
     private readonly userRepository: UserRepository,
-    private readonly conversation_service: ConversationService,
     private readonly assetRepository: AssetRepository,
     private readonly userState = container.resolve(UserState),
     private readonly teamState = container.resolve(TeamState),
-    private readonly conversationState = container.resolve(ConversationState),
     private readonly clientState = container.resolve(ClientState),
     private readonly core = container.resolve(Core),
   ) {
@@ -177,12 +168,6 @@ export class MessageRepository {
 
     this.eventService = eventRepository.eventService;
     this.event_mapper = new EventMapper();
-
-    this.clientMismatchHandler = new ClientMismatchHandler(
-      this.conversationRepositoryProvider,
-      this.cryptography_repository,
-      this.userRepository,
-    );
 
     this.isBlockingNotificationHandling = true;
 
@@ -195,6 +180,7 @@ export class MessageRepository {
 
   private initSubscriptions(): void {
     amplify.subscribe(WebAppEvents.EVENT.NOTIFICATION_HANDLING_STATE, this.setNotificationHandlingState);
+    amplify.subscribe(WebAppEvents.USER.SET_AVAILABILITY, this.sendAvailabilityStatus);
   }
 
   /**
@@ -209,15 +195,16 @@ export class MessageRepository {
   /**
    * Triggers the handler for mismatch. Can be used if a mismatch is triggered from outside the MessageRepository
    *
-   * @param conversationId
+   * @param conversation
    * @param mismatch
    */
-  public handleClientMismatch(
-    conversationId: QualifiedId,
-    mismatch: Partial<ClientMismatch> | Partial<MessageSendingStatus>,
+  public async updateMissingClients(
+    conversation: Conversation,
+    allClients: UserClients | QualifiedUserClients,
     consentType?: CONSENT_TYPE,
   ) {
-    return this.onClientMismatch?.(mismatch, conversationId, false, consentType);
+    const mismatch = {missing: allClients} as ClientMismatch;
+    return this.onClientMismatch?.(mismatch, conversation, false, consentType);
   }
 
   /**
@@ -272,7 +259,14 @@ export class MessageRepository {
     return this.sendAndInjectGenericCoreMessage(textMessage, conversation);
   }
 
-  private async sendEdit({conversation, message, messageId, originalMessageId, mentions, quote}: EditMessagePayload) {
+  private async sendEdit({
+    conversation,
+    message,
+    messageId,
+    originalMessageId,
+    mentions = [],
+    quote,
+  }: EditMessagePayload) {
     const baseMessage = MessageBuilder.createEditedText({
       ...this.createCommonMessagePayload(conversation),
       messageId,
@@ -294,7 +288,7 @@ export class MessageRepository {
     }: {
       linkPreview?: LinkPreviewUploadedContent;
       mentions: MentionEntity[];
-      quote?: QuoteEntity;
+      quote?: OutgoingQuote;
     },
   ) {
     const quoteData = quote && {quotedMessageId: quote.messageId, quotedMessageSha256: new Uint8Array(quote.hash)};
@@ -328,7 +322,7 @@ export class MessageRepository {
     conversation: Conversation,
     textMessage: string,
     mentions: MentionEntity[],
-    quoteEntity?: QuoteEntity,
+    quoteEntity?: OutgoingQuote,
   ): Promise<void> {
     const textPayload = {
       conversation,
@@ -337,8 +331,10 @@ export class MessageRepository {
       messageId: createRandomUuid(), // We set the id explicitely in order to be able to override the message if we generate a link preview
       quote: quoteEntity,
     };
-    await this.sendText(textPayload);
-    await this.handleLinkPreview(textPayload);
+    const {state} = await this.sendText(textPayload);
+    if (state !== PayloadBundleState.CANCELLED) {
+      await this.handleLinkPreview(textPayload);
+    }
   }
 
   /**
@@ -374,8 +370,10 @@ export class MessageRepository {
       messageId: createRandomUuid(), // We set the id explicitely in order to be able to override the message if we generate a link preview
       originalMessageId: originalMessage.id,
     };
-    await this.sendEdit(messagePayload);
-    await this.handleLinkPreview(messagePayload);
+    const {state} = await this.sendEdit(messagePayload);
+    if (state !== PayloadBundleState.CANCELLED) {
+      await this.handleLinkPreview(messagePayload);
+    }
   }
 
   private async handleLinkPreview(textPayload: TextMessagePayload & {messageId: string}) {
@@ -409,7 +407,7 @@ export class MessageRepository {
     conversationEntity: Conversation,
     url: string,
     tag: string | number | Record<string, string>,
-    quoteEntity: QuoteEntity,
+    quoteEntity: OutgoingQuote,
   ): Promise<void> {
     if (!tag) {
       tag = t('extensionsGiphyRandom');
@@ -455,40 +453,40 @@ export class MessageRepository {
   /**
    * Post file to a conversation using v3
    *
-   * @param conversationEntity Conversation to post the file
+   * @param conversation Conversation to post the file
    * @param file File object
    * @param asImage whether or not the file should be treated as an image
    * @returns Resolves when file was uploaded
    */
-
   private async uploadFile(
-    conversationEntity: Conversation,
+    conversation: Conversation,
     file: Blob,
     asImage: boolean = false,
   ): Promise<EventRecord | void> {
-    let messageId;
+    const uploadStarted = Date.now();
+    const injectedEvent = await this.sendAssetMetadata(conversation, file, asImage);
+    if (injectedEvent.state === PayloadBundleState.CANCELLED) {
+      throw new ConversationError(
+        ConversationError.TYPE.DEGRADED_CONVERSATION_CANCELLATION,
+        ConversationError.MESSAGE.DEGRADED_CONVERSATION_CANCELLATION,
+      );
+    }
     try {
-      const uploadStarted = Date.now();
-      const injectedEvent = await this.sendAssetMetadata(conversationEntity, file, asImage);
-      if (injectedEvent.state === PayloadBundleState.CANCELLED) {
-        throw new ConversationError(
-          ConversationError.TYPE.DEGRADED_CONVERSATION_CANCELLATION,
-          ConversationError.MESSAGE.DEGRADED_CONVERSATION_CANCELLATION,
-        );
-      }
-      messageId = injectedEvent.id;
-      await this.sendAssetRemotedata(conversationEntity, file, messageId, asImage);
+      await this.sendAssetRemotedata(conversation, file, injectedEvent.id, asImage);
       const uploadDuration = (Date.now() - uploadStarted) / TIME_IN_MILLIS.SECOND;
-      this.logger.info(`Finished to upload asset for conversation'${conversationEntity.id} in ${uploadDuration}`);
+      this.logger.info(`Finished to upload asset for conversation'${conversation.id} in ${uploadDuration}`);
     } catch (error) {
       if (this.isUserCancellationError(error)) {
         throw error;
       } else if (error instanceof RequestCancellationError) {
         return;
       }
-      this.logger.error(`Failed to upload asset for conversation '${conversationEntity.id}': ${error.message}`, error);
-      const messageEntity = await this.getMessageInConversationById(conversationEntity, messageId);
-      this.sendAssetUploadFailed(conversationEntity, messageEntity.id);
+      this.logger.error(
+        `Failed to upload asset for conversation '${conversation.id}': ${(error as Error).message}`,
+        error,
+      );
+      const messageEntity = await this.getMessageInConversationById(conversation, injectedEvent.id);
+      this.sendAssetUploadFailed(conversation, messageEntity.id);
       return this.updateMessageAsUploadFailed(messageEntity);
     }
   }
@@ -500,24 +498,21 @@ export class MessageRepository {
    * @param reason Failure reason
    * @returns Resolves when the message was updated
    */
-  private async updateMessageAsUploadFailed(message_et: ContentMessage, reason = AssetTransferState.UPLOAD_FAILED) {
-    if (message_et) {
-      if (!message_et.isContent()) {
-        throw new Error(`Tried to update wrong message type as upload failed '${(message_et as any).super_type}'`);
-      }
-
-      const asset_et = message_et.getFirstAsset() as FileAsset;
-      if (asset_et) {
-        if (!asset_et.isDownloadable()) {
-          throw new Error(`Tried to update message with wrong asset type as upload failed '${asset_et.type}'`);
-        }
-
-        asset_et.status(reason);
-        asset_et.upload_failed_reason(ProtobufAsset.NotUploaded.FAILED);
-      }
-
-      return this.eventService.updateEventAsUploadFailed(message_et.primary_key, reason);
+  private async updateMessageAsUploadFailed(message_et: StoredMessage, reason = AssetTransferState.UPLOAD_FAILED) {
+    if (!message_et.isContent()) {
+      throw new Error(`Tried to update wrong message type as upload failed '${(message_et as any).super_type}'`);
     }
+
+    const asset_et = message_et.getFirstAsset() as FileAsset;
+    if (asset_et) {
+      if (!asset_et.isDownloadable()) {
+        throw new Error(`Tried to update message with wrong asset type as upload failed '${asset_et.type}'`);
+      }
+      asset_et.status(reason);
+      asset_et.upload_failed_reason(Asset.NotUploaded.FAILED);
+    }
+
+    return this.eventService.updateEventAsUploadFailed(message_et.primary_key, reason);
   }
 
   private async sendAssetRemotedata(conversation: Conversation, file: Blob, messageId: string, asImage: boolean) {
@@ -529,7 +524,7 @@ export class MessageRepository {
       retention,
     };
     const asset = await this.assetRepository.uploadFile(file, messageId, options, () =>
-      this.cancelAssetUpload(messageId),
+      this.cancelAssetUpload(conversation, messageId),
     );
 
     const commonPayload = {
@@ -560,7 +555,9 @@ export class MessageRepository {
     try {
       metadata = await buildMetadata(file);
     } catch (error) {
-      const logMessage = `Couldn't render asset preview from metadata. Asset might be corrupt: ${error.message}`;
+      const logMessage = `Couldn't render asset preview from metadata. Asset might be corrupt: ${
+        (error as Error).message
+      }`;
       this.logger.warn(logMessage, error);
     }
     const meta = {length: file.size, name: (file as File).name, type: file.type} as Partial<FileMetaDataContent>;
@@ -602,7 +599,7 @@ export class MessageRepository {
     return this.sendAndInjectGenericCoreMessage(payload, conversation);
   }
 
-  private isUserCancellationError(error: ConversationError): boolean {
+  private isUserCancellationError(error: any): boolean {
     const errorTypes: string[] = [
       ConversationError.TYPE.DEGRADED_CONVERSATION_CANCELLATION,
       ConversationError.TYPE.LEGAL_HOLD_CONVERSATION_CANCELLATION,
@@ -698,10 +695,8 @@ export class MessageRepository {
       skipSelf,
       skipInjection,
       silentDegradationWarning,
-    }: {
-      nativePush?: boolean;
+    }: MessageSendingOptions & {
       playPingAudio?: boolean;
-      recipients?: QualifiedId[] | QualifiedUserClients | UserClients;
       silentDegradationWarning?: boolean;
       skipInjection?: boolean;
       skipSelf?: boolean;
@@ -739,49 +734,29 @@ export class MessageRepository {
       this.updateMessageAsSent(conversation, genericMessage.messageId, syncTimestamp ? sentTime : undefined);
     };
 
-    /**
-     * Once a message has been sent, check the state of the members of this conversation.
-     * If, in this conversation, there are still users that have 0 devices, that could mean they have been silently removed from the team
-     * We need to ask backend if those users have been deleted and, if so, trigger the teamMemberLeave event
-     */
-    const checkMissingTeamMembers = async (): Promise<void> => {
-      const membersWithoutClients = conversation
-        .participating_user_ets()
-        .filter(user => user.devices().length === 0)
-        .map(user => user.qualifiedId);
-      if (!membersWithoutClients.length) {
-        return;
-      }
-      const usersWithoutClients = await this.userRepository.getUserListFromBackend(
-        conversation.isFederated() ? membersWithoutClients : membersWithoutClients.map(({id}) => id),
-      );
-      return this.triggerTeamMemberLeaveChecks(usersWithoutClients);
-    };
-
     const conversationService = this.conversationService;
     // Configure ephemeral messages
     conversationService.messageTimer.setConversationLevelTimer(conversation.id, conversation.messageTimer());
 
-    return this.conversationService.send({
-      callbacks: {
-        onClientMismatch: mismatch =>
-          this.onClientMismatch?.(mismatch, conversation.qualifiedId, silentDegradationWarning),
-        onStart: injectOptimisticEvent,
-        onSuccess: async (genericMessage, sentTime) => {
-          if (this.teamState.isTeam()) {
-            // If we are in a team, we can be in the particular case where we are in a Tier1 team (team with a lot of users)
-            // In that case, backend will not warn us when a user is removed. We need to check this ourself manually
-            await checkMissingTeamMembers();
-          }
-          updateOptimisticEvent(genericMessage, sentTime);
+    return this.messageSender.queueMessage(() =>
+      this.conversationService.send({
+        callbacks: {
+          onClientMismatch: mismatch => this.onClientMismatch?.(mismatch, conversation, silentDegradationWarning),
+          onStart: injectOptimisticEvent,
+          onSuccess: async (genericMessage, sentTime) => {
+            const preMessageTimestamp = new Date(new Date(sentTime).getTime() - 10).toISOString();
+            // Trigger an empty mismatch to check for users that have no devices and that could have been removed from the team
+            await this.onClientMismatch?.({time: preMessageTimestamp}, conversation, silentDegradationWarning);
+            updateOptimisticEvent(genericMessage, sentTime);
+          },
         },
-      },
-      conversationDomain: conversation.isFederated() ? conversation.domain : undefined,
-      nativePush,
-      payloadBundle: payload,
-      targetMode,
-      userIds,
-    });
+        conversationDomain: conversation.isFederated() ? conversation.domain : undefined,
+        nativePush,
+        payloadBundle: payload,
+        targetMode,
+        userIds,
+      }),
+    );
   }
 
   /**
@@ -834,12 +809,14 @@ export class MessageRepository {
     const sessionReset = MessageBuilder.createSessionReset(this.createCommonMessagePayload(conversation));
 
     const userClient = {[userId.id]: [clientId]};
-    await this.conversationService.send({
-      conversationDomain: conversation.isFederated() ? conversation.domain : undefined,
-      payloadBundle: sessionReset,
-      targetMode: MessageTargetMode.USERS_CLIENTS,
-      userIds: conversation.isFederated() ? {[userId.domain]: userClient} : userClient, // we target this message to the specific client of the user (no need for mismatch handling here)
-    });
+    await this.messageSender.queueMessage(() =>
+      this.conversationService.send({
+        conversationDomain: conversation.isFederated() ? conversation.domain : undefined,
+        payloadBundle: sessionReset,
+        targetMode: MessageTargetMode.USERS_CLIENTS,
+        userIds: conversation.isFederated() ? {[userId.domain]: userClient} : userClient, // we target this message to the specific client of the user (no need for mismatch handling here)
+      }),
+    );
   }
 
   /**
@@ -889,10 +866,7 @@ export class MessageRepository {
     const sendingOptions = {
       nativePush: false,
       recipients: [messageEntity.qualifiedFrom],
-      // When not in a verified conversation (verified or degraded) we want the regular sending flow (send and reencrypt if there are mismatches)
-      // When in a verified (or degraded) conversation we want to prevent encrypting for unverified devices, we will then silent the degradation modal and force sending to only the devices that are verified
-      silentDegradationWarning: conversationEntity.verification_state() !== ConversationVerificationState.UNVERIFIED,
-
+      silentDegradationWarning: true, // We do not show the degradation popup in case of a confirmation
       targetMode: MessageTargetMode.USERS,
     };
     const res = await this.sendAndInjectGenericCoreMessage(confirmationMessage, conversationEntity, sendingOptions);
@@ -1072,24 +1046,40 @@ export class MessageRepository {
     return deleteCount;
   }
 
-  private sendGenericMessageToConversation(eventInfoEntity: EventInfoEntity): Promise<ClientMismatch> {
-    return this.messageSender.queueMessage(async () => {
-      const recipients = await this.createRecipients(eventInfoEntity.conversationId);
-      eventInfoEntity.updateOptions({recipients});
-      return this.sendGenericMessage(eventInfoEntity, true);
+  private readonly sendAvailabilityStatus = async (availability: Availability.Type) => {
+    const protoAvailability = new Availability({type: protoFromType(availability)});
+    const genericMessage = new GenericMessage({
+      [GENERIC_MESSAGE_TYPE.AVAILABILITY]: protoAvailability,
+      messageId: createRandomUuid(),
     });
-  }
+
+    const sortedUsers = this.userState
+      .directlyConnectedUsers()
+      // For the moment, we do not want to send status in federated env
+      // we can remove the filter when we actually want this feature in federated env (and we will need to implement federation for the core broadcastService)
+      .filter(user => !user.isFederated)
+      .sort(({id: idA}, {id: idB}) => idA.localeCompare(idB, undefined, {sensitivity: 'base'}));
+    const [members, other] = partition(sortedUsers, user => user.isTeamMember());
+    const users = [this.userState.self(), ...members, ...other].slice(
+      0,
+      UserRepository.CONFIG.MAXIMUM_TEAM_SIZE_BROADCAST,
+    );
+
+    const recipients = users.reduce<UserClients>((recipientsIndex, userEntity) => {
+      recipientsIndex[userEntity.id] = userEntity.devices().map(clientEntity => clientEntity.id);
+      return recipientsIndex;
+    }, {});
+    this.core.service!.broadcast.broadcastGenericMessage(genericMessage, recipients, false, mismatch => {
+      this.onClientMismatch?.(mismatch);
+    });
+  };
 
   /**
    * Cancel asset upload.
    * @param messageId Id of the message which upload has been cancelled
    */
-  private readonly cancelAssetUpload = (messageId: string) => {
-    this.sendAssetUploadFailed(
-      this.conversationState.activeConversation(),
-      messageId,
-      ProtobufAsset.NotUploaded.CANCELLED,
-    );
+  private readonly cancelAssetUpload = (conversation: Conversation, messageId: string) => {
+    this.sendAssetUploadFailed(conversation, messageId, Asset.NotUploaded.CANCELLED);
   };
 
   /**
@@ -1126,7 +1116,7 @@ export class MessageRepository {
         return await this.eventService.updateEvent(messageEntity.primary_key, changes);
       }
     } catch (error) {
-      if (error.type !== ConversationError.TYPE.MESSAGE_NOT_FOUND) {
+      if ((error as any).type !== ConversationError.TYPE.MESSAGE_NOT_FOUND) {
         throw error;
       }
     }
@@ -1140,11 +1130,18 @@ export class MessageRepository {
     }, {} as QualifiedUserClients);
   }
 
-  private async generateRecipients(
+  private createRecipients(users: User[]): UserClients {
+    return users.reduce((userClients, user) => {
+      userClients[user.id] = user.devices().map(client => client.id);
+      return userClients;
+    }, {} as UserClients);
+  }
+
+  private generateRecipients(
     conversation: Conversation,
-    recipients: QualifiedId[] | QualifiedUserClients | UserClients,
+    recipients?: QualifiedId[] | QualifiedUserClients | UserClients,
     skipSelf?: boolean,
-  ): Promise<QualifiedUserClients | UserClients> {
+  ): QualifiedUserClients | UserClients {
     if (isQualifiedUserClients(recipients) || isUserClients(recipients)) {
       // If we get a userId>client pairs, we just return those, no need to create recipients
       return recipients;
@@ -1155,113 +1152,44 @@ export class MessageRepository {
       // we filter the self user if skipSelf is true
       .filter(user => !skipSelf || !user.isMe);
 
-    return conversation.isFederated()
-      ? this.createQualifiedRecipients(users)
-      : this.createRecipients(
-          conversation.qualifiedId,
-          false,
-          users.map(user => user.id),
-        );
-  }
-
-  async createRecipients(
-    conversationId: QualifiedId,
-    skip_own_clients = false,
-    user_ids?: string[],
-  ): Promise<UserClients> {
-    const userEntities = await this.conversationRepositoryProvider().getAllUsersInConversation(conversationId);
-    const recipients: UserClients = {};
-    for (const userEntity of userEntities) {
-      if (!(skip_own_clients && userEntity.isMe)) {
-        if (user_ids && !user_ids.includes(userEntity.id)) {
-          continue;
-        }
-
-        recipients[userEntity.id] = userEntity.devices().map(client_et => client_et.id);
-      }
-    }
-    return recipients;
-  }
-
-  private async sendGenericMessage(eventInfoEntity: EventInfoEntity, checkLegalHold: boolean): Promise<ClientMismatch> {
-    try {
-      await this.grantOutgoingMessage(eventInfoEntity, undefined, checkLegalHold);
-      const sendAsExternal = await this.shouldSendAsExternal(eventInfoEntity);
-      if (sendAsExternal) {
-        return await this.sendExternalGenericMessage(eventInfoEntity);
-      }
-
-      const {genericMessage, options} = eventInfoEntity;
-      const payload = await this.cryptography_repository.encryptGenericMessage(
-        options.recipients as UserClients,
-        genericMessage,
-      );
-      payload.native_push = options.nativePush;
-      return await this.sendEncryptedMessage(eventInfoEntity, payload);
-    } catch (error) {
-      const isRequestTooLarge = isBackendError(error) && error.code === HTTP_STATUS.REQUEST_TOO_LONG;
-
-      if (isRequestTooLarge) {
-        return this.sendExternalGenericMessage(eventInfoEntity);
-      }
-
-      throw error;
-    }
+    return conversation.isFederated() ? this.createQualifiedRecipients(users) : this.createRecipients(users);
   }
 
   /**
    * Get Message with given ID from the database.
    *
-   * @param conversationEntity Conversation message belongs to
+   * @param conversation Conversation message belongs to
    * @param messageId ID of message
    * @param skipConversationMessages Don't use message entity from conversation
    * @param ensureUser Make sure message entity has a valid user
    * @returns Resolves with the message
    */
-  getMessageInConversationById(
-    conversationEntity: Conversation,
+  async getMessageInConversationById(
+    conversation: Conversation,
     messageId: string,
     skipConversationMessages = false,
     ensureUser = false,
-  ): Promise<ContentMessage> {
-    const messageEntity = !skipConversationMessages && conversationEntity.getMessage(messageId);
-    const messagePromise = messageEntity
-      ? Promise.resolve(messageEntity)
-      : this.eventService.loadEvent(conversationEntity.id, messageId).then(event => {
-          if (event) {
-            return this.event_mapper.mapJsonEvent(event, conversationEntity);
-          }
-          throw new ConversationError(
-            ConversationError.TYPE.MESSAGE_NOT_FOUND,
-            ConversationError.MESSAGE.MESSAGE_NOT_FOUND,
-          );
-        });
+  ): Promise<StoredContentMessage> {
+    const messageEntity = !skipConversationMessages && conversation.getMessage(messageId);
+    const message =
+      messageEntity ||
+      (await this.eventService.loadEvent(conversation.id, messageId).then(event => {
+        return event && this.event_mapper.mapJsonEvent(event, conversation);
+      }));
 
-    if (ensureUser) {
-      return messagePromise.then(message => {
-        if (message.from && !message.user().id) {
-          return this.userRepository.getUserById({domain: message.user().domain, id: message.from}).then(userEntity => {
-            message.user(userEntity);
-            return message as ContentMessage;
-          });
-        }
-        return message as ContentMessage;
-      });
+    if (!message) {
+      throw new ConversationError(
+        ConversationError.TYPE.MESSAGE_NOT_FOUND,
+        ConversationError.MESSAGE.MESSAGE_NOT_FOUND,
+      );
     }
-    return messagePromise as Promise<ContentMessage>;
-  }
 
-  static getOtherUsersWithoutClients(eventInfoEntity: EventInfoEntity, selfUserId: string): string[] {
-    const allRecipientsBesideSelf = Object.keys(eventInfoEntity.options.recipients).filter(id => id !== selfUserId);
-    const userIdsWithoutClients = [];
-    for (const userId of allRecipientsBesideSelf) {
-      const clientIdsOfUser = eventInfoEntity.options.recipients[userId];
-      const noRemainingClients = clientIdsOfUser.length === 0;
-      if (noRemainingClients) {
-        userIdsWithoutClients.push(userId);
-      }
+    if (ensureUser && message.from && !message.user().id) {
+      const user = await this.userRepository.getUserById({domain: message.user().domain, id: message.from});
+      message.user(user);
+      return message as StoredContentMessage;
     }
-    return userIdsWithoutClients;
+    return message as StoredContentMessage;
   }
 
   async triggerTeamMemberLeaveChecks(users: APIClientUser[]): Promise<void> {
@@ -1277,243 +1205,18 @@ export class MessageRepository {
     }
   }
 
-  private async shouldShowLegalHoldWarning(eventInfoEntity: EventInfoEntity): Promise<boolean> {
-    const messageType = eventInfoEntity.getType();
-    const isMessageEdit = messageType === GENERIC_MESSAGE_TYPE.EDITED;
-    const conversationEntity = this.conversationState.findConversation(eventInfoEntity.conversationId);
-    const localLegalHoldStatus = conversationEntity.legalHoldStatus();
-    await this.updateAllClients(conversationEntity, !isMessageEdit);
-    const updatedLocalLegalHoldStatus = conversationEntity.legalHoldStatus();
-
-    const {genericMessage} = eventInfoEntity;
-    (genericMessage as any)[messageType][PROTO_MESSAGE_TYPE.LEGAL_HOLD_STATUS] = updatedLocalLegalHoldStatus;
-
-    const haveNewClientsChangeLegalHoldStatus = localLegalHoldStatus !== updatedLocalLegalHoldStatus;
-
-    if (!isMessageEdit && haveNewClientsChangeLegalHoldStatus) {
-      const {conversationId, timestamp: numericTimestamp} = eventInfoEntity;
-      await this.conversationRepositoryProvider().injectLegalHoldMessage({
-        beforeTimestamp: true,
-        conversationId: conversationId,
-        legalHoldStatus: updatedLocalLegalHoldStatus,
-        timestamp: numericTimestamp,
-        userId: this.userState.self().qualifiedId,
-      });
+  public async updateAllClients(conversation: Conversation, blockSystemMessage: boolean): Promise<void> {
+    if (blockSystemMessage) {
+      conversation.blockLegalHoldMessage = true;
     }
-
-    return haveNewClientsChangeLegalHoldStatus && updatedLocalLegalHoldStatus === LegalHoldStatus.ENABLED;
-  }
-
-  private async grantOutgoingMessage(
-    eventInfoEntity: EventInfoEntity,
-    userIds: QualifiedId[],
-    checkLegalHold: boolean,
-  ): Promise<void> {
-    const messageType = eventInfoEntity.getType();
-    const allowedMessageTypes = ['cleared', 'clientAction', 'confirmation', 'deleted', 'lastRead'];
-
-    if (allowedMessageTypes.includes(messageType)) {
-      return;
-    }
-
-    if (this.teamState.isTeam()) {
-      const userIdsWithoutClients = MessageRepository.getOtherUsersWithoutClients(
-        eventInfoEntity,
-        this.userState.self().id,
-      );
-      const usersWithoutClients = await this.userRepository.getUserListFromBackend(userIdsWithoutClients);
-      this.triggerTeamMemberLeaveChecks(usersWithoutClients);
-    }
-
-    let shouldShowLegalHoldWarning: boolean = false;
-
-    if (checkLegalHold) {
-      shouldShowLegalHoldWarning = await this.shouldShowLegalHoldWarning(eventInfoEntity);
-    }
-
-    return this.grantMessage(eventInfoEntity, userIds, shouldShowLegalHoldWarning);
-  }
-
-  /**
-   * @deprecated Will not work with federation. Please use `sendFederatedMessage`.
-   */
-  async grantMessage(
-    eventInfoEntity: EventInfoEntity,
-    userIds: QualifiedId[],
-    shouldShowLegalHoldWarning: boolean,
-  ): Promise<void> {
-    const conversationEntity = await this.conversationRepositoryProvider().getConversationById(
-      eventInfoEntity.conversationId,
+    const missing = await this.conversationService.getAllParticipantsClients(
+      conversation.id,
+      conversation.isFederated() ? conversation.domain : undefined,
     );
-    const legalHoldMessageTypes: string[] = [
-      GENERIC_MESSAGE_TYPE.ASSET,
-      GENERIC_MESSAGE_TYPE.EDITED,
-      GENERIC_MESSAGE_TYPE.IMAGE,
-      GENERIC_MESSAGE_TYPE.TEXT,
-    ];
-    const isLegalHoldMessageType =
-      eventInfoEntity.genericMessage && legalHoldMessageTypes.includes(eventInfoEntity.genericMessage.content);
-    const verificationState = conversationEntity.verification_state();
-    const conversationDegraded = verificationState === ConversationVerificationState.DEGRADED;
-    if (conversationEntity.needsLegalHoldApproval) {
-      conversationEntity.needsLegalHoldApproval = false;
-      await showLegalHoldWarningModal(conversationEntity, conversationDegraded);
-      return;
-    } else if (shouldShowLegalHoldWarning) {
-      conversationEntity.needsLegalHoldApproval = !this.userState.self().isOnLegalHold() && isLegalHoldMessageType;
-    }
-    if (!conversationDegraded) {
-      return;
-    }
-    return new Promise((resolve, reject) => {
-      let sendAnyway = false;
-
-      userIds = conversationEntity.getUsersWithUnverifiedClients().map(userEntity => userEntity.qualifiedId);
-
-      return this.userRepository
-        .getUsersById(userIds)
-        .then(userEntities => {
-          let titleString;
-
-          const hasMultipleUsers = userEntities.length > 1;
-          const userNames = joinNames(userEntities, Declension.NOMINATIVE);
-          const titleSubstitutions = capitalizeFirstChar(userNames);
-
-          if (hasMultipleUsers) {
-            titleString = t('modalConversationNewDeviceHeadlineMany', titleSubstitutions);
-          } else {
-            const [firstUser] = userEntities;
-
-            if (firstUser) {
-              titleString = firstUser.isMe
-                ? t('modalConversationNewDeviceHeadlineYou', titleSubstitutions)
-                : t('modalConversationNewDeviceHeadlineOne', titleSubstitutions);
-            } else {
-              const conversationId = eventInfoEntity.conversationId;
-              const type = eventInfoEntity.getType();
-
-              const log = `Missing user IDs to grant '${type}' message in '${conversationId}'`;
-              this.logger.error(log);
-
-              const error = new Error('Failed to grant outgoing message');
-
-              return reject(error);
-            }
-          }
-
-          const actionString = t('modalConversationNewDeviceAction');
-          const messageString = t('modalConversationNewDeviceMessage');
-
-          const options: ModalOptions = {
-            close: () => {
-              if (!sendAnyway) {
-                reject(
-                  new ConversationError(
-                    ConversationError.TYPE.DEGRADED_CONVERSATION_CANCELLATION,
-                    ConversationError.MESSAGE.DEGRADED_CONVERSATION_CANCELLATION,
-                  ),
-                );
-              }
-            },
-            primaryAction: {
-              action: () => {
-                sendAnyway = true;
-                conversationEntity.verification_state(ConversationVerificationState.UNVERIFIED);
-                resolve();
-              },
-              text: actionString,
-            },
-            text: {
-              message: messageString,
-              title: titleString,
-            },
-          };
-
-          amplify.publish(
-            WebAppEvents.WARNING.MODAL,
-            ModalsViewModel.TYPE.CONFIRM,
-            options,
-            `degraded-${eventInfoEntity.conversationId}`,
-          );
-        })
-        .catch(reject);
-    });
-  }
-
-  public async updateAllClients(conversationEntity: Conversation, blockSystemMessage: boolean): Promise<void> {
+    const deleted = findDeletedClients(missing, await this.generateRecipients(conversation));
+    await this.onClientMismatch?.({deleted, missing} as ClientMismatch, conversation, true);
     if (blockSystemMessage) {
-      conversationEntity.blockLegalHoldMessage = true;
-    }
-    const sender = this.clientState.currentClient().id;
-    try {
-      await this.conversation_service.postEncryptedMessage(conversationEntity, {recipients: {}, sender});
-    } catch (axiosError) {
-      const error = axiosError.response?.data || axiosError;
-      if (error.missing) {
-        const remoteUserClients = error.missing as UserClients;
-        const localUserClients = await this.createRecipients(conversationEntity);
-        const selfId = this.userState.self().id;
-
-        const deletedUserClients = Object.entries(localUserClients).reduce<UserClients>(
-          (deleted, [userId, clients]) => {
-            if (userId === selfId) {
-              return deleted;
-            }
-            const deletedClients = getDifference(remoteUserClients[userId], clients);
-            if (deletedClients.length) {
-              deleted[userId] = deletedClients;
-            }
-            return deleted;
-          },
-          {},
-        );
-
-        await Promise.all(
-          Object.entries(deletedUserClients).map(([userId, clients]) =>
-            Promise.all(
-              clients.map(clientId => this.userRepository.removeClientFromUser({domain: '', id: userId}, clientId)),
-            ),
-          ),
-        );
-
-        const missingUserIds = Object.entries(remoteUserClients).reduce<string[]>((missing, [userId, clients]) => {
-          if (userId !== selfId) {
-            const missingClients = getDifference(localUserClients[userId] || ([] as string[]), clients);
-            if (missingClients.length) {
-              missing.push(userId);
-            }
-          }
-          return missing;
-        }, []);
-
-        const missingUserEntities = missingUserIds.map(missingUserId =>
-          this.userRepository.findUserById(missingUserId),
-        );
-
-        const usersMap = await this.userRepository.getClientsByUsers(missingUserEntities, false);
-        if (isQualifiedUserClientEntityMap(usersMap)) {
-          await Promise.all(
-            Object.entries(usersMap).map(([domain, userClientsMap]) =>
-              Object.entries(userClientsMap).map(([userId, clients]) =>
-                Promise.all(
-                  clients.map(client => this.userRepository.addClientToUser({domain, id: userId}, client, false)),
-                ),
-              ),
-            ),
-          );
-        } else {
-          await Promise.all(
-            Object.entries(usersMap).map(([userId, clients]) =>
-              Promise.all(
-                clients.map(client => this.userRepository.addClientToUser({domain: '', id: userId}, client, false)),
-              ),
-            ),
-          );
-        }
-      }
-    }
-    if (blockSystemMessage) {
-      conversationEntity.blockLegalHoldMessage = false;
+      conversation.blockLegalHoldMessage = false;
     }
   }
 
@@ -1523,30 +1226,15 @@ export class MessageRepository {
    *
    * @param conversationEntity Conversation to be marked as read
    */
-  public async markAsRead(conversationEntity: Conversation) {
-    const conversationId = conversationEntity.id;
-    const timestamp = conversationEntity.last_read_timestamp();
-    const protoLastRead = new LastRead({
-      conversationId,
-      lastReadTimestamp: timestamp,
-    });
-    const genericMessage = new GenericMessage({
-      [GENERIC_MESSAGE_TYPE.LAST_READ]: protoLastRead,
-      messageId: createRandomUuid(),
-    });
-
-    const eventInfoEntity = new EventInfoEntity(
-      genericMessage,
-      this.conversationState.self_conversation()?.qualifiedId,
-    );
-    try {
-      await this.sendGenericMessageToConversation(eventInfoEntity);
-      amplify.publish(WebAppEvents.NOTIFICATION.REMOVE_READ);
-      this.logger.info(`Marked conversation '${conversationId}' as read on '${new Date(timestamp).toISOString()}'`);
-    } catch (error) {
-      const errorMessage = 'Failed to update last read timestamp';
-      this.logger.error(`${errorMessage}: ${error.message}`, error);
-    }
+  public async markAsRead(conversation: Conversation) {
+    const timestamp = conversation.last_read_timestamp();
+    this.conversationService.sendLastRead(conversation.id, timestamp);
+    /*
+     * FIXME notification removal can be improved.
+     * We can add the conversation ID in the payload of the event and only check unread messages for this particular conversation
+     */
+    amplify.publish(WebAppEvents.NOTIFICATION.REMOVE_READ);
+    this.logger.info(`Marked conversation '${conversation.id}' as read on '${new Date(timestamp).toISOString()}'`);
   }
 
   /**
@@ -1555,30 +1243,8 @@ export class MessageRepository {
    * @param countlyId Countly new ID
    */
   public async sendCountlySync(countlyId: string) {
-    const selfConversation = this.conversationState.self_conversation();
-    if (selfConversation?.isFederated()) {
-      // TODO(federation)
-      this.logger.warn('syncly not implemented for federated env');
-      return;
-    }
-    const protoDataTransfer = new DataTransfer({
-      trackingIdentifier: {
-        identifier: countlyId,
-      },
-    });
-    const genericMessage = new GenericMessage({
-      [GENERIC_MESSAGE_TYPE.DATA_TRANSFER]: protoDataTransfer,
-      messageId: createRandomUuid(),
-    });
-
-    const eventInfoEntity = new EventInfoEntity(genericMessage, selfConversation.qualifiedId);
-    try {
-      await this.sendGenericMessageToConversation(eventInfoEntity);
-      this.logger.info(`Sent countly sync message with ID ${countlyId}`);
-    } catch (error) {
-      const errorMessage = `Failed to send countly sync message with ID ${countlyId}`;
-      this.logger.error(`${errorMessage}: ${error.message}`, error);
-    }
+    await this.conversationService.sendCountlySync(countlyId);
+    this.logger.info(`Sent countly sync message with ID ${countlyId}`);
   }
 
   /**
@@ -1588,11 +1254,7 @@ export class MessageRepository {
    * @param conversationId id of the conversation to send call message to
    * @returns Resolves when the confirmation was sent
    */
-  public sendCallingMessage(
-    conversation: Conversation,
-    payload: string,
-    options: {nativePush?: boolean; recipients?: UserClients | QualifiedUserClients},
-  ) {
+  public sendCallingMessage(conversation: Conversation, payload: string, options: MessageSendingOptions) {
     const message = MessageBuilder.createCall({
       ...this.createCommonMessagePayload(conversation),
       content: payload,
@@ -1607,171 +1269,6 @@ export class MessageRepository {
 
       targetMode: options?.recipients ? MessageTargetMode.USERS_CLIENTS : MessageTargetMode.USERS,
     });
-  }
-
-  /**
-   * Estimate whether message should be send as type external.
-   *
-   * @param eventInfoEntity Info about event
-   * @returns Is payload likely to be too big so that we switch to type external?
-   */
-  private async shouldSendAsExternal(eventInfoEntity: EventInfoEntity) {
-    const {conversationId, genericMessage} = eventInfoEntity;
-    const conversationEntity = await this.conversationRepositoryProvider().getConversationById(conversationId);
-    const messageInBytes = new Uint8Array(GenericMessage.encode(genericMessage).finish()).length;
-    const estimatedPayloadInBytes = conversationEntity.getNumberOfClients() * messageInBytes;
-    return estimatedPayloadInBytes > ConversationRepository.CONFIG.EXTERNAL_MESSAGE_THRESHOLD;
-  }
-
-  /**
-   * Send encrypted external message
-   *
-   * @param eventInfoEntity Event to be send
-   * @returns Resolves after sending the external message
-   */
-  private async sendExternalGenericMessage(eventInfoEntity: EventInfoEntity): Promise<ClientMismatch> {
-    const {genericMessage, options} = eventInfoEntity;
-    const messageType = eventInfoEntity.getType();
-    this.logger.info(`Sending external message of type '${messageType}'`, genericMessage);
-
-    try {
-      const encryptedAsset = await encryptAesAsset(GenericMessage.encode(genericMessage).finish());
-      const keyBytes = new Uint8Array(encryptedAsset.keyBytes);
-      const sha256 = new Uint8Array(encryptedAsset.sha256);
-
-      const externalMessage = new External({otrKey: keyBytes, sha256});
-
-      const genericMessageExternal = new GenericMessage({
-        [GENERIC_MESSAGE_TYPE.EXTERNAL]: externalMessage,
-        messageId: createRandomUuid(),
-      });
-
-      const payload = await this.cryptography_repository.encryptGenericMessage(
-        options.recipients as UserClients,
-        genericMessageExternal,
-      );
-      payload.data = arrayToBase64(encryptedAsset.cipherText);
-      payload.native_push = options.nativePush;
-      return await this.sendEncryptedMessage(eventInfoEntity, payload);
-    } catch (error) {
-      this.logger.info('Failed sending external message', error);
-      throw error;
-    }
-  }
-
-  /**
-   * Sends an OTR message to a conversation.
-   *
-   * @note Options for the precondition check on missing clients are:
-   * - `false` - all clients
-   * - `Array<string>` - only clients of listed users
-   * - `true` - force sending
-   *
-   * @param eventInfoEntity Info about message to be sent
-   * @param payload Payload
-   * @deprecated Please use `sendFederatedMessage`
-   * @returns Promise that resolves after sending the encrypted message
-   */
-  private async sendEncryptedMessage(
-    eventInfoEntity: EventInfoEntity,
-    payload: NewOTRMessage<string>,
-  ): Promise<ClientMismatch | undefined> {
-    const {conversationId, genericMessage, options} = eventInfoEntity;
-    const messageId = genericMessage.messageId;
-    let messageType = eventInfoEntity.getType();
-
-    if (messageType === GENERIC_MESSAGE_TYPE.CONFIRMATION) {
-      messageType += ` (type: "${eventInfoEntity.genericMessage.confirmation.type}")`;
-    }
-
-    const numberOfUsers = Object.keys(payload.recipients).length;
-    const numberOfClients = Object.values(payload.recipients)
-      .map(clientId => Object.keys(clientId).length)
-      .reduce((totalClients, clients) => totalClients + clients, 0);
-
-    const logMessage = `Sending '${messageType}' message (${messageId}) to conversation '${JSON.stringify(
-      conversationId,
-    )}'`;
-    this.logger.info(logMessage, payload);
-
-    if (numberOfUsers > numberOfClients) {
-      this.logger.warn(
-        `Sending '${messageType}' message (${messageId}) to just '${numberOfClients}' clients but there are '${numberOfUsers}' users in conversation '${JSON.stringify(
-          conversationId,
-        )}'`,
-      );
-    }
-
-    try {
-      const response = await this.conversation_service.postEncryptedMessage(
-        conversationId,
-        payload,
-        options.precondition,
-      );
-      await this.clientMismatchHandler.onClientMismatch(eventInfoEntity, response, payload);
-      return response;
-    } catch (axiosError) {
-      const errorData = axiosError.response?.data as ClientMismatch & {label: BackendErrorLabel};
-
-      const hasNoLegalholdConsent = errorData?.label === BackendErrorLabel.LEGAL_HOLD_MISSING_CONSENT;
-      const ignoredMessageTypes = [GENERIC_MESSAGE_TYPE.CONFIRMATION];
-      if (hasNoLegalholdConsent && !ignoredMessageTypes.includes(messageType as GENERIC_MESSAGE_TYPE)) {
-        const replaceLinkLegalHold = replaceLink(
-          Config.getConfig().URL.SUPPORT.LEGAL_HOLD_BLOCK,
-          '',
-          'read-more-legal-hold',
-        );
-        await new Promise<void>(resolve => {
-          amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.ACKNOWLEDGE, {
-            primaryAction: {
-              action: () => {
-                resolve();
-              },
-            },
-            text: {
-              htmlMessage: t('legalHoldMessageSendingMissingConsentMessage', {}, replaceLinkLegalHold),
-              title: t('legalHoldMessageSendingMissingConsentTitle'),
-            },
-          });
-        });
-        throw new ConversationError(
-          ConversationError.TYPE.LEGAL_HOLD_CONVERSATION_CANCELLATION,
-          ConversationError.MESSAGE.LEGAL_HOLD_CONVERSATION_CANCELLATION,
-        );
-      }
-
-      const isUnknownClient = errorData?.label === BackendClientError.LABEL.UNKNOWN_CLIENT;
-      if (isUnknownClient) {
-        this.clientRepository.removeLocalClient();
-        return undefined;
-      }
-
-      if (!errorData?.missing) {
-        throw errorData;
-      }
-
-      const payloadWithMissingClients = await this.clientMismatchHandler.onClientMismatch(
-        eventInfoEntity,
-        errorData,
-        payload,
-      );
-
-      const missedUserIds = Object.keys(errorData.missing).map(userId => ({
-        domain: '',
-        id: userId,
-      }));
-      await this.grantOutgoingMessage(eventInfoEntity, missedUserIds, true);
-      this.logger.info(
-        `Updated '${messageType}' message (${messageId}) for conversation '${JSON.stringify(
-          conversationId,
-        )}'. Will ignore missing receivers.`,
-        payloadWithMissingClients,
-      );
-      if (payloadWithMissingClients) {
-        return this.conversation_service.postEncryptedMessage(conversationId, payloadWithMissingClients, true);
-      }
-      return this.conversation_service.postEncryptedMessage(conversationId, payload, true);
-    }
   }
 
   private createCommonMessagePayload(conversation: Conversation) {
@@ -1804,7 +1301,7 @@ export class MessageRepository {
     switch (messageContentType) {
       case 'asset': {
         const protoAsset = genericMessage.asset;
-        if (protoAsset.original) {
+        if (protoAsset?.original) {
           if (!!protoAsset.original.image) {
             actionType = 'photo';
           } else if (!!protoAsset.original.audio) {
@@ -1835,7 +1332,7 @@ export class MessageRepository {
 
       case 'text': {
         const protoText = genericMessage.text;
-        const length = protoText[PROTO_MESSAGE_TYPE.LINK_PREVIEWS].length;
+        const length = protoText?.[PROTO_MESSAGE_TYPE.LINK_PREVIEWS]?.length;
         if (!length) {
           actionType = 'text';
         }

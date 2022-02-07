@@ -45,7 +45,7 @@ describe('InputLevel', () => {
 
     jest.spyOn(global, 'setInterval').mockImplementation((callback: () => void, interval: any) => {
       callback();
-      return 0;
+      return 0 as any;
     });
   });
 

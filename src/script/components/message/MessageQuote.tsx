@@ -70,14 +70,14 @@ const Quote: React.FC<QuoteProps> = ({
 
   useEffect(() => {
     const handleQuoteDeleted = (messageId: string) => {
-      if (quotedMessage.id === messageId) {
+      if (quotedMessage?.id === messageId) {
         setError(QuoteEntity.ERROR.MESSAGE_NOT_FOUND);
         setQuotedMessage(undefined);
       }
     };
 
     const handleQuoteUpdated = (originalMessageId: string, messageEntity: ContentMessage) => {
-      if (quotedMessage.id === originalMessageId) {
+      if (quotedMessage?.id === originalMessageId) {
         setQuotedMessage(messageEntity);
       }
     };
@@ -96,7 +96,7 @@ const Quote: React.FC<QuoteProps> = ({
       messageRepository
         .getMessageInConversationById(conversation, quote.messageId, true, true)
         .then(message => {
-          setQuotedMessage(message);
+          setQuotedMessage(message as ContentMessage);
         })
         .catch(error => {
           if (error.type === ConversationError.TYPE.MESSAGE_NOT_FOUND) {

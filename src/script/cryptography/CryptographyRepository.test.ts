@@ -29,73 +29,12 @@ import {CONVERSATION_EVENT, ConversationOtrMessageAddEvent} from '@wireapp/api-c
 import {ClientEvent} from 'src/script/event/Client';
 import {TestFactory} from '../../../test/helper/TestFactory';
 import {CryptographyError} from 'src/script/error/CryptographyError';
-import {entities} from '../../../test/api/payloads';
 
 describe('CryptographyRepository', () => {
   const testFactory = new TestFactory();
 
   beforeAll(async () => {
     await testFactory.exposeCryptographyActors(false);
-  });
-
-  describe('encryptGenericMessage', () => {
-    const jane_roe = {
-      clients: {
-        phone_id: '55cdd1dbe3c2ed74',
-      },
-      id: entities.user.jane_roe.id,
-    };
-    const john_doe = {
-      clients: {
-        desktop_id: 'b29034060fed476e',
-        phone_id: '4b0a0fbf418d264c',
-      },
-      id: entities.user.john_doe.id,
-    };
-
-    it('encrypts a generic message', () => {
-      spyOn(testFactory.cryptography_repository['cryptographyService'], 'getUsersPreKeys').and.callFake(
-        (recipients: Record<string, string[]>) =>
-          new Promise(resolve => {
-            const prekey_map: Record<string, any> = {};
-
-            for (const user_id in recipients) {
-              if (recipients.hasOwnProperty(user_id)) {
-                const client_ids = recipients[user_id];
-
-                prekey_map[user_id] = prekey_map[user_id] || {};
-
-                client_ids.forEach(client_id => {
-                  prekey_map[user_id][client_id] = {
-                    id: 65535,
-                    key: 'pQABARn//wKhAFgg3OpuTCUwDZMt1fklZB4M+fjDx/3fyx78gJ6j3H3dM2YDoQChAFggQU1orulueQHLv5YDYqEYl3D4O0zA9d+TaGGXXaBJmK0E9g==',
-                  };
-                });
-              }
-            }
-
-            resolve(prekey_map);
-          }),
-      );
-
-      const generic_message = new GenericMessage({
-        [GENERIC_MESSAGE_TYPE.TEXT]: new Text({content: 'Unit test'}),
-        messageId: createRandomUuid(),
-      });
-
-      const recipients = {
-        [john_doe.id]: [john_doe.clients.phone_id, john_doe.clients.desktop_id],
-        [jane_roe.id]: [jane_roe.clients.phone_id],
-      };
-
-      return testFactory.cryptography_repository.encryptGenericMessage(recipients, generic_message).then(payload => {
-        expect(payload.recipients).toBeTruthy();
-        expect(Object.keys(payload.recipients).length).toBe(2);
-        expect(Object.keys(payload.recipients[john_doe.id]).length).toBe(2);
-        expect(Object.keys(payload.recipients[jane_roe.id]).length).toBe(1);
-        expect(payload.recipients[jane_roe.id][jane_roe.clients.phone_id]).toEqual(jasmine.any(String));
-      });
-    });
   });
 
   describe('getRemoteFingerprint', () => {

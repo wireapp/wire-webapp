@@ -22,7 +22,7 @@ import {Runtime} from '@wireapp/commons';
 import type {WebappProperties} from '@wireapp/api-client/src/user/data';
 import type {QualifiedId} from '@wireapp/api-client/src/user';
 import type {CallConfigData} from '@wireapp/api-client/src/account/CallConfigData';
-import type {ClientMismatch, UserClients, QualifiedUserClients} from '@wireapp/api-client/src/conversation';
+import type {UserClients, QualifiedUserClients} from '@wireapp/api-client/src/conversation';
 import {matchQualifiedIds} from 'Util/QualifiedId';
 import {
   CALL_TYPE,
@@ -56,7 +56,6 @@ import {Config} from '../Config';
 import {ModalsViewModel} from '../view_model/ModalsViewModel';
 import {CALL_MESSAGE_TYPE} from './enum/CallMessageType';
 import {CallingEvent, EventBuilder} from '../conversation/EventBuilder';
-import {MessageSendingOptions} from '../conversation/EventInfoEntity';
 import {EventRepository} from '../event/EventRepository';
 import {MediaType} from '../media/MediaType';
 import {Call, SerializedConversationId} from './Call';
@@ -71,7 +70,7 @@ import type {ServerTimeHandler} from '../time/serverTimeHandler';
 import type {UserRepository} from '../user/UserRepository';
 import type {EventRecord} from '../storage';
 import type {EventSource} from '../event/EventSource';
-import {CONSENT_TYPE, MessageRepository} from '../conversation/MessageRepository';
+import {CONSENT_TYPE, MessageRepository, MessageSendingOptions} from '../conversation/MessageRepository';
 import type {MediaDevicesHandler} from '../media/MediaDevicesHandler';
 import {NoAudioInputError} from '../error/NoAudioInputError';
 import {APIClient} from '../service/APIClientSingleton';
@@ -298,12 +297,12 @@ export class CallingRepository {
     activeCall?.muteState(isMuted ? this.nextMuteState : MuteState.NOT_MUTED);
   };
 
-  private async pushClients(call: Call, checkMismatch?: boolean): Promise<boolean> {
+  private async pushClients(call: Call, checkMismatch?: boolean) {
     const {id, domain} = call.conversationId;
-    const missing = await this.core.service!.conversation.getAllParticipantsClients(id, domain);
-    const qualifiedClients = isQualifiedUserClients(missing)
-      ? flattenQualifiedUserClients(missing)
-      : flattenUserClients(missing);
+    const allClients = await this.core.service!.conversation.getAllParticipantsClients(id, domain);
+    const qualifiedClients = isQualifiedUserClients(allClients)
+      ? flattenQualifiedUserClients(allClients)
+      : flattenUserClients(allClients);
 
     const clients: Clients = flatten(
       qualifiedClients.map(({data, userId}) =>
@@ -315,7 +314,11 @@ export class CallingRepository {
     const consentType =
       this.getCallDirection(call) === CALL_DIRECTION.INCOMING ? CONSENT_TYPE.INCOMING_CALL : CONSENT_TYPE.OUTGOING_CALL;
     return checkMismatch
-      ? this.messageRepository.handleClientMismatch(call.conversationId, {missing} as ClientMismatch, consentType)
+      ? this.messageRepository.updateMissingClients(
+          this.conversationState.findConversation(call.conversationId),
+          allClients,
+          consentType,
+        )
       : true;
   }
 
@@ -568,11 +571,11 @@ export class CallingRepository {
       case CALL_MESSAGE_TYPE.CONFKEY: {
         if (source !== EventRepository.SOURCE.STREAM) {
           const {id, domain} = conversationId;
-          const missing = await this.core.service!.conversation.getAllParticipantsClients(id, domain);
+          const allClients = await this.core.service!.conversation.getAllParticipantsClients(id, domain);
           // We warn the message repository that a mismatch has happened outside of its lifecycle (eventually triggering a conversation degradation)
-          const shouldContinue = await this.messageRepository.handleClientMismatch(
-            conversationId,
-            {missing} as ClientMismatch,
+          const shouldContinue = await this.messageRepository.updateMissingClients(
+            this.conversationState.findConversation(conversationId),
+            allClients,
             CONSENT_TYPE.INCOMING_CALL,
           );
 
@@ -1036,7 +1039,6 @@ export class CallingRepository {
       const recipients = isFederated ? this.mapQualifiedTargets(parsedTargets) : this.mapTargets(parsedTargets);
       options = {
         nativePush: true,
-        precondition: true,
         recipients,
       };
     }
@@ -1060,27 +1062,11 @@ export class CallingRepository {
   };
 
   readonly sendModeratorMute = (conversationId: QualifiedId, recipients: Record<UserId, ClientId[]>) => {
-    this.sendCallingMessage(
-      conversationId,
-      {type: CALL_MESSAGE_TYPE.REMOTE_MUTE},
-      {
-        nativePush: true,
-        precondition: true,
-        recipients,
-      },
-    );
+    this.sendCallingMessage(conversationId, {type: CALL_MESSAGE_TYPE.REMOTE_MUTE}, {nativePush: true, recipients});
   };
 
   readonly sendModeratorKick = (conversationId: QualifiedId, recipients: Record<UserId, ClientId[]>) => {
-    this.sendCallingMessage(
-      conversationId,
-      {type: CALL_MESSAGE_TYPE.REMOTE_KICK},
-      {
-        nativePush: true,
-        precondition: true,
-        recipients,
-      },
-    );
+    this.sendCallingMessage(conversationId, {type: CALL_MESSAGE_TYPE.REMOTE_KICK}, {nativePush: true, recipients});
   };
 
   private readonly sendSFTRequest = (

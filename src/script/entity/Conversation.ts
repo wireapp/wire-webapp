@@ -46,6 +46,8 @@ import type {Call} from '../calling/Call';
 import {RECEIPT_MODE} from '@wireapp/api-client/src/conversation/data';
 import {ConversationRecord} from '../storage/record/ConversationRecord';
 import {LegalHoldModalViewModel} from '../view_model/content/LegalHoldModalViewModel';
+import {CallMessage} from './message/CallMessage';
+import {PingMessage} from './message/PingMessage';
 import {container} from 'tsyringe';
 import {TeamState} from '../team/TeamState';
 import {matchQualifiedIds} from 'Util/QualifiedId';
@@ -53,9 +55,9 @@ import {matchQualifiedIds} from 'Util/QualifiedId';
 interface UnreadState {
   allEvents: Message[];
   allMessages: ContentMessage[];
-  calls: ContentMessage[];
+  calls: CallMessage[];
   otherMessages: ContentMessage[];
-  pings: ContentMessage[];
+  pings: PingMessage[];
   selfMentions: ContentMessage[];
   selfReplies: ContentMessage[];
 }
@@ -424,9 +426,9 @@ export class Conversation {
           } else if (isSelfQuoted) {
             unreadState.selfReplies.push(messageEntity as ContentMessage);
           } else if (isMissedCall) {
-            unreadState.calls.push(messageEntity as ContentMessage);
+            unreadState.calls.push(messageEntity);
           } else if (isPing) {
-            unreadState.pings.push(messageEntity as ContentMessage);
+            unreadState.pings.push(messageEntity);
           } else if (isMessage) {
             unreadState.otherMessages.push(messageEntity as ContentMessage);
           }
@@ -513,7 +515,7 @@ export class Conversation {
   }
 
   get qualifiedId(): QualifiedId {
-    return {domain: this.domain, id: this.id};
+    return {domain: this.isFederated() ? this.domain : '', id: this.id};
   }
 
   private hasInitializedUsers() {

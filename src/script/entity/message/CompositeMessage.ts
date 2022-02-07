@@ -22,10 +22,10 @@ import ko from 'knockout';
 import {ContentMessage} from './ContentMessage';
 
 export class CompositeMessage extends ContentMessage {
-  errorButtonId: ko.Observable<string>;
+  errorButtonId: ko.Observable<string | undefined>;
   errorMessage: ko.Observable<string>;
-  selectedButtonId: ko.Observable<string>;
-  waitingButtonId: ko.Observable<string>;
+  selectedButtonId: ko.Observable<string | undefined>;
+  waitingButtonId: ko.Observable<string | undefined>;
 
   constructor(id?: string) {
     super(id);

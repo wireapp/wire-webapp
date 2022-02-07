@@ -41,8 +41,6 @@ import {
   CONVERSATION_TYPE,
   NewConversation,
   Conversation as BackendConversation,
-  UserClients,
-  QualifiedUserClients,
 } from '@wireapp/api-client/src/conversation/';
 import {container} from 'tsyringe';
 import {ConversationReceiptModeUpdateData} from '@wireapp/api-client/src/conversation/data/';
@@ -52,7 +50,7 @@ import {Logger, getLogger} from 'Util/Logger';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 import {PromiseQueue} from 'Util/PromiseQueue';
 import {replaceLink, t} from 'Util/LocalizerUtil';
-import {getDifference, getNextItem} from 'Util/ArrayUtil';
+import {getNextItem} from 'Util/ArrayUtil';
 import {createRandomUuid, noop} from 'Util/util';
 import {allowsAllFiles, getFileExtensionOrName, isAllowedFile} from 'Util/FileTypeUtil';
 import {
@@ -123,12 +121,8 @@ import {UserFilter} from '../user/UserFilter';
 import {ConversationFilter} from './ConversationFilter';
 import {ConversationMemberUpdateEvent} from '@wireapp/api-client/src/event';
 import {matchQualifiedIds} from 'Util/QualifiedId';
-import {isQualifiedUserClients} from '@wireapp/core/src/main/util';
-import {
-  flattenQualifiedUserClients,
-  flattenUserClients,
-} from '@wireapp/core/src/main/conversation/message/UserClientsUtil';
 import {ConversationVerificationState} from './ConversationVerificationState';
+import {extractClientDiff} from './ClientMismatchUtil';
 
 type ConversationDBChange = {obj: EventRecord; oldObj: EventRecord};
 type FetchPromise = {rejectFn: (error: ConversationError) => void; resolveFn: (conversation: Conversation) => void};
@@ -179,83 +173,67 @@ export class ConversationRepository {
     this.eventService = eventRepository.eventService;
     // we register a client mismatch handler agains the message repository so that we can react to missing members
     // FIXME this should be temporary. In the near future we want the core to handle clients/mismatch/verification. So the webapp won't need this logic at all
-    this.messageRepository.setClientMismatchHandler(
-      async (
-        {deleted = {}, missing = {}, redundant = {}, time = new Date().toISOString()},
-        conversationId,
-        silent,
-        consentType,
-      ) => {
-        const allDeleted = {...deleted, ...redundant} as QualifiedUserClients | UserClients;
-        const deletedClients = isQualifiedUserClients(allDeleted)
-          ? flattenQualifiedUserClients(allDeleted)
-          : flattenUserClients(allDeleted);
-        const missingClients = isQualifiedUserClients(missing)
-          ? flattenQualifiedUserClients(missing)
-          : flattenUserClients(missing);
+    this.messageRepository.setClientMismatchHandler(async (mismatch, conversation, silent, consentType) => {
+      const {missingClients, deletedClients, emptyUsers, missingUserIds} = extractClientDiff(
+        mismatch,
+        conversation?.allUserEntities,
+      );
 
-        const conversation = conversationId ? await this.getConversationById(conversationId) : undefined;
-        if (conversation) {
-          // add/remove users from the conversation (if any)
-          const missingUserIds = missingClients.map(({userId}) => userId);
-          const knownUsers = conversation.allUserEntities.map(user => user.qualifiedId);
-          const missingUsers = getDifference(knownUsers, missingUserIds, matchQualifiedIds);
-          if (missingUsers.length) {
-            await this.addMissingMember(conversation, missingUsers, new Date(time).getTime() - 1);
-          }
-        }
+      if (conversation && missingUserIds.length) {
+        // add/remove users from the conversation (if any)
+        await this.addMissingMember(conversation, missingUserIds, new Date(mismatch.time).getTime() - 1);
+      }
 
-        const removedTeamUserIds = (
-          await Promise.all(
-            deletedClients.map(
-              ({userId, data}) => data.map(client => this.userRepository.removeClientFromUser(userId, client))[0],
-            ),
-          )
-        )
-          .filter(user => user?.devices().length === 0)
-          .filter(user => !!user)
-          .filter(user => user.inTeam())
-          .map(user => user.id);
+      // Remove clients that are not needed anymore
+      await Promise.all(
+        deletedClients.map(({userId, clients}) =>
+          Promise.all(clients.map(client => this.userRepository.removeClientFromUser(userId, client))),
+        ),
+      );
+      const removedTeamUserIds = emptyUsers.filter(user => user.inTeam()).map(user => user.qualifiedId);
 
-        if (removedTeamUserIds.length) {
-          // If we have found some users that were removed from the conversation, we need to check if those users were also completely removed from the team
-          const usersWithoutClients = await this.userRepository.getUserListFromBackend(removedTeamUserIds);
+      if (removedTeamUserIds.length) {
+        // If we have found some users that were removed from the conversation, we need to check if those users were also completely removed from the team
+        const usersWithoutClients = await this.userRepository.getUserListFromBackend(
+          conversation.isFederated() ? removedTeamUserIds : removedTeamUserIds.map(({id}) => id),
+        );
+        await Promise.all(
           usersWithoutClients
             .filter(user => user.deleted)
-            .forEach(user =>
+            .map(user =>
               this.teamMemberLeave(
                 this.teamState.team().id,
                 {
                   domain: this.teamState.teamDomain(),
                   id: user.id,
                 },
-                new Date(time).getTime() - 1,
+                new Date(mismatch.time).getTime() - 1,
               ),
-            );
-        }
+            ),
+        );
+      }
 
-        let shouldWarnLegalHold = false;
-        if (missingClients.length) {
-          const wasVerified = conversation?.is_verified();
-          const legalHoldStatus = conversation?.legalHoldStatus();
-          const newDevices = await this.userRepository.updateMissingUsersClients(
-            missingClients.map(({userId}) => userId),
-          );
-          if (wasVerified && newDevices.length) {
-            // if the conversation is verified but some clients were missing, it means the conversation will degrade.
-            // We need to warn the user of the degradation and ask his permission to actually send the message
-            conversation.verification_state(ConversationVerificationState.DEGRADED);
-          }
-          if (conversation) {
-            const hasChangedLegalHoldStatus = conversation.legalHoldStatus() !== legalHoldStatus;
-            shouldWarnLegalHold = hasChangedLegalHoldStatus && newDevices.some(device => device.isLegalHold());
-          }
+      let shouldWarnLegalHold = false;
+      if (missingClients.length) {
+        const wasVerified = conversation?.is_verified();
+        const legalHoldStatus = conversation?.legalHoldStatus();
+        const newDevices = await this.userRepository.updateMissingUsersClients(
+          missingClients.map(({userId}) => userId),
+        );
+        if (wasVerified && newDevices.length) {
+          // if the conversation is verified but some clients were missing, it means the conversation will degrade.
+          // We need to warn the user of the degradation and ask his permission to actually send the message
+          conversation.verification_state(ConversationVerificationState.DEGRADED);
         }
-        return silent
-          ? false
-          : this.messageRepository.requestUserSendingPermission(conversation, shouldWarnLegalHold, consentType);
-      },
-    );
+        if (conversation) {
+          const hasChangedLegalHoldStatus = conversation.legalHoldStatus() !== legalHoldStatus;
+          shouldWarnLegalHold = hasChangedLegalHoldStatus && newDevices.some(device => device.isLegalHold());
+        }
+      }
+      return !conversation || silent
+        ? false
+        : this.messageRepository.requestUserSendingPermission(conversation, shouldWarnLegalHold, consentType);
+    });
 
     this.logger = getLogger('ConversationRepository');
 
@@ -376,6 +354,8 @@ export class ConversationRepository {
         this.deleteConversationFromRepository(conversationEntity);
       }
     });
+
+    this.cleanupEphemeralMessages();
   }
 
   //##############################################################################
@@ -1582,18 +1562,19 @@ export class ConversationRepository {
     isoDate = this.serverTimeHandler.toServerTimestamp(),
   ) => {
     const userEntity = await this.userRepository.getUserById(userId);
-    this.conversationState
+    const eventInjections = this.conversationState
       .conversations()
       .filter(conversationEntity => {
         const conversationInTeam = conversationEntity.team_id === teamId;
         const userIsParticipant = UserFilter.isParticipant(conversationEntity, userId);
         return conversationInTeam && userIsParticipant && !conversationEntity.removed_from_conversation();
       })
-      .forEach(conversationEntity => {
+      .map(conversationEntity => {
         const leaveEvent = EventBuilder.buildTeamMemberLeave(conversationEntity, userEntity, isoDate);
-        this.eventRepository.injectEvent(leaveEvent);
+        return this.eventRepository.injectEvent(leaveEvent);
       });
     userEntity.isDeleted = true;
+    return Promise.all(eventInjections);
   };
 
   /**
@@ -2811,7 +2792,21 @@ export class ConversationRepository {
   }
 
   /**
-   * Convert multiple JSON events into entities and add them to a given conversation.
+   * Convert multiple JSON events into entities and validate them
+   *
+   * @param events Event data
+   * @param conversationEntity Conversation entity the events will be added to
+   * @returns Resolves with an array of mapped messages
+   */
+  private async validateMessages(events: EventRecord[], conversationEntity: Conversation) {
+    const mappedEvents = await this.event_mapper.mapJsonEvents(events, conversationEntity);
+    const updatedEvents = (await this.updateMessagesUserEntities(mappedEvents)) as ContentMessage[];
+    const validatedMessages = (await this.ephemeralHandler.validateMessages(updatedEvents)) as ContentMessage[];
+    return validatedMessages;
+  }
+
+  /**
+   * Convert multiple JSON events into entities, validate and add them to a given conversation.
    *
    * @param events Event data
    * @param conversationEntity Conversation entity the events will be added to
@@ -2819,9 +2814,7 @@ export class ConversationRepository {
    * @returns Resolves with an array of mapped messages
    */
   private async addEventsToConversation(events: EventRecord[], conversationEntity: Conversation, prepend = true) {
-    const mappedEvents = await this.event_mapper.mapJsonEvents(events, conversationEntity);
-    const updatedEvents = (await this.updateMessagesUserEntities(mappedEvents)) as ContentMessage[];
-    const validatedMessages = (await this.ephemeralHandler.validateMessages(updatedEvents)) as ContentMessage[];
+    const validatedMessages = await this.validateMessages(events, conversationEntity);
     if (prepend && conversationEntity.messages().length) {
       conversationEntity.prependMessages(validatedMessages);
     } else {
@@ -2950,5 +2943,12 @@ export class ConversationRepository {
     }
 
     return false;
+  }
+
+  public async cleanupEphemeralMessages(): Promise<void> {
+    this.conversationState.conversations().forEach(async conversationEntity => {
+      const messages = (await this.eventService.loadEphemeralEvents(conversationEntity.id)) as EventRecord[];
+      this.validateMessages(messages, conversationEntity);
+    });
   }
 }

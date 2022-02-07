@@ -476,12 +476,13 @@ export class ConversationService {
    * @param query will be checked in against all text messages
    * @returns Resolves with the matching events
    */
-  searchInConversation(conversation_id: string, query: string): Promise<any> {
+  async searchInConversation(conversation_id: string, query: string): Promise<any> {
     const category_min = MessageCategory.TEXT;
     const category_max = MessageCategory.TEXT | MessageCategory.LINK | MessageCategory.LINK_PREVIEW;
 
-    return this.eventService.loadEventsWithCategory(conversation_id, category_min, category_max).then(events => {
-      return events.filter(({data: event_data}: any) => fullTextSearch(event_data.content, query));
-    });
+    const events = await this.eventService.loadEventsWithCategory(conversation_id, category_min, category_max);
+    return events
+      .filter(record => record.ephemeral_expires !== true)
+      .filter(({data: event_data}: any) => fullTextSearch(event_data.content, query));
   }
 }

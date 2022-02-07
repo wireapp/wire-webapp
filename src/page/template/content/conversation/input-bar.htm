@@ -1,6 +1,8 @@
 <!--@formatter:off-->
 <div id="conversation-input-bar" class="conversation-input-bar" data-bind="with: $root.inputBar">
-
+  <!-- ko if: classifiedDomains -->
+    <classified-bar params="users: conversationEntity().participating_user_ets, classifiedDomains: classifiedDomains"></classified-bar>
+  <!-- /ko -->
   <!-- ko if: isReplying() && !isEditing() -->
     <div class="input-bar__reply" data-uie-name="input-bar-reply-box">
       <close-icon data-bind="click: handleCancelReply" data-uie-name="do-close-reply-box"></close-icon>
