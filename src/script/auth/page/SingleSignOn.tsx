@@ -32,6 +32,7 @@ import {
   Overlay,
   Text,
 } from '@wireapp/react-ui-kit';
+import {WebAppEvents} from '@wireapp/webapp-events';
 import React, {useRef, useState} from 'react';
 import {useIntl} from 'react-intl';
 import {connect} from 'react-redux';
@@ -145,11 +146,11 @@ const SingleSignOn = ({hasDefaultSSOCode}: Props & ConnectedProps & DispatchProp
       setIsOverlayOpen(true);
 
       const closeSSOWindow = () => {
-        amplify.publish('BARDIA_CLOSE_SSO');
+        amplify.publish(WebAppEvents.LIFECYCLE.SSO_WINDOW_CLOSE);
         ssoWindowRef.current?.close();
       };
 
-      amplify.subscribe('BARDIA_SSO_WINDOW_CLOSED', () => {
+      amplify.subscribe(WebAppEvents.LIFECYCLE.SSO_WINDOW_CLOSED, () => {
         onChildWindowClose();
         reject(new BackendError({code: 500, label: BackendError.LABEL.SSO_USER_CANCELLED_ERROR}));
       });
@@ -190,7 +191,7 @@ const SingleSignOn = ({hasDefaultSSOCode}: Props & ConnectedProps & DispatchProp
   };
 
   const focusChildWindow = () => {
-    amplify.publish('BARDIA_FOCUS_SSO');
+    amplify.publish(WebAppEvents.LIFECYCLE.SSO_WINDOW_FOCUS);
     ssoWindowRef.current?.focus();
   };
 
