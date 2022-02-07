@@ -25,6 +25,7 @@ import {Conversation} from '../../../entity/Conversation';
 import {createRandomUuid} from '../../../util/util';
 import {Text} from '../../../entity/message/Text';
 import {User} from '../../../entity/User';
+import {LinkPreview} from 'src/script/entity/message/LinkPreview';
 
 describe('message', () => {
   let defaultParams: TextMessageProps;
@@ -57,5 +58,13 @@ describe('message', () => {
   it('displays a message', () => {
     const {getByText} = render(<TextMessage {...defaultParams} />);
     expect(getByText(textValue)).toBeDefined();
+  });
+
+  it('displays a link preview', () => {
+    const linkPreview = new LinkPreview({title: 'A link to the past'});
+    (defaultParams.message.getFirstAsset() as Text).previews([linkPreview]);
+
+    const {getByText} = render(<TextMessage {...defaultParams} />);
+    expect(getByText(linkPreview.title)).not.toBe(null);
   });
 });
