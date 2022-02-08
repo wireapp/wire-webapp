@@ -13,6 +13,7 @@ interface MessagesListParams {
   conversationRepository: ConversationRepository;
   messageRepository: MessageRepository;
   selfUser: User;
+  showUserDetails: (user: User) => void;
 }
 
 const MessagesList: React.FC<MessagesListParams> = ({
@@ -20,6 +21,7 @@ const MessagesList: React.FC<MessagesListParams> = ({
   selfUser,
   conversationRepository,
   messageRepository,
+  showUserDetails,
 }) => {
   const {messages} = useKoSubscribableChildren(conversation, ['messages']);
   const [focusedMessage, setFocusedMessage] = useState<string>();
@@ -80,9 +82,7 @@ const MessagesList: React.FC<MessagesListParams> = ({
         isSelfTemporaryGuest={selfUser.isTemporaryGuest()}
         messageRepository={messageRepository}
         lastReadTimestamp={conversationLastReadTimestamp}
-        onClickAvatar={function (user: User): void {
-          throw new Error('Function not implemented.');
-        }}
+        onClickAvatar={showUserDetails}
         onClickCancelRequest={function (message: ContentMessage): void {
           throw new Error('Function not implemented.');
         }}
@@ -148,6 +148,7 @@ registerReactComponent('messages-list', {
     conversationRepository: conversationRepository,
     messageRepository: messageRepository,
     selfUser: ko.unwrap(selfUser),
+    showUserDetails: showUserDetails
     `,
   component: MessagesList,
 });
