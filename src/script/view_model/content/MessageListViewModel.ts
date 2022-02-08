@@ -397,8 +397,8 @@ export class MessageListViewModel {
     this.messageRepository.toggleLike(this.conversation(), messageEntity);
   };
 
-  readonly clickOnInvitePeople = (): void => {
-    this.mainViewModel.panel.togglePanel(PanelViewModel.STATE.GUEST_OPTIONS, {entity: this.conversation()});
+  readonly clickOnInvitePeople = (conversation: Conversation): void => {
+    this.mainViewModel.panel.togglePanel(PanelViewModel.STATE.GUEST_OPTIONS, {entity: conversation});
   };
 
   readonly getInViewportCallback = (

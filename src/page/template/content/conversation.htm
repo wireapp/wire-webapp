@@ -15,8 +15,13 @@
     messageRepository: $root.messageRepository,
     selfUser: $root.userState.self,
     showUserDetails: $root.messageList.showUserDetails,
-    cancelConnectionRequest: $root.messageList.clickOnCancelRequest,
+    showImageDetails: $root.messageList.showDetails,
     showMessageDetails: $root.messageList.showMessageDetails,
+    showParticipants: $root.messageList.showParticipants,
+    cancelConnectionRequest: $root.messageList.clickOnCancelRequest,
+    resetSession: $root.messageList.onSessionResetClick,
+    invitePeople: $root.messageList.clickOnInvitePeople,
+    onClickMessage: $root.messageList.handleClickOnMessage,
   "
   ></messages-list>
   #include('content/conversation/input-bar.htm')

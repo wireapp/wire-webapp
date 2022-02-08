@@ -3,6 +3,7 @@ import {ConversationRepository} from 'src/script/conversation/ConversationReposi
 import {MessageRepository} from 'src/script/conversation/MessageRepository';
 import {Conversation} from 'src/script/entity/Conversation';
 import {ContentMessage} from 'src/script/entity/message/ContentMessage';
+import {DecryptErrorMessage} from 'src/script/entity/message/DecryptErrorMessage';
 import {MemberMessage} from 'src/script/entity/message/MemberMessage';
 import {Message} from 'src/script/entity/message/Message';
 import {User} from 'src/script/entity/User';
@@ -14,9 +15,14 @@ interface MessagesListParams {
   cancelConnectionRequest: (message: MemberMessage) => void;
   conversation: Conversation;
   conversationRepository: ConversationRepository;
+  invitePeople: (convesation: Conversation) => void;
   messageRepository: MessageRepository;
+  onClickMessage: (message: ContentMessage, event: Event) => void;
+  resetSession: (messageError: DecryptErrorMessage) => void;
   selfUser: User;
+  showImageDetails: (message: Message, event: MouseEvent) => void;
   showMessageDetails: (message: Message, showLikes?: boolean) => void;
+  showParticipants: (users: User[]) => void;
   showUserDetails: (user: User) => void;
 }
 
@@ -25,9 +31,14 @@ const MessagesList: React.FC<MessagesListParams> = ({
   selfUser,
   conversationRepository,
   messageRepository,
+  onClickMessage,
   showUserDetails,
   showMessageDetails,
+  showImageDetails,
+  showParticipants,
   cancelConnectionRequest,
+  resetSession,
+  invitePeople,
 }) => {
   const {messages} = useKoSubscribableChildren(conversation, ['messages']);
   const [focusedMessage, setFocusedMessage] = useState<string>();
@@ -52,9 +63,7 @@ const MessagesList: React.FC<MessagesListParams> = ({
   };
 
   const messagesEndRef = useRef(null);
-
-  useEffect(() => {
-    const endElement = messagesEndRef.current;
+  const updateScroll = (endElement: HTMLElement | undefined) => {
     if (!endElement) {
       return;
     }
@@ -63,8 +72,12 @@ const MessagesList: React.FC<MessagesListParams> = ({
     const scrollEndValue = Math.ceil(scrollEnd(scrollingContainer));
     const shouldStickToBottom = scrollPosition > scrollEndValue - 100;
     if (shouldStickToBottom) {
-      messagesEndRef.current?.scrollIntoView();
+      endElement.scrollIntoView();
     }
+  };
+
+  useEffect(() => {
+    updateScroll(messagesEndRef.current);
   }, [messages, messagesEndRef]);
 
   useEffect(() => {
@@ -90,23 +103,13 @@ const MessagesList: React.FC<MessagesListParams> = ({
         lastReadTimestamp={conversationLastReadTimestamp}
         onClickAvatar={showUserDetails}
         onClickCancelRequest={cancelConnectionRequest}
-        onClickImage={function (message: ContentMessage, event: UIEvent): void {
-          throw new Error('Function not implemented.');
-        }}
-        onClickInvitePeople={function (): void {
-          throw new Error('Function not implemented.');
-        }}
+        onClickImage={showImageDetails}
+        onClickInvitePeople={() => invitePeople(conversation)}
         onClickLikes={message => showMessageDetails(message, true)}
-        onClickMessage={function (message: ContentMessage, event: Event): void {
-          throw new Error('Function not implemented.');
-        }}
-        onClickParticipants={function (participants: User[]): void {
-          throw new Error('Function not implemented.');
-        }}
+        onClickMessage={onClickMessage}
+        onClickParticipants={showParticipants}
         onClickReceipts={message => showMessageDetails(message)}
-        onClickResetSession={function (messageError: DecryptErrorMessage): void {
-          throw new Error('Function not implemented.');
-        }}
+        onClickResetSession={resetSession}
         onClickTimestamp={async function (messageId: string) {
           setFocusedMessage(messageId);
           setTimeout(() => setFocusedMessage(undefined), 5000);
@@ -118,13 +121,8 @@ const MessagesList: React.FC<MessagesListParams> = ({
             conversationRepository.getMessagesWithOffset(conversation, messageEntity);
           }
         }}
-        onContentUpdated={function (): void {
-          throw new Error('Function not implemented.');
-        }}
+        onContentUpdated={() => updateScroll(messagesEndRef.current)}
         onLike={message => messageRepository.toggleLike(conversation, message)}
-        onMessageMarked={function (element: HTMLElement): void {
-          throw new Error('Function not implemented.');
-        }}
         selfId={selfUser.qualifiedId}
         shouldShowInvitePeople={shouldShowInvitePeople}
       />
@@ -143,12 +141,17 @@ export default MessagesList;
 registerReactComponent('messages-list', {
   bindings: `
     conversation: ko.unwrap(conversation),
-    conversationRepository: conversationRepository,
-    messageRepository: messageRepository,
+    conversationRepository,
+    messageRepository,
     selfUser: ko.unwrap(selfUser),
-    showUserDetails: showUserDetails,
-    cancelConnectionRequest: cancelConnectionRequest,
+    onClickMessage,
+    showUserDetails,
+    showImageDetails,
     showMessageDetails,
+    showParticipants,
+    resetSession,
+    invitePeople,
+    cancelConnectionRequest,
     `,
   component: MessagesList,
 });

@@ -374,9 +374,11 @@ export class Conversation {
 
     this.messages_unordered = ko.observableArray();
     this.messages = ko.pureComputed(() =>
-      this.messages_unordered().sort((message_a, message_b) => {
-        return message_a.timestamp() - message_b.timestamp();
-      }),
+      this.messages_unordered()
+        .slice()
+        .sort((message_a, message_b) => {
+          return message_a.timestamp() - message_b.timestamp();
+        }),
     );
 
     this.incomingMessages = ko.observableArray();

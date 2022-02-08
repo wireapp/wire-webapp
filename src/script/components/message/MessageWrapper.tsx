@@ -95,7 +95,6 @@ interface MessageParams extends MessageActions {
   message: BaseMessage;
   messageRepository: MessageRepository;
   onContentUpdated: () => void;
-  onMessageMarked: (element: HTMLElement) => void;
   selfId: QualifiedId;
   shouldShowInvitePeople: boolean;
   teamState?: TeamState;
@@ -178,21 +177,21 @@ const MessageWrapper: React.FC<MessageParams & {shouldShowAvatar: boolean}> = ({
     }
   };
 
-  if (message.hasAssetText()) {
-    // TODO
-    // add a listener to any changes to the assets. This will warn the parent that the message has changed
-    //this.assetSubscription = message.assets.subscribe(onContentUpdated);
-    // also listen for link previews on a single Text entity
-    //this.previewSubscription = (message.getFirstAsset() as Text).previews.subscribe(onContentUpdated);
-    /*
-    function dispose() {
-      if (this.assetSubscription) {
-        this.assetSubscription.dispose();
-        this.previewSubscription.dispose();
-      }
+  useEffect(() => {
+    if (message.isContent() && message.hasAssetText()) {
+      // add a listener to any changes to the assets. This will warn the parent that the message has changed
+      const assetSubscription = message.assets.subscribe(onContentUpdated);
+      // also listen for link previews on a single Text entity
+      const previewSubscription = (message.getFirstAsset() as Text).previews.subscribe(onContentUpdated);
+      return () => {
+        if (assetSubscription) {
+          assetSubscription.dispose();
+          previewSubscription.dispose();
+        }
+      };
     }
-    */
-  }
+    return undefined;
+  }, []);
 
   const contextMenuEntries = ko.pureComputed(() => {
     const messageEntity = message;
