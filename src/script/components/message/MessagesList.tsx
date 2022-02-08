@@ -25,6 +25,8 @@ const MessagesList: React.FC<MessagesListParams> = ({
   const [focusedMessage, setFocusedMessage] = useState<string>();
 
   const conversationLastReadTimestamp = useMemo(() => conversation.last_read_timestamp(), []);
+  const shouldShowInvitePeople =
+    conversation.isActiveParticipant() && conversation.inTeam() && conversation.isGuestRoom();
 
   const loadConversation = async (conversation: Conversation, message?: Message): Promise<Message[]> => {
     await conversationRepository.updateParticipatingUserEntities(conversation, false, true);
@@ -126,7 +128,7 @@ const MessagesList: React.FC<MessagesListParams> = ({
           throw new Error('Function not implemented.');
         }}
         selfId={selfUser.qualifiedId}
-        shouldShowInvitePeople={false}
+        shouldShowInvitePeople={shouldShowInvitePeople}
       />
     );
   });
