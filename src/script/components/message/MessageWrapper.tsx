@@ -23,15 +23,12 @@ import ko from 'knockout';
 import {container} from 'tsyringe';
 
 import {t} from 'Util/LocalizerUtil';
-import {includesOnlyEmojis} from 'Util/EmojiUtil';
 import {QualifiedId} from '@wireapp/api-client/src/user';
 
-import {EphemeralStatusType} from '../../message/EphemeralStatusType';
 import {Message as BaseMessage} from '../../entity/message/Message';
 import {ContextMenuEntry} from '../../ui/ContextMenu';
 import type {ContentMessage} from '../../entity/message/ContentMessage';
 import type {CompositeMessage} from '../../entity/message/CompositeMessage';
-import {StatusType} from '../../message/StatusType';
 import type {Text} from '../../entity/message/Text';
 import type {ActionsViewModel} from '../../view_model/ActionsViewModel';
 import type {Conversation} from '../../entity/Conversation';
@@ -56,7 +53,6 @@ import {
   formatLocale,
   formatDayMonth,
   isThisYear,
-  FnDate,
 } from 'Util/TimeUtil';
 
 import VerificationMessage from './VerificationMessage';
@@ -69,13 +65,11 @@ import DecryptionErrorMessage from './DecryptErrorMessage';
 import LegalHoldMessage from './LegalHoldMessage';
 import SystemMessage from './SystemMessage';
 import MemberMessage from './MemberMessage';
-import ReadReceiptStatus from './ReadReceiptStatus';
 import PingMessage from './PingMessage';
 import TextMessage from './ContentMessage';
 import React, {useEffect, useState} from 'react';
 
 export interface MessageActions {
-  onLike: (message: ContentMessage, button?: boolean) => void;
   onClickAvatar: (user: User) => void;
   onClickCancelRequest: (message: ContentMessage) => void;
   onClickImage: (message: ContentMessage, event: UIEvent) => void;
@@ -86,19 +80,20 @@ export interface MessageActions {
   onClickReceipts: (message: BaseMessage) => void;
   onClickResetSession: (messageError: DecryptErrorMessage) => void;
   onClickTimestamp: (messageId: string) => void;
+  onLike: (message: ContentMessage, button?: boolean) => void;
 }
 
 interface MessageParams extends MessageActions {
   actionsViewModel: ActionsViewModel;
   conversation: Conversation;
+  hasReadReceiptsTurnedOn: boolean;
   isLastDeliveredMessage: boolean;
   isMarked: boolean;
   isSelfTemporaryGuest: boolean;
-  message: BaseMessage;
-  messageRepository: MessageRepository;
   /** The last read timestamp at the moment the conversation was rendered */
   lastReadTimestamp: number;
-  hasReadReceiptsTurnedOn: boolean;
+  message: BaseMessage;
+  messageRepository: MessageRepository;
   onContentUpdated: () => void;
   onMessageMarked: (element: HTMLElement) => void;
   selfId: QualifiedId;
@@ -182,17 +177,6 @@ const MessageWrapper: React.FC<MessageParams & {shouldShowAvatar: boolean}> = ({
       messageRepository.sendButtonAction(conversation, message, buttonId);
     }
   };
-
-  /* TODO highlight message
-  ko.computed(
-    () => {
-      if (isMarked()) {
-        setTimeout(() => onMessageMarked(componentInfo.element));
-      }
-    },
-    {disposeWhenNodeIsRemoved: componentInfo.element},
-  );
-  */
 
   if (message.hasAssetText()) {
     // TODO
@@ -328,7 +312,7 @@ const MessageWrapper: React.FC<MessageParams & {shouldShowAvatar: boolean}> = ({
     return <CallTimeoutMessage message={message} />;
   }
   if (message.isSystem()) {
-    return <SystemMessage message={message} />;
+    return <SystemMessage message={message as any} />;
   }
   if (message.isMember()) {
     return (
@@ -363,9 +347,9 @@ const MessageWrapper: React.FC<MessageParams & {shouldShowAvatar: boolean}> = ({
 };
 
 const Wrapper: React.FC<
-  MessageParams & {previousMessage?: BaseMessage; conversationLastReadTimestamp: number}
+  MessageParams & {conversationLastReadTimestamp: number; previousMessage?: BaseMessage}
 > = props => {
-  const {message, previousMessage, conversationLastReadTimestamp} = props;
+  const {message, previousMessage, conversationLastReadTimestamp, isMarked} = props;
   const timeago = useRelativeTimestamp(message.timestamp());
   const timeagoDay = useRelativeTimestamp(message.timestamp(), true);
 
@@ -396,7 +380,7 @@ const Wrapper: React.FC<
   };
   return (
     <div
-      className="message"
+      className={`message ${isMarked ? 'message-marked' : ''}`}
       key={message.id}
       data-bind="in_viewport: {onVisible: getInViewportCallback(conversation(), message), container: getMessagesContainer()}"
       data-uie-uid={message.id}
