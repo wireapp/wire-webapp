@@ -120,6 +120,8 @@ export class Conversation {
   public readonly isGroup: ko.PureComputed<boolean>;
   public readonly isGuest: ko.Observable<boolean>;
   public readonly isGuestRoom: ko.PureComputed<boolean>;
+  public readonly isGuestAndServicesRoom: ko.PureComputed<boolean>;
+  public readonly isServicesRoom: ko.PureComputed<boolean>;
   public readonly isLeavable: ko.PureComputed<boolean>;
   public readonly isMutable: ko.PureComputed<boolean>;
   public readonly isRequest: ko.PureComputed<boolean>;
@@ -170,7 +172,7 @@ export class Conversation {
 
     this.logger = getLogger(`Conversation (${this.id})`);
 
-    this.accessState = ko.observable(ACCESS_STATE.OTHER.UNKNOWN);
+    this.accessState = ko.observable();
     this.accessCode = ko.observable();
     this.creator = undefined;
     this.name = ko.observable();
@@ -199,6 +201,8 @@ export class Conversation {
       return this.team_id && isSameTeam && !this.isGuest() && isSameDomain;
     });
     this.isGuestRoom = ko.pureComputed(() => this.accessState() === ACCESS_STATE.TEAM.GUEST_ROOM);
+    this.isGuestAndServicesRoom = ko.pureComputed(() => this.accessState() === ACCESS_STATE.TEAM.GUESTS_SERVICES);
+    this.isServicesRoom = ko.pureComputed(() => this.accessState() === ACCESS_STATE.TEAM.SERVICES);
     this.isTeamOnly = ko.pureComputed(() => this.accessState() === ACCESS_STATE.TEAM.TEAM_ONLY);
     this.withAllTeamMembers = ko.observable(false);
 

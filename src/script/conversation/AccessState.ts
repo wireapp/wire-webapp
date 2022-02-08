@@ -24,8 +24,10 @@ export enum PERSONAL {
 
 export enum TEAM {
   GUEST_ROOM = 'z.conversation.ACCESS_STATE.TEAM.GUEST_ROOM',
+  GUESTS_SERVICES = 'z.conversation.ACCESS_STATE.TEAM.GUESTS_SERVICES',
   LEGACY = 'z.conversation.ACCESS_STATE.TEAM.LEGACY',
   ONE2ONE = 'z.conversation.ACCESS_STATE.TEAM.ONE2ONE',
+  SERVICES = 'z.conversation.ACCESS_STATE.TEAM.SERVICES',
   TEAM_ONLY = 'z.conversation.ACCESS_STATE.TEAM.TEAM_ONLY',
 }
 

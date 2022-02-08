@@ -133,7 +133,9 @@ export class MessageListViewModel {
 
     this.showInvitePeople = ko.pureComputed(() => {
       return (
-        this.conversation().isActiveParticipant() && this.conversation().inTeam() && this.conversation().isGuestRoom()
+        this.conversation().isActiveParticipant() &&
+        this.conversation().inTeam() &&
+        (this.conversation().isGuestRoom() || this.conversation().isGuestAndServicesRoom())
       );
     });
   }
@@ -518,7 +520,10 @@ export class MessageListViewModel {
     if (messageEntity.expectsReadConfirmation) {
       if (conversationEntity.is1to1()) {
         shouldSendReadReceipt = this.conversationRepository.expectReadReceipt(conversationEntity);
-      } else if (conversationEntity.isGroup() && (conversationEntity.inTeam() || conversationEntity.isGuestRoom())) {
+      } else if (
+        conversationEntity.isGroup() &&
+        (conversationEntity.inTeam() || conversationEntity.isGuestRoom() || conversationEntity.isGuestAndServicesRoom())
+      ) {
         shouldSendReadReceipt = true;
       }
     }

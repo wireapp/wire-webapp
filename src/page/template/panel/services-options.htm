@@ -1,0 +1,28 @@
+<div
+  id="services-options"
+  class="panel__page guest-options"
+  data-bind="with: $root.subViews[$root.STATE.SERVICES_OPTIONS]"
+>
+  <!-- ko if: isVisible() -->
+  <div class="panel__header">
+    <arrow-left-icon
+      class="icon-button"
+      data-bind="clickOrDrag: onGoBack"
+      data-uie-name="go-back-services-options"
+    ></arrow-left-icon>
+    <div class="panel__header__title" data-bind="text: t('servicesOptionsTitle')"></div>
+    <close-icon
+      class="right-panel-close icon-button"
+      data-bind="clickOrDrag: onClose"
+      data-uie-name="do-close"
+    ></close-icon>
+  </div>
+  <div class="panel__content" data-bind="fadingscrollbar">
+    <div class="guest-options__content">
+      <base-toggle
+        params="isChecked: isServicesEnabled(), onToggle: toggleServiceAccessState, isDisabled: requestOngoing, infoText: t('servicesRoomToggleInfo'), toggleName: t('servicesOptionsTitle')"
+      ></base-toggle>
+    </div>
+  </div>
+  <!-- /ko -->
+</div>

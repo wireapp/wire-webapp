@@ -16,6 +16,7 @@ describe('ConversationFilter', () => {
       const conversationData: ConversationDatabaseData = {
         accessModes: undefined,
         accessRole: undefined,
+        accessRoleV2: undefined,
         archived_state: false,
         archived_timestamp: 0,
         cleared_timestamp: 0,
@@ -60,6 +61,7 @@ describe('ConversationFilter', () => {
       const conversationData: ConversationDatabaseData = {
         accessModes: [CONVERSATION_ACCESS.PRIVATE],
         accessRole: CONVERSATION_ACCESS_ROLE.PRIVATE,
+        accessRoleV2: undefined,
         archived_state: false,
         archived_timestamp: 0,
         cleared_timestamp: 0,

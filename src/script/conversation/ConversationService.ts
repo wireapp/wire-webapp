@@ -19,7 +19,7 @@
 
 import type {
   CONVERSATION_ACCESS,
-  CONVERSATION_ACCESS_ROLE,
+  ACCESS_ROLE_V2,
   ClientMismatch,
   Conversation as BackendConversation,
   ConversationCode,
@@ -247,11 +247,11 @@ export class ConversationService {
   putConversationAccess(
     conversationId: string,
     accessModes: CONVERSATION_ACCESS[],
-    accessRole: CONVERSATION_ACCESS_ROLE,
+    accessRole: ACCESS_ROLE_V2[],
   ): Promise<ConversationEvent> {
     return this.apiClient.conversation.api.putAccess(conversationId, {
       access: accessModes,
-      access_role: accessRole,
+      access_role_v2: accessRole,
     });
   }
 
