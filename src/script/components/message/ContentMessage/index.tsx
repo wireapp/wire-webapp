@@ -62,12 +62,12 @@ export interface TextMessageProps extends MessageActions {
   conversation: Conversation;
   findMessage: (conversation: Conversation, messageId: string) => Promise<ContentMessage | undefined>;
   focusMessage?: () => void;
-  onClickButton?: (message: ContentMessage, assetId: string) => void;
   isLastDeliveredMessage: boolean;
   message: ContentMessage;
-  shouldShowAvatar: boolean;
+  onClickButton?: (message: ContentMessage, assetId: string) => void;
   quotedMessage?: ContentMessage;
   selfId: QualifiedId;
+  shouldShowAvatar: boolean;
 }
 
 const ContentAsset = ({
@@ -291,16 +291,15 @@ const TextMessage: React.FC<TextMessageProps> = ({
             onClickReceipts={onClickReceipts}
           />
         </div>
-
-        {message.other_likes().length > 0 && (
-          <MessageFooterLike
-            message={message}
-            is1to1Conversation={conversation.is1to1()}
-            onLike={onLike}
-            onClickLikes={onClickLikes}
-          />
-        )}
       </div>
+      {message.other_likes().length > 0 && (
+        <MessageFooterLike
+          message={message}
+          is1to1Conversation={conversation.is1to1()}
+          onLike={onLike}
+          onClickLikes={onClickLikes}
+        />
+      )}
     </>
   );
 };

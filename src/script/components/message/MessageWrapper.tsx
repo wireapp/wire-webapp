@@ -28,12 +28,12 @@ import {QualifiedId} from '@wireapp/api-client/src/user';
 import {Message as BaseMessage} from '../../entity/message/Message';
 import {ContextMenuEntry} from '../../ui/ContextMenu';
 import type {ContentMessage} from '../../entity/message/ContentMessage';
+import type {MemberMessage as MemberMessageEntity} from '../../entity/message/MemberMessage';
 import type {CompositeMessage} from '../../entity/message/CompositeMessage';
 import type {Text} from '../../entity/message/Text';
 import type {ActionsViewModel} from '../../view_model/ActionsViewModel';
 import type {Conversation} from '../../entity/Conversation';
 import type {User} from '../../entity/User';
-import type {MessageListViewModel} from '../../view_model/content/MessageListViewModel';
 import type {DecryptErrorMessage} from '../../entity/message/DecryptErrorMessage';
 import {AssetRepository} from '../../assets/AssetRepository';
 import type {MessageRepository} from '../../conversation/MessageRepository';
@@ -71,10 +71,10 @@ import React, {useEffect, useState} from 'react';
 
 export interface MessageActions {
   onClickAvatar: (user: User) => void;
-  onClickCancelRequest: (message: ContentMessage) => void;
+  onClickCancelRequest: (message: MemberMessageEntity) => void;
   onClickImage: (message: ContentMessage, event: UIEvent) => void;
   onClickInvitePeople: () => void;
-  onClickLikes: (view: MessageListViewModel) => void;
+  onClickLikes: (message: BaseMessage) => void;
   onClickMessage: (message: ContentMessage | Text, event: Event) => void;
   onClickParticipants: (participants: User[]) => void;
   onClickReceipts: (message: BaseMessage) => void;

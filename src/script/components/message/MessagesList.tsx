@@ -2,6 +2,8 @@ import React, {useEffect, useMemo, useRef, useState} from 'react';
 import {ConversationRepository} from 'src/script/conversation/ConversationRepository';
 import {MessageRepository} from 'src/script/conversation/MessageRepository';
 import {Conversation} from 'src/script/entity/Conversation';
+import {ContentMessage} from 'src/script/entity/message/ContentMessage';
+import {MemberMessage} from 'src/script/entity/message/MemberMessage';
 import {Message} from 'src/script/entity/message/Message';
 import {User} from 'src/script/entity/User';
 import {registerReactComponent, useKoSubscribableChildren} from 'Util/ComponentUtil';
@@ -9,10 +11,12 @@ import {scrollEnd} from 'Util/scroll-helpers';
 import MessageWrapper from './MessageWrapper';
 
 interface MessagesListParams {
+  cancelConnectionRequest: (message: MemberMessage) => void;
   conversation: Conversation;
   conversationRepository: ConversationRepository;
   messageRepository: MessageRepository;
   selfUser: User;
+  showMessageDetails: (message: Message, showLikes?: boolean) => void;
   showUserDetails: (user: User) => void;
 }
 
@@ -22,6 +26,8 @@ const MessagesList: React.FC<MessagesListParams> = ({
   conversationRepository,
   messageRepository,
   showUserDetails,
+  showMessageDetails,
+  cancelConnectionRequest,
 }) => {
   const {messages} = useKoSubscribableChildren(conversation, ['messages']);
   const [focusedMessage, setFocusedMessage] = useState<string>();
@@ -83,18 +89,14 @@ const MessagesList: React.FC<MessagesListParams> = ({
         messageRepository={messageRepository}
         lastReadTimestamp={conversationLastReadTimestamp}
         onClickAvatar={showUserDetails}
-        onClickCancelRequest={function (message: ContentMessage): void {
-          throw new Error('Function not implemented.');
-        }}
+        onClickCancelRequest={cancelConnectionRequest}
         onClickImage={function (message: ContentMessage, event: UIEvent): void {
           throw new Error('Function not implemented.');
         }}
         onClickInvitePeople={function (): void {
           throw new Error('Function not implemented.');
         }}
-        onClickLikes={function (view: MessageListViewModel): void {
-          throw new Error('Function not implemented.');
-        }}
+        onClickLikes={message => showMessageDetails(message, true)}
         onClickMessage={function (message: ContentMessage, event: Event): void {
           throw new Error('Function not implemented.');
         }}
@@ -107,7 +109,7 @@ const MessagesList: React.FC<MessagesListParams> = ({
         onClickResetSession={function (messageError: DecryptErrorMessage): void {
           throw new Error('Function not implemented.');
         }}
-        onClickTimestamp={async function (messageId: string): void {
+        onClickTimestamp={async function (messageId: string) {
           setFocusedMessage(messageId);
           setTimeout(() => setFocusedMessage(undefined), 5000);
           const messageIsLoaded = conversation.getMessage(messageId);
@@ -121,9 +123,7 @@ const MessagesList: React.FC<MessagesListParams> = ({
         onContentUpdated={function (): void {
           throw new Error('Function not implemented.');
         }}
-        onLike={function (message: ContentMessage, button?: boolean): void {
-          throw new Error('Function not implemented.');
-        }}
+        onLike={message => messageRepository.toggleLike(conversation, message)}
         onMessageMarked={function (element: HTMLElement): void {
           throw new Error('Function not implemented.');
         }}
@@ -148,7 +148,9 @@ registerReactComponent('messages-list', {
     conversationRepository: conversationRepository,
     messageRepository: messageRepository,
     selfUser: ko.unwrap(selfUser),
-    showUserDetails: showUserDetails
+    showUserDetails: showUserDetails,
+    cancelConnectionRequest: cancelConnectionRequest,
+    showMessageDetails,
     `,
   component: MessagesList,
 });

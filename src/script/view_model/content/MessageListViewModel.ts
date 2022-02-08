@@ -544,10 +544,10 @@ export class MessageListViewModel {
     });
   };
 
-  readonly showMessageDetails = (view: {message: {id: string}}, showLikes: boolean): void => {
+  readonly showMessageDetails = (message: Message, showLikes: boolean): void => {
     if (!this.conversation().is1to1()) {
       this.mainViewModel.panel.togglePanel(PanelViewModel.STATE.MESSAGE_DETAILS, {
-        entity: {id: view.message.id} as Message,
+        entity: message,
         showLikes,
       });
     }

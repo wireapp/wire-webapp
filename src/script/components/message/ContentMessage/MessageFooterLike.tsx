@@ -20,7 +20,7 @@
 import React from 'react';
 import cx from 'classnames';
 
-import {registerReactComponent, useKoSubscribableChildren} from 'Util/ComponentUtil';
+import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {ContentMessage} from 'src/script/entity/message/ContentMessage';
 import {Message} from 'src/script/entity/message/Message';
 import MessageLike from './MessageLike';
@@ -28,7 +28,7 @@ import MessageLike from './MessageLike';
 export interface MessageFooterLikeProps {
   is1to1Conversation: boolean;
   message: ContentMessage;
-  onClickLikes: (view: {message: Message}) => void;
+  onClickLikes: (message: Message) => void;
   onLike: (message: ContentMessage, button?: boolean) => void;
 }
 
@@ -48,7 +48,7 @@ const MessageFooterLike: React.FC<MessageFooterLikeProps> = ({message, is1to1Con
         className={cx('message-footer-label', {
           'cursor-pointer': !is1to1Conversation,
         })}
-        onClick={is1to1Conversation ? null : () => onClickLikes({message})}
+        onClick={is1to1Conversation ? null : () => onClickLikes(message)}
       >
         <span
           className="font-size-xs text-foreground"
@@ -63,8 +63,3 @@ const MessageFooterLike: React.FC<MessageFooterLikeProps> = ({message, is1to1Con
 };
 
 export default MessageFooterLike;
-
-registerReactComponent('message-footer-like', {
-  bindings: 'message: ko.unwrap(message), is1to1Conversation: ko.unwrap(is1to1Conversation), onLike, onClickLikes',
-  component: MessageFooterLike,
-});
