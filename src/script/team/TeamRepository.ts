@@ -127,14 +127,20 @@ export class TeamRepository {
     if (this.userState.self().teamId) {
       await this.updateTeamMembers(team);
     }
-    this.teamState.teamFeatures(await this.teamService.getAllTeamFeatures());
-    this.scheduleFetchTeamInfo();
+    this.updateFeatureConfig();
+    this.scheduleTeamRefresh();
   };
 
-  readonly scheduleFetchTeamInfo = (): void => {
+  async updateFeatureConfig() {
+    this.teamState.teamFeatures(await this.teamService.getAllTeamFeatures());
+    return this.teamState.teamFeatures();
+  }
+
+  readonly scheduleTeamRefresh = (): void => {
     window.setInterval(async () => {
       try {
         await this.getTeam();
+        await this.updateFeatureConfig();
       } catch (error) {
         this.logger.error(error);
       }
@@ -389,8 +395,7 @@ export class TeamRepository {
     const shouldFetchConfig = handlingNotifications === NOTIFICATION_HANDLING_STATE.WEB_SOCKET;
 
     if (shouldFetchConfig) {
-      const featureConfigList = await this.teamService.getAllTeamFeatures();
-      this.teamState.teamFeatures(featureConfigList);
+      const featureConfigList = await this.updateFeatureConfig();
       this.handleConfigUpdate(featureConfigList);
     }
   };
@@ -403,8 +408,7 @@ export class TeamRepository {
       // Ignore notification stream events
       return;
     }
-    const featureConfigList = await this.teamService.getAllTeamFeatures();
-    this.teamState.teamFeatures(featureConfigList);
+    const featureConfigList = await this.updateFeatureConfig();
     this.handleConfigUpdate(featureConfigList);
   };
 
