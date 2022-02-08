@@ -39,7 +39,7 @@ import 'Components/calling/FullscreenVideoCall';
 import 'Components/list/ConversationListCallingCell';
 import 'Components/list/ConversationListCell';
 import 'Components/avatar/GroupAvatar';
-import 'Components/message';
+import 'Components/message/MessagesList';
 import '../page/message-list/MessageTimerButton';
 import 'Components/modal';
 import 'Components/panel/ServiceDetails';

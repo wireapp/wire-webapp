@@ -25,7 +25,6 @@ import $ from 'jquery';
 import ko from 'knockout';
 
 import {getLogger, Logger} from 'Util/Logger';
-import {isSameDay, differenceInMinutes} from 'Util/TimeUtil';
 import {safeWindowOpen, safeMailOpen} from 'Util/SanitizationUtil';
 import {scrollEnd, scrollToBottom, scrollBy} from 'Util/scroll-helpers';
 import {t} from 'Util/LocalizerUtil';
@@ -91,16 +90,6 @@ export class MessageListViewModel {
     this.focusedMessage = ko.observable(null);
 
     this.conversation = ko.observable(new Conversation());
-    this.verticallyCenterMessage = ko.pureComputed(() => {
-      if (this.conversation().messages_visible().length === 1) {
-        const [messageEntity] = this.conversation().messages_visible();
-        if (messageEntity instanceof MemberMessage) {
-          return messageEntity.isMember() && messageEntity.isConnection();
-        }
-        return false;
-      }
-      return false;
-    });
 
     amplify.subscribe(WebAppEvents.INPUT.RESIZE, this.handleInputResize);
 
@@ -159,6 +148,7 @@ export class MessageListViewModel {
   };
 
   private readonly shouldStickToBottom = (): boolean => {
+    return true; // TODO migrate
     const messagesContainer = this.getMessagesContainer();
     const scrollPosition = Math.ceil(messagesContainer.scrollTop);
     const scrollEndValue = Math.ceil(scrollEnd(messagesContainer));
@@ -166,12 +156,14 @@ export class MessageListViewModel {
   };
 
   readonly adjustScroll = (): void => {
+    return;
     if (this.shouldStickToBottom()) {
       scrollToBottom(this.getMessagesContainer());
     }
   };
 
   private readonly handleInputResize = (inputSizeDiff: number): void => {
+    return;
     if (inputSizeDiff) {
       scrollBy(this.getMessagesContainer(), inputSizeDiff);
     } else if (this.shouldStickToBottom()) {
@@ -188,6 +180,8 @@ export class MessageListViewModel {
 
     // Update new conversation
     this.conversation(conversationEntity);
+    this.conversationLoaded(true);
+    return;
 
     // Keep last read timestamp to render unread when entering conversation
     if (this.conversation().unreadState().allEvents.length) {
@@ -198,7 +192,6 @@ export class MessageListViewModel {
     await this.loadConversation(conversationEntity, messageEntity);
     await this.renderConversation(conversationEntity, messageEntity);
     conversationEntity.is_loaded(true);
-    this.conversationLoaded(true);
   };
 
   private readonly loadConversation = async (
@@ -221,6 +214,7 @@ export class MessageListViewModel {
   };
 
   private readonly renderConversation = (conversationEntity: Conversation, messageEntity: Message): Promise<void> => {
+    return;
     const messages_container = this.getMessagesContainer();
 
     const is_current_conversation = conversationEntity === this.conversation();
@@ -278,6 +272,7 @@ export class MessageListViewModel {
     changedMessages: ko.utils.ArrayChanges<Message | ContentMessage | MemberMessage>,
     shouldStickToBottom: boolean,
   ) => {
+    return;
     const messages_container = this.getMessagesContainer();
     const lastAddedItem = changedMessages
       .slice()
@@ -311,6 +306,7 @@ export class MessageListViewModel {
   };
 
   loadPrecedingMessages = async (): Promise<void> => {
+    return;
     const shouldPullMessages = !this.conversation().is_pending() && this.conversation().hasAdditionalMessages();
     const messagesContainer = this.getMessagesContainer();
 
@@ -417,48 +413,6 @@ export class MessageListViewModel {
     const [imageMessageEntity] = messageEntities.filter(item => item.id === messageEntity.id);
 
     amplify.publish(WebAppEvents.CONVERSATION.DETAIL_VIEW.SHOW, imageMessageEntity || messageEntity, messageEntities);
-  };
-
-  readonly getTimestampClass = (messageEntity: ContentMessage): string => {
-    const previousMessage = this.conversation().getPreviousMessage(messageEntity);
-    if (!previousMessage || messageEntity.isCall()) {
-      return '';
-    }
-
-    const isFirstUnread =
-      previousMessage.timestamp() <= this.conversationLastReadTimestamp &&
-      messageEntity.timestamp() > this.conversationLastReadTimestamp;
-
-    if (isFirstUnread) {
-      return 'message-timestamp-visible message-timestamp-unread';
-    }
-
-    const last = previousMessage.timestamp();
-    const current = messageEntity.timestamp();
-
-    if (!isSameDay(last, current)) {
-      return 'message-timestamp-visible message-timestamp-day';
-    }
-
-    if (differenceInMinutes(current, last) > 60) {
-      return 'message-timestamp-visible';
-    }
-
-    return '';
-  };
-
-  readonly shouldHideUserAvatar = (messageEntity: ContentMessage): boolean => {
-    // @todo avoid double check
-    if (this.getTimestampClass(messageEntity)) {
-      return false;
-    }
-
-    if (messageEntity.isContent() && messageEntity.replacing_message_id) {
-      return false;
-    }
-
-    const last_message = this.conversation().getPreviousMessage(messageEntity);
-    return last_message && last_message.isContent() && last_message.user().id === messageEntity.user().id;
   };
 
   readonly isLastDeliveredMessage = (messageEntity: Message): boolean => {

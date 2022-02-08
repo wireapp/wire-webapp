@@ -64,8 +64,3 @@ const LegalHoldMessage: React.FC<LegalHoldMessageProps> = ({
 };
 
 export default LegalHoldMessage;
-
-registerReactComponent('legalhold-message', {
-  component: LegalHoldMessage,
-  template: '<div data-bind="react: {message: ko.unwrap(message)}"></div>',
-});

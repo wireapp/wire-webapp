@@ -676,7 +676,7 @@ export class ConversationRepository {
       padding - precedingMessages.length,
     )) as EventRecord[];
     const messages = precedingMessages.concat(followingMessages);
-    const mappedMessageEntities = await this.addEventsToConversation(messages, conversationEntity);
+    //const mappedMessageEntities = await this.addEventsToConversation(messages, conversationEntity);
     conversationEntity.is_pending(false);
     return mappedMessageEntities;
   }

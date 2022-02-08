@@ -30,7 +30,7 @@ export interface ReadReceiptStatusProps {
   is1to1Conversation: boolean;
   isLastDeliveredMessage: boolean;
   message: Message;
-  onClickReceipts?: (view: {message: Message}) => void;
+  onClickReceipts?: (message: Message) => void;
 }
 
 const ReadReceiptStatus: React.FC<ReadReceiptStatusProps> = ({
@@ -74,7 +74,7 @@ const ReadReceiptStatus: React.FC<ReadReceiptStatusProps> = ({
             'with-tooltip with-tooltip--receipt': readReceiptTooltip,
           })}
           data-tooltip={readReceiptTooltip}
-          onClick={!is1to1Conversation ? () => onClickReceipts({message}) : undefined}
+          onClick={!is1to1Conversation ? () => onClickReceipts(message) : undefined}
           data-uie-name="status-message-read-receipts"
         >
           <Icon.Read />

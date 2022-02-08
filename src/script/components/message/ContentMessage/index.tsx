@@ -20,9 +20,8 @@
 import React from 'react';
 
 import {QualifiedId} from '@wireapp/api-client/src/user';
-import {registerReactComponent, useKoSubscribableChildren} from 'Util/ComponentUtil';
+import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 
-import {Message} from 'src/script/entity/message/Message';
 import {Conversation} from 'src/script/entity/Conversation';
 import {ContentMessage} from 'src/script/entity/message/ContentMessage';
 import {EphemeralStatusType} from '../../../message/EphemeralStatusType';
@@ -56,25 +55,19 @@ import Icon from 'Components/Icon';
 import {t} from 'Util/LocalizerUtil';
 import {StatusType} from '../../../message/StatusType';
 import {includesOnlyEmojis} from 'Util/EmojiUtil';
+import {MessageActions} from '../MessageWrapper';
 
-export interface TextMessageProps {
+export interface TextMessageProps extends MessageActions {
   contextMenuEntries: ContextMenuEntry[];
   conversation: Conversation;
   findMessage: (conversation: Conversation, messageId: string) => Promise<ContentMessage | undefined>;
   focusMessage?: () => void;
+  onClickButton?: (message: ContentMessage, assetId: string) => void;
   isLastDeliveredMessage: boolean;
   message: ContentMessage;
-  onClickAvatar?: () => void;
-  onClickButton?: (message: ContentMessage, assetId: string) => void;
-  onClickImage?: () => void;
-  onClickLikes?: () => void;
-  onClickMessage: (message: ContentMessage | Text, event: React.MouseEvent) => void;
-  onClickReceipts?: (view: {message: Message}) => void;
-  onClickTimestamp?: () => void;
-  onLike?: () => void;
+  shouldShowAvatar: boolean;
   quotedMessage?: ContentMessage;
   selfId: QualifiedId;
-  shouldShowAvatar: boolean;
 }
 
 const ContentAsset = ({
@@ -158,9 +151,9 @@ const TextMessage: React.FC<TextMessageProps> = ({
   message,
   findMessage,
   selfId,
-  shouldShowAvatar,
   isLastDeliveredMessage,
   contextMenuEntries,
+  shouldShowAvatar,
   onClickReceipts,
   onClickAvatar,
   onClickImage,
@@ -313,22 +306,3 @@ const TextMessage: React.FC<TextMessageProps> = ({
 };
 
 export default TextMessage;
-
-registerReactComponent('text-message', {
-  bindings: `message: ko.unwrap(message),
-    conversation: ko.unwrap(conversation),
-    selfId: selfId,
-    contextMenuEntries: ko.unwrap(contextMenuEntries),
-    findMessage: findMessage,
-    isLastDeliveredMessage: ko.unwrap(isLastDeliveredMessage),
-    onClickReceipts: onClickReceipts,
-    onLike: onLike,
-    onClickAvatar: onClickAvatar,
-    onClickMessage: onClickMessage,
-    onClickTimestamp: onClickTimestamp,
-    onClickLikes: onClickLikes,
-    onClickButton: onClickButton,
-    shouldShowAvatar: shouldShowAvatar,
-    `,
-  component: TextMessage,
-});

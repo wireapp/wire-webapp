@@ -892,7 +892,7 @@ export class Conversation {
    * Get the message before a given message.
    * @param message_et Message to look up from
    */
-  getPreviousMessage(message_et: ContentMessage): Message | ContentMessage | MemberMessage | SystemMessage | undefined {
+  getPreviousMessage(message_et: Message): Message | ContentMessage | MemberMessage | SystemMessage | undefined {
     const messages_visible = this.messages_visible();
     const message_index = messages_visible.indexOf(message_et);
     if (message_index > 0) {
