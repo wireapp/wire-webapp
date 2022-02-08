@@ -37,7 +37,7 @@ import {useAssetTransfer} from './AbstractAssetTransferStateTracker';
 export interface ImageAssetProps {
   asset: MediumImage;
   message: ContentMessage;
-  onClick: (message: ContentMessage, event: MouseEvent) => void;
+  onClick: (message: ContentMessage, event: React.MouseEvent) => void;
   teamState?: TeamState;
 }
 
@@ -91,7 +91,7 @@ const ImageAsset: React.FC<ImageAssetProps> = ({asset, message, onClick, teamSta
           })}
           data-uie-visible={visible && !isObfuscated}
           data-uie-status={imageUrl ? 'loaded' : 'loading'}
-          onClick={event => onClick(message, event.nativeEvent)}
+          onClick={event => onClick(message, event)}
           data-uie-name="go-image-detail"
           ref={setViewportElementRef}
         >

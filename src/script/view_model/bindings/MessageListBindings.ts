@@ -162,4 +162,3 @@ ko.bindingHandlers.background_image = {
     });
   },
 };
-

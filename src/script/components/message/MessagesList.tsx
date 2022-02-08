@@ -17,10 +17,10 @@ interface MessagesListParams {
   conversationRepository: ConversationRepository;
   invitePeople: (convesation: Conversation) => void;
   messageRepository: MessageRepository;
-  onClickMessage: (message: ContentMessage, event: Event) => void;
+  onClickMessage: (message: ContentMessage, event: React.MouseEvent) => void;
   resetSession: (messageError: DecryptErrorMessage) => void;
   selfUser: User;
-  showImageDetails: (message: Message, event: MouseEvent) => void;
+  showImageDetails: (message: Message, event: React.MouseEvent) => void;
   showMessageDetails: (message: Message, showLikes?: boolean) => void;
   showParticipants: (users: User[]) => void;
   showUserDetails: (user: User) => void;

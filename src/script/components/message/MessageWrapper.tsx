@@ -72,10 +72,10 @@ import React, {useEffect, useState} from 'react';
 export interface MessageActions {
   onClickAvatar: (user: User) => void;
   onClickCancelRequest: (message: MemberMessageEntity) => void;
-  onClickImage: (message: ContentMessage, event: UIEvent) => void;
+  onClickImage: (message: ContentMessage, event: React.MouseEvent) => void;
   onClickInvitePeople: () => void;
   onClickLikes: (message: BaseMessage) => void;
-  onClickMessage: (message: ContentMessage | Text, event: Event) => void;
+  onClickMessage: (message: ContentMessage | Text, event: React.MouseEvent) => void;
   onClickParticipants: (participants: User[]) => void;
   onClickReceipts: (message: BaseMessage) => void;
   onClickResetSession: (messageError: DecryptErrorMessage) => void;
@@ -162,7 +162,6 @@ const MessageWrapper: React.FC<MessageParams & {shouldShowAvatar: boolean}> = ({
   onClickResetSession,
   onClickCancelRequest,
   onLike,
-  onMessageMarked,
   messageRepository,
   actionsViewModel,
   teamState = container.resolve(TeamState),

@@ -20,7 +20,7 @@
 import React from 'react';
 import cx from 'classnames';
 
-import {registerReactComponent, useKoSubscribableChildren} from 'Util/ComponentUtil';
+import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {ContentMessage} from 'src/script/entity/message/ContentMessage';
 
 export interface MessageLikeProps {
@@ -51,8 +51,3 @@ const MessageLike: React.FC<MessageLikeProps> = ({message, onLike, className}) =
 };
 
 export default MessageLike;
-
-registerReactComponent('message-like', {
-  bindings: 'message: ko.unwrap(message), onLike, className',
-  component: MessageLike,
-});

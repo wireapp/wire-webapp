@@ -20,7 +20,7 @@
 import React from 'react';
 import Icon from 'Components/Icon';
 import {DecryptErrorMessage as DecryptErrorMessageEntity} from '../../entity/message/DecryptErrorMessage';
-import {registerReactComponent, useKoSubscribableChildren} from 'Util/ComponentUtil';
+import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 import DeviceId from 'Components/DeviceId';
 
@@ -94,8 +94,3 @@ const DecryptErrorMessage: React.FC<DecryptErrorMessageProps> = ({message, onCli
 };
 
 export default DecryptErrorMessage;
-
-registerReactComponent('decrypt-error-message', {
-  component: DecryptErrorMessage,
-  template: '<div data-bind="react: {message: ko.unwrap(message), onClickResetSession}"></div>',
-});

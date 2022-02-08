@@ -57,7 +57,7 @@ import {StatusType} from '../../../message/StatusType';
 import {includesOnlyEmojis} from 'Util/EmojiUtil';
 import {MessageActions} from '../MessageWrapper';
 
-export interface TextMessageProps extends MessageActions {
+export interface TextMessageProps extends Omit<MessageActions, 'onClickResetSession'> {
   contextMenuEntries: ContextMenuEntry[];
   conversation: Conversation;
   findMessage: (conversation: Conversation, messageId: string) => Promise<ContentMessage | undefined>;
@@ -80,9 +80,9 @@ const ContentAsset = ({
 }: {
   asset: Asset;
   message: ContentMessage;
-  onClickButton: (message: ContentMessage, assetId: string) => void;
-  onClickImage: () => void;
-  onClickMessage: (message: ContentMessage | Text, event: React.MouseEvent) => void;
+  onClickButton: TextMessageProps['onClickButton'];
+  onClickImage: MessageActions['onClickImage'];
+  onClickMessage: MessageActions['onClickMessage'];
   selfId: QualifiedId;
 }) => {
   const {isObfuscated} = useKoSubscribableChildren(message, ['isObfuscated']);

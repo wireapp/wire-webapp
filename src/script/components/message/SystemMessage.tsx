@@ -20,7 +20,7 @@
 import React from 'react';
 import Icon from 'Components/Icon';
 
-import {registerReactComponent, useKoSubscribableChildren} from 'Util/ComponentUtil';
+import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import MessageTime from './MessageTime';
 import {SystemMessageType} from '../../message/SystemMessageType';
 import {RenameMessage} from '../../entity/message/RenameMessage';
@@ -66,8 +66,3 @@ const SystemMessage: React.FC<SystemMessageProps> = ({message}) => {
 };
 
 export default SystemMessage;
-
-registerReactComponent('system-message', {
-  component: SystemMessage,
-  template: '<div data-bind="react: {message: ko.unwrap(message)}"></div>',
-});

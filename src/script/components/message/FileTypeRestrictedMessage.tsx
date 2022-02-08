@@ -18,7 +18,6 @@
  */
 
 import React from 'react';
-import {registerReactComponent} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 import {FileTypeRestrictedMessage as FileTypeRestrictedMessageEntity} from '../../entity/message/FileTypeRestrictedMessage';
 
@@ -52,8 +51,3 @@ const FileTypeRestrictedMessage: React.FC<FileTypeRestrictedMessageProps> = ({me
 };
 
 export default FileTypeRestrictedMessage;
-
-registerReactComponent('filetype-restricted-message', {
-  component: FileTypeRestrictedMessage,
-  template: '<div data-bind="react: {message: ko.unwrap(message)}"></div>',
-});

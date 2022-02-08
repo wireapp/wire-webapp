@@ -243,7 +243,7 @@ export class Message {
    * Check if the message content can be downloaded.
    * @returns `true`, if the message has downloadable content, `false` otherwise.
    */
-  isDownloadable(): boolean {
+  isDownloadable(): this is ContentMessage {
     const isExpiredEphemeral = this.ephemeral_status() === EphemeralStatusType.TIMED_OUT;
     if (isExpiredEphemeral) {
       return false;
@@ -342,7 +342,7 @@ export class Message {
    * @returns `true`, if message can be copied, `false` otherwise.
    */
 
-  isCopyable(): boolean {
+  isCopyable(): this is ContentMessage {
     return this.hasAssetText() && !this.isComposite() && (!this.isEphemeral() || this.user().isMe);
   }
 
@@ -390,7 +390,7 @@ export class Message {
    * Check if message can be reacted to.
    * @returns `true`, if message type supports reactions, `false` otherwise.
    */
-  isReactable(): boolean {
+  isReactable(): this is ContentMessage {
     return (
       this.isContent() &&
       !this.isComposite() &&

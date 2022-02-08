@@ -21,7 +21,7 @@ import React from 'react';
 import Icon from 'Components/Icon';
 import {CallMessage as CallMessageEntity} from '../../entity/message/CallMessage';
 
-import {registerReactComponent, useKoSubscribableChildren} from 'Util/ComponentUtil';
+import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import MessageTime from './MessageTime';
 
 export interface CallMessageProps {
@@ -66,8 +66,3 @@ const CallMessage: React.FC<CallMessageProps> = ({message}) => {
 };
 
 export default CallMessage;
-
-registerReactComponent('call-message', {
-  component: CallMessage,
-  template: '<div data-bind="react: {message: ko.unwrap(message)}"></div>',
-});

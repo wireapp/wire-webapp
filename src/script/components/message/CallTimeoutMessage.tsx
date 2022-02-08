@@ -22,7 +22,7 @@ import Icon from 'Components/Icon';
 import {t} from 'Util/LocalizerUtil';
 import {CallingTimeoutMessage} from '../../entity/message/CallingTimeoutMessage';
 
-import {registerReactComponent, useKoSubscribableChildren} from 'Util/ComponentUtil';
+import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import MessageTime from './MessageTime';
 import {REASON} from '@wireapp/avs';
 
@@ -60,8 +60,3 @@ const CallTimeoutMessage: React.FC<CallTimeoutMessageProps> = ({message}) => {
 };
 
 export default CallTimeoutMessage;
-
-registerReactComponent('call-timeout-message', {
-  component: CallTimeoutMessage,
-  template: '<div data-bind="react: {message: ko.unwrap(message)}"></div>',
-});

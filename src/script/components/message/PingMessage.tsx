@@ -21,7 +21,7 @@ import React from 'react';
 import cx from 'classnames';
 import {PingMessage as PingMessageEntity} from '../../entity/message/PingMessage';
 
-import {registerReactComponent, useKoSubscribableChildren} from 'Util/ComponentUtil';
+import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import MessageTime from './MessageTime';
 import ReadReceiptStatus from './ReadReceiptStatus';
 import {Message} from 'src/script/entity/message/Message';
@@ -30,7 +30,7 @@ export interface PingMessageProps {
   is1to1Conversation: boolean;
   isLastDeliveredMessage: boolean;
   message: PingMessageEntity;
-  onClickReceipts?: (view: {message: Message}) => void;
+  onClickReceipts?: (message: Message) => void;
 }
 
 const PingMessage: React.FC<PingMessageProps> = ({
@@ -80,9 +80,3 @@ const PingMessage: React.FC<PingMessageProps> = ({
 };
 
 export default PingMessage;
-
-registerReactComponent('ping-message', {
-  bindings:
-    'message: ko.unwrap(message), is1to1Conversation: ko.unwrap(is1to1Conversation), isLastDeliveredMessage: ko.unwrap(isLastDeliveredMessage), onClickReceipts: onClickReceipts',
-  component: PingMessage,
-});

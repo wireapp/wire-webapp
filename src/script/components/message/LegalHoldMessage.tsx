@@ -21,7 +21,6 @@ import React from 'react';
 import {LegalHoldMessage as LegalHoldMessageEntity} from '../../entity/message/LegalHoldMessage';
 import LegalHoldDot from '../LegalHoldDot';
 
-import {registerReactComponent} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 import {amplify} from 'amplify';
 import {LegalHoldModalViewModel} from '../../view_model/content/LegalHoldModalViewModel';

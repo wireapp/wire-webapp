@@ -20,7 +20,7 @@
 import React, {useEffect, useState} from 'react';
 import Icon from 'Components/Icon';
 
-import {registerReactComponent, useKoSubscribableChildren} from 'Util/ComponentUtil';
+import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 import cx from 'classnames';
 import {Message} from 'src/script/entity/message/Message';
@@ -88,9 +88,3 @@ const ReadReceiptStatus: React.FC<ReadReceiptStatusProps> = ({
 };
 
 export default ReadReceiptStatus;
-
-registerReactComponent('read-receipt-status', {
-  component: ReadReceiptStatus,
-  template:
-    '<div data-bind="react: {message: ko.unwrap(message), is1to1Conversation: ko.unwrap(is1to1Conversation), isLastDeliveredMessage: ko.unwrap(isLastDeliveredMessage), onClickReceipts: onClickReceipts}"></div>',
-});

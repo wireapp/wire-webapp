@@ -26,7 +26,7 @@ import ko from 'knockout';
 
 import {getLogger, Logger} from 'Util/Logger';
 import {safeWindowOpen, safeMailOpen} from 'Util/SanitizationUtil';
-import {scrollToBottom, scrollBy} from 'Util/scroll-helpers';
+import {scrollBy} from 'Util/scroll-helpers';
 import {t} from 'Util/LocalizerUtil';
 
 import {ActionsViewModel} from '../ActionsViewModel';
@@ -67,8 +67,8 @@ export class MessageListViewModel {
   private readonly conversationLoaded: ko.Observable<boolean>;
   conversationLastReadTimestamp: number;
   private readonly readMessagesBuffer: ko.ObservableArray<{conversation: Conversation; message: Message}>;
-  private messagesChangeSubscription: ko.Subscription;
-  private messagesBeforeChangeSubscription: ko.Subscription;
+  private readonly messagesChangeSubscription: ko.Subscription;
+  private readonly messagesBeforeChangeSubscription: ko.Subscription;
   private messagesContainer: HTMLElement;
   showInvitePeople: ko.PureComputed<boolean>;
 
@@ -146,12 +146,13 @@ export class MessageListViewModel {
   };
 
   private readonly handleInputResize = (inputSizeDiff: number): void => {
-    return;
+    /* TODO migrate
     if (inputSizeDiff) {
       scrollBy(this.getMessagesContainer(), inputSizeDiff);
     } else if (this.shouldStickToBottom()) {
       scrollToBottom(this.getMessagesContainer());
     }
+    */
   };
 
   changeConversation = async (conversationEntity: Conversation, messageEntity: Message): Promise<void> => {
@@ -197,7 +198,8 @@ export class MessageListViewModel {
   };
 
   private readonly renderConversation = (conversationEntity: Conversation, messageEntity: Message): Promise<void> => {
-    return;
+    return undefined;
+    /*
     const messages_container = this.getMessagesContainer();
 
     const is_current_conversation = conversationEntity === this.conversation();
@@ -249,8 +251,10 @@ export class MessageListViewModel {
         resolve();
       }, 100);
     });
+    */
   };
 
+  /*
   private readonly scrollAddedMessagesIntoView = (
     changedMessages: ko.utils.ArrayChanges<Message | ContentMessage | MemberMessage>,
     shouldStickToBottom: boolean,
@@ -287,6 +291,7 @@ export class MessageListViewModel {
       window.requestAnimationFrame(() => scrollToBottom(messages_container));
     }
   };
+  */
 
   loadPrecedingMessages = async (): Promise<void> => {
     const shouldPullMessages = !this.conversation().is_pending() && this.conversation().hasAdditionalMessages();

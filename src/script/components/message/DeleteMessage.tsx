@@ -20,7 +20,7 @@
 import React from 'react';
 import {DeleteMessage as DeleteMessageEntity} from '../../entity/message/DeleteMessage';
 
-import {registerReactComponent, useKoSubscribableChildren} from 'Util/ComponentUtil';
+import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import Avatar, {AVATAR_SIZE} from 'Components/Avatar';
 import {User} from 'src/script/entity/User';
 import MessageTime from './MessageTime';
@@ -70,8 +70,3 @@ const DeleteMessage: React.FC<DeleteMessageProps> = ({message, onClickAvatar}) =
 };
 
 export default DeleteMessage;
-
-registerReactComponent('delete-message', {
-  component: DeleteMessage,
-  template: '<div data-bind="react: {message: ko.unwrap(message), onClickAvatar}"></div>',
-});

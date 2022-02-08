@@ -24,7 +24,7 @@ import React, {useMemo} from 'react';
 import {VerificationMessage as VerificationMessageEntity} from '../../entity/message/VerificationMessage';
 import {VerificationMessageType} from '../../message/VerificationMessageType';
 
-import {registerReactComponent, useKoSubscribableChildren} from 'Util/ComponentUtil';
+import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {Declension, joinNames, t} from 'Util/LocalizerUtil';
 import {capitalizeFirstChar} from 'Util/StringUtil';
 
@@ -103,8 +103,3 @@ const VerificationMessage: React.FC<VerificationMessageProps> = ({message}) => {
 };
 
 export default VerificationMessage;
-
-registerReactComponent('verification-message', {
-  component: VerificationMessage,
-  template: '<div data-bind="react: {message: ko.unwrap(message)}"></div>',
-});

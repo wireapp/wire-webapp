@@ -20,7 +20,7 @@
 import React from 'react';
 
 import type {Message} from '../../entity/message/Message';
-import {registerReactComponent, useKoSubscribableChildren} from 'Util/ComponentUtil';
+import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 
 export interface EphemeralTimerProps {
   message: Message;
@@ -52,8 +52,3 @@ const EphemeralTimer: React.FC<EphemeralTimerProps> = ({message}) => {
 };
 
 export default EphemeralTimer;
-
-registerReactComponent('ephemeral-timer', {
-  bindings: 'message',
-  component: EphemeralTimer,
-});

@@ -20,7 +20,7 @@
 import React, {useEffect} from 'react';
 import Icon from 'Components/Icon';
 import {MemberMessage as MemberMessageEntity} from '../../entity/message/MemberMessage';
-import {registerReactComponent, useKoSubscribableChildren} from 'Util/ComponentUtil';
+import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import MessageTime from './MessageTime';
 import {t} from 'Util/LocalizerUtil';
 import ConnectedMessage from './memberMessage/ConnectedMessage';
@@ -183,9 +183,3 @@ const MemberMessage: React.FC<MemberMessageProps> = ({
 };
 
 export default MemberMessage;
-
-registerReactComponent('member-message', {
-  component: MemberMessage,
-  template:
-    '<div data-bind="react: {message: ko.unwrap(message), onClickInvitePeople, onClickParticipants, onClickCancelRequest, shouldShowInvitePeople: ko.unwrap(shouldShowInvitePeople), isSelfTemporaryGuest: ko.unwrap(isSelfTemporaryGuest), hasReadReceiptsTurnedOn, classifiedDomains: ko.unwrap(classifiedDomains)}"></div>',
-});

@@ -18,7 +18,6 @@
  */
 
 import React from 'react';
-import {registerReactComponent} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 
 export interface MissedMessageProps {}
@@ -35,8 +34,3 @@ const MissedMessage: React.FC<MissedMessageProps> = ({}) => {
 };
 
 export default MissedMessage;
-
-registerReactComponent('missed-message', {
-  component: MissedMessage,
-  template: '<div data-bind="react: {}"></div>',
-});
