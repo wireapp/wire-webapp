@@ -26,11 +26,10 @@ import ko from 'knockout';
 
 import {getLogger, Logger} from 'Util/Logger';
 import {safeWindowOpen, safeMailOpen} from 'Util/SanitizationUtil';
-import {scrollEnd, scrollToBottom, scrollBy} from 'Util/scroll-helpers';
+import {scrollToBottom, scrollBy} from 'Util/scroll-helpers';
 import {t} from 'Util/LocalizerUtil';
 
 import {ActionsViewModel} from '../ActionsViewModel';
-import {Config} from '../../Config';
 import {ContentMessage} from '../../entity/message/ContentMessage';
 import {Conversation} from '../../entity/Conversation';
 import {ConversationRepository} from '../../conversation/ConversationRepository';
@@ -144,22 +143,6 @@ export class MessageListViewModel {
       this.messagesChangeSubscription.dispose();
     }
     this.conversationLastReadTimestamp = undefined;
-    window.removeEventListener('resize', this.adjustScroll);
-  };
-
-  private readonly shouldStickToBottom = (): boolean => {
-    return true; // TODO migrate
-    const messagesContainer = this.getMessagesContainer();
-    const scrollPosition = Math.ceil(messagesContainer.scrollTop);
-    const scrollEndValue = Math.ceil(scrollEnd(messagesContainer));
-    return scrollPosition > scrollEndValue - Config.getConfig().SCROLL_TO_LAST_MESSAGE_THRESHOLD;
-  };
-
-  readonly adjustScroll = (): void => {
-    return;
-    if (this.shouldStickToBottom()) {
-      scrollToBottom(this.getMessagesContainer());
-    }
   };
 
   private readonly handleInputResize = (inputSizeDiff: number): void => {
@@ -306,36 +289,21 @@ export class MessageListViewModel {
   };
 
   loadPrecedingMessages = async (): Promise<void> => {
-    return;
     const shouldPullMessages = !this.conversation().is_pending() && this.conversation().hasAdditionalMessages();
-    const messagesContainer = this.getMessagesContainer();
-
-    if (shouldPullMessages && messagesContainer) {
-      const initialListHeight = messagesContainer.scrollHeight;
-
+    if (shouldPullMessages) {
       await this.conversationRepository.getPrecedingMessages(this.conversation());
-      if (messagesContainer) {
-        const newListHeight = messagesContainer.scrollHeight;
-        this.getMessagesContainer().scrollTop = newListHeight - initialListHeight;
-      }
-      return;
     }
-    return Promise.resolve();
   };
 
-  readonly loadFollowingMessages = (): Promise<void> => {
+  readonly loadFollowingMessages = () => {
     const lastMessage = this.conversation().getLastMessage();
 
     if (lastMessage) {
       if (!this.isLastReceivedMessage(lastMessage, this.conversation())) {
         // if the last loaded message is not the last of the conversation, we load the subsequent messages
         this.conversationRepository.getSubsequentMessages(this.conversation(), lastMessage as ContentMessage);
-      } else if (document.hasFocus()) {
-        // if the message is the last of the conversation and the app is in the foreground, then we update the last read timestamp of the conversation
-        this.updateConversationLastRead(this.conversation(), lastMessage);
       }
     }
-    return Promise.resolve();
   };
 
   focusMessage = async (messageId: string): Promise<void> => {
