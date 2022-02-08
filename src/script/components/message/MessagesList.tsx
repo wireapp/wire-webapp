@@ -103,9 +103,7 @@ const MessagesList: React.FC<MessagesListParams> = ({
         onClickParticipants={function (participants: User[]): void {
           throw new Error('Function not implemented.');
         }}
-        onClickReceipts={function (view: Message): void {
-          throw new Error('Function not implemented.');
-        }}
+        onClickReceipts={message => showMessageDetails(message)}
         onClickResetSession={function (messageError: DecryptErrorMessage): void {
           throw new Error('Function not implemented.');
         }}
