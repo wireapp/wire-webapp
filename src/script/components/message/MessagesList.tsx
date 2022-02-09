@@ -14,7 +14,10 @@ import MessageWrapper from './MessageWrapper';
 interface MessagesListParams {
   cancelConnectionRequest: (message: MemberMessage) => void;
   conversation: Conversation;
-  conversationRepository: ConversationRepository;
+  conversationRepository: Pick<
+    ConversationRepository,
+    'getPrecedingMessages' | 'getMessagesWithOffset' | 'updateParticipatingUserEntities' | 'expectReadReceipt'
+  >;
   getVisibleCallback: (conversation: Conversation, message: Message) => () => void | undefined;
   initialMessage: Message;
   invitePeople: (convesation: Conversation) => void;
@@ -88,7 +91,7 @@ const MessagesList: React.FC<MessagesListParams> = ({
     const scrollEndValue = Math.ceil(scrollEnd(scrollingContainer));
     const shouldStickToBottom = scrollPosition > scrollEndValue - 100;
     if (shouldStickToBottom) {
-      endElement.scrollIntoView();
+      endElement.scrollIntoView?.();
     } else if (scrollPosition === 0) {
       // If we hit the top and new messages were loaded, we keep the scroll position stable
       scrollingContainer.scrollTo({top: scrollingContainer.scrollHeight - scrollHeight.current});
@@ -106,7 +109,7 @@ const MessagesList: React.FC<MessagesListParams> = ({
   }, []);
 
   const messageViews = messages.map((message, index) => {
-    const previousMessage = index > 0 && messages.at(index - 1);
+    const previousMessage = index > 0 && messages[index - 1];
     const isLastDeliveredMessage = conversation.getLastDeliveredMessage() === message;
 
     const visibleCallback = getVisibleCallback(conversation, message);
