@@ -85,7 +85,7 @@ const ContentAsset = ({
   onClickMessage: MessageActions['onClickMessage'];
   selfId: QualifiedId;
 }) => {
-  const {isObfuscated} = useKoSubscribableChildren(message, ['isObfuscated']);
+  const {isObfuscated, status} = useKoSubscribableChildren(message, ['isObfuscated', 'status']);
   switch (asset.type) {
     case AssetType.TEXT:
       return (
@@ -93,7 +93,7 @@ const ContentAsset = ({
           {(asset as Text).should_render_text() && (
             <div
               className={`text ${includesOnlyEmojis((asset as Text).text) ? 'text-large' : ''} ${
-                message.status() === StatusType.SENDING ? 'text-foreground' : ''
+                status === StatusType.SENDING ? 'text-foreground' : ''
               } ${isObfuscated ? 'ephemeral-message-obfuscated' : ''}`}
               dangerouslySetInnerHTML={{__html: (asset as Text).render(selfId, message.accent_color())}}
               onClick={event => onClickMessage(asset as Text, event)}
@@ -163,10 +163,12 @@ const TextMessage: React.FC<TextMessageProps> = ({
   onClickButton,
   onLike,
 }) => {
-  const {headerSenderName, timestamp, ephemeral_caption} = useKoSubscribableChildren(message, [
+  const {headerSenderName, timestamp, ephemeral_caption, ephemeral_status} = useKoSubscribableChildren(message, [
     'headerSenderName',
     'timestamp',
     'ephemeral_caption',
+    'ephemeral_status',
+    'status',
   ]);
 
   const avatarSection = shouldShowAvatar ? (
@@ -233,7 +235,7 @@ const TextMessage: React.FC<TextMessageProps> = ({
         />
       )}
       <div className="message-body" title={ephemeral_caption}>
-        {message.ephemeral_status() === EphemeralStatusType.ACTIVE && (
+        {ephemeral_status === EphemeralStatusType.ACTIVE && (
           <div className="message-ephemeral-timer">
             <EphemeralTimer message={message} />
           </div>
@@ -268,7 +270,7 @@ const TextMessage: React.FC<TextMessageProps> = ({
               onClick={event => showContextMenu(event, contextMenuEntries, 'message-options-menu')}
             ></span>
           )}
-          {message.ephemeral_status() === EphemeralStatusType.ACTIVE && (
+          {ephemeral_status === EphemeralStatusType.ACTIVE && (
             <time
               className="time"
               data-uie-uid={message.id}
@@ -279,7 +281,7 @@ const TextMessage: React.FC<TextMessageProps> = ({
               {message.displayTimestampShort()}
             </time>
           )}
-          {message.ephemeral_status() !== EphemeralStatusType.ACTIVE && (
+          {ephemeral_status !== EphemeralStatusType.ACTIVE && (
             <MessageTime data-uie-uid={message.id} timestamp={timestamp}>
               {message.displayTimestampShort()}
             </MessageTime>

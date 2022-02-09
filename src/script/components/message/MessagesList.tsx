@@ -54,7 +54,10 @@ const MessagesList: React.FC<MessagesListParams> = ({
   messageActions,
   onLoading,
 }) => {
-  const {messages} = useKoSubscribableChildren(conversation, ['messages']);
+  const {messages, lastDeliveredMessage} = useKoSubscribableChildren(conversation, [
+    'messages',
+    'lastDeliveredMessage',
+  ]);
   const [focusedMessage, setFocusedMessage] = useState<string>(initialMessage?.id);
 
   const conversationLastReadTimestamp = useMemo(() => conversation.last_read_timestamp(), []);
@@ -110,7 +113,7 @@ const MessagesList: React.FC<MessagesListParams> = ({
 
   const messageViews = messages.map((message, index) => {
     const previousMessage = index > 0 && messages[index - 1];
-    const isLastDeliveredMessage = conversation.getLastDeliveredMessage() === message;
+    const isLastDeliveredMessage = lastDeliveredMessage?.id === message.id;
 
     const visibleCallback = getVisibleCallback(conversation, message);
     return (

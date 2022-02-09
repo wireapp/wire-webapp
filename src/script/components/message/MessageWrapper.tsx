@@ -68,6 +68,7 @@ import PingMessage from './PingMessage';
 import TextMessage from './ContentMessage';
 import React, {useEffect, useState} from 'react';
 import InViewport from 'Components/utils/InViewport';
+import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 
 export interface MessageActions {
   onClickAvatar: (user: User) => void;
@@ -150,7 +151,6 @@ const MessageWrapper: React.FC<MessageParams & {shouldShowAvatar: boolean}> = ({
   selfId,
   isSelfTemporaryGuest,
   isLastDeliveredMessage,
-  isMarked,
   shouldShowInvitePeople,
   shouldShowAvatar,
   hasReadReceiptsTurnedOn,
@@ -357,6 +357,7 @@ const Wrapper: React.FC<
   MessageParams & {conversationLastReadTimestamp: number; previousMessage?: BaseMessage}
 > = props => {
   const {message, previousMessage, conversationLastReadTimestamp, isMarked} = props;
+  const {status} = useKoSubscribableChildren(message, ['status']);
   const timeago = useRelativeTimestamp(message.timestamp());
   const timeagoDay = useRelativeTimestamp(message.timestamp(), true);
 
@@ -392,7 +393,7 @@ const Wrapper: React.FC<
       data-uie-uid={message.id}
       data-uie-value={message.super_type}
       data-uie-expired-status={message.ephemeral_expires()}
-      data-uie-send-status={message.status()}
+      data-uie-send-status={status}
       data-uie-name="item-message"
     >
       <div className={`message-header message-timestamp ${getTimestampClass()}`}>

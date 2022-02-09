@@ -108,6 +108,7 @@ export class Conversation {
   public readonly hasUnread: ko.PureComputed<boolean>;
   public id: string;
   public readonly inTeam: ko.PureComputed<boolean>;
+  public readonly lastDeliveredMessage: ko.PureComputed<Message | undefined>;
   public readonly is_archived: ko.Observable<boolean>;
   public readonly is_cleared: ko.PureComputed<boolean>;
   public readonly is_loaded: ko.Observable<boolean>;
@@ -380,6 +381,7 @@ export class Conversation {
           return message_a.timestamp() - message_b.timestamp();
         }),
     );
+    this.lastDeliveredMessage = ko.pureComputed(() => this.getLastDeliveredMessage());
 
     this.incomingMessages = ko.observableArray();
 
