@@ -151,7 +151,8 @@ const MessagesList: React.FC<MessagesListParams> = ({
 export default MessagesList;
 
 registerReactComponent('messages-list', {
-  bindings: `
+  component: MessagesList,
+  template: `<div data-bind="react: {
     conversation: ko.unwrap(conversation),
     conversationRepository,
     messageRepository,
@@ -166,6 +167,5 @@ registerReactComponent('messages-list', {
     cancelConnectionRequest,
     messageActions,
     onLoading,
-    `,
-  component: MessagesList,
+  }"></div>`,
 });

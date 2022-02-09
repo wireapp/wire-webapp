@@ -44,10 +44,8 @@ ko.bindingHandlers.react = {
     ko.utils.domNodeDisposal.addDisposeCallback(element, () => {
       // Allow react to clean up after the element is removed from the DOM.
       // This is needed to prevent memory leaks, as it calls all useEffect return functions and such.
-      if (element.nodeType !== Node.COMMENT_NODE) {
-        ReactDOM.unmountComponentAtNode(element);
-      }
-
+      const targetElement = element.nodeType !== Node.COMMENT_NODE ? element : element.parentNode;
+      ReactDOM.unmountComponentAtNode(targetElement);
       reactWrappers.delete(element);
     });
 
