@@ -69,6 +69,7 @@ import TextMessage from './ContentMessage';
 import React, {useEffect, useState} from 'react';
 import InViewport from 'Components/utils/InViewport';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
+import MessageTime from './MessageTime';
 
 export interface MessageActions {
   onClickAvatar: (user: User) => void;
@@ -401,22 +402,12 @@ const Wrapper: React.FC<
           <span className="message-unread-dot"></span>
         </div>
         <div className="message-header-label">
-          <time
-            data-timestamp-type="normal"
-            className="label-xs"
-            data-timestamp={message.timestamp()}
-            data-bind="showAllTimestamps"
-          >
+          <MessageTime timestamp={message.timestamp()} className="label-xs" data-timestamp-type="normal">
             {timeago}
-          </time>
-          <time
-            data-timestamp-type="day"
-            className="label-bold-xs"
-            data-timestamp={message.timestamp()}
-            data-bind="showAllTimestamps"
-          >
+          </MessageTime>
+          <MessageTime timestamp={message.timestamp()} data-timestamp-type="day" className="label-bold-xs">
             {timeagoDay}
-          </time>
+          </MessageTime>
         </div>
       </div>
 
