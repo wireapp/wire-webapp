@@ -15,7 +15,7 @@ jobs:
 
     strategy:
       matrix:
-        DISTRIBUTION: ['DISTRIBUTION_0', 'DISTRIBUTION_1']
+        DISTRIBUTION: ['DISTRIBUTION_0']
 
     env:
       TEST_COVERAGE_FAIL_THRESHOLD: 45
@@ -92,10 +92,10 @@ jobs:
           env.BUILD_DESKTOP == 'true'
         run: yarn --frozen-lockfile
 
-      - name: Test
-        # Run for all PRs and pushes to master/dev with DISTRIBUTION == 'wire'
-        if: matrix.DISTRIBUTION == 'DISTRIBUTION_0'
-        run: yarn test --coverage --coverage-reporters=lcov --detectOpenHandles=false
+      # - name: Test
+      #   # Run for all PRs and pushes to master/dev with DISTRIBUTION == 'wire'
+      #   if: matrix.DISTRIBUTION == 'DISTRIBUTION_0'
+      #   run: yarn test --coverage --coverage-reporters=lcov --detectOpenHandles=false
 
       - name: Monitor coverage
         # Run for all PRs and merges with DISTRIBUTION == 'wire'

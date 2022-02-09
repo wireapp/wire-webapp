@@ -19,19 +19,12 @@
 
 const webpack = require('webpack');
 const commonConfig = require('./webpack.config.common');
-const TerserJSPlugin = require('terser-webpack-plugin');
 
 module.exports = {
   ...commonConfig,
-  mode: 'production',
+  mode: 'development',
   optimization: {
     ...commonConfig.optimization,
-    minimizer: [
-      new TerserJSPlugin({
-        /* Dexie has issues with UglifyJS */
-        exclude: /dexie/g,
-      }),
-    ],
   },
   plugins: [
     ...commonConfig.plugins,
