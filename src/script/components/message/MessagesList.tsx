@@ -7,7 +7,7 @@ import {DecryptErrorMessage} from 'src/script/entity/message/DecryptErrorMessage
 import {MemberMessage} from 'src/script/entity/message/MemberMessage';
 import {Message} from 'src/script/entity/message/Message';
 import {User} from 'src/script/entity/User';
-import {registerReactComponent, useKoSubscribableChildren} from 'Util/ComponentUtil';
+import {registerStaticReactComponent, useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {scrollEnd} from 'Util/scroll-helpers';
 import MessageWrapper from './MessageWrapper';
 
@@ -80,7 +80,7 @@ const MessagesList: React.FC<MessagesListParams> = ({
     if (!endElement) {
       return;
     }
-    const scrollingContainer = endElement.parentElement.parentElement.parentElement;
+    const scrollingContainer = endElement.parentElement.parentElement;
     if (!scrollingContainer) {
       return;
     }
@@ -162,24 +162,4 @@ const MessagesList: React.FC<MessagesListParams> = ({
 
 export default MessagesList;
 
-registerReactComponent('messages-list', {
-  component: MessagesList,
-  template: `<div data-bind="react: {
-    conversation: ko.unwrap(conversation),
-    initialMessage: ko.unwrap(initialMessage),
-    conversationRepository,
-    messageRepository,
-    selfUser: ko.unwrap(selfUser),
-    onClickMessage,
-    showUserDetails,
-    showImageDetails,
-    showMessageDetails,
-    showParticipants,
-    resetSession,
-    invitePeople,
-    cancelConnectionRequest,
-    messageActions,
-    onLoading,
-    getVisibleCallback,
-  }"></div>`,
-});
+registerStaticReactComponent('messages-list', MessagesList);
