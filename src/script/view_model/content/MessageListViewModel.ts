@@ -145,6 +145,7 @@ export class MessageListViewModel {
 
   changeConversation = async (conversationEntity: Conversation, messageEntity: Message): Promise<void> => {
     // Clean up old conversation
+    this.conversationLoaded(false);
     if (this.conversation()) {
       this.releaseConversation(this.conversation());
     }
@@ -152,6 +153,14 @@ export class MessageListViewModel {
     // Update new conversation
     this.initialMessage(messageEntity);
     this.conversation(conversationEntity);
+    return new Promise(resolve => {
+      const subscription = this.conversationLoaded.subscribe(isLoaded => {
+        if (isLoaded) {
+          resolve();
+          subscription.dispose();
+        }
+      });
+    });
   };
 
   private readonly isLastReceivedMessage = (messageEntity: Message, conversationEntity: Conversation): boolean => {

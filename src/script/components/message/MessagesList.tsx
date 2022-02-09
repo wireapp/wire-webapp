@@ -108,7 +108,12 @@ const MessagesList: React.FC<MessagesListParams> = ({
 
   useEffect(() => {
     onLoading(true);
-    loadConversation(conversation, initialMessage).then(() => onLoading(false));
+    loadConversation(conversation, initialMessage).then(() => {
+      setTimeout(() => {
+        updateScroll(messagesEndRef.current);
+        onLoading(false);
+      }, 100);
+    });
   }, []);
 
   const messageViews = messages.map((message, index) => {
