@@ -23,6 +23,7 @@
     invitePeople: $root.messageList.clickOnInvitePeople,
     onClickMessage: $root.messageList.handleClickOnMessage,
     messageActions: $root.messageList.actionsViewModel,
+    onLoading: (loading) => $root.messageList.conversationLoaded(!loading),
   "
   ></messages-list>
   #include('content/conversation/input-bar.htm')

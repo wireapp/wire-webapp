@@ -22,6 +22,7 @@ interface MessagesListParams {
   };
   messageRepository: MessageRepository;
   onClickMessage: (message: ContentMessage, event: React.MouseEvent) => void;
+  onLoading: (isLoading: boolean) => void;
   resetSession: (messageError: DecryptErrorMessage) => void;
   selfUser: User;
   showImageDetails: (message: Message, event: React.MouseEvent) => void;
@@ -44,6 +45,7 @@ const MessagesList: React.FC<MessagesListParams> = ({
   resetSession,
   invitePeople,
   messageActions,
+  onLoading,
 }) => {
   const {messages} = useKoSubscribableChildren(conversation, ['messages']);
   const [focusedMessage, setFocusedMessage] = useState<string>();
@@ -59,6 +61,7 @@ const MessagesList: React.FC<MessagesListParams> = ({
       ? conversationRepository.getMessagesWithOffset(conversation, message)
       : conversationRepository.getPrecedingMessages(conversation);
   };
+
   const verticallyCenterMessage = (): boolean => {
     if (messages.length === 1) {
       const [firstMessage] = messages;
@@ -73,6 +76,9 @@ const MessagesList: React.FC<MessagesListParams> = ({
       return;
     }
     const scrollingContainer = endElement.parentElement.parentElement;
+    if (!scrollingContainer) {
+      return;
+    }
     const scrollPosition = Math.ceil(scrollingContainer.scrollTop);
     const scrollEndValue = Math.ceil(scrollEnd(scrollingContainer));
     const shouldStickToBottom = scrollPosition > scrollEndValue - 100;
@@ -86,7 +92,8 @@ const MessagesList: React.FC<MessagesListParams> = ({
   }, [messages, messagesEndRef]);
 
   useEffect(() => {
-    loadConversation(conversation, undefined);
+    onLoading(true);
+    loadConversation(conversation, undefined).then(() => onLoading(false));
   }, []);
 
   const messageViews = messages.map((message, index) => {
@@ -158,6 +165,7 @@ registerReactComponent('messages-list', {
     invitePeople,
     cancelConnectionRequest,
     messageActions,
+    onLoading,
     `,
   component: MessagesList,
 });
