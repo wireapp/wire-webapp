@@ -31,7 +31,6 @@ import type {ContentMessage} from '../../entity/message/ContentMessage';
 import type {MemberMessage as MemberMessageEntity} from '../../entity/message/MemberMessage';
 import type {CompositeMessage} from '../../entity/message/CompositeMessage';
 import type {Text} from '../../entity/message/Text';
-import type {ActionsViewModel} from '../../view_model/ActionsViewModel';
 import type {Conversation} from '../../entity/Conversation';
 import type {User} from '../../entity/User';
 import type {DecryptErrorMessage} from '../../entity/message/DecryptErrorMessage';
@@ -84,7 +83,6 @@ export interface MessageActions {
 }
 
 interface MessageParams extends MessageActions {
-  actionsViewModel: ActionsViewModel;
   conversation: Conversation;
   hasReadReceiptsTurnedOn: boolean;
   isLastDeliveredMessage: boolean;
@@ -93,6 +91,10 @@ interface MessageParams extends MessageActions {
   /** The last read timestamp at the moment the conversation was rendered */
   lastReadTimestamp: number;
   message: BaseMessage;
+  messageActions: {
+    deleteMessage: (conversation: Conversation, message: BaseMessage) => void;
+    deleteMessageEveryone: (conversation: Conversation, message: BaseMessage) => void;
+  };
   messageRepository: MessageRepository;
   onContentUpdated: () => void;
   selfId: QualifiedId;
@@ -163,7 +165,7 @@ const MessageWrapper: React.FC<MessageParams & {shouldShowAvatar: boolean}> = ({
   onClickCancelRequest,
   onLike,
   messageRepository,
-  actionsViewModel,
+  messageActions,
   teamState = container.resolve(TeamState),
 }) => {
   const findMessage = (conversation: Conversation, messageId: string) => {
@@ -252,14 +254,14 @@ const MessageWrapper: React.FC<MessageParams & {shouldShowAvatar: boolean}> = ({
 
     if (messageEntity.isDeletable()) {
       entries.push({
-        click: () => actionsViewModel.deleteMessage(conversation, messageEntity),
+        click: () => messageActions.deleteMessage(conversation, messageEntity),
         label: t('conversationContextMenuDelete'),
       });
     }
 
     if (canDelete) {
       entries.push({
-        click: () => actionsViewModel.deleteMessageEveryone(conversation, messageEntity),
+        click: () => messageActions.deleteMessageEveryone(conversation, messageEntity),
         label: t('conversationContextMenuDeleteEveryone'),
       });
     }

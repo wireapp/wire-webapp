@@ -16,6 +16,10 @@ interface MessagesListParams {
   conversation: Conversation;
   conversationRepository: ConversationRepository;
   invitePeople: (convesation: Conversation) => void;
+  messageActions: {
+    deleteMessage: (conversation: Conversation, message: Message) => void;
+    deleteMessageEveryone: (conversation: Conversation, message: Message) => void;
+  };
   messageRepository: MessageRepository;
   onClickMessage: (message: ContentMessage, event: React.MouseEvent) => void;
   resetSession: (messageError: DecryptErrorMessage) => void;
@@ -39,6 +43,7 @@ const MessagesList: React.FC<MessagesListParams> = ({
   cancelConnectionRequest,
   resetSession,
   invitePeople,
+  messageActions,
 }) => {
   const {messages} = useKoSubscribableChildren(conversation, ['messages']);
   const [focusedMessage, setFocusedMessage] = useState<string>();
@@ -92,7 +97,7 @@ const MessagesList: React.FC<MessagesListParams> = ({
         key={message.id}
         message={message}
         previousMessage={previousMessage}
-        actionsViewModel={undefined}
+        messageActions={messageActions}
         conversation={conversation}
         conversationLastReadTimestamp={conversationLastReadTimestamp}
         hasReadReceiptsTurnedOn={conversationRepository.expectReadReceipt(conversation)}
@@ -152,6 +157,7 @@ registerReactComponent('messages-list', {
     resetSession,
     invitePeople,
     cancelConnectionRequest,
+    messageActions,
     `,
   component: MessagesList,
 });
