@@ -1,4 +1,4 @@
-import React, {useEffect, useMemo, useRef, useState} from 'react';
+import React, {useEffect, useLayoutEffect, useMemo, useRef, useState} from 'react';
 import {ConversationRepository} from 'src/script/conversation/ConversationRepository';
 import {MessageRepository} from 'src/script/conversation/MessageRepository';
 import {Conversation} from '../../entity/Conversation';
@@ -28,8 +28,8 @@ interface MessagesListParams {
   selfUser: User;
   showImageDetails: (message: Message, event: React.MouseEvent) => void;
   showMessageDetails: (message: Message, showLikes?: boolean) => void;
-  showUserDetails: (user: User) => void;
   showParticipants: (users: User[]) => void;
+  showUserDetails: (user: User) => void;
 }
 
 const MessagesList: React.FC<MessagesListParams> = ({
@@ -73,11 +73,12 @@ const MessagesList: React.FC<MessagesListParams> = ({
   };
 
   const messagesEndRef = useRef(null);
+  const scrollHeight = useRef(0);
   const updateScroll = (endElement: HTMLElement | undefined) => {
     if (!endElement) {
       return;
     }
-    const scrollingContainer = endElement.parentElement.parentElement;
+    const scrollingContainer = endElement.parentElement.parentElement.parentElement;
     if (!scrollingContainer) {
       return;
     }
@@ -86,10 +87,14 @@ const MessagesList: React.FC<MessagesListParams> = ({
     const shouldStickToBottom = scrollPosition > scrollEndValue - 100;
     if (shouldStickToBottom) {
       endElement.scrollIntoView();
+    } else if (scrollPosition === 0) {
+      // If we hit the top and new messages were loaded, we keep the scroll position stable
+      scrollingContainer.scrollTo({top: scrollingContainer.scrollHeight - scrollHeight.current});
     }
+    scrollHeight.current = scrollingContainer.scrollHeight;
   };
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     updateScroll(messagesEndRef.current);
   }, [messages, messagesEndRef]);
 
