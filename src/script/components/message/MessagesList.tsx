@@ -156,10 +156,10 @@ const MessagesList: React.FC<MessagesListParams> = ({
     );
   });
   return (
-    <div className={`messages ${verticallyCenterMessage() ? 'flex-center' : ''}`}>
-      {messageViews}
+    <>
+      <div className={`messages ${verticallyCenterMessage() ? 'flex-center' : ''}`}>{messageViews}</div>
       <div ref={messagesEndRef} />
-    </div>
+    </>
   );
 };
 
