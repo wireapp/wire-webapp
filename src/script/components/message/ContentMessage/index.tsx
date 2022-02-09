@@ -163,13 +163,15 @@ const TextMessage: React.FC<TextMessageProps> = ({
   onClickButton,
   onLike,
 }) => {
-  const {headerSenderName, timestamp, ephemeral_caption, ephemeral_status} = useKoSubscribableChildren(message, [
-    'headerSenderName',
-    'timestamp',
-    'ephemeral_caption',
-    'ephemeral_status',
-    'status',
-  ]);
+  const {headerSenderName, timestamp, ephemeral_caption, ephemeral_status, assets, other_likes} =
+    useKoSubscribableChildren(message, [
+      'headerSenderName',
+      'timestamp',
+      'ephemeral_caption',
+      'ephemeral_status',
+      'assets',
+      'other_likes',
+    ]);
 
   const avatarSection = shouldShowAvatar ? (
     <div className="message-header">
@@ -241,7 +243,7 @@ const TextMessage: React.FC<TextMessageProps> = ({
           </div>
         )}
 
-        {message.assets().map(asset => (
+        {assets.map(asset => (
           <ContentAsset
             key={asset.type}
             asset={asset}
@@ -253,7 +255,7 @@ const TextMessage: React.FC<TextMessageProps> = ({
           />
         ))}
 
-        {!message.other_likes().length && message.isReactable() && (
+        {!other_likes.length && message.isReactable() && (
           <div className="message-body-like">
             <MessageLike
               className="message-body-like-icon like-button message-show-on-hover"
@@ -294,7 +296,7 @@ const TextMessage: React.FC<TextMessageProps> = ({
           />
         </div>
       </div>
-      {message.other_likes().length > 0 && (
+      {other_likes.length > 0 && (
         <MessageFooterLike
           message={message}
           is1to1Conversation={conversation.is1to1()}
