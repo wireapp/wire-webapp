@@ -241,7 +241,7 @@ const TextMessage: React.FC<TextMessageProps> = ({
 
         {message.assets().map(asset => (
           <ContentAsset
-            key={asset.id}
+            key={asset.type}
             asset={asset}
             message={message}
             selfId={selfId}

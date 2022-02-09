@@ -1,7 +1,7 @@
 import React, {useEffect, useMemo, useRef, useState} from 'react';
 import {ConversationRepository} from 'src/script/conversation/ConversationRepository';
 import {MessageRepository} from 'src/script/conversation/MessageRepository';
-import {Conversation} from 'src/script/entity/Conversation';
+import {Conversation} from '../../entity/Conversation';
 import {ContentMessage} from 'src/script/entity/message/ContentMessage';
 import {DecryptErrorMessage} from 'src/script/entity/message/DecryptErrorMessage';
 import {MemberMessage} from 'src/script/entity/message/MemberMessage';
@@ -15,6 +15,7 @@ interface MessagesListParams {
   cancelConnectionRequest: (message: MemberMessage) => void;
   conversation: Conversation;
   conversationRepository: ConversationRepository;
+  getVisibleCallback: (conversation: Conversation, message: Message) => () => void | undefined;
   invitePeople: (convesation: Conversation) => void;
   messageActions: {
     deleteMessage: (conversation: Conversation, message: Message) => void;
@@ -27,8 +28,8 @@ interface MessagesListParams {
   selfUser: User;
   showImageDetails: (message: Message, event: React.MouseEvent) => void;
   showMessageDetails: (message: Message, showLikes?: boolean) => void;
-  showParticipants: (users: User[]) => void;
   showUserDetails: (user: User) => void;
+  showParticipants: (users: User[]) => void;
 }
 
 const MessagesList: React.FC<MessagesListParams> = ({
@@ -36,6 +37,7 @@ const MessagesList: React.FC<MessagesListParams> = ({
   selfUser,
   conversationRepository,
   messageRepository,
+  getVisibleCallback,
   onClickMessage,
   showUserDetails,
   showMessageDetails,
@@ -99,9 +101,12 @@ const MessagesList: React.FC<MessagesListParams> = ({
   const messageViews = messages.map((message, index) => {
     const previousMessage = index > 0 && messages.at(index - 1);
     const isLastDeliveredMessage = conversation.getLastDeliveredMessage() === message;
+
+    const visibleCallback = getVisibleCallback(conversation, message);
     return (
       <MessageWrapper
         key={message.id}
+        onVisible={visibleCallback}
         message={message}
         previousMessage={previousMessage}
         messageActions={messageActions}
@@ -167,5 +172,6 @@ registerReactComponent('messages-list', {
     cancelConnectionRequest,
     messageActions,
     onLoading,
+    getVisibleCallback,
   }"></div>`,
 });

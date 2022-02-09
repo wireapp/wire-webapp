@@ -67,6 +67,7 @@ import MemberMessage from './MemberMessage';
 import PingMessage from './PingMessage';
 import TextMessage from './ContentMessage';
 import React, {useEffect, useState} from 'react';
+import InViewport from 'Components/utils/InViewport';
 
 export interface MessageActions {
   onClickAvatar: (user: User) => void;
@@ -97,6 +98,7 @@ interface MessageParams extends MessageActions {
   };
   messageRepository: MessageRepository;
   onContentUpdated: () => void;
+  onVisible?: () => void;
   selfId: QualifiedId;
   shouldShowInvitePeople: boolean;
   teamState?: TeamState;
@@ -164,6 +166,7 @@ const MessageWrapper: React.FC<MessageParams & {shouldShowAvatar: boolean}> = ({
   onClickResetSession,
   onClickCancelRequest,
   onLike,
+  onVisible,
   messageRepository,
   messageActions,
   teamState = container.resolve(TeamState),
@@ -270,7 +273,7 @@ const MessageWrapper: React.FC<MessageParams & {shouldShowAvatar: boolean}> = ({
   });
 
   if (message.isContent()) {
-    return (
+    const content = (
       <TextMessage
         message={message}
         findMessage={findMessage}
@@ -292,6 +295,10 @@ const MessageWrapper: React.FC<MessageParams & {shouldShowAvatar: boolean}> = ({
         onClickReceipts={onClickReceipts}
       />
     );
+    if (onVisible) {
+      return <InViewport onVisible={onVisible}>{content}</InViewport>;
+    }
+    return content;
   }
   if (message.isUnableToDecrypt()) {
     return <DecryptionErrorMessage message={message} onClickResetSession={onClickResetSession} />;
@@ -382,7 +389,6 @@ const Wrapper: React.FC<
     <div
       className={`message ${isMarked ? 'message-marked' : ''}`}
       key={message.id}
-      data-bind="in_viewport: {onVisible: getInViewportCallback(conversation(), message), container: getMessagesContainer()}"
       data-uie-uid={message.id}
       data-uie-value={message.super_type}
       data-uie-expired-status={message.ephemeral_expires()}

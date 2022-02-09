@@ -64,7 +64,7 @@ export class MessageListViewModel {
   readonly focusedMessage: ko.Observable<string>;
   readonly conversation: ko.Observable<Conversation>;
   readonly verticallyCenterMessage: ko.PureComputed<boolean>;
-  private readonly conversationLoaded: ko.Observable<boolean>;
+  readonly conversationLoaded = ko.observable(false);
   conversationLastReadTimestamp: number;
   private readonly readMessagesBuffer: ko.ObservableArray<{conversation: Conversation; message: Message}>;
   private readonly messagesChangeSubscription: ko.Subscription;
@@ -90,9 +90,6 @@ export class MessageListViewModel {
 
     this.conversation = ko.observable(new Conversation());
 
-    amplify.subscribe(WebAppEvents.INPUT.RESIZE, this.handleInputResize);
-
-    this.conversationLoaded = ko.observable(false);
     // Store last read to show until user switches conversation
     this.conversationLastReadTimestamp = undefined;
 
@@ -145,48 +142,14 @@ export class MessageListViewModel {
     this.conversationLastReadTimestamp = undefined;
   };
 
-  private readonly handleInputResize = (inputSizeDiff: number): void => {
-    /* TODO migrate
-    if (inputSizeDiff) {
-      scrollBy(this.getMessagesContainer(), inputSizeDiff);
-    } else if (this.shouldStickToBottom()) {
-      scrollToBottom(this.getMessagesContainer());
-    }
-    */
-  };
-
   changeConversation = async (conversationEntity: Conversation, messageEntity: Message): Promise<void> => {
     // Clean up old conversation
-    this.conversationLoaded(false);
     if (this.conversation()) {
       this.releaseConversation(this.conversation());
     }
 
     // Update new conversation
     this.conversation(conversationEntity);
-    this.conversationLoaded(true);
-    return;
-
-    // Keep last read timestamp to render unread when entering conversation
-    if (this.conversation().unreadState().allEvents.length) {
-      this.conversationLastReadTimestamp = this.conversation().last_read_timestamp();
-    }
-
-    conversationEntity.is_loaded(false);
-    await this.loadConversation(conversationEntity, messageEntity);
-    await this.renderConversation(conversationEntity, messageEntity);
-    conversationEntity.is_loaded(true);
-  };
-
-  private readonly loadConversation = async (
-    conversationEntity: Conversation,
-    messageEntity: Message,
-  ): Promise<ContentMessage[]> => {
-    await this.conversationRepository.updateParticipatingUserEntities(conversationEntity, false, true);
-
-    return messageEntity
-      ? this.conversationRepository.getMessagesWithOffset(conversationEntity, messageEntity)
-      : this.conversationRepository.getPrecedingMessages(conversationEntity);
   };
 
   private readonly isLastReceivedMessage = (messageEntity: Message, conversationEntity: Conversation): boolean => {
@@ -196,102 +159,6 @@ export class MessageListViewModel {
   readonly getMessagesContainer = () => {
     return this.messagesContainer;
   };
-
-  private readonly renderConversation = (conversationEntity: Conversation, messageEntity: Message): Promise<void> => {
-    return undefined;
-    /*
-    const messages_container = this.getMessagesContainer();
-
-    const is_current_conversation = conversationEntity === this.conversation();
-    if (!is_current_conversation) {
-      this.logger.info(`Skipped re-loading current conversation '${conversationEntity.display_name()}'`);
-      return Promise.resolve();
-    }
-
-    return new Promise(resolve => {
-      window.setTimeout(() => {
-        // Reset scroll position
-        messages_container.scrollTop = 0;
-
-        if (messageEntity) {
-          this.focusMessage(messageEntity.id);
-        } else {
-          const unread_message = $('.message-timestamp-unread');
-          if (unread_message.length) {
-            const unreadMarkerPosition = unread_message.parents('.message').position();
-
-            scrollBy(messages_container, unreadMarkerPosition.top);
-          } else {
-            scrollToBottom(messages_container);
-          }
-        }
-
-        window.addEventListener('resize', this.adjustScroll);
-
-        let shouldStickToBottomOnMessageAdd: boolean;
-
-        this.messagesBeforeChangeSubscription = conversationEntity.messages_visible.subscribe(
-          () => {
-            // we need to keep track of the scroll position before the message array has changed
-            shouldStickToBottomOnMessageAdd = this.shouldStickToBottom();
-          },
-          null,
-          'beforeChange',
-        );
-
-        // Subscribe for incoming messages
-        this.messagesChangeSubscription = conversationEntity.messages_visible.subscribe(
-          changedMessages => {
-            this.scrollAddedMessagesIntoView(changedMessages, shouldStickToBottomOnMessageAdd);
-            shouldStickToBottomOnMessageAdd = undefined;
-          },
-          null,
-          'arrayChange',
-        );
-        resolve();
-      }, 100);
-    });
-    */
-  };
-
-  /*
-  private readonly scrollAddedMessagesIntoView = (
-    changedMessages: ko.utils.ArrayChanges<Message | ContentMessage | MemberMessage>,
-    shouldStickToBottom: boolean,
-  ) => {
-    return;
-    const messages_container = this.getMessagesContainer();
-    const lastAddedItem = changedMessages
-      .slice()
-      .reverse()
-      .find(changedMessage => changedMessage.status === 'added');
-
-    // We are only interested in items that were added
-    if (!lastAddedItem) {
-      return;
-    }
-
-    const lastMessage = lastAddedItem.value;
-
-    if (lastMessage) {
-      // Message was prepended
-      if (lastMessage.timestamp() < this.conversation().last_event_timestamp()) {
-        return;
-      }
-
-      // Scroll to bottom if self user send the message
-      if (lastMessage.from === this.selfUser().id) {
-        window.requestAnimationFrame(() => scrollToBottom(messages_container));
-        return;
-      }
-    }
-
-    // Scroll to the end of the list if we are under a certain threshold
-    if (shouldStickToBottom) {
-      window.requestAnimationFrame(() => scrollToBottom(messages_container));
-    }
-  };
-  */
 
   loadPrecedingMessages = async (): Promise<void> => {
     const shouldPullMessages = !this.conversation().is_pending() && this.conversation().hasAdditionalMessages();
