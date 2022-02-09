@@ -94,7 +94,7 @@ export class GroupCreationViewModel {
     this.selectedContacts = ko.observableArray([]);
     this.showContacts = ko.observable(false);
     this.participantsInput = ko.observable('');
-    this.accessState = ko.observable(ACCESS_STATE.TEAM.TEAM_ONLY);
+    this.accessState = ko.observable(ACCESS_STATE.TEAM.GUESTS_SERVICES);
 
     this.isServicesRoom = ko.pureComputed(() => this.accessState() === ACCESS_STATE.TEAM.SERVICES);
     this.isGuestAndServicesRoom = ko.pureComputed(() => this.accessState() === ACCESS_STATE.TEAM.GUESTS_SERVICES);
