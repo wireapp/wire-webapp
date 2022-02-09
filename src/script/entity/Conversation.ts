@@ -373,15 +373,13 @@ export class Conversation {
     this.hasGlobalMessageTimer = ko.pureComputed(() => this.globalMessageTimer() > 0);
 
     this.messages_unordered = ko.observableArray();
-    this.messages = ko
-      .pureComputed(() =>
-        this.messages_unordered()
-          .slice()
-          .sort((message_a, message_b) => {
-            return message_a.timestamp() - message_b.timestamp();
-          }),
-      )
-      .extend({rateLimit: 100});
+    this.messages = ko.pureComputed(() =>
+      this.messages_unordered()
+        .slice()
+        .sort((message_a, message_b) => {
+          return message_a.timestamp() - message_b.timestamp();
+        }),
+    );
 
     this.incomingMessages = ko.observableArray();
 
