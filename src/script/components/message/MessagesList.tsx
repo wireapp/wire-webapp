@@ -16,6 +16,7 @@ interface MessagesListParams {
   conversation: Conversation;
   conversationRepository: ConversationRepository;
   getVisibleCallback: (conversation: Conversation, message: Message) => () => void | undefined;
+  initialMessage: Message;
   invitePeople: (convesation: Conversation) => void;
   messageActions: {
     deleteMessage: (conversation: Conversation, message: Message) => void;
@@ -34,6 +35,7 @@ interface MessagesListParams {
 
 const MessagesList: React.FC<MessagesListParams> = ({
   conversation,
+  initialMessage,
   selfUser,
   conversationRepository,
   messageRepository,
@@ -50,7 +52,7 @@ const MessagesList: React.FC<MessagesListParams> = ({
   onLoading,
 }) => {
   const {messages} = useKoSubscribableChildren(conversation, ['messages']);
-  const [focusedMessage, setFocusedMessage] = useState<string>();
+  const [focusedMessage, setFocusedMessage] = useState<string>(initialMessage?.id);
 
   const conversationLastReadTimestamp = useMemo(() => conversation.last_read_timestamp(), []);
   const shouldShowInvitePeople =
@@ -100,7 +102,7 @@ const MessagesList: React.FC<MessagesListParams> = ({
 
   useEffect(() => {
     onLoading(true);
-    loadConversation(conversation, undefined).then(() => onLoading(false));
+    loadConversation(conversation, initialMessage).then(() => onLoading(false));
   }, []);
 
   const messageViews = messages.map((message, index) => {
@@ -164,6 +166,7 @@ registerReactComponent('messages-list', {
   component: MessagesList,
   template: `<div data-bind="react: {
     conversation: ko.unwrap(conversation),
+    initialMessage: ko.unwrap(initialMessage),
     conversationRepository,
     messageRepository,
     selfUser: ko.unwrap(selfUser),

@@ -62,6 +62,7 @@ export class MessageListViewModel {
   readonly actionsViewModel: ActionsViewModel;
   readonly selfUser: ko.Observable<User>;
   readonly focusedMessage: ko.Observable<string>;
+  readonly initialMessage: ko.Observable<Message | undefined> = ko.observable();
   readonly conversation: ko.Observable<Conversation>;
   readonly verticallyCenterMessage: ko.PureComputed<boolean>;
   readonly conversationLoaded = ko.observable(false);
@@ -149,6 +150,7 @@ export class MessageListViewModel {
     }
 
     // Update new conversation
+    this.initialMessage(messageEntity);
     this.conversation(conversationEntity);
   };
 
