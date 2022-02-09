@@ -16,6 +16,7 @@ import {ClientState} from '../client/ClientState';
 import {AppLockState} from '../user/AppLockState';
 import {AppLockRepository} from '../user/AppLockRepository';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
+import {ModalsViewModel} from '../view_model/ModalsViewModel';
 
 export enum APPLOCK_STATE {
   FORGOT = 'applock.forgot',
@@ -116,6 +117,11 @@ const AppLock: React.FC<AppLockProps> = ({
       showAppLock();
     } else {
       appLockRepository.removeCode();
+      amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.ACKNOWLEDGE, {
+        text: {
+          title: t('featureConfigChangeModalAudioVideoHeadline', {brandName: Config.getConfig().BRAND_NAME}),
+        },
+      });
     }
   }, [isAppLockEnabled]);
 
@@ -128,7 +134,7 @@ const AppLock: React.FC<AppLockProps> = ({
         window.removeEventListener('focus', clearAppLockTimeout);
       };
     }
-    return undefined;
+    return clearAppLockTimeout();
   }, [isAppLockActivated, clearAppLockTimeout, startAppLockTimeout]);
 
   useEffect(() => {
@@ -148,12 +154,12 @@ const AppLock: React.FC<AppLockProps> = ({
     };
   }, [state, isVisible]);
 
-  const showAppLock = () => {
+  const showAppLock = useCallback(() => {
     if (isAppLockEnabled) {
       setState(appLockState.hasPassphrase() ? APPLOCK_STATE.LOCKED : APPLOCK_STATE.SETUP);
       setIsVisible(true);
     }
-  };
+  }, [isAppLockEnabled]);
 
   const onUnlock = async (event: React.FormEvent) => {
     event.preventDefault();
