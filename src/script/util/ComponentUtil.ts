@@ -18,7 +18,8 @@
  */
 
 import ko, {Unwrapped} from 'knockout';
-import {useEffect, useState} from 'react';
+import React, {useEffect, useState} from 'react';
+import ReactDOM from 'react-dom';
 interface RegisterReactComponent<Props> {
   component: React.ComponentType<Props>;
 }
@@ -33,6 +34,49 @@ interface RegisterReactComponentWithBindings<T> extends RegisterReactComponent<T
   template?: never;
 }
 
+/**
+ * Registers a static react component against the ko world.
+ * A Static component is a component that will not get updates for the observables directly given to it.
+ * It can still react to nested observables given by using the `useKoSubribableChildren` hook.
+ * A Static component is much optimal, in term of performance, that calling registerReactComponent (that will get a full state update everytime an observable changes).
+ *
+ * @param name Name of the component to register. can be used a `<component-name>` directly in ko
+ * @param {component}
+ */
+export function registerStaticReactComponent<Props>(name: string, component: React.ComponentType<Props>) {
+  if (ko.components.isRegistered(name)) {
+    return;
+  }
+
+  ko.components.register(name, {
+    template: '<!-- -->', // We do not need any particular template as this is going to be replaced by react content
+    viewModel: {
+      createViewModel: (params: Props, {element}: {element: HTMLElement}) => {
+        const unwrappedParams: Props = Object.entries(params)
+          .filter(([key]) => key !== '$raw') // Filter ko default $raw values
+          .reduce((acc, [key, value]) => {
+            return {...acc, [key]: ko.unwrap(value)};
+          }, {} as Props);
+        ReactDOM.render(React.createElement(component, unwrappedParams), element);
+
+        return {
+          dispose() {
+            ReactDOM.unmountComponentAtNode(element);
+          },
+        };
+      },
+    },
+  });
+}
+
+/**
+ * Registers a react component that will get a full state update every time parameter observable gets an update.
+ *
+ * @deprecated Please use `registerStaticReactComponent` instead. Just use it if you need observable updates from direct parameters
+ *   eg. `<component params="myObservable">` if you need your component to update when `myObservable` changes, you will need this function
+ * @param name Name of the component to register. can be used a `<component-name>` directly in ko
+ * @param {component}
+ */
 export function registerReactComponent<Props>(
   name: string,
   {
