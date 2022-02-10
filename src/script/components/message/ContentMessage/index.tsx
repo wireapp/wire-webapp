@@ -166,7 +166,7 @@ const TextMessage: React.FC<TextMessageProps> = ({
   onLike,
 }) => {
   const {entries: menuEntries} = useKoSubscribableChildren(contextMenu, ['entries']);
-  const {headerSenderName, timestamp, ephemeral_caption, ephemeral_status, assets, other_likes} =
+  const {headerSenderName, timestamp, ephemeral_caption, ephemeral_status, assets, other_likes, was_edited} =
     useKoSubscribableChildren(message, [
       'headerSenderName',
       'timestamp',
@@ -174,6 +174,7 @@ const TextMessage: React.FC<TextMessageProps> = ({
       'ephemeral_status',
       'assets',
       'other_likes',
+      'was_edited',
     ]);
 
   useEffect(() => {
@@ -233,7 +234,7 @@ const TextMessage: React.FC<TextMessageProps> = ({
             <Icon.Guest />
           </span>
         )}
-        {message.was_edited() && (
+        {was_edited && (
           <span className="message-header-label-icon icon-edit" title={message.displayEditedTimestamp()}></span>
         )}
       </div>
