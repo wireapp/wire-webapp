@@ -8,7 +8,6 @@ import {MemberMessage} from 'src/script/entity/message/MemberMessage';
 import {Message} from 'src/script/entity/message/Message';
 import {User} from 'src/script/entity/User';
 import {registerStaticReactComponent, useKoSubscribableChildren} from 'Util/ComponentUtil';
-import {scrollEnd} from 'Util/scroll-helpers';
 import MessageWrapper from './MessageWrapper';
 
 interface MessagesListParams {
@@ -81,7 +80,7 @@ const MessagesList: React.FC<MessagesListParams> = ({
     return false;
   };
 
-  const messagesEndRef = useRef(null);
+  const container = useRef();
   const scrollHeight = useRef(0);
   const updateScroll = (endElement: HTMLElement | undefined) => {
     if (!endElement) {
@@ -91,11 +90,11 @@ const MessagesList: React.FC<MessagesListParams> = ({
     if (!scrollingContainer) {
       return;
     }
-    const scrollPosition = Math.ceil(scrollingContainer.scrollTop);
-    const scrollEndValue = Math.ceil(scrollEnd(scrollingContainer));
-    const shouldStickToBottom = scrollPosition > scrollEndValue - 100;
+    const scrollPosition = scrollingContainer.scrollTop + scrollingContainer.clientHeight;
+    const previousScrollHeight = scrollHeight.current;
+    const shouldStickToBottom = scrollPosition > previousScrollHeight - 100;
     if (shouldStickToBottom) {
-      endElement.scrollIntoView?.();
+      scrollingContainer.scrollTo({top: scrollingContainer.scrollHeight});
     } else if (scrollPosition === 0) {
       // If we hit the top and new messages were loaded, we keep the scroll position stable
       scrollingContainer.scrollTo({top: scrollingContainer.scrollHeight - scrollHeight.current});
@@ -105,12 +104,12 @@ const MessagesList: React.FC<MessagesListParams> = ({
 
   useLayoutEffect(() => {
     // Update scroll position a first time synchronously
-    updateScroll(messagesEndRef.current);
+    updateScroll(container.current);
     setTimeout(() => {
       // in case some content loaded async, retrigger a scroll
-      updateScroll(messagesEndRef.current);
+      updateScroll(container.current);
     });
-  }, [messages, messagesEndRef]);
+  }, [messages, container]);
 
   useEffect(() => {
     onLoading(true);
@@ -118,7 +117,7 @@ const MessagesList: React.FC<MessagesListParams> = ({
       setTimeout(() => {
         if (!focusedMessage) {
           // We update the scroll in case there are no focused message
-          updateScroll(messagesEndRef.current);
+          updateScroll(container.current);
         }
         onLoading(false);
       }, 100);
@@ -165,7 +164,7 @@ const MessagesList: React.FC<MessagesListParams> = ({
             conversationRepository.getMessagesWithOffset(conversation, messageEntity);
           }
         }}
-        onContentUpdated={() => updateScroll(messagesEndRef.current)}
+        onContentUpdated={() => updateScroll(container.current)}
         onLike={message => messageRepository.toggleLike(conversation, message)}
         selfId={selfUser.qualifiedId}
         shouldShowInvitePeople={shouldShowInvitePeople}
@@ -173,10 +172,9 @@ const MessagesList: React.FC<MessagesListParams> = ({
     );
   });
   return (
-    <>
-      <div className={`messages ${verticallyCenterMessage() ? 'flex-center' : ''}`}>{messageViews}</div>
-      <div ref={messagesEndRef} />
-    </>
+    <div ref={container} className={`messages ${verticallyCenterMessage() ? 'flex-center' : ''}`}>
+      {messageViews}
+    </div>
   );
 };
 
