@@ -182,22 +182,6 @@ const MessageWrapper: React.FC<MessageParams & {shouldShowAvatar: boolean}> = ({
     }
   };
 
-  useEffect(() => {
-    if (message.isContent() && message.hasAssetText()) {
-      // add a listener to any changes to the assets. This will warn the parent that the message has changed
-      const assetSubscription = message.assets.subscribe(onContentUpdated);
-      // also listen for link previews on a single Text entity
-      const previewSubscription = (message.getFirstAsset() as Text).previews.subscribe(onContentUpdated);
-      return () => {
-        if (assetSubscription) {
-          assetSubscription.dispose();
-          previewSubscription.dispose();
-        }
-      };
-    }
-    return undefined;
-  }, []);
-
   const contextMenuEntries = ko.pureComputed(() => {
     const messageEntity = message;
     const entries: ContextMenuEntry[] = [];
@@ -283,6 +267,7 @@ const MessageWrapper: React.FC<MessageParams & {shouldShowAvatar: boolean}> = ({
         selfId={selfId}
         isLastDeliveredMessage={isLastDeliveredMessage}
         onLike={onLike}
+        onContentUpdated={onContentUpdated}
         onClickMessage={onClickMessage}
         onClickTimestamp={onClickTimestamp}
         onClickLikes={onClickLikes}
