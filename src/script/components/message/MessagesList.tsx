@@ -103,7 +103,12 @@ const MessagesList: React.FC<MessagesListParams> = ({
   };
 
   useLayoutEffect(() => {
+    // Update scroll position a first time synchronously
     updateScroll(messagesEndRef.current);
+    setTimeout(() => {
+      // in case some content loaded async, retrigger a scroll
+      updateScroll(messagesEndRef.current);
+    });
   }, [messages, messagesEndRef]);
 
   useEffect(() => {
