@@ -119,6 +119,7 @@ const AppLock: React.FC<AppLockProps> = ({
       appLockRepository.removeCode();
       amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.ACKNOWLEDGE, {
         text: {
+          htmlMessage: t('featureConfigChangeModalApplock'),
           title: t('featureConfigChangeModalAudioVideoHeadline', {brandName: Config.getConfig().BRAND_NAME}),
         },
       });
