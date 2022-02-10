@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2021 Wire Swiss GmbH
+ * Copyright (C) 2022 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,6 +18,7 @@
  */
 
 import React from 'react';
+import ko from 'knockout';
 import TextMessage, {TextMessageProps} from './index';
 import {render, waitFor} from '@testing-library/react';
 import {ContentMessage} from '../../../entity/message/ContentMessage';
@@ -40,7 +41,7 @@ describe('message', () => {
     message.assets.push(textAsset);
 
     defaultParams = {
-      contextMenuEntries: [],
+      contextMenu: {entries: ko.observable([])},
       conversation: new Conversation(),
       findMessage: jest.fn(),
       isLastDeliveredMessage: false,
