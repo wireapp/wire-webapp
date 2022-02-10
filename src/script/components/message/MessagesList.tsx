@@ -86,7 +86,7 @@ const MessagesList: React.FC<MessagesListParams> = ({
     if (!endElement) {
       return;
     }
-    const scrollingContainer = endElement.parentElement.parentElement;
+    const scrollingContainer = endElement.parentElement;
     if (!scrollingContainer) {
       return;
     }
