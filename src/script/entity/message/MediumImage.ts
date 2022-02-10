@@ -29,7 +29,6 @@ export class MediumImage extends FileAsset {
   public readonly correlation_id: string;
   public height: string;
   public width: string;
-  public ratio: number;
 
   constructor(id: string) {
     super(id);
@@ -42,5 +41,9 @@ export class MediumImage extends FileAsset {
 
     this.resource = ko.observable();
     this.logger = getLogger('MediumImage');
+  }
+
+  public get ratio() {
+    return parseInt(this.height, 10) / parseInt(this.width, 10);
   }
 }

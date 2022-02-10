@@ -197,6 +197,7 @@ const QuotedMessage: React.FC<QuotedMessageProps> = ({
               <Image
                 className="message-quote__image"
                 asset={asset.resource()}
+                aspectRatio={asset.ratio}
                 click={(asset, event) => showDetail(quotedMessage, event)}
               />
             </div>
