@@ -54,10 +54,11 @@ const MessagesList: React.FC<MessagesListParams> = ({
   messageActions,
   onLoading,
 }) => {
-  const {messages, lastDeliveredMessage} = useKoSubscribableChildren(conversation, [
+  const {messages: allMessages, lastDeliveredMessage} = useKoSubscribableChildren(conversation, [
     'messages',
     'lastDeliveredMessage',
   ]);
+  const messages = allMessages.filter(message => message.visible());
   const [focusedMessage, setFocusedMessage] = useState<string>(initialMessage?.id);
 
   const conversationLastReadTimestamp = useMemo(() => conversation.last_read_timestamp(), []);
