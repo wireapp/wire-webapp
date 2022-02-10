@@ -115,7 +115,7 @@ const AppLock: React.FC<AppLockProps> = ({
   useEffect(() => {
     if (isAppLockEnabled) {
       showAppLock();
-    } else {
+    } else if (appLockState.hasPassphrase()) {
       appLockRepository.removeCode();
       amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.ACKNOWLEDGE, {
         text: {
@@ -155,12 +155,10 @@ const AppLock: React.FC<AppLockProps> = ({
     };
   }, [state, isVisible]);
 
-  const showAppLock = useCallback(() => {
-    if (isAppLockEnabled) {
-      setState(appLockState.hasPassphrase() ? APPLOCK_STATE.LOCKED : APPLOCK_STATE.SETUP);
-      setIsVisible(true);
-    }
-  }, [isAppLockEnabled]);
+  const showAppLock = () => {
+    setState(appLockState.hasPassphrase() ? APPLOCK_STATE.LOCKED : APPLOCK_STATE.SETUP);
+    setIsVisible(true);
+  };
 
   const onUnlock = async (event: React.FormEvent) => {
     event.preventDefault();
