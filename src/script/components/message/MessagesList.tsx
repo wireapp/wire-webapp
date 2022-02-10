@@ -116,7 +116,10 @@ const MessagesList: React.FC<MessagesListParams> = ({
     onLoading(true);
     loadConversation(conversation, initialMessage).then(() => {
       setTimeout(() => {
-        updateScroll(messagesEndRef.current);
+        if (!focusedMessage) {
+          // We update the scroll in case there are no focused message
+          updateScroll(messagesEndRef.current);
+        }
         onLoading(false);
       }, 100);
     });

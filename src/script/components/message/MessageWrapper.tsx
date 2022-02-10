@@ -66,7 +66,7 @@ import SystemMessage from './SystemMessage';
 import MemberMessage from './MemberMessage';
 import PingMessage from './PingMessage';
 import TextMessage from './ContentMessage';
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useLayoutEffect, useRef, useState} from 'react';
 import InViewport from 'Components/utils/InViewport';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import MessageTime from './MessageTime';
@@ -358,9 +358,16 @@ const Wrapper: React.FC<
   MessageParams & {conversationLastReadTimestamp: number; previousMessage?: BaseMessage}
 > = props => {
   const {message, previousMessage, conversationLastReadTimestamp, isMarked} = props;
+  const messageElementRef = useRef<HTMLDivElement>();
   const {status} = useKoSubscribableChildren(message, ['status']);
   const timeago = useRelativeTimestamp(message.timestamp());
   const timeagoDay = useRelativeTimestamp(message.timestamp(), true);
+
+  useLayoutEffect(() => {
+    if (isMarked) {
+      messageElementRef.current?.scrollIntoView?.({block: 'center'});
+    }
+  }, [isMarked]);
 
   const markerType = getMessageMarkerType(message, previousMessage, conversationLastReadTimestamp);
   const getTimestampClass = (): string => {
@@ -390,6 +397,7 @@ const Wrapper: React.FC<
   return (
     <div
       className={`message ${isMarked ? 'message-marked' : ''}`}
+      ref={messageElementRef}
       key={message.id}
       data-uie-uid={message.id}
       data-uie-value={message.super_type}
