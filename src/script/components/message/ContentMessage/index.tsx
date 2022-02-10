@@ -58,7 +58,7 @@ import {includesOnlyEmojis} from 'Util/EmojiUtil';
 import {MessageActions} from '../MessageWrapper';
 
 export interface TextMessageProps extends Omit<MessageActions, 'onClickResetSession'> {
-  contextMenuEntries: ContextMenuEntry[];
+  contextMenu: {entries: ko.Subscribable<ContextMenuEntry[]>};
   conversation: Conversation;
   findMessage: (conversation: Conversation, messageId: string) => Promise<ContentMessage | undefined>;
   focusMessage?: () => void;
@@ -153,7 +153,7 @@ const TextMessage: React.FC<TextMessageProps> = ({
   findMessage,
   selfId,
   isLastDeliveredMessage,
-  contextMenuEntries,
+  contextMenu,
   shouldShowAvatar,
   onClickReceipts,
   onClickAvatar,
@@ -165,6 +165,7 @@ const TextMessage: React.FC<TextMessageProps> = ({
   onContentUpdated,
   onLike,
 }) => {
+  const {entries: menuEntries} = useKoSubscribableChildren(contextMenu, ['entries']);
   const {headerSenderName, timestamp, ephemeral_caption, ephemeral_status, assets, other_likes} =
     useKoSubscribableChildren(message, [
       'headerSenderName',
@@ -285,10 +286,10 @@ const TextMessage: React.FC<TextMessageProps> = ({
         )}
 
         <div className="message-body-actions">
-          {contextMenuEntries.length > 0 && (
+          {menuEntries.length > 0 && (
             <span
               className="context-menu icon-more font-size-xs"
-              onClick={event => showContextMenu(event, contextMenuEntries, 'message-options-menu')}
+              onClick={event => showContextMenu(event, menuEntries, 'message-options-menu')}
             ></span>
           )}
           {ephemeral_status === EphemeralStatusType.ACTIVE && (
