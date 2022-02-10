@@ -101,6 +101,7 @@ interface MessageParams extends MessageActions {
   messageRepository: MessageRepository;
   onContentUpdated: () => void;
   onVisible?: () => void;
+  previousMessage?: BaseMessage;
   selfId: QualifiedId;
   shouldShowInvitePeople: boolean;
   teamState?: TeamState;
@@ -146,14 +147,15 @@ function useRelativeTimestamp(timestamp: number, asDay?: boolean) {
   return timeago;
 }
 
-const MessageWrapper: React.FC<MessageParams & {shouldShowAvatar: boolean}> = ({
+const MessageWrapper: React.FC<MessageParams & {hasMarker: boolean}> = ({
   message,
   conversation,
   selfId,
+  hasMarker,
   isSelfTemporaryGuest,
   isLastDeliveredMessage,
   shouldShowInvitePeople,
-  shouldShowAvatar,
+  previousMessage,
   hasReadReceiptsTurnedOn,
   onContentUpdated,
   onClickAvatar,
@@ -263,7 +265,8 @@ const MessageWrapper: React.FC<MessageParams & {shouldShowAvatar: boolean}> = ({
         message={message}
         findMessage={findMessage}
         conversation={conversation}
-        shouldShowAvatar={shouldShowAvatar}
+        previousMessage={previousMessage}
+        hasMarker={hasMarker}
         selfId={selfId}
         isLastDeliveredMessage={isLastDeliveredMessage}
         onLike={onLike}
@@ -339,9 +342,7 @@ const MessageWrapper: React.FC<MessageParams & {shouldShowAvatar: boolean}> = ({
   return null;
 };
 
-const Wrapper: React.FC<
-  MessageParams & {conversationLastReadTimestamp: number; previousMessage?: BaseMessage}
-> = props => {
+const Wrapper: React.FC<MessageParams & {conversationLastReadTimestamp: number}> = props => {
   const {message, previousMessage, conversationLastReadTimestamp, isMarked} = props;
   const messageElementRef = useRef<HTMLDivElement>();
   const {status} = useKoSubscribableChildren(message, ['status']);
@@ -364,21 +365,7 @@ const Wrapper: React.FC<
     };
     return classes[markerType];
   };
-  const shouldShowUserAvatar = (): boolean => {
-    if (!previousMessage) {
-      return true;
-    }
 
-    if (markerType !== MessageMarkerType.NONE) {
-      return true;
-    }
-
-    if (message.isContent() && message.replacing_message_id) {
-      return true;
-    }
-
-    return !previousMessage.isContent() || previousMessage.user().id !== message.user().id;
-  };
   return (
     <div
       className={`message ${isMarked ? 'message-marked' : ''}`}
@@ -404,7 +391,7 @@ const Wrapper: React.FC<
         </div>
       </div>
 
-      <MessageWrapper {...props} shouldShowAvatar={shouldShowUserAvatar()} />
+      <MessageWrapper {...props} hasMarker={markerType !== MessageMarkerType.NONE} />
     </div>
   );
 };

@@ -56,19 +56,21 @@ import {t} from 'Util/LocalizerUtil';
 import {StatusType} from '../../../message/StatusType';
 import {includesOnlyEmojis} from 'Util/EmojiUtil';
 import {MessageActions} from '../MessageWrapper';
+import {Message} from 'src/script/entity/message/Message';
 
 export interface TextMessageProps extends Omit<MessageActions, 'onClickResetSession'> {
   contextMenu: {entries: ko.Subscribable<ContextMenuEntry[]>};
   conversation: Conversation;
   findMessage: (conversation: Conversation, messageId: string) => Promise<ContentMessage | undefined>;
   focusMessage?: () => void;
+  hasMarker?: boolean;
   isLastDeliveredMessage: boolean;
   message: ContentMessage;
   onClickButton?: (message: ContentMessage, assetId: string) => void;
   onContentUpdated?: () => void;
+  previousMessage: Message;
   quotedMessage?: ContentMessage;
   selfId: QualifiedId;
-  shouldShowAvatar: boolean;
 }
 
 const ContentAsset = ({
@@ -152,9 +154,10 @@ const TextMessage: React.FC<TextMessageProps> = ({
   message,
   findMessage,
   selfId,
+  hasMarker,
   isLastDeliveredMessage,
   contextMenu,
-  shouldShowAvatar,
+  previousMessage,
   onClickReceipts,
   onClickAvatar,
   onClickImage,
@@ -176,6 +179,17 @@ const TextMessage: React.FC<TextMessageProps> = ({
       'other_likes',
       'was_edited',
     ]);
+  const shouldShowAvatar = (): boolean => {
+    if (!previousMessage || hasMarker) {
+      return true;
+    }
+
+    if (message.isContent() && was_edited) {
+      return true;
+    }
+
+    return !previousMessage.isContent() || previousMessage.user().id !== message.user().id;
+  };
 
   useEffect(() => {
     if (message.hasAssetText()) {
@@ -193,7 +207,7 @@ const TextMessage: React.FC<TextMessageProps> = ({
     return undefined;
   }, []);
 
-  const avatarSection = shouldShowAvatar ? (
+  const avatarSection = shouldShowAvatar() ? (
     <div className="message-header">
       <div className="message-header-icon">
         <Avatar participant={message.user()} onAvatarClick={onClickAvatar} avatarSize={AVATAR_SIZE.X_SMALL} />
