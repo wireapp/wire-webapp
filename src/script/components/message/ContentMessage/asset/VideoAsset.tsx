@@ -26,7 +26,7 @@ import type {ContentMessage} from '../../../../entity/message/ContentMessage';
 import type {FileAsset} from '../../../../entity/message/FileAsset';
 import {useAssetTransfer} from './AbstractAssetTransferStateTracker';
 import {TeamState} from '../../../../team/TeamState';
-import {useKoSubscribableChildren} from 'Util/ComponentUtil';
+import {registerStaticReactComponent, useKoSubscribableChildren} from 'Util/ComponentUtil';
 import SeekBar from './controls/SeekBar';
 import MediaButton from './controls/MediaButton';
 import {t} from 'Util/LocalizerUtil';
@@ -201,3 +201,4 @@ const VideoAsset: React.FC<VideoAssetProps> = ({
 };
 
 export default VideoAsset;
+registerStaticReactComponent('video-asset', VideoAsset);
