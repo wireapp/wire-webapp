@@ -83,7 +83,7 @@ const MessagesList: React.FC<MessagesListParams> = ({
 
   const container = useRef();
   const scrollHeight = useRef(0);
-  const hasElementInView = useRef(false);
+  const elementInView = useRef<{center?: boolean; element: HTMLElement}>();
   const updateScroll = (endElement: HTMLElement | undefined) => {
     if (!endElement) {
       return;
@@ -92,29 +92,37 @@ const MessagesList: React.FC<MessagesListParams> = ({
     if (!scrollingContainer) {
       return;
     }
-    if (scrollHeight.current === 0) {
+    if (elementInView.current) {
+      // If we have an element we want to focus
+      const {element, center} = elementInView.current;
+      // For older browsers we compute the position to scroll to manually
+      const rect = element.getBoundingClientRect();
+      const top = rect.top - scrollingContainer.getBoundingClientRect().top;
+      const distance = center ? top - scrollingContainer.offsetHeight / 2 : top;
+      scrollingContainer.scrollTop += distance;
+    } else if (scrollHeight.current === 0) {
       // For first render we want to scroll directly to the bottom.
-      scrollingContainer.scrollTo({top: scrollingContainer.scrollHeight});
+      scrollingContainer.scrollTop = scrollingContainer.scrollHeight;
     } else {
       const scrollBottomPosition = scrollingContainer.scrollTop + scrollingContainer.clientHeight;
       const previousScrollHeight = scrollHeight.current;
       const shouldStickToBottom = previousScrollHeight - scrollBottomPosition < 100;
       if (shouldStickToBottom) {
-        scrollingContainer.scrollTo({top: scrollingContainer.scrollHeight});
+        scrollingContainer.scrollTop = scrollingContainer.scrollHeight;
       } else if (scrollingContainer.scrollTop === 0) {
         // If we hit the top and new messages were loaded, we keep the scroll position stable
-        scrollingContainer.scrollTo({top: scrollingContainer.scrollHeight - scrollHeight.current});
+        scrollingContainer.scrollTop = scrollingContainer.scrollHeight - scrollHeight.current;
       }
     }
     scrollHeight.current = scrollingContainer.scrollHeight;
   };
 
   useLayoutEffect(() => {
-    if (loaded && !hasElementInView.current) {
+    if (loaded) {
       // We update the scroll in case there are no focused message
       updateScroll(container.current);
     }
-  }, [messages.length, container, loaded]);
+  }, [messages.length, container, loaded, elementInView]);
 
   useEffect(() => {
     onLoading(true);
@@ -143,9 +151,9 @@ const MessagesList: React.FC<MessagesListParams> = ({
         hasReadReceiptsTurnedOn={conversationRepository.expectReadReceipt(conversation)}
         isLastDeliveredMessage={isLastDeliveredMessage}
         isMarked={focusedMessage === message.id}
-        onScrolledTo={() => {
-          hasElementInView.current = true;
-          setTimeout(() => (hasElementInView.current = false));
+        scrollTo={(element, center) => {
+          elementInView.current = {center, element};
+          setTimeout(() => (elementInView.current = undefined));
         }}
         isSelfTemporaryGuest={selfUser.isTemporaryGuest()}
         messageRepository={messageRepository}

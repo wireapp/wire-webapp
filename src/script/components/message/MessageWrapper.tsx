@@ -343,7 +343,9 @@ const MessageWrapper: React.FC<MessageParams & {hasMarker: boolean}> = ({
   return null;
 };
 
-const Wrapper: React.FC<MessageParams & {conversationLastReadTimestamp: number; onScrolledTo?: () => void}> = props => {
+const Wrapper: React.FC<
+  MessageParams & {conversationLastReadTimestamp: number; scrollTo?: (element: HTMLElement, center?: boolean) => void}
+> = props => {
   const {message, previousMessage, conversationLastReadTimestamp, isMarked} = props;
   const messageElementRef = useRef<HTMLDivElement>();
   const {status, ephemeral_expires, timestamp} = useKoSubscribableChildren(message, [
@@ -357,11 +359,9 @@ const Wrapper: React.FC<MessageParams & {conversationLastReadTimestamp: number; 
 
   useLayoutEffect(() => {
     if (isMarked) {
-      messageElementRef.current?.scrollIntoView?.({block: 'center'});
-      props.onScrolledTo?.();
+      props.scrollTo(messageElementRef.current, true);
     } else if (markerType === MessageMarkerType.UNREAD) {
-      messageElementRef.current?.scrollIntoView?.(true);
-      props.onScrolledTo?.();
+      props.scrollTo(messageElementRef.current);
     }
   }, [isMarked, messageElementRef]);
 

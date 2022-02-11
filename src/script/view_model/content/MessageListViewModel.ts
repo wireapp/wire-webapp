@@ -26,7 +26,6 @@ import ko from 'knockout';
 
 import {getLogger, Logger} from 'Util/Logger';
 import {safeWindowOpen, safeMailOpen} from 'Util/SanitizationUtil';
-import {scrollBy} from 'Util/scroll-helpers';
 import {t} from 'Util/LocalizerUtil';
 
 import {ActionsViewModel} from '../ActionsViewModel';
@@ -199,14 +198,6 @@ export class MessageListViewModel {
       conversationEntity.removeMessages();
       this.conversationRepository.getMessagesWithOffset(conversationEntity, messageEntity);
     }
-  };
-
-  readonly onMessageMarked = (messageElement: HTMLElement) => {
-    const messagesContainer = this.getMessagesContainer();
-    messageElement.classList.remove('message-marked');
-    scrollBy(messagesContainer, messageElement.getBoundingClientRect().top - messagesContainer.offsetHeight / 2);
-    messageElement.classList.add('message-marked');
-    this.focusedMessage(null);
   };
 
   readonly showUserDetails = (userEntity: User): void => {
