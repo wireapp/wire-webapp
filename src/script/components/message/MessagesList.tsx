@@ -58,6 +58,7 @@ const MessagesList: React.FC<MessagesListParams> = ({
     'lastDeliveredMessage',
   ]);
   const messages = allMessages.filter(message => message.visible());
+  const [loaded, setLoaded] = useState(false);
   const [focusedMessage, setFocusedMessage] = useState<string>(initialMessage?.id);
 
   const conversationLastReadTimestamp = useMemo(() => conversation.last_read_timestamp(), []);
@@ -82,6 +83,7 @@ const MessagesList: React.FC<MessagesListParams> = ({
 
   const container = useRef();
   const scrollHeight = useRef(0);
+  const hasElementInView = useRef(false);
   const updateScroll = (endElement: HTMLElement | undefined) => {
     if (!endElement) {
       return;
@@ -90,9 +92,15 @@ const MessagesList: React.FC<MessagesListParams> = ({
     if (!scrollingContainer) {
       return;
     }
+    if (scrollHeight.current === 0) {
+      // For first render we want to scroll directly to the bottom.
+      scrollingContainer.scrollTo({top: scrollingContainer.scrollHeight});
+      return;
+    }
+
     const scrollPosition = scrollingContainer.scrollTop + scrollingContainer.clientHeight;
     const previousScrollHeight = scrollHeight.current;
-    const shouldStickToBottom = scrollPosition > previousScrollHeight - 100;
+    const shouldStickToBottom = scrollPosition - previousScrollHeight < 100;
     if (shouldStickToBottom) {
       scrollingContainer.scrollTo({top: scrollingContainer.scrollHeight});
     } else if (scrollPosition === 0) {
@@ -103,22 +111,17 @@ const MessagesList: React.FC<MessagesListParams> = ({
   };
 
   useLayoutEffect(() => {
-    // Update scroll position a first time synchronously
-    updateScroll(container.current);
-    setTimeout(() => {
-      // in case some content loaded async, retrigger a scroll
+    if (loaded && !hasElementInView.current) {
+      // We update the scroll in case there are no focused message
       updateScroll(container.current);
-    });
-  }, [messages, container]);
+    }
+  }, [messages.length, container, loaded]);
 
   useEffect(() => {
     onLoading(true);
     loadConversation(conversation, initialMessage).then(() => {
       setTimeout(() => {
-        if (!focusedMessage) {
-          // We update the scroll in case there are no focused message
-          updateScroll(container.current);
-        }
+        setLoaded(true);
         onLoading(false);
       }, 100);
     });
@@ -141,6 +144,10 @@ const MessagesList: React.FC<MessagesListParams> = ({
         hasReadReceiptsTurnedOn={conversationRepository.expectReadReceipt(conversation)}
         isLastDeliveredMessage={isLastDeliveredMessage}
         isMarked={focusedMessage === message.id}
+        onScrolledTo={() => {
+          hasElementInView.current = true;
+          setTimeout(() => (hasElementInView.current = false));
+        }}
         isSelfTemporaryGuest={selfUser.isTemporaryGuest()}
         messageRepository={messageRepository}
         lastReadTimestamp={conversationLastReadTimestamp}
@@ -172,9 +179,11 @@ const MessagesList: React.FC<MessagesListParams> = ({
     );
   });
   return (
-    <div ref={container} className={`messages ${verticallyCenterMessage() ? 'flex-center' : ''}`}>
-      {messageViews}
-    </div>
+    loaded && (
+      <div ref={container} className={`messages ${verticallyCenterMessage() ? 'flex-center' : ''}`}>
+        {messageViews}
+      </div>
+    )
   );
 };
 

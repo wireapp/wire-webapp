@@ -342,20 +342,24 @@ const MessageWrapper: React.FC<MessageParams & {hasMarker: boolean}> = ({
   return null;
 };
 
-const Wrapper: React.FC<MessageParams & {conversationLastReadTimestamp: number}> = props => {
+const Wrapper: React.FC<MessageParams & {conversationLastReadTimestamp: number; onScrolledTo?: () => void}> = props => {
   const {message, previousMessage, conversationLastReadTimestamp, isMarked} = props;
   const messageElementRef = useRef<HTMLDivElement>();
   const {status} = useKoSubscribableChildren(message, ['status']);
   const timeago = useRelativeTimestamp(message.timestamp());
   const timeagoDay = useRelativeTimestamp(message.timestamp(), true);
+  const markerType = getMessageMarkerType(message, previousMessage, conversationLastReadTimestamp);
 
   useLayoutEffect(() => {
     if (isMarked) {
       messageElementRef.current?.scrollIntoView?.({block: 'center'});
+      props.onScrolledTo?.();
+    } else if (markerType === MessageMarkerType.UNREAD) {
+      messageElementRef.current?.scrollIntoView?.(true);
+      props.onScrolledTo?.();
     }
-  }, [isMarked]);
+  }, [isMarked, messageElementRef]);
 
-  const markerType = getMessageMarkerType(message, previousMessage, conversationLastReadTimestamp);
   const getTimestampClass = (): string => {
     const classes = {
       [MessageMarkerType.NONE]: '',
