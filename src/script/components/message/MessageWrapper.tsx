@@ -185,73 +185,70 @@ const MessageWrapper: React.FC<MessageParams & {hasMarker: boolean}> = ({
   };
 
   const contextMenuEntries = ko.pureComputed(() => {
-    const messageEntity = message;
     const entries: ContextMenuEntry[] = [];
 
     const isRestrictedFileShare = !teamState.isFileSharingReceivingEnabled();
 
-    const canDelete =
-      messageEntity.user().isMe && !conversation.removed_from_conversation() && messageEntity.isDeletable();
+    const canDelete = message.user().isMe && !conversation.removed_from_conversation() && message.isDeletable();
 
-    const canEdit = messageEntity.isEditable() && !conversation.removed_from_conversation();
+    const canEdit = message.isEditable() && !conversation.removed_from_conversation();
 
-    const hasDetails =
-      !conversation.is1to1() && !messageEntity.isEphemeral() && !conversation.removed_from_conversation();
+    const hasDetails = !conversation.is1to1() && !message.isEphemeral() && !conversation.removed_from_conversation();
 
-    if (messageEntity.isDownloadable() && !isRestrictedFileShare) {
+    if (message.isDownloadable() && !isRestrictedFileShare) {
       entries.push({
-        click: () => messageEntity.download(container.resolve(AssetRepository)),
+        click: () => message.download(container.resolve(AssetRepository)),
         label: t('conversationContextMenuDownload'),
       });
     }
 
-    if (messageEntity.isReactable() && !conversation.removed_from_conversation()) {
-      const label = messageEntity.is_liked() ? t('conversationContextMenuUnlike') : t('conversationContextMenuLike');
+    if (message.isReactable() && !conversation.removed_from_conversation()) {
+      const label = message.is_liked() ? t('conversationContextMenuUnlike') : t('conversationContextMenuLike');
 
       entries.push({
-        click: () => onLike(messageEntity, false),
+        click: () => onLike(message, false),
         label,
       });
     }
 
     if (canEdit) {
       entries.push({
-        click: () => amplify.publish(WebAppEvents.CONVERSATION.MESSAGE.EDIT, messageEntity),
+        click: () => amplify.publish(WebAppEvents.CONVERSATION.MESSAGE.EDIT, message),
         label: t('conversationContextMenuEdit'),
       });
     }
 
-    if (messageEntity.isReplyable() && !conversation.removed_from_conversation()) {
+    if (message.isReplyable() && !conversation.removed_from_conversation()) {
       entries.push({
-        click: () => amplify.publish(WebAppEvents.CONVERSATION.MESSAGE.REPLY, messageEntity),
+        click: () => amplify.publish(WebAppEvents.CONVERSATION.MESSAGE.REPLY, message),
         label: t('conversationContextMenuReply'),
       });
     }
 
-    if (messageEntity.isCopyable() && !isRestrictedFileShare) {
+    if (message.isCopyable() && !isRestrictedFileShare) {
       entries.push({
-        click: () => messageEntity.copy(),
+        click: () => message.copy(),
         label: t('conversationContextMenuCopy'),
       });
     }
 
     if (hasDetails) {
       entries.push({
-        click: () => onClickReceipts(this),
+        click: () => onClickReceipts(message),
         label: t('conversationContextMenuDetails'),
       });
     }
 
-    if (messageEntity.isDeletable()) {
+    if (message.isDeletable()) {
       entries.push({
-        click: () => messageActions.deleteMessage(conversation, messageEntity),
+        click: () => messageActions.deleteMessage(conversation, message),
         label: t('conversationContextMenuDelete'),
       });
     }
 
     if (canDelete) {
       entries.push({
-        click: () => messageActions.deleteMessageEveryone(conversation, messageEntity),
+        click: () => messageActions.deleteMessageEveryone(conversation, message),
         label: t('conversationContextMenuDeleteEveryone'),
       });
     }
