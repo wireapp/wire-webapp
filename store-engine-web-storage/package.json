@@ -5,7 +5,7 @@
     "@types/node": "~14",
     "@wireapp/store-engine": "4.9.7",
     "jasmine": "3.8.0",
-    "karma": "6.3.4",
+    "karma": "6.3.14",
     "karma-chrome-launcher": "3.1.0",
     "karma-jasmine": "4.0.1",
     "karma-typescript": "5.5.1",
