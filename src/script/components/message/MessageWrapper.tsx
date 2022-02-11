@@ -345,7 +345,11 @@ const MessageWrapper: React.FC<MessageParams & {hasMarker: boolean}> = ({
 const Wrapper: React.FC<MessageParams & {conversationLastReadTimestamp: number; onScrolledTo?: () => void}> = props => {
   const {message, previousMessage, conversationLastReadTimestamp, isMarked} = props;
   const messageElementRef = useRef<HTMLDivElement>();
-  const {status} = useKoSubscribableChildren(message, ['status']);
+  const {status, ephemeral_expires, timestamp} = useKoSubscribableChildren(message, [
+    'status',
+    'ephemeral_expires',
+    'timestamp',
+  ]);
   const timeago = useRelativeTimestamp(message.timestamp());
   const timeagoDay = useRelativeTimestamp(message.timestamp(), true);
   const markerType = getMessageMarkerType(message, previousMessage, conversationLastReadTimestamp);
@@ -377,7 +381,7 @@ const Wrapper: React.FC<MessageParams & {conversationLastReadTimestamp: number; 
       key={message.id}
       data-uie-uid={message.id}
       data-uie-value={message.super_type}
-      data-uie-expired-status={message.ephemeral_expires()}
+      data-uie-expired-status={ephemeral_expires}
       data-uie-send-status={status}
       data-uie-name="item-message"
     >
@@ -386,10 +390,10 @@ const Wrapper: React.FC<MessageParams & {conversationLastReadTimestamp: number; 
           <span className="message-unread-dot"></span>
         </div>
         <div className="message-header-label">
-          <MessageTime timestamp={message.timestamp()} className="label-xs" data-timestamp-type="normal">
+          <MessageTime timestamp={timestamp} className="label-xs" data-timestamp-type="normal">
             {timeago}
           </MessageTime>
-          <MessageTime timestamp={message.timestamp()} data-timestamp-type="day" className="label-bold-xs">
+          <MessageTime timestamp={timestamp} data-timestamp-type="day" className="label-bold-xs">
             {timeagoDay}
           </MessageTime>
         </div>
