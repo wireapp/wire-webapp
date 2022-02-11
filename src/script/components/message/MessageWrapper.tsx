@@ -324,7 +324,7 @@ const MessageWrapper: React.FC<MessageParams & {hasMarker: boolean}> = ({
     );
   }
   if (message.isPing()) {
-    return (
+    const content = (
       <PingMessage
         message={message}
         is1to1Conversation={conversation.is1to1()}
@@ -332,6 +332,10 @@ const MessageWrapper: React.FC<MessageParams & {hasMarker: boolean}> = ({
         onClickReceipts={onClickReceipts}
       />
     );
+    if (onVisible) {
+      return <InViewport onVisible={onVisible}>{content}</InViewport>;
+    }
+    return content;
   }
   if (message.isFileTypeRestricted()) {
     return <FileTypeRestrictedMessage message={message} />;
