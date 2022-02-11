@@ -95,17 +95,16 @@ const MessagesList: React.FC<MessagesListParams> = ({
     if (scrollHeight.current === 0) {
       // For first render we want to scroll directly to the bottom.
       scrollingContainer.scrollTo({top: scrollingContainer.scrollHeight});
-      return;
-    }
-
-    const scrollPosition = scrollingContainer.scrollTop + scrollingContainer.clientHeight;
-    const previousScrollHeight = scrollHeight.current;
-    const shouldStickToBottom = scrollPosition - previousScrollHeight < 100;
-    if (shouldStickToBottom) {
-      scrollingContainer.scrollTo({top: scrollingContainer.scrollHeight});
-    } else if (scrollPosition === 0) {
-      // If we hit the top and new messages were loaded, we keep the scroll position stable
-      scrollingContainer.scrollTo({top: scrollingContainer.scrollHeight - scrollHeight.current});
+    } else {
+      const scrollBottomPosition = scrollingContainer.scrollTop + scrollingContainer.clientHeight;
+      const previousScrollHeight = scrollHeight.current;
+      const shouldStickToBottom = previousScrollHeight - scrollBottomPosition < 100;
+      if (shouldStickToBottom) {
+        scrollingContainer.scrollTo({top: scrollingContainer.scrollHeight});
+      } else if (scrollingContainer.scrollTop === 0) {
+        // If we hit the top and new messages were loaded, we keep the scroll position stable
+        scrollingContainer.scrollTo({top: scrollingContainer.scrollHeight - scrollHeight.current});
+      }
     }
     scrollHeight.current = scrollingContainer.scrollHeight;
   };
