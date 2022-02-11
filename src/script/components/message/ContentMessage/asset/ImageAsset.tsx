@@ -109,6 +109,8 @@ const ImageAsset: React.FC<ImageAssetProps> = ({asset, message, onClick, teamSta
           <img
             data-uie-name="image-asset-img"
             className={cx('image-element', {'image-ephemeral': isObfuscated})}
+            height={asset.height}
+            width={asset.width}
             src={imageUrl || dummyImageUrl}
           />
         </div>

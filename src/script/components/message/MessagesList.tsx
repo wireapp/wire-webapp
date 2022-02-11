@@ -148,7 +148,7 @@ const MessagesList: React.FC<MessagesListParams> = ({
         conversationLastReadTimestamp={conversationLastReadTimestamp}
         hasReadReceiptsTurnedOn={conversationRepository.expectReadReceipt(conversation)}
         isLastDeliveredMessage={isLastDeliveredMessage}
-        isMarked={focusedMessage === message.id}
+        isMarked={focusedMessage && focusedMessage === message.id}
         scrollTo={(element, center) => {
           elementInView.current = {center, element};
           setTimeout(() => (elementInView.current = undefined));
