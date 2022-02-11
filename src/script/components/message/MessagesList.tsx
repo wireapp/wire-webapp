@@ -92,17 +92,15 @@ const MessagesList: React.FC<MessagesListParams> = ({
     if (!scrollingContainer) {
       return;
     }
-    if (elementInView.current) {
-      // If we have an element we want to focus
-      const {element, center} = elementInView.current;
-      // For older browsers we compute the position to scroll to manually
-      const rect = element.getBoundingClientRect();
-      const top = rect.top - scrollingContainer.getBoundingClientRect().top;
-      const distance = center ? top - scrollingContainer.offsetHeight / 2 : top;
-      scrollingContainer.scrollTop += distance;
-    } else if (scrollHeight.current === 0) {
+    if (scrollHeight.current === 0) {
       // For first render we want to scroll directly to the bottom.
-      scrollingContainer.scrollTop = scrollingContainer.scrollHeight;
+      if (elementInView.current) {
+        // If we have an element we want to focus
+        const {element, center} = elementInView.current;
+        element.scrollIntoView(center ? {block: 'center'} : true);
+      } else {
+        scrollingContainer.scrollTop = scrollingContainer.scrollHeight;
+      }
     } else {
       const scrollBottomPosition = scrollingContainer.scrollTop + scrollingContainer.clientHeight;
       const previousScrollHeight = scrollHeight.current;
