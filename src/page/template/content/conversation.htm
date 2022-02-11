@@ -10,7 +10,7 @@
     class="message-list"
     data-bind="fadingscrollbar, infinite_scroll: {onHitBottom: () => $root.messageList.loadFollowingMessages(), onHitTop: () => $root.messageList.loadPrecedingMessages(), onInit: $root.messageList.onMessageContainerInitiated}"
     params="
-    conversation: $root.messageList.conversation,
+    conversation: $root.conversationRepository.conversationState.activeConversation,
     conversationRepository: $root.conversationRepository,
     initialMessage: $root.messageList.initialMessage,
     messageRepository: $root.messageRepository,
