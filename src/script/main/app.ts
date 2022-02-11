@@ -128,6 +128,7 @@ import {Core} from '../service/CoreSingleton';
 
 function doRedirect(signOutReason: SIGN_OUT_REASON) {
   let url = `/auth/${location.search}`;
+  localStorage.setItem('loginredirect', location.hash);
 
   const isImmediateSignOutReason = App.CONFIG.SIGN_OUT_REASONS.IMMEDIATE.includes(signOutReason);
   if (isImmediateSignOutReason) {
@@ -667,7 +668,6 @@ class App {
   private _showInterface() {
     const mainView = new MainViewModel(this.repository);
     ko.applyBindings(mainView, this.appContainer);
-
     this.repository.notification.setContentViewModelStates(mainView.content.state, mainView.multitasking);
 
     const conversationEntity = this.repository.conversation.getMostRecentConversation();
@@ -681,6 +681,12 @@ class App {
       mainView.content.showConversation(conversationEntity, {});
     } else if (this.repository.user['userState'].connectRequests().length) {
       amplify.publish(WebAppEvents.CONTENT.SWITCH, ContentViewModel.STATE.CONNECTION_REQUESTS);
+    }
+
+    const redirect = localStorage.getItem('loginredirect');
+    if (redirect) {
+      localStorage.removeItem('loginredirect');
+      window.location.replace(redirect);
     }
 
     const router = new Router({
