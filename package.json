@@ -162,7 +162,7 @@
     "simple-git": "3.1.1",
     "sinon": "13.0.1",
     "snabbdom": "3.3.1",
-    "stylelint": "13.13.1",
+    "stylelint": "14.5.0",
     "stylelint-config-idiomatic-order": "8.1.0",
     "stylelint-config-prettier": "9.0.3",
     "svg-inline-loader": "0.8.2",
