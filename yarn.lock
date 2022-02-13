@@ -13584,10 +13584,10 @@ uuid@^3.3.2:
   resolved "https://registry.yarnpkg.com/uuid/-/uuid-3.4.0.tgz#b23e4358afa8a202fe7a100af1f5f883f02007ee"
   integrity sha512-HjSDRw6gZE5JMggctHBcjVak08+KEVhSIiDzFnT9S9aegmp85S/bReBVTb4QTFaRNptJ9kuYaNhnbNEOkbKb/A==
 
-uuidjs@4.2.10:
-  version "4.2.10"
-  resolved "https://registry.yarnpkg.com/uuidjs/-/uuidjs-4.2.10.tgz#fc6475f9b35fa20fae9cb3ad9b3df96826ed225d"
-  integrity sha512-UtmJ2d2oiEo0vunaAPWIHYPGMPLyfdB7EESwC/Cf2Jy8uZcvb4+GQqovzD9ixeBJF4BomZ391Qo1my7Mz6F00A==
+uuidjs@4.2.11:
+  version "4.2.11"
+  resolved "https://registry.yarnpkg.com/uuidjs/-/uuidjs-4.2.11.tgz#1c975d113277cdc4f140565cb1853218bf3764cb"
+  integrity sha512-uSd98rMEeoOEfCFphspo8f9N6eyrLv4Qhew56XciomGemP4uOYZ/fLZUPpnlJklVSsAV2S6Hd5p2XzF/ub5kxA==
 
 uuidjs@4.2.8:
   version "4.2.8"
