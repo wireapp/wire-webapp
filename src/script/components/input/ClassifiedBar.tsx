@@ -32,7 +32,7 @@ function isClassified(users: User[], classifiedDomains: string[]): boolean {
 
 interface ClassifiedBarProps {
   classifiedDomains?: string[];
-  style: CSSObject;
+  style?: CSSObject;
   users: User[];
 }
 
