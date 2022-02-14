@@ -44,6 +44,6 @@ export class MediumImage extends FileAsset {
   }
 
   public get ratio() {
-    return parseInt(this.height, 10) / parseInt(this.width, 10);
+    return parseInt(this.width, 10) / parseInt(this.height, 10);
   }
 }

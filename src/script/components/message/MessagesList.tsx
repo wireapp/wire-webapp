@@ -117,13 +117,6 @@ const MessagesList: React.FC<MessagesListParams> = ({
 
   useLayoutEffect(() => {
     if (loaded) {
-      // add a synchronous scroll update at load time in order for the list to be nicely scrolled when appearing on screen
-      updateScroll(container.current);
-    }
-  }, [loaded]);
-
-  useEffect(() => {
-    if (loaded) {
       // Update the scroll when the message list is updated
       updateScroll(container.current);
     }
