@@ -43,9 +43,9 @@ const barStyle = (highContrast: boolean): CSSObject => ({
   borderWidth: '1px 0',
   color: `var(--${highContrast ? 'app-bg' : 'background'})`,
   display: 'flex',
-  fontSize: 12,
+  fontSize: 11,
   fontWeight: 600,
-  height: '1.5em',
+  height: '1.6em',
   justifyContent: 'center',
   marginTop: '1em',
   textTransform: 'uppercase',
@@ -58,7 +58,7 @@ const ClassifiedBar: React.FC<ClassifiedBarProps> = ({users, classifiedDomains})
   }
   const classified = isClassified(users, classifiedDomains);
   const text = classified ? t('conversationClassified') : t('conversationNotClassified');
-  const highContrast = classified;
+  const highContrast = !classified;
   return (
     <div data-uie-name="classified-label" css={barStyle(highContrast)}>
       {text}
