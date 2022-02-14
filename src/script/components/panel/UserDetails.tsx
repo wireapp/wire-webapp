@@ -92,7 +92,13 @@ const UserDetails: React.FC<UserDetailsProps> = ({
         </div>
       )}
 
-      {classifiedDomains && <ClassifiedBar users={[participant]} classifiedDomains={classifiedDomains} />}
+      {classifiedDomains && (
+        <ClassifiedBar
+          users={[participant]}
+          classifiedDomains={classifiedDomains}
+          style={{width: 'calc(100% + 32px)'}}
+        />
+      )}
 
       <Avatar
         className="panel-participant__avatar"

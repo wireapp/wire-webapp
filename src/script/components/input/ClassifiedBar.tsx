@@ -32,6 +32,7 @@ function isClassified(users: User[], classifiedDomains: string[]): boolean {
 
 interface ClassifiedBarProps {
   classifiedDomains?: string[];
+  style: CSSObject;
   users: User[];
 }
 
@@ -51,7 +52,7 @@ const barStyle = (highContrast: boolean): CSSObject => ({
   width: '100%',
 });
 
-const ClassifiedBar: React.FC<ClassifiedBarProps> = ({users, classifiedDomains}) => {
+const ClassifiedBar: React.FC<ClassifiedBarProps> = ({users, classifiedDomains, style}) => {
   if (typeof classifiedDomains === 'undefined') {
     return null;
   }
@@ -59,7 +60,7 @@ const ClassifiedBar: React.FC<ClassifiedBarProps> = ({users, classifiedDomains})
   const text = classified ? t('conversationClassified') : t('conversationNotClassified');
   const highContrast = !classified;
   return (
-    <div data-uie-name="classified-label" css={barStyle(highContrast)}>
+    <div data-uie-name="classified-label" css={{...barStyle(highContrast), ...style}}>
       {text}
     </div>
   );
