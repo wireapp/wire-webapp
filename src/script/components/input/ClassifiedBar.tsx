@@ -47,7 +47,6 @@ const barStyle = (highContrast: boolean): CSSObject => ({
   fontWeight: 600,
   height: '1.6em',
   justifyContent: 'center',
-  marginTop: '1em',
   textTransform: 'uppercase',
   width: '100%',
 });

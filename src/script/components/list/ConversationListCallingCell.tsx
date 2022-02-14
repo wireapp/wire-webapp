@@ -47,12 +47,14 @@ import {useFadingScrollbar} from '../../ui/fadingScrollbar';
 import {CallActions, CallViewTab} from '../../view_model/CallingViewModel';
 import {showContextMenu, ContextMenuEntry} from '../../ui/ContextMenu';
 import type {ClientId, Participant, UserId} from '../../calling/Participant';
+import ClassifiedBar from 'Components/input/ClassifiedBar';
 
 export interface CallingCellProps {
   call: Call;
   callActions: CallActions;
   callingRepository: CallingRepository;
   callState?: CallState;
+  classifiedDomains?: string[];
   conversation: Conversation;
   hasAccessToCamera: boolean;
   isSelfVerified: boolean;
@@ -64,6 +66,7 @@ export interface CallingCellProps {
 
 const ConversationListCallingCell: React.FC<CallingCellProps> = ({
   conversation,
+  classifiedDomains,
   temporaryUserStyle,
   call,
   callActions,
@@ -280,6 +283,10 @@ const ConversationListCallingCell: React.FC<CallingCellProps> = ({
             )
           )}
 
+          {classifiedDomains && (
+            <ClassifiedBar users={conversation.participating_user_ets()} classifiedDomains={classifiedDomains} />
+          )}
+
           {!isDeclined && (
             <>
               <div className="conversation-list-calling-cell-controls">
@@ -412,6 +419,7 @@ registerReactComponent('conversation-list-calling-cell', {
     call,
     callActions,
     callingRepository,
+    classifiedDomains: ko.unwrap(classifiedDomains),
     conversation: ko.unwrap(conversation),
     hasAccessToCamera: ko.unwrap(hasAccessToCamera),
     isSelfVerified: ko.unwrap(isSelfVerified),
