@@ -22,22 +22,30 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 import {amplify} from 'amplify';
 
 import {t} from 'Util/LocalizerUtil';
-import {registerReactComponent, useKoSubscribableChildren} from 'Util/ComponentUtil';
+import {registerStaticReactComponent, useKoSubscribableChildren} from 'Util/ComponentUtil';
 
 import type {User} from '../../entity/User';
 import Avatar, {AVATAR_SIZE} from 'Components/Avatar';
 import Icon from 'Components/Icon';
 import AvailabilityState from 'Components/AvailabilityState';
+import ClassifiedBar from 'Components/input/ClassifiedBar';
 
 export interface UserDetailsProps {
   badge?: string;
+  classifiedDomains?: string[];
   isGroupAdmin?: boolean;
   isSelfVerified: boolean;
   isVerified?: boolean;
   participant: User;
 }
 
-const UserDetails: React.FC<UserDetailsProps> = ({badge, participant, isSelfVerified, isGroupAdmin}) => {
+const UserDetails: React.FC<UserDetailsProps> = ({
+  badge,
+  participant,
+  isSelfVerified,
+  isGroupAdmin,
+  classifiedDomains,
+}) => {
   const user = useKoSubscribableChildren(participant, [
     'inTeam',
     'isGuest',
@@ -83,6 +91,8 @@ const UserDetails: React.FC<UserDetailsProps> = ({badge, participant, isSelfVeri
           {participant.handle}
         </div>
       )}
+
+      {classifiedDomains && <ClassifiedBar users={[participant]} classifiedDomains={classifiedDomains} />}
 
       <Avatar
         className="panel-participant__avatar"
@@ -130,8 +140,4 @@ const UserDetails: React.FC<UserDetailsProps> = ({badge, participant, isSelfVeri
 
 export default UserDetails;
 
-registerReactComponent('panel-user-details', {
-  component: UserDetails,
-  template:
-    '<div data-bind="react: {badge: ko.unwrap(badge), isGroupAdmin: ko.unwrap(isGroupAdmin), isSelfVerified: ko.unwrap(isSelfVerified), isVerified: ko.unwrap(isVerified), participant: ko.unwrap(participant)}"></div>',
-});
+registerStaticReactComponent('panel-user-details', UserDetails);
