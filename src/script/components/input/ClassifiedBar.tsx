@@ -43,10 +43,11 @@ const barStyle = (highContrast: boolean): CSSObject => ({
   borderWidth: '1px 0',
   color: `var(--${highContrast ? 'app-bg' : 'background'})`,
   display: 'flex',
-  fontSize: 16,
+  fontSize: 12,
   fontWeight: 600,
-  height: 32,
+  height: '1.5em',
   justifyContent: 'center',
+  marginTop: '1em',
   textTransform: 'uppercase',
   width: '100%',
 });
