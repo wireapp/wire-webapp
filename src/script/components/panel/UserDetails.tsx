@@ -22,7 +22,7 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 import {amplify} from 'amplify';
 
 import {t} from 'Util/LocalizerUtil';
-import {registerStaticReactComponent, useKoSubscribableChildren} from 'Util/ComponentUtil';
+import {registerReactComponent, useKoSubscribableChildren} from 'Util/ComponentUtil';
 
 import type {User} from '../../entity/User';
 import Avatar, {AVATAR_SIZE} from 'Components/Avatar';
@@ -146,4 +146,8 @@ const UserDetails: React.FC<UserDetailsProps> = ({
 
 export default UserDetails;
 
-registerStaticReactComponent('panel-user-details', UserDetails);
+registerReactComponent('panel-user-details', {
+  component: UserDetails,
+  template:
+    '<div data-bind="react: {badge: ko.unwrap(badge), isGroupAdmin: ko.unwrap(isGroupAdmin), isSelfVerified: ko.unwrap(isSelfVerified), isVerified: ko.unwrap(isVerified), participant: ko.unwrap(participant)}"></div>',
+});
