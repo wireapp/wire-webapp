@@ -18,12 +18,14 @@
  */
 
 import Avatar, {AVATAR_SIZE} from 'Components/Avatar';
+import ClassifiedBar from 'Components/input/ClassifiedBar';
 import React from 'react';
 import {User} from 'src/script/entity/User';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 
 export interface ConnectedMessageProps {
+  classifiedDomains?: string[];
   onClickCancelRequest: () => void;
   showServicesWarning?: boolean;
   user: User;
@@ -33,6 +35,7 @@ const ConnectedMessage: React.FC<ConnectedMessageProps> = ({
   user,
   onClickCancelRequest,
   showServicesWarning = false,
+  classifiedDomains,
 }) => {
   const {name, providerName, isOutgoingRequest} = useKoSubscribableChildren(user, [
     'name',
@@ -50,6 +53,7 @@ const ConnectedMessage: React.FC<ConnectedMessageProps> = ({
       ) : (
         <span className="message-connected-username label-username">{handle}</span>
       )}
+      {isOutgoingRequest && classifiedDomains && <ClassifiedBar users={[user]} classifiedDomains={classifiedDomains} />}
       <Avatar
         avatarSize={AVATAR_SIZE.X_LARGE}
         participant={user}

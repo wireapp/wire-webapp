@@ -28,6 +28,7 @@ import {User} from 'src/script/entity/User';
 import useEffectRef from 'Util/useEffectRef';
 
 export interface MemberMessageProps {
+  classifiedDomains?: string[];
   hasReadReceiptsTurnedOn: boolean;
   isSelfTemporaryGuest: boolean;
   message: MemberMessageEntity;
@@ -45,6 +46,7 @@ const MemberMessage: React.FC<MemberMessageProps> = ({
   onClickInvitePeople,
   onClickParticipants,
   onClickCancelRequest,
+  classifiedDomains,
 }) => {
   const {
     otherUser,
@@ -97,6 +99,7 @@ const MemberMessage: React.FC<MemberMessageProps> = ({
           user={otherUser}
           showServicesWarning={message.showServicesWarning}
           onClickCancelRequest={() => onClickCancelRequest(message)}
+          classifiedDomains={classifiedDomains}
         />
       ) : (
         <>
@@ -184,5 +187,5 @@ export default MemberMessage;
 registerReactComponent('member-message', {
   component: MemberMessage,
   template:
-    '<div data-bind="react: {message: ko.unwrap(message), onClickInvitePeople, onClickParticipants, onClickCancelRequest, shouldShowInvitePeople: ko.unwrap(shouldShowInvitePeople), isSelfTemporaryGuest: ko.unwrap(isSelfTemporaryGuest), hasReadReceiptsTurnedOn}"></div>',
+    '<div data-bind="react: {message: ko.unwrap(message), onClickInvitePeople, onClickParticipants, onClickCancelRequest, shouldShowInvitePeople: ko.unwrap(shouldShowInvitePeople), isSelfTemporaryGuest: ko.unwrap(isSelfTemporaryGuest), hasReadReceiptsTurnedOn, classifiedDomains: ko.unwrap(classifiedDomains)}"></div>',
 });
