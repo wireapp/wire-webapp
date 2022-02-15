@@ -18,10 +18,11 @@
  */
 
 import React from 'react';
-import {act, render} from '@testing-library/react';
+import {act, render, waitFor} from '@testing-library/react';
 import {ContentMessage} from 'src/script/entity/message/ContentMessage';
 import {Conversation} from 'src/script/entity/Conversation';
 import MessagesList from './MessagesList';
+import {Text} from '../../entity/message/Text';
 import {createRandomUuid} from 'Util/util';
 import {User} from 'src/script/entity/User';
 
@@ -55,36 +56,34 @@ const getDefaultParams = (): React.ComponentProps<typeof MessagesList> => {
   };
 };
 
-describe('MessagesList', () => {
-  it('loads the message list when initiated', done => {
-    const params = getDefaultParams();
-    const message = new ContentMessage();
-    params.conversation.addMessage(message);
+const createTextMessage = (text: string) => {
+  const message = new ContentMessage(createRandomUuid());
+  const textAsset = new Text(createRandomUuid(), text);
+  message.assets.push(textAsset);
+  return message;
+};
 
-    render(
-      <MessagesList
-        {...params}
-        onLoading={isLoading => {
-          if (!isLoading) {
-            expect(params.conversationRepository.getPrecedingMessages).toHaveBeenCalled();
-            done();
-          }
-        }}
-      />,
-    );
+describe('MessagesList', () => {
+  it('loads the message list when initiated', async () => {
+    const params = getDefaultParams();
+    params.conversation.addMessage(createTextMessage('hello'));
+
+    const {getByText} = render(<MessagesList {...params} />);
+    await waitFor(() => getByText('hello'));
+    expect(params.onLoading).toHaveBeenCalled();
+    expect(params.conversationRepository.getPrecedingMessages).toHaveBeenCalled();
   });
 
-  it('updates the message list when message is added', () => {
+  it('updates the message list when message is added', async () => {
     const params = getDefaultParams();
-    const message = new ContentMessage(createRandomUuid());
-    params.conversation.addMessage(message);
+    params.conversation.addMessage(createTextMessage('first'));
 
-    const {container} = render(<MessagesList {...params} />);
-    expect(container.querySelectorAll('.message').length).toBe(1);
+    const {getByText} = render(<MessagesList {...params} />);
+    await waitFor(() => getByText('first'));
 
     act(() => {
-      params.conversation.addMessage(new ContentMessage(createRandomUuid()));
+      params.conversation.addMessage(createTextMessage('second'));
     });
-    expect(container.querySelectorAll('.message').length).toBe(2);
+    await waitFor(() => getByText('second'));
   });
 });
