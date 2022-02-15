@@ -22,7 +22,7 @@ import cx from 'classnames';
 
 import {noop} from 'Util/util';
 import {t} from 'Util/LocalizerUtil';
-import {registerStaticReactComponent, useKoSubscribableChildren} from 'Util/ComponentUtil';
+import {registerReactComponent, useKoSubscribableChildren} from 'Util/ComponentUtil';
 import useEffectRef from 'Util/useEffectRef';
 
 import {AVATAR_SIZE} from 'Components/Avatar';
@@ -222,4 +222,9 @@ const ConversationListCell: React.FC<ConversationListCellProps> = ({
 };
 
 export default ConversationListCell;
-registerStaticReactComponent('conversation-list-cell', ConversationListCell);
+
+registerReactComponent('conversation-list-cell', {
+  bindings:
+    'offsetTop: ko.unwrap(offsetTop), index: ko.unwrap(index), showJoinButton: ko.unwrap(showJoinButton), conversation, is_selected, isVisibleFunc, onJoinCall, rightClick, onClick',
+  component: ConversationListCell,
+});
