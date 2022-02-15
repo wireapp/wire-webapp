@@ -28,16 +28,24 @@ import type {User} from '../../entity/User';
 import Avatar, {AVATAR_SIZE} from 'Components/Avatar';
 import Icon from 'Components/Icon';
 import AvailabilityState from 'Components/AvailabilityState';
+import ClassifiedBar from 'Components/input/ClassifiedBar';
 
 export interface UserDetailsProps {
   badge?: string;
+  classifiedDomains?: string[];
   isGroupAdmin?: boolean;
   isSelfVerified: boolean;
   isVerified?: boolean;
   participant: User;
 }
 
-const UserDetails: React.FC<UserDetailsProps> = ({badge, participant, isSelfVerified, isGroupAdmin}) => {
+const UserDetails: React.FC<UserDetailsProps> = ({
+  badge,
+  participant,
+  isSelfVerified,
+  isGroupAdmin,
+  classifiedDomains,
+}) => {
   const user = useKoSubscribableChildren(participant, [
     'inTeam',
     'isGuest',
@@ -82,6 +90,14 @@ const UserDetails: React.FC<UserDetailsProps> = ({badge, participant, isSelfVeri
         <div className="panel-participant__user-name" data-uie-name="status-username">
           {participant.handle}
         </div>
+      )}
+
+      {classifiedDomains && (
+        <ClassifiedBar
+          users={[participant]}
+          classifiedDomains={classifiedDomains}
+          style={{width: 'calc(100% + 32px)'}}
+        />
       )}
 
       <Avatar

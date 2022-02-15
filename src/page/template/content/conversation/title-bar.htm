@@ -1,5 +1,6 @@
-<div id="conversation-title-bar" class="conversation-title-bar" data-bind="with: $root.titleBar">
-  <!-- ko if: conversationEntity() -->
+<!-- ko with: $root.titleBar -->
+<div id="conversation-title-bar" class="conversation-title-bar" data-bind="style: {background: isConnectionRequest() ? 'inherit' : ''}">
+  <!-- ko if: conversationEntity() && !isConnectionRequest() -->
     <div class="conversation-title-bar-library">
       <!-- ko if: isActivatedAccount() -->
         <span class="conversation-title-bar-icon button-icon-large icon-search"
@@ -50,3 +51,4 @@
     <!-- /ko -->
   <!-- /ko -->
 </div>
+<!-- /ko -->

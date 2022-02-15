@@ -94,6 +94,7 @@ export class ConversationDetailsViewModel extends BasePanelViewModel {
   timedMessagesText: ko.PureComputed<string>;
   addPeopleTooltip: ko.PureComputed<string>;
   isSelfGroupAdmin: ko.PureComputed<boolean>;
+  classifiedDomains: ko.PureComputed<string[] | undefined>;
 
   static get CONFIG() {
     return {
@@ -108,6 +109,7 @@ export class ConversationDetailsViewModel extends BasePanelViewModel {
 
     this.userState = container.resolve(UserState);
     this.teamState = container.resolve(TeamState);
+    this.classifiedDomains = this.teamState.classifiedDomains;
 
     const {conversation, integration, search, team} = repositories;
     this.conversationRepository = conversation;

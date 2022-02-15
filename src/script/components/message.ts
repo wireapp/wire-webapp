@@ -129,6 +129,7 @@ class Message {
   shouldShowAvatar: ko.Observable<boolean>;
   shouldShowInvitePeople: ko.Observable<boolean>;
   StatusType: typeof StatusType;
+  classifiedDomains: ko.PureComputed<string[] | undefined>;
   teamState: TeamState;
 
   constructor(
@@ -170,6 +171,7 @@ class Message {
     this.isSelfTemporaryGuest = isSelfTemporaryGuest;
     this.isLastDeliveredMessage = isLastDeliveredMessage;
     this.accentColor = ko.pureComputed(() => message.user().accent_color());
+    this.classifiedDomains = teamState.classifiedDomains;
 
     this.onClickImage = onClickImage;
     this.onClickInvitePeople = onClickInvitePeople;
@@ -449,7 +451,8 @@ ko.components.register('message', {
         onClickCancelRequest: onClickCancelRequest,
         hasReadReceiptsTurnedOn: hasReadReceiptsTurnedOn,
         shouldShowInvitePeople: shouldShowInvitePeople,
-        isSelfTemporaryGuest: isSelfTemporaryGuest
+        isSelfTemporaryGuest: isSelfTemporaryGuest,
+        classifiedDomains: classifiedDomains,
       "></member-message>
     <!-- /ko -->
     <!-- ko if: message.super_type === 'ping' -->
