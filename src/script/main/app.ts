@@ -228,7 +228,7 @@ class App {
     const sendingMessageQueue = new MessageSender();
 
     repositories.asset = container.resolve(AssetRepository);
-    repositories.audio = new AudioRepository();
+
     repositories.auth = new AuthRepository();
     repositories.giphy = new GiphyRepository(new GiphyService());
     repositories.properties = new PropertiesRepository(new PropertiesService(), selfService);
@@ -238,6 +238,8 @@ class App {
     repositories.cryptography = new CryptographyRepository(new CryptographyService());
     repositories.client = new ClientRepository(new ClientService(), repositories.cryptography, repositories.storage);
     repositories.media = new MediaRepository(new PermissionRepository());
+    repositories.audio = new AudioRepository(repositories.media.devicesHandler);
+
     repositories.user = new UserRepository(
       new UserService(),
       repositories.asset,

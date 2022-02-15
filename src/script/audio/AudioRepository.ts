@@ -25,6 +25,7 @@ import {container} from 'tsyringe';
 import {Logger, getLogger} from 'Util/Logger';
 
 import {NOTIFICATION_HANDLING_STATE} from '../event/NotificationHandlingState';
+import {DeviceTypes, MediaDevicesHandler} from '../media/MediaDevicesHandler';
 import {AudioPlayingType} from './AudioPlayingType';
 import {AudioState} from './AudioState';
 import {AudioType} from './AudioType';
@@ -40,7 +41,10 @@ export class AudioRepository {
   private readonly audioElements: Record<string, HTMLAudioElement>;
   private muted: boolean;
 
-  constructor(private readonly audioState = container.resolve(AudioState)) {
+  constructor(
+    private readonly devicesHandler: MediaDevicesHandler,
+    private readonly audioState = container.resolve(AudioState),
+  ) {
     this.logger = getLogger('AudioRepository');
     this.audioState.audioPreference.subscribe(audioPreference => {
       if (audioPreference === AudioPreference.NONE) {
@@ -80,6 +84,23 @@ export class AudioRepository {
     return audioElement;
   }
 
+  private updateSinkIds() {
+    const currentOutputDevice = this.devicesHandler?.currentDeviceId[DeviceTypes.AUDIO_OUTPUT]();
+    if (!currentOutputDevice) {
+      return;
+    }
+    Object.values(this.audioElements).forEach(element => {
+      element
+        .setSinkId(currentOutputDevice)
+        .then(() => {
+          this.logger.info(`Updated audio element output to: ${currentOutputDevice}`);
+        })
+        .catch(error => {
+          this.logger.warn(error);
+        });
+    });
+  }
+
   private getSoundById(audioId: AudioType): HTMLAudioElement {
     return this.audioElements[audioId];
   }
@@ -115,6 +136,7 @@ export class AudioRepository {
 
   init(preload: boolean = false): void {
     this.initSounds(preload);
+    this.updateSinkIds();
     this.subscribeToAudioEvents();
   }
 
@@ -138,6 +160,7 @@ export class AudioRepository {
   }
 
   play = async (audioId: AudioType, playInLoop: boolean = false): Promise<void> => {
+    this.updateSinkIds();
     const audioElement = this.getSoundById(audioId);
     if (!audioElement) {
       this.logger.error(`Failed to play '${audioId}': sound not found`);
