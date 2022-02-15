@@ -128,7 +128,10 @@ import {Core} from '../service/CoreSingleton';
 
 function doRedirect(signOutReason: SIGN_OUT_REASON) {
   let url = `/auth/${location.search}`;
-  localStorage.setItem(App.LOCAL_STORAGE_LOGIN_REDIRECT_KEY, location.hash);
+
+  if (location.hash.startsWith('#/user/') && signOutReason === SIGN_OUT_REASON.NOT_SIGNED_IN) {
+    localStorage.setItem(App.LOCAL_STORAGE_LOGIN_REDIRECT_KEY, location.hash);
+  }
 
   const isImmediateSignOutReason = App.CONFIG.SIGN_OUT_REASONS.IMMEDIATE.includes(signOutReason);
   if (isImmediateSignOutReason) {
