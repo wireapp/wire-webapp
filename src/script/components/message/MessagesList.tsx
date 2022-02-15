@@ -7,6 +7,7 @@ import {DecryptErrorMessage} from 'src/script/entity/message/DecryptErrorMessage
 import {MemberMessage} from 'src/script/entity/message/MemberMessage';
 import {Message} from 'src/script/entity/message/Message';
 import {User} from 'src/script/entity/User';
+import {StatusType} from '../../message/StatusType';
 import {registerStaticReactComponent, useKoSubscribableChildren} from 'Util/ComponentUtil';
 import MessageWrapper from './MessageWrapper';
 
@@ -81,35 +82,35 @@ const MessagesList: React.FC<MessagesListParams> = ({
     return false;
   };
 
-  const container = useRef();
+  const container = useRef<HTMLDivElement>();
   const scrollHeight = useRef(0);
-  const elementInView = useRef<{center?: boolean; element: HTMLElement}>();
 
-  const updateScroll = (endElement?: HTMLElement, visibleElement?: {center?: boolean; element: HTMLElement}) => {
-    if (!endElement) {
+  const updateScroll = (visibleElement?: {center?: boolean; element: HTMLElement}) => {
+    if (!container.current) {
       return;
     }
-    const scrollingContainer = endElement.parentElement;
+    const scrollingContainer = container.current.parentElement;
     if (!scrollingContainer) {
       return;
     }
+    const lastMessage = messages[messages.length - 1];
+    const previousScrollHeight = scrollHeight.current;
+    const scrollBottomPosition = scrollingContainer.scrollTop + scrollingContainer.clientHeight;
+    const shouldStickToBottom = previousScrollHeight - scrollBottomPosition < 100;
+
     if (visibleElement) {
       // If we have an element we want to focus
       const {element, center} = visibleElement;
       element.scrollIntoView(center ? {block: 'center'} : true);
-    } else if (scrollHeight.current === 0) {
-      // For first render we want to scroll directly to the bottom.
+    } else if (lastMessage.status() === StatusType.SENDING && lastMessage.user().id === selfUser.id) {
+      // The self user just sent a message, we scroll straight to the bottom
       scrollingContainer.scrollTop = scrollingContainer.scrollHeight;
-    } else {
-      const scrollBottomPosition = scrollingContainer.scrollTop + scrollingContainer.clientHeight;
-      const previousScrollHeight = scrollHeight.current;
-      const shouldStickToBottom = previousScrollHeight - scrollBottomPosition < 100;
-      if (shouldStickToBottom) {
-        scrollingContainer.scrollTop = scrollingContainer.scrollHeight;
-      } else if (scrollingContainer.scrollTop === 0) {
-        // If we hit the top and new messages were loaded, we keep the scroll position stable
-        scrollingContainer.scrollTop = scrollingContainer.scrollHeight - scrollHeight.current;
-      }
+    } else if (scrollingContainer.scrollTop === 0 && scrollingContainer.scrollHeight > previousScrollHeight) {
+      // If we hit the top and new messages were loaded, we keep the scroll position stable
+      scrollingContainer.scrollTop = scrollingContainer.scrollHeight - previousScrollHeight;
+    } else if (shouldStickToBottom) {
+      // Simple content update, we just scroll to bottom if we are in the stick to bottom threshold
+      scrollingContainer.scrollTop = scrollingContainer.scrollHeight;
     }
     scrollHeight.current = scrollingContainer.scrollHeight;
   };
@@ -117,7 +118,7 @@ const MessagesList: React.FC<MessagesListParams> = ({
   useLayoutEffect(() => {
     if (loaded) {
       // Update the scroll when the message list is updated
-      updateScroll(container.current, elementInView.current);
+      updateScroll();
     }
   }, [messages.length, loaded]);
 
@@ -148,7 +149,7 @@ const MessagesList: React.FC<MessagesListParams> = ({
         hasReadReceiptsTurnedOn={conversationRepository.expectReadReceipt(conversation)}
         isLastDeliveredMessage={isLastDeliveredMessage}
         isMarked={focusedMessage && focusedMessage === message.id}
-        scrollTo={(element, center) => updateScroll(container.current, {center, element})}
+        scrollTo={(element, center) => updateScroll({center, element})}
         isSelfTemporaryGuest={selfUser.isTemporaryGuest()}
         messageRepository={messageRepository}
         lastReadTimestamp={conversationLastReadTimestamp}
@@ -172,7 +173,7 @@ const MessagesList: React.FC<MessagesListParams> = ({
             conversationRepository.getMessagesWithOffset(conversation, messageEntity);
           }
         }}
-        onContentUpdated={() => updateScroll(container.current)}
+        onContentUpdated={() => updateScroll()}
         onLike={message => messageRepository.toggleLike(conversation, message)}
         selfId={selfUser.qualifiedId}
         shouldShowInvitePeople={shouldShowInvitePeople}
