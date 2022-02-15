@@ -4,8 +4,8 @@
       <div class="connect-request" data-bind="attr: {'data-uie-uid': id}" data-uie-name="connect-request">
         <div class="connect-request-name ellipsis" data-bind="text: name()"></div>
         <div class="connect-request-username label-username" data-bind="text: handle"></div>
-        <!-- ko if: classifiedDomains -->
-          <classified-bar params="users: [$data], classifiedDomains"></classified-bar>
+        <!-- ko if: $parent.classifiedDomains -->
+          <classified-bar params="users: [$data], classifiedDomains: $parent.classifiedDomains"></classified-bar>
         <!-- /ko -->
         <participant-avatar class="connect-request-avatar avatar-no-filter cursor-default" params="participant: $data, avatarSize: $parent.AVATAR_SIZE.X_LARGE, noBadge: true, noFilter: true"></participant-avatar>
         <div class="button-group">
