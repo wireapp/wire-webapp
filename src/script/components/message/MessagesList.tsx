@@ -84,7 +84,8 @@ const MessagesList: React.FC<MessagesListParams> = ({
   const container = useRef();
   const scrollHeight = useRef(0);
   const elementInView = useRef<{center?: boolean; element: HTMLElement}>();
-  const updateScroll = (endElement: HTMLElement | undefined) => {
+
+  const updateScroll = (endElement?: HTMLElement, visibleElement?: {center?: boolean; element: HTMLElement}) => {
     if (!endElement) {
       return;
     }
@@ -92,15 +93,13 @@ const MessagesList: React.FC<MessagesListParams> = ({
     if (!scrollingContainer) {
       return;
     }
-    if (scrollHeight.current === 0) {
+    if (visibleElement) {
+      // If we have an element we want to focus
+      const {element, center} = visibleElement;
+      element.scrollIntoView(center ? {block: 'center'} : true);
+    } else if (scrollHeight.current === 0) {
       // For first render we want to scroll directly to the bottom.
-      if (elementInView.current) {
-        // If we have an element we want to focus
-        const {element, center} = elementInView.current;
-        element.scrollIntoView(center ? {block: 'center'} : true);
-      } else {
-        scrollingContainer.scrollTop = scrollingContainer.scrollHeight;
-      }
+      scrollingContainer.scrollTop = scrollingContainer.scrollHeight;
     } else {
       const scrollBottomPosition = scrollingContainer.scrollTop + scrollingContainer.clientHeight;
       const previousScrollHeight = scrollHeight.current;
@@ -118,9 +117,9 @@ const MessagesList: React.FC<MessagesListParams> = ({
   useLayoutEffect(() => {
     if (loaded) {
       // Update the scroll when the message list is updated
-      updateScroll(container.current);
+      updateScroll(container.current, elementInView.current);
     }
-  }, [messages.length, container, loaded, elementInView]);
+  }, [messages.length, loaded]);
 
   useEffect(() => {
     onLoading(true);
@@ -149,10 +148,7 @@ const MessagesList: React.FC<MessagesListParams> = ({
         hasReadReceiptsTurnedOn={conversationRepository.expectReadReceipt(conversation)}
         isLastDeliveredMessage={isLastDeliveredMessage}
         isMarked={focusedMessage && focusedMessage === message.id}
-        scrollTo={(element, center) => {
-          elementInView.current = {center, element};
-          setTimeout(() => (elementInView.current = undefined));
-        }}
+        scrollTo={(element, center) => updateScroll(container.current, {center, element})}
         isSelfTemporaryGuest={selfUser.isTemporaryGuest()}
         messageRepository={messageRepository}
         lastReadTimestamp={conversationLastReadTimestamp}
