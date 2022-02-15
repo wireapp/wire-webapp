@@ -312,6 +312,7 @@ const MessageWrapper: React.FC<MessageParams & {hasMarker: boolean}> = ({
         hasReadReceiptsTurnedOn={hasReadReceiptsTurnedOn}
         shouldShowInvitePeople={shouldShowInvitePeople}
         isSelfTemporaryGuest={isSelfTemporaryGuest}
+        classifiedDomains={teamState.classifiedDomains()}
       />
     );
   }
