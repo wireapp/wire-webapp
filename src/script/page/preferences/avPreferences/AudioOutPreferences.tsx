@@ -34,7 +34,7 @@ const AudioOutPreferences: React.FC<AudioOutPreferencesProps> = ({devicesHandler
     DeviceTypes.AUDIO_OUTPUT,
   ]);
 
-  const {[DeviceTypes.AUDIO_INPUT]: currentDeviceId} = useKoSubscribableChildren(devicesHandler?.currentDeviceId, [
+  const {[DeviceTypes.AUDIO_OUTPUT]: currentDeviceId} = useKoSubscribableChildren(devicesHandler?.currentDeviceId, [
     DeviceTypes.AUDIO_OUTPUT,
   ]);
 
