@@ -169,7 +169,6 @@ const MessageWrapper: React.FC<MessageParams & {hasMarker: boolean}> = ({
   onClickResetSession,
   onClickCancelRequest,
   onLike,
-  onVisible,
   messageRepository,
   messageActions,
   teamState = container.resolve(TeamState),
@@ -257,7 +256,7 @@ const MessageWrapper: React.FC<MessageParams & {hasMarker: boolean}> = ({
   });
 
   if (message.isContent()) {
-    const content = (
+    return (
       <TextMessage
         message={message}
         findMessage={findMessage}
@@ -281,10 +280,6 @@ const MessageWrapper: React.FC<MessageParams & {hasMarker: boolean}> = ({
         onClickReceipts={onClickReceipts}
       />
     );
-    if (onVisible) {
-      return <InViewport onVisible={onVisible}>{content}</InViewport>;
-    }
-    return content;
   }
   if (message.isUnableToDecrypt()) {
     return <DecryptionErrorMessage message={message} onClickResetSession={onClickResetSession} />;
@@ -321,7 +316,7 @@ const MessageWrapper: React.FC<MessageParams & {hasMarker: boolean}> = ({
     );
   }
   if (message.isPing()) {
-    const content = (
+    return (
       <PingMessage
         message={message}
         is1to1Conversation={conversation.is1to1()}
@@ -329,10 +324,6 @@ const MessageWrapper: React.FC<MessageParams & {hasMarker: boolean}> = ({
         onClickReceipts={onClickReceipts}
       />
     );
-    if (onVisible) {
-      return <InViewport onVisible={onVisible}>{content}</InViewport>;
-    }
-    return content;
   }
   if (message.isFileTypeRestricted()) {
     return <FileTypeRestrictedMessage message={message} />;
@@ -375,6 +366,9 @@ const Wrapper: React.FC<
     return classes[markerType];
   };
 
+  const content = <MessageWrapper {...props} hasMarker={markerType !== MessageMarkerType.NONE} />;
+  const wrappedContent = props.onVisible ? <InViewport onVisible={props.onVisible}>{content}</InViewport> : content;
+
   return (
     <div
       className={`message ${isMarked ? 'message-marked' : ''}`}
@@ -399,8 +393,7 @@ const Wrapper: React.FC<
           </MessageTime>
         </div>
       </div>
-
-      <MessageWrapper {...props} hasMarker={markerType !== MessageMarkerType.NONE} />
+      {wrappedContent}
     </div>
   );
 };
