@@ -62,7 +62,6 @@ export class AddParticipantsViewModel extends BasePanelViewModel {
   selectedService: ko.Observable<ServiceEntity>;
   state: ko.Observable<string>;
   isTeamOnly: ko.PureComputed<boolean>;
-  isServicesEnabled: ko.PureComputed<boolean>;
   showIntegrations: ko.PureComputed<boolean>;
   enableAddAction: ko.PureComputed<boolean>;
   isStateAddPeople: ko.PureComputed<boolean>;
@@ -106,14 +105,12 @@ export class AddParticipantsViewModel extends BasePanelViewModel {
     this.state = ko.observable(AddParticipantsViewModel.STATE.ADD_PEOPLE);
 
     this.isTeamOnly = ko.pureComputed(() => this.activeConversation() && this.activeConversation().isTeamOnly());
-    this.isServicesEnabled = ko.pureComputed(
-      () =>
-        this.activeConversation() &&
-        (this.activeConversation().isServicesRoom() || this.activeConversation().isGuestAndServicesRoom()),
-    );
 
     this.showIntegrations = ko.pureComputed(() => {
       if (this.activeConversation()) {
+        const isServicesEnabled =
+          this.activeConversation().isServicesRoom() || this.activeConversation().isGuestAndServicesRoom();
+
         const firstUserEntity = this.activeConversation().firstUserEntity();
         const hasBotUser = firstUserEntity && firstUserEntity.isService;
         const allowIntegrations = this.activeConversation().isGroup() || hasBotUser;
@@ -122,7 +119,7 @@ export class AddParticipantsViewModel extends BasePanelViewModel {
           allowIntegrations &&
           this.activeConversation().inTeam() &&
           !this.isTeamOnly() &&
-          this.isServicesEnabled()
+          isServicesEnabled
         );
       }
       return undefined;
