@@ -20,7 +20,7 @@
 import React from 'react';
 import ko from 'knockout';
 import TextMessage, {TextMessageProps} from './index';
-import {render, waitFor} from '@testing-library/react';
+import {act, render, waitFor} from '@testing-library/react';
 import {ContentMessage} from '../../../entity/message/ContentMessage';
 import {Conversation} from '../../../entity/Conversation';
 import {createRandomUuid} from '../../../util/util';
@@ -52,13 +52,14 @@ describe('message', () => {
       onClickImage: jest.fn(),
       onClickInvitePeople: jest.fn(),
       onClickLikes: jest.fn(),
+      previousMessage: undefined,
       onClickMessage: jest.fn(),
       onClickParticipants: jest.fn(),
       onClickReceipts: jest.fn(),
+      onContentUpdated: jest.fn(),
       onClickTimestamp: jest.fn(),
       onLike: jest.fn(),
       selfId: {domain: '', id: createRandomUuid()},
-      shouldShowAvatar: true,
     };
   });
 
@@ -87,8 +88,10 @@ describe('message', () => {
     message.user(new User(createRandomUuid()));
     message.quote(new QuoteEntity({messageId: quotedMessage.id, userId: ''}));
 
-    const {getByText} = render(<TextMessage {...defaultParams} message={message} findMessage={findMessage} />);
-    await waitFor(() => getByText(quoteText));
-    expect(getByText(quoteText)).not.toBe(null);
+    await act(async () => {
+      const {getByText} = render(<TextMessage {...defaultParams} message={message} findMessage={findMessage} />);
+      await waitFor(() => getByText(quoteText));
+      expect(defaultParams.onContentUpdated).toHaveBeenCalled();
+    });
   });
 });
