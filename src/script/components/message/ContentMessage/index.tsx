@@ -17,7 +17,7 @@
  *
  */
 
-import React, {useEffect} from 'react';
+import React from 'react';
 
 import {QualifiedId} from '@wireapp/api-client/src/user';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
@@ -67,7 +67,6 @@ export interface TextMessageProps extends Omit<MessageActions, 'onClickResetSess
   isLastDeliveredMessage: boolean;
   message: ContentMessage;
   onClickButton?: (message: ContentMessage, assetId: string) => void;
-  onContentUpdated?: () => void;
   previousMessage: Message;
   quotedMessage?: ContentMessage;
   selfId: QualifiedId;
@@ -165,7 +164,6 @@ const TextMessage: React.FC<TextMessageProps> = ({
   onClickMessage,
   onClickLikes,
   onClickButton,
-  onContentUpdated,
   onLike,
 }) => {
   const {entries: menuEntries} = useKoSubscribableChildren(contextMenu, ['entries']);
@@ -190,22 +188,6 @@ const TextMessage: React.FC<TextMessageProps> = ({
 
     return !previousMessage.isContent() || previousMessage.user().id !== message.user().id;
   };
-
-  useEffect(() => {
-    if (message.hasAssetText()) {
-      // add a listener to any changes to the assets. This will warn the parent that the message has changed
-      const assetSubscription = message.assets.subscribe(onContentUpdated);
-      // also listen for link previews on a single Text entity
-      const previewSubscription = (message.getFirstAsset() as Text).previews.subscribe(onContentUpdated);
-      return () => {
-        if (assetSubscription) {
-          assetSubscription.dispose();
-          previewSubscription.dispose();
-        }
-      };
-    }
-    return undefined;
-  }, []);
 
   const avatarSection = shouldShowAvatar() ? (
     <div className="message-header">
@@ -261,7 +243,6 @@ const TextMessage: React.FC<TextMessageProps> = ({
       {message.quote() && (
         <MessageQuote
           conversation={conversation}
-          onContentUpdated={onContentUpdated}
           quote={message.quote()}
           selfId={selfId}
           findMessage={findMessage}

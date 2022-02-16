@@ -48,7 +48,6 @@ export interface QuoteProps {
   findMessage: (conversation: Conversation, messageId: string) => Promise<ContentMessage | undefined>;
   focusMessage: (id: string) => void;
   handleClickOnMessage: (message: ContentMessage, event: React.MouseEvent) => void;
-  onContentUpdated: () => void;
   quote: QuoteEntity;
   selfId: QualifiedId;
   showDetail: (message: ContentMessage, event: React.MouseEvent) => void;
@@ -64,7 +63,6 @@ const Quote: React.FC<QuoteProps> = ({
   selfId,
   showDetail,
   showUserDetails,
-  onContentUpdated,
 }) => {
   const [quotedMessage, setQuotedMessage] = useState<ContentMessage>();
   const [error, setError] = useState<Error | string>(quote.error);
@@ -97,7 +95,6 @@ const Quote: React.FC<QuoteProps> = ({
       findMessage(conversation, quote.messageId)
         .then(message => {
           setQuotedMessage(message as ContentMessage);
-          onContentUpdated();
         })
         .catch(error => {
           if (error.type === ConversationError.TYPE.MESSAGE_NOT_FOUND) {

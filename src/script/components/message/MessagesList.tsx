@@ -11,7 +11,8 @@ import {StatusType} from '../../message/StatusType';
 import {registerStaticReactComponent, useKoSubscribableChildren} from 'Util/ComponentUtil';
 import MessageWrapper from './MessageWrapper';
 import {Text} from 'src/script/entity/message/Text';
-import {throttle} from 'underscore';
+import {useResizeObserver} from '../../ui/resizeObserver';
+import useEffectRef from 'Util/useEffectRef';
 
 interface MessagesListParams {
   cancelConnectionRequest: (message: MemberMessage) => void;
@@ -84,14 +85,12 @@ const MessagesList: React.FC<MessagesListParams> = ({
     return false;
   };
 
-  const container = useRef<HTMLDivElement | null>(null);
+  const [messagesContainer, setContainer] = useEffectRef<HTMLDivElement | null>(null);
   const scrollHeight = useRef(0);
+  const nbMessages = useRef(0);
 
-  const updateScroll = (visibleElement?: {center?: boolean; element: HTMLElement}) => {
-    if (!container.current) {
-      return;
-    }
-    const scrollingContainer = container.current.parentElement;
+  const updateScroll = (container: Element, visibleElement?: {center?: boolean; element: HTMLElement}) => {
+    const scrollingContainer = container.parentElement;
     if (!scrollingContainer) {
       return;
     }
@@ -108,21 +107,27 @@ const MessagesList: React.FC<MessagesListParams> = ({
       // If we hit the top and new messages were loaded, we keep the scroll position stable
       scrollingContainer.scrollTop = scrollingContainer.scrollHeight - previousScrollHeight;
     } else if (shouldStickToBottom) {
+      // We only want to animate the scroll if there are new messages in the list
+      const behavior = nbMessages.current !== messages.length ? 'smooth' : 'auto';
       // Simple content update, we just scroll to bottom if we are in the stick to bottom threshold
-      scrollingContainer.scrollTo({behavior: 'smooth', top: scrollingContainer.scrollHeight});
+      scrollingContainer.scrollTo({behavior, top: scrollingContainer.scrollHeight});
     } else if (lastMessage && lastMessage.status() === StatusType.SENDING && lastMessage.user().id === selfUser.id) {
       // The self user just sent a message, we scroll straight to the bottom
       scrollingContainer.scrollTo({behavior: 'smooth', top: scrollingContainer.scrollHeight});
     }
     scrollHeight.current = scrollingContainer.scrollHeight;
+    nbMessages.current = messages.length;
   };
 
+  // Listen to resizes of the the container element (if it's resized it means something has changed in the message list)
+  useResizeObserver(messagesContainer, () => updateScroll(messagesContainer));
+  // Also listen to the scrolling container resizes (when the window resizes or the inputBar changes)
+  useResizeObserver(messagesContainer?.parentElement, () => updateScroll(messagesContainer));
   useLayoutEffect(() => {
-    if (loaded) {
-      // Update the scroll when the message list is updated
-      updateScroll();
+    if (messagesContainer) {
+      updateScroll(messagesContainer);
     }
-  }, [messages.length, loaded]);
+  }, [messages.length, messagesContainer]);
 
   useEffect(() => {
     onLoading(true);
@@ -132,14 +137,6 @@ const MessagesList: React.FC<MessagesListParams> = ({
         onLoading(false);
       }, 100);
     });
-  }, []);
-
-  useEffect(() => {
-    const debouncedScrollUpdate = throttle(() => updateScroll(), 50);
-    window.addEventListener('resize', debouncedScrollUpdate);
-    return () => {
-      window.removeEventListener('resize', debouncedScrollUpdate);
-    };
   }, []);
 
   const messageViews = messages.map((message, index) => {
@@ -159,7 +156,7 @@ const MessagesList: React.FC<MessagesListParams> = ({
         hasReadReceiptsTurnedOn={conversationRepository.expectReadReceipt(conversation)}
         isLastDeliveredMessage={isLastDeliveredMessage}
         isMarked={!!focusedMessage && focusedMessage === message.id}
-        scrollTo={(element, center) => updateScroll({center, element})}
+        scrollTo={(element, center) => updateScroll(messagesContainer, {center, element})}
         isSelfTemporaryGuest={selfUser.isTemporaryGuest()}
         messageRepository={messageRepository}
         lastReadTimestamp={conversationLastReadTimestamp}
@@ -183,7 +180,6 @@ const MessagesList: React.FC<MessagesListParams> = ({
             conversationRepository.getMessagesWithOffset(conversation, messageEntity);
           }
         }}
-        onContentUpdated={() => updateScroll()}
         onLike={message => messageRepository.toggleLike(conversation, message)}
         selfId={selfUser.qualifiedId}
         shouldShowInvitePeople={shouldShowInvitePeople}
@@ -194,7 +190,7 @@ const MessagesList: React.FC<MessagesListParams> = ({
     return null;
   }
   return (
-    <div ref={container} className={`messages ${verticallyCenterMessage() ? 'flex-center' : ''}`}>
+    <div ref={setContainer} className={`messages ${verticallyCenterMessage() ? 'flex-center' : ''}`}>
       {messageViews}
     </div>
   );

@@ -99,7 +99,6 @@ interface MessageParams extends MessageActions {
     deleteMessageEveryone: (conversation: Conversation, message: BaseMessage) => void;
   };
   messageRepository: MessageRepository;
-  onContentUpdated: () => void;
   onVisible?: () => void;
   previousMessage?: BaseMessage;
   selfId: QualifiedId;
@@ -157,7 +156,6 @@ const MessageWrapper: React.FC<MessageParams & {hasMarker: boolean}> = ({
   shouldShowInvitePeople,
   previousMessage,
   hasReadReceiptsTurnedOn,
-  onContentUpdated,
   onClickAvatar,
   onClickImage,
   onClickInvitePeople,
@@ -266,7 +264,6 @@ const MessageWrapper: React.FC<MessageParams & {hasMarker: boolean}> = ({
         selfId={selfId}
         isLastDeliveredMessage={isLastDeliveredMessage}
         onLike={onLike}
-        onContentUpdated={onContentUpdated}
         onClickMessage={onClickMessage}
         onClickTimestamp={onClickTimestamp}
         onClickLikes={onClickLikes}
