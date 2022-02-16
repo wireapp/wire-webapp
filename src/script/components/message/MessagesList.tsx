@@ -10,6 +10,7 @@ import {User} from 'src/script/entity/User';
 import {StatusType} from '../../message/StatusType';
 import {registerStaticReactComponent, useKoSubscribableChildren} from 'Util/ComponentUtil';
 import MessageWrapper from './MessageWrapper';
+import {Text} from 'src/script/entity/message/Text';
 
 interface MessagesListParams {
   cancelConnectionRequest: (message: MemberMessage) => void;
@@ -26,7 +27,7 @@ interface MessagesListParams {
     deleteMessageEveryone: (conversation: Conversation, message: Message) => void;
   };
   messageRepository: MessageRepository;
-  onClickMessage: (message: ContentMessage, event: React.MouseEvent) => void;
+  onClickMessage: (message: ContentMessage | Text, event: React.MouseEvent) => void;
   onLoading: (isLoading: boolean) => void;
   resetSession: (messageError: DecryptErrorMessage) => void;
   selfUser: User;
@@ -60,7 +61,7 @@ const MessagesList: React.FC<MessagesListParams> = ({
   ]);
   const messages = allMessages.filter(message => message.visible());
   const [loaded, setLoaded] = useState(false);
-  const [focusedMessage, setFocusedMessage] = useState<string>(initialMessage?.id);
+  const [focusedMessage, setFocusedMessage] = useState<string | undefined>(initialMessage?.id);
 
   const conversationLastReadTimestamp = useMemo(() => conversation.last_read_timestamp(), []);
   const shouldShowInvitePeople =
@@ -82,7 +83,7 @@ const MessagesList: React.FC<MessagesListParams> = ({
     return false;
   };
 
-  const container = useRef<HTMLDivElement>();
+  const container = useRef<HTMLDivElement | null>(null);
   const scrollHeight = useRef(0);
 
   const updateScroll = (visibleElement?: {center?: boolean; element: HTMLElement}) => {
@@ -133,7 +134,7 @@ const MessagesList: React.FC<MessagesListParams> = ({
   }, []);
 
   const messageViews = messages.map((message, index) => {
-    const previousMessage = index > 0 && messages[index - 1];
+    const previousMessage = messages[index - 1];
     const isLastDeliveredMessage = lastDeliveredMessage?.id === message.id;
 
     const visibleCallback = getVisibleCallback(conversation, message);
@@ -148,7 +149,7 @@ const MessagesList: React.FC<MessagesListParams> = ({
         conversationLastReadTimestamp={conversationLastReadTimestamp}
         hasReadReceiptsTurnedOn={conversationRepository.expectReadReceipt(conversation)}
         isLastDeliveredMessage={isLastDeliveredMessage}
-        isMarked={focusedMessage && focusedMessage === message.id}
+        isMarked={!!focusedMessage && focusedMessage === message.id}
         scrollTo={(element, center) => updateScroll({center, element})}
         isSelfTemporaryGuest={selfUser.isTemporaryGuest()}
         messageRepository={messageRepository}
@@ -180,12 +181,13 @@ const MessagesList: React.FC<MessagesListParams> = ({
       />
     );
   });
+  if (!loaded) {
+    return null;
+  }
   return (
-    loaded && (
-      <div ref={container} className={`messages ${verticallyCenterMessage() ? 'flex-center' : ''}`}>
-        {messageViews}
-      </div>
-    )
+    <div ref={container} className={`messages ${verticallyCenterMessage() ? 'flex-center' : ''}`}>
+      {messageViews}
+    </div>
   );
 };
 
