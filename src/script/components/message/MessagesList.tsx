@@ -1,4 +1,4 @@
-import React, {useEffect, useLayoutEffect, useMemo, useRef, useState} from 'react';
+import React, {useEffect, useLayoutEffect, useRef, useState} from 'react';
 import {ConversationRepository} from 'src/script/conversation/ConversationRepository';
 import {MessageRepository} from 'src/script/conversation/MessageRepository';
 import {Conversation} from '../../entity/Conversation';
@@ -65,7 +65,6 @@ const MessagesList: React.FC<MessagesListParams> = ({
   const [loaded, setLoaded] = useState(false);
   const [focusedMessage, setFocusedMessage] = useState<string | undefined>(initialMessage?.id);
 
-  const conversationLastReadTimestamp = useMemo(() => conversation.last_read_timestamp(), []);
   const shouldShowInvitePeople =
     conversation.isActiveParticipant() && conversation.inTeam() && conversation.isGuestRoom();
 
@@ -88,6 +87,7 @@ const MessagesList: React.FC<MessagesListParams> = ({
   const [messagesContainer, setContainer] = useEffectRef<HTMLDivElement | null>(null);
   const scrollHeight = useRef(0);
   const nbMessages = useRef(0);
+  const conversationLastReadTimestamp = useRef(conversation.last_read_timestamp());
 
   const updateScroll = (container: Element, visibleElement?: {center?: boolean; element: HTMLElement}) => {
     const scrollingContainer = container.parentElement;
@@ -152,14 +152,13 @@ const MessagesList: React.FC<MessagesListParams> = ({
         previousMessage={previousMessage}
         messageActions={messageActions}
         conversation={conversation}
-        conversationLastReadTimestamp={conversationLastReadTimestamp}
         hasReadReceiptsTurnedOn={conversationRepository.expectReadReceipt(conversation)}
         isLastDeliveredMessage={isLastDeliveredMessage}
         isMarked={!!focusedMessage && focusedMessage === message.id}
         scrollTo={(element, center) => updateScroll(messagesContainer, {center, element})}
         isSelfTemporaryGuest={selfUser.isTemporaryGuest()}
         messageRepository={messageRepository}
-        lastReadTimestamp={conversationLastReadTimestamp}
+        lastReadTimestamp={conversationLastReadTimestamp.current}
         onClickAvatar={showUserDetails}
         onClickCancelRequest={cancelConnectionRequest}
         onClickImage={showImageDetails}
