@@ -89,8 +89,8 @@ const MessagesList: React.FC<MessagesListParams> = ({
   const nbMessages = useRef(0);
   const conversationLastReadTimestamp = useRef(conversation.last_read_timestamp());
 
-  const updateScroll = (container: Element, visibleElement?: {center?: boolean; element: HTMLElement}) => {
-    const scrollingContainer = container.parentElement;
+  const updateScroll = (container: Element | null, visibleElement?: {center?: boolean; element: HTMLElement}) => {
+    const scrollingContainer = container?.parentElement;
     if (!scrollingContainer) {
       return;
     }
