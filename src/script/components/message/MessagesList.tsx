@@ -102,7 +102,7 @@ const MessagesList: React.FC<MessagesListParams> = ({
       // If we have an element we want to focus
       const {element, center} = visibleElement;
       element.scrollIntoView(center ? {block: 'center'} : true);
-    } else if (lastMessage.status() === StatusType.SENDING && lastMessage.user().id === selfUser.id) {
+    } else if (lastMessage && lastMessage.status() === StatusType.SENDING && lastMessage.user().id === selfUser.id) {
       // The self user just sent a message, we scroll straight to the bottom
       scrollingContainer.scrollTop = scrollingContainer.scrollHeight;
     } else if (scrollingContainer.scrollTop === 0 && scrollingContainer.scrollHeight > previousScrollHeight) {
