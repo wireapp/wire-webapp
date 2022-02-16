@@ -60,16 +60,10 @@ export class MessageListViewModel {
   private readonly logger: Logger;
   readonly actionsViewModel: ActionsViewModel;
   readonly selfUser: ko.Observable<User>;
-  readonly focusedMessage: ko.Observable<string>;
   readonly initialMessage: ko.Observable<Message | undefined> = ko.observable();
   readonly conversation: ko.Observable<Conversation>;
-  readonly verticallyCenterMessage: ko.PureComputed<boolean>;
   readonly conversationLoaded = ko.observable(false);
-  conversationLastReadTimestamp: number;
   private readonly readMessagesBuffer: ko.ObservableArray<{conversation: Conversation; message: Message}>;
-  private readonly messagesChangeSubscription: ko.Subscription;
-  private readonly messagesBeforeChangeSubscription: ko.Subscription;
-  private messagesContainer: HTMLElement;
   showInvitePeople: ko.PureComputed<boolean>;
 
   constructor(
@@ -86,12 +80,8 @@ export class MessageListViewModel {
 
     this.actionsViewModel = this.mainViewModel.actions;
     this.selfUser = this.userState.self;
-    this.focusedMessage = ko.observable(null);
 
     this.conversation = ko.observable(new Conversation());
-
-    // Store last read to show until user switches conversation
-    this.conversationLastReadTimestamp = undefined;
 
     // this buffer will collect all the read messages and send a read receipt in batch
     this.readMessagesBuffer = ko.observableArray();
@@ -110,12 +100,6 @@ export class MessageListViewModel {
         }
       });
 
-    // Store message subscription id
-    this.messagesChangeSubscription = undefined;
-    this.messagesBeforeChangeSubscription = undefined;
-
-    this.messagesContainer = undefined;
-
     this.showInvitePeople = ko.pureComputed(() => {
       return (
         this.conversation().isActiveParticipant() &&
@@ -125,21 +109,10 @@ export class MessageListViewModel {
     });
   }
 
-  readonly onMessageContainerInitiated = (messagesContainer: HTMLElement): void => {
-    this.messagesContainer = messagesContainer;
-  };
-
   readonly releaseConversation = (conversation_et: Conversation): void => {
     if (conversation_et) {
       conversation_et.release();
     }
-    if (this.messagesBeforeChangeSubscription) {
-      this.messagesBeforeChangeSubscription.dispose();
-    }
-    if (this.messagesChangeSubscription) {
-      this.messagesChangeSubscription.dispose();
-    }
-    this.conversationLastReadTimestamp = undefined;
   };
 
   changeConversation = async (conversationEntity: Conversation, messageEntity: Message): Promise<void> => {
@@ -166,10 +139,6 @@ export class MessageListViewModel {
     return messageEntity.timestamp() && messageEntity.timestamp() >= conversationEntity.last_event_timestamp();
   };
 
-  readonly getMessagesContainer = () => {
-    return this.messagesContainer;
-  };
-
   loadPrecedingMessages = async (): Promise<void> => {
     const shouldPullMessages = !this.conversation().is_pending() && this.conversation().hasAdditionalMessages();
     if (shouldPullMessages) {
@@ -185,18 +154,6 @@ export class MessageListViewModel {
         // if the last loaded message is not the last of the conversation, we load the subsequent messages
         this.conversationRepository.getSubsequentMessages(this.conversation(), lastMessage as ContentMessage);
       }
-    }
-  };
-
-  focusMessage = async (messageId: string): Promise<void> => {
-    const messageIsLoaded = !!this.conversation().getMessage(messageId);
-    this.focusedMessage(messageId);
-
-    if (!messageIsLoaded) {
-      const conversationEntity = this.conversation();
-      const messageEntity = await this.messageRepository.getMessageInConversationById(conversationEntity, messageId);
-      conversationEntity.removeMessages();
-      this.conversationRepository.getMessagesWithOffset(conversationEntity, messageEntity);
     }
   };
 
