@@ -110,10 +110,10 @@ const MessagesList: React.FC<MessagesListParams> = ({
       // We only want to animate the scroll if there are new messages in the list
       const behavior = nbMessages.current !== messages.length ? 'smooth' : 'auto';
       // Simple content update, we just scroll to bottom if we are in the stick to bottom threshold
-      scrollingContainer.scrollTo({behavior, top: scrollingContainer.scrollHeight});
+      scrollingContainer.scrollTo?.({behavior, top: scrollingContainer.scrollHeight});
     } else if (lastMessage && lastMessage.status() === StatusType.SENDING && lastMessage.user().id === selfUser.id) {
       // The self user just sent a message, we scroll straight to the bottom
-      scrollingContainer.scrollTo({behavior: 'smooth', top: scrollingContainer.scrollHeight});
+      scrollingContainer.scrollTo?.({behavior: 'smooth', top: scrollingContainer.scrollHeight});
     }
     scrollHeight.current = scrollingContainer.scrollHeight;
     nbMessages.current = messages.length;

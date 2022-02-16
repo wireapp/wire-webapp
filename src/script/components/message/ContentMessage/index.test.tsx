@@ -52,13 +52,12 @@ describe('message', () => {
       onClickImage: jest.fn(),
       onClickInvitePeople: jest.fn(),
       onClickLikes: jest.fn(),
-      previousMessage: undefined,
       onClickMessage: jest.fn(),
       onClickParticipants: jest.fn(),
       onClickReceipts: jest.fn(),
-      onContentUpdated: jest.fn(),
       onClickTimestamp: jest.fn(),
       onLike: jest.fn(),
+      previousMessage: undefined,
       selfId: {domain: '', id: createRandomUuid()},
     };
   });
@@ -91,7 +90,6 @@ describe('message', () => {
     await act(async () => {
       const {getByText} = render(<TextMessage {...defaultParams} message={message} findMessage={findMessage} />);
       await waitFor(() => getByText(quoteText));
-      expect(defaultParams.onContentUpdated).toHaveBeenCalled();
     });
   });
 });
