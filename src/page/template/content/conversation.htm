@@ -8,7 +8,7 @@
   <messages-list
     id="message-list"
     class="message-list"
-    data-bind="fadingscrollbar, infinite_scroll: {onHitBottom: () => $root.messageList.loadFollowingMessages(), onHitTop: () => $root.messageList.loadPrecedingMessages(), onInit: $root.messageList.onMessageContainerInitiated}"
+    data-bind="fadingscrollbar, infinite_scroll: {onHitBottom: () => $root.messageList.loadFollowingMessages(), onHitTop: () => $root.messageList.loadPrecedingMessages()}"
     params="
     conversation: $root.conversationRepository.conversationState.activeConversation,
     conversationRepository: $root.conversationRepository,
