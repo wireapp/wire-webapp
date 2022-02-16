@@ -248,7 +248,10 @@ export class MessageRepository {
    * @see https://github.com/wireapp/wire-docs/tree/master/src/understand/federation
    * @see https://docs.wire.com/understand/federation/index.html
    */
-  private async sendText({conversation, message, mentions = [], linkPreview, quote, messageId}: TextMessagePayload) {
+  private async sendText(
+    {conversation, message, mentions = [], linkPreview, quote, messageId}: TextMessagePayload,
+    options?: {syncTimestamp?: boolean},
+  ) {
     const baseMessage = MessageBuilder.createText({
       ...this.createCommonMessagePayload(conversation),
       messageId,
@@ -256,7 +259,7 @@ export class MessageRepository {
     });
     const textMessage = this.decorateTextMessage(conversation, baseMessage, {linkPreview, mentions, quote});
 
-    return this.sendAndInjectGenericCoreMessage(textMessage, conversation);
+    return this.sendAndInjectGenericCoreMessage(textMessage, conversation, options);
   }
 
   private async sendEdit({
@@ -385,12 +388,15 @@ export class MessageRepository {
     const linkPreview = await getLinkPreviewFromString(textPayload.message);
     if (linkPreview) {
       // If we detect a link preview, then we go on and send a new message (that will override the initial message) containing the link preview
-      await this.sendText({
-        ...textPayload,
-        linkPreview: linkPreview.image
-          ? await this.core.service!.linkPreview.uploadLinkPreviewImage(linkPreview as LinkPreviewContent)
-          : linkPreview,
-      });
+      await this.sendText(
+        {
+          ...textPayload,
+          linkPreview: linkPreview.image
+            ? await this.core.service!.linkPreview.uploadLinkPreviewImage(linkPreview as LinkPreviewContent)
+            : linkPreview,
+        },
+        {syncTimestamp: false},
+      );
     }
   }
 
