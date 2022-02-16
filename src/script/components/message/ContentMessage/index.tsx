@@ -26,39 +26,22 @@ import {Conversation} from 'src/script/entity/Conversation';
 import {ContentMessage} from 'src/script/entity/message/ContentMessage';
 import {EphemeralStatusType} from '../../../message/EphemeralStatusType';
 
-import {Asset} from 'src/script/entity/message/Asset';
-import type {FileAsset} from 'src/script/entity/message/FileAsset';
-import type {MediumImage} from 'src/script/entity/message/MediumImage';
-import type {Text} from 'src/script/entity/message/Text';
-import type {Location} from 'src/script/entity/message/Location';
-
 import Avatar, {AVATAR_SIZE} from 'Components/Avatar';
 import MessageQuote from './MessageQuote';
 import MessageLike from './MessageLike';
 import MessageFooterLike from './MessageFooterLike';
-import FileAssetComponent from './asset/FileAssetComponent';
-import AudioAssetComponent from './asset/AudioAsset';
-import ImageAssetComponent from './asset/ImageAsset';
-import LinkPreviewAssetComponent from './asset/LinkPreviewAssetComponent';
-import LocationAssetComponent from './asset/LocationAsset';
-import VideoAssetComponent from './asset/VideoAsset';
-import ButtonAssetComponent from './asset/MessageButton';
 import ReadReceiptStatus from '../ReadReceiptStatus';
 import EphemeralTimer from '../EphemeralTimer';
 
-import {AssetType} from '../../../assets/AssetType';
-import {Button} from 'src/script/entity/message/Button';
-import {CompositeMessage} from 'src/script/entity/message/CompositeMessage';
 import MessageTime from '../MessageTime';
 import {ContextMenuEntry, showContextMenu} from '../../../ui/ContextMenu';
 import Icon from 'Components/Icon';
 import {t} from 'Util/LocalizerUtil';
-import {StatusType} from '../../../message/StatusType';
-import {includesOnlyEmojis} from 'Util/EmojiUtil';
 import {MessageActions} from '../MessageWrapper';
 import {Message} from 'src/script/entity/message/Message';
+import ContentAsset from './asset';
 
-export interface TextMessageProps extends Omit<MessageActions, 'onClickResetSession'> {
+export interface ContentMessageProps extends Omit<MessageActions, 'onClickResetSession'> {
   contextMenu: {entries: ko.Subscribable<ContextMenuEntry[]>};
   conversation: Conversation;
   findMessage: (conversation: Conversation, messageId: string) => Promise<ContentMessage | undefined>;
@@ -72,83 +55,7 @@ export interface TextMessageProps extends Omit<MessageActions, 'onClickResetSess
   selfId: QualifiedId;
 }
 
-const ContentAsset = ({
-  asset,
-  message,
-  selfId,
-  onClickImage,
-  onClickMessage,
-  onClickButton,
-}: {
-  asset: Asset;
-  message: ContentMessage;
-  onClickButton: TextMessageProps['onClickButton'];
-  onClickImage: MessageActions['onClickImage'];
-  onClickMessage: MessageActions['onClickMessage'];
-  selfId: QualifiedId;
-}) => {
-  const {isObfuscated, status} = useKoSubscribableChildren(message, ['isObfuscated', 'status']);
-  switch (asset.type) {
-    case AssetType.TEXT:
-      return (
-        <>
-          {(asset as Text).should_render_text() && (
-            <div
-              className={`text ${includesOnlyEmojis((asset as Text).text) ? 'text-large' : ''} ${
-                status === StatusType.SENDING ? 'text-foreground' : ''
-              } ${isObfuscated ? 'ephemeral-message-obfuscated' : ''}`}
-              dangerouslySetInnerHTML={{__html: (asset as Text).render(selfId, message.accent_color())}}
-              onClick={event => onClickMessage(asset as Text, event)}
-              dir="auto"
-            ></div>
-          )}
-          {(asset as Text).previews().map(preview => (
-            <div key={preview.url} className="message-asset">
-              <LinkPreviewAssetComponent message={message} />
-            </div>
-          ))}
-        </>
-      );
-    case AssetType.FILE:
-      if ((asset as FileAsset).isFile()) {
-        return (
-          <div className={`message-asset ${isObfuscated && 'ephemeral-asset-expired icon-file'}`}>
-            <FileAssetComponent message={message} />
-          </div>
-        );
-      }
-      if ((asset as FileAsset).isAudio()) {
-        return (
-          <div className={`message-asset ${isObfuscated && 'ephemeral-asset-expired'}`}>
-            <AudioAssetComponent message={message} />
-          </div>
-        );
-      }
-      if ((asset as FileAsset).isVideo()) {
-        return (
-          <div className={`message-asset ${isObfuscated && 'ephemeral-asset-expired icon-movie'}`}>
-            <VideoAssetComponent message={message} />
-          </div>
-        );
-      }
-    case AssetType.IMAGE:
-      return <ImageAssetComponent asset={asset as MediumImage} message={message} onClick={onClickImage} />;
-    case AssetType.LOCATION:
-      return <LocationAssetComponent asset={asset as Location} />;
-    case AssetType.BUTTON:
-      return (
-        <ButtonAssetComponent
-          onClick={() => onClickButton(message, asset.id)}
-          label={(asset as Button).text}
-          id={asset.id}
-          message={message as CompositeMessage}
-        />
-      );
-  }
-  return null;
-};
-
-const TextMessage: React.FC<TextMessageProps> = ({
+const ContentMessageComponent: React.FC<ContentMessageProps> = ({
   conversation,
   message,
   findMessage,
@@ -324,4 +231,4 @@ const TextMessage: React.FC<TextMessageProps> = ({
   );
 };
 
-export default TextMessage;
+export default ContentMessageComponent;

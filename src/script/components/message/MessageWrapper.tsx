@@ -65,7 +65,7 @@ import LegalHoldMessage from './LegalHoldMessage';
 import SystemMessage from './SystemMessage';
 import MemberMessage from './MemberMessage';
 import PingMessage from './PingMessage';
-import TextMessage from './ContentMessage';
+import ContentMessageComponent from './ContentMessage';
 import React, {useEffect, useLayoutEffect, useRef, useState} from 'react';
 import InViewport from 'Components/utils/InViewport';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
@@ -255,7 +255,7 @@ const MessageWrapper: React.FC<MessageParams & {hasMarker: boolean}> = ({
 
   if (message.isContent()) {
     return (
-      <TextMessage
+      <ContentMessageComponent
         message={message}
         findMessage={findMessage}
         conversation={conversation}

@@ -19,7 +19,7 @@
 
 import React from 'react';
 import ko from 'knockout';
-import TextMessage, {TextMessageProps} from './index';
+import ContentMessageComponent, {ContentMessageProps} from './index';
 import {act, render, waitFor} from '@testing-library/react';
 import {ContentMessage} from '../../../entity/message/ContentMessage';
 import {Conversation} from '../../../entity/Conversation';
@@ -30,7 +30,7 @@ import {LinkPreview} from 'src/script/entity/message/LinkPreview';
 import {QuoteEntity} from 'src/script/message/QuoteEntity';
 
 describe('message', () => {
-  let defaultParams: TextMessageProps;
+  let defaultParams: ContentMessageProps;
   const textValue = 'hello';
 
   beforeEach(() => {
@@ -63,7 +63,7 @@ describe('message', () => {
   });
 
   it('displays a message', () => {
-    const {getByText} = render(<TextMessage {...defaultParams} />);
+    const {getByText} = render(<ContentMessageComponent {...defaultParams} />);
     expect(getByText(textValue)).toBeDefined();
   });
 
@@ -71,7 +71,7 @@ describe('message', () => {
     const linkPreview = new LinkPreview({title: 'A link to the past'});
     (defaultParams.message.getFirstAsset() as Text).previews([linkPreview]);
 
-    const {getByText} = render(<TextMessage {...defaultParams} />);
+    const {getByText} = render(<ContentMessageComponent {...defaultParams} />);
     expect(getByText(linkPreview.title)).not.toBe(null);
   });
 
@@ -88,7 +88,9 @@ describe('message', () => {
     message.quote(new QuoteEntity({messageId: quotedMessage.id, userId: ''}));
 
     await act(async () => {
-      const {getByText} = render(<TextMessage {...defaultParams} message={message} findMessage={findMessage} />);
+      const {getByText} = render(
+        <ContentMessageComponent {...defaultParams} message={message} findMessage={findMessage} />,
+      );
       await waitFor(() => getByText(quoteText));
     });
   });
