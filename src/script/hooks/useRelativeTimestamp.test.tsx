@@ -24,10 +24,10 @@ describe('useRelativeTimestamp', () => {
   });
 
   it.each([
-    [24 * 60 * 60 * 1001, 'conversationYesterday 1:00 AM'],
+    [24 * 60 * 60 * 1001, 'conversationYesterday 12:00 AM'],
     [5 * 24 * 60 * 60 * 1001, formatLocale(0, 'EEEE p')],
-    [10 * 24 * 60 * 60 * 1001, 'Thursday, Jan 1, 1:00 AM'],
-    [366 * 24 * 60 * 60 * 1001, 'Thursday, Jan 1 1970, 1:00 AM'],
+    [10 * 24 * 60 * 60 * 1001, 'Thursday, Jan 1, 12:00 AM'],
+    [366 * 24 * 60 * 60 * 1001, 'Thursday, Jan 1 1970, 12:00 AM'],
   ])('computes the right time according to the given timestamp', async (currentTime, expected) => {
     jest.setSystemTime(currentTime);
     const {result} = renderHook(() => useRelativeTimestamp(0, true));
