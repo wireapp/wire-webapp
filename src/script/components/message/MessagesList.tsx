@@ -11,6 +11,7 @@ import {StatusType} from '../../message/StatusType';
 import {registerStaticReactComponent, useKoSubscribableChildren} from 'Util/ComponentUtil';
 import MessageWrapper from './MessageWrapper';
 import {Text} from 'src/script/entity/message/Text';
+import {throttle} from 'underscore';
 
 interface MessagesListParams {
   cancelConnectionRequest: (message: MemberMessage) => void;
@@ -103,15 +104,15 @@ const MessagesList: React.FC<MessagesListParams> = ({
       // If we have an element we want to focus
       const {element, center} = visibleElement;
       element.scrollIntoView(center ? {block: 'center'} : true);
-    } else if (lastMessage && lastMessage.status() === StatusType.SENDING && lastMessage.user().id === selfUser.id) {
-      // The self user just sent a message, we scroll straight to the bottom
-      scrollingContainer.scrollTop = scrollingContainer.scrollHeight;
     } else if (scrollingContainer.scrollTop === 0 && scrollingContainer.scrollHeight > previousScrollHeight) {
       // If we hit the top and new messages were loaded, we keep the scroll position stable
       scrollingContainer.scrollTop = scrollingContainer.scrollHeight - previousScrollHeight;
     } else if (shouldStickToBottom) {
       // Simple content update, we just scroll to bottom if we are in the stick to bottom threshold
-      scrollingContainer.scrollTop = scrollingContainer.scrollHeight;
+      scrollingContainer.scrollTo({behavior: 'smooth', top: scrollingContainer.scrollHeight});
+    } else if (lastMessage && lastMessage.status() === StatusType.SENDING && lastMessage.user().id === selfUser.id) {
+      // The self user just sent a message, we scroll straight to the bottom
+      scrollingContainer.scrollTo({behavior: 'smooth', top: scrollingContainer.scrollHeight});
     }
     scrollHeight.current = scrollingContainer.scrollHeight;
   };
@@ -131,6 +132,14 @@ const MessagesList: React.FC<MessagesListParams> = ({
         onLoading(false);
       }, 100);
     });
+  }, []);
+
+  useEffect(() => {
+    const debouncedScrollUpdate = throttle(() => updateScroll(), 50);
+    window.addEventListener('resize', debouncedScrollUpdate);
+    return () => {
+      window.removeEventListener('resize', debouncedScrollUpdate);
+    };
   }, []);
 
   const messageViews = messages.map((message, index) => {
