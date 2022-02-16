@@ -9,6 +9,7 @@
     "allowSyntheticDefaultImports": true,
     "alwaysStrict": true,
     "baseUrl": ".",
+    "strict": true,
     "declaration": false,
     "downlevelIteration": true,
     "emitDecoratorMetadata": true,
