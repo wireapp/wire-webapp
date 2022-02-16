@@ -26,8 +26,6 @@ import {SystemMessageType} from '../../message/SystemMessageType';
 import {SystemMessage} from './SystemMessage';
 
 export class ReceiptModeUpdateMessage extends SystemMessage {
-  public caption: ko.PureComputed<string>;
-
   constructor(isReceiptEnabled: boolean) {
     super();
 

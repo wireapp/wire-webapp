@@ -297,7 +297,7 @@ const MessageWrapper: React.FC<MessageParams & {hasMarker: boolean}> = ({
     return <CallTimeoutMessage message={message} />;
   }
   if (message.isSystem()) {
-    return <SystemMessage message={message as any} />;
+    return <SystemMessage message={message} />;
   }
   if (message.isMember()) {
     return (

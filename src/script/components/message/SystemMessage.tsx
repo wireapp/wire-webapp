@@ -24,11 +24,9 @@ import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import MessageTime from './MessageTime';
 import {SystemMessageType} from '../../message/SystemMessageType';
 import {RenameMessage} from '../../entity/message/RenameMessage';
-import {MessageTimerUpdateMessage} from '../../entity/message/MessageTimerUpdateMessage';
-import {ReceiptModeUpdateMessage} from '../../entity/message/ReceiptModeUpdateMessage';
-import {DeleteConversationMessage} from '../../entity/message/DeleteConversationMessage';
+import {SystemMessage as SystemMessageEntity} from 'src/script/entity/message/SystemMessage';
 export interface SystemMessageProps {
-  message: DeleteConversationMessage | MessageTimerUpdateMessage | ReceiptModeUpdateMessage | RenameMessage;
+  message: SystemMessageEntity;
 }
 
 const SystemMessage: React.FC<SystemMessageProps> = ({message}) => {
