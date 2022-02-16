@@ -283,9 +283,7 @@ const ConversationListCallingCell: React.FC<CallingCellProps> = ({
             )
           )}
 
-          {classifiedDomains && (
-            <ClassifiedBar users={conversation.participating_user_ets()} classifiedDomains={classifiedDomains} />
-          )}
+          {classifiedDomains && <ClassifiedBar users={userEts} classifiedDomains={classifiedDomains} />}
 
           {!isDeclined && (
             <>
