@@ -135,7 +135,7 @@ const MessagesList: React.FC<MessagesListParams> = ({
       setTimeout(() => {
         setLoaded(true);
         onLoading(false);
-      }, 100);
+      }, 10);
     });
   }, []);
 
