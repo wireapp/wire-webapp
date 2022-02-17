@@ -27,12 +27,25 @@ const resizeObserver = new ResizeObserver(entries => {
   }
 });
 
+// In order to avoid firing the callback at init time (and only firing it when the content size actually updated)
+// we need this little tool to avoid it (see. https://github.com/WICG/resize-observer/issues/38)
+const skipFirstCall = (fn: (...args: unknown[]) => void) => {
+  let isFirst = true;
+  return () => {
+    if (isFirst) {
+      isFirst = false;
+      return;
+    }
+    return fn();
+  };
+};
+
 export const useResizeObserver = (element: Element | undefined, callback: (element: Element) => void) => {
   useEffect(() => {
     if (!element) {
       return () => {};
     }
-    observedElements.set(element, callback);
+    observedElements.set(element, skipFirstCall(callback));
     resizeObserver.observe(element);
     return () => {
       observedElements.delete(element);

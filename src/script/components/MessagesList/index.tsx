@@ -144,6 +144,10 @@ const MessagesList: React.FC<MessagesListParams> = ({
     });
   }, []);
 
+  if (!loaded) {
+    return null;
+  }
+
   const messageViews = messages.map((message, index) => {
     const previousMessage = messages[index - 1];
     const isLastDeliveredMessage = lastDeliveredMessage?.id === message.id;
@@ -160,13 +164,14 @@ const MessagesList: React.FC<MessagesListParams> = ({
         hasReadReceiptsTurnedOn={conversationRepository.expectReadReceipt(conversation)}
         isLastDeliveredMessage={isLastDeliveredMessage}
         isMarked={!!focusedMessage && focusedMessage === message.id}
-        scrollTo={(element, center) => {
-          // Keep track of the element that should be made visible
+        scrollTo={({element, center}, isUnread) => {
+          if (isUnread && messagesContainer) {
+            // if it's a new unread message, but we are not on the first render of the list,
+            // we do not need to scroll to the unread message
+            return;
+          }
           focusedElement.current = {center, element};
-          setTimeout(() => {
-            // Releasing the element that should be made visible in order for the scroll to restore its normal behavior
-            focusedElement.current = null;
-          }, 1000);
+          setTimeout(() => (focusedElement.current = null), 1000);
           updateScroll(messagesContainer);
         }}
         isSelfTemporaryGuest={selfUser.isTemporaryGuest()}
@@ -198,9 +203,7 @@ const MessagesList: React.FC<MessagesListParams> = ({
       />
     );
   });
-  if (!loaded) {
-    return null;
-  }
+
   return (
     <div ref={setContainer} className={`messages ${verticallyCenterMessage() ? 'flex-center' : ''}`}>
       {messageViews}

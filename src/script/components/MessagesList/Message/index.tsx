@@ -73,7 +73,9 @@ export interface MessageParams extends MessageActions {
   teamState?: TeamState;
 }
 
-const Message: React.FC<MessageParams & {scrollTo?: (element: HTMLElement, center?: boolean) => void}> = props => {
+const Message: React.FC<
+  MessageParams & {scrollTo?: (elm: {center?: boolean; element: HTMLElement}, isUnread?: boolean) => void}
+> = props => {
   const {message, previousMessage, isMarked, lastReadTimestamp} = props;
   const messageElementRef = useRef<HTMLDivElement>();
   const {status, ephemeral_expires, timestamp} = useKoSubscribableChildren(message, [
@@ -87,9 +89,9 @@ const Message: React.FC<MessageParams & {scrollTo?: (element: HTMLElement, cente
 
   useLayoutEffect(() => {
     if (isMarked) {
-      props.scrollTo(messageElementRef.current, true);
+      props.scrollTo({center: true, element: messageElementRef.current});
     } else if (markerType === MessageMarkerType.UNREAD) {
-      props.scrollTo(messageElementRef.current);
+      props.scrollTo({element: messageElementRef.current}, true);
     }
   }, [isMarked, messageElementRef]);
 
