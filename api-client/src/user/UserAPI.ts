@@ -43,6 +43,7 @@ import type {PublicClient, QualifiedPublicClients} from '../client/';
 import type {RichInfo} from './RichInfo';
 import type {UserClients, QualifiedUserClients} from '../conversation/';
 import type {QualifiedUserPreKeyBundleMap} from './UserPreKeyBundleMap';
+import {VerificationActionType} from '../auth/VerificationActionType';
 
 export class UserAPI {
   public static readonly DEFAULT_USERS_CHUNK_SIZE = 50;
@@ -68,6 +69,7 @@ export class UserAPI {
     SEND: 'send',
     USERS: '/users',
     V2: 'v2',
+    VERIFICATION: '/verification-code',
   };
 
   constructor(private readonly client: HttpClient) {}
@@ -452,6 +454,20 @@ export class UserAPI {
       url: `${UserAPI.URL.ACTIVATE}/${UserAPI.URL.SEND}`,
     };
 
+    await this.client.sendJSON(config);
+  }
+
+  /**
+   * Generates a verification code to be sent to the email address provided
+   * @param email users email address
+   * @param action whether the action is for a SCIM code generation or a user login
+   */
+  public async postVerificationCode(email: string, action: VerificationActionType): Promise<void> {
+    const config: AxiosRequestConfig = {
+      data: {email, action},
+      method: 'post',
+      url: `${UserAPI.URL.VERIFICATION}/${UserAPI.URL.SEND}`,
+    };
     await this.client.sendJSON(config);
   }
 

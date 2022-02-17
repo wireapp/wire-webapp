@@ -77,8 +77,10 @@ export class AuthAPI {
   }
 
   public async postLogin(loginData: LoginData): Promise<AccessTokenData> {
+    const {verificationCode, ...rest} = loginData;
     const login = {
-      ...loginData,
+      ...rest,
+      ...(verificationCode && {verification_code: verificationCode}),
       clientType: undefined as any,
       password: loginData.password ? String(loginData.password) : undefined,
     };
