@@ -36,11 +36,17 @@ const logger = getLogger('CameraPreferences');
 
 interface CameraPreferencesProps {
   devicesHandler: MediaDevicesHandler;
-  refreshStream: () => Promise<MediaStream>;
+  hasActiveCameraStream: boolean;
+  refreshStream: () => Promise<MediaStream | void>;
   streamHandler: MediaStreamHandler;
 }
 
-const CameraPreferences: React.FC<CameraPreferencesProps> = ({devicesHandler, streamHandler, refreshStream}) => {
+const CameraPreferences: React.FC<CameraPreferencesProps> = ({
+  devicesHandler,
+  streamHandler,
+  refreshStream,
+  hasActiveCameraStream,
+}) => {
   const [isRequesting, setIsRequesting] = useState(false);
   const [stream, setStream] = useState<MediaStream>();
   const [videoElement, setVideoElement] = useEffectRef<HTMLVideoElement>();
@@ -57,7 +63,20 @@ const CameraPreferences: React.FC<CameraPreferencesProps> = ({devicesHandler, st
   const requestStream = async () => {
     setIsRequesting(true);
     try {
-      setStream(await refreshStream());
+      // we should be able to change camera from prefrences page in middle of the call
+      if (hasActiveCameraStream) {
+        const refreshedStream = await refreshStream();
+        if (!refreshedStream) {
+          throw new Error('No stream returned');
+        }
+        setStream(refreshedStream);
+      } else {
+        const stream = await streamHandler.requestMediaStream(false, true, false, false);
+        if (!stream) {
+          throw new Error('No stream returned');
+        }
+        setStream(stream);
+      }
     } catch (error) {
       logger.warn(`Requesting MediaStream for type "${MediaType.VIDEO}" failed: ${error.message}`, error);
       setStream(null);
@@ -78,7 +97,7 @@ const CameraPreferences: React.FC<CameraPreferencesProps> = ({devicesHandler, st
 
   useEffect(
     () => () => {
-      if (stream) {
+      if (stream && !hasActiveCameraStream) {
         streamHandler.releaseTracksFromStream(stream);
       }
     },

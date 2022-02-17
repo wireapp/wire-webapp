@@ -896,10 +896,11 @@ export class CallingRepository {
     }
   }
 
-  public async refreshVideoInput() {
+  public async refreshVideoInput(): Promise<MediaStream | void> {
     const stream = await this.mediaStreamHandler.requestMediaStream(false, true, false, false);
     this.stopMediaSource(MediaType.VIDEO);
-    this.changeMediaSource(stream, MediaType.VIDEO);
+    const clonedMediaStream = this.changeMediaSource(stream, MediaType.VIDEO);
+    return clonedMediaStream;
   }
 
   public async refreshAudioInput(): Promise<MediaStream> {
@@ -941,7 +942,7 @@ export class CallingRepository {
     mediaStream: MediaStream,
     mediaType: MediaType,
     call: Call = this.callState.joinedCall(),
-  ): void {
+  ): MediaStream | void {
     if (!call) {
       return;
     }
@@ -959,12 +960,23 @@ export class CallingRepository {
     if (mediaType === MediaType.VIDEO && selfParticipant.sharesCamera() && !selfParticipant.sharesScreen()) {
       const videoTracks = mediaStream.getVideoTracks().map(track => track.clone());
       if (videoTracks.length > 0) {
-        selfParticipant.setVideoStream(new MediaStream(videoTracks), true);
+        const clonedMediaStream = new MediaStream(videoTracks);
+        selfParticipant.setVideoStream(clonedMediaStream, true);
         this.wCall.replaceTrack(this.serializeQualifiedId(call.conversationId), videoTracks[0]);
         // Remove the previous video stream
         this.mediaStreamHandler.releaseTracksFromStream(mediaStream);
+        return clonedMediaStream;
       }
     }
+  }
+
+  hasActiveCameraStream(): boolean {
+    const call = this.callState.joinedCall();
+    if (!call) {
+      return false;
+    }
+    const selfParticipant = call.getSelfParticipant();
+    return selfParticipant.sharesCamera() && selfParticipant.hasActiveVideo();
   }
 
   private mapTargets(targets: SendMessageTarget): UserClients {
