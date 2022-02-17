@@ -130,7 +130,7 @@ export class IntegrationRepository {
       const conversationEntity = await this.conversationRepository.createGroupConversation(
         [],
         undefined,
-        ACCESS_STATE.TEAM.GUEST_ROOM,
+        ACCESS_STATE.TEAM.GUESTS_SERVICES,
       );
 
       if (conversationEntity) {

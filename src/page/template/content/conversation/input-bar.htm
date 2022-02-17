@@ -1,6 +1,6 @@
 <!--@formatter:off-->
 <div id="conversation-input-bar" class="conversation-input-bar" data-bind="with: $root.inputBar">
-  <!-- ko if: classifiedDomains -->
+  <!-- ko if: classifiedDomains && !isConnectionRequest() -->
     <classified-bar params="users: conversationEntity().participating_user_ets, classifiedDomains: classifiedDomains"></classified-bar>
   <!-- /ko -->
   <!-- ko if: isReplying() && !isEditing() -->
@@ -62,7 +62,7 @@
     <!-- ko if: conversationEntity() && !conversationEntity().connection().isOutgoingRequest() -->
       <div class="controls-left">
         <!-- ko if: input().length -->
-          <participant-avatar class="cursor-default" params="participant: selfUser, size: participantAvatarSize"></participant-avatar>
+          <participant-avatar class="cursor-default" params="participant: selfUser, avatarSize: participantAvatarSize"></participant-avatar>
         <!-- /ko -->
       </div>
 

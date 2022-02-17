@@ -35,7 +35,7 @@ import 'Components/asset/controls/SeekBar';
 import 'Components/CopyToClipboard';
 import 'Components/message/EphemeralTimer';
 import '../page/start-ui/GroupList';
-import 'Components/toggle/GuestModeToggle';
+import 'Components/toggle/BaseToggle';
 import 'Components/icons';
 import 'Components/Image';
 import 'Components/toggle/InfoToggle';

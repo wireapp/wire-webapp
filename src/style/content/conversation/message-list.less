@@ -26,6 +26,12 @@
 .messages {
   max-width: @conversation-max-width;
   transform: translateZ(0);
+  &.flex-center {
+    margin: auto;
+    & .message {
+      min-width: 75%;
+    }
+  }
 }
 
 // MESSAGE
@@ -621,13 +627,14 @@
 .message-connected-contacts,
 .message-connected-provider-name,
 .message-connected-username {
+  margin-bottom: 16px;
   color: var(--foreground);
   font-size: @font-size-xs;
   line-height: @line-height-sm;
 }
 
 .message-connected-avatar {
-  margin-top: 32px;
+  margin-top: 24px;
 }
 
 .message-connected-cancel {

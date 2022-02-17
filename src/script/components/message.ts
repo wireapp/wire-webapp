@@ -129,6 +129,7 @@ class Message {
   shouldShowAvatar: ko.Observable<boolean>;
   shouldShowInvitePeople: ko.Observable<boolean>;
   StatusType: typeof StatusType;
+  classifiedDomains: ko.PureComputed<string[] | undefined>;
   teamState: TeamState;
 
   constructor(
@@ -170,6 +171,7 @@ class Message {
     this.isSelfTemporaryGuest = isSelfTemporaryGuest;
     this.isLastDeliveredMessage = isLastDeliveredMessage;
     this.accentColor = ko.pureComputed(() => message.user().accent_color());
+    this.classifiedDomains = teamState.classifiedDomains;
 
     this.onClickImage = onClickImage;
     this.onClickInvitePeople = onClickInvitePeople;
@@ -323,7 +325,7 @@ const normalTemplate: string = `
   <!-- ko if: shouldShowAvatar -->
     <div class="message-header">
       <div class="message-header-icon">
-        <participant-avatar class="cursor-pointer" params="participant: message.user, onAvatarClick: onClickAvatar, size: AVATAR_SIZE.X_SMALL"></participant-avatar>
+        <participant-avatar class="cursor-pointer" params="participant: message.user, onAvatarClick: onClickAvatar, avatarSize: AVATAR_SIZE.X_SMALL"></participant-avatar>
       </div>
       <div class="message-header-label">
         <span class="message-header-label-sender" data-bind='css: message.accent_color(), text: message.headerSenderName()' data-uie-name="sender-name"></span>
@@ -449,7 +451,8 @@ ko.components.register('message', {
         onClickCancelRequest: onClickCancelRequest,
         hasReadReceiptsTurnedOn: hasReadReceiptsTurnedOn,
         shouldShowInvitePeople: shouldShowInvitePeople,
-        isSelfTemporaryGuest: isSelfTemporaryGuest
+        isSelfTemporaryGuest: isSelfTemporaryGuest,
+        classifiedDomains: classifiedDomains,
       "></member-message>
     <!-- /ko -->
     <!-- ko if: message.super_type === 'ping' -->

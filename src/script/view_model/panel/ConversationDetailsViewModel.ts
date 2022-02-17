@@ -62,6 +62,7 @@ export class ConversationDetailsViewModel extends BasePanelViewModel {
   isActivatedAccount: ko.PureComputed<boolean>;
   isTeam: ko.PureComputed<boolean>;
   isTeamOnly: ko.PureComputed<boolean>;
+  isServicesRoom: ko.PureComputed<boolean>;
   serviceParticipants: ko.ObservableArray<ServiceEntity>;
   userParticipants: ko.ObservableArray<User>;
   showAllUsersCount: ko.Observable<number>;
@@ -77,6 +78,7 @@ export class ConversationDetailsViewModel extends BasePanelViewModel {
   showActionAddParticipants: ko.PureComputed<boolean>;
   showActionMute: ko.PureComputed<boolean>;
   showOptionGuests: ko.PureComputed<boolean>;
+  showOptionServices: ko.PureComputed<boolean>;
   showOptionReadReceipts: ko.PureComputed<boolean>;
   hasReceiptsEnabled: ko.PureComputed<boolean>;
   hasAdvancedNotifications: ko.PureComputed<boolean>;
@@ -87,10 +89,12 @@ export class ConversationDetailsViewModel extends BasePanelViewModel {
   participantsUserText: ko.PureComputed<string>;
   participantsServiceText: ko.PureComputed<string>;
   guestOptionsText: ko.PureComputed<string>;
+  servicesOptionsText: ko.PureComputed<string>;
   notificationStatusText: ko.PureComputed<string>;
   timedMessagesText: ko.PureComputed<string>;
   addPeopleTooltip: ko.PureComputed<string>;
   isSelfGroupAdmin: ko.PureComputed<boolean>;
+  classifiedDomains: ko.PureComputed<string[] | undefined>;
 
   static get CONFIG() {
     return {
@@ -105,6 +109,7 @@ export class ConversationDetailsViewModel extends BasePanelViewModel {
 
     this.userState = container.resolve(UserState);
     this.teamState = container.resolve(TeamState);
+    this.classifiedDomains = this.teamState.classifiedDomains;
 
     const {conversation, integration, search, team} = repositories;
     this.conversationRepository = conversation;
@@ -121,8 +126,12 @@ export class ConversationDetailsViewModel extends BasePanelViewModel {
     this.isActivatedAccount = this.userState.isActivatedAccount;
     this.isTeam = this.teamState.isTeam;
 
-    this.isTeamOnly = ko.pureComputed(() => this.activeConversation()?.isTeamOnly());
-
+    this.isTeamOnly = ko.pureComputed(
+      () => this.activeConversation()?.isTeamOnly() || this.activeConversation()?.isServicesRoom(),
+    );
+    this.isServicesRoom = ko.pureComputed(
+      () => this.activeConversation()?.isServicesRoom() || this.activeConversation()?.isGuestAndServicesRoom(),
+    );
     this.serviceParticipants = ko.observableArray();
     this.userParticipants = ko.observableArray();
     this.showAllUsersCount = ko.observable(0);
@@ -198,6 +207,14 @@ export class ConversationDetailsViewModel extends BasePanelViewModel {
       );
     });
 
+    this.showOptionServices = ko.pureComputed(() => {
+      return (
+        this.isActiveGroupParticipant() &&
+        this.activeConversation().team_id &&
+        roleRepository.canToggleGuests(this.activeConversation())
+      );
+    });
+
     this.showOptionReadReceipts = ko.pureComputed(
       () => !!this.activeConversation().team_id && roleRepository.canToggleReadReceipts(this.activeConversation()),
     );
@@ -221,7 +238,12 @@ export class ConversationDetailsViewModel extends BasePanelViewModel {
     );
 
     this.showSectionOptions = ko.pureComputed(() => {
-      return this.showOptionGuests() || this.showOptionNotificationsGroup() || this.showOptionTimedMessages();
+      return (
+        this.showOptionGuests() ||
+        this.showOptionNotificationsGroup() ||
+        this.showOptionTimedMessages() ||
+        this.showOptionServices()
+      );
     });
 
     this.canRenameGroup = ko.pureComputed(() => roleRepository.canRenameGroup(this.activeConversation()));
@@ -241,7 +263,11 @@ export class ConversationDetailsViewModel extends BasePanelViewModel {
     });
 
     this.guestOptionsText = ko.pureComputed(() => {
-      return this.isTeamOnly() ? t('conversationDetailsGuestsOff') : t('conversationDetailsGuestsOn');
+      return this.isTeamOnly() ? t('conversationDetailsOff') : t('conversationDetailsOn');
+    });
+
+    this.servicesOptionsText = ko.pureComputed(() => {
+      return this.isServicesRoom() ? t('conversationDetailsOn') : t('conversationDetailsOff');
     });
 
     this.notificationStatusText = ko.pureComputed(() => {
@@ -383,6 +409,10 @@ export class ConversationDetailsViewModel extends BasePanelViewModel {
 
   clickOnGuestOptions(): void {
     this.navigateTo(PanelViewModel.STATE.GUEST_OPTIONS, {entity: this.activeConversation()});
+  }
+
+  clickOnServicesOptions(): void {
+    this.navigateTo(PanelViewModel.STATE.SERVICES_OPTIONS, {entity: this.activeConversation()});
   }
 
   clickOnTimedMessages(): void {

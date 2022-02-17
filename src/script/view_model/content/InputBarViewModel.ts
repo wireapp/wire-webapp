@@ -112,6 +112,7 @@ export class InputBarViewModel {
   /** MIME types and file extensions are accepted */
   readonly acceptedImageTypes: string;
   readonly allowedFileTypes: string;
+  readonly isConnectionRequest: ko.PureComputed<boolean>;
 
   static get CONFIG() {
     return {
@@ -139,6 +140,12 @@ export class InputBarViewModel {
     this.textarea = null;
     this.acceptedImageTypes = Config.getConfig().ALLOWED_IMAGE_TYPES.join(',');
     this.allowedFileTypes = Config.getConfig().FEATURE.ALLOWED_FILE_UPLOAD_EXTENSIONS.join(',');
+    this.isConnectionRequest = ko.pureComputed(
+      () =>
+        this.conversationEntity() &&
+        (this.conversationEntity().connection().isOutgoingRequest() ||
+          this.conversationEntity().connection().isIncomingRequest()),
+    );
 
     this.selectionStart = ko.observable(0);
     this.selectionEnd = ko.observable(0);

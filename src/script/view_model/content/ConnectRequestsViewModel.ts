@@ -28,22 +28,26 @@ import {MainViewModel} from '../MainViewModel';
 import {ActionsViewModel} from '../ActionsViewModel';
 import {User} from '../../entity/User';
 import {UserState} from '../../user/UserState';
+import {TeamState} from '../../team/TeamState';
 
 export class ConnectRequestsViewModel {
   actionsViewModel: ActionsViewModel;
   connectRequests: ko.Computed<User[]>;
   AVATAR_SIZE: typeof AVATAR_SIZE;
   shouldUpdateScrollbar: ko.Computed<User[]>;
+  classifiedDomains: ko.PureComputed<string[] | undefined>;
 
   constructor(
     private readonly mainViewModel: MainViewModel,
     private readonly userState = container.resolve(UserState),
+    teamState = container.resolve(TeamState),
   ) {
     this.actionsViewModel = this.mainViewModel.actions;
     this.connectRequests = this.userState.connectRequests;
     this.AVATAR_SIZE = AVATAR_SIZE;
 
     this.shouldUpdateScrollbar = ko.computed(() => this.connectRequests()).extend({notify: 'always', rateLimit: 500});
+    this.classifiedDomains = teamState.classifiedDomains;
   }
 
   readonly afterRender = (elements: Object, request: User): void => {

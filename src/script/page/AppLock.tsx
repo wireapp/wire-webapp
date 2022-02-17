@@ -16,6 +16,7 @@ import {ClientState} from '../client/ClientState';
 import {AppLockState} from '../user/AppLockState';
 import {AppLockRepository} from '../user/AppLockRepository';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
+import {ModalsViewModel} from '../view_model/ModalsViewModel';
 
 export enum APPLOCK_STATE {
   FORGOT = 'applock.forgot',
@@ -114,8 +115,14 @@ const AppLock: React.FC<AppLockProps> = ({
   useEffect(() => {
     if (isAppLockEnabled) {
       showAppLock();
-    } else {
+    } else if (appLockState.hasPassphrase()) {
       appLockRepository.removeCode();
+      amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.ACKNOWLEDGE, {
+        text: {
+          htmlMessage: t('featureConfigChangeModalApplock'),
+          title: t('featureConfigChangeModalApplockHeadline'),
+        },
+      });
     }
   }, [isAppLockEnabled]);
 
@@ -128,7 +135,7 @@ const AppLock: React.FC<AppLockProps> = ({
         window.removeEventListener('focus', clearAppLockTimeout);
       };
     }
-    return undefined;
+    return clearAppLockTimeout();
   }, [isAppLockActivated, clearAppLockTimeout, startAppLockTimeout]);
 
   useEffect(() => {

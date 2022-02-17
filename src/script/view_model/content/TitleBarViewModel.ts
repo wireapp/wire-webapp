@@ -88,6 +88,7 @@ export class TitleBarViewModel {
   readonly isVideoCallingEnabled: ko.PureComputed<boolean>;
   readonly peopleTooltip: string;
   readonly conversationSubtitle: ko.PureComputed<string>;
+  readonly isConnectionRequest: ko.PureComputed<boolean>;
 
   constructor(
     readonly callingViewModel: CallingViewModel,
@@ -102,6 +103,12 @@ export class TitleBarViewModel {
     this.contentViewModel = contentViewModel;
 
     this.panelIsVisible = panelViewModel.isVisible;
+    this.isConnectionRequest = ko.pureComputed(
+      () =>
+        this.conversationEntity() &&
+        (this.conversationEntity().connection().isIncomingRequest() ||
+          this.conversationEntity().connection().isOutgoingRequest()),
+    );
 
     // TODO remove the titlebar for now to ensure that buttons are clickable in macOS wrappers
     window.setTimeout(() => $('.titlebar').remove(), TIME_IN_MILLIS.SECOND);

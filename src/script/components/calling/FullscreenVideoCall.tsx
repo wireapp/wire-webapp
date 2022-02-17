@@ -42,6 +42,7 @@ import DeviceToggleButton from './DeviceToggleButton';
 import Duration from './Duration';
 import GroupVideoGrid from './GroupVideoGrid';
 import Pagination from './Pagination';
+import ClassifiedBar from 'Components/input/ClassifiedBar';
 
 export interface FullscreenVideoCallProps {
   activeCallViewTab: string;
@@ -140,8 +141,14 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
     startedAt,
     participants,
   } = useKoSubscribableChildren(call, ['activeSpeakers', 'currentPage', 'pages', 'startedAt', 'participants']);
-  const {display_name: conversationName} = useKoSubscribableChildren(conversation, ['display_name']);
-  const {isVideoCallingEnabled} = useKoSubscribableChildren(teamState, ['isVideoCallingEnabled']);
+  const {display_name: conversationName, participating_user_ets: conversationParticipants} = useKoSubscribableChildren(
+    conversation,
+    ['display_name', 'participating_user_ets'],
+  );
+  const {isVideoCallingEnabled, classifiedDomains} = useKoSubscribableChildren(teamState, [
+    'isVideoCallingEnabled',
+    'classifiedDomains',
+  ]);
 
   const {videoInput: currentCameraDevice} = useKoSubscribableChildren(mediaDevicesHandler.currentDeviceId, [
     DeviceTypes.VIDEO_INPUT,
@@ -197,6 +204,13 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
         <div data-uie-name="video-timer" className="video-timer label-xs">
           <Duration startedAt={startedAt} />
         </div>
+        {classifiedDomains && (
+          <ClassifiedBar
+            users={conversationParticipants}
+            classifiedDomains={classifiedDomains}
+            style={{display: 'inline-block', lineHeight: '1.5em', margin: '1em 0', padding: '0 1em', width: 'auto'}}
+          />
+        )}
       </div>
 
       {!isChoosingScreen && (

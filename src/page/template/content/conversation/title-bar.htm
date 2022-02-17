@@ -1,4 +1,5 @@
-<div id="conversation-title-bar" class="conversation-title-bar" data-bind="with: $root.titleBar">
+<!-- ko with: $root.titleBar -->
+<div id="conversation-title-bar" class="conversation-title-bar">
   <!-- ko if: conversationEntity() -->
     <div class="conversation-title-bar-library">
       <!-- ko if: isActivatedAccount() -->
@@ -50,3 +51,4 @@
     <!-- /ko -->
   <!-- /ko -->
 </div>
+<!-- /ko -->

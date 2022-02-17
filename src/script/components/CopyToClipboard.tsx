@@ -18,7 +18,7 @@
  */
 
 import React from 'react';
-import {registerReactComponent} from 'Util/ComponentUtil';
+import {registerStaticReactComponent} from 'Util/ComponentUtil';
 
 export interface CopyToClipboardProps {
   text: string;
@@ -44,8 +44,4 @@ const CopyToClipboard: React.FC<CopyToClipboardProps> = ({text}) => {
 };
 
 export default CopyToClipboard;
-
-registerReactComponent('copy-to-clipboard', {
-  bindings: 'text: ko.unwrap(text)',
-  component: CopyToClipboard,
-});
+registerStaticReactComponent('copy-to-clipboard', CopyToClipboard);
