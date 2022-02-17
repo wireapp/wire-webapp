@@ -14,6 +14,7 @@ import {Text} from 'src/script/entity/message/Text';
 import {useResizeObserver} from '../../ui/resizeObserver';
 import useEffectRef from 'Util/useEffectRef';
 
+type FocusedElement = {center?: boolean; element: Element};
 interface MessagesListParams {
   cancelConnectionRequest: (message: MemberMessage) => void;
   conversation: Conversation;
@@ -87,11 +88,12 @@ const MessagesList: React.FC<MessagesListParams> = ({
   const [messagesContainer, setContainer] = useEffectRef<HTMLDivElement | null>(null);
   const scrollHeight = useRef(0);
   const nbMessages = useRef(0);
+  const focusedElement = useRef<FocusedElement | null>(null);
   const conversationLastReadTimestamp = useRef(conversation.last_read_timestamp());
 
-  const updateScroll = (container: Element | null, visibleElement?: {center?: boolean; element: HTMLElement}) => {
+  const updateScroll = (container: Element | null) => {
     const scrollingContainer = container?.parentElement;
-    if (!scrollingContainer) {
+    if (!scrollingContainer || !loaded) {
       return;
     }
     const lastMessage = messages[messages.length - 1];
@@ -99,10 +101,13 @@ const MessagesList: React.FC<MessagesListParams> = ({
     const scrollBottomPosition = scrollingContainer.scrollTop + scrollingContainer.clientHeight;
     const shouldStickToBottom = previousScrollHeight - scrollBottomPosition < 100;
 
-    if (visibleElement) {
+    if (focusedElement.current) {
       // If we have an element we want to focus
-      const {element, center} = visibleElement;
-      element.scrollIntoView(center ? {block: 'center'} : true);
+      const {element, center} = focusedElement.current;
+      const elementPosition = element.getBoundingClientRect();
+      const containerPosition = scrollingContainer.getBoundingClientRect();
+      const scrollBy = scrollingContainer.scrollTop + elementPosition.top - containerPosition.top;
+      scrollingContainer.scrollTo({top: scrollBy - (center ? scrollingContainer.offsetHeight / 2 : 0)});
     } else if (scrollingContainer.scrollTop === 0 && scrollingContainer.scrollHeight > previousScrollHeight) {
       // If we hit the top and new messages were loaded, we keep the scroll position stable
       scrollingContainer.scrollTop = scrollingContainer.scrollHeight - previousScrollHeight;
@@ -155,7 +160,15 @@ const MessagesList: React.FC<MessagesListParams> = ({
         hasReadReceiptsTurnedOn={conversationRepository.expectReadReceipt(conversation)}
         isLastDeliveredMessage={isLastDeliveredMessage}
         isMarked={!!focusedMessage && focusedMessage === message.id}
-        scrollTo={(element, center) => updateScroll(messagesContainer, {center, element})}
+        scrollTo={(element, center) => {
+          // Keep track of the element that should be made visible
+          focusedElement.current = {center, element};
+          setTimeout(() => {
+            // Releasing the element that should be made visible in order for the scroll to restore its normal behavior
+            focusedElement.current = null;
+          }, 1000);
+          updateScroll(messagesContainer);
+        }}
         isSelfTemporaryGuest={selfUser.isTemporaryGuest()}
         messageRepository={messageRepository}
         lastReadTimestamp={conversationLastReadTimestamp.current}
