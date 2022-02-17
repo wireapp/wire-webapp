@@ -146,7 +146,6 @@ function doRedirect(signOutReason: SIGN_OUT_REASON) {
 class App {
   static readonly LOCAL_STORAGE_LOGIN_REDIRECT_KEY = 'LOGIN_REDIRECT_KEY';
   logger: Logger;
-  appContainer: HTMLElement;
   service: {
     asset: AssetService;
     conversation: ConversationService;
@@ -189,9 +188,9 @@ class App {
    * @param apiClient Configured backend client
    */
   constructor(
-    appContainer: HTMLElement,
-    encryptedEngine?: SQLeetEngine,
-    private readonly apiClient = container.resolve(APIClient),
+    private readonly appContainer: HTMLElement,
+    private readonly apiClient: APIClient,
+    options?: {apiVersion: number; storageEngine?: SQLeetEngine},
   ) {
     this.apiClient.on(APIClient.TOPIC.ON_LOGOUT, () => this.logout(SIGN_OUT_REASON.NOT_SIGNED_IN, false));
     this.logger = getLogger('App');
@@ -199,7 +198,7 @@ class App {
 
     new WindowHandler();
 
-    this.service = this._setupServices(encryptedEngine);
+    this.service = this._setupServices(options.storageEngine);
     this.repository = this._setupRepositories();
     if (Config.getConfig().FEATURE.ENABLE_DEBUG) {
       import('Util/DebugUtil').then(({DebugUtil}) => {
@@ -906,6 +905,9 @@ class App {
 //##############################################################################
 
 $(async () => {
+  const apiClient = container.resolve(APIClient);
+  const apiVersion = await apiClient.useVersion(Config.getConfig().SUPPORTED_API_VERSIONS);
+
   enableLogging(Config.getConfig().FEATURE.ENABLE_DEBUG);
   exposeWrapperGlobals();
   const appContainer = document.getElementById('wire-main');
@@ -918,11 +920,11 @@ $(async () => {
     const shouldPersist = loadValue<boolean>(StorageKey.AUTH.PERSIST);
     if (shouldPersist === undefined) {
       doRedirect(SIGN_OUT_REASON.NOT_SIGNED_IN);
-    } else if (isTemporaryClientAndNonPersistent(shouldPersist)) {
-      const engine = await StorageService.getUninitializedEngine();
-      window.wire.app = new App(appContainer, engine);
     } else {
-      window.wire.app = new App(appContainer);
+      const storageEngine = isTemporaryClientAndNonPersistent(shouldPersist)
+        ? await StorageService.getUninitializedEngine()
+        : undefined;
+      window.wire.app = new App(appContainer, apiClient, {apiVersion, storageEngine});
     }
   }
 });
