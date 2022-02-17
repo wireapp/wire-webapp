@@ -896,11 +896,10 @@ export class CallingRepository {
     }
   }
 
-  public async refreshVideoInput(): Promise<MediaStream> {
+  public async refreshVideoInput() {
     const stream = await this.mediaStreamHandler.requestMediaStream(false, true, false, false);
     this.stopMediaSource(MediaType.VIDEO);
     this.changeMediaSource(stream, MediaType.VIDEO);
-    return stream;
   }
 
   public async refreshAudioInput(): Promise<MediaStream> {
@@ -962,6 +961,8 @@ export class CallingRepository {
       if (videoTracks.length > 0) {
         selfParticipant.setVideoStream(new MediaStream(videoTracks), true);
         this.wCall.replaceTrack(this.serializeQualifiedId(call.conversationId), videoTracks[0]);
+        // Remove the previous video stream
+        this.mediaStreamHandler.releaseTracksFromStream(mediaStream);
       }
     }
   }
