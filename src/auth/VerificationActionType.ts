@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2018 Wire Swiss GmbH
+ * Copyright (C) 2022 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,14 +17,7 @@
  *
  */
 
-import type {ClientType} from '../client/';
-
-export interface LoginData {
-  clientType: ClientType;
-  code?: string;
-  email?: string;
-  handle?: string;
-  password?: number | string;
-  phone?: string;
-  verificationCode?: string;
+export enum VerificationActionType {
+  GENERATE_SCIM_TOKEN = 'generate_scim_token',
+  LOGIN = 'login',
 }
