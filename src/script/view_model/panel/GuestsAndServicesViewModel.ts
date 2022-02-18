@@ -154,9 +154,7 @@ export class GuestsAndServicesViewModel extends BasePanelViewModel {
         }
       };
 
-      const hasGuestOrServices = conversationEntity.hasGuest() || conversationEntity.hasService();
-
-      if (this.isTeamOnly() || !hasGuestOrServices) {
+      if (this.isTeamOnly() || !conversationEntity.hasGuest()) {
         return changeAccessState();
       }
 
@@ -200,9 +198,8 @@ export class GuestsAndServicesViewModel extends BasePanelViewModel {
           this.requestOngoing(false);
         }
       };
-      const hasGuestOrServices = conversationEntity.hasGuest() || conversationEntity.hasService();
 
-      if (this.isTeamOnly() || !hasGuestOrServices) {
+      if (this.isTeamOnly() || !conversationEntity.hasService()) {
         return changeAccessState();
       }
 
