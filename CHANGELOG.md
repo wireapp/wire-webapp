@@ -3,6 +3,22 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [17.0.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/compare/@wireapp/api-client@16.8.0...@wireapp/api-client@17.0.0) (2022-02-21)
+
+
+### Code Refactoring
+
+* **api-client:** Move all the specific apis to an `api` namespace of the ApiClient ([#4228](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/issues/4228)) ([d18b348](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/commit/d18b34841822eea20114d99db67dc376b1311f15))
+
+
+### BREAKING CHANGES
+
+* **api-client:** All the specific api accessible from the apiClient have moved from `apiClient.<specificApi>.api` to `apiClient.api.<specificApi>` (eg. `apiClient.user.api` needs to be replaced with `apiClient.api.user`)
+
+
+
+
+
 # [16.8.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/compare/@wireapp/api-client@16.7.0...@wireapp/api-client@16.8.0) (2022-02-17)
 
 
