@@ -185,7 +185,7 @@ describe('APIClient', () => {
       expect(context.userId).toBe(accessTokenData.user);
       // Make access token invalid
       delete (client['accessTokenStore'].accessToken as any)?.access_token;
-      const response = await client.user.api.getUsers({handles: [queriedHandle]});
+      const response = await client.api.user.getUsers({handles: [queriedHandle]});
       expect(response[0].name).toBe(userData[0].name);
       expect(client['accessTokenStore'].accessToken?.access_token).toBeDefined();
     });
@@ -208,7 +208,7 @@ describe('APIClient', () => {
       const client = new APIClient();
       const testError = new Error('Test rejection');
 
-      spyOn(client.auth.api, 'postLogout').and.returnValue(Promise.reject(testError));
+      spyOn(client.api.auth, 'postLogout').and.returnValue(Promise.reject(testError));
       spyOn(client, 'disconnect').and.returnValue();
       spyOn(client['accessTokenStore'], 'delete').and.returnValue(Promise.resolve(undefined));
       spyOn(client['logger'], 'warn').and.returnValue();
@@ -220,7 +220,7 @@ describe('APIClient', () => {
     it('skips request when told to', async () => {
       const client = new APIClient();
 
-      spyOn(client.auth.api, 'postLogout');
+      spyOn(client.api.auth, 'postLogout');
       spyOn(client, 'disconnect').and.returnValue();
       spyOn(client['accessTokenStore'], 'delete').and.returnValue(Promise.resolve(undefined));
       spyOn(client['logger'], 'warn').and.returnValue();
