@@ -45,7 +45,6 @@ import {ConnectionMapper} from 'src/script/connection/ConnectionMapper';
 import {ClientEntity} from 'src/script/client/ClientEntity';
 import {MentionEntity} from 'src/script/message/MentionEntity';
 import {entities} from '../../../test/api/payloads';
-import {Config} from '../Config';
 
 describe('Conversation', () => {
   let conversation_et: Conversation = null;
@@ -670,10 +669,6 @@ describe('Conversation', () => {
   });
 
   describe('federation', () => {
-    beforeEach(() => {
-      spyOn(Config, 'getConfig').and.returnValue({FEATURE: {ENABLE_FEDERATION: true}});
-    });
-
     it('is considered a team conversation when teamId and domain are equal', () => {
       const teamId = 'team1';
       const conversation = new Conversation(createRandomUuid(), 'domain.test');
@@ -684,7 +679,6 @@ describe('Conversation', () => {
       selfUser.teamId = teamId;
       conversation.selfUser(selfUser);
 
-      expect(conversation.isFederated()).toBe(true);
       expect(conversation.inTeam()).toBe(true);
     });
 
@@ -699,7 +693,6 @@ describe('Conversation', () => {
       selfUser.teamId = teamId;
       conversation.selfUser(selfUser);
 
-      expect(conversation.isFederated()).toBe(true);
       expect(conversation.inTeam()).toBe(false);
     });
   });

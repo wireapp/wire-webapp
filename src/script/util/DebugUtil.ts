@@ -56,7 +56,6 @@ import {ConversationState} from '../conversation/ConversationState';
 import {CallState} from '../calling/CallState';
 import {MessageCategory} from '../message/MessageCategory';
 import {isQualifiedId} from '@wireapp/core/src/main/util';
-import {constructClientPrimaryKey} from './StorageUtil';
 
 function downloadText(text: string, filename: string = 'default.txt'): number {
   const url = `data:text/plain;charset=utf-8,${encodeURIComponent(text)}`;

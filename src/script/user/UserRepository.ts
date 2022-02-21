@@ -615,7 +615,7 @@ export class UserRepository {
     return this.userService.getUser(userId);
   }
 
-  getUserListFromBackend(userIds: string[] | QualifiedId[]): Promise<APIClientUser[]> {
+  getUserListFromBackend(userIds: QualifiedId[]): Promise<APIClientUser[]> {
     return this.userService.getUsers(userIds);
   }
 

@@ -38,10 +38,8 @@ export class ConnectionService {
    * @param userId User ID to start from
    * @returns Promise that resolves with user connections
    */
-  getConnections(useFederation: boolean = false): Promise<Connection[]> {
-    return useFederation
-      ? this.apiClient.api.connection.getConnectionList()
-      : this.apiClient.api.connection.getAllConnections();
+  getConnections(): Promise<Connection[]> {
+    return this.apiClient.api.connection.getConnectionList();
   }
 
   /**
@@ -53,16 +51,8 @@ export class ConnectionService {
    * @param name Name of the conversation being initiated (1 256 characters)
    * @returns Promise that resolves when the connection request was created
    */
-  postConnections(userId: string, name: string): Promise<Connection> {
-    return this.apiClient.api.connection.postConnection({
-      message: ' ',
-      name: name,
-      user: userId,
-    });
-  }
-
-  postFederationConnections(userId: QualifiedId) {
-    return this.apiClient.api.connection.postConnection(userId, true);
+  postConnections(userId: QualifiedId, name: string): Promise<Connection> {
+    return this.apiClient.api.connection.postConnection(userId, name);
   }
 
   /**
@@ -75,19 +65,9 @@ export class ConnectionService {
    * @param connectionStatus New relation status
    * @returns Promise that resolves when the status was updated
    */
-  putConnections(userId: string, status: ConnectionStatus): Promise<Connection> {
+  putConnections(userId: QualifiedId, status: ConnectionStatus): Promise<Connection> {
     return this.apiClient.api.connection.putConnection(userId, {
       status,
     });
-  }
-
-  putFederatedConnections(userId: QualifiedId, status: ConnectionStatus): Promise<Connection> {
-    return this.apiClient.api.connection.putConnection(
-      userId,
-      {
-        status,
-      },
-      true,
-    );
   }
 }
