@@ -125,6 +125,7 @@ import CallingContainer from 'Components/calling/CallingOverlayContainer';
 import {TeamError} from '../error/TeamError';
 import Warnings from '../view_model/WarningsContainer';
 import {Core} from '../service/CoreSingleton';
+import {migrateToQualifiedSessionIds} from './sessionIdMigrator';
 
 function doRedirect(signOutReason: SIGN_OUT_REASON) {
   let url = `/auth/${location.search}`;
@@ -408,6 +409,13 @@ class App {
       telemetry.timeStep(AppInitTimingsStep.RECEIVED_ACCESS_TOKEN);
       const {clientType} = await authRepository.init();
       const selfUser = await this.initiateSelfUser();
+      if (Config.getConfig().FEATURE.ENABLE_FEDERATION) {
+        // Migrate all existing session to fully qualified ids (if need be)
+        await migrateToQualifiedSessionIds(
+          this.repository.storage.storageService.db.sessions,
+          this.apiClient.context!.domain,
+        );
+      }
       loadingView.updateProgress(5, t('initReceivedSelfUser', selfUser.name()));
       telemetry.timeStep(AppInitTimingsStep.RECEIVED_SELF_USER);
       const clientEntity = await this._initiateSelfUserClients();
