@@ -1,6 +1,7 @@
 import {ConversationStatus} from '../../conversation/ConversationStatus';
 import {ConversationVerificationState} from '../../conversation/ConversationVerificationState';
 import {
+  ACCESS_ROLE_V2,
   DefaultConversationRoleName,
   CONVERSATION_ACCESS,
   CONVERSATION_ACCESS_ROLE,
@@ -11,8 +12,8 @@ import {LegalHoldStatus} from '@wireapp/protocol-messaging';
 import {RECEIPT_MODE} from '@wireapp/api-client/src/conversation/data';
 
 export interface ConversationRecord {
-  accessModes: CONVERSATION_ACCESS[];
-  accessRole: CONVERSATION_ACCESS_ROLE;
+  access: CONVERSATION_ACCESS[];
+  access_role: CONVERSATION_ACCESS_ROLE | ACCESS_ROLE_V2[];
   archived_state: boolean;
   archived_timestamp: number;
   cleared_timestamp: number;

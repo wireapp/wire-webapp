@@ -78,7 +78,9 @@ export class GuestsAndServicesViewModel extends BasePanelViewModel {
       () => this.activeConversation()?.isServicesRoom() || this.activeConversation()?.isGuestAndServicesRoom(),
     );
 
-    this.hasAccessCode = ko.pureComputed(() => (this.isGuestRoom() ? !!this.activeConversation().accessCode() : false));
+    this.hasAccessCode = ko.pureComputed(() =>
+      this.isGuestEnabled() ? !!this.activeConversation().accessCode() : false,
+    );
     this.isGuestLinkEnabled = ko.pureComputed(() => this.teamState.isGuestLinkEnabled());
     this.showLinkOptions = ko.pureComputed(() => this.isGuestEnabled());
 
@@ -97,7 +99,7 @@ export class GuestsAndServicesViewModel extends BasePanelViewModel {
 
   requestAccessCode = async (): Promise<void> => {
     // Handle conversations in legacy state
-    if (!this.isGuestRoom()) {
+    if (!this.isGuestEnabled() && !this.isServicesEnabled()) {
       await this.stateHandler.changeAccessState(this.activeConversation(), ACCESS_STATE.TEAM.GUEST_ROOM, true);
     }
 
@@ -220,7 +222,7 @@ export class GuestsAndServicesViewModel extends BasePanelViewModel {
   async _updateCode(isVisible: boolean, conversationEntity: Conversation): Promise<void> {
     const updateCode =
       conversationEntity &&
-      conversationEntity.isGuestRoom() &&
+      (conversationEntity.isGuestRoom() || conversationEntity.isGuestAndServicesRoom()) &&
       !conversationEntity.accessCode() &&
       this.isGuestLinkEnabled();
     if (isVisible && updateCode) {

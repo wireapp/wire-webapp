@@ -23,7 +23,12 @@ import {Availability, LegalHoldStatus} from '@wireapp/protocol-messaging';
 import {QualifiedId} from '@wireapp/api-client/src/user';
 import {Cancelable, debounce} from 'underscore';
 import {WebAppEvents} from '@wireapp/webapp-events';
-import {CONVERSATION_ACCESS, CONVERSATION_ACCESS_ROLE, CONVERSATION_TYPE} from '@wireapp/api-client/src/conversation/';
+import {
+  ACCESS_ROLE_V2,
+  CONVERSATION_ACCESS,
+  CONVERSATION_ACCESS_ROLE,
+  CONVERSATION_TYPE,
+} from '@wireapp/api-client/src/conversation/';
 import {getLogger, Logger} from 'Util/Logger';
 import {t} from 'Util/LocalizerUtil';
 import {truncate} from 'Util/StringUtil';
@@ -157,7 +162,7 @@ export class Conversation {
   public readonly hasExternal: ko.PureComputed<boolean>;
   public readonly hasFederatedUsers: ko.PureComputed<boolean>;
   public accessModes?: CONVERSATION_ACCESS[];
-  public accessRole?: CONVERSATION_ACCESS_ROLE;
+  public accessRole?: CONVERSATION_ACCESS_ROLE | ACCESS_ROLE_V2[];
   public domain: string;
   public isFederated: ko.PureComputed<boolean>;
 
@@ -973,8 +978,8 @@ export class Conversation {
 
   serialize(): ConversationRecord {
     return {
-      accessModes: this.accessModes,
-      accessRole: this.accessRole,
+      access: this.accessModes,
+      access_role: this.accessRole,
       archived_state: this.archivedState(),
       archived_timestamp: this.archivedTimestamp(),
       cleared_timestamp: this.cleared_timestamp(),
