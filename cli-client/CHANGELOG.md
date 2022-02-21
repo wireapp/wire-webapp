@@ -3,6 +3,22 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [10.0.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/cli-client/compare/@wireapp/cli-client@9.0.29...@wireapp/cli-client@10.0.0) (2022-02-21)
+
+
+### Code Refactoring
+
+* **api-client:** Move all the specific apis to an `api` namespace of the ApiClient ([#4228](https://github.com/wireapp/wire-web-packages/tree/main/packages/cli-client/issues/4228)) ([d18b348](https://github.com/wireapp/wire-web-packages/tree/main/packages/cli-client/commit/d18b34841822eea20114d99db67dc376b1311f15))
+
+
+### BREAKING CHANGES
+
+* **api-client:** All the specific api accessible from the apiClient have moved from `apiClient.<specificApi>.api` to `apiClient.api.<specificApi>` (eg. `apiClient.user.api` needs to be replaced with `apiClient.api.user`)
+
+
+
+
+
 ## [9.0.29](https://github.com/wireapp/wire-web-packages/tree/main/packages/cli-client/compare/@wireapp/cli-client@9.0.28...@wireapp/cli-client@9.0.29) (2022-02-17)
 
 **Note:** Version bump only for package @wireapp/cli-client
