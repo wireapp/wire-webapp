@@ -30,7 +30,7 @@ export class ClientAction {
     return async (dispatch, getState, {apiClient}) => {
       dispatch(ClientActionCreator.startGetAllClients());
       try {
-        const clients = await apiClient.client.api.getClients();
+        const clients = await apiClient.api.client.getClients();
         dispatch(ClientActionCreator.successfulGetAllClients(clients));
         return clients;
       } catch (error) {
@@ -44,7 +44,7 @@ export class ClientAction {
     return async (dispatch, getState, {apiClient}) => {
       dispatch(ClientActionCreator.startRemoveClient());
       try {
-        await apiClient.client.api.deleteClient(clientId, password);
+        await apiClient.api.client.deleteClient(clientId, password);
         dispatch(ClientActionCreator.successfulRemoveClient(clientId));
       } catch (error) {
         dispatch(ClientActionCreator.failedRemoveClient(error));

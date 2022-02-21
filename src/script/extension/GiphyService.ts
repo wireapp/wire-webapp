@@ -35,7 +35,7 @@ export class GiphyService {
    * @param ids A single id to fetch GIF data
    */
   getById(id: string): Promise<GiphyResult> {
-    return this.apiClient.giphy.api.getGiphyById(id);
+    return this.apiClient.api.giphy.getGiphyById(id);
   }
 
   /**
@@ -43,7 +43,7 @@ export class GiphyService {
    * @param ids Multiple IDs to fetch GIF data
    */
   getByIds(ids: string[]): Promise<GiphyMultipleResult> {
-    return this.apiClient.giphy.api.getGiphyByIds({ids});
+    return this.apiClient.api.giphy.getGiphyByIds({ids});
   }
 
   /**
@@ -51,20 +51,20 @@ export class GiphyService {
    * @param tag GIF tag to limit randomness by
    */
   getRandom(tag: string): Promise<GiphyResult> {
-    return this.apiClient.giphy.api.getGiphyRandom({tag});
+    return this.apiClient.api.giphy.getGiphyRandom({tag});
   }
 
   /**
    * Search GIFs for a word or phrase.
    */
   getSearch(options: GiphySearchOptions): Promise<GiphyMultipleResult> {
-    return this.apiClient.giphy.api.getGiphySearch(options);
+    return this.apiClient.api.giphy.getGiphySearch(options);
   }
 
   /**
    * Search GIFs for a word or phrase.
    */
   getTrending(options: GiphyTrendingOptions): Promise<GiphyMultipleResult> {
-    return this.apiClient.giphy.api.getGiphyTrending(options);
+    return this.apiClient.api.giphy.getGiphyTrending(options);
   }
 }

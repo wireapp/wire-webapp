@@ -79,18 +79,18 @@ export class UserService {
    * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/users/checkUserHandle
    */
   checkUserHandle(handle: string): Promise<void> {
-    return this.apiClient.user.api.headHandle(handle);
+    return this.apiClient.api.user.headHandle(handle);
   }
 
   async getUserByFQN({domain, handle}: QualifiedHandle): Promise<APIClientUser> {
     if (domain) {
-      return this.apiClient.user.api.getUserByHandle({
+      return this.apiClient.api.user.getUserByHandle({
         domain,
         handle,
       });
     }
-    const {user: userId} = await this.apiClient.user.api.getHandle(handle);
-    return this.apiClient.user.api.getUser(userId);
+    const {user: userId} = await this.apiClient.api.user.getHandle(handle);
+    return this.apiClient.api.user.getUser(userId);
   }
 
   /**
@@ -100,7 +100,7 @@ export class UserService {
    * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/users/checkUserHandles
    */
   checkUserHandles(usernames: string[], amount: number = 1): Promise<string[]> {
-    return this.apiClient.user.api.postHandles({
+    return this.apiClient.api.user.postHandles({
       handles: usernames,
       return: amount,
     });
@@ -115,11 +115,11 @@ export class UserService {
   getUsers(userIds: string[] | QualifiedId[]): Promise<APIClientUser[]> {
     if (isQualifiedIdArray(userIds)) {
       if (!!userIds[0].domain) {
-        return this.apiClient.user.api.postListUsers({qualified_ids: userIds});
+        return this.apiClient.api.user.postListUsers({qualified_ids: userIds});
       }
-      return this.apiClient.user.api.getUsers({ids: userIds.map(userId => userId.id)});
+      return this.apiClient.api.user.getUsers({ids: userIds.map(userId => userId.id)});
     }
-    return this.apiClient.user.api.getUsers({ids: userIds});
+    return this.apiClient.api.user.getUsers({ids: userIds});
   }
 
   /**
@@ -128,6 +128,6 @@ export class UserService {
    * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/users/user
    */
   getUser(userId: string | QualifiedId): Promise<APIClientUser> {
-    return this.apiClient.user.api.getUser(userId);
+    return this.apiClient.api.user.getUser(userId);
   }
 }

@@ -33,9 +33,9 @@ export class SelfAction {
     return async (dispatch, getState, {actions: {selfAction}, apiClient}) => {
       dispatch(SelfActionCreator.startFetchSelf());
       try {
-        const selfUser = await apiClient.self.api.getSelf();
+        const selfUser = await apiClient.api.self.getSelf();
         await dispatch(selfAction.doCheckPasswordState());
-        const {teams} = await apiClient.teams.team.api.getTeams();
+        const {teams} = await apiClient.api.teams.team.getTeams();
         const [boundTeam] = teams.filter(team => team.binding);
         selfUser.team = boundTeam?.id;
         dispatch(SelfActionCreator.successfulFetchSelf(selfUser));
@@ -51,7 +51,7 @@ export class SelfAction {
     return async (dispatch, getState, {apiClient, actions: {selfAction}}) => {
       dispatch(SelfActionCreator.startSetHandle());
       try {
-        await apiClient.self.api.putHandle({handle: handle.trim().toLowerCase()});
+        await apiClient.api.self.putHandle({handle: handle.trim().toLowerCase()});
         const selfUser = await dispatch(selfAction.fetchSelf());
         dispatch(SelfActionCreator.successfulSetHandle(selfUser));
       } catch (error) {
@@ -69,7 +69,7 @@ export class SelfAction {
       }
       dispatch(SelfActionCreator.startGetConsents());
       try {
-        const {results} = await apiClient.self.api.getConsents();
+        const {results} = await apiClient.api.self.getConsents();
         dispatch(SelfActionCreator.successfulGetConsents(results));
       } catch (error) {
         dispatch(SelfActionCreator.failedGetConsents(error));
@@ -91,7 +91,7 @@ export class SelfAction {
         value,
       };
       try {
-        await apiClient.self.api.putConsent(consent);
+        await apiClient.api.self.putConsent(consent);
         dispatch(SelfActionCreator.successfulSetConsent(consent));
       } catch (error) {
         dispatch(SelfActionCreator.failedSetConsent(error));
@@ -104,7 +104,7 @@ export class SelfAction {
     return async (dispatch, getState, {apiClient}) => {
       dispatch(SelfActionCreator.startSetSelfPassword());
       try {
-        await apiClient.self.api.putPassword(changePassword);
+        await apiClient.api.self.putPassword(changePassword);
         dispatch(SelfActionCreator.successfulSetSelfPassword());
       } catch (error) {
         dispatch(SelfActionCreator.failedSetSelfPassword(error));
@@ -117,7 +117,7 @@ export class SelfAction {
     return async (dispatch, getState, {apiClient}) => {
       dispatch(SelfActionCreator.startSetSelfEmail());
       try {
-        await apiClient.auth.api.putEmail({email});
+        await apiClient.api.auth.putEmail({email});
         dispatch(SelfActionCreator.successfulSetSelfEmail(email));
       } catch (error) {
         dispatch(SelfActionCreator.failedSetSelfEmail(error));
@@ -130,7 +130,7 @@ export class SelfAction {
     return async (dispatch, getState, {apiClient}) => {
       dispatch(SelfActionCreator.startSetPasswordState());
       try {
-        await apiClient.self.api.headPassword();
+        await apiClient.api.self.headPassword();
         dispatch(SelfActionCreator.successfulSetPasswordState({hasPassword: true}));
         return true;
       } catch (error) {

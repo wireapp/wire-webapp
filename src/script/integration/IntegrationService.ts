@@ -26,19 +26,19 @@ export class IntegrationService {
   constructor(private readonly apiClient = container.resolve(APIClient)) {}
 
   getProvider(providerId: string): Promise<Provider> {
-    return this.apiClient.teams.service.api.getProvider(providerId);
+    return this.apiClient.api.teams.service.getProvider(providerId);
   }
 
   async getProviderServices(providerId: string): Promise<Service[]> {
-    const servicesChunk = await this.apiClient.teams.service.api.getProviderServices(providerId);
+    const servicesChunk = await this.apiClient.api.teams.service.getProviderServices(providerId);
     return servicesChunk.services;
   }
 
   getService(providerId: string, serviceId: string): Promise<Service> {
-    return this.apiClient.teams.service.api.getService(providerId, serviceId);
+    return this.apiClient.api.teams.service.getService(providerId, serviceId);
   }
 
   getServices(tags: string[] | string, start: string): Promise<any> {
-    return this.apiClient.teams.service.api.getServices(undefined, start, tags);
+    return this.apiClient.api.teams.service.getServices(undefined, start, tags);
   }
 }
