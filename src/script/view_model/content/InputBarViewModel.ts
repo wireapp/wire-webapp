@@ -179,7 +179,6 @@ export class InputBarViewModel {
 
     computedReplyMessageEntity.subscribeChanged((isReplyingToMessage: boolean, wasReplyingToMessage: boolean) => {
       if (isReplyingToMessage !== wasReplyingToMessage) {
-        this.triggerInputChangeEvent();
         if (isReplyingToMessage) {
           amplify.subscribe(WebAppEvents.CONVERSATION.MESSAGE.REMOVED, handleRepliedMessageDeleted);
           amplify.subscribe(WebAppEvents.CONVERSATION.MESSAGE.UPDATED, handleRepliedMessageUpdated);
@@ -814,10 +813,6 @@ export class InputBarViewModel {
 
   readonly removedFromView = (): void => {
     amplify.unsubscribeAll(WebAppEvents.SHORTCUT.PING);
-  };
-
-  readonly triggerInputChangeEvent = (newInputHeight = 0, previousInputHeight = 0): void => {
-    amplify.publish(WebAppEvents.INPUT.RESIZE, newInputHeight - previousInputHeight);
   };
 
   readonly sendGiphy = (gifUrl: string, tag: string): void => {

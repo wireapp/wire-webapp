@@ -108,6 +108,7 @@ export class Conversation {
   public readonly hasUnread: ko.PureComputed<boolean>;
   public id: string;
   public readonly inTeam: ko.PureComputed<boolean>;
+  public readonly lastDeliveredMessage: ko.PureComputed<Message | undefined>;
   public readonly is_archived: ko.Observable<boolean>;
   public readonly is_cleared: ko.PureComputed<boolean>;
   public readonly is_loaded: ko.Observable<boolean>;
@@ -374,10 +375,11 @@ export class Conversation {
 
     this.messages_unordered = ko.observableArray();
     this.messages = ko.pureComputed(() =>
-      this.messages_unordered().sort((message_a, message_b) => {
+      [...this.messages_unordered()].sort((message_a, message_b) => {
         return message_a.timestamp() - message_b.timestamp();
       }),
     );
+    this.lastDeliveredMessage = ko.pureComputed(() => this.getLastDeliveredMessage());
 
     this.incomingMessages = ko.observableArray();
 
@@ -892,7 +894,7 @@ export class Conversation {
    * Get the message before a given message.
    * @param message_et Message to look up from
    */
-  getPreviousMessage(message_et: ContentMessage): Message | ContentMessage | MemberMessage | SystemMessage | undefined {
+  getPreviousMessage(message_et: Message): Message | ContentMessage | MemberMessage | SystemMessage | undefined {
     const messages_visible = this.messages_visible();
     const message_index = messages_visible.indexOf(message_et);
     if (message_index > 0) {

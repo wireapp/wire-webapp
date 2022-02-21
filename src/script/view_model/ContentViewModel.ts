@@ -68,6 +68,7 @@ import {
   ClientNotificationData,
 } from '../notification/PreferenceNotificationRepository';
 import {modals} from '../view_model/ModalsViewModel';
+import {MessageRepository} from '../conversation/MessageRepository';
 
 interface ShowConversationOptions {
   exposeMessage?: Message;
@@ -89,6 +90,7 @@ export class ContentViewModel {
   collectionDetails: CollectionDetailsViewModel;
   connectRequests: ConnectRequestsViewModel;
   conversationRepository: ConversationRepository;
+  messageRepository: MessageRepository;
   elementId: string;
   emojiInput: EmojiInputViewModel;
   giphy: GiphyViewModel;
@@ -139,6 +141,7 @@ export class ContentViewModel {
     this.mainViewModel = mainViewModel;
     this.conversationRepository = repositories.conversation;
     this.userRepository = repositories.user;
+    this.messageRepository = repositories.message;
     this.logger = getLogger('ContentViewModel');
     this.State = ContentViewModel.STATE;
 
