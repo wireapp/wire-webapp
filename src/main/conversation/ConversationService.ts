@@ -181,7 +181,7 @@ export class ConversationService {
   }
 
   private async getConversationQualifiedMembers(conversationId: QualifiedId): Promise<QualifiedId[]> {
-    const conversation = await this.apiClient.conversation.api.getConversation(conversationId, true);
+    const conversation = await this.apiClient.api.conversation.getConversation(conversationId, true);
     /*
      * If you are sending a message to a conversation, you have to include
      * yourself in the list of users if you want to sync a message also to your
@@ -225,7 +225,7 @@ export class ConversationService {
 
     const preKeys = await Promise.all(
       targets.map(async ({id: userId, clients}) => {
-        const prekeyBundle = await this.apiClient.user.api.getUserPreKeys(userId);
+        const prekeyBundle = await this.apiClient.api.user.getUserPreKeys(userId);
         // We filter the clients that should not receive the message (if a QualifiedUserClients was given as parameter)
         const userClients = clients
           ? prekeyBundle.clients.filter(client => clients.includes(client.client))
@@ -256,7 +256,7 @@ export class ConversationService {
     }
 
     if (!members.length) {
-      const conversation = await this.apiClient.conversation.api.getConversation(conversationId);
+      const conversation = await this.apiClient.api.conversation.getConversation(conversationId);
       /*
        * If you are sending a message to a conversation, you have to include
        * yourself in the list of users if you want to sync a message also to your
@@ -265,7 +265,7 @@ export class ConversationService {
       members = conversation.members.others.map(member => member.id).concat(conversation.members.self.id);
     }
 
-    const preKeys = await Promise.all(members.map(member => this.apiClient.user.api.getUserPreKeys(member)));
+    const preKeys = await Promise.all(members.map(member => this.apiClient.api.user.getUserPreKeys(member)));
 
     return preKeys.reduce((bundleMap: UserPreKeyBundleMap, bundle) => {
       const userId = bundle.user;
@@ -280,7 +280,7 @@ export class ConversationService {
   private async getSelfConversationId(): Promise<QualifiedId> {
     if (!this.selfConversationId) {
       const {userId} = this.apiClient.context!;
-      const {qualified_id, id} = await this.apiClient.conversation.api.getConversation(userId);
+      const {qualified_id, id} = await this.apiClient.api.conversation.getConversation(userId);
       const domain = this.config.useQualifiedIds ? qualified_id.domain : '';
       this.selfConversationId = {id, domain};
     }
@@ -868,7 +868,7 @@ export class ConversationService {
   }
 
   public leaveConversation(conversationId: string): Promise<ConversationMemberLeaveEvent> {
-    return this.apiClient.conversation.api.deleteMember(conversationId, this.apiClient.context!.userId);
+    return this.apiClient.api.conversation.deleteMember(conversationId, this.apiClient.context!.userId);
   }
 
   public async leaveConversations(conversationIds?: string[]): Promise<ConversationMemberLeaveEvent[]> {
@@ -891,23 +891,23 @@ export class ConversationService {
       users: ids,
     };
 
-    return this.apiClient.conversation.api.postConversation(newConversation);
+    return this.apiClient.api.conversation.postConversation(newConversation);
   }
 
   public async getConversations(conversationId: string): Promise<Conversation>;
   public async getConversations(conversationIds?: string[]): Promise<Conversation[]>;
   public async getConversations(conversationIds?: string | string[]): Promise<Conversation[] | Conversation> {
     if (!conversationIds || !conversationIds.length) {
-      return this.apiClient.conversation.api.getAllConversations();
+      return this.apiClient.api.conversation.getAllConversations();
     }
     if (typeof conversationIds === 'string') {
-      return this.apiClient.conversation.api.getConversation(conversationIds);
+      return this.apiClient.api.conversation.getConversation(conversationIds);
     }
-    return this.apiClient.conversation.api.getConversationsByIds(conversationIds);
+    return this.apiClient.api.conversation.getConversationsByIds(conversationIds);
   }
 
   public async getAsset({assetId, assetToken, otrKey, sha256}: RemoteData): Promise<Uint8Array> {
-    const request = this.apiClient.asset.api.getAssetV3(assetId, assetToken);
+    const request = this.apiClient.api.asset.getAssetV3(assetId, assetToken);
     const encryptedBuffer = (await request.response).buffer;
 
     return decryptAsset({
@@ -918,7 +918,7 @@ export class ConversationService {
   }
 
   public async getUnencryptedAsset(assetId: string, assetToken?: string): Promise<ArrayBuffer> {
-    const request = await this.apiClient.asset.api.getAssetV3(assetId, assetToken);
+    const request = await this.apiClient.api.asset.getAssetV3(assetId, assetToken);
     return (await request.response).buffer;
   }
 
@@ -928,16 +928,16 @@ export class ConversationService {
   ): Promise<T> {
     const ids = Array.isArray(userIds) ? userIds : [userIds];
     if (isStringArray(ids)) {
-      await this.apiClient.conversation.api.postMembers(conversationId, ids);
+      await this.apiClient.api.conversation.postMembers(conversationId, ids);
     } else if (isQualifiedIdArray(ids)) {
-      await this.apiClient.conversation.api.postMembersV2(conversationId, ids);
+      await this.apiClient.api.conversation.postMembersV2(conversationId, ids);
     }
 
     return userIds;
   }
 
   public async removeUser(conversationId: string, userId: string): Promise<string> {
-    await this.apiClient.conversation.api.deleteMember(conversationId, userId);
+    await this.apiClient.api.conversation.deleteMember(conversationId, userId);
     return userId;
   }
 
@@ -1062,11 +1062,11 @@ export class ConversationService {
   }
 
   public sendTypingStart(conversationId: string): Promise<void> {
-    return this.apiClient.conversation.api.postTyping(conversationId, {status: CONVERSATION_TYPING.STARTED});
+    return this.apiClient.api.conversation.postTyping(conversationId, {status: CONVERSATION_TYPING.STARTED});
   }
 
   public sendTypingStop(conversationId: string): Promise<void> {
-    return this.apiClient.conversation.api.postTyping(conversationId, {status: CONVERSATION_TYPING.STOPPED});
+    return this.apiClient.api.conversation.postTyping(conversationId, {status: CONVERSATION_TYPING.STOPPED});
   }
 
   public setConversationMutedStatus(
@@ -1083,7 +1083,7 @@ export class ConversationService {
       otr_muted_status: status,
     };
 
-    return this.apiClient.conversation.api.putMembershipProperties(conversationId, payload);
+    return this.apiClient.api.conversation.putMembershipProperties(conversationId, payload);
   }
 
   public toggleArchiveConversation(
@@ -1100,7 +1100,7 @@ export class ConversationService {
       otr_archived_ref: archiveTimestamp.toISOString(),
     };
 
-    return this.apiClient.conversation.api.putMembershipProperties(conversationId, payload);
+    return this.apiClient.api.conversation.putMembershipProperties(conversationId, payload);
   }
 
   public setMemberConversationRole(
@@ -1108,7 +1108,7 @@ export class ConversationService {
     userId: string,
     conversationRole: DefaultConversationRoleName | string,
   ): Promise<void> {
-    return this.apiClient.conversation.api.putOtherMember(userId, conversationId, {
+    return this.apiClient.api.conversation.putOtherMember(userId, conversationId, {
       conversation_role: conversationRole,
     });
   }

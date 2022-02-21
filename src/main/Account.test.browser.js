@@ -65,7 +65,7 @@ describe('Account', () => {
       account.service.client.synchronizeClients = () => Promise.resolve();
       account.service.notification.backend.getLastNotification = () => Promise.resolve({id: 'notification-id'});
       account.apiClient.context = {};
-      account.apiClient.client.api.postClient = () => Promise.resolve({id: context.clientId});
+      account.apiClient.api.client.postClient = () => Promise.resolve({id: context.clientId});
       await account.initClient(context);
 
       expect(account.service.client.register).toHaveBeenCalledTimes(1);
@@ -83,7 +83,7 @@ describe('Account', () => {
       await account.initServices(engine);
       spyOn(account.service.cryptography, 'initCryptobox').and.returnValue(Promise.resolve());
       spyOn(account.service.client, 'getLocalClient').and.returnValue(Promise.resolve({id: clientId}));
-      spyOn(account.apiClient.client.api, 'getClient').and.returnValue(Promise.resolve({id: clientId}));
+      spyOn(account.apiClient.api.client, 'getClient').and.returnValue(Promise.resolve({id: clientId}));
       await account.apiClient.createContext('userId', 'clientType', 'clientId');
 
       await account.loadAndValidateLocalClient();

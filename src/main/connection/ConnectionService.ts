@@ -24,23 +24,23 @@ export class ConnectionService {
   constructor(private readonly apiClient: APIClient) {}
 
   public getConnections(): Promise<Connection[]> {
-    return this.apiClient.connection.api.getAllConnections();
+    return this.apiClient.api.connection.getAllConnections();
   }
 
   public acceptConnection(userId: string): Promise<Connection> {
-    return this.apiClient.connection.api.putConnection(userId, {
+    return this.apiClient.api.connection.putConnection(userId, {
       status: ConnectionStatus.ACCEPTED,
     });
   }
 
   public ignoreConnection(userId: string): Promise<Connection> {
-    return this.apiClient.connection.api.putConnection(userId, {
+    return this.apiClient.api.connection.putConnection(userId, {
       status: ConnectionStatus.IGNORED,
     });
   }
 
   public createConnection(userId: string): Promise<Connection> {
-    return this.apiClient.connection.api.postConnection({
+    return this.apiClient.api.connection.postConnection({
       message: ' ',
       name: ' ',
       user: userId,

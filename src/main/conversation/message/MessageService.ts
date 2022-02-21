@@ -217,7 +217,7 @@ export class MessageService {
 
     const {id, domain} = options.conversationId;
 
-    return this.apiClient.conversation.api.postOTRMessageV2(id, domain, protoMessage);
+    return this.apiClient.api.conversation.postOTRMessageV2(id, domain, protoMessage);
   }
 
   private async sendOTRMessage(
@@ -246,8 +246,8 @@ export class MessageService {
     }
 
     return !options.conversationId
-      ? this.apiClient.broadcast.api.postBroadcastMessage(sendingClientId, message, ignoreMissing)
-      : this.apiClient.conversation.api.postOTRMessage(sendingClientId, options.conversationId, message, ignoreMissing);
+      ? this.apiClient.api.broadcast.postBroadcastMessage(sendingClientId, message, ignoreMissing)
+      : this.apiClient.api.conversation.postOTRMessage(sendingClientId, options.conversationId, message, ignoreMissing);
   }
 
   private async generateExternalPayload(plainText: Uint8Array): Promise<{text: Uint8Array; cipherText: Uint8Array}> {
@@ -296,7 +296,7 @@ export class MessageService {
     // remove deleted clients to the recipients
     deleted.forEach(({userId, data}) => data.forEach(clientId => delete recipients[userId.id][clientId]));
     if (missing.length) {
-      const missingPreKeyBundles = await this.apiClient.user.api.postMultiPreKeyBundles(mismatch.missing);
+      const missingPreKeyBundles = await this.apiClient.api.user.postMultiPreKeyBundles(mismatch.missing);
       const {encrypted} = await this.cryptographyService.encrypt(plainText, missingPreKeyBundles);
       const reEncryptedPayloads = flattenUserClients<{[client: string]: Uint8Array}>(encrypted);
       // add missing clients to the recipients
@@ -326,7 +326,7 @@ export class MessageService {
     );
 
     if (Object.keys(missing).length) {
-      const missingPreKeyBundles = await this.apiClient.user.api.postQualifiedMultiPreKeyBundles(mismatch.missing);
+      const missingPreKeyBundles = await this.apiClient.api.user.postQualifiedMultiPreKeyBundles(mismatch.missing);
       const {encrypted} = await this.cryptographyService.encryptQualified(plainText, missingPreKeyBundles);
       const reEncryptedPayloads = flattenQualifiedUserClients<{[client: string]: Uint8Array}>(encrypted);
       reEncryptedPayloads.forEach(
@@ -380,8 +380,8 @@ export class MessageService {
     }
 
     return !options.conversationId
-      ? this.apiClient.broadcast.api.postBroadcastProtobufMessage(sendingClientId, protoMessage, ignoreMissing)
-      : this.apiClient.conversation.api.postOTRProtobufMessage(
+      ? this.apiClient.api.broadcast.postBroadcastProtobufMessage(sendingClientId, protoMessage, ignoreMissing)
+      : this.apiClient.api.conversation.postOTRProtobufMessage(
           sendingClientId,
           options.conversationId,
           protoMessage,

@@ -97,13 +97,13 @@ describe('MessageService', () => {
 
   describe('sendFederatedMessage', () => {
     it('sends a message', async () => {
-      spyOn(apiClient.conversation.api, 'postOTRMessageV2').and.returnValue(Promise.resolve(baseMessageSendingStatus));
+      spyOn(apiClient.api.conversation, 'postOTRMessageV2').and.returnValue(Promise.resolve(baseMessageSendingStatus));
       const recipients = generateQualifiedRecipients([user1, user2]);
 
       await messageService.sendFederatedMessage('senderclientid', recipients, new Uint8Array(), {
         conversationId: {id: 'convid', domain: ''},
       });
-      expect(apiClient.conversation.api.postOTRMessageV2).toHaveBeenCalled();
+      expect(apiClient.api.conversation.postOTRMessageV2).toHaveBeenCalled();
     });
 
     describe('client mismatch', () => {
@@ -114,7 +114,7 @@ describe('MessageService', () => {
           deleted: {[user1.domain]: {[user1.id]: [user1.clients[0]]}},
           missing: {'2.wire.test': {[user2.id]: ['client22']}},
         };
-        spyOn(apiClient.conversation.api, 'postOTRMessageV2').and.callFake(() => {
+        spyOn(apiClient.api.conversation, 'postOTRMessageV2').and.callFake(() => {
           spyCounter++;
           if (spyCounter === 1) {
             const error = new Error();
@@ -126,7 +126,7 @@ describe('MessageService', () => {
           }
           return Promise.resolve(baseMessageSendingStatus);
         });
-        spyOn(apiClient.user.api, 'postQualifiedMultiPreKeyBundles').and.returnValue(Promise.resolve({}));
+        spyOn(apiClient.api.user, 'postQualifiedMultiPreKeyBundles').and.returnValue(Promise.resolve({}));
 
         const recipients = generateQualifiedRecipients([user1, user2]);
 
@@ -134,14 +134,14 @@ describe('MessageService', () => {
           reportMissing: true,
           conversationId: {id: 'convid', domain: ''},
         });
-        expect(apiClient.conversation.api.postOTRMessageV2).toHaveBeenCalledTimes(2);
+        expect(apiClient.api.conversation.postOTRMessageV2).toHaveBeenCalledTimes(2);
       });
 
       it('continues message sending if onClientMismatch returns true', async () => {
         const onClientMismatch = jasmine.createSpy('onClientMismatch').and.returnValue(true);
         const clientMismatch = {...baseMessageSendingStatus, missing: {'2.wire.test': {[user2.id]: ['client22']}}};
         let spyCounter = 0;
-        spyOn(apiClient.conversation.api, 'postOTRMessageV2').and.callFake(() => {
+        spyOn(apiClient.api.conversation, 'postOTRMessageV2').and.callFake(() => {
           spyCounter++;
           if (spyCounter === 1) {
             const error = new Error();
@@ -153,7 +153,7 @@ describe('MessageService', () => {
           }
           return Promise.resolve(baseMessageSendingStatus);
         });
-        spyOn(apiClient.user.api, 'postQualifiedMultiPreKeyBundles').and.returnValue(Promise.resolve({}));
+        spyOn(apiClient.api.user, 'postQualifiedMultiPreKeyBundles').and.returnValue(Promise.resolve({}));
 
         const recipients = generateQualifiedRecipients([user1, user2]);
 
@@ -162,14 +162,14 @@ describe('MessageService', () => {
           onClientMismatch,
           conversationId: {id: 'convid', domain: ''},
         });
-        expect(apiClient.conversation.api.postOTRMessageV2).toHaveBeenCalledTimes(2);
+        expect(apiClient.api.conversation.postOTRMessageV2).toHaveBeenCalledTimes(2);
         expect(onClientMismatch).toHaveBeenCalledWith(clientMismatch);
       });
 
       it('stops message sending if onClientMismatch returns false', async () => {
         const onClientMismatch = jasmine.createSpy('onClientMismatch').and.returnValue(false);
         const clientMismatch = {...baseMessageSendingStatus, missing: {'2.wire.test': {[user2.id]: ['client22']}}};
-        spyOn(apiClient.conversation.api, 'postOTRMessageV2').and.callFake(() => {
+        spyOn(apiClient.api.conversation, 'postOTRMessageV2').and.callFake(() => {
           const error = new Error();
           (error as any).response = {
             status: StatusCodes.PRECONDITION_FAILED,
@@ -177,7 +177,7 @@ describe('MessageService', () => {
           };
           return Promise.reject(error);
         });
-        spyOn(apiClient.user.api, 'postQualifiedMultiPreKeyBundles').and.returnValue(Promise.resolve({}));
+        spyOn(apiClient.api.user, 'postQualifiedMultiPreKeyBundles').and.returnValue(Promise.resolve({}));
 
         const recipients = generateQualifiedRecipients([user1, user2]);
 
@@ -186,7 +186,7 @@ describe('MessageService', () => {
           onClientMismatch,
           conversationId: {id: 'convid', domain: ''},
         });
-        expect(apiClient.conversation.api.postOTRMessageV2).toHaveBeenCalledTimes(1);
+        expect(apiClient.api.conversation.postOTRMessageV2).toHaveBeenCalledTimes(1);
         expect(onClientMismatch).toHaveBeenCalledWith(clientMismatch);
       });
     });
@@ -214,12 +214,12 @@ describe('MessageService', () => {
 
     it('should send regular to conversation', async () => {
       const message = 'Lorem ipsum dolor sit amet';
-      spyOn(apiClient.conversation.api, 'postOTRMessage').and.returnValue(Promise.resolve({} as ClientMismatch));
+      spyOn(apiClient.api.conversation, 'postOTRMessage').and.returnValue(Promise.resolve({} as ClientMismatch));
 
       await messageService.sendMessage(clientId, generateRecipients(generateUsers(3, 3)), createMessage(message), {
         conversationId,
       });
-      expect(apiClient.conversation.api.postOTRMessage).toHaveBeenCalledWith(
+      expect(apiClient.api.conversation.postOTRMessage).toHaveBeenCalledWith(
         clientId,
         conversationId,
         jasmine.any(Object),
@@ -229,7 +229,7 @@ describe('MessageService', () => {
 
     it('should send protobuf message to conversation', async () => {
       const message = 'Lorem ipsum dolor sit amet';
-      spyOn(apiClient.conversation.api, 'postOTRProtobufMessage').and.returnValue(
+      spyOn(apiClient.api.conversation, 'postOTRProtobufMessage').and.returnValue(
         Promise.resolve({} as ClientMismatch),
       );
 
@@ -237,7 +237,7 @@ describe('MessageService', () => {
         conversationId,
         sendAsProtobuf: true,
       });
-      expect(apiClient.conversation.api.postOTRProtobufMessage).toHaveBeenCalledWith(
+      expect(apiClient.api.conversation.postOTRProtobufMessage).toHaveBeenCalledWith(
         clientId,
         conversationId,
         jasmine.any(Object),
@@ -247,15 +247,15 @@ describe('MessageService', () => {
 
     it('should broadcast regular message if no conversationId is given', async () => {
       const message = 'Lorem ipsum dolor sit amet';
-      spyOn(apiClient.broadcast.api, 'postBroadcastMessage').and.returnValue(Promise.resolve({} as ClientMismatch));
+      spyOn(apiClient.api.broadcast, 'postBroadcastMessage').and.returnValue(Promise.resolve({} as ClientMismatch));
 
       await messageService.sendMessage(clientId, generateRecipients(generateUsers(3, 3)), createMessage(message));
-      expect(apiClient.broadcast.api.postBroadcastMessage).toHaveBeenCalledWith(clientId, jasmine.any(Object), false);
+      expect(apiClient.api.broadcast.postBroadcastMessage).toHaveBeenCalledWith(clientId, jasmine.any(Object), false);
     });
 
     it('should broadcast protobuf message if no conversationId is given', async () => {
       const message = 'Lorem ipsum dolor sit amet';
-      spyOn(apiClient.broadcast.api, 'postBroadcastProtobufMessage').and.returnValue(
+      spyOn(apiClient.api.broadcast, 'postBroadcastProtobufMessage').and.returnValue(
         Promise.resolve({} as ClientMismatch),
       );
 
@@ -263,7 +263,7 @@ describe('MessageService', () => {
         sendAsProtobuf: true,
       });
 
-      expect(apiClient.broadcast.api.postBroadcastProtobufMessage).toHaveBeenCalledWith(
+      expect(apiClient.api.broadcast.postBroadcastProtobufMessage).toHaveBeenCalledWith(
         clientId,
         jasmine.any(Object),
         false,
@@ -272,12 +272,12 @@ describe('MessageService', () => {
 
     it('should not send as external if payload small', async () => {
       const message = 'Lorem ipsum dolor sit amet';
-      spyOn(apiClient.conversation.api, 'postOTRMessage').and.returnValue(Promise.resolve({} as ClientMismatch));
+      spyOn(apiClient.api.conversation, 'postOTRMessage').and.returnValue(Promise.resolve({} as ClientMismatch));
 
       await messageService.sendMessage(clientId, generateRecipients(generateUsers(3, 3)), createMessage(message), {
         conversationId,
       });
-      expect(apiClient.conversation.api.postOTRMessage).toHaveBeenCalledWith(
+      expect(apiClient.api.conversation.postOTRMessage).toHaveBeenCalledWith(
         clientId,
         conversationId,
         jasmine.objectContaining({data: undefined}),
@@ -288,7 +288,7 @@ describe('MessageService', () => {
     it('should send as external if payload is big', async () => {
       const longMessage =
         'Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Duis autem Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Duis autem';
-      spyOn(apiClient.conversation.api, 'postOTRMessage').and.returnValue(Promise.resolve({} as ClientMismatch));
+      spyOn(apiClient.api.conversation, 'postOTRMessage').and.returnValue(Promise.resolve({} as ClientMismatch));
 
       await messageService.sendMessage(
         clientId,
@@ -298,7 +298,7 @@ describe('MessageService', () => {
           conversationId,
         },
       );
-      expect(apiClient.conversation.api.postOTRMessage).toHaveBeenCalledWith(
+      expect(apiClient.api.conversation.postOTRMessage).toHaveBeenCalledWith(
         clientId,
         conversationId,
         jasmine.objectContaining({data: jasmine.any(String)}),
@@ -321,7 +321,7 @@ describe('MessageService', () => {
           deleted: {[user1.id]: [user1.clients[0]]},
           missing: {[user2.id]: ['client22']},
         };
-        spyOn(apiClient.conversation.api, 'postOTRMessage').and.callFake(() => {
+        spyOn(apiClient.api.conversation, 'postOTRMessage').and.callFake(() => {
           spyCounter++;
           if (spyCounter === 1) {
             const error = new Error();
@@ -333,7 +333,7 @@ describe('MessageService', () => {
           }
           return Promise.resolve(baseClientMismatch);
         });
-        spyOn(apiClient.user.api, 'postMultiPreKeyBundles').and.returnValue(Promise.resolve({}));
+        spyOn(apiClient.api.user, 'postMultiPreKeyBundles').and.returnValue(Promise.resolve({}));
 
         const recipients = generateRecipients([user1, user2]);
 
@@ -341,14 +341,14 @@ describe('MessageService', () => {
           reportMissing: true,
           conversationId: 'convid',
         });
-        expect(apiClient.conversation.api.postOTRMessage).toHaveBeenCalledTimes(2);
+        expect(apiClient.api.conversation.postOTRMessage).toHaveBeenCalledTimes(2);
       });
 
       it('continues message sending if onClientMismatch returns true', async () => {
         const onClientMismatch = jasmine.createSpy().and.returnValue(Promise.resolve(true));
         const clientMismatch = {...baseClientMismatch, missing: {[user2.id]: ['client22']}};
         let spyCounter = 0;
-        spyOn(apiClient.conversation.api, 'postOTRMessage').and.callFake(() => {
+        spyOn(apiClient.api.conversation, 'postOTRMessage').and.callFake(() => {
           spyCounter++;
           if (spyCounter === 1) {
             const error = new Error();
@@ -360,7 +360,7 @@ describe('MessageService', () => {
           }
           return Promise.resolve(baseClientMismatch);
         });
-        spyOn(apiClient.user.api, 'postMultiPreKeyBundles').and.returnValue(Promise.resolve({}));
+        spyOn(apiClient.api.user, 'postMultiPreKeyBundles').and.returnValue(Promise.resolve({}));
 
         const recipients = generateRecipients([user1, user2]);
 
@@ -369,14 +369,14 @@ describe('MessageService', () => {
           onClientMismatch,
           conversationId: 'convid',
         });
-        expect(apiClient.conversation.api.postOTRMessage).toHaveBeenCalledTimes(2);
+        expect(apiClient.api.conversation.postOTRMessage).toHaveBeenCalledTimes(2);
         expect(onClientMismatch).toHaveBeenCalledWith(clientMismatch);
       });
 
       it('stops message sending if onClientMismatch returns false', async () => {
         const onClientMismatch = jasmine.createSpy().and.returnValue(Promise.resolve(false));
         const clientMismatch = {...baseMessageSendingStatus, missing: {[user2.id]: ['client22']}};
-        spyOn(apiClient.conversation.api, 'postOTRMessage').and.callFake(() => {
+        spyOn(apiClient.api.conversation, 'postOTRMessage').and.callFake(() => {
           const error = new Error();
           (error as any).response = {
             status: StatusCodes.PRECONDITION_FAILED,
@@ -384,7 +384,7 @@ describe('MessageService', () => {
           };
           return Promise.reject(error);
         });
-        spyOn(apiClient.user.api, 'postMultiPreKeyBundles').and.returnValue(Promise.resolve({}));
+        spyOn(apiClient.api.user, 'postMultiPreKeyBundles').and.returnValue(Promise.resolve({}));
 
         const recipients = generateRecipients([user1, user2]);
 
@@ -393,7 +393,7 @@ describe('MessageService', () => {
           onClientMismatch,
           conversationId: 'convid',
         });
-        expect(apiClient.conversation.api.postOTRMessage).toHaveBeenCalledTimes(1);
+        expect(apiClient.api.conversation.postOTRMessage).toHaveBeenCalledTimes(1);
         expect(onClientMismatch).toHaveBeenCalledWith(clientMismatch);
       });
     });

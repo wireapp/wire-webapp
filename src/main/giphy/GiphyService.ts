@@ -24,14 +24,14 @@ export class GiphyService {
   constructor(private readonly apiClient: APIClient) {}
 
   public getRandomGif(tag?: string, rating?: GIPHY_RATING): Promise<GiphyResult> {
-    return this.apiClient.giphy.api.getGiphyRandom({rating, tag});
+    return this.apiClient.api.giphy.getGiphyRandom({rating, tag});
   }
 
   public getTrendingGif(rating?: GIPHY_RATING): Promise<GiphyMultipleResult> {
-    return this.apiClient.giphy.api.getGiphyTrending({rating});
+    return this.apiClient.api.giphy.getGiphyTrending({rating});
   }
 
   public searchGif(options: GiphySearchOptions): Promise<GiphyMultipleResult> {
-    return this.apiClient.giphy.api.getGiphySearch(options);
+    return this.apiClient.api.giphy.getGiphySearch(options);
   }
 }
