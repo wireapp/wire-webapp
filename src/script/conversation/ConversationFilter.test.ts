@@ -14,9 +14,9 @@ describe('ConversationFilter', () => {
 
     it('does not show call controls for an outgoing connection request', () => {
       const conversationData: ConversationDatabaseData = {
-        accessModes: undefined,
-        accessRole: undefined,
+        access: undefined,
         accessRoleV2: undefined,
+        access_role: undefined,
         archived_state: false,
         archived_timestamp: 0,
         cleared_timestamp: 0,
@@ -59,9 +59,9 @@ describe('ConversationFilter', () => {
 
     it('shows call controls for an accepted connection request', () => {
       const conversationData: ConversationDatabaseData = {
-        accessModes: [CONVERSATION_ACCESS.PRIVATE],
-        accessRole: CONVERSATION_ACCESS_ROLE.PRIVATE,
+        access: [CONVERSATION_ACCESS.PRIVATE],
         accessRoleV2: undefined,
+        access_role: CONVERSATION_ACCESS_ROLE.PRIVATE,
         archived_state: false,
         archived_timestamp: 0,
         cleared_timestamp: 0,

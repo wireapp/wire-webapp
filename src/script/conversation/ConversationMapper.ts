@@ -63,9 +63,9 @@ export interface SelfStatusUpdateDatabaseData {
 
 export type ConversationDatabaseData = ConversationRecord &
   Partial<ConversationBackendData> & {
-    accessModes: CONVERSATION_ACCESS[];
-    accessRole: CONVERSATION_ACCESS_ROLE;
-    accessRoleV2: ACCESS_ROLE_V2[];
+    accessModes?: CONVERSATION_ACCESS[];
+    accessRole?: CONVERSATION_ACCESS_ROLE;
+    accessRoleV2?: ACCESS_ROLE_V2[];
     roles: {[userId: string]: DefaultConversationRoleName | string};
     status: ConversationStatus;
     team_id: string;
