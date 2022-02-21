@@ -30,8 +30,10 @@ describe('InvitationAction', () => {
     const expectedInvitation = 'invite';
     const mockedActions = {};
     const mockedApiClient = {
-      teams: {
-        invitation: {api: {postInvitation: () => Promise.resolve('invite')}},
+      api: {
+        teams: {
+          invitation: {postInvitation: () => Promise.resolve('invite')},
+        },
       },
     };
 
@@ -56,8 +58,10 @@ describe('InvitationAction', () => {
     const email = 'mail@mail.com';
     const mockedActions = {};
     const mockedApiClient = {
-      teams: {
-        invitation: {api: {postInvitation: () => Promise.reject(error)}},
+      api: {
+        teams: {
+          invitation: {postInvitation: () => Promise.reject(error)},
+        },
       },
     };
 
