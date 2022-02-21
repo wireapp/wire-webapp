@@ -193,7 +193,6 @@ ko.bindingHandlers.heightSync = {
   init(element, valueAccessor) {
     const params = ko.unwrap(valueAccessor()) || {};
 
-    const resizeCallback = params.callback;
     const targetElement = document.querySelector(params.target);
     const triggerValue = params.trigger;
 
@@ -202,9 +201,6 @@ ko.bindingHandlers.heightSync = {
       const targetHeight = targetElement.offsetHeight;
       if (sourceHeight !== targetHeight) {
         targetElement.style.height = `${element.scrollHeight}px`;
-        if (typeof resizeCallback === 'function') {
-          resizeCallback(sourceHeight, targetHeight);
-        }
       }
 
       const isScrolling = targetElement.scrollHeight > targetElement.offsetHeight;

@@ -187,7 +187,10 @@ const UserActions: React.FC<UserActionsProps> = ({
         // We create a local 1:1 conversation that will act as a placeholder before the other user has accepted the request
         const newConversation = createPlaceholder1to1Conversation(user, selfUser);
         const savedConversation = await actionsViewModel.saveConversation(newConversation);
-        actionsViewModel.open1to1Conversation(savedConversation);
+        if (!conversation) {
+          // Only open the new conversation if we aren't currently in a conversation context
+          actionsViewModel.open1to1Conversation(savedConversation);
+        }
         onAction(Actions.SEND_REQUEST);
       },
       icon: 'plus-icon',

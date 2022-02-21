@@ -17,6 +17,8 @@
  *
  */
 
+process.env.TZ = 'UTC';
+
 module.exports = {
   collectCoverageFrom: ['src/script/**/*.{ts,tsx}', '!src/script/util/test/**/*.*'],
   coverageThreshold: {

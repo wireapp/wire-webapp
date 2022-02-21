@@ -571,9 +571,10 @@ export class ConversationRepository {
     conversationEntity.is_pending(true);
 
     const firstMessageEntity = conversationEntity.getFirstMessage();
-    const upperBound = firstMessageEntity
-      ? new Date(firstMessageEntity.timestamp())
-      : new Date(conversationEntity.getLatestTimestamp(this.serverTimeHandler.toServerTimestamp()) + 1);
+    const upperBound =
+      firstMessageEntity && firstMessageEntity.timestamp()
+        ? new Date(firstMessageEntity.timestamp())
+        : new Date(conversationEntity.getLatestTimestamp(this.serverTimeHandler.toServerTimestamp()) + 1);
 
     const events = (await this.eventService.loadPrecedingEvents(
       conversationEntity.id,

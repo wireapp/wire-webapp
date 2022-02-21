@@ -29,7 +29,6 @@ import {SystemMessage} from './SystemMessage';
 
 export class MessageTimerUpdateMessage extends SystemMessage {
   public readonly message_timer: number;
-  public readonly caption: ko.PureComputed<string>;
 
   constructor(messageTimer: number) {
     super();
