@@ -1541,7 +1541,7 @@ export class CallingRepository {
   //##############################################################################
 
   fetchConfig(limit?: number): Promise<CallConfigData> {
-    return this.apiClient.account.api.getCallConfig(limit);
+    return this.apiClient.api.account.getCallConfig(limit);
   }
 
   private checkConcurrentJoinedCall(conversationId: QualifiedId, newCallState: CALL_STATE): Promise<void> {

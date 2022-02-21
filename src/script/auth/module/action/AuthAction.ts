@@ -113,7 +113,7 @@ export class AuthAction {
     return async (dispatch, getState, {apiClient}) => {
       dispatch(AuthActionCreator.startSendPhoneLoginCode());
       try {
-        const {expires_in} = await apiClient.auth.api.postLoginSend(loginRequest);
+        const {expires_in} = await apiClient.api.auth.postLoginSend(loginRequest);
         dispatch(AuthActionCreator.successfulSendPhoneLoginCode(expires_in));
       } catch (error) {
         dispatch(AuthActionCreator.failedSendPhoneLoginCode(error));
@@ -170,7 +170,7 @@ export class AuthAction {
       };
 
       try {
-        return await apiClient.auth.api.headInitiateLogin(code);
+        return await apiClient.api.auth.headInitiateLogin(code);
       } catch (error) {
         const mappedError = mapError(error);
         dispatch(AuthActionCreator.failedLogin(mappedError));
@@ -352,7 +352,7 @@ export class AuthAction {
 
   doGetDomainInfo = (domain: string): ThunkAction<Promise<DomainData>> => {
     return async (dispatch, getState, {apiClient}) => {
-      return apiClient.account.api.getDomain(domain);
+      return apiClient.api.account.getDomain(domain);
     };
   };
 
@@ -360,7 +360,7 @@ export class AuthAction {
     return async (dispatch, getState, {apiClient}) => {
       dispatch(AuthActionCreator.startGetSSOSettings());
       try {
-        const ssoSettings = await apiClient.account.api.getSSOSettings();
+        const ssoSettings = await apiClient.api.account.getSSOSettings();
         dispatch(AuthActionCreator.successfulGetSSOSettings(ssoSettings));
       } catch (error) {
         dispatch(AuthActionCreator.failedGetSSOSettings(error));

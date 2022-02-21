@@ -36,8 +36,8 @@ export class CryptographyService {
    */
   getUserPreKeyByIds(userId: QualifiedId, clientId: string): Promise<ClientPreKey> {
     return Config.getConfig().FEATURE.ENABLE_FEDERATION
-      ? this.apiClient.user.api.getClientPreKey(userId, clientId, true)
-      : this.apiClient.user.api.getClientPreKey(userId.id, clientId);
+      ? this.apiClient.api.user.getClientPreKey(userId, clientId, true)
+      : this.apiClient.api.user.getClientPreKey(userId.id, clientId);
   }
 
   /**
@@ -48,6 +48,6 @@ export class CryptographyService {
    * @returns Resolves once the pre-keys are accepted
    */
   putClientPreKeys(clientId: string, serializedPreKeys: PreKey[]): Promise<void> {
-    return this.apiClient.client.api.putClient(clientId, {prekeys: serializedPreKeys});
+    return this.apiClient.api.client.putClient(clientId, {prekeys: serializedPreKeys});
   }
 }

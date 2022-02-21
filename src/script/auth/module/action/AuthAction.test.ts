@@ -187,8 +187,8 @@ describe('AuthAction', () => {
     const phoneNumber = '+08723568';
     const expiresIn = 60;
     const mockedApiClient = {
-      auth: {
-        api: {
+      api: {
+        auth: {
           postLoginSend: () => Promise.resolve({expires_in: expiresIn}),
         },
       },
@@ -209,8 +209,8 @@ describe('AuthAction', () => {
     const error = new Error('test error');
     const phoneNumber = '+08723568';
     const mockedApiClient = {
-      auth: {
-        api: {
+      api: {
+        auth: {
           postLoginSend: () => Promise.reject(error),
         },
       },
@@ -229,8 +229,8 @@ describe('AuthAction', () => {
   it('validates SSO code', async () => {
     const ssoCode = 'wire-uuid';
     const mockedApiClient = {
-      auth: {
-        api: {
+      api: {
+        auth: {
           headInitiateLogin: () => Promise.resolve(),
         },
       },
@@ -250,8 +250,8 @@ describe('AuthAction', () => {
     });
     const ssoCode = 'wire-uuid';
     const mockedApiClient = {
-      auth: {
-        api: {
+      api: {
+        auth: {
           headInitiateLogin: () => Promise.reject(error),
         },
       },
@@ -272,8 +272,8 @@ describe('AuthAction', () => {
     });
     const ssoCode = 'wire-uuid';
     const mockedApiClient = {
-      auth: {
-        api: {
+      api: {
+        auth: {
           headInitiateLogin: () => Promise.reject(error),
         },
       },
@@ -294,8 +294,8 @@ describe('AuthAction', () => {
     });
     const ssoCode = 'wire-uuid';
     const mockedApiClient = {
-      auth: {
-        api: {
+      api: {
+        auth: {
           headInitiateLogin: () => Promise.reject(error),
         },
       },
