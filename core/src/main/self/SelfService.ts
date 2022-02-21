@@ -29,18 +29,18 @@ export class SelfService {
   }
 
   public checkUsernames(usernames: string[]): Promise<string[]> {
-    return this.apiClient.user.api.postHandles({
+    return this.apiClient.api.user.postHandles({
       handles: usernames,
     });
   }
 
   public async getName(): Promise<string> {
-    const {name} = await this.apiClient.self.api.getName();
+    const {name} = await this.apiClient.api.self.getName();
     return name;
   }
 
   public async getSelf(): Promise<Self> {
-    const selfData = await this.apiClient.self.api.getSelf();
+    const selfData = await this.apiClient.api.self.getSelf();
     return selfData;
   }
 
@@ -50,10 +50,10 @@ export class SelfService {
   }
 
   public setName(name: string): Promise<void> {
-    return this.apiClient.self.api.putSelf({name});
+    return this.apiClient.api.self.putSelf({name});
   }
 
   public setUsername(username: string): Promise<void> {
-    return this.apiClient.self.api.putHandle({handle: username});
+    return this.apiClient.api.self.putHandle({handle: username});
   }
 }

@@ -90,9 +90,9 @@ account.on(PayloadBundleType.TEXT, textMessage => {
     // TODO: The following is just a quick hack to continue if too many clients are registered!
     // We should expose this fail-safe method as an emergency function
     if (errorLabel === BackendErrorLabel.TOO_MANY_CLIENTS) {
-      const clients = await apiClient.client.api.getClients();
+      const clients = await apiClient.api.client.getClients();
       const client: RegisteredClient = clients[0];
-      await apiClient.client.api.deleteClient(client.id, loginData.password);
+      await apiClient.api.client.deleteClient(client.id, loginData.password);
       await account.logout();
 
       // TODO: Completely removing the Wire Cryptobox directoy isn't a good idea! The "logout" method should

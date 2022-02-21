@@ -24,10 +24,10 @@ export class ClientBackendRepository {
   constructor(private readonly apiClient: APIClient) {}
 
   public getClients(): Promise<RegisteredClient[]> {
-    return this.apiClient.client.api.getClients();
+    return this.apiClient.api.client.getClients();
   }
 
   public postClient(client: NewClient): Promise<RegisteredClient> {
-    return this.apiClient.client.api.postClient(client);
+    return this.apiClient.api.client.postClient(client);
   }
 }

@@ -31,38 +31,38 @@ export class TeamService {
   constructor(private readonly apiClient: APIClient) {}
 
   public addMember(teamId: string, memberData: MemberData): Promise<void> {
-    return this.apiClient.teams.member.api.postMembers(teamId, memberData);
+    return this.apiClient.api.teams.member.postMembers(teamId, memberData);
   }
 
   public createTeam(teamData: NewTeamData): Promise<void> {
-    return this.apiClient.teams.team.api.postTeam(teamData);
+    return this.apiClient.api.teams.team.postTeam(teamData);
   }
 
   public deleteTeam(teamId: string, password: string): Promise<void> {
-    return this.apiClient.teams.team.api.deleteTeam(teamId, password);
+    return this.apiClient.api.teams.team.deleteTeam(teamId, password);
   }
 
   public getAllMembers(teamId: string): Promise<Members> {
-    return this.apiClient.teams.member.api.getAllMembers(teamId);
+    return this.apiClient.api.teams.member.getAllMembers(teamId);
   }
 
   public getTeam(teamId: string): Promise<TeamData> {
-    return this.apiClient.teams.team.api.getTeam(teamId);
+    return this.apiClient.api.teams.team.getTeam(teamId);
   }
 
   public getTeams(): Promise<TeamChunkData> {
-    return this.apiClient.teams.team.api.getTeams();
+    return this.apiClient.api.teams.team.getTeams();
   }
 
   public removeMember(teamId: string, userId: string, password: string): Promise<void> {
-    return this.apiClient.teams.member.api.deleteMember(teamId, userId, password);
+    return this.apiClient.api.teams.member.deleteMember(teamId, userId, password);
   }
 
   public updateMember(teamId: string, memberData: MemberData): Promise<void> {
-    return this.apiClient.teams.member.api.putMembers(teamId, memberData);
+    return this.apiClient.api.teams.member.putMembers(teamId, memberData);
   }
 
   public updateTeam(teamId: string, teamData: UpdateTeamData): Promise<void> {
-    return this.apiClient.teams.team.api.putTeam(teamId, teamData);
+    return this.apiClient.api.teams.team.putTeam(teamId, teamData);
   }
 }

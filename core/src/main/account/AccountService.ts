@@ -26,6 +26,6 @@ export class AccountService {
 
   getCallConfig(): Promise<CallConfigData> {
     const iceCandidateLimit = Runtime.isFirefox() ? 3 : undefined;
-    return this.apiClient.account.api.getCallConfig(iceCandidateLimit);
+    return this.apiClient.api.account.getCallConfig(iceCandidateLimit);
   }
 }

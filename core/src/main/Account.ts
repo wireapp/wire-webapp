@@ -312,7 +312,7 @@ export class Account extends EventEmitter {
     await this.service!.cryptography.initCryptobox();
 
     const loadedClient = await this.service!.client.getLocalClient();
-    await this.apiClient.client.api.getClient(loadedClient.id);
+    await this.apiClient.api.client.getClient(loadedClient.id);
     this.apiClient.context!.clientId = loadedClient.id;
 
     return loadedClient;

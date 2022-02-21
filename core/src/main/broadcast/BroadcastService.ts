@@ -45,19 +45,19 @@ export class BroadcastService {
     onlyDirectConnections = false,
   ): Promise<UserPreKeyBundleMap> {
     const teamMembers = onlyDirectConnections
-      ? (await this.apiClient.conversation.api.getConversations()).conversations
+      ? (await this.apiClient.api.conversation.getConversations()).conversations
           .map(({members}) => members.others.map(user => user.id).concat(members.self.id))
           .flat()
-      : (await this.apiClient.teams.member.api.getAllMembers(teamId)).members.map(({user}) => user);
+      : (await this.apiClient.api.teams.member.getAllMembers(teamId)).members.map(({user}) => user);
 
     let members = Array.from(new Set(teamMembers)).map(member => ({id: member}));
 
     if (skipOwnClients) {
-      const selfUser = await this.apiClient.self.api.getSelf();
+      const selfUser = await this.apiClient.api.self.getSelf();
       members = members.filter(member => member.id !== selfUser.id);
     }
 
-    const preKeys = await Promise.all(members.map(member => this.apiClient.user.api.getUserPreKeys(member.id)));
+    const preKeys = await Promise.all(members.map(member => this.apiClient.api.user.getUserPreKeys(member.id)));
 
     return preKeys.reduce<UserPreKeyBundleMap>((bundleMap, bundle) => {
       bundleMap[bundle.user] = {};

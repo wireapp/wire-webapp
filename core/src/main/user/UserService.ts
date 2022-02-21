@@ -48,7 +48,7 @@ export class UserService {
   }
 
   public getUser(userId: string | QualifiedId): Promise<User> {
-    return this.apiClient.user.api.getUser(userId as QualifiedId);
+    return this.apiClient.api.user.getUser(userId as QualifiedId);
   }
 
   public async getUsers(userIds: string[] | QualifiedId[]): Promise<User[]> {
@@ -56,8 +56,8 @@ export class UserService {
       return [];
     }
     return isQualifiedIdArray(userIds)
-      ? this.apiClient.user.api.postListUsers({qualified_ids: userIds})
-      : this.apiClient.user.api.getUsers({ids: userIds});
+      ? this.apiClient.api.user.postListUsers({qualified_ids: userIds})
+      : this.apiClient.api.user.getUsers({ids: userIds});
   }
 
   /**

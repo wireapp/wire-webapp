@@ -86,37 +86,41 @@ export interface APIClient {
   on(event: TOPIC.ACCESS_TOKEN_REFRESH, listener: (accessToken: AccessTokenData) => void): this;
 }
 
+type Apis = {
+  account: AccountAPI;
+  asset: AssetAPI;
+  auth: AuthAPI;
+  broadcast: BroadcastAPI;
+  client: ClientAPI;
+  connection: ConnectionAPI;
+  conversation: ConversationAPI;
+  giphy: GiphyAPI;
+  notification: NotificationAPI;
+  self: SelfAPI;
+  services: ServicesAPI;
+  serviceProvider: ServiceProviderAPI;
+  teams: {
+    conversation: TeamConversationAPI;
+    feature: FeatureAPI;
+    identityProvider: IdentityProviderAPI;
+    invitation: TeamInvitationAPI;
+    legalhold: LegalHoldAPI;
+    member: MemberAPI;
+    payment: PaymentAPI;
+    billing: BillingAPI;
+    scim: ScimAPI;
+    search: TeamSearchAPI;
+    service: ServiceAPI;
+    team: TeamAPI;
+  };
+  user: UserAPI;
+};
+
 export class APIClient extends EventEmitter {
   private readonly logger: logdown.Logger;
 
   // APIs
-  public account: {api: AccountAPI};
-  public asset: {api: AssetAPI};
-  public auth: {api: AuthAPI};
-  public broadcast: {api: BroadcastAPI};
-  public client: {api: ClientAPI};
-  public connection: {api: ConnectionAPI};
-  public conversation: {api: ConversationAPI};
-  public giphy: {api: GiphyAPI};
-  public notification: {api: NotificationAPI};
-  public self: {api: SelfAPI};
-  public services: {api: ServicesAPI};
-  public serviceProvider: {api: ServiceProviderAPI};
-  public teams: {
-    conversation: {api: TeamConversationAPI};
-    feature: {api: FeatureAPI};
-    identityProvider: {api: IdentityProviderAPI};
-    invitation: {api: TeamInvitationAPI};
-    legalhold: {api: LegalHoldAPI};
-    member: {api: MemberAPI};
-    payment: {api: PaymentAPI};
-    billing: {api: BillingAPI};
-    scim: {api: ScimAPI};
-    search: {api: TeamSearchAPI};
-    service: {api: ServiceAPI};
-    team: {api: TeamAPI};
-  };
-  public user: {api: UserAPI};
+  public api: Apis;
 
   // Configuration
   private readonly accessTokenStore: AccessTokenStore;
@@ -164,82 +168,38 @@ export class APIClient extends EventEmitter {
       http: httpClient,
       ws: webSocket,
     };
-    this.account = {
-      api: new AccountAPI(this.transport.http),
-    };
-    this.asset = {
-      api: new AssetAPI(this.transport.http),
-    };
-    this.auth = {
-      api: new AuthAPI(this.transport.http),
-    };
-    this.services = {
-      api: new ServicesAPI(this.transport.http),
-    };
-    this.broadcast = {
-      api: new BroadcastAPI(this.transport.http),
-    };
-    this.client = {
-      api: new ClientAPI(this.transport.http),
-    };
-    this.connection = {
-      api: new ConnectionAPI(this.transport.http),
-    };
-    this.conversation = {
-      api: new ConversationAPI(this.transport.http),
-    };
-    this.giphy = {
-      api: new GiphyAPI(this.transport.http),
-    };
-    this.notification = {
-      api: new NotificationAPI(this.transport.http),
-    };
-    this.self = {
-      api: new SelfAPI(this.transport.http),
-    };
-    this.serviceProvider = {
-      api: new ServiceProviderAPI(this.transport.http),
-    };
-    this.teams = {
-      conversation: {
-        api: new TeamConversationAPI(this.transport.http),
+    this.api = this.configureApis(0);
+  }
+
+  private configureApis(_: number): Apis {
+    return {
+      account: new AccountAPI(this.transport.http),
+      asset: new AssetAPI(this.transport.http),
+      auth: new AuthAPI(this.transport.http),
+      services: new ServicesAPI(this.transport.http),
+      broadcast: new BroadcastAPI(this.transport.http),
+      client: new ClientAPI(this.transport.http),
+      connection: new ConnectionAPI(this.transport.http),
+      conversation: new ConversationAPI(this.transport.http),
+      giphy: new GiphyAPI(this.transport.http),
+      notification: new NotificationAPI(this.transport.http),
+      self: new SelfAPI(this.transport.http),
+      serviceProvider: new ServiceProviderAPI(this.transport.http),
+      teams: {
+        conversation: new TeamConversationAPI(this.transport.http),
+        feature: new FeatureAPI(this.transport.http),
+        identityProvider: new IdentityProviderAPI(this.transport.http),
+        invitation: new TeamInvitationAPI(this.transport.http),
+        legalhold: new LegalHoldAPI(this.transport.http),
+        member: new MemberAPI(this.transport.http),
+        payment: new PaymentAPI(this.transport.http),
+        billing: new BillingAPI(this.transport.http),
+        scim: new ScimAPI(this.transport.http),
+        search: new TeamSearchAPI(this.transport.http),
+        service: new ServiceAPI(this.transport.http),
+        team: new TeamAPI(this.transport.http),
       },
-      feature: {
-        api: new FeatureAPI(this.transport.http),
-      },
-      identityProvider: {
-        api: new IdentityProviderAPI(this.transport.http),
-      },
-      invitation: {
-        api: new TeamInvitationAPI(this.transport.http),
-      },
-      legalhold: {
-        api: new LegalHoldAPI(this.transport.http),
-      },
-      member: {
-        api: new MemberAPI(this.transport.http),
-      },
-      payment: {
-        api: new PaymentAPI(this.transport.http),
-      },
-      billing: {
-        api: new BillingAPI(this.transport.http),
-      },
-      scim: {
-        api: new ScimAPI(this.transport.http),
-      },
-      search: {
-        api: new TeamSearchAPI(this.transport.http),
-      },
-      service: {
-        api: new ServiceAPI(this.transport.http),
-      },
-      team: {
-        api: new TeamAPI(this.transport.http),
-      },
-    };
-    this.user = {
-      api: new UserAPI(this.transport.http),
+      user: new UserAPI(this.transport.http),
     };
   }
 
@@ -259,7 +219,7 @@ export class APIClient extends EventEmitter {
       await this.logout();
     }
 
-    const accessToken = await this.auth.api.postLogin(loginData);
+    const accessToken = await this.api.auth.postLogin(loginData);
 
     this.logger.info(
       `Saved initial access token. It will expire in "${accessToken.expires_in}" seconds.`,
@@ -291,7 +251,7 @@ export class APIClient extends EventEmitter {
       await this.logout();
     }
 
-    const user = await this.auth.api.postRegister(userAccount);
+    const user = await this.api.auth.postRegister(userAccount);
 
     await this.createContext(user.id, clientType);
 
@@ -302,7 +262,7 @@ export class APIClient extends EventEmitter {
     try {
       this.disconnect('Closed by client logout');
       if (!options.skipLogoutRequest) {
-        await this.auth.api.postLogout();
+        await this.api.auth.postLogout();
       }
     } catch (error) {
       this.logger.warn(error);
@@ -320,7 +280,7 @@ export class APIClient extends EventEmitter {
   private async createContext(userId: string, clientType: ClientType): Promise<Context> {
     let selfDomain = undefined;
     try {
-      const self = await this.self.api.getSelf();
+      const self = await this.api.self.getSelf();
       selfDomain = self.qualified_id?.domain;
       this.logger.info(`Got self domain "${selfDomain}"`);
     } catch (error) {

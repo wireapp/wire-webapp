@@ -33,7 +33,7 @@ describe('AssetService', () => {
         expires: '',
       };
 
-      spyOn(apiClient.asset.api, 'postAsset').and.returnValue({
+      spyOn(apiClient.api.asset, 'postAsset').and.returnValue({
         cancel: () => {},
         response: Promise.resolve(assetServerData),
       });
@@ -59,7 +59,7 @@ describe('AssetService', () => {
         response: Promise.resolve({} as any),
       };
 
-      spyOn(apiClient.asset.api, 'postAsset').and.returnValue(apiUpload);
+      spyOn(apiClient.api.asset, 'postAsset').and.returnValue(apiUpload);
 
       const asset = await assetService.uploadAsset(Buffer.from([1, 2, 3]));
       asset.cancel();
@@ -75,7 +75,7 @@ describe('AssetService', () => {
         response: Promise.resolve({} as any),
       };
 
-      spyOn(apiClient.asset.api, 'postAsset').and.callFake((_asset, _options, progressCallback) => {
+      spyOn(apiClient.api.asset, 'postAsset').and.callFake((_asset, _options, progressCallback) => {
         progressCallback?.(1);
         return apiUpload;
       });

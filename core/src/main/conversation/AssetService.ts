@@ -70,28 +70,28 @@ export class AssetService {
 
     switch (assetData.version) {
       case 1:
-        return this.apiClient.asset.api.getAssetV1(
+        return this.apiClient.api.asset.getAssetV1(
           assetData.assetId,
           assetData.conversationId,
           forceCaching,
           progressCallback,
         );
       case 2:
-        return this.apiClient.asset.api.getAssetV2(
+        return this.apiClient.api.asset.getAssetV2(
           assetData.assetId,
           assetData.conversationId,
           forceCaching,
           progressCallback,
         );
       case 3:
-        return this.apiClient.asset.api.getAssetV3(
+        return this.apiClient.api.asset.getAssetV3(
           assetData.assetKey,
           assetData.assetToken,
           forceCaching,
           progressCallback,
         );
       case 4:
-        return this.apiClient.asset.api.getAssetV4(
+        return this.apiClient.api.asset.getAssetV4(
           assetData.assetKey,
           assetData.assetDomain,
           assetData.assetToken,
@@ -110,7 +110,7 @@ export class AssetService {
    * @return cancellable request that resolves with the uploaded image
    */
   public uploadRawAsset(asset: Buffer | Uint8Array, options?: AssetOptions, progressCallback?: ProgressCallback) {
-    return this.apiClient.asset.api.postAsset(new Uint8Array(asset), options, progressCallback);
+    return this.apiClient.api.asset.postAsset(new Uint8Array(asset), options, progressCallback);
   }
 
   /**

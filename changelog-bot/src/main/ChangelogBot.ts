@@ -65,7 +65,7 @@ export class ChangelogBot {
     }
 
     if (!conversationIds) {
-      const allConversations = await client.conversation.api.getAllConversations();
+      const allConversations = await client.api.conversation.getAllConversations();
       const groupConversations = allConversations.filter(conversation => conversation.type === 0);
       conversationIds = groupConversations.map(conversation => conversation.id);
     }
