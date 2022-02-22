@@ -61,6 +61,7 @@ const AVPreferences: React.FC<AVPreferencesProps> = ({
         <CameraPreferences
           {...{devicesHandler, streamHandler}}
           refreshStream={() => callingRepository.refreshVideoInput()}
+          hasActiveCameraStream={callingRepository.hasActiveCameraStream()}
         />
       )}
       <CallOptions {...{constraintsHandler, propertiesRepository}} />

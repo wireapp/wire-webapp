@@ -196,6 +196,7 @@ export class CallingViewModel {
       },
       switchCameraInput: (call: Call, deviceId: string) => {
         this.mediaDevicesHandler.currentDeviceId.videoInput(deviceId);
+        this.callingRepository.refreshVideoInput();
       },
       switchScreenInput: (call: Call, deviceId: string) => {
         this.mediaDevicesHandler.currentDeviceId.screenInput(deviceId);
