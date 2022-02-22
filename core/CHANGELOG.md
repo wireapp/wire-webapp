@@ -3,6 +3,22 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [24.0.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/compare/@wireapp/core@23.0.0...@wireapp/core@24.0.0) (2022-02-22)
+
+
+### Features
+
+* **api-client:** Allow setting a backend version ([#4226](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/issues/4226)) ([7cda792](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/commit/7cda792e98ebcf4317dc165d9e027654fb11b78f))
+
+
+### BREAKING CHANGES
+
+* **api-client:** All the methods that were using useFederation do not need this parameter anymore (since the federation state is guessed from the api version number)
+
+
+
+
+
 # [23.0.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/compare/@wireapp/core@22.1.3...@wireapp/core@23.0.0) (2022-02-21)
 
 
