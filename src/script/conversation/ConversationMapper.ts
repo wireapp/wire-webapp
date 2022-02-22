@@ -402,7 +402,7 @@ export class ConversationMapper {
         return conversationEntity.accessState(ACCESS_STATE.TEAM.ONE2ONE);
       }
 
-      if (accessRoleV2.includes(ACCESS_ROLE_V2.TEAM_MEMBER)) {
+      if (accessRoleV2?.includes(ACCESS_ROLE_V2.TEAM_MEMBER)) {
         if (accessRoleV2.includes(ACCESS_ROLE_V2.GUEST) || accessRoleV2.includes(ACCESS_ROLE_V2.NON_TEAM_MEMBER)) {
           if (accessRoleV2.includes(ACCESS_ROLE_V2.SERVICE)) {
             return conversationEntity.accessState(ACCESS_STATE.TEAM.GUESTS_SERVICES);
