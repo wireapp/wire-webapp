@@ -34,7 +34,7 @@ export class ClientDatabaseRepository {
     LOCAL_IDENTITY: 'local_identity',
   };
 
-  constructor(private readonly storeEngine: CRUDEngine) {}
+  constructor(private readonly storeEngine: CRUDEngine, private readonly cryptographyService: CryptographyService) {}
 
   public getLocalClient(): Promise<MetaClient> {
     return this.getClient(ClientDatabaseRepository.KEYS.LOCAL_IDENTITY);
@@ -55,11 +55,7 @@ export class ClientDatabaseRepository {
     return this.storeEngine.delete(ClientDatabaseRepository.STORES.CLIENTS, sessionId);
   }
 
-  public createClientList(
-    userId: string,
-    clientList: RegisteredClient[],
-    domain: string | null,
-  ): Promise<MetaClient[]> {
+  public createClientList(userId: string, clientList: RegisteredClient[], domain?: string): Promise<MetaClient[]> {
     const createClientTasks: Promise<MetaClient>[] = [];
     for (const client of clientList) {
       createClientTasks.push(this.createClient(userId, client, domain));
@@ -67,7 +63,7 @@ export class ClientDatabaseRepository {
     return Promise.all(createClientTasks);
   }
 
-  public async createLocalClient(client: RegisteredClient, domain: string | null): Promise<MetaClient> {
+  public async createLocalClient(client: RegisteredClient, domain?: string): Promise<MetaClient> {
     const transformedClient = this.transformLocalClient(client, domain);
     await this.storeEngine.create(
       ClientDatabaseRepository.STORES.CLIENTS,
@@ -77,7 +73,7 @@ export class ClientDatabaseRepository {
     return transformedClient;
   }
 
-  public async updateLocalClient(client: RegisteredClient, domain: string | null): Promise<MetaClient> {
+  public async updateLocalClient(client: RegisteredClient, domain?: string): Promise<MetaClient> {
     const transformedClient = this.transformLocalClient(client, domain);
     await this.storeEngine.update(
       ClientDatabaseRepository.STORES.CLIENTS,
@@ -87,40 +83,38 @@ export class ClientDatabaseRepository {
     return transformedClient;
   }
 
-  public async updateClient(userId: string, client: RegisteredClient, domain: string | null): Promise<MetaClient> {
+  public async updateClient(userId: string, client: RegisteredClient, domain?: string): Promise<MetaClient> {
     const transformedClient = this.transformClient(userId, client, false, domain);
     await this.storeEngine.update(
       ClientDatabaseRepository.STORES.CLIENTS,
-      CryptographyService.constructSessionId(userId, client.id, domain),
+      this.cryptographyService.constructSessionId(userId, client.id, domain),
       transformedClient,
     );
     return transformedClient;
   }
 
-  public async createClient(userId: string, client: RegisteredClient, domain: string | null): Promise<MetaClient> {
+  public async createClient(userId: string, client: RegisteredClient, domain?: string): Promise<MetaClient> {
     const transformedClient = this.transformClient(userId, client, false, domain);
     await this.storeEngine.create(
       ClientDatabaseRepository.STORES.CLIENTS,
-      CryptographyService.constructSessionId(userId, client.id, domain),
+      this.cryptographyService.constructSessionId(userId, client.id, domain),
       transformedClient,
     );
     return transformedClient;
   }
 
-  private transformClient(
-    userId: string,
-    client: RegisteredClient,
-    verified: boolean,
-    domain: string | null,
-  ): MetaClient {
+  private transformClient(userId: string, client: RegisteredClient, verified: boolean, domain?: string): MetaClient {
     return {
       ...client,
       domain,
-      meta: {is_verified: verified, primary_key: CryptographyService.constructSessionId(userId, client.id, domain)},
+      meta: {
+        is_verified: verified,
+        primary_key: this.cryptographyService.constructSessionId(userId, client.id, domain),
+      },
     };
   }
 
-  private transformLocalClient(client: RegisteredClient, domain: string | null): MetaClient {
+  private transformLocalClient(client: RegisteredClient, domain?: string): MetaClient {
     return {
       ...client,
       domain,

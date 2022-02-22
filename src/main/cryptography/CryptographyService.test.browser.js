@@ -56,10 +56,11 @@ describe('CryptographyService', () => {
   });
 
   describe('"constructSessionId"', () => {
-    it('constructs a Session ID by a given User ID and Client ID.', () => {
+    it('constructs a Session ID by a given User ID and Client ID.', async () => {
       const clientId = '1ceb9063fced26d3';
       const userId = 'afbb5d60-1187-4385-9c29-7361dea79647';
-      const actual = CryptographyService.constructSessionId(userId, clientId);
+      cryptography = new CryptographyService(undefined, await createEngine('wire'), undefined);
+      const actual = cryptography.constructSessionId(userId, clientId);
       expect(actual).toContain(clientId);
       expect(actual).toContain(userId);
     });

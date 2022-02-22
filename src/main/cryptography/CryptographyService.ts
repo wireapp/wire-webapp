@@ -28,7 +28,7 @@ import type {
   UserClients,
 } from '@wireapp/api-client/src/conversation/';
 import type {ConversationOtrMessageAddEvent} from '@wireapp/api-client/src/event';
-import type {QualifiedUserPreKeyBundleMap, UserPreKeyBundleMap} from '@wireapp/api-client/src/user/';
+import type {QualifiedId, QualifiedUserPreKeyBundleMap, UserPreKeyBundleMap} from '@wireapp/api-client/src/user/';
 import {Cryptobox} from '@wireapp/cryptobox';
 import {keys as ProteusKeys} from '@wireapp/proteus';
 import {GenericMessage} from '@wireapp/protocol-messaging';
@@ -68,9 +68,10 @@ export class CryptographyService {
     });
   }
 
-  public static constructSessionId(userId: string, clientId: string, domain: string | null): string {
-    const baseId = `${userId}@${clientId}`;
-    return domain ? `${domain}@${baseId}` : baseId;
+  public constructSessionId(userId: string | QualifiedId, clientId: string, domain?: string): string {
+    const {id, domain: baseDomain} = typeof userId === 'string' ? {id: userId, domain} : userId;
+    const baseId = `${id}@${clientId}`;
+    return baseDomain && this.config.useQualifiedIds ? `${baseDomain}@${baseId}` : baseId;
   }
 
   public static convertArrayRecipientsToBase64(recipients: OTRRecipients<Uint8Array>): OTRRecipients<string> {
@@ -154,7 +155,7 @@ export class CryptographyService {
             .filter(clientId => !!users[userId][clientId]);
       for (const clientId of clientIds) {
         const base64PreKey = isUserClients(users) ? undefined : users[userId][clientId]?.key;
-        const sessionId = CryptographyService.constructSessionId(userId, clientId, domain || null);
+        const sessionId = this.constructSessionId(userId, clientId, domain);
         const result = await this.encryptPayloadForSession(sessionId, plainText, base64PreKey);
         if (result) {
           encrypted[userId] ||= {};
@@ -220,8 +221,7 @@ export class CryptographyService {
       data: {sender, text: cipherText},
     } = otrMessage;
 
-    const domain = this.config.useQualifiedIds ? qualified_from!.domain : null;
-    const sessionId = CryptographyService.constructSessionId(from, sender, domain);
+    const sessionId = this.constructSessionId(from, sender, qualified_from?.domain);
     const decryptedMessage = await this.decrypt(sessionId, cipherText);
     const genericMessage = GenericMessage.decode(decryptedMessage);
 

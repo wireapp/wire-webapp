@@ -64,15 +64,30 @@ describe('CryptographyService', () => {
     it('constructs a Session ID by a given User ID and Client ID.', () => {
       const clientId = '1ceb9063fced26d3';
       const userId = 'afbb5d60-1187-4385-9c29-7361dea79647';
-      const actual = CryptographyService.constructSessionId(userId, clientId, null);
+      const actual = cryptographyService.constructSessionId(userId, clientId);
       expect(actual).toContain(clientId);
       expect(actual).toContain(userId);
     });
 
-    it('constructs a Session ID by a given User ID and Client ID and domain.', () => {
+    it('constructs a Session ID by a given User ID and Client ID and domain.', async () => {
+      const cryptographyService = new CryptographyService(new APIClient(), await createEngine('wire'), {
+        useQualifiedIds: true,
+      });
       const clientId = '1ceb9063fced26d3';
       const userId = 'afbb5d60-1187-4385-9c29-7361dea79647';
-      const actual = CryptographyService.constructSessionId(userId, clientId, 'test.wire.link');
+      const actual = cryptographyService.constructSessionId(userId, clientId, 'test.wire.link');
+      expect(actual).toContain(clientId);
+      expect(actual).toContain(userId);
+      expect(actual).toContain('test.wire.link');
+    });
+
+    it('constructs a qualified Session ID by a given qualified User ID and Client ID.', async () => {
+      const cryptographyService = new CryptographyService(new APIClient(), await createEngine('wire'), {
+        useQualifiedIds: true,
+      });
+      const clientId = '1ceb9063fced26d3';
+      const userId = 'afbb5d60-1187-4385-9c29-7361dea79647';
+      const actual = cryptographyService.constructSessionId({id: userId, domain: 'test.wire.link'}, clientId);
       expect(actual).toContain(clientId);
       expect(actual).toContain(userId);
       expect(actual).toContain('test.wire.link');

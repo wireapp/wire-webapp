@@ -19,7 +19,7 @@
 
 import type {AxiosError} from 'axios';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
-import {APIClient} from '@wireapp/api-client';
+import {APIClient, BackendFeatures} from '@wireapp/api-client';
 import type {RegisterData} from '@wireapp/api-client/src/auth';
 import {AUTH_COOKIE_KEY, AUTH_TABLE_NAME, Context, Cookie, CookieStore, LoginData} from '@wireapp/api-client/src/auth/';
 import {ClientType, RegisteredClient} from '@wireapp/api-client/src/client/';
@@ -97,11 +97,6 @@ export interface Account {
 
 export type StoreEngineProvider = (storeName: string) => Promise<CRUDEngine>;
 
-type AccountConfig = {
-  /** If set to true, will use fully qualified ids and federated endpoints */
-  useQualifiedIds?: boolean;
-};
-
 export class Account extends EventEmitter {
   private readonly apiClient: APIClient;
   private readonly logger: logdown.Logger;
@@ -124,18 +119,16 @@ export class Account extends EventEmitter {
     team: TeamService;
     user: UserService;
   };
+  public backendFeatures: BackendFeatures;
 
   /**
    * @param apiClient The apiClient instance to use in the core (will create a new new one if undefined)
    * @param storeEngineProvider Used to store info in the database (will create a inMemory engine if undefined)
    */
-  constructor(
-    apiClient: APIClient = new APIClient(),
-    storeEngineProvider?: StoreEngineProvider,
-    private readonly config: AccountConfig = {},
-  ) {
+  constructor(apiClient: APIClient = new APIClient(), storeEngineProvider?: StoreEngineProvider) {
     super();
     this.apiClient = apiClient;
+    this.backendFeatures = this.apiClient.backendFeatures;
     if (storeEngineProvider) {
       this.storeEngineProvider = storeEngineProvider;
     } else {
@@ -200,15 +193,16 @@ export class Account extends EventEmitter {
   }
 
   public async initServices(storeEngine: CRUDEngine): Promise<void> {
+    const config = {useQualifiedIds: this.apiClient.backendFeatures.federationEndpoints};
     const accountService = new AccountService(this.apiClient);
     const assetService = new AssetService(this.apiClient);
-    const cryptographyService = new CryptographyService(this.apiClient, storeEngine, this.config);
+    const cryptographyService = new CryptographyService(this.apiClient, storeEngine, config);
 
     const clientService = new ClientService(this.apiClient, storeEngine, cryptographyService);
     const connectionService = new ConnectionService(this.apiClient);
     const giphyService = new GiphyService(this.apiClient);
     const linkPreviewService = new LinkPreviewService(assetService);
-    const conversationService = new ConversationService(this.apiClient, cryptographyService, this.config);
+    const conversationService = new ConversationService(this.apiClient, cryptographyService, config);
     const notificationService = new NotificationService(this.apiClient, cryptographyService, storeEngine);
     const selfService = new SelfService(this.apiClient);
     const teamService = new TeamService(this.apiClient);
