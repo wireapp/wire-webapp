@@ -136,6 +136,8 @@ const ConversationListCallingCell: React.FC<CallingCellProps> = ({
     hasActiveVideo: selfHasActiveVideo,
   } = useKoSubscribableChildren(selfParticipant, ['sharesScreen', 'sharesCamera', 'hasActiveVideo']);
 
+  const {activeSpeakers} = useKoSubscribableChildren(call, ['activeSpeakers']);
+
   const isOutgoingVideoCall = isOutgoing && selfSharesCamera;
   const isVideoUnsupported =
     !selfSharesCamera && !conversation?.supportsVideoCall(call.conversationType === CONV_TYPE.CONFERENCE);
@@ -259,9 +261,7 @@ const ConversationListCallingCell: React.FC<CallingCellProps> = ({
               onClick={isOngoing ? () => multitasking.isMinimized(false) : undefined}
             >
               <GroupVideoGrid
-                grid={
-                  activeCallViewTab === CallViewTab.ALL ? videoGrid : {grid: call.getActiveSpeakers(), thumbnail: null}
-                }
+                grid={activeCallViewTab === CallViewTab.ALL ? videoGrid : {grid: activeSpeakers, thumbnail: null}}
                 minimized
                 maximizedParticipant={maximizedParticipant}
                 selfParticipant={selfParticipant}

@@ -192,8 +192,6 @@ export class Call {
     }
   }
 
-  getActiveSpeakers = () => this.activeSpeakers();
-
   addParticipant(participant: Participant): void {
     this.participants.push(participant);
     this.updatePages();
