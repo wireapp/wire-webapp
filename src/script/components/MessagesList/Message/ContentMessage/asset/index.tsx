@@ -70,6 +70,7 @@ const ContentAsset = ({
               } ${isObfuscated ? 'ephemeral-message-obfuscated' : ''}`}
               dangerouslySetInnerHTML={{__html: (asset as Text).render(selfId, message.accent_color())}}
               onClick={event => onClickMessage(asset as Text, event)}
+              onAuxClick={event => onClickMessage(asset as Text, event)}
               dir="auto"
             ></div>
           )}
