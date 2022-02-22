@@ -546,7 +546,7 @@ export class CallingRepository {
    */
   onCallEvent = async (event: CallingEvent, source: string): Promise<void> => {
     const {content, conversation, qualified_conversation, from, qualified_from, sender: clientId, time} = event;
-    const isFederated = Config.getConfig().FEATURE.ENABLE_FEDERATION && qualified_conversation && qualified_from;
+    const isFederated = this.core.backendFeatures.isFederated && qualified_conversation && qualified_from;
     const userId = isFederated ? qualified_from : {domain: '', id: from};
     const conversationId = isFederated ? qualified_conversation : {domain: '', id: conversation};
     const currentTimestamp = this.serverTimeHandler.toServerTimestamp();
@@ -712,7 +712,7 @@ export class CallingRepository {
   }
 
   private serializeQualifiedId(id: QualifiedId): string {
-    if (id.domain && Config.getConfig().FEATURE.ENABLE_FEDERATION) {
+    if (id.domain && this.core.backendFeatures.isFederated) {
       return `${id.id}@${id.domain}`;
     }
     return id.id;
@@ -1048,8 +1048,9 @@ export class CallingRepository {
 
     if (typeof targets === 'string') {
       const parsedTargets: SendMessageTarget = JSON.parse(targets);
-      const isFederated = Config.getConfig().FEATURE.ENABLE_FEDERATION;
-      const recipients = isFederated ? this.mapQualifiedTargets(parsedTargets) : this.mapTargets(parsedTargets);
+      const recipients = this.core.backendFeatures.federationEndpoints
+        ? this.mapQualifiedTargets(parsedTargets)
+        : this.mapTargets(parsedTargets);
       options = {
         nativePush: true,
         recipients,

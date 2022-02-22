@@ -34,7 +34,6 @@ import {
   UserAssetType as APIClientUserAssetType,
   QualifiedId,
 } from '@wireapp/api-client/src/user';
-import type {QualifiedUserClientMap} from '@wireapp/api-client/src/client';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import type {AccentColor} from '@wireapp/commons';
 import type {BackendError, TraceState} from '@wireapp/api-client/src/http';
@@ -66,7 +65,7 @@ import {User} from '../entity/User';
 import {UserError} from '../error/UserError';
 import {UserMapper} from './UserMapper';
 import {UserState} from './UserState';
-import type {ClientRepository, QualifiedUserClientEntityMap, UserClientEntityMap} from '../client/ClientRepository';
+import type {ClientRepository, QualifiedUserClientEntityMap} from '../client/ClientRepository';
 import type {ConnectionEntity} from '../connection/ConnectionEntity';
 import type {EventSource} from '../event/EventSource';
 import type {PropertiesRepository} from '../properties/PropertiesRepository';
@@ -185,32 +184,10 @@ export class UserRepository {
   }
 
   /**
-   * Retrieves meta information about all the clients of given qualified users.
-   */
-  getClientsByQualifiedUserIds(
-    userIds: QualifiedId[],
-    updateClients: boolean,
-  ): Promise<QualifiedUserClientEntityMap | QualifiedUserClientMap> {
-    return this.clientRepository.getClientsByQualifiedUserIds(userIds, updateClients as any);
-  }
-
-  /**
    * Retrieves meta information about all the clients of given users.
    */
-  getClientsByUsers(
-    userEntities: User[] | QualifiedId[],
-    updateClients: boolean,
-  ): Promise<UserClientEntityMap | QualifiedUserClientEntityMap> {
-    const userIds = isQualifiedId(userEntities[0])
-      ? userEntities
-      : (userEntities as User[]).map(userEntity => userEntity.qualifiedId);
-    // TODO(Federation): When detecting a domain we actually should not need to check for the federation-feature because
-    // the system must be federation-aware. However, during the transition period it's safer to check for the config too.
-    if (Config.getConfig().FEATURE.ENABLE_FEDERATION) {
-      return this.clientRepository.getClientsByQualifiedUserIds(userIds, updateClients);
-    }
-
-    return this.clientRepository.getClientsByUserIds(userIds, updateClients);
+  private getClientsByUsers(userIds: QualifiedId[], updateClients: boolean): Promise<QualifiedUserClientEntityMap> {
+    return this.clientRepository.getClientsByQualifiedUserIds(userIds, updateClients);
   }
 
   /**
