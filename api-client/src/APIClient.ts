@@ -116,6 +116,15 @@ type Apis = {
   user: UserAPI;
 };
 
+/** map of all the features that the backend supports (depending on the backend api version number) */
+export type BackendFeatures = {
+  /** Does the backend API support federated endpoints */
+  federationEndpoints: boolean;
+  /** Is the backend actually talking to other federated domains */
+  isFederated: boolean;
+};
+
+type BackendVersionResponse = {supported: number[]; federated?: boolean};
 export class APIClient extends EventEmitter {
   private readonly logger: logdown.Logger;
 
@@ -127,6 +136,7 @@ export class APIClient extends EventEmitter {
   public context?: Context;
   public transport: {http: HttpClient; ws: WebSocketClient};
   public config: Config;
+  public backendFeatures: BackendFeatures;
 
   public static BACKEND = Backend;
 
@@ -168,10 +178,11 @@ export class APIClient extends EventEmitter {
       http: httpClient,
       ws: webSocket,
     };
-    this.api = this.configureApis(0);
+    this.backendFeatures = this.computeBackendFeatures(0);
+    this.api = this.configureApis(this.backendFeatures);
   }
 
-  private configureApis(_: number): Apis {
+  private configureApis(backendFeatures: BackendFeatures): Apis {
     return {
       account: new AccountAPI(this.transport.http),
       asset: new AssetAPI(this.transport.http),
@@ -179,8 +190,8 @@ export class APIClient extends EventEmitter {
       services: new ServicesAPI(this.transport.http),
       broadcast: new BroadcastAPI(this.transport.http),
       client: new ClientAPI(this.transport.http),
-      connection: new ConnectionAPI(this.transport.http),
-      conversation: new ConversationAPI(this.transport.http),
+      connection: new ConnectionAPI(this.transport.http, backendFeatures),
+      conversation: new ConversationAPI(this.transport.http, backendFeatures),
       giphy: new GiphyAPI(this.transport.http),
       notification: new NotificationAPI(this.transport.http),
       self: new SelfAPI(this.transport.http),
@@ -199,8 +210,54 @@ export class APIClient extends EventEmitter {
         service: new ServiceAPI(this.transport.http),
         team: new TeamAPI(this.transport.http),
       },
-      user: new UserAPI(this.transport.http),
+      user: new UserAPI(this.transport.http, backendFeatures),
     };
+  }
+
+  /**
+   * Will compute all the capabilities of the backend API according to the selected version and the version response payload
+   * @param backendVersion The agreed used version between the client and the backend
+   * @param responsePayload? The response from the server
+   */
+  private computeBackendFeatures(backendVersion: number, responsePayload?: BackendVersionResponse): BackendFeatures {
+    return {
+      federationEndpoints: backendVersion > 0,
+      isFederated: responsePayload?.federated || false,
+    };
+  }
+
+  /**
+   * Will set the APIClient to use a specific version of the API (by default uses version 0)
+   * It will fetch the API Config and use the highest possible version
+   * @param acceptedVersions Which version the consumer supports
+   * @return The highest version that is both supported by client and backend
+   */
+  async useVersion(acceptedVersions: number[]): Promise<number> {
+    if (acceptedVersions.length === 1 && acceptedVersions[0] === 0) {
+      // Nothing to do since version 0 is the default one
+      return 0;
+    }
+    let backendVersions: BackendVersionResponse = {supported: [0]};
+    try {
+      backendVersions = await (
+        await this.transport.http.sendRequest<BackendVersionResponse>({url: '/api-version'})
+      ).data;
+    } catch (error) {}
+    const highestCommonVersion = backendVersions.supported
+      .sort()
+      .reverse()
+      .find(version => acceptedVersions.includes(version));
+
+    if (highestCommonVersion === undefined) {
+      throw new Error(
+        `Backend does not support requested versions [${acceptedVersions.join(
+          ', ',
+        )}] (supported versions ${backendVersions.supported.join(', ')})`,
+      );
+    }
+    this.backendFeatures = this.computeBackendFeatures(0, backendVersions);
+    this.api = this.configureApis(this.backendFeatures);
+    return highestCommonVersion;
   }
 
   public async init(clientType: ClientType = ClientType.NONE, cookie?: Cookie): Promise<Context> {

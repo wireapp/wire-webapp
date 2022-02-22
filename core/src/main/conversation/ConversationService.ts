@@ -181,7 +181,7 @@ export class ConversationService {
   }
 
   private async getConversationQualifiedMembers(conversationId: QualifiedId): Promise<QualifiedId[]> {
-    const conversation = await this.apiClient.api.conversation.getConversation(conversationId, true);
+    const conversation = await this.apiClient.api.conversation.getConversation(conversationId);
     /*
      * If you are sending a message to a conversation, you have to include
      * yourself in the list of users if you want to sync a message also to your
@@ -333,7 +333,7 @@ export class ConversationService {
     if (targetMode !== MessageTargetMode.NONE && !userIds) {
       throw new Error('Cannot send targetted message when no userIds are given');
     }
-    if (conversationDomain) {
+    if (conversationDomain && this.config.useQualifiedIds) {
       if (isStringArray(userIds) || isUserClients(userIds)) {
         throw new Error('Invalid userIds option for sending to federated backend');
       }
@@ -774,7 +774,7 @@ export class ConversationService {
         return false;
       };
 
-      if (conversationDomain) {
+      if (conversationDomain && this.config.useQualifiedIds) {
         await this.messageService.sendFederatedMessage(sendingClientId, recipients, text, {
           conversationId: {id: conversationId, domain: conversationDomain},
           onClientMismatch,
@@ -922,18 +922,15 @@ export class ConversationService {
     return (await request.response).buffer;
   }
 
-  public async addUser<T extends string | string[] | QualifiedId | QualifiedId[]>(
+  public async addUser(
     conversationId: string,
-    userIds: T,
-  ): Promise<T> {
+    userIds: string | string[] | QualifiedId | QualifiedId[],
+  ): Promise<QualifiedId[]> {
     const ids = Array.isArray(userIds) ? userIds : [userIds];
-    if (isStringArray(ids)) {
-      await this.apiClient.api.conversation.postMembers(conversationId, ids);
-    } else if (isQualifiedIdArray(ids)) {
-      await this.apiClient.api.conversation.postMembersV2(conversationId, ids);
-    }
+    const qualifiedIds = isStringArray(ids) ? ids.map(id => ({id, domain: ''} as QualifiedId)) : (ids as QualifiedId[]);
+    await this.apiClient.api.conversation.postMembers(conversationId, qualifiedIds);
 
-    return userIds;
+    return qualifiedIds;
   }
 
   public async removeUser(conversationId: string, userId: string): Promise<string> {

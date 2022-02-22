@@ -18,6 +18,7 @@
  */
 
 import type {AxiosRequestConfig} from 'axios';
+import {BackendFeatures} from '../APIClient';
 
 import type {Connection, ConnectionRequest, ConnectionUpdate, UserConnectionList} from '../connection/';
 import {BackendError, BackendErrorLabel, HttpClient} from '../http/';
@@ -25,7 +26,7 @@ import {QualifiedId} from '../user';
 import {ConnectionLegalholdMissingConsentError} from './ConnectionError';
 
 export class ConnectionAPI {
-  constructor(private readonly client: HttpClient) {}
+  constructor(private readonly client: HttpClient, private readonly backendFeatures: BackendFeatures) {}
 
   public static readonly URL = {
     CONNECTIONS: '/connections',
@@ -36,11 +37,9 @@ export class ConnectionAPI {
    * @param userId The ID of the other user
    * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/users/connection
    */
-  public async getConnection(userId: QualifiedId, useFederation: true): Promise<Connection>;
-  public async getConnection(userId: string, useFederation?: false): Promise<Connection>;
-  public async getConnection(userId: string | QualifiedId, useFederation: boolean = false): Promise<Connection> {
+  public async getConnection(userId: string | QualifiedId): Promise<Connection> {
     const url =
-      typeof userId !== 'string' && useFederation
+      typeof userId !== 'string' && this.backendFeatures.federationEndpoints
         ? `${ConnectionAPI.URL.CONNECTIONS}/${userId.domain}/${userId}`
         : `${ConnectionAPI.URL.CONNECTIONS}/${userId}`;
     const config: AxiosRequestConfig = {
@@ -78,6 +77,9 @@ export class ConnectionAPI {
    * @see https://nginz-https.anta.wire.link/api/swagger-ui/#/default/post_list_connections
    */
   public getConnectionList(): Promise<Connection[]> {
+    if (!this.backendFeatures.federationEndpoints) {
+      return this.getAllConnections();
+    }
     let allConnections: Connection[] = [];
 
     const getConnectionChunks = async (pagingState?: string): Promise<Connection[]> => {
@@ -141,16 +143,11 @@ export class ConnectionAPI {
     return getConnectionChunks();
   }
 
-  public async postConnection(data: ConnectionRequest, useFederation?: false): Promise<Connection>;
-  public async postConnection(data: QualifiedId, useFederation: true): Promise<Connection>;
-  public async postConnection(
-    data: ConnectionRequest | QualifiedId,
-    useFederation: boolean = false,
-  ): Promise<Connection> {
-    if (useFederation) {
-      return this.postConnection_v2(data as QualifiedId);
+  public async postConnection(userId: QualifiedId, name?: string): Promise<Connection> {
+    if (this.backendFeatures.federationEndpoints) {
+      return this.postConnection_v2(userId as QualifiedId);
     }
-    return this.postConnection_v1(data as ConnectionRequest);
+    return this.postConnection_v1({user: userId.id, name} as ConnectionRequest);
   }
 
   /**
@@ -210,22 +207,11 @@ export class ConnectionAPI {
    * Note: You can have no more than 1000 connections in accepted or sent state.
    * @param userId The ID of the other user (qualified or not)
    * @param updatedConnection: The updated connection
-   * @param useFederation: whether the backend supports federation or not (in which case a QualifiedId must be provided)
    * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/users/updateConnection
    */
-  public async putConnection(userId: string, updatedConnection: ConnectionUpdate): Promise<Connection>;
-  public async putConnection(
-    userId: QualifiedId,
-    updatedConnection: ConnectionUpdate,
-    useFederation: true,
-  ): Promise<Connection>;
-  public async putConnection(
-    userId: string | QualifiedId,
-    updatedConnection: ConnectionUpdate,
-    useFederation: boolean = false,
-  ): Promise<Connection> {
+  public async putConnection(userId: string | QualifiedId, updatedConnection: ConnectionUpdate): Promise<Connection> {
     const url =
-      useFederation && typeof userId !== 'string'
+      this.backendFeatures.federationEndpoints && typeof userId !== 'string'
         ? `${ConnectionAPI.URL.CONNECTIONS}/${userId.domain}/${userId.id}`
         : `${ConnectionAPI.URL.CONNECTIONS}/${userId}`;
 

@@ -19,6 +19,7 @@
 
 import type {APIClient} from '@wireapp/api-client';
 import {Connection, ConnectionStatus} from '@wireapp/api-client/src/connection/';
+import {QualifiedId} from '@wireapp/api-client/src/user';
 
 export class ConnectionService {
   constructor(private readonly apiClient: APIClient) {}
@@ -39,11 +40,7 @@ export class ConnectionService {
     });
   }
 
-  public createConnection(userId: string): Promise<Connection> {
-    return this.apiClient.api.connection.postConnection({
-      message: ' ',
-      name: ' ',
-      user: userId,
-    });
+  public createConnection(userId: QualifiedId): Promise<Connection> {
+    return this.apiClient.api.connection.postConnection(userId, '');
   }
 }

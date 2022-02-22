@@ -23,7 +23,10 @@ import {ConversationAPI} from './ConversationAPI';
 const httpClientMock = jasmine.createSpyObj('httpClient', {sendJSON: () => ({data: ''})});
 
 describe('ConversationAPI', () => {
-  const conversationApi = new ConversationAPI(httpClientMock as HttpClient);
+  const conversationApi = new ConversationAPI(httpClientMock as HttpClient, {
+    federationEndpoints: false,
+    isFederated: false,
+  });
   describe('postORTMessage', () => {
     it('add ignore_missing and report_missing parameters', async () => {
       await conversationApi.postOTRMessage('client-id', 'conv-id', undefined, false);

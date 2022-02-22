@@ -168,7 +168,7 @@ export abstract class MessageHandler {
 
   async sendConnectionRequest(userId: string): Promise<void> {
     if (this.account?.service) {
-      await this.account.service.connection.createConnection(userId);
+      await this.account.service.connection.createConnection({id: userId, domain: ''});
     }
   }
 

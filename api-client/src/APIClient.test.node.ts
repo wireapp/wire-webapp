@@ -81,6 +81,36 @@ describe('APIClient', () => {
     });
   });
 
+  describe('useVersion', () => {
+    it('fails if backend versions and accepted version have no common version', async () => {
+      nock(baseUrl)
+        .get('/api-version')
+        .reply(200, {supported: [0, 1]});
+      const client = new APIClient();
+      try {
+        await client.useVersion([2, 3]);
+      } catch (error) {
+        expect((error as any).message).toContain('does not support');
+      }
+    });
+
+    it("uses version 0 if backend doesn't support /api-version endpoint", async () => {
+      nock(baseUrl).get('/api-version').reply(404);
+      const client = new APIClient();
+      const version = await client.useVersion([0, 1, 2, 3]);
+      expect(version).toBe(0);
+    });
+
+    it('uses highest common version', async () => {
+      nock(baseUrl)
+        .get('/api-version')
+        .reply(200, {supported: [0, 1]});
+      const client = new APIClient();
+      const version = await client.useVersion([0, 1, 2]);
+      expect(version).toBe(1);
+    });
+  });
+
   describe('login', () => {
     accessTokenData = {
       access_token:

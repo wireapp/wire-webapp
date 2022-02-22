@@ -21,30 +21,26 @@ import {APIClient} from '@wireapp/api-client';
 import {ClientType} from '@wireapp/api-client/src/client';
 import {LegalHoldStatus} from '@wireapp/protocol-messaging';
 import {MemoryEngine} from '@wireapp/store-engine';
-import {MessageTargetMode, PayloadBundleSource, PayloadBundleState, PayloadBundleType} from '.';
+import {ConversationService, MessageTargetMode, PayloadBundleSource, PayloadBundleState, PayloadBundleType} from '.';
 
-import {Account} from '../Account';
+import {CryptographyService} from '../cryptography';
 import * as PayloadHelper from '../test/PayloadHelper';
 import {LinkPreviewUploadedContent, MentionContent, QuoteContent} from './content';
 import {MessageBuilder} from './message/MessageBuilder';
 import {OtrMessage} from './message/OtrMessage';
 
 describe('ConversationService', () => {
-  let account: Account;
-
-  beforeAll(async () => {
+  function buildConversationService(federated?: boolean) {
     const client = new APIClient({urls: APIClient.BACKEND.STAGING});
-    account = new Account(client);
-    await account.initServices(new MemoryEngine());
-  });
-
-  beforeEach(() => {
-    account['apiClient'].context = {
+    client.context = {
       clientType: ClientType.NONE,
       userId: PayloadHelper.getUUID(),
       clientId: PayloadHelper.getUUID(),
     };
-  });
+    return new ConversationService(client, new CryptographyService(client, new MemoryEngine()), {
+      useQualifiedIds: federated,
+    });
+  }
 
   describe('"send"', () => {
     const baseMessage = {
@@ -66,7 +62,7 @@ describe('ConversationService', () => {
     ];
     messages.forEach(payloadBundle => {
       it(`calls callbacks when sending '${payloadBundle.type}' message is starting and successful`, async () => {
-        const conversationService = account.service!.conversation;
+        const conversationService = buildConversationService();
         const sentTime = new Date().toISOString();
         spyOn<any>(conversationService, 'sendGenericMessage').and.returnValue(Promise.resolve({time: sentTime}));
         const callbacks = {onStart: jasmine.createSpy(), onSuccess: jasmine.createSpy()};
@@ -85,7 +81,7 @@ describe('ConversationService', () => {
     describe('targetted messages', () => {
       const message: OtrMessage = {...baseMessage, type: PayloadBundleType.TEXT, content: {text: 'test'}};
       it('fails if no userIds are given', done => {
-        const conversationService = account.service!.conversation;
+        const conversationService = buildConversationService();
         conversationService
           .send({
             payloadBundle: message,
@@ -99,7 +95,7 @@ describe('ConversationService', () => {
 
       [{user1: ['client1'], user2: ['client11', 'client12']}, ['user1', 'user2']].forEach(recipients => {
         it(`forwards the list of users to report (${JSON.stringify(recipients)})`, async () => {
-          const conversationService = account.service!.conversation;
+          const conversationService = buildConversationService();
           spyOn<any>(conversationService, 'getRecipientsForConversation').and.returnValue(Promise.resolve({} as any));
           spyOn(conversationService['messageService'], 'sendMessage').and.returnValue(Promise.resolve({} as any));
           await conversationService.send({
@@ -126,7 +122,7 @@ describe('ConversationService', () => {
         ],
       ].forEach(recipients => {
         it(`forwards the list of users to report for federated message (${JSON.stringify(recipients)})`, async () => {
-          const conversationService = account.service!.conversation;
+          const conversationService = buildConversationService(true);
           spyOn<any>(conversationService, 'getQualifiedRecipientsForConversation').and.returnValue(
             Promise.resolve({} as any),
           );
@@ -157,7 +153,7 @@ describe('ConversationService', () => {
 
       [{user1: ['client1'], user2: ['client11', 'client12']}, ['user1', 'user2']].forEach(recipients => {
         it(`ignores all missing user/client pair if targetMode is USER_CLIENTS`, async () => {
-          const conversationService = account.service!.conversation;
+          const conversationService = buildConversationService(true);
           spyOn<any>(conversationService, 'getRecipientsForConversation').and.returnValue(Promise.resolve({} as any));
           spyOn(conversationService['messageService'], 'sendMessage').and.returnValue(Promise.resolve({} as any));
           await conversationService.send({
@@ -184,7 +180,7 @@ describe('ConversationService', () => {
         ],
       ].forEach(recipients => {
         it(`ignores all missing user/client pair if targetMode is USER_CLIENTS on federated env`, async () => {
-          const conversationService = account.service!.conversation;
+          const conversationService = buildConversationService(true);
           spyOn<any>(conversationService, 'getQualifiedRecipientsForConversation').and.returnValue(
             Promise.resolve({} as any),
           );
@@ -211,7 +207,7 @@ describe('ConversationService', () => {
     });
 
     it(`cancels message sending if onStart returns false`, async () => {
-      const conversationService = account.service!.conversation;
+      const conversationService = buildConversationService();
       spyOn<any>(conversationService, 'sendGenericMessage');
       const message: OtrMessage = {...baseMessage, type: PayloadBundleType.TEXT, content: {text: 'test'}};
       const callbacks = {onStart: () => Promise.resolve(false), onSuccess: jasmine.createSpy()};
@@ -226,7 +222,7 @@ describe('ConversationService', () => {
     });
 
     it(`does not call onSuccess when message was canceled`, async () => {
-      const conversationService = account.service!.conversation;
+      const conversationService = buildConversationService();
       spyOn<any>(conversationService, 'sendGenericMessage').and.returnValue(Promise.resolve({time: '', errored: true}));
       const message: OtrMessage = {...baseMessage, type: PayloadBundleType.TEXT, content: {text: 'test'}};
       const callbacks = {onSuccess: jasmine.createSpy()};
@@ -247,7 +243,7 @@ describe('ConversationService', () => {
         user2: ['client1', 'client2'],
         user3: ['client1', 'client2'],
       };
-      const conversationService = account.service!.conversation;
+      const conversationService = buildConversationService(true);
       spyOn(conversationService['messageService'], 'sendMessage').and.callFake(
         (_client, _recipients, _text, options) => {
           options?.onClientMismatch?.({missing: members, deleted: {}, redundant: {}, time: ''});
@@ -264,7 +260,7 @@ describe('ConversationService', () => {
         domain1: {user1: ['client1', 'client2']},
         domain2: {user2: ['client1', 'client2'], user3: ['client1', 'client2']},
       };
-      const conversationService = account.service!.conversation;
+      const conversationService = buildConversationService(true);
       spyOn(conversationService['messageService'], 'sendFederatedMessage').and.callFake(
         (_client, _recipients, _text, options) => {
           options?.onClientMismatch?.({missing: members, deleted: {}, redundant: {}, failed_to_send: {}, time: ''});
