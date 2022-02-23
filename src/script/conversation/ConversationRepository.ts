@@ -1458,16 +1458,16 @@ export class ConversationRepository {
    * Remove member from conversation.
    *
    * @param conversationEntity Conversation to remove member from
-   * @param user ID of member to be removed from the conversation
+   * @param userId ID of member to be removed from the conversation
    * @returns Resolves when member was removed from the conversation
    */
-  public async removeMember(conversationEntity: Conversation, user: QualifiedId) {
-    const response = await this.conversation_service.deleteMembers(conversationEntity.qualifiedId, user.qualifiedId);
+  public async removeMember(conversationEntity: Conversation, userId: QualifiedId) {
+    const response = await this.conversation_service.deleteMembers(conversationEntity.qualifiedId, userId);
     const roles = conversationEntity.roles();
-    delete roles[user.id];
+    delete roles[userId.id];
     conversationEntity.roles(roles);
     const currentTimestamp = this.serverTimeHandler.toServerTimestamp();
-    const event = response || EventBuilder.buildMemberLeave(conversationEntity, user, true, currentTimestamp);
+    const event = response || EventBuilder.buildMemberLeave(conversationEntity, userId, true, currentTimestamp);
     this.eventRepository.injectEvent(event, EventRepository.SOURCE.BACKEND_RESPONSE);
     return event;
   }

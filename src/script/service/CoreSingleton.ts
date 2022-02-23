@@ -24,6 +24,6 @@ import {APIClient} from './APIClientSingleton';
 @singleton()
 export class Core extends Account {
   constructor(apiClient = container.resolve(APIClient)) {
-    super(apiClient, undefined, {useQualifiedIds: true});
+    super(apiClient);
   }
 }

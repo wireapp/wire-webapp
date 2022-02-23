@@ -56,6 +56,7 @@ import {ConversationState} from '../conversation/ConversationState';
 import {CallState} from '../calling/CallState';
 import {MessageCategory} from '../message/MessageCategory';
 import {isQualifiedId} from '@wireapp/core/src/main/util';
+import {Core} from '../service/CoreSingleton';
 
 function downloadText(text: string, filename: string = 'default.txt'): number {
   const url = `data:text/plain;charset=utf-8,${encodeURIComponent(text)}`;
@@ -86,6 +87,7 @@ export class DebugUtil {
     private readonly userState = container.resolve(UserState),
     private readonly conversationState = container.resolve(ConversationState),
     private readonly callState = container.resolve(CallState),
+    private readonly core = container.resolve(Core),
   ) {
     this.$ = $;
     this.Dexie = Dexie;
@@ -113,7 +115,7 @@ export class DebugUtil {
   /** Used by QA test automation. */
   async breakSession(userId: string | QualifiedId, clientId: string): Promise<void> {
     const qualifiedId = isQualifiedId(userId) ? userId : {domain: '', id: userId};
-    const sessionId = constructClientPrimaryKey(qualifiedId, clientId);
+    const sessionId = this.core.service!.cryptography.constructSessionId(qualifiedId, clientId);
     const cryptobox = this.cryptographyRepository.cryptobox;
     const cryptoboxSession = await cryptobox.session_load(sessionId);
     cryptoboxSession.session.session_states = {};

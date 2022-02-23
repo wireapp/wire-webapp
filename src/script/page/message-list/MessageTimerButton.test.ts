@@ -42,7 +42,6 @@ describe('MessageTimerButton', () => {
   it('hides the timer button when the feature is disabled', () => {
     const conversation: Partial<Conversation> = {
       hasGlobalMessageTimer: ko.pureComputed(() => false),
-      isFederated: ko.pureComputed(() => false),
       messageTimer: ko.pureComputed(() => 0),
     };
 
@@ -62,7 +61,6 @@ describe('MessageTimerButton', () => {
   it('shows the inactive message timer button', () => {
     const conversation: Partial<Conversation> = {
       hasGlobalMessageTimer: ko.pureComputed(() => false),
-      isFederated: ko.pureComputed(() => false),
       messageTimer: ko.pureComputed(() => 0),
     };
 
@@ -84,7 +82,6 @@ describe('MessageTimerButton', () => {
 
     const conversation: Partial<Conversation> = {
       hasGlobalMessageTimer: ko.pureComputed(() => false),
-      isFederated: ko.pureComputed(() => false),
       messageTimer: ko.pureComputed(() => 0),
     };
 
@@ -110,7 +107,6 @@ describe('MessageTimerButton', () => {
 
     const conversation: Partial<Conversation> = {
       hasGlobalMessageTimer: ko.pureComputed(() => false),
-      isFederated: ko.pureComputed(() => false),
       messageTimer: ko.pureComputed(() => duration),
     };
 
@@ -136,7 +132,6 @@ describe('MessageTimerButton', () => {
 
     const conversation: Partial<Conversation> = {
       hasGlobalMessageTimer: ko.pureComputed(() => true),
-      isFederated: ko.pureComputed(() => false),
       messageTimer: ko.pureComputed(() => duration),
     };
 
@@ -162,7 +157,6 @@ describe('MessageTimerButton', () => {
 
     const conversation: Partial<Conversation> = {
       hasGlobalMessageTimer: ko.pureComputed(() => false),
-      isFederated: ko.pureComputed(() => false),
       messageTimer: ko.pureComputed(() => duration),
     };
 
@@ -190,7 +184,6 @@ describe('MessageTimerButton', () => {
 
     const conversation: Partial<Conversation> = {
       hasGlobalMessageTimer: ko.pureComputed(() => true),
-      isFederated: ko.pureComputed(() => false),
       messageTimer: ko.pureComputed(() => duration),
     };
 

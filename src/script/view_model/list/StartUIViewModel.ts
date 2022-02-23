@@ -142,8 +142,6 @@ export class StartUIViewModel {
     this.peopleTabActive = ko.pureComputed(() => this.state() === StartUIViewModel.STATE.ADD_PEOPLE);
 
     this.submittedSearch = false;
-    this.enableFederation = Config.getConfig().FEATURE.ENABLE_FEDERATION;
-    this.federationDomain = this.enableFederation && this.selfUser().domain;
 
     this.search = debounce((query: string): Promise<void> | void => {
       this.clearSearchResults();

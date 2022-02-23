@@ -428,20 +428,20 @@ export class UserRepository {
   /**
    * Get a user from the backend.
    */
-  private async fetchUserById(userId: string | QualifiedId): Promise<User> {
-    const [userEntity] = await this.fetchUsersById([userId] as [string] | [QualifiedId]);
+  private async fetchUserById(userId: QualifiedId): Promise<User> {
+    const [userEntity] = await this.fetchUsersById([userId]);
     return userEntity;
   }
 
   /**
    * Get users from the backend.
    */
-  private async fetchUsersById(userIds: string[] | QualifiedId[]): Promise<User[]> {
+  private async fetchUsersById(userIds: QualifiedId[]): Promise<User[]> {
     if (!userIds.length) {
       return [];
     }
 
-    const getUsers = async (chunkOfUserIds: string[] | QualifiedId[]): Promise<User[]> => {
+    const getUsers = async (chunkOfUserIds: QualifiedId[]): Promise<User[]> => {
       try {
         const response = await this.userService.getUsers(chunkOfUserIds);
         return response ? this.userMapper.mapUsersFromJson(response) : [];
@@ -459,10 +459,8 @@ export class UserRepository {
       }
     };
 
-    const chunksOfUserIds = chunk<string | QualifiedId>(userIds, Config.getConfig().MAXIMUM_USERS_PER_REQUEST);
-    const resolveArray = await Promise.all(
-      chunksOfUserIds.map(userChunk => getUsers(userChunk as string[] | QualifiedId[])),
-    );
+    const chunksOfUserIds = chunk<QualifiedId>(userIds, Config.getConfig().MAXIMUM_USERS_PER_REQUEST);
+    const resolveArray = await Promise.all(chunksOfUserIds.map(userChunk => getUsers(userChunk)));
     const newUserEntities = flatten(resolveArray);
     if (this.userState.isTeam()) {
       this.mapGuestStatus(newUserEntities);
