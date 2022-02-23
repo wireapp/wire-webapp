@@ -20,10 +20,5 @@
 import nodeCrypto from 'crypto';
 
 Object.defineProperty(global.self, 'crypto', {
-  value: {
-    getRandomValues: (arr: unknown[]) => nodeCrypto.randomBytes(arr.length),
-    subtle: {
-      digest: (_: string, buffer: Uint8Array) => nodeCrypto.createHash('SHA256').update(new Buffer(buffer)).digest(),
-    },
-  },
+  value: nodeCrypto.webcrypto,
 });
