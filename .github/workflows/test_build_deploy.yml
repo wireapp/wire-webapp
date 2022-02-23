@@ -2,10 +2,17 @@ name: CI
 
 on:
   push:
+    branches: [master, dev, edge, avs]
+  pull_request:
+    branches: [master, dev, edge, avs]
 
 jobs:
   test:
     runs-on: ubuntu-latest
+
+    env:
+      COMMIT_MESSAGE: ${{github.event.head_commit.message}}
+
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -17,37 +24,10 @@ jobs:
         with:
           node-version: 16.x
 
-      - name: Set environment variables
-        env:
-          COMMIT_URL: ${{github.event.head_commit.url}}
-          COMMITTER: ${{github.event.head_commit.committer.name}}
-        run: |
-          echo "BRANCH_NAME=$(git branch --show-current)" >> $GITHUB_ENV
-          echo "TAG=$(git tag --points-at ${{github.sha}})" >> $GITHUB_ENV
-          echo "PR_LAST_COMMIT_MESSAGE=$(git log --format=%B -n 1 ${{github.event.after}} | head -n 1)" >> $GITHUB_ENV
-          echo "DISTRIBUTION=${DISTRIBUTION/distribution-/}" >> $GITHUB_ENV
-
-      - name: Set TITLE and BUILD_DESKTOP
-        env:
-          PR_TITLE: ${{github.event.pull_request.title || env.PR_LAST_COMMIT_MESSAGE}}
-        run: |
-          echo "TITLE=${PR_TITLE}" >> $GITHUB_ENV
-          echo "BUILD_DESKTOP=${{contains(env.TAG, 'staging') || contains(env.TAG, 'production') || contains(env.PR_LAST_COMMIT_MESSAGE, '+Desktop')}}" >> $GITHUB_ENV
-
-      - name: Print environment variables
-        run: |
-          echo -e "BRANCH_NAME = ${BRANCH_NAME}"
-          echo -e "TAG = ${TAG}"
-          echo -e "TITLE = ${TITLE}"
-          echo -e "PR_LAST_COMMIT_MESSAGE = ${PR_LAST_COMMIT_MESSAGE}"
-          echo -e "COMMIT_URL = ${COMMIT_URL}"
-          echo -e "COMMITTER = ${COMMITTER}"
-          echo -e "BUILD_DESKTOP = ${BUILD_DESKTOP}"
-
       - name: Skip CI
         if: |
-          contains(env.TITLE || env.PR_LAST_COMMIT_MESSAGE, '[skip ci]') ||
-          contains(env.TITLE || env.PR_LAST_COMMIT_MESSAGE, '[ci skip]')
+          contains(env.COMMIT_MESSAGE, '[skip ci]') ||
+          contains(env.COMMIT_MESSAGE, '[ci skip]')
         uses: andymckay/cancel-action@0.2
 
       - name: Cancel Previous Runs
@@ -64,9 +44,6 @@ jobs:
         run: echo "machine github.com login ${GH_TOKEN}" > ~/.netrc
 
       - name: Install JS dependencies
-        if: |
-          github.event_name != 'pull_request' ||
-          env.BUILD_DESKTOP == 'true'
         run: yarn --frozen-lockfile
 
       - name: Test
@@ -79,9 +56,19 @@ jobs:
           files: ./coverage/lcov.info
           flags: unittests
 
-  build:
+      - name: Notify CI error
+        if: failure() && github.event_name != 'pull_request'
+        uses: wireapp/github-action-wire-messenger@v2.0.0
+        with:
+          email: ${{secrets.WIRE_BOT_EMAIL}}
+          password: ${{secrets.WIRE_BOT_PASSWORD}}
+          conversation: 'b2cc7120-4154-4be4-b0c0-45a8c361c4d1'
+          send_text: '${{github.event.pusher.name}} broke the "${GITHUB_REF#/refs/heads/}" branch on "${{github.repository}}" with [${{github.event.head_commit.message}}](${{github.event.head_commit.url}}) 🌵'
+
+  deploy:
     needs: test
     runs-on: ubuntu-latest
+    if: github.event_name != 'pull_request'
 
     env:
       DEPLOYMENT_RECOVERY_TIMEOUT_SECONDS: 150
@@ -92,24 +79,38 @@ jobs:
 
     steps:
       - name: Set environment variables
-        env:
-          # DISTRIBUTIONS are saved in the format `distribution-{name}`
-          DISTRIBUTION: ${{secrets[matrix.DISTRIBUTION]}}
         run: |
-          echo "DISTRIBUTION=${DISTRIBUTION/distribution-/}" >> $GITHUB_ENV
+          echo "BRANCH = ${GITHUB_REF#refs/heads/}" >> $GITHUB_ENV
+          echo "TAG = ${GITHUB_REF#refs/tags/}" >> $GITHUB_ENV
+          echo "BUILD_DESKTOP = ${{contains(env.TAG, 'staging') || contains(env.TAG, 'production') || contains(env.COMMIT_MESSAGE, '+Desktop')}}" >> $GITHUB_ENV
+
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      - name: Use latest Node.js v16
+        uses: actions/setup-node@v2
+        with:
+          node-version: 16.x
+
+      - name: Yarn cache
+        uses: c-hive/gha-yarn-cache@v2.1.0
+
+      - name: Authenticate git clone
+        env:
+          GH_TOKEN: ${{secrets.OTTO_THE_BOT_GH_TOKEN}}
+        run: echo "machine github.com login ${GH_TOKEN}" > ~/.netrc
+
+      - name: Install JS dependencies
+        run: yarn --frozen-lockfile
 
       - name: Build
-        # Run for all pushes to master/dev with DISTRIBUTION == 'wire'
-        # and when a desktop version should be built
-        if: |
-          github.event_name != 'pull_request' ||
-          env.BUILD_DESKTOP == 'true'
         run: yarn build:prod
 
       - name: Assembling release information
         if: contains(env.TAG, 'production')
-        # NOTE: always using 'master' config, since release version is only consumed at
-        #       'production' stage for now
+        # NOTE: always using 'master' config, since release version is only consumed at 'production' stage for now
         shell: bash
         run: |
           configVersion=$(cat ./app-config/package.json | jq -r '.dependencies["wire-web-config-default-master"]' | awk -F '#' '{ print $2 }')
@@ -124,50 +125,15 @@ jobs:
           name: release-info.json
           path: ./release-info.json
 
-      # https://wire-webapp-avs.zinfra.io/
-      - name: Deploy avs build to Elastic Beanstalk
-        if: env.BRANCH_NAME == 'avs'
+      - name: Deploy to branch specific env
         uses: einaregilsson/beanstalk-deploy@v14
         with:
           application_name: ${{env.AWS_APPLICATION_NAME}}
           aws_access_key: ${{secrets.WEBTEAM_AWS_ACCESS_KEY_ID}}
           aws_secret_key: ${{secrets.WEBTEAM_AWS_SECRET_ACCESS_KEY}}
           deployment_package: ${{env.AWS_BUILD_ZIP_PATH}}
-          environment_name: wire-webapp-avs
-          region: eu-central-1
-          use_existing_version_if_available: true
-          version_description: ${{github.sha}}
-          version_label: ${{github.run_id}}
-          wait_for_deployment: false
-          wait_for_environment_recovery: ${{env.DEPLOYMENT_RECOVERY_TIMEOUT_SECONDS}}
-
-      # Stage 1: https://wire-webapp-edge.zinfra.io/
-      - name: Deploy edge build to Elastic Beanstalk
-        if: env.BRANCH_NAME == 'edge'
-        uses: einaregilsson/beanstalk-deploy@v14
-        with:
-          application_name: ${{env.AWS_APPLICATION_NAME}}
-          aws_access_key: ${{secrets.WEBTEAM_AWS_ACCESS_KEY_ID}}
-          aws_secret_key: ${{secrets.WEBTEAM_AWS_SECRET_ACCESS_KEY}}
-          deployment_package: ${{env.AWS_BUILD_ZIP_PATH}}
-          environment_name: wire-webapp-edge
-          region: eu-central-1
-          use_existing_version_if_available: true
-          version_description: ${{github.sha}}
-          version_label: ${{github.run_id}}
-          wait_for_deployment: false
-          wait_for_environment_recovery: ${{env.DEPLOYMENT_RECOVERY_TIMEOUT_SECONDS}}
-
-      # Stage 2: https://wire-webapp-dev.zinfra.io/
-      - name: Deploy dev build to Elastic Beanstalk
-        if: env.BRANCH_NAME == 'dev'
-        uses: einaregilsson/beanstalk-deploy@v14
-        with:
-          application_name: ${{env.AWS_APPLICATION_NAME}}
-          aws_access_key: ${{secrets.WEBTEAM_AWS_ACCESS_KEY_ID}}
-          aws_secret_key: ${{secrets.WEBTEAM_AWS_SECRET_ACCESS_KEY}}
-          deployment_package: ${{env.AWS_BUILD_ZIP_PATH}}
-          environment_name: wire-webapp-dev
+          # https://wire-webapp-{{BRANCH}}.zinfra.io/
+          environment_name: wire-webapp-${{ env.BRANCH }}
           region: eu-central-1
           use_existing_version_if_available: true
           version_description: ${{github.sha}}
@@ -176,7 +142,7 @@ jobs:
           wait_for_environment_recovery: ${{env.DEPLOYMENT_RECOVERY_TIMEOUT_SECONDS}}
 
       # Stage 3: https://wire-webapp-staging.zinfra.io/
-      - name: Deploy staging build to Elastic Beanstalk
+      - name: Deploy to staging
         if: contains(env.TAG, 'staging')
         uses: einaregilsson/beanstalk-deploy@v14
         with:
@@ -192,25 +158,8 @@ jobs:
           wait_for_deployment: false
           wait_for_environment_recovery: ${{env.DEPLOYMENT_RECOVERY_TIMEOUT_SECONDS}}
 
-      # Stage 4: https://wire-webapp-master.zinfra.io/
-      - name: Deploy master build to Elastic Beanstalk
-        if: env.BRANCH_NAME == 'master'
-        uses: einaregilsson/beanstalk-deploy@v14
-        with:
-          application_name: ${{env.AWS_APPLICATION_NAME}}
-          aws_access_key: ${{secrets.WEBTEAM_AWS_ACCESS_KEY_ID}}
-          aws_secret_key: ${{secrets.WEBTEAM_AWS_SECRET_ACCESS_KEY}}
-          deployment_package: ${{env.AWS_BUILD_ZIP_PATH}}
-          environment_name: wire-webapp-master
-          region: eu-central-1
-          use_existing_version_if_available: true
-          version_description: ${{github.sha}}
-          version_label: ${{github.run_id}}
-          wait_for_deployment: false
-          wait_for_environment_recovery: ${{env.DEPLOYMENT_RECOVERY_TIMEOUT_SECONDS}}
-
       # Stage 5: https://app.wire.com/
-      - name: Deploy production build to Elastic Beanstalk
+      - name: Deploy to production
         if: contains(env.TAG, 'production')
         uses: einaregilsson/beanstalk-deploy@v14
         with:
@@ -228,15 +177,15 @@ jobs:
 
       - name: Push master/dev/edge Docker image
         if: |
-          env.BRANCH_NAME == 'master' ||
-          env.BRANCH_NAME == 'dev' ||
-          env.BRANCH_NAME == 'edge'
+          env.BRANCH == 'master' ||
+          env.BRANCH == 'dev' ||
+          env.BRANCH == 'edge'
         env:
           DOCKER_PASSWORD: ${{secrets.WEBTEAM_QUAY_PASSWORD}}
           DOCKER_USERNAME: ${{secrets.WEBTEAM_QUAY_USERNAME}}
         run: |
           if [ "$DISTRIBUTION" == "wire" ]; then
-            yarn docker '' "${{env.BRANCH_NAME}}"
+            yarn docker '' "${{env.BRANCH}}"
           fi
 
       - name: Push staging Docker image
@@ -315,15 +264,6 @@ jobs:
           send_gif: 'in the oven'
           send_text: 'Staging bump for commit **${{github.sha}}** ("${{env.TITLE}}") done! 🏁'
 
-      - name: Notify CI error
-        if: failure() && github.event_name != 'pull_request'
-        uses: wireapp/github-action-wire-messenger@v2.0.0
-        with:
-          email: ${{secrets.WIRE_BOT_EMAIL}}
-          password: ${{secrets.WIRE_BOT_PASSWORD}}
-          conversation: 'b2cc7120-4154-4be4-b0c0-45a8c361c4d1'
-          send_text: '${{env.COMMITTER}} broke the "${{env.BRANCH_NAME}}" branch on "${{github.repository}}" with [${{env.TITLE}}](${{env.COMMIT_URL}}) 🌵'
-
       - name: Build config.js file for desktop
         if: env.BUILD_DESKTOP == 'true'
         run: node electron/bin/build-config.js
@@ -339,7 +279,7 @@ jobs:
     name: Update Helm chart
     runs-on: ubuntu-latest
 
-    needs: test
+    needs: deploy
 
     steps:
       # NOTE: on average, this step will throw an error, because the artifact is generated
@@ -404,7 +344,7 @@ jobs:
 
   build_desktop_binaries:
     name: Build desktop binaries
-    needs: test
+    needs: deploy
     runs-on: ${{matrix.os}}
 
     strategy:
