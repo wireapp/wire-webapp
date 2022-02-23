@@ -17,8 +17,8 @@
  *
  */
 
-import {Crypto} from 'node-webcrypto-ossl';
+import nodeCrypto from 'crypto';
 
-Object.defineProperty(window, 'crypto', {
-  value: new Crypto(),
+Object.defineProperty(global.self, 'crypto', {
+  value: nodeCrypto.webcrypto,
 });
