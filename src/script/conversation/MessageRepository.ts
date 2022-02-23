@@ -756,7 +756,7 @@ export class MessageRepository {
             updateOptimisticEvent(genericMessage, sentTime);
           },
         },
-        conversationDomain: conversation.domain,
+        conversationDomain: conversation.domain || undefined,
         nativePush,
         payloadBundle: payload,
         targetMode,
