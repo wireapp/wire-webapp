@@ -26,7 +26,8 @@ jobs:
       - name: Set environment variables
         env:
           # DISTRIBUTIONS are saved in the format `distribution-{name}`
-          DISTRIBUTION: ${{secrets[matrix.DISTRIBUTION]}}
+          COMMIT_URL: ${{github.event.head_commit.url}}
+          COMMITTER: ${{github.event.head_commit.committer.name}}
         run: |
           echo "BRANCH_NAME=$(git branch --show-current)" >> $GITHUB_ENV
           echo "TAG=$(git tag --points-at ${{github.sha}})" >> $GITHUB_ENV
@@ -70,10 +71,7 @@ jobs:
         run: echo "machine github.com login ${GH_TOKEN}" > ~/.netrc
 
       - name: Install JS dependencies
-        # Run for all PRs with DISTRIBUTION == 'wire', all pushes to master/dev
-        # and when a desktop version should be built
         if: |
-          matrix.DISTRIBUTION == 'DISTRIBUTION_0' ||
           github.event_name != 'pull_request' ||
           env.BUILD_DESKTOP == 'true'
         run: yarn --frozen-lockfile
@@ -82,33 +80,43 @@ jobs:
     runs-on: ubuntu-latest
     needs: setup
 
-    strategy:
-      matrix:
-        DISTRIBUTION: ['DISTRIBUTION_0', 'DISTRIBUTION_1']
-
     env:
       TEST_COVERAGE_FAIL_THRESHOLD: 45
       TEST_COVERAGE_WARNING_THRESHOLD: 60
+
+    steps:
+      - name: Test
+        run: yarn test --coverage --coverage-reporters=lcov --detectOpenHandles=false
+
+      - name: Monitor coverage
+        uses: codecov/codecov-action@v1.3.2
+        with:
+          fail_ci_if_error: false
+          files: ./coverage/lcov.info
+          flags: unittests
+
+  build:
+    needs: test
+    runs-on: ubuntu-latest
+
+    env:
       DEPLOYMENT_RECOVERY_TIMEOUT_SECONDS: 150
       AWS_APPLICATION_NAME: Webapp
       AWS_BUILD_ZIP_PATH: server/dist/s3/ebs.zip
       COMMIT_URL: ${{github.event.head_commit.url}}
       COMMITTER: ${{github.event.head_commit.committer.name}}
 
-    steps:
-      - name: Test
-        # Run for all PRs and pushes to master/dev with DISTRIBUTION == 'wire'
-        if: matrix.DISTRIBUTION == 'DISTRIBUTION_0'
-        run: yarn test --coverage --coverage-reporters=lcov --detectOpenHandles=false
+    strategy:
+      matrix:
+        DISTRIBUTION: ['DISTRIBUTION_0', 'DISTRIBUTION_1']
 
-      - name: Monitor coverage
-        # Run for all PRs and merges with DISTRIBUTION == 'wire'
-        if: matrix.DISTRIBUTION == 'DISTRIBUTION_0'
-        uses: codecov/codecov-action@v1.3.2
-        with:
-          fail_ci_if_error: false
-          files: ./coverage/lcov.info
-          flags: unittests
+    steps:
+      - name: Set environment variables
+        env:
+          # DISTRIBUTIONS are saved in the format `distribution-{name}`
+          DISTRIBUTION: ${{secrets[matrix.DISTRIBUTION]}}
+        run: |
+          echo "DISTRIBUTION=${DISTRIBUTION/distribution-/}" >> $GITHUB_ENV
 
       - name: Build
         # Run for all pushes to master/dev with DISTRIBUTION == 'wire'
