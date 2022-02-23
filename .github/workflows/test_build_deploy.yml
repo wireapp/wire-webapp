@@ -10,7 +10,7 @@ on:
     branches: [master, dev, edge, avs]
 
 jobs:
-  setup:
+  test:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -25,7 +25,6 @@ jobs:
 
       - name: Set environment variables
         env:
-          # DISTRIBUTIONS are saved in the format `distribution-{name}`
           COMMIT_URL: ${{github.event.head_commit.url}}
           COMMITTER: ${{github.event.head_commit.committer.name}}
         run: |
@@ -76,15 +75,6 @@ jobs:
           env.BUILD_DESKTOP == 'true'
         run: yarn --frozen-lockfile
 
-  test:
-    runs-on: ubuntu-latest
-    needs: setup
-
-    env:
-      TEST_COVERAGE_FAIL_THRESHOLD: 45
-      TEST_COVERAGE_WARNING_THRESHOLD: 60
-
-    steps:
       - name: Test
         run: yarn test --coverage --coverage-reporters=lcov --detectOpenHandles=false
 
@@ -106,10 +96,6 @@ jobs:
       COMMIT_URL: ${{github.event.head_commit.url}}
       COMMITTER: ${{github.event.head_commit.committer.name}}
 
-    strategy:
-      matrix:
-        DISTRIBUTION: ['DISTRIBUTION_0', 'DISTRIBUTION_1']
-
     steps:
       - name: Set environment variables
         env:
@@ -127,7 +113,7 @@ jobs:
         run: yarn build:prod
 
       - name: Assembling release information
-        if: contains(env.TAG, 'production') && matrix.DISTRIBUTION == 'DISTRIBUTION_0'
+        if: contains(env.TAG, 'production')
         # NOTE: always using 'master' config, since release version is only consumed at
         #       'production' stage for now
         shell: bash
@@ -138,7 +124,7 @@ jobs:
           echo "{\"imageTag\": \"${containerImageTag}\", \"releaseName\": \"${TAG:-v${packageVersion}}\"}" > ./release-info.json
 
       - name: Storing release information
-        if: contains(env.TAG, 'production') && matrix.DISTRIBUTION == 'DISTRIBUTION_0'
+        if: contains(env.TAG, 'production')
         uses: actions/upload-artifact@v2
         with:
           name: release-info.json
@@ -146,7 +132,7 @@ jobs:
 
       # https://wire-webapp-avs.zinfra.io/
       - name: Deploy avs build to Elastic Beanstalk
-        if: env.BRANCH_NAME == 'avs' && matrix.DISTRIBUTION == 'DISTRIBUTION_0'
+        if: env.BRANCH_NAME == 'avs'
         uses: einaregilsson/beanstalk-deploy@v14
         with:
           application_name: ${{env.AWS_APPLICATION_NAME}}
@@ -163,7 +149,7 @@ jobs:
 
       # Stage 1: https://wire-webapp-edge.zinfra.io/
       - name: Deploy edge build to Elastic Beanstalk
-        if: env.BRANCH_NAME == 'edge' && matrix.DISTRIBUTION == 'DISTRIBUTION_0'
+        if: env.BRANCH_NAME == 'edge'
         uses: einaregilsson/beanstalk-deploy@v14
         with:
           application_name: ${{env.AWS_APPLICATION_NAME}}
@@ -180,7 +166,7 @@ jobs:
 
       # Stage 2: https://wire-webapp-dev.zinfra.io/
       - name: Deploy dev build to Elastic Beanstalk
-        if: env.BRANCH_NAME == 'dev' && matrix.DISTRIBUTION == 'DISTRIBUTION_0'
+        if: env.BRANCH_NAME == 'dev'
         uses: einaregilsson/beanstalk-deploy@v14
         with:
           application_name: ${{env.AWS_APPLICATION_NAME}}
@@ -197,7 +183,7 @@ jobs:
 
       # Stage 3: https://wire-webapp-staging.zinfra.io/
       - name: Deploy staging build to Elastic Beanstalk
-        if: contains(env.TAG, 'staging') && matrix.DISTRIBUTION == 'DISTRIBUTION_0'
+        if: contains(env.TAG, 'staging')
         uses: einaregilsson/beanstalk-deploy@v14
         with:
           application_name: ${{env.AWS_APPLICATION_NAME}}
@@ -214,7 +200,7 @@ jobs:
 
       # Stage 4: https://wire-webapp-master.zinfra.io/
       - name: Deploy master build to Elastic Beanstalk
-        if: env.BRANCH_NAME == 'master' && matrix.DISTRIBUTION == 'DISTRIBUTION_0'
+        if: env.BRANCH_NAME == 'master'
         uses: einaregilsson/beanstalk-deploy@v14
         with:
           application_name: ${{env.AWS_APPLICATION_NAME}}
@@ -231,7 +217,7 @@ jobs:
 
       # Stage 5: https://app.wire.com/
       - name: Deploy production build to Elastic Beanstalk
-        if: contains(env.TAG, 'production') && matrix.DISTRIBUTION == 'DISTRIBUTION_0'
+        if: contains(env.TAG, 'production')
         uses: einaregilsson/beanstalk-deploy@v14
         with:
           application_name: ${{env.AWS_APPLICATION_NAME}}
@@ -284,12 +270,12 @@ jobs:
           fi
 
       - name: Generate changelog for production release
-        if: contains(env.TAG, 'production') && matrix.DISTRIBUTION == 'DISTRIBUTION_0'
+        if: contains(env.TAG, 'production')
         run: yarn changelog:ci
 
       - name: Create GitHub production release
         id: create_release_production
-        if: contains(env.TAG, 'production') && matrix.DISTRIBUTION == 'DISTRIBUTION_0'
+        if: contains(env.TAG, 'production')
         uses: softprops/action-gh-release@v1
         env:
           GITHUB_TOKEN: ${{github.token}}
@@ -301,7 +287,7 @@ jobs:
           prerelease: false
 
       - name: Announce production release
-        if: contains(env.TAG, 'production') && matrix.DISTRIBUTION == 'DISTRIBUTION_0'
+        if: contains(env.TAG, 'production')
         uses: wireapp/github-action-wire-messenger@v2.0.0
         with:
           email: ${{secrets.WIRE_BOT_EMAIL}}
@@ -310,12 +296,12 @@ jobs:
           send_text: 'The web team just rolled out a new version of [Wire for Web](https://app.wire.com/). You can find what has changed in our [GitHub release notes](https://github.com/wireapp/wire-webapp/releases/latest).\n\nPlease note that the rollout can take up to 30 minutes to be fully deployed on all nodes. You can check here if you get already served our latest version from today: https://app.wire.com/version'
 
       - name: Generate changelog for staging release
-        if: contains(env.TAG, 'staging') && matrix.DISTRIBUTION == 'DISTRIBUTION_0'
+        if: contains(env.TAG, 'staging')
         run: yarn changelog:dev
 
       - name: Create GitHub staging release
         id: create_release_staging
-        if: contains(env.TAG, 'staging') && matrix.DISTRIBUTION == 'DISTRIBUTION_0'
+        if: contains(env.TAG, 'staging')
         uses: softprops/action-gh-release@v1
         env:
           GITHUB_TOKEN: ${{github.token}}
@@ -326,7 +312,7 @@ jobs:
           prerelease: true
 
       - name: Announce staging release
-        if: contains(env.TAG, 'staging') && matrix.DISTRIBUTION == 'DISTRIBUTION_0'
+        if: contains(env.TAG, 'staging')
         uses: wireapp/github-action-wire-messenger@v2.0.0
         with:
           email: ${{secrets.WIRE_BOT_EMAIL}}
@@ -336,7 +322,7 @@ jobs:
           send_text: 'Staging bump for commit **${{github.sha}}** ("${{env.TITLE}}") done! 🏁'
 
       - name: Notify CI error
-        if: failure() && github.event_name != 'pull_request' && matrix.DISTRIBUTION == 'DISTRIBUTION_0'
+        if: failure() && github.event_name != 'pull_request'
         uses: wireapp/github-action-wire-messenger@v2.0.0
         with:
           email: ${{secrets.WIRE_BOT_EMAIL}}
