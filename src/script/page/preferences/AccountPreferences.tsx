@@ -74,10 +74,9 @@ const AccountPreferences: React.FC<AccountPreferencesProps> = ({
   userRepository,
   propertiesRepository,
   conversationRepository,
-  showDomain,
+  showDomain = false,
   userState = container.resolve(UserState),
   teamState = container.resolve(TeamState),
-  richProfileRepository = container.resolve(RichProfileRepository),
 }) => {
   const {self: selfUser, isActivatedAccount} = useKoSubscribableChildren(userState, ['self', 'isActivatedAccount']);
   const {isTeam, teamName} = useKoSubscribableChildren(teamState, ['isTeam', 'teamName']);
@@ -96,7 +95,7 @@ const AccountPreferences: React.FC<AccountPreferencesProps> = ({
   const brandName = config.BRAND_NAME;
   const isConsentCheckEnabled = config.FEATURE.CHECK_CONSENT;
 
-  const richFields = useEnrichedFields(selfUser, false, richProfileRepository);
+  const richFields = useEnrichedFields(selfUser, {addDomain: showDomain, addEmail: false});
   const domain = selfUser.domain;
   const clickOnLeaveGuestRoom = (): void => {
     modals.showModal(
