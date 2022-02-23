@@ -88,7 +88,6 @@ export class StartUIViewModel {
   readonly manageTeamUrl: string;
   readonly manageServicesUrl: string;
   readonly federationDomain?: string;
-  readonly enableFederation: boolean;
   private submittedSearch: boolean;
   private readonly matchedUsers: ko.ObservableArray<User>;
   private readonly alreadyClickedOnContact: Record<string, boolean>;
@@ -203,7 +202,7 @@ export class StartUIViewModel {
     this.showFederatedDomainNotAvailable = ko.observable(false);
 
     this.searchOnFederatedDomain = ko.pureComputed(() => {
-      if (Config.getConfig().FEATURE.ENABLE_FEDERATION && isValidFederationUsername(this.searchInput())) {
+      if (isValidFederationUsername(this.searchInput())) {
         const [_, _username, domain] = this.searchInput().split('@');
         return domain;
       }
