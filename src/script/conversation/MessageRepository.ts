@@ -550,7 +550,7 @@ export class MessageRepository {
           file: {data: Buffer.from(await file.arrayBuffer())},
           originalMessageId: messageId,
         });
-    return this.sendAndInjectGenericCoreMessage(assetMessage, conversation);
+    return this.sendAndInjectGenericCoreMessage(assetMessage, conversation, {syncTimestamp: false});
   }
 
   /**
