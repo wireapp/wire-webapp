@@ -112,6 +112,9 @@ export class UserService {
    * @example ['0bb84213-8cc2-4bb1-9e0b-b8dd522396d5', '15ede065-72b3-433a-9917-252f076ed031']
    */
   getUsers(userIds: QualifiedId[]): Promise<APIClientUser[]> {
+    if (userIds.length === 0) {
+      return Promise.resolve([]);
+    }
     if (!!userIds[0].domain) {
       return this.apiClient.api.user.postListUsers({qualified_ids: userIds});
     }

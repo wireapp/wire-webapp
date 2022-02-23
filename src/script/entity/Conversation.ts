@@ -148,7 +148,7 @@ export class Conversation {
   public readonly receiptMode: ko.Observable<RECEIPT_MODE>;
   public readonly removed_from_conversation: ko.PureComputed<boolean>;
   public readonly roles: ko.Observable<Record<string, string>>;
-  public readonly selfUser: ko.Observable<User>;
+  public readonly selfUser: ko.Observable<User | undefined>;
   public readonly servicesCount: ko.PureComputed<number>;
   public readonly showNotificationsEverything: ko.PureComputed<boolean>;
   public readonly showNotificationsMentionsAndReplies: ko.PureComputed<boolean>;
@@ -202,8 +202,8 @@ export class Conversation {
 
     this.inTeam = ko.pureComputed(() => {
       const isSameTeam = this.selfUser()?.teamId === this.team_id;
-      const isSameDomain = this.domain === this.selfUser().domain;
-      return this.team_id && isSameTeam && !this.isGuest() && isSameDomain;
+      const isSameDomain = this.domain === this.selfUser()?.domain;
+      return !!this.team_id && isSameTeam && !this.isGuest() && isSameDomain;
     });
     this.isGuestRoom = ko.pureComputed(() => this.accessState() === ACCESS_STATE.TEAM.GUEST_ROOM);
     this.isGuestAndServicesRoom = ko.pureComputed(() => this.accessState() === ACCESS_STATE.TEAM.GUESTS_SERVICES);
