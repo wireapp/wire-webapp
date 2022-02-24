@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [18.0.1](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/compare/@wireapp/api-client@18.0.0...@wireapp/api-client@18.0.1) (2022-02-24)
+
+
+### Bug Fixes
+
+* **api-client:** Compute backend features based on actual used version ([#4230](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/issues/4230)) ([a8e9242](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/commit/a8e9242b00a8ab32c944ef2202dea657ecc2c365))
+
+
+
+
+
 # [18.0.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/compare/@wireapp/api-client@17.0.0...@wireapp/api-client@18.0.0) (2022-02-22)
 
 
