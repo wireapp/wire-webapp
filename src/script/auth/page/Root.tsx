@@ -53,6 +53,7 @@ import VerifyEmailCode from './VerifyEmailCode';
 import VerifyEmailLink from './VerifyEmailLink';
 import VerifyPhoneCode from './VerifyPhoneCode';
 import CustomEnvironmentRedirect from './CustomEnvironmentRedirect';
+import SetEntropy from './SetEntropy';
 
 interface RootProps {}
 
@@ -94,6 +95,7 @@ const Root: React.FC<RootProps & ConnectedProps & DispatchProps> = ({
 
   const ProtectedSetHandle = () => isAuthenticatedCheck(<SetHandle />);
   const ProtectedSetEmail = () => isAuthenticatedCheck(<SetEmail />);
+  // const ProtectedSetEntropy = () => isAuthenticatedCheck(<SetEntropy />);
   const ProtectedSetPassword = () => isAuthenticatedCheck(<SetPassword />);
 
   return (
@@ -121,6 +123,7 @@ const Root: React.FC<RootProps & ConnectedProps & DispatchProps> = ({
               <Route path={ROUTE.LOGIN_PHONE} component={PhoneLogin} />
               <Route path={ROUTE.SET_ACCOUNT_TYPE} component={SetAccountType} />
               <Route path={ROUTE.SET_EMAIL} component={ProtectedSetEmail} />
+              <Route path={ROUTE.SET_ENTROPY} component={SetEntropy} />
               <Route path={ROUTE.SET_HANDLE} component={ProtectedSetHandle} />
               <Route path={ROUTE.SET_PASSWORD} component={ProtectedSetPassword} />
               <Route path={`${ROUTE.SSO}/:code?`} component={SingleSignOn} />

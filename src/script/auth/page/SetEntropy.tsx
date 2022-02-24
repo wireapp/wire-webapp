@@ -18,40 +18,27 @@
  */
 
 import {ConsentType} from '@wireapp/api-client/src/self/index';
-import {
-  ArrowIcon,
-  ContainerXS,
-  Form,
-  H1,
-  Input,
-  InputSubmitCombo,
-  Muted,
-  RoundIconButton,
-  Text,
-} from '@wireapp/react-ui-kit';
-import React, {useEffect, useState} from 'react';
+import {ContainerXS, H1, Muted, Text} from '@wireapp/react-ui-kit';
+import React, {MouseEvent, useEffect, useState} from 'react';
 import {useIntl} from 'react-intl';
 import {connect} from 'react-redux';
 import {AnyAction, Dispatch} from 'redux';
-import {Config} from '../../Config';
 import useReactRouter from 'use-react-router';
 import {chooseHandleStrings} from '../../strings';
-import AcceptNewsModal from '../component/AcceptNewsModal';
 import {actionRoot as ROOT_ACTIONS} from '../module/action';
 import {BackendError} from '../module/action/BackendError';
 import {RootState, bindActionCreators} from '../module/reducer';
 import * as SelfSelector from '../module/selector/SelfSelector';
 import {ROUTE} from '../route';
-import {parseError} from '../util/errorUtil';
-import {createSuggestions} from '../util/handleUtil';
+// import {createSuggestions} from '../util/entropyUtil';
 import Page from './Page';
 
 interface Props extends React.HTMLProps<HTMLDivElement> {}
 
-const SetHandle = ({
+const SetEntropy = ({
   doGetConsents,
   doSetConsent,
-  doSetHandle,
+  // doSetEntropy,
   hasSelfHandle,
   hasUnsetMarketingConsent,
   checkHandles,
@@ -61,15 +48,11 @@ const SetHandle = ({
   const {formatMessage: _} = useIntl();
   const {history} = useReactRouter();
   const [error, setError] = useState(null);
-  const [handle, setHandle] = useState('');
+  const [entropy, SetEntropy] = useState('');
 
   useEffect(() => {
     if (hasSelfHandle) {
-      if (Config.getConfig().FEATURE.ENABLE_EXTRA_CLIENT_ENTROPY) {
-        history.push(ROUTE.SET_ENTROPY);
-      } else {
-        history.push(ROUTE.INITIAL_INVITE);
-      }
+      history.push(ROUTE.INITIAL_INVITE);
     }
   }, [hasSelfHandle]);
 
@@ -77,23 +60,21 @@ const SetHandle = ({
     (async () => {
       doGetConsents();
       try {
-        const suggestions = createSuggestions(name);
-        const handle = await checkHandles(suggestions);
-        setHandle(handle);
+        // const suggestions = createSuggestions(name);
+        // const entropy = await checkHandles(suggestions);
+        SetEntropy(entropy);
       } catch (error) {
         setError(error);
       }
     })();
   }, []);
 
-  const updateConsent = (consentType: ConsentType, value: number): Promise<void> => doSetConsent(consentType, value);
-
-  const onSetHandle = async (event: React.FormEvent): Promise<void> => {
+  const onSetEntropy = async (event: React.FormEvent): Promise<void> => {
     event.preventDefault();
     try {
-      await doSetHandle(handle.trim());
+      // await doSetEntropy(entropy.trim());
     } catch (error) {
-      if (error.label === BackendError.HANDLE_ERRORS.INVALID_HANDLE && handle.trim().length < 2) {
+      if (error.label === BackendError.HANDLE_ERRORS.INVALID_HANDLE && entropy.trim().length < 2) {
         error.label = BackendError.HANDLE_ERRORS.HANDLE_TOO_SHORT;
       }
       setError(error);
@@ -109,41 +90,21 @@ const SetHandle = ({
       <ContainerXS centerText verticalCenter style={{display: 'flex', flexDirection: 'column', minHeight: 428}}>
         <H1 center>{_(chooseHandleStrings.headline)}</H1>
         <Muted center>{_(chooseHandleStrings.subhead)}</Muted>
-        <Form style={{marginTop: 30}} onSubmit={onSetHandle}>
-          <InputSubmitCombo style={{paddingLeft: 0}}>
-            <Text center style={{minWidth: 38}}>
-              {'@'}
-            </Text>
-            <Input
-              name="handle"
-              placeholder={_(chooseHandleStrings.handlePlaceholder)}
-              type="text"
-              onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-                setError(null);
-                setHandle(event.target.value);
-              }}
-              value={handle}
-              autoFocus
-              data-uie-name="enter-handle"
-            />
-            <RoundIconButton
-              disabled={!handle || isFetching}
-              type="submit"
-              data-uie-name="do-send-handle"
-              formNoValidate
-            >
-              <ArrowIcon />
-            </RoundIconButton>
-          </InputSubmitCombo>
-        </Form>
-        {error && parseError(error)}
-      </ContainerXS>
-      {!isFetching && hasUnsetMarketingConsent && (
-        <AcceptNewsModal
-          onConfirm={() => updateConsent(ConsentType.MARKETING, 1)}
-          onDecline={() => updateConsent(ConsentType.MARKETING, 0)}
+
+        <Text center style={{minWidth: 38}}>
+          {'@'}
+        </Text>
+        <div
+          css={{height: '255px', width: '255px'}}
+          onMouseMove={(event: MouseEvent<HTMLDivElement>) => {
+            setError(null);
+            // eslint-disable-next-line no-console
+            console.log(event);
+            SetEntropy(entropy => entropy + event);
+          }}
+          data-uie-name="enter-entropy"
         />
-      )}
+      </ContainerXS>
     </Page>
   );
 };
@@ -163,9 +124,9 @@ const mapDispatchToProps = (dispatch: Dispatch<AnyAction>) =>
       checkHandles: ROOT_ACTIONS.userAction.checkHandles,
       doGetConsents: ROOT_ACTIONS.selfAction.doGetConsents,
       doSetConsent: ROOT_ACTIONS.selfAction.doSetConsent,
-      doSetHandle: ROOT_ACTIONS.selfAction.setHandle,
+      // doSetEntropy: ROOT_ACTIONS.selfAction.SetEntropy,
     },
     dispatch,
   );
 
-export default connect(mapStateToProps, mapDispatchToProps)(SetHandle);
+export default connect(mapStateToProps, mapDispatchToProps)(SetEntropy);
