@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [18.0.2](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/compare/@wireapp/api-client@18.0.1...@wireapp/api-client@18.0.2) (2022-02-24)
+
+
+### Bug Fixes
+
+* **api-client:** Make sure no url is created from objects ([cccc960](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/commit/cccc960f49b522130118da4103ee672dc1fe9fae))
+
+
+
+
+
 ## [18.0.1](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/compare/@wireapp/api-client@18.0.0...@wireapp/api-client@18.0.1) (2022-02-24)
 
 
