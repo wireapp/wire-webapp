@@ -17,7 +17,7 @@
  *
  */
 
-import {ClientClassification, ClientType, PublicClient} from '@wireapp/api-client/src/client/';
+import {ClientClassification, ClientType} from '@wireapp/api-client/src/client/';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 import {Runtime} from '@wireapp/commons';
 
@@ -49,23 +49,26 @@ describe('ClientRepository', () => {
 
       testFactory.client_repository['clientState'].currentClient(client);
 
-      const allClients: PublicClient[] = [
+      const clients = [
         {class: ClientClassification.DESKTOP, id: '706f64373b1bcf79'},
         {class: ClientClassification.PHONE, id: '809fd276d6709474'},
         {class: ClientClassification.DESKTOP, id: '8e11e06549c8cf1a'},
         {class: ClientClassification.TABLET, id: 'c411f97b139c818b'},
         {class: ClientClassification.DESKTOP, id: 'cbf3ea49214702d8'},
       ];
+      const apiResponse = {
+        '': {[entities.user.john_doe.id]: clients},
+      };
 
-      spyOn(testFactory.client_repository.clientService, 'getClientsByUserId').and.callFake(() =>
-        Promise.resolve(allClients),
+      spyOn(testFactory.client_repository.clientService, 'getClientsByUserIds').and.callFake(() =>
+        Promise.resolve(apiResponse),
       );
 
       const clientEntities = await testFactory.client_repository.getClientsByUserIds(
         [entities.user.john_doe.qualified_id],
         false,
       );
-      expect(clientEntities[entities.user.john_doe.id].length).toBe(allClients.length);
+      expect(clientEntities[''][entities.user.john_doe.id].length).toBe(clients.length);
     });
   });
 
