@@ -187,7 +187,7 @@ export class UserRepository {
    * Retrieves meta information about all the clients of given users.
    */
   private getClientsByUsers(userIds: QualifiedId[], updateClients: boolean): Promise<QualifiedUserClientEntityMap> {
-    return this.clientRepository.getClientsByQualifiedUserIds(userIds, updateClients);
+    return this.clientRepository.getClientsByUserIds(userIds, updateClients);
   }
 
   /**
