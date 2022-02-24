@@ -24,6 +24,7 @@ const httpClientMock = jasmine.createSpyObj('httpClient', {sendJSON: () => ({dat
 
 describe('ConversationAPI', () => {
   const conversationApi = new ConversationAPI(httpClientMock as HttpClient, {
+    version: 0,
     federationEndpoints: false,
     isFederated: false,
   });
