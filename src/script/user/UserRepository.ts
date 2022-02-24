@@ -460,7 +460,7 @@ export class UserRepository {
     };
 
     const chunksOfUserIds = chunk<QualifiedId>(userIds, Config.getConfig().MAXIMUM_USERS_PER_REQUEST);
-    const resolveArray = await Promise.all(chunksOfUserIds.map(userChunk => getUsers(userChunk)));
+    const resolveArray = await Promise.all(chunksOfUserIds.map(getUsers));
     const newUserEntities = flatten(resolveArray);
     if (this.userState.isTeam()) {
       this.mapGuestStatus(newUserEntities);
