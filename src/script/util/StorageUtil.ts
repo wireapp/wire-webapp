@@ -21,7 +21,6 @@ import {QualifiedId} from '@wireapp/api-client/src/user';
 import {amplify} from 'amplify';
 
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
-import {Config} from '../Config';
 
 export function loadValue<T>(key: string): T | undefined {
   return amplify.store(key);
@@ -36,21 +35,9 @@ export function storeValue(key: string, value: any, secondsToExpire?: number): v
   return amplify.store(key, value, config);
 }
 
-/**
- * Construct the primary key to store clients in database.
- *
- * @param userId Qualified User ID from the owner of the client
- * @param clientId ID of the client
- */
-export function constructClientPrimaryKey(userId: QualifiedId, clientId: string): string {
-  const userPrimaryKey = constructUserPrimaryKey(userId);
-  return `${userPrimaryKey}@${clientId}`;
-}
-
 export function constructUserPrimaryKey({id, domain}: QualifiedId): string {
-  if (Config.getConfig().FEATURE.ENABLE_FEDERATION && domain) {
+  if (domain) {
     return `${domain}@${id}`;
   }
-
   return id;
 }

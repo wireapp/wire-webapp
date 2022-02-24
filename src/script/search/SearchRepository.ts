@@ -27,7 +27,8 @@ import type {UserRepository} from '../user/UserRepository';
 import type {User} from '../entity/User';
 import type {QualifiedId} from '@wireapp/api-client/src/user/';
 import {matchQualifiedIds} from 'Util/QualifiedId';
-import {Config} from '../Config';
+import {container} from 'tsyringe';
+import {Core} from '../service/CoreSingleton';
 
 export class SearchRepository {
   logger: Logger;
@@ -61,7 +62,11 @@ export class SearchRepository {
    * @param searchService SearchService
    * @param userRepository Repository for all user interactions
    */
-  constructor(searchService: SearchService, userRepository: UserRepository) {
+  constructor(
+    searchService: SearchService,
+    userRepository: UserRepository,
+    private readonly core = container.resolve(Core),
+  ) {
     this.searchService = searchService;
     this.userRepository = userRepository;
     this.logger = getLogger('SearchRepository');
@@ -170,9 +175,7 @@ export class SearchRepository {
     isHandle?: boolean,
     maxResults = SearchRepository.CONFIG.MAX_SEARCH_RESULTS,
   ): Promise<User[]> {
-    const [rawName, rawDomain] = Config.getConfig().FEATURE.ENABLE_FEDERATION
-      ? query.replace(/^@/, '').split('@')
-      : [query];
+    const [rawName, rawDomain] = this.core.backendFeatures.isFederated ? query.replace(/^@/, '').split('@') : [query];
     const [name, domain] = validateHandle(rawName, rawDomain) ? [rawName, rawDomain] : [query];
 
     const matchedUserIdsFromDirectorySearch: QualifiedId[] = await this.searchService

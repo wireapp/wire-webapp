@@ -756,7 +756,7 @@ export class MessageRepository {
             updateOptimisticEvent(genericMessage, sentTime);
           },
         },
-        conversationDomain: conversation.isFederated() ? conversation.domain : undefined,
+        conversationDomain: conversation.domain || undefined,
         nativePush,
         payloadBundle: payload,
         targetMode,
@@ -817,10 +817,10 @@ export class MessageRepository {
     const userClient = {[userId.id]: [clientId]};
     await this.messageSender.queueMessage(() =>
       this.conversationService.send({
-        conversationDomain: conversation.isFederated() ? conversation.domain : undefined,
+        conversationDomain: this.core.backendFeatures.federationEndpoints ? conversation.domain : undefined,
         payloadBundle: sessionReset,
         targetMode: MessageTargetMode.USERS_CLIENTS,
-        userIds: conversation.isFederated() ? {[userId.domain]: userClient} : userClient, // we target this message to the specific client of the user (no need for mismatch handling here)
+        userIds: this.core.backendFeatures.federationEndpoints ? {[userId.domain]: userClient} : userClient, // we target this message to the specific client of the user (no need for mismatch handling here)
       }),
     );
   }
@@ -940,9 +940,9 @@ export class MessageRepository {
       await this.conversationService.deleteMessageEveryone(
         conversation.id,
         message.id,
-        conversation.isFederated() ? userIds : userIds.map(({id}) => id),
+        this.core.backendFeatures.federationEndpoints ? userIds : userIds.map(({id}) => id),
         true,
-        conversation.isFederated() ? conversation.domain : undefined,
+        this.core.backendFeatures.federationEndpoints ? conversation.domain : undefined,
       );
 
       await this.deleteMessageById(conversation, messageId);
@@ -972,7 +972,7 @@ export class MessageRepository {
         conversation.id,
         message.id,
         true,
-        conversation.isFederated() ? conversation.domain : undefined,
+        this.core.backendFeatures.federationEndpoints ? conversation.domain : undefined,
       );
       await this.deleteMessageById(conversation, message.id);
     } catch (error) {
@@ -1158,7 +1158,9 @@ export class MessageRepository {
       // we filter the self user if skipSelf is true
       .filter(user => !skipSelf || !user.isMe);
 
-    return conversation.isFederated() ? this.createQualifiedRecipients(users) : this.createRecipients(users);
+    return this.core.backendFeatures.federationEndpoints
+      ? this.createQualifiedRecipients(users)
+      : this.createRecipients(users);
   }
 
   /**
@@ -1217,7 +1219,7 @@ export class MessageRepository {
     }
     const missing = await this.conversationService.getAllParticipantsClients(
       conversation.id,
-      conversation.isFederated() ? conversation.domain : undefined,
+      this.core.backendFeatures.federationEndpoints ? conversation.domain : undefined,
     );
     const deleted = findDeletedClients(missing, await this.generateRecipients(conversation));
     await this.onClientMismatch?.({deleted, missing} as ClientMismatch, conversation, true);

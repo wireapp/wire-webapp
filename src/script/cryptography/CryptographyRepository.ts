@@ -31,7 +31,6 @@ import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 
 import {getLogger, Logger} from 'Util/Logger';
 import {base64ToArray} from 'Util/util';
-import {constructClientPrimaryKey} from 'Util/StorageUtil';
 
 import {CryptographyMapper} from './CryptographyMapper';
 import {Config} from '../Config';
@@ -42,6 +41,8 @@ import {UserError} from '../error/UserError';
 import type {CryptographyService} from './CryptographyService';
 import type {EventRecord} from '../storage';
 import {EventBuilder} from '../conversation/EventBuilder';
+import {container} from 'tsyringe';
+import {Core} from '../service/CoreSingleton';
 
 export interface SignalingKeys {
   enckey: string;
@@ -70,7 +71,10 @@ export class CryptographyRepository {
     return '💣';
   }
 
-  constructor(private readonly cryptographyService: CryptographyService) {
+  constructor(
+    private readonly cryptographyService: CryptographyService,
+    private readonly core = container.resolve(Core),
+  ) {
     this.logger = getLogger('CryptographyRepository');
     this.cryptographyMapper = new CryptographyMapper();
   }
@@ -149,7 +153,7 @@ export class CryptographyRepository {
   }
 
   private loadSession(userId: QualifiedId, clientId: string): Promise<CryptoboxSession | void> {
-    const sessionId = constructClientPrimaryKey(userId, clientId);
+    const sessionId = this.core.service!.cryptography.constructSessionId(userId, clientId);
 
     return this.cryptobox!.session_load(sessionId).catch(() => {
       return this.getUserPreKeyByIds(userId, clientId).then(preKey => {
@@ -159,7 +163,7 @@ export class CryptographyRepository {
   }
 
   deleteSession(userId: QualifiedId, clientId: string): Promise<string> {
-    const sessionId = constructClientPrimaryKey(userId, clientId);
+    const sessionId = this.core.service!.cryptography.constructSessionId(userId, clientId);
     return this.cryptobox!.session_delete(sessionId);
   }
 
@@ -227,7 +231,7 @@ export class CryptographyRepository {
         this.logger.log(
           `Initializing session with user '${userId}' (${clientId}${domainText}) with pre-key ID '${preKey.id}'.`,
         );
-        const sessionId = constructClientPrimaryKey({domain, id: userId}, clientId);
+        const sessionId = this.core.service!.cryptography.constructSessionId({domain, id: userId}, clientId);
         const preKeyArray = base64ToArray(preKey.key);
         return await this.cryptobox!.session_from_prekey(sessionId, preKeyArray.buffer);
       }
@@ -244,12 +248,11 @@ export class CryptographyRepository {
    * @returns Resolves with the decrypted message in ProtocolBuffer format
    */
   private async decryptEvent(event: EventRecord): Promise<GenericMessage> {
-    const isFederatedEnv = Config.getConfig().FEATURE.ENABLE_FEDERATION;
     const {data: eventData, from, qualified_from} = event;
-    const userId = isFederatedEnv ? qualified_from : {domain: '', id: from};
+    const userId = qualified_from || {domain: '', id: from};
     const cipherTextArray = base64ToArray(eventData.text || eventData.key);
     const cipherText = cipherTextArray.buffer;
-    const sessionId = constructClientPrimaryKey(userId, eventData.sender);
+    const sessionId = this.core.service!.cryptography.constructSessionId(userId, eventData.sender);
 
     const plaintext = await this.cryptobox!.decrypt(sessionId, cipherText);
     return GenericMessage.decode(plaintext);

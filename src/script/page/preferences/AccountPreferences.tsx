@@ -22,7 +22,7 @@ import React, {useRef} from 'react';
 import {container} from 'tsyringe';
 import {useEnrichedFields} from 'Components/panel/EnrichedFields';
 
-import {registerReactComponent, useKoSubscribableChildren} from 'Util/ComponentUtil';
+import {registerStaticReactComponent, useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 import {getLogger} from 'Util/Logger';
 import {loadValue} from 'Util/StorageUtil';
@@ -60,6 +60,8 @@ interface AccountPreferencesProps {
   conversationRepository: ConversationRepository;
   propertiesRepository: PropertiesRepository;
   richProfileRepository?: RichProfileRepository;
+  /** Should the domain be displayed */
+  showDomain?: boolean;
   teamState?: TeamState;
   userRepository: UserRepository;
   userState?: UserState;
@@ -72,9 +74,9 @@ const AccountPreferences: React.FC<AccountPreferencesProps> = ({
   userRepository,
   propertiesRepository,
   conversationRepository,
+  showDomain = false,
   userState = container.resolve(UserState),
   teamState = container.resolve(TeamState),
-  richProfileRepository = container.resolve(RichProfileRepository),
 }) => {
   const {self: selfUser, isActivatedAccount} = useKoSubscribableChildren(userState, ['self', 'isActivatedAccount']);
   const {isTeam, teamName} = useKoSubscribableChildren(teamState, ['isTeam', 'teamName']);
@@ -91,10 +93,9 @@ const AccountPreferences: React.FC<AccountPreferencesProps> = ({
   const isTemporaryAndNonPersistent = useRef(isTemporaryClientAndNonPersistent(loadValue(StorageKey.AUTH.PERSIST)));
   const config = Config.getConfig();
   const brandName = config.BRAND_NAME;
-  const isFederated = config.FEATURE.ENABLE_FEDERATION;
   const isConsentCheckEnabled = config.FEATURE.CHECK_CONSENT;
 
-  const richFields = useEnrichedFields(selfUser, false, richProfileRepository);
+  const richFields = useEnrichedFields(selfUser, {addDomain: showDomain, addEmail: false});
   const domain = selfUser.domain;
   const clickOnLeaveGuestRoom = (): void => {
     modals.showModal(
@@ -160,7 +161,7 @@ const AccountPreferences: React.FC<AccountPreferencesProps> = ({
             }}
           >
             <NameInput {...{canEditProfile, name, userRepository}} />
-            <UsernameInput {...{canEditProfile, userRepository, username}} domain={isFederated ? domain : undefined} />
+            <UsernameInput {...{canEditProfile, userRepository, username}} domain={showDomain ? domain : undefined} />
             {email && <EmailInput {...{canEditProfile, email, userRepository}} />}
             {phone && (
               <AccountInput label={t('preferencesAccountPhone')} value={phone} readOnly data-uie-name="enter-phone" />
@@ -212,8 +213,4 @@ const AccountPreferences: React.FC<AccountPreferencesProps> = ({
 
 export default AccountPreferences;
 
-registerReactComponent('account-preferences', {
-  component: AccountPreferences,
-  template:
-    '<div data-bind="react:{clientRepository, userRepository, propertiesRepository, conversationRepository}"></div>',
-});
+registerStaticReactComponent('account-preferences', AccountPreferences);

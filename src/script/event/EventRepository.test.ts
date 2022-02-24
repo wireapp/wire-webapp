@@ -451,6 +451,7 @@ describe('EventRepository', () => {
       const cryptobox = new Cryptobox(someEngine, 10);
       const preKeys = await cryptobox.create();
       testFactory.cryptography_repository.cryptobox = cryptobox;
+      testFactory.cryptography_repository['core'].service = {cryptography: {constructSessionId: jest.fn()}} as any;
 
       const ciphertext = await createEncodedCiphertext(preKeys[0], text, cryptobox.getIdentity());
       const event = {

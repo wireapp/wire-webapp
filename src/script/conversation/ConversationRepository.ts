@@ -194,9 +194,7 @@ export class ConversationRepository {
 
       if (removedTeamUserIds.length) {
         // If we have found some users that were removed from the conversation, we need to check if those users were also completely removed from the team
-        const usersWithoutClients = await this.userRepository.getUserListFromBackend(
-          conversation.isFederated() ? removedTeamUserIds : removedTeamUserIds.map(({id}) => id),
-        );
+        const usersWithoutClients = await this.userRepository.getUserListFromBackend(removedTeamUserIds);
         await Promise.all(
           usersWithoutClients
             .filter(user => user.deleted)
@@ -378,15 +376,14 @@ export class ConversationRepository {
     accessState?: string,
     options: Partial<NewConversation> = {},
   ): Promise<Conversation | undefined> {
-    const isFederated = Config.getConfig().FEATURE.ENABLE_FEDERATION;
-    const userIds = isFederated ? userEntities.map(user => user.qualifiedId) : userEntities.map(user => user.id);
+    const userIds = userEntities.map(user => user.qualifiedId);
 
     let payload: NewConversation & {conversation_role: string} = {
       conversation_role: DefaultRole.WIRE_MEMBER,
       name: groupName,
-      qualified_users: isFederated ? (userIds as QualifiedId[]) : undefined,
+      qualified_users: userIds,
       receipt_mode: null,
-      users: !isFederated ? (userIds as string[]) : [],
+      users: userIds.map(({id}) => id),
       ...options,
     };
 
@@ -1344,11 +1341,7 @@ export class ConversationRepository {
     const userIds = userEntities.map(userEntity => userEntity.qualifiedId);
 
     try {
-      const response = await this.conversation_service.postMembers(
-        conversationEntity.id,
-        userIds,
-        conversationEntity.isFederated(),
-      );
+      const response = await this.conversation_service.postMembers(conversationEntity.id, userIds);
       if (response) {
         this.eventRepository.injectEvent(response, EventRepository.SOURCE.BACKEND_RESPONSE);
       }
@@ -1457,7 +1450,7 @@ export class ConversationRepository {
   async leaveGuestRoom(): Promise<void> {
     if (this.userState.self().isTemporaryGuest()) {
       const conversationEntity = this.getMostRecentConversation(true);
-      await this.conversation_service.deleteMembers(conversationEntity.id, this.userState.self().id);
+      await this.conversation_service.deleteMembers(conversationEntity.qualifiedId, this.userState.self().qualifiedId);
     }
   }
 
@@ -1465,18 +1458,16 @@ export class ConversationRepository {
    * Remove member from conversation.
    *
    * @param conversationEntity Conversation to remove member from
-   * @param user ID of member to be removed from the conversation
+   * @param userId ID of member to be removed from the conversation
    * @returns Resolves when member was removed from the conversation
    */
-  public async removeMember(conversationEntity: Conversation, user: QualifiedId) {
-    const response = conversationEntity.isFederated()
-      ? await this.conversation_service.deleteQualifiedMembers(conversationEntity.qualifiedId, user)
-      : await this.conversation_service.deleteMembers(conversationEntity.id, user.id);
+  public async removeMember(conversationEntity: Conversation, userId: QualifiedId) {
+    const response = await this.conversation_service.deleteMembers(conversationEntity.qualifiedId, userId);
     const roles = conversationEntity.roles();
-    delete roles[user.id];
+    delete roles[userId.id];
     conversationEntity.roles(roles);
     const currentTimestamp = this.serverTimeHandler.toServerTimestamp();
-    const event = response || EventBuilder.buildMemberLeave(conversationEntity, user, true, currentTimestamp);
+    const event = response || EventBuilder.buildMemberLeave(conversationEntity, userId, true, currentTimestamp);
     this.eventRepository.injectEvent(event, EventRepository.SOURCE.BACKEND_RESPONSE);
     return event;
   }

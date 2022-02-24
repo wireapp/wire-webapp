@@ -33,8 +33,11 @@ import {CryptographyError} from 'src/script/error/CryptographyError';
 describe('CryptographyRepository', () => {
   const testFactory = new TestFactory();
 
-  beforeAll(async () => {
+  beforeEach(async () => {
     await testFactory.exposeCryptographyActors(false);
+    testFactory.cryptography_repository['core'].service = {
+      cryptography: {constructSessionId: jest.fn(() => 'user-id@device-id')},
+    } as any;
   });
 
   describe('getRemoteFingerprint', () => {
