@@ -38,10 +38,11 @@ export class ConnectionAPI {
    * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/users/connection
    */
   public async getConnection(userId: string | QualifiedId): Promise<Connection> {
+    const strUserId = typeof userId === 'string' ? userId : userId.id;
     const url =
       typeof userId !== 'string' && this.backendFeatures.federationEndpoints
         ? `${ConnectionAPI.URL.CONNECTIONS}/${userId.domain}/${userId}`
-        : `${ConnectionAPI.URL.CONNECTIONS}/${userId}`;
+        : `${ConnectionAPI.URL.CONNECTIONS}/${strUserId}`;
     const config: AxiosRequestConfig = {
       method: 'get',
       url,
@@ -210,10 +211,11 @@ export class ConnectionAPI {
    * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/users/updateConnection
    */
   public async putConnection(userId: string | QualifiedId, updatedConnection: ConnectionUpdate): Promise<Connection> {
+    const strUserId = typeof userId === 'string' ? userId : userId.id;
     const url =
       this.backendFeatures.federationEndpoints && typeof userId !== 'string'
         ? `${ConnectionAPI.URL.CONNECTIONS}/${userId.domain}/${userId.id}`
-        : `${ConnectionAPI.URL.CONNECTIONS}/${userId}`;
+        : `${ConnectionAPI.URL.CONNECTIONS}/${strUserId}`;
 
     const config: AxiosRequestConfig = {
       data: updatedConnection,

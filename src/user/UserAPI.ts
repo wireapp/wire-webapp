@@ -143,10 +143,11 @@ export class UserAPI {
    * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/users/getUserClient
    */
   public async getClient(userId: string | QualifiedId, clientId: string): Promise<PublicClient> {
+    const strUserId = typeof userId === 'string' ? userId : userId.id;
     const url =
       this.backendFeatures.federationEndpoints && typeof userId !== 'string'
         ? `${UserAPI.URL.USERS}/${userId.domain}/${userId.id}/${UserAPI.URL.CLIENTS}/${clientId}`
-        : `${UserAPI.URL.USERS}/${userId}/${UserAPI.URL.CLIENTS}/${clientId}`;
+        : `${UserAPI.URL.USERS}/${strUserId}/${UserAPI.URL.CLIENTS}/${clientId}`;
 
     const config: AxiosRequestConfig = {
       method: 'get',
@@ -167,7 +168,8 @@ export class UserAPI {
     if (this.backendFeatures.federationEndpoints && typeof userId !== 'string') {
       return this.getClientPreKey_v2(userId, clientId);
     }
-    return this.getClientPreKey_v1(userId as string, clientId);
+    const strUserId = typeof userId === 'string' ? userId : userId.id;
+    return this.getClientPreKey_v1(strUserId, clientId);
   }
 
   private async getClientPreKey_v1(userId: string, clientId: string): Promise<ClientPreKey> {
@@ -199,10 +201,11 @@ export class UserAPI {
    * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/users/getUserClients
    */
   public async getClients(userId: string | QualifiedId): Promise<PublicClient[]> {
+    const strUserId = typeof userId === 'string' ? userId : userId.id;
     const url =
       this.backendFeatures.federationEndpoints && typeof userId !== 'string'
         ? `${UserAPI.URL.USERS}/${userId.domain}/${userId.id}/${UserAPI.URL.CLIENTS}`
-        : `${UserAPI.URL.USERS}/${userId}/${UserAPI.URL.CLIENTS}`;
+        : `${UserAPI.URL.USERS}/${strUserId}/${UserAPI.URL.CLIENTS}`;
 
     const config: AxiosRequestConfig = {
       method: 'get',
