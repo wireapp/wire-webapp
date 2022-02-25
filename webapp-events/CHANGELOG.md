@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.13.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/webapp-events/compare/@wireapp/webapp-events@0.12.0...@wireapp/webapp-events@0.13.0) (2022-02-25)
+
+
+### Features
+
+* **api-client,webapp-events:** Add new event for soundless incoming calls (SQCALL-471) ([#4231](https://github.com/wireapp/wire-web-packages/tree/main/packages/webapp-events/issues/4231)) ([abaccfc](https://github.com/wireapp/wire-web-packages/tree/main/packages/webapp-events/commit/abaccfcebe5284160624b6ff1b6c8dc67a15c250))
+
+
+
+
+
 # [0.12.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/webapp-events/compare/@wireapp/webapp-events@0.11.3...@wireapp/webapp-events@0.12.0) (2022-02-07)
 
 
