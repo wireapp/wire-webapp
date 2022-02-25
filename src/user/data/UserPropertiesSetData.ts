@@ -36,6 +36,7 @@ export interface WebappProperties {
   settings: {
     call: {
       enable_vbr_encoding: boolean;
+      enable_soundless_incoming_calls: boolean;
     };
     emoji: {
       replace_inline: boolean;
