@@ -123,6 +123,7 @@ import {ConversationMemberUpdateEvent} from '@wireapp/api-client/src/event';
 import {matchQualifiedIds} from 'Util/QualifiedId';
 import {ConversationVerificationState} from './ConversationVerificationState';
 import {extractClientDiff} from './ClientMismatchUtil';
+import {Core} from '../service/CoreSingleton';
 
 type ConversationDBChange = {obj: EventRecord; oldObj: EventRecord};
 type FetchPromise = {rejectFn: (error: ConversationError) => void; resolveFn: (conversation: Conversation) => void};
@@ -169,6 +170,7 @@ export class ConversationRepository {
     private readonly userState = container.resolve(UserState),
     private readonly teamState = container.resolve(TeamState),
     private readonly conversationState = container.resolve(ConversationState),
+    private readonly core = container.resolve(Core),
   ) {
     this.eventService = eventRepository.eventService;
     // we register a client mismatch handler agains the message repository so that we can react to missing members
@@ -381,7 +383,7 @@ export class ConversationRepository {
     let payload: NewConversation & {conversation_role: string} = {
       conversation_role: DefaultRole.WIRE_MEMBER,
       name: groupName,
-      qualified_users: userIds,
+      qualified_users: this.core.backendFeatures.federationEndpoints ? userIds : undefined,
       receipt_mode: null,
       users: userIds.map(({id}) => id),
       ...options,
