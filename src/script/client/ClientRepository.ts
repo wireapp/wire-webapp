@@ -213,7 +213,7 @@ export class ClientRepository {
   private updateClientSchemaInDb(userId: QualifiedId, clientPayload: PublicClient): Promise<ClientRecord> {
     const clientRecord: ClientRecord = {
       ...clientPayload,
-      domain: userId.domain,
+      domain: this.core.backendFeatures.federationEndpoints ? userId.domain : undefined,
       meta: {
         is_verified: false,
         primary_key: this.core.service!.cryptography.constructSessionId(userId, clientPayload.id),
@@ -444,7 +444,7 @@ export class ClientRepository {
           if (backendClient) {
             const {client, wasUpdated} = ClientMapper.updateClient(databaseClient, {
               ...backendClient,
-              domain: userId.domain,
+              domain: this.core.backendFeatures.federationEndpoints ? userId.domain : undefined,
             });
 
             delete clientsFromBackend[clientId];
