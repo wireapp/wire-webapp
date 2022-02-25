@@ -18,15 +18,16 @@
  */
 
 import {ConsentType} from '@wireapp/api-client/src/self/index';
-import {ContainerXS, H1, Muted, Text} from '@wireapp/react-ui-kit';
-import React, {MouseEvent, useEffect, useState} from 'react';
+import {ContainerXS, H1, Muted} from '@wireapp/react-ui-kit';
+import React, {MouseEvent, useCallback, useEffect, useState} from 'react';
 import {useIntl} from 'react-intl';
 import {connect} from 'react-redux';
 import {AnyAction, Dispatch} from 'redux';
 import useReactRouter from 'use-react-router';
 import {chooseHandleStrings} from '../../strings';
+import Canvas from '../component/Canvas';
 import {actionRoot as ROOT_ACTIONS} from '../module/action';
-import {BackendError} from '../module/action/BackendError';
+// import {BackendError} from '../module/action/BackendError';
 import {RootState, bindActionCreators} from '../module/reducer';
 import * as SelfSelector from '../module/selector/SelfSelector';
 import {ROUTE} from '../route';
@@ -48,7 +49,8 @@ const SetEntropy = ({
   const {formatMessage: _} = useIntl();
   const {history} = useReactRouter();
   const [error, setError] = useState(null);
-  const [entropy, SetEntropy] = useState('');
+  const [frameCount, setFrameCount] = useState(0);
+  const [entropy, SetEntropy] = useState<[number, number][]>([]);
 
   useEffect(() => {
     if (hasSelfHandle) {
@@ -69,17 +71,46 @@ const SetEntropy = ({
     })();
   }, []);
 
-  const onSetEntropy = async (event: React.FormEvent): Promise<void> => {
-    event.preventDefault();
-    try {
-      // await doSetEntropy(entropy.trim());
-    } catch (error) {
-      if (error.label === BackendError.HANDLE_ERRORS.INVALID_HANDLE && entropy.trim().length < 2) {
-        error.label = BackendError.HANDLE_ERRORS.HANDLE_TOO_SHORT;
-      }
-      setError(error);
-    }
+  const onMouseMove = (event: MouseEvent<HTMLCanvasElement>) => {
+    setError(null);
+    setFrameCount(frameCount + 1);
+    event.persist();
+    SetEntropy(entropy => [
+      ...entropy,
+      [event.screenX - window.innerWidth / 2 + 144, event.screenY - window.innerHeight / 2 - 144],
+    ]);
+    // console.log(
+    //   event.screenX,
+    //   event.screenY,
+    //   event.screenX - window.innerWidth / 2 + 144,
+    //   event.screenY - window.innerHeight / 2 - 144,
+    // );
   };
+
+  const draw = useCallback(
+    (ctx: CanvasRenderingContext2D) => {
+      if (entropy.length > 1 && frameCount > 1) {
+        ctx.beginPath();
+        ctx.strokeStyle = 'blue';
+        ctx.moveTo(...entropy[frameCount - 2]);
+        ctx.lineTo(...entropy[frameCount - 1]);
+        ctx.stroke();
+      }
+    },
+    [entropy],
+  );
+
+  // const onSetEntropy = async (event: React.FormEvent): Promise<void> => {
+  //   event.preventDefault();
+  //   try {
+  //     // await doSetEntropy(entropy.trim());
+  //   } catch (error) {
+  //     if (error.label === BackendError.HANDLE_ERRORS.INVALID_HANDLE && entropy.trim().length < 2) {
+  //       error.label = BackendError.HANDLE_ERRORS.HANDLE_TOO_SHORT;
+  //     }
+  //     setError(error);
+  //   }
+  // };
 
   if (hasSelfHandle) {
     return null;
@@ -90,18 +121,17 @@ const SetEntropy = ({
       <ContainerXS centerText verticalCenter style={{display: 'flex', flexDirection: 'column', minHeight: 428}}>
         <H1 center>{_(chooseHandleStrings.headline)}</H1>
         <Muted center>{_(chooseHandleStrings.subhead)}</Muted>
+        <Canvas
+          style={{
+            alignSelf: 'center',
+            backgroundColor: 'white',
 
-        <Text center style={{minWidth: 38}}>
-          {'@'}
-        </Text>
-        <div
-          css={{height: '255px', width: '255px'}}
-          onMouseMove={(event: MouseEvent<HTMLDivElement>) => {
-            setError(null);
-            // eslint-disable-next-line no-console
-            console.log(event);
-            SetEntropy(entropy => entropy + event);
+            borderRadius: '5px',
+            height: '255px',
+            width: '255px',
           }}
+          draw={draw}
+          onMouseMove={onMouseMove}
           data-uie-name="enter-entropy"
         />
       </ContainerXS>
