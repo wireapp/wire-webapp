@@ -29,7 +29,7 @@ import {container} from 'tsyringe';
 import murmurhash from 'murmurhash';
 import {t} from 'Util/LocalizerUtil';
 import {Logger, getLogger} from 'Util/Logger';
-import {constructClientPrimaryKey, loadValue} from 'Util/StorageUtil';
+import {loadValue} from 'Util/StorageUtil';
 import {SIGN_OUT_REASON} from '../auth/SignOutReason';
 import {StorageKey} from '../storage/StorageKey';
 import {ModalsViewModel} from '../view_model/ModalsViewModel';
@@ -42,7 +42,7 @@ import {ClientError} from '../error/ClientError';
 import {ClientRecord, StorageRepository} from '../storage';
 import {ClientState} from './ClientState';
 import {matchQualifiedIds} from 'Util/QualifiedId';
-import {Config} from '../Config';
+import {Core} from '../service/CoreSingleton';
 
 export type UserClientEntityMap = {[userId: string]: ClientEntity[]};
 export type QualifiedUserClientEntityMap = {[domain: string]: UserClientEntityMap};
@@ -66,6 +66,7 @@ export class ClientRepository {
     public readonly cryptographyRepository: CryptographyRepository,
     private readonly storageRepository: StorageRepository,
     private readonly clientState = container.resolve(ClientState),
+    private readonly core = container.resolve(Core),
   ) {
     this.cryptographyRepository = cryptographyRepository;
     this.selfUser = ko.observable(undefined);
@@ -87,7 +88,7 @@ export class ClientRepository {
   //##############################################################################
 
   private deleteClientFromDb(userId: QualifiedId, clientId: string): Promise<string> {
-    return this.clientService.deleteClientFromDb(constructClientPrimaryKey(userId, clientId));
+    return this.clientService.deleteClientFromDb(this.core.service!.cryptography.constructSessionId(userId, clientId));
   }
 
   /**
@@ -168,7 +169,7 @@ export class ClientRepository {
    * @returns Resolves with the record stored in database
    */
   saveClientInDb(userId: QualifiedId, clientPayload: ClientRecord): Promise<ClientRecord> {
-    const primaryKey = constructClientPrimaryKey(userId, clientPayload.id);
+    const primaryKey = this.core.service!.cryptography.constructSessionId(userId, clientPayload.id);
     return this.clientService.saveClientInDb(primaryKey, clientPayload);
   }
 
@@ -182,7 +183,7 @@ export class ClientRepository {
    * @returns Number of updated records
    */
   private updateClientInDb(userId: QualifiedId, clientId: string, changes: Partial<ClientRecord>): Promise<number> {
-    const primaryKey = constructClientPrimaryKey(userId, clientId);
+    const primaryKey = this.core.service!.cryptography.constructSessionId(userId, clientId);
     // Preserve primary key on update
     changes.meta.primary_key = primaryKey;
     return this.clientService.updateClientInDb(primaryKey, changes);
@@ -215,7 +216,7 @@ export class ClientRepository {
       domain: userId.domain,
       meta: {
         is_verified: false,
-        primary_key: constructClientPrimaryKey(userId, clientPayload.id),
+        primary_key: this.core.service!.cryptography.constructSessionId(userId, clientPayload.id),
       },
     };
     return this.saveClientInDb(userId, clientRecord);
@@ -461,7 +462,7 @@ export class ClientRepository {
           if (backendClient) {
             const {client, wasUpdated} = ClientMapper.updateClient(databaseClient, {
               ...backendClient,
-              domain: Config.getConfig().FEATURE.ENABLE_FEDERATION ? userId.domain : undefined,
+              domain: userId.domain,
             });
 
             delete clientsFromBackend[clientId];
