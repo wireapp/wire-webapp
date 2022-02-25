@@ -173,6 +173,7 @@ export class MainViewModel {
       repositories.media.streamHandler,
       repositories.permission,
       repositories.team,
+      repositories.properties,
       this.selfUser,
       this.multitasking,
     );
