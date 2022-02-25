@@ -108,9 +108,7 @@ const UserDevices: React.FC<UserDevicesProps> = ({
   useEffect(() => {
     (async () => {
       try {
-        const qualifiedUsersMap = user.domain
-          ? Object.values(await clientRepository.getClientsByQualifiedUserIds([user], true))
-          : [await clientRepository.getClientsByUserIds([user], true)];
+        const qualifiedUsersMap = Object.values(await clientRepository.getClientsByUserIds([user], true));
         for (const qualifiedUsersMaps of qualifiedUsersMap) {
           for (const clientEntities of Object.values(qualifiedUsersMaps)) {
             setClients(sortUserDevices(clientEntities));
