@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2018 Wire Swiss GmbH
+ * Copyright (C) 2022 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,20 +18,21 @@
  */
 
 import {ConsentType} from '@wireapp/api-client/src/self/index';
-import {ContainerXS, H1, Muted} from '@wireapp/react-ui-kit';
-import React, {MouseEvent, useCallback, useEffect, useState} from 'react';
+import {ContainerXS, H1, Muted, Text} from '@wireapp/react-ui-kit';
+import React, {MouseEvent, PointerEvent, useCallback, useEffect, useState} from 'react';
 import {useIntl} from 'react-intl';
 import {connect} from 'react-redux';
 import {AnyAction, Dispatch} from 'redux';
+import {usePausableInterval} from '../../hooks/usePausableInterval';
+import {usePausableTimeout} from '../../hooks/usePausableTimeout';
 import useReactRouter from 'use-react-router';
 import {chooseHandleStrings} from '../../strings';
 import Canvas from '../component/Canvas';
 import {actionRoot as ROOT_ACTIONS} from '../module/action';
-// import {BackendError} from '../module/action/BackendError';
+import {BackendError} from '../module/action/BackendError';
 import {RootState, bindActionCreators} from '../module/reducer';
 import * as SelfSelector from '../module/selector/SelfSelector';
 import {ROUTE} from '../route';
-// import {createSuggestions} from '../util/entropyUtil';
 import Page from './Page';
 
 interface Props extends React.HTMLProps<HTMLDivElement> {}
@@ -51,6 +52,8 @@ const SetEntropy = ({
   const [error, setError] = useState(null);
   const [frameCount, setFrameCount] = useState(0);
   const [entropy, SetEntropy] = useState<[number, number][]>([]);
+  const [percent, setPercent] = useState(0);
+  const [pause, setPause] = useState(true);
 
   useEffect(() => {
     if (hasSelfHandle) {
@@ -58,20 +61,7 @@ const SetEntropy = ({
     }
   }, [hasSelfHandle]);
 
-  useEffect(() => {
-    (async () => {
-      doGetConsents();
-      try {
-        // const suggestions = createSuggestions(name);
-        // const entropy = await checkHandles(suggestions);
-        SetEntropy(entropy);
-      } catch (error) {
-        setError(error);
-      }
-    })();
-  }, []);
-
-  const onMouseMove = (event: MouseEvent<HTMLCanvasElement>) => {
+  const onMouseMove = (event: MouseEvent<HTMLCanvasElement> | PointerEvent<HTMLCanvasElement>) => {
     setError(null);
     setFrameCount(frameCount + 1);
     event.persist();
@@ -91,8 +81,11 @@ const SetEntropy = ({
     (ctx: CanvasRenderingContext2D) => {
       if (entropy.length > 1 && frameCount > 1) {
         ctx.beginPath();
-        ctx.strokeStyle = 'blue';
+        ctx.lineJoin = 'round';
         ctx.moveTo(...entropy[frameCount - 2]);
+        ctx.lineCap = 'round';
+        ctx.lineWidth = 2;
+        ctx.strokeStyle = 'blue';
         ctx.lineTo(...entropy[frameCount - 1]);
         ctx.stroke();
       }
@@ -100,21 +93,20 @@ const SetEntropy = ({
     [entropy],
   );
 
-  // const onSetEntropy = async (event: React.FormEvent): Promise<void> => {
-  //   event.preventDefault();
-  //   try {
-  //     // await doSetEntropy(entropy.trim());
-  //   } catch (error) {
-  //     if (error.label === BackendError.HANDLE_ERRORS.INVALID_HANDLE && entropy.trim().length < 2) {
-  //       error.label = BackendError.HANDLE_ERRORS.HANDLE_TOO_SHORT;
-  //     }
-  //     setError(error);
-  //   }
-  // };
+  const onSetEntropy = async (): Promise<void> => {
+    try {
+      // await doSetEntropy(entropy.trim());
+      alert('entropy');
+    } catch (error) {
+      if (error.label === BackendError.HANDLE_ERRORS.INVALID_HANDLE) {
+        error.label = BackendError.HANDLE_ERRORS.HANDLE_TOO_SHORT;
+      }
+      setError(error);
+    }
+  };
 
-  if (hasSelfHandle) {
-    return null;
-  }
+  usePausableTimeout(onSetEntropy, 30000, pause);
+  usePausableInterval(() => setPercent(percent => percent + 1), 300, pause);
 
   return (
     <Page>
@@ -125,15 +117,22 @@ const SetEntropy = ({
           style={{
             alignSelf: 'center',
             backgroundColor: 'white',
-
+            border: error ? 'red 2px solid' : 'black 2px solid',
             borderRadius: '5px',
             height: '255px',
             width: '255px',
           }}
           draw={draw}
           onMouseMove={onMouseMove}
+          onMouseEnter={() => setPause(false)}
+          onMouseLeave={() => {
+            setPause(true);
+            setError(!error);
+          }}
           data-uie-name="enter-entropy"
         />
+        <progress></progress>
+        <Text center>{percent}%</Text>
       </ContainerXS>
     </Page>
   );

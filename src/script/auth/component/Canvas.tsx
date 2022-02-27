@@ -1,15 +1,16 @@
-import React, {MouseEvent, useRef, useEffect, CSSProperties, useState} from 'react';
+import React, {MouseEvent, useRef, useEffect, CSSProperties} from 'react';
 
 interface CanvasProps {
   draw: (context: CanvasRenderingContext2D) => void;
+  onMouseEnter: () => void;
+  onMouseLeave: () => void;
   onMouseMove: (event: MouseEvent<HTMLCanvasElement>) => void;
   style: CSSProperties;
 }
 
 const Canvas = (props: CanvasProps) => {
-  const {draw, onMouseMove, style, ...rest} = props;
+  const {draw, onMouseMove, onMouseEnter, onMouseLeave, style, ...rest} = props;
   const canvasRef = useRef(null);
-  const [error, setError] = useState(false);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -33,16 +34,13 @@ const Canvas = (props: CanvasProps) => {
       css={{
         alignSelf: 'center',
         backgroundColor: 'white',
-        border: error ? 'red 2px solid' : 'black 2px solid',
         height: '255px',
         width: '255px',
         ...style,
       }}
-      onMouseMove={e => {
-        setError(false);
-        onMouseMove(e);
-      }}
-      onMouseLeave={() => setError(!error)}
+      onMouseEnter={onMouseEnter}
+      onMouseMove={onMouseMove}
+      onMouseLeave={onMouseLeave}
       ref={canvasRef}
       {...rest}
     />
