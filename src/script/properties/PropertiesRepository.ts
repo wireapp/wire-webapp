@@ -70,6 +70,7 @@ export class PropertiesRepository {
       enable_debugging: false,
       settings: {
         call: {
+          enable_soundless_incoming_calls: false,
           enable_vbr_encoding: true,
         },
         emoji: {
@@ -320,6 +321,9 @@ export class PropertiesRepository {
         break;
       case PROPERTIES_TYPE.CALL.ENABLE_VBR_ENCODING:
         amplify.publish(WebAppEvents.PROPERTIES.UPDATE.CALL.ENABLE_VBR_ENCODING, updatedPreference);
+        break;
+      case PROPERTIES_TYPE.CALL.ENABLE_SOUNDLESS_INCOMING_CALLS:
+        amplify.publish(WebAppEvents.PROPERTIES.UPDATE.CALL.ENABLE_SOUNDLESS_INCOMING_CALLS, updatedPreference);
         break;
       default:
         throw new Error(`Failed to update preference of unhandled type '${propertiesType}'`);
