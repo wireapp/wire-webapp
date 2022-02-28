@@ -1071,10 +1071,8 @@ export class MessageRepository {
       UserRepository.CONFIG.MAXIMUM_TEAM_SIZE_BROADCAST,
     );
 
-    const recipients =
-      false && this.core.backendFeatures.federationEndpoints
-        ? this.createQualifiedRecipients(users)
-        : this.createRecipients(users);
+    // FIXME: When federated broadcast is available on backend, also generate fully qualified recipients using this.createQualifiedRecipients(users)
+    const recipients = this.createRecipients(users);
 
     this.core.service!.broadcast.broadcastGenericMessage(genericMessage, recipients, false, mismatch => {
       this.onClientMismatch?.(mismatch);
