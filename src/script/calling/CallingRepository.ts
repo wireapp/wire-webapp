@@ -1236,8 +1236,8 @@ export class CallingRepository {
     conversationType: CONV_TYPE,
   ) => {
     const conversationId = this.parseQualifiedId(convId);
-    const conversationEntity = this.conversationState.findConversation(conversationId);
-    if (!conversationEntity) {
+    const conversation = this.conversationState.findConversation(conversationId);
+    if (!conversation) {
       return;
     }
     const storedCall = this.findCall(conversationId);
@@ -1246,13 +1246,13 @@ export class CallingRepository {
       // When a second call arrives in the same conversation, we need to clean that call first
       this.removeCall(storedCall);
     }
-    const canRing = !conversationEntity.showNotificationsNothing() && shouldRing && this.isReady;
+    const canRing = !conversation.showNotificationsNothing() && shouldRing && this.isReady;
     const selfParticipant = new Participant(this.selfUser, this.selfClientId);
     const isVideoCall = hasVideo ? CALL_TYPE.VIDEO : CALL_TYPE.NORMAL;
     const isMuted = Config.getConfig().FEATURE.CONFERENCE_AUTO_MUTE && conversationType === CONV_TYPE.CONFERENCE;
     const call = new Call(
       this.parseQualifiedId(userId),
-      conversationId,
+      conversation.qualifiedId,
       conversationType,
       selfParticipant,
       hasVideo ? CALL_TYPE.VIDEO : CALL_TYPE.NORMAL,
