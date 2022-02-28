@@ -179,6 +179,7 @@ export class ConversationRepository {
       const {missingClients, deletedClients, emptyUsers, missingUserIds} = extractClientDiff(
         mismatch,
         conversation?.allUserEntities,
+        this.core.backendFeatures.federationEndpoints ? userState.self().domain : '',
       );
 
       if (conversation && missingUserIds.length) {

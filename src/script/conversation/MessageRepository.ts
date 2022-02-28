@@ -1071,9 +1071,10 @@ export class MessageRepository {
       UserRepository.CONFIG.MAXIMUM_TEAM_SIZE_BROADCAST,
     );
 
-    const recipients = this.core.backendFeatures.federationEndpoints
-      ? this.createQualifiedRecipients(users)
-      : this.createRecipients(users);
+    const recipients =
+      false && this.core.backendFeatures.federationEndpoints
+        ? this.createQualifiedRecipients(users)
+        : this.createRecipients(users);
 
     this.core.service!.broadcast.broadcastGenericMessage(genericMessage, recipients, false, mismatch => {
       this.onClientMismatch?.(mismatch);
