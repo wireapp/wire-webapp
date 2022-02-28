@@ -115,17 +115,16 @@ export class ClientService {
    * Retrieves meta information about all the clients of a specific user.
    * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/users/getClients
    */
-  async getClientsByQualifiedUserIds(userIds: QualifiedId[]): Promise<QualifiedUserClientMap> {
+  async getClientsByUserIds(userIds: QualifiedId[]): Promise<QualifiedUserClientMap> {
+    if (!this.apiClient.backendFeatures.federationEndpoints) {
+      const clientsMap: {[userId: string]: PublicClient[]} = {};
+      for (const {id} of userIds) {
+        clientsMap[id] = await this.apiClient.api.user.getClients(id);
+      }
+      return {'': clientsMap};
+    }
     const listedClients = await this.apiClient.api.user.postListClients({qualified_users: userIds});
     return listedClients.qualified_user_map;
-  }
-
-  /**
-   * Retrieves meta information about all the clients of a specific user.
-   * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/users/getClients
-   */
-  async getClientsByUserId(userId: string): Promise<PublicClient[]> {
-    return this.apiClient.api.user.getClients(userId);
   }
 
   /**
