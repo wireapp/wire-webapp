@@ -58,16 +58,23 @@ const MessagesList: React.FC<MessagesListParams> = ({
   messageActions,
   onLoading,
 }) => {
-  const {messages: allMessages, lastDeliveredMessage} = useKoSubscribableChildren(conversation, [
+  const {
+    messages: allMessages,
+    lastDeliveredMessage,
+    isGuestRoom,
+    isGuestAndServicesRoom,
+  } = useKoSubscribableChildren(conversation, [
     'messages',
     'lastDeliveredMessage',
+    'isGuestRoom',
+    'isGuestAndServicesRoom',
   ]);
   const messages = allMessages.filter(message => message.visible());
   const [loaded, setLoaded] = useState(false);
   const [focusedMessage, setFocusedMessage] = useState<string | undefined>(initialMessage?.id);
 
   const shouldShowInvitePeople =
-    conversation.isActiveParticipant() && conversation.inTeam() && conversation.isGuestRoom();
+    conversation.isActiveParticipant() && conversation.inTeam() && (isGuestRoom || isGuestAndServicesRoom);
 
   const loadConversation = async (conversation: Conversation, message?: MessageEntity): Promise<MessageEntity[]> => {
     await conversationRepository.updateParticipatingUserEntities(conversation, false, true);

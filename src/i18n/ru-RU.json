@@ -942,6 +942,8 @@
   "preferencesOptionsEmojiReplaceDetail": ":-) → [icon]",
   "preferencesOptionsEnableAgcCheckbox": "Автоматическая регулировка усиления (АРУ)",
   "preferencesOptionsEnableAgcDetails": "Позволяет автоматически регулировать громкость микрофона, чтобы все участники звонка были слышны с одинаковой и комфортной громкостью.",
+  "preferencesOptionsEnableSoundlessIncomingCalls": "Soundless incoming calls",
+  "preferencesOptionsEnableSoundlessIncomingCallsDetails": "This makes the app not ring if you receive another call when you are already in a call.",
   "preferencesOptionsEnableVbrCheckbox": "Кодирование с переменным битрейтом",
   "preferencesOptionsEnableVbrDetails": "Это значительно снижает потребление данных при аудиозвонках и улучшает работу при медленном соединении. Выключите, чтобы использовать кодирование с постоянным битрейтом (CBR). Эта настройка влияет только на звонки 1:1; конференц-звонки всегда используют кодирование CBR.",
   "preferencesOptionsNotifications": "Уведомления",

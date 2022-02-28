@@ -50,7 +50,7 @@
         <!-- ko if: state() === State.PREFERENCES_ACCOUNT -->
           <div id="preferences-account" class="preferences-page preferences-account">
             <account-preferences
-              params="clientRepository: repositories.client, userRepository: repositories.user, propertiesRepository: repositories.properties, conversationRepository: repositories.conversation"
+              params="showDomain: isFederated, clientRepository: repositories.client, userRepository: repositories.user, propertiesRepository: repositories.properties, conversationRepository: repositories.conversation"
             ></account-preferences>
           </div>
         <!-- /ko -->

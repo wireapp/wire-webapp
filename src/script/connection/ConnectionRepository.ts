@@ -181,10 +181,7 @@ export class ConnectionRepository {
    */
   public async createConnection(userEntity: User): Promise<boolean> {
     try {
-      const isFederatedBackend = Config.getConfig().FEATURE.ENABLE_FEDERATION;
-      const response = isFederatedBackend
-        ? await this.connectionService.postFederationConnections(userEntity.qualifiedId)
-        : await this.connectionService.postConnections(userEntity.id, userEntity.name());
+      const response = await this.connectionService.postConnections(userEntity.qualifiedId, userEntity.name());
       const connectionEvent = {connection: response, user: {name: userEntity.name()}};
       await this.onUserConnection(connectionEvent, EventRepository.SOURCE.INJECTED);
       return true;
@@ -233,9 +230,9 @@ export class ConnectionRepository {
    *
    * @returns Promise that resolves when all connections have been retrieved and mapped
    */
-  async getConnections(useFederation: boolean = false): Promise<ConnectionEntity[]> {
+  async getConnections(): Promise<ConnectionEntity[]> {
     try {
-      const connectionData = await this.connectionService.getConnections(useFederation);
+      const connectionData = await this.connectionService.getConnections();
       const newConnectionEntities = ConnectionMapper.mapConnectionsFromJson(connectionData);
       return newConnectionEntities.length
         ? await this.updateConnections(newConnectionEntities)
@@ -302,11 +299,8 @@ export class ConnectionRepository {
    */
   private async updateStatus(userEntity: User, newStatus: ConnectionStatus): Promise<void> {
     const currentStatus = userEntity.connection().status();
-    const isFederated = Config.getConfig().FEATURE.ENABLE_FEDERATION;
     try {
-      const response = isFederated
-        ? await this.connectionService.putFederatedConnections(userEntity.qualifiedId, newStatus)
-        : await this.connectionService.putConnections(userEntity.id, newStatus);
+      const response = await this.connectionService.putConnections(userEntity.qualifiedId, newStatus);
       const connectionEvent = {connection: response, user: {name: userEntity.name()}};
       await this.onUserConnection(connectionEvent, EventRepository.SOURCE.INJECTED);
     } catch (error) {

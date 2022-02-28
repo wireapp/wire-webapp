@@ -110,6 +110,9 @@ export class Configuration {
 
   /** Image MIME types */
   readonly ALLOWED_IMAGE_TYPES = ['image/bmp', 'image/gif', 'image/jpeg', 'image/jpg', 'image/png'];
+
+  /** Which versions of the backend api do we support */
+  readonly SUPPORTED_API_VERSIONS = [0];
 }
 
 let instance: Configuration;

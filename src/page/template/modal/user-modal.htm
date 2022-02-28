@@ -12,7 +12,7 @@
     <div class="modal__body user-modal__wrapper" data-bind="css: {'user-modal__wrapper--max': !user() && !userNotFound() }">
       <!-- ko if: user() -->
         <panel-user-details params="participant: user, isSelfVerified: isSelfVerified, classifiedDomains: classifiedDomains"></panel-user-details>
-        <enriched-fields params="user: user"></enriched-fields>
+        <enriched-fields params="user: user, showDomain: $root.isFederated"></enriched-fields>
         <!-- ko if: user().isBlockedLegalHold() -->
           <div class="modal__message" data-bind="html: blockedForLegalHoldText" data-uie-name="status-blocked-legal-hold"></div>
         <!-- /ko -->

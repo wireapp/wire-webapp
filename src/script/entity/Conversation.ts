@@ -148,7 +148,7 @@ export class Conversation {
   public readonly receiptMode: ko.Observable<RECEIPT_MODE>;
   public readonly removed_from_conversation: ko.PureComputed<boolean>;
   public readonly roles: ko.Observable<Record<string, string>>;
-  public readonly selfUser: ko.Observable<User>;
+  public readonly selfUser: ko.Observable<User | undefined>;
   public readonly servicesCount: ko.PureComputed<number>;
   public readonly showNotificationsEverything: ko.PureComputed<boolean>;
   public readonly showNotificationsMentionsAndReplies: ko.PureComputed<boolean>;
@@ -164,7 +164,6 @@ export class Conversation {
   public accessModes?: CONVERSATION_ACCESS[];
   public accessRole?: CONVERSATION_ACCESS_ROLE | ACCESS_ROLE_V2[];
   public domain: string;
-  public isFederated: ko.PureComputed<boolean>;
 
   static get TIMESTAMP_TYPE(): typeof TIMESTAMP_TYPE {
     return TIMESTAMP_TYPE;
@@ -203,8 +202,8 @@ export class Conversation {
 
     this.inTeam = ko.pureComputed(() => {
       const isSameTeam = this.selfUser()?.teamId === this.team_id;
-      const isSameDomain = !this.isFederated() || this.domain === this.selfUser().domain;
-      return this.team_id && isSameTeam && !this.isGuest() && isSameDomain;
+      const isSameDomain = this.domain === this.selfUser()?.domain;
+      return !!this.team_id && isSameTeam && !this.isGuest() && isSameDomain;
     });
     this.isGuestRoom = ko.pureComputed(() => this.accessState() === ACCESS_STATE.TEAM.GUEST_ROOM);
     this.isGuestAndServicesRoom = ko.pureComputed(() => this.accessState() === ACCESS_STATE.TEAM.GUESTS_SERVICES);
@@ -332,8 +331,6 @@ export class Conversation {
     this.isCreatedBySelf = ko.pureComputed(
       () => this.selfUser().id === this.creator && !this.removed_from_conversation(),
     );
-
-    this.isFederated = ko.pureComputed(() => Config.getConfig().FEATURE.ENABLE_FEDERATION && !!this.domain);
 
     this.showNotificationsEverything = ko.pureComputed(() => {
       return this.notificationState() === NOTIFICATION_STATE.EVERYTHING;
@@ -522,7 +519,7 @@ export class Conversation {
   }
 
   get qualifiedId(): QualifiedId {
-    return {domain: this.isFederated() ? this.domain : '', id: this.id};
+    return {domain: this.domain, id: this.id};
   }
 
   private hasInitializedUsers() {

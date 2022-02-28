@@ -21,24 +21,24 @@ import type {RichInfoField} from '@wireapp/api-client/src/user/RichInfo';
 import React, {useEffect, useState} from 'react';
 import {container} from 'tsyringe';
 
-import {registerReactComponent, useKoSubscribableChildren} from 'Util/ComponentUtil';
+import {registerStaticReactComponent, useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 import {noop} from 'Util/util';
 
 import type {User} from '../../entity/User';
 import {RichProfileRepository} from '../../user/RichProfileRepository';
-import {Config} from '../../Config';
 
 export interface EnrichedFieldsProps {
   onFieldsLoaded?: (richFields: RichInfoField[]) => void;
   richProfileRepository?: RichProfileRepository;
+  showDomain?: boolean;
   user: User;
 }
 
 export const useEnrichedFields = (
   user: User,
-  addEmail: boolean,
-  richProfileRepository: RichProfileRepository,
+  {addEmail, addDomain}: {addDomain: boolean; addEmail: boolean},
+  richProfileRepository: RichProfileRepository = container.resolve(RichProfileRepository),
   onFieldsLoaded: (richFields: RichInfoField[]) => void = noop,
 ) => {
   const [fields, setFields] = useState<RichInfoField[]>([]);
@@ -47,13 +47,11 @@ export const useEnrichedFields = (
     let cancel = false;
     const returnFields: RichInfoField[] = addEmail && email ? [{type: t('userProfileEmail'), value: email}] : [];
 
-    if (Config.getConfig().FEATURE.ENABLE_FEDERATION) {
-      if (user.domain) {
-        returnFields.push({
-          type: t('userProfileDomain'),
-          value: user.domain,
-        });
-      }
+    if (addDomain && user.domain) {
+      returnFields.push({
+        type: t('userProfileDomain'),
+        value: user.domain,
+      });
     }
 
     const loadRichFields = async () => {
@@ -79,10 +77,16 @@ export const useEnrichedFields = (
 
 const EnrichedFields: React.FC<EnrichedFieldsProps> = ({
   onFieldsLoaded = noop,
+  showDomain = false,
   richProfileRepository = container.resolve(RichProfileRepository),
   user,
 }) => {
-  const fields = useEnrichedFields(user, true, richProfileRepository, onFieldsLoaded);
+  const fields = useEnrichedFields(
+    user,
+    {addDomain: showDomain, addEmail: true},
+    richProfileRepository,
+    onFieldsLoaded,
+  );
   return (
     fields && (
       <div className="enriched-fields">
@@ -103,7 +107,4 @@ const EnrichedFields: React.FC<EnrichedFieldsProps> = ({
 
 export default EnrichedFields;
 
-registerReactComponent<EnrichedFieldsProps>('enriched-fields', {
-  component: EnrichedFields,
-  template: '<div data-bind="react: {user: ko.unwrap(user), onFieldsLoaded, richProfileRepository}"></div>',
-});
+registerStaticReactComponent<EnrichedFieldsProps>('enriched-fields', EnrichedFields);

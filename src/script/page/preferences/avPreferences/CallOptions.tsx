@@ -42,6 +42,9 @@ const CallOptions: React.FC<CallOptionsProps> = ({constraintsHandler, properties
     !isCbrEncodingEnforced && propertiesRepository.properties.settings.call.enable_vbr_encoding,
   );
   const [agcEnabled, setAgcEnabled] = useState(constraintsHandler.getAgcPreference());
+  const [soundlessCallsEnabled, setSoundlessCallsEnabled] = useState(
+    propertiesRepository.properties.settings.call.enable_soundless_incoming_calls,
+  );
 
   useEffect(() => {
     const updateProperties = ({settings}: WebappProperties) => {
@@ -76,6 +79,16 @@ const CallOptions: React.FC<CallOptionsProps> = ({constraintsHandler, properties
         onChange={checked => {
           constraintsHandler.setAgcPreference(checked);
           setAgcEnabled(checked);
+        }}
+      />
+      <PreferencesCheckbox
+        uieName="status-preference-soundless-incoming-calls"
+        label={t('preferencesOptionsEnableSoundlessIncomingCalls')}
+        checked={soundlessCallsEnabled}
+        details={t('preferencesOptionsEnableSoundlessIncomingCallsDetails')}
+        onChange={checked => {
+          propertiesRepository.savePreference(PROPERTIES_TYPE.CALL.ENABLE_SOUNDLESS_INCOMING_CALLS, checked);
+          setSoundlessCallsEnabled(checked);
         }}
       />
     </PreferencesSection>
