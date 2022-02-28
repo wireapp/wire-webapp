@@ -18,12 +18,19 @@
  */
 
 import type {APIClient} from '@wireapp/api-client';
-import {ClientMismatch, UserClients} from '@wireapp/api-client/src/conversation';
+import {
+  ClientMismatch,
+  MessageSendingStatus,
+  QualifiedUserClients,
+  UserClients,
+} from '@wireapp/api-client/src/conversation';
 import type {UserPreKeyBundleMap} from '@wireapp/api-client/src/user/';
 import {GenericMessage} from '@wireapp/protocol-messaging';
 
 import {MessageService} from '../conversation/message/MessageService';
+import {flattenQualifiedUserClients} from '../conversation/message/UserClientsUtil';
 import type {CryptographyService} from '../cryptography/';
+import {isQualifiedUserClients} from '../util';
 
 export class BroadcastService {
   private readonly messageService: MessageService;
@@ -70,15 +77,20 @@ export class BroadcastService {
 
   public async broadcastGenericMessage(
     genericMessage: GenericMessage,
-    recipients: UserPreKeyBundleMap | UserClients,
+    recipients: UserPreKeyBundleMap | UserClients | QualifiedUserClients,
     sendAsProtobuf?: boolean,
-    onClientMismatch?: (mismatch: ClientMismatch) => void | boolean | Promise<boolean>,
-  ): Promise<ClientMismatch> {
+    onClientMismatch?: (mismatch: ClientMismatch | MessageSendingStatus) => void | boolean | Promise<boolean>,
+  ) {
     const plainTextArray = GenericMessage.encode(genericMessage).finish();
-    return this.messageService.sendMessage(this.apiClient.validatedClientId, recipients, plainTextArray, {
-      sendAsProtobuf,
-      reportMissing: Object.keys(recipients),
-      onClientMismatch,
-    });
+    return isQualifiedUserClients(recipients)
+      ? this.messageService.sendFederatedMessage(this.apiClient.validatedClientId, recipients, plainTextArray, {
+          reportMissing: flattenQualifiedUserClients(recipients).map(({userId}) => userId),
+          onClientMismatch,
+        })
+      : this.messageService.sendMessage(this.apiClient.validatedClientId, recipients, plainTextArray, {
+          sendAsProtobuf,
+          reportMissing: Object.keys(recipients),
+          onClientMismatch,
+        });
   }
 }
