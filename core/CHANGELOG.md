@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [24.1.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/compare/@wireapp/core@24.0.3...@wireapp/core@24.1.0) (2022-02-28)
+
+
+### Features
+
+* **core:** Allow sending broadcast message to federated env ([#4234](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/issues/4234)) ([ee66d4d](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/commit/ee66d4d269d0af9fdd72d9a20fdfa4cab884cf8d))
+
+
+
+
+
 ## [24.0.3](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/compare/@wireapp/core@24.0.2...@wireapp/core@24.0.3) (2022-02-25)
 
 **Note:** Version bump only for package @wireapp/core
