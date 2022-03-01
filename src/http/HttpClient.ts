@@ -56,6 +56,7 @@ export class HttpClient extends EventEmitter {
   private connectionState: ConnectionState;
   private readonly requestQueue: PriorityQueue;
   public static readonly TOPIC = TOPIC;
+  private versionPrefix = '';
 
   constructor(private readonly config: Config, public accessTokenStore: AccessTokenStore) {
     super();
@@ -94,6 +95,10 @@ export class HttpClient extends EventEmitter {
     });
   }
 
+  public useVersion(version: number): void {
+    this.versionPrefix = version > 0 ? `/v${version}` : '';
+  }
+
   private updateConnectionState(state: ConnectionState): void {
     if (this.connectionState !== state) {
       this.connectionState = state;
@@ -125,6 +130,8 @@ export class HttpClient extends EventEmitter {
     try {
       const response = await this.client.request<T>({
         ...config,
+        // We want to prefix all urls, except the ones with cookies which are attached to unprefixed urls
+        url: config.withCredentials ? config.url : `${this.versionPrefix}${config.url}`,
         maxBodyLength: FILE_SIZE_100_MB,
         maxContentLength: FILE_SIZE_100_MB,
       });
