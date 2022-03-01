@@ -5,11 +5,13 @@ interface CanvasProps {
   onMouseEnter: () => void;
   onMouseLeave: () => void;
   onMouseMove: (event: MouseEvent<HTMLCanvasElement>) => void;
+  sizeX: number;
+  sizeY: number;
   style: CSSProperties;
 }
 
 const Canvas = (props: CanvasProps) => {
-  const {draw, onMouseMove, onMouseEnter, onMouseLeave, style, ...rest} = props;
+  const {draw, onMouseMove, onMouseEnter, onMouseLeave, sizeX, sizeY, style, ...rest} = props;
   const canvasRef = useRef(null);
 
   useEffect(() => {
@@ -31,11 +33,14 @@ const Canvas = (props: CanvasProps) => {
 
   return (
     <canvas
+      height={sizeY}
+      width={sizeX}
       css={{
         alignSelf: 'center',
         backgroundColor: 'white',
-        height: '255px',
-        width: '255px',
+        height: `${sizeY}px`,
+        transition: 'ease-in',
+        width: `${sizeX}px`,
         ...style,
       }}
       onMouseEnter={onMouseEnter}

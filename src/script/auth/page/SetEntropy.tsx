@@ -18,7 +18,7 @@
  */
 
 import {ConsentType} from '@wireapp/api-client/src/self/index';
-import {ContainerXS, H1, Muted, Text} from '@wireapp/react-ui-kit';
+import {CheckRoundIcon, ContainerXS, H1, Muted, Text} from '@wireapp/react-ui-kit';
 import React, {MouseEvent, PointerEvent, useCallback, useEffect, useState} from 'react';
 import {useIntl} from 'react-intl';
 import {connect} from 'react-redux';
@@ -43,9 +43,7 @@ const SetEntropy = ({
   doSetConsent,
   // doSetEntropy,
   hasSelfHandle,
-  hasUnsetMarketingConsent,
-  checkHandles,
-  isFetching,
+
   name,
 }: Props & ConnectedProps & DispatchProps) => {
   const {formatMessage: _} = useIntl();
@@ -65,29 +63,32 @@ const SetEntropy = ({
   const onMouseMove = (event: MouseEvent<HTMLCanvasElement> | PointerEvent<HTMLCanvasElement>) => {
     setError(null);
     setFrameCount(frameCount + 1);
-    event.persist();
-    SetEntropy(entropy => [
-      ...entropy,
-      [event.screenX - window.innerWidth / 2 + 156, event.screenY - window.innerHeight / 2 - 144],
-    ]);
-    // console.log(
-    //   event.screenX,
-    //   event.screenY,
-    //   event.screenX - window.innerWidth / 2 + 144,
-    //   event.screenY - window.innerHeight / 2 - 144,
-    // );
+
+    const newEntropy: [number, number] = [
+      event.pageX - event.currentTarget?.getBoundingClientRect()?.x,
+      event.pageY - event.currentTarget?.getBoundingClientRect()?.y,
+    ];
+    SetEntropy(entropy => [...entropy, newEntropy]);
   };
 
   const draw = useCallback(
     (ctx: CanvasRenderingContext2D) => {
       if (entropy.length > 1 && frameCount > 1) {
         ctx.beginPath();
+        if (!entropy[frameCount - 2]) {
+          ctx.moveTo(...entropy[frameCount - 1]);
+        } else {
+          ctx.moveTo(...entropy[frameCount - 2]);
+        }
         ctx.lineJoin = 'round';
-        ctx.moveTo(...entropy[frameCount - 2]);
         ctx.lineCap = 'round';
         ctx.lineWidth = 2;
         ctx.strokeStyle = 'blue';
-        ctx.lineTo(...entropy[frameCount - 1]);
+        if (!entropy[frameCount - 1]) {
+          ctx.lineTo(...entropy[frameCount - 2]);
+        } else {
+          ctx.lineTo(...entropy[frameCount - 1]);
+        }
         ctx.stroke();
       }
     },
@@ -96,7 +97,7 @@ const SetEntropy = ({
 
   const onSetEntropy = async (): Promise<void> => {
     try {
-      // await doSetEntropy(entropy.trim());
+      // await doSetEntropy(entropy.filter(Boolean));
       alert('entropy');
     } catch (error) {
       if (error.label === BackendError.HANDLE_ERRORS.INVALID_HANDLE) {
@@ -113,34 +114,46 @@ const SetEntropy = ({
     <Page>
       <ContainerXS centerText verticalCenter style={{display: 'flex', flexDirection: 'column', minHeight: 428}}>
         <H1 center>{_(chooseHandleStrings.headline)}</H1>
-        <Muted center>{_(chooseHandleStrings.subhead)}</Muted>
-        <Canvas
-          style={{
-            alignSelf: 'center',
-            backgroundColor: 'white',
-            border: error ? 'red 2px solid' : 'black 2px solid',
-            borderRadius: '5px',
-            height: '255px',
-            width: '255px',
-          }}
-          draw={draw}
-          onMouseMove={onMouseMove}
-          onMouseEnter={() => setPause(false)}
-          onMouseLeave={() => {
-            setPause(true);
-            setError(!error);
-          }}
-          data-uie-name="enter-entropy"
-        />
-        <ProgressBar
-          error={error}
-          width={255}
-          percent={percent}
-          css={{
-            alignSelf: 'center',
-          }}
-        />
-        <Text center>{percent}%</Text>
+        {entropy.length > 300 && percent >= 100 ? (
+          <>
+            <CheckRoundIcon width={64} height={64} css={{alignSelf: 'center', marginBottom: '64px'}} />
+            <Muted center>{_(chooseHandleStrings.subhead)}</Muted>
+          </>
+        ) : (
+          <>
+            <Muted center>{_(chooseHandleStrings.subhead)}</Muted>
+            <Canvas
+              sizeX={255}
+              sizeY={255}
+              style={{
+                alignSelf: 'center',
+                backgroundColor: 'white',
+                border: error ? 'red 2px solid' : 'black 2px solid',
+                borderRadius: '5px',
+                height: '255px',
+                width: '255px',
+              }}
+              draw={draw}
+              onMouseMove={onMouseMove}
+              onMouseEnter={() => setPause(false)}
+              onMouseLeave={() => {
+                setPause(true);
+                setError(!error);
+                SetEntropy([...entropy, null]);
+              }}
+              data-uie-name="enter-entropy"
+            />
+            <ProgressBar
+              error={error}
+              width={255}
+              percent={percent}
+              css={{
+                alignSelf: 'center',
+              }}
+            />
+            <Text center>{percent}%</Text>
+          </>
+        )}
       </ContainerXS>
     </Page>
   );
