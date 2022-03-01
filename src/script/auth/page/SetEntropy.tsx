@@ -34,6 +34,7 @@ import {RootState, bindActionCreators} from '../module/reducer';
 import * as SelfSelector from '../module/selector/SelfSelector';
 import {ROUTE} from '../route';
 import Page from './Page';
+import {ProgressBar} from '../component/ProgressBar';
 
 interface Props extends React.HTMLProps<HTMLDivElement> {}
 
@@ -67,7 +68,7 @@ const SetEntropy = ({
     event.persist();
     SetEntropy(entropy => [
       ...entropy,
-      [event.screenX - window.innerWidth / 2 + 144, event.screenY - window.innerHeight / 2 - 144],
+      [event.screenX - window.innerWidth / 2 + 156, event.screenY - window.innerHeight / 2 - 144],
     ]);
     // console.log(
     //   event.screenX,
@@ -131,7 +132,14 @@ const SetEntropy = ({
           }}
           data-uie-name="enter-entropy"
         />
-        <progress></progress>
+        <ProgressBar
+          error={error}
+          width={255}
+          percent={percent}
+          css={{
+            alignSelf: 'center',
+          }}
+        />
         <Text center>{percent}%</Text>
       </ContainerXS>
     </Page>

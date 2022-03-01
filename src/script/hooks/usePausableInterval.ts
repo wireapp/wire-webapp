@@ -21,9 +21,9 @@ import {useRef, useEffect} from 'react';
 
 export const usePausableInterval = (callback: () => void, timer: number, pause: boolean) => {
   const intervalIdRef = useRef<() => void>();
-  const totalTimeRun = useRef<number>(0);
+  const totalTimeRun = useRef(0);
   const intervalId = useRef<number>();
-  const startTime = useRef<number>(new Date().getTime());
+  const startTime = useRef(new Date().getTime());
 
   useEffect(() => {
     intervalIdRef.current = callback;
@@ -36,15 +36,16 @@ export const usePausableInterval = (callback: () => void, timer: number, pause: 
 
     if (timer !== null) {
       if (pause === false) {
-        startTime.current = new Date().getTime();
-        intervalId.current = window.setInterval(
-          fn,
-          timer - totalTimeRun.current < timer ? timer : timer - totalTimeRun.current,
-        );
+        intervalId.current = window.setTimeout(function interval() {
+          startTime.current = new Date().getTime();
+          fn();
+          intervalId.current = window.setTimeout(interval, timer);
+        }, timer - totalTimeRun.current);
+        totalTimeRun.current = 0;
       }
       if (pause === true) {
         totalTimeRun.current = new Date().getTime() - startTime.current;
-        clearInterval(intervalId.current);
+        clearTimeout(intervalId.current);
       }
     }
   }, [timer, pause]);
