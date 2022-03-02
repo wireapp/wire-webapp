@@ -39,7 +39,7 @@
     "dotenv": "10.0.0",
     "istanbul": "1.1.0-alpha.1",
     "jasmine": "3.8.0",
-    "karma": "6.3.14",
+    "karma": "6.3.16",
     "karma-chrome-launcher": "3.1.0",
     "karma-jasmine": "4.0.1",
     "karma-jasmine-diff-reporter": "2.0.1",
