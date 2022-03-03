@@ -34,7 +34,9 @@
           #include('content/collection.htm')
         <!-- /ko -->
         <!-- ko if: state() === State.COLLECTION_DETAILS -->
-          #include('content/collection-details.htm')
+          <!-- ko with: $root.collectionDetails -->
+          <collection-details params="conversation: conversation, category: category, messages: messages"></collection-details>
+          <!-- /ko -->
         <!-- /ko -->
         <!-- ko if: state() === State.HISTORY_EXPORT -->
           #include('content/history-export.htm')

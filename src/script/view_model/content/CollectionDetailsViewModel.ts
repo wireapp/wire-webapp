@@ -21,140 +21,22 @@ import {amplify} from 'amplify';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import ko from 'knockout';
 
-import {getLogger, Logger} from 'Util/Logger';
-import {isToday, isThisYear, isSameDay, isSameMonth, formatLocale} from 'Util/TimeUtil';
-import {koPushDeferred} from 'Util/util';
-import {t} from 'Util/LocalizerUtil';
-
 import {ContentMessage} from '../../entity/message/ContentMessage';
-import {ContentViewModel} from '../ContentViewModel';
 import {Conversation} from '../../entity/Conversation';
-import {MessageCategory} from '../../message/MessageCategory';
 
 // Parent: ContentViewModel
 export class CollectionDetailsViewModel {
-  logger: Logger;
-  template: ko.Observable<string>;
-  conversationEntity: ko.Observable<Conversation>;
-  items: ko.ObservableArray<ContentMessage>;
-  lastMessageTimestamp: any;
-  MessageCategory: typeof MessageCategory;
-
-  constructor() {
-    this.logger = getLogger('CollectionDetailsViewModel');
-
-    this.template = ko.observable();
-    this.conversationEntity = ko.observable();
-
-    this.items = ko.observableArray();
-
-    this.lastMessageTimestamp = undefined;
-    this.MessageCategory = MessageCategory;
-  }
+  category: ko.Observable<string> = ko.observable();
+  messages: ko.Observable<ContentMessage[]> = ko.observable();
+  conversation: ko.Observable<Conversation> = ko.observable();
 
   readonly setConversation = (conversationEntity: Conversation, category: string, items: ContentMessage[]) => {
-    amplify.subscribe(WebAppEvents.CONVERSATION.EPHEMERAL_MESSAGE_TIMEOUT, this.messageRemoved);
-    amplify.subscribe(WebAppEvents.CONVERSATION.MESSAGE.ADDED, this.itemAdded);
-    amplify.subscribe(WebAppEvents.CONVERSATION.MESSAGE.REMOVED, this.itemRemoved);
-    this.template(category);
-    this.conversationEntity(conversationEntity);
-    koPushDeferred(this.items, items);
+    this.conversation(conversationEntity);
+    this.category(category);
+    this.messages(items);
   };
-
-  readonly itemAdded = (messageEntity: ContentMessage) => {
-    const isCurrentConversation = this.conversationEntity().id === messageEntity.conversation_id;
-    if (isCurrentConversation) {
-      switch (this.template()) {
-        case 'images': {
-          const isImage = messageEntity.category & MessageCategory.IMAGE;
-          const isGif = messageEntity.category & MessageCategory.GIF;
-          if (isImage && !isGif) {
-            this.items.push(messageEntity);
-          }
-          break;
-        }
-
-        case 'files': {
-          const isFile = messageEntity.category & MessageCategory.FILE;
-          if (isFile) {
-            this.items.push(messageEntity);
-          }
-          break;
-        }
-
-        case 'links':
-          const isLinkPreview = messageEntity.category & MessageCategory.LINK_PREVIEW;
-          if (isLinkPreview) {
-            this.items.push(messageEntity);
-          }
-          break;
-
-        default:
-          break;
-      }
-    }
-  };
-
-  readonly itemRemoved = (messageId: string, conversationId: string) => {
-    const isCurrentConversation = this.conversationEntity().id === conversationId;
-    if (isCurrentConversation) {
-      this.items.remove(messageEntity => messageEntity.id === messageId);
-      if (!this.items().length) {
-        this.clickOnBackButton();
-      }
-    }
-  };
-
-  readonly messageRemoved = (messageEntity: ContentMessage) => {
-    this.itemRemoved(messageEntity.id, messageEntity.conversation_id);
-  };
-
-  readonly removedFromView = () => {
-    amplify.unsubscribe(WebAppEvents.CONVERSATION.EPHEMERAL_MESSAGE_TIMEOUT, this.messageRemoved);
-    amplify.unsubscribe(WebAppEvents.CONVERSATION.MESSAGE.ADDED, this.itemAdded);
-    amplify.unsubscribe(WebAppEvents.CONVERSATION.MESSAGE.REMOVED, this.itemRemoved);
-    this.lastMessageTimestamp = undefined;
-    this.conversationEntity(null);
-    this.items.removeAll();
-  };
-
-  clickOnBackButton() {
-    amplify.publish(WebAppEvents.CONTENT.SWITCH, ContentViewModel.STATE.COLLECTION);
-  }
 
   clickOnImage(messageEntity: ContentMessage) {
     amplify.publish(WebAppEvents.CONVERSATION.DETAIL_VIEW.SHOW, messageEntity, this.items(), 'collection');
-  }
-
-  shouldShowHeader(messageEntity: ContentMessage) {
-    if (!this.lastMessageTimestamp) {
-      this.lastMessageTimestamp = messageEntity.timestamp();
-      return true;
-    }
-
-    // We passed today
-    const sameDay = isSameDay(messageEntity.timestamp(), this.lastMessageTimestamp);
-    const wasToday = isToday(this.lastMessageTimestamp);
-    if (!sameDay && wasToday) {
-      this.lastMessageTimestamp = messageEntity.timestamp();
-      return true;
-    }
-
-    // We passed the month
-    const sameMonth = isSameMonth(messageEntity.timestamp(), this.lastMessageTimestamp);
-    if (!sameMonth) {
-      this.lastMessageTimestamp = messageEntity.timestamp();
-      return true;
-    }
-
-    return false;
-  }
-
-  getTitleForHeader(messageEntity: ContentMessage) {
-    const messageDate = messageEntity.timestamp();
-    if (isToday(messageDate)) {
-      return t('conversationToday');
-    }
-    return isThisYear(messageDate) ? formatLocale(messageDate, 'MMMM') : formatLocale(messageDate, 'MMMM y');
   }
 }
