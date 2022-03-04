@@ -24,6 +24,7 @@ export const Segmentation = {
     DURATION: 'call_duration',
     END_REASON: 'call_end_reason',
     PARTICIPANTS: 'call_participants',
+    REASON: 'reason', // This has to be in sync with ios
     SCREEN_SHARE: 'call_screen_share',
     SETUP_TIME: 'call_setup_time',
     VIDEO: 'call_video',
