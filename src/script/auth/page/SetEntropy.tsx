@@ -18,8 +18,8 @@
  */
 
 import {ConsentType} from '@wireapp/api-client/src/self/index';
-import {CheckRoundIcon, ContainerXS, H1, Muted, Text} from '@wireapp/react-ui-kit';
-import React, {MouseEvent, PointerEvent, useCallback, useEffect, useState} from 'react';
+import {CheckRoundIcon, ContainerXS, H1, Muted, Text, useTimeout} from '@wireapp/react-ui-kit';
+import React, {MouseEvent, PointerEvent, useCallback, useState} from 'react';
 import {useIntl} from 'react-intl';
 import {connect} from 'react-redux';
 import {AnyAction, Dispatch} from 'redux';
@@ -38,27 +38,14 @@ import {ProgressBar} from '../component/ProgressBar';
 
 interface Props extends React.HTMLProps<HTMLDivElement> {}
 
-const SetEntropy = ({
-  doGetConsents,
-  doSetConsent,
-  // doSetEntropy,
-  hasSelfHandle,
-
-  name,
-}: Props & ConnectedProps & DispatchProps) => {
+const SetEntropy = ({doSetEntropy, hasSelfHandle}: Props & ConnectedProps & DispatchProps) => {
   const {formatMessage: _} = useIntl();
   const {history} = useReactRouter();
   const [error, setError] = useState(null);
   const [frameCount, setFrameCount] = useState(0);
-  const [entropy, SetEntropy] = useState<[number, number][]>([]);
+  const [entropy, setEntropy] = useState<[number, number][]>([]);
   const [percent, setPercent] = useState(0);
   const [pause, setPause] = useState(true);
-
-  useEffect(() => {
-    if (hasSelfHandle) {
-      history.push(ROUTE.INITIAL_INVITE);
-    }
-  }, [hasSelfHandle]);
 
   const onMouseMove = (event: MouseEvent<HTMLCanvasElement> | PointerEvent<HTMLCanvasElement>) => {
     setError(null);
@@ -68,7 +55,7 @@ const SetEntropy = ({
       event.pageX - event.currentTarget?.getBoundingClientRect()?.x,
       event.pageY - event.currentTarget?.getBoundingClientRect()?.y,
     ];
-    SetEntropy(entropy => [...entropy, newEntropy]);
+    setEntropy(entropy => [...entropy, newEntropy]);
   };
 
   const draw = useCallback(
@@ -97,8 +84,9 @@ const SetEntropy = ({
 
   const onSetEntropy = async (): Promise<void> => {
     try {
-      // await doSetEntropy(entropy.filter(Boolean));
-      alert('entropy');
+      await doSetEntropy(new Uint8Array(entropy.filter(Boolean).flat()));
+      // console.log(new Uint8Array(entropy.flat()));
+      useTimeout(() => history.push(ROUTE.VERIFY_EMAIL_CODE), 10000);
     } catch (error) {
       if (error.label === BackendError.HANDLE_ERRORS.INVALID_HANDLE) {
         error.label = BackendError.HANDLE_ERRORS.HANDLE_TOO_SHORT;
@@ -123,8 +111,8 @@ const SetEntropy = ({
           <>
             <Muted center>{_(chooseHandleStrings.subhead)}</Muted>
             <Canvas
-              sizeX={255}
-              sizeY={255}
+              sizeX={256}
+              sizeY={256}
               style={{
                 alignSelf: 'center',
                 backgroundColor: 'white',
@@ -139,13 +127,13 @@ const SetEntropy = ({
               onMouseLeave={() => {
                 setPause(true);
                 setError(!error);
-                SetEntropy([...entropy, null]);
+                setEntropy([...entropy, null]);
               }}
               data-uie-name="enter-entropy"
             />
             <ProgressBar
               error={error}
-              width={255}
+              width={256}
               percent={percent}
               css={{
                 alignSelf: 'center',
@@ -171,10 +159,7 @@ type DispatchProps = ReturnType<typeof mapDispatchToProps>;
 const mapDispatchToProps = (dispatch: Dispatch<AnyAction>) =>
   bindActionCreators(
     {
-      checkHandles: ROOT_ACTIONS.userAction.checkHandles,
-      doGetConsents: ROOT_ACTIONS.selfAction.doGetConsents,
-      doSetConsent: ROOT_ACTIONS.selfAction.doSetConsent,
-      // doSetEntropy: ROOT_ACTIONS.selfAction.SetEntropy,
+      doSetEntropy: ROOT_ACTIONS.authAction.doSetEntropy,
     },
     dispatch,
   );

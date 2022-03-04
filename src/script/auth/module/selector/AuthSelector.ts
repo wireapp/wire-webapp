@@ -60,6 +60,7 @@ export const hasDefaultSSOCode = (state: RootState) => !!state.authState.ssoSett
 export const getError = (state: RootState) => state.authState.error;
 export const getLoginData = (state: RootState) => state.authState.loginData;
 export const getCurrentFlow = (state: RootState) => state.authState.currentFlow;
+export const getEntropy = (state: RootState) => state.authState.entropy;
 export const getAccount = (state: RootState): RegistrationDataState => state.authState.account || unsetRegistrationData;
 export const getAccountTeam = (state: RootState) => getAccount(state).team || unsetTeam;
 export const getAccountTeamName = (state: RootState) => getAccountTeam(state).name;

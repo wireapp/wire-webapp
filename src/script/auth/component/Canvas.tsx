@@ -39,7 +39,7 @@ const Canvas = (props: CanvasProps) => {
         alignSelf: 'center',
         backgroundColor: 'white',
         height: `${sizeY}px`,
-        transition: 'ease-in',
+        transition: '0.5s ease-in',
         width: `${sizeX}px`,
         ...style,
       }}

@@ -33,7 +33,6 @@ import React, {useEffect, useState} from 'react';
 import {useIntl} from 'react-intl';
 import {connect} from 'react-redux';
 import {AnyAction, Dispatch} from 'redux';
-import {Config} from '../../Config';
 import useReactRouter from 'use-react-router';
 import {chooseHandleStrings} from '../../strings';
 import AcceptNewsModal from '../component/AcceptNewsModal';
@@ -65,11 +64,7 @@ const SetHandle = ({
 
   useEffect(() => {
     if (hasSelfHandle) {
-      if (Config.getConfig().FEATURE.ENABLE_EXTRA_CLIENT_ENTROPY) {
-        history.push(ROUTE.SET_ENTROPY);
-      } else {
-        history.push(ROUTE.INITIAL_INVITE);
-      }
+      history.push(ROUTE.INITIAL_INVITE);
     }
   }, [hasSelfHandle]);
 

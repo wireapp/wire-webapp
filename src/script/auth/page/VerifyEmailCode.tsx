@@ -46,6 +46,7 @@ const VerifyEmailCode = ({
   account,
   authError,
   currentFlow,
+  entropy,
   doRegisterPersonal,
   doRegisterTeam,
   doSendActivationCode,
@@ -125,6 +126,7 @@ const mapStateToProps = (state: RootState) => ({
   account: AuthSelector.getAccount(state),
   authError: AuthSelector.getError(state),
   currentFlow: AuthSelector.getCurrentFlow(state),
+  entropy: AuthSelector.getEntropy(state),
 });
 
 type DispatchProps = ReturnType<typeof mapDispatchToProps>;

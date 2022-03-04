@@ -213,6 +213,12 @@ export class AuthAction {
     };
   };
 
+  doSetEntropy = (entropy: Uint8Array): ThunkAction => {
+    return async dispatch => {
+      dispatch(AuthActionCreator.pushEntropyData(entropy));
+    };
+  };
+
   doRegisterTeam = (registration: RegisterData): ThunkAction => {
     return async (
       dispatch,

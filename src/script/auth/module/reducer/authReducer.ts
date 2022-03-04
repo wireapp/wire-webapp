@@ -46,6 +46,7 @@ export interface RegistrationDataState {
 export type AuthState = {
   readonly account: RegistrationDataState;
   readonly currentFlow: string;
+  readonly entropy?: Uint8Array;
   readonly error: Error;
   readonly fetched: boolean;
   readonly fetching: boolean;
@@ -72,6 +73,7 @@ export const initialAuthState: AuthState = {
     termsAccepted: false,
   },
   currentFlow: null,
+  entropy: null,
   error: null,
   fetched: false,
   fetching: false,
@@ -160,6 +162,9 @@ export function authReducer(state: AuthState = initialAuthState, action: AppActi
     }
     case AUTH_ACTION.REGISTER_PUSH_ACCOUNT_DATA: {
       return {...state, account: {...state.account, ...action.payload}, error: null};
+    }
+    case AUTH_ACTION.REGISTER_PUSH_ENTROPY_DATA: {
+      return {...state, entropy: action.payload, error: null};
     }
     case AUTH_ACTION.REGISTER_RESET_ACCOUNT_DATA: {
       return {...state, account: {...initialAuthState.account}, error: null};
