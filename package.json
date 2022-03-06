@@ -145,7 +145,7 @@
     "less": "3.13.1",
     "lint-staged": "12.3.5",
     "load-grunt-tasks": "5.1.0",
-    "node-fetch": "2.6.7",
+    "node-fetch": "3.2.1",
     "node-sass": "7.0.1",
     "os-browserify": "0.3.0",
     "path-browserify": "1.0.1",
