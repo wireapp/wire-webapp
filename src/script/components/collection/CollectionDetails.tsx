@@ -23,21 +23,14 @@ import {Conversation} from '../../entity/Conversation';
 import {useFadingScrollbar} from '../../ui/fadingScrollbar';
 import useEffectRef from 'Util/useEffectRef';
 
-import Image from 'Components/Image';
-import FileAssetComponent from 'Components/MessagesList/Message/ContentMessage/asset/FileAssetComponent';
-import AudioAsset from 'Components/MessagesList/Message/ContentMessage/asset/AudioAsset';
-import LinkPreviewAssetComponent from 'Components/MessagesList/Message/ContentMessage/asset/LinkPreviewAssetComponent';
-
-import {MessageCategory} from '../../message/MessageCategory';
 import {ContentMessage} from 'src/script/entity/message/ContentMessage';
-import {MediumImage} from 'src/script/entity/message/MediumImage';
 import {isToday, isThisYear, formatLocale} from 'Util/TimeUtil';
 import {amplify} from 'amplify';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import {ContentViewModel} from '../../view_model/ContentViewModel';
 import {t} from 'Util/LocalizerUtil';
+import {CollectionItem, isOfCategory, Category} from './CollectionItem';
 
-type Category = 'images' | 'links' | 'files' | 'audio' | 'video';
 interface CollectionDetailsProps {
   category: Category;
   conversation: Conversation;
@@ -62,50 +55,6 @@ const groupByDate = (messages: ContentMessage[]): GroupedCollection => {
       return groups;
     }, {}),
   );
-};
-
-const isOfCategory = (category: Category, message: ContentMessage) => {
-  switch (category) {
-    case 'images':
-      return message.category & MessageCategory.IMAGE;
-    case 'links':
-      return message.category & MessageCategory.LINK_PREVIEW;
-    case 'files':
-      return message.getFirstAsset().isFile();
-    case 'audio':
-      return message.getFirstAsset().isAudio();
-    case 'video':
-      return message.getFirstAsset().isVideo();
-    default:
-      return false;
-  }
-};
-
-const CollectionItem: React.FC<{allMessages: ContentMessage[]; message: ContentMessage}> = ({message, allMessages}) => {
-  if (isOfCategory('images', message)) {
-    return (
-      <Image
-        className="collection-image"
-        asset={(message.getFirstAsset() as MediumImage).resource()}
-        click={() => {
-          amplify.publish(WebAppEvents.CONVERSATION.DETAIL_VIEW.SHOW, message, allMessages, 'collection');
-        }}
-      />
-    );
-  }
-  if (isOfCategory('links', message)) {
-    return <LinkPreviewAssetComponent message={message} header={true} />;
-  }
-  if (isOfCategory('files', message)) {
-    return <FileAssetComponent className="collection-file" message={message} header={true} />;
-  }
-  if (isOfCategory('audio', message)) {
-    return <AudioAsset className="collection-file" message={message} hasHeader={true} />;
-  }
-  if (isOfCategory('video', message)) {
-    return <FileAssetComponent className="collection-file" message={message} hasHeader={true} />;
-  }
-  return null;
 };
 
 const CollectionDetails: React.FC<CollectionDetailsProps> = ({conversation, category, messages: initialMessages}) => {
