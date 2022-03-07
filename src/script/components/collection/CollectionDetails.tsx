@@ -69,7 +69,7 @@ const isOfCategory = (category: Category, message: ContentMessage) => {
     case 'images':
       return message.category & MessageCategory.IMAGE;
     case 'links':
-      return message.category & MessageCategory.LINK;
+      return message.category & MessageCategory.LINK_PREVIEW;
     case 'files':
       return message.getFirstAsset().isFile();
     case 'audio':
@@ -81,13 +81,15 @@ const isOfCategory = (category: Category, message: ContentMessage) => {
   }
 };
 
-const CollectionItem: React.FC<{message: ContentMessage}> = ({message}) => {
+const CollectionItem: React.FC<{allMessages: ContentMessage[]; message: ContentMessage}> = ({message, allMessages}) => {
   if (isOfCategory('images', message)) {
     return (
       <Image
         className="collection-image"
         asset={(message.getFirstAsset() as MediumImage).resource()}
-        click={() => {} /*function() {$parent.clickOnImage(messageEntity)}*/}
+        click={() => {
+          amplify.publish(WebAppEvents.CONVERSATION.DETAIL_VIEW.SHOW, message, allMessages, 'collection');
+        }}
       />
     );
   }
@@ -112,6 +114,10 @@ const CollectionDetails: React.FC<CollectionDetailsProps> = ({conversation, cate
   const [messages, setMessages] = useState<ContentMessage[]>(initialMessages);
   useFadingScrollbar(scrollbarRef);
 
+  const goBack = () => {
+    amplify.publish(WebAppEvents.CONTENT.SWITCH, ContentViewModel.STATE.COLLECTION);
+  };
+
   useEffect(() => {
     const addItem = (message: ContentMessage) => {
       if (!isOfCategory(category, message)) {
@@ -125,8 +131,12 @@ const CollectionDetails: React.FC<CollectionDetailsProps> = ({conversation, cate
         // A message from a different converation, nothing to do
         return;
       }
-      // TODO if empty, go back
-      setMessages(messages.filter(message => message.id !== messageId));
+      const newMessageList = messages.filter(message => message.id !== messageId);
+      if (newMessageList.length === 0) {
+        // If there are no messages left, go back
+        return goBack();
+      }
+      setMessages(newMessageList);
     };
 
     const removeMessage = (message: ContentMessage) => {
@@ -150,9 +160,7 @@ const CollectionDetails: React.FC<CollectionDetailsProps> = ({conversation, cate
           <span
             className="content-titlebar-icon icon-back"
             data-uie-name="do-collection-details-close"
-            onClick={() => {
-              amplify.publish(WebAppEvents.CONTENT.SWITCH, ContentViewModel.STATE.COLLECTION);
-            }}
+            onClick={goBack}
           ></span>
         </div>
         <span className="content-titlebar-items-center" data-uie-name="collection-details-conversation-name">
@@ -161,18 +169,19 @@ const CollectionDetails: React.FC<CollectionDetailsProps> = ({conversation, cate
       </div>
 
       <div className="content-list-wrapper">
-        <div className="content-list collection-list" ref={setScrollbarRef}></div>
-        <div className="collection-images">
-          {groupByDate(messages).map(([groupName, groupMessages]) => {
-            return (
-              <Fragment key={groupName}>
-                <header className="collection-date-separator">{groupName}</header>
-                {groupMessages.map(message => (
-                  <CollectionItem message={message} key={message.id} />
-                ))}
-              </Fragment>
-            );
-          })}
+        <div className="content-list collection-list" ref={setScrollbarRef}>
+          <div className="collection-images">
+            {groupByDate(messages).map(([groupName, groupMessages]) => {
+              return (
+                <Fragment key={groupName}>
+                  <header className="collection-date-separator">{groupName}</header>
+                  {groupMessages.map(message => (
+                    <CollectionItem message={message} key={message.id} allMessages={messages} />
+                  ))}
+                </Fragment>
+              );
+            })}
+          </div>
         </div>
       </div>
     </div>

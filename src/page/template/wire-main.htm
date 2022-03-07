@@ -34,8 +34,10 @@
           #include('content/collection.htm')
         <!-- /ko -->
         <!-- ko if: state() === State.COLLECTION_DETAILS -->
-          <!-- ko with: $root.collectionDetails -->
-          <collection-details params="conversation: conversation, category: category, messages: messages"></collection-details>
+          <!-- ko with: $root.collection -->
+            <!-- ko if: details -->
+            <collection-details params="conversation: conversationEntity, category: details().category, messages: details().messages"></collection-details>
+            <!-- /ko -->
           <!-- /ko -->
         <!-- /ko -->
         <!-- ko if: state() === State.HISTORY_EXPORT -->
