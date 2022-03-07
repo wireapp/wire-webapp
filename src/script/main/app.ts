@@ -408,7 +408,7 @@ class App {
       telemetry.timeStep(AppInitTimingsStep.RECEIVED_ACCESS_TOKEN);
       const {clientType} = await authRepository.init();
       const selfUser = await this.initiateSelfUser();
-      if (this.apiClient.backendFeatures.federationEndpoints) {
+      if (this.apiClient.backendFeatures.isFederated) {
         // Migrate all existing session to fully qualified ids (if need be)
         await migrateToQualifiedSessionIds(
           this.repository.storage.storageService.db.sessions,
