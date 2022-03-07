@@ -3,6 +3,22 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [24.2.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/compare/@wireapp/core@24.1.1...@wireapp/core@24.2.0) (2022-03-07)
+
+
+### Bug Fixes
+
+* **core:** Do not use qualified session ids in non-federated env ([#4237](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/issues/4237)) ([ad9e6d0](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/commit/ad9e6d0e903c42674aa7f60038463e3c1dfeb5e4))
+
+
+### Features
+
+* **api-client:** Send federated broadcast messages ([#4235](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/issues/4235)) ([4e437a5](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/commit/4e437a5c60a0c801d2ce10d802f100d7ac9c6f6b))
+
+
+
+
+
 ## [24.1.1](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/compare/@wireapp/core@24.1.0...@wireapp/core@24.1.1) (2022-03-01)
 
 **Note:** Version bump only for package @wireapp/core
