@@ -3,7 +3,7 @@
     "jasmine": true,
     "jest/globals": true
   },
-  "extends": ["@wireapp/eslint-config", "plugin:jest/recommended"],
+  "extends": ["@wireapp/eslint-config", "plugin:jest/recommended", "plugin:jsx-a11y/recommended"],
   "globals": {
     "$": true,
     "amplify": true,
@@ -55,6 +55,16 @@
     "jest/no-done-callback": "warn",
     "jest/no-disabled-tests": "warn",
     "jest/no-conditional-expect": "warn",
-    "sort-keys-fix/sort-keys-fix": "warn"
+    "sort-keys-fix/sort-keys-fix": "warn",
+    "jsx-a11y/click-events-have-key-events": "warn",
+    "jsx-a11y/no-static-element-interactions": "warn",
+    "jsx-a11y/interactive-supports-focus": "warn",
+    "jsx-a11y/no-autofocus": "warn",
+    "jsx-a11y/anchor-is-valid": "warn",
+    "jsx-a11y/label-has-associated-control": "warn",
+    "jsx-a11y/no-noninteractive-element-interactions": "warn",
+    "jsx-a11y/media-has-caption": "warn",
+    "jsx-a11y/alt-text": "warn",
+    "jsx-a11y/tabindex-no-positive": "warn"
   }
 }
