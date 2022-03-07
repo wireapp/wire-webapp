@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [18.3.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/compare/@wireapp/api-client@18.2.0...@wireapp/api-client@18.3.0) (2022-03-07)
+
+
+### Features
+
+* **api-client:** Send federated broadcast messages ([#4235](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/issues/4235)) ([4e437a5](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/commit/4e437a5c60a0c801d2ce10d802f100d7ac9c6f6b))
+
+
+
+
+
 # [18.2.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/compare/@wireapp/api-client@18.1.0...@wireapp/api-client@18.2.0) (2022-03-01)
 
 
