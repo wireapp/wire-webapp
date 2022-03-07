@@ -179,6 +179,7 @@ export class ConversationRepository {
       const {missingClients, deletedClients, emptyUsers, missingUserIds} = extractClientDiff(
         mismatch,
         conversation?.allUserEntities,
+        this.core.backendFeatures.federationEndpoints ? userState.self().domain : '',
       );
 
       if (conversation && missingUserIds.length) {
@@ -379,13 +380,20 @@ export class ConversationRepository {
     options: Partial<NewConversation> = {},
   ): Promise<Conversation | undefined> {
     const userIds = userEntities.map(user => user.qualifiedId);
+    const usersPayload = this.core.backendFeatures.federationEndpoints
+      ? {
+          qualified_users: userIds,
+          users: [] as string[],
+        }
+      : {
+          users: userIds.map(({id}) => id),
+        };
 
     let payload: NewConversation & {conversation_role: string} = {
       conversation_role: DefaultRole.WIRE_MEMBER,
       name: groupName,
-      qualified_users: this.core.backendFeatures.federationEndpoints ? userIds : undefined,
       receipt_mode: null,
-      users: userIds.map(({id}) => id),
+      ...usersPayload,
       ...options,
     };
 
