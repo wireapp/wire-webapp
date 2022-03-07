@@ -193,16 +193,21 @@ export class Account extends EventEmitter {
   }
 
   public async initServices(storeEngine: CRUDEngine): Promise<void> {
-    const config = {useQualifiedIds: this.apiClient.backendFeatures.federationEndpoints};
     const accountService = new AccountService(this.apiClient);
     const assetService = new AssetService(this.apiClient);
-    const cryptographyService = new CryptographyService(this.apiClient, storeEngine, config);
+    const cryptographyService = new CryptographyService(this.apiClient, storeEngine, {
+      // We want to encrypt with fully qualified session ids, only if the backend is federated with other backends
+      useQualifiedIds: this.backendFeatures.isFederated,
+    });
 
     const clientService = new ClientService(this.apiClient, storeEngine, cryptographyService);
     const connectionService = new ConnectionService(this.apiClient);
     const giphyService = new GiphyService(this.apiClient);
     const linkPreviewService = new LinkPreviewService(assetService);
-    const conversationService = new ConversationService(this.apiClient, cryptographyService, config);
+    const conversationService = new ConversationService(this.apiClient, cryptographyService, {
+      // We can use qualified ids to send messages as long as the backend supports federated endpoints
+      useQualifiedIds: this.backendFeatures.federationEndpoints,
+    });
     const notificationService = new NotificationService(this.apiClient, cryptographyService, storeEngine);
     const selfService = new SelfService(this.apiClient);
     const teamService = new TeamService(this.apiClient);
