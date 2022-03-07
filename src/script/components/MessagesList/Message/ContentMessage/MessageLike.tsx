@@ -33,7 +33,7 @@ const MessageLike: React.FC<MessageLikeProps> = ({message, onLike, className}) =
   const {is_liked: isLiked} = useKoSubscribableChildren(message, ['is_liked']);
 
   return (
-    <span
+    <button
       className={cx(className, {
         'like-button-liked': isLiked,
       })}
@@ -42,11 +42,13 @@ const MessageLike: React.FC<MessageLikeProps> = ({message, onLike, className}) =
       }}
       data-uie-name="do-like-message"
       data-uie-value={isLiked}
+      aria-label={isLiked ? 'Liked' : 'Like'}
       onClick={() => onLike(message)}
+      type="button"
     >
       <span className="icon-like-small"></span>
       <span className="icon-liked-small"></span>
-    </span>
+    </button>
   );
 };
 
