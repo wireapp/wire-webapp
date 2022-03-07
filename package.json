@@ -180,7 +180,8 @@
     "wrtc": "0.4.7"
   },
   "engines": {
-    "yarn": ">= 1.0.0"
+    "yarn": ">= 1.0.0",
+    "node": ">=15 <17"
   },
   "license": "GPL-3.0",
   "lint-staged": {
