@@ -211,8 +211,7 @@ export class MessageService {
     }
 
     if (!options.conversationId) {
-      //TODO implement federated broadcast sending
-      throw new Error('Unimplemented federated broadcast');
+      return this.apiClient.api.broadcast.postBroadcastFederatedMessage(sendingClientId, protoMessage);
     }
 
     const {id, domain} = options.conversationId;

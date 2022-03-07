@@ -185,6 +185,7 @@ export class APIClient extends EventEmitter {
   }
 
   private configureApis(backendFeatures: BackendFeatures): Apis {
+    this.logger.info('configuring APIs with config', backendFeatures);
     return {
       account: new AccountAPI(this.transport.http),
       asset: new AssetAPI(this.transport.http),
@@ -242,9 +243,7 @@ export class APIClient extends EventEmitter {
     }
     let backendVersions: BackendVersionResponse = {supported: [0]};
     try {
-      backendVersions = await (
-        await this.transport.http.sendRequest<BackendVersionResponse>({url: '/api-version'})
-      ).data;
+      backendVersions = (await this.transport.http.sendRequest<BackendVersionResponse>({url: '/api-version'})).data;
     } catch (error) {}
     const highestCommonVersion = backendVersions.supported
       .sort()

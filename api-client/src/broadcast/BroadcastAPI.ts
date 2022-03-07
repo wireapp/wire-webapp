@@ -21,7 +21,7 @@ import {proteus as ProtobufOTR} from '@wireapp/protocol-messaging/web/otr';
 import type {AxiosRequestConfig} from 'axios';
 
 import {ValidationError} from '../validation/';
-import type {ClientMismatch, NewOTRMessage} from '../conversation/';
+import type {ClientMismatch, MessageSendingStatus, NewOTRMessage} from '../conversation/';
 import type {HttpClient} from '../http/';
 
 export class BroadcastAPI {
@@ -29,6 +29,7 @@ export class BroadcastAPI {
 
   public static readonly URL = {
     BROADCAST: '/broadcast/otr/messages',
+    BROADCAST_FEDERATED: '/broadcast/proteus/messages',
   };
 
   /**
@@ -112,6 +113,30 @@ export class BroadcastAPI {
     }
 
     const response = await this.client.sendProtocolBuffer<ClientMismatch>(config);
+    return response.data;
+  }
+
+  /**
+   * Broadcast an encrypted message to all team members and all contacts in federated environments
+   * @param sendingClientId The sender's client ID
+   * @param messageData The message content
+   * @see https://staging-nginz-https.zinfra.io/swagger-ui/tab.html#!/postOtrBroadcast
+   */
+  public async postBroadcastFederatedMessage(
+    sendingClientId: string,
+    messageData: ProtobufOTR.QualifiedNewOtrMessage,
+  ): Promise<MessageSendingStatus> {
+    if (!sendingClientId) {
+      throw new ValidationError('Unable to send OTR message without client ID.');
+    }
+
+    const config: AxiosRequestConfig = {
+      data: ProtobufOTR.QualifiedNewOtrMessage.encode(messageData).finish().slice(),
+      method: 'post',
+      url: BroadcastAPI.URL.BROADCAST_FEDERATED,
+    };
+
+    const response = await this.client.sendProtocolBuffer<MessageSendingStatus>(config);
     return response.data;
   }
 }
