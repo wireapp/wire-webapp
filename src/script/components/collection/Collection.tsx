@@ -141,10 +141,9 @@ const Collection: React.FC<CollectionDetailsProps> = ({conversation, conversatio
   const categories = splitIntoCategories(messages);
   const {images, audio, links, files} = categories;
 
-  if (detailCategory) {
+  if (detailCategory && categories[detailCategory].length > 0) {
     return (
       <CollectionDetails
-        category={detailCategory}
         conversation={conversation}
         messages={categories[detailCategory]}
         onClose={() => setDetailCategory(undefined)}

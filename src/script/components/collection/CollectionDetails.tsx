@@ -26,11 +26,10 @@ import useEffectRef from 'Util/useEffectRef';
 import {ContentMessage} from 'src/script/entity/message/ContentMessage';
 import {isToday, isThisYear, formatLocale} from 'Util/TimeUtil';
 import {t} from 'Util/LocalizerUtil';
-import {CollectionItem, Category} from './CollectionItem';
+import {CollectionItem} from './CollectionItem';
 import {noop} from 'Util/util';
 
 interface CollectionDetailsProps {
-  category: Category;
   conversation: Conversation;
   messages: ContentMessage[];
   onClose?: () => void;
@@ -56,7 +55,7 @@ const groupByDate = (messages: ContentMessage[]): GroupedCollection => {
   );
 };
 
-const CollectionDetails: React.FC<CollectionDetailsProps> = ({conversation, category, messages, onClose = noop}) => {
+const CollectionDetails: React.FC<CollectionDetailsProps> = ({conversation, messages, onClose = noop}) => {
   const {display_name} = useKoSubscribableChildren(conversation, ['display_name']);
   const [scrollbarRef, setScrollbarRef] = useEffectRef<HTMLDivElement>();
   useFadingScrollbar(scrollbarRef);
