@@ -27,6 +27,7 @@ import {MediumImage} from 'src/script/entity/message/MediumImage';
 import {MessageCategory} from '../../message/MessageCategory';
 import {amplify} from 'amplify';
 import {WebAppEvents} from '@wireapp/webapp-events';
+import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 
 export type Category = 'images' | 'links' | 'files' | 'audio' | 'video';
 
@@ -51,11 +52,12 @@ export const CollectionItem: React.FC<{allMessages: ContentMessage[]; message: C
   message,
   allMessages,
 }) => {
+  const {assets} = useKoSubscribableChildren(message, ['assets']);
   if (isOfCategory('images', message)) {
     return (
       <Image
         className="collection-image"
-        asset={(message.getFirstAsset() as MediumImage).resource()}
+        asset={(assets[0] as MediumImage).resource()}
         click={() => {
           amplify.publish(WebAppEvents.CONVERSATION.DETAIL_VIEW.SHOW, message, allMessages, 'collection');
         }}

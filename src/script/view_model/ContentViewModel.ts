@@ -204,9 +204,6 @@ export class ContentViewModel {
         case ContentViewModel.STATE.PREFERENCES_DEVICES:
           this.preferencesDevices.updateDeviceInfo();
           break;
-        case ContentViewModel.STATE.COLLECTION:
-          this.collection.setConversation(this.previousConversation);
-          break;
         default:
           this.inputBar.removedFromView();
           this.titleBar.removedFromView();

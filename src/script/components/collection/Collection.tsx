@@ -69,12 +69,8 @@ const Section: React.FC<{
   );
 };
 
-type Categories = {
-  audio: ContentMessage[];
-  files: ContentMessage[];
-  images: ContentMessage[];
-  links: ContentMessage[];
-};
+type Categories = Record<Category, ContentMessage[]>;
+
 function splitIntoCategories(messages: ContentMessage[]): Categories {
   return messages.reduce<Categories>(
     (categories, message) => {
@@ -98,6 +94,7 @@ function splitIntoCategories(messages: ContentMessage[]): Categories {
       files: [],
       images: [],
       links: [],
+      video: [],
     },
   );
 }
@@ -106,7 +103,7 @@ const Collection: React.FC<CollectionDetailsProps> = ({conversation, conversatio
   const [searchTerm, setSearchTerm] = useState('');
   const {display_name} = useKoSubscribableChildren(conversation, ['display_name']);
   const [messages, setMessages] = useState<ContentMessage[]>([]);
-  const [details, setDetails] = useState<{category: Category; messages: ContentMessage[]} | undefined>();
+  const [detailCategory, setDetailCategory] = useState<Category | undefined>(undefined);
 
   useEffect(() => {
     conversationRepository
@@ -141,15 +138,16 @@ const Collection: React.FC<CollectionDetailsProps> = ({conversation, conversatio
     };
   }, []);
 
-  const {images, audio, links, files} = splitIntoCategories(messages);
+  const categories = splitIntoCategories(messages);
+  const {images, audio, links, files} = categories;
 
-  if (details) {
+  if (detailCategory) {
     return (
       <CollectionDetails
-        category={details.category}
+        category={detailCategory}
         conversation={conversation}
-        messages={details.messages}
-        onClose={() => setDetails(undefined)}
+        messages={categories[detailCategory]}
+        onClose={() => setDetailCategory(undefined)}
       />
     );
   }
@@ -160,7 +158,7 @@ const Collection: React.FC<CollectionDetailsProps> = ({conversation, conversatio
         messages={images}
         limit={12}
         uieName={'collection-section-image'}
-        onSelect={() => setDetails({category: 'images', messages: images})}
+        onSelect={() => setDetailCategory('images')}
       >
         <span className={`collection-header-icon icon-library`}></span>
         <span className="label-bold-xs">{t('collectionSectionImages')}</span>
@@ -169,7 +167,7 @@ const Collection: React.FC<CollectionDetailsProps> = ({conversation, conversatio
         messages={links}
         limit={4}
         uieName={'collection-section-link'}
-        onSelect={() => setDetails({category: 'links', messages: links})}
+        onSelect={() => setDetailCategory('links')}
       >
         <span className={`collection-header-icon icon-link`}></span>
         <span className="label-bold-xs">{t('collectionSectionLinks')}</span>
@@ -178,7 +176,7 @@ const Collection: React.FC<CollectionDetailsProps> = ({conversation, conversatio
         messages={audio}
         limit={4}
         uieName={'collection-section-audio'}
-        onSelect={() => setDetails({category: 'audio', messages: audio})}
+        onSelect={() => setDetailCategory('audio')}
       >
         <Icon.MicOn className="collection-header-icon" />
         <span className="label-bold-xs">{t('collectionSectionAudio')}</span>
@@ -187,7 +185,7 @@ const Collection: React.FC<CollectionDetailsProps> = ({conversation, conversatio
         messages={files}
         limit={4}
         uieName={'collection-section-files'}
-        onSelect={() => setDetails({category: 'files', messages: files})}
+        onSelect={() => setDetailCategory('files')}
       >
         <span className={`collection-header-icon icon-link`}></span>
         <span className="label-bold-xs">{t('collectionSectionFiles')}</span>
