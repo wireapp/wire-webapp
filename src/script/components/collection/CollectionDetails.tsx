@@ -17,24 +17,22 @@
  *
  */
 
-import React, {Fragment, useEffect, useState} from 'react';
-import {registerStaticReactComponent, useKoSubscribableChildren} from 'Util/ComponentUtil';
+import React, {Fragment} from 'react';
+import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {Conversation} from '../../entity/Conversation';
 import {useFadingScrollbar} from '../../ui/fadingScrollbar';
 import useEffectRef from 'Util/useEffectRef';
 
 import {ContentMessage} from 'src/script/entity/message/ContentMessage';
 import {isToday, isThisYear, formatLocale} from 'Util/TimeUtil';
-import {amplify} from 'amplify';
-import {WebAppEvents} from '@wireapp/webapp-events';
-import {ContentViewModel} from '../../view_model/ContentViewModel';
 import {t} from 'Util/LocalizerUtil';
-import {CollectionItem, isOfCategory, Category} from './CollectionItem';
+import {CollectionItem, Category} from './CollectionItem';
 
 interface CollectionDetailsProps {
   category: Category;
   conversation: Conversation;
   messages: ContentMessage[];
+  onClose: () => void;
 }
 
 type GroupedCollection = [string, ContentMessage[]][];
@@ -57,50 +55,10 @@ const groupByDate = (messages: ContentMessage[]): GroupedCollection => {
   );
 };
 
-const CollectionDetails: React.FC<CollectionDetailsProps> = ({conversation, category, messages: initialMessages}) => {
+const CollectionDetails: React.FC<CollectionDetailsProps> = ({conversation, category, messages, onClose}) => {
   const {display_name} = useKoSubscribableChildren(conversation, ['display_name']);
   const [scrollbarRef, setScrollbarRef] = useEffectRef<HTMLDivElement>();
-  const [messages, setMessages] = useState<ContentMessage[]>(initialMessages);
   useFadingScrollbar(scrollbarRef);
-
-  const goBack = () => {
-    amplify.publish(WebAppEvents.CONTENT.SWITCH, ContentViewModel.STATE.COLLECTION);
-  };
-
-  useEffect(() => {
-    const addItem = (message: ContentMessage) => {
-      if (!isOfCategory(category, message)) {
-        return;
-      }
-      setMessages([message].concat(messages));
-    };
-
-    const removeItem = (messageId: string, conversationId: string) => {
-      if (conversation.id !== conversationId) {
-        // A message from a different converation, nothing to do
-        return;
-      }
-      const newMessageList = messages.filter(message => message.id !== messageId);
-      if (newMessageList.length === 0) {
-        // If there are no messages left, go back
-        return goBack();
-      }
-      setMessages(newMessageList);
-    };
-
-    const removeMessage = (message: ContentMessage) => {
-      removeItem(message.id, message.conversation_id);
-    };
-
-    amplify.subscribe(WebAppEvents.CONVERSATION.EPHEMERAL_MESSAGE_TIMEOUT, removeMessage);
-    amplify.subscribe(WebAppEvents.CONVERSATION.MESSAGE.ADDED, addItem);
-    amplify.subscribe(WebAppEvents.CONVERSATION.MESSAGE.REMOVED, removeItem);
-    return () => {
-      amplify.unsubscribe(WebAppEvents.CONVERSATION.EPHEMERAL_MESSAGE_TIMEOUT, removeMessage);
-      amplify.unsubscribe(WebAppEvents.CONVERSATION.MESSAGE.ADDED, addItem);
-      amplify.unsubscribe(WebAppEvents.CONVERSATION.MESSAGE.REMOVED, removeItem);
-    };
-  });
 
   return (
     <div id="collection-details" className="collection-details content">
@@ -109,7 +67,7 @@ const CollectionDetails: React.FC<CollectionDetailsProps> = ({conversation, cate
           <span
             className="content-titlebar-icon icon-back"
             data-uie-name="do-collection-details-close"
-            onClick={goBack}
+            onClick={onClose}
           ></span>
         </div>
         <span className="content-titlebar-items-center" data-uie-name="collection-details-conversation-name">
@@ -138,5 +96,3 @@ const CollectionDetails: React.FC<CollectionDetailsProps> = ({conversation, cate
 };
 
 export default CollectionDetails;
-
-registerStaticReactComponent('collection-details', CollectionDetails);

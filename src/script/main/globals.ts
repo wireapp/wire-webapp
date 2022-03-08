@@ -37,6 +37,7 @@ import 'Components/toggle/InfoToggle';
 import '../page/preferences/avPreferences/InputLevel';
 import 'Components/calling/FullscreenVideoCall';
 import 'Components/collection/CollectionDetails';
+import 'Components/collection/Collection';
 import 'Components/list/ConversationListCallingCell';
 import 'Components/list/ConversationListCell';
 import 'Components/avatar/GroupAvatar';

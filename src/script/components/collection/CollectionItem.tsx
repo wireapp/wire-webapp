@@ -33,7 +33,7 @@ export type Category = 'images' | 'links' | 'files' | 'audio' | 'video';
 export const isOfCategory = (category: Category, message: ContentMessage) => {
   switch (category) {
     case 'images':
-      return message.category & MessageCategory.IMAGE;
+      return message.category & MessageCategory.IMAGE && !(message.category & MessageCategory.GIF);
     case 'links':
       return message.category & MessageCategory.LINK_PREVIEW;
     case 'files':
