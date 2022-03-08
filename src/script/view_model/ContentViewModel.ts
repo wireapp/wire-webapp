@@ -39,7 +39,6 @@ import {InviteModalViewModel} from './content/InviteModalViewModel';
 import {ConversationError} from '../error/ConversationError';
 import {CollectionViewModel} from './content/CollectionViewModel';
 import {ConnectRequestsViewModel} from './content/ConnectRequestsViewModel';
-import {CollectionDetailsViewModel} from './content/CollectionDetailsViewModel';
 import {GiphyViewModel} from './content/GiphyViewModel';
 import {HistoryImportViewModel} from './content/HistoryImportViewModel';
 import {HistoryExportViewModel} from './content/HistoryExportViewModel';
@@ -88,7 +87,6 @@ export class ContentViewModel {
   private readonly conversationState: ConversationState;
 
   collection: CollectionViewModel;
-  collectionDetails: CollectionDetailsViewModel;
   connectRequests: ConnectRequestsViewModel;
   conversationRepository: ConversationRepository;
   messageRepository: MessageRepository;
@@ -152,8 +150,7 @@ export class ContentViewModel {
     this.state = ko.observable(ContentViewModel.STATE.WATERMARK);
 
     // Nested view models
-    this.collectionDetails = new CollectionDetailsViewModel();
-    this.collection = new CollectionViewModel(this, repositories.conversation);
+    this.collection = new CollectionViewModel(repositories.conversation);
     this.connectRequests = new ConnectRequestsViewModel(mainViewModel);
     this.emojiInput = new EmojiInputViewModel(repositories.properties);
     this.giphy = new GiphyViewModel(repositories.giphy);
