@@ -1,4 +1,9 @@
-<div id="preferences" class="left-list left-list-preferences" data-bind="with: $root.preferences">
+<div
+  id="preferences"
+  class="left-list left-list-preferences"
+  data-bind="with: $root.preferences"
+  aria-hidden="true"
+>
   <div class="left-list-header">
     <span class="left-list-header-text" data-bind="text: t('preferencesHeadline')"></span>
     <span class="left-list-header-close-button button-icon-large icon-close" data-bind="clickOrDrag: clickOnClosePreferences, attr: {title: t('tooltipSearchClose')}" data-uie-name="do-close-preferences"></span>
