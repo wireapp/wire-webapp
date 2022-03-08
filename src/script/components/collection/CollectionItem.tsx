@@ -38,11 +38,11 @@ export const isOfCategory = (category: Category, message: ContentMessage) => {
     case 'links':
       return message.category & MessageCategory.LINK_PREVIEW;
     case 'files':
-      return message.getFirstAsset()?.isFile();
+      return message.category & MessageCategory.FILE && message.getFirstAsset()?.isFile();
     case 'audio':
-      return message.getFirstAsset()?.isAudio();
+      return message.category & MessageCategory.FILE && message.getFirstAsset()?.isAudio();
     case 'video':
-      return message.getFirstAsset()?.isVideo();
+      return message.category & MessageCategory.FILE && message.getFirstAsset()?.isVideo();
     default:
       return false;
   }
