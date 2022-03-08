@@ -347,13 +347,13 @@ export class ListViewModel {
     }
 
     const listStateElementId = this.getElementIdOfList(this.state());
-    $(`#${listStateElementId}`).removeClass('left-list-is-visible');
+    $(`#${listStateElementId}`).removeClass('left-list-is-visible').attr('aria-hidden', 'true');
     document.removeEventListener('keydown', this.onKeyDownListView);
   };
 
   private readonly showList = (newListState: string): void => {
     const listStateElementId = this.getElementIdOfList(newListState);
-    $(`#${listStateElementId}`).addClass('left-list-is-visible');
+    $(`#${listStateElementId}`).addClass('left-list-is-visible').removeAttr('aria-hidden');
 
     this.state(newListState);
     this.lastUpdate(Date.now());
