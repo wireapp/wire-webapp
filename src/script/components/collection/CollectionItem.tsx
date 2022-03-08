@@ -53,11 +53,13 @@ export const CollectionItem: React.FC<{allMessages: ContentMessage[]; message: C
   allMessages,
 }) => {
   const {assets} = useKoSubscribableChildren(message, ['assets']);
-  if (isOfCategory('images', message)) {
+  const firstAsset = assets[0];
+  const {resource} = useKoSubscribableChildren(firstAsset as MediumImage, ['resource']);
+  if (isOfCategory('images', message) && resource) {
     return (
       <Image
         className="collection-image"
-        asset={(assets[0] as MediumImage).resource()}
+        asset={resource}
         click={() => {
           amplify.publish(WebAppEvents.CONVERSATION.DETAIL_VIEW.SHOW, message, allMessages, 'collection');
         }}
