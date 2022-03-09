@@ -22,23 +22,12 @@ import {ClientEntity} from 'src/script/client/ClientEntity';
 import {t} from 'Util/LocalizerUtil';
 import {formatTimestamp} from 'Util/TimeUtil';
 import {splitFingerprint} from 'Util/StringUtil';
+import {FormattedId} from './FormattedId';
 
 interface DeviceProps {
   device: ClientEntity;
   fingerprint: string;
 }
-
-const FormattedId: React.FC<{idSlices: string[]}> = ({idSlices}) => {
-  return (
-    <>
-      {idSlices.map((slice, index) => (
-        <span className="device-id-part" key={slice + index}>
-          {slice}
-        </span>
-      ))}
-    </>
-  );
-};
 
 const DetailedDevice: React.FC<DeviceProps> = ({device, fingerprint}) => {
   return (
