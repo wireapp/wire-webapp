@@ -68,7 +68,6 @@ const DeviceDetailsPreferences: React.FC<DevicesPreferencesProps> = ({
     <div
       id="preferences-device-details"
       className="preferences-page preferences-device-details"
-      data-bind="with: $root.preferencesDeviceDetails"
       data-uie-name="preferences-devices-details"
     >
       <div className="preferences-titlebar" data-bind="text: t('preferencesDeviceDetails')"></div>

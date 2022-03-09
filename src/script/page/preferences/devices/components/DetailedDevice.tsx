@@ -32,7 +32,9 @@ interface DeviceProps {
 const DetailedDevice: React.FC<DeviceProps> = ({device, fingerprint}) => {
   return (
     <>
-      <div className="preferences-devices-model">{device.model}</div>
+      <div className="preferences-devices-model" data-uie-name="device-model">
+        {device.model}
+      </div>
       <div className="preferences-devices-id">
         <span>{t('preferencesDevicesId')}</span>
         <span data-uie-name="preferences-device-current-id">
