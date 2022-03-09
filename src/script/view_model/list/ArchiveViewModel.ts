@@ -32,6 +32,8 @@ export class ArchiveViewModel {
   private readonly conversationRepository: ConversationRepository;
   readonly archivedConversations: ko.ObservableArray<Conversation>;
   readonly shouldUpdateScrollbar: ko.Computed<number>;
+  readonly visible: ko.PureComputed<boolean>;
+  readonly ariaHidden: ko.PureComputed<string>;
   readonly onJoinCall: Function;
 
   constructor(
@@ -48,6 +50,9 @@ export class ArchiveViewModel {
     this.shouldUpdateScrollbar = ko
       .computed(() => this.listViewModel.lastUpdate())
       .extend({notify: 'always', rateLimit: 500});
+
+    this.visible = ko.pureComputed(() => listViewModel.state() === ListViewModel.STATE.ARCHIVE);
+    this.ariaHidden = ko.pureComputed(() => (this.visible() ? 'false' : 'true'));
 
     this.onJoinCall = onJoinCall;
   }
