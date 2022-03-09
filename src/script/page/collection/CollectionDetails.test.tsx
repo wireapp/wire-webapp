@@ -63,6 +63,7 @@ const createImageMessage = (timestamp: number = Date.now()) => {
   const message = new ContentMessage(createRandomUuid());
   message.timestamp(timestamp);
   const image = new MediumImage(createRandomUuid());
+  image.resource({} as any);
   message.assets.push(image);
   message.category = MessageCategory.IMAGE;
   return message;
