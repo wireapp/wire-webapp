@@ -38,6 +38,7 @@ const CollectionItem: React.FC<{allMessages: ContentMessage[]; message: ContentM
       <Image
         className="collection-image"
         asset={resource}
+        data-uie-name="image-asset"
         click={() => {
           amplify.publish(WebAppEvents.CONVERSATION.DETAIL_VIEW.SHOW, message, allMessages, 'collection');
         }}
