@@ -36,6 +36,8 @@ export class PreferencesListViewModel {
   selectedAV: ko.PureComputed<boolean>;
   selectedDevices: ko.PureComputed<boolean>;
   selectedOptions: ko.PureComputed<boolean>;
+  readonly visible: ko.PureComputed<boolean>;
+  readonly ariaHidden: ko.PureComputed<string>;
 
   constructor(
     private readonly contentViewModel: ContentViewModel,
@@ -63,6 +65,8 @@ export class PreferencesListViewModel {
       return devicesState.includes(this.contentState());
     });
     this.selectedOptions = ko.pureComputed(() => this.contentState() === ContentViewModel.STATE.PREFERENCES_OPTIONS);
+    this.visible = ko.pureComputed(() => listViewModel.state() === ListViewModel.STATE.PREFERENCES);
+    this.ariaHidden = ko.pureComputed(() => (this.visible() ? 'false' : 'true'));
   }
 
   readonly clickOnClosePreferences = (): void => {

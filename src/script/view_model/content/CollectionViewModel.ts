@@ -24,7 +24,6 @@ import ko from 'knockout';
 
 import {isEscapeKey} from 'Util/KeyboardUtil';
 
-import {CollectionDetailsViewModel} from './CollectionDetailsViewModel';
 import {ContentMessage} from '../../entity/message/ContentMessage';
 import {ContentViewModel} from '../ContentViewModel';
 import {Conversation} from '../../entity/Conversation';
@@ -36,21 +35,18 @@ import {Message} from '../../entity/message/Message';
 import '../../page/collection/FullSearch';
 
 export class CollectionViewModel {
-  collectionDetails: CollectionDetailsViewModel;
   conversationEntity: ko.Observable<Conversation>;
   audio: ko.ObservableArray<ContentMessage>;
   files: ko.ObservableArray<ContentMessage>;
   images: ko.ObservableArray<ContentMessage>;
   links: ko.ObservableArray<ContentMessage>;
   searchInput: ko.Observable<string>;
+  details: ko.Observable<{category: string; messages: ContentMessage[]} | undefined>;
 
   constructor(
-    contentViewModel: ContentViewModel,
     private readonly conversationRepository: ConversationRepository,
     private readonly conversationState = container.resolve(ConversationState),
   ) {
-    this.collectionDetails = contentViewModel.collectionDetails;
-
     this.conversationEntity = ko.observable();
 
     this.audio = ko.observableArray().extend({rateLimit: 1});
@@ -59,6 +55,7 @@ export class CollectionViewModel {
     this.links = ko.observableArray().extend({rateLimit: 1});
 
     this.searchInput = ko.observable('');
+    this.details = ko.observable();
   }
 
   onKeyDownCollection = (keyboardEvent: KeyboardEvent): void => {
@@ -114,6 +111,7 @@ export class CollectionViewModel {
   readonly setConversation = (conversationEntity = this.conversationState.activeConversation()): void => {
     if (conversationEntity) {
       this.conversationEntity(conversationEntity);
+      this.details(undefined);
 
       this.conversationRepository
         .getEventsForCategory(conversationEntity, MessageCategory.LINK_PREVIEW)
@@ -155,7 +153,7 @@ export class CollectionViewModel {
   }
 
   clickOnSection(category: string, items: ContentMessage[]): void {
-    this.collectionDetails.setConversation(this.conversationEntity(), category, [].concat(items));
+    this.details({category, messages: [...items]});
     amplify.publish(WebAppEvents.CONTENT.SWITCH, ContentViewModel.STATE.COLLECTION_DETAILS);
   }
 
