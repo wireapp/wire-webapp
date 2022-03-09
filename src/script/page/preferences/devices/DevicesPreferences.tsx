@@ -34,6 +34,7 @@ import useEffectRef from 'Util/useEffectRef';
 import DetailedDevice from './components/DetailedDevice';
 import DeviceDetailsPreferences from './DeviceDetailsPreferences';
 import {Conversation} from '../../../entity/Conversation';
+import {FormattedId} from './components/FormattedId';
 
 interface DevicesPreferencesProps {
   clientState: ClientState;
@@ -44,18 +45,6 @@ interface DevicesPreferencesProps {
   userState: UserState;
   verifyDevice: (userId: QualifiedId, device: ClientEntity, isVerified: boolean) => void;
 }
-
-const FormattedId: React.FC<{idSlices: string[]}> = ({idSlices}) => {
-  return (
-    <>
-      {idSlices.map((slice, index) => (
-        <span className="device-id-part" key={slice + index}>
-          {slice}
-        </span>
-      ))}
-    </>
-  );
-};
 
 const Device: React.FC<{
   device: ClientEntity;
@@ -156,7 +145,7 @@ const DevicesPreferences: React.FC<DevicesPreferencesProps> = ({
                 key={device.id}
                 isSSO={isSSO}
                 onSelect={setSelectedDevice}
-                onRemove={device => removeDevice(device)}
+                onRemove={removeDevice}
               />
             ))}
             <div className="preferences-detail">{t('preferencesDevicesActiveDetail')}</div>
