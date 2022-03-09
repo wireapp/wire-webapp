@@ -36,8 +36,8 @@ export class PreferencesListViewModel {
   selectedAV: ko.PureComputed<boolean>;
   selectedDevices: ko.PureComputed<boolean>;
   selectedOptions: ko.PureComputed<boolean>;
-  readonly visible: ko.Observable<boolean>;
-  readonly ariaHidden: ko.Observable<string>;
+  readonly visible: ko.PureComputed<boolean>;
+  readonly ariaHidden: ko.PureComputed<string>;
 
   constructor(
     private readonly contentViewModel: ContentViewModel,
@@ -65,8 +65,8 @@ export class PreferencesListViewModel {
       return devicesState.includes(this.contentState());
     });
     this.selectedOptions = ko.pureComputed(() => this.contentState() === ContentViewModel.STATE.PREFERENCES_OPTIONS);
-    this.visible = ko.observable(false);
-    this.ariaHidden = ko.observable('true');
+    this.visible = ko.pureComputed(() => listViewModel.state() === ListViewModel.STATE.PREFERENCES);
+    this.ariaHidden = ko.pureComputed(() => (this.visible() ? 'false' : 'true'));
   }
 
   readonly clickOnClosePreferences = (): void => {
@@ -102,15 +102,5 @@ export class PreferencesListViewModel {
 
   private readonly _switchContent = (newContentState: string): void => {
     this.contentViewModel.switchContent(newContentState);
-  };
-
-  readonly show = (): void => {
-    this.visible(true);
-    this.ariaHidden('false');
-  };
-
-  readonly hide = (): void => {
-    this.visible(false);
-    this.ariaHidden('true');
   };
 }

@@ -33,28 +33,32 @@ import type {MainViewModel} from '../MainViewModel';
 import type {Multitasking} from '../../notification/NotificationRepository';
 import type {TeamRepository} from '../../team/TeamRepository';
 import type {User} from '../../entity/User';
+import {ListViewModel} from '../ListViewModel';
 
 export class TemporaryGuestViewModel {
+  readonly listViewModel: ListViewModel;
   readonly multitasking: Multitasking;
   readonly callingViewModel: CallingViewModel;
   readonly selfUser: ko.Observable<User>;
   readonly isAccountCreationEnabled: boolean;
-  readonly visible: ko.Observable<boolean>;
-  readonly ariaHidden: ko.Observable<string>;
+  readonly visible: ko.PureComputed<boolean>;
+  readonly ariaHidden: ko.PureComputed<string>;
 
   constructor(
+    listViewModel: ListViewModel,
     mainViewModel: MainViewModel,
     readonly callingRepository: CallingRepository,
     readonly teamRepository: TeamRepository,
     private readonly userState = container.resolve(UserState),
   ) {
+    this.listViewModel = listViewModel;
     this.multitasking = mainViewModel.multitasking;
     this.callingViewModel = mainViewModel.calling;
     this.selfUser = this.userState.self;
     this.isAccountCreationEnabled = Config.getConfig().FEATURE.ENABLE_ACCOUNT_REGISTRATION;
 
-    this.visible = ko.observable(true);
-    this.ariaHidden = ko.observable('false');
+    this.visible = ko.pureComputed(() => listViewModel.state() === ListViewModel.STATE.TEMPORARY_GUEST);
+    this.ariaHidden = ko.pureComputed(() => (this.visible() ? 'false' : 'true'));
   }
 
   readonly clickOnPreferencesButton = (): void => {
@@ -77,15 +81,5 @@ export class TemporaryGuestViewModel {
 
   readonly isSelectedConversation = (): true => {
     return true;
-  };
-
-  readonly show = (): void => {
-    this.visible(true);
-    this.ariaHidden('false');
-  };
-
-  readonly hide = (): void => {
-    this.visible(false);
-    this.ariaHidden('true');
   };
 }

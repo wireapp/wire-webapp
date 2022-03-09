@@ -76,8 +76,8 @@ export class ConversationListViewModel {
   readonly makeOnClick: (conversationId: string, domain: string | null) => MouseEventHandler<Element>;
   readonly participantAvatarSize: typeof AVATAR_SIZE.SMALL;
   readonly getIsVisibleFunc: () => (() => boolean) | ((top: number, bottom: number) => boolean);
-  readonly visible: ko.Observable<boolean>;
-  readonly ariaHidden: ko.Observable<string>;
+  readonly visible: ko.PureComputed<boolean>;
+  readonly ariaHidden: ko.PureComputed<string>;
   private readonly logger: Logger;
   private readonly selfUser: ko.PureComputed<User>;
   private readonly showCalls: ko.Observable<boolean>;
@@ -149,8 +149,8 @@ export class ConversationListViewModel {
 
     this.webappIsLoaded = ko.observable(false);
 
-    this.visible = ko.observable(true);
-    this.ariaHidden = ko.observable('false');
+    this.visible = ko.pureComputed(() => listViewModel.state() === ListViewModel.STATE.CONVERSATIONS);
+    this.ariaHidden = ko.pureComputed(() => (this.visible() ? 'false' : 'true'));
 
     this.archiveTooltip = ko.pureComputed(() => {
       return t('tooltipConversationsArchived', this.archivedConversations().length);
@@ -315,15 +315,5 @@ export class ConversationListViewModel {
     if (this.isActivatedAccount()) {
       this.listViewModel.switchList(ListViewModel.STATE.START_UI);
     }
-  };
-
-  readonly show = (): void => {
-    this.visible(true);
-    this.ariaHidden('false');
-  };
-
-  readonly hide = (): void => {
-    this.visible(false);
-    this.ariaHidden('true');
   };
 }
