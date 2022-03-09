@@ -90,7 +90,7 @@ const createAudioMessage = () => {
   const audio = new FileAsset(createRandomUuid());
   spyOn(audio, 'isAudio').and.returnValue(true);
   message.assets.push(audio);
-  message.category = MessageCategory.AUDIO;
+  message.category = MessageCategory.FILE;
   return message;
 };
 
