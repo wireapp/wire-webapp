@@ -27,48 +27,17 @@ import {ContentMessage} from 'src/script/entity/message/ContentMessage';
 import {t} from 'Util/LocalizerUtil';
 import {isOfCategory, Category} from './utils';
 import Icon from 'Components/Icon';
-import FullSearch from '../../page/collection/FullSearch';
 import {ConversationRepository} from 'src/script/conversation/ConversationRepository';
 import {MessageCategory} from '../../message/MessageCategory';
-import CollectionItem from './CollectionItem';
+
+import FullSearch from './FullSearch';
 import CollectionDetails from './CollectionDetails';
+import CollectionSection from './CollectionSection';
 
 interface CollectionDetailsProps {
   conversation: Conversation;
   conversationRepository: ConversationRepository;
 }
-
-const Section: React.FC<{
-  limit: number;
-  messages: ContentMessage[];
-  onSelect: () => void;
-  uieName: string;
-}> = ({messages, limit, uieName, onSelect, children}) => {
-  if (messages.length === 0) {
-    return null;
-  }
-  const hasExtra = true || messages.length > limit;
-  const topMessages = messages.slice(0, limit);
-
-  return (
-    <section className="collection-section" data-uie-collection-size={messages.length} data-uie-name={uieName}>
-      <header>
-        {children}
-        {hasExtra && (
-          <button className="collection-header-all accent-text" onClick={() => onSelect()}>
-            <span data-uie-name="collection-show-all">{t('collectionShowAll', messages.length)}</span>
-            &nbsp;<span className="icon-forward font-size-xxs"></span>
-          </button>
-        )}
-      </header>
-      <div className="collection-images">
-        {topMessages.map(message => (
-          <CollectionItem message={message} allMessages={[]} key={message.id} />
-        ))}
-      </div>
-    </section>
-  );
-};
 
 type Categories = Record<Category, ContentMessage[]>;
 
@@ -153,42 +122,42 @@ const Collection: React.FC<CollectionDetailsProps> = ({conversation, conversatio
 
   const content = searchTerm ? null : (
     <>
-      <Section
+      <CollectionSection
         messages={images}
         limit={12}
         uieName={'collection-section-image'}
         onSelect={() => setDetailCategory('images')}
+        label={t('collectionSectionImages')}
       >
         <span className={`collection-header-icon icon-library`}></span>
-        <span className="label-bold-xs">{t('collectionSectionImages')}</span>
-      </Section>
-      <Section
+      </CollectionSection>
+      <CollectionSection
         messages={links}
         limit={4}
         uieName={'collection-section-link'}
         onSelect={() => setDetailCategory('links')}
+        label={t('collectionSectionLinks')}
       >
         <span className={`collection-header-icon icon-link`}></span>
-        <span className="label-bold-xs">{t('collectionSectionLinks')}</span>
-      </Section>
-      <Section
+      </CollectionSection>
+      <CollectionSection
         messages={audio}
         limit={4}
         uieName={'collection-section-audio'}
         onSelect={() => setDetailCategory('audio')}
+        label={t('collectionSectionAudio')}
       >
         <Icon.MicOn className="collection-header-icon" />
-        <span className="label-bold-xs">{t('collectionSectionAudio')}</span>
-      </Section>
-      <Section
+      </CollectionSection>
+      <CollectionSection
         messages={files}
         limit={4}
         uieName={'collection-section-files'}
         onSelect={() => setDetailCategory('files')}
+        label={t('collectionSectionFiles')}
       >
         <span className={`collection-header-icon icon-link`}></span>
-        <span className="label-bold-xs">{t('collectionSectionFiles')}</span>
-      </Section>
+      </CollectionSection>
     </>
   );
 
