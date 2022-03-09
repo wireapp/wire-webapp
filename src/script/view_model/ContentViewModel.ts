@@ -61,6 +61,7 @@ import '../page/preferences/OptionPreferences';
 import '../page/preferences/AVPreferences';
 import '../page/preferences/AboutPreferences';
 import '../page/preferences/Preferences';
+import '../page/preferences/devices/DevicesPreferences';
 import {
   PreferenceNotificationRepository,
   Notification,
