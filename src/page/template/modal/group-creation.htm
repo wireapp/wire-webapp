@@ -1,6 +1,5 @@
 <div id="group-creation-modal" data-bind="with: $root.groupCreation" class="group-creation__modal">
-  <!-- ko if: isShown -->
-    <modal params="isShown: isShown, onClosed: afterHideModal, id: 'group-creation', lock: true">
+    <modal params="isShown: isShown, onClosed: afterHideModal, ariaLabelby: 'group-creation-label', lock: true">
       <div class="modal__header">
         <!-- ko if: stateIsParticipants() -->
           <h2 id="group-creation-label" class="modal__header__title" data-bind="text: participantsHeaderText" data-uie-name="status-people-selected"></h2>
@@ -9,7 +8,7 @@
         <!-- /ko -->
         <!-- ko if: stateIsPreferences() -->
           <h2 id="group-creation-label" class="modal__header__title" data-bind="text: t('groupCreationPreferencesHeader')"></h2>
-          <button class="group-creation__action button-reset-default" type="button" data-bind="click: clickOnNext, css: {'accent-text': nameInput().length, 'enabled': nameInput().length}, enable: nameInput().length, text: t('groupCreationPreferencesAction'), attr: { 'aria-label': t('groupCreationPreferencesAction'), 'tabindex': nameInput().length ? '0' : '-1' }" data-uie-name="go-next"></button>
+          <button id="group-go-next" class="group-creation__action button-reset-default" type="button" data-bind="click: clickOnNext, css: {'accent-text': nameInput().length, 'enabled': nameInput().length}, enable: nameInput().length, text: t('groupCreationPreferencesAction'), attr: { 'aria-label': t('groupCreationPreferencesAction'), 'disabled': !nameInput().length }" data-uie-name="go-next"></button>
           <button class="button-reset-default" type="button" data-bind="click: clickOnClose, attr: { 'aria-label': t('groupCreationActionCloseModal')}" data-uie-name="do-close"><close-icon class="modal__header__button"></close-icon></button>
         <!-- /ko -->
       </div>
@@ -36,7 +35,7 @@
         <input class="modal__input"
         autocomplete="off" required spellcheck="false" type="text"
         data-bind="attr: {maxlength: maxNameLength, placeholder: t('groupCreationPreferencesPlaceholder')}, enter: clickOnNext, hasFocus: true, textInput: nameInput"
-        data-uie-name="enter-group-name">
+        data-uie-name="enter-group-name" />
         <div class="group-creation__error" data-bind="text: nameError, visible: nameError().length" data-uie-name="error-group-name"></div>
       </div>
         <!-- ko if: isTeam -->
@@ -56,6 +55,7 @@
             "></info-toggle>
           <!-- /ko -->
         <!-- /ko -->
+        <!-- ko if: stateIsPreferences() -->
+        <!-- /ko -->
       </modal>
-  <!-- /ko -->
 </div>

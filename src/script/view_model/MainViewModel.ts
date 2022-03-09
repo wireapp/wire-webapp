@@ -31,7 +31,6 @@ import {CallingViewModel} from './CallingViewModel';
 import {ActionsViewModel} from './ActionsViewModel';
 import {ListViewModel} from './ListViewModel';
 import {FaviconViewModel} from './FaviconViewModel';
-import {GroupCreationViewModel} from './content/GroupCreationViewModel';
 import {ImageDetailViewViewModel} from './ImageDetailViewViewModel';
 
 import type {AssetRepository} from '../assets/AssetRepository';
@@ -95,7 +94,6 @@ export class MainViewModel {
   calling: CallingViewModel;
   content: ContentViewModel;
   favicon: FaviconViewModel;
-  groupCreation: GroupCreationViewModel;
   isPanelOpen: ko.Observable<boolean>;
   lightbox: ImageDetailViewViewModel;
   list: ListViewModel;
@@ -149,13 +147,6 @@ export class MainViewModel {
     this.userState = container.resolve(UserState);
 
     this.modals = modals;
-
-    this.groupCreation = new GroupCreationViewModel(
-      this,
-      repositories.conversation,
-      repositories.search,
-      repositories.team,
-    );
 
     this.multitasking = {
       isMinimized: ko.observable(true),

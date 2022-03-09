@@ -34,12 +34,10 @@ import {SearchRepository} from '../../search/SearchRepository';
 import {UserState} from '../../user/UserState';
 import {TeamState} from '../../team/TeamState';
 import {TeamRepository} from 'src/script/team/TeamRepository';
-import type {MainViewModel} from '../MainViewModel';
 
 type GroupCreationSource = 'start_ui' | 'conversation_details' | 'create';
 
 export class GroupCreationViewModel {
-  mainViewModel: MainViewModel;
   isTeam: ko.PureComputed<boolean>;
   isShown: ko.Observable<boolean>;
   state: ko.Observable<string>;
@@ -76,14 +74,12 @@ export class GroupCreationViewModel {
   }
 
   constructor(
-    mainViewModel: MainViewModel,
     public readonly conversationRepository: ConversationRepository,
     public readonly searchRepository: SearchRepository,
     public readonly teamRepository: TeamRepository,
     private readonly userState = container.resolve(UserState),
     private readonly teamState = container.resolve(TeamState),
   ) {
-    this.mainViewModel = mainViewModel;
     this.isTeam = this.teamState.isTeam;
     this.maxNameLength = ConversationRepository.CONFIG.GROUP.MAX_NAME_LENGTH;
     this.maxSize = ConversationRepository.CONFIG.GROUP.MAX_SIZE;

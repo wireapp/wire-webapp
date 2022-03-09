@@ -19,10 +19,9 @@
 
 import ko from 'knockout';
 
-import {noop} from 'Util/util';
-
+import {noop, createRandomUuid} from 'Util/util';
 interface ModalParams {
-  id?: string;
+  ariaLabelby?: string;
   isShown: ko.Observable<boolean>;
   large?: boolean;
   onBgClick?: () => void;
@@ -47,19 +46,55 @@ ko.components.register('modal', {
   viewModel: function ({
     isShown,
     large,
-    id,
+    ariaLabelby,
     onBgClick = noop,
     onClosed = noop,
     showLoading = ko.observable(false),
   }: ModalParams): void {
     this.large = large;
-    this.id = id;
-    this.ariaLabelby = this.id ? `${this.id}-label` : '';
+    this.id = createRandomUuid();
+    this.ariaLabelby = ariaLabelby;
     this.onBgClick = () => ko.unwrap(onBgClick)();
     this.displayNone = ko.observable(!ko.unwrap(isShown));
     this.hasVisibleClass = ko.computed(() => isShown() && !this.displayNone()).extend({rateLimit: 20});
     this.showLoading = showLoading;
     let timeoutId = 0;
+
+    const maintaineFocus = (): void => {
+      if (!this.displayNone()) {
+        document.body.addEventListener('focus', this.onFocusModal, true);
+        document.addEventListener('keydown', this.onKeyDown);
+      }
+    };
+
+    this.onKeyDown = (event: KeyboardEvent): void => {
+      const focusableElements =
+        'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
+      const modal = document.getElementById(this.id);
+      const focusableContent = [...modal.querySelectorAll(focusableElements)];
+      const focusedItemIndex = focusableContent.indexOf(document.activeElement);
+      // If the SHIFT key is being pressed while tabbing (moving backwards) and
+      // the currently focused item is the first one, move the focus to the last focusable item from the dialog element
+      if (event.shiftKey && focusedItemIndex === 0) {
+        (focusableContent[focusableContent.length - 1] as HTMLElement)?.focus();
+        event.preventDefault();
+        // If the SHIFT key is not being pressed (moving forwards) and the currently
+        // focused item is the last one, move the focus to the first focusable item from the dialog element
+      } else if (!event.shiftKey && focusedItemIndex === focusableContent.length - 1) {
+        (focusableContent[0] as HTMLElement)?.focus();
+        event.preventDefault();
+      }
+    };
+
+    this.onFocusModal = (event: Event): void => {
+      if (!this.displayNone() && !(event.target as Element).closest('[aria-modal="true"]')) {
+        document.getElementById(this.id).focus();
+      }
+    };
+
+    const isDisplayNoneSubscription = this.displayNone.subscribe(() => {
+      maintaineFocus();
+    });
 
     const isShownSubscription = isShown.subscribe(visible => {
       if (visible) {
@@ -72,6 +107,9 @@ ko.components.register('modal', {
     });
 
     this.dispose = () => {
+      document.body.removeEventListener('focus', this.onFocusModal);
+      document.removeEventListener('keydown', this.onKeyDown);
+      isDisplayNoneSubscription.dispose();
       isShownSubscription.dispose();
       this.hasVisibleClass.dispose();
       window.clearTimeout(timeoutId);

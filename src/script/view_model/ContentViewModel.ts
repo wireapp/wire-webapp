@@ -31,6 +31,7 @@ import {Config} from '../Config';
 import {MessageListViewModel} from './content/MessageListViewModel';
 import {UserModalViewModel} from './content/UserModalViewModel';
 import {LegalHoldModalViewModel} from './content/LegalHoldModalViewModel';
+import {GroupCreationViewModel} from './content/GroupCreationViewModel';
 import {EmojiInputViewModel} from './content/EmojiInputViewModel';
 import {ModalsViewModel} from './ModalsViewModel';
 import {ServiceModalViewModel} from './content/ServiceModalViewModel';
@@ -94,6 +95,7 @@ export class ContentViewModel {
   elementId: string;
   emojiInput: EmojiInputViewModel;
   giphy: GiphyViewModel;
+  groupCreation: GroupCreationViewModel;
   historyExport: HistoryExportViewModel;
   historyImport: HistoryImportViewModel;
   inputBar: InputBarViewModel;
@@ -164,6 +166,7 @@ export class ContentViewModel {
       repositories.storage,
       repositories.message,
     );
+    this.groupCreation = new GroupCreationViewModel(repositories.conversation, repositories.search, repositories.team);
     this.userModal = new UserModalViewModel(repositories.user, mainViewModel.actions);
     this.serviceModal = new ServiceModalViewModel(repositories.integration, mainViewModel.actions);
     this.inviteModal = new InviteModalViewModel();
