@@ -69,7 +69,7 @@
           #include('content/preferences-device-details.htm')
         <!-- /ko -->
         <!-- ko if: state() === State.PREFERENCES_DEVICES -->
-          #include('content/preferences-devices.htm')
+          <devices-preferences params="cryptographyRepository: repositories.cryptography, removeDevice: mainViewModel.actions.deleteClient, verifyDevice: (userId, device, verified) => repositories.client.verifyClient(userId, device, verified), resetSession: (userId, device, conversation) => repositories.message.resetSession(userId, device.id, conversation)"></devices-preferences>
         <!-- /ko -->
         <!-- ko if: state() === State.PREFERENCES_OPTIONS -->
           <div id="preferences-options" class="preferences-page preferences-options">

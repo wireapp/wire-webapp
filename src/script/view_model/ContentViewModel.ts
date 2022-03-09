@@ -61,6 +61,7 @@ import '../page/preferences/AccountPreferences';
 import '../page/preferences/OptionPreferences';
 import '../page/preferences/AVPreferences';
 import '../page/preferences/AboutPreferences';
+import '../page/preferences/devices/DevicesPreferences';
 import {
   PreferenceNotificationRepository,
   Notification,
@@ -117,7 +118,6 @@ export class ContentViewModel {
   static get STATE() {
     return {
       COLLECTION: 'ContentViewModel.STATE.COLLECTION',
-      COLLECTION_DETAILS: 'ContentViewModel.STATE.COLLECTION_DETAILS',
       CONNECTION_REQUESTS: 'ContentViewModel.STATE.CONNECTION_REQUESTS',
       CONVERSATION: 'ContentViewModel.STATE.CONVERSATION',
       HISTORY_EXPORT: 'ContentViewModel.STATE.HISTORY_EXPORT',
