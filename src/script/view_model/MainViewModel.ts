@@ -102,7 +102,6 @@ export class MainViewModel {
   logger: Logger;
   mainClasses: ko.PureComputed<string | undefined>;
   modals: ModalsViewModel;
-  isModalOpen: ko.Observable<boolean>;
   multitasking: Multitasking;
   panel: PanelViewModel;
   selfUser: ko.Observable<User>;
@@ -161,8 +160,6 @@ export class MainViewModel {
     this.multitasking = {
       isMinimized: ko.observable(true),
     };
-
-    this.isModalOpen = ko.observable(false);
 
     this.selfUser = this.userState.self;
 

@@ -172,7 +172,6 @@ export class GroupCreationViewModel {
     this.groupCreationSource = groupCreationSource;
     this.enableReadReceipts(this.isTeam());
     this.isShown(true);
-    this.mainViewModel.isModalOpen(true);
     this.state(GroupCreationViewModel.STATE.PREFERENCES);
     if (userEntity) {
       this.selectedContacts.push(userEntity);
@@ -274,7 +273,7 @@ export class GroupCreationViewModel {
 
   readonly closeModal = (): void => {
     this.isShown(false);
-    this.mainViewModel.isModalOpen(false);
+    this.afterHideModal();
   };
 
   readonly afterHideModal = (): void => {

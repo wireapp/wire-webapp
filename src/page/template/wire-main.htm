@@ -3,7 +3,6 @@
      data-bind="css: mainClasses(), ignore_drop_file: true"
      data-uie-name="status-webapp"
      data-uie-value="is-loading">
-     <div class="wrapper" data-bind="attr: { 'aria-hidden': isModalOpen, 'tabindex': isModalOpen ? '-1' : '0' }">
     <!-- ko stopBinding: true -->
       <div id="app" class="app">
         <div id="left-column" class="left-column" data-bind="css: {'left-column--light-theme': !isActivatedAccount()}">
@@ -103,7 +102,6 @@
       #include('modals.htm')
       <div id="applock"></div>
     <!-- /ko -->
-  </div>
   #include('modal/group-creation.htm')
   <div id="calling-overlay-container"></div>
 </div>

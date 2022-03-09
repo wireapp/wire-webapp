@@ -22,6 +22,7 @@ import ko from 'knockout';
 import {noop} from 'Util/util';
 
 interface ModalParams {
+  id?: string;
   isShown: ko.Observable<boolean>;
   large?: boolean;
   onBgClick?: () => void;
@@ -31,7 +32,7 @@ interface ModalParams {
 
 ko.components.register('modal', {
   template: `
-    <div class="modal" data-bind="style: {display: displayNone() ? 'none': 'flex', zIndex: 10000001}">
+    <div class="modal" data-bind="style: {display: displayNone() ? 'none': 'flex', zIndex: 10000001}, attr: id ? {id: id, 'aria-labelledby': ariaLabelby} : {}" role="dialog" aria-modal="true" tabindex="-1">
       <!-- ko if: showLoading() -->
         <loading-icon class="modal__loading"></loading-icon>
       <!-- /ko -->
@@ -46,16 +47,20 @@ ko.components.register('modal', {
   viewModel: function ({
     isShown,
     large,
+    id,
     onBgClick = noop,
     onClosed = noop,
     showLoading = ko.observable(false),
   }: ModalParams): void {
     this.large = large;
+    this.id = id;
+    this.ariaLabelby = this.id ? `${this.id}-label` : '';
     this.onBgClick = () => ko.unwrap(onBgClick)();
     this.displayNone = ko.observable(!ko.unwrap(isShown));
     this.hasVisibleClass = ko.computed(() => isShown() && !this.displayNone()).extend({rateLimit: 20});
     this.showLoading = showLoading;
     let timeoutId = 0;
+
     const isShownSubscription = isShown.subscribe(visible => {
       if (visible) {
         return this.displayNone(false);
