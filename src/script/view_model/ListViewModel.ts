@@ -48,7 +48,6 @@ import type {ConversationRepository} from '../conversation/ConversationRepositor
 import type {TeamRepository} from '../team/TeamRepository';
 import type {ActionsViewModel} from './ActionsViewModel';
 import type {Conversation} from '../entity/Conversation';
-import type {ClientEntity} from '../client/ClientEntity';
 import type {User} from '../entity/User';
 import type {AssetRemoteData} from '../assets/AssetRemoteData';
 import {UserState} from '../user/UserState';
@@ -291,14 +290,8 @@ export class ListViewModel {
     this.contentViewModel.switchContent(ContentViewModel.STATE.PREFERENCES_ACCOUNT);
   };
 
-  readonly openPreferencesDevices = (deviceEntity?: ClientEntity): void => {
+  readonly openPreferencesDevices = (): void => {
     this.switchList(ListViewModel.STATE.PREFERENCES);
-
-    if (deviceEntity) {
-      this.contentViewModel.preferencesDeviceDetails.device(deviceEntity);
-      return this.contentViewModel.switchContent(ContentViewModel.STATE.PREFERENCES_DEVICE_DETAILS);
-    }
-
     return this.contentViewModel.switchContent(ContentViewModel.STATE.PREFERENCES_DEVICES);
   };
 
