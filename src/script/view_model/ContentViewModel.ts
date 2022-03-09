@@ -115,7 +115,6 @@ export class ContentViewModel {
   static get STATE() {
     return {
       COLLECTION: 'ContentViewModel.STATE.COLLECTION',
-      COLLECTION_DETAILS: 'ContentViewModel.STATE.COLLECTION_DETAILS',
       CONNECTION_REQUESTS: 'ContentViewModel.STATE.CONNECTION_REQUESTS',
       CONVERSATION: 'ContentViewModel.STATE.CONVERSATION',
       HISTORY_EXPORT: 'ContentViewModel.STATE.HISTORY_EXPORT',
@@ -384,8 +383,6 @@ export class ContentViewModel {
     switch (state) {
       case ContentViewModel.STATE.COLLECTION:
         return '.collection';
-      case ContentViewModel.STATE.COLLECTION_DETAILS:
-        return '.collection-details';
       case ContentViewModel.STATE.CONVERSATION:
         return '.conversation';
       case ContentViewModel.STATE.CONNECTION_REQUESTS:
@@ -412,7 +409,7 @@ export class ContentViewModel {
 
     const isStateConversation = this.previousState === ContentViewModel.STATE.CONVERSATION;
     if (isStateConversation) {
-      const collectionStates = [ContentViewModel.STATE.COLLECTION, ContentViewModel.STATE.COLLECTION_DETAILS];
+      const collectionStates = [ContentViewModel.STATE.COLLECTION];
       const isCollectionState = collectionStates.includes(newContentState);
       if (!isCollectionState) {
         this.conversationState.activeConversation(null);

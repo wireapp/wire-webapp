@@ -283,11 +283,7 @@ export class ConversationListViewModel {
   };
 
   readonly isSelectedConversation = (conversationEntity: Conversation): boolean => {
-    const expectedStates = [
-      ContentViewModel.STATE.COLLECTION,
-      ContentViewModel.STATE.COLLECTION_DETAILS,
-      ContentViewModel.STATE.CONVERSATION,
-    ];
+    const expectedStates = [ContentViewModel.STATE.COLLECTION, ContentViewModel.STATE.CONVERSATION];
 
     const isSelectedConversation = this.conversationState.isActiveConversation(conversationEntity);
     const isExpectedState = expectedStates.includes(this.contentState());
