@@ -25,11 +25,12 @@ import {Conversation} from '../../entity/Conversation';
 
 import {ContentMessage} from 'src/script/entity/message/ContentMessage';
 import {t} from 'Util/LocalizerUtil';
-import {Category, CollectionItem, isOfCategory} from './CollectionItem';
+import {isOfCategory, Category} from './utils';
 import Icon from 'Components/Icon';
 import FullSearch from '../../page/collection/FullSearch';
 import {ConversationRepository} from 'src/script/conversation/ConversationRepository';
 import {MessageCategory} from '../../message/MessageCategory';
+import CollectionItem from './CollectionItem';
 import CollectionDetails from './CollectionDetails';
 
 interface CollectionDetailsProps {
@@ -46,7 +47,7 @@ const Section: React.FC<{
   if (messages.length === 0) {
     return null;
   }
-  const hasExtra = messages.length > limit;
+  const hasExtra = true || messages.length > limit;
   const topMessages = messages.slice(0, limit);
 
   return (

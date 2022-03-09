@@ -98,33 +98,25 @@ describe('CollectionDetails', () => {
   const conversation = new Conversation();
   it('displays all image assets', async () => {
     const messages = [createImageMessage(), createImageMessage()];
-    const {getAllByText} = render(
-      <CollectionDetails conversation={conversation} messages={messages} category="images" />,
-    );
+    const {getAllByText} = render(<CollectionDetails conversation={conversation} messages={messages} />);
     expect(getAllByText('Image')).toHaveLength(messages.length);
   });
 
   it('displays all file assets', async () => {
     const messages = [createFileMessage(), createFileMessage()];
-    const {getAllByText} = render(
-      <CollectionDetails conversation={conversation} messages={messages} category="files" />,
-    );
+    const {getAllByText} = render(<CollectionDetails conversation={conversation} messages={messages} />);
     expect(getAllByText('File')).toHaveLength(messages.length);
   });
 
   it('displays all link preview assets', async () => {
     const messages = [createLinkMessage(), createLinkMessage()];
-    const {getAllByText} = render(
-      <CollectionDetails conversation={conversation} messages={messages} category="files" />,
-    );
+    const {getAllByText} = render(<CollectionDetails conversation={conversation} messages={messages} />);
     expect(getAllByText('Link Preview')).toHaveLength(messages.length);
   });
 
   it('displays all audio assets', async () => {
     const messages = [createAudioMessage(), createAudioMessage()];
-    const {getAllByText} = render(
-      <CollectionDetails conversation={conversation} messages={messages} category="files" />,
-    );
+    const {getAllByText} = render(<CollectionDetails conversation={conversation} messages={messages} />);
     expect(getAllByText('Audio')).toHaveLength(messages.length);
   });
 
@@ -140,9 +132,7 @@ describe('CollectionDetails', () => {
       createImageMessage(now - ONE_MONTH),
       createImageMessage(now - ONE_YEAR),
     ];
-    const {getAllByText} = render(
-      <CollectionDetails conversation={conversation} messages={messages} category="images" />,
-    );
+    const {getAllByText} = render(<CollectionDetails conversation={conversation} messages={messages} />);
     expect(getAllByText('Image')).toHaveLength(messages.length);
     expect(getAllByText('conversationToday')).toHaveLength(1);
     expect(getAllByText('March')).toHaveLength(1);

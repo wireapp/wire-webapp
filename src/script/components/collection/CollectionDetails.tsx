@@ -26,7 +26,7 @@ import useEffectRef from 'Util/useEffectRef';
 import {ContentMessage} from 'src/script/entity/message/ContentMessage';
 import {isToday, isThisYear, formatLocale} from 'Util/TimeUtil';
 import {t} from 'Util/LocalizerUtil';
-import {CollectionItem} from './CollectionItem';
+import CollectionItem from './CollectionItem';
 import {noop} from 'Util/util';
 
 interface CollectionDetailsProps {

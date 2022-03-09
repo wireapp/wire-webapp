@@ -24,35 +24,12 @@ import AudioAsset from 'Components/MessagesList/Message/ContentMessage/asset/Aud
 import LinkPreviewAssetComponent from 'Components/MessagesList/Message/ContentMessage/asset/LinkPreviewAssetComponent';
 import {ContentMessage} from 'src/script/entity/message/ContentMessage';
 import {MediumImage} from 'src/script/entity/message/MediumImage';
-import {MessageCategory} from '../../message/MessageCategory';
 import {amplify} from 'amplify';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
+import {isOfCategory} from './utils';
 
-export type Category = 'images' | 'links' | 'files' | 'audio';
-
-export const isOfCategory = (category: Category, message: ContentMessage) => {
-  switch (category) {
-    case 'images':
-      return message.category & MessageCategory.IMAGE && !(message.category & MessageCategory.GIF);
-    case 'links':
-      return message.category & MessageCategory.LINK_PREVIEW;
-    case 'audio':
-      return message.category & MessageCategory.FILE && message.getFirstAsset()?.isAudio();
-    case 'files':
-      return (
-        message.category & MessageCategory.FILE &&
-        (message.getFirstAsset()?.isFile() || message.getFirstAsset()?.isVideo())
-      );
-    default:
-      return false;
-  }
-};
-
-export const CollectionItem: React.FC<{allMessages: ContentMessage[]; message: ContentMessage}> = ({
-  message,
-  allMessages,
-}) => {
+const CollectionItem: React.FC<{allMessages: ContentMessage[]; message: ContentMessage}> = ({message, allMessages}) => {
   const {assets} = useKoSubscribableChildren(message, ['assets']);
   const firstAsset = assets[0];
   const {resource} = useKoSubscribableChildren(firstAsset as MediumImage, ['resource']);
@@ -78,3 +55,5 @@ export const CollectionItem: React.FC<{allMessages: ContentMessage[]; message: C
   }
   return null;
 };
+
+export default CollectionItem;
