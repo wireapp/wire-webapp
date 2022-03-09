@@ -74,22 +74,20 @@ const createLinkMessage = () => {
 const createAudioMessage = () => {
   const message = new ContentMessage(createRandomUuid());
   const audio = new FileAsset(createRandomUuid());
-  spyOn(audio, 'isAudio').and.returnValue(true);
+  audio.isAudio = () => true;
   message.assets.push(audio);
   message.category = MessageCategory.FILE;
   return message;
 };
 
-const mockConversationRepository = {
-  getEventsForCategory: jest.fn().mockResolvedValue([]),
-  searchInConversation: jest.fn().mockResolvedValue({messageEntities: [], query: 'term'}),
-};
-
 describe('Collection', () => {
   const conversation = new Conversation();
+  const messages = [createImageMessage(), createLinkMessage(), createAudioMessage(), createFileMessage()];
+  const mockConversationRepository = {
+    getEventsForCategory: jest.fn().mockResolvedValue(messages),
+    searchInConversation: jest.fn().mockResolvedValue({messageEntities: [createLinkMessage()], query: 'term'}),
+  };
   it('displays all image assets', async () => {
-    const messages = [createImageMessage(), createImageMessage(), createAudioMessage(), createFileMessage()];
-    mockConversationRepository.getEventsForCategory.mockResolvedValue(messages);
     const {getAllByText, getByText, queryByText} = render(
       <Collection conversation={conversation} conversationRepository={mockConversationRepository as any} />,
     );
@@ -98,13 +96,12 @@ describe('Collection', () => {
     expect(getAllByText('CollectionItem')).toHaveLength(messages.length);
     expect(getByText('collectionSectionAudio')).toBeDefined();
     expect(getByText('collectionSectionImages')).toBeDefined();
+    expect(getByText('collectionSectionLinks')).toBeDefined();
     expect(getByText('collectionSectionFiles')).toBeDefined();
     expect(queryByText('collectionDetails')).toBeNull();
   });
 
   it('displays collection details when a section is selected', async () => {
-    const messages = [createImageMessage(), createImageMessage(), createAudioMessage(), createFileMessage()];
-    mockConversationRepository.getEventsForCategory.mockResolvedValue(messages);
     const {getAllByText, getByText} = render(
       <Collection conversation={conversation} conversationRepository={mockConversationRepository as any} />,
     );
@@ -118,17 +115,16 @@ describe('Collection', () => {
 
   it('should display search results when term is typed', async () => {
     jest.useFakeTimers();
-    const messages = [createImageMessage(), createImageMessage(), createAudioMessage(), createFileMessage()];
-    mockConversationRepository.getEventsForCategory.mockResolvedValue(messages);
     const {getAllByText, queryByText, container} = render(
       <Collection conversation={conversation} conversationRepository={mockConversationRepository as any} />,
     );
 
     await waitFor(() => getAllByText('CollectionItem'));
-    act(() => {
+    await act(async () => {
       const input: HTMLInputElement = container.querySelector('[data-uie-name=full-search-header-input]');
       fireEvent.change(input, {target: {value: 'term'}});
       jest.advanceTimersByTime(500);
+      await waitFor(() => expect(mockConversationRepository.searchInConversation).toHaveBeenCalled());
     });
 
     expect(queryByText('CollectionTime')).toBeNull();
