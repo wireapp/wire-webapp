@@ -29,7 +29,7 @@ import {amplify} from 'amplify';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 
-export type Category = 'images' | 'links' | 'files' | 'audio' | 'video';
+export type Category = 'images' | 'links' | 'files' | 'audio';
 
 export const isOfCategory = (category: Category, message: ContentMessage) => {
   switch (category) {
@@ -37,12 +37,13 @@ export const isOfCategory = (category: Category, message: ContentMessage) => {
       return message.category & MessageCategory.IMAGE && !(message.category & MessageCategory.GIF);
     case 'links':
       return message.category & MessageCategory.LINK_PREVIEW;
-    case 'files':
-      return message.category & MessageCategory.FILE && message.getFirstAsset()?.isFile();
     case 'audio':
       return message.category & MessageCategory.FILE && message.getFirstAsset()?.isAudio();
-    case 'video':
-      return message.category & MessageCategory.FILE && message.getFirstAsset()?.isVideo();
+    case 'files':
+      return (
+        message.category & MessageCategory.FILE &&
+        (message.getFirstAsset()?.isFile() || message.getFirstAsset()?.isVideo())
+      );
     default:
       return false;
   }
@@ -74,9 +75,6 @@ export const CollectionItem: React.FC<{allMessages: ContentMessage[]; message: C
   }
   if (isOfCategory('audio', message)) {
     return <AudioAsset className="collection-file" message={message} hasHeader={true} />;
-  }
-  if (isOfCategory('video', message)) {
-    return <FileAssetComponent message={message} hasHeader={true} />;
   }
   return null;
 };

@@ -94,7 +94,6 @@ function splitIntoCategories(messages: ContentMessage[]): Categories {
       files: [],
       images: [],
       links: [],
-      video: [],
     },
   );
 }
