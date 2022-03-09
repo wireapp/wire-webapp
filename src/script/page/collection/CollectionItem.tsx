@@ -24,38 +24,21 @@ import AudioAsset from 'Components/MessagesList/Message/ContentMessage/asset/Aud
 import LinkPreviewAssetComponent from 'Components/MessagesList/Message/ContentMessage/asset/LinkPreviewAssetComponent';
 import {ContentMessage} from 'src/script/entity/message/ContentMessage';
 import {MediumImage} from 'src/script/entity/message/MediumImage';
-import {MessageCategory} from '../../message/MessageCategory';
 import {amplify} from 'amplify';
 import {WebAppEvents} from '@wireapp/webapp-events';
+import {useKoSubscribableChildren} from 'Util/ComponentUtil';
+import {isOfCategory} from './utils';
 
-export type Category = 'images' | 'links' | 'files' | 'audio' | 'video';
-
-export const isOfCategory = (category: Category, message: ContentMessage) => {
-  switch (category) {
-    case 'images':
-      return message.category & MessageCategory.IMAGE;
-    case 'links':
-      return message.category & MessageCategory.LINK_PREVIEW;
-    case 'files':
-      return message.getFirstAsset()?.isFile();
-    case 'audio':
-      return message.getFirstAsset()?.isAudio();
-    case 'video':
-      return message.getFirstAsset()?.isVideo();
-    default:
-      return false;
-  }
-};
-
-export const CollectionItem: React.FC<{allMessages: ContentMessage[]; message: ContentMessage}> = ({
-  message,
-  allMessages,
-}) => {
-  if (isOfCategory('images', message)) {
+const CollectionItem: React.FC<{allMessages: ContentMessage[]; message: ContentMessage}> = ({message, allMessages}) => {
+  const {assets} = useKoSubscribableChildren(message, ['assets']);
+  const firstAsset = assets[0];
+  const {resource} = useKoSubscribableChildren(firstAsset as MediumImage, ['resource']);
+  if (isOfCategory('images', message) && resource) {
     return (
       <Image
         className="collection-image"
-        asset={(message.getFirstAsset() as MediumImage).resource()}
+        asset={resource}
+        data-uie-name="image-asset"
         click={() => {
           amplify.publish(WebAppEvents.CONVERSATION.DETAIL_VIEW.SHOW, message, allMessages, 'collection');
         }}
@@ -71,8 +54,7 @@ export const CollectionItem: React.FC<{allMessages: ContentMessage[]; message: C
   if (isOfCategory('audio', message)) {
     return <AudioAsset className="collection-file" message={message} hasHeader={true} />;
   }
-  if (isOfCategory('video', message)) {
-    return <FileAssetComponent message={message} hasHeader={true} />;
-  }
   return null;
 };
+
+export default CollectionItem;
