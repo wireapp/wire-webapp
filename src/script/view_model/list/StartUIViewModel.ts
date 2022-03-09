@@ -88,6 +88,8 @@ export class StartUIViewModel {
   readonly manageTeamUrl: string;
   readonly manageServicesUrl: string;
   readonly federationDomain?: string;
+  readonly visible: ko.Observable<boolean>;
+  readonly ariaHidden: ko.Observable<string>;
   private submittedSearch: boolean;
   private readonly matchedUsers: ko.ObservableArray<User>;
   private readonly alreadyClickedOnContact: Record<string, boolean>;
@@ -245,6 +247,9 @@ export class StartUIViewModel {
     this.shouldUpdateScrollbar = ko
       .computed(() => this.listViewModel.lastUpdate())
       .extend({notify: 'always', rateLimit: 500});
+
+    this.visible = ko.observable(false);
+    this.ariaHidden = ko.observable('true');
   }
 
   readonly clickOnClose = (): void => {
@@ -473,5 +478,15 @@ export class StartUIViewModel {
       }
       this.logger.error(`Error searching for contacts: ${error.message}`, error);
     }
+  };
+
+  readonly show = (): void => {
+    this.visible(true);
+    this.ariaHidden('false');
+  };
+
+  readonly hide = (): void => {
+    this.visible(false);
+    this.ariaHidden('true');
   };
 }

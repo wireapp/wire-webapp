@@ -39,6 +39,8 @@ export class TemporaryGuestViewModel {
   readonly callingViewModel: CallingViewModel;
   readonly selfUser: ko.Observable<User>;
   readonly isAccountCreationEnabled: boolean;
+  readonly visible: ko.Observable<boolean>;
+  readonly ariaHidden: ko.Observable<string>;
 
   constructor(
     mainViewModel: MainViewModel,
@@ -50,6 +52,9 @@ export class TemporaryGuestViewModel {
     this.callingViewModel = mainViewModel.calling;
     this.selfUser = this.userState.self;
     this.isAccountCreationEnabled = Config.getConfig().FEATURE.ENABLE_ACCOUNT_REGISTRATION;
+
+    this.visible = ko.observable(true);
+    this.ariaHidden = ko.observable('false');
   }
 
   readonly clickOnPreferencesButton = (): void => {
@@ -72,5 +77,15 @@ export class TemporaryGuestViewModel {
 
   readonly isSelectedConversation = (): true => {
     return true;
+  };
+
+  readonly show = (): void => {
+    this.visible(true);
+    this.ariaHidden('false');
+  };
+
+  readonly hide = (): void => {
+    this.visible(false);
+    this.ariaHidden('true');
   };
 }

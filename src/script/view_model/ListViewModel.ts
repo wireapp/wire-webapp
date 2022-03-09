@@ -346,14 +346,50 @@ export class ListViewModel {
       this.start.resetView();
     }
 
-    const listStateElementId = this.getElementIdOfList(this.state());
-    $(`#${listStateElementId}`).removeClass('left-list-is-visible').attr('aria-hidden', 'true');
+    switch (this.state()) {
+      case ListViewModel.STATE.ARCHIVE:
+        this.archive.hide();
+        break;
+      case ListViewModel.STATE.CONVERSATIONS:
+        this.conversations.hide();
+        break;
+      case ListViewModel.STATE.PREFERENCES:
+        this.preferences.hide();
+        break;
+      case ListViewModel.STATE.START_UI:
+        this.start.hide();
+        break;
+      case ListViewModel.STATE.TEMPORARY_GUEST:
+        this.temporaryGuest.hide();
+        break;
+    }
+
+    // const listStateElementId = this.getElementIdOfList(this.state());
+    // $(`#${listStateElementId}`).removeClass('left-list-is-visible').attr('aria-hidden', 'true');
     document.removeEventListener('keydown', this.onKeyDownListView);
   };
 
   private readonly showList = (newListState: string): void => {
-    const listStateElementId = this.getElementIdOfList(newListState);
-    $(`#${listStateElementId}`).addClass('left-list-is-visible').removeAttr('aria-hidden');
+    switch (newListState) {
+      case ListViewModel.STATE.ARCHIVE:
+        this.archive.show();
+        break;
+      case ListViewModel.STATE.CONVERSATIONS:
+        this.conversations.show();
+        break;
+      case ListViewModel.STATE.PREFERENCES:
+        this.preferences.show();
+        break;
+      case ListViewModel.STATE.START_UI:
+        this.start.show();
+        break;
+      case ListViewModel.STATE.TEMPORARY_GUEST:
+        this.temporaryGuest.hide();
+        break;
+    }
+
+    // const listStateElementId = this.getElementIdOfList(newListState);
+    // $(`#${listStateElementId}`).addClass('left-list-is-visible').removeAttr('aria-hidden');
 
     this.state(newListState);
     this.lastUpdate(Date.now());
@@ -379,20 +415,20 @@ export class ListViewModel {
     }
   };
 
-  private readonly getElementIdOfList = (listState: string) => {
-    switch (listState) {
-      case ListViewModel.STATE.ARCHIVE:
-        return 'archive';
-      case ListViewModel.STATE.PREFERENCES:
-        return 'preferences';
-      case ListViewModel.STATE.START_UI:
-        return 'start-ui';
-      case ListViewModel.STATE.TEMPORARY_GUEST:
-        return 'temporary-guest';
-      default:
-        return 'conversations';
-    }
-  };
+  // private readonly getElementIdOfList = (listState: string) => {
+  //   switch (listState) {
+  //     case ListViewModel.STATE.ARCHIVE:
+  //       return 'archive';
+  //     case ListViewModel.STATE.PREFERENCES:
+  //       return 'preferences';
+  //     case ListViewModel.STATE.START_UI:
+  //       return 'start-ui';
+  //     case ListViewModel.STATE.TEMPORARY_GUEST:
+  //       return 'temporary-guest';
+  //     default:
+  //       return 'conversations';
+  //   }
+  // };
 
   readonly dismissModal = (): void => {
     this.modal(undefined);

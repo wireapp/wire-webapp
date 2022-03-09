@@ -1,7 +1,8 @@
+<!-- ko with: $root.conversations -->
 <div
   id="conversations"
-  class="conversations left-list-is-visible"
-  data-bind="with: $root.conversations"
+  class="conversations"
+  data-bind="css: { 'left-list-is-visible': visible }, attr: { 'aria-hidden': ariaHidden }"
 >
   <div class="left-list-header">
     <settings-icon
@@ -150,3 +151,4 @@
     <!-- /ko -->
   </div>
 </div>
+<!-- /ko -->

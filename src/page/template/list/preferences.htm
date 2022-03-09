@@ -1,8 +1,8 @@
+<!-- ko with: $root.preferences -->
 <div
   id="preferences"
   class="left-list left-list-preferences"
-  data-bind="with: $root.preferences"
-  aria-hidden="true"
+  data-bind="css: { 'left-list-is-visible': visible }, attr: { 'aria-hidden': ariaHidden }"
 >
   <div class="left-list-header">
     <span class="left-list-header-text" data-bind="text: t('preferencesHeadline')"></span>
@@ -37,3 +37,4 @@
     </ul>
   </div>
 </div>
+<!-- /ko -->
