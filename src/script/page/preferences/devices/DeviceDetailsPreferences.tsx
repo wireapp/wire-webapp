@@ -54,15 +54,15 @@ const DeviceDetailsPreferences: React.FC<DevicesPreferencesProps> = ({
   const brandName = Config.getConfig().BRAND_NAME;
 
   const resetSession = async () => {
-    await onResetSession(device);
     setResetState(SessionResetState.ONGOING);
+    await onResetSession(device);
     setTimeout(() => setResetState(SessionResetState.CONFIRMATION), MotionDuration.LONG);
     setTimeout(() => setResetState(SessionResetState.RESET), 5000);
   };
 
   useEffect(() => {
     getFingerprint(device).then(setFingerprint);
-  });
+  }, []);
 
   return (
     <div
@@ -70,8 +70,8 @@ const DeviceDetailsPreferences: React.FC<DevicesPreferencesProps> = ({
       className="preferences-page preferences-device-details"
       data-uie-name="preferences-devices-details"
     >
-      <div className="preferences-titlebar" data-bind="text: t('preferencesDeviceDetails')"></div>
-      <div className="preferences-content" data-bind="fadingscrollbar">
+      <div className="preferences-titlebar">{t('preferencesDeviceDetails')}</div>
+      <div className="preferences-content">
         <section className="preferences-section">
           <header className="preferences-devices-details">
             <button className="preferences-devices-icon icon-back" onClick={onClose} data-uie-name="go-back"></button>
@@ -87,12 +87,9 @@ const DeviceDetailsPreferences: React.FC<DevicesPreferencesProps> = ({
               checked={isVerified}
               onChange={event => onVerify(device, event.target.checked)}
             />
-            <label
-              className="button-label"
-              htmlFor="preferences_device_verification"
-              data-bind="click: toggleDeviceVerification, text: t('preferencesDevicesVerification')"
-              data-uie-name="do-verify"
-            ></label>
+            <label className="button-label" htmlFor="preferences_device_verification" data-uie-name="do-verify">
+              {t('preferencesDevicesVerification')}
+            </label>
           </div>
           <div className="preferences-detail">{t('preferencesDevicesFingerprintDetail', brandName)}</div>
         </section>
