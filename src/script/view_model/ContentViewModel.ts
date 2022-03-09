@@ -42,8 +42,6 @@ import {GiphyViewModel} from './content/GiphyViewModel';
 import {HistoryImportViewModel} from './content/HistoryImportViewModel';
 import {HistoryExportViewModel} from './content/HistoryExportViewModel';
 import {TitleBarViewModel} from './content/TitleBarViewModel';
-import {PreferencesDevicesViewModel} from './content/PreferencesDevicesViewModel';
-import {PreferencesDeviceDetailsViewModel} from './content/PreferencesDeviceDetailsViewModel';
 import {InputBarViewModel} from './content/InputBarViewModel';
 import {PanelViewModel} from './PanelViewModel';
 import type {MainViewModel, ViewModelRepositories} from './MainViewModel';
@@ -103,8 +101,6 @@ export class ContentViewModel {
   isFederated?: boolean;
   mainViewModel: MainViewModel;
   messageList: MessageListViewModel;
-  preferencesDeviceDetails: PreferencesDeviceDetailsViewModel;
-  preferencesDevices: PreferencesDevicesViewModel;
   previousConversation: Conversation | null = null;
   previousState: string | null = null;
   serviceModal: ServiceModalViewModel;
@@ -182,14 +178,6 @@ export class ContentViewModel {
     );
     this.titleBar = new TitleBarViewModel(mainViewModel.calling, mainViewModel.panel, this, repositories.calling);
 
-    this.preferencesDeviceDetails = new PreferencesDeviceDetailsViewModel(
-      mainViewModel,
-      repositories.client,
-      repositories.cryptography,
-      repositories.message,
-    );
-    this.preferencesDevices = new PreferencesDevicesViewModel(mainViewModel, this, repositories.cryptography);
-
     this.historyExport = new HistoryExportViewModel(repositories.backup);
     this.historyImport = new HistoryImportViewModel(repositories.backup);
 
@@ -201,9 +189,6 @@ export class ContentViewModel {
           break;
         case ContentViewModel.STATE.PREFERENCES_ACCOUNT:
           this.popNotification();
-          break;
-        case ContentViewModel.STATE.PREFERENCES_DEVICES:
-          this.preferencesDevices.updateDeviceInfo();
           break;
         default:
           this.inputBar.removedFromView();
