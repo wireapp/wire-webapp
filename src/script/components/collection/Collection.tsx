@@ -54,10 +54,10 @@ const Section: React.FC<{
       <header>
         {children}
         {hasExtra && (
-          <span className="collection-header-all accent-text" onClick={() => onSelect()}>
+          <button className="collection-header-all accent-text" onClick={() => onSelect()}>
             <span data-uie-name="collection-show-all">{t('collectionShowAll', messages.length)}</span>
             &nbsp;<span className="icon-forward font-size-xxs"></span>
-          </span>
+          </button>
         )}
       </header>
       <div className="collection-images">
@@ -196,11 +196,13 @@ const Collection: React.FC<CollectionDetailsProps> = ({conversation, conversatio
     <div id="collection" className="collection content">
       <div className="content-titlebar">
         <div className="content-titlebar-items-left">
-          <Icon.Close
+          <button
             className="content-titlebar-icon"
             data-uie-name="do-close-collection"
             onClick={() => amplify.publish(WebAppEvents.CONVERSATION.SHOW, conversation, {})}
-          />
+          >
+            <Icon.Close />
+          </button>
         </div>
         <span className="content-titlebar-items-center">{display_name}</span>
       </div>

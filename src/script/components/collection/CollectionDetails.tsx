@@ -64,11 +64,11 @@ const CollectionDetails: React.FC<CollectionDetailsProps> = ({conversation, mess
     <div id="collection-details" className="collection-details content">
       <div className="content-titlebar">
         <div className="content-titlebar-items-left">
-          <span
+          <button
             className="content-titlebar-icon icon-back"
             data-uie-name="do-collection-details-close"
             onClick={onClose}
-          ></span>
+          ></button>
         </div>
         <span className="content-titlebar-items-center" data-uie-name="collection-details-conversation-name">
           {display_name}
