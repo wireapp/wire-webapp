@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [18.3.1](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/compare/@wireapp/api-client@18.3.0...@wireapp/api-client@18.3.1) (2022-03-10)
+
+
+### Bug Fixes
+
+* **api-client:** Chunk request to get conversations by qualified ids ([#4238](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/issues/4238)) ([5a963da](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/commit/5a963da6cbe80d04a0686e1c0c7c4dcb1f491f0b))
+
+
+
+
+
 # [18.3.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/compare/@wireapp/api-client@18.2.0...@wireapp/api-client@18.3.0) (2022-03-07)
 
 
