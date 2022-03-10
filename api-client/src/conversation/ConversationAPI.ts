@@ -67,6 +67,7 @@ import {
 } from './ConversationError';
 import {QualifiedId} from '../user';
 import {BackendFeatures} from '../APIClient';
+import {chunk} from '@wireapp/commons/src/main/util/ArrayUtil';
 
 export class ConversationAPI {
   public static readonly MAX_CHUNK_SIZE = 500;
@@ -310,14 +311,24 @@ export class ConversationAPI {
    * @see https://staging-nginz-https.zinfra.io/api/swagger-ui/#/default/post_conversations_list_v2
    */
   public async getConversationsByQualifiedIds(conversations: QualifiedId[]): Promise<RemoteConversations> {
-    const config: AxiosRequestConfig = {
-      data: {qualified_ids: conversations},
-      method: 'post',
-      url: `${ConversationAPI.URL.CONVERSATIONS}/${ConversationAPI.URL.LIST}/${ConversationAPI.URL.V2}`,
-    };
+    const chunks = chunk(conversations, ConversationAPI.MAX_CHUNK_SIZE);
+    let results: RemoteConversations = {found: [], failed: [], not_found: []};
 
-    const {data} = await this.client.sendJSON<RemoteConversations>(config);
-    return data;
+    for (const chunk of chunks) {
+      const config: AxiosRequestConfig = {
+        data: {qualified_ids: chunk},
+        method: 'post',
+        url: `${ConversationAPI.URL.CONVERSATIONS}/${ConversationAPI.URL.LIST}/${ConversationAPI.URL.V2}`,
+      };
+
+      const {data} = await this.client.sendJSON<RemoteConversations>(config);
+      results = {
+        found: results.found?.concat(data.found ?? []),
+        not_found: results.not_found?.concat(data.not_found ?? []),
+        failed: results.failed?.concat(data.failed ?? []),
+      };
+    }
+    return results;
   }
 
   /**
