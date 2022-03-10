@@ -87,11 +87,13 @@ const Preferences: React.FC<PreferencesProps> = ({listViewModel, contentViewMode
         <div className="left-list-header">
           <span className="left-list-header-text">{t('preferencesHeadline')}</span>
           <button
-            className="left-list-header-close-button button-icon-large icon-close"
+            className="left-list-header-close-button button-icon-large"
             onClick={close}
             title={t('tooltipSearchClose')}
             data-uie-name="do-close-preferences"
-          ></button>
+          >
+            <Icon.Close />
+          </button>
         </div>
         <div className="left-list-center">
           <ul className="left-list-items preferences-list-items">
