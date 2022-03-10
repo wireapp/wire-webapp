@@ -17,33 +17,29 @@
  *
  */
 
-import {ConsentType} from '@wireapp/api-client/src/self/index';
-import {CheckRoundIcon, ContainerXS, H1, Muted, Text, useTimeout} from '@wireapp/react-ui-kit';
+import {CheckRoundIcon, ContainerXS, H1, Muted, Text} from '@wireapp/react-ui-kit';
 import React, {MouseEvent, PointerEvent, useCallback, useState} from 'react';
 import {useIntl} from 'react-intl';
-import {connect} from 'react-redux';
-import {AnyAction, Dispatch} from 'redux';
 import {usePausableInterval} from '../../hooks/usePausableInterval';
 import {usePausableTimeout} from '../../hooks/usePausableTimeout';
-import useReactRouter from 'use-react-router';
+
 import {chooseHandleStrings} from '../../strings';
 import Canvas from '../component/Canvas';
-import {actionRoot as ROOT_ACTIONS} from '../module/action';
-import {BackendError} from '../module/action/BackendError';
-import {RootState, bindActionCreators} from '../module/reducer';
-import * as SelfSelector from '../module/selector/SelfSelector';
-import {ROUTE} from '../route';
-import Page from './Page';
+
 import {ProgressBar} from '../component/ProgressBar';
 
-interface Props extends React.HTMLProps<HTMLDivElement> {}
+interface Props extends React.HTMLProps<HTMLDivElement> {
+  entropy: [number, number][];
+  error: any;
+  onSetEntropy: () => void;
+  setEntropy: React.Dispatch<React.SetStateAction<[number, number][]>>;
+  setError: React.Dispatch<any>;
+}
 
-const SetEntropy = ({doSetEntropy, hasSelfHandle}: Props & ConnectedProps & DispatchProps) => {
+const SetEntropy = ({setEntropy, entropy, error, setError, onSetEntropy}: Props) => {
   const {formatMessage: _} = useIntl();
-  const {history} = useReactRouter();
-  const [error, setError] = useState(null);
+
   const [frameCount, setFrameCount] = useState(0);
-  const [entropy, setEntropy] = useState<[number, number][]>([]);
   const [percent, setPercent] = useState(0);
   const [pause, setPause] = useState(true);
 
@@ -82,86 +78,54 @@ const SetEntropy = ({doSetEntropy, hasSelfHandle}: Props & ConnectedProps & Disp
     [entropy],
   );
 
-  const onSetEntropy = async (): Promise<void> => {
-    try {
-      await doSetEntropy(new Uint8Array(entropy.filter(Boolean).flat()));
-      // console.log(new Uint8Array(entropy.flat()));
-      useTimeout(() => history.push(ROUTE.VERIFY_EMAIL_CODE), 10000);
-    } catch (error) {
-      if (error.label === BackendError.HANDLE_ERRORS.INVALID_HANDLE) {
-        error.label = BackendError.HANDLE_ERRORS.HANDLE_TOO_SHORT;
-      }
-      setError(error);
-    }
-  };
-
   usePausableTimeout(onSetEntropy, 30000, pause);
   usePausableInterval(() => setPercent(percent => percent + 1), 300, pause);
 
   return (
-    <Page>
-      <ContainerXS centerText verticalCenter style={{display: 'flex', flexDirection: 'column', minHeight: 428}}>
-        <H1 center>{_(chooseHandleStrings.headline)}</H1>
-        {entropy.length > 300 && percent >= 100 ? (
-          <>
-            <CheckRoundIcon width={64} height={64} css={{alignSelf: 'center', marginBottom: '64px'}} />
-            <Muted center>{_(chooseHandleStrings.subhead)}</Muted>
-          </>
-        ) : (
-          <>
-            <Muted center>{_(chooseHandleStrings.subhead)}</Muted>
-            <Canvas
-              sizeX={256}
-              sizeY={256}
-              style={{
-                alignSelf: 'center',
-                backgroundColor: 'white',
-                border: error ? 'red 2px solid' : 'black 2px solid',
-                borderRadius: '5px',
-                height: '255px',
-                width: '255px',
-              }}
-              draw={draw}
-              onMouseMove={onMouseMove}
-              onMouseEnter={() => setPause(false)}
-              onMouseLeave={() => {
-                setPause(true);
-                setError(!error);
-                setEntropy([...entropy, null]);
-              }}
-              data-uie-name="enter-entropy"
-            />
-            <ProgressBar
-              error={error}
-              width={256}
-              percent={percent}
-              css={{
-                alignSelf: 'center',
-              }}
-            />
-            <Text center>{percent}%</Text>
-          </>
-        )}
-      </ContainerXS>
-    </Page>
+    <ContainerXS centerText verticalCenter style={{display: 'flex', flexDirection: 'column', minHeight: 428}}>
+      <H1 center>{_(chooseHandleStrings.headline)}</H1>
+      {entropy.length > 300 && percent >= 100 ? (
+        <>
+          <CheckRoundIcon width={64} height={64} css={{alignSelf: 'center', marginBottom: '64px'}} />
+          <Muted center>{_(chooseHandleStrings.subhead)}</Muted>
+        </>
+      ) : (
+        <>
+          <Muted center>{_(chooseHandleStrings.subhead)}</Muted>
+          <Canvas
+            sizeX={256}
+            sizeY={256}
+            style={{
+              alignSelf: 'center',
+              backgroundColor: 'white',
+              border: error ? 'red 2px solid' : 'black 2px solid',
+              borderRadius: '5px',
+              height: '255px',
+              width: '255px',
+            }}
+            draw={draw}
+            onMouseMove={onMouseMove}
+            onMouseEnter={() => setPause(false)}
+            onMouseLeave={() => {
+              setPause(true);
+              setError(!error);
+              setEntropy([...entropy, null]);
+            }}
+            data-uie-name="enter-entropy"
+          />
+          <ProgressBar
+            error={error}
+            width={256}
+            percent={percent}
+            css={{
+              alignSelf: 'center',
+            }}
+          />
+          <Text center>{percent}%</Text>
+        </>
+      )}
+    </ContainerXS>
   );
 };
 
-type ConnectedProps = ReturnType<typeof mapStateToProps>;
-const mapStateToProps = (state: RootState) => ({
-  hasSelfHandle: SelfSelector.hasSelfHandle(state),
-  hasUnsetMarketingConsent: SelfSelector.hasUnsetConsent(state, ConsentType.MARKETING) || false,
-  isFetching: SelfSelector.isFetching(state),
-  name: SelfSelector.getSelfName(state),
-});
-
-type DispatchProps = ReturnType<typeof mapDispatchToProps>;
-const mapDispatchToProps = (dispatch: Dispatch<AnyAction>) =>
-  bindActionCreators(
-    {
-      doSetEntropy: ROOT_ACTIONS.authAction.doSetEntropy,
-    },
-    dispatch,
-  );
-
-export default connect(mapStateToProps, mapDispatchToProps)(SetEntropy);
+export default SetEntropy;
