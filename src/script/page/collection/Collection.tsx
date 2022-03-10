@@ -152,7 +152,7 @@ const Collection: React.FC<CollectionDetailsProps> = ({conversation, conversatio
       <CollectionSection
         messages={files}
         limit={4}
-        uieName={'collection-section-files'}
+        uieName={'collection-section-file'}
         onSelect={() => setDetailCategory('files')}
         label={t('collectionSectionFiles')}
       >
@@ -177,7 +177,7 @@ const Collection: React.FC<CollectionDetailsProps> = ({conversation, conversatio
       </div>
 
       <div className="content-list-wrapper">
-        <div className="content-list collection-list" data-bind="fadingscrollbar: true">
+        <div className="content-list collection-list">
           <FullSearch
             searchProvider={query => conversationRepository.searchInConversation(conversation, query)}
             change={setSearchTerm}
