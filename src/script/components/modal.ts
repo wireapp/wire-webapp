@@ -19,7 +19,9 @@
 
 import ko from 'knockout';
 
+import {isTabKey} from 'Util/KeyboardUtil';
 import {noop, createRandomUuid} from 'Util/util';
+
 interface ModalParams {
   ariaLabelby?: string;
   isShown: ko.Observable<boolean>;
@@ -36,12 +38,12 @@ ko.components.register('modal', {
         <loading-icon class="modal__loading"></loading-icon>
       <!-- /ko -->
       <!-- ko ifnot: showLoading() -->
-        <div class="modal__content" data-bind="css: {'modal__content--large': large, 'modal__content--visible':  hasVisibleClass() && !showLoading()}, fadingscrollbar" >
+        <div class="modal__content" data-bind="css: {'modal__content--large': large, 'modal__content--visible':  hasVisibleClass() && !showLoading()}, fadingscrollbar">
           <!-- ko template: { nodes: $componentTemplateNodes, data: $parent } --><!-- /ko -->
         </div>
       <!-- /ko -->
     </div>
-    <div class="modal__overlay" data-bind="click: () => onBgClick(), css: {'modal__overlay--visible': hasVisibleClass()}, style: {display: displayNone() ? 'none': 'flex'}" ></div>
+    <div class="modal__overlay" data-bind="click: () => onBgClick(), css: {'modal__overlay--visible': hasVisibleClass()}, style: {display: displayNone() ? 'none': 'flex'}"></div>
     `,
   viewModel: function ({
     isShown,
@@ -62,34 +64,29 @@ ko.components.register('modal', {
 
     const maintaineFocus = (): void => {
       if (!this.displayNone()) {
-        document.body.addEventListener('focus', this.onFocusModal, true);
         document.addEventListener('keydown', this.onKeyDown);
       }
     };
 
     this.onKeyDown = (event: KeyboardEvent): void => {
+      if (!isTabKey(event)) {
+        return;
+      }
+      event.preventDefault();
       const focusableElements =
         'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
       const modal = document.getElementById(this.id);
       const focusableContent = [...modal.querySelectorAll(focusableElements)];
       const focusedItemIndex = focusableContent.indexOf(document.activeElement);
-      // If the SHIFT key is being pressed while tabbing (moving backwards) and
-      // the currently focused item is the first one, move the focus to the last focusable item from the dialog element
       if (event.shiftKey && focusedItemIndex === 0) {
         (focusableContent[focusableContent.length - 1] as HTMLElement)?.focus();
-        event.preventDefault();
-        // If the SHIFT key is not being pressed (moving forwards) and the currently
-        // focused item is the last one, move the focus to the first focusable item from the dialog element
-      } else if (!event.shiftKey && focusedItemIndex === focusableContent.length - 1) {
+        return;
+      }
+      if (!event.shiftKey && focusedItemIndex === focusableContent.length - 1) {
         (focusableContent[0] as HTMLElement)?.focus();
-        event.preventDefault();
+        return;
       }
-    };
-
-    this.onFocusModal = (event: Event): void => {
-      if (!this.displayNone() && !(event.target as Element).closest('[aria-modal="true"]')) {
-        document.getElementById(this.id).focus();
-      }
+      (focusableContent[focusedItemIndex + 1] as HTMLElement)?.focus();
     };
 
     const isDisplayNoneSubscription = this.displayNone.subscribe(() => {
@@ -101,14 +98,13 @@ ko.components.register('modal', {
         return this.displayNone(false);
       }
       timeoutId = window.setTimeout(() => {
+        document.removeEventListener('keydown', this.onKeyDown);
         this.displayNone(true);
         onClosed();
       }, 150);
     });
 
     this.dispose = () => {
-      document.body.removeEventListener('focus', this.onFocusModal);
-      document.removeEventListener('keydown', this.onKeyDown);
       isDisplayNoneSubscription.dispose();
       isShownSubscription.dispose();
       this.hasVisibleClass.dispose();
