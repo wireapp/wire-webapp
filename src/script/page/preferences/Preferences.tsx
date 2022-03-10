@@ -26,7 +26,9 @@ const PreferenceItem: React.FC<{IconComponent: React.FC; isSelected: boolean; la
         onClick={onSelect}
         data-uie-name="go-account"
       >
-        <IconComponent />
+        <span className="left-column-icon">
+          <IconComponent />
+        </span>
         <span className="center-column">{label}</span>
       </button>
     </li>
