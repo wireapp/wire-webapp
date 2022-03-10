@@ -10,28 +10,58 @@
   </div>
   <div class="left-list-center">
     <ul class="left-list-items preferences-list-items">
-      <li class="left-list-item left-list-item-clickable" data-bind="click: clickOnAccount, css: {'accent-text accent-fill': selectedAccount}" data-uie-name="go-account">
-        <profile-icon class="left-column-icon"></profile-icon>
-        <div class="center-column" data-bind="text: t('preferencesAccount')"></div>
+      <li class="left-list-item">
+        <button
+          class="left-list-item-button"
+          data-bind="click: clickOnAccount, css: {'accent-text accent-fill': selectedAccount}"
+          data-uie-name="go-account"
+        >
+          <profile-icon class="left-column-icon"></profile-icon>
+          <span class="center-column" data-bind="text: t('preferencesAccount')"></span>
+        </button>
       </li>
-      <li class="left-list-item left-list-item-clickable" data-bind="click: clickOnDevices, css: {'accent-text accent-fill': selectedDevices}" data-uie-name="go-devices">
-        <devices-icon class="left-column-icon"></devices-icon>
-        <div class="center-column" data-bind="text: t('preferencesDevices')"></div>
+      <li class="left-list-item">
+        <button
+          class="left-list-item-button"
+          data-bind="click: clickOnDevices, css: {'accent-text accent-fill': selectedDevices}"
+          data-uie-name="go-devices"
+        >
+          <devices-icon class="left-column-icon"></devices-icon>
+          <span class="center-column" data-bind="text: t('preferencesDevices')"></span>
+        </button>
       </li>
-      <li class="left-list-item left-list-item-clickable" data-bind="click: clickOnOptions, css: {'accent-text accent-fill': selectedOptions}" data-uie-name="go-options">
-        <options-icon class="left-column-icon"></options-icon>
-        <div class="center-column" data-bind="text: t('preferencesOptions')"></div>
+      <li class="left-list-item">
+        <button
+          class="left-list-item-button"
+          data-bind="click: clickOnOptions, css: {'accent-text accent-fill': selectedOptions}"
+          data-uie-name="go-options"
+        >
+          <options-icon class="left-column-icon"></options-icon>
+          <span class="center-column" data-bind="text: t('preferencesOptions')"></span>
+        </button>
       </li>
       <!-- ko if: supportsCalling -->
-        <li class="left-list-item left-list-item-clickable" data-bind="click: clickOnAV, css: {'accent-text accent-fill': selectedAV}" data-uie-name="go-audio-video">
-          <av-icon class="left-column-icon"></av-icon>
-          <div class="center-column" data-bind="text: t('preferencesAV')"></div>
+        <li class="left-list-item">
+          <button
+            class="left-list-item-button"
+            data-bind="click: clickOnAV, css: {'accent-text accent-fill': selectedAV}"
+            data-uie-name="go-audio-video"
+          >
+            <av-icon class="left-column-icon"></av-icon>
+            <span class="center-column" data-bind="text: t('preferencesAV')"></span>
+          </button>
         </li>
       <!-- /ko -->
       <!-- ko ifnot: isDesktop -->
-        <li class="left-list-item left-list-item-clickable" data-bind="click: clickOnAbout, css: {'accent-text accent-fill': selectedAbout}" data-uie-name="go-about">
-          <about-icon class="left-column-icon"></about-icon>
-          <div class="center-column" data-bind="text: t('preferencesAbout')"></div>
+        <li class="left-list-item">
+          <button
+            class="left-list-item-button"
+            data-bind="click: clickOnAbout, css: {'accent-text accent-fill': selectedAbout}"
+            data-uie-name="go-about"
+          >
+            <about-icon class="left-column-icon"></about-icon>
+            <span class="center-column" data-bind="text: t('preferencesAbout')"></span>
+          </button>
         </li>
       <!-- /ko -->
     </ul>
