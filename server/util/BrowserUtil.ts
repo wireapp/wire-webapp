@@ -17,7 +17,6 @@
  *
  */
 
-import {CommonConfig} from '@wireapp/commons';
 import useragent from 'express-useragent';
 
 interface ParsedUserAgent {
@@ -141,28 +140,7 @@ function parseUserAgent(userAgent?: string): ParsedUserAgent | null {
 }
 
 function isSupportedBrowser(userAgent: string): boolean {
-  const parsedUserAgent = parseUserAgent(userAgent);
-  if (!parsedUserAgent) {
-    return false;
-  }
-  if(parsedUserAgent.is.mobile) {
-    return true;
-  }
-  const invalidBrowser = parsedUserAgent.is.franz;
-  if (invalidBrowser) {
-    return false;
-  }
-  const browserName = parsedUserAgent.browser.name.toLowerCase();
-  const supportedBrowserVersionObject = CommonConfig.WEBAPP_SUPPORTED_BROWSERS[browserName];
-  const supportedBrowserVersion = supportedBrowserVersionObject?.major;
-
-  try {
-    const browserVersionString = (parsedUserAgent.browser.version.split('.') || [])[0];
-    const browserVersion = parseInt(browserVersionString, 10);
-    return supportedBrowserVersion ? browserVersion >= supportedBrowserVersion : false;
-  } catch (err) {
-    return false;
-  }
+  return true;
 }
 
 export {parseUserAgent, isSupportedBrowser};
