@@ -148,7 +148,8 @@
     text-align: left;
   }
 
-  .left-column-icon {
+  > .left-column-icon,
+  > .left-list-item-button > .left-column-icon {
     .flex-center;
 
     width: @left-list-item-left-width;
@@ -165,7 +166,8 @@
     }
   }
 
-  .center-column {
+  > .center-column,
+  > .left-list-item-button > .center-column {
     .ellipsis;
 
     position: relative;
