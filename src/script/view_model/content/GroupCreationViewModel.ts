@@ -140,7 +140,7 @@ export class GroupCreationViewModel {
     this.stateIsParticipants = ko.pureComputed(() => this.state() === GroupCreationViewModel.STATE.PARTICIPANTS);
 
     this.nameInput.subscribe(() => this.nameError(''));
-    const onEscape = () => this.closeModal();
+    const onEscape = () => this.isShown(false);
     this.stateIsPreferences.subscribe((stateIsPreference: boolean): void => {
       if (stateIsPreference) {
         onEscKey(onEscape);
@@ -179,7 +179,7 @@ export class GroupCreationViewModel {
   };
 
   readonly clickOnClose = (): void => {
-    this.closeModal();
+    this.isShown(false);
   };
 
   readonly clickOnToggleServicesMode = (): void => {
@@ -236,7 +236,7 @@ export class GroupCreationViewModel {
           accessState,
           options,
         );
-        this.closeModal();
+        this.isShown(false);
 
         amplify.publish(WebAppEvents.CONVERSATION.SHOW, conversationEntity, {});
       } catch (error) {
@@ -265,11 +265,6 @@ export class GroupCreationViewModel {
     }
 
     this.state(GroupCreationViewModel.STATE.PARTICIPANTS);
-  };
-
-  readonly closeModal = (): void => {
-    this.isShown(false);
-    this.afterHideModal();
   };
 
   readonly afterHideModal = (): void => {
