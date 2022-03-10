@@ -145,7 +145,10 @@ function isSupportedBrowser(userAgent: string): boolean {
   if (!parsedUserAgent) {
     return false;
   }
-  const invalidBrowser = parsedUserAgent.is.mobile || parsedUserAgent.is.franz;
+  if(parsedUserAgent.is.mobile) {
+    return true;
+  }
+  const invalidBrowser = parsedUserAgent.is.franz;
   if (invalidBrowser) {
     return false;
   }
