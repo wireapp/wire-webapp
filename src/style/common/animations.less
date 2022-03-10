@@ -21,14 +21,18 @@
   opacity: 1;
   pointer-events: auto;
   transform: translateY(0);
-  transition: all @animation-timing-slow @ease-out-expo @animation-timing-fast;
+  transition: visibility 0s, all @animation-timing-slow @ease-out-expo @animation-timing-fast;
+  visibility: visible;
 }
 
 .start-ui-transition-fadeout {
   opacity: 0;
   pointer-events: none;
   transform: translateY(@start-ui-search-bar-offset);
+  transition: visibility 0s;
   transition-delay: 0s;
   transition-duration: @animation-timing-fast;
+  transition-property: all;
   transition-timing-function: @ease-in-expo;
+  visibility: hidden;
 }

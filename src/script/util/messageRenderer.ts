@@ -130,7 +130,7 @@ export const renderMessage = (message: string, selfId: QualifiedId | null, menti
     }, message);
 
   markdownit.set({
-    highlight: function (code): string {
+    highlight: function (code, lang): string {
       const containsMentions = mentionEntities.some(mention => {
         const hash = createMentionHash(mention);
         return code.includes(hash);
@@ -140,7 +140,7 @@ export const renderMessage = (message: string, selfId: QualifiedId | null, menti
         // highlighting will be wrong anyway because this is not valid code
         return code;
       }
-      return hljs.highlightAuto(code).value;
+      return hljs.highlightAuto(code, lang && [lang]).value;
     },
   });
 

@@ -180,7 +180,7 @@ export class ListViewModel {
       repositories.user,
     );
     this.takeover = new TakeoverViewModel(this, repositories.user, repositories.conversation);
-    this.temporaryGuest = new TemporaryGuestViewModel(mainViewModel, repositories.calling, repositories.team);
+    this.temporaryGuest = new TemporaryGuestViewModel(this, mainViewModel, repositories.calling, repositories.team);
 
     this._initSubscriptions();
 
@@ -346,15 +346,10 @@ export class ListViewModel {
       this.start.resetView();
     }
 
-    const listStateElementId = this.getElementIdOfList(this.state());
-    $(`#${listStateElementId}`).removeClass('left-list-is-visible');
     document.removeEventListener('keydown', this.onKeyDownListView);
   };
 
   private readonly showList = (newListState: string): void => {
-    const listStateElementId = this.getElementIdOfList(newListState);
-    $(`#${listStateElementId}`).addClass('left-list-is-visible');
-
     this.state(newListState);
     this.lastUpdate(Date.now());
 
@@ -376,21 +371,6 @@ export class ListViewModel {
         if (respectLastState) {
           this.contentViewModel.switchPreviousContent();
         }
-    }
-  };
-
-  private readonly getElementIdOfList = (listState: string) => {
-    switch (listState) {
-      case ListViewModel.STATE.ARCHIVE:
-        return 'archive';
-      case ListViewModel.STATE.PREFERENCES:
-        return 'preferences';
-      case ListViewModel.STATE.START_UI:
-        return 'start-ui';
-      case ListViewModel.STATE.TEMPORARY_GUEST:
-        return 'temporary-guest';
-      default:
-        return 'conversations';
     }
   };
 

@@ -88,6 +88,8 @@ export class StartUIViewModel {
   readonly manageTeamUrl: string;
   readonly manageServicesUrl: string;
   readonly federationDomain?: string;
+  readonly visible: ko.PureComputed<boolean>;
+  readonly ariaHidden: ko.PureComputed<string>;
   private submittedSearch: boolean;
   private readonly matchedUsers: ko.ObservableArray<User>;
   private readonly alreadyClickedOnContact: Record<string, boolean>;
@@ -245,6 +247,9 @@ export class StartUIViewModel {
     this.shouldUpdateScrollbar = ko
       .computed(() => this.listViewModel.lastUpdate())
       .extend({notify: 'always', rateLimit: 500});
+
+    this.visible = ko.pureComputed(() => listViewModel.state() === ListViewModel.STATE.START_UI);
+    this.ariaHidden = ko.pureComputed(() => (this.visible() ? 'false' : 'true'));
   }
 
   readonly clickOnClose = (): void => {
