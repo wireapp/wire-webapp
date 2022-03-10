@@ -62,13 +62,14 @@ ko.components.register('modal', {
     this.showLoading = showLoading;
     let timeoutId = 0;
 
-    const maintaineFocus = (): void => {
+    const maintainFocus = (): void => {
       if (!this.displayNone()) {
-        document.addEventListener('keydown', this.onKeyDown);
+        document.addEventListener('keydown', onKeyDown);
       }
     };
 
-    this.onKeyDown = (event: KeyboardEvent): void => {
+    // Prevents focus jumping out of the modal content.
+    const onKeyDown = (event: KeyboardEvent): void => {
       if (!isTabKey(event)) {
         return;
       }
@@ -90,7 +91,7 @@ ko.components.register('modal', {
     };
 
     const isDisplayNoneSubscription = this.displayNone.subscribe(() => {
-      maintaineFocus();
+      maintainFocus();
     });
 
     const isShownSubscription = isShown.subscribe(visible => {
@@ -98,7 +99,7 @@ ko.components.register('modal', {
         return this.displayNone(false);
       }
       timeoutId = window.setTimeout(() => {
-        document.removeEventListener('keydown', this.onKeyDown);
+        document.removeEventListener('keydown', onKeyDown);
         this.displayNone(true);
         onClosed();
       }, 150);

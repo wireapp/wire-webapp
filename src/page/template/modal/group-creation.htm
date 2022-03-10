@@ -1,14 +1,14 @@
 <div id="group-creation-modal" data-bind="with: $root.groupCreation" class="group-creation__modal">
-  <modal params="isShown: isShown, onClosed: afterHideModal, ariaLabelby: 'group-creation-label', lock: true">
+  <modal params="isShown: isShown, onClosed: afterHideModal, ariaLabelby: 'group-creation-label'">
     <div class="modal__header">
       <!-- ko if: stateIsParticipants() -->
         <h2 id="group-creation-label" class="modal__header__title" data-bind="text: participantsHeaderText" data-uie-name="status-people-selected"></h2>
-        <button class="group-creation__action enabled accent-text button-reset-default" type="button" data-bind="click: clickOnCreate, text: participantsActionText, attr: { 'aria-label': participantsActionText }" data-uie-name="do-create-group"></button>
+        <button class="group-creation__action enabled accent-text" type="button" data-bind="click: clickOnCreate, text: participantsActionText, attr: { 'aria-label': participantsActionText }" data-uie-name="do-create-group"></button>
         <button class="button-reset-default" type="button" data-bind="click: clickOnBack, attr: { 'aria-label': t('groupCreationParticipantsActionBack')}" data-uie-name="go-back"><arrow-left-icon class="modal__header__button"></arrow-left-icon></button>
       <!-- /ko -->
       <!-- ko if: stateIsPreferences() -->
         <h2 id="group-creation-label" class="modal__header__title" data-bind="text: t('groupCreationPreferencesHeader')"></h2>
-        <button id="group-go-next" class="group-creation__action button-reset-default" type="button" data-bind="click: clickOnNext, css: {'accent-text': nameInput().length, 'enabled': nameInput().length}, enable: nameInput().length, text: t('groupCreationPreferencesAction'), attr: { 'aria-label': t('groupCreationPreferencesAction'), 'disabled': !nameInput().length }" data-uie-name="go-next"></button>
+        <button id="group-go-next" class="group-creation__action" type="button" data-bind="click: clickOnNext, css: {'accent-text': nameInput().length, 'enabled': nameInput().length}, enable: nameInput().length, text: t('groupCreationPreferencesAction'), attr: { 'aria-label': t('groupCreationPreferencesAction'), 'disabled': !nameInput().length }" data-uie-name="go-next"></button>
         <button class="button-reset-default" type="button" data-bind="click: clickOnClose, attr: { 'aria-label': t('groupCreationActionCloseModal')}" data-uie-name="do-close"><close-icon class="modal__header__button"></close-icon></button>
       <!-- /ko -->
     </div>

@@ -86,7 +86,7 @@ const listTemplate = (data: string, uieName: string = ''): string => `
       <!-- ko ifnot: noSelfInteraction && user.isMe -->
         <participant-item
           params="participant: user, noUnderline: noUnderline, showArrow: arrow, highlighted: highlightedUserIds.includes(user.id), customInfo: infos && infos()[user.id], canSelect: isSelectEnabled, isSelected: isSelected(user), mode: mode, external: teamState.isExternal(user.id), selfInTeam: selfInTeam, isSelfVerified: isSelfVerified"
-          data-bind="click: (viewmodel, event) => onUserClick(user, event),  event: {'keydown': (viewmodel, event) => onUserKeyPressed(user, event) }, attr: {'aria-label': user.name}" role="button" tabindex="0">
+          data-bind="click: (viewmodel, event) => onClickOrKeyPressed(user, event),  event: {'keydown': (viewmodel, event) => onUserKeyPressed(user, event) }, attr: {'aria-label': user.name}" role="button" tabindex="0">
         </participant-item>
       <!-- /ko -->
       </li>
@@ -183,16 +183,12 @@ ko.components.register('user-list', {
 
     this.onUserKeyPressed = (userEntity: User, event: KeyboardEvent) => {
       if (isSpaceKey(event) || isEnterKey(event)) {
-        onClickOrKeyPressed(userEntity, event);
+        this.onClickOrKeyPressed(userEntity, event);
       }
       return true;
     };
 
-    this.onUserClick = (userEntity: User, event: MouseEvent) => {
-      onClickOrKeyPressed(userEntity, event);
-    };
-
-    const onClickOrKeyPressed = (userEntity: User, event: MouseEvent | KeyboardEvent) => {
+    this.onClickOrKeyPressed = (userEntity: User, event: MouseEvent | KeyboardEvent) => {
       toggleUserSelection(userEntity);
       if (typeof click === 'function') {
         click(userEntity, event);
