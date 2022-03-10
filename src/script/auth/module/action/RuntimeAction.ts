@@ -19,9 +19,7 @@
 
 import type {CookiesStatic} from 'js-cookie';
 
-import {QUERY_KEY} from '../../route';
 import {Runtime} from '@wireapp/commons';
-import {hasURLParameter} from '../../util/urlUtil';
 import type {ThunkAction} from '../reducer';
 import {RuntimeActionCreator} from './creator/';
 import * as RuntimeSelector from '../../module/selector/RuntimeSelector';
@@ -29,15 +27,7 @@ import * as RuntimeSelector from '../../module/selector/RuntimeSelector';
 export class RuntimeAction {
   checkSupportedBrowser = (): ThunkAction<void> => {
     return (dispatch, getState, {getConfig}) => {
-      const isPwaSupportedBrowser = () => {
-        return Runtime.isMobileOS() || Runtime.isSafari();
-      };
-      const pwaAware = hasURLParameter(QUERY_KEY.PWA_AWARE);
-      const isPwaEnabled = getConfig().URL.MOBILE_BASE && pwaAware && isPwaSupportedBrowser();
-      if (
-        (!RuntimeSelector.hasToUseDesktopApplication(getState()) && Runtime.isWebappSupportedBrowser()) ||
-        isPwaEnabled
-      ) {
+      if (!RuntimeSelector.hasToUseDesktopApplication(getState())) {
         dispatch(RuntimeActionCreator.confirmSupportedBrowser());
       }
     };
