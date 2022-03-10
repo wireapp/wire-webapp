@@ -433,10 +433,13 @@ export class AuthActionCreator {
     type: AUTH_ACTION.REGISTER_PUSH_ACCOUNT_DATA,
   });
 
-  static pushEntropyData = (entropy: Uint8Array): PushEntropyDataAction => ({
-    payload: entropy,
-    type: AUTH_ACTION.REGISTER_PUSH_ENTROPY_DATA,
-  });
+  static pushEntropyData = (entropy: Uint8Array): PushEntropyDataAction => {
+    return {
+      payload: entropy,
+      type: AUTH_ACTION.REGISTER_PUSH_ENTROPY_DATA,
+    };
+  };
+
   static pushLoginData = (loginData: Partial<LoginData>): PushLoginDataAction => ({
     payload: loginData,
     type: AUTH_ACTION.PUSH_LOGIN_DATA,

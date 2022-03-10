@@ -38,6 +38,7 @@ const CreateAccount = ({}: Props) => {
       <ArrowIcon direction="left" color={COLOR.TEXT} style={{opacity: 0.56}} />
     </RouterLink>
   );
+
   return (
     <Page hasTeamData>
       <IsMobile>
@@ -60,8 +61,9 @@ const CreateAccount = ({}: Props) => {
                 onSubmit={() => {
                   if (Config.getConfig().FEATURE.ENABLE_EXTRA_CLIENT_ENTROPY) {
                     history.push(ROUTE.SET_ENTROPY);
+                  } else {
+                    history.push(ROUTE.VERIFY_EMAIL_CODE);
                   }
-                  history.push(ROUTE.VERIFY_EMAIL_CODE);
                 }}
                 submitText={_(createAccountStrings.submitButton)}
               />

@@ -24,22 +24,21 @@ import {actionRoot as ROOT_ACTIONS} from '../module/action';
 import {BackendError} from '../module/action/BackendError';
 import {ROUTE} from '../route';
 import useReactRouter from 'use-react-router';
-import {useTimeout} from '@wireapp/react-ui-kit';
 import {connect} from 'react-redux';
 import {AnyAction, Dispatch} from 'redux';
-import {bindActionCreators} from '../module/reducer';
+import {RootState, bindActionCreators} from '../module/reducer';
 
 interface Props extends React.HTMLProps<HTMLDivElement> {}
 
-const SetEntropyPage = ({doSetEntropy}: Props & DispatchProps) => {
+const SetEntropyPage = ({pushEntropyData}: Props & ConnectedProps & DispatchProps) => {
   const {history} = useReactRouter();
   const [entropy, setEntropy] = useState<[number, number][]>([]);
   const [error, setError] = useState(null);
 
   const onSetEntropy = async (): Promise<void> => {
     try {
-      await doSetEntropy(new Uint8Array(entropy.filter(Boolean).flat()));
-      useTimeout(() => history.push(ROUTE.VERIFY_EMAIL_CODE), 10000);
+      await pushEntropyData(new Uint8Array(entropy.filter(Boolean).flat()));
+      history.push(ROUTE.VERIFY_EMAIL_CODE);
     } catch (error) {
       if (error.label === BackendError.HANDLE_ERRORS.INVALID_HANDLE) {
         error.label = BackendError.HANDLE_ERRORS.HANDLE_TOO_SHORT;
@@ -61,13 +60,16 @@ const SetEntropyPage = ({doSetEntropy}: Props & DispatchProps) => {
   );
 };
 
+type ConnectedProps = ReturnType<typeof mapStateToProps>;
+const mapStateToProps = (state: RootState) => ({});
+
 type DispatchProps = ReturnType<typeof mapDispatchToProps>;
 const mapDispatchToProps = (dispatch: Dispatch<AnyAction>) =>
   bindActionCreators(
     {
-      doSetEntropy: ROOT_ACTIONS.authAction.doSetEntropy,
+      pushEntropyData: ROOT_ACTIONS.authAction.pushEntropyData,
     },
     dispatch,
   );
 
-export default connect(mapDispatchToProps)(SetEntropyPage);
+export default connect(mapStateToProps, mapDispatchToProps)(SetEntropyPage);

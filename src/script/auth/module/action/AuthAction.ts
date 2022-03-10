@@ -213,7 +213,7 @@ export class AuthAction {
     };
   };
 
-  doSetEntropy = (entropy: Uint8Array): ThunkAction => {
+  pushEntropyData = (entropy: Uint8Array): ThunkAction => {
     return async dispatch => {
       dispatch(AuthActionCreator.pushEntropyData(entropy));
     };
