@@ -39,8 +39,8 @@ const Preferences: React.FC<PreferencesProps> = ({listViewModel, contentViewMode
   const {state: listState} = useKoSubscribableChildren(listViewModel, ['state']);
   const {state: contentState} = useKoSubscribableChildren(contentViewModel, ['state']);
 
-  const supportsCalling = true;
-  const isDesktop = true || Runtime.isDesktopApp();
+  const isDesktop = Runtime.isDesktopApp();
+  const supportsCalling = Runtime.isSupportingLegacyCalling();
 
   const isVisible = listState === ListViewModel.STATE.PREFERENCES;
   const close = () => {
