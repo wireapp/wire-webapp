@@ -45,6 +45,7 @@ const HistoryBackupSection: React.FC<HistoryBackupSectionProps> = ({brandName}) 
       }}
       data-uie-name="do-backup-export"
       aria-describedby="preferences-history-describe-1"
+      type="button"
     >
       {t('preferencesOptionsBackupExportHeadline')}
     </button>

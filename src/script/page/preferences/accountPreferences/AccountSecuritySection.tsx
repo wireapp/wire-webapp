@@ -78,6 +78,7 @@ const AccountSecuritySection: React.FC<AccountSecuritySectionProps> = ({
           className="preferences-link accent-text"
           onClick={() => safeWindowOpen(manageTeamUrl)}
           data-uie-name="do-manage-team"
+          type="button"
         >
           {t('preferencesAccountManageTeam')}
         </button>
@@ -93,6 +94,7 @@ const AccountSecuritySection: React.FC<AccountSecuritySectionProps> = ({
           className="preferences-link accent-text"
           onClick={() => amplify.publish(WebAppEvents.PREFERENCES.CHANGE_APP_LOCK_PASSPHRASE)}
           data-uie-name="do-reset-app-lock"
+          type="button"
         >
           {t('preferencesAccountResetAppLockPassphrase')}
         </button>
@@ -103,6 +105,7 @@ const AccountSecuritySection: React.FC<AccountSecuritySectionProps> = ({
           onClick={() => safeWindowOpen(getAccountPagesUrl(URL_PATH.PASSWORD_RESET))}
           title={t('tooltipPreferencesPassword')}
           data-uie-name="do-reset-password"
+          type="button"
         >
           {t('preferencesAccountResetPassword')}
         </button>
@@ -113,6 +116,7 @@ const AccountSecuritySection: React.FC<AccountSecuritySectionProps> = ({
           className="preferences-link accent-text"
           onClick={onClickDeleteAccount}
           data-uie-name="go-delete-account"
+          type="button"
         >
           {t('preferencesAccountDelete')}
         </button>

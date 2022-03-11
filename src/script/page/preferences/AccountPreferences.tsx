@@ -193,6 +193,7 @@ const AccountPreferences: React.FC<AccountPreferencesProps> = ({
             className="preferences-link accent-text"
             onClick={clickOnLeaveGuestRoom}
             data-uie-name="do-leave-guest-room"
+            type="button"
           >
             {t('preferencesAccountLeaveGuestRoom')}
           </button>

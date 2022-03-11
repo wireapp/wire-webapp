@@ -67,6 +67,7 @@ const SaveCallLogs: React.FC<SaveCallLogsProps> = ({callingRepository, userState
           onClick={saveCallLogs}
           data-uie-name="get-call-logs"
           aria-describedby="call-logs-description"
+          type="button"
         >
           {t('preferencesOptionsCallLogsGet')}
         </button>
