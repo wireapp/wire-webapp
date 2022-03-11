@@ -17,36 +17,30 @@
  *
  */
 
-import {useRef, useEffect} from 'react';
+import {useRef} from 'react';
 
-export const usePausableInterval = (callback: () => void, timer: number, pause: boolean) => {
-  const intervalIdRef = useRef<() => void>();
+export const usePausableInterval = (callback: () => void, timer: number) => {
   const totalTimeRun = useRef(0);
   const intervalId = useRef<number>();
   const startTime = useRef(new Date().getTime());
 
-  useEffect(() => {
-    intervalIdRef.current = callback;
-  }, [callback]);
+  const removeInterval = () => {
+    window.clearTimeout(intervalId.current);
+  };
 
-  useEffect(() => {
-    const fn = () => {
-      intervalIdRef.current();
-    };
+  const start = () => {
+    intervalId.current = window.setTimeout(function interval() {
+      startTime.current = new Date().getTime();
+      callback();
+      intervalId.current = window.setTimeout(interval, timer);
+    }, timer - totalTimeRun.current);
+    totalTimeRun.current = 0;
+  };
 
-    if (timer !== null) {
-      if (pause === false) {
-        intervalId.current = window.setTimeout(function interval() {
-          startTime.current = new Date().getTime();
-          fn();
-          intervalId.current = window.setTimeout(interval, timer);
-        }, timer - totalTimeRun.current);
-        totalTimeRun.current = 0;
-      }
-      if (pause === true) {
-        totalTimeRun.current = new Date().getTime() - startTime.current;
-        clearTimeout(intervalId.current);
-      }
-    }
-  }, [timer, pause]);
+  const pause = () => {
+    totalTimeRun.current = new Date().getTime() - startTime.current;
+    removeInterval();
+  };
+
+  return {pause, removeInterval, start};
 };

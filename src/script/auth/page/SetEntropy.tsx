@@ -41,7 +41,6 @@ const SetEntropy = ({setEntropy, entropy, error, setError, onSetEntropy}: Props)
 
   const [frameCount, setFrameCount] = useState(0);
   const [percent, setPercent] = useState(0);
-  const [pause, setPause] = useState(true);
 
   const onMouseMove = (event: MouseEvent<HTMLCanvasElement> | PointerEvent<HTMLCanvasElement>) => {
     setError(null);
@@ -78,8 +77,11 @@ const SetEntropy = ({setEntropy, entropy, error, setError, onSetEntropy}: Props)
     [entropy],
   );
 
-  usePausableTimeout(onSetEntropy, 30000, pause);
-  usePausableInterval(() => setPercent(percent => percent + 1), 300, pause);
+  const {pause: pauseTimeout, start: startTimeout} = usePausableTimeout(onSetEntropy, 30000);
+  const {pause: pauseInterval, start: startInterval} = usePausableInterval(
+    () => setPercent(percent => percent + 1),
+    300,
+  );
 
   return (
     <ContainerXS centerText verticalCenter style={{display: 'flex', flexDirection: 'column', minHeight: 428}}>
@@ -105,9 +107,13 @@ const SetEntropy = ({setEntropy, entropy, error, setError, onSetEntropy}: Props)
             }}
             draw={draw}
             onMouseMove={onMouseMove}
-            onMouseEnter={() => setPause(false)}
+            onMouseEnter={() => {
+              startTimeout();
+              startInterval();
+            }}
             onMouseLeave={() => {
-              setPause(true);
+              pauseTimeout();
+              pauseInterval();
               setError(!error);
               setEntropy([...entropy, null]);
             }}
