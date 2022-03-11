@@ -19,30 +19,30 @@
 
 import {useRef, useEffect} from 'react';
 
-export const usePausableTimeout = (callback: () => void, timer: number) => {
+export const usePausableTimeout = (callback: () => void, timer: number, pause?: boolean) => {
+  const timeoutIdRef = useRef<() => void>();
   const totalTimeRun = useRef<number>(0);
   const timeoutId = useRef<number>();
   const startTime = useRef<number>(new Date().getTime());
 
-  const removeTimeout = () => {
-    window.clearTimeout(timeoutId.current);
-  };
-
-  const start = () => {
-    startTime.current = new Date().getTime();
-    timeoutId.current = window.setTimeout(callback, timer - totalTimeRun.current);
-  };
-
-  const pause = () => {
-    totalTimeRun.current = new Date().getTime() - startTime.current + totalTimeRun.current;
-    removeTimeout();
-  };
+  useEffect(() => {
+    timeoutIdRef.current = callback;
+  }, [callback]);
 
   useEffect(() => {
-    return () => {
-      removeTimeout();
+    const fn = () => {
+      timeoutIdRef.current();
     };
-  }, [timer, callback]);
 
-  return {pause, removeTimeout, start};
+    if (timer !== null) {
+      if (pause == false) {
+        startTime.current = new Date().getTime();
+        timeoutId.current = window.setTimeout(fn, timer - totalTimeRun.current);
+      }
+      if (pause === true) {
+        totalTimeRun.current = new Date().getTime() - startTime.current + totalTimeRun.current;
+        clearTimeout(timeoutId.current);
+      }
+    }
+  }, [timer, pause]);
 };

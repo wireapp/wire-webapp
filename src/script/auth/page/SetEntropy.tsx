@@ -18,7 +18,7 @@
  */
 
 import {CheckRoundIcon, ContainerXS, H1, Muted, Text} from '@wireapp/react-ui-kit';
-import React, {MouseEvent, PointerEvent, useCallback, useState} from 'react';
+import React, {MouseEvent, PointerEvent, useCallback, useEffect, useState} from 'react';
 import {useIntl} from 'react-intl';
 import {usePausableInterval} from '../../hooks/usePausableInterval';
 import {usePausableTimeout} from '../../hooks/usePausableTimeout';
@@ -38,9 +38,9 @@ interface Props extends React.HTMLProps<HTMLDivElement> {
 
 const SetEntropy = ({setEntropy, entropy, error, setError, onSetEntropy}: Props) => {
   const {formatMessage: _} = useIntl();
-
   const [frameCount, setFrameCount] = useState(0);
   const [percent, setPercent] = useState(0);
+  const [pause, setPause] = useState(true);
 
   const onMouseMove = (event: MouseEvent<HTMLCanvasElement> | PointerEvent<HTMLCanvasElement>) => {
     setError(null);
@@ -77,16 +77,26 @@ const SetEntropy = ({setEntropy, entropy, error, setError, onSetEntropy}: Props)
     [entropy],
   );
 
-  const {pause: pauseTimeout, start: startTimeout} = usePausableTimeout(onSetEntropy, 30000);
-  const {pause: pauseInterval, start: startInterval} = usePausableInterval(
-    () => setPercent(percent => percent + 1),
-    300,
-  );
+  usePausableTimeout(onSetEntropy, 15000, pause);
+  const {clearInterval} = usePausableInterval(() => setPercent(percent => percent + 1), 100, pause);
+
+  useEffect(() => {
+    if (frameCount <= 300 && percent > 95) {
+      setPercent(95);
+      setPause(true);
+    }
+    if (frameCount > 300) {
+      setPause(false);
+    }
+    if (percent >= 100) {
+      clearInterval();
+    }
+  }, [frameCount, percent]);
 
   return (
     <ContainerXS centerText verticalCenter style={{display: 'flex', flexDirection: 'column', minHeight: 428}}>
       <H1 center>{_(chooseHandleStrings.headline)}</H1>
-      {entropy.length > 300 && percent >= 100 ? (
+      {frameCount > 300 && percent >= 100 ? (
         <>
           <CheckRoundIcon width={64} height={64} css={{alignSelf: 'center', marginBottom: '64px'}} />
           <Muted center>{_(chooseHandleStrings.subhead)}</Muted>
@@ -108,12 +118,10 @@ const SetEntropy = ({setEntropy, entropy, error, setError, onSetEntropy}: Props)
             draw={draw}
             onMouseMove={onMouseMove}
             onMouseEnter={() => {
-              startTimeout();
-              startInterval();
+              setPause(false);
             }}
             onMouseLeave={() => {
-              pauseTimeout();
-              pauseInterval();
+              setPause(true);
               setError(!error);
               setEntropy([...entropy, null]);
             }}
@@ -130,6 +138,7 @@ const SetEntropy = ({setEntropy, entropy, error, setError, onSetEntropy}: Props)
           <Text center>{percent}%</Text>
         </>
       )}
+      {percent === 95 && pause === true && <Muted center>{_(chooseHandleStrings.subhead)}</Muted>}
     </ContainerXS>
   );
 };
