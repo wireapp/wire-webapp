@@ -17,7 +17,7 @@
     "forceConsistentCasingInFileNames": true,
     "jsx": "react",
     "module": "esnext",
-    "lib": ["dom", "esnext"],
+    "lib": ["dom", "esnext", "dom.iterable"],
     "moduleResolution": "node",
     "noEmitOnError": true,
     "noImplicitAny": true,

@@ -1,15 +1,15 @@
 <div id="group-creation-modal" data-bind="with: $root.groupCreation" class="group-creation__modal">
-  <modal params="isShown: isShown, onClosed: afterHideModal">
+  <modal params="isShown: isShown, onClosed: afterHideModal, ariaLabelby: 'group-creation-label'">
     <div class="modal__header">
       <!-- ko if: stateIsParticipants() -->
-        <div class="modal__header__title"  data-bind="text: participantsHeaderText" data-uie-name="status-people-selected"></div>
-        <div class="group-creation__action enabled accent-text" data-bind="click: clickOnCreate, text: participantsActionText" data-uie-name="do-create-group"></div>
-        <arrow-left-icon class="modal__header__button" data-bind="click: clickOnBack" data-uie-name="go-back"></arrow-left-icon>
+        <h2 id="group-creation-label" class="modal__header__title" data-bind="text: participantsHeaderText" data-uie-name="status-people-selected"></h2>
+        <button class="group-creation__action enabled accent-text" type="button" data-bind="click: clickOnCreate, text: participantsActionText, attr: { 'aria-label': participantsActionText }" data-uie-name="do-create-group"></button>
+        <button class="button-reset-default" type="button" data-bind="click: clickOnBack, attr: { 'aria-label': t('groupCreationParticipantsActionBack')}" data-uie-name="go-back"><arrow-left-icon class="modal__header__button"></arrow-left-icon></button>
       <!-- /ko -->
       <!-- ko if: stateIsPreferences() -->
-        <div class="modal__header__title" data-bind="text: t('groupCreationPreferencesHeader')"></div>
-        <div class="group-creation__action" data-bind="click: clickOnNext, css: {'accent-text': nameInput().length, 'enabled': nameInput().length}, enable: nameInput().length, text: t('groupCreationPreferencesAction')" data-uie-name="go-next"></div>
-        <close-icon class="modal__header__button" data-bind="click: clickOnClose" data-uie-name="do-close"></close-icon>
+        <h2 id="group-creation-label" class="modal__header__title" data-bind="text: t('groupCreationPreferencesHeader')"></h2>
+        <button id="group-go-next" class="group-creation__action" type="button" data-bind="click: clickOnNext, css: {'accent-text': nameInput().length, 'enabled': nameInput().length}, enable: nameInput().length, text: t('groupCreationPreferencesAction'), attr: { 'aria-label': t('groupCreationPreferencesAction'), 'disabled': !nameInput().length }" data-uie-name="go-next"></button>
+        <button class="button-reset-default" type="button" data-bind="click: clickOnClose, attr: { 'aria-label': t('groupCreationActionCloseModal')}" data-uie-name="do-close"><close-icon class="modal__header__button"></close-icon></button>
       <!-- /ko -->
     </div>
     <!-- ko if: stateIsParticipants() -->
@@ -18,7 +18,7 @@
       <!-- ko if: stateIsParticipants() -->
         <div class="group-creation__list" data-bind="fadingscrollbar">
           <!-- ko if: contacts().length -->
-            <user-list class="group-creation-modal-participants-list user-list-light" params="
+            <user-list class="group-creation-modal-participants-list user-list-light" params="  
               user: contacts,
               filter: participantsInput,
               selected: selectedContacts,
@@ -31,29 +31,29 @@
         </div>
       <!-- /ko -->
       <!-- ko if: stateIsPreferences() -->
-      <div class="modal-input-wrapper">
-      <input class="modal__input"
-      autocomplete="off" autofocus required spellcheck="false" type="text"
-      data-bind="attr: {maxlength: maxNameLength, placeholder: t('groupCreationPreferencesPlaceholder')}, enter: clickOnNext, hasFocus: true, textInput: nameInput"
-      data-uie-name="enter-group-name">
-      <div class="group-creation__error" data-bind="text: nameError, visible: nameError().length" data-uie-name="error-group-name"></div>
-    </div>
-      <!-- ko if: isTeam -->
+        <div class="modal-input-wrapper">
+          <input class="modal__input"
+          autocomplete="off" required spellcheck="false" type="text"
+          data-bind="attr: {maxlength: maxNameLength, placeholder: t('groupCreationPreferencesPlaceholder')}, enter: clickOnNext, hasFocus: true, textInput: nameInput"
+          data-uie-name="enter-group-name" />
+          <div class="group-creation__error" data-bind="text: nameError, visible: nameError().length" data-uie-name="error-group-name"></div>
+        </div>
+        <!-- ko if: isTeam -->
         <div class="modal__info" data-bind="text: t('groupSizeInfo', maxSize)" data-uie-name="status-group-size-info"></div>
         <base-toggle class="modal-style"
         params="isChecked: isGuestEnabled(), onToggle: clickOnToggleGuestMode, extendedInfo: true, extendedInfoText: t('guestRoomToggleInfoExtended'), infoText: t('guestRoomToggleInfo'), toggleName: t('guestOptionsTitle')"
       ></base-toggle>
-          <base-toggle class="modal-style"
-          params="isChecked: isServicesEnabled(), onToggle: clickOnToggleServicesMode, extendedInfo: true, extendedInfoText: t('servicesRoomToggleInfoExtended'), infoText: t('servicesRoomToggleInfo'), toggleName: t('servicesOptionsTitle')"
-        ></base-toggle>
-          <info-toggle class="modal-style" params="
-            dataUieName: 'read-receipts',
-            info: t('readReceiptsToogleInfo'),
-            isChecked: enableReadReceipts,
-            isDisabled: false,
-            name: t('readReceiptsToogleName')
-          "></info-toggle>
+        <base-toggle class="modal-style"
+        params="isChecked: isServicesEnabled(), onToggle: clickOnToggleServicesMode, extendedInfo: true, extendedInfoText: t('servicesRoomToggleInfoExtended'), infoText: t('servicesRoomToggleInfo'), toggleName: t('servicesOptionsTitle')"
+      ></base-toggle>
+        <info-toggle class="modal-style" params="
+          dataUieName: 'read-receipts',
+          info: t('readReceiptsToogleInfo'),
+          isChecked: enableReadReceipts,
+          isDisabled: false,
+          name: t('readReceiptsToogleName')
+        "></info-toggle>
         <!-- /ko -->
       <!-- /ko -->
-    </modal>
+  </modal>
 </div>
