@@ -72,7 +72,7 @@
                   <profile-icon class="start-ui-fed-wrapper__icon"></profile-icon>
                   <div class="start-ui-fed-wrapper__text" data-bind="text: t('searchTrySearchFederation')"></div>
                   <div class="start-ui-fed-wrapper__button">
-                    <button data-bind="click: () => {}, text: t('searchTrySearchLearnMore')" data-uie-name="do-search-learn-more" />
+                    <button type="button" data-bind="click: () => {}, text: t('searchTrySearchLearnMore')" data-uie-name="do-search-learn-more" />
                   </div>
                 </div>
               <!-- /ko -->
@@ -86,7 +86,7 @@
             <ul class="start-ui-list left-list-items">
               <!-- ko if: showInviteMember() && !!manageTeamUrl -->
               <li class="left-list-item">
-                <button class="left-list-item-button" data-bind="click: clickOpenManageTeam" data-uie-name="do-invite-member">
+                <button class="left-list-item-button" type="button" data-bind="click: clickOpenManageTeam" data-uie-name="do-invite-member">
                   <span class="left-column-icon icon-envelope"></span>
                   <span class="center-column" data-bind="text: t('searchMemberInvite')"></span>
                 </button>
@@ -94,7 +94,7 @@
               <!-- /ko -->
               <!-- ko if: z.userPermission().canCreateGroupConversation() -->
               <li class="left-list-item" >
-                <button class="left-list-item-button" data-bind="click: clickOnCreateGroup" data-uie-name="go-create-group">
+                <button class="left-list-item-button" type="button" data-bind="click: clickOnCreateGroup" data-uie-name="go-create-group">
                   <group-icon class="left-column-icon"></group-icon>
                   <span class="center-column" data-bind="text: t('searchCreateGroup')"></span>
                 </button>
@@ -102,7 +102,7 @@
               <!-- /ko -->
               <!-- ko if: z.userPermission().canCreateGuestRoom() && showCreateGuestRoom() -->
               <li class="left-list-item">
-                <button class="left-list-item-button" data-bind="click: clickOnCreateGuestRoom" data-uie-name="do-create-guest-room">
+                <button class="left-list-item-button" type="button" data-bind="click: clickOnCreateGuestRoom" data-uie-name="do-create-guest-room">
                   <guest-icon class="left-column-icon"></guest-icon>
                   <span class="center-column" data-bind="text: t('searchCreateGuestRoom')"></span>
                 </button>
