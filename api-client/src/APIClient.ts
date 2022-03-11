@@ -126,7 +126,7 @@ export type BackendFeatures = {
   isFederated: boolean;
 };
 
-type BackendVersionResponse = {supported: number[]; federated?: boolean};
+export type BackendVersionResponse = {supported: number[]; federation?: boolean};
 export class APIClient extends EventEmitter {
   private readonly logger: logdown.Logger;
 
@@ -226,7 +226,7 @@ export class APIClient extends EventEmitter {
     return {
       version: backendVersion,
       federationEndpoints: backendVersion > 0,
-      isFederated: responsePayload?.federated || false,
+      isFederated: responsePayload?.federation || false,
     };
   }
 

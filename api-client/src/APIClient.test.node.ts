@@ -22,7 +22,7 @@
 import nock from 'nock';
 import {AccentColor} from '@wireapp/commons/src/main';
 
-import {APIClient} from './APIClient';
+import {APIClient, BackendVersionResponse} from './APIClient';
 import {AuthAPI} from './auth/AuthAPI';
 import {ClientType} from './client';
 import {BackendErrorLabel, StatusCode} from './http';
@@ -113,9 +113,8 @@ describe('APIClient', () => {
     });
 
     it('returns the backend federation state', async () => {
-      nock(baseUrl)
-        .get('/api-version')
-        .reply(200, {supported: [0, 1], federated: true});
+      const response: BackendVersionResponse = {supported: [0, 1], federation: true};
+      nock(baseUrl).get('/api-version').reply(200, response);
       const client = new APIClient();
       const {isFederated} = await client.useVersion([0, 1, 2]);
       expect(isFederated).toBe(true);
