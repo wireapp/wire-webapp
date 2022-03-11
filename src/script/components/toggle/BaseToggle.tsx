@@ -45,10 +45,13 @@ const BaseToggle: React.FC<BaseToggleProps> = ({
   infoText,
 }) => {
   const uuid = React.useMemo(() => createRandomUuid(), []);
+  const labelUuid = React.useMemo(() => createRandomUuid(), []);
   return (
     <>
       <div className="info-toggle__row">
-        <div>{toggleName}</div>
+        <p id={labelUuid} className="info-toggle__name">
+          {toggleName}
+        </p>
         <div
           className={cx('slider', {
             disabled: isDisabled,
@@ -66,14 +69,16 @@ const BaseToggle: React.FC<BaseToggleProps> = ({
           <label
             className="button-label"
             htmlFor={uuid}
+            aria-pressed={isChecked}
+            aria-labelledby={labelUuid}
             data-uie-name={`do-allow-${toggleName?.toLowerCase()}`}
             data-uie-value={isChecked ? 'checked' : 'unchecked'}
           />
         </div>
       </div>
-      <div className="info-toggle__details" data-uie-name="status-guest-toggle">
+      <p className="info-toggle__details" data-uie-name="status-guest-toggle">
         {extendedInfo ? extendedInfoText : infoText}
-      </div>
+      </p>
     </>
   );
 };

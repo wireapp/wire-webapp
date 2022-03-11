@@ -722,9 +722,9 @@ export class ConversationRepository {
   public async searchInConversation(
     conversationEntity: Conversation,
     query: string,
-  ): Promise<{messageEntities?: Message[]; query?: string}> {
+  ): Promise<{messageEntities: Message[]; query: string}> {
     if (!conversationEntity || !query.length) {
-      return {};
+      return {messageEntities: [], query};
     }
 
     const events = await this.conversation_service.searchInConversation(conversationEntity.id, query);

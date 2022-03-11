@@ -52,6 +52,8 @@ export const isKey = (keyboardEvent?: KeyboardEvent, expectedKey = '') => {
   return eventKey === expectedKey.toLowerCase();
 };
 
+export const isTabKey = (keyboardEvent: KeyboardEvent): boolean => isKey(keyboardEvent, KEY.TAB);
+
 export const isEnterKey = (keyboardEvent: KeyboardEvent): boolean => isKey(keyboardEvent, KEY.ENTER);
 
 export const isSpaceKey = (keyboardEvent: KeyboardEvent): boolean => isKey(keyboardEvent, KEY.SPACE);

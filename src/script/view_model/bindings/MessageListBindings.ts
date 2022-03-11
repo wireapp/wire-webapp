@@ -21,7 +21,7 @@ import ko from 'knockout';
 import {container} from 'tsyringe';
 import 'jquery-mousewheel';
 
-import {isArrowKey, isPageUpDownKey, isMetaKey, isPasteAction} from 'Util/KeyboardUtil';
+import {isArrowKey, isPageUpDownKey, isMetaKey, isTabKey, isPasteAction} from 'Util/KeyboardUtil';
 import {noop} from 'Util/util';
 
 import {viewportObserver} from '../../ui/viewportObserver';
@@ -40,17 +40,16 @@ ko.bindingHandlers.focus_on_keydown = {
             if ($('.detail-view').hasClass('modal-show')) {
               return false;
             }
-
             const keyboard_event = (jquery_event.originalEvent || jquery_event) as KeyboardEvent;
             // check for activeElement needed, because in IE11 it could be undefined under some circumstances
             const active_element_is_input =
               document.activeElement && ['INPUT', 'TEXTAREA'].includes(document.activeElement.tagName);
             const is_arrow_key = isArrowKey(keyboard_event);
             const is_pageupdown_key = isPageUpDownKey(keyboard_event);
-
+            const is_tab_key = isTabKey(keyboard_event);
             if (is_pageupdown_key) {
               (document.activeElement as HTMLElement).blur();
-            } else if (!active_element_is_input && !is_arrow_key) {
+            } else if (!active_element_is_input && !is_arrow_key && !is_tab_key) {
               if (!isMetaKey(keyboard_event) || isPasteAction(keyboard_event)) {
                 element.focus();
               }

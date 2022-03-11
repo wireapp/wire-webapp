@@ -37,7 +37,6 @@ import {ModalsViewModel} from './ModalsViewModel';
 import {ServiceModalViewModel} from './content/ServiceModalViewModel';
 import {InviteModalViewModel} from './content/InviteModalViewModel';
 import {ConversationError} from '../error/ConversationError';
-import {CollectionViewModel} from './content/CollectionViewModel';
 import {ConnectRequestsViewModel} from './content/ConnectRequestsViewModel';
 import {GiphyViewModel} from './content/GiphyViewModel';
 import {HistoryImportViewModel} from './content/HistoryImportViewModel';
@@ -86,7 +85,6 @@ export class ContentViewModel {
   private readonly teamState: TeamState;
   private readonly conversationState: ConversationState;
 
-  collection: CollectionViewModel;
   connectRequests: ConnectRequestsViewModel;
   conversationRepository: ConversationRepository;
   messageRepository: MessageRepository;
@@ -117,7 +115,6 @@ export class ContentViewModel {
   static get STATE() {
     return {
       COLLECTION: 'ContentViewModel.STATE.COLLECTION',
-      COLLECTION_DETAILS: 'ContentViewModel.STATE.COLLECTION_DETAILS',
       CONNECTION_REQUESTS: 'ContentViewModel.STATE.CONNECTION_REQUESTS',
       CONVERSATION: 'ContentViewModel.STATE.CONVERSATION',
       HISTORY_EXPORT: 'ContentViewModel.STATE.HISTORY_EXPORT',
@@ -150,7 +147,6 @@ export class ContentViewModel {
     this.state = ko.observable(ContentViewModel.STATE.WATERMARK);
 
     // Nested view models
-    this.collection = new CollectionViewModel(repositories.conversation);
     this.connectRequests = new ConnectRequestsViewModel(mainViewModel);
     this.emojiInput = new EmojiInputViewModel(repositories.properties);
     this.giphy = new GiphyViewModel(repositories.giphy);
@@ -206,9 +202,6 @@ export class ContentViewModel {
           break;
         case ContentViewModel.STATE.PREFERENCES_DEVICES:
           this.preferencesDevices.updateDeviceInfo();
-          break;
-        case ContentViewModel.STATE.COLLECTION:
-          this.collection.setConversation(this.previousConversation);
           break;
         default:
           this.inputBar.removedFromView();
@@ -390,8 +383,6 @@ export class ContentViewModel {
     switch (state) {
       case ContentViewModel.STATE.COLLECTION:
         return '.collection';
-      case ContentViewModel.STATE.COLLECTION_DETAILS:
-        return '.collection-details';
       case ContentViewModel.STATE.CONVERSATION:
         return '.conversation';
       case ContentViewModel.STATE.CONNECTION_REQUESTS:
@@ -418,7 +409,7 @@ export class ContentViewModel {
 
     const isStateConversation = this.previousState === ContentViewModel.STATE.CONVERSATION;
     if (isStateConversation) {
-      const collectionStates = [ContentViewModel.STATE.COLLECTION, ContentViewModel.STATE.COLLECTION_DETAILS];
+      const collectionStates = [ContentViewModel.STATE.COLLECTION];
       const isCollectionState = collectionStates.includes(newContentState);
       if (!isCollectionState) {
         this.conversationState.activeConversation(null);
