@@ -158,6 +158,7 @@ const AccountPreferences: React.FC<AccountPreferencesProps> = ({
               display: 'flex',
               flexDirection: 'row',
               flexWrap: 'wrap',
+              marginLeft: '-8px',
             }}
           >
             <NameInput {...{canEditProfile, name, userRepository}} />
@@ -188,13 +189,13 @@ const AccountPreferences: React.FC<AccountPreferencesProps> = ({
         </PreferencesSection>
       ) : (
         <PreferencesSection hasSeparator>
-          <div
+          <button
             className="preferences-link accent-text"
             onClick={clickOnLeaveGuestRoom}
             data-uie-name="do-leave-guest-room"
           >
             {t('preferencesAccountLeaveGuestRoom')}
-          </div>
+          </button>
           <div className="preferences-leave-disclaimer">{t('preferencesAccountLeaveGuestRoomDescription')}</div>
         </PreferencesSection>
       )}

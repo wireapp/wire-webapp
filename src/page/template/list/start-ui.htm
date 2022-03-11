@@ -75,25 +75,31 @@
           <!-- ko ifnot: showSearchResults() -->
             <!-- ko if: showInviteMember() && !!manageTeamUrl -->
               <ul class="start-ui-invite-people left-list-items">
-                <li class="left-list-item left-list-item-clickable" data-bind="click: clickOpenManageTeam" data-uie-name="do-invite-member">
-                  <div class="left-column-icon icon-envelope"></div>
-                  <div class="center-column" data-bind="text: t('searchMemberInvite')"></div>
+                <li class="left-list-item">
+                  <button class="left-list-item-button" data-bind="click: clickOpenManageTeam" data-uie-name="do-invite-member">
+                    <span class="left-column-icon icon-envelope"></span>
+                    <span class="center-column" data-bind="text: t('searchMemberInvite')"></span>
+                  </button>
                 </li>
               </ul>
             <!-- /ko -->
             <!-- ko if: z.userPermission().canCreateGroupConversation() -->
               <ul class="start-ui-create-group left-list-items">
-                <li class="left-list-item left-list-item-clickable" data-bind="click: clickOnCreateGroup" data-uie-name="go-create-group">
-                  <group-icon class="left-column-icon"></group-icon>
-                  <div class="center-column" data-bind="text: t('searchCreateGroup')"></div>
+                <li class="left-list-item" >
+                  <button class="left-list-item-button" data-bind="click: clickOnCreateGroup" data-uie-name="go-create-group">
+                    <group-icon class="left-column-icon"></group-icon>
+                    <span class="center-column" data-bind="text: t('searchCreateGroup')"></span>
+                  </button>
                 </li>
               </ul>
             <!-- /ko -->
             <!-- ko if: z.userPermission().canCreateGuestRoom() && showCreateGuestRoom() -->
               <ul class="start-ui-create-guest-room left-list-items">
-                <li class="left-list-item left-list-item-clickable" data-bind="click: clickOnCreateGuestRoom" data-uie-name="do-create-guest-room">
-                  <guest-icon class="left-column-icon"></guest-icon>
-                  <div class="center-column" data-bind="text: t('searchCreateGuestRoom')"></div>
+                <li class="left-list-item">
+                  <button class="left-list-item-button"  data-bind="click: clickOnCreateGuestRoom" data-uie-name="do-create-guest-room">
+                    <guest-icon class="left-column-icon"></guest-icon>
+                    <span class="center-column" data-bind="text: t('searchCreateGuestRoom')"></span>
+                  </button>
                 </li>
               </ul>
             <!-- /ko -->
