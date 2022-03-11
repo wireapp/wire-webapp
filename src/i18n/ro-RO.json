@@ -460,6 +460,8 @@
   "footer.wireLink": "wire.com",
   "fullsearchNoResults": "Fără rezultate.",
   "fullsearchPlaceholder": "Caută prin mesaje text",
+  "groupCreationActionCloseModal": "Close group creation modal",
+  "groupCreationParticipantsActionBack": "Go Back",
   "groupCreationParticipantsActionCreate": "Gata",
   "groupCreationParticipantsActionSkip": "Skip",
   "groupCreationParticipantsHeader": "Adaugă persoane",

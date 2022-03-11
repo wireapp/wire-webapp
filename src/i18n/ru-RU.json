@@ -460,6 +460,8 @@
   "footer.wireLink": "wire.com",
   "fullsearchNoResults": "Ничего не найдено.",
   "fullsearchPlaceholder": "Поиск текстовых сообщений",
+  "groupCreationActionCloseModal": "Закрыть окно создания группы",
+  "groupCreationParticipantsActionBack": "Вернуться назад",
   "groupCreationParticipantsActionCreate": "Готово",
   "groupCreationParticipantsActionSkip": "Пропустить",
   "groupCreationParticipantsHeader": "Добавить участников",

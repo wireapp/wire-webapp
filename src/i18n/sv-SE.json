@@ -460,6 +460,8 @@
   "footer.wireLink": "wire.com",
   "fullsearchNoResults": "Inga resultat.",
   "fullsearchPlaceholder": "Sök textmeddelanden",
+  "groupCreationActionCloseModal": "Close group creation modal",
+  "groupCreationParticipantsActionBack": "Go Back",
   "groupCreationParticipantsActionCreate": "Färdig",
   "groupCreationParticipantsActionSkip": "Hoppa över",
   "groupCreationParticipantsHeader": "Lägg till personer",

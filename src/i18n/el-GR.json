@@ -460,6 +460,8 @@
   "footer.wireLink": "wire.com",
   "fullsearchNoResults": "Χωρίς Αποτέλεσμα.",
   "fullsearchPlaceholder": "Αναζήτηση μηνυμάτων κειμένου",
+  "groupCreationActionCloseModal": "Close group creation modal",
+  "groupCreationParticipantsActionBack": "Go Back",
   "groupCreationParticipantsActionCreate": "Έγινε",
   "groupCreationParticipantsActionSkip": "Παράλειψη",
   "groupCreationParticipantsHeader": "Προσθήκη ατόμων",

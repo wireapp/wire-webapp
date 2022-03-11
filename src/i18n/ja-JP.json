@@ -460,6 +460,8 @@
   "footer.wireLink": "wire.com",
   "fullsearchNoResults": "結果はありません",
   "fullsearchPlaceholder": "テキストメッセージの検索",
+  "groupCreationActionCloseModal": "Close group creation modal",
+  "groupCreationParticipantsActionBack": "Go Back",
   "groupCreationParticipantsActionCreate": "完了",
   "groupCreationParticipantsActionSkip": "省略",
   "groupCreationParticipantsHeader": "人を追加します",
