@@ -460,6 +460,8 @@
   "footer.wireLink": "wire.com",
   "fullsearchNoResults": "Ningún resultado.",
   "fullsearchPlaceholder": "Buscar mensajes",
+  "groupCreationActionCloseModal": "Close group creation modal",
+  "groupCreationParticipantsActionBack": "Go Back",
   "groupCreationParticipantsActionCreate": "Listo",
   "groupCreationParticipantsActionSkip": "Omitir",
   "groupCreationParticipantsHeader": "Agregar personas",

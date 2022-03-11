@@ -460,6 +460,8 @@
   "footer.wireLink": "wire.com",
   "fullsearchNoResults": "Nema rezultata.",
   "fullsearchPlaceholder": "Pretraži poruke",
+  "groupCreationActionCloseModal": "Close group creation modal",
+  "groupCreationParticipantsActionBack": "Go Back",
   "groupCreationParticipantsActionCreate": "Gotovo",
   "groupCreationParticipantsActionSkip": "Preskoči",
   "groupCreationParticipantsHeader": "Dodajte osobe",

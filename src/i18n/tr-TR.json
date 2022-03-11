@@ -460,6 +460,8 @@
   "footer.wireLink": "wire.com",
   "fullsearchNoResults": "Sonuç yok.",
   "fullsearchPlaceholder": "Metin mesajlarında ara",
+  "groupCreationActionCloseModal": "Close group creation modal",
+  "groupCreationParticipantsActionBack": "Go Back",
   "groupCreationParticipantsActionCreate": "Yapıldı",
   "groupCreationParticipantsActionSkip": "Geç",
   "groupCreationParticipantsHeader": "Kişi ekle",

@@ -460,6 +460,8 @@
   "footer.wireLink": "wire.com",
   "fullsearchNoResults": "نتیجه‌ای یافت نشد.",
   "fullsearchPlaceholder": "جستجو پیام‌های متنی",
+  "groupCreationActionCloseModal": "Close group creation modal",
+  "groupCreationParticipantsActionBack": "Go Back",
   "groupCreationParticipantsActionCreate": "انجام شد",
   "groupCreationParticipantsActionSkip": "Skip",
   "groupCreationParticipantsHeader": "Add people",

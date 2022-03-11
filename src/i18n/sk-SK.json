@@ -460,6 +460,8 @@
   "footer.wireLink": "wire.com",
   "fullsearchNoResults": "Žiadne výsledky.",
   "fullsearchPlaceholder": "Vyhľadať textové správy",
+  "groupCreationActionCloseModal": "Close group creation modal",
+  "groupCreationParticipantsActionBack": "Go Back",
   "groupCreationParticipantsActionCreate": "Done",
   "groupCreationParticipantsActionSkip": "Skip",
   "groupCreationParticipantsHeader": "Add people",

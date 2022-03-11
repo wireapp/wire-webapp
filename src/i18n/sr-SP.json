@@ -460,6 +460,8 @@
   "footer.wireLink": "wire.com\n \n",
   "fullsearchNoResults": "Нема резултата.",
   "fullsearchPlaceholder": "претражи текст порука",
+  "groupCreationActionCloseModal": "Close group creation modal",
+  "groupCreationParticipantsActionBack": "Go Back",
   "groupCreationParticipantsActionCreate": "Готово",
   "groupCreationParticipantsActionSkip": "Прескочи",
   "groupCreationParticipantsHeader": "Додајте људе",

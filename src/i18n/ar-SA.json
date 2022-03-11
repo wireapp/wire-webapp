@@ -460,6 +460,8 @@
   "footer.wireLink": "wire.com",
   "fullsearchNoResults": "لا نتائج.",
   "fullsearchPlaceholder": "ابحث في الرسائل النصية",
+  "groupCreationActionCloseModal": "Close group creation modal",
+  "groupCreationParticipantsActionBack": "Go Back",
   "groupCreationParticipantsActionCreate": "تـم",
   "groupCreationParticipantsActionSkip": "تخطِ",
   "groupCreationParticipantsHeader": "أضف أشخاصًا",

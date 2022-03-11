@@ -460,6 +460,8 @@
   "footer.wireLink": "wire.com",
   "fullsearchNoResults": "Žádné výsledky.",
   "fullsearchPlaceholder": "Prohledat zprávy",
+  "groupCreationActionCloseModal": "Close group creation modal",
+  "groupCreationParticipantsActionBack": "Go Back",
   "groupCreationParticipantsActionCreate": "Hotovo",
   "groupCreationParticipantsActionSkip": "Přeskočit",
   "groupCreationParticipantsHeader": "Add people",
