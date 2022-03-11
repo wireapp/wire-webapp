@@ -139,10 +139,19 @@
     cursor: pointer;
   }
 
-  > .left-column-icon {
+  .left-list-item-button {
+    .button-reset-default;
+    display: flex;
+    width: 100%;
+    text-align: left;
+  }
+
+  > .left-column-icon,
+  > .left-list-item-button > .left-column-icon {
     .flex-center;
 
     width: @left-list-item-left-width;
+    height: 100%;
     > svg {
       max-width: 16px;
       max-height: 16px;
@@ -155,7 +164,8 @@
     }
   }
 
-  > .center-column {
+  > .center-column,
+  > .left-list-item-button > .center-column {
     .ellipsis;
 
     position: relative;

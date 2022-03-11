@@ -1150,6 +1150,7 @@ export class CallingRepository {
       [Segmentation.CALL.DIRECTION]: this.getCallDirection(call),
       [Segmentation.CALL.DURATION]: Math.ceil((Date.now() - call.startedAt()) / 5000) * 5,
       [Segmentation.CALL.END_REASON]: reason,
+      [Segmentation.CALL.REASON]: this.getCallEndReasonText(reason),
       [Segmentation.CALL.PARTICIPANTS]: call.analyticsMaximumParticipants,
       [Segmentation.CALL.SCREEN_SHARE]: call.analyticsScreenSharing,
     });
@@ -1188,6 +1189,43 @@ export class CallingRepository {
     call.reason(reason);
   };
 
+  /*
+    Note: This is in sync with our ios code base
+    https://github.com/wireapp/wire-ios/blob/cf91b35d6ccbee5f03592f5bb763534341630428/Wire-iOS/Sources/Analytics/AnalyticsCallingTracker.swift#L182-L212
+  */
+  getCallEndReasonText = (reason: REASON): string => {
+    switch (reason) {
+      case REASON.CANCELED:
+        return 'canceled';
+      case REASON.NORMAL:
+      case REASON.STILL_ONGOING:
+        return 'normal';
+      case REASON.IO_ERROR:
+        return 'io_error';
+      case REASON.ERROR:
+        return 'internal_error';
+      case REASON.ANSWERED_ELSEWHERE:
+        return 'answered_elsewhere';
+      case REASON.TIMEOUT:
+      case REASON.TIMEOUT_ECONN:
+        return 'timeout';
+      case REASON.LOST_MEDIA:
+        return 'drop';
+      case REASON.REJECTED:
+        return 'rejected_elsewhere';
+      case REASON.OUTDATED_CLIENT:
+        return 'outdated_client';
+      case REASON.DATACHANNEL:
+        return 'datachannel';
+      case REASON.NOONE_JOINED:
+        return 'no_one_joined';
+      case REASON.EVERYONE_LEFT:
+        return 'everyone_left';
+      default:
+        return 'unknown';
+    }
+  };
+
   private readonly incomingCall = (
     convId: SerializedConversationId,
     timestamp: number,
@@ -1198,8 +1236,8 @@ export class CallingRepository {
     conversationType: CONV_TYPE,
   ) => {
     const conversationId = this.parseQualifiedId(convId);
-    const conversationEntity = this.conversationState.findConversation(conversationId);
-    if (!conversationEntity) {
+    const conversation = this.conversationState.findConversation(conversationId);
+    if (!conversation) {
       return;
     }
     const storedCall = this.findCall(conversationId);
@@ -1208,13 +1246,13 @@ export class CallingRepository {
       // When a second call arrives in the same conversation, we need to clean that call first
       this.removeCall(storedCall);
     }
-    const canRing = !conversationEntity.showNotificationsNothing() && shouldRing && this.isReady;
+    const canRing = !conversation.showNotificationsNothing() && shouldRing && this.isReady;
     const selfParticipant = new Participant(this.selfUser, this.selfClientId);
     const isVideoCall = hasVideo ? CALL_TYPE.VIDEO : CALL_TYPE.NORMAL;
     const isMuted = Config.getConfig().FEATURE.CONFERENCE_AUTO_MUTE && conversationType === CONV_TYPE.CONFERENCE;
     const call = new Call(
       this.parseQualifiedId(userId),
-      conversationId,
+      conversation.qualifiedId,
       conversationType,
       selfParticipant,
       hasVideo ? CALL_TYPE.VIDEO : CALL_TYPE.NORMAL,

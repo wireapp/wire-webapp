@@ -942,6 +942,8 @@
   "preferencesOptionsEmojiReplaceDetail": ":-) → [icon]",
   "preferencesOptionsEnableAgcCheckbox": "Controle automático de ganho (AGC)",
   "preferencesOptionsEnableAgcDetails": "Ative para permitir que o volume do microfone seja ajustado automaticamente para garantir que todos os participantes de uma chamada sejam ouvidos com um volume semelhante e confortável.",
+  "preferencesOptionsEnableSoundlessIncomingCalls": "Chamadas recebidas sem som",
+  "preferencesOptionsEnableSoundlessIncomingCallsDetails": "Isso faz com que o aplicativo não toque se você receber outra chamada enquanto estiver em uma chamada.",
   "preferencesOptionsEnableVbrCheckbox": "Codificação de taxa de bits variável",
   "preferencesOptionsEnableVbrDetails": "Isso faz com que as chamadas de áudio usem menos dados e funcionem melhor em redes mais lentas. Desligue para usar a codificação de taxa de bits constante (CBR). Essa configuração afeta apenas chamadas 1:1; as chamadas em conferência sempre usam a codificação CBR.",
   "preferencesOptionsNotifications": "Notificações",

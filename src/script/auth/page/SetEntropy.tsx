@@ -107,6 +107,7 @@ const SetEntropy = ({setEntropy, entropy, error, setError, onSetEntropy}: Props)
             {_(setEntropyStrings.subheadline)}
           </Muted>
           <Canvas
+            data-uie-name="element-canvas"
             sizeX={256}
             sizeY={256}
             style={{
@@ -127,7 +128,6 @@ const SetEntropy = ({setEntropy, entropy, error, setError, onSetEntropy}: Props)
               setError(!error);
               setEntropy([...entropy, null]);
             }}
-            data-uie-name="enter-entropy"
           />
           <ProgressBar
             error={error}

@@ -76,6 +76,8 @@ export class ConversationListViewModel {
   readonly makeOnClick: (conversationId: string, domain: string | null) => MouseEventHandler<Element>;
   readonly participantAvatarSize: typeof AVATAR_SIZE.SMALL;
   readonly getIsVisibleFunc: () => (() => boolean) | ((top: number, bottom: number) => boolean);
+  readonly visible: ko.PureComputed<boolean>;
+  readonly ariaHidden: ko.PureComputed<string>;
   private readonly logger: Logger;
   private readonly selfUser: ko.PureComputed<User>;
   private readonly showCalls: ko.Observable<boolean>;
@@ -146,6 +148,9 @@ export class ConversationListViewModel {
     });
 
     this.webappIsLoaded = ko.observable(false);
+
+    this.visible = ko.pureComputed(() => listViewModel.state() === ListViewModel.STATE.CONVERSATIONS);
+    this.ariaHidden = ko.pureComputed(() => (this.visible() ? 'false' : 'true'));
 
     this.archiveTooltip = ko.pureComputed(() => {
       return t('tooltipConversationsArchived', this.archivedConversations().length);
@@ -278,11 +283,7 @@ export class ConversationListViewModel {
   };
 
   readonly isSelectedConversation = (conversationEntity: Conversation): boolean => {
-    const expectedStates = [
-      ContentViewModel.STATE.COLLECTION,
-      ContentViewModel.STATE.COLLECTION_DETAILS,
-      ContentViewModel.STATE.CONVERSATION,
-    ];
+    const expectedStates = [ContentViewModel.STATE.COLLECTION, ContentViewModel.STATE.CONVERSATION];
 
     const isSelectedConversation = this.conversationState.isActiveConversation(conversationEntity);
     const isExpectedState = expectedStates.includes(this.contentState());

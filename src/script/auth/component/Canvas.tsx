@@ -1,6 +1,7 @@
 import React, {MouseEvent, useRef, useEffect, CSSProperties} from 'react';
 
 interface CanvasProps {
+  'data-uie-name': string;
   draw: (context: CanvasRenderingContext2D) => void;
   onMouseEnter: () => void;
   onMouseLeave: () => void;
@@ -33,6 +34,7 @@ const Canvas = (props: CanvasProps) => {
 
   return (
     <canvas
+      data-uie-name={props['data-uie-name']}
       height={sizeY}
       width={sizeX}
       css={{

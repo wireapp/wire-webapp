@@ -942,6 +942,8 @@
   "preferencesOptionsEmojiReplaceDetail": ":-) → [icon]",
   "preferencesOptionsEnableAgcCheckbox": "Automatic gain control (AGC)",
   "preferencesOptionsEnableAgcDetails": "Enable to allow your microphone volume to be adjusted automatically to ensure all participants in a call are heard with similar and comfortable loudness.",
+  "preferencesOptionsEnableSoundlessIncomingCalls": "Soundless incoming calls",
+  "preferencesOptionsEnableSoundlessIncomingCallsDetails": "This makes the app not ring if you receive another call when you are already in a call.",
   "preferencesOptionsEnableVbrCheckbox": "Variable Bit Rate Encoding",
   "preferencesOptionsEnableVbrDetails": "This makes audio calls use less data and work better on slower networks. Turn off to use constant bitrate encoding (CBR). This setting only affects 1:1 calls; conference calls always use CBR encoding.",
   "preferencesOptionsNotifications": "Notificări",

@@ -190,7 +190,7 @@ class App {
   constructor(
     private readonly appContainer: HTMLElement,
     private readonly apiClient: APIClient,
-    options?: {apiVersion: number; storageEngine?: SQLeetEngine},
+    options?: {storageEngine?: SQLeetEngine},
   ) {
     this.apiClient.on(APIClient.TOPIC.ON_LOGOUT, () => this.logout(SIGN_OUT_REASON.NOT_SIGNED_IN, false));
     this.logger = getLogger('App');
@@ -408,7 +408,7 @@ class App {
       telemetry.timeStep(AppInitTimingsStep.RECEIVED_ACCESS_TOKEN);
       const {clientType} = await authRepository.init();
       const selfUser = await this.initiateSelfUser();
-      if (this.apiClient.backendFeatures.federationEndpoints) {
+      if (this.apiClient.backendFeatures.isFederated) {
         // Migrate all existing session to fully qualified ids (if need be)
         await migrateToQualifiedSessionIds(
           this.repository.storage.storageService.db.sessions,
@@ -904,7 +904,7 @@ class App {
 
 $(async () => {
   const apiClient = container.resolve(APIClient);
-  const apiVersion = await apiClient.useVersion(Config.getConfig().SUPPORTED_API_VERSIONS);
+  await apiClient.useVersion(Config.getConfig().SUPPORTED_API_VERSIONS);
 
   enableLogging(Config.getConfig().FEATURE.ENABLE_DEBUG);
   exposeWrapperGlobals();
@@ -922,7 +922,7 @@ $(async () => {
       const storageEngine = isTemporaryClientAndNonPersistent(shouldPersist)
         ? await StorageService.getUninitializedEngine()
         : undefined;
-      window.wire.app = new App(appContainer, apiClient, {apiVersion, storageEngine});
+      window.wire.app = new App(appContainer, apiClient, {storageEngine});
     }
   }
 });

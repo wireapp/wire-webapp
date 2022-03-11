@@ -370,7 +370,7 @@ describe('Markdown for code snippets', () => {
 
   it('renders escaped Ruby code blocks', () => {
     const expected =
-      '<pre><code class="lang-ruby"><span class="hljs-built_in">require</span> <span class="hljs-string">&#x27;redcarpet&#x27;</span>\nmarkdown = Redcarpet.<span class="hljs-keyword">new</span>(<span class="hljs-string">&quot;Hello World!&quot;</span>)\nputs markdown.to_html\n</code></pre>';
+      '<pre><code class="lang-ruby"><span class="hljs-keyword">require</span> <span class="hljs-string">&#x27;redcarpet&#x27;</span>\nmarkdown = Redcarpet.new(<span class="hljs-string">&quot;Hello World!&quot;</span>)\nputs markdown.to_html\n</code></pre>';
 
     expect(
       renderMessage(
@@ -381,8 +381,7 @@ describe('Markdown for code snippets', () => {
 
   it('renders escaped JavaScript code blocks', () => {
     const expected =
-      '<pre><code class="lang-js"><span class="hljs-constructor">$(<span class="hljs-params">document</span>)</span>.ready(<span class="hljs-keyword">function</span><span class="hljs-literal">()</span> {\n  <span class="hljs-constructor">$(&#x27;<span class="hljs-params">pre</span> <span class="hljs-params">code</span>&#x27;)</span>.each(<span class="hljs-keyword">function</span>(i, block) {\n    hljs.highlight<span class="hljs-constructor">Block(<span class="hljs-params">block</span>)</span>;\n  });\n});\n</code></pre>';
-
+      '<pre><code class="lang-js">$(<span class="hljs-variable language_">document</span>).<span class="hljs-title function_">ready</span>(<span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) {\n  $(<span class="hljs-string">&#x27;pre code&#x27;</span>).<span class="hljs-title function_">each</span>(<span class="hljs-keyword">function</span>(<span class="hljs-params">i, block</span>) {\n    hljs.<span class="hljs-title function_">highlightBlock</span>(block);\n  });\n});\n</code></pre>';
     expect(
       renderMessage(
         "```js\n$(document).ready(function() {\n  $('pre code').each(function(i, block) {\n    hljs.highlightBlock(block);\n  });\n});\n```",
@@ -392,7 +391,7 @@ describe('Markdown for code snippets', () => {
 
   it('renders escaped TypeScript code blocks', () => {
     const expected =
-      '<pre><code class="lang-typescript"><span class="hljs-keyword">const</span> greetings = (<span class="hljs-attribute">name</span>: <span class="hljs-built_in">string</span>): <span class="hljs-built_in">string</span> =&gt; {\n  <span class="hljs-keyword">return</span> <span class="hljs-string">`Hello, <span class="hljs-subst">${name}</span>!`</span>;\n};\n<span class="hljs-built_in">console</span>.log(greetings(<span class="hljs-string">&#x27;world&#x27;</span>));\n</code></pre>';
+      '<pre><code class="lang-typescript"><span class="hljs-keyword">const</span> greetings = (<span class="hljs-attr">name</span>: <span class="hljs-built_in">string</span>): <span class="hljs-function"><span class="hljs-params">string</span> =&gt;</span> {\n  <span class="hljs-keyword">return</span> <span class="hljs-string">`Hello, <span class="hljs-subst">${name}</span>!`</span>;\n};\n<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-title function_">greetings</span>(<span class="hljs-string">&#x27;world&#x27;</span>));\n</code></pre>';
     expect(
       renderMessage(
         "```typescript\nconst greetings = (name: string): string => {\n  return `Hello, ${name}!`;\n};\nconsole.log(greetings('world'));\n```",
@@ -402,7 +401,7 @@ describe('Markdown for code snippets', () => {
 
   it('renders escaped HTML code blocks', () => {
     const expected =
-      '<pre><code class="lang-html">&lt;<span class="hljs-keyword">a</span> href=<span class="hljs-string">&quot;javascript:wire.app.logout()&quot;</span>&gt;This is <span class="hljs-keyword">a</span> trick&lt;/<span class="hljs-keyword">a</span>&gt;\n</code></pre>';
+      '<pre><code class="lang-html"><span class="hljs-tag">&lt;<span class="hljs-name">a</span> <span class="hljs-attr">href</span>=<span class="hljs-string">&quot;javascript:wire.app.logout()&quot;</span>&gt;</span>This is a trick<span class="hljs-tag">&lt;/<span class="hljs-name">a</span>&gt;</span>\n</code></pre>';
 
     expect(renderMessage('```html\n<a href="javascript:wire.app.logout()">This is a trick</a>\n```')).toEqual(expected);
   });

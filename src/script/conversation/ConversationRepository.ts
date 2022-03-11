@@ -123,6 +123,7 @@ import {ConversationMemberUpdateEvent} from '@wireapp/api-client/src/event';
 import {matchQualifiedIds} from 'Util/QualifiedId';
 import {ConversationVerificationState} from './ConversationVerificationState';
 import {extractClientDiff} from './ClientMismatchUtil';
+import {Core} from '../service/CoreSingleton';
 
 type ConversationDBChange = {obj: EventRecord; oldObj: EventRecord};
 type FetchPromise = {rejectFn: (error: ConversationError) => void; resolveFn: (conversation: Conversation) => void};
@@ -169,6 +170,7 @@ export class ConversationRepository {
     private readonly userState = container.resolve(UserState),
     private readonly teamState = container.resolve(TeamState),
     private readonly conversationState = container.resolve(ConversationState),
+    private readonly core = container.resolve(Core),
   ) {
     this.eventService = eventRepository.eventService;
     // we register a client mismatch handler agains the message repository so that we can react to missing members
@@ -177,6 +179,7 @@ export class ConversationRepository {
       const {missingClients, deletedClients, emptyUsers, missingUserIds} = extractClientDiff(
         mismatch,
         conversation?.allUserEntities,
+        this.core.backendFeatures.federationEndpoints ? userState.self().domain : '',
       );
 
       if (conversation && missingUserIds.length) {
@@ -377,13 +380,20 @@ export class ConversationRepository {
     options: Partial<NewConversation> = {},
   ): Promise<Conversation | undefined> {
     const userIds = userEntities.map(user => user.qualifiedId);
+    const usersPayload = this.core.backendFeatures.federationEndpoints
+      ? {
+          qualified_users: userIds,
+          users: [] as string[],
+        }
+      : {
+          users: userIds.map(({id}) => id),
+        };
 
     let payload: NewConversation & {conversation_role: string} = {
       conversation_role: DefaultRole.WIRE_MEMBER,
       name: groupName,
-      qualified_users: userIds,
       receipt_mode: null,
-      users: userIds.map(({id}) => id),
+      ...usersPayload,
       ...options,
     };
 
@@ -712,9 +722,9 @@ export class ConversationRepository {
   public async searchInConversation(
     conversationEntity: Conversation,
     query: string,
-  ): Promise<{messageEntities?: Message[]; query?: string}> {
+  ): Promise<{messageEntities: Message[]; query: string}> {
     if (!conversationEntity || !query.length) {
-      return {};
+      return {messageEntities: [], query};
     }
 
     const events = await this.conversation_service.searchInConversation(conversationEntity.id, query);

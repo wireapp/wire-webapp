@@ -213,7 +213,7 @@ export class ClientRepository {
   private updateClientSchemaInDb(userId: QualifiedId, clientPayload: PublicClient): Promise<ClientRecord> {
     const clientRecord: ClientRecord = {
       ...clientPayload,
-      domain: userId.domain,
+      domain: this.core.backendFeatures.federationEndpoints ? userId.domain : undefined,
       meta: {
         is_verified: false,
         primary_key: this.core.service!.cryptography.constructSessionId(userId, clientPayload.id),
@@ -346,12 +346,9 @@ export class ClientRepository {
    * @param updateClients Automatically update the clients
    * @returns Resolves with an array of client entities
    */
-  async getClientsByQualifiedUserIds(
-    userIds: QualifiedId[],
-    updateClients: boolean,
-  ): Promise<QualifiedUserClientEntityMap> {
+  async getClientsByUserIds(userIds: QualifiedId[], updateClients: boolean): Promise<QualifiedUserClientEntityMap> {
     const clientEntityMap: QualifiedUserClientEntityMap = {};
-    const qualifiedUserClientsMap = await this.clientService.getClientsByQualifiedUserIds(userIds);
+    const qualifiedUserClientsMap = await this.clientService.getClientsByUserIds(userIds);
 
     await Promise.all(
       Object.entries(qualifiedUserClientsMap).map(([domain, userClientMap]) =>
@@ -365,21 +362,6 @@ export class ClientRepository {
           }),
         ),
       ),
-    );
-
-    return clientEntityMap;
-  }
-
-  async getClientsByUserIds(userIds: QualifiedId[], updateClients: boolean): Promise<UserClientEntityMap> {
-    const clientEntityMap: UserClientEntityMap = {};
-    await Promise.all(
-      userIds.map(async userId => {
-        const clients = await this.clientService.getClientsByUserId(userId.id);
-        const isSelfClient = userId.id === this.selfUser().id;
-        clientEntityMap[userId.id] = updateClients
-          ? await this.updateClientsOfUserById(userId, clients, true)
-          : ClientMapper.mapClients(clients, isSelfClient, null);
-      }),
     );
 
     return clientEntityMap;
@@ -462,7 +444,7 @@ export class ClientRepository {
           if (backendClient) {
             const {client, wasUpdated} = ClientMapper.updateClient(databaseClient, {
               ...backendClient,
-              domain: userId.domain,
+              domain: this.core.backendFeatures.federationEndpoints ? userId.domain : undefined,
             });
 
             delete clientsFromBackend[clientId];

@@ -1,4 +1,9 @@
-<div id="temporary-guest" class="temporary-guest left-list left-list-is-visible" data-bind="with: $root.temporaryGuest">
+<!-- ko with: $root.temporaryGuest -->
+<div
+  id="temporary-guest"
+  class="temporary-guest left-list left-list-is-visible"
+  data-bind="css: { 'left-list-is-visible': visible }, attr: { 'aria-hidden': ariaHidden }"
+>
   <!-- ko using: callingViewModel -->
     <!-- ko foreach: {data: activeCalls, as: 'activeCall', noChildContext: true} -->
       <conversation-list-calling-cell
@@ -30,3 +35,4 @@
     <settings-icon  class="temporary-guest__footer__preferences" data-bind="click: clickOnPreferencesButton, attr: {title: t('tooltipConversationsPreferences')}" data-uie-name="go-preferences"></settings-icon>
   </div>
 </div>
+<!-- /ko -->

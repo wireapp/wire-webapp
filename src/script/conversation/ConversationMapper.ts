@@ -382,12 +382,13 @@ export class ConversationMapper {
     );
   }
 
-  static mapAccessCode(conversationEntity: Conversation, accessCode: ConversationCode): void {
-    const isTeamConversation = conversationEntity && conversationEntity.team_id;
+  static mapAccessCode(conversation: Conversation, accessCode: ConversationCode): void {
+    const isTeamConversation = conversation && conversation.team_id;
 
     if (accessCode.uri && isTeamConversation) {
-      const accessCodeUrl = `${window.wire.env.URL.ACCOUNT_BASE}/conversation-join/?key=${accessCode.key}&code=${accessCode.code}`;
-      conversationEntity.accessCode(accessCodeUrl);
+      const baseUrl = `${window.wire.env.URL.ACCOUNT_BASE}/conversation-join/?key=${accessCode.key}&code=${accessCode.code}`;
+      const accessCodeUrl = conversation.domain ? `${baseUrl}&domain=${conversation.domain}` : baseUrl;
+      conversation.accessCode(accessCodeUrl);
     }
   }
 

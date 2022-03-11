@@ -17,87 +17,30 @@
  *
  */
 
-import {ReactWrapper} from 'enzyme';
-import React from 'react';
-import {actionRoot} from '../module/action';
-import {initialRootState, RootState, Api} from '../module/reducer';
-import {mockStoreFactory} from '../util/test/mockStoreFactory';
-import {mountComponent} from '../util/test/TestUtil';
-import SetHandle from './SetHandle';
-import {MockStoreEnhanced} from 'redux-mock-store';
-import {ThunkDispatch} from 'redux-thunk';
-import {AnyAction} from 'redux';
-import {TypeUtil} from '@wireapp/commons';
-import {History} from 'history';
+import {fireEvent, render, screen} from '@testing-library/react';
+import React, {useState} from 'react';
+import SetEntropy from './SetEntropy';
 
-jest.mock('../util/SVGProvider');
+describe('SetEntropy', () => {
+  const mockonSetEntropy = async () => {
+    // eslint-disable-next-line no-console
+    console.log('sending entropy');
+  };
+  const [entropy, setEntropy] = useState<[number, number][]>([]);
+  const [error, setError] = useState(null);
 
-class SetHandlePage {
-  private readonly driver: ReactWrapper;
-
-  constructor(
-    store: MockStoreEnhanced<TypeUtil.RecursivePartial<RootState>, ThunkDispatch<RootState, Api, AnyAction>>,
-    history?: History<any>,
-  ) {
-    this.driver = mountComponent(<SetHandle />, store, history);
-  }
-
-  getHandleInput = () => this.driver.find('input[data-uie-name="enter-handle"]');
-  getSetHandleButton = () => this.driver.find('button[data-uie-name="do-send-handle"]');
-  getErrorMessage = (errorLabel?: string) =>
-    this.driver.find(`[data-uie-name="error-message"]${errorLabel ? `[data-uie-value="${errorLabel}"]` : ''}`);
-
-  clickSetHandleButton = () => this.getSetHandleButton().simulate('submit');
-
-  enterHandle = (value: string) => this.getHandleInput().simulate('change', {target: {value}});
-}
-
-describe('SetHandle', () => {
-  it('has disabled submit button as long as there is no input', () => {
-    spyOn(actionRoot.selfAction, 'doGetConsents').and.returnValue(() => Promise.resolve());
-    spyOn(actionRoot.userAction, 'checkHandles').and.returnValue(() => Promise.resolve());
-    const setHandlePage = new SetHandlePage(
-      mockStoreFactory()({
-        ...initialRootState,
-        runtimeState: {
-          hasCookieSupport: true,
-          hasIndexedDbSupport: true,
-          isSupportedBrowser: true,
-        },
-      }),
+  it('reacts to drawing', () => {
+    render(
+      <SetEntropy
+        onSetEntropy={mockonSetEntropy}
+        error={error}
+        setError={setError}
+        setEntropy={setEntropy}
+        entropy={entropy}
+      />,
     );
-
-    expect(setHandlePage.getHandleInput().exists()).toBe(true);
-
-    expect(setHandlePage.getSetHandleButton().exists()).toBe(true);
-
-    expect(setHandlePage.getSetHandleButton().props().disabled).toBe(true);
-    setHandlePage.enterHandle('e');
-
-    expect(setHandlePage.getSetHandleButton().props().disabled).toBe(false);
-  });
-
-  it('trims the handle', () => {
-    spyOn(actionRoot.userAction, 'checkHandles').and.returnValue(() => Promise.resolve());
-    spyOn(actionRoot.selfAction, 'doGetConsents').and.returnValue(() => Promise.resolve());
-    spyOn(actionRoot.selfAction, 'setHandle').and.returnValue(() => Promise.resolve());
-
-    const handle = 'handle';
-
-    const setHandlePage = new SetHandlePage(
-      mockStoreFactory()({
-        ...initialRootState,
-        runtimeState: {
-          hasCookieSupport: true,
-          hasIndexedDbSupport: true,
-          isSupportedBrowser: true,
-        },
-      }),
-    );
-
-    setHandlePage.getHandleInput().simulate('change', {target: {value: ` ${handle} `}});
-    setHandlePage.clickSetHandleButton();
-
-    expect(actionRoot.selfAction.setHandle).toHaveBeenCalledWith(handle);
+    const canvas = screen.getByTestId('element-canvas');
+    fireEvent.pointerMove(canvas);
+    expect(entropy.length).toBeTruthy();
   });
 });
