@@ -19,9 +19,11 @@
 
 import ko from 'knockout';
 
-import {noop} from 'Util/util';
+import {isTabKey} from 'Util/KeyboardUtil';
+import {noop, createRandomUuid} from 'Util/util';
 
 interface ModalParams {
+  ariaLabelby?: string;
   isShown: ko.Observable<boolean>;
   large?: boolean;
   onBgClick?: () => void;
@@ -31,42 +33,80 @@ interface ModalParams {
 
 ko.components.register('modal', {
   template: `
-    <div class="modal" data-bind="style: {display: displayNone() ? 'none': 'flex', zIndex: 10000001}">
+    <div class="modal" data-bind="style: {display: displayNone() ? 'none': 'flex', zIndex: 10000001}, attr: id ? {id: id, 'aria-labelledby': ariaLabelby} : {}" role="dialog" aria-modal="true" tabindex="-1">
       <!-- ko if: showLoading() -->
         <loading-icon class="modal__loading"></loading-icon>
       <!-- /ko -->
       <!-- ko ifnot: showLoading() -->
-        <div class="modal__content" data-bind="css: {'modal__content--large': large, 'modal__content--visible':  hasVisibleClass() && !showLoading()}, fadingscrollbar" >
+        <div class="modal__content" data-bind="css: {'modal__content--large': large, 'modal__content--visible':  hasVisibleClass() && !showLoading()}, fadingscrollbar">
           <!-- ko template: { nodes: $componentTemplateNodes, data: $parent } --><!-- /ko -->
         </div>
       <!-- /ko -->
     </div>
-    <div class="modal__overlay" data-bind="click: () => onBgClick(), css: {'modal__overlay--visible': hasVisibleClass()}, style: {display: displayNone() ? 'none': 'flex'}" ></div>
+    <div class="modal__overlay" data-bind="click: () => onBgClick(), css: {'modal__overlay--visible': hasVisibleClass()}, style: {display: displayNone() ? 'none': 'flex'}"></div>
     `,
   viewModel: function ({
     isShown,
     large,
+    ariaLabelby,
     onBgClick = noop,
     onClosed = noop,
     showLoading = ko.observable(false),
   }: ModalParams): void {
     this.large = large;
+    this.id = createRandomUuid();
+    this.ariaLabelby = ariaLabelby;
     this.onBgClick = () => ko.unwrap(onBgClick)();
     this.displayNone = ko.observable(!ko.unwrap(isShown));
     this.hasVisibleClass = ko.computed(() => isShown() && !this.displayNone()).extend({rateLimit: 20});
     this.showLoading = showLoading;
     let timeoutId = 0;
+
+    const maintainFocus = (): void => {
+      if (!this.displayNone()) {
+        document.addEventListener('keydown', onKeyDown);
+      }
+    };
+
+    // Prevents focus jumping out of the modal content.
+    const onKeyDown = (event: KeyboardEvent): void => {
+      if (!isTabKey(event)) {
+        return;
+      }
+      event.preventDefault();
+      const focusableElements =
+        'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
+      const modal = document.getElementById(this.id);
+      const focusableContent = [...modal.querySelectorAll(focusableElements)];
+      const focusedItemIndex = focusableContent.indexOf(document.activeElement);
+      if (event.shiftKey && focusedItemIndex === 0) {
+        (focusableContent[focusableContent.length - 1] as HTMLElement)?.focus();
+        return;
+      }
+      if (!event.shiftKey && focusedItemIndex === focusableContent.length - 1) {
+        (focusableContent[0] as HTMLElement)?.focus();
+        return;
+      }
+      (focusableContent[focusedItemIndex + 1] as HTMLElement)?.focus();
+    };
+
+    const isDisplayNoneSubscription = this.displayNone.subscribe(() => {
+      maintainFocus();
+    });
+
     const isShownSubscription = isShown.subscribe(visible => {
       if (visible) {
         return this.displayNone(false);
       }
       timeoutId = window.setTimeout(() => {
+        document.removeEventListener('keydown', onKeyDown);
         this.displayNone(true);
         onClosed();
       }, 150);
     });
 
     this.dispose = () => {
+      isDisplayNoneSubscription.dispose();
       isShownSubscription.dispose();
       this.hasVisibleClass.dispose();
       window.clearTimeout(timeoutId);
