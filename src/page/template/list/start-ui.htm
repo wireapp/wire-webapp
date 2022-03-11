@@ -73,36 +73,32 @@
           <!-- /ko -->
 
           <!-- ko ifnot: showSearchResults() -->
-            <!-- ko if: showInviteMember() && !!manageTeamUrl -->
-              <ul class="start-ui-invite-people left-list-items">
-                <li class="left-list-item">
-                  <button class="left-list-item-button" data-bind="click: clickOpenManageTeam" data-uie-name="do-invite-member">
-                    <span class="left-column-icon icon-envelope"></span>
-                    <span class="center-column" data-bind="text: t('searchMemberInvite')"></span>
-                  </button>
-                </li>
-              </ul>
-            <!-- /ko -->
-            <!-- ko if: z.userPermission().canCreateGroupConversation() -->
-              <ul class="start-ui-create-group left-list-items">
-                <li class="left-list-item" >
-                  <button class="left-list-item-button" data-bind="click: clickOnCreateGroup" data-uie-name="go-create-group">
-                    <group-icon class="left-column-icon"></group-icon>
-                    <span class="center-column" data-bind="text: t('searchCreateGroup')"></span>
-                  </button>
-                </li>
-              </ul>
-            <!-- /ko -->
-            <!-- ko if: z.userPermission().canCreateGuestRoom() && showCreateGuestRoom() -->
-              <ul class="start-ui-create-guest-room left-list-items">
-                <li class="left-list-item">
-                  <button class="left-list-item-button" data-bind="click: clickOnCreateGuestRoom" data-uie-name="do-create-guest-room">
-                    <guest-icon class="left-column-icon"></guest-icon>
-                    <span class="center-column" data-bind="text: t('searchCreateGuestRoom')"></span>
-                  </button>
-                </li>
-              </ul>
-            <!-- /ko -->
+            <ul class="start-ui-list left-list-items">
+              <!-- ko if: showInviteMember() && !!manageTeamUrl -->
+              <li class="left-list-item">
+                <button class="left-list-item-button" data-bind="click: clickOpenManageTeam" data-uie-name="do-invite-member">
+                  <span class="left-column-icon icon-envelope"></span>
+                  <span class="center-column" data-bind="text: t('searchMemberInvite')"></span>
+                </button>
+              </li>
+              <!-- /ko -->
+              <!-- ko if: z.userPermission().canCreateGroupConversation() -->
+              <li class="left-list-item" >
+                <button class="left-list-item-button" data-bind="click: clickOnCreateGroup" data-uie-name="go-create-group">
+                  <group-icon class="left-column-icon"></group-icon>
+                  <span class="center-column" data-bind="text: t('searchCreateGroup')"></span>
+                </button>
+              </li>
+              <!-- /ko -->
+              <!-- ko if: z.userPermission().canCreateGuestRoom() && showCreateGuestRoom() -->
+              <li class="left-list-item">
+                <button class="left-list-item-button" data-bind="click: clickOnCreateGuestRoom" data-uie-name="do-create-guest-room">
+                  <guest-icon class="left-column-icon"></guest-icon>
+                  <span class="center-column" data-bind="text: t('searchCreateGuestRoom')"></span>
+                </button>
+              </li>
+              <!-- /ko -->
+            </ul>
             <!-- ko if: showTopPeople() -->
               <div class="start-ui-list-top-people" data-uie-name="status-top-people">
                 <h3 class="start-ui-list-header start-ui-list-header-top-people" data-bind="text: t('searchTopPeople')"></h3>
