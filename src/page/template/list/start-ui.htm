@@ -14,8 +14,18 @@
     </user-input>
     <!-- ko if: isTeam() && z.userPermission().canChatWithServices() -->
       <div class="start-ui-list-tabs">
-        <div class="start-ui-list-tab" data-bind="click: clickOnShowPeople, css: {'active' : peopleTabActive()}, text: t('searchPeople')" data-uie-name="do-add-people"></div>
-        <div class="start-ui-list-tab" data-bind="click: clickOnShowServices, css: {'active' : !peopleTabActive()}, text: t('searchServices')" data-uie-name="do-add-services"></div>
+        <button
+          class="start-ui-list-tab"
+          type="button"
+          data-bind="click: clickOnShowPeople, css: {'active' : peopleTabActive()}, text: t('searchPeople')"
+          data-uie-name="do-add-people"
+        ></button>
+        <button
+          class="start-ui-list-tab"
+          type="button"
+          data-bind="click: clickOnShowServices, css: {'active' : !peopleTabActive()}, text: t('searchServices')"
+          data-uie-name="do-add-services"
+        ></button>
       </div>
     <!-- /ko -->
   </div>
