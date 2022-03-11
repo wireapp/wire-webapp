@@ -19,11 +19,11 @@
 
 import {CheckRoundIcon, ContainerXS, H1, Muted, Text} from '@wireapp/react-ui-kit';
 import React, {MouseEvent, PointerEvent, useCallback, useEffect, useState} from 'react';
-import {useIntl} from 'react-intl';
+
 import {usePausableInterval} from '../../hooks/usePausableInterval';
 import {usePausableTimeout} from '../../hooks/usePausableTimeout';
-
-import {chooseHandleStrings} from '../../strings';
+import {setEntropyStrings} from '../../strings';
+import {useIntl} from 'react-intl';
 import Canvas from '../component/Canvas';
 
 import {ProgressBar} from '../component/ProgressBar';
@@ -37,10 +37,10 @@ interface Props extends React.HTMLProps<HTMLDivElement> {
 }
 
 const SetEntropy = ({setEntropy, entropy, error, setError, onSetEntropy}: Props) => {
-  const {formatMessage: _} = useIntl();
   const [frameCount, setFrameCount] = useState(0);
   const [percent, setPercent] = useState(0);
   const [pause, setPause] = useState(true);
+  const {formatMessage: _} = useIntl();
 
   const onMouseMove = (event: MouseEvent<HTMLCanvasElement> | PointerEvent<HTMLCanvasElement>) => {
     setError(null);
@@ -95,15 +95,17 @@ const SetEntropy = ({setEntropy, entropy, error, setError, onSetEntropy}: Props)
 
   return (
     <ContainerXS centerText verticalCenter style={{display: 'flex', flexDirection: 'column', minHeight: 428}}>
-      <H1 center>{_(chooseHandleStrings.headline)}</H1>
+      <H1 center>{_(setEntropyStrings.headline)}</H1>
       {frameCount > 300 && percent >= 100 ? (
         <>
           <CheckRoundIcon width={64} height={64} css={{alignSelf: 'center', marginBottom: '64px'}} />
-          <Muted center>{_(chooseHandleStrings.subhead)}</Muted>
+          <Muted center>{_(setEntropyStrings.success)}</Muted>
         </>
       ) : (
         <>
-          <Muted center>{_(chooseHandleStrings.subhead)}</Muted>
+          <Muted center css={{marginBottom: '24px'}}>
+            {_(setEntropyStrings.subheadline)}
+          </Muted>
           <Canvas
             sizeX={256}
             sizeY={256}
@@ -138,7 +140,7 @@ const SetEntropy = ({setEntropy, entropy, error, setError, onSetEntropy}: Props)
           <Text center>{percent}%</Text>
         </>
       )}
-      {percent === 95 && pause === true && <Muted center>{_(chooseHandleStrings.subhead)}</Muted>}
+      {percent === 95 && pause === true && <Muted center>{_(setEntropyStrings.moreEntropyNeeded)}</Muted>}
     </ContainerXS>
   );
 };
