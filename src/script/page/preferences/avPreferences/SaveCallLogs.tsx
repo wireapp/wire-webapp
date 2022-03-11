@@ -71,7 +71,7 @@ const SaveCallLogs: React.FC<SaveCallLogsProps> = ({callingRepository, userState
           {t('preferencesOptionsCallLogsGet')}
         </button>
       </div>
-      <p id="call-logs-descriptio" className="preferences-detail">
+      <p id="call-logs-description" className="preferences-detail">
         {t('preferencesOptionsCallLogsDetail', brandName)}
       </p>
     </PreferencesSection>
