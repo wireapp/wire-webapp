@@ -50,13 +50,19 @@ const ServiceList: React.FC<ServiceListProps> = ({
 }) => {
   return (
     <Fragment>
-      <div className={cx('search-list', mode === MODE.COMPACT ? 'search-list-sm' : 'search-list-lg')}>
+      <ul className={cx('search-list', mode === MODE.COMPACT ? 'search-list-sm' : 'search-list-lg')}>
         {services.map(service => (
-          <div onClick={() => click(service)} key={service.id} data-uie-name={`service-list-service-${service.id}`}>
-            <ParticipantItem participant={service} noUnderline={noUnderline} showArrow={arrow} />
-          </div>
+          <li key={service.id}>
+            <button
+              className="search-list-button"
+              onClick={() => click(service)}
+              data-uie-name={`service-list-service-${service.id}`}
+            >
+              <ParticipantItem participant={service} noUnderline={noUnderline} showArrow={arrow} />
+            </button>
+          </li>
         ))}
-      </div>
+      </ul>
       {isSearching && !services.length && (
         <div className="no-results" data-uie-name="service-list-no-results">
           {t('searchListNoMatches')}
