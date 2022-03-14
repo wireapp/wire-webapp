@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [18.3.4](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/compare/@wireapp/api-client@18.3.3...@wireapp/api-client@18.3.4) (2022-03-14)
+
+
+### Bug Fixes
+
+* **api-client:** Chunk user prekeys requests ([#4243](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/issues/4243)) ([f6fae6a](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/commit/f6fae6a3fe5c341555f2b47f721f4dd47313df49))
+
+
+
+
+
 ## [18.3.3](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/compare/@wireapp/api-client@18.3.2...@wireapp/api-client@18.3.3) (2022-03-14)
 
 
