@@ -48,18 +48,27 @@ const ServiceList: React.FC<ServiceListProps> = ({
   noUnderline,
   services,
 }) => {
+  const handleKeyPress = (event: React.KeyboardEvent<HTMLDivElement>, service: ServiceEntity) => {
+    if (event.key === 'Enter' || event.key === ' ') {
+      click(service);
+    }
+  };
+
   return (
     <Fragment>
       <ul className={cx('search-list', mode === MODE.COMPACT ? 'search-list-sm' : 'search-list-lg')}>
         {services.map(service => (
           <li key={service.id}>
-            <button
+            <div
               className="search-list-button"
               onClick={() => click(service)}
+              onKeyPress={event => handleKeyPress(event, service)}
+              role="button"
+              tabIndex={0}
               data-uie-name={`service-list-service-${service.id}`}
             >
               <ParticipantItem participant={service} noUnderline={noUnderline} showArrow={arrow} />
-            </button>
+            </div>
           </li>
         ))}
       </ul>
