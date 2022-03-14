@@ -18,6 +18,7 @@
  */
 
 export enum VerificationActionType {
-  GENERATE_SCIM_TOKEN = 'generate_scim_token',
+  CREATE_SCIM_TOKEN = 'create_scim_token',
   LOGIN = 'login',
+  DELETE_TEAM = 'delete_team',
 }
