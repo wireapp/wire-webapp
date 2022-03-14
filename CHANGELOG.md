@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [18.3.3](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/compare/@wireapp/api-client@18.3.2...@wireapp/api-client@18.3.3) (2022-03-14)
+
+
+### Bug Fixes
+
+* update verification actions enum ([#4242](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/issues/4242)) ([fdd680d](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/commit/fdd680da31a65194839339b03bcaba3358fe9085))
+
+
+
+
+
 ## [18.3.2](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/compare/@wireapp/api-client@18.3.1...@wireapp/api-client@18.3.2) (2022-03-11)
 
 
