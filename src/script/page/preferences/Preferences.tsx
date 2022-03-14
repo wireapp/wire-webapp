@@ -10,6 +10,7 @@ import {Transition} from 'react-transition-group';
 
 type PreferencesProps = {
   contentViewModel: ContentViewModel;
+  isTemporaryGuest?: boolean;
   listViewModel: ListViewModel;
 };
 
@@ -37,7 +38,7 @@ const PreferenceItem: React.FC<{
   );
 };
 
-const Preferences: React.FC<PreferencesProps> = ({listViewModel, contentViewModel}) => {
+const Preferences: React.FC<PreferencesProps> = ({listViewModel, contentViewModel, isTemporaryGuest}) => {
   const {state: listState} = useKoSubscribableChildren(listViewModel, ['state']);
   const {state: contentState} = useKoSubscribableChildren(contentViewModel, ['state']);
 
@@ -46,7 +47,9 @@ const Preferences: React.FC<PreferencesProps> = ({listViewModel, contentViewMode
 
   const isVisible = listState === ListViewModel.STATE.PREFERENCES;
   const close = () => {
-    listViewModel.switchList(ListViewModel.STATE.CONVERSATIONS);
+    return isTemporaryGuest
+      ? listViewModel.showTemporaryGuest()
+      : listViewModel.switchList(ListViewModel.STATE.CONVERSATIONS);
   };
 
   const items = [
