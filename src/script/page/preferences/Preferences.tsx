@@ -13,19 +13,20 @@ type PreferencesProps = {
   listViewModel: ListViewModel;
 };
 
-const PreferenceItem: React.FC<{IconComponent: React.FC; isSelected: boolean; label: string; onSelect: () => void}> = ({
-  onSelect,
-  isSelected,
-  label,
-  IconComponent,
-}) => {
+const PreferenceItem: React.FC<{
+  IconComponent: React.FC;
+  isSelected: boolean;
+  label: string;
+  onSelect: () => void;
+  uieName: string;
+}> = ({onSelect, isSelected, label, uieName, IconComponent}) => {
   return (
     <li className="left-list-item">
       <button
         type="button"
         className={`left-list-item-button ${isSelected && 'accent-text accent-fill'}`}
         onClick={onSelect}
-        data-uie-name="go-account"
+        data-uie-name={uieName}
       >
         <span className="left-column-icon">
           <IconComponent />
@@ -53,28 +54,33 @@ const Preferences: React.FC<PreferencesProps> = ({listViewModel, contentViewMode
       IconComponent: Icon.Profile,
       id: ContentViewModel.STATE.PREFERENCES_ACCOUNT,
       label: t('preferencesAccount'),
+      uieName: 'go-account',
     },
     {
       IconComponent: Icon.Devices,
       id: ContentViewModel.STATE.PREFERENCES_DEVICES,
       label: t('preferencesDevices'),
+      uieName: 'go-devices',
     },
     {
       IconComponent: Icon.Options,
       id: ContentViewModel.STATE.PREFERENCES_OPTIONS,
       label: t('preferencesOptions'),
+      uieName: 'go-options',
     },
     {
       IconComponent: Icon.Av,
       hidden: !supportsCalling,
       id: ContentViewModel.STATE.PREFERENCES_AV,
       label: t('preferencesAV'),
+      uieName: 'go-audio-video',
     },
     {
       IconComponent: Icon.About,
-      hidden: !isDesktop,
+      hidden: isDesktop,
       id: ContentViewModel.STATE.PREFERENCES_ABOUT,
       label: t('preferencesAbout'),
+      uieName: 'go-about',
     },
   ];
 
@@ -107,6 +113,7 @@ const Preferences: React.FC<PreferencesProps> = ({listViewModel, contentViewMode
                   label={item.label}
                   onSelect={() => contentViewModel.switchContent(item.id)}
                   isSelected={contentState === item.id}
+                  uieName={item.uieName}
                   IconComponent={item.IconComponent}
                 />
               ))}

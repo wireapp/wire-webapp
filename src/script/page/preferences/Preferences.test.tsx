@@ -43,16 +43,16 @@ describe('Preferences', () => {
     expect(getByText('preferencesAccount')).not.toBeNull();
     expect(getByText('preferencesDevices')).not.toBeNull();
     expect(getByText('preferencesOptions')).not.toBeNull();
-    expect(queryByText('preferencesAbout')).toBeNull();
+    expect(queryByText('preferencesAbout')).not.toBeNull();
     expect(queryByText('preferencesAV')).toBeNull();
   });
 
-  it('renders the about section in a desktop app', () => {
+  it('renders the about section in a web app', () => {
     jest.spyOn(Runtime, 'isDesktopApp').mockReturnValue(true);
     jest.spyOn(Runtime, 'isSupportingLegacyCalling').mockReturnValue(false);
     const {queryByText} = render(<Preferences {...defaultParams} />);
     expect(queryByText('preferencesAV')).toBeNull();
-    expect(queryByText('preferencesAbout')).not.toBeNull();
+    expect(queryByText('preferencesAbout')).toBeNull();
   });
 
   it('renders the a/v section in a desktop app', () => {
@@ -60,6 +60,6 @@ describe('Preferences', () => {
     jest.spyOn(Runtime, 'isSupportingLegacyCalling').mockReturnValue(true);
     const {queryByText} = render(<Preferences {...defaultParams} />);
     expect(queryByText('preferencesAV')).not.toBeNull();
-    expect(queryByText('preferencesAbout')).toBeNull();
+    expect(queryByText('preferencesAbout')).not.toBeNull();
   });
 });
