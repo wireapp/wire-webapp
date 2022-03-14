@@ -42,8 +42,6 @@ import {GiphyViewModel} from './content/GiphyViewModel';
 import {HistoryImportViewModel} from './content/HistoryImportViewModel';
 import {HistoryExportViewModel} from './content/HistoryExportViewModel';
 import {TitleBarViewModel} from './content/TitleBarViewModel';
-import {PreferencesDevicesViewModel} from './content/PreferencesDevicesViewModel';
-import {PreferencesDeviceDetailsViewModel} from './content/PreferencesDeviceDetailsViewModel';
 import {InputBarViewModel} from './content/InputBarViewModel';
 import {PanelViewModel} from './PanelViewModel';
 import type {MainViewModel, ViewModelRepositories} from './MainViewModel';
@@ -61,6 +59,7 @@ import '../page/preferences/OptionPreferences';
 import '../page/preferences/AVPreferences';
 import '../page/preferences/AboutPreferences';
 import '../page/preferences/Preferences';
+import '../page/preferences/devices/DevicesPreferences';
 import {
   PreferenceNotificationRepository,
   Notification,
@@ -102,8 +101,6 @@ export class ContentViewModel {
   isFederated?: boolean;
   mainViewModel: MainViewModel;
   messageList: MessageListViewModel;
-  preferencesDeviceDetails: PreferencesDeviceDetailsViewModel;
-  preferencesDevices: PreferencesDevicesViewModel;
   previousConversation: Conversation | null = null;
   previousState: string | null = null;
   serviceModal: ServiceModalViewModel;
@@ -116,6 +113,7 @@ export class ContentViewModel {
   static get STATE() {
     return {
       COLLECTION: 'ContentViewModel.STATE.COLLECTION',
+      COLLECTION_DETAILS: 'ContentViewModel.STATE.COLLECTION_DETAILS',
       CONNECTION_REQUESTS: 'ContentViewModel.STATE.CONNECTION_REQUESTS',
       CONVERSATION: 'ContentViewModel.STATE.CONVERSATION',
       HISTORY_EXPORT: 'ContentViewModel.STATE.HISTORY_EXPORT',
@@ -181,14 +179,6 @@ export class ContentViewModel {
     );
     this.titleBar = new TitleBarViewModel(mainViewModel.calling, mainViewModel.panel, this, repositories.calling);
 
-    this.preferencesDeviceDetails = new PreferencesDeviceDetailsViewModel(
-      mainViewModel,
-      repositories.client,
-      repositories.cryptography,
-      repositories.message,
-    );
-    this.preferencesDevices = new PreferencesDevicesViewModel(mainViewModel, this, repositories.cryptography);
-
     this.historyExport = new HistoryExportViewModel(repositories.backup);
     this.historyImport = new HistoryImportViewModel(repositories.backup);
 
@@ -200,9 +190,6 @@ export class ContentViewModel {
           break;
         case ContentViewModel.STATE.PREFERENCES_ACCOUNT:
           this.popNotification();
-          break;
-        case ContentViewModel.STATE.PREFERENCES_DEVICES:
-          this.preferencesDevices.updateDeviceInfo();
           break;
         default:
           this.inputBar.removedFromView();
