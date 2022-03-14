@@ -21,7 +21,15 @@ import ko from 'knockout';
 import {container} from 'tsyringe';
 import 'jquery-mousewheel';
 
-import {isArrowKey, isPageUpDownKey, isMetaKey, isTabKey, isPasteAction} from 'Util/KeyboardUtil';
+import {
+  isArrowKey,
+  isPageUpDownKey,
+  isMetaKey,
+  isTabKey,
+  isPasteAction,
+  isEnterKey,
+  isSpaceKey,
+} from 'Util/KeyboardUtil';
 import {noop} from 'Util/util';
 
 import {viewportObserver} from '../../ui/viewportObserver';
@@ -47,9 +55,11 @@ ko.bindingHandlers.focus_on_keydown = {
             const is_arrow_key = isArrowKey(keyboard_event);
             const is_pageupdown_key = isPageUpDownKey(keyboard_event);
             const is_tab_key = isTabKey(keyboard_event);
+            const is_enter_key = isEnterKey(keyboard_event);
+            const is_space_key = isSpaceKey(keyboard_event);
             if (is_pageupdown_key) {
               (document.activeElement as HTMLElement).blur();
-            } else if (!active_element_is_input && !is_arrow_key && !is_tab_key) {
+            } else if (!active_element_is_input && !is_arrow_key && !is_tab_key && !is_enter_key && !is_space_key) {
               if (!isMetaKey(keyboard_event) || isPasteAction(keyboard_event)) {
                 element.focus();
               }
