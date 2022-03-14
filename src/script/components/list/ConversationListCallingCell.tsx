@@ -187,6 +187,7 @@ const ConversationListCallingCell: React.FC<CallingCellProps> = ({
           className="call-ui__button call-ui__button--green call-ui__button--join"
           style={{margin: '40px 16px 0px 16px'}}
           onClick={() => callActions.answer(call)}
+          type="button"
           data-uie-name="do-call-controls-call-join"
         >
           {t('callJoin')}
@@ -261,6 +262,7 @@ const ConversationListCallingCell: React.FC<CallingCellProps> = ({
                     className="call-ui__button call-ui__button--red"
                     onClick={() => callActions.leave(call)}
                     title={t('videoCallOverlayHangUp')}
+                    type="button"
                     data-uie-name="do-call-controls-call-leave"
                   >
                     <Icon.Hangup className="small-icon" style={{maxWidth: 17}} />
@@ -320,6 +322,7 @@ const ConversationListCallingCell: React.FC<CallingCellProps> = ({
                     data-uie-name="do-toggle-mute"
                     data-uie-value={isMuted ? 'active' : 'inactive'}
                     title={t('videoCallOverlayMicrophone')}
+                    type="button"
                     disabled={isConnecting}
                   >
                     {isMuted ? <Icon.MicOff className="small-icon" /> : <Icon.MicOn className="small-icon" />}
@@ -331,6 +334,7 @@ const ConversationListCallingCell: React.FC<CallingCellProps> = ({
                       disabled={disableVideoButton}
                       data-uie-name="do-toggle-video"
                       title={t('videoCallOverlayCamera')}
+                      type="button"
                       data-uie-value={selfSharesCamera ? 'active' : 'inactive'}
                     >
                       {selfSharesCamera ? (
@@ -349,6 +353,7 @@ const ConversationListCallingCell: React.FC<CallingCellProps> = ({
                       })}
                       data-tooltip={disableScreenButton ? t('videoCallScreenShareNotSupported') : undefined}
                       onClick={() => callActions.toggleScreenshare(call)}
+                      type="button"
                       data-uie-name="do-call-controls-toggle-screenshare"
                       data-uie-value={selfSharesScreen ? 'active' : 'inactive'}
                       data-uie-enabled={disableScreenButton ? 'false' : 'true'}
@@ -370,6 +375,7 @@ const ConversationListCallingCell: React.FC<CallingCellProps> = ({
                         'call-ui__button--active': showParticipants,
                       })}
                       onClick={() => setShowParticipants(current => !showParticipants)}
+                      type="button"
                       data-uie-name="do-toggle-participants"
                       aria-pressed={showParticipants}
                     >
@@ -382,6 +388,7 @@ const ConversationListCallingCell: React.FC<CallingCellProps> = ({
                       className="call-ui__button call-ui__button--red call-ui__button--large"
                       onClick={() => (isIncoming ? callActions.reject(call) : callActions.leave(call))}
                       title={t('videoCallOverlayHangUp')}
+                      type="button"
                       data-uie-name="do-call-controls-call-decline"
                     >
                       <Icon.Hangup className="small-icon" style={{maxWidth: 17}} />
@@ -391,6 +398,7 @@ const ConversationListCallingCell: React.FC<CallingCellProps> = ({
                     <button
                       className="call-ui__button call-ui__button--green call-ui__button--large"
                       onClick={() => callActions.answer(call)}
+                      type="button"
                       data-uie-name="do-call-controls-call-accept"
                     >
                       <Icon.Pickup className="small-icon" />

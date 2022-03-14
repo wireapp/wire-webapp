@@ -189,6 +189,7 @@ const ParticipantItem: React.FC<ParticipantItemProps> = ({
                 <button
                   className="participant-item__content__chevron"
                   onClick={event => onContextMenu(event as unknown as React.MouseEvent<HTMLDivElement>)}
+                  type="button"
                   data-uie-name="participant-menu-icon"
                 >
                   <Icon.Chevron />
