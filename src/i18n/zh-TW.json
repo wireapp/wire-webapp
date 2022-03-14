@@ -460,6 +460,8 @@
   "footer.wireLink": "wire.com",
   "fullsearchNoResults": "沒有結果。",
   "fullsearchPlaceholder": "搜尋訊息中的文字",
+  "groupCreationActionCloseModal": "Close group creation modal",
+  "groupCreationParticipantsActionBack": "Go Back",
   "groupCreationParticipantsActionCreate": "完成",
   "groupCreationParticipantsActionSkip": "Skip",
   "groupCreationParticipantsHeader": "Add people",

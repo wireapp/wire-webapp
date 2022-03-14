@@ -460,6 +460,8 @@
   "footer.wireLink": "wire.com",
   "fullsearchNoResults": "Nincs találat.",
   "fullsearchPlaceholder": "Szöveges üzenetek keresése",
+  "groupCreationActionCloseModal": "Close group creation modal",
+  "groupCreationParticipantsActionBack": "Go Back",
   "groupCreationParticipantsActionCreate": "Kész",
   "groupCreationParticipantsActionSkip": "Kihagyás",
   "groupCreationParticipantsHeader": "Partnerek hozzáadása",

@@ -25,6 +25,7 @@ import ParticipantItem from 'Components/list/ParticipantItem';
 
 import type {ServiceEntity} from '../integration/ServiceEntity';
 import {t} from '../util/LocalizerUtil';
+import {KEY} from 'Util/KeyboardUtil';
 
 export interface ServiceListProps {
   arrow: boolean;
@@ -48,15 +49,30 @@ const ServiceList: React.FC<ServiceListProps> = ({
   noUnderline,
   services,
 }) => {
+  const handleKeyPress = (event: React.KeyboardEvent<HTMLDivElement>, service: ServiceEntity) => {
+    if (event.key === KEY.ENTER || event.key === KEY.SPACE) {
+      click(service);
+    }
+  };
+
   return (
     <Fragment>
-      <div className={cx('search-list', mode === MODE.COMPACT ? 'search-list-sm' : 'search-list-lg')}>
+      <ul className={cx('search-list', mode === MODE.COMPACT ? 'search-list-sm' : 'search-list-lg')}>
         {services.map(service => (
-          <div onClick={() => click(service)} key={service.id} data-uie-name={`service-list-service-${service.id}`}>
-            <ParticipantItem participant={service} noUnderline={noUnderline} showArrow={arrow} />
-          </div>
+          <li key={service.id}>
+            <div
+              className="search-list-button"
+              onClick={() => click(service)}
+              onKeyPress={event => handleKeyPress(event, service)}
+              role="button"
+              tabIndex={0}
+              data-uie-name={`service-list-service-${service.id}`}
+            >
+              <ParticipantItem participant={service} noUnderline={noUnderline} showArrow={arrow} />
+            </div>
+          </li>
         ))}
-      </div>
+      </ul>
       {isSearching && !services.length && (
         <div className="no-results" data-uie-name="service-list-no-results">
           {t('searchListNoMatches')}

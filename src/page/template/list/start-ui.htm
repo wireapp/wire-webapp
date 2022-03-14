@@ -13,10 +13,24 @@
                 data-uie-name="enter-search">
     </user-input>
     <!-- ko if: isTeam() && z.userPermission().canChatWithServices() -->
-      <div class="start-ui-list-tabs">
-        <div class="start-ui-list-tab" data-bind="click: clickOnShowPeople, css: {'active' : peopleTabActive()}, text: t('searchPeople')" data-uie-name="do-add-people"></div>
-        <div class="start-ui-list-tab" data-bind="click: clickOnShowServices, css: {'active' : !peopleTabActive()}, text: t('searchServices')" data-uie-name="do-add-services"></div>
-      </div>
+      <ul class="start-ui-list-tabs">
+        <li class="start-ui-list-tab" data-bind="css: {'active' : peopleTabActive()}">
+          <button
+            class="start-ui-list-tab-button"
+            type="button"
+            data-bind="click: clickOnShowPeople, text: t('searchPeople'), disable: peopleTabActive()"
+            data-uie-name="do-add-people"
+          ></button>
+        </li>
+        <li class="start-ui-list-tab" data-bind="css: {'active' : !peopleTabActive()},">
+          <button
+            class="start-ui-list-tab-button"
+            type="button"
+            data-bind="click: clickOnShowServices, text: t('searchServices'), enable: peopleTabActive()"
+            data-uie-name="do-add-services"
+          ></button>
+        </li>
+      </ul>
     <!-- /ko -->
   </div>
 
@@ -62,7 +76,7 @@
                   <profile-icon class="start-ui-fed-wrapper__icon"></profile-icon>
                   <div class="start-ui-fed-wrapper__text" data-bind="text: t('searchTrySearchFederation')"></div>
                   <div class="start-ui-fed-wrapper__button">
-                    <button data-bind="click: () => {}, text: t('searchTrySearchLearnMore')" data-uie-name="do-search-learn-more" type="button" />
+                    <button type="button" data-bind="click: () => {}, text: t('searchTrySearchLearnMore')" data-uie-name="do-search-learn-more" />
                   </div>
                 </div>
               <!-- /ko -->
@@ -73,49 +87,45 @@
           <!-- /ko -->
 
           <!-- ko ifnot: showSearchResults() -->
-            <!-- ko if: showInviteMember() && !!manageTeamUrl -->
-              <ul class="start-ui-invite-people left-list-items">
-                <li class="left-list-item">
-                  <button class="left-list-item-button" data-bind="click: clickOpenManageTeam" data-uie-name="do-invite-member" type="button">
-                    <span class="left-column-icon icon-envelope"></span>
-                    <span class="center-column" data-bind="text: t('searchMemberInvite')"></span>
-                  </button>
-                </li>
-              </ul>
-            <!-- /ko -->
-            <!-- ko if: z.userPermission().canCreateGroupConversation() -->
-              <ul class="start-ui-create-group left-list-items">
-                <li class="left-list-item" >
-                  <button class="left-list-item-button" data-bind="click: clickOnCreateGroup" data-uie-name="go-create-group" type="button">
-                    <group-icon class="left-column-icon"></group-icon>
-                    <span class="center-column" data-bind="text: t('searchCreateGroup')"></span>
-                  </button>
-                </li>
-              </ul>
-            <!-- /ko -->
-            <!-- ko if: z.userPermission().canCreateGuestRoom() && showCreateGuestRoom() -->
-              <ul class="start-ui-create-guest-room left-list-items">
-                <li class="left-list-item">
-                  <button class="left-list-item-button"  data-bind="click: clickOnCreateGuestRoom" data-uie-name="do-create-guest-room" type="button">
-                    <guest-icon class="left-column-icon"></guest-icon>
-                    <span class="center-column" data-bind="text: t('searchCreateGuestRoom')"></span>
-                  </button>
-                </li>
-              </ul>
-            <!-- /ko -->
+            <ul class="start-ui-list left-list-items">
+              <!-- ko if: showInviteMember() && !!manageTeamUrl -->
+              <li class="left-list-item">
+                <button class="left-list-item-button" type="button" data-bind="click: clickOpenManageTeam" data-uie-name="do-invite-member">
+                  <span class="left-column-icon icon-envelope"></span>
+                  <span class="center-column" data-bind="text: t('searchMemberInvite')"></span>
+                </button>
+              </li>
+              <!-- /ko -->
+              <!-- ko if: z.userPermission().canCreateGroupConversation() -->
+              <li class="left-list-item" >
+                <button class="left-list-item-button" type="button" data-bind="click: clickOnCreateGroup" data-uie-name="go-create-group">
+                  <group-icon class="left-column-icon"></group-icon>
+                  <span class="center-column" data-bind="text: t('searchCreateGroup')"></span>
+                </button>
+              </li>
+              <!-- /ko -->
+              <!-- ko if: z.userPermission().canCreateGuestRoom() && showCreateGuestRoom() -->
+              <li class="left-list-item">
+                <button class="left-list-item-button" type="button" data-bind="click: clickOnCreateGuestRoom" data-uie-name="do-create-guest-room">
+                  <guest-icon class="left-column-icon"></guest-icon>
+                  <span class="center-column" data-bind="text: t('searchCreateGuestRoom')"></span>
+                </button>
+              </li>
+              <!-- /ko -->
+            </ul>
             <!-- ko if: showTopPeople() -->
               <div class="start-ui-list-top-people" data-uie-name="status-top-people">
-                <span class="start-ui-list-header start-ui-list-header-top-people" data-bind="text: t('searchTopPeople')"></span>
+                <h3 class="start-ui-list-header start-ui-list-header-top-people" data-bind="text: t('searchTopPeople')"></h3>
                 <top-people class="search-list-theme-black" params="users: topUsers, clickOnUser: clickOnContact"></top-people>
               </div>
             <!-- /ko -->
             <!-- ko if: showContacts() -->
               <div class="start-ui-list-contacts" data-uie-name="status-contacts">
                 <!-- ko if: isTeam() -->
-                  <span class="start-ui-list-header start-ui-list-header-contacts" data-bind="text: t('searchContacts')"></span>
+                  <h3 class="start-ui-list-header start-ui-list-header-contacts" data-bind="text: t('searchContacts')"></h3>
                 <!-- /ko -->
                 <!-- ko ifnot: isTeam() -->
-                  <span class="start-ui-list-header" data-bind="text: t('searchConnections')"></span>
+                  <h3 class="start-ui-list-header" data-bind="text: t('searchConnections')"></h3>
                 <!-- /ko -->
                 <!-- ko if: isVisible() -->
                   <user-list class="search-list-theme-black" params="user: contacts(), click: clickOnContact, searchRepository: searchRepository, teamRepository: teamRepository, conversationRepository: conversationRepository"></user-list>
@@ -128,24 +138,24 @@
             <div class="start-ui-list-search-results">
               <div class="contacts" data-bind="visible: searchResults.contacts().length > 0">
                 <!-- ko if: isTeam() -->
-                  <span class="start-ui-list-header start-ui-list-header-contacts" data-bind="text: t('searchContacts')"></span>
+                  <h3 class="start-ui-list-header start-ui-list-header-contacts" data-bind="text: t('searchContacts')"></h3>
                 <!-- /ko -->
                 <!-- ko ifnot: isTeam() -->
-                  <span class="start-ui-list-header start-ui-list-header-connections" data-bind="text: t('searchConnections')"></span>
+                  <h3 class="start-ui-list-header start-ui-list-header-connections" data-bind="text: t('searchConnections')"></h3>
                 <!-- /ko -->
                 <user-list class="search-list-theme-black" params="user: searchResults.contacts, filter: searchInput, skipSearch: true, click: clickOnContact, searchRepository: searchRepository, teamRepository: teamRepository, conversationRepository: conversationRepository"></user-list>
               </div>
               <div class="start-ui-groups" data-bind="visible: searchResults.groups().length > 0">
                 <!-- ko if: isTeam() -->
-                  <span class="start-ui-list-header" data-bind="text: t('searchTeamGroups')"></span>
+                  <h3 class="start-ui-list-header" data-bind="text: t('searchTeamGroups')"></h3>
                 <!-- /ko -->
                 <!-- ko ifnot: isTeam() -->
-                  <span class="start-ui-list-header" data-bind="text: t('searchGroups')"></span>
+                  <h3 class="start-ui-list-header" data-bind="text: t('searchGroups')"></h3>
                 <!-- /ko -->
                 <group-list params="groups: searchResults.groups, click: clickOnConversation"></group-list>
               </div>
               <div class="others" data-bind="visible: searchResults.others().length > 0">
-                <span class="start-ui-list-header" data-bind="text: searchOnFederatedDomain() ? t('searchOthersFederation', searchOnFederatedDomain()) : t('searchOthers')"></span>
+                <h3 class="start-ui-list-header" data-bind="text: searchOnFederatedDomain() ? t('searchOthersFederation', searchOnFederatedDomain()) : t('searchOthers')"></h3>
                 <user-list class="search-list-theme-black" params="user: searchResults.others, click: clickOnOther, mode: UserlistMode.OTHERS, searchRepository: searchRepository, teamRepository: teamRepository, conversationRepository: conversationRepository"></user-list>
               </div>
             </div>
@@ -156,9 +166,16 @@
           <!-- ko if: services().length -->
             <!-- ko if: z.userPermission().canManageServices() && !!manageServicesUrl -->
               <ul class="start-ui-manage-services left-list-items">
-                <li class="left-list-item left-list-item-clickable" data-bind="click: clickOpenManageServices" data-uie-name="go-manage-services">
-                  <service-icon class="left-column-icon"></service-icon>
-                  <div class="center-column" data-bind="text: t('searchManageServices')"></div>
+                <li class="left-list-item">
+                  <button
+                    class="left-list-item-button"
+                    type="button"
+                    data-bind="click: clickOpenManageServices"
+                    data-uie-name="go-manage-services"
+                  >
+                    <service-icon class="left-column-icon"></service-icon>
+                    <span class="center-column" data-bind="text: t('searchManageServices')"></span>
+                  </button>
                 </li>
               </ul>
             <!-- /ko -->
@@ -169,7 +186,12 @@
               <service-icon class="search__no-services__icon"></service-icon>
               <!-- ko if: z.userPermission().canManageServices() && !!manageServicesUrl -->
                 <div class="search__no-services__info" data-bind="text: t('searchNoServicesManager')" data-uie-name="label-no-services-enabled-manager"></div>
-                <div class="search__no-services__manage-button" data-bind="click: clickOpenManageServices, text: t('searchManageServicesNoResults')" data-uie-name="go-enable-services"></div>
+                <button
+                  class="search__no-services__manage-button"
+                  type="button"
+                  data-bind="click: clickOpenManageServices, text: t('searchManageServicesNoResults')"
+                  data-uie-name="go-enable-services"
+                ></button>
               <!-- /ko -->
               <!-- ko ifnot: z.userPermission().canManageServices() -->
                 <div class="search__no-services__info" data-bind="text: t('searchNoServicesMember')" data-uie-name="label-no-services-enabled"></div>
