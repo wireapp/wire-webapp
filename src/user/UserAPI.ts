@@ -612,24 +612,35 @@ export class UserAPI {
     userClientMap: QualifiedUserClients,
     limit: number = UserAPI.DEFAULT_USERS_PREKEY_BUNDLE_CHUNK_SIZE,
   ): Promise<QualifiedUserPreKeyBundleMap> {
-    const domainChunks = ArrayUtil.chunk(Object.keys(userClientMap), limit);
+    const flattenUsers = Object.entries(userClientMap).reduce((users, [domain, domainUsersClients]) => {
+      const domainUsers = Object.entries(domainUsersClients).map(([userId, clients]) => ({
+        userId: {id: userId, domain},
+        clients,
+      }));
+      return users.concat(domainUsers);
+    }, [] as {userId: QualifiedId; clients: string[]}[]);
 
-    const chunksPromises = domainChunks.map(userIdChunk => {
-      const rebuiltMap = userIdChunk.reduce<QualifiedUserClients>((chunkedUserClientMap, domainOrUserId) => {
-        chunkedUserClientMap[domainOrUserId] = userClientMap[domainOrUserId];
-        return chunkedUserClientMap;
-      }, {});
-
-      return this.postMultiQualifiedPreKeyBundlesChunk(rebuiltMap);
-    });
+    const chunksPromises = ArrayUtil.chunk(flattenUsers, limit)
+      .map(chunk => {
+        return chunk.reduce<QualifiedUserClients>((chunkedMap, {userId, clients}) => {
+          return {
+            ...chunkedMap,
+            [userId.domain]: {
+              ...chunkedMap[userId.domain],
+              [userId.id]: clients,
+            },
+          };
+        }, {});
+      })
+      .map(chunkedMap => this.postMultiQualifiedPreKeyBundlesChunk(chunkedMap));
 
     const userPreKeyBundleMapChunks = await Promise.all(chunksPromises);
 
     return userPreKeyBundleMapChunks.reduce((userPreKeyBundleMap, userPreKeyBundleMapChunk) => {
-      return {
-        ...userPreKeyBundleMap,
-        ...userPreKeyBundleMapChunk,
-      };
+      Object.entries(userPreKeyBundleMapChunk).forEach(([domain, userClientMap]) => {
+        userPreKeyBundleMap[domain] = {...userPreKeyBundleMap[domain], ...userClientMap};
+      });
+      return userPreKeyBundleMap;
     }, {});
   }
 
