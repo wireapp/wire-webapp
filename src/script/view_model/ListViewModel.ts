@@ -30,7 +30,6 @@ import {isEscapeKey} from 'Util/KeyboardUtil';
 
 import {ArchiveViewModel} from './list/ArchiveViewModel';
 import {ConversationListViewModel} from './list/ConversationListViewModel';
-import {PreferencesListViewModel} from './list/PreferencesListViewModel';
 import {StartUIViewModel} from './list/StartUIViewModel';
 import {TakeoverViewModel} from './list/TakeoverViewModel';
 import {TemporaryGuestViewModel} from './list/TemporaryGuestViewModel';
@@ -61,7 +60,6 @@ export class ListViewModel {
   private readonly teamState: TeamState;
   private readonly conversationState: ConversationState;
 
-  readonly preferences: PreferencesListViewModel;
   readonly takeover: TakeoverViewModel;
   readonly temporaryGuest: TemporaryGuestViewModel;
   readonly selfUserPicture: ko.PureComputed<AssetRemoteData | void>;
@@ -169,7 +167,6 @@ export class ListViewModel {
       repositories.preferenceNotification,
       repositories.properties,
     );
-    this.preferences = new PreferencesListViewModel(this.contentViewModel, this, repositories.calling);
     this.start = new StartUIViewModel(
       mainViewModel,
       this,
