@@ -5,7 +5,14 @@
   >
     <!-- ko if: service() -->
       <div class="modal__header">
-        <close-icon class="modal__header__button" data-bind="click: hide" data-uie-name="do-close"></close-icon>
+        <button
+          class="modal__header__button"
+          type="button"
+          data-bind="click: hide"
+          data-uie-name="do-close"
+        >
+          <close-icon></close-icon>
+        </button>
       </div>
       <div class="modal__body service-modal__body">
         <div class="service-modal__details">
