@@ -24,6 +24,8 @@ import {ListState, ListViewModel} from '../../view_model/ListViewModel';
 import {Transition} from 'react-transition-group';
 import Icon from 'Components/Icon';
 import {t} from 'Util/LocalizerUtil';
+import useEffectRef from 'Util/useEffectRef';
+import {useFadingScrollbar} from '../../ui/fadingScrollbar';
 
 type LeftListWrapperProps = {
   header: string;
@@ -35,6 +37,8 @@ type LeftListWrapperProps = {
 
 const LeftListWrapper: React.FC<LeftListWrapperProps> = ({listViewModel, openState, id, header, onClose, children}) => {
   const {state: listState} = useKoSubscribableChildren(listViewModel, ['state']);
+  const [scrollbarRef, setScrollbarRef] = useEffectRef<HTMLDivElement>();
+  useFadingScrollbar(scrollbarRef);
 
   const isVisible = listState === openState;
 
@@ -57,7 +61,9 @@ const LeftListWrapper: React.FC<LeftListWrapperProps> = ({listViewModel, openSta
             <Icon.Close />
           </button>
         </div>
-        <div className="left-list-center">{children}</div>
+        <div className="left-list-center" ref={setScrollbarRef}>
+          {children}
+        </div>
       </div>
     </Transition>
   );
