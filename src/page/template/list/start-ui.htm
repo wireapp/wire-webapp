@@ -18,7 +18,7 @@
           <button
             class="start-ui-list-tab-button"
             type="button"
-            data-bind="click: clickOnShowPeople, text: t('searchPeople')"
+            data-bind="click: clickOnShowPeople, text: t('searchPeople'), disable: peopleTabActive()"
             data-uie-name="do-add-people"
           ></button>
         </li>
@@ -26,7 +26,7 @@
           <button
             class="start-ui-list-tab-button"
             type="button"
-            data-bind="click: clickOnShowServices, text: t('searchServices')"
+            data-bind="click: clickOnShowServices, text: t('searchServices'), enable: peopleTabActive()"
             data-uie-name="do-add-services"
           ></button>
         </li>
