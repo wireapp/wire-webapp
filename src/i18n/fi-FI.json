@@ -460,6 +460,8 @@
   "footer.wireLink": "wire.com",
   "fullsearchNoResults": "Ei tuloksia.",
   "fullsearchPlaceholder": "Etsi viestejä",
+  "groupCreationActionCloseModal": "Close group creation modal",
+  "groupCreationParticipantsActionBack": "Go Back",
   "groupCreationParticipantsActionCreate": "Valmis",
   "groupCreationParticipantsActionSkip": "Skip",
   "groupCreationParticipantsHeader": "Add people",

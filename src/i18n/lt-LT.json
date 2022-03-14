@@ -460,6 +460,8 @@
   "footer.wireLink": "wire.com",
   "fullsearchNoResults": "Rezultatų nėra.",
   "fullsearchPlaceholder": "Ieškoti tekstinėse žinutėse",
+  "groupCreationActionCloseModal": "Close group creation modal",
+  "groupCreationParticipantsActionBack": "Go Back",
   "groupCreationParticipantsActionCreate": "Atlikta",
   "groupCreationParticipantsActionSkip": "Praleisti",
   "groupCreationParticipantsHeader": "Pridėti žmonių",

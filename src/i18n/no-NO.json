@@ -460,6 +460,8 @@
   "footer.wireLink": "wire.com",
   "fullsearchNoResults": "Ingen treff.",
   "fullsearchPlaceholder": "Search text messages",
+  "groupCreationActionCloseModal": "Close group creation modal",
+  "groupCreationParticipantsActionBack": "Go Back",
   "groupCreationParticipantsActionCreate": "Ferdig",
   "groupCreationParticipantsActionSkip": "Hopp over",
   "groupCreationParticipantsHeader": "Legg til personer",

@@ -460,6 +460,8 @@
   "footer.wireLink": "wire.com",
   "fullsearchNoResults": "Geen resultaten.",
   "fullsearchPlaceholder": "Zoek tekst berichten",
+  "groupCreationActionCloseModal": "Close group creation modal",
+  "groupCreationParticipantsActionBack": "Go Back",
   "groupCreationParticipantsActionCreate": "Klaar",
   "groupCreationParticipantsActionSkip": "Sla over",
   "groupCreationParticipantsHeader": "Personen toevoegen",
