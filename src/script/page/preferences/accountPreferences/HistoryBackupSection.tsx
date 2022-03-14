@@ -35,7 +35,7 @@ const HistoryBackupSection: React.FC<HistoryBackupSectionProps> = ({brandName}) 
     title={t('preferencesOptionsBackupHeader')}
     className="preferences-section-conversation-history"
   >
-    <div
+    <button
       className="preferences-link accent-text"
       onClick={() => {
         {
@@ -44,10 +44,14 @@ const HistoryBackupSection: React.FC<HistoryBackupSectionProps> = ({brandName}) 
         }
       }}
       data-uie-name="do-backup-export"
+      aria-describedby="preferences-history-describe-1"
+      type="button"
     >
       {t('preferencesOptionsBackupExportHeadline')}
-    </div>
-    <div className="preferences-detail">{t('preferencesOptionsBackupExportSecondary', brandName)}</div>
+    </button>
+    <p id="preferences-history-describe-1" className="preferences-detail">
+      {t('preferencesOptionsBackupExportSecondary', brandName)}
+    </p>
     <label
       className="preferences-link accent-text preferences-history-backup-import-field"
       data-uie-name="do-backup-import"
@@ -64,9 +68,12 @@ const HistoryBackupSection: React.FC<HistoryBackupSectionProps> = ({brandName}) 
           }
         }}
         data-uie-name="input-import-file"
+        aria-describedby="preferences-history-describe-2"
       />
     </label>
-    <div className="preferences-detail">{t('preferencesOptionsBackupImportSecondary')}</div>
+    <p id="preferences-history-describe-2" className="preferences-detail">
+      {t('preferencesOptionsBackupImportSecondary')}
+    </p>
   </PreferencesSection>
 );
 
