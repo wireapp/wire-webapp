@@ -39,7 +39,6 @@ interface Props extends React.HTMLProps<HTMLDivElement> {
 const SetEntropy = ({setEntropy, entropy, error, setError, onSetEntropy}: Props) => {
   const [frameCount, setFrameCount] = useState(0);
   const [percent, setPercent] = useState(0);
-  const [pause, setPause] = useState(true);
   const {formatMessage: _} = useIntl();
 
   const onMouseMove = (event: MouseEvent<HTMLCanvasElement> | PointerEvent<HTMLCanvasElement>) => {
@@ -77,16 +76,21 @@ const SetEntropy = ({setEntropy, entropy, error, setError, onSetEntropy}: Props)
     [entropy],
   );
 
-  usePausableTimeout(onSetEntropy, 15000, pause);
-  const {clearInterval} = usePausableInterval(() => setPercent(percent => percent + 1), 100, pause);
+  const {startTimeout, pauseTimeout} = usePausableTimeout(onSetEntropy, 35000);
+  const {clearInterval, startInterval, pauseInterval} = usePausableInterval(
+    () => setPercent(percent => percent + 1),
+    300,
+  );
 
   useEffect(() => {
     if (frameCount <= 300 && percent > 95) {
       setPercent(95);
-      setPause(true);
+      pauseInterval();
+      pauseTimeout();
     }
     if (frameCount > 300) {
-      setPause(false);
+      startInterval();
+      startTimeout();
     }
     if (percent >= 100) {
       clearInterval();
@@ -121,10 +125,12 @@ const SetEntropy = ({setEntropy, entropy, error, setError, onSetEntropy}: Props)
             draw={draw}
             onMouseMove={onMouseMove}
             onMouseEnter={() => {
-              setPause(false);
+              startInterval();
+              startTimeout();
             }}
             onMouseLeave={() => {
-              setPause(true);
+              pauseInterval();
+              pauseTimeout();
               setError(!error);
               setEntropy([...entropy, null]);
             }}
@@ -140,7 +146,7 @@ const SetEntropy = ({setEntropy, entropy, error, setError, onSetEntropy}: Props)
           <Text center>{percent}%</Text>
         </>
       )}
-      {percent === 95 && pause === true && <Muted center>{_(setEntropyStrings.moreEntropyNeeded)}</Muted>}
+      {percent === 95 && frameCount < 300 && <Muted center>{_(setEntropyStrings.moreEntropyNeeded)}</Muted>}
     </ContainerXS>
   );
 };

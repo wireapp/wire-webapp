@@ -17,13 +17,18 @@
  *
  */
 
-import {useRef, useEffect} from 'react';
+import {useRef, useEffect, useState} from 'react';
 
-export const usePausableTimeout = (callback: () => void, timer: number, pause?: boolean) => {
+export const usePausableTimeout = (callback: () => void, timer: number) => {
   const timeoutIdRef = useRef<() => void>();
   const totalTimeRun = useRef<number>(0);
   const timeoutId = useRef<number>();
   const startTime = useRef<number>(new Date().getTime());
+  const [pause, setPause] = useState(true);
+
+  const pauseTimeout = () => setPause(true);
+  const startTimeout = () => setPause(false);
+  const clearTimeout = () => window.clearTimeout(timeoutId.current);
 
   useEffect(() => {
     timeoutIdRef.current = callback;
@@ -41,8 +46,9 @@ export const usePausableTimeout = (callback: () => void, timer: number, pause?: 
       }
       if (pause === true) {
         totalTimeRun.current = new Date().getTime() - startTime.current + totalTimeRun.current;
-        clearTimeout(timeoutId.current);
+        clearTimeout();
       }
     }
   }, [timer, pause]);
+  return {clearTimeout, pauseTimeout, startTimeout};
 };

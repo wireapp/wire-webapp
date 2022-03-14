@@ -17,19 +17,22 @@
  *
  */
 
-import {useRef, useEffect} from 'react';
+import {useRef, useEffect, useState} from 'react';
 
-export const usePausableInterval = (callback: () => void, timer: number, pause: boolean) => {
+export const usePausableInterval = (callback: () => void, timer: number) => {
   const intervalIdRef = useRef<() => void>();
   const totalTimeRun = useRef(0);
   const intervalId = useRef<number>();
   const startTime = useRef(new Date().getTime());
+  const [pause, setPause] = useState(true);
+
+  const pauseInterval = () => setPause(true);
+  const startInterval = () => setPause(false);
+  const clearInterval = () => window.clearTimeout(intervalId.current);
 
   useEffect(() => {
     intervalIdRef.current = callback;
   }, [callback]);
-
-  const clearInterval = () => window.clearTimeout(intervalId.current);
 
   useEffect(() => {
     const fn = () => {
@@ -51,5 +54,5 @@ export const usePausableInterval = (callback: () => void, timer: number, pause: 
       }
     }
   }, [timer, pause]);
-  return {clearInterval};
+  return {clearInterval, pauseInterval, startInterval};
 };
