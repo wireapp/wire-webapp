@@ -186,13 +186,13 @@ const ParticipantItem: React.FC<ParticipantItemProps> = ({
                 </div>
               </div>
               {showDropdown && (
-                <div
+                <button
                   className="participant-item__content__chevron"
-                  onClick={onContextMenu}
+                  onClick={event => onContextMenu(event as unknown as React.MouseEvent<HTMLDivElement>)}
                   data-uie-name="participant-menu-icon"
                 >
                   <Icon.Chevron />
-                </div>
+                </button>
               )}
             </div>
 

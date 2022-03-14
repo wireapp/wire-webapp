@@ -22,6 +22,7 @@ import {container} from 'tsyringe';
 import {CALL_TYPE, CONV_TYPE, REASON as CALL_REASON, STATE as CALL_STATE} from '@wireapp/avs';
 import cx from 'classnames';
 import {DefaultConversationRoleName} from '@wireapp/api-client/src/conversation/';
+import {KEY} from 'Util/KeyboardUtil';
 
 import Avatar, {AVATAR_SIZE} from 'Components/Avatar';
 import GroupAvatar from 'Components/avatar/GroupAvatar';
@@ -40,7 +41,7 @@ import {Grid, useVideoGrid} from '../../calling/videoGridHandler';
 import type {Conversation} from '../../entity/Conversation';
 import type {Multitasking} from '../../notification/NotificationRepository';
 import {generateConversationUrl} from '../../router/routeGenerator';
-import {createNavigate} from '../../router/routerBindings';
+import {createNavigate, createNavigateKeyboard} from '../../router/routerBindings';
 import {TeamState} from '../../team/TeamState';
 import {CallState, MuteState} from '../../calling/CallState';
 import {useFadingScrollbar} from '../../ui/fadingScrollbar';
@@ -182,14 +183,14 @@ const ConversationListCallingCell: React.FC<CallingCellProps> = ({
   return (
     <>
       {showJoinButton && (
-        <div
+        <button
           className="call-ui__button call-ui__button--green call-ui__button--join"
           style={{margin: '40px 16px 0px 16px'}}
           onClick={() => callActions.answer(call)}
           data-uie-name="do-call-controls-call-join"
         >
           {t('callJoin')}
-        </div>
+        </button>
       )}
       {conversation && !isDeclined && (
         <div className="conversation-list-calling-cell-background">
@@ -197,61 +198,73 @@ const ConversationListCallingCell: React.FC<CallingCellProps> = ({
             <div className="conversation-list-calling-cell__info-bar">{t('muteStateRemoteMute')}</div>
           )}
           <div className="conversation-list-calling-cell conversation-list-cell">
-            {!temporaryUserStyle && (
-              <div className="conversation-list-cell-left" onClick={createNavigate(conversationUrl)}>
-                {isGroup && <GroupAvatar users={conversationParticipants} isLight={true} />}
-                {!isGroup && !!conversationParticipants.length && (
-                  <Avatar participant={conversationParticipants[0]} avatarSize={AVATAR_SIZE.SMALL} />
-                )}
-              </div>
-            )}
             <div
-              className={cx('conversation-list-cell-center', {
-                'conversation-list-cell-center-no-left': temporaryUserStyle,
-              })}
+              className="conversation-list-cell"
               onClick={createNavigate(conversationUrl)}
+              onKeyDown={createNavigateKeyboard(conversationUrl)}
+              tabIndex={0}
+              role="button"
+              aria-label={`${t('callGoToLabel')} ${conversationName}`}
             >
-              <span className="conversation-list-cell-name">{conversationName}</span>
-
-              {isIncoming && (
-                <span className="conversation-list-cell-description" data-uie-name="call-label-incoming">
-                  {t('callStateIncoming')}
-                </span>
-              )}
-              {isOutgoing && (
-                <span className="conversation-list-cell-description" data-uie-name="call-label-outgoing">
-                  {t('callStateOutgoing')}
-                </span>
-              )}
-              {isConnecting && (
-                <span className="conversation-list-cell-description" data-uie-name="call-label-connecting">
-                  {t('callStateConnecting')}
-                </span>
-              )}
-              {isOngoing && startedAt && (
-                <div className="conversation-list-info-wrapper">
-                  <span className="conversation-list-cell-description" data-uie-name="call-duration">
-                    <Duration {...{startedAt}} />
-                  </span>
-                  {isCbrEnabled && (
-                    <span className="conversation-list-cell-description" data-uie-name="call-cbr">
-                      {t('callStateCbr')}
-                    </span>
+              {!temporaryUserStyle && (
+                <div className="conversation-list-cell-left">
+                  {isGroup && <GroupAvatar users={conversationParticipants} isLight={true} />}
+                  {!isGroup && !!conversationParticipants.length && (
+                    <Avatar participant={conversationParticipants[0]} avatarSize={AVATAR_SIZE.SMALL} />
                   )}
                 </div>
               )}
+              <div
+                className={cx('conversation-list-cell-center ', {
+                  'conversation-list-cell-center-no-left': temporaryUserStyle,
+                })}
+              >
+                <span className="conversation-list-cell-name">{conversationName}</span>
+
+                {isIncoming && (
+                  <span className="conversation-list-cell-description" data-uie-name="call-label-incoming">
+                    {t('callStateIncoming')}
+                  </span>
+                )}
+                {isOutgoing && (
+                  <span className="conversation-list-cell-description" data-uie-name="call-label-outgoing">
+                    {t('callStateOutgoing')}
+                  </span>
+                )}
+                {isConnecting && (
+                  <span className="conversation-list-cell-description" data-uie-name="call-label-connecting">
+                    {t('callStateConnecting')}
+                  </span>
+                )}
+                {isOngoing && startedAt && (
+                  <div className="conversation-list-info-wrapper">
+                    <span
+                      className="conversation-list-cell-description"
+                      data-uie-name="call-duration"
+                      aria-label={t('callDurationLabel')}
+                    >
+                      <Duration {...{startedAt}} />
+                    </span>
+                    {isCbrEnabled && (
+                      <span className="conversation-list-cell-description" data-uie-name="call-cbr">
+                        {t('callStateCbr')}
+                      </span>
+                    )}
+                  </div>
+                )}
+              </div>
             </div>
             <div className="conversation-list-cell-right">
               {isConnecting ||
                 (isOngoing && (
-                  <div
+                  <button
                     className="call-ui__button call-ui__button--red"
                     onClick={() => callActions.leave(call)}
                     title={t('videoCallOverlayHangUp')}
                     data-uie-name="do-call-controls-call-leave"
                   >
                     <Icon.Hangup className="small-icon" style={{maxWidth: 17}} />
-                  </div>
+                  </button>
                 ))}
             </div>
           </div>
@@ -259,6 +272,18 @@ const ConversationListCallingCell: React.FC<CallingCellProps> = ({
             <div
               className="group-video__minimized-wrapper"
               onClick={isOngoing ? () => multitasking.isMinimized(false) : undefined}
+              onKeyDown={
+                isOngoing
+                  ? (event: React.KeyboardEvent<HTMLInputElement>) => {
+                      if (event.key === KEY.ENTER || event.key === KEY.SPACE) {
+                        multitasking.isMinimized(false);
+                      }
+                    }
+                  : undefined
+              }
+              role="button"
+              tabIndex={0}
+              aria-label={t('callMaximizeLabel')}
             >
               <GroupVideoGrid
                 grid={activeCallViewTab === CallViewTab.ALL ? videoGrid : {grid: activeSpeakers, thumbnail: null}}
@@ -316,7 +341,7 @@ const ConversationListCallingCell: React.FC<CallingCellProps> = ({
                     </button>
                   )}
                   {isOngoing && (
-                    <div
+                    <button
                       className={cx('call-ui__button', {
                         'call-ui__button--active': selfSharesScreen,
                         'call-ui__button--disabled': disableScreenButton,
@@ -334,41 +359,42 @@ const ConversationListCallingCell: React.FC<CallingCellProps> = ({
                       ) : (
                         <Icon.ScreenshareOff className="small-icon" />
                       )}
-                    </div>
+                    </button>
                   )}
                 </div>
 
                 <div className="conversation-list-calling-cell-controls-right">
                   {showParticipantsButton && (
-                    <div
+                    <button
                       className={cx('call-ui__button call-ui__button--participants', {
                         'call-ui__button--active': showParticipants,
                       })}
                       onClick={() => setShowParticipants(current => !showParticipants)}
                       data-uie-name="do-toggle-participants"
+                      aria-pressed={showParticipants}
                     >
                       <span>{t('callParticipants', participants.length)}</span>
                       <Icon.Chevron className="chevron" />
-                    </div>
+                    </button>
                   )}
                   {(isIncoming || isOutgoing) && (
-                    <div
+                    <button
                       className="call-ui__button call-ui__button--red call-ui__button--large"
                       onClick={() => (isIncoming ? callActions.reject(call) : callActions.leave(call))}
                       title={t('videoCallOverlayHangUp')}
                       data-uie-name="do-call-controls-call-decline"
                     >
                       <Icon.Hangup className="small-icon" style={{maxWidth: 17}} />
-                    </div>
+                    </button>
                   )}
                   {isIncoming && (
-                    <div
+                    <button
                       className="call-ui__button call-ui__button--green call-ui__button--large"
                       onClick={() => callActions.answer(call)}
                       data-uie-name="do-call-controls-call-accept"
                     >
                       <Icon.Pickup className="small-icon" />
-                    </div>
+                    </button>
                   )}
                 </div>
               </div>
