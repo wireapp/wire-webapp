@@ -403,28 +403,28 @@ const ConversationListCallingCell: React.FC<CallingCellProps> = ({
                   'call-ui__participant-list__wrapper--active': showParticipants,
                 })}
               >
-                <div
-                  className="call-ui__participant-list"
-                  ref={setScrollbarRef}
-                  data-uie-name="list-call-ui-participants"
-                >
-                  {participants
-                    .slice()
-                    .sort((participantA, participantB) => sortUsersByPriority(participantA.user, participantB.user))
-                    .map(participant => (
-                      <ParticipantItem
-                        key={participant.clientId}
-                        participant={participant.user}
-                        hideInfo
-                        noUnderline
-                        callParticipant={participant}
-                        selfInTeam={selfUser?.inTeam()}
-                        isSelfVerified={isSelfVerified}
-                        external={teamState.isExternal(participant.user.id)}
-                        onContextMenu={isModerator ? event => getParticipantContext(event, participant) : undefined}
-                        showDropdown={isModerator}
-                      />
-                    ))}
+                <div ref={setScrollbarRef} className="call-ui__participant-list__container">
+                  <ul className="call-ui__participant-list" data-uie-name="list-call-ui-participants">
+                    {participants
+                      .slice()
+                      .sort((participantA, participantB) => sortUsersByPriority(participantA.user, participantB.user))
+                      .map(participant => (
+                        <li key={participant.clientId}>
+                          <ParticipantItem
+                            key={participant.clientId}
+                            participant={participant.user}
+                            hideInfo
+                            noUnderline
+                            callParticipant={participant}
+                            selfInTeam={selfUser?.inTeam()}
+                            isSelfVerified={isSelfVerified}
+                            external={teamState.isExternal(participant.user.id)}
+                            onContextMenu={isModerator ? event => getParticipantContext(event, participant) : undefined}
+                            showDropdown={isModerator}
+                          />
+                        </li>
+                      ))}
+                  </ul>
                 </div>
               </div>
             </>

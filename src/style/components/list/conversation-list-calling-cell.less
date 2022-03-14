@@ -116,9 +116,14 @@
     }
   }
   &__participant-list {
-    max-height: 184px;
-    overflow-x: hidden;
-    overflow-y: scroll;
+    .list-unstyled;
+    margin: 0;
+
+    &__container {
+      max-height: 184px;
+      overflow-x: hidden;
+      overflow-y: scroll;
+    }
 
     &__wrapper {
       overflow: hidden;
