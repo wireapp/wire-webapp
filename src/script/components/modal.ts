@@ -33,7 +33,7 @@ interface ModalParams {
 
 ko.components.register('modal', {
   template: `
-    <div class="modal" data-bind="style: {display: displayNone() ? 'none': 'flex', zIndex: 10000001}, attr: id ? {id: id, 'aria-labelledby': ariaLabelby} : {}" role="dialog" aria-modal="true" tabindex="-1">
+    <div class="modal" data-bind="style: {display: displayNone() ? 'none': 'flex', zIndex: 10000001}, attr: id ? {id: id, 'aria-labelledby': ariaLabelby} : {}" tabIndex="-1" aria-labelledby="modal-title" aria-describedby="modal-desc" aria-modal="true" role="dialog" aria-modal="true">
       <!-- ko if: showLoading() -->
         <loading-icon class="modal__loading"></loading-icon>
       <!-- /ko -->
@@ -65,6 +65,9 @@ ko.components.register('modal', {
     const maintainFocus = (): void => {
       if (!this.displayNone()) {
         document.addEventListener('keydown', onKeyDown);
+        window.setTimeout(() => {
+          document.getElementById(this.id).focus();
+        });
       }
     };
 
