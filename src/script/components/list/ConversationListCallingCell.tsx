@@ -17,7 +17,7 @@
  *
  */
 
-import React, {useState} from 'react';
+import React, {useState, useCallback} from 'react';
 import {container} from 'tsyringe';
 import {CALL_TYPE, CONV_TYPE, REASON as CALL_REASON, STATE as CALL_STATE} from '@wireapp/avs';
 import cx from 'classnames';
@@ -180,6 +180,25 @@ const ConversationListCallingCell: React.FC<CallingCellProps> = ({
     showContextMenu(event.nativeEvent, entries, 'participant-moderator-menu');
   };
 
+  const handleMinimizedKeydown = useCallback(
+    (event: React.KeyboardEvent<HTMLInputElement>) => {
+      if (!isOngoing) {
+        return;
+      }
+      if (event.key === KEY.ENTER || event.key === KEY.SPACE) {
+        multitasking.isMinimized(false);
+      }
+    },
+    [isOngoing, multitasking],
+  );
+
+  const handleMinimizedClick = useCallback(() => {
+    if (!isOngoing) {
+      return;
+    }
+    multitasking.isMinimized(false);
+  }, [isOngoing, multitasking]);
+
   return (
     <>
       {showJoinButton && (
@@ -273,16 +292,8 @@ const ConversationListCallingCell: React.FC<CallingCellProps> = ({
           {(isOngoing || selfHasActiveVideo) && isMinimized && !!videoGrid?.grid?.length ? (
             <div
               className="group-video__minimized-wrapper"
-              onClick={isOngoing ? () => multitasking.isMinimized(false) : undefined}
-              onKeyDown={
-                isOngoing
-                  ? (event: React.KeyboardEvent<HTMLInputElement>) => {
-                      if (event.key === KEY.ENTER || event.key === KEY.SPACE) {
-                        multitasking.isMinimized(false);
-                      }
-                    }
-                  : undefined
-              }
+              onClick={handleMinimizedClick}
+              onKeyDown={handleMinimizedKeydown}
               role="button"
               tabIndex={0}
               aria-label={t('callMaximizeLabel')}
