@@ -74,7 +74,12 @@ const DeviceDetailsPreferences: React.FC<DevicesPreferencesProps> = ({
       <div className="preferences-content">
         <section className="preferences-section">
           <header className="preferences-devices-details">
-            <button className="preferences-devices-icon icon-back" onClick={onClose} data-uie-name="go-back"></button>
+            <button
+              type="button"
+              className="preferences-devices-icon icon-back"
+              onClick={onClose}
+              data-uie-name="go-back"
+            ></button>
             <span>{t('preferencesDevices')}</span>
           </header>
           <DetailedDevice device={device} fingerprint={fingerprint} />
@@ -105,6 +110,7 @@ const DeviceDetailsPreferences: React.FC<DevicesPreferencesProps> = ({
           <div className="preferences-devices-session" data-uie-name="preferences-device-details-session">
             {resetState === SessionResetState.RESET && (
               <button
+                type="button"
                 className="preferences-button button button-small button-fluid"
                 onClick={resetSession}
                 data-uie-name="do-session-reset"
@@ -127,6 +133,7 @@ const DeviceDetailsPreferences: React.FC<DevicesPreferencesProps> = ({
           <section className="preferences-section">
             <div className="preferences-info">{t('preferencesDevicesRemoveDetail')}</div>
             <button
+              type="button"
               className="preferences-button button button-small button-fluid"
               onClick={() => onRemove(device)}
               data-uie-name="go-remove-device"
