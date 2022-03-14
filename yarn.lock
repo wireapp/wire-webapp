@@ -2991,16 +2991,16 @@
   resolved "https://registry.yarnpkg.com/@wireapp/antiscroll-2/-/antiscroll-2-1.0.2.tgz#71a78d294ee0c88f42d50477ab61fa39272f5bca"
   integrity sha512-9KeB3yh9k01PjpuuRQsve4yY3+OVS2/hp9j+N13Is5wYCZRkUzZVCs8w9CyA/C6J5o9ukH0EzT7uurysWuhn/A==
 
-"@wireapp/api-client@18.0.0":
-  version "18.0.0"
-  resolved "https://registry.yarnpkg.com/@wireapp/api-client/-/api-client-18.0.0.tgz#e5e170e42f4cbcac24329b0bf30ac088c720d157"
-  integrity sha512-oy++kMKeJCUASQqMlOnCoDtxmSSnvpYrM38lhfVvxxTM8TH1afQhrVggPCHJ/MXGv+Na45awJq5zdb6DWgyJqw==
+"@wireapp/api-client@18.3.2":
+  version "18.3.2"
+  resolved "https://registry.yarnpkg.com/@wireapp/api-client/-/api-client-18.3.2.tgz#081ea33844c7db675e2cfbc59e4d2b30c0865faa"
+  integrity sha512-3JJmogzgZIVwVXV56p9tF64Xthkz/UQVK+2XnyXGqN6bTR1xofrPQfV+ICRd0VA0CSd6O55qs6TZKGm5wFokPg==
   dependencies:
     "@types/node" "~14"
     "@types/spark-md5" "3.0.2"
     "@types/tough-cookie" "4.0.1"
     "@wireapp/commons" "4.2.13"
-    "@wireapp/priority-queue" "1.6.38"
+    "@wireapp/priority-queue" "1.6.39"
     "@wireapp/protocol-messaging" "1.37.0"
     axios "0.21.4"
     axios-retry "3.1.9"
@@ -3048,14 +3048,14 @@
     logdown "3.3.1"
     rimraf "3.0.2"
 
-"@wireapp/core@24.0.0":
-  version "24.0.0"
-  resolved "https://registry.yarnpkg.com/@wireapp/core/-/core-24.0.0.tgz#029e7450925e4f9fcd986a5b2e568d528abb02e7"
-  integrity sha512-aM2378+XsOsLnmFF8me4nDrkolDend4AzsA4ROXqVpVjeiurP3SuzvFfhPtfW4M7MvJpceNhzOqe89n2vV9YNw==
+"@wireapp/core@24.2.2":
+  version "24.2.2"
+  resolved "https://registry.yarnpkg.com/@wireapp/core/-/core-24.2.2.tgz#27b7c81698ea262727cd1b39897cc0c8b043ddc9"
+  integrity sha512-UMk4qsrRz1Prips7Ci5TIsF6kgM8WwxEbp1byds+G6MX2I0dCWyaRgfg6nEm4OWTlQ9DD0IZ7DIs2d9AqhASkw==
   dependencies:
     "@types/long" "4.0.1"
     "@types/node" "~14"
-    "@wireapp/api-client" "18.0.0"
+    "@wireapp/api-client" "18.3.2"
     "@wireapp/cryptobox" "12.7.1"
     bazinga64 "5.10.0"
     hash.js "1.1.7"
@@ -3099,10 +3099,10 @@
   dependencies:
     "@types/node" "~14"
 
-"@wireapp/priority-queue@1.6.38":
-  version "1.6.38"
-  resolved "https://registry.yarnpkg.com/@wireapp/priority-queue/-/priority-queue-1.6.38.tgz#7dfc4667a977e7075ca87f52fc3e7554419738f0"
-  integrity sha512-WZ6oMoI9wpg0N/kdytXxoVuibyKCQCmlJF2xejacL4O13spRyfQghMYA+4PuKJmSTezk/78TGfKBwnhS3nRa6w==
+"@wireapp/priority-queue@1.6.39":
+  version "1.6.39"
+  resolved "https://registry.yarnpkg.com/@wireapp/priority-queue/-/priority-queue-1.6.39.tgz#ebf887bc74ae1331bc9ad3612fcc7dcaf7e47e0c"
+  integrity sha512-Rsv0DixzhEwETALKEk0BRlQ4w0W2/oNtYpcTxpcCGOLZee9aqag3ETFo2LLnvGjCv14Q95FkGrzpvRT8yo2SVQ==
   dependencies:
     "@types/node" "~14"
 
