@@ -69,6 +69,7 @@ const ServiceAvatar: React.FunctionComponent<ServiceAvatarProps> = ({participant
       </div>
       <AvatarImage
         avatarSize={avatarSize}
+        avatarAlt={ko.unwrap(participant.name)}
         borderRadius="20%"
         mediumPicture={participant.mediumPictureResource()}
         previewPicture={participant.previewPictureResource()}

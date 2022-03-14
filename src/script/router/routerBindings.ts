@@ -21,6 +21,7 @@ import ko from 'knockout';
 import React from 'react';
 
 import type {Router} from './Router';
+import {KEY} from 'Util/KeyboardUtil';
 
 let router: Router;
 
@@ -44,4 +45,13 @@ export const createNavigate =
   (event: React.MouseEvent<Element, MouseEvent>) => {
     router?.navigate(link);
     event.preventDefault();
+  };
+
+export const createNavigateKeyboard =
+  (link: string): React.KeyboardEventHandler =>
+  (event: React.KeyboardEvent<Element>) => {
+    if (event.key === KEY.ENTER || event.key === KEY.SPACE) {
+      router?.navigate(link);
+      event.preventDefault();
+    }
   };
