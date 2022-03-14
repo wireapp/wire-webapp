@@ -42,9 +42,9 @@ export interface ConversationListCellProps {
   conversation: Conversation;
   dataUieName?: string;
   index: number;
-  is_selected: (conversation: Conversation) => boolean;
-  isVisibleFunc: (top: number, bottom: number) => boolean;
-  offsetTop: number;
+  is_selected?: (conversation: Conversation) => boolean;
+  isVisibleFunc?: (top: number, bottom: number) => boolean;
+  offsetTop?: number;
   onClick: React.MouseEventHandler<Element>;
   onJoinCall: (conversation: Conversation, mediaType: MediaType) => void;
   rightClick: (conversation: Conversation, event: MouseEvent) => void;

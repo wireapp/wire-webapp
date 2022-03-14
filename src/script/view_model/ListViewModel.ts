@@ -54,6 +54,14 @@ import {UserState} from '../user/UserState';
 import {TeamState} from '../team/TeamState';
 import {ConversationState} from '../conversation/ConversationState';
 
+export enum ListState {
+  ARCHIVE = 'ListViewModel.STATE.ARCHIVE',
+  CONVERSATIONS = 'ListViewModel.STATE.CONVERSATIONS',
+  PREFERENCES = 'ListViewModel.STATE.PREFERENCES',
+  START_UI = 'ListViewModel.STATE.START_UI',
+  TEMPORARY_GUEST = 'ListViewModel.STATE.TEMPORARY_GUEST',
+}
+
 export class ListViewModel {
   private readonly userState: UserState;
   private readonly teamState: TeamState;
@@ -92,11 +100,11 @@ export class ListViewModel {
 
   static get STATE() {
     return {
-      ARCHIVE: 'ListViewModel.STATE.ARCHIVE',
-      CONVERSATIONS: 'ListViewModel.STATE.CONVERSATIONS',
-      PREFERENCES: 'ListViewModel.STATE.PREFERENCES',
-      START_UI: 'ListViewModel.STATE.START_UI',
-      TEMPORARY_GUEST: 'ListViewModel.STATE.TEMPORARY_GUEST',
+      ARCHIVE: ListState.ARCHIVE,
+      CONVERSATIONS: ListState.CONVERSATIONS,
+      PREFERENCES: ListState.PREFERENCES,
+      START_UI: ListState.START_UI,
+      TEMPORARY_GUEST: ListState.TEMPORARY_GUEST,
     };
   }
 

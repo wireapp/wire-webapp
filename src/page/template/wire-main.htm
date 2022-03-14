@@ -9,7 +9,7 @@
         <!-- ko if: webappLoaded -->
           #include('list/background.htm')
           <!-- ko ifnot: modal() -->
-            #include('list/archive.htm')
+            <archive-list params="listViewModel: $root, conversationRepository: conversationRepository"></archive-list>
             #include('list/conversations.htm')
             <preferences params="listViewModel: $root, contentViewModel: $root.contentViewModel"></preferences>
             #include('list/start-ui.htm')
