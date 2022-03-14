@@ -22,6 +22,7 @@ const PreferenceItem: React.FC<{IconComponent: React.FC; isSelected: boolean; la
   return (
     <li className="left-list-item">
       <button
+        type="button"
         className={`left-list-item-button ${isSelected && 'accent-text accent-fill'}`}
         onClick={onSelect}
         data-uie-name="go-account"
@@ -87,6 +88,7 @@ const Preferences: React.FC<PreferencesProps> = ({listViewModel, contentViewMode
         <div className="left-list-header">
           <span className="left-list-header-text">{t('preferencesHeadline')}</span>
           <button
+            type="button"
             className="left-list-header-close-button button-icon-large"
             onClick={close}
             title={t('tooltipSearchClose')}
