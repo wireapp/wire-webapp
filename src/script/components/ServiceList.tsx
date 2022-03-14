@@ -25,6 +25,7 @@ import ParticipantItem from 'Components/list/ParticipantItem';
 
 import type {ServiceEntity} from '../integration/ServiceEntity';
 import {t} from '../util/LocalizerUtil';
+import {KEY} from 'Util/KeyboardUtil';
 
 export interface ServiceListProps {
   arrow: boolean;
@@ -49,7 +50,7 @@ const ServiceList: React.FC<ServiceListProps> = ({
   services,
 }) => {
   const handleKeyPress = (event: React.KeyboardEvent<HTMLDivElement>, service: ServiceEntity) => {
-    if (event.key === 'Enter' || event.key === ' ') {
+    if (event.key === KEY.ENTER || event.key === KEY.SPACE) {
       click(service);
     }
   };
