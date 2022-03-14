@@ -1,6 +1,6 @@
 <div id="modals">
   <modal
-    params="isShown: isModalVisible(), onBgClick: content().onBgClick, onClosed: onModalHidden"
+    params="isShown: isModalVisible(), onBgClick: content().onBgClick, onClosed: onModalHidden, ariaDescribedBy: 'modal-description'"
     data-bind="attr: {'data-uie-name': content().modalUie}"
   >
     <div class="modal__header" data-uie-name="status-modal-title">
@@ -13,10 +13,10 @@
     <div class="modal__body" data-bind="fadingscrollbar">
       <div class="modal__text" data-uie-name="status-modal-text">
         <!-- ko if: content().messageHtml -->
-          <div id="modal-desc" data-bind="html: content().messageHtml"></div>
+          <div id="modal-description" data-bind="html: content().messageHtml"></div>
         <!-- /ko -->
         <!-- ko if: content().messageText -->
-          <div id="modal-desc" data-bind="text: content().messageText"></div>
+          <div id="modal-description" data-bind="text: content().messageText"></div>
         <!-- /ko -->
       </div>
       <!-- ko if: hasPassword() -->
