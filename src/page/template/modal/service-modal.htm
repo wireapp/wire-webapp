@@ -5,7 +5,12 @@
   >
     <!-- ko if: service() -->
       <div class="modal__header">
-        <button  class="modal__header__button" data-bind="click: hide" data-uie-name="do-close">
+        <button
+          class="modal__header__button"
+          type="button"
+          data-bind="click: hide"
+          data-uie-name="do-close"
+        >
           <close-icon></close-icon>
         </button>
       </div>
