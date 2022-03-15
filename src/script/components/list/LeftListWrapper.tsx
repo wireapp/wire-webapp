@@ -24,7 +24,7 @@ import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {throttle} from 'underscore';
 import {isScrollable, isScrolledBottom, isScrolledTop} from 'Util/scroll-helpers';
 import {ListState, ListViewModel} from '../../view_model/ListViewModel';
-import {Transition} from 'react-transition-group';
+import {Transition, TransitionStatus} from 'react-transition-group';
 import Icon from 'Components/Icon';
 import {t} from 'Util/LocalizerUtil';
 import useEffectRef from 'Util/useEffectRef';
@@ -38,12 +38,38 @@ type LeftListWrapperProps = {
   openState: ListState;
 };
 
-const style = css`
+const scrollStyle = css`
   position: relative;
   flex: 1 1 auto;
   overflow-x: hidden;
   overflow-y: scroll;
 `;
+
+const style = css`
+  position: absolute;
+  top: 0;
+  display: flex;
+  flex-direction: column;
+  visibility: hidden;
+  transform: translateY(88px);
+  width: 100%;
+`;
+
+const animationFast = 350;
+const animationSlow = 550;
+const enteringTransition = {
+  transition: `visibility 0s, all ${animationSlow}ms cubic-bezier(0.19, 1, 0.22, 1) ${animationFast}ms`,
+};
+const exitingTransition = {
+  transition: `visibility 0s, all ${animationFast}ms  cubic-bezier(0.6, 0.04, 0.98, 0.335)`,
+};
+
+const transitions: Partial<Record<TransitionStatus, React.CSSProperties>> = {
+  entered: {...exitingTransition, opacity: 1, transform: 'translateY(0)', visibility: 'visible'},
+  entering: {...enteringTransition, opacity: 1, transform: 'translateY(0)', visibility: 'visible'},
+  exited: {...enteringTransition, opacity: 0},
+  exiting: {...exitingTransition, opacity: 0},
+};
 
 const LeftListWrapper: React.FC<LeftListWrapperProps> = ({listViewModel, openState, id, header, onClose, children}) => {
   const {state: listState} = useKoSubscribableChildren(listViewModel, ['state']);
@@ -76,28 +102,32 @@ const LeftListWrapper: React.FC<LeftListWrapperProps> = ({listViewModel, openSta
   const isVisible = listState === openState;
 
   return (
-    <Transition in={isVisible} timeout={300}>
-      <div
-        id={id}
-        className={`left-list left-list-${id} ${isVisible && 'left-list-is-visible'}`}
-        aria-hidden={isVisible ? 'false' : 'true'}
-      >
-        <div className="left-list-header">
-          <span className="left-list-header-text">{header}</span>
-          <button
-            type="button"
-            className="left-list-header-close-button button-icon-large"
-            onClick={onClose}
-            title={t('tooltipSearchClose')}
-            data-uie-name="do-close-preferences"
-          >
-            <Icon.Close />
-          </button>
+    <Transition in={isVisible} timeout={{enter: animationSlow, exit: animationFast}}>
+      {state => (
+        <div
+          id={id}
+          className={`left-list-${id}`}
+          css={style}
+          style={transitions[state]}
+          aria-hidden={isVisible ? 'false' : 'true'}
+        >
+          <div className="left-list-header">
+            <span className="left-list-header-text">{header}</span>
+            <button
+              type="button"
+              className="left-list-header-close-button button-icon-large"
+              onClick={onClose}
+              title={t('tooltipSearchClose')}
+              data-uie-name="do-close-preferences"
+            >
+              <Icon.Close />
+            </button>
+          </div>
+          <div css={scrollStyle} ref={setScrollbarRef}>
+            {children}
+          </div>
         </div>
-        <div css={style} ref={setScrollbarRef}>
-          {children}
-        </div>
-      </div>
+      )}
     </Transition>
   );
 };
