@@ -22,10 +22,10 @@ import {t} from 'Util/LocalizerUtil';
 
 import {Runtime} from '@wireapp/commons';
 import Icon from 'Components/Icon';
-import {registerStaticReactComponent, useKoSubscribableChildren} from 'Util/ComponentUtil';
+import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {ListViewModel} from '../../../view_model/ListViewModel';
 import {ContentViewModel} from '../../../view_model/ContentViewModel';
-import LeftListWrapper from 'Components/list/LeftListWrapper';
+import ListWrapper from './ListWrapper';
 
 type PreferencesProps = {
   contentViewModel: ContentViewModel;
@@ -105,7 +105,7 @@ const Preferences: React.FC<PreferencesProps> = ({listViewModel, contentViewMode
   ];
 
   return (
-    <LeftListWrapper
+    <ListWrapper
       listViewModel={listViewModel}
       openState={ListViewModel.STATE.PREFERENCES}
       id="preferences"
@@ -126,10 +126,8 @@ const Preferences: React.FC<PreferencesProps> = ({listViewModel, contentViewMode
             />
           ))}
       </ul>
-    </LeftListWrapper>
+    </ListWrapper>
   );
 };
 
 export default Preferences;
-
-registerStaticReactComponent('preferences', Preferences);

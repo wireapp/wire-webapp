@@ -22,8 +22,8 @@ import React from 'react';
 import {amplify} from 'amplify';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import {t} from 'Util/LocalizerUtil';
-import {registerStaticReactComponent, useKoSubscribableChildren} from 'Util/ComponentUtil';
-import LeftListWrapper from 'Components/list/LeftListWrapper';
+import {useKoSubscribableChildren} from 'Util/ComponentUtil';
+import ListWrapper from './ListWrapper';
 import ConversationListCell from 'Components/list/ConversationListCell';
 import {Conversation} from '../../../entity/Conversation';
 import {ListViewModel} from '../../../view_model/ListViewModel';
@@ -31,14 +31,14 @@ import {ConversationState} from '../../../conversation/ConversationState';
 import {container} from 'tsyringe';
 import {ConversationRepository} from '../../../conversation/ConversationRepository';
 
-type ArchiveListProps = {
+type ArchiveProps = {
   answerCall: (conversation: Conversation) => void;
   conversationRepository: ConversationRepository;
   conversationState?: ConversationState;
   listViewModel: ListViewModel;
 };
 
-const ArchiveList: React.FC<ArchiveListProps> = ({
+const Archive: React.FC<ArchiveProps> = ({
   listViewModel,
   conversationRepository,
   answerCall,
@@ -59,7 +59,7 @@ const ArchiveList: React.FC<ArchiveListProps> = ({
   };
 
   return (
-    <LeftListWrapper
+    <ListWrapper
       listViewModel={listViewModel}
       openState={ListViewModel.STATE.ARCHIVE}
       id="archive"
@@ -81,10 +81,8 @@ const ArchiveList: React.FC<ArchiveListProps> = ({
           </li>
         ))}
       </ul>
-    </LeftListWrapper>
+    </ListWrapper>
   );
 };
 
-export default ArchiveList;
-
-registerStaticReactComponent('archive-list', ArchiveList);
+export default Archive;

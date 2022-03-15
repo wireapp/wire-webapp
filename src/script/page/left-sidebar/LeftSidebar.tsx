@@ -18,19 +18,20 @@
  */
 
 import React from 'react';
-
-import {registerStaticReactComponent, useKoSubscribableChildren} from 'Util/ComponentUtil';
-import {ListViewModel, ListState} from '../../view_model/ListViewModel';
-import {ContentViewModel} from '../../view_model/ContentViewModel';
 import {TransitionGroup, CSSTransition} from 'react-transition-group';
-import Preferences from './panels/Preferences';
-import ArchiveList from './panels/ArchiveList';
+import {registerStaticReactComponent, useKoSubscribableChildren} from 'Util/ComponentUtil';
+
+import {ListViewModel, ListState} from '../../view_model/ListViewModel';
+import {User} from '../../entity/User';
 import {ConversationRepository} from '../../conversation/ConversationRepository';
 
+import Preferences from './panels/Preferences';
+import Archive from './panels/Archive';
+
 type PreferencesProps = {
-  contentViewModel: ContentViewModel;
   conversationRepository: ConversationRepository;
   listViewModel: ListViewModel;
+  selfUser: User;
 };
 const Animated: React.FC = ({children, ...rest}) => {
   return (
@@ -40,24 +41,27 @@ const Animated: React.FC = ({children, ...rest}) => {
   );
 };
 
-const LeftSidebar: React.FC<PreferencesProps> = ({listViewModel, conversationRepository}) => {
+const LeftSidebar: React.FC<PreferencesProps> = ({listViewModel, conversationRepository, selfUser}) => {
   const {state} = useKoSubscribableChildren(listViewModel, ['state']);
   let content = <></>;
   switch (state) {
     case ListState.PREFERENCES:
       content = (
-        <Preferences contentViewModel={listViewModel.contentViewModel} listViewModel={listViewModel}></Preferences>
+        <Preferences
+          contentViewModel={listViewModel.contentViewModel}
+          listViewModel={listViewModel}
+          isTemporaryGuest={selfUser.isTemporaryGuest()}
+        ></Preferences>
       );
       break;
 
     case ListState.ARCHIVE:
       content = (
-        <ArchiveList
+        <Archive
           answerCall={listViewModel.answerCall}
           conversationRepository={conversationRepository}
           listViewModel={listViewModel}
-          conversationState={undefined}
-        ></ArchiveList>
+        ></Archive>
       );
   }
   return (

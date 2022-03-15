@@ -23,11 +23,11 @@ import {css} from '@emotion/core';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {throttle} from 'underscore';
 import {isScrollable, isScrolledBottom, isScrolledTop} from 'Util/scroll-helpers';
-import {ListState, ListViewModel} from '../../view_model/ListViewModel';
+import {ListState, ListViewModel} from '../../../view_model/ListViewModel';
 import Icon from 'Components/Icon';
 import {t} from 'Util/LocalizerUtil';
 import useEffectRef from 'Util/useEffectRef';
-import {useFadingScrollbar} from '../../ui/fadingScrollbar';
+import {useFadingScrollbar} from '../../../ui/fadingScrollbar';
 
 type LeftListWrapperProps = {
   header: string;
@@ -52,7 +52,7 @@ const style = css`
   width: 100%;
 `;
 
-const LeftListWrapper: React.FC<LeftListWrapperProps> = ({listViewModel, openState, id, header, onClose, children}) => {
+const ListWrapper: React.FC<LeftListWrapperProps> = ({listViewModel, openState, id, header, onClose, children}) => {
   const {state: listState} = useKoSubscribableChildren(listViewModel, ['state']);
   const [scrollbarRef, setScrollbarRef] = useEffectRef<HTMLDivElement>();
   useFadingScrollbar(scrollbarRef);
@@ -103,4 +103,4 @@ const LeftListWrapper: React.FC<LeftListWrapperProps> = ({listViewModel, openSta
   );
 };
 
-export default LeftListWrapper;
+export default ListWrapper;
