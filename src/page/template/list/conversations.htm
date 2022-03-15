@@ -17,8 +17,11 @@
     </button>
     <!-- ko if: isTeam() -->
     <availability-state
+      id="availability-state"
       class="left-list-header-availability"
-      data-bind="clickOrDrag: clickOnAvailability"
+      data-bind="clickOrDrag: clickOnAvailability, event: { keypress: pressOnAvailability }"
+      role="button"
+      tabindex="0"
       params="availability: selfAvailability, label: selfUserName, dataUieName: 'status-availability'"
     >
     </availability-state>
