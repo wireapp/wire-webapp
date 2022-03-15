@@ -55,6 +55,7 @@ import type {PropertiesRepository} from '../../properties/PropertiesRepository';
 import type {User} from '../../entity/User';
 import {createNavigate} from '../../router/routerBindings';
 import {QualifiedId} from '@wireapp/api-client/src/user';
+import {isEnterKey, isSpaceKey} from 'Util/KeyboardUtil';
 
 export class ConversationListViewModel {
   readonly startTooltip: string;
@@ -253,6 +254,19 @@ export class ConversationListViewModel {
 
   readonly clickOnAvailability = (viewModel: unknown, event: MouseEvent): void => {
     AvailabilityContextMenu.show(event, 'left-list-availability-menu');
+  };
+
+  readonly pressOnAvailability = (viewMode: unknown, event: KeyboardEvent): void => {
+    if (isSpaceKey(event) || isEnterKey(event)) {
+      const current = document.querySelector('#availability-state') as HTMLSpanElement;
+      const newEvent = new MouseEvent('MouseEvent', {
+        ...event,
+        clientX: current.offsetLeft,
+        clientY: current.offsetTop + current.offsetHeight,
+      });
+
+      AvailabilityContextMenu.show(newEvent as unknown as MouseEvent, 'left-list-availability-menu');
+    }
   };
 
   readonly clickOnConnectRequests = (): void => {
