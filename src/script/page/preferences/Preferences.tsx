@@ -112,7 +112,7 @@ const Preferences: React.FC<PreferencesProps> = ({listViewModel, contentViewMode
       header={t('preferencesHeadline')}
       onClose={close}
     >
-      <ul className="left-list-items preferences-list-items">
+      <ul className="left-list-items no-scroll preferences-list-items">
         {items
           .filter(item => !item.hidden)
           .map(item => (

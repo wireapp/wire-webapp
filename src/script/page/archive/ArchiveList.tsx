@@ -66,7 +66,7 @@ const ArchiveList: React.FC<ArchiveListProps> = ({
       header={t('archiveHeader')}
       onClose={close}
     >
-      <ul className="left-list-items">
+      <ul className="left-list-items no-scroll">
         {conversations.map((conversation, index) => (
           <li key={conversation.id}>
             <ConversationListCell

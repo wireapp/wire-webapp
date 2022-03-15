@@ -51,17 +51,15 @@ const LeftListWrapper: React.FC<LeftListWrapperProps> = ({listViewModel, openSta
   useFadingScrollbar(scrollbarRef);
 
   const calculateBorders = throttle((element: HTMLElement) => {
-    if (element) {
-      window.requestAnimationFrame(() => {
-        if (element.offsetHeight <= 0 || !isScrollable(element)) {
-          element.classList.remove('left-list-center-border-bottom', 'conversations-center-border-top');
-          return;
-        }
+    window.requestAnimationFrame(() => {
+      if (element.offsetHeight <= 0 || !isScrollable(element)) {
+        element.classList.remove('left-list-center-border-bottom', 'conversations-center-border-top');
+        return;
+      }
 
-        element.classList.toggle('left-list-center-border-top', !isScrolledTop(element));
-        element.classList.toggle('left-list-center-border-bottom', !isScrolledBottom(element));
-      });
-    }
+      element.classList.toggle('left-list-center-border-top', !isScrolledTop(element));
+      element.classList.toggle('left-list-center-border-bottom', !isScrolledBottom(element));
+    });
   }, 100);
 
   useEffect(() => {
@@ -69,6 +67,7 @@ const LeftListWrapper: React.FC<LeftListWrapperProps> = ({listViewModel, openSta
       return undefined;
     }
     const onScroll = (event: MouseEvent) => calculateBorders(event.target as HTMLElement);
+    calculateBorders(scrollbarRef);
     scrollbarRef.addEventListener('scroll', onScroll);
 
     return () => scrollbarRef.removeEventListener('scroll', onScroll);
