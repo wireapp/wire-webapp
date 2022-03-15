@@ -5,11 +5,16 @@
   data-bind="css: { 'left-list-is-visible': visible }, attr: { 'aria-hidden': ariaHidden }"
 >
   <div class="left-list-header">
-    <settings-icon
-      class="conversations-settings button-icon-large accent-text"
-      data-bind="clickOrDrag: clickOnPreferencesButton, attr: {title: t('tooltipConversationsPreferences')}, css: {'conversations-settings--badge': showBadge()}"
+    <button
+      class="conversations-settings-button"
+      data-bind="clickOrDrag: clickOnPreferencesButton, attr: {title: t('tooltipConversationsPreferences')}"
       data-uie-name="go-preferences"
-    ></settings-icon>
+    >
+      <settings-icon
+        class="conversations-settings button-icon-large accent-text"
+        data-bind="css: {'conversations-settings--badge': showBadge()}"
+      ></settings-icon>
+    </button>
     <!-- ko if: isTeam() -->
     <availability-state
       class="left-list-header-availability"
