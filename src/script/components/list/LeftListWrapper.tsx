@@ -17,9 +17,12 @@
  *
  */
 
-import React from 'react';
+import React, {useEffect} from 'react';
 
+import {css} from '@emotion/core';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
+import {throttle} from 'underscore';
+import {isScrollable, isScrolledBottom, isScrolledTop} from 'Util/scroll-helpers';
 import {ListState, ListViewModel} from '../../view_model/ListViewModel';
 import {Transition} from 'react-transition-group';
 import Icon from 'Components/Icon';
@@ -35,10 +38,41 @@ type LeftListWrapperProps = {
   openState: ListState;
 };
 
+const style = css`
+  position: relative;
+  flex: 1 1 auto;
+  overflow-x: hidden;
+  overflow-y: scroll;
+`;
+
 const LeftListWrapper: React.FC<LeftListWrapperProps> = ({listViewModel, openState, id, header, onClose, children}) => {
   const {state: listState} = useKoSubscribableChildren(listViewModel, ['state']);
   const [scrollbarRef, setScrollbarRef] = useEffectRef<HTMLDivElement>();
   useFadingScrollbar(scrollbarRef);
+
+  const calculateBorders = throttle((element: HTMLElement) => {
+    if (element) {
+      window.requestAnimationFrame(() => {
+        if (element.offsetHeight <= 0 || !isScrollable(element)) {
+          element.classList.remove('left-list-center-border-bottom', 'conversations-center-border-top');
+          return;
+        }
+
+        element.classList.toggle('left-list-center-border-top', !isScrolledTop(element));
+        element.classList.toggle('left-list-center-border-bottom', !isScrolledBottom(element));
+      });
+    }
+  }, 100);
+
+  useEffect(() => {
+    if (!scrollbarRef) {
+      return undefined;
+    }
+    const onScroll = (event: MouseEvent) => calculateBorders(event.target as HTMLElement);
+    scrollbarRef.addEventListener('scroll', onScroll);
+
+    return () => scrollbarRef.removeEventListener('scroll', onScroll);
+  }, [scrollbarRef]);
 
   const isVisible = listState === openState;
 
@@ -61,7 +95,7 @@ const LeftListWrapper: React.FC<LeftListWrapperProps> = ({listViewModel, openSta
             <Icon.Close />
           </button>
         </div>
-        <div className="left-list-center" ref={setScrollbarRef}>
+        <div css={style} ref={setScrollbarRef}>
           {children}
         </div>
       </div>

@@ -64,7 +64,7 @@ const ArchiveList: React.FC<ArchiveListProps> = ({
       header={t('archiveHeader')}
       onClose={close}
     >
-      <ul className="left-list-items" data-bind="bordered_list: archivedConversations">
+      <ul className="left-list-items">
         {conversations.map((conversation, index) => (
           <li key={conversation.id}>
             <ConversationListCell
