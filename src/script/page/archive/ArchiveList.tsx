@@ -32,6 +32,7 @@ import {container} from 'tsyringe';
 import {ConversationRepository} from '../../conversation/ConversationRepository';
 
 type ArchiveListProps = {
+  answerCall: (conversation: Conversation) => void;
   conversationRepository: ConversationRepository;
   conversationState: ConversationState;
   listViewModel: ListViewModel;
@@ -40,6 +41,7 @@ type ArchiveListProps = {
 const ArchiveList: React.FC<ArchiveListProps> = ({
   listViewModel,
   conversationRepository,
+  answerCall,
   conversationState = container.resolve(ConversationState),
 }) => {
   const {conversations_archived: conversations} = useKoSubscribableChildren(conversationState, [
@@ -72,9 +74,7 @@ const ArchiveList: React.FC<ArchiveListProps> = ({
               onClick={() => onClickConversation(conversation)}
               rightClick={listViewModel.onContextMenu}
               conversation={conversation}
-              onJoinCall={function (conversation: Conversation): boolean {
-                throw new Error('Function not implemented.');
-              }}
+              onJoinCall={answerCall}
               index={index}
               showJoinButton={false}
             />

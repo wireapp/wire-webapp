@@ -28,7 +28,6 @@ import {t} from 'Util/LocalizerUtil';
 import {iterateItem} from 'Util/ArrayUtil';
 import {isEscapeKey} from 'Util/KeyboardUtil';
 
-import {ArchiveViewModel} from './list/ArchiveViewModel';
 import {ConversationListViewModel} from './list/ConversationListViewModel';
 import {StartUIViewModel} from './list/StartUIViewModel';
 import {TakeoverViewModel} from './list/TakeoverViewModel';
@@ -87,7 +86,6 @@ export class ListViewModel {
   private readonly selfUser: ko.Observable<User>;
   private readonly modal: ko.Observable<string>;
   private readonly visibleListItems: ko.PureComputed<(string | Conversation)[]>;
-  private readonly archive: ArchiveViewModel;
   private readonly conversations: ConversationListViewModel;
   private readonly start: StartUIViewModel;
 
@@ -163,7 +161,6 @@ export class ListViewModel {
     });
 
     // Nested view models
-    this.archive = new ArchiveViewModel(this, repositories.conversation, this.answerCall);
     this.conversations = new ConversationListViewModel(
       mainViewModel,
       this,
