@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2021 Wire Swiss GmbH
+ * Copyright (C) 2022 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,7 +22,7 @@ import React from 'react';
 import Icon from 'Components/Icon';
 import {amplify} from 'amplify';
 import {WebAppEvents} from '@wireapp/webapp-events';
-import {registerStaticReactComponent, useKoSubscribableChildren} from 'Util/ComponentUtil';
+import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import ConversationListCallingCell from 'Components/list/ConversationListCallingCell';
 import {t} from 'Util/LocalizerUtil';
 import {User} from '../../entity/User';
@@ -32,17 +32,13 @@ import {ModalsViewModel} from '../../view_model/ModalsViewModel';
 import {CallingViewModel} from '../../view_model/CallingViewModel';
 import {QualifiedId} from '@wireapp/api-client/src/user';
 
-type TemporaryGuestConversationList = {
+type ConversationList = {
   callingViewModel: CallingViewModel;
   listViewModel: ListViewModel;
   selfUser: User;
 };
 
-const TemporaryGuestConversationList: React.FC<TemporaryGuestConversationList> = ({
-  selfUser,
-  listViewModel,
-  callingViewModel,
-}) => {
+const ConversationList: React.FC<ConversationList> = ({selfUser, listViewModel, callingViewModel}) => {
   const {expirationIsUrgent, expirationRemainingText} = useKoSubscribableChildren(selfUser, [
     'expirationIsUrgent',
     'expirationRemainingText',
@@ -133,6 +129,4 @@ const TemporaryGuestConversationList: React.FC<TemporaryGuestConversationList> =
   );
 };
 
-export default TemporaryGuestConversationList;
-
-registerStaticReactComponent('temporary-guest-conversation-list', TemporaryGuestConversationList);
+export default ConversationList;

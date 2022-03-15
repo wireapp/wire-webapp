@@ -20,7 +20,7 @@
             #include('list/takeover.htm')
           <!-- /ko -->
           <!-- ko if: modal() === ModalType.TEMPORARY_GUEST -->
-            <temporary-guest-conversation-list params="listViewModel: $root, callingViewModel: $root.callingViewModel, selfUser: $root.selfUser"></temporary-guest-conversation-list>
+            <temporary-guest params="listViewModel: $root, selfUser: $root.selfUser"></temporary-guest>
           <!-- /ko -->
         <!-- /ko -->
       </div>
