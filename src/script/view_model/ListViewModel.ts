@@ -353,9 +353,6 @@ export class ListViewModel {
 
   private readonly updateList = (newListState: string, respectLastState: boolean): void => {
     switch (newListState) {
-      case ListViewModel.STATE.ARCHIVE:
-        this.archive.updateList();
-        break;
       case ListViewModel.STATE.START_UI:
         this.start.updateList();
         break;
