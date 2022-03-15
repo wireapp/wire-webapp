@@ -23,8 +23,8 @@ import {t} from 'Util/LocalizerUtil';
 import {Runtime} from '@wireapp/commons';
 import Icon from 'Components/Icon';
 import {registerStaticReactComponent, useKoSubscribableChildren} from 'Util/ComponentUtil';
-import {ListViewModel} from '../../view_model/ListViewModel';
-import {ContentViewModel} from '../../view_model/ContentViewModel';
+import {ListViewModel} from '../../../view_model/ListViewModel';
+import {ContentViewModel} from '../../../view_model/ContentViewModel';
 import LeftListWrapper from 'Components/list/LeftListWrapper';
 
 type PreferencesProps = {

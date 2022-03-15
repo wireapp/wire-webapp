@@ -81,7 +81,7 @@ export class ListViewModel {
   private readonly callingRepository: CallingRepository;
   private readonly teamRepository: TeamRepository;
   private readonly actionsViewModel: ActionsViewModel;
-  private readonly contentViewModel: ContentViewModel;
+  public readonly contentViewModel: ContentViewModel;
   private readonly panelViewModel: PanelViewModel;
   private readonly isProAccount: ko.PureComputed<boolean>;
   private readonly selfUser: ko.Observable<User>;

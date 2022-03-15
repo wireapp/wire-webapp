@@ -25,16 +25,16 @@ import {t} from 'Util/LocalizerUtil';
 import {registerStaticReactComponent, useKoSubscribableChildren} from 'Util/ComponentUtil';
 import LeftListWrapper from 'Components/list/LeftListWrapper';
 import ConversationListCell from 'Components/list/ConversationListCell';
-import {Conversation} from '../../entity/Conversation';
-import {ListViewModel} from '../../view_model/ListViewModel';
-import {ConversationState} from '../../conversation/ConversationState';
+import {Conversation} from '../../../entity/Conversation';
+import {ListViewModel} from '../../../view_model/ListViewModel';
+import {ConversationState} from '../../../conversation/ConversationState';
 import {container} from 'tsyringe';
-import {ConversationRepository} from '../../conversation/ConversationRepository';
+import {ConversationRepository} from '../../../conversation/ConversationRepository';
 
 type ArchiveListProps = {
   answerCall: (conversation: Conversation) => void;
   conversationRepository: ConversationRepository;
-  conversationState: ConversationState;
+  conversationState?: ConversationState;
   listViewModel: ListViewModel;
 };
 

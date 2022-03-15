@@ -9,9 +9,8 @@
         <!-- ko if: webappLoaded -->
           #include('list/background.htm')
           <!-- ko ifnot: modal() -->
-            <archive-list params="listViewModel: $root, conversationRepository: conversationRepository, answerCall: answerCall"></archive-list>
+            <left-sidebar params="listViewModel: $root, conversationRepository: conversationRepository"></left-sidebar>
             #include('list/conversations.htm')
-            <preferences params="listViewModel: $root, contentViewModel: $root.contentViewModel"></preferences>
             #include('list/start-ui.htm')
           <!-- /ko -->
           <!-- ko if: modal() === ModalType.TAKEOVER -->

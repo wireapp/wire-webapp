@@ -36,3 +36,26 @@
   transition-timing-function: @ease-in-expo;
   visibility: hidden;
 }
+
+.fade-in-out {
+  &-enter {
+    opacity: 0;
+    transform: translateY(88px);
+    transition: all 500ms @ease-out-expo @animation-timing-fast;
+
+    &&-active {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  &-exit {
+    opacity: 1;
+    transform: translateY(0);
+    transition: all 300ms @ease-in-expo;
+
+    &&-active {
+      opacity: 0;
+      transform: translateY(88px);
+    }
+  }
+}
