@@ -31,7 +31,6 @@ import {isEscapeKey} from 'Util/KeyboardUtil';
 import {ConversationListViewModel} from './list/ConversationListViewModel';
 import {StartUIViewModel} from './list/StartUIViewModel';
 import {TakeoverViewModel} from './list/TakeoverViewModel';
-import {TemporaryGuestViewModel} from './list/TemporaryGuestViewModel';
 
 import {showContextMenu} from '../ui/ContextMenu';
 import {showLabelContextMenu} from '../ui/LabelContextMenu';
@@ -68,7 +67,6 @@ export class ListViewModel {
   private readonly conversationState: ConversationState;
 
   readonly takeover: TakeoverViewModel;
-  readonly temporaryGuest: TemporaryGuestViewModel;
   readonly ModalType: typeof ListViewModel.MODAL_TYPE;
   readonly isActivatedAccount: ko.PureComputed<boolean>;
   readonly webappLoaded: ko.Observable<boolean>;
@@ -179,7 +177,6 @@ export class ListViewModel {
       repositories.user,
     );
     this.takeover = new TakeoverViewModel(this, repositories.user, repositories.conversation);
-    this.temporaryGuest = new TemporaryGuestViewModel(this, mainViewModel, repositories.calling, repositories.team);
 
     this._initSubscriptions();
 
