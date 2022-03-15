@@ -67,7 +67,6 @@ import {
 } from '../notification/PreferenceNotificationRepository';
 import {modals} from '../view_model/ModalsViewModel';
 import {MessageRepository} from '../conversation/MessageRepository';
-import {Core} from '../service/CoreSingleton';
 
 interface ShowConversationOptions {
   exposeMessage?: Message;
@@ -98,7 +97,7 @@ export class ContentViewModel {
   inviteModal: InviteModalViewModel;
   legalHoldModal: LegalHoldModalViewModel;
   logger: Logger;
-  isFederated?: boolean;
+  readonly isFederated?: boolean;
   mainViewModel: MainViewModel;
   messageList: MessageListViewModel;
   previousConversation: Conversation | null = null;
@@ -138,7 +137,7 @@ export class ContentViewModel {
     this.conversationRepository = repositories.conversation;
     this.userRepository = repositories.user;
     this.messageRepository = repositories.message;
-    this.isFederated = container.resolve(Core).backendFeatures.isFederated;
+    this.isFederated = mainViewModel.isFederated;
     this.logger = getLogger('ContentViewModel');
     this.State = ContentViewModel.STATE;
 
