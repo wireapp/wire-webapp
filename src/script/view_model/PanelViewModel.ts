@@ -68,6 +68,7 @@ export class PanelViewModel {
   subViews: Record<string, BasePanelViewModel>;
   STATE: Record<string, string>;
   currentEntity: PanelEntity;
+  readonly isFederated: boolean;
 
   static get STATE() {
     return {
@@ -134,6 +135,7 @@ export class PanelViewModel {
     this.elementId = 'right-column';
     this.repositories = repositories;
     this.mainViewModel = mainViewModel;
+    this.isFederated = mainViewModel.isFederated;
 
     this.conversationEntity = conversationState.activeConversation;
     this.stateHistory = [];
