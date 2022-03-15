@@ -51,6 +51,8 @@ import type {User} from '../entity/User';
 import {UserState} from '../user/UserState';
 import {TeamState} from '../team/TeamState';
 import {ConversationState} from '../conversation/ConversationState';
+import '../page/temporary-guest/ConversationList';
+import {CallingViewModel} from './CallingViewModel';
 
 export enum ListState {
   ARCHIVE = 'ListViewModel.STATE.ARCHIVE',
@@ -80,6 +82,7 @@ export class ListViewModel {
   private readonly teamRepository: TeamRepository;
   private readonly actionsViewModel: ActionsViewModel;
   public readonly contentViewModel: ContentViewModel;
+  public readonly callingViewModel: CallingViewModel;
   private readonly panelViewModel: PanelViewModel;
   private readonly isProAccount: ko.PureComputed<boolean>;
   public readonly selfUser: ko.Observable<User>;
@@ -119,6 +122,7 @@ export class ListViewModel {
     this.actionsViewModel = mainViewModel.actions;
     this.contentViewModel = mainViewModel.content;
     this.panelViewModel = mainViewModel.panel;
+    this.callingViewModel = mainViewModel.calling;
 
     this.isActivatedAccount = this.userState.isActivatedAccount;
     this.isProAccount = this.teamState.isTeam;
