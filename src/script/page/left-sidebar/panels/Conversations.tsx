@@ -324,34 +324,27 @@ const Conversations: React.FC<ConversationsProps> = ({
 
   return (
     <ListWrapper id={'conversations'} headerElement={header} footer={footer} before={callingView}>
-      <ConversationsList
-        callState={callState}
-        conversations={conversations}
-        viewStyle={viewStyle}
-        listViewModel={listViewModel}
-        conversationState={conversationState}
-        conversationRepository={conversationRepository}
-      />
-      {/*
-  <!-- ko using: callingViewModel -->
-    <!-- ko foreach: {data: activeCalls, as: 'activeCall', noChildContext: true} -->
-    <!-- /ko -->
-  <!-- /ko -->
-
-  <div className="left-list-center">
-    <!-- ko if: noConversations() -->
-      <!-- ko if: archivedConversations().length === 0 -->
-      <div className="conversations-hint" data-uie-name="status-start-conversation-hint">
-        <div className="conversations-hint-text" data-bind="text: t('conversationsNoConversations')"></div>
-        <arrow-down-long-icon className="conversations-hint-arrow"></arrow-down-long-icon>
-      </div>
-      <!-- /ko -->
-      <!-- ko if: archivedConversations().length > 0 -->
-      <div className="conversations-all-archived" data-bind="text: t('conversationsAllArchived')"></div>
-      <!-- /ko -->
-    <!-- /ko -->
-  </div>
-  */}
+      {hasNoConversations ? (
+        <>
+          {archivedConversations.length === 0 ? (
+            <div className="conversations-hint" data-uie-name="status-start-conversation-hint">
+              <div className="conversations-hint-text">{t('conversationsNoConversations')}</div>
+              <Icon.ArrowDownLong className="conversations-hint-arrow" />
+            </div>
+          ) : (
+            <div className="conversations-all-archived">{t('conversationsAllArchived')}</div>
+          )}
+        </>
+      ) : (
+        <ConversationsList
+          callState={callState}
+          conversations={conversations}
+          viewStyle={viewStyle}
+          listViewModel={listViewModel}
+          conversationState={conversationState}
+          conversationRepository={conversationRepository}
+        />
+      )}
     </ListWrapper>
   );
 };

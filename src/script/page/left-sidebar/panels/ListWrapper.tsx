@@ -38,6 +38,7 @@ type LeftListWrapperProps = {
 };
 
 const scrollStyle = css`
+  position: relative;
   flex: 1 1 auto;
   overflow-x: hidden;
   overflow-y: scroll;
