@@ -37,6 +37,7 @@ import Avatar from 'Components/Avatar';
 import GroupAvatar from 'Components/avatar/GroupAvatar';
 import AvailabilityState from 'Components/AvailabilityState';
 import Icon from 'Components/Icon';
+import {KEY} from 'Util/KeyboardUtil';
 
 export interface ConversationListCellProps {
   conversation: Conversation;
@@ -115,14 +116,23 @@ const ConversationListCell: React.FC<ConversationListCellProps> = ({
     onJoinCall(conversation, MediaType.AUDIO);
   };
 
+  const handleKeyPress = (event: React.KeyboardEvent) => {
+    if (event.key === KEY.SPACE || event.key === KEY.ENTER) {
+      onClick(event as unknown as React.MouseEvent<Element, MouseEvent>);
+    }
+  };
+
   return (
     <div
       ref={setViewportElementRef}
       data-uie-name={dataUieName}
       data-uie-uid={conversation.id}
       data-uie-value={displayName}
+      role="button"
+      tabIndex={0}
       className={cx('conversation-list-cell', {'conversation-list-cell-active': isSelected})}
       onClick={onClick}
+      onKeyPress={handleKeyPress}
     >
       {isInViewport && (
         <>
@@ -162,7 +172,7 @@ const ConversationListCell: React.FC<ConversationListCellProps> = ({
                 event.stopPropagation();
                 rightClick(conversation, event.nativeEvent);
               }}
-            ></span>
+            />
             {!showJoinButton && (
               <>
                 {cellState.icon === ConversationStatusIcon.PENDING_CONNECTION && (

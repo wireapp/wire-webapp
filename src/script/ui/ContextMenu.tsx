@@ -72,7 +72,9 @@ const ContextMenu: React.FC<ContextMenuProps> = ({entries, defaultIdentifier = '
 
   useEffect(() => {
     if (selected) {
-      const selectedButton = document.querySelector(`#${selected.label.toLowerCase()}-button`) as HTMLButtonElement;
+      const selectedButton = document.querySelector(
+        `#${selected.label.split(' ').join('_').toLowerCase()}-button`,
+      ) as HTMLButtonElement;
       selectedButton.focus();
     }
   }, [selected]);
@@ -139,7 +141,7 @@ const ContextMenu: React.FC<ContextMenuProps> = ({entries, defaultIdentifier = '
             })}
           >
             <button
-              id={`${entry.label.toLowerCase()}-button`}
+              id={`${entry.label.split(' ').join('_').toLowerCase()}-button`}
               className="ctx-menu__button"
               data-uie-name={entry.identifier || defaultIdentifier}
               title={entry.title || entry.label}
