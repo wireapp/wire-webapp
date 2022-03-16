@@ -28,6 +28,8 @@ import useEffectRef from 'Util/useEffectRef';
 import {useFadingScrollbar} from '../../../ui/fadingScrollbar';
 
 type LeftListWrapperProps = {
+  /** A react element that will be inserted after the header but before the list */
+  before?: ReactElement;
   footer?: ReactElement;
   header?: string;
   headerElement?: ReactElement;
@@ -49,7 +51,15 @@ const style = css`
   height: 100%;
 `;
 
-const ListWrapper: React.FC<LeftListWrapperProps> = ({id, header, headerElement, onClose, children, footer}) => {
+const ListWrapper: React.FC<LeftListWrapperProps> = ({
+  id,
+  header,
+  headerElement,
+  onClose,
+  children,
+  footer,
+  before,
+}) => {
   const [scrollbarRef, setScrollbarRef] = useEffectRef<HTMLDivElement>();
   useFadingScrollbar(scrollbarRef);
 
@@ -96,6 +106,7 @@ const ListWrapper: React.FC<LeftListWrapperProps> = ({id, header, headerElement,
           </>
         )}
       </div>
+      {before ?? null}
       <div css={scrollStyle} ref={setScrollbarRef}>
         {children}
       </div>

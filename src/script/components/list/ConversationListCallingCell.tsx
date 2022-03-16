@@ -30,7 +30,7 @@ import GroupVideoGrid from 'Components/calling/GroupVideoGrid';
 import Icon from 'Components/Icon';
 import ParticipantItem from 'Components/list/ParticipantItem';
 import Duration from 'Components/calling/Duration';
-import {registerReactComponent, useKoSubscribableChildren} from 'Util/ComponentUtil';
+import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 import {sortUsersByPriority} from 'Util/StringUtil';
 import useEffectRef from 'Util/useEffectRef';
@@ -454,19 +454,3 @@ const ConversationListCallingCell: React.FC<CallingCellProps> = ({
 };
 
 export default ConversationListCallingCell;
-
-registerReactComponent('conversation-list-calling-cell', {
-  component: ConversationListCallingCell,
-  template: `<div data-bind="react: {
-    call,
-    callActions,
-    callingRepository,
-    classifiedDomains: ko.unwrap(classifiedDomains),
-    conversation: ko.unwrap(conversation),
-    hasAccessToCamera: ko.unwrap(hasAccessToCamera),
-    isSelfVerified: ko.unwrap(isSelfVerified),
-    multitasking,
-    temporaryUserStyle,
-  }"></div>
-    `,
-});

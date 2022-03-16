@@ -126,7 +126,7 @@ const ConversationsList: React.FC<{
     );
 
   return (
-    <ul css={css({paddingLeft: 0, position: 'relative'})}>
+    <ul css={css({paddingLeft: 0})}>
       {/*
       <!-- ko if: showConnectRequests() -->
       <li
@@ -237,50 +237,65 @@ const Conversations: React.FC<ConversationsProps> = ({
 
   const footer = (
     <div className="conversations-footer">
-      <button
-        type="button"
-        className="button-icon-large"
-        onClick={() => switchList(ListState.START_UI)}
-        title={t('tooltipConversationsStart', Shortcut.getShortcutTooltip(ShortcutType.START))}
-        data-uie-name="go-people"
-      >
-        <Icon.People />
-      </button>
-      <button
-        type="button"
-        className={`button-icon-large ${viewStyle === ConverationViewStyle.RECENT ? 'accent-fill' : ''}`}
-        onClick={() => setViewStyle(ConverationViewStyle.RECENT)}
-        title={t('conversationViewTooltip')}
-        data-uie-name="go-recent-view"
-        data-uie-status={viewStyle === ConverationViewStyle.RECENT ? 'active' : 'inactive'}
-      >
-        <Icon.ConversationsRecent />
-      </button>
-      <button
-        type="button"
-        className={`button-icon-large ${viewStyle === ConverationViewStyle.FOLDER ? 'accent-fill' : ''}`}
-        onClick={() => setViewStyle(ConverationViewStyle.FOLDER)}
-        title={t('folderViewTooltip')}
-        data-uie-name="go-folder-view"
-        data-uie-status={viewStyle === ConverationViewStyle.FOLDER ? 'active' : 'inactive'}
-      >
-        <Icon.ConversationsFolder />
-      </button>
-      {archivedConversations.length > 0 && (
-        <button
-          type="button"
-          className="button-icon-large"
-          onClick={() => switchList(ListState.ARCHIVE)}
-          title={t('tooltipConversationsArchived', archivedConversations.length)}
-        >
-          <Icon.Archive />
-        </button>
-      )}
+      <ul className="conversations-footer-list">
+        <li className="conversations-footer-list-item">
+          <button
+            type="button"
+            className="button-icon-large"
+            tabIndex={0}
+            onClick={() => switchList(ListState.START_UI)}
+            title={t('tooltipConversationsStart', Shortcut.getShortcutTooltip(ShortcutType.START))}
+            data-uie-name="go-people"
+          >
+            <Icon.People />
+          </button>
+        </li>
+
+        <li className="conversations-footer-list-item">
+          <button
+            type="button"
+            tabIndex={0}
+            className={`button-icon-large ${viewStyle === ConverationViewStyle.RECENT ? 'accent-fill' : ''}`}
+            onClick={() => setViewStyle(ConverationViewStyle.RECENT)}
+            title={t('conversationViewTooltip')}
+            data-uie-name="go-recent-view"
+            data-uie-status={viewStyle === ConverationViewStyle.RECENT ? 'active' : 'inactive'}
+          >
+            <Icon.ConversationsRecent />
+          </button>
+        </li>
+        <li className="conversations-footer-list-item">
+          <button
+            type="button"
+            tabIndex={0}
+            className={`button-icon-large ${viewStyle === ConverationViewStyle.FOLDER ? 'accent-fill' : ''}`}
+            onClick={() => setViewStyle(ConverationViewStyle.FOLDER)}
+            title={t('folderViewTooltip')}
+            data-uie-name="go-folder-view"
+            data-uie-status={viewStyle === ConverationViewStyle.FOLDER ? 'active' : 'inactive'}
+          >
+            <Icon.ConversationsFolder />
+          </button>
+        </li>
+        {archivedConversations.length > 0 && (
+          <li className="conversations-footer-list-item">
+            <button
+              type="button"
+              tabIndex={0}
+              className="button-icon-large"
+              onClick={() => switchList(ListState.ARCHIVE)}
+              title={t('tooltipConversationsArchived', archivedConversations.length)}
+            >
+              <Icon.Archive />
+            </button>
+          </li>
+        )}
+      </ul>
     </div>
   );
 
-  return (
-    <ListWrapper id={'conversations'} headerElement={header} footer={footer}>
+  const callingView = (
+    <>
       {activeCalls
         .filter(call => !call.reason())
         .map(call => {
@@ -288,22 +303,27 @@ const Conversations: React.FC<ConversationsProps> = ({
           const callingViewModel = listViewModel.callingViewModel;
           const callingRepository = callingViewModel.callingRepository;
           return (
-            <ConversationListCallingCell
-              key={conversation.id}
-              data-uie-name="item-call"
-              data-uie-id={conversation.id}
-              data-uie-value={conversation.display_name()}
-              call={call}
-              callActions={callingViewModel.callActions}
-              callingRepository={callingRepository}
-              conversation={conversation}
-              hasAccessToCamera={false}
-              isSelfVerified={false}
-              multitasking={callingViewModel.multitasking}
-            />
+            <div className="calling-cell" key={conversation.id}>
+              <ConversationListCallingCell
+                data-uie-name="item-call"
+                data-uie-id={conversation.id}
+                data-uie-value={conversation.display_name()}
+                call={call}
+                callActions={callingViewModel.callActions}
+                callingRepository={callingRepository}
+                conversation={conversation}
+                hasAccessToCamera={callingViewModel.hasAccessToCamera()}
+                isSelfVerified={selfUser.is_verified()}
+                multitasking={callingViewModel.multitasking}
+              />
+            </div>
           );
         })}
+    </>
+  );
 
+  return (
+    <ListWrapper id={'conversations'} headerElement={header} footer={footer} before={callingView}>
       <ConversationsList
         callState={callState}
         conversations={conversations}
