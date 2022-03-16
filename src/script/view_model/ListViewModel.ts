@@ -91,7 +91,6 @@ export class ListViewModel {
   static get MODAL_TYPE() {
     return {
       TAKEOVER: 'ListViewModel.MODAL_TYPE.TAKEOVER',
-      TEMPORARY_GUEST: 'ListViewModal.MODAL_TYPE.TEMPORARY_GUEST',
     };
   }
 
@@ -370,7 +369,6 @@ export class ListViewModel {
 
   readonly showTemporaryGuest = (): void => {
     this.switchList(ListViewModel.STATE.TEMPORARY_GUEST);
-    this.modal(ListViewModel.MODAL_TYPE.TEMPORARY_GUEST);
     const conversationEntity = this.conversationRepository.getMostRecentConversation();
     amplify.publish(WebAppEvents.CONVERSATION.SHOW, conversationEntity, {});
   };

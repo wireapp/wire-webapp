@@ -47,9 +47,7 @@ const TemporaryGuestConversations: React.FC<TemporaryGuestConversations> = ({
     'expirationIsUrgent',
     'expirationRemainingText',
   ]);
-  const {state} = useKoSubscribableChildren(listViewModel, ['state']);
 
-  const isVisible = state === ListViewModel.STATE.TEMPORARY_GUEST;
   const {activeCalls} = useKoSubscribableChildren(callingViewModel, ['activeCalls']);
   const isAccountCreationEnabled = Config.getConfig().FEATURE.ENABLE_ACCOUNT_REGISTRATION;
   const getConversationById = (conversationId: QualifiedId) => callingViewModel.getConversationById(conversationId);
@@ -98,7 +96,12 @@ const TemporaryGuestConversations: React.FC<TemporaryGuestConversations> = ({
         <Icon.LogoFull />
         <div className="temporary-guest__description">{t('temporaryGuestDescription')}</div>
         {isAccountCreationEnabled && (
-          <button className="temporary-guest__create-account" onClick={createAccount} data-uie-name="do-create-account">
+          <button
+            type="button"
+            className="temporary-guest__create-account"
+            onClick={createAccount}
+            data-uie-name="do-create-account"
+          >
             {t('temporaryGuestCta')}
           </button>
         )}
