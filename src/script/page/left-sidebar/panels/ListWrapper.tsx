@@ -23,12 +23,11 @@ import {css} from '@emotion/core';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {throttle} from 'underscore';
 import {isScrollable, isScrolledBottom, isScrolledTop} from 'Util/scroll-helpers';
-import {ListState, ListViewModel} from '../../view_model/ListViewModel';
-import {Transition} from 'react-transition-group';
+import {ListState, ListViewModel} from '../../../view_model/ListViewModel';
 import Icon from 'Components/Icon';
 import {t} from 'Util/LocalizerUtil';
 import useEffectRef from 'Util/useEffectRef';
-import {useFadingScrollbar} from '../../ui/fadingScrollbar';
+import {useFadingScrollbar} from '../../../ui/fadingScrollbar';
 
 type LeftListWrapperProps = {
   header: string;
@@ -38,14 +37,22 @@ type LeftListWrapperProps = {
   openState: ListState;
 };
 
-const style = css`
+const scrollStyle = css`
   position: relative;
   flex: 1 1 auto;
   overflow-x: hidden;
   overflow-y: scroll;
 `;
 
-const LeftListWrapper: React.FC<LeftListWrapperProps> = ({listViewModel, openState, id, header, onClose, children}) => {
+const style = css`
+  position: absolute;
+  top: 0;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+`;
+
+const ListWrapper: React.FC<LeftListWrapperProps> = ({listViewModel, openState, id, header, onClose, children}) => {
   const {state: listState} = useKoSubscribableChildren(listViewModel, ['state']);
   const [scrollbarRef, setScrollbarRef] = useEffectRef<HTMLDivElement>();
   useFadingScrollbar(scrollbarRef);
@@ -76,30 +83,24 @@ const LeftListWrapper: React.FC<LeftListWrapperProps> = ({listViewModel, openSta
   const isVisible = listState === openState;
 
   return (
-    <Transition in={isVisible} timeout={300}>
-      <div
-        id={id}
-        className={`left-list left-list-${id} ${isVisible && 'left-list-is-visible'}`}
-        aria-hidden={isVisible ? 'false' : 'true'}
-      >
-        <div className="left-list-header">
-          <span className="left-list-header-text">{header}</span>
-          <button
-            type="button"
-            className="left-list-header-close-button button-icon-large"
-            onClick={onClose}
-            title={t('tooltipSearchClose')}
-            data-uie-name="do-close-preferences"
-          >
-            <Icon.Close />
-          </button>
-        </div>
-        <div css={style} ref={setScrollbarRef}>
-          {children}
-        </div>
+    <div id={id} className={`left-list-${id}`} css={style} aria-hidden={isVisible ? 'false' : 'true'}>
+      <div className="left-list-header">
+        <span className="left-list-header-text">{header}</span>
+        <button
+          type="button"
+          className="left-list-header-close-button button-icon-large"
+          onClick={onClose}
+          title={t('tooltipSearchClose')}
+          data-uie-name="do-close-preferences"
+        >
+          <Icon.Close />
+        </button>
       </div>
-    </Transition>
+      <div css={scrollStyle} ref={setScrollbarRef}>
+        {children}
+      </div>
+    </div>
   );
 };
 
-export default LeftListWrapper;
+export default ListWrapper;

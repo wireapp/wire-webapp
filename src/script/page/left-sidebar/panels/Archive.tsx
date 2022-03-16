@@ -22,49 +22,47 @@ import React from 'react';
 import {amplify} from 'amplify';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import {t} from 'Util/LocalizerUtil';
-import {registerStaticReactComponent, useKoSubscribableChildren} from 'Util/ComponentUtil';
-import LeftListWrapper from 'Components/list/LeftListWrapper';
+import {useKoSubscribableChildren} from 'Util/ComponentUtil';
+import ListWrapper from './ListWrapper';
 import ConversationListCell from 'Components/list/ConversationListCell';
-import {Conversation} from '../../entity/Conversation';
-import {ListViewModel} from '../../view_model/ListViewModel';
-import {ConversationState} from '../../conversation/ConversationState';
+import {Conversation} from '../../../entity/Conversation';
+import {ListViewModel} from '../../../view_model/ListViewModel';
+import {ConversationState} from '../../../conversation/ConversationState';
 import {container} from 'tsyringe';
-import {ConversationRepository} from '../../conversation/ConversationRepository';
+import {ConversationRepository} from '../../../conversation/ConversationRepository';
 
-type ArchiveListProps = {
+type ArchiveProps = {
   answerCall: (conversation: Conversation) => void;
   conversationRepository: ConversationRepository;
-  conversationState: ConversationState;
+  conversationState?: ConversationState;
   listViewModel: ListViewModel;
+  onClose: () => void;
 };
 
-const ArchiveList: React.FC<ArchiveListProps> = ({
+const Archive: React.FC<ArchiveProps> = ({
   listViewModel,
   conversationRepository,
   answerCall,
+  onClose,
   conversationState = container.resolve(ConversationState),
 }) => {
   const {conversations_archived: conversations} = useKoSubscribableChildren(conversationState, [
     'conversations_archived',
   ]);
 
-  const close = () => {
-    listViewModel.switchList(ListViewModel.STATE.CONVERSATIONS);
-  };
-
   const onClickConversation = async (conversation: Conversation) => {
     await conversationRepository.unarchiveConversation(conversation, true, 'opened conversation from archive');
-    close();
+    onClose();
     amplify.publish(WebAppEvents.CONVERSATION.SHOW, conversation, {});
   };
 
   return (
-    <LeftListWrapper
+    <ListWrapper
       listViewModel={listViewModel}
       openState={ListViewModel.STATE.ARCHIVE}
       id="archive"
       header={t('archiveHeader')}
-      onClose={close}
+      onClose={onClose}
     >
       <ul className="left-list-items no-scroll">
         {conversations.map((conversation, index) => (
@@ -81,10 +79,8 @@ const ArchiveList: React.FC<ArchiveListProps> = ({
           </li>
         ))}
       </ul>
-    </LeftListWrapper>
+    </ListWrapper>
   );
 };
 
-export default ArchiveList;
-
-registerStaticReactComponent('archive-list', ArchiveList);
+export default Archive;
