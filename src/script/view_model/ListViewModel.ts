@@ -48,7 +48,6 @@ import type {TeamRepository} from '../team/TeamRepository';
 import type {ActionsViewModel} from './ActionsViewModel';
 import type {Conversation} from '../entity/Conversation';
 import type {User} from '../entity/User';
-import type {AssetRemoteData} from '../assets/AssetRemoteData';
 import {UserState} from '../user/UserState';
 import {TeamState} from '../team/TeamState';
 import {ConversationState} from '../conversation/ConversationState';
@@ -68,7 +67,6 @@ export class ListViewModel {
 
   readonly takeover: TakeoverViewModel;
   readonly temporaryGuest: TemporaryGuestViewModel;
-  readonly selfUserPicture: ko.PureComputed<AssetRemoteData | void>;
   readonly ModalType: typeof ListViewModel.MODAL_TYPE;
   readonly isActivatedAccount: ko.PureComputed<boolean>;
   readonly webappLoaded: ko.Observable<boolean>;
@@ -133,12 +131,6 @@ export class ListViewModel {
     this.lastUpdate = ko.observable();
     this.modal = ko.observable();
     this.webappLoaded = ko.observable(false);
-
-    this.selfUserPicture = ko.pureComputed((): AssetRemoteData | void => {
-      if (this.webappLoaded() && this.selfUser()) {
-        return this.selfUser().mediumPictureResource();
-      }
-    });
 
     this.visibleListItems = ko.pureComputed(() => {
       const isStatePreferences = this.state() === ListViewModel.STATE.PREFERENCES;

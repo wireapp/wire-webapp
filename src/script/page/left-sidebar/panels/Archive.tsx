@@ -36,25 +36,23 @@ type ArchiveProps = {
   conversationRepository: ConversationRepository;
   conversationState?: ConversationState;
   listViewModel: ListViewModel;
+  onClose: () => void;
 };
 
 const Archive: React.FC<ArchiveProps> = ({
   listViewModel,
   conversationRepository,
   answerCall,
+  onClose,
   conversationState = container.resolve(ConversationState),
 }) => {
   const {conversations_archived: conversations} = useKoSubscribableChildren(conversationState, [
     'conversations_archived',
   ]);
 
-  const close = () => {
-    listViewModel.switchList(ListViewModel.STATE.CONVERSATIONS);
-  };
-
   const onClickConversation = async (conversation: Conversation) => {
     await conversationRepository.unarchiveConversation(conversation, true, 'opened conversation from archive');
-    close();
+    onClose();
     amplify.publish(WebAppEvents.CONVERSATION.SHOW, conversation, {});
   };
 
@@ -64,7 +62,7 @@ const Archive: React.FC<ArchiveProps> = ({
       openState={ListViewModel.STATE.ARCHIVE}
       id="archive"
       header={t('archiveHeader')}
-      onClose={close}
+      onClose={onClose}
     >
       <ul className="left-list-items no-scroll">
         {conversations.map((conversation, index) => (

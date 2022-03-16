@@ -24,11 +24,15 @@ import {registerStaticReactComponent, useKoSubscribableChildren} from 'Util/Comp
 import {ListViewModel, ListState} from '../../view_model/ListViewModel';
 import {User} from '../../entity/User';
 import {ConversationRepository} from '../../conversation/ConversationRepository';
+import {AssetRepository} from '../../assets/AssetRepository';
 
 import Preferences from './panels/Preferences';
 import Archive from './panels/Archive';
+import Background from './Background';
+import {container} from 'tsyringe';
 
 type PreferencesProps = {
+  assetRepository?: AssetRepository;
   conversationRepository: ConversationRepository;
   listViewModel: ListViewModel;
   selfUser: User;
@@ -41,16 +45,27 @@ const Animated: React.FC = ({children, ...rest}) => {
   );
 };
 
-const LeftSidebar: React.FC<PreferencesProps> = ({listViewModel, conversationRepository, selfUser}) => {
+const LeftSidebar: React.FC<PreferencesProps> = ({
+  listViewModel,
+  conversationRepository,
+  assetRepository = container.resolve(AssetRepository),
+  selfUser,
+}) => {
   const {state} = useKoSubscribableChildren(listViewModel, ['state']);
   let content = <></>;
+  const goHome = () => {
+    return selfUser.isTemporaryGuest()
+      ? listViewModel.switchList(ListViewModel.STATE.TEMPORARY_GUEST)
+      : listViewModel.switchList(ListViewModel.STATE.CONVERSATIONS);
+  };
+
   switch (state) {
     case ListState.PREFERENCES:
       content = (
         <Preferences
           contentViewModel={listViewModel.contentViewModel}
           listViewModel={listViewModel}
-          isTemporaryGuest={selfUser.isTemporaryGuest()}
+          onClose={goHome}
         ></Preferences>
       );
       break;
@@ -61,13 +76,17 @@ const LeftSidebar: React.FC<PreferencesProps> = ({listViewModel, conversationRep
           answerCall={listViewModel.answerCall}
           conversationRepository={conversationRepository}
           listViewModel={listViewModel}
+          onClose={goHome}
         ></Archive>
       );
   }
   return (
-    <TransitionGroup>
-      <Animated key={state}>{content}</Animated>
-    </TransitionGroup>
+    <>
+      <Background selfUser={selfUser} assetRepository={assetRepository} />
+      <TransitionGroup>
+        <Animated key={state}>{content}</Animated>
+      </TransitionGroup>
+    </>
   );
 };
 

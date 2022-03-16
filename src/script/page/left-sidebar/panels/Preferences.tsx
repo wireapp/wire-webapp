@@ -31,6 +31,7 @@ type PreferencesProps = {
   contentViewModel: ContentViewModel;
   isTemporaryGuest?: boolean;
   listViewModel: ListViewModel;
+  onClose: () => void;
 };
 
 const PreferenceItem: React.FC<{
@@ -57,17 +58,11 @@ const PreferenceItem: React.FC<{
   );
 };
 
-const Preferences: React.FC<PreferencesProps> = ({listViewModel, contentViewModel, isTemporaryGuest}) => {
+const Preferences: React.FC<PreferencesProps> = ({listViewModel, contentViewModel, onClose}) => {
   const {state: contentState} = useKoSubscribableChildren(contentViewModel, ['state']);
 
   const isDesktop = Runtime.isDesktopApp();
   const supportsCalling = Runtime.isSupportingLegacyCalling();
-
-  const close = () => {
-    return isTemporaryGuest
-      ? listViewModel.showTemporaryGuest()
-      : listViewModel.switchList(ListViewModel.STATE.CONVERSATIONS);
-  };
 
   const items = [
     {
@@ -110,7 +105,7 @@ const Preferences: React.FC<PreferencesProps> = ({listViewModel, contentViewMode
       openState={ListViewModel.STATE.PREFERENCES}
       id="preferences"
       header={t('preferencesHeadline')}
-      onClose={close}
+      onClose={onClose}
     >
       <ul className="left-list-items no-scroll preferences-list-items">
         {items

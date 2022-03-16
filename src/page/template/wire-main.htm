@@ -7,8 +7,11 @@
     <div id="app" class="app">
       <div id="left-column" class="left-column" data-bind="css: {'left-column--light-theme': !isActivatedAccount()}">
         <!-- ko if: webappLoaded -->
-          #include('list/background.htm')
-          <left-sidebar params="listViewModel: $root, conversationRepository: conversationRepository, selfUser: selfUser"></left-sidebar>
+          <left-sidebar params="
+            listViewModel: $root,
+            conversationRepository: conversationRepository,
+            selfUser: selfUser,
+          "></left-sidebar>
           <!-- ko ifnot: modal() -->
             #include('list/conversations.htm')
             #include('list/start-ui.htm')
