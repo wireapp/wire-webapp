@@ -28,7 +28,6 @@ import {t} from 'Util/LocalizerUtil';
 import {iterateItem} from 'Util/ArrayUtil';
 import {isEscapeKey} from 'Util/KeyboardUtil';
 
-import {ArchiveViewModel} from './list/ArchiveViewModel';
 import {ConversationListViewModel} from './list/ConversationListViewModel';
 import {StartUIViewModel} from './list/StartUIViewModel';
 import {TakeoverViewModel} from './list/TakeoverViewModel';
@@ -53,6 +52,14 @@ import type {AssetRemoteData} from '../assets/AssetRemoteData';
 import {UserState} from '../user/UserState';
 import {TeamState} from '../team/TeamState';
 import {ConversationState} from '../conversation/ConversationState';
+
+export enum ListState {
+  ARCHIVE = 'ListViewModel.STATE.ARCHIVE',
+  CONVERSATIONS = 'ListViewModel.STATE.CONVERSATIONS',
+  PREFERENCES = 'ListViewModel.STATE.PREFERENCES',
+  START_UI = 'ListViewModel.STATE.START_UI',
+  TEMPORARY_GUEST = 'ListViewModel.STATE.TEMPORARY_GUEST',
+}
 
 export class ListViewModel {
   private readonly userState: UserState;
@@ -80,7 +87,6 @@ export class ListViewModel {
   private readonly selfUser: ko.Observable<User>;
   private readonly modal: ko.Observable<string>;
   private readonly visibleListItems: ko.PureComputed<(string | Conversation)[]>;
-  private readonly archive: ArchiveViewModel;
   private readonly conversations: ConversationListViewModel;
   private readonly start: StartUIViewModel;
 
@@ -93,11 +99,11 @@ export class ListViewModel {
 
   static get STATE() {
     return {
-      ARCHIVE: 'ListViewModel.STATE.ARCHIVE',
-      CONVERSATIONS: 'ListViewModel.STATE.CONVERSATIONS',
-      PREFERENCES: 'ListViewModel.STATE.PREFERENCES',
-      START_UI: 'ListViewModel.STATE.START_UI',
-      TEMPORARY_GUEST: 'ListViewModel.STATE.TEMPORARY_GUEST',
+      ARCHIVE: ListState.ARCHIVE,
+      CONVERSATIONS: ListState.CONVERSATIONS,
+      PREFERENCES: ListState.PREFERENCES,
+      START_UI: ListState.START_UI,
+      TEMPORARY_GUEST: ListState.TEMPORARY_GUEST,
     };
   }
 
@@ -157,7 +163,6 @@ export class ListViewModel {
     });
 
     // Nested view models
-    this.archive = new ArchiveViewModel(this, repositories.conversation, this.answerCall);
     this.conversations = new ConversationListViewModel(
       mainViewModel,
       this,
@@ -350,9 +355,6 @@ export class ListViewModel {
 
   private readonly updateList = (newListState: string, respectLastState: boolean): void => {
     switch (newListState) {
-      case ListViewModel.STATE.ARCHIVE:
-        this.archive.updateList();
-        break;
       case ListViewModel.STATE.START_UI:
         this.start.updateList();
         break;

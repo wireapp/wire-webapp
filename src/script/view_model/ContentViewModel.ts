@@ -60,6 +60,7 @@ import '../page/preferences/AVPreferences';
 import '../page/preferences/AboutPreferences';
 import '../page/preferences/Preferences';
 import '../page/preferences/devices/DevicesPreferences';
+import '../page/archive/ArchiveList';
 import {
   PreferenceNotificationRepository,
   Notification,
