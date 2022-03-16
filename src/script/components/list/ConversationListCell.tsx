@@ -22,7 +22,7 @@ import cx from 'classnames';
 
 import {noop} from 'Util/util';
 import {t} from 'Util/LocalizerUtil';
-import {registerReactComponent, useKoSubscribableChildren} from 'Util/ComponentUtil';
+import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import useEffectRef from 'Util/useEffectRef';
 
 import {AVATAR_SIZE} from 'Components/Avatar';
@@ -31,7 +31,6 @@ import {generateCellState} from '../../conversation/ConversationCellState';
 import {ConversationStatusIcon} from '../../conversation/ConversationStatusIcon';
 import type {Conversation} from '../../entity/Conversation';
 import {MediaType} from '../../media/MediaType';
-import {useViewPortObserver} from '../../ui/viewportObserver';
 
 import Avatar from 'Components/Avatar';
 import GroupAvatar from 'Components/avatar/GroupAvatar';
@@ -42,10 +41,7 @@ import {KEY} from 'Util/KeyboardUtil';
 export interface ConversationListCellProps {
   conversation: Conversation;
   dataUieName?: string;
-  index: number;
-  is_selected?: (conversation: Conversation) => boolean;
-  isVisibleFunc?: (top: number, bottom: number) => boolean;
-  offsetTop?: number;
+  isSelected?: (conversation: Conversation) => boolean;
   onClick: React.MouseEventHandler<Element>;
   onJoinCall: (conversation: Conversation, mediaType: MediaType) => void;
   rightClick: (conversation: Conversation, event: MouseEvent) => void;
@@ -57,11 +53,8 @@ const ConversationListCell: React.FC<ConversationListCellProps> = ({
   conversation,
   onJoinCall,
   onClick = noop,
-  is_selected = () => false,
+  isSelected = () => false,
   rightClick = noop,
-  index = 0,
-  isVisibleFunc = () => false,
-  offsetTop = 0,
   dataUieName,
 }) => {
   const {
@@ -88,14 +81,9 @@ const ConversationListCell: React.FC<ConversationListCellProps> = ({
     'isRequest',
   ]);
 
-  const isSelected = is_selected(conversation);
-  const cellHeight = 56;
-  const cellTop = index * cellHeight + offsetTop;
-  const cellBottom = cellTop + cellHeight;
+  const isActive = isSelected(conversation);
 
-  const isInitiallyVisible = isVisibleFunc(cellTop, cellBottom);
   const [viewportElementRef, setViewportElementRef] = useEffectRef<HTMLDivElement>();
-  const isInViewport = useViewPortObserver(viewportElementRef, isInitiallyVisible);
 
   useEffect(() => {
     const handleRightClick = (event: MouseEvent) => {
@@ -130,146 +118,136 @@ const ConversationListCell: React.FC<ConversationListCellProps> = ({
       data-uie-value={displayName}
       role="button"
       tabIndex={0}
-      className={cx('conversation-list-cell', {'conversation-list-cell-active': isSelected})}
+      className={cx('conversation-list-cell', {'conversation-list-cell-active': isActive})}
       onClick={onClick}
       onKeyPress={handleKeyPress}
     >
-      {isInViewport && (
-        <>
-          <div
-            className={cx('conversation-list-cell-left', {
-              'conversation-list-cell-left-opaque': removedFromConversation || users.length === 0,
-            })}
-          >
-            {isGroup && <GroupAvatar className="conversation-list-cell-avatar-arrow" users={users} />}
-            {!isGroup && !!users.length && (
-              <div className="avatar-halo">
-                <Avatar participant={users[0]} avatarSize={AVATAR_SIZE.SMALL} />
-              </div>
-            )}
+      <div
+        className={cx('conversation-list-cell-left', {
+          'conversation-list-cell-left-opaque': removedFromConversation || users.length === 0,
+        })}
+      >
+        {isGroup && <GroupAvatar className="conversation-list-cell-avatar-arrow" users={users} />}
+        {!isGroup && !!users.length && (
+          <div className="avatar-halo">
+            <Avatar participant={users[0]} avatarSize={AVATAR_SIZE.SMALL} />
           </div>
-          <div className="conversation-list-cell-center">
-            {is1to1 && selfUser.inTeam() ? (
-              <AvailabilityState
-                className="conversation-list-cell-availability"
-                availability={availabilityOfUser}
-                label={displayName}
-                theme={isSelected}
-                dataUieName="status-availability-item"
-              />
-            ) : (
-              <span className={cx('conversation-list-cell-name', {'accent-text': isSelected})}>{displayName}</span>
-            )}
-            <span className="conversation-list-cell-description" data-uie-name="secondary-line">
-              {cellState.description}
-            </span>
-          </div>
-          <div className="conversation-list-cell-right">
-            <button
-              className="conversation-list-cell-context-menu"
-              data-uie-name="go-options"
-              aria-label={t('conversationOptionsMenu')}
-              type="button"
-              onClick={event => {
-                event.stopPropagation();
-                rightClick(conversation, event.nativeEvent);
-              }}
-            ></button>
-            {!showJoinButton && (
-              <>
-                {cellState.icon === ConversationStatusIcon.PENDING_CONNECTION && (
-                  <span
-                    className="conversation-list-cell-badge cell-badge-dark"
-                    data-uie-name="status-pending"
-                    title={t('callStatusPending')}
-                    aria-label={t('callStatusPending')}
-                  >
-                    <Icon.Pending className="svg-icon" />
-                  </span>
-                )}
-                {cellState.icon === ConversationStatusIcon.UNREAD_MENTION && (
-                  <span
-                    className="conversation-list-cell-badge cell-badge-light"
-                    data-uie-name="status-mention"
-                    title={t('conversationStatusUnreadMention')}
-                    aria-label={t('conversationStatusUnreadMention')}
-                  >
-                    <Icon.Mention className="svg-icon" />
-                  </span>
-                )}
-                {cellState.icon === ConversationStatusIcon.UNREAD_REPLY && (
-                  <span
-                    className="conversation-list-cell-badge cell-badge-light"
-                    data-uie-name="status-reply"
-                    title={t('conversationStatusUnreadReply')}
-                    aria-label={t('conversationStatusUnreadReply')}
-                  >
-                    <Icon.Reply className="svg-icon" />
-                  </span>
-                )}
-                {cellState.icon === ConversationStatusIcon.UNREAD_PING && (
-                  <span
-                    className="conversation-list-cell-badge cell-badge-light"
-                    data-uie-name="status-ping"
-                    title={t('conversationStatusUnreadPing')}
-                    aria-label={t('conversationStatusUnreadPing')}
-                  >
-                    <Icon.Ping className="svg-icon" />
-                  </span>
-                )}
-                {cellState.icon === ConversationStatusIcon.MISSED_CALL && (
-                  <span
-                    className="conversation-list-cell-badge cell-badge-light"
-                    data-uie-name="status-missed-call"
-                    title={t('callStatusMissed')}
-                    aria-label={t('callStatusMissed')}
-                  >
-                    <Icon.Hangup className="svg-icon" />
-                  </span>
-                )}
-                {cellState.icon === ConversationStatusIcon.MUTED && (
-                  <span
-                    className="conversation-list-cell-badge cell-badge-dark conversation-muted"
-                    data-uie-name="status-silence"
-                    title={t('callStatusMutted')}
-                    aria-label={t('callStatusMutted')}
-                  >
-                    <Icon.Mute className="svg-icon" />
-                  </span>
-                )}
-                {cellState.icon === ConversationStatusIcon.UNREAD_MESSAGES && unreadState.allMessages.length > 0 && (
-                  <span
-                    className="conversation-list-cell-badge cell-badge-light"
-                    data-uie-name="status-unread"
-                    title={t('conversationStatusUnread')}
-                    aria-label={t('conversationStatusUnread')}
-                  >
-                    {unreadState.allMessages.length}
-                  </span>
-                )}
-              </>
-            )}
-            {showJoinButton && (
-              <button
-                onClick={onClickJoinCall}
-                type="button"
-                className="call-ui__button call-ui__button--green call-ui__button--join"
-                data-uie-name="do-call-controls-call-join"
+        )}
+      </div>
+      <div className="conversation-list-cell-center">
+        {is1to1 && selfUser.inTeam() ? (
+          <AvailabilityState
+            className="conversation-list-cell-availability"
+            availability={availabilityOfUser}
+            label={displayName}
+            theme={isActive}
+            dataUieName="status-availability-item"
+          />
+        ) : (
+          <span className={cx('conversation-list-cell-name', {'accent-text': isActive})}>{displayName}</span>
+        )}
+        <span className="conversation-list-cell-description" data-uie-name="secondary-line">
+          {cellState.description}
+        </span>
+      </div>
+      <div className="conversation-list-cell-right">
+        <button
+          className="conversation-list-cell-context-menu"
+          data-uie-name="go-options"
+          aria-label={t('conversationOptionsMenu')}
+          type="button"
+          onClick={event => {
+            event.stopPropagation();
+            rightClick(conversation, event.nativeEvent);
+          }}
+        ></button>
+        {!showJoinButton && (
+          <>
+            {cellState.icon === ConversationStatusIcon.PENDING_CONNECTION && (
+              <span
+                className="conversation-list-cell-badge cell-badge-dark"
+                data-uie-name="status-pending"
+                title={t('callStatusPending')}
+                aria-label={t('callStatusPending')}
               >
-                {t('callJoin')}
-              </button>
+                <Icon.Pending className="svg-icon" />
+              </span>
             )}
-          </div>
-        </>
-      )}
+            {cellState.icon === ConversationStatusIcon.UNREAD_MENTION && (
+              <span
+                className="conversation-list-cell-badge cell-badge-light"
+                data-uie-name="status-mention"
+                title={t('conversationStatusUnreadMention')}
+                aria-label={t('conversationStatusUnreadMention')}
+              >
+                <Icon.Mention className="svg-icon" />
+              </span>
+            )}
+            {cellState.icon === ConversationStatusIcon.UNREAD_REPLY && (
+              <span
+                className="conversation-list-cell-badge cell-badge-light"
+                data-uie-name="status-reply"
+                title={t('conversationStatusUnreadReply')}
+                aria-label={t('conversationStatusUnreadReply')}
+              >
+                <Icon.Reply className="svg-icon" />
+              </span>
+            )}
+            {cellState.icon === ConversationStatusIcon.UNREAD_PING && (
+              <span
+                className="conversation-list-cell-badge cell-badge-light"
+                data-uie-name="status-ping"
+                title={t('conversationStatusUnreadPing')}
+                aria-label={t('conversationStatusUnreadPing')}
+              >
+                <Icon.Ping className="svg-icon" />
+              </span>
+            )}
+            {cellState.icon === ConversationStatusIcon.MISSED_CALL && (
+              <span
+                className="conversation-list-cell-badge cell-badge-light"
+                data-uie-name="status-missed-call"
+                title={t('callStatusMissed')}
+                aria-label={t('callStatusMissed')}
+              >
+                <Icon.Hangup className="svg-icon" />
+              </span>
+            )}
+            {cellState.icon === ConversationStatusIcon.MUTED && (
+              <span
+                className="conversation-list-cell-badge cell-badge-dark conversation-muted"
+                data-uie-name="status-silence"
+                title={t('callStatusMutted')}
+                aria-label={t('callStatusMutted')}
+              >
+                <Icon.Mute className="svg-icon" />
+              </span>
+            )}
+            {cellState.icon === ConversationStatusIcon.UNREAD_MESSAGES && unreadState.allMessages.length > 0 && (
+              <span
+                className="conversation-list-cell-badge cell-badge-light"
+                data-uie-name="status-unread"
+                title={t('conversationStatusUnread')}
+                aria-label={t('conversationStatusUnread')}
+              >
+                {unreadState.allMessages.length}
+              </span>
+            )}
+          </>
+        )}
+        {showJoinButton && (
+          <button
+            onClick={onClickJoinCall}
+            type="button"
+            className="call-ui__button call-ui__button--green call-ui__button--join"
+            data-uie-name="do-call-controls-call-join"
+          >
+            {t('callJoin')}
+          </button>
+        )}
+      </div>
     </div>
   );
 };
 
 export default ConversationListCell;
-
-registerReactComponent('conversation-list-cell', {
-  bindings:
-    'offsetTop: ko.unwrap(offsetTop), index: ko.unwrap(index), showJoinButton: ko.unwrap(showJoinButton), conversation, is_selected, isVisibleFunc, onJoinCall, rightClick, onClick, dataUieName',
-  component: ConversationListCell,
-});

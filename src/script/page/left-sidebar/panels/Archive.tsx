@@ -62,13 +62,7 @@ const Archive: React.FC<ArchiveProps> = ({
   }, []);
 
   return (
-    <ListWrapper
-      listViewModel={listViewModel}
-      openState={ListViewModel.STATE.ARCHIVE}
-      id="archive"
-      header={t('archiveHeader')}
-      onClose={onClose}
-    >
+    <ListWrapper id="archive" header={t('archiveHeader')} onClose={onClose}>
       <ul className="left-list-items no-scroll">
         {conversations.map((conversation, index) => (
           <li key={conversation.id}>

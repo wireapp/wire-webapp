@@ -33,7 +33,7 @@ import {
 
 import {ListViewModel} from 'src/script/view_model/ListViewModel';
 import {ConversationState} from '../../conversation/ConversationState';
-import {registerReactComponent, useKoSubscribableChildren} from 'Util/ComponentUtil';
+import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import GroupedConversationsFolder from './GroupedConversationsFolder';
 import {CallState} from '../../calling/CallState';
 import {QualifiedId} from '@wireapp/api-client/src/user';
@@ -60,11 +60,9 @@ export interface GroupedConversationsProps {
   expandedFolders: string[];
   hasJoinableCall: (conversationId: QualifiedId) => boolean;
   isSelectedConversation: (conversationEntity: Conversation) => boolean;
-  isVisibleFunc: (top: number, bottom: number) => boolean;
   listViewModel: ListViewModel;
   onJoinCall: (conversationEntity: Conversation) => void;
   setExpandedFolders: (folders: string[]) => void;
-  toggle: (folderId: string) => void;
 }
 
 const GroupedConversations: React.FC<GroupedConversationsProps> = ({
@@ -72,7 +70,6 @@ const GroupedConversations: React.FC<GroupedConversationsProps> = ({
   expandedFolders,
   hasJoinableCall,
   isSelectedConversation,
-  isVisibleFunc,
   onJoinCall,
   setExpandedFolders,
   listViewModel,
@@ -114,27 +111,6 @@ const GroupedConversations: React.FC<GroupedConversationsProps> = ({
     [expandedFolders],
   );
 
-  /*
-   *  We need to calculate the offset from the top for the isVisibleFunc as we can't rely
-   *  on the index of the conversation alone. We need to account for the folder headers and
-   *  the height of the <conversation-list-cell>s of the previous open folders.
-   */
-  const getOffsetTop = (folder: ConversationLabel, conversation: Conversation) => {
-    const folderHeaderHeight = 53;
-    const firstFolderHeaderHeight = 33;
-    const cellHeight = 56;
-
-    const folderIndex = folders.indexOf(folder);
-    const totalHeaderHeight = folderHeaderHeight * folderIndex + firstFolderHeaderHeight;
-    const previousExpandedFolders = folders.slice(0, folderIndex).filter(({id}) => isExpanded(id));
-    const previousCellsHeight = previousExpandedFolders.reduce(
-      (height, {conversations}) => height + conversations.length * cellHeight,
-      0,
-    );
-    const currentCellsHeight = folder.conversations.indexOf(conversation) * cellHeight;
-    return totalHeaderHeight + previousCellsHeight + currentCellsHeight;
-  };
-
   return (
     <ul className="conversation-folder-list">
       {folders.map(folder => (
@@ -143,8 +119,6 @@ const GroupedConversations: React.FC<GroupedConversationsProps> = ({
           folder={folder}
           toggle={toggle}
           onJoinCall={onJoinCall}
-          getOffsetTop={getOffsetTop}
-          isVisibleFunc={isVisibleFunc}
           listViewModel={listViewModel}
           expandedFolders={expandedFolders}
           hasJoinableCall={hasJoinableCall}
@@ -156,9 +130,3 @@ const GroupedConversations: React.FC<GroupedConversationsProps> = ({
 };
 
 export default GroupedConversations;
-
-registerReactComponent<GroupedConversationsProps>('grouped-conversations', {
-  component: GroupedConversations,
-  template:
-    '<div data-bind="react: {expandedFolders: ko.unwrap(expandedFolders), setExpandedFolders: expandedFolders, conversationRepository, hasJoinableCall, isSelectedConversation, isVisibleFunc, listViewModel, onJoinCall}"></div>',
-});

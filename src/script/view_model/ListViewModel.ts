@@ -51,6 +51,7 @@ import {UserState} from '../user/UserState';
 import {TeamState} from '../team/TeamState';
 import {ConversationState} from '../conversation/ConversationState';
 import {CallingViewModel} from './CallingViewModel';
+import {PropertiesRepository} from '../properties/PropertiesRepository';
 
 export enum ListState {
   ARCHIVE = 'ListViewModel.STATE.ARCHIVE',
@@ -75,6 +76,7 @@ export class ListViewModel {
   private readonly elementId: 'left-column';
 
   private readonly conversationRepository: ConversationRepository;
+  public readonly propertiesRepository: PropertiesRepository;
   private readonly callingRepository: CallingRepository;
   private readonly teamRepository: TeamRepository;
   private readonly actionsViewModel: ActionsViewModel;
@@ -114,6 +116,7 @@ export class ListViewModel {
     this.conversationRepository = repositories.conversation;
     this.callingRepository = repositories.calling;
     this.teamRepository = repositories.team;
+    this.propertiesRepository = repositories.properties;
 
     this.actionsViewModel = mainViewModel.actions;
     this.contentViewModel = mainViewModel.content;

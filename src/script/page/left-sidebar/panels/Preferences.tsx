@@ -100,13 +100,7 @@ const Preferences: React.FC<PreferencesProps> = ({listViewModel, contentViewMode
   ];
 
   return (
-    <ListWrapper
-      listViewModel={listViewModel}
-      openState={ListViewModel.STATE.PREFERENCES}
-      id="preferences"
-      header={t('preferencesHeadline')}
-      onClose={onClose}
-    >
+    <ListWrapper id="preferences" header={t('preferencesHeadline')} onClose={onClose}>
       <ul className="left-list-items no-scroll preferences-list-items">
         {items
           .filter(item => !item.hidden)

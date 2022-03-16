@@ -19,23 +19,27 @@
 
 import React from 'react';
 import {CSSTransition, SwitchTransition} from 'react-transition-group';
+import {css} from '@emotion/core';
 import {registerStaticReactComponent, useKoSubscribableChildren} from 'Util/ComponentUtil';
+import {container} from 'tsyringe';
 
 import {ListViewModel, ListState} from '../../view_model/ListViewModel';
 import {User} from '../../entity/User';
 import {ConversationRepository} from '../../conversation/ConversationRepository';
 import {AssetRepository} from '../../assets/AssetRepository';
+import {PropertiesRepository} from '../../properties/PropertiesRepository';
 
 import Preferences from './panels/Preferences';
 import Archive from './panels/Archive';
 import Background from './Background';
-import {container} from 'tsyringe';
+import Conversations from './panels/Conversations';
 import TemporaryGuestConversations from './panels/TemporatyGuestConversations';
 
 type PreferencesProps = {
   assetRepository?: AssetRepository;
   conversationRepository: ConversationRepository;
   listViewModel: ListViewModel;
+  propertiesRepository: PropertiesRepository;
   selfUser: User;
 };
 const Animated: React.FC = ({children, ...rest}) => {
@@ -49,11 +53,13 @@ const Animated: React.FC = ({children, ...rest}) => {
 const LeftSidebar: React.FC<PreferencesProps> = ({
   listViewModel,
   conversationRepository,
+  propertiesRepository,
   assetRepository = container.resolve(AssetRepository),
   selfUser,
 }) => {
   const {state} = useKoSubscribableChildren(listViewModel, ['state']);
   let content = <span></span>;
+  const switchList = (list: ListState) => listViewModel.switchList(list);
   const goHome = () => {
     return selfUser.isTemporaryGuest()
       ? listViewModel.switchList(ListViewModel.STATE.TEMPORARY_GUEST)
@@ -61,6 +67,17 @@ const LeftSidebar: React.FC<PreferencesProps> = ({
   };
 
   switch (state) {
+    case ListState.CONVERSATIONS:
+      content = (
+        <Conversations
+          listViewModel={listViewModel}
+          conversationRepository={conversationRepository}
+          propertiesRepository={propertiesRepository}
+          switchList={switchList}
+          selfUser={selfUser}
+        />
+      );
+      break;
     case ListState.PREFERENCES:
       content = (
         <Preferences
@@ -95,7 +112,7 @@ const LeftSidebar: React.FC<PreferencesProps> = ({
   return (
     <>
       <Background selfUser={selfUser} assetRepository={assetRepository} />
-      <SwitchTransition>
+      <SwitchTransition css={css({height: '100%'})}>
         <Animated key={state}>{content}</Animated>
       </SwitchTransition>
     </>

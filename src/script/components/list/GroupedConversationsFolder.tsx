@@ -31,10 +31,8 @@ import {QualifiedId} from '@wireapp/api-client/src/user';
 export interface GroupedConversationsFolderProps {
   expandedFolders: string[];
   folder: ConversationLabel;
-  getOffsetTop: (folder: ConversationLabel, conversation: Conversation) => number;
   hasJoinableCall: (conversationId: QualifiedId) => boolean;
   isSelectedConversation: (conversationEntity: Conversation) => boolean;
-  isVisibleFunc: (top: number, bottom: number) => boolean;
   listViewModel: ListViewModel;
   onJoinCall: (conversationEntity: Conversation) => void;
   toggle: (folderId: string) => void;
@@ -44,9 +42,7 @@ const GroupedConversationsFolder: React.FC<GroupedConversationsFolderProps> = ({
   folder,
   toggle,
   onJoinCall,
-  getOffsetTop,
   listViewModel,
-  isVisibleFunc,
   expandedFolders,
   hasJoinableCall,
   isSelectedConversation,
@@ -61,7 +57,7 @@ const GroupedConversationsFolder: React.FC<GroupedConversationsFolderProps> = ({
       <GroupedConversationHeader onClick={() => toggle(folder.id)} conversationLabel={folder} isOpen={isExpanded} />
       <div>
         {isExpanded &&
-          conversations.map((conversation, index) => (
+          conversations.map(conversation => (
             <ConversationListCell
               dataUieName="item-conversation"
               key={conversation.id}
@@ -69,11 +65,8 @@ const GroupedConversationsFolder: React.FC<GroupedConversationsFolderProps> = ({
               rightClick={(_, event) => listViewModel.onContextMenu(conversation, event)}
               conversation={conversation}
               showJoinButton={hasJoinableCall(conversation.qualifiedId)}
-              is_selected={isSelectedConversation}
+              isSelected={isSelectedConversation}
               onJoinCall={onJoinCall}
-              offsetTop={getOffsetTop(folder, conversation)}
-              index={index}
-              isVisibleFunc={isVisibleFunc}
             />
           ))}
       </div>

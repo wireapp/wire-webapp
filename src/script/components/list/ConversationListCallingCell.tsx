@@ -37,7 +37,7 @@ import useEffectRef from 'Util/useEffectRef';
 
 import type {Call} from '../../calling/Call';
 import type {CallingRepository} from '../../calling/CallingRepository';
-import {Grid, useVideoGrid} from '../../calling/videoGridHandler';
+import {useVideoGrid} from '../../calling/videoGridHandler';
 import type {Conversation} from '../../entity/Conversation';
 import type {Multitasking} from '../../notification/NotificationRepository';
 import {generateConversationUrl} from '../../router/routeGenerator';
@@ -62,7 +62,6 @@ export interface CallingCellProps {
   multitasking: Multitasking;
   teamState?: TeamState;
   temporaryUserStyle?: boolean;
-  videoGrid: Grid;
 }
 
 const ConversationListCallingCell: React.FC<CallingCellProps> = ({
