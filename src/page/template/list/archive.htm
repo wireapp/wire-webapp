@@ -6,7 +6,12 @@
 >
   <div class="left-list-header">
     <span class="left-list-header-text" data-bind="text: t('archiveHeader')"></span>
-    <span class="left-list-header-close-button button-icon-large icon-close" data-bind="clickOrDrag: clickOnClose, attr: {title: t('tooltipSearchClose')}" data-uie-name="do-close-archive"></span>
+    <button
+      class="left-list-header-close-button button-icon-large icon-close"
+      type="button"
+      data-bind="clickOrDrag: clickOnClose, attr: {title: t('tooltipSearchClose')}"
+      data-uie-name="do-close-archive"
+    ></button>
   </div>
   <div class="left-list-center">
     <ul class="left-list-items" data-bind="antiscroll: shouldUpdateScrollbar, bordered_list: archivedConversations, foreach: {data: archivedConversations, as: 'conversation', noChildContext: true}">
