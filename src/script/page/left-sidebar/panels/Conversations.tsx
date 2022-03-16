@@ -43,6 +43,10 @@ import {Call} from 'src/script/calling/Call';
 import {matchQualifiedIds} from 'Util/QualifiedId';
 import {ConversationRepository} from '../../../conversation/ConversationRepository';
 import ConversationListCallingCell from 'Components/list/ConversationListCallingCell';
+import AvailabilityState from 'Components/AvailabilityState';
+import LegalHoldDot from 'Components/LegalHoldDot';
+import {TeamState} from '../../../team/TeamState';
+import {AvailabilityContextMenu} from '../../../ui/AvailabilityContextMenu';
 
 type ConversationsProps = {
   callState?: CallState;
@@ -52,6 +56,7 @@ type ConversationsProps = {
   propertiesRepository: PropertiesRepository;
   selfUser: User;
   switchList: (list: ListState) => void;
+  teamState?: TeamState;
 };
 
 enum ConverationViewStyle {
@@ -170,11 +175,16 @@ const Conversations: React.FC<ConversationsProps> = ({
   conversationRepository,
   listViewModel,
   conversationState = container.resolve(ConversationState),
+  teamState = container.resolve(TeamState),
   callState = container.resolve(CallState),
   selfUser,
   switchList,
 }) => {
-  const {name: userName} = useKoSubscribableChildren(selfUser, ['name']);
+  const {
+    name: userName,
+    availability: userAvailability,
+    hasPendingLegalHold,
+  } = useKoSubscribableChildren(selfUser, ['hasPendingLegalHold', 'name', 'availability']);
   const {conversations_archived: archivedConversations, conversations_unarchived: conversations} =
     useKoSubscribableChildren(conversationState, ['conversations_archived', 'conversations_unarchived']);
 
@@ -184,7 +194,6 @@ const Conversations: React.FC<ConversationsProps> = ({
     : ConverationViewStyle.RECENT;
 
   const [viewStyle, setViewStyle] = useState<ConverationViewStyle>(initialViewStyle);
-  const isTeam = false;
   const isLegalHold = false;
   const showBadge = () => false;
 
@@ -210,21 +219,28 @@ const Conversations: React.FC<ConversationsProps> = ({
       >
         <Icon.Settings />
       </button>
-      {isTeam ? (
+      {teamState.isTeam ? (
         <>
-          <availability-state
+          <button
+            type="button"
             className="left-list-header-availability"
-            data-bind="clickOrDrag: clickOnAvailability"
-            params="availability: selfAvailability, label: selfUserName, dataUieName: 'status-availability'"
+            tabIndex={0}
+            onClick={event => AvailabilityContextMenu.show(event.nativeEvent, 'left-list-availability-menu')}
           >
-            {' '}
-          </availability-state>
+            <AvailabilityState
+              className="availability-state"
+              availability={userAvailability}
+              dataUieName={'status-availability'}
+              label={userName}
+            />
+          </button>
           {isLegalHold && (
-            <legal-hold-dot
-              style="padding: 8px;"
-              params="legalHoldModal: contentViewModel.legalHoldModal, isPending: hasPendingLegalHold()"
-              data-bind="attr: {'data-uie-name': hasPendingLegalHold() ? 'status-legal-hold-pending' : 'status-legal-hold'}"
-            ></legal-hold-dot>
+            <LegalHoldDot
+              isPending={hasPendingLegalHold}
+              data-uie-name={hasPendingLegalHold ? 'status-legal-hold-pending' : 'status-legal-hold'}
+              legalHoldModal={undefined /**TODO*/}
+              style={{padding: '8px'}}
+            />
           )}
         </>
       ) : (
@@ -236,7 +252,7 @@ const Conversations: React.FC<ConversationsProps> = ({
   );
 
   const footer = (
-    <div className="conversations-footer">
+    <section className="conversations-footer">
       <ul className="conversations-footer-list">
         <li className="conversations-footer-list-item">
           <button
@@ -291,7 +307,7 @@ const Conversations: React.FC<ConversationsProps> = ({
           </li>
         )}
       </ul>
-    </div>
+    </section>
   );
 
   const callingView = (

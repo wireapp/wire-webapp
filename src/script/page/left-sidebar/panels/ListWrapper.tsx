@@ -89,7 +89,7 @@ const ListWrapper: React.FC<LeftListWrapperProps> = ({
 
   return (
     <div id={id} className={`left-list-${id}`} css={style}>
-      <div className="left-list-header">
+      <section className="left-list-header">
         {headerElement ? (
           headerElement
         ) : (
@@ -106,11 +106,11 @@ const ListWrapper: React.FC<LeftListWrapperProps> = ({
             </button>
           </>
         )}
-      </div>
+      </section>
       {before ?? null}
-      <div css={scrollStyle} ref={setScrollbarRef}>
+      <section css={scrollStyle} ref={setScrollbarRef}>
         {children}
-      </div>
+      </section>
       {footer ?? null}
     </div>
   );
