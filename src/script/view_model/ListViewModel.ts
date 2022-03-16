@@ -82,7 +82,7 @@ export class ListViewModel {
   public readonly contentViewModel: ContentViewModel;
   private readonly panelViewModel: PanelViewModel;
   private readonly isProAccount: ko.PureComputed<boolean>;
-  private readonly selfUser: ko.Observable<User>;
+  public readonly selfUser: ko.Observable<User>;
   private readonly modal: ko.Observable<string>;
   private readonly visibleListItems: ko.PureComputed<(string | Conversation)[]>;
   private readonly conversations: ConversationListViewModel;
