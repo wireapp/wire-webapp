@@ -31,7 +31,6 @@ import {isEscapeKey} from 'Util/KeyboardUtil';
 import {ConversationListViewModel} from './list/ConversationListViewModel';
 import {StartUIViewModel} from './list/StartUIViewModel';
 import {TakeoverViewModel} from './list/TakeoverViewModel';
-import {TemporaryGuestViewModel} from './list/TemporaryGuestViewModel';
 
 import {showContextMenu} from '../ui/ContextMenu';
 import {showLabelContextMenu} from '../ui/LabelContextMenu';
@@ -51,6 +50,7 @@ import type {User} from '../entity/User';
 import {UserState} from '../user/UserState';
 import {TeamState} from '../team/TeamState';
 import {ConversationState} from '../conversation/ConversationState';
+import {CallingViewModel} from './CallingViewModel';
 
 export enum ListState {
   ARCHIVE = 'ListViewModel.STATE.ARCHIVE',
@@ -66,7 +66,6 @@ export class ListViewModel {
   private readonly conversationState: ConversationState;
 
   readonly takeover: TakeoverViewModel;
-  readonly temporaryGuest: TemporaryGuestViewModel;
   readonly ModalType: typeof ListViewModel.MODAL_TYPE;
   readonly isActivatedAccount: ko.PureComputed<boolean>;
   readonly webappLoaded: ko.Observable<boolean>;
@@ -80,6 +79,7 @@ export class ListViewModel {
   private readonly teamRepository: TeamRepository;
   private readonly actionsViewModel: ActionsViewModel;
   public readonly contentViewModel: ContentViewModel;
+  public readonly callingViewModel: CallingViewModel;
   private readonly panelViewModel: PanelViewModel;
   private readonly isProAccount: ko.PureComputed<boolean>;
   public readonly selfUser: ko.Observable<User>;
@@ -91,7 +91,6 @@ export class ListViewModel {
   static get MODAL_TYPE() {
     return {
       TAKEOVER: 'ListViewModel.MODAL_TYPE.TAKEOVER',
-      TEMPORARY_GUEST: 'ListViewModal.MODAL_TYPE.TEMPORARY_GUEST',
     };
   }
 
@@ -119,6 +118,7 @@ export class ListViewModel {
     this.actionsViewModel = mainViewModel.actions;
     this.contentViewModel = mainViewModel.content;
     this.panelViewModel = mainViewModel.panel;
+    this.callingViewModel = mainViewModel.calling;
 
     this.isActivatedAccount = this.userState.isActivatedAccount;
     this.isProAccount = this.teamState.isTeam;
@@ -175,7 +175,6 @@ export class ListViewModel {
       repositories.user,
     );
     this.takeover = new TakeoverViewModel(this, repositories.user, repositories.conversation);
-    this.temporaryGuest = new TemporaryGuestViewModel(this, mainViewModel, repositories.calling, repositories.team);
 
     this._initSubscriptions();
 
@@ -370,7 +369,6 @@ export class ListViewModel {
 
   readonly showTemporaryGuest = (): void => {
     this.switchList(ListViewModel.STATE.TEMPORARY_GUEST);
-    this.modal(ListViewModel.MODAL_TYPE.TEMPORARY_GUEST);
     const conversationEntity = this.conversationRepository.getMostRecentConversation();
     amplify.publish(WebAppEvents.CONVERSATION.SHOW, conversationEntity, {});
   };
