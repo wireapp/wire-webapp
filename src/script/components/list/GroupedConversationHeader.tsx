@@ -42,21 +42,22 @@ const GroupedConversationHeader: React.FC<GroupedConversationHeaderProps> = ({on
   }, [conversations?.length]);
 
   return (
-    <div
+    <button
       onClick={onClick}
+      type="button"
       className={cx('conversation-folder__head', {'conversation-folder__head--open': isOpen})}
       data-uie-name="conversation-folder-head"
     >
-      <div className="disclose-icon">
+      <span className="disclose-icon">
         <Icon.Disclose />
-      </div>
+      </span>
       <span className="conversation-folder__head__name">{conversationLabel.name}</span>
       {badge > 0 && (
         <span className="cell-badge-dark conversation-folder__head__badge" data-uie-name="conversation-folder-badge">
           {badge}
         </span>
       )}
-    </div>
+    </button>
   );
 };
 
