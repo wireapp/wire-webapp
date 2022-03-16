@@ -52,6 +52,10 @@ const cleanUp = () => {
   }
 };
 
+const getButtonId = (label: string): string => {
+  return `${label.split(' ').join('-').toLowerCase()}-button`;
+};
+
 const ContextMenu: React.FC<ContextMenuProps> = ({entries, defaultIdentifier = 'ctx-menu-item', posX, posY}) => {
   const [mainElement, setMainElement] = useState<HTMLUListElement>();
   const [selected, setSelected] = useState<ContextMenuEntry>();
@@ -72,10 +76,8 @@ const ContextMenu: React.FC<ContextMenuProps> = ({entries, defaultIdentifier = '
 
   useEffect(() => {
     if (selected) {
-      const selectedButton = document.querySelector(
-        `#${selected.label.split(' ').join('_').toLowerCase()}-button`,
-      ) as HTMLButtonElement;
-      selectedButton.focus();
+      const selectedButton = document.querySelector(`#${getButtonId(selected.label)}`) as HTMLButtonElement;
+      selectedButton?.focus();
     }
   }, [selected]);
 
@@ -141,7 +143,7 @@ const ContextMenu: React.FC<ContextMenuProps> = ({entries, defaultIdentifier = '
             })}
           >
             <button
-              id={`${entry.label.split(' ').join('_').toLowerCase()}-button`}
+              id={getButtonId(entry.label)}
               className="ctx-menu__button"
               data-uie-name={entry.identifier || defaultIdentifier}
               title={entry.title || entry.label}
