@@ -44,6 +44,7 @@ const GroupedConversationHeader: React.FC<GroupedConversationHeaderProps> = ({on
   return (
     <button
       onClick={onClick}
+      type="button"
       className={cx('conversation-folder__head', {'conversation-folder__head--open': isOpen})}
       data-uie-name="conversation-folder-head"
     >
