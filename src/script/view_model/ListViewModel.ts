@@ -67,6 +67,7 @@ export class ListViewModel {
   readonly webappLoaded: ko.Observable<boolean>;
   readonly state: ko.Observable<string>;
   readonly lastUpdate: ko.Observable<number>;
+  readonly isFederated: boolean;
   private readonly elementId: 'left-column';
 
   private readonly conversationRepository: ConversationRepository;
@@ -106,6 +107,7 @@ export class ListViewModel {
     this.conversationState = container.resolve(ConversationState);
 
     this.elementId = 'left-column';
+    this.isFederated = mainViewModel.isFederated;
     this.conversationRepository = repositories.conversation;
     this.callingRepository = repositories.calling;
     this.teamRepository = repositories.team;

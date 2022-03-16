@@ -23,7 +23,8 @@ import {isTabKey} from 'Util/KeyboardUtil';
 import {noop, createRandomUuid} from 'Util/util';
 
 interface ModalParams {
-  ariaLabelby?: string;
+  ariaDescribedBy?: string;
+  ariaLabelBy?: string;
   isShown: ko.Observable<boolean>;
   large?: boolean;
   onBgClick?: () => void;
@@ -33,7 +34,7 @@ interface ModalParams {
 
 ko.components.register('modal', {
   template: `
-    <div class="modal" data-bind="style: {display: displayNone() ? 'none': 'flex', zIndex: 10000001}, attr: id ? {id: id, 'aria-labelledby': ariaLabelby} : {}" role="dialog" aria-modal="true" tabindex="-1">
+    <div class="modal" data-bind="style: {display: displayNone() ? 'none': 'flex', zIndex: 10000001}, attr: {id: id, 'aria-labelledby': ariaLabelBy, 'aria-describedby': ariaDescribedBy}" tabIndex="-1" aria-modal="true" role="dialog" aria-modal="true">
       <!-- ko if: showLoading() -->
         <loading-icon class="modal__loading"></loading-icon>
       <!-- /ko -->
@@ -48,14 +49,16 @@ ko.components.register('modal', {
   viewModel: function ({
     isShown,
     large,
-    ariaLabelby,
+    ariaLabelBy,
+    ariaDescribedBy,
     onBgClick = noop,
     onClosed = noop,
     showLoading = ko.observable(false),
   }: ModalParams): void {
     this.large = large;
     this.id = createRandomUuid();
-    this.ariaLabelby = ariaLabelby;
+    this.ariaLabelBy = ariaLabelBy;
+    this.ariaDescribedBy = ariaDescribedBy;
     this.onBgClick = () => ko.unwrap(onBgClick)();
     this.displayNone = ko.observable(!ko.unwrap(isShown));
     this.hasVisibleClass = ko.computed(() => isShown() && !this.displayNone()).extend({rateLimit: 20});
@@ -65,6 +68,9 @@ ko.components.register('modal', {
     const maintainFocus = (): void => {
       if (!this.displayNone()) {
         document.addEventListener('keydown', onKeyDown);
+        window.setTimeout(() => {
+          document.getElementById(this.id).focus();
+        });
       }
     };
 
