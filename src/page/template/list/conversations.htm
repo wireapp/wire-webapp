@@ -4,7 +4,7 @@
   class="conversations"
   data-bind="css: { 'left-list-is-visible': visible }, attr: { 'aria-hidden': ariaHidden }"
 >
-  <div class="left-list-header">
+  <section class="left-list-header">
     <button
       class="conversations-settings-button"
       data-bind="clickOrDrag: clickOnPreferencesButton, attr: {title: t('tooltipConversationsPreferences')}"
@@ -37,7 +37,7 @@
     <!-- ko ifnot: isTeam() -->
     <span class="left-list-header-text" data-bind="text: selfUserName" data-uie-name="status-name"></span>
     <!-- /ko -->
-  </div>
+  </section>
   <!-- ko using: callingViewModel -->
     <!-- ko foreach: {data: activeCalls, as: 'activeCall', noChildContext: true} -->
       <!-- ko if: !activeCall.reason() -->
@@ -57,7 +57,7 @@
       <!-- /ko -->
     <!-- /ko -->
   <!-- /ko -->
-  <div class="left-list-center">
+  <section class="left-list-center">
     <!-- ko if: unarchivedConversations().length > 0 || showConnectRequests() -->
     <ul
       class="left-list-items conversation-list"
@@ -144,32 +144,68 @@
       <div class="conversations-all-archived" data-bind="text: t('conversationsAllArchived')"></div>
       <!-- /ko -->
     <!-- /ko -->
-  </div>
-  <div class="conversations-footer">
-    <people-icon
-      class="button-icon-large"
-      data-bind="attr: {title: startTooltip}, click: clickOnPeopleButton"
-      data-uie-name="go-people"
-    ></people-icon>
-    <conversations-recent-icon
-      class="button-icon-large"
-      data-uie-name="go-recent-view"
-      data-bind="attr: {title: conversationsTooltip, 'data-uie-status': showRecentConversations() ? 'active' : 'inactive'}, css: {'accent-fill': showRecentConversations()}, click: () => showRecentConversations(true)"
-    >
-    </conversations-recent-icon>
-    <conversations-folder-icon
-      class="button-icon-large"
-      data-uie-name="go-folder-view"
-      data-bind="attr: {title: foldersTooltip, 'data-uie-status': showRecentConversations() ? 'inactive' : 'active'}, css: {'accent-fill': !showRecentConversations()}, click: () => showRecentConversations(false)"
-    >
-    </conversations-folder-icon>
-    <!-- ko if: archivedConversations().length > 0 -->
-    <archive-icon
-      class="button-icon-large"
-      data-bind="attr: {title: archiveTooltip}, click: clickOnArchivedButton"
-      data-uie-name="go-archive"
-    ></archive-icon>
-    <!-- /ko -->
-  </div>
+  </section>
+  <section class="conversations-footer">
+    <ul class="conversations-footer-list">
+      <li class="conversations-footer-list-item">
+        <people-icon
+          class="button-icon-large"
+          role="button"
+          tabindex="0"
+          data-bind="
+            attr: {title: startTooltip},
+            click: clickOnPeopleButton,
+            event: { keypress: (_, event) => handleKeyPress(event, clickOnPeopleButton) }
+          "
+          data-uie-name="go-people"
+        ></people-icon>
+      </li>
+      <li class="conversations-footer-list-item">
+        <conversations-recent-icon
+          class="button-icon-large"
+          role="button"
+          tabindex="0"
+          data-uie-name="go-recent-view"
+          data-bind="
+            attr: {title: conversationsTooltip, 'data-uie-status': showRecentConversations() ? 'active' : 'inactive'},
+            css: {'accent-fill': showRecentConversations()},
+            click: () => showRecentConversations(true),
+            event: { keypress: (_, event) => handleKeyPress(event, showRecentConversations.bind(null, true)) }
+          "
+        >
+        </conversations-recent-icon>
+      </li>
+      <li class="conversations-footer-list-item">
+        <conversations-folder-icon
+          class="button-icon-large"
+          role="button"
+          tabindex="0"
+          data-uie-name="go-folder-view"
+          data-bind="
+            attr: {title: foldersTooltip, 'data-uie-status': showRecentConversations() ? 'inactive' : 'active'},
+            css: {'accent-fill': !showRecentConversations()},
+            click: () => showRecentConversations(false),
+            event: { keypress: (_, event) => handleKeyPress(event, showRecentConversations.bind(null, false)) }
+          "
+        >
+        </conversations-folder-icon>
+      </li>
+      <!-- ko if: archivedConversations().length > 0 -->
+      <li class="conversations-footer-list-item">
+        <archive-icon
+          class="button-icon-large"
+          role="button"
+          tabindex="0"
+          data-bind="
+            attr: {title: archiveTooltip},
+            click: clickOnArchivedButton,
+            event: { keypress: (_, event) => handleKeyPress(event, clickOnArchivedButton) }
+          "
+          data-uie-name="go-archive"
+        ></archive-icon>
+      </li>
+      <!-- /ko -->
+    </ul>
+  </section>
 </div>
 <!-- /ko -->

@@ -313,6 +313,12 @@ export class ConversationListViewModel {
   // Footer actions
   //##############################################################################
 
+  readonly handleKeyPress = (event: KeyboardEvent, callback: () => void) => {
+    if (isSpaceKey(event) || isEnterKey(event)) {
+      callback();
+    }
+  };
+
   readonly clickOnArchivedButton = (): void => {
     this.listViewModel.switchList(ListViewModel.STATE.ARCHIVE);
   };
