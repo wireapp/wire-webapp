@@ -56,7 +56,8 @@ const UserBackground: React.FC<BackgroundProps> = ({selfUser, assetRepository}) 
 };
 
 const Background: React.FC<BackgroundProps> = props => {
-  return props.selfUser.isTemporaryGuest() ? <TemporaryGuestBackground /> : <UserBackground {...props} />;
+  const content = props.selfUser.isTemporaryGuest() ? <TemporaryGuestBackground /> : <UserBackground {...props} />;
+  return <div id="background">{content}</div>;
 };
 
 export default Background;
