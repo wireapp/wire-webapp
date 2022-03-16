@@ -53,7 +53,7 @@ const LeftSidebar: React.FC<PreferencesProps> = ({
   selfUser,
 }) => {
   const {state} = useKoSubscribableChildren(listViewModel, ['state']);
-  let content = <></>;
+  let content = <span></span>;
   const goHome = () => {
     return selfUser.isTemporaryGuest()
       ? listViewModel.switchList(ListViewModel.STATE.TEMPORARY_GUEST)
