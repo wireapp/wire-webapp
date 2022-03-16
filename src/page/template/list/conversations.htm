@@ -5,15 +5,23 @@
   data-bind="css: { 'left-list-is-visible': visible }, attr: { 'aria-hidden': ariaHidden }"
 >
   <div class="left-list-header">
-    <settings-icon
-      class="conversations-settings button-icon-large accent-text"
-      data-bind="clickOrDrag: clickOnPreferencesButton, attr: {title: t('tooltipConversationsPreferences')}, css: {'conversations-settings--badge': showBadge()}"
+    <button
+      class="conversations-settings-button"
+      data-bind="clickOrDrag: clickOnPreferencesButton, attr: {title: t('tooltipConversationsPreferences')}"
       data-uie-name="go-preferences"
-    ></settings-icon>
+    >
+      <settings-icon
+        class="conversations-settings button-icon-large accent-text"
+        data-bind="css: {'conversations-settings--badge': showBadge()}"
+      ></settings-icon>
+    </button>
     <!-- ko if: isTeam() -->
     <availability-state
+      id="availability-state"
       class="left-list-header-availability"
-      data-bind="clickOrDrag: clickOnAvailability"
+      data-bind="clickOrDrag: clickOnAvailability, event: { keypress: pressOnAvailability }"
+      role="button"
+      tabindex="0"
       params="availability: selfAvailability, label: selfUserName, dataUieName: 'status-availability'"
     >
     </availability-state>
@@ -87,16 +95,29 @@
       </li>
       <!-- /ko -->
       <!-- ko let: {isVisibleFunc: getIsVisibleFunc()} -->
-      <div data-uie-name="recent-view" data-bind="visible: showRecentConversations()">
-        <!-- ko foreach: {data: unarchivedConversations, as: 'conversation', noChildContext: true} -->
-        <conversation-list-cell
-          data-uie-name="item-conversation"
-          params="onClick: makeOnClick(conversation.id, conversation.domain), rightClick: (_, event) => listViewModel.onContextMenu(conversation, event), conversation: conversation, showJoinButton: hasJoinableCall(conversation.qualifiedId), is_selected: isSelectedConversation, onJoinCall: onJoinCall, index: $index, isVisibleFunc: isVisibleFunc"
-        >
-        </conversation-list-cell>
-        <!-- /ko -->
-      </div>
-      <div data-uie-name="folder-view" data-bind="hidden: showRecentConversations()">
+      <li data-uie-name="recent-view" data-bind="visible: showRecentConversations()">
+        <ul class="conversation-recent-view-list">
+          <!-- ko foreach: {data: unarchivedConversations, as: 'conversation', noChildContext: true} -->
+          <li class="conversation-recent-view-list-item">
+            <conversation-list-cell
+              data-uie-name="item-conversation"
+              params="
+                onClick: makeOnClick(conversation.id, conversation.domain),
+                rightClick: (_, event) => listViewModel.onContextMenu(conversation, event),
+                conversation: conversation,
+                showJoinButton: hasJoinableCall(conversation.qualifiedId),
+                is_selected: isSelectedConversation,
+                onJoinCall: onJoinCall,
+                index: $index,
+                isVisibleFunc: isVisibleFunc
+              "
+            >
+            </conversation-list-cell>
+          </li>
+          <!-- /ko -->
+        </ul>
+      </li>
+      <li data-uie-name="folder-view" data-bind="hidden: showRecentConversations()">
         <grouped-conversations
           params="
               conversationRepository: conversationRepository,
@@ -108,7 +129,7 @@
               isVisibleFunc: isVisibleFunc"
         >
         </grouped-conversations>
-      </div>
+      </li>
       <!-- /ko -->
     </ul>
     <!-- /ko -->
