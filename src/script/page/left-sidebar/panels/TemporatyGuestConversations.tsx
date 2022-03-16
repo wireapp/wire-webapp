@@ -25,20 +25,24 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import ConversationListCallingCell from 'Components/list/ConversationListCallingCell';
 import {t} from 'Util/LocalizerUtil';
-import {User} from '../../entity/User';
-import {ListViewModel} from '../../view_model/ListViewModel';
-import {Config} from '../../Config';
-import {ModalsViewModel} from '../../view_model/ModalsViewModel';
-import {CallingViewModel} from '../../view_model/CallingViewModel';
+import {User} from '../../../entity/User';
+import {ListViewModel} from '../../../view_model/ListViewModel';
+import {Config} from '../../../Config';
+import {ModalsViewModel} from '../../../view_model/ModalsViewModel';
+import {CallingViewModel} from '../../../view_model/CallingViewModel';
 import {QualifiedId} from '@wireapp/api-client/src/user';
 
-type ConversationList = {
+type TemporaryGuestConversations = {
   callingViewModel: CallingViewModel;
   listViewModel: ListViewModel;
   selfUser: User;
 };
 
-const ConversationList: React.FC<ConversationList> = ({selfUser, listViewModel, callingViewModel}) => {
+const TemporaryGuestConversations: React.FC<TemporaryGuestConversations> = ({
+  selfUser,
+  listViewModel,
+  callingViewModel,
+}) => {
   const {expirationIsUrgent, expirationRemainingText} = useKoSubscribableChildren(selfUser, [
     'expirationIsUrgent',
     'expirationRemainingText',
@@ -68,11 +72,7 @@ const ConversationList: React.FC<ConversationList> = ({selfUser, listViewModel, 
   };
 
   return (
-    <div
-      id="temporary-guest"
-      className={`temporary-guest left-list ${isVisible ? 'left-list-is-visible' : ''}`}
-      aria-hidden={isVisible ? 'false' : 'true'}
-    >
+    <div id="temporary-guest" className={`temporary-guest`}>
       {activeCalls.map(call => {
         const conversation = getConversationById(call.conversationId);
         return (
@@ -129,4 +129,4 @@ const ConversationList: React.FC<ConversationList> = ({selfUser, listViewModel, 
   );
 };
 
-export default ConversationList;
+export default TemporaryGuestConversations;

@@ -50,7 +50,6 @@ import type {User} from '../entity/User';
 import {UserState} from '../user/UserState';
 import {TeamState} from '../team/TeamState';
 import {ConversationState} from '../conversation/ConversationState';
-import '../page/temporary-guest/TemporaryGuest';
 import {CallingViewModel} from './CallingViewModel';
 
 export enum ListState {

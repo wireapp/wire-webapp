@@ -18,7 +18,7 @@
  */
 
 import React from 'react';
-import {TransitionGroup, CSSTransition} from 'react-transition-group';
+import {CSSTransition, SwitchTransition} from 'react-transition-group';
 import {registerStaticReactComponent, useKoSubscribableChildren} from 'Util/ComponentUtil';
 
 import {ListViewModel, ListState} from '../../view_model/ListViewModel';
@@ -30,6 +30,7 @@ import Preferences from './panels/Preferences';
 import Archive from './panels/Archive';
 import Background from './Background';
 import {container} from 'tsyringe';
+import TemporaryGuestConversations from './panels/TemporatyGuestConversations';
 
 type PreferencesProps = {
   assetRepository?: AssetRepository;
@@ -79,13 +80,24 @@ const LeftSidebar: React.FC<PreferencesProps> = ({
           onClose={goHome}
         ></Archive>
       );
+      break;
+
+    case ListState.TEMPORARY_GUEST:
+      content = (
+        <TemporaryGuestConversations
+          callingViewModel={listViewModel.callingViewModel}
+          listViewModel={listViewModel}
+          selfUser={selfUser}
+        />
+      );
+      break;
   }
   return (
     <>
       <Background selfUser={selfUser} assetRepository={assetRepository} />
-      <TransitionGroup>
+      <SwitchTransition>
         <Animated key={state}>{content}</Animated>
-      </TransitionGroup>
+      </SwitchTransition>
     </>
   );
 };
