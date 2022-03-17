@@ -127,19 +127,19 @@ const ConversationListCell: React.FC<ConversationListCellProps> = ({
       >
         {isInViewport && (
           <>
-            <div
+            <span
               className={cx('conversation-list-cell-left', {
                 'conversation-list-cell-left-opaque': removedFromConversation || users.length === 0,
               })}
             >
               {isGroup && <GroupAvatar className="conversation-list-cell-avatar-arrow" users={users} />}
               {!isGroup && !!users.length && (
-                <div className="avatar-halo">
+                <span className="avatar-halo">
                   <Avatar participant={users[0]} avatarSize={AVATAR_SIZE.SMALL} />
-                </div>
+                </span>
               )}
-            </div>
-            <div className="conversation-list-cell-center">
+            </span>
+            <span className="conversation-list-cell-center">
               {is1to1 && selfUser.inTeam() ? (
                 <AvailabilityState
                   className="conversation-list-cell-availability"
@@ -154,8 +154,8 @@ const ConversationListCell: React.FC<ConversationListCellProps> = ({
               <span className="conversation-list-cell-description" data-uie-name="secondary-line">
                 {cellState.description}
               </span>
-            </div>
-            <div className="conversation-list-cell-right">
+            </span>
+            <span className="conversation-list-cell-right">
               <span
                 className="conversation-list-cell-context-menu"
                 data-uie-name="go-options"
@@ -207,15 +207,15 @@ const ConversationListCell: React.FC<ConversationListCellProps> = ({
                 </>
               )}
               {showJoinButton && (
-                <div
+                <span
                   onClick={onClickJoinCall}
                   className="call-ui__button call-ui__button--green call-ui__button--join"
                   data-uie-name="do-call-controls-call-join"
                 >
                   {t('callJoin')}
-                </div>
+                </span>
               )}
-            </div>
+            </span>
           </>
         )}
       </button>
