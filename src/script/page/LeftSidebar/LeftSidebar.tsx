@@ -17,7 +17,7 @@
  *
  */
 
-import React from 'react';
+import React, {useEffect} from 'react';
 import {CSSTransition, SwitchTransition} from 'react-transition-group';
 import {css} from '@emotion/core';
 import {registerStaticReactComponent, useKoSubscribableChildren} from 'Util/ComponentUtil';
@@ -34,6 +34,8 @@ import Archive from './panels/Archive';
 import Background from './Background';
 import Conversations from './panels/Conversations';
 import TemporaryGuestConversations from './panels/TemporatyGuestConversations';
+import {amplify} from 'amplify';
+import {WebAppEvents} from '@wireapp/webapp-events';
 
 type LeftSidebarProps = {
   assetRepository?: AssetRepository;
@@ -65,6 +67,12 @@ const LeftSidebar: React.FC<LeftSidebarProps> = ({
       ? listViewModel.switchList(ListViewModel.STATE.TEMPORARY_GUEST)
       : listViewModel.switchList(ListViewModel.STATE.CONVERSATIONS);
   };
+
+  useEffect(() => {
+    amplify.subscribe(WebAppEvents.SHORTCUT.START, () => {
+      listViewModel.switchList(ListViewModel.STATE.START_UI);
+    });
+  }, []);
 
   switch (state) {
     case ListState.CONVERSATIONS:
