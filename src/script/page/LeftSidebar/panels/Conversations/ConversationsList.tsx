@@ -94,7 +94,7 @@ export const ConversationsList: React.FC<{
         {conversations.map(conversation => (
           <ConversationListCell
             key={conversation.id}
-            data-uie-name="item-conversation"
+            dataUieName="item-conversation"
             conversation={conversation}
             onClick={createNavigate(generateConversationUrl(conversation.id, conversation.domain))}
             isSelected={isActiveConversation}

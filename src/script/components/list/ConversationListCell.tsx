@@ -40,7 +40,7 @@ import {KEY} from 'Util/KeyboardUtil';
 
 export interface ConversationListCellProps {
   conversation: Conversation;
-  dataUieName?: string;
+  dataUieName: string;
   isSelected?: (conversation: Conversation) => boolean;
   onClick: React.MouseEventHandler<Element>;
   onJoinCall: (conversation: Conversation, mediaType: MediaType) => void;
