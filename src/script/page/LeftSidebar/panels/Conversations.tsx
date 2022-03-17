@@ -81,15 +81,26 @@ const ConversationsList: React.FC<{
   const {activeCalls} = useKoSubscribableChildren(callState, ['activeCalls']);
   const {connectRequests} = useKoSubscribableChildren(userState, ['connectRequests']);
   const [expandedFolders, setExpandedFolders] = useState<string[]>([]);
-  const openContextMenu = useCallback(
-    (conversation: Conversation, event: MouseEvent) => listViewModel.onContextMenu(conversation, event),
-    [],
-  );
-  const answerCall = useCallback((conversation: Conversation) => listViewModel.answerCall(conversation), []);
-  const isActiveConversation = useCallback(
-    (conversation: Conversation) => conversationState.isActiveConversation(conversation),
-    [],
-  );
+  const {activeConversation} = useKoSubscribableChildren(conversationState, ['activeConversation']);
+
+  const isActiveConversation = (conversation: Conversation) => conversationState.isActiveConversation(conversation);
+
+  useEffect(() => {
+    if (!activeConversation) {
+      return;
+    }
+    const conversationLabels =
+      conversationRepository.conversationLabelRepository.getConversationLabelIds(activeConversation);
+    setExpandedFolders(expanded => {
+      const isAlreadyOpen = conversationLabels.some(labelId => expanded.includes(labelId));
+
+      return isAlreadyOpen ? expanded : [...expanded, conversationLabels[0]];
+    });
+  }, [activeConversation]);
+
+  const openContextMenu = (conversation: Conversation, event: MouseEvent) =>
+    listViewModel.onContextMenu(conversation, event);
+  const answerCall = (conversation: Conversation) => listViewModel.answerCall(conversation);
   const {state: contentState} = useKoSubscribableChildren(listViewModel.contentViewModel, ['state']);
   const isShowingConnectionRequests = contentState === ContentViewModel.STATE.CONNECTION_REQUESTS;
 
