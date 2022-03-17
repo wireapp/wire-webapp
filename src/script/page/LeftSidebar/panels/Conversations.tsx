@@ -100,7 +100,7 @@ const ConversationsList: React.FC<{
 
   const conversationView =
     viewStyle === ConverationViewStyle.RECENT ? (
-      <div data-uie-name="recent-view">
+      <>
         {conversations.map(conversation => (
           <ConversationListCell
             key={conversation.id}
@@ -113,25 +113,25 @@ const ConversationsList: React.FC<{
             showJoinButton={hasJoinableCall(conversation)}
           />
         ))}
-      </div>
+      </>
     ) : (
-      <div data-uie-name="folder-view">
-        <GroupedConversations
-          callState={callState}
-          conversationRepository={conversationRepository}
-          conversationState={conversationState}
-          expandedFolders={expandedFolders}
-          hasJoinableCall={hasJoinableCall}
-          isSelectedConversation={isActiveConversation}
-          listViewModel={listViewModel}
-          onJoinCall={answerCall}
-          setExpandedFolders={setExpandedFolders}
-        />
-      </div>
+      <GroupedConversations
+        callState={callState}
+        conversationRepository={conversationRepository}
+        conversationState={conversationState}
+        expandedFolders={expandedFolders}
+        hasJoinableCall={hasJoinableCall}
+        isSelectedConversation={isActiveConversation}
+        listViewModel={listViewModel}
+        onJoinCall={answerCall}
+        setExpandedFolders={setExpandedFolders}
+      />
     );
 
+  const uieName = viewStyle === ConverationViewStyle.FOLDER ? 'folder-view' : 'recent-view';
+
   return (
-    <ul css={css({paddingLeft: 0})}>
+    <ul css={css({paddingLeft: 0})} data-uie-name={uieName}>
       {/*
       <!-- ko if: showConnectRequests() -->
       <li
@@ -239,7 +239,7 @@ const Conversations: React.FC<ConversationsProps> = ({
               isPending={hasPendingLegalHold}
               data-uie-name={hasPendingLegalHold ? 'status-legal-hold-pending' : 'status-legal-hold'}
               legalHoldModal={undefined /**TODO*/}
-              style={{padding: '8px'}}
+              css={{padding: '8px'}}
             />
           )}
         </>
