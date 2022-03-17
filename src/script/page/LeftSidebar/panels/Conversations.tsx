@@ -210,8 +210,9 @@ const Conversations: React.FC<ConversationsProps> = ({
   const {
     name: userName,
     availability: userAvailability,
+    isOnLegalHold,
     hasPendingLegalHold,
-  } = useKoSubscribableChildren(selfUser, ['hasPendingLegalHold', 'name', 'availability']);
+  } = useKoSubscribableChildren(selfUser, ['hasPendingLegalHold', 'isOnLegalHold', 'name', 'availability']);
   const {conversations_archived: archivedConversations, conversations_unarchived: conversations} =
     useKoSubscribableChildren(conversationState, ['conversations_archived', 'conversations_unarchived']);
 
@@ -221,7 +222,6 @@ const Conversations: React.FC<ConversationsProps> = ({
     : ConverationViewStyle.RECENT;
 
   const [viewStyle, setViewStyle] = useState<ConverationViewStyle>(initialViewStyle);
-  const isLegalHold = false;
   const showBadge = () => false;
 
   const hasNoConversations = conversations.length === 0;
@@ -258,7 +258,7 @@ const Conversations: React.FC<ConversationsProps> = ({
               label={userName}
             />
           </button>
-          {isLegalHold && (
+          {(isOnLegalHold || hasPendingLegalHold) && (
             <LegalHoldDot
               isPending={hasPendingLegalHold}
               data-uie-name={hasPendingLegalHold ? 'status-legal-hold-pending' : 'status-legal-hold'}
