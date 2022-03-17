@@ -212,7 +212,12 @@ const ConversationListCallingCell: React.FC<CallingCellProps> = ({
         </button>
       )}
       {conversation && !isDeclined && (
-        <div className="conversation-list-calling-cell-background">
+        <div
+          className="conversation-list-calling-cell-background"
+          data-uie-name="item-call"
+          data-uie-id={conversation.id}
+          data-uie-value={conversation.display_name()}
+        >
           {muteState === MuteState.REMOTE_MUTED && (
             <div className="conversation-list-calling-cell__info-bar">{t('muteStateRemoteMute')}</div>
           )}

@@ -204,9 +204,6 @@ const Conversations: React.FC<ConversationsProps> = ({
           return (
             <div className="calling-cell" key={conversation.id}>
               <ConversationListCallingCell
-                data-uie-name="item-call"
-                data-uie-id={conversation.id}
-                data-uie-value={conversation.display_name()}
                 call={call}
                 callActions={callingViewModel.callActions}
                 callingRepository={callingRepository}
