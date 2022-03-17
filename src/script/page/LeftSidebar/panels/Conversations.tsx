@@ -47,6 +47,10 @@ import AvailabilityState from 'Components/AvailabilityState';
 import LegalHoldDot from 'Components/LegalHoldDot';
 import {TeamState} from '../../../team/TeamState';
 import {AvailabilityContextMenu} from '../../../ui/AvailabilityContextMenu';
+import {UserState} from '../../../user/UserState';
+import Avatar, {AVATAR_SIZE} from 'Components/Avatar';
+import GroupAvatar from 'Components/avatar/GroupAvatar';
+import {ContentViewModel} from '../../../view_model/ContentViewModel';
 
 type ConversationsProps = {
   callState?: CallState;
@@ -57,6 +61,7 @@ type ConversationsProps = {
   selfUser: User;
   switchList: (list: ListState) => void;
   teamState?: TeamState;
+  userState?: UserState;
 };
 
 enum ConverationViewStyle {
@@ -70,9 +75,11 @@ const ConversationsList: React.FC<{
   conversations: Conversation[];
   conversationState: ConversationState;
   listViewModel: ListViewModel;
+  userState: UserState;
   viewStyle: ConverationViewStyle;
-}> = ({conversations, listViewModel, viewStyle, conversationState, conversationRepository, callState}) => {
+}> = ({conversations, listViewModel, viewStyle, userState, conversationState, conversationRepository, callState}) => {
   const {activeCalls} = useKoSubscribableChildren(callState, ['activeCalls']);
+  const {connectRequests} = useKoSubscribableChildren(userState, ['connectRequests']);
   const [expandedFolders, setExpandedFolders] = useState<string[]>([]);
   const openContextMenu = useCallback(
     (conversation: Conversation, event: MouseEvent) => listViewModel.onContextMenu(conversation, event),
@@ -83,6 +90,8 @@ const ConversationsList: React.FC<{
     (conversation: Conversation) => conversationState.isActiveConversation(conversation),
     [],
   );
+  const {state: contentState} = useKoSubscribableChildren(listViewModel.contentViewModel, ['state']);
+  const isShowingConnectionRequests = contentState === ContentViewModel.STATE.CONNECTION_REQUESTS;
 
   const hasJoinableCall = useCallback((conversation: Conversation) => {
     const call = activeCalls.find((callInstance: Call) =>
@@ -130,41 +139,47 @@ const ConversationsList: React.FC<{
 
   const uieName = viewStyle === ConverationViewStyle.FOLDER ? 'folder-view' : 'recent-view';
 
-  return (
-    <ul css={css({paddingLeft: 0})} data-uie-name={uieName}>
-      {/*
-      <!-- ko if: showConnectRequests() -->
+  const connectionText =
+    connectRequests.length > 1
+      ? t('conversationsConnectionRequestMany', connectRequests.length)
+      : t('conversationsConnectionRequestOne');
+
+  const connectionRequests =
+    connectRequests.length === 0 ? null : (
       <li
-        className="conversation-list-cell"
-        data-bind="click: clickOnConnectRequests, css: {'conversation-list-cell-active': stateIsRequests()}"
+        className={`conversation-list-cell ${isShowingConnectionRequests ? 'conversation-list-cell-active' : ''}`}
+        onClick={() => listViewModel.contentViewModel.switchContent(ContentViewModel.STATE.CONNECTION_REQUESTS)}
       >
         <div className="conversation-list-cell-left">
-          <!-- ko if: connectRequests().length === 1 -->
-          <div className="avatar-halo">
-            <participant-avatar params="participant: connectRequests()[0], avatarSize: participantAvatarSize">
-            </participant-avatar>
-          </div>
-          <!-- /ko -->
-
-          <!-- ko if: connectRequests().length > 1 -->
-          <group-avatar params="users: connectRequests()"></group-avatar>
-          <!-- /ko -->
+          {connectRequests.length === 1 ? (
+            <div className="avatar-halo">
+              <Avatar participant={connectRequests[0]} avatarSize={AVATAR_SIZE.SMALL} />
+            </div>
+          ) : (
+            <GroupAvatar users={connectRequests} />
+          )}
         </div>
 
         <div className="conversation-list-cell-center">
           <span
-            className="conversation-list-cell-name"
-            data-bind="text: connectRequestsText, css: {'accent-text': stateIsRequests()}"
+            className={`conversation-list-cell-name ${isShowingConnectionRequests ? 'accent-text' : ''}`}
             data-uie-name="item-pending-requests"
-          ></span>
+          >
+            {connectionText}
+          </span>
         </div>
 
         <div className="conversation-list-cell-right">
-          <span className="conversation-list-cell-badge cell-badge-dark icon-pending" data-uie-name="status-pending"></span>
+          <span
+            className="conversation-list-cell-badge cell-badge-dark icon-pending"
+            data-uie-name="status-pending"
+          ></span>
         </div>
       </li>
-      <!-- /ko -->
-*/}
+    );
+  return (
+    <ul css={css({paddingLeft: 0})} data-uie-name={uieName}>
+      {connectionRequests}
       {conversationView}
     </ul>
   );
@@ -177,6 +192,7 @@ const Conversations: React.FC<ConversationsProps> = ({
   conversationState = container.resolve(ConversationState),
   teamState = container.resolve(TeamState),
   callState = container.resolve(CallState),
+  userState = container.resolve(UserState),
   selfUser,
   switchList,
 }) => {
@@ -354,6 +370,7 @@ const Conversations: React.FC<ConversationsProps> = ({
       ) : (
         <ConversationsList
           callState={callState}
+          userState={userState}
           conversations={conversations}
           viewStyle={viewStyle}
           listViewModel={listViewModel}
