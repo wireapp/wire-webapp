@@ -28,7 +28,6 @@ import {t} from 'Util/LocalizerUtil';
 import {iterateItem} from 'Util/ArrayUtil';
 import {isEscapeKey} from 'Util/KeyboardUtil';
 
-import {ConversationListViewModel} from './list/ConversationListViewModel';
 import {StartUIViewModel} from './list/StartUIViewModel';
 import {TakeoverViewModel} from './list/TakeoverViewModel';
 
@@ -37,7 +36,6 @@ import {showLabelContextMenu} from '../ui/LabelContextMenu';
 import {Shortcut} from '../ui/Shortcut';
 import {ShortcutType} from '../ui/ShortcutType';
 import {ContentViewModel} from './ContentViewModel';
-import {DefaultLabelIds} from '../conversation/ConversationLabelRepository';
 import {ModalsViewModel} from './ModalsViewModel';
 import {PanelViewModel} from './PanelViewModel';
 import type {MainViewModel, ViewModelRepositories} from './MainViewModel';
@@ -87,7 +85,6 @@ export class ListViewModel {
   public readonly selfUser: ko.Observable<User>;
   private readonly modal: ko.Observable<string>;
   private readonly visibleListItems: ko.PureComputed<(string | Conversation)[]>;
-  private readonly conversations: ConversationListViewModel;
   private readonly start: StartUIViewModel;
 
   static get MODAL_TYPE() {
@@ -157,17 +154,6 @@ export class ListViewModel {
       return states.concat(this.conversationState.conversations_unarchived());
     });
 
-    // Nested view models
-    this.conversations = new ConversationListViewModel(
-      mainViewModel,
-      this,
-      this.answerCall,
-      repositories.event,
-      repositories.calling,
-      repositories.conversation,
-      repositories.preferenceNotification,
-      repositories.properties,
-    );
     this.start = new StartUIViewModel(
       mainViewModel,
       this,
@@ -410,7 +396,6 @@ export class ListViewModel {
         entries.push({
           click: () => {
             conversationLabelRepository.addConversationToFavorites(conversationEntity);
-            this.conversations.expandFolder(DefaultLabelIds.Favorites);
           },
           label: t('conversationPopoverFavorite'),
         });
