@@ -64,7 +64,7 @@ const Archive: React.FC<ArchiveProps> = ({
   return (
     <ListWrapper id="archive" header={t('archiveHeader')} onClose={onClose}>
       <ul className="left-list-items no-scroll">
-        {conversations.map((conversation, index) => (
+        {conversations.map(conversation => (
           <li key={conversation.id}>
             <ConversationListCell
               dataUieName="item-conversation-archived"
@@ -72,7 +72,6 @@ const Archive: React.FC<ArchiveProps> = ({
               rightClick={listViewModel.onContextMenu}
               conversation={conversation}
               onJoinCall={answerCall}
-              index={index}
               showJoinButton={false}
             />
           </li>
