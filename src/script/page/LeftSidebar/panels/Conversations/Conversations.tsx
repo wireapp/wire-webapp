@@ -75,6 +75,7 @@ const Conversations: React.FC<ConversationsProps> = ({
     isOnLegalHold,
     hasPendingLegalHold,
   } = useKoSubscribableChildren(selfUser, ['hasPendingLegalHold', 'isOnLegalHold', 'name', 'availability']);
+  const {connectRequests} = useKoSubscribableChildren(userState, ['connectRequests']);
   const {conversations_archived: archivedConversations, conversations_unarchived: conversations} =
     useKoSubscribableChildren(conversationState, ['conversations_archived', 'conversations_unarchived']);
 
@@ -86,7 +87,7 @@ const Conversations: React.FC<ConversationsProps> = ({
   const [viewStyle, setViewStyle] = useState<ConverationViewStyle>(initialViewStyle);
   const showBadge = () => false;
 
-  const hasNoConversations = conversations.length === 0;
+  const hasNoConversations = conversations.length + connectRequests.length === 0;
 
   useEffect(() => {
     propertiesRepository.savePreference(
@@ -235,6 +236,7 @@ const Conversations: React.FC<ConversationsProps> = ({
         </>
       ) : (
         <ConversationsList
+          connectRequests={connectRequests}
           callState={callState}
           userState={userState}
           conversations={conversations}

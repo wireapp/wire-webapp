@@ -20,7 +20,7 @@
 import React from 'react';
 import {act, render} from '@testing-library/react';
 
-import Conversations from './Conversations';
+import Conversations from './';
 import {ListState} from 'src/script/view_model/ListViewModel';
 
 import {User} from 'src/script/entity/User';

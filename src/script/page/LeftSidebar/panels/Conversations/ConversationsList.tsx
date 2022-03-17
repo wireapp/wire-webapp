@@ -38,18 +38,28 @@ import Avatar, {AVATAR_SIZE} from 'Components/Avatar';
 import GroupAvatar from 'Components/avatar/GroupAvatar';
 import {ContentViewModel} from '../../../../view_model/ContentViewModel';
 import {ConverationViewStyle} from './Conversations';
+import {User} from 'src/script/entity/User';
 
 export const ConversationsList: React.FC<{
   callState: CallState;
+  connectRequests: User[];
   conversationRepository: ConversationRepository;
   conversations: Conversation[];
   conversationState: ConversationState;
   listViewModel: ListViewModel;
   userState: UserState;
   viewStyle: ConverationViewStyle;
-}> = ({conversations, listViewModel, viewStyle, userState, conversationState, conversationRepository, callState}) => {
+}> = ({
+  conversations,
+  listViewModel,
+  viewStyle,
+  connectRequests,
+  userState,
+  conversationState,
+  conversationRepository,
+  callState,
+}) => {
   const {activeCalls} = useKoSubscribableChildren(callState, ['activeCalls']);
-  const {connectRequests} = useKoSubscribableChildren(userState, ['connectRequests']);
   const [expandedFolders, setExpandedFolders] = useState<string[]>([]);
   const {activeConversation} = useKoSubscribableChildren(conversationState, ['activeConversation']);
 
