@@ -225,7 +225,8 @@ const Login = ({
                   )}
                   {!Runtime.isDesktopApp() && (
                     <Checkbox
-                      tabIndex={3}
+                      id="enter-public-computer-sign-in"
+                      name="enter-public-computer-sign-in"
                       onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
                         pushLoginData({clientType: event.target.checked ? ClientType.TEMPORARY : ClientType.PERMANENT});
                       }}
@@ -233,7 +234,9 @@ const Login = ({
                       data-uie-name="enter-public-computer-sign-in"
                       style={{justifyContent: 'center', marginTop: '12px'}}
                     >
-                      <CheckboxLabel>{_(loginStrings.publicComputer)}</CheckboxLabel>
+                      <CheckboxLabel htmlFor="enter-public-computer-sign-in">
+                        {_(loginStrings.publicComputer)}
+                      </CheckboxLabel>
                     </Checkbox>
                   )}
                 </Form>
