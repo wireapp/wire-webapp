@@ -111,7 +111,7 @@ const ConversationListCell: React.FC<ConversationListCellProps> = ({
   };
 
   return (
-    <li ref={setViewportElementRef}>
+    <li ref={setViewportElementRef} data-uie-name={dataUieName}>
       <div
         data-uie-name={dataUieName}
         data-uie-uid={conversation.id}
