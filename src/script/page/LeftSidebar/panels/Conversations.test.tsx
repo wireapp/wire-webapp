@@ -28,6 +28,8 @@ import {PROPERTIES_TYPE} from 'src/script/properties/PropertiesType';
 
 describe('Conversations', () => {
   const defaultParams: React.ComponentProps<typeof Conversations> = {
+    conversationRepository: {} as any,
+    listViewModel: {} as any,
     propertiesRepository: {getPreference: jest.fn(), savePreference: jest.fn()} as any,
     selfUser: new User(),
     switchList: jest.fn(),

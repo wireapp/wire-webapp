@@ -53,7 +53,7 @@ import ClassifiedBar from 'Components/input/ClassifiedBar';
 export interface CallingCellProps {
   call: Call;
   callActions: CallActions;
-  callingRepository: CallingRepository;
+  callingRepository: Pick<CallingRepository, 'supportsScreenSharing' | 'sendModeratorMute'>;
   callState?: CallState;
   classifiedDomains?: string[];
   conversation: Conversation;
