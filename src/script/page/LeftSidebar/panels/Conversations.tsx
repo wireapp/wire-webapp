@@ -178,7 +178,7 @@ const ConversationsList: React.FC<{
       </li>
     );
   return (
-    <ul css={css({paddingLeft: 0})} data-uie-name={uieName}>
+    <ul css={css({margin: 0, paddingLeft: 0})} data-uie-name={uieName}>
       {connectionRequests}
       {conversationView}
     </ul>
@@ -226,9 +226,7 @@ const Conversations: React.FC<ConversationsProps> = ({
     <>
       <button
         type="button"
-        className={`conversations-settings button-icon-large accent-text ${
-          showBadge() ? 'conversations-settings--badge' : ''
-        }`}
+        className={`conversations-settings-button accent-text ${showBadge() ? 'conversations-settings--badge' : ''}`}
         title={t('tooltipConversationsPreferences')}
         onClick={() => switchList(ListState.PREFERENCES)}
         data-uie-name="go-preferences"
@@ -240,7 +238,6 @@ const Conversations: React.FC<ConversationsProps> = ({
           <button
             type="button"
             className="left-list-header-availability"
-            tabIndex={0}
             onClick={event => AvailabilityContextMenu.show(event.nativeEvent, 'left-list-availability-menu')}
           >
             <AvailabilityState
@@ -274,7 +271,6 @@ const Conversations: React.FC<ConversationsProps> = ({
           <button
             type="button"
             className="button-icon-large"
-            tabIndex={0}
             onClick={() => switchList(ListState.START_UI)}
             title={t('tooltipConversationsStart', Shortcut.getShortcutTooltip(ShortcutType.START))}
             data-uie-name="go-people"
@@ -286,7 +282,6 @@ const Conversations: React.FC<ConversationsProps> = ({
         <li className="conversations-footer-list-item">
           <button
             type="button"
-            tabIndex={0}
             className={`button-icon-large ${viewStyle === ConverationViewStyle.RECENT ? 'accent-fill' : ''}`}
             onClick={() => setViewStyle(ConverationViewStyle.RECENT)}
             title={t('conversationViewTooltip')}
@@ -299,7 +294,6 @@ const Conversations: React.FC<ConversationsProps> = ({
         <li className="conversations-footer-list-item">
           <button
             type="button"
-            tabIndex={0}
             className={`button-icon-large ${viewStyle === ConverationViewStyle.FOLDER ? 'accent-fill' : ''}`}
             onClick={() => setViewStyle(ConverationViewStyle.FOLDER)}
             title={t('folderViewTooltip')}
@@ -313,7 +307,6 @@ const Conversations: React.FC<ConversationsProps> = ({
           <li className="conversations-footer-list-item">
             <button
               type="button"
-              tabIndex={0}
               className="button-icon-large"
               onClick={() => switchList(ListState.ARCHIVE)}
               title={t('tooltipConversationsArchived', archivedConversations.length)}

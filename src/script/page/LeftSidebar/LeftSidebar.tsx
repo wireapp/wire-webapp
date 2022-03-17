@@ -35,7 +35,7 @@ import Background from './Background';
 import Conversations from './panels/Conversations';
 import TemporaryGuestConversations from './panels/TemporatyGuestConversations';
 
-type PreferencesProps = {
+type LeftSidebarProps = {
   assetRepository?: AssetRepository;
   conversationRepository: ConversationRepository;
   listViewModel: ListViewModel;
@@ -50,7 +50,7 @@ const Animated: React.FC = ({children, ...rest}) => {
   );
 };
 
-const LeftSidebar: React.FC<PreferencesProps> = ({
+const LeftSidebar: React.FC<LeftSidebarProps> = ({
   listViewModel,
   conversationRepository,
   propertiesRepository,

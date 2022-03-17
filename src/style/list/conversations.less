@@ -17,23 +17,10 @@
  *
  */
 
-.conversations {
-  user-select: none;
-  .left-list-container;
-
-  &:not(.left-list-is-visible) {
-    .start-ui-transition-fadeout;
-  }
-
-  &.left-list-is-visible {
-    .start-ui-transition-fadein;
-  }
-
-  .left-list-header-text {
-    max-width: 208px;
-    flex: 1;
-    text-align: center;
-  }
+.conversations .left-list-header-text {
+  max-width: 208px;
+  flex: 1;
+  text-align: center;
 }
 
 .conversations-footer-list {
@@ -58,10 +45,10 @@
 
 .conversations-settings-button {
   .button-reset-default;
+  .button-icon-large;
 }
 
 .conversations-settings {
-  .button-reset-default;
   position: relative;
 
   &--badge::after {

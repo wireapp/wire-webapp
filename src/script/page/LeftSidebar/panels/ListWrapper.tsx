@@ -88,7 +88,7 @@ const ListWrapper: React.FC<LeftListWrapperProps> = ({
   }, [scrollbarRef]);
 
   return (
-    <div id={id} className={`left-list-${id}`} css={style}>
+    <div id={id} className={`left-list-${id} ${id}`} css={style}>
       <section className="left-list-header">
         {headerElement ? (
           headerElement
