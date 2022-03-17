@@ -53,6 +53,9 @@ export enum BackendErrorLabel {
   PENDING_ACTIVATION = 'pending-activation',
   PENDING_LOGIN = 'pending-login',
   SUSPENDED_ACCOUNT = 'suspended',
+  CODE_AUTHENTICATION_REQUIRED = 'code-authentication-required',
+  CODE_AUTHENTICATION_FAILED = 'code-authentication-failed',
+  PASSWORD_AUTHENTICATION_FAILED = 'password-authentication-failed',
 
   // Client errors
   TOO_MANY_CLIENTS = 'too-many-clients',
