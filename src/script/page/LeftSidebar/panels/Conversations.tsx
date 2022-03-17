@@ -233,7 +233,7 @@ const Conversations: React.FC<ConversationsProps> = ({
       >
         <Icon.Settings />
       </button>
-      {teamState.isTeam ? (
+      {teamState.isTeam() ? (
         <>
           <button
             type="button"

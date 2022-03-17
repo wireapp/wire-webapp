@@ -83,7 +83,7 @@ const ConversationListCell: React.FC<ConversationListCellProps> = ({
 
   const isActive = isSelected(conversation);
 
-  const [viewportElementRef, setViewportElementRef] = useEffectRef<HTMLDivElement>();
+  const [viewportElementRef, setViewportElementRef] = useEffectRef<HTMLElement>();
 
   useEffect(() => {
     const handleRightClick = (event: MouseEvent) => {
@@ -111,56 +111,54 @@ const ConversationListCell: React.FC<ConversationListCellProps> = ({
   };
 
   return (
-    <div
-      ref={setViewportElementRef}
-      data-uie-name={dataUieName}
-      data-uie-uid={conversation.id}
-      data-uie-value={displayName}
-      role="button"
-      tabIndex={0}
-      className={cx('conversation-list-cell', {'conversation-list-cell-active': isActive})}
-      onClick={onClick}
-      onKeyPress={handleKeyPress}
-    >
+    <li ref={setViewportElementRef}>
       <div
-        className={cx('conversation-list-cell-left', {
-          'conversation-list-cell-left-opaque': removedFromConversation || users.length === 0,
-        })}
+        data-uie-name={dataUieName}
+        data-uie-uid={conversation.id}
+        data-uie-value={displayName}
+        role="button"
+        tabIndex={0}
+        className={cx('conversation-list-cell', {'conversation-list-cell-active': isActive})}
+        onClick={onClick}
+        onKeyPress={handleKeyPress}
       >
-        {isGroup && <GroupAvatar className="conversation-list-cell-avatar-arrow" users={users} />}
-        {!isGroup && !!users.length && (
-          <div className="avatar-halo">
-            <Avatar participant={users[0]} avatarSize={AVATAR_SIZE.SMALL} />
-          </div>
-        )}
-      </div>
-      <div className="conversation-list-cell-center">
-        {is1to1 && selfUser.inTeam() ? (
-          <AvailabilityState
-            className="conversation-list-cell-availability"
-            availability={availabilityOfUser}
-            label={displayName}
-            theme={isActive}
-            dataUieName="status-availability-item"
+        <div
+          className={cx('conversation-list-cell-left', {
+            'conversation-list-cell-left-opaque': removedFromConversation || users.length === 0,
+          })}
+        >
+          {isGroup && <GroupAvatar className="conversation-list-cell-avatar-arrow" users={users} />}
+          {!isGroup && !!users.length && (
+            <div className="avatar-halo">
+              <Avatar participant={users[0]} avatarSize={AVATAR_SIZE.SMALL} />
+            </div>
+          )}
+        </div>
+        <div className="conversation-list-cell-center">
+          {is1to1 && selfUser.inTeam() ? (
+            <AvailabilityState
+              className="conversation-list-cell-availability"
+              availability={availabilityOfUser}
+              label={displayName}
+              theme={isActive}
+              dataUieName="status-availability-item"
+            />
+          ) : (
+            <span className={cx('conversation-list-cell-name', {'accent-text': isActive})}>{displayName}</span>
+          )}
+          <span className="conversation-list-cell-description" data-uie-name="secondary-line">
+            {cellState.description}
+          </span>
+        </div>
+        <div className="conversation-list-cell-right">
+          <span
+            className="conversation-list-cell-context-menu"
+            data-uie-name="go-options"
+            onClick={event => {
+              event.stopPropagation();
+              rightClick(conversation, event.nativeEvent);
+            }}
           />
-        ) : (
-          <span className={cx('conversation-list-cell-name', {'accent-text': isActive})}>{displayName}</span>
-        )}
-        <span className="conversation-list-cell-description" data-uie-name="secondary-line">
-          {cellState.description}
-        </span>
-      </div>
-      <div className="conversation-list-cell-right">
-        <button
-          className="conversation-list-cell-context-menu"
-          data-uie-name="go-options"
-          aria-label={t('conversationOptionsMenu')}
-          type="button"
-          onClick={event => {
-            event.stopPropagation();
-            rightClick(conversation, event.nativeEvent);
-          }}
-        ></button>
         {!showJoinButton && (
           <>
             {cellState.icon === ConversationStatusIcon.PENDING_CONNECTION && (
@@ -246,7 +244,7 @@ const ConversationListCell: React.FC<ConversationListCellProps> = ({
           </button>
         )}
       </div>
-    </div>
+    </li>
   );
 };
 

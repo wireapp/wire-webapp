@@ -18,6 +18,7 @@
  */
 
 import React from 'react';
+import {css} from '@emotion/core';
 import type {ConversationLabel} from 'src/script/conversation/ConversationLabelRepository';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import ConversationListCell from './ConversationListCell';
@@ -55,7 +56,7 @@ const GroupedConversationsFolder: React.FC<GroupedConversationsFolderProps> = ({
   return (
     <li className="conversation-folder" data-uie-name="conversation-folder" data-uie-value={folder.name}>
       <GroupedConversationHeader onClick={() => toggle(folder.id)} conversationLabel={folder} isOpen={isExpanded} />
-      <div>
+      <ul css={css({listStyle: 'none', padding: 0})}>
         {isExpanded &&
           conversations.map(conversation => (
             <ConversationListCell
@@ -69,7 +70,7 @@ const GroupedConversationsFolder: React.FC<GroupedConversationsFolderProps> = ({
               onJoinCall={onJoinCall}
             />
           ))}
-      </div>
+      </ul>
     </li>
   );
 };
