@@ -53,12 +53,12 @@ export class ClientAction {
     };
   };
 
-  doInitializeClient = (clientType: ClientType, password?: string): ThunkAction => {
+  doInitializeClient = (clientType: ClientType, password?: string, verificationCode?: string): ThunkAction => {
     return async (dispatch, getState, {core, actions: {clientAction, webSocketAction}}) => {
       dispatch(ClientActionCreator.startInitializeClient());
       try {
         const creationStatus = await core.initClient(
-          {clientType, password},
+          {clientType, password, verificationCode},
           clientAction.generateClientPayload(clientType),
         );
         await dispatch(clientAction.doGetAllClients());

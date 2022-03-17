@@ -24,15 +24,21 @@ import {
   COLOR,
   Checkbox,
   CheckboxLabel,
+  CodeInput,
   Column,
   Columns,
   Container,
   ContainerXS,
   Form,
   H1,
+  H2,
+  Label,
   IsMobile,
   Link,
+  TextLink,
+  Loading,
   Muted,
+  Text,
 } from '@wireapp/react-ui-kit';
 import React, {useEffect, useState} from 'react';
 import {useIntl} from 'react-intl';
@@ -42,7 +48,7 @@ import {AnyAction, Dispatch} from 'redux';
 import useReactRouter from 'use-react-router';
 import {getLogger} from 'Util/Logger';
 import {Config} from '../../Config';
-import {loginStrings} from '../../strings';
+import {errorHandlerStrings, loginStrings, verifyStrings} from '../../strings';
 import AppAlreadyOpen from '../component/AppAlreadyOpen';
 import LoginForm from '../component/LoginForm';
 import RouterLink from '../component/RouterLink';
@@ -70,6 +76,7 @@ const Login = ({
   doInitializeClient,
   doLoginAndJoin,
   doLogin,
+  doSendTwoFactorCode,
   isFetching,
   pushLoginData,
   loginData,
@@ -84,6 +91,10 @@ const Login = ({
 
   const [isValidLink, setIsValidLink] = useState(true);
   const [validationErrors, setValidationErrors] = useState([]);
+
+  const [isResendingTwoFactorCode, setIsResendingTwoFactorCode] = useState(false);
+  const [twoFactorSubmitFailed, setTwoFactorSubmitFailed] = useState(false);
+  const [twoFactorLoginData, setTwoFactorLoginData] = useState<LoginData>();
 
   useEffect(() => {
     const queryClientType = UrlUtil.getURLParameter(QUERY_KEY.CLIENT_TYPE);
@@ -163,6 +174,16 @@ const Login = ({
             history.push(ROUTE.CLIENTS);
             break;
           }
+          case BackendError.LABEL.CODE_AUTHENTICATION_REQUIRED: {
+            const login: LoginData = {...formLoginData, clientType: loginData.clientType};
+            setTwoFactorLoginData(login);
+            doSendTwoFactorCode(login.email);
+            break;
+          }
+          case BackendError.LABEL.CODE_AUTHENTICATION_FAILED: {
+            setTwoFactorSubmitFailed(true);
+            break;
+          }
           case BackendError.LABEL.INVALID_CREDENTIALS:
           case LabeledError.GENERAL_ERRORS.LOW_DISK_SPACE: {
             break;
@@ -182,11 +203,28 @@ const Login = ({
     }
   };
 
+  const resendTwoFactorCode = async () => {
+    setIsResendingTwoFactorCode(true);
+    try {
+      await doSendTwoFactorCode(twoFactorLoginData.email);
+      setIsResendingTwoFactorCode(false);
+    } catch (error) {
+      logger.error('Unable to resend two factor code', error);
+      setIsResendingTwoFactorCode(false);
+    }
+  };
+
+  const submitTwoFactorLogin = (code: string) => {
+    setTwoFactorSubmitFailed(false);
+    handleSubmit({...twoFactorLoginData, verificationCode: code}, []);
+  };
+
   const backArrow = (
     <RouterLink to={ROUTE.INDEX} data-uie-name="go-index">
       <ArrowIcon direction="left" color={COLOR.TEXT} style={{opacity: 0.56}} />
     </RouterLink>
   );
+
   return (
     <Page>
       {(Config.getConfig().FEATURE.ENABLE_DOMAIN_DISCOVERY ||
@@ -214,47 +252,80 @@ const Login = ({
               centerText
               style={{display: 'flex', flexDirection: 'column', height: 428, justifyContent: 'space-between'}}
             >
-              <div>
-                <H1 center>{_(loginStrings.headline)}</H1>
-                <Muted>{_(loginStrings.subhead)}</Muted>
-                <Form style={{marginTop: 30}} data-uie-name="login">
-                  <LoginForm isFetching={isFetching} onSubmit={handleSubmit} />
-                  {validationErrors.length ? (
-                    parseValidationErrors(validationErrors)
-                  ) : loginError ? (
-                    parseError(loginError)
-                  ) : (
-                    <div style={{marginTop: '4px'}}>&nbsp;</div>
-                  )}
-                  {!Runtime.isDesktopApp() && (
-                    <Checkbox
-                      tabIndex={3}
-                      onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-                        pushLoginData({clientType: event.target.checked ? ClientType.TEMPORARY : ClientType.PERMANENT});
-                      }}
-                      checked={loginData.clientType === ClientType.TEMPORARY}
-                      data-uie-name="enter-public-computer-sign-in"
-                      style={{justifyContent: 'center', marginTop: '12px'}}
-                    >
-                      <CheckboxLabel>{_(loginStrings.publicComputer)}</CheckboxLabel>
-                    </Checkbox>
-                  )}
-                </Form>
-              </div>
-              <Columns>
-                <Column>
-                  <Link onClick={forgotPassword} data-uie-name="go-forgot-password">
-                    {_(loginStrings.forgotPassword)}
-                  </Link>
-                </Column>
-                {Config.getConfig().FEATURE.ENABLE_PHONE_LOGIN && (
-                  <Column>
-                    <Link onClick={() => history.push(ROUTE.LOGIN_PHONE)} data-uie-name="go-sign-in-phone">
-                      {_(loginStrings.phoneLogin)}
-                    </Link>
-                  </Column>
-                )}
-              </Columns>
+              {twoFactorLoginData && (
+                <div>
+                  <H2 center>{_(loginStrings.twoFactorLoginTitle)}</H2>
+                  <Text>{_(loginStrings.twoFactorLoginSubHead, {email: twoFactorLoginData.email})}</Text>
+                  <Label markInvalid={twoFactorSubmitFailed}>
+                    <CodeInput
+                      autoFocus
+                      style={{marginTop: 60}}
+                      onCodeComplete={submitTwoFactorLogin}
+                      data-uie-name="enter-code"
+                      markInvalid={twoFactorSubmitFailed}
+                    />
+                    {twoFactorSubmitFailed && (
+                      <div>{_(errorHandlerStrings[BackendError.LABEL.CODE_AUTHENTICATION_FAILED])}</div>
+                    )}
+                  </Label>
+                  <div style={{marginTop: 30}}>
+                    {isResendingTwoFactorCode ? (
+                      <Loading size={20} />
+                    ) : (
+                      <TextLink onClick={resendTwoFactorCode} center>
+                        {_(verifyStrings.resendCode)}
+                      </TextLink>
+                    )}
+                  </div>
+                </div>
+              )}
+              {!twoFactorLoginData && (
+                <>
+                  <div>
+                    <H1 center>{_(loginStrings.headline)}</H1>
+                    <Muted>{_(loginStrings.subhead)}</Muted>
+                    <Form style={{marginTop: 30}} data-uie-name="login">
+                      <LoginForm isFetching={isFetching} onSubmit={handleSubmit} />
+                      {validationErrors.length ? (
+                        parseValidationErrors(validationErrors)
+                      ) : loginError ? (
+                        parseError(loginError)
+                      ) : (
+                        <div style={{marginTop: '4px'}}>&nbsp;</div>
+                      )}
+                      {!Runtime.isDesktopApp() && (
+                        <Checkbox
+                          tabIndex={3}
+                          onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                            pushLoginData({
+                              clientType: event.target.checked ? ClientType.TEMPORARY : ClientType.PERMANENT,
+                            });
+                          }}
+                          checked={loginData.clientType === ClientType.TEMPORARY}
+                          data-uie-name="enter-public-computer-sign-in"
+                          style={{justifyContent: 'center', marginTop: '12px'}}
+                        >
+                          <CheckboxLabel>{_(loginStrings.publicComputer)}</CheckboxLabel>
+                        </Checkbox>
+                      )}
+                    </Form>
+                  </div>
+                  <Columns>
+                    <Column>
+                      <Link onClick={forgotPassword} data-uie-name="go-forgot-password">
+                        {_(loginStrings.forgotPassword)}
+                      </Link>
+                    </Column>
+                    {Config.getConfig().FEATURE.ENABLE_PHONE_LOGIN && (
+                      <Column>
+                        <Link onClick={() => history.push(ROUTE.LOGIN_PHONE)} data-uie-name="go-sign-in-phone">
+                          {_(loginStrings.phoneLogin)}
+                        </Link>
+                      </Column>
+                    )}
+                  </Columns>
+                </>
+              )}
             </ContainerXS>
           </Column>
           <Column />
@@ -281,6 +352,7 @@ const mapDispatchToProps = (dispatch: Dispatch<AnyAction>) =>
       doInitializeClient: actionRoot.clientAction.doInitializeClient,
       doLogin: actionRoot.authAction.doLogin,
       doLoginAndJoin: actionRoot.authAction.doLoginAndJoin,
+      doSendTwoFactorCode: actionRoot.authAction.doSendTwoFactorLoginCode,
       pushLoginData: actionRoot.authAction.pushLoginData,
       resetAuthError: actionRoot.authAction.resetAuthError,
     },
