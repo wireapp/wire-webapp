@@ -37,7 +37,6 @@ import Avatar from 'Components/Avatar';
 import GroupAvatar from 'Components/avatar/GroupAvatar';
 import AvailabilityState from 'Components/AvailabilityState';
 import Icon from 'Components/Icon';
-import {KEY} from 'Util/KeyboardUtil';
 
 export interface ConversationListCellProps {
   conversation: Conversation;
@@ -94,7 +93,7 @@ const ConversationListCell: React.FC<ConversationListCellProps> = ({
   const cellBottom = cellTop + cellHeight;
 
   const isInitiallyVisible = isVisibleFunc(cellTop, cellBottom);
-  const [viewportElementRef, setViewportElementRef] = useEffectRef<HTMLDivElement>();
+  const [viewportElementRef, setViewportElementRef] = useEffectRef<HTMLElement>();
   const isInViewport = useViewPortObserver(viewportElementRef, isInitiallyVisible);
 
   useEffect(() => {
@@ -116,118 +115,111 @@ const ConversationListCell: React.FC<ConversationListCellProps> = ({
     onJoinCall(conversation, MediaType.AUDIO);
   };
 
-  const handleKeyPress = (event: React.KeyboardEvent) => {
-    if (event.key === KEY.SPACE || event.key === KEY.ENTER) {
-      onClick(event as unknown as React.MouseEvent<Element, MouseEvent>);
-    }
-  };
-
   return (
-    <div
-      ref={setViewportElementRef}
-      data-uie-name={dataUieName}
-      data-uie-uid={conversation.id}
-      data-uie-value={displayName}
-      role="button"
-      tabIndex={0}
-      className={cx('conversation-list-cell', {'conversation-list-cell-active': isSelected})}
-      onClick={onClick}
-      onKeyPress={handleKeyPress}
-    >
-      {isInViewport && (
-        <>
-          <div
-            className={cx('conversation-list-cell-left', {
-              'conversation-list-cell-left-opaque': removedFromConversation || users.length === 0,
-            })}
-          >
-            {isGroup && <GroupAvatar className="conversation-list-cell-avatar-arrow" users={users} />}
-            {!isGroup && !!users.length && (
-              <div className="avatar-halo">
-                <Avatar participant={users[0]} avatarSize={AVATAR_SIZE.SMALL} />
-              </div>
-            )}
-          </div>
-          <div className="conversation-list-cell-center">
-            {is1to1 && selfUser.inTeam() ? (
-              <AvailabilityState
-                className="conversation-list-cell-availability"
-                availability={availabilityOfUser}
-                label={displayName}
-                theme={isSelected}
-                dataUieName="status-availability-item"
+    <li ref={setViewportElementRef}>
+      <button
+        type="button"
+        onClick={onClick}
+        data-uie-name={dataUieName}
+        data-uie-uid={conversation.id}
+        data-uie-value={displayName}
+        className={cx('conversation-list-cell', {'conversation-list-cell-active': isSelected})}
+      >
+        {isInViewport && (
+          <>
+            <div
+              className={cx('conversation-list-cell-left', {
+                'conversation-list-cell-left-opaque': removedFromConversation || users.length === 0,
+              })}
+            >
+              {isGroup && <GroupAvatar className="conversation-list-cell-avatar-arrow" users={users} />}
+              {!isGroup && !!users.length && (
+                <div className="avatar-halo">
+                  <Avatar participant={users[0]} avatarSize={AVATAR_SIZE.SMALL} />
+                </div>
+              )}
+            </div>
+            <div className="conversation-list-cell-center">
+              {is1to1 && selfUser.inTeam() ? (
+                <AvailabilityState
+                  className="conversation-list-cell-availability"
+                  availability={availabilityOfUser}
+                  label={displayName}
+                  theme={isSelected}
+                  dataUieName="status-availability-item"
+                />
+              ) : (
+                <span className={cx('conversation-list-cell-name', {'accent-text': isSelected})}>{displayName}</span>
+              )}
+              <span className="conversation-list-cell-description" data-uie-name="secondary-line">
+                {cellState.description}
+              </span>
+            </div>
+            <div className="conversation-list-cell-right">
+              <span
+                className="conversation-list-cell-context-menu"
+                data-uie-name="go-options"
+                onClick={event => {
+                  event.stopPropagation();
+                  rightClick(conversation, event.nativeEvent);
+                }}
               />
-            ) : (
-              <span className={cx('conversation-list-cell-name', {'accent-text': isSelected})}>{displayName}</span>
-            )}
-            <span className="conversation-list-cell-description" data-uie-name="secondary-line">
-              {cellState.description}
-            </span>
-          </div>
-          <div className="conversation-list-cell-right">
-            <span
-              className="conversation-list-cell-context-menu"
-              data-uie-name="go-options"
-              onClick={event => {
-                event.stopPropagation();
-                rightClick(conversation, event.nativeEvent);
-              }}
-            />
-            {!showJoinButton && (
-              <>
-                {cellState.icon === ConversationStatusIcon.PENDING_CONNECTION && (
-                  <span className="conversation-list-cell-badge cell-badge-dark" data-uie-name="status-pending">
-                    <Icon.Pending className="svg-icon" />
-                  </span>
-                )}
-                {cellState.icon === ConversationStatusIcon.UNREAD_MENTION && (
-                  <span className="conversation-list-cell-badge cell-badge-light" data-uie-name="status-mention">
-                    <Icon.Mention className="svg-icon" />
-                  </span>
-                )}
-                {cellState.icon === ConversationStatusIcon.UNREAD_REPLY && (
-                  <span className="conversation-list-cell-badge cell-badge-light" data-uie-name="status-reply">
-                    <Icon.Reply className="svg-icon" />
-                  </span>
-                )}
-                {cellState.icon === ConversationStatusIcon.UNREAD_PING && (
-                  <span className="conversation-list-cell-badge cell-badge-light" data-uie-name="status-ping">
-                    <Icon.Ping className="svg-icon" />
-                  </span>
-                )}
-                {cellState.icon === ConversationStatusIcon.MISSED_CALL && (
-                  <span className="conversation-list-cell-badge cell-badge-light" data-uie-name="status-missed-call">
-                    <Icon.Hangup className="svg-icon" />
-                  </span>
-                )}
-                {cellState.icon === ConversationStatusIcon.MUTED && (
-                  <span
-                    className="conversation-list-cell-badge cell-badge-dark conversation-muted"
-                    data-uie-name="status-silence"
-                  >
-                    <Icon.Mute className="svg-icon" />
-                  </span>
-                )}
-                {cellState.icon === ConversationStatusIcon.UNREAD_MESSAGES && unreadState.allMessages.length > 0 && (
-                  <span className="conversation-list-cell-badge cell-badge-light" data-uie-name="status-unread">
-                    {unreadState.allMessages.length}
-                  </span>
-                )}
-              </>
-            )}
-            {showJoinButton && (
-              <div
-                onClick={onClickJoinCall}
-                className="call-ui__button call-ui__button--green call-ui__button--join"
-                data-uie-name="do-call-controls-call-join"
-              >
-                {t('callJoin')}
-              </div>
-            )}
-          </div>
-        </>
-      )}
-    </div>
+              {!showJoinButton && (
+                <>
+                  {cellState.icon === ConversationStatusIcon.PENDING_CONNECTION && (
+                    <span className="conversation-list-cell-badge cell-badge-dark" data-uie-name="status-pending">
+                      <Icon.Pending className="svg-icon" />
+                    </span>
+                  )}
+                  {cellState.icon === ConversationStatusIcon.UNREAD_MENTION && (
+                    <span className="conversation-list-cell-badge cell-badge-light" data-uie-name="status-mention">
+                      <Icon.Mention className="svg-icon" />
+                    </span>
+                  )}
+                  {cellState.icon === ConversationStatusIcon.UNREAD_REPLY && (
+                    <span className="conversation-list-cell-badge cell-badge-light" data-uie-name="status-reply">
+                      <Icon.Reply className="svg-icon" />
+                    </span>
+                  )}
+                  {cellState.icon === ConversationStatusIcon.UNREAD_PING && (
+                    <span className="conversation-list-cell-badge cell-badge-light" data-uie-name="status-ping">
+                      <Icon.Ping className="svg-icon" />
+                    </span>
+                  )}
+                  {cellState.icon === ConversationStatusIcon.MISSED_CALL && (
+                    <span className="conversation-list-cell-badge cell-badge-light" data-uie-name="status-missed-call">
+                      <Icon.Hangup className="svg-icon" />
+                    </span>
+                  )}
+                  {cellState.icon === ConversationStatusIcon.MUTED && (
+                    <span
+                      className="conversation-list-cell-badge cell-badge-dark conversation-muted"
+                      data-uie-name="status-silence"
+                    >
+                      <Icon.Mute className="svg-icon" />
+                    </span>
+                  )}
+                  {cellState.icon === ConversationStatusIcon.UNREAD_MESSAGES && unreadState.allMessages.length > 0 && (
+                    <span className="conversation-list-cell-badge cell-badge-light" data-uie-name="status-unread">
+                      {unreadState.allMessages.length}
+                    </span>
+                  )}
+                </>
+              )}
+              {showJoinButton && (
+                <div
+                  onClick={onClickJoinCall}
+                  className="call-ui__button call-ui__button--green call-ui__button--join"
+                  data-uie-name="do-call-controls-call-join"
+                >
+                  {t('callJoin')}
+                </div>
+              )}
+            </div>
+          </>
+        )}
+      </button>
+    </li>
   );
 };
 
