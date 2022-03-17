@@ -18,39 +18,28 @@
  */
 
 import Icon from 'Components/Icon';
-import {css} from '@emotion/core';
-import React, {useCallback, useEffect, useState} from 'react';
-import {REASON as CALL_REASON, STATE as CALL_STATE} from '@wireapp/avs';
+import React, {useEffect, useState} from 'react';
 import {container} from 'tsyringe';
 import {t} from 'Util/LocalizerUtil';
 
-import {ListState, ListViewModel} from '../../../view_model/ListViewModel';
-import ListWrapper from './ListWrapper';
+import {ListState, ListViewModel} from '../../../../view_model/ListViewModel';
+import ListWrapper from '../ListWrapper';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
-import {User} from '../../../entity/User';
-import {ConversationState} from '../../../conversation/ConversationState';
-import {Shortcut} from '../../../ui/Shortcut';
-import {ShortcutType} from '../../../ui/ShortcutType';
-import {PropertiesRepository} from '../../../properties/PropertiesRepository';
-import {PROPERTIES_TYPE} from '../../../properties/PropertiesType';
-import {Conversation} from '../../../entity/Conversation';
-import ConversationListCell from 'Components/list/ConversationListCell';
-import GroupedConversations from 'Components/list/GroupedConversations';
-import {createNavigate} from '../../../router/routerBindings';
-import {generateConversationUrl} from '../../../router/routeGenerator';
-import {CallState} from '../../../calling/CallState';
-import {Call} from 'src/script/calling/Call';
-import {matchQualifiedIds} from 'Util/QualifiedId';
-import {ConversationRepository} from '../../../conversation/ConversationRepository';
+import {User} from '../../../../entity/User';
+import {ConversationState} from '../../../../conversation/ConversationState';
+import {Shortcut} from '../../../../ui/Shortcut';
+import {ShortcutType} from '../../../../ui/ShortcutType';
+import {PropertiesRepository} from '../../../../properties/PropertiesRepository';
+import {PROPERTIES_TYPE} from '../../../../properties/PropertiesType';
+import {CallState} from '../../../../calling/CallState';
+import {ConversationRepository} from '../../../../conversation/ConversationRepository';
 import ConversationListCallingCell from 'Components/list/ConversationListCallingCell';
 import AvailabilityState from 'Components/AvailabilityState';
 import LegalHoldDot from 'Components/LegalHoldDot';
-import {TeamState} from '../../../team/TeamState';
-import {AvailabilityContextMenu} from '../../../ui/AvailabilityContextMenu';
-import {UserState} from '../../../user/UserState';
-import Avatar, {AVATAR_SIZE} from 'Components/Avatar';
-import GroupAvatar from 'Components/avatar/GroupAvatar';
-import {ContentViewModel} from '../../../view_model/ContentViewModel';
+import {TeamState} from '../../../../team/TeamState';
+import {AvailabilityContextMenu} from '../../../../ui/AvailabilityContextMenu';
+import {UserState} from '../../../../user/UserState';
+import {ConversationsList} from './ConversationsList';
 
 type ConversationsProps = {
   callState?: CallState;
@@ -64,137 +53,10 @@ type ConversationsProps = {
   userState?: UserState;
 };
 
-enum ConverationViewStyle {
+export enum ConverationViewStyle {
   RECENT,
   FOLDER,
 }
-
-const ConversationsList: React.FC<{
-  callState: CallState;
-  conversationRepository: ConversationRepository;
-  conversations: Conversation[];
-  conversationState: ConversationState;
-  listViewModel: ListViewModel;
-  userState: UserState;
-  viewStyle: ConverationViewStyle;
-}> = ({conversations, listViewModel, viewStyle, userState, conversationState, conversationRepository, callState}) => {
-  const {activeCalls} = useKoSubscribableChildren(callState, ['activeCalls']);
-  const {connectRequests} = useKoSubscribableChildren(userState, ['connectRequests']);
-  const [expandedFolders, setExpandedFolders] = useState<string[]>([]);
-  const {activeConversation} = useKoSubscribableChildren(conversationState, ['activeConversation']);
-
-  const isActiveConversation = (conversation: Conversation) => conversationState.isActiveConversation(conversation);
-
-  useEffect(() => {
-    if (!activeConversation) {
-      return;
-    }
-    const conversationLabels =
-      conversationRepository.conversationLabelRepository.getConversationLabelIds(activeConversation);
-    setExpandedFolders(expanded => {
-      const isAlreadyOpen = conversationLabels.some(labelId => expanded.includes(labelId));
-
-      return isAlreadyOpen ? expanded : [...expanded, conversationLabels[0]];
-    });
-  }, [activeConversation]);
-
-  const openContextMenu = (conversation: Conversation, event: MouseEvent) =>
-    listViewModel.onContextMenu(conversation, event);
-  const answerCall = (conversation: Conversation) => listViewModel.answerCall(conversation);
-  const {state: contentState} = useKoSubscribableChildren(listViewModel.contentViewModel, ['state']);
-  const isShowingConnectionRequests = contentState === ContentViewModel.STATE.CONNECTION_REQUESTS;
-
-  const hasJoinableCall = useCallback((conversation: Conversation) => {
-    const call = activeCalls.find((callInstance: Call) =>
-      matchQualifiedIds(callInstance.conversationId, conversation.qualifiedId),
-    );
-    if (!call) {
-      return false;
-    }
-    return (
-      !conversation.removed_from_conversation() &&
-      call.state() === CALL_STATE.INCOMING &&
-      call.reason() !== CALL_REASON.ANSWERED_ELSEWHERE
-    );
-  }, []);
-
-  const conversationView =
-    viewStyle === ConverationViewStyle.RECENT ? (
-      <>
-        {conversations.map(conversation => (
-          <ConversationListCell
-            key={conversation.id}
-            data-uie-name="item-conversation"
-            conversation={conversation}
-            onClick={createNavigate(generateConversationUrl(conversation.id, conversation.domain))}
-            isSelected={isActiveConversation}
-            onJoinCall={answerCall}
-            rightClick={openContextMenu}
-            showJoinButton={hasJoinableCall(conversation)}
-          />
-        ))}
-      </>
-    ) : (
-      <GroupedConversations
-        callState={callState}
-        conversationRepository={conversationRepository}
-        conversationState={conversationState}
-        expandedFolders={expandedFolders}
-        hasJoinableCall={hasJoinableCall}
-        isSelectedConversation={isActiveConversation}
-        listViewModel={listViewModel}
-        onJoinCall={answerCall}
-        setExpandedFolders={setExpandedFolders}
-      />
-    );
-
-  const uieName = viewStyle === ConverationViewStyle.FOLDER ? 'folder-view' : 'recent-view';
-
-  const connectionText =
-    connectRequests.length > 1
-      ? t('conversationsConnectionRequestMany', connectRequests.length)
-      : t('conversationsConnectionRequestOne');
-
-  const connectionRequests =
-    connectRequests.length === 0 ? null : (
-      <li
-        className={`conversation-list-cell ${isShowingConnectionRequests ? 'conversation-list-cell-active' : ''}`}
-        onClick={() => listViewModel.contentViewModel.switchContent(ContentViewModel.STATE.CONNECTION_REQUESTS)}
-      >
-        <div className="conversation-list-cell-left">
-          {connectRequests.length === 1 ? (
-            <div className="avatar-halo">
-              <Avatar participant={connectRequests[0]} avatarSize={AVATAR_SIZE.SMALL} />
-            </div>
-          ) : (
-            <GroupAvatar users={connectRequests} />
-          )}
-        </div>
-
-        <div className="conversation-list-cell-center">
-          <span
-            className={`conversation-list-cell-name ${isShowingConnectionRequests ? 'accent-text' : ''}`}
-            data-uie-name="item-pending-requests"
-          >
-            {connectionText}
-          </span>
-        </div>
-
-        <div className="conversation-list-cell-right">
-          <span
-            className="conversation-list-cell-badge cell-badge-dark icon-pending"
-            data-uie-name="status-pending"
-          ></span>
-        </div>
-      </li>
-    );
-  return (
-    <ul css={css({margin: 0, paddingLeft: 0})} data-uie-name={uieName}>
-      {connectionRequests}
-      {conversationView}
-    </ul>
-  );
-};
 
 const Conversations: React.FC<ConversationsProps> = ({
   propertiesRepository,
@@ -262,7 +124,7 @@ const Conversations: React.FC<ConversationsProps> = ({
             <LegalHoldDot
               isPending={hasPendingLegalHold}
               data-uie-name={hasPendingLegalHold ? 'status-legal-hold-pending' : 'status-legal-hold'}
-              legalHoldModal={undefined /**TODO*/}
+              legalHoldModal={listViewModel.contentViewModel.legalHoldModal}
               css={{padding: '8px'}}
             />
           )}
