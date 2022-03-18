@@ -34,6 +34,7 @@ describe('Preferences', () => {
     listViewModel: {
       state: ko.observable(''),
     } as ListViewModel,
+    onClose: jest.fn(),
   };
 
   it('renders the right preferences items', () => {

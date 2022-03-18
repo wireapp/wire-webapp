@@ -21,7 +21,7 @@ import React, {useEffect, useMemo, useState} from 'react';
 import ReactDOM from 'react-dom';
 import cx from 'classnames';
 import Icon from 'Components/Icon';
-import {isEnterKey, isEscapeKey, isKey, isOneOfKeys, KEY} from 'Util/KeyboardUtil';
+import {isEnterKey, isEscapeKey, isKey, isOneOfKeys, isSpaceKey, KEY} from 'Util/KeyboardUtil';
 
 export interface ContextMenuEntry {
   click?: (event?: MouseEvent) => void;
@@ -42,6 +42,7 @@ interface ContextMenuProps {
 }
 
 let container: HTMLDivElement;
+let previouslyFocused: HTMLElement;
 
 const cleanUp = () => {
   if (container) {
@@ -51,22 +52,34 @@ const cleanUp = () => {
   }
 };
 
+const getButtonId = (label: string): string => {
+  return `${label.split(' ').join('-').toLowerCase()}-button`;
+};
+
 const ContextMenu: React.FC<ContextMenuProps> = ({entries, defaultIdentifier = 'ctx-menu-item', posX, posY}) => {
-  const [mainDiv, setMainDiv] = useState<HTMLDivElement>();
+  const [mainElement, setMainElement] = useState<HTMLUListElement>();
   const [selected, setSelected] = useState<ContextMenuEntry>();
 
   const style = useMemo<React.CSSProperties>(() => {
-    const left = mainDiv && window.innerWidth - posX < mainDiv.offsetWidth ? posX - mainDiv.offsetWidth : posX;
+    const left =
+      mainElement && window.innerWidth - posX < mainElement.offsetWidth ? posX - mainElement.offsetWidth : posX;
     const top = Math.max(
-      mainDiv && window.innerHeight - posY < mainDiv.offsetHeight ? posY - mainDiv.offsetHeight : posY,
+      mainElement && window.innerHeight - posY < mainElement.offsetHeight ? posY - mainElement.offsetHeight : posY,
       0,
     );
     return {
       left,
       top,
-      visibility: mainDiv ? 'unset' : 'hidden',
+      visibility: mainElement ? 'unset' : 'hidden',
     };
-  }, [mainDiv]);
+  }, [mainElement]);
+
+  useEffect(() => {
+    if (selected) {
+      const selectedButton = document.querySelector(`#${getButtonId(selected.label)}`) as HTMLButtonElement;
+      selectedButton?.focus();
+    }
+  }, [selected]);
 
   useEffect(() => {
     const onWheel = (event: MouseEvent) => event.preventDefault();
@@ -75,18 +88,19 @@ const ContextMenu: React.FC<ContextMenuProps> = ({entries, defaultIdentifier = '
       event.preventDefault();
       if (isEscapeKey(event)) {
         cleanUp();
+        previouslyFocused.focus();
       }
-      if (isOneOfKeys(event, [KEY.ARROW_UP, KEY.ARROW_DOWN])) {
+      if (isOneOfKeys(event, [KEY.ARROW_UP, KEY.ARROW_DOWN, KEY.TAB])) {
         if (!entries.includes(selected)) {
-          const index = isKey(event, KEY.ARROW_UP) ? entries.length - 1 : 0;
+          const index = isKey(event, KEY.ARROW_DOWN) || isKey(event, KEY.TAB) ? 0 : entries.length - 1;
           setSelected(entries[index]);
           return;
         }
-        const direction = isKey(event, KEY.ARROW_UP) ? -1 : 1;
+        const direction = isKey(event, KEY.ARROW_DOWN) || isKey(event, KEY.TAB) ? 1 : -1;
         const nextIndex = (entries.indexOf(selected) + direction + entries.length) % entries.length;
         setSelected(entries[nextIndex]);
       }
-      if (isEnterKey(event)) {
+      if (isEnterKey(event) || isSpaceKey(event)) {
         if (selected) {
           cleanUp();
           selected.click?.();
@@ -95,7 +109,7 @@ const ContextMenu: React.FC<ContextMenuProps> = ({entries, defaultIdentifier = '
     };
 
     const onMouseDown = (event: MouseEvent): void => {
-      const isOutsideClick = mainDiv && !mainDiv.contains(event.target as Node);
+      const isOutsideClick = mainElement && !mainElement.contains(event.target as Node);
       if (isOutsideClick) {
         cleanUp();
       }
@@ -112,43 +126,48 @@ const ContextMenu: React.FC<ContextMenuProps> = ({entries, defaultIdentifier = '
       window.removeEventListener('mousedown', onMouseDown);
       window.removeEventListener('resize', cleanUp);
     };
-  }, [mainDiv, selected]);
+  }, [mainElement, selected]);
 
   return (
-    <div className="ctx-menu" ref={setMainDiv} style={{maxHeight: window.innerHeight, ...style}}>
+    <ul className="ctx-menu" ref={setMainElement} style={{maxHeight: window.innerHeight, ...style}}>
       {entries.map((entry, index) =>
         entry.isSeparator ? (
-          <div key={`${index}`} className="ctx-menu__separator" />
+          <li key={`${index}`} className="ctx-menu__separator" />
         ) : (
-          <div
+          <li
             key={`${index}`}
-            {...(entry.isDisabled
-              ? undefined
-              : {
-                  onClick: event => {
-                    event.preventDefault();
-                    cleanUp();
-                    entry.click?.(event.nativeEvent);
-                  },
-                  onMouseEnter: () => {
-                    setSelected(undefined);
-                  },
-                })}
-            data-uie-name={entry.identifier || defaultIdentifier}
-            title={entry.title || entry.label}
             className={cx('ctx-menu__item', {
               'ctx-menu__item--checked': entry.isChecked,
               'ctx-menu__item--disabled': entry.isDisabled,
               selected: entry === selected,
             })}
           >
-            {entry.icon && <Icon name={entry.icon} className="ctx-menu__icon" />}
-            <span>{entry.label}</span>
-            {entry.isChecked && <Icon.Check className="ctx-menu__check" data-uie-name="ctx-menu-check" />}
-          </div>
+            <button
+              id={getButtonId(entry.label)}
+              className="ctx-menu__button"
+              data-uie-name={entry.identifier || defaultIdentifier}
+              title={entry.title || entry.label}
+              {...(entry.isDisabled
+                ? undefined
+                : {
+                    onClick: event => {
+                      event.preventDefault();
+                      cleanUp();
+                      entry.click?.(event.nativeEvent);
+                    },
+                    onMouseEnter: () => {
+                      setSelected(undefined);
+                    },
+                  })}
+            >
+              {entry.icon && <Icon name={entry.icon} className="ctx-menu__icon" />}
+              <span>{entry.label}</span>
+              {entry.isChecked && <Icon.Check className="ctx-menu__check" data-uie-name="ctx-menu-check" />}
+            </button>
+          </li>
         ),
       )}
-    </div>
+    </ul>
   );
 };
 
@@ -160,6 +179,7 @@ export const showContextMenu = (
   event.preventDefault();
   event.stopPropagation();
 
+  previouslyFocused = document.activeElement as HTMLElement;
   cleanUp();
 
   container = document.createElement('div');
