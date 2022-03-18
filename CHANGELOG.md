@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [24.3.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/compare/@wireapp/core@24.2.5...@wireapp/core@24.3.0) (2022-03-18)
+
+
+### Features
+
+* **core, api-client:** Add support for two factor authentication ([#4245](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/issues/4245)) ([4f27bbf](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/commit/4f27bbf00a34f265a534c93bce9004ddb757f1fc))
+
+
+
+
+
 ## [24.2.5](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/compare/@wireapp/core@24.2.4...@wireapp/core@24.2.5) (2022-03-17)
 
 **Note:** Version bump only for package @wireapp/core
