@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [18.5.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/compare/@wireapp/api-client@18.4.0...@wireapp/api-client@18.5.0) (2022-03-18)
+
+
+### Features
+
+* **core, api-client:** Add support for two factor authentication ([#4245](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/issues/4245)) ([4f27bbf](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/commit/4f27bbf00a34f265a534c93bce9004ddb757f1fc))
+
+
+
+
+
 # [18.4.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/compare/@wireapp/api-client@18.3.4...@wireapp/api-client@18.4.0) (2022-03-17)
 
 
