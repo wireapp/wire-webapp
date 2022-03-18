@@ -376,7 +376,7 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
             <button
               data-uie-name="pagination-next"
               onClick={() => changePage(currentPage + 1, call)}
-              className="hide-controls-hidden"
+              className="hide-controls-hidden button-reset-default"
               css={{
                 ...paginationButtonStyles,
                 borderBottomLeftRadius: 32,
@@ -391,7 +391,7 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
             <button
               data-uie-name="pagination-previous"
               onClick={() => changePage(currentPage - 1, call)}
-              className="hide-controls-hidden"
+              className="hide-controls-hidden button-reset-default"
               css={{
                 ...paginationButtonStyles,
                 borderBottomRightRadius: 32,

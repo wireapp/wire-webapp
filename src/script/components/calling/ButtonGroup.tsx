@@ -35,17 +35,17 @@ export interface ButtonGroupProps {
 
 const buttonGroupWrapperStyles: CSSObject = {
   alignItems: 'center',
-  display: 'flex',
-  'div:first-of-type': {
+  'button:first-of-type': {
     borderBottomLeftRadius: 12,
     borderTopLeftRadius: 12,
     paddingLeft: '14px !important',
   },
-  'div:last-of-type': {
+  'button:last-of-type': {
     borderBottomRightRadius: 12,
     borderTopRightRadius: 12,
     paddingRight: '14px !important',
   },
+  display: 'flex',
 };
 
 const buttonGroupItemStyles: CSSObject = {
@@ -69,7 +69,7 @@ const ButtonGroup: React.FC<ButtonGroupProps> = ({style, items, currentItem, onC
   return (
     <div css={{...buttonGroupWrapperStyles, ...style}} data-uie-name="button-group-wrapper">
       {items.map(({value, getText}) => (
-        <div
+        <button
           key={value}
           css={value === currentItem ? buttonGroupItemActiveStyles : buttonGroupItemStyles}
           onClick={() => {
@@ -77,11 +77,12 @@ const ButtonGroup: React.FC<ButtonGroupProps> = ({style, items, currentItem, onC
               onChangeItem(value);
             }
           }}
+          className="button-reset-default"
           data-uie-name="button-group-item"
           data-uie-value={value === currentItem ? 'active' : 'inactive'}
         >
           {getText(textSubstitute)}
-        </div>
+        </button>
       ))}
     </div>
   );

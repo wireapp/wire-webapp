@@ -45,11 +45,12 @@ const Pagination: React.FC<PaginationProps> = ({totalPages, currentPage, onChang
       data-uie-name="pagination-wrapper"
     >
       {pages.map(page => (
-        <div
+        <button
           data-uie-name="pagination-item"
           data-uie-status={currentPage === page ? 'active' : 'inactive'}
           key={page}
           onClick={() => onChangePage(page)}
+          className="button-reset-default"
           css={{
             ':last-child': {
               marginRight: 4,
