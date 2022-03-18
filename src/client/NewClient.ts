@@ -33,6 +33,7 @@ export interface NewClient extends SharedClientModel {
   location?: Location;
   model?: string;
   password?: string;
+  verificationCode?: string;
   type: ClientType.PERMANENT | ClientType.TEMPORARY;
 }
 
