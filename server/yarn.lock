@@ -3430,13 +3430,13 @@ map-visit@^1.0.0:
   dependencies:
     object-visit "^1.0.0"
 
-maxmind@4.3.5:
-  version "4.3.5"
-  resolved "https://registry.yarnpkg.com/maxmind/-/maxmind-4.3.5.tgz#84775635237a121e9dbb85356cf09587d8d81930"
-  integrity sha512-ak0TABuO664C5zXyQH5u13WmtdTwxxXLGOy1e51ZRrp/cEH9xfOcG20F51TcNhVyDos13Ys94kxN8/elg9Ri4Q==
+maxmind@4.3.6:
+  version "4.3.6"
+  resolved "https://registry.yarnpkg.com/maxmind/-/maxmind-4.3.6.tgz#5e4aa2491eef8bd401f34be307776fa1fb5bc3ca"
+  integrity sha512-CwnEZqJX0T6b2rWrc0/V3n9hL/hWAMEn7fY09077YJUHiHx7cn/esA2ZIz8BpYLSJUf7cGVel0oUJa9jMwyQpg==
   dependencies:
     mmdb-lib "2.0.2"
-    tiny-lru "7.0.6"
+    tiny-lru "8.0.2"
 
 media-typer@0.3.0:
   version "0.3.0"
@@ -4859,10 +4859,10 @@ throat@^5.0.0:
   resolved "https://registry.yarnpkg.com/throat/-/throat-5.0.0.tgz#c5199235803aad18754a667d659b5e72ce16764b"
   integrity sha512-fcwX4mndzpLQKBS1DVYhGAcYaYt7vsHNIvQV+WXMvnow5cgjPphq5CaayLaGsjRdSCKZFNGt7/GYAuXaNOiYCA==
 
-tiny-lru@7.0.6:
-  version "7.0.6"
-  resolved "https://registry.yarnpkg.com/tiny-lru/-/tiny-lru-7.0.6.tgz#b0c3cdede1e5882aa2d1ae21cb2ceccf2a331f24"
-  integrity sha512-zNYO0Kvgn5rXzWpL0y3RS09sMK67eGaQj9805jlK9G6pSadfriTczzLHFXa/xcW4mIRfmlB9HyQ/+SgL0V1uow==
+tiny-lru@8.0.2:
+  version "8.0.2"
+  resolved "https://registry.yarnpkg.com/tiny-lru/-/tiny-lru-8.0.2.tgz#812fccbe6e622ded552e3ff8a4c3b5ff34a85e4c"
+  integrity sha512-ApGvZ6vVvTNdsmt676grvCkUCGwzG9IqXma5Z07xJgiC5L7akUMof5U8G2JTI9Rz/ovtVhJBlY6mNhEvtjzOIg==
 
 tmpl@1.0.x:
   version "1.0.5"
