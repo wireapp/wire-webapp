@@ -54,7 +54,7 @@ const SetAccountType = ({}: Props) => {
     </RouterLink>
   );
 
-  const iconStyles = {
+  const iconStyles: React.CSSProperties = {
     alignItems: 'center',
     borderRadius: '50%',
     display: 'flex',
