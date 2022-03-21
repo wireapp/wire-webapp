@@ -260,6 +260,7 @@ export class Account extends EventEmitter {
   public async initClient(
     loginData: LoginData,
     clientInfo?: ClientInfo,
+    entropyData?: Uint8Array,
   ): Promise<{isNewClient: boolean; localClient: RegisteredClient}> {
     if (!this.service) {
       throw new Error('Services are not set.');
@@ -279,7 +280,7 @@ export class Account extends EventEmitter {
 
       if (notFoundInDatabase) {
         this.logger.log(`Could not find valid client in database "${this.storeEngine?.storeName}".`);
-        return this.registerClient(loginData, clientInfo);
+        return this.registerClient(loginData, clientInfo, entropyData);
       }
 
       if (notFoundOnBackend) {
@@ -295,12 +296,12 @@ export class Account extends EventEmitter {
           const context = await this.apiClient.init(loginData.clientType);
           await this.initEngine(context);
 
-          return this.registerClient(loginData, clientInfo);
+          return this.registerClient(loginData, clientInfo, entropyData);
         }
 
         this.logger.log('Last client was permanent - Deleting cryptography stores');
         await this.service!.cryptography.deleteCryptographyStores();
-        return this.registerClient(loginData, clientInfo);
+        return this.registerClient(loginData, clientInfo, entropyData);
       }
 
       throw error;
@@ -320,11 +321,12 @@ export class Account extends EventEmitter {
   private async registerClient(
     loginData: LoginData,
     clientInfo?: ClientInfo,
+    entropyData?: Uint8Array,
   ): Promise<{isNewClient: boolean; localClient: RegisteredClient}> {
     if (!this.service) {
       throw new Error('Services are not set.');
     }
-    const registeredClient = await this.service.client.register(loginData, clientInfo);
+    const registeredClient = await this.service.client.register(loginData, clientInfo, entropyData);
     this.apiClient.context!.clientId = registeredClient.id;
     this.logger.log('Client is created');
 
