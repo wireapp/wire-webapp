@@ -168,7 +168,7 @@ const ConversationListCell: React.FC<ConversationListCellProps> = ({
             <button
               className="conversation-list-cell-context-menu"
               data-uie-name="go-options"
-              aria-label="Open Options Menu"
+              aria-label={t('conversationOptionsMenu')}
               onClick={event => {
                 event.stopPropagation();
                 rightClick(conversation, event.nativeEvent);
