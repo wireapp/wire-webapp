@@ -1,16 +1,37 @@
+/*
+ * Wire
+ * Copyright (C) 2022 Wire Swiss GmbH
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ *
+ */
+
 import React from 'react';
 import {t} from 'Util/LocalizerUtil';
 
 import {Runtime} from '@wireapp/commons';
 import Icon from 'Components/Icon';
-import {registerStaticReactComponent, useKoSubscribableChildren} from 'Util/ComponentUtil';
-import {ListViewModel} from '../../view_model/ListViewModel';
-import {ContentViewModel} from '../../view_model/ContentViewModel';
-import {Transition} from 'react-transition-group';
+import {useKoSubscribableChildren} from 'Util/ComponentUtil';
+import {ListViewModel} from '../../../view_model/ListViewModel';
+import {ContentViewModel} from '../../../view_model/ContentViewModel';
+import ListWrapper from './ListWrapper';
 
 type PreferencesProps = {
   contentViewModel: ContentViewModel;
+  isTemporaryGuest?: boolean;
   listViewModel: ListViewModel;
+  onClose: () => void;
 };
 
 const PreferenceItem: React.FC<{
@@ -37,17 +58,11 @@ const PreferenceItem: React.FC<{
   );
 };
 
-const Preferences: React.FC<PreferencesProps> = ({listViewModel, contentViewModel}) => {
-  const {state: listState} = useKoSubscribableChildren(listViewModel, ['state']);
+const Preferences: React.FC<PreferencesProps> = ({listViewModel, contentViewModel, onClose}) => {
   const {state: contentState} = useKoSubscribableChildren(contentViewModel, ['state']);
 
   const isDesktop = Runtime.isDesktopApp();
   const supportsCalling = Runtime.isSupportingLegacyCalling();
-
-  const isVisible = listState === ListViewModel.STATE.PREFERENCES;
-  const close = () => {
-    listViewModel.switchList(ListViewModel.STATE.CONVERSATIONS);
-  };
 
   const items = [
     {
@@ -85,45 +100,29 @@ const Preferences: React.FC<PreferencesProps> = ({listViewModel, contentViewMode
   ];
 
   return (
-    <Transition in={isVisible} timeout={300}>
-      <div
-        id="preferences"
-        className={`left-list left-list-preferences ${isVisible && 'left-list-is-visible'}`}
-        aria-hidden={isVisible ? 'false' : 'true'}
-      >
-        <div className="left-list-header">
-          <span className="left-list-header-text">{t('preferencesHeadline')}</span>
-          <button
-            type="button"
-            className="left-list-header-close-button button-icon-large"
-            onClick={close}
-            title={t('tooltipSearchClose')}
-            data-uie-name="do-close-preferences"
-          >
-            <Icon.Close />
-          </button>
-        </div>
-        <div className="left-list-center">
-          <ul className="left-list-items preferences-list-items">
-            {items
-              .filter(item => !item.hidden)
-              .map(item => (
-                <PreferenceItem
-                  key={item.id}
-                  label={item.label}
-                  onSelect={() => contentViewModel.switchContent(item.id)}
-                  isSelected={contentState === item.id}
-                  uieName={item.uieName}
-                  IconComponent={item.IconComponent}
-                />
-              ))}
-          </ul>
-        </div>
-      </div>
-    </Transition>
+    <ListWrapper
+      listViewModel={listViewModel}
+      openState={ListViewModel.STATE.PREFERENCES}
+      id="preferences"
+      header={t('preferencesHeadline')}
+      onClose={onClose}
+    >
+      <ul className="left-list-items no-scroll preferences-list-items">
+        {items
+          .filter(item => !item.hidden)
+          .map(item => (
+            <PreferenceItem
+              key={item.id}
+              label={item.label}
+              onSelect={() => contentViewModel.switchContent(item.id)}
+              isSelected={contentState === item.id}
+              uieName={item.uieName}
+              IconComponent={item.IconComponent}
+            />
+          ))}
+      </ul>
+    </ListWrapper>
   );
 };
 
 export default Preferences;
-
-registerStaticReactComponent('preferences', Preferences);

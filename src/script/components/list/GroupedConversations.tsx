@@ -136,7 +136,7 @@ const GroupedConversations: React.FC<GroupedConversationsProps> = ({
   };
 
   return (
-    <>
+    <ul className="conversation-folder-list">
       {folders.map(folder => (
         <GroupedConversationsFolder
           key={`${folder.id}-${folder.conversations().length}`}
@@ -151,7 +151,7 @@ const GroupedConversations: React.FC<GroupedConversationsProps> = ({
           isSelectedConversation={isSelectedConversation}
         />
       ))}
-    </>
+    </ul>
   );
 };
 

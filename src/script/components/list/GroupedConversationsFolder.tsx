@@ -57,7 +57,7 @@ const GroupedConversationsFolder: React.FC<GroupedConversationsFolderProps> = ({
     createNavigate(generateConversationUrl(conversationId, domain));
 
   return (
-    <div className="conversation-folder" data-uie-name="conversation-folder" data-uie-value={folder.name}>
+    <li className="conversation-folder" data-uie-name="conversation-folder" data-uie-value={folder.name}>
       <GroupedConversationHeader onClick={() => toggle(folder.id)} conversationLabel={folder} isOpen={isExpanded} />
       <div>
         {isExpanded &&
@@ -77,7 +77,7 @@ const GroupedConversationsFolder: React.FC<GroupedConversationsFolderProps> = ({
             />
           ))}
       </div>
-    </div>
+    </li>
   );
 };
 

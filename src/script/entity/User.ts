@@ -37,7 +37,7 @@ import type {AssetRemoteData} from '../assets/AssetRemoteData';
 export class User {
   private expirationIntervalId?: number;
   private expirationTimeoutId?: number;
-  private readonly expirationIsUrgent: ko.Observable<boolean>;
+  public readonly expirationIsUrgent: ko.Observable<boolean>;
   public id: string;
   public isDeleted: boolean;
   public isMe: boolean;

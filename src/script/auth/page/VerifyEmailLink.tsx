@@ -17,7 +17,7 @@
  *
  */
 
-import {ContainerXS, H1, H3, Link, Muted} from '@wireapp/react-ui-kit';
+import {ContainerXS, H1, H3, Muted} from '@wireapp/react-ui-kit';
 import React, {useEffect} from 'react';
 import {useIntl} from 'react-intl';
 import {connect} from 'react-redux';
@@ -27,6 +27,7 @@ import {RootState} from '../module/reducer';
 import * as SelfSelector from '../module/selector/SelfSelector';
 import {ROUTE} from '../route';
 import Page from './Page';
+import RouterLink from '../component/RouterLink';
 
 interface Props extends React.HTMLProps<HTMLDivElement> {}
 
@@ -60,9 +61,9 @@ const VerifyEmailLink = ({hasSelfEmail}: Props & ConnectedProps) => {
           <Muted center block style={{marginTop: 64}} data-uie-name="verify-email-no-mail">
             {_(setEmailStrings.noMailHeadline)}
           </Muted>
-          <Link onClick={() => history.push(ROUTE.SET_EMAIL)} data-uie-name="go-set-email">
+          <RouterLink to={ROUTE.SET_EMAIL} data-uie-name="go-set-email">
             {_(setEmailStrings.tryAgain)}
-          </Link>
+          </RouterLink>
         </div>
       </ContainerXS>
     </Page>

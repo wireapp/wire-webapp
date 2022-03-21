@@ -62,6 +62,7 @@
   position: relative;
   overflow: hidden;
   max-width: 208px;
+  height: 100%;
   flex: 1;
   justify-content: center;
   margin-left: 8px;
@@ -99,13 +100,13 @@
 .left-list-center {
   position: relative;
   flex: 1 1 auto;
+}
 
-  &.left-list-center-border-bottom {
-    border-bottom: 1px solid fade(#fff, 16%);
-  }
-  &.left-list-center-border-top {
-    border-top: 1px solid fade(#fff, 16%);
-  }
+.left-list-center-border-bottom {
+  border-bottom: 1px solid fade(#fff, 16%);
+}
+.left-list-center-border-top {
+  border-top: 1px solid fade(#fff, 16%);
 }
 
 .left-list-items {
@@ -116,6 +117,10 @@
   margin: 0;
   overflow-x: hidden;
   overflow-y: scroll;
+  &.no-scroll {
+    position: relative;
+    overflow-y: visible;
+  }
 }
 
 .left-list-item {
