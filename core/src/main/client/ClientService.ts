@@ -80,6 +80,7 @@ export class ClientService {
       cookieLabel: 'default',
       model: '@wireapp/core',
     },
+    entropyData?: Uint8Array,
   ): Promise<RegisteredClient> {
     if (!this.apiClient.context) {
       throw new Error('Context is not set.');
@@ -89,7 +90,7 @@ export class ClientService {
       throw new Error(`Can't register client of type "${ClientType.NONE}"`);
     }
 
-    const serializedPreKeys: PreKey[] = await this.cryptographyService.createCryptobox();
+    const serializedPreKeys: PreKey[] = await this.cryptographyService.createCryptobox(entropyData);
 
     if (!this.cryptographyService.cryptobox.lastResortPreKey) {
       throw new Error('Cryptobox got initialized without a last resort PreKey.');
