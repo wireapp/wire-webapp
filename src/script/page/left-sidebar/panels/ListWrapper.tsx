@@ -91,7 +91,7 @@ const ListWrapper: React.FC<LeftListWrapperProps> = ({listViewModel, openState, 
           className="left-list-header-close-button button-icon-large"
           onClick={onClose}
           title={t('tooltipSearchClose')}
-          data-uie-name="do-close-preferences"
+          data-uie-name={`do-close-${id}`}
         >
           <Icon.Close />
         </button>
