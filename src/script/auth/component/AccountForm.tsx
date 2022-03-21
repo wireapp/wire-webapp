@@ -143,6 +143,7 @@ const AccountForm = ({account, ...props}: Props & ConnectedProps & DispatchProps
         <InputBlock>
           <Input
             name="name"
+            id="name"
             onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
               inputs.name.current.setCustomValidity('');
               setRegistrationData({...registrationData, name: event.target.value});
@@ -167,6 +168,7 @@ const AccountForm = ({account, ...props}: Props & ConnectedProps & DispatchProps
           />
           <Input
             name="email"
+            id="email"
             onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
               inputs.email.current.setCustomValidity('');
               setRegistrationData({...registrationData, email: event.target.value});
@@ -193,6 +195,7 @@ const AccountForm = ({account, ...props}: Props & ConnectedProps & DispatchProps
           />
           <Input
             name="password"
+            id="password"
             onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
               inputs.password.current.setCustomValidity('');
               setRegistrationData({...registrationData, password: event.target.value});
@@ -230,12 +233,13 @@ const AccountForm = ({account, ...props}: Props & ConnectedProps & DispatchProps
         }}
         markInvalid={!validInputs.terms}
         name="accept"
+        id="accept"
         required
         checked={registrationData.termsAccepted}
         data-uie-name="do-terms"
         style={{justifyContent: 'center'}}
       >
-        <CheckboxLabel>
+        <CheckboxLabel htmlFor="name">
           {Config.getConfig().FEATURE.ENABLE_ACCOUNT_REGISTRATION_ACCEPT_TERMS_AND_PRIVACY_POLICY ? (
             <FormattedMessage
               {...accountFormStrings.termsAndPrivacyPolicy}
