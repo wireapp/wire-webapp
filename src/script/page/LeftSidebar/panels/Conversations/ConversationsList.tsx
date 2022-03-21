@@ -33,6 +33,7 @@ import {CallState} from '../../../../calling/CallState';
 import {Call} from 'src/script/calling/Call';
 import {matchQualifiedIds} from 'Util/QualifiedId';
 import {ConversationRepository} from '../../../../conversation/ConversationRepository';
+import {DefaultLabelIds} from '../../../../conversation/ConversationLabelRepository';
 import Avatar, {AVATAR_SIZE} from 'Components/Avatar';
 import GroupAvatar from 'Components/avatar/GroupAvatar';
 import {ContentViewModel} from '../../../../view_model/ContentViewModel';
@@ -81,7 +82,7 @@ export const ConversationsList: React.FC<{
     setExpandedFolders(expanded => {
       const isAlreadyOpen = conversationLabels.some(labelId => expanded.includes(labelId));
 
-      return isAlreadyOpen ? expanded : [...expanded, conversationLabels[0]];
+      return isAlreadyOpen ? expanded : [...expanded, DefaultLabelIds.Favorites, conversationLabels[0]];
     });
 
     return () => {
