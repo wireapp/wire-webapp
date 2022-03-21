@@ -81,7 +81,6 @@ describe('PhoneLogin', () => {
 
   it('has an option to navigate back', async () => {
     const history = createMemoryHistory();
-    const historyPushSpy = spyOn(history, 'push');
     const phoneLoginPage = new PhoneLoginPage(
       mockStoreFactory()({
         ...initialRootState,
@@ -95,11 +94,7 @@ describe('PhoneLogin', () => {
     );
 
     expect(phoneLoginPage.getBackButton().exists()).toBe(true);
-    phoneLoginPage.getBackButton().simulate('click');
-
-    await waitForExpect(() => {
-      expect(historyPushSpy).toHaveBeenCalledWith(ROUTE.LOGIN as any);
-    });
+    expect(phoneLoginPage.getBackButton().props().href).toEqual(ROUTE.LOGIN);
   });
 
   it('navigates to verify phone code page if no password is set', async () => {

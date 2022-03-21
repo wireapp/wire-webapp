@@ -53,7 +53,7 @@ import {ROUTE} from '../route';
 import {Runtime} from '@wireapp/commons';
 import {isValidationError, parseError, parseValidationErrors} from '../util/errorUtil';
 import Page from './Page';
-import LinkButton from '../component/LinkButton';
+import RouterLink from '../component/RouterLink';
 
 interface Props extends React.HTMLProps<HTMLDivElement> {}
 
@@ -96,14 +96,9 @@ const PhoneLogin = ({
   };
 
   const backArrow = (
-    <LinkButton
-      onClick={() => {
-        history.push(ROUTE.LOGIN);
-      }}
-      data-uie-name="go-login"
-    >
+    <RouterLink to={ROUTE.LOGIN} data-uie-name="go-login">
       <ArrowIcon direction="left" color={COLOR.TEXT} style={{opacity: 0.56}} />
-    </LinkButton>
+    </RouterLink>
   );
   return (
     <Page>
