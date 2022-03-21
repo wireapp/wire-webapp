@@ -128,9 +128,8 @@ const Conversations: React.FC<ConversationsProps> = ({
           {(isOnLegalHold || hasPendingLegalHold) && (
             <LegalHoldDot
               isPending={hasPendingLegalHold}
-              data-uie-name={hasPendingLegalHold ? 'status-legal-hold-pending' : 'status-legal-hold'}
+              dataUieName={hasPendingLegalHold ? 'status-legal-hold-pending' : 'status-legal-hold'}
               legalHoldModal={listViewModel.contentViewModel.legalHoldModal}
-              css={{padding: '8px'}}
             />
           )}
         </>

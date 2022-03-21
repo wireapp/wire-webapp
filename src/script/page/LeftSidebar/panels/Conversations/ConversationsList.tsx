@@ -18,7 +18,7 @@
  */
 
 import {css} from '@emotion/core';
-import React, {useCallback, useEffect, useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {REASON as CALL_REASON, STATE as CALL_STATE} from '@wireapp/avs';
 import {t} from 'Util/LocalizerUtil';
 import {ListViewModel} from '../../../../view_model/ListViewModel';
@@ -96,7 +96,7 @@ export const ConversationsList: React.FC<{
   const {state: contentState} = useKoSubscribableChildren(listViewModel.contentViewModel, ['state']);
   const isShowingConnectionRequests = contentState === ContentViewModel.STATE.CONNECTION_REQUESTS;
 
-  const hasJoinableCall = useCallback((conversation: Conversation) => {
+  const hasJoinableCall = (conversation: Conversation) => {
     const call = activeCalls.find((callInstance: Call) =>
       matchQualifiedIds(callInstance.conversationId, conversation.qualifiedId),
     );
@@ -108,7 +108,7 @@ export const ConversationsList: React.FC<{
       call.state() === CALL_STATE.INCOMING &&
       call.reason() !== CALL_REASON.ANSWERED_ELSEWHERE
     );
-  }, []);
+  };
 
   const conversationView =
     viewStyle === ConverationViewStyle.RECENT ? (
