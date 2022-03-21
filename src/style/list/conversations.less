@@ -36,13 +36,16 @@
   }
 }
 
-.conversations-footer {
+.conversations-footer-list {
+  .list-unstyled;
+
   display: flex;
   height: @conversation-input-min-height;
   align-items: center;
   justify-content: space-between;
   padding-right: 12px;
   padding-left: 12px;
+  margin: 0;
   color: #fff;
 
   .conversations-footer-contacts-label {
@@ -51,6 +54,10 @@
     margin-left: 16px;
     color: #fff;
   }
+}
+
+.conversations-settings-button {
+  .button-reset-default;
 }
 
 .conversations-settings {
@@ -105,13 +112,23 @@
   flex-direction: column;
 }
 
+.conversation-folder-list {
+  .list-unstyled;
+  margin: 0;
+}
+
 .conversation-folder {
   &__head {
+    .button-reset-default;
+
     display: flex;
+    width: 100%;
+    align-items: center;
     margin: 20px 0;
     cursor: pointer;
     font-size: 11px;
     font-weight: @font-weight-regular;
+    text-align: left;
     text-transform: uppercase;
 
     .disclose-icon {

@@ -42,8 +42,6 @@ import {GiphyViewModel} from './content/GiphyViewModel';
 import {HistoryImportViewModel} from './content/HistoryImportViewModel';
 import {HistoryExportViewModel} from './content/HistoryExportViewModel';
 import {TitleBarViewModel} from './content/TitleBarViewModel';
-import {PreferencesDevicesViewModel} from './content/PreferencesDevicesViewModel';
-import {PreferencesDeviceDetailsViewModel} from './content/PreferencesDeviceDetailsViewModel';
 import {InputBarViewModel} from './content/InputBarViewModel';
 import {PanelViewModel} from './PanelViewModel';
 import type {MainViewModel, ViewModelRepositories} from './MainViewModel';
@@ -60,6 +58,8 @@ import '../page/preferences/AccountPreferences';
 import '../page/preferences/OptionPreferences';
 import '../page/preferences/AVPreferences';
 import '../page/preferences/AboutPreferences';
+import '../page/left-sidebar/LeftSidebar';
+import '../page/preferences/devices/DevicesPreferences';
 import {
   PreferenceNotificationRepository,
   Notification,
@@ -67,7 +67,6 @@ import {
 } from '../notification/PreferenceNotificationRepository';
 import {modals} from '../view_model/ModalsViewModel';
 import {MessageRepository} from '../conversation/MessageRepository';
-import {Core} from '../service/CoreSingleton';
 
 interface ShowConversationOptions {
   exposeMessage?: Message;
@@ -98,11 +97,9 @@ export class ContentViewModel {
   inviteModal: InviteModalViewModel;
   legalHoldModal: LegalHoldModalViewModel;
   logger: Logger;
-  isFederated?: boolean;
+  readonly isFederated?: boolean;
   mainViewModel: MainViewModel;
   messageList: MessageListViewModel;
-  preferencesDeviceDetails: PreferencesDeviceDetailsViewModel;
-  preferencesDevices: PreferencesDevicesViewModel;
   previousConversation: Conversation | null = null;
   previousState: string | null = null;
   serviceModal: ServiceModalViewModel;
@@ -115,6 +112,7 @@ export class ContentViewModel {
   static get STATE() {
     return {
       COLLECTION: 'ContentViewModel.STATE.COLLECTION',
+      COLLECTION_DETAILS: 'ContentViewModel.STATE.COLLECTION_DETAILS',
       CONNECTION_REQUESTS: 'ContentViewModel.STATE.CONNECTION_REQUESTS',
       CONVERSATION: 'ContentViewModel.STATE.CONVERSATION',
       HISTORY_EXPORT: 'ContentViewModel.STATE.HISTORY_EXPORT',
@@ -139,7 +137,7 @@ export class ContentViewModel {
     this.conversationRepository = repositories.conversation;
     this.userRepository = repositories.user;
     this.messageRepository = repositories.message;
-    this.isFederated = container.resolve(Core).backendFeatures.isFederated;
+    this.isFederated = mainViewModel.isFederated;
     this.logger = getLogger('ContentViewModel');
     this.State = ContentViewModel.STATE;
 
@@ -180,14 +178,6 @@ export class ContentViewModel {
     );
     this.titleBar = new TitleBarViewModel(mainViewModel.calling, mainViewModel.panel, this, repositories.calling);
 
-    this.preferencesDeviceDetails = new PreferencesDeviceDetailsViewModel(
-      mainViewModel,
-      repositories.client,
-      repositories.cryptography,
-      repositories.message,
-    );
-    this.preferencesDevices = new PreferencesDevicesViewModel(mainViewModel, this, repositories.cryptography);
-
     this.historyExport = new HistoryExportViewModel(repositories.backup);
     this.historyImport = new HistoryImportViewModel(repositories.backup);
 
@@ -199,9 +189,6 @@ export class ContentViewModel {
           break;
         case ContentViewModel.STATE.PREFERENCES_ACCOUNT:
           this.popNotification();
-          break;
-        case ContentViewModel.STATE.PREFERENCES_DEVICES:
-          this.preferencesDevices.updateDeviceInfo();
           break;
         default:
           this.inputBar.removedFromView();

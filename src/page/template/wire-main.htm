@@ -7,19 +7,13 @@
     <div id="app" class="app">
       <div id="left-column" class="left-column" data-bind="css: {'left-column--light-theme': !isActivatedAccount()}">
         <!-- ko if: webappLoaded -->
-          #include('list/background.htm')
+          <left-sidebar params="listViewModel: $root, conversationRepository: conversationRepository, selfUser: selfUser"></left-sidebar>
           <!-- ko ifnot: modal() -->
-            #include('list/archive.htm')
             #include('list/conversations.htm')
-            #include('list/preferences.htm')
             #include('list/start-ui.htm')
           <!-- /ko -->
           <!-- ko if: modal() === ModalType.TAKEOVER -->
             #include('list/takeover.htm')
-          <!-- /ko -->
-          <!-- ko if: modal() === ModalType.TEMPORARY_GUEST -->
-            #include('list/temporary-guest.htm')
-            #include('list/preferences.htm')
           <!-- /ko -->
         <!-- /ko -->
       </div>
@@ -62,7 +56,7 @@
           #include('content/preferences-device-details.htm')
         <!-- /ko -->
         <!-- ko if: state() === State.PREFERENCES_DEVICES -->
-          #include('content/preferences-devices.htm')
+          <devices-preferences params="cryptographyRepository: repositories.cryptography, removeDevice: mainViewModel.actions.deleteClient, verifyDevice: (userId, device, verified) => repositories.client.verifyClient(userId, device, verified), resetSession: (userId, device, conversation) => repositories.message.resetSession(userId, device.id, conversation)"></devices-preferences>
         <!-- /ko -->
         <!-- ko if: state() === State.PREFERENCES_OPTIONS -->
           <div id="preferences-options" class="preferences-page preferences-options">

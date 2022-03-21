@@ -52,6 +52,7 @@ describe('AvatarImage', () => {
 
     const avatarImage = new AvatarImagePage({
       assetRepository: assetRepo,
+      avatarAlt: participant.name(),
       avatarSize: AVATAR_SIZE.LARGE,
       devicePixelRatio: 2,
       mediumPicture: participant.mediumPictureResource(),
@@ -76,6 +77,7 @@ describe('AvatarImage', () => {
 
     const avatarImage = new AvatarImagePage({
       assetRepository: assetRepo,
+      avatarAlt: participant.name(),
       avatarSize: AVATAR_SIZE.LARGE,
       devicePixelRatio: 1,
       mediumPicture: participant.mediumPictureResource(),
@@ -99,6 +101,7 @@ describe('AvatarImage', () => {
 
     const avatarImage = new AvatarImagePage({
       assetRepository: assetRepo,
+      avatarAlt: participant.name(),
       avatarSize: AVATAR_SIZE.SMALL,
       devicePixelRatio: 2,
       mediumPicture: participant.mediumPictureResource(),
@@ -121,6 +124,7 @@ describe('AvatarImage', () => {
 
     const avatarImage = new AvatarImagePage({
       assetRepository: assetRepo,
+      avatarAlt: participant.name(),
       avatarSize: AVATAR_SIZE.LARGE,
       mediumPicture: participant.mediumPictureResource(),
       previewPicture: participant.previewPictureResource(),

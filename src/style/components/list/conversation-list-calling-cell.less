@@ -19,6 +19,7 @@
 
 .call-ui {
   &__button {
+    .button-reset-default;
     display: flex;
     min-width: 40px;
     height: 24px;
@@ -115,9 +116,14 @@
     }
   }
   &__participant-list {
-    max-height: 184px;
-    overflow-x: hidden;
-    overflow-y: scroll;
+    .list-unstyled;
+    margin: 0;
+
+    &__container {
+      max-height: 184px;
+      overflow-x: hidden;
+      overflow-y: scroll;
+    }
 
     &__wrapper {
       overflow: hidden;
@@ -173,7 +179,8 @@ svg.small-icon {
   max-height: 12px;
 }
 
-conversation-list-calling-cell {
+conversation-list-calling-cell,
+.calling-cell {
   position: relative;
   display: flex;
   flex-direction: column;

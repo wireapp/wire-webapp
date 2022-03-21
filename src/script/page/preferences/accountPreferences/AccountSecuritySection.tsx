@@ -74,13 +74,14 @@ const AccountSecuritySection: React.FC<AccountSecuritySectionProps> = ({
   return (
     <PreferencesSection hasSeparator className="preferences-section-account-security">
       {manageTeamUrl && hasAccessToFeature(FEATURES.MANAGE_TEAM, teamRole) && (
-        <div
+        <button
           className="preferences-link accent-text"
           onClick={() => safeWindowOpen(manageTeamUrl)}
           data-uie-name="do-manage-team"
+          type="button"
         >
           {t('preferencesAccountManageTeam')}
-        </div>
+        </button>
       )}
 
       {createTeamUrl && !isMacOsWrapper && (
@@ -89,29 +90,36 @@ const AccountSecuritySection: React.FC<AccountSecuritySectionProps> = ({
         </PreferencesLink>
       )}
       {isAppLockActivated && (
-        <div
+        <button
           className="preferences-link accent-text"
           onClick={() => amplify.publish(WebAppEvents.PREFERENCES.CHANGE_APP_LOCK_PASSPHRASE)}
           data-uie-name="do-reset-app-lock"
+          type="button"
         >
           {t('preferencesAccountResetAppLockPassphrase')}
-        </div>
+        </button>
       )}
       {!selfUser?.isSingleSignOn && (
-        <div
+        <button
           className="preferences-link accent-text"
           onClick={() => safeWindowOpen(getAccountPagesUrl(URL_PATH.PASSWORD_RESET))}
           title={t('tooltipPreferencesPassword')}
           data-uie-name="do-reset-password"
+          type="button"
         >
           {t('preferencesAccountResetPassword')}
-        </div>
+        </button>
       )}
 
       {!isTeam && (
-        <div className="preferences-link accent-text" onClick={onClickDeleteAccount} data-uie-name="go-delete-account">
+        <button
+          className="preferences-link accent-text"
+          onClick={onClickDeleteAccount}
+          data-uie-name="go-delete-account"
+          type="button"
+        >
           {t('preferencesAccountDelete')}
-        </div>
+        </button>
       )}
     </PreferencesSection>
   );

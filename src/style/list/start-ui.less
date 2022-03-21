@@ -91,33 +91,48 @@
 }
 
 .start-ui-list-tabs {
+  .list-unstyled;
+
   display: flex;
   height: 44px;
   padding: 0 8px;
+  margin: 0;
 
   .start-ui-list-tab {
     .flex-center;
+    .button-reset-default;
 
     flex-grow: 1;
     border-bottom: 1px solid transparent;
-    color: #fff;
-    cursor: pointer;
-    font-size: 11px;
-    font-weight: 600;
-    opacity: 0.56;
-    text-transform: uppercase;
 
     &.active {
       border-bottom-color: #fff;
-      cursor: default;
-      opacity: 1;
+      pointer-events: none;
+
+      .start-ui-list-tab-button {
+        cursor: default;
+        opacity: 1;
+        pointer-events: none;
+      }
+    }
+
+    .start-ui-list-tab-button {
+      .button-reset-default;
+
+      width: 100%;
+      height: 100%;
+
+      color: #fff;
+      cursor: pointer;
+      font-size: 11px;
+      font-weight: 600;
+      opacity: 0.56;
+      text-transform: uppercase;
     }
   }
 }
 .panel-manage-services,
-.start-ui-create-group,
-.start-ui-create-guest-room,
-.start-ui-invite-people,
+.start-ui-list,
 .start-ui-manage-services {
   position: relative;
   overflow: hidden;
@@ -203,6 +218,14 @@
   margin-top: 16px;
 }
 
+.start-ui-list-header-top-people {
+  margin-bottom: 10px;
+}
+
+.start-ui-list-header-connections {
+  margin-bottom: 0;
+}
+
 .start-ui-import {
   display: flex;
   height: @conversation-input-min-height;
@@ -282,6 +305,8 @@
   }
 
   &__manage-button {
+    .button-reset-default;
+
     padding: 4px 16px;
     margin-top: 16px;
     background-color: rgba(255, 255, 255, 0.24);

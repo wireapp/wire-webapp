@@ -54,7 +54,6 @@ import 'Util/LocalizerUtil';
 import '../localization/Localizer';
 import '../view_model/bindings/CommonBindings';
 import '../view_model/bindings/ConversationListBindings';
-import '../view_model/bindings/ListBackgroundBindings';
 import '../view_model/bindings/MessageListBindings';
 import '../view_model/bindings/VideoCallingBindings';
 import '../view_model/bindings/ReactBindings';
