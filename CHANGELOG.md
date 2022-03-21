@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [24.4.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/compare/@wireapp/core@24.3.1...@wireapp/core@24.4.0) (2022-03-21)
+
+
+### Features
+
+* **core:** updating entropy types ([#4240](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/issues/4240)) ([722b6da](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/commit/722b6da8056c1b1524e2db8d5f86f9bfccffb7e0))
+
+
+
+
+
 ## [24.3.1](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/compare/@wireapp/core@24.3.0...@wireapp/core@24.3.1) (2022-03-21)
 
 
