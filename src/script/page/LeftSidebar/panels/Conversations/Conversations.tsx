@@ -182,6 +182,7 @@ const Conversations: React.FC<ConversationsProps> = ({
             <button
               type="button"
               className="button-icon-large"
+              data-uie-name="go-archive"
               onClick={() => switchList(ListState.ARCHIVE)}
               title={t('tooltipConversationsArchived', archivedConversations.length)}
             >
