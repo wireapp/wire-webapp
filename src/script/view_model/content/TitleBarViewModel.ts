@@ -40,6 +40,7 @@ import {CallState} from '../../calling/CallState';
 import {TeamState} from '../../team/TeamState';
 import {ConversationFilter} from '../../conversation/ConversationFilter';
 import {matchQualifiedIds} from 'Util/QualifiedId';
+import {isEnterKey, isSpaceKey} from 'Util/KeyboardUtil';
 
 // Parent: ContentViewModel
 export function generateWarningBadgeKey({
@@ -195,6 +196,12 @@ export class TitleBarViewModel {
 
   readonly clickOnDetails = (): void => {
     this.showDetails(false);
+  };
+
+  readonly pressOnDetails = (viewMode: unknown, event: KeyboardEvent): void => {
+    if (isSpaceKey(event) || isEnterKey(event)) {
+      this.clickOnDetails();
+    }
   };
 
   readonly clickOnCollectionButton = (): void => {

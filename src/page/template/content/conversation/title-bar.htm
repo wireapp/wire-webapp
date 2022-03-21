@@ -3,15 +3,18 @@
   <!-- ko if: conversationEntity() -->
     <div class="conversation-title-bar-library">
       <!-- ko if: isActivatedAccount() -->
-        <span class="conversation-title-bar-icon button-icon-large icon-search"
-              data-bind="clickOrDrag: clickOnCollectionButton, attr: {title: t('tooltipConversationSearch')}"
-              data-uie-name="do-collections"></span>
+        <button class="conversation-title-bar-icon button-icon-large icon-search"
+              type="button"
+              data-bind="clickOrDrag: clickOnCollectionButton, attr: {title: t('tooltipConversationSearch'), 'aria-label': t('tooltipConversationSearch')}"
+              data-uie-name="do-collections"></button>
       <!-- /ko -->
     </div>
 
     <div id="show-participants"
-         data-bind="clickOrDrag: clickOnDetails, attr: {'title': peopleTooltip}"
+         data-bind="clickOrDrag: clickOnDetails, attr: {'title': peopleTooltip, 'aria-label': peopleTooltip}, event: { keypress: pressOnDetails }"
          data-placement="bottom"
+         role="button"
+         tabindex="0"
          data-uie-name="do-participants"
          class="conversation-title-bar-name">
          <div class="conversation-title-bar-name-label--wrapper">
@@ -32,18 +35,25 @@
       <!-- ko if: showCallControls() -->
         <!-- ko using: callingViewModel -->
           <!-- ko if: $parent.supportsVideoCall() && $parent.isVideoCallingEnabled() -->
-            <camera-icon class="conversation-title-bar-icon"
-                  data-bind="clickOrDrag: () => callActions.startVideo($parent.conversationEntity()), attr: {title: t('tooltipConversationVideoCall')}"
-                  data-uie-name="do-video-call">
-            </camera-icon>
+          <button type="button" class="conversation-title-bar-icon"
+              data-bind="clickOrDrag: () => callActions.startVideo($parent.conversationEntity()), attr: {title: t('tooltipConversationVideoCall'), 'aria-label': t('tooltipConversationVideoCall')}"
+              data-uie-name="do-video-call">
+            <camera-icon></camera-icon>
+          </button>
+           
           <!-- /ko -->
-          <pickup-icon class="conversation-title-bar-icon"
-                data-bind="clickOrDrag: () => callActions.startAudio($parent.conversationEntity()), attr: {title: t('tooltipConversationCall')}"
-                data-uie-name="do-call">
-          </pickup-icon>
+          <button type="button" class="conversation-title-bar-icon"
+            data-bind="clickOrDrag: () => callActions.startAudio($parent.conversationEntity()), attr: {title: t('tooltipConversationCall'), 'aria-label': t('tooltipConversationCall')}"
+            data-uie-name="do-call">
+            <pickup-icon></pickup-icon>
+          </button>
         <!-- /ko -->
       <!-- /ko -->
-      <info-icon class="conversation-title-bar-icon" data-bind="clickOrDrag: clickOnDetails, css: {'conversation-title-bar-icon--active': panelIsVisible()}, attr: {title: t('tooltipConversationInfo')}" data-uie-name="do-open-info"></info-icon>
+      <button type="button" class="conversation-title-bar-icon" 
+        data-bind="clickOrDrag: clickOnDetails, css: {'conversation-title-bar-icon--active': panelIsVisible()}, attr: {title: t('tooltipConversationInfo'), 'aria-label': t('tooltipConversationInfo')}"
+        data-uie-name="do-open-info">
+        <info-icon></info-icon>
+      </button>
     </div>
 
     <!-- ko if: badgeLabelCopy() -->
