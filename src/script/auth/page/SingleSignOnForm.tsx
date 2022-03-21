@@ -248,7 +248,6 @@ const SingleSignOnForm = ({
               ? ValidationError.FIELD.SSO_EMAIL_CODE.name
               : ValidationError.FIELD.SSO_CODE.name
           }
-          tabIndex={1}
           onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
             setCodeOrMail(event.target.value);
             setIsCodeOrMailInputValid(true);
@@ -274,13 +273,7 @@ const SingleSignOnForm = ({
           disabled={disableInput}
           data-uie-name="enter-code"
         />
-        <RoundIconButton
-          tabIndex={2}
-          disabled={!codeOrMail}
-          type="submit"
-          formNoValidate
-          data-uie-name="do-sso-sign-in"
-        >
+        <RoundIconButton disabled={!codeOrMail} type="submit" formNoValidate data-uie-name="do-sso-sign-in">
           <ArrowIcon />
         </RoundIconButton>
       </InputSubmitCombo>
@@ -304,7 +297,8 @@ const SingleSignOnForm = ({
       )}
       {!Runtime.isDesktopApp() && (
         <Checkbox
-          tabIndex={3}
+          name="enter-public-computer-sso-sign-in"
+          id="enter-public-computer-sso-sign-in"
           onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
             setClientType(event.target.checked ? ClientType.TEMPORARY : ClientType.PERMANENT)
           }
@@ -312,7 +306,7 @@ const SingleSignOnForm = ({
           data-uie-name="enter-public-computer-sso-sign-in"
           style={{justifyContent: 'center', marginTop: '36px'}}
         >
-          <CheckboxLabel>{_(loginStrings.publicComputer)}</CheckboxLabel>
+          <CheckboxLabel htmlFor="">{_(loginStrings.publicComputer)}</CheckboxLabel>
         </Checkbox>
       )}
     </Form>

@@ -57,7 +57,6 @@ import {QUERY_KEY, ROUTE} from '../route';
 import {Runtime} from '@wireapp/commons';
 import {parseError, parseValidationErrors} from '../util/errorUtil';
 import {UrlUtil} from '@wireapp/commons';
-import * as URLUtil from '../util/urlUtil';
 import Page from './Page';
 
 interface Props extends React.HTMLProps<HTMLDivElement> {}
@@ -135,8 +134,6 @@ const Login = ({
       logger.error('Unable to login immediately', error);
     }
   };
-
-  const forgotPassword = () => URLUtil.openTab(EXTERNAL_ROUTE.WIRE_ACCOUNT_PASSWORD_RESET);
 
   const handleSubmit = async (formLoginData: Partial<LoginData>, validationErrors: Error[]) => {
     setValidationErrors(validationErrors);
@@ -228,7 +225,8 @@ const Login = ({
                   )}
                   {!Runtime.isDesktopApp() && (
                     <Checkbox
-                      tabIndex={3}
+                      id="enter-public-computer-sign-in"
+                      name="enter-public-computer-sign-in"
                       onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
                         pushLoginData({clientType: event.target.checked ? ClientType.TEMPORARY : ClientType.PERMANENT});
                       }}
@@ -236,22 +234,28 @@ const Login = ({
                       data-uie-name="enter-public-computer-sign-in"
                       style={{justifyContent: 'center', marginTop: '12px'}}
                     >
-                      <CheckboxLabel>{_(loginStrings.publicComputer)}</CheckboxLabel>
+                      <CheckboxLabel htmlFor="enter-public-computer-sign-in">
+                        {_(loginStrings.publicComputer)}
+                      </CheckboxLabel>
                     </Checkbox>
                   )}
                 </Form>
               </div>
               <Columns>
                 <Column>
-                  <Link onClick={forgotPassword} data-uie-name="go-forgot-password">
+                  <Link
+                    href={EXTERNAL_ROUTE.WIRE_ACCOUNT_PASSWORD_RESET}
+                    target="_blank"
+                    data-uie-name="go-forgot-password"
+                  >
                     {_(loginStrings.forgotPassword)}
                   </Link>
                 </Column>
                 {Config.getConfig().FEATURE.ENABLE_PHONE_LOGIN && (
                   <Column>
-                    <Link onClick={() => history.push(ROUTE.LOGIN_PHONE)} data-uie-name="go-sign-in-phone">
+                    <RouterLink to={ROUTE.LOGIN_PHONE} data-uie-name="go-sign-in-phone">
                       {_(loginStrings.phoneLogin)}
-                    </Link>
+                    </RouterLink>
                   </Column>
                 )}
               </Columns>

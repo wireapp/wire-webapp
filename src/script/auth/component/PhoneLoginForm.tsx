@@ -49,7 +49,6 @@ const PhoneLoginForm = ({isFetching, onSubmit}: LoginFormProps) => {
   return (
     <InputBlock>
       <Select
-        tabIndex={1}
         style={{height: 57, marginBottom: 0}}
         value={country}
         onChange={(event: React.ChangeEvent<HTMLSelectElement>) => {
@@ -72,7 +71,6 @@ const PhoneLoginForm = ({isFetching, onSubmit}: LoginFormProps) => {
       </Select>
       <InputSubmitCombo style={{background: 'none', boxShadow: 'inset 16px 16px 0 #fff, inset -100px -16px 0 #fff'}}>
         <Input
-          tabIndex={2}
           style={{marginRight: 1, width: 80}}
           ref={countryCodeInput}
           value={`+${countryCode}`}
@@ -86,7 +84,6 @@ const PhoneLoginForm = ({isFetching, onSubmit}: LoginFormProps) => {
         />
         <Input
           name="phone-login"
-          tabIndex={3}
           onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
             setPhoneNumber(event.target.value);
             setValidInput(true);
@@ -106,7 +103,6 @@ const PhoneLoginForm = ({isFetching, onSubmit}: LoginFormProps) => {
         ) : (
           <RoundIconButton
             style={{marginLeft: 16}}
-            tabIndex={5}
             disabled={!phoneNumber}
             type="submit"
             formNoValidate
