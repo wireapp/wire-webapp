@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [18.5.1](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/compare/@wireapp/api-client@18.5.0...@wireapp/api-client@18.5.1) (2022-03-21)
+
+
+### Bug Fixes
+
+* **services:** Change verification code data payload according to backend spec ([#4247](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/issues/4247)) ([5f5937b](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/commit/5f5937b5e35d83c2c3cbfea81e3644fc5b0beeb3))
+
+
+
+
+
 # [18.5.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/compare/@wireapp/api-client@18.4.0...@wireapp/api-client@18.5.0) (2022-03-18)
 
 
