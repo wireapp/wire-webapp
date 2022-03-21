@@ -169,6 +169,7 @@ const ConversationListCell: React.FC<ConversationListCellProps> = ({
               className="conversation-list-cell-context-menu"
               data-uie-name="go-options"
               aria-label={t('conversationOptionsMenu')}
+              type="button"
               onClick={event => {
                 event.stopPropagation();
                 rightClick(conversation, event.nativeEvent);
@@ -251,6 +252,7 @@ const ConversationListCell: React.FC<ConversationListCellProps> = ({
             {showJoinButton && (
               <button
                 onClick={onClickJoinCall}
+                type="button"
                 className="call-ui__button call-ui__button--green call-ui__button--join"
                 data-uie-name="do-call-controls-call-join"
               >
