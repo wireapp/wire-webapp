@@ -236,7 +236,6 @@ const Conversations: React.FC<ConversationsProps> = ({
         <ConversationsList
           connectRequests={connectRequests}
           callState={callState}
-          userState={userState}
           conversations={conversations}
           viewStyle={viewStyle}
           listViewModel={listViewModel}

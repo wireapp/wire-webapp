@@ -33,12 +33,13 @@ import {CallState} from '../../../../calling/CallState';
 import {Call} from 'src/script/calling/Call';
 import {matchQualifiedIds} from 'Util/QualifiedId';
 import {ConversationRepository} from '../../../../conversation/ConversationRepository';
-import {UserState} from '../../../../user/UserState';
 import Avatar, {AVATAR_SIZE} from 'Components/Avatar';
 import GroupAvatar from 'Components/avatar/GroupAvatar';
 import {ContentViewModel} from '../../../../view_model/ContentViewModel';
 import {ConverationViewStyle} from './Conversations';
 import {User} from 'src/script/entity/User';
+import {amplify} from 'amplify';
+import {WebAppEvents} from '@wireapp/webapp-events';
 
 export const ConversationsList: React.FC<{
   callState: CallState;
@@ -47,14 +48,12 @@ export const ConversationsList: React.FC<{
   conversations: Conversation[];
   conversationState: ConversationState;
   listViewModel: ListViewModel;
-  userState: UserState;
   viewStyle: ConverationViewStyle;
 }> = ({
   conversations,
   listViewModel,
   viewStyle,
   connectRequests,
-  userState,
   conversationState,
   conversationRepository,
   callState,
@@ -67,15 +66,27 @@ export const ConversationsList: React.FC<{
 
   useEffect(() => {
     if (!activeConversation) {
-      return;
+      return () => {};
     }
     const conversationLabels =
       conversationRepository.conversationLabelRepository.getConversationLabelIds(activeConversation);
+    const expandFolder = (folderId: string) => {
+      setExpandedFolders(allExpanded => {
+        const isAlreadyOpen = allExpanded.includes(folderId);
+
+        return isAlreadyOpen ? allExpanded : [...allExpanded, folderId];
+      });
+    };
+    amplify.subscribe(WebAppEvents.CONTENT.EXPAND_FOLDER, expandFolder);
     setExpandedFolders(expanded => {
       const isAlreadyOpen = conversationLabels.some(labelId => expanded.includes(labelId));
 
       return isAlreadyOpen ? expanded : [...expanded, conversationLabels[0]];
     });
+
+    return () => {
+      amplify.unsubscribe(WebAppEvents.CONTENT.EXPAND_FOLDER, expandFolder);
+    };
   }, [activeConversation]);
 
   const openContextMenu = (conversation: Conversation, event: MouseEvent) =>
