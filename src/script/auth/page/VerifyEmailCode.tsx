@@ -17,7 +17,7 @@
  *
  */
 
-import {CodeInput, ContainerXS, H1, Link, Muted} from '@wireapp/react-ui-kit';
+import {CodeInput, ContainerXS, H1, Muted} from '@wireapp/react-ui-kit';
 import React from 'react';
 import {FormattedMessage, useIntl} from 'react-intl';
 import {connect} from 'react-redux';
@@ -33,6 +33,7 @@ import * as AuthSelector from '../module/selector/AuthSelector';
 import {ROUTE} from '../route';
 import {parseError} from '../util/errorUtil';
 import Page from './Page';
+import LinkButton from '../component/LinkButton';
 
 interface Props extends React.HTMLProps<HTMLDivElement>, RouteComponentProps<{}> {}
 
@@ -87,6 +88,7 @@ const VerifyEmailCode = ({
       logger.error('Failed to send email code', error);
     }
   };
+
   return (
     <Page hasAccountData>
       <ContainerXS
@@ -109,9 +111,9 @@ const VerifyEmailCode = ({
           {parseError(authError)}
         </div>
         <div>
-          <Link onClick={resendCode} data-uie-name="do-resend-code">
+          <LinkButton onClick={resendCode} data-uie-name="do-resend-code">
             {_(verifyStrings.resendCode)}
-          </Link>
+          </LinkButton>
           <RouterLink to={changeEmailRedirect[currentFlow]} style={{marginLeft: 35}} data-uie-name="go-change-email">
             {_(verifyStrings.changeEmail)}
           </RouterLink>

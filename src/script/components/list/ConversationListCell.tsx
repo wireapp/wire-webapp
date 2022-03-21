@@ -235,6 +235,6 @@ export default ConversationListCell;
 
 registerReactComponent('conversation-list-cell', {
   bindings:
-    'offsetTop: ko.unwrap(offsetTop), index: ko.unwrap(index), showJoinButton: ko.unwrap(showJoinButton), conversation, is_selected, isVisibleFunc, onJoinCall, rightClick, onClick',
+    'offsetTop: ko.unwrap(offsetTop), index: ko.unwrap(index), showJoinButton: ko.unwrap(showJoinButton), conversation, is_selected, isVisibleFunc, onJoinCall, rightClick, onClick, dataUieName',
   component: ConversationListCell,
 });
