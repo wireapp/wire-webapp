@@ -239,7 +239,7 @@ const AccountForm = ({account, ...props}: Props & ConnectedProps & DispatchProps
         data-uie-name="do-terms"
         style={{justifyContent: 'center'}}
       >
-        <CheckboxLabel htmlFor="name">
+        <CheckboxLabel htmlFor="accept">
           {Config.getConfig().FEATURE.ENABLE_ACCOUNT_REGISTRATION_ACCEPT_TERMS_AND_PRIVACY_POLICY ? (
             <FormattedMessage
               {...accountFormStrings.termsAndPrivacyPolicy}
