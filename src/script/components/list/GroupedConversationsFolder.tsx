@@ -27,12 +27,11 @@ import {generateConversationUrl} from '../../router/routeGenerator';
 import {createNavigate} from '../../router/routerBindings';
 import {ListViewModel} from 'src/script/view_model/ListViewModel';
 import {Conversation} from 'src/script/entity/Conversation';
-import {QualifiedId} from '@wireapp/api-client/src/user';
 
 export interface GroupedConversationsFolderProps {
   expandedFolders: string[];
   folder: ConversationLabel;
-  hasJoinableCall: (conversationId: QualifiedId) => boolean;
+  hasJoinableCall: (conversation: Conversation) => boolean;
   isSelectedConversation: (conversationEntity: Conversation) => boolean;
   listViewModel: ListViewModel;
   onJoinCall: (conversationEntity: Conversation) => void;
@@ -65,7 +64,7 @@ const GroupedConversationsFolder: React.FC<GroupedConversationsFolderProps> = ({
               onClick={makeOnClick(conversation.id, conversation.domain)}
               rightClick={(_, event) => listViewModel.onContextMenu(conversation, event)}
               conversation={conversation}
-              showJoinButton={hasJoinableCall(conversation.qualifiedId)}
+              showJoinButton={hasJoinableCall(conversation)}
               isSelected={isSelectedConversation}
               onJoinCall={onJoinCall}
             />
