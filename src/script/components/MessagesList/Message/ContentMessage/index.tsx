@@ -190,10 +190,10 @@ const ContentMessageComponent: React.FC<ContentMessageProps> = ({
 
         <div className="message-body-actions">
           {menuEntries.length > 0 && (
-            <span
+            <button
               className="context-menu icon-more font-size-xs"
               onClick={event => showContextMenu(event, menuEntries, 'message-options-menu')}
-            ></span>
+            ></button>
           )}
           {ephemeral_status === EphemeralStatusType.ACTIVE && (
             <time
