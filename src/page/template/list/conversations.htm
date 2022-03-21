@@ -101,8 +101,8 @@
           <!-- ko foreach: {data: unarchivedConversations, as: 'conversation', noChildContext: true} -->
           <li class="conversation-recent-view-list-item">
             <conversation-list-cell
-              data-uie-name="item-conversation"
               params="
+                dataUieName: 'item-conversation',
                 onClick: makeOnClick(conversation.id, conversation.domain),
                 rightClick: (_, event) => listViewModel.onContextMenu(conversation, event),
                 conversation: conversation,
