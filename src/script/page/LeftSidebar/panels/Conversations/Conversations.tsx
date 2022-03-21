@@ -40,12 +40,14 @@ import {TeamState} from '../../../../team/TeamState';
 import {AvailabilityContextMenu} from '../../../../ui/AvailabilityContextMenu';
 import {UserState} from '../../../../user/UserState';
 import {ConversationsList} from './ConversationsList';
+import {PreferenceNotificationRepository} from 'src/script/notification/PreferenceNotificationRepository';
 
 type ConversationsProps = {
   callState?: CallState;
   conversationRepository: ConversationRepository;
   conversationState?: ConversationState;
   listViewModel: ListViewModel;
+  preferenceNotificationRepository: PreferenceNotificationRepository;
   propertiesRepository: PropertiesRepository;
   selfUser: User;
   switchList: (list: ListState) => void;
@@ -61,6 +63,7 @@ export enum ConverationViewStyle {
 const Conversations: React.FC<ConversationsProps> = ({
   propertiesRepository,
   conversationRepository,
+  preferenceNotificationRepository,
   listViewModel,
   conversationState = container.resolve(ConversationState),
   teamState = container.resolve(TeamState),
@@ -78,6 +81,7 @@ const Conversations: React.FC<ConversationsProps> = ({
   const {connectRequests} = useKoSubscribableChildren(userState, ['connectRequests']);
   const {conversations_archived: archivedConversations, conversations_unarchived: conversations} =
     useKoSubscribableChildren(conversationState, ['conversations_archived', 'conversations_unarchived']);
+  const {notifications} = useKoSubscribableChildren(preferenceNotificationRepository, ['notifications']);
 
   const {activeCalls} = useKoSubscribableChildren(callState, ['activeCalls']);
   const initialViewStyle = propertiesRepository.getPreference(PROPERTIES_TYPE.INTERFACE.VIEW_FOLDERS)
@@ -85,7 +89,7 @@ const Conversations: React.FC<ConversationsProps> = ({
     : ConverationViewStyle.RECENT;
 
   const [viewStyle, setViewStyle] = useState<ConverationViewStyle>(initialViewStyle);
-  const showBadge = () => false;
+  const showBadge = notifications.length > 0;
 
   const hasNoConversations = conversations.length + connectRequests.length === 0;
 
@@ -100,7 +104,7 @@ const Conversations: React.FC<ConversationsProps> = ({
     <>
       <button
         type="button"
-        className={`conversations-settings-button accent-text ${showBadge() ? 'conversations-settings--badge' : ''}`}
+        className={`conversations-settings-button accent-text ${showBadge ? 'conversations-settings--badge' : ''}`}
         title={t('tooltipConversationsPreferences')}
         onClick={() => switchList(ListState.PREFERENCES)}
         data-uie-name="go-preferences"

@@ -79,6 +79,7 @@ const LeftSidebar: React.FC<LeftSidebarProps> = ({
       content = (
         <Conversations
           listViewModel={listViewModel}
+          preferenceNotificationRepository={listViewModel.contentViewModel.repositories.preferenceNotification}
           conversationRepository={conversationRepository}
           propertiesRepository={propertiesRepository}
           switchList={switchList}
