@@ -33,6 +33,7 @@ import * as AuthSelector from '../module/selector/AuthSelector';
 import {ROUTE} from '../route';
 import {parseError} from '../util/errorUtil';
 import Page from './Page';
+import {KEY} from 'Util/KeyboardUtil';
 
 interface Props extends React.HTMLProps<HTMLDivElement>, RouteComponentProps<{}> {}
 
@@ -86,6 +87,13 @@ const VerifyEmailCode = ({
       logger.error('Failed to send email code', error);
     }
   };
+
+  const handleKeyPress = (event: React.KeyboardEvent) => {
+    if (event.key === KEY.ENTER || event.key === KEY.SPACE) {
+      resendCode(event as unknown as React.MouseEvent);
+    }
+  };
+
   return (
     <Page hasAccountData>
       <ContainerXS
@@ -108,7 +116,13 @@ const VerifyEmailCode = ({
           {parseError(authError)}
         </div>
         <div>
-          <Link onClick={resendCode} data-uie-name="do-resend-code">
+          <Link
+            onClick={resendCode}
+            onKeyPress={handleKeyPress}
+            data-uie-name="do-resend-code"
+            role="button"
+            tabIndex={0}
+          >
             {_(verifyStrings.resendCode)}
           </Link>
           <RouterLink to={changeEmailRedirect[currentFlow]} style={{marginLeft: 35}} data-uie-name="go-change-email">
