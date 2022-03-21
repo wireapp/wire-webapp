@@ -25,11 +25,13 @@ import {ListState} from 'src/script/view_model/ListViewModel';
 
 import {User} from 'src/script/entity/User';
 import {PROPERTIES_TYPE} from 'src/script/properties/PropertiesType';
+import ko from 'knockout';
 
 describe('Conversations', () => {
   const defaultParams: React.ComponentProps<typeof Conversations> = {
     conversationRepository: {} as any,
     listViewModel: {} as any,
+    preferenceNotificationRepository: {notifications: ko.observable([])} as any,
     propertiesRepository: {getPreference: jest.fn(), savePreference: jest.fn()} as any,
     selfUser: new User(),
     switchList: jest.fn(),
