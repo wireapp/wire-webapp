@@ -259,6 +259,7 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
             <button
               className="video-controls__button"
               onClick={minimize}
+              type="button"
               aria-labelledby="minimize-label"
               data-uie-name="do-call-controls-video-minimize"
             >
@@ -282,6 +283,7 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
               data-uie-value={!isMuted ? 'inactive' : 'active'}
               onClick={() => toggleMute(call, !isMuted)}
               css={!isMuted ? videoControlActiveStyles : undefined}
+              type="button"
               aria-labelledby="mute-label"
               data-uie-name="do-call-controls-video-call-mute"
             >
@@ -331,6 +333,7 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
                 !canShareScreen ? videoControlDisabledStyles : selfSharesScreen ? videoControlActiveStyles : undefined
               }
               onClick={() => toggleScreenshare(call)}
+              type="button"
               aria-labelledby="screnn-share-label"
               data-uie-value={selfSharesScreen ? 'active' : 'inactive'}
               data-uie-enabled={canShareScreen ? 'true' : 'false'}
@@ -349,6 +352,7 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
             <button
               className="video-controls__button video-controls__button--red"
               onClick={() => leave(call)}
+              type="button"
               aria-labelledby="leave-label"
               data-uie-name="do-call-controls-video-call-cancel"
             >
@@ -376,6 +380,7 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
             <button
               data-uie-name="pagination-next"
               onClick={() => changePage(currentPage + 1, call)}
+              type="button"
               className="hide-controls-hidden button-reset-default"
               css={{
                 ...paginationButtonStyles,
@@ -390,6 +395,7 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
           {currentPage !== 0 && (
             <button
               data-uie-name="pagination-previous"
+              type="button"
               onClick={() => changePage(currentPage - 1, call)}
               className="hide-controls-hidden button-reset-default"
               css={{

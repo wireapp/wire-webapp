@@ -78,6 +78,7 @@ const ButtonGroup: React.FC<ButtonGroupProps> = ({style, items, currentItem, onC
             }
           }}
           className="button-reset-default"
+          type="button"
           data-uie-name="button-group-item"
           data-uie-value={value === currentItem ? 'active' : 'inactive'}
         >
