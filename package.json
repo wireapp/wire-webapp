@@ -46,7 +46,8 @@
     "underscore": "1.13.2",
     "use-react-router": "1.0.7",
     "uuidjs": "4.2.11",
-    "webrtc-adapter": "6.4.8"
+    "webrtc-adapter": "6.4.8",
+    "zustand": "3.7.1"
   },
   "devDependencies": {
     "@babel/core": "7.17.8",

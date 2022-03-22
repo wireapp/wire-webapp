@@ -18,7 +18,7 @@
  */
 
 import {css} from '@emotion/core';
-import React, {useEffect, useState} from 'react';
+import React from 'react';
 import {REASON as CALL_REASON, STATE as CALL_STATE} from '@wireapp/avs';
 import {t} from 'Util/LocalizerUtil';
 import {ListViewModel} from '../../../../view_model/ListViewModel';
@@ -26,21 +26,18 @@ import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {ConversationState} from '../../../../conversation/ConversationState';
 import {Conversation} from '../../../../entity/Conversation';
 import ConversationListCell from 'Components/list/ConversationListCell';
-import GroupedConversations from 'Components/list/GroupedConversations';
+import GroupedConversations from './GroupedConversations';
 import {createNavigate} from '../../../../router/routerBindings';
 import {generateConversationUrl} from '../../../../router/routeGenerator';
 import {CallState} from '../../../../calling/CallState';
 import {Call} from 'src/script/calling/Call';
 import {matchQualifiedIds} from 'Util/QualifiedId';
 import {ConversationRepository} from '../../../../conversation/ConversationRepository';
-import {DefaultLabelIds} from '../../../../conversation/ConversationLabelRepository';
 import Avatar, {AVATAR_SIZE} from 'Components/Avatar';
 import GroupAvatar from 'Components/avatar/GroupAvatar';
 import {ContentViewModel} from '../../../../view_model/ContentViewModel';
 import {ConverationViewStyle} from './Conversations';
 import {User} from 'src/script/entity/User';
-import {amplify} from 'amplify';
-import {WebAppEvents} from '@wireapp/webapp-events';
 
 export const ConversationsList: React.FC<{
   callState: CallState;
@@ -60,35 +57,8 @@ export const ConversationsList: React.FC<{
   callState,
 }) => {
   const {activeCalls} = useKoSubscribableChildren(callState, ['activeCalls']);
-  const [expandedFolders, setExpandedFolders] = useState<string[]>([]);
-  const {activeConversation} = useKoSubscribableChildren(conversationState, ['activeConversation']);
 
   const isActiveConversation = (conversation: Conversation) => conversationState.isActiveConversation(conversation);
-
-  useEffect(() => {
-    if (!activeConversation) {
-      return () => {};
-    }
-    const conversationLabels =
-      conversationRepository.conversationLabelRepository.getConversationLabelIds(activeConversation);
-    const expandFolder = (folderId: string) => {
-      setExpandedFolders(allExpanded => {
-        const isAlreadyOpen = allExpanded.includes(folderId);
-
-        return isAlreadyOpen ? allExpanded : [...allExpanded, folderId];
-      });
-    };
-    amplify.subscribe(WebAppEvents.CONTENT.EXPAND_FOLDER, expandFolder);
-    setExpandedFolders(expanded => {
-      const isAlreadyOpen = conversationLabels.some(labelId => expanded.includes(labelId));
-
-      return isAlreadyOpen ? expanded : [...expanded, DefaultLabelIds.Favorites, conversationLabels[0]];
-    });
-
-    return () => {
-      amplify.unsubscribe(WebAppEvents.CONTENT.EXPAND_FOLDER, expandFolder);
-    };
-  }, [activeConversation]);
 
   const openContextMenu = (conversation: Conversation, event: MouseEvent) =>
     listViewModel.onContextMenu(conversation, event);
@@ -131,12 +101,10 @@ export const ConversationsList: React.FC<{
         callState={callState}
         conversationRepository={conversationRepository}
         conversationState={conversationState}
-        expandedFolders={expandedFolders}
         hasJoinableCall={hasJoinableCall}
         isSelectedConversation={isActiveConversation}
         listViewModel={listViewModel}
         onJoinCall={answerCall}
-        setExpandedFolders={setExpandedFolders}
       />
     );
 

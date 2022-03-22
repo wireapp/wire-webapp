@@ -17,11 +17,13 @@
  *
  */
 
-import React, {useCallback, useEffect, useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {container} from 'tsyringe';
+import {WebAppEvents} from '@wireapp/webapp-events';
+import {amplify} from 'amplify';
 
-import type {ConversationRepository} from '../../conversation/ConversationRepository';
-import type {Conversation} from '../../entity/Conversation';
+import type {ConversationRepository} from '../../../../conversation/ConversationRepository';
+import type {Conversation} from '../../../../entity/Conversation';
 import {
   ConversationLabel,
   ConversationLabelRepository,
@@ -29,14 +31,16 @@ import {
   createLabelFavorites,
   createLabelGroups,
   createLabelPeople,
-} from '../../conversation/ConversationLabelRepository';
+  DefaultLabelIds,
+} from '../../../../conversation/ConversationLabelRepository';
 
 import {ListViewModel} from 'src/script/view_model/ListViewModel';
-import {ConversationState} from '../../conversation/ConversationState';
+import {ConversationState} from '../../../../conversation/ConversationState';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import GroupedConversationsFolder from './GroupedConversationsFolder';
-import {CallState} from '../../calling/CallState';
+import {CallState} from '../../../../calling/CallState';
 import {QualifiedId} from '@wireapp/api-client/src/user';
+import {useFolderState} from './state';
 
 const useLabels = (conversationLabelRepository: ConversationLabelRepository) => {
   const {labels: conversationLabels} = useKoSubscribableChildren(conversationLabelRepository, ['labels']);
@@ -57,30 +61,46 @@ export interface GroupedConversationsProps {
   callState: CallState;
   conversationRepository: ConversationRepository;
   conversationState: ConversationState;
-  expandedFolders: string[];
   hasJoinableCall: (conversationId: QualifiedId) => boolean;
   isSelectedConversation: (conversationEntity: Conversation) => boolean;
   listViewModel: ListViewModel;
   onJoinCall: (conversationEntity: Conversation) => void;
-  setExpandedFolders: (folders: string[]) => void;
 }
 
 const GroupedConversations: React.FC<GroupedConversationsProps> = ({
   conversationRepository,
-  expandedFolders,
   hasJoinableCall,
   isSelectedConversation,
   onJoinCall,
-  setExpandedFolders,
   listViewModel,
   conversationState = container.resolve(ConversationState),
   callState = container.resolve(CallState),
 }) => {
   const {conversationLabelRepository} = conversationRepository;
+  const {activeConversation} = useKoSubscribableChildren(conversationState, ['activeConversation']);
   const {conversations_unarchived: conversations} = useKoSubscribableChildren(conversationState, [
     'conversations_unarchived',
   ]);
+
   useKoSubscribableChildren(callState, ['activeCalls']);
+
+  const expandedFolders = useFolderState(state => state.expandedFolders);
+  const toggleFolder = useFolderState(state => state.toggleFolder);
+  const openFolder = useFolderState(state => state.openFolder);
+
+  useEffect(() => {
+    if (!activeConversation) {
+      return () => {};
+    }
+    const conversationLabels = conversationLabelRepository.getConversationLabelIds(activeConversation);
+    amplify.subscribe(WebAppEvents.CONTENT.EXPAND_FOLDER, openFolder);
+    openFolder(DefaultLabelIds.Favorites);
+    openFolder(conversationLabels[0]);
+
+    return () => {
+      amplify.unsubscribe(WebAppEvents.CONTENT.EXPAND_FOLDER, openFolder);
+    };
+  }, [activeConversation]);
 
   useLabels(conversationLabelRepository);
 
@@ -99,25 +119,13 @@ const GroupedConversations: React.FC<GroupedConversationsProps> = ({
     ...custom,
   ].filter(Boolean);
 
-  const isExpanded = useCallback((folderId: string): boolean => expandedFolders.includes(folderId), [expandedFolders]);
-  const toggle = useCallback(
-    (folderId: string): void => {
-      if (isExpanded(folderId)) {
-        setExpandedFolders(expandedFolders.filter(folder => folder !== folderId));
-      } else {
-        setExpandedFolders([...expandedFolders, folderId]);
-      }
-    },
-    [expandedFolders],
-  );
-
   return (
     <ul className="conversation-folder-list">
       {folders.map(folder => (
         <GroupedConversationsFolder
           key={`${folder.id}-${folder.conversations().length}`}
           folder={folder}
-          toggle={toggle}
+          toggle={toggleFolder}
           onJoinCall={onJoinCall}
           listViewModel={listViewModel}
           expandedFolders={expandedFolders}

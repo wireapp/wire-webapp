@@ -21,10 +21,10 @@ import React from 'react';
 import {css} from '@emotion/core';
 import type {ConversationLabel} from 'src/script/conversation/ConversationLabelRepository';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
-import ConversationListCell from './ConversationListCell';
+import ConversationListCell from 'Components/list/ConversationListCell';
 import GroupedConversationHeader from './GroupedConversationHeader';
-import {generateConversationUrl} from '../../router/routeGenerator';
-import {createNavigate} from '../../router/routerBindings';
+import {generateConversationUrl} from '../../../../router/routeGenerator';
+import {createNavigate} from '../../../../router/routerBindings';
 import {ListViewModel} from 'src/script/view_model/ListViewModel';
 import {Conversation} from 'src/script/entity/Conversation';
 
