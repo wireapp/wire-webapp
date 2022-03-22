@@ -192,6 +192,7 @@ const ContentMessageComponent: React.FC<ContentMessageProps> = ({
           {menuEntries.length > 0 && (
             <button
               className="context-menu icon-more font-size-xs"
+              aria-label={t('conversationContextMenuOpenLabel')}
               onClick={event => showContextMenu(event, menuEntries, 'message-options-menu')}
             ></button>
           )}

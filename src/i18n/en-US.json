@@ -224,6 +224,7 @@
   "conversationContextMenuLike": "Like",
   "conversationContextMenuReply": "Reply",
   "conversationContextMenuUnlike": "Unlike",
+  "conversationContextMenuOpenLabel": "Show Message Options",
   "conversationCreateReceiptsEnabled": "Read receipts are on",
   "conversationCreateTeam": "with [showmore]all team members[/showmore]",
   "conversationCreateTeamGuest": "with [showmore]all team members and one guest[/showmore]",
