@@ -41,6 +41,9 @@ import {AvailabilityContextMenu} from '../../../../ui/AvailabilityContextMenu';
 import {UserState} from '../../../../user/UserState';
 import {ConversationsList} from './ConversationsList';
 import {PreferenceNotificationRepository} from 'src/script/notification/PreferenceNotificationRepository';
+import {useFolderState} from './state';
+import {WebAppEvents} from '@wireapp/webapp-events';
+import {amplify} from 'amplify';
 
 type ConversationsProps = {
   callState?: CallState;
@@ -79,6 +82,7 @@ const Conversations: React.FC<ConversationsProps> = ({
     hasPendingLegalHold,
   } = useKoSubscribableChildren(selfUser, ['hasPendingLegalHold', 'isOnLegalHold', 'name', 'availability']);
   const {connectRequests} = useKoSubscribableChildren(userState, ['connectRequests']);
+  const {activeConversation} = useKoSubscribableChildren(conversationState, ['activeConversation']);
   const {conversations_archived: archivedConversations, conversations_unarchived: conversations} =
     useKoSubscribableChildren(conversationState, ['conversations_archived', 'conversations_unarchived']);
   const {notifications} = useKoSubscribableChildren(preferenceNotificationRepository, ['notifications']);
@@ -92,6 +96,25 @@ const Conversations: React.FC<ConversationsProps> = ({
   const showBadge = notifications.length > 0;
 
   const hasNoConversations = conversations.length + connectRequests.length === 0;
+  const openFolder = useFolderState(state => state.openFolder);
+  const isFolderOpen = useFolderState(state => state.isOpen);
+
+  useEffect(() => {
+    if (!activeConversation) {
+      return () => {};
+    }
+    const conversationLabels =
+      conversationRepository.conversationLabelRepository.getConversationLabelIds(activeConversation);
+    amplify.subscribe(WebAppEvents.CONTENT.EXPAND_FOLDER, openFolder);
+    const hasAlreadyOpenFolder = conversationLabels.some(isFolderOpen);
+    if (!hasAlreadyOpenFolder) {
+      openFolder(conversationLabels[0]);
+    }
+
+    return () => {
+      amplify.unsubscribe(WebAppEvents.CONTENT.EXPAND_FOLDER, openFolder);
+    };
+  }, [activeConversation]);
 
   useEffect(() => {
     propertiesRepository.savePreference(

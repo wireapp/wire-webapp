@@ -21,6 +21,7 @@ import create from 'zustand';
 
 type FolderState = {
   expandedFolders: string[];
+  isOpen: (folderId: string) => boolean;
   openFolder: (folderId: string) => void;
   toggleFolder: (folderId: string) => void;
 };
@@ -33,19 +34,21 @@ const closeFolder = (folderId: string, state: FolderState) => {
   return {...state, expandedFolders: state.expandedFolders.filter(id => id !== folderId)};
 };
 
-const useFolderState = create<FolderState>(set => ({
+const useFolderState = create<FolderState>((set, get) => ({
   expandedFolders: [],
+
+  isOpen: folderId => {
+    return get().expandedFolders.includes(folderId);
+  },
 
   openFolder: folderId =>
     set(state => {
-      const isExpanded = state.expandedFolders.includes(folderId);
-      return isExpanded ? state : openFolder(folderId, state);
+      return get().isOpen(folderId) ? state : openFolder(folderId, state);
     }),
 
   toggleFolder: folderId =>
     set(state => {
-      const isExpanded = state.expandedFolders.includes(folderId);
-      return isExpanded ? closeFolder(folderId, state) : openFolder(folderId, state);
+      return get().isOpen(folderId) ? closeFolder(folderId, state) : openFolder(folderId, state);
     }),
 }));
 

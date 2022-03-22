@@ -19,8 +19,6 @@
 
 import React, {useEffect, useState} from 'react';
 import {container} from 'tsyringe';
-import {WebAppEvents} from '@wireapp/webapp-events';
-import {amplify} from 'amplify';
 
 import type {ConversationRepository} from '../../../../conversation/ConversationRepository';
 import type {Conversation} from '../../../../entity/Conversation';
@@ -76,7 +74,6 @@ const GroupedConversations: React.FC<GroupedConversationsProps> = ({
   callState = container.resolve(CallState),
 }) => {
   const {conversationLabelRepository} = conversationRepository;
-  const {activeConversation} = useKoSubscribableChildren(conversationState, ['activeConversation']);
   const {conversations_unarchived: conversations} = useKoSubscribableChildren(conversationState, [
     'conversations_unarchived',
   ]);
@@ -85,23 +82,6 @@ const GroupedConversations: React.FC<GroupedConversationsProps> = ({
 
   const expandedFolders = useFolderState(state => state.expandedFolders);
   const toggleFolder = useFolderState(state => state.toggleFolder);
-  const openFolder = useFolderState(state => state.openFolder);
-
-  useEffect(() => {
-    if (!activeConversation) {
-      return () => {};
-    }
-    const conversationLabels = conversationLabelRepository.getConversationLabelIds(activeConversation);
-    amplify.subscribe(WebAppEvents.CONTENT.EXPAND_FOLDER, openFolder);
-    const hasAlreadyOpenFolder = conversationLabels.some(labelId => expandedFolders.includes(labelId));
-    if (!hasAlreadyOpenFolder) {
-      openFolder(conversationLabels[0]);
-    }
-
-    return () => {
-      amplify.unsubscribe(WebAppEvents.CONTENT.EXPAND_FOLDER, openFolder);
-    };
-  }, [activeConversation]);
 
   useLabels(conversationLabelRepository);
 
