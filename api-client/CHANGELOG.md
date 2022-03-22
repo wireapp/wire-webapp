@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [18.7.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/compare/@wireapp/api-client@18.6.0...@wireapp/api-client@18.7.0) (2022-03-22)
+
+
+### Features
+
+* **api-client:** add endpoint for 2ndFactorPassword feature config ([#4248](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/issues/4248)) ([2c3a06a](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/commit/2c3a06a096ddcd44fd819a7932a97e6166e6baa2))
+
+
+
+
+
 # [18.6.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/compare/@wireapp/api-client@18.5.1...@wireapp/api-client@18.6.0) (2022-03-22)
 
 
