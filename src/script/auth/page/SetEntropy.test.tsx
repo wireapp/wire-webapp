@@ -82,7 +82,7 @@ describe('SetEntropy', () => {
       fireEvent.mouseMove(canvas);
       fireEvent.mouseLeave(canvas);
     });
-    expect(setEntropy).toHaveBeenCalledTimes(6);
+    expect(setEntropy).toHaveBeenCalledTimes(2);
     expect(setError).toHaveBeenCalledTimes(6);
   });
 
@@ -109,7 +109,7 @@ describe('SetEntropy', () => {
       fireEvent.mouseMove(canvas);
       fireEvent.mouseLeave(canvas);
     });
-    expect(setEntropy).toHaveBeenCalledTimes(12);
+    expect(setEntropy).toHaveBeenCalledTimes(4);
     expect(setError).toHaveBeenCalledTimes(12);
   });
 });
