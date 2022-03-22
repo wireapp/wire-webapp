@@ -25,9 +25,7 @@ import {container} from 'tsyringe';
 
 import {ListViewModel, ListState} from '../../view_model/ListViewModel';
 import {User} from '../../entity/User';
-import {ConversationRepository} from '../../conversation/ConversationRepository';
 import {AssetRepository} from '../../assets/AssetRepository';
-import {PropertiesRepository} from '../../properties/PropertiesRepository';
 
 import Preferences from './panels/Preferences';
 import Archive from './panels/Archive';
@@ -39,9 +37,7 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 
 type LeftSidebarProps = {
   assetRepository?: AssetRepository;
-  conversationRepository: ConversationRepository;
   listViewModel: ListViewModel;
-  propertiesRepository: PropertiesRepository;
   selfUser: User;
 };
 const Animated: React.FC = ({children, ...rest}) => {
@@ -54,11 +50,10 @@ const Animated: React.FC = ({children, ...rest}) => {
 
 const LeftSidebar: React.FC<LeftSidebarProps> = ({
   listViewModel,
-  conversationRepository,
-  propertiesRepository,
   assetRepository = container.resolve(AssetRepository),
   selfUser,
 }) => {
+  const {conversationRepository, propertiesRepository} = listViewModel;
   const {state} = useKoSubscribableChildren(listViewModel, ['state']);
   let content = <span></span>;
   const switchList = (list: ListState) => listViewModel.switchList(list);

@@ -73,7 +73,7 @@ export class ListViewModel {
   readonly isFederated: boolean;
   private readonly elementId: 'left-column';
 
-  private readonly conversationRepository: ConversationRepository;
+  public readonly conversationRepository: ConversationRepository;
   public readonly propertiesRepository: PropertiesRepository;
   private readonly callingRepository: CallingRepository;
   private readonly teamRepository: TeamRepository;
