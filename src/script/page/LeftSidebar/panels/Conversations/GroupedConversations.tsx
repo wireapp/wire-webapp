@@ -31,7 +31,6 @@ import {
   createLabelFavorites,
   createLabelGroups,
   createLabelPeople,
-  DefaultLabelIds,
 } from '../../../../conversation/ConversationLabelRepository';
 
 import {ListViewModel} from 'src/script/view_model/ListViewModel';
@@ -94,8 +93,10 @@ const GroupedConversations: React.FC<GroupedConversationsProps> = ({
     }
     const conversationLabels = conversationLabelRepository.getConversationLabelIds(activeConversation);
     amplify.subscribe(WebAppEvents.CONTENT.EXPAND_FOLDER, openFolder);
-    openFolder(DefaultLabelIds.Favorites);
-    openFolder(conversationLabels[0]);
+    const hasAlreadyOpenFolder = conversationLabels.some(labelId => expandedFolders.includes(labelId));
+    if (!hasAlreadyOpenFolder) {
+      openFolder(conversationLabels[0]);
+    }
 
     return () => {
       amplify.unsubscribe(WebAppEvents.CONTENT.EXPAND_FOLDER, openFolder);
