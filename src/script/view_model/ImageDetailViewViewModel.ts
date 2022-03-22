@@ -18,7 +18,7 @@
  */
 
 import {iterateItem} from 'Util/ArrayUtil';
-import {KEY} from 'Util/KeyboardUtil';
+import {KEY, isEnterKey, isSpaceKey} from 'Util/KeyboardUtil';
 import {formatLocale} from 'Util/TimeUtil';
 import ko from 'knockout';
 import {amplify} from 'amplify';
@@ -26,6 +26,7 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {MessageCategory} from '../message/MessageCategory';
 import {Modal} from '../ui/Modal';
+
 import type {ActionsViewModel} from './ActionsViewModel';
 import type {AssetRepository} from '../assets/AssetRepository';
 import type {ContentMessage} from '../entity/message/ContentMessage';
@@ -176,6 +177,12 @@ export class ImageDetailViewViewModel {
         this.imageVisible(true);
       }
     });
+  };
+
+  readonly hadndlePressOnClose = (event: KeyboardEvent): void => {
+    if (isSpaceKey(event) || isEnterKey(event)) {
+      this.imageModal.hide();
+    }
   };
 
   readonly clickOnClose = () => {
