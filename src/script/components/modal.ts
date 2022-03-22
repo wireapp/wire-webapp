@@ -19,8 +19,7 @@
 
 import ko from 'knockout';
 
-import {isTabKey} from 'Util/KeyboardUtil';
-import {noop, createRandomUuid} from 'Util/util';
+import {noop, createRandomUuid, preventFocusOutside} from 'Util/util';
 
 interface ModalParams {
   ariaDescribedBy?: string;
@@ -76,24 +75,7 @@ ko.components.register('modal', {
 
     // Prevents focus jumping out of the modal content.
     const onKeyDown = (event: KeyboardEvent): void => {
-      if (!isTabKey(event)) {
-        return;
-      }
-      event.preventDefault();
-      const focusableElements =
-        'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
-      const modal = document.getElementById(this.id);
-      const focusableContent = [...modal.querySelectorAll(focusableElements)];
-      const focusedItemIndex = focusableContent.indexOf(document.activeElement);
-      if (event.shiftKey && focusedItemIndex === 0) {
-        (focusableContent[focusableContent.length - 1] as HTMLElement)?.focus();
-        return;
-      }
-      if (!event.shiftKey && focusedItemIndex === focusableContent.length - 1) {
-        (focusableContent[0] as HTMLElement)?.focus();
-        return;
-      }
-      (focusableContent[focusedItemIndex + 1] as HTMLElement)?.focus();
+      preventFocusOutside(event, this.id);
     };
 
     const isDisplayNoneSubscription = this.displayNone.subscribe(() => {
