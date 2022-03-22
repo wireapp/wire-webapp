@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [18.6.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/compare/@wireapp/api-client@18.5.1...@wireapp/api-client@18.6.0) (2022-03-22)
+
+
+### Features
+
+* **api-client:** add optional verification code to delete team endpoint ([#4246](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/issues/4246)) ([eac0c77](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/commit/eac0c777b5ad990e51607b4e85743e6c933d8091))
+
+
+
+
+
 ## [18.5.1](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/compare/@wireapp/api-client@18.5.0...@wireapp/api-client@18.5.1) (2022-03-21)
 
 
