@@ -23,8 +23,8 @@ import {createRandomUuid} from 'Util/util';
 import TestPage from 'Util/test/TestPage';
 
 import GroupedConversationHeader, {GroupedConversationHeaderProps} from './GroupedConversationHeader';
-import {ConversationLabel, LabelType} from '../../conversation/ConversationLabelRepository';
-import {Conversation} from '../../entity/Conversation';
+import {ConversationLabel, LabelType} from '../../../../conversation/ConversationLabelRepository';
+import {Conversation} from '../../../../entity/Conversation';
 
 class GroupedConversationHeaderPage extends TestPage<GroupedConversationHeaderProps> {
   constructor(props?: GroupedConversationHeaderProps) {

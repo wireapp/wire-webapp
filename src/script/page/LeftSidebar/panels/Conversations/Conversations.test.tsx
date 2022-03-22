@@ -29,7 +29,12 @@ import ko from 'knockout';
 
 describe('Conversations', () => {
   const defaultParams: React.ComponentProps<typeof Conversations> = {
-    conversationRepository: {} as any,
+    conversationRepository: {
+      conversationLabelRepository: {
+        addEventListener: jest.fn(),
+        removeEventListener: jest.fn(),
+      },
+    } as any,
     listViewModel: {} as any,
     preferenceNotificationRepository: {notifications: ko.observable([])} as any,
     propertiesRepository: {getPreference: jest.fn(), savePreference: jest.fn()} as any,
