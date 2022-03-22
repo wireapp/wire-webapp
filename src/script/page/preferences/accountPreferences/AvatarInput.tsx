@@ -28,6 +28,7 @@ import {UserRepository} from '../../../user/UserRepository';
 import {validateProfileImageResolution} from 'Util/util';
 import {getLogger} from 'Util/Logger';
 import {modals, ModalsViewModel} from '../../../view_model/ModalsViewModel';
+import {KEY} from 'Util/KeyboardUtil';
 
 interface AvatarInputProps {
   isActivatedAccount: boolean;
@@ -39,6 +40,8 @@ const FILE_TYPES = ['image/bmp', 'image/jpeg', 'image/jpg', 'image/png', '.jpg-l
 const logger = getLogger('AvatarInput');
 
 const AvatarInput: React.FC<AvatarInputProps> = ({selfUser, isActivatedAccount, userRepository}) => {
+  const inputRef = React.useRef(null);
+
   if (!isActivatedAccount) {
     return <Avatar participant={selfUser} avatarSize={AVATAR_SIZE.X_LARGE} />;
   }
@@ -85,30 +88,40 @@ const AvatarInput: React.FC<AvatarInputProps> = ({selfUser, isActivatedAccount, 
     }
   };
 
-  return (
-    <label
-      className="preferences-account-picture-button"
-      htmlFor="self-upload-file-input"
-      title={t('tooltipPreferencesPicture')}
-    >
-      <Avatar className="see-through" participant={selfUser} avatarSize={AVATAR_SIZE.X_LARGE}></Avatar>
-      <FileInput
-        id="self-upload-file-input"
-        data-uie-name="do-select-picture"
-        fileTypes={FILE_TYPES}
-        onFileChange={files => {
-          const newUserPicture = files.item(0);
+  const handleKeyPress = (event: React.KeyboardEvent) => {
+    if (event.key === KEY.ENTER || event.key == KEY.SPACE) {
+      inputRef.current.click();
+    }
+  };
 
-          setPicture(newUserPicture).catch(error => {
-            const isInvalidUpdate = error.type === UserError.TYPE.INVALID_UPDATE;
-            if (!isInvalidUpdate) {
-              throw error;
-            }
-          });
-        }}
-      />
-      <span className="icon-camera"></span>
-    </label>
+  return (
+    <div tabIndex={0} role="button" onKeyPress={handleKeyPress}>
+      <label
+        className="preferences-account-picture-button"
+        htmlFor="self-upload-file-input"
+        title={t('tooltipPreferencesPicture')}
+      >
+        <Avatar className="see-through" participant={selfUser} avatarSize={AVATAR_SIZE.X_LARGE} />
+        <FileInput
+          ref={inputRef}
+          id="self-upload-file-input"
+          data-uie-name="do-select-picture"
+          fileTypes={FILE_TYPES}
+          tabIndex={-1}
+          onFileChange={files => {
+            const newUserPicture = files.item(0);
+
+            setPicture(newUserPicture).catch(error => {
+              const isInvalidUpdate = error.type === UserError.TYPE.INVALID_UPDATE;
+              if (!isInvalidUpdate) {
+                throw error;
+              }
+            });
+          }}
+        />
+        <span className="icon-camera" />
+      </label>
+    </div>
   );
 };
 
