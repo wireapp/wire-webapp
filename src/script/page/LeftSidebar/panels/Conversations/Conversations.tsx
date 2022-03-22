@@ -33,6 +33,7 @@ import {PropertiesRepository} from '../../../../properties/PropertiesRepository'
 import {PROPERTIES_TYPE} from '../../../../properties/PropertiesType';
 import {CallState} from '../../../../calling/CallState';
 import {ConversationRepository} from '../../../../conversation/ConversationRepository';
+import {DefaultLabelIds} from '../../../../conversation/ConversationLabelRepository';
 import ConversationListCallingCell from 'Components/list/ConversationListCallingCell';
 import AvailabilityState from 'Components/AvailabilityState';
 import LegalHoldDot from 'Components/LegalHoldDot';
@@ -99,12 +100,13 @@ const Conversations: React.FC<ConversationsProps> = ({
   const openFolder = useFolderState(state => state.openFolder);
   const isFolderOpen = useFolderState(state => state.isOpen);
 
+  const {conversationLabelRepository} = conversationRepository;
+
   useEffect(() => {
     if (!activeConversation) {
       return () => {};
     }
-    const conversationLabels =
-      conversationRepository.conversationLabelRepository.getConversationLabelIds(activeConversation);
+    const conversationLabels = conversationLabelRepository.getConversationLabelIds(activeConversation);
     amplify.subscribe(WebAppEvents.CONTENT.EXPAND_FOLDER, openFolder);
     const hasAlreadyOpenFolder = conversationLabels.some(isFolderOpen);
     if (!hasAlreadyOpenFolder) {
@@ -115,6 +117,14 @@ const Conversations: React.FC<ConversationsProps> = ({
       amplify.unsubscribe(WebAppEvents.CONTENT.EXPAND_FOLDER, openFolder);
     };
   }, [activeConversation]);
+
+  useEffect(() => {
+    const openFavorites = () => openFolder(DefaultLabelIds.Favorites);
+    conversationLabelRepository.addEventListener('conversation-favorited', openFavorites);
+    return () => {
+      conversationLabelRepository.removeEventListener('conversation-favorited', openFavorites);
+    };
+  }, []);
 
   useEffect(() => {
     propertiesRepository.savePreference(

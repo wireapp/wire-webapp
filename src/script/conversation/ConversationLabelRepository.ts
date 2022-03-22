@@ -29,6 +29,7 @@ import {createRandomUuid} from 'Util/util';
 import type {Conversation} from '../entity/Conversation';
 import type {PropertiesService} from '../properties/PropertiesService';
 import {ModalsViewModel} from '../view_model/ModalsViewModel';
+import {TypedEventTarget} from 'Util/TypedEventTarget';
 
 export enum LabelType {
   Custom = 0,
@@ -79,7 +80,7 @@ export const createLabelPeople = (contacts: Conversation[] = []) =>
 export const createLabelFavorites = (favorites: Conversation[] = []) =>
   createLabel(t('conversationLabelFavorites'), favorites, DefaultLabelIds.Favorites);
 
-export class ConversationLabelRepository {
+export class ConversationLabelRepository extends TypedEventTarget<{type: 'conversation-favorited'}> {
   labels: ko.ObservableArray<ConversationLabel>;
   allLabeledConversations: ko.Computed<Conversation[]>;
   logger: Logger;
@@ -89,6 +90,7 @@ export class ConversationLabelRepository {
     private readonly conversations: ko.ObservableArray<Conversation>,
     private readonly propertiesService: PropertiesService,
   ) {
+    super();
     this.labels = ko.observableArray([]);
     this.allLabeledConversations = ko.pureComputed(() =>
       this.labels().reduce(
@@ -179,6 +181,7 @@ export class ConversationLabelRepository {
       this.labels.push(favoriteLabel);
     }
     favoriteLabel.conversations.push(addedConversation);
+    this.dispatch({type: 'conversation-favorited'});
     this.saveLabels();
   };
 
