@@ -78,10 +78,11 @@ export class TeamAPI {
     return response.data;
   }
 
-  public async deleteTeam(teamId: string, password: string): Promise<void> {
+  public async deleteTeam(teamId: string, password: string, verificationCode?: string): Promise<void> {
     const config: AxiosRequestConfig = {
       data: {
         password,
+        ...(verificationCode && {verification_code: verificationCode}),
       },
       method: 'delete',
       url: `${TeamAPI.URL.TEAMS}/${teamId}`,
