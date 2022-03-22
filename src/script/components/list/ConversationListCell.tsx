@@ -165,38 +165,65 @@ const ConversationListCell: React.FC<ConversationListCellProps> = ({
             </span>
           </div>
           <div className="conversation-list-cell-right">
-            <span
+            <button
               className="conversation-list-cell-context-menu"
               data-uie-name="go-options"
+              aria-label={t('conversationOptionsMenu')}
+              type="button"
               onClick={event => {
                 event.stopPropagation();
                 rightClick(conversation, event.nativeEvent);
               }}
-            />
+            ></button>
             {!showJoinButton && (
               <>
                 {cellState.icon === ConversationStatusIcon.PENDING_CONNECTION && (
-                  <span className="conversation-list-cell-badge cell-badge-dark" data-uie-name="status-pending">
+                  <span
+                    className="conversation-list-cell-badge cell-badge-dark"
+                    data-uie-name="status-pending"
+                    title={t('callStatusPending')}
+                    aria-label={t('callStatusPending')}
+                  >
                     <Icon.Pending className="svg-icon" />
                   </span>
                 )}
                 {cellState.icon === ConversationStatusIcon.UNREAD_MENTION && (
-                  <span className="conversation-list-cell-badge cell-badge-light" data-uie-name="status-mention">
+                  <span
+                    className="conversation-list-cell-badge cell-badge-light"
+                    data-uie-name="status-mention"
+                    title={t('conversationStatusUnreadMention')}
+                    aria-label={t('conversationStatusUnreadMention')}
+                  >
                     <Icon.Mention className="svg-icon" />
                   </span>
                 )}
                 {cellState.icon === ConversationStatusIcon.UNREAD_REPLY && (
-                  <span className="conversation-list-cell-badge cell-badge-light" data-uie-name="status-reply">
+                  <span
+                    className="conversation-list-cell-badge cell-badge-light"
+                    data-uie-name="status-reply"
+                    title={t('conversationStatusUnreadReply')}
+                    aria-label={t('conversationStatusUnreadReply')}
+                  >
                     <Icon.Reply className="svg-icon" />
                   </span>
                 )}
                 {cellState.icon === ConversationStatusIcon.UNREAD_PING && (
-                  <span className="conversation-list-cell-badge cell-badge-light" data-uie-name="status-ping">
+                  <span
+                    className="conversation-list-cell-badge cell-badge-light"
+                    data-uie-name="status-ping"
+                    title={t('conversationStatusUnreadPing')}
+                    aria-label={t('conversationStatusUnreadPing')}
+                  >
                     <Icon.Ping className="svg-icon" />
                   </span>
                 )}
                 {cellState.icon === ConversationStatusIcon.MISSED_CALL && (
-                  <span className="conversation-list-cell-badge cell-badge-light" data-uie-name="status-missed-call">
+                  <span
+                    className="conversation-list-cell-badge cell-badge-light"
+                    data-uie-name="status-missed-call"
+                    title={t('callStatusMissed')}
+                    aria-label={t('callStatusMissed')}
+                  >
                     <Icon.Hangup className="svg-icon" />
                   </span>
                 )}
@@ -204,25 +231,33 @@ const ConversationListCell: React.FC<ConversationListCellProps> = ({
                   <span
                     className="conversation-list-cell-badge cell-badge-dark conversation-muted"
                     data-uie-name="status-silence"
+                    title={t('callStatusMutted')}
+                    aria-label={t('callStatusMutted')}
                   >
                     <Icon.Mute className="svg-icon" />
                   </span>
                 )}
                 {cellState.icon === ConversationStatusIcon.UNREAD_MESSAGES && unreadState.allMessages.length > 0 && (
-                  <span className="conversation-list-cell-badge cell-badge-light" data-uie-name="status-unread">
+                  <span
+                    className="conversation-list-cell-badge cell-badge-light"
+                    data-uie-name="status-unread"
+                    title={t('conversationStatusUnread')}
+                    aria-label={t('conversationStatusUnread')}
+                  >
                     {unreadState.allMessages.length}
                   </span>
                 )}
               </>
             )}
             {showJoinButton && (
-              <div
+              <button
                 onClick={onClickJoinCall}
+                type="button"
                 className="call-ui__button call-ui__button--green call-ui__button--join"
                 data-uie-name="do-call-controls-call-join"
               >
                 {t('callJoin')}
-              </div>
+              </button>
             )}
           </div>
         </>
