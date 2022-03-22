@@ -126,7 +126,6 @@ const FullSearch: React.FC<FullSearchProps> = ({searchProvider, click = noop, ch
             <button
               className="button-icon icon-dismiss"
               onClick={() => setInput('')}
-              aria-label={t('searchDissmiss')}
               data-uie-name="full-search-dismiss"
             />
           )}
