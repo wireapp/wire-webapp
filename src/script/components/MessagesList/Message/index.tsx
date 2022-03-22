@@ -41,7 +41,7 @@ import {useRelativeTimestamp} from '../../../hooks/useRelativeTimestamp';
 export interface MessageActions {
   onClickAvatar: (user: User) => void;
   onClickCancelRequest: (message: MemberMessageEntity) => void;
-  onClickImage: (message: ContentMessage, event: React.MouseEvent) => void;
+  onClickImage: (message: ContentMessage, event: React.MouseEvent | React.KeyboardEvent) => void;
   onClickInvitePeople: () => void;
   onClickLikes: (message: BaseMessage) => void;
   onClickMessage: (message: ContentMessage | Text, event: React.MouseEvent) => void;

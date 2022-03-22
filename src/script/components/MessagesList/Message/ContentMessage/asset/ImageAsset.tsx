@@ -21,6 +21,8 @@ import Icon from 'Components/Icon';
 import React, {useEffect, useState} from 'react';
 import {container} from 'tsyringe';
 import cx from 'classnames';
+import {KEY} from 'Util/KeyboardUtil';
+import {t} from 'Util/LocalizerUtil';
 
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import useEffectRef from 'Util/useEffectRef';
@@ -37,7 +39,7 @@ import {useAssetTransfer} from './AbstractAssetTransferStateTracker';
 export interface ImageAssetProps {
   asset: MediumImage;
   message: ContentMessage;
-  onClick: (message: ContentMessage, event: React.MouseEvent) => void;
+  onClick: (message: ContentMessage, event: React.MouseEvent | React.KeyboardEvent) => void;
   teamState?: TeamState;
 }
 
@@ -80,6 +82,17 @@ const ImageAsset: React.FC<ImageAssetProps> = ({asset, message, onClick, teamSta
 
   const dummyImageUrl = `data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1 1' width='${asset.width}' height='${asset.height}'></svg>`;
 
+  const handleImageKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
+    if (event.key === KEY.ENTER || event.key === KEY.SPACE) {
+      onClick(message, event);
+    }
+    return true;
+  };
+
+  const imageAltText = `${message.user().name()} ${t(
+    'conversationAssetImageAlt',
+  )} ${message.displayTimestampLong()} ${message.displayTimestampShort()}`;
+
   return (
     <div data-uie-name="image-asset">
       {isFileSharingReceivingEnabled ? (
@@ -92,7 +105,11 @@ const ImageAsset: React.FC<ImageAssetProps> = ({asset, message, onClick, teamSta
           data-uie-visible={visible && !isObfuscated}
           data-uie-status={imageUrl ? 'loaded' : 'loading'}
           onClick={event => onClick(message, event)}
+          onKeyDown={handleImageKeyDown}
+          tabIndex={0}
+          role="button"
           data-uie-name="go-image-detail"
+          aria-label={imageAltText}
           ref={setViewportElementRef}
         >
           {isUploading && (
@@ -111,6 +128,7 @@ const ImageAsset: React.FC<ImageAssetProps> = ({asset, message, onClick, teamSta
             className={cx('image-element', {'image-ephemeral': isObfuscated})}
             style={!imageUrl ? {aspectRatio: asset.ratio.toString(), width: '100%'} : undefined}
             src={imageUrl || dummyImageUrl}
+            alt={imageAltText}
           />
         </div>
       ) : (

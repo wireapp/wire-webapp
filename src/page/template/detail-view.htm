@@ -6,12 +6,12 @@
           <div class="label-bold-xs" data-bind="text: messageEntity().unsafeSenderName(), attr: {'data-uie-uid': messageEntity().user().id, 'data-uie-value': messageEntity().user().name}" data-uie-name="fullscreen-picture-sender"></div>
           <div class="label-xs" data-bind="text: formatTimestamp(messageEntity().timestamp()), attr: {'data-timestamp': messageEntity().timestamp()}"></div>
         </div>
-        <button type="button" class="detail-view-header-close-button icon-button" data-bind="click: clickOnClose" data-uie-name="do-close-detail-view">
+        <button type="button" class="detail-view-header-close-button icon-button" data-bind="click: clickOnClose, attr: {'aria-label': t('conversationDetailsCloseLabel')}" data-uie-name="do-close-detail-view">
           <close-icon></close-icon>
         </button>
       </header>
-      <div class="detail-view-main" data-bind="click: clickOnClose, event: { keydown: (_, event) => hadndlePressOnClose(event) }" tabindex="0" role="button">
-        <img class="detail-view-image" data-bind="attr: {src: imageSrc()}" data-uie-name="status-picture"/>
+      <div class="detail-view-main" data-bind="click: clickOnClose, event: { keydown: (_, event) => hadndlePressOnClose(event) }, attr: {'aria-label': t('conversationDetailsCloseLabel')}" tabindex="0" role="button">
+        <img class="detail-view-image" data-bind="attr: {src: imageSrc(), alt: imageAlt}" data-uie-name="status-picture"/>
       </div>
       <footer class="detail-view-footer">
         <!-- ko if: messageEntity().isReactable() && !conversationEntity().removed_from_conversation() -->
