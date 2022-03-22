@@ -70,5 +70,6 @@ export type FeatureLegalhold = FeatureWithoutConfig;
 export type FeatureSearchVisibility = FeatureWithoutConfig;
 export type FeatureSelfDeletingMessages = Feature<FeatureSelfDeletingMessagesConfig>;
 export type FeatureSSO = FeatureWithoutConfig;
+export type FeatureSndFactorPassword = FeatureWithoutConfig;
 export type FeatureValidateSAMLEmails = FeatureWithoutConfig;
 export type FeatureVideoCalling = FeatureWithoutConfig;
