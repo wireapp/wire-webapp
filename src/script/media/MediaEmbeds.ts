@@ -88,7 +88,7 @@ const _appendIFrame = (link: HTMLAnchorElement, message: string, iFrame: string)
  *
  * @param params String where we should find the parameters
  */
-const _getParameters = (params: string): string => params.substr(params.indexOf('?'), params.length).replace(/^\?/, '');
+const _getParameters = (params: string): string => params.slice(params.indexOf('?')).replace(/^\?/, '');
 
 /**
  * Generate embedded YouTube URL to use as source in iFrames
@@ -184,7 +184,7 @@ export const MediaEmbeds = {
       let linkPathName = link.pathname;
 
       if (linkPathName.endsWith('/')) {
-        linkPathName = linkPathName.substr(0, linkPathName.length - 1);
+        linkPathName = linkPathName.slice(0, -1);
       }
 
       let isSingleTrack = false;

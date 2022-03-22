@@ -251,9 +251,9 @@ export class InputBarViewModel {
         .reduce(
           (currentPieces, mentionEntity) => {
             const currentPiece = currentPieces.shift();
-            currentPieces.unshift(currentPiece.substr(mentionEntity.endIndex));
-            currentPieces.unshift(currentPiece.substr(mentionEntity.startIndex, mentionEntity.length));
-            currentPieces.unshift(currentPiece.substr(0, mentionEntity.startIndex));
+            currentPieces.unshift(currentPiece.slice(mentionEntity.endIndex));
+            currentPieces.unshift(currentPiece.slice(mentionEntity.startIndex, mentionEntity.startIndex + mentionEntity.length));
+            currentPieces.unshift(currentPiece.slice(0, mentionEntity.startIndex));
             return currentPieces;
           },
           [this.input()],

@@ -45,7 +45,7 @@ const SaveCallLogs: React.FC<SaveCallLogsProps> = ({callingRepository, userState
     if (messageLog) {
       const callLog = [messageLog.join('\r\n')];
       const blob = new Blob(callLog, {type: 'text/plain;charset=utf-8'});
-      const truncatedId = userState.self().id.substr(0, OBFUSCATION_TRUNCATE_TO);
+      const truncatedId = userState.self().id.slice(0, OBFUSCATION_TRUNCATE_TO);
       const sanitizedBrandName = brandName.replace(/[^A-Za-z0-9_]/g, '');
       const filename = `${sanitizedBrandName}-${truncatedId}-Calling_${getCurrentDate()}.log`;
 
