@@ -171,7 +171,7 @@
   "callDegradationAction": "Verstanden",
   "callDegradationDescription": "Der Anruf wurde unterbrochen, weil {{username}} kein verifizierter Kontakt mehr ist.",
   "callDegradationTitle": "Anruf beendet",
-  "callDurationLabel": "Duration",
+  "callDurationLabel": "Dauer",
   "callEveryOneLeft": "alle anderen Teilnehmer aufgelegt haben.",
   "callGoToLabel": "Go to",
   "callJoin": "Beitreten",

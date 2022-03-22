@@ -28,14 +28,12 @@ import {
   Link,
   Logo,
   ProfileIcon,
-  RoundIconButton,
   TeamIcon,
   Text,
 } from '@wireapp/react-ui-kit';
 import React from 'react';
 import {useIntl} from 'react-intl';
 import {Redirect} from 'react-router';
-import useReactRouter from 'use-react-router';
 import {Config} from '../../Config';
 import {setAccountTypeStrings} from '../../strings';
 import RouterLink from '../component/RouterLink';
@@ -48,7 +46,6 @@ interface Props extends React.HTMLProps<HTMLDivElement> {}
 
 const SetAccountType = ({}: Props) => {
   const {formatMessage: _} = useIntl();
-  const {history} = useReactRouter();
   const isMacOsWrapper = Runtime.isDesktopApp() && Runtime.isMacOS();
 
   const backArrow = (
@@ -56,6 +53,17 @@ const SetAccountType = ({}: Props) => {
       <ArrowIcon direction="left" color={COLOR.TEXT} style={{opacity: 0.56}} />
     </RouterLink>
   );
+
+  const iconStyles: React.CSSProperties = {
+    alignItems: 'center',
+    borderRadius: '50%',
+    display: 'flex',
+    height: 72,
+    justifyContent: 'center',
+    margin: '0 auto',
+    width: 72,
+  };
+
   return (
     <Page>
       {!Config.getConfig().FEATURE.ENABLE_ACCOUNT_REGISTRATION && (
@@ -75,10 +83,15 @@ const SetAccountType = ({}: Props) => {
             <Logo scale={1.68} data-uie-name="ui-wire-logo" />
             <Columns style={{margin: '70px auto'}}>
               <Column style={{marginLeft: isMacOsWrapper ? 0 : 16}}>
-                <Link onClick={() => history.push(ROUTE.CREATE_ACCOUNT)} data-uie-name="go-register-personal">
-                  <RoundIconButton backgroundColor={COLOR.GREEN} style={{marginBottom: 12}} size={72}>
-                    <ProfileIcon height={31} width={31} />
-                  </RoundIconButton>
+                <RouterLink to={ROUTE.CREATE_ACCOUNT} data-uie-name="go-register-personal">
+                  <div
+                    style={{
+                      ...iconStyles,
+                      background: COLOR.GREEN,
+                    }}
+                  >
+                    <ProfileIcon height={31} width={31} color={'white'} />
+                  </div>
                   <Bold fontSize="24px" color={COLOR.LINK}>
                     {_(setAccountTypeStrings.createAccountForPersonalUse)}
                   </Bold>
@@ -95,7 +108,7 @@ const SetAccountType = ({}: Props) => {
                   >
                     {_(setAccountTypeStrings.createPersonalAccount)}
                   </Text>
-                </Link>
+                </RouterLink>
               </Column>
               <Column>
                 <Link
@@ -103,9 +116,14 @@ const SetAccountType = ({}: Props) => {
                   target="_blank"
                   data-uie-name="go-register-team"
                 >
-                  <RoundIconButton style={{marginBottom: 12}} size={72}>
-                    <TeamIcon height={31} width={31} />
-                  </RoundIconButton>
+                  <div
+                    style={{
+                      ...iconStyles,
+                      background: COLOR.BLUE,
+                    }}
+                  >
+                    <TeamIcon height={31} width={31} color={'white'} />
+                  </div>
                   <Bold fontSize="24px" color={COLOR.LINK}>
                     {_(setAccountTypeStrings.createAccountForOrganizations)}
                   </Bold>
