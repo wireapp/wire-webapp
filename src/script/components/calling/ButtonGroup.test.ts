@@ -27,8 +27,8 @@ class ButtonGroupPage extends TestPage<ButtonGroupProps> {
 
   getWrapper = () => this.get('div[data-uie-name="button-group-wrapper"]');
   getButtons = () => this.get('div[data-uie-name="button-group-item"]');
-  getActiveButton = () => this.get('div[data-uie-value="active"]');
-  getInactiveButton = () => this.get('div[data-uie-value="inactive"]');
+  getActiveButton = () => this.get('button[data-uie-value="active"]');
+  getInactiveButton = () => this.get('button[data-uie-value="inactive"]');
 
   clickOnInactiveButton = () => this.click(this.getInactiveButton());
   clickOnActiveButton = () => this.click(this.getActiveButton());
