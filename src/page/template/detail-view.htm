@@ -11,7 +11,7 @@
         </button>
       </header>
       <div class="detail-view-main" data-bind="click: clickOnClose, event: { keydown: (_, event) => hadndlePressOnClose(event) }, attr: {'aria-label': t('conversationDetailsCloseLabel')}" tabindex="0" role="button">
-        <img class="detail-view-image" data-bind="attr: {src: imageSrc(), alt: imageAlt}" data-uie-name="status-picture"/>
+        <img class="detail-view-image" data-bind="attr: {src: imageSrc()}" data-uie-name="status-picture" alt=""/>
       </div>
       <footer class="detail-view-footer">
         <!-- ko if: messageEntity().isReactable() && !conversationEntity().removed_from_conversation() -->

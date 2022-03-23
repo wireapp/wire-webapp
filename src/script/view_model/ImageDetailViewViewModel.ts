@@ -42,7 +42,6 @@ export class ImageDetailViewViewModel {
   source: string;
   imageModal: Modal;
   imageSrc: ko.Observable<string>;
-  imageAlt: string;
   imageVisible: ko.Observable<boolean>;
   conversationEntity: ko.Observable<Conversation>;
   items: ko.ObservableArray<ContentMessage>;
@@ -76,9 +75,6 @@ export class ImageDetailViewViewModel {
             .getConversationById({domain: '', id: conversationId})
             .then(conversationEntity => this.conversationEntity(conversationEntity));
         }
-        this.imageAlt = `${messageEntity
-          .user()
-          .name()} ${messageEntity.displayTimestampLong()} ${messageEntity.displayTimestampShort()}`;
       }
     });
 
@@ -95,7 +91,6 @@ export class ImageDetailViewViewModel {
     document.removeEventListener('keydown', this.onKeyDownLightBox);
     window.URL.revokeObjectURL(this.imageSrc());
 
-    this.imageAlt = '';
     this.imageSrc(undefined);
     this.items.removeAll();
     this.messageEntity(undefined);
