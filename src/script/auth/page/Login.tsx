@@ -92,7 +92,7 @@ const Login = ({
   const [isValidLink, setIsValidLink] = useState(true);
   const [validationErrors, setValidationErrors] = useState([]);
 
-  const [twoFactorSubmitFailed, setTwoFactorSubmitFailed] = useState(false);
+  const [twoFactorSubmitError, setTwoFactorSubmitError] = useState<string>('');
   const [twoFactorLoginData, setTwoFactorLoginData] = useState<LoginData>();
 
   useEffect(() => {
@@ -178,7 +178,7 @@ const Login = ({
             break;
           }
           case BackendError.LABEL.CODE_AUTHENTICATION_FAILED: {
-            setTwoFactorSubmitFailed(true);
+            setTwoFactorSubmitError(error.label);
             break;
           }
           case BackendError.LABEL.INVALID_CREDENTIALS:
@@ -209,7 +209,7 @@ const Login = ({
   };
 
   const submitTwoFactorLogin = (code: string) => {
-    setTwoFactorSubmitFailed(false);
+    setTwoFactorSubmitError('');
     handleSubmit({...twoFactorLoginData, verificationCode: code}, []);
   };
 
@@ -250,17 +250,15 @@ const Login = ({
                 <div>
                   <H2 center>{_(loginStrings.twoFactorLoginTitle)}</H2>
                   <Text>{_(loginStrings.twoFactorLoginSubHead, {email: twoFactorLoginData.email})}</Text>
-                  <Label markInvalid={twoFactorSubmitFailed}>
+                  <Label markInvalid={!!twoFactorSubmitError}>
                     <CodeInput
                       autoFocus
                       style={{marginTop: 60}}
                       onCodeComplete={submitTwoFactorLogin}
                       data-uie-name="enter-code"
-                      markInvalid={twoFactorSubmitFailed}
+                      markInvalid={!!twoFactorSubmitError}
                     />
-                    {twoFactorSubmitFailed && (
-                      <div>{_(errorHandlerStrings[BackendError.LABEL.CODE_AUTHENTICATION_FAILED])}</div>
-                    )}
+                    {!!twoFactorSubmitError && <div>{_(errorHandlerStrings[twoFactorSubmitError])}</div>}
                   </Label>
                   <div style={{marginTop: 30}}>
                     {isSendingTwoFactorCode ? (
