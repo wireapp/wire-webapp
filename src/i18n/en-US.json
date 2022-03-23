@@ -178,7 +178,7 @@
   "callJoin": "Join",
   "callStatusPending": "Call Pending",
   "callStatusMissed": "Missed Call",
-  "callStatusMutted": "Mutted Call",
+  "callStatusMuted": "Muted Call",
   "callMaximizeLabel": "Maximize Call",
   "callNoCameraAccess": "No camera access",
   "callNoOneJoined": "no other participant joined.",

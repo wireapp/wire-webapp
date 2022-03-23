@@ -217,8 +217,8 @@ const ConversationListCell: React.FC<ConversationListCellProps> = ({
                 <span
                   className="conversation-list-cell-badge cell-badge-dark conversation-muted"
                   data-uie-name="status-silence"
-                  title={t('callStatusMutted')}
-                  aria-label={t('callStatusMutted')}
+                  title={t('callStatusMuted')}
+                  aria-label={t('callStatusMuted')}
                 >
                   <Icon.Mute className="svg-icon" />
                 </span>
