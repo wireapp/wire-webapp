@@ -18,22 +18,24 @@ const EntropyCanvas = (props: CanvasProps) => {
     props;
   const canvasRef = useRef(null);
 
-  const draw = (ctx: CanvasRenderingContext2D) => {
-    if (entropy.length > 1 && frameCount > 1) {
+  const draw = (ctx: CanvasRenderingContext2D, entropy: [number, number][]) => {
+    if (entropy.length > 2) {
+      const previousPoint = entropy[entropy.length - 2];
+      const lastPoint = entropy[entropy.length - 1];
       ctx.beginPath();
-      if (!entropy[frameCount - 2]) {
-        ctx.moveTo(...entropy[frameCount - 1]);
+      if (!previousPoint) {
+        ctx.moveTo(...lastPoint);
       } else {
-        ctx.moveTo(...entropy[frameCount - 2]);
+        ctx.moveTo(...previousPoint);
       }
       ctx.lineJoin = 'round';
       ctx.lineCap = 'round';
       ctx.lineWidth = 2;
       ctx.strokeStyle = 'blue';
-      if (!entropy[frameCount - 1]) {
-        ctx.lineTo(...entropy[frameCount - 2]);
+      if (!lastPoint) {
+        ctx.lineTo(...previousPoint);
       } else {
-        ctx.lineTo(...entropy[frameCount - 1]);
+        ctx.lineTo(...lastPoint);
       }
       ctx.stroke();
     }
@@ -42,7 +44,7 @@ const EntropyCanvas = (props: CanvasProps) => {
   useEffect(() => {
     const canvas = canvasRef.current;
     const context = canvas.getContext('2d');
-    draw(context);
+    draw(context, entropy);
   }, [entropy]);
 
   const onMouseMove = (event: MouseEvent<HTMLCanvasElement>) => {

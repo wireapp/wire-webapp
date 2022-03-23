@@ -122,10 +122,7 @@ const Root: React.FC<RootProps & ConnectedProps & DispatchProps> = ({
               <Route path={ROUTE.LOGIN_PHONE} component={PhoneLogin} />
               <Route path={ROUTE.SET_ACCOUNT_TYPE} component={SetAccountType} />
               <Route path={ROUTE.SET_EMAIL} component={ProtectedSetEmail} />
-              <Route
-                path={ROUTE.SET_ENTROPY}
-                component={Config.getConfig().FEATURE.ENABLE_EXTRA_CLIENT_ENTROPY && SetEntropyPage}
-              />
+              <Route path={ROUTE.SET_ENTROPY} component={SetEntropyPage} />
               <Route path={ROUTE.SET_HANDLE} component={ProtectedSetHandle} />
               <Route path={ROUTE.SET_PASSWORD} component={ProtectedSetPassword} />
               <Route path={`${ROUTE.SSO}/:code?`} component={SingleSignOn} />
