@@ -607,6 +607,10 @@ export const errorHandlerStrings = defineMessages({
     defaultMessage: 'Something went wrong. Please contact your team administrator for details (Error 1).',
     id: 'BackendError.LABEL.SSO_UNSUPPORTED_SAML',
   },
+  [BackendError.LABEL.CODE_AUTHENTICATION_FAILED]: {
+    defaultMessage: 'Please try again',
+    id: 'BackendError.LABEL.CODE_AUTHENTICATION_FAILED',
+  },
   [BackendError.LABEL.SSO_GENERIC_ERROR]: {
     defaultMessage: 'Something went wrong. Please contact your team administrator for details (Error 0).',
     id: 'BackendError.LABEL.SSO_GENERIC_ERROR',
@@ -697,6 +701,14 @@ export const loginStrings = defineMessages({
   subhead: {
     defaultMessage: 'Enter your email address or username.',
     id: 'login.subhead',
+  },
+  twoFactorLoginSubHead: {
+    defaultMessage: 'Please check your email {email} for the verification code and enter it below.',
+    id: 'login.twoFactorLoginSubHead',
+  },
+  twoFactorLoginTitle: {
+    defaultMessage: 'Verify your account',
+    id: 'login.twoFactorLoginTitle',
   },
 });
 
