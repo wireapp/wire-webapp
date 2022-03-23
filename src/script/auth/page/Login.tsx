@@ -80,6 +80,7 @@ const Login = ({
   pushLoginData,
   loginData,
   defaultSSOCode,
+  isSendingTwoFactorCode,
 }: Props & ConnectedProps & DispatchProps) => {
   const logger = getLogger('Login');
   const {formatMessage: _} = useIntl();
@@ -91,7 +92,6 @@ const Login = ({
   const [isValidLink, setIsValidLink] = useState(true);
   const [validationErrors, setValidationErrors] = useState([]);
 
-  const [isResendingTwoFactorCode, setIsResendingTwoFactorCode] = useState(false);
   const [twoFactorSubmitFailed, setTwoFactorSubmitFailed] = useState(false);
   const [twoFactorLoginData, setTwoFactorLoginData] = useState<LoginData>();
 
@@ -201,13 +201,10 @@ const Login = ({
   };
 
   const resendTwoFactorCode = async () => {
-    setIsResendingTwoFactorCode(true);
     try {
       await doSendTwoFactorCode(twoFactorLoginData.email);
-      setIsResendingTwoFactorCode(false);
     } catch (error) {
       logger.error('Unable to resend two factor code', error);
-      setIsResendingTwoFactorCode(false);
     }
   };
 
@@ -266,7 +263,7 @@ const Login = ({
                     )}
                   </Label>
                   <div style={{marginTop: 30}}>
-                    {isResendingTwoFactorCode ? (
+                    {isSendingTwoFactorCode ? (
                       <Loading size={20} />
                     ) : (
                       <TextLink onClick={resendTwoFactorCode} center>
@@ -341,6 +338,7 @@ type ConnectedProps = ReturnType<typeof mapStateToProps>;
 const mapStateToProps = (state: RootState) => ({
   defaultSSOCode: AuthSelector.getDefaultSSOCode(state),
   isFetching: AuthSelector.isFetching(state),
+  isSendingTwoFactorCode: AuthSelector.isSendingTwoFactorCode(state),
   loginData: AuthSelector.getLoginData(state),
   loginError: AuthSelector.getError(state),
 });

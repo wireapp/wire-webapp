@@ -51,6 +51,7 @@ export type AuthState = {
   readonly fetching: boolean;
   readonly fetchingSSOSettings: boolean;
   readonly isAuthenticated: boolean;
+  readonly isSendingTwoFactorCode: boolean;
   readonly loginData: Partial<LoginData>;
   readonly ssoSettings?: SSOSettings;
 };
@@ -77,6 +78,7 @@ export const initialAuthState: AuthState = {
   fetching: false,
   fetchingSSOSettings: true,
   isAuthenticated: false,
+  isSendingTwoFactorCode: false,
   loginData: {
     clientType: Config.getConfig().FEATURE.DEFAULT_LOGIN_TEMPORARY_CLIENT ? ClientType.TEMPORARY : ClientType.PERMANENT,
   },
@@ -97,6 +99,19 @@ export function authReducer(state: AuthState = initialAuthState, action: AppActi
         error: null,
         fetching: true,
         isAuthenticated: false,
+      };
+    }
+    case AUTH_ACTION.SEND_TWO_FACTOR_CODE_START: {
+      return {
+        ...state,
+        isSendingTwoFactorCode: true,
+      };
+    }
+    case AUTH_ACTION.SEND_TWO_FACTOR_CODE_SUCCESS:
+    case AUTH_ACTION.SEND_TWO_FACTOR_CODE_FAILED: {
+      return {
+        ...state,
+        isSendingTwoFactorCode: false,
       };
     }
     case AUTH_ACTION.REFRESH_START: {

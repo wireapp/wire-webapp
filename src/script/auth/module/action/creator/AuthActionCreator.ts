@@ -77,6 +77,9 @@ export type AuthActions =
   | LoginStartAction
   | LoginSuccessAction
   | LoginFailedAction
+  | SendTwoFactorCodeStartAction
+  | SendTwoFactorCodeSuccessAction
+  | SendTwoFactorCodeFailedAction
   | SendPhoneLoginCodeStartAction
   | SendPhoneLoginCodeSuccessAction
   | SendPhoneLoginCodeFailedAction
