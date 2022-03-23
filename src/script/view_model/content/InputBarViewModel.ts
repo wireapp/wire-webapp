@@ -252,7 +252,9 @@ export class InputBarViewModel {
           (currentPieces, mentionEntity) => {
             const currentPiece = currentPieces.shift();
             currentPieces.unshift(currentPiece.slice(mentionEntity.endIndex));
-            currentPieces.unshift(currentPiece.slice(mentionEntity.startIndex, mentionEntity.startIndex + mentionEntity.length));
+            currentPieces.unshift(
+              currentPiece.slice(mentionEntity.startIndex, mentionEntity.startIndex + mentionEntity.length),
+            );
             currentPieces.unshift(currentPiece.slice(0, mentionEntity.startIndex));
             return currentPieces;
           },
