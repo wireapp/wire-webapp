@@ -18,7 +18,7 @@
  */
 
 import {iterateItem} from 'Util/ArrayUtil';
-import {KEY, isEnterKey, isSpaceKey} from 'Util/KeyboardUtil';
+import {KEY, handleKeyDown} from 'Util/KeyboardUtil';
 import {formatLocale} from 'Util/TimeUtil';
 import ko from 'knockout';
 import {amplify} from 'amplify';
@@ -181,9 +181,7 @@ export class ImageDetailViewViewModel {
   };
 
   readonly handlePressOnClose = (event: KeyboardEvent): void => {
-    if (isSpaceKey(event) || isEnterKey(event)) {
-      this.imageModal.hide();
-    }
+    handleKeyDown(event, this.clickOnClose);
   };
 
   readonly clickOnClose = () => {
