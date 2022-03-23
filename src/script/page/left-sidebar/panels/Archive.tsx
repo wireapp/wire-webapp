@@ -17,7 +17,7 @@
  *
  */
 
-import React from 'react';
+import React, {useEffect} from 'react';
 
 import {amplify} from 'amplify';
 import {WebAppEvents} from '@wireapp/webapp-events';
@@ -55,6 +55,11 @@ const Archive: React.FC<ArchiveProps> = ({
     onClose();
     amplify.publish(WebAppEvents.CONVERSATION.SHOW, conversation, {});
   };
+
+  useEffect(() => {
+    // will eventually load missing events from the db
+    conversationRepository.updateArchivedConversations();
+  }, []);
 
   return (
     <ListWrapper
