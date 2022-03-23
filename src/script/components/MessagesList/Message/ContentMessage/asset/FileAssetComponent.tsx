@@ -69,10 +69,8 @@ const FileAssetComponent: React.FC<FileAssetProps> = ({
   const isUploading = assetStatus === AssetTransferState.UPLOADING;
 
   const handleKeyPress = (event: React.KeyboardEvent) => {
-    if (event.key === KEY.SPACE || event.key === KEY.ENTER) {
-      if (isUploaded) {
-        downloadAsset(asset);
-      }
+    if (isUploaded && (event.key === KEY.SPACE || event.key === KEY.ENTER)) {
+      downloadAsset(asset);
     }
     return true;
   };
