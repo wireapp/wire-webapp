@@ -198,7 +198,7 @@ export class TitleBarViewModel {
     this.showDetails(false);
   };
 
-  readonly pressOnDetails = (viewMode: unknown, event: KeyboardEvent): void => {
+  readonly pressOnDetails = (event: KeyboardEvent): void => {
     if (isSpaceKey(event) || isEnterKey(event)) {
       this.clickOnDetails();
     }

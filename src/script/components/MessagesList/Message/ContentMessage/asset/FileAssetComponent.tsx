@@ -27,7 +27,7 @@ import AssetLoader from './AssetLoader';
 import {formatBytes, getFileExtension, trimFileExtension} from 'Util/util';
 import {t} from 'Util/LocalizerUtil';
 import {registerReactComponent, useKoSubscribableChildren} from 'Util/ComponentUtil';
-import {KEY} from 'Util/KeyboardUtil';
+import {handleKeyDown} from 'Util/KeyboardUtil';
 
 import type {FileAsset} from '../../../../../entity/message/FileAsset';
 import type {ContentMessage} from '../../../../../entity/message/ContentMessage';
@@ -68,13 +68,6 @@ const FileAssetComponent: React.FC<FileAssetProps> = ({
   const isDownloading = assetStatus === AssetTransferState.DOWNLOADING;
   const isUploading = assetStatus === AssetTransferState.UPLOADING;
 
-  const handleKeyPress = (event: React.KeyboardEvent) => {
-    if (isUploaded && (event.key === KEY.SPACE || event.key === KEY.ENTER)) {
-      downloadAsset(asset);
-    }
-    return true;
-  };
-
   return (
     !isObfuscated && (
       <div className="file-asset" data-uie-name="file-asset" data-uie-value={asset.file_name}>
@@ -94,7 +87,11 @@ const FileAssetComponent: React.FC<FileAssetProps> = ({
                 downloadAsset(asset);
               }
             }}
-            onKeyDown={handleKeyPress}
+            onKeyDown={event => {
+              if (isUploaded) {
+                handleKeyDown(event, downloadAsset.bind(null, asset));
+              }
+            }}
           >
             {isPendingUpload ? (
               <div className="asset-placeholder loading-dots"></div>

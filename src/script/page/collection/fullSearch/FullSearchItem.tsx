@@ -22,7 +22,7 @@ import React from 'react';
 import Avatar, {AVATAR_SIZE} from 'Components/Avatar';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {formatDateShort} from 'Util/TimeUtil';
-import {KEY} from 'Util/KeyboardUtil';
+import {handleKeyDown} from 'Util/KeyboardUtil';
 
 import type {Text} from '../../../entity/message/Text';
 import type {ContentMessage} from '../../../entity/message/ContentMessage';
@@ -38,20 +38,13 @@ const FullSearchItem: React.FC<FullSearchItemProps> = ({message, onClick, format
   const {name} = useKoSubscribableChildren(user, ['name']);
   const {parts, matches} = formatText((message.getFirstAsset() as Text).text);
 
-  const handleSearchItemKeydown = (event: React.KeyboardEvent<HTMLDivElement>) => {
-    if (event.key === KEY.ENTER || event.key === KEY.SPACE) {
-      onClick();
-    }
-    return true;
-  };
-
   return (
     <div
       className="full-search__item"
       onClick={onClick}
       role="button"
       tabIndex={0}
-      onKeyDown={handleSearchItemKeydown}
+      onKeyDown={e => handleKeyDown(e, onClick)}
       data-uie-name="full-search-item"
     >
       <div className="full-search__item__avatar">

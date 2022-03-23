@@ -21,7 +21,7 @@ import Icon from 'Components/Icon';
 import React, {useEffect, useState} from 'react';
 import {container} from 'tsyringe';
 import cx from 'classnames';
-import {KEY} from 'Util/KeyboardUtil';
+import {handleKeyDown} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
 
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
@@ -82,13 +82,6 @@ const ImageAsset: React.FC<ImageAssetProps> = ({asset, message, onClick, teamSta
 
   const dummyImageUrl = `data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1 1' width='${asset.width}' height='${asset.height}'></svg>`;
 
-  const handleImageKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
-    if (event.key === KEY.ENTER || event.key === KEY.SPACE) {
-      onClick(message, event);
-    }
-    return true;
-  };
-
   const imageAltText = `${message.user().name()} ${t(
     'conversationAssetImageAlt',
   )} ${message.displayTimestampLong()} ${message.displayTimestampShort()}`;
@@ -105,7 +98,7 @@ const ImageAsset: React.FC<ImageAssetProps> = ({asset, message, onClick, teamSta
           data-uie-visible={visible && !isObfuscated}
           data-uie-status={imageUrl ? 'loaded' : 'loading'}
           onClick={event => onClick(message, event)}
-          onKeyDown={handleImageKeyDown}
+          onKeyDown={event => handleKeyDown(event, onClick.bind(null, message, event))}
           tabIndex={0}
           role="button"
           data-uie-name="go-image-detail"

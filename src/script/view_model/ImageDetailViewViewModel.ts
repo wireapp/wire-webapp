@@ -180,7 +180,7 @@ export class ImageDetailViewViewModel {
     });
   };
 
-  readonly hadndlePressOnClose = (event: KeyboardEvent): void => {
+  readonly handlePressOnClose = (event: KeyboardEvent): void => {
     if (isSpaceKey(event) || isEnterKey(event)) {
       this.imageModal.hide();
     }

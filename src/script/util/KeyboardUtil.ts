@@ -136,6 +136,13 @@ export const offEscKey = (handler: KeyboardHandler) => {
   }
 };
 
+export const handleKeyDown = (event: React.KeyboardEvent<HTMLDivElement>, callback: () => void) => {
+  if (event.key === KEY.ENTER || event.key === KEY.SPACE) {
+    callback();
+  }
+  return true;
+};
+
 const handleDebugKey = () => {
   const removeDebugInfo = (els: NodeListOf<HTMLElement>) => els.forEach(el => el.parentNode.removeChild(el));
 
