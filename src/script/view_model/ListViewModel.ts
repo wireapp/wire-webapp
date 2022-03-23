@@ -29,7 +29,6 @@ import {iterateItem} from 'Util/ArrayUtil';
 import {isEscapeKey} from 'Util/KeyboardUtil';
 
 import {StartUIViewModel} from './list/StartUIViewModel';
-import {TakeoverViewModel} from './list/TakeoverViewModel';
 
 import {showContextMenu} from '../ui/ContextMenu';
 import {showLabelContextMenu} from '../ui/LabelContextMenu';
@@ -50,12 +49,14 @@ import {TeamState} from '../team/TeamState';
 import {ConversationState} from '../conversation/ConversationState';
 import {CallingViewModel} from './CallingViewModel';
 import {PropertiesRepository} from '../properties/PropertiesRepository';
+import {UserRepository} from '../user/UserRepository';
 
 export enum ListState {
   ARCHIVE = 'ListViewModel.STATE.ARCHIVE',
   CONVERSATIONS = 'ListViewModel.STATE.CONVERSATIONS',
   PREFERENCES = 'ListViewModel.STATE.PREFERENCES',
   START_UI = 'ListViewModel.STATE.START_UI',
+  TAKEOVER = 'ListViewModel.STATE.TAKEOVER',
   TEMPORARY_GUEST = 'ListViewModel.STATE.TEMPORARY_GUEST',
 }
 
@@ -64,7 +65,6 @@ export class ListViewModel {
   private readonly teamState: TeamState;
   private readonly conversationState: ConversationState;
 
-  readonly takeover: TakeoverViewModel;
   readonly ModalType: typeof ListViewModel.MODAL_TYPE;
   readonly isActivatedAccount: ko.PureComputed<boolean>;
   readonly webappLoaded: ko.Observable<boolean>;
@@ -77,21 +77,15 @@ export class ListViewModel {
   public readonly propertiesRepository: PropertiesRepository;
   private readonly callingRepository: CallingRepository;
   private readonly teamRepository: TeamRepository;
+  public readonly userRepository: UserRepository;
   private readonly actionsViewModel: ActionsViewModel;
   public readonly contentViewModel: ContentViewModel;
   public readonly callingViewModel: CallingViewModel;
   private readonly panelViewModel: PanelViewModel;
   private readonly isProAccount: ko.PureComputed<boolean>;
   public readonly selfUser: ko.Observable<User>;
-  private readonly modal: ko.Observable<string>;
   private readonly visibleListItems: ko.PureComputed<(string | Conversation)[]>;
   private readonly start: StartUIViewModel;
-
-  static get MODAL_TYPE() {
-    return {
-      TAKEOVER: 'ListViewModel.MODAL_TYPE.TAKEOVER',
-    };
-  }
 
   static get STATE() {
     return {
@@ -114,6 +108,7 @@ export class ListViewModel {
     this.callingRepository = repositories.calling;
     this.teamRepository = repositories.team;
     this.propertiesRepository = repositories.properties;
+    this.userRepository = repositories.user;
 
     this.actionsViewModel = mainViewModel.actions;
     this.contentViewModel = mainViewModel.content;
@@ -129,7 +124,6 @@ export class ListViewModel {
     // State
     this.state = ko.observable(ListViewModel.STATE.CONVERSATIONS);
     this.lastUpdate = ko.observable();
-    this.modal = ko.observable();
     this.webappLoaded = ko.observable(false);
 
     this.visibleListItems = ko.pureComputed(() => {
@@ -163,7 +157,6 @@ export class ListViewModel {
       repositories.team,
       repositories.user,
     );
-    this.takeover = new TakeoverViewModel(this, repositories.user, repositories.conversation);
 
     this._initSubscriptions();
 
@@ -348,12 +341,8 @@ export class ListViewModel {
     }
   };
 
-  readonly dismissModal = (): void => {
-    this.modal(undefined);
-  };
-
   readonly showTakeover = (): void => {
-    this.modal(ListViewModel.MODAL_TYPE.TAKEOVER);
+    this.state(ListState.TAKEOVER);
   };
 
   readonly showTemporaryGuest = (): void => {
