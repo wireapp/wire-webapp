@@ -58,8 +58,8 @@ import '../page/preferences/AccountPreferences';
 import '../page/preferences/OptionPreferences';
 import '../page/preferences/AVPreferences';
 import '../page/preferences/AboutPreferences';
-import '../page/left-sidebar/LeftSidebar';
 import '../page/preferences/devices/DevicesPreferences';
+import '../page/LeftSidebar';
 import {
   PreferenceNotificationRepository,
   Notification,

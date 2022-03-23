@@ -17,24 +17,24 @@
  *
  */
 
-import React, {useEffect} from 'react';
+import React, {ReactElement, useEffect} from 'react';
 
 import {css} from '@emotion/core';
-import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {throttle} from 'underscore';
 import {isScrollable, isScrolledBottom, isScrolledTop} from 'Util/scroll-helpers';
-import {ListState, ListViewModel} from '../../../view_model/ListViewModel';
 import Icon from 'Components/Icon';
 import {t} from 'Util/LocalizerUtil';
 import useEffectRef from 'Util/useEffectRef';
 import {useFadingScrollbar} from '../../../ui/fadingScrollbar';
 
 type LeftListWrapperProps = {
-  header: string;
+  /** A react element that will be inserted after the header but before the list */
+  before?: ReactElement;
+  footer?: ReactElement;
+  header?: string;
+  headerElement?: ReactElement;
   id: string;
-  listViewModel: ListViewModel;
-  onClose: () => void;
-  openState: ListState;
+  onClose?: () => void;
 };
 
 const scrollStyle = css`
@@ -45,15 +45,22 @@ const scrollStyle = css`
 `;
 
 const style = css`
-  position: absolute;
-  top: 0;
+  position: relative;
   display: flex;
   flex-direction: column;
   width: 100%;
+  height: 100%;
 `;
 
-const ListWrapper: React.FC<LeftListWrapperProps> = ({listViewModel, openState, id, header, onClose, children}) => {
-  const {state: listState} = useKoSubscribableChildren(listViewModel, ['state']);
+const ListWrapper: React.FC<LeftListWrapperProps> = ({
+  id,
+  header,
+  headerElement,
+  onClose,
+  children,
+  footer,
+  before,
+}) => {
   const [scrollbarRef, setScrollbarRef] = useEffectRef<HTMLDivElement>();
   useFadingScrollbar(scrollbarRef);
 
@@ -80,25 +87,31 @@ const ListWrapper: React.FC<LeftListWrapperProps> = ({listViewModel, openState, 
     return () => scrollbarRef.removeEventListener('scroll', onScroll);
   }, [scrollbarRef]);
 
-  const isVisible = listState === openState;
-
   return (
-    <div id={id} className={`left-list-${id}`} css={style} aria-hidden={isVisible ? 'false' : 'true'}>
-      <div className="left-list-header">
-        <span className="left-list-header-text">{header}</span>
-        <button
-          type="button"
-          className="left-list-header-close-button button-icon-large"
-          onClick={onClose}
-          title={t('tooltipSearchClose')}
-          data-uie-name={`do-close-${id}`}
-        >
-          <Icon.Close />
-        </button>
-      </div>
-      <div css={scrollStyle} ref={setScrollbarRef}>
+    <div id={id} className={`left-list-${id} ${id}`} css={style}>
+      <section className="left-list-header">
+        {headerElement ? (
+          headerElement
+        ) : (
+          <>
+            <span className="left-list-header-text">{header}</span>
+            <button
+              type="button"
+              className="left-list-header-close-button button-icon-large"
+              onClick={onClose}
+              title={t('tooltipSearchClose')}
+              data-uie-name={`do-close-${id}`}
+            >
+              <Icon.Close />
+            </button>
+          </>
+        )}
+      </section>
+      {before ?? null}
+      <section css={scrollStyle} ref={setScrollbarRef}>
         {children}
-      </div>
+      </section>
+      {footer ?? null}
     </div>
   );
 };

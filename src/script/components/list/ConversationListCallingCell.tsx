@@ -30,14 +30,14 @@ import GroupVideoGrid from 'Components/calling/GroupVideoGrid';
 import Icon from 'Components/Icon';
 import ParticipantItem from 'Components/list/ParticipantItem';
 import Duration from 'Components/calling/Duration';
-import {registerReactComponent, useKoSubscribableChildren} from 'Util/ComponentUtil';
+import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 import {sortUsersByPriority} from 'Util/StringUtil';
 import useEffectRef from 'Util/useEffectRef';
 
 import type {Call} from '../../calling/Call';
 import type {CallingRepository} from '../../calling/CallingRepository';
-import {Grid, useVideoGrid} from '../../calling/videoGridHandler';
+import {useVideoGrid} from '../../calling/videoGridHandler';
 import type {Conversation} from '../../entity/Conversation';
 import type {Multitasking} from '../../notification/NotificationRepository';
 import {generateConversationUrl} from '../../router/routeGenerator';
@@ -53,7 +53,7 @@ import ClassifiedBar from 'Components/input/ClassifiedBar';
 export interface CallingCellProps {
   call: Call;
   callActions: CallActions;
-  callingRepository: CallingRepository;
+  callingRepository: Pick<CallingRepository, 'supportsScreenSharing' | 'sendModeratorMute'>;
   callState?: CallState;
   classifiedDomains?: string[];
   conversation: Conversation;
@@ -62,7 +62,6 @@ export interface CallingCellProps {
   multitasking: Multitasking;
   teamState?: TeamState;
   temporaryUserStyle?: boolean;
-  videoGrid: Grid;
 }
 
 const ConversationListCallingCell: React.FC<CallingCellProps> = ({
@@ -213,7 +212,12 @@ const ConversationListCallingCell: React.FC<CallingCellProps> = ({
         </button>
       )}
       {conversation && !isDeclined && (
-        <div className="conversation-list-calling-cell-background">
+        <div
+          className="conversation-list-calling-cell-background"
+          data-uie-name="item-call"
+          data-uie-id={conversation.id}
+          data-uie-value={conversation.display_name()}
+        >
           {muteState === MuteState.REMOTE_MUTED && (
             <div className="conversation-list-calling-cell__info-bar">{t('muteStateRemoteMute')}</div>
           )}
@@ -455,19 +459,3 @@ const ConversationListCallingCell: React.FC<CallingCellProps> = ({
 };
 
 export default ConversationListCallingCell;
-
-registerReactComponent('conversation-list-calling-cell', {
-  component: ConversationListCallingCell,
-  template: `<div data-bind="react: {
-    call,
-    callActions,
-    callingRepository,
-    classifiedDomains: ko.unwrap(classifiedDomains),
-    conversation: ko.unwrap(conversation),
-    hasAccessToCamera: ko.unwrap(hasAccessToCamera),
-    isSelfVerified: ko.unwrap(isSelfVerified),
-    multitasking,
-    temporaryUserStyle,
-  }"></div>
-    `,
-});

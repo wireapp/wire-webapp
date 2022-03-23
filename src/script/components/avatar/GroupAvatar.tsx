@@ -18,7 +18,6 @@
  */
 
 import React from 'react';
-import {registerReactComponent} from 'Util/ComponentUtil';
 import {CSS_SQUARE, CSS_FLEX_CENTER} from 'Util/CSSMixin';
 
 import type {User} from '../../entity/User';
@@ -75,8 +74,3 @@ const GroupAvatar: React.FC<GroupAvatarProps> = ({users, isLight = false, classN
 };
 
 export default GroupAvatar;
-
-registerReactComponent('group-avatar', {
-  component: GroupAvatar,
-  template: '<div data-bind="react: {users: ko.unwrap(users), isLight}"></div>',
-});
