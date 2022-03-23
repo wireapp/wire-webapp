@@ -7,9 +7,7 @@ interface ProgressProps {
   width: number;
 }
 export const ProgressBar = ({width, percent, error, style}: ProgressProps) => {
-  const [progress, setProgress] = React.useState(0);
-
-  React.useEffect(() => setProgress(Math.floor((percent / 100) * width)), [percent, width]);
+  const progress = (percent / 100) * width;
 
   return (
     <div

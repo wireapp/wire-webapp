@@ -21,7 +21,6 @@
 require('core-js/es7/reflect');
 require('intersection-observer');
 require('fake-indexeddb/auto');
-require('jest-canvas-mock');
 
 require('src/script/util/test/mock/createObjectURLMock');
 require('src/script/util/test/mock/cryptoMock');

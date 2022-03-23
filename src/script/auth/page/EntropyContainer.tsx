@@ -18,13 +18,13 @@
  */
 
 import {CheckRoundIcon, ContainerXS, H1, Muted, Text} from '@wireapp/react-ui-kit';
-import React, {MouseEvent, PointerEvent, useCallback, useEffect, useState} from 'react';
+import React, {useEffect, useState} from 'react';
 
 import {usePausableInterval} from '../../hooks/usePausableInterval';
 import {usePausableTimeout} from '../../hooks/usePausableTimeout';
 import {setEntropyStrings} from '../../strings';
 import {useIntl} from 'react-intl';
-import Canvas from '../component/Canvas';
+import EntropyCanvas from '../component/Canvas';
 
 import {ProgressBar} from '../component/ProgressBar';
 
@@ -36,45 +36,10 @@ interface Props extends React.HTMLProps<HTMLDivElement> {
   setError: React.Dispatch<any>;
 }
 
-const SetEntropy = ({setEntropy, entropy, error, setError, onSetEntropy}: Props) => {
+const EntropyContainer = ({setEntropy, entropy, error, setError, onSetEntropy}: Props) => {
   const [frameCount, setFrameCount] = useState(0);
   const [percent, setPercent] = useState(0);
   const {formatMessage: _} = useIntl();
-
-  const onMouseMove = (event: MouseEvent<HTMLCanvasElement> | PointerEvent<HTMLCanvasElement>) => {
-    setError(null);
-    setFrameCount(frameCount + 1);
-
-    const newEntropy: [number, number] = [
-      event.pageX - event.currentTarget?.getBoundingClientRect()?.x,
-      event.pageY - event.currentTarget?.getBoundingClientRect()?.y,
-    ];
-    setEntropy(entropy => [...entropy, newEntropy]);
-  };
-
-  const draw = useCallback(
-    (ctx: CanvasRenderingContext2D) => {
-      if (entropy.length > 1 && frameCount > 1) {
-        ctx.beginPath();
-        if (!entropy[frameCount - 2]) {
-          ctx.moveTo(...entropy[frameCount - 1]);
-        } else {
-          ctx.moveTo(...entropy[frameCount - 2]);
-        }
-        ctx.lineJoin = 'round';
-        ctx.lineCap = 'round';
-        ctx.lineWidth = 2;
-        ctx.strokeStyle = 'blue';
-        if (!entropy[frameCount - 1]) {
-          ctx.lineTo(...entropy[frameCount - 2]);
-        } else {
-          ctx.lineTo(...entropy[frameCount - 1]);
-        }
-        ctx.stroke();
-      }
-    },
-    [entropy],
-  );
 
   const {startTimeout, pauseTimeout} = usePausableTimeout(onSetEntropy, 35000);
   const {clearInterval, startInterval, pauseInterval} = usePausableInterval(
@@ -97,6 +62,19 @@ const SetEntropy = ({setEntropy, entropy, error, setError, onSetEntropy}: Props)
     }
   }, [frameCount, percent]);
 
+  const onMouseEnter = () => {
+    setError(null);
+    startInterval();
+    startTimeout();
+  };
+
+  const onMouseLeave = () => {
+    pauseInterval();
+    pauseTimeout();
+    setError(!error);
+    setEntropy([...entropy, null]);
+  };
+
   return (
     <ContainerXS centerText verticalCenter style={{display: 'flex', flexDirection: 'column', minHeight: 428}}>
       <H1 center>{_(setEntropyStrings.headline)}</H1>
@@ -110,30 +88,19 @@ const SetEntropy = ({setEntropy, entropy, error, setError, onSetEntropy}: Props)
           <Muted center css={{marginBottom: '24px'}}>
             {_(setEntropyStrings.subheadline)}
           </Muted>
-          <Canvas
-            data-uie-name="element-canvas"
+          <EntropyCanvas
+            data-uie-name="element-entropy-canvas"
             sizeX={256}
             sizeY={256}
             style={{
-              alignSelf: 'center',
-              backgroundColor: 'white',
               border: error ? 'red 2px solid' : 'black 2px solid',
-              borderRadius: '5px',
-              height: '255px',
-              width: '255px',
             }}
-            draw={draw}
-            onMouseMove={onMouseMove}
-            onMouseEnter={() => {
-              startInterval();
-              startTimeout();
-            }}
-            onMouseLeave={() => {
-              pauseInterval();
-              pauseTimeout();
-              setError(!error);
-              setEntropy([...entropy, null]);
-            }}
+            onMouseEnter={onMouseEnter}
+            onMouseLeave={onMouseLeave}
+            setEntropy={setEntropy}
+            entropy={entropy}
+            setFrameCount={setFrameCount}
+            frameCount={frameCount}
           />
           <ProgressBar
             error={error}
@@ -151,4 +118,4 @@ const SetEntropy = ({setEntropy, entropy, error, setError, onSetEntropy}: Props)
   );
 };
 
-export default SetEntropy;
+export default EntropyContainer;

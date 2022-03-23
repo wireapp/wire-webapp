@@ -57,7 +57,7 @@ import * as AccentColor from '../util/AccentColor';
 import {parseError, parseValidationErrors} from '../util/errorUtil';
 import * as StringUtil from '../util/stringUtil';
 import {UrlUtil} from '@wireapp/commons';
-import SetEntropy from './SetEntropy';
+import EntropyContainer from './EntropyContainer';
 
 interface Props extends React.HTMLProps<HTMLDivElement> {}
 
@@ -209,7 +209,7 @@ const ConversationJoin = ({
         onCookiePolicyBannerClose={() => setShowCookiePolicyBanner(false)}
       >
         {isEntropyRequired && showEntropyForm ? (
-          <SetEntropy
+          <EntropyContainer
             error={error}
             setError={setError}
             entropy={entropy}

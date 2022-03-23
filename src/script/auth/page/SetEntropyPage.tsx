@@ -19,7 +19,7 @@
 
 import React, {useState} from 'react';
 import Page from './Page';
-import SetEntropy from './SetEntropy';
+import EntropyContainer from './EntropyContainer';
 import {actionRoot as ROOT_ACTIONS} from '../module/action';
 import {BackendError} from '../module/action/BackendError';
 import {ROUTE} from '../route';
@@ -49,7 +49,7 @@ const SetEntropyPage = ({pushEntropyData}: Props & ConnectedProps & DispatchProp
 
   return (
     <Page>
-      <SetEntropy
+      <EntropyContainer
         entropy={entropy}
         setEntropy={setEntropy}
         error={error}

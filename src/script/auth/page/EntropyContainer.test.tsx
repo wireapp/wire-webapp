@@ -20,9 +20,10 @@
 import {fireEvent, render, screen, act} from '@testing-library/react';
 import React from 'react';
 import {withIntl, withTheme} from '../util/test/TestUtil';
-import SetEntropy from './SetEntropy';
+import EntropyContainer from './EntropyContainer';
+require('jest-canvas-mock');
 
-describe('SetEntropy', () => {
+describe('EntropyContainer', () => {
   const mockonSetEntropy = async () => {
     // eslint-disable-next-line no-console
     console.log('sending entropy');
@@ -47,7 +48,7 @@ describe('SetEntropy', () => {
     const {getByText, queryByText} = render(
       withTheme(
         withIntl(
-          <SetEntropy
+          <EntropyContainer
             onSetEntropy={mockonSetEntropy}
             error={error}
             setError={setError}
@@ -66,7 +67,7 @@ describe('SetEntropy', () => {
     render(
       withTheme(
         withIntl(
-          <SetEntropy
+          <EntropyContainer
             onSetEntropy={mockonSetEntropy}
             error={error}
             setError={setError}
@@ -76,7 +77,7 @@ describe('SetEntropy', () => {
         ),
       ),
     );
-    const canvas = screen.getByTestId('element-canvas');
+    const canvas = screen.getByTestId('element-entropy-canvas');
     await act(async () => {
       fireEvent.mouseEnter(canvas);
       fireEvent.mouseMove(canvas);
@@ -90,7 +91,7 @@ describe('SetEntropy', () => {
     render(
       withTheme(
         withIntl(
-          <SetEntropy
+          <EntropyContainer
             onSetEntropy={mockonSetEntropy}
             error={error}
             setError={setError}
@@ -100,7 +101,7 @@ describe('SetEntropy', () => {
         ),
       ),
     );
-    const canvas = screen.getByTestId('element-canvas');
+    const canvas = screen.getByTestId('element-entropy-canvas');
     await act(async () => {
       fireEvent.mouseEnter(canvas);
       fireEvent.mouseMove(canvas);
