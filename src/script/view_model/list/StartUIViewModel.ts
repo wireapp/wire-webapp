@@ -342,7 +342,9 @@ export class StartUIViewModel {
 
     // Clean up
     this.clearSearchResults();
-    $('user-input input').focus();
+    setTimeout(() => {
+      $('user-input input').focus();
+    }, 700);
 
     this.state(state);
     const isAddingPeople = state === StartUIViewModel.STATE.ADD_PEOPLE;
