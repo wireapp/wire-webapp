@@ -88,7 +88,6 @@ const ConversationJoin = ({
   const [isValidName, setIsValidName] = useState(true);
   const [showCookiePolicyBanner, setShowCookiePolicyBanner] = useState(true);
   const [showEntropyForm, setShowEntropyForm] = useState(false);
-  const [entropy, setEntropy] = useState<[number, number][]>([]);
   const isEntropyRequired = Config.getConfig().FEATURE.ENABLE_EXTRA_CLIENT_ENTROPY;
 
   const isPwaSupportedBrowser = () => {
@@ -132,7 +131,7 @@ const ConversationJoin = ({
     window.location.replace(redirectLocation);
   };
 
-  const handleSubmit = async () => {
+  const handleSubmit = async (entropyData?: [number, number][]) => {
     try {
       const name = enteredName.trim();
       const registrationData = {
@@ -145,7 +144,7 @@ const ConversationJoin = ({
         {
           shouldInitializeClient: !isPwaEnabled,
         },
-        entropy && new Uint8Array(entropy.filter(Boolean).flat()),
+        entropyData && new Uint8Array(entropyData.filter(Boolean).flat()),
       );
       const conversationEvent = await doJoinConversationByCode(conversationKey, conversationCode);
       await setLastEventDate(new Date(conversationEvent.time));
@@ -209,13 +208,7 @@ const ConversationJoin = ({
         onCookiePolicyBannerClose={() => setShowCookiePolicyBanner(false)}
       >
         {isEntropyRequired && showEntropyForm ? (
-          <EntropyContainer
-            error={error}
-            setError={setError}
-            entropy={entropy}
-            setEntropy={setEntropy}
-            onSetEntropy={handleSubmit}
-          />
+          <EntropyContainer onSetEntropy={handleSubmit} />
         ) : isFullConversation ? (
           <ContainerXS style={{margin: 'auto 0'}}>
             <H2 style={{fontWeight: 500, marginBottom: '10px', marginTop: '0'}} data-uie-name="status-full-headline">

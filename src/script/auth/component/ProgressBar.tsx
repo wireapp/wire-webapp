@@ -11,6 +11,7 @@ export const ProgressBar = ({width, percent, error, style}: ProgressProps) => {
 
   return (
     <div
+      data-uie-name="element-progess-bar"
       style={{
         alignSelf: 'center',
         backgroundColor: 'white',

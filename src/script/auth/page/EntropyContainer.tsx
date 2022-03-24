@@ -18,27 +18,35 @@
  */
 
 import {CheckRoundIcon, ContainerXS, H1, Muted, Text} from '@wireapp/react-ui-kit';
-import React from 'react';
+import React, {useState} from 'react';
 
 import {setEntropyStrings} from '../../strings';
 import {useIntl} from 'react-intl';
-import {EntropyCanvas, percent, frameCount, pause} from '../component/Canvas';
+import EntropyCanvas from '../component/EntropyCanvas';
 
 import {ProgressBar} from '../component/ProgressBar';
 
 interface Props extends React.HTMLProps<HTMLDivElement> {
-  entropy: [number, number][];
-  onSetEntropy: () => void;
-  setEntropy: React.Dispatch<React.SetStateAction<[number, number][]>>;
+  onSetEntropy: (entropyData: [number, number][]) => void;
 }
 
-const EntropyContainer = ({setEntropy, entropy, onSetEntropy}: Props) => {
+const EntropyContainer = ({onSetEntropy}: Props) => {
   const {formatMessage: _} = useIntl();
+  const [entropy, setEntropy] = useState<[number, number][]>([]);
+  const [pause, setPause] = useState(true);
+  const [percent, setPercent] = useState(0);
+
+  const frames = entropy.filter(Boolean).length;
+  const onProgress = (entropyData: [number, number][], percentage: number, pause: boolean) => {
+    setEntropy(entropyData);
+    setPause(pause);
+    setPercent(percentage);
+  };
 
   return (
     <ContainerXS centerText verticalCenter style={{display: 'flex', flexDirection: 'column', minHeight: 428}}>
       <H1 center>{_(setEntropyStrings.headline)}</H1>
-      {frameCount > 300 && percent >= 100 ? (
+      {frames > 300 && percent >= 100 ? (
         <>
           <CheckRoundIcon width={64} height={64} css={{alignSelf: 'center', marginBottom: '64px'}} />
           <Muted center>{_(setEntropyStrings.success)}</Muted>
@@ -53,21 +61,15 @@ const EntropyContainer = ({setEntropy, entropy, onSetEntropy}: Props) => {
             sizeX={256}
             sizeY={256}
             onSetEntropy={onSetEntropy}
-            setEntropy={setEntropy}
-            entropy={entropy}
+            onProgress={onProgress}
           />
-          <ProgressBar
-            error={pause}
-            width={256}
-            percent={percent}
-            css={{
-              alignSelf: 'center',
-            }}
-          />
-          <Text center>{percent}%</Text>
+          <ProgressBar error={pause} width={256} percent={percent} />
+          <Text data-uie-name="element-entropy-percent" center>
+            {percent}%
+          </Text>
         </>
       )}
-      {percent === 95 && frameCount < 300 && <Muted center>{_(setEntropyStrings.moreEntropyNeeded)}</Muted>}
+      {percent === 95 && frames < 300 && <Muted center>{_(setEntropyStrings.moreEntropyNeeded)}</Muted>}
     </ContainerXS>
   );
 };

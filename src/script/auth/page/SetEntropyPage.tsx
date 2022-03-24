@@ -17,7 +17,7 @@
  *
  */
 
-import React, {useState} from 'react';
+import React from 'react';
 import Page from './Page';
 import EntropyContainer from './EntropyContainer';
 import {actionRoot as ROOT_ACTIONS} from '../module/action';
@@ -31,11 +31,11 @@ interface Props extends React.HTMLProps<HTMLDivElement> {}
 
 const SetEntropyPage = ({pushEntropyData}: Props & ConnectedProps & DispatchProps) => {
   const {history} = useReactRouter();
-  const [entropy, setEntropy] = useState<[number, number][]>([]);
+  // const [entropy, setEntropy] = useState<[number, number][]>([]);
 
-  const onSetEntropy = async (): Promise<void> => {
+  const onSetEntropy = async (entropyData: [number, number][]): Promise<void> => {
     try {
-      await pushEntropyData(new Uint8Array(entropy.filter(Boolean).flat()));
+      await pushEntropyData(new Uint8Array(entropyData.filter(Boolean).flat()));
       history.push(ROUTE.VERIFY_EMAIL_CODE);
     } catch (error) {
       console.warn(error);
@@ -44,7 +44,7 @@ const SetEntropyPage = ({pushEntropyData}: Props & ConnectedProps & DispatchProp
 
   return (
     <Page>
-      <EntropyContainer entropy={entropy} setEntropy={setEntropy} onSetEntropy={onSetEntropy} />
+      <EntropyContainer onSetEntropy={onSetEntropy} />
     </Page>
   );
 };
