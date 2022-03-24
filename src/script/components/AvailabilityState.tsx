@@ -63,8 +63,9 @@ const AvailabilityState: React.FC<AvailabilityStateProps> = ({
   const isAway = availability === Availability.Type.AWAY;
   const isBusy = availability === Availability.Type.BUSY;
 
-  const handleKeyPress = (event: React.KeyboardEvent<HTMLButtonElement>) => {
-    if (event.key === KEY.ENTER || event.key === KEY.SPACE) {
+  const handleKeyDown = (event: React.KeyboardEvent<HTMLButtonElement>) => {
+    const {key} = event;
+    if (key === KEY.ENTER || key === KEY.SPACE) {
       const {top, left, height} = (event.target as Element).getBoundingClientRect();
       const newEvent = new MouseEvent('MouseEvent', {
         ...event.nativeEvent,
@@ -108,7 +109,21 @@ const AvailabilityState: React.FC<AvailabilityStateProps> = ({
         />
       )}
 
-      {label && (
+      {label && !onClick && (
+        <label
+          className="availability-state-label"
+          css={
+            theme
+              ? {...buttonCommonStyles, color: 'var(--accent-color)', userSelect: 'none'}
+              : {...buttonCommonStyles, userSelect: 'none'}
+          }
+          data-uie-name="status-label"
+        >
+          {label}
+        </label>
+      )}
+
+      {label && onClick && (
         <button
           className="availability-state-label"
           css={
@@ -118,7 +133,7 @@ const AvailabilityState: React.FC<AvailabilityStateProps> = ({
           }
           data-uie-name="status-label"
           onClick={onClick}
-          onKeyPress={handleKeyPress}
+          onKeyDown={handleKeyDown}
         >
           {label}
         </button>
