@@ -96,6 +96,10 @@ export const setAccountTypeStrings = defineMessages({
     defaultMessage: 'Secure collaboration for businesses, institutions and professional organizations',
     id: 'index.createTeam',
   },
+  goBack: {
+    defaultMessage: 'Go Back',
+    id: 'index.goBack',
+  },
 });
 
 export const teamNameStrings = defineMessages({
@@ -677,6 +681,10 @@ export const loginStrings = defineMessages({
   forgotPassword: {
     defaultMessage: 'Forgot password?',
     id: 'login.forgotPassword',
+  },
+  goBack: {
+    defaultMessage: 'Go Back',
+    id: 'login.goBack',
   },
   headline: {
     defaultMessage: 'Log in',
