@@ -199,7 +199,7 @@ const ConversationListCallingCell: React.FC<CallingCellProps> = ({
   }, [isOngoing, multitasking]);
 
   return (
-    <>
+    <div className="conversation-calling-cell">
       {showJoinButton && (
         <button
           className="call-ui__button call-ui__button--green call-ui__button--join"
@@ -454,7 +454,7 @@ const ConversationListCallingCell: React.FC<CallingCellProps> = ({
           )}
         </div>
       )}
-    </>
+    </div>
   );
 };
 
