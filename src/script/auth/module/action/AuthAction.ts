@@ -228,6 +228,12 @@ export class AuthAction {
     };
   };
 
+  pushEntropyData = (entropy: Uint8Array): ThunkAction => {
+    return async dispatch => {
+      dispatch(AuthActionCreator.pushEntropyData(entropy));
+    };
+  };
+
   doRegisterTeam = (registration: RegisterData): ThunkAction => {
     return async (
       dispatch,
@@ -259,7 +265,7 @@ export class AuthAction {
     };
   };
 
-  doRegisterPersonal = (registration: RegisterData): ThunkAction => {
+  doRegisterPersonal = (registration: RegisterData, entropyData: Uint8Array): ThunkAction => {
     return async (
       dispatch,
       getState,
@@ -277,7 +283,7 @@ export class AuthAction {
         await this.persistAuthData(clientType, core, dispatch, localStorageAction);
         await dispatch(cookieAction.setCookie(COOKIE_NAME_APP_OPENED, {appInstanceId: getConfig().APP_INSTANCE_ID}));
         await dispatch(selfAction.fetchSelf());
-        await dispatch(clientAction.doInitializeClient(clientType));
+        await dispatch(clientAction.doInitializeClient(clientType, undefined, undefined, entropyData));
         dispatch(AuthActionCreator.successfulRegisterPersonal(registration));
       } catch (error) {
         dispatch(AuthActionCreator.failedRegisterPersonal(error));
@@ -286,7 +292,11 @@ export class AuthAction {
     };
   };
 
-  doRegisterWireless = (registrationData: RegisterData, options = {shouldInitializeClient: true}): ThunkAction => {
+  doRegisterWireless = (
+    registrationData: RegisterData,
+    options = {shouldInitializeClient: true},
+    entropyData?: Uint8Array,
+  ): ThunkAction => {
     return async (
       dispatch,
       getState,
@@ -306,7 +316,8 @@ export class AuthAction {
         await this.persistAuthData(clientType, core, dispatch, localStorageAction);
         await dispatch(cookieAction.setCookie(COOKIE_NAME_APP_OPENED, {appInstanceId: getConfig().APP_INSTANCE_ID}));
         await dispatch(selfAction.fetchSelf());
-        await (clientType !== ClientType.NONE && dispatch(clientAction.doInitializeClient(clientType)));
+        await (clientType !== ClientType.NONE &&
+          dispatch(clientAction.doInitializeClient(clientType, undefined, undefined, entropyData)));
         await dispatch(authAction.doFlushDatabase());
         dispatch(AuthActionCreator.successfulRegisterWireless(registrationData));
       } catch (error) {

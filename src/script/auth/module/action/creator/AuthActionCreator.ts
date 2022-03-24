@@ -52,6 +52,7 @@ export enum AUTH_ACTION {
   REGISTER_PERSONAL_START = 'REGISTER_PERSONAL_START',
   REGISTER_PERSONAL_SUCCESS = 'REGISTER_PERSONAL_SUCCESS',
   REGISTER_PUSH_ACCOUNT_DATA = 'REGISTER_PUSH_ACCOUNT_DATA',
+  REGISTER_PUSH_ENTROPY_DATA = 'REGISTER_PUSH_ENTROPY_DATA',
   REGISTER_RESET_ACCOUNT_DATA = 'REGISTER_RESET_ACCOUNT_DATA',
   REGISTER_TEAM_FAILED = 'REGISTER_TEAM_FAILED',
   REGISTER_TEAM_START = 'REGISTER_TEAM_START',
@@ -112,6 +113,7 @@ export type AuthActions =
   | ResetAuthErrorsAction
   | ResetRegistrationDataAction
   | PushRegistrationDataAction
+  | PushEntropyDataAction
   | ResetLoginDataAction
   | PushLoginDataAction
   | EnterTeamCreationFlowAction
@@ -267,6 +269,10 @@ export interface PushRegistrationDataAction extends AppAction {
   readonly type: AUTH_ACTION.REGISTER_PUSH_ACCOUNT_DATA;
 }
 
+export interface PushEntropyDataAction extends AppAction {
+  readonly payload: Uint8Array;
+  readonly type: AUTH_ACTION.REGISTER_PUSH_ENTROPY_DATA;
+}
 export interface ResetLoginDataAction extends AppAction {
   readonly type: AUTH_ACTION.RESET_LOGIN_DATA;
 }
@@ -456,6 +462,13 @@ export class AuthActionCreator {
     payload: accountData,
     type: AUTH_ACTION.REGISTER_PUSH_ACCOUNT_DATA,
   });
+
+  static pushEntropyData = (entropy: Uint8Array): PushEntropyDataAction => {
+    return {
+      payload: entropy,
+      type: AUTH_ACTION.REGISTER_PUSH_ENTROPY_DATA,
+    };
+  };
 
   static pushLoginData = (loginData: Partial<LoginData>): PushLoginDataAction => ({
     payload: loginData,

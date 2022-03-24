@@ -53,13 +53,19 @@ export class ClientAction {
     };
   };
 
-  doInitializeClient = (clientType: ClientType, password?: string, verificationCode?: string): ThunkAction => {
+  doInitializeClient = (
+    clientType: ClientType,
+    password?: string,
+    verificationCode?: string,
+    entropyData?: Uint8Array,
+  ): ThunkAction => {
     return async (dispatch, getState, {core, actions: {clientAction, webSocketAction}}) => {
       dispatch(ClientActionCreator.startInitializeClient());
       try {
         const creationStatus = await core.initClient(
           {clientType, password, verificationCode},
           clientAction.generateClientPayload(clientType),
+          entropyData,
         );
         await dispatch(clientAction.doGetAllClients());
         await dispatch(webSocketAction.listen());

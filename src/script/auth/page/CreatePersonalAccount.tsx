@@ -33,6 +33,7 @@ import * as AuthSelector from '../module/selector/AuthSelector';
 import {ROUTE} from '../route';
 import {Runtime} from '@wireapp/commons';
 import Page from './Page';
+import {Config} from '../../Config';
 
 interface Props extends React.HTMLAttributes<HTMLDivElement> {}
 
@@ -52,7 +53,13 @@ const CreatePersonalAccount = ({isPersonalFlow, enterPersonalCreationFlow}: Prop
     >
       <H1 center>{_(createPersonalAccountStrings.headLine)}</H1>
       <AccountForm
-        onSubmit={() => history.push(ROUTE.VERIFY_EMAIL_CODE)}
+        onSubmit={() => {
+          if (Config.getConfig().FEATURE.ENABLE_EXTRA_CLIENT_ENTROPY) {
+            history.push(ROUTE.SET_ENTROPY);
+          } else {
+            history.push(ROUTE.VERIFY_EMAIL_CODE);
+          }
+        }}
         submitText={_(createPersonalAccountStrings.submitButton)}
       />
     </ContainerXS>
