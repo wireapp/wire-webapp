@@ -97,7 +97,7 @@ const AccentColorPicker: React.FunctionComponent<AccentColorPickerProps> = ({use
                 },
                 '&:focus + span::before': {
                   ...CSS_SQUARE(16),
-                  outline: '1px solid blue',
+                  outline: '1px solid Highlight',
                 },
                 opacity: 0,
               }}
