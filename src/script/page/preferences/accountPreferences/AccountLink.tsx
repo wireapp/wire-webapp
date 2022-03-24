@@ -64,12 +64,13 @@ const AccountLink: React.FC<AccountLinkProps> = ({label, value, ...rest}) => {
           {value}
         </div>
       </div>
-      <div
+      <button
         data-uie-name="do-copy-profile-link"
-        role="button"
         onClick={() => copyText(value)}
         css={{
           alignItems: 'center',
+          background: 'none',
+          border: 'none',
           cursor: 'pointer',
           display: 'flex',
           flexDirection: 'row',
@@ -79,7 +80,7 @@ const AccountLink: React.FC<AccountLinkProps> = ({label, value, ...rest}) => {
       >
         <Icon.Copy css={{fill: 'var(--background)', marginRight: 8}} data-uie-name="profile-link-icon" />
         {t('preferencesAccountCopyLink')}
-      </div>
+      </button>
     </div>
   );
 };

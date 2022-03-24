@@ -61,10 +61,13 @@ body {
   font-size: @icon-size-sm;
 }
 
-// removed dotted outlines in firefox
-a,
-object {
-  outline: none !important;
+// common focus indicator for all the focusable elements
+* {
+  outline: none;
+
+  &:focus {
+    outline: 2px solid Highlight;
+  }
 }
 
 a {

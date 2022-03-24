@@ -96,7 +96,7 @@
 
 .preferences-link {
   .button-reset-default;
-  display: block;
+  display: inline-block;
   cursor: pointer;
   font-size: @font-size-sm;
   line-height: @line-height-xl;
@@ -150,11 +150,15 @@
 }
 
 .preferences-section {
+  display: flex;
   width: 560px;
+  flex-direction: column;
+  align-items: flex-start;
   margin-bottom: 32px;
 }
 
 .preferences-separator {
+  width: 100%;
   height: 1px;
   border: 0;
   margin: 0;
