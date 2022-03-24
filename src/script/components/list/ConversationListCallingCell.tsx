@@ -223,7 +223,7 @@ const ConversationListCallingCell: React.FC<CallingCellProps> = ({
           )}
           <div className="conversation-list-calling-cell conversation-list-cell">
             <div
-              className="conversation-list-cell"
+              className="conversation-list-cell conversation-list-cell-button"
               onClick={createNavigate(conversationUrl)}
               onKeyDown={createNavigateKeyboard(conversationUrl)}
               tabIndex={0}
