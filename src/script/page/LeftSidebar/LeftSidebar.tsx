@@ -34,7 +34,6 @@ import Conversations from './panels/Conversations';
 import TemporaryGuestConversations from './panels/TemporatyGuestConversations';
 import {amplify} from 'amplify';
 import {WebAppEvents} from '@wireapp/webapp-events';
-import Takeover from './panels/Takeover';
 
 type LeftSidebarProps = {
   assetRepository?: AssetRepository;
@@ -113,10 +112,6 @@ const LeftSidebar: React.FC<LeftSidebarProps> = ({
         />
       );
       break;
-    case ListState.TAKEOVER:
-      content = (
-        <Takeover goHome={goHome} listViewModel={listViewModel} selfUser={selfUser} userRepository={userRepository} />
-      );
   }
   return (
     <>

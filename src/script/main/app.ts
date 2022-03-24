@@ -686,8 +686,6 @@ class App {
     this.logger.info('Showing application UI');
     if (this.repository.user['userState'].isTemporaryGuest()) {
       mainView.list.showTemporaryGuest();
-    } else if (this.repository.user.shouldChangeUsername()) {
-      mainView.list.showTakeover();
     } else if (conversationEntity) {
       mainView.content.showConversation(conversationEntity, {});
     } else if (this.repository.user['userState'].connectRequests().length) {
