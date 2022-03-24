@@ -396,14 +396,14 @@ export class ConversationMapper {
     conversationEntity: Conversation,
     accessModes: CONVERSATION_ACCESS[],
     accessRole?: CONVERSATION_ACCESS_ROLE,
-    accessRoleV2?: ACCESS_ROLE_V2[],
+    accessRoleV2: ACCESS_ROLE_V2[] = [],
   ): typeof ACCESS_STATE {
     if (conversationEntity.team_id) {
       if (conversationEntity.is1to1()) {
         return conversationEntity.accessState(ACCESS_STATE.TEAM.ONE2ONE);
       }
 
-      if (accessRoleV2?.includes(ACCESS_ROLE_V2.TEAM_MEMBER)) {
+      if (accessRoleV2.includes(ACCESS_ROLE_V2.TEAM_MEMBER)) {
         if (accessRoleV2.includes(ACCESS_ROLE_V2.GUEST) || accessRoleV2.includes(ACCESS_ROLE_V2.NON_TEAM_MEMBER)) {
           if (accessRoleV2.includes(ACCESS_ROLE_V2.SERVICE)) {
             return conversationEntity.accessState(ACCESS_STATE.TEAM.GUESTS_SERVICES);
