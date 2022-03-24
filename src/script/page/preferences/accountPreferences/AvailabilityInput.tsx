@@ -31,23 +31,18 @@ interface AvailabilityInputProps {
 
 const AvailabilityInput: React.FC<AvailabilityInputProps> = ({availability}) => {
   return (
-    <div
+    <AvailabilityState
+      className="preferences-account-availability"
+      label={
+        availability === Availability.Type.NONE ? t('preferencesAccountAvailabilityUnset') : nameFromType(availability)
+      }
+      availability={availability}
+      showArrow
+      dataUieName="status-availability-in-profile"
       onClick={event => {
-        AvailabilityContextMenu.show(event.nativeEvent, 'preferences-account-availability-menu');
+        AvailabilityContextMenu.show(event.nativeEvent as MouseEvent, 'preferences-account-availability-menu');
       }}
-    >
-      <AvailabilityState
-        className="preferences-account-availability"
-        label={
-          availability === Availability.Type.NONE
-            ? t('preferencesAccountAvailabilityUnset')
-            : nameFromType(availability)
-        }
-        availability={availability}
-        showArrow
-        dataUieName="status-availability-in-profile"
-      />
-    </div>
+    />
   );
 };
 
