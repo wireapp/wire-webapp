@@ -53,7 +53,7 @@ const LeftSidebar: React.FC<LeftSidebarProps> = ({
   assetRepository = container.resolve(AssetRepository),
   selfUser,
 }) => {
-  const {conversationRepository, propertiesRepository, userRepository} = listViewModel;
+  const {conversationRepository, propertiesRepository} = listViewModel;
   const {state} = useKoSubscribableChildren(listViewModel, ['state']);
   let content = <span></span>;
   const switchList = (list: ListState) => listViewModel.switchList(list);

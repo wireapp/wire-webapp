@@ -49,14 +49,12 @@ import {TeamState} from '../team/TeamState';
 import {ConversationState} from '../conversation/ConversationState';
 import {CallingViewModel} from './CallingViewModel';
 import {PropertiesRepository} from '../properties/PropertiesRepository';
-import {UserRepository} from '../user/UserRepository';
 
 export enum ListState {
   ARCHIVE = 'ListViewModel.STATE.ARCHIVE',
   CONVERSATIONS = 'ListViewModel.STATE.CONVERSATIONS',
   PREFERENCES = 'ListViewModel.STATE.PREFERENCES',
   START_UI = 'ListViewModel.STATE.START_UI',
-  TAKEOVER = 'ListViewModel.STATE.TAKEOVER',
   TEMPORARY_GUEST = 'ListViewModel.STATE.TEMPORARY_GUEST',
 }
 
@@ -65,7 +63,6 @@ export class ListViewModel {
   private readonly teamState: TeamState;
   private readonly conversationState: ConversationState;
 
-  readonly ModalType: typeof ListViewModel.MODAL_TYPE;
   readonly isActivatedAccount: ko.PureComputed<boolean>;
   readonly webappLoaded: ko.Observable<boolean>;
   readonly state: ko.Observable<string>;
@@ -77,7 +74,6 @@ export class ListViewModel {
   public readonly propertiesRepository: PropertiesRepository;
   private readonly callingRepository: CallingRepository;
   private readonly teamRepository: TeamRepository;
-  public readonly userRepository: UserRepository;
   private readonly actionsViewModel: ActionsViewModel;
   public readonly contentViewModel: ContentViewModel;
   public readonly callingViewModel: CallingViewModel;
@@ -108,7 +104,6 @@ export class ListViewModel {
     this.callingRepository = repositories.calling;
     this.teamRepository = repositories.team;
     this.propertiesRepository = repositories.properties;
-    this.userRepository = repositories.user;
 
     this.actionsViewModel = mainViewModel.actions;
     this.contentViewModel = mainViewModel.content;
@@ -118,8 +113,6 @@ export class ListViewModel {
     this.isActivatedAccount = this.userState.isActivatedAccount;
     this.isProAccount = this.teamState.isTeam;
     this.selfUser = this.userState.self;
-
-    this.ModalType = ListViewModel.MODAL_TYPE;
 
     // State
     this.state = ko.observable(ListViewModel.STATE.CONVERSATIONS);
@@ -262,10 +255,6 @@ export class ListViewModel {
   openPreferencesAccount = async (): Promise<void> => {
     await this.teamRepository.getTeam();
 
-    if (this.isActivatedAccount()) {
-      this.dismissModal();
-    }
-
     this.switchList(ListViewModel.STATE.PREFERENCES);
     this.contentViewModel.switchContent(ContentViewModel.STATE.PREFERENCES_ACCOUNT);
   };
@@ -339,10 +328,6 @@ export class ListViewModel {
           this.contentViewModel.switchPreviousContent();
         }
     }
-  };
-
-  readonly showTakeover = (): void => {
-    this.state(ListState.TAKEOVER);
   };
 
   readonly showTemporaryGuest = (): void => {

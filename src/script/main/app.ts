@@ -588,9 +588,6 @@ class App {
       if (!userEntity.mediumPictureResource()) {
         this.repository.user.setDefaultPicture();
       }
-      if (!userEntity.username()) {
-        this.repository.user.getUsernameSuggestion();
-      }
     }
 
     return userEntity;
