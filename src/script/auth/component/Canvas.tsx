@@ -1,22 +1,56 @@
-import React, {MouseEvent, useRef, useEffect, CSSProperties} from 'react';
+import React, {MouseEvent, useRef, useEffect, useState} from 'react';
+import {usePausableInterval} from 'src/script/hooks/usePausableInterval';
+import {usePausableTimeout} from 'src/script/hooks/usePausableTimeout';
 
 interface CanvasProps {
   'data-uie-name': string;
   entropy: [number, number][];
-  frameCount: number;
-  onMouseEnter: () => void;
-  onMouseLeave: () => void;
+  onSetEntropy: () => void;
   setEntropy: React.Dispatch<React.SetStateAction<[number, number][]>>;
-  setFrameCount: React.Dispatch<React.SetStateAction<number>>;
   sizeX: number;
   sizeY: number;
-  style: CSSProperties;
 }
+const [percent, setPercent] = useState(0);
+const [frameCount, setFrameCount] = useState(0);
+const [pause, setPause] = useState(false);
 
 const EntropyCanvas = (props: CanvasProps) => {
-  const {setEntropy, entropy, frameCount, setFrameCount, onMouseEnter, onMouseLeave, sizeX, sizeY, style, ...rest} =
-    props;
+  const {setEntropy, entropy, sizeX, sizeY, onSetEntropy, ...rest} = props;
   const canvasRef = useRef(null);
+
+  const {startTimeout, pauseTimeout} = usePausableTimeout(onSetEntropy, 35000);
+  const {clearInterval, startInterval, pauseInterval} = usePausableInterval(
+    () => setPercent(percent => percent + 1),
+    300,
+  );
+
+  useEffect(() => {
+    if (frameCount <= 300 && percent > 95) {
+      setPercent(95);
+      pauseInterval();
+      pauseTimeout();
+    }
+    if (frameCount > 300) {
+      startInterval();
+      startTimeout();
+    }
+    if (percent >= 100) {
+      clearInterval();
+    }
+  }, [frameCount, percent]);
+
+  const onMouseEnter = () => {
+    setPause(false);
+    startInterval();
+    startTimeout();
+  };
+
+  const onMouseLeave = () => {
+    pauseInterval();
+    pauseTimeout();
+    setPause(!pause);
+    setEntropy([...entropy, null]);
+  };
 
   const draw = (ctx: CanvasRenderingContext2D, entropy: [number, number][]) => {
     if (entropy.length > 2) {
@@ -65,11 +99,11 @@ const EntropyCanvas = (props: CanvasProps) => {
       css={{
         alignSelf: 'center',
         backgroundColor: 'white',
+        border: pause ? 'red 2px solid' : 'black 2px solid',
         borderRadius: '5px',
         height: `${sizeY}px`,
         transition: '0.5s ease-in',
         width: `${sizeX}px`,
-        ...style,
       }}
       onMouseMove={onMouseMove}
       onMouseEnter={onMouseEnter}
@@ -80,4 +114,4 @@ const EntropyCanvas = (props: CanvasProps) => {
   );
 };
 
-export default EntropyCanvas;
+export {EntropyCanvas, percent, frameCount, pause};

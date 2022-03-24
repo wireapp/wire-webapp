@@ -18,62 +18,22 @@
  */
 
 import {CheckRoundIcon, ContainerXS, H1, Muted, Text} from '@wireapp/react-ui-kit';
-import React, {useEffect, useState} from 'react';
+import React from 'react';
 
-import {usePausableInterval} from '../../hooks/usePausableInterval';
-import {usePausableTimeout} from '../../hooks/usePausableTimeout';
 import {setEntropyStrings} from '../../strings';
 import {useIntl} from 'react-intl';
-import EntropyCanvas from '../component/Canvas';
+import {EntropyCanvas, percent, frameCount, pause} from '../component/Canvas';
 
 import {ProgressBar} from '../component/ProgressBar';
 
 interface Props extends React.HTMLProps<HTMLDivElement> {
   entropy: [number, number][];
-  error: any;
   onSetEntropy: () => void;
   setEntropy: React.Dispatch<React.SetStateAction<[number, number][]>>;
-  setError: React.Dispatch<any>;
 }
 
-const EntropyContainer = ({setEntropy, entropy, error, setError, onSetEntropy}: Props) => {
-  const [frameCount, setFrameCount] = useState(0);
-  const [percent, setPercent] = useState(0);
+const EntropyContainer = ({setEntropy, entropy, onSetEntropy}: Props) => {
   const {formatMessage: _} = useIntl();
-
-  const {startTimeout, pauseTimeout} = usePausableTimeout(onSetEntropy, 35000);
-  const {clearInterval, startInterval, pauseInterval} = usePausableInterval(
-    () => setPercent(percent => percent + 1),
-    300,
-  );
-
-  useEffect(() => {
-    if (frameCount <= 300 && percent > 95) {
-      setPercent(95);
-      pauseInterval();
-      pauseTimeout();
-    }
-    if (frameCount > 300) {
-      startInterval();
-      startTimeout();
-    }
-    if (percent >= 100) {
-      clearInterval();
-    }
-  }, [frameCount, percent]);
-
-  const onMouseEnter = () => {
-    setError(null);
-    startInterval();
-    startTimeout();
-  };
-
-  const onMouseLeave = () => {
-    pauseInterval();
-    pauseTimeout();
-    setError(!error);
-    setEntropy([...entropy, null]);
-  };
 
   return (
     <ContainerXS centerText verticalCenter style={{display: 'flex', flexDirection: 'column', minHeight: 428}}>
@@ -92,18 +52,12 @@ const EntropyContainer = ({setEntropy, entropy, error, setError, onSetEntropy}: 
             data-uie-name="element-entropy-canvas"
             sizeX={256}
             sizeY={256}
-            style={{
-              border: error ? 'red 2px solid' : 'black 2px solid',
-            }}
-            onMouseEnter={onMouseEnter}
-            onMouseLeave={onMouseLeave}
+            onSetEntropy={onSetEntropy}
             setEntropy={setEntropy}
             entropy={entropy}
-            setFrameCount={setFrameCount}
-            frameCount={frameCount}
           />
           <ProgressBar
-            error={error}
+            error={pause}
             width={256}
             percent={percent}
             css={{

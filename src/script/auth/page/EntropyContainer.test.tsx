@@ -50,8 +50,8 @@ describe('EntropyContainer', () => {
         withIntl(
           <EntropyContainer
             onSetEntropy={mockonSetEntropy}
-            error={error}
-            setError={setError}
+            // error={error}
+            // setError={setError}
             setEntropy={setEntropy}
             entropy={entropy}
           />,
@@ -69,8 +69,8 @@ describe('EntropyContainer', () => {
         withIntl(
           <EntropyContainer
             onSetEntropy={mockonSetEntropy}
-            error={error}
-            setError={setError}
+            // error={error}
+            // setError={setError}
             setEntropy={setEntropy}
             entropy={entropy}
           />,
@@ -93,8 +93,8 @@ describe('EntropyContainer', () => {
         withIntl(
           <EntropyContainer
             onSetEntropy={mockonSetEntropy}
-            error={error}
-            setError={setError}
+            // error={error}
+            // setError={setError}
             setEntropy={setEntropy}
             entropy={entropy}
           />,

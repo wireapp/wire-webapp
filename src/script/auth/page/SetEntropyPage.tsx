@@ -21,7 +21,6 @@ import React, {useState} from 'react';
 import Page from './Page';
 import EntropyContainer from './EntropyContainer';
 import {actionRoot as ROOT_ACTIONS} from '../module/action';
-import {BackendError} from '../module/action/BackendError';
 import {ROUTE} from '../route';
 import useReactRouter from 'use-react-router';
 import {connect} from 'react-redux';
@@ -33,29 +32,19 @@ interface Props extends React.HTMLProps<HTMLDivElement> {}
 const SetEntropyPage = ({pushEntropyData}: Props & ConnectedProps & DispatchProps) => {
   const {history} = useReactRouter();
   const [entropy, setEntropy] = useState<[number, number][]>([]);
-  const [error, setError] = useState(null);
 
   const onSetEntropy = async (): Promise<void> => {
     try {
       await pushEntropyData(new Uint8Array(entropy.filter(Boolean).flat()));
       history.push(ROUTE.VERIFY_EMAIL_CODE);
     } catch (error) {
-      if (error.label === BackendError.HANDLE_ERRORS.INVALID_HANDLE) {
-        error.label = BackendError.HANDLE_ERRORS.HANDLE_TOO_SHORT;
-      }
-      setError(error);
+      console.warn(error);
     }
   };
 
   return (
     <Page>
-      <EntropyContainer
-        entropy={entropy}
-        setEntropy={setEntropy}
-        error={error}
-        onSetEntropy={onSetEntropy}
-        setError={setError}
-      />
+      <EntropyContainer entropy={entropy} setEntropy={setEntropy} onSetEntropy={onSetEntropy} />
     </Page>
   );
 };
