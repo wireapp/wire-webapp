@@ -41,11 +41,11 @@ describe('EntropyCanvas', () => {
   const useErrorMock: any = (useState: any) => [useState, setErrorMock];
   jest.spyOn(React, 'useState').mockImplementation(useErrorMock);
 
-  const [entropy, setEntropy] = useStateMock([]);
-  const [error, setError] = useErrorMock(null);
+  const [, setEntropy] = useStateMock([]);
+  const [, setError] = useErrorMock(null);
 
-  const mockOnProgress = jest.fn((entropy: [number, number][], percent: number, pause: boolean) => {
-    setEntropy(entropy);
+  const mockOnProgress = jest.fn((entropyData: [number, number][], percent: number, pause: boolean) => {
+    setEntropy(entropyData);
     setError(pause);
   });
 

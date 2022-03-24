@@ -95,6 +95,7 @@ export class ConversationStateHandler extends AbstractConversationEventHandler {
 
             if (accessState === ACCESS_STATE.TEAM.TEAM_ONLY || accessState === ACCESS_STATE.TEAM.SERVICES) {
               conversationEntity.accessCode(undefined);
+              // this.revokeAccessCode(conversationEntity);
             }
           } catch (e) {
             let messageString: string;
