@@ -53,7 +53,6 @@ import {USER} from '../event/Client';
 import {ClientMapper} from '../client/ClientMapper';
 import {Config} from '../Config';
 import {ConsentValue} from './ConsentValue';
-import {createSuggestions} from './UserHandleGenerator';
 import {EventRepository} from '../event/EventRepository';
 import {LegalHoldModalViewModel} from '../view_model/content/LegalHoldModalViewModel';
 import {mapProfileAssetsV1} from '../assets/AssetMapper';
@@ -86,7 +85,6 @@ export class UserRepository {
   private readonly logger: Logger;
   public readonly userMapper: UserMapper;
   public getTeamMembersFromUsers: (users: User[]) => Promise<void>;
-  public shouldSetUsername: boolean;
 
   static get CONFIG() {
     return {
@@ -111,7 +109,6 @@ export class UserRepository {
     this.logger = getLogger('UserRepository');
 
     this.userMapper = new UserMapper(serverTimeHandler);
-    this.shouldSetUsername = false;
 
     this.getTeamMembersFromUsers = async (_: User[]) => undefined;
 
@@ -695,38 +692,12 @@ export class UserRepository {
   }
 
   /**
-   * Whether the user needs to set a username.
-   */
-  shouldChangeUsername(): boolean {
-    return this.shouldSetUsername;
-  }
-
-  /**
-   * Tries to generate a username suggestion.
-   */
-  async getUsernameSuggestion(): Promise<void> {
-    try {
-      const suggestions = createSuggestions(this.userState.self().name());
-      const validSuggestions = await this.verifyUsernames(suggestions);
-      this.shouldSetUsername = true;
-      this.userState.self().username(validSuggestions[0]);
-    } catch (error) {
-      if (error.code === HTTP_STATUS.NOT_FOUND) {
-        this.shouldSetUsername = false;
-      }
-
-      throw error;
-    }
-  }
-
-  /**
    * Change username.
    */
   async changeUsername(username: string): Promise<User> {
     if (username.length >= UserRepository.CONFIG.MINIMUM_USERNAME_LENGTH) {
       try {
         await this.selfService.putSelfHandle(username);
-        this.shouldSetUsername = false;
         return await this.userUpdate({user: {handle: username, id: this.userState.self().id}});
       } catch (error) {
         if ([HTTP_STATUS.CONFLICT, HTTP_STATUS.BAD_REQUEST].includes(error.code)) {
@@ -737,15 +708,6 @@ export class UserRepository {
     }
 
     throw new UserError(UserError.TYPE.INVALID_UPDATE, UserError.MESSAGE.INVALID_UPDATE);
-  }
-
-  /**
-   * Verify usernames against the backend.
-   * @param usernames Username suggestions
-   * @returns A list with usernames that are not taken.
-   */
-  private verifyUsernames(usernames: string[]): Promise<string[]> {
-    return this.userService.checkUserHandles(usernames);
   }
 
   /**

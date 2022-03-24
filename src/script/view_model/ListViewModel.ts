@@ -29,7 +29,6 @@ import {iterateItem} from 'Util/ArrayUtil';
 import {isEscapeKey} from 'Util/KeyboardUtil';
 
 import {StartUIViewModel} from './list/StartUIViewModel';
-import {TakeoverViewModel} from './list/TakeoverViewModel';
 
 import {showContextMenu} from '../ui/ContextMenu';
 import {showLabelContextMenu} from '../ui/LabelContextMenu';
@@ -64,8 +63,6 @@ export class ListViewModel {
   private readonly teamState: TeamState;
   private readonly conversationState: ConversationState;
 
-  readonly takeover: TakeoverViewModel;
-  readonly ModalType: typeof ListViewModel.MODAL_TYPE;
   readonly isActivatedAccount: ko.PureComputed<boolean>;
   readonly webappLoaded: ko.Observable<boolean>;
   readonly state: ko.Observable<string>;
@@ -83,15 +80,8 @@ export class ListViewModel {
   private readonly panelViewModel: PanelViewModel;
   private readonly isProAccount: ko.PureComputed<boolean>;
   public readonly selfUser: ko.Observable<User>;
-  private readonly modal: ko.Observable<string>;
   private readonly visibleListItems: ko.PureComputed<(string | Conversation)[]>;
   private readonly start: StartUIViewModel;
-
-  static get MODAL_TYPE() {
-    return {
-      TAKEOVER: 'ListViewModel.MODAL_TYPE.TAKEOVER',
-    };
-  }
 
   static get STATE() {
     return {
@@ -124,12 +114,9 @@ export class ListViewModel {
     this.isProAccount = this.teamState.isTeam;
     this.selfUser = this.userState.self;
 
-    this.ModalType = ListViewModel.MODAL_TYPE;
-
     // State
     this.state = ko.observable(ListViewModel.STATE.CONVERSATIONS);
     this.lastUpdate = ko.observable();
-    this.modal = ko.observable();
     this.webappLoaded = ko.observable(false);
 
     this.visibleListItems = ko.pureComputed(() => {
@@ -163,7 +150,6 @@ export class ListViewModel {
       repositories.team,
       repositories.user,
     );
-    this.takeover = new TakeoverViewModel(this, repositories.user, repositories.conversation);
 
     this._initSubscriptions();
 
@@ -269,10 +255,6 @@ export class ListViewModel {
   openPreferencesAccount = async (): Promise<void> => {
     await this.teamRepository.getTeam();
 
-    if (this.isActivatedAccount()) {
-      this.dismissModal();
-    }
-
     this.switchList(ListViewModel.STATE.PREFERENCES);
     this.contentViewModel.switchContent(ContentViewModel.STATE.PREFERENCES_ACCOUNT);
   };
@@ -346,14 +328,6 @@ export class ListViewModel {
           this.contentViewModel.switchPreviousContent();
         }
     }
-  };
-
-  readonly dismissModal = (): void => {
-    this.modal(undefined);
-  };
-
-  readonly showTakeover = (): void => {
-    this.modal(ListViewModel.MODAL_TYPE.TAKEOVER);
   };
 
   readonly showTemporaryGuest = (): void => {

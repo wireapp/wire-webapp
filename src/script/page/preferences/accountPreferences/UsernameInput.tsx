@@ -114,7 +114,6 @@ const UsernameInput: React.FC<UsernameInputProps> = ({username, domain, userRepo
         prefix="@"
         suffix={domain && `@${domain}`}
         setIsEditing={setIsEditing}
-        autoFocus={userRepository.shouldSetUsername}
         isDone={usernameInputDone.isDone}
         onValueChange={changeUsername}
         maxLength={256 - (domain?.length ?? 0)}
