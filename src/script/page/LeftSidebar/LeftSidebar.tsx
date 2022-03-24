@@ -34,6 +34,7 @@ import Conversations from './panels/Conversations';
 import TemporaryGuestConversations from './panels/TemporatyGuestConversations';
 import {amplify} from 'amplify';
 import {WebAppEvents} from '@wireapp/webapp-events';
+import StartUI from './panels/StartUI';
 
 type LeftSidebarProps = {
   assetRepository?: AssetRepository;
@@ -55,6 +56,7 @@ const LeftSidebar: React.FC<LeftSidebarProps> = ({
 }) => {
   const {conversationRepository, propertiesRepository} = listViewModel;
   const repositories = listViewModel.contentViewModel.repositories;
+
   const {state} = useKoSubscribableChildren(listViewModel, ['state']);
   let content = <span></span>;
   const switchList = (list: ListState) => listViewModel.switchList(list);
@@ -113,6 +115,16 @@ const LeftSidebar: React.FC<LeftSidebarProps> = ({
         />
       );
       break;
+
+    case ListState.START_UI:
+      content = (
+        <StartUI
+          onClose={goHome}
+          conversationRepository={conversationRepository}
+          searchRepository={repositories.search}
+          teamRepository={repositories.team}
+        />
+      );
   }
   return (
     <>

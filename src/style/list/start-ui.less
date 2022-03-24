@@ -20,16 +20,6 @@
 #start-ui {
   .left-list-container;
 
-  z-index: 1;
-
-  &.left-list-is-visible {
-    .start-ui-transition-fadein;
-  }
-
-  &:not(left-list-is-visible) {
-    .start-ui-transition-fadeout;
-  }
-
   group-list,
   top-people {
     & > div {
