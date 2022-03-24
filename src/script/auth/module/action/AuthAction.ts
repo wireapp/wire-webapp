@@ -25,6 +25,7 @@ import type {CRUDEngine} from '@wireapp/store-engine';
 import {SQLeetEngine} from '@wireapp/store-engine-sqleet';
 import {LowDiskSpaceError} from '@wireapp/store-engine/src/main/engine/error/';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
+import {VerificationActionType} from '@wireapp/api-client/src/auth/VerificationActionType';
 
 import {isTemporaryClientAndNonPersistent} from 'Util/util';
 import {currentCurrency, currentLanguage} from '../../localeConfig';
@@ -92,6 +93,7 @@ export class AuthAction {
           clientAction.doInitializeClient(
             loginData.clientType,
             loginData.password ? String(loginData.password) : undefined,
+            loginData.verificationCode,
           ),
         );
         dispatch(AuthActionCreator.successfulLogin());
@@ -117,6 +119,19 @@ export class AuthAction {
         dispatch(AuthActionCreator.successfulSendPhoneLoginCode(expires_in));
       } catch (error) {
         dispatch(AuthActionCreator.failedSendPhoneLoginCode(error));
+        throw error;
+      }
+    };
+  };
+
+  doSendTwoFactorLoginCode = (email: string): ThunkAction => {
+    return async (dispatch, getState, {apiClient}) => {
+      dispatch(AuthActionCreator.startSendTwoFactorCode());
+      try {
+        await apiClient.api.user.postVerificationCode(email, VerificationActionType.LOGIN);
+        dispatch(AuthActionCreator.successfulSendTwoFactorCode());
+      } catch (error) {
+        dispatch(AuthActionCreator.failedSendTwoFactorCode(error));
         throw error;
       }
     };
@@ -268,7 +283,7 @@ export class AuthAction {
         await this.persistAuthData(clientType, core, dispatch, localStorageAction);
         await dispatch(cookieAction.setCookie(COOKIE_NAME_APP_OPENED, {appInstanceId: getConfig().APP_INSTANCE_ID}));
         await dispatch(selfAction.fetchSelf());
-        await dispatch(clientAction.doInitializeClient(clientType, undefined, entropyData));
+        await dispatch(clientAction.doInitializeClient(clientType, undefined, undefined, entropyData));
         dispatch(AuthActionCreator.successfulRegisterPersonal(registration));
       } catch (error) {
         dispatch(AuthActionCreator.failedRegisterPersonal(error));
@@ -302,7 +317,7 @@ export class AuthAction {
         await dispatch(cookieAction.setCookie(COOKIE_NAME_APP_OPENED, {appInstanceId: getConfig().APP_INSTANCE_ID}));
         await dispatch(selfAction.fetchSelf());
         await (clientType !== ClientType.NONE &&
-          dispatch(clientAction.doInitializeClient(clientType, undefined, entropyData)));
+          dispatch(clientAction.doInitializeClient(clientType, undefined, undefined, entropyData)));
         await dispatch(authAction.doFlushDatabase());
         dispatch(AuthActionCreator.successfulRegisterWireless(registrationData));
       } catch (error) {

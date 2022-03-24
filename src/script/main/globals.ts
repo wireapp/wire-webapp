@@ -37,8 +37,6 @@ import 'Components/toggle/InfoToggle';
 import '../page/preferences/avPreferences/InputLevel';
 import 'Components/calling/FullscreenVideoCall';
 import '../page/collection/Collection';
-import 'Components/list/ConversationListCallingCell';
-import 'Components/list/ConversationListCell';
 import 'Components/avatar/GroupAvatar';
 import 'Components/MessagesList';
 import '../page/message-list/MessageTimerButton';

@@ -4,10 +4,8 @@ import {usePausableTimeout} from '../../hooks/usePausableTimeout';
 
 interface CanvasProps {
   'data-uie-name'?: string;
-  // entropy: [number, number][];
   onProgress: (entropyData: [number, number][], percent: number, pause: boolean) => void;
   onSetEntropy: (entropyData: [number, number][]) => void;
-  // setEntropy: React.Dispatch<React.SetStateAction<[number, number][]>>;
   sizeX: number;
   sizeY: number;
 }
@@ -16,14 +14,13 @@ const EntropyCanvas = (props: CanvasProps) => {
   const {sizeX, sizeY, onSetEntropy, onProgress, ...rest} = props;
   const canvasRef = useRef(null);
   const [percent, setPercent] = useState(0);
-  const [pause, setPause] = useState(false);
   const [entropy, setEntropy] = useState<[number, number][]>([]);
   const frames = entropy.filter(Boolean).length;
 
   const {startTimeout, pauseTimeout} = usePausableTimeout(() => onSetEntropy(entropy), 35000);
   const {clearInterval, startInterval, pauseInterval} = usePausableInterval(() => {
     setPercent(percent => percent + 1);
-    onProgress(entropy, percent, pause);
+    onProgress(entropy, percent, false);
   }, 300);
 
   useEffect(() => {
@@ -42,13 +39,11 @@ const EntropyCanvas = (props: CanvasProps) => {
   }, [percent, percent]);
 
   const onMouseEnter = () => {
-    setPause(false);
     startInterval();
     startTimeout();
   };
 
   const onMouseLeave = () => {
-    setPause(true);
     onProgress(entropy, percent, true);
     pauseInterval();
     pauseTimeout();
@@ -100,7 +95,6 @@ const EntropyCanvas = (props: CanvasProps) => {
       css={{
         alignSelf: 'center',
         backgroundColor: 'white',
-        border: pause ? 'red 2px solid' : 'black 2px solid',
         borderRadius: '5px',
         height: `${sizeY}px`,
         transition: '0.5s ease-in',

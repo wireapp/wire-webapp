@@ -33,7 +33,7 @@ interface Props extends React.HTMLProps<HTMLDivElement> {
 const EntropyContainer = ({onSetEntropy}: Props) => {
   const {formatMessage: _} = useIntl();
   const [entropy, setEntropy] = useState<[number, number][]>([]);
-  const [pause, setPause] = useState(true);
+  const [pause, setPause] = useState<boolean>(undefined);
   const [percent, setPercent] = useState(0);
 
   const frames = entropy.filter(Boolean).length;
@@ -57,6 +57,7 @@ const EntropyContainer = ({onSetEntropy}: Props) => {
             {_(setEntropyStrings.subheadline)}
           </Muted>
           <EntropyCanvas
+            css={{border: pause ? 'red 2px solid' : 'black 2px solid'}}
             data-uie-name="element-entropy-canvas"
             sizeX={256}
             sizeY={256}

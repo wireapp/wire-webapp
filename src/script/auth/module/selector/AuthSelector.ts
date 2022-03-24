@@ -54,6 +54,7 @@ const unsetTeam: TeamData = {
 
 export const isAuthenticated = (state: RootState) => state.authState.isAuthenticated;
 export const isFetching = (state: RootState) => state.authState.fetching;
+export const isSendingTwoFactorCode = (state: RootState) => state.authState.isSendingTwoFactorCode;
 export const isFetchingSSOSettings = (state: RootState) => state.authState.fetchingSSOSettings;
 export const getDefaultSSOCode = (state: RootState) => state.authState.ssoSettings?.default_sso_code;
 export const hasDefaultSSOCode = (state: RootState) => !!state.authState.ssoSettings?.default_sso_code;

@@ -83,7 +83,6 @@ const TemporaryGuestConversations: React.FC<TemporaryGuestConversations> = ({
               conversation={conversation}
               temporaryUserStyle={true}
               isSelfVerified={false}
-              videoGrid={undefined}
               callActions={callingViewModel.callActions}
               callingRepository={callingViewModel.callingRepository}
               hasAccessToCamera={callingViewModel.hasAccessToCamera()}

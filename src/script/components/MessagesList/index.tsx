@@ -34,7 +34,7 @@ interface MessagesListParams {
   onLoading: (isLoading: boolean) => void;
   resetSession: (messageError: DecryptErrorMessage) => void;
   selfUser: User;
-  showImageDetails: (message: MessageEntity, event: React.MouseEvent) => void;
+  showImageDetails: (message: MessageEntity, event: React.MouseEvent | React.KeyboardEvent) => void;
   showMessageDetails: (message: MessageEntity, showLikes?: boolean) => void;
   showParticipants: (users: User[]) => void;
   showUserDetails: (user: User) => void;
