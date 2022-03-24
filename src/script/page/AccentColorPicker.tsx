@@ -64,6 +64,8 @@ const AccentColorPicker: React.FunctionComponent<AccentColorPickerProps> = ({use
               aria-label={accentColor.name}
               checked={isChecked}
               onChange={() => doSetAccentColor(accentColor.id)}
+              data-uie-name="do-set-accent-color"
+              data-uie-value={accentColor.id}
               css={{
                 '& + span': {
                   cursor: 'pointer',
