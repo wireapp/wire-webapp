@@ -112,11 +112,7 @@ const AvailabilityState: React.FC<AvailabilityStateProps> = ({
       {label && !onClick && (
         <label
           className="availability-state-label"
-          css={
-            theme
-              ? {...buttonCommonStyles, color: 'var(--accent-color)', userSelect: 'none'}
-              : {...buttonCommonStyles, userSelect: 'none'}
-          }
+          css={theme ? {color: 'var(--accent-color)', userSelect: 'none'} : {userSelect: 'none'}}
           data-uie-name="status-label"
         >
           {label}
