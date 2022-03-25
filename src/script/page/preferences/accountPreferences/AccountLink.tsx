@@ -65,6 +65,7 @@ const AccountLink: React.FC<AccountLinkProps> = ({label, value, ...rest}) => {
         </div>
       </div>
       <button
+        type="button"
         data-uie-name="do-copy-profile-link"
         onClick={() => copyText(value)}
         css={{

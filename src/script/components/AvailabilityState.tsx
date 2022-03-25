@@ -120,6 +120,7 @@ const AvailabilityState: React.FC<AvailabilityStateProps> = ({
 
       {label && onClick && (
         <button
+          type="button"
           className="availability-state-label"
           css={
             theme
