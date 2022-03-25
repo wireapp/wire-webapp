@@ -3016,10 +3016,10 @@
     tough-cookie "4.0.0"
     ws "7.5.3"
 
-"@wireapp/avs@8.0.13":
-  version "8.0.13"
-  resolved "https://registry.yarnpkg.com/@wireapp/avs/-/avs-8.0.13.tgz#fef5d1127def4b05eabf6bbdc214a8033bb93048"
-  integrity sha512-nDmcDb3H4qUXXWHQQ0xcA16QJjbXCKpSNoqKJi2Q0pGHBkyOSGso79wYZyVil1AriUZjGM8Gg5CjWpTV317KKg==
+"@wireapp/avs@8.1.7":
+  version "8.1.7"
+  resolved "https://registry.yarnpkg.com/@wireapp/avs/-/avs-8.1.7.tgz#3ea2ba5b9d9765e95b533eb4fb0437b24ccbe9b4"
+  integrity sha512-bA+5Js9hWZJhlbGeBtKFRulvdLBWpxH3Xz3hvbC81M3QMhmb3TtcJPMNV6tr197Ho8hkszCrxWNNAkz46xX1ng==
 
 "@wireapp/cbor@4.7.3":
   version "4.7.3"
@@ -3052,7 +3052,6 @@
     jszip "3.7.0"
     logdown "3.3.1"
     rimraf "3.0.2"
-
 
 "@wireapp/core@24.4.0":
   version "24.4.0"
