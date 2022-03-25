@@ -23,12 +23,14 @@ import {CSSObject} from '@emotion/core';
 
 import {CSS_SQUARE} from 'Util/CSSMixin';
 import Icon from './Icon';
+import {KEY} from 'Util/KeyboardUtil';
 
 export interface AvailabilityStateProps {
   availability: Availability.Type;
   className?: string;
   dataUieName: string;
   label: string;
+  onClick?: (event: React.MouseEvent | React.KeyboardEvent) => void;
   showArrow?: boolean;
   theme?: boolean;
 }
@@ -41,6 +43,12 @@ const iconStyles: CSSObject = {
   stroke: 'currentColor',
 };
 
+const buttonCommonStyles: CSSObject = {
+  background: 'none',
+  border: 'none',
+  textTransform: 'uppercase',
+};
+
 const AvailabilityState: React.FC<AvailabilityStateProps> = ({
   availability,
   className,
@@ -48,10 +56,28 @@ const AvailabilityState: React.FC<AvailabilityStateProps> = ({
   label,
   showArrow = false,
   theme = false,
+  onClick,
 }) => {
   const isAvailable = availability === Availability.Type.AVAILABLE;
   const isAway = availability === Availability.Type.AWAY;
   const isBusy = availability === Availability.Type.BUSY;
+
+  const handleKeyDown = (event: React.KeyboardEvent<HTMLButtonElement>) => {
+    const {key} = event;
+    if (key === KEY.ENTER || key === KEY.SPACE) {
+      const {top, left, height} = (event.target as Element).getBoundingClientRect();
+      const newEvent = new MouseEvent('MouseEvent', {
+        ...event.nativeEvent,
+        clientX: left,
+        clientY: top + height,
+      });
+
+      onClick({
+        ...event,
+        nativeEvent: newEvent,
+      } as unknown as React.MouseEvent<Element, MouseEvent>);
+    }
+  };
 
   const content = (
     <span data-uie-name={dataUieName} css={{alignItems: 'center', display: 'flex', overflow: 'hidden'}}>
@@ -82,14 +108,31 @@ const AvailabilityState: React.FC<AvailabilityStateProps> = ({
         />
       )}
 
-      {label && (
-        <div
+      {label && !onClick && (
+        <label
           className="availability-state-label"
           css={theme ? {color: 'var(--accent-color)', userSelect: 'none'} : {userSelect: 'none'}}
           data-uie-name="status-label"
         >
           {label}
-        </div>
+        </label>
+      )}
+
+      {label && onClick && (
+        <button
+          type="button"
+          className="availability-state-label"
+          css={
+            theme
+              ? {...buttonCommonStyles, color: 'var(--accent-color)', userSelect: 'none'}
+              : {...buttonCommonStyles, userSelect: 'none'}
+          }
+          data-uie-name="status-label"
+          onClick={onClick}
+          onKeyDown={handleKeyDown}
+        >
+          {label}
+        </button>
       )}
 
       {showArrow && (
