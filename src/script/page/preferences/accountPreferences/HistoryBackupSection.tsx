@@ -24,7 +24,7 @@ import {HistoryExportViewModel} from '../../../view_model/content/HistoryExportV
 import {ContentViewModel} from '../../../view_model/ContentViewModel';
 import {t} from 'Util/LocalizerUtil';
 import PreferencesSection from '../components/PreferencesSection';
-import {KEY} from 'Util/KeyboardUtil';
+import {handleKeyDown} from 'Util/KeyboardUtil';
 
 interface HistoryBackupSectionProps {
   brandName: string;
@@ -33,10 +33,8 @@ interface HistoryBackupSectionProps {
 const HistoryBackupSection: React.FC<HistoryBackupSectionProps> = ({brandName}) => {
   const fileInputRef = React.useRef(null);
 
-  const handleKeyPress = (event: React.KeyboardEvent<HTMLDivElement>) => {
-    if (event.key === KEY.ENTER || event.key === KEY.SPACE) {
-      fileInputRef.current.click();
-    }
+  const fileInputClick = () => {
+    fileInputRef.current.click();
   };
 
   return (
@@ -44,6 +42,7 @@ const HistoryBackupSection: React.FC<HistoryBackupSectionProps> = ({brandName}) 
       hasSeparator
       title={t('preferencesOptionsBackupHeader')}
       className="preferences-section-conversation-history"
+      aria-label={t('preferencesOptionsBackupExportHeadline')}
     >
       <button
         className="preferences-link accent-text"
@@ -62,7 +61,11 @@ const HistoryBackupSection: React.FC<HistoryBackupSectionProps> = ({brandName}) 
       <p id="preferences-history-describe-1" className="preferences-detail">
         {t('preferencesOptionsBackupExportSecondary', brandName)}
       </p>
-      <div role="button" tabIndex={0} onKeyPress={handleKeyPress}>
+      <div
+        role="button"
+        tabIndex={0}
+        onKeyDown={(event: React.KeyboardEvent<HTMLElement>) => handleKeyDown(event, fileInputClick)}
+      >
         <label
           className="preferences-link accent-text preferences-history-backup-import-field"
           data-uie-name="do-backup-import"

@@ -28,7 +28,7 @@ import {UserRepository} from '../../../user/UserRepository';
 import {validateProfileImageResolution} from 'Util/util';
 import {getLogger} from 'Util/Logger';
 import {modals, ModalsViewModel} from '../../../view_model/ModalsViewModel';
-import {KEY} from 'Util/KeyboardUtil';
+import {handleKeyDown} from 'Util/KeyboardUtil';
 
 interface AvatarInputProps {
   isActivatedAccount: boolean;
@@ -88,14 +88,17 @@ const AvatarInput: React.FC<AvatarInputProps> = ({selfUser, isActivatedAccount, 
     }
   };
 
-  const handleKeyPress = (event: React.KeyboardEvent) => {
-    if (event.key === KEY.ENTER || event.key == KEY.SPACE) {
-      inputRef.current.click();
-    }
+  const inputClick = () => {
+    inputRef.current.click();
   };
 
   return (
-    <div tabIndex={0} role="button" onKeyPress={handleKeyPress}>
+    <div
+      tabIndex={0}
+      role="button"
+      onKeyDown={(event: React.KeyboardEvent<HTMLElement>) => handleKeyDown(event, inputClick)}
+      aria-label={t('tooltipPreferencesPicture')}
+    >
       <label
         className="preferences-account-picture-button"
         htmlFor="self-upload-file-input"
