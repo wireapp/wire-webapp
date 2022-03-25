@@ -46,11 +46,13 @@ export interface RegistrationDataState {
 export type AuthState = {
   readonly account: RegistrationDataState;
   readonly currentFlow: string;
+  readonly entropy?: Uint8Array;
   readonly error: Error;
   readonly fetched: boolean;
   readonly fetching: boolean;
   readonly fetchingSSOSettings: boolean;
   readonly isAuthenticated: boolean;
+  readonly isSendingTwoFactorCode: boolean;
   readonly loginData: Partial<LoginData>;
   readonly ssoSettings?: SSOSettings;
 };
@@ -72,11 +74,13 @@ export const initialAuthState: AuthState = {
     termsAccepted: false,
   },
   currentFlow: null,
+  entropy: null,
   error: null,
   fetched: false,
   fetching: false,
   fetchingSSOSettings: true,
   isAuthenticated: false,
+  isSendingTwoFactorCode: false,
   loginData: {
     clientType: Config.getConfig().FEATURE.DEFAULT_LOGIN_TEMPORARY_CLIENT ? ClientType.TEMPORARY : ClientType.PERMANENT,
   },
@@ -97,6 +101,19 @@ export function authReducer(state: AuthState = initialAuthState, action: AppActi
         error: null,
         fetching: true,
         isAuthenticated: false,
+      };
+    }
+    case AUTH_ACTION.SEND_TWO_FACTOR_CODE_START: {
+      return {
+        ...state,
+        isSendingTwoFactorCode: true,
+      };
+    }
+    case AUTH_ACTION.SEND_TWO_FACTOR_CODE_SUCCESS:
+    case AUTH_ACTION.SEND_TWO_FACTOR_CODE_FAILED: {
+      return {
+        ...state,
+        isSendingTwoFactorCode: false,
       };
     }
     case AUTH_ACTION.REFRESH_START: {
@@ -160,6 +177,9 @@ export function authReducer(state: AuthState = initialAuthState, action: AppActi
     }
     case AUTH_ACTION.REGISTER_PUSH_ACCOUNT_DATA: {
       return {...state, account: {...state.account, ...action.payload}, error: null};
+    }
+    case AUTH_ACTION.REGISTER_PUSH_ENTROPY_DATA: {
+      return {...state, entropy: action.payload, error: null};
     }
     case AUTH_ACTION.REGISTER_RESET_ACCOUNT_DATA: {
       return {...state, account: {...initialAuthState.account}, error: null};

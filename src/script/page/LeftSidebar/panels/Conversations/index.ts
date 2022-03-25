@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2018 Wire Swiss GmbH
+ * Copyright (C) 2022 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,48 +17,4 @@
  *
  */
 
-.takeover {
-  .left-list-container;
-
-  padding: 24px;
-}
-
-.takeover-names {
-  .flex-center;
-
-  flex: 1 1;
-  flex-direction: column;
-  text-align: center;
-}
-
-.takeover-names-name {
-  font-size: 28px;
-  line-height: 40px;
-  opacity: 0.48;
-}
-
-.takeover-names-username {
-  font-size: 24px;
-  line-height: 40px;
-}
-
-.takeover-actions {
-  display: flex;
-  flex: 0 0 auto;
-  flex-direction: column;
-
-  button + button {
-    margin-top: 16px;
-  }
-}
-
-.takeover-actions-sub {
-  line-height: 24px;
-  opacity: 0.8;
-}
-
-.takeover-actions-link {
-  margin-bottom: 24px;
-  font-weight: @font-weight-bold;
-  line-height: 24px;
-}
+export {default} from './Conversations';

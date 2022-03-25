@@ -588,9 +588,6 @@ class App {
       if (!userEntity.mediumPictureResource()) {
         this.repository.user.setDefaultPicture();
       }
-      if (!userEntity.username()) {
-        this.repository.user.getUsernameSuggestion();
-      }
     }
 
     return userEntity;
@@ -686,8 +683,6 @@ class App {
     this.logger.info('Showing application UI');
     if (this.repository.user['userState'].isTemporaryGuest()) {
       mainView.list.showTemporaryGuest();
-    } else if (this.repository.user.shouldChangeUsername()) {
-      mainView.list.showTakeover();
     } else if (conversationEntity) {
       mainView.content.showConversation(conversationEntity, {});
     } else if (this.repository.user['userState'].connectRequests().length) {

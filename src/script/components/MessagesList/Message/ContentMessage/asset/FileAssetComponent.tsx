@@ -27,6 +27,7 @@ import AssetLoader from './AssetLoader';
 import {formatBytes, getFileExtension, trimFileExtension} from 'Util/util';
 import {t} from 'Util/LocalizerUtil';
 import {registerReactComponent, useKoSubscribableChildren} from 'Util/ComponentUtil';
+import {handleKeyDown} from 'Util/KeyboardUtil';
 
 import type {FileAsset} from '../../../../../entity/message/FileAsset';
 import type {ContentMessage} from '../../../../../entity/message/ContentMessage';
@@ -78,9 +79,17 @@ const FileAssetComponent: React.FC<FileAssetProps> = ({
             })}
             data-uie-name="file"
             data-uie-value={asset.file_name}
+            role="button"
+            tabIndex={0}
+            aria-label={`${t('conversationContextMenuDownload')} ${fileName}.${fileExtension}`}
             onClick={() => {
               if (isUploaded) {
                 downloadAsset(asset);
+              }
+            }}
+            onKeyDown={event => {
+              if (isUploaded) {
+                handleKeyDown(event, downloadAsset.bind(null, asset));
               }
             }}
           >

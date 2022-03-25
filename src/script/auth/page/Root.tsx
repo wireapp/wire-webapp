@@ -53,6 +53,7 @@ import VerifyEmailCode from './VerifyEmailCode';
 import VerifyEmailLink from './VerifyEmailLink';
 import VerifyPhoneCode from './VerifyPhoneCode';
 import CustomEnvironmentRedirect from './CustomEnvironmentRedirect';
+import SetEntropyPage from './SetEntropyPage';
 
 interface RootProps {}
 
@@ -127,6 +128,9 @@ const Root: React.FC<RootProps & ConnectedProps & DispatchProps> = ({
               <Route path={ROUTE.VERIFY_EMAIL_LINK} component={VerifyEmailLink} />
               <Route path={ROUTE.VERIFY_PHONE_CODE} component={VerifyPhoneCode} />
               <Route path={ROUTE.CUSTOM_ENV_REDIRECT} component={CustomEnvironmentRedirect} />
+              {Config.getConfig().FEATURE.ENABLE_EXTRA_CLIENT_ENTROPY && (
+                <Route path={ROUTE.SET_ENTROPY} component={SetEntropyPage} />
+              )}
               <Route
                 path={ROUTE.VERIFY_EMAIL_CODE}
                 component={Config.getConfig().FEATURE.ENABLE_ACCOUNT_REGISTRATION && VerifyEmailCode}

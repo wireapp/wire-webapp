@@ -37,8 +37,6 @@ import 'Components/toggle/InfoToggle';
 import '../page/preferences/avPreferences/InputLevel';
 import 'Components/calling/FullscreenVideoCall';
 import '../page/collection/Collection';
-import 'Components/list/ConversationListCallingCell';
-import 'Components/list/ConversationListCell';
 import 'Components/avatar/GroupAvatar';
 import 'Components/MessagesList';
 import '../page/message-list/MessageTimerButton';
@@ -97,6 +95,7 @@ declare global {
           ENABLE_DEBUG: boolean;
           ENABLE_DOMAIN_DISCOVERY: boolean;
           ENABLE_ENFORCE_DESKTOP_APPLICATION_ONLY: boolean;
+          ENABLE_EXTRA_CLIENT_ENTROPY: boolean;
           ENABLE_MEDIA_EMBEDS: boolean;
           ENABLE_PHONE_LOGIN: boolean;
           ENABLE_SSO: boolean;

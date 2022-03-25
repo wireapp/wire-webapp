@@ -57,6 +57,7 @@ import * as AccentColor from '../util/AccentColor';
 import {parseError, parseValidationErrors} from '../util/errorUtil';
 import * as StringUtil from '../util/stringUtil';
 import {UrlUtil} from '@wireapp/commons';
+import EntropyContainer from './EntropyContainer';
 
 interface Props extends React.HTMLProps<HTMLDivElement> {}
 
@@ -86,6 +87,8 @@ const ConversationJoin = ({
   const [isValidLink, setIsValidLink] = useState(true);
   const [isValidName, setIsValidName] = useState(true);
   const [showCookiePolicyBanner, setShowCookiePolicyBanner] = useState(true);
+  const [showEntropyForm, setShowEntropyForm] = useState(false);
+  const isEntropyRequired = Config.getConfig().FEATURE.ENABLE_EXTRA_CLIENT_ENTROPY;
 
   const isPwaSupportedBrowser = () => {
     return Runtime.isMobileOS() || Runtime.isSafari();
@@ -128,47 +131,59 @@ const ConversationJoin = ({
     window.location.replace(redirectLocation);
   };
 
-  const handleSubmit = async (event: React.FormEvent) => {
+  const handleSubmit = async (entropyData?: [number, number][]) => {
+    try {
+      const name = enteredName.trim();
+      const registrationData = {
+        accent_id: accentColor.id,
+        expires_in: expiresIn,
+        name,
+      };
+      await doRegisterWireless(
+        registrationData as RegisterData,
+        {
+          shouldInitializeClient: !isPwaEnabled,
+        },
+        entropyData && new Uint8Array(entropyData.filter(Boolean).flat()),
+      );
+      const conversationEvent = await doJoinConversationByCode(conversationKey, conversationCode);
+      await setLastEventDate(new Date(conversationEvent.time));
+      routeToApp();
+    } catch (error) {
+      if (error.label) {
+        switch (error.label) {
+          default: {
+            const isValidationError = Object.values(ValidationError.ERROR).some(errorType =>
+              error.label.endsWith(errorType),
+            );
+            if (!isValidationError) {
+              doLogout();
+              console.warn('Unable to create wireless account', error);
+              setShowEntropyForm(false);
+            }
+          }
+        }
+      } else {
+        await doLogout();
+        console.warn('Unable to create wireless account', error);
+        setShowEntropyForm(false);
+      }
+    }
+    if (nameInput.current) {
+      nameInput.current.focus();
+    }
+  };
+
+  const checkNameValidity = (event: React.FormEvent) => {
     event.preventDefault();
     nameInput.current.value = nameInput.current.value.trim();
     if (!nameInput.current.checkValidity()) {
       setError(ValidationError.handleValidationState('name', nameInput.current.validity));
       setIsValidName(false);
+    } else if (isEntropyRequired) {
+      setShowEntropyForm(true);
     } else {
-      try {
-        const name = nameInput.current.value.trim();
-        const registrationData = {
-          accent_id: accentColor.id,
-          expires_in: expiresIn,
-          name,
-        };
-        await doRegisterWireless(registrationData as RegisterData, {
-          shouldInitializeClient: !isPwaEnabled,
-        });
-        const conversationEvent = await doJoinConversationByCode(conversationKey, conversationCode);
-        await setLastEventDate(new Date(conversationEvent.time));
-        routeToApp();
-      } catch (error) {
-        if (error.label) {
-          switch (error.label) {
-            default: {
-              const isValidationError = Object.values(ValidationError.ERROR).some(errorType =>
-                error.label.endsWith(errorType),
-              );
-              if (!isValidationError) {
-                doLogout();
-                console.warn('Unable to create wireless account', error);
-              }
-            }
-          }
-        } else {
-          await doLogout();
-          console.warn('Unable to create wireless account', error);
-        }
-      }
-    }
-    if (nameInput.current) {
-      nameInput.current.focus();
+      handleSubmit();
     }
   };
 
@@ -192,7 +207,9 @@ const ConversationJoin = ({
         showCookiePolicyBanner={showCookiePolicyBanner}
         onCookiePolicyBannerClose={() => setShowCookiePolicyBanner(false)}
       >
-        {isFullConversation ? (
+        {isEntropyRequired && showEntropyForm ? (
+          <EntropyContainer onSetEntropy={handleSubmit} />
+        ) : isFullConversation ? (
           <ContainerXS style={{margin: 'auto 0'}}>
             <H2 style={{fontWeight: 500, marginBottom: '10px', marginTop: '0'}} data-uie-name="status-full-headline">
               <FormattedMessage {...conversationJoinStrings.fullConversationHeadline} />
@@ -238,7 +255,7 @@ const ConversationJoin = ({
                   disabled={!enteredName || !isValidName}
                   type="submit"
                   formNoValidate
-                  onClick={handleSubmit}
+                  onClick={checkNameValidity}
                   data-uie-name="do-next"
                 >
                   <ArrowIcon />

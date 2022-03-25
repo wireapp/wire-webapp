@@ -7,14 +7,8 @@
     <div id="app" class="app">
       <div id="left-column" class="left-column" data-bind="css: {'left-column--light-theme': !isActivatedAccount()}">
         <!-- ko if: webappLoaded -->
-          <left-sidebar params="listViewModel: $root, conversationRepository: conversationRepository, selfUser: selfUser"></left-sidebar>
-          <!-- ko ifnot: modal() -->
-            #include('list/conversations.htm')
-            #include('list/start-ui.htm')
-          <!-- /ko -->
-          <!-- ko if: modal() === ModalType.TAKEOVER -->
-            #include('list/takeover.htm')
-          <!-- /ko -->
+          <left-sidebar params="listViewModel: $root, selfUser: selfUser"></left-sidebar>
+          #include('list/start-ui.htm')
         <!-- /ko -->
       </div>
       <div id="center-column" class="center-column">

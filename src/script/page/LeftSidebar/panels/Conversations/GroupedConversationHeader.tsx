@@ -22,8 +22,8 @@ import cx from 'classnames';
 
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 
-import type {ConversationLabel} from '../../conversation/ConversationLabelRepository';
-import Icon from '../Icon';
+import type {ConversationLabel} from '../../../../conversation/ConversationLabelRepository';
+import Icon from 'Components/Icon';
 
 export interface GroupedConversationHeaderProps {
   conversationLabel: ConversationLabel;

@@ -119,12 +119,11 @@ const FullSearch: React.FC<FullSearchProps> = ({searchProvider, click = noop, ch
             type="text"
             value={input}
             placeholder={t('fullsearchPlaceholder')}
-            autoFocus
             onChange={event => setInput(event.target.value)}
             data-uie-name="full-search-header-input"
           />
           {input && (
-            <span
+            <button
               className="button-icon icon-dismiss"
               onClick={() => setInput('')}
               data-uie-name="full-search-dismiss"
@@ -133,9 +132,9 @@ const FullSearch: React.FC<FullSearchProps> = ({searchProvider, click = noop, ch
         </div>
       </header>
       {hasNoResults && (
-        <div className="full-search__no-result" data-uie-name="full-search-no-results">
+        <p className="full-search__no-result" data-uie-name="full-search-no-results">
           {t('fullsearchNoResults')}
-        </div>
+        </p>
       )}
       <div className="full-search__list" data-uie-name="full-search-list">
         {messages.slice(0, messageCount).map(message => (

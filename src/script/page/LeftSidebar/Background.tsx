@@ -47,9 +47,10 @@ const UserBackground: React.FC<BackgroundProps> = ({selfUser, assetRepository}) 
     });
   }, [avatar]);
 
+  const style: React.CSSProperties = avatarUrl ? {backgroundImage: `url(${avatarUrl})`} : undefined;
   return (
     <div className="background">
-      <div className="background-image" style={{backgroundImage: `url(${avatarUrl})`}}></div>
+      <div className="background-image" style={style}></div>
       <div className="background-darken"></div>
     </div>
   );

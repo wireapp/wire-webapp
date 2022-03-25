@@ -28,16 +28,13 @@ import {t} from 'Util/LocalizerUtil';
 import {iterateItem} from 'Util/ArrayUtil';
 import {isEscapeKey} from 'Util/KeyboardUtil';
 
-import {ConversationListViewModel} from './list/ConversationListViewModel';
 import {StartUIViewModel} from './list/StartUIViewModel';
-import {TakeoverViewModel} from './list/TakeoverViewModel';
 
 import {showContextMenu} from '../ui/ContextMenu';
 import {showLabelContextMenu} from '../ui/LabelContextMenu';
 import {Shortcut} from '../ui/Shortcut';
 import {ShortcutType} from '../ui/ShortcutType';
 import {ContentViewModel} from './ContentViewModel';
-import {DefaultLabelIds} from '../conversation/ConversationLabelRepository';
 import {ModalsViewModel} from './ModalsViewModel';
 import {PanelViewModel} from './PanelViewModel';
 import type {MainViewModel, ViewModelRepositories} from './MainViewModel';
@@ -51,6 +48,7 @@ import {UserState} from '../user/UserState';
 import {TeamState} from '../team/TeamState';
 import {ConversationState} from '../conversation/ConversationState';
 import {CallingViewModel} from './CallingViewModel';
+import {PropertiesRepository} from '../properties/PropertiesRepository';
 
 export enum ListState {
   ARCHIVE = 'ListViewModel.STATE.ARCHIVE',
@@ -65,8 +63,6 @@ export class ListViewModel {
   private readonly teamState: TeamState;
   private readonly conversationState: ConversationState;
 
-  readonly takeover: TakeoverViewModel;
-  readonly ModalType: typeof ListViewModel.MODAL_TYPE;
   readonly isActivatedAccount: ko.PureComputed<boolean>;
   readonly webappLoaded: ko.Observable<boolean>;
   readonly state: ko.Observable<string>;
@@ -74,7 +70,8 @@ export class ListViewModel {
   readonly isFederated: boolean;
   private readonly elementId: 'left-column';
 
-  private readonly conversationRepository: ConversationRepository;
+  public readonly conversationRepository: ConversationRepository;
+  public readonly propertiesRepository: PropertiesRepository;
   private readonly callingRepository: CallingRepository;
   private readonly teamRepository: TeamRepository;
   private readonly actionsViewModel: ActionsViewModel;
@@ -83,16 +80,8 @@ export class ListViewModel {
   private readonly panelViewModel: PanelViewModel;
   private readonly isProAccount: ko.PureComputed<boolean>;
   public readonly selfUser: ko.Observable<User>;
-  private readonly modal: ko.Observable<string>;
   private readonly visibleListItems: ko.PureComputed<(string | Conversation)[]>;
-  private readonly conversations: ConversationListViewModel;
   private readonly start: StartUIViewModel;
-
-  static get MODAL_TYPE() {
-    return {
-      TAKEOVER: 'ListViewModel.MODAL_TYPE.TAKEOVER',
-    };
-  }
 
   static get STATE() {
     return {
@@ -114,6 +103,7 @@ export class ListViewModel {
     this.conversationRepository = repositories.conversation;
     this.callingRepository = repositories.calling;
     this.teamRepository = repositories.team;
+    this.propertiesRepository = repositories.properties;
 
     this.actionsViewModel = mainViewModel.actions;
     this.contentViewModel = mainViewModel.content;
@@ -124,12 +114,9 @@ export class ListViewModel {
     this.isProAccount = this.teamState.isTeam;
     this.selfUser = this.userState.self;
 
-    this.ModalType = ListViewModel.MODAL_TYPE;
-
     // State
     this.state = ko.observable(ListViewModel.STATE.CONVERSATIONS);
     this.lastUpdate = ko.observable();
-    this.modal = ko.observable();
     this.webappLoaded = ko.observable(false);
 
     this.visibleListItems = ko.pureComputed(() => {
@@ -154,17 +141,6 @@ export class ListViewModel {
       return states.concat(this.conversationState.conversations_unarchived());
     });
 
-    // Nested view models
-    this.conversations = new ConversationListViewModel(
-      mainViewModel,
-      this,
-      this.answerCall,
-      repositories.event,
-      repositories.calling,
-      repositories.conversation,
-      repositories.preferenceNotification,
-      repositories.properties,
-    );
     this.start = new StartUIViewModel(
       mainViewModel,
       this,
@@ -174,7 +150,6 @@ export class ListViewModel {
       repositories.team,
       repositories.user,
     );
-    this.takeover = new TakeoverViewModel(this, repositories.user, repositories.conversation);
 
     this._initSubscriptions();
 
@@ -280,10 +255,6 @@ export class ListViewModel {
   openPreferencesAccount = async (): Promise<void> => {
     await this.teamRepository.getTeam();
 
-    if (this.isActivatedAccount()) {
-      this.dismissModal();
-    }
-
     this.switchList(ListViewModel.STATE.PREFERENCES);
     this.contentViewModel.switchContent(ContentViewModel.STATE.PREFERENCES_ACCOUNT);
   };
@@ -359,14 +330,6 @@ export class ListViewModel {
     }
   };
 
-  readonly dismissModal = (): void => {
-    this.modal(undefined);
-  };
-
-  readonly showTakeover = (): void => {
-    this.modal(ListViewModel.MODAL_TYPE.TAKEOVER);
-  };
-
   readonly showTemporaryGuest = (): void => {
     this.switchList(ListViewModel.STATE.TEMPORARY_GUEST);
     const conversationEntity = this.conversationRepository.getMostRecentConversation();
@@ -407,7 +370,6 @@ export class ListViewModel {
         entries.push({
           click: () => {
             conversationLabelRepository.addConversationToFavorites(conversationEntity);
-            this.conversations.expandFolder(DefaultLabelIds.Favorites);
           },
           label: t('conversationPopoverFavorite'),
         });

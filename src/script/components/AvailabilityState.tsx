@@ -21,7 +21,6 @@ import React from 'react';
 import {Availability} from '@wireapp/protocol-messaging';
 import {CSSObject} from '@emotion/core';
 
-import {registerReactComponent} from 'Util/ComponentUtil';
 import {CSS_SQUARE} from 'Util/CSSMixin';
 import Icon from './Icon';
 import {KEY} from 'Util/KeyboardUtil';
@@ -167,9 +166,3 @@ const AvailabilityState: React.FC<AvailabilityStateProps> = ({
 };
 
 export default AvailabilityState;
-
-registerReactComponent<AvailabilityStateProps>('availability-state', {
-  component: AvailabilityState,
-  template:
-    '<span class="availability-state" data-bind="react: {availability: ko.unwrap(availability), label: ko.unwrap(label), showArrow, dataUieName, theme: ko.unwrap(theme)}"></span>',
-});

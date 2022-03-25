@@ -234,44 +234,6 @@ describe('UserRepository', () => {
       });
     });
 
-    describe('verifyUsernames', () => {
-      it('resolves with username when username is not taken', async () => {
-        const usernames = ['john_doe'];
-        const userRepo = new UserRepository(
-          {
-            checkUserHandles: jest.fn().mockImplementation(() => Promise.resolve(usernames)),
-          }, // UserService
-          {}, // AssetRepository,
-          {}, // SelfService,
-          {}, // ClientRepository,
-          {}, // ServerTimeHandler,
-          {}, // PropertiesRepository,
-          {}, // UserState
-        );
-
-        const _usernames = await userRepo.verifyUsernames(usernames);
-        expect(_usernames).toEqual(usernames);
-      });
-
-      it('returns empty array when username is taken', async () => {
-        const usernames = ['john_doe'];
-        const userRepo = new UserRepository(
-          {
-            checkUserHandles: jest.fn().mockImplementation(() => Promise.resolve([])),
-          }, // UserService
-          {}, // AssetRepository,
-          {}, // SelfService,
-          {}, // ClientRepository,
-          {}, // ServerTimeHandler,
-          {}, // PropertiesRepository,
-          {}, // UserState
-        );
-
-        const _usernames = await userRepo.verifyUsernames(usernames);
-        expect(_usernames.length).toBe(0);
-      });
-    });
-
     describe('verify_username', () => {
       it('resolves with username when username is not taken', async () => {
         const expectedUsername = 'john_doe';

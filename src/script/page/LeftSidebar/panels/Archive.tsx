@@ -17,7 +17,7 @@
  *
  */
 
-import React from 'react';
+import React, {useEffect} from 'react';
 
 import {amplify} from 'amplify';
 import {WebAppEvents} from '@wireapp/webapp-events';
@@ -56,16 +56,15 @@ const Archive: React.FC<ArchiveProps> = ({
     amplify.publish(WebAppEvents.CONVERSATION.SHOW, conversation, {});
   };
 
+  useEffect(() => {
+    // will eventually load missing events from the db
+    conversationRepository.updateArchivedConversations();
+  }, []);
+
   return (
-    <ListWrapper
-      listViewModel={listViewModel}
-      openState={ListViewModel.STATE.ARCHIVE}
-      id="archive"
-      header={t('archiveHeader')}
-      onClose={onClose}
-    >
+    <ListWrapper id="archive" header={t('archiveHeader')} onClose={onClose}>
       <ul className="left-list-items no-scroll">
-        {conversations.map((conversation, index) => (
+        {conversations.map(conversation => (
           <li key={conversation.id}>
             <ConversationListCell
               dataUieName="item-conversation-archived"
@@ -73,7 +72,6 @@ const Archive: React.FC<ArchiveProps> = ({
               rightClick={listViewModel.onContextMenu}
               conversation={conversation}
               onJoinCall={answerCall}
-              index={index}
               showJoinButton={false}
             />
           </li>

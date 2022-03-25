@@ -47,6 +47,7 @@ const VerifyEmailCode = ({
   account,
   authError,
   currentFlow,
+  entropyData,
   doRegisterPersonal,
   doRegisterTeam,
   doSendActivationCode,
@@ -70,7 +71,7 @@ const VerifyEmailCode = ({
       case AuthSelector.REGISTER_FLOW.PERSONAL:
       case AuthSelector.REGISTER_FLOW.GENERIC_INVITATION: {
         try {
-          await doRegisterPersonal({...account, email_code});
+          await doRegisterPersonal({...account, email_code}, entropyData);
           history.push(ROUTE.SET_HANDLE);
         } catch (error) {
           logger.error('Failed to create personal account', error);
@@ -127,6 +128,7 @@ const mapStateToProps = (state: RootState) => ({
   account: AuthSelector.getAccount(state),
   authError: AuthSelector.getError(state),
   currentFlow: AuthSelector.getCurrentFlow(state),
+  entropyData: AuthSelector.getEntropy(state),
 });
 
 type DispatchProps = ReturnType<typeof mapDispatchToProps>;

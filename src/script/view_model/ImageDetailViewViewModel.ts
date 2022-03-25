@@ -18,7 +18,7 @@
  */
 
 import {iterateItem} from 'Util/ArrayUtil';
-import {KEY} from 'Util/KeyboardUtil';
+import {KEY, handleKeyDown} from 'Util/KeyboardUtil';
 import {formatLocale} from 'Util/TimeUtil';
 import ko from 'knockout';
 import {amplify} from 'amplify';
@@ -26,6 +26,7 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {MessageCategory} from '../message/MessageCategory';
 import {Modal} from '../ui/Modal';
+
 import type {ActionsViewModel} from './ActionsViewModel';
 import type {AssetRepository} from '../assets/AssetRepository';
 import type {ContentMessage} from '../entity/message/ContentMessage';
@@ -59,6 +60,7 @@ export class ImageDetailViewViewModel {
 
     this.imageModal = undefined;
     this.imageSrc = ko.observable();
+
     this.imageVisible = ko.observable(false);
 
     this.conversationEntity = ko.observable();
@@ -176,6 +178,10 @@ export class ImageDetailViewViewModel {
         this.imageVisible(true);
       }
     });
+  };
+
+  readonly handlePressOnClose = (event: KeyboardEvent): void => {
+    handleKeyDown(event, this.clickOnClose);
   };
 
   readonly clickOnClose = () => {
