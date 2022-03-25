@@ -65,10 +65,12 @@ const HistoryBackupSection: React.FC<HistoryBackupSectionProps> = ({brandName}) 
         role="button"
         tabIndex={0}
         onKeyDown={(event: React.KeyboardEvent<HTMLElement>) => handleKeyDown(event, fileInputClick)}
+        aria-labelledby="do-backup-import"
       >
         <label
           className="preferences-link accent-text preferences-history-backup-import-field"
           data-uie-name="do-backup-import"
+          id="do-backup-import"
           htmlFor="file-import-input"
         >
           <span>{t('preferencesOptionsBackupImportHeadline')}</span>
