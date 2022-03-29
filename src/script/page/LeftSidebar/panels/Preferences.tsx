@@ -30,7 +30,7 @@ import {TeamRepository} from '../../../team/TeamRepository';
 type PreferencesProps = {
   contentViewModel: ContentViewModel;
   onClose: () => void;
-  teamRepository: TeamRepository;
+  teamRepository: Pick<TeamRepository, 'getTeam'>;
 };
 
 const PreferenceItem: React.FC<{
