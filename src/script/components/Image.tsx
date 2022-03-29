@@ -85,7 +85,7 @@ const Image: React.FC<ImageProps> = ({
   ) : (
     <div ref={setViewportElementRef} className={cx('image-wrapper', className)} {...props}>
       {assetSrc ? (
-        <img style={style} onClick={onClick} src={assetSrc} />
+        <img style={style} onClick={onClick} src={assetSrc} role="presentation" alt="" />
       ) : (
         <div style={style} className={cx({'loading-dots': assetIsLoading})}></div>
       )}

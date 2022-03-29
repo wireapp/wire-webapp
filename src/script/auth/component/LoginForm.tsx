@@ -90,7 +90,6 @@ const LoginForm = ({isFetching, onSubmit}: LoginFormProps) => {
         maxLength={128}
         type="text"
         required
-        autoFocus
         data-uie-name="enter-email"
       />
       <InputSubmitCombo>
@@ -119,6 +118,7 @@ const LoginForm = ({isFetching, onSubmit}: LoginFormProps) => {
             type="submit"
             formNoValidate
             onClick={handleSubmit}
+            aria-label={_(loginStrings.headline)}
             data-uie-name="do-sign-in"
           >
             <ArrowIcon />
