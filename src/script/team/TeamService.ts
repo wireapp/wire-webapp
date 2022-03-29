@@ -67,6 +67,11 @@ export class TeamService {
     return this.apiClient.api.teams.service.getTeamServices(teamId);
   }
 
+  async conversationHasGuestLink(conversationId: string): Promise<boolean> {
+    const {status} = await this.apiClient.api.conversation.getConversationGuestLinkFeature(conversationId);
+    return status === 'enabled';
+  }
+
   getAllTeamFeatures(): Promise<FeatureList> {
     return this.apiClient.api.teams.feature.getAllFeatures().catch(() => {
       // The following code enables all default features to ensure that modern webapps work with legacy backends (backends that don't provide a "feature-configs" endpoint)

@@ -179,6 +179,10 @@ export class TeamRepository {
     }
   }
 
+  async conversationHasGuestLinkEnabled(conversationId: string): Promise<boolean> {
+    return this.teamService.conversationHasGuestLink(conversationId);
+  }
+
   getTeamMembersFromUsers = async (users: User[]): Promise<void> => {
     const selfTeamId = this.userState.self().teamId;
     if (!selfTeamId) {
