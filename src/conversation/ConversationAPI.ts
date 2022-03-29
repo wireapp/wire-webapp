@@ -69,6 +69,8 @@ import {QualifiedId} from '../user';
 import {BackendFeatures} from '../APIClient';
 import {chunk} from '@wireapp/commons/src/main/util/ArrayUtil';
 
+type ConversationGuestLinkStatus = {status: 'enabled' | 'disabled'};
+
 export class ConversationAPI {
   public static readonly MAX_CHUNK_SIZE = 500;
   public static readonly URL = {
@@ -198,6 +200,16 @@ export class ConversationAPI {
     };
 
     const response = await this.client.sendJSON<ConversationCode>(config);
+    return response.data;
+  }
+
+  public async getConversationGuestLinkFeature(conversationId: string): Promise<ConversationGuestLinkStatus> {
+    const config: AxiosRequestConfig = {
+      method: 'get',
+      url: `${ConversationAPI.URL.CONVERSATIONS}/${conversationId}/features/conversationGuestLinks`,
+    };
+
+    const response = await this.client.sendJSON<ConversationGuestLinkStatus>(config);
     return response.data;
   }
 
