@@ -50,6 +50,8 @@ const AccentColorPicker: React.FunctionComponent<AccentColorPickerProps> = ({use
 
         return (
           <div
+            data-uie-name="element-accent-color-label"
+            data-uie-value={accentColor.id}
             key={accentColor.color}
             css={{
               alignItems: 'center',
