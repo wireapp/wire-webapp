@@ -414,6 +414,8 @@ const ConversationListCallingCell: React.FC<CallingCellProps> = ({
                       className="call-ui__button call-ui__button--green call-ui__button--large"
                       onClick={() => callActions.answer(call)}
                       type="button"
+                      title={t('callAccept')}
+                      aria-label={t('callAccept')}
                       data-uie-name="do-call-controls-call-accept"
                     >
                       <Icon.Pickup className="small-icon" />
