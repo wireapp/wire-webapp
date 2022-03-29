@@ -138,7 +138,7 @@ export const renderMessage = (message: string, selfId: QualifiedId | null, menti
       if (containsMentions) {
         // disable code highlighting if there is a mention in there
         // highlighting will be wrong anyway because this is not valid code
-        return code;
+        return escape(code);
       }
       return hljs.highlightAuto(code).value;
     },
