@@ -193,7 +193,7 @@ const Login = ({
         Config.getConfig().FEATURE.ENABLE_SSO ||
         Config.getConfig().FEATURE.ENABLE_ACCOUNT_REGISTRATION) && (
         <IsMobile>
-          <div style={{margin: 16}}>{backArrow}</div>
+          <div style={{margin: 16, position: 'absolute'}}>{backArrow}</div>
         </IsMobile>
       )}
       <Container centerText verticalCenter style={{width: '100%'}}>
@@ -209,7 +209,7 @@ const Login = ({
               )}
             </Column>
           </IsMobile>
-          <Column style={{flexBasis: 384, flexGrow: 0, padding: 0}}>
+          <Column style={{padding: '0 16px'}}>
             <ContainerXS
               centerText
               style={{display: 'flex', flexDirection: 'column', height: 428, justifyContent: 'space-between'}}

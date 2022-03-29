@@ -35,6 +35,7 @@ import DetailedDevice from './components/DetailedDevice';
 import DeviceDetailsPreferences from './DeviceDetailsPreferences';
 import {Conversation} from '../../../entity/Conversation';
 import {FormattedId} from './components/FormattedId';
+import PreferencesPage from '../components/PreferencesPage';
 
 interface DevicesPreferencesProps {
   clientState: ClientState;
@@ -127,8 +128,7 @@ const DevicesPreferences: React.FC<DevicesPreferencesProps> = ({
 
   return (
     <div id="preferences-devices" className="preferences-page preferences-devices">
-      <div className="preferences-titlebar">{t('preferencesDevices')}</div>
-      <div className="preferences-content" ref={setScrollbarRef}>
+      <PreferencesPage title={t('preferencesDevices')}>
         <section className="preferences-section" data-uie-name="preferences-device-current">
           <header className="preferences-header">{t('preferencesDevicesCurrent')}</header>
           <DetailedDevice device={currentClient} fingerprint={cryptographyRepository.getLocalFingerprint()} />
@@ -151,7 +151,7 @@ const DevicesPreferences: React.FC<DevicesPreferencesProps> = ({
             <div className="preferences-detail">{t('preferencesDevicesActiveDetail')}</div>
           </section>
         )}
-      </div>
+      </PreferencesPage>
     </div>
   );
 };

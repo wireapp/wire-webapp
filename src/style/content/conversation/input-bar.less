@@ -117,6 +117,10 @@
   min-width: @conversation-message-timestamp-width;
   align-items: center;
   justify-content: flex-end;
+
+  @media (max-width: 600px) {
+    min-width: auto;
+  }
 }
 
 .controls-right-button {
@@ -130,6 +134,12 @@
   margin-right: 12px;
   margin-left: 12px;
   line-height: 0;
+
+  @media (max-width: 600px) {
+    width: 24px;
+    height: 24px;
+    margin: 0 8px;
+  }
 
   svg path {
     fill: var(--background);

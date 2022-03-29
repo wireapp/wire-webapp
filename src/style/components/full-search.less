@@ -20,6 +20,10 @@
 .full-search {
   display: inline-block;
   width: 624px + 72px;
+  @media (max-width: 600px) {
+    width: 100%;
+    padding-right: 16px;
+  }
   &__header {
     display: flex;
     height: 40px;

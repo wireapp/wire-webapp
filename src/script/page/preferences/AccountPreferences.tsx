@@ -130,8 +130,8 @@ const AccountPreferences: React.FC<AccountPreferencesProps> = ({
           display: 'flex',
           flexDirection: 'column',
           gap: 16,
+          maxWidth: 560,
           paddingBottom: 32,
-          width: 560,
         }}
       >
         <div

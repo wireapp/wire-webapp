@@ -20,6 +20,7 @@
 import React from 'react';
 import useEffectRef from 'Util/useEffectRef';
 import {useFadingScrollbar} from '../../../ui/fadingScrollbar';
+import {ArrowIcon} from '@wireapp/react-ui-kit';
 
 interface PreferencesPageProps {
   title: string;
@@ -29,9 +30,21 @@ const PreferencesPage: React.FC<PreferencesPageProps> = ({title, children}) => {
   const [scrollbarRef, setScrollbarRef] = useEffectRef<HTMLDivElement>();
   useFadingScrollbar(scrollbarRef);
 
+  const openSidebar = (event: React.MouseEvent<HTMLButtonElement>) => {
+    event.preventDefault();
+    const app = document.querySelector<HTMLElement>('#app');
+    const leftColumn = app.querySelector<HTMLElement>('.left-column');
+    leftColumn.classList.add('open');
+  };
+
   return (
     <div style={{display: 'flex', flexDirection: 'column', height: '100vh'}}>
-      <div className="preferences-titlebar">{title}</div>
+      <div className="preferences-titlebar">
+        <button onClick={openSidebar} className="preferences-button">
+          <ArrowIcon direction="left" color="inherit"></ArrowIcon>
+        </button>
+        {title}
+      </div>
       <div className="preferences-content" ref={setScrollbarRef}>
         {children}
       </div>

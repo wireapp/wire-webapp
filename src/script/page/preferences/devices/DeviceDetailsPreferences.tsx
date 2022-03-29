@@ -24,6 +24,7 @@ import {t} from 'Util/LocalizerUtil';
 import DetailedDevice from './components/DetailedDevice';
 import {MotionDuration} from '../../../motion/MotionDuration';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
+import PreferencesPage from '../components/PreferencesPage';
 
 interface DevicesPreferencesProps {
   device: ClientEntity;
@@ -70,8 +71,7 @@ const DeviceDetailsPreferences: React.FC<DevicesPreferencesProps> = ({
       className="preferences-page preferences-device-details"
       data-uie-name="preferences-devices-details"
     >
-      <div className="preferences-titlebar" data-bind="text: t('preferencesDeviceDetails')"></div>
-      <div className="preferences-content" data-bind="fadingscrollbar">
+      <PreferencesPage title={t('preferencesDeviceDetails')}>
         <section className="preferences-section">
           <header className="preferences-devices-details">
             <button className="preferences-devices-icon icon-back" onClick={onClose} data-uie-name="go-back"></button>
@@ -138,7 +138,7 @@ const DeviceDetailsPreferences: React.FC<DevicesPreferencesProps> = ({
             </button>
           </section>
         )}
-      </div>
+      </PreferencesPage>
     </div>
   );
 };
