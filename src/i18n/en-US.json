@@ -502,7 +502,7 @@
   "groupParticipantActionUnblock": "Unblock…",
   "groupSizeInfo": "Up to {{count}} people can join a group conversation.",
   "guestLinkDisabled": "Generating guest links is not allowed in your team.",
-  "guestLinkDisabledOtherTeam": "You can't generate a guest link in this conversation, as it has been created by someone from another team and this team is not allowed to use guest links.",
+  "guestLinkDisabledByOtherTeam": "You can't generate a guest link in this conversation, as it has been created by someone from another team and this team is not allowed to use guest links.",
   "guestOptionsCopyLink": "Copy link",
   "guestOptionsCopyLinkDone": "Link copied!",
   "guestOptionsCreateLink": "Create link",
