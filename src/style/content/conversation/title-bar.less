@@ -72,13 +72,24 @@
   justify-content: flex-end;
 }
 
+.conversation-sidebar-open {
+  display: none !important;
+  @media (max-width: 600px) {
+    display: block !important;
+  }
+}
+
 .conversation-title-bar-icon {
   display: flex;
   height: 16px;
   flex: 0 0 auto;
   align-items: center;
+  padding: 0;
+  border: 0;
+  margin: 0;
   margin-right: 12px;
   margin-left: 12px;
+  background-color: transparent;
   cursor: pointer;
 
   svg path {

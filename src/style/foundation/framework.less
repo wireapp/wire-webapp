@@ -22,7 +22,6 @@
   .full-screen;
 
   display: flex;
-  min-width: @screen-md-min;
   background-color: var(--app-bg);
   transition: filter 0.3s;
 
@@ -32,6 +31,19 @@
     flex: 0 0 auto;
     color: @conversation-list-color;
     fill: @conversation-list-color;
+
+    @media (max-width: 600px) {
+      position: absolute;
+      left: 0;
+      transform: translateX(-100%);
+
+      &.open {
+        position: relative;
+        z-index: 50;
+        width: 100%;
+        transform: translateX(0);
+      }
+    }
 
     &--light-theme {
       color: var(--background);

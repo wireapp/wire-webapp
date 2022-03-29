@@ -2,6 +2,9 @@
 <div id="conversation-title-bar" class="conversation-title-bar">
   <!-- ko if: conversationEntity() -->
     <div class="conversation-title-bar-library">
+      <button class="conversation-title-bar-icon conversation-sidebar-open" data-bind="click: openLeftSidebar">
+        <arrow-left-icon class="modal__header__button"></arrow-left-icon>
+      </button>
       <!-- ko if: isActivatedAccount() -->
         <span class="conversation-title-bar-icon button-icon-large icon-search"
               data-bind="clickOrDrag: clickOnCollectionButton, attr: {title: t('tooltipConversationSearch')}"

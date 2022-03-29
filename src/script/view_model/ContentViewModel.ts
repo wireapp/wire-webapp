@@ -179,7 +179,13 @@ export class ContentViewModel {
       repositories.user,
       repositories.message,
     );
-    this.titleBar = new TitleBarViewModel(mainViewModel.calling, mainViewModel.panel, this, repositories.calling);
+    this.titleBar = new TitleBarViewModel(
+      mainViewModel.calling,
+      mainViewModel.panel,
+      this,
+      mainViewModel,
+      repositories.calling,
+    );
 
     this.historyExport = new HistoryExportViewModel(repositories.backup);
     this.historyImport = new HistoryImportViewModel(repositories.backup);
@@ -232,6 +238,10 @@ export class ContentViewModel {
 
   private _shiftContent(contentSelector: string): void {
     const incomingCssClass = 'content-animation-incoming-horizontal-left';
+
+    if (contentSelector.includes('preferences')) {
+      this.mainViewModel.closeSidebar();
+    }
 
     $(contentSelector)
       .removeClass(incomingCssClass)
@@ -314,6 +324,7 @@ export class ContentViewModel {
           entity: this.conversationState.activeConversation(),
         });
       }
+      this.mainViewModel.closeSidebar();
     } catch (error) {
       const isConversationNotFound = error.type === ConversationError.TYPE.CONVERSATION_NOT_FOUND;
       if (isConversationNotFound) {

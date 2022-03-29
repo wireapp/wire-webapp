@@ -40,6 +40,7 @@ import {CallState} from '../../calling/CallState';
 import {TeamState} from '../../team/TeamState';
 import {ConversationFilter} from '../../conversation/ConversationFilter';
 import {matchQualifiedIds} from 'Util/QualifiedId';
+import type {MainViewModel} from '../MainViewModel';
 
 // Parent: ContentViewModel
 export function generateWarningBadgeKey({
@@ -94,6 +95,7 @@ export class TitleBarViewModel {
     readonly callingViewModel: CallingViewModel,
     private readonly panelViewModel: PanelViewModel,
     readonly contentViewModel: ContentViewModel,
+    readonly mainViewModel: MainViewModel,
     private readonly callingRepository: CallingRepository,
     private readonly userState = container.resolve(UserState),
     private readonly conversationState = container.resolve(ConversationState),
@@ -101,6 +103,7 @@ export class TitleBarViewModel {
     private readonly teamState = container.resolve(TeamState),
   ) {
     this.contentViewModel = contentViewModel;
+    this.mainViewModel = mainViewModel;
 
     this.panelIsVisible = panelViewModel.isVisible;
     this.isConnectionRequest = ko.pureComputed(
@@ -199,6 +202,10 @@ export class TitleBarViewModel {
 
   readonly clickOnCollectionButton = (): void => {
     amplify.publish(WebAppEvents.CONTENT.SWITCH, ContentViewModel.STATE.COLLECTION);
+  };
+
+  readonly openLeftSidebar = (): void => {
+    this.mainViewModel.openSidebar();
   };
 
   readonly showAddParticipant = (): void => {

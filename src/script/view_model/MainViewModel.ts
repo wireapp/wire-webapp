@@ -216,6 +216,18 @@ export class MainViewModel {
     this.isPanelOpen(false);
   }
 
+  openSidebar = (): void => {
+    const app = document.querySelector<HTMLElement>('#app');
+    const leftColumn = app.querySelector<HTMLElement>('.left-column');
+    leftColumn.classList.add('open');
+  };
+
+  closeSidebar = (): void => {
+    const app = document.querySelector<HTMLElement>('#app');
+    const leftColumn = app.querySelector<HTMLElement>('.left-column');
+    leftColumn.classList.remove('open');
+  };
+
   readonly togglePanel = (forceState: string): Promise<void> => {
     const app = document.querySelector<HTMLElement>('#app');
     const panel = document.querySelector<HTMLElement>('.right-column');
