@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [18.8.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/compare/@wireapp/api-client@18.7.0...@wireapp/api-client@18.8.0) (2022-03-29)
+
+
+### Features
+
+* **api-client:** Add conversation guest link feature endpoint ([#4250](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/issues/4250)) ([ecbcb76](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/commit/ecbcb76448f7d39b5fc0428fcbe8dbf2ce40b199))
+
+
+
+
+
 # [18.7.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/compare/@wireapp/api-client@18.6.0...@wireapp/api-client@18.7.0) (2022-03-22)
 
 
