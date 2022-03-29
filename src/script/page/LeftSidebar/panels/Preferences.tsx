@@ -17,21 +17,20 @@
  *
  */
 
-import React from 'react';
+import React, {useEffect} from 'react';
 import {t} from 'Util/LocalizerUtil';
 
 import {Runtime} from '@wireapp/commons';
 import Icon from 'Components/Icon';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
-import {ListViewModel} from '../../../view_model/ListViewModel';
 import {ContentViewModel} from '../../../view_model/ContentViewModel';
 import ListWrapper from './ListWrapper';
+import {TeamRepository} from '../../../team/TeamRepository';
 
 type PreferencesProps = {
   contentViewModel: ContentViewModel;
-  isTemporaryGuest?: boolean;
-  listViewModel: ListViewModel;
   onClose: () => void;
+  teamRepository: TeamRepository;
 };
 
 const PreferenceItem: React.FC<{
@@ -58,8 +57,13 @@ const PreferenceItem: React.FC<{
   );
 };
 
-const Preferences: React.FC<PreferencesProps> = ({listViewModel, contentViewModel, onClose}) => {
+const Preferences: React.FC<PreferencesProps> = ({contentViewModel, teamRepository, onClose}) => {
   const {state: contentState} = useKoSubscribableChildren(contentViewModel, ['state']);
+
+  useEffect(() => {
+    // Update local team
+    teamRepository.getTeam();
+  }, []);
 
   const isDesktop = Runtime.isDesktopApp();
   const supportsCalling = Runtime.isSupportingLegacyCalling();
