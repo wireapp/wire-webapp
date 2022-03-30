@@ -92,6 +92,7 @@ exports[`"ErrorMessage" renders 1`] = `
     className="emotion-2"
   >
     <svg
+      aria-hidden="true"
       className="emotion-0"
       height={12}
       style={

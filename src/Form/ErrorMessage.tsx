@@ -45,7 +45,7 @@ export const filterErrorMessageProps = (props: ErrorMessageProps) => {
 
 export const ErrorMessage = ({children, ...props}: ErrorMessageProps) => (
   <FlexBox css={theme => errorMessageStyle(theme, props)} {...props}>
-    <ErrorIcon style={{marginRight: '8px'}} />
+    <ErrorIcon style={{marginRight: '8px'}} aria-hidden="true" />
     <Text color={COLOR.RED} fontSize={'11px'}>
       {children}
     </Text>
