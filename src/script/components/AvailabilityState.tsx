@@ -108,31 +108,14 @@ const AvailabilityState: React.FC<AvailabilityStateProps> = ({
         />
       )}
 
-      {label && !onClick && (
-        <label
+      {label && (
+        <span
           className="availability-state-label"
           css={theme ? {color: 'var(--accent-color)', userSelect: 'none'} : {userSelect: 'none'}}
           data-uie-name="status-label"
         >
           {label}
-        </label>
-      )}
-
-      {label && onClick && (
-        <button
-          type="button"
-          className="availability-state-label"
-          css={
-            theme
-              ? {...buttonCommonStyles, color: 'var(--accent-color)', userSelect: 'none'}
-              : {...buttonCommonStyles, userSelect: 'none'}
-          }
-          data-uie-name="status-label"
-          onClick={onClick}
-          onKeyDown={handleKeyDown}
-        >
-          {label}
-        </button>
+        </span>
       )}
 
       {showArrow && (
@@ -159,11 +142,30 @@ const AvailabilityState: React.FC<AvailabilityStateProps> = ({
     </span>
   );
 
+  const wrappedContent = onClick ? (
+    <button
+      type="button"
+      className="availability-state-label"
+      css={
+        theme
+          ? {...buttonCommonStyles, color: 'var(--accent-color)', userSelect: 'none'}
+          : {...buttonCommonStyles, userSelect: 'none'}
+      }
+      data-uie-name="status-label"
+      onClick={onClick}
+      onKeyDown={handleKeyDown}
+    >
+      {content}
+    </button>
+  ) : (
+    content
+  );
+
   if (className) {
-    return <span className={`availability-state ${className}`}>{content}</span>;
+    return <span className={`availability-state ${className}`}>{wrappedContent}</span>;
   }
 
-  return content;
+  return wrappedContent;
 };
 
 export default AvailabilityState;

@@ -49,7 +49,7 @@ const ServiceList: React.FC<ServiceListProps> = ({
   noUnderline,
   services,
 }) => {
-  const handleKeyPress = (event: React.KeyboardEvent<HTMLDivElement>, service: ServiceEntity) => {
+  const handleKeyDown = (event: React.KeyboardEvent<HTMLDivElement>, service: ServiceEntity) => {
     if (event.key === KEY.ENTER || event.key === KEY.SPACE) {
       click(service);
     }
@@ -60,15 +60,14 @@ const ServiceList: React.FC<ServiceListProps> = ({
       <ul className={cx('search-list', mode === MODE.COMPACT ? 'search-list-sm' : 'search-list-lg')}>
         {services.map(service => (
           <li key={service.id}>
-            <div
-              className="search-list-button"
-              onClick={() => click(service)}
-              onKeyPress={event => handleKeyPress(event, service)}
-              role="button"
-              tabIndex={0}
-              data-uie-name={`service-list-service-${service.id}`}
-            >
-              <ParticipantItem participant={service} noUnderline={noUnderline} showArrow={arrow} />
+            <div className="search-list-button" data-uie-name={`service-list-service-${service.id}`}>
+              <ParticipantItem
+                participant={service}
+                noUnderline={noUnderline}
+                showArrow={arrow}
+                onClick={() => click(service)}
+                onKeyDown={event => handleKeyDown(event, service)}
+              />
             </div>
           </li>
         ))}
