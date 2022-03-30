@@ -109,13 +109,13 @@ const AvailabilityState: React.FC<AvailabilityStateProps> = ({
       )}
 
       {label && (
-        <label
+        <span
           className="availability-state-label"
           css={theme ? {color: 'var(--accent-color)', userSelect: 'none'} : {userSelect: 'none'}}
           data-uie-name="status-label"
         >
           {label}
-        </label>
+        </span>
       )}
 
       {showArrow && (
