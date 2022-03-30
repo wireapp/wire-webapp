@@ -339,3 +339,15 @@ export function throttle(callback: Function, wait: number, immediate = false) {
     }
   };
 }
+
+export const toggleLeftSidebar = (open: boolean) => {
+  const app = document.querySelector<HTMLElement>('#app');
+  const leftColumn = app.querySelector<HTMLElement>('.left-column');
+  if (!open) {
+    leftColumn.classList.remove('open');
+    return;
+  }
+  if (!leftColumn.classList.contains('open')) {
+    leftColumn.classList.add('open');
+  }
+};

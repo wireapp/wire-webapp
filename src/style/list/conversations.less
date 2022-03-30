@@ -30,9 +30,12 @@
   }
 
   .left-list-header-text {
-    max-width: 208px;
     flex: 1;
     text-align: center;
+
+    @media (min-width: 600px) {
+      max-width: 208px;
+    }
   }
 }
 

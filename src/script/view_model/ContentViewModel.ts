@@ -22,7 +22,7 @@ import {ConnectionStatus} from '@wireapp/api-client/src/connection/';
 
 import {getLogger, Logger} from 'Util/Logger';
 import {t} from 'Util/LocalizerUtil';
-import {alias} from 'Util/util';
+import {alias, toggleLeftSidebar} from 'Util/util';
 import ko from 'knockout';
 import {amplify} from 'amplify';
 import {container} from 'tsyringe';
@@ -179,13 +179,7 @@ export class ContentViewModel {
       repositories.user,
       repositories.message,
     );
-    this.titleBar = new TitleBarViewModel(
-      mainViewModel.calling,
-      mainViewModel.panel,
-      this,
-      mainViewModel,
-      repositories.calling,
-    );
+    this.titleBar = new TitleBarViewModel(mainViewModel.calling, mainViewModel.panel, this, repositories.calling);
 
     this.historyExport = new HistoryExportViewModel(repositories.backup);
     this.historyImport = new HistoryImportViewModel(repositories.backup);
@@ -229,6 +223,7 @@ export class ContentViewModel {
       this.legalHoldModal.showRequestModal();
     }
     ko.applyBindings(this, document.getElementById(this.elementId));
+    this.openSidebar();
   }
 
   private _initSubscriptions() {
@@ -240,7 +235,7 @@ export class ContentViewModel {
     const incomingCssClass = 'content-animation-incoming-horizontal-left';
 
     if (contentSelector.includes('preferences')) {
-      this.mainViewModel.closeSidebar();
+      this.closeSidebar();
     }
 
     $(contentSelector)
@@ -251,6 +246,14 @@ export class ContentViewModel {
         $(this).removeClass(incomingCssClass).off(alias.animationend);
       });
   }
+
+  readonly closeSidebar = (): void => {
+    toggleLeftSidebar(false);
+  };
+
+  readonly openSidebar = (): void => {
+    toggleLeftSidebar(true);
+  };
 
   /**
    * Opens the specified conversation.
@@ -324,7 +327,7 @@ export class ContentViewModel {
           entity: this.conversationState.activeConversation(),
         });
       }
-      this.mainViewModel.closeSidebar();
+      this.closeSidebar();
     } catch (error) {
       const isConversationNotFound = error.type === ConversationError.TYPE.CONVERSATION_NOT_FOUND;
       if (isConversationNotFound) {

@@ -56,11 +56,14 @@
 .left-list-header-availability .availability-state {
   position: relative;
   overflow: hidden;
-  max-width: 208px;
   flex: 1;
   justify-content: center;
   margin-left: 8px;
   cursor: pointer;
+
+  @media (min-width: 600px) {
+    max-width: 208px;
+  }
 
   .availability-state-label {
     .ellipsis-nowrap;

@@ -21,6 +21,7 @@ import React from 'react';
 import useEffectRef from 'Util/useEffectRef';
 import {useFadingScrollbar} from '../../../ui/fadingScrollbar';
 import {ArrowIcon} from '@wireapp/react-ui-kit';
+import {toggleLeftSidebar} from 'Util/util';
 
 interface PreferencesPageProps {
   title: string;
@@ -32,9 +33,7 @@ const PreferencesPage: React.FC<PreferencesPageProps> = ({title, children}) => {
 
   const openSidebar = (event: React.MouseEvent<HTMLButtonElement>) => {
     event.preventDefault();
-    const app = document.querySelector<HTMLElement>('#app');
-    const leftColumn = app.querySelector<HTMLElement>('.left-column');
-    leftColumn.classList.add('open');
+    toggleLeftSidebar(true);
   };
 
   return (
