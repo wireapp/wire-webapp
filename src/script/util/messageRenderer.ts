@@ -138,7 +138,7 @@ export const renderMessage = (message: string, selfId: QualifiedId | null, menti
       if (containsMentions) {
         // disable code highlighting if there is a mention in there
         // highlighting will be wrong anyway because this is not valid code
-        return code;
+        return escape(code);
       }
       return hljs.highlightAuto(code, lang && [lang]).value;
     },
@@ -148,7 +148,7 @@ export const renderMessage = (message: string, selfId: QualifiedId | null, menti
     const cleanString = (hashedString: string) =>
       escape(
         Object.entries(mentionTexts).reduce(
-          (text, [mentionHash, mention]) => text.replace(mentionHash, mention.text),
+          (text, [mentionHash, mention]) => text.replace(mentionHash, () => mention.text),
           hashedString,
         ),
       );
@@ -214,7 +214,7 @@ export const renderMessage = (message: string, selfId: QualifiedId | null, menti
   const parsedText = Object.keys(mentionTexts).reduce((text, mentionHash) => {
     const mentionMarkup = renderMention(mentionTexts[mentionHash]);
 
-    return text.replace(mentionHash, mentionMarkup);
+    return text.replace(mentionHash, () => mentionMarkup);
   }, mentionlessText);
   return parsedText;
 };
