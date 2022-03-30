@@ -21,7 +21,6 @@ import React from 'react';
 import ko from 'knockout';
 import {render} from '@testing-library/react';
 import Preferences from './Preferences';
-import {ListViewModel} from 'src/script/view_model/ListViewModel';
 import {ContentViewModel} from 'src/script/view_model/ContentViewModel';
 
 import {Runtime} from '@wireapp/commons';
@@ -31,10 +30,8 @@ describe('Preferences', () => {
     contentViewModel: {
       state: ko.observable(''),
     } as ContentViewModel,
-    listViewModel: {
-      state: ko.observable(''),
-    } as ListViewModel,
     onClose: jest.fn(),
+    teamRepository: {getTeam: jest.fn()},
   };
 
   it('renders the right preferences items', () => {
