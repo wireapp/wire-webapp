@@ -65,7 +65,7 @@ const CreatePersonalAccount = ({isPersonalFlow, enterPersonalCreationFlow}: Prop
   return (
     <Page>
       <IsMobile>
-        <div style={{margin: 16}}>{backArrow}</div>
+        <div style={{margin: 16, position: 'absolute'}}>{backArrow}</div>
       </IsMobile>
       {isPersonalFlow ? (
         <Container centerText verticalCenter style={{width: '100%'}}>
@@ -75,7 +75,7 @@ const CreatePersonalAccount = ({isPersonalFlow, enterPersonalCreationFlow}: Prop
                 <div style={{margin: 'auto'}}>{backArrow}</div>
               </Column>
             </IsMobile>
-            <Column style={{flexBasis: 384, flexGrow: 0, padding: 0}}>{pageContent}</Column>
+            <Column style={{padding: '0 16px'}}>{pageContent}</Column>
             <Column />
           </Columns>
         </Container>
