@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [7.55.1](https://github.com/wireapp/wire-web-packages/tree/main/packages/react-ui-kit/compare/@wireapp/react-ui-kit@7.55.0...@wireapp/react-ui-kit@7.55.1) (2022-03-30)
+
+
+### Bug Fixes
+
+* **react-ui-kit/accessibility:** add aria-hidden to error message icon #ACC-23 ([#4249](https://github.com/wireapp/wire-web-packages/tree/main/packages/react-ui-kit/issues/4249)) ([f18e4ff](https://github.com/wireapp/wire-web-packages/tree/main/packages/react-ui-kit/commit/f18e4ff57d73a60b2a681f5c6db701e9cd029102)), closes [#ACC-23](https://github.com/wireapp/wire-web-packages/tree/main/packages/react-ui-kit/issues/ACC-23)
+
+
+
+
+
 # [7.55.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/react-ui-kit/compare/@wireapp/react-ui-kit@7.54.0...@wireapp/react-ui-kit@7.55.0) (2021-12-02)
 
 
