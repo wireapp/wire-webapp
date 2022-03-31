@@ -248,9 +248,9 @@ const AppLock: React.FC<AppLockProps> = ({
   return (
     <ModalComponent isShown={isVisible} showLoading={isLoading} onClosed={onClosed} data-uie-name="applock-modal">
       <div className="modal__header">
-        <div className="modal__header__title" data-uie-name="applock-modal-header">
+        <h2 className="modal__header__title" data-uie-name="applock-modal-header">
           {headerText()}
-        </div>
+        </h2>
       </div>
       <div className="modal__body" data-uie-name="applock-modal-body" data-uie-value={state}>
         {state === APPLOCK_STATE.SETUP && (
