@@ -128,7 +128,7 @@ const DevicesPreferences: React.FC<DevicesPreferencesProps> = ({
 
   return (
     <div id="preferences-devices" className="preferences-page preferences-devices">
-      <div className="preferences-titlebar">{t('preferencesDevices')}</div>
+      <h2 className="preferences-titlebar">{t('preferencesDevices')}</h2>
       <div className="preferences-content" ref={setScrollbarRef}>
         <section className="preferences-section" data-uie-name="preferences-device-current">
           <header className="preferences-header">{t('preferencesDevicesCurrent')}</header>

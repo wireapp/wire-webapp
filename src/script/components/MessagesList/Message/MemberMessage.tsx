@@ -109,7 +109,7 @@ const MemberMessage: React.FC<MemberMessageProps> = ({
                 className="message-group-creation-header-text"
                 dangerouslySetInnerHTML={{__html: htmlGroupCreationHeader}}
               />
-              <div className="message-group-creation-header-name">{name}</div>
+              <h2 className="message-group-creation-header-name">{name}</h2>
             </div>
           )}
 

@@ -173,7 +173,7 @@ const Collection: React.FC<CollectionDetailsProps> = ({conversation, conversatio
             <Icon.Close />
           </button>
         </div>
-        <span className="content-titlebar-items-center">{display_name}</span>
+        <h2 className="content-titlebar-items-center">{display_name}</h2>
       </div>
 
       <div className="content-list-wrapper">

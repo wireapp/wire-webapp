@@ -4,7 +4,7 @@
     data-bind="attr: {'data-uie-name': content().modalUie}"
   >
     <div class="modal__header" data-uie-name="status-modal-title">
-      <div class="modal__header__title" id="modal-title" data-bind="text: content().titleText"></div>
+      <h2 class="modal__header__title" id="modal-title" data-bind="text: content().titleText"></h2>
       <!-- ko if: content().showClose -->
         <close-icon class="modal__header__button" data-bind="click: hide" data-uie-name="do-close"></close-icon>
       <!-- /ko -->

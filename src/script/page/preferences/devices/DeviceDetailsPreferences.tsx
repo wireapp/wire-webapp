@@ -70,7 +70,7 @@ const DeviceDetailsPreferences: React.FC<DevicesPreferencesProps> = ({
       className="preferences-page preferences-device-details"
       data-uie-name="preferences-devices-details"
     >
-      <div className="preferences-titlebar">{t('preferencesDeviceDetails')}</div>
+      <h2 className="preferences-titlebar">{t('preferencesDeviceDetails')}</h2>
       <div className="preferences-content">
         <section className="preferences-section">
           <header className="preferences-devices-details">
@@ -79,7 +79,7 @@ const DeviceDetailsPreferences: React.FC<DevicesPreferencesProps> = ({
               className="preferences-devices-icon icon-back"
               onClick={onClose}
               data-uie-name="go-back"
-            ></button>
+            />
             <span>{t('preferencesDevices')}</span>
           </header>
           <DetailedDevice device={device} fingerprint={fingerprint} />
