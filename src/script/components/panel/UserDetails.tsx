@@ -74,9 +74,9 @@ const UserDetails: React.FC<UserDetailsProps> = ({
             dataUieName="status-name"
           />
         ) : (
-          <div className="panel-participant__head__name" data-uie-name="status-name">
+          <h2 className="panel-participant__head__name" data-uie-name="status-name">
             {user.name}
-          </div>
+          </h2>
         )}
         {isSelfVerified && user.is_verified && (
           <Icon.Verified
