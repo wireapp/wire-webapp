@@ -10,7 +10,7 @@
   "BackendError.LABEL.EMAIL_EXISTS": "Die angegebene E-Mail-Adresse wird bereits verwendet. {supportEmailExistsLink}",
   "BackendError.LABEL.HANDLE_EXISTS": "Dieser Benutzername ist bereits vergeben",
   "BackendError.LABEL.HANDLE_TOO_SHORT": "Bitte einen Benutzernamen mit mindestens zwei Zeichen eingeben",
-  "BackendError.LABEL.INVALID_CODE": "Invalid code, or maximum attempts exceeded. Please retry, or request another code.",
+  "BackendError.LABEL.INVALID_CODE": "Please retry, or request another code.",
   "BackendError.LABEL.INVALID_CREDENTIALS": "Bitte Eingaben überprüfen und nochmal versuchen",
   "BackendError.LABEL.INVALID_EMAIL": "Diese E-Mail-Adresse ist ungültig",
   "BackendError.LABEL.INVALID_HANDLE": "Dieser Benutzername ist ungültig",

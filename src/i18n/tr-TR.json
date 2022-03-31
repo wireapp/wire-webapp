@@ -10,7 +10,7 @@
   "BackendError.LABEL.EMAIL_EXISTS": "E-posta zaten kullanılıyor. {supportEmailExistsLink}",
   "BackendError.LABEL.HANDLE_EXISTS": "Bu kullanıcı adı zaten alınmış",
   "BackendError.LABEL.HANDLE_TOO_SHORT": "Lütfen en az 2 karakterden oluşan bir kullanıcı adı girin",
-  "BackendError.LABEL.INVALID_CODE": "Invalid code, or maximum attempts exceeded. Please retry, or request another code.",
+  "BackendError.LABEL.INVALID_CODE": "Please retry, or request another code.",
   "BackendError.LABEL.INVALID_CREDENTIALS": "Lütfen bilgilerinizi doğrulayın ve yeniden deneyin",
   "BackendError.LABEL.INVALID_EMAIL": "Bu e-posta adresi geçersiz",
   "BackendError.LABEL.INVALID_HANDLE": "Bu kullanıcı adı geçersiz",

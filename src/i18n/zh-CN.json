@@ -10,7 +10,7 @@
   "BackendError.LABEL.EMAIL_EXISTS": "此电子邮件地址已经注册。{supportEmailExistsLink}",
   "BackendError.LABEL.HANDLE_EXISTS": "此用户名已被使用",
   "BackendError.LABEL.HANDLE_TOO_SHORT": "请输入至少2个字符的用户名",
-  "BackendError.LABEL.INVALID_CODE": "Invalid code, or maximum attempts exceeded. Please retry, or request another code.",
+  "BackendError.LABEL.INVALID_CODE": "Please retry, or request another code.",
   "BackendError.LABEL.INVALID_CREDENTIALS": "请检查您提供的资料然后重试。",
   "BackendError.LABEL.INVALID_EMAIL": "该电子邮件地址无效。",
   "BackendError.LABEL.INVALID_HANDLE": "用户名无效",

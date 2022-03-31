@@ -10,7 +10,7 @@
   "BackendError.LABEL.EMAIL_EXISTS": "A megadott e-mail cím már használatban van. {supportEmailExistsLink}",
   "BackendError.LABEL.HANDLE_EXISTS": "A felhasználónév már foglalt",
   "BackendError.LABEL.HANDLE_TOO_SHORT": "Kérjük, legalább 2 karakterből álló nevet adj meg",
-  "BackendError.LABEL.INVALID_CODE": "Invalid code, or maximum attempts exceeded. Please retry, or request another code.",
+  "BackendError.LABEL.INVALID_CODE": "Please retry, or request another code.",
   "BackendError.LABEL.INVALID_CREDENTIALS": "Kérjük, ellenőrizd az adataid, majd próbáld meg újra",
   "BackendError.LABEL.INVALID_EMAIL": "Érvénytelen e-mail cím",
   "BackendError.LABEL.INVALID_HANDLE": "Ez a felhasználónév érvénytelen",
