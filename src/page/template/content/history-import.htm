@@ -9,13 +9,13 @@
   <!-- ko if: isDone -->
     <div class="history-message">
       <check-icon></check-icon>
-      <div class="history-message__headline" data-bind="text: t('backupImportSuccessHeadline')" data-uie-name="status-history-import-success"></div>
+      <h2 class="history-message__headline" data-bind="text: t('backupImportSuccessHeadline')" data-uie-name="status-history-import-success"></h2>
     </div>
   <!-- /ko -->
   <!-- ko if: error -->
     <div class="history-message">
-      <div class="history-message__headline" data-bind="text: errorHeadline" data-uie-name="status-history-import-error-headline"></div>
-      <div class="history-message__info" data-bind="text: errorSecondary" data-uie-name="status-history-import-error-info"></div>
+      <h2 class="history-message__headline" data-bind="text: errorHeadline" data-uie-name="status-history-import-error-headline"></h2>
+      <p class="history-message__info" data-bind="text: errorSecondary" data-uie-name="status-history-import-error-info"></p>
       <div class="history-message__buttons">
         <button class="button" data-bind="text: t('backupCancel'), click: dismissImport" data-uie-name="do-dismiss-history-import-error"></button>
       </div>
