@@ -31,7 +31,7 @@ const PreferencesPage: React.FC<PreferencesPageProps> = ({title, children}) => {
 
   return (
     <div style={{display: 'flex', flexDirection: 'column', height: '100vh'}}>
-      <div className="preferences-titlebar">{title}</div>
+      <h2 className="preferences-titlebar">{title}</h2>
       <div className="preferences-content" ref={setScrollbarRef}>
         {children}
       </div>
