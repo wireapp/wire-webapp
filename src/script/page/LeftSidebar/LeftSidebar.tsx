@@ -54,6 +54,7 @@ const LeftSidebar: React.FC<LeftSidebarProps> = ({
   selfUser,
 }) => {
   const {conversationRepository, propertiesRepository} = listViewModel;
+  const repositories = listViewModel.contentViewModel.repositories;
   const {state} = useKoSubscribableChildren(listViewModel, ['state']);
   let content = <span></span>;
   const switchList = (list: ListState) => listViewModel.switchList(list);
@@ -74,7 +75,7 @@ const LeftSidebar: React.FC<LeftSidebarProps> = ({
       content = (
         <Conversations
           listViewModel={listViewModel}
-          preferenceNotificationRepository={listViewModel.contentViewModel.repositories.preferenceNotification}
+          preferenceNotificationRepository={repositories.preferenceNotification}
           conversationRepository={conversationRepository}
           propertiesRepository={propertiesRepository}
           switchList={switchList}
@@ -86,7 +87,7 @@ const LeftSidebar: React.FC<LeftSidebarProps> = ({
       content = (
         <Preferences
           contentViewModel={listViewModel.contentViewModel}
-          listViewModel={listViewModel}
+          teamRepository={repositories.team}
           onClose={goHome}
         ></Preferences>
       );

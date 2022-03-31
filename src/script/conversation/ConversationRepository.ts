@@ -1120,6 +1120,7 @@ export class ConversationRepository {
               amplify.publish(WebAppEvents.CONVERSATION.SHOW, conversationEntity, {});
             } catch (error) {
               switch (error.label) {
+                case BackendErrorLabel.ACCESS_DENIED:
                 case BackendErrorLabel.NO_CONVERSATION:
                 case BackendErrorLabel.NO_CONVERSATION_CODE: {
                   showNoConversationModal();
