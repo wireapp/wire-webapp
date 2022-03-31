@@ -24,7 +24,7 @@
         <!-- ko if: conversationEntity().verification_state() === ConversationVerificationState.VERIFIED -->
           <verified-icon class="conversation-title-bar-name--verified"></verified-icon>
         <!-- /ko -->
-        <span class="conversation-title-bar-name-label" data-bind="text: conversationEntity().display_name()" data-uie-name="status-conversation-title-bar-label"></span>
+        <h2 class="conversation-title-bar-name-label" data-bind="text: conversationEntity().display_name()" data-uie-name="status-conversation-title-bar-label"></h2>
       </div>
       <!-- ko if: conversationSubtitle() -->
         <div class="conversation-title-bar-name--subtitle" data-bind="text: conversationSubtitle()"></div>
@@ -40,7 +40,7 @@
               data-uie-name="do-video-call">
             <camera-icon></camera-icon>
           </button>
-           
+
           <!-- /ko -->
           <button type="button" class="conversation-title-bar-icon"
             data-bind="clickOrDrag: () => callActions.startAudio($parent.conversationEntity()), attr: {title: t('tooltipConversationCall'), 'aria-label': t('tooltipConversationCall')}"
@@ -49,7 +49,7 @@
           </button>
         <!-- /ko -->
       <!-- /ko -->
-      <button type="button" class="conversation-title-bar-icon" 
+      <button type="button" class="conversation-title-bar-icon"
         data-bind="clickOrDrag: clickOnDetails, css: {'conversation-title-bar-icon--active': panelIsVisible()}, attr: {title: t('tooltipConversationInfo'), 'aria-label': t('tooltipConversationInfo')}"
         data-uie-name="do-open-info">
         <info-icon></info-icon>
