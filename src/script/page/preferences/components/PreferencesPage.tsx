@@ -37,7 +37,7 @@ const PreferencesPage: React.FC<PreferencesPageProps> = ({title, children}) => {
   };
 
   return (
-    <div style={{display: 'flex', flexDirection: 'column', height: '100vh'}}>
+    <div style={{display: 'flex', flexDirection: 'column', height: 'calc(var(--vh, 1vh) * 100)'}}>
       <div className="preferences-titlebar">
         <button onClick={openSidebar} className="preferences-button">
           <ArrowIcon direction="left" color="inherit"></ArrowIcon>
