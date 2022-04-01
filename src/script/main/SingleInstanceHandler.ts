@@ -104,7 +104,9 @@ export class SingleInstanceHandler {
   }
 
   private _isSingleRunningInstance(): boolean {
-    if (Runtime.isDesktopApp() || Runtime.isIOS()) {
+    // eslint-disable-next-line
+    console.log('isIos', Runtime.isIOS());
+    if (Runtime.isDesktopApp() || Runtime.isMobileOS()) {
       return true;
     }
     const cookieValue = Cookies.get(CONFIG.COOKIE_NAME);
