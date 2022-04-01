@@ -109,9 +109,22 @@
   }
 
   &__wrapper {
+    .list-unstyled;
+
     display: flex;
     width: 100%;
     justify-content: center;
+    margin: 0;
+  }
+
+  &__item {
+    &:first-child {
+      margin: 0 52px 0 0;
+    }
+
+    &:last-child {
+      margin: 0 0 0 52px;
+    }
   }
 
   &__button {
@@ -128,14 +141,6 @@
     border-radius: 32px;
     cursor: pointer;
     line-height: 0;
-
-    &:first-child {
-      margin: 0 52px 0 0;
-    }
-
-    &:last-child {
-      margin: 0 0 0 52px;
-    }
 
     svg > path {
       fill: #fff;
