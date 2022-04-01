@@ -10,7 +10,7 @@
   "BackendError.LABEL.EMAIL_EXISTS": "See e-posti aadress on juba kasutusel. {supportEmailExistsLink}",
   "BackendError.LABEL.HANDLE_EXISTS": "See kasutajanimi on juba kasutusel",
   "BackendError.LABEL.HANDLE_TOO_SHORT": "Palun sisesta vähemalt 2-tähemärgiline kasutajanimi",
-  "BackendError.LABEL.INVALID_CODE": "Invalid code, or maximum attempts exceeded. Please retry, or request another code.",
+  "BackendError.LABEL.INVALID_CODE": "Please retry, or request another code.",
   "BackendError.LABEL.INVALID_CREDENTIALS": "Palun kinnita oma andmed ja proovi uuesti",
   "BackendError.LABEL.INVALID_EMAIL": "See e-posti aadress on sobimatu",
   "BackendError.LABEL.INVALID_HANDLE": "See kasutajanimi on sobimatu",

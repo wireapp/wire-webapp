@@ -10,7 +10,7 @@
   "BackendError.LABEL.EMAIL_EXISTS": "Ця адреса електронної пошти вже використовується. {supportEmailExistsLink}",
   "BackendError.LABEL.HANDLE_EXISTS": "Даний нік вже використовується",
   "BackendError.LABEL.HANDLE_TOO_SHORT": "Будь ласка, введіть ім'я користувача, яке містить принаймні 2 символи",
-  "BackendError.LABEL.INVALID_CODE": "Invalid code, or maximum attempts exceeded. Please retry, or request another code.",
+  "BackendError.LABEL.INVALID_CODE": "Please retry, or request another code.",
   "BackendError.LABEL.INVALID_CREDENTIALS": "Будь ласка, перевірте ваші дані та повторіть спробу",
   "BackendError.LABEL.INVALID_EMAIL": "Дана email-адреса помилкова",
   "BackendError.LABEL.INVALID_HANDLE": "Даний нік невалідний",

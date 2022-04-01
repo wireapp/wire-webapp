@@ -10,7 +10,7 @@
   "BackendError.LABEL.EMAIL_EXISTS": "Tato e-mailová adresa je již používána. {supportEmailExistsLink}",
   "BackendError.LABEL.HANDLE_EXISTS": "Toto uživatelské jméno je již obsazeno",
   "BackendError.LABEL.HANDLE_TOO_SHORT": "Prosím, zadejte uživatelské jméno s alespoň 2 znaky",
-  "BackendError.LABEL.INVALID_CODE": "Invalid code, or maximum attempts exceeded. Please retry, or request another code.",
+  "BackendError.LABEL.INVALID_CODE": "Please retry, or request another code.",
   "BackendError.LABEL.INVALID_CREDENTIALS": "Zkontrolujte prosím své údaje a zkuste znovu",
   "BackendError.LABEL.INVALID_EMAIL": "Tato emailová adresa je neplatná",
   "BackendError.LABEL.INVALID_HANDLE": "Neplatné uživatelské jméno",

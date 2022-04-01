@@ -492,7 +492,7 @@ export const errorHandlerStrings = defineMessages({
     id: 'BackendErrorLabel.DOMAIN_BLOCKED_FOR_REGISTRATION',
   },
   [BackendError.LABEL.INVALID_CODE]: {
-    defaultMessage: 'Invalid code, or maximum attempts exceeded. Please retry, or request another code.',
+    defaultMessage: 'Please retry, or request another code.',
     id: 'BackendError.LABEL.INVALID_CODE',
   },
   [BackendError.LABEL.INVALID_CREDENTIALS]: {
@@ -632,7 +632,7 @@ export const errorHandlerStrings = defineMessages({
     id: 'BackendError.LABEL.SSO_UNSUPPORTED_SAML',
   },
   [BackendError.LABEL.CODE_AUTHENTICATION_FAILED]: {
-    defaultMessage: 'Please try again',
+    defaultMessage: 'Please retry, or request another code.',
     id: 'BackendError.LABEL.CODE_AUTHENTICATION_FAILED',
   },
   [BackendError.LABEL.SSO_GENERIC_ERROR]: {
