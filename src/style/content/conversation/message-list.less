@@ -275,6 +275,10 @@
   border: none;
   margin-left: 16px;
   background: @separator-color;
+
+  @media (max-width: 600px) {
+    min-width: @conversation-message-sender-width;
+  }
 }
 
 // MESSAGE - TIMESTAMP
@@ -309,6 +313,10 @@
     border: 0;
     margin-right: @conversation-message-timestamp-width;
 
+    @media (max-width: 600px) {
+      margin-right: @conversation-message-sender-width;
+    }
+
     .message-header-label {
       border-bottom: 1px dotted @separator-color;
     }
@@ -337,6 +345,10 @@
   padding-right: @conversation-message-timestamp-width;
   padding-left: @conversation-message-sender-width;
   margin-top: -5px;
+
+  @media (max-width: 600px) {
+    padding-right: @conversation-message-sender-width;
+  }
 
   .text {
     .text-selection;
@@ -481,6 +493,10 @@
   margin-right: @conversation-message-timestamp-width;
   margin-left: @conversation-message-sender-width;
 
+  @media (max-width: 600px) {
+    margin-right: @conversation-message-sender-width;
+  }
+
   > *:not(:last-child) {
     margin-right: 8px;
     margin-bottom: 8px;
@@ -517,6 +533,10 @@
   width: @conversation-message-timestamp-width;
   height: @line-height-lg;
   align-items: center;
+
+  @media (max-width: 600px) {
+    width: @conversation-message-sender-width;
+  }
 
   // actions pill
   .action-pill-style() {
