@@ -21,7 +21,7 @@ import {AudioPreference, WebappProperties} from '@wireapp/api-client/src/user/da
 import {WebAppEvents} from '@wireapp/webapp-events';
 import {amplify} from 'amplify';
 import {container} from 'tsyringe';
-
+import {Runtime} from '@wireapp/commons';
 import {Logger, getLogger} from 'Util/Logger';
 
 import {NOTIFICATION_HANDLING_STATE} from '../event/NotificationHandlingState';
@@ -86,7 +86,7 @@ export class AudioRepository {
 
   private updateSinkIds() {
     const currentOutputDevice = this.devicesHandler?.currentDeviceId[DeviceTypes.AUDIO_OUTPUT]();
-    if (!currentOutputDevice) {
+    if (!currentOutputDevice || Runtime.isMobileOS()) {
       return;
     }
     Object.values(this.audioElements).forEach(element => {
