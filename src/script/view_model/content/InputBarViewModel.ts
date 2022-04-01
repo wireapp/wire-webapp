@@ -737,7 +737,7 @@ export class InputBarViewModel {
           `${window?.visualViewport?.height || window.innerHeight - 270}px`,
         );
         conversation.classList.add('ios-keyboard-open');
-      }, 300);
+      }, 250);
     });
     this.textarea.addEventListener('blur', () => {
       conversation.classList.remove('ios-keyboard-open');
