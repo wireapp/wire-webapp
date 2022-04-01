@@ -105,7 +105,7 @@ const DevicesPreferences: React.FC<DevicesPreferencesProps> = ({
   const {clients, currentClient} = useKoSubscribableChildren(clientState, ['clients', 'currentClient']);
   const {self} = useKoSubscribableChildren(userState, ['self']);
   const isSSO = self?.isSingleSignOn;
-  const [scrollbarRef, setScrollbarRef] = useEffectRef<HTMLDivElement>();
+  const [scrollbarRef] = useEffectRef<HTMLDivElement>();
   const getFingerprint = (device: ClientEntity) =>
     cryptographyRepository.getRemoteFingerprint(self.qualifiedId, device.id);
   useFadingScrollbar(scrollbarRef);
