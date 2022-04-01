@@ -338,6 +338,10 @@
   padding-left: @conversation-message-sender-width;
   margin-top: -5px;
 
+  @media (max-width: 600px) {
+    padding-right: @conversation-message-sender-width;
+  }
+
   .text {
     .text-selection;
     .accent-selection;
@@ -517,6 +521,10 @@
   width: @conversation-message-timestamp-width;
   height: @line-height-lg;
   align-items: center;
+
+  @media (max-width: 600px) {
+    width: @conversation-message-sender-width;
+  }
 
   // actions pill
   .action-pill-style() {
