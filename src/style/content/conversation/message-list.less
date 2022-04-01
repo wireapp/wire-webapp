@@ -178,6 +178,10 @@
   font-weight: @font-weight-regular;
   white-space: normal;
 
+  @media (max-width: 600px) {
+    max-width: calc(100% - 120px);
+  }
+
   a {
     cursor: pointer;
   }
@@ -604,6 +608,11 @@
 .message-status,
 .message-status-read {
   left: 83px;
+
+  @media (max-width: 600px) {
+    left: 32px;
+  }
+
   &::before {
     display: flex;
     width: 16px;
