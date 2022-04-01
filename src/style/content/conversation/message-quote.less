@@ -6,6 +6,10 @@
   font-size: 14px;
   line-height: 1.5em;
 
+  @media (max-width: 600px) {
+    padding-right: @conversation-message-sender-width;
+  }
+
   &::before {
     position: absolute;
     top: 0;
