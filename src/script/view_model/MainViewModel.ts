@@ -201,6 +201,8 @@ export class MainViewModel {
     // Prevent Chrome (and Electron) from pushing the content out of the
     // viewport when using form elements (e.g. in the preferences)
     document.addEventListener('scroll', () => window.scrollTo(0, 0));
+    const vh = window.innerHeight * 0.01;
+    document.documentElement.style.setProperty('--vh', `${vh}px`);
   }
 
   openPanel(): Promise<void> {
