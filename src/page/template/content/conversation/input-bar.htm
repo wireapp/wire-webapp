@@ -89,6 +89,11 @@
         <mention-suggestions params="suggestions: mentionSuggestions, targetInputSelector: '#conversation-input-bar-text', onSelectionValidated: addMention"></mention-suggestions>
 
         <div class="controls-right">
+           <!-- ko if: input().length -->
+          <button class="mobile-submit-btn" data-bind="click: onInputEnter">
+            Send
+          </button>
+          <!-- /ko -->
           <!-- ko ifnot: isEditing() -->
             <!-- ko if: showGiphyButton() && isFileSharingSendingEnabled() -->
               <gif-icon class="controls-right-button button-icon-large"
