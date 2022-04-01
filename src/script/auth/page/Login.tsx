@@ -48,7 +48,7 @@ import {AnyAction, Dispatch} from 'redux';
 import useReactRouter from 'use-react-router';
 import {getLogger} from 'Util/Logger';
 import {Config} from '../../Config';
-import {errorHandlerStrings, loginStrings, verifyStrings} from '../../strings';
+import {loginStrings, verifyStrings} from '../../strings';
 import AppAlreadyOpen from '../component/AppAlreadyOpen';
 import LoginForm from '../component/LoginForm';
 import RouterLink from '../component/RouterLink';
@@ -178,7 +178,7 @@ const Login = ({
             break;
           }
           case BackendError.LABEL.CODE_AUTHENTICATION_FAILED: {
-            setTwoFactorSubmitError(error.label);
+            setTwoFactorSubmitError(error);
             break;
           }
           case BackendError.LABEL.INVALID_CREDENTIALS:
@@ -246,7 +246,7 @@ const Login = ({
               centerText
               style={{display: 'flex', flexDirection: 'column', height: 428, justifyContent: 'space-between'}}
             >
-              {twoFactorLoginData && (
+              {twoFactorLoginData ? (
                 <div>
                   <H2 center>{_(loginStrings.twoFactorLoginTitle)}</H2>
                   <Text>{_(loginStrings.twoFactorLoginSubHead, {email: twoFactorLoginData.email})}</Text>
@@ -258,7 +258,7 @@ const Login = ({
                       data-uie-name="enter-code"
                       markInvalid={!!twoFactorSubmitError}
                     />
-                    {!!twoFactorSubmitError && <div>{_(errorHandlerStrings[twoFactorSubmitError])}</div>}
+                    {!!twoFactorSubmitError && parseError(twoFactorSubmitError)}
                   </Label>
                   <div style={{marginTop: 30}}>
                     {isSendingTwoFactorCode ? (
@@ -270,8 +270,7 @@ const Login = ({
                     )}
                   </div>
                 </div>
-              )}
-              {!twoFactorLoginData && (
+              ) : (
                 <>
                   <div>
                     <H1 center>{_(loginStrings.headline)}</H1>
