@@ -58,7 +58,7 @@ export class SingleInstanceHandler {
   registerInstance(instanceId: string): boolean {
     this.instanceId = instanceId;
     const cookieName = CONFIG.COOKIE_NAME;
-    if (!!Cookies.get(cookieName)) {
+    if (!!Cookies.get(cookieName) && !Runtime.isIOS()) {
       return false;
     }
     Cookies.set(cookieName, JSON.stringify({appInstanceId: this.instanceId}), {
@@ -104,9 +104,7 @@ export class SingleInstanceHandler {
   }
 
   private _isSingleRunningInstance(): boolean {
-    // eslint-disable-next-line
-    console.log('isIos', Runtime.isIOS());
-    if (Runtime.isDesktopApp() || Runtime.isMobileOS()) {
+    if (Runtime.isDesktopApp() || Runtime.isIOS()) {
       return true;
     }
     const cookieValue = Cookies.get(CONFIG.COOKIE_NAME);
