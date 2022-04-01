@@ -24,7 +24,7 @@ import {UserActionCreator} from './creator/';
 export class UserAction {
   checkHandles = (handles: string[]): ThunkAction<Promise<string>> => {
     return async (dispatch, getState, {apiClient}) => {
-      const [availableHandle] = await apiClient.user.api.postHandles({handles, return: 1});
+      const [availableHandle] = await apiClient.api.user.postHandles({handles, return: 1});
       return availableHandle;
     };
   };
@@ -33,7 +33,7 @@ export class UserAction {
     return async (dispatch, getState, {apiClient}) => {
       dispatch(UserActionCreator.startSendActivationCode());
       try {
-        await apiClient.user.api.postActivationCode({email, locale: currentLanguage()});
+        await apiClient.api.user.postActivationCode({email, locale: currentLanguage()});
         dispatch(UserActionCreator.successfulSendActivationCode());
       } catch (error) {
         dispatch(UserActionCreator.failedSendActivationCode(error));

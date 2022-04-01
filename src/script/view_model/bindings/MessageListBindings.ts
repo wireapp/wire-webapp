@@ -21,22 +21,15 @@ import ko from 'knockout';
 import {container} from 'tsyringe';
 import 'jquery-mousewheel';
 
-import {t} from 'Util/LocalizerUtil';
 import {
-  TIME_IN_MILLIS,
-  fromUnixTime,
-  isYoungerThan2Minutes,
-  isYoungerThan1Hour,
-  isToday,
-  isYesterday,
-  formatTimeShort,
-  isYoungerThan7Days,
-  fromNowLocale,
-  formatLocale,
-  formatDayMonth,
-  isThisYear,
-} from 'Util/TimeUtil';
-import {isArrowKey, isPageUpDownKey, isMetaKey, isPasteAction} from 'Util/KeyboardUtil';
+  isArrowKey,
+  isPageUpDownKey,
+  isMetaKey,
+  isTabKey,
+  isPasteAction,
+  isEnterKey,
+  isSpaceKey,
+} from 'Util/KeyboardUtil';
 import {noop} from 'Util/util';
 
 import {viewportObserver} from '../../ui/viewportObserver';
@@ -55,17 +48,18 @@ ko.bindingHandlers.focus_on_keydown = {
             if ($('.detail-view').hasClass('modal-show')) {
               return false;
             }
-
             const keyboard_event = (jquery_event.originalEvent || jquery_event) as KeyboardEvent;
             // check for activeElement needed, because in IE11 it could be undefined under some circumstances
             const active_element_is_input =
               document.activeElement && ['INPUT', 'TEXTAREA'].includes(document.activeElement.tagName);
             const is_arrow_key = isArrowKey(keyboard_event);
             const is_pageupdown_key = isPageUpDownKey(keyboard_event);
-
+            const is_tab_key = isTabKey(keyboard_event);
+            const is_enter_key = isEnterKey(keyboard_event);
+            const is_space_key = isSpaceKey(keyboard_event);
             if (is_pageupdown_key) {
               (document.activeElement as HTMLElement).blur();
-            } else if (!active_element_is_input && !is_arrow_key) {
+            } else if (!active_element_is_input && !is_arrow_key && !is_tab_key && !is_enter_key && !is_space_key) {
               if (!isMetaKey(keyboard_event) || isPasteAction(keyboard_event)) {
                 element.focus();
               }
@@ -96,12 +90,8 @@ ko.bindingHandlers.showAllTimestamps = {
 };
 
 ko.bindingHandlers.infinite_scroll = {
-  init(
-    scrollingElement: HTMLElement,
-    params: () => {onHitBottom: () => void; onHitTop: () => void; onInit: (element: HTMLElement) => void},
-  ) {
-    const {onHitTop, onHitBottom, onInit} = params();
-    onInit(scrollingElement);
+  init(scrollingElement: HTMLElement, params: () => {onHitBottom: () => void; onHitTop: () => void}) {
+    const {onHitTop, onHitBottom} = params();
 
     const onScroll = ({target: element}: Event & {target: HTMLElement}) => {
       // On some HiDPI screens scrollTop returns a floating point number instead of an integer
@@ -177,64 +167,3 @@ ko.bindingHandlers.background_image = {
     });
   },
 };
-
-/**
- * Generate message timestamp.
- */
-ko.bindingHandlers.relative_timestamp = (function () {
-  // timestamp that should be updated
-  const timestamps: (() => void)[] = [];
-
-  const calculateTimestamp = (date: Date, isDay?: boolean) => {
-    if (isYoungerThan2Minutes(date)) {
-      return t('conversationJustNow');
-    }
-
-    if (isYoungerThan1Hour(date)) {
-      return fromNowLocale(date);
-    }
-
-    if (isToday(date)) {
-      const time = formatTimeShort(date);
-      return isDay ? `${t('conversationToday')} ${time}` : time;
-    }
-
-    if (isYesterday(date)) {
-      return `${t('conversationYesterday')} ${formatTimeShort(date)}`;
-    }
-    if (isYoungerThan7Days(date)) {
-      return formatLocale(date, 'EEEE p');
-    }
-
-    const weekDay = formatLocale(date, 'EEEE');
-    const dayMonth = formatDayMonth(date);
-    const year = isThisYear(date) ? '' : ` ${date.getFullYear()}`;
-    const time = formatTimeShort(date);
-    return isDay ? `${weekDay}, ${dayMonth}${year}, ${time}` : `${dayMonth}${year}, ${time}`;
-  };
-
-  // should be fine to update every minute
-  window.setInterval(() => timestamps.map(timestampFunc => timestampFunc()), TIME_IN_MILLIS.MINUTE);
-
-  const calculate = function (element: HTMLElement, timestamp: number | string, isDay?: boolean) {
-    const parsedTimestamp = window.parseInt(timestamp.toString());
-    const date = fromUnixTime(parsedTimestamp / TIME_IN_MILLIS.SECOND);
-    return (element.textContent = calculateTimestamp(date, isDay));
-  };
-
-  return {
-    init(element: HTMLElement, valueAccessor: ko.Observable<number>, allBindings: ko.AllBindings) {
-      const timestampFunc = function () {
-        calculate(element, valueAccessor(), allBindings.get('relative_timestamp_day'));
-      };
-
-      timestampFunc();
-      timestamps.push(timestampFunc);
-
-      ko.utils.domNodeDisposal.addDisposeCallback(element, () => {
-        const timestamp_index = timestamps.indexOf(timestampFunc);
-        timestamps.splice(timestamp_index, 1);
-      });
-    },
-  };
-})();

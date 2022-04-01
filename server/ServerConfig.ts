@@ -20,7 +20,7 @@ export interface ServerConfig {
       ENABLE_DEBUG: boolean;
       ENABLE_DOMAIN_DISCOVERY: boolean;
       ENABLE_ENFORCE_DESKTOP_APPLICATION_ONLY: boolean;
-      ENABLE_FEDERATION: boolean;
+      ENABLE_EXTRA_CLIENT_ENTROPY: boolean;
       ENABLE_MEDIA_EMBEDS: boolean;
       ENABLE_PHONE_LOGIN: boolean;
       ENABLE_SSO: boolean;

@@ -36,7 +36,6 @@ import {
   Form,
   H1,
   IsMobile,
-  Link,
 } from '@wireapp/react-ui-kit';
 import React, {useState} from 'react';
 import {useIntl} from 'react-intl';
@@ -54,6 +53,7 @@ import {ROUTE} from '../route';
 import {Runtime} from '@wireapp/commons';
 import {isValidationError, parseError, parseValidationErrors} from '../util/errorUtil';
 import Page from './Page';
+import RouterLink from '../component/RouterLink';
 
 interface Props extends React.HTMLProps<HTMLDivElement> {}
 
@@ -96,14 +96,9 @@ const PhoneLogin = ({
   };
 
   const backArrow = (
-    <Link
-      onClick={() => {
-        history.push(ROUTE.LOGIN);
-      }}
-      data-uie-name="go-login"
-    >
+    <RouterLink to={ROUTE.LOGIN} data-uie-name="go-login">
       <ArrowIcon direction="left" color={COLOR.TEXT} style={{opacity: 0.56}} />
-    </Link>
+    </RouterLink>
   );
   return (
     <Page>
@@ -136,7 +131,6 @@ const PhoneLogin = ({
                   )}
                   {!Runtime.isDesktopApp() && (
                     <Checkbox
-                      tabIndex={4}
                       onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
                         pushLoginData({clientType: event.target.checked ? ClientType.TEMPORARY : ClientType.PERMANENT});
                       }}

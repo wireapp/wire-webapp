@@ -48,6 +48,8 @@ import {Config} from '../Config';
 import {safeWindowOpen} from 'Util/SanitizationUtil';
 import {ROLE} from '../user/UserPermission';
 import {QualifiedId} from '@wireapp/api-client/src/user';
+import {PropertiesRepository} from '../properties/PropertiesRepository';
+import {PROPERTIES_TYPE} from '../properties/PropertiesType';
 
 export interface CallActions {
   answer: (call: Call) => void;
@@ -87,11 +89,12 @@ export class CallingViewModel {
 
   constructor(
     readonly callingRepository: CallingRepository,
-    audioRepository: AudioRepository,
+    readonly audioRepository: AudioRepository,
     readonly mediaDevicesHandler: MediaDevicesHandler,
     readonly mediaStreamHandler: MediaStreamHandler,
     readonly permissionRepository: PermissionRepository,
     readonly teamRepository: TeamRepository,
+    readonly propertiesRepository: PropertiesRepository,
     private readonly selfUser: ko.Observable<User>,
     readonly multitasking: Multitasking,
     private readonly conversationState = container.resolve(ConversationState),
@@ -143,9 +146,13 @@ export class CallingViewModel {
       });
     };
 
+    const hasSoundlessCallsEnabled = (): boolean => {
+      return this.propertiesRepository.getPreference(PROPERTIES_TYPE.CALL.ENABLE_SOUNDLESS_INCOMING_CALLS);
+    };
+
     this.callingRepository.onIncomingCall((call: Call) => {
       const shouldRing = this.selfUser().availability() !== Availability.Type.AWAY;
-      if (shouldRing) {
+      if (shouldRing && !hasSoundlessCallsEnabled()) {
         ring(call);
       }
     });
@@ -196,6 +203,7 @@ export class CallingViewModel {
       },
       switchCameraInput: (call: Call, deviceId: string) => {
         this.mediaDevicesHandler.currentDeviceId.videoInput(deviceId);
+        this.callingRepository.refreshVideoInput();
       },
       switchScreenInput: (call: Call, deviceId: string) => {
         this.mediaDevicesHandler.currentDeviceId.screenInput(deviceId);

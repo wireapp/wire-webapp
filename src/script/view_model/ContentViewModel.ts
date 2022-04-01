@@ -37,15 +37,11 @@ import {ModalsViewModel} from './ModalsViewModel';
 import {ServiceModalViewModel} from './content/ServiceModalViewModel';
 import {InviteModalViewModel} from './content/InviteModalViewModel';
 import {ConversationError} from '../error/ConversationError';
-import {CollectionViewModel} from './content/CollectionViewModel';
 import {ConnectRequestsViewModel} from './content/ConnectRequestsViewModel';
-import {CollectionDetailsViewModel} from './content/CollectionDetailsViewModel';
 import {GiphyViewModel} from './content/GiphyViewModel';
 import {HistoryImportViewModel} from './content/HistoryImportViewModel';
 import {HistoryExportViewModel} from './content/HistoryExportViewModel';
 import {TitleBarViewModel} from './content/TitleBarViewModel';
-import {PreferencesDevicesViewModel} from './content/PreferencesDevicesViewModel';
-import {PreferencesDeviceDetailsViewModel} from './content/PreferencesDeviceDetailsViewModel';
 import {InputBarViewModel} from './content/InputBarViewModel';
 import {PanelViewModel} from './PanelViewModel';
 import type {MainViewModel, ViewModelRepositories} from './MainViewModel';
@@ -62,12 +58,15 @@ import '../page/preferences/AccountPreferences';
 import '../page/preferences/OptionPreferences';
 import '../page/preferences/AVPreferences';
 import '../page/preferences/AboutPreferences';
+import '../page/preferences/devices/DevicesPreferences';
+import '../page/LeftSidebar';
 import {
   PreferenceNotificationRepository,
   Notification,
   ClientNotificationData,
 } from '../notification/PreferenceNotificationRepository';
 import {modals} from '../view_model/ModalsViewModel';
+import {MessageRepository} from '../conversation/MessageRepository';
 
 interface ShowConversationOptions {
   exposeMessage?: Message;
@@ -85,10 +84,9 @@ export class ContentViewModel {
   private readonly teamState: TeamState;
   private readonly conversationState: ConversationState;
 
-  collection: CollectionViewModel;
-  collectionDetails: CollectionDetailsViewModel;
   connectRequests: ConnectRequestsViewModel;
   conversationRepository: ConversationRepository;
+  messageRepository: MessageRepository;
   elementId: string;
   emojiInput: EmojiInputViewModel;
   giphy: GiphyViewModel;
@@ -99,10 +97,9 @@ export class ContentViewModel {
   inviteModal: InviteModalViewModel;
   legalHoldModal: LegalHoldModalViewModel;
   logger: Logger;
+  readonly isFederated?: boolean;
   mainViewModel: MainViewModel;
   messageList: MessageListViewModel;
-  preferencesDeviceDetails: PreferencesDeviceDetailsViewModel;
-  preferencesDevices: PreferencesDevicesViewModel;
   previousConversation: Conversation | null = null;
   previousState: string | null = null;
   serviceModal: ServiceModalViewModel;
@@ -139,6 +136,8 @@ export class ContentViewModel {
     this.mainViewModel = mainViewModel;
     this.conversationRepository = repositories.conversation;
     this.userRepository = repositories.user;
+    this.messageRepository = repositories.message;
+    this.isFederated = mainViewModel.isFederated;
     this.logger = getLogger('ContentViewModel');
     this.State = ContentViewModel.STATE;
 
@@ -146,8 +145,6 @@ export class ContentViewModel {
     this.state = ko.observable(ContentViewModel.STATE.WATERMARK);
 
     // Nested view models
-    this.collectionDetails = new CollectionDetailsViewModel();
-    this.collection = new CollectionViewModel(this, repositories.conversation);
     this.connectRequests = new ConnectRequestsViewModel(mainViewModel);
     this.emojiInput = new EmojiInputViewModel(repositories.properties);
     this.giphy = new GiphyViewModel(repositories.giphy);
@@ -181,14 +178,6 @@ export class ContentViewModel {
     );
     this.titleBar = new TitleBarViewModel(mainViewModel.calling, mainViewModel.panel, this, repositories.calling);
 
-    this.preferencesDeviceDetails = new PreferencesDeviceDetailsViewModel(
-      mainViewModel,
-      repositories.client,
-      repositories.cryptography,
-      repositories.message,
-    );
-    this.preferencesDevices = new PreferencesDevicesViewModel(mainViewModel, this, repositories.cryptography);
-
     this.historyExport = new HistoryExportViewModel(repositories.backup);
     this.historyImport = new HistoryImportViewModel(repositories.backup);
 
@@ -200,12 +189,6 @@ export class ContentViewModel {
           break;
         case ContentViewModel.STATE.PREFERENCES_ACCOUNT:
           this.popNotification();
-          break;
-        case ContentViewModel.STATE.PREFERENCES_DEVICES:
-          this.preferencesDevices.updateDeviceInfo();
-          break;
-        case ContentViewModel.STATE.COLLECTION:
-          this.collection.setConversation(this.previousConversation);
           break;
         default:
           this.inputBar.removedFromView();
@@ -387,8 +370,6 @@ export class ContentViewModel {
     switch (state) {
       case ContentViewModel.STATE.COLLECTION:
         return '.collection';
-      case ContentViewModel.STATE.COLLECTION_DETAILS:
-        return '.collection-details';
       case ContentViewModel.STATE.CONVERSATION:
         return '.conversation';
       case ContentViewModel.STATE.CONNECTION_REQUESTS:
@@ -415,7 +396,7 @@ export class ContentViewModel {
 
     const isStateConversation = this.previousState === ContentViewModel.STATE.CONVERSATION;
     if (isStateConversation) {
-      const collectionStates = [ContentViewModel.STATE.COLLECTION, ContentViewModel.STATE.COLLECTION_DETAILS];
+      const collectionStates = [ContentViewModel.STATE.COLLECTION];
       const isCollectionState = collectionStates.includes(newContentState);
       if (!isCollectionState) {
         this.conversationState.activeConversation(null);

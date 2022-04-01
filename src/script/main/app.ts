@@ -125,6 +125,7 @@ import CallingContainer from 'Components/calling/CallingOverlayContainer';
 import {TeamError} from '../error/TeamError';
 import Warnings from '../view_model/WarningsContainer';
 import {Core} from '../service/CoreSingleton';
+import {migrateToQualifiedSessionIds} from './sessionIdMigrator';
 
 function doRedirect(signOutReason: SIGN_OUT_REASON) {
   let url = `/auth/${location.search}`;
@@ -145,7 +146,6 @@ function doRedirect(signOutReason: SIGN_OUT_REASON) {
 class App {
   static readonly LOCAL_STORAGE_LOGIN_REDIRECT_KEY = 'LOGIN_REDIRECT_KEY';
   logger: Logger;
-  appContainer: HTMLElement;
   service: {
     asset: AssetService;
     conversation: ConversationService;
@@ -188,9 +188,9 @@ class App {
    * @param apiClient Configured backend client
    */
   constructor(
-    appContainer: HTMLElement,
-    encryptedEngine?: SQLeetEngine,
-    private readonly apiClient = container.resolve(APIClient),
+    private readonly appContainer: HTMLElement,
+    private readonly apiClient: APIClient,
+    options?: {storageEngine?: SQLeetEngine},
   ) {
     this.apiClient.on(APIClient.TOPIC.ON_LOGOUT, () => this.logout(SIGN_OUT_REASON.NOT_SIGNED_IN, false));
     this.logger = getLogger('App');
@@ -198,7 +198,7 @@ class App {
 
     new WindowHandler();
 
-    this.service = this._setupServices(encryptedEngine);
+    this.service = this._setupServices(options.storageEngine);
     this.repository = this._setupRepositories();
     if (Config.getConfig().FEATURE.ENABLE_DEBUG) {
       import('Util/DebugUtil').then(({DebugUtil}) => {
@@ -408,6 +408,13 @@ class App {
       telemetry.timeStep(AppInitTimingsStep.RECEIVED_ACCESS_TOKEN);
       const {clientType} = await authRepository.init();
       const selfUser = await this.initiateSelfUser();
+      if (this.apiClient.backendFeatures.isFederated) {
+        // Migrate all existing session to fully qualified ids (if need be)
+        await migrateToQualifiedSessionIds(
+          this.repository.storage.storageService.db.sessions,
+          this.apiClient.context!.domain,
+        );
+      }
       loadingView.updateProgress(5, t('initReceivedSelfUser', selfUser.name()));
       telemetry.timeStep(AppInitTimingsStep.RECEIVED_SELF_USER);
       const clientEntity = await this._initiateSelfUserClients();
@@ -426,9 +433,7 @@ class App {
       await teamRepository.initTeam();
 
       const conversationEntities = await conversationRepository.getConversations();
-      const connectionEntities = await connectionRepository.getConnections(
-        Config.getConfig().FEATURE.ENABLE_FEDERATION,
-      );
+      const connectionEntities = await connectionRepository.getConnections();
       loadingView.updateProgress(25, t('initReceivedUserData'));
 
       telemetry.timeStep(AppInitTimingsStep.RECEIVED_USER_DATA);
@@ -583,9 +588,6 @@ class App {
       if (!userEntity.mediumPictureResource()) {
         this.repository.user.setDefaultPicture();
       }
-      if (!userEntity.username()) {
-        this.repository.user.getUsernameSuggestion();
-      }
     }
 
     return userEntity;
@@ -681,8 +683,6 @@ class App {
     this.logger.info('Showing application UI');
     if (this.repository.user['userState'].isTemporaryGuest()) {
       mainView.list.showTemporaryGuest();
-    } else if (this.repository.user.shouldChangeUsername()) {
-      mainView.list.showTakeover();
     } else if (conversationEntity) {
       mainView.content.showConversation(conversationEntity, {});
     } else if (this.repository.user['userState'].connectRequests().length) {
@@ -898,6 +898,9 @@ class App {
 //##############################################################################
 
 $(async () => {
+  const apiClient = container.resolve(APIClient);
+  await apiClient.useVersion(Config.getConfig().SUPPORTED_API_VERSIONS);
+
   enableLogging(Config.getConfig().FEATURE.ENABLE_DEBUG);
   exposeWrapperGlobals();
   const appContainer = document.getElementById('wire-main');
@@ -910,11 +913,11 @@ $(async () => {
     const shouldPersist = loadValue<boolean>(StorageKey.AUTH.PERSIST);
     if (shouldPersist === undefined) {
       doRedirect(SIGN_OUT_REASON.NOT_SIGNED_IN);
-    } else if (isTemporaryClientAndNonPersistent(shouldPersist)) {
-      const engine = await StorageService.getUninitializedEngine();
-      window.wire.app = new App(appContainer, engine);
     } else {
-      window.wire.app = new App(appContainer);
+      const storageEngine = isTemporaryClientAndNonPersistent(shouldPersist)
+        ? await StorageService.getUninitializedEngine()
+        : undefined;
+      window.wire.app = new App(appContainer, apiClient, {storageEngine});
     }
   }
 });

@@ -17,11 +17,13 @@
  *
  */
 
+import ko from 'knockout';
 import {SuperType} from '../../message/SuperType';
 import {SystemMessageType} from '../../message/SystemMessageType';
 import {Message} from './Message';
 
 export class SystemMessage extends Message {
+  public caption: ko.PureComputed<string>;
   public system_message_type: SystemMessageType;
 
   constructor() {

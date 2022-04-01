@@ -27,6 +27,6 @@ export class RichProfileRepository {
   constructor(private readonly apiClient = container.resolve(APIClient)) {}
 
   getUserRichProfile(userId: string): Promise<RichInfo> {
-    return this.apiClient.user.api.getRichInfo(userId);
+    return this.apiClient.api.user.getRichInfo(userId);
   }
 }

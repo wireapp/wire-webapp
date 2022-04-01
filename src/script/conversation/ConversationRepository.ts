@@ -123,6 +123,7 @@ import {ConversationMemberUpdateEvent} from '@wireapp/api-client/src/event';
 import {matchQualifiedIds} from 'Util/QualifiedId';
 import {ConversationVerificationState} from './ConversationVerificationState';
 import {extractClientDiff} from './ClientMismatchUtil';
+import {Core} from '../service/CoreSingleton';
 
 type ConversationDBChange = {obj: EventRecord; oldObj: EventRecord};
 type FetchPromise = {rejectFn: (error: ConversationError) => void; resolveFn: (conversation: Conversation) => void};
@@ -169,6 +170,7 @@ export class ConversationRepository {
     private readonly userState = container.resolve(UserState),
     private readonly teamState = container.resolve(TeamState),
     private readonly conversationState = container.resolve(ConversationState),
+    private readonly core = container.resolve(Core),
   ) {
     this.eventService = eventRepository.eventService;
     // we register a client mismatch handler agains the message repository so that we can react to missing members
@@ -177,6 +179,7 @@ export class ConversationRepository {
       const {missingClients, deletedClients, emptyUsers, missingUserIds} = extractClientDiff(
         mismatch,
         conversation?.allUserEntities,
+        this.core.backendFeatures.federationEndpoints ? userState.self().domain : '',
       );
 
       if (conversation && missingUserIds.length) {
@@ -194,9 +197,7 @@ export class ConversationRepository {
 
       if (removedTeamUserIds.length) {
         // If we have found some users that were removed from the conversation, we need to check if those users were also completely removed from the team
-        const usersWithoutClients = await this.userRepository.getUserListFromBackend(
-          conversation.isFederated() ? removedTeamUserIds : removedTeamUserIds.map(({id}) => id),
-        );
+        const usersWithoutClients = await this.userRepository.getUserListFromBackend(removedTeamUserIds);
         await Promise.all(
           usersWithoutClients
             .filter(user => user.deleted)
@@ -378,15 +379,21 @@ export class ConversationRepository {
     accessState?: string,
     options: Partial<NewConversation> = {},
   ): Promise<Conversation | undefined> {
-    const isFederated = Config.getConfig().FEATURE.ENABLE_FEDERATION;
-    const userIds = isFederated ? userEntities.map(user => user.qualifiedId) : userEntities.map(user => user.id);
+    const userIds = userEntities.map(user => user.qualifiedId);
+    const usersPayload = this.core.backendFeatures.federationEndpoints
+      ? {
+          qualified_users: userIds,
+          users: [] as string[],
+        }
+      : {
+          users: userIds.map(({id}) => id),
+        };
 
     let payload: NewConversation & {conversation_role: string} = {
       conversation_role: DefaultRole.WIRE_MEMBER,
       name: groupName,
-      qualified_users: isFederated ? (userIds as QualifiedId[]) : undefined,
       receipt_mode: null,
-      users: !isFederated ? (userIds as string[]) : [],
+      ...usersPayload,
       ...options,
     };
 
@@ -571,9 +578,10 @@ export class ConversationRepository {
     conversationEntity.is_pending(true);
 
     const firstMessageEntity = conversationEntity.getFirstMessage();
-    const upperBound = firstMessageEntity
-      ? new Date(firstMessageEntity.timestamp())
-      : new Date(conversationEntity.getLatestTimestamp(this.serverTimeHandler.toServerTimestamp()) + 1);
+    const upperBound =
+      firstMessageEntity && firstMessageEntity.timestamp()
+        ? new Date(firstMessageEntity.timestamp())
+        : new Date(conversationEntity.getLatestTimestamp(this.serverTimeHandler.toServerTimestamp()) + 1);
 
     const events = (await this.eventService.loadPrecedingEvents(
       conversationEntity.id,
@@ -714,9 +722,9 @@ export class ConversationRepository {
   public async searchInConversation(
     conversationEntity: Conversation,
     query: string,
-  ): Promise<{messageEntities?: Message[]; query?: string}> {
+  ): Promise<{messageEntities: Message[]; query: string}> {
     if (!conversationEntity || !query.length) {
-      return {};
+      return {messageEntities: [], query};
     }
 
     const events = await this.conversation_service.searchInConversation(conversationEntity.id, query);
@@ -1112,6 +1120,7 @@ export class ConversationRepository {
               amplify.publish(WebAppEvents.CONVERSATION.SHOW, conversationEntity, {});
             } catch (error) {
               switch (error.label) {
+                case BackendErrorLabel.ACCESS_DENIED:
                 case BackendErrorLabel.NO_CONVERSATION:
                 case BackendErrorLabel.NO_CONVERSATION_CODE: {
                   showNoConversationModal();
@@ -1343,11 +1352,7 @@ export class ConversationRepository {
     const userIds = userEntities.map(userEntity => userEntity.qualifiedId);
 
     try {
-      const response = await this.conversation_service.postMembers(
-        conversationEntity.id,
-        userIds,
-        conversationEntity.isFederated(),
-      );
+      const response = await this.conversation_service.postMembers(conversationEntity.id, userIds);
       if (response) {
         this.eventRepository.injectEvent(response, EventRepository.SOURCE.BACKEND_RESPONSE);
       }
@@ -1456,7 +1461,7 @@ export class ConversationRepository {
   async leaveGuestRoom(): Promise<void> {
     if (this.userState.self().isTemporaryGuest()) {
       const conversationEntity = this.getMostRecentConversation(true);
-      await this.conversation_service.deleteMembers(conversationEntity.id, this.userState.self().id);
+      await this.conversation_service.deleteMembers(conversationEntity.qualifiedId, this.userState.self().qualifiedId);
     }
   }
 
@@ -1464,18 +1469,16 @@ export class ConversationRepository {
    * Remove member from conversation.
    *
    * @param conversationEntity Conversation to remove member from
-   * @param user ID of member to be removed from the conversation
+   * @param userId ID of member to be removed from the conversation
    * @returns Resolves when member was removed from the conversation
    */
-  public async removeMember(conversationEntity: Conversation, user: QualifiedId) {
-    const response = conversationEntity.isFederated()
-      ? await this.conversation_service.deleteQualifiedMembers(conversationEntity.qualifiedId, user)
-      : await this.conversation_service.deleteMembers(conversationEntity.id, user.id);
+  public async removeMember(conversationEntity: Conversation, userId: QualifiedId) {
+    const response = await this.conversation_service.deleteMembers(conversationEntity.qualifiedId, userId);
     const roles = conversationEntity.roles();
-    delete roles[user.id];
+    delete roles[userId.id];
     conversationEntity.roles(roles);
     const currentTimestamp = this.serverTimeHandler.toServerTimestamp();
-    const event = response || EventBuilder.buildMemberLeave(conversationEntity, user, true, currentTimestamp);
+    const event = response || EventBuilder.buildMemberLeave(conversationEntity, userId, true, currentTimestamp);
     this.eventRepository.injectEvent(event, EventRepository.SOURCE.BACKEND_RESPONSE);
     return event;
   }

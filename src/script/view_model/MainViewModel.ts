@@ -61,6 +61,7 @@ import type {EventTrackingRepository} from '../tracking/EventTrackingRepository'
 import type {MessageRepository} from '../conversation/MessageRepository';
 import {UserState} from '../user/UserState';
 import Warnings from './WarningsContainer';
+import {Core} from '../service/CoreSingleton';
 
 export interface ViewModelRepositories {
   asset: AssetRepository;
@@ -105,6 +106,7 @@ export class MainViewModel {
   selfUser: ko.Observable<User>;
   title: WindowTitleViewModel;
   userRepository: UserRepository;
+  isFederated: boolean;
   private readonly userState: UserState;
 
   static get CONFIG() {
@@ -145,6 +147,7 @@ export class MainViewModel {
     this.logger = getLogger('MainViewModel');
 
     this.userState = container.resolve(UserState);
+    this.isFederated = container.resolve(Core).backendFeatures.isFederated;
 
     this.modals = modals;
 
@@ -173,6 +176,7 @@ export class MainViewModel {
       repositories.media.streamHandler,
       repositories.permission,
       repositories.team,
+      repositories.properties,
       this.selfUser,
       this.multitasking,
     );

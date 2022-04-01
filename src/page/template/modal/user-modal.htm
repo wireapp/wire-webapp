@@ -5,18 +5,18 @@
   >
     <div class="modal__header">
       <!-- ko if: userNotFound() -->
-        <div class="modal__header__title" data-bind="text: t('userNotFoundTitle', brandName)" data-uie-name="status-modal-title"></div>
+        <h2 class="modal__header__title" data-bind="text: t('userNotFoundTitle', brandName)" data-uie-name="status-modal-title"></h2>
       <!-- /ko -->
       <close-icon class="modal__header__button" data-bind="click: hide" data-uie-name="do-close"></close-icon>
     </div>
     <div class="modal__body user-modal__wrapper" data-bind="css: {'user-modal__wrapper--max': !user() && !userNotFound() }">
       <!-- ko if: user() -->
         <panel-user-details params="participant: user, isSelfVerified: isSelfVerified, classifiedDomains: classifiedDomains"></panel-user-details>
-        <enriched-fields params="user: user"></enriched-fields>
+        <enriched-fields params="user: user, showDomain: $root.isFederated"></enriched-fields>
         <!-- ko if: user().isBlockedLegalHold() -->
           <div class="modal__message" data-bind="html: blockedForLegalHoldText" data-uie-name="status-blocked-legal-hold"></div>
         <!-- /ko -->
-        <!-- ko ifnot: user().isBlockedLegalHold() -->   
+        <!-- ko ifnot: user().isBlockedLegalHold() -->
           <user-actions
             params="user: user, actionsViewModel: actionsViewModel, onAction: onUserAction, isSelfActivated: isActivatedAccount(), selfUser: userState.self"
           ></user-actions>

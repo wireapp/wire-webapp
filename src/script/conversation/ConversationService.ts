@@ -54,12 +54,8 @@ import {StorageService} from '../storage';
 import {StorageSchemata} from '../storage/StorageSchemata';
 import {APIClient} from '../service/APIClientSingleton';
 import {ConversationRecord} from '../storage/record/ConversationRecord';
-import {Config} from '../Config';
 import {QualifiedId} from '@wireapp/api-client/src/user';
 
-function isFederatedEnv() {
-  return Config.getConfig().FEATURE.ENABLE_FEDERATION;
-}
 export class ConversationService {
   private readonly eventService: EventService;
   private readonly logger: Logger;
@@ -87,7 +83,7 @@ export class ConversationService {
    * @returns Resolves when the conversation was created
    */
   postConversations(payload: NewConversation): Promise<BackendConversation> {
-    return this.apiClient.conversation.api.postConversation(payload);
+    return this.apiClient.api.conversation.postConversation(payload);
   }
 
   //##############################################################################
@@ -99,8 +95,7 @@ export class ConversationService {
    * @returns Resolves with the conversation information
    */
   async getAllConversations(): Promise<BackendConversation[]> {
-    const conversationApi = this.apiClient.conversation.api;
-    return isFederatedEnv() ? conversationApi.getConversationList() : conversationApi.getAllConversations();
+    return this.apiClient.api.conversation.getConversationList();
   }
 
   /**
@@ -108,9 +103,7 @@ export class ConversationService {
    * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/conversations/conversation
    */
   getConversationById({id, domain}: QualifiedId): Promise<BackendConversation> {
-    return isFederatedEnv()
-      ? this.apiClient.conversation.api.getConversation({domain, id}, true)
-      : this.apiClient.conversation.api.getConversation(id);
+    return this.apiClient.api.conversation.getConversation({domain, id});
   }
 
   /**
@@ -123,7 +116,7 @@ export class ConversationService {
    * @returns Resolves with the server response
    */
   updateConversationName(conversationId: string, name: string): Promise<ConversationRenameEvent> {
-    return this.apiClient.conversation.api.putConversation(conversationId, {
+    return this.apiClient.api.conversation.putConversation(conversationId, {
       name,
     });
   }
@@ -141,7 +134,7 @@ export class ConversationService {
     conversationId: string,
     message_timer: number,
   ): Promise<ConversationMessageTimerUpdateEvent> {
-    return this.apiClient.conversation.api.putConversationMessageTimer(conversationId, {message_timer});
+    return this.apiClient.api.conversation.putConversationMessageTimer(conversationId, {message_timer});
   }
 
   /**
@@ -157,7 +150,7 @@ export class ConversationService {
     conversationId: string,
     receiptMode: ConversationReceiptModeUpdateData,
   ): Promise<ConversationReceiptModeUpdateEvent> {
-    return this.apiClient.conversation.api.putConversationReceiptMode(conversationId, receiptMode);
+    return this.apiClient.api.conversation.putConversationReceiptMode(conversationId, receiptMode);
   }
 
   /**
@@ -170,7 +163,7 @@ export class ConversationService {
    * @returns Resolves with the server response
    */
   updateMemberProperties(conversationId: string, payload: Partial<ConversationMemberUpdateData>): Promise<void> {
-    return this.apiClient.conversation.api.putMembershipProperties(conversationId, payload);
+    return this.apiClient.api.conversation.putMembershipProperties(conversationId, payload);
   }
 
   //##############################################################################
@@ -185,7 +178,7 @@ export class ConversationService {
    * @returns Resolves with the server response
    */
   deleteConversationCode(conversationId: string): Promise<ConversationCodeDeleteEvent> {
-    return this.apiClient.conversation.api.deleteConversationCode(conversationId);
+    return this.apiClient.api.conversation.deleteConversationCode(conversationId);
   }
 
   /**
@@ -196,7 +189,7 @@ export class ConversationService {
    * @returns Resolves with the server response
    */
   getConversationCode(conversationId: string): Promise<ConversationCode> {
-    return this.apiClient.conversation.api.getConversationCode(conversationId);
+    return this.apiClient.api.conversation.getConversationCode(conversationId);
   }
 
   /**
@@ -207,7 +200,7 @@ export class ConversationService {
    * @returns Resolves with the server response
    */
   postConversationCode(conversationId: string): Promise<ConversationCodeUpdateEvent> {
-    return this.apiClient.conversation.api.postConversationCodeRequest(conversationId);
+    return this.apiClient.api.conversation.postConversationCodeRequest(conversationId);
   }
 
   /**
@@ -219,7 +212,7 @@ export class ConversationService {
    * @returns Resolves with the server response
    */
   postConversationJoin(key: string, code: string): Promise<ConversationMemberJoinEvent> {
-    return this.apiClient.conversation.api.postJoinByCode({code, key});
+    return this.apiClient.api.conversation.postJoinByCode({code, key});
   }
 
   /**
@@ -231,7 +224,7 @@ export class ConversationService {
    * @returns Resolves with the server response
    */
   getConversationJoin(key: string, code: string): Promise<ConversationJoinData> {
-    return this.apiClient.conversation.api.getJoinByCode({code, key});
+    return this.apiClient.api.conversation.getJoinByCode({code, key});
   }
 
   /**
@@ -249,7 +242,7 @@ export class ConversationService {
     accessModes: CONVERSATION_ACCESS[],
     accessRole: ACCESS_ROLE_V2[],
   ): Promise<ConversationEvent> {
-    return this.apiClient.conversation.api.putAccess(conversationId, {
+    return this.apiClient.api.conversation.putAccess(conversationId, {
       access: accessModes,
       access_role_v2: accessRole,
     });
@@ -267,7 +260,7 @@ export class ConversationService {
    * @returns Resolves with the server response
    */
   deleteBots(conversationId: string, userId: string): Promise<void> {
-    return this.apiClient.conversation.api.deleteBot(conversationId, userId);
+    return this.apiClient.api.conversation.deleteBot(conversationId, userId);
   }
 
   /**
@@ -279,29 +272,19 @@ export class ConversationService {
    * @param userId ID of member to be removed from the the conversation
    * @returns Resolves with the server response
    */
-  deleteMembers(conversationId: string, userId: string): Promise<ConversationMemberLeaveEvent> {
-    return this.apiClient.conversation.api.deleteMember(conversationId, userId);
-  }
-
-  /**
-   * Remove member from federated conversation.
-   *
-   * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/conversations/removeMember
-   *
-   * @param conversationId Qualified ID of conversation to remove member from
-   * @param userId Qualified ID of member to be removed from the the conversation
-   * @returns Resolves with the server response
-   */
-  deleteQualifiedMembers(conversationId: QualifiedId, userId: QualifiedId): Promise<ConversationMemberLeaveEvent> {
-    return this.apiClient.conversation.api.deleteQualifiedMember(conversationId, userId);
+  deleteMembers(
+    conversationId: string | QualifiedId,
+    userId: string | QualifiedId,
+  ): Promise<ConversationMemberLeaveEvent> {
+    return this.apiClient.api.conversation.deleteMember(conversationId, userId);
   }
 
   putMembers(conversationId: string, userId: string, data: ConversationOtherMemberUpdateData): Promise<void> {
-    return this.apiClient.conversation.api.putOtherMember(userId, conversationId, data);
+    return this.apiClient.api.conversation.putOtherMember(userId, conversationId, data);
   }
 
   deleteConversation(teamId: string, conversationId: string): Promise<void> {
-    return this.apiClient.teams.conversation.api.deleteConversation(teamId, conversationId);
+    return this.apiClient.api.teams.conversation.deleteConversation(teamId, conversationId);
   }
 
   /**
@@ -313,7 +296,7 @@ export class ConversationService {
    * @returns Resolves with the server response
    */
   postBots(conversationId: string, providerId: string, serviceId: string): Promise<ConversationMemberJoinEvent> {
-    return this.apiClient.conversation.api.postBot(conversationId, providerId, serviceId);
+    return this.apiClient.api.conversation.postBot(conversationId, providerId, serviceId);
   }
 
   /**
@@ -350,7 +333,7 @@ export class ConversationService {
     }
 
     // TODO(federation): add domain in the postOTRMessage (?)
-    return this.apiClient.conversation.api.postOTRMessage(payload.sender, conversationId.id, payload, ignoreMissing);
+    return this.apiClient.api.conversation.postOTRMessage(payload.sender, conversationId.id, payload, ignoreMissing);
   }
 
   /**
@@ -362,17 +345,8 @@ export class ConversationService {
    * @param userIds IDs of users to be added to the conversation
    * @returns Resolves with the server response
    */
-  postMembers(
-    conversationId: string,
-    userIds: QualifiedId[],
-    useFederation: boolean,
-  ): Promise<ConversationMemberJoinEvent> {
-    return useFederation
-      ? this.apiClient.conversation.api.postMembersV2(conversationId, userIds)
-      : this.apiClient.conversation.api.postMembers(
-          conversationId,
-          userIds.map(({id}) => id),
-        );
+  postMembers(conversationId: string, userIds: QualifiedId[]): Promise<ConversationMemberJoinEvent> {
+    return this.apiClient.api.conversation.postMembers(conversationId, userIds);
   }
 
   //##############################################################################

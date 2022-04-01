@@ -75,6 +75,8 @@ const ParticipantItem: React.FC<ParticipantItemProps> = ({
   showArrow = false,
   showDropdown = false,
   onContextMenu = noop,
+  onClick = noop,
+  onKeyDown = noop,
 }) => {
   const [viewportElementRef, setViewportElementRef] = useEffectRef<HTMLDivElement>();
   const isInViewport = useViewPortObserver(viewportElementRef);
@@ -132,7 +134,11 @@ const ParticipantItem: React.FC<ParticipantItemProps> = ({
         'no-interaction': noInteraction,
         'no-underline': noUnderline,
       })}
+      role="button"
+      tabIndex={0}
       onContextMenu={onContextMenu}
+      onClick={onClick}
+      onKeyDown={onKeyDown}
     >
       <div
         className="participant-item"
@@ -186,13 +192,14 @@ const ParticipantItem: React.FC<ParticipantItemProps> = ({
                 </div>
               </div>
               {showDropdown && (
-                <div
+                <button
                   className="participant-item__content__chevron"
-                  onClick={onContextMenu}
+                  onClick={event => onContextMenu(event as unknown as React.MouseEvent<HTMLDivElement>)}
+                  type="button"
                   data-uie-name="participant-menu-icon"
                 >
                   <Icon.Chevron />
-                </div>
+                </button>
               )}
             </div>
 
@@ -266,6 +273,6 @@ export default ParticipantItem;
 
 registerReactComponent<ParticipantItemProps>('participant-item', {
   bindings:
-    'badge, callParticipant, showArrow, highlighted, noInteraction, noUnderline, canSelect, customInfo: ko.unwrap(customInfo), external: ko.unwrap(external), hideInfo, isSelected: ko.unwrap(isSelected), isSelfVerified: ko.unwrap(isSelfVerified), mode, participant, selfInTeam',
+    'badge, callParticipant, showArrow, highlighted, noInteraction, noUnderline, canSelect, customInfo: ko.unwrap(customInfo), external: ko.unwrap(external), hideInfo, isSelected: ko.unwrap(isSelected), isSelfVerified: ko.unwrap(isSelfVerified), mode, participant, selfInTeam, onClick, onKeyDown',
   component: ParticipantItem,
 });

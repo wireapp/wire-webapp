@@ -125,6 +125,7 @@ const AccountInput: React.FC<AccountInputProps> = ({
           marginBottom: 2,
         }}
         data-uie-name={labelUie}
+        htmlFor={valueUie}
       >
         {label}
       </label>
@@ -186,6 +187,7 @@ const AccountInput: React.FC<AccountInputProps> = ({
             </span>
           ) : (
             <input
+              id={valueUie}
               css={{
                 backgroundColor: 'transparent',
                 border: 'none',

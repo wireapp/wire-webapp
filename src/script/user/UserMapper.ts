@@ -29,7 +29,6 @@ import type {ServerTimeHandler} from '../time/serverTimeHandler';
 import '../view_model/bindings/CommonBindings';
 import {container} from 'tsyringe';
 import {UserState} from './UserState';
-import {Config} from '../Config';
 
 export class UserMapper {
   private readonly logger: Logger;
@@ -103,7 +102,7 @@ export class UserMapper {
       userEntity.domain = userData.qualified_id.domain;
       userEntity.id = userData.qualified_id.id;
       userEntity.isFederated =
-        this.userState.self() && Config.getConfig().FEATURE.ENABLE_FEDERATION
+        this.userState.self() && this.userState.self().domain
           ? userData.qualified_id.domain !== this.userState.self().domain
           : false;
     }
@@ -136,7 +135,7 @@ export class UserMapper {
         userEntity.id,
         userData.assets.map(asset => ({
           ...asset,
-          domain: Config.getConfig().FEATURE.ENABLE_FEDERATION ? userEntity.domain : undefined,
+          domain: userEntity.domain,
         })),
       );
     } else if (hasPicture) {

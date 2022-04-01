@@ -26,7 +26,6 @@ import type {User} from '../entity/User';
 import {StorageSchemata} from '../storage/StorageSchemata';
 import {StorageService} from '../storage/StorageService';
 import {APIClient} from '../service/APIClientSingleton';
-import {isQualifiedIdArray} from 'Util/TypePredicateUtil';
 import {constructUserPrimaryKey} from '../util/StorageUtil';
 
 export class UserService {
@@ -79,18 +78,18 @@ export class UserService {
    * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/users/checkUserHandle
    */
   checkUserHandle(handle: string): Promise<void> {
-    return this.apiClient.user.api.headHandle(handle);
+    return this.apiClient.api.user.headHandle(handle);
   }
 
   async getUserByFQN({domain, handle}: QualifiedHandle): Promise<APIClientUser> {
     if (domain) {
-      return this.apiClient.user.api.getUserByHandle({
+      return this.apiClient.api.user.getUserByHandle({
         domain,
         handle,
       });
     }
-    const {user: userId} = await this.apiClient.user.api.getHandle(handle);
-    return this.apiClient.user.api.getUser(userId);
+    const {user: userId} = await this.apiClient.api.user.getHandle(handle);
+    return this.apiClient.api.user.getUser(userId);
   }
 
   /**
@@ -100,7 +99,7 @@ export class UserService {
    * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/users/checkUserHandles
    */
   checkUserHandles(usernames: string[], amount: number = 1): Promise<string[]> {
-    return this.apiClient.user.api.postHandles({
+    return this.apiClient.api.user.postHandles({
       handles: usernames,
       return: amount,
     });
@@ -112,14 +111,14 @@ export class UserService {
    * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/users/users
    * @example ['0bb84213-8cc2-4bb1-9e0b-b8dd522396d5', '15ede065-72b3-433a-9917-252f076ed031']
    */
-  getUsers(userIds: string[] | QualifiedId[]): Promise<APIClientUser[]> {
-    if (isQualifiedIdArray(userIds)) {
-      if (!!userIds[0].domain) {
-        return this.apiClient.user.api.postListUsers({qualified_ids: userIds});
-      }
-      return this.apiClient.user.api.getUsers({ids: userIds.map(userId => userId.id)});
+  getUsers(userIds: QualifiedId[]): Promise<APIClientUser[]> {
+    if (userIds.length === 0) {
+      return Promise.resolve([]);
     }
-    return this.apiClient.user.api.getUsers({ids: userIds});
+    if (!!userIds[0].domain) {
+      return this.apiClient.api.user.postListUsers({qualified_ids: userIds});
+    }
+    return this.apiClient.api.user.getUsers({ids: userIds.map(userId => userId.id)});
   }
 
   /**
@@ -128,6 +127,6 @@ export class UserService {
    * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/users/user
    */
   getUser(userId: string | QualifiedId): Promise<APIClientUser> {
-    return this.apiClient.user.api.getUser(userId);
+    return this.apiClient.api.user.getUser(userId);
   }
 }

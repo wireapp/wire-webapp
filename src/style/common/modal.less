@@ -285,8 +285,6 @@
     &--visible {
       transform: scale(1);
     }
-    &--large {
-    }
   }
 
   &__header {
@@ -317,10 +315,16 @@
       display: flex;
       align-items: center;
       justify-content: center;
+      padding: 0;
+      margin: 0;
+      font-size: inherit;
+      font-weight: inherit;
       pointer-events: none;
     }
 
     &__button {
+      .button-reset-default;
+
       display: flex;
       width: 16px;
       height: 16px;
@@ -348,6 +352,7 @@
   }
 
   &__button {
+    .button-reset-default;
     display: inline-block;
     width: calc(50% - 8px);
     height: 40px;

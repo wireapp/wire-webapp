@@ -49,9 +49,9 @@ const ChooseScreen: React.FC<ChooseScreenProps> = ({cancel, choose, screens = []
 
   const renderPreviews = (list: Screen[], uieName: string) =>
     list.map(({id, thumbnail}) => (
-      <div key={id} className="choose-screen-list-item" data-uie-name={uieName} onClick={() => choose(id)}>
-        <img className="choose-screen-list-image" src={thumbnail.toDataURL()} />
-      </div>
+      <button key={id} className="choose-screen-list-item" data-uie-name={uieName} onClick={() => choose(id)}>
+        <img className="choose-screen-list-image" src={thumbnail.toDataURL()} role="presentation" alt="" />
+      </button>
     ));
 
   return (
@@ -65,11 +65,11 @@ const ChooseScreen: React.FC<ChooseScreenProps> = ({cancel, choose, screens = []
         </Fragment>
       )}
       <div id="choose-screen-controls" className="choose-screen-controls">
-        <div
+        <button
           className="choose-screen-controls-button button-round button-round-dark button-round-md icon-close"
           data-uie-name="do-choose-screen-cancel"
           onClick={cancel}
-        ></div>
+        ></button>
       </div>
     </div>
   );

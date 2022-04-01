@@ -767,7 +767,6 @@ export class EventMapper {
 
     assetEntity.file_size = content_length;
     assetEntity.file_type = content_type;
-    assetEntity.ratio = +assetEntity.height / +assetEntity.width;
 
     if (info) {
       assetEntity.width = `${info.width}px`;

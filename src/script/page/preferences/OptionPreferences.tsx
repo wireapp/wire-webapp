@@ -177,6 +177,7 @@ const OptionPreferences: React.FC<OptionPreferencesProps> = ({
               onChange={newOptionReplaceInlineEmoji => saveOptionEmojiPreference(newOptionReplaceInlineEmoji)}
               details={
                 <div
+                  aria-hidden="true"
                   dangerouslySetInnerHTML={{
                     __html: t(
                       'preferencesOptionsEmojiReplaceDetail',

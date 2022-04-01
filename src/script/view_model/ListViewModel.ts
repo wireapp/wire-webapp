@@ -28,19 +28,13 @@ import {t} from 'Util/LocalizerUtil';
 import {iterateItem} from 'Util/ArrayUtil';
 import {isEscapeKey} from 'Util/KeyboardUtil';
 
-import {ArchiveViewModel} from './list/ArchiveViewModel';
-import {ConversationListViewModel} from './list/ConversationListViewModel';
-import {PreferencesListViewModel} from './list/PreferencesListViewModel';
 import {StartUIViewModel} from './list/StartUIViewModel';
-import {TakeoverViewModel} from './list/TakeoverViewModel';
-import {TemporaryGuestViewModel} from './list/TemporaryGuestViewModel';
 
 import {showContextMenu} from '../ui/ContextMenu';
 import {showLabelContextMenu} from '../ui/LabelContextMenu';
 import {Shortcut} from '../ui/Shortcut';
 import {ShortcutType} from '../ui/ShortcutType';
 import {ContentViewModel} from './ContentViewModel';
-import {DefaultLabelIds} from '../conversation/ConversationLabelRepository';
 import {ModalsViewModel} from './ModalsViewModel';
 import {PanelViewModel} from './PanelViewModel';
 import type {MainViewModel, ViewModelRepositories} from './MainViewModel';
@@ -49,57 +43,53 @@ import type {ConversationRepository} from '../conversation/ConversationRepositor
 import type {TeamRepository} from '../team/TeamRepository';
 import type {ActionsViewModel} from './ActionsViewModel';
 import type {Conversation} from '../entity/Conversation';
-import type {ClientEntity} from '../client/ClientEntity';
 import type {User} from '../entity/User';
-import type {AssetRemoteData} from '../assets/AssetRemoteData';
 import {UserState} from '../user/UserState';
 import {TeamState} from '../team/TeamState';
 import {ConversationState} from '../conversation/ConversationState';
+import {CallingViewModel} from './CallingViewModel';
+import {PropertiesRepository} from '../properties/PropertiesRepository';
+
+export enum ListState {
+  ARCHIVE = 'ListViewModel.STATE.ARCHIVE',
+  CONVERSATIONS = 'ListViewModel.STATE.CONVERSATIONS',
+  PREFERENCES = 'ListViewModel.STATE.PREFERENCES',
+  START_UI = 'ListViewModel.STATE.START_UI',
+  TEMPORARY_GUEST = 'ListViewModel.STATE.TEMPORARY_GUEST',
+}
 
 export class ListViewModel {
   private readonly userState: UserState;
   private readonly teamState: TeamState;
   private readonly conversationState: ConversationState;
 
-  readonly preferences: PreferencesListViewModel;
-  readonly takeover: TakeoverViewModel;
-  readonly temporaryGuest: TemporaryGuestViewModel;
-  readonly selfUserPicture: ko.PureComputed<AssetRemoteData | void>;
-  readonly ModalType: typeof ListViewModel.MODAL_TYPE;
   readonly isActivatedAccount: ko.PureComputed<boolean>;
   readonly webappLoaded: ko.Observable<boolean>;
   readonly state: ko.Observable<string>;
   readonly lastUpdate: ko.Observable<number>;
+  readonly isFederated: boolean;
   private readonly elementId: 'left-column';
 
-  private readonly conversationRepository: ConversationRepository;
+  public readonly conversationRepository: ConversationRepository;
+  public readonly propertiesRepository: PropertiesRepository;
   private readonly callingRepository: CallingRepository;
   private readonly teamRepository: TeamRepository;
   private readonly actionsViewModel: ActionsViewModel;
-  private readonly contentViewModel: ContentViewModel;
+  public readonly contentViewModel: ContentViewModel;
+  public readonly callingViewModel: CallingViewModel;
   private readonly panelViewModel: PanelViewModel;
   private readonly isProAccount: ko.PureComputed<boolean>;
-  private readonly selfUser: ko.Observable<User>;
-  private readonly modal: ko.Observable<string>;
+  public readonly selfUser: ko.Observable<User>;
   private readonly visibleListItems: ko.PureComputed<(string | Conversation)[]>;
-  private readonly archive: ArchiveViewModel;
-  private readonly conversations: ConversationListViewModel;
   private readonly start: StartUIViewModel;
-
-  static get MODAL_TYPE() {
-    return {
-      TAKEOVER: 'ListViewModel.MODAL_TYPE.TAKEOVER',
-      TEMPORARY_GUEST: 'ListViewModal.MODAL_TYPE.TEMPORARY_GUEST',
-    };
-  }
 
   static get STATE() {
     return {
-      ARCHIVE: 'ListViewModel.STATE.ARCHIVE',
-      CONVERSATIONS: 'ListViewModel.STATE.CONVERSATIONS',
-      PREFERENCES: 'ListViewModel.STATE.PREFERENCES',
-      START_UI: 'ListViewModel.STATE.START_UI',
-      TEMPORARY_GUEST: 'ListViewModel.STATE.TEMPORARY_GUEST',
+      ARCHIVE: ListState.ARCHIVE,
+      CONVERSATIONS: ListState.CONVERSATIONS,
+      PREFERENCES: ListState.PREFERENCES,
+      START_UI: ListState.START_UI,
+      TEMPORARY_GUEST: ListState.TEMPORARY_GUEST,
     };
   }
 
@@ -109,31 +99,25 @@ export class ListViewModel {
     this.conversationState = container.resolve(ConversationState);
 
     this.elementId = 'left-column';
+    this.isFederated = mainViewModel.isFederated;
     this.conversationRepository = repositories.conversation;
     this.callingRepository = repositories.calling;
     this.teamRepository = repositories.team;
+    this.propertiesRepository = repositories.properties;
 
     this.actionsViewModel = mainViewModel.actions;
     this.contentViewModel = mainViewModel.content;
     this.panelViewModel = mainViewModel.panel;
+    this.callingViewModel = mainViewModel.calling;
 
     this.isActivatedAccount = this.userState.isActivatedAccount;
     this.isProAccount = this.teamState.isTeam;
     this.selfUser = this.userState.self;
 
-    this.ModalType = ListViewModel.MODAL_TYPE;
-
     // State
     this.state = ko.observable(ListViewModel.STATE.CONVERSATIONS);
     this.lastUpdate = ko.observable();
-    this.modal = ko.observable();
     this.webappLoaded = ko.observable(false);
-
-    this.selfUserPicture = ko.pureComputed((): AssetRemoteData | void => {
-      if (this.webappLoaded() && this.selfUser()) {
-        return this.selfUser().mediumPictureResource();
-      }
-    });
 
     this.visibleListItems = ko.pureComputed(() => {
       const isStatePreferences = this.state() === ListViewModel.STATE.PREFERENCES;
@@ -157,19 +141,6 @@ export class ListViewModel {
       return states.concat(this.conversationState.conversations_unarchived());
     });
 
-    // Nested view models
-    this.archive = new ArchiveViewModel(this, repositories.conversation, this.answerCall);
-    this.conversations = new ConversationListViewModel(
-      mainViewModel,
-      this,
-      this.answerCall,
-      repositories.event,
-      repositories.calling,
-      repositories.conversation,
-      repositories.preferenceNotification,
-      repositories.properties,
-    );
-    this.preferences = new PreferencesListViewModel(this.contentViewModel, this, repositories.calling);
     this.start = new StartUIViewModel(
       mainViewModel,
       this,
@@ -179,8 +150,6 @@ export class ListViewModel {
       repositories.team,
       repositories.user,
     );
-    this.takeover = new TakeoverViewModel(this, repositories.user, repositories.conversation);
-    this.temporaryGuest = new TemporaryGuestViewModel(mainViewModel, repositories.calling, repositories.team);
 
     this._initSubscriptions();
 
@@ -286,22 +255,12 @@ export class ListViewModel {
   openPreferencesAccount = async (): Promise<void> => {
     await this.teamRepository.getTeam();
 
-    if (this.isActivatedAccount()) {
-      this.dismissModal();
-    }
-
     this.switchList(ListViewModel.STATE.PREFERENCES);
     this.contentViewModel.switchContent(ContentViewModel.STATE.PREFERENCES_ACCOUNT);
   };
 
-  readonly openPreferencesDevices = (deviceEntity?: ClientEntity): void => {
+  readonly openPreferencesDevices = (): void => {
     this.switchList(ListViewModel.STATE.PREFERENCES);
-
-    if (deviceEntity) {
-      this.contentViewModel.preferencesDeviceDetails.device(deviceEntity);
-      return this.contentViewModel.switchContent(ContentViewModel.STATE.PREFERENCES_DEVICE_DETAILS);
-    }
-
     return this.contentViewModel.switchContent(ContentViewModel.STATE.PREFERENCES_DEVICES);
   };
 
@@ -346,15 +305,10 @@ export class ListViewModel {
       this.start.resetView();
     }
 
-    const listStateElementId = this.getElementIdOfList(this.state());
-    $(`#${listStateElementId}`).removeClass('left-list-is-visible');
     document.removeEventListener('keydown', this.onKeyDownListView);
   };
 
   private readonly showList = (newListState: string): void => {
-    const listStateElementId = this.getElementIdOfList(newListState);
-    $(`#${listStateElementId}`).addClass('left-list-is-visible');
-
     this.state(newListState);
     this.lastUpdate(Date.now());
 
@@ -363,9 +317,6 @@ export class ListViewModel {
 
   private readonly updateList = (newListState: string, respectLastState: boolean): void => {
     switch (newListState) {
-      case ListViewModel.STATE.ARCHIVE:
-        this.archive.updateList();
-        break;
       case ListViewModel.STATE.START_UI:
         this.start.updateList();
         break;
@@ -379,32 +330,8 @@ export class ListViewModel {
     }
   };
 
-  private readonly getElementIdOfList = (listState: string) => {
-    switch (listState) {
-      case ListViewModel.STATE.ARCHIVE:
-        return 'archive';
-      case ListViewModel.STATE.PREFERENCES:
-        return 'preferences';
-      case ListViewModel.STATE.START_UI:
-        return 'start-ui';
-      case ListViewModel.STATE.TEMPORARY_GUEST:
-        return 'temporary-guest';
-      default:
-        return 'conversations';
-    }
-  };
-
-  readonly dismissModal = (): void => {
-    this.modal(undefined);
-  };
-
-  readonly showTakeover = (): void => {
-    this.modal(ListViewModel.MODAL_TYPE.TAKEOVER);
-  };
-
   readonly showTemporaryGuest = (): void => {
     this.switchList(ListViewModel.STATE.TEMPORARY_GUEST);
-    this.modal(ListViewModel.MODAL_TYPE.TEMPORARY_GUEST);
     const conversationEntity = this.conversationRepository.getMostRecentConversation();
     amplify.publish(WebAppEvents.CONVERSATION.SHOW, conversationEntity, {});
   };
@@ -443,7 +370,6 @@ export class ListViewModel {
         entries.push({
           click: () => {
             conversationLabelRepository.addConversationToFavorites(conversationEntity);
-            this.conversations.expandFolder(DefaultLabelIds.Favorites);
           },
           label: t('conversationPopoverFavorite'),
         });

@@ -34,7 +34,6 @@ import {
   UserAssetType as APIClientUserAssetType,
   QualifiedId,
 } from '@wireapp/api-client/src/user';
-import type {QualifiedUserClientMap} from '@wireapp/api-client/src/client';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import type {AccentColor} from '@wireapp/commons';
 import type {BackendError, TraceState} from '@wireapp/api-client/src/http';
@@ -54,7 +53,6 @@ import {USER} from '../event/Client';
 import {ClientMapper} from '../client/ClientMapper';
 import {Config} from '../Config';
 import {ConsentValue} from './ConsentValue';
-import {createSuggestions} from './UserHandleGenerator';
 import {EventRepository} from '../event/EventRepository';
 import {LegalHoldModalViewModel} from '../view_model/content/LegalHoldModalViewModel';
 import {mapProfileAssetsV1} from '../assets/AssetMapper';
@@ -66,7 +64,7 @@ import {User} from '../entity/User';
 import {UserError} from '../error/UserError';
 import {UserMapper} from './UserMapper';
 import {UserState} from './UserState';
-import type {ClientRepository, QualifiedUserClientEntityMap, UserClientEntityMap} from '../client/ClientRepository';
+import type {ClientRepository, QualifiedUserClientEntityMap} from '../client/ClientRepository';
 import type {ConnectionEntity} from '../connection/ConnectionEntity';
 import type {EventSource} from '../event/EventSource';
 import type {PropertiesRepository} from '../properties/PropertiesRepository';
@@ -87,7 +85,6 @@ export class UserRepository {
   private readonly logger: Logger;
   public readonly userMapper: UserMapper;
   public getTeamMembersFromUsers: (users: User[]) => Promise<void>;
-  public shouldSetUsername: boolean;
 
   static get CONFIG() {
     return {
@@ -112,7 +109,6 @@ export class UserRepository {
     this.logger = getLogger('UserRepository');
 
     this.userMapper = new UserMapper(serverTimeHandler);
-    this.shouldSetUsername = false;
 
     this.getTeamMembersFromUsers = async (_: User[]) => undefined;
 
@@ -185,31 +181,9 @@ export class UserRepository {
   }
 
   /**
-   * Retrieves meta information about all the clients of given qualified users.
-   */
-  getClientsByQualifiedUserIds(
-    userIds: QualifiedId[],
-    updateClients: boolean,
-  ): Promise<QualifiedUserClientEntityMap | QualifiedUserClientMap> {
-    return this.clientRepository.getClientsByQualifiedUserIds(userIds, updateClients as any);
-  }
-
-  /**
    * Retrieves meta information about all the clients of given users.
    */
-  getClientsByUsers(
-    userEntities: User[] | QualifiedId[],
-    updateClients: boolean,
-  ): Promise<UserClientEntityMap | QualifiedUserClientEntityMap> {
-    const userIds = isQualifiedId(userEntities[0])
-      ? userEntities
-      : (userEntities as User[]).map(userEntity => userEntity.qualifiedId);
-    // TODO(Federation): When detecting a domain we actually should not need to check for the federation-feature because
-    // the system must be federation-aware. However, during the transition period it's safer to check for the config too.
-    if (Config.getConfig().FEATURE.ENABLE_FEDERATION) {
-      return this.clientRepository.getClientsByQualifiedUserIds(userIds, updateClients);
-    }
-
+  private getClientsByUsers(userIds: QualifiedId[], updateClients: boolean): Promise<QualifiedUserClientEntityMap> {
     return this.clientRepository.getClientsByUserIds(userIds, updateClients);
   }
 
@@ -451,20 +425,20 @@ export class UserRepository {
   /**
    * Get a user from the backend.
    */
-  private async fetchUserById(userId: string | QualifiedId): Promise<User> {
-    const [userEntity] = await this.fetchUsersById([userId] as [string] | [QualifiedId]);
+  private async fetchUserById(userId: QualifiedId): Promise<User> {
+    const [userEntity] = await this.fetchUsersById([userId]);
     return userEntity;
   }
 
   /**
    * Get users from the backend.
    */
-  private async fetchUsersById(userIds: string[] | QualifiedId[]): Promise<User[]> {
+  private async fetchUsersById(userIds: QualifiedId[]): Promise<User[]> {
     if (!userIds.length) {
       return [];
     }
 
-    const getUsers = async (chunkOfUserIds: string[] | QualifiedId[]): Promise<User[]> => {
+    const getUsers = async (chunkOfUserIds: QualifiedId[]): Promise<User[]> => {
       try {
         const response = await this.userService.getUsers(chunkOfUserIds);
         return response ? this.userMapper.mapUsersFromJson(response) : [];
@@ -482,10 +456,8 @@ export class UserRepository {
       }
     };
 
-    const chunksOfUserIds = chunk<string | QualifiedId>(userIds, Config.getConfig().MAXIMUM_USERS_PER_REQUEST);
-    const resolveArray = await Promise.all(
-      chunksOfUserIds.map(userChunk => getUsers(userChunk as string[] | QualifiedId[])),
-    );
+    const chunksOfUserIds = chunk<QualifiedId>(userIds, Config.getConfig().MAXIMUM_USERS_PER_REQUEST);
+    const resolveArray = await Promise.all(chunksOfUserIds.map(getUsers));
     const newUserEntities = flatten(resolveArray);
     if (this.userState.isTeam()) {
       this.mapGuestStatus(newUserEntities);
@@ -615,7 +587,7 @@ export class UserRepository {
     return this.userService.getUser(userId);
   }
 
-  getUserListFromBackend(userIds: string[] | QualifiedId[]): Promise<APIClientUser[]> {
+  getUserListFromBackend(userIds: QualifiedId[]): Promise<APIClientUser[]> {
     return this.userService.getUsers(userIds);
   }
 
@@ -720,38 +692,12 @@ export class UserRepository {
   }
 
   /**
-   * Whether the user needs to set a username.
-   */
-  shouldChangeUsername(): boolean {
-    return this.shouldSetUsername;
-  }
-
-  /**
-   * Tries to generate a username suggestion.
-   */
-  async getUsernameSuggestion(): Promise<void> {
-    try {
-      const suggestions = createSuggestions(this.userState.self().name());
-      const validSuggestions = await this.verifyUsernames(suggestions);
-      this.shouldSetUsername = true;
-      this.userState.self().username(validSuggestions[0]);
-    } catch (error) {
-      if (error.code === HTTP_STATUS.NOT_FOUND) {
-        this.shouldSetUsername = false;
-      }
-
-      throw error;
-    }
-  }
-
-  /**
    * Change username.
    */
   async changeUsername(username: string): Promise<User> {
     if (username.length >= UserRepository.CONFIG.MINIMUM_USERNAME_LENGTH) {
       try {
         await this.selfService.putSelfHandle(username);
-        this.shouldSetUsername = false;
         return await this.userUpdate({user: {handle: username, id: this.userState.self().id}});
       } catch (error) {
         if ([HTTP_STATUS.CONFLICT, HTTP_STATUS.BAD_REQUEST].includes(error.code)) {
@@ -762,15 +708,6 @@ export class UserRepository {
     }
 
     throw new UserError(UserError.TYPE.INVALID_UPDATE, UserError.MESSAGE.INVALID_UPDATE);
-  }
-
-  /**
-   * Verify usernames against the backend.
-   * @param usernames Username suggestions
-   * @returns A list with usernames that are not taken.
-   */
-  private verifyUsernames(usernames: string[]): Promise<string[]> {
-    return this.userService.checkUserHandles(usernames);
   }
 
   /**

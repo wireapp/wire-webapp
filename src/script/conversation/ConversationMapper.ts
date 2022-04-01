@@ -63,9 +63,9 @@ export interface SelfStatusUpdateDatabaseData {
 
 export type ConversationDatabaseData = ConversationRecord &
   Partial<ConversationBackendData> & {
-    accessModes: CONVERSATION_ACCESS[];
-    accessRole: CONVERSATION_ACCESS_ROLE;
-    accessRoleV2: ACCESS_ROLE_V2[];
+    accessModes?: CONVERSATION_ACCESS[];
+    accessRole?: CONVERSATION_ACCESS_ROLE;
+    accessRoleV2?: ACCESS_ROLE_V2[];
     roles: {[userId: string]: DefaultConversationRoleName | string};
     status: ConversationStatus;
     team_id: string;
@@ -251,6 +251,8 @@ export class ConversationMapper {
     const accessRole = conversationData.accessRole || conversationData.access_role;
     const accessRoleV2 = conversationData.accessRoleV2 || conversationData.access_role_v2;
     if (accessModes && (accessRole || accessRoleV2)) {
+      conversationEntity.accessModes = accessModes;
+      conversationEntity.accessRole = accessRoleV2 || accessRole;
       ConversationMapper.mapAccessState(conversationEntity, accessModes, accessRole, accessRoleV2);
     }
 
@@ -380,12 +382,13 @@ export class ConversationMapper {
     );
   }
 
-  static mapAccessCode(conversationEntity: Conversation, accessCode: ConversationCode): void {
-    const isTeamConversation = conversationEntity && conversationEntity.team_id;
+  static mapAccessCode(conversation: Conversation, accessCode: ConversationCode): void {
+    const isTeamConversation = conversation && conversation.team_id;
 
     if (accessCode.uri && isTeamConversation) {
-      const accessCodeUrl = `${window.wire.env.URL.ACCOUNT_BASE}/conversation-join/?key=${accessCode.key}&code=${accessCode.code}`;
-      conversationEntity.accessCode(accessCodeUrl);
+      const baseUrl = `${window.wire.env.URL.ACCOUNT_BASE}/conversation-join/?key=${accessCode.key}&code=${accessCode.code}`;
+      const accessCodeUrl = conversation.domain ? `${baseUrl}&domain=${conversation.domain}` : baseUrl;
+      conversation.accessCode(accessCodeUrl);
     }
   }
 
@@ -393,7 +396,7 @@ export class ConversationMapper {
     conversationEntity: Conversation,
     accessModes: CONVERSATION_ACCESS[],
     accessRole?: CONVERSATION_ACCESS_ROLE,
-    accessRoleV2?: ACCESS_ROLE_V2[],
+    accessRoleV2: ACCESS_ROLE_V2[] = [],
   ): typeof ACCESS_STATE {
     if (conversationEntity.team_id) {
       if (conversationEntity.is1to1()) {

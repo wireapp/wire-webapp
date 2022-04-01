@@ -55,14 +55,15 @@ type ClientDiff = {
 export function extractClientDiff(
   {deleted = {}, redundant = {}, missing = {}}: Partial<ClientMismatch> | Partial<MessageSendingStatus>,
   users?: User[],
+  defaultDomain: string = '',
 ): ClientDiff {
   const allDeleted = {...deleted, ...redundant} as QualifiedUserClients | UserClients;
   const deletedClients = isQualifiedUserClients(allDeleted)
     ? flattenQualifiedUserClients(allDeleted)
-    : flattenUserClients(allDeleted);
+    : flattenUserClients(allDeleted, defaultDomain);
   const missingClients = isQualifiedUserClients(missing)
     ? flattenQualifiedUserClients(missing)
-    : flattenUserClients(missing);
+    : flattenUserClients(missing, defaultDomain);
 
   const toClientDiff = ({userId, data}: {data: string[]; userId: QualifiedId}) => ({clients: data, userId});
 

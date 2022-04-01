@@ -546,7 +546,7 @@ export class CallingRepository {
    */
   onCallEvent = async (event: CallingEvent, source: string): Promise<void> => {
     const {content, conversation, qualified_conversation, from, qualified_from, sender: clientId, time} = event;
-    const isFederated = Config.getConfig().FEATURE.ENABLE_FEDERATION && qualified_conversation && qualified_from;
+    const isFederated = this.core.backendFeatures.isFederated && qualified_conversation && qualified_from;
     const userId = isFederated ? qualified_from : {domain: '', id: from};
     const conversationId = isFederated ? qualified_conversation : {domain: '', id: conversation};
     const currentTimestamp = this.serverTimeHandler.toServerTimestamp();
@@ -712,7 +712,7 @@ export class CallingRepository {
   }
 
   private serializeQualifiedId(id: QualifiedId): string {
-    if (id.domain && Config.getConfig().FEATURE.ENABLE_FEDERATION) {
+    if (id.domain && this.core.backendFeatures.isFederated) {
       return `${id.id}@${id.domain}`;
     }
     return id.id;
@@ -896,11 +896,11 @@ export class CallingRepository {
     }
   }
 
-  public async refreshVideoInput(): Promise<MediaStream> {
+  public async refreshVideoInput(): Promise<MediaStream | void> {
     const stream = await this.mediaStreamHandler.requestMediaStream(false, true, false, false);
     this.stopMediaSource(MediaType.VIDEO);
-    this.changeMediaSource(stream, MediaType.VIDEO);
-    return stream;
+    const clonedMediaStream = this.changeMediaSource(stream, MediaType.VIDEO);
+    return clonedMediaStream;
   }
 
   public async refreshAudioInput(): Promise<MediaStream> {
@@ -942,7 +942,7 @@ export class CallingRepository {
     mediaStream: MediaStream,
     mediaType: MediaType,
     call: Call = this.callState.joinedCall(),
-  ): void {
+  ): MediaStream | void {
     if (!call) {
       return;
     }
@@ -960,10 +960,23 @@ export class CallingRepository {
     if (mediaType === MediaType.VIDEO && selfParticipant.sharesCamera() && !selfParticipant.sharesScreen()) {
       const videoTracks = mediaStream.getVideoTracks().map(track => track.clone());
       if (videoTracks.length > 0) {
-        selfParticipant.setVideoStream(new MediaStream(videoTracks), true);
+        const clonedMediaStream = new MediaStream(videoTracks);
+        selfParticipant.setVideoStream(clonedMediaStream, true);
         this.wCall.replaceTrack(this.serializeQualifiedId(call.conversationId), videoTracks[0]);
+        // Remove the previous video stream
+        this.mediaStreamHandler.releaseTracksFromStream(mediaStream);
+        return clonedMediaStream;
       }
     }
+  }
+
+  hasActiveCameraStream(): boolean {
+    const call = this.callState.joinedCall();
+    if (!call) {
+      return false;
+    }
+    const selfParticipant = call.getSelfParticipant();
+    return selfParticipant.sharesCamera() && selfParticipant.hasActiveVideo();
   }
 
   private mapTargets(targets: SendMessageTarget): UserClients {
@@ -1035,8 +1048,9 @@ export class CallingRepository {
 
     if (typeof targets === 'string') {
       const parsedTargets: SendMessageTarget = JSON.parse(targets);
-      const isFederated = Config.getConfig().FEATURE.ENABLE_FEDERATION;
-      const recipients = isFederated ? this.mapQualifiedTargets(parsedTargets) : this.mapTargets(parsedTargets);
+      const recipients = this.core.backendFeatures.federationEndpoints
+        ? this.mapQualifiedTargets(parsedTargets)
+        : this.mapTargets(parsedTargets);
       options = {
         nativePush: true,
         recipients,
@@ -1136,6 +1150,7 @@ export class CallingRepository {
       [Segmentation.CALL.DIRECTION]: this.getCallDirection(call),
       [Segmentation.CALL.DURATION]: Math.ceil((Date.now() - call.startedAt()) / 5000) * 5,
       [Segmentation.CALL.END_REASON]: reason,
+      [Segmentation.CALL.REASON]: this.getCallEndReasonText(reason),
       [Segmentation.CALL.PARTICIPANTS]: call.analyticsMaximumParticipants,
       [Segmentation.CALL.SCREEN_SHARE]: call.analyticsScreenSharing,
     });
@@ -1174,6 +1189,43 @@ export class CallingRepository {
     call.reason(reason);
   };
 
+  /*
+    Note: This is in sync with our ios code base
+    https://github.com/wireapp/wire-ios/blob/cf91b35d6ccbee5f03592f5bb763534341630428/Wire-iOS/Sources/Analytics/AnalyticsCallingTracker.swift#L182-L212
+  */
+  getCallEndReasonText = (reason: REASON): string => {
+    switch (reason) {
+      case REASON.CANCELED:
+        return 'canceled';
+      case REASON.NORMAL:
+      case REASON.STILL_ONGOING:
+        return 'normal';
+      case REASON.IO_ERROR:
+        return 'io_error';
+      case REASON.ERROR:
+        return 'internal_error';
+      case REASON.ANSWERED_ELSEWHERE:
+        return 'answered_elsewhere';
+      case REASON.TIMEOUT:
+      case REASON.TIMEOUT_ECONN:
+        return 'timeout';
+      case REASON.LOST_MEDIA:
+        return 'drop';
+      case REASON.REJECTED:
+        return 'rejected_elsewhere';
+      case REASON.OUTDATED_CLIENT:
+        return 'outdated_client';
+      case REASON.DATACHANNEL:
+        return 'datachannel';
+      case REASON.NOONE_JOINED:
+        return 'no_one_joined';
+      case REASON.EVERYONE_LEFT:
+        return 'everyone_left';
+      default:
+        return 'unknown';
+    }
+  };
+
   private readonly incomingCall = (
     convId: SerializedConversationId,
     timestamp: number,
@@ -1184,8 +1236,8 @@ export class CallingRepository {
     conversationType: CONV_TYPE,
   ) => {
     const conversationId = this.parseQualifiedId(convId);
-    const conversationEntity = this.conversationState.findConversation(conversationId);
-    if (!conversationEntity) {
+    const conversation = this.conversationState.findConversation(conversationId);
+    if (!conversation) {
       return;
     }
     const storedCall = this.findCall(conversationId);
@@ -1194,13 +1246,13 @@ export class CallingRepository {
       // When a second call arrives in the same conversation, we need to clean that call first
       this.removeCall(storedCall);
     }
-    const canRing = !conversationEntity.showNotificationsNothing() && shouldRing && this.isReady;
+    const canRing = !conversation.showNotificationsNothing() && shouldRing && this.isReady;
     const selfParticipant = new Participant(this.selfUser, this.selfClientId);
     const isVideoCall = hasVideo ? CALL_TYPE.VIDEO : CALL_TYPE.NORMAL;
     const isMuted = Config.getConfig().FEATURE.CONFERENCE_AUTO_MUTE && conversationType === CONV_TYPE.CONFERENCE;
     const call = new Call(
       this.parseQualifiedId(userId),
-      conversationId,
+      conversation.qualifiedId,
       conversationType,
       selfParticipant,
       hasVideo ? CALL_TYPE.VIDEO : CALL_TYPE.NORMAL,
@@ -1541,7 +1593,7 @@ export class CallingRepository {
   //##############################################################################
 
   fetchConfig(limit?: number): Promise<CallConfigData> {
-    return this.apiClient.account.api.getCallConfig(limit);
+    return this.apiClient.api.account.getCallConfig(limit);
   }
 
   private checkConcurrentJoinedCall(conversationId: QualifiedId, newCallState: CALL_STATE): Promise<void> {

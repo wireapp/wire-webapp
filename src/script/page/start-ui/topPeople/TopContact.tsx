@@ -24,6 +24,7 @@ import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {useEffect, useState} from 'react';
 import {ConnectionStatus} from '@wireapp/api-client/src/connection';
 import React from 'react';
+import {handleKeyDown} from 'Util/KeyboardUtil';
 
 export interface TopContactProps {
   assetRepository: AssetRepository;
@@ -47,9 +48,12 @@ const TopContact: React.FC<TopContactProps> = ({assetRepository, user, clickOnUs
       data-uie-status={connectionStatus}
       data-uie-uid={user.id}
       data-uie-value={name}
+      role="button"
+      tabIndex={0}
       onClick={event => {
         clickOnUser(user, event);
       }}
+      onKeyPress={event => handleKeyDown(event, clickOnUser.bind(this, user, event))}
     >
       <Avatar avatarSize={AVATAR_SIZE.LARGE} className="search-list-item-image" participant={user} />
       <div className="search-list-item-content">

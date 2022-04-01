@@ -27,7 +27,7 @@ export class ConversationAction {
     return async (dispatch, getState, {apiClient}) => {
       dispatch(ConversationActionCreator.startConversationCodeCheck());
       try {
-        await apiClient.conversation.api.postConversationCodeCheck({code, key, uri});
+        await apiClient.api.conversation.postConversationCodeCheck({code, key, uri});
         dispatch(ConversationActionCreator.successfulConversationCodeCheck());
       } catch (error) {
         dispatch(ConversationActionCreator.failedConversationCodeCheck(error));
@@ -40,7 +40,7 @@ export class ConversationAction {
     return async (dispatch, getState, {apiClient}) => {
       dispatch(ConversationActionCreator.startJoinConversationByCode());
       try {
-        const conversationEvent = await apiClient.conversation.api.postJoinByCode({code, key, uri});
+        const conversationEvent = await apiClient.api.conversation.postJoinByCode({code, key, uri});
         dispatch(ConversationActionCreator.successfulJoinConversationByCode(conversationEvent));
         return conversationEvent;
       } catch (error) {

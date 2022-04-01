@@ -34,7 +34,6 @@ import {registerReactComponent} from 'Util/ComponentUtil';
 import {matchQualifiedIds} from 'Util/QualifiedId';
 import {ACCESS_STATE} from '../../conversation/AccessState';
 import {CONVERSATION_TYPE} from '@wireapp/api-client/src/conversation';
-import {Config} from '../../Config';
 
 export enum Actions {
   ACCEPT_REQUEST = 'UserActions.ACCEPT_REQUEST',
@@ -185,20 +184,12 @@ const UserActions: React.FC<UserActionsProps> = ({
           // Sending the connection failed, there is nothing more to do
           return;
         }
-        const config = Config.getConfig().FEATURE;
-        if (config.ENABLE_FEDERATION) {
-          /**
-           * This can be generalize to any 1:1 conversation creation. Though, this is quite a big change and we will keep it for federated backends for now.
-           * The idea is to create a local conversation once a connection request is sent instead of requesting the conversation against the backend.
-           * Since there is no more information on backend as we have locally we have everything to create this conversation and avoid a back and forth with backend.
-           *
-           * Before generalizing this, we need to account for special cases (probably with team users...). At the end of the federation feature we will probably have a pretty good idea what are the special cases
-           */
-          const newConversation = createPlaceholder1to1Conversation(user, selfUser);
-          const savedConversation = await actionsViewModel.saveConversation(newConversation);
+        // We create a local 1:1 conversation that will act as a placeholder before the other user has accepted the request
+        const newConversation = createPlaceholder1to1Conversation(user, selfUser);
+        const savedConversation = await actionsViewModel.saveConversation(newConversation);
+        if (!conversation) {
+          // Only open the new conversation if we aren't currently in a conversation context
           actionsViewModel.open1to1Conversation(savedConversation);
-        } else {
-          await create1to1Conversation(user, !conversation);
         }
         onAction(Actions.SEND_REQUEST);
       },

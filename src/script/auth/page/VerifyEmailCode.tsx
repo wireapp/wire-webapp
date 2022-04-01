@@ -17,7 +17,7 @@
  *
  */
 
-import {CodeInput, ContainerXS, H1, Link, Muted} from '@wireapp/react-ui-kit';
+import {CodeInput, ContainerXS, H1, Muted} from '@wireapp/react-ui-kit';
 import React from 'react';
 import {FormattedMessage, useIntl} from 'react-intl';
 import {connect} from 'react-redux';
@@ -33,6 +33,7 @@ import * as AuthSelector from '../module/selector/AuthSelector';
 import {ROUTE} from '../route';
 import {parseError} from '../util/errorUtil';
 import Page from './Page';
+import LinkButton from '../component/LinkButton';
 
 interface Props extends React.HTMLProps<HTMLDivElement>, RouteComponentProps<{}> {}
 
@@ -46,6 +47,7 @@ const VerifyEmailCode = ({
   account,
   authError,
   currentFlow,
+  entropyData,
   doRegisterPersonal,
   doRegisterTeam,
   doSendActivationCode,
@@ -69,7 +71,7 @@ const VerifyEmailCode = ({
       case AuthSelector.REGISTER_FLOW.PERSONAL:
       case AuthSelector.REGISTER_FLOW.GENERIC_INVITATION: {
         try {
-          await doRegisterPersonal({...account, email_code});
+          await doRegisterPersonal({...account, email_code}, entropyData);
           history.push(ROUTE.SET_HANDLE);
         } catch (error) {
           logger.error('Failed to create personal account', error);
@@ -86,6 +88,7 @@ const VerifyEmailCode = ({
       logger.error('Failed to send email code', error);
     }
   };
+
   return (
     <Page hasAccountData>
       <ContainerXS
@@ -108,9 +111,9 @@ const VerifyEmailCode = ({
           {parseError(authError)}
         </div>
         <div>
-          <Link onClick={resendCode} data-uie-name="do-resend-code">
+          <LinkButton onClick={resendCode} data-uie-name="do-resend-code">
             {_(verifyStrings.resendCode)}
-          </Link>
+          </LinkButton>
           <RouterLink to={changeEmailRedirect[currentFlow]} style={{marginLeft: 35}} data-uie-name="go-change-email">
             {_(verifyStrings.changeEmail)}
           </RouterLink>
@@ -125,6 +128,7 @@ const mapStateToProps = (state: RootState) => ({
   account: AuthSelector.getAccount(state),
   authError: AuthSelector.getError(state),
   currentFlow: AuthSelector.getCurrentFlow(state),
+  entropyData: AuthSelector.getEntropy(state),
 });
 
 type DispatchProps = ReturnType<typeof mapDispatchToProps>;

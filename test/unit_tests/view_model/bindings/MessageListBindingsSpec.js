@@ -36,10 +36,9 @@ describe('messageListBindings', () => {
         const context = {
           onHitBottom: jest.fn(),
           onHitTop: jest.fn(),
-          onInit: jest.fn(),
         };
 
-        const boundElement = `<div style='height: 10px; overflow: scroll' class="scroll" data-bind="{infinite_scroll: {onHitTop, onHitBottom, onInit}}">
+        const boundElement = `<div style='height: 10px; overflow: scroll' class="scroll" data-bind="{infinite_scroll: {onHitTop, onHitBottom}}">
         <div style="height: ${contentHeight}px;"></div>
       </div>`;
 
@@ -63,7 +62,6 @@ describe('messageListBindings', () => {
           scrollingElement.scrollTop = scrollTop;
           return new Promise(resolve => {
             setTimeout(() => {
-              expect(context.onInit).toHaveBeenCalledWith(scrollingElement);
               ['onHitBottom', 'onHitTop'].forEach(callback => {
                 if (expectedCalls.includes(callback)) {
                   // eslint-disable-next-line jest/no-conditional-expect

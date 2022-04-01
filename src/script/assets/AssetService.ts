@@ -68,7 +68,7 @@ export class AssetService {
     forceCaching?: boolean,
     progressCallback?: ProgressCallback,
   ) {
-    return this.apiClient.asset.api.getAssetV1(assetId, conversationId, forceCaching, progressCallback);
+    return this.apiClient.api.asset.getAssetV1(assetId, conversationId, forceCaching, progressCallback);
   }
 
   async downloadAssetV2(
@@ -77,10 +77,10 @@ export class AssetService {
     forceCaching?: boolean,
     progressCallback?: ProgressCallback,
   ) {
-    return this.apiClient.asset.api.getAssetV2(assetId, conversationId, forceCaching, progressCallback);
+    return this.apiClient.api.asset.getAssetV2(assetId, conversationId, forceCaching, progressCallback);
   }
 
   async downloadAssetV3(assetId: string, token?: string, forceCaching?: boolean, progressCallback?: ProgressCallback) {
-    return this.apiClient.asset.api.getAssetV3(assetId, token, forceCaching, progressCallback);
+    return this.apiClient.api.asset.getAssetV3(assetId, token, forceCaching, progressCallback);
   }
 }

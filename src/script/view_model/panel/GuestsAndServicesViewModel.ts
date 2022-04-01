@@ -49,6 +49,7 @@ export class GuestsAndServicesViewModel extends BasePanelViewModel {
   isServicesEnabled: ko.PureComputed<boolean>;
   isServicesRoom: ko.PureComputed<boolean>;
   isGuestLinkEnabled: ko.PureComputed<boolean>;
+  guestLinkDisabledInfo: ko.PureComputed<string>;
   showLinkOptions: ko.PureComputed<boolean>;
   brandName: string;
 
@@ -78,12 +79,37 @@ export class GuestsAndServicesViewModel extends BasePanelViewModel {
       () => this.activeConversation()?.isServicesRoom() || this.activeConversation()?.isGuestAndServicesRoom(),
     );
 
-    this.hasAccessCode = ko.pureComputed(() => (this.isGuestRoom() ? !!this.activeConversation().accessCode() : false));
-    this.isGuestLinkEnabled = ko.pureComputed(() => this.teamState.isGuestLinkEnabled());
+    this.hasAccessCode = ko.pureComputed(() =>
+      this.isGuestEnabled() ? !!this.activeConversation().accessCode() : false,
+    );
+    const conversationHasGuestLinkEnabled = ko.observable<boolean | undefined>(undefined);
+    this.isGuestLinkEnabled = ko.pureComputed(() => {
+      if (this.activeConversation().inTeam()) {
+        return this.teamState.isGuestLinkEnabled();
+      }
+      return conversationHasGuestLinkEnabled();
+    });
+    this.guestLinkDisabledInfo = ko.pureComputed(() => {
+      if (conversationHasGuestLinkEnabled() === false) {
+        return t('guestLinkDisabledByOtherTeam');
+      }
+      return t('guestLinkDisabled');
+    });
+
     this.showLinkOptions = ko.pureComputed(() => this.isGuestEnabled());
 
     this.activeConversation.subscribe(conversationEntity => this._updateCode(this.isVisible(), conversationEntity));
-    this.isVisible.subscribe(isVisible => this._updateCode(isVisible, this.activeConversation()));
+    this.isVisible.subscribe(async isVisible => {
+      if (!this.activeConversation().inTeam() && !this.isGuestLinkEnabled()) {
+        // If the conversation is not in my team and the guest link is disabled
+        // We check that the conversation itself has guest link enabled
+        const hasGuestLink = await params.repositories.team.conversationHasGuestLinkEnabled(
+          this.activeConversation().id,
+        );
+        conversationHasGuestLinkEnabled(hasGuestLink);
+      }
+      this._updateCode(isVisible, this.activeConversation());
+    });
     this.brandName = Config.getConfig().BRAND_NAME;
   }
 
@@ -97,7 +123,7 @@ export class GuestsAndServicesViewModel extends BasePanelViewModel {
 
   requestAccessCode = async (): Promise<void> => {
     // Handle conversations in legacy state
-    if (!this.isGuestRoom()) {
+    if (!this.isGuestEnabled() && !this.isServicesEnabled()) {
       await this.stateHandler.changeAccessState(this.activeConversation(), ACCESS_STATE.TEAM.GUEST_ROOM, true);
     }
 
@@ -154,9 +180,7 @@ export class GuestsAndServicesViewModel extends BasePanelViewModel {
         }
       };
 
-      const hasGuestOrServices = conversationEntity.hasGuest() || conversationEntity.hasService();
-
-      if (this.isTeamOnly() || !hasGuestOrServices) {
+      if (this.isTeamOnly() || !conversationEntity.hasGuest()) {
         return changeAccessState();
       }
 
@@ -200,9 +224,8 @@ export class GuestsAndServicesViewModel extends BasePanelViewModel {
           this.requestOngoing(false);
         }
       };
-      const hasGuestOrServices = conversationEntity.hasGuest() || conversationEntity.hasService();
 
-      if (this.isTeamOnly() || !hasGuestOrServices) {
+      if (this.isTeamOnly() || !conversationEntity.hasService()) {
         return changeAccessState();
       }
 
@@ -223,7 +246,7 @@ export class GuestsAndServicesViewModel extends BasePanelViewModel {
   async _updateCode(isVisible: boolean, conversationEntity: Conversation): Promise<void> {
     const updateCode =
       conversationEntity &&
-      conversationEntity.isGuestRoom() &&
+      (conversationEntity.isGuestRoom() || conversationEntity.isGuestAndServicesRoom()) &&
       !conversationEntity.accessCode() &&
       this.isGuestLinkEnabled();
     if (isVisible && updateCode) {

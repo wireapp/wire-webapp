@@ -38,14 +38,12 @@ describe('SelfAction', () => {
       },
     };
     const mockedApiClient = {
-      self: {
-        api: {
+      api: {
+        self: {
           getSelf: () => Promise.resolve(selfUser),
         },
-      },
-      teams: {
-        team: {
-          api: {
+        teams: {
+          team: {
             getTeams: () => Promise.resolve(team),
           },
         },
@@ -75,8 +73,8 @@ describe('SelfAction', () => {
       selfAction: {},
     };
     const mockedApiClient = {
-      self: {
-        api: {
+      api: {
+        self: {
           getSelf: () => Promise.reject(error),
         },
       },
@@ -92,7 +90,9 @@ describe('SelfAction', () => {
 
   it('fetches the set password state', async () => {
     const mockedApiClient = {
-      self: {api: {headPassword: () => Promise.resolve({status: HTTP_STATUS.OK})}},
+      api: {
+        self: {headPassword: () => Promise.resolve({status: HTTP_STATUS.OK})},
+      },
     };
 
     const store = mockStoreFactory({
@@ -108,7 +108,7 @@ describe('SelfAction', () => {
 
   it('fetches the unset password state', async () => {
     const mockedApiClient = {
-      self: {api: {headPassword: () => Promise.reject({response: {status: HTTP_STATUS.NOT_FOUND}})}},
+      api: {self: {headPassword: () => Promise.reject({response: {status: HTTP_STATUS.NOT_FOUND}})}},
     };
 
     const store = mockStoreFactory({
@@ -125,7 +125,7 @@ describe('SelfAction', () => {
   it('handles failed password check', async () => {
     const error = {response: {status: HTTP_STATUS.BAD_REQUEST}} as unknown as Error;
     const mockedApiClient = {
-      self: {api: {headPassword: () => Promise.reject(error)}},
+      api: {self: {headPassword: () => Promise.reject(error)}},
     };
 
     const store = mockStoreFactory({
@@ -147,7 +147,7 @@ describe('SelfAction', () => {
   it('can set the self email', async () => {
     const email = 'myemail@mail.com';
     const mockedApiClient = {
-      auth: {api: {putEmail: () => Promise.resolve()}},
+      api: {auth: {putEmail: () => Promise.resolve()}},
     };
 
     const store = mockStoreFactory({
@@ -165,7 +165,7 @@ describe('SelfAction', () => {
     const email = 'myemail@mail.com';
     const error = new Error('test error');
     const mockedApiClient = {
-      auth: {api: {putEmail: () => Promise.reject(error)}},
+      api: {auth: {putEmail: () => Promise.reject(error)}},
     };
 
     const store = mockStoreFactory({
@@ -181,7 +181,7 @@ describe('SelfAction', () => {
   it('can set the self password', async () => {
     const password = 'password';
     const mockedApiClient = {
-      self: {api: {putPassword: () => Promise.resolve()}},
+      api: {self: {putPassword: () => Promise.resolve()}},
     };
 
     const store = mockStoreFactory({
@@ -199,7 +199,7 @@ describe('SelfAction', () => {
     const password = 'password';
     const error = new Error('test error');
     const mockedApiClient = {
-      self: {api: {putPassword: () => Promise.reject(error)}},
+      api: {self: {putPassword: () => Promise.reject(error)}},
     };
 
     const store = mockStoreFactory({

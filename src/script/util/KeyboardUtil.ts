@@ -52,6 +52,8 @@ export const isKey = (keyboardEvent?: KeyboardEvent, expectedKey = '') => {
   return eventKey === expectedKey.toLowerCase();
 };
 
+export const isTabKey = (keyboardEvent: KeyboardEvent): boolean => isKey(keyboardEvent, KEY.TAB);
+
 export const isEnterKey = (keyboardEvent: KeyboardEvent): boolean => isKey(keyboardEvent, KEY.ENTER);
 
 export const isSpaceKey = (keyboardEvent: KeyboardEvent): boolean => isKey(keyboardEvent, KEY.SPACE);
@@ -132,6 +134,13 @@ export const offEscKey = (handler: KeyboardHandler) => {
   if (index >= 0) {
     escKeyHandlers.splice(index, 1);
   }
+};
+
+export const handleKeyDown = (event: React.KeyboardEvent<HTMLElement> | KeyboardEvent, callback: () => void) => {
+  if (event.key === KEY.ENTER || event.key === KEY.SPACE) {
+    callback();
+  }
+  return true;
 };
 
 const handleDebugKey = () => {

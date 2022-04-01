@@ -24,50 +24,80 @@ import {HistoryExportViewModel} from '../../../view_model/content/HistoryExportV
 import {ContentViewModel} from '../../../view_model/ContentViewModel';
 import {t} from 'Util/LocalizerUtil';
 import PreferencesSection from '../components/PreferencesSection';
+import {handleKeyDown} from 'Util/KeyboardUtil';
 
 interface HistoryBackupSectionProps {
   brandName: string;
 }
 
-const HistoryBackupSection: React.FC<HistoryBackupSectionProps> = ({brandName}) => (
-  <PreferencesSection
-    hasSeparator
-    title={t('preferencesOptionsBackupHeader')}
-    className="preferences-section-conversation-history"
-  >
-    <div
-      className="preferences-link accent-text"
-      onClick={() => {
-        {
-          amplify.publish(WebAppEvents.CONTENT.SWITCH, ContentViewModel.STATE.HISTORY_EXPORT);
-          amplify.publish(WebAppEvents.BACKUP.EXPORT.START);
-        }
-      }}
-      data-uie-name="do-backup-export"
+const HistoryBackupSection: React.FC<HistoryBackupSectionProps> = ({brandName}) => {
+  const fileInputRef = React.useRef(null);
+
+  const fileInputClick = () => {
+    fileInputRef.current.click();
+  };
+
+  return (
+    <PreferencesSection
+      hasSeparator
+      title={t('preferencesOptionsBackupHeader')}
+      className="preferences-section-conversation-history"
+      aria-label={t('preferencesOptionsBackupExportHeadline')}
     >
-      {t('preferencesOptionsBackupExportHeadline')}
-    </div>
-    <div className="preferences-detail">{t('preferencesOptionsBackupExportSecondary', brandName)}</div>
-    <label
-      className="preferences-link accent-text preferences-history-backup-import-field"
-      data-uie-name="do-backup-import"
-    >
-      <span>{t('preferencesOptionsBackupImportHeadline')}</span>
-      <input
-        type="file"
-        accept={`.${HistoryExportViewModel.CONFIG.FILE_EXTENSION}`}
-        onChange={event => {
-          const file = event.target.files[0];
-          if (file) {
-            amplify.publish(WebAppEvents.CONTENT.SWITCH, ContentViewModel.STATE.HISTORY_IMPORT);
-            amplify.publish(WebAppEvents.BACKUP.IMPORT.START, file);
+      <button
+        className="preferences-link accent-text"
+        onClick={() => {
+          {
+            amplify.publish(WebAppEvents.CONTENT.SWITCH, ContentViewModel.STATE.HISTORY_EXPORT);
+            amplify.publish(WebAppEvents.BACKUP.EXPORT.START);
           }
         }}
-        data-uie-name="input-import-file"
-      />
-    </label>
-    <div className="preferences-detail">{t('preferencesOptionsBackupImportSecondary')}</div>
-  </PreferencesSection>
-);
+        data-uie-name="do-backup-export"
+        aria-describedby="preferences-history-describe-1"
+        type="button"
+      >
+        {t('preferencesOptionsBackupExportHeadline')}
+      </button>
+      <p id="preferences-history-describe-1" className="preferences-detail">
+        {t('preferencesOptionsBackupExportSecondary', brandName)}
+      </p>
+      <div
+        role="button"
+        tabIndex={0}
+        onKeyDown={(event: React.KeyboardEvent<HTMLElement>) => handleKeyDown(event, fileInputClick)}
+        aria-labelledby="do-backup-import"
+      >
+        <label
+          className="preferences-link accent-text preferences-history-backup-import-field"
+          data-uie-name="do-backup-import"
+          id="do-backup-import"
+          htmlFor="file-import-input"
+        >
+          <span>{t('preferencesOptionsBackupImportHeadline')}</span>
+          <input
+            id="file-import-input"
+            ref={fileInputRef}
+            tabIndex={-1}
+            type="file"
+            accept={`.${HistoryExportViewModel.CONFIG.FILE_EXTENSION}`}
+            onChange={(event: any) => {
+              const file = event.target.files[0];
+              if (file) {
+                amplify.publish(WebAppEvents.CONTENT.SWITCH, ContentViewModel.STATE.HISTORY_IMPORT);
+                amplify.publish(WebAppEvents.BACKUP.IMPORT.START, file);
+              }
+            }}
+            onFocus={({target}) => target.blur()}
+            data-uie-name="input-import-file"
+            aria-describedby="preferences-history-describe-2"
+          />
+        </label>
+      </div>
+      <p id="preferences-history-describe-2" className="preferences-detail">
+        {t('preferencesOptionsBackupImportSecondary')}
+      </p>
+    </PreferencesSection>
+  );
+};
 
 export default HistoryBackupSection;

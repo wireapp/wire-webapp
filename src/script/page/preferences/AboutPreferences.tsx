@@ -52,31 +52,45 @@ const AboutPreferences: React.FC<AboutPreferencesProps> = ({userState = containe
     <PreferencesPage title={t('preferencesAbout')}>
       {showSupportSection && (
         <PreferencesSection title={t('preferencesAboutSupport')}>
-          <PreferencesLink href={config.URL.SUPPORT.INDEX} uie="go-support">
-            {t('preferencesAboutSupportWebsite')}
-          </PreferencesLink>
-          <PreferencesLink href={config.URL.SUPPORT.CONTACT} uie="go-contact-support">
-            {t('preferencesAboutSupportContact')}
-          </PreferencesLink>
+          <ul className="preferences-about-list">
+            <li className="preferences-about-list-item">
+              <PreferencesLink href={config.URL.SUPPORT.INDEX} uie="go-support">
+                {t('preferencesAboutSupportWebsite')}
+              </PreferencesLink>
+            </li>
+            <li className="preferences-about-list-item">
+              <PreferencesLink href={config.URL.SUPPORT.CONTACT} uie="go-contact-support">
+                {t('preferencesAboutSupportContact')}
+              </PreferencesLink>
+            </li>
+          </ul>
         </PreferencesSection>
       )}
       {showWireSection && (
         <PreferencesSection title={config.BRAND_NAME}>
-          {termsOfUseUrl && (
-            <PreferencesLink href={termsOfUseUrl} uie="go-legal">
-              {t('preferencesAboutTermsOfUse')}
-            </PreferencesLink>
-          )}
-          {privacyPolicyUrl && (
-            <PreferencesLink href={privacyPolicyUrl} uie="go-privacy">
-              {t('preferencesAboutPrivacyPolicy')}
-            </PreferencesLink>
-          )}
-          {websiteUrl && (
-            <PreferencesLink href={websiteUrl} uie="go-wire-dot-com">
-              {t('preferencesAboutWebsite', config.BRAND_NAME)}
-            </PreferencesLink>
-          )}
+          <ul className="preferences-about-list">
+            {termsOfUseUrl && (
+              <li className="preferences-about-list-item">
+                <PreferencesLink href={termsOfUseUrl} uie="go-legal">
+                  {t('preferencesAboutTermsOfUse')}
+                </PreferencesLink>
+              </li>
+            )}
+            {privacyPolicyUrl && (
+              <li className="preferences-about-list-item">
+                <PreferencesLink href={privacyPolicyUrl} uie="go-privacy">
+                  {t('preferencesAboutPrivacyPolicy')}
+                </PreferencesLink>
+              </li>
+            )}
+            {websiteUrl && (
+              <li className="preferences-about-list-item">
+                <PreferencesLink href={websiteUrl} uie="go-wire-dot-com">
+                  {t('preferencesAboutWebsite', config.BRAND_NAME)}
+                </PreferencesLink>
+              </li>
+            )}
+          </ul>
         </PreferencesSection>
       )}
       <PreferencesSection hasSeparator>

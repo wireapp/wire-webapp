@@ -57,7 +57,7 @@ export class AuthRepository {
 
   async logout(): Promise<void> {
     try {
-      await this.apiClient.auth.api.postLogout();
+      await this.apiClient.api.auth.postLogout();
       return this.logger.info('Log out on backend successful');
     } catch (error) {
       return this.logger.warn(`Log out on backend failed: ${error.message}`, error);

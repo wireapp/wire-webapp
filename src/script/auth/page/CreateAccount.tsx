@@ -20,6 +20,7 @@
 import {ArrowIcon, COLOR, Column, Columns, Container, ContainerXS, H1, IsMobile} from '@wireapp/react-ui-kit';
 import React from 'react';
 import {useIntl} from 'react-intl';
+import {Config} from '../../../script/Config';
 import useReactRouter from 'use-react-router';
 import {createAccountStrings} from '../../strings';
 import AccountForm from '../component/AccountForm';
@@ -37,6 +38,7 @@ const CreateAccount = ({}: Props) => {
       <ArrowIcon direction="left" color={COLOR.TEXT} style={{opacity: 0.56}} />
     </RouterLink>
   );
+
   return (
     <Page hasTeamData>
       <IsMobile>
@@ -56,7 +58,13 @@ const CreateAccount = ({}: Props) => {
             >
               <H1 center>{_(createAccountStrings.headLine)}</H1>
               <AccountForm
-                onSubmit={() => history.push(ROUTE.VERIFY_EMAIL_CODE)}
+                onSubmit={() => {
+                  if (Config.getConfig().FEATURE.ENABLE_EXTRA_CLIENT_ENTROPY) {
+                    history.push(ROUTE.SET_ENTROPY);
+                  } else {
+                    history.push(ROUTE.VERIFY_EMAIL_CODE);
+                  }
+                }}
                 submitText={_(createAccountStrings.submitButton)}
               />
             </ContainerXS>

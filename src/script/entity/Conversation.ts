@@ -23,7 +23,12 @@ import {Availability, LegalHoldStatus} from '@wireapp/protocol-messaging';
 import {QualifiedId} from '@wireapp/api-client/src/user';
 import {Cancelable, debounce} from 'underscore';
 import {WebAppEvents} from '@wireapp/webapp-events';
-import {CONVERSATION_ACCESS, CONVERSATION_ACCESS_ROLE, CONVERSATION_TYPE} from '@wireapp/api-client/src/conversation/';
+import {
+  ACCESS_ROLE_V2,
+  CONVERSATION_ACCESS,
+  CONVERSATION_ACCESS_ROLE,
+  CONVERSATION_TYPE,
+} from '@wireapp/api-client/src/conversation/';
 import {getLogger, Logger} from 'Util/Logger';
 import {t} from 'Util/LocalizerUtil';
 import {truncate} from 'Util/StringUtil';
@@ -108,6 +113,7 @@ export class Conversation {
   public readonly hasUnread: ko.PureComputed<boolean>;
   public id: string;
   public readonly inTeam: ko.PureComputed<boolean>;
+  public readonly lastDeliveredMessage: ko.PureComputed<Message | undefined>;
   public readonly is_archived: ko.Observable<boolean>;
   public readonly is_cleared: ko.PureComputed<boolean>;
   public readonly is_loaded: ko.Observable<boolean>;
@@ -142,7 +148,7 @@ export class Conversation {
   public readonly receiptMode: ko.Observable<RECEIPT_MODE>;
   public readonly removed_from_conversation: ko.PureComputed<boolean>;
   public readonly roles: ko.Observable<Record<string, string>>;
-  public readonly selfUser: ko.Observable<User>;
+  public readonly selfUser: ko.Observable<User | undefined>;
   public readonly servicesCount: ko.PureComputed<number>;
   public readonly showNotificationsEverything: ko.PureComputed<boolean>;
   public readonly showNotificationsMentionsAndReplies: ko.PureComputed<boolean>;
@@ -156,9 +162,8 @@ export class Conversation {
   public readonly hasExternal: ko.PureComputed<boolean>;
   public readonly hasFederatedUsers: ko.PureComputed<boolean>;
   public accessModes?: CONVERSATION_ACCESS[];
-  public accessRole?: CONVERSATION_ACCESS_ROLE;
+  public accessRole?: CONVERSATION_ACCESS_ROLE | ACCESS_ROLE_V2[];
   public domain: string;
-  public isFederated: ko.PureComputed<boolean>;
 
   static get TIMESTAMP_TYPE(): typeof TIMESTAMP_TYPE {
     return TIMESTAMP_TYPE;
@@ -197,8 +202,8 @@ export class Conversation {
 
     this.inTeam = ko.pureComputed(() => {
       const isSameTeam = this.selfUser()?.teamId === this.team_id;
-      const isSameDomain = !this.isFederated() || this.domain === this.selfUser().domain;
-      return this.team_id && isSameTeam && !this.isGuest() && isSameDomain;
+      const isSameDomain = this.domain === this.selfUser()?.domain;
+      return !!this.team_id && isSameTeam && !this.isGuest() && isSameDomain;
     });
     this.isGuestRoom = ko.pureComputed(() => this.accessState() === ACCESS_STATE.TEAM.GUEST_ROOM);
     this.isGuestAndServicesRoom = ko.pureComputed(() => this.accessState() === ACCESS_STATE.TEAM.GUESTS_SERVICES);
@@ -327,8 +332,6 @@ export class Conversation {
       () => this.selfUser().id === this.creator && !this.removed_from_conversation(),
     );
 
-    this.isFederated = ko.pureComputed(() => Config.getConfig().FEATURE.ENABLE_FEDERATION && !!this.domain);
-
     this.showNotificationsEverything = ko.pureComputed(() => {
       return this.notificationState() === NOTIFICATION_STATE.EVERYTHING;
     });
@@ -374,10 +377,11 @@ export class Conversation {
 
     this.messages_unordered = ko.observableArray();
     this.messages = ko.pureComputed(() =>
-      this.messages_unordered().sort((message_a, message_b) => {
+      [...this.messages_unordered()].sort((message_a, message_b) => {
         return message_a.timestamp() - message_b.timestamp();
       }),
     );
+    this.lastDeliveredMessage = ko.pureComputed(() => this.getLastDeliveredMessage());
 
     this.incomingMessages = ko.observableArray();
 
@@ -515,7 +519,7 @@ export class Conversation {
   }
 
   get qualifiedId(): QualifiedId {
-    return {domain: this.isFederated() ? this.domain : '', id: this.id};
+    return {domain: this.domain, id: this.id};
   }
 
   private hasInitializedUsers() {
@@ -892,7 +896,7 @@ export class Conversation {
    * Get the message before a given message.
    * @param message_et Message to look up from
    */
-  getPreviousMessage(message_et: ContentMessage): Message | ContentMessage | MemberMessage | SystemMessage | undefined {
+  getPreviousMessage(message_et: Message): Message | ContentMessage | MemberMessage | SystemMessage | undefined {
     const messages_visible = this.messages_visible();
     const message_index = messages_visible.indexOf(message_et);
     if (message_index > 0) {
@@ -971,8 +975,8 @@ export class Conversation {
 
   serialize(): ConversationRecord {
     return {
-      accessModes: this.accessModes,
-      accessRole: this.accessRole,
+      access: this.accessModes,
+      access_role: this.accessRole,
       archived_state: this.archivedState(),
       archived_timestamp: this.archivedTimestamp(),
       cleared_timestamp: this.cleared_timestamp(),

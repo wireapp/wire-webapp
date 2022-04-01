@@ -28,43 +28,43 @@ export class SelfService {
   constructor(private readonly apiClient = container.resolve(APIClient)) {}
 
   deleteSelf(password?: string): Promise<void> {
-    return this.apiClient.self.api.deleteSelf({password});
+    return this.apiClient.api.self.deleteSelf({password});
   }
 
   getSelf(traceStates: TraceState[]): Promise<Self> {
     traceStates.push({position: 'SelfService.getSelf', vendor: 'webapp'});
-    return this.apiClient.self.api.getSelf(traceStates);
+    return this.apiClient.api.self.getSelf(traceStates);
   }
 
   async getSelfConsent(): Promise<Consent[]> {
-    return (await this.apiClient.self.api.getConsents()).results;
+    return (await this.apiClient.api.self.getConsents()).results;
   }
 
   putSelf(selfData: UserUpdate): Promise<void> {
-    return this.apiClient.self.api.putSelf(selfData);
+    return this.apiClient.api.self.putSelf(selfData);
   }
 
   putSelfConsent(type: number, value: number, source: string): Promise<void> {
-    return this.apiClient.self.api.putConsent({source, type, value});
+    return this.apiClient.api.self.putConsent({source, type, value});
   }
 
   putSelfEmail(email: string): Promise<void> {
-    return this.apiClient.auth.api.putEmail({email});
+    return this.apiClient.api.auth.putEmail({email});
   }
 
   putSelfHandle(handle: string): Promise<void> {
-    return this.apiClient.self.api.putHandle({handle});
+    return this.apiClient.api.self.putHandle({handle});
   }
 
   putSelfLocale(locale: string): Promise<void> {
-    return this.apiClient.self.api.putLocale({locale});
+    return this.apiClient.api.self.putLocale({locale});
   }
 
   putSelfPassword(newPassword: string, oldPassword?: string): Promise<void> {
-    return this.apiClient.self.api.putPassword({new_password: newPassword, old_password: oldPassword});
+    return this.apiClient.api.self.putPassword({new_password: newPassword, old_password: oldPassword});
   }
 
   putSelfPhone(phone: string): Promise<void> {
-    return this.apiClient.self.api.putPhone({phone});
+    return this.apiClient.api.self.putPhone({phone});
   }
 }

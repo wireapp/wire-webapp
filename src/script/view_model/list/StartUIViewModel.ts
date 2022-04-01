@@ -88,7 +88,8 @@ export class StartUIViewModel {
   readonly manageTeamUrl: string;
   readonly manageServicesUrl: string;
   readonly federationDomain?: string;
-  readonly enableFederation: boolean;
+  readonly visible: ko.PureComputed<boolean>;
+  readonly ariaHidden: ko.PureComputed<string>;
   private submittedSearch: boolean;
   private readonly matchedUsers: ko.ObservableArray<User>;
   private readonly alreadyClickedOnContact: Record<string, boolean>;
@@ -142,8 +143,6 @@ export class StartUIViewModel {
     this.peopleTabActive = ko.pureComputed(() => this.state() === StartUIViewModel.STATE.ADD_PEOPLE);
 
     this.submittedSearch = false;
-    this.enableFederation = Config.getConfig().FEATURE.ENABLE_FEDERATION;
-    this.federationDomain = this.enableFederation && this.selfUser().domain;
 
     this.search = debounce((query: string): Promise<void> | void => {
       this.clearSearchResults();
@@ -205,7 +204,7 @@ export class StartUIViewModel {
     this.showFederatedDomainNotAvailable = ko.observable(false);
 
     this.searchOnFederatedDomain = ko.pureComputed(() => {
-      if (Config.getConfig().FEATURE.ENABLE_FEDERATION && isValidFederationUsername(this.searchInput())) {
+      if (isValidFederationUsername(this.searchInput())) {
         const [_, _username, domain] = this.searchInput().split('@');
         return domain;
       }
@@ -248,6 +247,9 @@ export class StartUIViewModel {
     this.shouldUpdateScrollbar = ko
       .computed(() => this.listViewModel.lastUpdate())
       .extend({notify: 'always', rateLimit: 500});
+
+    this.visible = ko.pureComputed(() => listViewModel.state() === ListViewModel.STATE.START_UI);
+    this.ariaHidden = ko.pureComputed(() => (this.visible() ? 'false' : 'true'));
   }
 
   readonly clickOnClose = (): void => {
@@ -340,7 +342,9 @@ export class StartUIViewModel {
 
     // Clean up
     this.clearSearchResults();
-    $('user-input input').focus();
+    setTimeout(() => {
+      $('user-input input').focus();
+    }, 700);
 
     this.state(state);
     const isAddingPeople = state === StartUIViewModel.STATE.ADD_PEOPLE;

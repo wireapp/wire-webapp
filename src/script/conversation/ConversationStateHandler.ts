@@ -89,13 +89,13 @@ export class ConversationStateHandler extends AbstractConversationEventHandler {
 
         if (accessModes && accessRole) {
           try {
+            if (accessState === ACCESS_STATE.TEAM.TEAM_ONLY || accessState === ACCESS_STATE.TEAM.SERVICES) {
+              conversationEntity.accessCode(undefined);
+              await this.revokeAccessCode(conversationEntity);
+            }
             await this.conversationService.putConversationAccess(conversationEntity.id, accessModes, accessRole);
 
             conversationEntity.accessState(accessState);
-
-            if (accessState === ACCESS_STATE.TEAM.TEAM_ONLY || accessState === ACCESS_STATE.TEAM.SERVICES) {
-              conversationEntity.accessCode(undefined);
-            }
           } catch (e) {
             let messageString: string;
 

@@ -18,7 +18,7 @@
  */
 
 import {LoginData} from '@wireapp/api-client/src/auth';
-import {CodeInput, Column, Columns, ContainerXS, H1, Link} from '@wireapp/react-ui-kit';
+import {CodeInput, Column, Columns, ContainerXS, H1} from '@wireapp/react-ui-kit';
 import React, {useEffect, useState} from 'react';
 import {useIntl} from 'react-intl';
 import {connect} from 'react-redux';
@@ -34,6 +34,8 @@ import * as AuthSelector from '../module/selector/AuthSelector';
 import {ROUTE} from '../route';
 import {parseError} from '../util/errorUtil';
 import Page from './Page';
+import LinkButton from '../component/LinkButton';
+import RouterLink from '../component/RouterLink';
 
 interface Props extends React.HTMLProps<HTMLDivElement> {}
 
@@ -118,14 +120,14 @@ const VerifyPhoneCode = ({
         </div>
         <Columns>
           <Column>
-            <Link onClick={resendCode} data-uie-name="do-resend-code">
+            <LinkButton onClick={resendCode} data-uie-name="do-resend-code">
               {_(phoneLoginStrings.verifyCodeResend)}
-            </Link>
+            </LinkButton>
           </Column>
           <Column>
-            <Link onClick={() => history.push(ROUTE.LOGIN_PHONE)} data-uie-name="go-change-phone">
+            <RouterLink to={ROUTE.LOGIN_PHONE} data-uie-name="go-change-phone">
               {_(phoneLoginStrings.verifyCodeChangePhone)}
-            </Link>
+            </RouterLink>
           </Column>
         </Columns>
       </ContainerXS>

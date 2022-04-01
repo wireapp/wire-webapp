@@ -18,6 +18,7 @@
  */
 
 import {useEffect, useRef} from 'react';
+import {KEY} from 'Util/KeyboardUtil';
 
 const hideControlsClass = 'hide-controls';
 
@@ -37,7 +38,7 @@ const useHideElement = (timeout: number, skipClass?: string) => {
       hideTimeout = window.setTimeout(hideElement, timeout);
     };
 
-    const onMouseMove = ({target}: MouseEvent) => {
+    const resetTimer = (target: Element) => {
       window.clearTimeout(hideTimeout);
       ref.current.classList.remove(hideControlsClass);
 
@@ -51,9 +52,20 @@ const useHideElement = (timeout: number, skipClass?: string) => {
       startTimer();
     };
 
+    const onMouseMove = ({target}: MouseEvent) => {
+      resetTimer(target as Element);
+    };
+
+    const onKeyDown = ({target, key}: KeyboardEvent) => {
+      if (key === KEY.TAB) {
+        resetTimer(target as Element);
+      }
+    };
+
     ref.current.addEventListener('mouseleave', hideElement);
     ref.current.addEventListener('mouseout', hideElement);
     ref.current.addEventListener('mousemove', onMouseMove);
+    ref.current.addEventListener('keydown', onKeyDown);
 
     startTimer();
     return () => {
@@ -61,6 +73,7 @@ const useHideElement = (timeout: number, skipClass?: string) => {
       ref.current.removeEventListener('mouseleave', hideElement);
       ref.current.removeEventListener('mouseout', hideElement);
       ref.current.removeEventListener('mousemove', onMouseMove);
+      ref.current.removeEventListener('keydown', onKeyDown);
       ref.current.classList.remove(hideControlsClass);
     };
   }, [ref.current]);

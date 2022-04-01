@@ -60,6 +60,8 @@ interface AccountPreferencesProps {
   conversationRepository: ConversationRepository;
   propertiesRepository: PropertiesRepository;
   richProfileRepository?: RichProfileRepository;
+  /** Should the domain be displayed */
+  showDomain?: boolean;
   teamState?: TeamState;
   userRepository: UserRepository;
   userState?: UserState;
@@ -72,9 +74,9 @@ const AccountPreferences: React.FC<AccountPreferencesProps> = ({
   userRepository,
   propertiesRepository,
   conversationRepository,
+  showDomain = false,
   userState = container.resolve(UserState),
   teamState = container.resolve(TeamState),
-  richProfileRepository = container.resolve(RichProfileRepository),
 }) => {
   const {self: selfUser, isActivatedAccount} = useKoSubscribableChildren(userState, ['self', 'isActivatedAccount']);
   const {isTeam, teamName} = useKoSubscribableChildren(teamState, ['isTeam', 'teamName']);
@@ -91,10 +93,9 @@ const AccountPreferences: React.FC<AccountPreferencesProps> = ({
   const isTemporaryAndNonPersistent = useRef(isTemporaryClientAndNonPersistent(loadValue(StorageKey.AUTH.PERSIST)));
   const config = Config.getConfig();
   const brandName = config.BRAND_NAME;
-  const isFederated = config.FEATURE.ENABLE_FEDERATION;
   const isConsentCheckEnabled = config.FEATURE.CHECK_CONSENT;
 
-  const richFields = useEnrichedFields(selfUser, false, richProfileRepository);
+  const richFields = useEnrichedFields(selfUser, {addDomain: showDomain, addEmail: false});
   const domain = selfUser.domain;
   const clickOnLeaveGuestRoom = (): void => {
     modals.showModal(
@@ -157,10 +158,11 @@ const AccountPreferences: React.FC<AccountPreferencesProps> = ({
               display: 'flex',
               flexDirection: 'row',
               flexWrap: 'wrap',
+              marginLeft: '-8px',
             }}
           >
             <NameInput {...{canEditProfile, name, userRepository}} />
-            <UsernameInput {...{canEditProfile, userRepository, username}} domain={isFederated ? domain : undefined} />
+            <UsernameInput {...{canEditProfile, userRepository, username}} domain={showDomain ? domain : undefined} />
             {email && <EmailInput {...{canEditProfile, email, userRepository}} />}
             {phone && (
               <AccountInput label={t('preferencesAccountPhone')} value={phone} readOnly data-uie-name="enter-phone" />
@@ -187,13 +189,14 @@ const AccountPreferences: React.FC<AccountPreferencesProps> = ({
         </PreferencesSection>
       ) : (
         <PreferencesSection hasSeparator>
-          <div
+          <button
             className="preferences-link accent-text"
             onClick={clickOnLeaveGuestRoom}
             data-uie-name="do-leave-guest-room"
+            type="button"
           >
             {t('preferencesAccountLeaveGuestRoom')}
-          </div>
+          </button>
           <div className="preferences-leave-disclaimer">{t('preferencesAccountLeaveGuestRoomDescription')}</div>
         </PreferencesSection>
       )}
@@ -215,5 +218,5 @@ export default AccountPreferences;
 registerReactComponent('account-preferences', {
   component: AccountPreferences,
   template:
-    '<div data-bind="react:{clientRepository, userRepository, propertiesRepository, conversationRepository}"></div>',
+    '<div data-bind="react:{clientRepository, userRepository, propertiesRepository, conversationRepository, showDomain}"></div>',
 });

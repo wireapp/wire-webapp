@@ -68,7 +68,7 @@ export class ClientService {
    * @returns Resolves once the deletion of the client is complete
    */
   deleteClient(clientId: string, password: string): Promise<void> {
-    return this.apiClient.client.api.deleteClient(clientId, password);
+    return this.apiClient.api.client.deleteClient(clientId, password);
   }
 
   /**
@@ -79,7 +79,7 @@ export class ClientService {
    * @returns Resolves once the update of the client is complete
    */
   putClientCapabilities(clientId: string, clientCapabilities: ClientCapabilityData): Promise<void> {
-    return this.apiClient.client.api.putClient(clientId, clientCapabilities);
+    return this.apiClient.api.client.putClient(clientId, clientCapabilities);
   }
 
   /**
@@ -88,7 +88,7 @@ export class ClientService {
    * @returns Resolves once the deletion of the temporary client is complete
    */
   deleteTemporaryClient(clientId: string): Promise<void> {
-    return this.apiClient.client.api.deleteClient(clientId);
+    return this.apiClient.api.client.deleteClient(clientId);
   }
 
   /**
@@ -99,7 +99,7 @@ export class ClientService {
    * @returns Resolves with the requested client
    */
   getClientById(clientId: string): Promise<RegisteredClient> {
-    return this.apiClient.client.api.getClient(clientId);
+    return this.apiClient.api.client.getClient(clientId);
   }
 
   /**
@@ -108,24 +108,23 @@ export class ClientService {
    * @returns Resolves with the clients of the self user
    */
   getClients(): Promise<RegisteredClient[]> {
-    return this.apiClient.client.api.getClients();
+    return this.apiClient.api.client.getClients();
   }
 
   /**
    * Retrieves meta information about all the clients of a specific user.
    * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/users/getClients
    */
-  async getClientsByQualifiedUserIds(userIds: QualifiedId[]): Promise<QualifiedUserClientMap> {
-    const listedClients = await this.apiClient.user.api.postListClients({qualified_users: userIds});
+  async getClientsByUserIds(userIds: QualifiedId[]): Promise<QualifiedUserClientMap> {
+    if (!this.apiClient.backendFeatures.federationEndpoints) {
+      const clientsMap: {[userId: string]: PublicClient[]} = {};
+      for (const {id} of userIds) {
+        clientsMap[id] = await this.apiClient.api.user.getClients(id);
+      }
+      return {'': clientsMap};
+    }
+    const listedClients = await this.apiClient.api.user.postListClients({qualified_users: userIds});
     return listedClients.qualified_user_map;
-  }
-
-  /**
-   * Retrieves meta information about all the clients of a specific user.
-   * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/users/getClients
-   */
-  async getClientsByUserId(userId: string): Promise<PublicClient[]> {
-    return this.apiClient.user.api.getClients(userId);
   }
 
   /**
@@ -134,7 +133,7 @@ export class ClientService {
    * @returns Resolves with the registered client information
    */
   postClients(newClient: NewClient): Promise<RegisteredClient> {
-    return this.apiClient.client.api.postClient(newClient);
+    return this.apiClient.api.client.postClient(newClient);
   }
 
   //##############################################################################

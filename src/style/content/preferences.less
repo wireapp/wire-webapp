@@ -33,7 +33,9 @@
   flex: 0 0 auto;
   align-items: center;
   justify-content: center;
+  padding: 0;
   border-bottom: 1px solid var(--foreground-fade-8);
+  margin: 0;
   background-color: var(--app-bg);
   color: var(--background);
 }
@@ -57,6 +59,7 @@
 
 .preferences-detail {
   width: 380px;
+  margin: 0;
   color: var(--foreground);
   font-size: @font-size-xs;
   line-height: @line-height-sm;
@@ -94,7 +97,8 @@
 }
 
 .preferences-link {
-  display: block;
+  .button-reset-default;
+  display: inline-block;
   cursor: pointer;
   font-size: @font-size-sm;
   line-height: @line-height-xl;
@@ -148,14 +152,23 @@
 }
 
 .preferences-section {
+  display: flex;
   width: 560px;
+  flex-direction: column;
+  align-items: flex-start;
   margin-bottom: 32px;
 }
 
 .preferences-separator {
+  width: 100%;
   height: 1px;
   border: 0;
   margin: 0;
   margin-bottom: 32px;
   background: @separator-color;
+}
+
+.preferences-about-list {
+  .list-unstyled;
+  margin: 0;
 }
