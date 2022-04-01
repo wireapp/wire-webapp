@@ -104,7 +104,7 @@ export class SingleInstanceHandler {
   }
 
   private _isSingleRunningInstance(): boolean {
-    if (Runtime.isDesktopApp()) {
+    if (Runtime.isDesktopApp() || Runtime.isIOS()) {
       return true;
     }
     const cookieValue = Cookies.get(CONFIG.COOKIE_NAME);
