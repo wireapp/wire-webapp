@@ -60,6 +60,7 @@ import {User} from '../../entity/User';
 import {UserState} from '../../user/UserState';
 import {TeamState} from '../../team/TeamState';
 import '../../page/message-list/MentionSuggestions';
+import {Runtime} from '@wireapp/commons';
 
 interface DraftMessage {
   mentions: MentionEntity[];
@@ -374,6 +375,7 @@ export class InputBarViewModel {
     this.textarea = nodes.find(node => node.id === 'conversation-input-bar-text') as HTMLTextAreaElement;
     this.shadowInput = nodes.find(node => node.classList?.contains('shadow-input')) as HTMLDivElement;
     this.updateSelectionState();
+    this.iosKeyboardHack();
   };
 
   loadInitialStateForConversation = async (conversationEntity: Conversation): Promise<void> => {
@@ -721,6 +723,19 @@ export class InputBarViewModel {
     }
 
     return undefined;
+  };
+
+  readonly iosKeyboardHack = (): void => {
+    if (!Runtime.isIOS()) {
+      return;
+    }
+    const conversation = document.getElementById('conversation');
+    this.textarea.addEventListener('focus', () => {
+      conversation.classList.add('ios-keyboard-open');
+    });
+    this.textarea.addEventListener('blur', () => {
+      conversation.classList.remove('ios-keyboard-open');
+    });
   };
 
   readonly handleMentionFlow = (): void => {
