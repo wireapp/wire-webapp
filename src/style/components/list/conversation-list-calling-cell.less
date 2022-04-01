@@ -261,7 +261,15 @@ conversation-list-calling-cell:first-of-type {
 
   &-left,
   &-right {
+    .list-unstyled;
     display: flex;
+    margin: 0;
+  }
+}
+
+.conversation-list-calling-cell-controls-item {
+  & + & {
+    margin-left: 8px;
   }
 }
 
