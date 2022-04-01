@@ -34,6 +34,12 @@
 
   display: flex;
   flex-direction: column;
+
+  &.ios-keyboard-open {
+    @media (max-width: 600px) {
+      max-height: calc(calc(var(--vh, 1vh) * 100) - 290px);
+    }
+  }
 }
 
 .conversation-loading {
