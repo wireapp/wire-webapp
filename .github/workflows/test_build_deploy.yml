@@ -2,12 +2,12 @@ name: CI
 
 on:
   push:
-    branches: [master, dev, edge, avs]
+    branches: [master, dev, edge, avs, mobile]
     tags:
       - '*staging*'
       - '*production*'
   pull_request:
-    branches: [master, dev, edge, avs]
+    branches: [master, dev, edge, avs, mobile]
 
 jobs:
   test_build_deploy:
