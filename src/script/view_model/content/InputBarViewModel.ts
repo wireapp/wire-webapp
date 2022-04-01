@@ -731,6 +731,7 @@ export class InputBarViewModel {
     }
     const conversation = document.getElementById('conversation');
     this.textarea.addEventListener('focus', () => {
+      document.documentElement.style.setProperty('--visual-viewport', `${window.visualViewport.height}px`);
       conversation.classList.add('ios-keyboard-open');
     });
     this.textarea.addEventListener('blur', () => {
