@@ -103,7 +103,7 @@
     "autoprefixer": "9.8.8",
     "babel-eslint": "10.1.0",
     "babel-loader": "8.2.4",
-    "concurrently": "7.0.0",
+    "concurrently": "7.1.0",
     "cross-env": "7.0.3",
     "cspell": "5.19.5",
     "cssnano": "4.1.11",
