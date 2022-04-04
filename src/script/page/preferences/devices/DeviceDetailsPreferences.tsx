@@ -70,18 +70,18 @@ const DeviceDetailsPreferences: React.FC<DevicesPreferencesProps> = ({
       className="preferences-page preferences-device-details"
       data-uie-name="preferences-devices-details"
     >
-      <div className="preferences-titlebar">{t('preferencesDeviceDetails')}</div>
+      <h2 className="preferences-titlebar">{t('preferencesDeviceDetails')}</h2>
       <div className="preferences-content">
-        <section className="preferences-section">
-          <header className="preferences-devices-details">
+        <fieldset className="preferences-section">
+          <legend className="preferences-devices-details">
             <button
               type="button"
               className="preferences-devices-icon icon-back"
               onClick={onClose}
               data-uie-name="go-back"
-            ></button>
+            />
             <span>{t('preferencesDevices')}</span>
-          </header>
+          </legend>
           <DetailedDevice device={device} fingerprint={fingerprint} />
           <div className="preferences-devices-verification slider">
             <input
@@ -97,7 +97,7 @@ const DeviceDetailsPreferences: React.FC<DevicesPreferencesProps> = ({
             </label>
           </div>
           <div className="preferences-detail">{t('preferencesDevicesFingerprintDetail', brandName)}</div>
-        </section>
+        </fieldset>
 
         <section className="preferences-section">
           <header className="preferences-header">

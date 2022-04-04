@@ -128,18 +128,18 @@ const DevicesPreferences: React.FC<DevicesPreferencesProps> = ({
 
   return (
     <div id="preferences-devices" className="preferences-page preferences-devices">
-      <div className="preferences-titlebar">{t('preferencesDevices')}</div>
+      <h2 className="preferences-titlebar">{t('preferencesDevices')}</h2>
       <div className="preferences-content" ref={setScrollbarRef}>
-        <section className="preferences-section" data-uie-name="preferences-device-current">
-          <header className="preferences-header">{t('preferencesDevicesCurrent')}</header>
+        <fieldset className="preferences-section" data-uie-name="preferences-device-current">
+          <legend className="preferences-header">{t('preferencesDevicesCurrent')}</legend>
           <DetailedDevice device={currentClient} fingerprint={cryptographyRepository.getLocalFingerprint()} />
-        </section>
+        </fieldset>
 
         <hr className="preferences-devices-separator preferences-separator" />
 
         {clients.length > 0 && (
-          <section className="preferences-section">
-            <header className="preferences-header">{t('preferencesDevicesActive')}</header>
+          <fieldset className="preferences-section">
+            <legend className="preferences-header">{t('preferencesDevicesActive')}</legend>
             {clients.map(device => (
               <Device
                 device={device}
@@ -150,7 +150,7 @@ const DevicesPreferences: React.FC<DevicesPreferencesProps> = ({
               />
             ))}
             <div className="preferences-detail">{t('preferencesDevicesActiveDetail')}</div>
-          </section>
+          </fieldset>
         )}
       </div>
     </div>

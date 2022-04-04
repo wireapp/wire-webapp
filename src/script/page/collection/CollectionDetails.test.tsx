@@ -122,7 +122,8 @@ describe('CollectionDetails', () => {
   });
 
   it('groups assets by month', async () => {
-    jest.setSystemTime(1646089200000); // March 1st 2022 00:00:00
+    jest.useFakeTimers();
+    jest.setSystemTime(1647298800000); // March 15 2022 00:00:00
     const ONE_DAY = 24 * 60 * 60 * 1000;
     const ONE_MONTH = 30 * ONE_DAY;
     const ONE_YEAR = 12 * ONE_MONTH;

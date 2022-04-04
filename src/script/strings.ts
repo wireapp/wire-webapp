@@ -96,6 +96,10 @@ export const setAccountTypeStrings = defineMessages({
     defaultMessage: 'Secure collaboration for businesses, institutions and professional organizations',
     id: 'index.createTeam',
   },
+  goBack: {
+    defaultMessage: 'Go Back',
+    id: 'index.goBack',
+  },
 });
 
 export const teamNameStrings = defineMessages({
@@ -488,7 +492,7 @@ export const errorHandlerStrings = defineMessages({
     id: 'BackendErrorLabel.DOMAIN_BLOCKED_FOR_REGISTRATION',
   },
   [BackendError.LABEL.INVALID_CODE]: {
-    defaultMessage: 'Invalid code, or maximum attempts exceeded. Please retry, or request another code.',
+    defaultMessage: 'Please retry, or request another code.',
     id: 'BackendError.LABEL.INVALID_CODE',
   },
   [BackendError.LABEL.INVALID_CREDENTIALS]: {
@@ -628,7 +632,7 @@ export const errorHandlerStrings = defineMessages({
     id: 'BackendError.LABEL.SSO_UNSUPPORTED_SAML',
   },
   [BackendError.LABEL.CODE_AUTHENTICATION_FAILED]: {
-    defaultMessage: 'Please try again',
+    defaultMessage: 'Please retry, or request another code.',
     id: 'BackendError.LABEL.CODE_AUTHENTICATION_FAILED',
   },
   [BackendError.LABEL.SSO_GENERIC_ERROR]: {
@@ -697,6 +701,10 @@ export const loginStrings = defineMessages({
   forgotPassword: {
     defaultMessage: 'Forgot password?',
     id: 'login.forgotPassword',
+  },
+  goBack: {
+    defaultMessage: 'Go Back',
+    id: 'login.goBack',
   },
   headline: {
     defaultMessage: 'Log in',

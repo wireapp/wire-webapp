@@ -47,7 +47,7 @@ const ConnectedMessage: React.FC<ConnectedMessageProps> = ({
 
   return (
     <div className="message-connected" data-uie-name="element-connected-message">
-      <span className="message-connected-header">{name}</span>
+      <h2 className="message-connected-header">{name}</h2>
       {isService ? (
         <span className="message-connected-provider-name">{providerName}</span>
       ) : (

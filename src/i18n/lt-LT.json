@@ -10,7 +10,7 @@
   "BackendError.LABEL.EMAIL_EXISTS": "Šis el. pašto adresas jau užregistruotas. {supportEmailExistsLink}",
   "BackendError.LABEL.HANDLE_EXISTS": "Naudotojo vardas jau naudojamas",
   "BackendError.LABEL.HANDLE_TOO_SHORT": "Įrašykite bent 2 simbolių naudotojo vardą",
-  "BackendError.LABEL.INVALID_CODE": "Invalid code, or maximum attempts exceeded. Please retry, or request another code.",
+  "BackendError.LABEL.INVALID_CODE": "Please retry, or request another code.",
   "BackendError.LABEL.INVALID_CREDENTIALS": "Patikrinkite duomenis ir bandykite dar kartą",
   "BackendError.LABEL.INVALID_EMAIL": "Šis el. pašto adresas yra neteingas",
   "BackendError.LABEL.INVALID_HANDLE": "Naudotojo vardas neleistinas",

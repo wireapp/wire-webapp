@@ -85,8 +85,22 @@ const listTemplate = (data: string, uieName: string = ''): string => `
       <!-- /ko -->
       <!-- ko ifnot: noSelfInteraction && user.isMe -->
         <participant-item
-          params="participant: user, noUnderline: noUnderline, showArrow: arrow, highlighted: highlightedUserIds.includes(user.id), customInfo: infos && infos()[user.id], canSelect: isSelectEnabled, isSelected: isSelected(user), mode: mode, external: teamState.isExternal(user.id), selfInTeam: selfInTeam, isSelfVerified: isSelfVerified"
-          data-bind="click: (viewmodel, event) => onClickOrKeyPressed(user, event),  event: {'keydown': (viewmodel, event) => onUserKeyPressed(user, event) }, attr: {'aria-label': user.name}" role="button" tabindex="0">
+          params="
+            participant: user,
+            noUnderline: noUnderline,
+            showArrow: arrow,
+            highlighted: highlightedUserIds.includes(user.id),
+            customInfo: infos && infos()[user.id],
+            canSelect: isSelectEnabled,
+            isSelected: isSelected(user),
+            mode: mode,
+            external: teamState.isExternal(user.id),
+            selfInTeam: selfInTeam,
+            isSelfVerified: isSelfVerified,
+            onClick: (event) => onClickOrKeyPressed(user, event),
+            onKeyDown: (event) => onUserKeyPressed(user, event)
+          "
+          data-bind="attr: {'aria-label': user.name}">
         </participant-item>
       <!-- /ko -->
       </li>

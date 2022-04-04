@@ -104,9 +104,24 @@ const ConversationListCell: React.FC<ConversationListCellProps> = ({
     onJoinCall(conversation, MediaType.AUDIO);
   };
 
-  const handleKeyPress = (event: React.KeyboardEvent) => {
+  const handleDivKeyDown = (event: React.KeyboardEvent) => {
     if (event.key === KEY.SPACE || event.key === KEY.ENTER) {
       onClick(event as unknown as React.MouseEvent<Element, MouseEvent>);
+    }
+  };
+
+  const handleContextKeyDown = (event: React.KeyboardEvent) => {
+    if (event.key === KEY.SPACE || event.key === KEY.ENTER) {
+      event.stopPropagation();
+      event.preventDefault();
+
+      const {top, left, height} = (event.target as Element).getBoundingClientRect();
+      const newEvent = new MouseEvent('MouseEvent', {
+        ...(event as unknown as MouseEvent),
+        clientX: left,
+        clientY: top + height,
+      });
+      rightClick(conversation, newEvent);
     }
   };
 
@@ -120,7 +135,7 @@ const ConversationListCell: React.FC<ConversationListCellProps> = ({
         tabIndex={0}
         className={cx('conversation-list-cell', {'conversation-list-cell-active': isActive})}
         onClick={onClick}
-        onKeyPress={handleKeyPress}
+        onKeyDown={handleDivKeyDown}
       >
         <div
           className={cx('conversation-list-cell-left', {
@@ -160,7 +175,8 @@ const ConversationListCell: React.FC<ConversationListCellProps> = ({
               event.stopPropagation();
               rightClick(conversation, event.nativeEvent);
             }}
-          ></button>
+            onKeyDown={handleContextKeyDown}
+          />
           {!showJoinButton && (
             <>
               {cellState.icon === ConversationStatusIcon.PENDING_CONNECTION && (

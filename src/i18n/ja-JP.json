@@ -10,7 +10,7 @@
   "BackendError.LABEL.EMAIL_EXISTS": "このメールアドレスは既に使用されています。{supportEmailExistsLink}",
   "BackendError.LABEL.HANDLE_EXISTS": "このユーザー名は既に使われています",
   "BackendError.LABEL.HANDLE_TOO_SHORT": "ユーザー名は最低２文字の入力が必要です。",
-  "BackendError.LABEL.INVALID_CODE": "Invalid code, or maximum attempts exceeded. Please retry, or request another code.",
+  "BackendError.LABEL.INVALID_CODE": "Please retry, or request another code.",
   "BackendError.LABEL.INVALID_CREDENTIALS": "詳細を確認して、もう一度やり直してください。",
   "BackendError.LABEL.INVALID_EMAIL": "このメールアドレスは無効です",
   "BackendError.LABEL.INVALID_HANDLE": "このユーザー名は無効です",

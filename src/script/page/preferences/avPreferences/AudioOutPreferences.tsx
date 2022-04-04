@@ -47,6 +47,7 @@ const AudioOutPreferences: React.FC<AudioOutPreferencesProps> = ({devicesHandler
         value={currentDeviceId}
         icon={Icon.Speaker}
         defaultDeviceName={t('preferencesAVSpeakers')}
+        title={t('preferencesAVSpeakers')}
       />
     </PreferencesSection>
   );

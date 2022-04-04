@@ -1914,10 +1914,10 @@ expect@^26.6.2:
     jest-message-util "^26.6.2"
     jest-regex-util "^26.0.0"
 
-express-sitemap-xml@3.0.0:
-  version "3.0.0"
-  resolved "https://registry.yarnpkg.com/express-sitemap-xml/-/express-sitemap-xml-3.0.0.tgz#b97db01f126fec01edfbb8fecee24a2b474b3d88"
-  integrity sha512-5cim7WY3g5C2HpK0sJAS749PSEhCV/NtQzdkdor1PzTdTHqS405h/obWJy6rz4UpU+s07+awK9uRQTIbZyQCsQ==
+express-sitemap-xml@3.0.1:
+  version "3.0.1"
+  resolved "https://registry.yarnpkg.com/express-sitemap-xml/-/express-sitemap-xml-3.0.1.tgz#d758a61274e16cff740445204b48f6507eb8c4ab"
+  integrity sha512-/jXUFdEN0RgHGjyVk0+ELYl03ytGVLzDMXopoU6QlFKoRRKsRJyVw7vnwcWZLAw3Fl3swcgkvgDHci27nQDOrA==
   dependencies:
     p-memoize "^4.0.1"
     xmlbuilder "^15.1.1"
@@ -5051,10 +5051,10 @@ typedarray-to-buffer@^3.1.5:
   dependencies:
     is-typedarray "^1.0.0"
 
-typescript@4.6.2:
-  version "4.6.2"
-  resolved "https://registry.yarnpkg.com/typescript/-/typescript-4.6.2.tgz#fe12d2727b708f4eef40f51598b3398baa9611d4"
-  integrity sha512-HM/hFigTBHZhLXshn9sN37H085+hQGeJHJ/X7LpBWLID/fbc2acUMfU+lGD98X81sKP+pFa9f0DZmCwB9GnbAg==
+typescript@4.6.3:
+  version "4.6.3"
+  resolved "https://registry.yarnpkg.com/typescript/-/typescript-4.6.3.tgz#eefeafa6afdd31d725584c67a0eaba80f6fc6c6c"
+  integrity sha512-yNIatDa5iaofVozS/uQJEl3JRWLKKGJKh6Yaiv0GLGSuhpFJe7P3SbHZ8/yjAHRQwKRoA6YZqlfjXWmVzoVSMw==
 
 typpy@2.3.11:
   version "2.3.11"

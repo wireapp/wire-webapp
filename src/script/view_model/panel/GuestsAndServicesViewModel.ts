@@ -49,6 +49,7 @@ export class GuestsAndServicesViewModel extends BasePanelViewModel {
   isServicesEnabled: ko.PureComputed<boolean>;
   isServicesRoom: ko.PureComputed<boolean>;
   isGuestLinkEnabled: ko.PureComputed<boolean>;
+  guestLinkDisabledInfo: ko.PureComputed<string>;
   showLinkOptions: ko.PureComputed<boolean>;
   brandName: string;
 
@@ -81,11 +82,34 @@ export class GuestsAndServicesViewModel extends BasePanelViewModel {
     this.hasAccessCode = ko.pureComputed(() =>
       this.isGuestEnabled() ? !!this.activeConversation().accessCode() : false,
     );
-    this.isGuestLinkEnabled = ko.pureComputed(() => this.teamState.isGuestLinkEnabled());
+    const conversationHasGuestLinkEnabled = ko.observable<boolean | undefined>(undefined);
+    this.isGuestLinkEnabled = ko.pureComputed(() => {
+      if (this.activeConversation().inTeam()) {
+        return this.teamState.isGuestLinkEnabled();
+      }
+      return conversationHasGuestLinkEnabled();
+    });
+    this.guestLinkDisabledInfo = ko.pureComputed(() => {
+      if (conversationHasGuestLinkEnabled() === false) {
+        return t('guestLinkDisabledByOtherTeam');
+      }
+      return t('guestLinkDisabled');
+    });
+
     this.showLinkOptions = ko.pureComputed(() => this.isGuestEnabled());
 
     this.activeConversation.subscribe(conversationEntity => this._updateCode(this.isVisible(), conversationEntity));
-    this.isVisible.subscribe(isVisible => this._updateCode(isVisible, this.activeConversation()));
+    this.isVisible.subscribe(async isVisible => {
+      if (!this.activeConversation().inTeam() && !this.isGuestLinkEnabled()) {
+        // If the conversation is not in my team and the guest link is disabled
+        // We check that the conversation itself has guest link enabled
+        const hasGuestLink = await params.repositories.team.conversationHasGuestLinkEnabled(
+          this.activeConversation().id,
+        );
+        conversationHasGuestLinkEnabled(hasGuestLink);
+      }
+      this._updateCode(isVisible, this.activeConversation());
+    });
     this.brandName = Config.getConfig().BRAND_NAME;
   }
 

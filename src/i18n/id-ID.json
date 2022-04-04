@@ -10,7 +10,7 @@
   "BackendError.LABEL.EMAIL_EXISTS": "Alamat e-mail ini telah digunakan. {supportEmailExistsLink}",
   "BackendError.LABEL.HANDLE_EXISTS": "Nama pengguna ini sudah ada",
   "BackendError.LABEL.HANDLE_TOO_SHORT": "Harap masukan nama pengguna minimal 2 karakter",
-  "BackendError.LABEL.INVALID_CODE": "Invalid code, or maximum attempts exceeded. Please retry, or request another code.",
+  "BackendError.LABEL.INVALID_CODE": "Please retry, or request another code.",
   "BackendError.LABEL.INVALID_CREDENTIALS": "Mohon verifikasi data Anda dan coba lagi",
   "BackendError.LABEL.INVALID_EMAIL": "Alamat e-mail ini tidak valid",
   "BackendError.LABEL.INVALID_HANDLE": "Nama pengguna ini tidak valid",
