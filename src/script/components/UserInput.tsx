@@ -27,16 +27,16 @@ export interface UserInputProps {
   enter?: () => void | Promise<void>;
   input: string;
   placeholder: string;
-  selectedUsers: User[];
+  selectedUsers?: User[];
   setInput: (input: string) => void;
-  setSelectedUsers: (users: User[]) => void;
+  setSelectedUsers?: (users: User[]) => void;
 }
 
 const UserInput: React.FC<UserInputProps> = ({
   enter: onEnter,
   input,
-  selectedUsers,
-  setSelectedUsers,
+  selectedUsers = [],
+  setSelectedUsers = () => {},
   placeholder,
   setInput,
 }: UserInputProps) => {

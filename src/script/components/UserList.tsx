@@ -54,7 +54,7 @@ const USER_CHUNK_SIZE = 64;
 export interface UserListProps {
   arrow: boolean;
   click: (userEntity: User, event: MouseEvent | KeyboardEvent) => void;
-  conversation: Conversation;
+  conversation?: Conversation;
   conversationRepository: ConversationRepository;
   conversationState?: ConversationState;
   highlightedUsers: () => User[];
@@ -85,7 +85,6 @@ const UserList: React.FC<UserListProps> = ({
   infos,
   highlightedUsers = () => [],
   noUnderline = false,
-  arrow = false,
   mode = UserlistMode.DEFAULT,
   conversation,
   truncate = false,
@@ -151,7 +150,7 @@ const UserList: React.FC<UserListProps> = ({
    * This is needed for large teams (>= 2000 members)
    */
   const fetchMembersFromBackend = debounce(async (query: string, isHandle: boolean, ignoreMembers: User[]) => {
-    const resultUsers = await searchRepository.searchByName(query, isHandle);
+    const resultUsers = await searchRepository!.searchByName(query, isHandle);
     const selfTeamId = userState.self().teamId;
     const foundMembers = resultUsers.filter(user => user.teamId === selfTeamId);
     const ignoreIds = ignoreMembers.map(member => member.id);
@@ -171,7 +170,7 @@ const UserList: React.FC<UserListProps> = ({
     if (normalizedQuery) {
       const trimmedQuery = filter.trim();
       const isHandle = trimmedQuery.startsWith('@') && validateHandle(normalizedQuery);
-      if (!skipSearch) {
+      if (searchRepository) {
         const SEARCHABLE_FIELDS = SearchRepository.CONFIG.SEARCHABLE_FIELDS;
         const properties = isHandle ? [SEARCHABLE_FIELDS.USERNAME] : undefined;
         resultUsers = searchRepository.searchUserInSet(normalizedQuery, userEntities, properties);
@@ -183,7 +182,7 @@ const UserList: React.FC<UserListProps> = ({
           teamRepository.isSelfConnectedTo(user.id) ||
           user.username() === normalizedQuery,
       );
-      if (!skipSearch && selfInTeam) {
+      if (searchRepository && selfInTeam) {
         fetchMembersFromBackend(trimmedQuery, isHandle, resultUsers);
       }
     } else {
