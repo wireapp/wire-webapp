@@ -22,7 +22,7 @@ import cx from 'classnames';
 
 import {registerReactComponent, useKoSubscribableChildren} from 'Util/ComponentUtil';
 import Avatar, {AVATAR_SIZE} from 'Components/Avatar';
-import {UserlistMode} from 'Components/userList';
+import {UserlistMode} from 'Components/UserList';
 import {t} from 'Util/LocalizerUtil';
 import {capitalizeFirstChar} from 'Util/StringUtil';
 import {noop} from 'Util/util';
@@ -38,7 +38,7 @@ import ParticipantMicOnIcon from 'Components/calling/ParticipantMicOnIcon';
 import Icon from 'Components/Icon';
 import useEffectRef from 'Util/useEffectRef';
 
-export interface ParticipantItemProps extends React.HTMLProps<HTMLDivElement> {
+export interface ParticipantItemProps extends Omit<React.HTMLProps<HTMLDivElement>, 'onClick' | 'onKeyDown'> {
   badge?: boolean;
   callParticipant?: Participant;
   canSelect?: boolean;
@@ -51,6 +51,8 @@ export interface ParticipantItemProps extends React.HTMLProps<HTMLDivElement> {
   mode?: UserlistMode;
   noInteraction?: boolean;
   noUnderline?: boolean;
+  onClick?: (user: User | ServiceEntity, event: MouseEvent) => void;
+  onKeyDown?: (user: User | ServiceEntity, event: KeyboardEvent) => void;
   participant: User | ServiceEntity;
   selfInTeam?: boolean;
   showArrow?: boolean;
@@ -137,8 +139,8 @@ const ParticipantItem: React.FC<ParticipantItemProps> = ({
       role="button"
       tabIndex={0}
       onContextMenu={onContextMenu}
-      onClick={onClick}
-      onKeyDown={onKeyDown}
+      onClick={event => onClick(participant as User, event.nativeEvent)}
+      onKeyDown={event => onKeyDown(participant as User, event.nativeEvent)}
     >
       <div
         className="participant-item"
