@@ -131,7 +131,7 @@ const DevicesPreferences: React.FC<DevicesPreferencesProps> = ({
       <h2 className="preferences-titlebar">{t('preferencesDevices')}</h2>
       <div className="preferences-content" ref={setScrollbarRef}>
         <fieldset className="preferences-section" data-uie-name="preferences-device-current">
-          <lagend className="preferences-header">{t('preferencesDevicesCurrent')}</lagend>
+          <legend className="preferences-header">{t('preferencesDevicesCurrent')}</legend>
           <DetailedDevice device={currentClient} fingerprint={cryptographyRepository.getLocalFingerprint()} />
         </fieldset>
 
