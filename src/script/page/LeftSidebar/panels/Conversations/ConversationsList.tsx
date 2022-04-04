@@ -19,7 +19,6 @@
 
 import {css} from '@emotion/core';
 import React from 'react';
-import {REASON as CALL_REASON, STATE as CALL_STATE} from '@wireapp/avs';
 import {t} from 'Util/LocalizerUtil';
 import {ListViewModel} from '../../../../view_model/ListViewModel';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
@@ -56,7 +55,7 @@ export const ConversationsList: React.FC<{
   conversationRepository,
   callState,
 }) => {
-  const {activeCalls} = useKoSubscribableChildren(callState, ['activeCalls']);
+  const {joinableCalls} = useKoSubscribableChildren(callState, ['joinableCalls']);
 
   const isActiveConversation = (conversation: Conversation) => conversationState.isActiveConversation(conversation);
 
@@ -67,17 +66,13 @@ export const ConversationsList: React.FC<{
   const isShowingConnectionRequests = contentState === ContentViewModel.STATE.CONNECTION_REQUESTS;
 
   const hasJoinableCall = (conversation: Conversation) => {
-    const call = activeCalls.find((callInstance: Call) =>
+    const call = joinableCalls.find((callInstance: Call) =>
       matchQualifiedIds(callInstance.conversationId, conversation.qualifiedId),
     );
     if (!call) {
       return false;
     }
-    return (
-      !conversation.removed_from_conversation() &&
-      call.state() === CALL_STATE.INCOMING &&
-      call.reason() !== CALL_REASON.ANSWERED_ELSEWHERE
-    );
+    return !conversation.removed_from_conversation();
   };
 
   const conversationView =

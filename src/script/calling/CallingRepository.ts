@@ -293,7 +293,7 @@ export class CallingRepository {
 
   private readonly updateMuteState = (isMuted: number) => {
     const activeStates = [CALL_STATE.MEDIA_ESTAB, CALL_STATE.ANSWERED, CALL_STATE.OUTGOING];
-    const activeCall = this.callState.activeCalls().find(call => activeStates.includes(call.state()));
+    const activeCall = this.callState.calls().find(call => activeStates.includes(call.state()));
     activeCall?.muteState(isMuted ? this.nextMuteState : MuteState.NOT_MUTED);
   };
 
@@ -384,7 +384,7 @@ export class CallingRepository {
 
   findCall(conversationId: QualifiedId): Call | undefined {
     return this.callState
-      .activeCalls()
+      .calls()
       .find((callInstance: Call) => matchQualifiedIds(callInstance.conversationId, conversationId));
   }
 
@@ -398,7 +398,7 @@ export class CallingRepository {
   }
 
   private storeCall(call: Call): void {
-    this.callState.activeCalls.push(call);
+    this.callState.calls.push(call);
     const conversation = this.conversationState.findConversation(call.conversationId);
     if (conversation) {
       conversation.call(call);
@@ -406,12 +406,12 @@ export class CallingRepository {
   }
 
   private removeCall(call: Call): void {
-    const index = this.callState.activeCalls().indexOf(call);
+    const index = this.callState.calls().indexOf(call);
     call.getSelfParticipant().releaseMediaStream(true);
     call.participants.removeAll();
     call.removeAllAudio();
     if (index !== -1) {
-      this.callState.activeCalls.splice(index, 1);
+      this.callState.calls.splice(index, 1);
     }
     const conversation = this.conversationState.findConversation(call.conversationId);
     if (conversation) {
@@ -1494,7 +1494,7 @@ export class CallingRepository {
   };
 
   private readonly audioCbrChanged = (userid: UserId, clientid: ClientId, enabled: number) => {
-    const activeCall = this.callState.activeCalls()[0];
+    const activeCall = this.callState.calls()[0];
     if (activeCall && !Config.getConfig().FEATURE.ENFORCE_CONSTANT_BITRATE) {
       activeCall.isCbrEnabled(!!enabled);
     }
@@ -1583,7 +1583,7 @@ export class CallingRepository {
    */
   destroy(): void {
     this.callState
-      .activeCalls()
+      .calls()
       .forEach((call: Call) => this.wCall.end(this.wUser, this.serializeQualifiedId(call.conversationId)));
     this.wCall.destroy(this.wUser);
   }
@@ -1599,7 +1599,7 @@ export class CallingRepository {
   private checkConcurrentJoinedCall(conversationId: QualifiedId, newCallState: CALL_STATE): Promise<void> {
     const idleCallStates = [CALL_STATE.INCOMING, CALL_STATE.NONE, CALL_STATE.UNKNOWN];
     const activeCall = this.callState
-      .activeCalls()
+      .calls()
       .find(call => !matchQualifiedIds(call.conversationId, conversationId) && !idleCallStates.includes(call.state()));
     if (!activeCall) {
       return Promise.resolve();

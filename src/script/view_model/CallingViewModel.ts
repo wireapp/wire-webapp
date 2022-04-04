@@ -103,7 +103,7 @@ export class CallingViewModel {
   ) {
     this.isSelfVerified = ko.pureComputed(() => selfUser().is_verified());
     this.activeCalls = ko.pureComputed(() =>
-      this.callState.activeCalls().filter(call => {
+      this.callState.calls().filter(call => {
         const conversation = this.conversationState.findConversation(call.conversationId);
         if (!conversation || conversation.removed_from_conversation()) {
           return false;

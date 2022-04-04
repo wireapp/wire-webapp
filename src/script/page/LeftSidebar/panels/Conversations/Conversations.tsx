@@ -232,26 +232,24 @@ const Conversations: React.FC<ConversationsProps> = ({
 
   const callingView = (
     <>
-      {activeCalls
-        .filter(call => !call.reason())
-        .map(call => {
-          const conversation = conversationState.findConversation(call.conversationId);
-          const callingViewModel = listViewModel.callingViewModel;
-          const callingRepository = callingViewModel.callingRepository;
-          return (
-            <div className="calling-cell" key={conversation.id}>
-              <ConversationListCallingCell
-                call={call}
-                callActions={callingViewModel.callActions}
-                callingRepository={callingRepository}
-                conversation={conversation}
-                hasAccessToCamera={callingViewModel.hasAccessToCamera()}
-                isSelfVerified={selfUser.is_verified()}
-                multitasking={callingViewModel.multitasking}
-              />
-            </div>
-          );
-        })}
+      {activeCalls.map(call => {
+        const conversation = conversationState.findConversation(call.conversationId);
+        const callingViewModel = listViewModel.callingViewModel;
+        const callingRepository = callingViewModel.callingRepository;
+        return (
+          <div className="calling-cell" key={conversation.id}>
+            <ConversationListCallingCell
+              call={call}
+              callActions={callingViewModel.callActions}
+              callingRepository={callingRepository}
+              conversation={conversation}
+              hasAccessToCamera={callingViewModel.hasAccessToCamera()}
+              isSelfVerified={selfUser.is_verified()}
+              multitasking={callingViewModel.multitasking}
+            />
+          </div>
+        );
+      })}
     </>
   );
 
