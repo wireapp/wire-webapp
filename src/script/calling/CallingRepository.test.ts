@@ -93,7 +93,7 @@ describe('CallingRepository', () => {
         {currentAvailableDeviceId: mediaDevices} as MediaDevicesHandler,
       );
       activeCall.state(CALL_STATE.MEDIA_ESTAB);
-      spyOn(callingRepository['callState'], 'activeCalls').and.returnValue([activeCall]);
+      spyOn(callingRepository['callState'], 'calls').and.returnValue([activeCall]);
       spyOn(amplify, 'publish').and.returnValue(undefined);
       const conversationId = createConversationId();
       const conversationType = CONV_TYPE.ONEONONE;
