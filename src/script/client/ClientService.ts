@@ -19,9 +19,10 @@
 
 import type {
   NewClient,
-  QualifiedPublicClients,
   RegisteredClient,
+  QualifiedUserClientMap,
   ClientCapabilityData,
+  PublicClient,
 } from '@wireapp/api-client/src/client';
 import type {QualifiedId} from '@wireapp/api-client/src/user';
 import {container} from 'tsyringe';
@@ -32,8 +33,6 @@ import type {ClientRecord} from '../storage';
 import {StorageService} from '../storage';
 import {StorageSchemata} from '../storage/StorageSchemata';
 import {APIClient} from '../service/APIClientSingleton';
-
-export type QualifiedPublicUserMap = QualifiedPublicClients['qualified_user_map'];
 
 export class ClientService {
   private readonly logger: Logger;
@@ -69,7 +68,7 @@ export class ClientService {
    * @returns Resolves once the deletion of the client is complete
    */
   deleteClient(clientId: string, password: string): Promise<void> {
-    return this.apiClient.client.api.deleteClient(clientId, password);
+    return this.apiClient.api.client.deleteClient(clientId, password);
   }
 
   /**
@@ -80,7 +79,7 @@ export class ClientService {
    * @returns Resolves once the update of the client is complete
    */
   putClientCapabilities(clientId: string, clientCapabilities: ClientCapabilityData): Promise<void> {
-    return this.apiClient.client.api.putClient(clientId, clientCapabilities);
+    return this.apiClient.api.client.putClient(clientId, clientCapabilities);
   }
 
   /**
@@ -89,7 +88,7 @@ export class ClientService {
    * @returns Resolves once the deletion of the temporary client is complete
    */
   deleteTemporaryClient(clientId: string): Promise<void> {
-    return this.apiClient.client.api.deleteClient(clientId);
+    return this.apiClient.api.client.deleteClient(clientId);
   }
 
   /**
@@ -100,7 +99,7 @@ export class ClientService {
    * @returns Resolves with the requested client
    */
   getClientById(clientId: string): Promise<RegisteredClient> {
-    return this.apiClient.client.api.getClient(clientId);
+    return this.apiClient.api.client.getClient(clientId);
   }
 
   /**
@@ -109,42 +108,23 @@ export class ClientService {
    * @returns Resolves with the clients of the self user
    */
   getClients(): Promise<RegisteredClient[]> {
-    return this.apiClient.client.api.getClients();
+    return this.apiClient.api.client.getClients();
   }
 
   /**
    * Retrieves meta information about all the clients of a specific user.
    * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/users/getClients
-   *
-   * @param userId ID of user to retrieve clients for
-   * @returns Resolves with the clients of a user
    */
-  async getClientsByUserIds(userIds: (QualifiedId | string)[]): Promise<QualifiedPublicUserMap> {
-    // Add 'none' as domain for non-federated users
-    let clients: QualifiedPublicUserMap = {none: {}};
-
-    const {qualifiedIds, stringIds} = userIds.reduce(
-      (result, userId) => {
-        if (typeof userId === 'string') {
-          result.stringIds.push(userId);
-        } else {
-          result.qualifiedIds.push(userId);
-        }
-        return result;
-      },
-      {qualifiedIds: [], stringIds: []},
-    );
-
-    for (const userId of stringIds) {
-      clients.none[userId] = await this.apiClient.user.api.getClients(userId);
+  async getClientsByUserIds(userIds: QualifiedId[]): Promise<QualifiedUserClientMap> {
+    if (!this.apiClient.backendFeatures.federationEndpoints) {
+      const clientsMap: {[userId: string]: PublicClient[]} = {};
+      for (const {id} of userIds) {
+        clientsMap[id] = await this.apiClient.api.user.getClients(id);
+      }
+      return {'': clientsMap};
     }
-
-    if (qualifiedIds.length) {
-      const listedClients = await this.apiClient.user.api.postListClients({qualified_users: qualifiedIds});
-      clients = {...clients, ...listedClients.qualified_user_map};
-    }
-
-    return clients;
+    const listedClients = await this.apiClient.api.user.postListClients({qualified_users: userIds});
+    return listedClients.qualified_user_map;
   }
 
   /**
@@ -153,7 +133,7 @@ export class ClientService {
    * @returns Resolves with the registered client information
    */
   postClients(newClient: NewClient): Promise<RegisteredClient> {
-    return this.apiClient.client.api.postClient(newClient);
+    return this.apiClient.api.client.postClient(newClient);
   }
 
   //##############################################################################

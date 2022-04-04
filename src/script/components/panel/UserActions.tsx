@@ -24,13 +24,16 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 import {t} from 'Util/LocalizerUtil';
 
 import type {ConversationRoleRepository} from '../../conversation/ConversationRoleRepository';
-import type {Conversation} from '../../entity/Conversation';
+import {Conversation} from '../../entity/Conversation';
 import type {ActionsViewModel} from '../../view_model/ActionsViewModel';
 import type {User} from '../../entity/User';
 import type {MenuItem} from './PanelActions';
 
 import PanelActions from './PanelActions';
 import {registerReactComponent} from 'Util/ComponentUtil';
+import {matchQualifiedIds} from 'Util/QualifiedId';
+import {ACCESS_STATE} from '../../conversation/AccessState';
+import {CONVERSATION_TYPE} from '@wireapp/api-client/src/conversation';
 
 export enum Actions {
   ACCEPT_REQUEST = 'UserActions.ACCEPT_REQUEST',
@@ -64,7 +67,22 @@ export interface UserActionsProps {
   conversationRoleRepository?: ConversationRoleRepository;
   isSelfActivated: boolean;
   onAction: (action: Actions) => void;
+  selfUser: User;
   user: User;
+}
+
+function createPlaceholder1to1Conversation(user: User, selfUser: User) {
+  const {id, domain} = user.connection().conversationId;
+  const conversation = new Conversation(id, domain);
+  conversation.name(user.name());
+  conversation.selfUser(selfUser);
+  conversation.type(CONVERSATION_TYPE.CONNECT);
+  conversation.participating_user_ids([user.qualifiedId]);
+  conversation.participating_user_ets([user]);
+  conversation.accessState(ACCESS_STATE.PERSONAL.ONE2ONE);
+  conversation.last_event_timestamp(Date.now());
+  conversation.connection(user.connection());
+  return conversation;
 }
 
 const UserActions: React.FC<UserActionsProps> = ({
@@ -74,6 +92,7 @@ const UserActions: React.FC<UserActionsProps> = ({
   conversation,
   onAction,
   conversationRoleRepository,
+  selfUser,
 }) => {
   const isNotMe = !user.isMe && isSelfActivated;
 
@@ -160,8 +179,18 @@ const UserActions: React.FC<UserActionsProps> = ({
     isNotConnectedUser &&
     canConnect && {
       click: async () => {
-        await actionsViewModel.sendConnectionRequest(user);
-        await create1to1Conversation(user, !conversation);
+        const connectionIsSent = await actionsViewModel.sendConnectionRequest(user);
+        if (!connectionIsSent) {
+          // Sending the connection failed, there is nothing more to do
+          return;
+        }
+        // We create a local 1:1 conversation that will act as a placeholder before the other user has accepted the request
+        const newConversation = createPlaceholder1to1Conversation(user, selfUser);
+        const savedConversation = await actionsViewModel.saveConversation(newConversation);
+        if (!conversation) {
+          // Only open the new conversation if we aren't currently in a conversation context
+          actionsViewModel.open1to1Conversation(savedConversation);
+        }
         onAction(Actions.SEND_REQUEST);
       },
       icon: 'plus-icon',
@@ -196,7 +225,7 @@ const UserActions: React.FC<UserActionsProps> = ({
   const removeUserFromConversation: MenuItem = isNotMe &&
     conversation &&
     !conversation.removed_from_conversation() &&
-    conversation.participating_user_ids().some(id => user.id === id) &&
+    conversation.participating_user_ids().some(userId => matchQualifiedIds(userId, user)) &&
     conversationRoleRepository.canRemoveParticipants(conversation) && {
       click: async () => {
         await actionsViewModel.removeFromConversation(conversation, user);
@@ -228,5 +257,5 @@ export default UserActions;
 registerReactComponent('user-actions', {
   component: UserActions,
   template:
-    '<div data-bind="react: {user: ko.unwrap(user), isSelfActivated: ko.unwrap(isSelfActivated), onAction, conversationRoleRepository, conversation: ko.unwrap(conversation), actionsViewModel}"></div>',
+    '<div data-bind="react: {user: ko.unwrap(user), isSelfActivated: ko.unwrap(isSelfActivated), onAction, conversationRoleRepository, conversation: ko.unwrap(conversation), actionsViewModel, selfUser: ko.unwrap(selfUser)}"></div>',
 });

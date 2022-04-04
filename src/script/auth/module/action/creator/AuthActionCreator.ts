@@ -52,6 +52,7 @@ export enum AUTH_ACTION {
   REGISTER_PERSONAL_START = 'REGISTER_PERSONAL_START',
   REGISTER_PERSONAL_SUCCESS = 'REGISTER_PERSONAL_SUCCESS',
   REGISTER_PUSH_ACCOUNT_DATA = 'REGISTER_PUSH_ACCOUNT_DATA',
+  REGISTER_PUSH_ENTROPY_DATA = 'REGISTER_PUSH_ENTROPY_DATA',
   REGISTER_RESET_ACCOUNT_DATA = 'REGISTER_RESET_ACCOUNT_DATA',
   REGISTER_TEAM_FAILED = 'REGISTER_TEAM_FAILED',
   REGISTER_TEAM_START = 'REGISTER_TEAM_START',
@@ -63,6 +64,9 @@ export enum AUTH_ACTION {
   SEND_PHONE_LOGIN_CODE_FAILED = 'SEND_PHONE_LOGIN_CODE_FAILED',
   SEND_PHONE_LOGIN_CODE_START = 'SEND_PHONE_LOGIN_CODE_START',
   SEND_PHONE_LOGIN_CODE_SUCCESS = 'SEND_PHONE_LOGIN_CODE_SUCCESS',
+  SEND_TWO_FACTOR_CODE_FAILED = 'SEND_TWO_FACTOR_CODE_FAILED',
+  SEND_TWO_FACTOR_CODE_START = 'SEND_TWO_FACTOR_CODE_START',
+  SEND_TWO_FACTOR_CODE_SUCCESS = 'SEND_TWO_FACTOR_CODE_SUCCESS',
   SILENT_LOGOUT_FAILED = 'SILENT_LOGOUT_FAILED',
   SILENT_LOGOUT_SUCCESS = 'SILENT_LOGOUT_SUCCESS',
   VALIDATE_LOCAL_CLIENT_FAILED = 'VALIDATE_LOCAL_CLIENT_FAILED',
@@ -74,6 +78,9 @@ export type AuthActions =
   | LoginStartAction
   | LoginSuccessAction
   | LoginFailedAction
+  | SendTwoFactorCodeStartAction
+  | SendTwoFactorCodeSuccessAction
+  | SendTwoFactorCodeFailedAction
   | SendPhoneLoginCodeStartAction
   | SendPhoneLoginCodeSuccessAction
   | SendPhoneLoginCodeFailedAction
@@ -106,6 +113,7 @@ export type AuthActions =
   | ResetAuthErrorsAction
   | ResetRegistrationDataAction
   | PushRegistrationDataAction
+  | PushEntropyDataAction
   | ResetLoginDataAction
   | PushLoginDataAction
   | EnterTeamCreationFlowAction
@@ -135,6 +143,17 @@ export interface SendPhoneLoginCodeSuccessAction extends AppAction {
 export interface SendPhoneLoginCodeFailedAction extends AppAction {
   readonly error: Error;
   readonly type: AUTH_ACTION.SEND_PHONE_LOGIN_CODE_FAILED;
+}
+
+export interface SendTwoFactorCodeStartAction extends AppAction {
+  readonly type: AUTH_ACTION.SEND_TWO_FACTOR_CODE_START;
+}
+export interface SendTwoFactorCodeSuccessAction extends AppAction {
+  readonly type: AUTH_ACTION.SEND_TWO_FACTOR_CODE_SUCCESS;
+}
+export interface SendTwoFactorCodeFailedAction extends AppAction {
+  readonly error: Error;
+  readonly type: AUTH_ACTION.SEND_TWO_FACTOR_CODE_FAILED;
 }
 
 export interface RegisterTeamStartAction extends AppAction {
@@ -250,6 +269,10 @@ export interface PushRegistrationDataAction extends AppAction {
   readonly type: AUTH_ACTION.REGISTER_PUSH_ACCOUNT_DATA;
 }
 
+export interface PushEntropyDataAction extends AppAction {
+  readonly payload: Uint8Array;
+  readonly type: AUTH_ACTION.REGISTER_PUSH_ENTROPY_DATA;
+}
 export interface ResetLoginDataAction extends AppAction {
   readonly type: AUTH_ACTION.RESET_LOGIN_DATA;
 }
@@ -294,6 +317,19 @@ export class AuthActionCreator {
   static failedSendPhoneLoginCode = (error: Error): SendPhoneLoginCodeFailedAction => ({
     error,
     type: AUTH_ACTION.SEND_PHONE_LOGIN_CODE_FAILED,
+  });
+
+  static startSendTwoFactorCode = (): SendTwoFactorCodeStartAction => ({
+    type: AUTH_ACTION.SEND_TWO_FACTOR_CODE_START,
+  });
+
+  static successfulSendTwoFactorCode = (): SendTwoFactorCodeSuccessAction => ({
+    type: AUTH_ACTION.SEND_TWO_FACTOR_CODE_SUCCESS,
+  });
+
+  static failedSendTwoFactorCode = (error: Error): SendTwoFactorCodeFailedAction => ({
+    error,
+    type: AUTH_ACTION.SEND_TWO_FACTOR_CODE_FAILED,
   });
 
   static startRegisterTeam = (): RegisterTeamStartAction => ({
@@ -426,6 +462,13 @@ export class AuthActionCreator {
     payload: accountData,
     type: AUTH_ACTION.REGISTER_PUSH_ACCOUNT_DATA,
   });
+
+  static pushEntropyData = (entropy: Uint8Array): PushEntropyDataAction => {
+    return {
+      payload: entropy,
+      type: AUTH_ACTION.REGISTER_PUSH_ENTROPY_DATA,
+    };
+  };
 
   static pushLoginData = (loginData: Partial<LoginData>): PushLoginDataAction => ({
     payload: loginData,

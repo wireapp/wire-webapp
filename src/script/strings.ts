@@ -1,3 +1,4 @@
+import {BackendClientError} from './error/BackendClientError';
 /*
  * Wire
  * Copyright (C) 2018 Wire Swiss GmbH
@@ -80,7 +81,7 @@ export const indexStrings = defineMessages({
 
 export const setAccountTypeStrings = defineMessages({
   createAccountForOrganizations: {
-    defaultMessage: 'Pro',
+    defaultMessage: 'Wire for Free',
     id: 'index.createAccountForOrganizations',
   },
   createAccountForPersonalUse: {
@@ -94,6 +95,10 @@ export const setAccountTypeStrings = defineMessages({
   createTeam: {
     defaultMessage: 'Secure collaboration for businesses, institutions and professional organizations',
     id: 'index.createTeam',
+  },
+  goBack: {
+    defaultMessage: 'Go Back',
+    id: 'index.goBack',
   },
 });
 
@@ -111,7 +116,7 @@ export const teamNameStrings = defineMessages({
     id: 'teamName.teamNamePlaceholder',
   },
   whatIsWireTeamsLink: {
-    defaultMessage: 'What is Wire Pro?',
+    defaultMessage: 'What is a team?',
     id: 'teamName.whatIsWireTeamsLink',
   },
 });
@@ -263,6 +268,26 @@ export const setEmailStrings = defineMessages({
   },
 });
 
+export const setEntropyStrings = defineMessages({
+  headline: {
+    defaultMessage: 'Create Entropy',
+    id: 'setEntropy.headline',
+  },
+  moreEntropyNeeded: {
+    defaultMessage: 'Please continue moving your mouse within the window to create enough entropy.',
+    id: 'setEntropy.moreEntropyNeeded',
+  },
+  subheadline: {
+    defaultMessage:
+      'Move your mouse as randomly as possible within the window below until the progress bar is 100% filled. This creates a random number which helps to protect your account and increases the overall security.',
+    id: 'setEntropy.subheadline',
+  },
+  success: {
+    defaultMessage: 'Entropy successfully created',
+    id: 'setEntropy.success',
+  },
+});
+
 export const setPasswordStrings = defineMessages({
   button: {
     defaultMessage: 'Set password',
@@ -317,6 +342,10 @@ export const acceptNewsModalStrings = defineMessages({
 });
 
 export const unsupportedStrings = defineMessages({
+  desktopOnlyMessage: {
+    defaultMessage: 'Please use {brandName} on your desktop app instead.',
+    id: 'unsupported.desktopOnlyMessage',
+  },
   headlineBrowser: {
     defaultMessage: 'This browser is not supported.',
     id: 'unsupported.headlineBrowser',
@@ -457,8 +486,13 @@ export const errorHandlerStrings = defineMessages({
     defaultMessage: 'This phone number is not allowed',
     id: 'BackendError.LABEL.BLACKLISTED_PHONE',
   },
+  [BackendClientError.LABEL.DOMAIN_BLOCKED_FOR_REGISTRATION]: {
+    defaultMessage:
+      'You can’t create this account as your email domain is intentionally blocked. Please ask your team admin to invite you via email.',
+    id: 'BackendErrorLabel.DOMAIN_BLOCKED_FOR_REGISTRATION',
+  },
   [BackendError.LABEL.INVALID_CODE]: {
-    defaultMessage: 'Invalid code, or maximum attempts exceeded. Please retry, or request another code.',
+    defaultMessage: 'Please retry, or request another code.',
     id: 'BackendError.LABEL.INVALID_CODE',
   },
   [BackendError.LABEL.INVALID_CREDENTIALS]: {
@@ -597,6 +631,10 @@ export const errorHandlerStrings = defineMessages({
     defaultMessage: 'Something went wrong. Please contact your team administrator for details (Error 1).',
     id: 'BackendError.LABEL.SSO_UNSUPPORTED_SAML',
   },
+  [BackendError.LABEL.CODE_AUTHENTICATION_FAILED]: {
+    defaultMessage: 'Please retry, or request another code.',
+    id: 'BackendError.LABEL.CODE_AUTHENTICATION_FAILED',
+  },
   [BackendError.LABEL.SSO_GENERIC_ERROR]: {
     defaultMessage: 'Something went wrong. Please contact your team administrator for details (Error 0).',
     id: 'BackendError.LABEL.SSO_GENERIC_ERROR',
@@ -664,6 +702,10 @@ export const loginStrings = defineMessages({
     defaultMessage: 'Forgot password?',
     id: 'login.forgotPassword',
   },
+  goBack: {
+    defaultMessage: 'Go Back',
+    id: 'login.goBack',
+  },
   headline: {
     defaultMessage: 'Log in',
     id: 'login.headline',
@@ -687,6 +729,14 @@ export const loginStrings = defineMessages({
   subhead: {
     defaultMessage: 'Enter your email address or username.',
     id: 'login.subhead',
+  },
+  twoFactorLoginSubHead: {
+    defaultMessage: 'Please check your email {email} for the verification code and enter it below.',
+    id: 'login.twoFactorLoginSubHead',
+  },
+  twoFactorLoginTitle: {
+    defaultMessage: 'Verify your account',
+    id: 'login.twoFactorLoginTitle',
   },
 });
 

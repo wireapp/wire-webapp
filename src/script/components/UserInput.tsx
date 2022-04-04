@@ -17,7 +17,7 @@
  *
  */
 
-import React, {useLayoutEffect, useRef} from 'react';
+import React, {useEffect, useLayoutEffect, useRef} from 'react';
 import {registerReactComponent} from 'Util/ComponentUtil';
 import type {User} from '../entity/User';
 import {MAX_HANDLE_LENGTH} from '../user/UserHandleGenerator';
@@ -48,14 +48,12 @@ const UserInput: React.FC<UserInputProps> = ({
 
   useLayoutEffect(() => {
     inputElement.current.focus();
-    const handle = window.requestAnimationFrame(() => {
-      innerElement.current.scrollTop = inputElement.current.scrollHeight;
-    });
+    innerElement.current.scrollTop = inputElement.current.scrollHeight;
+  }, [selectedUsers.length]);
 
-    return () => {
-      window.cancelAnimationFrame(handle);
-    };
-  }, [selectedUsers]);
+  useEffect(() => {
+    setInput('');
+  }, [selectedUsers.length]);
 
   const placeHolderText = emptyInput && noSelectedUsers ? placeholder : '';
 
@@ -75,7 +73,7 @@ const UserInput: React.FC<UserInputProps> = ({
             maxLength={MAX_HANDLE_LENGTH}
             onChange={event => setInput(event.target.value)}
             onKeyDown={(event: React.KeyboardEvent<HTMLInputElement>) => {
-              if (isRemovalAction(event.keyCode) && emptyInput) {
+              if (isRemovalAction(event.key) && emptyInput) {
                 setSelectedUsers(selectedUsers.slice(0, -1));
               } else if (isEnterKey(event.nativeEvent)) {
                 event.preventDefault();

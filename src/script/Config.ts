@@ -65,6 +65,7 @@ export class Configuration {
       SCREEN_ACCESS_DENIED: 'https://support.wire.com/hc/articles/202935412',
     },
     TEAMS_BASE: 'https://teams.wire.com',
+    TEAMS_BILLING: 'https://teams.wire.com/billing',
     TEAMS_CREATE: 'https://wire.com/create-team/?pk_campaign=client&pk_kwd=desktop',
     TERMS_OF_USE_PERSONAL: 'https://wire-website-staging.zinfra.io/legal/terms/personal',
     TERMS_OF_USE_TEAMS: 'https://wire-website-staging.zinfra.io/legal/terms/teams',
@@ -109,6 +110,9 @@ export class Configuration {
 
   /** Image MIME types */
   readonly ALLOWED_IMAGE_TYPES = ['image/bmp', 'image/gif', 'image/jpeg', 'image/jpg', 'image/png'];
+
+  /** Which versions of the backend api do we support */
+  readonly SUPPORTED_API_VERSIONS = [1, 0];
 }
 
 let instance: Configuration;

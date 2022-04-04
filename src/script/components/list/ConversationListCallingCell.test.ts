@@ -52,7 +52,7 @@ const createCall = (
   selfClientId = createRandomUuid(),
 ) => {
   const selfParticipant = new Participant(selfUser, selfClientId);
-  const call = new Call('', '', 0, selfParticipant, CALL_TYPE.NORMAL, {
+  const call = new Call({domain: '', id: ''}, {domain: '', id: ''}, 0, selfParticipant, CALL_TYPE.NORMAL, {
     currentAvailableDeviceId: {
       audioOutput: ko.pureComputed(() => 'test'),
     },
@@ -63,12 +63,12 @@ const createCall = (
 
 const createProps = async () => {
   const mockCallingRepository: Partial<CallingRepository> = {
+    sendModeratorMute: jest.fn(),
     supportsScreenSharing: true,
   };
 
-  const mockTeamState: Partial<TeamState> = {
-    isExternal: () => false,
-  };
+  const mockTeamState = new TeamState();
+  jest.spyOn(mockTeamState, 'isExternal').mockReturnValue(false);
 
   const conversation = new Conversation();
   conversation.participating_user_ets([new User('id', null)]);

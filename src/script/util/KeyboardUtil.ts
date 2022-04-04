@@ -19,11 +19,6 @@
 
 import {Runtime} from '@wireapp/commons';
 
-export const KEY_CODE = {
-  BACKSPACE: 8,
-  DELETE: 46,
-};
-
 export const KEY = {
   ARROW_DOWN: Runtime.isEdge() ? 'Down' : 'ArrowDown',
   ARROW_LEFT: Runtime.isEdge() ? 'Left' : 'ArrowLeft',
@@ -57,6 +52,8 @@ export const isKey = (keyboardEvent?: KeyboardEvent, expectedKey = '') => {
   return eventKey === expectedKey.toLowerCase();
 };
 
+export const isTabKey = (keyboardEvent: KeyboardEvent): boolean => isKey(keyboardEvent, KEY.TAB);
+
 export const isEnterKey = (keyboardEvent: KeyboardEvent): boolean => isKey(keyboardEvent, KEY.ENTER);
 
 export const isSpaceKey = (keyboardEvent: KeyboardEvent): boolean => isKey(keyboardEvent, KEY.SPACE);
@@ -73,9 +70,7 @@ export const isMetaKey = (keyboardEvent: KeyboardEvent): boolean =>
 export const isPasteAction = (keyboardEvent: KeyboardEvent): boolean =>
   isMetaKey(keyboardEvent) && isKey(keyboardEvent, KEY.KEY_V);
 
-export const isRemovalAction = (keyCode: number): boolean => {
-  return [KEY_CODE.BACKSPACE, KEY_CODE.DELETE].includes(keyCode);
-};
+export const isRemovalAction = (key: string): boolean => [KEY.BACKSPACE, KEY.DELETE].includes(key);
 
 export const insertAtCaret = (areaId: string, text: string) => {
   // http://stackoverflow.com/a/1064139
@@ -139,6 +134,13 @@ export const offEscKey = (handler: KeyboardHandler) => {
   if (index >= 0) {
     escKeyHandlers.splice(index, 1);
   }
+};
+
+export const handleKeyDown = (event: React.KeyboardEvent<HTMLElement> | KeyboardEvent, callback: () => void) => {
+  if (event.key === KEY.ENTER || event.key === KEY.SPACE) {
+    callback();
+  }
+  return true;
 };
 
 const handleDebugKey = () => {

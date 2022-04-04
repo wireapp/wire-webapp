@@ -21,15 +21,16 @@ import React from 'react';
 import {Availability} from '@wireapp/protocol-messaging';
 import {CSSObject} from '@emotion/core';
 
-import {registerReactComponent} from 'Util/ComponentUtil';
 import {CSS_SQUARE} from 'Util/CSSMixin';
 import Icon from './Icon';
+import {KEY} from 'Util/KeyboardUtil';
 
 export interface AvailabilityStateProps {
   availability: Availability.Type;
   className?: string;
   dataUieName: string;
   label: string;
+  onClick?: (event: React.MouseEvent | React.KeyboardEvent) => void;
   showArrow?: boolean;
   theme?: boolean;
 }
@@ -42,6 +43,12 @@ const iconStyles: CSSObject = {
   stroke: 'currentColor',
 };
 
+const buttonCommonStyles: CSSObject = {
+  background: 'none',
+  border: 'none',
+  textTransform: 'uppercase',
+};
+
 const AvailabilityState: React.FC<AvailabilityStateProps> = ({
   availability,
   className,
@@ -49,10 +56,28 @@ const AvailabilityState: React.FC<AvailabilityStateProps> = ({
   label,
   showArrow = false,
   theme = false,
+  onClick,
 }) => {
   const isAvailable = availability === Availability.Type.AVAILABLE;
   const isAway = availability === Availability.Type.AWAY;
   const isBusy = availability === Availability.Type.BUSY;
+
+  const handleKeyDown = (event: React.KeyboardEvent<HTMLButtonElement>) => {
+    const {key} = event;
+    if (key === KEY.ENTER || key === KEY.SPACE) {
+      const {top, left, height} = (event.target as Element).getBoundingClientRect();
+      const newEvent = new MouseEvent('MouseEvent', {
+        ...event.nativeEvent,
+        clientX: left,
+        clientY: top + height,
+      });
+
+      onClick({
+        ...event,
+        nativeEvent: newEvent,
+      } as unknown as React.MouseEvent<Element, MouseEvent>);
+    }
+  };
 
   const content = (
     <span data-uie-name={dataUieName} css={{alignItems: 'center', display: 'flex', overflow: 'hidden'}}>
@@ -84,13 +109,13 @@ const AvailabilityState: React.FC<AvailabilityStateProps> = ({
       )}
 
       {label && (
-        <div
+        <span
           className="availability-state-label"
           css={theme ? {color: 'var(--accent-color)', userSelect: 'none'} : {userSelect: 'none'}}
           data-uie-name="status-label"
         >
           {label}
-        </div>
+        </span>
       )}
 
       {showArrow && (
@@ -105,8 +130,10 @@ const AvailabilityState: React.FC<AvailabilityStateProps> = ({
               height: 0,
               width: 0,
             },
-            display: 'inline-block',
+            alignItems: 'center',
+            display: 'inline-flex',
             marginLeft: 4,
+            marginTop: 4,
             paddingBottom: 4,
             ...CSS_SQUARE(16),
           }}
@@ -115,17 +142,30 @@ const AvailabilityState: React.FC<AvailabilityStateProps> = ({
     </span>
   );
 
+  const wrappedContent = onClick ? (
+    <button
+      type="button"
+      className="availability-state-label"
+      css={
+        theme
+          ? {...buttonCommonStyles, color: 'var(--accent-color)', userSelect: 'none'}
+          : {...buttonCommonStyles, userSelect: 'none'}
+      }
+      data-uie-name="status-label"
+      onClick={onClick}
+      onKeyDown={handleKeyDown}
+    >
+      {content}
+    </button>
+  ) : (
+    content
+  );
+
   if (className) {
-    return <span className={`availability-state ${className}`}>{content}</span>;
+    return <span className={`availability-state ${className}`}>{wrappedContent}</span>;
   }
 
-  return content;
+  return wrappedContent;
 };
 
 export default AvailabilityState;
-
-registerReactComponent<AvailabilityStateProps>('availability-state', {
-  component: AvailabilityState,
-  template:
-    '<span class="availability-state" data-bind="react: {availability: ko.unwrap(availability), label: ko.unwrap(label), showArrow, dataUieName, theme: ko.unwrap(theme)}"></span>',
-});

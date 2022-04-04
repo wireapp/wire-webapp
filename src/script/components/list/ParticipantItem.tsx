@@ -18,10 +18,9 @@
  */
 
 import React, {Fragment} from 'react';
-import ko from 'knockout';
 import cx from 'classnames';
 
-import {registerReactComponent, useKoSubscribable} from 'Util/ComponentUtil';
+import {registerReactComponent, useKoSubscribableChildren} from 'Util/ComponentUtil';
 import Avatar, {AVATAR_SIZE} from 'Components/Avatar';
 import {UserlistMode} from 'Components/UserList';
 import {t} from 'Util/LocalizerUtil';
@@ -37,8 +36,6 @@ import {Participant} from '../../calling/Participant';
 import AvailabilityState from 'Components/AvailabilityState';
 import ParticipantMicOnIcon from 'Components/calling/ParticipantMicOnIcon';
 import Icon from 'Components/Icon';
-import {Availability} from '@wireapp/protocol-messaging';
-import {Config} from '../../Config';
 import useEffectRef from 'Util/useEffectRef';
 
 export interface ParticipantItemProps extends Omit<React.HTMLProps<HTMLDivElement>, 'onClick'> {
@@ -58,10 +55,10 @@ export interface ParticipantItemProps extends Omit<React.HTMLProps<HTMLDivElemen
   participant: User | ServiceEntity;
   selfInTeam?: boolean;
   showArrow?: boolean;
+  showDropdown?: boolean;
 }
 
 const ParticipantItem: React.FC<ParticipantItemProps> = ({
-  onClick,
   badge,
   callParticipant,
   canSelect,
@@ -77,7 +74,10 @@ const ParticipantItem: React.FC<ParticipantItemProps> = ({
   participant,
   selfInTeam,
   showArrow = false,
+  showDropdown = false,
   onContextMenu = noop,
+  onClick = noop,
+  onKeyDown = noop,
 }) => {
   const [viewportElementRef, setViewportElementRef] = useEffectRef<HTMLDivElement>();
   const isInViewport = useViewPortObserver(viewportElementRef);
@@ -90,46 +90,56 @@ const ParticipantItem: React.FC<ParticipantItemProps> = ({
   const hasUsernameInfo = isUser && !hideInfo && !hasCustomInfo && !isTemporaryGuest;
   const isOthersMode = mode === UserlistMode.OTHERS;
 
-  const isGuest = useKoSubscribable((participant as User).isGuest ?? ko.observable(false));
-  const isVerified = useKoSubscribable((participant as User).is_verified ?? ko.observable(false));
-  const availability = useKoSubscribable((participant as User).availability ?? ko.observable<Availability.Type>());
-
-  const participantName = useKoSubscribable(
-    isUser ? (participant as User).name : ko.observable((participant as ServiceEntity).name),
+  const {
+    is_verified: isVerified,
+    isDirectGuest,
+    availability,
+    expirationText,
+    name: participantName,
+  } = useKoSubscribableChildren(
+    // We need to make TS believe that this is a User, otherwise it will complain about
+    // the fields in the array that don't exist on ServiceEntity
+    participant as User,
+    participant instanceof User ? ['isDirectGuest', 'is_verified', 'availability', 'expirationText', 'name'] : ['name'],
   );
-  const callParticipantSharesCamera = useKoSubscribable(callParticipant?.sharesCamera ?? ko.observable(false));
-  const callParticipantSharesScreen = useKoSubscribable(callParticipant?.sharesScreen ?? ko.observable(false));
-  const callParticipantIsActivelySpeaking = useKoSubscribable(
-    callParticipant?.isActivelySpeaking ?? ko.observable(false),
-  );
 
-  const callParticipantIsMuted = useKoSubscribable(callParticipant ? callParticipant.isMuted : ko.observable());
+  const isFederated = participant instanceof User && participant.isFederated;
 
-  let contentInfo: ko.Observable;
-  if (hasCustomInfo) {
-    contentInfo = ko.observable(customInfo);
-  } else if (hideInfo) {
-    contentInfo = ko.observable('');
-  } else if (isService) {
-    contentInfo = ko.observable((participant as ServiceEntity).summary);
-  } else if (isTemporaryGuest) {
-    contentInfo = (participant as User).expirationText;
-  } else {
-    contentInfo = ko.observable((participant as User).handle);
-  }
+  const {sharesCamera, sharesScreen, isActivelySpeaking, isMuted} = useKoSubscribableChildren(callParticipant, [
+    'sharesCamera',
+    'sharesScreen',
+    'isActivelySpeaking',
+    'isMuted',
+  ]);
 
-  const contentInfoText = useKoSubscribable(contentInfo);
+  const contentInfoText = (() => {
+    if (hasCustomInfo) {
+      return customInfo;
+    }
+    if (hideInfo) {
+      return '';
+    }
+    if (isService) {
+      return (participant as ServiceEntity).summary;
+    }
+    if (isTemporaryGuest) {
+      return expirationText;
+    }
+    return (participant as User).handle;
+  })();
 
   return (
     <div
-      onClick={() => onClick(participant as User)}
       className={cx('participant-item-wrapper', {
         highlighted,
         'no-interaction': noInteraction,
         'no-underline': noUnderline,
-        'show-arrow': showArrow,
       })}
+      role="button"
+      tabIndex={0}
       onContextMenu={onContextMenu}
+      onClick={() => onClick(participant as User)}
+      onKeyDown={onKeyDown}
     >
       <div
         className="participant-item"
@@ -144,45 +154,57 @@ const ParticipantItem: React.FC<ParticipantItemProps> = ({
             </div>
 
             <div className="participant-item__content">
-              <div className="participant-item__content__name-wrapper">
-                {isUser && selfInTeam && (
-                  <AvailabilityState
-                    availability={availability}
-                    className="participant-item__content__availability participant-item__content__name"
-                    dataUieName="status-name"
-                    label={participantName}
-                  />
-                )}
+              <div className="participant-item__content__text">
+                <div className="participant-item__content__name-wrapper">
+                  {isUser && selfInTeam && (
+                    <AvailabilityState
+                      availability={availability}
+                      className="participant-item__content__availability participant-item__content__name"
+                      dataUieName="status-name"
+                      label={participantName}
+                    />
+                  )}
 
-                {(isService || !selfInTeam) && (
-                  <div className="participant-item__content__name" data-uie-name="status-name">
-                    {participantName}
-                  </div>
-                )}
-                {isSelf && <div className="participant-item__content__self-indicator">{selfString}</div>}
-              </div>
-              <div className="participant-item__content__info">
-                {contentInfoText && (
-                  <Fragment>
-                    <span
-                      className={cx('participant-item__content__username label-username-notext', {
-                        'label-username': hasUsernameInfo,
-                      })}
-                      data-uie-name="status-username"
-                    >
-                      {contentInfoText}
-                    </span>
-                    {hasUsernameInfo && badge && (
-                      <span className="participant-item__content__badge" data-uie-name="status-partner">
-                        {badge}
+                  {(isService || !selfInTeam) && (
+                    <div className="participant-item__content__name" data-uie-name="status-name">
+                      {participantName}
+                    </div>
+                  )}
+                  {isSelf && <div className="participant-item__content__self-indicator">{selfString}</div>}
+                </div>
+                <div className="participant-item__content__info">
+                  {contentInfoText && (
+                    <Fragment>
+                      <span
+                        className={cx('participant-item__content__username label-username-notext', {
+                          'label-username': hasUsernameInfo,
+                        })}
+                        data-uie-name="status-username"
+                      >
+                        {contentInfoText}
                       </span>
-                    )}
-                  </Fragment>
-                )}
+                      {hasUsernameInfo && badge && (
+                        <span className="participant-item__content__badge" data-uie-name="status-partner">
+                          {badge}
+                        </span>
+                      )}
+                    </Fragment>
+                  )}
+                </div>
               </div>
+              {showDropdown && (
+                <button
+                  className="participant-item__content__chevron"
+                  onClick={event => onContextMenu(event as unknown as React.MouseEvent<HTMLDivElement>)}
+                  type="button"
+                  data-uie-name="participant-menu-icon"
+                >
+                  <Icon.Chevron />
+                </button>
+              )}
             </div>
 
-            {isUser && !isOthersMode && isGuest && (
+            {!isOthersMode && isDirectGuest && (
               <span
                 className="guest-icon with-tooltip with-tooltip--external"
                 data-tooltip={t('conversationGuestIndicator')}
@@ -191,11 +213,14 @@ const ParticipantItem: React.FC<ParticipantItemProps> = ({
               </span>
             )}
 
-            {participant instanceof User &&
-              Config.getConfig().FEATURE.ENABLE_FEDERATION &&
-              !participant.isOnSameFederatedDomain() && (
-                <Icon.Federation className="federation-icon" data-uie-name="status-federated-user" />
-              )}
+            {isFederated && (
+              <span
+                className="federation-icon with-tooltip with-tooltip--external"
+                data-tooltip={t('conversationFederationIndicator')}
+              >
+                <Icon.Federation data-uie-name="status-federated-user" />
+              </span>
+            )}
 
             {external && (
               <span className="partner-icon with-tooltip with-tooltip--external" data-tooltip={t('rolePartner')}>
@@ -209,21 +234,19 @@ const ParticipantItem: React.FC<ParticipantItemProps> = ({
 
             {callParticipant && (
               <>
-                {callParticipantSharesScreen && (
-                  <Icon.Screenshare className="screenshare-icon" data-uie-name="status-screenshare" />
-                )}
+                {sharesScreen && <Icon.Screenshare className="screenshare-icon" data-uie-name="status-screenshare" />}
 
-                {callParticipantSharesCamera && <Icon.Camera className="camera-icon" data-uie-name="status-video" />}
+                {sharesCamera && <Icon.Camera className="camera-icon" data-uie-name="status-video" />}
 
-                {!callParticipantIsMuted && (
+                {!isMuted && (
                   <ParticipantMicOnIcon
                     className="participant-mic-on-icon"
-                    isActive={callParticipantIsActivelySpeaking}
-                    data-uie-name={callParticipantIsActivelySpeaking ? 'status-active-speaking' : 'status-audio-on'}
+                    isActive={isActivelySpeaking}
+                    data-uie-name={isActivelySpeaking ? 'status-active-speaking' : 'status-audio-on'}
                   />
                 )}
 
-                {callParticipantIsMuted && (
+                {isMuted && (
                   <Icon.MicOff
                     className="mic-off-icon"
                     data-uie-name="status-audio-off"
@@ -239,8 +262,7 @@ const ParticipantItem: React.FC<ParticipantItemProps> = ({
                 data-uie-name="status-selected"
               />
             )}
-
-            <Icon.Disclose className="disclose-icon" />
+            {showArrow && <Icon.Disclose className="disclose-icon" />}
           </>
         )}
       </div>
@@ -252,6 +274,6 @@ export default ParticipantItem;
 
 registerReactComponent<ParticipantItemProps>('participant-item', {
   bindings:
-    'badge, callParticipant, showArrow, highlighted, noInteraction, noUnderline, canSelect, customInfo, external: ko.unwrap(external), hideInfo, isSelected: ko.unwrap(isSelected), isSelfVerified: ko.unwrap(isSelfVerified), mode, participant, selfInTeam',
+    'badge, callParticipant, showArrow, highlighted, noInteraction, noUnderline, canSelect, customInfo: ko.unwrap(customInfo), external: ko.unwrap(external), hideInfo, isSelected: ko.unwrap(isSelected), isSelfVerified: ko.unwrap(isSelfVerified), mode, participant, selfInTeam, onClick, onKeyDown',
   component: ParticipantItem,
 });

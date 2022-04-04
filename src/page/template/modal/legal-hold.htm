@@ -2,7 +2,7 @@
   <modal params="isShown: isVisible, onBgClick: onBgClick, onClosed: onClosed, showLoading: isLoading() " data-uie-name="legal-hold-modal">
     <div class="modal__header">
       <!-- ko if: showRequest() -->
-        <div class="modal__header__title" data-bind="text: t('legalHoldModalTitle')" data-uie-name="status-modal-title"></div>
+        <h2 class="modal__header__title" data-bind="text: t('legalHoldModalTitle')" data-uie-name="status-modal-title"></h2>
       <!-- /ko -->
       <!-- ko ifnot: showRequest() -->
         <close-icon class="modal__header__button" data-bind="click: onBgClick" data-uie-name="do-close"></close-icon>

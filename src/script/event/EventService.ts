@@ -23,7 +23,6 @@ import {Asset as ProtobufAsset} from '@wireapp/protocol-messaging';
 
 import {getLogger, Logger} from 'Util/Logger';
 
-import {StatusType} from '../message/StatusType';
 import {MessageCategory} from '../message/MessageCategory';
 import {categoryFromEvent} from '../message/MessageCategorization';
 
@@ -87,6 +86,34 @@ export class EventService {
     }
   }
 
+  async loadEphemeralEvents(conversationId: string): Promise<EventRecord[]> {
+    if (!conversationId) {
+      this.logger.error(`Cannot get ephemeral events in conversation '${conversationId}' without ID`);
+      throw new ConversationError(BASE_ERROR_TYPE.MISSING_PARAMETER, BaseError.MESSAGE.MISSING_PARAMETER);
+    }
+
+    try {
+      if (this.storageService.db) {
+        const events = await this.storageService.db
+          .table(StorageSchemata.OBJECT_STORE.EVENTS)
+          .where('conversation')
+          .equals(conversationId)
+          .and(record => !!record.ephemeral_expires)
+          .toArray();
+        return events;
+      }
+
+      const records = (await this.storageService.getAll(StorageSchemata.OBJECT_STORE.EVENTS)) as EventRecord[];
+      return records
+        .filter(record => record.conversation === conversationId && !!record.ephemeral_expires)
+        .sort(compareEventsById);
+    } catch (error) {
+      const logMessage = `Failed to get ephemeral events for conversation '${conversationId}': ${error.message}`;
+      this.logger.error(logMessage, error);
+      throw error;
+    }
+  }
+
   /**
    * Load event from database.
    *
@@ -134,11 +161,20 @@ export class EventService {
     categoryMin: MessageCategory,
     categoryMax = MessageCategory.LIKED,
   ): Promise<DBEvents> {
+    const filterExpired = (record: EventRecord) => {
+      if (typeof record.ephemeral_expires !== 'undefined') {
+        return +record.ephemeral_expires - Date.now() > 0;
+      }
+
+      return true;
+    };
+
     if (this.storageService.db) {
       const events = await this.storageService.db
         .table(StorageSchemata.OBJECT_STORE.EVENTS)
         .where('[conversation+category]')
         .between([conversationId, categoryMin], [conversationId, categoryMax], true, true)
+        .and(filterExpired)
         .sortBy('time');
       return events;
     }
@@ -149,6 +185,7 @@ export class EventService {
         record =>
           record.conversation === conversationId && record.category >= categoryMin && record.category <= categoryMax,
       )
+      .filter(filterExpired)
       .sort(compareEventsByTime);
   }
 
@@ -323,30 +360,6 @@ export class EventService {
 
   addEventDeletedListener(callback: DatabaseListenerCallback): void {
     this.storageService.addDeletedListener(StorageSchemata.OBJECT_STORE.EVENTS, callback);
-  }
-
-  /**
-   * Update event as uploaded in database.
-   *
-   * @param primaryKey Primary key used to find an event in the database
-   * @param event Updated event asset data
-   */
-  async updateEventAsUploadSucceeded(primaryKey: string, event: EventRecord): Promise<void> {
-    const record = await this.storageService.load<EventRecord>(StorageSchemata.OBJECT_STORE.EVENTS, primaryKey);
-    if (!record) {
-      this.logger.warn('Did not find message to update asset (uploaded)', primaryKey);
-      return;
-    }
-    const assetData = event.data;
-    record.data.id = assetData.id;
-    record.data.key = assetData.key;
-    record.data.otr_key = assetData.otr_key;
-    record.data.sha256 = assetData.sha256;
-    record.data.status = AssetTransferState.UPLOADED;
-    record.data.token = assetData.token;
-    record.status = StatusType.SENT;
-    await this.replaceEvent(record);
-    this.logger.info('Updated asset message_et (uploaded)', primaryKey);
   }
 
   /**

@@ -21,7 +21,8 @@ import React from 'react';
 import {AccentColor} from '@wireapp/commons';
 
 import {registerReactComponent} from 'Util/ComponentUtil';
-import {CSS_ABSOLUTE_CENTER, CSS_SQUARE} from 'Util/CSSMixin';
+import {CSS_SQUARE} from 'Util/CSSMixin';
+import {t} from 'Util/LocalizerUtil';
 
 import type {User} from '../entity/User';
 
@@ -32,58 +33,84 @@ export interface AccentColorPickerProps {
 
 const AccentColorPicker: React.FunctionComponent<AccentColorPickerProps> = ({user, doSetAccentColor}) => {
   return (
-    <span
-      className="preferences-account-accent-color preferences-section-account-space-before"
+    <fieldset
+      className="preferences-account-accent-color"
       css={{
+        alignItems: 'center',
+        border: 'none',
         display: 'inline-flex',
         height: 24,
         justifyContent: 'space-between',
+        padding: 0,
       }}
+      aria-label={t('chooseAccountColor')}
     >
       {AccentColor.ACCENT_COLORS.map(accentColor => {
         const isChecked = user.accent_id() === accentColor.id;
+
         return (
-          <label
-            key={accentColor.id}
+          <div
             data-uie-name="element-accent-color-label"
             data-uie-value={accentColor.id}
+            key={accentColor.color}
             css={{
-              '::after': {
-                ...CSS_SQUARE(isChecked ? 16 : 12),
-                border: `0px solid ${accentColor.color}`,
-                borderWidth: isChecked ? 1 : 0,
-              },
-              '::before': {
-                ...CSS_SQUARE(isChecked ? 10 : 6),
-                backgroundColor: accentColor.color,
-              },
-              '::before, ::after': {
-                ...CSS_ABSOLUTE_CENTER,
-                borderRadius: '50%',
-                content: '""',
-                transition: 'all 0.15s ease-out',
-              },
-              cursor: 'pointer',
-              position: 'relative',
-              width: 16,
+              alignItems: 'center',
+              display: 'flex',
+              justifyContent: 'center',
             }}
           >
             <input
+              id={accentColor.color}
               type="radio"
               name="accent"
+              aria-label={accentColor.name}
               checked={isChecked}
               onChange={() => doSetAccentColor(accentColor.id)}
               data-uie-name="do-set-accent-color"
               data-uie-value={accentColor.id}
               css={{
+                '& + span': {
+                  cursor: 'pointer',
+                  display: 'inline-block',
+                  position: 'relative',
+                },
+                '& + span::after': {
+                  ...CSS_SQUARE(isChecked ? 10 : 6),
+                  background: accentColor.color,
+                  left: '-10px',
+                  top: '-3px',
+                },
+                '& + span::before': {
+                  ...CSS_SQUARE(isChecked ? 16 : 12),
+                  left: '-15px',
+                  top: '-8px',
+                },
+                '& + span::before, & + span::after': {
+                  borderRadius: '50%',
+                  content: '""',
+                  display: 'inline-block',
+                  position: 'absolute',
+                  transition: 'all 0.15s ease-out',
+                },
+                '&:checked + span::after': {
+                  left: '-12px',
+                  top: '-5px',
+                },
+                '&:checked + span::before': {
+                  border: `1px solid ${accentColor.color}`,
+                },
+                '&:focus + span::before': {
+                  ...CSS_SQUARE(16),
+                  outline: '1px solid Highlight',
+                },
                 opacity: 0,
-                position: 'absolute',
               }}
             />
-          </label>
+            <span onClick={() => doSetAccentColor(accentColor.id)} />
+          </div>
         );
       })}
-    </span>
+    </fieldset>
   );
 };
 

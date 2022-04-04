@@ -32,10 +32,10 @@ describe('RichProfileRepository', () => {
     it("fetches the user's rich profile if it is not already in cache", () => {
       const userId = createRandomUuid();
       const response = [];
-      spyOn(richProfileRepository.apiClient.user.api, 'getRichInfo').and.returnValue(Promise.resolve(response));
+      spyOn(richProfileRepository.apiClient.api.user, 'getRichInfo').and.returnValue(Promise.resolve(response));
 
       return richProfileRepository.getUserRichProfile(userId).then(richProfile => {
-        expect(richProfileRepository.apiClient.user.api.getRichInfo).toHaveBeenCalledTimes(1);
+        expect(richProfileRepository.apiClient.api.user.getRichInfo).toHaveBeenCalledTimes(1);
         expect(richProfile).toBe(response);
       });
     });

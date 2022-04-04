@@ -50,7 +50,6 @@ import {UserRepository} from '../user/UserRepository';
 import {serverTimeHandler} from '../time/serverTimeHandler';
 import {CallingRepository} from '../calling/CallingRepository';
 import {BackupRepository} from '../backup/BackupRepository';
-import {BroadcastRepository} from '../broadcast/BroadcastRepository';
 import {NotificationRepository} from '../notification/NotificationRepository';
 import {IntegrationRepository} from '../integration/IntegrationRepository';
 import {IntegrationService} from '../integration/IntegrationService';
@@ -80,7 +79,6 @@ import {WindowHandler} from '../ui/WindowHandler';
 import {Router} from '../router/Router';
 import {initRouterBindings} from '../router/routerBindings';
 
-import '../page/message-list/mentionSuggestions';
 import './globals';
 
 import {ReceiptsMiddleware} from '../event/preprocessor/ReceiptsMiddleware';
@@ -93,15 +91,12 @@ import {showInitialModal} from '../user/AvailabilityModal';
 import {URLParameter} from '../auth/URLParameter';
 import {SIGN_OUT_REASON} from '../auth/SignOutReason';
 import {ClientRepository} from '../client/ClientRepository';
-import {WarningsViewModel} from '../view_model/WarningsViewModel';
 import {ContentViewModel} from '../view_model/ContentViewModel';
 import AppLock from '../page/AppLock';
 import {CacheRepository} from '../cache/CacheRepository';
 import {SelfService} from '../self/SelfService';
-import {BroadcastService} from '../broadcast/BroadcastService';
 import {PropertiesRepository} from '../properties/PropertiesRepository';
 import {PropertiesService} from '../properties/PropertiesService';
-import {LinkPreviewRepository} from '../links/LinkPreviewRepository';
 import {AssetService} from '../assets/AssetService';
 import {UserService} from '../user/UserService';
 import {AudioRepository} from '../audio/AudioRepository';
@@ -128,9 +123,16 @@ import type {User} from '../entity/User';
 import {MessageRepository} from '../conversation/MessageRepository';
 import CallingContainer from 'Components/calling/CallingOverlayContainer';
 import {TeamError} from '../error/TeamError';
+import Warnings from '../view_model/WarningsContainer';
+import {Core} from '../service/CoreSingleton';
+import {migrateToQualifiedSessionIds} from './sessionIdMigrator';
 
 function doRedirect(signOutReason: SIGN_OUT_REASON) {
   let url = `/auth/${location.search}`;
+
+  if (location.hash.startsWith('#/user/') && signOutReason === SIGN_OUT_REASON.NOT_SIGNED_IN) {
+    localStorage.setItem(App.LOCAL_STORAGE_LOGIN_REDIRECT_KEY, location.hash);
+  }
 
   const isImmediateSignOutReason = App.CONFIG.SIGN_OUT_REASONS.IMMEDIATE.includes(signOutReason);
   if (isImmediateSignOutReason) {
@@ -142,8 +144,8 @@ function doRedirect(signOutReason: SIGN_OUT_REASON) {
 }
 
 class App {
+  static readonly LOCAL_STORAGE_LOGIN_REDIRECT_KEY = 'LOGIN_REDIRECT_KEY';
   logger: Logger;
-  appContainer: HTMLElement;
   service: {
     asset: AssetService;
     conversation: ConversationService;
@@ -186,9 +188,9 @@ class App {
    * @param apiClient Configured backend client
    */
   constructor(
-    appContainer: HTMLElement,
-    encryptedEngine?: SQLeetEngine,
-    private readonly apiClient = container.resolve(APIClient),
+    private readonly appContainer: HTMLElement,
+    private readonly apiClient: APIClient,
+    options?: {storageEngine?: SQLeetEngine},
   ) {
     this.apiClient.on(APIClient.TOPIC.ON_LOGOUT, () => this.logout(SIGN_OUT_REASON.NOT_SIGNED_IN, false));
     this.logger = getLogger('App');
@@ -196,7 +198,7 @@ class App {
 
     new WindowHandler();
 
-    this.service = this._setupServices(encryptedEngine);
+    this.service = this._setupServices(options.storageEngine);
     this.repository = this._setupRepositories();
     if (Config.getConfig().FEATURE.ENABLE_DEBUG) {
       import('Util/DebugUtil').then(({DebugUtil}) => {
@@ -229,16 +231,18 @@ class App {
     const sendingMessageQueue = new MessageSender();
 
     repositories.asset = container.resolve(AssetRepository);
-    repositories.audio = new AudioRepository();
+
     repositories.auth = new AuthRepository();
     repositories.giphy = new GiphyRepository(new GiphyService());
     repositories.properties = new PropertiesRepository(new PropertiesService(), selfService);
     repositories.serverTime = serverTimeHandler;
     repositories.storage = new StorageRepository();
 
-    repositories.cryptography = new CryptographyRepository(new CryptographyService(), repositories.storage);
-    repositories.client = new ClientRepository(new ClientService(), repositories.cryptography);
+    repositories.cryptography = new CryptographyRepository(new CryptographyService());
+    repositories.client = new ClientRepository(new ClientService(), repositories.cryptography, repositories.storage);
     repositories.media = new MediaRepository(new PermissionRepository());
+    repositories.audio = new AudioRepository(repositories.media.devicesHandler);
+
     repositories.user = new UserRepository(
       new UserService(),
       repositories.asset,
@@ -258,19 +262,12 @@ class App {
     repositories.search = new SearchRepository(new SearchService(), repositories.user);
     repositories.team = new TeamRepository(new TeamService(), repositories.user, repositories.asset);
 
-    repositories.conversation = new ConversationRepository(
-      this.service.conversation,
-      () => repositories.message,
-      repositories.connection,
-      repositories.event,
-      repositories.team,
-      repositories.user,
-      repositories.properties,
-      serverTimeHandler,
-    );
-
     repositories.message = new MessageRepository(
-      repositories.client,
+      /*
+       * FIXME there is a cyclic dependency between message and conversation repos.
+       * MessageRepository should NOT depend upon ConversationRepository.
+       * We need to remove all usages of conversationRepository inside the messageRepository
+       */
       () => repositories.conversation,
       repositories.cryptography,
       repositories.event,
@@ -278,9 +275,18 @@ class App {
       repositories.properties,
       serverTimeHandler,
       repositories.user,
-      this.service.conversation,
-      new LinkPreviewRepository(repositories.asset, repositories.properties),
       repositories.asset,
+    );
+
+    repositories.conversation = new ConversationRepository(
+      this.service.conversation,
+      repositories.message,
+      repositories.connection,
+      repositories.event,
+      repositories.team,
+      repositories.user,
+      repositories.properties,
+      serverTimeHandler,
     );
 
     repositories.eventTracker = new EventTrackingRepository(repositories.message);
@@ -296,13 +302,6 @@ class App {
       readReceiptMiddleware.processEvent.bind(readReceiptMiddleware),
     ]);
     repositories.backup = new BackupRepository(new BackupService(), repositories.conversation);
-    repositories.broadcast = new BroadcastRepository(
-      new BroadcastService(),
-      repositories.client,
-      repositories.message,
-      repositories.cryptography,
-      sendingMessageQueue,
-    );
     repositories.calling = new CallingRepository(
       repositories.message,
       repositories.event,
@@ -407,18 +406,27 @@ class App {
       this._registerSingleInstance();
       loadingView.updateProgress(2.5);
       telemetry.timeStep(AppInitTimingsStep.RECEIVED_ACCESS_TOKEN);
-      await authRepository.init();
-      await this.initiateSelfUser();
-      loadingView.updateProgress(5, t('initReceivedSelfUser', userRepository['userState'].self().name()));
+      const {clientType} = await authRepository.init();
+      const selfUser = await this.initiateSelfUser();
+      if (this.apiClient.backendFeatures.isFederated) {
+        // Migrate all existing session to fully qualified ids (if need be)
+        await migrateToQualifiedSessionIds(
+          this.repository.storage.storageService.db.sessions,
+          this.apiClient.context!.domain,
+        );
+      }
+      loadingView.updateProgress(5, t('initReceivedSelfUser', selfUser.name()));
       telemetry.timeStep(AppInitTimingsStep.RECEIVED_SELF_USER);
       const clientEntity = await this._initiateSelfUserClients();
-      const selfUser = userRepository['userState'].self();
-      callingRepository.initAvs(selfUser, clientEntity.id);
+      callingRepository.initAvs(selfUser, clientEntity().id);
       loadingView.updateProgress(7.5, t('initValidatedClient'));
       telemetry.timeStep(AppInitTimingsStep.VALIDATED_CLIENT);
-      telemetry.addStatistic(AppInitStatisticsValue.CLIENT_TYPE, clientEntity.type);
+      telemetry.addStatistic(AppInitStatisticsValue.CLIENT_TYPE, clientEntity().type);
 
-      await cryptographyRepository.initCryptobox();
+      const core = container.resolve(Core);
+      await core.init(clientType, undefined, this.service.storage['engine']);
+      await cryptographyRepository.init(core.service!.cryptography.cryptobox, clientEntity);
+
       loadingView.updateProgress(10);
       telemetry.timeStep(AppInitTimingsStep.INITIALIZED_CRYPTOGRAPHY);
 
@@ -463,7 +471,7 @@ class App {
 
       userRepository['userState'].self().devices(clientEntities);
       this.logger.info('App pre-loading completed');
-      await this._handleUrlParams();
+      this._handleUrlParams();
       await conversationRepository.updateConversationsOnAppInit();
       await conversationRepository.conversationLabelRepository.loadLabels();
 
@@ -580,9 +588,6 @@ class App {
       if (!userEntity.mediumPictureResource()) {
         this.repository.user.setDefaultPicture();
       }
-      if (!userEntity.username()) {
-        this.repository.user.getUsernameSuggestion();
-      }
     }
 
     return userEntity;
@@ -621,11 +626,10 @@ class App {
     return this.repository.client
       .getValidLocalClient()
       .then(clientObservable => {
-        this.repository.cryptography.currentClient = clientObservable;
         this.repository.event.currentClient = clientObservable;
         return this.repository.client.getClientsForSelf();
       })
-      .then(() => this.repository.client['clientState'].currentClient());
+      .then(() => this.repository.client['clientState'].currentClient);
   }
 
   /**
@@ -672,7 +676,6 @@ class App {
   private _showInterface() {
     const mainView = new MainViewModel(this.repository);
     ko.applyBindings(mainView, this.appContainer);
-
     this.repository.notification.setContentViewModelStates(mainView.content.state, mainView.multitasking);
 
     const conversationEntity = this.repository.conversation.getMostRecentConversation();
@@ -680,12 +683,16 @@ class App {
     this.logger.info('Showing application UI');
     if (this.repository.user['userState'].isTemporaryGuest()) {
       mainView.list.showTemporaryGuest();
-    } else if (this.repository.user.shouldChangeUsername()) {
-      mainView.list.showTakeover();
     } else if (conversationEntity) {
       mainView.content.showConversation(conversationEntity, {});
     } else if (this.repository.user['userState'].connectRequests().length) {
       amplify.publish(WebAppEvents.CONTENT.SWITCH, ContentViewModel.STATE.CONNECTION_REQUESTS);
+    }
+
+    const redirect = localStorage.getItem(App.LOCAL_STORAGE_LOGIN_REDIRECT_KEY);
+    if (redirect) {
+      localStorage.removeItem(App.LOCAL_STORAGE_LOGIN_REDIRECT_KEY);
+      window.location.replace(redirect);
     }
 
     const router = new Router({
@@ -697,7 +704,7 @@ class App {
       '/preferences/devices': () => mainView.list.openPreferencesDevices(),
       '/preferences/options': () => mainView.list.openPreferencesOptions(),
       '/user/:userId(/:domain)': (userId: string, domain?: string) => {
-        mainView.content.userModal.showUser(userId, domain, () => router.navigate('/'));
+        mainView.content.userModal.showUser({domain, id: userId}, () => router.navigate('/'));
       },
     });
     initRouterBindings(router);
@@ -855,7 +862,7 @@ class App {
    * Notify about found update
    */
   readonly update = (): void => {
-    amplify.publish(WebAppEvents.WARNING.SHOW, WarningsViewModel.TYPE.LIFECYCLE_UPDATE);
+    amplify.publish(WebAppEvents.WARNING.SHOW, Warnings.TYPE.LIFECYCLE_UPDATE);
   };
 
   /**
@@ -891,18 +898,26 @@ class App {
 //##############################################################################
 
 $(async () => {
+  const apiClient = container.resolve(APIClient);
+  await apiClient.useVersion(Config.getConfig().SUPPORTED_API_VERSIONS);
+
   enableLogging(Config.getConfig().FEATURE.ENABLE_DEBUG);
   exposeWrapperGlobals();
   const appContainer = document.getElementById('wire-main');
   if (appContainer) {
+    const enforceDesktopApplication =
+      Config.getConfig().FEATURE.ENABLE_ENFORCE_DESKTOP_APPLICATION_ONLY && !Runtime.isDesktopApp();
+    if (enforceDesktopApplication) {
+      doRedirect(SIGN_OUT_REASON.APP_INIT);
+    }
     const shouldPersist = loadValue<boolean>(StorageKey.AUTH.PERSIST);
     if (shouldPersist === undefined) {
       doRedirect(SIGN_OUT_REASON.NOT_SIGNED_IN);
-    } else if (isTemporaryClientAndNonPersistent(shouldPersist)) {
-      const engine = await StorageService.getUninitializedEngine();
-      window.wire.app = new App(appContainer, engine);
     } else {
-      window.wire.app = new App(appContainer);
+      const storageEngine = isTemporaryClientAndNonPersistent(shouldPersist)
+        ? await StorageService.getUninitializedEngine()
+        : undefined;
+      window.wire.app = new App(appContainer, apiClient, {storageEngine});
     }
   }
 });

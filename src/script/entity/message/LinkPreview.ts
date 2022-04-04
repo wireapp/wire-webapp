@@ -17,36 +17,35 @@
  *
  */
 
-import ko from 'knockout';
 import type {ITweet} from '@wireapp/protocol-messaging';
 
 import {obfuscate} from 'Util/StringUtil';
 
 import type {AssetRemoteData} from '../../assets/AssetRemoteData';
-import type {LinkPreviewMetaDataType} from '../../links/LinkPreviewMetaDataType';
 
+export type LinkPreviewData = {
+  image?: AssetRemoteData;
+  title?: string;
+  tweet?: ITweet;
+  url?: string;
+};
 export class LinkPreview {
-  public image_resource: ko.Observable<AssetRemoteData>;
-  public title: string;
   public url: string;
-  public meta_data_type?: LinkPreviewMetaDataType;
-  public meta_data?: ITweet;
+  public title: string;
+  public image?: AssetRemoteData;
+  public tweet?: ITweet;
 
-  constructor(title?: string, url?: string) {
-    this.title = title || '';
-    this.url = url || '';
-
-    this.image_resource = ko.observable();
-    this.meta_data = undefined;
-    this.meta_data_type = undefined;
+  constructor({title = '', url = '', tweet, image}: LinkPreviewData = {}) {
+    this.title = title;
+    this.url = url;
+    this.tweet = tweet;
+    this.image = image;
   }
 
   obfuscate(): void {
     this.title = obfuscate(this.title);
     this.url = obfuscate(this.url);
-
-    this.image_resource(undefined);
-    this.meta_data = undefined;
-    this.meta_data_type = undefined;
+    this.tweet = undefined;
+    this.image = undefined;
   }
 }

@@ -15,7 +15,8 @@ import {SIGN_OUT_REASON} from '../auth/SignOutReason';
 import {ClientState} from '../client/ClientState';
 import {AppLockState} from '../user/AppLockState';
 import {AppLockRepository} from '../user/AppLockRepository';
-import {useKoSubscribable} from 'Util/ComponentUtil';
+import {useKoSubscribableChildren} from 'Util/ComponentUtil';
+import {ModalsViewModel} from '../view_model/ModalsViewModel';
 
 export enum APPLOCK_STATE {
   FORGOT = 'applock.forgot',
@@ -57,8 +58,10 @@ const AppLock: React.FC<AppLockProps> = ({
   const [setupPassphrase, setSetupPassphrase] = useState('');
   const [inactivityTimeoutId, setInactivityTimeoutId] = useState<number>();
   const [scheduledTimeoutId, setScheduledTimeoutId] = useState<number>();
-  const isAppLockActivated = useKoSubscribable(appLockState.isAppLockActivated);
-  const isAppLockEnabled = useKoSubscribable(appLockState.isAppLockEnabled);
+  const {isAppLockActivated, isAppLockEnabled} = useKoSubscribableChildren(appLockState, [
+    'isAppLockActivated',
+    'isAppLockEnabled',
+  ]);
 
   const focusElement = (input: HTMLInputElement) => setTimeout(() => input?.focus());
   const forceFocus = ({target}: React.FocusEvent<HTMLInputElement>) => focusElement(target);
@@ -112,8 +115,14 @@ const AppLock: React.FC<AppLockProps> = ({
   useEffect(() => {
     if (isAppLockEnabled) {
       showAppLock();
-    } else {
+    } else if (appLockState.hasPassphrase()) {
       appLockRepository.removeCode();
+      amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.ACKNOWLEDGE, {
+        text: {
+          htmlMessage: t('featureConfigChangeModalApplock'),
+          title: t('featureConfigChangeModalApplockHeadline'),
+        },
+      });
     }
   }, [isAppLockEnabled]);
 
@@ -126,7 +135,7 @@ const AppLock: React.FC<AppLockProps> = ({
         window.removeEventListener('focus', clearAppLockTimeout);
       };
     }
-    return undefined;
+    return clearAppLockTimeout();
   }, [isAppLockActivated, clearAppLockTimeout, startAppLockTimeout]);
 
   useEffect(() => {
@@ -239,9 +248,9 @@ const AppLock: React.FC<AppLockProps> = ({
   return (
     <ModalComponent isShown={isVisible} showLoading={isLoading} onClosed={onClosed} data-uie-name="applock-modal">
       <div className="modal__header">
-        <div className="modal__header__title" data-uie-name="applock-modal-header">
+        <h2 className="modal__header__title" data-uie-name="applock-modal-header">
           {headerText()}
-        </div>
+        </h2>
       </div>
       <div className="modal__body" data-uie-name="applock-modal-body" data-uie-value={state}>
         {state === APPLOCK_STATE.SETUP && (

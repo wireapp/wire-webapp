@@ -22,6 +22,8 @@ import {AxiosError} from 'axios';
 import {User} from '../entity/User';
 import type {QualifiedId} from '@wireapp/api-client/src/user/';
 import {Conversation} from '../entity/Conversation';
+import {ClientRecord} from '../storage/record/ClientRecord';
+import {QualifiedUserClientEntityMap} from '../client/ClientRepository';
 
 export function isAxiosError(errorCandidate: any): errorCandidate is AxiosError {
   return errorCandidate && errorCandidate.isAxiosError === true;
@@ -40,9 +42,17 @@ export function isQualifiedIdArray(ids: string[] | QualifiedId[]): ids is Qualif
 }
 
 export function isQualifiedId(userId: string | QualifiedId): userId is QualifiedId {
-  return typeof userId === 'object' && 'domain' in userId && typeof userId.domain === 'string';
+  return typeof userId === 'object' && 'domain' in userId;
 }
 
 export function isConversationEntity(conversation: any): conversation is Conversation {
   return conversation instanceof Conversation;
+}
+
+export function isClientRecord(record: any): record is ClientRecord {
+  return !!record.meta;
+}
+
+export function isQualifiedUserClientEntityMap(map: any): map is QualifiedUserClientEntityMap {
+  return Object.keys(map)[0]?.includes('.');
 }

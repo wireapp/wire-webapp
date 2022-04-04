@@ -25,6 +25,7 @@ import {getUserName} from 'Util/SanitizationUtil';
 import {TIME_IN_MILLIS, formatDurationCaption, formatTimeShort, formatDateNumeral, fromUnixTime} from 'Util/TimeUtil';
 import {t} from 'Util/LocalizerUtil';
 
+import {QualifiedId} from '@wireapp/api-client/src/user';
 import {AssetTransferState} from '../../assets/AssetTransferState';
 import {AssetType} from '../../assets/AssetType';
 import {EphemeralStatusType} from '../../message/EphemeralStatusType';
@@ -44,6 +45,10 @@ import type {DecryptErrorMessage} from './DecryptErrorMessage';
 import type {PingMessage} from './PingMessage';
 import type {LinkPreview} from './LinkPreview';
 import type {ReadReceipt} from '../../storage/record/EventRecord';
+import {DeleteMessage} from './DeleteMessage';
+import {MissedMessage} from './MissedMessage';
+import {CallingTimeoutMessage} from './CallingTimeoutMessage';
+import {FileTypeRestrictedMessage} from './FileTypeRestrictedMessage';
 
 export class Message {
   private messageTimerStarted: boolean;
@@ -150,6 +155,10 @@ export class Message {
     this.accent_color = ko.pureComputed(() => `accent-color-${this.user().accent_id()}`);
   }
 
+  public get qualifiedFrom(): QualifiedId {
+    return {domain: this.fromDomain || '', id: this.from};
+  }
+
   readonly displayTimestampShort = (): string => {
     const date = fromUnixTime(this.timestamp() / TIME_IN_MILLIS.SECOND);
     return formatTimeShort(date);
@@ -234,7 +243,7 @@ export class Message {
    * Check if the message content can be downloaded.
    * @returns `true`, if the message has downloadable content, `false` otherwise.
    */
-  isDownloadable(): boolean {
+  isDownloadable(): this is ContentMessage {
     const isExpiredEphemeral = this.ephemeral_status() === EphemeralStatusType.TIMED_OUT;
     if (isExpiredEphemeral) {
       return false;
@@ -292,6 +301,22 @@ export class Message {
     return this.super_type === SuperType.SYSTEM;
   }
 
+  isFileTypeRestricted(): this is FileTypeRestrictedMessage {
+    return this.super_type === SuperType.FILE_TYPE_RESTRICTED;
+  }
+
+  isDelete(): this is DeleteMessage {
+    return this.super_type === SuperType.DELETE;
+  }
+
+  isMissed(): this is MissedMessage {
+    return this.super_type === SuperType.MISSED;
+  }
+
+  isCallTimeout(): this is CallingTimeoutMessage {
+    return this.super_type === SuperType.CALL_TIME_OUT;
+  }
+
   /**
    * Check if message is an undecryptable message.
    * @returns Is message unable to decrypt
@@ -317,7 +342,7 @@ export class Message {
    * @returns `true`, if message can be copied, `false` otherwise.
    */
 
-  isCopyable(): boolean {
+  isCopyable(): this is ContentMessage {
     return this.hasAssetText() && !this.isComposite() && (!this.isEphemeral() || this.user().isMe);
   }
 
@@ -365,7 +390,7 @@ export class Message {
    * Check if message can be reacted to.
    * @returns `true`, if message type supports reactions, `false` otherwise.
    */
-  isReactable(): boolean {
+  isReactable(): this is ContentMessage {
     return (
       this.isContent() &&
       !this.isComposite() &&

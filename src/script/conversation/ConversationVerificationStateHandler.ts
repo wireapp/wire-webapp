@@ -18,7 +18,6 @@
  */
 
 import {amplify} from 'amplify';
-import {intersection} from 'underscore';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import {container} from 'tsyringe';
 
@@ -26,21 +25,21 @@ import {Logger, getLogger} from 'Util/Logger';
 
 import {ConversationVerificationState} from './ConversationVerificationState';
 import {EventBuilder} from '../conversation/EventBuilder';
+import type {QualifiedId} from '@wireapp/api-client/src/user/';
 import {EventRecord} from '../storage';
 import {VerificationMessageType} from '../message/VerificationMessageType';
 import type {ClientEntity} from '../client/ClientEntity';
 import type {Conversation} from '../entity/Conversation';
 import type {EventRepository} from '../event/EventRepository';
-import type {ServerTimeHandler} from '../time/serverTimeHandler';
 import {UserState} from '../user/UserState';
 import {ConversationState} from './ConversationState';
+import {matchQualifiedIds} from 'Util/QualifiedId';
 
 export class ConversationVerificationStateHandler {
   private readonly logger: Logger;
 
   constructor(
     private readonly eventRepository: EventRepository,
-    private readonly serverTimeHandler: ServerTimeHandler,
     private readonly userState = container.resolve(UserState),
     private readonly conversationState = container.resolve(ConversationState),
   ) {
@@ -52,7 +51,7 @@ export class ConversationVerificationStateHandler {
     amplify.subscribe(WebAppEvents.CLIENT.VERIFICATION_STATE_CHANGED, this.onClientVerificationChanged);
   }
 
-  readonly onClientVerificationChanged = (userId: string): void => {
+  readonly onClientVerificationChanged = (userId: QualifiedId): void => {
     this.getActiveConversationsWithUsers([userId]).forEach(({conversationEntity, userIds}) => {
       const isStateChange = this.checkChangeToVerified(conversationEntity);
       if (!isStateChange) {
@@ -65,7 +64,7 @@ export class ConversationVerificationStateHandler {
    * Self user or other participant added clients.
    * @param userId ID of user that added client (can be self user ID)
    */
-  readonly onClientAdded = (userId: string, _clientEntity?: ClientEntity): void => {
+  readonly onClientAdded = (userId: QualifiedId, _clientEntity?: ClientEntity): void => {
     this.onClientsAdded([userId]);
   };
 
@@ -73,7 +72,7 @@ export class ConversationVerificationStateHandler {
    * Multiple participants added clients.
    * @param userIds Multiple user IDs (can include self user ID)
    */
-  onClientsAdded(userIds: string[]): void {
+  onClientsAdded(userIds: QualifiedId[]): void {
     this.getActiveConversationsWithUsers(userIds).forEach(({conversationEntity, userIds: matchingUserIds}) => {
       this.checkChangeToDegraded(conversationEntity, matchingUserIds, VerificationMessageType.NEW_DEVICE);
     });
@@ -83,7 +82,7 @@ export class ConversationVerificationStateHandler {
    * Self user removed a client or other participants deleted clients.
    * @param userId ID of user that added client (can be self user ID)
    */
-  readonly onClientRemoved = (userId: string, _clientId?: string): void => {
+  readonly onClientRemoved = (userId: QualifiedId): void => {
     this.getActiveConversationsWithUsers([userId]).forEach(({conversationEntity}) => {
       this.checkChangeToVerified(conversationEntity);
     });
@@ -100,7 +99,7 @@ export class ConversationVerificationStateHandler {
   /**
    * Clients of a user were updated.
    */
-  readonly onClientsUpdated = (userId: string): void => {
+  readonly onClientsUpdated = (userId: QualifiedId): void => {
     this.getActiveConversationsWithUsers([userId]).forEach(({conversationEntity, userIds}) => {
       const isStateChange = this.checkChangeToVerified(conversationEntity);
       if (!isStateChange) {
@@ -114,7 +113,7 @@ export class ConversationVerificationStateHandler {
    * @param conversationEntity Changed conversation entity
    * @param userIds IDs of added members
    */
-  onMemberJoined(conversationEntity: Conversation, userIds: string[]): void {
+  onMemberJoined(conversationEntity: Conversation, userIds: QualifiedId[]): void {
     this.checkChangeToDegraded(conversationEntity, userIds, VerificationMessageType.NEW_MEMBER);
   }
 
@@ -134,16 +133,8 @@ export class ConversationVerificationStateHandler {
    */
   private checkChangeToVerified(conversationEntity: Conversation): boolean {
     if (this.willChangeToVerified(conversationEntity)) {
-      const currentTimestamp = this.serverTimeHandler.toServerTimestamp();
-      const allVerifiedEvent = EventBuilder.buildAllVerified(conversationEntity, currentTimestamp);
+      const allVerifiedEvent = EventBuilder.buildAllVerified(conversationEntity);
       this.eventRepository.injectEvent(allVerifiedEvent as EventRecord);
-
-      amplify.publish(
-        WebAppEvents.CONVERSATION.VERIFICATION_STATE_CHANGED,
-        conversationEntity.participating_user_ids(),
-        true,
-      );
-
       return true;
     }
 
@@ -160,7 +151,7 @@ export class ConversationVerificationStateHandler {
    */
   private checkChangeToDegraded(
     conversationEntity: Conversation,
-    userIds: string[],
+    userIds: QualifiedId[],
     type: VerificationMessageType,
   ): boolean {
     const shouldShowDegradationWarning = type !== VerificationMessageType.UNVERIFIED;
@@ -181,8 +172,7 @@ export class ConversationVerificationStateHandler {
         throw new Error('Conversation degraded without affected users');
       }
 
-      const currentTimestamp = this.serverTimeHandler.toServerTimestamp();
-      const event = EventBuilder.buildDegraded(conversationEntity, userIds, type, currentTimestamp);
+      const event = EventBuilder.buildDegraded(conversationEntity, userIds, type);
       this.eventRepository.injectEvent(event as EventRecord);
 
       return true;
@@ -197,14 +187,19 @@ export class ConversationVerificationStateHandler {
    * @param userIds Multiple user IDs (can include self user ID)
    * @returns Array of objects containing the conversation entities and matching user IDs
    */
-  private getActiveConversationsWithUsers(userIds: string[]): {conversationEntity: Conversation; userIds: string[]}[] {
+  private getActiveConversationsWithUsers(
+    userIds: QualifiedId[],
+  ): {conversationEntity: Conversation; userIds: QualifiedId[]}[] {
     return this.conversationState
       .filtered_conversations()
       .map((conversationEntity: Conversation) => {
         if (!conversationEntity.removed_from_conversation()) {
-          const selfUserId = this.userState.self().id;
-          const userIdsInConversation = conversationEntity.participating_user_ids().concat(selfUserId);
-          const matchingUserIds = intersection(userIdsInConversation, userIds);
+          const userIdsInConversation = conversationEntity
+            .participating_user_ids()
+            .concat(this.userState.self().qualifiedId);
+          const matchingUserIds = userIdsInConversation.filter(userIdInConversation =>
+            userIds.find(userId => matchQualifiedIds(userId, userIdInConversation)),
+          );
 
           if (!!matchingUserIds.length) {
             return {conversationEntity, userIds: matchingUserIds};
@@ -212,7 +207,10 @@ export class ConversationVerificationStateHandler {
         }
         return undefined;
       })
-      .filter(activeConversationInfo => !!activeConversationInfo);
+      .filter(activeConversationInfo => !!activeConversationInfo) as {
+      conversationEntity: Conversation;
+      userIds: QualifiedId[];
+    }[];
   }
 
   /**

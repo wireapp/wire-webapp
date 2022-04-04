@@ -18,6 +18,7 @@
  */
 
 import {NotificationPreference, WebappProperties} from '@wireapp/api-client/src/user/data/';
+import type {QualifiedId} from '@wireapp/api-client/src/user/';
 import {Availability} from '@wireapp/protocol-messaging';
 import {amplify} from 'amplify';
 import ko from 'knockout';
@@ -56,11 +57,11 @@ import {SuperType} from '../message/SuperType';
 import {SystemMessageType} from '../message/SystemMessageType';
 import type {PermissionRepository} from '../permission/PermissionRepository';
 import {ContentViewModel} from '../view_model/ContentViewModel';
-import {WarningsViewModel} from '../view_model/WarningsViewModel';
 import {AssetRepository} from '../assets/AssetRepository';
 import {UserState} from '../user/UserState';
 import {ConversationState} from '../conversation/ConversationState';
 import {CallState} from '../calling/CallState';
+import Warnings from '../view_model/WarningsContainer';
 
 export interface Multitasking {
   isMinimized: ko.Observable<boolean>;
@@ -71,15 +72,19 @@ interface ContentViewModelState {
   state: () => string | false;
 }
 
+type NotificationData = {conversationId?: QualifiedId; messageId?: string; messageType: string};
 interface NotificationContent {
   /** Notification options */
-  options: {data: {conversationId: string; messageId: string; messageType: string}};
+  options: {data: NotificationData; tag: string};
   /** Timeout for notification */
   timeout: number;
   /** Notification title */
   title: string;
   /** Function to be triggered on click */
   trigger: Function;
+}
+interface WebappNotifications extends Notification {
+  data: NotificationData;
 }
 
 /**
@@ -92,7 +97,7 @@ export class NotificationRepository {
   private contentViewModelState: ContentViewModelState;
   private readonly conversationRepository: ConversationRepository;
   private readonly logger: Logger;
-  private readonly notifications: any[];
+  private readonly notifications: WebappNotifications[];
   private readonly notificationsPreference: ko.Observable<NotificationPreference>;
   private readonly permissionRepository: PermissionRepository;
   private readonly permissionState: ko.Observable<PermissionState | PermissionStatusState | NotificationPermission>;
@@ -218,7 +223,7 @@ export class NotificationRepository {
     }
 
     const isUserBusy = this.selfUser().availability() === Availability.Type.BUSY;
-    const isSelfMentionOrReply = messageEntity.isContent() && messageEntity.isUserTargeted(this.selfUser().id);
+    const isSelfMentionOrReply = messageEntity.isContent() && messageEntity.isUserTargeted(this.selfUser().qualifiedId);
     const isCallMessage = messageEntity.super_type === SuperType.CALL;
 
     if (isUserBusy && !isSelfMentionOrReply && !isCallMessage && !isComposite) {
@@ -226,7 +231,11 @@ export class NotificationRepository {
     }
 
     const notifyInConversation = conversationEntity
-      ? NotificationRepository.shouldNotifyInConversation(conversationEntity, messageEntity, this.selfUser().id)
+      ? NotificationRepository.shouldNotifyInConversation(
+          conversationEntity,
+          messageEntity,
+          this.selfUser().qualifiedId,
+        )
       : true;
 
     if (notifyInConversation) {
@@ -242,7 +251,7 @@ export class NotificationRepository {
     this.notifications.forEach(notification => {
       const {conversationId, messageId, messageType} = notification.data || {};
 
-      if (messageId) {
+      if (conversationId && messageId) {
         this.conversationRepository.isMessageRead(conversationId, messageId).then(isRead => {
           if (isRead) {
             notification.close();
@@ -270,7 +279,7 @@ export class NotificationRepository {
    * @param permissionState State of browser permission
    * @returns Resolves with `true` if notifications are enabled
    */
-  readonly updatePermissionState = (permissionState: PermissionState | NotificationPermission): boolean => {
+  readonly updatePermissionState = (permissionState: PermissionState | NotificationPermission): boolean | undefined => {
     this.permissionState(permissionState);
     return this.checkPermissionState();
   };
@@ -300,7 +309,7 @@ export class NotificationRepository {
         if (assetEntity.isText()) {
           let notificationText;
 
-          if (assetEntity.isUserMentioned(this.selfUser().id)) {
+          if (assetEntity.isUserMentioned(this.selfUser().qualifiedId)) {
             notificationText = t('notificationMention', assetEntity.text, {}, true);
           } else if (messageEntity.isUserQuoted(this.selfUser().id)) {
             notificationText = t('notificationReply', assetEntity.text, {}, true);
@@ -388,7 +397,7 @@ export class NotificationRepository {
   private createBodyMemberUpdate(messageEntity?: MemberMessage, conversationEntity?: Conversation): string | void {
     const isGroup = conversationEntity && conversationEntity.isGroup();
 
-    switch (messageEntity.memberMessageType) {
+    switch (messageEntity?.memberMessageType) {
       case SystemMessageType.NORMAL:
         if (isGroup) {
           if (messageEntity.isMemberJoin()) {
@@ -418,7 +427,7 @@ export class NotificationRepository {
    */
   private createBodyObfuscated(messageEntity: ContentMessage): string {
     if (messageEntity.isContent()) {
-      const isSelfMentioned = messageEntity.isUserMentioned(this.selfUser().id);
+      const isSelfMentioned = messageEntity.isUserMentioned(this.selfUser().qualifiedId);
 
       if (isSelfMentioned) {
         return t('notificationObfuscatedMention');
@@ -484,7 +493,7 @@ export class NotificationRepository {
         return createBodyMessageTimerUpdate();
       }
       case SystemMessageType.CONVERSATION_DELETE: {
-        return (messageEntity as DeleteConversationMessage).caption;
+        return (messageEntity as DeleteConversationMessage).caption();
       }
     }
   }
@@ -498,10 +507,10 @@ export class NotificationRepository {
     messageEntity: ContentMessage,
     connectionEntity: ConnectionEntity,
     conversationEntity: Conversation,
-  ): Promise<any> {
+  ): Promise<NotificationContent | undefined> {
     const body = this.createOptionsBody(messageEntity, conversationEntity);
     if (!body) {
-      return Promise.resolve();
+      return Promise.resolve(undefined);
     }
     const shouldObfuscateSender = this.shouldObfuscateNotificationSender(messageEntity);
     return this.createOptionsIcon(shouldObfuscateSender, messageEntity.user()).then(iconUrl => {
@@ -557,7 +566,7 @@ export class NotificationRepository {
     messageEntity: Message,
     connectionEntity: ConnectionEntity,
     conversationEntity: Conversation,
-  ): {conversationId: string; messageId: string | undefined; messageType: string} {
+  ): NotificationContent['options']['data'] {
     const {id: messageId, type: messageType} = messageEntity;
 
     return {
@@ -597,7 +606,7 @@ export class NotificationRepository {
    * @param conversationEntity Conversation entity
    */
   private createOptionsTag(connectionEntity?: ConnectionEntity, conversationEntity?: Conversation): string {
-    return this.getConversationId(connectionEntity, conversationEntity);
+    return this.getConversationId(connectionEntity, conversationEntity)?.id || '';
   }
 
   /**
@@ -642,7 +651,7 @@ export class NotificationRepository {
     const conversationId = this.getConversationId(connectionEntity, conversationEntity);
 
     const containsSelfMention =
-      messageEntity.isContent() && (messageEntity as ContentMessage).isUserMentioned(this.selfUser().id);
+      messageEntity.isContent() && (messageEntity as ContentMessage).isUserMentioned(this.selfUser().qualifiedId);
     if (containsSelfMention) {
       const showOptions = {exposeMessage: messageEntity, openFirstSelfMention: true};
       return () => amplify.publish(WebAppEvents.CONVERSATION.SHOW, conversationEntity, showOptions);
@@ -665,11 +674,14 @@ export class NotificationRepository {
    * @param conversationEntity Conversation entity
    * @returns ID of conversation
    */
-  private getConversationId(connectionEntity?: ConnectionEntity, conversationEntity?: Conversation): string {
+  private getConversationId(
+    connectionEntity?: ConnectionEntity,
+    conversationEntity?: Conversation,
+  ): QualifiedId | undefined {
     if (connectionEntity) {
       return connectionEntity.conversationId;
     }
-    return conversationEntity && conversationEntity.id;
+    return conversationEntity?.qualifiedId;
   }
 
   /**
@@ -748,12 +760,12 @@ export class NotificationRepository {
 
   // Request browser permission for notifications.
   private async requestPermission(): Promise<void> {
-    amplify.publish(WebAppEvents.WARNING.SHOW, WarningsViewModel.TYPE.REQUEST_NOTIFICATION);
+    amplify.publish(WebAppEvents.WARNING.SHOW, Warnings.TYPE.REQUEST_NOTIFICATION);
     // Note: The callback will be only triggered in Chrome.
     // If you ignore a permission request on Firefox, then the callback will not be triggered.
     if (window.Notification.requestPermission) {
       const permissionState = await window.Notification.requestPermission();
-      amplify.publish(WebAppEvents.WARNING.DISMISS, WarningsViewModel.TYPE.REQUEST_NOTIFICATION);
+      amplify.publish(WebAppEvents.WARNING.DISMISS, Warnings.TYPE.REQUEST_NOTIFICATION);
       this.updatePermissionState(permissionState);
     }
   }
@@ -829,7 +841,10 @@ export class NotificationRepository {
      * See https://developer.mozilla.org/en-US/docs/Web/API/Notification/data
      */
     this.removeReadNotifications();
-    const notification = new window.Notification(notificationContent.title, notificationContent.options);
+    const notification: WebappNotifications = new window.Notification(
+      notificationContent.title,
+      notificationContent.options,
+    );
     const {conversationId, messageId, messageType} = notificationContent.options.data;
     let timeoutTriggerId: number;
 
@@ -877,7 +892,7 @@ export class NotificationRepository {
   static shouldNotifyInConversation(
     conversationEntity: Conversation,
     messageEntity: ContentMessage,
-    userId: string,
+    userId: QualifiedId,
   ): boolean {
     if (messageEntity.isComposite()) {
       return true;

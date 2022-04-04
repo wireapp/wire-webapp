@@ -20,10 +20,11 @@
 import {User} from '../../../entity/User';
 import {AssetRepository} from '../../../assets/AssetRepository';
 import Avatar, {AVATAR_SIZE} from 'Components/Avatar';
-import {useKoSubscribable} from 'Util/ComponentUtil';
+import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {useEffect, useState} from 'react';
 import {ConnectionStatus} from '@wireapp/api-client/src/connection';
 import React from 'react';
+import {handleKeyDown} from 'Util/KeyboardUtil';
 
 export interface TopContactProps {
   assetRepository: AssetRepository;
@@ -32,8 +33,7 @@ export interface TopContactProps {
 }
 
 const TopContact: React.FC<TopContactProps> = ({assetRepository, user, clickOnUser}) => {
-  const name = useKoSubscribable(user.name);
-  const connection = useKoSubscribable(user.connection);
+  const {name, connection} = useKoSubscribableChildren(user, ['name', 'connection']);
   const [connectionStatus, setConnectionStatus] = useState<ConnectionStatus>();
 
   useEffect(() => {
@@ -48,9 +48,12 @@ const TopContact: React.FC<TopContactProps> = ({assetRepository, user, clickOnUs
       data-uie-status={connectionStatus}
       data-uie-uid={user.id}
       data-uie-value={name}
+      role="button"
+      tabIndex={0}
       onClick={event => {
         clickOnUser(user, event);
       }}
+      onKeyPress={event => handleKeyDown(event, clickOnUser.bind(this, user, event))}
     >
       <Avatar avatarSize={AVATAR_SIZE.LARGE} className="search-list-item-image" participant={user} />
       <div className="search-list-item-content">

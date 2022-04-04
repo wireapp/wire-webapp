@@ -71,6 +71,21 @@
   color: #fff;
   font-weight: @font-weight-bold;
   text-align: center;
+
+  &__info-bar {
+    .text-white;
+    position: absolute;
+    top: -36px;
+    display: inline-block;
+    padding: 5px 16px;
+    margin: auto;
+    background-color: var(--accent-color);
+    border-radius: 6px;
+    box-shadow: 0 2px 16px 0 fade(#000, 8%);
+    font-size: 12px;
+    font-weight: @font-weight-light;
+    transform: translateX(-50%);
+  }
 }
 
 .video-timer {
@@ -94,12 +109,26 @@
   }
 
   &__wrapper {
+    .list-unstyled;
+
     display: flex;
     width: 100%;
     justify-content: center;
+    margin: 0;
+  }
+
+  &__item {
+    &:first-child {
+      margin: 0 52px 0 0;
+    }
+
+    &:last-child {
+      margin: 0 0 0 52px;
+    }
   }
 
   &__button {
+    .button-reset-default;
     position: relative;
     display: flex;
     width: 56px;
@@ -113,14 +142,6 @@
     cursor: pointer;
     line-height: 0;
 
-    &:first-child {
-      margin: 0 52px 0 0;
-    }
-
-    &:last-child {
-      margin: 0 0 0 52px;
-    }
-
     svg > path {
       fill: #fff;
     }
@@ -129,6 +150,7 @@
       position: absolute;
       bottom: -16px;
       left: 50%;
+      margin: 0;
       color: #fff;
       font-size: 11px;
       font-weight: @font-weight-regular;

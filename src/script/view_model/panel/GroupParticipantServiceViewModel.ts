@@ -27,6 +27,7 @@ import type {ActionsViewModel} from '../ActionsViewModel';
 import type {IntegrationRepository} from '../../integration/IntegrationRepository';
 import type {User} from '../../entity/User';
 import type {PanelParams} from '../PanelViewModel';
+import {matchQualifiedIds} from 'Util/QualifiedId';
 
 export class GroupParticipantServiceViewModel extends BasePanelViewModel {
   integrationRepository: IntegrationRepository;
@@ -59,7 +60,7 @@ export class GroupParticipantServiceViewModel extends BasePanelViewModel {
     this.selectedInConversation = ko.pureComputed(() => {
       if (this.isVisible() && this.activeConversation()) {
         const participatingUserIds = this.activeConversation().participating_user_ids();
-        return participatingUserIds.some(id => this.selectedParticipant().id === id);
+        return participatingUserIds.some(user => matchQualifiedIds(this.selectedParticipant(), user));
       }
       return false;
     });

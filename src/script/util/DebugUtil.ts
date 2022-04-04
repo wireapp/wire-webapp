@@ -24,6 +24,7 @@ import {
   ConversationEvent,
   ConversationOtrMessageAddEvent,
 } from '@wireapp/api-client/src/event/';
+import type {QualifiedId} from '@wireapp/api-client/src/user';
 import type {Notification} from '@wireapp/api-client/src/notification/';
 import {MemberLeaveReason} from '@wireapp/api-client/src/conversation/data/';
 import {ConnectionStatus} from '@wireapp/api-client/src/connection/';
@@ -54,6 +55,8 @@ import {UserState} from '../user/UserState';
 import {ConversationState} from '../conversation/ConversationState';
 import {CallState} from '../calling/CallState';
 import {MessageCategory} from '../message/MessageCategory';
+import {isQualifiedId} from '@wireapp/core/src/main/util';
+import {Core} from '../service/CoreSingleton';
 
 function downloadText(text: string, filename: string = 'default.txt'): number {
   const url = `data:text/plain;charset=utf-8,${encodeURIComponent(text)}`;
@@ -84,6 +87,7 @@ export class DebugUtil {
     private readonly userState = container.resolve(UserState),
     private readonly conversationState = container.resolve(ConversationState),
     private readonly callState = container.resolve(CallState),
+    private readonly core = container.resolve(Core),
   ) {
     this.$ = $;
     this.Dexie = Dexie;
@@ -109,8 +113,9 @@ export class DebugUtil {
   }
 
   /** Used by QA test automation. */
-  async breakSession(userId: string, clientId: string): Promise<void> {
-    const sessionId = `${userId}@${clientId}`;
+  async breakSession(userId: string | QualifiedId, clientId: string): Promise<void> {
+    const qualifiedId = isQualifiedId(userId) ? userId : {domain: '', id: userId};
+    const sessionId = this.core.service!.cryptography.constructSessionId(qualifiedId, clientId);
     const cryptobox = this.cryptographyRepository.cryptobox;
     const cryptoboxSession = await cryptobox.session_load(sessionId);
     cryptoboxSession.session.session_states = {};
@@ -144,6 +149,7 @@ export class DebugUtil {
      */
     window.openGraphAsync = url => {
       return Promise.resolve({
+        description: 'an interesting article about the past',
         image: {
           data:
             'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAJYAAACWCAYAAAA8AXHiAAADiUlEQVR4nO3dS67cMAwEwHeWuf8dkxOMDV' +
@@ -161,6 +167,7 @@ export class DebugUtil {
             'WtBKwBKMACa+xJLG4lYA1AAdZ5sP4Df5GjbWdSI2IAAAAASUVORK5CYII=',
         },
         title: 'A link to the past',
+        type: 'article',
         url,
       });
     };
@@ -191,7 +198,7 @@ export class DebugUtil {
       notification.from === userId && notification.data && notification.data.sender === clientId;
     const hasExpectedTimestamp = (notification: ConversationOtrMessageAddEvent, dateTime: Date) =>
       notification.time === dateTime.toISOString();
-    const conversation = await this.conversationRepository.getConversationById(conversationId);
+    const conversation = await this.conversationRepository.getConversationById({domain: '', id: conversationId});
     const message = await this.messageRepository.getMessageInConversationById(conversation, messageId);
     const notificationList = await this.eventRepository.notificationService.getNotifications(
       undefined,
@@ -222,8 +229,8 @@ export class DebugUtil {
   async getEventInfo(
     event: ConversationEvent,
   ): Promise<{conversation: Conversation; event: ConversationEvent; user: User}> {
-    const conversation = await this.conversationRepository.getConversationById(event.conversation);
-    const user = await this.userRepository.getUserById(event.from, event.qualified_from?.domain);
+    const conversation = await this.conversationRepository.getConversationById(event.qualified_conversation);
+    const user = await this.userRepository.getUserById(event.qualified_from || {domain: '', id: event.from});
 
     const debugInformation = {
       conversation,
@@ -328,7 +335,7 @@ export class DebugUtil {
   }
 
   async reprocessNotifications(notificationId?: string) {
-    const isEncryptedEvent = (event: any): event is EventRecord => {
+    const isEncryptedEvent = (event: any): event is ConversationOtrMessageAddEvent => {
       return event.type === CONVERSATION_EVENT.OTR_MESSAGE_ADD;
     };
 

@@ -30,7 +30,7 @@ export class ClientAction {
     return async (dispatch, getState, {apiClient}) => {
       dispatch(ClientActionCreator.startGetAllClients());
       try {
-        const clients = await apiClient.client.api.getClients();
+        const clients = await apiClient.api.client.getClients();
         dispatch(ClientActionCreator.successfulGetAllClients(clients));
         return clients;
       } catch (error) {
@@ -44,7 +44,7 @@ export class ClientAction {
     return async (dispatch, getState, {apiClient}) => {
       dispatch(ClientActionCreator.startRemoveClient());
       try {
-        await apiClient.client.api.deleteClient(clientId, password);
+        await apiClient.api.client.deleteClient(clientId, password);
         dispatch(ClientActionCreator.successfulRemoveClient(clientId));
       } catch (error) {
         dispatch(ClientActionCreator.failedRemoveClient(error));
@@ -53,13 +53,19 @@ export class ClientAction {
     };
   };
 
-  doInitializeClient = (clientType: ClientType, password?: string): ThunkAction => {
+  doInitializeClient = (
+    clientType: ClientType,
+    password?: string,
+    verificationCode?: string,
+    entropyData?: Uint8Array,
+  ): ThunkAction => {
     return async (dispatch, getState, {core, actions: {clientAction, webSocketAction}}) => {
       dispatch(ClientActionCreator.startInitializeClient());
       try {
         const creationStatus = await core.initClient(
-          {clientType, password},
+          {clientType, password, verificationCode},
           clientAction.generateClientPayload(clientType),
+          entropyData,
         );
         await dispatch(clientAction.doGetAllClients());
         await dispatch(webSocketAction.listen());

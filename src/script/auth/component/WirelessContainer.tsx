@@ -71,13 +71,21 @@ export const WirelessContainer: React.SFC<Props> = ({showCookiePolicyBanner, onC
               />
             </Link>
           </div>
-          <div
-            onClick={(event: React.MouseEvent<HTMLDivElement>) => onCookiePolicyBannerClose(event)}
-            style={{cursor: 'pointer', padding: '16px', position: 'absolute', right: 0, top: 0}}
+          <button
+            onClick={(event: React.MouseEvent<HTMLButtonElement>) => onCookiePolicyBannerClose(event)}
+            style={{
+              background: 'none',
+              border: 'none',
+              cursor: 'pointer',
+              padding: '16px',
+              position: 'absolute',
+              right: 0,
+              top: 0,
+            }}
             data-uie-name="do-close-cookie-banner"
           >
             <CloseIcon />
-          </div>
+          </button>
         </Header>
       )}
       <Content>

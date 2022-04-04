@@ -26,16 +26,17 @@ import {
   DefaultConversationRoleName,
   CONVERSATION_ACCESS,
   CONVERSATION_ACCESS_ROLE,
+  ACCESS_ROLE_V2,
   CONVERSATION_TYPE,
 } from '@wireapp/api-client/src/conversation';
 
 import {ACCESS_STATE} from './AccessState';
-import {NOTIFICATION_STATE} from './NotificationSetting';
 import {ConversationStatus} from './ConversationStatus';
 import {Conversation} from '../entity/Conversation';
 import {BASE_ERROR_TYPE, BaseError} from '../error/BaseError';
 import {ConversationError} from '../error/ConversationError';
 import {ConversationRecord} from '../storage/record/ConversationRecord';
+import {matchQualifiedIds, QualifiedEntity} from 'Util/QualifiedId';
 
 /** Conversation self data from the database. */
 export interface SelfStatusUpdateDatabaseData {
@@ -62,8 +63,9 @@ export interface SelfStatusUpdateDatabaseData {
 
 export type ConversationDatabaseData = ConversationRecord &
   Partial<ConversationBackendData> & {
-    accessModes: CONVERSATION_ACCESS[];
-    accessRole: CONVERSATION_ACCESS_ROLE;
+    accessModes?: CONVERSATION_ACCESS[];
+    accessRole?: CONVERSATION_ACCESS_ROLE;
+    accessRoleV2?: ACCESS_ROLE_V2[];
     roles: {[userId: string]: DefaultConversationRoleName | string};
     status: ConversationStatus;
     team_id: string;
@@ -177,7 +179,7 @@ export class ConversationMapper {
     }
 
     // Backend states
-    const {otr_archived, otr_muted} = selfState;
+    const {otr_archived, otr_muted_status: mutedState} = selfState;
 
     if (otr_archived !== undefined) {
       const archivedTimestamp = new Date(selfState.otr_archived_ref).getTime();
@@ -185,16 +187,10 @@ export class ConversationMapper {
       conversationEntity.archivedState(otr_archived);
     }
 
-    if (otr_muted !== undefined) {
+    if (mutedState !== undefined) {
       const mutedTimestamp = new Date(selfState.otr_muted_ref).getTime();
       conversationEntity.setTimestamp(mutedTimestamp, Conversation.TIMESTAMP_TYPE.MUTED);
-
-      const mutedState = ConversationMapper.getMutedState(otr_muted, selfState.otr_muted_status);
-      if (typeof mutedState === 'boolean') {
-        conversationEntity.mutedState(mutedState === true ? NOTIFICATION_STATE.NOTHING : NOTIFICATION_STATE.EVERYTHING);
-      } else {
-        conversationEntity.mutedState(mutedState);
-      }
+      conversationEntity.mutedState(mutedState);
     }
 
     if (disablePersistence) {
@@ -215,7 +211,7 @@ export class ConversationMapper {
       throw new ConversationError(BASE_ERROR_TYPE.INVALID_PARAMETER, BaseError.MESSAGE.INVALID_PARAMETER);
     }
 
-    const {creator, id, members, name, others, type} = conversationData;
+    const {creator, id, members, name, others, qualified_others, type} = conversationData;
     let conversationEntity = new Conversation(id, conversationData.domain || conversationData.qualified_id?.domain);
     conversationEntity.roles(conversationData.roles || {});
 
@@ -223,7 +219,7 @@ export class ConversationMapper {
     conversationEntity.type(type);
     conversationEntity.name(name || '');
 
-    const selfState = members ? members.self : conversationData;
+    const selfState = members?.self || conversationData;
     conversationEntity = ConversationMapper.updateSelfStatus(conversationEntity, selfState as any);
 
     if (!conversationEntity.last_event_timestamp() && initialTimestamp) {
@@ -232,7 +228,12 @@ export class ConversationMapper {
     }
 
     // Active participants from database or backend payload
-    const participatingUserIds = others || members.others.map(other => other.id);
+    const participatingUserIds =
+      qualified_others ||
+      (members?.others
+        ? members.others.map(other => ({domain: other.qualified_id?.domain || '', id: other.id}))
+        : others.map(userId => ({domain: '', id: userId})));
+
     conversationEntity.participating_user_ids(participatingUserIds);
 
     // Team ID from database or backend payload
@@ -248,23 +249,16 @@ export class ConversationMapper {
     // Access related data
     const accessModes = conversationData.accessModes || conversationData.access;
     const accessRole = conversationData.accessRole || conversationData.access_role;
-    if (accessModes && accessRole) {
-      ConversationMapper.mapAccessState(conversationEntity, accessModes, accessRole);
+    const accessRoleV2 = conversationData.accessRoleV2 || conversationData.access_role_v2;
+    if (accessModes && (accessRole || accessRoleV2)) {
+      conversationEntity.accessModes = accessModes;
+      conversationEntity.accessRole = accessRoleV2 || accessRole;
+      ConversationMapper.mapAccessState(conversationEntity, accessModes, accessRole, accessRoleV2);
     }
 
     conversationEntity.receiptMode(conversationData.receipt_mode);
 
     return conversationEntity;
-  }
-
-  static getMutedState(mutedState: boolean, notificationState?: number): boolean | number {
-    const validNotificationStates = Object.values(NOTIFICATION_STATE);
-    if (validNotificationStates.includes(notificationState)) {
-      // Ensure bit at offset 0 to be 1 for backwards compatibility of deprecated boolean based state is true
-      return mutedState ? notificationState | 0b1 : NOTIFICATION_STATE.EVERYTHING;
-    }
-
-    return typeof mutedState === 'boolean' ? mutedState : NOTIFICATION_STATE.EVERYTHING;
   }
 
   static mergeConversation(
@@ -275,19 +269,35 @@ export class ConversationMapper {
 
     return remoteConversations.map(
       (remoteConversationData: ConversationBackendData & {receipt_mode: number}, index: number) => {
-        const conversationId = remoteConversationData.id;
-        const newLocalConversation = {id: conversationId} as ConversationDatabaseData;
-        const localConversationData: ConversationDatabaseData =
-          localConversations.find(({id}) => id === conversationId) || newLocalConversation;
+        const remoteConversationId: QualifiedEntity = remoteConversationData.qualified_id || {
+          domain: '',
+          id: remoteConversationData.id,
+        };
+        const localConversationData =
+          localConversations.find(conversationId => matchQualifiedIds(conversationId, remoteConversationId)) ||
+          (remoteConversationId as ConversationDatabaseData);
 
-        const {access, access_role, creator, members, message_timer, receipt_mode, name, team, type} =
-          remoteConversationData;
+        const {
+          access,
+          access_role,
+          access_role_v2,
+          creator,
+          members,
+          message_timer,
+          qualified_id,
+          receipt_mode,
+          name,
+          team,
+          type,
+        } = remoteConversationData;
         const {others: othersStates, self: selfState} = members;
 
         const updates: Partial<ConversationDatabaseData> = {
           accessModes: access,
           accessRole: access_role,
+          accessRoleV2: access_role_v2,
           creator,
+          domain: qualified_id?.domain,
           message_timer,
           name,
           receipt_mode,
@@ -296,6 +306,14 @@ export class ConversationMapper {
           team_id: team,
           type,
         };
+
+        const qualified_others = othersStates
+          ?.filter(other => !!other.qualified_id)
+          .map(({qualified_id}) => qualified_id);
+
+        if (qualified_others.length) {
+          updates.qualified_others = qualified_others;
+        }
 
         // Add roles for self
         if (selfState.conversation_role && !(selfState.id in updates.roles)) {
@@ -354,7 +372,7 @@ export class ConversationMapper {
         const isRemoteMutedTimestampNewer = isRemoteTimestampNewer(mutedTimestamp, remoteMutedTimestamp);
 
         if (isRemoteMutedTimestampNewer || mutedState === undefined) {
-          const remoteMutedState = ConversationMapper.getMutedState(selfState.otr_muted, selfState.otr_muted_status);
+          const remoteMutedState = selfState.otr_muted_status;
           mergedConversation.muted_state = remoteMutedState;
           mergedConversation.muted_timestamp = remoteMutedTimestamp;
         }
@@ -364,23 +382,37 @@ export class ConversationMapper {
     );
   }
 
-  static mapAccessCode(conversationEntity: Conversation, accessCode: ConversationCode): void {
-    const isTeamConversation = conversationEntity && conversationEntity.team_id;
+  static mapAccessCode(conversation: Conversation, accessCode: ConversationCode): void {
+    const isTeamConversation = conversation && conversation.team_id;
 
     if (accessCode.uri && isTeamConversation) {
-      const accessCodeUrl = `${window.wire.env.URL.ACCOUNT_BASE}/conversation-join/?key=${accessCode.key}&code=${accessCode.code}`;
-      conversationEntity.accessCode(accessCodeUrl);
+      const baseUrl = `${window.wire.env.URL.ACCOUNT_BASE}/conversation-join/?key=${accessCode.key}&code=${accessCode.code}`;
+      const accessCodeUrl = conversation.domain ? `${baseUrl}&domain=${conversation.domain}` : baseUrl;
+      conversation.accessCode(accessCodeUrl);
     }
   }
 
   static mapAccessState(
     conversationEntity: Conversation,
     accessModes: CONVERSATION_ACCESS[],
-    accessRole: CONVERSATION_ACCESS_ROLE,
+    accessRole?: CONVERSATION_ACCESS_ROLE,
+    accessRoleV2: ACCESS_ROLE_V2[] = [],
   ): typeof ACCESS_STATE {
     if (conversationEntity.team_id) {
       if (conversationEntity.is1to1()) {
         return conversationEntity.accessState(ACCESS_STATE.TEAM.ONE2ONE);
+      }
+
+      if (accessRoleV2.includes(ACCESS_ROLE_V2.TEAM_MEMBER)) {
+        if (accessRoleV2.includes(ACCESS_ROLE_V2.GUEST) || accessRoleV2.includes(ACCESS_ROLE_V2.NON_TEAM_MEMBER)) {
+          if (accessRoleV2.includes(ACCESS_ROLE_V2.SERVICE)) {
+            return conversationEntity.accessState(ACCESS_STATE.TEAM.GUESTS_SERVICES);
+          }
+          return conversationEntity.accessState(ACCESS_STATE.TEAM.GUEST_ROOM);
+        } else if (accessRoleV2.includes(ACCESS_ROLE_V2.SERVICE)) {
+          return conversationEntity.accessState(ACCESS_STATE.TEAM.SERVICES);
+        }
+        return conversationEntity.accessState(ACCESS_STATE.TEAM.TEAM_ONLY);
       }
 
       const isTeamRole = accessRole === CONVERSATION_ACCESS_ROLE.TEAM;
@@ -393,6 +425,10 @@ export class ConversationMapper {
         return conversationEntity.accessState(ACCESS_STATE.TEAM.TEAM_ONLY);
       }
 
+      const isVerifiedRole = accessRole === CONVERSATION_ACCESS_ROLE.ACTIVATED;
+      if (isVerifiedRole) {
+        return conversationEntity.accessState(ACCESS_STATE.TEAM.GUEST_ROOM);
+      }
       const isNonVerifiedRole = accessRole === CONVERSATION_ACCESS_ROLE.NON_ACTIVATED;
 
       const includesCodeMode = accessModes.includes(CONVERSATION_ACCESS.CODE);
@@ -400,12 +436,12 @@ export class ConversationMapper {
 
       const isGuestRoomMode = isNonVerifiedRole && isExpectedModes;
       return isGuestRoomMode
-        ? conversationEntity.accessState(ACCESS_STATE.TEAM.GUEST_ROOM)
+        ? conversationEntity.accessState(ACCESS_STATE.TEAM.GUESTS_SERVICES)
         : conversationEntity.accessState(ACCESS_STATE.TEAM.LEGACY);
     }
 
     if (conversationEntity.isSelf()) {
-      return conversationEntity.accessState(ACCESS_STATE.SELF);
+      return conversationEntity.accessState(ACCESS_STATE.OTHER.SELF);
     }
 
     const personalAccessState = conversationEntity.isGroup()

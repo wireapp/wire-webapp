@@ -26,7 +26,6 @@ import {afterRender} from 'Util/util';
 
 import {WindowTitleViewModel} from './WindowTitleViewModel';
 import {modals, ModalsViewModel} from './ModalsViewModel';
-import {WarningsViewModel} from './WarningsViewModel';
 import {ContentViewModel} from './ContentViewModel';
 import {CallingViewModel} from './CallingViewModel';
 import {ActionsViewModel} from './ActionsViewModel';
@@ -58,17 +57,17 @@ import type {TeamRepository} from '../team/TeamRepository';
 import type {User} from '../entity/User';
 import type {UserRepository} from '../user/UserRepository';
 import type {AuthRepository} from '../auth/AuthRepository';
-import type {BroadcastRepository} from '../broadcast/BroadcastRepository';
 import type {EventTrackingRepository} from '../tracking/EventTrackingRepository';
 import type {MessageRepository} from '../conversation/MessageRepository';
 import {UserState} from '../user/UserState';
+import Warnings from './WarningsContainer';
+import {Core} from '../service/CoreSingleton';
 
 export interface ViewModelRepositories {
   asset: AssetRepository;
   audio: AudioRepository;
   auth: AuthRepository;
   backup: BackupRepository;
-  broadcast: BroadcastRepository;
   calling: CallingRepository;
   client: ClientRepository;
   connection: ConnectionRepository;
@@ -107,8 +106,8 @@ export class MainViewModel {
   selfUser: ko.Observable<User>;
   title: WindowTitleViewModel;
   userRepository: UserRepository;
+  isFederated: boolean;
   private readonly userState: UserState;
-  warnings: WarningsViewModel;
 
   static get CONFIG() {
     return {
@@ -148,6 +147,7 @@ export class MainViewModel {
     this.logger = getLogger('MainViewModel');
 
     this.userState = container.resolve(UserState);
+    this.isFederated = container.resolve(Core).backendFeatures.isFederated;
 
     this.modals = modals;
 
@@ -176,6 +176,7 @@ export class MainViewModel {
       repositories.media.streamHandler,
       repositories.permission,
       repositories.team,
+      repositories.properties,
       this.selfUser,
       this.multitasking,
     );
@@ -190,7 +191,7 @@ export class MainViewModel {
     );
     this.title = new WindowTitleViewModel(this);
     this.favicon = new FaviconViewModel(amplify);
-    this.warnings = new WarningsViewModel();
+    Warnings.init();
 
     this.mainClasses = ko.pureComputed(() => {
       if (this.selfUser()) {

@@ -21,6 +21,14 @@ import {config} from './config';
 import {Server} from './Server';
 import {formatDate} from './util/TimeUtil';
 
+const federation = process.env.FEDERATION;
+
+if (federation) {
+  config.SERVER.APP_BASE = `https://local.${federation}.wire.link:8081`;
+  config.CLIENT.BACKEND_REST = `https://nginz-https.${federation}.wire.link`;
+  config.CLIENT.BACKEND_WS = `wss://nginz-ssl.${federation}.wire.link`;
+}
+
 const server = new Server(config);
 
 server

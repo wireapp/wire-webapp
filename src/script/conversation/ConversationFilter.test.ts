@@ -14,12 +14,14 @@ describe('ConversationFilter', () => {
 
     it('does not show call controls for an outgoing connection request', () => {
       const conversationData: ConversationDatabaseData = {
-        accessModes: undefined,
-        accessRole: undefined,
+        access: undefined,
+        accessRoleV2: undefined,
+        access_role: undefined,
         archived_state: false,
         archived_timestamp: 0,
         cleared_timestamp: 0,
         creator: '077f0600-4ee6-4b9c-84e6-2795d6cbef0a',
+        domain: '',
         ephemeral_timer: null,
         global_message_timer: null,
         id: '796161e1-a319-41e3-9b33-2b3ab0b3b87a',
@@ -33,6 +35,7 @@ describe('ConversationFilter', () => {
         muted_timestamp: 0,
         name: 'Florian@Staging11',
         others: ['71e25be1-5433-4647-964d-03a5d9e7c970'],
+        qualified_others: undefined,
         receipt_mode: null,
         roles: {},
         status: 0,
@@ -56,12 +59,14 @@ describe('ConversationFilter', () => {
 
     it('shows call controls for an accepted connection request', () => {
       const conversationData: ConversationDatabaseData = {
-        accessModes: [CONVERSATION_ACCESS.PRIVATE],
-        accessRole: CONVERSATION_ACCESS_ROLE.PRIVATE,
+        access: [CONVERSATION_ACCESS.PRIVATE],
+        accessRoleV2: undefined,
+        access_role: CONVERSATION_ACCESS_ROLE.PRIVATE,
         archived_state: false,
         archived_timestamp: 0,
         cleared_timestamp: 0,
         creator: '077f0600-4ee6-4b9c-84e6-2795d6cbef0a',
+        domain: '',
         ephemeral_timer: null,
         global_message_timer: null,
         id: '796161e1-a319-41e3-9b33-2b3ab0b3b87a',
@@ -76,6 +81,7 @@ describe('ConversationFilter', () => {
         muted_timestamp: 0,
         name: 'Florian@Staging11',
         others: ['71e25be1-5433-4647-964d-03a5d9e7c970'],
+        qualified_others: undefined,
         receipt_mode: null,
         roles: {
           '077f0600-4ee6-4b9c-84e6-2795d6cbef0a': 'wire_admin',

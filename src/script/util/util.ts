@@ -30,6 +30,7 @@ import {StorageKey} from '../storage/StorageKey';
 import {loadValue} from './StorageUtil';
 import {AuthError} from '../error/AuthError';
 import type {Conversation} from '../entity/Conversation';
+import {isTabKey} from 'Util/KeyboardUtil';
 
 export const isTemporaryClientAndNonPersistent = (persist: boolean): boolean => {
   if (persist === undefined) {
@@ -143,10 +144,10 @@ export const loadImage = function (blob: Blob): Promise<HTMLImageElement> {
   });
 };
 
-export const loadFileBuffer = (file: Blob | File): Promise<string | ArrayBuffer> => {
+export const loadFileBuffer = (file: Blob | File): Promise<ArrayBuffer> => {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
-    reader.onload = () => resolve(reader.result);
+    reader.onload = () => resolve(reader.result as ArrayBuffer);
     reader.onerror = reject;
     reader.readAsArrayBuffer(file);
   });
@@ -339,3 +340,24 @@ export function throttle(callback: Function, wait: number, immediate = false) {
     }
   };
 }
+
+export const preventFocusOutside = (event: KeyboardEvent, parentId: string): void => {
+  if (!isTabKey(event)) {
+    return;
+  }
+  event.preventDefault();
+  const focusableElements =
+    'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
+  const parent = document.getElementById(parentId);
+  const focusableContent = [...parent.querySelectorAll(focusableElements)];
+  const focusedItemIndex = focusableContent.indexOf(document.activeElement);
+  if (event.shiftKey && focusedItemIndex === 0) {
+    (focusableContent[focusableContent.length - 1] as HTMLElement)?.focus();
+    return;
+  }
+  if (!event.shiftKey && focusedItemIndex === focusableContent.length - 1) {
+    (focusableContent[0] as HTMLElement)?.focus();
+    return;
+  }
+  (focusableContent[focusedItemIndex + 1] as HTMLElement)?.focus();
+};

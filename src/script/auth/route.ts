@@ -67,6 +67,7 @@ export const ROUTE = {
   LOGIN_PHONE: '/phonelogin',
   SET_ACCOUNT_TYPE: '/setaccounttype',
   SET_EMAIL: '/setemail',
+  SET_ENTROPY: '/setentropy',
   SET_HANDLE: '/sethandle',
   SET_PASSWORD: '/setpassword',
   SSO: '/sso',

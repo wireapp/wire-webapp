@@ -42,37 +42,34 @@ const LegalHoldDot: React.FC<LegalHoldDotProps> = ({
   dataUieName = 'legal-hold-dot-pending-icon',
 }) => {
   const isInteractive = !!legalHoldModal;
+  const onClick = (event: React.MouseEvent) => {
+    event.stopPropagation();
+    if (isInteractive) {
+      if (isPending) {
+        legalHoldModal.showRequestModal(true);
+        return;
+      }
+
+      legalHoldModal.showUsers(conversation);
+    }
+  };
 
   return (
-    <div
-      className={cx(
-        'legal-hold-dot',
-        {
-          'legal-hold-dot--active': !isPending,
-          'legal-hold-dot--interactive': isInteractive,
-          'legal-hold-dot--large': large,
-        },
-        className,
-      )}
-      onClick={event => {
-        event.stopPropagation();
-        if (isInteractive) {
-          if (isPending) {
-            legalHoldModal.showRequestModal(true);
-            return;
-          }
-
-          if (conversation) {
-            legalHoldModal.showUsers(conversation);
-            return;
-          }
-
-          legalHoldModal.showUsers();
-        }
-      }}
-    >
-      {isPending && <Icon.Pending data-uie-name={dataUieName} />}
-    </div>
+    <button type="button" className="legal-hold-dot-button" onClick={onClick} data-uie-name={dataUieName}>
+      <span
+        className={cx(
+          'legal-hold-dot',
+          {
+            'legal-hold-dot--active': !isPending,
+            'legal-hold-dot--interactive': isInteractive,
+            'legal-hold-dot--large': large,
+          },
+          className,
+        )}
+      >
+        {isPending && <Icon.Pending className="pending-icon" />}
+      </span>
+    </button>
   );
 };
 

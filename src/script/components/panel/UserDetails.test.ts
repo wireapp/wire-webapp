@@ -19,9 +19,9 @@
 
 import TestPage from 'Util/test/TestPage';
 import {createRandomUuid} from 'Util/util';
-
 import {User} from '../../entity/User';
 import UserDetails, {UserDetailsProps} from './UserDetails';
+import {ClientEntity} from '../../client/ClientEntity';
 
 class UserDetailsPage extends TestPage<UserDetailsProps> {
   constructor(props: UserDetailsProps) {
@@ -59,11 +59,13 @@ describe('UserDetails', () => {
     expect(userDetails.getAdmin().exists()).toBeFalsy();
   });
 
-  it('renders the correct infos for a verified group admin', () => {
-    const participant = new User(createRandomUuid(), null);
-    const userDetails = new UserDetailsPage({isGroupAdmin: true, isSelfVerified: true, isVerified: true, participant});
+  it('shows a verified icon when all clients from the self user are verified and all clients of the other participant are verified', () => {
+    const otherParticipant = new User(createRandomUuid(), null);
+    const verifiedClient = new ClientEntity(false, null);
+    verifiedClient.meta.isVerified(true);
+    otherParticipant.devices.push(verifiedClient);
+    const userDetails = new UserDetailsPage({isGroupAdmin: true, isSelfVerified: true, participant: otherParticipant});
     expect(userDetails.getVerifiedIcon().exists()).toBeTruthy();
-
     expect(userDetails.getAdmin().exists()).toBeTruthy();
   });
 

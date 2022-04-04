@@ -27,18 +27,21 @@ import {mapProfileAssets, mapProfileAssetsV1, updateUserEntityAssets} from '../a
 import {User} from '../entity/User';
 import type {ServerTimeHandler} from '../time/serverTimeHandler';
 import '../view_model/bindings/CommonBindings';
+import {container} from 'tsyringe';
+import {UserState} from './UserState';
 
 export class UserMapper {
   private readonly logger: Logger;
-  private readonly serverTimeHandler: ServerTimeHandler;
 
   /**
    * Construct a new User Mapper.
    * @param serverTimeHandler Handles time shift between server and client
    */
-  constructor(serverTimeHandler: ServerTimeHandler) {
+  constructor(
+    private readonly serverTimeHandler: ServerTimeHandler,
+    private readonly userState: UserState = container.resolve(UserState),
+  ) {
     this.logger = getLogger('UserMapper');
-    this.serverTimeHandler = serverTimeHandler;
   }
 
   mapUserFromJson(userData: APIClientUser | APIClientSelf): User {
@@ -98,6 +101,10 @@ export class UserMapper {
     if (userData.qualified_id) {
       userEntity.domain = userData.qualified_id.domain;
       userEntity.id = userData.qualified_id.id;
+      userEntity.isFederated =
+        this.userState.self() && this.userState.self().domain
+          ? userData.qualified_id.domain !== this.userState.self().domain
+          : false;
     }
 
     const {
@@ -124,7 +131,13 @@ export class UserMapper {
     const hasPicture = picture?.length;
     let mappedAssets;
     if (hasAsset) {
-      mappedAssets = mapProfileAssets(userEntity.id, userData.assets);
+      mappedAssets = mapProfileAssets(
+        userEntity.id,
+        userData.assets.map(asset => ({
+          ...asset,
+          domain: userEntity.domain,
+        })),
+      );
     } else if (hasPicture) {
       mappedAssets = mapProfileAssetsV1(userEntity.id, userData.picture);
     }
@@ -175,7 +188,8 @@ export class UserMapper {
       userEntity.isSingleSignOn = true;
     }
 
-    if (teamId) {
+    if (teamId && !userEntity.isFederated) {
+      // To be in the same team, the user needs to have the same teamId and to be on the same domain (not federated)
       userEntity.inTeam(true);
       userEntity.teamId = teamId;
     }

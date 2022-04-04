@@ -55,7 +55,7 @@ export class InvitationAction {
 
       const teamId = selfSelector.getSelfTeamId(state);
       try {
-        const createdInvite = await apiClient.teams.invitation.api.postInvitation(teamId, newInvite);
+        const createdInvite = await apiClient.api.teams.invitation.postInvitation(teamId, newInvite);
         dispatch(InvitationActionCreator.successfulAddInvite(createdInvite));
       } catch (error) {
         dispatch(InvitationActionCreator.failedAddInvite(error));

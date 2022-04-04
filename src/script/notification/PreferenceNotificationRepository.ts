@@ -20,17 +20,25 @@
 import {amplify} from 'amplify';
 import ko from 'knockout';
 import {groupBy} from 'underscore';
-import {USER_EVENT} from '@wireapp/api-client/src/event/';
+import {USER_EVENT, UserEvent} from '@wireapp/api-client/src/event';
+import type {QualifiedId} from '@wireapp/api-client/src/user';
+import {ClientType} from '@wireapp/api-client/src/client';
 import {WebAppEvents} from '@wireapp/webapp-events';
-
 import {loadValue, resetStoreValue, storeValue} from 'Util/StorageUtil';
-
 import type {ClientEntity} from '../client/ClientEntity';
 import type {User} from '../entity/User';
 import {PropertiesRepository} from '../properties/PropertiesRepository';
+import {matchQualifiedIds} from 'Util/QualifiedId';
 
+export type ClientNotificationData = {
+  domain?: string;
+  id: string;
+  model: string;
+  time: string;
+  type: ClientType;
+};
 export interface Notification {
-  data: ClientEntity | boolean;
+  data: ClientNotificationData | boolean;
   type: string;
 }
 
@@ -68,14 +76,18 @@ export class PreferenceNotificationRepository {
         : resetStoreValue(notificationsStorageKey);
     });
 
-    amplify.subscribe(WebAppEvents.USER.CLIENT_ADDED, (userId: string, clientEntity?: ClientEntity) => {
-      if (userId === selfUserObservable().id) {
-        this.onClientAdd(userId, clientEntity);
+    amplify.subscribe(WebAppEvents.USER.CLIENT_ADDED, (user: QualifiedId, clientEntity?: ClientEntity) => {
+      if (clientEntity && !clientEntity.isLegalHold() && matchQualifiedIds(user, selfUserObservable())) {
+        const {id, domain, type, time, model} = clientEntity;
+        this.notifications.push({
+          data: {domain, id, model, time, type},
+          type: PreferenceNotificationRepository.CONFIG.NOTIFICATION_TYPES.NEW_CLIENT,
+        });
       }
     });
-    amplify.subscribe(WebAppEvents.USER.CLIENT_REMOVED, (userId: string, clientId?: string) => {
-      if (userId === selfUserObservable().id) {
-        this.onClientRemove(userId, clientId);
+    amplify.subscribe(WebAppEvents.USER.CLIENT_REMOVED, (user: QualifiedId, clientId: string) => {
+      if (matchQualifiedIds(user, selfUserObservable())) {
+        this.onClientRemove(user.id, clientId, user.domain);
       }
     });
     amplify.subscribe(WebAppEvents.USER.EVENT_FROM_BACKEND, this.onUserEvent);
@@ -94,23 +106,20 @@ export class PreferenceNotificationRepository {
       .sort((a, b) => prio(a) - prio(b));
   }
 
-  onClientAdd(_userId: string, clientEntity?: ClientEntity): void {
-    if (clientEntity) {
-      this.notifications.push({
-        data: clientEntity,
-        type: PreferenceNotificationRepository.CONFIG.NOTIFICATION_TYPES.NEW_CLIENT,
-      });
-    }
-  }
-
-  onClientRemove(_userId: string, clientId: string): void {
+  onClientRemove(_userId: string, clientId: string, domain: string | null): void {
     this.notifications.remove(({data: clientEntity}) => {
-      const isExpectedId = typeof clientEntity !== 'boolean' && clientEntity.id === clientId;
-      return isExpectedId && (clientEntity as ClientEntity).isPermanent();
+      if (typeof clientEntity === 'boolean') {
+        return false;
+      }
+      const isExpectedId = matchQualifiedIds(
+        {domain: clientEntity.domain, id: clientEntity.id},
+        {domain, id: clientId},
+      );
+      return isExpectedId && clientEntity.type === ClientType.PERMANENT;
     });
   }
 
-  readonly onUserEvent = (event: any): void => {
+  readonly onUserEvent = (event: UserEvent & {value?: string}): void => {
     if (event.type === USER_EVENT.PROPERTIES_DELETE || event.type === USER_EVENT.PROPERTIES_SET) {
       if (event.key === PropertiesRepository.CONFIG.WIRE_RECEIPT_MODE.key) {
         const defaultValue = !!PropertiesRepository.CONFIG.WIRE_RECEIPT_MODE.defaultValue;

@@ -27,6 +27,7 @@ import ko from 'knockout';
 import {afterRender, formatBytes} from 'Util/util';
 import {allowsAllFiles, hasAllowedExtension, getFileExtensionOrName} from 'Util/FileTypeUtil';
 import {AVATAR_SIZE} from 'Components/Avatar';
+import 'Components/input/ClassifiedBar';
 import {KEY, isFunctionKey, insertAtCaret} from 'Util/KeyboardUtil';
 import {renderMessage} from 'Util/messageRenderer';
 import {t} from 'Util/LocalizerUtil';
@@ -46,7 +47,7 @@ import {FileAsset} from '../../entity/message/FileAsset';
 import {MediumImage} from '../../entity/message/MediumImage';
 import {MentionEntity} from '../../message/MentionEntity';
 import {MessageHasher} from '../../message/MessageHasher';
-import {MessageRepository} from '../../conversation/MessageRepository';
+import {MessageRepository, OutgoingQuote} from '../../conversation/MessageRepository';
 import {ModalsViewModel} from '../ModalsViewModel';
 import {QuoteEntity} from '../../message/QuoteEntity';
 import {SearchRepository} from '../../search/SearchRepository';
@@ -58,6 +59,7 @@ import {Text} from '../../entity/message/Text';
 import {User} from '../../entity/User';
 import {UserState} from '../../user/UserState';
 import {TeamState} from '../../team/TeamState';
+import '../../page/message-list/MentionSuggestions';
 
 interface DraftMessage {
   mentions: MentionEntity[];
@@ -100,6 +102,7 @@ export class InputBarViewModel {
   readonly richTextInput: ko.PureComputed<string>;
   readonly inputPlaceholder: ko.PureComputed<string>;
   readonly showGiphyButton: ko.PureComputed<boolean>;
+  readonly classifiedDomains: ko.PureComputed<string[]>;
   readonly isFileSharingSendingEnabled: ko.PureComputed<boolean>;
   readonly pingTooltip: string;
   readonly hasLocalEphemeralTimer: ko.PureComputed<boolean>;
@@ -109,7 +112,7 @@ export class InputBarViewModel {
   /** MIME types and file extensions are accepted */
   readonly acceptedImageTypes: string;
   readonly allowedFileTypes: string;
-  readonly disableControls: ko.PureComputed<boolean>;
+  readonly isConnectionRequest: ko.PureComputed<boolean>;
 
   static get CONFIG() {
     return {
@@ -137,6 +140,12 @@ export class InputBarViewModel {
     this.textarea = null;
     this.acceptedImageTypes = Config.getConfig().ALLOWED_IMAGE_TYPES.join(',');
     this.allowedFileTypes = Config.getConfig().FEATURE.ALLOWED_FILE_UPLOAD_EXTENSIONS.join(',');
+    this.isConnectionRequest = ko.pureComputed(
+      () =>
+        this.conversationEntity() &&
+        (this.conversationEntity().connection().isOutgoingRequest() ||
+          this.conversationEntity().connection().isIncomingRequest()),
+    );
 
     this.selectionStart = ko.observable(0);
     this.selectionEnd = ko.observable(0);
@@ -150,6 +159,7 @@ export class InputBarViewModel {
     this.replyMessageEntity = ko.observable();
 
     this.isFileSharingSendingEnabled = this.teamState.isFileSharingSendingEnabled;
+    this.classifiedDomains = this.teamState.classifiedDomains;
 
     const handleRepliedMessageDeleted = (messageId: string) => {
       if (this.replyMessageEntity()?.id === messageId) {
@@ -169,7 +179,6 @@ export class InputBarViewModel {
 
     computedReplyMessageEntity.subscribeChanged((isReplyingToMessage: boolean, wasReplyingToMessage: boolean) => {
       if (isReplyingToMessage !== wasReplyingToMessage) {
-        this.triggerInputChangeEvent();
         if (isReplyingToMessage) {
           amplify.subscribe(WebAppEvents.CONVERSATION.MESSAGE.REMOVED, handleRepliedMessageDeleted);
           amplify.subscribe(WebAppEvents.CONVERSATION.MESSAGE.UPDATED, handleRepliedMessageUpdated);
@@ -331,11 +340,12 @@ export class InputBarViewModel {
 
     this.hasLocalEphemeralTimer = ko.pureComputed(() => {
       const conversationEntity = this.conversationEntity();
-      return conversationEntity.localMessageTimer() && !conversationEntity.hasGlobalMessageTimer();
+      return (
+        teamState.isSelfDeletingMessagesEnabled() &&
+        conversationEntity.localMessageTimer() &&
+        !conversationEntity.hasGlobalMessageTimer()
+      );
     });
-
-    // TODO(Federation): For Federation playground builds we disable every other activity than sending plain text messages
-    this.disableControls = ko.pureComputed(() => this.conversationEntity()?.isFederated());
 
     this.conversationEntity.subscribe(this.loadInitialStateForConversation);
     this.draftMessage.subscribe(message => {
@@ -519,7 +529,7 @@ export class InputBarViewModel {
   readonly clickToPing = (): void => {
     if (this.conversationEntity() && !this.pingDisabled()) {
       this.pingDisabled(true);
-      this.messageRepository.sendKnock(this.conversationEntity()).then(() => {
+      this.messageRepository.sendPing(this.conversationEntity()).then(() => {
         window.setTimeout(() => this.pingDisabled(false), InputBarViewModel.CONFIG.PING_TIMEOUT);
       });
     }
@@ -636,8 +646,6 @@ export class InputBarViewModel {
 
     if (this.isEditing()) {
       this.sendMessageEdit(messageText, this.editMessageEntity());
-    } else if (this.disableControls()) {
-      this.sendFederatedMessage(messageText);
     } else {
       this.sendMessage(messageText, this.replyMessageEntity());
     }
@@ -653,9 +661,7 @@ export class InputBarViewModel {
       switch (keyboardEvent.key) {
         case KEY.ARROW_UP: {
           if (!isFunctionKey(keyboardEvent) && !this.input().length) {
-            if (!this.conversationEntity()?.isFederated()) {
-              this.editMessage(this.conversationEntity().getLastEditableMessage() as ContentMessage);
-            }
+            this.editMessage(this.conversationEntity().getLastEditableMessage() as ContentMessage);
             this.updateMentions(data, keyboardEvent);
           }
           break;
@@ -809,10 +815,6 @@ export class InputBarViewModel {
     amplify.unsubscribeAll(WebAppEvents.SHORTCUT.PING);
   };
 
-  readonly triggerInputChangeEvent = (newInputHeight = 0, previousInputHeight = 0): void => {
-    amplify.publish(WebAppEvents.INPUT.RESIZE, newInputHeight - previousInputHeight);
-  };
-
   readonly sendGiphy = (gifUrl: string, tag: string): void => {
     const conversationEntity = this.conversationEntity();
     const replyMessageEntity = this.replyMessageEntity();
@@ -822,7 +824,7 @@ export class InputBarViewModel {
     });
   };
 
-  private readonly _generateQuote = (replyMessageEntity: ContentMessage): Promise<QuoteEntity | undefined> => {
+  private readonly _generateQuote = (replyMessageEntity: ContentMessage): Promise<OutgoingQuote | undefined> => {
     return !replyMessageEntity
       ? Promise.resolve(undefined)
       : this.eventRepository.eventService
@@ -835,15 +837,6 @@ export class InputBarViewModel {
               userId: replyMessageEntity.from,
             });
           });
-  };
-
-  readonly sendFederatedMessage = (messageText: string): void => {
-    if (!messageText.length) {
-      return;
-    }
-
-    this.messageRepository.sendFederatedMessage(messageText);
-    this.cancelMessageReply();
   };
 
   readonly sendMessage = (messageText: string, replyMessageEntity: ContentMessage): void => {

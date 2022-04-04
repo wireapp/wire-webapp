@@ -130,7 +130,7 @@ export class IntegrationRepository {
       const conversationEntity = await this.conversationRepository.createGroupConversation(
         [],
         undefined,
-        ACCESS_STATE.TEAM.GUEST_ROOM,
+        ACCESS_STATE.TEAM.GUESTS_SERVICES,
       );
 
       if (conversationEntity) {
@@ -222,8 +222,11 @@ export class IntegrationRepository {
    * @param userEntity Service user to be removed from the conversation
    */
   removeService(conversationEntity: Conversation, userEntity: User): Promise<MemberLeaveEvent> {
-    const {id: userId} = userEntity;
-    return this.conversationRepository.removeService(conversationEntity, userId);
+    const {id: userId, domain} = userEntity;
+    return this.conversationRepository.removeService(conversationEntity, {
+      domain,
+      id: userId,
+    });
   }
 
   async searchForServices(query: string, queryObservable: ko.Observable<string>): Promise<void> {
@@ -234,10 +237,8 @@ export class IntegrationRepository {
       const isCurrentQuery = normalizedQuery === IntegrationRepository.normalizeQuery(queryObservable());
       if (isCurrentQuery) {
         serviceEntities = serviceEntities
-          .filter(serviceEntity => compareTransliteration(serviceEntity.name, normalizedQuery))
-          .sort((serviceA, serviceB) => {
-            return sortByPriority(serviceA.name, serviceB.name, normalizedQuery);
-          });
+          .filter(serviceEntity => compareTransliteration(serviceEntity.name(), normalizedQuery))
+          .sort((serviceA, serviceB) => sortByPriority(serviceA.name(), serviceB.name(), normalizedQuery));
         this.services(serviceEntities);
       }
     } catch (error) {

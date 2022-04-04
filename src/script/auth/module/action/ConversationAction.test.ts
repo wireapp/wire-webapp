@@ -29,7 +29,7 @@ describe('ConversationAction', () => {
     const code = 'code';
     const mockedActions = {};
     const mockedApiClient = {
-      conversation: {api: {postConversationCodeCheck: () => Promise.resolve()}},
+      api: {conversation: {postConversationCodeCheck: () => Promise.resolve()}},
     };
     const mockedCore = {};
 
@@ -52,7 +52,7 @@ describe('ConversationAction', () => {
     const code = 'code';
     const mockedActions = {};
     const mockedApiClient = {
-      conversation: {api: {postConversationCodeCheck: () => Promise.reject(error)}},
+      api: {conversation: {postConversationCodeCheck: () => Promise.reject(error)}},
     };
     const mockedCore = {};
 
@@ -74,7 +74,7 @@ describe('ConversationAction', () => {
     const code = 'code';
     const mockedActions = {};
     const mockedApiClient = {
-      conversation: {api: {postJoinByCode: () => Promise.resolve(conversationEvent)}},
+      api: {conversation: {postJoinByCode: () => Promise.resolve(conversationEvent)}},
     };
     const mockedCore = {};
 
@@ -97,7 +97,7 @@ describe('ConversationAction', () => {
     const code = 'code';
     const mockedActions = {};
     const mockedApiClient = {
-      conversation: {api: {postJoinByCode: () => Promise.reject(error)}},
+      api: {conversation: {postJoinByCode: () => Promise.reject(error)}},
     };
     const mockedCore = {};
 

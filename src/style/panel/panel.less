@@ -200,6 +200,22 @@
       }
     }
 
+    &--info {
+      display: flex;
+      margin-right: 94px;
+      margin-left: 12px;
+    }
+
+    &__text--info {
+      font-size: 12px;
+      font-weight: @font-weight-bold;
+    }
+
+    &__icon--info {
+      margin-top: 3px;
+      margin-right: 16px;
+    }
+
     &--alternate &__default {
       opacity: 1;
       transform: translateX(0);
@@ -261,6 +277,11 @@
       path {
         fill: var(--background-fade-40);
       }
+    }
+
+    .service-icon svg {
+      width: 16px;
+      height: 16px;
     }
 
     &.disabled {

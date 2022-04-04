@@ -18,6 +18,7 @@
  */
 
 import type {Connection, ConnectionStatus} from '@wireapp/api-client/src/connection/';
+import {QualifiedId} from '@wireapp/api-client/src/user';
 import {container} from 'tsyringe';
 
 import {APIClient} from '../service/APIClientSingleton';
@@ -38,7 +39,7 @@ export class ConnectionService {
    * @returns Promise that resolves with user connections
    */
   getConnections(): Promise<Connection[]> {
-    return this.apiClient.connection.api.getAllConnections();
+    return this.apiClient.api.connection.getConnectionList();
   }
 
   /**
@@ -50,12 +51,8 @@ export class ConnectionService {
    * @param name Name of the conversation being initiated (1 256 characters)
    * @returns Promise that resolves when the connection request was created
    */
-  postConnections(userId: string, name: string): Promise<Connection> {
-    return this.apiClient.connection.api.postConnection({
-      message: ' ',
-      name: name,
-      user: userId,
-    });
+  postConnections(userId: QualifiedId, name: string): Promise<Connection> {
+    return this.apiClient.api.connection.postConnection(userId, name);
   }
 
   /**
@@ -68,8 +65,8 @@ export class ConnectionService {
    * @param connectionStatus New relation status
    * @returns Promise that resolves when the status was updated
    */
-  putConnections(userId: string, status: ConnectionStatus): Promise<Connection> {
-    return this.apiClient.connection.api.putConnection(userId, {
+  putConnections(userId: QualifiedId, status: ConnectionStatus): Promise<Connection> {
+    return this.apiClient.api.connection.putConnection(userId, {
       status,
     });
   }

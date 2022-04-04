@@ -19,7 +19,7 @@
 
 import ko from 'knockout';
 import {container, singleton} from 'tsyringe';
-import {FeatureList, FeatureStatus} from '@wireapp/api-client/src/team/feature/';
+import {FeatureList, FeatureStatus, SelfDeletingTimeout} from '@wireapp/api-client/src/team/feature/';
 
 import {sortUsersByPriority} from 'Util/StringUtil';
 
@@ -36,10 +36,15 @@ export class TeamState {
   public readonly supportsLegalHold: ko.Observable<boolean>;
   public readonly teamName: ko.PureComputed<string>;
   public readonly teamFeatures: ko.Observable<FeatureList>;
+  public readonly classifiedDomains: ko.PureComputed<string[] | undefined>;
   public readonly isConferenceCallingEnabled: ko.PureComputed<boolean>;
   public readonly isFileSharingSendingEnabled: ko.PureComputed<boolean>;
   public readonly isFileSharingReceivingEnabled: ko.PureComputed<boolean>;
   public readonly isVideoCallingEnabled: ko.PureComputed<boolean>;
+  public readonly isGuestLinkEnabled: ko.PureComputed<boolean>;
+  public readonly isSelfDeletingMessagesEnabled: ko.PureComputed<boolean>;
+  public readonly isSelfDeletingMessagesEnforced: ko.PureComputed<boolean>;
+  public readonly getEnforcedSelfDeletingMessagesTimeout: ko.PureComputed<SelfDeletingTimeout>;
   public readonly isAppLockEnabled: ko.PureComputed<boolean>;
   public readonly isAppLockEnforced: ko.PureComputed<boolean>;
   public readonly appLockInactivityTimeoutSecs: ko.PureComputed<number>;
@@ -47,6 +52,7 @@ export class TeamState {
   readonly teamUsers: ko.PureComputed<User[]>;
   readonly isTeam: ko.PureComputed<boolean>;
   readonly team: ko.Observable<TeamEntity>;
+  readonly teamDomain: ko.PureComputed<string>;
   readonly teamSize: ko.PureComputed<number>;
 
   constructor(private readonly userState = container.resolve(UserState)) {
@@ -61,6 +67,7 @@ export class TeamState {
     this.memberInviters = ko.observable({});
     this.teamFeatures = ko.observable();
 
+    this.teamDomain = ko.pureComputed(() => userState.self().domain);
     this.teamName = ko.pureComputed(() => (this.isTeam() ? this.team().name() : this.userState.self().name()));
     this.teamSize = ko.pureComputed(() => (this.isTeam() ? this.teamMembers().length + 1 : 0));
     this.teamUsers = ko.pureComputed(() => {
@@ -85,18 +92,37 @@ export class TeamState {
       return status ? status === FeatureStatus.ENABLED : true;
     });
 
+    this.classifiedDomains = ko.pureComputed(() => {
+      return this.teamFeatures()?.classifiedDomains.status === FeatureStatus.ENABLED
+        ? this.teamFeatures().classifiedDomains.config.domains
+        : undefined;
+    });
+
+    this.isSelfDeletingMessagesEnabled = ko.pureComputed(
+      () => this.teamFeatures()?.selfDeletingMessages?.status === FeatureStatus.ENABLED,
+    );
+    this.getEnforcedSelfDeletingMessagesTimeout = ko.pureComputed(
+      () =>
+        (this.teamFeatures()?.selfDeletingMessages?.config?.enforcedTimeoutSeconds || SelfDeletingTimeout.OFF) * 1000,
+    );
+    this.isSelfDeletingMessagesEnforced = ko.pureComputed(
+      () => this.getEnforcedSelfDeletingMessagesTimeout() > SelfDeletingTimeout.OFF,
+    );
+
     this.isVideoCallingEnabled = ko.pureComputed(
       // TODO connect to video calling feature config
       () => true || this.teamFeatures()?.videoCalling?.status === FeatureStatus.ENABLED,
     );
     this.isConferenceCallingEnabled = ko.pureComputed(
-      // TODO connect to conference calling feature config
-      () => true || this.teamFeatures()?.conferenceCalling?.status === FeatureStatus.ENABLED,
+      () => this.teamFeatures()?.conferenceCalling?.status === FeatureStatus.ENABLED,
     );
     this.isAppLockEnabled = ko.pureComputed(() => this.teamFeatures()?.appLock?.status === FeatureStatus.ENABLED);
     this.isAppLockEnforced = ko.pureComputed(() => this.teamFeatures()?.appLock?.config?.enforceAppLock);
     this.appLockInactivityTimeoutSecs = ko.pureComputed(
       () => this.teamFeatures()?.appLock?.config?.inactivityTimeoutSecs,
+    );
+    this.isGuestLinkEnabled = ko.pureComputed(
+      () => this.teamFeatures()?.conversationGuestLinks?.status === FeatureStatus.ENABLED,
     );
   }
 

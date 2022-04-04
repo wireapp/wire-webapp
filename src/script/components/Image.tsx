@@ -30,6 +30,7 @@ import RestrictedImage from './asset/RestrictedImage';
 import useEffectRef from 'Util/useEffectRef';
 
 export interface ImageProps extends React.HTMLProps<HTMLDivElement> {
+  aspectRatio?: number;
   asset: AssetRemoteData;
   assetRepository?: AssetRepository;
   click?: (asset: AssetRemoteData, event: React.MouseEvent) => void;
@@ -44,6 +45,7 @@ const Image: React.FC<ImageProps> = ({
   isQuote = false,
   assetRepository = container.resolve(AssetRepository),
   teamState = container.resolve(TeamState),
+  aspectRatio,
   ...props
 }) => {
   const [viewportElementRef, setViewportElementRef] = useEffectRef<HTMLDivElement>();
@@ -77,14 +79,15 @@ const Image: React.FC<ImageProps> = ({
     };
   }, [isInViewport]);
 
+  const style = aspectRatio ? {aspectRatio: aspectRatio.toString(), width: '100%'} : undefined;
   return !isFileSharingReceivingEnabled ? (
     <RestrictedImage className={className} showMessage={!isQuote} isSmall={isQuote} />
   ) : (
     <div ref={setViewportElementRef} className={cx('image-wrapper', className)} {...props}>
       {assetSrc ? (
-        <img onClick={onClick} src={assetSrc} />
+        <img style={style} onClick={onClick} src={assetSrc} role="presentation" alt="" />
       ) : (
-        <div className={cx({'loading-dots': assetIsLoading})}></div>
+        <div style={style} className={cx({'loading-dots': assetIsLoading})}></div>
       )}
     </div>
   );

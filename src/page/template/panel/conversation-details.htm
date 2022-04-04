@@ -26,7 +26,7 @@
         <!-- ko ifnot: isServiceMode() -->
           <!-- ko if: firstParticipant() -->
             <panel-user-details
-              params="participant: firstParticipant, isVerified: isVerified, badge: teamRepository.getRoleBadge(firstParticipant().id), isSelfVerified: isSelfVerified"
+              params="participant: firstParticipant, isVerified: isVerified, badge: teamRepository.getRoleBadge(firstParticipant().id), isSelfVerified: isSelfVerified, classifiedDomains: classifiedDomains"
             ></panel-user-details>
             <!-- ko if: firstParticipant().isConnected() || firstParticipant().inTeam() -->
               <div class="conversation-details__devices">
@@ -37,7 +37,7 @@
                 </div>
               </div>
             <!-- /ko -->
-            <enriched-fields params="user: firstParticipant"></enriched-fields>
+            <enriched-fields params="user: firstParticipant, showDomain: $root.isFederated"></enriched-fields>
           <!-- /ko -->
         <!-- /ko -->
       <!-- /ko -->
@@ -200,6 +200,23 @@
               </div>
             </div>
           <!-- /ko -->
+          <!-- ko if: showOptionServices() -->
+          <div class="conversation-details__services-options">
+            <div class="panel__action-item" data-bind="click: clickOnServicesOptions" data-uie-name="go-services-options">
+              <service-icon class="panel__action-item__icon service-icon"></service-icon>
+              <div class="panel__action-item__summary">
+                <div class="panel__action-item__text" data-bind="text: t('conversationDetailsActionServicesOptions')"></div>
+                <div
+                  class="panel__action-item__status"
+                  data-bind="text: servicesOptionsText"
+                  data-uie-name="status-allow-services"
+                ></div>
+              </div>
+              <disclose-icon class="disclose-icon"></disclose-icon>
+            </div>
+          </div>
+        <!-- /ko -->
+
           <!-- ko if: showOptionReadReceipts() -->
             <div class="conversation-details__read-receipts">
               <read-receipt-toggle

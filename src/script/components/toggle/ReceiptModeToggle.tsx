@@ -18,7 +18,7 @@
  */
 
 import React, {Fragment} from 'react';
-import {Confirmation} from '@wireapp/protocol-messaging';
+import {RECEIPT_MODE} from '@wireapp/api-client/src/conversation/data';
 
 import {registerReactComponent} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
@@ -26,13 +26,13 @@ import {t} from 'Util/LocalizerUtil';
 import Icon from '../Icon';
 
 export interface ReceiptModeToggleProps {
-  onReceiptModeChanged: (receiptMode: Confirmation.Type) => void;
-  receiptMode: Confirmation.Type;
+  onReceiptModeChanged: (receiptMode: RECEIPT_MODE) => void;
+  receiptMode: RECEIPT_MODE;
 }
 
 const ReceiptModeToggle: React.FC<ReceiptModeToggleProps> = ({receiptMode, onReceiptModeChanged}) => {
   const updateValue = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const newReceiptMode = event.target.checked ? Confirmation.Type.READ : Confirmation.Type.DELIVERED;
+    const newReceiptMode = event.target.checked ? RECEIPT_MODE.ON : RECEIPT_MODE.OFF;
     onReceiptModeChanged(newReceiptMode);
   };
 
@@ -46,7 +46,7 @@ const ReceiptModeToggle: React.FC<ReceiptModeToggleProps> = ({receiptMode, onRec
           <div className="panel__action-item__text">{t('receiptToggleLabel')}</div>
         </div>
         <input
-          checked={receiptMode !== Confirmation.Type.DELIVERED}
+          checked={receiptMode !== RECEIPT_MODE.OFF}
           className="slider-input"
           data-uie-name="toggle-receipt-mode-checkbox"
           id="receipt-toggle-input"

@@ -32,6 +32,7 @@
 
   display: flex;
   height: 100%;
+  flex-direction: column;
   flex-grow: 1;
   cursor: pointer;
   user-select: none;
@@ -72,6 +73,7 @@
 }
 
 .conversation-title-bar-icon {
+  .button-reset-default;
   display: flex;
   height: 16px;
   flex: 0 0 auto;
@@ -95,4 +97,13 @@
   .label-bold-xs;
   overflow: hidden;
   text-overflow: ellipsis;
+  &--wrapper {
+    .flex-center;
+    display: flex;
+  }
+}
+
+.conversation-title-bar-name--subtitle {
+  .font-size-xs;
+  color: var(--background-fade-40);
 }

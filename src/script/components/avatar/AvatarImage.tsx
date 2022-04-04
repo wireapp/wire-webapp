@@ -31,6 +31,7 @@ import {container} from 'tsyringe';
 
 export interface AvatarImageProps {
   assetRepository?: AssetRepository;
+  avatarAlt: string;
   avatarSize: AVATAR_SIZE;
   backgroundColor?: string;
   borderRadius?: string;
@@ -42,6 +43,7 @@ export interface AvatarImageProps {
 
 const AvatarImage: React.FunctionComponent<AvatarImageProps> = ({
   assetRepository = container.resolve(AssetRepository),
+  avatarAlt,
   avatarSize,
   backgroundColor = 'currentColor',
   borderRadius = '50%',
@@ -107,6 +109,7 @@ const AvatarImage: React.FunctionComponent<AvatarImageProps> = ({
               ...transitionImageStyles[state],
             }}
             src={avatarImage}
+            alt={avatarAlt}
           />
         );
       }}

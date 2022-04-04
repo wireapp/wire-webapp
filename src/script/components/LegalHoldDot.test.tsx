@@ -26,7 +26,7 @@ class LegalHoldDotPage extends TestPage<LegalHoldDotProps> {
     super(LegalHoldDot, props);
   }
 
-  getPendingIcon = () => this.get('svg[data-uie-name="legal-hold-dot-pending-icon"]');
+  getPendingIcon = () => this.get('svg.pending-icon');
 }
 
 describe('LegalHoldDot', () => {

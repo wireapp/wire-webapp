@@ -193,7 +193,6 @@ ko.bindingHandlers.heightSync = {
   init(element, valueAccessor) {
     const params = ko.unwrap(valueAccessor()) || {};
 
-    const resizeCallback = params.callback;
     const targetElement = document.querySelector(params.target);
     const triggerValue = params.trigger;
 
@@ -202,9 +201,6 @@ ko.bindingHandlers.heightSync = {
       const targetHeight = targetElement.offsetHeight;
       if (sourceHeight !== targetHeight) {
         targetElement.style.height = `${element.scrollHeight}px`;
-        if (typeof resizeCallback === 'function') {
-          resizeCallback(sourceHeight, targetHeight);
-        }
       }
 
       const isScrolling = targetElement.scrollHeight > targetElement.offsetHeight;
@@ -454,7 +450,6 @@ ko.bindingHandlers.fadingscrollbar = {
  */
 ko.bindingHandlers.antiscroll = {
   init(element, valueAccessor) {
-    let trigger_subscription: ko.Subscription;
     ($(element) as any).antiscroll({
       autoHide: true,
       autoWrap: true,
@@ -462,31 +457,26 @@ ko.bindingHandlers.antiscroll = {
       notHorizontal: true,
     });
 
-    const parent_element = $(element).parent();
-    const antiscroll = parent_element.data('antiscroll');
+    const parentElement = $(element).parent();
+    const antiscroll = parentElement.data('antiscroll');
 
     if (antiscroll) {
-      const trigger_value = valueAccessor();
-      if (ko.isObservable(trigger_value)) {
-        trigger_subscription = trigger_value.subscribe(() => {
+      const observer = new ResizeObserver(throttle(() => antiscroll.rebuild(), 100));
+      observer.observe(parentElement[0], {box: 'border-box'});
+      observer.observe(element, {box: 'border-box'});
+
+      let triggerSubscription: ko.Subscription;
+      const triggerValue = valueAccessor();
+      if (ko.isObservable(triggerValue)) {
+        triggerSubscription = triggerValue.subscribe(() => {
           antiscroll.rebuild();
         });
       }
 
-      const resize_event = `resize.${Date.now()}`;
-      $(window).on(
-        resize_event,
-        throttle(() => {
-          antiscroll.rebuild();
-        }, 100),
-      );
-
       ko.utils.domNodeDisposal.addDisposeCallback(element, () => {
         antiscroll.destroy();
-        $(window).off(resize_event);
-        if (trigger_subscription) {
-          trigger_subscription.dispose();
-        }
+        observer.disconnect();
+        triggerSubscription?.dispose();
       });
     }
   },

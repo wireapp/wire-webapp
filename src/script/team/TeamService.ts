@@ -32,43 +32,48 @@ export class TeamService {
   constructor(private readonly apiClient = container.resolve(APIClient)) {}
 
   getTeamConversationRoles(teamId: string): Promise<ConversationRolesList> {
-    return this.apiClient.teams.conversation.api.getRoles(teamId);
+    return this.apiClient.api.teams.conversation.getRoles(teamId);
   }
 
   getTeamById(teamId: string): Promise<TeamData> {
-    return this.apiClient.teams.team.api.getTeam(teamId);
+    return this.apiClient.api.teams.team.getTeam(teamId);
   }
 
   getTeamMember(teamId: string, userId: string): Promise<MemberData> {
-    return this.apiClient.teams.member.api.getMember(teamId, userId);
+    return this.apiClient.api.teams.member.getMember(teamId, userId);
   }
 
   getLegalHoldState(teamId: string, userId: string): Promise<LegalHoldMemberData> {
-    return this.apiClient.teams.legalhold.api.getMemberLegalHold(teamId, userId);
+    return this.apiClient.api.teams.legalhold.getMemberLegalHold(teamId, userId);
   }
 
   sendLegalHoldApproval(teamId: string, userId: string, password: string): Promise<void> {
-    return this.apiClient.teams.legalhold.api.putMemberApproveLegalHold(teamId, userId, password);
+    return this.apiClient.api.teams.legalhold.putMemberApproveLegalHold(teamId, userId, password);
   }
 
   getAllTeamMembers(teamId: string): Promise<Members> {
-    return this.apiClient.teams.member.api.getAllMembers(teamId);
+    return this.apiClient.api.teams.member.getAllMembers(teamId);
   }
 
   getTeamMembersByIds(teamId: string, userIds: string[]): Promise<MemberData[]> {
-    return this.apiClient.teams.member.api.getMembers(teamId, {ids: userIds});
+    return this.apiClient.api.teams.member.getMembers(teamId, {ids: userIds});
   }
 
   getTeams(): Promise<TeamChunkData> {
-    return this.apiClient.teams.team.api.getTeams();
+    return this.apiClient.api.teams.team.getTeams();
   }
 
   getWhitelistedServices(teamId: string): Promise<Services> {
-    return this.apiClient.teams.service.api.getTeamServices(teamId);
+    return this.apiClient.api.teams.service.getTeamServices(teamId);
+  }
+
+  async conversationHasGuestLink(conversationId: string): Promise<boolean> {
+    const {status} = await this.apiClient.api.conversation.getConversationGuestLinkFeature(conversationId);
+    return status === 'enabled';
   }
 
   getAllTeamFeatures(): Promise<FeatureList> {
-    return this.apiClient.teams.feature.api.getAllFeatures().catch(() => {
+    return this.apiClient.api.teams.feature.getAllFeatures().catch(() => {
       // The following code enables all default features to ensure that modern webapps work with legacy backends (backends that don't provide a "feature-configs" endpoint)
       const defaultFeatures: FeatureList = {
         [FEATURE_KEY.APPLOCK]: {

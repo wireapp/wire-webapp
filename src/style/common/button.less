@@ -171,6 +171,7 @@
 }
 
 .button-icon-large {
+  .button-reset-default;
   .button-icon;
 
   padding: 8px;
@@ -187,6 +188,10 @@
   cursor: pointer;
   line-height: 24px;
   outline: 0;
+
+  &.disabled {
+    cursor: not-allowed;
+  }
 }
 
 // Colors and more
@@ -242,4 +247,14 @@
 
 .svg-button {
   cursor: pointer;
+}
+
+.button-reset-default {
+  padding: 0;
+  border: 0;
+  background-color: transparent;
+  border-radius: 0;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: inherit;
 }

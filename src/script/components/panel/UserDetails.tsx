@@ -28,16 +28,24 @@ import type {User} from '../../entity/User';
 import Avatar, {AVATAR_SIZE} from 'Components/Avatar';
 import Icon from 'Components/Icon';
 import AvailabilityState from 'Components/AvailabilityState';
+import ClassifiedBar from 'Components/input/ClassifiedBar';
 
 export interface UserDetailsProps {
   badge?: string;
+  classifiedDomains?: string[];
   isGroupAdmin?: boolean;
   isSelfVerified: boolean;
   isVerified?: boolean;
   participant: User;
 }
 
-const UserDetails: React.FC<UserDetailsProps> = ({badge, participant, isSelfVerified, isVerified, isGroupAdmin}) => {
+const UserDetails: React.FC<UserDetailsProps> = ({
+  badge,
+  participant,
+  isSelfVerified,
+  isGroupAdmin,
+  classifiedDomains,
+}) => {
   const user = useKoSubscribableChildren(participant, [
     'inTeam',
     'isGuest',
@@ -49,8 +57,11 @@ const UserDetails: React.FC<UserDetailsProps> = ({badge, participant, isSelfVeri
   ]);
 
   useEffect(() => {
-    amplify.publish(WebAppEvents.USER.UPDATE, participant.id);
+    amplify.publish(WebAppEvents.USER.UPDATE, participant.qualifiedId);
   }, [participant]);
+
+  const isFederated = participant.isFederated;
+  const isGuest = !isFederated && participant.isGuest();
 
   return (
     <div className="panel-participant">
@@ -63,11 +74,11 @@ const UserDetails: React.FC<UserDetailsProps> = ({badge, participant, isSelfVeri
             dataUieName="status-name"
           />
         ) : (
-          <div className="panel-participant__head__name" data-uie-name="status-name">
+          <h2 className="panel-participant__head__name" data-uie-name="status-name">
             {user.name}
-          </div>
+          </h2>
         )}
-        {isSelfVerified && (isVerified ?? user.is_verified) && (
+        {isSelfVerified && user.is_verified && (
           <Icon.Verified
             className="panel-participant__head__verified-icon"
             data-uie-name="status-verified-participant"
@@ -79,6 +90,14 @@ const UserDetails: React.FC<UserDetailsProps> = ({badge, participant, isSelfVeri
         <div className="panel-participant__user-name" data-uie-name="status-username">
           {participant.handle}
         </div>
+      )}
+
+      {classifiedDomains && (
+        <ClassifiedBar
+          users={[participant]}
+          classifiedDomains={classifiedDomains}
+          style={{width: 'calc(100% + 32px)'}}
+        />
       )}
 
       <Avatar
@@ -95,7 +114,14 @@ const UserDetails: React.FC<UserDetailsProps> = ({badge, participant, isSelfVeri
         </div>
       )}
 
-      {user.isGuest && (
+      {isFederated && (
+        <div className="panel-participant__label" data-uie-name="status-federated-user">
+          <Icon.Federation />
+          <span>{t('conversationFederationIndicator')}</span>
+        </div>
+      )}
+
+      {isGuest && (
         <div className="panel-participant__label" data-uie-name="status-guest">
           <Icon.Guest />
           <span>{t('conversationGuestIndicator')}</span>
@@ -123,5 +149,5 @@ export default UserDetails;
 registerReactComponent('panel-user-details', {
   component: UserDetails,
   template:
-    '<div data-bind="react: {badge: ko.unwrap(badge), isGroupAdmin: ko.unwrap(isGroupAdmin), isSelfVerified: ko.unwrap(isSelfVerified), isVerified: ko.unwrap(isVerified), participant: ko.unwrap(participant)}"></div>',
+    '<div data-bind="react: {badge: ko.unwrap(badge), isGroupAdmin: ko.unwrap(isGroupAdmin), isSelfVerified: ko.unwrap(isSelfVerified), isVerified: ko.unwrap(isVerified), participant: ko.unwrap(participant), classifiedDomains: ko.unwrap(classifiedDomains)}"></div>',
 });

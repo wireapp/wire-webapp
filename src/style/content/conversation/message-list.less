@@ -26,6 +26,12 @@
 .messages {
   max-width: @conversation-max-width;
   transform: translateZ(0);
+  &.flex-center {
+    margin: auto;
+    & .message {
+      min-width: 75%;
+    }
+  }
 }
 
 // MESSAGE
@@ -525,6 +531,7 @@
 
   // CONTEXT MENU
   .context-menu {
+    .button-reset-default;
     .square(16px);
     .action-pill-style;
 
@@ -612,7 +619,10 @@
 }
 
 .message-connected-header {
+  padding: 0;
+  margin: 0;
   font-size: @font-size-lg;
+  font-weight: normal;
   line-height: 42px;
   text-align: center;
   word-break: break-all;
@@ -621,13 +631,14 @@
 .message-connected-contacts,
 .message-connected-provider-name,
 .message-connected-username {
+  margin-bottom: 16px;
   color: var(--foreground);
   font-size: @font-size-xs;
   line-height: @line-height-sm;
 }
 
 .message-connected-avatar {
-  margin-top: 32px;
+  margin-top: 24px;
 }
 
 .message-connected-cancel {
@@ -646,6 +657,7 @@
 }
 
 .message-group-creation-header-name {
+  padding: 0;
   margin: 8px 0;
   font-size: @font-size-lg;
   font-weight: @font-weight-bold;

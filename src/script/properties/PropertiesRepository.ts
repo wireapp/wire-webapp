@@ -19,9 +19,9 @@
 
 import ko from 'knockout';
 import {amplify} from 'amplify';
-import {Confirmation} from '@wireapp/protocol-messaging';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import {AudioPreference, NotificationPreference, WebappProperties} from '@wireapp/api-client/src/user/data/';
+import {RECEIPT_MODE} from '@wireapp/api-client/src/conversation/data';
 import {ConsentType} from '@wireapp/api-client/src/self/';
 
 import {Environment} from 'Util/Environment';
@@ -46,7 +46,7 @@ export class PropertiesRepository {
         key: 'WIRE_MARKETING_CONSENT',
       },
       WIRE_RECEIPT_MODE: {
-        defaultValue: Confirmation.Type.DELIVERED,
+        defaultValue: RECEIPT_MODE.OFF,
         key: 'WIRE_RECEIPT_MODE',
       },
     };
@@ -54,7 +54,7 @@ export class PropertiesRepository {
 
   private readonly logger: Logger;
   public readonly propertiesService: PropertiesService;
-  public readonly receiptMode: ko.Observable<Confirmation.Type>;
+  public readonly receiptMode: ko.Observable<RECEIPT_MODE>;
   private readonly selfService: SelfService;
   private readonly selfUser: ko.Observable<User>;
   public properties: WebappProperties;
@@ -70,6 +70,7 @@ export class PropertiesRepository {
       enable_debugging: false,
       settings: {
         call: {
+          enable_soundless_incoming_calls: false,
           enable_vbr_encoding: true,
         },
         emoji: {
@@ -234,7 +235,7 @@ export class PropertiesRepository {
   deleteProperty(key: string): void {
     switch (key) {
       case PropertiesRepository.CONFIG.WIRE_RECEIPT_MODE.key:
-        this.setProperty(key, Confirmation.Type.DELIVERED);
+        this.setProperty(key, RECEIPT_MODE.OFF);
         break;
       case PropertiesRepository.CONFIG.WIRE_MARKETING_CONSENT.key:
         this.setProperty(key, ConsentValue.NOT_GIVEN);
@@ -261,24 +262,20 @@ export class PropertiesRepository {
     }
   }
 
-  updateProperty(key: string, value: any): Promise<void> | void {
+  async updateProperty(key: string, value: any): Promise<void> {
+    this.setProperty(key, value);
     switch (key) {
       case PropertiesRepository.CONFIG.WIRE_RECEIPT_MODE.key:
-        if (value === Confirmation.Type.DELIVERED) {
+        if (value === RECEIPT_MODE.OFF) {
           return this.propertiesService.deletePropertiesByKey(key);
         }
         return this.propertiesService.putPropertiesByKey(key, value);
-        break;
       case PropertiesRepository.CONFIG.WIRE_MARKETING_CONSENT.key:
-        return this.selfService
-          .putSelfConsent(ConsentType.MARKETING, value, `Webapp ${Environment.version(false)}`)
-          .then(() => {
-            if (value === ConsentValue.NOT_GIVEN) {
-              return this.propertiesService.deletePropertiesByKey(key);
-            }
-            return this.propertiesService.putPropertiesByKey(key, value);
-          });
-        break;
+        await this.selfService.putSelfConsent(ConsentType.MARKETING, value, `Webapp ${Environment.version(false)}`);
+        if (value === ConsentValue.NOT_GIVEN) {
+          return this.propertiesService.deletePropertiesByKey(key);
+        }
+        return this.propertiesService.putPropertiesByKey(key, value);
     }
   }
 
@@ -324,6 +321,9 @@ export class PropertiesRepository {
         break;
       case PROPERTIES_TYPE.CALL.ENABLE_VBR_ENCODING:
         amplify.publish(WebAppEvents.PROPERTIES.UPDATE.CALL.ENABLE_VBR_ENCODING, updatedPreference);
+        break;
+      case PROPERTIES_TYPE.CALL.ENABLE_SOUNDLESS_INCOMING_CALLS:
+        amplify.publish(WebAppEvents.PROPERTIES.UPDATE.CALL.ENABLE_SOUNDLESS_INCOMING_CALLS, updatedPreference);
         break;
       default:
         throw new Error(`Failed to update preference of unhandled type '${propertiesType}'`);

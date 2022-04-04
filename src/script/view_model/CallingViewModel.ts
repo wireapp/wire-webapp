@@ -46,13 +46,16 @@ import {ButtonGroupTab} from 'Components/calling/ButtonGroup';
 import {TeamState} from '../team/TeamState';
 import {Config} from '../Config';
 import {safeWindowOpen} from 'Util/SanitizationUtil';
+import {ROLE} from '../user/UserPermission';
+import {QualifiedId} from '@wireapp/api-client/src/user';
+import {PropertiesRepository} from '../properties/PropertiesRepository';
+import {PROPERTIES_TYPE} from '../properties/PropertiesType';
 
 export interface CallActions {
   answer: (call: Call) => void;
   changePage: (newPage: number, call: Call) => void;
   leave: (call: Call) => void;
   reject: (call: Call) => void;
-  setVideoSpeakersActiveTab: (tab: string) => void;
   startAudio: (conversationEntity: Conversation) => void;
   startVideo: (conversationEntity: Conversation) => void;
   switchCameraInput: (call: Call, deviceId: string) => void;
@@ -62,19 +65,19 @@ export interface CallActions {
   toggleScreenshare: (call: Call) => void;
 }
 
-export enum VideoSpeakersTab {
+export enum CallViewTab {
   ALL = 'all',
   SPEAKERS = 'speakers',
 }
 
-export const VideoSpeakersTabs: ButtonGroupTab[] = [
-  {getText: () => t('videoSpeakersTabSpeakers'), value: VideoSpeakersTab.SPEAKERS},
-  {getText: substitute => t('videoSpeakersTabAll', substitute), value: VideoSpeakersTab.ALL},
+export const CallViewTabs: ButtonGroupTab[] = [
+  {getText: () => t('videoSpeakersTabSpeakers'), value: CallViewTab.SPEAKERS},
+  {getText: substitute => t('videoSpeakersTabAll', substitute), value: CallViewTab.ALL},
 ];
 
 declare global {
   interface HTMLAudioElement {
-    setSinkId: (sinkId: string) => Promise<void>;
+    setSinkId?: (sinkId: string) => Promise<void>;
   }
 }
 
@@ -82,15 +85,16 @@ export class CallingViewModel {
   readonly activeCalls: ko.PureComputed<Call[]>;
   readonly callActions: CallActions;
   readonly isSelfVerified: ko.Computed<boolean>;
-  readonly videoSpeakersActiveTab: ko.Observable<string>;
+  readonly activeCallViewTab: ko.Observable<string>;
 
   constructor(
     readonly callingRepository: CallingRepository,
-    audioRepository: AudioRepository,
+    readonly audioRepository: AudioRepository,
     readonly mediaDevicesHandler: MediaDevicesHandler,
     readonly mediaStreamHandler: MediaStreamHandler,
     readonly permissionRepository: PermissionRepository,
     readonly teamRepository: TeamRepository,
+    readonly propertiesRepository: PropertiesRepository,
     private readonly selfUser: ko.Observable<User>,
     readonly multitasking: Multitasking,
     private readonly conversationState = container.resolve(ConversationState),
@@ -134,7 +138,7 @@ export class CallingViewModel {
 
     const startCall = (conversationEntity: Conversation, callType: CALL_TYPE): void => {
       const convType = conversationEntity.isGroup() ? CONV_TYPE.GROUP : CONV_TYPE.ONEONONE;
-      this.callingRepository.startCall(conversationEntity.id, convType, callType).then(call => {
+      this.callingRepository.startCall(conversationEntity.qualifiedId, convType, callType).then(call => {
         if (!call) {
           return;
         }
@@ -142,9 +146,13 @@ export class CallingViewModel {
       });
     };
 
+    const hasSoundlessCallsEnabled = (): boolean => {
+      return this.propertiesRepository.getPreference(PROPERTIES_TYPE.CALL.ENABLE_SOUNDLESS_INCOMING_CALLS);
+    };
+
     this.callingRepository.onIncomingCall((call: Call) => {
       const shouldRing = this.selfUser().availability() !== Availability.Type.AWAY;
-      if (shouldRing) {
+      if (shouldRing && !hasSoundlessCallsEnabled()) {
         ring(call);
       }
     });
@@ -174,13 +182,10 @@ export class CallingViewModel {
       },
       leave: (call: Call) => {
         this.callingRepository.leaveCall(call.conversationId);
-        callState.videoSpeakersActiveTab(VideoSpeakersTab.ALL);
+        callState.activeCallViewTab(CallViewTab.ALL);
       },
       reject: (call: Call) => {
         this.callingRepository.rejectCall(call.conversationId);
-      },
-      setVideoSpeakersActiveTab: (tab: string) => {
-        callState.videoSpeakersActiveTab(tab);
       },
       startAudio: (conversationEntity: Conversation): void => {
         if (conversationEntity.isGroup() && !this.teamState.isConferenceCallingEnabled()) {
@@ -198,6 +203,7 @@ export class CallingViewModel {
       },
       switchCameraInput: (call: Call, deviceId: string) => {
         this.mediaDevicesHandler.currentDeviceId.videoInput(deviceId);
+        this.callingRepository.refreshVideoInput();
       },
       switchScreenInput: (call: Call, deviceId: string) => {
         this.mediaDevicesHandler.currentDeviceId.screenInput(deviceId);
@@ -243,27 +249,47 @@ export class CallingViewModel {
   }
 
   private showRestrictedConferenceCallingModal() {
-    const replaceEnterprise = replaceLink(
-      Config.getConfig().URL.PRICING,
-      'modal__text__read-more',
-      'read-more-pricing',
-    );
-    amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.CONFIRM, {
-      primaryAction: {
-        action: () => {
-          safeWindowOpen(Config.getConfig().URL.PRICING);
+    if (this.selfUser().inTeam()) {
+      if (this.selfUser().teamRole() === ROLE.OWNER) {
+        const replaceEnterprise = replaceLink(
+          Config.getConfig().URL.PRICING,
+          'modal__text__read-more',
+          'read-more-pricing',
+        );
+        amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.CONFIRM, {
+          primaryAction: {
+            action: () => {
+              safeWindowOpen(Config.getConfig().URL.TEAMS_BILLING);
+            },
+            text: t('callingRestrictedConferenceCallOwnerModalUpgradeButton'),
+          },
+          text: {
+            htmlMessage: t(
+              'callingRestrictedConferenceCallOwnerModalDescription',
+              {brandName: Config.getConfig().BRAND_NAME},
+              replaceEnterprise,
+            ),
+            title: t('callingRestrictedConferenceCallOwnerModalTitle'),
+          },
+        });
+      } else {
+        amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.ACKNOWLEDGE, {
+          text: {
+            htmlMessage: t('callingRestrictedConferenceCallTeamMemberModalDescription'),
+            title: t('callingRestrictedConferenceCallTeamMemberModalTitle'),
+          },
+        });
+      }
+    } else {
+      amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.ACKNOWLEDGE, {
+        text: {
+          htmlMessage: t('callingRestrictedConferenceCallPersonalModalDescription', {
+            brandName: Config.getConfig().BRAND_NAME,
+          }),
+          title: t('callingRestrictedConferenceCallPersonalModalTitle'),
         },
-        text: t('callingRestrictedConferenceCallModalUpgradeButton'),
-      },
-      text: {
-        htmlMessage: t(
-          'callingRestrictedConferenceCallModalDescription',
-          {brandName: Config.getConfig().BRAND_NAME},
-          replaceEnterprise,
-        ),
-        title: t('callingRestrictedConferenceCallModalTitle'),
-      },
-    });
+      });
+    }
   }
 
   isIdle(call: Call): boolean {
@@ -286,7 +312,7 @@ export class CallingViewModel {
     return call.state() === CALL_STATE.MEDIA_ESTAB;
   }
 
-  getConversationById(conversationId: string): Conversation {
+  getConversationById(conversationId: QualifiedId): Conversation {
     return this.conversationState.findConversation(conversationId);
   }
 

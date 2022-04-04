@@ -30,22 +30,22 @@ export class PropertiesService {
    * @returns Resolves when all properties for user have been cleared
    */
   deleteProperties(): Promise<void> {
-    return this.apiClient.user.api.deleteProperties();
+    return this.apiClient.api.user.deleteProperties();
   }
 
   deletePropertiesByKey(key: string): Promise<void> {
-    return this.apiClient.user.api.deleteProperty(key);
+    return this.apiClient.api.user.deleteProperty(key);
   }
 
   getProperties(): Promise<string[]> {
-    return this.apiClient.user.api.getProperties();
+    return this.apiClient.api.user.getProperties();
   }
 
   getPropertiesByKey<T = any>(key: string): Promise<T> {
-    return this.apiClient.user.api.getProperty<T>(key);
+    return this.apiClient.api.user.getProperty<T>(key);
   }
 
   putPropertiesByKey<T extends Record<string, any>>(key: string, properties: T): Promise<void> {
-    return this.apiClient.user.api.putProperty<T>(key, properties);
+    return this.apiClient.api.user.putProperty<T>(key, properties);
   }
 }

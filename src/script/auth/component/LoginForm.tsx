@@ -78,7 +78,6 @@ const LoginForm = ({isFetching, onSubmit}: LoginFormProps) => {
     <InputBlock>
       <Input
         name="email"
-        tabIndex={1}
         onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
           setEmail(event.target.value);
           setValidEmailInput(true);
@@ -91,13 +90,11 @@ const LoginForm = ({isFetching, onSubmit}: LoginFormProps) => {
         maxLength={128}
         type="text"
         required
-        autoFocus
         data-uie-name="enter-email"
       />
       <InputSubmitCombo>
         <Input
           name="password-login"
-          tabIndex={2}
           onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
             setPassword(event.target.value);
             setValidPasswordInput(true);
@@ -117,11 +114,11 @@ const LoginForm = ({isFetching, onSubmit}: LoginFormProps) => {
         ) : (
           <RoundIconButton
             style={{marginLeft: 16}}
-            tabIndex={4}
             disabled={!email || !password}
             type="submit"
             formNoValidate
             onClick={handleSubmit}
+            aria-label={_(loginStrings.headline)}
             data-uie-name="do-sign-in"
           >
             <ArrowIcon />

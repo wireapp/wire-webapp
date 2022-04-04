@@ -25,6 +25,7 @@ import type {CRUDEngine} from '@wireapp/store-engine';
 import {SQLeetEngine} from '@wireapp/store-engine-sqleet';
 import {LowDiskSpaceError} from '@wireapp/store-engine/src/main/engine/error/';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
+import {VerificationActionType} from '@wireapp/api-client/src/auth/VerificationActionType';
 
 import {isTemporaryClientAndNonPersistent} from 'Util/util';
 import {currentCurrency, currentLanguage} from '../../localeConfig';
@@ -92,6 +93,7 @@ export class AuthAction {
           clientAction.doInitializeClient(
             loginData.clientType,
             loginData.password ? String(loginData.password) : undefined,
+            loginData.verificationCode,
           ),
         );
         dispatch(AuthActionCreator.successfulLogin());
@@ -113,10 +115,23 @@ export class AuthAction {
     return async (dispatch, getState, {apiClient}) => {
       dispatch(AuthActionCreator.startSendPhoneLoginCode());
       try {
-        const {expires_in} = await apiClient.auth.api.postLoginSend(loginRequest);
+        const {expires_in} = await apiClient.api.auth.postLoginSend(loginRequest);
         dispatch(AuthActionCreator.successfulSendPhoneLoginCode(expires_in));
       } catch (error) {
         dispatch(AuthActionCreator.failedSendPhoneLoginCode(error));
+        throw error;
+      }
+    };
+  };
+
+  doSendTwoFactorLoginCode = (email: string): ThunkAction => {
+    return async (dispatch, getState, {apiClient}) => {
+      dispatch(AuthActionCreator.startSendTwoFactorCode());
+      try {
+        await apiClient.api.user.postVerificationCode(email, VerificationActionType.LOGIN);
+        dispatch(AuthActionCreator.successfulSendTwoFactorCode());
+      } catch (error) {
+        dispatch(AuthActionCreator.failedSendTwoFactorCode(error));
         throw error;
       }
     };
@@ -170,7 +185,7 @@ export class AuthAction {
       };
 
       try {
-        return await apiClient.auth.api.headInitiateLogin(code);
+        return await apiClient.api.auth.headInitiateLogin(code);
       } catch (error) {
         const mappedError = mapError(error);
         dispatch(AuthActionCreator.failedLogin(mappedError));
@@ -213,6 +228,12 @@ export class AuthAction {
     };
   };
 
+  pushEntropyData = (entropy: Uint8Array): ThunkAction => {
+    return async dispatch => {
+      dispatch(AuthActionCreator.pushEntropyData(entropy));
+    };
+  };
+
   doRegisterTeam = (registration: RegisterData): ThunkAction => {
     return async (
       dispatch,
@@ -244,7 +265,7 @@ export class AuthAction {
     };
   };
 
-  doRegisterPersonal = (registration: RegisterData): ThunkAction => {
+  doRegisterPersonal = (registration: RegisterData, entropyData: Uint8Array): ThunkAction => {
     return async (
       dispatch,
       getState,
@@ -262,7 +283,7 @@ export class AuthAction {
         await this.persistAuthData(clientType, core, dispatch, localStorageAction);
         await dispatch(cookieAction.setCookie(COOKIE_NAME_APP_OPENED, {appInstanceId: getConfig().APP_INSTANCE_ID}));
         await dispatch(selfAction.fetchSelf());
-        await dispatch(clientAction.doInitializeClient(clientType));
+        await dispatch(clientAction.doInitializeClient(clientType, undefined, undefined, entropyData));
         dispatch(AuthActionCreator.successfulRegisterPersonal(registration));
       } catch (error) {
         dispatch(AuthActionCreator.failedRegisterPersonal(error));
@@ -271,7 +292,11 @@ export class AuthAction {
     };
   };
 
-  doRegisterWireless = (registrationData: RegisterData, options = {shouldInitializeClient: true}): ThunkAction => {
+  doRegisterWireless = (
+    registrationData: RegisterData,
+    options = {shouldInitializeClient: true},
+    entropyData?: Uint8Array,
+  ): ThunkAction => {
     return async (
       dispatch,
       getState,
@@ -291,7 +316,8 @@ export class AuthAction {
         await this.persistAuthData(clientType, core, dispatch, localStorageAction);
         await dispatch(cookieAction.setCookie(COOKIE_NAME_APP_OPENED, {appInstanceId: getConfig().APP_INSTANCE_ID}));
         await dispatch(selfAction.fetchSelf());
-        await (clientType !== ClientType.NONE && dispatch(clientAction.doInitializeClient(clientType)));
+        await (clientType !== ClientType.NONE &&
+          dispatch(clientAction.doInitializeClient(clientType, undefined, undefined, entropyData)));
         await dispatch(authAction.doFlushDatabase());
         dispatch(AuthActionCreator.successfulRegisterWireless(registrationData));
       } catch (error) {
@@ -352,7 +378,7 @@ export class AuthAction {
 
   doGetDomainInfo = (domain: string): ThunkAction<Promise<DomainData>> => {
     return async (dispatch, getState, {apiClient}) => {
-      return apiClient.account.api.getDomain(domain);
+      return apiClient.api.account.getDomain(domain);
     };
   };
 
@@ -360,7 +386,7 @@ export class AuthAction {
     return async (dispatch, getState, {apiClient}) => {
       dispatch(AuthActionCreator.startGetSSOSettings());
       try {
-        const ssoSettings = await apiClient.account.api.getSSOSettings();
+        const ssoSettings = await apiClient.api.account.getSSOSettings();
         dispatch(AuthActionCreator.successfulGetSSOSettings(ssoSettings));
       } catch (error) {
         dispatch(AuthActionCreator.failedGetSSOSettings(error));

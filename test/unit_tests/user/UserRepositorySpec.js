@@ -17,8 +17,8 @@
  *
  */
 
-import {Confirmation} from '@wireapp/protocol-messaging';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
+import {RECEIPT_MODE} from '@wireapp/api-client/src/conversation/data';
 
 import {ConsentValue} from 'src/script/user/ConsentValue';
 import {PropertiesRepository} from 'src/script/properties/PropertiesRepository';
@@ -126,7 +126,7 @@ describe('UserRepository', () => {
         const turnOnReceiptMode = {
           key: PropertiesRepository.CONFIG.WIRE_RECEIPT_MODE.key,
           type: 'user.properties-set',
-          value: Confirmation.Type.READ,
+          value: RECEIPT_MODE.ON,
         };
         const turnOffReceiptMode = {
           key: PropertiesRepository.CONFIG.WIRE_RECEIPT_MODE.key,
@@ -135,15 +135,15 @@ describe('UserRepository', () => {
         const source = EventRepository.SOURCE.WEB_SOCKET;
         const receiptMode = testFactory.user_repository.propertyRepository.receiptMode;
 
-        expect(receiptMode()).toBe(Confirmation.Type.DELIVERED);
+        expect(receiptMode()).toBe(RECEIPT_MODE.OFF);
 
         testFactory.user_repository.onUserEvent(turnOnReceiptMode, source);
 
-        expect(receiptMode()).toBe(Confirmation.Type.READ);
+        expect(receiptMode()).toBe(RECEIPT_MODE.ON);
 
         testFactory.user_repository.onUserEvent(turnOffReceiptMode, source);
 
-        expect(receiptMode()).toBe(Confirmation.Type.DELIVERED);
+        expect(receiptMode()).toBe(RECEIPT_MODE.OFF);
       });
     });
   });
@@ -231,44 +231,6 @@ describe('UserRepository', () => {
           expect(userJohnDoe.devices()[0].id).toBe(entities.clients.john_doe.permanent.id);
           expect(userJohnDoe.devices()[1].id).toBe(entities.clients.john_doe.temporary.id);
         });
-      });
-    });
-
-    describe('verifyUsernames', () => {
-      it('resolves with username when username is not taken', async () => {
-        const usernames = ['john_doe'];
-        const userRepo = new UserRepository(
-          {
-            checkUserHandles: jest.fn().mockImplementation(() => Promise.resolve(usernames)),
-          }, // UserService
-          {}, // AssetRepository,
-          {}, // SelfService,
-          {}, // ClientRepository,
-          {}, // ServerTimeHandler,
-          {}, // PropertiesRepository,
-          {}, // UserState
-        );
-
-        const _usernames = await userRepo.verifyUsernames(usernames);
-        expect(_usernames).toEqual(usernames);
-      });
-
-      it('returns empty array when username is taken', async () => {
-        const usernames = ['john_doe'];
-        const userRepo = new UserRepository(
-          {
-            checkUserHandles: jest.fn().mockImplementation(() => Promise.resolve([])),
-          }, // UserService
-          {}, // AssetRepository,
-          {}, // SelfService,
-          {}, // ClientRepository,
-          {}, // ServerTimeHandler,
-          {}, // PropertiesRepository,
-          {}, // UserState
-        );
-
-        const _usernames = await userRepo.verifyUsernames(usernames);
-        expect(_usernames.length).toBe(0);
       });
     });
 

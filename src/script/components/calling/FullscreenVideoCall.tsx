@@ -25,24 +25,29 @@ import Icon from 'Components/Icon';
 import React, {useEffect, useMemo, useState} from 'react';
 import {TeamState} from '../../team/TeamState';
 import {container} from 'tsyringe';
-import {useKoSubscribable, useKoSubscribableChildren} from 'Util/ComponentUtil';
+import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 import type {Call} from '../../calling/Call';
 import type {Participant} from '../../calling/Participant';
 import type {Grid} from '../../calling/videoGridHandler';
 import type {Conversation} from '../../entity/Conversation';
+import {MuteState} from '../../calling/CallState';
 import useHideElement from '../../hooks/useHideElement';
-import type {ElectronDesktopCapturerSource, MediaDevicesHandler} from '../../media/MediaDevicesHandler';
+import {DeviceTypes, ElectronDesktopCapturerSource, MediaDevicesHandler} from '../../media/MediaDevicesHandler';
 import type {Multitasking} from '../../notification/NotificationRepository';
 import {t} from '../../util/LocalizerUtil';
-import {VideoSpeakersTab, VideoSpeakersTabs} from '../../view_model/CallingViewModel';
+import {CallViewTab, CallViewTabs} from '../../view_model/CallingViewModel';
 import ButtonGroup from './ButtonGroup';
 import DeviceToggleButton from './DeviceToggleButton';
 import Duration from './Duration';
 import GroupVideoGrid from './GroupVideoGrid';
 import Pagination from './Pagination';
+import ClassifiedBar from 'Components/input/ClassifiedBar';
+import {KEY} from 'Util/KeyboardUtil';
+import {preventFocusOutside} from 'Util/util';
 
 export interface FullscreenVideoCallProps {
+  activeCallViewTab: string;
   call: Call;
   canShareScreen: boolean;
   changePage: (newPage: number, call: Call) => void;
@@ -53,15 +58,15 @@ export interface FullscreenVideoCallProps {
   maximizedParticipant: Participant;
   mediaDevicesHandler: MediaDevicesHandler;
   multitasking: Multitasking;
+  muteState: MuteState;
+  setActiveCallViewTab: (tab: string) => void;
   setMaximizedParticipant: (call: Call, participant: Participant) => void;
-  setVideoSpeakersActiveTab: (tab: string) => void;
   switchCameraInput: (call: Call, deviceId: string) => void;
   teamState?: TeamState;
   toggleCamera: (call: Call) => void;
   toggleMute: (call: Call, muteState: boolean) => void;
   toggleScreenshare: (call: Call) => void;
   videoGrid: Grid;
-  videoSpeakersActiveTab: string;
 }
 
 const FullscreenVideoCallConfig = {
@@ -109,14 +114,15 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
   conversation,
   isChoosingScreen,
   isMuted,
+  muteState,
   mediaDevicesHandler,
   multitasking,
   videoGrid,
   maximizedParticipant,
-  videoSpeakersActiveTab,
+  activeCallViewTab,
   switchCameraInput,
   setMaximizedParticipant,
-  setVideoSpeakersActiveTab,
+  setActiveCallViewTab,
   toggleMute,
   toggleCamera,
   toggleScreenshare,
@@ -137,13 +143,20 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
     startedAt,
     participants,
   } = useKoSubscribableChildren(call, ['activeSpeakers', 'currentPage', 'pages', 'startedAt', 'participants']);
-  const {display_name: conversationName} = useKoSubscribableChildren(conversation, ['display_name']);
-  const {isVideoCallingEnabled} = useKoSubscribableChildren(teamState, ['isVideoCallingEnabled']);
+  const {display_name: conversationName, participating_user_ets: conversationParticipants} = useKoSubscribableChildren(
+    conversation,
+    ['display_name', 'participating_user_ets'],
+  );
+  const {isVideoCallingEnabled, classifiedDomains} = useKoSubscribableChildren(teamState, [
+    'isVideoCallingEnabled',
+    'classifiedDomains',
+  ]);
 
-  const currentCameraDevice = mediaDevicesHandler.currentDeviceId.videoInput();
-  const switchCameraSource = (call: Call, deviceId: string) => switchCameraInput(call, deviceId);
+  const {videoInput: currentCameraDevice} = useKoSubscribableChildren(mediaDevicesHandler.currentDeviceId, [
+    DeviceTypes.VIDEO_INPUT,
+  ]);
   const minimize = () => multitasking.isMinimized(true);
-  const videoInput = useKoSubscribable(mediaDevicesHandler.availableDevices.videoInput);
+  const {videoInput} = useKoSubscribableChildren(mediaDevicesHandler.availableDevices, [DeviceTypes.VIDEO_INPUT]);
   const showToggleVideo =
     isVideoCallingEnabled &&
     (call.initialType === CALL_TYPE.VIDEO ||
@@ -160,12 +173,31 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
   const updateUnreadCount = (unreadCount: number) => setHasUnreadMessages(unreadCount > 0);
   useEffect(() => {
     amplify.subscribe(WebAppEvents.LIFECYCLE.UNREAD_COUNT, updateUnreadCount);
-    return () => {
-      amplify.unsubscribe(WebAppEvents.LIFECYCLE.UNREAD_COUNT, updateUnreadCount);
-    };
+    return () => amplify.unsubscribe(WebAppEvents.LIFECYCLE.UNREAD_COUNT, updateUnreadCount);
   }, []);
 
   const totalPages = callPages.length;
+
+  const isSpaceOrEnterKey = (event: React.KeyboardEvent<HTMLDivElement>) => {
+    return event.key === KEY.ENTER || event.key === KEY.SPACE;
+  };
+
+  const handleToggleCameraKeydown = (event: React.KeyboardEvent<HTMLDivElement>) => {
+    if (isSpaceOrEnterKey(event)) {
+      toggleCamera(call);
+    }
+    return true;
+  };
+
+  useEffect(() => {
+    const onKeyDown = (event: KeyboardEvent): void => {
+      preventFocusOutside(event, 'video-calling');
+    };
+    document.addEventListener('keydown', onKeyDown);
+    return () => {
+      document.removeEventListener('keydown', onKeyDown);
+    };
+  }, []);
 
   return (
     <div id="video-calling" className="video-calling" ref={wrapper}>
@@ -174,7 +206,7 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
           maximizedParticipant={maximizedParticipant}
           selfParticipant={selfParticipant}
           grid={
-            videoSpeakersActiveTab === VideoSpeakersTab.SPEAKERS
+            activeCallViewTab === CallViewTab.SPEAKERS
               ? {
                   grid: activeSpeakers,
                   thumbnail: null,
@@ -188,22 +220,32 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
       {!isChoosingScreen && <div className="video-element-overlay hide-controls-hidden"></div>}
 
       <div id="video-title" className="video-title hide-controls-hidden">
+        {muteState === MuteState.REMOTE_MUTED && (
+          <div className="video-title__info-bar">{t('muteStateRemoteMute')}</div>
+        )}
         <div className="video-remote-name">{conversationName}</div>
         <div data-uie-name="video-timer" className="video-timer label-xs">
           <Duration startedAt={startedAt} />
         </div>
+        {classifiedDomains && (
+          <ClassifiedBar
+            users={conversationParticipants}
+            classifiedDomains={classifiedDomains}
+            style={{display: 'inline-block', lineHeight: '1.5em', margin: '1em 0', padding: '0 1em', width: 'auto'}}
+          />
+        )}
       </div>
 
       {!isChoosingScreen && (
         <div id="video-controls" className="video-controls hide-controls-hidden">
           {participants.length > 2 && (
             <ButtonGroup
-              items={Object.values(VideoSpeakersTabs)}
+              items={Object.values(CallViewTabs)}
               onChangeItem={item => {
-                setVideoSpeakersActiveTab(item);
+                setActiveCallViewTab(item);
                 setMaximizedParticipant(call, null);
               }}
-              currentItem={videoSpeakersActiveTab}
+              currentItem={activeCallViewTab}
               style={{margin: '0 auto', marginBottom: 32, width: 'fit-content'}}
               textSubstitute={participants.length.toString()}
             />
@@ -213,90 +255,130 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
               {maximizedParticipant ? t('videoCallOverlayFitVideoLabelGoBack') : t('videoCallOverlayFitVideoLabel')}
             </div>
           )}
-          <div className="video-controls__wrapper">
-            <div className="video-controls__button" onClick={minimize} data-uie-name="do-call-controls-video-minimize">
-              {hasUnreadMessages ? (
-                <Icon.MessageUnread
-                  css={{
-                    marginRight: '-2px',
-                    marginTop: '-2px',
-                  }}
-                />
-              ) : (
-                <Icon.Message />
-              )}
-              <div className="video-controls__button__label">{t('videoCallOverlayConversations')}</div>
-            </div>
-
-            <div
-              className="video-controls__button"
-              data-uie-value={!isMuted ? 'inactive' : 'active'}
-              onClick={() => toggleMute(call, !isMuted)}
-              css={!isMuted ? videoControlActiveStyles : undefined}
-              data-uie-name="do-call-controls-video-call-mute"
-            >
-              <div className="video-controls__button__label">{t('videoCallOverlayMicrophone')}</div>
-              {isMuted ? <Icon.MicOff width={16} height={16} /> : <Icon.MicOn width={16} height={16} />}
-            </div>
-
-            {showToggleVideo && (
-              <div
+          <ul className="video-controls__wrapper">
+            <li className="video-controls__item">
+              <button
                 className="video-controls__button"
-                data-uie-value={selfSharesCamera ? 'active' : 'inactive'}
-                onClick={() => toggleCamera(call)}
-                css={selfSharesCamera ? videoControlActiveStyles : videoControlInActiveStyles}
-                data-uie-name="do-call-controls-toggle-video"
+                onClick={minimize}
+                type="button"
+                aria-labelledby="minimize-label"
+                data-uie-name="do-call-controls-video-minimize"
               >
-                {selfSharesCamera ? <Icon.Camera width={16} height={16} /> : <Icon.CameraOff width={16} height={16} />}
-                {showSwitchCamera ? (
-                  <DeviceToggleButton
-                    styles={css`
-                      position: absolute;
-                      bottom: -16px;
-                      left: 50%;
-                      transform: translateX(-50%);
-                    `}
-                    currentDevice={currentCameraDevice}
-                    devices={availableCameras}
-                    onChooseDevice={deviceId => switchCameraSource(call, deviceId)}
+                {hasUnreadMessages ? (
+                  <Icon.MessageUnread
+                    css={{
+                      marginRight: '-2px',
+                      marginTop: '-2px',
+                    }}
                   />
                 ) : (
-                  <div className="video-controls__button__label">{t('videoCallOverlayCamera')}</div>
+                  <Icon.Message />
                 )}
-              </div>
+                <span id="minimize-label" className="video-controls__button__label">
+                  {t('videoCallOverlayConversations')}
+                </span>
+              </button>
+            </li>
+
+            <li className="video-controls__item">
+              <button
+                className="video-controls__button"
+                data-uie-value={!isMuted ? 'inactive' : 'active'}
+                onClick={() => toggleMute(call, !isMuted)}
+                css={!isMuted ? videoControlActiveStyles : undefined}
+                type="button"
+                aria-labelledby="mute-label"
+                data-uie-name="do-call-controls-video-call-mute"
+              >
+                <span id="mute-label" className="video-controls__button__label">
+                  {t('videoCallOverlayMicrophone')}
+                </span>
+                {isMuted ? <Icon.MicOff width={16} height={16} /> : <Icon.MicOn width={16} height={16} />}
+              </button>
+            </li>
+
+            {showToggleVideo && (
+              <li className="video-controls__item">
+                <div
+                  className="video-controls__button"
+                  data-uie-value={selfSharesCamera ? 'active' : 'inactive'}
+                  onClick={() => toggleCamera(call)}
+                  onKeyDown={e => handleToggleCameraKeydown(e)}
+                  role="button"
+                  tabIndex={0}
+                  css={selfSharesCamera ? videoControlActiveStyles : videoControlInActiveStyles}
+                  aria-labelledby="video-label"
+                  data-uie-name="do-call-controls-toggle-video"
+                >
+                  {selfSharesCamera ? (
+                    <Icon.Camera width={16} height={16} />
+                  ) : (
+                    <Icon.CameraOff width={16} height={16} />
+                  )}
+                  {showSwitchCamera ? (
+                    <DeviceToggleButton
+                      styles={css`
+                        position: absolute;
+                        bottom: -16px;
+                        left: 50%;
+                        transform: translateX(-50%);
+                      `}
+                      currentDevice={currentCameraDevice}
+                      devices={availableCameras}
+                      onChooseDevice={deviceId => switchCameraInput(call, deviceId)}
+                    />
+                  ) : (
+                    <span id="video-label" className="video-controls__button__label">
+                      {t('videoCallOverlayCamera')}
+                    </span>
+                  )}
+                </div>
+              </li>
             )}
 
-            <div
-              className={`video-controls__button ${!canShareScreen ? 'with-tooltip with-tooltip--top' : ''}`}
-              data-tooltip={t('videoCallScreenShareNotSupported')}
-              css={
-                !canShareScreen ? videoControlDisabledStyles : selfSharesScreen ? videoControlActiveStyles : undefined
-              }
-              onClick={() => toggleScreenshare(call)}
-              data-uie-value={selfSharesScreen ? 'active' : 'inactive'}
-              data-uie-enabled={canShareScreen ? 'true' : 'false'}
-              data-uie-name="do-toggle-screen"
-            >
-              {selfSharesScreen ? (
-                <Icon.Screenshare width={16} height={16} />
-              ) : (
-                <Icon.ScreenshareOff width={16} height={16} />
-              )}
-              <div className="video-controls__button__label">{t('videoCallOverlayShareScreen')}</div>
-            </div>
+            <li className="video-controls__item">
+              <button
+                className={`video-controls__button ${!canShareScreen ? 'with-tooltip with-tooltip--top' : ''}`}
+                data-tooltip={t('videoCallScreenShareNotSupported')}
+                css={
+                  !canShareScreen ? videoControlDisabledStyles : selfSharesScreen ? videoControlActiveStyles : undefined
+                }
+                onClick={() => toggleScreenshare(call)}
+                type="button"
+                aria-labelledby="screnn-share-label"
+                data-uie-value={selfSharesScreen ? 'active' : 'inactive'}
+                data-uie-enabled={canShareScreen ? 'true' : 'false'}
+                data-uie-name="do-toggle-screen"
+              >
+                {selfSharesScreen ? (
+                  <Icon.Screenshare width={16} height={16} />
+                ) : (
+                  <Icon.ScreenshareOff width={16} height={16} />
+                )}
+                <span id="screen-share-label" className="video-controls__button__label">
+                  {t('videoCallOverlayShareScreen')}
+                </span>
+              </button>
+            </li>
 
-            <div
-              className="video-controls__button video-controls__button--red"
-              onClick={() => leave(call)}
-              data-uie-name="do-call-controls-video-call-cancel"
-            >
-              <Icon.Hangup />
-              <div className="video-controls__button__label">{t('videoCallOverlayHangUp')}</div>
-            </div>
-          </div>
+            <li className="video-controls__item">
+              <button
+                className="video-controls__button video-controls__button--red"
+                onClick={() => leave(call)}
+                type="button"
+                aria-labelledby="leave-label"
+                data-uie-name="do-call-controls-video-call-cancel"
+              >
+                <Icon.Hangup />
+                <span id="leave-label" className="video-controls__button__label">
+                  {t('videoCallOverlayHangUp')}
+                </span>
+              </button>
+            </li>
+          </ul>
         </div>
       )}
-      {!maximizedParticipant && videoSpeakersActiveTab === VideoSpeakersTab.ALL && totalPages > 1 && (
+      {!maximizedParticipant && activeCallViewTab === CallViewTab.ALL && totalPages > 1 && (
         <>
           <div
             className="hide-controls-hidden"
@@ -309,10 +391,11 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
             />
           </div>
           {currentPage !== totalPages - 1 && (
-            <div
+            <button
               data-uie-name="pagination-next"
               onClick={() => changePage(currentPage + 1, call)}
-              className="hide-controls-hidden"
+              type="button"
+              className="hide-controls-hidden button-reset-default"
               css={{
                 ...paginationButtonStyles,
                 borderBottomLeftRadius: 32,
@@ -321,13 +404,14 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
               }}
             >
               <Icon.ArrowNext css={{left: 4, position: 'relative'}} />
-            </div>
+            </button>
           )}
           {currentPage !== 0 && (
-            <div
+            <button
               data-uie-name="pagination-previous"
+              type="button"
               onClick={() => changePage(currentPage - 1, call)}
-              className="hide-controls-hidden"
+              className="hide-controls-hidden button-reset-default"
               css={{
                 ...paginationButtonStyles,
                 borderBottomRightRadius: 32,
@@ -336,7 +420,7 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
               }}
             >
               <Icon.ArrowNext css={{position: 'relative', right: 4, transform: 'rotate(180deg)'}} />
-            </div>
+            </button>
           )}
         </>
       )}

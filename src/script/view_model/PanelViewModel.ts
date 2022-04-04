@@ -68,6 +68,7 @@ export class PanelViewModel {
   subViews: Record<string, BasePanelViewModel>;
   STATE: Record<string, string>;
   currentEntity: PanelEntity;
+  readonly isFederated: boolean;
 
   static get STATE() {
     return {
@@ -80,6 +81,7 @@ export class PanelViewModel {
       MESSAGE_DETAILS: 'PanelViewModel.STATE.MESSAGE_DETAILS',
       NOTIFICATIONS: 'PanelViewModel.STATE.NOTIFICATIONS',
       PARTICIPANT_DEVICES: 'PanelViewModel.STATE.DEVICES',
+      SERVICES_OPTIONS: 'PanelViewModel.STATE.SERVICES_OPTIONS',
       TIMED_MESSAGES: 'PanelViewModel.STATE.TIMED_MESSAGES',
     };
   }
@@ -94,6 +96,7 @@ export class PanelViewModel {
     [PanelViewModel.STATE.MESSAGE_DETAILS]: 'message-details',
     [PanelViewModel.STATE.NOTIFICATIONS]: 'notification-settings',
     [PanelViewModel.STATE.PARTICIPANT_DEVICES]: 'participant-devices',
+    [PanelViewModel.STATE.SERVICES_OPTIONS]: 'services-options',
     [PanelViewModel.STATE.TIMED_MESSAGES]: 'timed-messages',
   };
 
@@ -105,6 +108,7 @@ export class PanelViewModel {
       [PanelViewModel.STATE.GROUP_PARTICIPANT_SERVICE]: GroupParticipantServiceViewModel,
       [PanelViewModel.STATE.GROUP_PARTICIPANT_USER]: GroupParticipantUserViewModel,
       [PanelViewModel.STATE.GUEST_OPTIONS]: GuestsAndServicesViewModel,
+      [PanelViewModel.STATE.SERVICES_OPTIONS]: GuestsAndServicesViewModel,
       [PanelViewModel.STATE.MESSAGE_DETAILS]: MessageDetailsViewModel,
     };
 
@@ -131,6 +135,7 @@ export class PanelViewModel {
     this.elementId = 'right-column';
     this.repositories = repositories;
     this.mainViewModel = mainViewModel;
+    this.isFederated = mainViewModel.isFederated;
 
     this.conversationEntity = conversationState.activeConversation;
     this.stateHistory = [];

@@ -24,7 +24,8 @@ import type {TeamData} from '@wireapp/api-client/src/team/team/TeamData';
 import {Availability} from '@wireapp/protocol-messaging';
 import {TEAM_EVENT} from '@wireapp/api-client/src/event/TeamEvent';
 import type {FeatureList} from '@wireapp/api-client/src/team/feature/';
-import {FeatureStatus, FEATURE_KEY} from '@wireapp/api-client/src/team/feature/';
+import {FeatureStatus, FEATURE_KEY, SelfDeletingTimeout} from '@wireapp/api-client/src/team/feature/';
+import {formatDuration} from 'Util/TimeUtil';
 import type {
   TeamConversationDeleteEvent,
   TeamDeleteEvent,
@@ -126,14 +127,20 @@ export class TeamRepository {
     if (this.userState.self().teamId) {
       await this.updateTeamMembers(team);
     }
-    this.teamState.teamFeatures(await this.teamService.getAllTeamFeatures());
-    this.scheduleFetchTeamInfo();
+    this.updateFeatureConfig();
+    this.scheduleTeamRefresh();
   };
 
-  readonly scheduleFetchTeamInfo = (): void => {
+  async updateFeatureConfig() {
+    this.teamState.teamFeatures(await this.teamService.getAllTeamFeatures());
+    return this.teamState.teamFeatures();
+  }
+
+  readonly scheduleTeamRefresh = (): void => {
     window.setInterval(async () => {
       try {
         await this.getTeam();
+        await this.updateFeatureConfig();
       } catch (error) {
         this.logger.error(error);
       }
@@ -142,7 +149,7 @@ export class TeamRepository {
 
   getTeam = async (): Promise<TeamEntity> => {
     const selfTeamId = this.userState.self().teamId;
-    const teamData = selfTeamId ? await this.getTeamById() : await this.getBindingTeam();
+    const teamData = selfTeamId ? await this.getTeamById(selfTeamId) : await this.getBindingTeam();
 
     const teamEntity = teamData ? this.teamMapper.mapTeamFromObject(teamData, this.teamState.team()) : new TeamEntity();
     this.teamState.team(teamEntity);
@@ -170,6 +177,10 @@ export class TeamRepository {
     if (!hasMore && members.length) {
       return this.teamMapper.mapMemberFromArray(members);
     }
+  }
+
+  async conversationHasGuestLinkEnabled(conversationId: string): Promise<boolean> {
+    return this.teamService.conversationHasGuestLink(conversationId);
   }
 
   getTeamMembersFromUsers = async (users: User[]): Promise<void> => {
@@ -297,7 +308,9 @@ export class TeamRepository {
       this.teamState.memberRoles({});
       this.teamState.memberInviters({});
     }
-    const userEntities = await this.userRepository.getUsersById(memberIds);
+    const userEntities = await this.userRepository.getUsersById(
+      memberIds.map(memberId => ({domain: this.teamState.teamDomain(), id: memberId})),
+    );
 
     if (append) {
       const knownUserIds = teamEntity.members().map(({id}) => id);
@@ -317,7 +330,7 @@ export class TeamRepository {
 
       const memberIds = teamMembers
         .filter(({userId}) => userId !== this.userState.self().id)
-        .map(memberEntity => memberEntity.userId);
+        .map(memberEntity => ({domain: this.teamState.teamDomain(), id: memberEntity.userId}));
 
       const userEntities = await this.userRepository.getUsersById(memberIds);
       teamEntity.members(userEntities);
@@ -333,8 +346,8 @@ export class TeamRepository {
     }
   }
 
-  private getTeamById(): Promise<TeamData> {
-    return this.teamService.getTeamById(this.userState.self().teamId);
+  private getTeamById(teamId: string): Promise<TeamData> {
+    return this.teamService.getTeamById(teamId);
   }
 
   private getBindingTeam(): Promise<TeamData | undefined> {
@@ -361,7 +374,7 @@ export class TeamRepository {
     const {
       data: {conv: conversationId},
     } = eventJson;
-    amplify.publish(WebAppEvents.CONVERSATION.DELETE, conversationId);
+    amplify.publish(WebAppEvents.CONVERSATION.DELETE, {domain: '', id: conversationId});
   }
 
   private _onMemberJoin(eventJson: TeamMemberJoinEvent): void {
@@ -374,7 +387,7 @@ export class TeamRepository {
 
     if (isLocalTeam && isOtherUser) {
       this.userRepository
-        .getUserById(userId, this.userState.self().domain)
+        .getUserById({domain: this.userState.self().domain, id: userId})
         .then(userEntity => this.addUserToTeam(userEntity));
       this.getTeamMember(teamId, userId).then(member => this.updateMemberRoles(this.teamState.team(), member));
     }
@@ -386,8 +399,7 @@ export class TeamRepository {
     const shouldFetchConfig = handlingNotifications === NOTIFICATION_HANDLING_STATE.WEB_SOCKET;
 
     if (shouldFetchConfig) {
-      const featureConfigList = await this.teamService.getAllTeamFeatures();
-      this.teamState.teamFeatures(featureConfigList);
+      const featureConfigList = await this.updateFeatureConfig();
       this.handleConfigUpdate(featureConfigList);
     }
   };
@@ -400,11 +412,8 @@ export class TeamRepository {
       // Ignore notification stream events
       return;
     }
-    if (eventJson.name === FEATURE_KEY.FILE_SHARING) {
-      const featureConfigList = await this.teamService.getAllTeamFeatures();
-      this.teamState.teamFeatures(featureConfigList);
-      this.handleConfigUpdate(featureConfigList);
-    }
+    const featureConfigList = await this.updateFeatureConfig();
+    this.handleConfigUpdate(featureConfigList);
   };
 
   private readonly handleConfigUpdate = (featureConfigList: FeatureList) => {
@@ -413,59 +422,88 @@ export class TeamRepository {
     if (previousConfig) {
       this.handleAudioVideoFeatureChange(previousConfig, featureConfigList);
       this.handleFileSharingFeatureChange(previousConfig, featureConfigList);
+      this.handleSelfDeletingMessagesFeatureChange(previousConfig, featureConfigList);
       this.handleConferenceCallingFeatureChange(previousConfig, featureConfigList);
+      this.handleGuestLinkFeatureChange(previousConfig, featureConfigList);
     }
-
     this.saveFeatureConfig(featureConfigList);
   };
 
   private readonly handleFileSharingFeatureChange = (previousConfig: FeatureList, newConfig: FeatureList) => {
-    const changeList = [];
-
     const hasFileSharingChanged = previousConfig?.fileSharing?.status !== newConfig?.fileSharing?.status;
-    if (hasFileSharingChanged) {
-      const hasChangedToEnabled = newConfig?.fileSharing?.status === FeatureStatus.ENABLED;
-      changeList.push(
-        `<li>${
-          hasChangedToEnabled
-            ? t('featureConfigChangeModalFileSharingDescriptionItemFileSharingEnabled')
-            : t('featureConfigChangeModalFileSharingDescriptionItemFileSharingDisabled')
-        }</li>`,
-      );
-    }
+    const hasChangedToEnabled = newConfig?.fileSharing?.status === FeatureStatus.ENABLED;
 
     if (hasFileSharingChanged) {
-      const message = `${t('featureConfigChangeModalDescription')} <ul class="modal__list">${changeList}</ul>`;
       amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.ACKNOWLEDGE, {
         text: {
-          htmlMessage: message,
-          title: t('featureConfigChangeModalFileSharingHeadline'),
+          htmlMessage: hasChangedToEnabled
+            ? t('featureConfigChangeModalFileSharingDescriptionItemFileSharingEnabled')
+            : t('featureConfigChangeModalFileSharingDescriptionItemFileSharingDisabled'),
+          title: t('featureConfigChangeModalFileSharingHeadline', {brandName: Config.getConfig().BRAND_NAME}),
+        },
+      });
+    }
+  };
+
+  private readonly handleGuestLinkFeatureChange = (previousConfig: FeatureList, newConfig: FeatureList) => {
+    const hasGuestLinkChanged =
+      previousConfig?.conversationGuestLinks?.status !== newConfig?.conversationGuestLinks?.status;
+    const hasGuestLinkChangedToEnabled = newConfig?.conversationGuestLinks?.status === FeatureStatus.ENABLED;
+
+    if (hasGuestLinkChanged) {
+      amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.ACKNOWLEDGE, {
+        text: {
+          htmlMessage: hasGuestLinkChangedToEnabled
+            ? t('featureConfigChangeModalConversationGuestLinksDescriptionItemConversationGuestLinksEnabled')
+            : t('featureConfigChangeModalConversationGuestLinksDescriptionItemConversationGuestLinksDisabled'),
+          title: t('featureConfigChangeModalConversationGuestLinksHeadline'),
+        },
+      });
+    }
+  };
+
+  private readonly handleSelfDeletingMessagesFeatureChange = (
+    {selfDeletingMessages: previousState}: FeatureList,
+    {selfDeletingMessages: newState}: FeatureList,
+  ) => {
+    const previousTimeout = previousState?.config?.enforcedTimeoutSeconds * 1000;
+    const newTimeout = newState?.config?.enforcedTimeoutSeconds * 1000;
+    const previousStatus = previousState?.status;
+    const newStatus = newState?.status;
+
+    const hasTimeoutChanged = previousTimeout !== newTimeout;
+    const isEnforced = newTimeout > SelfDeletingTimeout.OFF;
+    const hasStatusChanged = previousStatus !== newStatus;
+    const hasFeatureChanged = hasStatusChanged || hasTimeoutChanged;
+    const isFeatureEnabled = newStatus === FeatureStatus.ENABLED;
+
+    if (hasFeatureChanged) {
+      amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.ACKNOWLEDGE, {
+        text: {
+          htmlMessage: isFeatureEnabled
+            ? isEnforced
+              ? t('featureConfigChangeModalSelfDeletingMessagesDescriptionItemEnforced', {
+                  timeout: formatDuration(newTimeout).text,
+                })
+              : t('featureConfigChangeModalSelfDeletingMessagesDescriptionItemEnabled')
+            : t('featureConfigChangeModalSelfDeletingMessagesDescriptionItemDisabled'),
+          title: t('featureConfigChangeModalSelfDeletingMessagesHeadline', {brandName: Config.getConfig().BRAND_NAME}),
         },
       });
     }
   };
 
   private readonly handleAudioVideoFeatureChange = (previousConfig: FeatureList, newConfig: FeatureList) => {
-    const changeList = [];
-
     const hasVideoCallingChanged = previousConfig?.videoCalling?.status !== newConfig?.videoCalling?.status;
-    if (hasVideoCallingChanged) {
-      const hasChangedToEnabled = newConfig?.videoCalling?.status === FeatureStatus.ENABLED;
-      changeList.push(
-        `<li>${
-          hasChangedToEnabled
-            ? t('featureConfigChangeModalAudioVideoDescriptionItemCameraEnabled')
-            : t('featureConfigChangeModalAudioVideoDescriptionItemCameraDisabled')
-        }</li>`,
-      );
-    }
+    const hasChangedToEnabled = newConfig?.videoCalling?.status === FeatureStatus.ENABLED;
 
     if (hasVideoCallingChanged) {
-      const message = `${t('featureConfigChangeModalDescription')} <ul class="modal__list">${changeList}</ul>`;
       amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.ACKNOWLEDGE, {
         text: {
-          htmlMessage: message,
-          title: t('featureConfigChangeModalAudioVideoHeadline'),
+          htmlMessage: hasChangedToEnabled
+            ? t('featureConfigChangeModalAudioVideoDescriptionItemCameraEnabled')
+            : t('featureConfigChangeModalAudioVideoDescriptionItemCameraDisabled'),
+          title: t('featureConfigChangeModalAudioVideoHeadline', {brandName: Config.getConfig().BRAND_NAME}),
         },
       });
     }
@@ -524,13 +562,7 @@ export class TeamRepository {
       }
 
       this.teamState.team().members.remove(member => member.id === userId);
-      amplify.publish(
-        WebAppEvents.TEAM.MEMBER_LEAVE,
-        teamId,
-        userId,
-        this.userState.self().domain,
-        new Date(time).toISOString(),
-      );
+      amplify.publish(WebAppEvents.TEAM.MEMBER_LEAVE, teamId, {domain: '', id: userId}, new Date(time).toISOString());
     }
   }
 

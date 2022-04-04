@@ -29,6 +29,8 @@ import type {User} from '../../entity/User';
 import type {UserRepository} from '../../user/UserRepository';
 import type {ActionsViewModel} from '../ActionsViewModel';
 import {UserState} from '../../user/UserState';
+import {QualifiedId} from '@wireapp/api-client/src/user';
+import {TeamState} from '../../team/TeamState';
 
 export class UserModalViewModel {
   userRepository: UserRepository;
@@ -43,14 +45,17 @@ export class UserModalViewModel {
   isSelfVerified: ko.PureComputed<boolean>;
   isActivatedAccount: ko.PureComputed<boolean>;
   blockedForLegalHoldText: string;
+  classifiedDomains: ko.PureComputed<string[]>;
 
   constructor(
     userRepository: UserRepository,
     actionsViewModel: ActionsViewModel,
     private readonly userState = container.resolve(UserState),
+    teamState = container.resolve(TeamState),
   ) {
     this.userRepository = userRepository;
     this.actionsViewModel = actionsViewModel;
+    this.classifiedDomains = teamState.classifiedDomains;
 
     this.isActivatedAccount = this.userState.isActivatedAccount;
     this.isVisible = ko.observable(false);
@@ -78,13 +83,13 @@ export class UserModalViewModel {
     this.hide();
   };
 
-  showUser(userId: string, domain?: string, onModalClosed: () => void = noop): void {
+  showUser(userId: QualifiedId, onModalClosed: () => void = noop): void {
     this.onClosedCallback = onModalClosed;
     this.user(null);
     this.userNotFound(false);
     if (userId) {
       this.userRepository
-        .getUserById(userId, domain)
+        .getUserById(userId)
         .then(user => {
           if (user.isDeleted) {
             return this.userNotFound(true);

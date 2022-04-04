@@ -38,6 +38,7 @@ import {PanelViewModel} from '../PanelViewModel';
 import {UserState} from '../../user/UserState';
 import {TeamState} from '../../team/TeamState';
 import {TeamRepository} from '../../team/TeamRepository';
+import {matchQualifiedIds} from 'Util/QualifiedId';
 
 export class AddParticipantsViewModel extends BasePanelViewModel {
   private readonly userState: UserState;
@@ -107,10 +108,19 @@ export class AddParticipantsViewModel extends BasePanelViewModel {
 
     this.showIntegrations = ko.pureComputed(() => {
       if (this.activeConversation()) {
+        const isServicesEnabled =
+          this.activeConversation().isServicesRoom() || this.activeConversation().isGuestAndServicesRoom();
+
         const firstUserEntity = this.activeConversation().firstUserEntity();
         const hasBotUser = firstUserEntity && firstUserEntity.isService;
         const allowIntegrations = this.activeConversation().isGroup() || hasBotUser;
-        return this.isTeam() && allowIntegrations && this.activeConversation().inTeam() && !this.isTeamOnly();
+        return (
+          this.isTeam() &&
+          allowIntegrations &&
+          this.activeConversation().inTeam() &&
+          !this.isTeamOnly() &&
+          isServicesEnabled
+        );
       }
       return undefined;
     });
@@ -128,13 +138,16 @@ export class AddParticipantsViewModel extends BasePanelViewModel {
       }
 
       if (this.isTeam()) {
-        userEntities = this.isTeamOnly() ? this.teamMembers().sort(sortUsersByPriority) : this.teamUsers();
+        userEntities =
+          this.isTeamOnly() || this.activeConversation().isServicesRoom()
+            ? this.teamMembers().sort(sortUsersByPriority)
+            : this.teamUsers();
       } else {
         userEntities = this.userState.connectedUsers();
       }
 
       return userEntities.filter(userEntity => {
-        return !activeConversation.participating_user_ids().find(id => userEntity.id === id);
+        return !activeConversation.participating_user_ids().find(userId => matchQualifiedIds(userEntity, userId));
       });
     });
 

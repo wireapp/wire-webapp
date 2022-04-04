@@ -30,7 +30,7 @@ export interface ClientRecord {
     lat?: number;
     lon?: number;
   };
-  meta?: {
+  meta: {
     is_verified?: boolean;
     primary_key?: string;
   };

@@ -25,13 +25,10 @@ import $ from 'jquery';
 import ko from 'knockout';
 
 import {getLogger, Logger} from 'Util/Logger';
-import {isSameDay, differenceInMinutes} from 'Util/TimeUtil';
 import {safeWindowOpen, safeMailOpen} from 'Util/SanitizationUtil';
-import {scrollEnd, scrollToBottom, scrollBy} from 'Util/scroll-helpers';
 import {t} from 'Util/LocalizerUtil';
 
 import {ActionsViewModel} from '../ActionsViewModel';
-import {Config} from '../../Config';
 import {ContentMessage} from '../../entity/message/ContentMessage';
 import {Conversation} from '../../entity/Conversation';
 import {ConversationRepository} from '../../conversation/ConversationRepository';
@@ -63,15 +60,10 @@ export class MessageListViewModel {
   private readonly logger: Logger;
   readonly actionsViewModel: ActionsViewModel;
   readonly selfUser: ko.Observable<User>;
-  readonly focusedMessage: ko.Observable<string>;
+  readonly initialMessage: ko.Observable<Message | undefined> = ko.observable();
   readonly conversation: ko.Observable<Conversation>;
-  readonly verticallyCenterMessage: ko.PureComputed<boolean>;
-  private readonly conversationLoaded: ko.Observable<boolean>;
-  conversationLastReadTimestamp: number;
+  readonly conversationLoaded = ko.observable(false);
   private readonly readMessagesBuffer: ko.ObservableArray<{conversation: Conversation; message: Message}>;
-  private messagesChangeSubscription: ko.Subscription;
-  private messagesBeforeChangeSubscription: ko.Subscription;
-  private messagesContainer: HTMLElement;
   showInvitePeople: ko.PureComputed<boolean>;
 
   constructor(
@@ -88,25 +80,8 @@ export class MessageListViewModel {
 
     this.actionsViewModel = this.mainViewModel.actions;
     this.selfUser = this.userState.self;
-    this.focusedMessage = ko.observable(null);
 
     this.conversation = ko.observable(new Conversation());
-    this.verticallyCenterMessage = ko.pureComputed(() => {
-      if (this.conversation().messages_visible().length === 1) {
-        const [messageEntity] = this.conversation().messages_visible();
-        if (messageEntity instanceof MemberMessage) {
-          return messageEntity.isMember() && messageEntity.isConnection();
-        }
-        return false;
-      }
-      return false;
-    });
-
-    amplify.subscribe(WebAppEvents.INPUT.RESIZE, this.handleInputResize);
-
-    this.conversationLoaded = ko.observable(false);
-    // Store last read to show until user switches conversation
-    this.conversationLastReadTimestamp = undefined;
 
     // this buffer will collect all the read messages and send a read receipt in batch
     this.readMessagesBuffer = ko.observableArray();
@@ -125,55 +100,18 @@ export class MessageListViewModel {
         }
       });
 
-    // Store message subscription id
-    this.messagesChangeSubscription = undefined;
-    this.messagesBeforeChangeSubscription = undefined;
-
-    this.messagesContainer = undefined;
-
     this.showInvitePeople = ko.pureComputed(() => {
       return (
-        this.conversation().isActiveParticipant() && this.conversation().inTeam() && this.conversation().isGuestRoom()
+        this.conversation().isActiveParticipant() &&
+        this.conversation().inTeam() &&
+        (this.conversation().isGuestRoom() || this.conversation().isGuestAndServicesRoom())
       );
     });
   }
 
-  readonly onMessageContainerInitiated = (messagesContainer: HTMLElement): void => {
-    this.messagesContainer = messagesContainer;
-  };
-
   readonly releaseConversation = (conversation_et: Conversation): void => {
     if (conversation_et) {
       conversation_et.release();
-    }
-    if (this.messagesBeforeChangeSubscription) {
-      this.messagesBeforeChangeSubscription.dispose();
-    }
-    if (this.messagesChangeSubscription) {
-      this.messagesChangeSubscription.dispose();
-    }
-    this.conversationLastReadTimestamp = undefined;
-    window.removeEventListener('resize', this.adjustScroll);
-  };
-
-  private readonly shouldStickToBottom = (): boolean => {
-    const messagesContainer = this.getMessagesContainer();
-    const scrollPosition = Math.ceil(messagesContainer.scrollTop);
-    const scrollEndValue = Math.ceil(scrollEnd(messagesContainer));
-    return scrollPosition > scrollEndValue - Config.getConfig().SCROLL_TO_LAST_MESSAGE_THRESHOLD;
-  };
-
-  readonly adjustScroll = (): void => {
-    if (this.shouldStickToBottom()) {
-      scrollToBottom(this.getMessagesContainer());
-    }
-  };
-
-  private readonly handleInputResize = (inputSizeDiff: number): void => {
-    if (inputSizeDiff) {
-      scrollBy(this.getMessagesContainer(), inputSizeDiff);
-    } else if (this.shouldStickToBottom()) {
-      scrollToBottom(this.getMessagesContainer());
     }
   };
 
@@ -185,180 +123,38 @@ export class MessageListViewModel {
     }
 
     // Update new conversation
-    this.logger.info('conversationEntity', conversationEntity);
+    this.initialMessage(messageEntity);
     this.conversation(conversationEntity);
-
-    // Keep last read timestamp to render unread when entering conversation
-    if (this.conversation().unreadState().allEvents.length) {
-      this.conversationLastReadTimestamp = this.conversation().last_read_timestamp();
-    }
-
-    conversationEntity.is_loaded(false);
-    await this.loadConversation(conversationEntity, messageEntity);
-    await this.renderConversation(conversationEntity, messageEntity);
-    conversationEntity.is_loaded(true);
-    this.conversationLoaded(true);
-  };
-
-  private readonly loadConversation = async (
-    conversationEntity: Conversation,
-    messageEntity: Message,
-  ): Promise<ContentMessage[]> => {
-    await this.conversationRepository.updateParticipatingUserEntities(conversationEntity, false, true);
-
-    return messageEntity
-      ? this.conversationRepository.getMessagesWithOffset(conversationEntity, messageEntity)
-      : this.conversationRepository.getPrecedingMessages(conversationEntity);
+    return new Promise(resolve => {
+      const subscription = this.conversationLoaded.subscribe(isLoaded => {
+        if (isLoaded) {
+          resolve();
+          subscription.dispose();
+        }
+      });
+    });
   };
 
   private readonly isLastReceivedMessage = (messageEntity: Message, conversationEntity: Conversation): boolean => {
     return messageEntity.timestamp() && messageEntity.timestamp() >= conversationEntity.last_event_timestamp();
   };
 
-  readonly getMessagesContainer = () => {
-    return this.messagesContainer;
-  };
-
-  private readonly renderConversation = (conversationEntity: Conversation, messageEntity: Message): Promise<void> => {
-    const messages_container = this.getMessagesContainer();
-
-    const is_current_conversation = conversationEntity === this.conversation();
-    if (!is_current_conversation) {
-      this.logger.info(`Skipped re-loading current conversation '${conversationEntity.display_name()}'`);
-      return Promise.resolve();
-    }
-
-    return new Promise(resolve => {
-      window.setTimeout(() => {
-        // Reset scroll position
-        messages_container.scrollTop = 0;
-
-        if (messageEntity) {
-          this.focusMessage(messageEntity.id);
-        } else {
-          const unread_message = $('.message-timestamp-unread');
-          if (unread_message.length) {
-            const unreadMarkerPosition = unread_message.parents('.message').position();
-
-            scrollBy(messages_container, unreadMarkerPosition.top);
-          } else {
-            scrollToBottom(messages_container);
-          }
-        }
-
-        window.addEventListener('resize', this.adjustScroll);
-
-        let shouldStickToBottomOnMessageAdd: boolean;
-
-        this.messagesBeforeChangeSubscription = conversationEntity.messages_visible.subscribe(
-          () => {
-            // we need to keep track of the scroll position before the message array has changed
-            shouldStickToBottomOnMessageAdd = this.shouldStickToBottom();
-          },
-          null,
-          'beforeChange',
-        );
-
-        // Subscribe for incoming messages
-        this.messagesChangeSubscription = conversationEntity.messages_visible.subscribe(
-          changedMessages => {
-            this.scrollAddedMessagesIntoView(changedMessages, shouldStickToBottomOnMessageAdd);
-            shouldStickToBottomOnMessageAdd = undefined;
-          },
-          null,
-          'arrayChange',
-        );
-        resolve();
-      }, 100);
-    });
-  };
-
-  private readonly scrollAddedMessagesIntoView = (
-    changedMessages: ko.utils.ArrayChanges<Message | ContentMessage | MemberMessage>,
-    shouldStickToBottom: boolean,
-  ) => {
-    const messages_container = this.getMessagesContainer();
-    const lastAddedItem = changedMessages
-      .slice()
-      .reverse()
-      .find(changedMessage => changedMessage.status === 'added');
-
-    // We are only interested in items that were added
-    if (!lastAddedItem) {
-      return;
-    }
-
-    const lastMessage = lastAddedItem.value;
-
-    if (lastMessage) {
-      // Message was prepended
-      if (lastMessage.timestamp() < this.conversation().last_event_timestamp()) {
-        return;
-      }
-
-      // Scroll to bottom if self user send the message
-      if (lastMessage.from === this.selfUser().id) {
-        window.requestAnimationFrame(() => scrollToBottom(messages_container));
-        return;
-      }
-    }
-
-    // Scroll to the end of the list if we are under a certain threshold
-    if (shouldStickToBottom) {
-      window.requestAnimationFrame(() => scrollToBottom(messages_container));
-    }
-  };
-
   loadPrecedingMessages = async (): Promise<void> => {
     const shouldPullMessages = !this.conversation().is_pending() && this.conversation().hasAdditionalMessages();
-    const messagesContainer = this.getMessagesContainer();
-
-    if (shouldPullMessages && messagesContainer) {
-      const initialListHeight = messagesContainer.scrollHeight;
-
+    if (shouldPullMessages) {
       await this.conversationRepository.getPrecedingMessages(this.conversation());
-      if (messagesContainer) {
-        const newListHeight = messagesContainer.scrollHeight;
-        this.getMessagesContainer().scrollTop = newListHeight - initialListHeight;
-      }
-      return;
     }
-    return Promise.resolve();
   };
 
-  readonly loadFollowingMessages = (): Promise<void> => {
+  readonly loadFollowingMessages = () => {
     const lastMessage = this.conversation().getLastMessage();
 
     if (lastMessage) {
       if (!this.isLastReceivedMessage(lastMessage, this.conversation())) {
         // if the last loaded message is not the last of the conversation, we load the subsequent messages
         this.conversationRepository.getSubsequentMessages(this.conversation(), lastMessage as ContentMessage);
-      } else if (document.hasFocus()) {
-        // if the message is the last of the conversation and the app is in the foreground, then we update the last read timestamp of the conversation
-        this.updateConversationLastRead(this.conversation(), lastMessage);
       }
     }
-    return Promise.resolve();
-  };
-
-  focusMessage = async (messageId: string): Promise<void> => {
-    const messageIsLoaded = !!this.conversation().getMessage(messageId);
-    this.focusedMessage(messageId);
-
-    if (!messageIsLoaded) {
-      const conversationEntity = this.conversation();
-      const messageEntity = await this.messageRepository.getMessageInConversationById(conversationEntity, messageId);
-      conversationEntity.removeMessages();
-      this.conversationRepository.getMessagesWithOffset(conversationEntity, messageEntity);
-    }
-  };
-
-  readonly onMessageMarked = (messageElement: HTMLElement) => {
-    const messagesContainer = this.getMessagesContainer();
-    messageElement.classList.remove('message-marked');
-    scrollBy(messagesContainer, messageElement.getBoundingClientRect().top - messagesContainer.offsetHeight / 2);
-    messageElement.classList.add('message-marked');
-    this.focusedMessage(null);
   };
 
   readonly showUserDetails = (userEntity: User): void => {
@@ -390,10 +186,9 @@ export class MessageListViewModel {
     messageEntity.is_resetting_session(true);
     try {
       await this.messageRepository.resetSession(
-        messageEntity.from,
+        {domain: messageEntity.fromDomain, id: messageEntity.from},
         messageEntity.client_id,
-        this.conversation().id,
-        messageEntity.domain,
+        this.conversation(),
       );
       resetProgress();
     } catch (error) {
@@ -419,48 +214,6 @@ export class MessageListViewModel {
     amplify.publish(WebAppEvents.CONVERSATION.DETAIL_VIEW.SHOW, imageMessageEntity || messageEntity, messageEntities);
   };
 
-  readonly getTimestampClass = (messageEntity: ContentMessage): string => {
-    const previousMessage = this.conversation().getPreviousMessage(messageEntity);
-    if (!previousMessage || messageEntity.isCall()) {
-      return '';
-    }
-
-    const isFirstUnread =
-      previousMessage.timestamp() <= this.conversationLastReadTimestamp &&
-      messageEntity.timestamp() > this.conversationLastReadTimestamp;
-
-    if (isFirstUnread) {
-      return 'message-timestamp-visible message-timestamp-unread';
-    }
-
-    const last = previousMessage.timestamp();
-    const current = messageEntity.timestamp();
-
-    if (!isSameDay(last, current)) {
-      return 'message-timestamp-visible message-timestamp-day';
-    }
-
-    if (differenceInMinutes(current, last) > 60) {
-      return 'message-timestamp-visible';
-    }
-
-    return '';
-  };
-
-  readonly shouldHideUserAvatar = (messageEntity: ContentMessage): boolean => {
-    // @todo avoid double check
-    if (this.getTimestampClass(messageEntity)) {
-      return false;
-    }
-
-    if (messageEntity.isContent() && messageEntity.replacing_message_id) {
-      return false;
-    }
-
-    const last_message = this.conversation().getPreviousMessage(messageEntity);
-    return last_message && last_message.isContent() && last_message.user().id === messageEntity.user().id;
-  };
-
   readonly isLastDeliveredMessage = (messageEntity: Message): boolean => {
     return this.conversation().getLastDeliveredMessage() === messageEntity;
   };
@@ -475,8 +228,8 @@ export class MessageListViewModel {
     this.messageRepository.toggleLike(this.conversation(), messageEntity);
   };
 
-  readonly clickOnInvitePeople = (): void => {
-    this.mainViewModel.panel.togglePanel(PanelViewModel.STATE.GUEST_OPTIONS, {entity: this.conversation()});
+  readonly clickOnInvitePeople = (conversation: Conversation): void => {
+    this.mainViewModel.panel.togglePanel(PanelViewModel.STATE.GUEST_OPTIONS, {entity: conversation});
   };
 
   readonly getInViewportCallback = (
@@ -520,7 +273,10 @@ export class MessageListViewModel {
     if (messageEntity.expectsReadConfirmation) {
       if (conversationEntity.is1to1()) {
         shouldSendReadReceipt = this.conversationRepository.expectReadReceipt(conversationEntity);
-      } else if (conversationEntity.isGroup() && (conversationEntity.inTeam() || conversationEntity.isGuestRoom())) {
+      } else if (
+        conversationEntity.isGroup() &&
+        (conversationEntity.inTeam() || conversationEntity.isGuestRoom() || conversationEntity.isGuestAndServicesRoom())
+      ) {
         shouldSendReadReceipt = true;
       }
     }
@@ -557,7 +313,7 @@ export class MessageListViewModel {
   };
 
   readonly handleClickOnMessage = (messageEntity: ContentMessage | Text, event: MouseEvent): boolean => {
-    if (event.which === 3) {
+    if (event.button === 2) {
       // Default browser behavior on right click
       return true;
     }
@@ -565,6 +321,7 @@ export class MessageListViewModel {
     const emailTarget = (event.target as HTMLElement).closest<HTMLAnchorElement>('[data-email-link]');
     if (emailTarget) {
       safeMailOpen(emailTarget.href);
+      event.preventDefault();
       return false;
     }
 
@@ -583,6 +340,7 @@ export class MessageListViewModel {
           title: t('modalOpenLinkTitle'),
         },
       });
+      event.preventDefault();
       return false;
     }
 
@@ -596,7 +354,7 @@ export class MessageListViewModel {
     if (userId) {
       (async () => {
         try {
-          const userEntity = await this.userRepository.getUserById(userId, domain);
+          const userEntity = await this.userRepository.getUserById({domain, id: userId});
           this.showUserDetails(userEntity);
         } catch (error) {
           if (error.type !== UserError.TYPE.USER_NOT_FOUND) {
@@ -617,10 +375,10 @@ export class MessageListViewModel {
     });
   };
 
-  readonly showMessageDetails = (view: {message: {id: string}}, showLikes: boolean): void => {
+  readonly showMessageDetails = (message: Message, showLikes: boolean): void => {
     if (!this.conversation().is1to1()) {
       this.mainViewModel.panel.togglePanel(PanelViewModel.STATE.MESSAGE_DETAILS, {
-        entity: {id: view.message.id} as Message,
+        entity: message,
         showLikes,
       });
     }

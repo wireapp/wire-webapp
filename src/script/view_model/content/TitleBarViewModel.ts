@@ -23,7 +23,7 @@ import {amplify} from 'amplify';
 import ko from 'knockout';
 import {container} from 'tsyringe';
 
-import {t} from 'Util/LocalizerUtil';
+import {StringIdentifer, t} from 'Util/LocalizerUtil';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 
 import {ConversationVerificationState} from '../../conversation/ConversationVerificationState';
@@ -39,8 +39,44 @@ import {ConversationState} from '../../conversation/ConversationState';
 import {CallState} from '../../calling/CallState';
 import {TeamState} from '../../team/TeamState';
 import {ConversationFilter} from '../../conversation/ConversationFilter';
+import {matchQualifiedIds} from 'Util/QualifiedId';
+import {handleKeyDown} from 'Util/KeyboardUtil';
 
 // Parent: ContentViewModel
+export function generateWarningBadgeKey({
+  hasFederated,
+  hasExternal,
+  hasGuest,
+  hasService,
+}: {
+  hasExternal?: boolean;
+  hasFederated?: boolean;
+  hasGuest?: boolean;
+  hasService?: boolean;
+}): StringIdentifer {
+  const baseKey = 'guestRoomConversationBadge';
+  const extras = [];
+  if (hasGuest && !hasExternal && !hasService && !hasFederated) {
+    return baseKey;
+  }
+  if (hasFederated) {
+    extras.push('Federated');
+  }
+  if (hasExternal) {
+    extras.push('External');
+  }
+  if (hasGuest) {
+    extras.push('Guest');
+  }
+  if (hasService) {
+    extras.push('Service');
+  }
+  if (!extras.length) {
+    return '';
+  }
+  return `${baseKey}${extras.join('And')}` as StringIdentifer;
+}
+
 export class TitleBarViewModel {
   readonly panelIsVisible: ko.PureComputed<boolean>;
   readonly conversationEntity: ko.Observable<Conversation>;
@@ -52,6 +88,8 @@ export class TitleBarViewModel {
   readonly supportsVideoCall: ko.PureComputed<boolean>;
   readonly isVideoCallingEnabled: ko.PureComputed<boolean>;
   readonly peopleTooltip: string;
+  readonly conversationSubtitle: ko.PureComputed<string>;
+  readonly isConnectionRequest: ko.PureComputed<boolean>;
 
   constructor(
     readonly callingViewModel: CallingViewModel,
@@ -66,47 +104,47 @@ export class TitleBarViewModel {
     this.contentViewModel = contentViewModel;
 
     this.panelIsVisible = panelViewModel.isVisible;
+    this.isConnectionRequest = ko.pureComputed(
+      () =>
+        this.conversationEntity() &&
+        (this.conversationEntity().connection().isIncomingRequest() ||
+          this.conversationEntity().connection().isOutgoingRequest()),
+    );
 
     // TODO remove the titlebar for now to ensure that buttons are clickable in macOS wrappers
     window.setTimeout(() => $('.titlebar').remove(), TIME_IN_MILLIS.SECOND);
 
-    this.conversationEntity = this.conversationState.activeConversation;
+    this.conversationEntity = this.conversationState.activeConversation!;
     this.ConversationVerificationState = ConversationVerificationState;
 
     this.isActivatedAccount = this.userState.isActivatedAccount;
+    this.conversationSubtitle = ko.pureComputed(() => {
+      return this.conversationEntity() &&
+        this.conversationEntity().is1to1() &&
+        this.conversationEntity().firstUserEntity() &&
+        this.conversationEntity().firstUserEntity().isFederated
+        ? this.conversationEntity().firstUserEntity()?.handle ?? ''
+        : '';
+    });
 
     this.hasCall = ko.pureComputed(() => {
       const hasEntities = this.conversationEntity() && !!this.callState.joinedCall();
-      return hasEntities ? this.conversationEntity().id === this.callState.joinedCall().conversationId : false;
+      return hasEntities
+        ? matchQualifiedIds(this.conversationEntity().qualifiedId, this.callState.joinedCall().conversationId)
+        : false;
     });
 
     this.badgeLabelCopy = ko.pureComputed(() => {
-      if (this.conversationEntity().is1to1()) {
+      if (this.conversationEntity().is1to1() || this.conversationEntity().isRequest()) {
         return '';
       }
       const hasExternal = this.conversationEntity().hasExternal();
-      const hasGuest = this.conversationEntity().hasGuest();
+      const hasGuest = this.conversationEntity().hasDirectGuest();
       const hasService = this.conversationEntity().hasService();
-      if (hasExternal && hasGuest && hasService) {
-        return t('guestRoomConversationBadgeExternalAndGuestAndService');
-      }
-      if (hasExternal && hasGuest) {
-        return t('guestRoomConversationBadgeExternalAndGuest');
-      }
-      if (hasExternal && hasService) {
-        return t('guestRoomConversationBadgeExternalAndService');
-      }
-      if (hasExternal) {
-        return t('guestRoomConversationBadgeExternal');
-      }
-      if (hasGuest && hasService) {
-        return t('guestRoomConversationBadgeGuestAndService');
-      }
-      if (hasGuest) {
-        return t('guestRoomConversationBadge');
-      }
-      if (hasService) {
-        return t('guestRoomConversationBadgeService');
+      const hasFederated = this.conversationEntity().hasFederatedUsers();
+      const translationKey = generateWarningBadgeKey({hasExternal, hasFederated, hasGuest, hasService});
+      if (translationKey) {
+        return t(translationKey);
       }
       return '';
     });
@@ -153,11 +191,15 @@ export class TitleBarViewModel {
 
   private readonly _startCall = (conversationEntity: Conversation, callType: CALL_TYPE): void => {
     const convType = conversationEntity.isGroup() ? CONV_TYPE.GROUP : CONV_TYPE.ONEONONE;
-    this.callingRepository.startCall(conversationEntity.id, convType, callType);
+    this.callingRepository.startCall(conversationEntity.qualifiedId, convType, callType);
   };
 
   readonly clickOnDetails = (): void => {
     this.showDetails(false);
+  };
+
+  readonly pressOnDetails = (event: KeyboardEvent): void => {
+    handleKeyDown(event, this.clickOnDetails);
   };
 
   readonly clickOnCollectionButton = (): void => {

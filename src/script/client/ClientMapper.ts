@@ -17,13 +17,15 @@
  *
  */
 
+import type {PublicClient, RegisteredClient} from '@wireapp/api-client/src/client';
 import {ClientRecord} from '../storage';
+import {isClientRecord} from '../util/TypePredicateUtil';
 import {ClientEntity} from './ClientEntity';
 
 export class ClientMapper {
   static get CONFIG() {
     return {
-      CLIENT_PAYLOAD: ['class', 'id'],
+      CLIENT_PAYLOAD: ['class', 'id', 'domain'],
       SELF_CLIENT_PAYLOAD: ['address', 'cookie', 'label', 'location', 'model', 'time', 'type'],
     };
   }
@@ -34,8 +36,12 @@ export class ClientMapper {
    * @param isSelfClient Creating self client
    * @returns Mapped client entity
    */
-  static mapClient(clientPayload: Record<string, any>, isSelfClient: boolean): ClientEntity {
-    const clientEntity = new ClientEntity(isSelfClient);
+  static mapClient(
+    clientPayload: ClientRecord | PublicClient | RegisteredClient,
+    isSelfClient: boolean,
+    domain: string | null,
+  ): ClientEntity {
+    const clientEntity = new ClientEntity(isSelfClient, domain);
 
     ClientMapper.CONFIG.CLIENT_PAYLOAD.forEach(name => ClientMapper._mapMember(clientEntity, clientPayload, name));
 
@@ -45,7 +51,7 @@ export class ClientMapper {
       );
     }
 
-    if (clientPayload.meta) {
+    if (isClientRecord(clientPayload)) {
       const {userId} = ClientEntity.dismantleUserClientId(clientPayload.meta.primary_key);
 
       clientEntity.meta.isVerified(clientPayload.meta.is_verified);
@@ -59,12 +65,16 @@ export class ClientMapper {
   /**
    * Maps an object of client IDs with their payloads to client entities.
    *
-   * @param clientsPayload Clients data
+   * @param clientRecords Clients data
    * @param isSelfClient Creating self client
    * @returns Mapped client entities
    */
-  static mapClients(clientsPayload: Record<string, any>[], isSelfClient: boolean): ClientEntity[] {
-    return clientsPayload.map(clientPayload => ClientMapper.mapClient(clientPayload, isSelfClient));
+  static mapClients(
+    clientRecords: ClientRecord[] | PublicClient[] | RegisteredClient[],
+    isSelfClient: boolean,
+    domain: string | null,
+  ): ClientEntity[] {
+    return clientRecords.map(clientRecord => ClientMapper.mapClient(clientRecord, isSelfClient, domain));
   }
 
   /**

@@ -18,11 +18,9 @@
  */
 
 import type {ClientPreKey, PreKey} from '@wireapp/api-client/src/auth/';
-import type {UserClients} from '@wireapp/api-client/src/conversation/';
-import type {UserPreKeyBundleMap} from '@wireapp/api-client/src/user/';
-import {container} from 'tsyringe';
-
+import type {QualifiedId} from '@wireapp/api-client/src/user/';
 import {APIClient} from '../service/APIClientSingleton';
+import {container} from 'tsyringe';
 
 export class CryptographyService {
   constructor(private readonly apiClient = container.resolve(APIClient)) {}
@@ -35,19 +33,8 @@ export class CryptographyService {
    * @param clientId Client ID
    * @returns Resolves with a pre-key for given the client of the user
    */
-  getUserPreKeyByIds(userId: string, clientId: string, domain: string | null): Promise<ClientPreKey> {
-    return this.apiClient.user.api.getClientPreKey(userId, clientId, domain);
-  }
-
-  /**
-   * Gets a pre-key for each client of a user client map.
-   * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/users/getMultiPrekeyBundles
-   *
-   * @param recipients User client map to request pre-keys for
-   * @returns Resolves with a pre-key for each client of the given map
-   */
-  getUsersPreKeys(recipients: UserClients): Promise<UserPreKeyBundleMap> {
-    return this.apiClient.user.api.postMultiPreKeyBundles(recipients);
+  getUserPreKeyByIds(userId: QualifiedId, clientId: string): Promise<ClientPreKey> {
+    return this.apiClient.api.user.getClientPreKey(userId, clientId);
   }
 
   /**
@@ -58,6 +45,6 @@ export class CryptographyService {
    * @returns Resolves once the pre-keys are accepted
    */
   putClientPreKeys(clientId: string, serializedPreKeys: PreKey[]): Promise<void> {
-    return this.apiClient.client.api.putClient(clientId, {prekeys: serializedPreKeys});
+    return this.apiClient.api.client.putClient(clientId, {prekeys: serializedPreKeys});
   }
 }

@@ -17,8 +17,7 @@
  *
  */
 
-import {ProgressCallback, RequestCancelable} from '@wireapp/api-client/src/http/';
-import {AssetOptions, AssetUploadData} from '@wireapp/api-client/src/asset/';
+import {ProgressCallback} from '@wireapp/api-client/src/http/';
 import {singleton, container} from 'tsyringe';
 import {legacyAsset, assetV3, isValidApiPath} from 'Util/ValidationUtil';
 
@@ -63,21 +62,13 @@ export class AssetService {
     return `${url}?access_token=${this.apiClient['accessTokenStore'].accessToken?.access_token}${assetTokenParam}${cachingParam}`;
   }
 
-  uploadFile(
-    asset: Uint8Array,
-    options: AssetOptions,
-    onProgress?: ProgressCallback,
-  ): Promise<RequestCancelable<AssetUploadData>> {
-    return this.apiClient.asset.api.postAsset(asset, options, onProgress);
-  }
-
   async downloadAssetV1(
     assetId: string,
     conversationId: string,
     forceCaching?: boolean,
     progressCallback?: ProgressCallback,
   ) {
-    return this.apiClient.asset.api.getAssetV1(assetId, conversationId, forceCaching, progressCallback);
+    return this.apiClient.api.asset.getAssetV1(assetId, conversationId, forceCaching, progressCallback);
   }
 
   async downloadAssetV2(
@@ -86,10 +77,10 @@ export class AssetService {
     forceCaching?: boolean,
     progressCallback?: ProgressCallback,
   ) {
-    return this.apiClient.asset.api.getAssetV2(assetId, conversationId, forceCaching, progressCallback);
+    return this.apiClient.api.asset.getAssetV2(assetId, conversationId, forceCaching, progressCallback);
   }
 
   async downloadAssetV3(assetId: string, token?: string, forceCaching?: boolean, progressCallback?: ProgressCallback) {
-    return this.apiClient.asset.api.getAssetV3(assetId, token, forceCaching, progressCallback);
+    return this.apiClient.api.asset.getAssetV3(assetId, token, forceCaching, progressCallback);
   }
 }

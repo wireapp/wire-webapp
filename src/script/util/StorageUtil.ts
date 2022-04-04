@@ -17,6 +17,7 @@
  *
  */
 
+import {QualifiedId} from '@wireapp/api-client/src/user';
 import {amplify} from 'amplify';
 
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
@@ -32,4 +33,11 @@ export function resetStoreValue(key: string): void {
 export function storeValue(key: string, value: any, secondsToExpire?: number): void {
   const config = secondsToExpire ? {expires: secondsToExpire * TIME_IN_MILLIS.SECOND} : undefined;
   return amplify.store(key, value, config);
+}
+
+export function constructUserPrimaryKey({id, domain}: QualifiedId): string {
+  if (domain) {
+    return `${domain}@${id}`;
+  }
+  return id;
 }
