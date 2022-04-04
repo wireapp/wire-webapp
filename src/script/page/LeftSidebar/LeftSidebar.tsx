@@ -123,6 +123,7 @@ const LeftSidebar: React.FC<LeftSidebarProps> = ({
           conversationRepository={conversationRepository}
           searchRepository={repositories.search}
           teamRepository={repositories.team}
+          integrationRepository={repositories.integration}
         />
       );
   }

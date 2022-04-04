@@ -21,10 +21,10 @@ import {CONVERSATION_TYPE} from '@wireapp/api-client/src/conversation';
 import GroupList, {GroupListProps} from './GroupList';
 import TestPage from 'Util/test/TestPage';
 import {createRandomUuid, noop} from 'Util/util';
-import {AssetRepository} from '../../assets/AssetRepository';
-import {Conversation} from '../../entity/Conversation';
-import {User} from '../../entity/User';
-import {Router} from '../../router/Router';
+import {AssetRepository} from '../../../../../assets/AssetRepository';
+import {Conversation} from '../../../../../entity/Conversation';
+import {User} from '../../../../../entity/User';
+import {Router} from '../../../../../router/Router';
 import type {QualifiedId} from '@wireapp/api-client/src/user/';
 
 class GroupListPage extends TestPage<GroupListProps> {
