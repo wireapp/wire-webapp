@@ -17,7 +17,7 @@
  *
  */
 
-import React, {useEffect, useMemo, useState} from 'react';
+import React, {useEffect, useMemo, useRef, useState} from 'react';
 
 import {registerReactComponent} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
@@ -44,6 +44,7 @@ const FullSearch: React.FC<FullSearchProps> = ({searchProvider, click = noop, ch
   const MAX_OFFSET_INDEX = 30;
 
   const [input, setInput] = useState('');
+  const inputRef = useRef<HTMLInputElement>();
   const [messages, setMessages] = useState<ContentMessage[]>([]);
   const [messageCount, setMessageCount] = useState(0);
   const [hasNoResults, setHasNoResults] = useState(false);
@@ -84,6 +85,12 @@ const FullSearch: React.FC<FullSearchProps> = ({searchProvider, click = noop, ch
     };
   }, [element, messages]);
 
+  useEffect(() => {
+    if (inputRef.current) {
+      inputRef.current.focus();
+    }
+  }, []);
+
   const formatSearchResult = useMemo(() => {
     const regex = getSearchRegex(input);
 
@@ -118,6 +125,7 @@ const FullSearch: React.FC<FullSearchProps> = ({searchProvider, click = noop, ch
           <input
             type="text"
             value={input}
+            ref={inputRef}
             placeholder={t('fullsearchPlaceholder')}
             onChange={event => setInput(event.target.value)}
             data-uie-name="full-search-header-input"
