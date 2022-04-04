@@ -283,8 +283,8 @@ const UserList: React.FC<UserListProps> = ({
                         external={teamState.isExternal(user.id)}
                         selfInTeam={selfInTeam}
                         isSelfVerified={isSelfVerified}
-                        onClick={(user, event) => onClickOrKeyPressed(user, event)}
-                        onKeyDown={(user, event) => onUserKeyPressed(user, event)}
+                        onClick={(user, event) => onClickOrKeyPressed(user as User, event)}
+                        onKeyDown={(user, event) => onUserKeyPressed(user as User, event)}
                       />
                     </li>
                   ))}

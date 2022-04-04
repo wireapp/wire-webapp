@@ -51,8 +51,8 @@ export interface ParticipantItemProps extends Omit<React.HTMLProps<HTMLDivElemen
   mode?: UserlistMode;
   noInteraction?: boolean;
   noUnderline?: boolean;
-  onClick?: (user: User, event: MouseEvent) => void;
-  onKeyDown?: (user: User, event: KeyboardEvent) => void;
+  onClick?: (user: User | ServiceEntity, event: MouseEvent) => void;
+  onKeyDown?: (user: User | ServiceEntity, event: KeyboardEvent) => void;
   participant: User | ServiceEntity;
   selfInTeam?: boolean;
   showArrow?: boolean;
