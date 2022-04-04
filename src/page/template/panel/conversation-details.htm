@@ -129,7 +129,7 @@
           <!-- ko if: activeConversation() && activeConversation().isGroup() -->
           <!-- ko if: userParticipants().length -->
             <user-list
-              params="user: userParticipants, click: clickOnShowUser, noUnderline: true, arrow: true, searchRepository: searchRepository, teamRepository: teamRepository, conversationRepository: conversationRepository, conversation: activeConversation, truncate: true, showEmptyAdmin: true, selfFirst: false, noSelfInteraction: true"
+              params="observers: {users: userParticipants}, click: clickOnShowUser, noUnderline: true, arrow: true, searchRepository: searchRepository, teamRepository: teamRepository, conversationRepository: conversationRepository, conversation: activeConversation, truncate: true, showEmptyAdmin: true, selfFirst: false, noSelfInteraction: true"
               data-uie-name="list-users"
             ></user-list>
             <!-- ko if: showAllUsersCount() > 0 -->

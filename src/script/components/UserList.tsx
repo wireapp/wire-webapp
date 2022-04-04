@@ -52,44 +52,36 @@ export enum UserlistMode {
 const USER_CHUNK_SIZE = 64;
 
 export interface UserListProps {
-  addToSelected: (user: User) => void;
   arrow: boolean;
   click: (userEntity: User, event: MouseEvent | KeyboardEvent) => void;
   conversation: Conversation;
   conversationRepository: ConversationRepository;
   conversationState?: ConversationState;
-  filter: string;
   highlightedUsers: () => User[];
   infos: Record<string, string>;
   maxVisibleUsers: number;
   mode: UserlistMode;
   noSelfInteraction: boolean;
   noUnderline: boolean;
+  observables: {filter: ko.Observable<string>; selected: ko.ObservableArray<User>; users: ko.ObservableArray<User>};
   reducedUserCount: number;
-  removeFromSelected: (user: User) => void;
   searchRepository: SearchRepository;
-  selected: User[];
   selfFirst: boolean;
   showEmptyAdmin: boolean;
   skipSearch: boolean;
   teamRepository: TeamRepository;
   teamState: TeamState;
   truncate: boolean;
-  user: User[];
   userState?: UserState;
 }
 
 const UserList: React.FC<UserListProps> = ({
   click,
-  filter = '',
   skipSearch = false,
-  selected: selectedUsers,
-  addToSelected,
-  removeFromSelected,
   searchRepository,
   teamRepository,
   conversationRepository,
-  user: userEntities,
+  observables,
   infos,
   highlightedUsers = () => [],
   noUnderline = false,
@@ -116,10 +108,15 @@ const UserList: React.FC<UserListProps> = ({
   const [filteredUserEntities, setFilteredUserEntities] = useState<User[]>([]);
 
   const highlightedUserIds = highlightedUsers().map(user => user.id);
-  const isSelectEnabled = !!selectedUsers;
   const selfInTeam = userState.self().inTeam();
   const {self} = useKoSubscribableChildren(userState, ['self']);
+  const {
+    users: userEntities,
+    selected: selectedUsers,
+    filter = '',
+  } = useKoSubscribableChildren(observables, ['users', 'selected', 'filter']);
   const {is_verified: isSelfVerified} = useKoSubscribableChildren(self, ['is_verified']);
+  const isSelectEnabled = !!selectedUsers;
 
   const showRoles = !!conversation;
   const isCompactMode = mode === UserlistMode.COMPACT;
@@ -142,9 +139,9 @@ const UserList: React.FC<UserListProps> = ({
   const toggleUserSelection = (userEntity: User): void => {
     if (isSelectEnabled) {
       if (isSelected(userEntity)) {
-        removeFromSelected(userEntity);
+        observables.selected.remove(userEntity);
       } else {
-        addToSelected(userEntity);
+        observables.selected.push(userEntity);
       }
     }
   };
@@ -166,6 +163,7 @@ const UserList: React.FC<UserListProps> = ({
   }, 300);
 
   // Filter all list items if a filter is provided
+
   useEffect(() => {
     const connectedUsers = conversationState.connectedUsers();
     let resultUsers = userEntities.slice();
@@ -202,7 +200,7 @@ const UserList: React.FC<UserListProps> = ({
     // make sure the self user is the first one in the list
     const [selfUser, otherUsers] = partition(resultUsers, user => user.isMe);
     setFilteredUserEntities(selfUser.concat(otherUsers));
-  }, [filter]);
+  }, [filter, userEntities.length]);
 
   const foundUserEntities = () => {
     if (!remoteTeamMembers.length) {
@@ -272,7 +270,7 @@ const UserList: React.FC<UserListProps> = ({
                   {adminUsers.slice(0, maxShownUsers).map(user => (
                     <li key={user.id}>
                       <ParticipantItem
-                        noInteraction={noSelfInteraction && user.isMe}
+                        noInteraction={!(noSelfInteraction && user.isMe)}
                         participant={user}
                         noUnderline={noUnderline}
                         highlighted={highlightedUserIds.includes(user.id)}
@@ -306,7 +304,7 @@ const UserList: React.FC<UserListProps> = ({
                 {memberUsers.slice(0, maxShownUsers - adminUsers.length).map(user => (
                   <ParticipantItem
                     key={user.id}
-                    noInteraction={noSelfInteraction && user.isMe}
+                    noInteraction={!(noSelfInteraction && user.isMe)}
                     participant={user}
                     noUnderline={noUnderline}
                     highlighted={highlightedUserIds.includes(user.id)}
@@ -317,7 +315,7 @@ const UserList: React.FC<UserListProps> = ({
                     external={teamState.isExternal(user.id)}
                     selfInTeam={selfInTeam}
                     isSelfVerified={isSelfVerified}
-                    onClick={noSelfInteraction && user.isMe ? onClickOrKeyPressed : undefined}
+                    onClick={!(noSelfInteraction && user.isMe) ? onClickOrKeyPressed : undefined}
                   />
                 ))}
               </div>
@@ -333,7 +331,7 @@ const UserList: React.FC<UserListProps> = ({
             .map(user => (
               <ParticipantItem
                 key={user.id}
-                noInteraction={noSelfInteraction && user.isMe}
+                noInteraction={!(noSelfInteraction && user.isMe)}
                 participant={user}
                 noUnderline={noUnderline}
                 highlighted={highlightedUserIds.includes(user.id)}
@@ -344,7 +342,7 @@ const UserList: React.FC<UserListProps> = ({
                 external={teamState.isExternal(user.id)}
                 selfInTeam={selfInTeam}
                 isSelfVerified={isSelfVerified}
-                onClick={noSelfInteraction && user.isMe ? onClickOrKeyPressed : undefined}
+                onClick={!(noSelfInteraction && user.isMe) ? onClickOrKeyPressed : undefined}
               />
             ))}
         </div>
