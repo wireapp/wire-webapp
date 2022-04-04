@@ -63,10 +63,9 @@ export interface UserListProps {
   mode: UserlistMode;
   noSelfInteraction: boolean;
   noUnderline: boolean;
-  observers: {filter: ko.Observable<string>; users: ko.ObservableArray<User>};
+  observables: {filter: ko.Observable<string>; selected: ko.ObservableArray<User>; users: ko.ObservableArray<User>};
   reducedUserCount: number;
   searchRepository: SearchRepository;
-  selected: {selected: ko.ObservableArray<User>};
   selfFirst: boolean;
   showEmptyAdmin: boolean;
   skipSearch: boolean;
@@ -79,11 +78,10 @@ export interface UserListProps {
 const UserList: React.FC<UserListProps> = ({
   click,
   skipSearch = false,
-  selected,
   searchRepository,
   teamRepository,
   conversationRepository,
-  observers,
+  observables,
   infos,
   highlightedUsers = () => [],
   noUnderline = false,
@@ -112,8 +110,11 @@ const UserList: React.FC<UserListProps> = ({
   const highlightedUserIds = highlightedUsers().map(user => user.id);
   const selfInTeam = userState.self().inTeam();
   const {self} = useKoSubscribableChildren(userState, ['self']);
-  const {selected: selectedUsers} = useKoSubscribableChildren(selected, ['selected']);
-  const {users: userEntities, filter = ''} = useKoSubscribableChildren(observers, ['users', 'filter']);
+  const {
+    users: userEntities,
+    selected: selectedUsers,
+    filter = '',
+  } = useKoSubscribableChildren(observables, ['users', 'selected', 'filter']);
   const {is_verified: isSelfVerified} = useKoSubscribableChildren(self, ['is_verified']);
   const isSelectEnabled = !!selectedUsers;
 
@@ -138,9 +139,9 @@ const UserList: React.FC<UserListProps> = ({
   const toggleUserSelection = (userEntity: User): void => {
     if (isSelectEnabled) {
       if (isSelected(userEntity)) {
-        selected.selected.remove(userEntity);
+        observables.selected.remove(userEntity);
       } else {
-        selected.selected.push(userEntity);
+        observables.selected.push(userEntity);
       }
     }
   };
