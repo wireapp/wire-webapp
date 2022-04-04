@@ -20,7 +20,7 @@
 import {singleton} from 'tsyringe';
 import ko from 'knockout';
 import {Call} from './Call';
-import {STATE as CALL_STATE} from '@wireapp/avs';
+import {REASON as CALL_REASON, STATE as CALL_STATE} from '@wireapp/avs';
 import {CallViewTab} from '../view_model/CallingViewModel';
 import {Config} from '../Config';
 import type {ElectronDesktopCapturerSource} from '../media/MediaDevicesHandler';
@@ -36,7 +36,9 @@ export enum MuteState {
 
 @singleton()
 export class CallState {
-  public readonly activeCalls: ko.ObservableArray<Call> = ko.observableArray();
+  public readonly calls: ko.ObservableArray<Call> = ko.observableArray();
+  /** List of calls that can be joined by the user */
+  public readonly joinableCalls: ko.PureComputed<Call[]>;
   public readonly acceptedVersionWarnings: ko.ObservableArray<QualifiedId> = ko.observableArray<QualifiedId>();
   public readonly cbrEncoding: ko.Observable<number> = ko.observable(
     Config.getConfig().FEATURE.ENFORCE_CONSTANT_BITRATE ? 1 : 0,
@@ -44,18 +46,26 @@ export class CallState {
   public readonly videoSpeakersActiveTab: ko.Observable<string> = ko.observable(CallViewTab.ALL);
   readonly selectableScreens: ko.Observable<ElectronDesktopCapturerSource[]> = ko.observable([]);
   readonly selectableWindows: ko.Observable<ElectronDesktopCapturerSource[]> = ko.observable([]);
+  /** call that is current active (connecting or connected) */
+  public readonly activeCalls: ko.PureComputed<Call[]>;
   public readonly joinedCall: ko.PureComputed<Call | undefined>;
   public readonly activeCallViewTab: ko.Observable<string> = ko.observable(CallViewTab.ALL);
   readonly isChoosingScreen: ko.PureComputed<boolean>;
   readonly isSpeakersViewActive: ko.PureComputed<boolean>;
 
   constructor() {
-    this.joinedCall = ko.pureComputed(() => this.activeCalls().find(call => call.state() === CALL_STATE.MEDIA_ESTAB));
+    this.joinedCall = ko.pureComputed(() => this.calls().find(call => call.state() === CALL_STATE.MEDIA_ESTAB));
+    this.activeCalls = ko.pureComputed(() => this.calls().filter(call => !call.reason()));
+    this.joinableCalls = ko.pureComputed(() =>
+      this.calls().filter(
+        call => call.state() === CALL_STATE.INCOMING && call.reason() !== CALL_REASON.ANSWERED_ELSEWHERE,
+      ),
+    );
     this.isChoosingScreen = ko.pureComputed(
       () => this.selectableScreens().length > 0 || this.selectableWindows().length > 0,
     );
 
-    this.activeCalls.subscribe(activeCalls => {
+    this.calls.subscribe(activeCalls => {
       const activeCallIds = activeCalls.map(call => call.conversationId);
       this.acceptedVersionWarnings.remove(
         acceptedId => !activeCallIds.some(callId => matchQualifiedIds(acceptedId, callId)),
