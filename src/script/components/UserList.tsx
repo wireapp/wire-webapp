@@ -21,6 +21,8 @@ import React, {Fragment, useEffect, useState} from 'react';
 import cx from 'classnames';
 
 import {container} from 'tsyringe';
+import {isEnterKey, isSpaceKey} from 'Util/KeyboardUtil';
+import {debounce} from 'underscore';
 
 import {t} from 'Util/LocalizerUtil';
 import {partition} from 'Util/ArrayUtil';
@@ -36,7 +38,7 @@ import {validateHandle} from '../user/UserHandleGenerator';
 
 import {UserState} from '../user/UserState';
 import {ConversationState} from '../conversation/ConversationState';
-import {registerReactComponent, useKoSubscribable} from 'Util/ComponentUtil';
+import {registerStaticReactComponent, useKoSubscribableChildren} from 'Util/ComponentUtil';
 import ParticipantItem from 'Components/list/ParticipantItem';
 import {TeamState} from '../team/TeamState';
 import useEffectRef from 'Util/useEffectRef';
@@ -52,7 +54,7 @@ const USER_CHUNK_SIZE = 64;
 export interface UserListProps {
   addToSelected: (user: User) => void;
   arrow: boolean;
-  click: (userEntity: User) => void;
+  click: (userEntity: User, event: MouseEvent | KeyboardEvent) => void;
   conversation: Conversation;
   conversationRepository: ConversationRepository;
   conversationState?: ConversationState;
@@ -114,14 +116,30 @@ const UserList: React.FC<UserListProps> = ({
   const [filteredUserEntities, setFilteredUserEntities] = useState<User[]>([]);
 
   const highlightedUserIds = highlightedUsers().map(user => user.id);
-  const isSelectEnabled = typeof selectedUsers === 'function';
+  const isSelectEnabled = !!selectedUsers;
   const selfInTeam = userState.self().inTeam();
-  const isSelfVerified = useKoSubscribable(userState.self().is_verified);
+  const {self} = useKoSubscribableChildren(userState, ['self']);
+  const {is_verified: isSelfVerified} = useKoSubscribableChildren(self, ['is_verified']);
+
   const showRoles = !!conversation;
   const isCompactMode = mode === UserlistMode.COMPACT;
   const cssClasses = isCompactMode ? 'search-list-sm' : 'search-list-lg';
 
-  const onUserClick = (userEntity: User) => {
+  const onUserKeyPressed = (userEntity: User, event: KeyboardEvent) => {
+    if (isSpaceKey(event) || isEnterKey(event)) {
+      onClickOrKeyPressed(userEntity, event);
+    }
+    return true;
+  };
+
+  const onClickOrKeyPressed = (userEntity: User, event: MouseEvent | KeyboardEvent) => {
+    toggleUserSelection(userEntity);
+    if (typeof click === 'function') {
+      click(userEntity, event);
+    }
+  };
+
+  const toggleUserSelection = (userEntity: User): void => {
     if (isSelectEnabled) {
       if (isSelected(userEntity)) {
         removeFromSelected(userEntity);
@@ -129,16 +147,13 @@ const UserList: React.FC<UserListProps> = ({
         addToSelected(userEntity);
       }
     }
-    if (typeof click === 'function') {
-      click(userEntity);
-    }
   };
 
   /**
    * Try to load additional members from the backend.
    * This is needed for large teams (>= 2000 members)
    */
-  async function fetchMembersFromBackend(query: string, isHandle: boolean, ignoreMembers: User[]) {
+  const fetchMembersFromBackend = debounce(async (query: string, isHandle: boolean, ignoreMembers: User[]) => {
     const resultUsers = await searchRepository.searchByName(query, isHandle);
     const selfTeamId = userState.self().teamId;
     const foundMembers = resultUsers.filter(user => user.teamId === selfTeamId);
@@ -148,7 +163,7 @@ const UserList: React.FC<UserListProps> = ({
     // We shouldn't show any members that have the 'external' role and are not already locally known.
     const nonExternalMembers = await teamRepository.filterExternals(uniqueMembers);
     setRemoteTeamMembers(nonExternalMembers);
-  }
+  }, 300);
 
   // Filter all list items if a filter is provided
   useEffect(() => {
@@ -253,25 +268,27 @@ const UserList: React.FC<UserListProps> = ({
                 {t('searchListAdmins', adminCount)}
               </div>
               {adminUsers.length > 0 && (
-                <div className={cx('search-list', cssClasses)} data-uie-name="list-admins">
+                <ul className={cx('search-list', cssClasses)} data-uie-name="list-admins">
                   {adminUsers.slice(0, maxShownUsers).map(user => (
-                    <ParticipantItem
-                      key={user.id}
-                      noInteraction={noSelfInteraction && user.isMe}
-                      participant={user}
-                      noUnderline={noUnderline}
-                      highlighted={highlightedUserIds.includes(user.id)}
-                      customInfo={infos && infos[user.id]}
-                      canSelect={isSelectEnabled}
-                      isSelected={isSelected(user)}
-                      mode={mode}
-                      external={teamState.isExternal(user.id)}
-                      selfInTeam={selfInTeam}
-                      isSelfVerified={isSelfVerified}
-                      onClick={noSelfInteraction && user.isMe ? onUserClick : undefined}
-                    />
+                    <li key={user.id}>
+                      <ParticipantItem
+                        noInteraction={noSelfInteraction && user.isMe}
+                        participant={user}
+                        noUnderline={noUnderline}
+                        highlighted={highlightedUserIds.includes(user.id)}
+                        customInfo={infos && infos[user.id]}
+                        canSelect={isSelectEnabled}
+                        isSelected={isSelected(user)}
+                        mode={mode}
+                        external={teamState.isExternal(user.id)}
+                        selfInTeam={selfInTeam}
+                        isSelfVerified={isSelfVerified}
+                        onClick={(user, event) => onClickOrKeyPressed(user, event)}
+                        onKeyDown={(user, event) => onUserKeyPressed(user, event)}
+                      />
+                    </li>
                   ))}
-                </div>
+                </ul>
               )}
               {!(adminUsers.length > 0) && (
                 <div className="user-list__no-admin" data-uie-name="status-no-admins">
@@ -300,7 +317,7 @@ const UserList: React.FC<UserListProps> = ({
                     external={teamState.isExternal(user.id)}
                     selfInTeam={selfInTeam}
                     isSelfVerified={isSelfVerified}
-                    onClick={noSelfInteraction && user.isMe ? onUserClick : undefined}
+                    onClick={noSelfInteraction && user.isMe ? onClickOrKeyPressed : undefined}
                   />
                 ))}
               </div>
@@ -327,7 +344,7 @@ const UserList: React.FC<UserListProps> = ({
                 external={teamState.isExternal(user.id)}
                 selfInTeam={selfInTeam}
                 isSelfVerified={isSelfVerified}
-                onClick={noSelfInteraction && user.isMe ? onUserClick : undefined}
+                onClick={noSelfInteraction && user.isMe ? onClickOrKeyPressed : undefined}
               />
             ))}
         </div>
@@ -360,8 +377,4 @@ const UserList: React.FC<UserListProps> = ({
 
 export default UserList;
 
-registerReactComponent('user-list', {
-  bindings:
-    'user: ko.unwrap(‍user), selected: ko.unwrap(‍selected), addToSelected: selected, removeFromSelected: selected, filter: ko.unwrap(‍filter), conversation: ko.unwrap(‍conversation), ‍infos: ko.unwrap(‍infos), arrow, userState, teamState, conversationState, ‍click, ‍conversationRepository, ‍highlightedUsers, ‍maxVisibleUsers, ‍mode, ‍noSelfInteraction, ‍noUnderline, ‍reducedUserCount, ‍searchRepository, ‍selfFirst, ‍showEmptyAdmin, ‍skipSearch, ‍teamRepository, ‍truncate',
-  component: UserList,
-});
+registerStaticReactComponent('user-list', UserList);

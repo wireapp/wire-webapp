@@ -38,7 +38,7 @@ import ParticipantMicOnIcon from 'Components/calling/ParticipantMicOnIcon';
 import Icon from 'Components/Icon';
 import useEffectRef from 'Util/useEffectRef';
 
-export interface ParticipantItemProps extends Omit<React.HTMLProps<HTMLDivElement>, 'onClick'> {
+export interface ParticipantItemProps extends Omit<React.HTMLProps<HTMLDivElement>, 'onClick' | 'onKeyDown'> {
   badge?: boolean;
   callParticipant?: Participant;
   canSelect?: boolean;
@@ -51,7 +51,8 @@ export interface ParticipantItemProps extends Omit<React.HTMLProps<HTMLDivElemen
   mode?: UserlistMode;
   noInteraction?: boolean;
   noUnderline?: boolean;
-  onClick?: (user: User) => void;
+  onClick?: (user: User, event: MouseEvent) => void;
+  onKeyDown?: (user: User, event: KeyboardEvent) => void;
   participant: User | ServiceEntity;
   selfInTeam?: boolean;
   showArrow?: boolean;
@@ -138,8 +139,8 @@ const ParticipantItem: React.FC<ParticipantItemProps> = ({
       role="button"
       tabIndex={0}
       onContextMenu={onContextMenu}
-      onClick={() => onClick(participant as User)}
-      onKeyDown={onKeyDown}
+      onClick={event => onClick(participant as User, event.nativeEvent)}
+      onKeyDown={event => onKeyDown(participant as User, event.nativeEvent)}
     >
       <div
         className="participant-item"
