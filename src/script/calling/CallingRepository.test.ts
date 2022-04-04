@@ -75,7 +75,7 @@ describe('CallingRepository', () => {
   });
 
   afterEach(() => {
-    callingRepository['callState'].activeCalls([]);
+    callingRepository['callState'].calls([]);
   });
 
   afterAll(() => {
@@ -93,7 +93,7 @@ describe('CallingRepository', () => {
         {currentAvailableDeviceId: mediaDevices} as MediaDevicesHandler,
       );
       activeCall.state(CALL_STATE.MEDIA_ESTAB);
-      spyOn(callingRepository['callState'], 'activeCalls').and.returnValue([activeCall]);
+      spyOn(callingRepository['callState'], 'calls').and.returnValue([activeCall]);
       spyOn(amplify, 'publish').and.returnValue(undefined);
       const conversationId = createConversationId();
       const conversationType = CONV_TYPE.ONEONONE;
@@ -143,7 +143,7 @@ describe('CallingRepository', () => {
       declinedCall.state(CALL_STATE.INCOMING);
       declinedCall.reason(REASON.STILL_ONGOING);
 
-      callingRepository['callState'].activeCalls([incomingCall, activeCall, declinedCall]);
+      callingRepository['callState'].calls([incomingCall, activeCall, declinedCall]);
 
       expect(callingRepository['callState'].joinedCall()).toBe(activeCall);
     });
@@ -360,10 +360,10 @@ describe('CallingRepository ISO', () => {
         type: CALL.E_CALL,
       };
 
-      expect(callingRepo['callState'].activeCalls().length).toBe(0);
+      expect(callingRepo['callState'].calls().length).toBe(0);
 
       callingRepo.onIncomingCall(call => {
-        expect(callingRepo['callState'].activeCalls().length).toBe(1);
+        expect(callingRepo['callState'].calls().length).toBe(1);
 
         done();
       });
@@ -439,7 +439,7 @@ describe.skip('E2E audio call', () => {
         }, 30);
       }
     });
-    activeCallsSub = client['callState'].activeCalls.subscribe(calls => {
+    activeCallsSub = client['callState'].calls.subscribe(calls => {
       if (calls.length === 0) {
         onCallClosed();
       }
