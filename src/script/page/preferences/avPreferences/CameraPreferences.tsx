@@ -121,6 +121,7 @@ const CameraPreferences: React.FC<CameraPreferencesProps> = ({
         icon={Icon.Camera}
         isRequesting={isRequesting}
         onChange={deviceId => devicesHandler.currentDeviceId[DeviceTypes.VIDEO_INPUT](deviceId)}
+        title={t('preferencesAVCamera')}
       />
 
       {isRequesting ? (

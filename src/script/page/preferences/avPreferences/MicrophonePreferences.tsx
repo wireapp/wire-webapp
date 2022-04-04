@@ -100,6 +100,7 @@ const MicrophonePreferences: React.FC<MicrophonePreferencesProps> = ({
         icon={Icon.MicOn}
         isRequesting={isRequesting}
         onChange={deviceId => devicesHandler.currentDeviceId[DeviceTypes.AUDIO_INPUT](deviceId)}
+        title={t('preferencesAVMicrophone')}
       />
       {isRequesting ? (
         <div className="preferences-av-spinner">
