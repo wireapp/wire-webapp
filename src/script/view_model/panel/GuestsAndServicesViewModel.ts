@@ -87,7 +87,7 @@ export class GuestsAndServicesViewModel extends BasePanelViewModel {
       if (this.activeConversation().inTeam()) {
         return this.teamState.isGuestLinkEnabled();
       }
-      return conversationHasGuestLinkEnabled();
+      return this.teamState.isGuestLinkEnabled() && conversationHasGuestLinkEnabled();
     });
     this.guestLinkDisabledInfo = ko.pureComputed(() => {
       if (conversationHasGuestLinkEnabled() === false) {
