@@ -88,6 +88,7 @@ export class ContentViewModel {
   conversationRepository: ConversationRepository;
   messageRepository: MessageRepository;
   elementId: string;
+  sidebarId: string;
   emojiInput: EmojiInputViewModel;
   giphy: GiphyViewModel;
   groupCreation: GroupCreationViewModel;
@@ -133,6 +134,7 @@ export class ContentViewModel {
     this.conversationState = container.resolve(ConversationState);
 
     this.elementId = 'center-column';
+    this.sidebarId = 'left-column';
     this.mainViewModel = mainViewModel;
     this.conversationRepository = repositories.conversation;
     this.userRepository = repositories.user;
@@ -224,7 +226,7 @@ export class ContentViewModel {
     amplify.subscribe(WebAppEvents.CONVERSATION.SHOW, this.showConversation);
   }
 
-  private _shiftContent(contentSelector: string): void {
+  private _shiftContent(contentSelector: string, hideSidebar: boolean = false): void {
     const incomingCssClass = 'content-animation-incoming-horizontal-left';
 
     $(contentSelector)
@@ -234,6 +236,13 @@ export class ContentViewModel {
       .one(alias.animationend, function () {
         $(this).removeClass(incomingCssClass).off(alias.animationend);
       });
+
+    const sidebar = $(`#${this.sidebarId}`);
+    if (hideSidebar) {
+      sidebar.css('visibility', 'hidden');
+    } else {
+      sidebar.removeAttr('style');
+    }
   }
 
   /**
@@ -408,7 +417,11 @@ export class ContentViewModel {
 
   private readonly showContent = (newContentState: string) => {
     this.state(newContentState);
-    return this._shiftContent(this.getElementOfContent(newContentState));
+    return this._shiftContent(
+      this.getElementOfContent(newContentState),
+      newContentState === ContentViewModel.STATE.HISTORY_EXPORT ||
+        newContentState === ContentViewModel.STATE.HISTORY_IMPORT,
+    );
   };
 
   private readonly popNotification = (): void => {
