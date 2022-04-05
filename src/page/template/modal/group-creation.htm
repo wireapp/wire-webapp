@@ -19,7 +19,7 @@
         <div class="group-creation__list" data-bind="fadingscrollbar">
           <!-- ko if: contacts().length -->
             <user-list class="group-creation-modal-participants-list user-list-light" params="  
-              observers: {users: contacts, filter: participantsInput, selected: selectedContacts},
+              observables: {users: contacts, filter: participantsInput, selected: selectedContacts},
               searchRepository: searchRepository,
               teamRepository: teamRepository,
               conversationRepository: conversationRepository,

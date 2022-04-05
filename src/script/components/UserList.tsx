@@ -354,7 +354,7 @@ const UserList: React.FC<UserListProps> = ({
         </div>
       )}
 
-      {typeof filter === 'function' && (
+      {!!filter && (
         <Fragment>
           {userEntities.length === 0 && (
             <div className="user-list__no-results" data-uie-name="status-all-added">

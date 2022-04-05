@@ -51,7 +51,7 @@
           <div class="legal-hold-modal__subjects" data-bind="text: t('legalHoldSubjects')"></div>
 
           <user-list
-            params="observers: {users: users}, click: showUserDevices, conversationRepository: conversationRepository, teamRepository: teamRepository, noUnderline: true, arrow: true"
+            params="observables: {users: users}, click: showUserDevices, conversationRepository: conversationRepository, teamRepository: teamRepository, noUnderline: true, arrow: true"
           ></user-list>
         <!-- /ko -->
         <!-- ko if: devicesUser() -->
