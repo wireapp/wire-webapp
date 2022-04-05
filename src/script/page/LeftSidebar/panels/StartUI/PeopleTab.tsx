@@ -218,13 +218,14 @@ export const PeopleTab: React.FC<{
             ) : (
               <h3 className="start-ui-list-header start-ui-list-header-connections">{t('searchConnections')}</h3>
             )}
-            <UserList
-              //className="search-list-theme-black"
-              onClick={user => openContact(user)}
-              conversationRepository={conversationRepository}
-              mode={UserlistMode.COMPACT}
-              users={results.contacts}
-            />
+            <div className="search-list-theme-black">
+              <UserList
+                onClick={user => openContact(user)}
+                conversationRepository={conversationRepository}
+                mode={UserlistMode.COMPACT}
+                users={results.contacts}
+              />
+            </div>
           </div>
         )}
         {results.groups.length > 0 && (
@@ -244,13 +245,14 @@ export const PeopleTab: React.FC<{
             <h3 className="start-ui-list-header">
               {searchOnFederatedDomain() ? t('searchOthersFederation', searchOnFederatedDomain()) : t('searchOthers')}
             </h3>
-            <UserList
-              //className="search-list-theme-black"
-              users={results.others}
-              onClick={openOther}
-              mode={UserlistMode.OTHERS}
-              conversationRepository={conversationRepository}
-            />
+            <div className="search-list-theme-black">
+              <UserList
+                users={results.others}
+                onClick={openOther}
+                mode={UserlistMode.OTHERS}
+                conversationRepository={conversationRepository}
+              />
+            </div>
           </div>
         )}
       </div>
