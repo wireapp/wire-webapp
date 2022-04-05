@@ -14,7 +14,7 @@ import {noop} from 'underscore';
 import GroupList from './components/GroupList';
 import {Conversation} from 'src/script/entity/Conversation';
 
-type SearchResultsData = {contacts?: User[]; groups?: Conversation[]; others?: User[]};
+type SearchResultsData = {contacts: User[]; groups: Conversation[]; others: User[]};
 
 export const PeopleTab: React.FC<{
   canSearchUnconnectedUsers: boolean;
@@ -37,7 +37,7 @@ export const PeopleTab: React.FC<{
   searchRepository,
   conversationRepository,
 }) => {
-  const [results, setResults] = useState<SearchResultsData>({});
+  const [results, setResults] = useState<SearchResultsData>({contacts: [], groups: [], others: []});
 
   useDebounce(
     async () => {
@@ -45,7 +45,7 @@ export const PeopleTab: React.FC<{
 
       const query = SearchRepository.normalizeQuery(searchQuery);
       if (!query) {
-        setResults({contacts: allLocalUsers});
+        setResults({...results, contacts: allLocalUsers});
         return;
       }
 
@@ -70,6 +70,7 @@ export const PeopleTab: React.FC<{
       const localSearchResults: SearchResultsData = {
         contacts: filteredResults,
         groups: conversationRepository.getGroupsByName(query, isHandle),
+        others: [],
       };
       setResults(localSearchResults);
       if (searchRemote) {
@@ -93,11 +94,10 @@ export const PeopleTab: React.FC<{
             )}
             <UserList
               //className="search-list-theme-black"
-              click={noop}
+              onClick={noop}
               conversationRepository={conversationRepository}
               mode={UserlistMode.COMPACT}
-              teamRepository={teamRepository}
-              user={results.contacts}
+              users={results.contacts}
             />
           </div>
         )}
@@ -120,10 +120,9 @@ export const PeopleTab: React.FC<{
             </h3>
             <UserList
               //className="search-list-theme-black"
-              user={results.others ?? []}
-              click={noop}
+              users={results.others ?? []}
+              onClick={noop}
               mode={UserlistMode.OTHERS}
-              teamRepository={teamRepository}
               conversationRepository={conversationRepository}
             />
           </div>

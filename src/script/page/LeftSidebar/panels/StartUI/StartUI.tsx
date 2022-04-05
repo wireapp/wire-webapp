@@ -142,7 +142,7 @@ const StartUI: React.FC<StartUIProps> = ({
       <span className="icon-invite start-ui-import-icon"></span>
       <span>{t('searchInvite', brandName)}</span>
     </button>
-  ) : null;
+  ) : undefined;
 
   return (
     <ListWrapper id={'start-ui'} header={teamName} onClose={onClose} before={before} footer={footer}>

@@ -30,6 +30,7 @@ import '../Config';
 import '../page/AccentColorPicker';
 import 'Components/CopyToClipboard';
 import '../page/LeftSidebar/panels/StartUI/components/GroupList';
+import 'Components/UserSearchableList';
 import 'Components/toggle/BaseToggle';
 import 'Components/icons';
 import 'Components/Image';
