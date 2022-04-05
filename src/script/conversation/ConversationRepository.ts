@@ -986,7 +986,7 @@ export class ConversationRepository {
     return this.conversation_service.getActiveConversationsFromDb().then(conversation_ids => {
       return conversation_ids
         .map(conversation_id => this.conversationState.findConversation(conversation_id))
-        .filter(conversationEntity => conversationEntity);
+        .filter((conversationEntity): conversationEntity is Conversation => !!conversationEntity);
     });
   }
 

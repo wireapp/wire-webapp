@@ -68,8 +68,14 @@ const StartUI: React.FC<StartUIProps> = ({
 }) => {
   const brandName = Config.getConfig().BRAND_NAME;
   const {self: selfUser} = useKoSubscribableChildren(userState, ['self']);
-  const {canInviteTeamMembers, canSearchUnconnectedUsers, canManageServices, canChatWithServices} =
-    generatePermissionHelpers(selfUser.teamRole());
+  const {
+    canInviteTeamMembers,
+    canSearchUnconnectedUsers,
+    canManageServices,
+    canChatWithServices,
+    canCreateGuestRoom,
+    canCreateGroupConversation,
+  } = generatePermissionHelpers(selfUser.teamRole());
 
   const isTeam = teamState.isTeam();
   const teamName = teamState.teamName();
@@ -134,8 +140,8 @@ const StartUI: React.FC<StartUIProps> = ({
         close={onClose}
         mainViewModel={mainViewModel}
         canInviteTeamMembers={canInviteTeamMembers()}
-        canCreateGroupConversation={false}
-        canCreateGuestRoom={false}
+        canCreateGroupConversation={canCreateGroupConversation()}
+        canCreateGuestRoom={canCreateGuestRoom()}
       />
     ) : (
       <ServicesTab

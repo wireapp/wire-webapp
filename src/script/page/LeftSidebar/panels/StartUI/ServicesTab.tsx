@@ -5,15 +5,16 @@ import Icon from 'Components/Icon';
 import ServiceList from 'Components/ServiceList';
 import {ServiceEntity} from 'src/script/integration/ServiceEntity';
 import {IntegrationRepository} from 'src/script/integration/IntegrationRepository';
+import {getManageServicesUrl} from '../../../../externalRoute';
 
 export const ServicesTab: React.FC<{
   canManageServices: boolean;
   integrationRepository: IntegrationRepository;
-  manageServiceUrl?: string;
   searchQuery: string;
-}> = ({searchQuery, canManageServices, manageServiceUrl, integrationRepository}) => {
+}> = ({searchQuery, canManageServices, integrationRepository}) => {
   const isInitial = false;
   const [services, setServices] = useState<ServiceEntity[]>(integrationRepository.services());
+  const manageServicesUrl = getManageServicesUrl('client_landing');
 
   useDebounce(
     async () => {
@@ -60,7 +61,7 @@ export const ServicesTab: React.FC<{
           <span className="search__no-services__icon">
             <Icon.Service />
           </span>
-          {canManageServices && manageServiceUrl && (
+          {canManageServices && manageServicesUrl && (
             <>
               <div className="search__no-services__info" data-uie-name="label-no-services-enabled-manager">
                 {t('searchNoServicesManager')}

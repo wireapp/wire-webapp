@@ -15,7 +15,10 @@ import {Conversation} from 'src/script/entity/Conversation';
 import {MainViewModel} from 'src/script/view_model/MainViewModel';
 import Icon from 'Components/Icon';
 import TopPeople from './components/TopPeople';
-import {getManageServicesUrl, getManageTeamUrl} from '../../../../externalRoute';
+import {getManageTeamUrl} from '../../../../externalRoute';
+import {WebAppEvents} from '@wireapp/webapp-events';
+import {amplify} from 'amplify';
+import {safeWindowOpen} from 'Util/SanitizationUtil';
 
 type SearchResultsData = {contacts: User[]; groups: Conversation[]; others: User[]};
 
@@ -59,10 +62,20 @@ export const PeopleTab: React.FC<{
   const searchOnFederatedDomain = () => '';
 
   const manageTeamUrl = getManageTeamUrl('client_landing');
-  const manageServicesUrl = getManageServicesUrl('client_landing');
   const showTopPeople = false;
-  const showContacts = false;
-  const isVisible = false;
+
+  const getTopPeople = () => {
+    return conversationRepository
+      .getMostActiveConversations()
+      .then(conversationEntities => {
+        return conversationEntities
+          .filter(conversation => conversation.is1to1())
+          .slice(0, 6)
+          .map(conversation => conversation.participating_user_ids()[0]);
+      })
+      .then(userIds => this.userRepository.getUsersById(userIds))
+      .then(userEntities => userEntities.filter(userEntity => !userEntity.isBlocked()));
+  };
 
   useDebounce(
     async () => {
@@ -133,7 +146,7 @@ export const PeopleTab: React.FC<{
                 <button
                   className="left-list-item-button"
                   type="button"
-                  data-bind="click: clickOpenManageTeam"
+                  onClick={() => safeWindowOpen(manageTeamUrl)}
                   data-uie-name="do-invite-member"
                 >
                   <span className="left-column-icon icon-envelope"></span>
@@ -146,7 +159,7 @@ export const PeopleTab: React.FC<{
                 <button
                   className="left-list-item-button"
                   type="button"
-                  data-bind="click: clickOnCreateGroup"
+                  onClick={() => amplify.publish(WebAppEvents.CONVERSATION.CREATE_GROUP, 'start_ui')}
                   data-uie-name="go-create-group"
                 >
                   <span className="left-column-icon">
@@ -161,7 +174,11 @@ export const PeopleTab: React.FC<{
                 <button
                   className="left-list-item-button"
                   type="button"
-                  data-bind="click: clickOnCreateGuestRoom"
+                  onClick={() =>
+                    conversationRepository.createGuestRoom().then(conversation => {
+                      amplify.publish(WebAppEvents.CONVERSATION.SHOW, conversation, {});
+                    })
+                  }
                   data-uie-name="do-create-guest-room"
                 >
                   <span className="left-column-icon">
