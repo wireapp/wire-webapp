@@ -111,7 +111,7 @@ const UserList: React.FC<UserListProps> = ({
   const selfInTeam = userState.self().inTeam();
   const {self} = useKoSubscribableChildren(userState, ['self']);
   const {
-    users: userEntities,
+    users: userEntities = [],
     selected: selectedUsers,
     filter = '',
   } = useKoSubscribableChildren(observables, ['users', 'selected', 'filter']);
@@ -354,7 +354,7 @@ const UserList: React.FC<UserListProps> = ({
         </div>
       )}
 
-      {typeof filter === 'function' && (
+      {!!filter && (
         <Fragment>
           {userEntities.length === 0 && (
             <div className="user-list__no-results" data-uie-name="status-all-added">
