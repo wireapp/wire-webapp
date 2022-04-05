@@ -42,13 +42,16 @@ export const PeopleTab: React.FC<{
   mainViewModel,
 }) => {
   const actions = mainViewModel.actions;
-  const [results, setResults] = useState<SearchResultsData>({contacts: [], groups: [], others: []});
+  const getLocalUsers = () => {
+    return isTeam ? teamState.teamUsers() : userState.connectedUsers();
+  };
+  const [results, setResults] = useState<SearchResultsData>({contacts: getLocalUsers(), groups: [], others: []});
 
   const searchOnFederatedDomain = () => '';
 
   useDebounce(
     async () => {
-      const allLocalUsers = isTeam ? teamState.teamUsers() : userState.connectedUsers();
+      const allLocalUsers = getLocalUsers();
 
       const query = SearchRepository.normalizeQuery(searchQuery);
       if (!query) {
