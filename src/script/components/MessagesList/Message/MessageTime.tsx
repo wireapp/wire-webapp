@@ -28,6 +28,7 @@ const MessageTime: React.FC<MessageTimeProps> = ({timestamp, children, ...props}
   const date = fromUnixTime(timestamp / TIME_IN_MILLIS.SECOND);
   const formattedTime = formatTimeShort(date);
   const formattedDate = formatDateNumeral(date);
+  const dateTimeFormat = new Date(date).toISOString();
 
   // Equivalent for `ko.bindingHandlers.showAllTimestamps`
   const showAllTimestamps = (show: boolean) => {
@@ -40,6 +41,7 @@ const MessageTime: React.FC<MessageTimeProps> = ({timestamp, children, ...props}
       className="time with-tooltip with-tooltip--top with-tooltip--time"
       onMouseEnter={() => showAllTimestamps(true)}
       onMouseLeave={() => showAllTimestamps(false)}
+      dateTime={dateTimeFormat}
       data-timestamp={timestamp}
       data-tooltip={formattedDate}
       {...props}
