@@ -111,7 +111,7 @@ const UserList: React.FC<UserListProps> = ({
   const selfInTeam = userState.self().inTeam();
   const {self} = useKoSubscribableChildren(userState, ['self']);
   const {
-    users: userEntities = [],
+    users: userEntities,
     selected: selectedUsers,
     filter = '',
   } = useKoSubscribableChildren(observables, ['users', 'selected', 'filter']);
