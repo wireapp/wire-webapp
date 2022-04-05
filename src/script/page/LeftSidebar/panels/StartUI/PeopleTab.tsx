@@ -10,23 +10,26 @@ import {TeamRepository} from '../../../../team/TeamRepository';
 import {ConversationRepository} from '../../../../conversation/ConversationRepository';
 import {User} from '../../../../entity/User';
 import UserList, {UserlistMode} from 'Components/UserList';
-import {noop} from 'underscore';
 import GroupList from './components/GroupList';
 import {Conversation} from 'src/script/entity/Conversation';
+import {MainViewModel} from 'src/script/view_model/MainViewModel';
 
 type SearchResultsData = {contacts: User[]; groups: Conversation[]; others: User[]};
 
 export const PeopleTab: React.FC<{
   canSearchUnconnectedUsers: boolean;
+  close: () => void;
   conversationRepository: ConversationRepository;
   conversationState: ConversationState;
   isTeam: boolean;
+  mainViewModel: MainViewModel;
   searchQuery: string;
   searchRepository: SearchRepository;
   teamRepository: TeamRepository;
   teamState: TeamState;
   userState: UserState;
 }> = ({
+  close,
   searchQuery,
   isTeam,
   teamRepository,
@@ -36,8 +39,12 @@ export const PeopleTab: React.FC<{
   conversationState,
   searchRepository,
   conversationRepository,
+  mainViewModel,
 }) => {
+  const actions = mainViewModel.actions;
   const [results, setResults] = useState<SearchResultsData>({contacts: [], groups: [], others: []});
+
+  const searchOnFederatedDomain = () => '';
 
   useDebounce(
     async () => {
@@ -82,10 +89,26 @@ export const PeopleTab: React.FC<{
     [searchQuery],
   );
 
+  const openContact = async (user: User) => {
+    const conversationEntity = await actions.getOrCreate1to1Conversation(user);
+    actions.open1to1Conversation(conversationEntity);
+  };
+
+  const openOther = (user: User) => {
+    if (user.isOutgoingRequest()) {
+      return openContact(user);
+    }
+    return mainViewModel.content.userModal.showUser(user);
+  };
+
+  const openConversation = (conversation: Conversation): Promise<void> => {
+    return actions.openGroupConversation(conversation).then(close);
+  };
+
   return (
     <div>
       <div className="start-ui-list-search-results">
-        {results.contacts?.length > 0 && (
+        {results.contacts.length > 0 && (
           <div className="contacts">
             {isTeam ? (
               <h3 className="start-ui-list-header start-ui-list-header-contacts">{t('searchContacts')}</h3>
@@ -94,34 +117,32 @@ export const PeopleTab: React.FC<{
             )}
             <UserList
               //className="search-list-theme-black"
-              onClick={noop}
+              onClick={user => openContact(user)}
               conversationRepository={conversationRepository}
               mode={UserlistMode.COMPACT}
               users={results.contacts}
             />
           </div>
         )}
-        {results.groups?.length > 0 && (
+        {results.groups.length > 0 && (
           <div className="start-ui-groups">
             {isTeam ? (
               <h3 className="start-ui-list-header">{t('searchTeamGroups')}</h3>
             ) : (
               <h3 className="start-ui-list-header">{t('searchGroups')}</h3>
             )}
-            <GroupList groups={results.groups} click={noop} />
+            <GroupList groups={results.groups} click={openConversation} />
           </div>
         )}
-        {results.others?.length > 0 && (
+        {results.others.length > 0 && (
           <div className="others">
             <h3 className="start-ui-list-header">
-              {false && searchOnFederatedDomain()
-                ? t('searchOthersFederation', searchOnFederatedDomain())
-                : t('searchOthers')}
+              {searchOnFederatedDomain() ? t('searchOthersFederation', searchOnFederatedDomain()) : t('searchOthers')}
             </h3>
             <UserList
               //className="search-list-theme-black"
-              users={results.others ?? []}
-              onClick={noop}
+              users={results.others}
+              onClick={openOther}
               mode={UserlistMode.OTHERS}
               conversationRepository={conversationRepository}
             />

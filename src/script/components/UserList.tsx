@@ -36,7 +36,6 @@ import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import ParticipantItem from 'Components/list/ParticipantItem';
 import {TeamState} from '../team/TeamState';
 import useEffectRef from 'Util/useEffectRef';
-import {noop} from 'Util/util';
 
 export enum UserlistMode {
   COMPACT = 'UserlistMode.COMPACT',
@@ -104,12 +103,10 @@ const UserList: React.FC<UserListProps> = ({
     return true;
   };
 
-  const onClickOrKeyPressed = onSelectUser
-    ? (userEntity: User, event: MouseEvent | KeyboardEvent) => {
-        onSelectUser(userEntity);
-        onClick?.(userEntity, event);
-      }
-    : noop;
+  const onClickOrKeyPressed = (userEntity: User, event: MouseEvent | KeyboardEvent) => {
+    onSelectUser?.(userEntity);
+    onClick?.(userEntity, event);
+  };
 
   const isSelected = (userEntity: User): boolean =>
     isSelectEnabled && selectedUsers.some(user => user.id === userEntity.id);

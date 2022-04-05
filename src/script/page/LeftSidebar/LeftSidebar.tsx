@@ -124,6 +124,7 @@ const LeftSidebar: React.FC<LeftSidebarProps> = ({
           searchRepository={repositories.search}
           teamRepository={repositories.team}
           integrationRepository={repositories.integration}
+          mainViewModel={listViewModel.mainViewModel}
         />
       );
   }

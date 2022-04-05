@@ -36,11 +36,13 @@ import {Config} from '../../../../Config';
 import {IntegrationRepository} from 'src/script/integration/IntegrationRepository';
 import {ServicesTab} from './ServicesTab';
 import {PeopleTab} from './PeopleTab';
+import {MainViewModel} from 'src/script/view_model/MainViewModel';
 
 type StartUIProps = {
   conversationRepository: ConversationRepository;
   conversationState?: ConversationState;
   integrationRepository: IntegrationRepository;
+  mainViewModel: MainViewModel;
   onClose: () => void;
   searchRepository: SearchRepository;
   teamRepository: TeamRepository;
@@ -62,6 +64,7 @@ const StartUI: React.FC<StartUIProps> = ({
   searchRepository,
   integrationRepository,
   teamRepository,
+  mainViewModel,
 }) => {
   const brandName = Config.getConfig().BRAND_NAME;
   const {self: selfUser} = useKoSubscribableChildren(userState, ['self']);
@@ -128,6 +131,8 @@ const StartUI: React.FC<StartUIProps> = ({
         conversationState={conversationState}
         searchRepository={searchRepository}
         conversationRepository={conversationRepository}
+        close={onClose}
+        mainViewModel={mainViewModel}
       />
     ) : (
       <ServicesTab

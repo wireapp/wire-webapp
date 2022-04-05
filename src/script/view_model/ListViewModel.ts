@@ -71,6 +71,7 @@ export class ListViewModel {
   readonly isFederated: boolean;
   private readonly elementId: 'left-column';
 
+  public readonly mainViewModel: MainViewModel;
   public readonly conversationRepository: ConversationRepository;
   public readonly propertiesRepository: PropertiesRepository;
   private readonly callingRepository: CallingRepository;
@@ -100,6 +101,7 @@ export class ListViewModel {
     this.teamState = container.resolve(TeamState);
     this.conversationState = container.resolve(ConversationState);
 
+    this.mainViewModel = mainViewModel;
     this.elementId = 'left-column';
     this.isFederated = mainViewModel.isFederated;
     this.conversationRepository = repositories.conversation;
