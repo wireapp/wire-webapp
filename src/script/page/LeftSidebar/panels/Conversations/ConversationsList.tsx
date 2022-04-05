@@ -144,9 +144,9 @@ export const ConversationsList: React.FC<{
       </li>
     );
   return (
-    <ul css={css({margin: 0, paddingLeft: 0})} data-uie-name={uieName}>
+    <div css={css({margin: 0, paddingLeft: 0})} data-uie-name={uieName}>
       {connectionRequests}
       {conversationView}
-    </ul>
+    </div>
   );
 };

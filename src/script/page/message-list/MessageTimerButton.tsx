@@ -101,9 +101,9 @@ export const MessageTimerButton: React.FC<MessageTimerButtonProps> = ({
             </div>
           )
         ) : (
-          <div className={cx('button-icon-large', {disabled: isTimerDisabled})}>
+          <span className={cx('button-icon-large', {disabled: isTimerDisabled})}>
             <Icon.Timer data-uie-name="message-timer-icon" />
-          </div>
+          </span>
         )}
       </span>
     )

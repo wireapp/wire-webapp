@@ -61,6 +61,7 @@
   "ValidationError.FIELD.SSO_CODE.PATTERN_MISMATCH": "Please enter a valid SSO code",
   "ValidationError.FIELD.SSO_EMAIL_CODE.PATTERN_MISMATCH": "Please enter a valid email or SSO code",
   "ValidationError.FIELD.SSO_LOGIN.PATTERN_MISMATCH": "Invalid code",
+  "accessibility.openConversation": "Open {{name}} conversation",
   "acceptNewsModal.confirmButton": "Accept",
   "acceptNewsModal.declineButton": "No, thanks",
   "acceptNewsModal.headline": "Do you want to receive news and product updates from {brandName} via email?",
