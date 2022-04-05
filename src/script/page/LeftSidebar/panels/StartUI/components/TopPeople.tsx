@@ -36,7 +36,11 @@ const TopPeople: React.FC<TopPeopleProps> = ({clickOnUser, max, users}) => {
   const searchListItems = displayedUsers.map(user => (
     <TopContact assetRepository={assetRepository} clickOnUser={clickOnUser} key={user.id} user={user} />
   ));
-  return <div className="search-list search-list-sm">{searchListItems}</div>;
+  return (
+    <div className="search-list search-list-sm" data-uie-name="top-people">
+      {searchListItems}
+    </div>
+  );
 };
 
 export default TopPeople;
