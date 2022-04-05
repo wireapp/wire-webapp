@@ -28,10 +28,10 @@
     <!-- /ko -->
     <div class="panel__content" data-bind="fadingscrollbar" style="flex-grow: 1">
       <!-- ko if: state() === states.RECEIPTS -->
-        <user-list class="user-list-light" params="observers: {users: receiptUsers}, infos: receiptTimes, noUnderline: true, conversationRepository: conversationRepository, teamRepository: teamRepository" data-uie-name="read-list"></user-list>
+        <user-list class="user-list-light" params="observables: {users: receiptUsers}, infos: receiptTimes, noUnderline: true, conversationRepository: conversationRepository, teamRepository: teamRepository" data-uie-name="read-list"></user-list>
       <!-- /ko -->
       <!-- ko if: state() === states.LIKES -->
-        <user-list class="user-list-light" params="observers: {users: likeUsers}, noUnderline: true, conversationRepository: conversationRepository, teamRepository: teamRepository" data-uie-name="like-list"></user-list>
+        <user-list class="user-list-light" params="observables: {users: likeUsers}, noUnderline: true, conversationRepository: conversationRepository, teamRepository: teamRepository" data-uie-name="like-list"></user-list>
       <!-- /ko -->
       <!-- ko if: state() === states.NO_RECEIPTS -->
         <div class="message-details__empty" data-uie-name="message-details-no-receipts-placeholder">
