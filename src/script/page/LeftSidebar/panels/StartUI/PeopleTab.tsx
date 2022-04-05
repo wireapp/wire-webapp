@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {TeamState} from '../../../../team/TeamState';
 import {UserState} from '../../../../user/UserState';
 import {t} from 'Util/LocalizerUtil';
@@ -19,6 +19,7 @@ import {getManageTeamUrl} from '../../../../externalRoute';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import {amplify} from 'amplify';
 import {safeWindowOpen} from 'Util/SanitizationUtil';
+import {UserRepository} from 'src/script/user/UserRepository';
 
 type SearchResultsData = {contacts: User[]; groups: Conversation[]; others: User[]};
 
@@ -36,6 +37,7 @@ export const PeopleTab: React.FC<{
   searchRepository: SearchRepository;
   teamRepository: TeamRepository;
   teamState: TeamState;
+  userRepository: UserRepository;
   userState: UserState;
 }> = ({
   close,
@@ -52,17 +54,18 @@ export const PeopleTab: React.FC<{
   searchRepository,
   conversationRepository,
   mainViewModel,
+  userRepository,
 }) => {
   const actions = mainViewModel.actions;
   const getLocalUsers = () => {
     return isTeam ? teamState.teamUsers() : userState.connectedUsers();
   };
   const [results, setResults] = useState<SearchResultsData>({contacts: getLocalUsers(), groups: [], others: []});
+  const [topPeople, setTopPeople] = useState<User[]>([]);
 
   const searchOnFederatedDomain = () => '';
 
   const manageTeamUrl = getManageTeamUrl('client_landing');
-  const showTopPeople = false;
 
   const getTopPeople = () => {
     return conversationRepository
@@ -73,9 +76,15 @@ export const PeopleTab: React.FC<{
           .slice(0, 6)
           .map(conversation => conversation.participating_user_ids()[0]);
       })
-      .then(userIds => this.userRepository.getUsersById(userIds))
-      .then(userEntities => userEntities.filter(userEntity => !userEntity.isBlocked()));
+      .then(userIds => userRepository.getUsersById(userIds))
+      .then(userEntities => userEntities.filter(user => !user.isBlocked()));
   };
+
+  useEffect(() => {
+    if (!isTeam) {
+      getTopPeople().then(setTopPeople);
+    }
+  }, []);
 
   useDebounce(
     async () => {
@@ -189,11 +198,13 @@ export const PeopleTab: React.FC<{
               </li>
             )}
           </ul>
-          {showTopPeople && (
+          {topPeople.length > 0 && (
             <div className="start-ui-list-top-people" data-uie-name="status-top-people">
               <h3 className="start-ui-list-header start-ui-list-header-top-people">{t('searchTopPeople')}</h3>
               <div className="search-list-theme-black">
-                <TopPeople users={topUsers} clickOnUser={openContact} />
+                <div className="top-people">
+                  <TopPeople users={topPeople} clickOnUser={openContact} />
+                </div>
               </div>
             </div>
           )}
@@ -223,7 +234,9 @@ export const PeopleTab: React.FC<{
             ) : (
               <h3 className="start-ui-list-header">{t('searchGroups')}</h3>
             )}
-            <GroupList groups={results.groups} click={openConversation} />
+            <div className="group-list">
+              <GroupList groups={results.groups} click={openConversation} />
+            </div>
           </div>
         )}
         {results.others.length > 0 && (

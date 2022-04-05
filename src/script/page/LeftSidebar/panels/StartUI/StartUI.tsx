@@ -37,6 +37,7 @@ import {IntegrationRepository} from 'src/script/integration/IntegrationRepositor
 import {ServicesTab} from './ServicesTab';
 import {PeopleTab} from './PeopleTab';
 import {MainViewModel} from 'src/script/view_model/MainViewModel';
+import {UserRepository} from 'src/script/user/UserRepository';
 
 type StartUIProps = {
   conversationRepository: ConversationRepository;
@@ -47,6 +48,7 @@ type StartUIProps = {
   searchRepository: SearchRepository;
   teamRepository: TeamRepository;
   teamState?: TeamState;
+  userRepository: UserRepository;
   userState?: UserState;
 };
 
@@ -65,6 +67,7 @@ const StartUI: React.FC<StartUIProps> = ({
   integrationRepository,
   teamRepository,
   mainViewModel,
+  userRepository,
 }) => {
   const brandName = Config.getConfig().BRAND_NAME;
   const {self: selfUser} = useKoSubscribableChildren(userState, ['self']);
@@ -142,6 +145,7 @@ const StartUI: React.FC<StartUIProps> = ({
         canInviteTeamMembers={canInviteTeamMembers()}
         canCreateGroupConversation={canCreateGroupConversation()}
         canCreateGuestRoom={canCreateGuestRoom()}
+        userRepository={userRepository}
       />
     ) : (
       <ServicesTab
