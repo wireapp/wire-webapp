@@ -133,6 +133,9 @@ const StartUI: React.FC<StartUIProps> = ({
         conversationRepository={conversationRepository}
         close={onClose}
         mainViewModel={mainViewModel}
+        canInviteTeamMembers={canInviteTeamMembers()}
+        canCreateGroupConversation={false}
+        canCreateGuestRoom={false}
       />
     ) : (
       <ServicesTab
@@ -142,8 +145,12 @@ const StartUI: React.FC<StartUIProps> = ({
       />
     );
 
-  const footer = canInviteTeamMembers() ? (
-    <button className="start-ui-import" data-bind="click: clickToShowInviteModal" data-uie-name="show-invite-modal">
+  const footer = !isTeam ? (
+    <button
+      className="start-ui-import"
+      onClick={() => mainViewModel.content.inviteModal.show()}
+      data-uie-name="show-invite-modal"
+    >
       <span className="icon-invite start-ui-import-icon"></span>
       <span>{t('searchInvite', brandName)}</span>
     </button>

@@ -13,10 +13,16 @@ import UserList, {UserlistMode} from 'Components/UserList';
 import GroupList from './components/GroupList';
 import {Conversation} from 'src/script/entity/Conversation';
 import {MainViewModel} from 'src/script/view_model/MainViewModel';
+import Icon from 'Components/Icon';
+import TopPeople from './components/TopPeople';
+import {getManageServicesUrl, getManageTeamUrl} from '../../../../externalRoute';
 
 type SearchResultsData = {contacts: User[]; groups: Conversation[]; others: User[]};
 
 export const PeopleTab: React.FC<{
+  canCreateGroupConversation: boolean;
+  canCreateGuestRoom: boolean;
+  canInviteTeamMembers: boolean;
   canSearchUnconnectedUsers: boolean;
   close: () => void;
   conversationRepository: ConversationRepository;
@@ -35,7 +41,10 @@ export const PeopleTab: React.FC<{
   teamRepository,
   teamState,
   userState,
+  canInviteTeamMembers,
   canSearchUnconnectedUsers,
+  canCreateGroupConversation,
+  canCreateGuestRoom,
   conversationState,
   searchRepository,
   conversationRepository,
@@ -48,6 +57,12 @@ export const PeopleTab: React.FC<{
   const [results, setResults] = useState<SearchResultsData>({contacts: getLocalUsers(), groups: [], others: []});
 
   const searchOnFederatedDomain = () => '';
+
+  const manageTeamUrl = getManageTeamUrl('client_landing');
+  const manageServicesUrl = getManageServicesUrl('client_landing');
+  const showTopPeople = false;
+  const showContacts = false;
+  const isVisible = false;
 
   useDebounce(
     async () => {
@@ -110,6 +125,63 @@ export const PeopleTab: React.FC<{
 
   return (
     <div>
+      {searchQuery.length === 0 && (
+        <>
+          <ul className="start-ui-list left-list-items">
+            {canInviteTeamMembers && !!manageTeamUrl && (
+              <li className="left-list-item">
+                <button
+                  className="left-list-item-button"
+                  type="button"
+                  data-bind="click: clickOpenManageTeam"
+                  data-uie-name="do-invite-member"
+                >
+                  <span className="left-column-icon icon-envelope"></span>
+                  <span className="center-column">{t('searchMemberInvite')}</span>
+                </button>
+              </li>
+            )}
+            {canCreateGroupConversation && (
+              <li className="left-list-item">
+                <button
+                  className="left-list-item-button"
+                  type="button"
+                  data-bind="click: clickOnCreateGroup"
+                  data-uie-name="go-create-group"
+                >
+                  <span className="left-column-icon">
+                    <Icon.Group />
+                  </span>
+                  <span className="center-column">{t('searchCreateGroup')}</span>
+                </button>
+              </li>
+            )}
+            {canCreateGuestRoom && (
+              <li className="left-list-item">
+                <button
+                  className="left-list-item-button"
+                  type="button"
+                  data-bind="click: clickOnCreateGuestRoom"
+                  data-uie-name="do-create-guest-room"
+                >
+                  <span className="left-column-icon">
+                    <Icon.Guest />
+                  </span>
+                  <span className="center-column">{t('searchCreateGuestRoom')}</span>
+                </button>
+              </li>
+            )}
+          </ul>
+          {showTopPeople && (
+            <div className="start-ui-list-top-people" data-uie-name="status-top-people">
+              <h3 className="start-ui-list-header start-ui-list-header-top-people">{t('searchTopPeople')}</h3>
+              <div className="search-list-theme-black">
+                <TopPeople users={topUsers} clickOnUser={openContact} />
+              </div>
+            </div>
+          )}
+        </>
+      )}
       <div className="start-ui-list-search-results">
         {results.contacts.length > 0 && (
           <div className="contacts">
@@ -197,52 +269,5 @@ export const PeopleTab: React.FC<{
               <!-- /ko -->
             <!-- /ko -->
 
-            <!-- ko ifnot: showSearchResults() -->
-              <ul className="start-ui-list left-list-items">
-                <!-- ko if: showInviteMember() && !!manageTeamUrl -->
-                <li className="left-list-item">
-                  <button className="left-list-item-button" type="button" data-bind="click: clickOpenManageTeam" data-uie-name="do-invite-member">
-                    <span className="left-column-icon icon-envelope"></span>
-                    <span className="center-column" data-bind="text: t('searchMemberInvite')"></span>
-                  </button>
-                </li>
-                <!-- /ko -->
-                <!-- ko if: z.userPermission().canCreateGroupConversation() -->
-                <li className="left-list-item" >
-                  <button className="left-list-item-button" type="button" data-bind="click: clickOnCreateGroup" data-uie-name="go-create-group">
-                    <group-icon className="left-column-icon"></group-icon>
-                    <span className="center-column" data-bind="text: t('searchCreateGroup')"></span>
-                  </button>
-                </li>
-                <!-- /ko -->
-                <!-- ko if: z.userPermission().canCreateGuestRoom() && showCreateGuestRoom() -->
-                <li className="left-list-item">
-                  <button className="left-list-item-button" type="button" data-bind="click: clickOnCreateGuestRoom" data-uie-name="do-create-guest-room">
-                    <guest-icon className="left-column-icon"></guest-icon>
-                    <span className="center-column" data-bind="text: t('searchCreateGuestRoom')"></span>
-                  </button>
-                </li>
-                <!-- /ko -->
-              </ul>
-              <!-- ko if: showTopPeople() -->
-                <div className="start-ui-list-top-people" data-uie-name="status-top-people">
-                  <h3 className="start-ui-list-header start-ui-list-header-top-people" data-bind="text: t('searchTopPeople')"></h3>
-                  <top-people className="search-list-theme-black" params="users: topUsers, clickOnUser: clickOnContact"></top-people>
-                </div>
-              <!-- /ko -->
-              <!-- ko if: showContacts() -->
-                <div className="start-ui-list-contacts" data-uie-name="status-contacts">
-                  <!-- ko if: isTeam() -->
-                    <h3 className="start-ui-list-header start-ui-list-header-contacts" data-bind="text: t('searchContacts')"></h3>
-                  <!-- /ko -->
-                  <!-- ko ifnot: isTeam() -->
-                    <h3 className="start-ui-list-header" data-bind="text: t('searchConnections')"></h3>
-                  <!-- /ko -->
-                  <!-- ko if: isVisible() -->
-                    <user-list className="search-list-theme-black" params="user: contacts(), click: clickOnContact, searchRepository: searchRepository, teamRepository: teamRepository, conversationRepository: conversationRepository"></user-list>
-                  <!-- /ko -->
-                </div>
-              <!-- /ko -->
-            <!-- /ko -->
   */
 };
