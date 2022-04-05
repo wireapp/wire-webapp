@@ -26,7 +26,6 @@ import type {SearchService} from './SearchService';
 import type {UserRepository} from '../user/UserRepository';
 import type {User} from '../entity/User';
 import type {QualifiedId} from '@wireapp/api-client/src/user/';
-import {matchQualifiedIds} from 'Util/QualifiedId';
 import {container} from 'tsyringe';
 import {Core} from '../service/CoreSingleton';
 
@@ -180,23 +179,10 @@ export class SearchRepository {
 
     const matchedUserIdsFromDirectorySearch: QualifiedId[] = await this.searchService
       .getContacts(name, SearchRepository.CONFIG.MAX_DIRECTORY_RESULTS, domain)
-      .then(({documents}) => documents.map(match => ({domain: match.qualified_id?.domain || null, id: match.id})));
+      .then(({documents}) => documents.map(match => ({domain: match.qualified_id?.domain || '', id: match.id})));
 
     const userIds: QualifiedId[] = [...matchedUserIdsFromDirectorySearch];
     const userEntities = await this.userRepository.getUsersById(userIds);
-
-    if (validateHandle(name, domain)) {
-      const apiUser = await this.userRepository.getUserByHandle({domain, handle: name});
-      if (apiUser) {
-        const knownUser = userEntities.find(user =>
-          matchQualifiedIds(user, apiUser.qualified_id || {domain: '', id: apiUser.id}),
-        );
-        if (!knownUser) {
-          const matchedUser = this.userRepository.userMapper.mapUserFromJson(apiUser);
-          userEntities.push(matchedUser);
-        }
-      }
-    }
 
     return Promise.resolve(userEntities)
       .then(userEntities => {
