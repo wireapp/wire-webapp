@@ -92,15 +92,17 @@ export const ConversationsList: React.FC<{
         ))}
       </>
     ) : (
-      <GroupedConversations
-        callState={callState}
-        conversationRepository={conversationRepository}
-        conversationState={conversationState}
-        hasJoinableCall={hasJoinableCall}
-        isSelectedConversation={isActiveConversation}
-        listViewModel={listViewModel}
-        onJoinCall={answerCall}
-      />
+      <li>
+        <GroupedConversations
+          callState={callState}
+          conversationRepository={conversationRepository}
+          conversationState={conversationState}
+          hasJoinableCall={hasJoinableCall}
+          isSelectedConversation={isActiveConversation}
+          listViewModel={listViewModel}
+          onJoinCall={answerCall}
+        />
+      </li>
     );
 
   const uieName = viewStyle === ConverationViewStyle.FOLDER ? 'folder-view' : 'recent-view';
@@ -144,9 +146,9 @@ export const ConversationsList: React.FC<{
       </li>
     );
   return (
-    <div css={css({margin: 0, paddingLeft: 0})} data-uie-name={uieName}>
+    <ul css={css({margin: 0, paddingLeft: 0})} data-uie-name={uieName}>
       {connectionRequests}
       {conversationView}
-    </div>
+    </ul>
   );
 };
