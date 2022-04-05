@@ -92,7 +92,7 @@ export const PeopleTab: React.FC<{
 
       const query = SearchRepository.normalizeQuery(searchQuery);
       if (!query) {
-        setResults({...results, contacts: allLocalUsers});
+        setResults({contacts: allLocalUsers, groups: [], others: []});
         return;
       }
 
