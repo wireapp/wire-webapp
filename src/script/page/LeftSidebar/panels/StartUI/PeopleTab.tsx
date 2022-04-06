@@ -137,7 +137,7 @@ export const PeopleTab: React.FC<{
       const trimmedQuery = searchQuery.trim();
       const isHandle = trimmedQuery.startsWith('@') && validateHandle(query);
 
-      const localSearchSources = searchRemote ? conversationState.connectedUsers() : allLocalUsers;
+      const localSearchSources = !searchRemote ? conversationState.connectedUsers() : allLocalUsers;
 
       const SEARCHABLE_FIELDS = SearchRepository.CONFIG.SEARCHABLE_FIELDS;
       const searchFields = isHandle ? [SEARCHABLE_FIELDS.USERNAME] : undefined;
