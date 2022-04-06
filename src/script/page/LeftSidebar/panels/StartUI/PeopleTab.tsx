@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import {TeamState} from '../../../../team/TeamState';
 import {UserState} from '../../../../user/UserState';
 import {t} from 'Util/LocalizerUtil';
@@ -65,6 +65,7 @@ export const PeopleTab: React.FC<{
   const [results, setResults] = useState<SearchResultsData>({contacts: getLocalUsers(), groups: [], others: []});
   const [topPeople, setTopPeople] = useState<User[]>([]);
   const [hasFederationError, setHasFederationError] = useState(false);
+  const currentSearchQuery = useRef('');
 
   const searchOnFederatedDomain = () => '';
   const hasResults = results.contacts.length + results.groups.length + results.others.length > 0;
@@ -126,12 +127,23 @@ export const PeopleTab: React.FC<{
       setResults(localSearchResults);
       if (searchRemote) {
         const userEntities = await searchRepository.searchByName(query, isHandle);
-        setResults({...localSearchResults, others: userEntities});
+        if (currentSearchQuery.current === searchQuery) {
+          // Only update the results if the query that has been processed correspond to the current search query
+          setResults({...localSearchResults, others: userEntities});
+        }
       }
     },
     300,
     [searchQuery],
   );
+
+  useEffect(() => {
+    // keep track of the most up to date value of the search query (in order to cancel outdated queries)
+    currentSearchQuery.current = searchQuery;
+    return () => {
+      currentSearchQuery.current = '';
+    };
+  }, [searchQuery]);
 
   const openContact = async (user: User) => {
     const conversationEntity = await actions.getOrCreate1to1Conversation(user);
