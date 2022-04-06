@@ -46,18 +46,20 @@ const BaseToggle: React.FC<BaseToggleProps> = ({
 }) => {
   const uuid = React.useMemo(() => createRandomUuid(), []);
   const labelUuid = React.useMemo(() => createRandomUuid(), []);
+  const inputRef = React.useRef<HTMLInputElement>();
   return (
     <>
       <div className="info-toggle__row">
-        <p id={labelUuid} className="info-toggle__name">
+        <label htmlFor={uuid} id={labelUuid} className="info-toggle__name">
           {toggleName}
-        </p>
+        </label>
         <div
           className={cx('slider', {
             disabled: isDisabled,
           })}
         >
           <input
+            ref={inputRef}
             className="slider-input"
             type="checkbox"
             name="toggler"
@@ -66,14 +68,15 @@ const BaseToggle: React.FC<BaseToggleProps> = ({
             checked={isChecked}
             data-uie-name={`allow-${toggleName?.toLowerCase()}-input`}
           />
-          <label
+          <button
             className="button-label"
-            htmlFor={uuid}
             aria-pressed={isChecked}
+            type="button"
+            onClick={() => setIsChecked(inputRef.current.checked)}
             aria-labelledby={labelUuid}
             data-uie-name={`do-allow-${toggleName?.toLowerCase()}`}
             data-uie-value={isChecked ? 'checked' : 'unchecked'}
-          />
+          ></button>
         </div>
       </div>
       <p className="info-toggle__details" data-uie-name="status-guest-toggle">
