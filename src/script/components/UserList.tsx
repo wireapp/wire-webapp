@@ -49,7 +49,7 @@ export interface UserListProps {
   conversation?: Conversation;
   conversationRepository: ConversationRepository;
   conversationState?: ConversationState;
-  highlightedUsers?: () => User[];
+  highlightedUsers?: User[];
   infos?: Record<string, string>;
   maxVisibleUsers?: number;
   mode?: UserlistMode;
@@ -71,7 +71,7 @@ const UserList: React.FC<UserListProps> = ({
   conversationRepository,
   users,
   infos,
-  highlightedUsers = () => [],
+  highlightedUsers = [],
   noUnderline = false,
   mode = UserlistMode.DEFAULT,
   conversation,
@@ -87,7 +87,7 @@ const UserList: React.FC<UserListProps> = ({
 }) => {
   const [maxShownUsers, setMaxShownUsers] = useState(USER_CHUNK_SIZE);
 
-  const highlightedUserIds = highlightedUsers().map(user => user.id);
+  const highlightedUserIds = highlightedUsers.map(user => user.id);
   const selfInTeam = userState.self().inTeam();
   const {self} = useKoSubscribableChildren(userState, ['self']);
   const {is_verified: isSelfVerified} = useKoSubscribableChildren(self, ['is_verified']);

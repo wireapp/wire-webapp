@@ -39,7 +39,12 @@ import UserList from './UserList';
 
 export type UserListProps = Omit<React.ComponentProps<typeof UserList>, 'users' | 'selectedUsers'> & {
   conversationState?: ConversationState;
-  observables: {filter: ko.Observable<string>; selected: ko.ObservableArray<User>; users: ko.ObservableArray<User>};
+  observables: {
+    filter?: ko.Observable<string>;
+    highlightedUsers?: ko.Observable<User[]>;
+    selected?: ko.ObservableArray<User>;
+    users: ko.ObservableArray<User>;
+  };
   searchRepository: SearchRepository;
   selfFirst?: boolean;
   teamRepository: TeamRepository;
@@ -60,7 +65,8 @@ const UserSearchableList: React.FC<UserListProps> = props => {
     users,
     selected: selectedUsers,
     filter = '',
-  } = useKoSubscribableChildren(observables, ['users', 'selected', 'filter']);
+    highlightedUsers,
+  } = useKoSubscribableChildren(observables, ['users', 'selected', 'filter', 'highlightedUsers']);
 
   /**
    * Try to load additional members from the backend.
@@ -144,7 +150,8 @@ const UserSearchableList: React.FC<UserListProps> = props => {
       {...userListProps}
       users={foundUserEntities()}
       selectedUsers={selectedUsers}
-      onSelectUser={toggleUserSelection}
+      highlightedUsers={highlightedUsers}
+      onSelectUser={observables.selected ? toggleUserSelection : undefined}
     />
   );
 };
