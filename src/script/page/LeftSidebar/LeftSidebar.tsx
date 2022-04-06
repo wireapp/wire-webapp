@@ -126,6 +126,7 @@ const LeftSidebar: React.FC<LeftSidebarProps> = ({
           integrationRepository={repositories.integration}
           mainViewModel={listViewModel.mainViewModel}
           userRepository={repositories.user}
+          isFederated={listViewModel.isFederated}
         />
       );
   }

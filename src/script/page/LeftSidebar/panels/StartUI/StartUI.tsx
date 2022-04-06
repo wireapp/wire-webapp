@@ -43,6 +43,7 @@ type StartUIProps = {
   conversationRepository: ConversationRepository;
   conversationState?: ConversationState;
   integrationRepository: IntegrationRepository;
+  isFederated: boolean;
   mainViewModel: MainViewModel;
   onClose: () => void;
   searchRepository: SearchRepository;
@@ -68,6 +69,7 @@ const StartUI: React.FC<StartUIProps> = ({
   teamRepository,
   mainViewModel,
   userRepository,
+  isFederated,
 }) => {
   const brandName = Config.getConfig().BRAND_NAME;
   const {self: selfUser} = useKoSubscribableChildren(userState, ['self']);
@@ -86,8 +88,6 @@ const StartUI: React.FC<StartUIProps> = ({
 
   const [searchQuery, setSearchQuery] = useState('');
   const [activeTab, setActiveTab] = useState(Tabs.PEOPLE);
-
-  const isFederated = false; //TODO
 
   const before = (
     <div id="start-ui-header" className={cx('start-ui-header', {'start-ui-header-integrations': isTeam})}>
@@ -133,6 +133,7 @@ const StartUI: React.FC<StartUIProps> = ({
       <PeopleTab
         searchQuery={searchQuery}
         isTeam={isTeam}
+        isFederated={isFederated}
         teamRepository={teamRepository}
         teamState={teamState}
         userState={userState}

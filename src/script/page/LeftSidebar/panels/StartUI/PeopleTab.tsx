@@ -31,6 +31,7 @@ export const PeopleTab: React.FC<{
   close: () => void;
   conversationRepository: ConversationRepository;
   conversationState: ConversationState;
+  isFederated: boolean;
   isTeam: boolean;
   mainViewModel: MainViewModel;
   searchQuery: string;
@@ -43,6 +44,7 @@ export const PeopleTab: React.FC<{
   close,
   searchQuery,
   isTeam,
+  isFederated,
   teamRepository,
   teamState,
   userState,
@@ -62,8 +64,10 @@ export const PeopleTab: React.FC<{
   };
   const [results, setResults] = useState<SearchResultsData>({contacts: getLocalUsers(), groups: [], others: []});
   const [topPeople, setTopPeople] = useState<User[]>([]);
+  const [hasFederationError, setHasFederationError] = useState(false);
 
   const searchOnFederatedDomain = () => '';
+  const hasResults = results.contacts.length + results.groups.length + results.others.length > 0;
 
   const manageTeamUrl = getManageTeamUrl('client_landing');
 
@@ -147,6 +151,62 @@ export const PeopleTab: React.FC<{
 
   return (
     <div>
+      {!hasResults && (
+        <>
+          {!canSearchUnconnectedUsers ? (
+            <span className="start-ui-no-contacts__icon">
+              <Icon.People />
+            </span>
+          ) : (
+            <div className="start-ui-no-contacts" data-bind="text: t('searchNoContactsOnWire', brandName)"></div>
+          )}
+        </>
+      )}
+
+      {hasFederationError && (
+        <div className="start-ui-fed-domain-unavailable">
+          <div className="start-ui-fed-domain-unavailable__head">{t('searchConnectWithOtherDomain')}</div>
+          <span className="start-ui-fed-domain-unavailable__text">{t('searchFederatedDomainNotAvailable')}</span>
+          {/*FIXME: re-enable when federation article is available
+                <a className="start-ui-fed-domain-unavailable__link" rel="nofollow noopener noreferrer" target="_blank" data-bind="attr: {href: ''}, text: t('searchFederatedDomainNotAvailableLearnMore')"></a>
+            */}
+        </div>
+      )}
+
+      {!hasFederationError && !hasResults && (
+        <>
+          {!canSearchUnconnectedUsers && (
+            <div className="start-ui-no-search-results__content">
+              <span className="start-ui-no-search-results__icon">
+                <Icon.Message />
+              </span>
+              <div
+                className="start-ui-no-search-results__text"
+                data-bind="text: t('searchNoMatchesPartner')"
+                data-uie-name="label-no-search-result"
+              ></div>
+            </div>
+          )}
+          {isFederated ? (
+            <div className="start-ui-fed-wrapper">
+              <span className="start-ui-fed-wrapper__icon">
+                <Icon.Profile />
+              </span>
+              <div className="start-ui-fed-wrapper__text">{t('searchTrySearchFederation')}</div>
+              <div className="start-ui-fed-wrapper__button">
+                {/*FIXME: re-enable when federation article is available
+                <button type="button" data-bind="click: () => {}" data-uie-name="do-search-learn-more">
+                  {t('searchTrySearchLearnMore')}
+                </button>
+          */}
+              </div>
+            </div>
+          ) : (
+            <div className="start-ui-no-search-results">{t('searchTrySearch')}</div>
+          )}
+        </>
+      )}
+
       {searchQuery.length === 0 && (
         <>
           <ul className="start-ui-list left-list-items">
@@ -258,48 +318,4 @@ export const PeopleTab: React.FC<{
       </div>
     </div>
   );
-  /*
-            <!-- ko if: showNoMatches() -->
-              <!-- ko if: showOnlyConnectedUsers() -->
-                <people-icon className="start-ui-no-contacts__icon"></people-icon>
-              <!-- /ko -->
-              <!-- ko ifnot: showOnlyConnectedUsers() -->
-                <div className="start-ui-no-contacts" data-bind="text: t('searchNoContactsOnWire', brandName)"></div>
-              <!-- /ko -->
-            <!-- /ko -->
-
-            <!-- ko if: showFederatedDomainNotAvailable() -->
-              <div className="start-ui-fed-domain-unavailable">
-                <div className="start-ui-fed-domain-unavailable__head" data-bind="text: 'Connect with other domain'"></div>
-                <span className="start-ui-fed-domain-unavailable__text" data-bind="text: t('searchFederatedDomainNotAvailable')"></span>
-                <!-- FIXME: re-enable when federation article is available
-                <a className="start-ui-fed-domain-unavailable__link" rel="nofollow noopener noreferrer" target="_blank" data-bind="attr: {href: ''}, text: t('searchFederatedDomainNotAvailableLearnMore')"></a>
-                -->
-              </div>
-            <!-- /ko -->
-
-            <!-- ko if: !showFederatedDomainNotAvailable() && showNoSearchResults() -->
-              <!-- ko if: showOnlyConnectedUsers() -->
-                <div className="start-ui-no-search-results__content">
-                  <message-icon className="start-ui-no-search-results__icon"></message-icon>
-                  <div className="start-ui-no-search-results__text" data-bind="text: t('searchNoMatchesPartner')" data-uie-name="label-no-search-result"></div>
-                </div>
-              <!-- /ko -->
-              <!-- ko ifnot: showOnlyConnectedUsers() -->
-                <!-- ko if: $root.isFederated -->
-                  <div className="start-ui-fed-wrapper">
-                    <profile-icon className="start-ui-fed-wrapper__icon"></profile-icon>
-                    <div className="start-ui-fed-wrapper__text" data-bind="text: t('searchTrySearchFederation')"></div>
-                    <div className="start-ui-fed-wrapper__button">
-                      <button type="button" data-bind="click: () => {}, text: t('searchTrySearchLearnMore')" data-uie-name="do-search-learn-more" />
-                    </div>
-                  </div>
-                <!-- /ko -->
-                <!-- ko ifnot: $root.isFederated -->
-                  <div className="start-ui-no-search-results" data-bind="text: t('searchTrySearch')"></div>
-                <!-- /ko -->
-              <!-- /ko -->
-            <!-- /ko -->
-
-  */
 };

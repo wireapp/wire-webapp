@@ -38,7 +38,6 @@ export const ServicesTab: React.FC<{
                 <button
                   className="left-list-item-button"
                   type="button"
-                  data-bind="click: clickOpenManageServices"
                   onClick={openManageServices}
                   data-uie-name="go-manage-services"
                 >
