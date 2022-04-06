@@ -127,15 +127,18 @@ const ConversationListCell: React.FC<ConversationListCellProps> = ({
 
   return (
     <li ref={setViewportElementRef}>
-      <div className={cx('conversation-list-cell', {'conversation-list-cell-active': isActive})}>
+      <div
+        data-uie-name={dataUieName}
+        data-uie-uid={conversation.id}
+        data-uie-value={displayName}
+        className={cx('conversation-list-cell', {'conversation-list-cell-active': isActive})}
+      >
         <div
-          data-uie-name={dataUieName}
-          data-uie-uid={conversation.id}
-          data-uie-value={displayName}
           role="button"
           className="conversation-list-cell-main-button"
           onClick={onClick}
           onKeyDown={handleDivKeyDown}
+          data-uie-name="go-open-conversation"
           tabIndex={0}
           aria-label={t('accessibility.openConversation', displayName)}
         >
