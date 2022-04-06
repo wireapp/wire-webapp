@@ -229,7 +229,10 @@ export class IntegrationRepository {
     });
   }
 
-  async searchForServices(query: string, queryObservable?: ko.Observable<string>): Promise<ServiceEntity[]> {
+  async searchForServices(
+    query: string,
+    queryObservable?: ko.Observable<string>,
+  ): Promise<ServiceEntity[] | undefined> {
     const normalizedQuery = IntegrationRepository.normalizeQuery(query);
 
     try {
@@ -244,7 +247,8 @@ export class IntegrationRepository {
         return serviceEntities;
       }
     } catch (error) {
-      return this.logger.error(`Error searching for services: ${error.message}`, error);
+      this.logger.error(`Error searching for services: ${error.message}`, error);
     }
+    return undefined;
   }
 }
