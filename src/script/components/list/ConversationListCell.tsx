@@ -138,6 +138,7 @@ const ConversationListCell: React.FC<ConversationListCellProps> = ({
           className="conversation-list-cell-main-button"
           onClick={onClick}
           onKeyDown={handleDivKeyDown}
+          data-uie-name="go-open-conversation"
           tabIndex={0}
           aria-label={t('accessibility.openConversation', displayName)}
         >
