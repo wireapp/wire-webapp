@@ -1,4 +1,6 @@
 import React, {useEffect, useRef, useState} from 'react';
+import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
+import {BackendErrorLabel} from '@wireapp/api-client/src/http';
 import {TeamState} from '../../../../team/TeamState';
 import {UserState} from '../../../../user/UserState';
 import {t} from 'Util/LocalizerUtil';
@@ -20,6 +22,8 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 import {amplify} from 'amplify';
 import {safeWindowOpen} from 'Util/SanitizationUtil';
 import {UserRepository} from 'src/script/user/UserRepository';
+import {isBackendError} from 'Util/TypePredicateUtil';
+import {getLogger} from 'Util/Logger';
 
 type SearchResultsData = {contacts: User[]; groups: Conversation[]; others: User[]};
 
@@ -58,12 +62,14 @@ export const PeopleTab: React.FC<{
   mainViewModel,
   userRepository,
 }) => {
+  const logger = getLogger('PeopleSearch');
   const actions = mainViewModel.actions;
   const getLocalUsers = () => {
     return isTeam ? teamState.teamUsers() : userState.connectedUsers();
   };
   const [results, setResults] = useState<SearchResultsData>({contacts: getLocalUsers(), groups: [], others: []});
   const [topPeople, setTopPeople] = useState<User[]>([]);
+  const teamSize = teamState.teamSize();
   const [hasFederationError, setHasFederationError] = useState(false);
   const currentSearchQuery = useRef('');
 
@@ -93,6 +99,7 @@ export const PeopleTab: React.FC<{
 
   useDebounce(
     async () => {
+      setHasFederationError(false);
       const allLocalUsers = getLocalUsers();
 
       const query = SearchRepository.normalizeQuery(searchQuery);
@@ -126,10 +133,22 @@ export const PeopleTab: React.FC<{
       };
       setResults(localSearchResults);
       if (searchRemote) {
-        const userEntities = await searchRepository.searchByName(query, isHandle);
-        if (currentSearchQuery.current === searchQuery) {
-          // Only update the results if the query that has been processed correspond to the current search query
-          setResults({...localSearchResults, others: userEntities});
+        try {
+          const userEntities = await searchRepository.searchByName(query, isHandle);
+          if (currentSearchQuery.current === searchQuery) {
+            // Only update the results if the query that has been processed correspond to the current search query
+            setResults({...localSearchResults, others: userEntities});
+          }
+        } catch (error) {
+          if (isBackendError(error)) {
+            if (error.code === HTTP_STATUS.UNPROCESSABLE_ENTITY) {
+              return setHasFederationError(true);
+            }
+            if (error.code === HTTP_STATUS.BAD_REQUEST && error.label === BackendErrorLabel.FEDERATION_NOT_ALLOWED) {
+              return logger.warn(`Error searching for contacts: ${error.message}`);
+            }
+          }
+          logger.error(`Error searching for contacts: ${(error as any).message}`, error);
         }
       }
     },
@@ -222,7 +241,7 @@ export const PeopleTab: React.FC<{
       {searchQuery.length === 0 && (
         <>
           <ul className="start-ui-list left-list-items">
-            {canInviteTeamMembers && !!manageTeamUrl && (
+            {teamSize === 1 && canInviteTeamMembers && !!manageTeamUrl && (
               <li className="left-list-item">
                 <button
                   className="left-list-item-button"

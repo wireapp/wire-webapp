@@ -84,7 +84,6 @@ const StartUI: React.FC<StartUIProps> = ({
 
   const isTeam = teamState.isTeam();
   const teamName = teamState.teamName();
-  const teamSize = teamState.teamSize();
 
   const [searchQuery, setSearchQuery] = useState('');
   const [activeTab, setActiveTab] = useState(Tabs.PEOPLE);
