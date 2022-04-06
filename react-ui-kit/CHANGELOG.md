@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [7.55.2](https://github.com/wireapp/wire-web-packages/tree/main/packages/react-ui-kit/compare/@wireapp/react-ui-kit@7.55.1...@wireapp/react-ui-kit@7.55.2) (2022-04-06)
+
+
+### Bug Fixes
+
+* **react-ui-kit:** fix issue with mobile keyboard ([#4252](https://github.com/wireapp/wire-web-packages/tree/main/packages/react-ui-kit/issues/4252)) ([434a931](https://github.com/wireapp/wire-web-packages/tree/main/packages/react-ui-kit/commit/434a931a3b5794240583960505050c5b40916194))
+
+
+
+
+
 ## [7.55.1](https://github.com/wireapp/wire-web-packages/tree/main/packages/react-ui-kit/compare/@wireapp/react-ui-kit@7.55.0...@wireapp/react-ui-kit@7.55.1) (2022-03-30)
 
 
