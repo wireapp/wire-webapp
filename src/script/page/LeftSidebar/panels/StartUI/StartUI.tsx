@@ -17,7 +17,7 @@
  *
  */
 
-import React, {useState} from 'react';
+import React, {useRef, useState} from 'react';
 
 import ListWrapper from '../ListWrapper';
 import {container} from 'tsyringe';
@@ -35,9 +35,11 @@ import {ConversationRepository} from '../../../../conversation/ConversationRepos
 import {Config} from '../../../../Config';
 import {IntegrationRepository} from 'src/script/integration/IntegrationRepository';
 import {ServicesTab} from './ServicesTab';
-import {PeopleTab} from './PeopleTab';
+import {PeopleTab, SearchResultsData} from './PeopleTab';
 import {MainViewModel} from 'src/script/view_model/MainViewModel';
 import {UserRepository} from 'src/script/user/UserRepository';
+import {User} from 'src/script/entity/User';
+import {Conversation} from 'src/script/entity/Conversation';
 
 type StartUIProps = {
   conversationRepository: ConversationRepository;
@@ -82,11 +84,43 @@ const StartUI: React.FC<StartUIProps> = ({
     canCreateGroupConversation,
   } = generatePermissionHelpers(selfUser.teamRole());
 
+  const actions = mainViewModel.actions;
   const isTeam = teamState.isTeam();
   const teamName = teamState.teamName();
 
   const [searchQuery, setSearchQuery] = useState('');
   const [activeTab, setActiveTab] = useState(Tabs.PEOPLE);
+
+  const peopleSearchResults = useRef<SearchResultsData | undefined>(undefined);
+
+  const openFirstConversation = (): void => {
+    if (peopleSearchResults.current) {
+      const {contacts, groups} = peopleSearchResults.current;
+      if (contacts.length > 0) {
+        openContact(contacts[0]);
+        return;
+      }
+      if (groups.length > 0) {
+        openConversation(groups[0]);
+      }
+    }
+  };
+
+  const openContact = async (user: User) => {
+    const conversationEntity = await actions.getOrCreate1to1Conversation(user);
+    actions.open1to1Conversation(conversationEntity);
+  };
+
+  const openOther = (user: User) => {
+    if (user.isOutgoingRequest()) {
+      return openContact(user);
+    }
+    return mainViewModel.content.userModal.showUser(user);
+  };
+
+  const openConversation = (conversation: Conversation): Promise<void> => {
+    return actions.openGroupConversation(conversation).then(close);
+  };
 
   const before = (
     <div id="start-ui-header" className={cx('start-ui-header', {'start-ui-header-integrations': isTeam})}>
@@ -96,6 +130,7 @@ const StartUI: React.FC<StartUIProps> = ({
           placeholder={isFederated ? t('searchPlaceholderFederation') : t('searchPlaceholder')}
           selectedUsers={[]}
           setInput={setSearchQuery}
+          enter={openFirstConversation}
         />
       </div>
       {isTeam && canChatWithServices() && (
@@ -140,12 +175,14 @@ const StartUI: React.FC<StartUIProps> = ({
         conversationState={conversationState}
         searchRepository={searchRepository}
         conversationRepository={conversationRepository}
-        close={onClose}
-        mainViewModel={mainViewModel}
         canInviteTeamMembers={canInviteTeamMembers()}
         canCreateGroupConversation={canCreateGroupConversation()}
         canCreateGuestRoom={canCreateGuestRoom()}
         userRepository={userRepository}
+        onClickContact={openContact}
+        onClickConversation={openConversation}
+        onClickUser={openOther}
+        onSearchResults={searchResult => (peopleSearchResults.current = searchResult)}
       />
     ) : (
       <ServicesTab

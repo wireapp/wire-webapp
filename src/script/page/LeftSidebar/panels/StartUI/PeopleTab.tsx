@@ -14,7 +14,6 @@ import {User} from '../../../../entity/User';
 import UserList, {UserlistMode} from 'Components/UserList';
 import GroupList from './components/GroupList';
 import {Conversation} from 'src/script/entity/Conversation';
-import {MainViewModel} from 'src/script/view_model/MainViewModel';
 import Icon from 'Components/Icon';
 import TopPeople from './components/TopPeople';
 import {getManageTeamUrl} from '../../../../externalRoute';
@@ -27,19 +26,21 @@ import {getLogger} from 'Util/Logger';
 import {partition} from 'underscore';
 import {sortByPriority} from 'Util/StringUtil';
 
-type SearchResultsData = {contacts: User[]; groups: Conversation[]; others: User[]};
+export type SearchResultsData = {contacts: User[]; groups: Conversation[]; others: User[]};
 
 export const PeopleTab: React.FC<{
   canCreateGroupConversation: boolean;
   canCreateGuestRoom: boolean;
   canInviteTeamMembers: boolean;
   canSearchUnconnectedUsers: boolean;
-  close: () => void;
   conversationRepository: ConversationRepository;
   conversationState: ConversationState;
   isFederated: boolean;
   isTeam: boolean;
-  mainViewModel: MainViewModel;
+  onClickContact: (user: User) => void;
+  onClickConversation: (conversation: Conversation) => void;
+  onClickUser: (user: User) => void;
+  onSearchResults: (results: SearchResultsData | undefined) => void;
   searchQuery: string;
   searchRepository: SearchRepository;
   teamRepository: TeamRepository;
@@ -47,7 +48,6 @@ export const PeopleTab: React.FC<{
   userRepository: UserRepository;
   userState: UserState;
 }> = ({
-  close,
   searchQuery,
   isTeam,
   isFederated,
@@ -61,11 +61,13 @@ export const PeopleTab: React.FC<{
   conversationState,
   searchRepository,
   conversationRepository,
-  mainViewModel,
   userRepository,
+  onClickContact,
+  onClickConversation,
+  onClickUser,
+  onSearchResults,
 }) => {
   const logger = getLogger('PeopleSearch');
-  const actions = mainViewModel.actions;
   const getLocalUsers = () => {
     return isTeam ? teamState.teamUsers() : userState.connectedUsers();
   };
@@ -126,6 +128,7 @@ export const PeopleTab: React.FC<{
       const query = SearchRepository.normalizeQuery(searchQuery);
       if (!query) {
         setResults({contacts: allLocalUsers, groups: [], others: []});
+        onSearchResults(undefined);
         return;
       }
 
@@ -153,6 +156,7 @@ export const PeopleTab: React.FC<{
         others: [],
       };
       setResults(localSearchResults);
+      onSearchResults(localSearchResults);
       if (searchRemote) {
         try {
           const userEntities = await searchRepository.searchByName(query, isHandle);
@@ -162,6 +166,7 @@ export const PeopleTab: React.FC<{
 
           if (currentSearchQuery.current === searchQuery) {
             // Only update the results if the query that has been processed correspond to the current search query
+            onSearchResults(results);
             setResults(results);
           }
         } catch (error) {
@@ -186,24 +191,9 @@ export const PeopleTab: React.FC<{
     currentSearchQuery.current = searchQuery;
     return () => {
       currentSearchQuery.current = '';
+      onSearchResults(undefined);
     };
   }, [searchQuery]);
-
-  const openContact = async (user: User) => {
-    const conversationEntity = await actions.getOrCreate1to1Conversation(user);
-    actions.open1to1Conversation(conversationEntity);
-  };
-
-  const openOther = (user: User) => {
-    if (user.isOutgoingRequest()) {
-      return openContact(user);
-    }
-    return mainViewModel.content.userModal.showUser(user);
-  };
-
-  const openConversation = (conversation: Conversation): Promise<void> => {
-    return actions.openGroupConversation(conversation).then(close);
-  };
 
   return (
     <div>
@@ -319,7 +309,7 @@ export const PeopleTab: React.FC<{
               <h3 className="start-ui-list-header start-ui-list-header-top-people">{t('searchTopPeople')}</h3>
               <div className="search-list-theme-black">
                 <div className="top-people">
-                  <TopPeople users={topPeople} clickOnUser={openContact} />
+                  <TopPeople users={topPeople} clickOnUser={onClickContact} />
                 </div>
               </div>
             </div>
@@ -336,7 +326,7 @@ export const PeopleTab: React.FC<{
             )}
             <div className="search-list-theme-black">
               <UserList
-                onClick={user => openContact(user)}
+                onClick={user => onClickContact(user)}
                 conversationRepository={conversationRepository}
                 mode={UserlistMode.COMPACT}
                 users={results.contacts}
@@ -352,7 +342,7 @@ export const PeopleTab: React.FC<{
               <h3 className="start-ui-list-header">{t('searchGroups')}</h3>
             )}
             <div className="group-list">
-              <GroupList groups={results.groups} click={openConversation} />
+              <GroupList groups={results.groups} click={onClickConversation} />
             </div>
           </div>
         )}
@@ -364,7 +354,7 @@ export const PeopleTab: React.FC<{
             <div className="search-list-theme-black">
               <UserList
                 users={results.others}
-                onClick={openOther}
+                onClick={onClickUser}
                 mode={UserlistMode.OTHERS}
                 conversationRepository={conversationRepository}
               />
