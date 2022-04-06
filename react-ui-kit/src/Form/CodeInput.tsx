@@ -52,7 +52,7 @@ const digitInputStyle: <T>(theme: Theme, props: DigitInputProps<T>) => CSSObject
 const DigitInput: React.FC<DigitInputProps<HTMLInputElement>> = React.forwardRef<
   HTMLInputElement,
   DigitInputProps<HTMLInputElement>
->((props, ref) => <input ref={ref} css={theme => digitInputStyle(theme, props)} {...props} />);
+>((props, ref) => <input ref={ref} css={theme => digitInputStyle(theme, props)} {...props} type="tel" />);
 
 export interface CodeInputProps<T = HTMLInputElement> extends InputProps<T> {
   autoFocus?: boolean;
@@ -161,7 +161,6 @@ export const CodeInput = ({
           onKeyUp={forceSelection}
           markInvalid={markInvalid}
           ref={node => (inputs[index] = node)}
-          type="text"
           value={values[index]}
           onChange={() => {}}
           disabled={disabled}
