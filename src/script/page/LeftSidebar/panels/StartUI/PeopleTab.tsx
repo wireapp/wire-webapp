@@ -24,6 +24,8 @@ import {safeWindowOpen} from 'Util/SanitizationUtil';
 import {UserRepository} from 'src/script/user/UserRepository';
 import {isBackendError} from 'Util/TypePredicateUtil';
 import {getLogger} from 'Util/Logger';
+import {partition} from 'underscore';
+import {sortByPriority} from 'Util/StringUtil';
 
 type SearchResultsData = {contacts: User[]; groups: Conversation[]; others: User[]};
 
@@ -77,6 +79,25 @@ export const PeopleTab: React.FC<{
   const hasResults = results.contacts.length + results.groups.length + results.others.length > 0;
 
   const manageTeamUrl = getManageTeamUrl('client_landing');
+
+  const organizeTeamSearchResults = async (
+    remoteUsers: User[],
+    searchResults: SearchResultsData,
+    query: string,
+  ): Promise<SearchResultsData> => {
+    const selfTeamId = userState.self().teamId;
+    const [contacts, others] = partition(remoteUsers, user => user.teamId === selfTeamId);
+    const knownContactIds = searchResults.contacts.map(({id}) => id);
+    const newContacts = contacts.filter(({id}) => !knownContactIds.includes(id));
+    const nonExternalContacts = await teamRepository.filterExternals(newContacts);
+    return {
+      ...searchResults,
+      contacts: [...searchResults.contacts, ...nonExternalContacts].sort((userA, userB) =>
+        sortByPriority(userA.name(), userB.name(), query),
+      ),
+      others: others,
+    };
+  };
 
   const getTopPeople = () => {
     return conversationRepository
@@ -135,9 +156,13 @@ export const PeopleTab: React.FC<{
       if (searchRemote) {
         try {
           const userEntities = await searchRepository.searchByName(query, isHandle);
+          const results = userState.self().inTeam()
+            ? await organizeTeamSearchResults(userEntities, localSearchResults, query)
+            : {...localSearchResults, others: userEntities};
+
           if (currentSearchQuery.current === searchQuery) {
             // Only update the results if the query that has been processed correspond to the current search query
-            setResults({...localSearchResults, others: userEntities});
+            setResults(results);
           }
         } catch (error) {
           if (isBackendError(error)) {
