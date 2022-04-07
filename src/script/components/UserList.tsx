@@ -93,6 +93,9 @@ const UserList: React.FC<UserListProps> = ({
   const {is_verified: isSelfVerified} = useKoSubscribableChildren(self, ['is_verified']);
   const isSelectEnabled = !!onSelectUser;
 
+  // subscribe to roles changes in order to react to them
+  useKoSubscribableChildren(conversation, ['roles']);
+
   const isCompactMode = mode === UserlistMode.COMPACT;
   const cssClasses = isCompactMode ? 'search-list-sm' : 'search-list-lg';
 
