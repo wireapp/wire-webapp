@@ -69,7 +69,13 @@ export const PeopleTab: React.FC<{
 }) => {
   const logger = getLogger('PeopleSearch');
   const getLocalUsers = () => {
-    return isTeam ? teamState.teamUsers() : userState.connectedUsers();
+    const connectedUsers = conversationState.connectedUsers();
+    if (!isTeam) {
+      return connectedUsers;
+    }
+    return teamState
+      .teamUsers()
+      .filter(user => connectedUsers.includes(user) || teamRepository.isSelfConnectedTo(user.id));
   };
   const [results, setResults] = useState<SearchResultsData>({contacts: getLocalUsers(), groups: [], others: []});
   const [topPeople, setTopPeople] = useState<User[]>([]);
