@@ -26,7 +26,6 @@ import {getLogger} from 'Util/Logger';
 import {partition} from 'underscore';
 import {sortByPriority} from 'Util/StringUtil';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
-import {Config} from '../../../../Config';
 
 export type SearchResultsData = {contacts: User[]; groups: Conversation[]; others: User[]};
 
@@ -69,7 +68,6 @@ export const PeopleTab: React.FC<{
   onClickUser,
   onSearchResults,
 }) => {
-  const brandName = Config.getConfig().BRAND_NAME;
   const logger = getLogger('PeopleSearch');
   const [topPeople, setTopPeople] = useState<User[]>([]);
   const teamSize = teamState.teamSize();
@@ -77,14 +75,16 @@ export const PeopleTab: React.FC<{
   const currentSearchQuery = useRef('');
 
   const {connectedUsers} = useKoSubscribableChildren(conversationState, ['connectedUsers']);
-  const getLocalUsers = () => {
+  const getLocalUsers = (unfiltered?: boolean) => {
     if (!canSearchUnconnectedUsers) {
       return connectedUsers;
     }
     if (isTeam) {
-      return teamState
-        .teamUsers()
-        .filter(user => connectedUsers.includes(user) || teamRepository.isSelfConnectedTo(user.id));
+      return unfiltered
+        ? teamState.teamUsers()
+        : teamState
+            .teamUsers()
+            .filter(user => connectedUsers.includes(user) || teamRepository.isSelfConnectedTo(user.id));
     }
     return userState.connectedUsers();
   };
@@ -101,9 +101,7 @@ export const PeopleTab: React.FC<{
   ): Promise<SearchResultsData> => {
     const selfTeamId = userState.self().teamId;
     const [contacts, others] = partition(remoteUsers, user => user.teamId === selfTeamId);
-    const knownContactIds = searchResults.contacts.map(({id}) => id);
-    const newContacts = contacts.filter(({id}) => !knownContactIds.includes(id));
-    const nonExternalContacts = await teamRepository.filterExternals(newContacts);
+    const nonExternalContacts = await teamRepository.filterExternals(contacts);
     return {
       ...searchResults,
       contacts: [...searchResults.contacts, ...nonExternalContacts].sort((userA, userB) =>
@@ -135,14 +133,13 @@ export const PeopleTab: React.FC<{
   useDebounce(
     async () => {
       setHasFederationError(false);
-      const localSearchSources = getLocalUsers();
-
       const query = SearchRepository.normalizeQuery(searchQuery);
       if (!query) {
-        setResults({contacts: localSearchSources, groups: [], others: []});
+        setResults({contacts: getLocalUsers(), groups: [], others: []});
         onSearchResults(undefined);
         return;
       }
+      const localSearchSources = getLocalUsers(true);
 
       // Contacts, groups and others
       const trimmedQuery = searchQuery.trim();
@@ -169,9 +166,11 @@ export const PeopleTab: React.FC<{
       if (canSearchUnconnectedUsers) {
         try {
           const userEntities = await searchRepository.searchByName(query, isHandle);
+          const localUserIds = localSearchResults.contacts.map(({id}) => id);
+          const onlyRemoteUsers = userEntities.filter(user => !localUserIds.includes(user.id));
           const results = userState.self().inTeam()
-            ? await organizeTeamSearchResults(userEntities, localSearchResults, query)
-            : {...localSearchResults, others: userEntities};
+            ? await organizeTeamSearchResults(onlyRemoteUsers, localSearchResults, query)
+            : {...localSearchResults, others: onlyRemoteUsers};
 
           if (currentSearchQuery.current === searchQuery) {
             // Only update the results if the query that has been processed correspond to the current search query
@@ -205,19 +204,7 @@ export const PeopleTab: React.FC<{
   }, [searchQuery]);
 
   return (
-    <div>
-      {!hasResults && (
-        <>
-          {!canSearchUnconnectedUsers ? (
-            <span className="start-ui-no-contacts__icon">
-              <Icon.People />
-            </span>
-          ) : (
-            <div className="start-ui-no-contacts">{t('searchNoContactsOnWire', brandName)}</div>
-          )}
-        </>
-      )}
-
+    <>
       {hasFederationError && (
         <div className="start-ui-fed-domain-unavailable">
           <div className="start-ui-fed-domain-unavailable__head">{t('searchConnectWithOtherDomain')}</div>
@@ -230,19 +217,16 @@ export const PeopleTab: React.FC<{
 
       {!hasFederationError && !hasResults && (
         <>
-          {!canSearchUnconnectedUsers && (
+          {!canSearchUnconnectedUsers ? (
             <div className="start-ui-no-search-results__content">
               <span className="start-ui-no-search-results__icon">
                 <Icon.Message />
               </span>
-              <div
-                className="start-ui-no-search-results__text"
-                data-bind="text: t('searchNoMatchesPartner')"
-                data-uie-name="label-no-search-result"
-              ></div>
+              <div className="start-ui-no-search-results__text" data-uie-name="label-no-search-result">
+                {t('searchNoMatchesPartner')}
+              </div>
             </div>
-          )}
-          {isFederated ? (
+          ) : isFederated ? (
             <div className="start-ui-fed-wrapper">
               <span className="start-ui-fed-wrapper__icon">
                 <Icon.Profile />
@@ -371,6 +355,6 @@ export const PeopleTab: React.FC<{
           </div>
         )}
       </div>
-    </div>
+    </>
   );
 };

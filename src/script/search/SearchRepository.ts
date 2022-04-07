@@ -185,11 +185,7 @@ export class SearchRepository {
     const userEntities = await this.userRepository.getUsersById(userIds);
 
     return Promise.resolve(userEntities)
-      .then(userEntities => {
-        return userEntities.filter(userEntity => {
-          return !userEntity.isMe && !userEntity.isConnected() && !userEntity.isTeamMember();
-        });
-      })
+      .then(userEntities => userEntities.filter(userEntity => !userEntity.isMe))
       .then(userEntities => {
         if (isHandle) {
           userEntities = userEntities.filter(userEntity => startsWith(userEntity.username(), query));
