@@ -25,6 +25,7 @@ import {isBackendError} from 'Util/TypePredicateUtil';
 import {getLogger} from 'Util/Logger';
 import {partition} from 'underscore';
 import {sortByPriority} from 'Util/StringUtil';
+import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 
 export type SearchResultsData = {contacts: User[]; groups: Conversation[]; others: User[]};
 
@@ -68,8 +69,13 @@ export const PeopleTab: React.FC<{
   onSearchResults,
 }) => {
   const logger = getLogger('PeopleSearch');
+  const [topPeople, setTopPeople] = useState<User[]>([]);
+  const teamSize = teamState.teamSize();
+  const [hasFederationError, setHasFederationError] = useState(false);
+  const currentSearchQuery = useRef('');
+
+  const {connectedUsers} = useKoSubscribableChildren(conversationState, ['connectedUsers']);
   const getLocalUsers = () => {
-    const connectedUsers = conversationState.connectedUsers();
     if (!isTeam) {
       return connectedUsers;
     }
@@ -78,11 +84,6 @@ export const PeopleTab: React.FC<{
       .filter(user => connectedUsers.includes(user) || teamRepository.isSelfConnectedTo(user.id));
   };
   const [results, setResults] = useState<SearchResultsData>({contacts: getLocalUsers(), groups: [], others: []});
-  const [topPeople, setTopPeople] = useState<User[]>([]);
-  const teamSize = teamState.teamSize();
-  const [hasFederationError, setHasFederationError] = useState(false);
-  const currentSearchQuery = useRef('');
-
   const searchOnFederatedDomain = () => '';
   const hasResults = results.contacts.length + results.groups.length + results.others.length > 0;
 
