@@ -60,6 +60,7 @@ import {User} from '../../entity/User';
 import {UserState} from '../../user/UserState';
 import {TeamState} from '../../team/TeamState';
 import '../../page/message-list/MentionSuggestions';
+import {InputHTMLAttributes} from 'react';
 
 interface DraftMessage {
   mentions: MentionEntity[];
@@ -113,7 +114,7 @@ export class InputBarViewModel {
   readonly acceptedImageTypes: string;
   readonly allowedFileTypes: string;
   readonly isConnectionRequest: ko.PureComputed<boolean>;
-  readonly inputFileAttr: ko.Observable<{accept?: string; 'aria-label': string}>;
+  readonly inputFileAttr: ko.Observable<InputHTMLAttributes<HTMLInputElement>>;
 
   static get CONFIG() {
     return {
