@@ -26,6 +26,7 @@ import {getLogger} from 'Util/Logger';
 import {partition} from 'underscore';
 import {sortByPriority} from 'Util/StringUtil';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
+import {Config} from '../../../../Config';
 
 export type SearchResultsData = {contacts: User[]; groups: Conversation[]; others: User[]};
 
@@ -68,6 +69,7 @@ export const PeopleTab: React.FC<{
   onClickUser,
   onSearchResults,
 }) => {
+  const brandName = Config.getConfig().BRAND_NAME;
   const logger = getLogger('PeopleSearch');
   const [topPeople, setTopPeople] = useState<User[]>([]);
   const teamSize = teamState.teamSize();
@@ -77,6 +79,9 @@ export const PeopleTab: React.FC<{
   const {connectedUsers} = useKoSubscribableChildren(conversationState, ['connectedUsers']);
   const getLocalUsers = () => {
     if (!isTeam) {
+      if (canSearchUnconnectedUsers) {
+        return userState.connectedUsers();
+      }
       return connectedUsers;
     }
     return teamState
@@ -130,21 +135,18 @@ export const PeopleTab: React.FC<{
   useDebounce(
     async () => {
       setHasFederationError(false);
-      const allLocalUsers = getLocalUsers();
+      const localSearchSources = getLocalUsers();
 
       const query = SearchRepository.normalizeQuery(searchQuery);
       if (!query) {
-        setResults({contacts: allLocalUsers, groups: [], others: []});
+        setResults({contacts: localSearchSources, groups: [], others: []});
         onSearchResults(undefined);
         return;
       }
 
-      const searchRemote = canSearchUnconnectedUsers;
       // Contacts, groups and others
       const trimmedQuery = searchQuery.trim();
       const isHandle = trimmedQuery.startsWith('@') && validateHandle(query);
-
-      const localSearchSources = !searchRemote ? conversationState.connectedUsers() : allLocalUsers;
 
       const SEARCHABLE_FIELDS = SearchRepository.CONFIG.SEARCHABLE_FIELDS;
       const searchFields = isHandle ? [SEARCHABLE_FIELDS.USERNAME] : undefined;
@@ -164,7 +166,7 @@ export const PeopleTab: React.FC<{
       };
       setResults(localSearchResults);
       onSearchResults(localSearchResults);
-      if (searchRemote) {
+      if (canSearchUnconnectedUsers) {
         try {
           const userEntities = await searchRepository.searchByName(query, isHandle);
           const results = userState.self().inTeam()
@@ -211,7 +213,7 @@ export const PeopleTab: React.FC<{
               <Icon.People />
             </span>
           ) : (
-            <div className="start-ui-no-contacts" data-bind="text: t('searchNoContactsOnWire', brandName)"></div>
+            <div className="start-ui-no-contacts">{t('searchNoContactsOnWire', brandName)}</div>
           )}
         </>
       )}
