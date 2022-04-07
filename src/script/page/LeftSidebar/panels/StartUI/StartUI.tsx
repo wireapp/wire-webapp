@@ -40,6 +40,7 @@ import {MainViewModel} from 'src/script/view_model/MainViewModel';
 import {UserRepository} from 'src/script/user/UserRepository';
 import {User} from 'src/script/entity/User';
 import {Conversation} from 'src/script/entity/Conversation';
+import {ServiceEntity} from 'src/script/integration/ServiceEntity';
 
 type StartUIProps = {
   conversationRepository: ConversationRepository;
@@ -117,6 +118,9 @@ const StartUI: React.FC<StartUIProps> = ({
     }
     return mainViewModel.content.userModal.showUser(user);
   };
+  const openService = (service: ServiceEntity) => {
+    mainViewModel.content.serviceModal.showService(service);
+  };
 
   const openConversation = (conversation: Conversation): Promise<void> => {
     return actions.openGroupConversation(conversation).then(close);
@@ -189,6 +193,7 @@ const StartUI: React.FC<StartUIProps> = ({
         searchQuery={searchQuery}
         canManageServices={canManageServices()}
         integrationRepository={integrationRepository}
+        onClickService={openService}
       />
     );
 

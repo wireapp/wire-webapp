@@ -11,8 +11,9 @@ import {safeWindowOpen} from 'Util/SanitizationUtil';
 export const ServicesTab: React.FC<{
   canManageServices: boolean;
   integrationRepository: IntegrationRepository;
+  onClickService: (service: ServiceEntity) => void;
   searchQuery: string;
-}> = ({searchQuery, canManageServices, integrationRepository}) => {
+}> = ({searchQuery, canManageServices, integrationRepository, onClickService}) => {
   const isInitial = false;
   const [services, setServices] = useState<ServiceEntity[]>(integrationRepository.services());
   const manageServicesUrl = getManageServicesUrl('client_landing');
@@ -49,14 +50,7 @@ export const ServicesTab: React.FC<{
               </li>
             </ul>
           )}
-          <ServiceList
-            arrow={true}
-            click={function (serviceEntity: ServiceEntity): void {
-              throw new Error('Function not implemented.');
-            }}
-            noUnderline={true}
-            services={services}
-          />
+          <ServiceList arrow={true} click={onClickService} noUnderline={true} services={services} />
         </>
       )}
       {services.length === 0 && !isInitial && (
