@@ -113,6 +113,7 @@ export class InputBarViewModel {
   readonly acceptedImageTypes: string;
   readonly allowedFileTypes: string;
   readonly isConnectionRequest: ko.PureComputed<boolean>;
+  readonly inputFileAttr: ko.Observable<{accept?: string; 'aria-label': string}>;
 
   static get CONFIG() {
     return {
@@ -140,6 +141,11 @@ export class InputBarViewModel {
     this.textarea = null;
     this.acceptedImageTypes = Config.getConfig().ALLOWED_IMAGE_TYPES.join(',');
     this.allowedFileTypes = Config.getConfig().FEATURE.ALLOWED_FILE_UPLOAD_EXTENSIONS.join(',');
+    this.inputFileAttr = ko.observable(
+      this.allowedFileTypes === '*'
+        ? {'aria-label': t('tooltipConversationFile')}
+        : {accept: this.allowedFileTypes, 'aria-label': t('tooltipConversationFile')},
+    );
     this.isConnectionRequest = ko.pureComputed(
       () =>
         this.conversationEntity() &&
