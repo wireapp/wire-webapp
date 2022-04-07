@@ -36,6 +36,7 @@ import {registerStaticReactComponent, useKoSubscribableChildren} from 'Util/Comp
 import {TeamState} from '../team/TeamState';
 
 import UserList from './UserList';
+import {t} from 'Util/LocalizerUtil';
 
 export type UserListProps = Omit<React.ComponentProps<typeof UserList>, 'users' | 'selectedUsers'> & {
   conversationState?: ConversationState;
@@ -145,6 +146,19 @@ const UserSearchableList: React.FC<UserListProps> = props => {
     }
   };
 
+  const userList = foundUserEntities();
+
+  if (userList.length === 0) {
+    return users.length === 0 ? (
+      <div className="user-list__no-results" data-uie-name="status-all-added">
+        {t('searchListEveryoneParticipates')}
+      </div>
+    ) : (
+      <div className="user-list__no-results" data-uie-name="status-no-matches">
+        {t('searchListNoMatches')}
+      </div>
+    );
+  }
   return (
     <UserList
       {...userListProps}
