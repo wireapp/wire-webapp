@@ -209,7 +209,14 @@ const StartUI: React.FC<StartUIProps> = ({
   ) : undefined;
 
   return (
-    <ListWrapper id={'start-ui'} header={teamName} onClose={onClose} before={before} footer={footer}>
+    <ListWrapper
+      id={'start-ui'}
+      header={teamName}
+      headerUieName="status-team-name-search"
+      onClose={onClose}
+      before={before}
+      footer={footer}
+    >
       {content}
     </ListWrapper>
   );
