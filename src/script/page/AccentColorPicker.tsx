@@ -44,6 +44,8 @@ const AccentColorPicker: React.FunctionComponent<AccentColorPickerProps> = ({use
         }}
       >
         {AccentColor.ACCENT_COLORS.map(accentColor => {
+          const nameSplit = accentColor.name.replace(/([A-Z])/g, ',$1').split(',');
+          const name = nameSplit[nameSplit.length - 1];
           const isChecked = user.accent_id() === accentColor.id;
 
           return (
@@ -54,6 +56,7 @@ const AccentColorPicker: React.FunctionComponent<AccentColorPickerProps> = ({use
               css={{
                 alignItems: 'center',
                 display: 'flex',
+                flexDirection: 'column',
                 justifyContent: 'center',
               }}
             >
@@ -61,7 +64,6 @@ const AccentColorPicker: React.FunctionComponent<AccentColorPickerProps> = ({use
                 id={accentColor.color}
                 type="radio"
                 name="accent"
-                aria-label={accentColor.name}
                 checked={isChecked}
                 onChange={() => doSetAccentColor(accentColor.id)}
                 data-uie-name="do-set-accent-color"
@@ -73,14 +75,14 @@ const AccentColorPicker: React.FunctionComponent<AccentColorPickerProps> = ({use
                     position: 'relative',
                   },
                   '& + span::after': {
-                    ...CSS_SQUARE(isChecked ? 10 : 6),
+                    ...CSS_SQUARE(10),
                     background: accentColor.color,
-                    left: '-10px',
-                    top: '-3px',
+                    left: '-5px',
+                    top: '-5px',
                   },
                   '& + span::before': {
-                    ...CSS_SQUARE(isChecked ? 16 : 12),
-                    left: '-15px',
+                    ...CSS_SQUARE(16),
+                    left: '-8px',
                     top: '-8px',
                   },
                   '& + span::before, & + span::after': {
@@ -91,7 +93,7 @@ const AccentColorPicker: React.FunctionComponent<AccentColorPickerProps> = ({use
                     transition: 'all 0.15s ease-out',
                   },
                   '&:checked + span::after': {
-                    left: '-12px',
+                    left: '-5px',
                     top: '-5px',
                   },
                   '&:checked + span::before': {
@@ -105,6 +107,13 @@ const AccentColorPicker: React.FunctionComponent<AccentColorPickerProps> = ({use
                 }}
               />
               <span onClick={() => doSetAccentColor(accentColor.id)} />
+              <label
+                htmlFor={accentColor.color}
+                onClick={() => doSetAccentColor(accentColor.id)}
+                style={{cursor: 'pointer', fontSize: '11px', marginTop: '14px'}}
+              >
+                {name}
+              </label>
             </div>
           );
         })}
