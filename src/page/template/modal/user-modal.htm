@@ -1,5 +1,5 @@
 <div class="user-modal" data-bind="with: $root.userModal">
-  <modal
+  <modal-dialog
     params="isShown: isVisible, onBgClick: hide, onClosed: onClosed"
     data-bind="attr: {'data-uie-name': user() ? 'modal-user-profile' : userNotFound() ? 'modal-cannot-open-profile' : ''}"
   >
@@ -34,5 +34,5 @@
         </div>
       <!-- /ko -->
     </div>
-  </modal>
+  </modal-dialog>
 </div>
