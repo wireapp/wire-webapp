@@ -904,6 +904,7 @@
   "preferencesAccountAppLockCheckbox": "Lock With Passcode",
   "preferencesAccountAppLockDetail": "Lock Wire after {{locktime}} in the background. Unlock with Touch ID or enter your passcode.",
   "preferencesAccountAvailabilityUnset": "Set a status",
+  "preferencesAccountAccentColor": "Set a custom color",
   "preferencesAccountCopyLink": "Copy profile link",
   "preferencesAccountCreateTeam": "Create a team",
   "preferencesAccountData": "Data usage permissions",

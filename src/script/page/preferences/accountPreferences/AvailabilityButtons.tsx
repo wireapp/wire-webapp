@@ -60,6 +60,15 @@ const activeStyles: CSSObject = {
   color: '#0667C8',
 };
 
+const headerStyles: CSSObject = {
+  fontSize: '12px',
+  fontWeight: 400,
+  lineHeight: '14px',
+  margin: '37px 0 6px',
+  padding: 0,
+  textTransform: 'uppercase',
+};
+
 const AvailabilityButtons: React.FC<AvailabilityInputProps> = ({availability}) => {
   const icons: {
     [key: string]: any;
@@ -114,23 +123,26 @@ const AvailabilityButtons: React.FC<AvailabilityInputProps> = ({availability}) =
   ];
 
   return (
-    <div>
-      {entries.map(item => {
-        const isActive = availability === item.availability;
+    <>
+      <h3 css={headerStyles}>{t('preferencesAccountAvailabilityUnset')}</h3>
+      <div>
+        {entries.map(item => {
+          const isActive = availability === item.availability;
 
-        return (
-          <button
-            key={item.availability}
-            css={{...buttonStyles, ...(isActive ? activeStyles : {})}}
-            type="button"
-            onClick={() => item.click()}
-          >
-            {icons[item.availability]}
-            {item.label}
-          </button>
-        );
-      })}
-    </div>
+          return (
+            <button
+              key={item.availability}
+              css={{...buttonStyles, ...(isActive ? activeStyles : {})}}
+              type="button"
+              onClick={() => item.click()}
+            >
+              {icons[item.availability]}
+              {item.label}
+            </button>
+          );
+        })}
+      </div>
+    </>
   );
 };
 

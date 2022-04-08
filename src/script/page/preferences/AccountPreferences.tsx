@@ -129,7 +129,6 @@ const AccountPreferences: React.FC<AccountPreferencesProps> = ({
           alignItems: 'center',
           display: 'flex',
           flexDirection: 'column',
-          gap: 16,
           paddingBottom: 32,
           width: 560,
         }}
