@@ -64,6 +64,7 @@ import {Runtime} from '@wireapp/commons';
 import {parseError, parseValidationErrors} from '../util/errorUtil';
 import {UrlUtil} from '@wireapp/commons';
 import Page from './Page';
+import EntropyContainer from './EntropyContainer';
 
 interface Props extends React.HTMLProps<HTMLDivElement> {}
 
@@ -76,6 +77,7 @@ const Login = ({
   doLoginAndJoin,
   doLogin,
   doSendTwoFactorCode,
+  validateLocalClient,
   isFetching,
   pushLoginData,
   loginData,
@@ -94,6 +96,11 @@ const Login = ({
 
   const [twoFactorSubmitError, setTwoFactorSubmitError] = useState<string>('');
   const [twoFactorLoginData, setTwoFactorLoginData] = useState<LoginData>();
+
+  const [showEntropyForm, setShowEntropyForm] = useState(false);
+  const isEntropyRequired = Config.getConfig().FEATURE.ENABLE_EXTRA_CLIENT_ENTROPY;
+  const [entropy, setEntropy] = useState<Uint8Array>();
+  // console.log('zephyr', validateLocalClient());
 
   useEffect(() => {
     const queryClientType = UrlUtil.getURLParameter(QUERY_KEY.CLIENT_TYPE);
@@ -146,19 +153,30 @@ const Login = ({
     }
   };
 
-  const handleSubmit = async (formLoginData: Partial<LoginData>, validationErrors: Error[]) => {
+  const handleSubmit = async (
+    formLoginData: Partial<LoginData>,
+    validationErrors: Error[],
+    entropyData?: Uint8Array,
+  ) => {
     setValidationErrors(validationErrors);
+    const login: LoginData = {...formLoginData, clientType: loginData.clientType};
     try {
       if (validationErrors.length) {
         throw validationErrors[0];
       }
-      const login: LoginData = {...formLoginData, clientType: loginData.clientType};
+
+      if (isEntropyRequired && !showEntropyForm && !entropyData) {
+        setShowEntropyForm(true);
+        setTwoFactorLoginData(login);
+        return;
+      }
+      // console.log('zephyr', validateLocalClient());
 
       const hasKeyAndCode = conversationKey && conversationCode;
       if (hasKeyAndCode) {
-        await doLoginAndJoin(login, conversationKey, conversationCode);
+        await doLoginAndJoin(login, conversationKey, conversationCode, undefined, entropyData);
       } else {
-        await doLogin(login);
+        await doLogin(login, entropyData);
       }
 
       return history.push(ROUTE.HISTORY_INFO);
@@ -172,7 +190,7 @@ const Login = ({
             break;
           }
           case BackendError.LABEL.CODE_AUTHENTICATION_REQUIRED: {
-            const login: LoginData = {...formLoginData, clientType: loginData.clientType};
+            // const login: LoginData = {...formLoginData, clientType: loginData.clientType};
             setTwoFactorLoginData(login);
             doSendTwoFactorCode(login.email);
             break;
@@ -210,7 +228,13 @@ const Login = ({
 
   const submitTwoFactorLogin = (code: string) => {
     setTwoFactorSubmitError('');
-    handleSubmit({...twoFactorLoginData, verificationCode: code}, []);
+    handleSubmit({...twoFactorLoginData, verificationCode: code}, [], entropy);
+  };
+
+  const submitEntropyLogin = (entropyData: [number, number][]) => {
+    const entropyUint = new Uint8Array(entropyData.filter(Boolean).flat());
+    setEntropy(entropyUint);
+    handleSubmit(twoFactorLoginData, [], entropyUint);
   };
 
   const backArrow = (
@@ -228,105 +252,109 @@ const Login = ({
           <div style={{margin: 16}}>{backArrow}</div>
         </IsMobile>
       )}
-      <Container centerText verticalCenter style={{width: '100%'}}>
-        {!isValidLink && <Redirect to={ROUTE.CONVERSATION_JOIN_INVALID} />}
-        <AppAlreadyOpen />
-        <Columns>
-          <IsMobile not>
-            <Column style={{display: 'flex'}}>
-              {(Config.getConfig().FEATURE.ENABLE_DOMAIN_DISCOVERY ||
-                Config.getConfig().FEATURE.ENABLE_SSO ||
-                Config.getConfig().FEATURE.ENABLE_ACCOUNT_REGISTRATION) && (
-                <div style={{margin: 'auto'}}>{backArrow}</div>
-              )}
-            </Column>
-          </IsMobile>
-          <Column style={{flexBasis: 384, flexGrow: 0, padding: 0}}>
-            <ContainerXS
-              centerText
-              style={{display: 'flex', flexDirection: 'column', height: 428, justifyContent: 'space-between'}}
-            >
-              {twoFactorLoginData ? (
-                <div>
-                  <H2 center>{_(loginStrings.twoFactorLoginTitle)}</H2>
-                  <Text>{_(loginStrings.twoFactorLoginSubHead, {email: twoFactorLoginData.email})}</Text>
-                  <Label markInvalid={!!twoFactorSubmitError}>
-                    <CodeInput
-                      autoFocus
-                      style={{marginTop: 60}}
-                      onCodeComplete={submitTwoFactorLogin}
-                      data-uie-name="enter-code"
-                      markInvalid={!!twoFactorSubmitError}
-                    />
-                    {!!twoFactorSubmitError && parseError(twoFactorSubmitError)}
-                  </Label>
-                  <div style={{marginTop: 30}}>
-                    {isSendingTwoFactorCode ? (
-                      <Loading size={20} />
-                    ) : (
-                      <TextLink onClick={resendTwoFactorCode} center>
-                        {_(verifyStrings.resendCode)}
-                      </TextLink>
-                    )}
-                  </div>
-                </div>
-              ) : (
-                <>
+      {isEntropyRequired && showEntropyForm && !entropy ? (
+        <EntropyContainer onSetEntropy={submitEntropyLogin} />
+      ) : (
+        <Container centerText verticalCenter style={{width: '100%'}}>
+          {!isValidLink && <Redirect to={ROUTE.CONVERSATION_JOIN_INVALID} />}
+          <AppAlreadyOpen />
+          <Columns>
+            <IsMobile not>
+              <Column style={{display: 'flex'}}>
+                {(Config.getConfig().FEATURE.ENABLE_DOMAIN_DISCOVERY ||
+                  Config.getConfig().FEATURE.ENABLE_SSO ||
+                  Config.getConfig().FEATURE.ENABLE_ACCOUNT_REGISTRATION) && (
+                  <div style={{margin: 'auto'}}>{backArrow}</div>
+                )}
+              </Column>
+            </IsMobile>
+            <Column style={{flexBasis: 384, flexGrow: 0, padding: 0}}>
+              <ContainerXS
+                centerText
+                style={{display: 'flex', flexDirection: 'column', height: 428, justifyContent: 'space-between'}}
+              >
+                {twoFactorLoginData ? (
                   <div>
-                    <H1 center>{_(loginStrings.headline)}</H1>
-                    <Muted>{_(loginStrings.subhead)}</Muted>
-                    <Form style={{marginTop: 30}} data-uie-name="login">
-                      <LoginForm isFetching={isFetching} onSubmit={handleSubmit} />
-                      {validationErrors.length ? (
-                        parseValidationErrors(validationErrors)
-                      ) : loginError ? (
-                        parseError(loginError)
+                    <H2 center>{_(loginStrings.twoFactorLoginTitle)}</H2>
+                    <Text>{_(loginStrings.twoFactorLoginSubHead, {email: twoFactorLoginData.email})}</Text>
+                    <Label markInvalid={!!twoFactorSubmitError}>
+                      <CodeInput
+                        autoFocus
+                        style={{marginTop: 60}}
+                        onCodeComplete={submitTwoFactorLogin}
+                        data-uie-name="enter-code"
+                        markInvalid={!!twoFactorSubmitError}
+                      />
+                      {!!twoFactorSubmitError && parseError(twoFactorSubmitError)}
+                    </Label>
+                    <div style={{marginTop: 30}}>
+                      {isSendingTwoFactorCode ? (
+                        <Loading size={20} />
                       ) : (
-                        <div style={{marginTop: '4px'}}>&nbsp;</div>
+                        <TextLink onClick={resendTwoFactorCode} center>
+                          {_(verifyStrings.resendCode)}
+                        </TextLink>
                       )}
-                      {!Runtime.isDesktopApp() && (
-                        <Checkbox
-                          onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-                            pushLoginData({
-                              clientType: event.target.checked ? ClientType.TEMPORARY : ClientType.PERMANENT,
-                            });
-                          }}
-                          checked={loginData.clientType === ClientType.TEMPORARY}
-                          data-uie-name="enter-public-computer-sign-in"
-                          style={{justifyContent: 'center', marginTop: '12px'}}
-                        >
-                          <CheckboxLabel htmlFor="enter-public-computer-sign-in">
-                            {_(loginStrings.publicComputer)}
-                          </CheckboxLabel>
-                        </Checkbox>
-                      )}
-                    </Form>
+                    </div>
                   </div>
-                  <Columns>
-                    <Column>
-                      <Link
-                        href={EXTERNAL_ROUTE.WIRE_ACCOUNT_PASSWORD_RESET}
-                        target="_blank"
-                        data-uie-name="go-forgot-password"
-                      >
-                        {_(loginStrings.forgotPassword)}
-                      </Link>
-                    </Column>
-                    {Config.getConfig().FEATURE.ENABLE_PHONE_LOGIN && (
+                ) : (
+                  <>
+                    <div>
+                      <H1 center>{_(loginStrings.headline)}</H1>
+                      <Muted>{_(loginStrings.subhead)}</Muted>
+                      <Form style={{marginTop: 30}} data-uie-name="login">
+                        <LoginForm isFetching={isFetching} onSubmit={handleSubmit} />
+                        {validationErrors.length ? (
+                          parseValidationErrors(validationErrors)
+                        ) : loginError ? (
+                          parseError(loginError)
+                        ) : (
+                          <div style={{marginTop: '4px'}}>&nbsp;</div>
+                        )}
+                        {!Runtime.isDesktopApp() && (
+                          <Checkbox
+                            onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                              pushLoginData({
+                                clientType: event.target.checked ? ClientType.TEMPORARY : ClientType.PERMANENT,
+                              });
+                            }}
+                            checked={loginData.clientType === ClientType.TEMPORARY}
+                            data-uie-name="enter-public-computer-sign-in"
+                            style={{justifyContent: 'center', marginTop: '12px'}}
+                          >
+                            <CheckboxLabel htmlFor="enter-public-computer-sign-in">
+                              {_(loginStrings.publicComputer)}
+                            </CheckboxLabel>
+                          </Checkbox>
+                        )}
+                      </Form>
+                    </div>
+                    <Columns>
                       <Column>
-                        <RouterLink to={ROUTE.LOGIN_PHONE} data-uie-name="go-sign-in-phone">
-                          {_(loginStrings.phoneLogin)}
-                        </RouterLink>
+                        <Link
+                          href={EXTERNAL_ROUTE.WIRE_ACCOUNT_PASSWORD_RESET}
+                          target="_blank"
+                          data-uie-name="go-forgot-password"
+                        >
+                          {_(loginStrings.forgotPassword)}
+                        </Link>
                       </Column>
-                    )}
-                  </Columns>
-                </>
-              )}
-            </ContainerXS>
-          </Column>
-          <Column />
-        </Columns>
-      </Container>
+                      {Config.getConfig().FEATURE.ENABLE_PHONE_LOGIN && (
+                        <Column>
+                          <RouterLink to={ROUTE.LOGIN_PHONE} data-uie-name="go-sign-in-phone">
+                            {_(loginStrings.phoneLogin)}
+                          </RouterLink>
+                        </Column>
+                      )}
+                    </Columns>
+                  </>
+                )}
+              </ContainerXS>
+            </Column>
+            <Column />
+          </Columns>
+        </Container>
+      )}
     </Page>
   );
 };
@@ -352,6 +380,7 @@ const mapDispatchToProps = (dispatch: Dispatch<AnyAction>) =>
       doSendTwoFactorCode: actionRoot.authAction.doSendTwoFactorLoginCode,
       pushLoginData: actionRoot.authAction.pushLoginData,
       resetAuthError: actionRoot.authAction.resetAuthError,
+      validateLocalClient: actionRoot.authAction.validateLocalClient,
     },
     dispatch,
   );

@@ -50,26 +50,33 @@ export class AuthAction {
     };
   };
 
-  doLogin = (loginData: LoginData): ThunkAction => {
+  doLogin = (loginData: LoginData, entropyData?: Uint8Array): ThunkAction => {
     const onBeforeLogin: LoginLifecycleFunction = async (dispatch, getState, {actions: {authAction}}) =>
       dispatch(authAction.doSilentLogout());
-    return this.doLoginPlain(loginData, onBeforeLogin);
+    return this.doLoginPlain(loginData, onBeforeLogin, undefined, entropyData);
   };
 
-  doLoginAndJoin = (loginData: LoginData, key: string, code: string, uri?: string): ThunkAction => {
+  doLoginAndJoin = (
+    loginData: LoginData,
+    key: string,
+    code: string,
+    uri?: string,
+    entropyData?: Uint8Array,
+  ): ThunkAction => {
     const onBeforeLogin: LoginLifecycleFunction = async (dispatch, getState, {actions: {authAction}}) =>
       dispatch(authAction.doSilentLogout());
     const onAfterLogin: LoginLifecycleFunction = async (dispatch, getState, {actions: {conversationAction}}) => {
       await dispatch(conversationAction.doJoinConversationByCode(key, code, uri));
     };
 
-    return this.doLoginPlain(loginData, onBeforeLogin, onAfterLogin);
+    return this.doLoginPlain(loginData, onBeforeLogin, onAfterLogin, entropyData);
   };
 
   doLoginPlain = (
     loginData: LoginData,
     onBeforeLogin: LoginLifecycleFunction = async () => {},
     onAfterLogin: LoginLifecycleFunction = async () => {},
+    entropyData?: Uint8Array,
   ): ThunkAction => {
     return async (dispatch, getState, global) => {
       const {
@@ -94,6 +101,7 @@ export class AuthAction {
             loginData.clientType,
             loginData.password ? String(loginData.password) : undefined,
             loginData.verificationCode,
+            entropyData,
           ),
         );
         dispatch(AuthActionCreator.successfulLogin());
