@@ -24,12 +24,72 @@ import {Availability} from '@wireapp/protocol-messaging';
 
 import {t} from 'Util/LocalizerUtil';
 import {ContextMenuEntry} from '../../../ui/ContextMenu';
+import Icon from 'Components/Icon';
+import {CSS_SQUARE} from 'Util/CSSMixin';
+import {CSSObject} from '@emotion/core';
 
 interface AvailabilityInputProps {
   availability: Availability.Type;
 }
 
+const iconStyles: CSSObject = {
+  ...CSS_SQUARE(10),
+  fill: 'currentColor',
+  margin: '0 6px 1px 0',
+  minWidth: 10,
+  stroke: 'currentColor',
+};
+
+const buttonStyles: CSSObject = {
+  '&:first-child': {
+    borderRadius: '12px 0px 0px 12px',
+  },
+  '&:last-child': {
+    borderRadius: '0px 12px 12px 0px',
+  },
+  background: '#FFFFFF',
+  border: '1px solid #DCE0E3',
+  fontSize: '13px',
+  fontWeight: 500,
+  padding: '8px 12px',
+};
+
+const activeStyles: CSSObject = {
+  background: '#E7F0FA',
+  border: '1px solid #6AA4DE',
+  color: '#0667C8',
+};
+
 const AvailabilityButtons: React.FC<AvailabilityInputProps> = ({availability}) => {
+  const icons: {
+    [key: string]: any;
+  } = {
+    [Availability.Type.AVAILABLE]: (
+      <Icon.AvailabilityAvailable
+        className="availability-state-icon"
+        css={{...iconStyles, fill: '#1D7833', stroke: '#1D7833'}}
+        data-uie-name="status-availability-icon"
+        data-uie-value="available"
+      />
+    ),
+    [Availability.Type.BUSY]: (
+      <Icon.AvailabilityBusy
+        className="availability-state-icon"
+        css={{...iconStyles, fill: '#A25915', stroke: '#A25915'}}
+        data-uie-name="status-availability-icon"
+        data-uie-value="busy"
+      />
+    ),
+    [Availability.Type.AWAY]: (
+      <Icon.AvailabilityAway
+        className="availability-state-icon"
+        css={{...iconStyles, fill: '#C20013', stroke: '#C20013'}}
+        data-uie-name="status-availability-icon"
+        data-uie-value="away"
+      />
+    ),
+    [Availability.Type.NONE]: null,
+  };
   const entries: ContextMenuEntry[] = [
     {
       availability: Availability.Type.AVAILABLE,
@@ -55,16 +115,21 @@ const AvailabilityButtons: React.FC<AvailabilityInputProps> = ({availability}) =
 
   return (
     <div>
-      {entries.map(item => (
-        <button
-          key={item.availability}
-          style={{background: availability === item.availability && 'red'}}
-          type="button"
-          onClick={() => item.click()}
-        >
-          {item.label}
-        </button>
-      ))}
+      {entries.map(item => {
+        const isActive = availability === item.availability;
+
+        return (
+          <button
+            key={item.availability}
+            css={{...buttonStyles, ...(isActive ? activeStyles : {})}}
+            type="button"
+            onClick={() => item.click()}
+          >
+            {icons[item.availability]}
+            {item.label}
+          </button>
+        );
+      })}
     </div>
   );
 };
