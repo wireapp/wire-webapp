@@ -42,7 +42,7 @@ import {modals, ModalsViewModel} from '../../view_model/ModalsViewModel';
 import AccentColorPicker from '../AccentColorPicker';
 import AccountInput from './accountPreferences/AccountInput';
 import AccountSecuritySection from './accountPreferences/AccountSecuritySection';
-import AvailabilityInput from './accountPreferences/AvailabilityInput';
+import AvailabilityButtons from './accountPreferences/AvailabilityButtons';
 import AvatarInput from './accountPreferences/AvatarInput';
 import DataUsageSection from './accountPreferences/DataUsageSection';
 import EmailInput from './accountPreferences/EmailInput';
@@ -144,7 +144,7 @@ const AccountPreferences: React.FC<AccountPreferencesProps> = ({
         <div>
           <AvatarInput {...{isActivatedAccount, selfUser, userRepository}} />
         </div>
-        {isActivatedAccount && isTeam && <AvailabilityInput {...{availability}} />}
+        {isActivatedAccount && isTeam && <AvailabilityButtons {...{availability}} />}
         {isActivatedAccount && canEditProfile && (
           <div>
             <AccentColorPicker user={selfUser} doSetAccentColor={id => userRepository.changeAccentColor(id)} />

@@ -22,8 +22,10 @@ import ReactDOM from 'react-dom';
 import cx from 'classnames';
 import Icon from 'Components/Icon';
 import {isEnterKey, isEscapeKey, isKey, isOneOfKeys, isSpaceKey, KEY} from 'Util/KeyboardUtil';
+import {Availability} from '@wireapp/protocol-messaging';
 
 export interface ContextMenuEntry {
+  availability?: Availability.Type;
   click?: (event?: MouseEvent) => void;
   icon?: string;
   identifier?: string;
