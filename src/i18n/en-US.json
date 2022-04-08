@@ -354,7 +354,6 @@
   "conversationNotClassified": "Security level: Unclassified",
   "conversationNotFoundMessage": "You may not have permission with this account or it no longer exists.",
   "conversationNotFoundTitle": "{{brandName}} can’t open this conversation.",
-
   "conversationParticipantsSearchPlaceholder": "Search by name",
   "conversationParticipantsTitle": "People",
   "conversationPing": " pinged",
