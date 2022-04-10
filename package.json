@@ -68,7 +68,7 @@
     "@types/adm-zip": "0.5.0",
     "@types/classnames": "2.3.1",
     "@types/dexie-batch": "0.4.3",
-    "@types/enzyme": "3.10.11",
+    "@types/enzyme": "3.10.12",
     "@types/generate-changelog": "1.8.1",
     "@types/highlight.js": "10.1.0",
     "@types/jest": "27.4.1",
