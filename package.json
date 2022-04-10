@@ -47,7 +47,7 @@
     "use-react-router": "1.0.7",
     "uuidjs": "4.2.11",
     "webrtc-adapter": "6.4.8",
-    "zustand": "3.7.1"
+    "zustand": "3.7.2"
   },
   "devDependencies": {
     "@babel/core": "7.17.9",
