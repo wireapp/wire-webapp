@@ -17,7 +17,7 @@
  *
  */
 
-import React, {Fragment, useEffect, useState} from 'react';
+import React, {Fragment, useState} from 'react';
 import cx from 'classnames';
 
 import {container} from 'tsyringe';
@@ -28,14 +28,13 @@ import {t} from 'Util/LocalizerUtil';
 import type {ConversationRepository} from '../conversation/ConversationRepository';
 import type {Conversation} from '../entity/Conversation';
 import type {User} from '../entity/User';
-import {useViewPortObserver} from '../ui/viewportObserver';
 
 import {UserState} from '../user/UserState';
 import {ConversationState} from '../conversation/ConversationState';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import ParticipantItem from 'Components/list/ParticipantItem';
 import {TeamState} from '../team/TeamState';
-import useEffectRef from 'Util/useEffectRef';
+import InViewport from './utils/InViewport';
 
 export enum UserlistMode {
   COMPACT = 'UserlistMode.COMPACT',
@@ -113,15 +112,6 @@ const UserList: React.FC<UserListProps> = ({
 
   const isSelected = (userEntity: User): boolean =>
     isSelectEnabled && selectedUsers.some(user => user.id === userEntity.id);
-
-  const [viewportElementRef, setViewportElementRef] = useEffectRef<HTMLDivElement>();
-  const isInViewport = useViewPortObserver(viewportElementRef);
-
-  useEffect(() => {
-    if (isInViewport) {
-      setMaxShownUsers(maxShownUsers + USER_CHUNK_SIZE);
-    }
-  }, [isInViewport]);
 
   let content;
 
@@ -245,9 +235,12 @@ const UserList: React.FC<UserListProps> = ({
     <>
       {content}
       {users.length > maxShownUsers && (
-        <div ref={setViewportElementRef}>
+        <InViewport
+          onVisible={() => setMaxShownUsers(maxShownUsers + USER_CHUNK_SIZE)}
+          key={`in-viewport-${Math.random()}`}
+        >
           <div css={{height: 100}}></div>
-        </div>
+        </InViewport>
       )}
     </>
   );
