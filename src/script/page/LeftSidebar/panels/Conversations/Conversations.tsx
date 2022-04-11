@@ -82,6 +82,7 @@ const Conversations: React.FC<ConversationsProps> = ({
     isOnLegalHold,
     hasPendingLegalHold,
   } = useKoSubscribableChildren(selfUser, ['hasPendingLegalHold', 'isOnLegalHold', 'name', 'availability']);
+  const {classifiedDomains} = useKoSubscribableChildren(teamState, ['classifiedDomains']);
   const {connectRequests} = useKoSubscribableChildren(userState, ['connectRequests']);
   const {activeConversation} = useKoSubscribableChildren(conversationState, ['activeConversation']);
   const {conversations_archived: archivedConversations, conversations_unarchived: conversations} =
@@ -239,6 +240,7 @@ const Conversations: React.FC<ConversationsProps> = ({
         return (
           <div className="calling-cell" key={conversation.id}>
             <ConversationListCallingCell
+              classifiedDomains={classifiedDomains}
               call={call}
               callActions={callingViewModel.callActions}
               callingRepository={callingRepository}
