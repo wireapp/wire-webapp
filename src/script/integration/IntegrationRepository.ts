@@ -229,20 +229,26 @@ export class IntegrationRepository {
     });
   }
 
-  async searchForServices(query: string, queryObservable: ko.Observable<string>): Promise<void> {
+  async searchForServices(
+    query: string,
+    queryObservable?: ko.Observable<string>,
+  ): Promise<ServiceEntity[] | undefined> {
     const normalizedQuery = IntegrationRepository.normalizeQuery(query);
 
     try {
       let serviceEntities = await this.teamRepository.getWhitelistedServices(this.teamState.team().id);
-      const isCurrentQuery = normalizedQuery === IntegrationRepository.normalizeQuery(queryObservable());
+      const isCurrentQuery =
+        !queryObservable || normalizedQuery === IntegrationRepository.normalizeQuery(queryObservable());
       if (isCurrentQuery) {
         serviceEntities = serviceEntities
           .filter(serviceEntity => compareTransliteration(serviceEntity.name(), normalizedQuery))
           .sort((serviceA, serviceB) => sortByPriority(serviceA.name(), serviceB.name(), normalizedQuery));
         this.services(serviceEntities);
+        return serviceEntities;
       }
     } catch (error) {
-      return this.logger.error(`Error searching for services: ${error.message}`, error);
+      this.logger.error(`Error searching for services: ${error.message}`, error);
     }
+    return undefined;
   }
 }

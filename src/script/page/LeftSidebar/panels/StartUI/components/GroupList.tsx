@@ -20,9 +20,9 @@
 import React from 'react';
 import {container} from 'tsyringe';
 import {registerReactComponent} from 'Util/ComponentUtil';
-import {AssetRepository} from '../../assets/AssetRepository';
-import type {Conversation} from '../../entity/Conversation';
-import {Router} from '../../router/Router';
+import {AssetRepository} from '../../../../../assets/AssetRepository';
+import type {Conversation} from '../../../../../entity/Conversation';
+import {Router} from '../../../../../router/Router';
 import GroupListItem from './groupList/GroupListItem';
 
 export interface GroupListProps {

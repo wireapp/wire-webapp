@@ -17,18 +17,16 @@
  *
  */
 
-import ko from 'knockout';
-import {registerReactComponent} from 'Util/ComponentUtil';
-import {User} from '../../entity/User';
+import {User} from '../../../../../entity/User';
 import TopContact from './topPeople/TopContact';
 import React from 'react';
 import {container} from 'tsyringe';
-import {AssetRepository} from '../../assets/AssetRepository';
+import {AssetRepository} from '../../../../../assets/AssetRepository';
 
 interface TopPeopleProps {
-  clickOnUser: (userEntity: User, event: React.MouseEvent) => void;
+  clickOnUser: (user: User, event: React.MouseEvent) => void;
   max?: number;
-  users: ko.ObservableArray<User>;
+  users: User[];
 }
 
 const TopPeople: React.FC<TopPeopleProps> = ({clickOnUser, max, users}) => {
@@ -42,8 +40,3 @@ const TopPeople: React.FC<TopPeopleProps> = ({clickOnUser, max, users}) => {
 };
 
 export default TopPeople;
-
-registerReactComponent<TopPeopleProps>('top-people', {
-  component: TopPeople,
-  template: '<div data-bind="react: {clickOnUser, users: ko.unwrap(users), max}"></div>',
-});

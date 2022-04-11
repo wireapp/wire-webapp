@@ -29,7 +29,8 @@ import '../Config';
 
 import '../page/AccentColorPicker';
 import 'Components/CopyToClipboard';
-import '../page/start-ui/GroupList';
+import '../page/LeftSidebar/panels/StartUI/components/GroupList';
+import 'Components/UserSearchableList';
 import 'Components/toggle/BaseToggle';
 import 'Components/icons';
 import 'Components/Image';
@@ -44,7 +45,7 @@ import 'Components/modal';
 import 'Components/panel/ServiceDetails';
 import 'Components/panel/UserDetails';
 import 'Components/ServiceList';
-import '../page/start-ui/TopPeople';
+import '../page/LeftSidebar/panels/StartUI/components/TopPeople';
 import 'Components/UserInput';
 
 import 'Util/LocalizerUtil';

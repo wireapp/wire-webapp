@@ -29,6 +29,7 @@ import {User} from '../entity/User';
 export class UserState {
   public directlyConnectedUsers: ko.PureComputed<User[]>;
   public isTeam: ko.Observable<boolean> | ko.PureComputed<boolean>;
+  /** All the users that are directly connect to the self user (do not include users that are connected through conversations) */
   public readonly connectedUsers: ko.PureComputed<User[]>;
   public readonly users: ko.ObservableArray<User>;
   public teamMembers: ko.PureComputed<User[]>;
