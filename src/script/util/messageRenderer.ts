@@ -153,7 +153,7 @@ export const renderMessage = (message: string, selfId: QualifiedId | null, menti
         ),
       );
     const link = tokens[idx];
-    const href = cleanString(link.attrGet('href'));
+    const href = link.attrGet('href');
     const isEmail = href.startsWith('mailto:');
     const isWireDeepLink = href.toLowerCase().startsWith('wire://');
     const nextToken = tokens[idx + 1];
@@ -175,9 +175,9 @@ export const renderMessage = (message: string, selfId: QualifiedId | null, menti
     if (!isWireDeepLink && !['autolink', 'linkify'].includes(link.markup)) {
       const title = link.attrGet('title');
       if (title) {
-        link.attrSet('title', cleanString(title));
+        link.attrSet('title', title);
       }
-      link.attrSet('href', cleanString(href));
+      link.attrSet('href', href);
       if (nextToken?.type === 'text') {
         nextToken.content = text;
       }
