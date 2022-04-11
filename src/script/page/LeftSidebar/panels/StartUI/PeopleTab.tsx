@@ -209,7 +209,7 @@ export const PeopleTab: React.FC<{
         <div className="start-ui-fed-domain-unavailable">
           <div className="start-ui-fed-domain-unavailable__head">{t('searchConnectWithOtherDomain')}</div>
           <span className="start-ui-fed-domain-unavailable__text">{t('searchFederatedDomainNotAvailable')}</span>
-          {/*FIXME: re-enable when federation article is available
+          {/*@todo: re-enable when federation article is available
                 <a className="start-ui-fed-domain-unavailable__link" rel="nofollow noopener noreferrer" target="_blank" data-bind="attr: {href: ''}, text: t('searchFederatedDomainNotAvailableLearnMore')"></a>
             */}
         </div>
@@ -233,7 +233,7 @@ export const PeopleTab: React.FC<{
               </span>
               <div className="start-ui-fed-wrapper__text">{t('searchTrySearchFederation')}</div>
               <div className="start-ui-fed-wrapper__button">
-                {/*FIXME: re-enable when federation article is available
+                {/*@todo: re-enable when federation article is available
                 <button type="button" data-bind="click: () => {}" data-uie-name="do-search-learn-more">
                   {t('searchTrySearchLearnMore')}
                 </button>
