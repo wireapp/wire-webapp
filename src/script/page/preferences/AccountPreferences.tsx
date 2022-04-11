@@ -136,6 +136,7 @@ const AccountPreferences: React.FC<AccountPreferencesProps> = ({
         <div
           css={{
             fontWeight: 400,
+            marginBottom: 16,
           }}
         >
           {name}
