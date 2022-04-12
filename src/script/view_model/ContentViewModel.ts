@@ -116,7 +116,7 @@ export class ContentViewModel {
   previousConversation: Conversation | null = null;
   previousState: string | null = null;
   serviceModal: ServiceModalViewModel;
-  state: ko.Observable<string>;
+  state: ko.Observable<ContentState>;
   State: typeof ContentViewModel.STATE;
   titleBar: TitleBarViewModel;
   userModal: UserModalViewModel;
@@ -348,7 +348,7 @@ export class ContentViewModel {
     }
   };
 
-  readonly switchContent = (newContentState: string): void => {
+  readonly switchContent = (newContentState: ContentState): void => {
     const isStateChange = newContentState !== this.state();
     if (isStateChange) {
       this.releaseContent(newContentState);
@@ -376,7 +376,7 @@ export class ContentViewModel {
     }
   };
 
-  private readonly checkContentAvailability = (state: string) => {
+  private readonly checkContentAvailability = (state: ContentState): ContentState => {
     const isStateRequests = state === ContentViewModel.STATE.CONNECTION_REQUESTS;
     if (isStateRequests) {
       const hasConnectRequests = !!this.userState.connectRequests().length;
@@ -412,12 +412,12 @@ export class ContentViewModel {
     }
   };
 
-  private readonly releaseContent = (newContentState: string) => {
+  private readonly releaseContent = (newContentState: ContentState) => {
     this.previousState = this.state();
 
     const isStateConversation = this.previousState === ContentViewModel.STATE.CONVERSATION;
     if (isStateConversation) {
-      const collectionStates = [ContentViewModel.STATE.COLLECTION];
+      const collectionStates = [ContentState.COLLECTION];
       const isCollectionState = collectionStates.includes(newContentState);
       if (!isCollectionState) {
         this.conversationState.activeConversation(null);
@@ -427,7 +427,7 @@ export class ContentViewModel {
     }
   };
 
-  private readonly showContent = (newContentState: string) => {
+  private readonly showContent = (newContentState: ContentState) => {
     this.state(newContentState);
     return this._shiftContent(
       this.getElementOfContent(newContentState),

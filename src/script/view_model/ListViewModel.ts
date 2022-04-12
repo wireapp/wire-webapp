@@ -32,7 +32,7 @@ import {showContextMenu} from '../ui/ContextMenu';
 import {showLabelContextMenu} from '../ui/LabelContextMenu';
 import {Shortcut} from '../ui/Shortcut';
 import {ShortcutType} from '../ui/ShortcutType';
-import {ContentViewModel} from './ContentViewModel';
+import {ContentState, ContentViewModel} from './ContentViewModel';
 import {ModalsViewModel} from './ModalsViewModel';
 import {PanelViewModel} from './PanelViewModel';
 import type {MainViewModel, ViewModelRepositories} from './MainViewModel';
@@ -238,7 +238,7 @@ export class ListViewModel {
       activePreference = ContentViewModel.STATE.PREFERENCES_DEVICES;
     }
 
-    const nextPreference = iterateItem(this.visibleListItems(), activePreference, reverse) as string;
+    const nextPreference = iterateItem(this.visibleListItems(), activePreference, reverse) as ContentState;
     if (nextPreference) {
       this.contentViewModel.switchContent(nextPreference);
     }
