@@ -33,6 +33,7 @@ type LeftListWrapperProps = {
   footer?: ReactElement;
   header?: string;
   headerElement?: ReactElement;
+  headerUieName?: string;
   id: string;
   onClose?: () => void;
 };
@@ -60,6 +61,7 @@ const ListWrapper: React.FC<LeftListWrapperProps> = ({
   children,
   footer,
   before,
+  headerUieName,
 }) => {
   const [scrollbarRef, setScrollbarRef] = useEffectRef<HTMLDivElement>();
   useFadingScrollbar(scrollbarRef);
@@ -89,12 +91,14 @@ const ListWrapper: React.FC<LeftListWrapperProps> = ({
 
   return (
     <div id={id} className={`left-list-${id} ${id}`} css={style}>
-      <section className="left-list-header">
+      <section className={`left-list-header left-list-header-${id}`}>
         {headerElement ? (
           headerElement
         ) : (
           <>
-            <span className="left-list-header-text">{header}</span>
+            <span className="left-list-header-text" data-uie-name={headerUieName}>
+              {header}
+            </span>
             <button
               type="button"
               className="left-list-header-close-button button-icon-large"

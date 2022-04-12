@@ -27,16 +27,16 @@ export interface UserInputProps {
   enter?: () => void | Promise<void>;
   input: string;
   placeholder: string;
-  selectedUsers: User[];
+  selectedUsers?: User[];
   setInput: (input: string) => void;
-  setSelectedUsers: (users: User[]) => void;
+  setSelectedUsers?: (users: User[]) => void;
 }
 
 const UserInput: React.FC<UserInputProps> = ({
   enter: onEnter,
   input,
-  selectedUsers,
-  setSelectedUsers,
+  selectedUsers = [],
+  setSelectedUsers = () => {},
   placeholder,
   setInput,
 }: UserInputProps) => {
@@ -58,7 +58,7 @@ const UserInput: React.FC<UserInputProps> = ({
   const placeHolderText = emptyInput && noSelectedUsers ? placeholder : '';
 
   return (
-    <form autoComplete="off" className="search-outer">
+    <form autoComplete="off" className="search-outer user-input">
       <div className="search-inner-wrap">
         <div className="search-inner" ref={innerElement}>
           <div className="search-icon icon-search" />

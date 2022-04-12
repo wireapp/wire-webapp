@@ -17,8 +17,8 @@
  *
  */
 
-import {User} from '../../../entity/User';
-import {AssetRepository} from '../../../assets/AssetRepository';
+import {User} from '../../../../../../entity/User';
+import {AssetRepository} from '../../../../../../assets/AssetRepository';
 import Avatar, {AVATAR_SIZE} from 'Components/Avatar';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {useEffect, useState} from 'react';

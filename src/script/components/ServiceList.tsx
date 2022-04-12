@@ -66,7 +66,7 @@ const ServiceList: React.FC<ServiceListProps> = ({
                 noUnderline={noUnderline}
                 showArrow={arrow}
                 onClick={() => click(service)}
-                onKeyDown={(service, event) => handleKeyDown(event, service as ServiceEntity)}
+                onKeyDown={(service, event) => handleKeyDown(event, service)}
               />
             </div>
           </li>
