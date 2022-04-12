@@ -25,6 +25,8 @@ import {isEnterKey, isRemovalAction} from 'Util/KeyboardUtil';
 
 export interface UserInputProps {
   enter?: () => void | Promise<void>;
+  /** Will force the component to have a dark theme and not follow user's theme */
+  forceDark?: boolean;
   input: string;
   placeholder: string;
   selectedUsers?: User[];
@@ -39,6 +41,7 @@ const UserInput: React.FC<UserInputProps> = ({
   setSelectedUsers = () => {},
   placeholder,
   setInput,
+  forceDark,
 }: UserInputProps) => {
   const innerElement = useRef<HTMLDivElement>();
   const inputElement = useRef<HTMLInputElement>();
@@ -58,7 +61,7 @@ const UserInput: React.FC<UserInputProps> = ({
   const placeHolderText = emptyInput && noSelectedUsers ? placeholder : '';
 
   return (
-    <form autoComplete="off" className="search-outer user-input">
+    <form autoComplete="off" className={`search-outer user-input ${forceDark ? '' : 'user-list-light'}`}>
       <div className="search-inner-wrap">
         <div className="search-inner" ref={innerElement}>
           <div className="search-icon icon-search" />
