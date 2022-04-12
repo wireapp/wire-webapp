@@ -20,7 +20,7 @@
 import React, {useEffect, useState} from 'react';
 import {amplify} from 'amplify';
 import {WebAppEvents} from '@wireapp/webapp-events';
-import {registerStaticReactComponent, useKoSubscribableChildren} from 'Util/ComponentUtil';
+import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {Conversation} from '../../entity/Conversation';
 
 import {ContentMessage} from 'src/script/entity/message/ContentMessage';
@@ -191,5 +191,3 @@ const Collection: React.FC<CollectionDetailsProps> = ({conversation, conversatio
 };
 
 export default Collection;
-
-registerStaticReactComponent('collection', Collection);

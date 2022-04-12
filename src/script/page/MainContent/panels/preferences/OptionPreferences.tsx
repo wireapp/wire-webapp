@@ -25,7 +25,7 @@ import {THEMES as ThemeViewModelThemes} from '../../../../view_model/ThemeViewMo
 import {WebAppEvents} from '@wireapp/webapp-events';
 import {PROPERTIES_TYPE} from '../../../../properties/PropertiesType';
 
-import {registerReactComponent, useKoSubscribableChildren} from 'Util/ComponentUtil';
+import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 
 import {PropertiesRepository} from '../../../../properties/PropertiesRepository';
@@ -193,8 +193,3 @@ const OptionPreferences: React.FC<OptionPreferencesProps> = ({
 };
 
 export default OptionPreferences;
-
-registerReactComponent('option-preferences', {
-  component: OptionPreferences,
-  template: '<div data-bind="react:{propertiesRepository}"></div>',
-});

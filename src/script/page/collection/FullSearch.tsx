@@ -19,7 +19,6 @@
 
 import React, {useEffect, useMemo, useRef, useState} from 'react';
 
-import {registerReactComponent} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 import {noop} from 'Util/util';
 import {isScrolledBottom} from 'Util/scroll-helpers';
@@ -159,8 +158,3 @@ const FullSearch: React.FC<FullSearchProps> = ({searchProvider, click = noop, ch
 };
 
 export default FullSearch;
-
-registerReactComponent('full-search', {
-  bindings: 'change, click, searchProvider',
-  component: FullSearch,
-});

@@ -18,7 +18,7 @@
  */
 
 import React from 'react';
-import {registerReactComponent, useKoSubscribableChildren} from 'Util/ComponentUtil';
+import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import type {CallingRepository} from '../../../../calling/CallingRepository';
 import type {MediaRepository} from '../../../../media/MediaRepository';
 import type {PropertiesRepository} from '../../../../properties/PropertiesRepository';
@@ -71,8 +71,3 @@ const AVPreferences: React.FC<AVPreferencesProps> = ({
 };
 
 export default AVPreferences;
-
-registerReactComponent('av-preferences', {
-  component: AVPreferences,
-  template: '<div data-bind="react: {callingRepository, mediaRepository, propertiesRepository}"></div>',
-});

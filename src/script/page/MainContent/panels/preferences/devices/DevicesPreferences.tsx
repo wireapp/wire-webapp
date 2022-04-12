@@ -23,7 +23,7 @@ import {ClientState} from '../../../../../client/ClientState';
 import {UserState} from '../../../../../user/UserState';
 import {ConversationState} from '../../../../../conversation/ConversationState';
 import {container} from 'tsyringe';
-import {registerStaticReactComponent, useKoSubscribableChildren} from '../../../../../util/ComponentUtil';
+import {useKoSubscribableChildren} from '../../../../../util/ComponentUtil';
 import {QualifiedId} from '@wireapp/api-client/src/user';
 import {t} from 'Util/LocalizerUtil';
 import VerifiedIcon from 'Components/VerifiedIcon';
@@ -158,5 +158,3 @@ const DevicesPreferences: React.FC<DevicesPreferencesProps> = ({
 };
 
 export default DevicesPreferences;
-
-registerStaticReactComponent('devices-preferences', DevicesPreferences);

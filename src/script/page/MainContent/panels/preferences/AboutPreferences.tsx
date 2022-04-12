@@ -23,7 +23,7 @@ import {t} from 'Util/LocalizerUtil';
 import {Config} from '../../../../Config';
 import {getPrivacyPolicyUrl, getTermsOfUsePersonalUrl, getTermsOfUseTeamUrl, URL} from '../../../../externalRoute';
 import {UserState} from '../../../../user/UserState';
-import {registerReactComponent, useKoSubscribableChildren} from '../../../../util/ComponentUtil';
+import {useKoSubscribableChildren} from '../../../../util/ComponentUtil';
 import PreferencesLink from './components/PreferencesLink';
 import PreferencesPage from './components/PreferencesPage';
 import PreferencesSection from './components/PreferencesSection';
@@ -102,8 +102,3 @@ const AboutPreferences: React.FC<AboutPreferencesProps> = ({userState = containe
 };
 
 export default AboutPreferences;
-
-registerReactComponent('about-preferences', {
-  component: AboutPreferences,
-  template: '<div data-bind="react: {}"></div>',
-});

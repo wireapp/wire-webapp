@@ -19,8 +19,6 @@
 
 import React from 'react';
 import {AccentColor} from '@wireapp/commons';
-
-import {registerReactComponent} from 'Util/ComponentUtil';
 import {CSS_SQUARE} from 'Util/CSSMixin';
 import {t} from 'Util/LocalizerUtil';
 
@@ -114,8 +112,3 @@ const AccentColorPicker: React.FunctionComponent<AccentColorPickerProps> = ({use
 };
 
 export default AccentColorPicker;
-
-registerReactComponent('accent-color-picker', {
-  component: AccentColorPicker,
-  template: '<span data-bind="react: {user: ko.unwrap(user), doSetAccentColor: selected}"></span>',
-});

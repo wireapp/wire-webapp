@@ -22,7 +22,7 @@ import React, {useRef} from 'react';
 import {container} from 'tsyringe';
 import {useEnrichedFields} from 'Components/panel/EnrichedFields';
 
-import {registerReactComponent, useKoSubscribableChildren} from 'Util/ComponentUtil';
+import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 import {getLogger} from 'Util/Logger';
 import {loadValue} from 'Util/StorageUtil';
@@ -214,9 +214,3 @@ const AccountPreferences: React.FC<AccountPreferencesProps> = ({
 };
 
 export default AccountPreferences;
-
-registerReactComponent('account-preferences', {
-  component: AccountPreferences,
-  template:
-    '<div data-bind="react:{clientRepository, userRepository, propertiesRepository, conversationRepository, showDomain}"></div>',
-});
