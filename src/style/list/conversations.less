@@ -44,9 +44,34 @@
   }
 }
 
-body.theme-dark {
-  .conversations-footer-list {
-    border-top: 0;
+.conversations-footer-list-item {
+  height: 100%;
+  padding: 2px 0;
+}
+
+.conversations-footer-btn {
+  .button-reset-default;
+  .label-small-medium;
+  display: flex;
+  height: 100%;
+  flex-direction: column;
+  align-items: center;
+  padding: 8px;
+  border-radius: 6px;
+  color: var(--main-color);
+  text-transform: capitalize;
+
+  svg {
+    margin-bottom: 4px;
+  }
+
+  &.active {
+    background-color: var(--blue-500);
+    color: var(--white);
+
+    svg {
+      fill: var(--white);
+    }
   }
 }
 
