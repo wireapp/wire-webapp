@@ -21,6 +21,7 @@ import React from 'react';
 import {amplify} from 'amplify';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import {Availability} from '@wireapp/protocol-messaging';
+import cx from 'classnames';
 
 import {t} from 'Util/LocalizerUtil';
 import {ContextMenuEntry} from '../../../ui/ContextMenu';
@@ -38,20 +39,6 @@ const iconStyles: CSSObject = {
   margin: '0 6px 1px 0',
   minWidth: 10,
   stroke: 'currentColor',
-};
-
-const buttonStyles: CSSObject = {
-  '&:first-child': {
-    borderRadius: '12px 0px 0px 12px',
-  },
-  '&:last-child': {
-    borderRadius: '0px 12px 12px 0px',
-  },
-  background: '#FFFFFF',
-  border: '1px solid #DCE0E3',
-  fontSize: '13px',
-  fontWeight: 500,
-  padding: '8px 12px',
 };
 
 const activeStyles: CSSObject = {
@@ -125,14 +112,20 @@ const AvailabilityButtons: React.FC<AvailabilityInputProps> = ({availability}) =
       <h3 className="label" css={headerStyles}>
         {t('preferencesAccountAvailabilityUnset')}
       </h3>
-      <div>
-        {entries.map(item => {
+      <div className="buttons-group">
+        {entries.map((item, index) => {
           const isActive = availability === item.availability;
+          const isFirst = index === 0;
+          const isLast = index === entries.length - 1;
 
           return (
             <button
+              className={cx('buttons-group-button', {
+                'buttons-group-button-left': isFirst,
+                'buttons-group-button-right': isLast,
+              })}
               key={item.availability}
-              css={{...buttonStyles, ...(isActive ? activeStyles : {})}}
+              css={isActive ? activeStyles : {}}
               type="button"
               onClick={() => item.click()}
             >
