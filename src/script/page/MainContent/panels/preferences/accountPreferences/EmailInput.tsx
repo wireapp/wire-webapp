@@ -22,11 +22,11 @@ import {amplify} from 'amplify';
 import React from 'react';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 
-import {ModalsViewModel} from '../../../view_model/ModalsViewModel';
+import {ModalsViewModel} from '../../../../../view_model/ModalsViewModel';
 import AccountInput, {useInputDone} from './AccountInput';
 import {getLogger} from 'Util/Logger';
 import {t} from 'Util/LocalizerUtil';
-import {UserRepository} from '../../../user/UserRepository';
+import {UserRepository} from '../../../../../user/UserRepository';
 
 interface EmailInputProps {
   canEditProfile: boolean;

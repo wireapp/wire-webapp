@@ -19,28 +19,28 @@
 
 import React, {useState} from 'react';
 import {ClientEntity} from 'src/script/client/ClientEntity';
-import {ClientState} from '../../../client/ClientState';
-import {UserState} from '../../../user/UserState';
-import {ConversationState} from '../../../conversation/ConversationState';
+import {ClientState} from '../../../../../client/ClientState';
+import {UserState} from '../../../../../user/UserState';
+import {ConversationState} from '../../../../../conversation/ConversationState';
 import {container} from 'tsyringe';
-import {registerStaticReactComponent, useKoSubscribableChildren} from '../../../util/ComponentUtil';
+import {registerStaticReactComponent, useKoSubscribableChildren} from '../../../../../util/ComponentUtil';
 import {QualifiedId} from '@wireapp/api-client/src/user';
 import {t} from 'Util/LocalizerUtil';
 import VerifiedIcon from 'Components/VerifiedIcon';
 import Icon from 'Components/Icon';
 import {CryptographyRepository} from 'src/script/cryptography/CryptographyRepository';
-import {useFadingScrollbar} from '../../../ui/fadingScrollbar';
+import {useFadingScrollbar} from '../../../../../ui/fadingScrollbar';
 import useEffectRef from 'Util/useEffectRef';
 import DetailedDevice from './components/DetailedDevice';
 import DeviceDetailsPreferences from './DeviceDetailsPreferences';
-import {Conversation} from '../../../entity/Conversation';
+import {Conversation} from '../../../../../entity/Conversation';
 import {FormattedId} from './components/FormattedId';
 
 interface DevicesPreferencesProps {
   clientState: ClientState;
   conversationState: ConversationState;
   cryptographyRepository: CryptographyRepository;
-  removeDevice: (device: ClientEntity) => Promise<void>;
+  removeDevice: (device: ClientEntity) => Promise<unknown>;
   resetSession: (userId: QualifiedId, device: ClientEntity, conversation: Conversation) => Promise<void>;
   userState: UserState;
   verifyDevice: (userId: QualifiedId, device: ClientEntity, isVerified: boolean) => void;

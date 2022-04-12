@@ -25,11 +25,11 @@ import {container} from 'tsyringe';
 import {t} from 'Util/LocalizerUtil';
 import {getCurrentDate} from 'Util/TimeUtil';
 import {downloadBlob} from 'Util/util';
-import {Config} from '../../../Config';
+import {Config} from '../../../../../Config';
 import PreferencesSection from '../components/PreferencesSection';
-import type {CallingRepository} from '../../../calling/CallingRepository';
-import {ModalsViewModel} from '../../../view_model/ModalsViewModel';
-import {UserState} from '../../../user/UserState';
+import type {CallingRepository} from '../../../../../calling/CallingRepository';
+import {ModalsViewModel} from '../../../../../view_model/ModalsViewModel';
+import {UserState} from '../../../../../user/UserState';
 
 interface SaveCallLogsProps {
   callingRepository: CallingRepository;

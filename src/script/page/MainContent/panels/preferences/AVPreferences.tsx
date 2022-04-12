@@ -19,11 +19,11 @@
 
 import React from 'react';
 import {registerReactComponent, useKoSubscribableChildren} from 'Util/ComponentUtil';
-import type {CallingRepository} from '../../calling/CallingRepository';
-import type {MediaRepository} from '../../media/MediaRepository';
-import type {PropertiesRepository} from '../../properties/PropertiesRepository';
+import type {CallingRepository} from '../../../../calling/CallingRepository';
+import type {MediaRepository} from '../../../../media/MediaRepository';
+import type {PropertiesRepository} from '../../../../properties/PropertiesRepository';
 import {t} from 'Util/LocalizerUtil';
-import {DeviceTypes} from '../../media/MediaDevicesHandler';
+import {DeviceTypes} from '../../../../media/MediaDevicesHandler';
 import SaveCallLogs from './avPreferences/SaveCallLogs';
 import CallOptions from './avPreferences/CallOptions';
 import CameraPreferences from './avPreferences/CameraPreferences';

@@ -35,7 +35,7 @@ import 'Components/toggle/BaseToggle';
 import 'Components/icons';
 import 'Components/Image';
 import 'Components/toggle/InfoToggle';
-import '../page/preferences/avPreferences/InputLevel';
+import '../page/MainContent/panels/preferences/avPreferences/InputLevel';
 import 'Components/calling/FullscreenVideoCall';
 import '../page/collection/Collection';
 import 'Components/avatar/GroupAvatar';

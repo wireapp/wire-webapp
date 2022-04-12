@@ -18,13 +18,13 @@
  */
 
 import React from 'react';
-import {AppLockState} from '../../../user/AppLockState';
+import {AppLockState} from '../../../../../user/AppLockState';
 import {RECEIPT_MODE} from '@wireapp/api-client/src/conversation/data';
 import {t} from 'Util/LocalizerUtil';
 import {container} from 'tsyringe';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
-import {PropertiesRepository} from '../../../properties/PropertiesRepository';
-import {AppLockRepository} from '../../../user/AppLockRepository';
+import {PropertiesRepository} from '../../../../../properties/PropertiesRepository';
+import {AppLockRepository} from '../../../../../user/AppLockRepository';
 import {formatDurationCaption} from 'Util/TimeUtil';
 import PreferencesSection from '../components/PreferencesSection';
 import PreferencesCheckbox from '../components/PreferencesCheckbox';

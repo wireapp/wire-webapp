@@ -25,12 +25,12 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {t} from 'Util/LocalizerUtil';
 
-import {PropertiesRepository} from '../../../properties/PropertiesRepository';
-import {PROPERTIES_TYPE} from '../../../properties/PropertiesType';
-import {TeamState} from '../../../team/TeamState';
+import {PropertiesRepository} from '../../../../../properties/PropertiesRepository';
+import {PROPERTIES_TYPE} from '../../../../../properties/PropertiesType';
+import {TeamState} from '../../../../../team/TeamState';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
-import {Config} from '../../../Config';
-import {ConsentValue} from '../../../user/ConsentValue';
+import {Config} from '../../../../../Config';
+import {ConsentValue} from '../../../../../user/ConsentValue';
 import PreferencesSection from '../components/PreferencesSection';
 import PreferencesCheckbox from '../components/PreferencesCheckbox';
 

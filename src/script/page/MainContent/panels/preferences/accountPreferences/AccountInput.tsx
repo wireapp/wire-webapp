@@ -20,7 +20,7 @@
 import React, {useEffect, useState} from 'react';
 import Icon from 'Components/Icon';
 import useIsMounted from 'Util/useIsMounted';
-import {MotionDuration} from '../../../motion/MotionDuration';
+import {MotionDuration} from '../../../../../motion/MotionDuration';
 
 interface AccountInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   allowedChars?: string;

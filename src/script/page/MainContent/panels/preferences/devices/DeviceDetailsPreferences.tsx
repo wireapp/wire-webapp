@@ -19,10 +19,10 @@
 
 import React, {useEffect, useState} from 'react';
 import {ClientEntity} from 'src/script/client/ClientEntity';
-import {Config} from '../../../Config';
+import {Config} from '../../../../../Config';
 import {t} from 'Util/LocalizerUtil';
 import DetailedDevice from './components/DetailedDevice';
-import {MotionDuration} from '../../../motion/MotionDuration';
+import {MotionDuration} from '../../../../../motion/MotionDuration';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 
 interface DevicesPreferencesProps {

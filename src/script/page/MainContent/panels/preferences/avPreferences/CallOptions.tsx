@@ -24,10 +24,10 @@ import type {WebappProperties} from '@wireapp/api-client/src/user/data/';
 
 import {t} from 'Util/LocalizerUtil';
 
-import {Config} from '../../../Config';
-import type {MediaConstraintsHandler} from '../../../media/MediaConstraintsHandler';
-import type {PropertiesRepository} from '../../../properties/PropertiesRepository';
-import {PROPERTIES_TYPE} from '../../../properties/PropertiesType';
+import {Config} from '../../../../../Config';
+import type {MediaConstraintsHandler} from '../../../../../media/MediaConstraintsHandler';
+import type {PropertiesRepository} from '../../../../../properties/PropertiesRepository';
+import {PROPERTIES_TYPE} from '../../../../../properties/PropertiesType';
 import PreferencesCheckbox from '../components/PreferencesCheckbox';
 import PreferencesSection from '../components/PreferencesSection';
 

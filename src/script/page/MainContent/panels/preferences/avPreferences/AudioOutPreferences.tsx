@@ -23,7 +23,7 @@ import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 import PreferencesSection from '../components/PreferencesSection';
 import DeviceSelect from './DeviceSelect';
-import {DeviceTypes, MediaDevicesHandler} from '../../../media/MediaDevicesHandler';
+import {DeviceTypes, MediaDevicesHandler} from '../../../../../media/MediaDevicesHandler';
 
 interface AudioOutPreferencesProps {
   devicesHandler: MediaDevicesHandler;

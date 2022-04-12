@@ -19,15 +19,15 @@
 
 import React from 'react';
 import Avatar, {AVATAR_SIZE} from 'Components/Avatar';
-import {User} from '../../../entity/User';
+import {User} from '../../../../../entity/User';
 import {t} from 'Util/LocalizerUtil';
 import FileInput from './FileInput';
-import {UserError} from '../../../error/UserError';
-import {Config} from '../../../Config';
-import {UserRepository} from '../../../user/UserRepository';
+import {UserError} from '../../../../../error/UserError';
+import {Config} from '../../../../../Config';
+import {UserRepository} from '../../../../../user/UserRepository';
 import {validateProfileImageResolution} from 'Util/util';
 import {getLogger} from 'Util/Logger';
-import {modals, ModalsViewModel} from '../../../view_model/ModalsViewModel';
+import {modals, ModalsViewModel} from '../../../../../view_model/ModalsViewModel';
 import {handleKeyDown} from 'Util/KeyboardUtil';
 
 interface AvatarInputProps {

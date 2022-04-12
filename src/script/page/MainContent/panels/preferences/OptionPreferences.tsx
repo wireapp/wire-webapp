@@ -21,32 +21,22 @@ import React, {useEffect, useState} from 'react';
 import {amplify} from 'amplify';
 import {container} from 'tsyringe';
 import {AudioPreference, WebappProperties, NotificationPreference} from '@wireapp/api-client/src/user/data/';
-import {THEMES as ThemeViewModelThemes} from '../../view_model/ThemeViewModel';
+import {THEMES as ThemeViewModelThemes} from '../../../../view_model/ThemeViewModel';
 import {WebAppEvents} from '@wireapp/webapp-events';
-import {PROPERTIES_TYPE} from '../../properties/PropertiesType';
+import {PROPERTIES_TYPE} from '../../../../properties/PropertiesType';
 
 import {registerReactComponent, useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 
-import {ClientRepository} from '../../client/ClientRepository';
-import {ConversationRepository} from '../../conversation/ConversationRepository';
-import {PropertiesRepository} from '../../properties/PropertiesRepository';
-import {TeamState} from '../../team/TeamState';
-import {RichProfileRepository} from '../../user/RichProfileRepository';
-import type {UserRepository} from '../../user/UserRepository';
-import {UserState} from '../../user/UserState';
+import {PropertiesRepository} from '../../../../properties/PropertiesRepository';
+import {UserState} from '../../../../user/UserState';
 import PreferencesCheckbox from './components/PreferencesCheckbox';
 import PreferencesSection from './components/PreferencesSection';
 import PreferencesRadio from './components/PreferencesRadio';
 import PreferencesPage from './components/PreferencesPage';
 
 interface OptionPreferencesProps {
-  clientRepository: ClientRepository;
-  conversationRepository: ConversationRepository;
   propertiesRepository: PropertiesRepository;
-  richProfileRepository?: RichProfileRepository;
-  teamState?: TeamState;
-  userRepository: UserRepository;
   userState?: UserState;
 }
 

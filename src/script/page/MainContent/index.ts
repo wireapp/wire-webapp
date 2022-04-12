@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2021 Wire Swiss GmbH
+ * Copyright (C) 2022 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,25 +17,4 @@
  *
  */
 
-import React from 'react';
-import {t} from 'Util/LocalizerUtil';
-import type {ClientRepository} from '../../../client/ClientRepository';
-
-interface LogoutSectionProps {
-  clientRepository: ClientRepository;
-}
-
-const LogoutSection: React.FC<LogoutSectionProps> = ({clientRepository}) => (
-  <section className="preferences-section">
-    <button
-      className="preferences-link accent-text"
-      onClick={() => clientRepository.logoutClient()}
-      data-uie-name="do-logout"
-      type="button"
-    >
-      {t('preferencesAccountLogOut')}
-    </button>
-  </section>
-);
-
-export default LogoutSection;
+export {default} from './MainContent';

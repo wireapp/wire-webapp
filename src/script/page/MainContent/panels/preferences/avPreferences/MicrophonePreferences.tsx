@@ -24,13 +24,13 @@ import {t} from 'Util/LocalizerUtil';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {getLogger} from 'Util/Logger';
 
-import {Config} from '../../../Config';
+import {Config} from '../../../../../Config';
 import PreferencesSection from '../components/PreferencesSection';
 import DeviceSelect from './DeviceSelect';
-import {DeviceTypes, MediaDevicesHandler} from '../../../media/MediaDevicesHandler';
-import {MediaStreamHandler} from '../../../media/MediaStreamHandler';
+import {DeviceTypes, MediaDevicesHandler} from '../../../../../media/MediaDevicesHandler';
+import {MediaStreamHandler} from '../../../../../media/MediaStreamHandler';
 import InputLevel from './InputLevel';
-import {MediaType} from '../../../media/MediaType';
+import {MediaType} from '../../../../../media/MediaType';
 
 const logger = getLogger('MicrophonePreferences');
 

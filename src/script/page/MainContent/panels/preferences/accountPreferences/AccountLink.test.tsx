@@ -20,7 +20,7 @@
 import React from 'react';
 import {render, fireEvent, screen} from '@testing-library/react';
 import AccountLink from './AccountLink';
-import * as utils from '../../../util/ClipboardUtil';
+import * as utils from '../../../../../util/ClipboardUtil';
 
 test('copies correct text', async () => {
   const mockCopy: any = jest.spyOn(utils, 'copyText');

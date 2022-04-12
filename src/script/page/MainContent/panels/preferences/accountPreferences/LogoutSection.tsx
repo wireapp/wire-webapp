@@ -18,25 +18,24 @@
  */
 
 import React from 'react';
-import useEffectRef from 'Util/useEffectRef';
-import {useFadingScrollbar} from '../../../ui/fadingScrollbar';
+import {t} from 'Util/LocalizerUtil';
+import type {ClientRepository} from '../../../../../client/ClientRepository';
 
-interface PreferencesPageProps {
-  title: string;
+interface LogoutSectionProps {
+  clientRepository: ClientRepository;
 }
 
-const PreferencesPage: React.FC<PreferencesPageProps> = ({title, children}) => {
-  const [scrollbarRef, setScrollbarRef] = useEffectRef<HTMLDivElement>();
-  useFadingScrollbar(scrollbarRef);
+const LogoutSection: React.FC<LogoutSectionProps> = ({clientRepository}) => (
+  <section className="preferences-section">
+    <button
+      className="preferences-link accent-text"
+      onClick={() => clientRepository.logoutClient()}
+      data-uie-name="do-logout"
+      type="button"
+    >
+      {t('preferencesAccountLogOut')}
+    </button>
+  </section>
+);
 
-  return (
-    <div style={{display: 'flex', flexDirection: 'column', height: '100vh'}}>
-      <h2 className="preferences-titlebar">{title}</h2>
-      <div className="preferences-content" ref={setScrollbarRef}>
-        {children}
-      </div>
-    </div>
-  );
-};
-
-export default PreferencesPage;
+export default LogoutSection;

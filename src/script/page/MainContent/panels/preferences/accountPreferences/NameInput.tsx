@@ -23,7 +23,7 @@ import {getLogger} from 'Util/Logger';
 import {t} from 'Util/LocalizerUtil';
 
 import AccountInput, {useInputDone} from './AccountInput';
-import {UserRepository} from '../../../user/UserRepository';
+import {UserRepository} from '../../../../../user/UserRepository';
 
 interface NameInputProps {
   canEditProfile: boolean;

@@ -21,9 +21,9 @@ import AvailabilityState from 'Components/AvailabilityState';
 import React from 'react';
 import {Availability} from '@wireapp/protocol-messaging';
 
-import {nameFromType} from '../../../user/AvailabilityMapper';
+import {nameFromType} from '../../../../../user/AvailabilityMapper';
 import {t} from 'Util/LocalizerUtil';
-import {AvailabilityContextMenu} from '../../../ui/AvailabilityContextMenu';
+import {AvailabilityContextMenu} from '../../../../../ui/AvailabilityContextMenu';
 
 interface AvailabilityInputProps {
   availability: Availability.Type;
