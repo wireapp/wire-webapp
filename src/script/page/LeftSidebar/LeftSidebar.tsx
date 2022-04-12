@@ -29,7 +29,6 @@ import {AssetRepository} from '../../assets/AssetRepository';
 
 import Preferences from './panels/Preferences';
 import Archive from './panels/Archive';
-import Background from './Background';
 import Conversations from './panels/Conversations';
 import TemporaryGuestConversations from './panels/TemporatyGuestConversations';
 import {amplify} from 'amplify';
@@ -116,7 +115,6 @@ const LeftSidebar: React.FC<LeftSidebarProps> = ({
   }
   return (
     <>
-      <Background selfUser={selfUser} assetRepository={assetRepository} />
       <SwitchTransition css={css({height: '100%'})}>
         <Animated key={state}>{content}</Animated>
       </SwitchTransition>
