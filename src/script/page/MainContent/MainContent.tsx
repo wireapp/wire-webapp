@@ -105,7 +105,6 @@ const MainContent: React.FC<LeftSidebarProps> = ({
 
     case ContentState.PREFERENCES_DEVICES:
       title = t('accessibility.headings.preferencesDevices');
-      // params="cryptographyRepository: repositories.cryptography, removeDevice: mainViewModel.actions.deleteClient, verifyDevice: , resetSession: "
       content = (
         <DevicesPreferences
           clientState={container.resolve(ClientState)}
