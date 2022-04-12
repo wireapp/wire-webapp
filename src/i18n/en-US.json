@@ -307,6 +307,7 @@
   "conversationDeviceYourDevices": " your devices",
   "conversationEditTimestamp": "Edited: {{date}}",
   "conversationFederationIndicator": "Federated",
+  "conversationFooterContacts": "Contacts",
   "conversationFileAssetRestricted": "Receiving files is prohibited",
   "conversationGuestIndicator": "Guest",
   "conversationImageAssetRestricted": "Receiving images is prohibited",
