@@ -26,7 +26,7 @@ import {ContentViewModel, ContentState} from '../../view_model/ContentViewModel'
 import {t} from 'Util/LocalizerUtil';
 import Icon from 'Components/Icon';
 import AboutPreferences from './panels/preferences/AboutPreferences';
-import Collection from '../collection/Collection';
+import Collection from './panels/Collection';
 import AccountPreferences from './panels/preferences/AccountPreferences';
 import DevicesPreferences from './panels/preferences/devices/DevicesPreferences';
 import OptionPreferences from './panels/preferences/OptionPreferences';

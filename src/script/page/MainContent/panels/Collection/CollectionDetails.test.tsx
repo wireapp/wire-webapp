@@ -28,7 +28,7 @@ import {MediumImage} from 'src/script/entity/message/MediumImage';
 import {FileAsset} from 'src/script/entity/message/FileAsset';
 import {MessageCategory} from 'src/script/message/MessageCategory';
 import {LinkPreview} from 'src/script/entity/message/LinkPreview';
-import {Text} from '../../entity/message/Text';
+import {Text} from '../../../../entity/message/Text';
 
 jest.mock(
   'Components/Image',

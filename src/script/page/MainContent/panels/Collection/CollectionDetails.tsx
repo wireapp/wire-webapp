@@ -19,8 +19,8 @@
 
 import React, {Fragment} from 'react';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
-import {Conversation} from '../../entity/Conversation';
-import {useFadingScrollbar} from '../../ui/fadingScrollbar';
+import {Conversation} from '../../../../entity/Conversation';
+import {useFadingScrollbar} from '../../../../ui/fadingScrollbar';
 import useEffectRef from 'Util/useEffectRef';
 
 import {ContentMessage} from 'src/script/entity/message/ContentMessage';

@@ -24,10 +24,10 @@ import {noop} from 'Util/util';
 import {isScrolledBottom} from 'Util/scroll-helpers';
 import useEffectRef from 'Util/useEffectRef';
 
-import type {Message} from '../../entity/message/Message';
-import useDebounce from '../../hooks/useDebounce';
-import {getSearchRegex} from '../../search/FullTextSearch';
-import {ContentMessage} from '../../entity/message/ContentMessage';
+import type {Message} from '../../../../entity/message/Message';
+import useDebounce from '../../../../hooks/useDebounce';
+import {getSearchRegex} from '../../../../search/FullTextSearch';
+import {ContentMessage} from '../../../../entity/message/ContentMessage';
 import FullSearchItem from './fullSearch/FullSearchItem';
 
 export interface FullSearchProps {

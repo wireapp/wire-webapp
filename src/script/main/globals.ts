@@ -27,7 +27,6 @@ import type {NotificationService} from '../event/NotificationService';
 
 import '../Config';
 
-import '../page/AccentColorPicker';
 import 'Components/CopyToClipboard';
 import 'Components/UserSearchableList';
 import 'Components/toggle/BaseToggle';
