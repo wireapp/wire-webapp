@@ -134,9 +134,10 @@ const AccountPreferences: React.FC<AccountPreferencesProps> = ({
         }}
       >
         <div
+          className="heading-h3"
           css={{
-            fontWeight: 400,
             marginBottom: 16,
+            textTransform: 'uppercase',
           }}
         >
           {name}

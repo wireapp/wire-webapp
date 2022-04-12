@@ -33,8 +33,6 @@ export interface AccentColorPickerProps {
 }
 
 const headerStyles: CSSObject = {
-  fontSize: '12px',
-  fontWeight: 400,
   lineHeight: '14px',
   margin: '20px 0 6px',
   padding: 0,
@@ -45,7 +43,9 @@ const headerStyles: CSSObject = {
 const AccentColorPicker: React.FunctionComponent<AccentColorPickerProps> = ({user, doSetAccentColor}) => {
   return (
     <>
-      <h3 css={headerStyles}>{t('preferencesAccountAccentColor')}</h3>
+      <h3 className="label" css={headerStyles}>
+        {t('preferencesAccountAccentColor')}
+      </h3>
       <fieldset css={{border: 'none', margin: 0, padding: 0}} aria-label={t('chooseAccountColor')}>
         <div
           className="preferences-account-accent-color"

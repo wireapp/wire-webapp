@@ -61,8 +61,6 @@ const activeStyles: CSSObject = {
 };
 
 const headerStyles: CSSObject = {
-  fontSize: '12px',
-  fontWeight: 400,
   lineHeight: '14px',
   margin: '37px 0 6px',
   padding: 0,
@@ -124,7 +122,9 @@ const AvailabilityButtons: React.FC<AvailabilityInputProps> = ({availability}) =
 
   return (
     <>
-      <h3 css={headerStyles}>{t('preferencesAccountAvailabilityUnset')}</h3>
+      <h3 className="label" css={headerStyles}>
+        {t('preferencesAccountAvailabilityUnset')}
+      </h3>
       <div>
         {entries.map(item => {
           const isActive = availability === item.availability;
