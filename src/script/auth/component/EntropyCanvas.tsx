@@ -1,6 +1,5 @@
 import React, {MouseEvent, useRef, useEffect, useState} from 'react';
 import {usePausableInterval} from '../../hooks/usePausableInterval';
-// import {usePausableTimeout} from '../../hooks/usePausableTimeout';
 
 interface CanvasProps {
   'data-uie-name'?: string;
@@ -17,7 +16,6 @@ const EntropyCanvas = (props: CanvasProps) => {
   const [entropy, setEntropy] = useState<[number, number][]>([]);
   const frames = entropy.filter(Boolean).length;
 
-  // const {startTimeout, pauseTimeout} = usePausableTimeout(() => onSetEntropy(entropy), 35000);
   const {clearInterval, startInterval, pauseInterval} = usePausableInterval(() => {
     setPercent(percent => percent + 1);
     onProgress(entropy, percent, false);
@@ -27,11 +25,9 @@ const EntropyCanvas = (props: CanvasProps) => {
     if (frames <= 300 && percent > 95) {
       setPercent(95);
       pauseInterval();
-      // pauseTimeout();
     }
     if (frames > 300) {
       startInterval();
-      // startTimeout();
     }
     if (frames >= 100) {
       clearInterval();
@@ -40,13 +36,12 @@ const EntropyCanvas = (props: CanvasProps) => {
 
   const onMouseEnter = () => {
     startInterval();
-    // startTimeout();
   };
 
   const onMouseLeave = () => {
     onProgress(entropy, percent, true);
     pauseInterval();
-    // pauseTimeout();
+
     setEntropy([...entropy, null]);
   };
 
