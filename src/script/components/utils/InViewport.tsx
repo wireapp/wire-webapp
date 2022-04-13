@@ -23,9 +23,10 @@ import {viewportObserver} from '../../ui/viewportObserver';
 interface InViewportParams {
   fullyInView?: boolean;
   onVisible: () => void;
+  style?: React.CSSProperties;
 }
 
-const InViewport: React.FC<InViewportParams> = ({children, onVisible, fullyInView = true}) => {
+const InViewport: React.FC<InViewportParams> = ({children, style, onVisible, fullyInView = true}) => {
   const domNode = useRef<HTMLDivElement>();
 
   useEffect(() => {
@@ -64,7 +65,11 @@ const InViewport: React.FC<InViewportParams> = ({children, onVisible, fullyInVie
     return () => releaseTrackers();
   }, [onVisible]);
 
-  return <div ref={domNode}>{children}</div>;
+  return (
+    <div ref={domNode} style={style}>
+      {children}
+    </div>
+  );
 };
 
 export default InViewport;
