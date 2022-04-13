@@ -96,13 +96,6 @@ const AccountInput: React.FC<AccountInputProps> = ({
   return (
     <div
       css={{
-        '.edit-icon': {
-          opacity: 0,
-          transition: 'opacity 0.2s ease-in-out',
-        },
-        ':hover .edit-icon': {
-          opacity: 1,
-        },
         backgroundColor: isEditing ? 'var(--preference-account-input-bg)' : 'transparent',
         display: 'flex',
         flexDirection: 'column',
@@ -117,17 +110,42 @@ const AccountInput: React.FC<AccountInputProps> = ({
       }}
     >
       <label
+        className="label"
         css={{
           color: 'var(--foreground)',
-          fontSize: '12px',
-          fontWeight: 'normal',
-          lineHeight: '1.33',
-          marginBottom: 2,
+          lineHeight: '14px',
+          marginBottom: 6,
+          position: 'relative',
         }}
         data-uie-name={labelUie}
         htmlFor={valueUie}
       >
         {label}
+        {!readOnly && (
+          <button
+            type="button"
+            css={{background: 'transparent', border: 'none', margin: 0, padding: 0, position: 'absolute', top: '-1px'}}
+            onClick={() => {
+              setIsEditingExternal?.(true);
+              setIsEditing(true);
+            }}
+          >
+            {isDone ? (
+              <Icon.AnimatedCheck
+                css={{path: {stroke: 'var(--foreground)'}}}
+                data-uie-name={`${iconUiePrefix}-icon-check`}
+              />
+            ) : (
+              !isEditing && (
+                <Icon.Edit
+                  css={{fill: 'var(--foreground)'}}
+                  className="edit-icon"
+                  data-uie-name={`${iconUiePrefix}-icon`}
+                />
+              )
+            )}
+          </button>
+        )}
       </label>
       <div
         css={{
@@ -135,10 +153,7 @@ const AccountInput: React.FC<AccountInputProps> = ({
         }}
       >
         <div css={{alignItems: 'center', display: 'flex', lineHeight: '1.38', position: 'absolute'}}>
-          <span
-            css={{borderBottom: readOnly || isEditing ? 'none' : '1px dashed var(--foreground)'}}
-            data-uie-name={`${iconUiePrefix}-display`}
-          >
+          <span data-uie-name={`${iconUiePrefix}-display`}>
             <span
               css={{
                 opacity: isEditing ? 0.4 : 1,
@@ -155,21 +170,6 @@ const AccountInput: React.FC<AccountInputProps> = ({
               {suffix}
             </span>
           </span>
-          {isDone ? (
-            <Icon.AnimatedCheck
-              css={{path: {stroke: 'var(--foreground)'}}}
-              data-uie-name={`${iconUiePrefix}-icon-check`}
-            />
-          ) : (
-            !readOnly &&
-            !isEditing && (
-              <Icon.Edit
-                css={{fill: 'var(--foreground)'}}
-                className="edit-icon"
-                data-uie-name={`${iconUiePrefix}-icon`}
-              />
-            )
-          )}
         </div>
         <div
           css={{
@@ -188,10 +188,11 @@ const AccountInput: React.FC<AccountInputProps> = ({
           ) : (
             <input
               id={valueUie}
+              className="text"
               css={{
                 backgroundColor: 'transparent',
                 border: 'none',
-                fontSize: '16px',
+                lineHeight: '24px',
                 outline: 'none',
                 padding: 0,
                 width: '100%',
@@ -209,10 +210,6 @@ const AccountInput: React.FC<AccountInputProps> = ({
                 setInput(value);
                 setIsEditingExternal?.(false);
                 setIsEditing(false);
-              }}
-              onFocus={() => {
-                setIsEditingExternal?.(true);
-                setIsEditing(true);
               }}
               spellCheck={false}
               {...rest}
