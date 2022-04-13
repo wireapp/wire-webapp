@@ -45,12 +45,18 @@ const EntropyContainer = ({onSetEntropy}: Props) => {
   };
 
   return (
-    <ContainerXS centerText verticalCenter style={{display: 'flex', flexDirection: 'column', minHeight: 428}}>
+    <ContainerXS
+      centerText
+      verticalCenter
+      style={{display: 'flex', flexDirection: 'column', justifyContent: 'space-around', minHeight: 428}}
+    >
       <H1 center>{_(setEntropyStrings.headline)}</H1>
       {frames > 300 && percent >= 100 ? (
         <>
-          <CheckRoundIcon width={64} height={64} css={{alignSelf: 'center', marginBottom: '64px'}} />
-          <Muted center>{_(setEntropyStrings.success)}</Muted>
+          <CheckRoundIcon width={64} height={64} css={{alignSelf: 'center', marginBottom: 64}} />
+          <Muted center style={{marginBottom: 40}}>
+            {_(setEntropyStrings.success)}
+          </Muted>
           <Button
             onClick={() => onSetEntropy(entropy)}
             autoFocus

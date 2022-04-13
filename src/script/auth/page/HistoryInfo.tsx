@@ -30,14 +30,13 @@ import * as ClientSelector from '../module/selector/ClientSelector';
 import {QUERY_KEY, ROUTE} from '../route';
 import Page from './Page';
 import {KEY} from 'Util/KeyboardUtil';
-import {hasURLParameter} from '../util/urlUtil';
 
 interface Props extends React.HTMLProps<HTMLDivElement> {}
 
 const HistoryInfo = ({hasHistory, clients, currentSelfClient, isNewCurrentSelfClient}: Props & ConnectedProps) => {
   const {formatMessage: _} = useIntl();
   const {history} = useReactRouter();
-  const paramNewClient = hasURLParameter(QUERY_KEY.NEW_CLIENT);
+  const newClient = localStorage.getItem(QUERY_KEY.NEW_CLIENT) ?? false;
 
   const onContinue = () => {
     return history.push(ROUTE.SET_EMAIL);
@@ -52,7 +51,7 @@ const HistoryInfo = ({hasHistory, clients, currentSelfClient, isNewCurrentSelfCl
    *   3. new local client is temporary
    */
   const shouldShowHistoryInfo =
-    (isNewCurrentSelfClient || paramNewClient) &&
+    (isNewCurrentSelfClient || newClient) &&
     (hasHistory || clients.length > 1 || (currentSelfClient && currentSelfClient.type === ClientType.TEMPORARY));
 
   if (!shouldShowHistoryInfo) {

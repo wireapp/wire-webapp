@@ -52,7 +52,7 @@ export class LocalStorageAction {
       dispatch(LocalStorageActionCreator.startLocalStorageGet());
       let data: string | boolean | number;
       try {
-        data = JSON.parse(localStorage.getItem(key)).data;
+        data = JSON.parse(localStorage.getItem(key) ?? '{}').data;
         dispatch(LocalStorageActionCreator.successfulLocalStorageGet(key, data));
         return data;
       } catch (error) {

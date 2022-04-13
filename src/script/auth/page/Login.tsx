@@ -66,7 +66,6 @@ import {parseError, parseValidationErrors} from '../util/errorUtil';
 import {UrlUtil} from '@wireapp/commons';
 import Page from './Page';
 import EntropyContainer from './EntropyContainer';
-import {pathWithParams} from '../util/urlUtil';
 
 interface Props extends React.HTMLProps<HTMLDivElement> {}
 
@@ -75,17 +74,18 @@ const Login = ({
   resetAuthError,
   doCheckConversationCode,
   doInit,
+  doSetLocalStorage,
   doInitializeClient,
   doLoginAndJoin,
   doLogin,
   doSendTwoFactorCode,
-  validateLocalClient,
   isFetching,
   pushLoginData,
   loginData,
   defaultSSOCode,
   isSendingTwoFactorCode,
   isNewCurrentSelfClient,
+  getCurrentSelfClient,
 }: Props & ConnectedProps & DispatchProps) => {
   const logger = getLogger('Login');
   const {formatMessage: _} = useIntl();
@@ -165,8 +165,8 @@ const Login = ({
     entropyData?: Uint8Array,
   ) => {
     setValidationErrors(validationErrors);
-    const login: LoginData = {...formLoginData, clientType: loginData.clientType};
     try {
+      const login: LoginData = {...formLoginData, clientType: loginData.clientType};
       if (validationErrors.length) {
         throw validationErrors[0];
       }
@@ -181,22 +181,26 @@ const Login = ({
       if (isEntropyRequired && !showEntropyForm && !entropyData && isNewCurrentSelfClient) {
         setShowEntropyForm(true);
         setEntropyLoginData(login);
+        doSetLocalStorage(QUERY_KEY.NEW_CLIENT, true);
         return;
       }
-      return history.push(pathWithParams(ROUTE.HISTORY_INFO, {[QUERY_KEY.NEW_CLIENT]: 'true'}));
+
+      return history.push(ROUTE.HISTORY_INFO);
     } catch (error) {
       if ((error as BackendError).label) {
         const backendError = error as BackendError;
         switch (backendError.label) {
           case BackendError.LABEL.TOO_MANY_CLIENTS: {
             resetAuthError();
+            if (isEntropyRequired && formLoginData?.verificationCode) {
+              doSetLocalStorage(QUERY_KEY.CONVERSATION_CODE, formLoginData?.verificationCode);
+            }
             history.push(ROUTE.CLIENTS);
             break;
           }
           case BackendError.LABEL.CODE_AUTHENTICATION_REQUIRED: {
-            // const login: LoginData = {...formLoginData, clientType: loginData.clientType};
+            const login: LoginData = {...formLoginData, clientType: loginData.clientType};
             setTwoFactorLoginData(login);
-            setShowEntropyForm(false);
             doSendTwoFactorCode(login.email);
             break;
           }
@@ -367,6 +371,7 @@ const Login = ({
 type ConnectedProps = ReturnType<typeof mapStateToProps>;
 const mapStateToProps = (state: RootState) => ({
   defaultSSOCode: AuthSelector.getDefaultSSOCode(state),
+  getCurrentSelfClient: ClientSelector.getCurrentSelfClient(state),
   isFetching: AuthSelector.isFetching(state),
   isNewCurrentSelfClient: ClientSelector.isNewCurrentSelfClient(state),
   isSendingTwoFactorCode: AuthSelector.isSendingTwoFactorCode(state),
@@ -384,6 +389,7 @@ const mapDispatchToProps = (dispatch: Dispatch<AnyAction>) =>
       doLogin: actionRoot.authAction.doLogin,
       doLoginAndJoin: actionRoot.authAction.doLoginAndJoin,
       doSendTwoFactorCode: actionRoot.authAction.doSendTwoFactorLoginCode,
+      doSetLocalStorage: actionRoot.localStorageAction.setLocalStorage,
       pushLoginData: actionRoot.authAction.pushLoginData,
       resetAuthError: actionRoot.authAction.resetAuthError,
       validateLocalClient: actionRoot.authAction.validateLocalClient,

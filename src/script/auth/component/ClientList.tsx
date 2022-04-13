@@ -30,14 +30,17 @@ import * as LocalStorageAction from '../module/action/LocalStorageAction';
 import {RootState, bindActionCreators} from '../module/reducer';
 import * as ClientSelector from '../module/selector/ClientSelector';
 import * as SelfSelector from '../module/selector/SelfSelector';
-import {ROUTE} from '../route';
+import {QUERY_KEY, ROUTE} from '../route';
 import ClientItem from './ClientItem';
 import EntropyContainer from '../page/EntropyContainer';
 
 const logger = getLogger('ClientList');
 
-interface Props extends React.HTMLProps<HTMLDivElement> {}
+interface Props extends React.HTMLProps<HTMLDivElement> {
+  handleEntropyContainer?: (show: boolean) => void;
+}
 const ClientList = ({
+  handleEntropyContainer,
   clientError,
   isFetching,
   isSSOUser,
@@ -46,6 +49,7 @@ const ClientList = ({
   doRemoveClient,
   getLocalStorage,
   resetAuthError,
+  removeLocalStorage,
 }: Props & ConnectedProps & DispatchProps) => {
   const {history} = useReactRouter();
   const [showLoading, setShowLoading] = React.useState(false);
@@ -63,19 +67,24 @@ const ClientList = ({
   };
 
   const removeClient = async (clientId: string, password?: string, entropyData?: Uint8Array) => {
+    const SFAcode = ((await getLocalStorage(QUERY_KEY.CONVERSATION_CODE)) as string) ?? undefined;
+    if (isEntropyRequired && !showEntropyForm) {
+      setShowEntropyForm(true);
+      setPassword(password);
+      handleEntropyContainer(false);
+      return;
+    }
     try {
-      if (isEntropyRequired && !showEntropyForm) {
-        setShowEntropyForm(true);
-        setPassword(password);
-      }
       setShowLoading(true);
       await doRemoveClient(clientId, password);
       const persist = getLocalStorage(LocalStorageAction.LocalStorageKey.AUTH.PERSIST);
-      await doInitializeClient(persist ? ClientType.PERMANENT : ClientType.TEMPORARY, password, undefined, entropyData);
+      await doInitializeClient(persist ? ClientType.PERMANENT : ClientType.TEMPORARY, password, SFAcode, entropyData);
       return history.push(ROUTE.HISTORY_INFO);
     } catch (error) {
       logger.error(error);
     } finally {
+      removeLocalStorage(QUERY_KEY.CONVERSATION_CODE);
+      setShowEntropyForm(false);
       setShowLoading(false);
     }
   };
@@ -128,7 +137,9 @@ const mapDispatchToProps = (dispatch: Dispatch<AnyAction>) =>
       doInitializeClient: ROOT_ACTIONS.clientAction.doInitializeClient,
       doRemoveClient: ROOT_ACTIONS.clientAction.doRemoveClient,
       getLocalStorage: ROOT_ACTIONS.localStorageAction.getLocalStorage,
+      removeLocalStorage: ROOT_ACTIONS.localStorageAction.deleteLocalStorage,
       resetAuthError: ROOT_ACTIONS.authAction.resetAuthError,
+      setLocalStorage: ROOT_ACTIONS.localStorageAction.setLocalStorage,
     },
     dispatch,
   );
