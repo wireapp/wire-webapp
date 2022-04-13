@@ -58,6 +58,7 @@ import {BackendError} from '../module/action/BackendError';
 import {LabeledError} from '../module/action/LabeledError';
 import {ValidationError} from '../module/action/ValidationError';
 import {RootState, bindActionCreators} from '../module/reducer';
+import * as ClientSelector from '../module/selector/ClientSelector';
 import * as AuthSelector from '../module/selector/AuthSelector';
 import {QUERY_KEY, ROUTE} from '../route';
 import {Runtime} from '@wireapp/commons';
@@ -65,6 +66,7 @@ import {parseError, parseValidationErrors} from '../util/errorUtil';
 import {UrlUtil} from '@wireapp/commons';
 import Page from './Page';
 import EntropyContainer from './EntropyContainer';
+import {pathWithParams} from '../util/urlUtil';
 
 interface Props extends React.HTMLProps<HTMLDivElement> {}
 
@@ -83,11 +85,12 @@ const Login = ({
   loginData,
   defaultSSOCode,
   isSendingTwoFactorCode,
+  isNewCurrentSelfClient,
 }: Props & ConnectedProps & DispatchProps) => {
   const logger = getLogger('Login');
   const {formatMessage: _} = useIntl();
   const {history} = useReactRouter();
-
+  // const newClient = UrlUtil.hasURLParameter(QUERY_KEY.NEW_CLIENT);
   const [conversationCode, setConversationCode] = useState<string | null>(null);
   const [conversationKey, setConversationKey] = useState<string | null>(null);
 
@@ -97,10 +100,13 @@ const Login = ({
   const [twoFactorSubmitError, setTwoFactorSubmitError] = useState<string>('');
   const [twoFactorLoginData, setTwoFactorLoginData] = useState<LoginData>();
 
+  const [entropyLoginData, setEntropyLoginData] = useState<LoginData>();
   const [showEntropyForm, setShowEntropyForm] = useState(false);
   const isEntropyRequired = Config.getConfig().FEATURE.ENABLE_EXTRA_CLIENT_ENTROPY;
+  //  && UrlUtil.hasURLParameter(QUERY_KEY.NEW_CLIENT);
+  // console.log(isEntropyRequired, newClient);
+
   const [entropy, setEntropy] = useState<Uint8Array>();
-  // console.log('zephyr', validateLocalClient());
 
   useEffect(() => {
     const queryClientType = UrlUtil.getURLParameter(QUERY_KEY.CLIENT_TYPE);
@@ -165,13 +171,6 @@ const Login = ({
         throw validationErrors[0];
       }
 
-      if (isEntropyRequired && !showEntropyForm && !entropyData) {
-        setShowEntropyForm(true);
-        setTwoFactorLoginData(login);
-        return;
-      }
-      // console.log('zephyr', validateLocalClient());
-
       const hasKeyAndCode = conversationKey && conversationCode;
       if (hasKeyAndCode) {
         await doLoginAndJoin(login, conversationKey, conversationCode, undefined, entropyData);
@@ -179,7 +178,12 @@ const Login = ({
         await doLogin(login, entropyData);
       }
 
-      return history.push(ROUTE.HISTORY_INFO);
+      if (isEntropyRequired && !showEntropyForm && !entropyData && isNewCurrentSelfClient) {
+        setShowEntropyForm(true);
+        setEntropyLoginData(login);
+        return;
+      }
+      return history.push(pathWithParams(ROUTE.HISTORY_INFO, {[QUERY_KEY.NEW_CLIENT]: 'true'}));
     } catch (error) {
       if ((error as BackendError).label) {
         const backendError = error as BackendError;
@@ -192,6 +196,7 @@ const Login = ({
           case BackendError.LABEL.CODE_AUTHENTICATION_REQUIRED: {
             // const login: LoginData = {...formLoginData, clientType: loginData.clientType};
             setTwoFactorLoginData(login);
+            setShowEntropyForm(false);
             doSendTwoFactorCode(login.email);
             break;
           }
@@ -234,7 +239,7 @@ const Login = ({
   const submitEntropyLogin = (entropyData: [number, number][]) => {
     const entropyUint = new Uint8Array(entropyData.filter(Boolean).flat());
     setEntropy(entropyUint);
-    handleSubmit(twoFactorLoginData, [], entropyUint);
+    handleSubmit(entropyLoginData, [], entropyUint);
   };
 
   const backArrow = (
@@ -363,6 +368,7 @@ type ConnectedProps = ReturnType<typeof mapStateToProps>;
 const mapStateToProps = (state: RootState) => ({
   defaultSSOCode: AuthSelector.getDefaultSSOCode(state),
   isFetching: AuthSelector.isFetching(state),
+  isNewCurrentSelfClient: ClientSelector.isNewCurrentSelfClient(state),
   isSendingTwoFactorCode: AuthSelector.isSendingTwoFactorCode(state),
   loginData: AuthSelector.getLoginData(state),
   loginError: AuthSelector.getError(state),

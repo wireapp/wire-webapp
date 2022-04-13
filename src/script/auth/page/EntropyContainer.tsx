@@ -17,14 +17,15 @@
  *
  */
 
-import {CheckRoundIcon, ContainerXS, H1, Muted, Text} from '@wireapp/react-ui-kit';
+import {Button, CheckRoundIcon, ContainerXS, H1, Muted, Text} from '@wireapp/react-ui-kit';
 import React, {useState} from 'react';
 
-import {setEntropyStrings} from '../../strings';
+import {historyInfoStrings, setEntropyStrings} from '../../strings';
 import {useIntl} from 'react-intl';
 import EntropyCanvas from '../component/EntropyCanvas';
 
 import {ProgressBar} from '../component/ProgressBar';
+import {KEY} from 'Util/KeyboardUtil';
 
 interface Props extends React.HTMLProps<HTMLDivElement> {
   onSetEntropy: (entropyData: [number, number][]) => void;
@@ -50,6 +51,18 @@ const EntropyContainer = ({onSetEntropy}: Props) => {
         <>
           <CheckRoundIcon width={64} height={64} css={{alignSelf: 'center', marginBottom: '64px'}} />
           <Muted center>{_(setEntropyStrings.success)}</Muted>
+          <Button
+            onClick={() => onSetEntropy(entropy)}
+            autoFocus
+            data-uie-name="do-entropy-confirm"
+            onKeyDown={(event: React.KeyboardEvent) => {
+              if (event.key === KEY.ENTER) {
+                onSetEntropy(entropy);
+              }
+            }}
+          >
+            {_(historyInfoStrings.ok)}
+          </Button>
         </>
       ) : (
         <>

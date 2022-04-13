@@ -22,6 +22,7 @@ import {ContainerXS, Loading} from '@wireapp/react-ui-kit';
 import React from 'react';
 import {connect} from 'react-redux';
 import {AnyAction, Dispatch} from 'redux';
+import {Config} from '../../Config';
 import useReactRouter from 'use-react-router';
 import {getLogger} from 'Util/Logger';
 import {actionRoot as ROOT_ACTIONS} from '../module/action/';
@@ -31,6 +32,7 @@ import * as ClientSelector from '../module/selector/ClientSelector';
 import * as SelfSelector from '../module/selector/SelfSelector';
 import {ROUTE} from '../route';
 import ClientItem from './ClientItem';
+import EntropyContainer from '../page/EntropyContainer';
 
 const logger = getLogger('ClientList');
 
@@ -49,6 +51,10 @@ const ClientList = ({
   const [showLoading, setShowLoading] = React.useState(false);
   const [currentlySelectedClient, setCurrentlySelectedClient] = React.useState<string | null>(null);
 
+  const [showEntropyForm, setShowEntropyForm] = React.useState(false);
+  const [password, setPassword] = React.useState<string>(undefined);
+  const isEntropyRequired = Config.getConfig().FEATURE.ENABLE_EXTRA_CLIENT_ENTROPY;
+
   const setSelectedClient = (clientId: string) => {
     const isSelectedClient = currentlySelectedClient === clientId;
     clientId = isSelectedClient ? null : clientId;
@@ -56,18 +62,26 @@ const ClientList = ({
     resetAuthError();
   };
 
-  const removeClient = async (clientId: string, password?: string) => {
+  const removeClient = async (clientId: string, password?: string, entropyData?: Uint8Array) => {
     try {
+      if (isEntropyRequired && !showEntropyForm) {
+        setShowEntropyForm(true);
+        setPassword(password);
+      }
       setShowLoading(true);
       await doRemoveClient(clientId, password);
       const persist = getLocalStorage(LocalStorageAction.LocalStorageKey.AUTH.PERSIST);
-      await doInitializeClient(persist ? ClientType.PERMANENT : ClientType.TEMPORARY, password);
+      await doInitializeClient(persist ? ClientType.PERMANENT : ClientType.TEMPORARY, password, undefined, entropyData);
       return history.push(ROUTE.HISTORY_INFO);
     } catch (error) {
       logger.error(error);
     } finally {
       setShowLoading(false);
     }
+  };
+  const submitEntropy = (entropyData: [number, number][]) => {
+    const entropyUint = new Uint8Array(entropyData.filter(Boolean).flat());
+    removeClient(currentlySelectedClient, password, entropyUint);
   };
 
   const isSelectedClient = (clientId: string) => clientId === currentlySelectedClient;
@@ -76,6 +90,8 @@ const ClientList = ({
     <ContainerXS centerText verticalCenter style={{justifyContent: 'center'}}>
       <Loading />
     </ContainerXS>
+  ) : isEntropyRequired && showEntropyForm ? (
+    <EntropyContainer onSetEntropy={submitEntropy} />
   ) : (
     <ContainerXS
       centerText
