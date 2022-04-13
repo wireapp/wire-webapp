@@ -52,7 +52,6 @@ const AccentColorPicker: React.FunctionComponent<AccentColorPickerProps> = ({use
           css={{
             alignItems: 'center',
             display: 'inline-flex',
-            height: 24,
             justifyContent: 'space-between',
           }}
         >
