@@ -135,6 +135,7 @@ const StartUI: React.FC<StartUIProps> = ({
           selectedUsers={[]}
           setInput={setSearchQuery}
           enter={openFirstConversation}
+          forceDark
         />
       </div>
       {isTeam && canChatWithServices() && (
