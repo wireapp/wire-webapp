@@ -19,7 +19,6 @@
 
 import React from 'react';
 import {t} from 'Util/LocalizerUtil';
-import Icon from 'Components/Icon';
 import {copyText} from 'Util/ClipboardUtil';
 
 interface AccountLinkProps {
@@ -68,18 +67,21 @@ const AccountLink: React.FC<AccountLinkProps> = ({label, value, ...rest}) => {
         type="button"
         data-uie-name="do-copy-profile-link"
         onClick={() => copyText(value)}
+        className="text-bold"
         css={{
+          '&:hover': {
+            color: 'var(--blue-500)',
+          },
           alignItems: 'center',
           background: 'none',
           border: 'none',
           cursor: 'pointer',
           display: 'flex',
           flexDirection: 'row',
+          marginTop: 25,
           paddingLeft: 8,
-          paddingTop: 8,
         }}
       >
-        <Icon.Copy css={{fill: 'var(--background)', marginRight: 8}} data-uie-name="profile-link-icon" />
         {t('preferencesAccountCopyLink')}
       </button>
     </div>

@@ -100,7 +100,7 @@ const AccountInput: React.FC<AccountInputProps> = ({
         display: 'flex',
         flexDirection: 'column',
         height: 56,
-        marginBottom: 8,
+        marginBottom: 40,
 
         padding: 8,
 
