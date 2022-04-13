@@ -21,10 +21,11 @@ import {overlayedObserver} from '../../ui/overlayedObserver';
 import {viewportObserver} from '../../ui/viewportObserver';
 
 interface InViewportParams {
+  fullyInView?: boolean;
   onVisible: () => void;
 }
 
-const InViewport: React.FC<InViewportParams> = ({children, onVisible}) => {
+const InViewport: React.FC<InViewportParams> = ({children, onVisible, fullyInView = true}) => {
   const domNode = useRef<HTMLDivElement>();
 
   useEffect(() => {
@@ -53,7 +54,7 @@ const InViewport: React.FC<InViewportParams> = ({children, onVisible}) => {
         inViewport = isInViewport;
         triggerCallbackIfVisible();
       },
-      true,
+      fullyInView,
       element.parentElement,
     );
     overlayedObserver.trackElement(element, isVisible => {
