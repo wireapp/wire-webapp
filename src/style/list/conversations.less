@@ -65,8 +65,22 @@
     margin-bottom: 4px;
   }
 
+  .button-states();
+
+  &:focus-visible {
+    background-color: var(--white);
+    outline: 1px solid var(--gray-40);
+  }
+
+  body.theme-dark & {
+    &:focus-visible {
+      background-color: var(--gray-95);
+      outline: 1px solid var(--gray-90);
+    }
+  }
+
   &.active {
-    .button-active;
+    .button-active();
     color: var(--white);
 
     svg {

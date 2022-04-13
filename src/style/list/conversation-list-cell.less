@@ -26,6 +26,15 @@
   cursor: pointer;
   font-weight: @font-weight-regular;
 
+  .button-states();
+
+  &:focus-visible {
+    .conversation-list-cell-center,
+    .conversation-list-cell-right {
+      border-bottom: 0 !important;
+    }
+  }
+
   &::after {
     position: absolute;
     right: 0;
@@ -38,7 +47,7 @@
   }
 
   &--active {
-    .button-active;
+    .button-active();
 
     .conversation-list-cell-center,
     .conversation-list-cell-right {

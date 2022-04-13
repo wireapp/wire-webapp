@@ -41,7 +41,7 @@
   .setVariables(foreground background);
   .setColorFade(foreground, @foreground);
   .setColorFade(background, @background);
-  .setVariables(blue-500 blue-600 blue-700 green-500 petrol-500 purple-500 red-500 amber-500);
+  .setVariables(blue-200 blue-500 blue-600 blue-700 blue-800 green-500 petrol-500 purple-500 red-500 amber-500);
   .setVariables(app-bg sidebar-bg sidebar-border-color main-color border-color app-bg-secondary conversation-list-bg-opacity);
   .setVariables(modal-bg modal-border-color);
   .setVariables(preference-account-input-bg);
@@ -374,10 +374,34 @@
 }
 
 .button-active() {
-  background-color: var(--blue-500);
+  background-color: var(--blue-500) !important;
 
   body.theme-dark & {
-    border: 1px solid var(--blue-600);
-    background-color: var(--blue-700);
+    border: 1px solid var(--blue-600) !important;
+    background-color: var(--blue-700) !important;
+  }
+}
+
+.button-states() {
+  transition: background-color 0.15s ease-in-out;
+
+  &:hover {
+    background-color: var(--white);
+  }
+
+  &:focus-visible {
+    background-color: var(--white);
+    outline: 1px solid var(--blue-200);
+  }
+
+  body.theme-dark & {
+    &:hover {
+      background-color: var(--gray-95);
+    }
+
+    &:focus-visible {
+      background-color: var(--gray-95);
+      outline: 1px solid var(--blue-800);
+    }
   }
 }
