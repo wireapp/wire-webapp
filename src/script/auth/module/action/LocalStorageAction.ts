@@ -47,7 +47,7 @@ export class LocalStorageAction {
     };
   };
 
-  getLocalStorage = (key: string): ThunkAction<Promise<string | boolean | number>> => {
+  getLocalStorage = (key: string): ThunkAction<Promise<any>> => {
     return async (dispatch, getState, {localStorage}) => {
       dispatch(LocalStorageActionCreator.startLocalStorageGet());
       let data: string | boolean | number;

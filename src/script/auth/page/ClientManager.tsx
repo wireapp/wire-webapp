@@ -36,7 +36,6 @@ interface Props extends React.HTMLProps<HTMLDivElement> {}
 const ClientManager = ({doGetAllClients, doLogout}: Props & ConnectedProps & DispatchProps) => {
   const {formatMessage: _} = useIntl();
   const {history} = useReactRouter();
-  const [showHeaders, setShowHeaders] = React.useState(true);
   useEffect(() => {
     doGetAllClients();
   }, []);
@@ -46,7 +45,6 @@ const ClientManager = ({doGetAllClients, doLogout}: Props & ConnectedProps & Dis
       history.push(ROUTE.INDEX);
     } catch (error) {}
   };
-  const handleEntropyContainer = (show: boolean) => setShowHeaders(show);
 
   return (
     <Page>
@@ -55,17 +53,15 @@ const ClientManager = ({doGetAllClients, doLogout}: Props & ConnectedProps & Dis
         verticalCenter
         style={{display: 'flex', flexDirection: 'column', justifyContent: 'space-around', minHeight: 428}}
       >
-        {showHeaders && (
-          <>
-            <H1 center style={{marginTop: '140px'}}>
-              {_(clientManagerStrings.headline)}
-            </H1>
-            <Muted center style={{marginBottom: '42px'}} data-uie-name="status-device-limit-info">
-              {_(clientManagerStrings.subhead, {brandName: Config.getConfig().BRAND_NAME})}
-            </Muted>
-          </>
-        )}
-        <ClientList handleEntropyContainer={handleEntropyContainer} />
+        <>
+          <H1 center style={{marginTop: '140px'}}>
+            {_(clientManagerStrings.headline)}
+          </H1>
+          <Muted center style={{marginBottom: '42px'}} data-uie-name="status-device-limit-info">
+            {_(clientManagerStrings.subhead, {brandName: Config.getConfig().BRAND_NAME})}
+          </Muted>
+        </>
+        <ClientList />
         <Link onClick={logout} style={{alignSelf: 'center', margin: '48px 0 80px 0'}} data-uie-name="go-sign-out">
           {_(clientManagerStrings.logout)}
         </Link>

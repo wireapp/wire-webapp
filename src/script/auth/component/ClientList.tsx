@@ -22,29 +22,26 @@ import {ContainerXS, Loading} from '@wireapp/react-ui-kit';
 import React from 'react';
 import {connect} from 'react-redux';
 import {AnyAction, Dispatch} from 'redux';
-import {Config} from '../../Config';
 import useReactRouter from 'use-react-router';
 import {getLogger} from 'Util/Logger';
 import {actionRoot as ROOT_ACTIONS} from '../module/action/';
 import * as LocalStorageAction from '../module/action/LocalStorageAction';
 import {RootState, bindActionCreators} from '../module/reducer';
 import * as ClientSelector from '../module/selector/ClientSelector';
+import {getEntropy} from '../module/selector/AuthSelector';
 import * as SelfSelector from '../module/selector/SelfSelector';
 import {QUERY_KEY, ROUTE} from '../route';
 import ClientItem from './ClientItem';
-import EntropyContainer from '../page/EntropyContainer';
 
 const logger = getLogger('ClientList');
 
-interface Props extends React.HTMLProps<HTMLDivElement> {
-  handleEntropyContainer?: (show: boolean) => void;
-}
+interface Props extends React.HTMLProps<HTMLDivElement> {}
 const ClientList = ({
-  handleEntropyContainer,
   clientError,
   isFetching,
   isSSOUser,
   permanentClients,
+  entropy,
   doInitializeClient,
   doRemoveClient,
   getLocalStorage,
@@ -55,10 +52,6 @@ const ClientList = ({
   const [showLoading, setShowLoading] = React.useState(false);
   const [currentlySelectedClient, setCurrentlySelectedClient] = React.useState<string | null>(null);
 
-  const [showEntropyForm, setShowEntropyForm] = React.useState(false);
-  const [password, setPassword] = React.useState<string>(undefined);
-  const isEntropyRequired = Config.getConfig().FEATURE.ENABLE_EXTRA_CLIENT_ENTROPY;
-
   const setSelectedClient = (clientId: string) => {
     const isSelectedClient = currentlySelectedClient === clientId;
     clientId = isSelectedClient ? null : clientId;
@@ -66,31 +59,20 @@ const ClientList = ({
     resetAuthError();
   };
 
-  const removeClient = async (clientId: string, password?: string, entropyData?: Uint8Array) => {
+  const removeClient = async (clientId: string, password?: string) => {
     const SFAcode = ((await getLocalStorage(QUERY_KEY.CONVERSATION_CODE)) as string) ?? undefined;
-    if (isEntropyRequired && !showEntropyForm) {
-      setShowEntropyForm(true);
-      setPassword(password);
-      handleEntropyContainer(false);
-      return;
-    }
     try {
       setShowLoading(true);
       await doRemoveClient(clientId, password);
       const persist = getLocalStorage(LocalStorageAction.LocalStorageKey.AUTH.PERSIST);
-      await doInitializeClient(persist ? ClientType.PERMANENT : ClientType.TEMPORARY, password, SFAcode, entropyData);
+      await doInitializeClient(persist ? ClientType.PERMANENT : ClientType.TEMPORARY, password, SFAcode, entropy);
       return history.push(ROUTE.HISTORY_INFO);
     } catch (error) {
       logger.error(error);
     } finally {
       removeLocalStorage(QUERY_KEY.CONVERSATION_CODE);
-      setShowEntropyForm(false);
       setShowLoading(false);
     }
-  };
-  const submitEntropy = (entropyData: [number, number][]) => {
-    const entropyUint = new Uint8Array(entropyData.filter(Boolean).flat());
-    removeClient(currentlySelectedClient, password, entropyUint);
   };
 
   const isSelectedClient = (clientId: string) => clientId === currentlySelectedClient;
@@ -99,8 +81,6 @@ const ClientList = ({
     <ContainerXS centerText verticalCenter style={{justifyContent: 'center'}}>
       <Loading />
     </ContainerXS>
-  ) : isEntropyRequired && showEntropyForm ? (
-    <EntropyContainer onSetEntropy={submitEntropy} />
   ) : (
     <ContainerXS
       centerText
@@ -125,6 +105,7 @@ const ClientList = ({
 type ConnectedProps = ReturnType<typeof mapStateToProps>;
 const mapStateToProps = (state: RootState) => ({
   clientError: ClientSelector.getError(state),
+  entropy: getEntropy(state),
   isFetching: ClientSelector.isFetching(state),
   isSSOUser: SelfSelector.isSSOUser(state),
   permanentClients: ClientSelector.getPermanentClients(state),
@@ -139,7 +120,6 @@ const mapDispatchToProps = (dispatch: Dispatch<AnyAction>) =>
       getLocalStorage: ROOT_ACTIONS.localStorageAction.getLocalStorage,
       removeLocalStorage: ROOT_ACTIONS.localStorageAction.deleteLocalStorage,
       resetAuthError: ROOT_ACTIONS.authAction.resetAuthError,
-      setLocalStorage: ROOT_ACTIONS.localStorageAction.setLocalStorage,
     },
     dispatch,
   );

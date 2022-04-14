@@ -78,6 +78,7 @@ const Login = ({
   doInitializeClient,
   doLoginAndJoin,
   doLogin,
+  pushEntropyData,
   doSendTwoFactorCode,
   isFetching,
   pushLoginData,
@@ -195,7 +196,10 @@ const Login = ({
           case BackendError.LABEL.TOO_MANY_CLIENTS: {
             resetAuthError();
             if (isEntropyRequired && formLoginData?.verificationCode) {
-              doSetLocalStorage(QUERY_KEY.CONVERSATION_CODE, formLoginData?.verificationCode);
+              doSetLocalStorage(QUERY_KEY.CONVERSATION_CODE, formLoginData.verificationCode);
+            }
+            if (entropy.current) {
+              pushEntropyData(entropy.current);
             }
             history.push(ROUTE.CLIENTS);
             break;
@@ -242,9 +246,8 @@ const Login = ({
     handleSubmit({...twoFactorLoginData, verificationCode: code}, [], entropy.current);
   };
 
-  const submitEntropyLogin = async (entropyData: [number, number][]) => {
-    const entropyUint = new Uint8Array(entropyData.filter(Boolean).flat());
-    onEntropyGenerated?.current(entropyUint);
+  const storeEntropy = async (entropyData: [number, number][]) => {
+    onEntropyGenerated?.current(new Uint8Array(entropyData.filter(Boolean).flat()));
   };
 
   const backArrow = (
@@ -263,7 +266,7 @@ const Login = ({
         </IsMobile>
       )}
       {isEntropyRequired && showEntropyForm ? (
-        <EntropyContainer onSetEntropy={submitEntropyLogin} />
+        <EntropyContainer onSetEntropy={storeEntropy} />
       ) : (
         <Container centerText verticalCenter style={{width: '100%'}}>
           {!isValidLink && <Redirect to={ROUTE.CONVERSATION_JOIN_INVALID} />}
@@ -391,6 +394,7 @@ const mapDispatchToProps = (dispatch: Dispatch<AnyAction>) =>
       doLoginAndJoin: actionRoot.authAction.doLoginAndJoin,
       doSendTwoFactorCode: actionRoot.authAction.doSendTwoFactorLoginCode,
       doSetLocalStorage: actionRoot.localStorageAction.setLocalStorage,
+      pushEntropyData: actionRoot.authAction.pushEntropyData,
       pushLoginData: actionRoot.authAction.pushLoginData,
       resetAuthError: actionRoot.authAction.resetAuthError,
       validateLocalClient: actionRoot.authAction.validateLocalClient,
