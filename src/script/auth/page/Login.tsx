@@ -98,7 +98,7 @@ const Login = ({
   const [twoFactorLoginData, setTwoFactorLoginData] = useState<LoginData>();
 
   const [showEntropyForm, setShowEntropyForm] = useState(false);
-  const isEntropyRequired = true || Config.getConfig().FEATURE.ENABLE_EXTRA_CLIENT_ENTROPY;
+  const isEntropyRequired = Config.getConfig().FEATURE.ENABLE_EXTRA_CLIENT_ENTROPY;
 
   const onEntropyGenerated = useRef<((entropy: Uint8Array) => void) | undefined>();
   const entropy = useRef<Uint8Array | undefined>();
