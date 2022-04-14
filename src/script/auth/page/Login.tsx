@@ -98,10 +98,24 @@ const Login = ({
   const [twoFactorLoginData, setTwoFactorLoginData] = useState<LoginData>();
 
   const [showEntropyForm, setShowEntropyForm] = useState(false);
-  const isEntropyRequired = Config.getConfig().FEATURE.ENABLE_EXTRA_CLIENT_ENTROPY;
+  const isEntropyRequired = true || Config.getConfig().FEATURE.ENABLE_EXTRA_CLIENT_ENTROPY;
 
   const onEntropyGenerated = useRef<((entropy: Uint8Array) => void) | undefined>();
   const entropy = useRef<Uint8Array | undefined>();
+  const getEntropy = isEntropyRequired
+    ? () => {
+        // This is somewhat hacky. When the login action detects a new device and that entropy is required, then we give back a promise to the login action.
+        // This way we can just halt the login process, wait for the user to generate entropy and then give back the resulting entropy to the login action.
+        setShowEntropyForm(true);
+        return new Promise<Uint8Array>(resolve => {
+          // we need to keep a reference to the resolve function of the promise as it's going to be called by the entropyContainer callback
+          onEntropyGenerated.current = entropyData => {
+            entropy.current = entropyData;
+            resolve(entropyData);
+          };
+        });
+      }
+    : undefined;
 
   useEffect(() => {
     const queryClientType = UrlUtil.getURLParameter(QUERY_KEY.CLIENT_TYPE);
@@ -147,18 +161,15 @@ const Login = ({
   const immediateLogin = async () => {
     try {
       await doInit({isImmediateLogin: true, shouldValidateLocalClient: false});
-      await doInitializeClient(ClientType.PERMANENT, undefined);
+      const entropyData = await getEntropy?.();
+      await doInitializeClient(ClientType.PERMANENT, undefined, undefined, entropyData);
       return history.push(ROUTE.HISTORY_INFO);
     } catch (error) {
       logger.error('Unable to login immediately', error);
     }
   };
 
-  const handleSubmit = async (
-    formLoginData: Partial<LoginData>,
-    validationErrors: Error[],
-    entropyData?: Uint8Array,
-  ) => {
+  const handleSubmit = async (formLoginData: Partial<LoginData>, validationErrors: Error[] = []) => {
     setValidationErrors(validationErrors);
     try {
       const login: LoginData = {...formLoginData, clientType: loginData.clientType};
@@ -167,20 +178,6 @@ const Login = ({
       }
 
       const hasKeyAndCode = conversationKey && conversationCode;
-      const getEntropy = isEntropyRequired
-        ? () => {
-            // This is somewhat hacky. When the login action detects a new device and that entropy is required, then we give back a promise to the login action.
-            // This way we can just halt the login process, wait for the user to generate entropy and then give back the resulting entropy to the login action.
-            setShowEntropyForm(true);
-            return new Promise<Uint8Array>(resolve => {
-              // we need to keep a reference to the resolve function of the promise as it's going to be called by the entropyContainer callback
-              onEntropyGenerated.current = entropyData => {
-                entropy.current = entropyData;
-                resolve(entropyData);
-              };
-            });
-          }
-        : undefined;
       if (hasKeyAndCode) {
         await doLoginAndJoin(login, conversationKey, conversationCode, undefined, getEntropy);
       } else {
@@ -242,11 +239,11 @@ const Login = ({
 
   const submitTwoFactorLogin = (code: string) => {
     setTwoFactorSubmitError('');
-    handleSubmit({...twoFactorLoginData, verificationCode: code}, [], entropy.current);
+    handleSubmit({...twoFactorLoginData, verificationCode: code}, []);
   };
 
   const storeEntropy = async (entropyData: [number, number][]) => {
-    onEntropyGenerated?.current(new Uint8Array(entropyData.filter(Boolean).flat()));
+    onEntropyGenerated.current?.(new Uint8Array(entropyData.filter(Boolean).flat()));
   };
 
   const backArrow = (
