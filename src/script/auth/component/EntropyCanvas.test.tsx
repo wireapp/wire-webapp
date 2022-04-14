@@ -62,7 +62,7 @@ describe('EntropyCanvas', () => {
       fireEvent.mouseLeave(canvas);
     });
     expect(setEntropy).toHaveBeenCalledTimes(1);
-    expect(setError).toHaveBeenCalledTimes(5);
+    expect(setError).toHaveBeenCalledTimes(3);
   });
 
   it('starts drawing again after leaving canvas', async () => {
@@ -81,6 +81,6 @@ describe('EntropyCanvas', () => {
       fireEvent.mouseLeave(canvas);
     });
     expect(setEntropy).toHaveBeenCalledTimes(2);
-    expect(setError).toHaveBeenCalledTimes(10);
+    expect(setError).toHaveBeenCalledTimes(6);
   });
 });

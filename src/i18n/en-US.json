@@ -1056,7 +1056,7 @@
   "setEmail.tryAgain": "Try again",
   "setEntropy.headline": "Create Entropy",
   "setEntropy.moreEntropyNeeded": "Please continue moving your mouse within the window to create enough entropy.",
-  "setEntropy.subheadline": "Move your mouse as randomly as possible within the window below until the progress bar is 100% filled. This creates a random number which helps to protect your account and increases the overall security.",
+  "setEntropy.subheadline": "Move your mouse randomly within the window below until the progress bar is 100% filled. This way, you create a random number to improve your account protection and increase the overall security.",
   "setEntropy.success": "Entropy successfully created",
   "setPassword.button": "Set password",
   "setPassword.headline": "Set password",
