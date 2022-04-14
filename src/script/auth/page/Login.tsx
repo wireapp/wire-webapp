@@ -58,7 +58,6 @@ import {BackendError} from '../module/action/BackendError';
 import {LabeledError} from '../module/action/LabeledError';
 import {ValidationError} from '../module/action/ValidationError';
 import {RootState, bindActionCreators} from '../module/reducer';
-import * as ClientSelector from '../module/selector/ClientSelector';
 import * as AuthSelector from '../module/selector/AuthSelector';
 import {QUERY_KEY, ROUTE} from '../route';
 import {Runtime} from '@wireapp/commons';
@@ -375,9 +374,7 @@ const Login = ({
 type ConnectedProps = ReturnType<typeof mapStateToProps>;
 const mapStateToProps = (state: RootState) => ({
   defaultSSOCode: AuthSelector.getDefaultSSOCode(state),
-  getCurrentSelfClient: ClientSelector.getCurrentSelfClient(state),
   isFetching: AuthSelector.isFetching(state),
-  isNewCurrentSelfClient: ClientSelector.isNewCurrentSelfClient(state),
   isSendingTwoFactorCode: AuthSelector.isSendingTwoFactorCode(state),
   loginData: AuthSelector.getLoginData(state),
   loginError: AuthSelector.getError(state),
@@ -397,7 +394,6 @@ const mapDispatchToProps = (dispatch: Dispatch<AnyAction>) =>
       pushEntropyData: actionRoot.authAction.pushEntropyData,
       pushLoginData: actionRoot.authAction.pushLoginData,
       resetAuthError: actionRoot.authAction.resetAuthError,
-      validateLocalClient: actionRoot.authAction.validateLocalClient,
     },
     dispatch,
   );
