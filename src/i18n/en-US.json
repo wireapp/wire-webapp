@@ -1011,6 +1011,7 @@
   "searchContacts": "Contacts",
   "searchCreateGroup": "Create group",
   "searchCreateGuestRoom": "Create guest room",
+  "searchConnectWithOtherDomain": "Connect with other domain",
   "searchFederatedDomainNotAvailable": "The federated domain is currently not available.",
   "searchFederatedDomainNotAvailableLearnMore": "Learn more",
   "searchGroups": "Groups",

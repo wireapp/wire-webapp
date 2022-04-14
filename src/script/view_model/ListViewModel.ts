@@ -28,8 +28,6 @@ import {t} from 'Util/LocalizerUtil';
 import {iterateItem} from 'Util/ArrayUtil';
 import {isEscapeKey} from 'Util/KeyboardUtil';
 
-import {StartUIViewModel} from './list/StartUIViewModel';
-
 import {showContextMenu} from '../ui/ContextMenu';
 import {showLabelContextMenu} from '../ui/LabelContextMenu';
 import {Shortcut} from '../ui/Shortcut';
@@ -49,6 +47,7 @@ import {TeamState} from '../team/TeamState';
 import {ConversationState} from '../conversation/ConversationState';
 import {CallingViewModel} from './CallingViewModel';
 import {PropertiesRepository} from '../properties/PropertiesRepository';
+import {SearchRepository} from '../search/SearchRepository';
 
 export enum ListState {
   ARCHIVE = 'ListViewModel.STATE.ARCHIVE',
@@ -70,10 +69,12 @@ export class ListViewModel {
   readonly isFederated: boolean;
   private readonly elementId: 'left-column';
 
+  public readonly mainViewModel: MainViewModel;
   public readonly conversationRepository: ConversationRepository;
   public readonly propertiesRepository: PropertiesRepository;
   private readonly callingRepository: CallingRepository;
-  private readonly teamRepository: TeamRepository;
+  public readonly teamRepository: TeamRepository;
+  public readonly searchRepository: SearchRepository;
   private readonly actionsViewModel: ActionsViewModel;
   public readonly contentViewModel: ContentViewModel;
   public readonly callingViewModel: CallingViewModel;
@@ -81,7 +82,6 @@ export class ListViewModel {
   private readonly isProAccount: ko.PureComputed<boolean>;
   public readonly selfUser: ko.Observable<User>;
   private readonly visibleListItems: ko.PureComputed<(string | Conversation)[]>;
-  private readonly start: StartUIViewModel;
 
   static get STATE() {
     return {
@@ -98,12 +98,14 @@ export class ListViewModel {
     this.teamState = container.resolve(TeamState);
     this.conversationState = container.resolve(ConversationState);
 
+    this.mainViewModel = mainViewModel;
     this.elementId = 'left-column';
     this.isFederated = mainViewModel.isFederated;
     this.conversationRepository = repositories.conversation;
     this.callingRepository = repositories.calling;
     this.teamRepository = repositories.team;
     this.propertiesRepository = repositories.properties;
+    this.searchRepository = repositories.search;
 
     this.actionsViewModel = mainViewModel.actions;
     this.contentViewModel = mainViewModel.content;
@@ -140,16 +142,6 @@ export class ListViewModel {
       const states: (string | Conversation)[] = hasConnectRequests ? [ContentViewModel.STATE.CONNECTION_REQUESTS] : [];
       return states.concat(this.conversationState.conversations_unarchived());
     });
-
-    this.start = new StartUIViewModel(
-      mainViewModel,
-      this,
-      repositories.conversation,
-      repositories.integration,
-      repositories.search,
-      repositories.team,
-      repositories.user,
-    );
 
     this._initSubscriptions();
 
@@ -300,11 +292,6 @@ export class ListViewModel {
   };
 
   private readonly hideList = (): void => {
-    const stateIsStartUI = this.state() === ListViewModel.STATE.START_UI;
-    if (stateIsStartUI) {
-      this.start.resetView();
-    }
-
     document.removeEventListener('keydown', this.onKeyDownListView);
   };
 
@@ -317,9 +304,6 @@ export class ListViewModel {
 
   private readonly updateList = (newListState: string, respectLastState: boolean): void => {
     switch (newListState) {
-      case ListViewModel.STATE.START_UI:
-        this.start.updateList();
-        break;
       case ListViewModel.STATE.PREFERENCES:
         amplify.publish(WebAppEvents.CONTENT.SWITCH, ContentViewModel.STATE.PREFERENCES_ACCOUNT);
         break;

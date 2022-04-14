@@ -254,3 +254,26 @@
   font-family: inherit;
   font-size: inherit;
 }
+
+// -- new design buttons --
+
+.buttons-group {
+  display: flex;
+
+  &-button {
+    .button-small;
+    padding: 8px 12px;
+    border: 1px solid @gray-40;
+    background: @white;
+
+    color: @black;
+  }
+
+  &-button-left {
+    border-radius: 12px 0 0 12px;
+  }
+
+  &-button-right {
+    border-radius: 0 12px 12px 0;
+  }
+}

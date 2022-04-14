@@ -193,7 +193,37 @@ describe('renderMessage', () => {
     );
 
     expect(renderMessage("[email](mailto:'\\);alert\\('pwned'\\)//)")).toBe(
-      '<a href="mailto:&amp;amp;#x27;);alert(&amp;amp;#x27;pwned&amp;amp;#x27;)//" data-email-link="true" data-md-link="true" data-uie-name="markdown-link">email</a>',
+      '<a href="mailto:\');alert(\'pwned\')//" data-email-link="true" data-md-link="true" data-uie-name="markdown-link">email</a>',
+    );
+  });
+
+  it('renders a link from markdown notation with a title', () => {
+    expect(renderMessage('[sometext](https://some.domain "this is a title")')).toBe(
+      `<a href="https://some.domain" title="this is a title" target="_blank" rel="nofollow noopener noreferrer" data-md-link="true" data-uie-name="markdown-link">sometext</a>`,
+    );
+  });
+
+  it('does not render a broken markdown link', () => {
+    expect(renderMessage(`[sometext](https://some.domain"><script>alert("oops")</script>)`)).toBe(
+      `[sometext](<a href="https://some.domain" target="_blank" rel="nofollow noopener noreferrer">https://some.domain</a>&quot;&gt;&lt;script&gt;alert(&quot;oops&quot;)&lt;/script&gt;)`,
+    );
+  });
+
+  it('escapes url params', () => {
+    expect(renderMessage(`[sometext](https://some.domain?param1=a&param2=b)`)).toBe(
+      `<a href="https://some.domain?param1=a&amp;param2=b" target="_blank" rel="nofollow noopener noreferrer" data-md-link="true" data-uie-name="markdown-link">sometext</a>`,
+    );
+  });
+
+  it('escapes links with html charachters on their title', () => {
+    expect(renderMessage(`[sometext](https://some.domain "<this> &' >that<")`)).toBe(
+      `<a href="https://some.domain" title="&lt;this&gt; &amp;' &gt;that&lt;" target="_blank" rel="nofollow noopener noreferrer" data-md-link="true" data-uie-name="markdown-link">sometext</a>`,
+    );
+  });
+
+  it('escapes links with an xss attempt on their title', () => {
+    expect(renderMessage(`[sometext](https://some.domain '"><script>alert("oops")</script>')`)).toBe(
+      `<a href="https://some.domain" title="&quot;&gt;&lt;script&gt;alert(&quot;oops&quot;)&lt;/script&gt;" target="_blank" rel="nofollow noopener noreferrer" data-md-link="true" data-uie-name="markdown-link">sometext</a>`,
     );
   });
 
