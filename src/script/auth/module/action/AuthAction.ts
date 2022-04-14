@@ -50,10 +50,10 @@ export class AuthAction {
     };
   };
 
-  doLogin = (loginData: LoginData, entropyData?: Uint8Array): ThunkAction => {
+  doLogin = (loginData: LoginData, getEntropy?: () => Promise<Uint8Array>): ThunkAction => {
     const onBeforeLogin: LoginLifecycleFunction = async (dispatch, getState, {actions: {authAction}}) =>
       dispatch(authAction.doSilentLogout());
-    return this.doLoginPlain(loginData, onBeforeLogin, undefined, entropyData);
+    return this.doLoginPlain(loginData, onBeforeLogin, undefined, getEntropy);
   };
 
   doLoginAndJoin = (
@@ -61,7 +61,7 @@ export class AuthAction {
     key: string,
     code: string,
     uri?: string,
-    entropyData?: Uint8Array,
+    getEntropy?: () => Promise<Uint8Array>,
   ): ThunkAction => {
     const onBeforeLogin: LoginLifecycleFunction = async (dispatch, getState, {actions: {authAction}}) =>
       dispatch(authAction.doSilentLogout());
@@ -69,14 +69,14 @@ export class AuthAction {
       await dispatch(conversationAction.doJoinConversationByCode(key, code, uri));
     };
 
-    return this.doLoginPlain(loginData, onBeforeLogin, onAfterLogin, entropyData);
+    return this.doLoginPlain(loginData, onBeforeLogin, onAfterLogin, getEntropy);
   };
 
   doLoginPlain = (
     loginData: LoginData,
     onBeforeLogin: LoginLifecycleFunction = async () => {},
     onAfterLogin: LoginLifecycleFunction = async () => {},
-    entropyData?: Uint8Array,
+    getEntropy?: () => Promise<Uint8Array>,
   ): ThunkAction => {
     return async (dispatch, getState, global) => {
       const {
@@ -95,6 +95,14 @@ export class AuthAction {
           cookieAction.setCookie(COOKIE_NAME_APP_OPENED, {appInstanceId: global.getConfig().APP_INSTANCE_ID}),
         );
         await dispatch(selfAction.fetchSelf());
+        let entropyData: Uint8Array | undefined = undefined;
+        if (getEntropy) {
+          try {
+            await core.loadAndValidateLocalClient();
+          } catch (e) {
+            entropyData = await getEntropy();
+          }
+        }
         await onAfterLogin(dispatch, getState, global);
         await dispatch(
           clientAction.doInitializeClient(

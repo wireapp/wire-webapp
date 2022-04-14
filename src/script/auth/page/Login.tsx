@@ -40,7 +40,7 @@ import {
   Muted,
   Text,
 } from '@wireapp/react-ui-kit';
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import {useIntl} from 'react-intl';
 import {connect} from 'react-redux';
 import {Redirect} from 'react-router';
@@ -84,13 +84,10 @@ const Login = ({
   loginData,
   defaultSSOCode,
   isSendingTwoFactorCode,
-  isNewCurrentSelfClient,
-  getCurrentSelfClient,
 }: Props & ConnectedProps & DispatchProps) => {
   const logger = getLogger('Login');
   const {formatMessage: _} = useIntl();
   const {history} = useReactRouter();
-  // const newClient = UrlUtil.hasURLParameter(QUERY_KEY.NEW_CLIENT);
   const [conversationCode, setConversationCode] = useState<string | null>(null);
   const [conversationKey, setConversationKey] = useState<string | null>(null);
 
@@ -100,13 +97,11 @@ const Login = ({
   const [twoFactorSubmitError, setTwoFactorSubmitError] = useState<string>('');
   const [twoFactorLoginData, setTwoFactorLoginData] = useState<LoginData>();
 
-  const [entropyLoginData, setEntropyLoginData] = useState<LoginData>();
   const [showEntropyForm, setShowEntropyForm] = useState(false);
   const isEntropyRequired = Config.getConfig().FEATURE.ENABLE_EXTRA_CLIENT_ENTROPY;
-  //  && UrlUtil.hasURLParameter(QUERY_KEY.NEW_CLIENT);
-  // console.log(isEntropyRequired, newClient);
 
-  const [entropy, setEntropy] = useState<Uint8Array>();
+  const onEntropyGenerated = useRef<((entropy: Uint8Array) => void) | undefined>();
+  const entropy = useRef<Uint8Array | undefined>();
 
   useEffect(() => {
     const queryClientType = UrlUtil.getURLParameter(QUERY_KEY.CLIENT_TYPE);
@@ -172,17 +167,24 @@ const Login = ({
       }
 
       const hasKeyAndCode = conversationKey && conversationCode;
+      const getEntropy = isEntropyRequired
+        ? () => {
+            // This is somewhat hacky. When the login action detects a new device and that entropy is required, then we give back a promise to the login action.
+            // This way we can just halt the login process, wait for the user to generate entropy and then give back the resulting entropy to the login action.
+            setShowEntropyForm(true);
+            return new Promise<Uint8Array>(resolve => {
+              // we need to keep a reference to the resolve function of the promise as it's going to be called by the entropyContainer callback
+              onEntropyGenerated.current = entropyData => {
+                entropy.current = entropyData;
+                resolve(entropyData);
+              };
+            });
+          }
+        : undefined;
       if (hasKeyAndCode) {
-        await doLoginAndJoin(login, conversationKey, conversationCode, undefined, entropyData);
+        await doLoginAndJoin(login, conversationKey, conversationCode, undefined, getEntropy);
       } else {
-        await doLogin(login, entropyData);
-      }
-
-      if (isEntropyRequired && !showEntropyForm && !entropyData && isNewCurrentSelfClient) {
-        setShowEntropyForm(true);
-        setEntropyLoginData(login);
-        doSetLocalStorage(QUERY_KEY.NEW_CLIENT, true);
-        return;
+        await doLogin(login, getEntropy);
       }
 
       return history.push(ROUTE.HISTORY_INFO);
@@ -237,13 +239,12 @@ const Login = ({
 
   const submitTwoFactorLogin = (code: string) => {
     setTwoFactorSubmitError('');
-    handleSubmit({...twoFactorLoginData, verificationCode: code}, [], entropy);
+    handleSubmit({...twoFactorLoginData, verificationCode: code}, [], entropy.current);
   };
 
-  const submitEntropyLogin = (entropyData: [number, number][]) => {
+  const submitEntropyLogin = async (entropyData: [number, number][]) => {
     const entropyUint = new Uint8Array(entropyData.filter(Boolean).flat());
-    setEntropy(entropyUint);
-    handleSubmit(entropyLoginData, [], entropyUint);
+    onEntropyGenerated?.current(entropyUint);
   };
 
   const backArrow = (
@@ -261,7 +262,7 @@ const Login = ({
           <div style={{margin: 16}}>{backArrow}</div>
         </IsMobile>
       )}
-      {isEntropyRequired && showEntropyForm && !entropy ? (
+      {isEntropyRequired && showEntropyForm ? (
         <EntropyContainer onSetEntropy={submitEntropyLogin} />
       ) : (
         <Container centerText verticalCenter style={{width: '100%'}}>
