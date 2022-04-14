@@ -197,8 +197,8 @@ const ConversationListCell: React.FC<ConversationListCellProps> = ({
                 <span
                   className="conversation-list-cell-badge cell-badge-light"
                   data-uie-name="status-pending"
-                  title={t('accessibility.callStatusPending')}
-                  aria-label={t('accessibility.callStatusPending')}
+                  title={t('accessibility.conversationStatusPending')}
+                  aria-label={t('accessibility.conversationStatusPending')}
                 >
                   <Icon.Pending className="svg-icon" />
                 </span>
@@ -247,8 +247,8 @@ const ConversationListCell: React.FC<ConversationListCellProps> = ({
                 <span
                   className="conversation-list-cell-badge cell-badge-light conversation-muted"
                   data-uie-name="status-silence"
-                  title={t('accessibility.callStatusMuted')}
-                  aria-label={t('accessibility.callStatusMuted')}
+                  title={t('accessibility.conversationStatusMuted')}
+                  aria-label={t('accessibility.conversationStatusMuted')}
                 >
                   <Icon.Mute className="svg-icon" />
                 </span>
