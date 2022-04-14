@@ -34,10 +34,6 @@ const EntropyCanvas = (props: CanvasProps) => {
     }
   }, [percent, percent]);
 
-  const onMouseEnter = () => {
-    startInterval();
-  };
-
   const onMouseLeave = () => {
     onProgress(entropy, percent, true);
     pauseInterval();
@@ -75,6 +71,7 @@ const EntropyCanvas = (props: CanvasProps) => {
   }, [entropy]);
 
   const onMouseMove = (event: MouseEvent<HTMLCanvasElement>) => {
+    startInterval();
     const newEntropy: [number, number] = [
       event.pageX - event.currentTarget?.getBoundingClientRect()?.x,
       event.pageY - event.currentTarget?.getBoundingClientRect()?.y,
@@ -96,7 +93,6 @@ const EntropyCanvas = (props: CanvasProps) => {
         width: `${sizeX}px`,
       }}
       onMouseMove={onMouseMove}
-      onMouseEnter={onMouseEnter}
       onMouseLeave={onMouseLeave}
       ref={canvasRef}
       {...rest}
