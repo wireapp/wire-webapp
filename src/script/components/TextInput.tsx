@@ -19,6 +19,7 @@
 
 import React from 'react';
 import {registerReactComponent} from 'Util/ComponentUtil';
+import Icon from 'Components/Icon';
 
 export interface UserInputProps {
   label: string;
@@ -29,9 +30,11 @@ export interface UserInputProps {
   value: string;
 }
 
-const TextInput: React.FC<UserInputProps> = ({label, name, onChange, placeholder, value}: UserInputProps) => {
+const TextInput: React.FC<UserInputProps> = ({label, name, onCancel, onChange, placeholder, value}: UserInputProps) => {
+  const isFilled = Boolean(value);
+
   return (
-    <div css={{display: 'flex', flexDirection: 'column-reverse', width: '100%'}}>
+    <div css={{display: 'flex', flexDirection: 'column-reverse', position: 'relative', width: '100%'}}>
       <input
         className="text-input"
         css={{
@@ -73,6 +76,28 @@ const TextInput: React.FC<UserInputProps> = ({label, name, onChange, placeholder
       >
         {label}
       </label>
+      {isFilled && (
+        <button
+          css={{
+            background: 'var(--text-input-color)',
+            alignItems: 'center',
+            border: 'none',
+            borderRadius: '50%',
+            bottom: 16,
+            display: 'flex',
+            height: 16,
+            justifyContent: 'center',
+            margin: 0,
+            padding: 0,
+            position: 'absolute',
+            right: 16,
+            width: 16,
+          }}
+          onClick={onCancel}
+        >
+          <Icon.Close css={{fill: 'var(--text-input-background)', height: 8, width: 8}} />
+        </button>
+      )}
     </div>
   );
 };
