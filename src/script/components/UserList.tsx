@@ -241,7 +241,7 @@ const UserList: React.FC<UserListProps> = ({
           fullyInView={false}
           onVisible={() => setMaxShownUsers(maxShownUsers + USER_CHUNK_SIZE)}
           key={`in-viewport-${Math.random()}`}
-          style={{transform: 'translateY(-60px)'}}
+          style={{height: 10, transform: 'translateY(-60px)', width: 10}}
         />
       )}
     </>
