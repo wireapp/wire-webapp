@@ -22,6 +22,8 @@ import {registerReactComponent} from 'Util/ComponentUtil';
 import Icon from 'Components/Icon';
 
 export interface UserInputProps {
+  errorMessage?: string;
+  isError?: boolean;
   label: string;
   name: string;
   onCancel: () => void;
@@ -30,11 +32,37 @@ export interface UserInputProps {
   value: string;
 }
 
-const TextInput: React.FC<UserInputProps> = ({label, name, onCancel, onChange, placeholder, value}: UserInputProps) => {
+const TextInput: React.FC<UserInputProps> = ({
+  errorMessage,
+  isError,
+  label,
+  name,
+  onCancel,
+  onChange,
+  placeholder,
+  value,
+}: UserInputProps) => {
   const isFilled = Boolean(value);
 
   return (
-    <div css={{display: 'flex', flexDirection: 'column-reverse', position: 'relative', width: '100%'}}>
+    <div
+      css={{display: 'flex', flexDirection: 'column-reverse', paddingBottom: 26, position: 'relative', width: '100%'}}
+    >
+      {isError && errorMessage && (
+        <span
+          className="label"
+          css={{
+            bottom: 4,
+            color: 'var(--text-input-alert)',
+            left: 0,
+            lineHeight: '14px',
+            position: 'absolute',
+            textTransform: 'unset',
+          }}
+        >
+          {errorMessage}
+        </span>
+      )}
       <input
         className="text-input"
         css={{
@@ -52,7 +80,7 @@ const TextInput: React.FC<UserInputProps> = ({label, name, onCancel, onChange, p
           },
           background: 'var(--text-input-background)',
           border: '1px solid',
-          borderColor: 'var(--text-input-border)',
+          borderColor: isError ? 'var(--text-input-alert) !important' : 'var(--text-input-border)',
           borderRadius: 12,
           color: 'var(--text-input-color)',
           outline: 'none',
@@ -68,6 +96,7 @@ const TextInput: React.FC<UserInputProps> = ({label, name, onCancel, onChange, p
       <label
         className="label-medium"
         css={{
+          color: isError && 'var(--text-input-alert) !important',
           display: 'flex',
           flexDirection: 'column',
           marginBottom: 2,
@@ -79,11 +108,11 @@ const TextInput: React.FC<UserInputProps> = ({label, name, onCancel, onChange, p
       {isFilled && (
         <button
           css={{
-            background: 'var(--text-input-color)',
             alignItems: 'center',
+            background: 'var(--text-input-color)',
             border: 'none',
             borderRadius: '50%',
-            bottom: 16,
+            bottom: 42,
             display: 'flex',
             height: 16,
             justifyContent: 'center',
