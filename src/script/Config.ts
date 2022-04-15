@@ -22,10 +22,10 @@ import {createRandomUuid} from 'Util/util';
 const env = window.wire.env;
 
 export const ACCENT_ID = {
+  AMBER: 5,
   BLUE: 1,
   GREEN: 2,
-  ORANGE: 5,
-  PINK: 6,
+  PETROL: 6,
   PURPLE: 7,
   RED: 4,
   YELLOW: 3,

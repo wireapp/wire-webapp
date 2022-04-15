@@ -96,12 +96,12 @@ export class User {
 
   static get ACCENT_COLOR() {
     return {
-      [ACCENT_ID.BLUE]: '#2391d3',
-      [ACCENT_ID.GREEN]: '#00c800',
-      [ACCENT_ID.ORANGE]: '#ff8900',
-      [ACCENT_ID.PINK]: '#fe5ebd',
-      [ACCENT_ID.PURPLE]: '#9c00fe',
-      [ACCENT_ID.RED]: '#fb0807',
+      [ACCENT_ID.BLUE]: 'var(--blue-500)',
+      [ACCENT_ID.GREEN]: 'var(--green-500)',
+      [ACCENT_ID.PURPLE]: 'var(--purple-500)',
+      [ACCENT_ID.AMBER]: 'var(--amber-500)',
+      [ACCENT_ID.RED]: 'var(--red-500)',
+      [ACCENT_ID.PETROL]: 'var(--petrol-500)',
       [ACCENT_ID.YELLOW]: '#febf02',
     };
   }
