@@ -33,7 +33,7 @@ export interface AccentColorPickerProps {
 
 const AccentColorPicker: React.FunctionComponent<AccentColorPickerProps> = ({user, doSetAccentColor}) => {
   return (
-    <fieldset css={{border: 'none', margin: 0, padding: 0}} aria-label={t('chooseAccountColor')}>
+    <fieldset css={{border: 'none', margin: 0, padding: 0}} aria-label={t('accessibility.chooseAccountColor')}>
       <div
         className="preferences-account-accent-color"
         css={{
