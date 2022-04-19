@@ -26,6 +26,7 @@
   position: absolute;
   opacity: 0;
 
+  & + button,
   & + label {
     position: relative;
     display: block;
@@ -52,6 +53,7 @@
     }
   }
 
+  &:checked + button,
   &:checked + label {
     background-color: @w-green;
 

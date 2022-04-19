@@ -169,7 +169,7 @@ export function roleFromTeamPermissions(permissions: PermissionsData): ROLE {
  * @param boundRole Default role that will be used by default in every helper. Can be overridden by passing a role when calling the helper
  * @returns helpers
  */
-export function generatePermissionHelpers(boundRole = ROLE.NONE): Record<string, (role: ROLE) => boolean> {
+export function generatePermissionHelpers(boundRole = ROLE.NONE): Record<string, (role?: ROLE) => boolean> {
   return Object.entries(FEATURES).reduce<Record<string, (role: ROLE) => boolean>>(
     (helpers, [featureKey, featureValue]: [string, number]) => {
       const camelCasedFeature = featureKey.toLowerCase().split('_').map(capitalizeFirstChar).join('');

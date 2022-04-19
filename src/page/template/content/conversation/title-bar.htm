@@ -10,25 +10,25 @@
       <!-- /ko -->
     </li>
 
-    <li id="show-participants"
-        data-bind="clickOrDrag: clickOnDetails, attr: {'title': peopleTooltip, 'aria-label': peopleTooltip}, event: { keydown: (_, event) => pressOnDetails(event) }"
+    <li class="conversation-title-bar-name">
+      <div id="show-participants" data-bind="clickOrDrag: clickOnDetails, attr: {'title': peopleTooltip, 'aria-label': peopleTooltip}, event: { keydown: (_, event) => pressOnDetails(event) }"
         data-placement="bottom"
         role="button"
         tabindex="0"
-        data-uie-name="do-participants"
-        class="conversation-title-bar-name">
-      <div class="conversation-title-bar-name-label--wrapper">
-        <!-- ko if: conversationEntity().hasLegalHold() -->
-        <legal-hold-dot style="margin: 0 16px 0 0" params="legalHoldModal: contentViewModel.legalHoldModal, conversation: conversationEntity" data-uie-name="status-legal-hold-conversation"></legal-hold-dot>
+        data-uie-name="do-participants">
+        <div class="conversation-title-bar-name-label--wrapper">
+          <!-- ko if: conversationEntity().hasLegalHold() -->
+          <legal-hold-dot style="margin: 0 16px 0 0" params="legalHoldModal: contentViewModel.legalHoldModal, conversation: conversationEntity" data-uie-name="status-legal-hold-conversation"></legal-hold-dot>
+          <!-- /ko -->
+          <!-- ko if: conversationEntity().verification_state() === ConversationVerificationState.VERIFIED -->
+          <verified-icon class="conversation-title-bar-name--verified"></verified-icon>
+          <!-- /ko -->
+          <h2 class="conversation-title-bar-name-label" data-bind="text: conversationEntity().display_name()" data-uie-name="status-conversation-title-bar-label"></h2>
+        </div>
+        <!-- ko if: conversationSubtitle() -->
+        <div class="conversation-title-bar-name--subtitle" data-bind="text: conversationSubtitle()"></div>
         <!-- /ko -->
-        <!-- ko if: conversationEntity().verification_state() === ConversationVerificationState.VERIFIED -->
-        <verified-icon class="conversation-title-bar-name--verified"></verified-icon>
-        <!-- /ko -->
-        <h2 class="conversation-title-bar-name-label" data-bind="text: conversationEntity().display_name()" data-uie-name="status-conversation-title-bar-label"></h2>
       </div>
-      <!-- ko if: conversationSubtitle() -->
-      <div class="conversation-title-bar-name--subtitle" data-bind="text: conversationSubtitle()"></div>
-      <!-- /ko -->
     </li>
 
     <li class="conversation-title-bar-icons">

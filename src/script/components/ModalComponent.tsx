@@ -31,7 +31,7 @@ interface ModalComponentProps {
 
 const ModalOverlayStyles: CSSObject = {
   alignItems: 'center',
-  backgroundColor: 'fade(#000, 64%)',
+  backgroundColor: 'rgba(0,0,0, 0.64)',
   bottom: 0,
   justifyContent: 'center',
   left: 0,

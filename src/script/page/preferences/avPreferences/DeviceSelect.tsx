@@ -26,6 +26,7 @@ interface DeviceSelectProps {
   icon: React.ComponentType;
   isRequesting?: boolean;
   onChange: (deviceId: string) => void;
+  title: string;
   uieName?: string;
   value: string;
 }
@@ -38,6 +39,7 @@ const DeviceSelect: React.FC<DeviceSelectProps> = ({
   icon: DeviceIcon,
   uieName,
   onChange,
+  title,
 }) => {
   const lessThanTwoDevices = devices.length < 2;
   const disabled = lessThanTwoDevices || isRequesting;
@@ -58,6 +60,7 @@ const DeviceSelect: React.FC<DeviceSelectProps> = ({
           value={value}
           data-uie-name={uieName}
           onChange={({target}) => onChange(target.value)}
+          aria-label={title}
         >
           {devices.map(({deviceId, label}) => (
             <option key={deviceId} value={deviceId}>
@@ -65,7 +68,7 @@ const DeviceSelect: React.FC<DeviceSelectProps> = ({
             </option>
           ))}
         </select>
-        {!lessThanTwoDevices && <label className="icon-down preferences-av-label" />}
+        {!lessThanTwoDevices && <span className="icon-down preferences-av-label" />}
       </div>
     </div>
   );

@@ -31,9 +31,9 @@ interface ModalParams {
   showLoading: ko.Observable<boolean>;
 }
 
-ko.components.register('modal', {
+ko.components.register('modal-dialog', {
   template: `
-    <div class="modal" data-bind="style: {display: displayNone() ? 'none': 'flex', zIndex: 10000001}, attr: {id: id, 'aria-labelledby': ariaLabelBy, 'aria-describedby': ariaDescribedBy}" tabIndex="-1" aria-modal="true" role="dialog" aria-modal="true">
+    <div class="modal" data-bind="style: {display: displayNone() ? 'none': 'flex', zIndex: 10000001}, attr: displayNone() ? {} : {id: id, 'aria-labelledby': ariaLabelBy, 'aria-describedby': ariaDescribedBy}" tabIndex="-1" aria-modal="true" role="dialog" aria-modal="true">
       <!-- ko if: showLoading() -->
         <loading-icon class="modal__loading"></loading-icon>
       <!-- /ko -->

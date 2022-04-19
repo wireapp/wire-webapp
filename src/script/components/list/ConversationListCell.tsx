@@ -131,45 +131,51 @@ const ConversationListCell: React.FC<ConversationListCellProps> = ({
         data-uie-name={dataUieName}
         data-uie-uid={conversation.id}
         data-uie-value={displayName}
-        role="button"
-        tabIndex={0}
         className={cx('conversation-list-cell', {'conversation-list-cell-active': isActive})}
-        onClick={onClick}
-        onKeyDown={handleDivKeyDown}
       >
         <div
-          className={cx('conversation-list-cell-left', {
-            'conversation-list-cell-left-opaque': removedFromConversation || users.length === 0,
-          })}
+          role="button"
+          className="conversation-list-cell-main-button"
+          onClick={onClick}
+          onKeyDown={handleDivKeyDown}
+          data-uie-name="go-open-conversation"
+          tabIndex={0}
+          aria-label={t('accessibility.openConversation', displayName)}
         >
-          {isGroup && <GroupAvatar className="conversation-list-cell-avatar-arrow" users={users} />}
-          {!isGroup && !!users.length && (
-            <div className="avatar-halo">
-              <Avatar participant={users[0]} avatarSize={AVATAR_SIZE.SMALL} />
-            </div>
-          )}
-        </div>
-        <div className="conversation-list-cell-center">
-          {is1to1 && selfUser.inTeam() ? (
-            <AvailabilityState
-              className="conversation-list-cell-availability"
-              availability={availabilityOfUser}
-              label={displayName}
-              theme={isActive}
-              dataUieName="status-availability-item"
-            />
-          ) : (
-            <span className={cx('conversation-list-cell-name', {'accent-text': isActive})}>{displayName}</span>
-          )}
-          <span className="conversation-list-cell-description" data-uie-name="secondary-line">
-            {cellState.description}
-          </span>
+          <div
+            className={cx('conversation-list-cell-left', {
+              'conversation-list-cell-left-opaque': removedFromConversation || users.length === 0,
+            })}
+          >
+            {isGroup && <GroupAvatar className="conversation-list-cell-avatar-arrow" users={users} />}
+            {!isGroup && !!users.length && (
+              <div className="avatar-halo">
+                <Avatar participant={users[0]} avatarSize={AVATAR_SIZE.SMALL} />
+              </div>
+            )}
+          </div>
+          <div className="conversation-list-cell-center">
+            {is1to1 && selfUser.inTeam() ? (
+              <AvailabilityState
+                className="conversation-list-cell-availability"
+                availability={availabilityOfUser}
+                label={displayName}
+                theme={isActive}
+                dataUieName="status-availability-item"
+              />
+            ) : (
+              <span className={cx('conversation-list-cell-name', {'accent-text': isActive})}>{displayName}</span>
+            )}
+            <span className="conversation-list-cell-description" data-uie-name="secondary-line">
+              {cellState.description}
+            </span>
+          </div>
         </div>
         <div className="conversation-list-cell-right">
           <button
             className="conversation-list-cell-context-menu"
             data-uie-name="go-options"
-            aria-label={t('conversationOptionsMenu')}
+            aria-label={t('accessibility.conversationOptionsMenu')}
             type="button"
             onClick={event => {
               event.stopPropagation();
@@ -183,8 +189,8 @@ const ConversationListCell: React.FC<ConversationListCellProps> = ({
                 <span
                   className="conversation-list-cell-badge cell-badge-dark"
                   data-uie-name="status-pending"
-                  title={t('callStatusPending')}
-                  aria-label={t('callStatusPending')}
+                  title={t('accessibility.conversationStatusPending')}
+                  aria-label={t('accessibility.conversationStatusPending')}
                 >
                   <Icon.Pending className="svg-icon" />
                 </span>
@@ -193,8 +199,8 @@ const ConversationListCell: React.FC<ConversationListCellProps> = ({
                 <span
                   className="conversation-list-cell-badge cell-badge-light"
                   data-uie-name="status-mention"
-                  title={t('conversationStatusUnreadMention')}
-                  aria-label={t('conversationStatusUnreadMention')}
+                  title={t('accessibility.conversationStatusUnreadMention')}
+                  aria-label={t('accessibility.conversationStatusUnreadMention')}
                 >
                   <Icon.Mention className="svg-icon" />
                 </span>
@@ -203,8 +209,8 @@ const ConversationListCell: React.FC<ConversationListCellProps> = ({
                 <span
                   className="conversation-list-cell-badge cell-badge-light"
                   data-uie-name="status-reply"
-                  title={t('conversationStatusUnreadReply')}
-                  aria-label={t('conversationStatusUnreadReply')}
+                  title={t('accessibility.conversationStatusUnreadReply')}
+                  aria-label={t('accessibility.conversationStatusUnreadReply')}
                 >
                   <Icon.Reply className="svg-icon" />
                 </span>
@@ -213,8 +219,8 @@ const ConversationListCell: React.FC<ConversationListCellProps> = ({
                 <span
                   className="conversation-list-cell-badge cell-badge-light"
                   data-uie-name="status-ping"
-                  title={t('conversationStatusUnreadPing')}
-                  aria-label={t('conversationStatusUnreadPing')}
+                  title={t('accessibility.conversationStatusUnreadPing')}
+                  aria-label={t('accessibility.conversationStatusUnreadPing')}
                 >
                   <Icon.Ping className="svg-icon" />
                 </span>
@@ -223,8 +229,8 @@ const ConversationListCell: React.FC<ConversationListCellProps> = ({
                 <span
                   className="conversation-list-cell-badge cell-badge-light"
                   data-uie-name="status-missed-call"
-                  title={t('callStatusMissed')}
-                  aria-label={t('callStatusMissed')}
+                  title={t('accessibility.callStatusMissed')}
+                  aria-label={t('accessibility.callStatusMissed')}
                 >
                   <Icon.Hangup className="svg-icon" />
                 </span>
@@ -233,8 +239,8 @@ const ConversationListCell: React.FC<ConversationListCellProps> = ({
                 <span
                   className="conversation-list-cell-badge cell-badge-dark conversation-muted"
                   data-uie-name="status-silence"
-                  title={t('callStatusMuted')}
-                  aria-label={t('callStatusMuted')}
+                  title={t('accessibility.conversationStatusMuted')}
+                  aria-label={t('accessibility.conversationStatusMuted')}
                 >
                   <Icon.Mute className="svg-icon" />
                 </span>
@@ -243,8 +249,8 @@ const ConversationListCell: React.FC<ConversationListCellProps> = ({
                 <span
                   className="conversation-list-cell-badge cell-badge-light"
                   data-uie-name="status-unread"
-                  title={t('conversationStatusUnread')}
-                  aria-label={t('conversationStatusUnread')}
+                  title={t('accessibility.conversationStatusUnread')}
+                  aria-label={t('accessibility.conversationStatusUnread')}
                 >
                   {unreadState.allMessages.length}
                 </span>

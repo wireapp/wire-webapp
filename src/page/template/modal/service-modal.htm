@@ -1,5 +1,5 @@
 <div class="service-modal" data-bind="with: $root.serviceModal">
-  <modal
+  <modal-dialog
     params="isShown: isVisible, onBgClick: hide, onClosed: onClosed"
     data-bind="attr: {'data-uie-name': service() ? 'modal-service' : ''}"
   >
@@ -42,5 +42,5 @@
         ></button>
       </div>
     <!-- /ko -->
-  </modal>
+  </modal-dialog>
 </div>

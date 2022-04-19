@@ -49,7 +49,7 @@ const ServiceList: React.FC<ServiceListProps> = ({
   noUnderline,
   services,
 }) => {
-  const handleKeyDown = (event: React.KeyboardEvent<HTMLDivElement>, service: ServiceEntity) => {
+  const handleKeyDown = (event: KeyboardEvent, service: ServiceEntity) => {
     if (event.key === KEY.ENTER || event.key === KEY.SPACE) {
       click(service);
     }
@@ -66,7 +66,7 @@ const ServiceList: React.FC<ServiceListProps> = ({
                 noUnderline={noUnderline}
                 showArrow={arrow}
                 onClick={() => click(service)}
-                onKeyDown={event => handleKeyDown(event, service)}
+                onKeyDown={(service, event) => handleKeyDown(event, service)}
               />
             </div>
           </li>

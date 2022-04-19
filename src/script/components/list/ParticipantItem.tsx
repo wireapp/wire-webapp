@@ -22,7 +22,7 @@ import cx from 'classnames';
 
 import {registerReactComponent, useKoSubscribableChildren} from 'Util/ComponentUtil';
 import Avatar, {AVATAR_SIZE} from 'Components/Avatar';
-import {UserlistMode} from 'Components/userList';
+import {UserlistMode} from 'Components/UserList';
 import {t} from 'Util/LocalizerUtil';
 import {capitalizeFirstChar} from 'Util/StringUtil';
 import {noop} from 'Util/util';
@@ -38,7 +38,7 @@ import ParticipantMicOnIcon from 'Components/calling/ParticipantMicOnIcon';
 import Icon from 'Components/Icon';
 import useEffectRef from 'Util/useEffectRef';
 
-export interface ParticipantItemProps extends React.HTMLProps<HTMLDivElement> {
+export interface ParticipantItemProps<UserType> extends Omit<React.HTMLProps<HTMLDivElement>, 'onClick' | 'onKeyDown'> {
   badge?: boolean;
   callParticipant?: Participant;
   canSelect?: boolean;
@@ -51,33 +51,38 @@ export interface ParticipantItemProps extends React.HTMLProps<HTMLDivElement> {
   mode?: UserlistMode;
   noInteraction?: boolean;
   noUnderline?: boolean;
-  participant: User | ServiceEntity;
+  onClick?: (user: UserType, event: MouseEvent) => void;
+  onKeyDown?: (user: UserType, event: KeyboardEvent) => void;
+  participant: UserType;
   selfInTeam?: boolean;
   showArrow?: boolean;
   showDropdown?: boolean;
 }
 
-const ParticipantItem: React.FC<ParticipantItemProps> = ({
-  badge,
-  callParticipant,
-  canSelect,
-  customInfo,
-  external,
-  hideInfo,
-  highlighted = false,
-  isSelected,
-  isSelfVerified = false,
-  mode = UserlistMode.DEFAULT,
-  noInteraction = false,
-  noUnderline = false,
-  participant,
-  selfInTeam,
-  showArrow = false,
-  showDropdown = false,
-  onContextMenu = noop,
-  onClick = noop,
-  onKeyDown = noop,
-}) => {
+const ParticipantItem = <UserType extends User | ServiceEntity>(
+  props: React.PropsWithChildren<ParticipantItemProps<UserType>>,
+): React.ReactElement | null => {
+  const {
+    badge,
+    callParticipant,
+    canSelect,
+    customInfo,
+    external,
+    hideInfo,
+    highlighted = false,
+    isSelected,
+    isSelfVerified = false,
+    mode = UserlistMode.DEFAULT,
+    noInteraction = false,
+    noUnderline = false,
+    participant,
+    selfInTeam,
+    showArrow = false,
+    showDropdown = false,
+    onContextMenu = noop,
+    onClick = noop,
+    onKeyDown = noop,
+  } = props;
   const [viewportElementRef, setViewportElementRef] = useEffectRef<HTMLDivElement>();
   const isInViewport = useViewPortObserver(viewportElementRef);
   const isUser = participant instanceof User && !participant.isService;
@@ -137,8 +142,8 @@ const ParticipantItem: React.FC<ParticipantItemProps> = ({
       role="button"
       tabIndex={0}
       onContextMenu={onContextMenu}
-      onClick={onClick}
-      onKeyDown={onKeyDown}
+      onClick={noInteraction ? noop : event => onClick(participant, event.nativeEvent)}
+      onKeyDown={noInteraction ? noop : event => onKeyDown(participant, event.nativeEvent)}
     >
       <div
         className="participant-item"
@@ -149,7 +154,7 @@ const ParticipantItem: React.FC<ParticipantItemProps> = ({
         {isInViewport && (
           <>
             <div className="participant-item__image">
-              <Avatar avatarSize={AVATAR_SIZE.SMALL} participant={participant as User} />
+              <Avatar avatarSize={AVATAR_SIZE.SMALL} participant={participant} />
             </div>
 
             <div className="participant-item__content">
@@ -271,7 +276,7 @@ const ParticipantItem: React.FC<ParticipantItemProps> = ({
 
 export default ParticipantItem;
 
-registerReactComponent<ParticipantItemProps>('participant-item', {
+registerReactComponent('participant-item', {
   bindings:
     'badge, callParticipant, showArrow, highlighted, noInteraction, noUnderline, canSelect, customInfo: ko.unwrap(customInfo), external: ko.unwrap(external), hideInfo, isSelected: ko.unwrap(isSelected), isSelfVerified: ko.unwrap(isSelfVerified), mode, participant, selfInTeam, onClick, onKeyDown',
   component: ParticipantItem,

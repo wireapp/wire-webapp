@@ -50,26 +50,33 @@ export class AuthAction {
     };
   };
 
-  doLogin = (loginData: LoginData): ThunkAction => {
+  doLogin = (loginData: LoginData, getEntropy?: () => Promise<Uint8Array>): ThunkAction => {
     const onBeforeLogin: LoginLifecycleFunction = async (dispatch, getState, {actions: {authAction}}) =>
       dispatch(authAction.doSilentLogout());
-    return this.doLoginPlain(loginData, onBeforeLogin);
+    return this.doLoginPlain(loginData, onBeforeLogin, undefined, getEntropy);
   };
 
-  doLoginAndJoin = (loginData: LoginData, key: string, code: string, uri?: string): ThunkAction => {
+  doLoginAndJoin = (
+    loginData: LoginData,
+    key: string,
+    code: string,
+    uri?: string,
+    getEntropy?: () => Promise<Uint8Array>,
+  ): ThunkAction => {
     const onBeforeLogin: LoginLifecycleFunction = async (dispatch, getState, {actions: {authAction}}) =>
       dispatch(authAction.doSilentLogout());
     const onAfterLogin: LoginLifecycleFunction = async (dispatch, getState, {actions: {conversationAction}}) => {
       await dispatch(conversationAction.doJoinConversationByCode(key, code, uri));
     };
 
-    return this.doLoginPlain(loginData, onBeforeLogin, onAfterLogin);
+    return this.doLoginPlain(loginData, onBeforeLogin, onAfterLogin, getEntropy);
   };
 
   doLoginPlain = (
     loginData: LoginData,
     onBeforeLogin: LoginLifecycleFunction = async () => {},
     onAfterLogin: LoginLifecycleFunction = async () => {},
+    getEntropy?: () => Promise<Uint8Array>,
   ): ThunkAction => {
     return async (dispatch, getState, global) => {
       const {
@@ -88,12 +95,21 @@ export class AuthAction {
           cookieAction.setCookie(COOKIE_NAME_APP_OPENED, {appInstanceId: global.getConfig().APP_INSTANCE_ID}),
         );
         await dispatch(selfAction.fetchSelf());
+        let entropyData: Uint8Array | undefined = undefined;
+        if (getEntropy) {
+          try {
+            await core.loadAndValidateLocalClient();
+          } catch (e) {
+            entropyData = await getEntropy();
+          }
+        }
         await onAfterLogin(dispatch, getState, global);
         await dispatch(
           clientAction.doInitializeClient(
             loginData.clientType,
             loginData.password ? String(loginData.password) : undefined,
             loginData.verificationCode,
+            entropyData,
           ),
         );
         dispatch(AuthActionCreator.successfulLogin());

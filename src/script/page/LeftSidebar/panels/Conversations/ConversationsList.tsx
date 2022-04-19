@@ -92,15 +92,17 @@ export const ConversationsList: React.FC<{
         ))}
       </>
     ) : (
-      <GroupedConversations
-        callState={callState}
-        conversationRepository={conversationRepository}
-        conversationState={conversationState}
-        hasJoinableCall={hasJoinableCall}
-        isSelectedConversation={isActiveConversation}
-        listViewModel={listViewModel}
-        onJoinCall={answerCall}
-      />
+      <li>
+        <GroupedConversations
+          callState={callState}
+          conversationRepository={conversationRepository}
+          conversationState={conversationState}
+          hasJoinableCall={hasJoinableCall}
+          isSelectedConversation={isActiveConversation}
+          listViewModel={listViewModel}
+          onJoinCall={answerCall}
+        />
+      </li>
     );
 
   const uieName = viewStyle === ConverationViewStyle.FOLDER ? 'folder-view' : 'recent-view';

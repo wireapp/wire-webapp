@@ -1,5 +1,5 @@
 <div class="invite-modal" data-bind="with: $root.inviteModal">
-  <modal
+  <modal-dialog
     params="isShown: isVisible, onBgClick: hide"
     data-bind="attr: {'data-uie-name': isVisible() ? 'modal-invite' : ''}"
   >
@@ -15,5 +15,5 @@
       <textarea data-bind="value: inviteMessage, event:{click: (_, event) => onTextClick(event.target), blur: onBlur}" class="modal__input reset-textarea invite-modal__message" dir="auto"></textarea>
       <div class="modal__info invite-modal__info" data-bind="text: inviteHint"></div>
     </div>
-  </modal>
+  </modal-dialog>
 </div>

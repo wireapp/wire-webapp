@@ -1,5 +1,5 @@
 <div class="legal-hold-modal" data-bind="with: $root.legalHoldModal">
-  <modal params="isShown: isVisible, onBgClick: onBgClick, onClosed: onClosed, showLoading: isLoading() " data-uie-name="legal-hold-modal">
+  <modal-dialog params="isShown: isVisible, onBgClick: onBgClick, onClosed: onClosed, showLoading: isLoading() " data-uie-name="legal-hold-modal">
     <div class="modal__header">
       <!-- ko if: showRequest() -->
         <h2 class="modal__header__title" data-bind="text: t('legalHoldModalTitle')" data-uie-name="status-modal-title"></h2>
@@ -51,7 +51,7 @@
           <div class="legal-hold-modal__subjects" data-bind="text: t('legalHoldSubjects')"></div>
 
           <user-list
-            params="user: users(), click: showUserDevices, conversationRepository: conversationRepository, teamRepository: teamRepository, noUnderline: true, arrow: true"
+            params="observables: {users: users}, onClick: showUserDevices, conversationRepository: conversationRepository, teamRepository: teamRepository, noUnderline: true, arrow: true"
           ></user-list>
         <!-- /ko -->
         <!-- ko if: devicesUser() -->
@@ -68,5 +68,5 @@
         <!-- /ko -->
       <!-- /ko -->
     </div>
-  </modal>
+  </modal-dialog>
 </div>

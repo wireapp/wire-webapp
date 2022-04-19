@@ -20,10 +20,10 @@
 import Avatar, {AVATAR_SIZE} from 'Components/Avatar';
 import React from 'react';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
-import {AssetRepository} from '../../../assets/AssetRepository';
-import type {Conversation} from '../../../entity/Conversation';
-import {generateConversationUrl} from '../../../router/routeGenerator';
-import {Router} from '../../../router/Router';
+import {AssetRepository} from '../../../../../../assets/AssetRepository';
+import type {Conversation} from '../../../../../../entity/Conversation';
+import {generateConversationUrl} from '../../../../../../router/routeGenerator';
+import {Router} from '../../../../../../router/Router';
 import GroupAvatar from 'Components/avatar/GroupAvatar';
 
 export interface GroupListItemProps {
