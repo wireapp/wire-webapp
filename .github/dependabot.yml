@@ -62,5 +62,6 @@ updates:
   # Github actions
   - package-ecosystem: 'github-actions'
     directory: '/'
+    open-pull-requests-limit: 99
     schedule:
       interval: 'daily'
