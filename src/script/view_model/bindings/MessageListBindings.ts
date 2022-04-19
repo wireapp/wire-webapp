@@ -29,6 +29,7 @@ import {
   isPasteAction,
   isEnterKey,
   isSpaceKey,
+  isFunctionKey,
 } from 'Util/KeyboardUtil';
 import {noop} from 'Util/util';
 
@@ -52,14 +53,18 @@ ko.bindingHandlers.focus_on_keydown = {
             // check for activeElement needed, because in IE11 it could be undefined under some circumstances
             const active_element_is_input =
               document.activeElement && ['INPUT', 'TEXTAREA'].includes(document.activeElement.tagName);
-            const is_arrow_key = isArrowKey(keyboard_event);
             const is_pageupdown_key = isPageUpDownKey(keyboard_event);
-            const is_tab_key = isTabKey(keyboard_event);
-            const is_enter_key = isEnterKey(keyboard_event);
-            const is_space_key = isSpaceKey(keyboard_event);
+
             if (is_pageupdown_key) {
               (document.activeElement as HTMLElement).blur();
-            } else if (!active_element_is_input && !is_arrow_key && !is_tab_key && !is_enter_key && !is_space_key) {
+            } else if (
+              !active_element_is_input &&
+              !isArrowKey(keyboard_event) &&
+              !isTabKey(keyboard_event) &&
+              !isEnterKey(keyboard_event) &&
+              !isSpaceKey(keyboard_event) &&
+              !isFunctionKey(keyboard_event)
+            ) {
               if (!isMetaKey(keyboard_event) || isPasteAction(keyboard_event)) {
                 element.focus();
               }
