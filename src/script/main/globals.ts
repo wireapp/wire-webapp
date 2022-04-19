@@ -27,17 +27,13 @@ import type {NotificationService} from '../event/NotificationService';
 
 import '../Config';
 
-import '../page/AccentColorPicker';
 import 'Components/CopyToClipboard';
-import '../page/LeftSidebar/panels/StartUI/components/GroupList';
 import 'Components/UserSearchableList';
 import 'Components/toggle/BaseToggle';
 import 'Components/icons';
 import 'Components/Image';
 import 'Components/toggle/InfoToggle';
-import '../page/preferences/avPreferences/InputLevel';
 import 'Components/calling/FullscreenVideoCall';
-import '../page/collection/Collection';
 import 'Components/avatar/GroupAvatar';
 import 'Components/MessagesList';
 import '../page/message-list/MessageTimerButton';
@@ -45,7 +41,6 @@ import 'Components/modal';
 import 'Components/panel/ServiceDetails';
 import 'Components/panel/UserDetails';
 import 'Components/ServiceList';
-import '../page/LeftSidebar/panels/StartUI/components/TopPeople';
 import 'Components/UserInput';
 
 import 'Util/LocalizerUtil';
