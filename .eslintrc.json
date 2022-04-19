@@ -52,5 +52,10 @@
     "jsx-a11y/no-noninteractive-element-interactions": "warn",
     "jsx-a11y/media-has-caption": "warn",
     "jsx-a11y/tabindex-no-positive": "warn"
+  },
+  "settings": {
+    "react": {
+      "version": "detect"
+    }
   }
 }
