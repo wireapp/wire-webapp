@@ -18,32 +18,55 @@
  *
  */
 
-import React from 'react';
+import React, {useEffect} from 'react';
 import {registerReactComponent} from 'Util/ComponentUtil';
 import Icon from 'Components/Icon';
+import {CheckIcon, COLOR} from '@wireapp/react-ui-kit';
 
 export interface UserInputProps {
   errorMessage?: string;
   isError?: boolean;
+  isSuccess?: boolean;
   label: string;
   name: string;
   onCancel: () => void;
   onChange: React.ChangeEventHandler<HTMLInputElement>;
+  onSuccessDismissed?: () => void;
   placeholder: string;
   value: string;
 }
 
+const SUCCESS_DISMISS_TIMEOUT = 2500;
+
 const TextInput: React.FC<UserInputProps> = ({
   errorMessage,
   isError,
+  isSuccess,
   label,
   name,
   onCancel,
   onChange,
+  onSuccessDismissed,
   placeholder,
   value,
 }: UserInputProps) => {
   const isFilled = Boolean(value);
+
+  useEffect(() => {
+    if (isSuccess && onSuccessDismissed) {
+      setTimeout(() => {
+        onSuccessDismissed();
+      }, SUCCESS_DISMISS_TIMEOUT);
+    }
+  }, [isSuccess, onSuccessDismissed]);
+
+  let changedColor = null;
+  if (isError) {
+    changedColor = 'var(--text-input-alert) !important';
+  }
+  if (isSuccess) {
+    changedColor = 'var(--green-500) !important';
+  }
 
   return (
     <div
@@ -94,7 +117,7 @@ const TextInput: React.FC<UserInputProps> = ({
           },
           background: 'var(--text-input-background)',
           border: '1px solid',
-          borderColor: isError ? 'var(--text-input-alert) !important' : 'var(--text-input-border)',
+          borderColor: changedColor || 'var(--text-input-border)',
           borderRadius: 12,
           color: 'var(--text-input-color)',
           outline: 'none',
@@ -110,7 +133,7 @@ const TextInput: React.FC<UserInputProps> = ({
       <label
         className="label-medium"
         css={{
-          color: isError && 'var(--text-input-alert) !important',
+          color: changedColor,
           display: 'flex',
           flexDirection: 'column',
           marginBottom: 2,
@@ -119,7 +142,7 @@ const TextInput: React.FC<UserInputProps> = ({
       >
         {label}
       </label>
-      {isFilled && (
+      {isFilled && !isSuccess && (
         <button
           css={{
             alignItems: 'center',
@@ -140,6 +163,22 @@ const TextInput: React.FC<UserInputProps> = ({
         >
           <Icon.Close css={{fill: 'var(--text-input-background)', height: 8, width: 8}} />
         </button>
+      )}
+      {isSuccess && (
+        <CheckIcon
+          css={{
+            fill: changedColor,
+            alignItems: 'center',
+            bottom: 42,
+            height: 16,
+            margin: 0,
+            padding: 0,
+            position: 'absolute',
+            right: 16,
+            width: 16,
+          }}
+          color={COLOR.TEXT}
+        />
       )}
     </div>
   );
