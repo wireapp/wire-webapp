@@ -9,6 +9,10 @@ on:
   pull_request:
     branches: [master, dev, edge, avs, mobile]
 
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   test_build_deploy:
     runs-on: ubuntu-latest
@@ -69,11 +73,6 @@ jobs:
           contains(env.TITLE || env.PR_LAST_COMMIT_MESSAGE, '[skip ci]') ||
           contains(env.TITLE || env.PR_LAST_COMMIT_MESSAGE, '[ci skip]')
         uses: andymckay/cancel-action@0.2
-
-      - name: Cancel Previous Runs
-        uses: styfle/cancel-workflow-action@0.9.1
-        with:
-          access_token: ${{github.token}}
 
       - name: Yarn cache
         uses: c-hive/gha-yarn-cache@v2.1.0
