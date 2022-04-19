@@ -376,7 +376,7 @@ jobs:
       #       run all subsequent steps.
       - name: Obtaining release information artifact
         id: release-info-artifact
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v3
         continue-on-error: true
         with:
           name: release-info.json
