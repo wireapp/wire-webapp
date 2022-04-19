@@ -41,7 +41,7 @@ class CheckPasswordPage {
 
   constructor(
     store: MockStoreEnhanced<TypeUtil.RecursivePartial<RootState>, ThunkDispatch<RootState, Api, AnyAction>>,
-    history?: History<any>,
+    history?: History,
   ) {
     this.driver = mountComponent(<CheckPassword />, store, history);
   }

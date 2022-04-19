@@ -22,7 +22,7 @@ import {StyledApp, Loading, ContainerXS, THEME_ID} from '@wireapp/react-ui-kit';
 import React, {useEffect} from 'react';
 import {IntlProvider} from 'react-intl';
 import {connect} from 'react-redux';
-import {HashRouter as Router, Redirect, Route, Switch} from 'react-router-dom';
+import {HashRouter as Router, Navigate, Route, Routes} from 'react-router-dom';
 import {AnyAction, Dispatch} from 'redux';
 import {Config} from '../../Config';
 import {mapLanguage, normalizeLanguage} from '../localeConfig';
@@ -110,79 +110,86 @@ const Root: React.FC<RootProps & ConnectedProps & DispatchProps> = ({
             <Loading />
           </ContainerXS>
         ) : (
-          <Router hashType="noslash">
-            <Switch>
-              <Route
-                exact
-                path={ROUTE.INDEX}
-                render={() => {
-                  setTitle(
-                    `${t('authLandingPageTitleP1')} ${Config.getConfig().BRAND_NAME} . ${t('authLandingPageTitleP2')}`,
-                  );
-                  return <Index />;
-                }}
-              />
-              <Route path={ROUTE.CHECK_PASSWORD} component={CheckPassword} />
-              <Route path={ROUTE.CLIENTS} component={ProtectedClientManager} />
-              <Route path={ROUTE.CONVERSATION_JOIN_INVALID} component={ConversationJoinInvalid} />
-              <Route path={ROUTE.CONVERSATION_JOIN} component={ConversationJoin} />
-              <Route
-                path={ROUTE.CREATE_TEAM}
-                component={Config.getConfig().FEATURE.ENABLE_ACCOUNT_REGISTRATION && TeamName}
-              />
-              <Route path={ROUTE.HISTORY_INFO} component={ProtectedHistoryInfo} />
-              <Route path={ROUTE.INITIAL_INVITE} component={ProtectedInitialInvite} />
-              <Route
-                path={ROUTE.LOGIN}
-                render={() => {
-                  setTitle(`${t('authLoginTitle')} . ${Config.getConfig().BRAND_NAME}`);
-                  return <Login />;
-                }}
-              />
-              <Route path={ROUTE.LOGIN_PHONE} component={PhoneLogin} />
-              <Route
-                path={ROUTE.SET_ACCOUNT_TYPE}
-                render={() => {
-                  setTitle(`${t('authAccCreationTitle')} . ${Config.getConfig().BRAND_NAME}`);
-                  return <SetAccountType />;
-                }}
-              />
-              <Route path={ROUTE.SET_EMAIL} component={ProtectedSetEmail} />
-              <Route path={ROUTE.SET_HANDLE} component={ProtectedSetHandle} />
-              <Route
-                path={ROUTE.SET_PASSWORD}
-                render={() => {
-                  setTitle(`${t('authForgotPasswordTitle')} . ${Config.getConfig().BRAND_NAME}`);
-                  return <ProtectedSetPassword />;
-                }}
-              />
-              <Route
-                path={`${ROUTE.SSO}/:code?`}
-                render={() => {
-                  setTitle(`${t('authSSOLoginTitle')} . ${Config.getConfig().BRAND_NAME}`);
-                  return <SingleSignOn />;
-                }}
-              />
-              <Route path={ROUTE.VERIFY_EMAIL_LINK} component={VerifyEmailLink} />
-              <Route path={ROUTE.VERIFY_PHONE_CODE} component={VerifyPhoneCode} />
-              <Route path={ROUTE.CUSTOM_ENV_REDIRECT} component={CustomEnvironmentRedirect} />
-              {Config.getConfig().FEATURE.ENABLE_EXTRA_CLIENT_ENTROPY && (
-                <Route path={ROUTE.SET_ENTROPY} component={SetEntropyPage} />
+          <Router>
+            <Routes>
+              <Route path={ROUTE.INDEX}>
+                <Index />
+              </Route>
+              <Route path={ROUTE.CHECK_PASSWORD}>
+                <CheckPassword />
+              </Route>
+              <Route path={ROUTE.CLIENTS}>
+                <ProtectedClientManager />
+              </Route>
+              <Route path={ROUTE.CONVERSATION_JOIN_INVALID}>
+                <ConversationJoinInvalid />
+              </Route>
+              <Route path={ROUTE.CONVERSATION_JOIN}>
+                <ConversationJoin />
+              </Route>
+              {Config.getConfig().FEATURE.ENABLE_ACCOUNT_REGISTRATION && (
+                <Route path={ROUTE.CREATE_TEAM}>
+                  <TeamName />
+                </Route>
               )}
-              <Route
-                path={ROUTE.VERIFY_EMAIL_CODE}
-                component={Config.getConfig().FEATURE.ENABLE_ACCOUNT_REGISTRATION && VerifyEmailCode}
-              />
-              <Route
-                path={ROUTE.CREATE_ACCOUNT}
-                component={Config.getConfig().FEATURE.ENABLE_ACCOUNT_REGISTRATION && CreatePersonalAccount}
-              />
-              <Route
-                path={ROUTE.CREATE_TEAM_ACCOUNT}
-                component={Config.getConfig().FEATURE.ENABLE_ACCOUNT_REGISTRATION && CreateAccount}
-              />
-              <Redirect to={ROUTE.INDEX} />
-            </Switch>
+              <Route path={ROUTE.HISTORY_INFO}>
+                <ProtectedHistoryInfo />
+              </Route>
+              <Route path={ROUTE.INITIAL_INVITE}>
+                <ProtectedInitialInvite />
+              </Route>
+              <Route path={ROUTE.LOGIN}>
+                <Login />
+              </Route>
+              <Route path={ROUTE.LOGIN_PHONE}>
+                <PhoneLogin />
+              </Route>
+              <Route path={ROUTE.SET_ACCOUNT_TYPE}>
+                <SetAccountType />
+              </Route>
+              <Route path={ROUTE.SET_EMAIL}>
+                <ProtectedSetEmail />
+              </Route>
+              <Route path={ROUTE.SET_HANDLE}>
+                <ProtectedSetHandle />
+              </Route>
+              <Route path={ROUTE.SET_PASSWORD}>
+                <ProtectedSetPassword />
+              </Route>
+              <Route path={`${ROUTE.SSO}/:code?`}>
+                <SingleSignOn />
+              </Route>
+              <Route path={ROUTE.VERIFY_EMAIL_LINK}>
+                <VerifyEmailLink />
+              </Route>
+              <Route path={ROUTE.VERIFY_PHONE_CODE}>
+                <VerifyPhoneCode />
+              </Route>
+              <Route path={ROUTE.CUSTOM_ENV_REDIRECT}>
+                <CustomEnvironmentRedirect />
+              </Route>
+              {Config.getConfig().FEATURE.ENABLE_EXTRA_CLIENT_ENTROPY && (
+                <Route path={ROUTE.SET_ENTROPY}>
+                  <SetEntropyPage />
+                </Route>
+              )}
+              {Config.getConfig().FEATURE.ENABLE_ACCOUNT_REGISTRATION && (
+                <Route path={ROUTE.VERIFY_EMAIL_CODE}>
+                  <VerifyEmailCode />
+                </Route>
+              )}
+              {Config.getConfig().FEATURE.ENABLE_ACCOUNT_REGISTRATION && (
+                <Route path={ROUTE.CREATE_ACCOUNT}>
+                  <CreatePersonalAccount />
+                </Route>
+              )}
+              {Config.getConfig().FEATURE.ENABLE_ACCOUNT_REGISTRATION && (
+                <Route path={ROUTE.CREATE_TEAM_ACCOUNT}>
+                  <CreateAccount />
+                </Route>
+              )}
+              <Navigate to={ROUTE.INDEX} replace />
+            </Routes>
           </Router>
         )}
       </StyledApp>

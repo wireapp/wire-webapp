@@ -40,7 +40,7 @@ class SingleSignOnFormPage {
   constructor(
     store: MockStoreEnhanced<TypeUtil.RecursivePartial<RootState>, ThunkDispatch<RootState, Api, AnyAction>>,
     componentProps: SingleSignOnFormProps,
-    history?: History<any>,
+    history?: History,
   ) {
     this.driver = mountComponent(<SingleSignOnForm {...componentProps} />, store, history);
   }

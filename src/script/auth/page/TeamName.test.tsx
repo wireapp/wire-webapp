@@ -37,7 +37,7 @@ class SetTeamNamePage {
 
   constructor(
     store: MockStoreEnhanced<TypeUtil.RecursivePartial<RootState>, ThunkDispatch<RootState, Api, AnyAction>>,
-    history?: History<any>,
+    history?: History,
   ) {
     this.driver = mountComponent(<TeamName />, store, history);
   }

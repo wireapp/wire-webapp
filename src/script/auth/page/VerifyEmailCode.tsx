@@ -21,7 +21,6 @@ import {CodeInput, ContainerXS, H1, Muted} from '@wireapp/react-ui-kit';
 import React from 'react';
 import {FormattedMessage, useIntl} from 'react-intl';
 import {connect} from 'react-redux';
-import {RouteComponentProps} from 'react-router';
 import {AnyAction, Dispatch} from 'redux';
 import useReactRouter from 'use-react-router';
 import {getLogger} from 'Util/Logger';
@@ -35,7 +34,7 @@ import {parseError} from '../util/errorUtil';
 import Page from './Page';
 import LinkButton from '../component/LinkButton';
 
-interface Props extends React.HTMLProps<HTMLDivElement>, RouteComponentProps<{}> {}
+interface Props extends React.HTMLProps<HTMLDivElement> {}
 
 const changeEmailRedirect = {
   [AuthSelector.REGISTER_FLOW.PERSONAL]: ROUTE.CREATE_ACCOUNT,
