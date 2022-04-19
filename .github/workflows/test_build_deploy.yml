@@ -127,7 +127,7 @@ jobs:
 
       - name: Storing release information
         if: contains(env.TAG, 'production') && matrix.DISTRIBUTION == 'DISTRIBUTION_0'
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: release-info.json
           path: ./release-info.json
@@ -356,7 +356,7 @@ jobs:
 
       - name: Upload WebApp artifacts
         if: env.BUILD_DESKTOP == 'true'
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: webapp-dist
           path: ./server/dist
