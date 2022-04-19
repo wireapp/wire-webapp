@@ -79,6 +79,19 @@ const TextInput: React.FC<UserInputProps> = ({
             },
             borderColor: 'var(--blue-500)',
           },
+          '::placeholder': {
+            // Chrome, Firefox, Opera, Safari 10.1+
+            color: 'var(--text-input-placeholder)',
+            opacity: 1, // Firefox
+          },
+          ':-ms-input-placeholder': {
+            // Internet Explorer 10-11
+            color: 'var(--text-input-placeholder)',
+          },
+          '::-ms-input-placeholder': {
+            // Microsoft Edge
+            color: 'var(--text-input-placeholder)',
+          },
           background: 'var(--text-input-background)',
           border: '1px solid',
           borderColor: isError ? 'var(--text-input-alert) !important' : 'var(--text-input-border)',
