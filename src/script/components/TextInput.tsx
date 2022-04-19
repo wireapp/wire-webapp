@@ -1,3 +1,4 @@
+/* eslint-disable sort-keys-fix/sort-keys-fix */
 /*
  * Wire
  * Copyright (C) 2018 Wire Swiss GmbH
@@ -69,14 +70,14 @@ const TextInput: React.FC<UserInputProps> = ({
           '&::placeholder': {
             color: 'var(--text-input-placeholder)',
           },
+          '&:hover': {
+            borderColor: 'var(--text-input-border-hover)',
+          },
           '&:focus, &:active': {
             '& + label': {
               color: 'var(--blue-500)',
             },
             borderColor: 'var(--blue-500)',
-          },
-          '&:hover': {
-            borderColor: 'var(--text-input-border-hover)',
           },
           background: 'var(--text-input-background)',
           border: '1px solid',
