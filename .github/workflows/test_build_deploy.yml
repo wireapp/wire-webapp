@@ -134,7 +134,7 @@ jobs:
       # https://wire-webapp-avs.zinfra.io/
       - name: Deploy avs build to Elastic Beanstalk
         if: env.BRANCH_NAME == 'avs' && matrix.DISTRIBUTION == 'DISTRIBUTION_0'
-        uses: einaregilsson/beanstalk-deploy@v14
+        uses: einaregilsson/beanstalk-deploy@v20
         with:
           application_name: ${{env.AWS_APPLICATION_NAME}}
           aws_access_key: ${{secrets.WEBTEAM_AWS_ACCESS_KEY_ID}}
@@ -151,7 +151,7 @@ jobs:
       # Stage 1: https://wire-webapp-edge.zinfra.io/
       - name: Deploy edge build to Elastic Beanstalk
         if: env.BRANCH_NAME == 'edge' && matrix.DISTRIBUTION == 'DISTRIBUTION_0'
-        uses: einaregilsson/beanstalk-deploy@v14
+        uses: einaregilsson/beanstalk-deploy@v20
         with:
           application_name: ${{env.AWS_APPLICATION_NAME}}
           aws_access_key: ${{secrets.WEBTEAM_AWS_ACCESS_KEY_ID}}
@@ -168,7 +168,7 @@ jobs:
       # Stage 2: https://wire-webapp-dev.zinfra.io/
       - name: Deploy dev build to Elastic Beanstalk
         if: env.BRANCH_NAME == 'dev' && matrix.DISTRIBUTION == 'DISTRIBUTION_0'
-        uses: einaregilsson/beanstalk-deploy@v14
+        uses: einaregilsson/beanstalk-deploy@v20
         with:
           application_name: ${{env.AWS_APPLICATION_NAME}}
           aws_access_key: ${{secrets.WEBTEAM_AWS_ACCESS_KEY_ID}}
@@ -185,7 +185,7 @@ jobs:
       # Stage 3: https://wire-webapp-staging.zinfra.io/
       - name: Deploy staging build to Elastic Beanstalk
         if: contains(env.TAG, 'staging') && matrix.DISTRIBUTION == 'DISTRIBUTION_0'
-        uses: einaregilsson/beanstalk-deploy@v14
+        uses: einaregilsson/beanstalk-deploy@v20
         with:
           application_name: ${{env.AWS_APPLICATION_NAME}}
           aws_access_key: ${{secrets.WEBTEAM_AWS_ACCESS_KEY_ID}}
@@ -202,7 +202,7 @@ jobs:
       # Stage 4: https://wire-webapp-master.zinfra.io/
       - name: Deploy master build to Elastic Beanstalk
         if: env.BRANCH_NAME == 'master' && matrix.DISTRIBUTION == 'DISTRIBUTION_0'
-        uses: einaregilsson/beanstalk-deploy@v14
+        uses: einaregilsson/beanstalk-deploy@v20
         with:
           application_name: ${{env.AWS_APPLICATION_NAME}}
           aws_access_key: ${{secrets.WEBTEAM_AWS_ACCESS_KEY_ID}}
@@ -219,7 +219,7 @@ jobs:
       # Stage 5: https://app.wire.com/
       - name: Deploy production build to Elastic Beanstalk
         if: contains(env.TAG, 'production') && matrix.DISTRIBUTION == 'DISTRIBUTION_0'
-        uses: einaregilsson/beanstalk-deploy@v14
+        uses: einaregilsson/beanstalk-deploy@v20
         with:
           application_name: ${{env.AWS_APPLICATION_NAME}}
           aws_access_key: ${{secrets.WEBTEAM_AWS_ACCESS_KEY_ID}}
@@ -236,7 +236,7 @@ jobs:
       # Stage 6: https://mobile.wire.com
       - name: Deploy mobile build to Elastic Beanstalk
         if: env.BRANCH_NAME == 'mobile' && matrix.DISTRIBUTION == 'DISTRIBUTION_0'
-        uses: einaregilsson/beanstalk-deploy@v14
+        uses: einaregilsson/beanstalk-deploy@v20
         with:
           application_name: ${{env.AWS_APPLICATION_NAME}}
           aws_access_key: ${{secrets.WEBTEAM_AWS_ACCESS_KEY_ID}}
