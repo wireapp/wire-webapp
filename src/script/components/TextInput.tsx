@@ -24,6 +24,7 @@ import Icon from 'Components/Icon';
 import {CheckIcon, COLOR} from '@wireapp/react-ui-kit';
 
 export interface UserInputProps {
+  disabled?: boolean;
   errorMessage?: string;
   isError?: boolean;
   isSuccess?: boolean;
@@ -39,6 +40,7 @@ export interface UserInputProps {
 const SUCCESS_DISMISS_TIMEOUT = 2500;
 
 const TextInput: React.FC<UserInputProps> = ({
+  disabled,
   errorMessage,
   isError,
   isSuccess,
@@ -90,17 +92,18 @@ const TextInput: React.FC<UserInputProps> = ({
       <input
         className="text-input"
         css={{
+          '&[disabled]': {},
           '&::placeholder': {
             color: 'var(--text-input-placeholder)',
           },
           '&:hover': {
-            borderColor: 'var(--text-input-border-hover)',
+            borderColor: !disabled && 'var(--text-input-border-hover)',
           },
           '&:focus, &:active': {
             '& + label': {
-              color: 'var(--blue-500)',
+              color: !disabled && 'var(--blue-500)',
             },
-            borderColor: 'var(--blue-500)',
+            borderColor: !disabled && 'var(--blue-500)',
           },
           '::placeholder': {
             // Chrome, Firefox, Opera, Safari 10.1+
@@ -115,7 +118,7 @@ const TextInput: React.FC<UserInputProps> = ({
             // Microsoft Edge
             color: 'var(--text-input-placeholder)',
           },
-          background: 'var(--text-input-background)',
+          background: disabled ? 'var(--text-input-disabled)' : 'var(--text-input-background)',
           border: '1px solid',
           borderColor: changedColor || 'var(--text-input-border)',
           borderRadius: 12,
@@ -124,6 +127,7 @@ const TextInput: React.FC<UserInputProps> = ({
           padding: '12px 16px',
           width: '100%',
         }}
+        disabled={disabled}
         id={name}
         name={name}
         value={value}
@@ -133,7 +137,7 @@ const TextInput: React.FC<UserInputProps> = ({
       <label
         className="label-medium"
         css={{
-          color: changedColor,
+          color: changedColor || 'var(--text-input-label)',
           display: 'flex',
           flexDirection: 'column',
           marginBottom: 2,
