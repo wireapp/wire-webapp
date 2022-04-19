@@ -6,6 +6,10 @@ on:
   schedule:
     - cron: '0 8 * * *'
 
+concurrency:
+  group: translations-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   sync_translations:
     runs-on: ubuntu-latest
@@ -13,9 +17,6 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
-
-      - name: Cancel Previous Runs
-        uses: styfle/cancel-workflow-action@0.9.1
 
       - name: Yarn cache
         uses: c-hive/gha-yarn-cache@v2.1.0
