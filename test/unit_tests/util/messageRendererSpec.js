@@ -400,7 +400,7 @@ describe('Markdown for code snippets', () => {
 
   it('renders escaped Ruby code blocks', () => {
     const expected =
-      '<pre><code class="lang-ruby"><span class="hljs-keyword">require</span> <span class="hljs-string">&#x27;redcarpet&#x27;</span>\nmarkdown = Redcarpet.new(<span class="hljs-string">&quot;Hello World!&quot;</span>)\nputs markdown.to_html\n</code></pre>';
+      '<pre><code class="lang-ruby"><span class="hljs-keyword">require</span> <span class="hljs-string">&#x27;redcarpet&#x27;</span>\nmarkdown = <span class="hljs-title class_">Redcarpet</span>.new(<span class="hljs-string">&quot;Hello World!&quot;</span>)\nputs markdown.to_html\n</code></pre>';
 
     expect(
       renderMessage(
