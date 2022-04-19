@@ -28,7 +28,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           fetch-depth: 0
 
@@ -390,7 +390,7 @@ jobs:
           echo "::set-output name=releaseInfo::$(cat ${ARTIFACT_LOCAL_PATH})"
 
       - name: Checking out 'wire-server'
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         if: ${{ steps.release-info-file.outputs.exists == 'true' }}
         with:
           repository: 'wireapp/wire-server'
