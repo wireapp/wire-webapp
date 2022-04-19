@@ -11,6 +11,10 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      # Add /github/workspace as a safe directory to read git config from (see https://github.blog/2022-04-12-git-security-vulnerability-announced/)
+      - name: Set safe config reading directory
+        run: git config --global --add safe.directory /github/workspace
+
       - name: Checkout
         uses: actions/checkout@v2.3.4
 
