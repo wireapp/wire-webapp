@@ -22,6 +22,7 @@ import React, {useEffect} from 'react';
 import {registerReactComponent} from 'Util/ComponentUtil';
 import Icon from 'Components/Icon';
 import {CheckIcon, COLOR} from '@wireapp/react-ui-kit';
+import {CSSObject} from '@emotion/core';
 
 export interface UserInputProps {
   disabled?: boolean;
@@ -69,6 +70,17 @@ const TextInput: React.FC<UserInputProps> = ({
   if (isSuccess) {
     changedColor = 'var(--green-500) !important';
   }
+  const iconCss: CSSObject = {
+    fill: changedColor,
+    alignItems: 'center',
+    bottom: 42,
+    height: 16,
+    margin: 0,
+    padding: 0,
+    position: 'absolute',
+    right: 16,
+    width: 16,
+  };
 
   return (
     <div
@@ -146,7 +158,7 @@ const TextInput: React.FC<UserInputProps> = ({
       >
         {label}
       </label>
-      {isFilled && !isSuccess && (
+      {isFilled && !isSuccess && !isError && (
         <button
           css={{
             alignItems: 'center',
@@ -168,22 +180,8 @@ const TextInput: React.FC<UserInputProps> = ({
           <Icon.Close css={{fill: 'var(--text-input-background)', height: 8, width: 8}} />
         </button>
       )}
-      {isSuccess && (
-        <CheckIcon
-          css={{
-            fill: changedColor,
-            alignItems: 'center',
-            bottom: 42,
-            height: 16,
-            margin: 0,
-            padding: 0,
-            position: 'absolute',
-            right: 16,
-            width: 16,
-          }}
-          color={COLOR.TEXT}
-        />
-      )}
+      {isSuccess && !isError && <CheckIcon css={iconCss} color={COLOR.TEXT} />}
+      {isError && <Icon.ExclamationMark css={iconCss} color={COLOR.TEXT} />}
     </div>
   );
 };
