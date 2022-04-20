@@ -74,7 +74,7 @@ const TextInput: React.FC<UserInputProps> = ({
     changedColor = 'var(--text-input-alert) !important';
   }
   if (isSuccess) {
-    changedColor = 'var(--green-500) !important';
+    changedColor = 'var(--text-input-success) !important';
   }
 
   return (
