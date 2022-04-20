@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [6.0.21](https://github.com/wireapp/wire-web-packages/tree/main/packages/changelog-bot/compare/@wireapp/changelog-bot@6.0.20...@wireapp/changelog-bot@6.0.21) (2022-04-20)
+
+**Note:** Version bump only for package @wireapp/changelog-bot
+
+
+
+
+
 ## [6.0.20](https://github.com/wireapp/wire-web-packages/tree/main/packages/changelog-bot/compare/@wireapp/changelog-bot@6.0.19...@wireapp/changelog-bot@6.0.20) (2022-04-06)
 
 **Note:** Version bump only for package @wireapp/changelog-bot
