@@ -18,7 +18,7 @@ module.exports = {
         '@emotion',
       ],
       presets: [
-        ['@babel/preset-react', {importSource: '@emotion/react'}],
+        ['@babel/preset-react', {importSource: '@emotion/react', runtime: 'automatic'}],
         '@babel/preset-typescript',
         ['@babel/preset-env', {...presetEnvConfig, modules: 'commonjs'}],
       ],
