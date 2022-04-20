@@ -285,7 +285,9 @@ const Login = ({
                 {twoFactorLoginData ? (
                   <div>
                     <H2 center>{_(loginStrings.twoFactorLoginTitle)}</H2>
-                    <Text>{_(loginStrings.twoFactorLoginSubHead, {email: twoFactorLoginData.email})}</Text>
+                    <Text data-uie-name="label-with-email">
+                      {_(loginStrings.twoFactorLoginSubHead, {email: twoFactorLoginData.email})}
+                    </Text>
                     <Label markInvalid={!!twoFactorSubmitError}>
                       <CodeInput
                         autoFocus
@@ -300,7 +302,7 @@ const Login = ({
                       {isSendingTwoFactorCode ? (
                         <Loading size={20} />
                       ) : (
-                        <TextLink onClick={resendTwoFactorCode} center>
+                        <TextLink onClick={resendTwoFactorCode} center data-uie-name="do-resend-code">
                           {_(verifyStrings.resendCode)}
                         </TextLink>
                       )}
