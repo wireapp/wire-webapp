@@ -18,7 +18,7 @@
  */
 
 /** @jsx jsx */
-import {CSSObject, jsx, keyframes} from '@emotion/core';
+import {CSSObject, jsx, keyframes} from '@emotion/react';
 import React from 'react';
 
 import {COLOR} from '../Identity';
@@ -82,7 +82,7 @@ export const filterPillProps = (props: PillProps) => filterProps(props, ['active
 
 export const Pill = (props: PillProps) => (
   <span
-    css={theme => pillStyle(theme, props)}
+    css={(theme: Theme) => pillStyle(theme, props)}
     data-uie-name="element-pill"
     data-uie-status={props.type}
     {...filterPillProps(props)}

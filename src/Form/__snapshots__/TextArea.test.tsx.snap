@@ -1,19 +1,19 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`"TextArea" renders 1`] = `
-.emotion-1 {
-  background: rgb(237,237,238);
+.emotion-0 {
+  background: rgb(237, 237, 238);
   -webkit-transition: background 0.15s;
   transition: background 0.15s;
 }
 
-.emotion-0 {
+.emotion-1 {
   background: #fff;
   border: none;
   border-radius: 4px;
   box-shadow: 0 0 0 1px #696c6e;
   caret-color: #0772de;
-  color: rgb(29,30,31);
+  color: rgb(29, 30, 31);
   font-weight: 300;
   line-height: 24px;
   margin: 0 0 16px;
@@ -23,38 +23,38 @@ exports[`"TextArea" renders 1`] = `
   width: 100%;
 }
 
-.emotion-0::-moz-placeholder {
-  color: rgb(80,82,84);
+.emotion-1::-moz-placeholder {
+  color: rgb(80, 82, 84);
   font-size: 11px;
   text-transform: none;
   opacity: 1;
 }
 
-.emotion-0::-ms-input-placeholder {
-  color: rgb(80,82,84);
+.emotion-1::-ms-input-placeholder {
+  color: rgb(80, 82, 84);
   font-size: 11px;
   text-transform: none;
 }
 
-.emotion-0::-webkit-input-placeholder {
-  color: rgb(80,82,84);
+.emotion-1::-webkit-input-placeholder {
+  color: rgb(80, 82, 84);
   font-size: 11px;
   text-transform: none;
 }
 
-.emotion-0:focus {
+.emotion-1:focus {
   box-shadow: 0 0 0 1px #0772de;
 }
 
-.emotion-0:invalid {
+.emotion-1:invalid {
   box-shadow: 0 0 0 1px #696c6e;
 }
 
 <div
-  className="emotion-1"
+  className="emotion-0"
 >
   <textarea
-    className="textarea emotion-0"
+    className="textarea emotion-1"
   >
     TextArea
   </textarea>
@@ -62,19 +62,19 @@ exports[`"TextArea" renders 1`] = `
 `;
 
 exports[`"TextArea" renders as disabled 1`] = `
-.emotion-1 {
-  background: rgb(237,237,238);
+.emotion-0 {
+  background: rgb(237, 237, 238);
   -webkit-transition: background 0.15s;
   transition: background 0.15s;
 }
 
-.emotion-0 {
-  background: rgba(71,73,75,0.16000000000000003);
+.emotion-1 {
+  background: rgba(71, 73, 75, 0.16000000000000003);
   border: none;
   border-radius: 4px;
   box-shadow: 0 0 0 1px #696c6e;
   caret-color: #0772de;
-  color: rgb(29,30,31);
+  color: rgb(29, 30, 31);
   font-weight: 300;
   line-height: 24px;
   margin: 0 0 16px;
@@ -84,38 +84,38 @@ exports[`"TextArea" renders as disabled 1`] = `
   width: 100%;
 }
 
-.emotion-0::-moz-placeholder {
-  color: rgb(80,82,84);
+.emotion-1::-moz-placeholder {
+  color: rgb(80, 82, 84);
   font-size: 11px;
   text-transform: none;
   opacity: 1;
 }
 
-.emotion-0::-ms-input-placeholder {
-  color: rgb(80,82,84);
+.emotion-1::-ms-input-placeholder {
+  color: rgb(80, 82, 84);
   font-size: 11px;
   text-transform: none;
 }
 
-.emotion-0::-webkit-input-placeholder {
-  color: rgb(80,82,84);
+.emotion-1::-webkit-input-placeholder {
+  color: rgb(80, 82, 84);
   font-size: 11px;
   text-transform: none;
 }
 
-.emotion-0:focus {
+.emotion-1:focus {
   box-shadow: 0 0 0 1px #0772de;
 }
 
-.emotion-0:invalid {
+.emotion-1:invalid {
   box-shadow: 0 0 0 1px #696c6e;
 }
 
 <div
-  className="emotion-1"
+  className="emotion-0"
 >
   <textarea
-    className="textarea emotion-0"
+    className="textarea emotion-1"
     disabled={true}
   >
     TextArea
@@ -124,19 +124,19 @@ exports[`"TextArea" renders as disabled 1`] = `
 `;
 
 exports[`"TextArea" renders as invalid 1`] = `
-.emotion-1 {
-  background: rgb(237,237,238);
+.emotion-0 {
+  background: rgb(237, 237, 238);
   -webkit-transition: background 0.15s;
   transition: background 0.15s;
 }
 
-.emotion-0 {
+.emotion-1 {
   background: #fff;
   border: none;
   border-radius: 4px;
   box-shadow: 0 0 0 1px #e02020;
   caret-color: #0772de;
-  color: rgb(29,30,31);
+  color: rgb(29, 30, 31);
   font-weight: 300;
   line-height: 24px;
   margin: 0 0 16px;
@@ -146,34 +146,34 @@ exports[`"TextArea" renders as invalid 1`] = `
   width: 100%;
 }
 
-.emotion-0::-moz-placeholder {
-  color: rgb(80,82,84);
+.emotion-1::-moz-placeholder {
+  color: rgb(80, 82, 84);
   font-size: 11px;
   text-transform: none;
   opacity: 1;
 }
 
-.emotion-0::-ms-input-placeholder {
-  color: rgb(80,82,84);
+.emotion-1::-ms-input-placeholder {
+  color: rgb(80, 82, 84);
   font-size: 11px;
   text-transform: none;
 }
 
-.emotion-0::-webkit-input-placeholder {
-  color: rgb(80,82,84);
+.emotion-1::-webkit-input-placeholder {
+  color: rgb(80, 82, 84);
   font-size: 11px;
   text-transform: none;
 }
 
-.emotion-0:focus {
+.emotion-1:focus {
   box-shadow: 0 0 0 1px #0772de;
 }
 
 <div
-  className="emotion-1"
+  className="emotion-0"
 >
   <textarea
-    className="textarea emotion-0"
+    className="textarea emotion-1"
   >
     TextArea
   </textarea>
@@ -181,19 +181,19 @@ exports[`"TextArea" renders as invalid 1`] = `
 `;
 
 exports[`"TextArea" renders with placeholderTextTransform 1`] = `
-.emotion-1 {
-  background: rgb(237,237,238);
+.emotion-0 {
+  background: rgb(237, 237, 238);
   -webkit-transition: background 0.15s;
   transition: background 0.15s;
 }
 
-.emotion-0 {
+.emotion-1 {
   background: #fff;
   border: none;
   border-radius: 4px;
   box-shadow: 0 0 0 1px #696c6e;
   caret-color: #0772de;
-  color: rgb(29,30,31);
+  color: rgb(29, 30, 31);
   font-weight: 300;
   line-height: 24px;
   margin: 0 0 16px;
@@ -203,38 +203,38 @@ exports[`"TextArea" renders with placeholderTextTransform 1`] = `
   width: 100%;
 }
 
-.emotion-0::-moz-placeholder {
-  color: rgb(80,82,84);
+.emotion-1::-moz-placeholder {
+  color: rgb(80, 82, 84);
   font-size: 11px;
   text-transform: uppercase;
   opacity: 1;
 }
 
-.emotion-0::-ms-input-placeholder {
-  color: rgb(80,82,84);
+.emotion-1::-ms-input-placeholder {
+  color: rgb(80, 82, 84);
   font-size: 11px;
   text-transform: uppercase;
 }
 
-.emotion-0::-webkit-input-placeholder {
-  color: rgb(80,82,84);
+.emotion-1::-webkit-input-placeholder {
+  color: rgb(80, 82, 84);
   font-size: 11px;
   text-transform: uppercase;
 }
 
-.emotion-0:focus {
+.emotion-1:focus {
   box-shadow: 0 0 0 1px #0772de;
 }
 
-.emotion-0:invalid {
+.emotion-1:invalid {
   box-shadow: 0 0 0 1px #696c6e;
 }
 
 <div
-  className="emotion-1"
+  className="emotion-0"
 >
   <textarea
-    className="textarea emotion-0"
+    className="textarea emotion-1"
     placeholder="TextArea"
   >
     TextArea

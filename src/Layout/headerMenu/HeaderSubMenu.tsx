@@ -18,7 +18,7 @@
  */
 
 /** @jsx jsx */
-import {CSSObject, jsx} from '@emotion/core';
+import {CSSObject, jsx} from '@emotion/react';
 import React from 'react';
 
 import {COLOR, Opacity, Slide, YAxisMovement} from '../../Identity';
@@ -66,7 +66,7 @@ export const DESKTOP_HEADER_SUB_MENU_CLASSNAME = 'desktopStyledHeaderSubMenu';
 export const DesktopStyledHeaderSubMenu = (props: DesktopStyledHeaderSubMenuProps) => (
   <div
     className={DESKTOP_HEADER_SUB_MENU_CLASSNAME}
-    css={theme => desktopStyledHeaderSubMenuStyle(theme, props)}
+    css={(theme: Theme) => desktopStyledHeaderSubMenuStyle(theme, props)}
     {...props}
   />
 );

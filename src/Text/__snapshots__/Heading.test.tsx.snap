@@ -1,13 +1,13 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`"Heading" renders H! (dark theme) 1`] = `
-.emotion-1 {
+.emotion-0 {
   background: #000;
   -webkit-transition: background 0.15s;
   transition: background 0.15s;
 }
 
-.emotion-0 {
+.emotion-1 {
   color: #fff;
   display: block;
   font-size: 48px;
@@ -20,18 +20,18 @@ exports[`"Heading" renders H! (dark theme) 1`] = `
   min-height: 48px;
 }
 
-@media (max-width:639px) {
-  .emotion-0 {
+@media (max-width: 639px) {
+  .emotion-1 {
     font-size: 40px;
     line-height: 48px;
   }
 }
 
 <div
-  className="emotion-1"
+  className="emotion-0"
 >
   <h1
-    className="emotion-0"
+    className="emotion-1"
   >
     H1
   </h1>
@@ -39,14 +39,14 @@ exports[`"Heading" renders H! (dark theme) 1`] = `
 `;
 
 exports[`"Heading" renders H1 1`] = `
-.emotion-1 {
-  background: rgb(237,237,238);
+.emotion-0 {
+  background: rgb(237, 237, 238);
   -webkit-transition: background 0.15s;
   transition: background 0.15s;
 }
 
-.emotion-0 {
-  color: rgb(29,30,31);
+.emotion-1 {
+  color: rgb(29, 30, 31);
   display: block;
   font-size: 48px;
   font-weight: 300;
@@ -58,18 +58,18 @@ exports[`"Heading" renders H1 1`] = `
   min-height: 48px;
 }
 
-@media (max-width:639px) {
-  .emotion-0 {
+@media (max-width: 639px) {
+  .emotion-1 {
     font-size: 40px;
     line-height: 48px;
   }
 }
 
 <div
-  className="emotion-1"
+  className="emotion-0"
 >
   <h1
-    className="emotion-0"
+    className="emotion-1"
   >
     H1
   </h1>
@@ -77,14 +77,14 @@ exports[`"Heading" renders H1 1`] = `
 `;
 
 exports[`"Heading" renders H1 2`] = `
-.emotion-1 {
-  background: rgb(237,237,238);
+.emotion-0 {
+  background: rgb(237, 237, 238);
   -webkit-transition: background 0.15s;
   transition: background 0.15s;
 }
 
-.emotion-0 {
-  color: rgb(29,30,31);
+.emotion-1 {
+  color: rgb(29, 30, 31);
   display: block;
   font-size: 48px;
   font-weight: 300;
@@ -96,18 +96,18 @@ exports[`"Heading" renders H1 2`] = `
   min-height: 48px;
 }
 
-@media (max-width:639px) {
-  .emotion-0 {
+@media (max-width: 639px) {
+  .emotion-1 {
     font-size: 40px;
     line-height: 48px;
   }
 }
 
 <div
-  className="emotion-1"
+  className="emotion-0"
 >
   <h1
-    className="emotion-0"
+    className="emotion-1"
   >
     H1
   </h1>
@@ -115,14 +115,14 @@ exports[`"Heading" renders H1 2`] = `
 `;
 
 exports[`"Heading" renders H2 1`] = `
-.emotion-1 {
-  background: rgb(237,237,238);
+.emotion-0 {
+  background: rgb(237, 237, 238);
   -webkit-transition: background 0.15s;
   transition: background 0.15s;
 }
 
-.emotion-0 {
-  color: rgb(29,30,31);
+.emotion-1 {
+  color: rgb(29, 30, 31);
   display: block;
   font-size: 20px;
   font-weight: 700;
@@ -133,8 +133,8 @@ exports[`"Heading" renders H2 1`] = `
   margin-top: 32px;
 }
 
-@media (max-width:639px) {
-  .emotion-0 {
+@media (max-width: 639px) {
+  .emotion-1 {
     font-size: 18px;
     line-height: 26px;
     margin-bottom: 20px;
@@ -143,10 +143,10 @@ exports[`"Heading" renders H2 1`] = `
 }
 
 <div
-  className="emotion-1"
+  className="emotion-0"
 >
   <h2
-    className="emotion-0"
+    className="emotion-1"
   >
     H2
   </h2>
@@ -154,14 +154,14 @@ exports[`"Heading" renders H2 1`] = `
 `;
 
 exports[`"Heading" renders H3 1`] = `
-.emotion-1 {
-  background: rgb(237,237,238);
+.emotion-0 {
+  background: rgb(237, 237, 238);
   -webkit-transition: background 0.15s;
   transition: background 0.15s;
 }
 
-.emotion-0 {
-  color: rgb(29,30,31);
+.emotion-1 {
+  color: rgb(29, 30, 31);
   display: block;
   font-size: 16px;
   font-weight: 600;
@@ -171,10 +171,10 @@ exports[`"Heading" renders H3 1`] = `
 }
 
 <div
-  className="emotion-1"
+  className="emotion-0"
 >
   <h3
-    className="emotion-0"
+    className="emotion-1"
   >
     H3
   </h3>
@@ -182,14 +182,14 @@ exports[`"Heading" renders H3 1`] = `
 `;
 
 exports[`"Heading" renders H4 1`] = `
-.emotion-1 {
-  background: rgb(237,237,238);
+.emotion-0 {
+  background: rgb(237, 237, 238);
   -webkit-transition: background 0.15s;
   transition: background 0.15s;
 }
 
-.emotion-0 {
-  color: rgb(29,30,31);
+.emotion-1 {
+  color: rgb(29, 30, 31);
   display: block;
   font-size: 11px;
   font-weight: 300;
@@ -200,10 +200,10 @@ exports[`"Heading" renders H4 1`] = `
 }
 
 <div
-  className="emotion-1"
+  className="emotion-0"
 >
   <h3
-    className="emotion-0"
+    className="emotion-1"
   >
     H4
   </h3>

@@ -18,11 +18,12 @@
  */
 
 /** @jsx jsx */
-import {CSSObject, jsx} from '@emotion/core';
+import {CSSObject, jsx} from '@emotion/react';
 import React from 'react';
 
 import {COLOR} from '../Identity/';
 import {ANIMATION, DURATION, EASE} from '../Identity/motions';
+import {Theme} from '../Layout';
 import {QueryKeys, media} from '../mediaQueries';
 import {OverlayBackgroundProps, OverlayWrapperProps, overlayBackgroundStyle} from '../Modal/Overlay';
 import {noop} from '../util';
@@ -40,7 +41,7 @@ const MenuModalWrapper = (props: OverlayWrapperProps) => <div css={menuModalWrap
 
 const MenuModalBody = (props: React.HTMLProps<HTMLDivElement>) => (
   <div
-    css={theme => ({
+    css={(theme: Theme) => ({
       animation: `${ANIMATION.bottomUpMovement} ${DURATION.DEFAULT}ms ${EASE.EXPONENTIAL}`,
       backgroundColor: COLOR.tint(theme.general.backgroundColor, 0.16),
       boxShadow: '0 16px 64px 0 rgba(0, 0, 0, 0.16)',
@@ -107,7 +108,7 @@ export type MenuItemProps<T = HTMLLIElement> = React.HTMLProps<T>;
 
 export const MenuItem = ({children = null, ...props}: MenuItemProps & React.HTMLProps<HTMLLIElement>) => (
   <li
-    css={theme => ({
+    css={(theme: Theme) => ({
       alignItems: 'center',
       color: theme.general.color,
       cursor: 'pointer',

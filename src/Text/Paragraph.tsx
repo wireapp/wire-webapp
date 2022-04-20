@@ -18,7 +18,7 @@
  */
 
 /** @jsx jsx */
-import {CSSObject, jsx} from '@emotion/core';
+import {CSSObject, jsx} from '@emotion/react';
 
 import type {Theme} from '../Layout';
 import {QueryKeys, media} from '../mediaQueries';
@@ -36,7 +36,7 @@ export const paragraphStyle: <T>(theme: Theme, props: ParagraphProps<T>) => CSSO
 });
 
 export const Paragraph = (props: ParagraphProps) => (
-  <p css={theme => paragraphStyle(theme, props)} {...filterTextProps(props)} />
+  <p css={(theme: Theme) => paragraphStyle(theme, props)} {...filterTextProps(props)} />
 );
 
 export type LeadProps<T = HTMLParagraphElement> = TextProps<T>;
@@ -53,4 +53,6 @@ export const leadStyle: <T>(theme: Theme, props: LeadProps<T>) => CSSObject = (
   },
 });
 
-export const Lead = (props: LeadProps) => <p css={theme => leadStyle(theme, props)} {...filterTextProps(props)} />;
+export const Lead = (props: LeadProps) => (
+  <p css={(theme: Theme) => leadStyle(theme, props)} {...filterTextProps(props)} />
+);

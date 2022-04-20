@@ -18,7 +18,7 @@
  */
 
 /** @jsx jsx */
-import {CSSObject, jsx} from '@emotion/core';
+import {CSSObject, jsx} from '@emotion/react';
 import {useEffect, useState} from 'react';
 
 import {IsInViewport, IsInViewportProps} from '../Misc/';

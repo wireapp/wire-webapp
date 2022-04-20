@@ -1,7 +1,13 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`"Switch" renders (dark theme) 1`] = `
-.emotion-4 {
+.emotion-0 {
+  background: #000;
+  -webkit-transition: background 0.15s;
+  transition: background 0.15s;
+}
+
+.emotion-1 {
   display: inline-block;
   position: relative;
   text-align: left;
@@ -13,7 +19,7 @@ exports[`"Switch" renders (dark theme) 1`] = `
   width: 42px;
 }
 
-.emotion-0 {
+.emotion-2 {
   display: none;
 }
 
@@ -25,7 +31,7 @@ exports[`"Switch" renders (dark theme) 1`] = `
   overflow: hidden;
 }
 
-.emotion-1 {
+.emotion-4 {
   display: block;
   margin-left: -100%;
   -webkit-transition: margin 0.1s ease-in 0s;
@@ -33,19 +39,19 @@ exports[`"Switch" renders (dark theme) 1`] = `
   width: 200%;
 }
 
-.emotion-1:after {
+.emotion-4:after {
   content: " ";
   padding-right: 10px;
   text-align: right;
 }
 
-.emotion-1:before {
+.emotion-4:before {
   content: " ";
   padding-left: 10px;
 }
 
-.emotion-1:before,
-.emotion-1:after {
+.emotion-4:before,
+.emotion-4:after {
   background-color: #d2d2d2;
   box-sizing: border-box;
   display: block;
@@ -56,7 +62,7 @@ exports[`"Switch" renders (dark theme) 1`] = `
   width: 50%;
 }
 
-.emotion-2 {
+.emotion-5 {
   background: #fff;
   border-radius: 100%;
   bottom: 0;
@@ -72,21 +78,15 @@ exports[`"Switch" renders (dark theme) 1`] = `
   width: 23px;
 }
 
-.emotion-5 {
-  background: #000;
-  -webkit-transition: background 0.15s;
-  transition: background 0.15s;
-}
-
 <div
-  className="emotion-5"
+  className="emotion-0"
 >
   <div
-    className="emotion-4"
+    className="emotion-1"
   >
     <input
       checked={false}
-      className="emotion-0"
+      className="emotion-2"
       id="3"
       onChange={[Function]}
       type="checkbox"
@@ -96,10 +96,10 @@ exports[`"Switch" renders (dark theme) 1`] = `
       htmlFor="3"
     >
       <span
-        className="emotion-1"
+        className="emotion-4"
       />
       <span
-        className="emotion-2"
+        className="emotion-5"
       />
     </label>
   </div>
@@ -107,13 +107,13 @@ exports[`"Switch" renders (dark theme) 1`] = `
 `;
 
 exports[`"Switch" renders checked 1`] = `
-.emotion-5 {
-  background: rgb(237,237,238);
+.emotion-0 {
+  background: rgb(237, 237, 238);
   -webkit-transition: background 0.15s;
   transition: background 0.15s;
 }
 
-.emotion-4 {
+.emotion-1 {
   display: inline-block;
   position: relative;
   text-align: left;
@@ -125,7 +125,7 @@ exports[`"Switch" renders checked 1`] = `
   width: 42px;
 }
 
-.emotion-0 {
+.emotion-2 {
   display: none;
 }
 
@@ -137,7 +137,7 @@ exports[`"Switch" renders checked 1`] = `
   overflow: hidden;
 }
 
-.emotion-1 {
+.emotion-4 {
   display: block;
   margin-left: 0;
   -webkit-transition: margin 0.1s ease-in 0s;
@@ -145,19 +145,19 @@ exports[`"Switch" renders checked 1`] = `
   width: 200%;
 }
 
-.emotion-1:after {
+.emotion-4:after {
   content: " ";
   padding-right: 10px;
   text-align: right;
 }
 
-.emotion-1:before {
+.emotion-4:before {
   content: " ";
   padding-left: 10px;
 }
 
-.emotion-1:before,
-.emotion-1:after {
+.emotion-4:before,
+.emotion-4:after {
   background-color: #0772de;
   box-sizing: border-box;
   display: block;
@@ -168,7 +168,7 @@ exports[`"Switch" renders checked 1`] = `
   width: 50%;
 }
 
-.emotion-2 {
+.emotion-5 {
   background: #fff;
   border-radius: 100%;
   bottom: 0;
@@ -185,14 +185,14 @@ exports[`"Switch" renders checked 1`] = `
 }
 
 <div
-  className="emotion-5"
+  className="emotion-0"
 >
   <div
-    className="emotion-4"
+    className="emotion-1"
   >
     <input
       checked={true}
-      className="emotion-0"
+      className="emotion-2"
       id="2"
       onChange={[Function]}
       type="checkbox"
@@ -202,10 +202,10 @@ exports[`"Switch" renders checked 1`] = `
       htmlFor="2"
     >
       <span
-        className="emotion-1"
+        className="emotion-4"
       />
       <span
-        className="emotion-2"
+        className="emotion-5"
       />
     </label>
   </div>
@@ -213,13 +213,13 @@ exports[`"Switch" renders checked 1`] = `
 `;
 
 exports[`"Switch" renders disabled 1`] = `
-.emotion-5 {
-  background: rgb(237,237,238);
+.emotion-0 {
+  background: rgb(237, 237, 238);
   -webkit-transition: background 0.15s;
   transition: background 0.15s;
 }
 
-.emotion-4 {
+.emotion-1 {
   display: inline-block;
   position: relative;
   text-align: left;
@@ -231,7 +231,7 @@ exports[`"Switch" renders disabled 1`] = `
   width: 42px;
 }
 
-.emotion-0 {
+.emotion-2 {
   display: none;
 }
 
@@ -242,7 +242,7 @@ exports[`"Switch" renders disabled 1`] = `
   overflow: hidden;
 }
 
-.emotion-1 {
+.emotion-4 {
   display: block;
   margin-left: -100%;
   -webkit-transition: margin 0.1s ease-in 0s;
@@ -250,20 +250,20 @@ exports[`"Switch" renders disabled 1`] = `
   width: 200%;
 }
 
-.emotion-1:after {
+.emotion-4:after {
   content: " ";
   padding-right: 10px;
   text-align: right;
 }
 
-.emotion-1:before {
+.emotion-4:before {
   content: " ";
   padding-left: 10px;
 }
 
-.emotion-1:before,
-.emotion-1:after {
-  background-color: rgb(228,228,228);
+.emotion-4:before,
+.emotion-4:after {
+  background-color: rgb(228, 228, 228);
   box-sizing: border-box;
   display: block;
   float: left;
@@ -273,7 +273,7 @@ exports[`"Switch" renders disabled 1`] = `
   width: 50%;
 }
 
-.emotion-2 {
+.emotion-5 {
   background: #fff;
   border-radius: 100%;
   bottom: 0;
@@ -291,14 +291,14 @@ exports[`"Switch" renders disabled 1`] = `
 }
 
 <div
-  className="emotion-5"
+  className="emotion-0"
 >
   <div
-    className="emotion-4"
+    className="emotion-1"
   >
     <input
       checked={false}
-      className="emotion-0"
+      className="emotion-2"
       disabled={true}
       id="4"
       onChange={[Function]}
@@ -309,10 +309,10 @@ exports[`"Switch" renders disabled 1`] = `
       htmlFor="4"
     >
       <span
-        className="emotion-1"
+        className="emotion-4"
       />
       <span
-        className="emotion-2"
+        className="emotion-5"
       />
     </label>
   </div>
@@ -320,13 +320,13 @@ exports[`"Switch" renders disabled 1`] = `
 `;
 
 exports[`"Switch" renders unchecked 1`] = `
-.emotion-5 {
-  background: rgb(237,237,238);
+.emotion-0 {
+  background: rgb(237, 237, 238);
   -webkit-transition: background 0.15s;
   transition: background 0.15s;
 }
 
-.emotion-4 {
+.emotion-1 {
   display: inline-block;
   position: relative;
   text-align: left;
@@ -338,7 +338,7 @@ exports[`"Switch" renders unchecked 1`] = `
   width: 42px;
 }
 
-.emotion-0 {
+.emotion-2 {
   display: none;
 }
 
@@ -350,7 +350,7 @@ exports[`"Switch" renders unchecked 1`] = `
   overflow: hidden;
 }
 
-.emotion-1 {
+.emotion-4 {
   display: block;
   margin-left: -100%;
   -webkit-transition: margin 0.1s ease-in 0s;
@@ -358,19 +358,19 @@ exports[`"Switch" renders unchecked 1`] = `
   width: 200%;
 }
 
-.emotion-1:after {
+.emotion-4:after {
   content: " ";
   padding-right: 10px;
   text-align: right;
 }
 
-.emotion-1:before {
+.emotion-4:before {
   content: " ";
   padding-left: 10px;
 }
 
-.emotion-1:before,
-.emotion-1:after {
+.emotion-4:before,
+.emotion-4:after {
   background-color: #d2d2d2;
   box-sizing: border-box;
   display: block;
@@ -381,7 +381,7 @@ exports[`"Switch" renders unchecked 1`] = `
   width: 50%;
 }
 
-.emotion-2 {
+.emotion-5 {
   background: #fff;
   border-radius: 100%;
   bottom: 0;
@@ -398,14 +398,14 @@ exports[`"Switch" renders unchecked 1`] = `
 }
 
 <div
-  className="emotion-5"
+  className="emotion-0"
 >
   <div
-    className="emotion-4"
+    className="emotion-1"
   >
     <input
       checked={false}
-      className="emotion-0"
+      className="emotion-2"
       id="1"
       onChange={[Function]}
       type="checkbox"
@@ -415,10 +415,10 @@ exports[`"Switch" renders unchecked 1`] = `
       htmlFor="1"
     >
       <span
-        className="emotion-1"
+        className="emotion-4"
       />
       <span
-        className="emotion-2"
+        className="emotion-5"
       />
     </label>
   </div>

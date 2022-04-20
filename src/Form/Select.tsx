@@ -18,7 +18,7 @@
  */
 
 /** @jsx jsx */
-import {CSSObject, jsx} from '@emotion/core';
+import {CSSObject, jsx} from '@emotion/react';
 
 import {COLOR} from '../Identity';
 import type {Theme} from '../Layout';
@@ -62,5 +62,5 @@ export const selectStyle: <T>(theme: Theme, props: SelectProps<T>) => CSSObject 
 const filterSelectProps = (props: SelectProps) => filterProps(props, ['markInvalid']);
 
 export const Select = (props: SelectProps) => (
-  <select css={theme => selectStyle(theme, props)} {...filterSelectProps(props)} />
+  <select css={(theme: Theme) => selectStyle(theme, props)} {...filterSelectProps(props)} />
 );

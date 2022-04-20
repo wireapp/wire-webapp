@@ -19,7 +19,7 @@
 
 /** @jsx jsx */
 import React from 'react';
-import {CSSObject, jsx} from '@emotion/core';
+import {CSSObject, jsx} from '@emotion/react';
 
 import {GUTTER} from './sizes';
 

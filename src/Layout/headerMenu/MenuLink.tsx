@@ -18,7 +18,7 @@
  */
 
 /** @jsx jsx */
-import {CSSObject, jsx} from '@emotion/core';
+import {CSSObject, jsx} from '@emotion/react';
 
 import {QueryKeys, media} from '../../mediaQueries';
 import {LinkProps, filterLinkProps, linkStyle} from '../../Text';
@@ -71,5 +71,9 @@ export const filterMenuLinkProps = (props: MenuLinkProps) =>
   filterProps(filterLinkProps(props) as MenuLinkProps, ['button']);
 
 export const MenuLink = (props: MenuLinkProps) => (
-  <a className={MENU_LINK_CLASSNAME} css={theme => menuLinkStyle(theme, props)} {...filterMenuLinkProps(props)} />
+  <a
+    className={MENU_LINK_CLASSNAME}
+    css={(theme: Theme) => menuLinkStyle(theme, props)}
+    {...filterMenuLinkProps(props)}
+  />
 );

@@ -2,23 +2,23 @@
 
 exports[`"Line" renders (dark theme) 1`] = `
 .emotion-0 {
-  border: none;
-  border-bottom: 1px solid rgb(213,214,214);
-  margin-bottom: 16px;
-  margin-top: 16px;
-}
-
-.emotion-1 {
   background: #000;
   -webkit-transition: background 0.15s;
   transition: background 0.15s;
 }
 
+.emotion-1 {
+  border: none;
+  border-bottom: 1px solid rgb(213, 214, 214);
+  margin-bottom: 16px;
+  margin-top: 16px;
+}
+
 <div
-  className="emotion-1"
+  className="emotion-0"
 >
   <hr
-    className="emotion-0"
+    className="emotion-1"
   >
     Line
   </hr>
@@ -26,24 +26,24 @@ exports[`"Line" renders (dark theme) 1`] = `
 `;
 
 exports[`"Line" renders 1`] = `
-.emotion-1 {
-  background: rgb(237,237,238);
+.emotion-0 {
+  background: rgb(237, 237, 238);
   -webkit-transition: background 0.15s;
   transition: background 0.15s;
 }
 
-.emotion-0 {
+.emotion-1 {
   border: none;
-  border-bottom: 1px solid rgb(213,214,214);
+  border-bottom: 1px solid rgb(213, 214, 214);
   margin-bottom: 16px;
   margin-top: 16px;
 }
 
 <div
-  className="emotion-1"
+  className="emotion-0"
 >
   <hr
-    className="emotion-0"
+    className="emotion-1"
   >
     Line
   </hr>
@@ -51,13 +51,13 @@ exports[`"Line" renders 1`] = `
 `;
 
 exports[`"Line" renders with color 1`] = `
-.emotion-1 {
-  background: rgb(237,237,238);
+.emotion-0 {
+  background: rgb(237, 237, 238);
   -webkit-transition: background 0.15s;
   transition: background 0.15s;
 }
 
-.emotion-0 {
+.emotion-1 {
   border: none;
   border-bottom: 1px solid #e02020;
   margin-bottom: 16px;
@@ -65,10 +65,10 @@ exports[`"Line" renders with color 1`] = `
 }
 
 <div
-  className="emotion-1"
+  className="emotion-0"
 >
   <hr
-    className="emotion-0"
+    className="emotion-1"
     color="#e02020"
   >
     Line

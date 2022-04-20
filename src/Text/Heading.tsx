@@ -18,7 +18,7 @@
  */
 
 /** @jsx jsx */
-import {CSSObject, jsx} from '@emotion/core';
+import {CSSObject, jsx} from '@emotion/react';
 
 import type {Theme} from '../Layout';
 import {QueryKeys, media} from '../mediaQueries';
@@ -59,7 +59,9 @@ export const h1Style: <T>(theme: Theme, props: HeadingProps<T>) => CSSObject = (
   },
 });
 
-export const H1 = (props: HeadingProps) => <h1 css={theme => h1Style(theme, props)} {...filterTextProps(props)} />;
+export const H1 = (props: HeadingProps) => (
+  <h1 css={(theme: Theme) => h1Style(theme, props)} {...filterTextProps(props)} />
+);
 
 export const h2Style: <T>(theme: Theme, props: HeadingProps<T>) => CSSObject = (
   theme,
@@ -79,7 +81,9 @@ export const h2Style: <T>(theme: Theme, props: HeadingProps<T>) => CSSObject = (
   },
 });
 
-export const H2 = (props: HeadingProps) => <h2 css={theme => h2Style(theme, props)} {...filterTextProps(props)} />;
+export const H2 = (props: HeadingProps) => (
+  <h2 css={(theme: Theme) => h2Style(theme, props)} {...filterTextProps(props)} />
+);
 
 export const h3Style: <T>(theme: Theme, props: HeadingProps<T>) => CSSObject = (
   theme,
@@ -91,7 +95,9 @@ export const h3Style: <T>(theme: Theme, props: HeadingProps<T>) => CSSObject = (
   marginBottom: '16px',
 });
 
-export const H3 = (props: HeadingProps) => <h3 css={theme => h3Style(theme, props)} {...filterTextProps(props)} />;
+export const H3 = (props: HeadingProps) => (
+  <h3 css={(theme: Theme) => h3Style(theme, props)} {...filterTextProps(props)} />
+);
 
 export const h4Style: <T>(theme: Theme, props: HeadingProps<T>) => CSSObject = (
   theme,
@@ -104,4 +110,6 @@ export const h4Style: <T>(theme: Theme, props: HeadingProps<T>) => CSSObject = (
   marginTop: '20px',
 });
 
-export const H4 = (props: HeadingProps) => <h3 css={theme => h4Style(theme, props)} {...filterTextProps(props)} />;
+export const H4 = (props: HeadingProps) => (
+  <h3 css={(theme: Theme) => h4Style(theme, props)} {...filterTextProps(props)} />
+);

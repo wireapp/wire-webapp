@@ -18,7 +18,7 @@
  */
 
 /** @jsx jsx */
-import {CSSObject, jsx} from '@emotion/core';
+import {CSSObject, jsx} from '@emotion/react';
 import React from 'react';
 
 import {COLOR} from '../Identity';
@@ -73,7 +73,7 @@ const tabBarItemStyle: <T>(theme: Theme, props: TabBarItemProps<T>) => CSSObject
 };
 
 export const TabBarItem = ({children = null, ...props}: TabBarItemProps) => (
-  <span css={theme => tabBarItemStyle(theme, props)} {...props}>
+  <span css={(theme: Theme) => tabBarItemStyle(theme, props)} {...props}>
     {children}
   </span>
 );

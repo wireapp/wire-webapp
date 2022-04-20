@@ -1,13 +1,13 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`"ErrorMessage" renders 1`] = `
-.emotion-3 {
-  background: rgb(237,237,238);
+.emotion-0 {
+  background: rgb(237, 237, 238);
   -webkit-transition: background 0.15s;
   transition: background 0.15s;
 }
 
-.emotion-2 {
+.emotion-1 {
   -webkit-align-items: flex-start;
   -webkit-box-align: flex-start;
   -ms-flex-align: flex-start;
@@ -19,12 +19,13 @@ exports[`"ErrorMessage" renders 1`] = `
   -webkit-flex-direction: row;
   -ms-flex-direction: row;
   flex-direction: row;
+  -webkit-box-flex-wrap: nowrap;
   -webkit-flex-wrap: nowrap;
   -ms-flex-wrap: nowrap;
   flex-wrap: nowrap;
   -webkit-box-pack: start;
-  -webkit-justify-content: flex-start;
   -ms-flex-pack: start;
+  -webkit-justify-content: flex-start;
   justify-content: flex-start;
   -webkit-align-items: center;
   -webkit-box-align: center;
@@ -37,18 +38,19 @@ exports[`"ErrorMessage" renders 1`] = `
   -webkit-flex-direction: row;
   -ms-flex-direction: row;
   flex-direction: row;
+  -webkit-box-flex-wrap: nowrap;
   -webkit-flex-wrap: nowrap;
   -ms-flex-wrap: nowrap;
   flex-wrap: nowrap;
   -webkit-box-pack: center;
-  -webkit-justify-content: center;
   -ms-flex-pack: center;
+  -webkit-justify-content: center;
   justify-content: center;
   margin-bottom: 12px;
 }
 
-.emotion-2 a {
-  color: rgb(29,30,31);
+.emotion-1 a {
+  color: rgb(29, 30, 31);
   display: inline;
   font-size: 11px;
   font-weight: 300;
@@ -61,22 +63,22 @@ exports[`"ErrorMessage" renders 1`] = `
   transition: all 0.24s;
 }
 
-.emotion-2 a:hover {
-  color: rgb(24,25,26);
+.emotion-1 a:hover {
+  color: rgb(24, 25, 26);
 }
 
-.emotion-2 a:visited,
-.emotion-2 a:link,
-.emotion-2 a:active {
-  color: rgb(29,30,31);
+.emotion-1 a:visited,
+.emotion-1 a:link,
+.emotion-1 a:active {
+  color: rgb(29, 30, 31);
 }
 
-.emotion-0 {
-  fill: rgb(29,30,31);
+.emotion-2 {
+  fill: rgb(29, 30, 31);
   overflow: visible;
 }
 
-.emotion-1 {
+.emotion-3 {
   color: #e02020;
   display: inline;
   font-size: 11px;
@@ -86,14 +88,14 @@ exports[`"ErrorMessage" renders 1`] = `
 }
 
 <div
-  className="emotion-3"
+  className="emotion-0"
 >
   <div
-    className="emotion-2"
+    className="emotion-1"
   >
     <svg
       aria-hidden="true"
-      className="emotion-0"
+      className="emotion-2"
       height={12}
       style={
         Object {
@@ -132,7 +134,7 @@ exports[`"ErrorMessage" renders 1`] = `
       </g>
     </svg>
     <span
-      className="emotion-1"
+      className="emotion-3"
     >
       ErrorMessage
     </span>

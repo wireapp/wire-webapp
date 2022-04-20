@@ -18,7 +18,7 @@
  */
 
 /** @jsx jsx */
-import {CSSObject, jsx} from '@emotion/core';
+import {CSSObject, jsx} from '@emotion/react';
 import React from 'react';
 import type {Property} from 'csstype';
 
@@ -81,7 +81,7 @@ export const textStyle: <T>(theme: Theme, props: TextProps<T>) => CSSObject = (
 });
 
 export const Text = React.forwardRef<HTMLSpanElement, TextProps<HTMLSpanElement>>((props, ref) => (
-  <span ref={ref} css={theme => textStyle(theme, props)} {...filterTextProps(props)} />
+  <span ref={ref} css={(theme: Theme) => textStyle(theme, props)} {...filterTextProps(props)} />
 ));
 
 export const Bold = React.forwardRef<HTMLSpanElement, TextProps<HTMLSpanElement>>((props, ref) => (

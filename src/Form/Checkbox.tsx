@@ -18,10 +18,11 @@
  */
 
 /** @jsx jsx */
-import {jsx} from '@emotion/core';
+import {jsx} from '@emotion/react';
 import React from 'react';
 
 import {COLOR} from '../Identity';
+import {Theme} from '../Layout';
 import {Text, TextProps, textStyle, textLinkStyle} from '../Text';
 import {filterProps} from '../util';
 import {INPUT_CLASSNAME, Input, InputProps} from './Input';
@@ -38,7 +39,7 @@ const StyledLabel = (props: StyledLabelProps) => {
     '<svg xmlns="http://www.w3.org/2000/svg" width="12" height="10" viewBox="0 0 8 6"><path fill="white" d="M2.8 6L8 .7 7.3 0 2.8 4.6.7 2.4l-.7.7z"/></svg>';
   return (
     <label
-      css={theme => ({
+      css={(theme: Theme) => ({
         [`.${INPUT_CLASSNAME}:checked + &::before`]: {
           background: `${COLOR.BLUE} url('data:image/svg+xml; utf8, ${checkSvg}') no-repeat center`,
         },
@@ -109,7 +110,7 @@ export type CheckboxLabelProps<T = HTMLSpanElement> = TextProps<T>;
 
 export const CheckboxLabel = ({color = COLOR.TEXT, ...props}: CheckboxLabelProps) => (
   <Text
-    css={theme => ({
+    css={(theme: Theme) => ({
       ...textStyle(theme, {
         color,
         ...props,

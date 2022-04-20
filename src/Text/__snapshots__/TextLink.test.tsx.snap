@@ -2,6 +2,12 @@
 
 exports[`"TextLink" renders (dark theme) 1`] = `
 .emotion-0 {
+  background: #000;
+  -webkit-transition: background 0.15s;
+  transition: background 0.15s;
+}
+
+.emotion-1 {
   color: #0772de;
   display: inline;
   font-size: 16px;
@@ -15,27 +21,21 @@ exports[`"TextLink" renders (dark theme) 1`] = `
   transition: all 0.24s;
 }
 
-.emotion-0:hover {
-  color: rgb(6,96,187);
+.emotion-1:hover {
+  color: rgb(6, 96, 187);
 }
 
-.emotion-0:visited,
-.emotion-0:link,
-.emotion-0:active {
+.emotion-1:visited,
+.emotion-1:link,
+.emotion-1:active {
   color: #0772de;
 }
 
-.emotion-1 {
-  background: #000;
-  -webkit-transition: background 0.15s;
-  transition: background 0.15s;
-}
-
 <div
-  className="emotion-1"
+  className="emotion-0"
 >
   <a
-    className="emotion-0"
+    className="emotion-1"
     rel="noopener noreferrer"
   >
     TextLink
@@ -44,13 +44,13 @@ exports[`"TextLink" renders (dark theme) 1`] = `
 `;
 
 exports[`"TextLink" renders 1`] = `
-.emotion-1 {
-  background: rgb(237,237,238);
+.emotion-0 {
+  background: rgb(237, 237, 238);
   -webkit-transition: background 0.15s;
   transition: background 0.15s;
 }
 
-.emotion-0 {
+.emotion-1 {
   color: #0772de;
   display: inline;
   font-size: 16px;
@@ -64,21 +64,21 @@ exports[`"TextLink" renders 1`] = `
   transition: all 0.24s;
 }
 
-.emotion-0:hover {
-  color: rgb(6,96,187);
+.emotion-1:hover {
+  color: rgb(6, 96, 187);
 }
 
-.emotion-0:visited,
-.emotion-0:link,
-.emotion-0:active {
+.emotion-1:visited,
+.emotion-1:link,
+.emotion-1:active {
   color: #0772de;
 }
 
 <div
-  className="emotion-1"
+  className="emotion-0"
 >
   <a
-    className="emotion-0"
+    className="emotion-1"
     rel="noopener noreferrer"
   >
     TextLink

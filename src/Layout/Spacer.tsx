@@ -18,7 +18,7 @@
  */
 
 /** @jsx jsx */
-import {jsx, jsx as JSX} from '@emotion/core';
+import {jsx} from '@emotion/react';
 import React from 'react';
 
 export interface SpacerProps<T = HTMLDivElement> extends React.HTMLProps<T> {
@@ -26,6 +26,6 @@ export interface SpacerProps<T = HTMLDivElement> extends React.HTMLProps<T> {
   vertical?: boolean;
 }
 
-export function Spacer({size = 8, vertical = false}: SpacerProps): JSX.Element {
+export function Spacer({size = 8, vertical = false}: SpacerProps): React.ReactNode {
   return <div style={vertical ? {display: 'inline-block', width: size} : {height: size}} />;
 }

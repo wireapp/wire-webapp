@@ -18,7 +18,7 @@
  */
 
 /** @jsx jsx */
-import {CSSObject, jsx} from '@emotion/core';
+import {CSSObject, jsx} from '@emotion/react';
 
 import {Loading} from '../Misc';
 import {COLOR} from '../Identity';
@@ -46,7 +46,7 @@ export const ButtonLink = ({
   loadingColor = COLOR.WHITE,
   ...props
 }: ButtonProps<HTMLAnchorElement>) => (
-  <a css={theme => buttonLinkStyle(theme, props)} {...filterButtonLinkProps(props)}>
+  <a css={(theme: Theme) => buttonLinkStyle(theme, props)} {...filterButtonLinkProps(props)}>
     {showLoading ? <Loading size={30} color={loadingColor} style={{display: 'flex', margin: 'auto'}} /> : children}
   </a>
 );

@@ -19,7 +19,7 @@
 
 module.exports = {
   setupFilesAfterEnv: [],
-  snapshotSerializers: ['jest-emotion'],
+  snapshotSerializers: ['@emotion/jest/serializer'],
   testPathIgnorePatterns: ['[a-z]+.test.js', 'node_modules'],
   verbose: true,
 };

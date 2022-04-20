@@ -18,10 +18,11 @@
  */
 
 /** @jsx jsx */
-import {jsx} from '@emotion/core';
+import {jsx} from '@emotion/react';
 
 import {INPUT_CLASSNAME, InputProps, inputStyle} from './Input';
 import {COLOR} from '../Identity';
+import {Theme} from '../Layout';
 
 export type InputSubmitComboProps<T = HTMLDivElement> = InputProps<T>;
 
@@ -30,7 +31,7 @@ export const INPUT_SUBMIT_COMBO_CLASSNAME = 'inputSubmitCombo';
 export const InputSubmitCombo = ({children, ...props}: InputSubmitComboProps) => (
   <div
     className={INPUT_SUBMIT_COMBO_CLASSNAME}
-    css={theme => ({
+    css={(theme: Theme) => ({
       ...inputStyle(theme, props),
       '&:focus-within': {
         boxShadow: `0 0 0 1px ${COLOR.BLUE}`,

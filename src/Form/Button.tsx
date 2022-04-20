@@ -18,7 +18,7 @@
  */
 
 /** @jsx jsx */
-import {CSSObject, jsx} from '@emotion/core';
+import {CSSObject, jsx} from '@emotion/react';
 
 import {COLOR} from '../Identity';
 import {defaultTransition} from '../Identity/motions';
@@ -87,7 +87,7 @@ export const buttonStyle: <T>(theme: Theme, props: ButtonProps<T>) => CSSObject 
 });
 
 export const Button = ({showLoading, children, loadingColor = COLOR.WHITE, ...props}: ButtonProps) => (
-  <button css={theme => buttonStyle(theme, props)} {...filterButtonProps(props)}>
+  <button css={(theme: Theme) => buttonStyle(theme, props)} {...filterButtonProps(props)}>
     {showLoading ? <Loading size={30} color={loadingColor} style={{display: 'flex', margin: 'auto'}} /> : children}
   </button>
 );

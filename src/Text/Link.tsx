@@ -18,7 +18,7 @@
  */
 
 /** @jsx jsx */
-import {CSSObject, jsx} from '@emotion/core';
+import {CSSObject, jsx} from '@emotion/react';
 import Color from 'color';
 
 import {COLOR} from '../Identity/colors';
@@ -54,7 +54,7 @@ export const filterLinkProps = (props: LinkProps) => filterProps(filterTextProps
 
 export const Link = (props: LinkProps) => {
   return (
-    <a css={theme => linkStyle(theme, props)} rel="noopener noreferrer" {...filterLinkProps(props)}>
+    <a css={(theme: Theme) => linkStyle(theme, props)} rel="noopener noreferrer" {...filterLinkProps(props)}>
       {props.children}
     </a>
   );
