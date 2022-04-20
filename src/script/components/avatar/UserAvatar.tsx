@@ -22,6 +22,7 @@ import {COLOR} from '@wireapp/react-ui-kit';
 
 import {User} from '../../entity/User';
 
+import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {AVATAR_SIZE, STATE} from '../Avatar';
 import AvatarBackground from './AvatarBackground';
 import AvatarImage from './AvatarImage';
@@ -56,6 +57,10 @@ const UserAvatar: React.FunctionComponent<UserAvatarProps> = ({
 }) => {
   const isImageGrey = !noFilter && [STATE.BLOCKED, STATE.IGNORED, STATE.PENDING, STATE.UNKNOWN].includes(state);
   const backgroundColor = state === STATE.UNKNOWN ? COLOR.GRAY : undefined;
+  const {mediumPictureResource, previewPictureResource} = useKoSubscribableChildren(participant, [
+    'mediumPictureResource',
+    'previewPictureResource',
+  ]);
   return (
     <AvatarWrapper
       avatarSize={avatarSize}
@@ -74,8 +79,8 @@ const UserAvatar: React.FunctionComponent<UserAvatarProps> = ({
         avatarAlt={participant.name()}
         backgroundColor={backgroundColor}
         isGrey={isImageGrey}
-        mediumPicture={participant.mediumPictureResource()}
-        previewPicture={participant.previewPictureResource()}
+        mediumPicture={mediumPictureResource}
+        previewPicture={previewPictureResource}
       />
       {!noBadge && shouldShowBadge(avatarSize, state) && <AvatarBadge state={state} />}
       {!isImageGrey && <AvatarBorder />}
