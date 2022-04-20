@@ -69,7 +69,11 @@ describe('AccentColorPicker', () => {
 
     AccentColor.ACCENT_COLORS.forEach(accentColor => {
       act(() => {
-        container.querySelector(`[data-uie-name="do-set-accent-color"][data-uie-value="${accentColor.id}"]`).click();
+        (
+          container.querySelector(
+            `[data-uie-name="do-set-accent-color"][data-uie-value="${accentColor.id}"]`,
+          ) as HTMLInputElement
+        ).click();
       });
       expect(props.doSetAccentColor).toHaveBeenCalledWith(accentColor.id);
     });
