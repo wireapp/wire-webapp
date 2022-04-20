@@ -1,7 +1,9 @@
+import {CSSObject} from '@emotion/react';
 import {MouseEvent, useRef, useEffect, useState} from 'react';
 import {usePausableInterval} from '../../hooks/usePausableInterval';
 
 interface CanvasProps {
+  css?: CSSObject;
   'data-uie-name'?: string;
   onProgress: (entropyData: [number, number][], percent: number, pause: boolean) => void;
   onSetEntropy: (entropyData: [number, number][]) => void;
@@ -10,7 +12,7 @@ interface CanvasProps {
 }
 
 const EntropyCanvas = (props: CanvasProps) => {
-  const {sizeX, sizeY, onSetEntropy, onProgress, ...rest} = props;
+  const {sizeX, sizeY, onSetEntropy, onProgress, css, ...rest} = props;
   const canvasRef = useRef(null);
   const [percent, setPercent] = useState(0);
   const [entropy, setEntropy] = useState<[number, number][]>([]);
@@ -85,6 +87,7 @@ const EntropyCanvas = (props: CanvasProps) => {
       height={sizeY}
       width={sizeX}
       css={{
+        ...css,
         alignSelf: 'center',
         backgroundColor: 'white',
         borderRadius: '5px',

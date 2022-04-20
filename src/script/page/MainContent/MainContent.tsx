@@ -19,7 +19,6 @@
 
 import React from 'react';
 import {CSSTransition, SwitchTransition} from 'react-transition-group';
-import {css} from '@emotion/react';
 import {registerStaticReactComponent, useKoSubscribableChildren} from 'Util/ComponentUtil';
 
 import {ContentViewModel, ContentState} from '../../view_model/ContentViewModel';
@@ -148,7 +147,7 @@ const MainContent: React.FC<LeftSidebarProps> = ({
   return (
     <>
       <h1 className="visually-hidden">{title}</h1>
-      <SwitchTransition css={css({height: '100%'})}>
+      <SwitchTransition>
         <Animated key={state}>{content}</Animated>
       </SwitchTransition>
     </>

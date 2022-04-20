@@ -19,7 +19,6 @@
 
 import React, {useEffect} from 'react';
 import {CSSTransition, SwitchTransition} from 'react-transition-group';
-import {css} from '@emotion/react';
 import {registerStaticReactComponent, useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {container} from 'tsyringe';
 
@@ -131,7 +130,7 @@ const LeftSidebar: React.FC<LeftSidebarProps> = ({
   }
   return (
     <>
-      <SwitchTransition css={css({height: '100%'})}>
+      <SwitchTransition>
         <Animated key={state}>{content}</Animated>
       </SwitchTransition>
     </>
