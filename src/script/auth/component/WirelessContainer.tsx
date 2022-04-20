@@ -67,7 +67,7 @@ export const WirelessContainer: React.FC<Props> = ({showCookiePolicyBanner, onCo
                 values={{
                   newline: <br />,
                   // eslint-disable-next-line react/display-name
-                  strong: (...chunks: any[]) => <strong>{chunks}</strong>,
+                  strong: ((...chunks: any[]) => <strong>{chunks}</strong>) as any,
                 }}
               />
             </Link>
