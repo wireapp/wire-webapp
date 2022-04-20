@@ -80,7 +80,7 @@ setStrings(strings);
 
 (function setAppLocale() {
   const queryParam = getParameter(URLParameter.LOCALE);
-  const currentBrowserLocale = navigator.language.substr(0, 2) as LocaleType;
+  const currentBrowserLocale = navigator.language.slice(0, 2) as LocaleType;
 
   if (queryParam) {
     storeValue(StorageKey.LOCALIZATION.LOCALE, queryParam);

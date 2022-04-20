@@ -93,7 +93,7 @@ module.exports = grunt => {
 
     let user = grunt.config('gitinfo.local.branch.current.currentUser');
     if (user) {
-      user = user.substr(0, user.indexOf(' ')).toLowerCase();
+      user = user.substring(0, user.indexOf(' ')).toLowerCase();
     }
 
     let version = format(new Date(), 'yyyy.MM.dd.HH.mm');
