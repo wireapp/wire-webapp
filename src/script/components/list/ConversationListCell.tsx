@@ -183,6 +183,7 @@ const ConversationListCell: React.FC<ConversationListCellProps> = ({
             className={cx('conversation-list-cell-context-menu', {
               'conversation-list-cell-context-menu--active': isActive,
             })}
+            data-uie-name="go-options"
             aria-label={t('accessibility.conversationOptionsMenu')}
             type="button"
             onClick={event => {
