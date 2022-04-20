@@ -9,6 +9,10 @@ on:
   pull_request:
     branches: [master, dev, edge, avs, mobile]
 
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   test_build_deploy:
     runs-on: ubuntu-latest
@@ -28,12 +32,12 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           fetch-depth: 0
 
       - name: Use latest Node.js v16
-        uses: actions/setup-node@v2
+        uses: actions/setup-node@v3
         with:
           node-version: 16.x
 
@@ -70,11 +74,6 @@ jobs:
           contains(env.TITLE || env.PR_LAST_COMMIT_MESSAGE, '[ci skip]')
         uses: andymckay/cancel-action@0.2
 
-      - name: Cancel Previous Runs
-        uses: styfle/cancel-workflow-action@0.5.0
-        with:
-          access_token: ${{github.token}}
-
       - name: Yarn cache
         uses: c-hive/gha-yarn-cache@v2.1.0
 
@@ -100,7 +99,7 @@ jobs:
       - name: Monitor coverage
         # Run for all PRs and merges with DISTRIBUTION == 'wire'
         if: matrix.DISTRIBUTION == 'DISTRIBUTION_0'
-        uses: codecov/codecov-action@v1.3.2
+        uses: codecov/codecov-action@v3.0.0
         with:
           fail_ci_if_error: false
           files: ./coverage/lcov.info
@@ -127,7 +126,7 @@ jobs:
 
       - name: Storing release information
         if: contains(env.TAG, 'production') && matrix.DISTRIBUTION == 'DISTRIBUTION_0'
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: release-info.json
           path: ./release-info.json
@@ -135,7 +134,7 @@ jobs:
       # https://wire-webapp-avs.zinfra.io/
       - name: Deploy avs build to Elastic Beanstalk
         if: env.BRANCH_NAME == 'avs' && matrix.DISTRIBUTION == 'DISTRIBUTION_0'
-        uses: einaregilsson/beanstalk-deploy@v14
+        uses: einaregilsson/beanstalk-deploy@v20
         with:
           application_name: ${{env.AWS_APPLICATION_NAME}}
           aws_access_key: ${{secrets.WEBTEAM_AWS_ACCESS_KEY_ID}}
@@ -152,7 +151,7 @@ jobs:
       # Stage 1: https://wire-webapp-edge.zinfra.io/
       - name: Deploy edge build to Elastic Beanstalk
         if: env.BRANCH_NAME == 'edge' && matrix.DISTRIBUTION == 'DISTRIBUTION_0'
-        uses: einaregilsson/beanstalk-deploy@v14
+        uses: einaregilsson/beanstalk-deploy@v20
         with:
           application_name: ${{env.AWS_APPLICATION_NAME}}
           aws_access_key: ${{secrets.WEBTEAM_AWS_ACCESS_KEY_ID}}
@@ -169,7 +168,7 @@ jobs:
       # Stage 2: https://wire-webapp-dev.zinfra.io/
       - name: Deploy dev build to Elastic Beanstalk
         if: env.BRANCH_NAME == 'dev' && matrix.DISTRIBUTION == 'DISTRIBUTION_0'
-        uses: einaregilsson/beanstalk-deploy@v14
+        uses: einaregilsson/beanstalk-deploy@v20
         with:
           application_name: ${{env.AWS_APPLICATION_NAME}}
           aws_access_key: ${{secrets.WEBTEAM_AWS_ACCESS_KEY_ID}}
@@ -186,7 +185,7 @@ jobs:
       # Stage 3: https://wire-webapp-staging.zinfra.io/
       - name: Deploy staging build to Elastic Beanstalk
         if: contains(env.TAG, 'staging') && matrix.DISTRIBUTION == 'DISTRIBUTION_0'
-        uses: einaregilsson/beanstalk-deploy@v14
+        uses: einaregilsson/beanstalk-deploy@v20
         with:
           application_name: ${{env.AWS_APPLICATION_NAME}}
           aws_access_key: ${{secrets.WEBTEAM_AWS_ACCESS_KEY_ID}}
@@ -203,7 +202,7 @@ jobs:
       # Stage 4: https://wire-webapp-master.zinfra.io/
       - name: Deploy master build to Elastic Beanstalk
         if: env.BRANCH_NAME == 'master' && matrix.DISTRIBUTION == 'DISTRIBUTION_0'
-        uses: einaregilsson/beanstalk-deploy@v14
+        uses: einaregilsson/beanstalk-deploy@v20
         with:
           application_name: ${{env.AWS_APPLICATION_NAME}}
           aws_access_key: ${{secrets.WEBTEAM_AWS_ACCESS_KEY_ID}}
@@ -220,7 +219,7 @@ jobs:
       # Stage 5: https://app.wire.com/
       - name: Deploy production build to Elastic Beanstalk
         if: contains(env.TAG, 'production') && matrix.DISTRIBUTION == 'DISTRIBUTION_0'
-        uses: einaregilsson/beanstalk-deploy@v14
+        uses: einaregilsson/beanstalk-deploy@v20
         with:
           application_name: ${{env.AWS_APPLICATION_NAME}}
           aws_access_key: ${{secrets.WEBTEAM_AWS_ACCESS_KEY_ID}}
@@ -237,7 +236,7 @@ jobs:
       # Stage 6: https://mobile.wire.com
       - name: Deploy mobile build to Elastic Beanstalk
         if: env.BRANCH_NAME == 'mobile' && matrix.DISTRIBUTION == 'DISTRIBUTION_0'
-        uses: einaregilsson/beanstalk-deploy@v14
+        uses: einaregilsson/beanstalk-deploy@v20
         with:
           application_name: ${{env.AWS_APPLICATION_NAME}}
           aws_access_key: ${{secrets.WEBTEAM_AWS_ACCESS_KEY_ID}}
@@ -356,7 +355,7 @@ jobs:
 
       - name: Upload WebApp artifacts
         if: env.BUILD_DESKTOP == 'true'
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: webapp-dist
           path: ./server/dist
@@ -376,7 +375,7 @@ jobs:
       #       run all subsequent steps.
       - name: Obtaining release information artifact
         id: release-info-artifact
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v3
         continue-on-error: true
         with:
           name: release-info.json
@@ -390,7 +389,7 @@ jobs:
           echo "::set-output name=releaseInfo::$(cat ${ARTIFACT_LOCAL_PATH})"
 
       - name: Checking out 'wire-server'
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         if: ${{ steps.release-info-file.outputs.exists == 'true' }}
         with:
           repository: 'wireapp/wire-server'
@@ -410,7 +409,7 @@ jobs:
       - name: Creating Pull Request
         id: create-pr
         if: ${{ steps.release-info-file.outputs.exists == 'true' }}
-        uses: peter-evans/create-pull-request@v3
+        uses: peter-evans/create-pull-request@v4
         with:
           draft: false
           token: ${{ secrets.ZEBOT_GH_TOKEN }}

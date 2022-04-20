@@ -86,6 +86,8 @@ const UserList: React.FC<UserListProps> = ({
 }) => {
   const [maxShownUsers, setMaxShownUsers] = useState(USER_CHUNK_SIZE);
 
+  const hasMoreUsers = !truncate && users.length > maxShownUsers;
+
   const highlightedUserIds = highlightedUsers.map(user => user.id);
   const selfInTeam = userState.self().inTeam();
   const {self} = useKoSubscribableChildren(userState, ['self']);
@@ -234,13 +236,13 @@ const UserList: React.FC<UserListProps> = ({
   return (
     <>
       {content}
-      {users.length > maxShownUsers && (
+      {hasMoreUsers && (
         <InViewport
+          fullyInView={false}
           onVisible={() => setMaxShownUsers(maxShownUsers + USER_CHUNK_SIZE)}
           key={`in-viewport-${Math.random()}`}
-        >
-          <div css={{height: 100}}></div>
-        </InViewport>
+          style={{height: 10, transform: 'translateY(-60px)', width: 10}}
+        />
       )}
     </>
   );

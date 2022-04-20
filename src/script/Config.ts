@@ -19,13 +19,14 @@
 
 import {ValidationUtil} from '@wireapp/commons';
 import {createRandomUuid} from 'Util/util';
+import {Runtime} from '@wireapp/commons';
 const env = window.wire.env;
 
 export const ACCENT_ID = {
+  AMBER: 5,
   BLUE: 1,
   GREEN: 2,
-  ORANGE: 5,
-  PINK: 6,
+  PETROL: 6,
   PURPLE: 7,
   RED: 4,
   YELLOW: 3,
@@ -41,7 +42,10 @@ export class Configuration {
   readonly BRAND_NAME = env.BRAND_NAME || 'Wire';
   readonly COUNTLY_API_KEY = env.COUNTLY_API_KEY;
   readonly ENVIRONMENT = env.ENVIRONMENT || 'production';
-  readonly FEATURE = env.FEATURE;
+  readonly FEATURE = {
+    ...env.FEATURE,
+    ENABLE_EXTRA_CLIENT_ENTROPY: env.FEATURE.ENABLE_EXTRA_CLIENT_ENTROPY && Runtime.isWindows(),
+  };
   readonly MAX_GROUP_PARTICIPANTS = env.MAX_GROUP_PARTICIPANTS || 500;
   readonly MAX_VIDEO_PARTICIPANTS = env.MAX_VIDEO_PARTICIPANTS || 4;
   readonly NEW_PASSWORD_MINIMUM_LENGTH = env.NEW_PASSWORD_MINIMUM_LENGTH || ValidationUtil.DEFAULT_PASSWORD_MIN_LENGTH;

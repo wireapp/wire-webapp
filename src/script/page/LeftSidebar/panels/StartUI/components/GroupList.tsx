@@ -19,7 +19,6 @@
 
 import React from 'react';
 import {container} from 'tsyringe';
-import {registerReactComponent} from 'Util/ComponentUtil';
 import {AssetRepository} from '../../../../../assets/AssetRepository';
 import type {Conversation} from '../../../../../entity/Conversation';
 import {Router} from '../../../../../router/Router';
@@ -48,8 +47,3 @@ const GroupList: React.FC<GroupListProps> = ({
 };
 
 export default GroupList;
-
-registerReactComponent('group-list', {
-  component: GroupList,
-  template: '<div data-bind="react: {click, groups: ko.unwrap(groups)}"></div>',
-});
