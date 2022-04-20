@@ -2,157 +2,17 @@
 
 exports[`"ButtonLink" renders (dark theme) 1`] = `
 .emotion-0 {
-  color: #fff;
-  display: -webkit-inline-box !important;
-  display: -webkit-inline-flex !important;
-  display: -ms-inline-flexbox !important;
-  display: inline-flex !important;
-  font-size: 16px;
-  font-weight: 600;
-  overflow: hidden;
-  text-align: center;
-  text-overflow: ellipsis;
-  text-transform: none;
-  white-space: nowrap;
-  background-color: #0772de;
-  border: 0;
-  border-radius: 8px;
-  cursor: pointer;
-  height: 48px;
-  line-height: 48px;
-  margin-bottom: 16px;
-  max-width: 100%;
-  min-width: 150px;
-  opacity: 1;
-  outline: none;
-  padding: 0 32px;
-  -webkit-text-decoration: none;
-  text-decoration: none;
-  touch-action: manipulation;
-  -webkit-transition: all 0.24s;
-  transition: all 0.24s;
-  width: auto;
-}
-
-.emotion-0:hover,
-.emotion-0:focus {
-  background-color: rgb(7,107,209);
-  -webkit-text-decoration: none;
-  text-decoration: none;
-}
-
-.emotion-1 {
   background: #000;
   -webkit-transition: background 0.15s;
   transition: background 0.15s;
 }
 
-<div
-  className="emotion-1"
->
-  <a
-    className="emotion-0"
-  >
-    ButtonLink
-  </a>
-</div>
-`;
-
-exports[`"ButtonLink" renders 1`] = `
-.emotion-1 {
-  background: rgb(237,237,238);
-  -webkit-transition: background 0.15s;
-  transition: background 0.15s;
-}
-
-.emotion-0 {
-  color: #fff;
-  display: -webkit-inline-box !important;
-  display: -webkit-inline-flex !important;
-  display: -ms-inline-flexbox !important;
-  display: inline-flex !important;
-  font-size: 16px;
-  font-weight: 600;
-  overflow: hidden;
-  text-align: center;
-  text-overflow: ellipsis;
-  text-transform: none;
-  white-space: nowrap;
-  background-color: #0772de;
-  border: 0;
-  border-radius: 8px;
-  cursor: pointer;
-  height: 48px;
-  line-height: 48px;
-  margin-bottom: 16px;
-  max-width: 100%;
-  min-width: 150px;
-  opacity: 1;
-  outline: none;
-  padding: 0 32px;
-  -webkit-text-decoration: none;
-  text-decoration: none;
-  touch-action: manipulation;
-  -webkit-transition: all 0.24s;
-  transition: all 0.24s;
-  width: auto;
-}
-
-.emotion-0:hover,
-.emotion-0:focus {
-  background-color: rgb(7,107,209);
-  -webkit-text-decoration: none;
-  text-decoration: none;
-}
-
-<div
-  className="emotion-1"
->
-  <a
-    className="emotion-0"
-  >
-    Submit
-  </a>
-</div>
-`;
-
-exports[`"ButtonLink" renders in loading state 1`] = `
-@keyframes animation-0 {
-  0% {
-    stroke-dashoffset: 251.36;
-  }
-
-  100% {
-    stroke-dashoffset: 0;
-  }
-}
-
-@keyframes animation-1 {
-  0% {
-    -webkit-transform: rotate(0);
-    -ms-transform: rotate(0);
-    transform: rotate(0);
-  }
-
-  100% {
-    -webkit-transform: rotate(360deg);
-    -ms-transform: rotate(360deg);
-    transform: rotate(360deg);
-  }
-}
-
-.emotion-2 {
-  background: rgb(237,237,238);
-  -webkit-transition: background 0.15s;
-  transition: background 0.15s;
-}
-
 .emotion-1 {
   color: #fff;
-  display: -webkit-inline-box !important;
-  display: -webkit-inline-flex !important;
-  display: -ms-inline-flexbox !important;
-  display: inline-flex !important;
+  display: -webkit-inline-box!important;
+  display: -webkit-inline-flex!important;
+  display: -ms-inline-flexbox!important;
+  display: inline-flex!important;
   font-size: 16px;
   font-weight: 600;
   overflow: hidden;
@@ -182,22 +42,162 @@ exports[`"ButtonLink" renders in loading state 1`] = `
 
 .emotion-1:hover,
 .emotion-1:focus {
-  background-color: rgb(7,107,209);
+  background-color: rgb(7, 107, 209);
   -webkit-text-decoration: none;
   text-decoration: none;
 }
 
+<div
+  className="emotion-0"
+>
+  <a
+    className="emotion-1"
+  >
+    ButtonLink
+  </a>
+</div>
+`;
+
+exports[`"ButtonLink" renders 1`] = `
 .emotion-0 {
-  -webkit-animation: animation-0 2400ms ease-in-out infinite, animation-1 2400ms linear -1800ms infinite;
-  animation: animation-0 2400ms ease-in-out infinite, animation-1 2400ms linear -1800ms infinite;
+  background: rgb(237, 237, 238);
+  -webkit-transition: background 0.15s;
+  transition: background 0.15s;
+}
+
+.emotion-1 {
+  color: #fff;
+  display: -webkit-inline-box!important;
+  display: -webkit-inline-flex!important;
+  display: -ms-inline-flexbox!important;
+  display: inline-flex!important;
+  font-size: 16px;
+  font-weight: 600;
+  overflow: hidden;
+  text-align: center;
+  text-overflow: ellipsis;
+  text-transform: none;
+  white-space: nowrap;
+  background-color: #0772de;
+  border: 0;
+  border-radius: 8px;
+  cursor: pointer;
+  height: 48px;
+  line-height: 48px;
+  margin-bottom: 16px;
+  max-width: 100%;
+  min-width: 150px;
+  opacity: 1;
+  outline: none;
+  padding: 0 32px;
+  -webkit-text-decoration: none;
+  text-decoration: none;
+  touch-action: manipulation;
+  -webkit-transition: all 0.24s;
+  transition: all 0.24s;
+  width: auto;
+}
+
+.emotion-1:hover,
+.emotion-1:focus {
+  background-color: rgb(7, 107, 209);
+  -webkit-text-decoration: none;
+  text-decoration: none;
+}
+
+<div
+  className="emotion-0"
+>
+  <a
+    className="emotion-1"
+  >
+    Submit
+  </a>
+</div>
+`;
+
+exports[`"ButtonLink" renders in loading state 1`] = `
+@keyframes animation-0 {
+  0% {
+    stroke-dashoffset: 251.36;
+  }
+
+  100% {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes animation-1 {
+  0% {
+    -webkit-transform: rotate(0);
+    -moz-transform: rotate(0);
+    -ms-transform: rotate(0);
+    transform: rotate(0);
+  }
+
+  100% {
+    -webkit-transform: rotate(360deg);
+    -moz-transform: rotate(360deg);
+    -ms-transform: rotate(360deg);
+    transform: rotate(360deg);
+  }
+}
+
+.emotion-0 {
+  background: rgb(237, 237, 238);
+  -webkit-transition: background 0.15s;
+  transition: background 0.15s;
+}
+
+.emotion-1 {
+  color: #fff;
+  display: -webkit-inline-box!important;
+  display: -webkit-inline-flex!important;
+  display: -ms-inline-flexbox!important;
+  display: inline-flex!important;
+  font-size: 16px;
+  font-weight: 600;
+  overflow: hidden;
+  text-align: center;
+  text-overflow: ellipsis;
+  text-transform: none;
+  white-space: nowrap;
+  background-color: #0772de;
+  border: 0;
+  border-radius: 8px;
+  cursor: pointer;
+  height: 48px;
+  line-height: 48px;
+  margin-bottom: 16px;
+  max-width: 100%;
+  min-width: 150px;
+  opacity: 1;
+  outline: none;
+  padding: 0 32px;
+  -webkit-text-decoration: none;
+  text-decoration: none;
+  touch-action: manipulation;
+  -webkit-transition: all 0.24s;
+  transition: all 0.24s;
+  width: auto;
+}
+
+.emotion-1:hover,
+.emotion-1:focus {
+  background-color: rgb(7, 107, 209);
+  -webkit-text-decoration: none;
+  text-decoration: none;
+}
+
+.emotion-2 {
+  -webkit-animation: animation-0 2400ms ease-in-out infinite,animation-1 2400ms linear -1800ms infinite;
+  animation: animation-0 2400ms ease-in-out infinite,animation-1 2400ms linear -1800ms infinite;
   stroke-dasharray: 125.68;
-  -webkit-transform-origin: 50% 50%;
-  -ms-transform-origin: 50% 50%;
   transform-origin: 50% 50%;
 }
 
 <div
-  className="emotion-2"
+  className="emotion-0"
 >
   <a
     className="emotion-1"
@@ -222,7 +222,7 @@ exports[`"ButtonLink" renders in loading state 1`] = `
         stroke="rgba(255, 255, 255, 0.07999999999999996)"
       />
       <circle
-        className="emotion-0"
+        className="emotion-2"
         cx="21.5"
         cy="21.5"
         r="20"

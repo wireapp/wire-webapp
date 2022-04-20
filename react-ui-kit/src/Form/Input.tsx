@@ -18,7 +18,7 @@
  */
 
 /** @jsx jsx */
-import {CSSObject, jsx} from '@emotion/core';
+import {CSSObject, jsx} from '@emotion/react';
 import type {Property} from 'csstype';
 import React from 'react';
 
@@ -87,7 +87,7 @@ export const Input: React.FC<InputProps<HTMLInputElement>> = React.forwardRef<
   return (
     <input
       className={INPUT_CLASSNAME}
-      css={theme => inputStyle(theme, props)}
+      css={(theme: Theme) => inputStyle(theme, props)}
       ref={ref}
       type={type}
       {...filterInputProps(props)}

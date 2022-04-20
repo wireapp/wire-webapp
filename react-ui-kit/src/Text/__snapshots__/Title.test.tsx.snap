@@ -2,6 +2,12 @@
 
 exports[`"Title" renders (dark theme) 1`] = `
 .emotion-0 {
+  background: #000;
+  -webkit-transition: background 0.15s;
+  transition: background 0.15s;
+}
+
+.emotion-1 {
   color: #696c6e;
   display: block;
   font-size: 32px;
@@ -11,17 +17,11 @@ exports[`"Title" renders (dark theme) 1`] = `
   margin-bottom: 8px;
 }
 
-.emotion-1 {
-  background: #000;
-  -webkit-transition: background 0.15s;
-  transition: background 0.15s;
-}
-
 <div
-  className="emotion-1"
+  className="emotion-0"
 >
   <div
-    className="emotion-0"
+    className="emotion-1"
   >
     Title
   </div>
@@ -29,13 +29,13 @@ exports[`"Title" renders (dark theme) 1`] = `
 `;
 
 exports[`"Title" renders 1`] = `
-.emotion-1 {
-  background: rgb(237,237,238);
+.emotion-0 {
+  background: rgb(237, 237, 238);
   -webkit-transition: background 0.15s;
   transition: background 0.15s;
 }
 
-.emotion-0 {
+.emotion-1 {
   color: #696c6e;
   display: block;
   font-size: 32px;
@@ -46,10 +46,10 @@ exports[`"Title" renders 1`] = `
 }
 
 <div
-  className="emotion-1"
+  className="emotion-0"
 >
   <div
-    className="emotion-0"
+    className="emotion-1"
   >
     Title
   </div>

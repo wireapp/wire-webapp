@@ -18,7 +18,7 @@
  */
 
 import React from 'react';
-import {jsx as JSX} from '@emotion/core';
+import {jsx as JSX} from '@emotion/react';
 import renderer from 'react-test-renderer';
 
 import {StyledApp, THEME_ID} from '../Layout';

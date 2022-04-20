@@ -18,6 +18,6 @@
  */
 
 module.exports = {
-  plugins: ['@babel/plugin-transform-runtime', 'babel-plugin-emotion', '@babel/plugin-proposal-class-properties'],
+  plugins: ['@babel/plugin-transform-runtime', '@emotion', '@babel/plugin-proposal-class-properties'],
   presets: ['@babel/preset-react', '@babel/preset-typescript', '@babel/preset-env'],
 };

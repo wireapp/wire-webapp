@@ -18,7 +18,7 @@
  */
 
 /** @jsx jsx */
-import {CSSObject, jsx} from '@emotion/core';
+import {CSSObject, jsx} from '@emotion/react';
 import React from 'react';
 
 import {QueryKeys, media} from '../../mediaQueries';
@@ -57,7 +57,7 @@ export const menuOpenButtonStyle: <T>(theme: Theme, props: MenuOpenButtonProps<T
 const filterMenuOpenButtonProps = (props: MenuOpenButtonProps) => filterProps(props, ['open']);
 
 export const MenuOpenButton = (props: MenuOpenButtonProps) => (
-  <div css={theme => menuOpenButtonStyle(theme, props)} {...filterMenuOpenButtonProps(props)}>
+  <div css={(theme: Theme) => menuOpenButtonStyle(theme, props)} {...filterMenuOpenButtonProps(props)}>
     <div />
     <div />
     <div />

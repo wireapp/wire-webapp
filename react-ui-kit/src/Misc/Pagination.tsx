@@ -18,7 +18,7 @@
  */
 
 /** @jsx jsx */
-import {jsx} from '@emotion/core';
+import {jsx} from '@emotion/react';
 import React from 'react';
 
 import {COLOR} from '../Identity';
@@ -33,7 +33,7 @@ interface PaginationProps<T = HTMLDivElement> extends React.PropsWithRef<React.H
   previousPageComponent?: any;
 }
 
-export const Pagination: React.SFC<PaginationProps> = ({
+export const Pagination: React.FC<PaginationProps> = ({
   currentPage = 0,
   numberOfPages = 1,
   goPage,

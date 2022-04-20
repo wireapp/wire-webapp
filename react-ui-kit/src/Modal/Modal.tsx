@@ -18,7 +18,7 @@
  */
 
 /** @jsx jsx */
-import {CSSObject, jsx} from '@emotion/core';
+import {CSSObject, jsx} from '@emotion/react';
 import React, {CSSProperties} from 'react';
 import Color from 'color';
 
@@ -58,7 +58,7 @@ const modalBodyStyle: <T>(theme: Theme, props: ModalBodyProps<T>) => CSSObject =
 const filterModalBodyProps = (props: ModalBodyProps) => filterProps(props, ['fullscreen']);
 
 const ModalBody = (props: ModalBodyProps) => (
-  <div css={theme => modalBodyStyle(theme, props)} {...filterModalBodyProps(props)} />
+  <div css={(theme: Theme) => modalBodyStyle(theme, props)} {...filterModalBodyProps(props)} />
 );
 
 const ModalClose = (props: SVGIconProps<SVGSVGElement>) => (
@@ -167,7 +167,7 @@ interface ModalProps {
   onClose?: () => void;
 }
 
-export const Modal: React.SFC<ModalProps & React.HTMLProps<HTMLDivElement>> = ({
+export const Modal: React.FC<ModalProps & React.HTMLProps<HTMLDivElement>> = ({
   actions = [],
   children,
   bodyStyle,

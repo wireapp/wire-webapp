@@ -17,7 +17,7 @@
  *
  */
 
-import {keyframes} from '@emotion/core';
+import {keyframes} from '@emotion/react';
 
 // https://motion.wire.com/_guidelines_/rules.html
 

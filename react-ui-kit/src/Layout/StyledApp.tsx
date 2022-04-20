@@ -19,7 +19,7 @@
 
 /** @jsx jsx */
 import React from 'react';
-import {CSSObject, jsx} from '@emotion/core';
+import {CSSObject, jsx} from '@emotion/react';
 
 import {GlobalStyle} from '../GlobalStyle';
 import {filterProps} from '../util';
@@ -42,7 +42,7 @@ const filterStyledAppContainerProps = (props: StyledAppContainerProps) =>
   filterProps(props, ['backgroundColor', 'themeId']);
 
 const StyledAppContainer = (props: StyledAppContainerProps) => (
-  <div css={theme => styledAppContainerStyle(theme, props)} {...filterStyledAppContainerProps(props)} />
+  <div css={(theme: Theme) => styledAppContainerStyle(theme, props)} {...filterStyledAppContainerProps(props)} />
 );
 
 export const StyledApp = ({themeId = THEME_ID.LIGHT, children, ...props}) => (

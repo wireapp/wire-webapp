@@ -18,7 +18,7 @@
  */
 
 /** @jsx jsx */
-import {CSSObject, jsx} from '@emotion/core';
+import {CSSObject, jsx} from '@emotion/react';
 import type {Property} from 'csstype';
 import React from 'react';
 
@@ -86,7 +86,7 @@ export const TextArea: React.FC<TextAreaProps<HTMLTextAreaElement>> = React.forw
 >((props, ref) => (
   <textarea
     className={TEXTAREA_CLASSNAME}
-    css={theme => textAreaStyle(theme, props)}
+    css={(theme: Theme) => textAreaStyle(theme, props)}
     ref={ref}
     {...filterTextAreaProps(props)}
   />

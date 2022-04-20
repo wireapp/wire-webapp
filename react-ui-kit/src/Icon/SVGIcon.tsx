@@ -18,7 +18,7 @@
  */
 
 /** @jsx jsx */
-import {CSSObject, jsx} from '@emotion/core';
+import {CSSObject, jsx} from '@emotion/react';
 import React from 'react';
 
 import type {Theme} from '../Layout';
@@ -65,7 +65,7 @@ export const SVGIcon = ({
   const shadowId = shadow && Math.random().toString();
   return (
     <svg
-      css={theme => svgIconStyle(theme, props)}
+      css={(theme: Theme) => svgIconStyle(theme, props)}
       viewBox={`0 0 ${realWidth} ${realHeight}`}
       width={newWidth}
       height={newHeight}

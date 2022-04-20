@@ -18,14 +18,13 @@
  */
 
 /** @jsx jsx */
-import {Global, CSSObject, css, jsx} from '@emotion/core';
+import {Global, CSSObject, css, jsx, withTheme} from '@emotion/react';
 import emotionNormalize from 'emotion-normalize';
-import {withTheme} from 'emotion-theming';
 
 import type {Theme} from './Layout';
 import {textLinkStyle} from './Text/TextLink';
 
-const globalStyles: (theme: Theme) => CSSObject = theme => ({
+const globalStyles: (theme: Theme) => CSSObject = (theme: Theme) => ({
   '*': {
     boxSizing: 'border-box',
   },
@@ -62,6 +61,6 @@ const globalStyle = (theme: Theme) => css`
   ${globalStyles(theme)}
 `;
 
-export const GlobalStyle = withTheme(({theme}) => {
+export const GlobalStyle = withTheme(({theme}: {theme: Theme}) => {
   return <Global styles={globalStyle(theme)} />;
 });

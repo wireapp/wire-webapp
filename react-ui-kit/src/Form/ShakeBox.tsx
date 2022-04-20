@@ -18,7 +18,7 @@
  */
 
 /** @jsx jsx */
-import {jsx} from '@emotion/core';
+import {jsx} from '@emotion/react';
 import React, {useEffect, useImperativeHandle, useState} from 'react';
 
 export interface ShakeBoxProps extends React.HTMLProps<HTMLDivElement> {

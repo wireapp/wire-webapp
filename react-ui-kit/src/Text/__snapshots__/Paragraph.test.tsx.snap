@@ -1,13 +1,13 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`"Lead" renders (dark theme) 1`] = `
-.emotion-1 {
+.emotion-0 {
   background: #000;
   -webkit-transition: background 0.15s;
   transition: background 0.15s;
 }
 
-.emotion-0 {
+.emotion-1 {
   color: #fff;
   display: block;
   font-size: 24px;
@@ -18,17 +18,17 @@ exports[`"Lead" renders (dark theme) 1`] = `
   margin-top: 0;
 }
 
-@media (max-width:639px) {
-  .emotion-0 {
+@media (max-width: 639px) {
+  .emotion-1 {
     font-size: 20px;
   }
 }
 
 <div
-  className="emotion-1"
+  className="emotion-0"
 >
   <p
-    className="emotion-0"
+    className="emotion-1"
   >
     Lead
   </p>
@@ -36,14 +36,14 @@ exports[`"Lead" renders (dark theme) 1`] = `
 `;
 
 exports[`"Lead" renders 1`] = `
-.emotion-1 {
-  background: rgb(237,237,238);
+.emotion-0 {
+  background: rgb(237, 237, 238);
   -webkit-transition: background 0.15s;
   transition: background 0.15s;
 }
 
-.emotion-0 {
-  color: rgb(29,30,31);
+.emotion-1 {
+  color: rgb(29, 30, 31);
   display: block;
   font-size: 24px;
   font-weight: 300;
@@ -53,17 +53,17 @@ exports[`"Lead" renders 1`] = `
   margin-top: 0;
 }
 
-@media (max-width:639px) {
-  .emotion-0 {
+@media (max-width: 639px) {
+  .emotion-1 {
     font-size: 20px;
   }
 }
 
 <div
-  className="emotion-1"
+  className="emotion-0"
 >
   <p
-    className="emotion-0"
+    className="emotion-1"
   >
     Lead
   </p>
@@ -71,13 +71,13 @@ exports[`"Lead" renders 1`] = `
 `;
 
 exports[`"Paragraph" renders (dark theme) 1`] = `
-.emotion-1 {
+.emotion-0 {
   background: #000;
   -webkit-transition: background 0.15s;
   transition: background 0.15s;
 }
 
-.emotion-0 {
+.emotion-1 {
   color: #fff;
   display: block;
   font-size: 16px;
@@ -89,10 +89,10 @@ exports[`"Paragraph" renders (dark theme) 1`] = `
 }
 
 <div
-  className="emotion-1"
+  className="emotion-0"
 >
   <p
-    className="emotion-0"
+    className="emotion-1"
   >
     Paragraph
   </p>
@@ -100,14 +100,14 @@ exports[`"Paragraph" renders (dark theme) 1`] = `
 `;
 
 exports[`"Paragraph" renders 1`] = `
-.emotion-1 {
-  background: rgb(237,237,238);
+.emotion-0 {
+  background: rgb(237, 237, 238);
   -webkit-transition: background 0.15s;
   transition: background 0.15s;
 }
 
-.emotion-0 {
-  color: rgb(29,30,31);
+.emotion-1 {
+  color: rgb(29, 30, 31);
   display: block;
   font-size: 16px;
   font-weight: 300;
@@ -118,10 +118,10 @@ exports[`"Paragraph" renders 1`] = `
 }
 
 <div
-  className="emotion-1"
+  className="emotion-0"
 >
   <p
-    className="emotion-0"
+    className="emotion-1"
   >
     Paragraph
   </p>

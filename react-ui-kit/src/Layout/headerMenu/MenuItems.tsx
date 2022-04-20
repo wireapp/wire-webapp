@@ -19,7 +19,7 @@
 
 /** @jsx jsx */
 import React from 'react';
-import {CSSObject, jsx} from '@emotion/core';
+import {CSSObject, jsx} from '@emotion/react';
 
 import {QueryKeys, media} from '../../mediaQueries';
 import {filterProps} from '../../util';
@@ -50,5 +50,5 @@ export const menuItemsStyle: <T>(theme: Theme, props: MenuItemsProps<T>) => CSSO
 const filterMenuItemProps = (props: MenuItemsProps) => filterProps(props, ['open']);
 
 export const MenuItems = (props: MenuItemsProps) => (
-  <div css={theme => menuItemsStyle(theme, props)} {...filterMenuItemProps(props)} />
+  <div css={(theme: Theme) => menuItemsStyle(theme, props)} {...filterMenuItemProps(props)} />
 );

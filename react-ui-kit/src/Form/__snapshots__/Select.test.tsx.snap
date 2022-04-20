@@ -1,19 +1,19 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`"Select" renders 1`] = `
-.emotion-1 {
-  background: rgb(237,237,238);
+.emotion-0 {
+  background: rgb(237, 237, 238);
   -webkit-transition: background 0.15s;
   transition: background 0.15s;
 }
 
-.emotion-0 {
+.emotion-1 {
   background: #fff center right 16px no-repeat url("data:image/svg+xml;utf8,%0A%20%20%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%228%22%20height%3D%228%22%20viewBox%3D%220%200%208%208%22%3E%0A%20%20%20%20%3Cpath%20fill%3D%22rgb(29%2C%2030%2C%2031)%22%20fillRule%3D%22evenodd%22%20d%3D%22M0%202h8L4%207%22%20%2F%3E%0A%20%20%3C%2Fsvg%3E%0A");
   border: none;
   border-radius: 4px;
   box-shadow: 0 0 0 1px #696c6e;
   caret-color: #0772de;
-  color: rgb(29,30,31);
+  color: rgb(29, 30, 31);
   font-weight: 300;
   height: 56px;
   line-height: 24px;
@@ -23,53 +23,54 @@ exports[`"Select" renders 1`] = `
   width: 100%;
   -webkit-appearance: none;
   -moz-appearance: none;
+  -ms-appearance: none;
   appearance: none;
   cursor: pointer;
   font-size: 16px;
   padding-right: 30px;
 }
 
-.emotion-0::-moz-placeholder {
-  color: rgb(80,82,84);
+.emotion-1::-moz-placeholder {
+  color: rgb(80, 82, 84);
   font-size: 11px;
   text-transform: none;
   opacity: 1;
 }
 
-.emotion-0::-ms-input-placeholder {
-  color: rgb(80,82,84);
+.emotion-1::-ms-input-placeholder {
+  color: rgb(80, 82, 84);
   font-size: 11px;
   text-transform: none;
 }
 
-.emotion-0::-webkit-input-placeholder {
-  color: rgb(80,82,84);
+.emotion-1::-webkit-input-placeholder {
+  color: rgb(80, 82, 84);
   font-size: 11px;
   text-transform: none;
 }
 
-.emotion-0:focus {
+.emotion-1:focus {
   box-shadow: 0 0 0 1px #0772de;
 }
 
-.emotion-0:invalid:not(:focus) {
+.emotion-1:invalid:not(:focus) {
   box-shadow: 0 0 0 1px #696c6e;
 }
 
-.emotion-0:-moz-focusring {
+.emotion-1:-moz-focusring {
   color: transparent;
   text-shadow: 0 0 0 #000;
 }
 
-.emotion-0:disabled {
+.emotion-1:disabled {
   color: #696c6e;
 }
 
 <div
-  className="emotion-1"
+  className="emotion-0"
 >
   <select
-    className="emotion-0"
+    className="emotion-1"
   >
     <option>
       a
@@ -82,19 +83,19 @@ exports[`"Select" renders 1`] = `
 `;
 
 exports[`"Select" renders as disabled 1`] = `
-.emotion-1 {
-  background: rgb(237,237,238);
+.emotion-0 {
+  background: rgb(237, 237, 238);
   -webkit-transition: background 0.15s;
   transition: background 0.15s;
 }
 
-.emotion-0 {
-  background: rgba(71,73,75,0.16000000000000003);
+.emotion-1 {
+  background: rgba(71, 73, 75, 0.16000000000000003);
   border: none;
   border-radius: 4px;
   box-shadow: 0 0 0 1px #696c6e;
   caret-color: #0772de;
-  color: rgb(29,30,31);
+  color: rgb(29, 30, 31);
   font-weight: 300;
   height: 56px;
   line-height: 24px;
@@ -104,53 +105,54 @@ exports[`"Select" renders as disabled 1`] = `
   width: 100%;
   -webkit-appearance: none;
   -moz-appearance: none;
+  -ms-appearance: none;
   appearance: none;
   cursor: normal;
   font-size: 16px;
   padding-right: 30px;
 }
 
-.emotion-0::-moz-placeholder {
-  color: rgb(80,82,84);
+.emotion-1::-moz-placeholder {
+  color: rgb(80, 82, 84);
   font-size: 11px;
   text-transform: none;
   opacity: 1;
 }
 
-.emotion-0::-ms-input-placeholder {
-  color: rgb(80,82,84);
+.emotion-1::-ms-input-placeholder {
+  color: rgb(80, 82, 84);
   font-size: 11px;
   text-transform: none;
 }
 
-.emotion-0::-webkit-input-placeholder {
-  color: rgb(80,82,84);
+.emotion-1::-webkit-input-placeholder {
+  color: rgb(80, 82, 84);
   font-size: 11px;
   text-transform: none;
 }
 
-.emotion-0:focus {
+.emotion-1:focus {
   box-shadow: 0 0 0 1px #0772de;
 }
 
-.emotion-0:invalid:not(:focus) {
+.emotion-1:invalid:not(:focus) {
   box-shadow: 0 0 0 1px #696c6e;
 }
 
-.emotion-0:-moz-focusring {
+.emotion-1:-moz-focusring {
   color: transparent;
   text-shadow: 0 0 0 #000;
 }
 
-.emotion-0:disabled {
+.emotion-1:disabled {
   color: #696c6e;
 }
 
 <div
-  className="emotion-1"
+  className="emotion-0"
 >
   <select
-    className="emotion-0"
+    className="emotion-1"
     disabled={true}
   >
     <option>
@@ -164,19 +166,19 @@ exports[`"Select" renders as disabled 1`] = `
 `;
 
 exports[`"Select" renders as invalid 1`] = `
-.emotion-1 {
-  background: rgb(237,237,238);
+.emotion-0 {
+  background: rgb(237, 237, 238);
   -webkit-transition: background 0.15s;
   transition: background 0.15s;
 }
 
-.emotion-0 {
+.emotion-1 {
   background: #fff center right 16px no-repeat url("data:image/svg+xml;utf8,%0A%20%20%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%228%22%20height%3D%228%22%20viewBox%3D%220%200%208%208%22%3E%0A%20%20%20%20%3Cpath%20fill%3D%22rgb(29%2C%2030%2C%2031)%22%20fillRule%3D%22evenodd%22%20d%3D%22M0%202h8L4%207%22%20%2F%3E%0A%20%20%3C%2Fsvg%3E%0A");
   border: none;
   border-radius: 4px;
   box-shadow: 0 0 0 1px #e02020;
   caret-color: #0772de;
-  color: rgb(29,30,31);
+  color: rgb(29, 30, 31);
   font-weight: 300;
   height: 56px;
   line-height: 24px;
@@ -186,53 +188,54 @@ exports[`"Select" renders as invalid 1`] = `
   width: 100%;
   -webkit-appearance: none;
   -moz-appearance: none;
+  -ms-appearance: none;
   appearance: none;
   cursor: pointer;
   font-size: 16px;
   padding-right: 30px;
 }
 
-.emotion-0::-moz-placeholder {
-  color: rgb(80,82,84);
+.emotion-1::-moz-placeholder {
+  color: rgb(80, 82, 84);
   font-size: 11px;
   text-transform: none;
   opacity: 1;
 }
 
-.emotion-0::-ms-input-placeholder {
-  color: rgb(80,82,84);
+.emotion-1::-ms-input-placeholder {
+  color: rgb(80, 82, 84);
   font-size: 11px;
   text-transform: none;
 }
 
-.emotion-0::-webkit-input-placeholder {
-  color: rgb(80,82,84);
+.emotion-1::-webkit-input-placeholder {
+  color: rgb(80, 82, 84);
   font-size: 11px;
   text-transform: none;
 }
 
-.emotion-0:focus {
+.emotion-1:focus {
   box-shadow: 0 0 0 1px #0772de;
 }
 
-.emotion-0:invalid:not(:focus) {
+.emotion-1:invalid:not(:focus) {
   box-shadow: 0 0 0 1px #696c6e;
 }
 
-.emotion-0:-moz-focusring {
+.emotion-1:-moz-focusring {
   color: transparent;
   text-shadow: 0 0 0 #000;
 }
 
-.emotion-0:disabled {
+.emotion-1:disabled {
   color: #696c6e;
 }
 
 <div
-  className="emotion-1"
+  className="emotion-0"
 >
   <select
-    className="emotion-0"
+    className="emotion-1"
   >
     <option>
       a

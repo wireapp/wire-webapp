@@ -18,7 +18,7 @@
  */
 
 /** @jsx jsx */
-import {CSSObject, jsx} from '@emotion/core';
+import {CSSObject, jsx} from '@emotion/react';
 import React, {useEffect, useState} from 'react';
 
 import type {Theme} from '../Layout';
@@ -52,7 +52,7 @@ const digitInputStyle: <T>(theme: Theme, props: DigitInputProps<T>) => CSSObject
 const DigitInput: React.FC<DigitInputProps<HTMLInputElement>> = React.forwardRef<
   HTMLInputElement,
   DigitInputProps<HTMLInputElement>
->((props, ref) => <input ref={ref} css={theme => digitInputStyle(theme, props)} {...props} type="tel" />);
+>((props, ref) => <input ref={ref} css={(theme: Theme) => digitInputStyle(theme, props)} {...props} type="tel" />);
 
 export interface CodeInputProps<T = HTMLInputElement> extends InputProps<T> {
   autoFocus?: boolean;

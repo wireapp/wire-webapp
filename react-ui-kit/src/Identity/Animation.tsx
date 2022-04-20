@@ -18,14 +18,14 @@
  */
 
 const {CSSTransition, TransitionGroup} = require('react-transition-group');
-import {ClassNames, jsx as JSX} from '@emotion/core';
+import {ClassNames} from '@emotion/react';
 import React from 'react';
 
 import {DURATION, EASE} from './motions';
 
 type TransitionProps = Partial<any> & {
   children: React.ReactNode;
-  component?: keyof JSX.IntrinsicElements | React.ComponentType<any>;
+  component?: string | React.ComponentType<any>;
 };
 
 type OpacityProps = TransitionProps & {
@@ -40,7 +40,7 @@ type MovementProps = TransitionProps & {
 
 type TransitionContainerProps = React.HTMLProps<any> & {
   appear?: boolean;
-  component?: keyof JSX.IntrinsicElements;
+  component?: string;
   enter?: boolean;
   exit?: boolean;
 };

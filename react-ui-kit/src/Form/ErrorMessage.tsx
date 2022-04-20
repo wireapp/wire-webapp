@@ -18,7 +18,7 @@
  */
 
 /** @jsx jsx */
-import {CSSObject, jsx} from '@emotion/core';
+import {CSSObject, jsx} from '@emotion/react';
 import {ErrorIcon} from '../Icon';
 
 import {COLOR} from '../Identity';
@@ -44,7 +44,7 @@ export const filterErrorMessageProps = (props: ErrorMessageProps) => {
 };
 
 export const ErrorMessage = ({children, ...props}: ErrorMessageProps) => (
-  <FlexBox css={theme => errorMessageStyle(theme, props)} {...props}>
+  <FlexBox css={(theme: Theme) => errorMessageStyle(theme, props)} {...props}>
     <ErrorIcon style={{marginRight: '8px'}} aria-hidden="true" />
     <Text color={COLOR.RED} fontSize={'11px'}>
       {children}

@@ -18,7 +18,7 @@
  */
 
 /** @jsx jsx */
-import {CSSObject, jsx} from '@emotion/core';
+import {CSSObject, jsx} from '@emotion/react';
 
 import type {Theme} from '../Layout';
 import {LinkProps, linkStyle} from './Link';
@@ -42,7 +42,7 @@ const labelStyle: <T>(theme: Theme, props: LabelProps<T>) => CSSObject = (
 });
 
 export const Label = (props: LabelProps) => (
-  <label css={theme => labelStyle(theme, props)} {...filterTextProps(props)} />
+  <label css={(theme: Theme) => labelStyle(theme, props)} {...filterTextProps(props)} />
 );
 
 export type LabelLinkProps<T = HTMLAnchorElement> = LinkProps<T>;
@@ -52,5 +52,5 @@ const labelLinkStyle: <T>(theme, props: LabelLinkProps<T>) => CSSObject = (theme
 });
 
 export const LabelLink = (props: LabelProps<HTMLAnchorElement>) => (
-  <a css={theme => labelLinkStyle(theme, props)} {...filterTextProps(props)} />
+  <a css={(theme: Theme) => labelLinkStyle(theme, props)} {...filterTextProps(props)} />
 );
