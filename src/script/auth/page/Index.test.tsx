@@ -19,7 +19,6 @@
 
 import {TypeUtil} from '@wireapp/commons';
 import {ReactWrapper} from 'enzyme';
-import React from 'react';
 import {Config, Configuration} from '../../Config';
 import {initialRootState, RootState, Api} from '../module/reducer';
 import {mockStoreFactory} from '../util/test/mockStoreFactory';

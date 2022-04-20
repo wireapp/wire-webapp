@@ -17,8 +17,6 @@
  *
  */
 
-/** @jsx jsx */
-import {jsx} from '@emotion/react';
 import {ErrorMessage} from '@wireapp/react-ui-kit';
 import {Fragment} from 'react';
 import {FormattedMessage} from 'react-intl';

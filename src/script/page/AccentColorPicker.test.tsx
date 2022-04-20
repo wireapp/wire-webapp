@@ -17,7 +17,6 @@
  *
  */
 
-import React from 'react';
 import {AccentColor} from '@wireapp/commons';
 
 import {render, act} from '@testing-library/react';

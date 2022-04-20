@@ -17,10 +17,8 @@
  *
  */
 
-/** @jsx jsx */
 import React from 'react';
-import {jsx} from '@emotion/react';
-import {LinkProps, linkStyle} from '@wireapp/react-ui-kit';
+import {LinkProps, linkStyle, Theme} from '@wireapp/react-ui-kit';
 
 const linkButtonStyle = {
   background: 'none',
@@ -30,7 +28,7 @@ const linkButtonStyle = {
 };
 
 const LinkButton = (props: React.ButtonHTMLAttributes<HTMLButtonElement>) => (
-  <button css={theme => linkStyle(theme, props as unknown as LinkProps)} style={linkButtonStyle} {...props} />
+  <button css={(theme: Theme) => linkStyle(theme, props as unknown as LinkProps)} style={linkButtonStyle} {...props} />
 );
 
 export default LinkButton;

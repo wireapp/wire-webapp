@@ -17,7 +17,6 @@
  *
  */
 
-import React from 'react';
 import {fireEvent, render, waitFor, act} from '@testing-library/react';
 
 import Collection from './Collection';

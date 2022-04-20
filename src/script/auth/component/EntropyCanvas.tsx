@@ -1,4 +1,4 @@
-import React, {MouseEvent, useRef, useEffect, useState} from 'react';
+import {MouseEvent, useRef, useEffect, useState} from 'react';
 import {usePausableInterval} from '../../hooks/usePausableInterval';
 
 interface CanvasProps {

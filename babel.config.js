@@ -15,12 +15,12 @@ module.exports = {
         '@babel/plugin-proposal-class-properties',
         '@babel/plugin-proposal-nullish-coalescing-operator',
         '@babel/plugin-proposal-optional-chaining',
+        '@emotion',
       ],
       presets: [
         '@babel/preset-react',
         '@babel/preset-typescript',
         ['@babel/preset-env', {...presetEnvConfig, modules: 'commonjs'}],
-        '@emotion/babel-preset-css-prop',
       ],
     },
   },
@@ -30,11 +30,7 @@ module.exports = {
     '@babel/plugin-proposal-nullish-coalescing-operator',
     '@babel/plugin-proposal-optional-chaining',
     '@babel/plugin-syntax-dynamic-import',
+    '@emotion',
   ],
-  presets: [
-    '@babel/preset-react',
-    '@babel/preset-typescript',
-    ['@babel/preset-env', presetEnvConfig],
-    '@emotion/babel-preset-css-prop',
-  ],
+  presets: ['@babel/preset-react', '@babel/preset-typescript', ['@babel/preset-env', presetEnvConfig]],
 };

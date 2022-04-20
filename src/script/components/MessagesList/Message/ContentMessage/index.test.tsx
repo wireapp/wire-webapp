@@ -17,7 +17,6 @@
  *
  */
 
-import React from 'react';
 import ko from 'knockout';
 import ContentMessageComponent, {ContentMessageProps} from './index';
 import {act, render, waitFor} from '@testing-library/react';

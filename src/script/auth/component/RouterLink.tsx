@@ -17,8 +17,6 @@
  *
  */
 
-/** @jsx jsx */
-import {jsx} from '@emotion/react';
 import {LinkProps, linkStyle, Theme} from '@wireapp/react-ui-kit';
 import * as RouterDOM from 'react-router-dom';
 
