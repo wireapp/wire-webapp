@@ -38,7 +38,7 @@ const PreferencesRadio: React.FC<PreferencesRadioProps> = ({
   onChange,
   uieName = name,
 }) => {
-  const {current: id} = useRef(Math.random().toString(36).substr(2));
+  const {current: id} = useRef(Math.random().toString(36).slice(2));
 
   return (
     <div className="preferences-option">
