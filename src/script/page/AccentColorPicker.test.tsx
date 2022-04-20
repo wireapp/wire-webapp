@@ -23,6 +23,7 @@ import TestPage from 'Util/test/TestPage';
 
 import AccentColorPicker, {AccentColorPickerProps} from './AccentColorPicker';
 import {User} from '../entity/User';
+import ko from 'knockout';
 
 class AccentColorPickerPage extends TestPage<AccentColorPickerProps> {
   constructor(props?: AccentColorPickerProps) {
@@ -41,7 +42,7 @@ describe('AccentColorPicker', () => {
     const colorPicker = new AccentColorPickerPage({
       doSetAccentColor: () => {},
       user: {
-        accent_id: () => AccentColor.BRIGHT_ORANGE.id,
+        accent_id: ko.observable(AccentColor.BRIGHT_ORANGE.id),
       } as User,
     });
 
@@ -57,7 +58,7 @@ describe('AccentColorPicker', () => {
     const colorPicker = new AccentColorPickerPage({
       doSetAccentColor: () => {},
       user: {
-        accent_id: () => selectedAccentColorId,
+        accent_id: ko.observable(selectedAccentColorId),
       } as User,
     });
 
@@ -69,7 +70,7 @@ describe('AccentColorPicker', () => {
     const colorPicker = new AccentColorPickerPage({
       doSetAccentColor: jasmine.createSpy(),
       user: {
-        accent_id: () => 0,
+        accent_id: ko.observable(0),
       } as User,
     });
 
@@ -83,14 +84,14 @@ describe('AccentColorPicker', () => {
     const colorPicker = new AccentColorPickerPage({
       doSetAccentColor: jasmine.createSpy(),
       user: {
-        accent_id: () => 0,
+        accent_id: ko.observable(0),
       } as User,
     });
 
     AccentColor.ACCENT_COLORS.forEach(accentColor => {
       colorPicker['driver'].setProps({
         user: {
-          accent_id: () => accentColor.id,
+          accent_id: ko.observable(accentColor.id),
         },
       });
       expect(colorPicker.getAccentColorInput(accentColor.id).props().checked).toBe(true);
