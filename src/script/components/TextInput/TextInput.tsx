@@ -1,4 +1,3 @@
-/* eslint-disable sort-keys-fix/sort-keys-fix */
 /*
  * Wire
  * Copyright (C) 2018 Wire Swiss GmbH

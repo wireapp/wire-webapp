@@ -1,3 +1,4 @@
+/* eslint-disable sort-keys-fix/sort-keys-fix */
 import {CSSObject} from '@emotion/core';
 
 export const getIconCSS = (fill?: string): CSSObject => ({
@@ -33,16 +34,15 @@ export const getInputCSS = (disabled?: boolean, borderColor?: string): CSSObject
   '&::placeholder': {
     color: 'var(--text-input-placeholder)',
   },
+  '&:hover': {
+    borderColor: !disabled && 'var(--text-input-border-hover)',
+  },
   '&:focus, &:active': {
     '& + label': {
       color: !disabled && 'var(--blue-500)',
     },
     borderColor: !disabled && 'var(--blue-500)',
   },
-  '&:hover': {
-    borderColor: !disabled && 'var(--text-input-border-hover)',
-  },
-  '&[disabled]': {},
   ':-ms-input-placeholder': {
     // Internet Explorer 10-11
     color: 'var(--text-input-placeholder)',
