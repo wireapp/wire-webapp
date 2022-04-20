@@ -51,6 +51,13 @@
   flex-shrink: 0;
   justify-content: flex-start;
   padding: 0 12px;
+  border-bottom: 1px solid var(--sidebar-border-color);
+}
+
+body.theme-dark {
+  .left-list-header {
+    border-bottom-color: var(--gray-95);
+  }
 }
 
 .left-list-header-start-ui {
@@ -70,22 +77,23 @@
 
   .availability-state-label {
     .ellipsis-nowrap;
-    .label-bold-xs;
-    display: inline-block;
-    line-height: 12px;
+    .heading-h3;
 
+    display: inline-block;
     text-align: center;
+    text-transform: uppercase;
   }
 }
 
 .left-list-header-text {
   .ellipsis-nowrap;
-  .label-bold-xs;
+  .heading-h3;
 
   display: inline-block;
   max-width: @conversation-list-width - 40px;
   flex-grow: 1;
   text-align: center;
+  text-transform: uppercase;
 }
 
 .left-list-header-close-button {

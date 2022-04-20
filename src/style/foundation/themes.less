@@ -28,8 +28,12 @@ body.theme-default {
   // -------------------------------------------
   // Framework
   // ----------------------------------------------------------------------------
-  @app-bg: #fafafa;
-  @app-bg-secondary: #feffff;
+  @app-bg: var(--gray-10);
+  @sidebar-bg: var(--gray-20);
+  @sidebar-border-color: var(--gray-50);
+  @border-color: var(--gray-40);
+  @main-color: var(--black);
+  @app-bg-secondary: var(--white);
   @conversation-list-bg-opacity: fade(#000, 64%);
   @sidebar-box-shadow: #eee;
   @sidebar-box-shadow-lg: rgba(0, 0, 0, 0.12);
@@ -91,11 +95,13 @@ body.theme-dark {
   // ----------------------------------------------------------------------------
   // Framework
   // ----------------------------------------------------------------------------
-  @app-bg: #17181a;
-  @app-bg-secondary: #202123;
+  @app-bg: var(--gray-95);
+  @sidebar-bg: var(--gray-100);
+  @sidebar-border-color: var(--gray-95);
+  @main-color: var(--white);
+  @border-color: var(--gray-90);
+  @app-bg-secondary: var(--black);
   @conversation-list-bg-opacity: fade(#000, 78%);
-  @sidebar-box-shadow: #1c1d1f;
-  @sidebar-box-shadow-lg: rgba(0, 0, 0, 0.12);
 
   // ----------------------------------------------------------------------------
   // Modal

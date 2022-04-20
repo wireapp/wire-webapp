@@ -181,44 +181,51 @@ const Conversations: React.FC<ConversationsProps> = ({
         <li className="conversations-footer-list-item">
           <button
             type="button"
-            className="button-icon-large"
+            className="conversations-footer-btn"
             onClick={() => switchList(ListState.START_UI)}
             title={t('tooltipConversationsStart', Shortcut.getShortcutTooltip(ShortcutType.START))}
             data-uie-name="go-people"
           >
-            <Icon.People />
+            <Icon.People aria-hidden="true" />
+            {t('conversationFooterContacts')}
           </button>
         </li>
 
         <li className="conversations-footer-list-item">
           <button
             type="button"
-            className={`button-icon-large ${viewStyle === ConverationViewStyle.RECENT ? 'accent-fill' : ''}`}
+            role="tab"
+            className={`conversations-footer-btn ${viewStyle === ConverationViewStyle.RECENT ? 'active' : ''}`}
             onClick={() => setViewStyle(ConverationViewStyle.RECENT)}
             title={t('conversationViewTooltip')}
             data-uie-name="go-recent-view"
             data-uie-status={viewStyle === ConverationViewStyle.RECENT ? 'active' : 'inactive'}
+            aria-selected={viewStyle === ConverationViewStyle.RECENT}
           >
-            <Icon.ConversationsRecent />
+            <Icon.ConversationsRecent aria-hidden="true" />
+            {t('conversationViewTooltip')}
           </button>
         </li>
         <li className="conversations-footer-list-item">
           <button
             type="button"
-            className={`button-icon-large ${viewStyle === ConverationViewStyle.FOLDER ? 'accent-fill' : ''}`}
+            role="tab"
+            className={`conversations-footer-btn ${viewStyle === ConverationViewStyle.FOLDER ? 'active' : ''}`}
             onClick={() => setViewStyle(ConverationViewStyle.FOLDER)}
             title={t('folderViewTooltip')}
             data-uie-name="go-folder-view"
             data-uie-status={viewStyle === ConverationViewStyle.FOLDER ? 'active' : 'inactive'}
+            aria-selected={viewStyle === ConverationViewStyle.FOLDER}
           >
-            <Icon.ConversationsFolder />
+            <Icon.ConversationsFolder aria-hidden="true" />
+            {t('folderViewTooltip')}
           </button>
         </li>
         {archivedConversations.length > 0 && (
           <li className="conversations-footer-list-item">
             <button
               type="button"
-              className="button-icon-large"
+              className="conversations-footer-btn"
               data-uie-name="go-archive"
               onClick={() => switchList(ListState.ARCHIVE)}
               title={t('tooltipConversationsArchived', archivedConversations.length)}
