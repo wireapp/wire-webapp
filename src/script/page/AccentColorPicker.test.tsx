@@ -17,83 +17,86 @@
  *
  */
 
+import React from 'react';
 import {AccentColor} from '@wireapp/commons';
 
-import TestPage from 'Util/test/TestPage';
+import {render, act} from '@testing-library/react';
 
 import AccentColorPicker, {AccentColorPickerProps} from './AccentColorPicker';
 import {User} from '../entity/User';
-
-class AccentColorPickerPage extends TestPage<AccentColorPickerProps> {
-  constructor(props?: AccentColorPickerProps) {
-    super(AccentColorPicker, props);
-  }
-
-  getAccentColors = () => this.get('input[data-uie-name="do-set-accent-color"]');
-  getAccentColorInput = (accentColorId: number) =>
-    this.get(`input[data-uie-name="do-set-accent-color"][data-uie-value=${accentColorId}]`);
-  changeAccentColorInput = (accentColorId: number) =>
-    this.changeValue(this.getAccentColorInput(accentColorId), {checked: true});
-}
+import ko from 'knockout';
 
 describe('AccentColorPicker', () => {
   it('shows expected accent colors', async () => {
-    const colorPicker = new AccentColorPickerPage({
+    const props: AccentColorPickerProps = {
       doSetAccentColor: () => {},
       user: {
-        accent_id: () => AccentColor.BRIGHT_ORANGE.id,
+        accent_id: ko.observable(AccentColor.BRIGHT_ORANGE.id),
       } as User,
-    });
+    };
+    const {container} = render(<AccentColorPicker {...props} />);
 
-    expect(colorPicker.getAccentColors().exists()).toBe(true);
-    expect(colorPicker.getAccentColors().length).toBe(AccentColor.ACCENT_COLORS.length);
-    AccentColor.ACCENT_COLORS.forEach(accentColor =>
-      expect(colorPicker.getAccentColorInput(accentColor.id).exists()).toBe(true),
+    expect(container.querySelectorAll('[data-uie-name="do-set-accent-color"]').length).toBe(
+      AccentColor.ACCENT_COLORS.length,
     );
   });
 
   it('selects users current accent color', async () => {
     const selectedAccentColorId = AccentColor.BRIGHT_ORANGE.id;
-    const colorPicker = new AccentColorPickerPage({
+    const props = {
       doSetAccentColor: () => {},
       user: {
-        accent_id: () => selectedAccentColorId,
+        accent_id: ko.observable(selectedAccentColorId),
       } as User,
-    });
+    };
+    const {container} = render(<AccentColorPicker {...props} />);
 
-    expect(colorPicker.getAccentColorInput(selectedAccentColorId).exists()).toBe(true);
-    expect(colorPicker.getAccentColorInput(selectedAccentColorId).props().checked).toBe(true);
+    const input: HTMLInputElement = container.querySelector(
+      `[data-uie-name="do-set-accent-color"][data-uie-value="${selectedAccentColorId}"]`,
+    );
+    expect(input).not.toBe(null);
+    expect(input.checked).toBe(true);
   });
 
   it('updates users accent color on click', async () => {
-    const colorPicker = new AccentColorPickerPage({
+    const props = {
       doSetAccentColor: jasmine.createSpy(),
       user: {
-        accent_id: () => 0,
+        accent_id: ko.observable(0),
       } as User,
-    });
+    };
+    const {container} = render(<AccentColorPicker {...props} />);
 
     AccentColor.ACCENT_COLORS.forEach(accentColor => {
-      colorPicker.changeAccentColorInput(accentColor.id);
-      expect(colorPicker.getProps().doSetAccentColor).toHaveBeenCalledWith(accentColor.id);
+      act(() => {
+        (
+          container.querySelector(
+            `[data-uie-name="do-set-accent-color"][data-uie-value="${accentColor.id}"]`,
+          ) as HTMLInputElement
+        ).click();
+      });
+      expect(props.doSetAccentColor).toHaveBeenCalledWith(accentColor.id);
     });
   });
 
   it('selects color on remote user accent color update', async () => {
-    const colorPicker = new AccentColorPickerPage({
+    const props = {
       doSetAccentColor: jasmine.createSpy(),
       user: {
-        accent_id: () => 0,
+        accent_id: ko.observable(0),
       } as User,
-    });
+    };
+    const {container} = render(<AccentColorPicker {...props} />);
 
     AccentColor.ACCENT_COLORS.forEach(accentColor => {
-      colorPicker['driver'].setProps({
-        user: {
-          accent_id: () => accentColor.id,
-        },
+      act(() => {
+        props.user.accent_id(accentColor.id);
       });
-      expect(colorPicker.getAccentColorInput(accentColor.id).props().checked).toBe(true);
+      const input: HTMLInputElement = container.querySelector(
+        `[data-uie-name="do-set-accent-color"][data-uie-value="${accentColor.id}"]`,
+      );
+      expect(input).not.toBe(null);
+      expect(input.checked).toBe(true);
     });
   });
 });
