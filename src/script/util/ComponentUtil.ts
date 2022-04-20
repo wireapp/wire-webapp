@@ -20,25 +20,9 @@
 import ko, {Unwrapped} from 'knockout';
 import React, {useEffect, useState} from 'react';
 import {createRoot} from 'react-dom/client';
-interface RegisterReactComponent<Props> {
-  component: React.ComponentType<Props>;
-}
-
-interface RegisterReactComponentWithTemplate<T> extends RegisterReactComponent<T> {
-  bindings?: never;
-  template: string;
-}
-
-interface RegisterReactComponentWithBindings<T> extends RegisterReactComponent<T> {
-  bindings: string;
-  template?: never;
-}
 
 /**
- * Registers a static react component against the ko world.
- * A Static component is a component that will not get updates for the observables directly given to it.
- * It can still react to nested observables given by using the `useKoSubribableChildren` hook.
- * A Static component is much optimal, in term of performance, that calling registerReactComponent (that will get a full state update everytime an observable changes).
+ * Registers a react component against the ko world.
  *
  * @param name Name of the component to register. can be used a `<component-name>` directly in ko
  * @param {component}
@@ -52,17 +36,15 @@ export function registerStaticReactComponent<Props>(name: string, component: Rea
     template: '<!-- -->', // We do not need any particular template as this is going to be replaced by react content
     viewModel: {
       createViewModel: (params: Props, {element}: {element: HTMLElement}) => {
-        const unwrappedParams: Props = Object.entries(params)
-          .filter(([key]) => key !== '$raw') // Filter ko default $raw values
-          .reduce((acc, [key, value]) => {
-            return {...acc, [key]: ko.unwrap(value)};
-          }, {} as Props);
-        const root = createRoot(element);
-        root.render(React.createElement(component, unwrappedParams));
-
+        let state: Props = resolveObservables(params);
+        const subscription = subscribeProperties(params, updates => {
+          state = {...state, ...updates};
+          ReactDOM.render(React.createElement(component, state), element);
+        });
         return {
           dispose() {
-            root.unmount();
+            ReactDOM.unmountComponentAtNode(element);
+            subscription.dispose();
           },
         };
       },
@@ -71,42 +53,14 @@ export function registerStaticReactComponent<Props>(name: string, component: Rea
 }
 
 /**
- * Registers a react component that will get a full state update every time parameter observable gets an update.
- *
- * @deprecated Please use `registerStaticReactComponent` instead. Just use it if you need observable updates from direct parameters
- *   eg. `<component params="myObservable">` if you need your component to update when `myObservable` changes, you will need this function
- * @param name Name of the component to register. can be used a `<component-name>` directly in ko
- * @param {component}
- */
-export function registerReactComponent<Props>(
-  name: string,
-  {
-    template,
-    bindings,
-    component,
-  }: RegisterReactComponentWithBindings<Props> | RegisterReactComponentWithTemplate<Props>,
-) {
-  if (!ko.components.isRegistered(name)) {
-    ko.components.register(name, {
-      template: template ?? `<!-- ko react: {${bindings}} --><!-- /ko -->`,
-      viewModel: function (knockoutParams: Props) {
-        const bindingsString = bindings ?? /react: ?{([^]*)}/.exec(template)[1];
-        const pairs = bindingsString?.split(',');
-        const neededParams = pairs?.map(pair => {
-          const [name, value = name] = pair.split(':');
-          return value.replace(/ko\.unwrap\(|\)/g, '').trim();
-        }) as (keyof Props)[];
-
-        neededParams.forEach(param => {
-          if (!knockoutParams.hasOwnProperty(param)) {
-            knockoutParams[param] = undefined;
-          }
-        });
-        Object.assign(this, knockoutParams);
-        this.reactComponent = component;
-      },
-    });
-  }
+- * Registers a react component that will get a full state update every time parameter observable gets an update.
+- *
+- * @deprecated Please use `registerStaticReactComponent` instead. Just use it if you need observable updates from direct parameters
+- * @param name Name of the component to register. can be used a `<component-name>` directly in ko
+- * @param {component}
+- */
+export function registerReactComponent<Props>(name: string, {component}: {component: React.ComponentType<Props>}) {
+  return registerStaticReactComponent(name, component);
 }
 
 type Subscribables<T> = {
@@ -117,6 +71,46 @@ type UnwrappedValues<T, S = Subscribables<T>> = {
   [Key in keyof S]: Unwrapped<S[Key]>;
 };
 
+const resolveObservables = <C extends keyof Subscribables<P>, P extends Partial<Record<C, ko.Subscribable>>>(
+  object: P,
+  children?: C[],
+): UnwrappedValues<P> => {
+  const properties = children ?? (Object.keys(object).filter(key => key !== '$raw') as C[]);
+  return properties.reduce<UnwrappedValues<P>>((acc, child) => {
+    acc[child] = ko.unwrap(object?.[child]);
+    return acc;
+  }, {} as UnwrappedValues<P>);
+};
+
+const subscribeProperties = <C extends keyof Subscribables<P>, P extends Partial<Record<C, ko.Subscribable>>>(
+  object: P,
+  onUpdate: (updates: Partial<UnwrappedValues<P>>) => void,
+  children?: C[],
+) => {
+  const properties = children ?? (Object.keys(object).filter(key => key !== '$raw') as C[]);
+  onUpdate(resolveObservables(object, children));
+
+  const subscriptions = properties
+    .filter(child => ko.isSubscribable(object?.[child]))
+    .map(child => {
+      const subscribable = object[child];
+      let batchedUpdates = {};
+      let batchTimeout: NodeJS.Timeout;
+      return subscribable?.subscribe((value: Unwrapped<typeof subscribable>) => {
+        clearTimeout(batchTimeout);
+        batchedUpdates = {...batchedUpdates, [child]: value};
+        batchTimeout = setTimeout(() => {
+          onUpdate(batchedUpdates);
+          batchedUpdates = {};
+        });
+      });
+    });
+
+  return {
+    dispose: () => subscriptions.forEach(subscription => subscription?.dispose()),
+  };
+};
+
 export const useKoSubscribableChildren = <
   C extends keyof Subscribables<P>,
   P extends Partial<Record<C, ko.Subscribable>>,
@@ -124,22 +118,14 @@ export const useKoSubscribableChildren = <
   parent: P,
   children: C[],
 ): UnwrappedValues<P> => {
-  const getInitialState = (root: P): UnwrappedValues<P> =>
-    children.reduce((acc, child) => {
-      acc[child] = root?.[child]?.();
-      return acc;
-    }, {} as UnwrappedValues<P>);
-
-  const [state, setState] = useState<UnwrappedValues<P>>(getInitialState(parent));
+  const [state, setState] = useState<UnwrappedValues<P>>(resolveObservables(parent, children));
   useEffect(() => {
-    setState(getInitialState(parent));
-    const subscriptions = children.map(child => {
-      const subscribable = parent?.[child];
-      return subscribable?.subscribe((value: Unwrapped<typeof subscribable>) => {
-        setState(prevState => ({...prevState, [child]: value}));
-      });
-    });
-    return () => subscriptions.forEach(subscription => subscription?.dispose());
+    const subscription = subscribeProperties(
+      parent,
+      updates => setState(currentState => ({...currentState, ...updates})),
+      children,
+    );
+    return () => subscription.dispose();
   }, [parent]);
 
   return state;
