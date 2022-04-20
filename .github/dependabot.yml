@@ -1,5 +1,6 @@
 version: 2
 updates:
+  # Webapp configs
   - package-ecosystem: npm
     directory: '/app-config'
     schedule:
@@ -9,6 +10,8 @@ updates:
     open-pull-requests-limit: 99
     labels:
       - 'type: chore 🧹'
+
+  # Webapp frontend dependencies
   - package-ecosystem: npm
     directory: '/'
     schedule:
@@ -36,6 +39,8 @@ updates:
         versions:
           - '> 4.3.0'
       - dependency-name: '@wireapp/avs'
+
+  # Server dependencies
   - package-ecosystem: npm
     directory: '/server'
     schedule:
@@ -53,23 +58,10 @@ updates:
       - dependency-name: '@types/node'
         versions:
           - '>= 13.a'
-  - package-ecosystem: npm
-    directory: '/electron'
-    schedule:
-      interval: weekly
-      day: sunday
-      time: '16:00'
-      timezone: 'Europe/Berlin'
+
+  # Github actions
+  - package-ecosystem: 'github-actions'
+    directory: '/'
     open-pull-requests-limit: 99
-    labels:
-      - 'type: chore 🧹'
-    ignore:
-      - dependency-name: electron
-        versions:
-          - '>= 12.a'
-      - dependency-name: '@types/node'
-        versions:
-          - '>= 13.a'
-      - dependency-name: 'husky'
-        versions:
-          - '>= 5.a'
+    schedule:
+      interval: 'daily'

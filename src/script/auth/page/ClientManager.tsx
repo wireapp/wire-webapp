@@ -45,6 +45,7 @@ const ClientManager = ({doGetAllClients, doLogout}: Props & ConnectedProps & Dis
       history.push(ROUTE.INDEX);
     } catch (error) {}
   };
+
   return (
     <Page>
       <ContainerXS

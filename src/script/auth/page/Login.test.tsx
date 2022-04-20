@@ -88,7 +88,10 @@ describe('Login', () => {
     loginPage.clickLoginButton();
 
     await waitForExpect(() => {
-      expect(actionRoot.authAction.doLogin).toHaveBeenCalledWith({clientType: ClientType.PERMANENT, email, password});
+      expect(actionRoot.authAction.doLogin).toHaveBeenCalledWith(
+        {clientType: ClientType.PERMANENT, email, password},
+        undefined,
+      );
     });
 
     expect(historyPushSpy).toHaveBeenCalledWith(ROUTE.HISTORY_INFO as any);
@@ -122,7 +125,10 @@ describe('Login', () => {
     loginPage.clickLoginButton();
 
     await waitForExpect(() => {
-      expect(actionRoot.authAction.doLogin).toHaveBeenCalledWith({clientType: ClientType.PERMANENT, email, password});
+      expect(actionRoot.authAction.doLogin).toHaveBeenCalledWith(
+        {clientType: ClientType.PERMANENT, email, password},
+        undefined,
+      );
     });
 
     expect(historyPushSpy).toHaveBeenCalledWith(ROUTE.CLIENTS as any);
@@ -155,7 +161,10 @@ describe('Login', () => {
     loginPage.clickLoginButton();
 
     await waitForExpect(() => {
-      expect(actionRoot.authAction.doLogin).toHaveBeenCalledWith({clientType: ClientType.PERMANENT, handle, password});
+      expect(actionRoot.authAction.doLogin).toHaveBeenCalledWith(
+        {clientType: ClientType.PERMANENT, handle, password},
+        undefined,
+      );
     });
 
     expect(historyPushSpy).toHaveBeenCalledWith(ROUTE.HISTORY_INFO as any);

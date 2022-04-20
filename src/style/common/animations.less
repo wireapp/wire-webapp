@@ -59,3 +59,16 @@
     }
   }
 }
+
+.slide-in-left {
+  &-enter {
+    opacity: 0;
+    transform: translateX(24px);
+    transition: all @animation-timing-slow @ease-out-expo;
+
+    &&-active {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+}
