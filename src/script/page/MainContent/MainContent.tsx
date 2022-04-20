@@ -40,7 +40,7 @@ type LeftSidebarProps = {
   contentViewModel: ContentViewModel;
   conversationState?: ConversationState;
 };
-const Animated: React.FC = ({children, ...rest}) => {
+const Animated: React.FC<{children: React.ReactNode}> = ({children, ...rest}) => {
   return (
     <CSSTransition classNames="slide-in-left" timeout={{enter: 500}} {...rest}>
       {children}

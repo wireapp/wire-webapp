@@ -27,11 +27,12 @@ import SVGProvider from '../util/SVGProvider';
 import {Config} from '../../Config';
 
 export interface Props extends React.HTMLAttributes<HTMLDivElement> {
+  children: React.ReactNode;
   onCookiePolicyBannerClose?: (event: React.MouseEvent<HTMLElement>) => void;
   showCookiePolicyBanner?: boolean;
 }
 
-export const WirelessContainer: React.SFC<Props> = ({showCookiePolicyBanner, onCookiePolicyBannerClose, children}) => {
+export const WirelessContainer: React.FC<Props> = ({showCookiePolicyBanner, onCookiePolicyBannerClose, children}) => {
   const {formatMessage: _} = useIntl();
   return (
     <div

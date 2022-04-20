@@ -18,7 +18,7 @@
  */
 
 import React from 'react';
-import {css} from '@emotion/core';
+import {css} from '@emotion/react';
 import type {ConversationLabel} from 'src/script/conversation/ConversationLabelRepository';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import ConversationListCell from 'Components/list/ConversationListCell';

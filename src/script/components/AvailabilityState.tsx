@@ -20,7 +20,7 @@
 import React from 'react';
 import cx from 'classnames';
 import {Availability} from '@wireapp/protocol-messaging';
-import {CSSObject} from '@emotion/core';
+import {CSSObject} from '@emotion/react';
 
 import {CSS_SQUARE} from 'Util/CSSMixin';
 import Icon from './Icon';

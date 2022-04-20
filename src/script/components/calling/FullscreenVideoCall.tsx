@@ -17,7 +17,7 @@
  *
  */
 
-import {css, CSSObject} from '@emotion/core';
+import {css, CSSObject} from '@emotion/react';
 import {CALL_TYPE, CONV_TYPE} from '@wireapp/avs';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import {amplify} from 'amplify';

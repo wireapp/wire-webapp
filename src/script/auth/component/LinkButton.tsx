@@ -19,7 +19,7 @@
 
 /** @jsx jsx */
 import React from 'react';
-import {jsx} from '@emotion/core';
+import {jsx} from '@emotion/react';
 import {LinkProps, linkStyle} from '@wireapp/react-ui-kit';
 
 const linkButtonStyle = {
