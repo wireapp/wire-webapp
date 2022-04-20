@@ -62,7 +62,6 @@
     "@faker-js/faker": "6.1.2",
     "@formatjs/cli": "4.8.3",
     "@testing-library/react": "13.1.1",
-    "@testing-library/react-hooks": "8.0.0",
     "@types/adm-zip": "0.5.0",
     "@types/classnames": "2.3.1",
     "@types/dexie-batch": "0.4.3",
