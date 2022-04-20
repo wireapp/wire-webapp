@@ -19,7 +19,7 @@
 
 import React from 'react';
 import {CSSTransition, SwitchTransition} from 'react-transition-group';
-import {css} from '@emotion/core';
+import {css} from '@emotion/react';
 import {registerStaticReactComponent, useKoSubscribableChildren} from 'Util/ComponentUtil';
 
 import {ContentViewModel, ContentState} from '../../view_model/ContentViewModel';
