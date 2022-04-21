@@ -88,8 +88,4 @@ const BaseToggle: React.FC<BaseToggleProps> = ({
 
 export default BaseToggle;
 
-registerReactComponent('base-toggle', {
-  component: BaseToggle,
-  template:
-    '<div class="base-toggle" data-bind="react: {isChecked: ko.unwrap(isChecked), isDisabled: ko.unwrap(isDisabled), setIsChecked: onToggle, toggleName: toggleName, infoText: infoText, extendedInfoText: extendedInfoText, extendedInfo }"></div>',
-});
+registerReactComponent('base-toggle', BaseToggle);

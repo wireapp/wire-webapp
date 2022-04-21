@@ -66,4 +66,4 @@ const ParticipantMicOnIcon: React.FC<ParticipantMicOnIconProps> = ({
 
 export default ParticipantMicOnIcon;
 
-registerReactComponent('participant-mic-on-icon', {component: ParticipantMicOnIcon});
+registerReactComponent('participant-mic-on-icon', ParticipantMicOnIcon);

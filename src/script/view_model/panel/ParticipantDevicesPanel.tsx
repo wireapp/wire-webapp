@@ -69,4 +69,4 @@ const ParticipantDevicesPanel: React.FC<ParticipantDevicesPanelProps> = ({reposi
 
 export default ParticipantDevicesPanel;
 
-registerReactComponent('participant-devices-panel', {component: ParticipantDevicesPanel});
+registerReactComponent('participant-devices-panel', ParticipantDevicesPanel);

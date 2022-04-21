@@ -124,4 +124,4 @@ const MentionSuggestionList: React.FunctionComponent<MentionSuggestionListProps>
 
 export default MentionSuggestionList;
 
-registerReactComponent('mention-suggestions', {component: MentionSuggestionList});
+registerReactComponent('mention-suggestions', MentionSuggestionList);

@@ -276,4 +276,4 @@ const ParticipantItem = <UserType extends User | ServiceEntity>(
 
 export default ParticipantItem;
 
-registerReactComponent('participant-item', {component: ParticipantItem});
+registerReactComponent('participant-item', ParticipantItem);

@@ -51,4 +51,4 @@ const RestrictedFile: React.FC<RestrictedFileProps> = ({asset}) => {
 
 export default RestrictedFile;
 
-registerReactComponent<RestrictedFileProps>('file-restricted', {component: RestrictedFile});
+registerReactComponent('file-restricted', RestrictedFile);

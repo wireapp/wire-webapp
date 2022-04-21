@@ -36,4 +36,4 @@ const LoadingBar: React.FC<LoadingBarProps> = ({progress, message}) => (
 
 export default LoadingBar;
 
-registerReactComponent('loading-bar', {component: LoadingBar});
+registerReactComponent('loading-bar', LoadingBar);

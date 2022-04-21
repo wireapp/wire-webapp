@@ -75,4 +75,4 @@ const LegalHoldDot: React.FC<LegalHoldDotProps> = ({
 
 export default LegalHoldDot;
 
-registerReactComponent<LegalHoldDotProps>('legal-hold-dot', {component: LegalHoldDot});
+registerReactComponent('legal-hold-dot', LegalHoldDot);

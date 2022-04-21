@@ -119,4 +119,4 @@ const TextInput: React.ForwardRefRenderFunction<HTMLDivElement, UserInputProps> 
 
 export default React.forwardRef(TextInput);
 
-registerReactComponent<UserInputProps>('text-input', {component: TextInput});
+registerReactComponent('text-input', TextInput);

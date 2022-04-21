@@ -68,4 +68,4 @@ const ClassifiedBar: React.FC<ClassifiedBarProps> = ({users, classifiedDomains, 
 
 export default ClassifiedBar;
 
-registerReactComponent('classified-bar', {component: ClassifiedBar});
+registerReactComponent('classified-bar', ClassifiedBar);

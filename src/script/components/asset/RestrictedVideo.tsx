@@ -47,4 +47,4 @@ const RestrictedVideo: React.FC<RestrictedVideoProps> = ({showMessage = true, is
 
 export default RestrictedVideo;
 
-registerReactComponent<RestrictedVideoProps>('video-restricted', {component: RestrictedVideo});
+registerReactComponent('video-restricted', RestrictedVideo);

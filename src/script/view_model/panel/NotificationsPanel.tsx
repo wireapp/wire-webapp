@@ -89,4 +89,4 @@ const NotificationsPanel: React.FC<NotificationsPanelProps> = ({
 
 export default NotificationsPanel;
 
-registerReactComponent('notifications-panel', {component: NotificationsPanel});
+registerReactComponent('notifications-panel', NotificationsPanel);

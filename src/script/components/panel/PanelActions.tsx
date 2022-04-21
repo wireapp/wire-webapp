@@ -54,4 +54,4 @@ const PanelActions: React.FC<PanelActionsProps> = ({items}) => {
 
 export default PanelActions;
 
-registerReactComponent('panel-actions', {component: PanelActions});
+registerReactComponent('panel-actions', PanelActions);

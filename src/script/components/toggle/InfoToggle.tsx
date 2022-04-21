@@ -67,8 +67,4 @@ const InfoToggle: React.FC<InfoToggleProps> = ({dataUieName, info, isChecked, is
 
 export default InfoToggle;
 
-registerReactComponent('info-toggle', {
-  component: InfoToggle,
-  template:
-    '<div class="info-toggle" data-bind="react: {isChecked: ko.unwrap(isChecked), setIsChecked: isChecked, dataUieName, info, isDisabled, name}"></div>',
-});
+registerReactComponent('info-toggle', InfoToggle);

@@ -254,4 +254,4 @@ const UserActions: React.FC<UserActionsProps> = ({
 
 export default UserActions;
 
-registerReactComponent('user-actions', {component: UserActions});
+registerReactComponent('user-actions', UserActions);

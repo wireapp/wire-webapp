@@ -19,7 +19,7 @@
 
 import React from 'react';
 import {CSSTransition, SwitchTransition} from 'react-transition-group';
-import {registerStaticReactComponent, useKoSubscribableChildren} from 'Util/ComponentUtil';
+import {registerReactComponent, useKoSubscribableChildren} from 'Util/ComponentUtil';
 
 import {ContentViewModel, ContentState} from '../../view_model/ContentViewModel';
 import {t} from 'Util/LocalizerUtil';
@@ -156,4 +156,4 @@ const MainContent: React.FC<LeftSidebarProps> = ({
 
 export default MainContent;
 
-registerStaticReactComponent('main-content', MainContent);
+registerReactComponent('main-content', MainContent);

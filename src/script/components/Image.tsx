@@ -95,4 +95,4 @@ const Image: React.FC<ImageProps> = ({
 
 export default Image;
 
-registerReactComponent<ImageProps>('image-component', {component: Image});
+registerReactComponent('image-component', Image);

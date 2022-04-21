@@ -19,7 +19,7 @@
 
 import React, {useEffect} from 'react';
 import {CSSTransition, SwitchTransition} from 'react-transition-group';
-import {registerStaticReactComponent, useKoSubscribableChildren} from 'Util/ComponentUtil';
+import {registerReactComponent, useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {container} from 'tsyringe';
 
 import {ListViewModel, ListState} from '../../view_model/ListViewModel';
@@ -139,4 +139,4 @@ const LeftSidebar: React.FC<LeftSidebarProps> = ({
 
 export default LeftSidebar;
 
-registerStaticReactComponent('left-sidebar', LeftSidebar);
+registerReactComponent('left-sidebar', LeftSidebar);

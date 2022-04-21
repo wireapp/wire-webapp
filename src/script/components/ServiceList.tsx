@@ -83,4 +83,4 @@ const ServiceList: React.FC<ServiceListProps> = ({
 
 export default ServiceList;
 
-registerReactComponent('service-list', {component: ServiceList});
+registerReactComponent('service-list', ServiceList);

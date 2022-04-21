@@ -44,4 +44,4 @@ const RestrictedImage: React.FC<RestrictedImageProps> = ({showMessage = true, is
 
 export default RestrictedImage;
 
-registerReactComponent<RestrictedImageProps>('image-restricted', {component: RestrictedImage});
+registerReactComponent('image-restricted', RestrictedImage);

@@ -27,7 +27,7 @@ import {createRoot} from 'react-dom/client';
  * @param name Name of the component to register. can be used a `<component-name>` directly in ko
  * @param {component}
  */
-export function registerStaticReactComponent<Props>(name: string, component: React.ComponentType<Props>) {
+export function registerReactComponent<Props>(name: string, component: React.ComponentType<Props>) {
   if (ko.components.isRegistered(name)) {
     return;
   }
@@ -52,17 +52,6 @@ export function registerStaticReactComponent<Props>(name: string, component: Rea
   });
 }
 
-/**
-- * Registers a react component that will get a full state update every time parameter observable gets an update.
-- *
-- * @deprecated Please use `registerStaticReactComponent` instead. Just use it if you need observable updates from direct parameters
-- * @param name Name of the component to register. can be used a `<component-name>` directly in ko
-- * @param {component}
-- */
-export function registerReactComponent<Props>(name: string, {component}: {component: React.ComponentType<Props>}) {
-  return registerStaticReactComponent(name, component);
-}
-
 type Subscribables<T> = {
   [Key in keyof T]: T[Key] extends ko.Subscribable ? T[Key] : never;
 };
@@ -82,6 +71,13 @@ const resolveObservables = <C extends keyof Subscribables<P>, P extends Partial<
   }, {} as UnwrappedValues<P>);
 };
 
+/**
+ * Will subscribe to all the observable properties of the object and call the onUpdate callback everytime one observable updates
+ *
+ * @param object The object containinig some observable properties
+ * @param onUpdate The callback called everytime an observable emits. It will only give back the slice of the object that have updates
+ * @param children? An optional list of properties to watch (by default will watch for all the observable properties)
+ */
 const subscribeProperties = <C extends keyof Subscribables<P>, P extends Partial<Record<C, ko.Subscribable>>>(
   object: P,
   onUpdate: (updates: Partial<UnwrappedValues<P>>) => void,

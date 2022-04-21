@@ -53,4 +53,4 @@ const ServiceDetails: React.FC<ServiceDetailsProps> = ({service}) => {
 
 export default ServiceDetails;
 
-registerReactComponent('panel-service-details', {component: ServiceDetails});
+registerReactComponent('panel-service-details', ServiceDetails);

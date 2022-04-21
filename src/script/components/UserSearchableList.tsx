@@ -32,7 +32,7 @@ import {validateHandle} from '../user/UserHandleGenerator';
 
 import {UserState} from '../user/UserState';
 import {ConversationState} from '../conversation/ConversationState';
-import {registerStaticReactComponent, useKoSubscribableChildren} from 'Util/ComponentUtil';
+import {registerReactComponent, useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {TeamState} from '../team/TeamState';
 
 import UserList from './UserList';
@@ -172,4 +172,4 @@ const UserSearchableList: React.FC<UserListProps> = props => {
 
 export default UserSearchableList;
 
-registerStaticReactComponent('user-list', UserSearchableList);
+registerReactComponent('user-list', UserSearchableList);

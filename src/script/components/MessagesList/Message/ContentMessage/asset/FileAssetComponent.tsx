@@ -26,7 +26,7 @@ import RestrictedFile from 'Components/asset/RestrictedFile';
 import AssetLoader from './AssetLoader';
 import {formatBytes, getFileExtension, trimFileExtension} from 'Util/util';
 import {t} from 'Util/LocalizerUtil';
-import {registerReactComponent, useKoSubscribableChildren} from 'Util/ComponentUtil';
+import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {handleKeyDown} from 'Util/KeyboardUtil';
 
 import type {FileAsset} from '../../../../../entity/message/FileAsset';
@@ -137,8 +137,3 @@ const FileAssetComponent: React.FC<FileAssetProps> = ({
 };
 
 export default FileAssetComponent;
-
-registerReactComponent('file-asset', {
-  component: FileAssetComponent,
-  template: '<div data-bind="react: {hasHeader: header, message: ko.unwrap(message)}"></div>',
-});

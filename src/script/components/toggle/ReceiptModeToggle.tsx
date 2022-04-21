@@ -80,4 +80,4 @@ const ReceiptModeToggle: React.FC<ReceiptModeToggleProps> = ({receiptMode, onRec
 
 export default ReceiptModeToggle;
 
-registerReactComponent('read-receipt-toggle', {component: ReceiptModeToggle});
+registerReactComponent('read-receipt-toggle', ReceiptModeToggle);
