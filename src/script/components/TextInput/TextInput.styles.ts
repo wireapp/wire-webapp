@@ -37,7 +37,7 @@ export const getInputCSS = (disabled?: boolean, borderColor?: string): CSSObject
   '&:hover': {
     borderColor: !disabled && 'var(--text-input-border-hover)',
   },
-  '&:focus, &:active': {
+  '&:focus, &:focus-visible, &:active': {
     '& + label': {
       color: !disabled && 'var(--blue-500)',
     },
