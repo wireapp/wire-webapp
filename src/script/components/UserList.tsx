@@ -184,25 +184,26 @@ const UserList: React.FC<UserListProps> = ({
             <div className="user-list__header" data-uie-name="label-conversation-members">
               {t('searchListMembers', memberCount)}
             </div>
-            <div className={cx('search-list', cssClasses)} data-uie-name="list-members">
+            <ul className={cx('search-list', cssClasses)} data-uie-name="list-members">
               {members.slice(0, maxShownUsers - admins.length).map(user => (
-                <ParticipantItem
-                  key={user.id}
-                  noInteraction={noSelfInteraction && user.isMe}
-                  participant={user}
-                  noUnderline={noUnderline}
-                  highlighted={highlightedUserIds.includes(user.id)}
-                  customInfo={infos && infos[user.id]}
-                  canSelect={isSelectEnabled}
-                  isSelected={isSelected(user)}
-                  mode={mode}
-                  external={teamState.isExternal(user.id)}
-                  selfInTeam={selfInTeam}
-                  isSelfVerified={isSelfVerified}
-                  onClick={onClickOrKeyPressed}
-                />
+                <li key={user.id}>
+                  <ParticipantItem
+                    noInteraction={noSelfInteraction && user.isMe}
+                    participant={user}
+                    noUnderline={noUnderline}
+                    highlighted={highlightedUserIds.includes(user.id)}
+                    customInfo={infos && infos[user.id]}
+                    canSelect={isSelectEnabled}
+                    isSelected={isSelected(user)}
+                    mode={mode}
+                    external={teamState.isExternal(user.id)}
+                    selfInTeam={selfInTeam}
+                    isSelfVerified={isSelfVerified}
+                    onClick={onClickOrKeyPressed}
+                  />
+                </li>
               ))}
-            </div>
+            </ul>
           </Fragment>
         )}
       </>

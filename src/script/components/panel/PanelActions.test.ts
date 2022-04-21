@@ -26,8 +26,8 @@ class PanelActionsPage extends TestPage<PanelActionsProps> {
     super(PanelActions, props);
   }
 
-  getMainAction = (identifier: string) => this.get(`div[data-uie-name="${identifier}"]`);
-  getMainActionLabel = (identifier: string) => this.get(`div[data-uie-name="${identifier}-item-text"]`);
+  getMainAction = (identifier: string) => this.get(`[data-uie-name="${identifier}"]`);
+  getMainActionLabel = (identifier: string) => this.get(`[data-uie-name="${identifier}-item-text"]`);
   clickMainAction = (identifier: string) => this.click(this.getMainAction(identifier));
 }
 

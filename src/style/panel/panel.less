@@ -22,6 +22,12 @@
 .panel {
   overflow: hidden;
 
+  &__actions {
+    padding: 0;
+    margin: 0;
+    list-style: none;
+  }
+
   &__page {
     display: flex;
     flex-direction: column;
@@ -109,6 +115,27 @@
     overflow-y: auto;
     transform: translateX(0);
 
+    ul {
+      padding: 0;
+      margin: 0;
+      list-style: none;
+
+      li {
+        position: relative;
+
+        &:not(:last-child) {
+          &::after {
+            position: absolute;
+            right: 0;
+            bottom: 0;
+            left: @left-list-item-left-width;
+            border-bottom: 1px solid var(--border-color);
+            content: '';
+          }
+        }
+      }
+    }
+
     &--fill {
       flex-grow: 1;
     }
@@ -134,15 +161,22 @@
   }
 
   &__action-item {
+    .button-reset-default();
     display: flex;
-    height: 48px;
-    min-height: 48px;
+    width: 100%;
+    min-height: 56px;
     align-items: center;
-    margin: 0 16px;
+    padding: 0 16px;
     cursor: pointer;
-    fill: var(--foreground);
-    font-weight: @font-weight-regular;
-    user-select: none;
+
+    .button-states();
+    .text-medium;
+
+    svg {
+      path {
+        fill: currentColor;
+      }
+    }
 
     &__option {
       flex-shrink: 0;
@@ -253,11 +287,13 @@
     }
 
     &__text {
+      display: flex;
       overflow: hidden;
-      flex: 1;
-      font-size: 14px;
+      flex-grow: 1;
+      align-items: center;
       text-overflow: ellipsis;
       white-space: nowrap;
+      .text-medium;
     }
 
     &__status {
@@ -267,26 +303,16 @@
     }
 
     &__summary {
-      flex-grow: 1;
-      line-height: 16px;
-    }
-
-    .disclose-icon {
       display: flex;
-      margin-left: 12px;
-      path {
-        fill: var(--background-fade-40);
-      }
+      flex-direction: column;
+      flex-grow: 1;
+      align-items: flex-start;
+      justify-content: center;
     }
 
     .service-icon svg {
       width: 16px;
       height: 16px;
-    }
-
-    &.disabled {
-      opacity: 0.4;
-      pointer-events: none;
     }
 
     &--no-border {

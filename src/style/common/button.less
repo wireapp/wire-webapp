@@ -433,15 +433,18 @@
   }
 
   body.theme-dark & {
-    color: var(--black);
+    border: 1px solid var(--gray-100);
+    background-color: var(--gray-90);
+    color: var(--white);
 
     &:hover {
-      background-color: var(--accent-color-400);
+      border-color: var(--gray-70);
+      background-color: var(--gray-80);
     }
 
     &:focus-visible {
-      background-color: var(--accent-color-400);
-      outline: 1px solid var(--accent-color-100);
+      background-color: var(--gray-80);
+      outline: 1px solid var(--gray-50);
     }
   }
 
