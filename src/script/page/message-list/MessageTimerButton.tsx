@@ -82,6 +82,7 @@ export const MessageTimerButton: React.FC<MessageTimerButtonProps> = ({
         title={t('tooltipConversationEphemeral')}
         data-uie-value={isTimerDisabled ? 'disabled' : 'enabled'}
         data-uie-name="do-set-ephemeral-timer"
+        type="button"
       >
         {hasMessageTimer ? (
           conversation && (
