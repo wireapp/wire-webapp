@@ -69,7 +69,7 @@ describe('when visiting the index page', () => {
       }),
     );
 
-    expect(indexPage.getLogo()).not.toBeNull();
+    expect(indexPage.getLogo().exists()).toBe(true);
   });
 
   it('redirects to SSO login if default SSO code is set', async () => {
@@ -217,7 +217,7 @@ describe('when visiting the index page', () => {
         }),
       );
 
-      expect(indexPage.getCreateAccountButton()).toBeNull();
+      expect(indexPage.getCreateAccountButton().exists()).toBe(false);
     });
   });
 
@@ -246,7 +246,7 @@ describe('when visiting the index page', () => {
         history,
       );
 
-      expect(indexPage.getCreateAccountButton()).not.toBeNull();
+      expect(indexPage.getCreateAccountButton().exists()).toBe(true);
       indexPage.clickCreateAccountButton();
 
       await waitForExpect(() => {
@@ -277,7 +277,7 @@ describe('when visiting the index page', () => {
         }),
       );
 
-      expect(indexPage.getSSOLoginButton()).toBeNull();
+      expect(indexPage.getSSOLoginButton().exists()).toBe(false);
     });
   });
 

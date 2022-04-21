@@ -181,9 +181,9 @@ describe('Login', () => {
       }),
     );
 
-    expect(loginPage.getEmailInput()).not.toBeNull();
-    expect(loginPage.getPasswordInput()).not.toBeNull();
-    expect(loginPage.getLoginButton()).not.toBeNull();
+    expect(loginPage.getEmailInput().exists()).toBe(true);
+    expect(loginPage.getPasswordInput().exists()).toBe(true);
+    expect(loginPage.getLoginButton().exists()).toBe(true);
 
     expect(loginPage.getLoginButton().props().disabled).toBe(true);
     loginPage.enterEmail('e');
@@ -214,7 +214,7 @@ describe('Login', () => {
         }),
       );
 
-      expect(loginPage.getBackButton()).toBeNull();
+      expect(loginPage.getBackButton().exists()).toBe(false);
     });
   });
 
@@ -236,7 +236,7 @@ describe('Login', () => {
         }),
       );
 
-      expect(loginPage.getBackButton()).not.toBeNull();
+      expect(loginPage.getBackButton().exists()).toBe(true);
     });
   });
 });

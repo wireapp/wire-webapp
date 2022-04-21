@@ -69,6 +69,6 @@ describe('MessageButton', () => {
     });
 
     expect(messageButton.getError()).toBeNull();
-    expect(messageButton.getButtonWithId(messageId).getAttribute('data-uie-selected')).toBe(true);
+    expect(messageButton.getButtonWithId(messageId).getAttribute('data-uie-selected')).toBe('true');
   });
 });

@@ -42,7 +42,7 @@ describe('ReceiptModeToggle', () => {
 
     const checkBox = receiptModeToggle.getCheckbox();
 
-    expect(checkBox.getAttribute('checked')).toBe(false);
+    expect(checkBox.getAttribute('checked')).toBe(null);
   });
 
   it('unchecks the checkbox when receipts are turned off', () => {
@@ -53,6 +53,6 @@ describe('ReceiptModeToggle', () => {
 
     const checkBox = receiptModeToggle.getCheckbox();
 
-    expect(checkBox.getAttribute('checked')).toBe(true);
+    expect(checkBox.getAttribute('checked')).toBe('');
   });
 });
