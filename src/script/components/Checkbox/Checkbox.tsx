@@ -30,7 +30,7 @@ interface CheckboxProps {
 const Checkbox: React.FC<CheckboxProps> = ({disabled, label, isChecked, name, onCheckedChanged}) => {
   return (
     <label
-      htmlFor={name}
+      className="label-base"
       css={{
         '&:hover': {
           cursor: !disabled && 'pointer',
@@ -40,7 +40,9 @@ const Checkbox: React.FC<CheckboxProps> = ({disabled, label, isChecked, name, on
         },
         alignItems: 'center',
         display: 'flex',
+        fontSize: '',
       }}
+      htmlFor={name}
     >
       <input
         disabled={disabled}
@@ -70,7 +72,7 @@ const Checkbox: React.FC<CheckboxProps> = ({disabled, label, isChecked, name, on
           // set to `inline-block` as `inline elements ignore `height` and `width`
           display: 'inline-block',
           height: 20,
-          marginRight: 4,
+          marginRight: 8,
           width: 20,
           ...(isChecked && {
             background: 'var(--checkbox-background-selected)',
