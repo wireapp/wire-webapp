@@ -1,6 +1,6 @@
 const year = new Date().getFullYear();
 
-module.exports = () => ({
+module.exports = {
   env: {
     browser: true,
     es6: true,
@@ -154,4 +154,4 @@ module.exports = () => ({
       version: 'latest',
     },
   },
-});
+};
