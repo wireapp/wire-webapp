@@ -36,7 +36,7 @@ const Checkbox: React.FC<CheckboxProps> = ({disabled, label, isChecked, name, on
           cursor: !disabled && 'pointer',
         },
         '&:hover svg': {
-          borderColor: !disabled && 'var(--blue-500)',
+          borderColor: !disabled && 'var(--checkbox-border-hover)',
         },
         alignItems: 'center',
         display: 'flex',
@@ -50,7 +50,7 @@ const Checkbox: React.FC<CheckboxProps> = ({disabled, label, isChecked, name, on
         onChange={onCheckedChanged}
         css={{
           '&:active + svg, &:focus + svg, &:focus-visible + svg': {
-            borderColor: !disabled && 'var(--blue-500)',
+            borderColor: !disabled && 'var(--checkbox-border-hover)',
           },
           clip: 'rect(0 0 0 0)',
           clipPath: 'inset(50%)',
@@ -63,8 +63,8 @@ const Checkbox: React.FC<CheckboxProps> = ({disabled, label, isChecked, name, on
       />
       <svg
         css={{
-          background: 'var(--gray-20)',
-          border: '2px var(--gray-80) solid',
+          background: 'var(--checkbox-background)',
+          border: '1.5px var(--checkbox-border) solid',
           borderRadius: 3,
 
           // set to `inline-block` as `inline elements ignore `height` and `width`
@@ -73,12 +73,14 @@ const Checkbox: React.FC<CheckboxProps> = ({disabled, label, isChecked, name, on
           marginRight: 4,
           width: 20,
           ...(isChecked && {
-            background: 'var(--blue-500)',
-            borderColor: 'var(--blue-500)',
+            background: 'var(--checkbox-background-selected)',
+            borderColor: 'var(--checkbox-background-selected)',
           }),
           ...(disabled && {
-            background: isChecked ? 'var(--gray-60)' : 'var(--gray-10)',
-            borderColor: 'var(--gray-60)',
+            background: isChecked
+              ? 'var(--checkbox-background-disabled-selected)'
+              : 'var(--checkbox-background-disabled)',
+            borderColor: 'var(--checkbox-border-disabled)',
             pointerEvents: 'none',
           }),
         }}
@@ -91,7 +93,7 @@ const Checkbox: React.FC<CheckboxProps> = ({disabled, label, isChecked, name, on
         <path
           d="M1 4.5L5 9L14 1"
           strokeWidth="2"
-          stroke={isChecked ? '#fff' : 'none'} // only show the checkmark when `isCheck` is `true`
+          stroke={isChecked ? 'var(--white)' : 'none'} // only show the checkmark when `isCheck` is `true`
         />
       </svg>
       {label}
