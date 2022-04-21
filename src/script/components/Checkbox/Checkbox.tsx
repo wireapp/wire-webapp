@@ -18,6 +18,7 @@
  */
 
 import React from 'react';
+import {getInputCSS, getLabelCSS, getSvgCSS} from './Checkbox.styles';
 
 interface CheckboxProps {
   disabled?: boolean;
@@ -29,63 +30,17 @@ interface CheckboxProps {
 
 const Checkbox: React.FC<CheckboxProps> = ({disabled, label, isChecked, name, onCheckedChanged}) => {
   return (
-    <label
-      className="label-base"
-      css={{
-        '&:hover': {
-          cursor: !disabled && 'pointer',
-        },
-        '&:hover svg': {
-          borderColor: !disabled && 'var(--checkbox-border-hover)',
-        },
-        alignItems: 'center',
-        display: 'flex',
-        fontSize: '',
-      }}
-      htmlFor={name}
-    >
+    <label className="label-base" css={getLabelCSS(disabled)} htmlFor={name}>
       <input
         disabled={disabled}
         type="checkbox"
         id={name}
         name={name}
         onChange={onCheckedChanged}
-        css={{
-          '&:active + svg, &:focus + svg, &:focus-visible + svg': {
-            borderColor: !disabled && 'var(--checkbox-border-hover)',
-          },
-          clip: 'rect(0 0 0 0)',
-          clipPath: 'inset(50%)',
-          height: 1,
-          overflow: 'hidden',
-          position: 'absolute',
-          whiteSpace: 'nowrap',
-          width: 1,
-        }}
+        css={getInputCSS(disabled)}
       />
       <svg
-        css={{
-          background: 'var(--checkbox-background)',
-          border: '1.5px var(--checkbox-border) solid',
-          borderRadius: 3,
-
-          // set to `inline-block` as `inline elements ignore `height` and `width`
-          display: 'inline-block',
-          height: 20,
-          marginRight: 8,
-          width: 20,
-          ...(isChecked && {
-            background: 'var(--checkbox-background-selected)',
-            borderColor: 'var(--checkbox-background-selected)',
-          }),
-          ...(disabled && {
-            background: isChecked
-              ? 'var(--checkbox-background-disabled-selected)'
-              : 'var(--checkbox-background-disabled)',
-            borderColor: 'var(--checkbox-border-disabled)',
-            pointerEvents: 'none',
-          }),
-        }}
+        css={getSvgCSS(isChecked, disabled)}
         // This element is purely decorative so
         // we hide it for screen readers
         aria-hidden="true"
