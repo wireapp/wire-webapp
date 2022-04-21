@@ -24,6 +24,10 @@ import {useKoSubscribableChildren} from './ComponentUtil';
 
 describe('ComponentUtil', () => {
   describe('useKoSubscribableChildren', () => {
+    beforeEach(() => {
+      jest.useFakeTimers();
+    });
+
     it('returns a new object with updated values, when one observable changes', () => {
       const obj = {
         observableA: ko.observable(0),
@@ -33,11 +37,11 @@ describe('ComponentUtil', () => {
       const preResult = result.current;
       act(() => {
         obj.observableA(1);
+        jest.advanceTimersByTime(1);
       });
       const postResult = result.current;
 
       expect(preResult).toEqual({observableA: 0, observableB: 0});
-
       expect(postResult).toEqual({observableA: 1, observableB: 0});
     });
 
