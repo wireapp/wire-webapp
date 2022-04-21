@@ -34,7 +34,7 @@ void (async () => {
 
   try {
     const changelog = await Changelog.generate({
-      exclude: ['chore', 'docs', 'refactor', 'style', 'test'],
+      exclude: ['chore', 'docs', 'refactor', 'style', 'test', 'runfix'],
       repoUrl: pkg.repository.url.replace('.git', ''),
       tag: `${from}...${to}`,
     });
