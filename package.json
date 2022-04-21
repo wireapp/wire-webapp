@@ -62,6 +62,7 @@
     "@faker-js/faker": "6.1.2",
     "@formatjs/cli": "4.8.3",
     "@testing-library/react": "13.1.1",
+    "@koush/wrtc": "0.5.3",
     "@types/adm-zip": "0.5.0",
     "@types/classnames": "2.3.1",
     "@types/dexie-batch": "0.4.3",
@@ -173,8 +174,7 @@
     "webpack-cli": "4.9.2",
     "webpack-dev-middleware": "5.3.1",
     "webpack-hot-middleware": "2.25.1",
-    "workbox-webpack-plugin": "6.4.2",
-    "wrtc": "0.4.7"
+    "workbox-webpack-plugin": "6.4.2"
   },
   "engines": {
     "yarn": ">= 1.0.0",
