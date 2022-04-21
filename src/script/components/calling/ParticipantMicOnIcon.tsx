@@ -66,7 +66,4 @@ const ParticipantMicOnIcon: React.FC<ParticipantMicOnIconProps> = ({
 
 export default ParticipantMicOnIcon;
 
-registerReactComponent('participant-mic-on-icon', {
-  component: ParticipantMicOnIcon,
-  template: '<span data-bind="react: {className, isActive: ko.unwrap(isActive), color}"></span>',
-});
+registerReactComponent('participant-mic-on-icon', {component: ParticipantMicOnIcon});

@@ -83,8 +83,4 @@ const ServiceList: React.FC<ServiceListProps> = ({
 
 export default ServiceList;
 
-registerReactComponent('service-list', {
-  component: ServiceList,
-  template:
-    '<div data-bind="react: {arrow, click, isSearching: ko.unwrap(isSearching), mode, noUnderline, services: ko.unwrap(services)}"></div>',
-});
+registerReactComponent('service-list', {component: ServiceList});

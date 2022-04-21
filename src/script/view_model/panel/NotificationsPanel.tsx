@@ -89,7 +89,4 @@ const NotificationsPanel: React.FC<NotificationsPanelProps> = ({
 
 export default NotificationsPanel;
 
-registerReactComponent('notifications-panel', {
-  component: NotificationsPanel,
-  template: '<div data-bind="react: {onGoBack, onClose, repositories}"></div>',
-});
+registerReactComponent('notifications-panel', {component: NotificationsPanel});

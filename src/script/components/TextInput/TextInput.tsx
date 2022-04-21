@@ -119,7 +119,4 @@ const TextInput: React.ForwardRefRenderFunction<HTMLDivElement, UserInputProps> 
 
 export default React.forwardRef(TextInput);
 
-registerReactComponent<UserInputProps>('text-input', {
-  component: TextInput,
-  template: '<div data-bind="react: {label, name, onChange, placeholder, value: ko.unwrap(value)}"></div>',
-});
+registerReactComponent<UserInputProps>('text-input', {component: TextInput});
