@@ -16,6 +16,7 @@
  * along with this program. If not, see http://www.gnu.org/licenses/.
  *
  */
+
 import React, {useEffect, useRef} from 'react';
 import {overlayedObserver} from '../../ui/overlayedObserver';
 import {viewportObserver} from '../../ui/viewportObserver';
