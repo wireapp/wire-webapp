@@ -17,12 +17,13 @@
  *
  */
 
-import {CSSObject} from '@emotion/core';
+import {CSSObject} from '@emotion/react';
 import React, {useEffect, useState} from 'react';
 import {noop} from 'Util/util';
 import Icon from './Icon';
 
 interface ModalComponentProps {
+  children: React.ReactNode;
   isShown: boolean;
   onBgClick?: () => void;
   onClosed?: () => void;

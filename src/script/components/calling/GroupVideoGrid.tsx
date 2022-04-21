@@ -18,7 +18,7 @@
  */
 
 import React, {useState, useEffect, CSSProperties} from 'react';
-import {css} from '@emotion/core';
+import {css} from '@emotion/react';
 
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
@@ -50,7 +50,10 @@ const calculateRowsAndColumns = (totalCount: number): RowsAndColumns => {
   return {'--columns': columns, '--rows': rows};
 };
 
-const GroupVideoThumbnailWrapper: React.FC<{minimized: boolean}> = ({minimized, children}) => (
+const GroupVideoThumbnailWrapper: React.FC<{children?: React.ReactNode; minimized: boolean}> = ({
+  minimized,
+  children,
+}) => (
   <div
     className="group-video__thumbnail"
     css={

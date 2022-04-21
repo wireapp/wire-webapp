@@ -1,5 +1,5 @@
 /* eslint-disable sort-keys-fix/sort-keys-fix */
-import {CSSObject} from '@emotion/core';
+import {CSSObject} from '@emotion/react';
 
 export const getIconCSS = (fill?: string): CSSObject => ({
   alignItems: 'center',
@@ -37,7 +37,7 @@ export const getInputCSS = (disabled?: boolean, borderColor?: string): CSSObject
   '&:hover': {
     borderColor: !disabled && 'var(--text-input-border-hover)',
   },
-  '&:focus, &:active': {
+  '&:focus, &:focus-visible, &:active': {
     '& + label': {
       color: !disabled && 'var(--blue-500)',
     },

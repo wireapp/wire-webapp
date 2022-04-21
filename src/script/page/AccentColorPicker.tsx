@@ -22,6 +22,7 @@ import {AccentColor} from '@wireapp/commons';
 import {CSS_SQUARE} from 'Util/CSSMixin';
 import {t} from 'Util/LocalizerUtil';
 import {User} from '../entity/User';
+import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 
 export interface AccentColorPickerProps {
   doSetAccentColor: (id: number) => void;
@@ -29,6 +30,7 @@ export interface AccentColorPickerProps {
 }
 
 const AccentColorPicker: React.FunctionComponent<AccentColorPickerProps> = ({user, doSetAccentColor}) => {
+  const {accent_id: accentId} = useKoSubscribableChildren(user, ['accent_id']);
   return (
     <fieldset css={{border: 'none', margin: 0, padding: 0}} aria-label={t('accessibility.chooseAccountColor')}>
       <div
@@ -41,7 +43,7 @@ const AccentColorPicker: React.FunctionComponent<AccentColorPickerProps> = ({use
         }}
       >
         {AccentColor.ACCENT_COLORS.map(accentColor => {
-          const isChecked = user.accent_id() === accentColor.id;
+          const isChecked = accentId === accentColor.id;
           const color = User.ACCENT_COLOR[accentColor.id];
 
           return (

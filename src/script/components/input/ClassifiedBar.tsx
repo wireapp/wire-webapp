@@ -18,7 +18,7 @@
  */
 
 import React from 'react';
-import {CSSObject} from '@emotion/core';
+import {CSSObject} from '@emotion/react';
 import {registerReactComponent} from 'Util/ComponentUtil';
 import {User} from 'src/script/entity/User';
 import {t} from 'Util/LocalizerUtil';

@@ -24,10 +24,7 @@ import EntropyCanvas from './EntropyCanvas';
 require('jest-canvas-mock');
 
 describe('EntropyCanvas', () => {
-  const mockonSetEntropy = jest.fn().mockImplementation((a: [number, number][]) => {
-    // eslint-disable-next-line no-console
-    console.log(a);
-  });
+  const mockonSetEntropy = jest.fn().mockImplementation(() => {});
 
   afterEach(() => {
     jest.clearAllMocks();
@@ -62,7 +59,7 @@ describe('EntropyCanvas', () => {
       fireEvent.mouseLeave(canvas);
     });
     expect(setEntropy).toHaveBeenCalledTimes(1);
-    expect(setError).toHaveBeenCalledTimes(3);
+    expect(setError).toHaveBeenCalledTimes(5);
   });
 
   it('starts drawing again after leaving canvas', async () => {
@@ -81,6 +78,6 @@ describe('EntropyCanvas', () => {
       fireEvent.mouseLeave(canvas);
     });
     expect(setEntropy).toHaveBeenCalledTimes(2);
-    expect(setError).toHaveBeenCalledTimes(6);
+    expect(setError).toHaveBeenCalledTimes(10);
   });
 });

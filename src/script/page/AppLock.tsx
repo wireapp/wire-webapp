@@ -1,5 +1,4 @@
 import React, {useState, useEffect, useRef, useCallback} from 'react';
-import ReactDOM from 'react-dom';
 import {ValidationUtil} from '@wireapp/commons';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import {container} from 'tsyringe';
@@ -17,6 +16,7 @@ import {AppLockState} from '../user/AppLockState';
 import {AppLockRepository} from '../user/AppLockRepository';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {ModalsViewModel} from '../view_model/ModalsViewModel';
+import {createRoot} from 'react-dom/client';
 
 export enum APPLOCK_STATE {
   FORGOT = 'applock.forgot',
@@ -499,6 +499,6 @@ const AppLock: React.FC<AppLockProps> = ({
 export default {
   AppLock,
   init: (clientRepository: ClientRepository) => {
-    ReactDOM.render(<AppLock clientRepository={clientRepository} />, document.getElementById('applock'));
+    createRoot(document.getElementById('applock')).render(<AppLock clientRepository={clientRepository} />);
   },
 };

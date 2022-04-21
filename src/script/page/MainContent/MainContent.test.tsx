@@ -17,7 +17,6 @@
  *
  */
 
-import React from 'react';
 import ko from 'knockout';
 import {act, render, waitFor} from '@testing-library/react';
 import MainContent from './MainContent';
