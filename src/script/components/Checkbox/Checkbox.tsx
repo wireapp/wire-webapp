@@ -20,35 +20,37 @@
 import React from 'react';
 
 interface CheckboxProps {
+  disabled?: boolean;
   isChecked: boolean;
   label: string;
   name: string;
   onCheckedChanged: () => void;
 }
 
-const Checkbox: React.FC<CheckboxProps> = ({label, isChecked, name, onCheckedChanged}) => {
+const Checkbox: React.FC<CheckboxProps> = ({disabled, label, isChecked, name, onCheckedChanged}) => {
   return (
     <label
       htmlFor={name}
       css={{
         '&:hover': {
-          cursor: 'pointer',
+          cursor: !disabled && 'pointer',
         },
         '&:hover svg': {
-          borderColor: 'var(--blue-500)',
+          borderColor: !disabled && 'var(--blue-500)',
         },
         alignItems: 'center',
         display: 'flex',
       }}
     >
       <input
+        disabled={disabled}
         type="checkbox"
         id={name}
         name={name}
         onChange={onCheckedChanged}
         css={{
           '&:active + svg, &:focus + svg, &:focus-visible + svg': {
-            borderColor: 'var(--blue-500)',
+            borderColor: !disabled && 'var(--blue-500)',
           },
           clip: 'rect(0 0 0 0)',
           clipPath: 'inset(50%)',
@@ -65,14 +67,19 @@ const Checkbox: React.FC<CheckboxProps> = ({label, isChecked, name, onCheckedCha
           border: '2px var(--gray-80) solid',
           borderRadius: 3,
 
-          display: 'inline-block',
           // set to `inline-block` as `inline elements ignore `height` and `width`
+          display: 'inline-block',
           height: 20,
           marginRight: 4,
           width: 20,
           ...(isChecked && {
             background: 'var(--blue-500)',
             borderColor: 'var(--blue-500)',
+          }),
+          ...(disabled && {
+            background: isChecked ? 'var(--gray-60)' : 'var(--gray-10)',
+            borderColor: 'var(--gray-60)',
+            pointerEvents: 'none',
           }),
         }}
         // This element is purely decorative so
