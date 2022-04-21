@@ -32,6 +32,6 @@ class LoadingBarPage extends TestPage<LoadingBarProps> {
 describe('LoadingBar', () => {
   it('renders correct progress', async () => {
     const LoadingBar = new LoadingBarPage({message: 'example', progress: 30});
-    expect(LoadingBar.getProgressElement().getDOMNode().getAttribute('style')).toBe('width: 30%;');
+    expect(LoadingBar.getProgressElement().getAttribute('style')).toBe('width: 30%;');
   });
 });

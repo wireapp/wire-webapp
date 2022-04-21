@@ -66,11 +66,11 @@ describe('PhoneLogin', () => {
       }),
     );
 
-    expect(phoneLoginPage.getPhoneInput().exists()).toBe(true);
+    expect(phoneLoginPage.getPhoneInput()).not.toBeNull();
 
-    expect(phoneLoginPage.getCountryCodeInput().exists()).toBe(true);
+    expect(phoneLoginPage.getCountryCodeInput()).not.toBeNull();
 
-    expect(phoneLoginPage.getLoginButton().exists()).toBe(true);
+    expect(phoneLoginPage.getLoginButton()).not.toBeNull();
 
     expect(phoneLoginPage.getLoginButton().props().disabled).toBe(true);
     phoneLoginPage.getPhoneInput().simulate('change', {target: {value: '1'}});
@@ -92,7 +92,7 @@ describe('PhoneLogin', () => {
       history,
     );
 
-    expect(phoneLoginPage.getBackButton().exists()).toBe(true);
+    expect(phoneLoginPage.getBackButton()).not.toBeNull();
     expect(phoneLoginPage.getBackButton().props().href).toEqual(ROUTE.LOGIN);
   });
 

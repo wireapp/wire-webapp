@@ -18,24 +18,27 @@
  */
 
 import React from 'react';
-import {EnzymePropSelector, ReactWrapper} from 'enzyme';
-import {mountComponent} from './TestUtil';
-import {act} from '@testing-library/react';
+import {act, fireEvent, render, RenderResult} from '@testing-library/react';
 
 export default class TestPage<T> {
-  private readonly driver: ReactWrapper;
+  private readonly driver: RenderResult;
   private readonly props: T;
+  private readonly component: React.FC | React.ComponentClass;
 
   constructor(Component: React.FC<T> | React.ComponentClass<T>, props?: T) {
     this.props = props;
-    this.driver = mountComponent(<Component {...this.props} />);
+    this.component = Component;
+    this.driver = render(<Component {...this.props} />);
   }
 
-  get = (selector: string | EnzymePropSelector) => this.driver.find(selector as EnzymePropSelector);
+  get renderResults() {
+    return this.driver;
+  }
+
+  get = (selector: string) => this.driver.container.querySelector(selector);
+  getAll = (selector: string) => this.driver.container.querySelectorAll(selector);
 
   getProps = () => this.props;
-
-  getText = () => this.driver.text();
 
   private readonly do = (action: Function) => {
     act(() => {
@@ -43,18 +46,17 @@ export default class TestPage<T> {
     });
     this.update();
   };
-  click = (element: ReactWrapper) => this.do(() => element.simulate('click'));
-  doubleClick = (element: ReactWrapper) => this.do(() => element.simulate('dblclick'));
-  changeValue = (element: ReactWrapper, value: any) => this.do(() => element.simulate('change', {target: {value}}));
-  changeCheckboxValue = (element: ReactWrapper, value: any) =>
-    this.do(() => element.simulate('change', {target: {checked: value}}));
-  changeFiles = (element: ReactWrapper, files: File[]) => this.do(() => element.simulate('change', {target: {files}}));
-  submit = (element: ReactWrapper) => this.do(() => element.simulate('submit'));
-  mouseEnter = (element: ReactWrapper) => this.do(() => element.simulate('mouseenter'));
-  keyUp = (element: ReactWrapper, key: string) => this.do(() => element.simulate('keyup', {key}));
-  keyDown = (element: ReactWrapper, key: string) => this.do(() => element.simulate('keydown', {key}));
+  click = (element: Element) => this.do(() => fireEvent.click(element));
+  doubleClick = (element: Element) => this.do(() => fireEvent.dblClick(element));
+  changeValue = (element: Element, value: any) => this.do(() => fireEvent.change(element, {target: {value}}));
+  changeCheckboxValue = (element: Element, value: any) =>
+    this.do(() => fireEvent.change(element, {target: {checked: value}}));
+  changeFiles = (element: Element, files: File[]) => this.do(() => fireEvent.change(element, {target: {files}}));
+  submit = (element: Element) => this.do(() => fireEvent.submit(element));
+  mouseEnter = (element: Element) => this.do(() => fireEvent.mouseEnter(element));
+  keyUp = (element: Element, key: string) => this.do(() => fireEvent.keyUp(element, {key}));
+  keyDown = (element: Element, key: string) => this.do(() => fireEvent.keyDown(element, {key}));
 
-  update = () => this.driver.update();
-  setProps = (props: T) => this.do(() => this.driver.setProps(props));
-  debug = (element?: ReactWrapper) => console.info((element ? element : this.driver).debug());
+  update = () => {};
+  setProps = (props: T) => this.do(() => this.driver.rerender(<this.component {...props} />));
 }

@@ -53,7 +53,7 @@ describe('image-asset', () => {
     image.height = '10';
     image.width = '100';
     const testPage = new ImageAssetTestPage({...defaultProps, asset: image});
-    const imgSrc = testPage.getImg().prop('src');
+    const imgSrc = testPage.getImg().getAttribute('src');
 
     expect(imgSrc).toContain('svg');
     expect(imgSrc).toContain('10');
@@ -83,7 +83,7 @@ describe('image-asset', () => {
         act(() => {
           testPage.update();
         });
-        const imgSrc = testPage.getImg().prop('src');
+        const imgSrc = testPage.getImg().getAttribute('src');
         expect(imgSrc).toContain('/image-url');
       });
 

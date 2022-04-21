@@ -69,7 +69,7 @@ describe('when visiting the index page', () => {
       }),
     );
 
-    expect(indexPage.getLogo().exists()).toBe(true);
+    expect(indexPage.getLogo()).not.toBeNull();
   });
 
   it('redirects to SSO login if default SSO code is set', async () => {
@@ -113,7 +113,7 @@ describe('when visiting the index page', () => {
       }),
     );
 
-    expect(indexPage.getWelcomeText().exists()).toBe(true);
+    expect(indexPage.getWelcomeText()).not.toBeNull();
 
     expect(indexPage.getWelcomeText().text()).toContain(Config.getConfig().BRAND_NAME);
   });
@@ -137,7 +137,7 @@ describe('when visiting the index page', () => {
       }),
     );
 
-    expect(indexPage.getWelcomeText().exists()).toBe(true);
+    expect(indexPage.getWelcomeText()).not.toBeNull();
 
     expect(indexPage.getWelcomeText().text()).toContain(customBackendName);
   });
@@ -158,7 +158,7 @@ describe('when visiting the index page', () => {
       history,
     );
 
-    expect(indexPage.getLoginButton().exists()).toBe(true);
+    expect(indexPage.getLoginButton()).not.toBeNull();
     indexPage.clickLoginButton();
 
     await waitForExpect(() => {
@@ -188,7 +188,7 @@ describe('when visiting the index page', () => {
       history,
     );
 
-    expect(indexPage.getSSOLoginButton().exists()).toBe(true);
+    expect(indexPage.getSSOLoginButton()).not.toBeNull();
     indexPage.clickSSOLoginButton();
 
     await waitForExpect(() => {
@@ -217,7 +217,7 @@ describe('when visiting the index page', () => {
         }),
       );
 
-      expect(indexPage.getCreateAccountButton().exists()).toBe(false);
+      expect(indexPage.getCreateAccountButton()).toBeNull();
     });
   });
 
@@ -246,7 +246,7 @@ describe('when visiting the index page', () => {
         history,
       );
 
-      expect(indexPage.getCreateAccountButton().exists()).toBe(true);
+      expect(indexPage.getCreateAccountButton()).not.toBeNull();
       indexPage.clickCreateAccountButton();
 
       await waitForExpect(() => {
@@ -277,7 +277,7 @@ describe('when visiting the index page', () => {
         }),
       );
 
-      expect(indexPage.getSSOLoginButton().exists()).toBe(false);
+      expect(indexPage.getSSOLoginButton()).toBeNull();
     });
   });
 

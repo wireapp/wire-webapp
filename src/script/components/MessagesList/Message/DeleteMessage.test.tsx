@@ -55,7 +55,7 @@ describe('DeleteMessage', () => {
       onClickAvatar: jest.fn(),
     });
 
-    expect(deleteMessagePage.getDeleteMessage().exists()).toBe(true);
-    expect(deleteMessagePage.getDeleteMessageSenderName().text()).toBe(senderName);
+    expect(deleteMessagePage.getDeleteMessage()).not.toBeNull();
+    expect(deleteMessagePage.getDeleteMessageSenderName().textContent).toBe(senderName);
   });
 });

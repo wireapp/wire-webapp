@@ -104,7 +104,7 @@ describe('AppLock', () => {
         clientRepository,
       });
       const appLockModal = appLockPage.getAppLockModal();
-      expect(appLockModal.props().style.display).toBe('none');
+      expect(window.getComputedStyle(appLockModal).getPropertyValue('display')).toBe('none');
     });
   });
 
@@ -121,7 +121,7 @@ describe('AppLock', () => {
         appLockState,
         clientRepository,
       });
-      expect(appLockPage.getAppLockModalBody(APPLOCK_STATE.LOCKED).exists()).toBe(true);
+      expect(appLockPage.getAppLockModalBody(APPLOCK_STATE.LOCKED)).not.toBeNull();
     });
 
     it('shows setup state when there is no passphrase is set and app lock is enabled', () => {
@@ -140,7 +140,7 @@ describe('AppLock', () => {
         amplify.publish(WebAppEvents.PREFERENCES.CHANGE_APP_LOCK_PASSPHRASE);
       });
       appLockPage.update();
-      expect(appLockPage.getAppLockModalBody(APPLOCK_STATE.SETUP).exists()).toBe(true);
+      expect(appLockPage.getAppLockModalBody(APPLOCK_STATE.SETUP)).not.toBeNull();
     });
 
     it('shows setup state when there is no passphrase is set and enforced is enabled', () => {
@@ -158,7 +158,7 @@ describe('AppLock', () => {
         amplify.publish(WebAppEvents.PREFERENCES.CHANGE_APP_LOCK_PASSPHRASE);
       });
       appLockPage.update();
-      expect(appLockPage.getAppLockModalBody(APPLOCK_STATE.SETUP).exists()).toBe(true);
+      expect(appLockPage.getAppLockModalBody(APPLOCK_STATE.SETUP)).not.toBeNull();
     });
   });
 
@@ -176,6 +176,6 @@ describe('AppLock', () => {
     });
 
     const appLockModal = appLockPage.getAppLockModal();
-    expect(appLockModal.props().style.display).toBe('flex');
+    expect(window.getComputedStyle(appLockModal).getPropertyValue('display')).toBe('flex');
   });
 });

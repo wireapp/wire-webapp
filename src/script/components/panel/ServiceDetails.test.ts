@@ -41,8 +41,8 @@ describe('ServiceDetails', () => {
     service.providerName(serviceProvider);
     const serviceDetails = new ServiceDetailsPage({service});
 
-    expect(serviceDetails.getName().text()).toBe(serviceName);
-    expect(serviceDetails.getProvider().text()).toBe(serviceProvider);
-    expect(serviceDetails.getDescription().text()).toBe(serviceDescription);
+    expect(serviceDetails.getName().textContent).toBe(serviceName);
+    expect(serviceDetails.getProvider().textContent).toBe(serviceProvider);
+    expect(serviceDetails.getDescription().textContent).toBe(serviceDescription);
   });
 });

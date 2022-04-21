@@ -42,7 +42,7 @@ describe('AvailabilityState', () => {
       theme: false,
     });
 
-    expect(availabilityState.getAvailableIcon().exists()).toBe(true);
+    expect(availabilityState.getAvailableIcon()).not.toBeNull();
   });
 
   it('renders away icon', async () => {
@@ -54,7 +54,7 @@ describe('AvailabilityState', () => {
       theme: false,
     });
 
-    expect(availabilityState.getAwayIcon().exists()).toBe(true);
+    expect(availabilityState.getAwayIcon()).not.toBeNull();
   });
 
   it('renders busy icon', async () => {
@@ -66,7 +66,7 @@ describe('AvailabilityState', () => {
       theme: false,
     });
 
-    expect(availabilityState.getBusyIcon().exists()).toBe(true);
+    expect(availabilityState.getBusyIcon()).not.toBeNull();
   });
 
   it('renders availability icon with arrow', async () => {
@@ -78,7 +78,7 @@ describe('AvailabilityState', () => {
       theme: false,
     });
 
-    expect(availabilityState.getBusyIcon().exists()).toBe(true);
-    expect(availabilityState.getArrow().exists()).toBe(true);
+    expect(availabilityState.getBusyIcon()).not.toBeNull();
+    expect(availabilityState.getArrow()).not.toBeNull();
   });
 });

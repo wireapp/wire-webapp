@@ -25,7 +25,7 @@ class DeviceIdPage extends TestPage<DeviceIdProps> {
     super(DeviceId, props);
   }
 
-  getDeviceIdParts = () => this.get('[data-uie-name="element-device-id-part"]');
+  getDeviceIdParts = () => this.getAll('[data-uie-name="element-device-id-part"]');
 }
 
 describe('DeviceId', () => {
@@ -33,7 +33,7 @@ describe('DeviceId', () => {
     const deviceIdPage = new DeviceIdPage({
       deviceId: '66e66c79e8d1dea4',
     });
-    const deviceIdParts = deviceIdPage.getDeviceIdParts().map(node => node.text());
+    const deviceIdParts = Array.from(deviceIdPage.getDeviceIdParts()).map(node => node.textContent);
     expect(deviceIdParts).toEqual(['66', 'e6', '6c', '79', 'e8', 'd1', 'de', 'a4']);
   });
 
@@ -41,7 +41,7 @@ describe('DeviceId', () => {
     const deviceIdPage = new DeviceIdPage({
       deviceId: '6e66c79e8d1dea4',
     });
-    const deviceIdParts = deviceIdPage.getDeviceIdParts().map(node => node.text());
+    const deviceIdParts = Array.from(deviceIdPage.getDeviceIdParts()).map(node => node.textContent);
     expect(deviceIdParts).toEqual(['06', 'e6', '6c', '79', 'e8', 'd1', 'de', 'a4']);
   });
 });

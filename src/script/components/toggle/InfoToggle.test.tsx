@@ -48,7 +48,7 @@ describe('InfoToggle', () => {
     };
 
     const infoToggle = new InfoTogglePage(props);
-    expect(infoToggle.getInfo(dataUieName).text()).toBe('example');
+    expect(infoToggle.getInfo(dataUieName).textContent).toBe('example');
     infoToggle.changeInputValue(!isChecked);
     expect(isChecked).toBe(true);
   });

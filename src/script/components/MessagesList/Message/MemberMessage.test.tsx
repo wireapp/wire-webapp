@@ -63,6 +63,6 @@ describe('MemberMessage', () => {
       shouldShowInvitePeople: false,
     });
 
-    expect(memberMessagePage.getConnectedMessage().exists()).toBe(true);
+    expect(memberMessagePage.getConnectedMessage()).not.toBeNull();
   });
 });

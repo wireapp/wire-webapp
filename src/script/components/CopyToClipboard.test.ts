@@ -33,7 +33,7 @@ describe('CopyToClipboard', () => {
     const text = 'please copy this';
     const ClipboardPage = new CopyToClipboardPage({text});
 
-    expect(ClipboardPage.getTextField().text()).toEqual(text);
+    expect(ClipboardPage.getTextField().textContent).toEqual(text);
   });
 
   it('selects the whole text when clicked', () => {

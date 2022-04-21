@@ -17,7 +17,7 @@
  *
  */
 
-import React, {Fragment} from 'react';
+import React from 'react';
 
 import {registerReactComponent} from 'Util/ComponentUtil';
 import Icon from '../Icon';

@@ -56,7 +56,7 @@ describe('MessageFooterLike', () => {
       onLike: spyOnLike,
     });
 
-    expect(messageFooterLikePage.getLike().exists()).toBe(true);
+    expect(messageFooterLikePage.getLike()).not.toBeNull();
     messageFooterLikePage.clickLike();
 
     expect(spyOnLike).toHaveBeenCalledWith(message);
@@ -73,7 +73,7 @@ describe('MessageFooterLike', () => {
       onLike: () => {},
     });
 
-    expect(messageFooterLikePage.getLikeNameList().exists()).toBe(true);
+    expect(messageFooterLikePage.getLikeNameList()).not.toBeNull();
     messageFooterLikePage.clickLikeNameList();
 
     expect(spyOnOpenConversationDetails).toHaveBeenCalled();
@@ -90,7 +90,7 @@ describe('MessageFooterLike', () => {
       onLike: () => {},
     });
 
-    expect(messageFooterLikePage.getLikeNameList().exists()).toBe(true);
+    expect(messageFooterLikePage.getLikeNameList()).not.toBeNull();
     messageFooterLikePage.clickLikeNameList();
 
     expect(spyOnOpenConversationDetails).not.toHaveBeenCalled();

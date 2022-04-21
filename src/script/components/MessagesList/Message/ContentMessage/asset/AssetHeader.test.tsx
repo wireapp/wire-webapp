@@ -30,8 +30,8 @@ class AssetHeaderPage extends TestPage<AssetHeaderProps> {
     super(AssetHeader, props);
   }
 
-  getUserName = () => this.get('span[data-uie-name="asset-header-user-name"]').text();
-  getTime = () => this.get('span[data-uie-name="asset-header-time"]').text();
+  getUserName = () => this.get('span[data-uie-name="asset-header-user-name"]').textContent;
+  getTime = () => this.get('span[data-uie-name="asset-header-time"]').textContent;
 }
 
 describe('AssetHeader', () => {

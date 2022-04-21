@@ -25,7 +25,7 @@ class InputLevelTestPage extends TestPage<InputLevelProps> {
     super(InputLevel, props);
   }
 
-  getActiveInputLevelBullets = () => this.get('.input-level__bullet--active');
+  getActiveInputLevelBullets = () => this.getAll('.input-level__bullet--active');
 }
 
 describe('InputLevel', () => {

@@ -68,9 +68,9 @@ describe('SetEmail', () => {
       }),
     );
 
-    expect(setEmailPage.getEmailInput().exists()).toBe(true);
+    expect(setEmailPage.getEmailInput()).not.toBeNull();
 
-    expect(setEmailPage.getVerifyEmailButton().exists()).toBe(true);
+    expect(setEmailPage.getVerifyEmailButton()).not.toBeNull();
 
     expect(setEmailPage.getVerifyEmailButton().props().disabled).toBe(true);
     setEmailPage.enterEmail('e');
@@ -90,7 +90,7 @@ describe('SetEmail', () => {
       }),
     );
 
-    expect(setEmailPage.getErrorMessage().exists()).toBe(false);
+    expect(setEmailPage.getErrorMessage()).toBeNull();
 
     setEmailPage.enterEmail('e');
     setEmailPage.clickVerifyEmailButton();
@@ -98,7 +98,7 @@ describe('SetEmail', () => {
     await waitForExpect(() => {
       setEmailPage.update();
 
-      expect(setEmailPage.getErrorMessage(ValidationError.FIELD.EMAIL.TYPE_MISMATCH).exists()).toBe(true);
+      expect(setEmailPage.getErrorMessage(ValidationError.FIELD.EMAIL.TYPE_MISMATCH)).not.toBeNull();
     });
   });
 
