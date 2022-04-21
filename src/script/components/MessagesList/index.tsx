@@ -162,7 +162,7 @@ const MessagesList: React.FC<MessagesListParams> = ({
     const visibleCallback = getVisibleCallback(conversation, message);
     return (
       <Message
-        key={message.id}
+        key={message.id + message.timestamp}
         onVisible={visibleCallback}
         message={message}
         previousMessage={previousMessage}
