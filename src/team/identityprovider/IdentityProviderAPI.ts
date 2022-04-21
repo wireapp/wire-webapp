@@ -80,11 +80,11 @@ export class IdentityProviderAPI {
     return response.data;
   }
 
-  public async putIdentityProvider(identityData: string): Promise<IdentityProvider> {
+  public async putIdentityProvider(identityProviderId: string, identityData: string): Promise<IdentityProvider> {
     const config: AxiosRequestConfig = {
       data: identityData,
       method: 'put',
-      url: `${IdentityProviderAPI.URL.PROVIDER}`,
+      url: `${IdentityProviderAPI.URL.PROVIDER}/${identityProviderId}`,
     };
 
     const response = await this.client.sendXML<IdentityProvider>(config);
