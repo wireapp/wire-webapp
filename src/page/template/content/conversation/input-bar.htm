@@ -88,7 +88,7 @@
         </div>
         <mention-suggestions params="suggestions: mentionSuggestions, targetInputSelector: '#conversation-input-bar-text', onSelectionValidated: addMention"></mention-suggestions>
 
-        <ul class="controls-right">
+        <ul class="controls-right buttons-group">
           <!-- ko ifnot: isEditing() -->
             <!-- ko if: showGiphyButton() && isFileSharingSendingEnabled() -->
               <li>
@@ -101,34 +101,32 @@
             <!-- /ko -->
 
             <!-- ko ifnot: input().length -->
-            <li>
-              <message-timer-button params="conversation: conversationEntity"></message-timer-button>
-            </li>
-
             <!-- ko if: isFileSharingSendingEnabled() -->
               <li>
-                <label id="conversation-input-bar-photo" class="controls-right-button button-icon-large">
-                  <image-icon></image-icon>
-                  <input data-bind="attr: {accept: acceptedImageTypes}, file_select: uploadImages" type="file" multiple="multiple" data-uie-name="do-share-image"/>
-                </label>
-              </li>
-
-              <li>
-                <label id="conversation-input-bar-files" class="controls-right-button button-icon-large" data-bind="attr: {title: t('tooltipConversationFile')}">
-                  <attachment-icon></attachment-icon>
-                  <input data-bind="attr: inputFileAttr, file_select: uploadFiles" type="file" multiple="multiple" data-uie-name="do-share-file"/>
-                </label>
-              </li>
-              <!-- /ko -->
-
-              <li>
-                <button class="controls-right-button button-icon-large"
+                <button class="controls-right-button button-icon-large buttons-group-button-left"
                       type="button"
                       data-bind="click: clickToPing, disabled: pingDisabled(), attr: {'title': pingTooltip, 'aria-label': pingTooltip}, css: {'disabled': pingDisabled()}"
                       data-uie-name="do-ping">
                   <ping-icon></ping-icon>
                 </button>
               </li>
+              <li>
+                <label id="conversation-input-bar-photo" class="controls-right-button no-radius button-icon-large">
+                  <image-icon></image-icon>
+                  <input data-bind="attr: {accept: acceptedImageTypes}, file_select: uploadImages" type="file" multiple="multiple" data-uie-name="do-share-image"/>
+                </label>
+              </li>
+
+              <li>
+                <label id="conversation-input-bar-files" class="controls-right-button no-radius button-icon-large" data-bind="attr: {title: t('tooltipConversationFile')}">
+                  <attachment-icon></attachment-icon>
+                  <input data-bind="attr: inputFileAttr, file_select: uploadFiles" type="file" multiple="multiple" data-uie-name="do-share-file"/>
+                </label>
+              </li>
+              <!-- /ko -->
+              <li>
+                <message-timer-button params="conversation: conversationEntity"></message-timer-button>
+              </li>   
             <!-- /ko -->
           <!-- /ko -->
 
@@ -141,6 +139,13 @@
               </button>
             </li>
           <!-- /ko -->
+          <li>
+            <button type="button" class="controls-right-button controls-right-button--send"
+                  data-bind="click: onInputEnter, disable: input().length === 0, css: {'active': input().length !== 0}, attr: {'title': t('tooltipConversationSendMessage'), 'aria-label': t('tooltipConversationSendMessage')}"
+                  data-uie-name="do-send-message">
+              <send-icon></close-icon>
+            </button>
+          </li>
         </ul>
       <!-- /ko -->
     <!-- /ko -->
