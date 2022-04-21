@@ -17,37 +17,22 @@
  *
  */
 
-@badge-height: 20px;
-
-.badge {
-  .label-nocase-xs;
-
-  min-width: 24px;
-  background-color: var(--foreground);
-  border-radius: @badge-height / 2;
-  color: #fff;
-  line-height: @badge-height;
-  text-align: center;
-}
+@badge-height: 18px;
 
 .cell-badge {
   display: flex;
-  min-width: 32px;
-  height: @badge-height;
+  min-width: 24px;
+  min-height: @badge-height;
   align-items: center;
   justify-content: center;
-  border-radius: 10px;
+  padding: 3px 6px;
+  border-radius: 6px;
   font-size: 12px;
-  line-height: @badge-height;
 
   &.disabled {
     cursor: default;
     opacity: 0.32;
     pointer-events: none;
-  }
-
-  &.conversation-muted {
-    opacity: 0.8;
   }
 
   svg {
@@ -60,24 +45,44 @@
   }
 }
 
-.cell-badge-light {
+.light-badge {
   .cell-badge;
+  border: 1px solid var(--gray-40);
 
-  background-color: #feffff;
-  color: #323639;
+  background-color: @white;
+  color: @black;
 
   svg > path {
-    fill: #323639;
+    fill: @black;
+  }
+}
+
+.cell-badge-light {
+  .light-badge;
+
+  body.theme-dark & {
+    .dark-badge;
+    border: 1px solid var(--gray-90);
+  }
+}
+
+.dark-badge {
+  .cell-badge;
+  border: 0;
+  background-color: @black;
+
+  color: @white;
+
+  svg > path {
+    fill: @white;
   }
 }
 
 .cell-badge-dark {
-  .cell-badge;
+  .dark-badge;
 
-  background-color: fade(#000, 16%);
-
-  svg > path {
-    fill: #fff;
+  body.theme-dark & {
+    .light-badge;
   }
 }
 

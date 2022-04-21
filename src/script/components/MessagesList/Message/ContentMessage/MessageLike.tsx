@@ -19,6 +19,7 @@
 
 import React from 'react';
 import cx from 'classnames';
+import {t} from 'Util/LocalizerUtil';
 
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {ContentMessage} from 'src/script/entity/message/ContentMessage';
@@ -42,7 +43,7 @@ const MessageLike: React.FC<MessageLikeProps> = ({message, onLike, className}) =
       }}
       data-uie-name="do-like-message"
       data-uie-value={isLiked}
-      aria-label={isLiked ? 'Liked' : 'Like'}
+      aria-label={t(isLiked ? 'accessibility.messages.liked' : 'accessibility.messages.like')}
       onClick={() => onLike(message)}
       type="button"
     >

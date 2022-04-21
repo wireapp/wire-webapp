@@ -18,6 +18,7 @@
  */
 
 import React from 'react';
+import cx from 'classnames';
 import {Availability} from '@wireapp/protocol-messaging';
 import {CSSObject} from '@emotion/core';
 
@@ -110,8 +111,8 @@ const AvailabilityState: React.FC<AvailabilityStateProps> = ({
 
       {label && (
         <span
-          className="availability-state-label"
-          css={theme ? {color: 'var(--accent-color)', userSelect: 'none'} : {userSelect: 'none'}}
+          className={cx('availability-state-label', {'availability-state-label--active': theme})}
+          css={{userSelect: 'none'}}
           data-uie-name="status-label"
         >
           {label}

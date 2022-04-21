@@ -19,13 +19,11 @@
 
 import React from 'react';
 import {AccentColor} from '@wireapp/commons';
-
-import {registerReactComponent} from 'Util/ComponentUtil';
 import {CSS_SQUARE} from 'Util/CSSMixin';
 import {t} from 'Util/LocalizerUtil';
 import {CSSObject} from '@emotion/core';
-
-import type {User} from '../entity/User';
+import {User} from '../entity/User';
+import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 
 export interface AccentColorPickerProps {
   doSetAccentColor: (id: number) => void;
@@ -41,12 +39,13 @@ const headerStyles: CSSObject = {
 };
 
 const AccentColorPicker: React.FunctionComponent<AccentColorPickerProps> = ({user, doSetAccentColor}) => {
+  const {accent_id: accentId} = useKoSubscribableChildren(user, ['accent_id']);
   return (
     <>
       <h3 className="label" css={headerStyles}>
         {t('preferencesAccountAccentColor')}
       </h3>
-      <fieldset css={{border: 'none', margin: 0, padding: 0}} aria-label={t('chooseAccountColor')}>
+      <fieldset css={{border: 'none', margin: 0, padding: 0}} aria-label={t('accessibility.chooseAccountColor')}>
         <div
           className="preferences-account-accent-color"
           css={{
@@ -58,7 +57,8 @@ const AccentColorPicker: React.FunctionComponent<AccentColorPickerProps> = ({use
           {AccentColor.ACCENT_COLORS.map(accentColor => {
             const nameSplit = accentColor.name.replace(/([A-Z])/g, ',$1').split(',');
             const name = nameSplit[nameSplit.length - 1];
-            const isChecked = user.accent_id() === accentColor.id;
+            const color = User.ACCENT_COLOR[accentColor.id];
+            const isChecked = accentId === accentColor.id;
 
             return (
               <div
@@ -82,13 +82,14 @@ const AccentColorPicker: React.FunctionComponent<AccentColorPickerProps> = ({use
                   data-uie-value={accentColor.id}
                   css={{
                     '& + span': {
+                      color: color,
                       cursor: 'pointer',
                       display: 'inline-block',
                       position: 'relative',
                     },
                     '& + span::after': {
                       ...CSS_SQUARE(10),
-                      background: accentColor.color,
+                      background: 'currentColor',
                       left: '-5px',
                       top: '-5px',
                     },
@@ -109,7 +110,7 @@ const AccentColorPicker: React.FunctionComponent<AccentColorPickerProps> = ({use
                       top: '-5px',
                     },
                     '&:checked + span::before': {
-                      border: `1px solid ${accentColor.color}`,
+                      border: '1px solid currentColor',
                     },
                     '&:focus + span::before': {
                       ...CSS_SQUARE(16),
@@ -136,8 +137,3 @@ const AccentColorPicker: React.FunctionComponent<AccentColorPickerProps> = ({use
 };
 
 export default AccentColorPicker;
-
-registerReactComponent('accent-color-picker', {
-  component: AccentColorPicker,
-  template: '<span data-bind="react: {user: ko.unwrap(user), doSetAccentColor: selected}"></span>',
-});

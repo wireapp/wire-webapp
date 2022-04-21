@@ -38,31 +38,178 @@
 @accent_colors-6: @w-pink;
 @accent_colors-7: @w-purple;
 
-body {
-  --accent-color: @w-gray;
-  --accent-color-fade-16: fade(@w-gray, 16%);
-  --accent-color-fade-24: fade(@w-gray, 24%);
-  --accent-color-darken-16: darken(@w-gray, 16%);
+@blue-50: #e7f0fa;
+@blue-100: #cde1f4;
+@blue-200: #9bc2e9;
+@blue-400: #3885d3;
+@blue-500: #0667c8;
+@blue-600: #0552a0;
+@blue-700: #043e78;
+@blue-800: #022950;
+
+@blue-dark-50: #eef7ff;
+@blue-dark-100: #ddedff;
+@blue-dark-200: #bbdbff;
+@blue-dark-400: #76b8ff;
+@blue-dark-500: #54a6ff;
+@blue-dark-600: #4385cc;
+@blue-dark-700: #326499;
+@blue-dark-800: #224266;
+
+@green-50: #e8f1ea;
+@green-100: #d2e4d6;
+@green-200: #a5c9ad;
+@green-400: #4a935c;
+@green-500: #1d7833;
+@green-600: #176029;
+@green-700: #11481f;
+@green-800: #0c3014;
+
+@green-dark-50: #ebfcef;
+@green-dark-100: #d6f8de;
+@green-dark-200: #acf1bd;
+@green-dark-400: #59e27c;
+@green-dark-500: #30db5b;
+@green-dark-600: #26af49;
+@green-dark-700: #1d8337;
+@green-dark-800: #135824;
+
+@petrol-50: #e5f1f3;
+@petrol-100: #cce2e7;
+@petrol-200: #99c6d0;
+@petrol-400: #348da1;
+@petrol-500: #01718e;
+@petrol-600: #015a6e;
+@petrol-700: #014352;
+@petrol-800: #002d37;
+
+@petrol-dark-50: #effdff;
+@petrol-dark-100: #dffaff;
+@petrol-dark-200: #bef5ff;
+@petrol-dark-400: #7debff;
+@petrol-dark-500: #5de6ff;
+@petrol-dark-600: #4ab8cc;
+@petrol-dark-700: #388a99;
+@petrol-dark-800: #255c66;
+
+@purple-50: #f4edf7;
+@purple-100: #e7daee;
+@purple-200: #d0b4dd;
+@purple-400: #a169bc;
+@purple-500: #8944ab;
+@purple-600: #6e3689;
+@purple-700: #522967;
+@purple-800: #371b44;
+
+@purple-dark-50: #fcf4ff;
+@purple-dark-100: #f8e9ff;
+@purple-dark-200: #f0d2ff;
+@purple-dark-400: #e1a5ff;
+@purple-dark-500: #da8fff;
+@purple-dark-600: #ae72cc;
+@purple-dark-700: #835699;
+@purple-dark-800: #573966;
+
+@red-50: #f9e6e8;
+@red-100: #f3ccd0;
+@red-200: #e799a1;
+@red-400: #ce3342;
+@red-500: #c20013;
+@red-600: #9b000f;
+@red-700: #74000b;
+@red-800: #4e0008;
+
+@red-dark-50: #fff2f1;
+@red-dark-100: #ffe4e2;
+@red-dark-200: #ffc9c6;
+@red-dark-400: #ff928d;
+@red-dark-500: #ff7770;
+@red-dark-600: #cc5f5a;
+@red-dark-700: #994743;
+@red-dark-800: #66302d;
+
+@amber-50: #f6eee8;
+@amber-100: #ecded0;
+@amber-200: #dabda1;
+@amber-400: #b57a44;
+@amber-500: #a25915;
+@amber-600: #824711;
+@amber-700: #61350d;
+@amber-800: #412408;
+
+@amber-dark-50: #fffbea;
+@amber-dark-100: #fff6d4;
+@amber-dark-200: #ffeea8;
+@amber-dark-400: #ffdd51;
+@amber-dark-500: #ffd426;
+@amber-dark-600: #ccaa1e;
+@amber-dark-700: #997f17;
+@amber-dark-800: #66550f;
+
+.colors() {
+  amber: 5;
+  blue: 1;
+  green: 2;
+  petrol: 6;
+  purple: 7;
+  red: 4;
 }
 
-.generate-css-vars(@accent_id) when (@accent_id > 0) {
-  .generate-css-vars(@accent_id - 1);
-  @accent-color: 'accent_colors-@{accent_id}';
+@color-index: 50, 100, 200, 400, 500, 600, 700, 800;
 
-  .accent-color-@{accent_id} {
-    color: @@accent-color;
+body {
+  &.theme-default {
+    each(.colors(), .(@color-key, @color-name) {
+      @name: @color-name;
+      @accent-color: '@{color-name}-500';
+      --@{name}-500: @@accent-color;
+    });
   }
+  &.theme-dark {
+    each(.colors(), .(@color-key, @color-name) {
+      @name: @color-name;
+      @accent-dark-color:'@{color-name}-dark-500';
+        --@{name}-500: @@accent-dark-color;
+    });
+  }
+}
 
-  .main-accent-color-@{accent_id} {
+each(.colors(), .(@color-key, @color-name) {
+  @name: @color-name;
+  @accent-color: '@{name}-500';
+
+  .main-accent-color-@{color-key} {
     --accent-color: @@accent-color;
     --accent-color-fade-16: fade(@@accent-color, 16%);
     --accent-color-fade-24: fade(@@accent-color, 24%);
     --accent-color-darken-16: darken(@@accent-color, 16%);
+    each(@color-index, {
+      @accent-color: '@{name}-@{value}';
+      --accent-color-@{value}: @@accent-color;
+    })
   }
-}
-.generate-css-vars(7);
 
-.accent-selection() {
+  .accent-color-@{color-key} {
+    color: @@accent-color;
+  }
+
+  body.theme-dark {
+    @accent-color-dark: '@{name}-dark-500';
+
+    .main-accent-color-@{color-key} {
+      --accent-color: @@accent-color-dark;
+      each(@color-index, {
+        @accent-color: '@{name}-dark-@{value}';
+        --accent-color-@{value}: @@accent-color;
+      })
+    }
+
+    .accent-color-@{color-key} {
+      color: @@accent-color-dark;
+    }
+  }
+})
+  .accent-selection() {
   &::-moz-selection {
     background-color: var(--accent-color-fade-24);
   }

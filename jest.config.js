@@ -40,7 +40,7 @@ module.exports = {
   testEnvironmentOptions: {
     resources: 'usable', // For <img>.src the package `canvas` is needed as well
   },
-  testPathIgnorePatterns: ['<rootDir>/test/index.test.js', '<rootDir>/test/main.test.js', '<rootDir>/server'],
+  testPathIgnorePatterns: ['<rootDir>/server'],
   testRegex: '(test|Spec)\\.[tj]sx?$',
   testRunner: 'jest-jasmine2',
 };

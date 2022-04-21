@@ -54,12 +54,8 @@ import {TeamState} from '../team/TeamState';
 import {ConversationState} from '../conversation/ConversationState';
 import {isConversationEntity} from 'Util/TypePredicateUtil';
 import {matchQualifiedIds} from 'Util/QualifiedId';
-import '../page/preferences/AccountPreferences';
-import '../page/preferences/OptionPreferences';
-import '../page/preferences/AVPreferences';
-import '../page/preferences/AboutPreferences';
-import '../page/preferences/devices/DevicesPreferences';
 import '../page/LeftSidebar';
+import '../page/MainContent';
 import {
   PreferenceNotificationRepository,
   Notification,
@@ -77,6 +73,22 @@ interface ShowConversationOptions {
 interface ShowConversationOverload {
   (conversation: Conversation, options: ShowConversationOptions): Promise<void>;
   (conversationId: string, options: ShowConversationOptions, domain: string | null): Promise<void>;
+}
+
+export enum ContentState {
+  COLLECTION = 'ContentViewModel.STATE.COLLECTION',
+  COLLECTION_DETAILS = 'ContentViewModel.STATE.COLLECTION_DETAILS',
+  CONNECTION_REQUESTS = 'ContentViewModel.STATE.CONNECTION_REQUESTS',
+  CONVERSATION = 'ContentViewModel.STATE.CONVERSATION',
+  HISTORY_EXPORT = 'ContentViewModel.STATE.HISTORY_EXPORT',
+  HISTORY_IMPORT = 'ContentViewModel.STATE.HISTORY_IMPORT',
+  PREFERENCES_ABOUT = 'ContentViewModel.STATE.PREFERENCES_ABOUT',
+  PREFERENCES_ACCOUNT = 'ContentViewModel.STATE.PREFERENCES_ACCOUNT',
+  PREFERENCES_AV = 'ContentViewModel.STATE.PREFERENCES_AV',
+  PREFERENCES_DEVICE_DETAILS = 'ContentViewModel.STATE.PREFERENCES_DEVICE_DETAILS',
+  PREFERENCES_DEVICES = 'ContentViewModel.STATE.PREFERENCES_DEVICES',
+  PREFERENCES_OPTIONS = 'ContentViewModel.STATE.PREFERENCES_OPTIONS',
+  WATERMARK = 'ContentViewModel.STATE.WATERMARK',
 }
 
 export class ContentViewModel {
@@ -104,7 +116,7 @@ export class ContentViewModel {
   previousConversation: Conversation | null = null;
   previousState: string | null = null;
   serviceModal: ServiceModalViewModel;
-  state: ko.Observable<string>;
+  state: ko.Observable<ContentState>;
   State: typeof ContentViewModel.STATE;
   titleBar: TitleBarViewModel;
   userModal: UserModalViewModel;
@@ -112,19 +124,19 @@ export class ContentViewModel {
 
   static get STATE() {
     return {
-      COLLECTION: 'ContentViewModel.STATE.COLLECTION',
-      COLLECTION_DETAILS: 'ContentViewModel.STATE.COLLECTION_DETAILS',
-      CONNECTION_REQUESTS: 'ContentViewModel.STATE.CONNECTION_REQUESTS',
-      CONVERSATION: 'ContentViewModel.STATE.CONVERSATION',
-      HISTORY_EXPORT: 'ContentViewModel.STATE.HISTORY_EXPORT',
-      HISTORY_IMPORT: 'ContentViewModel.STATE.HISTORY_IMPORT',
-      PREFERENCES_ABOUT: 'ContentViewModel.STATE.PREFERENCES_ABOUT',
-      PREFERENCES_ACCOUNT: 'ContentViewModel.STATE.PREFERENCES_ACCOUNT',
-      PREFERENCES_AV: 'ContentViewModel.STATE.PREFERENCES_AV',
-      PREFERENCES_DEVICES: 'ContentViewModel.STATE.PREFERENCES_DEVICES',
-      PREFERENCES_DEVICE_DETAILS: 'ContentViewModel.STATE.PREFERENCES_DEVICE_DETAILS',
-      PREFERENCES_OPTIONS: 'ContentViewModel.STATE.PREFERENCES_OPTIONS',
-      WATERMARK: 'ContentViewModel.STATE.WATERMARK',
+      COLLECTION: ContentState.COLLECTION,
+      COLLECTION_DETAILS: ContentState.COLLECTION_DETAILS,
+      CONNECTION_REQUESTS: ContentState.CONNECTION_REQUESTS,
+      CONVERSATION: ContentState.CONVERSATION,
+      HISTORY_EXPORT: ContentState.HISTORY_EXPORT,
+      HISTORY_IMPORT: ContentState.HISTORY_IMPORT,
+      PREFERENCES_ABOUT: ContentState.PREFERENCES_ABOUT,
+      PREFERENCES_ACCOUNT: ContentState.PREFERENCES_ACCOUNT,
+      PREFERENCES_AV: ContentState.PREFERENCES_AV,
+      PREFERENCES_DEVICES: ContentState.PREFERENCES_DEVICES,
+      PREFERENCES_DEVICE_DETAILS: ContentState.PREFERENCES_DEVICE_DETAILS,
+      PREFERENCES_OPTIONS: ContentState.PREFERENCES_OPTIONS,
+      WATERMARK: ContentState.WATERMARK,
     };
   }
 
@@ -336,7 +348,7 @@ export class ContentViewModel {
     }
   };
 
-  readonly switchContent = (newContentState: string): void => {
+  readonly switchContent = (newContentState: ContentState): void => {
     const isStateChange = newContentState !== this.state();
     if (isStateChange) {
       this.releaseContent(newContentState);
@@ -364,7 +376,7 @@ export class ContentViewModel {
     }
   };
 
-  private readonly checkContentAvailability = (state: string) => {
+  private readonly checkContentAvailability = (state: ContentState): ContentState => {
     const isStateRequests = state === ContentViewModel.STATE.CONNECTION_REQUESTS;
     if (isStateRequests) {
       const hasConnectRequests = !!this.userState.connectRequests().length;
@@ -400,12 +412,12 @@ export class ContentViewModel {
     }
   };
 
-  private readonly releaseContent = (newContentState: string) => {
+  private readonly releaseContent = (newContentState: ContentState) => {
     this.previousState = this.state();
 
     const isStateConversation = this.previousState === ContentViewModel.STATE.CONVERSATION;
     if (isStateConversation) {
-      const collectionStates = [ContentViewModel.STATE.COLLECTION];
+      const collectionStates = [ContentState.COLLECTION];
       const isCollectionState = collectionStates.includes(newContentState);
       if (!isCollectionState) {
         this.conversationState.activeConversation(null);
@@ -415,7 +427,7 @@ export class ContentViewModel {
     }
   };
 
-  private readonly showContent = (newContentState: string) => {
+  private readonly showContent = (newContentState: ContentState) => {
     this.state(newContentState);
     return this._shiftContent(
       this.getElementOfContent(newContentState),

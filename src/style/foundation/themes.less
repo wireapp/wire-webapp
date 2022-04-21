@@ -25,18 +25,15 @@ body.theme-default {
   @foreground: #8d989f;
   @background: #323639;
 
-  @blue-500: #0667c8;
-  @green-500: #1d7833;
-  @petrol-500: #01718e;
-  @purple-500: #8944ab;
-  @red-500: #c20013;
-  @amber-500: #a25915;
-
-  // ----------------------------------------------------------------------------
+  // -------------------------------------------
   // Framework
   // ----------------------------------------------------------------------------
-  @app-bg: #fafafa;
-  @app-bg-secondary: #feffff;
+  @app-bg: var(--gray-10);
+  @sidebar-bg: var(--gray-20);
+  @sidebar-border-color: var(--gray-50);
+  @border-color: var(--gray-40);
+  @main-color: var(--black);
+  @app-bg-secondary: var(--white);
   @conversation-list-bg-opacity: fade(#000, 64%);
   @sidebar-box-shadow: #eee;
   @sidebar-box-shadow-lg: rgba(0, 0, 0, 0.12);
@@ -56,6 +53,26 @@ body.theme-default {
   // Editing Input
   // ----------------------------------------------------------------------------
   @text-input-editing: mix(@w-yellow, #fff, 16%);
+  @text-input-background: #fff;
+  @text-input-border: @gray-40;
+  @text-input-border-hover: @gray-60;
+  @text-input-placeholder: @gray-70;
+  @text-input-color: #000;
+  @text-input-alert: @red-500;
+  @text-input-disabled: @gray-20;
+  @text-input-label: @gray-80;
+  @text-input-success: @green-500;
+
+  // ----------------------------------------------------------------------------
+  // Checkbox
+  // ----------------------------------------------------------------------------
+  @checkbox-background: @gray-20;
+  @checkbox-background-selected: @blue-500;
+  @checkbox-background-disabled: @gray-10;
+  @checkbox-background-disabled-selected: @gray-60;
+  @checkbox-border: @gray-80;
+  @checkbox-border-hover: @blue-500;
+  @checkbox-border-disabled: @gray-60;
 
   // ----------------------------------------------------------------------------
   // Message Quote Vertical Bar
@@ -85,21 +102,17 @@ body.theme-dark {
   // ----------------------------------------------------------------------------
   @foreground: #737476;
   @background: #feffff;
-  @blue-500: #54a6ff;
-  @green-500: #30db5b;
-  @petrol-500: #5de6ff;
-  @purple-500: #da8fff;
-  @red-500: #ff7770;
-  @amber-500: #ffd426;
 
   // ----------------------------------------------------------------------------
   // Framework
   // ----------------------------------------------------------------------------
-  @app-bg: #17181a;
-  @app-bg-secondary: #202123;
+  @app-bg: var(--gray-95);
+  @sidebar-bg: var(--gray-100);
+  @sidebar-border-color: var(--gray-95);
+  @main-color: var(--white);
+  @border-color: var(--gray-90);
+  @app-bg-secondary: var(--black);
   @conversation-list-bg-opacity: fade(#000, 78%);
-  @sidebar-box-shadow: #1c1d1f;
-  @sidebar-box-shadow-lg: rgba(0, 0, 0, 0.12);
 
   // ----------------------------------------------------------------------------
   // Modal
@@ -116,6 +129,26 @@ body.theme-dark {
   // Editing Input
   // ----------------------------------------------------------------------------
   @text-input-editing: #42391c;
+  @text-input-background: #000;
+  @text-input-border: @gray-80;
+  @text-input-border-hover: @gray-40;
+  @text-input-placeholder: @gray-60;
+  @text-input-color: #fff;
+  @text-input-alert: @red-dark-500;
+  @text-input-disabled: @gray-100;
+  @text-input-label: @gray-40;
+  @text-input-success: @green-dark-500;
+
+  // ----------------------------------------------------------------------------
+  // Checkbox
+  // ----------------------------------------------------------------------------
+  @checkbox-background: @gray-90;
+  @checkbox-background-selected: @blue-dark-500;
+  @checkbox-background-disabled: @gray-90;
+  @checkbox-background-disabled-selected: @gray-80;
+  @checkbox-border: @gray-80;
+  @checkbox-border-hover: @blue-dark-500;
+  @checkbox-border-disabled: @gray-80;
 
   // ----------------------------------------------------------------------------
   // Message Quote Vertical Bar

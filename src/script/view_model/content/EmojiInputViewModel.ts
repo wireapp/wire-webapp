@@ -317,8 +317,8 @@ export class EmojiInputViewModel {
     }
 
     const {selectionStart: selection, value: text} = input;
-    let textBeforeCursor = text.substr(0, selection);
-    let textAfterCursor = text.substr(selection);
+    let textBeforeCursor = text.slice(0, selection);
+    let textAfterCursor = text.slice(selection);
 
     for (const replacement of EmojiInputViewModel.INLINE_REPLACEMENT) {
       const icon = this.emojiDict[replacement.name];
@@ -342,7 +342,7 @@ export class EmojiInputViewModel {
       return;
     }
 
-    const query = text.substr(this.emojiStartPosition, selection - this.emojiStartPosition);
+    const query = text.slice(this.emojiStartPosition, selection);
     if (!query.length) {
       return this.closeEmojiPopup();
     }
@@ -428,8 +428,8 @@ export class EmojiInputViewModel {
   private readonly enterEmoji = (input: HTMLInputElement, emojiIcon: string): void => {
     const {selectionStart: selection, value: text} = input;
 
-    const textBeforeEmoji = text.substr(0, this.emojiStartPosition - 1);
-    const textAfterEmoji = text.substr(selection);
+    const textBeforeEmoji = text.substring(0, this.emojiStartPosition - 1);
+    const textAfterEmoji = text.slice(selection);
     const newCursorPosition = textBeforeEmoji.length + emojiIcon.length;
     input.value = `${textBeforeEmoji}${emojiIcon}${textAfterEmoji}`;
     input.setSelectionRange(newCursorPosition, newCursorPosition);

@@ -26,6 +26,15 @@
   cursor: pointer;
   font-weight: @font-weight-regular;
 
+  .button-states();
+
+  &:focus-visible {
+    .conversation-list-cell-center,
+    .conversation-list-cell-right {
+      border-bottom: 0 !important;
+    }
+  }
+
   &::after {
     position: absolute;
     right: 0;
@@ -35,6 +44,15 @@
     background-color: #fff;
     content: '';
     opacity: 0.06;
+  }
+
+  &--active {
+    .button-active();
+
+    .conversation-list-cell-center,
+    .conversation-list-cell-right {
+      border-bottom: 0 !important;
+    }
   }
 }
 
@@ -63,6 +81,7 @@
   flex: 1 1 auto;
   flex-direction: column;
   justify-content: center;
+  border-bottom: 1px solid var(--border-color);
 
   &.conversation-list-cell-center-no-left {
     padding-left: 16px;
@@ -73,6 +92,7 @@
   .flex-center;
 
   padding-right: 16px;
+  border-bottom: 1px solid var(--border-color);
 }
 
 .conversation-recent-view-list {
@@ -90,35 +110,48 @@
 
   .availability-state-label {
     .ellipsis-nowrap;
+    .text-medium;
 
     padding-bottom: 2px;
     margin-right: 4px;
     margin-bottom: -2px;
-    font-size: 14px;
-    line-height: 16px;
+
+    &--active {
+      color: var(--white);
+    }
   }
 }
 
 .conversation-list-cell-name {
   .ellipsis-nowrap;
+  .text-medium;
 
   padding-bottom: 2px;
   margin-right: 4px;
   margin-bottom: -2px;
-  font-size: 14px;
-  line-height: 16px;
-  user-select: none;
+
+  &--active {
+    color: var(--white);
+  }
 }
 
 .conversation-list-cell-description {
   .ellipsis-nowrap;
+  .subline;
 
   margin-top: 2px;
   margin-right: 4px;
-  font-size: 12px;
-  font-weight: @font-weight-regular;
-  line-height: 16px;
-  opacity: 0.64;
+  color: var(--gray-90);
+
+  &--active {
+    color: var(--white);
+  }
+}
+
+body.theme-dark {
+  .conversation-list-cell-description {
+    color: var(--gray-20);
+  }
 }
 
 .conversation-list-cell-badge {
@@ -133,7 +166,7 @@
   &::before {
     width: 0;
     height: 0;
-    border-top: 4px solid #fff;
+    border-top: 4px solid var(--main-color);
     border-right: 4px solid transparent;
     border-left: 4px solid transparent;
     content: '';
@@ -144,10 +177,12 @@
       opacity: 1;
     }
   }
+
+  &--active {
+    &::before {
+      border-top-color: var(--white);
+    }
+  }
 }
 
 /* states */
-
-.conversation-list-cell-left-opaque {
-  opacity: 0.32;
-}
