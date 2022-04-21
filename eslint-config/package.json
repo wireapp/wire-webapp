@@ -1,7 +1,7 @@
 {
   "description": "Wire ESLint config",
   "license": "GPL-3.0",
-  "main": "eslintrc.json",
+  "main": "eslintrc.js",
   "name": "@wireapp/eslint-config",
   "peerDependencies": {
     "@babel/eslint-parser": ">=7",
