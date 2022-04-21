@@ -21,37 +21,6 @@ import ko, {Unwrapped} from 'knockout';
 import React, {useEffect, useState} from 'react';
 import {createRoot} from 'react-dom/client';
 
-/**
- * Registers a react component against the ko world.
- *
- * @param name Name of the component to register. can be used a `<component-name>` directly in ko
- * @param {component}
- */
-export function registerReactComponent<Props>(name: string, component: React.ComponentType<Props>) {
-  if (ko.components.isRegistered(name)) {
-    return;
-  }
-
-  ko.components.register(name, {
-    template: '<!-- -->', // We do not need any particular template as this is going to be replaced by react content
-    viewModel: {
-      createViewModel: (params: Props, {element}: {element: HTMLElement}) => {
-        let state: Props = resolveObservables(params);
-        const subscription = subscribeProperties(params, updates => {
-          state = {...state, ...updates};
-          ReactDOM.render(React.createElement(component, state), element);
-        });
-        return {
-          dispose() {
-            ReactDOM.unmountComponentAtNode(element);
-            subscription.dispose();
-          },
-        };
-      },
-    },
-  });
-}
-
 type Subscribables<T> = {
   [Key in keyof T]: T[Key] extends ko.Subscribable ? T[Key] : never;
 };
@@ -106,6 +75,37 @@ const subscribeProperties = <C extends keyof Subscribables<P>, P extends Partial
     dispose: () => subscriptions.forEach(subscription => subscription?.dispose()),
   };
 };
+
+/**
+ * Registers a react component against the ko world.
+ *
+ * @param name Name of the component to register. can be used a `<component-name>` directly in ko
+ * @param component The React component to register
+ */
+export function registerReactComponent<Props>(name: string, component: React.ComponentType<Props>) {
+  if (ko.components.isRegistered(name)) {
+    return;
+  }
+
+  ko.components.register(name, {
+    template: '<!-- -->', // We do not need any particular template as this is going to be replaced by react content
+    viewModel: {
+      createViewModel: (params: Props, {element}: {element: HTMLElement}) => {
+        let state: Props = resolveObservables(params);
+        const subscription = subscribeProperties(params, updates => {
+          state = {...state, ...updates};
+          ReactDOM.render(React.createElement(component, state), element);
+        });
+        return {
+          dispose() {
+            ReactDOM.unmountComponentAtNode(element);
+            subscription.dispose();
+          },
+        };
+      },
+    },
+  });
+}
 
 export const useKoSubscribableChildren = <
   C extends keyof Subscribables<P>,
