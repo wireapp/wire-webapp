@@ -3105,10 +3105,10 @@
     bazinga64 "5.10.0"
     buffer "6.0.3"
 
-"@wireapp/eslint-config@1.12.0":
-  version "1.12.0"
-  resolved "https://registry.yarnpkg.com/@wireapp/eslint-config/-/eslint-config-1.12.0.tgz#05b5339b0b7a80dd9d663a0fac139a7e3e3b2ced"
-  integrity sha512-cyE2+ajy4DZ00RTnVfm3F2MvKErSUDw8oh2o4gapqaA/jptjfqYE2MqE4dxGfNwWDZtCk4AOyR3qMnK+XEzrAg==
+"@wireapp/eslint-config@1.12.4":
+  version "1.12.4"
+  resolved "https://registry.yarnpkg.com/@wireapp/eslint-config/-/eslint-config-1.12.4.tgz#7554c59da799d86f5dc3bd9e824987ec1b439214"
+  integrity sha512-hZfkER9rsNnjYGrkkDgrLC61k7ufjEtJBh5/CuhFLuzp59W3whEJ3l0v5nzt145F1EuW9ApWJmqIKbL4ANyCeQ==
 
 "@wireapp/lru-cache@3.8.1":
   version "3.8.1"
