@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.12.1](https://github.com/wireapp/wire-web-packages/tree/main/packages/eslint-config/compare/@wireapp/eslint-config@1.12.0...@wireapp/eslint-config@1.12.1) (2022-04-21)
+
+
+### Bug Fixes
+
+* upgrade eslint config ([aee7821](https://github.com/wireapp/wire-web-packages/tree/main/packages/eslint-config/commit/aee78219d07847dc5ab8dd6dfbc1b03a8beabe86))
+
+
+
+
+
 # [1.12.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/eslint-config/compare/@wireapp/eslint-config@1.11.2...@wireapp/eslint-config@1.12.0) (2021-12-02)
 
 

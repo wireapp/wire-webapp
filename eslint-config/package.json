@@ -4,6 +4,7 @@
   "main": "eslintrc.json",
   "name": "@wireapp/eslint-config",
   "peerDependencies": {
+    "@babel/eslint-parser": ">=7",
     "@typescript-eslint/eslint-plugin": ">=3",
     "@typescript-eslint/parser": ">=3",
     "eslint": ">=7",
@@ -15,9 +16,8 @@
     "eslint-plugin-react": ">=7",
     "eslint-plugin-react-hooks": ">=2",
     "eslint-plugin-unused-imports": ">=1.1",
-    "@babel/eslint-parser": ">=7",
     "prettier": ">=2"
   },
   "repository": "https://github.com/wireapp/wire-web-packages/tree/main/packages/eslint-config",
-  "version": "1.12.0"
+  "version": "1.12.1"
 }
