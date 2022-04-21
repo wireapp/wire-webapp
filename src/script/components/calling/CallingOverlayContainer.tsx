@@ -20,7 +20,7 @@
 import {QualifiedId} from '@wireapp/api-client/src/user';
 import {CALL_TYPE, STATE as CALL_STATE} from '@wireapp/avs';
 import React, {Fragment, useEffect} from 'react';
-import ReactDOM from 'react-dom';
+import {createRoot} from 'react-dom/client';
 import {container} from 'tsyringe';
 
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
@@ -212,14 +212,13 @@ export default {
     mediaStreamHandler: MediaStreamHandler,
     mediaDevicesHandler: MediaDevicesHandler,
   ) => {
-    ReactDOM.render(
+    createRoot(document.getElementById('calling-overlay-container')).render(
       <CallingContainer
         multitasking={multitasking}
         callingRepository={callingRepository}
         mediaStreamHandler={mediaStreamHandler}
         mediaDevicesHandler={mediaDevicesHandler}
       />,
-      document.getElementById('calling-overlay-container'),
     );
   },
 };

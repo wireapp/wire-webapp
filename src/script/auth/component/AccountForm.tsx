@@ -245,7 +245,7 @@ const AccountForm = ({account, ...props}: Props & ConnectedProps & DispatchProps
               {...accountFormStrings.termsAndPrivacyPolicy}
               values={{
                 // eslint-disable-next-line react/display-name
-                privacypolicy: (...chunks: string[] | React.ReactNode[]) => (
+                privacypolicy: ((...chunks: string[] | React.ReactNode[]) => (
                   <a
                     target="_blank"
                     rel="noopener noreferrer"
@@ -254,9 +254,9 @@ const AccountForm = ({account, ...props}: Props & ConnectedProps & DispatchProps
                   >
                     {chunks}
                   </a>
-                ),
+                )) as any,
                 // eslint-disable-next-line react/display-name
-                terms: (...chunks: string[] | React.ReactNode[]) => (
+                terms: ((...chunks: string[] | React.ReactNode[]) => (
                   <a
                     target="_blank"
                     rel="noopener noreferrer"
@@ -269,7 +269,7 @@ const AccountForm = ({account, ...props}: Props & ConnectedProps & DispatchProps
                   >
                     {chunks}
                   </a>
-                ),
+                )) as any,
               }}
             />
           ) : (
@@ -277,7 +277,7 @@ const AccountForm = ({account, ...props}: Props & ConnectedProps & DispatchProps
               {...accountFormStrings.terms}
               values={{
                 // eslint-disable-next-line react/display-name
-                terms: (...chunks: string[] | React.ReactNode[]) => (
+                terms: ((...chunks: string[] | React.ReactNode[]) => (
                   <a
                     target="_blank"
                     rel="noopener noreferrer"
@@ -290,7 +290,7 @@ const AccountForm = ({account, ...props}: Props & ConnectedProps & DispatchProps
                   >
                     {chunks}
                   </a>
-                ),
+                )) as any,
               }}
             />
           )}

@@ -19,7 +19,6 @@
 
 import React from 'react';
 import {CSSTransition, SwitchTransition} from 'react-transition-group';
-import {css} from '@emotion/core';
 import {registerStaticReactComponent, useKoSubscribableChildren} from 'Util/ComponentUtil';
 
 import {ContentViewModel, ContentState} from '../../view_model/ContentViewModel';
@@ -40,7 +39,7 @@ type LeftSidebarProps = {
   contentViewModel: ContentViewModel;
   conversationState?: ConversationState;
 };
-const Animated: React.FC = ({children, ...rest}) => {
+const Animated: React.FC<{children: React.ReactNode}> = ({children, ...rest}) => {
   return (
     <CSSTransition classNames="slide-in-left" timeout={{enter: 500}} {...rest}>
       {children}
@@ -148,7 +147,7 @@ const MainContent: React.FC<LeftSidebarProps> = ({
   return (
     <>
       <h1 className="visually-hidden">{title}</h1>
-      <SwitchTransition css={css({height: '100%'})}>
+      <SwitchTransition>
         <Animated key={state}>{content}</Animated>
       </SwitchTransition>
     </>

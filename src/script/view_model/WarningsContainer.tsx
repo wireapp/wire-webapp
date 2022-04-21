@@ -18,7 +18,6 @@
  */
 
 import {WebAppEvents} from '@wireapp/webapp-events';
-import ReactDOM from 'react-dom';
 import {amplify} from 'amplify';
 import cx from 'classnames';
 
@@ -34,6 +33,7 @@ import {Runtime} from '@wireapp/commons';
 
 import React, {useEffect, useState} from 'react';
 import Icon from 'Components/Icon';
+import {createRoot} from 'react-dom/client';
 
 const WarningsContainer: React.FC = () => {
   const logger = getLogger('WarningsViewModel');
@@ -444,7 +444,7 @@ const Warnings = {
   CONFIG,
   TYPE,
   init: () => {
-    ReactDOM.render(<WarningsContainer />, document.getElementById('warnings'));
+    createRoot(document.getElementById('warnings')).render(<WarningsContainer />);
   },
 };
 

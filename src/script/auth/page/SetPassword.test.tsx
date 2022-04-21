@@ -18,7 +18,6 @@
  */
 
 import {ReactWrapper} from 'enzyme';
-import React from 'react';
 import waitForExpect from 'wait-for-expect';
 import {ValidationError} from '../module/action/ValidationError';
 import {initialRootState, RootState, Api} from '../module/reducer';

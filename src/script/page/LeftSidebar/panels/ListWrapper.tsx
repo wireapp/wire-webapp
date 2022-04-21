@@ -19,7 +19,7 @@
 
 import React, {ReactElement, useEffect} from 'react';
 
-import {css} from '@emotion/core';
+import {css} from '@emotion/react';
 import {throttle} from 'underscore';
 import {isScrollable, isScrolledBottom, isScrolledTop} from 'Util/scroll-helpers';
 import Icon from 'Components/Icon';
@@ -30,6 +30,7 @@ import {useFadingScrollbar} from '../../../ui/fadingScrollbar';
 type LeftListWrapperProps = {
   /** A react element that will be inserted after the header but before the list */
   before?: ReactElement;
+  children: React.ReactNode;
   footer?: ReactElement;
   header?: string;
   headerElement?: ReactElement;

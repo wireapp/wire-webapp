@@ -19,7 +19,6 @@
 
 import {ReactWrapper} from 'enzyme';
 import {createMemoryHistory} from 'history';
-import React from 'react';
 import waitForExpect from 'wait-for-expect';
 import {actionRoot} from '../module/action';
 import {initialRootState, RootState, Api} from '../module/reducer';

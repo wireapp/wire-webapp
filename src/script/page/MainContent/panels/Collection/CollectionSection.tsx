@@ -4,6 +4,7 @@ import {t} from 'Util/LocalizerUtil';
 import CollectionItem from './CollectionItem';
 
 const CollectionSection: React.FC<{
+  children: React.ReactNode;
   label: string;
   limit: number;
   messages: ContentMessage[];

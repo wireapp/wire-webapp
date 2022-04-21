@@ -18,7 +18,6 @@
  */
 
 // https://github.com/facebook/react/issues/11163#issuecomment-628379291
-import React from 'react';
 import {VideoHTMLAttributes, useEffect, useRef} from 'react';
 
 type VideoProps = VideoHTMLAttributes<HTMLVideoElement> & {

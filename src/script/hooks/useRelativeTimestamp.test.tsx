@@ -1,5 +1,5 @@
 import {useRelativeTimestamp} from './useRelativeTimestamp';
-import {renderHook, act} from '@testing-library/react-hooks';
+import {renderHook, act} from '@testing-library/react';
 import {formatLocale, formatTimeShort} from 'Util/TimeUtil';
 
 describe('useRelativeTimestamp', () => {

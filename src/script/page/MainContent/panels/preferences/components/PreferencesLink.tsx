@@ -20,6 +20,7 @@
 import React from 'react';
 
 interface PreferencesLinkProps {
+  children: React.ReactNode;
   href: string;
   uie?: string;
 }
