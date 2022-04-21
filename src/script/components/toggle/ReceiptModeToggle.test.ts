@@ -29,8 +29,6 @@ class ReceiptModeTogglePage extends TestPage<ReceiptModeToggleProps> {
   }
 
   getCheckbox = () => this.get('input[data-uie-name="toggle-receipt-mode-checkbox"]');
-  checkCheckbox = () => this.changeValue(this.getCheckbox(), {checked: true});
-  uncheckCheckbox = () => this.changeValue(this.getCheckbox(), {checked: false});
 }
 
 describe('ReceiptModeToggle', () => {

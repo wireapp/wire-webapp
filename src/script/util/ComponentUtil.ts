@@ -59,15 +59,8 @@ const subscribeProperties = <C extends keyof Subscribables<P>, P extends Partial
     .filter(child => ko.isSubscribable(object?.[child]))
     .map(child => {
       const subscribable = object[child];
-      let batchedUpdates = {};
-      let batchTimeout: NodeJS.Timeout;
       return subscribable?.subscribe((value: Unwrapped<typeof subscribable>) => {
-        clearTimeout(batchTimeout);
-        batchedUpdates = {...batchedUpdates, [child]: value};
-        batchTimeout = setTimeout(() => {
-          onUpdate(batchedUpdates);
-          batchedUpdates = {};
-        });
+        onUpdate({[child]: value} as Partial<UnwrappedValues<P>>);
       });
     });
 

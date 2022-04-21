@@ -17,7 +17,6 @@
  *
  */
 
-import {act} from '@testing-library/react';
 import TestPage from 'Util/test/TestPage';
 
 import {viewportObserver} from 'src/script/ui/viewportObserver';
@@ -77,17 +76,10 @@ describe('image-asset', () => {
       }),
     );
     const testPage = new ImageAssetTestPage({...defaultProps, asset: image});
-    await act(async () => {
-      await waitForExpect(() => {
-        expect(createObjectURLSpy).toHaveBeenCalled();
-        act(() => {
-          testPage.update();
-        });
-        const imgSrc = testPage.getImg().getAttribute('src');
-        expect(imgSrc).toContain('/image-url');
-      });
-
-      container.reset();
+    await waitForExpect(() => {
+      expect(createObjectURLSpy).toHaveBeenCalled();
+      const imgSrc = testPage.getImg().getAttribute('src');
+      expect(imgSrc).toContain('/image-url');
     });
   });
 });

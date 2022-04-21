@@ -67,9 +67,9 @@ describe('SetPassword', () => {
       }),
     );
 
-    expect(setPasswordPage.getPasswordInput()).not.toBeNull();
+    expect(setPasswordPage.getPasswordInput().exists()).toBe(true);
 
-    expect(setPasswordPage.getSetPasswordButton()).not.toBeNull();
+    expect(setPasswordPage.getSetPasswordButton().exists()).toBe(true);
 
     expect(setPasswordPage.getSetPasswordButton().props().disabled).toBe(true);
     setPasswordPage.enterPassword('e');
@@ -89,7 +89,7 @@ describe('SetPassword', () => {
       }),
     );
 
-    expect(setPasswordPage.getErrorMessage()).toBeNull();
+    expect(setPasswordPage.getErrorMessage().exists()).toBe(false);
 
     setPasswordPage.enterPassword('e');
     setPasswordPage.clickSetPasswordButton();
@@ -97,7 +97,7 @@ describe('SetPassword', () => {
     await waitForExpect(() => {
       setPasswordPage.update();
 
-      expect(setPasswordPage.getErrorMessage(ValidationError.FIELD.PASSWORD.PATTERN_MISMATCH)).not.toBeNull();
+      expect(setPasswordPage.getErrorMessage(ValidationError.FIELD.PASSWORD.PATTERN_MISMATCH).exists()).toBe(true);
     });
   });
 });

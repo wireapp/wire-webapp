@@ -73,7 +73,7 @@ describe('UnsupportedBrowser', () => {
       }),
     );
 
-    expect(unsupportedPage.getOnlyDesktopMessage()).not.toBeNull();
+    expect(unsupportedPage.getOnlyDesktopMessage().exists()).toBe(true);
   });
 
   it('renders content in desktop application when ENABLE_ENFORCE_DESKTOP_APPLICATION_ONLY is true', async () => {
@@ -100,7 +100,7 @@ describe('UnsupportedBrowser', () => {
       {children: 'content'},
     );
 
-    expect(unsupportedPage.getOnlyDesktopMessage()).toBeNull();
+    expect(unsupportedPage.getOnlyDesktopMessage().exists()).toBe(false);
     expect(unsupportedPage.getText()).toContain(expectedContent);
   });
 
@@ -124,6 +124,6 @@ describe('UnsupportedBrowser', () => {
       }),
     );
 
-    expect(unsupportedPage.getGeneralUnsupprtedMessage()).not.toBeNull();
+    expect(unsupportedPage.getGeneralUnsupprtedMessage().exists()).toBe(true);
   });
 });
