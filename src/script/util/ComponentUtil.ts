@@ -92,13 +92,14 @@ export function registerReactComponent<Props>(name: string, component: React.Com
     viewModel: {
       createViewModel: (params: Props, {element}: {element: HTMLElement}) => {
         let state: Props = resolveObservables(params);
+        const root = createRoot(element);
         const subscription = subscribeProperties(params, updates => {
           state = {...state, ...updates};
-          ReactDOM.render(React.createElement(component, state), element);
+          root.render(React.createElement(component, state));
         });
         return {
           dispose() {
-            ReactDOM.unmountComponentAtNode(element);
+            root.unmount();
             subscription.dispose();
           },
         };
