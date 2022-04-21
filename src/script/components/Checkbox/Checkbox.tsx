@@ -34,6 +34,11 @@ const Checkbox: React.FC<CheckboxProps> = ({label, isChecked, name, onCheckedCha
         '&:hover': {
           cursor: 'pointer',
         },
+        '&:hover svg': {
+          borderColor: 'var(--blue-500)',
+        },
+        alignItems: 'center',
+        display: 'flex',
       }}
     >
       <input
@@ -42,8 +47,8 @@ const Checkbox: React.FC<CheckboxProps> = ({label, isChecked, name, onCheckedCha
         name={name}
         onChange={onCheckedChanged}
         css={{
-          '&:active + svg': {
-            outline: '1px solid Highlight',
+          '&:active + svg, &:focus + svg, &:focus-visible + svg': {
+            borderColor: 'var(--blue-500)',
           },
           clip: 'rect(0 0 0 0)',
           clipPath: 'inset(50%)',
@@ -56,8 +61,9 @@ const Checkbox: React.FC<CheckboxProps> = ({label, isChecked, name, onCheckedCha
       />
       <svg
         css={{
-          background: '#fff',
-          border: '2px #ddd solid',
+          background: 'var(--gray-20)',
+          border: '2px var(--gray-80) solid',
+          borderRadius: 3,
 
           display: 'inline-block',
           // set to `inline-block` as `inline elements ignore `height` and `width`
@@ -65,8 +71,8 @@ const Checkbox: React.FC<CheckboxProps> = ({label, isChecked, name, onCheckedCha
           marginRight: 4,
           width: 20,
           ...(isChecked && {
-            background: 'purple',
-            borderColor: 'purple',
+            background: 'var(--blue-500)',
+            borderColor: 'var(--blue-500)',
           }),
         }}
         // This element is purely decorative so
