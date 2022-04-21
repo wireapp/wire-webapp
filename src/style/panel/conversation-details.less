@@ -31,7 +31,7 @@
   }
 
   &__header {
-    padding: 8px 16px;
+    padding: 0 16px;
   }
 
   &__flex-row {
@@ -40,12 +40,11 @@
   }
 
   &__name {
+    .heading-h2;
+
     display: flex;
-    min-height: 24px;
     padding: 0;
     border: none;
-    font-size: 20px;
-    font-weight: @font-weight-bold;
     word-break: break-word;
 
     &--input {
@@ -81,29 +80,25 @@
 
   &__participant_count {
     margin-top: 8px;
-    font-size: 11px;
-    font-weight: @font-weight-bold;
     text-transform: uppercase;
+    .label-bold;
 
     &__service {
       margin-left: 8px;
     }
 
     &__text {
-      color: var(--foreground);
+      .label;
     }
   }
 
   &__list-head {
     .panel-header;
+    width: 100%;
   }
 
   &__participant-options {
-    margin: 32px 0 0;
-  }
-
-  &__bottom-actions {
-    margin: 16px 0 5px;
+    margin: 24px 0 0;
   }
 
   &__group-size-info {
@@ -115,5 +110,11 @@
 
   &__read-receipts {
     margin: 24px 0;
+  }
+
+  &__bottom-actions {
+    padding: 0;
+    margin: 0;
+    list-style: none;
   }
 }

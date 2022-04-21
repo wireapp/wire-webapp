@@ -30,11 +30,11 @@
             ></panel-user-details>
             <!-- ko if: firstParticipant().isConnected() || firstParticipant().inTeam() -->
               <div class="conversation-details__devices">
-                <div class="panel__action-item" data-bind="click: clickOnDevices" data-uie-name="go-devices">
+                <button class="panel__action-item" data-bind="click: clickOnDevices" data-uie-name="go-devices" type="button">
                   <devices-icon class="panel__action-item__icon"></devices-icon>
-                  <div class="panel__action-item__text" data-bind="text: t('conversationDetailsActionDevices')"></div>
-                  <disclose-icon class="disclose-icon"></disclose-icon>
-                </div>
+                  <span class="panel__action-item__text" data-bind="text: t('conversationDetailsActionDevices')"></span>
+                  <chevron-right class="chevron-right-icon"></chevron-right>
+                </button>
               </div>
             <!-- /ko -->
             <enriched-fields params="user: firstParticipant, showDomain: $root.isFederated"></enriched-fields>
@@ -113,15 +113,16 @@
         <!-- ko if: showTopActions() -->
           <!-- ko if: showActionAddParticipants() -->
             <div class="conversation-details__participant-options">
-              <div
+              <button
                 class="panel__action-item"
+                type="button"
                 data-bind="click: clickOnAddParticipants, attr:{'title': addPeopleTooltip}"
                 data-uie-name="go-add-people"
               >
                 <plus-icon class="panel__action-item__icon"></plus-icon>
-                <div class="panel__action-item__text" data-bind="text: t('conversationDetailsActionAddParticipants')"></div>
-                <disclose-icon class="disclose-icon"></disclose-icon>
-              </div>
+                <span class="panel__action-item__text" data-bind="text: t('conversationDetailsActionAddParticipants')"></span>
+                <chevron-right class="chevron-right-icon"></chevron-right>
+            </button>
             </div>
           <!-- /ko -->
         <!-- /ko -->
@@ -133,18 +134,19 @@
               data-uie-name="list-users"
             ></user-list>
             <!-- ko if: showAllUsersCount() > 0 -->
-              <div
+              <button
+                type="button"
                 class="panel__action-item panel__action-item--no-border"
                 data-bind="click: clickOnShowAll"
                 data-uie-name="go-conversation-participants"
               >
                 <people-icon class="panel__action-item__icon"></people-icon>
-                <div
+                <span
                   class="panel__action-item__text"
                   data-bind="text: t('conversationDetailsActionConversationParticipants', showAllUsersCount())"
-                ></div>
-                <disclose-icon class="disclose-icon"></disclose-icon>
-              </div>
+                ></span>
+                <chevron-right class="chevron-right-icon"></chevron-right>
+              </button>
             <!-- /ko -->
           <!-- /ko -->
         <!-- /ko -->
@@ -152,110 +154,111 @@
       <!-- ko if: showTopActions() -->
         <!-- ko if: showSectionOptions() -->
           <div class="conversation-details__list-head" data-bind="text: t('conversationDetailsOptions')"></div>
-          <!-- ko if: showOptionNotificationsGroup() -->
-            <div class="conversation-details__notifications">
-              <div class="panel__action-item" data-bind="click: clickOnNotifications" data-uie-name="go-notifications">
-                <notification-icon class="panel__action-item__icon"></notification-icon>
-                <div class="panel__action-item__summary">
-                  <div class="panel__action-item__text" data-bind="text: t('conversationDetailsActionNotifications')"></div>
-                  <div
-                    class="panel__action-item__status"
-                    data-bind="text: notificationStatusText"
-                    data-uie-name="status-notifications"
-                  ></div>
-                </div>
-                <disclose-icon class="disclose-icon"></disclose-icon>
-              </div>
-            </div>
-          <!-- /ko -->
-          <!-- ko if: showOptionTimedMessages() -->
-            <div class="conversation-details__timed-messages">
-              <div class="panel__action-item" data-bind="click: clickOnTimedMessages" data-uie-name="go-timed-messages">
+          <ul>
+            <!-- ko if: showOptionNotificationsGroup() -->
+            <li class="conversation-details__notifications">
+                <button class="panel__action-item" data-bind="click: clickOnNotifications" data-uie-name="go-notifications" type="button">
+                  <notification-icon class="panel__action-item__icon"></notification-icon>
+                  <div class="panel__action-item__summary">
+                    <div class="panel__action-item__text" data-bind="text: t('conversationDetailsActionNotifications')"></div>
+                    <div
+                      class="panel__action-item__status"
+                      data-bind="text: notificationStatusText"
+                      data-uie-name="status-notifications"
+                    ></div>
+                  </div>
+                  <chevron-right class="chevron-right-icon"></chevron-right>
+                </button>
+            </li>
+            <!-- /ko -->
+            <!-- ko if: showOptionTimedMessages() -->
+            <li class="conversation-details__timed-messages">
+              <button class="panel__action-item" data-bind="click: clickOnTimedMessages" data-uie-name="go-timed-messages" type="button">
                 <timer-icon class="panel__action-item__icon"></timer-icon>
-                <div class="panel__action-item__summary">
-                  <div class="panel__action-item__text" data-bind="text: t('conversationDetailsActionTimedMessages')"></div>
-                  <div
+                <span class="panel__action-item__summary">
+                  <span class="panel__action-item__text" data-bind="text: t('conversationDetailsActionTimedMessages')"></span>
+                  <span
                     class="panel__action-item__status"
                     data-bind="text: timedMessagesText"
                     data-uie-name="status-timed-messages"
-                  ></div>
-                </div>
-                <disclose-icon class="disclose-icon"></disclose-icon>
-              </div>
-            </div>
+                  ></span>
+                </span>
+                <chevron-right class="chevron-right-icon"></chevron-right>
+              </button>
+            </li>
           <!-- /ko -->
           <!-- ko if: showOptionGuests() -->
-            <div class="conversation-details__guest-options">
-              <div class="panel__action-item" data-bind="click: clickOnGuestOptions" data-uie-name="go-guest-options">
-                <guest-icon class="panel__action-item__icon"></guest-icon>
-                <div class="panel__action-item__summary">
-                  <div class="panel__action-item__text" data-bind="text: t('conversationDetailsActionGuestOptions')"></div>
-                  <div
-                    class="panel__action-item__status"
-                    data-bind="text: guestOptionsText"
-                    data-uie-name="status-allow-guests"
-                  ></div>
-                </div>
-                <disclose-icon class="disclose-icon"></disclose-icon>
-              </div>
-            </div>
+           <li class="conversation-details__guest-options">
+            <button class="panel__action-item" data-bind="click: clickOnGuestOptions" data-uie-name="go-guest-options" type="button">
+              <guest-icon class="panel__action-item__icon"></guest-icon>
+              <span class="panel__action-item__summary">
+                <span class="panel__action-item__text" data-bind="text: t('conversationDetailsActionGuestOptions')"></span>
+                <span
+                  class="panel__action-item__status"
+                  data-bind="text: guestOptionsText"
+                  data-uie-name="status-allow-guests"
+                ></span>
+              </span>
+              <chevron-right class="chevron-right-icon"></chevron-right>
+            </button>
+          </li>
           <!-- /ko -->
           <!-- ko if: showOptionServices() -->
-          <div class="conversation-details__services-options">
-            <div class="panel__action-item" data-bind="click: clickOnServicesOptions" data-uie-name="go-services-options">
+          <li class="conversation-details__services-options">
+            <button class="panel__action-item" data-bind="click: clickOnServicesOptions" data-uie-name="go-services-options" type="button">
               <service-icon class="panel__action-item__icon service-icon"></service-icon>
-              <div class="panel__action-item__summary">
-                <div class="panel__action-item__text" data-bind="text: t('conversationDetailsActionServicesOptions')"></div>
-                <div
+              <span class="panel__action-item__summary">
+                <span class="panel__action-item__text" data-bind="text: t('conversationDetailsActionServicesOptions')"></span>
+                <span
                   class="panel__action-item__status"
                   data-bind="text: servicesOptionsText"
                   data-uie-name="status-allow-services"
-                ></div>
-              </div>
-              <disclose-icon class="disclose-icon"></disclose-icon>
-            </div>
-          </div>
-        <!-- /ko -->
-
-          <!-- ko if: showOptionReadReceipts() -->
-            <div class="conversation-details__read-receipts">
-              <read-receipt-toggle
-                params="receiptMode: activeConversation().receiptMode, onReceiptModeChanged: updateConversationReceiptMode"
-              ></read-receipt-toggle>
-            </div>
+                ></span>
+              </span>
+              <chevron-right class="chevron-right-icon"></chevron-right>
+            </button>
+          </li>
           <!-- /ko -->
+          <!-- ko if: showOptionReadReceipts() -->
+          <li class="conversation-details__read-receipts">
+            <read-receipt-toggle
+              params="receiptMode: activeConversation().receiptMode, onReceiptModeChanged: updateConversationReceiptMode"
+            ></read-receipt-toggle>
+          </li>
+          <!-- /ko -->
+          </ul>
         <!-- /ko -->
       <!-- /ko -->
-      <div class="conversation-details__participants">
-        <!-- ko if: serviceParticipants().length -->
-          <div class="conversation-details__list-head" data-bind="text: t('conversationDetailsServices')"></div>
-          <service-list
-            params="services: serviceParticipants, click: clickOnShowService, noUnderline: true, arrow: true"
-            data-uie-name="list-services"
-          ></service-list>
-        <!-- /ko -->
-      </div>
+      <!-- ko if: serviceParticipants().length -->
+          <div class="conversation-details__participants">
+              <div class="conversation-details__list-head" data-bind="text: t('conversationDetailsServices')"></div>
+              <service-list
+                params="services: serviceParticipants, click: clickOnShowService, noUnderline: true, arrow: true"
+                data-uie-name="list-services"
+              ></service-list>
+          </div>
+      <!-- /ko -->
     <!-- /ko -->
     <!-- ko if: isActivatedAccount()-->
-      <div class="conversation-details__bottom-actions">
+      <ul class="conversation-details__bottom-actions">
         <!-- ko if: showOptionNotifications1To1() -->
-          <div class="conversation-details__notifications">
-            <div class="panel__action-item" data-bind="click: clickOnNotifications" data-uie-name="go-notifications">
+          <li class="conversation-details__notifications">
+            <button class="panel__action-item" data-bind="click: clickOnNotifications" data-uie-name="go-notifications" type="button">
               <notification-icon class="panel__action-item__icon"></notification-icon>
-              <div class="panel__action-item__summary">
-                <div class="panel__action-item__text" data-bind="text: t('conversationDetailsActionNotifications')"></div>
-                <div
+              <span class="panel__action-item__summary">
+                <span class="panel__action-item__text" data-bind="text: t('conversationDetailsActionNotifications')"></span>
+                <span
                   class="panel__action-item__status"
                   data-bind="text: notificationStatusText"
                   data-uie-name="status-notifications"
-                ></div>
-              </div>
-              <disclose-icon class="disclose-icon"></disclose-icon>
-            </div>
-          </div>
+                ></span>
+              </span>
+              <chevron-right class="chevron-right-icon"></chevron-right>
+            </button>
+          </li>
         <!-- /ko -->
         <!-- ko if: isSingleUserMode(activeConversation()) -->
-          <div class="conversation-details__read-receipts" data-uie-name="label-1to1-read-receipts">
+          <li class="conversation-details__read-receipts" data-uie-name="label-1to1-read-receipts">
             <div
               class="panel__info-text panel__info-text--head panel__info-text--margin-bottom"
               data-bind="text: hasReceiptsEnabled() ? t('conversationDetails1to1ReceiptsHeadEnabled') : t('conversationDetails1to1ReceiptsHeadDisabled')"
@@ -268,10 +271,10 @@
               class="panel__info-text panel__info-text--margin"
               data-bind="text: t('conversationDetails1to1ReceiptsSecond')"
             ></div>
-          </div>
+          </li>
         <!-- /ko -->
+        </ul>
         <panel-actions params="items: getConversationActions(activeConversation())"></panel-actions>
-      </div>
       <!-- /ko -->
     </div>
   <!-- /ko -->
