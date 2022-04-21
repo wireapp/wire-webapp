@@ -3,6 +3,22 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [19.0.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/compare/@wireapp/api-client@18.8.3...@wireapp/api-client@19.0.0) (2022-04-21)
+
+
+### Bug Fixes
+
+* **services:** Add identity provider id for identities update endpoint ([#4256](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/issues/4256)) ([2d01d0c](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/commit/2d01d0cf29e9760b7970748befcb6a9aef3efa20))
+
+
+### BREAKING CHANGES
+
+* **services:** This version changes order of parameters in putIdentityProvider
+
+
+
+
+
 ## [18.8.3](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/compare/@wireapp/api-client@18.8.2...@wireapp/api-client@18.8.3) (2022-04-20)
 
 **Note:** Version bump only for package @wireapp/api-client
