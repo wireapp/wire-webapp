@@ -20,14 +20,10 @@
 .user-input {
   position: relative;
   display: block;
-  background: fade(#fff, 8%);
-  border-radius: 4px;
+  border: 1px solid var(--gray-40);
+  background: var(--white);
+  border-radius: 12px;
   color: var(--main-color);
-
-  &.user-list-light {
-    background: fade(@w-gray, 16%);
-    color: var(--background);
-  }
 
   &.modal-style {
     min-height: 48px;
@@ -49,7 +45,7 @@
 
 .search-outer {
   overflow: hidden;
-  padding: 4px 8px;
+  padding: 0 16px;
 }
 
 .search-inner-wrap {
@@ -62,6 +58,7 @@
   display: flex;
   max-height: 84px;
   flex-wrap: wrap;
+  align-items: center;
   overflow-y: auto;
 }
 
@@ -94,14 +91,18 @@
 
 .search-inner > input {
   min-width: 65px;
-  height: @avatar-diameter-xs;
+  height: 48px;
   flex: 1 1;
+  padding: 0;
   border: none;
   appearance: none;
   background-color: transparent;
   color: currentColor;
-  line-height: @avatar-diameter-xs;
+  font-size: 16px;
+  line-height: 1;
   outline: none;
+
+  .text-light;
 
   &:invalid {
     box-shadow: none;
@@ -111,8 +112,6 @@
     &:invalid {
       color: var(--foreground-fade-40);
     }
-    .label-xs;
-
     padding-left: 8px;
     color: var(--foreground-fade-40);
   }

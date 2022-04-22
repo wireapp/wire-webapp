@@ -79,7 +79,7 @@
     border: var(--modal-border-color);
     margin: auto; // http://stackoverflow.com/questions/24538100/issue-when-centering-vertically-with-flexbox-when-heights-are-unknown
     background-color: var(--app-bg-secondary);
-    border-radius: 4px;
+    border-radius: 10px;
     cursor: default;
 
     a.close {
@@ -256,7 +256,7 @@
     flex-direction: column;
 
     align-self: center;
-    padding: 16px;
+    padding: 24px;
 
     border: var(--modal-border-color);
     margin: auto;
@@ -264,7 +264,7 @@
     background-color: var(--modal-bg);
     border-radius: 4px;
     cursor: default;
-    font-size: 14px;
+    font-size: 16px;
     justify-self: center;
     overflow-y: hidden;
 
@@ -298,9 +298,7 @@
     margin-bottom: 16px;
     color: var(--background);
     fill: var(--background);
-    font-size: 11px;
-    font-weight: @font-weight-bold;
-    text-transform: uppercase;
+    .heading-h2;
 
     & > * {
       position: relative;
@@ -343,7 +341,7 @@
   &__buttons {
     display: flex;
     justify-content: flex-end;
-    margin-top: 16px;
+    margin-top: 20px;
     --button-color: var(--accent-color);
 
     &--column {
@@ -352,42 +350,19 @@
   }
 
   &__button {
-    .button-reset-default;
-    display: inline-block;
-    width: calc(50% - 8px);
-    height: 40px;
-    padding: 0 16px;
-    border: 1px solid var(--button-color);
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 11px;
-    font-weight: 600;
-    line-height: 38px;
-    text-align: center;
-    text-decoration: none;
-    text-transform: uppercase;
-    transition: opacity 0.25s linear;
-    user-select: none;
-
-    & + & {
-      margin-left: 16px;
+    &:not(&--primary) {
+      .button-text-secondary;
     }
-
-    &--disabled,
-    &:disabled {
-      cursor: default;
-      filter: saturate(0.5);
-      opacity: 0.5;
+    & + & {
+      margin-left: 12px;
     }
 
     &--secondary {
-      background: #fff;
-      color: var(--button-color);
+      .button-text-secondary;
     }
 
     &--primary {
-      background: var(--button-color);
-      color: #fff;
+      .button-text-primary;
     }
 
     &--alert {
@@ -401,9 +376,6 @@
         margin-top: 16px;
         margin-left: 0;
       }
-    }
-    &:focus {
-      box-shadow: 0 0 1px 3px var(--background-fade-40);
     }
   }
 

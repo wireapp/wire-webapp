@@ -31,38 +31,49 @@ export interface ReceiptModeToggleProps {
 }
 
 const ReceiptModeToggle: React.FC<ReceiptModeToggleProps> = ({receiptMode, onReceiptModeChanged}) => {
-  const updateValue = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const newReceiptMode = event.target.checked ? RECEIPT_MODE.ON : RECEIPT_MODE.OFF;
+  const updateValue = () => {
+    const newReceiptMode = receiptMode !== RECEIPT_MODE.ON ? RECEIPT_MODE.ON : RECEIPT_MODE.OFF;
     onReceiptModeChanged(newReceiptMode);
   };
 
+  const inputRef = React.useRef<HTMLInputElement>();
+  const isChecked = receiptMode !== RECEIPT_MODE.OFF;
   return (
     <Fragment>
-      <div className="panel__action-item">
-        <div className="panel__action-item__icon">
-          <Icon.Read />
-        </div>
-        <div className="panel__action-item__summary">
-          <div className="panel__action-item__text">{t('receiptToggleLabel')}</div>
-        </div>
-        <input
-          checked={receiptMode !== RECEIPT_MODE.OFF}
-          className="slider-input"
-          data-uie-name="toggle-receipt-mode-checkbox"
-          id="receipt-toggle-input"
-          name="preferences_device_verification_toggle"
-          onChange={updateValue}
-          type="checkbox"
-        />
+      <div className="panel__action-item panel__action-item--toggle">
         <label
           htmlFor="receipt-toggle-input"
           data-uie-name="do-toggle-receipt-mode"
           data-uie-receipt-status={receiptMode}
+          className="panel__action-item-label"
+        >
+          <span className="panel__action-item__icon">
+            <Icon.Read />
+          </span>
+          <span className="panel__action-item__summary">
+            <span className="panel__action-item__text">{t('receiptToggleLabel')}</span>
+          </span>
+        </label>
+        <input
+          ref={inputRef}
+          checked={isChecked}
+          className="slider-input"
+          data-uie-name="toggle-receipt-mode-checkbox"
+          id="receipt-toggle-input"
+          name="preferences_device_verification_toggle"
+          onChange={() => updateValue()}
+          type="checkbox"
         />
+        <button
+          className="button-label"
+          aria-pressed={receiptMode !== RECEIPT_MODE.OFF}
+          type="button"
+          onClick={() => updateValue()}
+        ></button>
       </div>
-      <div className="panel__info-text panel__info-text--margin" data-uie-name="status-info-toggle-receipt-mode">
+      <p className="panel__info-text panel__info-text--margin" data-uie-name="status-info-toggle-receipt-mode">
         {t('receiptToggleInfo')}
-      </div>
+      </p>
     </Fragment>
   );
 };
