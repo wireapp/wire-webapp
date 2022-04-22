@@ -83,7 +83,7 @@ const DeviceCard: React.FC<DeviceCardProps> = ({
         </div>
       </div>
       {showVerified && <VerifiedIcon isVerified={isVerified()} />}
-      {clickable && <Icon.Disclose className="disclose-icon" data-uie-name="disclose-icon" />}
+      {clickable && <Icon.ChevronRight className="disclose-icon" data-uie-name="disclose-icon" />}
     </div>
   );
 };

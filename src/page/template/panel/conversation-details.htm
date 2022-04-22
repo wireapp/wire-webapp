@@ -28,6 +28,7 @@
             <panel-user-details
               params="participant: firstParticipant, isVerified: isVerified, badge: teamRepository.getRoleBadge(firstParticipant().id), isSelfVerified: isSelfVerified, classifiedDomains: classifiedDomains"
             ></panel-user-details>
+            <enriched-fields params="user: firstParticipant, showDomain: $root.isFederated"></enriched-fields>
             <!-- ko if: firstParticipant().isConnected() || firstParticipant().inTeam() -->
               <div class="conversation-details__devices">
                 <button class="panel__action-item" data-bind="click: clickOnDevices" data-uie-name="go-devices" type="button">
@@ -37,7 +38,6 @@
                 </button>
               </div>
             <!-- /ko -->
-            <enriched-fields params="user: firstParticipant, showDomain: $root.isFederated"></enriched-fields>
           <!-- /ko -->
         <!-- /ko -->
       <!-- /ko -->
@@ -159,14 +159,14 @@
             <li class="conversation-details__notifications">
                 <button class="panel__action-item" data-bind="click: clickOnNotifications" data-uie-name="go-notifications" type="button">
                   <notification-icon class="panel__action-item__icon"></notification-icon>
-                  <div class="panel__action-item__summary">
-                    <div class="panel__action-item__text" data-bind="text: t('conversationDetailsActionNotifications')"></div>
-                    <div
+                  <span class="panel__action-item__summary">
+                    <span class="panel__action-item__text" data-bind="text: t('conversationDetailsActionNotifications')"></span>
+                    <span
                       class="panel__action-item__status"
                       data-bind="text: notificationStatusText"
                       data-uie-name="status-notifications"
-                    ></div>
-                  </div>
+                    ></span>
+                  </span>
                   <chevron-right class="chevron-right-icon"></chevron-right>
                 </button>
             </li>
@@ -259,18 +259,18 @@
         <!-- /ko -->
         <!-- ko if: isSingleUserMode(activeConversation()) -->
           <li class="conversation-details__read-receipts" data-uie-name="label-1to1-read-receipts">
-            <div
+            <p
               class="panel__info-text panel__info-text--head panel__info-text--margin-bottom"
               data-bind="text: hasReceiptsEnabled() ? t('conversationDetails1to1ReceiptsHeadEnabled') : t('conversationDetails1to1ReceiptsHeadDisabled')"
-            ></div>
-            <div
+            ></p>
+            <p
               class="panel__info-text panel__info-text--margin-bottom"
               data-bind="text: t('conversationDetails1to1ReceiptsFirst')"
-            ></div>
-            <div
+            ></p>
+            <p
               class="panel__info-text panel__info-text--margin"
               data-bind="text: t('conversationDetails1to1ReceiptsSecond')"
-            ></div>
+            ></p>
           </li>
         <!-- /ko -->
         </ul>
