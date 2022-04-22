@@ -109,68 +109,67 @@ const AccountInput: React.FC<AccountInputProps> = ({
         width: 280,
       }}
     >
-      <label
-        className="label"
-        css={{
-          color: 'var(--foreground)',
-          lineHeight: '14px',
-          marginBottom: 6,
-          position: 'relative',
-        }}
-        data-uie-name={labelUie}
-        htmlFor={valueUie}
-      >
-        {label}
-        {!readOnly && (
-          <button
-            type="button"
-            css={{background: 'transparent', border: 'none', margin: 0, padding: 0, position: 'absolute', top: '-1px'}}
-            onClick={() => {
-              setIsEditingExternal?.(true);
-              setIsEditing(true);
+      {!isEditing && (
+        <>
+          <label
+            className="label"
+            css={{
+              color: 'var(--foreground)',
+              lineHeight: '14px',
+              marginBottom: 6,
+              position: 'relative',
+            }}
+            data-uie-name={labelUie}
+            htmlFor={valueUie}
+          >
+            {label}
+            {!readOnly && (
+              <button
+                type="button"
+                css={{
+                  background: 'transparent',
+                  border: 'none',
+                  margin: 0,
+                  padding: 0,
+                  position: 'absolute',
+                  top: '-1px',
+                }}
+                onClick={() => {
+                  setIsEditingExternal?.(true);
+                  setIsEditing(true);
+                }}
+              >
+                {isDone ? (
+                  <Icon.AnimatedCheck
+                    css={{path: {stroke: 'var(--foreground)'}}}
+                    data-uie-name={`${iconUiePrefix}-icon-check`}
+                  />
+                ) : (
+                  <Icon.Edit
+                    css={{fill: 'var(--foreground)'}}
+                    className="edit-icon"
+                    data-uie-name={`${iconUiePrefix}-icon`}
+                  />
+                )}
+              </button>
+            )}
+          </label>
+          <div
+            css={{
+              position: 'relative',
             }}
           >
-            {isDone ? (
-              <Icon.AnimatedCheck
-                css={{path: {stroke: 'var(--foreground)'}}}
-                data-uie-name={`${iconUiePrefix}-icon-check`}
-              />
-            ) : (
-              !isEditing && (
-                <Icon.Edit
-                  css={{fill: 'var(--foreground)'}}
-                  className="edit-icon"
-                  data-uie-name={`${iconUiePrefix}-icon`}
-                />
-              )
-            )}
-          </button>
-        )}
-      </label>
-      <div
-        css={{
-          position: 'relative',
-        }}
-      >
-        <div css={{alignItems: 'center', display: 'flex', lineHeight: '1.38', position: 'absolute'}}>
-          <span data-uie-name={`${iconUiePrefix}-display`}>
-            <span
-              css={{
-                opacity: isEditing ? 0.4 : 1,
-              }}
-            >
-              {prefix}
-            </span>
-            <span css={{opacity: 0}}>{input}</span>
-            <span
-              css={{
-                opacity: isEditing ? 0.4 : 1,
-              }}
-            >
-              {suffix}
-            </span>
-          </span>
-        </div>
+            <div css={{alignItems: 'center', display: 'flex', lineHeight: '1.38', position: 'absolute'}}>
+              <span data-uie-name={`${iconUiePrefix}-display`}>
+                <span>{prefix}</span>
+                <span>{input}</span>
+                <span>{suffix}</span>
+              </span>
+            </div>
+          </div>
+        </>
+      )}
+      {isEditing && (
         <div
           css={{
             alignItems: 'center',
@@ -216,7 +215,7 @@ const AccountInput: React.FC<AccountInputProps> = ({
             />
           )}
         </div>
-      </div>
+      )}
     </div>
   );
 };
