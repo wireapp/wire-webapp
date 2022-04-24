@@ -18,6 +18,7 @@
  */
 
 import React, {useRef} from 'react';
+import Checkbox from 'Components/Checkbox';
 
 interface PreferencesCheckboxProps {
   checked: boolean;
@@ -28,32 +29,20 @@ interface PreferencesCheckboxProps {
   uieName?: string;
 }
 
-const PreferencesCheckbox: React.FC<PreferencesCheckboxProps> = ({
-  checked,
-  disabled,
-  onChange,
-  label,
-  details,
-  uieName,
-}) => {
+const PreferencesCheckbox: React.FC<PreferencesCheckboxProps> = ({checked, disabled, onChange, label, details}) => {
   const {current: id} = useRef(Math.random().toString(36).slice(2));
   return (
     <>
       <div className="preferences-option">
-        <div className="preferences-option-icon checkbox accent-text" data-uie-value={checked} data-uie-name={uieName}>
-          <input
-            type="checkbox"
-            disabled={disabled}
-            id={id}
-            checked={checked}
-            onChange={({target}) => onChange(target.checked)}
-          />
-          <label className="preferences-options-checkbox-label" htmlFor={id}>
-            {label}
-          </label>
-        </div>
+        <Checkbox
+          label={label}
+          name={id}
+          disabled={disabled}
+          isChecked={checked}
+          onCheckedChanged={() => onChange(!checked)}
+        />
       </div>
-      {details && <div className="preferences-detail">{details}</div>}
+      {details && <div css={{color: 'var(--gray-90)', fontSize: 12, lineHeight: '14px'}}>{details}</div>}
     </>
   );
 };
