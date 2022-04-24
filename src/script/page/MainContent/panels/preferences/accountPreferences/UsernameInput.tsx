@@ -127,6 +127,7 @@ const UsernameInput: React.FC<UsernameInputProps> = ({username, domain, userRepo
             'text-foreground': !errorState,
             'text-red': errorState === UserNameState.TAKEN,
           })}
+          css={{margin: '-15px 0 0 8px'}}
         >
           {isEditing && (
             <>

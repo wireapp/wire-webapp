@@ -62,7 +62,7 @@ export const getInputCSS = (disabled?: boolean, borderColor?: string): CSSObject
   borderRadius: 12,
   color: 'var(--text-input-color)',
   outline: 'none',
-  padding: '12px 16px',
+  padding: '12px 38px 12px 16px',
   width: '100%',
 });
 

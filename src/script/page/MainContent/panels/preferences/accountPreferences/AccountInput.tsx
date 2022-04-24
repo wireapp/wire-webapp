@@ -17,10 +17,11 @@
  *
  */
 
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useState, useRef} from 'react';
 import Icon from 'Components/Icon';
 import useIsMounted from 'Util/useIsMounted';
 import {MotionDuration} from '../../../../../motion/MotionDuration';
+import TextInput from 'Components/TextInput';
 
 interface AccountInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   allowedChars?: string;
@@ -74,11 +75,28 @@ const AccountInput: React.FC<AccountInputProps> = ({
   valueUie,
   ...rest
 }) => {
+  const textInputRef = useRef<HTMLDivElement>(null);
   const [input, setInput] = useState<string>();
   const [isEditing, setIsEditing] = useState(false);
   useEffect(() => {
     setInput(value);
   }, [value]);
+
+  useEffect(() => {
+    const handleClickOutside = (event: any) => {
+      if (textInputRef.current && !textInputRef.current.contains(event.target)) {
+        setInput(value);
+        setIsEditingExternal?.(false);
+        setIsEditing(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [textInputRef]);
 
   const updateInput = (value: string) => {
     if (allowedChars) {
@@ -92,20 +110,17 @@ const AccountInput: React.FC<AccountInputProps> = ({
     }
     setInput(value);
   };
+
   const iconUiePrefix = rest['data-uie-name'] ?? 'account-input';
+
   return (
     <div
       css={{
-        backgroundColor: isEditing ? 'var(--preference-account-input-bg)' : 'transparent',
         display: 'flex',
         flexDirection: 'column',
         height: 56,
         marginBottom: 40,
-
         padding: 8,
-
-        svg: {marginLeft: 8},
-
         width: 280,
       }}
     >
@@ -116,7 +131,7 @@ const AccountInput: React.FC<AccountInputProps> = ({
             css={{
               color: 'var(--foreground)',
               lineHeight: '14px',
-              marginBottom: 6,
+              marginBottom: 16,
               position: 'relative',
             }}
             data-uie-name={labelUie}
@@ -132,6 +147,7 @@ const AccountInput: React.FC<AccountInputProps> = ({
                   margin: 0,
                   padding: 0,
                   position: 'absolute',
+                  svg: {marginLeft: 8},
                   top: '-1px',
                 }}
                 onClick={() => {
@@ -170,51 +186,26 @@ const AccountInput: React.FC<AccountInputProps> = ({
         </>
       )}
       {isEditing && (
-        <div
-          css={{
-            alignItems: 'center',
-            display: 'flex',
-            lineHeight: '1.38',
-            position: 'absolute',
-            width: '100%',
+        <TextInput
+          label={label}
+          name={valueUie}
+          value={input}
+          onChange={({target}) => updateInput(target.value)}
+          onCancel={() => updateInput('')}
+          onKeyDown={event => {
+            if (event.key === 'Enter' && !event.shiftKey && !event.altKey) {
+              event.preventDefault();
+              onValueChange?.(input);
+              (event.target as HTMLInputElement).blur();
+            }
           }}
-        >
-          <span css={{opacity: 0}}>{prefix}</span>
-          {readOnly ? (
-            <span data-uie-name={valueUie} data-uie-value={value} {...rest}>
-              {value}
-            </span>
-          ) : (
-            <input
-              id={valueUie}
-              className="text"
-              css={{
-                backgroundColor: 'transparent',
-                border: 'none',
-                lineHeight: '24px',
-                outline: 'none',
-                padding: 0,
-                width: '100%',
-              }}
-              value={input}
-              onChange={({target}) => updateInput(target.value)}
-              onKeyPress={event => {
-                if (event.key === 'Enter' && !event.shiftKey && !event.altKey) {
-                  event.preventDefault();
-                  onValueChange?.(input);
-                  (event.target as HTMLInputElement).blur();
-                }
-              }}
-              onBlur={() => {
-                setInput(value);
-                setIsEditingExternal?.(false);
-                setIsEditing(false);
-              }}
-              spellCheck={false}
-              {...rest}
-            />
-          )}
-        </div>
+          onBlur={() => {
+            setInput(value);
+            setIsEditingExternal?.(false);
+            setIsEditing(false);
+          }}
+          ref={textInputRef}
+        />
       )}
     </div>
   );
