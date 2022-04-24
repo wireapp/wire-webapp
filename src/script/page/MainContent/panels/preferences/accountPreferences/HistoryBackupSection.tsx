@@ -45,7 +45,7 @@ const HistoryBackupSection: React.FC<HistoryBackupSectionProps> = ({brandName}) 
       aria-label={t('preferencesOptionsBackupExportHeadline')}
     >
       <button
-        className="preferences-link accent-text"
+        className="button-text-primary"
         onClick={() => {
           {
             amplify.publish(WebAppEvents.CONTENT.SWITCH, ContentViewModel.STATE.HISTORY_EXPORT);
@@ -62,13 +62,14 @@ const HistoryBackupSection: React.FC<HistoryBackupSectionProps> = ({brandName}) 
         {t('preferencesOptionsBackupExportSecondary', brandName)}
       </p>
       <div
+        className="button-text-primary preferences-history-restore-button"
         role="button"
         tabIndex={0}
         onKeyDown={(event: React.KeyboardEvent<HTMLElement>) => handleKeyDown(event, fileInputClick)}
         aria-labelledby="do-backup-import"
       >
         <label
-          className="preferences-link accent-text preferences-history-backup-import-field"
+          className="preferences-history-backup-import-field"
           data-uie-name="do-backup-import"
           id="do-backup-import"
           htmlFor="file-import-input"
