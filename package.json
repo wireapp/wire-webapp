@@ -61,7 +61,7 @@
     "@babel/preset-env": "7.16.11",
     "@babel/preset-react": "7.16.7",
     "@babel/preset-typescript": "7.16.7",
-    "@faker-js/faker": "6.1.2",
+    "@faker-js/faker": "6.2.0",
     "@formatjs/cli": "4.8.3",
     "@koush/wrtc": "0.5.3",
     "@testing-library/react": "13.1.1",
