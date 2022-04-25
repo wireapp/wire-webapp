@@ -70,7 +70,7 @@ const AccountLink: React.FC<AccountLinkProps> = ({label, value, ...rest}) => {
         className="text-bold"
         css={{
           '&:hover': {
-            color: 'var(--blue-500)',
+            color: 'var(--accent-color)',
           },
           alignItems: 'center',
           background: 'none',

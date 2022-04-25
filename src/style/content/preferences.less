@@ -100,10 +100,18 @@
 
 .preferences-link {
   .button-reset-default;
+
   display: inline-block;
+  margin-bottom: 8px;
+  color: @black;
   cursor: pointer;
-  font-size: @font-size-sm;
-  line-height: @line-height-xl;
+  font-size: @font-size-base;
+  line-height: @line-height-lg;
+
+  &:hover {
+    .accent-text;
+    text-decoration: underline;
+  }
 }
 
 .preferences-option {

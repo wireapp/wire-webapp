@@ -190,7 +190,7 @@ const AccountPreferences: React.FC<AccountPreferencesProps> = ({
       ) : (
         <PreferencesSection hasSeparator>
           <button
-            className="preferences-link accent-text"
+            className="preferences-link"
             onClick={clickOnLeaveGuestRoom}
             data-uie-name="do-leave-guest-room"
             type="button"

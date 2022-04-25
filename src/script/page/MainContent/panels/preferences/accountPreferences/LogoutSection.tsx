@@ -28,7 +28,7 @@ interface LogoutSectionProps {
 const LogoutSection: React.FC<LogoutSectionProps> = ({clientRepository}) => (
   <section className="preferences-section">
     <button
-      className="preferences-link accent-text"
+      className="preferences-link"
       onClick={() => clientRepository.logoutClient()}
       data-uie-name="do-logout"
       type="button"
