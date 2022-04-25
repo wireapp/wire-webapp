@@ -33,11 +33,13 @@ const PreferencesSection: React.FC<PreferencesSectionProps> = ({
   hasSeparator,
   children,
 }) => (
-  <fieldset className={`preferences-section ${className}`} data-uie-name={uieName}>
+  <>
     {hasSeparator && <hr className="preferences-separator" />}
-    {title && <legend className="preferences-header">{title}</legend>}
-    {children}
-  </fieldset>
+    <fieldset className={`preferences-section ${className}`} data-uie-name={uieName}>
+      {title && <legend className="preferences-header">{title}</legend>}
+      {children}
+    </fieldset>
+  </>
 );
 
 export default PreferencesSection;

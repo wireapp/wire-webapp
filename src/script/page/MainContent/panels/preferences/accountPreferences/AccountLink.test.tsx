@@ -39,10 +39,8 @@ test('renders elements correctly', () => {
   const label = screen.getByTestId('label-profile-link');
   const value = screen.getByTestId('profile-link');
   const button = screen.getByTestId('do-copy-profile-link');
-  const icon = screen.getByTestId('profile-link-icon');
 
   expect(label).toBeTruthy();
   expect(value).toBeTruthy();
   expect(button).toBeTruthy();
-  expect(icon).toBeTruthy();
 });

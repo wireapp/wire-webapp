@@ -42,7 +42,7 @@ import {modals, ModalsViewModel} from '../../../../view_model/ModalsViewModel';
 import AccentColorPicker from '../../../AccentColorPicker';
 import AccountInput from './accountPreferences/AccountInput';
 import AccountSecuritySection from './accountPreferences/AccountSecuritySection';
-import AvailabilityInput from './accountPreferences/AvailabilityInput';
+import AvailabilityButtons from './accountPreferences/AvailabilityButtons';
 import AvatarInput from './accountPreferences/AvatarInput';
 import DataUsageSection from './accountPreferences/DataUsageSection';
 import EmailInput from './accountPreferences/EmailInput';
@@ -129,22 +129,22 @@ const AccountPreferences: React.FC<AccountPreferencesProps> = ({
           alignItems: 'center',
           display: 'flex',
           flexDirection: 'column',
-          gap: 16,
-          paddingBottom: 32,
           width: 560,
         }}
       >
-        <div
+        <h3
+          className="heading-h3"
           css={{
-            fontWeight: 400,
+            marginBottom: 16,
+            textTransform: 'uppercase',
           }}
         >
           {name}
-        </div>
+        </h3>
         <div>
           <AvatarInput {...{isActivatedAccount, selfUser, userRepository}} />
         </div>
-        {isActivatedAccount && isTeam && <AvailabilityInput {...{availability}} />}
+        {isActivatedAccount && isTeam && <AvailabilityButtons {...{availability}} />}
         {isActivatedAccount && canEditProfile && (
           <div>
             <AccentColorPicker user={selfUser} doSetAccentColor={id => userRepository.changeAccentColor(id)} />
@@ -190,7 +190,7 @@ const AccountPreferences: React.FC<AccountPreferencesProps> = ({
       ) : (
         <PreferencesSection hasSeparator>
           <button
-            className="preferences-link accent-text"
+            className="preferences-link"
             onClick={clickOnLeaveGuestRoom}
             data-uie-name="do-leave-guest-room"
             type="button"

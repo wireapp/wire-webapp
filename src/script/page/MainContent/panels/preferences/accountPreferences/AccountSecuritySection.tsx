@@ -75,7 +75,7 @@ const AccountSecuritySection: React.FC<AccountSecuritySectionProps> = ({
     <PreferencesSection hasSeparator className="preferences-section-account-security">
       {manageTeamUrl && hasAccessToFeature(FEATURES.MANAGE_TEAM, teamRole) && (
         <button
-          className="preferences-link accent-text"
+          className="preferences-link"
           onClick={() => safeWindowOpen(manageTeamUrl)}
           data-uie-name="do-manage-team"
           type="button"
@@ -91,7 +91,7 @@ const AccountSecuritySection: React.FC<AccountSecuritySectionProps> = ({
       )}
       {isAppLockActivated && (
         <button
-          className="preferences-link accent-text"
+          className="preferences-link"
           onClick={() => amplify.publish(WebAppEvents.PREFERENCES.CHANGE_APP_LOCK_PASSPHRASE)}
           data-uie-name="do-reset-app-lock"
           type="button"
@@ -101,7 +101,7 @@ const AccountSecuritySection: React.FC<AccountSecuritySectionProps> = ({
       )}
       {!selfUser?.isSingleSignOn && (
         <button
-          className="preferences-link accent-text"
+          className="preferences-link"
           onClick={() => safeWindowOpen(getAccountPagesUrl(URL_PATH.PASSWORD_RESET))}
           title={t('tooltipPreferencesPassword')}
           data-uie-name="do-reset-password"
@@ -113,7 +113,7 @@ const AccountSecuritySection: React.FC<AccountSecuritySectionProps> = ({
 
       {!isTeam && (
         <button
-          className="preferences-link accent-text"
+          className="preferences-link"
           onClick={onClickDeleteAccount}
           data-uie-name="go-delete-account"
           type="button"

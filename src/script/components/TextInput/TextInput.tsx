@@ -37,28 +37,35 @@ export interface UserInputProps {
   isSuccess?: boolean;
   label: string;
   name: string;
+  onBlur: React.FocusEventHandler<HTMLInputElement>;
   onCancel: () => void;
   onChange: React.ChangeEventHandler<HTMLInputElement>;
+  onKeyDown: React.KeyboardEventHandler<HTMLInputElement>;
   onSuccessDismissed?: () => void;
-  placeholder: string;
+  placeholder?: string;
   value: string;
 }
 
 const SUCCESS_DISMISS_TIMEOUT = 2500;
 
-const TextInput: React.FC<UserInputProps> = ({
-  disabled,
-  errorMessage,
-  isError,
-  isSuccess,
-  label,
-  name,
-  onCancel,
-  onChange,
-  onSuccessDismissed,
-  placeholder,
-  value,
-}: UserInputProps) => {
+const TextInput: React.ForwardRefRenderFunction<HTMLDivElement, UserInputProps> = (
+  {
+    disabled,
+    errorMessage,
+    isError,
+    isSuccess,
+    label,
+    name,
+    onCancel,
+    onChange,
+    onBlur,
+    onKeyDown,
+    onSuccessDismissed,
+    placeholder,
+    value,
+  }: UserInputProps,
+  ref: React.ForwardedRef<HTMLDivElement>,
+) => {
   const isFilled = Boolean(value);
 
   useEffect(() => {
@@ -78,7 +85,7 @@ const TextInput: React.FC<UserInputProps> = ({
   }
 
   return (
-    <div css={containerCSS}>
+    <div css={containerCSS} ref={ref}>
       {isError && errorMessage && (
         <span className="label" css={errorMessageCSS}>
           {errorMessage}
@@ -92,6 +99,8 @@ const TextInput: React.FC<UserInputProps> = ({
         name={name}
         value={value}
         onChange={onChange}
+        onBlur={onBlur}
+        onKeyDown={onKeyDown}
         placeholder={placeholder}
       />
       <label className="label-medium" css={getLabelCSS(changedColor)} htmlFor={name}>
@@ -108,7 +117,7 @@ const TextInput: React.FC<UserInputProps> = ({
   );
 };
 
-export default TextInput;
+export default React.forwardRef(TextInput);
 
 registerReactComponent<UserInputProps>('text-input', {
   component: TextInput,
