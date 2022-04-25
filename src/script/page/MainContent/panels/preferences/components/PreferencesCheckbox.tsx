@@ -29,7 +29,14 @@ interface PreferencesCheckboxProps {
   uieName?: string;
 }
 
-const PreferencesCheckbox: React.FC<PreferencesCheckboxProps> = ({checked, disabled, onChange, label, details}) => {
+const PreferencesCheckbox: React.FC<PreferencesCheckboxProps> = ({
+  checked,
+  disabled,
+  onChange,
+  label,
+  details,
+  uieName,
+}) => {
   const {current: id} = useRef(Math.random().toString(36).slice(2));
   return (
     <>
@@ -40,6 +47,8 @@ const PreferencesCheckbox: React.FC<PreferencesCheckboxProps> = ({checked, disab
           disabled={disabled}
           isChecked={checked}
           onCheckedChanged={() => onChange(!checked)}
+          data-uie-value={checked}
+          data-uie-name={uieName}
         />
       </div>
       {details && <div className="preferences-detail">{details}</div>}
