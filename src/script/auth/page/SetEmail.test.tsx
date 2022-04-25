@@ -90,7 +90,7 @@ describe('SetEmail', () => {
       }),
     );
 
-    expect(setEmailPage.getErrorMessage()).toBeNull();
+    expect(setEmailPage.getErrorMessage().exists()).toBe(false);
 
     setEmailPage.enterEmail('e');
     setEmailPage.clickVerifyEmailButton();
@@ -98,7 +98,7 @@ describe('SetEmail', () => {
     await waitForExpect(() => {
       setEmailPage.update();
 
-      expect(setEmailPage.getErrorMessage(ValidationError.FIELD.EMAIL.TYPE_MISMATCH)).not.toBeNull();
+      expect(setEmailPage.getErrorMessage(ValidationError.FIELD.EMAIL.TYPE_MISMATCH).exists()).toBe(true);
     });
   });
 
