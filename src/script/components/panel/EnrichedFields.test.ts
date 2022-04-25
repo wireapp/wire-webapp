@@ -31,9 +31,9 @@ class EnrichedFieldsPage extends TestPage<EnrichedFieldsProps> {
     super(EnrichedFields, props);
   }
 
-  getEntries = () => this.get('[data-uie-name="item-enriched-key"]');
+  getEntries = () => this.getAll('[data-uie-name="item-enriched-key"]');
   findByValue = (expectedValue: string) =>
-    this.get(`[data-uie-name="item-enriched-value"][data-uie-value="${expectedValue}"]`);
+    this.getAll(`[data-uie-name="item-enriched-value"][data-uie-value="${expectedValue}"]`);
 }
 
 const richInfo: Partial<RichInfo> = {

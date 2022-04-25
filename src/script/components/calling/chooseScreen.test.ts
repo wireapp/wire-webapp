@@ -25,7 +25,7 @@ class ChooseScreenPage extends TestPage<ChooseScreenProps> {
   constructor(props?: ChooseScreenProps) {
     super(ChooseScreen, props);
   }
-  getListItems = () => this.get('.choose-screen-list-item');
+  getListItems = () => this.getAll('.choose-screen-list-item');
   getCancelButton = () => this.get('[data-uie-name="do-choose-screen-cancel"]');
 }
 
@@ -62,7 +62,7 @@ describe('ChooseScreen', () => {
 
   it('calls cancel on cancel button click', () => {
     const chooseScreen = new ChooseScreenPage(props);
-    chooseScreen.getCancelButton().simulate('click');
+    chooseScreen.click(chooseScreen.getCancelButton());
     expect(props.cancel).toHaveBeenCalled();
   });
 
@@ -70,7 +70,7 @@ describe('ChooseScreen', () => {
     const chooseScreen = new ChooseScreenPage(props);
     const ids = [...screens, ...windows].map(({id}) => id);
     chooseScreen.getListItems().forEach((listItem, index) => {
-      listItem.simulate('click');
+      chooseScreen.click(listItem);
       expect(props.choose).toHaveBeenCalledWith(ids[index]);
     });
   });

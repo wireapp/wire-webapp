@@ -71,8 +71,8 @@ describe('GroupList', () => {
       groups,
       router: router as Router,
     });
-    expect(groupListPage.getGroupConversationItem(groups[0].id).exists()).toBe(true);
-    expect(groupListPage.getGroupConversationItem(groups[1].id).exists()).toBe(true);
+    expect(groupListPage.getGroupConversationItem(groups[0].id)).not.toBeNull();
+    expect(groupListPage.getGroupConversationItem(groups[1].id)).not.toBeNull();
   });
 
   it('shows group list and navigates conversation on click', () => {

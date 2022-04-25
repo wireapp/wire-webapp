@@ -72,7 +72,7 @@ describe('LinkPreviewAssetComponent', () => {
     });
 
     const linkPreviewUploadMessage = testPage.getLinkPreviewTitle();
-    expect(linkPreviewUploadMessage.exists()).toBeTruthy();
+    expect(linkPreviewUploadMessage).not.toBeNull();
   });
 
   it('does not render link previews from timed-out / obfuscated messages', () => {
@@ -85,7 +85,7 @@ describe('LinkPreviewAssetComponent', () => {
     });
 
     const linkPreviewUploadMessage = testPage.getLinkPreviewTitle();
-    expect(linkPreviewUploadMessage.exists()).toBeFalsy();
+    expect(linkPreviewUploadMessage).toBeNull();
   });
 
   it('displays the author if the link is a tweet', () => {
@@ -96,10 +96,10 @@ describe('LinkPreviewAssetComponent', () => {
     });
 
     const linkPreviewUploadMessage = testPage.getLinkPreviewTitle();
-    expect(linkPreviewUploadMessage.exists()).toBeTruthy();
+    expect(linkPreviewUploadMessage).not.toBeNull();
 
     const linkPreviewTweetAuthor = testPage.getTweetAuthor();
-    expect(linkPreviewTweetAuthor.exists()).toBeTruthy();
+    expect(linkPreviewTweetAuthor).not.toBeNull();
   });
 
   it('cleans the preview URL', () => {
@@ -110,10 +110,10 @@ describe('LinkPreviewAssetComponent', () => {
     });
 
     const linkPreviewUploadMessage = testPage.getLinkPreviewTitle();
-    expect(linkPreviewUploadMessage.exists()).toBeTruthy();
+    expect(linkPreviewUploadMessage).not.toBeNull();
 
     const linkPreviewUrlElement = testPage.getLinkPreviewUrl();
-    expect(linkPreviewUrlElement.exists()).toBeTruthy();
-    expect(linkPreviewUrlElement.text()).toBe('example.com');
+    expect(linkPreviewUrlElement).not.toBeNull();
+    expect(linkPreviewUrlElement.textContent).toBe('example.com');
   });
 });

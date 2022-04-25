@@ -21,7 +21,7 @@ import React from 'react';
 
 import {User} from '../entity/User';
 import {ServiceEntity} from '../integration/ServiceEntity';
-import {registerStaticReactComponent, useKoSubscribableChildren} from 'Util/ComponentUtil';
+import {registerReactComponent, useKoSubscribableChildren} from 'Util/ComponentUtil';
 
 import UserAvatar from './avatar/UserAvatar';
 import ServiceAvatar from './avatar/ServiceAvatar';
@@ -152,4 +152,4 @@ const Avatar: React.FunctionComponent<AvatarProps> = ({
 };
 
 export default Avatar;
-registerStaticReactComponent('participant-avatar', Avatar);
+registerReactComponent('participant-avatar', Avatar);

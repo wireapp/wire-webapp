@@ -13,7 +13,13 @@
       <!-- /ko -->
     </div>
     <!-- ko if: stateIsParticipants() -->
-      <user-input class="modal-style" params="input: participantsInput, selected: selectedContacts, placeholder: t('groupCreationParticipantsPlaceholder'), enter: clickOnCreate" spellcheck="false"></user-input>
+      <user-input class="modal-style" params="
+        input: participantsInput,
+        setInput: value => participantsInput(value),
+        selectedUsers: selectedContacts,
+        setSelectedUsers: (users) => selectedContacts(users),
+        placeholder: t('groupCreationParticipantsPlaceholder'),
+        enter: clickOnCreate" spellcheck="false"></user-input>
     <!-- /ko -->
       <!-- ko if: stateIsParticipants() -->
         <div class="group-creation__list" data-bind="fadingscrollbar">
@@ -39,15 +45,16 @@
         <!-- ko if: isTeam -->
         <div class="modal__info" data-bind="text: t('groupSizeInfo', maxSize)" data-uie-name="status-group-size-info"></div>
         <base-toggle class="modal-style"
-        params="isChecked: isGuestEnabled(), onToggle: clickOnToggleGuestMode, extendedInfo: true, extendedInfoText: t('guestRoomToggleInfoExtended'), infoText: t('guestRoomToggleInfo'), toggleName: t('guestOptionsTitle')"
+        params="isChecked: isGuestEnabled(), setIsChecked: clickOnToggleGuestMode, extendedInfo: true, extendedInfoText: t('guestRoomToggleInfoExtended'), infoText: t('guestRoomToggleInfo'), toggleName: t('guestOptionsTitle')"
       ></base-toggle>
         <base-toggle class="modal-style"
-        params="isChecked: isServicesEnabled(), onToggle: clickOnToggleServicesMode, extendedInfo: true, extendedInfoText: t('servicesRoomToggleInfoExtended'), infoText: t('servicesRoomToggleInfo'), toggleName: t('servicesOptionsTitle')"
+        params="isChecked: isServicesEnabled(), setIsChecked: clickOnToggleServicesMode, extendedInfo: true, extendedInfoText: t('servicesRoomToggleInfoExtended'), infoText: t('servicesRoomToggleInfo'), toggleName: t('servicesOptionsTitle')"
       ></base-toggle>
         <info-toggle class="modal-style" params="
           dataUieName: 'read-receipts',
           info: t('readReceiptsToogleInfo'),
           isChecked: enableReadReceipts,
+          setIsChecked: (checked) => enableReadReceipts(checked),
           isDisabled: false,
           name: t('readReceiptsToogleName')
         "></info-toggle>

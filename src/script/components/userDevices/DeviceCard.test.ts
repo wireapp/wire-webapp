@@ -58,7 +58,7 @@ describe('DeviceCard', () => {
       showIcon: true,
     });
 
-    expect(deviceCard.getDesktopIcon().exists()).toBe(true);
+    expect(deviceCard.getDesktopIcon()).not.toBeNull();
   });
 
   it('renders mobile devices icon for non-desktop clients', async () => {
@@ -72,7 +72,7 @@ describe('DeviceCard', () => {
       showIcon: true,
     });
 
-    expect(deviceCard.getMobileDeviceIcon().exists()).toBe(true);
+    expect(deviceCard.getMobileDeviceIcon()).not.toBeNull();
   });
 
   it('shows disclose icon when component is clickable', async () => {
@@ -87,7 +87,7 @@ describe('DeviceCard', () => {
       showIcon: true,
     });
 
-    expect(deviceCard.getDiscloseIcon().exists()).toBe(true);
+    expect(deviceCard.getDiscloseIcon()).not.toBeNull();
   });
 
   it('shows verified icon', async () => {
@@ -102,7 +102,7 @@ describe('DeviceCard', () => {
       showVerified: true,
     });
 
-    expect(deviceCard.getVerifiedIcon().exists()).toBe(true);
+    expect(deviceCard.getVerifiedIcon()).not.toBeNull();
   });
 
   it('shows unverified icon', async () => {
@@ -117,6 +117,6 @@ describe('DeviceCard', () => {
       showVerified: true,
     });
 
-    expect(deviceCard.getNotVerifiedIcon().exists()).toBe(true);
+    expect(deviceCard.getNotVerifiedIcon()).not.toBeNull();
   });
 });

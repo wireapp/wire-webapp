@@ -25,7 +25,18 @@ import {RenameMessage} from 'src/script/entity/message/RenameMessage';
 import {SystemMessageType} from 'src/script/message/SystemMessageType';
 import TestPage from 'Util/test/TestPage';
 import SystemMessage, {SystemMessageProps} from './SystemMessage';
-import Icon from 'Components/Icon';
+
+jest.mock('Components/Icon', () => ({
+  Edit: function EditIcon() {
+    return <span className="editicon"></span>;
+  },
+  Read: function ReadIcon() {
+    return <span className="readicon"></span>;
+  },
+  Timer: function TimerIcon() {
+    return <span className="timericon"></span>;
+  },
+}));
 
 type SystemMessageUnion =
   | DeleteConversationMessage
@@ -39,9 +50,9 @@ class SystemMessagePage extends TestPage<SystemMessageProps> {
   }
 
   getSystemMessage = () => this.get('[data-uie-name="element-message-system"]');
-  getEditIcon = () => this.get(Icon.Edit);
-  getTimerIcon = () => this.get(Icon.Timer);
-  getReadIcon = () => this.get(Icon.Read);
+  getEditIcon = () => this.get('.editicon');
+  getTimerIcon = () => this.get('.timericon');
+  getReadIcon = () => this.get('.readicon');
 }
 
 const createSystemMessage = (partialSystemMessage: Partial<SystemMessageUnion>) => {
@@ -62,8 +73,8 @@ describe('SystemMessage', () => {
       }),
     });
 
-    expect(systemMessagePage.getSystemMessage().exists()).toBe(true);
-    expect(systemMessagePage.getEditIcon().exists()).toBe(true);
+    expect(systemMessagePage.getSystemMessage()).not.toBeNull();
+    expect(systemMessagePage.getEditIcon()).not.toBeNull();
   });
 
   it('shows timer icon for MessageTimerUpdateMessage', async () => {
@@ -73,8 +84,8 @@ describe('SystemMessage', () => {
       }),
     });
 
-    expect(systemMessagePage.getSystemMessage().exists()).toBe(true);
-    expect(systemMessagePage.getTimerIcon().exists()).toBe(true);
+    expect(systemMessagePage.getSystemMessage()).not.toBeNull();
+    expect(systemMessagePage.getTimerIcon()).not.toBeNull();
   });
 
   it('shows read icon for ReceiptModeUpdateMessage', async () => {
@@ -84,7 +95,7 @@ describe('SystemMessage', () => {
       }),
     });
 
-    expect(systemMessagePage.getSystemMessage().exists()).toBe(true);
-    expect(systemMessagePage.getReadIcon().exists()).toBe(true);
+    expect(systemMessagePage.getSystemMessage()).not.toBeNull();
+    expect(systemMessagePage.getReadIcon()).not.toBeNull();
   });
 });

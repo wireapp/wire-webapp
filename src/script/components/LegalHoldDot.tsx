@@ -75,8 +75,4 @@ const LegalHoldDot: React.FC<LegalHoldDotProps> = ({
 
 export default LegalHoldDot;
 
-registerReactComponent<LegalHoldDotProps>('legal-hold-dot', {
-  component: LegalHoldDot,
-  template:
-    '<div data-bind="react: {conversation, isPending: ko.unwrap(isPending), large, className, legalHoldModal}"></div>',
-});
+registerReactComponent('legal-hold-dot', LegalHoldDot);

@@ -38,7 +38,7 @@ import MediaButton from './controls/MediaButton';
 import Icon from 'Components/Icon';
 import useEffectRef from 'Util/useEffectRef';
 import {useAssetTransfer} from './AbstractAssetTransferStateTracker';
-import {registerReactComponent, useKoSubscribableChildren} from 'Util/ComponentUtil';
+import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 
 const logger = getLogger('AudioAssetComponent');
 
@@ -148,8 +148,3 @@ const AudioAsset: React.FC<AudioAssetProps> = ({
 };
 
 export default AudioAsset;
-
-registerReactComponent<AudioAssetProps>('audio-asset', {
-  bindings: 'hasHeader: header, className, message: ko.unwrap(message)',
-  component: AudioAsset,
-});

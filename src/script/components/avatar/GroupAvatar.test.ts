@@ -43,7 +43,7 @@ describe('GroupAvatar', () => {
       users: [user0, user1, user2, user3],
     });
 
-    expect(GroupAvatar.getAvatarWrapper().exists()).toBe(true);
-    expect(GroupAvatar.getAvatarWrapper().children().length).toBe(4);
+    expect(GroupAvatar.getAvatarWrapper()).not.toBeNull();
+    expect(GroupAvatar.getAvatarWrapper().children.length).toBe(4);
   });
 });

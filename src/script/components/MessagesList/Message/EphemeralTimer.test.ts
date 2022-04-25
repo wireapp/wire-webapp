@@ -41,7 +41,7 @@ describe('EphemeralTimer', () => {
     const ephemeralTimer = new EphemeralTimerPage({message});
     const circle = ephemeralTimer.getCircle();
 
-    expect(circle.props().style['--offset']).toBe(1);
+    expect(window.getComputedStyle(circle).getPropertyValue('--offset')).toBe('1');
   });
   it('hides the icon when no ephemeral timer was started', () => {
     const message = new Message();
@@ -49,6 +49,6 @@ describe('EphemeralTimer', () => {
     const ephemeralTimer = new EphemeralTimerPage({message});
     const circle = ephemeralTimer.getCircle();
 
-    expect(circle.props().style['--offset']).toBe(0);
+    expect(window.getComputedStyle(circle).getPropertyValue('--offset')).toBe('0');
   });
 });

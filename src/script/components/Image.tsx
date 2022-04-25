@@ -95,7 +95,4 @@ const Image: React.FC<ImageProps> = ({
 
 export default Image;
 
-registerReactComponent<ImageProps>('image-component', {
-  component: Image,
-  template: '<span data-bind="react: {className, asset: ko.unwrap(asset), assetRepository, click, isQuote}"></span>',
-});
+registerReactComponent('image-component', Image);

@@ -68,9 +68,9 @@ describe('SetEmail', () => {
       }),
     );
 
-    expect(setEmailPage.getEmailInput().exists()).toBe(true);
+    expect(setEmailPage.getEmailInput()).not.toBeNull();
 
-    expect(setEmailPage.getVerifyEmailButton().exists()).toBe(true);
+    expect(setEmailPage.getVerifyEmailButton()).not.toBeNull();
 
     expect(setEmailPage.getVerifyEmailButton().props().disabled).toBe(true);
     setEmailPage.enterEmail('e');

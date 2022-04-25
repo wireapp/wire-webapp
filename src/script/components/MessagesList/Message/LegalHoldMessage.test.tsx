@@ -46,8 +46,8 @@ describe('LegalHoldMessage', () => {
       }),
     });
 
-    expect(legalHoldMessagePage.getLegalHoldDeactivatedMessage().exists()).toBe(true);
-    expect(legalHoldMessagePage.getLegalHoldActivatedMessage().exists()).toBe(false);
+    expect(legalHoldMessagePage.getLegalHoldDeactivatedMessage()).not.toBeNull();
+    expect(legalHoldMessagePage.getLegalHoldActivatedMessage()).toBeNull();
   });
   it('shows legal hold activated message', async () => {
     const legalHoldMessagePage = new LegalHoldMessagePage({
@@ -56,7 +56,7 @@ describe('LegalHoldMessage', () => {
       }),
     });
 
-    expect(legalHoldMessagePage.getLegalHoldActivatedMessage().exists()).toBe(true);
-    expect(legalHoldMessagePage.getLegalHoldDeactivatedMessage().exists()).toBe(false);
+    expect(legalHoldMessagePage.getLegalHoldActivatedMessage()).not.toBeNull();
+    expect(legalHoldMessagePage.getLegalHoldDeactivatedMessage()).toBeNull();
   });
 });

@@ -118,7 +118,4 @@ const TimedMessagesPanel: React.FC<TimedMessagesPanelProps> = ({onClose, onGoBac
 
 export default TimedMessagesPanel;
 
-registerReactComponent('timed-messages-panel', {
-  component: TimedMessagesPanel,
-  template: '<div data-bind="react: {onGoBack, onClose, repositories}"></div>',
-});
+registerReactComponent('timed-messages-panel', TimedMessagesPanel);

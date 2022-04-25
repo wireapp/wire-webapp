@@ -27,7 +27,7 @@ import {MemberMessage} from 'src/script/entity/message/MemberMessage';
 import {Message as MessageEntity} from 'src/script/entity/message/Message';
 import {User} from 'src/script/entity/User';
 import {StatusType} from '../../message/StatusType';
-import {registerStaticReactComponent, useKoSubscribableChildren} from 'Util/ComponentUtil';
+import {registerReactComponent, useKoSubscribableChildren} from 'Util/ComponentUtil';
 import Message from './Message';
 import {Text} from 'src/script/entity/message/Text';
 import {useResizeObserver} from '../../ui/resizeObserver';
@@ -239,4 +239,4 @@ const MessagesList: React.FC<MessagesListParams> = ({
 
 export default MessagesList;
 
-registerStaticReactComponent('messages-list', MessagesList);
+registerReactComponent('messages-list', MessagesList);

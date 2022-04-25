@@ -66,7 +66,7 @@ describe('Avatar', () => {
       participant,
     });
 
-    expect(participantAvatar.getTemporaryGuestAvatar().exists()).toBe(true);
+    expect(participantAvatar.getTemporaryGuestAvatar()).not.toBeNull();
   });
 
   it('renders service avatar', () => {
@@ -77,7 +77,7 @@ describe('Avatar', () => {
       participant,
     });
 
-    expect(participantAvatar.getServiceAvatar().exists()).toBe(true);
+    expect(participantAvatar.getServiceAvatar()).not.toBeNull();
   });
 
   /**
@@ -92,7 +92,7 @@ describe('Avatar', () => {
       participant,
     });
 
-    expect(participantAvatar.getServiceAvatar().exists()).toBe(true);
+    expect(participantAvatar.getServiceAvatar()).not.toBeNull();
   });
 
   it('renders user avatar', () => {
@@ -103,6 +103,6 @@ describe('Avatar', () => {
       participant,
     });
 
-    expect(participantAvatar.getUserAvatar().exists()).toBe(true);
+    expect(participantAvatar.getUserAvatar()).not.toBeNull();
   });
 });

@@ -33,6 +33,7 @@ import {MediaDevicesHandler} from 'src/script/media/MediaDevicesHandler';
 import {CallActions} from 'src/script/view_model/CallingViewModel';
 import {CallingRepository} from 'src/script/calling/CallingRepository';
 import {TeamState} from 'src/script/team/TeamState';
+import {waitFor} from '@testing-library/react';
 
 class ConversationListCallingCellPage extends TestPage<CallingCellProps> {
   constructor(props?: CallingCellProps) {
@@ -91,8 +92,8 @@ describe('ConversationListCallingCell', () => {
     props.call.state(CALL_STATE.INCOMING);
     const callingCellPage = new ConversationListCallingCellPage(props);
 
-    expect(callingCellPage.getAcceptButton().exists()).toBe(true);
-    expect(callingCellPage.getDeclineButton().exists()).toBe(true);
+    expect(callingCellPage.getAcceptButton()).not.toBeNull();
+    expect(callingCellPage.getDeclineButton()).not.toBeNull();
   });
 
   it('displays an outgoing ringing call', async () => {
@@ -100,7 +101,7 @@ describe('ConversationListCallingCell', () => {
     props.call.state(CALL_STATE.OUTGOING);
     const callingCellPage = new ConversationListCallingCellPage(props);
 
-    expect(callingCellPage.getOutgoingLabel().exists()).toBe(true);
+    expect(callingCellPage.getOutgoingLabel()).not.toBeNull();
   });
 
   it('displays a call that is connecting', async () => {
@@ -108,7 +109,7 @@ describe('ConversationListCallingCell', () => {
     props.call.state(CALL_STATE.ANSWERED);
     const callingCellPage = new ConversationListCallingCellPage(props);
 
-    expect(callingCellPage.getConnectingLabel().exists()).toBe(true);
+    expect(callingCellPage.getConnectingLabel()).not.toBeNull();
   });
 
   it('displays the running time of an ongoing call', async () => {
@@ -120,15 +121,16 @@ describe('ConversationListCallingCell', () => {
     jest.setSystemTime(now);
     act(() => {
       props.call.startedAt(now);
+      callingCellPage.setProps(props);
     });
-    callingCellPage.setProps(props);
+    await waitFor(() => callingCellPage.renderResults.getByText('00:00'));
 
-    expect(callingCellPage.getCallDuration().text()).toBe('00:00');
+    expect(callingCellPage.getCallDuration().textContent).toBe('00:00');
     act(() => {
       jest.advanceTimersByTime(10000);
     });
 
-    expect(callingCellPage.getCallDuration().text()).toBe('00:10');
+    expect(callingCellPage.getCallDuration().textContent).toBe('00:10');
     jest.useRealTimers();
   });
 });

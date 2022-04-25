@@ -17,7 +17,7 @@
  *
  */
 
-import React, {Fragment} from 'react';
+import React from 'react';
 
 import {registerReactComponent} from 'Util/ComponentUtil';
 import Icon from '../Icon';
@@ -35,7 +35,7 @@ export interface PanelActionsProps {
 
 const PanelActions: React.FC<PanelActionsProps> = ({items}) => {
   return (
-    <Fragment>
+    <ul className="panel-actions">
       {items.map(({click, identifier, icon, label}) => (
         <li key={identifier}>
           <button className="panel__action-item" onClick={click} data-uie-name={identifier} type="button">
@@ -48,13 +48,10 @@ const PanelActions: React.FC<PanelActionsProps> = ({items}) => {
           </button>
         </li>
       ))}
-    </Fragment>
+    </ul>
   );
 };
 
 export default PanelActions;
 
-registerReactComponent('panel-actions', {
-  component: PanelActions,
-  template: '<ul class="panel-actions" data-bind="react: {items: ko.unwrap(items)}"></ul>',
-});
+registerReactComponent('panel-actions', PanelActions);

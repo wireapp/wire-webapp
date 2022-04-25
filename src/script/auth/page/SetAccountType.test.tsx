@@ -75,7 +75,7 @@ describe('when visiting the set account type page', () => {
         }),
       );
 
-      expect(accountTypePage.getIndexRedirect().exists()).toBe(true);
+      expect(accountTypePage.getIndexRedirect()).not.toBeNull();
     });
   });
 
@@ -103,7 +103,7 @@ describe('when visiting the set account type page', () => {
         }),
       );
 
-      expect(accountTypePage.getLogo().exists()).toBe(true);
+      expect(accountTypePage.getLogo()).not.toBeNull();
     });
 
     it('shows an option to create a private account', () => {
@@ -118,7 +118,7 @@ describe('when visiting the set account type page', () => {
         }),
       );
 
-      expect(accountTypePage.getPersonalAccountButton().exists()).toBe(true);
+      expect(accountTypePage.getPersonalAccountButton()).not.toBeNull();
     });
 
     it('shows an option to create a team', () => {
@@ -133,7 +133,7 @@ describe('when visiting the set account type page', () => {
         }),
       );
 
-      expect(accountTypePage.clickTeamAccountButton().exists()).toBe(true);
+      expect(accountTypePage.clickTeamAccountButton()).not.toBeNull();
     });
   });
 });

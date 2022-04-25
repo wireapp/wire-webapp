@@ -55,7 +55,7 @@ describe('PingMessage', () => {
       }),
     });
 
-    expect(pingMessagePage.getPingMessage().exists()).toBe(true);
-    expect(pingMessagePage.getPingMessageText().text()).toBe(`${sender}${caption}`);
+    expect(pingMessagePage.getPingMessage()).not.toBeNull();
+    expect(pingMessagePage.getPingMessageText().textContent).toBe(`${sender}${caption}`);
   });
 });

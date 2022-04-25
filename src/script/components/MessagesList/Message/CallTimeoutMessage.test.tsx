@@ -55,7 +55,7 @@ describe('CallTimeoutMessage', () => {
       }),
     });
 
-    expect(callMessagePage.getCallTimeoutMessage(REASON.NOONE_JOINED).exists()).toBe(true);
+    expect(callMessagePage.getCallTimeoutMessage(REASON.NOONE_JOINED)).not.toBeNull();
   });
 
   it('shows that all participants left', async () => {
@@ -65,6 +65,6 @@ describe('CallTimeoutMessage', () => {
       }),
     });
 
-    expect(callMessagePage.getCallTimeoutMessage(REASON.EVERYONE_LEFT).exists()).toBe(true);
+    expect(callMessagePage.getCallTimeoutMessage(REASON.EVERYONE_LEFT)).not.toBeNull();
   });
 });

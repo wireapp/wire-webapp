@@ -21,7 +21,7 @@ import type {RichInfoField} from '@wireapp/api-client/src/user/RichInfo';
 import React, {useEffect, useState} from 'react';
 import {container} from 'tsyringe';
 
-import {registerStaticReactComponent, useKoSubscribableChildren} from 'Util/ComponentUtil';
+import {registerReactComponent, useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 import {noop} from 'Util/util';
 
@@ -107,4 +107,4 @@ const EnrichedFields: React.FC<EnrichedFieldsProps> = ({
 
 export default EnrichedFields;
 
-registerStaticReactComponent<EnrichedFieldsProps>('enriched-fields', EnrichedFields);
+registerReactComponent<EnrichedFieldsProps>('enriched-fields', EnrichedFields);
