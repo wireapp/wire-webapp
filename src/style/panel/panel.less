@@ -172,6 +172,12 @@
     align-items: center;
     padding: 0 16px;
 
+    &--link {
+      .panel__action-item__icon {
+        width: 32px;
+      }
+    }
+
     &-label {
       display: flex;
       flex-grow: 1;
@@ -291,9 +297,10 @@
     &__context {
       display: flex;
       width: 40px;
-      margin-left: 4px;
+      margin-left: 1px;
+
       path {
-        fill: var(--background);
+        fill: currentColor;
       }
     }
 
