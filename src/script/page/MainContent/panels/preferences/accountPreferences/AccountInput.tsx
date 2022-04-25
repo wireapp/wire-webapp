@@ -129,7 +129,6 @@ const AccountInput: React.FC<AccountInputProps> = ({
           <label
             className="label preferences-label"
             css={{
-              color: 'var(--foreground)',
               lineHeight: '14px',
               marginBottom: 16,
               position: 'relative',
