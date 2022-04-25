@@ -132,7 +132,7 @@ const AccountPreferences: React.FC<AccountPreferencesProps> = ({
           width: 560,
         }}
       >
-        <div
+        <h3
           className="heading-h3"
           css={{
             marginBottom: 16,
@@ -140,7 +140,7 @@ const AccountPreferences: React.FC<AccountPreferencesProps> = ({
           }}
         >
           {name}
-        </div>
+        </h3>
         <div>
           <AvatarInput {...{isActivatedAccount, selfUser, userRepository}} />
         </div>
