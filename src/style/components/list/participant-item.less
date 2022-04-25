@@ -74,7 +74,11 @@
     display: flex;
 
     path {
-      fill: var(--background-fade-40);
+      fill: var(--gray-90);
+
+      body.theme-dark & {
+        fill: var(--white);
+      }
     }
   }
 

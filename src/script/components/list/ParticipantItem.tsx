@@ -266,7 +266,7 @@ const ParticipantItem = <UserType extends User | ServiceEntity>(
                 data-uie-name="status-selected"
               />
             )}
-            {showArrow && <Icon.Disclose className="disclose-icon" />}
+            {showArrow && <Icon.ChevronRight className="disclose-icon" />}
           </>
         )}
       </div>

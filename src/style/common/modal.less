@@ -79,7 +79,7 @@
     border: var(--modal-border-color);
     margin: auto; // http://stackoverflow.com/questions/24538100/issue-when-centering-vertically-with-flexbox-when-heights-are-unknown
     background-color: var(--app-bg-secondary);
-    border-radius: 4px;
+    border-radius: 10px;
     cursor: default;
 
     a.close {
@@ -150,7 +150,7 @@
 
   .modal-option {
     padding-right: 32px;
-    margin-bottom: 16px;
+    margin-bottom: 20px;
 
     .modal-checkbox {
       margin-right: 4px;
@@ -251,12 +251,13 @@
     z-index: @z-index-modal + 1;
     display: flex;
     overflow: hidden;
-    width: 384px;
+    width: 100%;
+    max-width: 460px;
     max-height: 540px;
     flex-direction: column;
 
     align-self: center;
-    padding: 16px;
+    padding: 30px 30px 26px;
 
     border: var(--modal-border-color);
     margin: auto;
@@ -264,7 +265,7 @@
     background-color: var(--modal-bg);
     border-radius: 4px;
     cursor: default;
-    font-size: 14px;
+    font-size: 16px;
     justify-self: center;
     overflow-y: hidden;
 
@@ -289,41 +290,26 @@
 
   &__header {
     position: relative;
-    display: flex;
-    height: 24px;
     min-height: 24px;
-    flex-direction: row-reverse;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 16px;
-    color: var(--background);
-    fill: var(--background);
-    font-size: 11px;
-    font-weight: @font-weight-bold;
-    text-transform: uppercase;
-
-    & > * {
-      position: relative;
-    }
+    padding-top: 12px;
+    margin-bottom: 20px;
+    color: var(--main-color);
+    fill: var(--main-color);
+    text-align: center;
 
     &__title {
-      position: absolute;
-      top: 0;
-      right: 0;
-      bottom: 0;
-      left: 0;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 0;
       margin: 0;
       font-size: inherit;
       font-weight: inherit;
       pointer-events: none;
+      .heading-h2;
     }
 
     &__button {
       .button-reset-default;
+      position: absolute;
+      top: -6px;
+      right: -5px;
 
       display: flex;
       width: 16px;
@@ -332,18 +318,31 @@
       justify-content: center;
       cursor: pointer;
     }
+
+    &--list {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding-top: 0;
+
+      .modal__header {
+        &__button {
+          position: relative;
+          top: 0;
+          left: 0;
+        }
+      }
+    }
   }
 
   &__body {
-    padding: 0 16px 16px;
-    margin: 0 -16px -16px;
     overflow-y: auto;
   }
 
   &__buttons {
     display: flex;
     justify-content: flex-end;
-    margin-top: 16px;
+    margin-top: 20px;
     --button-color: var(--accent-color);
 
     &--column {
@@ -352,42 +351,21 @@
   }
 
   &__button {
-    .button-reset-default;
-    display: inline-block;
-    width: calc(50% - 8px);
-    height: 40px;
-    padding: 0 16px;
-    border: 1px solid var(--button-color);
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 11px;
-    font-weight: 600;
-    line-height: 38px;
-    text-align: center;
-    text-decoration: none;
-    text-transform: uppercase;
-    transition: opacity 0.25s linear;
-    user-select: none;
+    width: 100%;
 
-    & + & {
-      margin-left: 16px;
+    &:not(&--primary) {
+      .button-text-secondary;
     }
-
-    &--disabled,
-    &:disabled {
-      cursor: default;
-      filter: saturate(0.5);
-      opacity: 0.5;
+    & + & {
+      margin-left: 12px;
     }
 
     &--secondary {
-      background: #fff;
-      color: var(--button-color);
+      .button-text-secondary;
     }
 
     &--primary {
-      background: var(--button-color);
-      color: #fff;
+      .button-text-primary;
     }
 
     &--alert {
@@ -402,9 +380,6 @@
         margin-left: 0;
       }
     }
-    &:focus {
-      box-shadow: 0 0 1px 3px var(--background-fade-40);
-    }
   }
 
   &__title {
@@ -417,7 +392,7 @@
   }
 
   &__text {
-    margin-bottom: 16px;
+    margin-bottom: 30px;
     line-height: 1.5;
     overflow-wrap: break-word;
 

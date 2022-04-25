@@ -27,6 +27,23 @@
     border-top: 1px solid var(--background-fade-8);
     margin: 24px 16px 16px;
 
+    &-text,
+    &-head {
+      color: var(--gray-90);
+
+      body.theme-dark & {
+        color: var(--white);
+      }
+    }
+
+    &-head {
+      .text-medium;
+    }
+
+    &-text {
+      .subline;
+    }
+
     &__head {
       margin-bottom: 8px;
       font-weight: @font-weight-bold;
