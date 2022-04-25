@@ -17,7 +17,7 @@
  *
  */
 
-import {fireEvent} from '@testing-library/react';
+import {act, fireEvent} from '@testing-library/react';
 import {FileAsset} from 'src/script/entity/message/FileAsset';
 import TestPage from 'Util/test/TestPage';
 
@@ -63,11 +63,15 @@ describe('AudioSeekBar', () => {
 
     const clipPathWidth = () => audioSeekBar.getClipRect().getAttribute('width');
 
-    audioElement.dispatchEvent(new Event('timeupdate'));
+    act(() => {
+      audioElement.dispatchEvent(new Event('timeupdate'));
+    });
 
     expect(clipPathWidth()).toEqual('0.5');
 
-    audioElement.dispatchEvent(new Event('ended'));
+    act(() => {
+      audioElement.dispatchEvent(new Event('ended'));
+    });
 
     expect(clipPathWidth()).toEqual('0');
   });
@@ -79,7 +83,9 @@ describe('AudioSeekBar', () => {
     Object.defineProperty(svg, 'clientWidth', {get: () => 100});
 
     const expected = 500;
-    fireEvent.click(svg, {pageX: 50});
+    act(() => {
+      fireEvent.click(svg, {clientX: 50});
+    });
 
     expect(props.audioElement.currentTime).toBeCloseTo(expected);
   });

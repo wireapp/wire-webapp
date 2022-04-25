@@ -33,6 +33,7 @@ describe('InputLevel', () => {
   beforeAll(() => {
     originalAudioContext = window.AudioContext;
     window.AudioContext = jest.fn().mockImplementation(() => ({
+      close: () => Promise.resolve(),
       createAnalyser: () =>
         ({
           frequencyBinCount: 100,
@@ -40,7 +41,7 @@ describe('InputLevel', () => {
             arr.fill(128);
           },
         } as AnalyserNode),
-      createMediaStreamSource: (stream: MediaStream) => ({connect: () => {}}),
+      createMediaStreamSource: (stream: MediaStream) => ({connect: () => {}, disconnect: () => {}}),
     }));
 
     jest.spyOn(global, 'setInterval').mockImplementation((callback: () => void, interval: any) => {
