@@ -30,7 +30,7 @@ import {ActionRoot, actionRoot} from '../../module/action/';
 export interface MockStoreParameters {
   actions?: TypeUtil.RecursivePartial<ActionRoot>;
   apiClient?: TypeUtil.RecursivePartial<APIClient>;
-  cookieStore?: CookiesStatic<object>;
+  cookieStore?: CookiesStatic<string>;
   core?: TypeUtil.RecursivePartial<Account>;
   getConfig?: () => any;
   localStorage?: Storage;
