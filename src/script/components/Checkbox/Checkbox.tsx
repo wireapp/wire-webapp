@@ -37,7 +37,7 @@ const Checkbox: React.FC<CheckboxProps> = ({disabled, label, isChecked, name, on
         id={name}
         name={name}
         onChange={onCheckedChanged}
-        css={getInputCSS(disabled)}
+        css={getInputCSS(isChecked, disabled)}
       />
       <svg
         css={getSvgCSS(isChecked, disabled)}

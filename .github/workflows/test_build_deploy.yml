@@ -99,7 +99,7 @@ jobs:
       - name: Monitor coverage
         # Run for all PRs and merges with DISTRIBUTION == 'wire'
         if: matrix.DISTRIBUTION == 'DISTRIBUTION_0'
-        uses: codecov/codecov-action@v3.0.0
+        uses: codecov/codecov-action@v3.1.0
         with:
           fail_ci_if_error: false
           files: ./coverage/lcov.info
