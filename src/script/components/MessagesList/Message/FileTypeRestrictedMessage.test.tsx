@@ -54,7 +54,7 @@ describe('FileTypeRestrictedMessage', () => {
       }),
     });
 
-    expect(fileTypeRestrictedMessagePage.getFileTypeRestrictedMessageText(true).exists()).toBe(true);
+    expect(fileTypeRestrictedMessagePage.getFileTypeRestrictedMessageText(true)).not.toBeNull();
   });
 
   it('shows outgoing message', async () => {
@@ -64,6 +64,6 @@ describe('FileTypeRestrictedMessage', () => {
       }),
     });
 
-    expect(fileTypeRestrictedMessagePage.getFileTypeRestrictedMessageText(false).exists()).toBe(true);
+    expect(fileTypeRestrictedMessagePage.getFileTypeRestrictedMessageText(false)).not.toBeNull();
   });
 });

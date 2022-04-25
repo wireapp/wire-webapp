@@ -28,12 +28,10 @@ class InfoTogglePage extends TestPage<InfoToggleProps> {
 
   getInput = () => this.get('input[data-uie-name="info-toggle-input"]');
   getInfo = (dataUieName: string) => this.get(`div[data-uie-name="status-info-toggle-${dataUieName}"]`);
-
-  changeInputValue = (value: boolean) => this.changeCheckboxValue(this.getInput(), value);
 }
 
 describe('InfoToggle', () => {
-  it('toggles check property', async () => {
+  it('toggles check property', () => {
     const dataUieName = 'example';
     let isChecked = false;
     const props = {
@@ -48,8 +46,9 @@ describe('InfoToggle', () => {
     };
 
     const infoToggle = new InfoTogglePage(props);
-    expect(infoToggle.getInfo(dataUieName).text()).toBe('example');
-    infoToggle.changeInputValue(!isChecked);
+    expect(infoToggle.getInfo(dataUieName).textContent).toBe('example');
+    infoToggle.click(infoToggle.getInput());
+
     expect(isChecked).toBe(true);
   });
 });

@@ -32,7 +32,7 @@ class FileAssetComponentTestPage extends TestPage<FileAssetProps> {
 
   getFile = () => this.get('[data-uie-name="file"]');
 
-  getFileSize = () => this.get('[data-uie-name="file-size"]').text();
+  getFileSize = () => this.get('[data-uie-name="file-size"]').textContent;
 }
 
 describe('FileAssetComponent', () => {
@@ -58,7 +58,7 @@ describe('FileAssetComponent', () => {
     });
 
     const fileUploadMessage = testPage.getFile();
-    expect(fileUploadMessage.exists()).toBeTruthy();
+    expect(fileUploadMessage).not.toBeNull();
   });
 
   it('does not render file uploads from timed-out / obfuscated messages', () => {
@@ -76,7 +76,7 @@ describe('FileAssetComponent', () => {
     });
 
     const fileUploadMessage = testPage.getFile();
-    expect(fileUploadMessage.exists()).toBeFalsy();
+    expect(fileUploadMessage).toBeNull();
   });
 
   it('shows the file size in MB', () => {

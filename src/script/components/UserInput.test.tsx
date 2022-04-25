@@ -29,7 +29,7 @@ class UserInputPage extends TestPage<UserInputProps> {
   }
 
   getInput = () => this.get('[data-uie-name="enter-users"]');
-  getSelectedUsers = () => this.get('[data-uie-name="item-selected"]');
+  getSelectedUsers = () => this.getAll('[data-uie-name="item-selected"]');
   pressBackSpace = () => this.keyDown(this.getInput(), KEY.BACKSPACE);
 }
 

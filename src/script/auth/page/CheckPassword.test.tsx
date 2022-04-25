@@ -71,8 +71,8 @@ describe('CheckPassword', () => {
       }),
     );
 
-    expect(checkPasswordPage.getPasswordInput().exists()).toBe(true);
-    expect(checkPasswordPage.getLoginButton().exists()).toBe(true);
+    expect(checkPasswordPage.getPasswordInput()).not.toBeNull();
+    expect(checkPasswordPage.getLoginButton()).not.toBeNull();
     expect(checkPasswordPage.getLoginButton().props().disabled).toBe(true);
     checkPasswordPage.enterPassword('e');
     expect(checkPasswordPage.getLoginButton().props().disabled).toBe(false);
@@ -135,7 +135,7 @@ describe('CheckPassword', () => {
     await waitForExpect(() => {
       checkPasswordPage.update();
 
-      expect(checkPasswordPage.getErrorMessage(BackendError.LABEL.INVALID_CREDENTIALS).exists()).toBe(true);
+      expect(checkPasswordPage.getErrorMessage(BackendError.LABEL.INVALID_CREDENTIALS)).not.toBeNull();
     });
   });
 

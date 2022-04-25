@@ -68,7 +68,4 @@ const ClassifiedBar: React.FC<ClassifiedBarProps> = ({users, classifiedDomains, 
 
 export default ClassifiedBar;
 
-registerReactComponent('classified-bar', {
-  component: ClassifiedBar,
-  template: '<div data-bind="react: {users: ko.unwrap(users), classifiedDomains: ko.unwrap(classifiedDomains)}"></div>',
-});
+registerReactComponent('classified-bar', ClassifiedBar);

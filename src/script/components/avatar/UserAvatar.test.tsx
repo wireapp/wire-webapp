@@ -46,8 +46,8 @@ describe('UserAvatar', () => {
       state: STATE.NONE,
     });
 
-    expect(userAvatar.getInitials().exists()).toBe(true);
-    expect(userAvatar.getInitials().text()).toBe('AB');
+    expect(userAvatar.getInitials()).not.toBeNull();
+    expect(userAvatar.getInitials().textContent).toBe('AB');
   });
 
   it('shows single initial character when avatar size is extra small', async () => {
@@ -60,8 +60,8 @@ describe('UserAvatar', () => {
       state: STATE.NONE,
     });
 
-    expect(userAvatar.getInitials().exists()).toBe(true);
-    expect(userAvatar.getInitials().text()).toBe('A');
+    expect(userAvatar.getInitials()).not.toBeNull();
+    expect(userAvatar.getInitials().textContent).toBe('A');
   });
 
   it('does not show avatar badge in default state', async () => {
@@ -74,7 +74,7 @@ describe('UserAvatar', () => {
       state: STATE.NONE,
     });
 
-    expect(userAvatar.getUserBadgeIcon().exists()).toBe(false);
+    expect(userAvatar.getUserBadgeIcon()).toBeNull();
   });
 
   it('shows avatar badge for blocked user', async () => {
@@ -87,7 +87,7 @@ describe('UserAvatar', () => {
       state: STATE.BLOCKED,
     });
 
-    expect(userAvatar.getUserBadgeIcon(STATE.BLOCKED).exists()).toBe(true);
+    expect(userAvatar.getUserBadgeIcon(STATE.BLOCKED)).not.toBeNull();
   });
 
   it('shows avatar badge for connection request', async () => {
@@ -100,6 +100,6 @@ describe('UserAvatar', () => {
       state: STATE.PENDING,
     });
 
-    expect(userAvatar.getUserBadgeIcon(STATE.PENDING).exists()).toBe(true);
+    expect(userAvatar.getUserBadgeIcon(STATE.PENDING)).not.toBeNull();
   });
 });

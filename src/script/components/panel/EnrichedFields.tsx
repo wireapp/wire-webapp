@@ -21,7 +21,7 @@ import type {RichInfoField} from '@wireapp/api-client/src/user/RichInfo';
 import React, {useEffect, useState} from 'react';
 import {container} from 'tsyringe';
 
-import {registerStaticReactComponent, useKoSubscribableChildren} from 'Util/ComponentUtil';
+import {registerReactComponent, useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 import {noop} from 'Util/util';
 
@@ -88,16 +88,16 @@ const EnrichedFields: React.FC<EnrichedFieldsProps> = ({
     onFieldsLoaded,
   );
   return (
-    fields && (
+    fields?.length > 0 && (
       <div className="enriched-fields">
         {fields.map(({type, value}) => (
           <div key={type} className="enriched-fields__entry">
-            <div className="enriched-fields__entry__key" data-uie-name="item-enriched-key">
+            <p className="enriched-fields__entry__key" data-uie-name="item-enriched-key">
               {type}
-            </div>
-            <div className="enriched-fields__entry__value" data-uie-name="item-enriched-value" data-uie-value={value}>
+            </p>
+            <p className="enriched-fields__entry__value" data-uie-name="item-enriched-value" data-uie-value={value}>
               {value}
-            </div>
+            </p>
           </div>
         ))}
       </div>
@@ -107,4 +107,4 @@ const EnrichedFields: React.FC<EnrichedFieldsProps> = ({
 
 export default EnrichedFields;
 
-registerStaticReactComponent<EnrichedFieldsProps>('enriched-fields', EnrichedFields);
+registerReactComponent<EnrichedFieldsProps>('enriched-fields', EnrichedFields);

@@ -17,7 +17,6 @@
  *
  */
 
-import {act} from 'react-dom/test-utils';
 import ko from 'knockout';
 
 import {Call} from 'src/script/calling/Call';
@@ -25,20 +24,9 @@ import {Participant} from 'src/script/calling/Participant';
 import {Conversation} from 'src/script/entity/Conversation';
 import {User} from 'src/script/entity/User';
 import FullscreenVideoCall, {FullscreenVideoCallProps} from './FullscreenVideoCall';
-import TestPage from 'Util/test/TestPage';
 import {Grid} from 'src/script/calling/videoGridHandler';
 import {MediaDevicesHandler} from 'src/script/media/MediaDevicesHandler';
-
-class FullscreenVideoCallPage extends TestPage<FullscreenVideoCallProps> {
-  constructor(props?: FullscreenVideoCallProps) {
-    super(FullscreenVideoCall, props);
-  }
-
-  getVideoControls = () => this.get('.video-controls__button');
-  getVideoTimer = () => this.get('div[data-uie-name="video-timer"]');
-  getActiveSpeakerToggle = () => this.get('ButtonGroup');
-  clickInactiveButton = () => this.click(this.get('ButtonGroup > [data-uie-value="inactive"]'));
-}
+import {render, waitFor, act} from '@testing-library/react';
 
 describe('fullscreenVideoCall', () => {
   const createProps = (): FullscreenVideoCallProps => {
@@ -83,39 +71,39 @@ describe('fullscreenVideoCall', () => {
   it('shows the available screens', () => {
     const props = createProps();
 
-    const fullscreenVideoCall = new FullscreenVideoCallPage(props);
+    const {queryByText} = render(<FullscreenVideoCall {...props} />);
 
-    expect(fullscreenVideoCall.getVideoControls().exists()).toBe(true);
+    expect(queryByText('videoCallOverlayConversations')).not.toBe(null);
   });
 
   it('shows the calling timer', async () => {
     const props = createProps();
 
-    const fullscreenVideoCall = new FullscreenVideoCallPage(props);
+    const {getByText} = render(<FullscreenVideoCall {...props} />);
     const now = Date.now();
 
     jest.setSystemTime(now);
-    props.call.startedAt(Date.now());
-    fullscreenVideoCall.setProps(props);
+    act(() => {
+      props.call.startedAt(Date.now());
+    });
 
-    expect(fullscreenVideoCall.getVideoTimer().text()).toEqual('00:00');
+    await waitFor(() => getByText('00:00'));
 
     act(() => {
       jest.advanceTimersByTime(1001);
-      fullscreenVideoCall.update();
     });
 
-    expect(fullscreenVideoCall.getVideoTimer().text()).toEqual('00:01');
+    await waitFor(() => getByText('00:01'));
   });
 
   it('has no active speaker toggle for calls with more less than 3 participants', () => {
     const props = createProps();
-    const fullscreenVideoCall = new FullscreenVideoCallPage(props);
+    const {queryByText} = render(<FullscreenVideoCall {...props} />);
 
-    expect(fullscreenVideoCall.getActiveSpeakerToggle().exists()).toBe(false);
+    expect(queryByText('videoSpeakersTabSpeakers')).toBeNull();
   });
 
-  it('resets the maximized participant on active speaker switch', () => {
+  it('resets the maximized participant on active speaker switch', async () => {
     const setMaximizedSpy = jasmine.createSpy();
     const props = createProps();
     props.setMaximizedParticipant = setMaximizedSpy;
@@ -125,13 +113,10 @@ describe('fullscreenVideoCall', () => {
     props.call.addParticipant(new Participant(new User('c', null), 'd'));
     props.call.addParticipant(new Participant(new User('e', null), 'f'));
 
-    const fullscreenVideoCall = new FullscreenVideoCallPage(props);
-    const activeSpeakerToggle = fullscreenVideoCall.getActiveSpeakerToggle();
+    const {getByText} = render(<FullscreenVideoCall {...props} />);
+    await waitFor(() => getByText('videoSpeakersTabSpeakers'));
 
-    expect(activeSpeakerToggle.exists()).toBe(true);
-
-    const inactiveButton = activeSpeakerToggle.find('[data-uie-value="inactive"]');
-    fullscreenVideoCall.click(inactiveButton.first());
+    getByText('videoSpeakersTabSpeakers').click();
 
     expect(setMaximizedSpy).toHaveBeenCalledWith(props.call, null);
   });

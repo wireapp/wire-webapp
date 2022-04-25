@@ -41,15 +41,17 @@ describe('Preferences', () => {
   it('renders the right component according to view state', () => {
     jest.useFakeTimers();
     const {queryByText, getByText} = render(<MainContent {...defaultParams} />);
-    expect(queryByText('preferencesAbout')).toBeNull();
+    expect(queryByText('accessibility.headings.preferencesAbout')).toBeNull();
     expect(queryByText('AccountPreferences')).not.toBeNull();
 
     act(() => {
       defaultParams.contentViewModel.state(ContentState.PREFERENCES_ABOUT);
     });
-    waitFor(() => getByText('preferencesAbout'));
-    jest.advanceTimersByTime(1000);
+    waitFor(() => getByText('accessibility.headings.preferencesAbout'));
+    act(() => {
+      jest.advanceTimersByTime(1000);
+    });
     expect(queryByText('AccountPreferences')).toBeNull();
-    expect(queryByText('preferencesAbout')).not.toBeNull();
+    expect(queryByText('accessibility.headings.preferencesAbout')).not.toBeNull();
   });
 });

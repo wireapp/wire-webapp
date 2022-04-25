@@ -29,8 +29,6 @@ class ReceiptModeTogglePage extends TestPage<ReceiptModeToggleProps> {
   }
 
   getCheckbox = () => this.get('input[data-uie-name="toggle-receipt-mode-checkbox"]');
-  checkCheckbox = () => this.changeValue(this.getCheckbox(), {checked: true});
-  uncheckCheckbox = () => this.changeValue(this.getCheckbox(), {checked: false});
 }
 
 describe('ReceiptModeToggle', () => {
@@ -42,7 +40,7 @@ describe('ReceiptModeToggle', () => {
 
     const checkBox = receiptModeToggle.getCheckbox();
 
-    expect(checkBox.props().checked).toBe(false);
+    expect(checkBox.getAttribute('checked')).toBe(null);
   });
 
   it('unchecks the checkbox when receipts are turned off', () => {
@@ -53,6 +51,6 @@ describe('ReceiptModeToggle', () => {
 
     const checkBox = receiptModeToggle.getCheckbox();
 
-    expect(checkBox.props().checked).toBe(true);
+    expect(checkBox.getAttribute('checked')).toBe('');
   });
 });

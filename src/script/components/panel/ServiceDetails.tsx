@@ -53,7 +53,4 @@ const ServiceDetails: React.FC<ServiceDetailsProps> = ({service}) => {
 
 export default ServiceDetails;
 
-registerReactComponent('panel-service-details', {
-  component: ServiceDetails,
-  template: '<div data-bind="react: {service: ko.unwrap(service)}"></div>',
-});
+registerReactComponent('panel-service-details', ServiceDetails);

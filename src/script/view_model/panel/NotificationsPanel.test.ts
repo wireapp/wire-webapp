@@ -27,14 +27,15 @@ import {Conversation} from 'src/script/entity/Conversation';
 import {NOTIFICATION_STATE} from 'src/script/conversation/NotificationSetting';
 import {ConversationState} from 'src/script/conversation/ConversationState';
 import {ConversationRepository} from 'src/script/conversation/ConversationRepository';
+import {fireEvent} from '@testing-library/react';
 
 class NotificationsPanelPage extends TestPage<NotificationsPanelProps> {
   constructor(props?: NotificationsPanelProps) {
     super(NotificationsPanel, props);
   }
 
-  getCheckedInput = () => this.get('input[checked=true]');
-  getInputWithValue = (value: number) => this.get(`input[value=${value}]`);
+  getCheckedInput = () => this.get('input[checked]') as HTMLInputElement;
+  getInputWithValue = (value: number) => this.get(`input[value="${value}"]`);
   clickInputWithValue = (value: number) => this.click(this.getInputWithValue(value));
 }
 
@@ -56,7 +57,7 @@ describe('NotificationsPanel', () => {
       onGoBack,
       repositories: {} as ViewModelRepositories,
     });
-    expect(notificationsPanel.getCheckedInput().prop('value')).toEqual(NOTIFICATION_STATE.MENTIONS_AND_REPLIES);
+    expect(notificationsPanel.getCheckedInput().value).toEqual(NOTIFICATION_STATE.MENTIONS_AND_REPLIES.toString());
   });
 
   it('sets the correct new value on the ative conversation', () => {
@@ -73,7 +74,7 @@ describe('NotificationsPanel', () => {
       onGoBack,
       repositories: {conversation: conversationRepo} as ViewModelRepositories,
     });
-    notificationsPanel.getInputWithValue(NOTIFICATION_STATE.MENTIONS_AND_REPLIES).simulate('change');
+    fireEvent.click(notificationsPanel.getInputWithValue(NOTIFICATION_STATE.MENTIONS_AND_REPLIES));
     expect(conversationRepo.setNotificationState).toHaveBeenCalledWith(
       conversation,
       NOTIFICATION_STATE.MENTIONS_AND_REPLIES,

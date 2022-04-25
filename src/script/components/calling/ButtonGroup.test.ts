@@ -46,7 +46,7 @@ describe('ButtonGroup', () => {
       onChangeItem: () => {},
     });
 
-    expect(buttonGroup.getWrapper().children().length).toBe(2);
+    expect(buttonGroup.getWrapper().children.length).toBe(2);
   });
 
   it('changes active button on click', async () => {
@@ -60,11 +60,11 @@ describe('ButtonGroup', () => {
 
     const buttonGroup = new ButtonGroupPage(props);
 
-    expect(buttonGroup.getWrapper().children().length).toBe(2);
-    expect(buttonGroup.getActiveButton().text()).toBe('one');
+    expect(buttonGroup.getWrapper().children.length).toBe(2);
+    expect(buttonGroup.getActiveButton().textContent).toBe('one');
 
     buttonGroup.clickOnInactiveButton();
-    expect(buttonGroup.getActiveButton().text()).toBe('two');
+    expect(buttonGroup.getActiveButton().textContent).toBe('two');
   });
 
   it('triggers onChangeItem only on inactive buttons', () => {

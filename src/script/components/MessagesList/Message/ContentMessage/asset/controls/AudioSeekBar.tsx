@@ -84,7 +84,7 @@ const AudioSeekBar: React.FC<AudioSeekBarProps> = ({asset, audioElement, disable
   const updateSvgWidth = () => setSvgWidth(svgNode.current?.clientWidth ?? 0);
 
   const onLevelClick = (event: React.MouseEvent<SVGSVGElement, MouseEvent>) => {
-    const mouse_x = event.pageX - svgNode.current.getBoundingClientRect().left;
+    const mouse_x = (event.pageX ?? event.clientX) - svgNode.current.getBoundingClientRect().left;
     const calculatedTime = (audioElement.duration * mouse_x) / svgNode.current.clientWidth;
     const currentTime = isNaN(calculatedTime) ? 0 : calculatedTime;
     audioElement.currentTime = clamp(currentTime, 0, audioElement.duration);

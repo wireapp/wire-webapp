@@ -44,7 +44,7 @@ describe('ServiceAvatar', () => {
       participant: service,
     });
 
-    expect(serviceAvatar.getServiceIcon().exists()).toBe(true);
+    expect(serviceAvatar.getServiceIcon()).not.toBeNull();
   });
 
   it('does not show initials', async () => {
@@ -56,7 +56,7 @@ describe('ServiceAvatar', () => {
       participant: service,
     });
 
-    expect(serviceAvatar.getInitials().exists()).toBe(false);
+    expect(serviceAvatar.getInitials()).toBeNull();
   });
 
   it('does not show avatar badge', async () => {
@@ -68,6 +68,6 @@ describe('ServiceAvatar', () => {
       participant: service,
     });
 
-    expect(serviceAvatar.getUserBadgeIcon().exists()).toBe(false);
+    expect(serviceAvatar.getUserBadgeIcon()).toBeNull();
   });
 });

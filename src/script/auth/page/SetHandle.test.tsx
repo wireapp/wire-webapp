@@ -66,9 +66,9 @@ describe('SetHandle', () => {
       }),
     );
 
-    expect(setHandlePage.getHandleInput().exists()).toBe(true);
+    expect(setHandlePage.getHandleInput()).not.toBeNull();
 
-    expect(setHandlePage.getSetHandleButton().exists()).toBe(true);
+    expect(setHandlePage.getSetHandleButton()).not.toBeNull();
 
     expect(setHandlePage.getSetHandleButton().props().disabled).toBe(true);
     setHandlePage.enterHandle('e');

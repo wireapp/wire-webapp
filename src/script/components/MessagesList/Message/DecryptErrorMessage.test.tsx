@@ -58,14 +58,14 @@ describe('DecryptErrorMessage', () => {
       onClickResetSession: jest.fn(),
     });
 
-    expect(decryptErrorMessagePage.getDecryptErrorMessage().exists()).toBe(true);
-    expect(decryptErrorMessagePage.getResetEncryptionSessionLink().exists()).toBe(false);
+    expect(decryptErrorMessagePage.getDecryptErrorMessage()).not.toBeNull();
+    expect(decryptErrorMessagePage.getResetEncryptionSessionLink()).toBeNull();
     act(() => {
       isRecoverable(true);
     });
     decryptErrorMessagePage.update();
 
-    expect(decryptErrorMessagePage.getResetEncryptionSessionLink().exists()).toBe(true);
+    expect(decryptErrorMessagePage.getResetEncryptionSessionLink()).not.toBeNull();
   });
 
   it('shows loading spinner during session reset', async () => {
@@ -80,21 +80,21 @@ describe('DecryptErrorMessage', () => {
       },
     });
 
-    expect(decryptErrorMessagePage.getDecryptErrorMessage().exists()).toBe(true);
-    expect(decryptErrorMessagePage.getResetEncryptionSessionLoadingSpinner().exists()).toBe(false);
-    expect(decryptErrorMessagePage.getResetEncryptionSessionLink().exists()).toBe(true);
+    expect(decryptErrorMessagePage.getDecryptErrorMessage()).not.toBeNull();
+    expect(decryptErrorMessagePage.getResetEncryptionSessionLoadingSpinner()).toBeNull();
+    expect(decryptErrorMessagePage.getResetEncryptionSessionLink()).not.toBeNull();
 
     decryptErrorMessagePage.clickResetEncryptionSessionLink();
 
-    expect(decryptErrorMessagePage.getResetEncryptionSessionLink().exists()).toBe(false);
-    expect(decryptErrorMessagePage.getResetEncryptionSessionLoadingSpinner().exists()).toBe(true);
+    expect(decryptErrorMessagePage.getResetEncryptionSessionLink()).toBeNull();
+    expect(decryptErrorMessagePage.getResetEncryptionSessionLoadingSpinner()).not.toBeNull();
 
     act(() => {
       isResetting(false);
     });
     decryptErrorMessagePage.update();
 
-    expect(decryptErrorMessagePage.getResetEncryptionSessionLink().exists()).toBe(true);
-    expect(decryptErrorMessagePage.getResetEncryptionSessionLoadingSpinner().exists()).toBe(false);
+    expect(decryptErrorMessagePage.getResetEncryptionSessionLink()).not.toBeNull();
+    expect(decryptErrorMessagePage.getResetEncryptionSessionLoadingSpinner()).toBeNull();
   });
 });

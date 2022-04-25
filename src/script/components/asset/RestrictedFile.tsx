@@ -51,7 +51,4 @@ const RestrictedFile: React.FC<RestrictedFileProps> = ({asset}) => {
 
 export default RestrictedFile;
 
-registerReactComponent<RestrictedFileProps>('file-restricted', {
-  component: RestrictedFile,
-  template: '<span data-bind="react: {asset: ko.unwrap(asset)}"></span>',
-});
+registerReactComponent('file-restricted', RestrictedFile);

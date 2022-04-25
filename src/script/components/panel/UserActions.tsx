@@ -254,8 +254,4 @@ const UserActions: React.FC<UserActionsProps> = ({
 
 export default UserActions;
 
-registerReactComponent('user-actions', {
-  component: UserActions,
-  template:
-    '<div data-bind="react: {user: ko.unwrap(user), isSelfActivated: ko.unwrap(isSelfActivated), onAction, conversationRoleRepository, conversation: ko.unwrap(conversation), actionsViewModel, selfUser: ko.unwrap(selfUser)}"></div>',
-});
+registerReactComponent('user-actions', UserActions);

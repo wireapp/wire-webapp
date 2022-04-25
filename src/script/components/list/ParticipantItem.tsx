@@ -266,7 +266,7 @@ const ParticipantItem = <UserType extends User | ServiceEntity>(
                 data-uie-name="status-selected"
               />
             )}
-            {showArrow && <Icon.Disclose className="disclose-icon" />}
+            {showArrow && <Icon.ChevronRight className="disclose-icon" />}
           </>
         )}
       </div>
@@ -276,8 +276,4 @@ const ParticipantItem = <UserType extends User | ServiceEntity>(
 
 export default ParticipantItem;
 
-registerReactComponent('participant-item', {
-  bindings:
-    'badge, callParticipant, showArrow, highlighted, noInteraction, noUnderline, canSelect, customInfo: ko.unwrap(customInfo), external: ko.unwrap(external), hideInfo, isSelected: ko.unwrap(isSelected), isSelfVerified: ko.unwrap(isSelfVerified), mode, participant, selfInTeam, onClick, onKeyDown',
-  component: ParticipantItem,
-});
+registerReactComponent('participant-item', ParticipantItem);

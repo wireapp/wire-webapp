@@ -28,9 +28,8 @@ class AssetLoaderPage extends TestPage<AssetLoaderProps> {
 
   getStatus = () => this.get('div[data-uie-name="status-loading-media"]');
   clickStatus = () => this.click(this.getStatus());
-  getViewBox = () =>
-    this.get('svg[data-uie-name="asset-loader-svg"]').getDOMNode<SVGSVGElement>().getAttribute('viewBox');
-  getCircle = () => this.get('circle[data-uie-name="asset-loader-circle"]').getDOMNode<SVGCircleElement>();
+  getViewBox = () => this.get('svg[data-uie-name="asset-loader-svg"]').getAttribute('viewBox');
+  getCircle = () => this.get('circle[data-uie-name="asset-loader-circle"]');
 }
 
 describe('AssetLoader', () => {
@@ -65,19 +64,27 @@ describe('AssetLoader', () => {
 
   it('sets the correct circle style', async () => {
     const assetLoaderSmallTen = new AssetLoaderPage({large: false, loadProgress: 10, onCancel: () => {}});
-    const strokeDasharraySmallTen = assetLoaderSmallTen.getCircle().style.strokeDasharray;
+    const strokeDasharraySmallTen = window
+      .getComputedStyle(assetLoaderSmallTen.getCircle())
+      .getPropertyValue('stroke-dasharray');
     expect(strokeDasharraySmallTen).toBe('10 100');
 
     const assetLoaderSmallFifty = new AssetLoaderPage({large: false, loadProgress: 50, onCancel: () => {}});
-    const strokeDasharraySmallFifty = assetLoaderSmallFifty.getCircle().style.strokeDasharray;
+    const strokeDasharraySmallFifty = window
+      .getComputedStyle(assetLoaderSmallFifty.getCircle())
+      .getPropertyValue('stroke-dasharray');
     expect(strokeDasharraySmallFifty).toBe('50 100');
 
     const assetLoaderLargeTen = new AssetLoaderPage({large: true, loadProgress: 10, onCancel: () => {}});
-    const strokeDasharrayLargeTen = assetLoaderLargeTen.getCircle().style.strokeDasharray;
+    const strokeDasharrayLargeTen = window
+      .getComputedStyle(assetLoaderLargeTen.getCircle())
+      .getPropertyValue('stroke-dasharray');
     expect(strokeDasharrayLargeTen).toBe('20 200');
 
     const assetLoaderLargeFifty = new AssetLoaderPage({large: true, loadProgress: 50, onCancel: () => {}});
-    const strokeDasharrayLargeFifty = assetLoaderLargeFifty.getCircle().style.strokeDasharray;
+    const strokeDasharrayLargeFifty = window
+      .getComputedStyle(assetLoaderLargeFifty.getCircle())
+      .getPropertyValue('stroke-dasharray');
     expect(strokeDasharrayLargeFifty).toBe('100 200');
   });
 });

@@ -164,18 +164,7 @@ const UserDevices: React.FC<UserDevicesProps> = ({
 
 export default UserDevices;
 
-registerReactComponent('user-devices', {
-  bindings: `
-    clientRepository,
-    cryptographyRepository,
-    current: ko.unwrap(current),
-    goTo,
-    messageRepository,
-    noPadding,
-    user: ko.unwrap(userEntity)
-  `,
-  component: UserDevices,
-});
+registerReactComponent('user-devices', UserDevices);
 
 export const makeUserDevicesHistory = () => {
   const history = ko.observableArray<UserDevicesHistoryEntry>();

@@ -41,8 +41,8 @@ describe('PanelActions', () => {
     const mainActionLabel = panelAction.getMainActionLabel(items[0].identifier);
     const mainAction = panelAction.getMainAction(items[0].identifier);
 
-    expect(mainActionLabel.text()).toBe(items[0].label);
-    expect(mainAction.exists()).toBe(true);
+    expect(mainActionLabel.textContent).toBe(items[0].label);
+    expect(mainAction).not.toBeNull();
 
     panelAction.clickMainAction(items[0].identifier);
 
@@ -61,8 +61,8 @@ describe('PanelActions', () => {
     const mainAction = panelAction.getMainAction(items[0].identifier);
     const secondaryAction = panelAction.getMainAction(items[1].identifier);
 
-    expect(mainActionLabel.text()).toBe(items[0].label);
-    expect(mainAction.exists()).toBe(true);
-    expect(secondaryAction.exists()).toBe(true);
+    expect(mainActionLabel.textContent).toBe(items[0].label);
+    expect(mainAction).not.toBeNull();
+    expect(secondaryAction).not.toBeNull();
   });
 });
