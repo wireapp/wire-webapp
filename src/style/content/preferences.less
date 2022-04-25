@@ -61,11 +61,15 @@ body.theme-dark {
 }
 
 .preferences-detail {
-  margin: 0;
-  margin-top: 10px;
   color: var(--gray-90);
   font-size: @font-size-small;
   line-height: 14px;
+}
+
+body.theme-dark {
+  .preferences-detail {
+    color: @gray-20;
+  }
 }
 
 .preferences-detail-bold {
@@ -92,7 +96,13 @@ body.theme-dark {
 }
 
 .preferences-label {
-  color: var(--background);
+  color: var(--gray-80);
+}
+
+body.theme-dark {
+  .preferences-label {
+    color: var(--white);
+  }
 }
 
 .preferences-info {
@@ -113,6 +123,17 @@ body.theme-dark {
   &:hover {
     .accent-text;
     text-decoration: underline;
+  }
+}
+
+body.theme-dark {
+  .preferences-link {
+    color: @white;
+
+    &:hover {
+      .accent-text;
+      text-decoration: underline;
+    }
   }
 }
 

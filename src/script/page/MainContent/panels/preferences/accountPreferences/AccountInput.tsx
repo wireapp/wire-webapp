@@ -127,7 +127,7 @@ const AccountInput: React.FC<AccountInputProps> = ({
       {!isEditing && (
         <>
           <label
-            className="label"
+            className="label preferences-label"
             css={{
               color: 'var(--foreground)',
               lineHeight: '14px',

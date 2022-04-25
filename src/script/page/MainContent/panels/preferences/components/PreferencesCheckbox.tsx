@@ -42,7 +42,7 @@ const PreferencesCheckbox: React.FC<PreferencesCheckboxProps> = ({checked, disab
           onCheckedChanged={() => onChange(!checked)}
         />
       </div>
-      {details && <div css={{color: 'var(--gray-90)', fontSize: 12, lineHeight: '14px'}}>{details}</div>}
+      {details && <div className="preferences-detail">{details}</div>}
     </>
   );
 };
