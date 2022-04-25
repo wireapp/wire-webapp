@@ -44,7 +44,7 @@ const PreferenceItem: React.FC<{
     <li className="left-list-item">
       <button
         type="button"
-        className={`left-list-item-button ${isSelected && 'accent-text accent-fill'}`}
+        className={`left-list-item-button ${isSelected && 'left-list-item-button--active'}`}
         onClick={onSelect}
         data-uie-name={uieName}
       >
