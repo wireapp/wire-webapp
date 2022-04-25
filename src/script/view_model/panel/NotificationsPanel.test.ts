@@ -35,7 +35,7 @@ class NotificationsPanelPage extends TestPage<NotificationsPanelProps> {
   }
 
   getCheckedInput = () => this.get('input[checked=true]');
-  getInputWithValue = (value: number) => this.get(`input[value=${value}]`);
+  getInputWithValue = (value: number) => this.get(`input[value="${value}"]`);
   clickInputWithValue = (value: number) => this.click(this.getInputWithValue(value));
 }
 
@@ -57,7 +57,7 @@ describe('NotificationsPanel', () => {
       onGoBack,
       repositories: {} as ViewModelRepositories,
     });
-    expect(notificationsPanel.getCheckedInput().getAttribute('value')).toEqual(NOTIFICATION_STATE.MENTIONS_AND_REPLIES);
+    expect(notificationsPanel.getCheckedInput().value).toEqual(NOTIFICATION_STATE.MENTIONS_AND_REPLIES);
   });
 
   it('sets the correct new value on the ative conversation', () => {
