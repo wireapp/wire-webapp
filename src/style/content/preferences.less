@@ -26,19 +26,21 @@
 .preferences-titlebar {
   .label-bold-xs;
   .heading-h3;
+  .flex-center;
 
   position: relative;
-  display: flex;
   width: 100%;
-  height: @content-title-bar-height;
-  flex: 0 0 auto;
-  align-items: center;
-  justify-content: center;
+  min-height: @content-title-bar-height;
   padding: 0;
-  border-bottom: 1px solid var(--foreground-fade-8);
   margin: 0;
-  background-color: var(--app-bg);
-  color: var(--background);
+  background-color: var(--sidebar-bg);
+  color: @black;
+}
+
+body.theme-dark {
+  .preferences-titlebar {
+    color: @white;
+  }
 }
 
 .preferences-content {
