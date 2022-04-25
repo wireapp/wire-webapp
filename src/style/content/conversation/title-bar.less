@@ -23,6 +23,8 @@
   position: relative;
   width: 100%;
   height: @content-title-bar-height;
+  padding: 0 8px;
+  margin: 0;
   background-color: var(--sidebar-bg);
 }
 
@@ -70,26 +72,30 @@
 
 .conversation-title-bar-icons {
   justify-content: flex-end;
+
+  .buttons-group {
+    margin-right: 8px;
+
+    button,
+    [role='button'] {
+      border-radius: 0;
+
+      &:first-of-type {
+        border-radius: 12px 0 0 12px;
+      }
+
+      &:last-of-type {
+        border-radius: 0 12px 12px 0;
+      }
+    }
+  }
 }
 
 .conversation-title-bar-icon {
-  .button-reset-default;
-  display: flex;
-  height: 16px;
-  flex: 0 0 auto;
-  align-items: center;
-  margin-right: 12px;
-  margin-left: 12px;
-  cursor: pointer;
+  .button-icon-primary;
 
-  svg path {
-    fill: var(--background);
-  }
-
-  &--active {
-    svg path {
-      fill: @w-blue;
-    }
+  * > {
+    display: flex;
   }
 }
 

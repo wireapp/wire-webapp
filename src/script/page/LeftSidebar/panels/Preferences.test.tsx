@@ -17,7 +17,6 @@
  *
  */
 
-import React from 'react';
 import ko from 'knockout';
 import {render} from '@testing-library/react';
 import Preferences from './Preferences';

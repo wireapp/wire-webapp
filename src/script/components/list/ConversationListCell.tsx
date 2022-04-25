@@ -131,6 +131,7 @@ const ConversationListCell: React.FC<ConversationListCellProps> = ({
         data-uie-name={dataUieName}
         data-uie-uid={conversation.id}
         data-uie-value={displayName}
+        data-uie-status={isActive ? 'active' : 'inactive'}
         className={cx('conversation-list-cell', {'conversation-list-cell--active': isActive})}
       >
         <div
@@ -184,7 +185,6 @@ const ConversationListCell: React.FC<ConversationListCellProps> = ({
               'conversation-list-cell-context-menu--active': isActive,
             })}
             data-uie-name="go-options"
-            data-uie-status={isActive ? 'active' : 'inactive'}
             aria-label={t('accessibility.conversationOptionsMenu')}
             type="button"
             onClick={event => {

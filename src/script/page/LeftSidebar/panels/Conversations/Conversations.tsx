@@ -231,6 +231,7 @@ const Conversations: React.FC<ConversationsProps> = ({
               title={t('tooltipConversationsArchived', archivedConversations.length)}
             >
               <Icon.Archive />
+              {t('conversationFooterArchive')}
             </button>
           </li>
         )}

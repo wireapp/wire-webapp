@@ -1,7 +1,28 @@
-import React, {MouseEvent, useRef, useEffect, useState} from 'react';
+/*
+ * Wire
+ * Copyright (C) 2022 Wire Swiss GmbH
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ *
+ */
+
+import {CSSObject} from '@emotion/react';
+import {MouseEvent, useRef, useEffect, useState} from 'react';
 import {usePausableInterval} from '../../hooks/usePausableInterval';
 
 interface CanvasProps {
+  css?: CSSObject;
   'data-uie-name'?: string;
   onProgress: (entropyData: [number, number][], percent: number, pause: boolean) => void;
   onSetEntropy: (entropyData: [number, number][]) => void;
@@ -10,7 +31,7 @@ interface CanvasProps {
 }
 
 const EntropyCanvas = (props: CanvasProps) => {
-  const {sizeX, sizeY, onSetEntropy, onProgress, ...rest} = props;
+  const {sizeX, sizeY, onSetEntropy, onProgress, css, ...rest} = props;
   const canvasRef = useRef(null);
   const [percent, setPercent] = useState(0);
   const [entropy, setEntropy] = useState<[number, number][]>([]);
@@ -85,6 +106,7 @@ const EntropyCanvas = (props: CanvasProps) => {
       height={sizeY}
       width={sizeX}
       css={{
+        ...css,
         alignSelf: 'center',
         backgroundColor: 'white',
         borderRadius: '5px',

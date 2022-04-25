@@ -17,15 +17,13 @@
  *
  */
 
-/** @jsx jsx */
-import {jsx} from '@emotion/core';
-import {LinkProps, linkStyle} from '@wireapp/react-ui-kit';
+import {LinkProps, linkStyle, Theme} from '@wireapp/react-ui-kit';
 import * as RouterDOM from 'react-router-dom';
 
 type RouterLinkProps = LinkProps & RouterDOM.LinkProps;
 
 const RRLink = RouterDOM.Link;
 
-const RouterLink = (props: RouterLinkProps) => <RRLink css={theme => linkStyle(theme, props)} {...props} />;
+const RouterLink = (props: RouterLinkProps) => <RRLink css={(theme: Theme) => linkStyle(theme, props)} {...props} />;
 
 export default RouterLink;

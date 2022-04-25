@@ -16,6 +16,7 @@
  * along with this program. If not, see http://www.gnu.org/licenses/.
  *
  */
+
 import {container, singleton} from 'tsyringe';
 import sodium from 'libsodium-wrappers-sumo';
 import {AppLockState} from './AppLockState';

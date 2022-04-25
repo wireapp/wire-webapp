@@ -18,7 +18,7 @@
  */
 
 import React from 'react';
-import {keyframes} from '@emotion/core';
+import {keyframes} from '@emotion/react';
 import {registerReactComponent} from 'Util/ComponentUtil';
 import SVGProvider from '../../auth/util/SVGProvider';
 import {UserState} from '../../user/UserState';

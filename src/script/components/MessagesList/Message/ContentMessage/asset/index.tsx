@@ -17,7 +17,6 @@
  *
  */
 
-import React from 'react';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 
 import {QualifiedId} from '@wireapp/api-client/src/user';

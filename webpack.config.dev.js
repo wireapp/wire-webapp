@@ -28,13 +28,9 @@ module.exports = {
   entry: {
     ...commonConfig.entry,
     app: ['webpack-hot-middleware/client?reload=true', path.resolve(__dirname, srcScript, 'main/app.ts')],
-    auth: [
-      'webpack-hot-middleware/client',
-      'react-hot-loader/patch',
-      path.resolve(__dirname, srcScript, 'auth/main.tsx'),
-    ],
+    auth: ['webpack-hot-middleware/client', path.resolve(__dirname, srcScript, 'auth/main.tsx')],
   },
   mode: 'development',
   plugins: [...commonConfig.plugins, new webpack.HotModuleReplacementPlugin()],
-  resolve: {...commonConfig.resolve, alias: {...commonConfig.resolve.alias, 'react-dom': '@hot-loader/react-dom'}},
+  resolve: {...commonConfig.resolve, alias: {...commonConfig.resolve.alias}},
 };

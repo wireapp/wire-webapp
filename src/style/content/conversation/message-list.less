@@ -95,7 +95,7 @@
 
   .message-mention {
     color: var(--accent-color);
-    font-weight: @font-weight-bold;
+    .text-medium;
 
     .mention-at-sign {
       font-size: 14px;
@@ -481,7 +481,8 @@
   transition-property: opacity;
   transition-timing-function: @ease-out-quart;
 
-  .message:hover & {
+  .message:hover &,
+  .message:focus-visible & {
     opacity: 1;
     transition-delay: @animation-timing-faster + 0.05;
   }
@@ -510,15 +511,18 @@
 
   // CONTEXT MENU
   .context-menu {
-    .button-reset-default;
-    .square(16px);
     .action-pill-style;
-
+    .button-icon-secondary;
+    .square(16px);
     position: absolute;
     left: 8px;
+
+    min-width: 0;
+    min-height: 0;
     justify-content: center;
 
-    &:focus {
+    &:focus,
+    &:focus-visible {
       opacity: 1 !important;
     }
   }

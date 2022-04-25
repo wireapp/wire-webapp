@@ -17,18 +17,8 @@
  *
  */
 
-import {act} from 'react-dom/test-utils';
-
-import Duration, {DurationProps} from './Duration';
-import TestPage from 'Util/test/TestPage';
-
-class DurationPage extends TestPage<DurationProps> {
-  constructor(props?: DurationProps) {
-    super(Duration, props);
-  }
-
-  getRenderedTime = () => this.getText();
-}
+import {act, render} from '@testing-library/react';
+import Duration from './Duration';
 
 describe('Duration', () => {
   beforeEach(() => {
@@ -39,19 +29,17 @@ describe('Duration', () => {
 
   it('shows correct timer', async () => {
     const now = Date.now();
-    const Duration = new DurationPage({
-      startedAt: now,
-    });
+    const {getByText, queryByText} = render(<Duration startedAt={now} />);
 
     jest.setSystemTime(now);
 
-    expect(Duration.getText()).toEqual('00:00');
+    expect(getByText('00:00')).not.toBe(null);
 
     act(() => {
       jest.advanceTimersByTime(1001);
-      Duration.update();
     });
 
-    expect(Duration.getText()).toEqual('00:01');
+    expect(getByText('00:01')).not.toBe(null);
+    expect(queryByText('00:00')).toBe(null);
   });
 });

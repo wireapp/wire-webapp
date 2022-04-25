@@ -14,7 +14,8 @@
     "z": true,
     "RTCAudioSource": true
   },
-  "ignorePatterns": [".git/", "docs/", "node_modules/", "resource/", "server/bin/", "server/dist/", "server/node_modules/", "src/ext/", "src/script/localization/**/webapp*.js", "src/worker/"],
+  "plugins": ["sort-keys-fix"],
+  "ignorePatterns": [".git/", "docs/", "bin/", "node_modules/", "resource/", "server/bin/", "server/dist/", "server/node_modules/", "src/ext/", "src/script/localization/**/webapp*.js", "src/worker/"],
   "overrides": [
     {
       "files": ["*.ts", "*.tsx"],
@@ -51,7 +52,8 @@
     "jsx-a11y/label-has-associated-control": "warn",
     "jsx-a11y/no-noninteractive-element-interactions": "warn",
     "jsx-a11y/media-has-caption": "warn",
-    "jsx-a11y/tabindex-no-positive": "warn"
+    "jsx-a11y/tabindex-no-positive": "warn",
+    "react/react-in-jsx-scope": "off"
   },
   "settings": {
     "react": {

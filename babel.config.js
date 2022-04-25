@@ -1,3 +1,22 @@
+/*
+ * Wire
+ * Copyright (C) 2022 Wire Swiss GmbH
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ *
+ */
+
 const presetEnvConfig = {
   corejs: 'core-js@2',
   debug: false,
@@ -15,12 +34,12 @@ module.exports = {
         '@babel/plugin-proposal-class-properties',
         '@babel/plugin-proposal-nullish-coalescing-operator',
         '@babel/plugin-proposal-optional-chaining',
+        '@emotion',
       ],
       presets: [
-        '@babel/preset-react',
+        ['@babel/preset-react', {importSource: '@emotion/react', runtime: 'automatic'}],
         '@babel/preset-typescript',
         ['@babel/preset-env', {...presetEnvConfig, modules: 'commonjs'}],
-        '@emotion/babel-preset-css-prop',
       ],
     },
   },
@@ -30,11 +49,11 @@ module.exports = {
     '@babel/plugin-proposal-nullish-coalescing-operator',
     '@babel/plugin-proposal-optional-chaining',
     '@babel/plugin-syntax-dynamic-import',
+    '@emotion',
   ],
   presets: [
-    '@babel/preset-react',
+    ['@babel/preset-react', {importSource: '@emotion/react', runtime: 'automatic'}],
     '@babel/preset-typescript',
     ['@babel/preset-env', presetEnvConfig],
-    '@emotion/babel-preset-css-prop',
   ],
 };

@@ -19,7 +19,7 @@
 
 import ko, {Unwrapped} from 'knockout';
 import React, {useEffect, useState} from 'react';
-import ReactDOM from 'react-dom';
+import {createRoot} from 'react-dom/client';
 interface RegisterReactComponent<Props> {
   component: React.ComponentType<Props>;
 }
@@ -57,11 +57,12 @@ export function registerStaticReactComponent<Props>(name: string, component: Rea
           .reduce((acc, [key, value]) => {
             return {...acc, [key]: ko.unwrap(value)};
           }, {} as Props);
-        ReactDOM.render(React.createElement(component, unwrappedParams), element);
+        const root = createRoot(element);
+        root.render(React.createElement(component, unwrappedParams));
 
         return {
           dispose() {
-            ReactDOM.unmountComponentAtNode(element);
+            root.unmount();
           },
         };
       },

@@ -22,8 +22,7 @@ import 'core-js/es7/object';
 import 'core-js/es7/reflect';
 import cookieStore from 'js-cookie';
 import React from 'react';
-import * as ReactDOM from 'react-dom';
-import {AppContainer} from 'react-hot-loader';
+import {createRoot} from 'react-dom/client';
 import {Provider, ConnectedComponent} from 'react-redux';
 
 import {enableLogging} from 'Util/LoggerUtil';
@@ -57,15 +56,13 @@ const store = configureStore({
 });
 
 const Wrapper = (Component: ConnectedComponent<React.FunctionComponent, any>): JSX.Element => (
-  <AppContainer>
-    <Provider store={store}>
-      <Component />
-    </Provider>
-  </AppContainer>
+  <Provider store={store}>
+    <Component />
+  </Provider>
 );
 
 const render = (Component: ConnectedComponent<React.FunctionComponent, any>): void => {
-  ReactDOM.render(Wrapper(Component), document.getElementById('main'));
+  createRoot(document.getElementById('main')).render(Wrapper(Component));
 };
 
 function runApp(): void {

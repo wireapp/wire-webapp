@@ -75,13 +75,14 @@ export const MessageTimerButton: React.FC<MessageTimerButtonProps> = ({
 
   return (
     isSelfDeletingMessagesEnabled && (
-      <span
+      <button
         id="conversation-input-bar-message-timer"
-        className="controls-right-button conversation-input-bar-message-timer"
+        className="controls-right-button buttons-group-button-right conversation-input-bar-message-timer"
         onClick={isTimerDisabled ? undefined : onClick}
         title={t('tooltipConversationEphemeral')}
         data-uie-value={isTimerDisabled ? 'disabled' : 'enabled'}
         data-uie-name="do-set-ephemeral-timer"
+        type="button"
       >
         {hasMessageTimer ? (
           conversation && (
@@ -101,11 +102,11 @@ export const MessageTimerButton: React.FC<MessageTimerButtonProps> = ({
             </div>
           )
         ) : (
-          <span className={cx('button-icon-large', {disabled: isTimerDisabled})}>
+          <span className={cx({disabled: isTimerDisabled})}>
             <Icon.Timer data-uie-name="message-timer-icon" />
           </span>
         )}
-      </span>
+      </button>
     )
   );
 };
