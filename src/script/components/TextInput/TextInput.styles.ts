@@ -39,9 +39,9 @@ export const getInputCSS = (disabled?: boolean, borderColor?: string): CSSObject
   },
   '&:focus, &:focus-visible, &:active': {
     '& + label': {
-      color: !disabled && 'var(--blue-500)',
+      color: !disabled && 'var(--accent-color-500)',
     },
-    borderColor: !disabled && 'var(--blue-500)',
+    borderColor: !disabled && 'var(--accent-color-500)',
   },
   ':-ms-input-placeholder': {
     // Internet Explorer 10-11
