@@ -21,7 +21,7 @@ import React from 'react';
 import {AccentColor} from '@wireapp/commons';
 import {CSS_SQUARE} from 'Util/CSSMixin';
 import {t} from 'Util/LocalizerUtil';
-import {CSSObject} from '@emotion/core';
+import {CSSObject} from '@emotion/serialize';
 import {User} from '../entity/User';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 

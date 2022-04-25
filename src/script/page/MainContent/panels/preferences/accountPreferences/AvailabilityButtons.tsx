@@ -26,7 +26,7 @@ import cx from 'classnames';
 import {t} from 'Util/LocalizerUtil';
 import Icon from 'Components/Icon';
 import {CSS_SQUARE} from 'Util/CSSMixin';
-import {CSSObject} from '@emotion/core';
+import {CSSObject} from '@emotion/serialize';
 import {ContextMenuEntry} from '../../../../../ui/ContextMenu';
 
 interface AvailabilityInputProps {
