@@ -18,7 +18,8 @@
  */
 
 import React from 'react';
-import {getInputCSS, getLabelCSS, getSvgCSS} from './Checkbox.styles';
+import {getInputCSS, getInputCSSDark, getLabelCSS, getSvgCSS} from './Checkbox.styles';
+import {Global} from '@emotion/react';
 
 interface CheckboxProps {
   disabled?: boolean;
@@ -31,7 +32,9 @@ interface CheckboxProps {
 const Checkbox: React.FC<CheckboxProps> = ({disabled, label, isChecked, name, onCheckedChanged}) => {
   return (
     <label className="label-base" css={getLabelCSS(disabled)} htmlFor={name}>
+      <Global styles={getInputCSSDark(isChecked, disabled)} />
       <input
+        className={isChecked && 'input-dark'}
         disabled={disabled}
         type="checkbox"
         id={name}
