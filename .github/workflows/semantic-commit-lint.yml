@@ -5,7 +5,7 @@ on:
     types: [opened, edited, synchronize]
 
 permissions:
-  contents: read
+  statuses: write
 
 jobs:
   semantic-commit-pr-title-lint:
