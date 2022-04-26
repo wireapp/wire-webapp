@@ -61,7 +61,7 @@ const LegalHoldDot: React.FC<LegalHoldDotProps> = ({
         className={cx(
           'legal-hold-dot',
           {
-            'legal-hold-dot--active': isPending,
+            'legal-hold-dot--active': !isPending,
             'legal-hold-dot--interactive': isInteractive,
             'legal-hold-dot--large': large,
           },
