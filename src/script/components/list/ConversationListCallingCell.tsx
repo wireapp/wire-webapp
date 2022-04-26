@@ -402,7 +402,7 @@ const ConversationListCallingCell: React.FC<CallingCellProps> = ({
                         aria-pressed={showParticipants}
                       >
                         <span>{t('callParticipants', participants.length)}</span>
-                        <Icon.Chevron className="chevron" />
+                        <Icon.ChevronRight className="chevron" />
                       </button>
                     </li>
                   )}

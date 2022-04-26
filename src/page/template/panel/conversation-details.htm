@@ -5,17 +5,17 @@
 >
   <!-- ko if: isVisible() -->
     <div class="panel__header panel__header--reverse">
-      <close-icon
-        class="right-panel-close icon-button"
-        data-bind="clickOrDrag: onClose"
-        data-uie-name="do-close"
-      ></close-icon>
+      <button class="right-panel-close icon-button" type="button" data-bind="clickOrDrag: onClose, title: t('accessibility.rightPanel.close'), 'aria-label': t('accessibility.rightPanel.close')"
+      data-uie-name="do-close">
+        <close-icon aria-hidden="true"></close-icon>
+      </button>
+      
       <!-- ko if: showActionMute() -->
-        <mute-icon
-          class="right-panel-mute icon-button"
-          data-bind="clickOrDrag: clickToToggleMute, css: {'right-panel-mute--active': activeConversation() && activeConversation().showNotificationsNothing()}"
-          data-uie-name="do-mute"
-        ></mute-icon>
+      <button class="right-panel-close icon-button" type="button" 
+        data-bind="clickOrDrag: clickToToggleMute, css: {'right-panel-mute--active': activeConversation() && activeConversation().showNotificationsNothing()}"
+        data-uie-name="do-mute">
+          <mute-icon aria-hidden="true"></mute-icon>
+      </button>
       <!-- /ko -->
     </div>
     <div class="panel__content" data-bind="fadingscrollbar">

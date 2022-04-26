@@ -58,18 +58,14 @@
       justify-content: center;
       background-color: var(--background-fade-40);
       border-radius: 8px;
+      color: var(--white);
       cursor: pointer;
       opacity: 0;
       transition: opacity @animation-timing-fast @ease-out-quart;
 
-      fullscreen-icon {
-        svg {
-          width: 24px;
-          height: 24px;
-
-          path {
-            fill: #fff;
-          }
+      svg {
+        path {
+          fill: currentColor;
         }
       }
 
