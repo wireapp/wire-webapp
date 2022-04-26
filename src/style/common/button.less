@@ -268,10 +268,10 @@
     align-items: center;
     justify-content: center;
     padding: 8px 12px;
-    border: 1px solid @gray-40;
-    background: @white;
+    border: 1px solid var(--gray-40);
+    background: var(--white);
 
-    color: @black;
+    color: var(--black);
   }
 
   &-button-left {
@@ -280,6 +280,29 @@
 
   &-button-right {
     border-radius: 0 12px 12px 0 !important;
+  }
+
+  &-button-active {
+    border: 1px solid var(--accent-color-300);
+    background: var(--accent-color-50);
+    color: var(--accent-color-500);
+  }
+}
+
+body.theme-dark {
+  .buttons-group {
+    &-button {
+      border: 1px solid var(--gray-100);
+      background: var(--gray-90);
+
+      color: var(--white);
+    }
+
+    &-button-active {
+      border: 1px solid var(--accent-color-600);
+      background: var(--accent-color-700);
+      color: var(--white);
+    }
   }
 }
 
