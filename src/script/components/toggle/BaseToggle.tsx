@@ -73,10 +73,11 @@ const BaseToggle: React.FC<BaseToggleProps> = ({
             aria-pressed={isChecked}
             type="button"
             onClick={() => setIsChecked(inputRef.current.checked)}
-            aria-labelledby={labelUuid}
             data-uie-name={`do-allow-${toggleName?.toLowerCase()}`}
             data-uie-value={isChecked ? 'checked' : 'unchecked'}
-          ></button>
+          >
+            <span className="visually-hidden">{toggleName}</span>
+          </button>
         </div>
       </div>
       <p className="info-toggle__details" data-uie-name="status-guest-toggle">

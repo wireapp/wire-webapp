@@ -144,8 +144,11 @@ export class InputBarViewModel {
     this.allowedFileTypes = Config.getConfig().FEATURE.ALLOWED_FILE_UPLOAD_EXTENSIONS.join(',');
     this.inputFileAttr = ko.observable(
       this.allowedFileTypes === '*'
-        ? {'aria-label': t('tooltipConversationFile')}
-        : {accept: this.allowedFileTypes, 'aria-label': t('tooltipConversationFile')},
+        ? {title: t('tooltipConversationFile')}
+        : {
+            accept: this.allowedFileTypes,
+            title: t('tooltipConversationFile'),
+          },
     );
     this.isConnectionRequest = ko.pureComputed(
       () =>

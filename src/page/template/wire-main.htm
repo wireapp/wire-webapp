@@ -1,4 +1,4 @@
-<div id="wire-main"
+<main id="wire-main"
      class="off"
      data-bind="css: mainClasses(), ignore_drop_file: true"
      data-uie-name="status-webapp"
@@ -6,7 +6,7 @@
   <!-- ko stopBinding: true -->
     <div id="app" class="app">
       <div id="left-column" class="left-column" data-bind="css: {'left-column--light-theme': !isActivatedAccount()}">
-        <h1 class="visually-hidden" data-bind="text: t('accessibility.headings.sidebar')"></h1>
+        <header><h1 class="visually-hidden" data-bind="text: t('accessibility.headings.sidebar')"></h1></header>
         <!-- ko if: webappLoaded -->
           <left-sidebar params="listViewModel: $root, selfUser: selfUser"></left-sidebar>
         <!-- /ko -->
@@ -56,4 +56,4 @@
     <div id="applock"></div>
   <!-- /ko -->
   <div id="calling-overlay-container"></div>
-</div>
+</main>

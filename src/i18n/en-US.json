@@ -1105,6 +1105,7 @@
   "tooltipConversationDetailsRename": "Change conversation name",
   "tooltipConversationEphemeral": "Self-deleting message",
   "tooltipConversationFile": "Add file",
+  "tooltipConversationAddImage": "Add image",
   "tooltipConversationSendMessage": "Send message",
   "tooltipConversationInfo": "Conversation Info",
   "tooltipConversationInputPlaceholder": "Type a message",
