@@ -413,7 +413,7 @@
   "conversationsPopoverMoveTo": "会話を移動する",
   "conversationsPopoverNewFolder": "新規フォルダを作成",
   "conversationsPopoverNoCustomFolders": "カスタムフォルダなし",
-  "conversationsPopoverNotificationSettings": "通知…",
+  "conversationsPopoverNotificationSettings": "通知",
   "conversationsPopoverNotify": "会話をミュート解除",
   "conversationsPopoverRemoveFrom": "\"{{name}}\" から削除",
   "conversationsPopoverSilence": "ミュート",

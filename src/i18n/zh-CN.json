@@ -413,7 +413,7 @@
   "conversationsPopoverMoveTo": "移至 ...",
   "conversationsPopoverNewFolder": "建立新资料夹",
   "conversationsPopoverNoCustomFolders": "无自定义文件夹",
-  "conversationsPopoverNotificationSettings": "通知…",
+  "conversationsPopoverNotificationSettings": "通知",
   "conversationsPopoverNotify": "取消静音对话",
   "conversationsPopoverRemoveFrom": "从 \"{{name}} “移除\n",
   "conversationsPopoverSilence": "静音对话",
