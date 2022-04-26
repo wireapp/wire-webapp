@@ -27,11 +27,18 @@ interface CheckboxProps {
   label: string;
   name: string;
   onCheckedChanged: () => void;
+  uieName: string;
 }
 
-const Checkbox: React.FC<CheckboxProps> = ({disabled, label, isChecked, name, onCheckedChanged}) => {
+const Checkbox: React.FC<CheckboxProps> = ({disabled, label, isChecked, name, onCheckedChanged, uieName}) => {
   return (
-    <label className="label-base" css={getLabelCSS(disabled)} htmlFor={name}>
+    <label
+      className="label-base"
+      css={getLabelCSS(disabled)}
+      htmlFor={name}
+      data-uie-name={uieName}
+      data-uie-value={isChecked}
+    >
       <Global styles={getInputCSSDark(isChecked, disabled)} />
       <input
         className={isChecked && 'input-dark'}
