@@ -204,7 +204,6 @@
   "callDegradationTitle": "Call ended",
   "callDurationLabel": "Duration",
   "callEveryOneLeft": "all other participants left.",
-  "callGoToLabel": "Go to {{conversationName}}",
   "callJoin": "Join",
   "callMaximizeLabel": "Maximize Call",
   "callNoCameraAccess": "No camera access",

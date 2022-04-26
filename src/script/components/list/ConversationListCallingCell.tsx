@@ -228,7 +228,7 @@ const ConversationListCallingCell: React.FC<CallingCellProps> = ({
               onKeyDown={createNavigateKeyboard(conversationUrl)}
               tabIndex={0}
               role="button"
-              aria-label={t('callGoToLabel', conversationName)}
+              aria-label={t('accessibility.openConversation', conversationName)}
             >
               {!temporaryUserStyle && (
                 <div className="conversation-list-cell-left">
