@@ -11,11 +11,11 @@
       </button>
       
       <!-- ko if: showActionMute() -->
-        <mute-icon
-          class="right-panel-mute icon-button"
-          data-bind="clickOrDrag: clickToToggleMute, css: {'right-panel-mute--active': activeConversation() && activeConversation().showNotificationsNothing()}"
-          data-uie-name="do-mute"
-        ></mute-icon>
+      <button class="right-panel-close icon-button" type="button" 
+        data-bind="clickOrDrag: clickToToggleMute, css: {'right-panel-mute--active': activeConversation() && activeConversation().showNotificationsNothing()}"
+        data-uie-name="do-mute">
+          <mute-icon aria-hidden="true"></mute-icon>
+      </button>
       <!-- /ko -->
     </div>
     <div class="panel__content" data-bind="fadingscrollbar">
