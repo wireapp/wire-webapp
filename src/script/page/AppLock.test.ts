@@ -104,7 +104,7 @@ describe('AppLock', () => {
         clientRepository,
       });
       const appLockModal = appLockPage.getAppLockModal();
-      expect(appLockModal).toBeNull();
+      expect(window.getComputedStyle(appLockModal).getPropertyValue('display')).toBe('none');
     });
   });
 
