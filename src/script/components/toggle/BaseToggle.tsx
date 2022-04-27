@@ -48,7 +48,7 @@ const BaseToggle: React.FC<BaseToggleProps> = ({
   const labelUuid = React.useMemo(() => createRandomUuid(), []);
   const inputRef = React.useRef<HTMLInputElement>();
   return (
-    <>
+    <div className="base-toggle">
       <div className="info-toggle__row">
         <label htmlFor={uuid} id={labelUuid} className="info-toggle__name">
           {toggleName}
@@ -83,7 +83,7 @@ const BaseToggle: React.FC<BaseToggleProps> = ({
       <p className="info-toggle__details" data-uie-name="status-guest-toggle">
         {extendedInfo ? extendedInfoText : infoText}
       </p>
-    </>
+    </div>
   );
 };
 
