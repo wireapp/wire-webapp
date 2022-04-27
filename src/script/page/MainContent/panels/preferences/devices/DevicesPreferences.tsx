@@ -75,6 +75,7 @@ const Device: React.FC<{
       <div className="preferences-devices-card-action">
         {!device.isLegalHold() && (
           <button
+            aria-label={t('preferencesDevicesRemove')}
             type="button"
             className={`preferences-devices-card-action__delete ${isSSO && 'svg-red'}`}
             onClick={event => {

@@ -49,6 +49,25 @@ export const getInputCSS = (isChecked: boolean, disabled?: boolean): CSSObject =
   width: 1,
 });
 
+export const getInputCSSDark = (isChecked: boolean, disabled?: boolean): CSSObject => ({
+  'body.theme-dark .input-dark': {
+    '& + svg': {
+      ...(isChecked && {
+        background: 'var(--accent-color-600)',
+        borderColor: 'var(--accent-color-600)',
+      }),
+    },
+    '&:active + svg': {
+      borderColor: !disabled && 'var(--accent-color-600)',
+    },
+    '&:focus + svg, &:focus-visible + svg': {
+      backgroundColor: isChecked && 'var(--accent-color-700)',
+      borderColor: 'var(--accent-color-700)',
+      outline: '1px solid var(--accent-color-700)',
+    },
+  },
+});
+
 export const getSvgCSS = (isChecked: boolean, disabled?: boolean): CSSObject => ({
   background: 'var(--checkbox-background)',
   border: '1.5px var(--checkbox-border) solid',

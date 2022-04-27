@@ -18,12 +18,12 @@
  */
 
 import React from 'react';
-import {AccentColor} from '@wireapp/commons';
 import {CSS_SQUARE} from 'Util/CSSMixin';
 import {t} from 'Util/LocalizerUtil';
 import {CSSObject} from '@emotion/serialize';
 import {User} from '../entity/User';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
+import {ACCENT_ID} from '../Config';
 
 export interface AccentColorPickerProps {
   doSetAccentColor: (id: number) => void;
@@ -54,17 +54,17 @@ const AccentColorPicker: React.FunctionComponent<AccentColorPickerProps> = ({use
             justifyContent: 'space-between',
           }}
         >
-          {AccentColor.ACCENT_COLORS.map(accentColor => {
-            const nameSplit = accentColor.name.replace(/([A-Z])/g, ',$1').split(',');
-            const name = nameSplit[nameSplit.length - 1];
-            const color = User.ACCENT_COLOR[accentColor.id];
-            const isChecked = accentId === accentColor.id;
+          {Object.keys(ACCENT_ID).map(key => {
+            const id = ACCENT_ID[key];
+            const name = key.toLowerCase();
+            const color = User.ACCENT_COLOR[id];
+            const isChecked = accentId === id;
 
             return (
               <div
                 data-uie-name="element-accent-color-label"
-                data-uie-value={accentColor.id}
-                key={accentColor.color}
+                data-uie-value={id}
+                key={id}
                 css={{
                   alignItems: 'center',
                   display: 'flex',
@@ -73,13 +73,13 @@ const AccentColorPicker: React.FunctionComponent<AccentColorPickerProps> = ({use
                 }}
               >
                 <input
-                  id={accentColor.color}
+                  id={String(id)}
                   type="radio"
                   name="accent"
                   checked={isChecked}
-                  onChange={() => doSetAccentColor(accentColor.id)}
+                  onChange={() => doSetAccentColor(id)}
                   data-uie-name="do-set-accent-color"
-                  data-uie-value={accentColor.id}
+                  data-uie-value={id}
                   css={{
                     '& + span': {
                       color: color,
@@ -119,11 +119,11 @@ const AccentColorPicker: React.FunctionComponent<AccentColorPickerProps> = ({use
                     opacity: 0,
                   }}
                 />
-                <span onClick={() => doSetAccentColor(accentColor.id)} />
+                <span onClick={() => doSetAccentColor(id)} />
                 <label
-                  htmlFor={accentColor.color}
-                  onClick={() => doSetAccentColor(accentColor.id)}
-                  style={{cursor: 'pointer', fontSize: '11px', marginTop: '14px'}}
+                  htmlFor={String(id)}
+                  onClick={() => doSetAccentColor(id)}
+                  style={{cursor: 'pointer', fontSize: '11px', marginTop: '14px', textTransform: 'capitalize'}}
                 >
                   {name}
                 </label>

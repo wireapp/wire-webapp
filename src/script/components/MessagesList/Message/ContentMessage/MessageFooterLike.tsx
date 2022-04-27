@@ -50,11 +50,7 @@ const MessageFooterLike: React.FC<MessageFooterLikeProps> = ({message, is1to1Con
         })}
         onClick={is1to1Conversation ? null : () => onClickLikes(message)}
       >
-        <span
-          className="font-size-xs text-foreground"
-          data-uie-name="message-liked-names"
-          data-uie-value={reactionsUserIds}
-        >
+        <span className="message-footer-text" data-uie-name="message-liked-names" data-uie-value={reactionsUserIds}>
           {likeCaption}
         </span>
       </div>

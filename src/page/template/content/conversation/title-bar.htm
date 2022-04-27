@@ -56,7 +56,7 @@
       <!-- /ko -->
     
       <button type="button" class="conversation-title-bar-icon"
-              data-bind="clickOrDrag: clickOnDetails, css: {'conversation-title-bar-icon--active': panelIsVisible()}, attr: {title: t('tooltipConversationInfo'), 'aria-label': t('tooltipConversationInfo')}"
+              data-bind="clickOrDrag: clickOnDetails, css: {'active': panelIsVisible()}, attr: {title: t('tooltipConversationInfo'), 'aria-label': t('tooltipConversationInfo')}"
               data-uie-name="do-open-info">
         <info-icon aria-hidden="true"></info-icon>
       </button>

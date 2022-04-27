@@ -48,7 +48,7 @@ const BaseToggle: React.FC<BaseToggleProps> = ({
   const labelUuid = React.useMemo(() => createRandomUuid(), []);
   const inputRef = React.useRef<HTMLInputElement>();
   return (
-    <>
+    <div className="base-toggle">
       <div className="info-toggle__row">
         <label htmlFor={uuid} id={labelUuid} className="info-toggle__name">
           {toggleName}
@@ -73,16 +73,17 @@ const BaseToggle: React.FC<BaseToggleProps> = ({
             aria-pressed={isChecked}
             type="button"
             onClick={() => setIsChecked(inputRef.current.checked)}
-            aria-labelledby={labelUuid}
             data-uie-name={`do-allow-${toggleName?.toLowerCase()}`}
             data-uie-value={isChecked ? 'checked' : 'unchecked'}
-          ></button>
+          >
+            <span className="visually-hidden">{toggleName}</span>
+          </button>
         </div>
       </div>
       <p className="info-toggle__details" data-uie-name="status-guest-toggle">
         {extendedInfo ? extendedInfoText : infoText}
       </p>
-    </>
+    </div>
   );
 };
 

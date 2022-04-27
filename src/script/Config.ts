@@ -22,14 +22,13 @@ import {createRandomUuid} from 'Util/util';
 import {Runtime} from '@wireapp/commons';
 const env = window.wire.env;
 
-export const ACCENT_ID = {
+export const ACCENT_ID: Record<string, number> = {
   AMBER: 5,
   BLUE: 1,
   GREEN: 2,
   PETROL: 6,
   PURPLE: 7,
   RED: 4,
-  YELLOW: 3,
 };
 
 export class Configuration {
