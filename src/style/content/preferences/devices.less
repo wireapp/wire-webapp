@@ -18,14 +18,14 @@
  */
 
 .preferences-devices-model {
-  height: @line-height-xl;
-  font-weight: @font-weight-bold;
-  line-height: @line-height-xl;
+  font-size: @font-size-base;
+  font-weight: @font-weight-medium;
+  line-height: @line-height-lg;
 }
 
 .preferences-devices-activated {
   margin: 16px 0;
-  color: var(--foreground);
+  color: var(--gray-90);
   font-size: @font-size-xs;
   line-height: @line-height-sm;
 }
@@ -34,6 +34,7 @@
   display: flex;
   width: 560px;
   height: 72px;
+  align-items: center;
   justify-content: space-between;
   padding-top: 8px;
   cursor: pointer;
@@ -83,7 +84,9 @@
 }
 
 .preferences-devices-id {
-  .label-xs;
+  font-size: @font-size-small;
+  line-height: 14px;
+  text-transform: uppercase;
 
   span:first-child {
     .label-bold;
@@ -110,11 +113,8 @@
 }
 
 .preferences-devices-fingerprint-label {
-  .label-xs;
-
   margin-top: 32px;
   margin-bottom: 8px;
-  color: var(--foreground);
 }
 
 .preferences-devices-session {
@@ -140,4 +140,10 @@
 .preferences-devices-separator {
   width: 560px;
   margin-bottom: 32px;
+}
+
+body.theme-dark {
+  .preferences-devices-activated {
+    color: var(--gray-20);
+  }
 }
