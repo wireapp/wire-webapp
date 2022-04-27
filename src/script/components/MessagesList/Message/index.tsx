@@ -112,7 +112,7 @@ const Message: React.FC<
     <div
       className={`message ${isMarked ? 'message-marked' : ''}`}
       ref={messageElementRef}
-      key={message.id + message.timestamp}
+      key={message.id}
       data-uie-uid={message.id}
       data-uie-value={message.super_type}
       data-uie-expired-status={ephemeral_expires}
