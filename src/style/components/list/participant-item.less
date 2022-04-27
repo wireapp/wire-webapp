@@ -21,6 +21,15 @@
   position: relative;
   display: block;
 
+  &[role='button'] {
+    .button-reset-default();
+    .text-medium;
+
+    &:not(.no-interaction) {
+      .button-states();
+    }
+  }
+
   &:not(.no-underline)::after {
     position: absolute;
     right: 0;

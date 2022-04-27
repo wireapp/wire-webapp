@@ -321,9 +321,13 @@
     }
 
     &__status {
-      font-size: 12px;
+      .subline;
+      color: var(--gray-70);
       justify-self: flex-end;
-      opacity: 0.56;
+
+      body.theme-dark & {
+        color: var(--white);
+      }
     }
 
     &__summary {
