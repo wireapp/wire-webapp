@@ -23,6 +23,7 @@ import type {Conversation} from '../entity/Conversation';
 import type {LegalHoldModalViewModel} from '../view_model/content/LegalHoldModalViewModel';
 import Icon from 'Components/Icon';
 import {registerReactComponent} from 'Util/ComponentUtil';
+import {t} from 'Util/LocalizerUtil';
 
 export interface LegalHoldDotProps {
   className?: string;
@@ -69,6 +70,7 @@ const LegalHoldDot: React.FC<LegalHoldDotProps> = ({
       >
         {isPending && <Icon.Pending className="pending-icon" />}
       </span>
+      <span className="visibility-hidden">{t('legalHoldHeadline')}</span>
     </button>
   );
 };

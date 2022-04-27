@@ -69,7 +69,9 @@ const ReceiptModeToggle: React.FC<ReceiptModeToggleProps> = ({receiptMode, onRec
           aria-pressed={receiptMode !== RECEIPT_MODE.OFF}
           type="button"
           onClick={() => updateValue()}
-        ></button>
+        >
+          <span className="visually-hidden">{t('receiptToggleLabel')}</span>
+        </button>
       </div>
       <p className="panel__info-text panel__info-text--margin" data-uie-name="status-info-toggle-receipt-mode">
         {t('receiptToggleInfo')}

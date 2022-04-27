@@ -107,6 +107,9 @@ const ModalComponent: React.FC<ModalComponentProps> = ({
       onClick={onBgClick}
       css={hasVisibleClass ? ModalOverlayVisibleStyles : ModalOverlayStyles}
       style={{display: displayNone ? 'none' : 'flex'}}
+      tabIndex={0}
+      role="button"
+      onKeyDown={onBgClick}
       {...rest}
     >
       {showLoading ? (
@@ -114,9 +117,12 @@ const ModalComponent: React.FC<ModalComponentProps> = ({
       ) : (
         <div
           onClick={event => event.stopPropagation()}
+          role="button"
+          tabIndex={-1}
+          onKeyDown={event => event.stopPropagation()}
           css={hasVisibleClass ? ModalContentVisibleStyles : ModalContentStyles}
         >
-          {children}
+          {hasVisibleClass ? children : null}
         </div>
       )}
     </div>
