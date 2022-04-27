@@ -19,52 +19,27 @@
 
 .call-ui {
   &__button {
-    .button-reset-default;
-    display: flex;
-    min-width: 40px;
-    height: 24px;
-    align-items: center;
-    justify-content: center;
-    border: none;
-    animation: show-call-ui-button @animation-timing-fast ease-in-out 0s 1;
-    background-color: var(--background-fade-8);
-    border-radius: 12px;
-    color: var(--background);
-    cursor: pointer;
-    font-size: 12px;
-    line-height: 24px;
-    outline: none;
-    text-align: center;
+    .button-icon-primary();
+    min-height: 24px;
 
-    > * {
-      line-height: 0;
-    }
-
-    svg > path {
-      fill: var(--background);
-    }
-
-    &--active {
-      background-color: var(--background);
-      color: var(--app-bg-secondary);
-
-      svg > path {
-        fill: var(--app-bg-secondary);
+    svg {
+      path {
+        fill: currentColor;
       }
     }
 
-    &--disabled,
-    &:disabled {
-      cursor: default;
+    &--active {
+      background-color: var(--main-color) !important;
+      color: var(--white) !important;
 
-      svg {
-        opacity: 0.4;
+      body.theme-dark & {
+        color: var(--black) !important;
       }
     }
 
     &--join,
     &--participants {
-      padding: 0 8px;
+      padding: 0 9px;
     }
 
     &--join {
@@ -73,11 +48,14 @@
     }
 
     &--participants {
-      font-weight: @font-weight-regular;
+      font-size: @font-size-small;
+      font-weight: @font-weight-bold;
+      letter-spacing: 0.25px;
       white-space: nowrap;
 
       .chevron {
         margin-left: 8px;
+        transform: rotate(90deg);
 
         path {
           fill: currentcolor;
@@ -87,7 +65,7 @@
 
     &--active&--participants {
       .chevron {
-        transform: rotate(-180deg);
+        transform: rotate(-90deg);
       }
     }
 
@@ -97,24 +75,48 @@
 
     &--green,
     &--red {
-      color: #fff;
-      svg > path {
-        fill: #fff;
+      color: var(--white);
+
+      body.theme-dark & {
+        color: var(--black);
       }
     }
 
     &--green {
-      background-color: @w-green !important;
+      border-color: var(--green-500) !important;
+      background-color: var(--green-500) !important;
+
+      &:hover {
+        border-color: var(--green-600) !important;
+        background-color: var(--green-600) !important;
+
+        body.theme-dark & {
+          border-color: var(--green-400) !important;
+          background-color: var(--green-400) !important;
+        }
+      }
     }
 
     &--red {
-      background-color: @w-red !important;
+      border-color: var(--red-500) !important;
+      background-color: var(--red-500) !important;
+
+      &:hover {
+        border-color: @red-600 !important;
+        background-color: @red-600 !important;
+
+        body.theme-dark & {
+          border-color: @red-dark-400 !important;
+          background-color: @red-dark-400 !important;
+        }
+      }
     }
 
     & + & {
       margin-left: 8px;
     }
   }
+
   &__participant-list {
     .list-unstyled;
     margin: 0;
@@ -143,10 +145,6 @@
     }
 
     .participant-item {
-      height: 40px !important;
-      cursor: default !important;
-      fill: var(--background-fade-48);
-
       &__image {
         width: 48px !important;
       }
@@ -184,7 +182,7 @@ svg.small-icon {
   display: flex;
   flex-direction: column;
   flex-shrink: 0;
-  margin: 0 16px 16px;
+  margin: 10px 14px 16px;
   animation: show-call-ui @animation-timing-fast ease-in-out 0s 1;
 
   &.dark-bg {
@@ -196,14 +194,18 @@ svg.small-icon {
   }
 
   .conversation-list-cell-name {
-    color: var(--background);
+    color: #33373a;
+
+    body.theme-dark & {
+      color: var(--white);
+    }
   }
 
   .conversation-list-cell-description {
-    margin-top: 0;
-    color: var(--background-fade-40);
-    font-size: 11px;
+    margin-top: 2px;
+    color: var(--gray-90);
     opacity: 1;
+    .subline;
   }
 
   .conversation-list-info-wrapper {

@@ -152,7 +152,7 @@ export class CallingViewModel {
 
     this.callingRepository.onIncomingCall((call: Call) => {
       const shouldRing = this.selfUser().availability() !== Availability.Type.AWAY;
-      if (shouldRing && !hasSoundlessCallsEnabled()) {
+      if (shouldRing && (!hasSoundlessCallsEnabled() || this.activeCalls().length === 1)) {
         ring(call);
       }
     });

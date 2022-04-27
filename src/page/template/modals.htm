@@ -11,14 +11,16 @@
       </button>
     </div>
     <div class="modal__body" data-bind="fadingscrollbar">
-      <div class="modal__text" data-uie-name="status-modal-text">
-        <!-- ko if: content().messageHtml -->
-          <div id="modal-description" data-bind="html: content().messageHtml"></div>
+      <!-- ko if: content().messageHtml || content().messageText -->
+        <div class="modal__text" data-uie-name="status-modal-text">
+          <!-- ko if: content().messageHtml -->
+            <div id="modal-description" data-bind="html: content().messageHtml"></div>
+          <!-- /ko -->
+          <!-- ko if: content().messageText -->
+            <div id="modal-description" data-bind="text: content().messageText"></div>
+          <!-- /ko -->
+        </div>
         <!-- /ko -->
-        <!-- ko if: content().messageText -->
-          <div id="modal-description" data-bind="text: content().messageText"></div>
-        <!-- /ko -->
-      </div>
       <!-- ko if: hasPassword() -->
         <form data-bind="submit: () => doAction(confirm, content().closeOnConfirm)">
           <input class="modal__input" type="password" data-bind="textInput: passwordValue, attr: {placeholder: content().inputPlaceholder}, hasFocus: inputFocus"/>

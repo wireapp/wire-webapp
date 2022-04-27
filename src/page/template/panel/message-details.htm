@@ -5,12 +5,10 @@
 >
   <!-- ko if: isVisible() -->
     <div class="panel__header">
-      <div class="panel__header__title" data-bind="text: panelTitle()" data-uie-name="message-details-title"></div>
-      <close-icon
-        class="right-panel-close icon-button"
-        data-bind="clickOrDrag: onClose"
-        data-uie-name="do-close"
-      ></close-icon>
+      <h4 class="panel__header__title" data-bind="text: panelTitle()" data-uie-name="message-details-title"></h4>
+      <button type="button" class="right-panel-close icon-button" data-bind="clickOrDrag: onClose, title: t('accessibility.rightPanel.close'), 'aria-label': t('accessibility.rightPanel.close')" data-uie-name="do-close">
+        <close-icon></close-icon>
+      </button>
     </div>
     <!-- ko if: showTabs() -->
       <div class="panel__tabs">
