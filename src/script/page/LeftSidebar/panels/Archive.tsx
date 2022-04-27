@@ -65,16 +65,15 @@ const Archive: React.FC<ArchiveProps> = ({
     <ListWrapper id="archive" header={t('archiveHeader')} onClose={onClose}>
       <ul className="left-list-items no-scroll">
         {conversations.map(conversation => (
-          <li key={conversation.id}>
-            <ConversationListCell
-              dataUieName="item-conversation-archived"
-              onClick={() => onClickConversation(conversation)}
-              rightClick={listViewModel.onContextMenu}
-              conversation={conversation}
-              onJoinCall={answerCall}
-              showJoinButton={false}
-            />
-          </li>
+          <ConversationListCell
+            key={conversation.id}
+            dataUieName="item-conversation-archived"
+            onClick={() => onClickConversation(conversation)}
+            rightClick={listViewModel.onContextMenu}
+            conversation={conversation}
+            onJoinCall={answerCall}
+            showJoinButton={false}
+          />
         ))}
       </ul>
     </ListWrapper>

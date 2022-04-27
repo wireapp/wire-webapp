@@ -7,7 +7,7 @@
     <div class="panel__header">
       <h4 class="panel__header__title" data-bind="text: panelTitle()" data-uie-name="message-details-title"></h4>
       <button type="button" class="right-panel-close icon-button" data-bind="clickOrDrag: onClose, title: t('accessibility.rightPanel.close'), 'aria-label': t('accessibility.rightPanel.close')" data-uie-name="do-close">
-        <close-icon></close-icon>
+        <close-icon aria-hidden="true"></close-icon>
       </button>
     </div>
     <!-- ko if: showTabs() -->
@@ -33,19 +33,19 @@
       <!-- /ko -->
       <!-- ko if: state() === states.NO_RECEIPTS -->
         <div class="message-details__empty" data-uie-name="message-details-no-receipts-placeholder">
-          <read-icon class="message-details__empty__icon"></read-icon>
+          <read-icon aria-hidden="true" class="message-details__empty__icon"></read-icon>
           <div class="message-details__empty__text" data-bind="text: t('messageDetailsNoReceipts')"></div>
         </div>
       <!-- /ko -->
       <!-- ko if: state() === states.NO_LIKES -->
         <div class="message-details__empty" data-uie-name="message-details-no-likes-placeholder">
-          <like-icon class="message-details__empty__icon"></like-icon>
+          <like-icon aria-hidden="true" class="message-details__empty__icon"></like-icon>
           <div class="message-details__empty__text" data-bind="text: t('messageDetailsNoLikes')"></div>
         </div>
       <!-- /ko -->
       <!-- ko if: state() === states.RECEIPTS_OFF -->
         <div class="message-details__empty" data-uie-name="message-details-receipts-off-placeholder">
-          <read-icon class="message-details__empty__icon"></read-icon>
+          <read-icon aria-hidden="true" class="message-details__empty__icon"></read-icon>
           <div class="message-details__empty__text" data-bind="text: t('messageDetailsReceiptsOff')"></div>
         </div>
       <!-- /ko -->
