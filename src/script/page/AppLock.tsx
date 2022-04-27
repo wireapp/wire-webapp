@@ -265,261 +265,253 @@ const AppLock: React.FC<AppLockProps> = ({
   };
 
   return (
-    isVisible && (
-      <ModalComponent isShown={isVisible} showLoading={isLoading} onClosed={onClosed} data-uie-name="applock-modal">
-        <div className="modal__header">
-          <h2 className="modal__header__title" data-uie-name="applock-modal-header">
-            {headerText()}
-          </h2>
-        </div>
-        <div className="modal__body" data-uie-name="applock-modal-body" data-uie-value={state}>
-          {state === APPLOCK_STATE.SETUP && (
-            <form onSubmit={onSetCode}>
-              <div
-                className="modal__text"
-                dangerouslySetInnerHTML={{__html: t('modalAppLockSetupMessage', {}, {br: '<br><br>'})}}
-                data-uie-name="label-applock-set-text"
-              ></div>
-              <div className="modal__text modal__label" data-uie-name="label-applock-unlock-text">
-                {t('modalAppLockPasscode')}
-              </div>
-              <input
-                className="modal__input"
-                type="password"
-                value={setupPassphrase}
-                onChange={event => setSetupPassphrase(event.target.value)}
-                data-uie-status={isSetupPassphraseValid ? 'valid' : 'invalid'}
-                data-uie-name="input-applock-set-a"
-                autoComplete="new-password"
-                onBlur={forceFocus}
-                ref={focusElement}
-              />
-              <div
-                className={`modal__passcode__info ${isSetupPassphraseLength ? 'modal__passcode__info--valid' : ''}`}
-                data-uie-status={isSetupPassphraseLength ? 'valid' : 'invalid'}
-                data-uie-name="passcode-validation-charnumber"
+    <ModalComponent isShown={isVisible} showLoading={isLoading} onClosed={onClosed} data-uie-name="applock-modal">
+      <div className="modal__header">
+        <h2 className="modal__header__title" data-uie-name="applock-modal-header">
+          {headerText()}
+        </h2>
+      </div>
+      <div className="modal__body" data-uie-name="applock-modal-body" data-uie-value={state}>
+        {state === APPLOCK_STATE.SETUP && (
+          <form onSubmit={onSetCode}>
+            <div
+              className="modal__text"
+              dangerouslySetInnerHTML={{__html: t('modalAppLockSetupMessage', {}, {br: '<br><br>'})}}
+              data-uie-name="label-applock-set-text"
+            ></div>
+            <div className="modal__text modal__label" data-uie-name="label-applock-unlock-text">
+              {t('modalAppLockPasscode')}
+            </div>
+            <input
+              className="modal__input"
+              type="password"
+              value={setupPassphrase}
+              onChange={event => setSetupPassphrase(event.target.value)}
+              data-uie-status={isSetupPassphraseValid ? 'valid' : 'invalid'}
+              data-uie-name="input-applock-set-a"
+              autoComplete="new-password"
+              onBlur={forceFocus}
+              ref={focusElement}
+            />
+            <div
+              className={`modal__passcode__info ${isSetupPassphraseLength ? 'modal__passcode__info--valid' : ''}`}
+              data-uie-status={isSetupPassphraseLength ? 'valid' : 'invalid'}
+              data-uie-name="passcode-validation-charnumber"
+            >
+              {t('modalAppLockSetupLong', {
+                minPasswordLength: Config.getConfig().NEW_PASSWORD_MINIMUM_LENGTH.toString(),
+              })}
+            </div>
+            <div
+              className={`modal__passcode__info ${isSetupPassphraseLower ? 'modal__passcode__info--valid' : ''}`}
+              data-uie-status={isSetupPassphraseLower ? 'valid' : 'invalid'}
+              data-uie-name="passcode-validation-lowercase"
+            >
+              {t('modalAppLockSetupLower')}
+            </div>
+            <div
+              className={`modal__passcode__info ${isSetupPassphraseUpper ? 'modal__passcode__info--valid' : ''}`}
+              data-uie-status={isSetupPassphraseUpper ? 'valid' : 'invalid'}
+              data-uie-name="passcode-validation-uppercase"
+            >
+              {t('modalAppLockSetupUppercase')}
+            </div>
+            <div
+              className={`modal__passcode__info ${isSetupPassphraseDigit ? 'modal__passcode__info--valid' : ''}`}
+              data-uie-status={isSetupPassphraseDigit ? 'valid' : 'invalid'}
+              data-uie-name="passcode-validation-digit"
+            >
+              {t('modalAppLockSetupDigit')}
+            </div>
+            <div
+              className={`modal__passcode__info ${isSetupPassphraseSpecial ? 'modal__passcode__info--valid' : ''}`}
+              data-uie-status={isSetupPassphraseSpecial ? 'valid' : 'invalid'}
+              data-uie-name="passcode-validation-specialchar"
+            >
+              {t('modalAppLockSetupSpecial')}
+            </div>
+            <div className="modal__buttons">
+              <button
+                type="submit"
+                className="modal__button modal__button--primary modal__button--full"
+                data-uie-name="do-action"
+                disabled={!isSetupPassphraseValid}
               >
-                {t('modalAppLockSetupLong', {
-                  minPasswordLength: Config.getConfig().NEW_PASSWORD_MINIMUM_LENGTH.toString(),
-                })}
-              </div>
-              <div
-                className={`modal__passcode__info ${isSetupPassphraseLower ? 'modal__passcode__info--valid' : ''}`}
-                data-uie-status={isSetupPassphraseLower ? 'valid' : 'invalid'}
-                data-uie-name="passcode-validation-lowercase"
+                {t('modalAppLockSetupAcceptButton')}
+              </button>
+            </div>
+          </form>
+        )}
+        {state === APPLOCK_STATE.SETUP_CHANGE && (
+          <form onSubmit={onSetCode}>
+            <div
+              className="modal__text"
+              dangerouslySetInnerHTML={{
+                __html: t(
+                  'modalAppLockSetupChangeMessage',
+                  {brandName: Config.getConfig().BRAND_NAME},
+                  {br: '<br><br>'},
+                ),
+              }}
+              data-uie-name="label-applock-set-text"
+            ></div>
+            <div className="modal__text modal__label" data-uie-name="label-applock-unlock-text">
+              {t('modalAppLockPasscode')}
+            </div>
+            <input
+              className="modal__input"
+              type="password"
+              value={setupPassphrase}
+              onChange={event => setSetupPassphrase(event.target.value)}
+              data-uie-status={isSetupPassphraseValid ? 'valid' : 'invalid'}
+              data-uie-name="input-applock-set-a"
+              autoComplete="new-password"
+              onBlur={forceFocus}
+              ref={focusElement}
+            />
+            <div className={`modal__passcode__info ${isSetupPassphraseLength ? 'modal__passcode__info--valid' : ''}`}>
+              {t('modalAppLockSetupLong', {
+                minPasswordLength: Config.getConfig().NEW_PASSWORD_MINIMUM_LENGTH.toString(),
+              })}
+            </div>
+            <div className={`modal__passcode__info ${isSetupPassphraseLower ? 'modal__passcode__info--valid' : ''}`}>
+              {t('modalAppLockSetupLower')}
+            </div>
+            <div className={`modal__passcode__info ${isSetupPassphraseUpper ? 'modal__passcode__info--valid' : ''}`}>
+              {t('modalAppLockSetupUppercase')}
+            </div>
+            <div className={`modal__passcode__info ${isSetupPassphraseDigit ? 'modal__passcode__info--valid' : ''}`}>
+              {t('modalAppLockSetupDigit')}
+            </div>
+            <div className={`modal__passcode__info ${isSetupPassphraseSpecial ? 'modal__passcode__info--valid' : ''}`}>
+              {t('modalAppLockSetupSpecial')}
+            </div>
+            <div className="modal__buttons">
+              <button
+                type="submit"
+                className="modal__button modal__button--primary modal__button--full"
+                data-uie-name="do-action"
+                disabled={!isSetupPassphraseValid}
               >
-                {t('modalAppLockSetupLower')}
-              </div>
-              <div
-                className={`modal__passcode__info ${isSetupPassphraseUpper ? 'modal__passcode__info--valid' : ''}`}
-                data-uie-status={isSetupPassphraseUpper ? 'valid' : 'invalid'}
-                data-uie-name="passcode-validation-uppercase"
+                {t('modalAppLockSetupAcceptButton')}
+              </button>
+            </div>
+          </form>
+        )}
+
+        {state === APPLOCK_STATE.LOCKED && (
+          <form onSubmit={onUnlock}>
+            <div className="modal__text modal__label" data-uie-name="label-applock-unlock-text">
+              {t('modalAppLockPasscode')}
+            </div>
+            <input
+              className="modal__input"
+              type="password"
+              id={Math.random().toString()}
+              name="password"
+              onKeyDown={clearUnlockError}
+              data-uie-name="input-applock-unlock"
+              autoComplete="new-password"
+              onBlur={forceFocus}
+              ref={focusElement}
+            />
+            <div className="modal__input__error" data-uie-name="label-applock-unlock-error">
+              {unlockError}
+            </div>
+
+            <div className="modal__cta" data-uie-name="go-forgot-passphrase" onClick={onClickForgot}>
+              {t('modalAppLockLockedForgotCTA')}
+            </div>
+
+            <div className="modal__buttons">
+              <button
+                type="submit"
+                className="modal__button modal__button--primary modal__button--full"
+                data-uie-name="do-action"
               >
-                {t('modalAppLockSetupUppercase')}
-              </div>
-              <div
-                className={`modal__passcode__info ${isSetupPassphraseDigit ? 'modal__passcode__info--valid' : ''}`}
-                data-uie-status={isSetupPassphraseDigit ? 'valid' : 'invalid'}
-                data-uie-name="passcode-validation-digit"
+                {t('modalAppLockLockedUnlockButton')}
+              </button>
+            </div>
+          </form>
+        )}
+
+        {state === APPLOCK_STATE.FORGOT && (
+          <React.Fragment>
+            <div className="modal__text" data-uie-name="label-applock-forgot-text">
+              {t('modalAppLockForgotMessage')}
+            </div>
+            <div className="modal__cta" onClick={onClickWipe} data-uie-name="go-wipe-database">
+              {t('modalAppLockForgotWipeCTA')}
+            </div>
+            <div className="modal__buttons">
+              <button
+                onClick={onGoBack}
+                className="modal__button modal__button--secondary modal__button--full"
+                data-uie-name="do-go-back"
               >
-                {t('modalAppLockSetupDigit')}
-              </div>
-              <div
-                className={`modal__passcode__info ${isSetupPassphraseSpecial ? 'modal__passcode__info--valid' : ''}`}
-                data-uie-status={isSetupPassphraseSpecial ? 'valid' : 'invalid'}
-                data-uie-name="passcode-validation-specialchar"
+                {t('modalAppLockForgotGoBackButton')}
+              </button>
+            </div>
+          </React.Fragment>
+        )}
+
+        {state === APPLOCK_STATE.WIPE_CONFIRM && (
+          <React.Fragment>
+            <div className="modal__text" data-uie-name="label-applock-wipe-confirm-text">
+              {t('modalAppLockWipeConfirmMessage')}
+            </div>
+            <div className="modal__buttons">
+              <button onClick={onGoBack} className="modal__button modal__button--secondary" data-uie-name="do-go-back">
+                {t('modalAppLockWipeConfirmGoBackButton')}
+              </button>
+              <button
+                onClick={onClickWipeConfirm}
+                className="modal__button modal__button--primary modal__button--alert"
+                data-uie-name="do-action"
               >
-                {t('modalAppLockSetupSpecial')}
-              </div>
-              <div className="modal__buttons">
-                <button
-                  type="submit"
-                  className="modal__button modal__button--primary modal__button--full"
-                  data-uie-name="do-action"
-                  disabled={!isSetupPassphraseValid}
-                >
-                  {t('modalAppLockSetupAcceptButton')}
-                </button>
-              </div>
-            </form>
-          )}
-          {state === APPLOCK_STATE.SETUP_CHANGE && (
-            <form onSubmit={onSetCode}>
-              <div
-                className="modal__text"
-                dangerouslySetInnerHTML={{
-                  __html: t(
-                    'modalAppLockSetupChangeMessage',
-                    {brandName: Config.getConfig().BRAND_NAME},
-                    {br: '<br><br>'},
-                  ),
-                }}
-                data-uie-name="label-applock-set-text"
-              ></div>
-              <div className="modal__text modal__label" data-uie-name="label-applock-unlock-text">
-                {t('modalAppLockPasscode')}
-              </div>
-              <input
-                className="modal__input"
-                type="password"
-                value={setupPassphrase}
-                onChange={event => setSetupPassphrase(event.target.value)}
-                data-uie-status={isSetupPassphraseValid ? 'valid' : 'invalid'}
-                data-uie-name="input-applock-set-a"
-                autoComplete="new-password"
-                onBlur={forceFocus}
-                ref={focusElement}
-              />
-              <div className={`modal__passcode__info ${isSetupPassphraseLength ? 'modal__passcode__info--valid' : ''}`}>
-                {t('modalAppLockSetupLong', {
-                  minPasswordLength: Config.getConfig().NEW_PASSWORD_MINIMUM_LENGTH.toString(),
-                })}
-              </div>
-              <div className={`modal__passcode__info ${isSetupPassphraseLower ? 'modal__passcode__info--valid' : ''}`}>
-                {t('modalAppLockSetupLower')}
-              </div>
-              <div className={`modal__passcode__info ${isSetupPassphraseUpper ? 'modal__passcode__info--valid' : ''}`}>
-                {t('modalAppLockSetupUppercase')}
-              </div>
-              <div className={`modal__passcode__info ${isSetupPassphraseDigit ? 'modal__passcode__info--valid' : ''}`}>
-                {t('modalAppLockSetupDigit')}
-              </div>
-              <div
-                className={`modal__passcode__info ${isSetupPassphraseSpecial ? 'modal__passcode__info--valid' : ''}`}
+                {t('modalAppLockWipeConfirmConfirmButton')}
+              </button>
+            </div>
+          </React.Fragment>
+        )}
+
+        {state === APPLOCK_STATE.WIPE_PASSWORD && (
+          <form onSubmit={onWipeDatabase}>
+            <input
+              className="modal__input"
+              type="password"
+              name="password"
+              autoComplete="new-password"
+              placeholder={t('modalAppLockWipePasswordPlaceholder')}
+              onKeyDown={clearWipeError}
+              data-uie-name="input-applock-wipe"
+              onBlur={forceFocus}
+              ref={focusElement}
+            />
+            <div className="modal__input__error" style={{height: 20}} data-uie-name="label-applock-wipe-error">
+              {wipeError}
+            </div>
+            <div className="modal__buttons">
+              <button
+                type="button"
+                onClick={onGoBack}
+                className="modal__button modal__button--secondary"
+                data-uie-name="do-go-back"
               >
-                {t('modalAppLockSetupSpecial')}
-              </div>
-              <div className="modal__buttons">
-                <button
-                  type="submit"
-                  className="modal__button modal__button--primary modal__button--full"
-                  data-uie-name="do-action"
-                  disabled={!isSetupPassphraseValid}
-                >
-                  {t('modalAppLockSetupAcceptButton')}
-                </button>
-              </div>
-            </form>
-          )}
-
-          {state === APPLOCK_STATE.LOCKED && (
-            <form onSubmit={onUnlock}>
-              <div className="modal__text modal__label" data-uie-name="label-applock-unlock-text">
-                {t('modalAppLockPasscode')}
-              </div>
-              <input
-                className="modal__input"
-                type="password"
-                id={Math.random().toString()}
-                name="password"
-                onKeyDown={clearUnlockError}
-                data-uie-name="input-applock-unlock"
-                autoComplete="new-password"
-                onBlur={forceFocus}
-                ref={focusElement}
-              />
-              <div className="modal__input__error" data-uie-name="label-applock-unlock-error">
-                {unlockError}
-              </div>
-
-              <div className="modal__cta" data-uie-name="go-forgot-passphrase" onClick={onClickForgot}>
-                {t('modalAppLockLockedForgotCTA')}
-              </div>
-
-              <div className="modal__buttons">
-                <button
-                  type="submit"
-                  className="modal__button modal__button--primary modal__button--full"
-                  data-uie-name="do-action"
-                >
-                  {t('modalAppLockLockedUnlockButton')}
-                </button>
-              </div>
-            </form>
-          )}
-
-          {state === APPLOCK_STATE.FORGOT && (
-            <React.Fragment>
-              <div className="modal__text" data-uie-name="label-applock-forgot-text">
-                {t('modalAppLockForgotMessage')}
-              </div>
-              <div className="modal__cta" onClick={onClickWipe} data-uie-name="go-wipe-database">
-                {t('modalAppLockForgotWipeCTA')}
-              </div>
-              <div className="modal__buttons">
-                <button
-                  onClick={onGoBack}
-                  className="modal__button modal__button--secondary modal__button--full"
-                  data-uie-name="do-go-back"
-                >
-                  {t('modalAppLockForgotGoBackButton')}
-                </button>
-              </div>
-            </React.Fragment>
-          )}
-
-          {state === APPLOCK_STATE.WIPE_CONFIRM && (
-            <React.Fragment>
-              <div className="modal__text" data-uie-name="label-applock-wipe-confirm-text">
-                {t('modalAppLockWipeConfirmMessage')}
-              </div>
-              <div className="modal__buttons">
-                <button
-                  onClick={onGoBack}
-                  className="modal__button modal__button--secondary"
-                  data-uie-name="do-go-back"
-                >
-                  {t('modalAppLockWipeConfirmGoBackButton')}
-                </button>
-                <button
-                  onClick={onClickWipeConfirm}
-                  className="modal__button modal__button--primary modal__button--alert"
-                  data-uie-name="do-action"
-                >
-                  {t('modalAppLockWipeConfirmConfirmButton')}
-                </button>
-              </div>
-            </React.Fragment>
-          )}
-
-          {state === APPLOCK_STATE.WIPE_PASSWORD && (
-            <form onSubmit={onWipeDatabase}>
-              <input
-                className="modal__input"
-                type="password"
-                name="password"
-                autoComplete="new-password"
-                placeholder={t('modalAppLockWipePasswordPlaceholder')}
-                onKeyDown={clearWipeError}
-                data-uie-name="input-applock-wipe"
-                onBlur={forceFocus}
-                ref={focusElement}
-              />
-              <div className="modal__input__error" style={{height: 20}} data-uie-name="label-applock-wipe-error">
-                {wipeError}
-              </div>
-              <div className="modal__buttons">
-                <button
-                  type="button"
-                  onClick={onGoBack}
-                  className="modal__button modal__button--secondary"
-                  data-uie-name="do-go-back"
-                >
-                  {t('modalAppLockWipePasswordGoBackButton')}
-                </button>
-                <button
-                  type="submit"
-                  className="modal__button modal__button--primary modal__button--alert"
-                  data-uie-name="do-action"
-                >
-                  {t('modalAppLockWipePasswordConfirmButton')}
-                </button>
-              </div>
-            </form>
-          )}
-        </div>
-      </ModalComponent>
-    )
+                {t('modalAppLockWipePasswordGoBackButton')}
+              </button>
+              <button
+                type="submit"
+                className="modal__button modal__button--primary modal__button--alert"
+                data-uie-name="do-action"
+              >
+                {t('modalAppLockWipePasswordConfirmButton')}
+              </button>
+            </div>
+          </form>
+        )}
+      </div>
+    </ModalComponent>
   );
 };
 
