@@ -5,11 +5,11 @@
         data-bind="clickOrDrag: onGoBack, title: t('accessibility.rightPanel.GoBack'), 'aria-label': t('accessibility.rightPanel.GoBack')"
         data-uie-name="go-back-guest-options"
       >
-        <arrow-left-icon></arrow-left-icon>
+        <arrow-left-icon aria-hidden="true"></arrow-left-icon>
       </button>
-      <h4 class="panel__header__title" data-bind="text: t('guestOptionsTitle')"></h4>
+      <h3 class="panel__header__title" data-bind="text: t('guestOptionsTitle')"></h3>
       <button type="button" class="right-panel-close icon-button" data-bind="clickOrDrag: onClose, title: t('accessibility.rightPanel.close'), 'aria-label': t('accessibility.rightPanel.close')" data-uie-name="do-close">
-        <close-icon></close-icon>
+        <close-icon aria-hidden="true"></close-icon>
       </button>
     </div>
     <div class="panel__content" data-bind="fadingscrollbar">
@@ -24,30 +24,30 @@
             <copy-to-clipboard class="guest-options__link" params="text: activeConversation().accessCode" data-uie-name="status-invite-link"></copy-to-clipboard>
             <button class="panel__action-item panel__action-item--link panel__action-item--alternate" type="button" data-bind="click: copyLink, css: {'panel__action-item--show-alternative': isLinkCopied}" data-uie-name="do-copy-link">
               <span class="panel__action-item__default">
-                <copy-icon class="panel__action-item__icon" aria-hidden></copy-icon>
+                <copy-icon class="panel__action-item__icon" aria-hidden="true"></copy-icon>
                 <span class="panel__action-item__text" data-bind="text: t('guestOptionsCopyLink')"></span>
               </span>
               <span class="panel__action-item__alternative">
-                <check-icon class="panel__action-item__icon" aria-hidden></check-icon>
+                <check-icon class="panel__action-item__icon" aria-hidden="true"></check-icon>
                 <span class="panel__action-item__text" data-bind="text: t('guestOptionsCopyLinkDone')" data-uie-name="status-copy-link-done"></span>
               </span>
             </button>
             <button class="panel__action-item panel__action-item--link" type="button" data-bind="click: revokeAccessCode, css:{'disabled': requestOngoing}">
-              <close-icon class="panel__action-item__icon" aria-hidden></close-icon>
+              <close-icon class="panel__action-item__icon" aria-hidden="true"></close-icon>
               <span class="panel__action-item__text" data-bind="text: t('guestOptionsRevokeLink')" data-uie-name="do-revoke-link"></span>
             </button>
           <!-- /ko -->
 
           <!-- ko ifnot: hasAccessCode() -->
             <button class="panel__action-item panel__action-item--link" type="button" data-bind="click: requestAccessCode, css:{'disabled': requestOngoing}">
-              <link-icon class="panel__action-item__icon" aria-hidden></link-icon>
+              <link-icon class="panel__action-item__icon" aria-hidden="true"></link-icon>
               <span class="panel__action-item__text" data-bind="text: t('guestOptionsCreateLink')" data-uie-name="do-create-link"></span>
             </button>
           <!-- /ko -->
         <!-- /ko -->
         <!-- ko ifnot: isGuestLinkEnabled() -->
           <div class="panel__action-item--info">
-            <info-icon class="panel__action-item__icon--info"></info-icon>
+            <info-icon class="panel__action-item__icon--info" aria-hidden="true"></info-icon>
             <p class="panel__action-item__text--info" data-bind="text: guestLinkDisabledInfo" data-uie-name="guest-link-disabled-info"></p>
           </div>
         <!-- /ko -->

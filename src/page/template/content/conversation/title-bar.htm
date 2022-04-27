@@ -6,7 +6,9 @@
       <button class="conversation-title-bar-icon icon-search"
               type="button"
               data-bind="clickOrDrag: clickOnCollectionButton, attr: {title: t('tooltipConversationSearch'), 'aria-label': t('tooltipConversationSearch')}"
-              data-uie-name="do-collections"></button>
+              data-uie-name="do-collections">
+            <span class="visually-hidden" data-bind="text: t('tooltipConversationSearch')"></span>
+      </button>
       <!-- /ko -->
     </li>
 
@@ -21,7 +23,7 @@
           <legal-hold-dot style="margin: 0 16px 0 0" params="legalHoldModal: contentViewModel.legalHoldModal, conversation: conversationEntity" data-uie-name="status-legal-hold-conversation"></legal-hold-dot>
           <!-- /ko -->
           <!-- ko if: conversationEntity().verification_state() === ConversationVerificationState.VERIFIED -->
-          <verified-icon class="conversation-title-bar-name--verified"></verified-icon>
+          <verified-icon aria-hidden="true" class="conversation-title-bar-name--verified"></verified-icon>
           <!-- /ko -->
           <h2 class="conversation-title-bar-name-label" data-bind="text: conversationEntity().display_name()" data-uie-name="status-conversation-title-bar-label"></h2>
         </div>
@@ -40,14 +42,14 @@
           <button type="button" class="conversation-title-bar-icon"
                   data-bind="clickOrDrag: () => callActions.startVideo($parent.conversationEntity()), attr: {title: t('tooltipConversationVideoCall'), 'aria-label': t('tooltipConversationVideoCall')}"
                   data-uie-name="do-video-call">
-            <camera-icon></camera-icon>
+            <camera-icon aria-hidden="true"></camera-icon>
           </button>
 
           <!-- /ko -->
           <button type="button" class="conversation-title-bar-icon"
                   data-bind="clickOrDrag: () => callActions.startAudio($parent.conversationEntity()), attr: {title: t('tooltipConversationCall'), 'aria-label': t('tooltipConversationCall')}"
                   data-uie-name="do-call">
-            <pickup-icon></pickup-icon>
+            <pickup-icon aria-hidden="true"></pickup-icon>
           </button>
         </div>
       <!-- /ko -->
@@ -56,7 +58,7 @@
       <button type="button" class="conversation-title-bar-icon"
               data-bind="clickOrDrag: clickOnDetails, css: {'conversation-title-bar-icon--active': panelIsVisible()}, attr: {title: t('tooltipConversationInfo'), 'aria-label': t('tooltipConversationInfo')}"
               data-uie-name="do-open-info">
-        <info-icon></info-icon>
+        <info-icon aria-hidden="true"></info-icon>
       </button>
     </li>
 
