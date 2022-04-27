@@ -1,9 +1,16 @@
 <div id="guest-options" class="panel__page guest-options" data-bind="with: $root.subViews[$root.STATE.GUEST_OPTIONS]">
   <!-- ko if: isVisible() -->
     <div class="panel__header">
-      <arrow-left-icon class="icon-button" data-bind="clickOrDrag: onGoBack" data-uie-name="go-back-guest-options"></arrow-left-icon>
+      <button type="button" class="icon-button" 
+        data-bind="clickOrDrag: onGoBack, title: t('accessibility.rightPanel.GoBack'), 'aria-label': t('accessibility.rightPanel.GoBack')"
+        data-uie-name="go-back-guest-options"
+      >
+        <arrow-left-icon></arrow-left-icon>
+      </button>
       <h4 class="panel__header__title" data-bind="text: t('guestOptionsTitle')"></h4>
-      <close-icon class="right-panel-close icon-button" data-bind="clickOrDrag: onClose" data-uie-name="do-close"></close-icon>
+      <button type="button" class="right-panel-close icon-button" data-bind="clickOrDrag: onClose, title: t('accessibility.rightPanel.close'), 'aria-label': t('accessibility.rightPanel.close')" data-uie-name="do-close">
+        <close-icon></close-icon>
+      </button>
     </div>
     <div class="panel__content" data-bind="fadingscrollbar">
       <div class="guest-options__content">

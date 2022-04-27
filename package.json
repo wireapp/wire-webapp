@@ -72,7 +72,7 @@
     "@types/generate-changelog": "1.8.1",
     "@types/highlight.js": "10.1.0",
     "@types/jest": "27.4.1",
-    "@types/js-cookie": "3.0.1",
+    "@types/js-cookie": "3.0.2",
     "@types/jsdom": "16.2.14",
     "@types/keyboardjs": "2.5.0",
     "@types/libsodium-wrappers-sumo": "0.7.5",

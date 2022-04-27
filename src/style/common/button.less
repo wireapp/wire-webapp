@@ -140,17 +140,17 @@
 //
 .icon-button,
 .button-icon {
+  .button-icon-secondary();
+
   display: inline-flex;
   align-items: center;
-  cursor: pointer;
 
   > label,
   > span {
-    .label-xs;
+    .label;
 
     margin-left: 8px;
     color: var(--background);
-    cursor: pointer;
   }
 
   > input {
@@ -440,7 +440,9 @@ body.theme-dark {
   transition: background-color 0.15s ease-in-out, border-color 0.15s ease-in-out;
 
   svg {
-    fill: currentColor;
+    path {
+      fill: currentColor;
+    }
   }
 }
 

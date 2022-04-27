@@ -228,7 +228,7 @@ const ConversationListCallingCell: React.FC<CallingCellProps> = ({
               onKeyDown={createNavigateKeyboard(conversationUrl)}
               tabIndex={0}
               role="button"
-              aria-label={`${t('callGoToLabel')} ${conversationName}`}
+              aria-label={t('accessibility.openConversation', conversationName)}
             >
               {!temporaryUserStyle && (
                 <div className="conversation-list-cell-left">
@@ -402,7 +402,7 @@ const ConversationListCallingCell: React.FC<CallingCellProps> = ({
                         aria-pressed={showParticipants}
                       >
                         <span>{t('callParticipants', participants.length)}</span>
-                        <Icon.Chevron className="chevron" />
+                        <Icon.ChevronRight className="chevron" />
                       </button>
                     </li>
                   )}
