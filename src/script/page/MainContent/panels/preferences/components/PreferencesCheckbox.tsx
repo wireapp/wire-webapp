@@ -47,11 +47,10 @@ const PreferencesCheckbox: React.FC<PreferencesCheckboxProps> = ({
           disabled={disabled}
           isChecked={checked}
           onCheckedChanged={() => onChange(!checked)}
-          data-uie-value={checked}
-          data-uie-name={uieName}
+          uieName={uieName}
         />
       </div>
-      {details && <div className="preferences-detail">{details}</div>}
+      {details && <div className="preferences-detail preferences-detail-intended">{details}</div>}
     </>
   );
 };

@@ -128,6 +128,7 @@ const OptionPreferences: React.FC<OptionPreferencesProps> = ({
 
       {isActivatedAccount && (
         <>
+          <hr className="preferences-separator" />
           <PreferencesSection title={t('preferencesOptionsNotifications')}>
             <PreferencesRadio
               name="preferences-options-notification"
@@ -153,6 +154,7 @@ const OptionPreferences: React.FC<OptionPreferencesProps> = ({
               ]}
             />
           </PreferencesSection>
+          <hr className="preferences-separator" />
           <PreferencesSection title={t('preferencesOptionsPopular')}>
             <PreferencesCheckbox
               uieName="status-preference-use-dark-mode"

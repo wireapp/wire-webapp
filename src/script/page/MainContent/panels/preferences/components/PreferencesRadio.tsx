@@ -55,7 +55,7 @@ const PreferencesRadio: React.FC<PreferencesRadioProps> = ({
               data-uie-name={`${uieName}-${value}`}
             />
             <label htmlFor={id + value}>
-              <span className="preferences-label">{label}</span>
+              <span>{label}</span>
               {detailLabel && selectedValue === value && (
                 <span className="preferences-hint">{` · ${detailLabel}`}</span>
               )}

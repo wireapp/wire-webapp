@@ -41,12 +41,6 @@ const iconStyles: CSSObject = {
   stroke: 'currentColor',
 };
 
-const activeStyles: CSSObject = {
-  background: '#E7F0FA',
-  border: '1px solid #6AA4DE',
-  color: '#0667C8',
-};
-
 const headerStyles: CSSObject = {
   lineHeight: '14px',
   margin: '37px 0 6px',
@@ -61,7 +55,7 @@ const AvailabilityButtons: React.FC<AvailabilityInputProps> = ({availability}) =
     [Availability.Type.AVAILABLE]: (
       <Icon.AvailabilityAvailable
         className="availability-state-icon"
-        css={{...iconStyles, fill: '#1D7833', stroke: '#1D7833'}}
+        css={{...iconStyles, fill: 'var(--green-500)', stroke: 'var(--green-500)'}}
         data-uie-name="status-availability-icon"
         data-uie-value="available"
       />
@@ -69,7 +63,7 @@ const AvailabilityButtons: React.FC<AvailabilityInputProps> = ({availability}) =
     [Availability.Type.BUSY]: (
       <Icon.AvailabilityBusy
         className="availability-state-icon"
-        css={{...iconStyles, fill: '#A25915', stroke: '#A25915'}}
+        css={{...iconStyles, fill: 'var(--amber-500)', stroke: 'var(--amber-500)'}}
         data-uie-name="status-availability-icon"
         data-uie-value="busy"
       />
@@ -77,7 +71,7 @@ const AvailabilityButtons: React.FC<AvailabilityInputProps> = ({availability}) =
     [Availability.Type.AWAY]: (
       <Icon.AvailabilityAway
         className="availability-state-icon"
-        css={{...iconStyles, fill: '#C20013', stroke: '#C20013'}}
+        css={{...iconStyles, fill: 'var(--red-500)', stroke: 'var(--red-500)'}}
         data-uie-name="status-availability-icon"
         data-uie-value="away"
       />
@@ -121,11 +115,11 @@ const AvailabilityButtons: React.FC<AvailabilityInputProps> = ({availability}) =
           return (
             <button
               className={cx('buttons-group-button', {
+                'buttons-group-button-active': isActive,
                 'buttons-group-button-left': isFirst,
                 'buttons-group-button-right': isLast,
               })}
               key={item.availability}
-              css={isActive ? activeStyles : {}}
               type="button"
               onClick={() => item.click()}
             >

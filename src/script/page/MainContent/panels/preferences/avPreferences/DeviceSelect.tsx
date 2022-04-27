@@ -53,12 +53,16 @@ const DeviceSelect: React.FC<DeviceSelectProps> = ({
         <DeviceIcon />
       </div>
       <div className="input-select">
+        <label className="label-medium" htmlFor={uieName}>
+          {title}
+        </label>
         <select
           className={cx('preferences-av-select', {'preferences-av-select-disabled': disabled})}
           name="select"
           disabled={disabled}
           value={value}
           data-uie-name={uieName}
+          id={uieName}
           onChange={({target}) => onChange(target.value)}
           aria-label={title}
         >

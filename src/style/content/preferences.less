@@ -61,9 +61,14 @@ body.theme-dark {
 }
 
 .preferences-detail {
+  margin-top: 10px;
   color: var(--gray-90);
   font-size: @font-size-small;
   line-height: 14px;
+
+  &-intended {
+    margin-left: 28.5px;
+  }
 }
 
 body.theme-dark {
@@ -114,7 +119,7 @@ body.theme-dark {
   .button-reset-default;
 
   display: inline-block;
-  margin-bottom: 8px;
+  margin-bottom: 10px;
   color: @black;
   cursor: pointer;
   font-size: @font-size-base;
@@ -139,7 +144,6 @@ body.theme-dark {
 
 .preferences-option {
   display: flex;
-  margin-bottom: 16px;
 
   input:disabled {
     &,
@@ -150,7 +154,7 @@ body.theme-dark {
   }
 
   & ~ & {
-    margin-top: 32px;
+    margin-top: 24px;
   }
 }
 
@@ -161,7 +165,7 @@ body.theme-dark {
 .preferences-option-icon {
   height: @line-height-sm;
   padding-right: 18px;
-  margin: 0 0 0 -34px;
+  margin: 0;
   font-size: @font-size-sm;
   line-height: @line-height-sm;
 
