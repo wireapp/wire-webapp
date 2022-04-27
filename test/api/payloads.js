@@ -157,7 +157,7 @@ entities.user = {
   john_doe: {
     email: 'jd@wire.com',
     phone: '+49177123456',
-    accent_id: 3,
+    accent_id: 1,
     picture: entities.picture,
     name: 'John Doe',
     id: 'd5a39ffb-6ce3-4cc8-9048-0e15d031b4c5',
