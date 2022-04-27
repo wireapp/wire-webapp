@@ -179,9 +179,10 @@ const MessagesList: React.FC<MessagesListParams> = ({
     const isLastDeliveredMessage = lastDeliveredMessage?.id === message.id;
 
     const visibleCallback = getVisibleCallback(conversation, message);
+    const key = (message.id || 'message-') + message.timestamp();
     return (
       <Message
-        key={message.id + message.timestamp}
+        key={key}
         onVisible={visibleCallback}
         message={message}
         previousMessage={previousMessage}
