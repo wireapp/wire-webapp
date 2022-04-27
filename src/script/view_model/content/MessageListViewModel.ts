@@ -336,7 +336,7 @@ export class MessageListViewModel {
           text: t('modalOpenLinkAction'),
         },
         text: {
-          message: t('modalOpenLinkMessage', href),
+          message: t('modalOpenLinkMessage', href, {}, true),
           title: t('modalOpenLinkTitle'),
         },
       });
