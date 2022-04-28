@@ -92,7 +92,8 @@
   display: flex;
   height: 44px;
   padding: 0 8px;
-  margin: 0;
+  border-bottom: 1px solid var(--gray-50);
+  margin: 20px -8px 0;
 
   .start-ui-list-tab {
     .flex-center;
@@ -100,6 +101,7 @@
 
     flex-grow: 1;
     border-bottom: 1px solid transparent;
+    margin: 0 10px -1px;
 
     &.active {
       border-bottom-color: var(--main-color);
@@ -120,9 +122,9 @@
 
       color: var(--main-color);
       cursor: pointer;
-      font-size: 11px;
-      font-weight: 600;
-      opacity: 0.56;
+      font-size: @font-size-small;
+      font-weight: @font-weight-medium;
+      line-height: 14px;
       text-transform: uppercase;
     }
   }
