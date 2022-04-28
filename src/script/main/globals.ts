@@ -41,7 +41,7 @@ import 'Components/modal';
 import 'Components/panel/ServiceDetails';
 import 'Components/panel/UserDetails';
 import 'Components/ServiceList';
-import 'Components/UserInput';
+import 'Components/SearchInput';
 
 import 'Util/LocalizerUtil';
 
