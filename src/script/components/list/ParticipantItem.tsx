@@ -154,7 +154,7 @@ const ParticipantItem = <UserType extends User | ServiceEntity>(
         {isInViewport && (
           <>
             <div className="participant-item__image">
-              <Avatar avatarSize={AVATAR_SIZE.SMALL} participant={participant} />
+              <Avatar avatarSize={AVATAR_SIZE.SMALL} participant={participant} aria-hidden="true" />
             </div>
 
             <div className="participant-item__content">
