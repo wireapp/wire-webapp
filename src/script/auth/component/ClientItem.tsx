@@ -238,7 +238,6 @@ const ClientItem = ({selected, onClientRemoval, onClick, client, clientError, re
               <InputSubmitCombo style={{background: 'transparent', boxShadow: 'none', marginBottom: '0'}}>
                 <Input
                   autoComplete="section-login password"
-                  autoFocus
                   data-uie-name="remove-device-password"
                   ref={passwordInput}
                   name="password"

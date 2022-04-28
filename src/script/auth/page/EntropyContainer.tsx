@@ -59,7 +59,6 @@ const EntropyContainer = ({onSetEntropy}: Props) => {
           </Muted>
           <Button
             onClick={() => onSetEntropy(entropy)}
-            autoFocus
             data-uie-name="do-entropy-confirm"
             onKeyDown={(event: React.KeyboardEvent) => {
               if (event.key === KEY.ENTER) {

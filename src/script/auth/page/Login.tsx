@@ -290,7 +290,6 @@ const Login = ({
                     </Text>
                     <Label markInvalid={!!twoFactorSubmitError}>
                       <CodeInput
-                        autoFocus
                         style={{marginTop: 60}}
                         onCodeComplete={submitTwoFactorLogin}
                         data-uie-name="enter-code"

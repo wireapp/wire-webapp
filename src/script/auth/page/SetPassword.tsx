@@ -99,7 +99,6 @@ const SetPassword = ({
             }}
             ref={passwordInput}
             value={password}
-            autoFocus
             required
             pattern={ValidationUtil.getNewPasswordPattern(Config.getConfig().NEW_PASSWORD_MINIMUM_LENGTH)}
             data-uie-name="enter-password"

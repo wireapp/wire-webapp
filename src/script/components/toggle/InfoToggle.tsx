@@ -17,7 +17,7 @@
  *
  */
 
-import React, {Fragment} from 'react';
+import React from 'react';
 import {createRandomUuid} from 'Util/util';
 import cx from 'classnames';
 import {registerReactComponent} from 'Util/ComponentUtil';
@@ -37,9 +37,11 @@ const InfoToggle: React.FC<InfoToggleProps> = ({dataUieName, info, isChecked, is
   const {current: inputId} = React.useRef(createRandomUuid());
 
   return (
-    <Fragment>
+    <div className="info-toggle">
       <div className="info-toggle__row">
-        <div>{name}</div>
+        <label htmlFor={inputId} className="info-toggle__name">
+          {name}
+        </label>
         <div className={cx('slider', {disabled: isDisabled})}>
           <input
             className="slider-input"
@@ -50,18 +52,21 @@ const InfoToggle: React.FC<InfoToggleProps> = ({dataUieName, info, isChecked, is
             type="checkbox"
             data-uie-name="info-toggle-input"
           />
-          <label
-            htmlFor={inputId}
+          <button
             className="button-label"
+            aria-pressed={isChecked}
+            onClick={() => setIsChecked(!isChecked)}
             data-uie-name={dataUieNameLabelText}
             data-uie-value={isChecked ? 'checked' : 'unchecked'}
-          />
+          >
+            <span className="visually-hidden">{name}</span>
+          </button>
         </div>
       </div>
-      <div className="info-toggle__details" data-uie-name={dataUieNameInfoText}>
+      <p className="info-toggle__details" data-uie-name={dataUieNameInfoText}>
         {info}
-      </div>
-    </Fragment>
+      </p>
+    </div>
   );
 };
 
