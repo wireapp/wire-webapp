@@ -68,7 +68,7 @@ const LegalHoldDot: React.FC<LegalHoldDotProps> = ({
           className,
         )}
       >
-        {isPending && <Icon.Pending aria-hidden="true" className="pending-icon" />}
+        {isPending && <Icon.Pending className="pending-icon" />}
       </span>
       <span className="visibility-hidden">{t('legalHoldHeadline')}</span>
     </button>

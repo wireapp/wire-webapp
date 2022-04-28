@@ -208,7 +208,7 @@ const ClientItem = ({selected, onClientRemoval, onClick, client, clientError, re
         >
           <div style={{display: 'flex', flexDirection: 'row'}}>
             <div style={{flexBasis: '32px', margin: 'auto'}}>
-              <DeviceIcon aria-hidden="true" color="#323639" />
+              <DeviceIcon color="#323639" />
             </div>
             <div style={{flexGrow: 1}}>
               <Text bold block color="#323639" data-uie-name="device-header-model">
@@ -226,7 +226,7 @@ const ClientItem = ({selected, onClientRemoval, onClick, client, clientError, re
                 style={{margin: 'auto'}}
                 type="submit"
               >
-                <TrashIcon aria-hidden="true" />
+                <TrashIcon />
               </RoundIconButton>
             )}
           </div>
@@ -261,7 +261,7 @@ const ClientItem = ({selected, onClientRemoval, onClick, client, clientError, re
                   style={{marginBottom: '-4px'}}
                   type="submit"
                 >
-                  <TrashIcon aria-hidden="true" />
+                  <TrashIcon />
                 </RoundIconButton>
               </InputSubmitCombo>
             </Form>

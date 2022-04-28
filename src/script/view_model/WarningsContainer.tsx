@@ -365,11 +365,7 @@ const WarningsContainer: React.FC = () => {
         <div className="warning-bar warning-bar-connection">
           <div className="warning-bar-message">
             <span>{t('warningConnectivityConnectionLost', brandName)}</span>
-            <Icon.Loading
-              aria-hidden="true"
-              className="warning-bar-spinner"
-              data-uie-name="status-loading"
-            ></Icon.Loading>
+            <Icon.Loading className="warning-bar-spinner" data-uie-name="status-loading"></Icon.Loading>
           </div>
         </div>
       )}

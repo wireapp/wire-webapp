@@ -188,7 +188,7 @@ const Conversations: React.FC<ConversationsProps> = ({
               title={t('tooltipConversationsStart', Shortcut.getShortcutTooltip(ShortcutType.START))}
               data-uie-name="go-people"
             >
-              <Icon.People aria-hidden="true" />
+              <Icon.People />
               {t('conversationFooterContacts')}
             </button>
           </li>
@@ -205,7 +205,7 @@ const Conversations: React.FC<ConversationsProps> = ({
               data-uie-status={viewStyle === ConverationViewStyle.RECENT ? 'active' : 'inactive'}
               aria-selected={viewStyle === ConverationViewStyle.RECENT}
             >
-              <Icon.ConversationsRecent aria-hidden="true" />
+              <Icon.ConversationsRecent />
               {t('conversationViewTooltip')}
             </button>
           </li>
@@ -221,7 +221,7 @@ const Conversations: React.FC<ConversationsProps> = ({
               data-uie-status={viewStyle === ConverationViewStyle.FOLDER ? 'active' : 'inactive'}
               aria-selected={viewStyle === ConverationViewStyle.FOLDER}
             >
-              <Icon.ConversationsFolder aria-hidden="true" />
+              <Icon.ConversationsFolder />
               {t('folderViewTooltip')}
             </button>
           </li>

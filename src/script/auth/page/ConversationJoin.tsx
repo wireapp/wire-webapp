@@ -257,7 +257,7 @@ const ConversationJoin = ({
                   onClick={checkNameValidity}
                   data-uie-name="do-next"
                 >
-                  <ArrowIcon aria-hidden="true" />
+                  <ArrowIcon />
                 </RoundIconButton>
               </InputSubmitCombo>
               {error ? parseValidationErrors(error) : parseError(conversationError)}
@@ -290,6 +290,7 @@ const ConversationJoin = ({
               {_(conversationJoinStrings.existentAccountSubhead)}
             </Text>
             <Button
+              type="button"
               style={{marginTop: 16}}
               onClick={async () => {
                 try {

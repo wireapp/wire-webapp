@@ -78,8 +78,8 @@ const HistoryInfo = ({hasHistory, clients, currentSelfClient, isNewCurrentSelfCl
           </Paragraph>
         )}
         <Button
+          type="button"
           onClick={onContinue}
-          autoFocus
           data-uie-name="do-history-confirm"
           onKeyDown={(event: React.KeyboardEvent) => {
             if (event.key === KEY.ENTER) {

@@ -113,7 +113,7 @@ const ModalComponent: React.FC<ModalComponentProps> = ({
       {...rest}
     >
       {showLoading ? (
-        <Icon.Loading aria-hidden="true" width="48" height="48" css={{path: {fill: 'var(--modal-bg)'}}} />
+        <Icon.Loading width="48" height="48" css={{path: {fill: 'var(--modal-bg)'}}} />
       ) : (
         <div
           onClick={event => event.stopPropagation()}

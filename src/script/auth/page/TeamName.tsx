@@ -152,7 +152,7 @@ const TeamName = ({
                       onClick={handleSubmit}
                       data-uie-name="do-next"
                     >
-                      <ArrowIcon aria-hidden="true" />
+                      <ArrowIcon />
                     </RoundIconButton>
                   </InputSubmitCombo>
                   {error ? parseValidationErrors(error) : parseError(authError)}

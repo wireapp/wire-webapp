@@ -272,14 +272,8 @@ const SingleSignOnForm = ({
           disabled={disableInput}
           data-uie-name="enter-code"
         />
-        <RoundIconButton
-          aria-hidden="true"
-          disabled={!codeOrMail}
-          type="submit"
-          formNoValidate
-          data-uie-name="do-sso-sign-in"
-        >
-          <ArrowIcon aria-hidden="true" />
+        <RoundIconButton disabled={!codeOrMail} type="submit" formNoValidate data-uie-name="do-sso-sign-in">
+          <ArrowIcon />
         </RoundIconButton>
       </InputSubmitCombo>
       {validationError ? (

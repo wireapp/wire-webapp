@@ -73,6 +73,7 @@ export const WirelessContainer: React.FC<Props> = ({showCookiePolicyBanner, onCo
             </Link>
           </div>
           <button
+            type="button"
             onClick={(event: React.MouseEvent<HTMLButtonElement>) => onCookiePolicyBannerClose(event)}
             style={{
               background: 'none',
@@ -85,13 +86,13 @@ export const WirelessContainer: React.FC<Props> = ({showCookiePolicyBanner, onCo
             }}
             data-uie-name="do-close-cookie-banner"
           >
-            <CloseIcon aria-hidden="true" />
+            <CloseIcon />
           </button>
         </Header>
       )}
       <Content>
         <Header style={{height: '40px', marginLeft: '8px', marginTop: '20px'}}>
-          <SVGIcon scale={0.9} realWidth={78} realHeight={25} aria-hidden="true">
+          <SVGIcon scale={0.9} realWidth={78} realHeight={25}>
             <g dangerouslySetInnerHTML={{__html: SVGProvider['logo-full-icon']?.documentElement?.innerHTML}} />
           </SVGIcon>
         </Header>

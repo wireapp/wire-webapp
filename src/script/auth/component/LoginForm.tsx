@@ -121,7 +121,7 @@ const LoginForm = ({isFetching, onSubmit}: LoginFormProps) => {
             aria-label={_(loginStrings.headline)}
             data-uie-name="do-sign-in"
           >
-            <ArrowIcon aria-hidden="true" />
+            <ArrowIcon />
           </RoundIconButton>
         )}
       </InputSubmitCombo>
