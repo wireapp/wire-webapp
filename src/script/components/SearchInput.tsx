@@ -62,7 +62,7 @@ const SearchInput: React.FC<SearchInputProps> = ({
   const placeHolderText = emptyInput && noSelectedUsers ? placeholder : '';
 
   return (
-    <form autoComplete="off" className={`search-outer user-input ${forceDark ? '' : 'user-list-light'}`}>
+    <form autoComplete="off" className={`search-outer ${forceDark ? '' : 'user-list-light'}`}>
       <div className="search-inner-wrap">
         <div className="search-inner" ref={innerElement}>
           <div className="search-icon icon-search" />
