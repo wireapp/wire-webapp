@@ -50,6 +50,7 @@ const Checkbox: React.FC<CheckboxProps> = ({disabled, label, isChecked, name, on
         css={getInputCSS(isChecked, disabled)}
       />
       <svg
+        aria-hidden="true"
         css={getSvgCSS(isChecked, disabled)}
         // This element is purely decorative so
         // we hide it for screen readers

@@ -92,7 +92,7 @@ export const WirelessContainer: React.FC<Props> = ({showCookiePolicyBanner, onCo
       )}
       <Content>
         <Header style={{height: '40px', marginLeft: '8px', marginTop: '20px'}}>
-          <SVGIcon scale={0.9} realWidth={78} realHeight={25}>
+          <SVGIcon aria-hidden="true" scale={0.9} realWidth={78} realHeight={25}>
             <g dangerouslySetInnerHTML={{__html: SVGProvider['logo-full-icon']?.documentElement?.innerHTML}} />
           </SVGIcon>
         </Header>
