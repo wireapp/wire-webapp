@@ -91,6 +91,7 @@ const SearchInput: React.FC<SearchInputProps> = ({
             spellCheck={false}
             type="text"
             value={input}
+            aria-label={placeholder}
           />
           {input && (
             <button className="search-input-cancel" onClick={() => setInput('')}>

@@ -30,6 +30,16 @@
     content: '';
   }
 
+  &:hover {
+    .participant-item {
+      background: var(--white);
+    }
+
+    &::after {
+      border-bottom: none;
+    }
+  }
+
   .camera-icon,
   .federation-icon,
   .guest-icon svg,
