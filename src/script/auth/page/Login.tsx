@@ -248,7 +248,7 @@ const Login = ({
 
   const backArrow = (
     <RouterLink to={ROUTE.INDEX} data-uie-name="go-index" aria-label={_(loginStrings.goBack)}>
-      <ArrowIcon direction="left" color={COLOR.TEXT} style={{opacity: 0.56}} />
+      <ArrowIcon aria-hidden="true" direction="left" color={COLOR.TEXT} style={{opacity: 0.56}} />
     </RouterLink>
   );
 

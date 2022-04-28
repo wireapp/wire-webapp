@@ -53,13 +53,12 @@ const EntropyContainer = ({onSetEntropy}: Props) => {
       <H1 center>{_(setEntropyStrings.headline)}</H1>
       {frames > 300 && percent >= 100 ? (
         <>
-          <CheckRoundIcon width={64} height={64} css={{alignSelf: 'center', marginBottom: 64}} />
+          <CheckRoundIcon aria-hidden="true" width={64} height={64} css={{alignSelf: 'center', marginBottom: 64}} />
           <Muted center style={{marginBottom: 40}}>
             {_(setEntropyStrings.success)}
           </Muted>
           <Button
             onClick={() => onSetEntropy(entropy)}
-            autoFocus
             data-uie-name="do-entropy-confirm"
             onKeyDown={(event: React.KeyboardEvent) => {
               if (event.key === KEY.ENTER) {

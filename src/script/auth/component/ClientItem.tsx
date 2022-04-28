@@ -208,7 +208,7 @@ const ClientItem = ({selected, onClientRemoval, onClick, client, clientError, re
         >
           <div style={{display: 'flex', flexDirection: 'row'}}>
             <div style={{flexBasis: '32px', margin: 'auto'}}>
-              <DeviceIcon color="#323639" />
+              <DeviceIcon aria-hidden="true" color="#323639" />
             </div>
             <div style={{flexGrow: 1}}>
               <Text bold block color="#323639" data-uie-name="device-header-model">
@@ -226,7 +226,7 @@ const ClientItem = ({selected, onClientRemoval, onClick, client, clientError, re
                 style={{margin: 'auto'}}
                 type="submit"
               >
-                <TrashIcon />
+                <TrashIcon aria-hidden="true" />
               </RoundIconButton>
             )}
           </div>
@@ -238,7 +238,6 @@ const ClientItem = ({selected, onClientRemoval, onClick, client, clientError, re
               <InputSubmitCombo style={{background: 'transparent', boxShadow: 'none', marginBottom: '0'}}>
                 <Input
                   autoComplete="section-login password"
-                  autoFocus
                   data-uie-name="remove-device-password"
                   ref={passwordInput}
                   name="password"
@@ -262,7 +261,7 @@ const ClientItem = ({selected, onClientRemoval, onClick, client, clientError, re
                   style={{marginBottom: '-4px'}}
                   type="submit"
                 >
-                  <TrashIcon />
+                  <TrashIcon aria-hidden="true" />
                 </RoundIconButton>
               </InputSubmitCombo>
             </Form>

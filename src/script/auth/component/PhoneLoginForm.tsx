@@ -109,7 +109,7 @@ const PhoneLoginForm = ({isFetching, onSubmit}: LoginFormProps) => {
             onClick={handleSubmit}
             data-uie-name="do-sign-in-phone"
           >
-            <ArrowIcon />
+            <ArrowIcon aria-hidden="true" />
           </RoundIconButton>
         )}
       </InputSubmitCombo>

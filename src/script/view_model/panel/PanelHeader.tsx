@@ -35,13 +35,13 @@ const PanelHeader: React.FC<PanelHeaderProps> = ({onGoBack, onClose, title, goBa
     <div className="panel__header">
       <DragableClickWrapper onClick={onGoBack}>
         <div className="icon-button" data-uie-name={goBackUie}>
-          <Icon.ArrowLeft />
+          <Icon.ArrowLeft aria-hidden="true" />
         </div>
       </DragableClickWrapper>
       <div className="panel__header__title">{title}</div>
       <DragableClickWrapper onClick={onClose}>
         <div className="icon-button" data-uie-name={closeUie}>
-          <Icon.Close className="right-panel-close" />
+          <Icon.Close aria-hidden="true" className="right-panel-close" />
         </div>
       </DragableClickWrapper>
     </div>

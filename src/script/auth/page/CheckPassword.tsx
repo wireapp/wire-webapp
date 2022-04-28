@@ -119,7 +119,6 @@ const CheckPassword = ({loginData, doLogin, resetAuthError, isFetching}: Props &
           <InputSubmitCombo>
             <Input
               onChange={(event: React.ChangeEvent<HTMLInputElement>) => setPassword(event.target.value)}
-              tabIndex={1}
               type="password"
               name="password-login"
               autoComplete="section-login password"
@@ -127,7 +126,6 @@ const CheckPassword = ({loginData, doLogin, resetAuthError, isFetching}: Props &
               pattern={'.{1,1024}'}
               data-uie-name="enter-password"
               required
-              autoFocus
               ref={passwordInput}
               markInvalid={!validPasswordInput}
               value={password}
@@ -137,7 +135,6 @@ const CheckPassword = ({loginData, doLogin, resetAuthError, isFetching}: Props &
             ) : (
               <RoundIconButton
                 style={{marginLeft: 16}}
-                tabIndex={2}
                 type="submit"
                 formNoValidate
                 onClick={handleLogin}
@@ -145,7 +142,7 @@ const CheckPassword = ({loginData, doLogin, resetAuthError, isFetching}: Props &
                 showLoading={isFetching}
                 data-uie-name="do-sign-in"
               >
-                <ArrowIcon />
+                <ArrowIcon aria-hidden="true" />
               </RoundIconButton>
             )}
           </InputSubmitCombo>

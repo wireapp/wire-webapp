@@ -244,7 +244,6 @@ const ConversationJoin = ({
                     setEnteredName(event.target.value);
                   }}
                   placeholder={_(conversationJoinStrings.namePlaceholder)}
-                  autoFocus
                   maxLength={64}
                   minLength={2}
                   pattern=".{2,64}"
@@ -258,7 +257,7 @@ const ConversationJoin = ({
                   onClick={checkNameValidity}
                   data-uie-name="do-next"
                 >
-                  <ArrowIcon />
+                  <ArrowIcon aria-hidden="true" />
                 </RoundIconButton>
               </InputSubmitCombo>
               {error ? parseValidationErrors(error) : parseError(conversationError)}

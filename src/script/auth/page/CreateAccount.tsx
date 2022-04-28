@@ -35,7 +35,7 @@ const CreateAccount = ({}: Props) => {
   const {history} = useReactRouter();
   const backArrow = (
     <RouterLink to={ROUTE.CREATE_TEAM} data-uie-name="go-register-team">
-      <ArrowIcon direction="left" color={COLOR.TEXT} style={{opacity: 0.56}} />
+      <ArrowIcon aria-hidden="true" direction="left" color={COLOR.TEXT} style={{opacity: 0.56}} />
     </RouterLink>
   );
 

@@ -50,7 +50,7 @@ const SetAccountType = ({}: Props) => {
 
   const backArrow = (
     <RouterLink to={ROUTE.INDEX} data-uie-name="go-index" aria-label={_(setAccountTypeStrings.goBack)}>
-      <ArrowIcon direction="left" color={COLOR.TEXT} style={{opacity: 0.56}} />
+      <ArrowIcon aria-hidden="true" direction="left" color={COLOR.TEXT} style={{opacity: 0.56}} />
     </RouterLink>
   );
 
@@ -90,7 +90,7 @@ const SetAccountType = ({}: Props) => {
                       background: COLOR.GREEN,
                     }}
                   >
-                    <ProfileIcon height={31} width={31} color={'white'} />
+                    <ProfileIcon aria-hidden="true" height={31} width={31} color={'white'} />
                   </div>
                   <Bold fontSize="24px" color={COLOR.LINK}>
                     {_(setAccountTypeStrings.createAccountForPersonalUse)}
@@ -122,7 +122,7 @@ const SetAccountType = ({}: Props) => {
                       background: COLOR.BLUE,
                     }}
                   >
-                    <TeamIcon height={31} width={31} color={'white'} />
+                    <TeamIcon aria-hidden="true" height={31} width={31} color={'white'} />
                   </div>
                   <Bold fontSize="24px" color={COLOR.LINK}>
                     {_(setAccountTypeStrings.createAccountForOrganizations)}

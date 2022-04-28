@@ -267,14 +267,19 @@ const SingleSignOnForm = ({
               ? `(${SSO_CODE_PREFIX_REGEX}${PATTERN.UUID_V4}|${PATTERN.EMAIL})`
               : `${SSO_CODE_PREFIX_REGEX}${PATTERN.UUID_V4}`
           }
-          autoFocus
           type="text"
           required
           disabled={disableInput}
           data-uie-name="enter-code"
         />
-        <RoundIconButton disabled={!codeOrMail} type="submit" formNoValidate data-uie-name="do-sso-sign-in">
-          <ArrowIcon />
+        <RoundIconButton
+          aria-hidden="true"
+          disabled={!codeOrMail}
+          type="submit"
+          formNoValidate
+          data-uie-name="do-sso-sign-in"
+        >
+          <ArrowIcon aria-hidden="true" />
         </RoundIconButton>
       </InputSubmitCombo>
       {validationError ? (

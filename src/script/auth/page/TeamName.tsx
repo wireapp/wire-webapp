@@ -143,7 +143,6 @@ const TeamName = ({
                       maxLength={256}
                       minLength={2}
                       required
-                      autoFocus
                       data-uie-name="enter-team-name"
                     />
                     <RoundIconButton
@@ -153,7 +152,7 @@ const TeamName = ({
                       onClick={handleSubmit}
                       data-uie-name="do-next"
                     >
-                      <ArrowIcon />
+                      <ArrowIcon aria-hidden="true" />
                     </RoundIconButton>
                   </InputSubmitCombo>
                   {error ? parseValidationErrors(error) : parseError(authError)}
