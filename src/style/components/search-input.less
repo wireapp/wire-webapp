@@ -113,9 +113,9 @@
 
   &::placeholder {
     &:invalid {
-      color: var(--foreground-fade-40);
+      color: var(--gray-50);
     }
-    color: var(--foreground-fade-40);
+    color: var(--gray-70);
   }
 
   // hack for chrome to fix line height issue
@@ -137,6 +137,14 @@
   &:focus-visible,
   &:active {
     border-color: var(--accent-color-500);
+  }
+}
+
+body.theme-dark {
+  .search-inner > input {
+    &::placeholder {
+      color: var(--gray-60);
+    }
   }
 }
 

@@ -60,10 +60,6 @@ body.theme-dark {
   }
 }
 
-.left-list-header-start-ui {
-  background-color: rgba(255, 255, 255, 0.08);
-}
-
 .left-list-header-availability,
 .left-list-header-availability .availability-state {
   .button-reset-default;
@@ -194,7 +190,7 @@ body.theme-dark {
     height: 100%;
     flex: 1 1;
     align-items: center;
-    border-bottom: 1px solid var(--border-color);
+    border-bottom: 1px solid var(--gray-40);
     margin-right: -8px;
     cursor: pointer;
     font-weight: @font-weight-medium;
@@ -244,6 +240,13 @@ body.theme-dark {
 }
 
 body.theme-dark {
+  .left-list-item {
+    > .center-column,
+    > .left-list-item-button > .center-column {
+      border-bottom-color: var(--gray-90);
+    }
+  }
+
   .left-list-item-button {
     &:hover {
       background: @gray-95;
