@@ -150,9 +150,13 @@ export class CallingViewModel {
       return this.propertiesRepository.getPreference(PROPERTIES_TYPE.CALL.ENABLE_SOUNDLESS_INCOMING_CALLS);
     };
 
+    const hasJoinedCall = (): boolean => {
+      return !!this.callState.joinedCall();
+    };
+
     this.callingRepository.onIncomingCall((call: Call) => {
       const shouldRing = this.selfUser().availability() !== Availability.Type.AWAY;
-      if (shouldRing && (!hasSoundlessCallsEnabled() || this.activeCalls().length === 1)) {
+      if (shouldRing && (!hasSoundlessCallsEnabled() || !hasJoinedCall())) {
         ring(call);
       }
     });
