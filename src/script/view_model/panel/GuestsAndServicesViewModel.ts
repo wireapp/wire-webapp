@@ -41,6 +41,7 @@ export class GuestsAndServicesViewModel extends BasePanelViewModel {
   logger: Logger;
   isLinkCopied: ko.Observable<boolean>;
   requestOngoing: ko.Observable<boolean>;
+  isToggleDisabled: ko.PureComputed<boolean>;
   isGuestRoom: ko.PureComputed<boolean>;
   isGuestAndServicesRoom: ko.PureComputed<boolean>;
   isTeamOnly: ko.PureComputed<boolean>;
@@ -69,6 +70,7 @@ export class GuestsAndServicesViewModel extends BasePanelViewModel {
 
     this.isLinkCopied = ko.observable(false);
     this.requestOngoing = ko.observable(false);
+    this.isToggleDisabled = ko.pureComputed(() => this.requestOngoing() || !this.activeConversation().inTeam());
 
     this.isGuestRoom = ko.pureComputed(() => this.activeConversation()?.isGuestRoom());
     this.isGuestAndServicesRoom = ko.pureComputed(() => this.activeConversation()?.isGuestAndServicesRoom());
