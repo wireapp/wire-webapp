@@ -83,10 +83,11 @@ const CustomEnvironmentRedirect = ({doNavigate, doSendNavigationEvent}: Dispatch
               width: 120,
             }}
           >
-            <SVGIcon color={COLOR.WHITE} realWidth={47} realHeight={38}>
+            <SVGIcon aria-hidden="true" color={COLOR.WHITE} realWidth={47} realHeight={38}>
               <g dangerouslySetInnerHTML={{__html: SVGProvider['logo-icon']?.documentElement?.innerHTML}} />
             </SVGIcon>
             <svg
+              aria-hidden="true"
               style={{position: 'absolute'}}
               width={124}
               height={124}

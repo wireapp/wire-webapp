@@ -107,7 +107,7 @@ const TextInput: React.ForwardRefRenderFunction<HTMLDivElement, UserInputProps> 
         {label}
       </label>
       {isFilled && !isSuccess && !isError && (
-        <button css={cancelButtonCSS} onClick={onCancel}>
+        <button type="button" css={cancelButtonCSS} onClick={onCancel}>
           <Icon.Close css={{fill: 'var(--text-input-background)', height: 8, width: 8}} />
         </button>
       )}

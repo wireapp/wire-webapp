@@ -267,7 +267,6 @@ const SingleSignOnForm = ({
               ? `(${SSO_CODE_PREFIX_REGEX}${PATTERN.UUID_V4}|${PATTERN.EMAIL})`
               : `${SSO_CODE_PREFIX_REGEX}${PATTERN.UUID_V4}`
           }
-          autoFocus
           type="text"
           required
           disabled={disableInput}

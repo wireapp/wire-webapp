@@ -92,7 +92,6 @@ const SetEmail = ({hasSelfEmail, isSelfSSOUser, doSetEmail, isFetching}: Props &
             value={email}
             ref={emailInput}
             markInvalid={!isValidEmail}
-            autoFocus
             maxLength={128}
             required
             data-uie-name="enter-email"

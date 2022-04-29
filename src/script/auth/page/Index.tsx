@@ -67,7 +67,14 @@ const Index = ({defaultSSOCode}: Props & ConnectedProps & DispatchProps) => {
   return (
     <Page>
       <ContainerXS centerText verticalCenter style={{width: '380px'}}>
-        <SVGIcon scale={1.3} realWidth={78} realHeight={25} style={{marginBottom: '80px'}} data-uie-name="ui-wire-logo">
+        <SVGIcon
+          aria-hidden="true"
+          scale={1.3}
+          realWidth={78}
+          realHeight={25}
+          style={{marginBottom: '80px'}}
+          data-uie-name="ui-wire-logo"
+        >
           <g dangerouslySetInnerHTML={{__html: SVGProvider['logo-full-icon']?.documentElement?.innerHTML}} />
         </SVGIcon>
         <Text
@@ -81,6 +88,7 @@ const Index = ({defaultSSOCode}: Props & ConnectedProps & DispatchProps) => {
         {Config.getConfig().FEATURE.ENABLE_ACCOUNT_REGISTRATION ? (
           <>
             <Button
+              type="button"
               onClick={() => history.push(ROUTE.SET_ACCOUNT_TYPE)}
               block
               style={{fontSize: '13px'}}
@@ -89,6 +97,7 @@ const Index = ({defaultSSOCode}: Props & ConnectedProps & DispatchProps) => {
               {_(indexStrings.createAccount)}
             </Button>
             <Button
+              type="button"
               onClick={() => history.push(ROUTE.LOGIN)}
               block
               backgroundColor={'transparent'}
@@ -110,6 +119,7 @@ const Index = ({defaultSSOCode}: Props & ConnectedProps & DispatchProps) => {
             )}
             {(Config.getConfig().FEATURE.ENABLE_SSO || Config.getConfig().FEATURE.ENABLE_DOMAIN_DISCOVERY) && (
               <Button
+                type="button"
                 onClick={() => history.push(ROUTE.SSO)}
                 block
                 color={COLOR.TEXT}
@@ -125,11 +135,18 @@ const Index = ({defaultSSOCode}: Props & ConnectedProps & DispatchProps) => {
           </>
         ) : (
           <>
-            <Button onClick={() => history.push(ROUTE.LOGIN)} block style={{fontSize: '13px'}} data-uie-name="go-login">
+            <Button
+              type="button"
+              onClick={() => history.push(ROUTE.LOGIN)}
+              block
+              style={{fontSize: '13px'}}
+              data-uie-name="go-login"
+            >
               {_(indexStrings.logIn)}
             </Button>
             {(Config.getConfig().FEATURE.ENABLE_SSO || Config.getConfig().FEATURE.ENABLE_DOMAIN_DISCOVERY) && (
               <Button
+                type="button"
                 onClick={() => history.push(ROUTE.SSO)}
                 block
                 backgroundColor={'transparent'}

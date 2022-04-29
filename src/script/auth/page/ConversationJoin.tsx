@@ -244,7 +244,6 @@ const ConversationJoin = ({
                     setEnteredName(event.target.value);
                   }}
                   placeholder={_(conversationJoinStrings.namePlaceholder)}
-                  autoFocus
                   maxLength={64}
                   minLength={2}
                   pattern=".{2,64}"
@@ -291,6 +290,7 @@ const ConversationJoin = ({
               {_(conversationJoinStrings.existentAccountSubhead)}
             </Text>
             <Button
+              type="button"
               style={{marginTop: 16}}
               onClick={async () => {
                 try {
