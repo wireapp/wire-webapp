@@ -27,7 +27,7 @@ class InfoTogglePage extends TestPage<InfoToggleProps> {
   }
 
   getInput = () => this.get('input[data-uie-name="info-toggle-input"]');
-  getInfo = (dataUieName: string) => this.get(`div[data-uie-name="status-info-toggle-${dataUieName}"]`);
+  getInfo = (dataUieName: string) => this.get(`[data-uie-name="status-info-toggle-${dataUieName}"]`);
 }
 
 describe('InfoToggle', () => {

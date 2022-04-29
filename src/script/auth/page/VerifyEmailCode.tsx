@@ -107,7 +107,7 @@ const VerifyEmailCode = ({
               }}
             />
           </Muted>
-          <CodeInput autoFocus style={{marginTop: 10}} onCodeComplete={createAccount} data-uie-name="enter-code" />
+          <CodeInput style={{marginTop: 10}} onCodeComplete={createAccount} data-uie-name="enter-code" />
           {parseError(authError)}
         </div>
         <div>

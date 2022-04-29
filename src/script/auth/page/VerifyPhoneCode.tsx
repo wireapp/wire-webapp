@@ -115,7 +115,7 @@ const VerifyPhoneCode = ({
       >
         <div>
           <H1 center>{_(phoneLoginStrings.verifyCodeDescription, {number: loginData.phone})}</H1>
-          <CodeInput autoFocus style={{marginTop: 10}} onCodeComplete={handleLogin} data-uie-name="enter-code" />
+          <CodeInput style={{marginTop: 10}} onCodeComplete={handleLogin} data-uie-name="enter-code" />
           {parseError(error)}
         </div>
         <Columns>
