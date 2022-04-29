@@ -66,11 +66,6 @@ const SearchInput: React.FC<SearchInputProps> = ({
       <div className="search-inner-wrap">
         <div className="search-inner" ref={innerElement}>
           <div className="search-icon icon-search" />
-          {selectedUsers.map(({name, id}) => (
-            <span key={id} data-uie-name="item-selected">
-              {name()}
-            </span>
-          ))}
           <input
             className="search-input"
             data-uie-name="enter-users"
@@ -98,6 +93,13 @@ const SearchInput: React.FC<SearchInputProps> = ({
               <Icon.Close css={{fill: 'var(--text-input-background)', height: 8, width: 8}} />
             </button>
           )}
+        </div>
+        <div className="search-input-selected">
+          {selectedUsers.map(({name, id}) => (
+            <span key={id} data-uie-name="item-selected">
+              {name()}
+            </span>
+          ))}
         </div>
       </div>
     </form>
