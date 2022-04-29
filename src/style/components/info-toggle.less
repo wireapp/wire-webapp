@@ -25,7 +25,10 @@
   .info-toggle__name {
     .text-medium;
     margin: 0;
+    color: var(--black);
     cursor: pointer;
+    font-weight: @font-weight-light;
+    line-height: @line-height-lg;
   }
 
   .info-toggle__row {
@@ -50,18 +53,20 @@
   }
 
   .modal-style & {
-    margin-bottom: 24px;
+    margin-bottom: 16px;
 
     .info-toggle__row {
-      padding: 12px;
+      padding: 10px;
       border: none;
       margin: 0 -8px;
-      background-color: var(--foreground-fade-8);
       border-radius: 4px;
     }
 
     .info-toggle__details {
-      margin: 8px 4px 0;
+      margin: 0 2px 0;
+      color: var(--gray-90);
+      font-size: @font-size-small;
+      line-height: 14px;
     }
   }
 }

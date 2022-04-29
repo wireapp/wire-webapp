@@ -53,6 +53,7 @@
         </div>
         <!-- ko if: isTeam -->
         <div class="modal__info" data-bind="text: t('groupSizeInfo', maxSize), style: { visibility: nameError().length > 0 ? 'hidden' : 'visible' }" data-uie-name="status-group-size-info"></div>
+        <hr class="group-creation__modal__separator" />
         <base-toggle class="modal-style"
         params="isChecked: isGuestEnabled(), setIsChecked: clickOnToggleGuestMode, extendedInfo: true, extendedInfoText: t('guestRoomToggleInfoExtended'), infoText: t('guestRoomToggleInfo'), toggleName: t('guestOptionsTitle')"
       ></base-toggle>
