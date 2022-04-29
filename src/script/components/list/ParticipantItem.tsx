@@ -144,6 +144,7 @@ const ParticipantItem = <UserType extends User | ServiceEntity>(
       onContextMenu={onContextMenu}
       onClick={noInteraction ? noop : event => onClick(participant, event.nativeEvent)}
       onKeyDown={noInteraction ? noop : event => onKeyDown(participant, event.nativeEvent)}
+      aria-label={t('accessibility.openConversation', participantName)}
     >
       <div
         className="participant-item"
