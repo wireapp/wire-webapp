@@ -35,8 +35,18 @@
     right: 0;
     bottom: 0;
     left: @left-list-item-left-width;
-    border-bottom: 1px solid var(--border-color);
+    border-bottom: 1px solid var(--gray-40);
     content: '';
+  }
+
+  &:hover {
+    .participant-item {
+      background: var(--white);
+    }
+
+    &::after {
+      border-bottom: none;
+    }
   }
 
   .camera-icon,
@@ -177,6 +187,20 @@
 
   &.no-interaction .participant-item {
     cursor: default;
+  }
+}
+
+body.theme-dark {
+  .participant-item-wrapper {
+    &:not(.no-underline)::after {
+      border-bottom-color: var(--gray-90);
+    }
+  }
+
+  .participant-item-wrapper:hover {
+    .participant-item {
+      background: #26272c;
+    }
   }
 }
 

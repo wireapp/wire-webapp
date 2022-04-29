@@ -23,7 +23,7 @@ import ListWrapper from '../ListWrapper';
 import {container} from 'tsyringe';
 import {TeamState} from '../../../../team/TeamState';
 import {UserState} from '../../../../user/UserState';
-import UserInput from 'Components/UserInput';
+import SearchInput from 'Components/SearchInput';
 import {t} from 'Util/LocalizerUtil';
 import cx from 'classnames';
 import {SearchRepository} from '../../../../search/SearchRepository';
@@ -129,7 +129,7 @@ const StartUI: React.FC<StartUIProps> = ({
   const before = (
     <div id="start-ui-header" className={cx('start-ui-header', {'start-ui-header-integrations': isTeam})}>
       <div className="start-ui-header-user-input" data-uie-name="enter-search">
-        <UserInput
+        <SearchInput
           input={searchQuery}
           placeholder={isFederated ? t('searchPlaceholderFederation') : t('searchPlaceholder')}
           selectedUsers={[]}

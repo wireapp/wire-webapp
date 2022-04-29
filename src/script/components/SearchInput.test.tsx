@@ -18,14 +18,14 @@
  */
 
 import TestPage from 'Util/test/TestPage';
-import UserInput, {UserInputProps} from 'Components/UserInput';
+import SearchInput, {SearchInputProps} from 'Components/SearchInput';
 import ko from 'knockout';
 import {User} from '../entity/User';
 import {KEY} from 'Util/KeyboardUtil';
 
-class UserInputPage extends TestPage<UserInputProps> {
-  constructor(props?: UserInputProps) {
-    super(UserInput, props);
+class SearchInputPage extends TestPage<SearchInputProps> {
+  constructor(props?: SearchInputProps) {
+    super(SearchInput, props);
   }
 
   getInput = () => this.get('[data-uie-name="enter-users"]');
@@ -33,9 +33,9 @@ class UserInputPage extends TestPage<UserInputProps> {
   pressBackSpace = () => this.keyDown(this.getInput(), KEY.BACKSPACE);
 }
 
-describe('UserInput', () => {
+describe('SearchInput', () => {
   it('lists all selected users', async () => {
-    const userInputPage = new UserInputPage({
+    const userInputPage = new SearchInputPage({
       enter: () => {},
       input: '',
       placeholder: '',
@@ -64,7 +64,7 @@ describe('UserInput', () => {
       setSelectedUsers: selectedUsers,
     };
 
-    const userInputPage = new UserInputPage(props);
+    const userInputPage = new SearchInputPage(props);
     expect(userInputPage.getSelectedUsers().length).toBe(4);
 
     userInputPage.pressBackSpace();

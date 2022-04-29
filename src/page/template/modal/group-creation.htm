@@ -9,7 +9,7 @@
       <!-- ko if: stateIsPreferences() -->
         <button class="button-reset-default" type="button" data-bind="click: clickOnClose, attr: { 'aria-label': t('accessibility.groupCreationActionCloseModal')}" data-uie-name="do-close"><close-icon aria-hidden="true" class="modal__header__button"></close-icon></button>
         <h2 id="group-creation-label" class="modal__header__title" data-bind="text: t('groupCreationPreferencesHeader')"></h2>
-        <button id="group-go-next" class="group-creation__action" type="button" data-bind="click: clickOnNext, css: {'accent-text': nameInput().length, 'enabled': nameInput().length}, enable: nameInput().length, text: t('groupCreationPreferencesAction'), attr: { 'aria-label': t('groupCreationPreferencesAction'), 'disabled': !nameInput().length }" data-uie-name="go-next"></button>
+        <button id="group-go-next" class="group-creation__action" type="button" data-bind="click: clickOnNext, css: {'accent-text': groupName().length, 'enabled': groupName().length && !nameError().length}, text: t('groupCreationPreferencesAction'), attr: { 'aria-label': t('groupCreationPreferencesAction') }" data-uie-name="go-next"></button>
       <!-- /ko -->
     </div>
     <!-- ko if: stateIsParticipants() -->
@@ -24,7 +24,7 @@
       <!-- ko if: stateIsParticipants() -->
         <div class="group-creation__list" data-bind="fadingscrollbar">
           <!-- ko if: contacts().length -->
-            <user-list class="group-creation-modal-participants-list user-list-light" params="  
+            <user-list class="group-creation-modal-participants-list user-list-light" params="
               observables: {users: contacts, filter: participantsInput, selected: selectedContacts},
               searchRepository: searchRepository,
               teamRepository: teamRepository,
@@ -36,14 +36,24 @@
       <!-- /ko -->
       <!-- ko if: stateIsPreferences() -->
         <div class="modal-input-wrapper">
-          <input class="modal__input"
-          autocomplete="off" required spellcheck="false" type="text"
-          data-bind="attr: {maxlength: maxNameLength, placeholder: t('groupCreationPreferencesPlaceholder')}, enter: clickOnNext, hasFocus: true, textInput: nameInput"
-          data-uie-name="enter-group-name" />
-          <div class="group-creation__error" data-bind="text: nameError, visible: nameError().length" data-uie-name="error-group-name"></div>
+          <text-input
+            params="
+              label: t('groupCreationPreferencesPlaceholder'),
+              placeholder: t('groupCreationPreferencesPlaceholder'),
+              uieName: 'enter-group-name',
+              name: 'enter-group-name',
+              onCancel: onGroupNameCancel,
+              onChange: onGroupNameChange,
+              value: groupName,
+              isError: nameError().length > 0,
+              errorMessage: nameError
+            "
+          >
+          </text-input>
         </div>
         <!-- ko if: isTeam -->
-        <div class="modal__info" data-bind="text: t('groupSizeInfo', maxSize)" data-uie-name="status-group-size-info"></div>
+        <div class="modal__info" data-bind="text: t('groupSizeInfo', maxSize), style: { visibility: nameError().length > 0 ? 'hidden' : 'visible' }" data-uie-name="status-group-size-info"></div>
+        <hr class="group-creation__modal__separator" />
         <base-toggle class="modal-style"
         params="isChecked: isGuestEnabled(), setIsChecked: clickOnToggleGuestMode, extendedInfo: true, extendedInfoText: t('guestRoomToggleInfoExtended'), infoText: t('guestRoomToggleInfo'), toggleName: t('guestOptionsTitle')"
       ></base-toggle>

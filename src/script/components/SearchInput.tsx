@@ -22,8 +22,9 @@ import {registerReactComponent} from 'Util/ComponentUtil';
 import type {User} from '../entity/User';
 import {MAX_HANDLE_LENGTH} from '../user/UserHandleGenerator';
 import {isEnterKey, isRemovalAction} from 'Util/KeyboardUtil';
+import Icon from 'Components/Icon';
 
-export interface UserInputProps {
+export interface SearchInputProps {
   enter?: () => void | Promise<void>;
   /** Will force the component to have a dark theme and not follow user's theme */
   forceDark?: boolean;
@@ -34,7 +35,7 @@ export interface UserInputProps {
   setSelectedUsers?: (users: User[]) => void;
 }
 
-const UserInput: React.FC<UserInputProps> = ({
+const SearchInput: React.FC<SearchInputProps> = ({
   enter: onEnter,
   input,
   selectedUsers = [],
@@ -42,7 +43,7 @@ const UserInput: React.FC<UserInputProps> = ({
   placeholder,
   setInput,
   forceDark,
-}: UserInputProps) => {
+}: SearchInputProps) => {
   const innerElement = useRef<HTMLDivElement>();
   const inputElement = useRef<HTMLInputElement>();
 
@@ -61,15 +62,10 @@ const UserInput: React.FC<UserInputProps> = ({
   const placeHolderText = emptyInput && noSelectedUsers ? placeholder : '';
 
   return (
-    <form autoComplete="off" className={`search-outer user-input ${forceDark ? '' : 'user-list-light'}`}>
+    <form autoComplete="off" className={`search-outer ${forceDark ? '' : 'user-list-light'}`}>
       <div className="search-inner-wrap">
         <div className="search-inner" ref={innerElement}>
           <div className="search-icon icon-search" />
-          {selectedUsers.map(({name, id}) => (
-            <span key={id} data-uie-name="item-selected">
-              {name()}
-            </span>
-          ))}
           <input
             className="search-input"
             data-uie-name="enter-users"
@@ -90,13 +86,26 @@ const UserInput: React.FC<UserInputProps> = ({
             spellCheck={false}
             type="text"
             value={input}
+            aria-label={placeholder}
           />
+          {input && (
+            <button className="search-input-cancel" onClick={() => setInput('')}>
+              <Icon.Close css={{fill: 'var(--text-input-background)', height: 8, width: 8}} />
+            </button>
+          )}
+        </div>
+        <div className="search-input-selected">
+          {selectedUsers.map(({name, id}) => (
+            <span key={id} data-uie-name="item-selected">
+              {name()}
+            </span>
+          ))}
         </div>
       </div>
     </form>
   );
 };
 
-export default UserInput;
+export default SearchInput;
 
-registerReactComponent('user-input', UserInput);
+registerReactComponent('user-input', SearchInput);

@@ -257,12 +257,12 @@
     flex-direction: column;
 
     align-self: center;
-    padding: 30px 30px 26px;
+    padding: 20px;
 
-    border: var(--modal-border-color);
+    border: var(--gray-10);
     margin: auto;
     animation: scaleIn 0.35s @ease-out-quart;
-    background-color: var(--modal-bg);
+    background-color: var(--white);
     border-radius: 4px;
     cursor: default;
     font-size: 16px;
@@ -441,9 +441,9 @@
   }
   &__info {
     margin: 8px 0 24px;
-    color: var(--foreground);
-    font-size: @font-size-xs;
-    line-height: @line-height-sm;
+    color: var(--gray-80);
+    font-size: @font-size-small;
+    line-height: 14px;
   }
 
   &__cta {
@@ -459,6 +459,17 @@
       font-weight: @font-weight-regular;
       text-align: right;
     }
+  }
+}
+
+body.theme-dark {
+  .modal__info {
+    color: var(--gray-40);
+  }
+
+  .modal__content {
+    border-color: var(--gray-10);
+    background: var(--gray-95);
   }
 }
 

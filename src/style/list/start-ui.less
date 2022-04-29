@@ -36,7 +36,6 @@
 
 .start-ui-header {
   padding: 8px;
-  background-color: rgba(255, 255, 255, 0.08);
   &.start-ui-header-integrations {
     padding-bottom: 0;
     margin-bottom: -1px;
@@ -92,7 +91,8 @@
   display: flex;
   height: 44px;
   padding: 0 8px;
-  margin: 0;
+  border-bottom: 1px solid var(--gray-50);
+  margin: 20px -8px 0;
 
   .start-ui-list-tab {
     .flex-center;
@@ -100,9 +100,10 @@
 
     flex-grow: 1;
     border-bottom: 1px solid transparent;
+    margin: 0 10px -1px;
 
     &.active {
-      border-bottom-color: var(--main-color);
+      border-bottom-color: var(--black);
       pointer-events: none;
 
       .start-ui-list-tab-button {
@@ -120,13 +121,26 @@
 
       color: var(--main-color);
       cursor: pointer;
-      font-size: 11px;
-      font-weight: 600;
-      opacity: 0.56;
+      font-size: @font-size-small;
+      font-weight: @font-weight-medium;
+      line-height: 14px;
       text-transform: uppercase;
     }
   }
 }
+
+body.theme-dark {
+  .start-ui-list-tabs {
+    border-bottom-color: var(--gray-70);
+
+    .start-ui-list-tab {
+      &.active {
+        border-bottom-color: var(--white);
+      }
+    }
+  }
+}
+
 .panel-manage-services,
 .start-ui-list,
 .start-ui-manage-services {
@@ -210,7 +224,20 @@
 .start-ui-list-header-connections,
 .start-ui-list-header-contacts,
 .start-ui-list-header-top-people {
+  padding-bottom: 4px;
+  border-bottom: 1px solid var(--gray-60);
   margin-top: 16px;
+  margin-bottom: 0;
+  color: var(--gray-70);
+}
+
+body.theme-dark {
+  .start-ui-list-header-connections,
+  .start-ui-list-header-contacts,
+  .start-ui-list-header-top-people {
+    border-bottom-color: var(--gray-70);
+    color: var(--gray-50);
+  }
 }
 
 .start-ui-list-header-top-people {

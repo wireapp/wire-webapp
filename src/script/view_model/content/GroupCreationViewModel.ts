@@ -44,7 +44,6 @@ export class GroupCreationViewModel {
   private isCreatingConversation: boolean;
   groupCreationSource: GroupCreationSource;
   nameError: ko.Observable<string>;
-  nameInput: ko.Observable<string>;
   selectedContacts: ko.ObservableArray<User>;
   showContacts: ko.Observable<boolean>;
   participantsInput: ko.Observable<string>;
@@ -65,6 +64,11 @@ export class GroupCreationViewModel {
   maxNameLength: number;
   maxSize: number;
 
+  // onGroupNameBlur,
+  // onChange: onGroupNameChange,
+  // onKeyDown: onGroupNameKeydown,
+  groupName: ko.Observable<string>;
+
   static get STATE() {
     return {
       DEFAULT: 'GroupCreationViewModel.STATE.DEFAULT',
@@ -80,6 +84,7 @@ export class GroupCreationViewModel {
     private readonly userState = container.resolve(UserState),
     private readonly teamState = container.resolve(TeamState),
   ) {
+    this.groupName = ko.observable('');
     this.isTeam = this.teamState.isTeam;
     this.maxNameLength = ConversationRepository.CONFIG.GROUP.MAX_NAME_LENGTH;
     this.maxSize = ConversationRepository.CONFIG.GROUP.MAX_SIZE;
@@ -90,7 +95,6 @@ export class GroupCreationViewModel {
     this.isCreatingConversation = false;
     this.groupCreationSource = undefined;
     this.nameError = ko.observable('');
-    this.nameInput = ko.observable('');
     this.selectedContacts = ko.observableArray([]);
     this.showContacts = ko.observable(false);
     this.participantsInput = ko.observable('');
@@ -139,7 +143,6 @@ export class GroupCreationViewModel {
     this.stateIsPreferences = ko.pureComputed(() => this.state() === GroupCreationViewModel.STATE.PREFERENCES);
     this.stateIsParticipants = ko.pureComputed(() => this.state() === GroupCreationViewModel.STATE.PARTICIPANTS);
 
-    this.nameInput.subscribe(() => this.nameError(''));
     const onEscape = () => this.isShown(false);
     this.stateIsPreferences.subscribe((stateIsPreference: boolean): void => {
       if (stateIsPreference) {
@@ -163,6 +166,26 @@ export class GroupCreationViewModel {
 
     amplify.subscribe(WebAppEvents.CONVERSATION.CREATE_GROUP, this.showCreateGroup);
   }
+
+  readonly onGroupNameCancel = () => {
+    this.groupName('');
+  };
+  readonly onGroupNameChange = (event: any) => {
+    event.preventDefault();
+    const {value} = event.target;
+
+    const trimmedNameInput = value.trim();
+    const nameTooLong = trimmedNameInput.length > this.maxNameLength;
+    const nameTooShort = !trimmedNameInput.length;
+
+    this.groupName(trimmedNameInput);
+    if (nameTooLong) {
+      return this.nameError(t('groupCreationPreferencesErrorNameLong'));
+    } else if (nameTooShort) {
+      return this.nameError(t('groupCreationPreferencesErrorNameShort'));
+    }
+    this.nameError('');
+  };
 
   readonly showCreateGroup = (groupCreationSource: GroupCreationSource, userEntity: User) => {
     this.groupCreationSource = groupCreationSource;
@@ -232,7 +255,7 @@ export class GroupCreationViewModel {
       try {
         const conversationEntity = await this.conversationRepository.createGroupConversation(
           this.selectedContacts(),
-          this.nameInput(),
+          this.groupName(),
           accessState,
           options,
         );
@@ -247,23 +270,6 @@ export class GroupCreationViewModel {
   };
 
   readonly clickOnNext = (): void => {
-    if (!this.nameInput().length) {
-      return;
-    }
-
-    const trimmedNameInput = this.nameInput().trim();
-    const nameTooLong = trimmedNameInput.length > this.maxNameLength;
-    const nameTooShort = !trimmedNameInput.length;
-
-    this.nameInput(trimmedNameInput.slice(0, this.maxNameLength));
-    if (nameTooLong) {
-      return this.nameError(t('groupCreationPreferencesErrorNameLong'));
-    }
-
-    if (nameTooShort) {
-      return this.nameError(t('groupCreationPreferencesErrorNameShort'));
-    }
-
     this.state(GroupCreationViewModel.STATE.PARTICIPANTS);
   };
 
@@ -271,7 +277,7 @@ export class GroupCreationViewModel {
     this.isCreatingConversation = false;
     this.groupCreationSource = undefined;
     this.nameError('');
-    this.nameInput('');
+    this.groupName('');
     this.participantsInput('');
     this.selectedContacts([]);
     this.state(GroupCreationViewModel.STATE.DEFAULT);

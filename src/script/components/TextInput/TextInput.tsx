@@ -37,13 +37,14 @@ export interface UserInputProps {
   isSuccess?: boolean;
   label: string;
   name: string;
-  onBlur: React.FocusEventHandler<HTMLInputElement>;
+  onBlur?: React.FocusEventHandler<HTMLInputElement>;
   onCancel: () => void;
   onChange: React.ChangeEventHandler<HTMLInputElement>;
-  onKeyDown: React.KeyboardEventHandler<HTMLInputElement>;
+  onKeyDown?: React.KeyboardEventHandler<HTMLInputElement>;
   onSuccessDismissed?: () => void;
   placeholder?: string;
   value: string;
+  uieName?: string;
 }
 
 const SUCCESS_DISMISS_TIMEOUT = 2500;
@@ -63,6 +64,7 @@ const TextInput: React.ForwardRefRenderFunction<HTMLDivElement, UserInputProps> 
     onSuccessDismissed,
     placeholder,
     value,
+    uieName,
   }: UserInputProps,
   ref: React.ForwardedRef<HTMLDivElement>,
 ) => {
@@ -102,6 +104,7 @@ const TextInput: React.ForwardRefRenderFunction<HTMLDivElement, UserInputProps> 
         onBlur={onBlur}
         onKeyDown={onKeyDown}
         placeholder={placeholder}
+        data-uie-name={uieName}
       />
       <label className="label-medium" css={getLabelCSS(changedColor)} htmlFor={name}>
         {label}
@@ -117,6 +120,8 @@ const TextInput: React.ForwardRefRenderFunction<HTMLDivElement, UserInputProps> 
   );
 };
 
-export default React.forwardRef(TextInput);
+const TextInputForwarded = React.forwardRef(TextInput);
 
-registerReactComponent('text-input', TextInput);
+export default TextInputForwarded;
+
+registerReactComponent('text-input', TextInputForwarded);
