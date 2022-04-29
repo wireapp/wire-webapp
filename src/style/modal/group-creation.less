@@ -20,7 +20,7 @@
 .group-creation {
   &__modal {
     .modal-input-wrapper {
-      min-height: 48px;
+      min-height: 67px;
     }
     .modal__content {
       height: 490px;
@@ -29,12 +29,25 @@
     .modal__info {
       margin: 8px 4px 24px;
     }
+
+    .modal__header {
+      margin-bottom: 35px;
+      line-height: @line-height-lg;
+    }
   }
 
   &__action {
     .button-reset-default;
+    color: var(--black);
+    font-size: @font-size-base;
+    font-weight: @font-weight-bold;
+    line-height: @line-height-lg;
     opacity: 0.32;
     transition: all 0.25s ease-in-out;
+
+    &:hover {
+      text-decoration: underline;
+    }
 
     &.enabled {
       cursor: pointer;
