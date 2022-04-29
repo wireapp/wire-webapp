@@ -118,7 +118,6 @@ const SetHandle = ({
                 setHandle(event.target.value);
               }}
               value={handle}
-              autoFocus
               data-uie-name="enter-handle"
             />
             <RoundIconButton

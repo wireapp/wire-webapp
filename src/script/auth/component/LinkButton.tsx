@@ -28,7 +28,12 @@ const linkButtonStyle = {
 };
 
 const LinkButton = (props: React.ButtonHTMLAttributes<HTMLButtonElement>) => (
-  <button css={(theme: Theme) => linkStyle(theme, props as unknown as LinkProps)} style={linkButtonStyle} {...props} />
+  <button
+    type="button"
+    css={(theme: Theme) => linkStyle(theme, props as unknown as LinkProps)}
+    style={linkButtonStyle}
+    {...props}
+  />
 );
 
 export default LinkButton;

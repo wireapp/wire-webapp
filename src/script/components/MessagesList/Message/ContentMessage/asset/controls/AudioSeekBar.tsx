@@ -101,6 +101,7 @@ const AudioSeekBar: React.FC<AudioSeekBarProps> = ({asset, audioElement, disable
 
   return (
     <svg
+      aria-hidden="true"
       className={cx('audio-seek-bar', {'element-disabled': disabled})}
       width="100%"
       height="100%"

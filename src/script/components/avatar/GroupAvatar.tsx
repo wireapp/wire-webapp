@@ -56,7 +56,6 @@ const GroupAvatar: React.FC<GroupAvatarProps> = ({users, isLight = false, classN
           <div
             key={user.id}
             className="group-avatar-box"
-            aria-hidden="true"
             css={{
               ...CSS_FLEX_CENTER,
               ...CSS_SQUARE(14),

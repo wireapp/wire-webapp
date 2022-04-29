@@ -46,6 +46,7 @@ const AppAlreadyOpen = ({isAppAlreadyOpen, fullscreen, removeCookie}: AppAlready
           <Columns style={{marginTop: '20px'}}>
             <Column style={{textAlign: 'center'}}>
               <Button
+                type="button"
                 block
                 onClick={() => removeCookie(CookieSelector.COOKIE_NAME_APP_OPENED)}
                 style={{marginBottom: '10px'}}

@@ -200,7 +200,6 @@ const ConversationListCell: React.FC<ConversationListCellProps> = ({
                   className="conversation-list-cell-badge cell-badge-light"
                   data-uie-name="status-pending"
                   title={t('accessibility.conversationStatusPending')}
-                  aria-label={t('accessibility.conversationStatusPending')}
                 >
                   <Icon.Pending className="svg-icon" />
                 </span>
@@ -210,7 +209,6 @@ const ConversationListCell: React.FC<ConversationListCellProps> = ({
                   className="conversation-list-cell-badge cell-badge-dark"
                   data-uie-name="status-mention"
                   title={t('accessibility.conversationStatusUnreadMention')}
-                  aria-label={t('accessibility.conversationStatusUnreadMention')}
                 >
                   <Icon.Mention className="svg-icon" />
                 </span>
@@ -230,7 +228,6 @@ const ConversationListCell: React.FC<ConversationListCellProps> = ({
                   className="conversation-list-cell-badge cell-badge-dark"
                   data-uie-name="status-ping"
                   title={t('accessibility.conversationStatusUnreadPing')}
-                  aria-label={t('accessibility.conversationStatusUnreadPing')}
                 >
                   <Icon.Ping className="svg-icon" />
                 </span>
@@ -240,7 +237,6 @@ const ConversationListCell: React.FC<ConversationListCellProps> = ({
                   className="conversation-list-cell-badge cell-badge-dark"
                   data-uie-name="status-missed-call"
                   title={t('accessibility.callStatusMissed')}
-                  aria-label={t('accessibility.callStatusMissed')}
                 >
                   <Icon.Hangup className="svg-icon" />
                 </span>
@@ -250,7 +246,6 @@ const ConversationListCell: React.FC<ConversationListCellProps> = ({
                   className="conversation-list-cell-badge cell-badge-light conversation-muted"
                   data-uie-name="status-silence"
                   title={t('accessibility.conversationStatusMuted')}
-                  aria-label={t('accessibility.conversationStatusMuted')}
                 >
                   <Icon.Mute className="svg-icon" />
                 </span>
@@ -260,7 +255,6 @@ const ConversationListCell: React.FC<ConversationListCellProps> = ({
                   className="conversation-list-cell-badge cell-badge-dark"
                   data-uie-name="status-unread"
                   title={t('accessibility.conversationStatusUnread')}
-                  aria-label={t('accessibility.conversationStatusUnread')}
                 >
                   {unreadState.allMessages.length}
                 </span>

@@ -159,7 +159,6 @@ const AccountForm = ({account, ...props}: Props & ConnectedProps & DispatchProps
                 inputs.email.current.focus();
               }
             }}
-            autoFocus
             maxLength={64}
             minLength={2}
             pattern=".{2,64}"

@@ -189,6 +189,10 @@ export const createAccountStrings = defineMessages({
 });
 
 export const createPersonalAccountStrings = defineMessages({
+  goBack: {
+    defaultMessage: 'Go back',
+    id: 'createPersonalAccount.goBack',
+  },
   headLine: {
     defaultMessage: 'New account',
     id: 'createPersonalAccount.headLine',

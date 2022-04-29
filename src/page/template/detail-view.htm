@@ -7,7 +7,7 @@
           <div class="label-xs" data-bind="text: formatTimestamp(messageEntity().timestamp()), attr: {'data-timestamp': messageEntity().timestamp()}"></div>
         </div>
         <button type="button" class="detail-view-header-close-button icon-button" data-bind="click: clickOnClose, attr: {'aria-label': t('accessibility.conversationDetailsCloseLabel')}" data-uie-name="do-close-detail-view">
-          <close-icon></close-icon>
+          <close-icon aria-hidden="true"></close-icon>
         </button>
       </header>
       <div class="detail-view-main" data-bind="click: clickOnClose, event: { keydown: (_, event) => handlePressOnClose(event) }, attr: {'aria-label': t('accessibility.conversationDetailsCloseLabel')}" tabindex="0" role="button">
@@ -22,7 +22,7 @@
         <!-- /ko -->
         <!-- ko if: messageEntity().isReplyable() && !conversationEntity().removed_from_conversation() -->
           <button type="button" class="detail-view-action-button" data-bind="click: clickOnReply" data-uie-name="do-reply-fullscreen-picture">
-            <reply-icon></reply-icon>
+            <reply-icon aria-hidden="true"></reply-icon>
             <span data-bind="text: t('conversationContextMenuReply')"></span>
           </button>
         <!-- /ko -->

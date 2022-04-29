@@ -5,7 +5,7 @@
 >
   <!-- ko if: isVisible() -->
     <div class="panel__header panel__header--reverse">
-      <button class="right-panel-close icon-button" type="button" data-bind="clickOrDrag: onClose, title: t('accessibility.rightPanel.close'), 'aria-label': t('accessibility.rightPanel.close')"
+      <button class="right-panel-close icon-button" type="button" data-bind="clickOrDrag: onClose, attr: { title: t('accessibility.rightPanel.close'), 'aria-label': t('accessibility.rightPanel.close')}"
       data-uie-name="do-close">
         <close-icon aria-hidden="true"></close-icon>
       </button>
@@ -32,9 +32,9 @@
             <!-- ko if: firstParticipant().isConnected() || firstParticipant().inTeam() -->
               <div class="conversation-details__devices">
                 <button class="panel__action-item" data-bind="click: clickOnDevices" data-uie-name="go-devices" type="button">
-                  <devices-icon class="panel__action-item__icon"></devices-icon>
+                  <devices-icon aria-hidden="true" class="panel__action-item__icon"></devices-icon>
                   <span class="panel__action-item__text" data-bind="text: t('conversationDetailsActionDevices')"></span>
-                  <chevron-right class="chevron-right-icon"></chevron-right>
+                  <chevron-right aria-hidden="true" class="chevron-right-icon"></chevron-right>
                 </button>
               </div>
             <!-- /ko -->
@@ -55,7 +55,7 @@
                 data-bind="text: activeConversation() && activeConversation().display_name()"
               ></div>
               <!-- ko if: canRenameGroup() -->
-                <edit-icon class="conversation-details__name__edit-icon"></edit-icon>
+                <edit-icon aria-hidden="true" class="conversation-details__name__edit-icon"></edit-icon>
               <!-- /ko -->
             </div>
             <textarea
@@ -119,9 +119,9 @@
                 data-bind="click: clickOnAddParticipants, attr:{'title': addPeopleTooltip}"
                 data-uie-name="go-add-people"
               >
-                <plus-icon class="panel__action-item__icon"></plus-icon>
+                <plus-icon aria-hidden="true" class="panel__action-item__icon"></plus-icon>
                 <span class="panel__action-item__text" data-bind="text: t('conversationDetailsActionAddParticipants')"></span>
-                <chevron-right class="chevron-right-icon"></chevron-right>
+                <chevron-right aria-hidden="true" class="chevron-right-icon"></chevron-right>
             </button>
             </div>
           <!-- /ko -->
@@ -140,12 +140,12 @@
                 data-bind="click: clickOnShowAll"
                 data-uie-name="go-conversation-participants"
               >
-                <people-icon class="panel__action-item__icon"></people-icon>
+                <people-icon aria-hidden="true" class="panel__action-item__icon"></people-icon>
                 <span
                   class="panel__action-item__text"
                   data-bind="text: t('conversationDetailsActionConversationParticipants', showAllUsersCount())"
                 ></span>
-                <chevron-right class="chevron-right-icon"></chevron-right>
+                <chevron-right aria-hidden="true" class="chevron-right-icon"></chevron-right>
               </button>
             <!-- /ko -->
           <!-- /ko -->
@@ -158,7 +158,7 @@
             <!-- ko if: showOptionNotificationsGroup() -->
             <li class="conversation-details__notifications">
                 <button class="panel__action-item" data-bind="click: clickOnNotifications" data-uie-name="go-notifications" type="button">
-                  <notification-icon class="panel__action-item__icon"></notification-icon>
+                  <notification-icon aria-hidden="true" class="panel__action-item__icon"></notification-icon>
                   <span class="panel__action-item__summary">
                     <span class="panel__action-item__text" data-bind="text: t('conversationDetailsActionNotifications')"></span>
                     <span
@@ -167,14 +167,14 @@
                       data-uie-name="status-notifications"
                     ></span>
                   </span>
-                  <chevron-right class="chevron-right-icon"></chevron-right>
+                  <chevron-right aria-hidden="true" class="chevron-right-icon"></chevron-right>
                 </button>
             </li>
             <!-- /ko -->
             <!-- ko if: showOptionTimedMessages() -->
             <li class="conversation-details__timed-messages">
               <button class="panel__action-item" data-bind="click: clickOnTimedMessages" data-uie-name="go-timed-messages" type="button">
-                <timer-icon class="panel__action-item__icon"></timer-icon>
+                <timer-icon aria-hidden="true" class="panel__action-item__icon"></timer-icon>
                 <span class="panel__action-item__summary">
                   <span class="panel__action-item__text" data-bind="text: t('conversationDetailsActionTimedMessages')"></span>
                   <span
@@ -183,14 +183,14 @@
                     data-uie-name="status-timed-messages"
                   ></span>
                 </span>
-                <chevron-right class="chevron-right-icon"></chevron-right>
+                <chevron-right aria-hidden="true" class="chevron-right-icon"></chevron-right>
               </button>
             </li>
           <!-- /ko -->
           <!-- ko if: showOptionGuests() -->
            <li class="conversation-details__guest-options">
             <button class="panel__action-item" data-bind="click: clickOnGuestOptions" data-uie-name="go-guest-options" type="button">
-              <guest-icon class="panel__action-item__icon"></guest-icon>
+              <guest-icon aria-hidden="true" class="panel__action-item__icon"></guest-icon>
               <span class="panel__action-item__summary">
                 <span class="panel__action-item__text" data-bind="text: t('conversationDetailsActionGuestOptions')"></span>
                 <span
@@ -199,14 +199,14 @@
                   data-uie-name="status-allow-guests"
                 ></span>
               </span>
-              <chevron-right class="chevron-right-icon"></chevron-right>
+              <chevron-right aria-hidden="true" class="chevron-right-icon"></chevron-right>
             </button>
           </li>
           <!-- /ko -->
           <!-- ko if: showOptionServices() -->
           <li class="conversation-details__services-options">
             <button class="panel__action-item" data-bind="click: clickOnServicesOptions" data-uie-name="go-services-options" type="button">
-              <service-icon class="panel__action-item__icon service-icon"></service-icon>
+              <service-icon aria-hidden="true" class="panel__action-item__icon service-icon"></service-icon>
               <span class="panel__action-item__summary">
                 <span class="panel__action-item__text" data-bind="text: t('conversationDetailsActionServicesOptions')"></span>
                 <span
@@ -215,7 +215,7 @@
                   data-uie-name="status-allow-services"
                 ></span>
               </span>
-              <chevron-right class="chevron-right-icon"></chevron-right>
+              <chevron-right aria-hidden="true" class="chevron-right-icon"></chevron-right>
             </button>
           </li>
           <!-- /ko -->
@@ -244,7 +244,7 @@
         <!-- ko if: showOptionNotifications1To1() -->
           <li class="conversation-details__notifications">
             <button class="panel__action-item" data-bind="click: clickOnNotifications" data-uie-name="go-notifications" type="button">
-              <notification-icon class="panel__action-item__icon"></notification-icon>
+              <notification-icon aria-hidden="true" class="panel__action-item__icon"></notification-icon>
               <span class="panel__action-item__summary">
                 <span class="panel__action-item__text" data-bind="text: t('conversationDetailsActionNotifications')"></span>
                 <span
@@ -253,7 +253,7 @@
                   data-uie-name="status-notifications"
                 ></span>
               </span>
-              <chevron-right class="chevron-right-icon"></chevron-right>
+              <chevron-right aria-hidden="true" class="chevron-right-icon"></chevron-right>
             </button>
           </li>
         <!-- /ko -->

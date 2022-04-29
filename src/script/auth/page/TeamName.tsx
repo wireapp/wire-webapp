@@ -143,7 +143,6 @@ const TeamName = ({
                       maxLength={256}
                       minLength={2}
                       required
-                      autoFocus
                       data-uie-name="enter-team-name"
                     />
                     <RoundIconButton

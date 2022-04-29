@@ -5,14 +5,16 @@
   <!-- /ko -->
   <!-- ko if: isReplying() && !isEditing() -->
     <div class="input-bar__reply" data-uie-name="input-bar-reply-box">
-      <close-icon data-bind="click: handleCancelReply" data-uie-name="do-close-reply-box"></close-icon>
+      <button type="button" class="button-reset-default" data-bind="click: handleCancelReply" data-uie-name="do-close-reply-box">
+        <close-icon aria-hidden="true"></close-icon>
+      </button>
       <div class="input-bar__reply__body">
         <div class="input-bar__reply__vert-bar"></div>
         <div class="input-bar__reply__text">
           <div class="input-bar__reply__sender-name">
             <span data-bind="text: replyMessageEntity().headerSenderName()" data-uie-name="label-name-reply-box"></span>
             <!-- ko if: replyMessageEntity().was_edited() -->
-              <edit-icon data-uie-name="message-edited-reply-box"></edit-icon>
+              <edit-icon aria-hidden="true" data-uie-name="message-edited-reply-box"></edit-icon>
             <!-- /ko -->
           </div>
           <!-- ko if: replyAsset() -->
@@ -34,21 +36,21 @@
 
             <!-- ko if: replyAsset().isAudio()-->
               <div class="input-bar__reply__message" data-uie-name="media-audio-reply-box">
-                <mic-on-icon class="input-bar__reply__icon"></mic-on-icon>
+                <mic-on-icon aria-hidden="true" class="input-bar__reply__icon"></mic-on-icon>
                 <span data-bind="text: t('replyAudioMessage')"></span>
               </div>
             <!-- /ko -->
 
             <!-- ko if: replyAsset().isFile()-->
               <div class="input-bar__reply__message" data-uie-name="media-file-reply-box">
-                <file-icon class="input-bar__reply__icon"></file-icon>
+                <file-icon aria-hidden="true" class="input-bar__reply__icon"></file-icon>
                 <span data-bind="text: replyAsset().file_name"></span>
               </div>
             <!-- /ko -->
 
             <!-- ko if: replyAsset().isLocation()-->
               <div class="input-bar__reply__message" data-uie-name="media-location-reply-box">
-                <location-icon class="input-bar__reply__icon"></location-icon>
+                <location-icon aria-hidden="true" class="input-bar__reply__icon"></location-icon>
                 <span data-bind="text: replyAsset().name"></span>
               </div>
             <!-- /ko -->
@@ -75,7 +77,7 @@
                               enter: onInputEnter,
                               hasFocus: hasFocus,
                               textInput: input,
-                              attr: {'placeholder': inputPlaceholder},
+                              attr: {'placeholder': inputPlaceholder, 'aria-label': inputPlaceholder},
                               css: {'conversation-input-bar-text--accent': hasLocalEphemeralTimer()},
                               paste_file: onPasteFiles"
                     data-uie-name="input-message"
@@ -95,7 +97,7 @@
                 <button type="button" class="controls-right-button button-icon-large"
                   data-bind="click: clickToShowGiphy, attr: {title: t('extensionsBubbleButtonGif'), 'aria-label': t('extensionsBubbleButtonGif')}"
                   data-uie-name="do-giphy-popover">
-                  <gif-icon></gif-icon>
+                  <gif-icon aria-hidden="true"></gif-icon>
                 </button>
               </li>
             <!-- /ko -->
@@ -107,19 +109,21 @@
                       type="button"
                       data-bind="click: clickToPing, disabled: pingDisabled(), attr: {'title': pingTooltip, 'aria-label': pingTooltip}, css: {'disabled': pingDisabled()}"
                       data-uie-name="do-ping">
-                  <ping-icon></ping-icon>
+                  <ping-icon aria-hidden="true"></ping-icon>
                 </button>
               </li>
               <li>
                 <label id="conversation-input-bar-photo" class="controls-right-button no-radius button-icon-large">
-                  <image-icon></image-icon>
+                  <image-icon aria-hidden="true"></image-icon>
+                  <p class="visually-hidden" data-bind="text: t('tooltipConversationAddImage')"></p>
                   <input data-bind="attr: {accept: acceptedImageTypes}, file_select: uploadImages" type="file" multiple="multiple" data-uie-name="do-share-image"/>
                 </label>
               </li>
 
               <li>
-                <label id="conversation-input-bar-files" class="controls-right-button no-radius button-icon-large" data-bind="attr: {title: t('tooltipConversationFile')}">
-                  <attachment-icon></attachment-icon>
+                <label id="conversation-input-bar-files" class="controls-right-button no-radius button-icon-large">
+                  <p class="visually-hidden" data-bind="text: t('tooltipConversationFile')"></p>
+                  <attachment-icon aria-hidden="true"></attachment-icon>
                   <input data-bind="attr: inputFileAttr, file_select: uploadFiles" type="file" multiple="multiple" data-uie-name="do-share-file"/>
                 </label>
               </li>
@@ -135,7 +139,7 @@
               <button type="button" class="controls-right-button button-icon-large"
                     data-bind="click: cancelMessageEditing"
                     data-uie-name="do-cancel-edit">
-                <close-icon></close-icon>
+                <close-icon aria-hidden="true"></close-icon>
               </button>
             </li>
           <!-- /ko -->
@@ -143,7 +147,7 @@
             <button type="button" class="controls-right-button controls-right-button--send"
                   data-bind="click: onInputEnter, disable: input().length === 0, css: {'active': input().length !== 0}, attr: {'title': t('tooltipConversationSendMessage'), 'aria-label': t('tooltipConversationSendMessage')}"
                   data-uie-name="do-send-message">
-              <send-icon></close-icon>
+              <send-icon aria-hidden="true"></close-icon>
             </button>
           </li>
         </ul>
@@ -159,17 +163,17 @@
           <!-- /ko -->
           <!-- ko ifnot: pastedFilePreviewUrl() -->
             <span class="conversation-input-bar-paste-icon">
-              <file-icon></file-icon>
+              <file-icon aria-hidden="true"></file-icon>
             </span>
           <!-- /ko -->
           <span data-bind="text: pastedFileName"></span>
         </div>
         <div class="controls-right">
           <button type="button" class="conversation-input-bar-paste-cancel button-icon-large" data-bind="click: clickToCancelPastedFile">
-            <close-icon></close-icon>
+            <close-icon aria-hidden="true"></close-icon>
           </button>
           <button type="button" class="conversation-input-bar-paste-send" data-bind="click: sendPastedFile">
-            <send-icon></send-icon>
+            <send-icon aria-hidden="true"></send-icon>
           </button>
         </div>
       </div>

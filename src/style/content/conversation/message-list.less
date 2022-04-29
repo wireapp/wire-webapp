@@ -428,6 +428,15 @@
   line-height: @avatar-diameter-xs;
 }
 
+.message-footer-text {
+  color: var(--gray-70);
+  font-size: 11px;
+
+  body.theme-dark & {
+    color: var(--gray-60);
+  }
+}
+
 .message-footer-icon {
   .flex-center;
 
@@ -545,10 +554,15 @@
     .action-pill-style;
     position: absolute;
     bottom: 3px;
-    color: var(--background-fade-40);
-    font-size: @font-size-xs;
+    color: var(--gray-70);
     pointer-events: none;
     user-select: none;
+
+    .subline;
+
+    body.theme-dark & {
+      color: var(--gray-60);
+    }
 
     &--clickable {
       cursor: pointer;
@@ -614,9 +628,12 @@
 .message-connected-provider-name,
 .message-connected-username {
   margin-bottom: 16px;
-  color: var(--foreground);
-  font-size: @font-size-xs;
-  line-height: @line-height-sm;
+  .subline;
+  color: var(--gray-90);
+
+  body.theme-dark & {
+    color: var(--white);
+  }
 }
 
 .message-connected-avatar {

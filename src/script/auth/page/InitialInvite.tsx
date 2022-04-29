@@ -158,7 +158,6 @@ const InitialInvite = ({
                 // Note: Curser issues when using controlled input
                 // value={enteredEmail}
                 ref={emailInput}
-                autoFocus
                 data-uie-name="enter-invite-email"
               />
               <RoundIconButton
@@ -175,7 +174,7 @@ const InitialInvite = ({
         </div>
         <div>
           {invites.length ? (
-            <Button onClick={onInviteDone} data-uie-name="do-next">
+            <Button type="button" onClick={onInviteDone} data-uie-name="do-next">
               {_(inviteStrings.nextButton)}
             </Button>
           ) : (

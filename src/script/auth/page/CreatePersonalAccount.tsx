@@ -65,8 +65,12 @@ const CreatePersonalAccount = ({isPersonalFlow, enterPersonalCreationFlow}: Prop
     </ContainerXS>
   );
   const backArrow = (
-    <RouterLink to={isMacOsWrapper ? ROUTE.INDEX : ROUTE.SET_ACCOUNT_TYPE} data-uie-name="go-index">
-      <ArrowIcon direction="left" color={COLOR.TEXT} style={{opacity: 0.56}} />
+    <RouterLink
+      to={isMacOsWrapper ? ROUTE.INDEX : ROUTE.SET_ACCOUNT_TYPE}
+      data-uie-name="go-index"
+      aria-label={_(createPersonalAccountStrings.goBack)}
+    >
+      <ArrowIcon aria-hidden="true" direction="left" color={COLOR.TEXT} style={{opacity: 0.56}} />
     </RouterLink>
   );
   return (
