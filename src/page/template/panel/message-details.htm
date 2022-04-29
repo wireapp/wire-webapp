@@ -6,7 +6,8 @@
   <!-- ko if: isVisible() -->
     <div class="panel__header">
       <h4 class="panel__header__title" data-bind="text: panelTitle()" data-uie-name="message-details-title"></h4>
-      <button type="button" class="right-panel-close icon-button" data-bind="clickOrDrag: onClose, title: t('accessibility.rightPanel.close'), 'aria-label': t('accessibility.rightPanel.close')" data-uie-name="do-close">
+      <button class="right-panel-close icon-button" type="button" data-bind="clickOrDrag: onClose, attr: { title: t('accessibility.rightPanel.close'), 'aria-label': t('accessibility.rightPanel.close')}"
+ data-uie-name="do-close">
         <close-icon aria-hidden="true"></close-icon>
       </button>
     </div>

@@ -2,11 +2,11 @@
   <!-- ko if: isVisible() -->
     <div class="panel__header">
       <button type="button" class="icon-button" 
-        data-bind="clickOrDrag: onGoBack, title: t('accessibility.rightPanel.GoBack'), 'aria-label': t('accessibility.rightPanel.GoBack')"
+        data-bind="clickOrDrag: onGoBack, attr: { title: t('accessibility.rightPanel.GoBack'), 'aria-label': t('accessibility.rightPanel.GoBack') }"
         data-uie-name="go-back-group-participant">
         <arrow-left-icon aria-hidden="true"></arrow-left-icon>
       </button>
-      <button type="button" class="icon-button" data-bind="clickOrDrag: onClose, title: t('accessibility.rightPanel.close'), 'aria-label': t('accessibility.rightPanel.close')" data-uie-name="do-close">
+      <button type="button" class="icon-button" data-bind="clickOrDrag: onClose, attr: { title: t('accessibility.rightPanel.close'), 'aria-label': t('accessibility.rightPanel.close') }" data-uie-name="do-close">
         <close-icon aria-hidden="true"></close-icon>
       </button>
     </div>
