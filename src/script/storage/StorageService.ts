@@ -78,7 +78,7 @@ export class StorageService {
    * @param requestPersistentStorage if a persistent storage should be requested
    * @returns Resolves with the database name
    */
-  async init(userId: string = this.userId, requestPersistentStorage: boolean = false): Promise<string> {
+  init(userId: string = this.userId, requestPersistentStorage: boolean = false): string {
     this.dbName = this.engine.storeName;
 
     try {

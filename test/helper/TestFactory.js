@@ -26,7 +26,6 @@ import 'core-js/es7/reflect';
 import {container} from 'tsyringe';
 import ko from 'knockout';
 import {ClientClassification, ClientType} from '@wireapp/api-client/src/client/';
-import {MemoryEngine} from '@wireapp/store-engine';
 
 import {CallingRepository} from 'src/script/calling/CallingRepository';
 import {serverTimeHandler} from 'src/script/time/serverTimeHandler';
@@ -73,6 +72,7 @@ import {TeamState} from 'src/script/team/TeamState';
 import {ConversationState} from 'src/script/conversation/ConversationState';
 import {AssetService} from 'src/script/assets/AssetService';
 import {entities} from '../api/payloads';
+import {createStorageEngine, DatabaseTypes} from 'src/script/service/StoreEngineProvider';
 
 export class TestFactory {
   constructor() {
@@ -90,7 +90,8 @@ export class TestFactory {
    * @returns {Promise<StorageRepository>} The storage repository.
    */
   async exposeStorageActors() {
-    container.registerInstance(StorageService, new StorageService(new MemoryEngine()));
+    const engine = await createStorageEngine('test', DatabaseTypes.PERMANENT);
+    container.registerInstance(StorageService, new StorageService(engine));
     this.storage_service = container.resolve(StorageService);
     if (!this.storage_service.db) {
       this.storage_service.init(entities.user.john_doe.id, false);
