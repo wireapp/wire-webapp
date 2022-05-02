@@ -29,17 +29,18 @@ import {enableLogging} from 'Util/LoggerUtil';
 import {exposeWrapperGlobals} from 'Util/wrapper';
 
 import {Config} from '../Config';
-import {configureClient} from './configureClient';
-import {configureCore} from './configureCore';
+import {Core} from '../service/CoreSingleton';
+import {APIClient} from '../service/APIClientSingleton';
 import './configureEnvironment';
 import {configureStore} from './configureStore';
 import {actionRoot} from './module/action';
 import Root from './page/Root';
+import {container} from 'tsyringe';
 
 exposeWrapperGlobals();
 
-const apiClient = configureClient();
-const core = configureCore(apiClient);
+const apiClient = container.resolve(APIClient);
+const core = container.resolve(Core);
 
 let localStorage;
 try {
