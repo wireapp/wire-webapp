@@ -18,10 +18,22 @@
  */
 
 import type {APIClient} from '@wireapp/api-client';
+import {ClientType} from '@wireapp/api-client/src/client';
 import {Account} from '@wireapp/core';
 
-import {providePermanentEngine} from './StoreEngineProvider';
+import {createStorageEngine, DatabaseTypes} from './StoreEngineProvider';
 
-const configureCore = (apiClient: APIClient) => new Account(apiClient, providePermanentEngine);
+const clientToDbType: Record<ClientType, DatabaseTypes> = {
+  [ClientType.PERMANENT]: DatabaseTypes.PERMANENT,
+  [ClientType.TEMPORARY]: DatabaseTypes.TEMPORARY,
+  [ClientType.NONE]: DatabaseTypes.EFFEMERAL,
+};
+
+const configureCore = (apiClient: APIClient) =>
+  new Account(apiClient, {
+    createStore: (storeName, context) => {
+      return createStorageEngine(storeName, clientToDbType[context.clientType]);
+    },
+  });
 
 export {configureCore};

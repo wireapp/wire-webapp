@@ -424,7 +424,7 @@ class App {
       telemetry.addStatistic(AppInitStatisticsValue.CLIENT_TYPE, clientEntity().type);
 
       const core = container.resolve(Core);
-      await core.init(clientType, undefined, this.service.storage['engine']);
+      await core.init(clientType);
       await cryptographyRepository.init(core.service!.cryptography.cryptobox, clientEntity);
 
       loadingView.updateProgress(10);

@@ -20,6 +20,7 @@
 import type {CRUDEngine} from '@wireapp/store-engine';
 import {IndexedDBEngine} from '@wireapp/store-engine-dexie';
 import {SQLeetEngine} from '@wireapp/store-engine-sqleet';
+import {MemoryEngine} from '@wireapp/store-engine';
 import Dexie, {Transaction} from 'dexie';
 
 import {saveRandomEncryptionKey} from 'Util/ephemeralValueStore';
@@ -27,7 +28,16 @@ import {saveRandomEncryptionKey} from 'Util/ephemeralValueStore';
 import {StorageSchemata} from '../storage';
 import {SQLeetSchemata} from '../storage/SQLeetSchemata';
 
-export const providePermanentEngine = async (storeName: string): Promise<CRUDEngine> => {
+export enum DatabaseTypes {
+  /** a permament storage that will still live after logout */
+  PERMANENT,
+  /** a storage that will stay there after reload but will be deleted when loging out */
+  TEMPORARY,
+  /** a storage that will be lost when the app is reloaded */
+  EFFEMERAL,
+}
+
+const providePermanentEngine = async (storeName: string): Promise<CRUDEngine> => {
   const db = new Dexie(storeName);
   const databaseSchemata = StorageSchemata.SCHEMATA;
   databaseSchemata.forEach(({schema, upgrade, version}) => {
@@ -44,10 +54,22 @@ export const providePermanentEngine = async (storeName: string): Promise<CRUDEng
   return engine;
 };
 
-export const provideTemporaryAndNonPersistentEngine = async (storeName: string): Promise<CRUDEngine> => {
+const provideTemporaryAndNonPersistentEngine = async (storeName: string): Promise<CRUDEngine> => {
   await Dexie.delete('/sqleet');
   const encryptionKey = await saveRandomEncryptionKey();
   const engine = new SQLeetEngine('/worker/sqleet-worker.js', SQLeetSchemata.getLatest(), encryptionKey);
   await engine.init(storeName);
   return engine;
 };
+
+export async function createStorageEngine(storeName: string, type: DatabaseTypes): Promise<CRUDEngine> {
+  switch (type) {
+    case DatabaseTypes.PERMANENT:
+      return providePermanentEngine(storeName);
+    case DatabaseTypes.TEMPORARY:
+      return provideTemporaryAndNonPersistentEngine(storeName);
+
+    case DatabaseTypes.EFFEMERAL:
+      return new MemoryEngine();
+  }
+}
