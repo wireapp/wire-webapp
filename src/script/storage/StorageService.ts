@@ -84,7 +84,7 @@ export class StorageService {
     try {
       if (this.hasHookSupport) {
         this.db = this.engine['db'];
-        this._initCrudHooks();
+        this._initCrudHooks(this.db);
       }
       return this.dbName;
     } catch (error) {
@@ -94,7 +94,7 @@ export class StorageService {
     }
   }
 
-  private _initCrudHooks(): void {
+  private _initCrudHooks(db: DexieDatabase): void {
     const callListener = (
       table: string,
       eventType: string,
@@ -112,20 +112,19 @@ export class StorageService {
     const listenableTables = [StorageSchemata.OBJECT_STORE.EVENTS];
 
     listenableTables.forEach(table => {
-      this.db
-        .table(table)
-        .hook(
-          DEXIE_CRUD_EVENT.UPDATING,
-          function (modifications: Object, primaryKey: string, obj: Object, transaction: Transaction): void {
-            this.onsuccess = updatedObj => callListener(table, DEXIE_CRUD_EVENT.UPDATING, obj, updatedObj, transaction);
-          },
-        );
+      db.table(table).hook(
+        DEXIE_CRUD_EVENT.UPDATING,
+        function (modifications: Object, primaryKey: string, obj: Object, transaction: Transaction): void {
+          this.onsuccess = updatedObj => callListener(table, DEXIE_CRUD_EVENT.UPDATING, obj, updatedObj, transaction);
+        },
+      );
 
-      this.db
-        .table(table)
-        .hook(DEXIE_CRUD_EVENT.DELETING, function (primaryKey: string, obj: Object, transaction: Transaction): void {
+      db.table(table).hook(
+        DEXIE_CRUD_EVENT.DELETING,
+        function (primaryKey: string, obj: Object, transaction: Transaction): void {
           this.onsuccess = (): void => callListener(table, DEXIE_CRUD_EVENT.DELETING, obj, undefined, transaction);
-        });
+        },
+      );
     });
   }
 
@@ -149,7 +148,7 @@ export class StorageService {
   async clearStores(): Promise<void[]> {
     const deleteStorePromises = this.isTemporaryAndNonPersistent
       ? [this.engine.purge()]
-      : Object.keys(this.db._dbSchema)
+      : Object.keys(this.db?._dbSchema ?? [])
           // avoid clearing tables needed by third parties (dexie-observable for eg)
           .filter(table => !table.startsWith('_'))
           .map(storeName => this.deleteStore(storeName));
@@ -220,6 +219,10 @@ export class StorageService {
       return deletedRecords;
     }
 
+    if (!this.db) {
+      return 0;
+    }
+
     return this.db
       .table(storeName)
       .where('id')
@@ -242,6 +245,10 @@ export class StorageService {
       }
 
       return deletedRecords;
+    }
+
+    if (!this.db) {
+      return 0;
     }
 
     return this.db
@@ -273,6 +280,9 @@ export class StorageService {
    * @returns Resolves with matching tables
    */
   getTables(tableNames: string[]): Dexie.Table<any, any>[] {
+    if (!this.db) {
+      return [];
+    }
     return tableNames.map(tableName => this.db.table(tableName));
   }
 
@@ -359,7 +369,7 @@ export class StorageService {
    */
   terminate(reason: string = 'unknown reason'): void {
     this.logger.info(`Closing database connection with '${this.dbName}' because of '${reason}'.`);
-    if (!this.isTemporaryAndNonPersistent) {
+    if (this.db) {
       this.db.close();
     }
   }

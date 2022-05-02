@@ -85,9 +85,6 @@ export class AuthAction {
       dispatch(AuthActionCreator.startLogin());
       try {
         await onBeforeLogin(dispatch, getState, global);
-        if (isTemporaryClientAndNonPersistent(loginData.clientType === ClientType.PERMANENT)) {
-          (core as any).storeEngineProvider = dbName => create;
-        }
         await core.login(loginData, false, clientAction.generateClientPayload(loginData.clientType));
         await this.persistAuthData(loginData.clientType, core, dispatch, localStorageAction);
         await dispatch(
