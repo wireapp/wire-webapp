@@ -31,13 +31,13 @@ import {SQLeetSchemata} from '../storage/SQLeetSchemata';
 export enum DatabaseTypes {
   /** a permament storage that will still live after logout */
   PERMANENT,
-  /** a storage that will stay there after reload but will be deleted when loging out */
-  TEMPORARY,
+  /** a storage that is encrypted on disk */
+  ENCRYPTED,
   /** a storage that will be lost when the app is reloaded */
   EFFEMERAL,
 }
 
-const providePermanentEngine = async (storeName: string): Promise<CRUDEngine> => {
+const providePermanentEngine = async (storeName: string, requestPersistentStorage: boolean): Promise<CRUDEngine> => {
   const db = new Dexie(storeName);
   const databaseSchemata = StorageSchemata.SCHEMATA;
   databaseSchemata.forEach(({schema, upgrade, version}) => {
@@ -50,7 +50,11 @@ const providePermanentEngine = async (storeName: string): Promise<CRUDEngine> =>
     return db.version(version).stores(schema);
   });
   const engine = new IndexedDBEngine();
-  await engine.initWithDb(db);
+  try {
+    await engine.initWithDb(db, requestPersistentStorage);
+  } catch (error) {
+    await engine.initWithDb(db, false);
+  }
   return engine;
 };
 
@@ -62,11 +66,16 @@ const provideTemporaryAndNonPersistentEngine = async (storeName: string): Promis
   return engine;
 };
 
-export async function createStorageEngine(storeName: string, type: DatabaseTypes): Promise<CRUDEngine> {
+export async function createStorageEngine(
+  storeName: string,
+  type: DatabaseTypes,
+  requestPersistentStorage: boolean = false,
+): Promise<CRUDEngine> {
   switch (type) {
     case DatabaseTypes.PERMANENT:
-      return providePermanentEngine(storeName);
-    case DatabaseTypes.TEMPORARY:
+      return providePermanentEngine(storeName, requestPersistentStorage);
+
+    case DatabaseTypes.ENCRYPTED:
       return provideTemporaryAndNonPersistentEngine(storeName);
 
     case DatabaseTypes.EFFEMERAL:
