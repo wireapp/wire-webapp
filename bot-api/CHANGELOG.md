@@ -3,6 +3,52 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [12.0.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/bot-api/compare/@wireapp/bot-api@11.0.21...@wireapp/bot-api@12.0.0) (2022-05-02)
+
+
+### Code Refactoring
+
+* Cleanup storage initialization ([#4257](https://github.com/wireapp/wire-web-packages/tree/main/packages/bot-api/issues/4257)) ([cf952c5](https://github.com/wireapp/wire-web-packages/tree/main/packages/bot-api/commit/cf952c5522ccebe2c4e97d7dbb27de447a532032))
+
+
+### BREAKING CHANGES
+
+* The way custom database are given to the `Account` has changed.
+- The constructor signature now changes.
+If you were doing
+
+```js
+const account = new Account(apiClient, createStoreEngine);
+```
+
+Now you need to do 
+
+```js
+const account = new Account(apiClient, {createStore: createStoreEngine});
+```
+
+- The `login` and `init` function do not take a storage engine parameter anymore. You now need to give a `createStore` function to the constructor in order to give a custom storage engine to the core. 
+
+BEFORE
+
+```js
+const account = new Accoun(apiClient);
+
+account.login(data, initClient, clientInfo, database);
+```
+
+AFTER
+
+```js
+const account = new Accoun(apiClient, {createStore: () => database});
+
+account.login(data, initClient, clientInfo);
+```
+
+
+
+
+
 ## [11.0.21](https://github.com/wireapp/wire-web-packages/tree/main/packages/bot-api/compare/@wireapp/bot-api@11.0.20...@wireapp/bot-api@11.0.21) (2022-04-21)
 
 **Note:** Version bump only for package @wireapp/bot-api

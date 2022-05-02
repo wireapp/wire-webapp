@@ -3,6 +3,52 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [7.0.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/changelog-bot/compare/@wireapp/changelog-bot@6.0.22...@wireapp/changelog-bot@7.0.0) (2022-05-02)
+
+
+### Code Refactoring
+
+* Cleanup storage initialization ([#4257](https://github.com/wireapp/wire-web-packages/tree/main/packages/changelog-bot/issues/4257)) ([cf952c5](https://github.com/wireapp/wire-web-packages/tree/main/packages/changelog-bot/commit/cf952c5522ccebe2c4e97d7dbb27de447a532032))
+
+
+### BREAKING CHANGES
+
+* The way custom database are given to the `Account` has changed.
+- The constructor signature now changes.
+If you were doing
+
+```js
+const account = new Account(apiClient, createStoreEngine);
+```
+
+Now you need to do 
+
+```js
+const account = new Account(apiClient, {createStore: createStoreEngine});
+```
+
+- The `login` and `init` function do not take a storage engine parameter anymore. You now need to give a `createStore` function to the constructor in order to give a custom storage engine to the core. 
+
+BEFORE
+
+```js
+const account = new Accoun(apiClient);
+
+account.login(data, initClient, clientInfo, database);
+```
+
+AFTER
+
+```js
+const account = new Accoun(apiClient, {createStore: () => database});
+
+account.login(data, initClient, clientInfo);
+```
+
+
+
+
+
 ## [6.0.22](https://github.com/wireapp/wire-web-packages/tree/main/packages/changelog-bot/compare/@wireapp/changelog-bot@6.0.21...@wireapp/changelog-bot@6.0.22) (2022-04-21)
 
 **Note:** Version bump only for package @wireapp/changelog-bot
