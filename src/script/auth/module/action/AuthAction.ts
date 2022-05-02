@@ -65,8 +65,22 @@ export class AuthAction {
   ): ThunkAction => {
     const onBeforeLogin: LoginLifecycleFunction = async (dispatch, getState, {actions: {authAction}}) =>
       dispatch(authAction.doSilentLogout());
-    const onAfterLogin: LoginLifecycleFunction = async (dispatch, getState, {actions: {conversationAction}}) => {
-      await dispatch(conversationAction.doJoinConversationByCode(key, code, uri));
+    const onAfterLogin: LoginLifecycleFunction = async (
+      dispatch,
+      getState,
+      {actions: {localStorageAction, conversationAction}},
+    ) => {
+      const conversation = await dispatch(conversationAction.doJoinConversationByCode(key, code, uri));
+      const domain = conversation?.qualified_conversation?.domain;
+      return (
+        conversation &&
+        (await dispatch(
+          localStorageAction.setLocalStorage(LocalStorageKey.AUTH.LOGIN_CONVERSATION_KEY, {
+            conversation: conversation.conversation,
+            domain,
+          }),
+        ))
+      );
     };
 
     return this.doLoginPlain(loginData, onBeforeLogin, onAfterLogin, getEntropy);

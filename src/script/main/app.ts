@@ -145,6 +145,7 @@ function doRedirect(signOutReason: SIGN_OUT_REASON) {
 
 class App {
   static readonly LOCAL_STORAGE_LOGIN_REDIRECT_KEY = 'LOGIN_REDIRECT_KEY';
+  static readonly LOCAL_STORAGE_LOGIN_CONVERSATION_KEY = 'LOGIN_CONVERSATION_KEY';
   logger: Logger;
   service: {
     asset: AssetService;
@@ -693,6 +694,13 @@ class App {
     if (redirect) {
       localStorage.removeItem(App.LOCAL_STORAGE_LOGIN_REDIRECT_KEY);
       window.location.replace(redirect);
+    }
+
+    const conversationRedirect = localStorage.getItem(App.LOCAL_STORAGE_LOGIN_CONVERSATION_KEY);
+    if (conversationRedirect) {
+      const {conversation, domain} = JSON.parse(conversationRedirect)?.data;
+      localStorage.removeItem(App.LOCAL_STORAGE_LOGIN_CONVERSATION_KEY);
+      window.location.replace(`#/conversation/${conversation}${domain && `/${domain}`}`);
     }
 
     const router = new Router({
