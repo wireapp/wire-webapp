@@ -21,12 +21,12 @@ import type {CRUDEngine} from '@wireapp/store-engine';
 import {IndexedDBEngine} from '@wireapp/store-engine-dexie';
 import {SQLeetEngine} from '@wireapp/store-engine-sqleet';
 import {MemoryEngine} from '@wireapp/store-engine';
-import Dexie, {Transaction} from 'dexie';
+import Dexie from 'dexie';
 
 import {saveRandomEncryptionKey} from 'Util/ephemeralValueStore';
 
-import {StorageSchemata} from '../storage';
 import {SQLeetSchemata} from '../storage/SQLeetSchemata';
+import {DexieDatabase} from '../storage/DexieDatabase';
 
 export enum DatabaseTypes {
   /** a permament storage that will still live after logout */
@@ -38,17 +38,7 @@ export enum DatabaseTypes {
 }
 
 const providePermanentEngine = async (storeName: string, requestPersistentStorage: boolean): Promise<CRUDEngine> => {
-  const db = new Dexie(storeName);
-  const databaseSchemata = StorageSchemata.SCHEMATA;
-  databaseSchemata.forEach(({schema, upgrade, version}) => {
-    if (upgrade) {
-      return db
-        .version(version)
-        .stores(schema)
-        .upgrade((transaction: Transaction) => upgrade(transaction, db));
-    }
-    return db.version(version).stores(schema);
-  });
+  const db = new DexieDatabase(storeName);
   const engine = new IndexedDBEngine();
   try {
     await engine.initWithDb(db, requestPersistentStorage);
