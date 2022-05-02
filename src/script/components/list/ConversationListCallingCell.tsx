@@ -47,7 +47,7 @@ import {CallState, MuteState} from '../../calling/CallState';
 import {useFadingScrollbar} from '../../ui/fadingScrollbar';
 import {CallActions, CallViewTab} from '../../view_model/CallingViewModel';
 import {showContextMenu, ContextMenuEntry} from '../../ui/ContextMenu';
-import type {ClientId, Participant, UserId} from '../../calling/Participant';
+import type {Participant} from '../../calling/Participant';
 import ClassifiedBar from 'Components/input/ClassifiedBar';
 
 export interface CallingCellProps {
@@ -152,8 +152,7 @@ const ConversationListCallingCell: React.FC<CallingCellProps> = ({
     event.preventDefault();
 
     const muteParticipant = {
-      click: () =>
-        callingRepository.sendModeratorMute(conversation.qualifiedId, {[participant.user.id]: [participant.clientId]}),
+      click: () => callingRepository.sendModeratorMute(conversation.qualifiedId, [participant]),
       icon: 'mic-off-icon',
       identifier: `moderator-mute-participant`,
       isDisabled: participant.isMuted(),
@@ -162,13 +161,10 @@ const ConversationListCallingCell: React.FC<CallingCellProps> = ({
 
     const muteOthers: ContextMenuEntry = {
       click: () => {
-        const recipients = participants
-          .filter(p => p !== participant)
-          .reduce((acc, {user, clientId}) => {
-            acc[user.id] = [...(acc[user.id] || []), clientId];
-            return acc;
-          }, {} as Record<UserId, ClientId[]>);
-        callingRepository.sendModeratorMute(conversation.qualifiedId, recipients);
+        callingRepository.sendModeratorMute(
+          conversation.qualifiedId,
+          participants.filter(p => p !== participant),
+        );
       },
       icon: 'mic-off-icon',
       identifier: 'moderator-mute-others',
