@@ -63,7 +63,7 @@ if (!message) {
   await engine.init('');
 
   const apiClient = new APIClient({urls: APIClient.BACKEND.PRODUCTION});
-  const account = new Account(apiClient, () => Promise.resolve(engine));
+  const account = new Account(apiClient, {createStore: () => Promise.resolve(engine)});
   await account.login(login);
 
   const text = message || `I am posting from ${name} v${version}. 🌞`;

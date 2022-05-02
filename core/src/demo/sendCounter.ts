@@ -73,7 +73,7 @@ const {
   await engine.init('sender', {fileExtension: '.json'});
 
   const apiClient = new APIClient({urls: backend});
-  const account = new Account(apiClient, () => Promise.resolve(engine));
+  const account = new Account(apiClient, {createStore: () => Promise.resolve(engine)});
   await account.login(login);
   await account.listen();
 

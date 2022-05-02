@@ -57,7 +57,7 @@ export class ChangelogBot {
 
     const client = new APIClient({urls: backendUrls});
 
-    const account = new Account(client, () => Promise.resolve(engine));
+    const account = new Account(client, {createStore: () => Promise.resolve(engine)});
     try {
       await account.login(this.loginData);
     } catch (error) {

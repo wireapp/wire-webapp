@@ -72,7 +72,7 @@ const storeEngineProvider = async (storeName: string) => {
 };
 
 const apiClient = new APIClient({urls: APIClient.BACKEND.PRODUCTION});
-const account = new Account(apiClient, storeEngineProvider);
+const account = new Account(apiClient, {createStore: storeEngineProvider});
 
 account.on(PayloadBundleType.TEXT, textMessage => {
   console.info(

@@ -17,7 +17,6 @@
  *
  */
 
-import {MemoryEngine} from '@wireapp/store-engine';
 import {MessageHandler} from '@wireapp/bot-api';
 import {Account} from '@wireapp/core';
 import {CONVERSATION_TYPING} from '@wireapp/api-client/src/conversation/data/';
@@ -41,7 +40,7 @@ describe('MessageHandler', () => {
   beforeEach(async () => {
     mainHandler = new MainHandler();
     mainHandler.account = new Account();
-    await mainHandler.account!.initServices(new MemoryEngine());
+    await mainHandler.account!.initServices({userId: 'user-id', clientType: ClientType.NONE});
     await mainHandler.account!['apiClient']['createContext']('user-id', ClientType.NONE);
 
     spyOn(mainHandler.account!.service!.conversation, 'send').and.returnValue(Promise.resolve({} as TextMessage));

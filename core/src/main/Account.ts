@@ -95,12 +95,12 @@ export interface Account {
   on(event: TOPIC.ERROR, listener: (payload: CoreError) => void): this;
 }
 
-export type StoreEngineProvider = (storeName: string) => Promise<CRUDEngine>;
+export type CreateStoreFn = (storeName: string, context: Context) => undefined | Promise<CRUDEngine | undefined>;
 
 export class Account extends EventEmitter {
   private readonly apiClient: APIClient;
   private readonly logger: logdown.Logger;
-  private readonly storeEngineProvider: StoreEngineProvider;
+  private readonly createStore: CreateStoreFn;
   private storeEngine?: CRUDEngine;
 
   public static readonly TOPIC = TOPIC;
@@ -123,21 +123,16 @@ export class Account extends EventEmitter {
 
   /**
    * @param apiClient The apiClient instance to use in the core (will create a new new one if undefined)
-   * @param storeEngineProvider Used to store info in the database (will create a inMemory engine if undefined)
+   * @param storeEngineProvider Used to store info in the database (will create a inMemory engine if returns undefined)
    */
-  constructor(apiClient: APIClient = new APIClient(), storeEngineProvider?: StoreEngineProvider) {
+  constructor(
+    apiClient: APIClient = new APIClient(),
+    {createStore = () => undefined}: {createStore?: CreateStoreFn} = {},
+  ) {
     super();
     this.apiClient = apiClient;
     this.backendFeatures = this.apiClient.backendFeatures;
-    if (storeEngineProvider) {
-      this.storeEngineProvider = storeEngineProvider;
-    } else {
-      this.storeEngineProvider = async (storeName: string) => {
-        const engine = new MemoryEngine();
-        await engine.init(storeName);
-        return engine;
-      };
-    }
+    this.createStore = createStore;
 
     apiClient.on(APIClient.TOPIC.COOKIE_REFRESH, async (cookie?: Cookie) => {
       if (cookie && this.storeEngine) {
@@ -170,37 +165,29 @@ export class Account extends EventEmitter {
 
   public async register(registration: RegisterData, clientType: ClientType): Promise<Context> {
     const context = await this.apiClient.register(registration, clientType);
-    const storeEngine = await this.initEngine(context);
-    await this.initServices(storeEngine);
+    await this.initServices(context);
     return context;
   }
 
-  public async init(clientType: ClientType, cookie?: Cookie, initializedStoreEngine?: CRUDEngine): Promise<Context> {
+  public async init(clientType: ClientType, cookie?: Cookie, initClient: boolean = true): Promise<Context> {
     const context = await this.apiClient.init(clientType, cookie);
-    if (initializedStoreEngine) {
-      this.storeEngine = initializedStoreEngine;
-      this.logger.log(`Initialized store with existing engine "${this.storeEngine.storeName}".`);
-    } else {
-      this.storeEngine = await this.initEngine(context);
-    }
-    await this.initServices(this.storeEngine);
-    if (initializedStoreEngine) {
-      await this.initClient({
-        clientType,
-      });
+    await this.initServices(context);
+    if (initClient) {
+      await this.initClient({clientType});
     }
     return context;
   }
 
-  public async initServices(storeEngine: CRUDEngine): Promise<void> {
+  public async initServices(context: Context): Promise<void> {
+    this.storeEngine = await this.initEngine(context);
     const accountService = new AccountService(this.apiClient);
     const assetService = new AssetService(this.apiClient);
-    const cryptographyService = new CryptographyService(this.apiClient, storeEngine, {
+    const cryptographyService = new CryptographyService(this.apiClient, this.storeEngine, {
       // We want to encrypt with fully qualified session ids, only if the backend is federated with other backends
       useQualifiedIds: this.backendFeatures.isFederated,
     });
 
-    const clientService = new ClientService(this.apiClient, storeEngine, cryptographyService);
+    const clientService = new ClientService(this.apiClient, this.storeEngine, cryptographyService);
     const connectionService = new ConnectionService(this.apiClient);
     const giphyService = new GiphyService(this.apiClient);
     const linkPreviewService = new LinkPreviewService(assetService);
@@ -208,7 +195,7 @@ export class Account extends EventEmitter {
       // We can use qualified ids to send messages as long as the backend supports federated endpoints
       useQualifiedIds: this.backendFeatures.federationEndpoints,
     });
-    const notificationService = new NotificationService(this.apiClient, cryptographyService, storeEngine);
+    const notificationService = new NotificationService(this.apiClient, cryptographyService, this.storeEngine);
     const selfService = new SelfService(this.apiClient);
     const teamService = new TeamService(this.apiClient);
 
@@ -232,23 +219,12 @@ export class Account extends EventEmitter {
     };
   }
 
-  public async login(
-    loginData: LoginData,
-    initClient: boolean = true,
-    clientInfo?: ClientInfo,
-    initializedStoreEngine?: CRUDEngine,
-  ): Promise<Context> {
+  public async login(loginData: LoginData, initClient: boolean = true, clientInfo?: ClientInfo): Promise<Context> {
     this.resetContext();
     LoginSanitizer.removeNonPrintableCharacters(loginData);
 
     const context = await this.apiClient.login(loginData);
-    if (initializedStoreEngine) {
-      this.storeEngine = initializedStoreEngine;
-      this.logger.log(`Initialized store with existing engine "${this.storeEngine.storeName}".`);
-    } else {
-      this.storeEngine = await this.initEngine(context);
-    }
-    await this.initServices(this.storeEngine);
+    await this.initServices(context);
 
     if (initClient) {
       await this.initClient(loginData, clientInfo);
@@ -396,11 +372,22 @@ export class Account extends EventEmitter {
     const clientType = context.clientType === ClientType.NONE ? '' : `@${context.clientType}`;
     const dbName = `wire@${this.apiClient.config.urls.name}@${context.userId}${clientType}`;
     this.logger.log(`Initialising store with name "${dbName}"...`);
-    this.storeEngine = await this.storeEngineProvider(dbName);
+    const openDb = async () => {
+      const initializedDb = await this.createStore(dbName, context);
+      if (initializedDb) {
+        this.logger.log(`Initialized store with existing engine "${dbName}".`);
+        return initializedDb;
+      }
+      this.logger.log(`Initialized store with new memory engine "${dbName}".`);
+      const memoryEngine = new MemoryEngine();
+      await memoryEngine.init(dbName);
+      return memoryEngine;
+    };
+    const storeEngine = await openDb();
     const cookie = CookieStore.getCookie();
     if (cookie) {
-      await this.persistCookie(this.storeEngine, cookie);
+      await this.persistCookie(storeEngine, cookie);
     }
-    return this.storeEngine;
+    return storeEngine;
   }
 }

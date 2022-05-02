@@ -91,7 +91,7 @@ export class Bot extends MessageHandler {
       await storeEngine?.updateOrCreate(AUTH_TABLE_NAME, AUTH_ACCESS_TOKEN_KEY, accessToken);
     });
 
-    this.account = storeEngine ? new Account(apiClient, () => Promise.resolve(storeEngine)) : new Account(apiClient);
+    this.account = new Account(apiClient, {createStore: () => Promise.resolve(storeEngine)});
 
     for (const payloadType of Object.values(PayloadBundleType)) {
       this.account.removeAllListeners(payloadType);
@@ -103,10 +103,10 @@ export class Bot extends MessageHandler {
         throw new Error('Store engine not provided');
       }
       const cookie = await this.getCookie(storeEngine);
-      await this.account.init(this.config.clientType, cookie, storeEngine);
+      await this.account.init(this.config.clientType, cookie);
     } catch (error) {
       this.logger.warn('Failed to init account from cookie', error);
-      await this.account.login(login, true, undefined, storeEngine);
+      await this.account.login(login);
     }
 
     await this.account.listen();
