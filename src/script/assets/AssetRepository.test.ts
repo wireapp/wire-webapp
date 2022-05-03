@@ -38,9 +38,9 @@ describe('AssetRepository', () => {
   const options = {} as AssetUploadOptions;
   let core: Core;
 
-  beforeEach(async () => {
+  beforeEach(() => {
     core = container.resolve(Core);
-    await core.initServices({} as any);
+    core.initServices({} as any);
     const mockedAPIClient = {
       asset: {
         api: {
