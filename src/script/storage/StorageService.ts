@@ -18,14 +18,19 @@
  */
 
 import {CRUDEngine, error as StoreEngineError} from '@wireapp/store-engine';
+import {ClientType} from '@wireapp/api-client/src/client/';
 import {IndexedDBEngine} from '@wireapp/store-engine-dexie';
 import {SQLeetEngine} from '@wireapp/store-engine-sqleet';
 import Dexie, {Transaction} from 'dexie';
 import {singleton} from 'tsyringe';
 
+import {getEphemeralValue} from 'Util/ephemeralValueStore';
 import {Logger, getLogger} from 'Util/Logger';
 import {loadValue, storeValue} from 'Util/StorageUtil';
 
+import {Config} from '../Config';
+import {SQLeetSchemata} from './SQLeetSchemata';
+import {StorageKey} from './StorageKey';
 import {StorageSchemata} from './StorageSchemata';
 import {StorageError} from '../error/StorageError';
 import {DexieDatabase} from './DexieDatabase';
@@ -51,18 +56,19 @@ export class StorageService {
   private readonly engine: CRUDEngine;
   public readonly isTemporaryAndNonPersistent: boolean;
   private readonly logger: Logger;
-  private readonly userId?: string;
+  private userId?: string;
   public dbName?: string;
 
-  constructor(engine: CRUDEngine) {
+  constructor(encryptedEngine?: CRUDEngine) {
     this.logger = getLogger('StorageService');
 
     this.dbName = undefined;
     this.userId = undefined;
 
-    this.engine = engine;
+    this.isTemporaryAndNonPersistent = !!encryptedEngine;
+
+    this.engine = encryptedEngine || new IndexedDBEngine();
     this.hasHookSupport = this.engine instanceof IndexedDBEngine;
-    this.isTemporaryAndNonPersistent = this.engine instanceof SQLeetEngine;
 
     this.dbListeners = [];
   }
@@ -78,13 +84,27 @@ export class StorageService {
    * @param requestPersistentStorage if a persistent storage should be requested
    * @returns Resolves with the database name
    */
-  init(userId: string = this.userId, requestPersistentStorage: boolean = false): string {
-    this.dbName = this.engine.storeName;
+  async init(userId: string = this.userId, requestPersistentStorage: boolean = false): Promise<string> {
+    const isPermanent = loadValue(StorageKey.AUTH.PERSIST);
+    const clientType = isPermanent ? ClientType.PERMANENT : ClientType.TEMPORARY;
+
+    this.userId = userId;
+    this.dbName = `wire@${Config.getConfig().ENVIRONMENT}@${userId}@${clientType}`;
 
     try {
-      if (this.hasHookSupport) {
-        this.db = this.engine['db'];
-        this._initCrudHooks(this.db);
+      if (this.isTemporaryAndNonPersistent) {
+        this.logger.info(`Initializing Storage Service with encrypted database '${this.dbName}'`);
+        await this.engine.init(this.dbName);
+      } else {
+        this.db = new DexieDatabase(this.dbName);
+        try {
+          await this.engine.initWithDb(this.db, requestPersistentStorage);
+        } catch (error) {
+          await this.engine.initWithDb(this.db, false);
+        }
+        await this.db.open();
+        this._initCrudHooks();
+        this.logger.info(`Storage Service initialized with database '${this.dbName}' version '${this.db.verno}'`);
       }
       return this.dbName;
     } catch (error) {
@@ -94,7 +114,12 @@ export class StorageService {
     }
   }
 
-  private _initCrudHooks(db: DexieDatabase): void {
+  static async getUninitializedEngine(): Promise<SQLeetEngine> {
+    const encryptionKey = await getEphemeralValue();
+    return new SQLeetEngine('/worker/sqleet-worker.js', SQLeetSchemata.getLatest(), encryptionKey);
+  }
+
+  private _initCrudHooks(): void {
     const callListener = (
       table: string,
       eventType: string,
@@ -112,19 +137,20 @@ export class StorageService {
     const listenableTables = [StorageSchemata.OBJECT_STORE.EVENTS];
 
     listenableTables.forEach(table => {
-      db.table(table).hook(
-        DEXIE_CRUD_EVENT.UPDATING,
-        function (modifications: Object, primaryKey: string, obj: Object, transaction: Transaction): void {
-          this.onsuccess = updatedObj => callListener(table, DEXIE_CRUD_EVENT.UPDATING, obj, updatedObj, transaction);
-        },
-      );
+      this.db
+        .table(table)
+        .hook(
+          DEXIE_CRUD_EVENT.UPDATING,
+          function (modifications: Object, primaryKey: string, obj: Object, transaction: Transaction): void {
+            this.onsuccess = updatedObj => callListener(table, DEXIE_CRUD_EVENT.UPDATING, obj, updatedObj, transaction);
+          },
+        );
 
-      db.table(table).hook(
-        DEXIE_CRUD_EVENT.DELETING,
-        function (primaryKey: string, obj: Object, transaction: Transaction): void {
+      this.db
+        .table(table)
+        .hook(DEXIE_CRUD_EVENT.DELETING, function (primaryKey: string, obj: Object, transaction: Transaction): void {
           this.onsuccess = (): void => callListener(table, DEXIE_CRUD_EVENT.DELETING, obj, undefined, transaction);
-        },
-      );
+        });
     });
   }
 
@@ -148,7 +174,7 @@ export class StorageService {
   async clearStores(): Promise<void[]> {
     const deleteStorePromises = this.isTemporaryAndNonPersistent
       ? [this.engine.purge()]
-      : Object.keys(this.db?._dbSchema ?? [])
+      : Object.keys(this.db._dbSchema)
           // avoid clearing tables needed by third parties (dexie-observable for eg)
           .filter(table => !table.startsWith('_'))
           .map(storeName => this.deleteStore(storeName));
@@ -219,10 +245,6 @@ export class StorageService {
       return deletedRecords;
     }
 
-    if (!this.db) {
-      return 0;
-    }
-
     return this.db
       .table(storeName)
       .where('id')
@@ -245,10 +267,6 @@ export class StorageService {
       }
 
       return deletedRecords;
-    }
-
-    if (!this.db) {
-      return 0;
     }
 
     return this.db
@@ -280,9 +298,6 @@ export class StorageService {
    * @returns Resolves with matching tables
    */
   getTables(tableNames: string[]): Dexie.Table<any, any>[] {
-    if (!this.db) {
-      return [];
-    }
     return tableNames.map(tableName => this.db.table(tableName));
   }
 
@@ -369,7 +384,7 @@ export class StorageService {
    */
   terminate(reason: string = 'unknown reason'): void {
     this.logger.info(`Closing database connection with '${this.dbName}' because of '${reason}'.`);
-    if (this.db) {
+    if (!this.isTemporaryAndNonPersistent) {
       this.db.close();
     }
   }

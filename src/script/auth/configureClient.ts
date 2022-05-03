@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2020 Wire Swiss GmbH
+ * Copyright (C) 2018 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,20 +17,18 @@
  *
  */
 
-import {APIClient as APIClientUnconfigured} from '@wireapp/api-client';
-import {singleton} from 'tsyringe';
+import {APIClient} from '@wireapp/api-client';
 
 import {Config} from '../Config';
 
-@singleton()
-export class APIClient extends APIClientUnconfigured {
-  constructor() {
-    super({
-      urls: {
-        name: 'backend',
-        rest: Config.getConfig().BACKEND_REST,
-        ws: Config.getConfig().BACKEND_WS,
-      },
-    });
-  }
-}
+const configureClient = () => {
+  return new APIClient({
+    urls: {
+      name: Config.getConfig().ENVIRONMENT,
+      rest: Config.getConfig().BACKEND_REST,
+      ws: Config.getConfig().BACKEND_WS,
+    },
+  });
+};
+
+export {configureClient};

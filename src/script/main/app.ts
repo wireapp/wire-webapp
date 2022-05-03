@@ -23,7 +23,6 @@ import 'core-js/es7/reflect';
 import ko from 'knockout';
 import platform from 'platform';
 import {container} from 'tsyringe';
-import {ClientType} from '@wireapp/api-client/src/client/';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import {amplify} from 'amplify';
 import type {SQLeetEngine} from '@wireapp/store-engine-sqleet';
@@ -32,7 +31,7 @@ import {Runtime} from '@wireapp/commons';
 
 import {getLogger, Logger} from 'Util/Logger';
 import {t} from 'Util/LocalizerUtil';
-import {checkIndexedDb, createRandomUuid} from 'Util/util';
+import {checkIndexedDb, createRandomUuid, isTemporaryClientAndNonPersistent} from 'Util/util';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 import {enableLogging} from 'Util/LoggerUtil';
 import {Environment} from 'Util/Environment';
@@ -188,14 +187,18 @@ class App {
    * @param encryptedEngine Encrypted database handler
    * @param apiClient Configured backend client
    */
-  constructor(private readonly appContainer: HTMLElement, core: Core, private readonly apiClient: APIClient) {
+  constructor(
+    private readonly appContainer: HTMLElement,
+    private readonly apiClient: APIClient,
+    options?: {storageEngine?: SQLeetEngine},
+  ) {
     this.apiClient.on(APIClient.TOPIC.ON_LOGOUT, () => this.logout(SIGN_OUT_REASON.NOT_SIGNED_IN, false));
     this.logger = getLogger('App');
     this.appContainer = appContainer;
 
     new WindowHandler();
 
-    this.service = this._setupServices(core.storage);
+    this.service = this._setupServices(options.storageEngine);
     this.repository = this._setupRepositories();
     if (Config.getConfig().FEATURE.ENABLE_DEBUG) {
       import('Util/DebugUtil').then(({DebugUtil}) => {
@@ -210,7 +213,7 @@ class App {
     this.singleInstanceHandler = new SingleInstanceHandler(onExtraInstanceStarted);
 
     this._subscribeToEvents();
-    this.initApp(core);
+    this.initApp();
     this.initServiceWorker();
   }
 
@@ -373,7 +376,7 @@ class App {
    *
    * @param App init after page reload
    */
-  async initApp(core: Core) {
+  async initApp() {
     // add body information
     const osCssClass = Runtime.isMacOS() ? 'os-mac' : 'os-pc';
     const platformCssClass = Runtime.isDesktopApp() ? 'platform-electron' : 'platform-web';
@@ -403,7 +406,7 @@ class App {
       this._registerSingleInstance();
       loadingView.updateProgress(2.5);
       telemetry.timeStep(AppInitTimingsStep.RECEIVED_ACCESS_TOKEN);
-      await authRepository.init();
+      const {clientType} = await authRepository.init();
       const selfUser = await this.initiateSelfUser();
       if (this.apiClient.backendFeatures.isFederated) {
         // Migrate all existing session to fully qualified ids (if need be)
@@ -420,6 +423,8 @@ class App {
       telemetry.timeStep(AppInitTimingsStep.VALIDATED_CLIENT);
       telemetry.addStatistic(AppInitStatisticsValue.CLIENT_TYPE, clientEntity().type);
 
+      const core = container.resolve(Core);
+      await core.init(clientType, undefined, this.service.storage['engine']);
       await cryptographyRepository.init(core.service!.cryptography.cryptobox, clientEntity);
 
       loadingView.updateProgress(10);
@@ -894,7 +899,6 @@ class App {
 
 $(async () => {
   const apiClient = container.resolve(APIClient);
-  const core = container.resolve(Core);
   await apiClient.useVersion(Config.getConfig().SUPPORTED_API_VERSIONS);
 
   enableLogging(Config.getConfig().FEATURE.ENABLE_DEBUG);
@@ -910,8 +914,10 @@ $(async () => {
     if (shouldPersist === undefined) {
       doRedirect(SIGN_OUT_REASON.NOT_SIGNED_IN);
     } else {
-      await core.init(shouldPersist ? ClientType.PERMANENT : ClientType.TEMPORARY);
-      window.wire.app = new App(appContainer, core, apiClient);
+      const storageEngine = isTemporaryClientAndNonPersistent(shouldPersist)
+        ? await StorageService.getUninitializedEngine()
+        : undefined;
+      window.wire.app = new App(appContainer, apiClient, {storageEngine});
     }
   }
 });
