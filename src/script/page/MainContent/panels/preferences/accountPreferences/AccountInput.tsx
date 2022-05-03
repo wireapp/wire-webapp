@@ -112,6 +112,7 @@ const AccountInput: React.FC<AccountInputProps> = ({
   };
 
   const iconUiePrefix = rest['data-uie-name'] ?? 'account-input';
+  const fieldUieName = `${iconUiePrefix}-display`;
 
   return (
     <div
@@ -175,7 +176,7 @@ const AccountInput: React.FC<AccountInputProps> = ({
             }}
           >
             <div css={{alignItems: 'center', display: 'flex', lineHeight: '1.38', position: 'absolute'}}>
-              <span data-uie-name={`${iconUiePrefix}-display`}>
+              <span data-uie-name={fieldUieName}>
                 <span>{prefix}</span>
                 <span>{input}</span>
                 <span>{suffix}</span>
@@ -186,6 +187,7 @@ const AccountInput: React.FC<AccountInputProps> = ({
       )}
       {isEditing && (
         <TextInput
+          uieName={fieldUieName}
           label={label}
           name={valueUie}
           value={input}
