@@ -45,6 +45,7 @@ import {ConversationError} from 'src/script/error/ConversationError';
 import {EventRecord, StorageService} from '../storage';
 import {ConversationRepository} from './ConversationRepository';
 import {CONVERSATION_ACCESS, CONVERSATION_ACCESS_ROLE} from '@wireapp/api-client/src/conversation';
+import {escapeRegex} from 'Util/SanitizationUtil';
 
 import {UserGenerator} from '../../../test/helper/UserGenerator';
 import {TestFactory} from '../../../test/helper/TestFactory';
@@ -467,7 +468,7 @@ describe('ConversationRepository', () => {
 
     describe('conversation.asset-add', () => {
       beforeEach(() => {
-        const matchUsers = new RegExp(`${Config.getConfig().BACKEND_REST}/users\\?ids=([a-z0-9-,]+)`);
+        const matchUsers = new RegExp(`${escapeRegex(Config.getConfig().BACKEND_REST)}/users\\?ids=([a-z0-9-,]+)`);
         (server as any).respondWith('GET', matchUsers, (xhr: any, ids: string) => {
           const users = [];
           for (const userId of ids.split(',')) {
@@ -517,7 +518,7 @@ describe('ConversationRepository', () => {
           xhr.respond(HTTP_STATUS.OK, {'Content-Type': 'application/json'}, JSON.stringify(users));
         });
 
-        const matchConversations = new RegExp(`${Config.getConfig().BACKEND_REST}/conversations/([a-z0-9-]+)`);
+        const matchConversations = new RegExp(`${escapeRegex(Config.getConfig().BACKEND_REST)}/conversations/([a-z0-9-]+)`);
         (server as any).respondWith('GET', matchConversations, (xhr: any, conversationId: string) => {
           const conversation = {
             access: [CONVERSATION_ACCESS.PRIVATE],
