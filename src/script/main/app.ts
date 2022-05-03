@@ -894,8 +894,8 @@ class App {
 
 $(async () => {
   const apiClient = container.resolve(APIClient);
-  const core = container.resolve(Core);
   await apiClient.useVersion(Config.getConfig().SUPPORTED_API_VERSIONS);
+  const core = container.resolve(Core);
 
   enableLogging(Config.getConfig().FEATURE.ENABLE_DEBUG);
   exposeWrapperGlobals();
