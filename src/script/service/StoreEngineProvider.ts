@@ -20,34 +20,55 @@
 import type {CRUDEngine} from '@wireapp/store-engine';
 import {IndexedDBEngine} from '@wireapp/store-engine-dexie';
 import {SQLeetEngine} from '@wireapp/store-engine-sqleet';
-import Dexie, {Transaction} from 'dexie';
+import {MemoryEngine} from '@wireapp/store-engine';
+import Dexie from 'dexie';
 
 import {saveRandomEncryptionKey} from 'Util/ephemeralValueStore';
 
-import {StorageSchemata} from '../storage';
 import {SQLeetSchemata} from '../storage/SQLeetSchemata';
+import {DexieDatabase} from '../storage/DexieDatabase';
 
-export const providePermanentEngine = async (storeName: string): Promise<CRUDEngine> => {
-  const db = new Dexie(storeName);
-  const databaseSchemata = StorageSchemata.SCHEMATA;
-  databaseSchemata.forEach(({schema, upgrade, version}) => {
-    if (upgrade) {
-      return db
-        .version(version)
-        .stores(schema)
-        .upgrade((transaction: Transaction) => upgrade(transaction, db));
-    }
-    return db.version(version).stores(schema);
-  });
+export enum DatabaseTypes {
+  /** a permament storage that will still live after logout */
+  PERMANENT,
+  /** a storage that is encrypted on disk */
+  ENCRYPTED,
+  /** a storage that will be lost when the app is reloaded */
+  EFFEMERAL,
+}
+
+const providePermanentEngine = async (storeName: string, requestPersistentStorage: boolean): Promise<CRUDEngine> => {
+  const db = new DexieDatabase(storeName);
   const engine = new IndexedDBEngine();
-  await engine.initWithDb(db);
+  try {
+    await engine.initWithDb(db, requestPersistentStorage);
+  } catch (error) {
+    await engine.initWithDb(db, false);
+  }
   return engine;
 };
 
-export const provideTemporaryAndNonPersistentEngine = async (storeName: string): Promise<CRUDEngine> => {
+const provideTemporaryAndNonPersistentEngine = async (storeName: string): Promise<CRUDEngine> => {
   await Dexie.delete('/sqleet');
   const encryptionKey = await saveRandomEncryptionKey();
   const engine = new SQLeetEngine('/worker/sqleet-worker.js', SQLeetSchemata.getLatest(), encryptionKey);
   await engine.init(storeName);
   return engine;
 };
+
+export async function createStorageEngine(
+  storeName: string,
+  type: DatabaseTypes,
+  requestPersistentStorage: boolean = false,
+): Promise<CRUDEngine> {
+  switch (type) {
+    case DatabaseTypes.PERMANENT:
+      return providePermanentEngine(storeName, requestPersistentStorage);
+
+    case DatabaseTypes.ENCRYPTED:
+      return provideTemporaryAndNonPersistentEngine(storeName);
+
+    case DatabaseTypes.EFFEMERAL:
+      return new MemoryEngine();
+  }
+}

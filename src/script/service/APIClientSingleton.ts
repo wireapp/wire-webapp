@@ -27,7 +27,7 @@ export class APIClient extends APIClientUnconfigured {
   constructor() {
     super({
       urls: {
-        name: 'backend',
+        name: Config.getConfig().ENVIRONMENT,
         rest: Config.getConfig().BACKEND_REST,
         ws: Config.getConfig().BACKEND_WS,
       },
