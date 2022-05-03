@@ -1113,7 +1113,10 @@ export class ConversationRepository {
           action: async () => {
             try {
               const response = await this.conversation_service.postConversationJoin(key, code);
-              const conversationEntity = await this.getConversationById({domain: '', id: conversationId});
+              const conversationEntity = await this.getConversationById({
+                domain: this.userState.self().domain,
+                id: conversationId,
+              });
               if (response) {
                 await this.onMemberJoin(conversationEntity, response);
               }
