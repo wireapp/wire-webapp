@@ -84,7 +84,6 @@ describe('ConversationRepository', () => {
   beforeEach(() => {
     server = sinon.fakeServer.create();
     server.autoRespond = true;
-    sinon.spy(jQuery, 'ajax');
 
     return testFactory.exposeConversationActors().then((conversation_repository: ConversationRepository) => {
       amplify.publish(WebAppEvents.EVENT.NOTIFICATION_HANDLING_STATE, NOTIFICATION_HANDLING_STATE.WEB_SOCKET);
@@ -117,7 +116,6 @@ describe('ConversationRepository', () => {
   afterEach(() => {
     server.restore();
     storage_service.clearStores();
-    (jQuery as any).ajax.restore();
     testFactory.conversation_repository['conversationState'].conversations.removeAll();
   });
 
