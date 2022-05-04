@@ -175,10 +175,10 @@ export class GroupCreationViewModel {
     const {value} = event.target;
 
     const trimmedNameInput = value.trim();
-    const nameTooLong = trimmedNameInput.length > this.maxNameLength;
+    const nameTooLong = value.length > this.maxNameLength;
     const nameTooShort = !trimmedNameInput.length;
 
-    this.groupName(trimmedNameInput);
+    this.groupName(value);
     if (nameTooLong) {
       return this.nameError(t('groupCreationPreferencesErrorNameLong'));
     } else if (nameTooShort) {
