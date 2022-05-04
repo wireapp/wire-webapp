@@ -881,17 +881,42 @@ export class ConversationService {
 
     return Promise.all(conversationIds.map(conversationId => this.leaveConversation(conversationId)));
   }
+  /**
+   * Create a group conversation.
+   * @param  {string} name
+   * @param  {string|string[]} otherUserIds
+   * @deprecated
+   * @returns Promise
+   */
+  public createConversation(name: string, otherUserIds: string | string[]): Promise<Conversation>;
+  /**
+   * Create a group conversation.
+   *
+   * @note Do not include yourself as the requestor
+   * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/conversations/createGroupConversation
+   *
+   * @param conversationData Payload object for group creation
+   * @returns Resolves when the conversation was created
+   */
+  public createConversation(conversationData: NewConversation): Promise<Conversation>;
+  public createConversation(
+    conversationData: NewConversation | string,
+    otherUserIds?: string | string[],
+  ): Promise<Conversation> {
+    let payload: NewConversation;
+    if (typeof conversationData === 'string') {
+      const ids = typeof otherUserIds === 'string' ? [otherUserIds] : otherUserIds;
 
-  public createConversation(name: string, otherUserIds: string | string[] = []): Promise<Conversation> {
-    const ids = typeof otherUserIds === 'string' ? [otherUserIds] : otherUserIds;
+      payload = {
+        name: conversationData,
+        receipt_mode: null,
+        users: ids ?? [],
+      };
+    } else {
+      payload = conversationData;
+    }
 
-    const newConversation: NewConversation = {
-      name,
-      receipt_mode: null,
-      users: ids,
-    };
-
-    return this.apiClient.api.conversation.postConversation(newConversation);
+    return this.apiClient.api.conversation.postConversation(payload);
   }
 
   public async getConversations(conversationId: string): Promise<Conversation>;
