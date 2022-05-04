@@ -101,9 +101,9 @@ export const renderMessage = (message: string, selfId: QualifiedId | null, menti
     const elementClasses = mentionData.isSelfMentioned ? ' self-mention' : '';
     let elementAttributes = mentionData.isSelfMentioned
       ? ' data-uie-name="label-self-mention"'
-      : ` data-uie-name="label-other-mention" data-user-id="${mentionData.userId}"`;
+      : ` data-uie-name="label-other-mention" data-user-id="${escape(mentionData.userId)}"`;
     if (!mentionData.isSelfMentioned && mentionData.domain) {
-      elementAttributes += ` data-user-domain="${mentionData.domain}"`;
+      elementAttributes += ` data-user-domain="${escape(mentionData.domain)}"`;
     }
 
     const mentionText = mentionData.text.replace(/^@/, '');
