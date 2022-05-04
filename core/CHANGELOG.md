@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [25.1.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/compare/@wireapp/core@25.0.0...@wireapp/core@25.1.0) (2022-05-04)
+
+
+### Features
+
+* Allow complete payload to crete conversations ([#4258](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/issues/4258)) ([a6d53e2](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/commit/a6d53e219e6ed96309ab02469b803ac461d38603))
+
+
+
+
+
 # [25.0.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/compare/@wireapp/core@24.4.7...@wireapp/core@25.0.0) (2022-05-02)
 
 
