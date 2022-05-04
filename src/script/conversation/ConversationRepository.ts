@@ -444,7 +444,7 @@ export class ConversationRepository {
     }
 
     try {
-      const response = await this.conversation_service.postConversations(payload);
+      const response = await this.core.service!.conversation.createConversation(payload);
       const {conversationEntity} = await this.onCreate({
         conversation: response.id,
         data: {
