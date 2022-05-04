@@ -1084,8 +1084,8 @@ export class ConversationRepository {
    *
    * @param event Custom event containing join key/code
    */
-  private readonly onConversationJoin = async (event: {detail: {code: string; key: string}}) => {
-    const {key, code} = event.detail;
+  private readonly onConversationJoin = async (event: {detail: {code: string; key: string; domain?: string}}) => {
+    const {key, code, domain} = event.detail;
 
     const showNoConversationModal = () => {
       const titleText = t('modalConversationJoinNotFoundHeadline');
@@ -1113,7 +1113,10 @@ export class ConversationRepository {
           action: async () => {
             try {
               const response = await this.conversation_service.postConversationJoin(key, code);
-              const conversationEntity = await this.getConversationById({domain: '', id: conversationId});
+              const conversationEntity = await this.getConversationById({
+                domain: domain ?? this.userState.self().domain,
+                id: conversationId,
+              });
               if (response) {
                 await this.onMemberJoin(conversationEntity, response);
               }

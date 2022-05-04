@@ -124,10 +124,12 @@ const ConversationJoin = ({
     }
   }, []);
 
-  const routeToApp = () => {
+  const routeToApp = (conversation: string = '', domain: string = '') => {
     const redirectLocation = isPwaEnabled
       ? UrlUtil.pathWithParams(EXTERNAL_ROUTE.PWA_LOGIN, {[QUERY_KEY.IMMEDIATE_LOGIN]: 'true'})
-      : UrlUtil.pathWithParams(EXTERNAL_ROUTE.WEBAPP);
+      : `${UrlUtil.pathWithParams(EXTERNAL_ROUTE.WEBAPP)}${
+          conversation && `#/conversation/${conversation}${domain && `/${domain}`}`
+        }`;
     window.location.replace(redirectLocation);
   };
 
@@ -148,7 +150,8 @@ const ConversationJoin = ({
       );
       const conversationEvent = await doJoinConversationByCode(conversationKey, conversationCode);
       await setLastEventDate(new Date(conversationEvent.time));
-      routeToApp();
+
+      routeToApp(conversationEvent.conversation, conversationEvent.qualified_conversation.domain);
     } catch (error) {
       if (error.label) {
         switch (error.label) {
@@ -219,62 +222,64 @@ const ConversationJoin = ({
             </Text>
           </ContainerXS>
         ) : renderTemporaryGuestAccountCreation ? (
-          <ContainerXS style={{margin: 'auto 0'}}>
-            <AppAlreadyOpen fullscreen={isPwaEnabled} />
-            <H2 style={{fontWeight: 500, marginBottom: '10px', marginTop: '0'}}>
-              <FormattedMessage
-                {...conversationJoinStrings.headline}
-                values={{
-                  brandName: Config.getConfig().BRAND_NAME,
-                }}
-              />
-            </H2>
-            <Text style={{fontSize: '16px', marginTop: '10px'}}>
-              <FormattedMessage {...conversationJoinStrings.subhead} />
-            </Text>
-            <Form style={{marginTop: 30}}>
-              <InputSubmitCombo>
-                <Input
-                  name="name"
-                  autoComplete="username"
-                  value={enteredName}
-                  ref={nameInput}
-                  onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-                    resetErrors();
-                    setEnteredName(event.target.value);
+          <div>
+            <ContainerXS style={{margin: 'auto 0'}}>
+              <AppAlreadyOpen fullscreen={isPwaEnabled} />
+              <H2 style={{fontWeight: 500, marginBottom: '10px', marginTop: '0'}}>
+                <FormattedMessage
+                  {...conversationJoinStrings.headline}
+                  values={{
+                    brandName: Config.getConfig().BRAND_NAME,
                   }}
-                  placeholder={_(conversationJoinStrings.namePlaceholder)}
-                  maxLength={64}
-                  minLength={2}
-                  pattern=".{2,64}"
-                  required
-                  data-uie-name="enter-name"
                 />
-                <RoundIconButton
-                  disabled={!enteredName || !isValidName}
-                  type="submit"
-                  formNoValidate
-                  onClick={checkNameValidity}
-                  data-uie-name="do-next"
-                >
-                  <ArrowIcon />
-                </RoundIconButton>
-              </InputSubmitCombo>
-              {error ? parseValidationErrors(error) : parseError(conversationError)}
-            </Form>
-            {!isPwaEnabled && (
-              <Small block>
-                {`${_(conversationJoinStrings.hasAccount)} `}
-                <RouterLink
-                  to={`${ROUTE.LOGIN}/${conversationKey}/${conversationCode}`}
-                  textTransform={'none'}
-                  data-uie-name="go-login"
-                >
-                  {_(conversationJoinStrings.loginLink)}
-                </RouterLink>
-              </Small>
-            )}
-          </ContainerXS>
+              </H2>
+              <Text style={{fontSize: '16px', marginTop: '10px'}}>
+                <FormattedMessage {...conversationJoinStrings.subhead} />
+              </Text>
+              <Form style={{marginTop: 30}}>
+                <InputSubmitCombo>
+                  <Input
+                    name="name"
+                    autoComplete="username"
+                    value={enteredName}
+                    ref={nameInput}
+                    onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                      resetErrors();
+                      setEnteredName(event.target.value);
+                    }}
+                    placeholder={_(conversationJoinStrings.namePlaceholder)}
+                    maxLength={64}
+                    minLength={2}
+                    pattern=".{2,64}"
+                    required
+                    data-uie-name="enter-name"
+                  />
+                  <RoundIconButton
+                    disabled={!enteredName || !isValidName}
+                    type="submit"
+                    formNoValidate
+                    onClick={checkNameValidity}
+                    data-uie-name="do-next"
+                  >
+                    <ArrowIcon />
+                  </RoundIconButton>
+                </InputSubmitCombo>
+                {error ? parseValidationErrors(error) : parseError(conversationError)}
+              </Form>
+              {!isPwaEnabled && (
+                <Small block>
+                  {`${_(conversationJoinStrings.hasAccount)} `}
+                  <RouterLink
+                    to={`${ROUTE.LOGIN}/${conversationKey}/${conversationCode}`}
+                    textTransform={'none'}
+                    data-uie-name="go-login"
+                  >
+                    {_(conversationJoinStrings.loginLink)}
+                  </RouterLink>
+                </Small>
+              )}
+            </ContainerXS>
+          </div>
         ) : (
           <ContainerXS style={{margin: 'auto 0'}}>
             <AppAlreadyOpen fullscreen={isPwaEnabled} />
@@ -294,8 +299,8 @@ const ConversationJoin = ({
               style={{marginTop: 16}}
               onClick={async () => {
                 try {
-                  await doJoinConversationByCode(conversationKey, conversationCode);
-                  routeToApp();
+                  const conversationEvent = await doJoinConversationByCode(conversationKey, conversationCode);
+                  routeToApp(conversationEvent.conversation, conversationEvent.qualified_conversation.domain);
                 } catch (error) {
                   console.warn('Unable to join conversation with existing account', error);
                 }
