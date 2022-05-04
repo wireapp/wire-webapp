@@ -124,7 +124,7 @@ const ConversationJoin = ({
     }
   }, []);
 
-  const routeToApp = (conversation?: string, domain?: string) => {
+  const routeToApp = (conversation: string = '', domain: string = '') => {
     const redirectLocation = isPwaEnabled
       ? UrlUtil.pathWithParams(EXTERNAL_ROUTE.PWA_LOGIN, {[QUERY_KEY.IMMEDIATE_LOGIN]: 'true'})
       : `${UrlUtil.pathWithParams(EXTERNAL_ROUTE.WEBAPP)}${

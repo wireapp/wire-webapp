@@ -700,7 +700,7 @@ class App {
     if (conversationRedirect) {
       const {conversation, domain} = JSON.parse(conversationRedirect)?.data;
       localStorage.removeItem(App.LOCAL_STORAGE_LOGIN_CONVERSATION_KEY);
-      window.location.replace(`#/conversation/${conversation}${domain && `/${domain}`}`);
+      window.location.replace(`#/conversation/${conversation}${domain ? `/${domain}` : ''}`);
     }
 
     const router = new Router({
