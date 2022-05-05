@@ -29,6 +29,7 @@ interface AccountInputProps extends React.InputHTMLAttributes<HTMLInputElement> 
   forceLowerCase?: boolean;
   isDone?: boolean;
   label: string;
+  fieldName: string;
   labelUie?: string;
   maxLength?: number;
   onValueChange?: (value: string) => void;
@@ -61,6 +62,7 @@ export const useInputDone = () => {
 
 const AccountInput: React.FC<AccountInputProps> = ({
   label,
+  fieldName,
   value,
   readOnly,
   onValueChange,
@@ -112,7 +114,6 @@ const AccountInput: React.FC<AccountInputProps> = ({
   };
 
   const iconUiePrefix = rest['data-uie-name'] ?? 'account-input';
-  const fieldUieName = `${iconUiePrefix}-display`;
 
   return (
     <div
@@ -138,6 +139,7 @@ const AccountInput: React.FC<AccountInputProps> = ({
             htmlFor={valueUie}
           >
             {label}
+
             {!readOnly && (
               <button
                 type="button"
@@ -154,6 +156,7 @@ const AccountInput: React.FC<AccountInputProps> = ({
                   setIsEditingExternal?.(true);
                   setIsEditing(true);
                 }}
+                data-uie-name={`go-edit-${fieldName}`}
               >
                 {isDone ? (
                   <Icon.AnimatedCheck
@@ -170,13 +173,14 @@ const AccountInput: React.FC<AccountInputProps> = ({
               </button>
             )}
           </label>
+
           <div
             css={{
               position: 'relative',
             }}
           >
             <div css={{alignItems: 'center', display: 'flex', lineHeight: '1.38', position: 'absolute'}}>
-              <span data-uie-name={fieldUieName}>
+              <span data-uie-name={`${fieldName}-display`}>
                 <span>{prefix}</span>
                 <span>{input}</span>
                 <span>{suffix}</span>
@@ -185,9 +189,10 @@ const AccountInput: React.FC<AccountInputProps> = ({
           </div>
         </>
       )}
+
       {isEditing && (
         <TextInput
-          uieName={fieldUieName}
+          uieName={`enter-${fieldName}-input`}
           label={label}
           name={valueUie}
           value={input}
