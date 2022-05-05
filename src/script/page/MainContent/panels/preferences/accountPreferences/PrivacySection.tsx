@@ -49,6 +49,7 @@ const PrivacySection: React.FC<PrivacySectionProps> = ({
     ]);
 
   const {receiptMode} = useKoSubscribableChildren(propertiesRepository, ['receiptMode']);
+
   return (
     <PreferencesSection hasSeparator className="preferences-section-privacy" title={t('preferencesAccountPrivacy')}>
       <PreferencesCheckbox

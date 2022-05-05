@@ -200,7 +200,9 @@ const AccountPreferences: React.FC<AccountPreferencesProps> = ({
           <div className="preferences-leave-disclaimer">{t('preferencesAccountLeaveGuestRoomDescription')}</div>
         </PreferencesSection>
       )}
+
       {isConsentCheckEnabled && <DataUsageSection {...{brandName, isActivatedAccount, propertiesRepository}} />}
+
       <PrivacySection {...{propertiesRepository}} />
       {isActivatedAccount && (
         <>
