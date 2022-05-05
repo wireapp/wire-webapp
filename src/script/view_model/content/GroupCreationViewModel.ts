@@ -176,7 +176,7 @@ export class GroupCreationViewModel {
     const {value} = event.target as HTMLInputElement;
 
     const trimmedNameInput = value.trim();
-    const nameTooLong = value.length > this.maxNameLength;
+    const nameTooLong = trimmedNameInput.length > this.maxNameLength;
     const nameTooShort = !trimmedNameInput.length;
 
     this.groupName(value);
