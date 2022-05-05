@@ -29,6 +29,7 @@ interface AccountInputProps extends React.InputHTMLAttributes<HTMLInputElement> 
   forceLowerCase?: boolean;
   isDone?: boolean;
   label: string;
+  fieldName: string;
   labelUie?: string;
   maxLength?: number;
   onValueChange?: (value: string) => void;
@@ -61,6 +62,7 @@ export const useInputDone = () => {
 
 const AccountInput: React.FC<AccountInputProps> = ({
   label,
+  fieldName,
   value,
   readOnly,
   onValueChange,
@@ -154,6 +156,7 @@ const AccountInput: React.FC<AccountInputProps> = ({
                   setIsEditingExternal?.(true);
                   setIsEditing(true);
                 }}
+                data-uie-name={`go-edit-${fieldName}`}
               >
                 {isDone ? (
                   <Icon.AnimatedCheck
@@ -177,7 +180,7 @@ const AccountInput: React.FC<AccountInputProps> = ({
             }}
           >
             <div css={{alignItems: 'center', display: 'flex', lineHeight: '1.38', position: 'absolute'}}>
-              <span data-uie-name="item-enriched-value">
+              <span data-uie-name={`${fieldName}-display`}>
                 <span>{prefix}</span>
                 <span>{input}</span>
                 <span>{suffix}</span>
@@ -189,7 +192,7 @@ const AccountInput: React.FC<AccountInputProps> = ({
 
       {isEditing && (
         <TextInput
-          uieName="item-enriched-value"
+          uieName={`enter-${fieldName}-input`}
           label={label}
           name={valueUie}
           value={input}

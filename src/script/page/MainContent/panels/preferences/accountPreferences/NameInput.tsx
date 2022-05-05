@@ -57,7 +57,7 @@ const NameInput: React.FC<NameInputProps> = ({name, userRepository, canEditProfi
       label={t('preferencesAccountDisplayname')}
       value={name}
       readOnly={!canEditProfile}
-      data-uie-name="enter-name"
+      fieldName="displayname"
       maxLength={128}
     />
   );
