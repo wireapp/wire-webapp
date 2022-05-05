@@ -170,21 +170,30 @@ export class GroupCreationViewModel {
   readonly onGroupNameCancel = () => {
     this.groupName('');
   };
-  readonly onGroupNameChange = (event: any) => {
+
+  readonly onGroupNameChange = (event: Event) => {
     event.preventDefault();
-    const {value} = event.target;
+    const {value} = event.target as HTMLInputElement;
 
     const trimmedNameInput = value.trim();
     const nameTooLong = trimmedNameInput.length > this.maxNameLength;
     const nameTooShort = !trimmedNameInput.length;
 
-    this.groupName(trimmedNameInput);
+    this.groupName(value);
     if (nameTooLong) {
       return this.nameError(t('groupCreationPreferencesErrorNameLong'));
     } else if (nameTooShort) {
       return this.nameError(t('groupCreationPreferencesErrorNameShort'));
     }
     this.nameError('');
+  };
+
+  readonly onGroupNameBlur = (event: Event) => {
+    event.preventDefault();
+    const {value} = event.target as HTMLInputElement;
+
+    const trimmedName = value.trim();
+    this.groupName(trimmedName);
   };
 
   readonly showCreateGroup = (groupCreationSource: GroupCreationSource, userEntity: User) => {
