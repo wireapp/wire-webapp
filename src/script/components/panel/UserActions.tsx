@@ -30,7 +30,7 @@ import type {User} from '../../entity/User';
 import type {MenuItem} from './PanelActions';
 
 import PanelActions from './PanelActions';
-import {registerReactComponent} from 'Util/ComponentUtil';
+import {registerReactComponent, useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {matchQualifiedIds} from 'Util/QualifiedId';
 import {ACCESS_STATE} from '../../conversation/AccessState';
 import {CONVERSATION_TYPE} from '@wireapp/api-client/src/conversation';
@@ -94,6 +94,15 @@ const UserActions: React.FC<UserActionsProps> = ({
   conversationRoleRepository,
   selfUser,
 }) => {
+  useKoSubscribableChildren(user, [
+    'isTemporaryGuest',
+    'isTeamMember',
+    'isBlocked',
+    'isRequest',
+    'isCanceled',
+    'isUnknown',
+  ]);
+
   const isNotMe = !user.isMe && isSelfActivated;
 
   const create1to1Conversation = async (userEntity: User, showConversation: boolean): Promise<void> => {
