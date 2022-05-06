@@ -50,6 +50,7 @@ const PreferencesCheckbox: React.FC<PreferencesCheckboxProps> = ({
           uieName={uieName}
         />
       </div>
+
       {details && <div className="preferences-detail preferences-detail-intended">{details}</div>}
     </>
   );

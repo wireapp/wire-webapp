@@ -32,40 +32,49 @@ interface CheckboxProps {
 
 const Checkbox: React.FC<CheckboxProps> = ({disabled, label, isChecked, name, onCheckedChanged, uieName}) => {
   return (
-    <label
-      className="label-base"
-      css={getLabelCSS(disabled)}
-      htmlFor={name}
-      data-uie-name={uieName}
-      data-uie-value={isChecked}
-    >
-      <Global styles={getInputCSSDark(isChecked, disabled)} />
+    <>
       <input
-        className={isChecked && 'input-dark'}
-        disabled={disabled}
+        {...(isChecked && {
+          className: 'input-dark',
+        })}
         type="checkbox"
+        checked={isChecked}
+        disabled={disabled}
+        aria-checked={isChecked}
         id={name}
         name={name}
         onChange={onCheckedChanged}
         css={getInputCSS(isChecked, disabled)}
       />
-      <svg
-        aria-hidden="true"
-        css={getSvgCSS(isChecked, disabled)}
-        // This element is purely decorative so
-        // we hide it for screen readers
 
-        viewBox="0 0 15 11"
-        fill="none"
+      <label
+        className="label-base"
+        css={getLabelCSS(disabled)}
+        htmlFor={name}
+        data-uie-name={uieName}
+        data-uie-value={isChecked}
       >
-        <path
-          d="M1 4.5L5 9L14 1"
-          strokeWidth="2"
-          stroke={isChecked ? 'var(--white)' : 'none'} // only show the checkmark when `isCheck` is `true`
-        />
-      </svg>
-      {label}
-    </label>
+        <Global styles={getInputCSSDark(isChecked, disabled)} />
+
+        <svg
+          aria-hidden="true"
+          css={getSvgCSS(isChecked, disabled)}
+          // This element is purely decorative so
+          // we hide it for screen readers
+
+          viewBox="0 0 15 11"
+          fill="none"
+        >
+          <path
+            d="M1 4.5L5 9L14 1"
+            strokeWidth="2"
+            stroke={isChecked ? 'var(--white)' : 'none'} // only show the checkmark when `isCheck` is `true`
+          />
+        </svg>
+
+        {label}
+      </label>
+    </>
   );
 };
 
