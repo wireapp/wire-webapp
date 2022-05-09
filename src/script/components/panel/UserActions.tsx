@@ -94,13 +94,33 @@ const UserActions: React.FC<UserActionsProps> = ({
   conversationRoleRepository,
   selfUser,
 }) => {
-  useKoSubscribableChildren(user, [
+  //isBlocked: false
+  // isCanceled: false
+  // isRequest: false
+  // isTeamMember: false
+  // isTemporaryGuest: false
+  // isUnknown: false
+
+  const {
+    isBlocked,
+    isCanceled,
+    isRequest,
+    isTeamMember,
+    isTemporaryGuest,
+    isUnknown,
+    isConnected,
+    isOutgoingRequest,
+    isIncomingRequest,
+  } = useKoSubscribableChildren(user, [
     'isTemporaryGuest',
     'isTeamMember',
     'isBlocked',
+    'isOutgoingRequest',
+    'isIncomingRequest',
     'isRequest',
     'isCanceled',
     'isUnknown',
+    'isConnected',
   ]);
 
   const isNotMe = !user.isMe && isSelfActivated;
@@ -137,7 +157,7 @@ const UserActions: React.FC<UserActionsProps> = ({
     };
 
   const open1To1Conversation: MenuItem = isNotMe &&
-    (user.isConnected() || user.isTeamMember()) && {
+    (isConnected || isTeamMember) && {
       click: async () => {
         await create1to1Conversation(user, true);
         onAction(Actions.OPEN_CONVERSATION);
@@ -148,7 +168,7 @@ const UserActions: React.FC<UserActionsProps> = ({
     };
 
   const acceptConnectionRequest: MenuItem = isNotMe &&
-    user.isIncomingRequest() && {
+    isIncomingRequest && {
       click: async () => {
         await actionsViewModel.acceptConnectionRequest(user);
         await create1to1Conversation(user, true);
@@ -160,7 +180,7 @@ const UserActions: React.FC<UserActionsProps> = ({
     };
 
   const ignoreConnectionRequest: MenuItem = isNotMe &&
-    user.isIncomingRequest() && {
+    isIncomingRequest && {
       click: async () => {
         await actionsViewModel.ignoreConnectionRequest(user);
         onAction(Actions.IGNORE_REQUEST);
@@ -171,7 +191,7 @@ const UserActions: React.FC<UserActionsProps> = ({
     };
 
   const cancelConnectionRequest: MenuItem = isNotMe &&
-    user.isOutgoingRequest() && {
+    isOutgoingRequest && {
       click: async () => {
         await actionsViewModel.cancelConnectionRequest(user);
         await create1to1Conversation(user, false);
@@ -182,8 +202,8 @@ const UserActions: React.FC<UserActionsProps> = ({
       label: t('groupParticipantActionCancelRequest'),
     };
 
-  const isNotConnectedUser = user.isCanceled() || user.isUnknown();
-  const canConnect = !user.isTeamMember() && !user.isTemporaryGuest();
+  const isNotConnectedUser = isCanceled || isUnknown;
+  const canConnect = !isTeamMember && !isTemporaryGuest;
   const sendConnectionRequest: MenuItem = isNotMe &&
     isNotConnectedUser &&
     canConnect && {
@@ -208,7 +228,7 @@ const UserActions: React.FC<UserActionsProps> = ({
     };
 
   const blockUser: MenuItem = isNotMe &&
-    (user.isConnected() || user.isRequest()) && {
+    (isConnected || isRequest) && {
       click: async () => {
         await actionsViewModel.blockUser(user);
         await create1to1Conversation(user, false);
@@ -220,7 +240,7 @@ const UserActions: React.FC<UserActionsProps> = ({
     };
 
   const unblockUser: MenuItem = isNotMe &&
-    user.isBlocked() && {
+    isBlocked && {
       click: async () => {
         await actionsViewModel.unblockUser(user);
         await create1to1Conversation(user, !conversation);
