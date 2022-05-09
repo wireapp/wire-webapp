@@ -75,13 +75,26 @@ const AudioAsset: React.FC<AudioAssetProps> = ({
       try {
         const blob = await loadAsset(asset.original_resource());
         setAudioSrc(window.URL.createObjectURL(blob));
-        audioElement?.play();
       } catch (error) {
         logger.error('Failed to load audio asset ', error);
       }
       asset.status(AssetTransferState.UPLOADED);
     }
   };
+
+  useEffect(() => {
+    if (audioSrc && audioElement) {
+      const playPromise = audioElement.play();
+
+      if (playPromise !== undefined) {
+        playPromise.catch(error => {
+          logger.error('Failed to load audio asset ', error);
+          // Auto-play was prevented
+          // Show paused UI.
+        });
+      }
+    }
+  }, [audioElement, audioSrc]);
 
   useEffect(() => {
     return () => {
