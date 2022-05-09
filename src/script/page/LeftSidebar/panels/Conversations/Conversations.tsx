@@ -145,7 +145,8 @@ const Conversations: React.FC<ConversationsProps> = ({
       >
         <Icon.Settings />
       </button>
-      {teamState.isTeam() ? (
+
+      {!teamState.isTeam() ? (
         <>
           <button
             type="button"
@@ -159,13 +160,13 @@ const Conversations: React.FC<ConversationsProps> = ({
               label={userName}
             />
           </button>
-          {(isOnLegalHold || hasPendingLegalHold) && (
-            <LegalHoldDot
-              isPending={hasPendingLegalHold}
-              dataUieName={hasPendingLegalHold ? 'status-legal-hold-pending' : 'status-legal-hold'}
-              legalHoldModal={listViewModel.contentViewModel.legalHoldModal}
-            />
-          )}
+          {/*{(isOnLegalHold || hasPendingLegalHold) && (*/}
+          <LegalHoldDot
+            isPending={hasPendingLegalHold}
+            dataUieName={hasPendingLegalHold ? 'status-legal-hold-pending' : 'status-legal-hold'}
+            legalHoldModal={listViewModel.contentViewModel.legalHoldModal}
+          />
+          {/*)}*/}
         </>
       ) : (
         <span className="left-list-header-text" data-uie-name="status-name">
