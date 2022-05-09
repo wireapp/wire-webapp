@@ -90,11 +90,11 @@ export class TestFactory {
    * @returns {Promise<StorageRepository>} The storage repository.
    */
   async exposeStorageActors() {
-    const engine = await createStorageEngine('test', DatabaseTypes.PERMANENT);
-    container.registerInstance(StorageService, new StorageService(engine));
+    container.registerInstance(StorageService, new StorageService());
     this.storage_service = container.resolve(StorageService);
     if (!this.storage_service.db) {
-      this.storage_service.init(entities.user.john_doe.id, false);
+      const engine = await createStorageEngine('test', DatabaseTypes.PERMANENT);
+      this.storage_service.init(engine);
     }
     this.storage_repository = singleton(StorageRepository, this.storage_service);
 
