@@ -174,18 +174,10 @@ const AccountInput: React.FC<AccountInputProps> = ({
             )}
           </label>
 
-          <div
-            css={{
-              position: 'relative',
-            }}
-          >
-            <div css={{alignItems: 'center', display: 'flex', lineHeight: '1.38', position: 'absolute'}}>
-              <span data-uie-name={`${fieldName}-display`}>
-                <span>{prefix}</span>
-                <span>{input}</span>
-                <span>{suffix}</span>
-              </span>
-            </div>
+          <div css={{alignItems: 'center', display: 'flex', lineHeight: '1.38', width: '100%'}}>
+            <span data-uie-name={`${fieldName}-display`} className="ellipsis">
+              {[prefix, input, suffix].filter(Boolean).join('')}
+            </span>
           </div>
         </>
       )}
