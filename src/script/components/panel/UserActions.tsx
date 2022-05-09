@@ -94,13 +94,6 @@ const UserActions: React.FC<UserActionsProps> = ({
   conversationRoleRepository,
   selfUser,
 }) => {
-  //isBlocked: false
-  // isCanceled: false
-  // isRequest: false
-  // isTeamMember: false
-  // isTemporaryGuest: false
-  // isUnknown: false
-
   const {
     isBlocked,
     isCanceled,
