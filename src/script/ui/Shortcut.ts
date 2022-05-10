@@ -112,20 +112,6 @@ const SHORTCUT_MAP: Record<string, Shortcut> = {
       },
     },
   },
-  [ShortcutType.PING]: {
-    event: WebAppEvents.SHORTCUT.PING,
-    shortcut: {
-      electron: {
-        macos: 'command + k',
-        menu: true,
-        pc: 'ctrl + k',
-      },
-      webapp: {
-        macos: 'command + alt + k',
-        pc: 'ctrl + alt + k',
-      },
-    },
-  },
   [ShortcutType.PEOPLE]: {
     event: WebAppEvents.SHORTCUT.PEOPLE,
     shortcut: {
