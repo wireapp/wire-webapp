@@ -88,7 +88,6 @@ const VideoAsset: React.FC<VideoAssetProps> = ({
         try {
           const blob = await loadAsset(asset.original_resource());
           setVideoSrc(window.URL.createObjectURL(blob));
-
           setIsVideoLoaded(true);
         } catch (error) {
           console.error('Failed to load video asset ', error);
@@ -111,11 +110,9 @@ const VideoAsset: React.FC<VideoAssetProps> = ({
     if (videoSrc && videoElement) {
       const playPromise = videoElement.play();
 
-      if (playPromise !== undefined) {
-        playPromise.catch(error => {
-          console.error('Failed to load video asset ', error);
-        });
-      }
+      playPromise?.catch(error => {
+        console.error('Failed to load video asset ', error);
+      });
     }
   }, [videoElement, videoSrc]);
 

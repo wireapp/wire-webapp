@@ -86,13 +86,9 @@ const AudioAsset: React.FC<AudioAssetProps> = ({
     if (audioSrc && audioElement) {
       const playPromise = audioElement.play();
 
-      if (playPromise !== undefined) {
-        playPromise.catch(error => {
-          logger.error('Failed to load audio asset ', error);
-          // Auto-play was prevented
-          // Show paused UI.
-        });
-      }
+      playPromise?.catch(error => {
+        logger.error('Failed to load audio asset ', error);
+      });
     }
   }, [audioElement, audioSrc]);
 
@@ -105,6 +101,7 @@ const AudioAsset: React.FC<AudioAssetProps> = ({
   return (
     <div className={cx('audio-asset', className)} data-uie-name="audio-asset" data-uie-value={asset.file_name}>
       <audio ref={setAudioElement} src={audioSrc} onTimeUpdate={onTimeupdate} />
+
       {!isObfuscated ? (
         <>
           {hasHeader && (
