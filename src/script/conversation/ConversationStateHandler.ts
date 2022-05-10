@@ -34,6 +34,12 @@ import {ACCESS_STATE} from './AccessState';
 import {ConversationMapper} from './ConversationMapper';
 import type {ConversationService} from './ConversationService';
 import {ConversationEvent} from './EventBuilder';
+import {
+  ACCESS_MODES,
+  ACCESS_TYPES,
+  hasAccessToConversationFeature,
+  isGettingAccessToConversationFeature,
+} from './ConversationAccessPermission';
 
 export class ConversationStateHandler extends AbstractConversationEventHandler {
   private readonly conversationService: ConversationService;
@@ -89,38 +95,32 @@ export class ConversationStateHandler extends AbstractConversationEventHandler {
 
         if (accessModes && accessRole) {
           try {
-            if (accessState === ACCESS_STATE.TEAM.TEAM_ONLY || accessState === ACCESS_STATE.TEAM.SERVICES) {
+            if (!hasAccessToConversationFeature(ACCESS_MODES.CODE, accessState)) {
+              // if (accessState === ACCESS_STATE.TEAM.TEAM_ONLY || accessState === ACCESS_STATE.TEAM.SERVICES) {
               conversationEntity.accessCode(undefined);
               await this.revokeAccessCode(conversationEntity);
-            }
-            await this.conversationService.putConversationAccess(conversationEntity.id, accessModes, accessRole);
+              // }
+              await this.conversationService.putConversationAccess(conversationEntity.id, accessModes, accessRole);
 
-            conversationEntity.accessState(accessState);
+              conversationEntity.accessState(accessState);
+            }
           } catch (e) {
             let messageString: string;
 
             if (
-              (prevAccessState === ACCESS_STATE.TEAM.TEAM_ONLY && accessState === ACCESS_STATE.TEAM.SERVICES) ||
-              (prevAccessState === ACCESS_STATE.TEAM.SERVICES && accessState === ACCESS_STATE.TEAM.GUESTS_SERVICES)
+              isGettingAccessToConversationFeature(ACCESS_TYPES.GUEST, prevAccessState, accessState) &&
+              !isGettingAccessToConversationFeature(ACCESS_TYPES.SERVICE, prevAccessState, accessState)
             ) {
               messageString = t('modalConversationGuestOptionsAllowGuestMessage');
-            }
-            if (
-              (prevAccessState === ACCESS_STATE.TEAM.GUEST_ROOM && accessState === ACCESS_STATE.TEAM.TEAM_ONLY) ||
-              (prevAccessState === ACCESS_STATE.TEAM.GUESTS_SERVICES && accessState === ACCESS_STATE.TEAM.SERVICES)
-            ) {
+            } else {
               messageString = t('modalConversationGuestOptionsDisableGuestMessage');
             }
             if (
-              (prevAccessState === ACCESS_STATE.TEAM.GUEST_ROOM && accessState === ACCESS_STATE.TEAM.GUESTS_SERVICES) ||
-              (prevAccessState === ACCESS_STATE.TEAM.TEAM_ONLY && accessState === ACCESS_STATE.TEAM.SERVICES)
+              isGettingAccessToConversationFeature(ACCESS_TYPES.SERVICE, prevAccessState, accessState) &&
+              !isGettingAccessToConversationFeature(ACCESS_TYPES.GUEST, prevAccessState, accessState)
             ) {
               messageString = t('modalConversationServicesOptionsAllowServicesMessage');
-            }
-            if (
-              (prevAccessState === ACCESS_STATE.TEAM.GUESTS_SERVICES && accessState === ACCESS_STATE.TEAM.GUEST_ROOM) ||
-              (prevAccessState === ACCESS_STATE.TEAM.SERVICES && accessState === ACCESS_STATE.TEAM.TEAM_ONLY)
-            ) {
+            } else {
               messageString = t('modalConversationServicesOptionsDisableServicesMessage');
             }
             this._showModal(messageString);

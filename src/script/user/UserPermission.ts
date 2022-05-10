@@ -185,11 +185,11 @@ export function hasAccessToFeature(feature: number, role: ROLE): boolean {
   return !!(feature & permissions);
 }
 
-function combinePermissions(permissions: number[]): number {
+export function combinePermissions(permissions: number[]): number {
   return permissions.reduce((acc, permission) => acc | permission, 0);
 }
 
-function hasPermissions(memberPermissions: number, expectedPermissions: number): boolean {
+export function hasPermissions(memberPermissions: number, expectedPermissions: number): boolean {
   return Number.isSafeInteger(memberPermissions) && (memberPermissions & expectedPermissions) === expectedPermissions;
 }
 
