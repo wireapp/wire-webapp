@@ -76,6 +76,7 @@ const BaseToggle: React.FC<BaseToggleProps> = ({
             data-uie-name={`do-allow-${toggleName?.toLowerCase()}`}
             data-uie-value={isChecked ? 'checked' : 'unchecked'}
           >
+            <span className="button-label__switch" />
             <span className="visually-hidden">{toggleName}</span>
           </button>
         </div>

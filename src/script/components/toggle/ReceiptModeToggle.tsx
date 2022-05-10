@@ -70,6 +70,7 @@ const ReceiptModeToggle: React.FC<ReceiptModeToggleProps> = ({receiptMode, onRec
           type="button"
           onClick={() => updateValue()}
         >
+          <span className="button-label__switch" />
           <span className="visually-hidden">{t('receiptToggleLabel')}</span>
         </button>
       </div>

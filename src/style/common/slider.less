@@ -67,16 +67,18 @@
   }
 
   &:checked + button,
-  &:checked + label .button-label__switch {
-    background-color: var(--green-500);
+  &:checked + label {
+    .button-label__switch {
+      background-color: var(--green-500);
 
-    body.theme-dark & {
-      border: 1px solid var(--green-500);
-      background-color: @green-dark-700;
-    }
+      body.theme-dark & {
+        border: 1px solid var(--green-500);
+        background-color: @green-dark-700;
+      }
 
-    &::after {
-      left: 27px;
+      &::after {
+        left: 27px;
+      }
     }
   }
 }
