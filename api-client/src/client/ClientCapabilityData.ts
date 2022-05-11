@@ -20,5 +20,5 @@
 import {ClientCapability} from './ClientCapability';
 
 export type ClientCapabilityData = {
-  capabilities: ClientCapability[];
+  capabilities?: ClientCapability[];
 };
