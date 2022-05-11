@@ -20,7 +20,7 @@
 import type {AxiosRequestConfig} from 'axios';
 
 import type {PreKeyBundle} from '../auth/';
-import type {NewClient, RegisteredClient, UpdatedClient} from '../client/';
+import type {CreateClientPayload, RegisteredClient, UpdateClientPayload} from '../client/';
 import {ClientCapabilityRemovedError} from './ClientError';
 import {BackendError, BackendErrorLabel, HttpClient} from '../http/';
 import {ClientCapabilityData} from './ClientCapabilityData';
@@ -34,7 +34,7 @@ export class ClientAPI {
     PREKEYS: 'prekeys',
   };
 
-  public async postClient(newClient: NewClient): Promise<RegisteredClient> {
+  public async postClient(newClient: CreateClientPayload): Promise<RegisteredClient> {
     const config: AxiosRequestConfig = {
       data: newClient,
       method: 'post',
@@ -45,7 +45,7 @@ export class ClientAPI {
     return response.data;
   }
 
-  public async putClient(clientId: string, updatedClient: UpdatedClient): Promise<void> {
+  public async putClient(clientId: string, updatedClient: UpdateClientPayload): Promise<void> {
     const config: AxiosRequestConfig = {
       data: updatedClient,
       method: 'put',
