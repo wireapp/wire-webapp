@@ -30,15 +30,19 @@ export interface LegalHoldDotProps {
   conversation?: Conversation;
   dataUieName?: string;
   isPending?: boolean;
+  isMessage?: boolean;
   large?: boolean;
+  showText?: boolean;
   legalHoldModal?: LegalHoldModalViewModel;
 }
 
 const LegalHoldDot: React.FC<LegalHoldDotProps> = ({
   conversation,
   isPending,
+  isMessage = false,
   large,
   legalHoldModal,
+  showText = false,
   className = '',
   dataUieName = 'legal-hold-dot-pending-icon',
 }) => {
@@ -64,13 +68,14 @@ const LegalHoldDot: React.FC<LegalHoldDotProps> = ({
             'legal-hold-dot--active': !isPending,
             'legal-hold-dot--interactive': isInteractive,
             'legal-hold-dot--large': large,
+            'legal-hold-dot--message': isMessage,
           },
           className,
         )}
       >
         {isPending && <Icon.Pending className="pending-icon" />}
       </span>
-      <span className="visibility-hidden">{t('legalHoldHeadline')}</span>
+      {showText && <span className="visibility-hidden legal-hold-dot--text">{t('legalHoldHeadline')}</span>}
     </button>
   );
 };
