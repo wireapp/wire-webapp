@@ -63,9 +63,12 @@ const DeviceCard: React.FC<DeviceCardProps> = ({
       data-uie-uid={id}
       data-uie-name="device-card"
     >
-      {/*{showLegalHoldIcon && (*/}
-      <LegalHoldDot className="device-card__icon device-card__legal_hold_icon" dataUieName="status-legal-hold-device" />
-      {/*)}*/}
+      {showLegalHoldIcon && (
+        <LegalHoldDot
+          className="device-card__icon device-card__legal_hold_icon"
+          dataUieName="status-legal-hold-device"
+        />
+      )}
       {showDesktopIcon && <Icon.Desktop className="device-card__icon" data-uie-name="status-desktop-device" />}
       {showMobileIcon && <Icon.Devices className="device-card__icon" data-uie-name="status-mobile-device" />}
       <div className="device-card__info" data-uie-name="device-card-info" data-uie-value={label}>
