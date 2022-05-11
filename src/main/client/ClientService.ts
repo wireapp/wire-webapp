@@ -19,7 +19,7 @@
 
 import type {APIClient} from '@wireapp/api-client';
 import type {LoginData, PreKey} from '@wireapp/api-client/src/auth/';
-import {ClientClassification, ClientType, NewClient, RegisteredClient} from '@wireapp/api-client/src/client/';
+import {ClientClassification, ClientType, CreateClientPayload, RegisteredClient} from '@wireapp/api-client/src/client/';
 import type {CRUDEngine} from '@wireapp/store-engine';
 
 import type {CryptographyService} from '../cryptography/';
@@ -96,7 +96,7 @@ export class ClientService {
       throw new Error('Cryptobox got initialized without a last resort PreKey.');
     }
 
-    const newClient: NewClient = {
+    const newClient: CreateClientPayload = {
       class: clientInfo.classification,
       cookie: clientInfo.cookieLabel,
       label: clientInfo.label,
