@@ -24,7 +24,7 @@ import {ClientCapabilityData} from './ClientCapabilityData';
 type BaseUpdatePayload = ClientCapabilityData & {label?: string};
 type MLSUpdatePayload = {
   mls_public_keys: {
-    ed25519: string[];
+    ed25519: string;
   };
 } & BaseUpdatePayload;
 
