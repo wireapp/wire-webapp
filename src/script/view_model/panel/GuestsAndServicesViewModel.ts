@@ -194,13 +194,13 @@ export class GuestsAndServicesViewModel extends BasePanelViewModel {
     }
   };
 
-  toggleGuestAccessState = async () =>
+  toggleGuestAccessState = () =>
     this.toggleAccessState(
       teamPermissionsForAccessState(ACCESS_STATE.TEAM.GUEST_FEATURES),
       t('modalConversationRemoveGuestsMessage'),
     );
 
-  toggleServicesAccessState = async () =>
+  toggleServicesAccessState = () =>
     this.toggleAccessState(ACCESS_TYPES.SERVICE, t('modalConversationRemoveServicesMessage'));
 
   async _updateCode(isVisible: boolean, conversationEntity: Conversation): Promise<void> {
