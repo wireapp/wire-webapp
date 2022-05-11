@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [19.1.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/compare/@wireapp/api-client@19.0.0...@wireapp/api-client@19.1.0) (2022-05-11)
+
+
+### Features
+
+* Add MLS device creation types ([#4259](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/issues/4259)) ([c88ed7c](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/commit/c88ed7cf3804828b4fe8e56d842a6207abea4c2d))
+
+
+
+
+
 # [19.0.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/compare/@wireapp/api-client@18.8.3...@wireapp/api-client@19.0.0) (2022-04-21)
 
 
