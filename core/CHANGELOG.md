@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [25.2.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/compare/@wireapp/core@25.1.0...@wireapp/core@25.2.0) (2022-05-11)
+
+
+### Features
+
+* Add MLS device creation types ([#4259](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/issues/4259)) ([c88ed7c](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/commit/c88ed7cf3804828b4fe8e56d842a6207abea4c2d))
+
+
+
+
+
 # [25.1.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/compare/@wireapp/core@25.0.0...@wireapp/core@25.1.0) (2022-05-04)
 
 
