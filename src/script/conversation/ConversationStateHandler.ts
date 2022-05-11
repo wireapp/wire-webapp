@@ -34,12 +34,7 @@ import {ACCESS_STATE} from './AccessState';
 import {ConversationMapper} from './ConversationMapper';
 import type {ConversationService} from './ConversationService';
 import {ConversationEvent} from './EventBuilder';
-import {
-  ACCESS_MODES,
-  ACCESS_TYPES,
-  hasAccessToConversationFeature,
-  isGettingAccessToConversationFeature,
-} from './ConversationAccessPermission';
+import {ACCESS_MODES, ACCESS_TYPES, hasAccessToFeature, isGettingAccessToFeature} from './ConversationAccessPermission';
 
 export class ConversationStateHandler extends AbstractConversationEventHandler {
   private readonly conversationService: ConversationService;
@@ -95,11 +90,10 @@ export class ConversationStateHandler extends AbstractConversationEventHandler {
 
         if (accessModes && accessRole) {
           try {
-            if (!hasAccessToConversationFeature(ACCESS_MODES.CODE, accessState)) {
-              // if (accessState === ACCESS_STATE.TEAM.TEAM_ONLY || accessState === ACCESS_STATE.TEAM.SERVICES) {
+            if (!hasAccessToFeature(ACCESS_MODES.CODE, accessState)) {
               conversationEntity.accessCode(undefined);
               await this.revokeAccessCode(conversationEntity);
-              // }
+
               await this.conversationService.putConversationAccess(conversationEntity.id, accessModes, accessRole);
 
               conversationEntity.accessState(accessState);
@@ -108,16 +102,16 @@ export class ConversationStateHandler extends AbstractConversationEventHandler {
             let messageString: string;
 
             if (
-              isGettingAccessToConversationFeature(ACCESS_TYPES.GUEST, prevAccessState, accessState) &&
-              !isGettingAccessToConversationFeature(ACCESS_TYPES.SERVICE, prevAccessState, accessState)
+              isGettingAccessToFeature(ACCESS_TYPES.GUEST, prevAccessState, accessState) &&
+              !isGettingAccessToFeature(ACCESS_TYPES.SERVICE, prevAccessState, accessState)
             ) {
               messageString = t('modalConversationGuestOptionsAllowGuestMessage');
             } else {
               messageString = t('modalConversationGuestOptionsDisableGuestMessage');
             }
             if (
-              isGettingAccessToConversationFeature(ACCESS_TYPES.SERVICE, prevAccessState, accessState) &&
-              !isGettingAccessToConversationFeature(ACCESS_TYPES.GUEST, prevAccessState, accessState)
+              isGettingAccessToFeature(ACCESS_TYPES.SERVICE, prevAccessState, accessState) &&
+              !isGettingAccessToFeature(ACCESS_TYPES.GUEST, prevAccessState, accessState)
             ) {
               messageString = t('modalConversationServicesOptionsAllowServicesMessage');
             } else {

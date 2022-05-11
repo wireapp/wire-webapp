@@ -17,7 +17,7 @@
  *
  */
 
-import {combinePermissions} from '../user/UserPermission';
+import {combinePermissions, hasPermissions} from '../user/UserPermission';
 import {ACCESS_STATE} from './AccessState';
 
 export const ACCESS_TYPES = {
@@ -32,7 +32,7 @@ export const ACCESS_MODES = {
   INVITE: 1 << 4,
 };
 
-function teamPermissionsForAccessState(state: ACCESS_STATE): number {
+export function teamPermissionsForAccessState(state: ACCESS_STATE): number {
   switch (state) {
     case ACCESS_STATE.TEAM.GUESTS_SERVICES: {
       return combinePermissions([teamPermissionsForAccessState(ACCESS_STATE.TEAM.GUEST_ROOM), ACCESS_TYPES.SERVICE]);
@@ -40,10 +40,11 @@ function teamPermissionsForAccessState(state: ACCESS_STATE): number {
     case ACCESS_STATE.TEAM.GUEST_ROOM: {
       return combinePermissions([
         teamPermissionsForAccessState(ACCESS_STATE.TEAM.TEAM_ONLY),
-        ACCESS_TYPES.GUEST,
-        ACCESS_MODES.CODE,
-        ACCESS_TYPES.NON_TEAM_MEMBER,
+        teamPermissionsForAccessState(ACCESS_STATE.TEAM.GUEST_FEATURES),
       ]);
+    }
+    case ACCESS_STATE.TEAM.GUEST_FEATURES: {
+      return combinePermissions([ACCESS_TYPES.GUEST, ACCESS_MODES.CODE, ACCESS_TYPES.NON_TEAM_MEMBER]);
     }
     case ACCESS_STATE.TEAM.SERVICES: {
       return combinePermissions([teamPermissionsForAccessState(ACCESS_STATE.TEAM.TEAM_ONLY), ACCESS_TYPES.SERVICE]);
@@ -57,11 +58,39 @@ function teamPermissionsForAccessState(state: ACCESS_STATE): number {
   }
 }
 
-export function hasAccessToConversationFeature(feature: number, state: ACCESS_STATE): boolean {
+export function hasAccessToFeature(feature: number, state: ACCESS_STATE): boolean {
   const permissions = teamPermissionsForAccessState(state);
   return !!(feature & permissions);
 }
 
-export function isGettingAccessToConversationFeature(feature: number, prevState: ACCESS_STATE, current: ACCESS_STATE) {
-  return !hasAccessToConversationFeature(feature, prevState) && hasAccessToConversationFeature(feature, current);
+export function isGettingAccessToFeature(feature: number, prevState: ACCESS_STATE, current: ACCESS_STATE) {
+  return !hasAccessToFeature(feature, prevState) && hasAccessToFeature(feature, current);
+}
+
+/** AccessStates sorted by permissions. most first */
+const AccessStatesByPerm = [
+  ACCESS_STATE.TEAM.GUESTS_SERVICES,
+  ACCESS_STATE.TEAM.GUEST_ROOM,
+  ACCESS_STATE.TEAM.SERVICES,
+  ACCESS_STATE.TEAM.TEAM_ONLY,
+  ACCESS_STATE.TEAM.ONE2ONE,
+  ACCESS_STATE.TEAM.LEGACY,
+];
+
+export function accessFromPermissions(permissions: number): ACCESS_STATE {
+  const invalidRoles = [ACCESS_STATE.TEAM.LEGACY, ACCESS_STATE.TEAM.ONE2ONE];
+  const detectedRole = AccessStatesByPerm.filter(role => !invalidRoles.includes(role)).find(role =>
+    hasPermissionForRole(permissions, role),
+  );
+  return detectedRole || ACCESS_STATE.TEAM.LEGACY;
+}
+
+function hasPermissionForRole(memberPermissions: number, state: ACCESS_STATE): boolean {
+  const rolePermissions = teamPermissionsForAccessState(state);
+  return hasPermissions(memberPermissions, rolePermissions);
+}
+
+export function toggleFeature(feature: number, state: ACCESS_STATE): ACCESS_STATE {
+  let permissions = teamPermissionsForAccessState(state);
+  return accessFromPermissions((permissions ^= feature));
 }
