@@ -19,6 +19,7 @@
 
 import {CSSObject} from '@emotion/react';
 import {MouseEvent, useRef, useEffect, useState} from 'react';
+import {flushSync} from 'react-dom';
 import {usePausableInterval} from '../../hooks/usePausableInterval';
 
 interface CanvasProps {
@@ -38,7 +39,10 @@ const EntropyCanvas = (props: CanvasProps) => {
   const frames = entropy.filter(Boolean).length;
 
   const {clearInterval, startInterval, pauseInterval} = usePausableInterval(() => {
-    setPercent(percent => percent + 1);
+    // This prevents automatic batching of state updates from react 18. https://github.com/reactwg/react-18/discussions/21
+    flushSync(() => {
+      setPercent(percent => percent + 1);
+    });
     onProgress(entropy, percent, false);
   }, 300);
 
