@@ -112,25 +112,35 @@
                   <ping-icon aria-hidden="true"></ping-icon>
                 </button>
               </li>
+
               <li>
-                <label id="conversation-input-bar-photo" class="controls-right-button no-radius button-icon-large">
-                  <image-icon aria-hidden="true"></image-icon>
-                  <p class="visually-hidden" data-bind="text: t('tooltipConversationAddImage')"></p>
-                  <input data-bind="attr: {accept: acceptedImageTypes}, file_select: uploadImages" type="file" multiple="multiple" data-uie-name="do-share-image"/>
-                </label>
+                <button type="button" data-bind="attr: {'aria-label': t('tooltipConversationAddImage')}" class="conversation-button">
+                  <label for="conversation-input-bar-photo" class="controls-right-button no-radius button-icon-large">
+                    <image-icon aria-hidden="true"></image-icon>
+                    <input
+                      id="conversation-input-bar-photo"
+                      data-bind="attr: {accept: acceptedImageTypes}, file_select: uploadImages"
+                      type="file"
+                      multiple="multiple"
+                      data-uie-name="do-share-image"
+                    />
+                  </label>
+                </button>
+
               </li>
 
               <li>
-                <label id="conversation-input-bar-files" class="controls-right-button no-radius button-icon-large">
-                  <p class="visually-hidden" data-bind="text: t('tooltipConversationFile')"></p>
-                  <attachment-icon aria-hidden="true"></attachment-icon>
-                  <input data-bind="attr: inputFileAttr, file_select: uploadFiles" type="file" multiple="multiple" data-uie-name="do-share-file"/>
-                </label>
+                <button type="button" data-bind="attr: {'aria-label': t('tooltipConversationFile')}" class="conversation-button">
+                  <label id="conversation-input-bar-files" class="controls-right-button no-radius button-icon-large">
+                    <attachment-icon aria-hidden="true"></attachment-icon>
+                    <input data-bind="attr: inputFileAttr, file_select: uploadFiles" type="file" multiple="multiple" data-uie-name="do-share-file"/>
+                  </label>
+                </button>
               </li>
               <!-- /ko -->
               <li>
                 <message-timer-button params="conversation: conversationEntity"></message-timer-button>
-              </li>   
+              </li>
             <!-- /ko -->
           <!-- /ko -->
 

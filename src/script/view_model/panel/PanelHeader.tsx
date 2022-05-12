@@ -34,15 +34,17 @@ const PanelHeader: React.FC<PanelHeaderProps> = ({onGoBack, onClose, title, goBa
   return (
     <div className="panel__header">
       <DragableClickWrapper onClick={onGoBack}>
-        <div className="icon-button" data-uie-name={goBackUie}>
+        <button className="icon-button" data-uie-name={goBackUie} title={goBackUie}>
           <Icon.ArrowLeft />
-        </div>
+        </button>
       </DragableClickWrapper>
+
       <div className="panel__header__title">{title}</div>
+
       <DragableClickWrapper onClick={onClose}>
-        <div className="icon-button" data-uie-name={closeUie}>
+        <button className="icon-button" data-uie-name={closeUie} title={closeUie}>
           <Icon.Close className="right-panel-close" />
-        </div>
+        </button>
       </DragableClickWrapper>
     </div>
   );
