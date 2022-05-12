@@ -20,6 +20,7 @@
 import React from 'react';
 
 import DragableClickWrapper from 'Components/DragableClickWrapper';
+import {t} from 'Util/LocalizerUtil';
 import Icon from 'Components/Icon';
 
 export interface PanelHeaderProps {
@@ -34,7 +35,7 @@ const PanelHeader: React.FC<PanelHeaderProps> = ({onGoBack, onClose, title, goBa
   return (
     <div className="panel__header">
       <DragableClickWrapper onClick={onGoBack}>
-        <button className="icon-button" data-uie-name={goBackUie} title={goBackUie}>
+        <button className="icon-button" data-uie-name={goBackUie} title={t('index.goBack')}>
           <Icon.ArrowLeft />
         </button>
       </DragableClickWrapper>
@@ -42,7 +43,7 @@ const PanelHeader: React.FC<PanelHeaderProps> = ({onGoBack, onClose, title, goBa
       <div className="panel__header__title">{title}</div>
 
       <DragableClickWrapper onClick={onClose}>
-        <button className="icon-button" data-uie-name={closeUie} title={closeUie}>
+        <button className="icon-button" data-uie-name={closeUie} title={t('accessibility.rightPanel.close')}>
           <Icon.Close className="right-panel-close" />
         </button>
       </DragableClickWrapper>
