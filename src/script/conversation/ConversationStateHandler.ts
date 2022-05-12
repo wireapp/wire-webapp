@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2018 Wire Swiss GmbH
+ * Copyright (C) 2022 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -34,7 +34,7 @@ import {ACCESS_STATE} from './AccessState';
 import {ConversationMapper} from './ConversationMapper';
 import type {ConversationService} from './ConversationService';
 import {ConversationEvent} from './EventBuilder';
-import {ACCESS_MODES, ACCESS_TYPES, hasAccessToFeature, isGettingAccessToFeature} from './ConversationAccessPermission';
+import {ACCESS_MODES, ACCESS_TYPES, isGettingAccessToFeature} from './ConversationAccessPermission';
 
 export class ConversationStateHandler extends AbstractConversationEventHandler {
   private readonly conversationService: ConversationService;
@@ -90,14 +90,13 @@ export class ConversationStateHandler extends AbstractConversationEventHandler {
 
         if (accessModes && accessRole) {
           try {
-            if (!hasAccessToFeature(ACCESS_MODES.CODE, accessState)) {
+            if (isGettingAccessToFeature(~ACCESS_MODES.CODE, prevAccessState, accessState)) {
               conversationEntity.accessCode(undefined);
               await this.revokeAccessCode(conversationEntity);
 
               await this.conversationService.putConversationAccess(conversationEntity.id, accessModes, accessRole);
-
-              conversationEntity.accessState(accessState);
             }
+            conversationEntity.accessState(accessState);
           } catch (e) {
             let messageString: string;
 
