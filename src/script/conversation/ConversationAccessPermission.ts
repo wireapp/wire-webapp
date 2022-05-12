@@ -18,7 +18,7 @@
  */
 
 import {combinePermissions, hasPermissions} from '../user/UserPermission';
-import {ACCESS_STATE} from './AccessState';
+import {ACCESS_STATE, TEAM} from './AccessState';
 
 export const ACCESS_TYPES = {
   GUEST: 1 << 0,
@@ -77,7 +77,7 @@ const AccessStatesByPerm = [
   ACCESS_STATE.TEAM.LEGACY,
 ];
 
-export function accessFromPermissions(permissions: number): ACCESS_STATE {
+export function accessFromPermissions(permissions: number): TEAM {
   const invalidRoles = [ACCESS_STATE.TEAM.LEGACY, ACCESS_STATE.TEAM.ONE2ONE];
   const detectedRole = AccessStatesByPerm.filter(role => !invalidRoles.includes(role)).find(role =>
     hasPermissionForRole(permissions, role),
@@ -90,7 +90,7 @@ function hasPermissionForRole(memberPermissions: number, state: ACCESS_STATE): b
   return hasPermissions(memberPermissions, rolePermissions);
 }
 
-export function toggleFeature(feature: number, state: ACCESS_STATE): ACCESS_STATE {
+export function toggleFeature(feature: number, state: ACCESS_STATE): TEAM {
   let permissions = teamPermissionsForAccessState(state);
   return accessFromPermissions((permissions ^= feature));
 }
