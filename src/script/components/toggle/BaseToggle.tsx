@@ -30,10 +30,11 @@ export interface BaseToggleProps {
   isChecked: boolean;
   isDisabled?: boolean;
   setIsChecked: (isChecked: boolean) => void;
+  toggleId?: string;
   toggleName?: string;
 }
 
-const defaultToggleName = 'toggle';
+const defaultToggleName = 'base-toggle';
 
 const BaseToggle: React.FC<BaseToggleProps> = ({
   extendedInfo,
@@ -41,6 +42,7 @@ const BaseToggle: React.FC<BaseToggleProps> = ({
   isDisabled,
   setIsChecked,
   extendedInfoText,
+  toggleId = defaultToggleName,
   toggleName = defaultToggleName,
   infoText,
 }) => {
@@ -48,7 +50,7 @@ const BaseToggle: React.FC<BaseToggleProps> = ({
   const labelUuid = React.useMemo(() => createRandomUuid(), []);
   const inputRef = React.useRef<HTMLInputElement>();
   return (
-    <div className="base-toggle">
+    <div className={defaultToggleName}>
       <div className="info-toggle__row">
         <label htmlFor={uuid} id={labelUuid} className="info-toggle__name">
           {toggleName}
@@ -66,14 +68,14 @@ const BaseToggle: React.FC<BaseToggleProps> = ({
             id={uuid}
             onChange={(event: React.ChangeEvent<HTMLInputElement>) => setIsChecked(event.target.checked)}
             checked={isChecked}
-            data-uie-name={`allow-${toggleName?.toLowerCase()}-input`}
+            data-uie-name={`allow-${toggleId}-input`}
           />
           <button
             className="button-label"
             aria-pressed={isChecked}
             type="button"
             onClick={() => setIsChecked(inputRef.current.checked)}
-            data-uie-name={`do-allow-${toggleName?.toLowerCase()}`}
+            data-uie-name={`do-allow-${toggleId}`}
             data-uie-value={isChecked ? 'checked' : 'unchecked'}
           >
             <span className="button-label__switch" />
@@ -81,7 +83,7 @@ const BaseToggle: React.FC<BaseToggleProps> = ({
           </button>
         </div>
       </div>
-      <p className="info-toggle__details" data-uie-name="status-guest-toggle">
+      <p className="info-toggle__details" data-uie-name={`status-${toggleId}`}>
         {extendedInfo ? extendedInfoText : infoText}
       </p>
     </div>

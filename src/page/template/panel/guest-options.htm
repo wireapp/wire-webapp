@@ -15,7 +15,7 @@
     </div>
     <div class="panel__content" data-bind="fadingscrollbar">
       <div class="guest-options__content">
-        <base-toggle params="isChecked: isGuestEnabled(), setIsChecked: toggleGuestAccessState, isDisabled: isToggleDisabled(), toggleName: t('guestRoomToggleName')"></base-toggle>
+        <base-toggle params="isChecked: isGuestEnabled(), setIsChecked: toggleGuestAccessState, isDisabled: isToggleDisabled(), toggleName: t('guestRoomToggleName'), toggleId: 'guests'"></base-toggle>
         <p class="guest-options__info-head" data-bind="text: t('guestRoomToggleInfoHead')"></p>
         <p class="guest-options__info-text" data-uie-name="status-guest-options-info" data-bind="text: !activeConversation().inTeam()? t('guestRoomToggleInfoDisabled'): showLinkOptions() ? t('guestOptionsInfoText', brandName): t('guestRoomToggleInfo') "></p>
       </div>
