@@ -131,9 +131,15 @@
 
               <li>
                 <button type="button" data-bind="attr: {'aria-label': t('tooltipConversationFile')}" class="conversation-button">
-                  <label id="conversation-input-bar-files" class="controls-right-button no-radius button-icon-large">
+                  <label for="conversation-input-bar-files" class="controls-right-button no-radius button-icon-large">
                     <attachment-icon aria-hidden="true"></attachment-icon>
-                    <input data-bind="attr: inputFileAttr, file_select: uploadFiles" type="file" multiple="multiple" data-uie-name="do-share-file"/>
+                    <input
+                      id="conversation-input-bar-files"
+                      data-bind="attr: inputFileAttr, file_select: uploadFiles"
+                      type="file"
+                      multiple="multiple"
+                      data-uie-name="do-share-file"
+                    />
                   </label>
                 </button>
               </li>
