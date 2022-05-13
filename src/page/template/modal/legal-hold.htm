@@ -4,7 +4,7 @@
       <!-- ko if: showRequest() -->
         <h2 class="modal__header__title" data-bind="text: t('legalHoldModalTitle')" data-uie-name="status-modal-title"></h2>
       <!-- /ko -->
-      <!-- ko ifnot: showRequest() -->
+      <!-- ko if: !devicesUser() -->
         <close-icon class="modal__header__button" data-bind="click: onBgClick" data-uie-name="do-close"></close-icon>
       <!-- /ko -->
       <!-- ko if: devicesUser() -->
