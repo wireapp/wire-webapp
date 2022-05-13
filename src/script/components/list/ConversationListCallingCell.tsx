@@ -211,6 +211,7 @@ const ConversationListCallingCell: React.FC<CallingCellProps> = ({
           {t('callJoin')}
         </button>
       )}
+
       {conversation && !isDeclined && (
         <div
           className="conversation-list-calling-cell-background"
@@ -278,6 +279,7 @@ const ConversationListCallingCell: React.FC<CallingCellProps> = ({
                 )}
               </div>
             </div>
+
             <div className="conversation-list-cell-right">
               {isConnecting ||
                 (isOngoing && (
@@ -293,6 +295,7 @@ const ConversationListCallingCell: React.FC<CallingCellProps> = ({
                 ))}
             </div>
           </div>
+
           {(isOngoing || selfHasActiveVideo) && isMinimized && !!videoGrid?.grid?.length ? (
             <div
               className="group-video__minimized-wrapper"
@@ -339,11 +342,14 @@ const ConversationListCallingCell: React.FC<CallingCellProps> = ({
                       data-uie-value={isMuted ? 'active' : 'inactive'}
                       title={t('videoCallOverlayMicrophone')}
                       type="button"
+                      role="switch"
+                      aria-checked={!isMuted}
                       disabled={isConnecting}
                     >
                       {isMuted ? <Icon.MicOff className="small-icon" /> : <Icon.MicOn className="small-icon" />}
                     </button>
                   </li>
+
                   {showVideoButton && (
                     <li className="conversation-list-calling-cell-controls-item">
                       <button
@@ -363,6 +369,7 @@ const ConversationListCallingCell: React.FC<CallingCellProps> = ({
                       </button>
                     </li>
                   )}
+
                   {isOngoing && (
                     <li className="conversation-list-calling-cell-controls-item">
                       <button
@@ -406,6 +413,7 @@ const ConversationListCallingCell: React.FC<CallingCellProps> = ({
                       </button>
                     </li>
                   )}
+
                   {(isIncoming || isOutgoing) && (
                     <li className="conversation-list-calling-cell-controls-item">
                       <button
@@ -419,6 +427,7 @@ const ConversationListCallingCell: React.FC<CallingCellProps> = ({
                       </button>
                     </li>
                   )}
+
                   {isIncoming && (
                     <li className="conversation-list-calling-cell-controls-item">
                       <button
@@ -435,6 +444,7 @@ const ConversationListCallingCell: React.FC<CallingCellProps> = ({
                   )}
                 </ul>
               </div>
+
               <div
                 className={cx('call-ui__participant-list__wrapper', {
                   'call-ui__participant-list__wrapper--active': showParticipants,

@@ -133,10 +133,12 @@ const AccountPreferences: React.FC<AccountPreferencesProps> = ({
         }}
       >
         <h3
-          className="heading-h3"
+          className="heading-h3 text-center ellipsis"
+          title={name}
           css={{
             marginBottom: 16,
             textTransform: 'uppercase',
+            width: '100%',
           }}
         >
           {name}

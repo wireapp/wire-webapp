@@ -26,7 +26,6 @@ import {container} from 'tsyringe';
 import {ClientType} from '@wireapp/api-client/src/client/';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import {amplify} from 'amplify';
-import type {SQLeetEngine} from '@wireapp/store-engine-sqleet';
 import Dexie from 'dexie';
 import {Runtime} from '@wireapp/commons';
 
@@ -189,14 +188,18 @@ class App {
    * @param encryptedEngine Encrypted database handler
    * @param apiClient Configured backend client
    */
-  constructor(private readonly appContainer: HTMLElement, core: Core, private readonly apiClient: APIClient) {
+  constructor(
+    private readonly appContainer: HTMLElement,
+    private readonly core: Core,
+    private readonly apiClient: APIClient,
+  ) {
     this.apiClient.on(APIClient.TOPIC.ON_LOGOUT, () => this.logout(SIGN_OUT_REASON.NOT_SIGNED_IN, false));
     this.logger = getLogger('App');
     this.appContainer = appContainer;
 
     new WindowHandler();
 
-    this.service = this._setupServices(core.storage);
+    this.service = this._setupServices();
     this.repository = this._setupRepositories();
     if (Config.getConfig().FEATURE.ENABLE_DEBUG) {
       import('Util/DebugUtil').then(({DebugUtil}) => {
@@ -211,7 +214,6 @@ class App {
     this.singleInstanceHandler = new SingleInstanceHandler(onExtraInstanceStarted);
 
     this._subscribeToEvents();
-    this.initApp(core);
     this.initServiceWorker();
   }
 
@@ -326,8 +328,8 @@ class App {
    * @param Encrypted database handler
    * @returns All services
    */
-  private _setupServices(encryptedEngine: SQLeetEngine) {
-    container.registerInstance(StorageService, new StorageService(encryptedEngine));
+  private _setupServices() {
+    container.registerInstance(StorageService, new StorageService());
     const storageService = container.resolve(StorageService);
     const eventService = Runtime.isEdge() ? new EventServiceNoCompound() : new EventService();
 
@@ -372,9 +374,9 @@ class App {
    *   Any failure in the Promise chain will result in a logout.
    * @todo Check if we really need to logout the user in all these error cases or how to recover from them
    *
-   * @param App init after page reload
+   * @param clientType
    */
-  async initApp(core: Core) {
+  async initApp(clientType: ClientType) {
     // add body information
     const osCssClass = Runtime.isMacOS() ? 'os-mac' : 'os-pc';
     const platformCssClass = Runtime.isDesktopApp() ? 'platform-electron' : 'platform-web';
@@ -387,7 +389,6 @@ class App {
     const telemetry = new AppInitTelemetry();
     try {
       const {
-        auth: authRepository,
         audio: audioRepository,
         calling: callingRepository,
         client: clientRepository,
@@ -404,7 +405,9 @@ class App {
       this._registerSingleInstance();
       loadingView.updateProgress(2.5);
       telemetry.timeStep(AppInitTimingsStep.RECEIVED_ACCESS_TOKEN);
-      await authRepository.init();
+
+      await this.core.init(clientType);
+
       const selfUser = await this.initiateSelfUser();
       if (this.apiClient.backendFeatures.isFederated) {
         // Migrate all existing session to fully qualified ids (if need be)
@@ -421,7 +424,7 @@ class App {
       telemetry.timeStep(AppInitTimingsStep.VALIDATED_CLIENT);
       telemetry.addStatistic(AppInitStatisticsValue.CLIENT_TYPE, clientEntity().type);
 
-      await cryptographyRepository.init(core.service!.cryptography.cryptobox, clientEntity);
+      await cryptographyRepository.init(this.core.service!.cryptography.cryptobox, clientEntity);
 
       loadingView.updateProgress(10);
       telemetry.timeStep(AppInitTimingsStep.INITIALIZED_CRYPTOGRAPHY);
@@ -606,7 +609,7 @@ class App {
       }
     }
 
-    await container.resolve(StorageService).init(userEntity.id);
+    await container.resolve(StorageService).init(this.core.storage);
     this.repository.client.init(userEntity);
     await this.repository.properties.init(userEntity);
     this._checkUserInformation(userEntity);
@@ -918,8 +921,9 @@ $(async () => {
     if (shouldPersist === undefined) {
       doRedirect(SIGN_OUT_REASON.NOT_SIGNED_IN);
     } else {
-      await core.init(shouldPersist ? ClientType.PERMANENT : ClientType.TEMPORARY);
-      window.wire.app = new App(appContainer, core, apiClient);
+      const app = new App(appContainer, core, apiClient);
+      window.wire.app = app;
+      app.initApp(shouldPersist ? ClientType.PERMANENT : ClientType.TEMPORARY);
     }
   }
 });

@@ -279,16 +279,21 @@
     }
 
     &--alternate &__alternative {
+      display: none;
+      align-items: center;
       opacity: 0;
       transform: translateX(10px);
       transition: all @animation-timing-fast @ease-out-expo;
     }
 
     &--show-alternative &__default {
+      display: none;
       opacity: 0;
       transform: translateX(-10px);
     }
+
     &--show-alternative &__alternative {
+      display: flex;
       opacity: 1;
       transform: translateX(0);
     }

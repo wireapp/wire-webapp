@@ -114,6 +114,7 @@ const AvailabilityState: React.FC<AvailabilityStateProps> = ({
           className={cx('availability-state-label', {'availability-state-label--active': theme})}
           css={{userSelect: 'none'}}
           data-uie-name="status-label"
+          title={label}
         >
           {label}
         </span>

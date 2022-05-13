@@ -279,7 +279,12 @@ export class GroupCreationViewModel {
   };
 
   readonly clickOnNext = (): void => {
-    this.state(GroupCreationViewModel.STATE.PARTICIPANTS);
+    const groupName = this.groupName();
+    const nameTooLong = groupName.length > this.maxNameLength;
+
+    if (groupName.length && !nameTooLong) {
+      this.state(GroupCreationViewModel.STATE.PARTICIPANTS);
+    }
   };
 
   readonly afterHideModal = (): void => {

@@ -61,6 +61,7 @@ const UserAvatar: React.FunctionComponent<UserAvatarProps> = ({
     'mediumPictureResource',
     'previewPictureResource',
   ]);
+
   return (
     <AvatarWrapper
       avatarSize={avatarSize}

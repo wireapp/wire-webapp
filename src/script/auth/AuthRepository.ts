@@ -17,13 +17,9 @@
  *
  */
 
-import type {Context} from '@wireapp/api-client/src/auth/';
-import {ClientType} from '@wireapp/api-client/src/client/';
 import {container} from 'tsyringe';
 
 import {Logger, getLogger} from 'Util/Logger';
-import {loadValue} from 'Util/StorageUtil';
-import {StorageKey} from '../storage/StorageKey';
 import {APIClient} from '../service/APIClientSingleton';
 
 export class AuthRepository {
@@ -47,12 +43,6 @@ export class AuthRepository {
 
   constructor(private readonly apiClient = container.resolve(APIClient)) {
     this.logger = getLogger('AuthRepository');
-  }
-
-  init(): Promise<Context> {
-    const persist = loadValue(StorageKey.AUTH.PERSIST);
-    const clientType = persist ? ClientType.PERMANENT : ClientType.TEMPORARY;
-    return this.apiClient.init(clientType);
   }
 
   async logout(): Promise<void> {

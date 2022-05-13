@@ -46,25 +46,15 @@ enum DEXIE_CRUD_EVENT {
 @singleton()
 export class StorageService {
   public db?: DexieDatabase;
-  private readonly hasHookSupport: boolean;
-  private readonly dbListeners: DatabaseListener[];
-  private readonly engine: CRUDEngine;
-  public readonly isTemporaryAndNonPersistent: boolean;
+  private readonly dbListeners: DatabaseListener[] = [];
+  private hasHookSupport: boolean;
+  private engine: CRUDEngine;
+  public isTemporaryAndNonPersistent: boolean;
   private readonly logger: Logger;
-  private readonly userId?: string;
   public dbName?: string;
 
-  constructor(engine: CRUDEngine) {
+  constructor() {
     this.logger = getLogger('StorageService');
-
-    this.dbName = undefined;
-    this.userId = undefined;
-
-    this.engine = engine;
-    this.hasHookSupport = this.engine instanceof IndexedDBEngine;
-    this.isTemporaryAndNonPersistent = this.engine instanceof SQLeetEngine;
-
-    this.dbListeners = [];
   }
 
   //##############################################################################
@@ -78,8 +68,11 @@ export class StorageService {
    * @param requestPersistentStorage if a persistent storage should be requested
    * @returns Resolves with the database name
    */
-  init(userId: string = this.userId, requestPersistentStorage: boolean = false): string {
+  init(engine: CRUDEngine): string {
+    this.engine = engine;
     this.dbName = this.engine.storeName;
+    this.hasHookSupport = this.engine instanceof IndexedDBEngine;
+    this.isTemporaryAndNonPersistent = this.engine instanceof SQLeetEngine;
 
     try {
       if (this.hasHookSupport) {

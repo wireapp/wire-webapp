@@ -59,6 +59,7 @@ const InfoToggle: React.FC<InfoToggleProps> = ({dataUieName, info, isChecked, is
             data-uie-name={dataUieNameLabelText}
             data-uie-value={isChecked ? 'checked' : 'unchecked'}
           >
+            <span className="button-label__switch" />
             <span className="visually-hidden">{name}</span>
           </button>
         </div>

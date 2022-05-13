@@ -83,6 +83,7 @@ const DeviceDetailsPreferences: React.FC<DevicesPreferencesProps> = ({
             <span>{t('preferencesDevices')}</span>
           </legend>
           <DetailedDevice device={device} fingerprint={fingerprint} />
+
           <div className="preferences-devices-verification slider">
             <input
               className="slider-input"
@@ -92,10 +93,13 @@ const DeviceDetailsPreferences: React.FC<DevicesPreferencesProps> = ({
               checked={isVerified}
               onChange={event => onVerify(device, event.target.checked)}
             />
+
             <label className="button-label" htmlFor="preferences_device_verification" data-uie-name="do-verify">
-              {t('preferencesDevicesVerification')}
+              <span className="button-label__switch" />
+              <span className="button-label__text">{t('preferencesDevicesVerification')}</span>
             </label>
           </div>
+
           <div className="preferences-detail">{t('preferencesDevicesFingerprintDetail', brandName)}</div>
         </fieldset>
 

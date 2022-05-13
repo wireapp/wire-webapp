@@ -126,11 +126,21 @@ const DeviceDetails: React.FC<DeviceDetailsProps> = ({
 
       <div className="participant-devices__verify">
         <div className="slider" data-uie-name="do-toggle-verified">
-          <input className="slider-input" type="checkbox" name="toggle" id="toggle" defaultChecked={isVerified} />
-          <label className="button-label" htmlFor="toggle" onClick={clickToToggleDeviceVerification}>
-            {t('participantDevicesDetailVerify')}
+          <input
+            className="slider-input"
+            type="checkbox"
+            name="toggle"
+            id="toggle"
+            defaultChecked={isVerified}
+            onChange={clickToToggleDeviceVerification}
+          />
+
+          <label className="button-label" htmlFor="toggle">
+            <span className="button-label__switch" />
+            <span className="button-label__text">{t('participantDevicesDetailVerify')}</span>
           </label>
         </div>
+
         <div className="participant-devices__actions">
           <Icon.Loading
             className="accent-fill"

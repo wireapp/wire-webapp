@@ -75,13 +75,22 @@ const AudioAsset: React.FC<AudioAssetProps> = ({
       try {
         const blob = await loadAsset(asset.original_resource());
         setAudioSrc(window.URL.createObjectURL(blob));
-        audioElement?.play();
       } catch (error) {
         logger.error('Failed to load audio asset ', error);
       }
       asset.status(AssetTransferState.UPLOADED);
     }
   };
+
+  useEffect(() => {
+    if (audioSrc && audioElement) {
+      const playPromise = audioElement.play();
+
+      playPromise?.catch(error => {
+        logger.error('Failed to load audio asset ', error);
+      });
+    }
+  }, [audioElement, audioSrc]);
 
   useEffect(() => {
     return () => {
@@ -92,6 +101,7 @@ const AudioAsset: React.FC<AudioAssetProps> = ({
   return (
     <div className={cx('audio-asset', className)} data-uie-name="audio-asset" data-uie-value={asset.file_name}>
       <audio ref={setAudioElement} src={audioSrc} onTimeUpdate={onTimeupdate} />
+
       {!isObfuscated ? (
         <>
           {hasHeader && (

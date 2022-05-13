@@ -52,12 +52,21 @@
       .availability-state-icon,
       .availability-state-label {
         display: inline;
+
+        .ellipsis;
+        padding: 0 16px;
       }
     }
   }
 
+  &__user-name {
+    .ellipsis;
+    padding: 0 16px;
+  }
+
   &__user-name,
   &__provider-name {
+    width: 100%;
     margin: 8px 0 0;
     font-size: 12px;
     font-weight: @font-weight-regular;

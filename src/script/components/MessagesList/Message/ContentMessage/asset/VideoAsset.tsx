@@ -79,18 +79,20 @@ const VideoAsset: React.FC<VideoAssetProps> = ({
   const onPlayButtonClicked = async (): Promise<void> => {
     if (isFileSharingReceivingEnabled) {
       setDisplaySmall(false);
+
       if (videoSrc) {
-        videoElement?.play();
+        videoElement.play();
       } else {
         asset.status(AssetTransferState.DOWNLOADING);
+
         try {
           const blob = await loadAsset(asset.original_resource());
           setVideoSrc(window.URL.createObjectURL(blob));
-          videoElement?.play();
           setIsVideoLoaded(true);
         } catch (error) {
           console.error('Failed to load video asset ', error);
         }
+
         asset.status(AssetTransferState.UPLOADED);
       }
     }
@@ -103,6 +105,16 @@ const VideoAsset: React.FC<VideoAssetProps> = ({
   const onVideoPlaying = (): void => {
     videoElement.style.backgroundColor = '#000';
   };
+
+  useEffect(() => {
+    if (videoSrc && videoElement) {
+      const playPromise = videoElement.play();
+
+      playPromise?.catch(error => {
+        console.error('Failed to load video asset ', error);
+      });
+    }
+  }, [videoElement, videoSrc]);
 
   return (
     !isObfuscated && (
@@ -172,6 +184,7 @@ const VideoAsset: React.FC<VideoAssetProps> = ({
                           />
                         )}
                       </div>
+
                       {isVideoLoaded && (
                         <div className="video-asset__controls__bottom">
                           <SeekBar
@@ -192,6 +205,7 @@ const VideoAsset: React.FC<VideoAssetProps> = ({
                 </>
               )}
             </div>
+
             <div className="video-asset__container__sizer"></div>
           </>
         )}
