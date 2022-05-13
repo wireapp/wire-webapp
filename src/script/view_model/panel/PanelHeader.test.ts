@@ -29,8 +29,8 @@ class PanelHeaderPage extends TestPage<PanelHeaderProps> {
     super(PanelHeader, props);
   }
 
-  getGoBackButton = () => this.get(`div[data-uie-name="${goBackUie}"]`);
-  getCloseButton = () => this.get(`div[data-uie-name="${closeUie}"]`);
+  getGoBackButton = () => this.get(`button[data-uie-name="${goBackUie}"]`);
+  getCloseButton = () => this.get(`button[data-uie-name="${closeUie}"]`);
   clickGoBackButton = () => this.click(this.getGoBackButton());
   clickCloseButton = () => this.click(this.getCloseButton());
 }
