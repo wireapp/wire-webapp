@@ -132,7 +132,7 @@ export class GuestsAndServicesViewModel extends BasePanelViewModel {
   requestAccessCode = async (): Promise<void> => {
     // Handle conversations in legacy state
     if (!this.isGuestEnabled() && !this.isServicesEnabled()) {
-      await this.stateHandler.changeAccessState(this.activeConversation(), ACCESS_STATE.TEAM.GUEST_ROOM, true);
+      await this.stateHandler.changeAccessState(this.activeConversation(), ACCESS_STATE.TEAM.GUEST_ROOM);
     }
 
     if (!this.requestOngoing()) {
@@ -171,7 +171,7 @@ export class GuestsAndServicesViewModel extends BasePanelViewModel {
       const changeAccessState = async (): Promise<void> => {
         if (!this.requestOngoing()) {
           this.requestOngoing(true);
-          await this.stateHandler.changeAccessState(conversationEntity, newAccessState, true);
+          await this.stateHandler.changeAccessState(conversationEntity, newAccessState);
           this.requestOngoing(false);
         }
       };

@@ -69,6 +69,12 @@ export function hasAccessToFeature(feature: number, state: ACCESS_STATE): boolea
 export function isGettingAccessToFeature(feature: number, prevState: ACCESS_STATE, current: ACCESS_STATE) {
   return !hasAccessToFeature(feature, prevState) && hasAccessToFeature(feature, current);
 }
+export function featureFromStateChange(prevState: ACCESS_STATE, current: ACCESS_STATE) {
+  const feature = Object.entries(ACCESS).find(
+    ([, v]) => v & (teamPermissionsForAccessState(prevState) ^ teamPermissionsForAccessState(current)),
+  )[0];
+  return ACCESS_ROLE_V2[feature as keyof typeof ACCESS_ROLE_V2];
+}
 
 /** AccessStates sorted by permissions. most first */
 const AccessStatesByPerm = [
