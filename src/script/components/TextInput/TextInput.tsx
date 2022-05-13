@@ -45,6 +45,7 @@ export interface UserInputProps {
   placeholder?: string;
   value: string;
   uieName?: string;
+  errorUieName?: string;
 }
 
 const SUCCESS_DISMISS_TIMEOUT = 2500;
@@ -65,6 +66,7 @@ const TextInput: React.ForwardRefRenderFunction<HTMLDivElement, UserInputProps> 
     placeholder,
     value,
     uieName,
+    errorUieName,
   }: UserInputProps,
   ref: React.ForwardedRef<HTMLDivElement>,
 ) => {
@@ -89,10 +91,11 @@ const TextInput: React.ForwardRefRenderFunction<HTMLDivElement, UserInputProps> 
   return (
     <div css={containerCSS} ref={ref}>
       {isError && errorMessage && (
-        <span className="label" css={errorMessageCSS}>
+        <span className="label" css={errorMessageCSS} data-uie-name={errorUieName}>
           {errorMessage}
         </span>
       )}
+
       <input
         className="text-input"
         css={getInputCSS(disabled, changedColor)}
