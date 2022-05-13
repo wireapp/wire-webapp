@@ -17,6 +17,7 @@
  *
  */
 
+import {CONVERSATION_ACCESS, ACCESS_ROLE_V2} from '@wireapp/api-client/src/conversation/';
 import {combinePermissions, hasPermissions} from '../user/UserPermission';
 import {ACCESS_STATE, TEAM} from './AccessState';
 
@@ -31,6 +32,8 @@ export const ACCESS_MODES = {
   CODE: 1 << 5,
   INVITE: 1 << 4,
 };
+
+export const ACCESS = {...ACCESS_TYPES, ...ACCESS_MODES};
 
 export function teamPermissionsForAccessState(state: ACCESS_STATE): number {
   switch (state) {
@@ -93,4 +96,38 @@ function hasPermissionForRole(memberPermissions: number, state: ACCESS_STATE): b
 export function toggleFeature(feature: number, state: ACCESS_STATE): TEAM {
   let permissions = teamPermissionsForAccessState(state);
   return accessFromPermissions((permissions ^= feature));
+}
+
+interface UpdatedAccessRights {
+  accessModes: CONVERSATION_ACCESS[];
+  accessRole: ACCESS_ROLE_V2[];
+}
+
+/**
+ * This function returns arrays of the names of the new features to be turned on in the backend for each change in access state.
+ * @param accessState the new access state
+ * @returns {UpdatedAccessRights} UpdatedAccessRights
+ */
+export function updateAccessRights(accessState: ACCESS_STATE): UpdatedAccessRights {
+  const newAccessRights: UpdatedAccessRights = {accessModes: [], accessRole: []};
+
+  teamPermissionsForAccessState(accessState)
+    //turn the permissions into a bitwise value ie. 11011
+    .toString(2)
+    .split('')
+    //reverse so that the index reflects the number of significant figures for finding the feature
+    .reverse()
+    //find the name of the feature with the correct sigfigs
+    .map((f: '1' | '0', i) => Object.entries(ACCESS).find(([, v]) => v === +f << i)?.[0])
+    .forEach(feature => {
+      const accessRole = ACCESS_ROLE_V2[feature as keyof typeof ACCESS_ROLE_V2];
+      const accessModes = CONVERSATION_ACCESS[feature as keyof typeof CONVERSATION_ACCESS];
+      if (accessRole) {
+        newAccessRights.accessRole.push(accessRole);
+      } else if (accessModes) {
+        newAccessRights.accessModes.push(accessModes);
+      }
+    });
+
+  return newAccessRights;
 }

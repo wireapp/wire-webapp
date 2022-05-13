@@ -17,7 +17,7 @@
  *
  */
 
-import {CONVERSATION_ACCESS, ACCESS_ROLE_V2, ConversationCode} from '@wireapp/api-client/src/conversation/';
+import {ConversationCode} from '@wireapp/api-client/src/conversation/';
 import {ConversationAccessUpdateData, ConversationAccessV2UpdateData} from '@wireapp/api-client/src/conversation/data/';
 import {CONVERSATION_EVENT} from '@wireapp/api-client/src/event/';
 import {amplify} from 'amplify';
@@ -34,7 +34,7 @@ import {ACCESS_STATE} from './AccessState';
 import {ConversationMapper} from './ConversationMapper';
 import type {ConversationService} from './ConversationService';
 import {ConversationEvent} from './EventBuilder';
-import {ACCESS_MODES, ACCESS_TYPES, isGettingAccessToFeature} from './ConversationAccessPermission';
+import {ACCESS_MODES, ACCESS_TYPES, isGettingAccessToFeature, updateAccessRights} from './ConversationAccessPermission';
 
 export class ConversationStateHandler extends AbstractConversationEventHandler {
   private readonly conversationService: ConversationService;
@@ -61,32 +61,7 @@ export class ConversationStateHandler extends AbstractConversationEventHandler {
       const prevAccessState = conversationEntity.accessState();
 
       if (isStateChange) {
-        let accessModes;
-        let accessRole;
-
-        switch (accessState) {
-          case ACCESS_STATE.TEAM.GUEST_ROOM:
-            accessModes = [CONVERSATION_ACCESS.INVITE, CONVERSATION_ACCESS.CODE];
-            accessRole = [ACCESS_ROLE_V2.GUEST, ACCESS_ROLE_V2.NON_TEAM_MEMBER, ACCESS_ROLE_V2.TEAM_MEMBER];
-            break;
-          case ACCESS_STATE.TEAM.TEAM_ONLY:
-            accessModes = [CONVERSATION_ACCESS.INVITE];
-            accessRole = [ACCESS_ROLE_V2.TEAM_MEMBER];
-            break;
-          case ACCESS_STATE.TEAM.GUESTS_SERVICES:
-            accessModes = [CONVERSATION_ACCESS.INVITE, CONVERSATION_ACCESS.CODE];
-            accessRole = [
-              ACCESS_ROLE_V2.GUEST,
-              ACCESS_ROLE_V2.NON_TEAM_MEMBER,
-              ACCESS_ROLE_V2.TEAM_MEMBER,
-              ACCESS_ROLE_V2.SERVICE,
-            ];
-            break;
-          case ACCESS_STATE.TEAM.SERVICES:
-            accessModes = [CONVERSATION_ACCESS.INVITE];
-            accessRole = [ACCESS_ROLE_V2.TEAM_MEMBER, ACCESS_ROLE_V2.SERVICE];
-            break;
-        }
+        const {accessModes, accessRole} = updateAccessRights(accessState);
 
         if (accessModes && accessRole) {
           try {
