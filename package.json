@@ -126,7 +126,7 @@
     "eslint-plugin-unused-imports": "2.0.0",
     "fake-indexeddb": "3.1.7",
     "generate-changelog": "1.8.0",
-    "grunt": "1.5.2",
+    "grunt": "1.5.3",
     "grunt-aws-s3": "2.0.2",
     "grunt-cli": "1.4.3",
     "grunt-contrib-clean": "2.0.1",
