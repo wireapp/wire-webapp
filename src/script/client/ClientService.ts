@@ -18,7 +18,7 @@
  */
 
 import type {
-  NewClient,
+  CreateClientPayload,
   RegisteredClient,
   QualifiedUserClientMap,
   ClientCapabilityData,
@@ -132,7 +132,7 @@ export class ClientService {
    * @param newClient Client payload
    * @returns Resolves with the registered client information
    */
-  postClients(newClient: NewClient): Promise<RegisteredClient> {
+  postClients(newClient: CreateClientPayload): Promise<RegisteredClient> {
     return this.apiClient.api.client.postClient(newClient);
   }
 
