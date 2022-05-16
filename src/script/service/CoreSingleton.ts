@@ -35,6 +35,7 @@ export class Core extends Account {
 
         return createStorageEngine(storeName, dbType);
       },
+      nbPrekeys: 100,
     });
   }
   get storage() {
