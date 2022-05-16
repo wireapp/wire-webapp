@@ -26,7 +26,7 @@ class BasePage extends TestPage<BaseToggleProps> {
     super(BaseToggle, props);
   }
 
-  getInput = () => this.get('input[data-uie-name="allow-toggle-input"]');
+  getInput = () => this.get('input[data-uie-name="allow-base-toggle-input"]');
 }
 
 describe('BaseToggle', () => {
