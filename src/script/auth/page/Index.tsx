@@ -66,7 +66,7 @@ const Index = ({defaultSSOCode}: Props & ConnectedProps & DispatchProps) => {
   }, []);
   return (
     <Page>
-      <ContainerXS centerText verticalCenter style={{width: '380px'}}>
+      <ContainerXS centerText verticalCenter style={{width: '330px'}}>
         <SVGIcon
           aria-hidden="true"
           scale={1.3}
@@ -77,6 +77,7 @@ const Index = ({defaultSSOCode}: Props & ConnectedProps & DispatchProps) => {
         >
           <g dangerouslySetInnerHTML={{__html: SVGProvider['logo-full-icon']?.documentElement?.innerHTML}} />
         </SVGIcon>
+
         <Text
           block
           center
@@ -85,28 +86,29 @@ const Index = ({defaultSSOCode}: Props & ConnectedProps & DispatchProps) => {
         >
           {_(indexStrings.welcome, {brandName: Config.getConfig().BACKEND_NAME})}
         </Text>
+
         {Config.getConfig().FEATURE.ENABLE_ACCOUNT_REGISTRATION ? (
           <>
             <Button
               type="button"
               onClick={() => history.push(ROUTE.SET_ACCOUNT_TYPE)}
               block
-              style={{fontSize: '13px'}}
+              style={{borderRadius: '16px'}}
               data-uie-name="go-set-account-type"
             >
               {_(indexStrings.createAccount)}
             </Button>
+
             <Button
               type="button"
               onClick={() => history.push(ROUTE.LOGIN)}
               block
-              backgroundColor={'transparent'}
-              color={COLOR.BLUE}
-              style={{border: `1px solid ${COLOR.BLUE}`, fontSize: '13px'}}
+              style={{borderRadius: '16px'}}
               data-uie-name="go-login"
             >
               {_(indexStrings.logIn)}
             </Button>
+
             {logoutReason && (
               <ErrorMessage data-uie-name="status-logout-reason">
                 <FormattedMessage
@@ -117,14 +119,15 @@ const Index = ({defaultSSOCode}: Props & ConnectedProps & DispatchProps) => {
                 />
               </ErrorMessage>
             )}
+
             {(Config.getConfig().FEATURE.ENABLE_SSO || Config.getConfig().FEATURE.ENABLE_DOMAIN_DISCOVERY) && (
               <Button
                 type="button"
                 onClick={() => history.push(ROUTE.SSO)}
                 block
                 color={COLOR.TEXT}
-                backgroundColor={COLOR.GRAY_LIGHTEN_64}
-                style={{fontSize: '13px', marginTop: '120px'}}
+                backgroundColor={COLOR.WHITE}
+                style={{border: '1px solid #DCE0E3', borderRadius: '16px', marginTop: '82px'}}
                 data-uie-name="go-sso-login"
               >
                 {_(
@@ -139,11 +142,12 @@ const Index = ({defaultSSOCode}: Props & ConnectedProps & DispatchProps) => {
               type="button"
               onClick={() => history.push(ROUTE.LOGIN)}
               block
-              style={{fontSize: '13px'}}
+              style={{borderRadius: '16px'}}
               data-uie-name="go-login"
             >
               {_(indexStrings.logIn)}
             </Button>
+
             {(Config.getConfig().FEATURE.ENABLE_SSO || Config.getConfig().FEATURE.ENABLE_DOMAIN_DISCOVERY) && (
               <Button
                 type="button"
@@ -151,7 +155,7 @@ const Index = ({defaultSSOCode}: Props & ConnectedProps & DispatchProps) => {
                 block
                 backgroundColor={'transparent'}
                 color={COLOR.BLUE}
-                style={{border: `1px solid ${COLOR.BLUE}`, fontSize: '13px'}}
+                style={{border: `1px solid ${COLOR.BLUE}`, borderRadius: '16px'}}
                 data-uie-name="go-sso-login"
               >
                 {_(
@@ -159,6 +163,7 @@ const Index = ({defaultSSOCode}: Props & ConnectedProps & DispatchProps) => {
                 )}
               </Button>
             )}
+
             {logoutReason && (
               <ErrorMessage data-uie-name="status-logout-reason">
                 <FormattedMessage
