@@ -35,7 +35,7 @@ export class ClientBackendRepository {
     return this.apiClient.api.client.putClient(clientId, updates);
   }
 
-  public deleteClient(clientId: string, password: string): Promise<void> {
+  public deleteClient(clientId: string, password?: string): Promise<void> {
     return this.apiClient.api.client.deleteClient(clientId, password);
   }
 
