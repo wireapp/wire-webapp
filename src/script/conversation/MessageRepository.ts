@@ -103,6 +103,7 @@ import {PROPERTIES_TYPE} from '../properties/PropertiesType';
 import {findDeletedClients} from './ClientMismatchUtil';
 import {protoFromType} from '../user/AvailabilityMapper';
 import {partition} from 'underscore';
+import {ConversationState} from './ConversationState';
 
 export interface MessageSendingOptions {
   /** Send native push notification for message. Default is `true`. */
@@ -162,6 +163,7 @@ export class MessageRepository {
     private readonly userState = container.resolve(UserState),
     private readonly teamState = container.resolve(TeamState),
     private readonly clientState = container.resolve(ClientState),
+    private readonly conversationState = container.resolve(ConversationState),
     private readonly core = container.resolve(Core),
   ) {
     this.logger = getLogger('MessageRepository');
@@ -1232,11 +1234,13 @@ export class MessageRepository {
    * Sends a message to backend that the conversation has been fully read.
    * The message will allow all the self clients to synchronize conversation read state.
    *
-   * @param conversationEntity Conversation to be marked as read
+   * @param conversation Conversation to be marked as read
    */
   public async markAsRead(conversation: Conversation) {
     const timestamp = conversation.last_read_timestamp();
-    this.conversationService.sendLastRead(conversation.id, timestamp);
+    this.conversationService.sendLastRead(conversation.id, timestamp, {
+      userIds: this.generateRecipients(this.conversationState.self_conversation()),
+    });
     /*
      * FIXME notification removal can be improved.
      * We can add the conversation ID in the payload of the event and only check unread messages for this particular conversation
@@ -1251,7 +1255,9 @@ export class MessageRepository {
    * @param countlyId Countly new ID
    */
   public async sendCountlySync(countlyId: string) {
-    await this.conversationService.sendCountlySync(countlyId);
+    await this.conversationService.sendCountlySync(countlyId, {
+      userIds: this.generateRecipients(this.conversationState.self_conversation()),
+    });
     this.logger.info(`Sent countly sync message with ID ${countlyId}`);
   }
 
