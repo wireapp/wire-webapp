@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [25.3.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/compare/@wireapp/core@25.2.1...@wireapp/core@25.3.0) (2022-05-16)
+
+
+### Features
+
+* **api-client:** Add MLS clients endpoints ([#4260](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/issues/4260)) ([d7bf7c1](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/commit/d7bf7c12dfe215e79f57cf99ad91cb7d05b36a12))
+
+
+
+
+
 ## [25.2.1](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/compare/@wireapp/core@25.2.0...@wireapp/core@25.2.1) (2022-05-11)
 
 **Note:** Version bump only for package @wireapp/core
