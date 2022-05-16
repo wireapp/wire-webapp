@@ -17,7 +17,7 @@
  *
  */
 
-import {ConversationCode, ACCESS_ROLE_V2} from '@wireapp/api-client/src/conversation/';
+import {ConversationCode} from '@wireapp/api-client/src/conversation/';
 import {ConversationAccessUpdateData, ConversationAccessV2UpdateData} from '@wireapp/api-client/src/conversation/data/';
 import {CONVERSATION_EVENT} from '@wireapp/api-client/src/event/';
 import {amplify} from 'amplify';
@@ -36,7 +36,6 @@ import type {ConversationService} from './ConversationService';
 import {ConversationEvent} from './EventBuilder';
 import {
   ACCESS_MODES,
-  ACCESS_TYPES,
   featureFromStateChange,
   isGettingAccessToFeature,
   updateAccessRights,
@@ -64,28 +63,23 @@ export class ConversationStateHandler extends AbstractConversationEventHandler {
     if (isConversationInTeam) {
       if (isStateChange) {
         const {accessModes, accessRole} = updateAccessRights(accessState);
-
         if (accessModes && accessRole) {
           try {
             if (isGettingAccessToFeature(~ACCESS_MODES.CODE, prevAccessState, accessState)) {
               conversationEntity.accessCode(undefined);
               await this.revokeAccessCode(conversationEntity);
-
-              await this.conversationService.putConversationAccess(conversationEntity.id, accessModes, accessRole);
             }
+            await this.conversationService.putConversationAccess(conversationEntity.id, accessModes, accessRole);
+
             conversationEntity.accessState(accessState);
           } catch (e) {
             let messageString: string;
+            const {featureName, ...featureInfo} = featureFromStateChange(prevAccessState, accessState);
 
-            if (isGettingAccessToFeature(ACCESS_TYPES.GUEST, prevAccessState, accessState)) {
-              messageString = t('modalConversationGuestOptionsAllowGuestMessage');
+            if (featureInfo.isAvailable) {
+              messageString = t(`modalConversationFeatureOptionsAllowFeatureMessage`, {feature: `${featureName}s`});
             } else {
-              messageString = t('modalConversationGuestOptionsDisableGuestMessage');
-            }
-            if (isGettingAccessToFeature(ACCESS_TYPES.SERVICE, prevAccessState, accessState)) {
-              messageString = t('modalConversationServicesOptionsAllowServicesMessage');
-            } else {
-              messageString = t('modalConversationServicesOptionsDisableServicesMessage');
+              messageString = t(`modalConversationFeatureOptionsDisableFeatureMessage`, {feature: `${featureName}s`});
             }
             this._showModal(messageString);
           }
@@ -93,12 +87,8 @@ export class ConversationStateHandler extends AbstractConversationEventHandler {
         }
       }
     }
-
-    this._showModal(
-      featureFromStateChange(prevAccessState, accessState) === ACCESS_ROLE_V2.GUEST
-        ? t('modalConversationGuestOptionsToggleGuestsMessage')
-        : t('modalConversationServicesOptionsToggleServicesMessage'),
-    );
+    const {featureName} = featureFromStateChange(prevAccessState, accessState);
+    this._showModal(t('modalConversationFeatureOptionsToggleFeatureMessage', {feature: `${featureName}s`}));
   }
 
   async getAccessCode(conversationEntity: Conversation): Promise<void> {

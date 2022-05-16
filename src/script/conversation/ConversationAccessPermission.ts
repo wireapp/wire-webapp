@@ -72,8 +72,12 @@ export function isGettingAccessToFeature(feature: number, prevState: ACCESS_STAT
 export function featureFromStateChange(prevState: ACCESS_STATE, current: ACCESS_STATE) {
   const feature = Object.entries(ACCESS).find(
     ([, v]) => v & (teamPermissionsForAccessState(prevState) ^ teamPermissionsForAccessState(current)),
-  )[0];
-  return ACCESS_ROLE_V2[feature as keyof typeof ACCESS_ROLE_V2];
+  );
+  return {
+    featureName: ACCESS_ROLE_V2[feature[0] as keyof typeof ACCESS_ROLE_V2],
+    isAvailable: hasAccessToFeature(feature[1], current),
+    number: feature[1],
+  };
 }
 
 /** AccessStates sorted by permissions. most first */
