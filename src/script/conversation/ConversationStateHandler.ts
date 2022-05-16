@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2022 Wire Swiss GmbH
+ * Copyright (C) 2018 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -77,9 +77,9 @@ export class ConversationStateHandler extends AbstractConversationEventHandler {
             const {featureName, ...featureInfo} = featureFromStateChange(prevAccessState, accessState);
 
             if (featureInfo.isAvailable) {
-              messageString = t(`modalConversation${featureName}OptionsAllow${featureName}Message`);
+              messageString = t(`modalConversationOptionsAllow${featureName}Message`);
             } else {
-              messageString = t(`modalConversation${featureName}OptionsDisable${featureName}Message`);
+              messageString = t(`modalConversationOptionsDisable${featureName}Message`);
             }
             this._showModal(messageString);
           }
@@ -88,7 +88,7 @@ export class ConversationStateHandler extends AbstractConversationEventHandler {
       }
     }
     const {featureName} = featureFromStateChange(prevAccessState, accessState);
-    this._showModal(t(`modalConversation${featureName}OptionsToggle${featureName}Message`));
+    this._showModal(t(`modalConversationOptionsToggle${featureName}Message`));
   }
 
   async getAccessCode(conversationEntity: Conversation): Promise<void> {

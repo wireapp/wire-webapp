@@ -76,7 +76,7 @@ export function featureFromStateChange(prevState: ACCESS_STATE, current: ACCESS_
   const featString = ACCESS_ROLE_V2[feature[0] as keyof typeof ACCESS_ROLE_V2];
   return {
     feature: featString,
-    featureName: featString[0].toUpperCase() + featString.slice(1),
+    featureName: (featString[0].toUpperCase() + featString.slice(1)) as 'Guest' | 'Service',
     isAvailable: hasAccessToFeature(feature[1], current),
     number: feature[1],
   };
