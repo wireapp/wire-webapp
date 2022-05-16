@@ -3078,10 +3078,10 @@
     logdown "3.3.1"
     rimraf "3.0.2"
 
-"@wireapp/core@25.3.0":
-  version "25.3.0"
-  resolved "https://registry.yarnpkg.com/@wireapp/core/-/core-25.3.0.tgz#1e727e73de432508a4ff50e70fee3d67ec497d22"
-  integrity sha512-d+OQ/tTMuG9oL4n/+a9dA7CCRWlpH3iYYG5+0Rh3eew1ithAC6NFX0dDlp+XUrapLRk+zkTUUCBctuPCf4Z+oQ==
+"@wireapp/core@26.0.0":
+  version "26.0.0"
+  resolved "https://registry.yarnpkg.com/@wireapp/core/-/core-26.0.0.tgz#f3b9f5385489a05983648451f55b33c7cbdf4d5a"
+  integrity sha512-ERU730rPou+XSHUVwpayMq8NX+RxOBkyhR9DowVrJALJ+Nl49woyh3Tw5SN0/6dUxqIKqEyAd87YXmBzH3555g==
   dependencies:
     "@types/long" "4.0.1"
     "@types/node" "~14"
