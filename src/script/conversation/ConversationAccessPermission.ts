@@ -73,8 +73,10 @@ export function featureFromStateChange(prevState: ACCESS_STATE, current: ACCESS_
   const feature = Object.entries(ACCESS).find(
     ([, v]) => v & (teamPermissionsForAccessState(prevState) ^ teamPermissionsForAccessState(current)),
   );
+  const featString = ACCESS_ROLE_V2[feature[0] as keyof typeof ACCESS_ROLE_V2];
   return {
-    featureName: ACCESS_ROLE_V2[feature[0] as keyof typeof ACCESS_ROLE_V2],
+    feature: featString,
+    featureName: featString[0].toUpperCase() + featString.slice(1),
     isAvailable: hasAccessToFeature(feature[1], current),
     number: feature[1],
   };

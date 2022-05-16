@@ -65,7 +65,7 @@ export class ConversationStateHandler extends AbstractConversationEventHandler {
         const {accessModes, accessRole} = updateAccessRights(accessState);
         if (accessModes && accessRole) {
           try {
-            if (isGettingAccessToFeature(~ACCESS_MODES.CODE, prevAccessState, accessState)) {
+            if (!isGettingAccessToFeature(ACCESS_MODES.CODE, prevAccessState, accessState)) {
               conversationEntity.accessCode(undefined);
               await this.revokeAccessCode(conversationEntity);
             }
@@ -77,9 +77,9 @@ export class ConversationStateHandler extends AbstractConversationEventHandler {
             const {featureName, ...featureInfo} = featureFromStateChange(prevAccessState, accessState);
 
             if (featureInfo.isAvailable) {
-              messageString = t(`modalConversationFeatureOptionsAllowFeatureMessage`, {feature: `${featureName}s`});
+              messageString = t(`modalConversation${featureName}OptionsAllow${featureName}Message`);
             } else {
-              messageString = t(`modalConversationFeatureOptionsDisableFeatureMessage`, {feature: `${featureName}s`});
+              messageString = t(`modalConversation${featureName}OptionsDisable${featureName}Message`);
             }
             this._showModal(messageString);
           }
@@ -88,7 +88,7 @@ export class ConversationStateHandler extends AbstractConversationEventHandler {
       }
     }
     const {featureName} = featureFromStateChange(prevAccessState, accessState);
-    this._showModal(t('modalConversationFeatureOptionsToggleFeatureMessage', {feature: `${featureName}s`}));
+    this._showModal(t(`modalConversation${featureName}OptionsToggle${featureName}Message`));
   }
 
   async getAccessCode(conversationEntity: Conversation): Promise<void> {
