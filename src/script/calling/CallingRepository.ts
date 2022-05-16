@@ -1068,6 +1068,7 @@ export class CallingRepository {
   ) => {
     const conversation = this.conversationState.findConversation(conversationId);
     const content = typeof payload === 'string' ? payload : JSON.stringify(payload);
+
     const message = await this.messageRepository.sendCallingMessage(conversation, content, options);
     if (message.state === PayloadBundleState.CANCELLED) {
       // If the user has cancelled message sending because of a degradation warning, we abort the call
@@ -1075,11 +1076,34 @@ export class CallingRepository {
     }
   };
 
-  readonly sendModeratorMute = (conversationId: QualifiedId, recipients: Record<UserId, ClientId[]>) => {
+  readonly convertParticipantsToCallingMessageRecepients = (
+    participants: Participant[],
+  ): UserClients | QualifiedUserClients => {
+    const isFederated = this.core.backendFeatures.federationEndpoints;
+
+    if (isFederated) {
+      return participants.reduce((participants, participant) => {
+        participants[participant.user.domain] ||= {};
+        participants[participant.user.domain][participant.user.id] = [participant.clientId];
+        return participants;
+      }, {} as QualifiedUserClients);
+    }
+
+    const recipients: UserClients = {};
+    for (const participant of participants) {
+      recipients[participant.user.id] = [participant.clientId];
+    }
+
+    return recipients;
+  };
+
+  readonly sendModeratorMute = (conversationId: QualifiedId, participants: Participant[]) => {
+    const recipients = this.convertParticipantsToCallingMessageRecepients(participants);
     this.sendCallingMessage(conversationId, {type: CALL_MESSAGE_TYPE.REMOTE_MUTE}, {nativePush: true, recipients});
   };
 
-  readonly sendModeratorKick = (conversationId: QualifiedId, recipients: Record<UserId, ClientId[]>) => {
+  readonly sendModeratorKick = (conversationId: QualifiedId, participants: Participant[]) => {
+    const recipients = this.convertParticipantsToCallingMessageRecepients(participants);
     this.sendCallingMessage(conversationId, {type: CALL_MESSAGE_TYPE.REMOTE_KICK}, {nativePush: true, recipients});
   };
 
