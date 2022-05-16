@@ -20,6 +20,7 @@
 import type {APIClient} from '@wireapp/api-client';
 import type {LoginData, PreKey} from '@wireapp/api-client/src/auth/';
 import {ClientClassification, ClientType, CreateClientPayload, RegisteredClient} from '@wireapp/api-client/src/client/';
+import {QualifiedId} from '@wireapp/api-client/src/user';
 import type {CRUDEngine} from '@wireapp/store-engine';
 
 import type {CryptographyService} from '../cryptography/';
@@ -52,6 +53,21 @@ export class ClientService {
 
   public getClients(): Promise<RegisteredClient[]> {
     return this.backend.getClients();
+  }
+
+  /**
+   * Will delete the given client from backend and will also delete it from the local database
+   * @param clientId The id of the client to delete
+   * @param password Password of the owning user
+   * @param isLocalClient Is the client also the client currently used by the app (as opposed to a client the user owns but not currenly in use)
+   * @returns Promise
+   */
+  public async deleteClient(clientId: string, password: string, isLocalClient: boolean = false): Promise<unknown> {
+    const userId: QualifiedId = {id: this.apiClient.userId as string, domain: this.apiClient.domain || ''};
+    await this.backend.deleteClient(clientId, password);
+    return isLocalClient
+      ? this.database.deleteLocalClient()
+      : this.database.deleteClient(this.cryptographyService.constructSessionId(userId, clientId));
   }
 
   public getLocalClient(): Promise<MetaClient> {
