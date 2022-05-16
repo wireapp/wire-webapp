@@ -58,9 +58,9 @@ export class CryptographyService {
   constructor(
     readonly apiClient: APIClient,
     private readonly storeEngine: CRUDEngine,
-    private readonly config: {useQualifiedIds?: boolean} = {},
+    private readonly config: {useQualifiedIds: boolean; nbPrekeys: number},
   ) {
-    this.cryptobox = new Cryptobox(this.storeEngine);
+    this.cryptobox = new Cryptobox(this.storeEngine, config.nbPrekeys);
     this.database = new CryptographyDatabaseRepository(this.storeEngine);
     this.logger = logdown('@wireapp/core/cryptography/CryptographyService', {
       logger: console,

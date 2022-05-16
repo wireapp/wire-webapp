@@ -97,11 +97,28 @@ export interface Account {
 
 export type CreateStoreFn = (storeName: string, context: Context) => undefined | Promise<CRUDEngine | undefined>;
 
+interface AccountOptions {
+  /** Used to store info in the database (will create a inMemory engine if returns undefined) */
+  createStore?: CreateStoreFn;
+
+  /** Number of prekeys to generate when creating a new device (defaults to 2)
+   * Prekeys are Diffie-Hellmann public keys which allow offline initiation of a secure Proteus session between two devices.
+   * Having a high value will:
+   *    - make creating a new device consuming more CPU resources
+   *    - make it less likely that all prekeys get consumed while the device is offline and the last resort prekey will not be used to create new session
+   * Having a low value will:
+   *    - make creating a new device fast
+   *    - make it likely that all prekeys get consumed while the device is offline and the last resort prekey will be used to create new session
+   */
+  nbPrekeys?: number;
+}
+
 export class Account extends EventEmitter {
   private readonly apiClient: APIClient;
   private readonly logger: logdown.Logger;
   private readonly createStore: CreateStoreFn;
   private storeEngine?: CRUDEngine;
+  private readonly nbPrekeys: number;
 
   public static readonly TOPIC = TOPIC;
   public service?: {
@@ -123,15 +140,16 @@ export class Account extends EventEmitter {
 
   /**
    * @param apiClient The apiClient instance to use in the core (will create a new new one if undefined)
-   * @param storeEngineProvider Used to store info in the database (will create a inMemory engine if returns undefined)
+   * @param storeEngineProvider
    */
   constructor(
     apiClient: APIClient = new APIClient(),
-    {createStore = () => undefined}: {createStore?: CreateStoreFn} = {},
+    {createStore = () => undefined, nbPrekeys = 2}: AccountOptions = {},
   ) {
     super();
     this.apiClient = apiClient;
     this.backendFeatures = this.apiClient.backendFeatures;
+    this.nbPrekeys = nbPrekeys;
     this.createStore = createStore;
 
     apiClient.on(APIClient.TOPIC.COOKIE_REFRESH, async (cookie?: Cookie) => {
@@ -185,6 +203,7 @@ export class Account extends EventEmitter {
     const cryptographyService = new CryptographyService(this.apiClient, this.storeEngine, {
       // We want to encrypt with fully qualified session ids, only if the backend is federated with other backends
       useQualifiedIds: this.backendFeatures.isFederated,
+      nbPrekeys: this.nbPrekeys,
     });
 
     const clientService = new ClientService(this.apiClient, this.storeEngine, cryptographyService);

@@ -46,7 +46,10 @@ describe('CryptographyService', () => {
   });
 
   beforeEach(async () => {
-    cryptographyService = new CryptographyService(new APIClient(), await createEngine('wire'));
+    cryptographyService = new CryptographyService(new APIClient(), await createEngine('wire'), {
+      nbPrekeys: 1,
+      useQualifiedIds: false,
+    });
     const preKeys = await cryptographyService.cryptobox.create();
     aliceLastResortPreKey = preKeys.filter(preKey => preKey.key_id === Proteus.keys.PreKey.MAX_PREKEY_ID)[0];
     bob = new Cryptobox(await createEngine('wire'));
@@ -72,6 +75,7 @@ describe('CryptographyService', () => {
     it('constructs a Session ID by a given User ID and Client ID and domain.', async () => {
       const cryptographyService = new CryptographyService(new APIClient(), await createEngine('wire'), {
         useQualifiedIds: true,
+        nbPrekeys: 1,
       });
       const clientId = '1ceb9063fced26d3';
       const userId = 'afbb5d60-1187-4385-9c29-7361dea79647';
@@ -84,6 +88,7 @@ describe('CryptographyService', () => {
     it('constructs a qualified Session ID by a given qualified User ID and Client ID.', async () => {
       const cryptographyService = new CryptographyService(new APIClient(), await createEngine('wire'), {
         useQualifiedIds: true,
+        nbPrekeys: 1,
       });
       const clientId = '1ceb9063fced26d3';
       const userId = 'afbb5d60-1187-4385-9c29-7361dea79647';
