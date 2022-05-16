@@ -34,4 +34,12 @@ export class ClientBackendRepository {
   public putClient(clientId: string, updates: UpdateClientPayload): Promise<void> {
     return this.apiClient.api.client.putClient(clientId, updates);
   }
+
+  public deleteClient(clientId: string, password: string): Promise<void> {
+    return this.apiClient.api.client.deleteClient(clientId, password);
+  }
+
+  public uploadMLSKeyPackages(clientId: string, keyPackages: string[]): Promise<void> {
+    return this.apiClient.api.client.uploadMLSKeyPackages(clientId, keyPackages);
+  }
 }
