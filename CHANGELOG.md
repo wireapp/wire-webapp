@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [26.1.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/compare/@wireapp/core@26.0.0...@wireapp/core@26.1.0) (2022-05-16)
+
+
+### Features
+
+* Allow consumer to set number of prekeys generated ([#4263](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/issues/4263)) ([648ecda](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/commit/648ecdad260488e1d07965a84a28c346d6f015c3))
+
+
+
+
+
 # [26.0.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/compare/@wireapp/core@25.3.1...@wireapp/core@26.0.0) (2022-05-16)
 
 
