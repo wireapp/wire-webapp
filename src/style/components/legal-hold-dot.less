@@ -19,14 +19,17 @@
 
 .legal-hold-dot-button {
   .button-reset-default;
+
+  display: flex;
+  align-items: center;
   padding: 8px;
 }
 
 .legal-hold-dot {
   position: relative;
   display: flex;
-  width: 16px;
-  height: 16px;
+  width: 12px;
+  height: 12px;
   align-items: center;
   justify-content: center;
   background-color: rgba(@w-red, 0.24);
@@ -41,6 +44,11 @@
     height: 48px;
   }
 
+  &--message {
+    width: 16px;
+    height: 16px;
+  }
+
   &--active::after {
     display: block;
     width: 50%;
@@ -48,6 +56,12 @@
     background-color: @w-red;
     border-radius: 50%;
     content: '';
+  }
+
+  &--text {
+    margin-left: 6px;
+    font-size: 11px;
+    line-height: 13px;
   }
 
   pending-icon,

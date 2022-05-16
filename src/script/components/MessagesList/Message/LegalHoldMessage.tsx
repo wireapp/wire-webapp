@@ -42,7 +42,7 @@ const LegalHoldMessage: React.FC<LegalHoldMessageProps> = ({
   return (
     <div className="message-header">
       <div className="message-header-icon">
-        <LegalHoldDot />
+        <LegalHoldDot isMessage />
       </div>
       <div className="message-header-label">
         {message.isActivationMessage ? (
