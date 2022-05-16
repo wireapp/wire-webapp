@@ -45,10 +45,7 @@ export class ClientDatabaseRepository {
   }
 
   public deleteLocalClient(): Promise<string> {
-    return this.storeEngine.delete(
-      ClientDatabaseRepository.STORES.CLIENTS,
-      ClientDatabaseRepository.KEYS.LOCAL_IDENTITY,
-    );
+    return this.deleteClient(ClientDatabaseRepository.KEYS.LOCAL_IDENTITY);
   }
 
   public deleteClient(sessionId: string): Promise<string> {
