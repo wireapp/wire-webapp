@@ -37,9 +37,13 @@ describe('ConversationService', () => {
       userId: PayloadHelper.getUUID(),
       clientId: PayloadHelper.getUUID(),
     };
-    return new ConversationService(client, new CryptographyService(client, new MemoryEngine()), {
-      useQualifiedIds: federated,
-    });
+    return new ConversationService(
+      client,
+      new CryptographyService(client, new MemoryEngine(), {useQualifiedIds: false, nbPrekeys: 1}),
+      {
+        useQualifiedIds: federated,
+      },
+    );
   }
 
   describe('"send"', () => {

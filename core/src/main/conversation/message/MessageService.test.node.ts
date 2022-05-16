@@ -88,7 +88,7 @@ function fakeEncrypt(
 
 describe('MessageService', () => {
   const apiClient = new APIClient();
-  const cryptographyService = new CryptographyService(apiClient, {} as any);
+  const cryptographyService = new CryptographyService(apiClient, {} as any, {useQualifiedIds: false, nbPrekeys: 1});
   const messageService = new MessageService(apiClient, cryptographyService);
 
   beforeEach(() => {
