@@ -22,7 +22,7 @@ import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 import {APIClient, BackendFeatures} from '@wireapp/api-client';
 import type {RegisterData} from '@wireapp/api-client/src/auth';
 import {AUTH_COOKIE_KEY, AUTH_TABLE_NAME, Context, Cookie, CookieStore, LoginData} from '@wireapp/api-client/src/auth/';
-import {ClientType, RegisteredClient} from '@wireapp/api-client/src/client/';
+import {ClientClassification, ClientType, RegisteredClient} from '@wireapp/api-client/src/client/';
 import * as Events from '@wireapp/api-client/src/event';
 import {WebSocketClient} from '@wireapp/api-client/src/tcp/';
 import * as cryptobox from '@wireapp/cryptobox';
@@ -113,6 +113,12 @@ interface AccountOptions {
   nbPrekeys?: number;
 }
 
+const coreDefaultClient: ClientInfo = {
+  classification: ClientClassification.DESKTOP,
+  cookieLabel: 'default',
+  model: '@wireapp/core',
+};
+
 export class Account extends EventEmitter {
   private readonly apiClient: APIClient;
   private readonly logger: logdown.Logger;
@@ -181,12 +187,25 @@ export class Account extends EventEmitter {
     return this.apiClient.validatedUserId;
   }
 
+  /**
+   * Will register a new user to the backend
+   *
+   * @param registration The user's data
+   * @param clientType Type of client to create (temporary or permanent)
+   */
   public async register(registration: RegisterData, clientType: ClientType): Promise<Context> {
     const context = await this.apiClient.register(registration, clientType);
     await this.initServices(context);
     return context;
   }
 
+  /**
+   * Will init the core with an aleady existing client (both on backend and local)
+   * Will fail if local client cannot be found
+   *
+   * @param clientType The type of client the user is using (temporary or permanent)
+   * @param cookie The cookie to identify the user against backend (will use the browser's one if not given)
+   */
   public async init(clientType: ClientType, cookie?: Cookie, initClient: boolean = true): Promise<Context> {
     const context = await this.apiClient.init(clientType, cookie);
     await this.initServices(context);
@@ -194,6 +213,97 @@ export class Account extends EventEmitter {
       await this.initClient({clientType});
     }
     return context;
+  }
+
+  /**
+   * Will log the user in with the given credential.
+   * Will also create the local client and store it in DB
+   *
+   * @param loginData The credentials of the user
+   * @param initClient Should the call also create the local client
+   * @param clientInfo Info about the client to create (name, type...)
+   */
+  public async login(
+    loginData: LoginData,
+    initClient: boolean = true,
+    clientInfo: ClientInfo = coreDefaultClient,
+  ): Promise<Context> {
+    this.resetContext();
+    LoginSanitizer.removeNonPrintableCharacters(loginData);
+
+    const context = await this.apiClient.login(loginData);
+    await this.initServices(context);
+
+    if (initClient) {
+      await this.initClient(loginData, clientInfo);
+    }
+
+    return context;
+  }
+
+  /**
+   * Will try to get the load the local client from local DB.
+   * If clientInfo are provided, will also create the client on backend and DB
+   * If clientInfo are not provideo, the method will fail if local client cannot be found
+   *
+   * @param loginData User's credentials
+   * @param clientInfo Will allow creating the client if the local client cannot be found (else will fail if local client is not found)
+   * @param entropyData Additional entropy data
+   * @returns The local existing client or newly created client
+   */
+  public async initClient(
+    loginData: LoginData,
+    clientInfo?: ClientInfo,
+    entropyData?: Uint8Array,
+  ): Promise<{isNewClient: boolean; localClient: RegisteredClient}> {
+    if (!this.service) {
+      throw new Error('Services are not set.');
+    }
+
+    try {
+      const localClient = await this.loadAndValidateLocalClient();
+      return {isNewClient: false, localClient};
+    } catch (error) {
+      if (!clientInfo) {
+        // If no client info provided, the client should not be created
+        throw error;
+      }
+      // There was no client so we need to "create" and "register" a client
+      const notFoundInDatabase =
+        error instanceof cryptobox.error.CryptoboxError ||
+        (error as Error).constructor.name === 'CryptoboxError' ||
+        error instanceof StoreEngineError.RecordNotFoundError ||
+        (error as Error).constructor.name === StoreEngineError.RecordNotFoundError.name;
+      const notFoundOnBackend = (error as AxiosError).response?.status === HTTP_STATUS.NOT_FOUND;
+
+      if (notFoundInDatabase) {
+        this.logger.log(`Could not find valid client in database "${this.storeEngine?.storeName}".`);
+        return this.registerClient(loginData, clientInfo, entropyData);
+      }
+
+      if (notFoundOnBackend) {
+        this.logger.log('Could not find valid client on backend');
+        const client = await this.service!.client.getLocalClient();
+        const shouldDeleteWholeDatabase = client.type === ClientType.TEMPORARY;
+        if (shouldDeleteWholeDatabase) {
+          this.logger.log('Last client was temporary - Deleting database');
+
+          if (this.storeEngine) {
+            await this.storeEngine.clearTables();
+          }
+          const context = await this.apiClient.init(loginData.clientType);
+          await this.initEngine(context);
+
+          return this.registerClient(loginData, clientInfo, entropyData);
+        }
+
+        this.logger.log('Last client was permanent - Deleting cryptography stores');
+        await this.service!.cryptography.deleteCryptographyStores();
+        return this.registerClient(loginData, clientInfo, entropyData);
+      }
+
+      throw error;
+    }
   }
 
   public async initServices(context: Context): Promise<void> {
@@ -238,71 +348,6 @@ export class Account extends EventEmitter {
     };
   }
 
-  public async login(loginData: LoginData, initClient: boolean = true, clientInfo?: ClientInfo): Promise<Context> {
-    this.resetContext();
-    LoginSanitizer.removeNonPrintableCharacters(loginData);
-
-    const context = await this.apiClient.login(loginData);
-    await this.initServices(context);
-
-    if (initClient) {
-      await this.initClient(loginData, clientInfo);
-    }
-
-    return context;
-  }
-
-  public async initClient(
-    loginData: LoginData,
-    clientInfo?: ClientInfo,
-    entropyData?: Uint8Array,
-  ): Promise<{isNewClient: boolean; localClient: RegisteredClient}> {
-    if (!this.service) {
-      throw new Error('Services are not set.');
-    }
-
-    try {
-      const localClient = await this.loadAndValidateLocalClient();
-      return {isNewClient: false, localClient};
-    } catch (error) {
-      // There was no client so we need to "create" and "register" a client
-      const notFoundInDatabase =
-        error instanceof cryptobox.error.CryptoboxError ||
-        (error as Error).constructor.name === 'CryptoboxError' ||
-        error instanceof StoreEngineError.RecordNotFoundError ||
-        (error as Error).constructor.name === StoreEngineError.RecordNotFoundError.name;
-      const notFoundOnBackend = (error as AxiosError).response?.status === HTTP_STATUS.NOT_FOUND;
-
-      if (notFoundInDatabase) {
-        this.logger.log(`Could not find valid client in database "${this.storeEngine?.storeName}".`);
-        return this.registerClient(loginData, clientInfo, entropyData);
-      }
-
-      if (notFoundOnBackend) {
-        this.logger.log('Could not find valid client on backend');
-        const client = await this.service!.client.getLocalClient();
-        const shouldDeleteWholeDatabase = client.type === ClientType.TEMPORARY;
-        if (shouldDeleteWholeDatabase) {
-          this.logger.log('Last client was temporary - Deleting database');
-
-          if (this.storeEngine) {
-            await this.storeEngine.clearTables();
-          }
-          const context = await this.apiClient.init(loginData.clientType);
-          await this.initEngine(context);
-
-          return this.registerClient(loginData, clientInfo, entropyData);
-        }
-
-        this.logger.log('Last client was permanent - Deleting cryptography stores');
-        await this.service!.cryptography.deleteCryptographyStores();
-        return this.registerClient(loginData, clientInfo, entropyData);
-      }
-
-      throw error;
-    }
-  }
-
   public async loadAndValidateLocalClient(): Promise<RegisteredClient> {
     await this.service!.cryptography.initCryptobox();
 
@@ -315,7 +360,7 @@ export class Account extends EventEmitter {
 
   private async registerClient(
     loginData: LoginData,
-    clientInfo?: ClientInfo,
+    clientInfo: ClientInfo = coreDefaultClient,
     entropyData?: Uint8Array,
   ): Promise<{isNewClient: boolean; localClient: RegisteredClient}> {
     if (!this.service) {

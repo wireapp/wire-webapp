@@ -21,7 +21,7 @@ import Dexie from 'dexie';
 import UUID from 'uuidjs';
 import {Account} from '@wireapp/core';
 import {APIClient} from '@wireapp/api-client';
-import {ClientType} from '@wireapp/api-client/src/client';
+import {ClientClassification, ClientType} from '@wireapp/api-client/src/client';
 
 describe('Account', () => {
   const context = {clientType: ClientType.NONE, userId: 'user'};
@@ -65,7 +65,11 @@ describe('Account', () => {
       account.service.notification.backend.getLastNotification = () => Promise.resolve({id: 'notification-id'});
       account.apiClient.context = {};
       account.apiClient.api.client.postClient = () => Promise.resolve({id: context.clientId});
-      await account.initClient(context);
+      await account.initClient(context, {
+        classification: ClientClassification.DESKTOP,
+        cookieLabel: 'default',
+        model: 'test',
+      });
 
       expect(account.service.client.register).toHaveBeenCalledTimes(1);
     });
