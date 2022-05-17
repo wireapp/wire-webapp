@@ -19,7 +19,7 @@
 
 import type {APIClient} from '@wireapp/api-client';
 import type {LoginData, PreKey} from '@wireapp/api-client/src/auth/';
-import {ClientClassification, ClientType, CreateClientPayload, RegisteredClient} from '@wireapp/api-client/src/client/';
+import {ClientType, CreateClientPayload, RegisteredClient} from '@wireapp/api-client/src/client/';
 import {QualifiedId} from '@wireapp/api-client/src/user';
 import type {CRUDEngine} from '@wireapp/store-engine';
 
@@ -99,11 +99,7 @@ export class ClientService {
   // TODO: Split functionality into "create" and "register" client
   public async register(
     loginData: LoginData,
-    clientInfo: ClientInfo = {
-      classification: ClientClassification.DESKTOP,
-      cookieLabel: 'default',
-      model: '@wireapp/core',
-    },
+    clientInfo: ClientInfo,
     entropyData?: Uint8Array,
   ): Promise<RegisteredClient> {
     if (!this.apiClient.context) {
