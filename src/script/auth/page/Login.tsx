@@ -191,7 +191,7 @@ const Login = ({
         switch (backendError.label) {
           case BackendError.LABEL.TOO_MANY_CLIENTS: {
             resetAuthError();
-            if (isEntropyRequired && formLoginData?.verificationCode) {
+            if (formLoginData?.verificationCode) {
               doSetLocalStorage(QUERY_KEY.CONVERSATION_CODE, formLoginData.verificationCode);
             }
             if (entropy.current) {
