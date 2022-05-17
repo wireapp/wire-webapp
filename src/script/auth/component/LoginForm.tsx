@@ -19,7 +19,17 @@
 
 import {LoginData} from '@wireapp/api-client/src/auth';
 import {css} from '@emotion/react';
-import {Button, Input, Link, Loading, COLOR} from '@wireapp/react-ui-kit';
+import {
+  Button,
+  Input,
+  Link,
+  Loading,
+  COLOR,
+  InputSubmitCombo,
+  RoundIconButton,
+  ShowIcon,
+  HideIcon,
+} from '@wireapp/react-ui-kit';
 import React, {useRef, useState} from 'react';
 import {useIntl} from 'react-intl';
 
@@ -39,15 +49,15 @@ const inputContainer = css`
   display: flex;
   flex-direction: column;
 
+  &:focus-within label {
+    color: ${COLOR.BLUE};
+  }
+
   label {
     font-size: 14px;
     order: -1;
     text-align: left;
     margin-bottom: 2px;
-  }
-
-  input:focus + label {
-    color: ${COLOR.BLUE};
   }
 `;
 
@@ -59,6 +69,7 @@ const LoginForm = ({isFetching, onSubmit}: LoginFormProps) => {
   const [validPasswordInput, setValidPasswordInput] = useState(true);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [isPasswordVisible, setIsPasswordVisible] = useState<boolean>(false);
 
   const handleSubmit = (event: React.FormEvent): void => {
     event.preventDefault();
@@ -92,6 +103,8 @@ const LoginForm = ({isFetching, onSubmit}: LoginFormProps) => {
     onSubmit(loginData, validationErrors);
   };
 
+  const toggleIsPasswordVisible = () => setIsPasswordVisible(prevState => !prevState);
+
   return (
     <div>
       <div css={inputContainer}>
@@ -111,49 +124,58 @@ const LoginForm = ({isFetching, onSubmit}: LoginFormProps) => {
           type="text"
           required
           data-uie-name="enter-email"
+          style={{height: '48px'}}
         />
 
         <label htmlFor="email">Email / username</label>
       </div>
 
       <div css={inputContainer}>
+        <InputSubmitCombo style={{height: '48px'}}>
+          <Input
+            name="password-login"
+            id="password-login"
+            onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+              setPassword(event.target.value);
+              setValidPasswordInput(true);
+            }}
+            ref={passwordInput}
+            markInvalid={!validPasswordInput}
+            value={password}
+            autoComplete="section-login password"
+            type={isPasswordVisible ? 'text' : 'password'}
+            placeholder={_(loginStrings.passwordPlaceholder)}
+            pattern={'.{1,1024}'}
+            required
+            data-uie-name="enter-password"
+            style={{height: '48px'}}
+          />
+
+          <RoundIconButton type="button" onClick={toggleIsPasswordVisible} style={{backgroundColor: 'transparent'}}>
+            {isPasswordVisible ? <HideIcon color={COLOR.BLACK} /> : <ShowIcon color={COLOR.BLACK} />}
+          </RoundIconButton>
+        </InputSubmitCombo>
+
         <label htmlFor="password-login">Password</label>
+      </div>
 
-        <Input
-          name="password-login"
-          id="password-login"
-          onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-            setPassword(event.target.value);
-            setValidPasswordInput(true);
-          }}
-          ref={passwordInput}
-          markInvalid={!validPasswordInput}
-          value={password}
-          autoComplete="section-login password"
-          type="password"
-          placeholder={_(loginStrings.passwordPlaceholder)}
-          pattern={'.{1,1024}'}
-          required
-          data-uie-name="enter-password"
-          style={{margin: '0 0 6px'}}
-        />
-
+      <div style={{marginTop: '8px'}}>
         <Link
           href={EXTERNAL_ROUTE.WIRE_ACCOUNT_PASSWORD_RESET}
           target="_blank"
           fontSize="16px"
           bold={false}
           color={COLOR.BLUE}
-          style={{textDecoration: 'underline'}}
+          style={{marginTop: '8px', textDecoration: 'underline'}}
           data-uie-name="go-forgot-password"
-          textTransform="capitalize"
+          textTransform="none"
         >
           {_(loginStrings.forgotPassword)}
         </Link>
       </div>
 
       <Button
-        type="button"
+        type="submit"
         onClick={handleSubmit}
         block
         disabled={!email || !password}

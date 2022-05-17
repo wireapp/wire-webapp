@@ -249,6 +249,16 @@ const Login = ({
     </RouterLink>
   );
 
+  const renderErrorSection = () => {
+    if (validationErrors.length) {
+      return <div style={{marginTop: '12px'}}>{parseValidationErrors(validationErrors)}</div>;
+    } else if (loginError) {
+      return <div style={{marginTop: '12px'}}>{parseError(loginError)}</div>;
+    }
+
+    return <div style={{marginTop: '4px'}}>&nbsp;</div>;
+  };
+
   return (
     <Page>
       {(Config.getConfig().FEATURE.ENABLE_DOMAIN_DISCOVERY ||
@@ -315,18 +325,14 @@ const Login = ({
                 ) : (
                   <>
                     <div>
-                      <H1 center>{_(loginStrings.headline)}</H1>
+                      <H1 center style={{fontSize: '24px'}}>
+                        {_(loginStrings.headline)}
+                      </H1>
 
                       <Form style={{marginTop: 30}} data-uie-name="login">
                         <LoginForm isFetching={isFetching} onSubmit={handleSubmit} />
 
-                        {validationErrors.length ? (
-                          parseValidationErrors(validationErrors)
-                        ) : loginError ? (
-                          parseError(loginError)
-                        ) : (
-                          <div style={{marginTop: '4px'}}>&nbsp;</div>
-                        )}
+                        {renderErrorSection()}
 
                         {!Runtime.isDesktopApp() && (
                           <Checkbox
@@ -337,6 +343,7 @@ const Login = ({
                             }}
                             checked={loginData.clientType === ClientType.TEMPORARY}
                             data-uie-name="enter-public-computer-sign-in"
+                            style={{justifyContent: 'center'}}
                           >
                             <CheckboxLabel htmlFor="enter-public-computer-sign-in">
                               {_(loginStrings.publicComputer)}
@@ -353,8 +360,10 @@ const Login = ({
                             to={ROUTE.LOGIN_PHONE}
                             data-uie-name="go-sign-in-phone"
                             fontSize="16px"
-                            color={COLOR.BLUE}
-                            textTransform="capitalize"
+                            bold={false}
+                            color={COLOR.BLACK}
+                            style={{textDecoration: 'underline'}}
+                            textTransform="none"
                           >
                             {_(loginStrings.phoneLogin)}
                           </RouterLink>
