@@ -3,6 +3,22 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [27.0.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/compare/@wireapp/core@26.1.0...@wireapp/core@27.0.0) (2022-05-17)
+
+
+### Bug Fixes
+
+* Avoid silently creating client when initializing core ([#4264](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/issues/4264)) ([65a843a](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/commit/65a843a2052dad2543e6cf046aca55ce85cc7c5e))
+
+
+### BREAKING CHANGES
+
+* if you were relying on account.init() to also create a new client, this behavior now change and will throw an error instead. If you also want to create a device (if it doesn't exist already), you should use the account.login() or account.initClient() methods instead
+
+
+
+
+
 # [26.1.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/compare/@wireapp/core@26.0.0...@wireapp/core@26.1.0) (2022-05-16)
 
 
