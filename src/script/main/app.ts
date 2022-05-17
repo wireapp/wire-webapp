@@ -115,7 +115,7 @@ import {TeamService} from '../team/TeamService';
 import {SearchService} from '../search/SearchService';
 import {CryptographyService} from '../cryptography/CryptographyService';
 import {AccessTokenError, ACCESS_TOKEN_ERROR_TYPE} from '../error/AccessTokenError';
-import {ClientError} from '../error/ClientError';
+import {ClientError, CLIENT_ERROR_TYPE} from '../error/ClientError';
 import {AuthError} from '../error/AuthError';
 import {AssetRepository} from '../assets/AssetRepository';
 import type {BaseError} from '../error/BaseError';
@@ -406,7 +406,11 @@ class App {
       loadingView.updateProgress(2.5);
       telemetry.timeStep(AppInitTimingsStep.RECEIVED_ACCESS_TOKEN);
 
-      await this.core.init(clientType);
+      try {
+        await this.core.init(clientType);
+      } catch (error) {
+        throw new ClientError(CLIENT_ERROR_TYPE.NO_VALID_CLIENT, 'Client has been deleted on backend');
+      }
 
       const selfUser = await this.initiateSelfUser();
       if (this.apiClient.backendFeatures.isFederated) {
@@ -549,6 +553,10 @@ class App {
 
     if (navigator.onLine === true) {
       switch (type) {
+        case CLIENT_ERROR_TYPE.NO_VALID_CLIENT: {
+          this.logger.warn(`Redirecting to login: ${error.message}`, error);
+          return this._redirectToLogin(SIGN_OUT_REASON.CLIENT_REMOVED);
+        }
         case AccessTokenError.TYPE.NOT_FOUND_IN_CACHE:
         case AccessTokenError.TYPE.RETRIES_EXCEEDED:
         case AccessTokenError.TYPE.REQUEST_FORBIDDEN: {
