@@ -245,9 +245,7 @@ const AppLock: React.FC<AppLockProps> = ({
     setState(APPLOCK_STATE.NONE);
     setSetupPassphrase('');
   };
-  const cancelAppLock = isAppLockEnforced
-    ? undefined
-    : () => {
+  const onCancelAppLock = () => {
         appLockRepository.setEnabled(false);
         setIsVisible(false);
       };
@@ -338,8 +336,8 @@ const AppLock: React.FC<AppLockProps> = ({
               {t('modalAppLockSetupSpecial')}
             </div>
             <div className="modal__buttons">
-              {cancelAppLock && (
-                <button type="button" className="modal__button modal__button--secondary" onClick={cancelAppLock}>
+              {!isAppLockEnforced && (
+                <button type="button" className="modal__button modal__button--secondary" onClick={onCancelAppLock}>
                   {t('modalConfirmSecondary')}
                 </button>
               )}
