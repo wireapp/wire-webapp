@@ -77,8 +77,9 @@ const AppLock: React.FC<AppLockProps> = ({
   const [setupPassphrase, setSetupPassphrase] = useState('');
   const [inactivityTimeoutId, setInactivityTimeoutId] = useState<number>();
   const [scheduledTimeoutId, setScheduledTimeoutId] = useState<number>();
-  const {isAppLockActivated, isAppLockEnabled} = useKoSubscribableChildren(appLockState, [
+  const {isAppLockActivated, isAppLockEnabled, isAppLockEnforced} = useKoSubscribableChildren(appLockState, [
     'isAppLockActivated',
+    'isAppLockEnabled',
     'isAppLockEnabled',
   ]);
 
@@ -244,6 +245,12 @@ const AppLock: React.FC<AppLockProps> = ({
     setState(APPLOCK_STATE.NONE);
     setSetupPassphrase('');
   };
+  const cancelAppLock = isAppLockEnforced
+    ? undefined
+    : () => {
+        appLockRepository.setEnabled(false);
+        setIsVisible(false);
+      };
 
   const headerText = () => {
     switch (state) {
@@ -331,6 +338,11 @@ const AppLock: React.FC<AppLockProps> = ({
               {t('modalAppLockSetupSpecial')}
             </div>
             <div className="modal__buttons">
+              {cancelAppLock && (
+                <button type="button" className="modal__button modal__button--secondary" onClick={cancelAppLock}>
+                  {t('modalConfirmSecondary')}
+                </button>
+              )}
               <button
                 type="submit"
                 className="modal__button modal__button--primary modal__button--full"
