@@ -95,8 +95,8 @@ export class ClientRepository {
    * Delete the temporary client on the backend.
    * @returns Resolves when the temporary client was deleted on the backend
    */
-  private deleteTemporaryClient(): Promise<void> {
-    return this.clientService.deleteTemporaryClient(this.clientState.currentClient().id);
+  private deleteLocalTemporaryClient() {
+    return this.core.service!.client.deleteLocalClient();
   }
 
   /**
@@ -305,7 +305,7 @@ export class ClientRepository {
   logoutClient = async (): Promise<void> => {
     if (this.clientState.currentClient()) {
       if (this.clientState.isTemporaryClient()) {
-        await this.deleteTemporaryClient();
+        await this.deleteLocalTemporaryClient();
         amplify.publish(WebAppEvents.LIFECYCLE.SIGN_OUT, SIGN_OUT_REASON.USER_REQUESTED, true);
       } else {
         amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.OPTION, {

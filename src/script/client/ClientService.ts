@@ -83,15 +83,6 @@ export class ClientService {
   }
 
   /**
-   * Deletes the temporary client of a user.
-   * @param clientId ID of the temporary client to be deleted
-   * @returns Resolves once the deletion of the temporary client is complete
-   */
-  deleteTemporaryClient(clientId: string): Promise<void> {
-    return this.apiClient.api.client.deleteClient(clientId);
-  }
-
-  /**
    * Retrieves meta information about a specific client.
    * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/users/getClients
    *
