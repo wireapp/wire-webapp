@@ -17,6 +17,7 @@
  *
  */
 
+/* eslint-disable sort-keys-fix/sort-keys-fix */
 import {CONVERSATION_ACCESS, ACCESS_ROLE_V2} from '@wireapp/api-client/src/conversation/';
 import {combinePermissions, hasPermissions} from '../user/UserPermission';
 import {ACCESS_STATE, TEAM} from './AccessState';
@@ -24,13 +25,13 @@ import {ACCESS_STATE, TEAM} from './AccessState';
 export const ACCESS_TYPES = {
   GUEST: 1 << 0,
   NON_TEAM_MEMBER: 1 << 1,
-  SERVICE: 1 << 3,
   TEAM_MEMBER: 1 << 2,
+  SERVICE: 1 << 3,
 };
 
 export const ACCESS_MODES = {
-  CODE: 1 << 5,
   INVITE: 1 << 4,
+  CODE: 1 << 5,
 };
 
 export const ACCESS = {...ACCESS_TYPES, ...ACCESS_MODES};
@@ -69,6 +70,7 @@ export function hasAccessToFeature(feature: number, state: ACCESS_STATE): boolea
 export function isGettingAccessToFeature(feature: number, prevState: ACCESS_STATE, current: ACCESS_STATE) {
   return !hasAccessToFeature(feature, prevState) && hasAccessToFeature(feature, current);
 }
+
 export function featureFromStateChange(prevState: ACCESS_STATE, current: ACCESS_STATE) {
   const feature = Object.entries(ACCESS).find(
     ([, v]) => v & (teamPermissionsForAccessState(prevState) ^ teamPermissionsForAccessState(current)),
