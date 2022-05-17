@@ -80,7 +80,7 @@ const AppLock: React.FC<AppLockProps> = ({
   const {isAppLockActivated, isAppLockEnabled, isAppLockEnforced} = useKoSubscribableChildren(appLockState, [
     'isAppLockActivated',
     'isAppLockEnabled',
-    'isAppLockEnabled',
+    'isAppLockEnforced',
   ]);
 
   const focusElement = (input: HTMLInputElement) => setTimeout(() => input?.focus());
