@@ -94,7 +94,7 @@
   "accessibility.headings.preferencesOptions": "Preferences - options",
   "accessibility.headings.sidebar": "Navigation",
   "accessibility.messages.like": "Like message",
-  isLimitedFeaturePlan"accessibility.messages.liked": "Unlike message",
+  "accessibility.messages.liked": "Unlike message",
   "accessibility.openConversation": "Open {{name}} conversation",
   "accessibility.rightPanel.GoBack": "Go back",
   "accessibility.rightPanel.close": "Close conversation info",
