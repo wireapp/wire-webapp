@@ -246,9 +246,9 @@ const AppLock: React.FC<AppLockProps> = ({
     setSetupPassphrase('');
   };
   const onCancelAppLock = () => {
-        appLockRepository.setEnabled(false);
-        setIsVisible(false);
-      };
+    appLockRepository.setEnabled(false);
+    setIsVisible(false);
+  };
 
   const headerText = () => {
     switch (state) {
