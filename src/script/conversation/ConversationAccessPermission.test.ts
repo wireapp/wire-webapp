@@ -17,8 +17,15 @@
  *
  */
 
+/* eslint-disable sort-keys-fix/sort-keys-fix */
 import {ACCESS_STATE, TEAM} from './AccessState';
 import {
+  ACCESS,
+  ACCESS_MODES,
+  ACCESS_TYPES,
+  featureFromStateChange,
+  hasAccessToFeature,
+  isGettingAccessToFeature,
   // ACCESS_MODES,
   // featureFromStateChange,
   // isGettingAccessToFeature,
@@ -26,31 +33,81 @@ import {
   // updateAccessRights,
 } from './ConversationAccessPermission';
 
-// describe('ConversationAccessPermissions', () => {
-
-describe('teamPermissionsForAccessState', () => {
-  const team = {
-    GUESTS_SERVICES: (1 << 0) | (1 << 1) | (1 << 5) | (1 << 4) | (1 << 2) | (1 << 3),
-    GUEST_FEATURES: (1 << 0) | (1 << 1) | (1 << 5),
-    GUEST_ROOM: (1 << 0) | (1 << 1) | (1 << 5) | (1 << 4) | (1 << 2),
+describe('ConversationAccessPermissions', () => {
+  const mockTeam = {
+    GUESTS_SERVICES:
+      ACCESS_TYPES.GUEST |
+      ACCESS_TYPES.NON_TEAM_MEMBER |
+      ACCESS_MODES.CODE |
+      ACCESS_MODES.INVITE |
+      ACCESS_TYPES.TEAM_MEMBER |
+      ACCESS_TYPES.SERVICE,
+    GUEST_ROOM:
+      ACCESS_TYPES.GUEST |
+      ACCESS_TYPES.NON_TEAM_MEMBER |
+      ACCESS_MODES.CODE |
+      ACCESS_MODES.INVITE |
+      ACCESS_TYPES.TEAM_MEMBER,
+    SERVICES: ACCESS_MODES.INVITE | ACCESS_TYPES.TEAM_MEMBER | ACCESS_TYPES.SERVICE,
+    TEAM_ONLY: ACCESS_MODES.INVITE | ACCESS_TYPES.TEAM_MEMBER,
     LEGACY: 0,
+    GUEST_FEATURES: ACCESS_TYPES.GUEST | ACCESS_TYPES.NON_TEAM_MEMBER | ACCESS_MODES.CODE,
     ONE2ONE: 0,
-    SERVICES: (1 << 4) | (1 << 2) | (1 << 3),
-    TEAM_ONLY: (1 << 4) | (1 << 2),
   };
-  const entry: [TEAM, number][] = Object.entries(team).map(([k, v]) => [
+  const entry: [TEAM, number][] = Object.entries(mockTeam).map(([k, v]) => [
     ACCESS_STATE.TEAM[k as keyof typeof ACCESS_STATE.TEAM],
     v,
   ]);
+  describe('teamPermissionsForAccessState', () => {
+    it.each(entry)('should return the features for %s', (accessState, results) => {
+      expect(
+        teamPermissionsForAccessState(accessState as typeof ACCESS_STATE.TEAM[keyof typeof ACCESS_STATE.TEAM]),
+      ).toBe(results);
+    });
 
-  it.each(entry)('should return the expected number for features for each team state', (accessState, results) => {
-    expect(teamPermissionsForAccessState(accessState as typeof ACCESS_STATE.TEAM[keyof typeof ACCESS_STATE.TEAM])).toBe(
-      results,
-    );
+    it('should return 0 if an unknown value is passed to it', () => {
+      expect(teamPermissionsForAccessState(ACCESS_STATE.OTHER.SELF)).toBe(0);
+    });
   });
 
-  it('should return 0 if an unknown value is passed to it', () => {
-    expect(teamPermissionsForAccessState(ACCESS_STATE.OTHER.SELF)).toBe(0);
+  describe('hasAccessToFeature', () => {
+    it.each(entry)('%s has access to the correct features', (state, results) => {
+      Object.values(ACCESS).forEach(feature =>
+        expect(hasAccessToFeature(feature, state) === !!(results & feature)).toBeTruthy(),
+      );
+    });
+  });
+
+  describe('isGettingAccessToFeature', () => {
+    it('Correctly loses feature', () => {
+      expect(
+        isGettingAccessToFeature(ACCESS_TYPES.GUEST, ACCESS_STATE.TEAM.GUEST_ROOM, ACCESS_STATE.TEAM.TEAM_ONLY),
+      ).toBeFalsy();
+    });
+    it('Correctly gains feature', () => {
+      expect(
+        isGettingAccessToFeature(ACCESS_TYPES.SERVICE, ACCESS_STATE.TEAM.TEAM_ONLY, ACCESS_STATE.TEAM.SERVICES),
+      ).toBeTruthy();
+    });
+    it('Correctly remains the same', () => {
+      expect(
+        isGettingAccessToFeature(ACCESS_TYPES.SERVICE, ACCESS_STATE.TEAM.TEAM_ONLY, ACCESS_STATE.TEAM.TEAM_ONLY),
+      ).toBeFalsy();
+    });
+  });
+
+  describe('featureFromStateChange', () => {
+    it.each(entry.slice(0, -3))('gives feature information for %s', (prev, feat) => {
+      entry.slice(0, -3).forEach(([team]) => {
+        const result = featureFromStateChange(prev, team);
+        if (prev === team) {
+          // eslint-disable-next-line jest/no-conditional-expect
+          return Object.values(result).forEach(value => expect(value).toBeFalsy());
+        }
+        expect(['guest', 'service']).toContain(result.feature);
+        expect(['Guest', 'Service']).toContain(result.featureName);
+        expect(result.isAvailable === !!(feat & result.number)).toBeFalsy();
+      });
+    });
   });
 });
-// });

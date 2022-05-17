@@ -72,15 +72,18 @@ export function isGettingAccessToFeature(feature: number, prevState: ACCESS_STAT
 }
 
 export function featureFromStateChange(prevState: ACCESS_STATE, current: ACCESS_STATE) {
+  if (prevState === current) {
+    return {feature: undefined, featureName: undefined, isAvailable: undefined, number: 0};
+  }
   const feature = Object.entries(ACCESS).find(
     ([, v]) => v & (teamPermissionsForAccessState(prevState) ^ teamPermissionsForAccessState(current)),
   );
-  const featString = ACCESS_ROLE_V2[feature[0] as keyof typeof ACCESS_ROLE_V2];
+  const featString = ACCESS_ROLE_V2[feature?.[0] as keyof typeof ACCESS_ROLE_V2];
   return {
     feature: featString,
-    featureName: (featString[0].toUpperCase() + featString.slice(1)) as 'Guest' | 'Service',
-    isAvailable: hasAccessToFeature(feature[1], current),
-    number: feature[1],
+    featureName: (featString?.[0].toUpperCase() + featString?.slice(1)) as 'Guest' | 'Service',
+    isAvailable: hasAccessToFeature(feature?.[1], current),
+    number: feature?.[1],
   };
 }
 
