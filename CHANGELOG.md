@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [19.2.1](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/compare/@wireapp/api-client@19.2.0...@wireapp/api-client@19.2.1) (2022-05-18)
+
+
+### Bug Fixes
+
+* **api-client,react-ui-kit:** Correct migration to react 18 ([#4265](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/issues/4265)) ([f6afcca](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/commit/f6afccaf1e08c32a97cd6226cf0f681014cf0245))
+
+
+
+
+
 # [19.2.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/compare/@wireapp/api-client@19.1.1...@wireapp/api-client@19.2.0) (2022-05-16)
 
 
