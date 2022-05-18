@@ -34,6 +34,11 @@ import {SearchRepository} from '../../search/SearchRepository';
 import {UserState} from '../../user/UserState';
 import {TeamState} from '../../team/TeamState';
 import {TeamRepository} from 'src/script/team/TeamRepository';
+import {
+  ACCESS_TYPES,
+  teamPermissionsForAccessState,
+  toggleFeature,
+} from '../../conversation/ConversationAccessPermission';
 
 type GroupCreationSource = 'start_ui' | 'conversation_details' | 'create';
 
@@ -214,43 +219,15 @@ export class GroupCreationViewModel {
     this.isShown(false);
   };
 
-  readonly clickOnToggleServicesMode = (): void => {
-    let newAccessState: TEAM;
-
-    if (this.isGuestRoom()) {
-      newAccessState = ACCESS_STATE.TEAM.GUESTS_SERVICES;
-    }
-
-    if (this.isGuestAndServicesRoom()) {
-      newAccessState = ACCESS_STATE.TEAM.GUEST_ROOM;
-    }
-    if (this.isServicesRoom()) {
-      newAccessState = ACCESS_STATE.TEAM.TEAM_ONLY;
-    }
-    if (this.isTeamOnly()) {
-      newAccessState = ACCESS_STATE.TEAM.SERVICES;
-    }
+  readonly clickOnToggle = (feature: number): void => {
+    const newAccessState = toggleFeature(feature, this.accessState());
 
     this.accessState(newAccessState);
   };
-  readonly clickOnToggleGuestMode = (): void => {
-    let newAccessState: TEAM;
 
-    if (this.isServicesRoom()) {
-      newAccessState = ACCESS_STATE.TEAM.GUESTS_SERVICES;
-    }
-    if (this.isTeamOnly()) {
-      newAccessState = ACCESS_STATE.TEAM.GUEST_ROOM;
-    }
-    if (this.isGuestRoom()) {
-      newAccessState = ACCESS_STATE.TEAM.TEAM_ONLY;
-    }
-    if (this.isGuestAndServicesRoom()) {
-      newAccessState = ACCESS_STATE.TEAM.SERVICES;
-    }
-
-    this.accessState(newAccessState);
-  };
+  readonly clickOnToggleServicesMode = () => this.clickOnToggle(ACCESS_TYPES.SERVICE);
+  readonly clickOnToggleGuestMode = () =>
+    this.clickOnToggle(teamPermissionsForAccessState(ACCESS_STATE.TEAM.GUEST_FEATURES));
 
   clickOnCreate = async (): Promise<void> => {
     if (!this.isCreatingConversation) {

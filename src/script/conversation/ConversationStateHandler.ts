@@ -17,7 +17,7 @@
  *
  */
 
-import {CONVERSATION_ACCESS, ACCESS_ROLE_V2, ConversationCode} from '@wireapp/api-client/src/conversation/';
+import {ConversationCode} from '@wireapp/api-client/src/conversation/';
 import {ConversationAccessUpdateData, ConversationAccessV2UpdateData} from '@wireapp/api-client/src/conversation/data/';
 import {CONVERSATION_EVENT} from '@wireapp/api-client/src/event/';
 import {amplify} from 'amplify';
@@ -34,6 +34,12 @@ import {ACCESS_STATE} from './AccessState';
 import {ConversationMapper} from './ConversationMapper';
 import type {ConversationService} from './ConversationService';
 import {ConversationEvent} from './EventBuilder';
+import {
+  ACCESS_MODES,
+  featureFromStateChange,
+  isGettingAccessToFeature,
+  updateAccessRights,
+} from './ConversationAccessPermission';
 
 export class ConversationStateHandler extends AbstractConversationEventHandler {
   private readonly conversationService: ConversationService;
@@ -49,47 +55,17 @@ export class ConversationStateHandler extends AbstractConversationEventHandler {
     this.conversationService = conversationService;
   }
 
-  async changeAccessState(
-    conversationEntity: Conversation,
-    accessState: ACCESS_STATE,
-    isTogglingGuest: boolean,
-  ): Promise<void> {
+  async changeAccessState(conversationEntity: Conversation, accessState: ACCESS_STATE): Promise<void> {
     const isConversationInTeam = conversationEntity && conversationEntity.inTeam();
+    const isStateChange = conversationEntity.accessState() !== accessState;
+    const prevAccessState = conversationEntity.accessState();
+
     if (isConversationInTeam) {
-      const isStateChange = conversationEntity.accessState() !== accessState;
-      const prevAccessState = conversationEntity.accessState();
-
       if (isStateChange) {
-        let accessModes;
-        let accessRole;
-
-        switch (accessState) {
-          case ACCESS_STATE.TEAM.GUEST_ROOM:
-            accessModes = [CONVERSATION_ACCESS.INVITE, CONVERSATION_ACCESS.CODE];
-            accessRole = [ACCESS_ROLE_V2.GUEST, ACCESS_ROLE_V2.NON_TEAM_MEMBER, ACCESS_ROLE_V2.TEAM_MEMBER];
-            break;
-          case ACCESS_STATE.TEAM.TEAM_ONLY:
-            accessModes = [CONVERSATION_ACCESS.INVITE];
-            accessRole = [ACCESS_ROLE_V2.TEAM_MEMBER];
-            break;
-          case ACCESS_STATE.TEAM.GUESTS_SERVICES:
-            accessModes = [CONVERSATION_ACCESS.INVITE, CONVERSATION_ACCESS.CODE];
-            accessRole = [
-              ACCESS_ROLE_V2.GUEST,
-              ACCESS_ROLE_V2.NON_TEAM_MEMBER,
-              ACCESS_ROLE_V2.TEAM_MEMBER,
-              ACCESS_ROLE_V2.SERVICE,
-            ];
-            break;
-          case ACCESS_STATE.TEAM.SERVICES:
-            accessModes = [CONVERSATION_ACCESS.INVITE];
-            accessRole = [ACCESS_ROLE_V2.TEAM_MEMBER, ACCESS_ROLE_V2.SERVICE];
-            break;
-        }
-
+        const {accessModes, accessRole} = updateAccessRights(accessState);
         if (accessModes && accessRole) {
           try {
-            if (accessState === ACCESS_STATE.TEAM.TEAM_ONLY || accessState === ACCESS_STATE.TEAM.SERVICES) {
+            if (!isGettingAccessToFeature(ACCESS_MODES.CODE, prevAccessState, accessState)) {
               conversationEntity.accessCode(undefined);
               await this.revokeAccessCode(conversationEntity);
             }
@@ -98,30 +74,12 @@ export class ConversationStateHandler extends AbstractConversationEventHandler {
             conversationEntity.accessState(accessState);
           } catch (e) {
             let messageString: string;
+            const {featureName, ...featureInfo} = featureFromStateChange(prevAccessState, accessState);
 
-            if (
-              (prevAccessState === ACCESS_STATE.TEAM.TEAM_ONLY && accessState === ACCESS_STATE.TEAM.SERVICES) ||
-              (prevAccessState === ACCESS_STATE.TEAM.SERVICES && accessState === ACCESS_STATE.TEAM.GUESTS_SERVICES)
-            ) {
-              messageString = t('modalConversationGuestOptionsAllowGuestMessage');
-            }
-            if (
-              (prevAccessState === ACCESS_STATE.TEAM.GUEST_ROOM && accessState === ACCESS_STATE.TEAM.TEAM_ONLY) ||
-              (prevAccessState === ACCESS_STATE.TEAM.GUESTS_SERVICES && accessState === ACCESS_STATE.TEAM.SERVICES)
-            ) {
-              messageString = t('modalConversationGuestOptionsDisableGuestMessage');
-            }
-            if (
-              (prevAccessState === ACCESS_STATE.TEAM.GUEST_ROOM && accessState === ACCESS_STATE.TEAM.GUESTS_SERVICES) ||
-              (prevAccessState === ACCESS_STATE.TEAM.TEAM_ONLY && accessState === ACCESS_STATE.TEAM.SERVICES)
-            ) {
-              messageString = t('modalConversationServicesOptionsAllowServicesMessage');
-            }
-            if (
-              (prevAccessState === ACCESS_STATE.TEAM.GUESTS_SERVICES && accessState === ACCESS_STATE.TEAM.GUEST_ROOM) ||
-              (prevAccessState === ACCESS_STATE.TEAM.SERVICES && accessState === ACCESS_STATE.TEAM.TEAM_ONLY)
-            ) {
-              messageString = t('modalConversationServicesOptionsDisableServicesMessage');
+            if (featureInfo.isAvailable) {
+              messageString = t(`modalConversationOptionsAllow${featureName}Message`);
+            } else {
+              messageString = t(`modalConversationOptionsDisable${featureName}Message`);
             }
             this._showModal(messageString);
           }
@@ -129,12 +87,8 @@ export class ConversationStateHandler extends AbstractConversationEventHandler {
         }
       }
     }
-
-    this._showModal(
-      isTogglingGuest
-        ? t('modalConversationGuestOptionsToggleGuestsMessage')
-        : t('modalConversationServicesOptionsToggleServicesMessage'),
-    );
+    const {featureName} = featureFromStateChange(prevAccessState, accessState);
+    this._showModal(t(`modalConversationOptionsToggle${featureName}Message`));
   }
 
   async getAccessCode(conversationEntity: Conversation): Promise<void> {
