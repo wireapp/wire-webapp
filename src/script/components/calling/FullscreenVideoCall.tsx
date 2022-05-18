@@ -289,10 +289,13 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
                 type="button"
                 aria-labelledby="mute-label"
                 data-uie-name="do-call-controls-video-call-mute"
+                role="switch"
+                aria-checked={!isMuted}
               >
                 <span id="mute-label" className="video-controls__button__label">
                   {t('videoCallOverlayMicrophone')}
                 </span>
+
                 {isMuted ? <Icon.MicOff width={16} height={16} /> : <Icon.MicOn width={16} height={16} />}
               </button>
             </li>
@@ -304,7 +307,8 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
                   data-uie-value={selfSharesCamera ? 'active' : 'inactive'}
                   onClick={() => toggleCamera(call)}
                   onKeyDown={e => handleToggleCameraKeydown(e)}
-                  role="button"
+                  role="switch"
+                  aria-checked={selfSharesCamera}
                   tabIndex={0}
                   css={selfSharesCamera ? videoControlActiveStyles : videoControlInActiveStyles}
                   aria-labelledby="video-label"
@@ -315,6 +319,7 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
                   ) : (
                     <Icon.CameraOff width={16} height={16} />
                   )}
+
                   {showSwitchCamera ? (
                     <DeviceToggleButton
                       styles={css`
