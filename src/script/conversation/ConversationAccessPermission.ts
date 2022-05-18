@@ -73,17 +73,17 @@ export function isGettingAccessToFeature(feature: number, prevState: ACCESS_STAT
 
 export function featureFromStateChange(prevState: ACCESS_STATE, current: ACCESS_STATE) {
   if (prevState === current) {
-    return {feature: undefined, featureName: undefined, isAvailable: undefined, number: 0};
+    return {feature: undefined, featureName: undefined, isAvailable: undefined, bitmask: 0};
   }
-  const [featureName, featureValue] = Object.entries(ACCESS).find(
-    ([, value]) => value & (teamPermissionsForAccessState(prevState) ^ teamPermissionsForAccessState(current)),
+  const [featureName, featureBitmask] = Object.entries(ACCESS).find(
+    ([, bitmask]) => bitmask & (teamPermissionsForAccessState(prevState) ^ teamPermissionsForAccessState(current)),
   );
   const featString = ACCESS_ROLE_V2[featureName as keyof typeof ACCESS_ROLE_V2];
   return {
     feature: featString,
     featureName: (featString?.[0].toUpperCase() + featString?.slice(1)) as 'Guest' | 'Service',
-    isAvailable: hasAccessToFeature(featureValue, current),
-    number: featureValue,
+    isAvailable: hasAccessToFeature(featureBitmask, current),
+    bitmask: featureBitmask,
   };
 }
 
@@ -135,7 +135,7 @@ export function updateAccessRights(accessState: ACCESS_STATE): UpdatedAccessRigh
     //reverse so that the index reflects the number of significant figures for finding the feature
     .reverse()
     //find the name of the feature with the correct sigfigs
-    .map((f: '1' | '0', i) => Object.entries(ACCESS).find(([, v]) => v === +f << i)?.[0])
+    .map((bit: '1' | '0', i) => Object.entries(ACCESS).find(([, bitmask]) => bitmask === +bit << i)?.[0])
     .forEach(feature => {
       const accessRole = ACCESS_ROLE_V2[feature as keyof typeof ACCESS_ROLE_V2];
       const accessModes = CONVERSATION_ACCESS[feature as keyof typeof CONVERSATION_ACCESS];
