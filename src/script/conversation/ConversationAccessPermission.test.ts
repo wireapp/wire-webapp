@@ -20,17 +20,14 @@
 /* eslint-disable sort-keys-fix/sort-keys-fix */
 import {ACCESS_STATE, TEAM} from './AccessState';
 import {
-  ACCESS,
+  accessFromPermissions,
   ACCESS_MODES,
   ACCESS_TYPES,
   featureFromStateChange,
   hasAccessToFeature,
   isGettingAccessToFeature,
-  // ACCESS_MODES,
-  // featureFromStateChange,
-  // isGettingAccessToFeature,
   teamPermissionsForAccessState,
-  // updateAccessRights,
+  toggleFeature,
 } from './ConversationAccessPermission';
 
 describe('ConversationAccessPermissions', () => {
@@ -70,10 +67,14 @@ describe('ConversationAccessPermissions', () => {
     });
   });
 
-  describe('hasAccessToFeature', () => {
-    it.each(entry)('%s has access to the correct features', (state, results) => {
-      Object.values(ACCESS).forEach(feature =>
-        expect(hasAccessToFeature(feature, state) === !!(results & feature)).toBeTruthy(),
+  describe('hasAccessToFeature & toggleFeature', () => {
+    it.each(entry.slice(0, -3))('%s has correct features and can toggle', (state, results) => {
+      const features = [ACCESS_TYPES.SERVICE, ACCESS_TYPES.GUEST | ACCESS_TYPES.NON_TEAM_MEMBER | ACCESS_MODES.CODE];
+      features.forEach(feature =>
+        // toggling the feature should mean the current access state no longer has access to it.
+        expect(
+          hasAccessToFeature(feature, state) === hasAccessToFeature(feature, toggleFeature(feature, state)),
+        ).toBeFalsy(),
       );
     });
   });
@@ -106,8 +107,18 @@ describe('ConversationAccessPermissions', () => {
         }
         expect(['guest', 'service']).toContain(result.feature);
         expect(['Guest', 'Service']).toContain(result.featureName);
+        // compared to the original, feature should be falsy (opposite state)
         expect(result.isAvailable === !!(feat & result.number)).toBeFalsy();
       });
+    });
+  });
+
+  describe('accessFromPermissions', () => {
+    it.each(entry.slice(0, -2))('gives %s for %d', (team, permissions) => {
+      expect(accessFromPermissions(permissions)).toBe(team);
+    });
+    it('gives z.conversation.ACCESS_STATE.TEAM.LEGACY for unknown permissions', () => {
+      expect(accessFromPermissions(entry[5][1])).toBe(ACCESS_STATE.TEAM.LEGACY);
     });
   });
 });
