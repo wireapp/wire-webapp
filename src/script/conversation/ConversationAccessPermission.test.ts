@@ -18,6 +18,7 @@
  */
 
 /* eslint-disable sort-keys-fix/sort-keys-fix */
+import {CONVERSATION_ACCESS, ACCESS_ROLE_V2} from '@wireapp/api-client/src/conversation/';
 import {ACCESS_STATE, TEAM} from './AccessState';
 import {
   accessFromPermissions,
@@ -28,6 +29,8 @@ import {
   isGettingAccessToFeature,
   teamPermissionsForAccessState,
   toggleFeature,
+  updateAccessRights,
+  UpdatedAccessRights,
 } from './ConversationAccessPermission';
 
 describe('ConversationAccessPermissions', () => {
@@ -51,12 +54,14 @@ describe('ConversationAccessPermissions', () => {
     GUEST_FEATURES: ACCESS_TYPES.GUEST | ACCESS_TYPES.NON_TEAM_MEMBER | ACCESS_MODES.CODE,
     ONE2ONE: 0,
   };
-  const entry: [TEAM, number][] = Object.entries(mockTeam).map(([k, v]) => [
-    ACCESS_STATE.TEAM[k as keyof typeof ACCESS_STATE.TEAM],
-    v,
-  ]);
+
+  const accessStateMapper = <V>(teamObject: {[k in keyof typeof ACCESS_STATE.TEAM]: V}): [TEAM, V][] =>
+    Object.entries(teamObject).map(([k, v]) => [ACCESS_STATE.TEAM[k as keyof typeof ACCESS_STATE.TEAM], v]);
+
+  const mockAccessTeam = accessStateMapper(mockTeam);
+
   describe('teamPermissionsForAccessState', () => {
-    it.each(entry)('should return the features for %s', (accessState, results) => {
+    it.each(mockAccessTeam)('should return the features for %s', (accessState, results) => {
       expect(
         teamPermissionsForAccessState(accessState as typeof ACCESS_STATE.TEAM[keyof typeof ACCESS_STATE.TEAM]),
       ).toBe(results);
@@ -68,7 +73,7 @@ describe('ConversationAccessPermissions', () => {
   });
 
   describe('hasAccessToFeature & toggleFeature', () => {
-    it.each(entry.slice(0, -3))('%s has correct features and can toggle', (state, results) => {
+    it.each(mockAccessTeam.slice(0, -3))('%s has correct features and can toggle', (state, results) => {
       const features = [ACCESS_TYPES.SERVICE, ACCESS_TYPES.GUEST | ACCESS_TYPES.NON_TEAM_MEMBER | ACCESS_MODES.CODE];
       features.forEach(feature =>
         // toggling the feature should mean the current access state no longer has access to it.
@@ -98,8 +103,8 @@ describe('ConversationAccessPermissions', () => {
   });
 
   describe('featureFromStateChange', () => {
-    it.each(entry.slice(0, -3))('gives feature information for %s', (prev, feat) => {
-      entry.slice(0, -3).forEach(([team]) => {
+    it.each(mockAccessTeam.slice(0, -3))('gives feature information for %s', (prev, feat) => {
+      mockAccessTeam.slice(0, -3).forEach(([team]) => {
         const result = featureFromStateChange(prev, team);
         if (prev === team) {
           // eslint-disable-next-line jest/no-conditional-expect
@@ -114,11 +119,46 @@ describe('ConversationAccessPermissions', () => {
   });
 
   describe('accessFromPermissions', () => {
-    it.each(entry.slice(0, -2))('gives %s for %d', (team, permissions) => {
+    it.each(mockAccessTeam.slice(0, -2))('gives %s for %d', (team, permissions) => {
       expect(accessFromPermissions(permissions)).toBe(team);
     });
     it('gives z.conversation.ACCESS_STATE.TEAM.LEGACY for unknown permissions', () => {
-      expect(accessFromPermissions(entry[5][1])).toBe(ACCESS_STATE.TEAM.LEGACY);
+      expect(accessFromPermissions(mockAccessTeam[5][1])).toBe(ACCESS_STATE.TEAM.LEGACY);
+    });
+  });
+
+  describe('updateAccessRights', () => {
+    const mockRights = {
+      GUESTS_SERVICES: {
+        accessRole: [
+          ACCESS_ROLE_V2.GUEST,
+          ACCESS_ROLE_V2.NON_TEAM_MEMBER,
+          ACCESS_ROLE_V2.TEAM_MEMBER,
+          ACCESS_ROLE_V2.SERVICE,
+        ],
+        accessModes: [CONVERSATION_ACCESS.INVITE, CONVERSATION_ACCESS.CODE],
+      },
+      GUEST_ROOM: {
+        accessRole: [ACCESS_ROLE_V2.GUEST, ACCESS_ROLE_V2.NON_TEAM_MEMBER, ACCESS_ROLE_V2.TEAM_MEMBER],
+        accessModes: [CONVERSATION_ACCESS.INVITE, CONVERSATION_ACCESS.CODE],
+      },
+      SERVICES: {
+        accessModes: [CONVERSATION_ACCESS.INVITE],
+        accessRole: [ACCESS_ROLE_V2.TEAM_MEMBER, ACCESS_ROLE_V2.SERVICE],
+      },
+      TEAM_ONLY: {accessModes: [CONVERSATION_ACCESS.INVITE], accessRole: [ACCESS_ROLE_V2.TEAM_MEMBER]},
+      LEGACY: {accessModes: [], accessRole: []} as UpdatedAccessRights,
+      GUEST_FEATURES: {
+        accessRole: [ACCESS_ROLE_V2.GUEST, ACCESS_ROLE_V2.NON_TEAM_MEMBER],
+        accessModes: [CONVERSATION_ACCESS.CODE],
+      },
+      ONE2ONE: {accessModes: [], accessRole: []} as UpdatedAccessRights,
+    };
+
+    const mockAccessRights = accessStateMapper(mockRights);
+
+    it.each(mockAccessRights)('returns rights array for %s', (state, rights) => {
+      expect(updateAccessRights(state)).toStrictEqual(rights);
     });
   });
 });
