@@ -355,6 +355,8 @@ const ConversationListCallingCell: React.FC<CallingCellProps> = ({
                         data-uie-name="do-toggle-video"
                         title={t('videoCallOverlayCamera')}
                         type="button"
+                        role="switch"
+                        aria-checked={selfSharesCamera}
                         data-uie-value={selfSharesCamera ? 'active' : 'inactive'}
                       >
                         {selfSharesCamera ? (
