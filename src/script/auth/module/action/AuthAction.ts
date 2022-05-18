@@ -171,7 +171,8 @@ export class AuthAction {
     ) => {
       dispatch(AuthActionCreator.startLogin());
       try {
-        await core.init(clientType);
+        // we first init the core without initializing the client for now (this will be done later on)
+        await core.init(clientType, undefined, false);
         await this.persistAuthData(clientType, core, dispatch, localStorageAction);
         await dispatch(selfAction.fetchSelf());
         await dispatch(cookieAction.setCookie(COOKIE_NAME_APP_OPENED, {appInstanceId: getConfig().APP_INSTANCE_ID}));
