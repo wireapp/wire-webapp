@@ -24,8 +24,8 @@
     "babel-jest": "27.0.6",
     "babel-loader": "8.2.2",
     "jest": "26.6.1",
-    "react": "18.0.0",
-    "react-dom": "18.0.0",
+    "react": "18.1.0",
+    "react-dom": "18.1.0",
     "react-helmet": "6.1.0",
     "react-hot-loader": "4.13.0",
     "react-styleguidist": "11.2.0",
@@ -36,8 +36,8 @@
   "homepage": "https://wire-react-ui-kit.netlify.app/",
   "peerDependencies": {
     "@types/react": "^17.0.0",
-    "react": "^17.0.1",
-    "react-dom": "^17.0.1"
+    "react": "^18.1.0",
+    "react-dom": "^18.1.0"
   },
   "peerDependenciesMeta": {
     "@types/react": {

@@ -25,7 +25,7 @@ import {ContainerXS, Content, Header, StyledApp} from '@wireapp/react-ui-kit/Lay
 import {H1, Link, Text} from '@wireapp/react-ui-kit/Text';
 import logdown from 'logdown';
 import React, {Component} from 'react';
-import ReactDOM from 'react-dom';
+import {createRoot} from 'react-dom/client';
 
 const logger = logdown('Demo');
 logger.state.isEnabled = true;
@@ -134,5 +134,7 @@ window.onload = function () {
   });
   window.wire = {client};
 
-  ReactDOM.render(<Auth />, document.getElementById('app'));
+  const container = document.getElementById('app');
+  const root = createRoot(container); // createRoot(container!) if you use TypeScript
+  root.render(<Auth />);
 };
