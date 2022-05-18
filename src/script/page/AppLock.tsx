@@ -337,7 +337,12 @@ const AppLock: React.FC<AppLockProps> = ({
             </div>
             <div className="modal__buttons">
               {!isAppLockEnforced && (
-                <button type="button" className="modal__button modal__button--secondary" onClick={onCancelAppLock}>
+                <button
+                  type="button"
+                  className="modal__button modal__button--secondary"
+                  data-uie-name="do-cancel-applock"
+                  onClick={onCancelAppLock}
+                >
                   {t('modalConfirmSecondary')}
                 </button>
               )}
