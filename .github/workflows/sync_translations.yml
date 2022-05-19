@@ -42,6 +42,8 @@ jobs:
         with:
           upload_sources: true
           upload_translations: false
+          github_user_name: otto-the-bot
+          github_user_email: webapp+otto@wire.com
           download_translations: true
           push_translations: true
           create_pull_request: true
