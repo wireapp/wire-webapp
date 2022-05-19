@@ -42,8 +42,6 @@ jobs:
           INPUT_DEBUG_MODE: false
         with:
           upload_sources: true
-          github_user_name: otto-the-bot
-          github_user_email: webapp+otto@wire.com
           upload_translations: false
           download_translations: true
           push_translations: true
