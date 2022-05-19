@@ -66,6 +66,10 @@ module.exports = {
       content: 'src/Identity/colors.md',
       name: 'Colors',
     },
+    {
+      content: 'src/Identity/colors-v2.md',
+      name: 'Colors v2',
+    },
   ],
   serverPort: 8090,
   skipComponentsWithoutExample: true,

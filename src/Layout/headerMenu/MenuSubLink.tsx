@@ -40,7 +40,7 @@ export const menuSubLinkStyle: <T>(theme: Theme, props: MenuSubLinkProps<T>) => 
   textDecoration: 'none',
   transition: defaultTransition,
   [media[QueryKeys.DESKTOP]]: {
-    '&:first-child': {
+    '&:first-of-type': {
       marginLeft: 0,
     },
     '&:last-child': {
