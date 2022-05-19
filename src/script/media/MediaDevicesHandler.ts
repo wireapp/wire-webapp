@@ -32,6 +32,7 @@ declare global {
       getSources(options: ElectronGetSourcesOptions, callback: ElectronDesktopCapturerCallback): void;
       // Electron > 4
       getSources(options: ElectronGetSourcesOptions): Promise<ElectronDesktopCapturerSource[]>;
+      getDesktopSources(options: ElectronGetSourcesOptions): Promise<ElectronDesktopCapturerSource[]>;
     };
   }
 }
@@ -265,6 +266,14 @@ export class MediaDevicesHandler {
     };
 
     const getSourcesWrapper = (options: ElectronGetSourcesOptions): Promise<ElectronDesktopCapturerSource[]> => {
+      /**
+       * Electron.desktopCapturer.getSources() is not available from electron 17 anymore
+       * for further info please visit:
+       * https://www.electronjs.org/docs/latest/breaking-changes#removed-desktopcapturergetsources-in-the-renderer
+       */
+      if (window.desktopCapturer.getDesktopSources) {
+        return window.desktopCapturer.getDesktopSources(options);
+      }
       if (window.desktopCapturer.getSources.constructor.name === 'AsyncFunction') {
         // Electron > 4
         return window.desktopCapturer.getSources(options);
