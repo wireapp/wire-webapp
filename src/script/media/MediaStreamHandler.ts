@@ -173,7 +173,11 @@ export class MediaStreamHandler {
         if (
           audio === true &&
           video !== true &&
-          [MEDIA_STREAM_ERROR.NOT_READABLE_ERROR, MEDIA_STREAM_ERROR.NOT_ALLOWED_ERROR].includes(name)
+          [
+            MEDIA_STREAM_ERROR.NOT_READABLE_ERROR,
+            MEDIA_STREAM_ERROR.NOT_ALLOWED_ERROR,
+            MEDIA_STREAM_ERROR.NOT_FOUND_ERROR,
+          ].includes(name)
         ) {
           throw new NoAudioInputError(error);
         }
