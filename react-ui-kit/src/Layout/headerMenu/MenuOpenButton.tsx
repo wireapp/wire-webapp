@@ -38,14 +38,14 @@ export const menuOpenButtonStyle: <T>(theme: Theme, props: MenuOpenButtonProps<T
     transition: 'all 0.25s ease-in-out',
     width: '16px',
   },
-  'div:nth-child(1)': {
+  'div:nth-of-type(1)': {
     transform: open ? 'translateY(6px) rotate(-45deg)' : undefined,
   },
-  'div:nth-child(2)': {
+  'div:nth-of-type(2)': {
     opacity: open ? 0 : undefined,
     transform: open ? 'scale(0, 1)' : undefined,
   },
-  'div:nth-child(3)': {
+  'div:nth-of-type(3)': {
     transform: open ? 'translateY(-6px) rotate(45deg)' : undefined,
   },
   [media[QueryKeys.DESKTOP]]: {
