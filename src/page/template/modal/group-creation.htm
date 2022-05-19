@@ -57,10 +57,10 @@
         <div class="modal__info" data-bind="text: t('groupSizeInfo', maxSize), style: { visibility: nameError().length > 0 ? 'hidden' : 'visible' }" data-uie-name="status-group-size-info"></div>
         <hr class="group-creation__modal__separator" />
         <base-toggle class="modal-style"
-        params="isChecked: isGuestEnabled(), setIsChecked: clickOnToggleGuestMode, extendedInfo: true, extendedInfoText: t('guestRoomToggleInfoExtended'), infoText: t('guestRoomToggleInfo'), toggleName: t('guestOptionsTitle')"
+        params="isChecked: isGuestEnabled(), setIsChecked: clickOnToggleGuestMode, extendedInfo: true, extendedInfoText: t('guestRoomToggleInfoExtended'), infoText: t('guestRoomToggleInfo'), toggleName: t('guestOptionsTitle'), toggleId: 'guests'"
       ></base-toggle>
         <base-toggle class="modal-style"
-        params="isChecked: isServicesEnabled(), setIsChecked: clickOnToggleServicesMode, extendedInfo: true, extendedInfoText: t('servicesRoomToggleInfoExtended'), infoText: t('servicesRoomToggleInfo'), toggleName: t('servicesOptionsTitle')"
+        params="isChecked: isServicesEnabled(), setIsChecked: clickOnToggleServicesMode, extendedInfo: true, extendedInfoText: t('servicesRoomToggleInfoExtended'), infoText: t('servicesRoomToggleInfo'), toggleName: t('servicesOptionsTitle'), toggleId: 'services'"
       ></base-toggle>
         <info-toggle class="modal-style" params="
           dataUieName: 'read-receipts',
