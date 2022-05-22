@@ -172,7 +172,7 @@
     "wait-for-expect": "3.0.2",
     "webpack": "5.72.1",
     "webpack-cli": "4.9.2",
-    "webpack-dev-middleware": "5.3.1",
+    "webpack-dev-middleware": "5.3.3",
     "webpack-hot-middleware": "2.25.1",
     "workbox-webpack-plugin": "6.4.2"
   },
