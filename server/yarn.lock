@@ -3386,10 +3386,10 @@ netmask@^2.0.1:
   resolved "https://registry.yarnpkg.com/netmask/-/netmask-2.0.2.tgz#8b01a07644065d536383835823bc52004ebac5e7"
   integrity sha512-dBpDMdxv9Irdq66304OLfEmQ9tbNRFnFTuZiLo+bD+r332bBmMJ8GBLXklIXXgxd3+v9+KUnZaUR5PJMa75Gsg==
 
-nocache@3.0.3:
-  version "3.0.3"
-  resolved "https://registry.yarnpkg.com/nocache/-/nocache-3.0.3.tgz#07a3f4094746d5211c298d1938dcb5c1e1e352ca"
-  integrity sha512-bd+lPsDTjbfAuKez+xp8xvp15SrQuOjzajRGqRpCAE06FPB1pJzV/QkyBgFD5KOktv/M/A8M0vY7yatnOUaM5Q==
+nocache@3.0.4:
+  version "3.0.4"
+  resolved "https://registry.yarnpkg.com/nocache/-/nocache-3.0.4.tgz#5b37a56ec6e09fc7d401dceaed2eab40c8bfdf79"
+  integrity sha512-WDD0bdg9mbq6F4mRxEYcPWwfA1vxd0mrvKOyxI7Xj/atfRHVeutzuWByG//jfm4uPzp0y4Kj051EORCBSQMycw==
 
 node-int64@^0.4.0:
   version "0.4.0"
