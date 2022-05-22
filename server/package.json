@@ -17,7 +17,7 @@
     "http-status-codes": "2.2.0",
     "logdown": "3.3.1",
     "maxmind": "4.3.6",
-    "nocache": "3.0.3",
+    "nocache": "3.0.4",
     "opn": "6.0.0",
     "pm2": "5.2.0"
   },
