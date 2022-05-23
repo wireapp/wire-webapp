@@ -36,6 +36,7 @@ import {AppLockRepository} from '../user/AppLockRepository';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {ModalsViewModel} from '../view_model/ModalsViewModel';
 import {createRoot} from 'react-dom/client';
+import Icon from 'Components/Icon';
 
 export enum APPLOCK_STATE {
   FORGOT = 'applock.forgot',
@@ -272,6 +273,13 @@ const AppLock: React.FC<AppLockProps> = ({
   return (
     <ModalComponent isShown={isVisible} showLoading={isLoading} onClosed={onClosed} data-uie-name="applock-modal">
       <div className="modal__header">
+        {!isAppLockEnforced && (
+          <button type="button" className="modal__header__button" onClick={onCancelAppLock} data-uie-name="do-close">
+            <span aria-hidden="true">
+              <Icon.Close />
+            </span>
+          </button>
+        )}
         <h2 className="modal__header__title" data-uie-name="applock-modal-header">
           {headerText()}
         </h2>
