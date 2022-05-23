@@ -550,7 +550,7 @@
   "guestRoomConversationHead": "Personen außerhalb des Teams können an dieser Unterhaltung teilnehmen.",
   "guestRoomConversationName": "Gästebereich",
   "guestRoomToggleInfo": "Öffnen Sie diese Unterhaltung für Personen außerhalb Ihres Teams.",
-  "guestRoomToggleInfoDisabled": "You can't disable the guest option in this conversation, as it has been created by someone from another team. This toggle would remove you from the team",
+  "guestRoomToggleInfoDisabled": "You can't disable the guest option in this conversation, as it has been created by someone from another team.",
   "guestRoomToggleInfoExtended": "Öffnen Sie diese Unterhaltung für Personen außerhalb Ihres Teams. Diese Einstellung kann später jederzeit geändert werden.",
   "guestRoomToggleInfoHead": "Gäste-Links",
   "guestRoomToggleName": "Gäste zulassen",

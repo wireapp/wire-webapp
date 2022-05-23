@@ -550,7 +550,7 @@
   "guestRoomConversationHead": "Folk uden for dit team kan deltage i denne samtale.",
   "guestRoomConversationName": "Gæsterum",
   "guestRoomToggleInfo": "Open this conversation to people outside your team.",
-  "guestRoomToggleInfoDisabled": "You can't disable the guest option in this conversation, as it has been created by someone from another team. This toggle would remove you from the team",
+  "guestRoomToggleInfoDisabled": "You can't disable the guest option in this conversation, as it has been created by someone from another team.",
   "guestRoomToggleInfoExtended": "Open this conversation to people outside your team. You can always change it later.",
   "guestRoomToggleInfoHead": "Guest Links",
   "guestRoomToggleName": "Allow Guests",
