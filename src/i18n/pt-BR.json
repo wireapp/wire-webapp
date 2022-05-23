@@ -550,7 +550,7 @@
   "guestRoomConversationHead": "Pessoas de fora da sua equipe podem participar desta conversa.",
   "guestRoomConversationName": "Sala de convidados",
   "guestRoomToggleInfo": "Abra esta conversa para pessoas de fora da sua equipe.",
-  "guestRoomToggleInfoDisabled": "You can't disable the guest option in this conversation, as it has been created by someone from another team. This toggle would remove you from the team",
+  "guestRoomToggleInfoDisabled": "You can't disable the guest option in this conversation, as it has been created by someone from another team.",
   "guestRoomToggleInfoExtended": "Abra esta conversa para pessoas de fora da sua equipe. Você sempre pode alterar isso mais tarde.",
   "guestRoomToggleInfoHead": "Links de convidados",
   "guestRoomToggleName": "Permitir convidados",
