@@ -162,7 +162,7 @@ export class GuestsAndServicesViewModel extends BasePanelViewModel {
     });
   };
 
-  toggleAccessState = async (feature: number, message: string): Promise<void> => {
+  toggleAccessState = async (feature: number, message: string, hasConversationMembers: boolean): Promise<void> => {
     const conversationEntity = this.activeConversation();
 
     if (conversationEntity.inTeam()) {
@@ -176,7 +176,7 @@ export class GuestsAndServicesViewModel extends BasePanelViewModel {
         }
       };
 
-      if (this.isTeamOnly() || !conversationEntity.hasGuest()) {
+      if (this.isTeamOnly() || !hasConversationMembers) {
         return changeAccessState();
       }
 
@@ -198,10 +198,15 @@ export class GuestsAndServicesViewModel extends BasePanelViewModel {
     this.toggleAccessState(
       teamPermissionsForAccessState(ACCESS_STATE.TEAM.GUEST_FEATURES),
       t('modalConversationRemoveGuestsMessage'),
+      this.activeConversation().hasGuest(),
     );
 
   toggleServicesAccessState = () =>
-    this.toggleAccessState(ACCESS_TYPES.SERVICE, t('modalConversationRemoveServicesMessage'));
+    this.toggleAccessState(
+      ACCESS_TYPES.SERVICE,
+      t('modalConversationRemoveServicesMessage'),
+      this.activeConversation().hasService(),
+    );
 
   async _updateCode(isVisible: boolean, conversationEntity: Conversation): Promise<void> {
     const updateCode =
