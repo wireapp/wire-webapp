@@ -38,7 +38,7 @@ export const textAreaStyle: <T>(theme: Theme, props: TextAreaProps<T>) => CSSObj
 ) => {
   const placeholderStyle = {
     color: theme.Input.placeholderColor,
-    fontSize: '11px',
+    fontSize: '16px',
     textTransform: placeholderTextTransform,
   };
 

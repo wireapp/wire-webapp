@@ -3,7 +3,7 @@
 import {jsx} from '@emotion/react';
 import {COLOR, Container, H1, H2, H3, Line} from '@wireapp/react-ui-kit';
 import Color from 'color';
-import {COLOR as Colors, BASE_LIGHT_COLOR, BASE_DARK_COLOR} from './colors-v2';
+import {COLOR_V2 as Colors, BASE_LIGHT_COLOR, BASE_DARK_COLOR} from './colors-v2';
 
 const colorElementStyle = props => ({
   '&::after': {

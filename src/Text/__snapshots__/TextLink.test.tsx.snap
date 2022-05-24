@@ -8,7 +8,7 @@ exports[`"TextLink" renders (dark theme) 1`] = `
 }
 
 .emotion-1 {
-  color: #0772de;
+  color: #0667c8;
   display: inline;
   font-size: 16px;
   font-weight: 300;
@@ -22,13 +22,13 @@ exports[`"TextLink" renders (dark theme) 1`] = `
 }
 
 .emotion-1:hover {
-  color: rgb(6, 96, 187);
+  color: rgb(5, 87, 168);
 }
 
 .emotion-1:visited,
 .emotion-1:link,
 .emotion-1:active {
-  color: #0772de;
+  color: #0667c8;
 }
 
 <div
@@ -51,7 +51,7 @@ exports[`"TextLink" renders 1`] = `
 }
 
 .emotion-1 {
-  color: #0772de;
+  color: #0667c8;
   display: inline;
   font-size: 16px;
   font-weight: 300;
@@ -65,13 +65,13 @@ exports[`"TextLink" renders 1`] = `
 }
 
 .emotion-1:hover {
-  color: rgb(6, 96, 187);
+  color: rgb(5, 87, 168);
 }
 
 .emotion-1:visited,
 .emotion-1:link,
 .emotion-1:active {
-  color: #0772de;
+  color: #0667c8;
 }
 
 <div

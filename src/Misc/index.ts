@@ -17,7 +17,9 @@
  *
  */
 
+export * from './ButtonGroup';
 export * from './childrenWithDefaultProps';
+export * from './IconButton';
 export * from './IsInViewport';
 export * from './Loading';
 export * from './Pagination';

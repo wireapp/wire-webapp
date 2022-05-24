@@ -223,7 +223,7 @@ const GRAYS: Record<string, string> = {
   GRAY_100: '#17181a',
 };
 
-export const COLOR: any = {
+export const COLOR_V2: any = {
   ...BASE_DARK_COLOR,
   ...BASE_LIGHT_COLOR,
   ...DARK,

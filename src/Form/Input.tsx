@@ -22,7 +22,7 @@ import {CSSObject, jsx} from '@emotion/react';
 import type {Property} from 'csstype';
 import React from 'react';
 
-import {COLOR} from '../Identity';
+import {COLOR_V2} from '../Identity';
 import type {Theme} from '../Layout';
 import type {TextProps} from '../Text';
 import {filterProps} from '../util';
@@ -38,7 +38,7 @@ export const inputStyle: <T>(theme: Theme, props: InputProps<T>) => CSSObject = 
 ) => {
   const placeholderStyle = {
     color: theme.Input.placeholderColor,
-    fontSize: '11px',
+    fontSize: '16px',
     textTransform: placeholderTextTransform,
   };
 
@@ -54,21 +54,21 @@ export const inputStyle: <T>(theme: Theme, props: InputProps<T>) => CSSObject = 
       ...placeholderStyle,
     },
     '&:focus': {
-      boxShadow: `0 0 0 1px ${COLOR.BLUE}`,
+      boxShadow: `0 0 0 1px ${COLOR_V2.BLUE}`,
     },
     '&:invalid:not(:focus)': !markInvalid
       ? {
-          boxShadow: `0 0 0 1px ${COLOR.GRAY}`,
+          boxShadow: `0 0 0 1px ${COLOR_V2.GRAY}`,
         }
       : {},
     background: disabled ? theme.Input.backgroundColorDisabled : theme.Input.backgroundColor,
     border: 'none',
     borderRadius: '4px',
-    boxShadow: markInvalid ? `0 0 0 1px ${COLOR.RED}` : `0 0 0 1px ${COLOR.GRAY}`,
-    caretColor: COLOR.BLUE,
+    boxShadow: markInvalid ? `0 0 0 1px ${COLOR_V2.RED}` : `0 0 0 1px ${COLOR_V2.GRAY}`,
+    caretColor: COLOR_V2.BLUE,
     color: theme.general.color,
     fontWeight: 300,
-    height: '56px',
+    height: '48px',
     lineHeight: '24px',
     margin: '0 0 16px',
     outline: 'none',

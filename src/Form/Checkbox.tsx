@@ -19,9 +19,9 @@
 
 /** @jsx jsx */
 import {jsx} from '@emotion/react';
-import React from 'react';
+import React, {useId} from 'react';
 
-import {COLOR} from '../Identity';
+import {COLOR, COLOR_V2} from '../Identity';
 import {Theme} from '../Layout';
 import {Text, TextProps, textStyle, textLinkStyle} from '../Text';
 import {filterProps} from '../util';
@@ -34,35 +34,53 @@ export interface StyledLabelProps<T = HTMLLabelElement> extends React.HTMLProps<
 
 const filterStyledLabelProps = (props: StyledLabelProps) => filterProps(props, ['markInvalid']);
 
+const checkSvg =
+  '<svg width="15" height="13" viewBox="0 0 16 13" xmlns="http://www.w3.org/2000/svg"><path d="M5.65685 12.0711L15.9842 1.62738L14.57 0.213167L5.65685 9.24264L1.41421 5L0 6.41421L5.65685 12.0711Z" fill="white"/></svg>';
+
 const StyledLabel = (props: StyledLabelProps) => {
-  const checkSvg =
-    '<svg xmlns="http://www.w3.org/2000/svg" width="12" height="10" viewBox="0 0 8 6"><path fill="white" d="M2.8 6L8 .7 7.3 0 2.8 4.6.7 2.4l-.7.7z"/></svg>';
+  const {disabled, markInvalid} = props;
+
   return (
     <label
       css={(theme: Theme) => ({
         [`.${INPUT_CLASSNAME}:checked + &::before`]: {
-          background: `${COLOR.BLUE} url('data:image/svg+xml; utf8, ${checkSvg}') no-repeat center`,
+          background: `${
+            disabled ? COLOR_V2.GRAY_60 : COLOR_V2.BLUE
+          } url('data:image/svg+xml; utf8, ${checkSvg}') no-repeat center`,
+          borderColor: COLOR_V2.BLUE,
         },
-        [`.${INPUT_CLASSNAME}:focus + &::before`]: {
-          borderColor: COLOR.BLUE,
-        },
+        ...(!disabled && {
+          [`.${INPUT_CLASSNAME}:focus + &::before`]: {
+            borderColor: COLOR_V2.BLUE,
+          },
+          [`.${INPUT_CLASSNAME}:hover + &::before`]: {
+            borderColor: COLOR_V2.BLUE,
+          },
+        }),
         '&::before': {
-          background: COLOR.WHITE,
-          border: props.markInvalid ? `1px solid ${COLOR.RED}` : `1px solid ${COLOR.GRAY}`,
-          borderRadius: '1px',
+          background: disabled ? COLOR_V2.GRAY_10 : COLOR_V2.GRAY_20,
+          ...(!disabled
+            ? {
+                border: markInvalid ? `1.5px solid ${COLOR_V2.RED}` : `1.5px solid ${COLOR_V2.GRAY_80}`,
+              }
+            : {
+                border: `1.5px solid ${COLOR_V2.GRAY_60}`,
+              }),
+          borderRadius: '3px',
           boxSizing: 'border-box',
           content: '""',
           display: 'inline-block',
-          height: '16px',
-          margin: '4px 8px 0 -16px',
-          opacity: props.disabled ? 0.56 : 1,
-          width: '16px',
+          height: '22px',
+          lineHeight: '22px',
+          margin: '0 8px 0 -16px',
+          width: '22px',
         },
         a: {
           ...textLinkStyle(theme, {}),
         },
+        lineHeight: '22px',
         display: 'flex',
-        opacity: props.disabled ? 0.56 : 1,
+        opacity: disabled ? 0.56 : 1,
       })}
       {...filterStyledLabelProps(props)}
     />
@@ -78,7 +96,7 @@ const filterCheckboxProps = (props: CheckboxProps) => filterProps(props, ['markI
 export const Checkbox: React.FC<CheckboxProps<HTMLInputElement>> = React.forwardRef<
   HTMLInputElement,
   CheckboxProps<HTMLInputElement>
->(({id = Math.random().toString(), children, style, disabled, ...props}, ref) => (
+>(({id = useId(), children, style, disabled, ...props}, ref) => (
   <div
     css={{
       alignItems: 'center',
@@ -91,10 +109,10 @@ export const Checkbox: React.FC<CheckboxProps<HTMLInputElement>> = React.forward
       type={'checkbox'}
       id={id}
       style={{
-        height: '16px',
+        height: '22px',
         marginBottom: '0',
         opacity: 0,
-        width: '16px',
+        width: '22px',
       }}
       disabled={disabled}
       ref={ref}

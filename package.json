@@ -19,7 +19,7 @@
     "@emotion/jest": "11.9.1",
     "@hot-loader/react-dom": "17.0.1",
     "@types/jest": "26.0.24",
-    "@types/react": "18.0.5",
+    "@types/react": "18.0.9",
     "@types/webpack-env": "1.16.2",
     "babel-jest": "27.0.6",
     "babel-loader": "8.2.2",
@@ -35,7 +35,7 @@
   },
   "homepage": "https://wire-react-ui-kit.netlify.app/",
   "peerDependencies": {
-    "@types/react": "^17.0.0",
+    "@types/react": "^18.0.9",
     "react": "^18.1.0",
     "react-dom": "^18.1.0"
   },

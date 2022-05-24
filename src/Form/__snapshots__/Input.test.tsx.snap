@@ -11,11 +11,11 @@ exports[`"Input" renders 1`] = `
   background: #fff;
   border: none;
   border-radius: 4px;
-  box-shadow: 0 0 0 1px #696c6e;
-  caret-color: #0772de;
+  box-shadow: 0 0 0 1px undefined;
+  caret-color: #0667c8;
   color: rgb(29, 30, 31);
   font-weight: 300;
-  height: 56px;
+  height: 48px;
   line-height: 24px;
   margin: 0 0 16px;
   outline: none;
@@ -25,29 +25,29 @@ exports[`"Input" renders 1`] = `
 
 .emotion-1::-moz-placeholder {
   color: rgb(80, 82, 84);
-  font-size: 11px;
+  font-size: 16px;
   text-transform: none;
   opacity: 1;
 }
 
 .emotion-1::-ms-input-placeholder {
   color: rgb(80, 82, 84);
-  font-size: 11px;
+  font-size: 16px;
   text-transform: none;
 }
 
 .emotion-1::-webkit-input-placeholder {
   color: rgb(80, 82, 84);
-  font-size: 11px;
+  font-size: 16px;
   text-transform: none;
 }
 
 .emotion-1:focus {
-  box-shadow: 0 0 0 1px #0772de;
+  box-shadow: 0 0 0 1px #0667c8;
 }
 
 .emotion-1:invalid:not(:focus) {
-  box-shadow: 0 0 0 1px #696c6e;
+  box-shadow: 0 0 0 1px undefined;
 }
 
 <div
@@ -70,11 +70,11 @@ exports[`"Input" renders as disabled 1`] = `
   background: rgba(71, 73, 75, 0.16000000000000003);
   border: none;
   border-radius: 4px;
-  box-shadow: 0 0 0 1px #696c6e;
-  caret-color: #0772de;
+  box-shadow: 0 0 0 1px undefined;
+  caret-color: #0667c8;
   color: rgb(29, 30, 31);
   font-weight: 300;
-  height: 56px;
+  height: 48px;
   line-height: 24px;
   margin: 0 0 16px;
   outline: none;
@@ -84,29 +84,29 @@ exports[`"Input" renders as disabled 1`] = `
 
 .emotion-1::-moz-placeholder {
   color: rgb(80, 82, 84);
-  font-size: 11px;
+  font-size: 16px;
   text-transform: none;
   opacity: 1;
 }
 
 .emotion-1::-ms-input-placeholder {
   color: rgb(80, 82, 84);
-  font-size: 11px;
+  font-size: 16px;
   text-transform: none;
 }
 
 .emotion-1::-webkit-input-placeholder {
   color: rgb(80, 82, 84);
-  font-size: 11px;
+  font-size: 16px;
   text-transform: none;
 }
 
 .emotion-1:focus {
-  box-shadow: 0 0 0 1px #0772de;
+  box-shadow: 0 0 0 1px #0667c8;
 }
 
 .emotion-1:invalid:not(:focus) {
-  box-shadow: 0 0 0 1px #696c6e;
+  box-shadow: 0 0 0 1px undefined;
 }
 
 <div
@@ -130,11 +130,11 @@ exports[`"Input" renders as invalid 1`] = `
   background: #fff;
   border: none;
   border-radius: 4px;
-  box-shadow: 0 0 0 1px #e02020;
-  caret-color: #0772de;
+  box-shadow: 0 0 0 1px #c20013;
+  caret-color: #0667c8;
   color: rgb(29, 30, 31);
   font-weight: 300;
-  height: 56px;
+  height: 48px;
   line-height: 24px;
   margin: 0 0 16px;
   outline: none;
@@ -144,25 +144,25 @@ exports[`"Input" renders as invalid 1`] = `
 
 .emotion-1::-moz-placeholder {
   color: rgb(80, 82, 84);
-  font-size: 11px;
+  font-size: 16px;
   text-transform: none;
   opacity: 1;
 }
 
 .emotion-1::-ms-input-placeholder {
   color: rgb(80, 82, 84);
-  font-size: 11px;
+  font-size: 16px;
   text-transform: none;
 }
 
 .emotion-1::-webkit-input-placeholder {
   color: rgb(80, 82, 84);
-  font-size: 11px;
+  font-size: 16px;
   text-transform: none;
 }
 
 .emotion-1:focus {
-  box-shadow: 0 0 0 1px #0772de;
+  box-shadow: 0 0 0 1px #0667c8;
 }
 
 <div
@@ -185,11 +185,11 @@ exports[`"Input" renders with placeholderTextTransform 1`] = `
   background: #fff;
   border: none;
   border-radius: 4px;
-  box-shadow: 0 0 0 1px #696c6e;
-  caret-color: #0772de;
+  box-shadow: 0 0 0 1px undefined;
+  caret-color: #0667c8;
   color: rgb(29, 30, 31);
   font-weight: 300;
-  height: 56px;
+  height: 48px;
   line-height: 24px;
   margin: 0 0 16px;
   outline: none;
@@ -199,29 +199,29 @@ exports[`"Input" renders with placeholderTextTransform 1`] = `
 
 .emotion-1::-moz-placeholder {
   color: rgb(80, 82, 84);
-  font-size: 11px;
+  font-size: 16px;
   text-transform: uppercase;
   opacity: 1;
 }
 
 .emotion-1::-ms-input-placeholder {
   color: rgb(80, 82, 84);
-  font-size: 11px;
+  font-size: 16px;
   text-transform: uppercase;
 }
 
 .emotion-1::-webkit-input-placeholder {
   color: rgb(80, 82, 84);
-  font-size: 11px;
+  font-size: 16px;
   text-transform: uppercase;
 }
 
 .emotion-1:focus {
-  box-shadow: 0 0 0 1px #0772de;
+  box-shadow: 0 0 0 1px #0667c8;
 }
 
 .emotion-1:invalid:not(:focus) {
-  box-shadow: 0 0 0 1px #696c6e;
+  box-shadow: 0 0 0 1px undefined;
 }
 
 <div
