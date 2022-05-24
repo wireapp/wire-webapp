@@ -550,7 +550,7 @@
   "guestRoomConversationHead": "Участники не из вашей команды смогут присоединиться к этой беседе.",
   "guestRoomConversationName": "Гостевая комната",
   "guestRoomToggleInfo": "Открыть эту беседу для людей не из вашей команды.",
-  "guestRoomToggleInfoDisabled": "You can't disable the guest option in this conversation, as it has been created by someone from another team.",
+  "guestRoomToggleInfoDisabled": "Вы не можете отключить опцию гостя в этой беседе, поскольку она была создана кем-то из другой команды.",
   "guestRoomToggleInfoExtended": "Открыть эту беседу для людей не из вашей команды. Вы всегда сможете изменить это позже.",
   "guestRoomToggleInfoHead": "Гостевые ссылки",
   "guestRoomToggleName": "Разрешить гостей",
