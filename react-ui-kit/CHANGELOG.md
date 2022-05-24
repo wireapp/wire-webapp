@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [8.2.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/react-ui-kit/compare/@wireapp/react-ui-kit@8.1.0...@wireapp/react-ui-kit@8.2.0) (2022-05-24)
+
+
+### Features
+
+* prepare new components ui (ACC-82) ([#4269](https://github.com/wireapp/wire-web-packages/tree/main/packages/react-ui-kit/issues/4269)) ([8b0cbce](https://github.com/wireapp/wire-web-packages/tree/main/packages/react-ui-kit/commit/8b0cbcebec48b14d6df6efece68e98c03731f8db))
+
+
+
+
+
 # [8.1.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/react-ui-kit/compare/@wireapp/react-ui-kit@8.0.1...@wireapp/react-ui-kit@8.1.0) (2022-05-19)
 
 
