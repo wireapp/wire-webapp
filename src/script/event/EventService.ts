@@ -371,14 +371,14 @@ export class EventService {
   async updateEventAsUploadFailed(
     primaryKey: string,
     reason: ProtobufAsset.NotUploaded | AssetTransferState,
-  ): Promise<EventRecord | void> {
+  ): Promise<EventRecord | undefined> {
     const record = await this.storageService.load<EventRecord<AssetData>>(
       StorageSchemata.OBJECT_STORE.EVENTS,
       primaryKey,
     );
     if (!record) {
       this.logger.warn('Did not find message to update asset (failed)', primaryKey);
-      return;
+      return undefined;
     }
     record.data.reason = reason;
     record.data.status = AssetTransferState.UPLOAD_FAILED;

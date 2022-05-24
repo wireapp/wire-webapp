@@ -1860,7 +1860,10 @@ export class ConversationRepository {
     return this.pushToReceivingQueue(eventJson, eventSource);
   };
 
-  private handleConversationEvent(eventJson: IncomingEvent, eventSource = EventRepository.SOURCE.STREAM) {
+  private handleConversationEvent(
+    eventJson: IncomingEvent,
+    eventSource: EventSource = EventSource.NOTIFICATION_STREAM,
+  ) {
     if (!eventJson) {
       return Promise.reject(new Error('Conversation Repository Event Handling: Event missing'));
     }
@@ -1900,7 +1903,7 @@ export class ConversationRepository {
           // Check if conversation was archived
           previouslyArchived = conversationEntity.is_archived();
 
-          const isBackendTimestamp = eventSource !== EventRepository.SOURCE.INJECTED;
+          const isBackendTimestamp = eventSource !== EventSource.INJECTED;
           conversationEntity.updateTimestampServer(eventJson.server_time || eventJson.time, isBackendTimestamp);
         }
 

@@ -23,7 +23,7 @@ import {EventSource} from './EventSource';
 import {EventValidation} from './EventValidation';
 
 export function validateEvent(
-  event: {timestamp: number; type: CONVERSATION_EVENT | USER_EVENT},
+  event: {time: string; type: CONVERSATION_EVENT | USER_EVENT},
   source: EventSource,
   lastEventDate?: string,
 ): EventValidation {
@@ -34,8 +34,8 @@ export function validateEvent(
     return EventValidation.IGNORED_TYPE;
   }
 
-  const eventTime = event.timestamp;
-  const isFromNotificationStream = source === EventSource.STREAM;
+  const eventTime = event.time;
+  const isFromNotificationStream = source === EventSource.NOTIFICATION_STREAM;
   const shouldCheckEventDate = !!eventTime && isFromNotificationStream && lastEventDate;
 
   if (shouldCheckEventDate) {
