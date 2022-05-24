@@ -141,6 +141,10 @@ export const WebAppEvents = {
     ASK_TO_CLEAR_DATA: 'wire.webapp.lifecycle.ask_to_clear_data',
     CHANGE_ENVIRONMENT: 'wire.webapp.lifecycle.change_environment',
     LOADED: 'wire.webapp.lifecycle.loaded',
+    /**
+     * This event is sent to desktop wrapper when the app is ready to receive window events such as deeplinks
+     */
+    READY_FOR_EVENTS: 'wire.webapp.lifecycle.ready_for_events',
     REFRESH: 'wire.webapp.lifecycle.refresh',
     RESTART: 'wire.webapp.lifecycle.restart',
     SIGN_OUT: 'wire.webapp.lifecycle.sign_out',
