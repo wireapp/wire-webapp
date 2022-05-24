@@ -162,7 +162,7 @@ export class GuestsAndServicesViewModel extends BasePanelViewModel {
     });
   };
 
-  toggleAccessState = async (feature: number, message: string, hasConversationMembers: boolean): Promise<void> => {
+  toggleAccessState = async (feature: number, message: string, willAffectMembers: boolean): Promise<void> => {
     const conversationEntity = this.activeConversation();
 
     if (conversationEntity.inTeam()) {
@@ -176,7 +176,7 @@ export class GuestsAndServicesViewModel extends BasePanelViewModel {
         }
       };
 
-      if (this.isTeamOnly() || !hasConversationMembers) {
+      if (this.isTeamOnly() || !willAffectMembers) {
         return changeAccessState();
       }
 
