@@ -52,7 +52,7 @@ exports[`"ErrorMessage" renders 1`] = `
 .emotion-1 a {
   color: rgb(29, 30, 31);
   display: inline;
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 300;
   text-align: left;
   text-transform: none;
@@ -81,7 +81,7 @@ exports[`"ErrorMessage" renders 1`] = `
 .emotion-3 {
   color: #e02020;
   display: inline;
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 300;
   text-align: left;
   text-transform: none;

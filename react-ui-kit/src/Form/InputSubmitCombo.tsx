@@ -21,7 +21,7 @@
 import {jsx} from '@emotion/react';
 
 import {INPUT_CLASSNAME, InputProps, inputStyle} from './Input';
-import {COLOR} from '../Identity';
+import {COLOR_V2} from '../Identity';
 import {Theme} from '../Layout';
 
 export type InputSubmitComboProps<T = HTMLDivElement> = InputProps<T>;
@@ -34,7 +34,7 @@ export const InputSubmitCombo = ({children, ...props}: InputSubmitComboProps) =>
     css={(theme: Theme) => ({
       ...inputStyle(theme, props),
       '&:focus-within': {
-        boxShadow: `0 0 0 1px ${COLOR.BLUE}`,
+        boxShadow: `0 0 0 1px ${COLOR_V2.BLUE}`,
       },
       [`.${INPUT_CLASSNAME}`]: {
         '&:focus, &:invalid:not(:focus)': {
@@ -47,7 +47,7 @@ export const InputSubmitCombo = ({children, ...props}: InputSubmitComboProps) =>
       },
       alignItems: 'center',
       display: 'flex',
-      height: '57px', // needs a bit more space to not overlap with the `boxShadow` from `:focus`
+      height: '49px', // needs a bit more space to not overlap with the `boxShadow` from `:focus`
       justifyContent: 'space-between',
       marginBottom: '4px',
       paddingLeft: 0,

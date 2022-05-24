@@ -20,7 +20,7 @@
 /** @jsx jsx */
 import {CSSObject, jsx} from '@emotion/react';
 
-import {COLOR} from '../Identity/colors';
+import {COLOR_V2} from '../Identity/colors-v2';
 import type {Theme} from '../Layout';
 import {LinkProps, filterLinkProps, linkStyle} from './Link';
 
@@ -28,7 +28,7 @@ export type TextLinkProps<T = HTMLAnchorElement> = LinkProps<T>;
 
 export const textLinkStyle: <T>(theme: Theme, props: TextLinkProps<T>) => CSSObject = (
   theme,
-  {color = COLOR.BLUE, fontSize = '16px', bold = false, textTransform = 'none', ...props},
+  {color = COLOR_V2.BLUE, fontSize = '16px', bold = false, textTransform = 'none', ...props},
 ) => ({
   ...linkStyle(theme, {bold, color, fontSize, textTransform, ...props}),
 });

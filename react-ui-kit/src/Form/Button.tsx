@@ -20,14 +20,22 @@
 /** @jsx jsx */
 import {CSSObject, jsx} from '@emotion/react';
 
-import {COLOR} from '../Identity';
+import {COLOR, COLOR_V2} from '../Identity';
 import {defaultTransition} from '../Identity/motions';
 import type {Theme} from '../Layout';
 import {Loading} from '../Misc';
 import {TextProps, filterTextProps, textStyle} from '../Text';
 import {filterProps} from '../util';
 
+enum ButtonVariant {
+  PRIMARY = 'primary',
+  SECONDARY = 'secondary',
+  TERTIARY = 'tertiary',
+  SEND = 'send',
+}
+
 export interface ButtonProps<T = HTMLButtonElement> extends TextProps<T> {
+  variant?: ButtonVariant;
   backgroundColor?: string;
   loadingColor?: string;
   noCapital?: boolean;
@@ -37,7 +45,8 @@ export interface ButtonProps<T = HTMLButtonElement> extends TextProps<T> {
 export const buttonStyle: <T>(theme: Theme, props: ButtonProps<T>) => CSSObject = (
   theme,
   {
-    backgroundColor = COLOR.BLUE,
+    variant = ButtonVariant.PRIMARY,
+    backgroundColor,
     block = false,
     disabled = false,
     noCapital = false,
@@ -55,7 +64,6 @@ export const buttonStyle: <T>(theme: Theme, props: ButtonProps<T>) => CSSObject 
     block,
     bold,
     center,
-    color,
     disabled,
     fontSize,
     noWrap,
@@ -63,27 +71,91 @@ export const buttonStyle: <T>(theme: Theme, props: ButtonProps<T>) => CSSObject 
     truncate,
     ...props,
   }),
-  '&:hover, &:focus': {
-    backgroundColor: disabled ? backgroundColor : COLOR.shade(backgroundColor, 0.06),
-    textDecoration: 'none',
-  },
-  backgroundColor: backgroundColor,
   border: 0,
-  borderRadius: '8px',
   cursor: disabled ? 'default' : 'pointer',
-  display: 'inline-block',
-  height: '48px',
-  lineHeight: '48px',
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
   marginBottom: '16px',
-  maxWidth: '100%',
-  minWidth: '150px',
-  opacity: disabled ? 0.56 : 1,
+  padding: 0,
   outline: 'none',
-  padding: '0 32px',
   textDecoration: 'none',
   touchAction: 'manipulation',
   transition: defaultTransition,
   width: block ? '100%' : 'auto',
+  '&:hover, &:focus': {
+    textDecoration: 'none',
+  },
+  ...(variant !== ButtonVariant.TERTIARY && {
+    borderRadius: variant === ButtonVariant.SEND ? '100%' : '16px',
+    height: variant === ButtonVariant.SEND ? '40px' : '48px',
+    lineHeight: variant === ButtonVariant.SEND ? '40px' : '48px',
+    ...(variant !== ButtonVariant.SEND && {
+      maxWidth: '100%',
+      minWidth: '125px',
+      padding: '0 16px',
+    }),
+  }),
+  ...(variant === ButtonVariant.PRIMARY && {
+    backgroundColor: backgroundColor || disabled ? COLOR_V2.GRAY_50 : COLOR_V2.BLUE,
+    color: disabled ? COLOR_V2.GRAY_80 : COLOR_V2.WHITE,
+    ...(!disabled && {
+      '&:hover, &:focus': {
+        backgroundColor: COLOR_V2.BLUE_LIGHT_600,
+      },
+      '&:focus': {
+        border: `1px solid ${COLOR_V2.BLUE_LIGHT_700}`,
+      },
+      '&:active': {
+        backgroundColor: COLOR_V2.BLUE_LIGHT_700,
+      },
+    }),
+  }),
+  ...(variant === ButtonVariant.SECONDARY && {
+    backgroundColor: backgroundColor || disabled ? COLOR_V2.GRAY_20 : COLOR_V2.WHITE,
+    border: `1px solid ${COLOR_V2.GRAY_40}`,
+    color: disabled ? COLOR_V2.GRAY_60 : COLOR_V2.BLACK,
+    ...(!disabled && {
+      '&:hover, &:focus': {
+        border: `1px solid ${COLOR_V2.BLUE}`,
+      },
+      '&:focus': {
+        color: COLOR_V2.BLUE,
+      },
+      '&:active': {
+        backgroundColor: COLOR_V2.BLUE_LIGHT_50,
+        border: `1px solid ${COLOR_V2.BLUE}`,
+        color: COLOR_V2.BLUE,
+      },
+    }),
+  }),
+  ...(variant === ButtonVariant.TERTIARY && {
+    color: disabled ? COLOR_V2.GRAY_60 : COLOR_V2.BLACK,
+    lineHeight: '24px',
+    ...(!disabled && {
+      '&:hover, &:focus': {
+        color: COLOR_V2.BLUE,
+      },
+      '&:focus': {
+        border: `1px solid ${COLOR_V2.BLUE_LIGHT_300}`,
+      },
+    }),
+  }),
+  ...(variant === ButtonVariant.SEND && {
+    backgroundColor: backgroundColor || disabled ? COLOR_V2.GRAY_70 : COLOR_V2.BLUE,
+    width: '40px',
+    ...(!disabled && {
+      '&:hover, &:focus': {
+        backgroundColor: COLOR_V2.BLUE_LIGHT_600,
+      },
+      '&:focus': {
+        border: `1px solid ${COLOR_V2.BLUE_LIGHT_800}`,
+      },
+      '&:active': {
+        backgroundColor: COLOR_V2.BLUE_LIGHT_700,
+      },
+    }),
+  }),
 });
 
 export const Button = ({showLoading, children, loadingColor = COLOR.WHITE, ...props}: ButtonProps) => (

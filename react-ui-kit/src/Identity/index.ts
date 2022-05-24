@@ -21,4 +21,5 @@ export * from './Animation';
 export * from './Avatar';
 export * from './AvatarGrid';
 export * from './colors';
+export * from './colors-v2';
 export * from './Logo';
