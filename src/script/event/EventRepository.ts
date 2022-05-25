@@ -49,6 +49,7 @@ import {UserState} from '../user/UserState';
 import {AssetData, CryptographyMapper} from '../cryptography/CryptographyMapper';
 import Warnings from '../view_model/WarningsContainer';
 import {Account} from '@wireapp/core';
+import {WEBSOCKET_STATE} from '@wireapp/api-client/src/tcp/ReconnectingWebsocket';
 
 export class EventRepository {
   logger: Logger;
@@ -151,6 +152,27 @@ export class EventRepository {
     account.listen({
       onConnected: () => {
         this.notificationHandlingState(NOTIFICATION_HANDLING_STATE.WEB_SOCKET);
+      },
+      onConnectionStateChanged: state => {
+        switch (state) {
+          case WEBSOCKET_STATE.CONNECTING: {
+            amplify.publish(WebAppEvents.WARNING.DISMISS, Warnings.TYPE.NO_INTERNET);
+            amplify.publish(WebAppEvents.WARNING.SHOW, Warnings.TYPE.CONNECTIVITY_RECONNECT);
+            return;
+          }
+          case WEBSOCKET_STATE.CLOSING: {
+            return;
+          }
+          case WEBSOCKET_STATE.CLOSED: {
+            amplify.publish(WebAppEvents.WARNING.SHOW, Warnings.TYPE.NO_INTERNET);
+            return;
+          }
+          case WEBSOCKET_STATE.OPEN: {
+            amplify.publish(WebAppEvents.CONNECTION.ONLINE);
+            amplify.publish(WebAppEvents.WARNING.DISMISS, Warnings.TYPE.NO_INTERNET);
+            amplify.publish(WebAppEvents.WARNING.DISMISS, Warnings.TYPE.CONNECTIVITY_RECONNECT);
+          }
+        }
       },
       onEvent: (payload, source) => {
         this.handleEvent({...payload, event: payload.event as EventRecord}, source);
