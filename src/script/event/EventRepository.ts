@@ -146,37 +146,51 @@ export class EventRepository {
   // WebSocket handling
   //##############################################################################
 
-  async connectWebSocket(account: Account) {
+  /**
+   * connects to the websocket with the given account
+   *
+   * @param account the account to connect to
+   * @param onNotificationStreamProgress callback when a notification for the notification stream has been processed
+   * @returns Resolves when the notification stream has fully been processed
+   */
+  async connectWebSocket(
+    account: Account,
+    onNotificationStreamProgress: (progress: {done: number; total: number}) => void,
+  ): Promise<void> {
     await this.handleTimeDrift();
     this.notificationHandlingState(NOTIFICATION_HANDLING_STATE.STREAM);
-    account.listen({
-      onConnected: () => {
-        this.notificationHandlingState(NOTIFICATION_HANDLING_STATE.WEB_SOCKET);
-      },
-      onConnectionStateChanged: state => {
-        switch (state) {
-          case WEBSOCKET_STATE.CONNECTING: {
-            amplify.publish(WebAppEvents.WARNING.DISMISS, Warnings.TYPE.NO_INTERNET);
-            amplify.publish(WebAppEvents.WARNING.SHOW, Warnings.TYPE.CONNECTIVITY_RECONNECT);
-            return;
+    return new Promise(resolve => {
+      account.listen({
+        onConnected: () => {
+          this.notificationHandlingState(NOTIFICATION_HANDLING_STATE.WEB_SOCKET);
+          resolve();
+        },
+        onConnectionStateChanged: state => {
+          switch (state) {
+            case WEBSOCKET_STATE.CONNECTING: {
+              amplify.publish(WebAppEvents.WARNING.DISMISS, Warnings.TYPE.NO_INTERNET);
+              amplify.publish(WebAppEvents.WARNING.SHOW, Warnings.TYPE.CONNECTIVITY_RECONNECT);
+              return;
+            }
+            case WEBSOCKET_STATE.CLOSING: {
+              return;
+            }
+            case WEBSOCKET_STATE.CLOSED: {
+              amplify.publish(WebAppEvents.WARNING.SHOW, Warnings.TYPE.NO_INTERNET);
+              return;
+            }
+            case WEBSOCKET_STATE.OPEN: {
+              amplify.publish(WebAppEvents.CONNECTION.ONLINE);
+              amplify.publish(WebAppEvents.WARNING.DISMISS, Warnings.TYPE.NO_INTERNET);
+              amplify.publish(WebAppEvents.WARNING.DISMISS, Warnings.TYPE.CONNECTIVITY_RECONNECT);
+            }
           }
-          case WEBSOCKET_STATE.CLOSING: {
-            return;
-          }
-          case WEBSOCKET_STATE.CLOSED: {
-            amplify.publish(WebAppEvents.WARNING.SHOW, Warnings.TYPE.NO_INTERNET);
-            return;
-          }
-          case WEBSOCKET_STATE.OPEN: {
-            amplify.publish(WebAppEvents.CONNECTION.ONLINE);
-            amplify.publish(WebAppEvents.WARNING.DISMISS, Warnings.TYPE.NO_INTERNET);
-            amplify.publish(WebAppEvents.WARNING.DISMISS, Warnings.TYPE.CONNECTIVITY_RECONNECT);
-          }
-        }
-      },
-      onEvent: (payload, source) => {
-        this.handleEvent({...payload, event: payload.event as EventRecord}, source);
-      },
+        },
+        onEvent: (payload, source) => {
+          this.handleEvent({...payload, event: payload.event as EventRecord}, source);
+        },
+        onNotificationStreamProgress,
+      });
     });
   }
 

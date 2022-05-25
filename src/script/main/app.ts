@@ -445,7 +445,9 @@ class App {
 
       await userRepository.loadUsers();
 
-      await eventRepository.connectWebSocket(this.core);
+      await eventRepository.connectWebSocket(this.core, ({done, total}) => {
+        loadingView.updateProgress(25 + 50 * (done / total), t('initDecryption'), {handled: done, total});
+      });
       eventRepository.watchNetworkStatus();
       const notificationsCount = eventRepository.notificationsTotal;
 
