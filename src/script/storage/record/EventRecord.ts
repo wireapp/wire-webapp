@@ -48,7 +48,8 @@ export interface EventRecord<T = any> {
   ephemeral_expires?: boolean | string | number;
   ephemeral_started?: number;
   ephemeral_time?: string;
-  error_code?: string;
+  error_code?: number;
+  error?: string;
   from: string;
   from_client_id?: string;
   id?: string;

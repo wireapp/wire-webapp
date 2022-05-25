@@ -48,8 +48,10 @@ import type {NotificationService} from './NotificationService';
 import {UserState} from '../user/UserState';
 import {AssetData, CryptographyMapper} from '../cryptography/CryptographyMapper';
 import Warnings from '../view_model/WarningsContainer';
-import {Account} from '@wireapp/core';
+import {Account, ProcessedEventPayload} from '@wireapp/core';
 import {WEBSOCKET_STATE} from '@wireapp/api-client/src/tcp/ReconnectingWebsocket';
+import {HandledEventPayload} from '@wireapp/core/src/main/notification';
+import {EventBuilder} from '../conversation/EventBuilder';
 
 export class EventRepository {
   logger: Logger;
@@ -338,7 +340,7 @@ export class EventRepository {
    * @returns Resolves with the saved record or the plain event if the event was skipped
    */
   private handleEvent(
-    {event, decryptedData}: {event: EventRecord; decryptedData?: GenericMessage},
+    {event, decryptedData, decryptionError}: Omit<ProcessedEventPayload, 'event'> & {event: EventRecord},
     source: EventSource,
   ): Promise<EventRecord> {
     const logObject = {eventJson: JSON.stringify(event), eventObject: event};
@@ -349,18 +351,18 @@ export class EventRepository {
     );
     switch (validationResult) {
       default: {
-        return Promise.resolve(event);
+        return Promise.resolve(event as EventRecord);
       }
       case EventValidation.IGNORED_TYPE: {
         this.logger.info(`Ignored event type '${event.type}'`, logObject);
-        return Promise.resolve(event);
+        return Promise.resolve(event as EventRecord);
       }
       case EventValidation.OUTDATED_TIMESTAMP: {
         this.logger.info(`Ignored outdated event type: '${event.type}'`, logObject);
-        return Promise.resolve(event);
+        return Promise.resolve(event as EventRecord);
       }
       case EventValidation.VALID:
-        return this.processEvent(event, source, decryptedData);
+        return this.processEvent(event as EventRecord, source, decryptedData, decryptionError);
     }
   }
 
@@ -375,7 +377,12 @@ export class EventRepository {
     event: EventRecord,
     source: EventSource,
     decryptedData?: GenericMessage,
+    decryptionError?: HandledEventPayload['decryptionError'],
   ): Promise<EventRecord> {
+    if (decryptionError) {
+      this.logger.warn(`Decryption Error: (${decryptionError.code}) ${decryptionError.message}`, decryptionError);
+      event = EventBuilder.buildUnableToDecrypt(event, decryptionError);
+    }
     if (decryptedData) {
       event = await new CryptographyMapper().mapGenericMessage(decryptedData, event);
     }

@@ -72,7 +72,7 @@ export interface BackendEventMessage<T> extends Omit<BaseEvent, 'id'> {
 
 export interface ErrorEvent extends BaseEvent {
   error: string;
-  error_code: string;
+  error_code: number;
   type: CONVERSATION;
 }
 
@@ -160,7 +160,7 @@ export type CallingTimeoutEvent = ConversationEvent<{reason: AVS_REASON.NOONE_JO
 
 export interface ErrorEvent extends BaseEvent {
   error: string;
-  error_code: string;
+  error_code: number;
   id: string;
   type: CONVERSATION;
 }
@@ -367,7 +367,7 @@ export const EventBuilder = {
     return {
       ...buildQualifiedId(conversationId || conversation),
       error: `${messageError.message} (${eventData.sender})`,
-      error_code: `${errorCode} (${eventData.sender})`,
+      error_code: errorCode,
       from,
       id: createRandomUuid(),
       time,
@@ -477,13 +477,13 @@ export const EventBuilder = {
     };
   },
 
-  buildUnableToDecrypt(event: EventRecord, decryptionError: Error, errorCode: number): ErrorEvent {
+  buildUnableToDecrypt(event: EventRecord, decryptionError: {code: number; message: string}): ErrorEvent {
     const {qualified_conversation: conversationId, qualified_from, conversation, data: eventData, from, time} = event;
 
     return {
       ...buildQualifiedId(conversationId || conversation),
       error: `${decryptionError.message} (${eventData.sender})`,
-      error_code: `${errorCode} (${eventData.sender})`,
+      error_code: decryptionError.code,
       from,
       id: createRandomUuid(),
       qualified_from: qualified_from || {domain: '', id: from},

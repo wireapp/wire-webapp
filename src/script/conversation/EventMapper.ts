@@ -63,7 +63,7 @@ import type {Asset} from '../entity/message/Asset';
 import type {Text as TextAsset} from '../entity/message/Text';
 import {LinkPreview as LinkPreviewEntity, LinkPreviewData} from '../entity/message/LinkPreview';
 import {CallingTimeoutMessage} from '../entity/message/CallingTimeoutMessage';
-import {MemberJoinEvent, MemberLeaveEvent, TeamMemberLeaveEvent} from './EventBuilder';
+import {MemberJoinEvent, MemberLeaveEvent, TeamMemberLeaveEvent, ErrorEvent} from './EventBuilder';
 import {AssetData} from '../cryptography/CryptographyMapper';
 
 // Event Mapper to convert all server side JSON events into core entities.
@@ -248,7 +248,7 @@ export class EventMapper {
 
       case ClientEvent.CONVERSATION.INCOMING_MESSAGE_TOO_BIG:
       case ClientEvent.CONVERSATION.UNABLE_TO_DECRYPT: {
-        messageEntity = this._mapEventUnableToDecrypt(event);
+        messageEntity = this._mapEventUnableToDecrypt(event as ErrorEvent);
         break;
       }
 
@@ -634,13 +634,12 @@ export class EventMapper {
    * @param error_code Error data received as JSON
    * @returns Decrypt error message entity
    */
-  private _mapEventUnableToDecrypt({error_code: errorCode}: EventRecord) {
+  private _mapEventUnableToDecrypt({error_code: errorCode, error}: ErrorEvent) {
     const messageEntity = new DecryptErrorMessage();
 
     if (errorCode) {
-      const [code] = errorCode.split(' ');
-      messageEntity.error_code = code;
-      messageEntity.client_id = errorCode.substring(code.length + 1).replace(/[()]/g, '');
+      messageEntity.error_code = errorCode;
+      messageEntity.client_id = error.replace(/\n/g, '').replace(/^.*\(([\w\d]+)\)$/g, '$1');
     }
 
     return messageEntity;

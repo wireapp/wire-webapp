@@ -35,7 +35,7 @@ import {container} from 'tsyringe';
 import {getLogger, Logger} from 'Util/Logger';
 
 import {checkVersion} from '../lifecycle/newVersionHandler';
-import {createRandomUuid, downloadFile} from './util';
+import {arrayToBase64, createRandomUuid, downloadFile} from './util';
 import {StorageSchemata} from '../storage/StorageSchemata';
 import {EventRepository} from '../event/EventRepository';
 import {ViewModelRepositories} from '../view_model/MainViewModel';
@@ -123,7 +123,7 @@ export class DebugUtil {
     const record = {
       created: Date.now(),
       id: sessionId,
-      serialised: cryptoboxSession.session.serialise(),
+      serialised: arrayToBase64(cryptoboxSession.session.serialise()),
       version: 'broken_by_qa',
     };
 
