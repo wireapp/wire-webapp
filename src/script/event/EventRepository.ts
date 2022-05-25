@@ -159,8 +159,8 @@ export class EventRepository {
   ): Promise<void> {
     await this.handleTimeDrift();
     this.notificationHandlingState(NOTIFICATION_HANDLING_STATE.STREAM);
-    return new Promise(resolve => {
-      account.listen({
+    return new Promise(async resolve => {
+      this.disconnectWebSocket = await account.listen({
         onConnected: () => {
           this.notificationHandlingState(NOTIFICATION_HANDLING_STATE.WEB_SOCKET);
           resolve();
@@ -195,11 +195,9 @@ export class EventRepository {
   }
 
   /**
-   * Close the WebSocket connection.
+   * Close the WebSocket connection. (will be set only once the connectWebSocket is called)
    */
-  disconnectWebSocket() {
-    //TODO
-  }
+  disconnectWebSocket: () => void = () => {};
 
   //##############################################################################
   // Notification Stream handling
