@@ -408,7 +408,7 @@ export class TeamRepository {
     eventJson: TeamEvent & {name: FEATURE_KEY},
     source: EventSource,
   ): Promise<void> => {
-    if (source !== EventSource.WEB_SOCKET) {
+    if (source !== EventSource.WEBSOCKET) {
       // Ignore notification stream events
       return;
     }

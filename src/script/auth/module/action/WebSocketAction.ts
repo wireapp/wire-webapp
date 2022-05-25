@@ -17,31 +17,18 @@
  *
  */
 
-import * as Events from '@wireapp/api-client/src/event/';
+//import * as Events from '@wireapp/api-client/src/event/';
 import {ConnectionState, HttpClient} from '@wireapp/api-client/src/http/';
-import type {Notification} from '@wireapp/api-client/src/notification/';
-import {PayloadBundle, PayloadBundleSource, PayloadBundleType} from '@wireapp/core/src/main/conversation/';
-import type {UserUpdateMessage} from '@wireapp/core/src/main/conversation/message/UserMessage';
-import {UserMapper} from '@wireapp/core/src/main/user/UserMapper';
+//import type {Notification} from '@wireapp/api-client/src/notification/';
+//import {PayloadBundle, PayloadBundleSource, PayloadBundleType} from '@wireapp/core/src/main/conversation/';
+// import type {UserUpdateMessage} from '@wireapp/core/src/main/conversation/message/UserMessage';
+// import {UserMapper} from '@wireapp/core/src/main/user/UserMapper';
 import {getLogger} from 'Util/Logger';
 import type {ThunkAction} from '../../module/reducer';
-import * as SelfSelector from '../../module/selector/SelfSelector';
+//import * as SelfSelector from '../../module/selector/SelfSelector';
 
 export class WebSocketAction {
   private readonly logger = getLogger('WebSocketAction');
-
-  disconnect = (): ThunkAction => {
-    return async (dispatch, getState, {apiClient, core}) => {
-      try {
-        apiClient.disconnect();
-        for (const payloadType of Object.values(PayloadBundleType)) {
-          core.removeAllListeners(payloadType);
-        }
-      } catch (error) {
-        this.logger.warn('Error during WebSocket disconnect:', error.message);
-      }
-    };
-  };
 
   listen = (): ThunkAction => {
     return async (dispatch, getState, {apiClient, core, actions: {selfAction}}) => {
@@ -52,6 +39,7 @@ export class WebSocketAction {
         );
       });
 
+      /* TODO why do we need this?
       await core.listen(async (notification: Notification, source: PayloadBundleSource) => {
         for (const event of notification.payload) {
           let data: PayloadBundle | void;
@@ -80,6 +68,7 @@ export class WebSocketAction {
           }
         }
       });
+      */
     };
   };
 }

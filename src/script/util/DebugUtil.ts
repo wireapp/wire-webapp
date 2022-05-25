@@ -334,37 +334,6 @@ export class DebugUtil {
     navigator.mediaDevices.ondevicechange(null);
   }
 
-  async reprocessNotifications(notificationId?: string) {
-    const isEncryptedEvent = (event: any): event is ConversationOtrMessageAddEvent => {
-      return event.type === CONVERSATION_EVENT.OTR_MESSAGE_ADD;
-    };
-
-    const clientId = this.eventRepository.currentClient().id;
-    this.logger.log(`Your current client has ID "${clientId}".`);
-
-    const notifications = await this.eventRepository.notificationService.getAllNotificationsForClient(clientId);
-    this.logger.log(
-      `The notification stream has "${notifications.length}" notifications in total for your current client.`,
-    );
-
-    if (notificationId) {
-      this.logger.log(`You've set a filter, so only notification with ID "${notificationId}" will be processed...`);
-    }
-
-    const filteredNotifications = notifications.filter(notification =>
-      notificationId ? notification.id === notificationId : true,
-    );
-
-    for (const {payload} of filteredNotifications) {
-      for (const event of payload) {
-        if (isEncryptedEvent(event)) {
-          this.logger.log(`Processing event type "${event.type}" from "${event.time}"...`);
-          await this.cryptographyRepository.handleEncryptedEvent(event);
-        }
-      }
-    }
-  }
-
   injectLegalHoldLeaveEvent(includeSelf = false, maxUsers = Infinity) {
     const conversation = this.conversationState.activeConversation();
     let users = [];
@@ -375,14 +344,16 @@ export class DebugUtil {
     users = users.slice(0, maxUsers);
     return this.eventRepository['handleEvent'](
       {
-        category: MessageCategory.NONE,
-        conversation: conversation.id,
-        data: {reason: MemberLeaveReason.LEGAL_HOLD_POLICY_CONFLICT, user_ids: users},
-        from: this.userState.self().id,
-        id: createRandomUuid(),
-        time: conversation.getNextIsoDate(),
-        type: CONVERSATION_EVENT.MEMBER_LEAVE,
-      } as EventRecord,
+        event: {
+          category: MessageCategory.NONE,
+          conversation: conversation.id,
+          data: {reason: MemberLeaveReason.LEGAL_HOLD_POLICY_CONFLICT, user_ids: users},
+          from: this.userState.self().id,
+          id: createRandomUuid(),
+          time: conversation.getNextIsoDate(),
+          type: CONVERSATION_EVENT.MEMBER_LEAVE,
+        } as EventRecord,
+      },
       EventRepository.SOURCE.WEB_SOCKET,
     );
   }
@@ -391,16 +362,18 @@ export class DebugUtil {
     const conversation = this.conversationState.activeConversation();
     return this.eventRepository['handleEvent'](
       {
-        connection: {
-          conversation: conversation.id,
-          from: this.userState.self().id,
-          last_update: conversation.getNextIsoDate(),
-          message: ' ',
-          status: ConnectionStatus.MISSING_LEGAL_HOLD_CONSENT,
-          to: userId,
-        },
-        type: USER_EVENT.CONNECTION,
-      } as unknown as EventRecord,
+        event: {
+          connection: {
+            conversation: conversation.id,
+            from: this.userState.self().id,
+            last_update: conversation.getNextIsoDate(),
+            message: ' ',
+            status: ConnectionStatus.MISSING_LEGAL_HOLD_CONSENT,
+            to: userId,
+          },
+          type: USER_EVENT.CONNECTION,
+        } as unknown as EventRecord,
+      },
       EventRepository.SOURCE.WEB_SOCKET,
     );
   }

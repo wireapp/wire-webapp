@@ -200,8 +200,6 @@ export class TestFactory {
     this.event_repository = new EventRepository(
       this.event_service,
       this.notification_service,
-      this.web_socket_service,
-      this.cryptography_repository,
       serverTimeHandler,
       this.user_repository['userState'],
     );
