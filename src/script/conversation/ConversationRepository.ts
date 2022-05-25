@@ -131,9 +131,6 @@ type EntityObject = {conversationEntity: Conversation; messageEntity: Message};
 type IncomingEvent = ConversationEvent | ClientConversationEvent;
 
 export class ConversationRepository {
-  private init_handled: number;
-  private init_promise?: {rejectFn: (reason?: any) => void; resolveFn: (value?: unknown) => void};
-  private init_total: number;
   private isBlockingNotificationHandling: boolean;
   private readonly conversationsWithNewEvents: Map<any, any>;
   private readonly ephemeralHandler: ConversationEphemeralHandler;
@@ -249,10 +246,6 @@ export class ConversationRepository {
 
     this.teamState.isTeam.subscribe(() => this.mapGuestStatusSelf());
     this.receiving_queue = new PromiseQueue({name: 'ConversationRepository.Receiving'});
-
-    this.init_handled = 0;
-    this.init_promise = undefined;
-    this.init_total = 0;
 
     this.initSubscriptions();
 
@@ -1067,15 +1060,8 @@ export class ConversationRepository {
     }
   }
 
-  initializeConversations(): Promise<unknown> | undefined {
+  initializeConversations(): void {
     this.initStateUpdates();
-    this.init_total = this.receiving_queue.getLength();
-
-    if (this.init_total > 5) {
-      this.logger.log(`Handling '${this.init_total}' additional messages on app start`);
-      return new Promise((resolve, reject) => (this.init_promise = {rejectFn: reject, resolveFn: resolve}));
-    }
-    return undefined;
   }
 
   /**
@@ -2198,38 +2184,7 @@ export class ConversationRepository {
    * @param source Source of event
    */
   private pushToReceivingQueue(eventJson: IncomingEvent, source: EventSource) {
-    this.receiving_queue
-      .push(() => this.handleConversationEvent(eventJson, source))
-      .then(() => {
-        if (this.init_promise) {
-          const eventFromStream = source === EventRepository.SOURCE.STREAM;
-          if (eventFromStream) {
-            this.init_handled = this.init_handled + 1;
-            if (this.init_handled % 5 === 0 || this.init_handled < 5) {
-              const content = {
-                handled: this.init_handled,
-                total: this.init_total,
-              };
-              const progress = (this.init_handled / this.init_total) * 20 + 75;
-
-              amplify.publish(WebAppEvents.APP.UPDATE_PROGRESS, progress, t('initEvents'), content);
-            }
-          }
-
-          if (!this.receiving_queue.getLength() || !eventFromStream) {
-            this.init_promise.resolveFn();
-            this.init_promise = undefined;
-          }
-        }
-      })
-      .catch(error => {
-        if (this.init_promise) {
-          this.init_promise.rejectFn(error);
-          this.init_promise = undefined;
-        } else {
-          throw error;
-        }
-      });
+    this.receiving_queue.push(() => this.handleConversationEvent(eventJson, source));
   }
 
   /**
