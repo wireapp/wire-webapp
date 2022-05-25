@@ -33,7 +33,6 @@ import {AssetTransferState} from 'src/script/assets/AssetTransferState';
 import {ClientEntity} from 'src/script/client/ClientEntity';
 import {EventError} from 'src/script/error/EventError';
 import {TestFactory} from '../../../test/helper/TestFactory';
-import {OnNotificationCallback, WebSocketService} from './WebSocketService';
 import {EventSource} from './EventSource';
 import {EventRecord} from '../storage';
 import {EventService} from './EventService';
@@ -78,23 +77,10 @@ beforeAll(async () => {
 describe('EventRepository', () => {
   let last_notification_id: string;
 
-  class WebSocketServiceMock extends WebSocketService {
-    private websocket_handler: OnNotificationCallback;
-
-    async connect(onNotification: OnNotificationCallback): Promise<void> {
-      this.websocket_handler = onNotification;
-    }
-
-    publish(data: Notification) {
-      this.websocket_handler(data);
-    }
-  }
-
   beforeAll(() => testFactory.exposeClientActors());
 
   beforeEach(() => {
     return testFactory.exposeEventActors().then(event_repository => {
-      (event_repository as any).webSocketService = new WebSocketServiceMock();
       last_notification_id = undefined;
     });
   });

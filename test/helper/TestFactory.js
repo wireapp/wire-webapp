@@ -42,7 +42,6 @@ import {EventRepository} from 'src/script/event/EventRepository';
 import {EventServiceNoCompound} from 'src/script/event/EventServiceNoCompound';
 import {EventService} from 'src/script/event/EventService';
 import {NotificationService} from 'src/script/event/NotificationService';
-import {WebSocketService} from 'src/script/event/WebSocketService';
 import {ConnectionService} from 'src/script/connection/ConnectionService';
 import {ConnectionRepository} from 'src/script/connection/ConnectionRepository';
 import {CryptographyRepository} from 'src/script/cryptography/CryptographyRepository';
@@ -191,7 +190,6 @@ export class TestFactory {
   async exposeEventActors() {
     await this.exposeUserActors();
 
-    this.web_socket_service = new WebSocketService();
     this.event_service = new EventService(this.storage_service);
     this.event_service_no_compound = new EventServiceNoCompound(this.storage_service);
     this.notification_service = new NotificationService(this.storage_service);
