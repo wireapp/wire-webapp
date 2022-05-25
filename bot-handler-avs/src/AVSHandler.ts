@@ -35,7 +35,7 @@ import type {CallMessage} from '@wireapp/core/src/main/conversation/message/OtrM
 
 import type {Call} from './Call';
 
-const wrtc = require('wrtc');
+const wrtc = require('@koush/wrtc');
 
 declare global {
   namespace NodeJS {
