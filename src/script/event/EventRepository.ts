@@ -52,6 +52,7 @@ import {Account, ProcessedEventPayload} from '@wireapp/core';
 import {WEBSOCKET_STATE} from '@wireapp/api-client/src/tcp/ReconnectingWebsocket';
 import {HandledEventPayload} from '@wireapp/core/src/main/notification';
 import {EventBuilder} from '../conversation/EventBuilder';
+import {EventName} from '../tracking/EventName';
 
 export class EventRepository {
   logger: Logger;
@@ -381,6 +382,9 @@ export class EventRepository {
   ): Promise<EventRecord> {
     if (decryptionError) {
       this.logger.warn(`Decryption Error: (${decryptionError.code}) ${decryptionError.message}`, decryptionError);
+      amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.E2EE.FAILED_MESSAGE_DECRYPTION, {
+        cause: decryptionError.code,
+      });
       event = EventBuilder.buildUnableToDecrypt(event, decryptionError);
     }
     if (decryptedData) {
