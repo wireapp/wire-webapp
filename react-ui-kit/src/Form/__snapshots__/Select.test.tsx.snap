@@ -17,7 +17,6 @@ exports[`"Select" renders 1`] = `
   font-weight: 300;
   height: 48px;
   line-height: 24px;
-  margin: 0 0 16px;
   outline: none;
   padding: 0 16px;
   width: 100%;
@@ -99,7 +98,6 @@ exports[`"Select" renders as disabled 1`] = `
   font-weight: 300;
   height: 48px;
   line-height: 24px;
-  margin: 0 0 16px;
   outline: none;
   padding: 0 16px;
   width: 100%;
@@ -182,7 +180,6 @@ exports[`"Select" renders as invalid 1`] = `
   font-weight: 300;
   height: 48px;
   line-height: 24px;
-  margin: 0 0 16px;
   outline: none;
   padding: 0 16px;
   width: 100%;

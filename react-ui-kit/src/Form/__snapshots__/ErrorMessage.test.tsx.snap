@@ -42,10 +42,10 @@ exports[`"ErrorMessage" renders 1`] = `
   -webkit-flex-wrap: nowrap;
   -ms-flex-wrap: nowrap;
   flex-wrap: nowrap;
-  -webkit-box-pack: center;
-  -ms-flex-pack: center;
-  -webkit-justify-content: center;
-  justify-content: center;
+  -webkit-box-pack: start;
+  -ms-flex-pack: start;
+  -webkit-justify-content: flex-start;
+  justify-content: flex-start;
   margin-bottom: 12px;
 }
 
@@ -74,17 +74,13 @@ exports[`"ErrorMessage" renders 1`] = `
 }
 
 .emotion-2 {
-  fill: rgb(29, 30, 31);
-  overflow: visible;
-}
-
-.emotion-3 {
-  color: #e02020;
+  color: #c20013;
   display: inline;
   font-size: 12px;
   font-weight: 300;
   text-align: left;
   text-transform: none;
+  font-weight: 400;
 }
 
 <div
@@ -93,48 +89,8 @@ exports[`"ErrorMessage" renders 1`] = `
   <div
     className="emotion-1"
   >
-    <svg
-      aria-hidden="true"
-      className="emotion-2"
-      height={12}
-      style={
-        Object {
-          "marginRight": "8px",
-        }
-      }
-      viewBox="0 0 13 12"
-      width={13}
-    >
-      <g>
-        <g
-          fill="none"
-          fillRule="evenodd"
-          transform="translate(.5 .333)"
-        >
-          <circle
-            cx="6"
-            cy="6"
-            fill="#E02020"
-            r="6"
-          />
-          <text
-            fill="#FFF"
-            fontFamily="SFProText-Heavy, SF Pro Text"
-            fontSize="9"
-            fontWeight="600"
-          >
-            <tspan
-              x="4.291"
-              y="9"
-            >
-              !
-            </tspan>
-          </text>
-        </g>
-      </g>
-    </svg>
     <span
-      className="emotion-3"
+      className="emotion-2"
     >
       ErrorMessage
     </span>

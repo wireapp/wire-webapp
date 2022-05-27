@@ -19,9 +19,8 @@
 
 /** @jsx jsx */
 import {CSSObject, jsx} from '@emotion/react';
-import {ErrorIcon} from '../Icon';
 
-import {COLOR} from '../Identity';
+import {COLOR_V2} from '../Identity';
 import {FlexBox, FlexBoxProps, flexBoxStyle, filterFlexBoxProps, Theme} from '../Layout';
 import {Text, linkStyle} from '../Text';
 import {filterProps} from '../util';
@@ -30,7 +29,7 @@ type ErrorMessageProps<T = HTMLDivElement> = FlexBoxProps<T>;
 
 export const errorMessageStyle: <T>(theme: Theme, props: ErrorMessageProps<T>) => CSSObject = (
   theme,
-  {justify = 'center', align = 'center', ...props},
+  {justify = 'flex-start', align = 'center', ...props},
 ) => ({
   ...flexBoxStyle({align, justify, ...props}),
   a: {
@@ -45,8 +44,7 @@ export const filterErrorMessageProps = (props: ErrorMessageProps) => {
 
 export const ErrorMessage = ({children, ...props}: ErrorMessageProps) => (
   <FlexBox css={(theme: Theme) => errorMessageStyle(theme, props)} {...props}>
-    <ErrorIcon style={{marginRight: '8px'}} aria-hidden="true" />
-    <Text color={COLOR.RED} fontSize={'12px'}>
+    <Text color={COLOR_V2.RED_LIGHT_500} fontSize={'12px'} css={{fontWeight: 400}}>
       {children}
     </Text>
   </FlexBox>
