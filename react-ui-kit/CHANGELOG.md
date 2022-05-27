@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [8.3.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/react-ui-kit/compare/@wireapp/react-ui-kit@8.2.0...@wireapp/react-ui-kit@8.3.0) (2022-05-27)
+
+
+### Features
+
+* Prepare Input component ([#4272](https://github.com/wireapp/wire-web-packages/tree/main/packages/react-ui-kit/issues/4272)) ([2b695b2](https://github.com/wireapp/wire-web-packages/tree/main/packages/react-ui-kit/commit/2b695b25b22433da0851567677786aceec2f2ff2))
+
+
+
+
+
 # [8.2.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/react-ui-kit/compare/@wireapp/react-ui-kit@8.1.0...@wireapp/react-ui-kit@8.2.0) (2022-05-24)
 
 
