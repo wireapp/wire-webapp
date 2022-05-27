@@ -20,7 +20,7 @@
 /** @jsx jsx */
 import {jsx} from '@emotion/react';
 
-import {INPUT_CLASSNAME, InputProps, inputStyle} from './Input';
+import {INPUT_CLASSNAME, INPUT_GROUP, InputProps, inputStyle} from './Input';
 import {COLOR_V2} from '../Identity';
 import {Theme} from '../Layout';
 
@@ -36,12 +36,14 @@ export const InputSubmitCombo = ({children, ...props}: InputSubmitComboProps) =>
       '&:focus-within': {
         boxShadow: `0 0 0 1px ${COLOR_V2.BLUE}`,
       },
+      [`.${INPUT_GROUP}`]: {
+        flexGrow: 1,
+      },
       [`.${INPUT_CLASSNAME}`]: {
         '&:focus, &:invalid:not(:focus)': {
           boxShadow: 'none',
         },
         boxShadow: 'none',
-        flexGrow: 1,
         margin: '0 8px 0 0',
         padding: '0 0 0 16px',
       },

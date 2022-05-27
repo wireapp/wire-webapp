@@ -22,7 +22,7 @@ import React from 'react';
 import {CSSObject, jsx} from '@emotion/react';
 
 import {COLOR} from '../Identity';
-import {INPUT_CLASSNAME} from './Input';
+import {INPUT_CLASSNAME, INPUT_GROUP} from './Input';
 import {INPUT_SUBMIT_COMBO_CLASSNAME} from './InputSubmitCombo';
 
 export type InputBlockProps<T = HTMLDivElement> = React.HTMLProps<T>;
@@ -35,6 +35,9 @@ const inputBlockStyle: (props: InputBlockProps) => CSSObject = props => ({
   [`.${INPUT_CLASSNAME}, .${INPUT_SUBMIT_COMBO_CLASSNAME}`]: {
     marginBottom: '1px !important',
     marginTop: '0 !important',
+  },
+  [`.${INPUT_GROUP}`]: {
+    marginBottom: 0,
   },
 });
 

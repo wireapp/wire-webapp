@@ -45,6 +45,29 @@ const shakeBox = useRef();
       <Button type="submit" formNoValidate>
         Submit Button
       </Button>
+
+      <Input placeholder="InputBlock" label="Input Block" id="inputBlock" />
+
+      <Input placeholder="Input required" label="Second input required" isRequired id="requiredInputBlock" />
+
+      <Input
+        placeholder="Error input"
+        markInvalid
+        label="Error input"
+        error={<ErrorMessage>Error message</ErrorMessage>}
+        isRequired
+        id="errorInputBlock"
+      />
+
+      <Input
+        type="password"
+        placeholder="Password Input"
+        label="Password Input"
+        isRequired
+        id="passwordInput"
+        helperText="Must have at least one: uppercase letter, lowercase letter, number, symbol"
+      />
+
       <InputBlock>
         <Input placeholder="InputBlock" markInvalid />
         <Input placeholder="Second Input" markInvalid />

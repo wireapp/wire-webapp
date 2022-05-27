@@ -23,6 +23,18 @@ exports[`"Checkbox" renders (dark theme) 1`] = `
 }
 
 .emotion-2 {
+  margin-bottom: 20px;
+}
+
+.emotion-2:focus-within label {
+  color: #0667c8;
+}
+
+.emotion-3 {
+  position: relative;
+}
+
+.emotion-4 {
   background: rgb(61, 61, 61);
   border: none;
   border-radius: 4px;
@@ -32,40 +44,39 @@ exports[`"Checkbox" renders (dark theme) 1`] = `
   font-weight: 300;
   height: 48px;
   line-height: 24px;
-  margin: 0 0 16px;
   outline: none;
   padding: 0 16px;
   width: 100%;
 }
 
-.emotion-2::-moz-placeholder {
+.emotion-4::-moz-placeholder {
   color: rgb(237, 237, 238);
   font-size: 16px;
   text-transform: none;
   opacity: 1;
 }
 
-.emotion-2::-ms-input-placeholder {
+.emotion-4::-ms-input-placeholder {
   color: rgb(237, 237, 238);
   font-size: 16px;
   text-transform: none;
 }
 
-.emotion-2::-webkit-input-placeholder {
+.emotion-4::-webkit-input-placeholder {
   color: rgb(237, 237, 238);
   font-size: 16px;
   text-transform: none;
 }
 
-.emotion-2:focus {
+.emotion-4:focus {
   box-shadow: 0 0 0 1px #0667c8;
 }
 
-.emotion-2:invalid:not(:focus) {
+.emotion-4:invalid:not(:focus) {
   box-shadow: 0 0 0 1px undefined;
 }
 
-.emotion-3 {
+.emotion-5 {
   line-height: 22px;
   display: -webkit-box;
   display: -webkit-flex;
@@ -74,20 +85,20 @@ exports[`"Checkbox" renders (dark theme) 1`] = `
   opacity: 1;
 }
 
-.wireinput:checked+.emotion-3::before {
+.wireinput:checked+.emotion-5::before {
   background: #0667c8 url('data:image/svg+xml; utf8, <svg width="15" height="13" viewBox="0 0 16 13" xmlns="http://www.w3.org/2000/svg"><path d="M5.65685 12.0711L15.9842 1.62738L14.57 0.213167L5.65685 9.24264L1.41421 5L0 6.41421L5.65685 12.0711Z" fill="white"/></svg>') no-repeat center;
   border-color: #0667c8;
 }
 
-.wireinput:focus+.emotion-3::before {
+.wireinput:focus+.emotion-5::before {
   border-color: #0667c8;
 }
 
-.wireinput:hover+.emotion-3::before {
+.wireinput:hover+.emotion-5::before {
   border-color: #0667c8;
 }
 
-.emotion-3::before {
+.emotion-5::before {
   background: #edeff0;
   border: 1.5px solid #54585f;
   border-radius: 3px;
@@ -100,7 +111,7 @@ exports[`"Checkbox" renders (dark theme) 1`] = `
   width: 22px;
 }
 
-.emotion-3 a {
+.emotion-5 a {
   color: #0667c8;
   display: inline;
   font-size: 16px;
@@ -114,13 +125,13 @@ exports[`"Checkbox" renders (dark theme) 1`] = `
   transition: all 0.24s;
 }
 
-.emotion-3 a:hover {
+.emotion-5 a:hover {
   color: rgb(5, 87, 168);
 }
 
-.emotion-3 a:visited,
-.emotion-3 a:link,
-.emotion-3 a:active {
+.emotion-5 a:visited,
+.emotion-5 a:link,
+.emotion-5 a:active {
   color: #0667c8;
 }
 
@@ -130,21 +141,29 @@ exports[`"Checkbox" renders (dark theme) 1`] = `
   <div
     className="emotion-1"
   >
-    <input
-      className="wireinput emotion-2"
-      id="1"
-      style={
-        Object {
-          "height": "22px",
-          "marginBottom": "0",
-          "opacity": 0,
-          "width": "22px",
-        }
-      }
-      type="checkbox"
-    />
+    <div
+      className="input-group emotion-2"
+    >
+      <div
+        className="emotion-3"
+      >
+        <input
+          className="wireinput emotion-4"
+          id="1"
+          style={
+            Object {
+              "height": "22px",
+              "marginBottom": "0",
+              "opacity": 0,
+              "width": "22px",
+            }
+          }
+          type="checkbox"
+        />
+      </div>
+    </div>
     <label
-      className="emotion-3"
+      className="emotion-5"
       htmlFor="1"
     >
       Checkbox
@@ -176,6 +195,18 @@ exports[`"Checkbox" renders 1`] = `
 }
 
 .emotion-2 {
+  margin-bottom: 20px;
+}
+
+.emotion-2:focus-within label {
+  color: #0667c8;
+}
+
+.emotion-3 {
+  position: relative;
+}
+
+.emotion-4 {
   background: #fff;
   border: none;
   border-radius: 4px;
@@ -185,40 +216,39 @@ exports[`"Checkbox" renders 1`] = `
   font-weight: 300;
   height: 48px;
   line-height: 24px;
-  margin: 0 0 16px;
   outline: none;
   padding: 0 16px;
   width: 100%;
 }
 
-.emotion-2::-moz-placeholder {
+.emotion-4::-moz-placeholder {
   color: rgb(80, 82, 84);
   font-size: 16px;
   text-transform: none;
   opacity: 1;
 }
 
-.emotion-2::-ms-input-placeholder {
+.emotion-4::-ms-input-placeholder {
   color: rgb(80, 82, 84);
   font-size: 16px;
   text-transform: none;
 }
 
-.emotion-2::-webkit-input-placeholder {
+.emotion-4::-webkit-input-placeholder {
   color: rgb(80, 82, 84);
   font-size: 16px;
   text-transform: none;
 }
 
-.emotion-2:focus {
+.emotion-4:focus {
   box-shadow: 0 0 0 1px #0667c8;
 }
 
-.emotion-2:invalid:not(:focus) {
+.emotion-4:invalid:not(:focus) {
   box-shadow: 0 0 0 1px undefined;
 }
 
-.emotion-3 {
+.emotion-5 {
   line-height: 22px;
   display: -webkit-box;
   display: -webkit-flex;
@@ -227,20 +257,20 @@ exports[`"Checkbox" renders 1`] = `
   opacity: 1;
 }
 
-.wireinput:checked+.emotion-3::before {
+.wireinput:checked+.emotion-5::before {
   background: #0667c8 url('data:image/svg+xml; utf8, <svg width="15" height="13" viewBox="0 0 16 13" xmlns="http://www.w3.org/2000/svg"><path d="M5.65685 12.0711L15.9842 1.62738L14.57 0.213167L5.65685 9.24264L1.41421 5L0 6.41421L5.65685 12.0711Z" fill="white"/></svg>') no-repeat center;
   border-color: #0667c8;
 }
 
-.wireinput:focus+.emotion-3::before {
+.wireinput:focus+.emotion-5::before {
   border-color: #0667c8;
 }
 
-.wireinput:hover+.emotion-3::before {
+.wireinput:hover+.emotion-5::before {
   border-color: #0667c8;
 }
 
-.emotion-3::before {
+.emotion-5::before {
   background: #edeff0;
   border: 1.5px solid #54585f;
   border-radius: 3px;
@@ -253,7 +283,7 @@ exports[`"Checkbox" renders 1`] = `
   width: 22px;
 }
 
-.emotion-3 a {
+.emotion-5 a {
   color: #0667c8;
   display: inline;
   font-size: 16px;
@@ -267,13 +297,13 @@ exports[`"Checkbox" renders 1`] = `
   transition: all 0.24s;
 }
 
-.emotion-3 a:hover {
+.emotion-5 a:hover {
   color: rgb(5, 87, 168);
 }
 
-.emotion-3 a:visited,
-.emotion-3 a:link,
-.emotion-3 a:active {
+.emotion-5 a:visited,
+.emotion-5 a:link,
+.emotion-5 a:active {
   color: #0667c8;
 }
 
@@ -283,21 +313,29 @@ exports[`"Checkbox" renders 1`] = `
   <div
     className="emotion-1"
   >
-    <input
-      className="wireinput emotion-2"
-      id="1"
-      style={
-        Object {
-          "height": "22px",
-          "marginBottom": "0",
-          "opacity": 0,
-          "width": "22px",
-        }
-      }
-      type="checkbox"
-    />
+    <div
+      className="input-group emotion-2"
+    >
+      <div
+        className="emotion-3"
+      >
+        <input
+          className="wireinput emotion-4"
+          id="1"
+          style={
+            Object {
+              "height": "22px",
+              "marginBottom": "0",
+              "opacity": 0,
+              "width": "22px",
+            }
+          }
+          type="checkbox"
+        />
+      </div>
+    </div>
     <label
-      className="emotion-3"
+      className="emotion-5"
       htmlFor="1"
     >
       Check
@@ -329,6 +367,18 @@ exports[`"Checkbox" renders as invalid 1`] = `
 }
 
 .emotion-2 {
+  margin-bottom: 20px;
+}
+
+.emotion-2:focus-within label {
+  color: #0667c8;
+}
+
+.emotion-3 {
+  position: relative;
+}
+
+.emotion-4 {
   background: #fff;
   border: none;
   border-radius: 4px;
@@ -338,40 +388,39 @@ exports[`"Checkbox" renders as invalid 1`] = `
   font-weight: 300;
   height: 48px;
   line-height: 24px;
-  margin: 0 0 16px;
   outline: none;
   padding: 0 16px;
   width: 100%;
 }
 
-.emotion-2::-moz-placeholder {
+.emotion-4::-moz-placeholder {
   color: rgb(80, 82, 84);
   font-size: 16px;
   text-transform: none;
   opacity: 1;
 }
 
-.emotion-2::-ms-input-placeholder {
+.emotion-4::-ms-input-placeholder {
   color: rgb(80, 82, 84);
   font-size: 16px;
   text-transform: none;
 }
 
-.emotion-2::-webkit-input-placeholder {
+.emotion-4::-webkit-input-placeholder {
   color: rgb(80, 82, 84);
   font-size: 16px;
   text-transform: none;
 }
 
-.emotion-2:focus {
+.emotion-4:focus {
   box-shadow: 0 0 0 1px #0667c8;
 }
 
-.emotion-2:invalid:not(:focus) {
+.emotion-4:invalid:not(:focus) {
   box-shadow: 0 0 0 1px undefined;
 }
 
-.emotion-3 {
+.emotion-5 {
   line-height: 22px;
   display: -webkit-box;
   display: -webkit-flex;
@@ -380,20 +429,20 @@ exports[`"Checkbox" renders as invalid 1`] = `
   opacity: 1;
 }
 
-.wireinput:checked+.emotion-3::before {
+.wireinput:checked+.emotion-5::before {
   background: #0667c8 url('data:image/svg+xml; utf8, <svg width="15" height="13" viewBox="0 0 16 13" xmlns="http://www.w3.org/2000/svg"><path d="M5.65685 12.0711L15.9842 1.62738L14.57 0.213167L5.65685 9.24264L1.41421 5L0 6.41421L5.65685 12.0711Z" fill="white"/></svg>') no-repeat center;
   border-color: #0667c8;
 }
 
-.wireinput:focus+.emotion-3::before {
+.wireinput:focus+.emotion-5::before {
   border-color: #0667c8;
 }
 
-.wireinput:hover+.emotion-3::before {
+.wireinput:hover+.emotion-5::before {
   border-color: #0667c8;
 }
 
-.emotion-3::before {
+.emotion-5::before {
   background: #edeff0;
   border: 1.5px solid #c20013;
   border-radius: 3px;
@@ -406,7 +455,7 @@ exports[`"Checkbox" renders as invalid 1`] = `
   width: 22px;
 }
 
-.emotion-3 a {
+.emotion-5 a {
   color: #0667c8;
   display: inline;
   font-size: 16px;
@@ -420,13 +469,13 @@ exports[`"Checkbox" renders as invalid 1`] = `
   transition: all 0.24s;
 }
 
-.emotion-3 a:hover {
+.emotion-5 a:hover {
   color: rgb(5, 87, 168);
 }
 
-.emotion-3 a:visited,
-.emotion-3 a:link,
-.emotion-3 a:active {
+.emotion-5 a:visited,
+.emotion-5 a:link,
+.emotion-5 a:active {
   color: #0667c8;
 }
 
@@ -436,21 +485,29 @@ exports[`"Checkbox" renders as invalid 1`] = `
   <div
     className="emotion-1"
   >
-    <input
-      className="wireinput emotion-2"
-      id="1"
-      style={
-        Object {
-          "height": "22px",
-          "marginBottom": "0",
-          "opacity": 0,
-          "width": "22px",
-        }
-      }
-      type="checkbox"
-    />
+    <div
+      className="input-group emotion-2"
+    >
+      <div
+        className="emotion-3"
+      >
+        <input
+          className="wireinput emotion-4"
+          id="1"
+          style={
+            Object {
+              "height": "22px",
+              "marginBottom": "0",
+              "opacity": 0,
+              "width": "22px",
+            }
+          }
+          type="checkbox"
+        />
+      </div>
+    </div>
     <label
-      className="emotion-3"
+      className="emotion-5"
       htmlFor="1"
     >
       Check
@@ -482,6 +539,18 @@ exports[`"Checkbox" renders disabled 1`] = `
 }
 
 .emotion-2 {
+  margin-bottom: 20px;
+}
+
+.emotion-2:focus-within label {
+  color: #0667c8;
+}
+
+.emotion-3 {
+  position: relative;
+}
+
+.emotion-4 {
   background: rgba(71, 73, 75, 0.16000000000000003);
   border: none;
   border-radius: 4px;
@@ -491,40 +560,39 @@ exports[`"Checkbox" renders disabled 1`] = `
   font-weight: 300;
   height: 48px;
   line-height: 24px;
-  margin: 0 0 16px;
   outline: none;
   padding: 0 16px;
   width: 100%;
 }
 
-.emotion-2::-moz-placeholder {
+.emotion-4::-moz-placeholder {
   color: rgb(80, 82, 84);
   font-size: 16px;
   text-transform: none;
   opacity: 1;
 }
 
-.emotion-2::-ms-input-placeholder {
+.emotion-4::-ms-input-placeholder {
   color: rgb(80, 82, 84);
   font-size: 16px;
   text-transform: none;
 }
 
-.emotion-2::-webkit-input-placeholder {
+.emotion-4::-webkit-input-placeholder {
   color: rgb(80, 82, 84);
   font-size: 16px;
   text-transform: none;
 }
 
-.emotion-2:focus {
+.emotion-4:focus {
   box-shadow: 0 0 0 1px #0667c8;
 }
 
-.emotion-2:invalid:not(:focus) {
+.emotion-4:invalid:not(:focus) {
   box-shadow: 0 0 0 1px undefined;
 }
 
-.emotion-3 {
+.emotion-5 {
   line-height: 22px;
   display: -webkit-box;
   display: -webkit-flex;
@@ -533,12 +601,12 @@ exports[`"Checkbox" renders disabled 1`] = `
   opacity: 0.56;
 }
 
-.wireinput:checked+.emotion-3::before {
+.wireinput:checked+.emotion-5::before {
   background: #9fa1a7 url('data:image/svg+xml; utf8, <svg width="15" height="13" viewBox="0 0 16 13" xmlns="http://www.w3.org/2000/svg"><path d="M5.65685 12.0711L15.9842 1.62738L14.57 0.213167L5.65685 9.24264L1.41421 5L0 6.41421L5.65685 12.0711Z" fill="white"/></svg>') no-repeat center;
   border-color: #0667c8;
 }
 
-.emotion-3::before {
+.emotion-5::before {
   background: #fafafa;
   border: 1.5px solid #9fa1a7;
   border-radius: 3px;
@@ -551,7 +619,7 @@ exports[`"Checkbox" renders disabled 1`] = `
   width: 22px;
 }
 
-.emotion-3 a {
+.emotion-5 a {
   color: #0667c8;
   display: inline;
   font-size: 16px;
@@ -565,13 +633,13 @@ exports[`"Checkbox" renders disabled 1`] = `
   transition: all 0.24s;
 }
 
-.emotion-3 a:hover {
+.emotion-5 a:hover {
   color: rgb(5, 87, 168);
 }
 
-.emotion-3 a:visited,
-.emotion-3 a:link,
-.emotion-3 a:active {
+.emotion-5 a:visited,
+.emotion-5 a:link,
+.emotion-5 a:active {
   color: #0667c8;
 }
 
@@ -581,22 +649,30 @@ exports[`"Checkbox" renders disabled 1`] = `
   <div
     className="emotion-1"
   >
-    <input
-      className="wireinput emotion-2"
-      disabled={true}
-      id="1"
-      style={
-        Object {
-          "height": "22px",
-          "marginBottom": "0",
-          "opacity": 0,
-          "width": "22px",
-        }
-      }
-      type="checkbox"
-    />
+    <div
+      className="input-group emotion-2"
+    >
+      <div
+        className="emotion-3"
+      >
+        <input
+          className="wireinput emotion-4"
+          disabled={true}
+          id="1"
+          style={
+            Object {
+              "height": "22px",
+              "marginBottom": "0",
+              "opacity": 0,
+              "width": "22px",
+            }
+          }
+          type="checkbox"
+        />
+      </div>
+    </div>
     <label
-      className="emotion-3"
+      className="emotion-5"
       disabled={true}
       htmlFor="1"
     >
