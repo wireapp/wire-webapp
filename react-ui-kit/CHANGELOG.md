@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [8.4.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/react-ui-kit/compare/@wireapp/react-ui-kit@8.3.0...@wireapp/react-ui-kit@8.4.0) (2022-05-30)
+
+
+### Features
+
+* Prepare new form elements ([#4273](https://github.com/wireapp/wire-web-packages/tree/main/packages/react-ui-kit/issues/4273)) ([a80de23](https://github.com/wireapp/wire-web-packages/tree/main/packages/react-ui-kit/commit/a80de238d2a9b396e7495f89d757f531f8f9abd3))
+
+
+
+
+
 # [8.3.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/react-ui-kit/compare/@wireapp/react-ui-kit@8.2.0...@wireapp/react-ui-kit@8.3.0) (2022-05-27)
 
 
