@@ -99,7 +99,7 @@ const AccountSecuritySection: React.FC<AccountSecuritySectionProps> = ({
           {t('preferencesAccountResetAppLockPassphrase')}
         </button>
       )}
-      {!selfUser?.isSingleSignOn && (
+      {!selfUser?.isNoPassSSO && (
         <button
           className="preferences-link"
           onClick={() => safeWindowOpen(getAccountPagesUrl(URL_PATH.PASSWORD_RESET))}

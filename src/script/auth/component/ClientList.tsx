@@ -39,7 +39,7 @@ interface Props extends React.HTMLProps<HTMLDivElement> {}
 const ClientList = ({
   clientError,
   isFetching,
-  isSSOUser,
+  isNoPassSSO,
   permanentClients,
   entropy,
   doInitializeClient,
@@ -94,7 +94,7 @@ const ClientList = ({
           key={client.id}
           onClick={() => setSelectedClient(client.id)}
           onClientRemoval={(password?: string) => removeClient(client.id, password)}
-          requirePassword={!isSSOUser}
+          requirePassword={!isNoPassSSO}
           selected={isSelectedClient(client.id)}
         />
       ))}
@@ -107,7 +107,7 @@ const mapStateToProps = (state: RootState) => ({
   clientError: ClientSelector.getError(state),
   entropy: getEntropy(state),
   isFetching: ClientSelector.isFetching(state),
-  isSSOUser: SelfSelector.isSSOUser(state),
+  isNoPassSSO: SelfSelector.isNoPassSSO(state),
   permanentClients: ClientSelector.getPermanentClients(state),
 });
 

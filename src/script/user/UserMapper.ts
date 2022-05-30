@@ -184,8 +184,11 @@ export class UserMapper {
       userEntity.serviceId = service.id;
     }
 
-    if (ssoId && ssoId.subject) {
+    if (ssoId && Object.keys(ssoId).length) {
       userEntity.isSingleSignOn = true;
+    }
+    if (ssoId?.subject) {
+      userEntity.isNoPassSSO = true;
     }
 
     if (teamId && !userEntity.isFederated) {

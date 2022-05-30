@@ -45,7 +45,8 @@ export const hasSelfHandle = (state: RootState) => !!getSelfHandle(state);
 export const hasSelfEmail = (state: RootState) => !!getSelfEmail(state);
 export const hasSelfPassword = (state: RootState) => !!state.selfState.hasPassword;
 export const isFetching = (state: RootState) => state.selfState.fetching;
-export const isSSOUser = (state: RootState) => !!getSelf(state).sso_id?.subject;
+export const isSSOUser = (state: RootState) => !!getSelf(state).sso_id;
+export const isNoPassSSO = (state: RootState) => !!getSelf(state).sso_id?.subject;
 export const isTemporaryGuest = (state: RootState) => !!getSelf(state).expires_at;
 const getConsent = (state: RootState, consentType: number) => getConsents(state)[consentType];
 export const hasUnsetConsent = (state: RootState, consentType: number) =>

@@ -120,7 +120,7 @@ export class LegalHoldModalViewModel {
       setModalParams(true);
     }
     const selfUser = this.userState.self();
-    this.requiresPassword(!selfUser.isSingleSignOn);
+    this.requiresPassword(!selfUser.isNoPassSSO);
     if (!selfUser.inTeam()) {
       setModalParams(false);
       return;
