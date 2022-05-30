@@ -72,7 +72,7 @@ export interface BackendEventMessage<T> extends Omit<BaseEvent, 'id'> {
 
 export interface ErrorEvent extends BaseEvent {
   error: string;
-  error_code: number;
+  error_code: number | string;
   type: CONVERSATION;
 }
 
@@ -160,7 +160,7 @@ export type CallingTimeoutEvent = ConversationEvent<{reason: AVS_REASON.NOONE_JO
 
 export interface ErrorEvent extends BaseEvent {
   error: string;
-  error_code: number;
+  error_code: number | string;
   id: string;
   type: CONVERSATION;
 }

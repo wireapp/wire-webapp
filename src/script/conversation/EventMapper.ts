@@ -638,7 +638,7 @@ export class EventMapper {
     const messageEntity = new DecryptErrorMessage();
 
     if (errorCode) {
-      messageEntity.error_code = errorCode;
+      messageEntity.error_code = typeof errorCode === 'string' ? parseInt(errorCode.split(' ')[0], 10) : errorCode;
       messageEntity.client_id = error.replace(/\n/g, '').replace(/^.*\(([\w\d]+)\)$/g, '$1');
     }
 
