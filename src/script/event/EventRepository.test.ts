@@ -22,8 +22,6 @@ import {Cryptobox} from '@wireapp/cryptobox';
 import {Asset as ProtobufAsset, GenericMessage, Text} from '@wireapp/protocol-messaging';
 import {init as proteusInit, keys as ProteusKeys} from '@wireapp/proteus';
 import {CONVERSATION_EVENT, USER_EVENT} from '@wireapp/api-client/src/event/';
-import type {Notification} from '@wireapp/api-client/src/notification/';
-import {DatabaseKeys} from '@wireapp/core/src/main/notification/NotificationDatabaseRepository';
 import {arrayToBase64, createRandomUuid} from 'Util/util';
 import {GENERIC_MESSAGE_TYPE} from 'src/script/cryptography/GenericMessageType';
 import {ClientEvent} from 'src/script/event/Client';
@@ -82,43 +80,6 @@ describe('EventRepository', () => {
   beforeEach(() => {
     return testFactory.exposeEventActors().then(event_repository => {
       last_notification_id = undefined;
-    });
-  });
-
-  describe('updateFromStream', () => {
-    const latestNotificationId = createRandomUuid();
-
-    beforeEach(() => {
-      jest.spyOn<EventRepository, any>(testFactory.event_repository, 'handleNotification');
-      jest.spyOn<EventRepository, any>(testFactory.event_repository, 'handleEvent');
-      jest.spyOn<EventRepository, any>(testFactory.event_repository, 'distributeEvent');
-
-      jest.spyOn(testFactory.notification_service, 'getAllNotificationsForClient').mockImplementation(() => {
-        return new Promise(resolve => {
-          window.setTimeout(() => {
-            resolve([
-              {id: createRandomUuid(), payload: []},
-              {id: latestNotificationId, payload: []},
-            ]);
-          }, 10);
-        });
-      });
-
-      jest.spyOn(testFactory.notification_service, 'getNotificationsLast').mockImplementation(() => {
-        const notification = {id: latestNotificationId, payload: [{}]} as Notification;
-        return Promise.resolve(notification);
-      });
-
-      jest.spyOn(testFactory.notification_service, 'getLastNotificationIdFromDb').mockImplementation(() => {
-        return last_notification_id
-          ? Promise.resolve(last_notification_id)
-          : Promise.reject(new EventError(EventError.TYPE.NO_LAST_ID, EventError.MESSAGE.NO_LAST_ID));
-      });
-      jest.spyOn(testFactory.notification_service, 'getAllNotificationsForClient').mockResolvedValue([]);
-      jest.spyOn(testFactory.notification_service, 'getServerTime').mockResolvedValue(new Date().toISOString());
-      jest
-        .spyOn(testFactory.notification_service, 'saveLastNotificationIdToDb')
-        .mockImplementation(() => Promise.resolve(DatabaseKeys.PRIMARY_KEY_LAST_NOTIFICATION));
     });
   });
 

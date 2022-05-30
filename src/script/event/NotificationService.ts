@@ -18,15 +18,12 @@
  */
 
 import type {NotificationList} from '@wireapp/api-client/src/notification/';
-import {CONVERSATION_EVENT} from '@wireapp/api-client/src/event/';
-import type {Notification} from '@wireapp/api-client/src/notification/';
 import {DatabaseKeys} from '@wireapp/core/src/main/notification/NotificationDatabaseRepository';
 import {container} from 'tsyringe';
 
 import {Logger, getLogger} from 'Util/Logger';
 
-import {EventRecord, StorageSchemata, StorageService} from '../storage/';
-import {EventError} from '../error/EventError';
+import {StorageSchemata, StorageService} from '../storage/';
 import {APIClient} from '../service/APIClientSingleton';
 
 export class NotificationService {
@@ -67,57 +64,6 @@ export class NotificationService {
     return notificationList.time;
   }
 
-  getAllNotificationsForClient(clientId: string, notificationId?: string): Promise<Notification[]> {
-    return this.apiClient.api.notification.getAllNotifications(clientId, notificationId);
-  }
-
-  /**
-   * Get the last notification for a given client.
-   * @param clientId Only return notifications targeted at the given client
-   * @returns Resolves with the last known notification for given client
-   */
-  getNotificationsLast(clientId: string): Promise<Notification> {
-    return this.apiClient.api.notification.getLastNotification(clientId);
-  }
-
-  /**
-   * Load latest event date from persistent storage.
-   * @returns Resolves with the date in ISO 8601 format from the latest event stored in local database
-   */
-  getLastEventDateFromDb(): Promise<string> {
-    return this.storageService
-      .load<{value: string}>(this.AMPLIFY_STORE_NAME, DatabaseKeys.PRIMARY_KEY_LAST_EVENT)
-      .catch(error => {
-        this.logger.error(`Failed to get last event timestamp from storage: ${error.message}`, error);
-        throw new EventError(EventError.TYPE.DATABASE_FAILURE, EventError.MESSAGE.DATABASE_FAILURE);
-      })
-      .then(record => {
-        if (record?.value) {
-          return record.value;
-        }
-        throw new EventError(EventError.TYPE.NO_LAST_DATE, EventError.MESSAGE.NO_LAST_DATE);
-      });
-  }
-
-  /**
-   * Load last notifications ID from persistent storage.
-   * @returns Resolves with the stored last notification ID (UUIDv4)
-   */
-  getLastNotificationIdFromDb(): Promise<string> {
-    return this.storageService
-      .load<{value: string}>(this.AMPLIFY_STORE_NAME, DatabaseKeys.PRIMARY_KEY_LAST_NOTIFICATION)
-      .catch(error => {
-        this.logger.error(`Failed to get last notification ID from storage: ${error.message}`, error);
-        throw new EventError(EventError.TYPE.DATABASE_FAILURE, EventError.MESSAGE.DATABASE_FAILURE);
-      })
-      .then(record => {
-        if (record?.value) {
-          return record.value;
-        }
-        throw new EventError(EventError.TYPE.NO_LAST_ID, EventError.MESSAGE.NO_LAST_ID);
-      });
-  }
-
   /**
    * Load missed ID from persistent storage.
    * @returns Resolves with the stored missed ID.
@@ -145,17 +91,6 @@ export class NotificationService {
   }
 
   /**
-   * Save last notification ID to persistent storage.
-   * @param notificationId Notification ID to be stored
-   * @returns Resolves with the primary key of the stored record
-   */
-  saveLastNotificationIdToDb(notificationId: string): Promise<string> {
-    return this.storageService.save(this.AMPLIFY_STORE_NAME, DatabaseKeys.PRIMARY_KEY_LAST_NOTIFICATION, {
-      value: notificationId,
-    });
-  }
-
-  /**
    * Save missed notifications ID to persistent storage.
    * @param notificationId Notification ID to be stored
    * @returns Resolves with the primary key of the stored record
@@ -164,33 +99,5 @@ export class NotificationService {
     return this.storageService.save(this.AMPLIFY_STORE_NAME, NotificationService.CONFIG.PRIMARY_KEY_MISSED, {
       value: notificationId,
     });
-  }
-
-  async getNotificationIdByMessageId(messageId: string, clientId: string): Promise<string | void> {
-    let message: EventRecord;
-
-    if (this.storageService.isTemporaryAndNonPersistent) {
-      const events = await this.storageService.getAll<EventRecord>(StorageSchemata.OBJECT_STORE.EVENTS);
-      message = Object.values(events).filter(event => event.id === messageId)[0];
-    } else {
-      message = await this.storageService.db.table(StorageSchemata.OBJECT_STORE.EVENTS).where({id: messageId}).first();
-    }
-
-    const notifications = await this.apiClient.api.notification.getAllNotifications(clientId);
-
-    for (const notification of notifications) {
-      const matchedEvent = notification.payload.find(event => {
-        return (
-          event.type === CONVERSATION_EVENT.OTR_MESSAGE_ADD &&
-          event.time === message.time &&
-          event.from === message.from &&
-          event.conversation === message.conversation
-        );
-      });
-
-      if (matchedEvent) {
-        return notification.id;
-      }
-    }
   }
 }
