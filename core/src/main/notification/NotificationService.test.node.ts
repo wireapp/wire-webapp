@@ -33,7 +33,7 @@ const MOCK_BACKEND = {
 
 describe('NotificationService', () => {
   describe('handleEvent', () => {
-    it('propagates errors to the outer calling function', async done => {
+    it('propagates errors to the outer calling function', async () => {
       const storeEngine = new MemoryEngine();
       await storeEngine.init('NotificationService.test');
 
@@ -44,16 +44,24 @@ describe('NotificationService', () => {
 
       spyOn<any>(notificationService, 'handleEvent').and.throwError('Test error');
 
-      notificationService.on(NotificationService.TOPIC.NOTIFICATION_ERROR, notificationError => {
-        expect(notificationError.error.message).toBe('Test error');
-        done();
+      const promise = new Promise<void>(resolve => {
+        notificationService.on(NotificationService.TOPIC.NOTIFICATION_ERROR, notificationError => {
+          expect(notificationError.error.message).toBe('Test error');
+          resolve();
+        });
       });
 
       const notification = {
         payload: [{}],
       } as unknown as Notification;
 
-      await notificationService.handleNotification(notification, PayloadBundleSource.NOTIFICATION_STREAM);
+      const handledNotifications = notificationService.handleNotification(
+        notification,
+        PayloadBundleSource.NOTIFICATION_STREAM,
+      );
+      await handledNotifications.next();
+
+      return promise;
     });
   });
 
@@ -73,7 +81,12 @@ describe('NotificationService', () => {
         transient: false,
       } as unknown as Notification;
 
-      await notificationService.handleNotification(notification, PayloadBundleSource.NOTIFICATION_STREAM);
+      const handledNotifications = notificationService.handleNotification(
+        notification,
+        PayloadBundleSource.NOTIFICATION_STREAM,
+      );
+
+      await handledNotifications.next();
 
       expect(spySetLastNotificationId.calls.count()).toBe(1);
     });
@@ -93,7 +106,11 @@ describe('NotificationService', () => {
         transient: true,
       } as unknown as Notification;
 
-      await notificationService.handleNotification(notification, PayloadBundleSource.NOTIFICATION_STREAM);
+      const handledNotifications = notificationService.handleNotification(
+        notification,
+        PayloadBundleSource.NOTIFICATION_STREAM,
+      );
+      await handledNotifications.next();
 
       expect(spySetLastNotificationId.calls.count()).toBe(0);
     });
@@ -118,7 +135,11 @@ describe('NotificationService', () => {
         transient: true,
       } as unknown as Notification;
 
-      await notificationService.handleNotification(notification, PayloadBundleSource.NOTIFICATION_STREAM);
+      const handledNotifications = notificationService.handleNotification(
+        notification,
+        PayloadBundleSource.NOTIFICATION_STREAM,
+      );
+      await handledNotifications.next();
     });
   });
 });

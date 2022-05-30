@@ -30,7 +30,11 @@ import {PayloadBundle, PayloadBundleSource, PayloadBundleState, PayloadBundleTyp
 import {MessageBuilder} from '../conversation/message/MessageBuilder';
 
 export class UserMapper {
-  public static mapUserEvent(event: UserEvent, selfUserId: string, source: PayloadBundleSource): PayloadBundle | void {
+  public static mapUserEvent(
+    event: UserEvent,
+    selfUserId: string,
+    source: PayloadBundleSource,
+  ): PayloadBundle | undefined {
     switch (event.type) {
       case USER_EVENT.CONNECTION: {
         const {connection, user} = event as UserConnectionEvent;
@@ -88,5 +92,6 @@ export class UserMapper {
         };
       }
     }
+    return undefined;
   }
 }
