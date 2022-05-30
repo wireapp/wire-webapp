@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [27.2.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/compare/@wireapp/core@27.1.0...@wireapp/core@27.2.0) (2022-05-30)
+
+
+### Features
+
+* Add missed notifications hook ([#4275](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/issues/4275)) ([f81217b](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/commit/f81217bad53fed2e4fb163c6ae871b39ca16cf58))
+
+
+
+
+
 # [27.1.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/compare/@wireapp/core@27.0.5...@wireapp/core@27.1.0) (2022-05-30)
 
 
