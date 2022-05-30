@@ -188,7 +188,7 @@ export class UserMapper {
       userEntity.isSingleSignOn = true;
     }
     if (ssoId?.subject) {
-      userEntity.isNoPassSSO = true;
+      userEntity.isNoPasswordSSO = true;
     }
 
     if (teamId && !userEntity.isFederated) {

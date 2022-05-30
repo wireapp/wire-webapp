@@ -43,7 +43,7 @@ export class User {
   public isMe: boolean;
   public isService: boolean;
   public isSingleSignOn: boolean;
-  public isNoPassSSO: boolean;
+  public isNoPasswordSSO: boolean;
   public joaatHash: number;
   public providerId?: string;
   public readonly accent_color: ko.PureComputed<string>;
@@ -126,7 +126,7 @@ export class User {
     this.isMe = false;
     this.isService = false;
     this.isSingleSignOn = false;
-    this.isNoPassSSO = false;
+    this.isNoPasswordSSO = false;
     this.isDeleted = false;
     this.providerId = undefined;
     this.serviceId = undefined;
