@@ -200,6 +200,7 @@ export class EventRepository {
             }
           }
         },
+        onMissedNotifications: notificationId => this.triggerMissedSystemEventMessageRendering(notificationId),
         onNotificationStreamProgress,
       });
     });
@@ -246,17 +247,14 @@ export class EventRepository {
     }
   }
 
-  /* TODO
-  private triggerMissedSystemEventMessageRendering() {
-    this.notificationService.getMissedIdFromDb().then(notificationId => {
-      const shouldUpdatePersistedId = this.lastNotificationId() !== notificationId;
-      if (shouldUpdatePersistedId) {
-        amplify.publish(WebAppEvents.CONVERSATION.MISSED_EVENTS);
-        this.notificationService.saveMissedIdToDb(this.lastNotificationId());
-      }
-    });
+  private async triggerMissedSystemEventMessageRendering(missedNotificationId: string) {
+    const notificationId = await this.notificationService.getMissedIdFromDb();
+    const shouldUpdatePersistedId = missedNotificationId !== notificationId;
+    if (shouldUpdatePersistedId) {
+      amplify.publish(WebAppEvents.CONVERSATION.MISSED_EVENTS);
+      this.notificationService.saveMissedIdToDb(this.lastNotificationId());
+    }
   }
-  */
 
   /**
    * Persist updated last event timestamp.
