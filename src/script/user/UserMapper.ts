@@ -187,6 +187,9 @@ export class UserMapper {
     if (ssoId && Object.keys(ssoId).length) {
       userEntity.isSingleSignOn = true;
     }
+    if (ssoId?.subject) {
+      userEntity.isNoPasswordSSO = true;
+    }
 
     if (teamId && !userEntity.isFederated) {
       // To be in the same team, the user needs to have the same teamId and to be on the same domain (not federated)
