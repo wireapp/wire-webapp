@@ -19,10 +19,15 @@
 
 import type {AxiosRequestConfig} from 'axios';
 
-import type {HttpClient} from '../http/';
+import {HttpClient} from '../http/';
 import type {Notification, NotificationList} from './';
 
 export const NOTIFICATION_SIZE_MAXIMUM = 10000;
+
+type NotificationsReponse = {
+  notifications: Notification[];
+  missedNotification?: string;
+};
 
 export class NotificationAPI {
   constructor(private readonly client: HttpClient) {}
@@ -81,16 +86,31 @@ export class NotificationAPI {
    * @param lastNotificationId Only return notifications more recent than this
    * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/push/fetchNotifications
    */
-  public async getAllNotifications(clientId?: string, lastNotificationId?: string): Promise<Notification[]> {
+  public async getAllNotifications(clientId?: string, lastNotificationId?: string): Promise<NotificationsReponse> {
     let notificationList: Notification[] = [];
 
-    const getNotificationChunks = async (clientId?: string, lastNotificationId?: string): Promise<Notification[]> => {
-      const {notifications, has_more} = await this.getNotifications(
-        clientId,
-        NOTIFICATION_SIZE_MAXIMUM,
-        lastNotificationId,
-      );
+    const getNotificationChunks = async (
+      currentClientId?: string,
+      currentNotificationId?: string,
+    ): Promise<NotificationsReponse> => {
+      let payload: NotificationList = {
+        notifications: [],
+        time: '0',
+        has_more: false,
+      };
+      let hasMissedNotifications = false;
+      try {
+        payload = await this.getNotifications(currentClientId, NOTIFICATION_SIZE_MAXIMUM, currentNotificationId);
+      } catch (error) {
+        if (HttpClient.isAxiosError(error)) {
+          payload = error.response?.data?.notifications ? error.response.data : payload;
+          hasMissedNotifications = true;
+        } else {
+          throw error;
+        }
+      }
 
+      const {notifications, has_more} = payload;
       if (notifications.length) {
         notificationList = notificationList.concat(notifications);
       }
@@ -98,11 +118,14 @@ export class NotificationAPI {
       if (has_more) {
         const lastNotification = notifications[notifications.length - 1];
         if (lastNotification) {
-          return getNotificationChunks(clientId, lastNotification.id);
+          return getNotificationChunks(currentClientId, lastNotification.id);
         }
       }
 
-      return notificationList;
+      return {
+        notifications: notificationList,
+        missedNotification: hasMissedNotifications ? currentNotificationId : undefined,
+      };
     };
 
     return getNotificationChunks(clientId, lastNotificationId);
