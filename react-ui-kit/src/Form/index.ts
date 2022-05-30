@@ -32,3 +32,4 @@ export * from './ShakeBox';
 export * from './Switch';
 export * from './TextArea';
 export * from './Tooltip';
+export * from './InputLabel';

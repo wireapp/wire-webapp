@@ -4,7 +4,7 @@ Demo:
 import React from 'react';
 import {
   Container,
-  Label,
+  InputLabel,
   LabelLink,
   InputSubmitCombo,
   RoundIconButton,
@@ -16,48 +16,48 @@ import {
 } from '@wireapp/react-ui-kit';
 
 <Container>
-  <Label>Label</Label>
+  <InputLabel>InputLabel</InputLabel>
   <LabelLink block>LabelLink</LabelLink>
 
   <Line />
-  <Label>
+  <InputLabel>
     <div style={{marginLeft: '16px'}}>{"I'm a label!"}</div>
     <Input placeholder="Focus me!" />
-  </Label>
-  <Label markInvalid>
+  </InputLabel>
+  <InputLabel markInvalid>
     <div style={{marginLeft: '16px'}}>{'Uh error!'}</div>
     <Input placeholder="Error" markInvalid />
-  </Label>
+  </InputLabel>
 
-  <Label>
+  <InputLabel>
     <div style={{marginLeft: '16px'}}>{'TextArea!'}</div>
     <TextArea placeholder="Text" />
-  </Label>
+  </InputLabel>
 
-  <Label markInvalid>
+  <InputLabel markInvalid>
     <div style={{marginLeft: '16px'}}>{'Uh error!'}</div>
     <TextArea placeholder="Text" markInvalid />
-  </Label>
+  </InputLabel>
 
-  <Label>
+  <InputLabel>
     <div style={{marginLeft: '16px'}}>{'Select!'}</div>
     <Select>
       <option>a</option>
       <option>b</option>
       <option>c</option>
     </Select>
-  </Label>
+  </InputLabel>
 
-  <Label markInvalid>
+  <InputLabel markInvalid>
     <div style={{marginLeft: '16px'}}>{'Uh error!'}</div>
     <Select markInvalid>
       <option>a</option>
       <option>b</option>
       <option>c</option>
     </Select>
-  </Label>
+  </InputLabel>
 
-  <Label>
+  <InputLabel>
     <div style={{marginLeft: '16px'}}>{'SubmitCombo label'}</div>
     <InputSubmitCombo>
       <Input placeholder="Input submit Combo" name="password" />
@@ -65,9 +65,9 @@ import {
         <ArrowIcon />
       </RoundIconButton>
     </InputSubmitCombo>
-  </Label>
+  </InputLabel>
 
-  <Label markInvalid>
+  <InputLabel markInvalid>
     <div style={{marginLeft: '16px'}}>{'SubmitCombo label'}</div>
     <InputSubmitCombo markInvalid>
       <Input placeholder="Input submit Combo" name="password" />
@@ -75,6 +75,6 @@ import {
         <ArrowIcon />
       </RoundIconButton>
     </InputSubmitCombo>
-  </Label>
+  </InputLabel>
 </Container>;
 ```

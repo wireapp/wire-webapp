@@ -892,7 +892,7 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 
 ### Features
 
-* **react-ui-kit:** External Label ([#3113](https://github.com/wireapp/wire-web-packages/tree/main/packages/react-ui-kit/issues/3113)) ([44c0767](https://github.com/wireapp/wire-web-packages/tree/main/packages/react-ui-kit/commit/44c076733ff64be12a583b937265eda6724506a5))
+* **react-ui-kit:** External InputLabel ([#3113](https://github.com/wireapp/wire-web-packages/tree/main/packages/react-ui-kit/issues/3113)) ([44c0767](https://github.com/wireapp/wire-web-packages/tree/main/packages/react-ui-kit/commit/44c076733ff64be12a583b937265eda6724506a5))
 
 
 
@@ -4227,7 +4227,7 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 
 ### BREAKING CHANGES
 
-* **react-ui-kit:** H1: 
+* **react-ui-kit:** H1:
 - font size 40px -> 48px
 - line-height: 56px
 - margin-bottom: 64px
@@ -4235,7 +4235,7 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 - font-size 24px -> 40px
 - line-height: 32px -> 48px
 
-H2: 
+H2:
 - font-weight: 300 -> 700
 - line-height: 32px;
 - margin-bottom: 24px;

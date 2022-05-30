@@ -48,14 +48,14 @@ const shakeBox = useRef();
 
       <Input placeholder="InputBlock" label="Input Block" id="inputBlock" />
 
-      <Input placeholder="Input required" label="Second input required" isRequired id="requiredInputBlock" />
+      <Input placeholder="Input required" label="Second input required" required id="requiredInputBlock" />
 
       <Input
         placeholder="Error input"
         markInvalid
         label="Error input"
         error={<ErrorMessage>Error message</ErrorMessage>}
-        isRequired
+        required
         id="errorInputBlock"
       />
 
@@ -63,7 +63,7 @@ const shakeBox = useRef();
         type="password"
         placeholder="Password Input"
         label="Password Input"
-        isRequired
+        required
         id="passwordInput"
         helperText="Must have at least one: uppercase letter, lowercase letter, number, symbol"
       />

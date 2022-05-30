@@ -69,7 +69,7 @@ exports[`"TextArea" renders as disabled 1`] = `
 }
 
 .emotion-1 {
-  background: rgba(71, 73, 75, 0.16000000000000003);
+  background: #edeff0;
   border: none;
   border-radius: 4px;
   box-shadow: 0 0 0 1px #696c6e;
