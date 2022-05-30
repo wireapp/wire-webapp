@@ -189,8 +189,16 @@ export class EventRepository {
             }
           }
         },
-        onEvent: (payload, source) => {
-          this.handleEvent({...payload, event: payload.event as EventRecord}, source);
+        onEvent: async (payload, source) => {
+          try {
+            await this.handleEvent({...payload, event: payload.event as EventRecord}, source);
+          } catch (error) {
+            if (source === EventSource.NOTIFICATION_STREAM) {
+              this.logger.warn(`Failed to handle event of type "${event.type}": ${error.message}`, error);
+            } else {
+              throw error;
+            }
+          }
         },
         onNotificationStreamProgress,
       });
