@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [19.3.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/compare/@wireapp/api-client@19.2.5...@wireapp/api-client@19.3.0) (2022-05-30)
+
+
+### Features
+
+* Add missed notifications hook ([#4275](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/issues/4275)) ([f81217b](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/commit/f81217bad53fed2e4fb163c6ae871b39ca16cf58))
+
+
+
+
+
 ## [19.2.5](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/compare/@wireapp/api-client@19.2.4...@wireapp/api-client@19.2.5) (2022-05-30)
 
 **Note:** Version bump only for package @wireapp/api-client
