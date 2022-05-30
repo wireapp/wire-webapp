@@ -17,18 +17,13 @@
  *
  */
 
-import {MemoryEngine} from '@wireapp/store-engine';
-import {Cryptobox} from '@wireapp/cryptobox';
-import {Asset as ProtobufAsset, GenericMessage, Text} from '@wireapp/protocol-messaging';
-import {init as proteusInit, keys as ProteusKeys} from '@wireapp/proteus';
+import {Asset as ProtobufAsset} from '@wireapp/protocol-messaging';
 import {CONVERSATION_EVENT, USER_EVENT} from '@wireapp/api-client/src/event/';
-import {arrayToBase64, createRandomUuid} from 'Util/util';
-import {GENERIC_MESSAGE_TYPE} from 'src/script/cryptography/GenericMessageType';
+import {createRandomUuid} from 'Util/util';
 import {ClientEvent} from 'src/script/event/Client';
 import {NOTIFICATION_HANDLING_STATE} from 'src/script/event/NotificationHandlingState';
 import {EventRepository} from 'src/script/event/EventRepository';
 import {AssetTransferState} from 'src/script/assets/AssetTransferState';
-import {ClientEntity} from 'src/script/client/ClientEntity';
 import {EventError} from 'src/script/error/EventError';
 import {TestFactory} from '../../../test/helper/TestFactory';
 import {EventSource} from './EventSource';
@@ -38,49 +33,11 @@ import {StatusType} from '../message/StatusType';
 
 const testFactory = new TestFactory();
 
-async function createEncodedCiphertext(
-  preKey: ProteusKeys.PreKey,
-  text = 'Hello, World!',
-  receivingIdentity = testFactory.cryptography_repository.cryptobox.getIdentity(),
-) {
-  const bobEngine = new MemoryEngine();
-  await bobEngine.init('bob');
-
-  const sender = new Cryptobox(bobEngine, 1);
-  await sender.create();
-
-  const genericMessage = new GenericMessage({
-    [GENERIC_MESSAGE_TYPE.TEXT]: new Text({content: text}),
-    messageId: createRandomUuid(),
-  });
-
-  const sessionId = `from-${sender
-    .getIdentity()
-    .public_key.fingerprint()}-to-${preKey.key_pair.public_key.fingerprint()}`;
-  const preKeyBundle = new ProteusKeys.PreKeyBundle(receivingIdentity.public_key, preKey);
-
-  const cipherText = await sender.encrypt(
-    sessionId,
-    GenericMessage.encode(genericMessage).finish(),
-    preKeyBundle.serialise(),
-  );
-
-  return arrayToBase64(cipherText);
-}
-
-beforeAll(async () => {
-  await proteusInit();
-});
-
 describe('EventRepository', () => {
-  let last_notification_id: string;
-
   beforeAll(() => testFactory.exposeClientActors());
 
   beforeEach(() => {
-    return testFactory.exposeEventActors().then(event_repository => {
-      last_notification_id = undefined;
-    });
+    return testFactory.exposeEventActors();
   });
 
   describe('getCommonMessageUpdates', () => {
@@ -261,43 +218,6 @@ describe('EventRepository', () => {
         expect(testFactory.event_service.saveEvent).toHaveBeenCalled();
         expect(testFactory.event_repository['distributeEvent']).toHaveBeenCalled();
       });
-    });
-  });
-
-  describe('processEvent', () => {
-    it('processes OTR events', async () => {
-      const text = 'Hello, this is a test!';
-
-      // Create client for testing
-      const ownClientId = 'f180a823bf0d1204';
-      const client = new ClientEntity(false, null);
-      client.id = ownClientId;
-      testFactory.client_repository['clientState'].currentClient(client);
-
-      // Create Cryptobox for testing
-      const someEngine = new MemoryEngine();
-      await someEngine.init('someEngine');
-      const cryptobox = new Cryptobox(someEngine, 10);
-      const preKeys = await cryptobox.create();
-      testFactory.cryptography_repository.cryptobox = cryptobox;
-      testFactory.cryptography_repository['core'].service = {cryptography: {constructSessionId: jest.fn()}} as any;
-
-      const ciphertext = await createEncodedCiphertext(preKeys[0], text, cryptobox.getIdentity());
-      const event = {
-        conversation: 'fdc6cf1a-4e37-424e-a106-ab3d2cc5c8e0',
-        data: {
-          recipient: ownClientId,
-          sender: '4c28652a6dd21938',
-          text: ciphertext,
-        },
-        from: '6f88716b-1383-44da-9d57-45b51cc64d90',
-        time: '2018-07-10T14:54:21.621Z',
-        type: 'conversation.otr-message-add',
-      } as EventRecord;
-      const source = EventRepository.SOURCE.STREAM;
-      const messagePayload = await testFactory.event_repository['processEvent'](event, source);
-
-      expect(messagePayload.data.content).toBe(text);
     });
   });
 
