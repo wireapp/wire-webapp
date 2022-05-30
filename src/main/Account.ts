@@ -383,6 +383,7 @@ export class Account extends EventEmitter {
     await this.apiClient.logout();
     this.resetContext();
   }
+
   /**
    * Will download and handle the notification stream since last stored notification id.
    * Once the notification stream has been handled from backend, will then connect to the websocket and start listening to incoming events
@@ -395,6 +396,7 @@ export class Account extends EventEmitter {
     onConnected = () => {},
     onConnectionStateChanged = () => {},
     onNotificationStreamProgress = () => {},
+    onMissedNotifications = () => {},
   }: {
     /**
      * Called when a new event arrives from backend
@@ -417,6 +419,15 @@ export class Account extends EventEmitter {
      * called when the connection stateh with the backend has changed
      */
     onConnectionStateChanged?: (state: WEBSOCKET_STATE) => void;
+
+    /**
+     * called when we detect lost notification from backend.
+     * When a client doesn't log in for a while (28 days, as of now) notifications that are older than 28 days will be deleted from backend.
+     * If the client query the backend for the notifications since a particular notification ID and this ID doesn't exist anymore on the backend, we deduce that some messages were not sync before they were removed from backend.
+     * We can then detect that something was wrong and warn the consumer that there might be some missing old messages
+     * @param  {string} notificationId
+     */
+    onMissedNotifications?: (notificationId: string) => void;
   } = {}): Promise<() => void> {
     if (!this.apiClient.context) {
       throw new Error('Context is not set - please login first');
@@ -462,7 +473,7 @@ export class Account extends EventEmitter {
       await this.service!.notification.handleNotificationStream(async (notification, source, progress) => {
         await handleNotification(notification, source);
         onNotificationStreamProgress(progress);
-      });
+      }, onMissedNotifications);
       onConnected();
     };
     await this.apiClient.connect(onBeforeConnect);

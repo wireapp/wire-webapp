@@ -73,7 +73,7 @@ export class NotificationService extends EventEmitter {
     this.database = new NotificationDatabaseRepository(storeEngine);
   }
 
-  private async getAllNotifications(): Promise<Notification[]> {
+  private async getAllNotifications() {
     const clientId = this.apiClient.clientId;
     const lastNotificationId = await this.database.getLastNotificationId();
     return this.backend.getAllNotifications(clientId, lastNotificationId);
@@ -122,8 +122,15 @@ export class NotificationService extends EventEmitter {
     return this.database.updateLastNotificationId(lastNotification);
   }
 
-  public async handleNotificationStream(notificationHandler: NotificationHandler): Promise<void> {
-    const notifications = await this.getAllNotifications();
+  public async handleNotificationStream(
+    notificationHandler: NotificationHandler,
+    onMissedNotifications: (notificationId: string) => void,
+  ): Promise<void> {
+    const {notifications, missedNotification} = await this.getAllNotifications();
+    if (missedNotification) {
+      onMissedNotifications(missedNotification);
+    }
+
     for (const [index, notification] of notifications.entries()) {
       await notificationHandler(notification, PayloadBundleSource.NOTIFICATION_STREAM, {
         done: index + 1,
