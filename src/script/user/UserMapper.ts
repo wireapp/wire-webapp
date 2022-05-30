@@ -184,7 +184,7 @@ export class UserMapper {
       userEntity.serviceId = service.id;
     }
 
-    if (ssoId && Object.keys(ssoId).length) {
+    if (ssoId && ssoId.subject) {
       userEntity.isSingleSignOn = true;
     }
 
