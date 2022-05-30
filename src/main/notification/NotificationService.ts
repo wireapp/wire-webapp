@@ -26,52 +26,31 @@ import logdown from 'logdown';
 import {PayloadBundle, PayloadBundleSource, PayloadBundleType} from '../conversation';
 import type {AssetContent} from '../conversation/content';
 import {ConversationMapper} from '../conversation/ConversationMapper';
-import * as OtrMessage from '../conversation/message/OtrMessage';
-import * as UserMessage from '../conversation/message/UserMessage';
 import {CoreError, NotificationError} from '../CoreError';
-import type {CryptographyService} from '../cryptography';
+import type {CryptographyService, DecryptionError} from '../cryptography';
 import {UserMapper} from '../user/UserMapper';
 import {NotificationBackendRepository} from './NotificationBackendRepository';
 import {NotificationDatabaseRepository} from './NotificationDatabaseRepository';
+import {GenericMessage} from '@wireapp/protocol-messaging';
+
+export type HandledEventPayload = {
+  event: Events.BackendEvent;
+  mappedEvent?: PayloadBundle;
+  decryptedData?: GenericMessage;
+  decryptionError?: {code: number; message: string};
+};
 
 enum TOPIC {
   NOTIFICATION_ERROR = 'NotificationService.TOPIC.NOTIFICATION_ERROR',
 }
 
-export type NotificationHandler = (notification: Notification, source: PayloadBundleSource) => Promise<void>;
+export type NotificationHandler = (
+  notification: Notification,
+  source: PayloadBundleSource,
+  progress: {done: number; total: number},
+) => Promise<void>;
 
 export interface NotificationService {
-  on(event: PayloadBundleType.ASSET, listener: (payload: OtrMessage.FileAssetMessage) => void): this;
-  on(event: PayloadBundleType.BUTTON_ACTION, listener: (payload: OtrMessage.ButtonActionMessage) => void): this;
-  on(event: PayloadBundleType.ASSET_ABORT, listener: (payload: OtrMessage.FileAssetAbortMessage) => void): this;
-  on(event: PayloadBundleType.ASSET_IMAGE, listener: (payload: OtrMessage.ImageAssetMessage) => void): this;
-  on(event: PayloadBundleType.ASSET_META, listener: (payload: OtrMessage.FileAssetMetaDataMessage) => void): this;
-  on(event: PayloadBundleType.CALL, listener: (payload: OtrMessage.CallMessage) => void): this;
-  on(event: PayloadBundleType.CLIENT_ACTION, listener: (payload: OtrMessage.ResetSessionMessage) => void): this;
-  on(event: PayloadBundleType.CLIENT_ADD, listener: (payload: UserMessage.UserClientAddMessage) => void): this;
-  on(event: PayloadBundleType.CLIENT_REMOVE, listener: (payload: UserMessage.UserClientRemoveMessage) => void): this;
-  on(event: PayloadBundleType.CONFIRMATION, listener: (payload: OtrMessage.ConfirmationMessage) => void): this;
-  on(event: PayloadBundleType.CONNECTION_REQUEST, listener: (payload: UserMessage.UserConnectionMessage) => void): this;
-  on(event: PayloadBundleType.USER_UPDATE, listener: (payload: UserMessage.UserUpdateMessage) => void): this;
-  on(
-    event: PayloadBundleType.CONVERSATION_CLEAR,
-    listener: (payload: OtrMessage.ClearConversationMessage) => void,
-  ): this;
-  on(event: PayloadBundleType.CONVERSATION_RENAME, listener: (payload: Events.ConversationRenameEvent) => void): this;
-  on(event: PayloadBundleType.LOCATION, listener: (payload: OtrMessage.LocationMessage) => void): this;
-  on(event: PayloadBundleType.MEMBER_JOIN, listener: (payload: Events.TeamMemberJoinEvent) => void): this;
-  on(event: PayloadBundleType.MESSAGE_DELETE, listener: (payload: OtrMessage.DeleteMessage) => void): this;
-  on(event: PayloadBundleType.MESSAGE_EDIT, listener: (payload: OtrMessage.EditedTextMessage) => void): this;
-  on(event: PayloadBundleType.MESSAGE_HIDE, listener: (payload: OtrMessage.HideMessage) => void): this;
-  on(event: PayloadBundleType.PING, listener: (payload: OtrMessage.PingMessage) => void): this;
-  on(event: PayloadBundleType.REACTION, listener: (payload: OtrMessage.ReactionMessage) => void): this;
-  on(event: PayloadBundleType.TEXT, listener: (payload: OtrMessage.TextMessage) => void): this;
-  on(
-    event: PayloadBundleType.TIMER_UPDATE,
-    listener: (payload: Events.ConversationMessageTimerUpdateEvent) => void,
-  ): this;
-  on(event: PayloadBundleType.TYPING, listener: (payload: Events.ConversationTypingEvent) => void): this;
-  on(event: PayloadBundleType.UNKNOWN, listener: (payload: any) => void): this;
   on(event: TOPIC.NOTIFICATION_ERROR, listener: (payload: NotificationError) => void): this;
 }
 
@@ -94,7 +73,7 @@ export class NotificationService extends EventEmitter {
     this.database = new NotificationDatabaseRepository(storeEngine);
   }
 
-  public async getAllNotifications(): Promise<Notification[]> {
+  private async getAllNotifications(): Promise<Notification[]> {
     const clientId = this.apiClient.clientId;
     const lastNotificationId = await this.database.getLastNotificationId();
     return this.backend.getAllNotifications(clientId, lastNotificationId);
@@ -145,26 +124,30 @@ export class NotificationService extends EventEmitter {
 
   public async handleNotificationStream(notificationHandler: NotificationHandler): Promise<void> {
     const notifications = await this.getAllNotifications();
-    for (const notification of notifications) {
-      await notificationHandler(notification, PayloadBundleSource.NOTIFICATION_STREAM).catch(error =>
-        this.logger.error(error),
-      );
+    for (const [index, notification] of notifications.entries()) {
+      await notificationHandler(notification, PayloadBundleSource.NOTIFICATION_STREAM, {
+        done: index + 1,
+        total: notifications.length,
+      }).catch(error => this.logger.error(error));
     }
   }
 
-  public readonly handleNotification: NotificationHandler = async (
+  public async *handleNotification(
     notification: Notification,
     source: PayloadBundleSource,
-  ): Promise<void> => {
+  ): AsyncGenerator<HandledEventPayload> {
     for (const event of notification.payload) {
-      let data: PayloadBundle | void;
-
+      this.logger.log(`Handling event of type "${event.type}" for notification with ID "${notification.id}"`, event);
       try {
-        this.logger.log(`Handling event of type "${event.type}" for notification with ID "${notification.id}"`, event);
-        data = await this.handleEvent(event, source);
+        const data = await this.handleEvent(event, source);
         if (!notification.transient) {
+          // keep track of the last handled notification for next time we fetch the notification stream
           await this.setLastNotificationId(notification);
         }
+        yield {
+          ...data,
+          mappedEvent: data.mappedEvent ? this.cleanupPayloadBundle(data.mappedEvent) : undefined,
+        };
       } catch (error) {
         this.logger.error(
           `There was an error with notification ID "${notification.id}": ${(error as Error).message}`,
@@ -176,68 +159,47 @@ export class NotificationService extends EventEmitter {
           type: CoreError.NOTIFICATION_ERROR,
         };
         this.emit(NotificationService.TOPIC.NOTIFICATION_ERROR, notificationError);
-        continue;
-      }
-
-      if (data) {
-        switch (data.type) {
-          case PayloadBundleType.ASSET_IMAGE:
-          case PayloadBundleType.BUTTON_ACTION:
-          case PayloadBundleType.CALL:
-          case PayloadBundleType.CLIENT_ACTION:
-          case PayloadBundleType.CLIENT_ADD:
-          case PayloadBundleType.CLIENT_REMOVE:
-          case PayloadBundleType.CONFIRMATION:
-          case PayloadBundleType.CONNECTION_REQUEST:
-          case PayloadBundleType.LOCATION:
-          case PayloadBundleType.MESSAGE_DELETE:
-          case PayloadBundleType.MESSAGE_EDIT:
-          case PayloadBundleType.MESSAGE_HIDE:
-          case PayloadBundleType.PING:
-          case PayloadBundleType.REACTION:
-          case PayloadBundleType.TEXT:
-          case PayloadBundleType.USER_UPDATE:
-            this.emit(data.type, data);
-            break;
-          case PayloadBundleType.ASSET: {
-            const assetContent = data.content as AssetContent;
-            const isMetaData = !!assetContent && !!assetContent.original && !assetContent.uploaded;
-            const isAbort = !!assetContent.abortReason || (!assetContent.original && !assetContent.uploaded);
-
-            if (isMetaData) {
-              data.type = PayloadBundleType.ASSET_META;
-              this.emit(PayloadBundleType.ASSET_META, data);
-            } else if (isAbort) {
-              data.type = PayloadBundleType.ASSET_ABORT;
-              this.emit(PayloadBundleType.ASSET_ABORT, data);
-            } else {
-              this.emit(PayloadBundleType.ASSET, data);
-            }
-            break;
-          }
-          case PayloadBundleType.TIMER_UPDATE:
-          case PayloadBundleType.CONVERSATION_RENAME:
-          case PayloadBundleType.CONVERSATION_CLEAR:
-          case PayloadBundleType.MEMBER_JOIN:
-          case PayloadBundleType.TYPING:
-            this.emit(data.type, event);
-            break;
-        }
-      } else {
-        const {type, conversation, from} = event as Events.ConversationEvent;
-        const conversationText = conversation ? ` in conversation "${conversation}"` : '';
-        const fromText = from ? ` from user "${from}".` : '';
-
-        this.logger.log(`Received unsupported event "${type}"${conversationText}${fromText}`, {event});
       }
     }
-  };
+    if (!notification.transient) {
+      // keep track of the last handled notification for next time we fetch the notification stream
+      await this.setLastNotificationId(notification);
+    }
+  }
 
-  private async handleEvent(event: Events.BackendEvent, source: PayloadBundleSource): Promise<PayloadBundle | void> {
+  private cleanupPayloadBundle(payload: PayloadBundle): PayloadBundle {
+    switch (payload.type) {
+      case PayloadBundleType.ASSET: {
+        const assetContent = payload.content as AssetContent;
+        const isMetaData = !!assetContent?.original && !assetContent?.uploaded;
+        const isAbort = !!assetContent.abortReason || (!assetContent.original && !assetContent.uploaded);
+
+        if (isMetaData) {
+          payload.type = PayloadBundleType.ASSET_META;
+        } else if (isAbort) {
+          payload.type = PayloadBundleType.ASSET_ABORT;
+        }
+        return payload;
+      }
+      default:
+        return payload;
+    }
+  }
+
+  private async handleEvent(event: Events.BackendEvent, source: PayloadBundleSource): Promise<HandledEventPayload> {
     switch (event.type) {
       // Encrypted events
       case Events.CONVERSATION_EVENT.OTR_MESSAGE_ADD: {
-        return this.cryptographyService.decodeGenericMessage(event, source);
+        try {
+          const decryptedData = await this.cryptographyService.decryptMessage(event);
+          return {
+            mappedEvent: this.cryptographyService.mapGenericMessage(event, decryptedData, source),
+            event,
+            decryptedData,
+          };
+        } catch (error) {
+          return {event, decryptionError: error as DecryptionError};
+        }
       }
       // Meta events
       case Events.CONVERSATION_EVENT.MEMBER_JOIN:
@@ -246,15 +208,16 @@ export class NotificationService extends EventEmitter {
       case Events.CONVERSATION_EVENT.TYPING: {
         const {conversation, from} = event;
         const metaEvent = {...event, conversation, from};
-        return ConversationMapper.mapConversationEvent(metaEvent, source);
+        return {mappedEvent: ConversationMapper.mapConversationEvent(metaEvent, source), event};
       }
       // User events
       case Events.USER_EVENT.CONNECTION:
       case Events.USER_EVENT.CLIENT_ADD:
       case Events.USER_EVENT.UPDATE:
       case Events.USER_EVENT.CLIENT_REMOVE: {
-        return UserMapper.mapUserEvent(event, this.apiClient.context!.userId, source);
+        return {mappedEvent: UserMapper.mapUserEvent(event, this.apiClient.context!.userId, source), event};
       }
     }
+    return {event};
   }
 }

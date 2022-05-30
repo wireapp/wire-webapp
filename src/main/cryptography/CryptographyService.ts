@@ -30,7 +30,7 @@ import type {
 import type {ConversationOtrMessageAddEvent} from '@wireapp/api-client/src/event';
 import type {QualifiedId, QualifiedUserPreKeyBundleMap, UserPreKeyBundleMap} from '@wireapp/api-client/src/user/';
 import {Cryptobox} from '@wireapp/cryptobox';
-import {keys as ProteusKeys} from '@wireapp/proteus';
+import {errors as ProteusErrors, keys as ProteusKeys} from '@wireapp/proteus';
 import {GenericMessage} from '@wireapp/protocol-messaging';
 import type {CRUDEngine} from '@wireapp/store-engine';
 import {Decoder, Encoder} from 'bazinga64';
@@ -41,6 +41,8 @@ import type {SessionPayloadBundle} from '../cryptography/';
 import {isUserClients} from '../util';
 import {CryptographyDatabaseRepository} from './CryptographyDatabaseRepository';
 import {GenericMessageMapper} from './GenericMessageMapper';
+
+export type DecryptionError = {code: number; message: string};
 
 export interface MetaClient extends RegisteredClient {
   meta: {
@@ -211,10 +213,7 @@ export class CryptographyService {
     this.logger.log(`Deleted session ID "${sessionId}".`);
   }
 
-  public async decodeGenericMessage(
-    otrMessage: ConversationOtrMessageAddEvent,
-    source: PayloadBundleSource,
-  ): Promise<PayloadBundle> {
+  public async decryptMessage(otrMessage: ConversationOtrMessageAddEvent): Promise<GenericMessage> {
     const {
       from,
       qualified_from,
@@ -222,9 +221,19 @@ export class CryptographyService {
     } = otrMessage;
 
     const sessionId = this.constructSessionId(from, sender, qualified_from?.domain);
-    const decryptedMessage = await this.decrypt(sessionId, cipherText);
-    const genericMessage = GenericMessage.decode(decryptedMessage);
+    try {
+      const decryptedMessage = await this.decrypt(sessionId, cipherText);
+      return GenericMessage.decode(decryptedMessage);
+    } catch (error) {
+      throw this.generateDecryptionError(otrMessage, error as ProteusErrors.DecodeError);
+    }
+  }
 
+  public mapGenericMessage(
+    otrMessage: ConversationOtrMessageAddEvent,
+    genericMessage: GenericMessage,
+    source: PayloadBundleSource,
+  ): PayloadBundle {
     if (genericMessage.content === GenericMessageType.EPHEMERAL) {
       const unwrappedMessage = GenericMessageMapper.mapGenericMessage(genericMessage.ephemeral, otrMessage, source);
       unwrappedMessage.id = genericMessage.messageId;
@@ -236,5 +245,39 @@ export class CryptographyService {
       return unwrappedMessage;
     }
     return GenericMessageMapper.mapGenericMessage(genericMessage, otrMessage, source);
+  }
+
+  private generateDecryptionError(
+    event: ConversationOtrMessageAddEvent,
+    error: ProteusErrors.DecryptError,
+  ): DecryptionError {
+    const errorCode = error.code ?? 999;
+    let message = 'Unknown decryption error';
+
+    const {data: eventData, from: remoteUserId, time: formattedTime} = event;
+    const remoteClientId = eventData.sender;
+
+    const isDuplicateMessage = error instanceof ProteusErrors.DecryptError.DuplicateMessage;
+    const isOutdatedMessage = error instanceof ProteusErrors.DecryptError.OutdatedMessage;
+    // We don't need to show these message errors to the user
+    if (isDuplicateMessage || isOutdatedMessage) {
+      message = `Message from user ID "${remoteUserId}" at "${formattedTime}" will not be handled because it is outdated or a duplicate.`;
+    }
+
+    const isInvalidMessage = error instanceof ProteusErrors.DecryptError.InvalidMessage;
+    const isInvalidSignature = error instanceof ProteusErrors.DecryptError.InvalidSignature;
+    const isRemoteIdentityChanged = error instanceof ProteusErrors.DecryptError.RemoteIdentityChanged;
+    // Session is broken, let's see what's really causing it...
+    if (isInvalidMessage || isInvalidSignature) {
+      message = `Session with user '${remoteUserId}' (${remoteClientId}) is broken.\nReset the session for possible fix.`;
+    } else if (isRemoteIdentityChanged) {
+      message = `Remote identity of client '${remoteClientId}' from user '${remoteUserId}' changed`;
+    }
+
+    this.logger.warn(
+      `Failed to decrypt event from client '${remoteClientId}' of user '${remoteUserId}' (${formattedTime}).\nError Code: '${errorCode}'\nError Message: ${error.message}`,
+      error,
+    );
+    return {code: errorCode, message};
   }
 }

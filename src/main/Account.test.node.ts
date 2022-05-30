@@ -24,14 +24,15 @@ import {ClientAPI, ClientType, RegisteredClient} from '@wireapp/api-client/src/c
 import {Self, SelfAPI} from '@wireapp/api-client/src/self';
 import {ConversationAPI} from '@wireapp/api-client/src/conversation';
 import {BackendError, BackendErrorLabel} from '@wireapp/api-client/src/http';
-import {Notification, NotificationAPI} from '@wireapp/api-client/src/notification';
+import {NotificationAPI} from '@wireapp/api-client/src/notification';
 import {AccentColor, ValidationUtil} from '@wireapp/commons';
 import {GenericMessage, Text} from '@wireapp/protocol-messaging';
 import * as Proteus from '@wireapp/proteus';
 import nock = require('nock');
 import {Account} from './Account';
-import {PayloadBundleSource, PayloadBundleType} from './conversation';
+import {PayloadBundleType} from './conversation';
 import {MessageBuilder} from './conversation/message/MessageBuilder';
+import {WebSocketClient} from '@wireapp/api-client/src/tcp';
 
 const BASE_URL = 'mock-backend.wire.com';
 const MOCK_BACKEND = {
@@ -219,21 +220,14 @@ describe('Account', () => {
 
     await account.listen();
 
-    spyOn<any>(account.service!.notification, 'handleEvent').and.returnValue({type: PayloadBundleType.TEXT});
-    account.service!.notification.on(PayloadBundleType.TEXT, message => {
-      expect(message.type).toBe(PayloadBundleType.TEXT);
+    spyOn<any>(account.service!.notification, 'handleEvent').and.returnValue({
+      mappedEvent: {type: PayloadBundleType.TEXT},
     });
     account.on(PayloadBundleType.TEXT, message => {
       expect(message.type).toBe(PayloadBundleType.TEXT);
       done();
     });
 
-    await account.service!.notification.handleNotification(
-      {
-        payload: [{}],
-        transient: true,
-      } as unknown as Notification,
-      PayloadBundleSource.WEBSOCKET,
-    );
+    account.service!.notification['apiClient'].transport.ws.emit(WebSocketClient.TOPIC.ON_MESSAGE, {payload: [{}]});
   });
 });
