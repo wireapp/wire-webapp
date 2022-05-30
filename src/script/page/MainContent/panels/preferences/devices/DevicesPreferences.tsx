@@ -105,7 +105,7 @@ const DevicesPreferences: React.FC<DevicesPreferencesProps> = ({
   const [selectedDevice, setSelectedDevice] = useState<ClientEntity | undefined>();
   const {clients, currentClient} = useKoSubscribableChildren(clientState, ['clients', 'currentClient']);
   const {self} = useKoSubscribableChildren(userState, ['self']);
-  const isSSO = self?.isSingleSignOn;
+  const isSSO = self?.isNoPasswordSSO;
   const [scrollbarRef, setScrollbarRef] = useEffectRef<HTMLDivElement>();
   const getFingerprint = (device: ClientEntity) =>
     cryptographyRepository.getRemoteFingerprint(self.qualifiedId, device.id);
