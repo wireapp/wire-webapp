@@ -21,13 +21,10 @@ import type {NotificationList} from '@wireapp/api-client/src/notification/';
 import {DatabaseKeys} from '@wireapp/core/src/main/notification/NotificationDatabaseRepository';
 import {container} from 'tsyringe';
 
-import {Logger, getLogger} from 'Util/Logger';
-
 import {StorageSchemata, StorageService} from '../storage/';
 import {APIClient} from '../service/APIClientSingleton';
 
 export class NotificationService {
-  private readonly logger: Logger;
   private readonly AMPLIFY_STORE_NAME: string;
 
   static get CONFIG() {
@@ -42,7 +39,6 @@ export class NotificationService {
     private readonly storageService = container.resolve(StorageService),
     private readonly apiClient = container.resolve(APIClient),
   ) {
-    this.logger = getLogger('NotificationService');
     this.AMPLIFY_STORE_NAME = StorageSchemata.OBJECT_STORE.AMPLIFY;
   }
 
