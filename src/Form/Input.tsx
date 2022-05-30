@@ -27,10 +27,10 @@ import type {Theme} from '../Layout';
 import type {TextProps} from '../Text';
 import {filterProps} from '../util';
 import {ErrorIcon, HideIcon, ShowIcon} from '../Icon';
+import InputLabel from './InputLabel';
 
 export interface InputProps<T = HTMLInputElement> extends TextProps<T> {
   label?: string;
-  isRequired?: boolean;
   error?: ReactElement;
   markInvalid?: boolean;
   helperText?: string;
@@ -69,7 +69,7 @@ export const inputStyle: <T>(theme: Theme, props: InputProps<T>, hasError?: bool
     background: disabled ? theme.Input.backgroundColorDisabled : theme.Input.backgroundColor,
     border: 'none',
     borderRadius: '4px',
-    boxShadow: markInvalid ? `0 0 0 1px ${COLOR_V2.RED}` : `0 0 0 1px ${COLOR_V2.GRAY}`,
+    boxShadow: markInvalid ? `0 0 0 1px ${COLOR_V2.RED}` : `0 0 0 1px ${COLOR_V2.GRAY_40}`,
     caretColor: COLOR_V2.BLUE,
     color: theme.general.color,
     fontWeight: 300,
@@ -96,7 +96,7 @@ const centerInputAction: CSSObject = {
 export const Input: React.FC<InputProps<HTMLInputElement>> = React.forwardRef<
   HTMLInputElement,
   InputProps<HTMLInputElement>
->(({type, label, isRequired, error, helperText, ...props}, ref) => {
+>(({type, label, error, helperText, ...props}, ref) => {
   const [togglePassword, setTogglePassword] = useState<boolean>(false);
 
   const hasError = !!error;
@@ -116,18 +116,9 @@ export const Input: React.FC<InputProps<HTMLInputElement>> = React.forwardRef<
       }}
     >
       {label && (
-        <label
-          htmlFor={props.id}
-          css={{
-            fontSize: '14px',
-            fontWeight: 400,
-            lineHeight: '16px',
-            color: props.markInvalid ? COLOR_V2.RED_LIGHT_500 : COLOR_V2.GRAY_80,
-          }}
-        >
+        <InputLabel htmlFor={props.id} isRequired={props.required} markInvalid={props.markInvalid}>
           {label}
-          {isRequired && <span css={{fontSize: '16px', marginLeft: '4px', color: COLOR_V2.RED_LIGHT_500}}>*</span>}
-        </label>
+        </InputLabel>
       )}
 
       <div css={{marginBottom: hasError && '8px', position: 'relative'}}>
@@ -136,7 +127,7 @@ export const Input: React.FC<InputProps<HTMLInputElement>> = React.forwardRef<
           css={(theme: Theme) => inputStyle(theme, props, hasError)}
           ref={ref}
           type={isPasswordInput ? toggledPasswordType : type}
-          aria-required={isRequired}
+          aria-required={props.required}
           {...filterInputProps(props)}
         />
 
@@ -149,6 +140,7 @@ export const Input: React.FC<InputProps<HTMLInputElement>> = React.forwardRef<
             type="button"
             css={{...centerInputAction, background: 'transparent', border: 'none', cursor: 'pointer', padding: 0}}
             onClick={toggleSetPassword}
+            title="Toggle password visibility"
             aria-controls={props.id}
             aria-expanded={togglePassword}
           >

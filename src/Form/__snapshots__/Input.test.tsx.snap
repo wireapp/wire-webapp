@@ -23,7 +23,7 @@ exports[`"Input" renders 1`] = `
   background: #fff;
   border: none;
   border-radius: 4px;
-  box-shadow: 0 0 0 1px undefined;
+  box-shadow: 0 0 0 1px #dce0e3;
   caret-color: #0667c8;
   color: rgb(29, 30, 31);
   font-weight: 300;
@@ -98,10 +98,10 @@ exports[`"Input" renders as disabled 1`] = `
 }
 
 .emotion-3 {
-  background: rgba(71, 73, 75, 0.16000000000000003);
+  background: #edeff0;
   border: none;
   border-radius: 4px;
-  box-shadow: 0 0 0 1px undefined;
+  box-shadow: 0 0 0 1px #dce0e3;
   caret-color: #0667c8;
   color: rgb(29, 30, 31);
   font-weight: 300;
@@ -254,7 +254,7 @@ exports[`"Input" renders with placeholderTextTransform 1`] = `
   background: #fff;
   border: none;
   border-radius: 4px;
-  box-shadow: 0 0 0 1px undefined;
+  box-shadow: 0 0 0 1px #dce0e3;
   caret-color: #0667c8;
   color: rgb(29, 30, 31);
   font-weight: 300;

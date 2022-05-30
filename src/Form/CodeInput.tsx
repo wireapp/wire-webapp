@@ -24,6 +24,7 @@ import React, {useEffect, useState} from 'react';
 import type {Theme} from '../Layout';
 import {noop} from '../util';
 import {InputProps, inputStyle} from './Input';
+import {COLOR_V2} from '../Identity';
 
 const CodeInputWrapper = (props: React.HTMLProps<HTMLDivElement>) => (
   <div
@@ -42,11 +43,15 @@ const digitInputStyle: <T>(theme: Theme, props: DigitInputProps<T>) => CSSObject
   '& + &': {
     marginLeft: '19px',
   },
-  fontSize: '32px',
-  lineHeight: '56px',
+  '&:hover': {
+    boxShadow: `0 0 0 1px ${COLOR_V2.GRAY_60}`,
+  },
+  fontSize: '24px',
+  lineHeight: '28px',
   padding: 0,
   textAlign: 'center',
   width: '48px',
+  height: '56px',
 });
 
 const DigitInput: React.FC<DigitInputProps<HTMLInputElement>> = React.forwardRef<
