@@ -122,19 +122,6 @@ export class EventRepository {
     this.eventProcessMiddlewares = [];
   }
 
-  public watchNetworkStatus() {
-    window.addEventListener('online', () => {
-      this.logger.info('Internet connection regained. Re-establishing WebSocket connection...');
-      // this.connectWebSocket();
-    });
-
-    window.addEventListener('offline', () => {
-      this.logger.warn('Internet connection lost');
-      this.disconnectWebSocket();
-      amplify.publish(WebAppEvents.WARNING.SHOW, Warnings.TYPE.NO_INTERNET);
-    });
-  }
-
   /**
    * Will set a middleware to run before the EventRepository actually processes the event.
    * Middleware is just a function with the following signature (Event) => Promise<Event>.
@@ -161,53 +148,68 @@ export class EventRepository {
     onNotificationStreamProgress: (progress: {done: number; total: number}) => void,
   ): Promise<void> {
     await this.handleTimeDrift();
-    this.notificationHandlingState(NOTIFICATION_HANDLING_STATE.STREAM);
-    return new Promise(async resolve => {
-      this.disconnectWebSocket = await account.listen({
-        onConnected: () => {
-          this.notificationHandlingState(NOTIFICATION_HANDLING_STATE.WEB_SOCKET);
-          amplify.publish(WebAppEvents.WARNING.DISMISS, Warnings.TYPE.CONNECTIVITY_RECOVERY);
-          resolve();
-        },
-        onConnectionStateChanged: state => {
-          switch (state) {
-            case WEBSOCKET_STATE.CONNECTING: {
-              amplify.publish(WebAppEvents.WARNING.DISMISS, Warnings.TYPE.NO_INTERNET);
-              amplify.publish(WebAppEvents.WARNING.SHOW, Warnings.TYPE.CONNECTIVITY_RECONNECT);
-              return;
+    const connect = () => {
+      this.notificationHandlingState(NOTIFICATION_HANDLING_STATE.STREAM);
+      return new Promise<void>(async resolve => {
+        this.disconnectWebSocket = await account.listen({
+          onConnected: () => {
+            this.notificationHandlingState(NOTIFICATION_HANDLING_STATE.WEB_SOCKET);
+            amplify.publish(WebAppEvents.WARNING.DISMISS, Warnings.TYPE.CONNECTIVITY_RECOVERY);
+            amplify.publish(WebAppEvents.WARNING.DISMISS, Warnings.TYPE.NO_INTERNET);
+            resolve();
+          },
+          onConnectionStateChanged: state => {
+            switch (state) {
+              case WEBSOCKET_STATE.CONNECTING: {
+                amplify.publish(WebAppEvents.WARNING.DISMISS, Warnings.TYPE.NO_INTERNET);
+                amplify.publish(WebAppEvents.WARNING.SHOW, Warnings.TYPE.CONNECTIVITY_RECONNECT);
+                return;
+              }
+              case WEBSOCKET_STATE.CLOSING: {
+                return;
+              }
+              case WEBSOCKET_STATE.CLOSED: {
+                amplify.publish(WebAppEvents.WARNING.SHOW, Warnings.TYPE.NO_INTERNET);
+                return;
+              }
+              case WEBSOCKET_STATE.OPEN: {
+                amplify.publish(WebAppEvents.CONNECTION.ONLINE);
+                amplify.publish(WebAppEvents.WARNING.DISMISS, Warnings.TYPE.NO_INTERNET);
+                amplify.publish(WebAppEvents.WARNING.DISMISS, Warnings.TYPE.CONNECTIVITY_RECONNECT);
+              }
             }
-            case WEBSOCKET_STATE.CLOSING: {
-              return;
+          },
+          onEvent: async (payload, source) => {
+            try {
+              await this.handleEvent({...payload, event: payload.event as EventRecord}, source);
+            } catch (error) {
+              if (source === EventSource.NOTIFICATION_STREAM) {
+                this.logger.warn(`Failed to handle event of type "${event.type}": ${error.message}`, error);
+              } else {
+                throw error;
+              }
             }
-            case WEBSOCKET_STATE.CLOSED: {
-              amplify.publish(WebAppEvents.WARNING.SHOW, Warnings.TYPE.NO_INTERNET);
-              return;
-            }
-            case WEBSOCKET_STATE.OPEN: {
-              amplify.publish(WebAppEvents.CONNECTION.ONLINE);
-              amplify.publish(WebAppEvents.WARNING.DISMISS, Warnings.TYPE.NO_INTERNET);
-              amplify.publish(WebAppEvents.WARNING.DISMISS, Warnings.TYPE.CONNECTIVITY_RECONNECT);
-            }
-          }
-        },
-        onEvent: async (payload, source) => {
-          try {
-            await this.handleEvent({...payload, event: payload.event as EventRecord}, source);
-          } catch (error) {
-            if (source === EventSource.NOTIFICATION_STREAM) {
-              this.logger.warn(`Failed to handle event of type "${event.type}": ${error.message}`, error);
-            } else {
-              throw error;
-            }
-          }
-        },
-        onMissedNotifications: notificationId => this.triggerMissedSystemEventMessageRendering(notificationId),
-        onNotificationStreamProgress: ({done, total}) => {
-          amplify.publish(WebAppEvents.WARNING.SHOW, Warnings.TYPE.CONNECTIVITY_RECOVERY);
-          onNotificationStreamProgress({done, total});
-        },
+          },
+          onMissedNotifications: notificationId => this.triggerMissedSystemEventMessageRendering(notificationId),
+          onNotificationStreamProgress: ({done, total}) => {
+            amplify.publish(WebAppEvents.WARNING.SHOW, Warnings.TYPE.CONNECTIVITY_RECOVERY);
+            onNotificationStreamProgress({done, total});
+          },
+        });
       });
+    };
+
+    window.addEventListener('online', () => {
+      this.logger.info('Internet connection regained. Re-establishing WebSocket connection...');
+      connect();
     });
+
+    window.addEventListener('offline', () => {
+      this.logger.warn('Internet connection lost');
+      this.disconnectWebSocket();
+      amplify.publish(WebAppEvents.WARNING.SHOW, Warnings.TYPE.NO_INTERNET);
+    });
+    return connect();
   }
 
   /**

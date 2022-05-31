@@ -448,7 +448,6 @@ class App {
       await eventRepository.connectWebSocket(this.core, ({done, total}) => {
         loadingView.updateProgress(25 + 50 * (done / total), t('initDecryption'), {handled: done, total});
       });
-      eventRepository.watchNetworkStatus();
       const notificationsCount = eventRepository.notificationsTotal;
 
       telemetry.timeStep(AppInitTimingsStep.UPDATED_FROM_NOTIFICATIONS);
