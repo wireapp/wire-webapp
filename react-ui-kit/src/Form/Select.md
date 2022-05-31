@@ -4,17 +4,25 @@ Demo:
 import {Fragment} from 'react';
 import {Columns, Column, ErrorMessage, Select} from '@wireapp/react-ui-kit';
 
+const options = [
+  {value: '1', label: 'Option 1'},
+  {value: '2', label: 'Option 2'},
+  {value: '3', label: 'Option 3'},
+];
+
 <Fragment>
   <Columns>
     <Column>Select</Column>
 
     <Column>
-      <Select label="Select" id="firstSelect">
-        <option>a</option>
-        <option>b</option>
-        <option>c</option>
-        <option>d</option>
-      </Select>
+      <Select
+        label="Select"
+        id="firstSelect"
+        options={options}
+        value={options[0]}
+        onChange={selectedOption => console.log('Selected option', selectedOption)}
+        dataUieName="select"
+      />
     </Column>
   </Columns>
 
@@ -22,9 +30,14 @@ import {Columns, Column, ErrorMessage, Select} from '@wireapp/react-ui-kit';
     <Column>Disabled Select</Column>
 
     <Column>
-      <Select disabled label="Disabled select" id="disabledSelect">
-        <option>a</option>
-      </Select>
+      <Select
+        disabled
+        label="Disabled select"
+        id="disabledSelect"
+        options={options}
+        onChange={selectedOption => console.log('Selected option', selectedOption)}
+        dataUieName="disabled-select"
+      />
     </Column>
   </Columns>
 
@@ -32,9 +45,14 @@ import {Columns, Column, ErrorMessage, Select} from '@wireapp/react-ui-kit';
     <Column>Required Select</Column>
 
     <Column>
-      <Select label="Required select" required id="requiredSelect">
-        <option>a</option>
-      </Select>
+      <Select
+        label="Required select"
+        required
+        id="requiredSelect"
+        options={options}
+        onChange={selectedOption => console.log('Selected option', selectedOption)}
+        dataUieName="required-select"
+      />
     </Column>
   </Columns>
 
@@ -48,9 +66,10 @@ import {Columns, Column, ErrorMessage, Select} from '@wireapp/react-ui-kit';
         id="invalidSelect"
         required
         error={<ErrorMessage>Error message</ErrorMessage>}
-      >
-        <option>a</option>
-      </Select>
+        options={options}
+        onChange={selectedOption => console.log('Selected option', selectedOption)}
+        dataUieName="invalid-select"
+      />
     </Column>
   </Columns>
 </Fragment>;

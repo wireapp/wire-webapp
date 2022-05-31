@@ -16,6 +16,10 @@ exports[`"Select" renders 1`] = `
 }
 
 .emotion-2 {
+  position: relative;
+}
+
+.emotion-3 {
   background: #fff center right 16px no-repeat url("data:image/svg+xml;utf8,%0A%20%20%20%20%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2216%22%20height%3D%2216%22%20viewBox%3D%220%200%2016%2016%22%3E%0A%20%20%20%20%20%20%20%20%3Cpath%20fill%3D%22rgb(29%2C%2030%2C%2031)%22%20fill-rule%3D%22evenodd%22%20clip-rule%3D%22evenodd%22%20d%3D%22M7.99963%2012.5711L15.6565%204.91421L14.2423%203.5L7.99963%209.74264L1.75699%203.5L0.342773%204.91421L7.99963%2012.5711Z%22%2F%3E%0A%20%20%20%20%3C%2Fsvg%3E%0A");
   border: none;
   border-radius: 4px;
@@ -35,52 +39,67 @@ exports[`"Select" renders 1`] = `
   cursor: pointer;
   font-size: 16px;
   padding-right: 30px;
+  text-align: left;
 }
 
-.emotion-2::-moz-placeholder {
+.emotion-3::-moz-placeholder {
   color: rgb(80, 82, 84);
   font-size: 16px;
   text-transform: none;
   opacity: 1;
 }
 
-.emotion-2::-ms-input-placeholder {
+.emotion-3::-ms-input-placeholder {
   color: rgb(80, 82, 84);
   font-size: 16px;
   text-transform: none;
 }
 
-.emotion-2::-webkit-input-placeholder {
+.emotion-3::-webkit-input-placeholder {
   color: rgb(80, 82, 84);
   font-size: 16px;
   text-transform: none;
 }
 
-.emotion-2:focus {
+.emotion-3:focus {
   box-shadow: 0 0 0 1px #0667c8;
 }
 
-.emotion-2:invalid:not(:focus) {
+.emotion-3:invalid:not(:focus) {
   box-shadow: 0 0 0 1px undefined;
 }
 
-.emotion-2:-moz-focusring {
+.emotion-3:-moz-focusring {
   color: transparent;
   text-shadow: 0 0 0 #000;
 }
 
-.emotion-2:invalid,
-.emotion-2 option:first-of-type {
+.emotion-3:invalid,
+.emotion-3 option:first-of-type {
   color: #c20013;
 }
 
-.emotion-2:hover {
+.emotion-3:hover {
   box-shadow: 0 0 0 1px #9fa1a7;
 }
 
-.emotion-2:focus,
-.emotion-2:active {
+.emotion-3:focus,
+.emotion-3:active {
   box-shadow: 0 0 0 1px #0667c8;
+}
+
+.emotion-4 {
+  height: 0;
+  visibility: hidden;
+  margin: 3px 0 0;
+  padding: 0;
+  border-radius: 10px;
+  border: 1px solid #0667c8;
+  position: absolute;
+  top: 100%;
+  left: 0;
+  width: 100%;
+  z-index: 9;
 }
 
 <div
@@ -89,23 +108,27 @@ exports[`"Select" renders 1`] = `
   <div
     className="emotion-1"
   >
-    <select
+    <div
       className="emotion-2"
     >
-      <option
-        disabled={true}
-        hidden={true}
-        selected={true}
+      <button
+        aria-activedescendant=""
+        aria-expanded={false}
+        aria-haspopup="listbox"
+        className="emotion-3"
+        onClick={[Function]}
+        onKeyDown={[Function]}
+        type="button"
       >
         - Please select -
-      </option>
-      <option>
-        a
-      </option>
-      <option>
-        b
-      </option>
-    </select>
+      </button>
+      <ul
+        className="emotion-4"
+        onKeyDown={[Function]}
+        role="listbox"
+        tabIndex={-1}
+      />
+    </div>
   </div>
 </div>
 `;
@@ -126,6 +149,10 @@ exports[`"Select" renders as disabled 1`] = `
 }
 
 .emotion-2 {
+  position: relative;
+}
+
+.emotion-3 {
   background: #edeff0 center right 16px no-repeat url("data:image/svg+xml;utf8,%0A%20%20%20%20%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2216%22%20height%3D%2216%22%20viewBox%3D%220%200%2016%2016%22%3E%0A%20%20%20%20%20%20%20%20%3Cpath%20fill%3D%22rgb(29%2C%2030%2C%2031)%22%20fill-rule%3D%22evenodd%22%20clip-rule%3D%22evenodd%22%20d%3D%22M7.99963%2012.5711L15.6565%204.91421L14.2423%203.5L7.99963%209.74264L1.75699%203.5L0.342773%204.91421L7.99963%2012.5711Z%22%2F%3E%0A%20%20%20%20%3C%2Fsvg%3E%0A");
   border: none;
   border-radius: 4px;
@@ -145,43 +172,58 @@ exports[`"Select" renders as disabled 1`] = `
   cursor: normal;
   font-size: 16px;
   padding-right: 30px;
+  text-align: left;
 }
 
-.emotion-2::-moz-placeholder {
+.emotion-3::-moz-placeholder {
   color: rgb(80, 82, 84);
   font-size: 16px;
   text-transform: none;
   opacity: 1;
 }
 
-.emotion-2::-ms-input-placeholder {
+.emotion-3::-ms-input-placeholder {
   color: rgb(80, 82, 84);
   font-size: 16px;
   text-transform: none;
 }
 
-.emotion-2::-webkit-input-placeholder {
+.emotion-3::-webkit-input-placeholder {
   color: rgb(80, 82, 84);
   font-size: 16px;
   text-transform: none;
 }
 
-.emotion-2:focus {
+.emotion-3:focus {
   box-shadow: 0 0 0 1px #0667c8;
 }
 
-.emotion-2:invalid:not(:focus) {
+.emotion-3:invalid:not(:focus) {
   box-shadow: 0 0 0 1px undefined;
 }
 
-.emotion-2:-moz-focusring {
+.emotion-3:-moz-focusring {
   color: transparent;
   text-shadow: 0 0 0 #000;
 }
 
-.emotion-2:invalid,
-.emotion-2 option:first-of-type {
+.emotion-3:invalid,
+.emotion-3 option:first-of-type {
   color: #c20013;
+}
+
+.emotion-4 {
+  height: 0;
+  visibility: hidden;
+  margin: 3px 0 0;
+  padding: 0;
+  border-radius: 10px;
+  border: 1px solid #0667c8;
+  position: absolute;
+  top: 100%;
+  left: 0;
+  width: 100%;
+  z-index: 9;
 }
 
 <div
@@ -190,24 +232,28 @@ exports[`"Select" renders as disabled 1`] = `
   <div
     className="emotion-1"
   >
-    <select
+    <div
       className="emotion-2"
-      disabled={true}
     >
-      <option
+      <button
+        aria-activedescendant=""
+        aria-expanded={false}
+        aria-haspopup="listbox"
+        className="emotion-3"
         disabled={true}
-        hidden={true}
-        selected={true}
+        onClick={[Function]}
+        onKeyDown={[Function]}
+        type="button"
       >
         - Please select -
-      </option>
-      <option>
-        a
-      </option>
-      <option>
-        b
-      </option>
-    </select>
+      </button>
+      <ul
+        className="emotion-4"
+        onKeyDown={[Function]}
+        role="listbox"
+        tabIndex={-1}
+      />
+    </div>
   </div>
 </div>
 `;
@@ -228,10 +274,14 @@ exports[`"Select" renders as invalid 1`] = `
 }
 
 .emotion-2 {
+  position: relative;
+}
+
+.emotion-3 {
   background: #fff center right 16px no-repeat url("data:image/svg+xml;utf8,%0A%20%20%20%20%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2216%22%20height%3D%2216%22%20viewBox%3D%220%200%2016%2016%22%3E%0A%20%20%20%20%20%20%20%20%3Cpath%20fill%3D%22rgb(29%2C%2030%2C%2031)%22%20fill-rule%3D%22evenodd%22%20clip-rule%3D%22evenodd%22%20d%3D%22M7.99963%2012.5711L15.6565%204.91421L14.2423%203.5L7.99963%209.74264L1.75699%203.5L0.342773%204.91421L7.99963%2012.5711Z%22%2F%3E%0A%20%20%20%20%3C%2Fsvg%3E%0A");
   border: none;
   border-radius: 4px;
-  box-shadow: 0 0 0 1px #c20013;
+  box-shadow: 0 0 0 1px #dce0e3;
   caret-color: #0667c8;
   color: rgb(29, 30, 31);
   font-weight: 300;
@@ -247,52 +297,67 @@ exports[`"Select" renders as invalid 1`] = `
   cursor: pointer;
   font-size: 16px;
   padding-right: 30px;
+  text-align: left;
 }
 
-.emotion-2::-moz-placeholder {
+.emotion-3::-moz-placeholder {
   color: rgb(80, 82, 84);
   font-size: 16px;
   text-transform: none;
   opacity: 1;
 }
 
-.emotion-2::-ms-input-placeholder {
+.emotion-3::-ms-input-placeholder {
   color: rgb(80, 82, 84);
   font-size: 16px;
   text-transform: none;
 }
 
-.emotion-2::-webkit-input-placeholder {
+.emotion-3::-webkit-input-placeholder {
   color: rgb(80, 82, 84);
   font-size: 16px;
   text-transform: none;
 }
 
-.emotion-2:focus {
+.emotion-3:focus {
   box-shadow: 0 0 0 1px #0667c8;
 }
 
-.emotion-2:invalid:not(:focus) {
+.emotion-3:invalid:not(:focus) {
   box-shadow: 0 0 0 1px undefined;
 }
 
-.emotion-2:-moz-focusring {
+.emotion-3:-moz-focusring {
   color: transparent;
   text-shadow: 0 0 0 #000;
 }
 
-.emotion-2:invalid,
-.emotion-2 option:first-of-type {
+.emotion-3:invalid,
+.emotion-3 option:first-of-type {
   color: #c20013;
 }
 
-.emotion-2:hover {
+.emotion-3:hover {
   box-shadow: 0 0 0 1px #9fa1a7;
 }
 
-.emotion-2:focus,
-.emotion-2:active {
+.emotion-3:focus,
+.emotion-3:active {
   box-shadow: 0 0 0 1px #0667c8;
+}
+
+.emotion-4 {
+  height: 0;
+  visibility: hidden;
+  margin: 3px 0 0;
+  padding: 0;
+  border-radius: 10px;
+  border: 1px solid #0667c8;
+  position: absolute;
+  top: 100%;
+  left: 0;
+  width: 100%;
+  z-index: 9;
 }
 
 <div
@@ -301,23 +366,27 @@ exports[`"Select" renders as invalid 1`] = `
   <div
     className="emotion-1"
   >
-    <select
+    <div
       className="emotion-2"
     >
-      <option
-        disabled={true}
-        hidden={true}
-        selected={true}
+      <button
+        aria-activedescendant=""
+        aria-expanded={false}
+        aria-haspopup="listbox"
+        className="emotion-3"
+        onClick={[Function]}
+        onKeyDown={[Function]}
+        type="button"
       >
         - Please select -
-      </option>
-      <option>
-        a
-      </option>
-      <option>
-        b
-      </option>
-    </select>
+      </button>
+      <ul
+        className="emotion-4"
+        onKeyDown={[Function]}
+        role="listbox"
+        tabIndex={-1}
+      />
+    </div>
   </div>
 </div>
 `;
