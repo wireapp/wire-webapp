@@ -175,7 +175,7 @@ const AccountInput: React.FC<AccountInputProps> = ({
           </label>
 
           <div css={{alignItems: 'center', display: 'flex', lineHeight: '1.38', width: '100%'}}>
-            <span data-uie-name={`${fieldName}-display`} className="ellipsis">
+            <span data-uie-name={valueUie ?? `${fieldName}-display`} className="ellipsis">
               {[prefix, input, suffix].filter(Boolean).join('')}
             </span>
           </div>
