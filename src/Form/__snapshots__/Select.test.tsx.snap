@@ -99,6 +99,8 @@ exports[`"Select" renders 1`] = `
   top: 100%;
   left: 0;
   width: 100%;
+  max-height: 240px;
+  overflow-y: auto;
   z-index: 9;
 }
 
@@ -223,6 +225,8 @@ exports[`"Select" renders as disabled 1`] = `
   top: 100%;
   left: 0;
   width: 100%;
+  max-height: 240px;
+  overflow-y: auto;
   z-index: 9;
 }
 
@@ -357,6 +361,8 @@ exports[`"Select" renders as invalid 1`] = `
   top: 100%;
   left: 0;
   width: 100%;
+  max-height: 240px;
+  overflow-y: auto;
   z-index: 9;
 }
 
