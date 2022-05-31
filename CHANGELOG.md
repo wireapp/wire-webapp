@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [8.5.1](https://github.com/wireapp/wire-web-packages/tree/main/packages/react-ui-kit/compare/@wireapp/react-ui-kit@8.5.0...@wireapp/react-ui-kit@8.5.1) (2022-05-31)
+
+
+### Bug Fixes
+
+* add max-height-for-select-dropdown ([#4276](https://github.com/wireapp/wire-web-packages/tree/main/packages/react-ui-kit/issues/4276)) ([084acd7](https://github.com/wireapp/wire-web-packages/tree/main/packages/react-ui-kit/commit/084acd704b870af962a01282652c2dd0925052ee))
+
+
+
+
+
 # [8.5.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/react-ui-kit/compare/@wireapp/react-ui-kit@8.4.0...@wireapp/react-ui-kit@8.5.0) (2022-05-31)
 
 
