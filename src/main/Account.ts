@@ -470,10 +470,14 @@ export class Account extends EventEmitter {
     this.apiClient.transport.ws.on(WebSocketClient.TOPIC.ON_STATE_CHANGE, onConnectionStateChanged);
 
     const onBeforeConnect = async () => {
+      // Lock websocket in order to buffer any message that arrives while we handle the notification stream
+      this.apiClient.transport.ws.lock();
       await this.service!.notification.handleNotificationStream(async (notification, source, progress) => {
         await handleNotification(notification, source);
         onNotificationStreamProgress(progress);
       }, onMissedNotifications);
+      // We can now unlock the websocket and let the new messages being handled and decrypted
+      this.apiClient.transport.ws.unlock();
       onConnected();
     };
     await this.apiClient.connect(onBeforeConnect);
