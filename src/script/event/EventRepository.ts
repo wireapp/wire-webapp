@@ -166,6 +166,7 @@ export class EventRepository {
       this.disconnectWebSocket = await account.listen({
         onConnected: () => {
           this.notificationHandlingState(NOTIFICATION_HANDLING_STATE.WEB_SOCKET);
+          amplify.publish(WebAppEvents.WARNING.DISMISS, Warnings.TYPE.CONNECTIVITY_RECOVERY);
           resolve();
         },
         onConnectionStateChanged: state => {
@@ -201,7 +202,10 @@ export class EventRepository {
           }
         },
         onMissedNotifications: notificationId => this.triggerMissedSystemEventMessageRendering(notificationId),
-        onNotificationStreamProgress,
+        onNotificationStreamProgress: ({done, total}) => {
+          amplify.publish(WebAppEvents.WARNING.SHOW, Warnings.TYPE.CONNECTIVITY_RECOVERY);
+          onNotificationStreamProgress({done, total});
+        },
       });
     });
   }
