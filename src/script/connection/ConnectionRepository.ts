@@ -233,7 +233,10 @@ export class ConnectionRepository {
   async getConnections(): Promise<ConnectionEntity[]> {
     try {
       const connectionData = await this.connectionService.getConnections();
+      console.log('connections', connectionData);
       const newConnectionEntities = ConnectionMapper.mapConnectionsFromJson(connectionData);
+      console.log('NEWconnections', newConnectionEntities);
+
       return newConnectionEntities.length
         ? await this.updateConnections(newConnectionEntities)
         : Object.values(this.connectionState.connectionEntities());
@@ -286,6 +289,8 @@ export class ConnectionRepository {
       allConnections[connectionEntity.userId.id] = connectionEntity;
       return allConnections;
     }, this.connectionState.connectionEntities());
+    console.log('UPDATEDconnections', updatedConnections);
+
     this.connectionState.connectionEntities(updatedConnections);
     await this.userRepository.updateUsersFromConnections(connectionEntities);
     return Object.values(this.connectionState.connectionEntities());

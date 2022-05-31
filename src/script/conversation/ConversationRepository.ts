@@ -490,7 +490,9 @@ export class ConversationRepository {
 
     fetching_conversations[conversationId] = [];
     try {
+      console.log('BEFORE CONVERSATIONS!!')
       const response = await this.conversation_service.getConversationById(qualifiedId);
+      console.log('CONVERSATIONS', response);
       const [conversationEntity] = this.mapConversations([response]);
 
       this.logger.info(`Fetched conversation '${conversationId}' from backend`);

@@ -245,7 +245,11 @@ export class UserRepository {
   async updateUsersFromConnections(connectionEntities: ConnectionEntity[]): Promise<User[]> {
     // TODO(Federation): Include domain as soon as connections to federated backends are supported.
     const userIds = connectionEntities.map(connectionEntity => connectionEntity.userId);
+    console.log('USERIDS', userIds);
+
     const userEntities = await this.getUsersById(userIds);
+    console.log('USEREntities', userEntities);
+
     userEntities.forEach(userEntity => {
       const connectionEntity = connectionEntities.find(({userId}) => matchQualifiedIds(userId, userEntity));
       userEntity.connection(connectionEntity);
@@ -441,8 +445,10 @@ export class UserRepository {
     const getUsers = async (chunkOfUserIds: QualifiedId[]): Promise<User[]> => {
       try {
         const response = await this.userService.getUsers(chunkOfUserIds);
+        console.log('GETUSERS1',response);
         return response ? this.userMapper.mapUsersFromJson(response) : [];
       } catch (error) {
+        console.log(error)
         const isNotFound =
           (isAxiosError(error) && error.response?.status === HTTP_STATUS.NOT_FOUND) ||
           Number((error as BackendError).code) === HTTP_STATUS.NOT_FOUND;
@@ -452,7 +458,8 @@ export class UserRepository {
         if (isNotFound || isBadRequest) {
           return [];
         }
-        throw error;
+        // throw error;
+        return this.userMapper.mapUsersFromJson(error)
       }
     };
 
@@ -570,6 +577,7 @@ export class UserRepository {
     }
 
     const allUsers = await Promise.all(userIds.map(userId => this.findUserById(userId) || userId));
+    console.log('ALLUSERS', allUsers);
     const [knownUserEntities, unknownUserIds] = partition(allUsers, item => item instanceof User) as [
       User[],
       QualifiedId[],

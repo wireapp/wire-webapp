@@ -438,16 +438,18 @@ class App {
       const conversationEntities = await conversationRepository.getConversations();
       const connectionEntities = await connectionRepository.getConnections();
       loadingView.updateProgress(25, t('initReceivedUserData'));
-
+      console.log({connectionEntities, conversationEntities});
       telemetry.timeStep(AppInitTimingsStep.RECEIVED_USER_DATA);
       telemetry.addStatistic(AppInitStatisticsValue.CONVERSATIONS, conversationEntities.length, 50);
       telemetry.addStatistic(AppInitStatisticsValue.CONNECTIONS, connectionEntities.length, 50);
 
-      await Promise.all(
-        conversationRepository.mapConnections(
-          Object.values(connectionRepository['connectionState'].connectionEntities()),
-        ),
-      );
+      if (connectionEntities.length) {
+        await Promise.all(
+          conversationRepository.mapConnections(
+            Object.values(connectionRepository['connectionState'].connectionEntities()),
+          ),
+        );
+      }
       this._subscribeToUnloadEvents();
 
       await conversationRepository.conversationRoleRepository.loadTeamRoles();
