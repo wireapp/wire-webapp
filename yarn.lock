@@ -5168,15 +5168,10 @@ dexie-batch@0.4.3:
   resolved "https://registry.yarnpkg.com/dexie-batch/-/dexie-batch-0.4.3.tgz#7c470f1f3a2669e149880ffd4116bff167306f2b"
   integrity sha512-RGpnRpuTrkfRkw3Y6OInm4ZPSdHltjwEFn6cZpHl9RXRK52Dn8O7e3Vvcmc0uWNEMGQstJjyBu/R4ZqGMz5mtg==
 
-dexie@3.2.2:
+dexie@3.2.2, dexie@latest:
   version "3.2.2"
   resolved "https://registry.yarnpkg.com/dexie/-/dexie-3.2.2.tgz#fa6f2a3c0d6ed0766f8d97a03720056f88fe0e01"
   integrity sha512-q5dC3HPmir2DERlX+toCBbHQXW5MsyrFqPFcovkH9N2S/UW/H3H5AWAB6iEOExeraAu+j+zRDG+zg/D7YhH0qg==
-
-dexie@latest:
-  version "3.0.3"
-  resolved "https://registry.yarnpkg.com/dexie/-/dexie-3.0.3.tgz#ede63849dfe5f07e13e99bb72a040e8ac1d29dab"
-  integrity sha512-BSFhGpngnCl1DOr+8YNwBDobRMH0ziJs2vts69VilwetHYOtEDcLqo7d/XiIphM0tJZ2rPPyAGd31lgH2Ln3nw==
 
 diff-sequences@^27.5.1:
   version "27.5.1"
