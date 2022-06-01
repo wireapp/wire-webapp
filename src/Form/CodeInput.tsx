@@ -48,6 +48,7 @@ const digitInputStyle: <T>(theme: Theme, props: DigitInputProps<T>) => CSSObject
   },
   fontSize: '24px',
   lineHeight: '28px',
+  borderRadius: '12px',
   padding: 0,
   textAlign: 'center',
   width: '48px',
