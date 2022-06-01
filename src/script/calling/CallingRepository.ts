@@ -694,6 +694,12 @@ export class CallingRepository {
           : Promise.resolve(true);
       const success = await loadPreviewPromise;
       if (success) {
+        /**
+         * Since we might have been on a conference call before, which was started as muted, then we've hung up and started an outgoing call,
+         * we are stuck in muted state so we should call the AVS function setMute(this.wUser, 0) before initiating the call to fix this
+         * Further info: https://wearezeta.atlassian.net/browse/SQCALL-551
+         */
+        this.wCall.setMute(this.wUser, 0);
         this.wCall.start(this.wUser, convId, callType, conversationType, this.callState.cbrEncoding());
         this.sendCallingEvent(EventName.CALLING.INITIATED_CALL, call);
         this.sendCallingEvent(EventName.CONTRIBUTED, call, {
