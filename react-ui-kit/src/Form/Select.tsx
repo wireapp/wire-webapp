@@ -151,7 +151,9 @@ export const Select = ({
   const selectContainerRef = useRef<HTMLDivElement>(null);
   const listRef = useRef<HTMLUListElement>(null);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const [selectedOption, setSelectedOption] = useState<number | null>(() => (value ? options.indexOf(value) : null));
+  const [selectedOption, setSelectedOption] = useState<number | null>(() =>
+    value ? options.findIndex(option => option.value === value.value) : null,
+  );
 
   const onToggleDropdown = () => setIsDropdownOpen(prevState => !prevState);
 
@@ -241,6 +243,13 @@ export const Select = ({
       window.removeEventListener('click', handleOutsideClick);
     };
   }, []);
+
+  useEffect(() => {
+    if (value) {
+      const valueIdx = options.findIndex(option => option.value === value.value);
+      setSelectedOption(valueIdx);
+    }
+  }, [options, value]);
 
   return (
     <div
