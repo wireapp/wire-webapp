@@ -53,6 +53,7 @@ import {WEBSOCKET_STATE} from '@wireapp/api-client/src/tcp/ReconnectingWebsocket
 import {HandledEventPayload} from '@wireapp/core/src/main/notification';
 import {EventBuilder} from '../conversation/EventBuilder';
 import {EventName} from '../tracking/EventName';
+import {PayloadBundleSource} from '@wireapp/core/src/main/conversation';
 
 export class EventRepository {
   logger: Logger;
@@ -136,6 +137,40 @@ export class EventRepository {
   // WebSocket handling
   //##############################################################################
 
+  private readonly updateConnectivitityStatus = (state: WEBSOCKET_STATE) => {
+    switch (state) {
+      case WEBSOCKET_STATE.CONNECTING: {
+        amplify.publish(WebAppEvents.WARNING.DISMISS, Warnings.TYPE.NO_INTERNET);
+        amplify.publish(WebAppEvents.WARNING.SHOW, Warnings.TYPE.CONNECTIVITY_RECONNECT);
+        return;
+      }
+      case WEBSOCKET_STATE.CLOSING: {
+        return;
+      }
+      case WEBSOCKET_STATE.CLOSED: {
+        amplify.publish(WebAppEvents.WARNING.SHOW, Warnings.TYPE.NO_INTERNET);
+        return;
+      }
+      case WEBSOCKET_STATE.OPEN: {
+        amplify.publish(WebAppEvents.CONNECTION.ONLINE);
+        amplify.publish(WebAppEvents.WARNING.DISMISS, Warnings.TYPE.NO_INTERNET);
+        amplify.publish(WebAppEvents.WARNING.DISMISS, Warnings.TYPE.CONNECTIVITY_RECONNECT);
+      }
+    }
+  };
+
+  private readonly handleIncomingEvent = async (payload: HandledEventPayload, source: PayloadBundleSource) => {
+    try {
+      await this.handleEvent({...payload, event: payload.event as EventRecord}, source);
+    } catch (error) {
+      if (source === EventSource.NOTIFICATION_STREAM) {
+        this.logger.warn(`Failed to handle event of type "${event.type}": ${error.message}`, error);
+      } else {
+        throw error;
+      }
+    }
+  };
+
   /**
    * connects to the websocket with the given account
    *
@@ -154,43 +189,12 @@ export class EventRepository {
         this.disconnectWebSocket = await account.listen({
           onConnected: () => {
             this.notificationHandlingState(NOTIFICATION_HANDLING_STATE.WEB_SOCKET);
-            amplify.publish(WebAppEvents.WARNING.DISMISS, Warnings.TYPE.CONNECTIVITY_RECOVERY);
-            amplify.publish(WebAppEvents.WARNING.DISMISS, Warnings.TYPE.NO_INTERNET);
+            this.updateConnectivitityStatus(WEBSOCKET_STATE.OPEN);
             resolve();
           },
-          onConnectionStateChanged: state => {
-            switch (state) {
-              case WEBSOCKET_STATE.CONNECTING: {
-                amplify.publish(WebAppEvents.WARNING.DISMISS, Warnings.TYPE.NO_INTERNET);
-                amplify.publish(WebAppEvents.WARNING.SHOW, Warnings.TYPE.CONNECTIVITY_RECONNECT);
-                return;
-              }
-              case WEBSOCKET_STATE.CLOSING: {
-                return;
-              }
-              case WEBSOCKET_STATE.CLOSED: {
-                amplify.publish(WebAppEvents.WARNING.SHOW, Warnings.TYPE.NO_INTERNET);
-                return;
-              }
-              case WEBSOCKET_STATE.OPEN: {
-                amplify.publish(WebAppEvents.CONNECTION.ONLINE);
-                amplify.publish(WebAppEvents.WARNING.DISMISS, Warnings.TYPE.NO_INTERNET);
-                amplify.publish(WebAppEvents.WARNING.DISMISS, Warnings.TYPE.CONNECTIVITY_RECONNECT);
-              }
-            }
-          },
-          onEvent: async (payload, source) => {
-            try {
-              await this.handleEvent({...payload, event: payload.event as EventRecord}, source);
-            } catch (error) {
-              if (source === EventSource.NOTIFICATION_STREAM) {
-                this.logger.warn(`Failed to handle event of type "${event.type}": ${error.message}`, error);
-              } else {
-                throw error;
-              }
-            }
-          },
-          onMissedNotifications: notificationId => this.triggerMissedSystemEventMessageRendering(notificationId),
+          onConnectionStateChanged: this.updateConnectivitityStatus,
+          onEvent: this.handleIncomingEvent,
+          onMissedNotifications: this.triggerMissedSystemEventMessageRendering,
           onNotificationStreamProgress: ({done, total}) => {
             amplify.publish(WebAppEvents.WARNING.SHOW, Warnings.TYPE.CONNECTIVITY_RECOVERY);
             onNotificationStreamProgress({done, total});
@@ -253,14 +257,14 @@ export class EventRepository {
     }
   }
 
-  private async triggerMissedSystemEventMessageRendering(missedNotificationId: string) {
+  private readonly triggerMissedSystemEventMessageRendering = async (missedNotificationId: string) => {
     const notificationId = await this.notificationService.getMissedIdFromDb();
     const shouldUpdatePersistedId = missedNotificationId !== notificationId;
     if (shouldUpdatePersistedId) {
       amplify.publish(WebAppEvents.CONVERSATION.MISSED_EVENTS);
       this.notificationService.saveMissedIdToDb(this.lastNotificationId());
     }
-  }
+  };
 
   /**
    * Persist updated last event timestamp.
