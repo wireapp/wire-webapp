@@ -76,7 +76,7 @@ async function buildMessageRepository(): Promise<[MessageRepository, MessageRepo
   const dependencies = {
     conversationRepository: () => ({} as ConversationRepository),
     cryptographyRepository: new CryptographyRepository({} as any),
-    eventRepository: new EventRepository(new EventService({} as any), {} as any, {} as any, {} as any, {} as any),
+    eventRepository: new EventRepository(new EventService({} as any), {} as any, {} as any, {} as any),
     messageSender,
     propertiesRepository: new PropertiesRepository({} as any, {} as any),
     serverTimeHandler: serverTimeHandler,

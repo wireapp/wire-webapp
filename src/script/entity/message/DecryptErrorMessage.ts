@@ -28,7 +28,7 @@ import {Message} from './Message';
 
 export class DecryptErrorMessage extends Message {
   public client_id: string;
-  public error_code: string;
+  public error_code: number;
   public domain?: string;
   private readonly is_remote_identity_changed: ko.PureComputed<boolean>;
   public readonly htmlCaption: ko.PureComputed<string>;
@@ -44,7 +44,7 @@ export class DecryptErrorMessage extends Message {
     super();
     this.super_type = SuperType.UNABLE_TO_DECRYPT;
 
-    this.error_code = '';
+    this.error_code = 0;
     this.client_id = '';
 
     // TODO: Replace this with React Intl interpolation once we can use it in the whole project

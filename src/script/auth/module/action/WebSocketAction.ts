@@ -19,8 +19,7 @@
 
 import * as Events from '@wireapp/api-client/src/event/';
 import {ConnectionState, HttpClient} from '@wireapp/api-client/src/http/';
-import type {Notification} from '@wireapp/api-client/src/notification/';
-import {PayloadBundle, PayloadBundleSource, PayloadBundleType} from '@wireapp/core/src/main/conversation/';
+import {PayloadBundle, PayloadBundleType} from '@wireapp/core/src/main/conversation/';
 import type {UserUpdateMessage} from '@wireapp/core/src/main/conversation/message/UserMessage';
 import {UserMapper} from '@wireapp/core/src/main/user/UserMapper';
 import {getLogger} from 'Util/Logger';
@@ -29,19 +28,6 @@ import * as SelfSelector from '../../module/selector/SelfSelector';
 
 export class WebSocketAction {
   private readonly logger = getLogger('WebSocketAction');
-
-  disconnect = (): ThunkAction => {
-    return async (dispatch, getState, {apiClient, core}) => {
-      try {
-        apiClient.disconnect();
-        for (const payloadType of Object.values(PayloadBundleType)) {
-          core.removeAllListeners(payloadType);
-        }
-      } catch (error) {
-        this.logger.warn('Error during WebSocket disconnect:', error.message);
-      }
-    };
-  };
 
   listen = (): ThunkAction => {
     return async (dispatch, getState, {apiClient, core, actions: {selfAction}}) => {
@@ -52,10 +38,9 @@ export class WebSocketAction {
         );
       });
 
-      await core.listen(async (notification: Notification, source: PayloadBundleSource) => {
-        for (const event of notification.payload) {
+      await core.listen({
+        onEvent: async ({event}, source) => {
           let data: PayloadBundle | void;
-
           try {
             switch (event.type) {
               case Events.USER_EVENT.UPDATE: {
@@ -64,8 +49,7 @@ export class WebSocketAction {
               // Note: We do not want to update the last message timestamp
             }
           } catch (error) {
-            this.logger.error(`There was an error with notification ID "${notification.id}": ${error.message}`, error);
-            continue;
+            this.logger.error(`There was an error with event ID "${event.type}": ${error.message}`, error);
           }
           if (data) {
             switch (data.type) {
@@ -78,7 +62,7 @@ export class WebSocketAction {
                 break;
             }
           }
-        }
+        },
       });
     };
   };

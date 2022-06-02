@@ -67,7 +67,6 @@ import {EventService} from '../event/EventService';
 import {NotificationService} from '../event/NotificationService';
 import {QuotedMessageMiddleware} from '../event/preprocessor/QuotedMessageMiddleware';
 import {ServiceMiddleware} from '../event/preprocessor/ServiceMiddleware';
-import {WebSocketService} from '../event/WebSocketService';
 import {ConversationService} from '../conversation/ConversationService';
 import {SingleInstanceHandler} from './SingleInstanceHandler';
 import {AppInitStatisticsValue} from '../telemetry/app_init/AppInitStatisticsValue';
@@ -154,7 +153,6 @@ class App {
     integration: IntegrationService;
     notification: NotificationService;
     storage: StorageService;
-    webSocket: WebSocketService;
   };
   repository: ViewModelRepositories = {} as ViewModelRepositories;
   debug: DebugUtil;
@@ -252,13 +250,7 @@ class App {
       repositories.properties,
     );
     repositories.connection = new ConnectionRepository(new ConnectionService(), repositories.user);
-    repositories.event = new EventRepository(
-      this.service.event,
-      this.service.notification,
-      this.service.webSocket,
-      repositories.cryptography,
-      serverTimeHandler,
-    );
+    repositories.event = new EventRepository(this.service.event, this.service.notification, serverTimeHandler);
     repositories.search = new SearchRepository(new SearchService(), repositories.user);
     repositories.team = new TeamRepository(new TeamService(), repositories.user, repositories.asset);
 
@@ -340,7 +332,6 @@ class App {
       integration: new IntegrationService(),
       notification: new NotificationService(),
       storage: storageService,
-      webSocket: new WebSocketService(),
     };
   }
 
@@ -456,8 +447,9 @@ class App {
 
       await userRepository.loadUsers();
 
-      await eventRepository.connectWebSocket();
-      eventRepository.watchNetworkStatus();
+      await eventRepository.connectWebSocket(this.core, ({done, total}) => {
+        loadingView.updateProgress(25 + 50 * (done / total), t('initDecryption'), {handled: done, total});
+      });
       const notificationsCount = eventRepository.notificationsTotal;
 
       telemetry.timeStep(AppInitTimingsStep.UPDATED_FROM_NOTIFICATIONS);

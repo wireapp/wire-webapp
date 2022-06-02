@@ -17,17 +17,15 @@
  *
  */
 
-import {Asset as ProtobufAsset} from '@wireapp/protocol-messaging';
+import {Asset as ProtobufAsset, GenericMessage} from '@wireapp/protocol-messaging';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import {amplify} from 'amplify';
 import ko from 'knockout';
-import {CONVERSATION_EVENT, USER_EVENT, ConversationOtrMessageAddEvent} from '@wireapp/api-client/src/event/';
-import type {Notification, NotificationList} from '@wireapp/api-client/src/notification/';
-import {AbortHandler} from '@wireapp/api-client/src/tcp/';
+import {USER_EVENT, CONVERSATION_EVENT} from '@wireapp/api-client/src/event/';
+import type {Notification} from '@wireapp/api-client/src/notification/';
 import {container} from 'tsyringe';
 import {getLogger, Logger} from 'Util/Logger';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
-import {t} from 'Util/LocalizerUtil';
 
 import {CALL_MESSAGE_TYPE} from '../calling/enum/CallMessageType';
 import {AssetTransferState} from '../assets/AssetTransferState';
@@ -40,20 +38,22 @@ import {categoryFromEvent} from '../message/MessageCategorization';
 import {EventSource} from './EventSource';
 import {EventValidation} from './EventValidation';
 import {validateEvent} from './EventValidator';
-import {ConversationError} from '../error/ConversationError';
 import {CryptographyError} from '../error/CryptographyError';
 import {EventError} from '../error/EventError';
 import type {EventService} from './EventService';
-import type {WebSocketService} from './WebSocketService';
-import type {CryptographyRepository} from '../cryptography/CryptographyRepository';
 import type {ServerTimeHandler} from '../time/serverTimeHandler';
 import type {ClientEntity} from '../client/ClientEntity';
 import type {EventRecord} from '../storage';
 import type {NotificationService} from './NotificationService';
 import {UserState} from '../user/UserState';
-import {isAxiosError} from 'Util/TypePredicateUtil';
-import {AssetData} from '../cryptography/CryptographyMapper';
+import {AssetData, CryptographyMapper} from '../cryptography/CryptographyMapper';
 import Warnings from '../view_model/WarningsContainer';
+import {Account, ProcessedEventPayload} from '@wireapp/core';
+import {WEBSOCKET_STATE} from '@wireapp/api-client/src/tcp/ReconnectingWebsocket';
+import {HandledEventPayload} from '@wireapp/core/src/main/notification';
+import {EventBuilder} from '../conversation/EventBuilder';
+import {EventName} from '../tracking/EventName';
+import {PayloadBundleSource} from '@wireapp/core/src/main/conversation';
 
 export class EventRepository {
   logger: Logger;
@@ -95,16 +95,14 @@ export class EventRepository {
     return {
       BACKEND_RESPONSE: EventSource.BACKEND_RESPONSE,
       INJECTED: EventSource.INJECTED,
-      STREAM: EventSource.STREAM,
-      WEB_SOCKET: EventSource.WEB_SOCKET,
+      STREAM: EventSource.NOTIFICATION_STREAM,
+      WEB_SOCKET: EventSource.WEBSOCKET,
     };
   }
 
   constructor(
     readonly eventService: EventService,
     readonly notificationService: NotificationService,
-    private readonly webSocketService: WebSocketService,
-    private readonly cryptographyRepository: CryptographyRepository,
     private readonly serverTimeHandler: ServerTimeHandler,
     private readonly userState = container.resolve(UserState),
   ) {
@@ -125,19 +123,6 @@ export class EventRepository {
     this.eventProcessMiddlewares = [];
   }
 
-  public watchNetworkStatus() {
-    window.addEventListener('online', () => {
-      this.logger.info('Internet connection regained. Re-establishing WebSocket connection...');
-      this.connectWebSocket();
-    });
-
-    window.addEventListener('offline', () => {
-      this.logger.warn('Internet connection lost');
-      this.disconnectWebSocket();
-      amplify.publish(WebAppEvents.WARNING.SHOW, Warnings.TYPE.NO_INTERNET);
-    });
-  }
-
   /**
    * Will set a middleware to run before the EventRepository actually processes the event.
    * Middleware is just a function with the following signature (Event) => Promise<Event>.
@@ -152,40 +137,89 @@ export class EventRepository {
   // WebSocket handling
   //##############################################################################
 
-  async connectWebSocket() {
-    if (!this.currentClient().id) {
-      throw new EventError(EventError.TYPE.NO_CLIENT_ID, EventError.MESSAGE.NO_CLIENT_ID);
+  private readonly updateConnectivitityStatus = (state: WEBSOCKET_STATE) => {
+    switch (state) {
+      case WEBSOCKET_STATE.CONNECTING: {
+        amplify.publish(WebAppEvents.WARNING.DISMISS, Warnings.TYPE.NO_INTERNET);
+        amplify.publish(WebAppEvents.WARNING.SHOW, Warnings.TYPE.CONNECTIVITY_RECONNECT);
+        return;
+      }
+      case WEBSOCKET_STATE.CLOSING: {
+        return;
+      }
+      case WEBSOCKET_STATE.CLOSED: {
+        amplify.publish(WebAppEvents.WARNING.SHOW, Warnings.TYPE.NO_INTERNET);
+        return;
+      }
+      case WEBSOCKET_STATE.OPEN: {
+        amplify.publish(WebAppEvents.CONNECTION.ONLINE);
+        amplify.publish(WebAppEvents.WARNING.DISMISS, Warnings.TYPE.NO_INTERNET);
+        amplify.publish(WebAppEvents.WARNING.DISMISS, Warnings.TYPE.CONNECTIVITY_RECONNECT);
+      }
     }
+  };
 
-    this.webSocketService.clientId = this.currentClient().id;
-    return this.webSocketService.connect(
-      notification => this.handleNotification(notification),
-      async (abortHandler: AbortHandler) => {
-        try {
-          this.webSocketService.lockWebsocket();
-          this.notificationHandlingState(NOTIFICATION_HANDLING_STATE.STREAM);
-          amplify.publish(WebAppEvents.WARNING.SHOW, Warnings.TYPE.CONNECTIVITY_RECOVERY);
-          await this.initializeFromStream(abortHandler);
-          this.notificationHandlingState(NOTIFICATION_HANDLING_STATE.WEB_SOCKET);
-          this.logger.info(`Done handling '${this.notificationsTotal}' notifications from the stream`);
-          this.webSocketService.unlockWebsocket();
-          amplify.publish(WebAppEvents.WARNING.DISMISS, Warnings.TYPE.NO_INTERNET);
-        } catch (error) {
-          this.logger.warn('Error while processing notification stream', error);
-        } finally {
-          amplify.publish(WebAppEvents.WARNING.DISMISS, Warnings.TYPE.CONNECTIVITY_RECOVERY);
-        }
-      },
-    );
+  private readonly handleIncomingEvent = async (payload: HandledEventPayload, source: PayloadBundleSource) => {
+    try {
+      await this.handleEvent({...payload, event: payload.event as EventRecord}, source);
+    } catch (error) {
+      if (source === EventSource.NOTIFICATION_STREAM) {
+        this.logger.warn(`Failed to handle event of type "${event.type}": ${error.message}`, error);
+      } else {
+        throw error;
+      }
+    }
+  };
+
+  /**
+   * connects to the websocket with the given account
+   *
+   * @param account the account to connect to
+   * @param onNotificationStreamProgress callback when a notification for the notification stream has been processed
+   * @returns Resolves when the notification stream has fully been processed
+   */
+  async connectWebSocket(
+    account: Account,
+    onNotificationStreamProgress: (progress: {done: number; total: number}) => void,
+  ): Promise<void> {
+    await this.handleTimeDrift();
+    const connect = () => {
+      this.notificationHandlingState(NOTIFICATION_HANDLING_STATE.STREAM);
+      return new Promise<void>(async resolve => {
+        this.disconnectWebSocket = await account.listen({
+          onConnected: () => {
+            this.notificationHandlingState(NOTIFICATION_HANDLING_STATE.WEB_SOCKET);
+            this.updateConnectivitityStatus(WEBSOCKET_STATE.OPEN);
+            resolve();
+          },
+          onConnectionStateChanged: this.updateConnectivitityStatus,
+          onEvent: this.handleIncomingEvent,
+          onMissedNotifications: this.triggerMissedSystemEventMessageRendering,
+          onNotificationStreamProgress: ({done, total}) => {
+            amplify.publish(WebAppEvents.WARNING.SHOW, Warnings.TYPE.CONNECTIVITY_RECOVERY);
+            onNotificationStreamProgress({done, total});
+          },
+        });
+      });
+    };
+
+    window.addEventListener('online', () => {
+      this.logger.info('Internet connection regained. Re-establishing WebSocket connection...');
+      connect();
+    });
+
+    window.addEventListener('offline', () => {
+      this.logger.warn('Internet connection lost');
+      this.disconnectWebSocket();
+      amplify.publish(WebAppEvents.WARNING.SHOW, Warnings.TYPE.NO_INTERNET);
+    });
+    return connect();
   }
 
   /**
-   * Close the WebSocket connection.
+   * Close the WebSocket connection. (will be set only once the connectWebSocket is called)
    */
-  disconnectWebSocket() {
-    this.notificationHandlingState(NOTIFICATION_HANDLING_STATE.STREAM);
-    this.webSocketService.disconnect();
-  }
+  disconnectWebSocket: () => void = () => {};
 
   //##############################################################################
   // Notification Stream handling
@@ -199,160 +233,6 @@ export class EventRepository {
         this.serverTimeHandler.computeTimeOffset(errorResponse.response?.time);
       }
     }
-  }
-
-  /**
-   * Get notifications for the current client from the stream.
-   *
-   * @param notificationId Event ID to start from
-   * @param abortHandler Max. number of notifications to retrieve from backend at once
-   * @returns Resolves when all new notifications from the stream have been handled with the latest notification ID that has been processed
-   */
-  private async getNotifications(notificationId: string, abortHandler: AbortHandler): Promise<string> {
-    function hasMissedNotifications(data: any): data is NotificationList {
-      return !!data.notifications;
-    }
-
-    const processNotifications = async (notifications: Notification[], abortHandler: AbortHandler) => {
-      if (notifications.length <= 0) {
-        this.logger.info(`No notifications found since '${notificationId}'`);
-        return notificationId;
-      }
-
-      this.notificationsTotal += notifications.length;
-      this.logger.info(`Fetched '${this.notificationsTotal}' notifications from the backend`);
-
-      this.logger.info(`Processing '${notifications.length}' notifications`);
-      for (const notification of notifications) {
-        await this.handleNotification(notification);
-
-        // Abort notification stream handling due to websocket disconnect
-        // We'll start processing from the last processed notification when the websocket reconnects
-        if (abortHandler.isAborted()) {
-          this.logger.info(
-            `Abort notification stream handling at ID "${notification.id}" due to WebSocket disconnect. We will restart with ID "${notificationId}".`,
-          );
-          throw new EventError(EventError.TYPE.WEBSOCKET_DISCONNECT, EventError.MESSAGE.WEBSOCKET_DISCONNECT);
-        }
-      }
-
-      notificationId = notifications[notifications.length - 1].id;
-      return notificationId;
-    };
-
-    try {
-      await this.handleTimeDrift();
-      const notificationList = await this.notificationService.getAllNotificationsForClient(
-        this.currentClient().id,
-        notificationId,
-      );
-      return await processNotifications(notificationList, abortHandler);
-    } catch (error) {
-      // When asking for /notifications with a `since` set to a notification ID that the backend doesn't know of (because it does not belong to our client or it is older than the lifetime of the notification stream),
-      // we will receive a HTTP 404 status code with a `notifications` payload
-      // TODO: In the future we should ask the backend for the last known notification id (HTTP GET /notifications/{id}) instead of using the "errorResponse.notifications" payload
-      if (isAxiosError(error)) {
-        if (hasMissedNotifications(error.response.data)) {
-          this.triggerMissedSystemEventMessageRendering();
-          const {has_more, notifications: missedNotifications} = error.response.data;
-          if (has_more) {
-            const furtherMissedNotifications = await this.notificationService.getAllNotificationsForClient(
-              this.currentClient().id,
-              missedNotifications[missedNotifications.length - 1].id,
-            );
-            missedNotifications.push(...furtherMissedNotifications);
-          }
-          return processNotifications(missedNotifications, abortHandler);
-        }
-        this.logger.info(`No notifications found since '${notificationId}'`, error);
-        throw new EventError(EventError.TYPE.NO_NOTIFICATIONS, EventError.MESSAGE.NO_NOTIFICATIONS);
-      }
-
-      this.logger.error(`Failed to get notifications: ${error.message}`, error);
-      throw new EventError(EventError.TYPE.REQUEST_FAILURE, EventError.MESSAGE.REQUEST_FAILURE);
-    }
-  }
-
-  /**
-   * Get the last notification.
-   * @returns Resolves with the last handled notification ID and time
-   */
-  private getStreamState() {
-    return this.notificationService
-      .getLastNotificationIdFromDb()
-      .catch(error => {
-        const isNoLastId = error.type === EventError.TYPE.NO_LAST_ID;
-        if (!isNoLastId) {
-          throw error;
-        }
-
-        this.logger.warn('Last notification ID not found in database. Resetting...');
-        return this.setStreamState(this.currentClient().id).then(() => {
-          this.triggerMissedSystemEventMessageRendering();
-          return this.lastNotificationId();
-        });
-      })
-      .then(notificationId => {
-        this.lastNotificationId(notificationId);
-        return this.notificationService.getLastEventDateFromDb();
-      })
-      .then(eventDate => this.lastEventDate(eventDate))
-      .catch(error => {
-        const isNoLastDate = error.type === EventError.TYPE.NO_LAST_DATE;
-        if (!isNoLastDate) {
-          throw error;
-        }
-
-        this.logger.warn('Last event date not found in database. Resetting...');
-        this.lastEventDate(new Date(0).toISOString());
-      })
-      .then(() => ({eventDate: this.lastEventDate(), notificationId: this.lastNotificationId()}));
-  }
-
-  /**
-   * Set state for notification stream.
-   * @param abortHandler Handler for WebSocket disconnects
-   * @returns Resolves when all notifications have been handled
-   */
-  private async initializeFromStream(abortHandler: AbortHandler) {
-    try {
-      const {notificationId} = await this.getStreamState();
-      this.logger.info(`Retrieving messages from notification stream. Starting with ID "${notificationId}"...`);
-      return await this.updateFromStream(notificationId, abortHandler);
-    } catch (error) {
-      const isNoLastId = error.type === EventError.TYPE.NO_LAST_ID;
-      if (isNoLastId) {
-        this.logger.info('No notifications found for this user', error);
-        return 0;
-      }
-
-      throw error;
-    }
-  }
-
-  /**
-   * Get the last notification ID and set event date for a given client.
-   *
-   * @param clientId Client ID to retrieve last notification ID for
-   * @param isInitialization Set initial date to 0 if not found
-   * @returns Resolves when stream state has been initialized
-   */
-  private setStreamState(clientId: string, isInitialization = false): Promise<(string | void)[] | undefined> {
-    return this.notificationService.getNotificationsLast(clientId).then(({id: notificationId, payload}) => {
-      const [event] = payload;
-      const isoDateString = this.getIsoDateFromEvent(event as EventRecord, isInitialization) as string;
-
-      if (notificationId) {
-        const logMessage = isoDateString
-          ? `Set starting point on notification stream to '${notificationId}' (isoDateString)`
-          : `Reset starting point on notification stream to '${notificationId}'`;
-        this.logger.info(logMessage);
-
-        return Promise.all([this.updateLastEventDate(isoDateString), this.updateLastNotificationId(notificationId)]);
-      }
-
-      return undefined;
-    });
   }
 
   private getIsoDateFromEvent(event: EventRecord, defaultValue = false): string | void {
@@ -377,39 +257,14 @@ export class EventRepository {
     }
   }
 
-  private triggerMissedSystemEventMessageRendering() {
-    this.notificationService.getMissedIdFromDb().then(notificationId => {
-      const shouldUpdatePersistedId = this.lastNotificationId() !== notificationId;
-      if (shouldUpdatePersistedId) {
-        amplify.publish(WebAppEvents.CONVERSATION.MISSED_EVENTS);
-        this.notificationService.saveMissedIdToDb(this.lastNotificationId());
-      }
-    });
-  }
-
-  /**
-   * Fetch all missed events from the notification stream since the given last notification ID.
-   *
-   * @param lastNotificationId Last known notification ID to start update from
-   * @param abortHandler Handler for WebSocket disconnects
-   * @returns Resolves with the total number of processed notifications
-   */
-  private async updateFromStream(lastNotificationId: string, abortHandler: AbortHandler): Promise<number> {
-    this.notificationsTotal = 0;
-    try {
-      const updatedLastNotificationId = await this.getNotifications(lastNotificationId, abortHandler);
-      this.logger.info(`ID of last notification fetched from stream is '${updatedLastNotificationId}'`);
-      return this.notificationsTotal;
-    } catch (error) {
-      const isNoNotifications = error.type === EventError.TYPE.NO_NOTIFICATIONS;
-      if (isNoNotifications) {
-        this.logger.info('No notifications found for this user', error);
-        return 0;
-      }
-
-      throw error;
+  private readonly triggerMissedSystemEventMessageRendering = async (missedNotificationId: string) => {
+    const notificationId = await this.notificationService.getMissedIdFromDb();
+    const shouldUpdatePersistedId = missedNotificationId !== notificationId;
+    if (shouldUpdatePersistedId) {
+      amplify.publish(WebAppEvents.CONVERSATION.MISSED_EVENTS);
+      this.notificationService.saveMissedIdToDb(this.lastNotificationId());
     }
-  }
+  };
 
   /**
    * Persist updated last event timestamp.
@@ -425,32 +280,6 @@ export class EventRepository {
     }
   }
 
-  /**
-   * Persist updated last notification ID.
-   *
-   * @param notificationId Updated last notification ID
-   * @returns Resolves when the last notification ID was stored
-   */
-  private updateLastNotificationId(notificationId: string): Promise<string | void> {
-    if (notificationId) {
-      this.lastNotificationId(notificationId);
-      return this.notificationService.saveLastNotificationIdToDb(notificationId);
-    }
-    return Promise.resolve();
-  }
-
-  private updateProgress() {
-    if (this.notificationsHandled % 5 === 0 || this.notificationsHandled < 5) {
-      const content = {
-        handled: this.notificationsHandled,
-        total: this.notificationsTotal,
-      };
-      const progress = (this.notificationsHandled / this.notificationsTotal) * 50 + 25;
-
-      amplify.publish(WebAppEvents.APP.UPDATE_PROGRESS, progress, t('initDecryption'), content);
-    }
-  }
-
   //##############################################################################
   // Notification/Event handling
   //##############################################################################
@@ -463,7 +292,7 @@ export class EventRepository {
    * @param source Source of injection
    * @returns Resolves when the event has been processed
    */
-  async injectEvent(event: EventRecord, source = EventRepository.SOURCE.INJECTED): Promise<EventRecord> {
+  async injectEvent(event: EventRecord, source: EventSource = EventSource.INJECTED): Promise<EventRecord> {
     if (!event) {
       throw new EventError(EventError.TYPE.NO_EVENT, EventError.MESSAGE.NO_EVENT);
     }
@@ -477,7 +306,7 @@ export class EventRepository {
     const inSelfConversation = conversationId === this.userState.self().id;
     if (!inSelfConversation) {
       this.logger.info(`Injected event ID '${id}' of type '${type}' with source '${source}'`, event);
-      return this.handleEvent(event, source);
+      return this.handleEvent({event}, source);
     }
     return event;
   }
@@ -527,7 +356,10 @@ export class EventRepository {
    * @param source Source of event
    * @returns Resolves with the saved record or the plain event if the event was skipped
    */
-  private handleEvent(event: EventRecord, source: EventSource): Promise<EventRecord> {
+  private handleEvent(
+    {event, decryptedData, decryptionError}: Omit<ProcessedEventPayload, 'event'> & {event: EventRecord},
+    source: EventSource,
+  ): Promise<EventRecord> {
     const logObject = {eventJson: JSON.stringify(event), eventObject: event};
     const validationResult = validateEvent(
       event as {time: string; type: CONVERSATION_EVENT | USER_EVENT},
@@ -536,18 +368,18 @@ export class EventRepository {
     );
     switch (validationResult) {
       default: {
-        return Promise.resolve(event);
+        return Promise.resolve(event as EventRecord);
       }
       case EventValidation.IGNORED_TYPE: {
         this.logger.info(`Ignored event type '${event.type}'`, logObject);
-        return Promise.resolve(event);
+        return Promise.resolve(event as EventRecord);
       }
       case EventValidation.OUTDATED_TIMESTAMP: {
         this.logger.info(`Ignored outdated event type: '${event.type}'`, logObject);
-        return Promise.resolve(event);
+        return Promise.resolve(event as EventRecord);
       }
       case EventValidation.VALID:
-        return this.processEvent(event, source);
+        return this.processEvent(event as EventRecord, source, decryptedData, decryptionError);
     }
   }
 
@@ -558,19 +390,30 @@ export class EventRepository {
    * @param source Source of event
    * @returns Resolves with the saved record or `true` if the event was skipped
    */
-  private async processEvent(event: EventRecord, source: EventSource): Promise<EventRecord> {
-    const isEncryptedEvent = event.type === CONVERSATION_EVENT.OTR_MESSAGE_ADD;
-    if (isEncryptedEvent) {
-      event = await this.cryptographyRepository.handleEncryptedEvent(event as ConversationOtrMessageAddEvent);
+  private async processEvent(
+    event: EventRecord,
+    source: EventSource,
+    decryptedData?: GenericMessage,
+    decryptionError?: HandledEventPayload['decryptionError'],
+  ): Promise<EventRecord> {
+    if (decryptionError) {
+      this.logger.warn(`Decryption Error: (${decryptionError.code}) ${decryptionError.message}`, decryptionError);
+      amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.E2EE.FAILED_MESSAGE_DECRYPTION, {
+        cause: decryptionError.code,
+      });
+      event = EventBuilder.buildUnableToDecrypt(event, decryptionError);
     }
-
+    if (decryptedData) {
+      event = await new CryptographyMapper().mapGenericMessage(decryptedData, event);
+    }
     for (const eventProcessMiddleware of this.eventProcessMiddlewares) {
       event = await eventProcessMiddleware(event);
     }
 
     const shouldSaveEvent = EventTypeHandling.STORE.includes(event.type as CONVERSATION_EVENT);
     if (shouldSaveEvent) {
-      event = (await this.handleEventSaving(event)) as ConversationOtrMessageAddEvent;
+      const savedEvent = await this.handleEventSaving(event);
+      event = savedEvent ?? event;
     }
 
     return this.handleEventDistribution(event, source);
@@ -613,7 +456,7 @@ export class EventRepository {
    * @param event Backend event extracted from notification stream
    * @returns Resolves with the saved event
    */
-  private handleEventSaving(event: EventRecord): Promise<EventRecord | void> {
+  private handleEventSaving(event: EventRecord): Promise<EventRecord | undefined> {
     const conversationId = event.conversation;
     const mappedData = event.data || {};
 
@@ -634,9 +477,9 @@ export class EventRepository {
         // check for duplicates (same id)
         const loadEventPromise = newEvent.id
           ? this.eventService.loadEvent(conversationId, newEvent.id)
-          : Promise.resolve();
+          : Promise.resolve(undefined);
 
-        return (loadEventPromise as Promise<EventRecord>).then((storedEvent: EventRecord) => {
+        return loadEventPromise.then((storedEvent?: EventRecord) => {
           return storedEvent
             ? this.handleDuplicatedEvent(storedEvent, newEvent)
             : this.eventService.saveEvent(newEvent);
@@ -685,7 +528,7 @@ export class EventRepository {
   private async handleAssetUpdate(
     originalEvent: EventRecord<AssetData>,
     newEvent: EventRecord<AssetData>,
-  ): Promise<EventRecord | void> {
+  ): Promise<EventRecord> {
     const newEventData = newEvent.data;
     // the preview status is not sent by the client so we fake a 'preview' status in order to cleanly handle it in the switch statement
     const ASSET_PREVIEW = 'preview';
@@ -720,7 +563,7 @@ export class EventRepository {
     }
   }
 
-  private handleLinkPreviewUpdate(originalEvent: EventRecord, newEvent: EventRecord): Promise<EventRecord | void> {
+  private handleLinkPreviewUpdate(originalEvent: EventRecord, newEvent: EventRecord): Promise<EventRecord> {
     const newEventData = newEvent.data;
     const originalData = originalEvent.data;
     if (originalEvent.from !== newEvent.from) {
@@ -806,50 +649,6 @@ export class EventRepository {
     const baseErrorMessage = 'Event validation failed:';
     this.logger.warn(`${baseLogMessage} ${logMessage || errorMessage}`, event);
     throw new EventError(EventError.TYPE.VALIDATION_FAILED, `${baseErrorMessage} ${errorMessage}`);
-  }
-
-  /**
-   * Handle all events from the payload of an incoming notification.
-   *
-   * @param events Events contained in a notification
-   * @param id Notification ID
-   * @param transient Type of notification
-   * @returns Resolves with the ID of the handled notification
-   */
-  private async handleNotification({payload: events, id, transient}: Notification): Promise<string | void> {
-    const source = transient !== undefined ? EventRepository.SOURCE.WEB_SOCKET : EventRepository.SOURCE.STREAM;
-    const isTransientEvent = !!transient;
-    this.logger.info(`Handling notification '${id}' from '${source}' containing '${events.length}' events`, events);
-
-    if (!isTransientEvent) {
-      this.updateLastNotificationId(id);
-    }
-
-    if (!events.length) {
-      this.logger.warn('Notification payload does not contain any events');
-      return;
-    }
-
-    try {
-      await Promise.all(
-        events.map(async event => {
-          try {
-            await this.handleEvent(event as EventRecord, source);
-          } catch (error) {
-            this.logger.warn(`Failed to handle event of type "${event.type}": ${error.message}`, error);
-          }
-        }),
-      );
-      this.notificationsHandled++;
-      if (this.notificationHandlingState() === NOTIFICATION_HANDLING_STATE.STREAM) {
-        this.updateProgress();
-      }
-    } catch (error) {
-      if (error.type === ConversationError.TYPE.CONVERSATION_NOT_FOUND) {
-        return;
-      }
-      this.logger.error(`Failed to handle notification '${id}' from '${source}': ${error.message}`, error);
-    }
   }
 
   /**
