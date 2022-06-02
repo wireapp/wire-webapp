@@ -33,4 +33,7 @@ module.exports = {
   mode: 'development',
   plugins: [...commonConfig.plugins, new webpack.HotModuleReplacementPlugin()],
   resolve: {...commonConfig.resolve, alias: {...commonConfig.resolve.alias}},
+  snapshot: {
+    managedPaths: [],
+  },
 };

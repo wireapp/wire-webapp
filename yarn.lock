@@ -3082,6 +3082,24 @@
     tough-cookie "4.0.0"
     ws "7.5.3"
 
+"@wireapp/api-client@file:.yalc/@wireapp/api-client":
+  version "18.8.2"
+  dependencies:
+    "@types/node" "~14"
+    "@types/spark-md5" "3.0.2"
+    "@types/tough-cookie" "4.0.1"
+    "@wireapp/commons" "4.2.13"
+    "@wireapp/priority-queue" "1.6.39"
+    "@wireapp/protocol-messaging" "1.37.0"
+    axios "0.21.4"
+    axios-retry "3.1.9"
+    http-status-codes "2.1.4"
+    logdown "3.3.1"
+    reconnecting-websocket "4.4.0"
+    spark-md5 "3.0.1"
+    tough-cookie "4.0.0"
+    ws "7.5.3"
+
 "@wireapp/avs@8.1.13":
   version "8.1.13"
   resolved "https://registry.yarnpkg.com/@wireapp/avs/-/avs-8.1.13.tgz#8f87ec2cff840bee115308db0c2b4d200911bec2"

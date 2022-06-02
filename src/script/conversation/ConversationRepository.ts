@@ -490,7 +490,7 @@ export class ConversationRepository {
 
     fetching_conversations[conversationId] = [];
     try {
-      console.log('BEFORE CONVERSATIONS!!')
+      console.log('BEFORE CONVERSATIONS!!');
       const response = await this.conversation_service.getConversationById(qualifiedId);
       console.log('CONVERSATIONS', response);
       const [conversationEntity] = this.mapConversations([response]);
@@ -504,8 +504,12 @@ export class ConversationRepository {
       return conversationEntity;
     } catch (originalError) {
       if (originalError.code === HTTP_STATUS.NOT_FOUND) {
-        this.deleteConversationLocally(qualifiedId, false);
+        // this.deleteConversationLocally(qualifiedId, false);
+        return new Conversation(conversationId, domain);
       }
+      // if (originalError.code === HTTP_STATUS.INTERNAL_SERVER_ERROR) {
+      //   return {qualified_id: qualifiedId} as unknown as Conversation;
+      // }
       const error = new ConversationError(
         ConversationError.TYPE.CONVERSATION_NOT_FOUND,
         ConversationError.MESSAGE.CONVERSATION_NOT_FOUND,
