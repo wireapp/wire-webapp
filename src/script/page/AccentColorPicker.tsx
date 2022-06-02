@@ -55,8 +55,8 @@ const AccentColorPicker: React.FunctionComponent<AccentColorPickerProps> = ({use
           }}
         >
           {Object.keys(ACCENT_ID).map(key => {
-            const id = ACCENT_ID[key];
-            const name = key.toLowerCase();
+            const id = ACCENT_ID[key as keyof typeof ACCENT_ID];
+            const name = t(`preferencesAccountAccentColor${key as keyof typeof ACCENT_ID}`);
             const color = User.ACCENT_COLOR[id];
             const isChecked = accentId === id;
 
