@@ -18,13 +18,8 @@
  */
 
 import ko from 'knockout';
-import {WebAppEvents} from '@wireapp/webapp-events';
-import {amplify} from 'amplify';
-
 import {t} from 'Util/LocalizerUtil';
-
 import {Config} from '../Config';
-
 import 'Components/LoadingBar';
 
 export class LoadingViewModel {
@@ -35,7 +30,6 @@ export class LoadingViewModel {
   constructor() {
     this.loadingMessage = ko.observable('');
     this.loadingProgress = ko.observable(0);
-    amplify.subscribe(WebAppEvents.APP.UPDATE_PROGRESS, this.updateProgress);
 
     const elementId = 'loading-screen';
     this.element = document.getElementById(elementId);
@@ -45,7 +39,6 @@ export class LoadingViewModel {
   readonly removeFromView = () => {
     ko.cleanNode(this.element);
     this.element.remove();
-    amplify.unsubscribeAll(WebAppEvents.APP.UPDATE_PROGRESS);
   };
 
   readonly updateProgress = (progress = 0, message?: string, replaceContent?: {handled: number; total: number}) => {

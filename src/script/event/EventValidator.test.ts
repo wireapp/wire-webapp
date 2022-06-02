@@ -35,7 +35,7 @@ describe('EventValidator', () => {
         type: CONVERSATION_EVENT.TYPING,
       };
 
-      const source = EventSource.WEB_SOCKET;
+      const source = EventSource.WEBSOCKET;
       const result = validateEvent(event, source, undefined);
 
       expect(result).toBe(EventValidation.IGNORED_TYPE);
