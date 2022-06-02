@@ -29,38 +29,15 @@ Prerequisites:
 
    - This will install all dependencies and fetch a [configuration](https://github.com/wireapp/wire-web-config-wire/) for the application.
 
-1. Rename `.env.localhost` to `.env` in order to configure the application. This configuration can override/extend the configuration from the previous step.
-
 ## 2. Build & run
-
-### Production
-
-1. Run `yarn build:prod`
-1. Run `cd server && yarn start:prod`
 
 ### Development
 
-1. Run `yarn start` and Wire's web app will be available at: https://localhost:8081/auth/
+1. Rename `.env.localhost` to `.env` in order to configure the application. This configuration can override/extend the configuration from the previous step.
 1. Add the following entries to your hosts file (macOS / Linux: `/etc/hosts`, Windows 10: `%WINDIR%\system32\drivers\etc\hosts`):
    - `127.0.0.1 local.wire.com` (to connect with production backend)
    - `127.0.0.1 local.zinfra.io` (to connect with staging backend)
-1. Use Chrome or Firefox with the following settings:
-   - custom user data directory to not mess up your usual browser configuration
-     - Chrome: add `--user-data-dir=<path>` to the start parameters
-     - Firefox: add `--profile <path>` to the start parameters
-   - disabled [CORS](https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS) to circumvent issues when connecting to our backend from localhost
-     - Chrome: add `--disable-web-security` to the start parameters
-     - Firefox: install the [CORS Everywhere](https://addons.mozilla.org/en-US/firefox/addon/cors-everywhere/) plugin
-   - disabled [`SameSite`](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Set-Cookie/SameSite) attribute to allow cross-site cookies
-     - Chrome: add `--disable-features=SameSiteByDefaultCookies` to the start parameters
-     - Firefox: Go to `about:config` and make sure you have the following settings:
-       - `network.cookie.sameSite.laxByDefault: false`
-       - `network.cookie.sameSite.noneRequiresSecure: false`
-   - ignored certificate errors (optional, also see [Install the self-signed certificate](#install-the-self-signed-certificate))
-     - Chrome: add `--ignore-certificate-errors` to the start parameters
-     - Firefox:
-       1. Go to Edit > Preferences > Privacy & Security
-       2. Uncheck the checkbox for "Query OCSP responder servers to confirm the current validity of certificates"
+1. Run `yarn start` and Wire's web app will be available at: https://local.zinfra.io:8081/auth/
 
 #### Install the self-signed certificate
 
@@ -69,6 +46,11 @@ If you would like your browser to trust the certificate from "local.wire.com" or
 1. Download [mkcert](https://github.com/FiloSottile/mkcert/releases/latest)
 1. Set the `CAROOT` environment variable to `<WebApp Dir>/server/certificate`
 1. Run `mkcert -install`
+
+### Production
+
+1. Run `yarn build:prod`
+1. Run `cd server && yarn start:prod`
 
 ## Testing
 
