@@ -18,7 +18,7 @@
  */
 
 import {ClientType} from '@wireapp/api-client/src/client';
-import {Button, ContainerXS, H1, Link, Paragraph} from '@wireapp/react-ui-kit';
+import {Button, ContainerXS, H1, Link, Paragraph, COLOR} from '@wireapp/react-ui-kit';
 import React from 'react';
 import {FormattedMessage, useIntl} from 'react-intl';
 import {connect} from 'react-redux';
@@ -60,9 +60,12 @@ const HistoryInfo = ({hasHistory, clients, currentSelfClient, isNewCurrentSelfCl
 
   return (
     <Page>
-      <ContainerXS centerText verticalCenter style={{width: '100%'}}>
-        <H1 center>{_(headline, {brandName: Config.getConfig().BRAND_NAME})}</H1>
-        <Paragraph center style={{marginBottom: 56}}>
+      <ContainerXS centerText verticalCenter style={{maxWidth: '300px', width: '100%'}}>
+        <H1 center css={{fontSize: '24px', fontWeight: 500, lineHeight: '28px'}}>
+          {_(headline, {brandName: Config.getConfig().BRAND_NAME})}
+        </H1>
+
+        <Paragraph center style={{letterSpacing: '0.05px', marginBottom: 86}}>
           <FormattedMessage
             {...infoText}
             values={{
@@ -70,13 +73,7 @@ const HistoryInfo = ({hasHistory, clients, currentSelfClient, isNewCurrentSelfCl
             }}
           />
         </Paragraph>
-        {!hasHistory && (
-          <Paragraph center style={{marginBottom: 40}}>
-            <Link href={Config.getConfig().URL.SUPPORT.HISTORY} target="_blank" data-uie-name="do-history-learn-more">
-              {_(historyInfoStrings.learnMore)}
-            </Link>
-          </Paragraph>
-        )}
+
         <Button
           type="button"
           onClick={onContinue}
@@ -89,6 +86,22 @@ const HistoryInfo = ({hasHistory, clients, currentSelfClient, isNewCurrentSelfCl
         >
           {_(historyInfoStrings.ok)}
         </Button>
+
+        {!hasHistory && (
+          <Paragraph center style={{marginTop: 4}}>
+            <Link
+              href={Config.getConfig().URL.SUPPORT.HISTORY}
+              target="_blank"
+              data-uie-name="do-history-learn-more"
+              textTransform="none"
+              bold={false}
+              style={{fontSize: '16px', textDecoration: 'underline'}}
+              color={COLOR.BLUE}
+            >
+              {_(historyInfoStrings.learnMore)}
+            </Link>
+          </Paragraph>
+        )}
       </ContainerXS>
     </Page>
   );

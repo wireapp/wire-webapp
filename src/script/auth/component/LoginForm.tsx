@@ -18,7 +18,18 @@
  */
 
 import {LoginData} from '@wireapp/api-client/src/auth';
-import {ArrowIcon, Input, InputBlock, InputSubmitCombo, Loading, RoundIconButton} from '@wireapp/react-ui-kit';
+import {css} from '@emotion/react';
+import {
+  Button,
+  Input,
+  Link,
+  Loading,
+  COLOR,
+  InputSubmitCombo,
+  RoundIconButton,
+  ShowIcon,
+  HideIcon,
+} from '@wireapp/react-ui-kit';
 import React, {useRef, useState} from 'react';
 import {useIntl} from 'react-intl';
 
@@ -27,11 +38,28 @@ import {isValidEmail, isValidPhoneNumber, isValidUsername} from 'Util/Validation
 import {Config} from '../../Config';
 import {loginStrings} from '../../strings';
 import {ValidationError} from '../module/action/ValidationError';
+import {EXTERNAL_ROUTE} from '../externalRoute';
 
 interface LoginFormProps {
   isFetching: boolean;
   onSubmit: (loginData: Partial<LoginData>, validationErrors: Error[]) => Promise<void>;
 }
+
+const inputContainer = css`
+  display: flex;
+  flex-direction: column;
+
+  &:focus-within label {
+    color: ${COLOR.BLUE};
+  }
+
+  label {
+    font-size: 14px;
+    order: -1;
+    text-align: left;
+    margin-bottom: 2px;
+  }
+`;
 
 const LoginForm = ({isFetching, onSubmit}: LoginFormProps) => {
   const {formatMessage: _} = useIntl();
@@ -41,6 +69,7 @@ const LoginForm = ({isFetching, onSubmit}: LoginFormProps) => {
   const [validPasswordInput, setValidPasswordInput] = useState(true);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [isPasswordVisible, setIsPasswordVisible] = useState<boolean>(false);
 
   const handleSubmit = (event: React.FormEvent): void => {
     event.preventDefault();
@@ -74,58 +103,96 @@ const LoginForm = ({isFetching, onSubmit}: LoginFormProps) => {
     onSubmit(loginData, validationErrors);
   };
 
+  const toggleIsPasswordVisible = () => setIsPasswordVisible(prevState => !prevState);
+
   return (
-    <InputBlock>
-      <Input
-        name="email"
-        onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-          setEmail(event.target.value);
-          setValidEmailInput(true);
-        }}
-        ref={emailInput}
-        markInvalid={!validEmailInput}
-        value={email}
-        autoComplete="username email"
-        placeholder={_(loginStrings.emailPlaceholder)}
-        maxLength={128}
-        type="text"
-        required
-        data-uie-name="enter-email"
-      />
-      <InputSubmitCombo>
+    <div>
+      <div css={inputContainer}>
         <Input
-          name="password-login"
+          name="email"
+          id="email"
           onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-            setPassword(event.target.value);
-            setValidPasswordInput(true);
+            setEmail(event.target.value);
+            setValidEmailInput(true);
           }}
-          ref={passwordInput}
-          markInvalid={!validPasswordInput}
-          value={password}
-          autoComplete="section-login password"
-          type="password"
-          placeholder={_(loginStrings.passwordPlaceholder)}
-          pattern={'.{1,1024}'}
+          ref={emailInput}
+          markInvalid={!validEmailInput}
+          value={email}
+          autoComplete="username email"
+          placeholder={_(loginStrings.emailPlaceholder)}
+          maxLength={128}
+          type="text"
           required
-          data-uie-name="enter-password"
+          data-uie-name="enter-email"
+          style={{height: '48px'}}
         />
-        {isFetching ? (
-          <Loading size={32} />
-        ) : (
-          <RoundIconButton
-            style={{marginLeft: 16}}
-            disabled={!email || !password}
-            type="submit"
-            formNoValidate
-            onClick={handleSubmit}
-            aria-label={_(loginStrings.headline)}
-            data-uie-name="do-sign-in"
-          >
-            <ArrowIcon />
+
+        <label htmlFor="email">Email / username</label>
+      </div>
+
+      <div css={inputContainer}>
+        <InputSubmitCombo style={{height: '48px'}}>
+          <Input
+            name="password-login"
+            id="password-login"
+            onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+              setPassword(event.target.value);
+              setValidPasswordInput(true);
+            }}
+            ref={passwordInput}
+            markInvalid={!validPasswordInput}
+            value={password}
+            autoComplete="section-login password"
+            type={isPasswordVisible ? 'text' : 'password'}
+            placeholder={_(loginStrings.passwordPlaceholder)}
+            pattern={'.{1,1024}'}
+            required
+            data-uie-name="enter-password"
+            style={{height: '48px'}}
+          />
+
+          <RoundIconButton type="button" onClick={toggleIsPasswordVisible} style={{backgroundColor: 'transparent'}}>
+            {isPasswordVisible ? <HideIcon color={COLOR.BLACK} /> : <ShowIcon color={COLOR.BLACK} />}
           </RoundIconButton>
-        )}
-      </InputSubmitCombo>
-    </InputBlock>
+        </InputSubmitCombo>
+
+        <label htmlFor="password-login">Password</label>
+      </div>
+
+      <div style={{marginTop: '8px'}}>
+        <Link
+          href={EXTERNAL_ROUTE.WIRE_ACCOUNT_PASSWORD_RESET}
+          target="_blank"
+          fontSize="16px"
+          bold={false}
+          color={COLOR.BLUE}
+          style={{marginTop: '8px', textDecoration: 'underline'}}
+          data-uie-name="go-forgot-password"
+          textTransform="none"
+        >
+          {_(loginStrings.forgotPassword)}
+        </Link>
+      </div>
+
+      <Button
+        type="submit"
+        onClick={handleSubmit}
+        block
+        disabled={!email || !password}
+        style={{
+          alignItems: 'center',
+          borderRadius: '16px',
+          display: 'flex',
+          justifyContent: 'center',
+          marginBottom: '0',
+          marginTop: '20px',
+        }}
+        aria-label={_(loginStrings.headline)}
+        data-uie-name="do-sign-in"
+      >
+        {isFetching ? <Loading size={32} /> : _(loginStrings.headline)}
+      </Button>
+    </div>
   );
 };
 

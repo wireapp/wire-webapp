@@ -889,7 +889,7 @@ export const historyInfoStrings = defineMessages({
     id: 'historyInfo.noHistoryHeadline',
   },
   noHistoryInfo: {
-    defaultMessage: 'For privacy reasons, {newline}your conversation history will not appear here.',
+    defaultMessage: 'For privacy reasons, your conversation history will not appear here.',
     id: 'historyInfo.noHistoryInfo',
   },
   ok: {

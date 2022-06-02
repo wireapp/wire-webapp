@@ -34,10 +34,8 @@ import {
   H2,
   Label,
   IsMobile,
-  Link,
   TextLink,
   Loading,
-  Muted,
   Text,
 } from '@wireapp/react-ui-kit';
 import React, {useEffect, useRef, useState} from 'react';
@@ -52,7 +50,6 @@ import {loginStrings, verifyStrings} from '../../strings';
 import AppAlreadyOpen from '../component/AppAlreadyOpen';
 import LoginForm from '../component/LoginForm';
 import RouterLink from '../component/RouterLink';
-import {EXTERNAL_ROUTE} from '../externalRoute';
 import {actionRoot} from '../module/action/';
 import {BackendError} from '../module/action/BackendError';
 import {LabeledError} from '../module/action/LabeledError';
@@ -252,6 +249,16 @@ const Login = ({
     </RouterLink>
   );
 
+  const renderErrorSection = () => {
+    if (validationErrors.length) {
+      return <div style={{marginTop: '12px'}}>{parseValidationErrors(validationErrors)}</div>;
+    } else if (loginError) {
+      return <div style={{marginTop: '12px'}}>{parseError(loginError)}</div>;
+    }
+
+    return <div style={{marginTop: '4px'}}>&nbsp;</div>;
+  };
+
   return (
     <Page>
       {(Config.getConfig().FEATURE.ENABLE_DOMAIN_DISCOVERY ||
@@ -261,12 +268,15 @@ const Login = ({
           <div style={{margin: 16}}>{backArrow}</div>
         </IsMobile>
       )}
+
       {isEntropyRequired && showEntropyForm ? (
         <EntropyContainer onSetEntropy={storeEntropy} />
       ) : (
         <Container centerText verticalCenter style={{width: '100%'}}>
           {!isValidLink && <Redirect to={ROUTE.CONVERSATION_JOIN_INVALID} />}
+
           <AppAlreadyOpen />
+
           <Columns>
             <IsMobile not>
               <Column style={{display: 'flex'}}>
@@ -277,6 +287,7 @@ const Login = ({
                 )}
               </Column>
             </IsMobile>
+
             <Column style={{flexBasis: 384, flexGrow: 0, padding: 0}}>
               <ContainerXS
                 centerText
@@ -285,9 +296,11 @@ const Login = ({
                 {twoFactorLoginData ? (
                   <div>
                     <H2 center>{_(loginStrings.twoFactorLoginTitle)}</H2>
+
                     <Text data-uie-name="label-with-email">
                       {_(loginStrings.twoFactorLoginSubHead, {email: twoFactorLoginData.email})}
                     </Text>
+
                     <Label markInvalid={!!twoFactorSubmitError}>
                       <CodeInput
                         style={{marginTop: 60}}
@@ -295,8 +308,10 @@ const Login = ({
                         data-uie-name="enter-code"
                         markInvalid={!!twoFactorSubmitError}
                       />
+
                       {!!twoFactorSubmitError && parseError(twoFactorSubmitError)}
                     </Label>
+
                     <div style={{marginTop: 30}}>
                       {isSendingTwoFactorCode ? (
                         <Loading size={20} />
@@ -310,17 +325,15 @@ const Login = ({
                 ) : (
                   <>
                     <div>
-                      <H1 center>{_(loginStrings.headline)}</H1>
-                      <Muted>{_(loginStrings.subhead)}</Muted>
+                      <H1 center style={{fontSize: '24px'}}>
+                        {_(loginStrings.headline)}
+                      </H1>
+
                       <Form style={{marginTop: 30}} data-uie-name="login">
                         <LoginForm isFetching={isFetching} onSubmit={handleSubmit} />
-                        {validationErrors.length ? (
-                          parseValidationErrors(validationErrors)
-                        ) : loginError ? (
-                          parseError(loginError)
-                        ) : (
-                          <div style={{marginTop: '4px'}}>&nbsp;</div>
-                        )}
+
+                        {renderErrorSection()}
+
                         {!Runtime.isDesktopApp() && (
                           <Checkbox
                             onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
@@ -330,7 +343,7 @@ const Login = ({
                             }}
                             checked={loginData.clientType === ClientType.TEMPORARY}
                             data-uie-name="enter-public-computer-sign-in"
-                            style={{justifyContent: 'center', marginTop: '12px'}}
+                            style={{justifyContent: 'center'}}
                           >
                             <CheckboxLabel htmlFor="enter-public-computer-sign-in">
                               {_(loginStrings.publicComputer)}
@@ -339,19 +352,19 @@ const Login = ({
                         )}
                       </Form>
                     </div>
+
                     <Columns>
-                      <Column>
-                        <Link
-                          href={EXTERNAL_ROUTE.WIRE_ACCOUNT_PASSWORD_RESET}
-                          target="_blank"
-                          data-uie-name="go-forgot-password"
-                        >
-                          {_(loginStrings.forgotPassword)}
-                        </Link>
-                      </Column>
                       {Config.getConfig().FEATURE.ENABLE_PHONE_LOGIN && (
-                        <Column>
-                          <RouterLink to={ROUTE.LOGIN_PHONE} data-uie-name="go-sign-in-phone">
+                        <Column style={{marginTop: '24px'}}>
+                          <RouterLink
+                            to={ROUTE.LOGIN_PHONE}
+                            data-uie-name="go-sign-in-phone"
+                            fontSize="16px"
+                            bold={false}
+                            color={COLOR.BLACK}
+                            style={{textDecoration: 'underline'}}
+                            textTransform="none"
+                          >
                             {_(loginStrings.phoneLogin)}
                           </RouterLink>
                         </Column>
@@ -361,6 +374,7 @@ const Login = ({
                 )}
               </ContainerXS>
             </Column>
+
             <Column />
           </Columns>
         </Container>

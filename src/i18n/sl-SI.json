@@ -558,7 +558,7 @@
   "historyInfo.hasHistoryInfo": "Messages sent in the meantime {newline}will not appear here.",
   "historyInfo.learnMore": "Nauči se več",
   "historyInfo.noHistoryHeadline": "Prvič uporabljate {brandName} na tej napravi.",
-  "historyInfo.noHistoryInfo": "For privacy reasons, {newline}your conversation history will not appear here.",
+  "historyInfo.noHistoryInfo": "For privacy reasons, your conversation history will not appear here.",
   "historyInfo.ok": "V redu",
   "index.createAccount": "Create account",
   "index.createAccountForOrganizations": "Wire for Free",
