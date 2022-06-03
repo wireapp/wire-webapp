@@ -397,6 +397,7 @@ export class Account extends EventEmitter {
     onConnectionStateChanged = () => {},
     onNotificationStreamProgress = () => {},
     onMissedNotifications = () => {},
+    dryRun = false,
   }: {
     /**
      * Called when a new event arrives from backend
@@ -428,6 +429,11 @@ export class Account extends EventEmitter {
      * @param  {string} notificationId
      */
     onMissedNotifications?: (notificationId: string) => void;
+
+    /**
+     * When set will not decrypt and not store the last notification ID. This is useful if you only want to subscribe to unencrypted backend events
+     */
+    dryRun?: boolean;
   } = {}): Promise<() => void> {
     if (!this.apiClient.context) {
       throw new Error('Context is not set - please login first');
@@ -454,7 +460,11 @@ export class Account extends EventEmitter {
 
     const handleNotification = async (notification: Notification, source: PayloadBundleSource): Promise<void> => {
       try {
-        const messages = this.service!.notification.handleNotification(notification, PayloadBundleSource.WEBSOCKET);
+        const messages = this.service!.notification.handleNotification(
+          notification,
+          PayloadBundleSource.WEBSOCKET,
+          dryRun,
+        );
         for await (const message of messages) {
           await handleEvent(message, source);
         }

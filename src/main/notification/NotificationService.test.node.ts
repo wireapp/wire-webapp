@@ -87,6 +87,7 @@ describe('NotificationService', () => {
       );
 
       await handledNotifications.next();
+      await handledNotifications.next();
 
       expect(spySetLastNotificationId.calls.count()).toBe(1);
     });
