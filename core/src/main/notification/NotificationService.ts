@@ -142,15 +142,12 @@ export class NotificationService extends EventEmitter {
   public async *handleNotification(
     notification: Notification,
     source: PayloadBundleSource,
+    dryRun: boolean = false,
   ): AsyncGenerator<HandledEventPayload> {
     for (const event of notification.payload) {
       this.logger.log(`Handling event of type "${event.type}" for notification with ID "${notification.id}"`, event);
       try {
-        const data = await this.handleEvent(event, source);
-        if (!notification.transient) {
-          // keep track of the last handled notification for next time we fetch the notification stream
-          await this.setLastNotificationId(notification);
-        }
+        const data = await this.handleEvent(event, source, dryRun);
         yield {
           ...data,
           mappedEvent: data.mappedEvent ? this.cleanupPayloadBundle(data.mappedEvent) : undefined,
@@ -168,7 +165,7 @@ export class NotificationService extends EventEmitter {
         this.emit(NotificationService.TOPIC.NOTIFICATION_ERROR, notificationError);
       }
     }
-    if (!notification.transient) {
+    if (!dryRun && !notification.transient) {
       // keep track of the last handled notification for next time we fetch the notification stream
       await this.setLastNotificationId(notification);
     }
@@ -193,10 +190,19 @@ export class NotificationService extends EventEmitter {
     }
   }
 
-  private async handleEvent(event: Events.BackendEvent, source: PayloadBundleSource): Promise<HandledEventPayload> {
+  private async handleEvent(
+    event: Events.BackendEvent,
+    source: PayloadBundleSource,
+    dryRun: boolean = false,
+  ): Promise<HandledEventPayload> {
     switch (event.type) {
       // Encrypted events
       case Events.CONVERSATION_EVENT.OTR_MESSAGE_ADD: {
+        if (dryRun) {
+          // In case of a dry run, we do not want to decrypt messages
+          // We just return the raw event to the caller
+          return {event};
+        }
         try {
           const decryptedData = await this.cryptographyService.decryptMessage(event);
           return {
