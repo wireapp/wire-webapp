@@ -111,7 +111,7 @@ export class TeamService {
           config: {
             allowList: [],
           },
-          status: FeatureStatus.ENABLED,
+          status: FeatureStatus.DISABLED,
         },
         [FEATURE_KEY.VALIDATE_SAML_EMAILS]: {
           status: FeatureStatus.ENABLED,
