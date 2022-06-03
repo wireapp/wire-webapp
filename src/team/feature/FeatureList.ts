@@ -25,6 +25,7 @@ import type {
   FeatureDigitalSignature,
   FeatureFileSharing,
   FeatureLegalhold,
+  FeatureMLS,
   FeatureSelfDeletingMessages,
   FeatureSndFactorPassword,
   FeatureVideoCalling,
@@ -35,16 +36,17 @@ export enum FEATURE_KEY {
   APPLOCK = 'appLock',
   CLASSIFIED_DOMAINS = 'classifiedDomains',
   CONFERENCE_CALLING = 'conferenceCalling',
-  DIGITAL_SIGNATURES = 'digitalSignatures',
   CONVERSATION_GUEST_LINKS = 'conversationGuestLinks',
+  DIGITAL_SIGNATURES = 'digitalSignatures',
   FILE_SHARING = 'fileSharing',
   LEGALHOLD = 'legalhold',
+  MLS = 'MLS',
   SEARCH_VISIBILITY = 'searchVisibility',
+  SELF_DELETING_MESSAGES = 'selfDeletingMessages',
+  SND_FACTOR_PASSWORD = 'sndFactorPasswordChallenge',
   SSO = 'sso',
   VALIDATE_SAML_EMAILS = 'validateSAMLemails',
   VIDEO_CALLING = 'videoCalling',
-  SELF_DELETING_MESSAGES = 'selfDeletingMessages',
-  SND_FACTOR_PASSWORD = 'sndFactorPasswordChallenge',
 }
 
 export type FeatureList = {
@@ -59,6 +61,7 @@ export type FeatureList = {
   [FEATURE_KEY.SELF_DELETING_MESSAGES]?: FeatureSelfDeletingMessages;
   [FEATURE_KEY.SND_FACTOR_PASSWORD]?: FeatureSndFactorPassword;
   [FEATURE_KEY.SSO]?: FeatureWithoutConfig;
+  [FEATURE_KEY.MLS]?: FeatureMLS;
   [FEATURE_KEY.VALIDATE_SAML_EMAILS]?: FeatureWithoutConfig;
   [FEATURE_KEY.VIDEO_CALLING]?: FeatureVideoCalling;
 };

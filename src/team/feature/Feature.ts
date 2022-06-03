@@ -59,6 +59,9 @@ export interface FeatureSelfDeletingMessagesConfig extends FeatureConfig {
 export interface FeatureClassifiedDomainsConfig extends FeatureConfig {
   domains: string[];
 }
+export interface FeatureMLSConfig extends FeatureConfig {
+  allowList: string[];
+}
 
 export type FeatureAppLock = Feature<FeatureAppLockConfig>;
 export type FeatureClassifiedDomains = Feature<FeatureClassifiedDomainsConfig>;
@@ -69,6 +72,7 @@ export type FeatureFileSharing = FeatureWithoutConfig;
 export type FeatureLegalhold = FeatureWithoutConfig;
 export type FeatureSearchVisibility = FeatureWithoutConfig;
 export type FeatureSelfDeletingMessages = Feature<FeatureSelfDeletingMessagesConfig>;
+export type FeatureMLS = Feature<FeatureMLSConfig>;
 export type FeatureSSO = FeatureWithoutConfig;
 export type FeatureSndFactorPassword = FeatureWithoutConfig;
 export type FeatureValidateSAMLEmails = FeatureWithoutConfig;
