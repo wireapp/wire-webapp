@@ -102,7 +102,7 @@ export class User {
       [ACCENT_ID.PURPLE]: 'var(--purple-500)',
       [ACCENT_ID.AMBER]: 'var(--amber-500)',
       [ACCENT_ID.RED]: 'var(--red-500)',
-      [ACCENT_ID.PETROL]: 'var(--petrol-500)',
+      [ACCENT_ID.TURQUOISE]: 'var(--turquoise-500)',
     };
   }
 
