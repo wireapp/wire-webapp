@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [19.4.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/compare/@wireapp/api-client@19.3.3...@wireapp/api-client@19.4.0) (2022-06-03)
+
+
+### Features
+
+* **core, api-client:** Add MLS team feature config (fs-653) ([#4283](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/issues/4283)) ([59dc2ce](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/commit/59dc2ce3a298ee7e8fc67da9f2a90ed79db50f24))
+
+
+
+
+
 ## [19.3.3](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/compare/@wireapp/api-client@19.3.2...@wireapp/api-client@19.3.3) (2022-06-01)
 
 **Note:** Version bump only for package @wireapp/api-client
