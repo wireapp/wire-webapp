@@ -76,7 +76,7 @@ export class ConversationService {
    * Retrieves all the conversations of a user.
    * @returns Resolves with the conversation information
    */
-  async getAllConversations(): Promise<BackendConversation[]> {
+  async getAllConversations() {
     return this.apiClient.api.conversation.getConversationList();
   }
 

@@ -483,9 +483,7 @@ export class ConversationRepository {
 
     fetching_conversations[conversationId] = [];
     try {
-      console.log('BEFORE CONVERSATIONS!!');
       const response = await this.conversation_service.getConversationById(qualifiedId);
-      console.log('CONVERSATIONS', response);
       const [conversationEntity] = this.mapConversations([response]);
 
       this.logger.info(`Fetched conversation '${conversationId}' from backend`);
@@ -497,12 +495,13 @@ export class ConversationRepository {
       return conversationEntity;
     } catch (originalError) {
       if (originalError.code === HTTP_STATUS.NOT_FOUND) {
-        // this.deleteConversationLocally(qualifiedId, false);
-        return new Conversation(conversationId, domain);
+        this.deleteConversationLocally(qualifiedId, false);
       }
-      // if (originalError.code === HTTP_STATUS.INTERNAL_SERVER_ERROR) {
-      //   return {qualified_id: qualifiedId} as unknown as Conversation;
-      // }
+      if (originalError.code === HTTP_STATUS.INTERNAL_SERVER_ERROR /* TODO && is federation error */) {
+        const fakeConv = new Conversation(conversationId, domain);
+        fakeConv.display_name('test');
+        return fakeConv;
+      }
       const error = new ConversationError(
         ConversationError.TYPE.CONVERSATION_NOT_FOUND,
         ConversationError.MESSAGE.CONVERSATION_NOT_FOUND,
@@ -518,7 +517,7 @@ export class ConversationRepository {
   public async getConversations(): Promise<Conversation[]> {
     const remoteConversationsPromise = this.conversation_service.getAllConversations().catch(error => {
       this.logger.error(`Failed to get all conversations from backend: ${error.message}`);
-      return [];
+      return {found: []};
     });
 
     const [localConversations, remoteConversations] = await Promise.all([
@@ -526,7 +525,7 @@ export class ConversationRepository {
       remoteConversationsPromise,
     ]);
     let conversationsData: any[];
-    if (!remoteConversations.length) {
+    if (!remoteConversations.found.length) {
       conversationsData = localConversations;
     } else {
       const data = ConversationMapper.mergeConversation(localConversations, remoteConversations);

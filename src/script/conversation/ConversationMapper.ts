@@ -28,6 +28,7 @@ import {
   CONVERSATION_ACCESS_ROLE,
   ACCESS_ROLE_V2,
   CONVERSATION_TYPE,
+  RemoteConversations,
 } from '@wireapp/api-client/src/conversation';
 
 import {ACCESS_STATE} from './AccessState';
@@ -263,12 +264,16 @@ export class ConversationMapper {
 
   static mergeConversation(
     localConversations: ConversationDatabaseData[],
-    remoteConversations: ConversationBackendData[],
+    remoteConversations: RemoteConversations,
   ): ConversationDatabaseData[] {
     localConversations = localConversations.filter(conversationData => conversationData);
 
-    return remoteConversations.map(
-      (remoteConversationData: ConversationBackendData & {receipt_mode: number}, index: number) => {
+    const failedConversations = remoteConversations.failed.map(failedConversationId => {
+      return localConversations.find(conversationId => matchQualifiedIds(conversationId, failedConversationId));
+    });
+
+    return remoteConversations.found
+      .map((remoteConversationData: ConversationBackendData & {receipt_mode: number}, index: number) => {
         const remoteConversationId: QualifiedEntity = remoteConversationData.qualified_id || {
           domain: '',
           id: remoteConversationData.id,
@@ -378,8 +383,8 @@ export class ConversationMapper {
         }
 
         return mergedConversation;
-      },
-    );
+      })
+      .concat(failedConversations);
   }
 
   static mapAccessCode(conversation: Conversation, accessCode: ConversationCode): void {
