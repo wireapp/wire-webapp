@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [27.3.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/compare/@wireapp/core@27.2.4...@wireapp/core@27.3.0) (2022-06-03)
+
+
+### Features
+
+* Add listen dryrun option ([#4282](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/issues/4282)) ([a10bbe1](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/commit/a10bbe14f1967a85d38444ed3e745f57c6504e9e))
+
+
+
+
+
 ## [27.2.4](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/compare/@wireapp/core@27.2.3...@wireapp/core@27.2.4) (2022-06-01)
 
 **Note:** Version bump only for package @wireapp/core
