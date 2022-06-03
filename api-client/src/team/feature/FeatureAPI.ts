@@ -31,6 +31,7 @@ import type {
   FeatureFileSharing,
   FeatureSelfDeletingMessages,
   FeatureSndFactorPassword,
+  FeatureMLS,
 } from './Feature';
 import type {FeatureList} from './FeatureList';
 import {FeatureConversationGuestLink, FeatureLockedError} from '.';
@@ -51,6 +52,7 @@ export class FeatureAPI {
     LEGAL_HOLD: 'legalhold',
     SND_FACTOR_PASSWORD: 'sndFactorPasswordChallenge',
     SSO: 'sso',
+    MLS: 'mls',
     TEAMS: '/teams',
   };
 
@@ -268,6 +270,16 @@ export class FeatureAPI {
     };
 
     const response = await this.client.sendJSON<FeatureSSO>(config);
+    return response.data;
+  }
+
+  public async getMLSFeature(): Promise<FeatureMLS> {
+    const config: AxiosRequestConfig = {
+      method: 'get',
+      url: `${FeatureAPI.URL.FEATURE_CONFIGS}/${FeatureAPI.URL.MLS}`,
+    };
+
+    const response = await this.client.sendJSON<FeatureMLS>(config);
     return response.data;
   }
 
