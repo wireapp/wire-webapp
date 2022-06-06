@@ -40,12 +40,17 @@ import {t} from 'Util/LocalizerUtil';
 
 export type UserListProps = Omit<React.ComponentProps<typeof UserList>, 'users' | 'selectedUsers'> & {
   conversationState?: ConversationState;
-  observables: {
+  // TODO: Remove this observables once all of the consumers of UserSearchableList are in migrated to react
+  observables?: {
     filter?: ko.Observable<string>;
     highlightedUsers?: ko.Observable<User[]>;
     selected?: ko.ObservableArray<User>;
     users: ko.ObservableArray<User>;
   };
+  filter?: string;
+  highlightedUsers?: User[];
+  selected?: User[];
+  users: User[];
   searchRepository: SearchRepository;
   selfFirst?: boolean;
   teamRepository: TeamRepository;
@@ -63,11 +68,17 @@ const UserSearchableList: React.FC<UserListProps> = props => {
 
   const selfInTeam = userState.self().inTeam();
   const {
-    users,
-    selected: selectedUsers,
-    filter = '',
-    highlightedUsers,
+    users: unwrappedUsers,
+    selected: unwrappedSelected,
+    filter: unwrappedFilter = '',
+    highlightedUsers: unwrappedHighlightedUsers,
   } = useKoSubscribableChildren(observables, ['users', 'selected', 'filter', 'highlightedUsers']);
+
+  // Note: We have to do this to handle both react & knockout props
+  const filter = props.filter || unwrappedFilter;
+  const highlightedUsers = props.highlightedUsers || unwrappedHighlightedUsers;
+  const selectedUsers = props.selected || unwrappedSelected;
+  const users = props.users || unwrappedUsers;
 
   /**
    * Try to load additional members from the backend.

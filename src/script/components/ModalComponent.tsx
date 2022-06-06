@@ -27,7 +27,7 @@ interface ModalComponentProps {
   isShown: boolean;
   onBgClick?: () => void;
   onClosed?: () => void;
-  showLoading: boolean;
+  showLoading?: boolean;
 }
 
 const ModalOverlayStyles: CSSObject = {

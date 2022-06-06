@@ -24,8 +24,9 @@ import {registerReactComponent} from 'Util/ComponentUtil';
 import {createRandomUuid} from 'Util/util';
 
 export interface BaseToggleProps {
-  extendedInfo?: string;
+  extendedInfo?: boolean;
   extendedInfoText?: string;
+  className?: string;
   infoText?: string;
   isChecked: boolean;
   isDisabled?: boolean;
@@ -44,13 +45,14 @@ const BaseToggle: React.FC<BaseToggleProps> = ({
   extendedInfoText,
   toggleId = defaultToggleName,
   toggleName = defaultToggleName,
+  className,
   infoText,
 }) => {
   const uuid = React.useMemo(() => createRandomUuid(), []);
   const labelUuid = React.useMemo(() => createRandomUuid(), []);
   const inputRef = React.useRef<HTMLInputElement>();
   return (
-    <div className={defaultToggleName}>
+    <div className={cx(defaultToggleName, className)}>
       <div className="info-toggle__row">
         <label htmlFor={uuid} id={labelUuid} className="info-toggle__name">
           {toggleName}
