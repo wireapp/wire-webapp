@@ -17,8 +17,7 @@
  *
  */
 
-import React from 'react';
-import {createRandomUuid} from 'Util/util';
+import React, {useId} from 'react';
 import cx from 'classnames';
 import {registerReactComponent} from 'Util/ComponentUtil';
 
@@ -43,7 +42,7 @@ const InfoToggle: React.FC<InfoToggleProps> = ({
 }) => {
   const dataUieNameInfoText = `status-info-toggle-${dataUieName}`;
   const dataUieNameLabelText = `do-toggle-${dataUieName}`;
-  const {current: inputId} = React.useRef(createRandomUuid());
+  const inputId = useId();
 
   return (
     <div className={cx('info-toggle', className)}>
