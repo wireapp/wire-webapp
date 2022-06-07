@@ -268,7 +268,7 @@ export class ConversationMapper {
   ): ConversationDatabaseData[] {
     localConversations = localConversations.filter(conversationData => conversationData);
 
-    const failedConversations = remoteConversations.failed.map(failedConversationId => {
+    const failedConversations = (remoteConversations.failed ?? []).map(failedConversationId => {
       return localConversations.find(conversationId => matchQualifiedIds(conversationId, failedConversationId));
     });
 
