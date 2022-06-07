@@ -24,6 +24,7 @@ import {
   Conversation as ConversationBackendData,
   Member as MemberBackendData,
   OtherMember as OtherMemberBackendData,
+  RemoteConversations,
 } from '@wireapp/api-client/src/conversation/';
 import {createRandomUuid} from 'Util/util';
 import {RECEIPT_MODE} from '@wireapp/api-client/src/conversation/data';
@@ -412,7 +413,7 @@ describe('ConversationMapper', () => {
 
       const [mergedConversation] = ConversationMapper.mergeConversation(
         [local_data] as ConversationDatabaseData[],
-        [remoteData] as ConversationBackendData[],
+        {found: [remoteData]} as RemoteConversations,
       );
 
       expect(mergedConversation.creator).toBe(remoteData.creator);
@@ -448,7 +449,7 @@ describe('ConversationMapper', () => {
 
       const [merged_conversation, merged_conversation_2] = ConversationMapper.mergeConversation(
         [localData] as ConversationDatabaseData[],
-        [remoteData, remoteData2] as ConversationBackendData[],
+        {found: [remoteData, remoteData2]} as RemoteConversations,
       );
 
       expect(merged_conversation.creator).toBe(remoteData.creator);
@@ -497,7 +498,7 @@ describe('ConversationMapper', () => {
       ].forEach(({local, remote, expected}) => {
         const [merged_conversation] = ConversationMapper.mergeConversation(
           [local] as ConversationDatabaseData[],
-          [remote] as ConversationBackendData[],
+          {found: [remote]} as RemoteConversations,
         );
 
         expect(merged_conversation.message_timer).toEqual(expected.message_timer);
@@ -529,7 +530,7 @@ describe('ConversationMapper', () => {
 
       const [merged_conversation] = ConversationMapper.mergeConversation(
         [localData] as ConversationDatabaseData[],
-        [remoteData] as ConversationBackendData[],
+        {found: [remoteData]} as RemoteConversations,
       );
 
       expect(merged_conversation.creator).toBe(remoteData.creator);
@@ -568,7 +569,9 @@ describe('ConversationMapper', () => {
 
       remoteData.members.others = remoteData.members.others.concat(othersUpdate);
 
-      const [merged_conversation] = ConversationMapper.mergeConversation([], [remoteData] as ConversationBackendData[]);
+      const [merged_conversation] = ConversationMapper.mergeConversation([], {
+        found: [remoteData],
+      } as RemoteConversations);
 
       expect(merged_conversation.others.length).toBe(3);
     });
@@ -586,7 +589,7 @@ describe('ConversationMapper', () => {
 
       const [merged_conversation] = ConversationMapper.mergeConversation(
         [localData] as ConversationDatabaseData[],
-        [remoteData] as ConversationBackendData[],
+        {found: [remoteData]} as RemoteConversations,
       );
 
       expect(merged_conversation.last_event_timestamp).toBe(localData.last_event_timestamp);
@@ -598,7 +601,7 @@ describe('ConversationMapper', () => {
       const [localData, remoteData] = getDataWithReadReceiptMode(localReceiptMode, 1);
       const [mergedConversation] = ConversationMapper.mergeConversation(
         [localData] as ConversationDatabaseData[],
-        [remoteData] as ConversationBackendData[],
+        {found: [remoteData]} as RemoteConversations,
       );
 
       expect(mergedConversation.receipt_mode).toBe(localReceiptMode);
@@ -610,7 +613,7 @@ describe('ConversationMapper', () => {
 
       const [mergedConversation] = ConversationMapper.mergeConversation(
         [localData] as ConversationDatabaseData[],
-        [remoteData] as ConversationBackendData[],
+        {found: [remoteData]} as RemoteConversations,
       );
 
       expect(mergedConversation.receipt_mode).toBe(remoteReceiptMode);
