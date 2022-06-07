@@ -38,7 +38,7 @@ import {TeamState} from '../team/TeamState';
 import UserList from './UserList';
 import {t} from 'Util/LocalizerUtil';
 
-export type UserListProps = Omit<React.ComponentProps<typeof UserList>, 'users' | 'selectedUsers'> & {
+export type UserListProps = React.ComponentProps<typeof UserList> & {
   conversationState?: ConversationState;
   // TODO: Remove this observables once all of the consumers of UserSearchableList are in migrated to react
   observables?: {
@@ -48,9 +48,7 @@ export type UserListProps = Omit<React.ComponentProps<typeof UserList>, 'users' 
     users: ko.ObservableArray<User>;
   };
   filter?: string;
-  highlightedUsers?: User[];
   selected?: User[];
-  users: User[];
   searchRepository: SearchRepository;
   selfFirst?: boolean;
   teamRepository: TeamRepository;
