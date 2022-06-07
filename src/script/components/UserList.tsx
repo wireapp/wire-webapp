@@ -54,7 +54,7 @@ export interface UserListProps {
   mode?: UserlistMode;
   noSelfInteraction?: boolean;
   noUnderline?: boolean;
-  onClick: (userEntity: User, event: MouseEvent | KeyboardEvent) => void;
+  onClick?: (userEntity: User, event: MouseEvent | KeyboardEvent) => void;
   onSelectUser?: (user: User) => void;
   reducedUserCount?: number;
   selectedUsers?: User[];

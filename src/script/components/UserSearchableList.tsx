@@ -38,14 +38,18 @@ import {TeamState} from '../team/TeamState';
 import UserList from './UserList';
 import {t} from 'Util/LocalizerUtil';
 
-export type UserListProps = Omit<React.ComponentProps<typeof UserList>, 'users' | 'selectedUsers'> & {
+export type UserListProps = React.ComponentProps<typeof UserList> & {
   conversationState?: ConversationState;
-  observables: {
+  // TODO: Remove this observables once all of the consumers of UserSearchableList are in migrated to react
+  observables?: {
     filter?: ko.Observable<string>;
     highlightedUsers?: ko.Observable<User[]>;
     selected?: ko.ObservableArray<User>;
     users: ko.ObservableArray<User>;
   };
+  filter?: string;
+  selected?: User[];
+  onUpdateSelectedUsers?: (updatedUsers: User[]) => void;
   searchRepository: SearchRepository;
   selfFirst?: boolean;
   teamRepository: TeamRepository;
@@ -54,7 +58,7 @@ export type UserListProps = Omit<React.ComponentProps<typeof UserList>, 'users' 
   userState?: UserState;
 };
 
-const UserSearchableList: React.FC<UserListProps> = props => {
+const UserSearchableList: React.FC<UserListProps> = ({onUpdateSelectedUsers, ...props}) => {
   const {searchRepository, teamRepository, observables, selfFirst, ...userListProps} = props;
   const {userState = container.resolve(UserState), conversationState = container.resolve(ConversationState)} = props;
 
@@ -63,11 +67,17 @@ const UserSearchableList: React.FC<UserListProps> = props => {
 
   const selfInTeam = userState.self().inTeam();
   const {
-    users,
-    selected: selectedUsers,
-    filter = '',
-    highlightedUsers,
+    users: unwrappedUsers,
+    selected: unwrappedSelected,
+    filter: unwrappedFilter = '',
+    highlightedUsers: unwrappedHighlightedUsers,
   } = useKoSubscribableChildren(observables, ['users', 'selected', 'filter', 'highlightedUsers']);
+
+  // Note: We have to do this to handle both react & knockout props
+  const filter = props.filter || unwrappedFilter;
+  const highlightedUsers = props.highlightedUsers || unwrappedHighlightedUsers;
+  const selectedUsers = props.selected || unwrappedSelected;
+  const users = props.users || unwrappedUsers;
 
   /**
    * Try to load additional members from the backend.
@@ -140,9 +150,11 @@ const UserSearchableList: React.FC<UserListProps> = props => {
 
   const toggleUserSelection = (user: User) => {
     if (selectedUsers.find(selectedUser => selectedUser.id === user.id)) {
-      observables.selected.remove(user);
+      observables?.selected?.remove(user);
+      onUpdateSelectedUsers?.([...selectedUsers].filter(selectedUser => selectedUser.id !== user.id));
     } else {
-      observables.selected.push(user);
+      onUpdateSelectedUsers?.([...selectedUsers, user]);
+      observables?.selected?.push(user);
     }
   };
 
@@ -165,7 +177,9 @@ const UserSearchableList: React.FC<UserListProps> = props => {
       users={foundUserEntities()}
       selectedUsers={selectedUsers}
       highlightedUsers={highlightedUsers}
-      onSelectUser={observables.selected ? toggleUserSelection : undefined}
+      {...(!!selectedUsers && {
+        onSelectUser: toggleUserSelection,
+      })}
     />
   );
 };

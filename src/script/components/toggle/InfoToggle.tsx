@@ -17,8 +17,7 @@
  *
  */
 
-import React from 'react';
-import {createRandomUuid} from 'Util/util';
+import React, {useId} from 'react';
 import cx from 'classnames';
 import {registerReactComponent} from 'Util/ComponentUtil';
 
@@ -28,16 +27,25 @@ export interface InfoToggleProps {
   isChecked: boolean;
   isDisabled: boolean;
   name: string;
+  className?: string;
   setIsChecked: (checked: boolean) => void;
 }
 
-const InfoToggle: React.FC<InfoToggleProps> = ({dataUieName, info, isChecked, isDisabled, name, setIsChecked}) => {
+const InfoToggle: React.FC<InfoToggleProps> = ({
+  dataUieName,
+  className = '',
+  info,
+  isChecked,
+  isDisabled,
+  name,
+  setIsChecked,
+}) => {
   const dataUieNameInfoText = `status-info-toggle-${dataUieName}`;
   const dataUieNameLabelText = `do-toggle-${dataUieName}`;
-  const {current: inputId} = React.useRef(createRandomUuid());
+  const inputId = useId();
 
   return (
-    <div className="info-toggle">
+    <div className={cx('info-toggle', className)}>
       <div className="info-toggle__row">
         <label htmlFor={inputId} className="info-toggle__name">
           {name}
