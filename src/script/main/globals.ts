@@ -42,7 +42,6 @@ import 'Components/panel/ServiceDetails';
 import 'Components/panel/UserDetails';
 import 'Components/ServiceList';
 import 'Components/SearchInput';
-import '../page/Modals/GroupCreation/GroupCreationModal';
 
 import 'Util/LocalizerUtil';
 

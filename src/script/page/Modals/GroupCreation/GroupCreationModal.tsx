@@ -18,6 +18,7 @@
  */
 
 import React, {useEffect, useState} from 'react';
+import {createRoot} from 'react-dom/client';
 import {container} from 'tsyringe';
 import cx from 'classnames';
 import {amplify} from 'amplify';
@@ -32,7 +33,7 @@ import {SearchRepository} from '../../../search/SearchRepository';
 import {TeamRepository} from '../../../team/TeamRepository';
 import {TeamState} from '../../../team/TeamState';
 import {UserState} from '../../../user/UserState';
-import {registerReactComponent, useKoSubscribableChildren} from 'Util/ComponentUtil';
+import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import ModalComponent from 'Components/ModalComponent';
 import SearchInput from 'Components/SearchInput';
 import UserSearchableList from 'Components/UserSearchableList';
@@ -56,8 +57,8 @@ interface GroupCreationModalProps {
   conversationRepository: ConversationRepository;
   searchRepository: SearchRepository;
   teamRepository: TeamRepository;
-  userState: UserState;
-  teamState: TeamState;
+  userState?: UserState;
+  teamState?: TeamState;
 }
 
 enum GroupCreationModalState {
@@ -307,6 +308,7 @@ const GroupCreationModal: React.FC<GroupCreationModalProps> = ({
                 users={getContacts()}
                 filter={participantsInput}
                 selected={selectedContacts}
+                onUpdateSelectedUsers={setSelectedContacts}
                 searchRepository={searchRepository}
                 teamRepository={teamRepository}
                 conversationRepository={conversationRepository}
@@ -385,6 +387,19 @@ const GroupCreationModal: React.FC<GroupCreationModalProps> = ({
   );
 };
 
-export default GroupCreationModal;
-
-registerReactComponent('group-creation', GroupCreationModal);
+export default {
+  GroupCreationModal,
+  init: (
+    conversationRepository: ConversationRepository,
+    searchRepository: SearchRepository,
+    teamRepository: TeamRepository,
+  ) => {
+    createRoot(document.getElementById('group-creation-modal-container')).render(
+      <GroupCreationModal
+        conversationRepository={conversationRepository}
+        searchRepository={searchRepository}
+        teamRepository={teamRepository}
+      />,
+    );
+  },
+};
