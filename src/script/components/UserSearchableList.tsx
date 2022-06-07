@@ -58,7 +58,7 @@ export type UserListProps = React.ComponentProps<typeof UserList> & {
   userState?: UserState;
 };
 
-const UserSearchableList: React.FC<UserListProps> = props => {
+const UserSearchableList: React.FC<UserListProps> = ({onUpdateSelectedUsers, ...props}) => {
   const {searchRepository, teamRepository, observables, selfFirst, ...userListProps} = props;
   const {userState = container.resolve(UserState), conversationState = container.resolve(ConversationState)} = props;
 
@@ -151,9 +151,9 @@ const UserSearchableList: React.FC<UserListProps> = props => {
   const toggleUserSelection = (user: User) => {
     if (selectedUsers.find(selectedUser => selectedUser.id === user.id)) {
       observables?.selected?.remove(user);
-      props.onUpdateSelectedUsers?.([...selectedUsers].filter(selectedUser => selectedUser.id !== user.id));
+      onUpdateSelectedUsers?.([...selectedUsers].filter(selectedUser => selectedUser.id !== user.id));
     } else {
-      props.onUpdateSelectedUsers?.([...selectedUsers, user]);
+      onUpdateSelectedUsers?.([...selectedUsers, user]);
       observables?.selected?.push(user);
     }
   };
