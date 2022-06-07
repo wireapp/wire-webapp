@@ -28,13 +28,13 @@ export interface InfoToggleProps {
   isChecked: boolean;
   isDisabled: boolean;
   name: string;
-  className: string;
+  className?: string;
   setIsChecked: (checked: boolean) => void;
 }
 
 const InfoToggle: React.FC<InfoToggleProps> = ({
   dataUieName,
-  className,
+  className = '',
   info,
   isChecked,
   isDisabled,
