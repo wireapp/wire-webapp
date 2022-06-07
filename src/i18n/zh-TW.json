@@ -1132,6 +1132,7 @@
   "tooltipPreferencesPicture": "更換您的圖片...",
   "tooltipPreferencesRename": "改變你的名字",
   "tooltipSearchClose": "關閉 (Esc)",
+  "unavailableUser": "Username unavailable",
   "unsupported.desktopOnlyMessage": "Please use {brandName} on your desktop app instead.",
   "unsupported.headlineBrowser": "This browser is not supported.",
   "unsupported.headlineCookies": "Enable cookies",

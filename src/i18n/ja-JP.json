@@ -1132,6 +1132,7 @@
   "tooltipPreferencesPicture": "あなたの写真を変更する...",
   "tooltipPreferencesRename": "名前を変更する",
   "tooltipSearchClose": "閉じる (Esc)",
+  "unavailableUser": "Username unavailable",
   "unsupported.desktopOnlyMessage": "Please use {brandName} on your desktop app instead.",
   "unsupported.headlineBrowser": "お使いのブラウザーはサポートされていません。",
   "unsupported.headlineCookies": "クッキーを有効化",

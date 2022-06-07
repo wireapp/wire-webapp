@@ -1132,6 +1132,7 @@
   "tooltipPreferencesPicture": "Resminizi değiştirin…",
   "tooltipPreferencesRename": "İsminizi değiştirin",
   "tooltipSearchClose": "Kapat (Esc)",
+  "unavailableUser": "Username unavailable",
   "unsupported.desktopOnlyMessage": "Please use {brandName} on your desktop app instead.",
   "unsupported.headlineBrowser": "Bu tarayıcı desteklenmiyor.",
   "unsupported.headlineCookies": "Çerezleri etkinleştir",

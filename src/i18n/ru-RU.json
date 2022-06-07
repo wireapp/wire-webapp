@@ -1132,6 +1132,7 @@
   "tooltipPreferencesPicture": "Изменить свое фото…",
   "tooltipPreferencesRename": "Изменить свое имя",
   "tooltipSearchClose": "Закрыть (Esc)",
+  "unavailableUser": "Username unavailable",
   "unsupported.desktopOnlyMessage": "Необходимо использовать {brandName} на вашем компьютере.",
   "unsupported.headlineBrowser": "Этот браузер не поддерживается.",
   "unsupported.headlineCookies": "Включить cookie",

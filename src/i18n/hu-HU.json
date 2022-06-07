@@ -1132,6 +1132,7 @@
   "tooltipPreferencesPicture": "Profilkép módosítása…",
   "tooltipPreferencesRename": "Név módosítása",
   "tooltipSearchClose": "Bezárás (Esc)",
+  "unavailableUser": "Username unavailable",
   "unsupported.desktopOnlyMessage": "Please use {brandName} on your desktop app instead.",
   "unsupported.headlineBrowser": "Ez a böngésző nem támogatott.",
   "unsupported.headlineCookies": "Cookie-k bekapcsolása",

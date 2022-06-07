@@ -1132,6 +1132,7 @@
   "tooltipPreferencesPicture": "Змініть своє фото…",
   "tooltipPreferencesRename": "Змініть своє ім’я",
   "tooltipSearchClose": "Закрити (Esc)",
+  "unavailableUser": "Username unavailable",
   "unsupported.desktopOnlyMessage": "Please use {brandName} on your desktop app instead.",
   "unsupported.headlineBrowser": "Ваш браузер не підтримується.",
   "unsupported.headlineCookies": "Увімкнути cookies",

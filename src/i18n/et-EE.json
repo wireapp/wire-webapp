@@ -1132,6 +1132,7 @@
   "tooltipPreferencesPicture": "Muuda oma pilti…",
   "tooltipPreferencesRename": "Muuda oma nime",
   "tooltipSearchClose": "Sulge (Esc)",
+  "unavailableUser": "Username unavailable",
   "unsupported.desktopOnlyMessage": "Please use {brandName} on your desktop app instead.",
   "unsupported.headlineBrowser": "Seda brauserit ei toetata.",
   "unsupported.headlineCookies": "Luba küpsised",

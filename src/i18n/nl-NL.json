@@ -1132,6 +1132,7 @@
   "tooltipPreferencesPicture": "Verander je foto…",
   "tooltipPreferencesRename": "Wijzig je naam",
   "tooltipSearchClose": "Sluiten (esc)",
+  "unavailableUser": "Username unavailable",
   "unsupported.desktopOnlyMessage": "Please use {brandName} on your desktop app instead.",
   "unsupported.headlineBrowser": "Deze browser wordt niet ondersteund.",
   "unsupported.headlineCookies": "Enable cookies",

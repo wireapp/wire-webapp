@@ -1132,6 +1132,7 @@
   "tooltipPreferencesPicture": "غيّر صورتك…",
   "tooltipPreferencesRename": "غيّر اسمك",
   "tooltipSearchClose": "إغلاق (Esc)",
+  "unavailableUser": "Username unavailable",
   "unsupported.desktopOnlyMessage": "Please use {brandName} on your desktop app instead.",
   "unsupported.headlineBrowser": "هذا المتصفح غير مدعوم.",
   "unsupported.headlineCookies": "مكّن ملفات الارتباط (cookies)",
