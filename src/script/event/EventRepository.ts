@@ -155,6 +155,7 @@ export class EventRepository {
         amplify.publish(WebAppEvents.CONNECTION.ONLINE);
         amplify.publish(WebAppEvents.WARNING.DISMISS, Warnings.TYPE.NO_INTERNET);
         amplify.publish(WebAppEvents.WARNING.DISMISS, Warnings.TYPE.CONNECTIVITY_RECONNECT);
+        amplify.publish(WebAppEvents.WARNING.DISMISS, Warnings.TYPE.CONNECTIVITY_RECOVERY);
       }
     }
   };
