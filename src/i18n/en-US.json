@@ -846,6 +846,7 @@
   "muteStateRemoteMute": "You have been muted",
   "noActiveSpeakers": "No active speakers…",
   "nonexistentUser": "Deleted User",
+  "unavailableUser": "Username unavailable",
   "notificationAssetAdd": "Shared a picture",
   "notificationConnectionAccepted": "Accepted your connection request",
   "notificationConnectionConnected": "You are now connected",

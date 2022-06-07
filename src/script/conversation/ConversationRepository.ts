@@ -512,7 +512,7 @@ export class ConversationRepository {
   public async getConversations(): Promise<Conversation[]> {
     const remoteConversationsPromise = this.conversation_service.getAllConversations().catch(error => {
       this.logger.error(`Failed to get all conversations from backend: ${error.message}`);
-      return [];
+      return {found: []};
     });
 
     const [localConversations, remoteConversations] = await Promise.all([
@@ -520,7 +520,7 @@ export class ConversationRepository {
       remoteConversationsPromise,
     ]);
     let conversationsData: any[];
-    if (!remoteConversations.length) {
+    if (!remoteConversations.found.length) {
       conversationsData = localConversations;
     } else {
       const data = ConversationMapper.mergeConversation(localConversations, remoteConversations);
