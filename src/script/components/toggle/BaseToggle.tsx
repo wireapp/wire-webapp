@@ -17,11 +17,10 @@
  *
  */
 
-import React from 'react';
+import React, {useId} from 'react';
 import cx from 'classnames';
 
 import {registerReactComponent} from 'Util/ComponentUtil';
-import {createRandomUuid} from 'Util/util';
 
 export interface BaseToggleProps {
   extendedInfo?: boolean;
@@ -48,8 +47,8 @@ const BaseToggle: React.FC<BaseToggleProps> = ({
   className,
   infoText,
 }) => {
-  const uuid = React.useMemo(() => createRandomUuid(), []);
-  const labelUuid = React.useMemo(() => createRandomUuid(), []);
+  const uuid = useId();
+  const labelUuid = useId();
   const inputRef = React.useRef<HTMLInputElement>();
   return (
     <div className={cx(defaultToggleName, className)}>
