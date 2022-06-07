@@ -24,6 +24,7 @@ import React, {useEffect, useState} from 'react';
 import {FormattedMessage, useIntl} from 'react-intl';
 import useReactRouter from 'use-react-router';
 import {Config} from '../../Config';
+import '../../localization/Localizer';
 import {indexStrings, logoutReasonStrings} from '../../strings';
 import {QUERY_KEY, ROUTE} from '../route';
 import Page from './Page';
