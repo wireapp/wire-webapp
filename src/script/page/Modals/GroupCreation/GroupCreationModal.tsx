@@ -285,7 +285,7 @@ const GroupCreationModal: React.FC<GroupCreationModalProps> = ({
           <SearchInput
             // className="modal-style"
             input={participantsInput}
-            setInput={value => setParticipantsInput(value)}
+            setInput={setParticipantsInput}
             selectedUsers={selectedContacts}
             setSelectedUsers={setSelectedContacts}
             placeholder={t('groupCreationParticipantsPlaceholder')}
