@@ -367,7 +367,7 @@ const GroupCreationModal: React.FC<GroupCreationModalProps> = ({
                   dataUieName={'read-receipts'}
                   info={t('readReceiptsToogleInfo')}
                   isChecked={enableReadReceipts}
-                  setIsChecked={checked => setEnableReadReceipts(checked)}
+                  setIsChecked={setEnableReadReceipts}
                   isDisabled={false}
                   name={t('readReceiptsToogleName')}
                 />
