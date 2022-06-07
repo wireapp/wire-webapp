@@ -178,8 +178,8 @@ const UserSearchableList: React.FC<UserListProps> = props => {
       selectedUsers={selectedUsers}
       highlightedUsers={highlightedUsers}
       {...(!!selectedUsers && {
-        onSelectUser: toggleUserSelection
-      })
+        onSelectUser: toggleUserSelection,
+      })}
     />
   );
 };
