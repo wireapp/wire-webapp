@@ -109,6 +109,7 @@ export enum BackendErrorLabel {
 
   // Federation errors
   FEDERATION_NOT_ALLOWED = 'federation-denied',
+  FEDERATION_NOT_AVAILABLE = 'federation-not-available',
   FEDERATION_BACKEND_NOT_FOUND = 'srv-record-not-found',
 }
 
