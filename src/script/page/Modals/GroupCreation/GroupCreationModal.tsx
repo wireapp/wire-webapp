@@ -169,7 +169,6 @@ const GroupCreationModal: React.FC<GroupCreationModalProps> = ({
   };
 
   const onGroupNameChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    event.preventDefault();
     const {value} = event.target;
 
     const trimmedNameInput = value.trim();
@@ -322,7 +321,6 @@ const GroupCreationModal: React.FC<GroupCreationModalProps> = ({
                 onCancel={() => setGroupName('')}
                 onChange={onGroupNameChange}
                 onBlur={event => {
-                  event.preventDefault();
                   const {value} = event.target as HTMLInputElement;
                   const trimmedName = value.trim();
                   setGroupName(trimmedName);
