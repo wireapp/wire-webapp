@@ -97,7 +97,7 @@ const GroupCreationModal: React.FC<GroupCreationModalProps> = ({
   const {isTeam} = useKoSubscribableChildren(teamState, ['isTeam']);
 
   useEffect(() => {
-    const showCreateGroup = (source: GroupCreationSource, userEntity: User) => {
+    const showCreateGroup = (_: string, userEntity: User) => {
       setEnableReadReceipts(isTeam);
       setIsShown(true);
       setGroupCreationState(GroupCreationModalState.PREFERENCES);
@@ -105,6 +105,7 @@ const GroupCreationModal: React.FC<GroupCreationModalProps> = ({
         setSelectedContacts([...selectedContacts, userEntity]);
       }
     };
+
     amplify.subscribe(WebAppEvents.CONVERSATION.CREATE_GROUP, showCreateGroup);
   }, []);
 
