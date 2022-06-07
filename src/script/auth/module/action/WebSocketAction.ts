@@ -39,6 +39,8 @@ export class WebSocketAction {
       });
 
       await core.listen({
+        // We just want to get unencrypted backend events, so we use a dry run in order not to store the last notificationId and avoid decrypting events
+        dryRun: true,
         onEvent: async ({event}, source) => {
           let data: PayloadBundle | void;
           try {

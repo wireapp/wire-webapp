@@ -198,8 +198,8 @@ export class TitleBarViewModel {
     this.showDetails(false);
   };
 
-  readonly pressOnDetails = (event: KeyboardEvent): void => {
-    handleKeyDown(event, this.clickOnDetails);
+  readonly pressOnDetails = (event: KeyboardEvent): boolean => {
+    return handleKeyDown(event, this.clickOnDetails);
   };
 
   readonly clickOnCollectionButton = (): void => {
