@@ -242,7 +242,6 @@ export class ConversationAPI {
       method: 'get',
       url,
     };
-
     const response = await this.client.sendJSON<Conversation>(config);
     return response.data;
   }
@@ -346,13 +345,13 @@ export class ConversationAPI {
   /**
    * Get all local & remote conversations from a federated backend.
    */
-  public async getConversationList(): Promise<Conversation[]> {
+  public async getConversationList(): Promise<RemoteConversations> {
     if (!this.backendFeatures.federationEndpoints) {
-      return this.getAllConversations();
+      return {found: await this.getAllConversations()};
     }
     const allConversationIds = await this.getQualifiedConversationIds();
     const conversations = await this.getConversationsByQualifiedIds(allConversationIds);
-    return conversations.found || [];
+    return conversations;
   }
 
   /**
