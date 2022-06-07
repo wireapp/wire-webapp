@@ -184,10 +184,12 @@ const GroupCreationModal: React.FC<GroupCreationModalProps> = ({
     setNameError('');
   };
 
-  const clickOnNext = (): void => {
-    const nameTooLong = groupName.length > maxNameLength;
+  const groupNameLength = groupName.length;
 
-    if (groupName.length && !nameTooLong) {
+  const clickOnNext = (): void => {
+    const nameTooLong = groupNameLength > maxNameLength;
+
+    if (groupNameLength && !nameTooLong) {
       setGroupCreationState(GroupCreationModalState.PARTICIPANTS);
     }
   };
@@ -272,8 +274,8 @@ const GroupCreationModal: React.FC<GroupCreationModalProps> = ({
               <button
                 id="group-go-next"
                 className={cx('group-creation__action', {
-                  'accent-text': groupName.length,
-                  enabled: groupName.length && !nameError.length,
+                  'accent-text': groupNameLength,
+                  enabled: groupNameLength && !nameError.length,
                 })}
                 type="button"
                 onClick={clickOnNext}
