@@ -283,7 +283,6 @@ const GroupCreationModal: React.FC<GroupCreationModalProps> = ({
         </div>
         {stateIsParticipants && (
           <SearchInput
-            // className="modal-style"
             input={participantsInput}
             setInput={setParticipantsInput}
             selectedUsers={selectedContacts}
