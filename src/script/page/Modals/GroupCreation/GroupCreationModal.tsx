@@ -101,6 +101,7 @@ const GroupCreationModal: React.FC<GroupCreationModalProps> = ({
       setEnableReadReceipts(isTeam);
       setIsShown(true);
       setGroupCreationState(GroupCreationModalState.PREFERENCES);
+
       if (userEntity) {
         setSelectedContacts([...selectedContacts, userEntity]);
       }
