@@ -452,6 +452,7 @@ export class UserRepository {
             userId => userId.domain === this.userState.self().domain,
           );
           const users = await getUsers(sameBackendUsers);
+
           return users.concat(
             federatedUsers.map(userId => {
               /* When a federated backend is unreachable, we generate fake users locally with some default values
