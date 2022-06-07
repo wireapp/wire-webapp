@@ -235,11 +235,13 @@ const GroupCreationModal: React.FC<GroupCreationModalProps> = ({
               >
                 <Icon.ArrowLeft aria-hidden="true" className="modal__header__button" />
               </button>
+
               <h2 id="group-creation-label" className="modal__header__title" data-uie-name="status-people-selected">
                 {selectedContacts.length
                   ? t('groupCreationParticipantsHeaderWithCounter', selectedContacts.length)
                   : t('groupCreationParticipantsHeader')}
               </h2>
+
               <button
                 className="group-creation__action enabled accent-text"
                 type="button"
@@ -262,9 +264,11 @@ const GroupCreationModal: React.FC<GroupCreationModalProps> = ({
               >
                 <Icon.Close aria-hidden="true" className="modal__header__button" />
               </button>
+
               <h2 id="group-creation-label" className="modal__header__title">
                 {t('groupCreationPreferencesHeader')}
               </h2>
+
               <button
                 id="group-go-next"
                 className={cx('group-creation__action', {
