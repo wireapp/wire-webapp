@@ -21,9 +21,9 @@ import uint32 from 'uint32';
 
 export const joaatHash = (stringToHash: string): number => {
   let hash = uint32.toUint32(0);
-  const key = stringToHash?.toLowerCase();
+  const key = stringToHash.toLowerCase();
 
-  for (let index = 0; index < key?.length; index++) {
+  for (let index = 0; index < key.length; index++) {
     hash = uint32.addMod32(hash, uint32.toUint32(key.charCodeAt(index)));
     hash = uint32.addMod32(hash, uint32.shiftLeft(hash, 10));
     hash = uint32.xor(hash, uint32.shiftRight(hash, 6));

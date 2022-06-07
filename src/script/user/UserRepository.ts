@@ -472,8 +472,7 @@ export class UserRepository {
         if (isNotFound || isBadRequest) {
           return [];
         }
-        // throw error;
-        return this.userMapper.mapUsersFromJson(error);
+        throw error;
       }
     };
 

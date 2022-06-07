@@ -497,11 +497,6 @@ export class ConversationRepository {
       if (originalError.code === HTTP_STATUS.NOT_FOUND) {
         this.deleteConversationLocally(qualifiedId, false);
       }
-      if (originalError.code === HTTP_STATUS.INTERNAL_SERVER_ERROR /* TODO && is federation error */) {
-        const fakeConv = new Conversation(conversationId, domain);
-        fakeConv.display_name('test');
-        return fakeConv;
-      }
       const error = new ConversationError(
         ConversationError.TYPE.CONVERSATION_NOT_FOUND,
         ConversationError.MESSAGE.CONVERSATION_NOT_FOUND,
