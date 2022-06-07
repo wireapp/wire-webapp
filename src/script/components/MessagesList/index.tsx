@@ -18,6 +18,8 @@
  */
 
 import React, {useEffect, useLayoutEffect, useRef, useState} from 'react';
+import ReactDom from 'react-dom';
+import {debounce} from 'underscore';
 import {ConversationRepository} from 'src/script/conversation/ConversationRepository';
 import {MessageRepository} from 'src/script/conversation/MessageRepository';
 import {Conversation} from '../../entity/Conversation';
@@ -32,6 +34,7 @@ import Message from './Message';
 import {Text} from 'src/script/entity/message/Text';
 import {useResizeObserver} from '../../ui/resizeObserver';
 import useEffectRef from 'Util/useEffectRef';
+import Icon from 'Components/Icon';
 
 type FocusedElement = {center?: boolean; element: Element};
 interface MessagesListParams {
@@ -91,6 +94,7 @@ const MessagesList: React.FC<MessagesListParams> = ({
   const messages = allMessages.filter(message => message.visible());
   const [loaded, setLoaded] = useState(false);
   const [focusedMessage, setFocusedMessage] = useState<string | undefined>(initialMessage?.id);
+  const [showJumpToBottom, setShowJumpToBottom] = useState<boolean>(false);
 
   const shouldShowInvitePeople =
     conversation.isActiveParticipant() && conversation.inTeam() && (isGuestRoom || isGuestAndServicesRoom);
@@ -150,12 +154,25 @@ const MessagesList: React.FC<MessagesListParams> = ({
     nbMessages.current = messages.length;
   };
 
+  const onJumpToBottom = (element: HTMLElement) => {
+    element.scroll({behavior: 'smooth', top: element.scrollHeight});
+  };
+
   // Listen to resizes of the the container element (if it's resized it means something has changed in the message list)
   useResizeObserver(messagesContainer, () => updateScroll(messagesContainer));
   // Also listen to the scrolling container resizes (when the window resizes or the inputBar changes)
   useResizeObserver(messagesContainer?.parentElement, () => updateScroll(messagesContainer));
   useLayoutEffect(() => {
     if (messagesContainer) {
+      const onScrollEventHandler: EventListener = debounce(event => {
+        const element = event.target as HTMLDivElement;
+        if (element.scrollHeight - element.scrollTop > element.clientHeight + 100) {
+          setShowJumpToBottom(true);
+        } else {
+          setShowJumpToBottom(false);
+        }
+      }, 300);
+      messagesContainer.parentElement.addEventListener('scroll', onScrollEventHandler, {passive: true});
       updateScroll(messagesContainer);
     }
   }, [messages.length, messagesContainer]);
@@ -233,6 +250,13 @@ const MessagesList: React.FC<MessagesListParams> = ({
 
   return (
     <div ref={setContainer} className={`messages ${verticallyCenterMessage() ? 'flex-center' : ''}`}>
+      {showJumpToBottom &&
+        ReactDom.createPortal(
+          <div onClick={() => onJumpToBottom(messagesContainer?.parentElement)} className="jump-to-bottom">
+            <Icon.ArrowNext width="24" height="24" />
+          </div>,
+          document.getElementById('jump-to-bottom-container'),
+        )}
       {messageViews}
     </div>
   );

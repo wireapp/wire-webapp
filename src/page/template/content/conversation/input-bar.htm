@@ -1,5 +1,6 @@
 <!--@formatter:off-->
 <div id="conversation-input-bar" class="conversation-input-bar" data-bind="with: $root.inputBar">
+  <div id="jump-to-bottom-container"></div>
   <!-- ko if: classifiedDomains && !isConnectionRequest() -->
     <classified-bar params="users: conversationEntity().participating_user_ets, classifiedDomains: classifiedDomains"></classified-bar>
   <!-- /ko -->
