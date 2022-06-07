@@ -40,7 +40,7 @@ import TextInputForwarded from 'Components/TextInput/TextInput';
 import BaseToggle from 'Components/toggle/BaseToggle';
 import InfoToggle from 'Components/toggle/InfoToggle';
 import {User} from '../../../entity/User';
-import {TEAM, ACCESS_STATE} from '../../../conversation/AccessState';
+import {ACCESS_STATE} from '../../../conversation/AccessState';
 import Icon from 'Components/Icon';
 import {t} from 'Util/LocalizerUtil';
 import {onEscKey, offEscKey} from 'Util/KeyboardUtil';
@@ -80,7 +80,7 @@ const GroupCreationModal: React.FC<GroupCreationModalProps> = ({
   const [enableReadReceipts, setEnableReadReceipts] = useState<boolean>(false);
   const [showContacts, setShowContacts] = useState<boolean>(false);
   const [isCreatingConversation, setIsCreatingConversation] = useState<boolean>(false);
-  const [accessState, setAccessState] = useState<TEAM>(ACCESS_STATE.TEAM.GUESTS_SERVICES);
+  const [accessState, setAccessState] = useState<ACCESS_STATE>(ACCESS_STATE.TEAM.GUESTS_SERVICES);
   const [nameError, setNameError] = useState<string>('');
   const [groupName, setGroupName] = useState<string>('');
   const [participantsInput, setParticipantsInput] = useState<string>('');
