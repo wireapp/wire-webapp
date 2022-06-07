@@ -1132,6 +1132,7 @@
   "tooltipPreferencesPicture": "Cambiar tu foto…",
   "tooltipPreferencesRename": "Cambiar tu nombre",
   "tooltipSearchClose": "Cerrar (Esc)",
+  "unavailableUser": "Username unavailable",
   "unsupported.desktopOnlyMessage": "Please use {brandName} on your desktop app instead.",
   "unsupported.headlineBrowser": "No se admite este navegador.",
   "unsupported.headlineCookies": "Activar cookies",

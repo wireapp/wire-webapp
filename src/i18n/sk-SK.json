@@ -1132,6 +1132,7 @@
   "tooltipPreferencesPicture": "Zmeniť obrázok…",
   "tooltipPreferencesRename": "Zmeniť Vaše meno",
   "tooltipSearchClose": "Zavrieť (Esc)",
+  "unavailableUser": "Username unavailable",
   "unsupported.desktopOnlyMessage": "Please use {brandName} on your desktop app instead.",
   "unsupported.headlineBrowser": "This browser is not supported.",
   "unsupported.headlineCookies": "Enable cookies",

@@ -1132,6 +1132,7 @@
   "tooltipPreferencesPicture": "Измените своју слику…",
   "tooltipPreferencesRename": "Промените име",
   "tooltipSearchClose": "Затвори (Esc)",
+  "unavailableUser": "Username unavailable",
   "unsupported.desktopOnlyMessage": "Please use {brandName} on your desktop app instead.",
   "unsupported.headlineBrowser": "Овај прегледач није подржан.",
   "unsupported.headlineCookies": "Омогући колачиће",
