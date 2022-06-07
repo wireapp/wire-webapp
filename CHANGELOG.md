@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [19.5.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/compare/@wireapp/api-client@19.4.0...@wireapp/api-client@19.5.0) (2022-06-07)
+
+
+### Features
+
+* **api:** Improve federated unavailable error handling ([#4280](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/issues/4280)) ([15a0900](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/commit/15a0900e04c02e3193c9c8dbce98ec83d0fff0ae))
+
+
+
+
+
 # [19.4.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/compare/@wireapp/api-client@19.3.3...@wireapp/api-client@19.4.0) (2022-06-03)
 
 
