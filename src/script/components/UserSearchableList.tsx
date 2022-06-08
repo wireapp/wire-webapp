@@ -173,7 +173,7 @@ const UserSearchableList: React.FC<UserListProps> = ({onUpdateSelectedUsers, ...
       ) : (
         <UserList
           {...userListProps}
-          users={foundUserEntities()}
+          users={userList}
           selectedUsers={selectedUsers}
           highlightedUsers={highlightedUsers}
           {...(!!selectedUsers && {
