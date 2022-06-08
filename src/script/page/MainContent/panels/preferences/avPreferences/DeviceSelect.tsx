@@ -17,7 +17,7 @@
  *
  */
 
-import React, {useState} from 'react';
+import React from 'react';
 import cx from 'classnames';
 import {Select} from '@wireapp/react-ui-kit';
 
@@ -43,7 +43,11 @@ const DeviceSelect: React.FC<DeviceSelectProps> = ({
   title,
 }) => {
   const currentDevice = devices.find(obj => obj.deviceId === value);
-  const [device, setDevice] = useState({label: currentDevice.label, value: value});
+  const currentOption = {label: currentDevice.label, value: currentDevice.deviceId};
+  const getOptionsFromDevices = devices.map(({deviceId, label}) => ({
+    label: label || defaultDeviceName,
+    value: deviceId,
+  }));
   const lessThanTwoDevices = devices.length < 2;
   const disabled = lessThanTwoDevices || isRequesting;
   return (
@@ -62,14 +66,10 @@ const DeviceSelect: React.FC<DeviceSelectProps> = ({
       >
         <Select
           id={uieName}
-          onChange={(selectedDevice: string) => {
-            const device = devices.find(obj => obj.deviceId === selectedDevice);
-            setDevice({label: device.label, value: selectedDevice});
-            onChange(selectedDevice);
-          }}
+          onChange={onChange}
           dataUieName={uieName}
-          options={devices.map(({deviceId, label}) => ({label: label || defaultDeviceName, value: deviceId}))}
-          value={device}
+          options={getOptionsFromDevices}
+          value={currentOption}
           label={title}
           disabled={disabled}
         />
