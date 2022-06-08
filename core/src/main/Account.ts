@@ -25,7 +25,7 @@ import type {Notification} from '@wireapp/api-client/src/notification/';
 import {AUTH_COOKIE_KEY, AUTH_TABLE_NAME, Context, Cookie, CookieStore, LoginData} from '@wireapp/api-client/src/auth/';
 import {ClientClassification, ClientType, RegisteredClient} from '@wireapp/api-client/src/client/';
 import * as Events from '@wireapp/api-client/src/event';
-import {WebSocketClient} from '@wireapp/api-client/src/tcp/';
+import {AbortHandler, WebSocketClient} from '@wireapp/api-client/src/tcp/';
 import * as cryptobox from '@wireapp/cryptobox';
 import {CRUDEngine, MemoryEngine, error as StoreEngineError} from '@wireapp/store-engine';
 import {EventEmitter} from 'events';
@@ -479,13 +479,17 @@ export class Account extends EventEmitter {
     );
     this.apiClient.transport.ws.on(WebSocketClient.TOPIC.ON_STATE_CHANGE, onConnectionStateChanged);
 
-    const onBeforeConnect = async () => {
+    const onBeforeConnect = async (abortHandler: AbortHandler) => {
       // Lock websocket in order to buffer any message that arrives while we handle the notification stream
       this.apiClient.transport.ws.lock();
-      await this.service!.notification.handleNotificationStream(async (notification, source, progress) => {
-        await handleNotification(notification, source);
-        onNotificationStreamProgress(progress);
-      }, onMissedNotifications);
+      await this.service!.notification.handleNotificationStream(
+        async (notification, source, progress) => {
+          await handleNotification(notification, source);
+          onNotificationStreamProgress(progress);
+        },
+        onMissedNotifications,
+        abortHandler,
+      );
       // We can now unlock the websocket and let the new messages being handled and decrypted
       this.apiClient.transport.ws.unlock();
       onConnected();
@@ -494,6 +498,8 @@ export class Account extends EventEmitter {
 
     return () => {
       this.apiClient.disconnect();
+      this.apiClient.transport.ws.removeAllListeners(WebSocketClient.TOPIC.ON_MESSAGE);
+      this.apiClient.transport.ws.removeListener(WebSocketClient.TOPIC.ON_STATE_CHANGE, onConnectionStateChanged);
     };
   }
 
