@@ -164,6 +164,7 @@ const UserSearchableList: React.FC<UserListProps> = ({onUpdateSelectedUsers, ...
     const hasUsers = !!users.length;
     const noResultsDataUieName = hasUsers ? 'status-no-matches' : 'status-all-added';
     const noResultsTranslationText = hasUsers ? 'searchListNoMatches' : 'searchListEveryoneParticipates';
+
     return (
       <div className="user-list-wrapper">
         <div className="user-list__no-results" data-uie-name={noResultsDataUieName}>
@@ -172,6 +173,7 @@ const UserSearchableList: React.FC<UserListProps> = ({onUpdateSelectedUsers, ...
       </div>
     );
   }
+
   return (
     <div className="user-list-wrapper">
       <UserList
