@@ -91,7 +91,6 @@ import {URLParameter} from '../auth/URLParameter';
 import {SIGN_OUT_REASON} from '../auth/SignOutReason';
 import {ClientRepository} from '../client/ClientRepository';
 import {ContentViewModel} from '../view_model/ContentViewModel';
-import AppLock from '../page/AppLock';
 import {CacheRepository} from '../cache/CacheRepository';
 import {SelfService} from '../self/SelfService';
 import {PropertiesRepository} from '../properties/PropertiesRepository';
@@ -467,7 +466,6 @@ class App {
 
       telemetry.timeStep(AppInitTimingsStep.APP_LOADED);
       this._showInterface();
-      AppLock.init(clientRepository);
 
       loadingView.removeFromView();
       telemetry.report();

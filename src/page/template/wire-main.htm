@@ -56,8 +56,8 @@
     </div>
     #include('detail-view.htm')
     #include('modals.htm')
-    <div id="applock"></div>
     <!-- /ko -->
+    <app-lock-container params="clientRepository: $root.content.repositories.client"></app-lock-container>
     <warnings-container></warnings-container>
     <calling-overlay-container params="
       multitasking: $root.multitasking,
