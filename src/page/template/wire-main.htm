@@ -29,7 +29,11 @@
           <h1 class="visually-hidden" data-bind="text: t('accessibility.headings.historyImport')"></h1>
           #include('content/history-import.htm')
         <!-- /ko -->
-        <div id="group-creation-modal-container"></div>
+        <group-creation-modal params="
+          conversationRepository: $root.repositories.conversation,
+          searchRepository: $root.repositories.search,
+          teamRepository: $root.repositories.team,
+        "></group-creation-modal>
         #include('modal/user-modal.htm')
         #include('modal/service-modal.htm')
         #include('modal/invite-modal.htm')
