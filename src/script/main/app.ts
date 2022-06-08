@@ -121,7 +121,6 @@ import {AssetRepository} from '../assets/AssetRepository';
 import type {BaseError} from '../error/BaseError';
 import type {User} from '../entity/User';
 import {MessageRepository} from '../conversation/MessageRepository';
-import CallingContainer from 'Components/calling/CallingOverlayContainer';
 import {TeamError} from '../error/TeamError';
 import Warnings from '../view_model/WarningsContainer';
 import {Core} from '../service/CoreSingleton';
@@ -720,13 +719,6 @@ class App {
     this.repository.properties.checkPrivacyPermission().then(() => {
       window.setTimeout(() => this.repository.notification.checkPermission(), App.CONFIG.NOTIFICATION_CHECK);
     });
-
-    CallingContainer.init(
-      mainView.multitasking,
-      this.repository.calling,
-      this.repository.media.streamHandler,
-      this.repository.media.devicesHandler,
-    );
   }
 
   /**

@@ -54,6 +54,11 @@
     <div id="warnings"></div>
     #include('modals.htm')
     <div id="applock"></div>
-  <!-- /ko -->
-  <div id="calling-overlay-container"></div>
+    <!-- /ko -->
+    <calling-overlay-container params="
+      multitasking: $root.multitasking,
+      callingRepository: $root.content.repositories.calling,
+      mediaRepository: $root.content.repositories.media,
+      ">
+    </calling-overlay-container>
 </main>
