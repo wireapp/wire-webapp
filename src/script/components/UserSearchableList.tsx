@@ -159,32 +159,28 @@ const UserSearchableList: React.FC<UserListProps> = ({onUpdateSelectedUsers, ...
   };
 
   const userList = foundUserEntities();
-
-  if (userList.length === 0) {
-    const hasUsers = !!users.length;
-    const noResultsDataUieName = hasUsers ? 'status-no-matches' : 'status-all-added';
-    const noResultsTranslationText = hasUsers ? 'searchListNoMatches' : 'searchListEveryoneParticipates';
-
-    return (
-      <div className="user-list-wrapper">
-        <div className="user-list__no-results" data-uie-name={noResultsDataUieName}>
-          {t(noResultsTranslationText)}
-        </div>
-      </div>
-    );
-  }
+  const userListIsEmpty = userList.length === 0;
+  const hasUsers = !!users.length;
+  const noResultsDataUieName = hasUsers ? 'status-no-matches' : 'status-all-added';
+  const noResultsTranslationText = hasUsers ? 'searchListNoMatches' : 'searchListEveryoneParticipates';
 
   return (
     <div className="user-list-wrapper">
-      <UserList
-        {...userListProps}
-        users={foundUserEntities()}
-        selectedUsers={selectedUsers}
-        highlightedUsers={highlightedUsers}
-        {...(!!selectedUsers && {
-          onSelectUser: toggleUserSelection,
-        })}
-      />
+      {userListIsEmpty ? (
+        <div className="user-list__no-results" data-uie-name={noResultsDataUieName}>
+          {t(noResultsTranslationText)}
+        </div>
+      ) : (
+        <UserList
+          {...userListProps}
+          users={foundUserEntities()}
+          selectedUsers={selectedUsers}
+          highlightedUsers={highlightedUsers}
+          {...(!!selectedUsers && {
+            onSelectUser: toggleUserSelection,
+          })}
+        />
+      )}
     </div>
   );
 };
