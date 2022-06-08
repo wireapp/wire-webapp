@@ -855,7 +855,7 @@ export const clientManagerStrings = defineMessages({
     id: 'clientManager.headline',
   },
   logout: {
-    defaultMessage: 'Log out',
+    defaultMessage: 'Cancel process',
     id: 'clientManager.logout',
   },
   subhead: {

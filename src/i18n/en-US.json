@@ -229,7 +229,7 @@
   "chooseHandle.subhead": "Your username helps people find you.",
   "clientItem.passwordPlaceholder": "Password",
   "clientManager.headline": "Remove a device",
-  "clientManager.logout": "Log out",
+  "clientManager.logout": "Cancel process",
   "clientManager.subhead": "Remove one of your other devices to start using {brandName} on this one.",
   "collectionSectionAudio": "Audio messages",
   "collectionSectionFiles": "Files",

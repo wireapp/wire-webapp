@@ -17,7 +17,7 @@
  *
  */
 
-import {ContainerXS, H1, Link, Muted} from '@wireapp/react-ui-kit';
+import {ContainerXS, H1, Link, Muted, useTimeout} from '@wireapp/react-ui-kit';
 import React, {useEffect} from 'react';
 import {useIntl} from 'react-intl';
 import {connect} from 'react-redux';
@@ -39,12 +39,16 @@ const ClientManager = ({doGetAllClients, doLogout}: Props & ConnectedProps & Dis
   useEffect(() => {
     doGetAllClients();
   }, []);
+
   const logout = async () => {
     try {
       await doLogout();
       history.push(ROUTE.INDEX);
     } catch (error) {}
   };
+
+  // Automatically log the user out if ten minutes passes.
+  useTimeout(logout, 1000 * 60 * 10);
 
   return (
     <Page>
