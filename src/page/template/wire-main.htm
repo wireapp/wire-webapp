@@ -55,10 +55,10 @@
       </div>
     </div>
     #include('detail-view.htm')
-    <div id="warnings"></div>
     #include('modals.htm')
     <!-- /ko -->
     <app-lock-container params="clientRepository: $root.content.repositories.client"></app-lock-container>
+    <warnings-container></warnings-container>
     <calling-overlay-container params="
       multitasking: $root.multitasking,
       callingRepository: $root.content.repositories.calling,
