@@ -23,6 +23,7 @@ import cx from 'classnames';
 import {amplify} from 'amplify';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import {RECEIPT_MODE} from '@wireapp/api-client/src/conversation/data/ConversationReceiptModeUpdateData';
+import {ConversationProtocol} from '@wireapp/api-client/src/conversation/NewConversation';
 
 import {getLogger} from 'Util/Logger';
 import {sortUsersByPriority} from 'Util/StringUtil';
@@ -78,6 +79,7 @@ const GroupCreationModal: React.FC<GroupCreationModalProps> = ({
   const [isShown, setIsShown] = useState<boolean>(false);
   const [selectedContacts, setSelectedContacts] = useState<User[]>([]);
   const [enableReadReceipts, setEnableReadReceipts] = useState<boolean>(false);
+  const [enableMls, setEnableMls] = useState<boolean>(false);
   const [showContacts, setShowContacts] = useState<boolean>(false);
   const [isCreatingConversation, setIsCreatingConversation] = useState<boolean>(false);
   const [accessState, setAccessState] = useState<ACCESS_STATE>(ACCESS_STATE.TEAM.GUESTS_SERVICES);
@@ -94,7 +96,7 @@ const GroupCreationModal: React.FC<GroupCreationModalProps> = ({
   const maxSize = ConversationRepository.CONFIG.GROUP.MAX_SIZE;
 
   const onEscape = () => setIsShown(false);
-  const {isTeam} = useKoSubscribableChildren(teamState, ['isTeam']);
+  const {isTeam, isMLSEnabled} = useKoSubscribableChildren(teamState, ['isTeam', 'isMLSEnabled']);
 
   useEffect(() => {
     const showCreateGroup = (_: string, userEntity: User) => {
@@ -158,6 +160,7 @@ const GroupCreationModal: React.FC<GroupCreationModalProps> = ({
           groupName,
           isTeam ? accessState : undefined,
           {
+            protocol: enableMls ? ConversationProtocol.MLS : ConversationProtocol.PROTEUS,
             receipt_mode: enableReadReceipts ? RECEIPT_MODE.ON : RECEIPT_MODE.OFF,
           },
         );
@@ -356,7 +359,7 @@ const GroupCreationModal: React.FC<GroupCreationModalProps> = ({
                   extendedInfoText={t('guestRoomToggleInfoExtended')}
                   infoText={t('guestRoomToggleInfo')}
                   toggleName={t('guestOptionsTitle')}
-                  toggleId={'guests'}
+                  toggleId="guests"
                 />
                 <BaseToggle
                   className="modal-style"
@@ -370,13 +373,25 @@ const GroupCreationModal: React.FC<GroupCreationModalProps> = ({
                 />
                 <InfoToggle
                   className="modal-style"
-                  dataUieName={'read-receipts'}
-                  info={t('readReceiptsToogleInfo')}
+                  dataUieName="read-receipts"
+                  info={t('readReceiptsToggleInfo')}
                   isChecked={enableReadReceipts}
                   setIsChecked={setEnableReadReceipts}
                   isDisabled={false}
-                  name={t('readReceiptsToogleName')}
+                  name={t('readReceiptsToggleName')}
                 />
+                {isMLSEnabled && (
+                  <InfoToggle
+                    className="modal-style"
+                    dataUieName="mls"
+                    info={t('mlsToggleInfo')}
+                    isChecked={enableMls}
+                    setIsChecked={setEnableMls}
+                    isDisabled={false}
+                    name={t('mlsToggleName')}
+                  />
+                )}
+                <br />
               </>
             )}
           </>
