@@ -34,6 +34,7 @@ import AVPreferences from './panels/preferences/AVPreferences';
 import {container} from 'tsyringe';
 import {ClientState} from '../../client/ClientState';
 import {UserState} from '../../user/UserState';
+import {StyledApp} from '@wireapp/react-ui-kit';
 
 type LeftSidebarProps = {
   contentViewModel: ContentViewModel;
@@ -147,9 +148,11 @@ const MainContent: React.FC<LeftSidebarProps> = ({
   return (
     <>
       <h1 className="visually-hidden">{title}</h1>
-      <SwitchTransition>
-        <Animated key={state}>{content}</Animated>
-      </SwitchTransition>
+      <StyledApp>
+        <SwitchTransition>
+          <Animated key={state}>{content}</Animated>
+        </SwitchTransition>
+      </StyledApp>
     </>
   );
 };
