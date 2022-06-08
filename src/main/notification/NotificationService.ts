@@ -32,6 +32,7 @@ import {UserMapper} from '../user/UserMapper';
 import {NotificationBackendRepository} from './NotificationBackendRepository';
 import {NotificationDatabaseRepository} from './NotificationDatabaseRepository';
 import {GenericMessage} from '@wireapp/protocol-messaging';
+import {AbortHandler} from '@wireapp/api-client/src/tcp';
 
 export type HandledEventPayload = {
   event: Events.BackendEvent;
@@ -125,6 +126,7 @@ export class NotificationService extends EventEmitter {
   public async handleNotificationStream(
     notificationHandler: NotificationHandler,
     onMissedNotifications: (notificationId: string) => void,
+    abortHandler: AbortHandler,
   ): Promise<void> {
     const {notifications, missedNotification} = await this.getAllNotifications();
     if (missedNotification) {
@@ -132,6 +134,12 @@ export class NotificationService extends EventEmitter {
     }
 
     for (const [index, notification] of notifications.entries()) {
+      if (abortHandler.isAborted()) {
+        /* Stop handling notifications if the websocket has been disconnected.
+         * Upon reconnecting we are going to restart handling the notification stream for where we left of
+         */
+        return;
+      }
       await notificationHandler(notification, PayloadBundleSource.NOTIFICATION_STREAM, {
         done: index + 1,
         total: notifications.length,
