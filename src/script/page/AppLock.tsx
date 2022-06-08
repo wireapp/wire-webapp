@@ -33,9 +33,8 @@ import {SIGN_OUT_REASON} from '../auth/SignOutReason';
 import {ClientState} from '../client/ClientState';
 import {AppLockState} from '../user/AppLockState';
 import {AppLockRepository} from '../user/AppLockRepository';
-import {useKoSubscribableChildren} from 'Util/ComponentUtil';
+import {registerReactComponent, useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {ModalsViewModel} from '../view_model/ModalsViewModel';
-import {createRoot} from 'react-dom/client';
 import Icon from 'Components/Icon';
 
 export enum APPLOCK_STATE {
@@ -538,9 +537,4 @@ const AppLock: React.FC<AppLockProps> = ({
   );
 };
 
-export default {
-  AppLock,
-  init: (clientRepository: ClientRepository) => {
-    createRoot(document.getElementById('applock')).render(<AppLock clientRepository={clientRepository} />);
-  },
-};
+registerReactComponent('app-lock-container', AppLock);
