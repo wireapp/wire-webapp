@@ -22,7 +22,7 @@ import {ArrowIcon, Input, InputBlock, InputSubmitCombo, Loading, RoundIconButton
 import React, {useRef, useState} from 'react';
 import {useIntl} from 'react-intl';
 import {COUNTRY_CODES, getCountryByCode, getCountryCode} from 'Util/CountryCodes';
-import {phoneLoginStrings} from '../../strings';
+// import {phoneLoginStrings} from '../../strings';
 
 interface LoginFormProps {
   isFetching: boolean;
@@ -37,6 +37,10 @@ const PhoneLoginForm = ({isFetching, onSubmit}: LoginFormProps) => {
   const [validInput, setValidInput] = useState(true);
   const phoneInput = useRef();
   const countryCodeInput = useRef();
+  const countryList = COUNTRY_CODES.map(({iso, name}) => ({
+    label: name,
+    value: iso,
+  }));
 
   const handleSubmit = (event: React.FormEvent) => {
     event.preventDefault();
@@ -49,6 +53,17 @@ const PhoneLoginForm = ({isFetching, onSubmit}: LoginFormProps) => {
   return (
     <InputBlock>
       <Select
+        // style={{height: 57, marginBottom: 0}}
+        id=""
+        onChange={(selectedCountry: string) => {
+          setCountry(selectedCountry);
+          setCountryCode((getCountryCode(selectedCountry) || 'X2').toString(10));
+        }}
+        dataUieName=""
+        options={countryList}
+        value={{label: country, value: countryCode}}
+      />
+      {/* <Select
         style={{height: 57, marginBottom: 0}}
         value={country}
         onChange={(event: React.ChangeEvent<HTMLSelectElement>) => {
@@ -68,7 +83,7 @@ const PhoneLoginForm = ({isFetching, onSubmit}: LoginFormProps) => {
             {name}
           </option>
         ))}
-      </Select>
+      </Select> */}
       <InputSubmitCombo style={{background: 'none', boxShadow: 'inset 16px 16px 0 #fff, inset -100px -16px 0 #fff'}}>
         <Input
           style={{marginRight: 1, width: 80}}
