@@ -166,7 +166,7 @@ const UserSearchableList: React.FC<UserListProps> = ({onUpdateSelectedUsers, ...
 
   return (
     <div className="user-list-wrapper">
-      {userListIsEmpty ? (
+      {isEmptyUserList ? (
         <div className="user-list__no-results" data-uie-name={noResultsDataUieName}>
           {t(noResultsTranslationText)}
         </div>
