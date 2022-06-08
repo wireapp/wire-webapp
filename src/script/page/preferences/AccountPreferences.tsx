@@ -145,7 +145,7 @@ const AccountPreferences: React.FC<AccountPreferencesProps> = ({
           <AvatarInput {...{isActivatedAccount, selfUser, userRepository}} />
         </div>
         {isActivatedAccount && isTeam && <AvailabilityInput {...{availability}} />}
-        {isActivatedAccount && canEditProfile && (
+        {isActivatedAccount && (
           <div>
             <AccentColorPicker user={selfUser} doSetAccentColor={id => userRepository.changeAccentColor(id)} />
           </div>
@@ -163,7 +163,7 @@ const AccountPreferences: React.FC<AccountPreferencesProps> = ({
           >
             <NameInput {...{canEditProfile, name, userRepository}} />
             <UsernameInput {...{canEditProfile, userRepository, username}} domain={showDomain ? domain : undefined} />
-            {email && <EmailInput {...{canEditProfile, email, userRepository}} />}
+            {email && !selfUser.isNoPasswordSSO && <EmailInput {...{canEditProfile, email, userRepository}} />}
             {phone && (
               <AccountInput label={t('preferencesAccountPhone')} value={phone} readOnly data-uie-name="enter-phone" />
             )}
