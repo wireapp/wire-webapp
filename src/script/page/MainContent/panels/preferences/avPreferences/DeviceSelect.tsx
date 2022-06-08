@@ -42,14 +42,14 @@ const DeviceSelect: React.FC<DeviceSelectProps> = ({
   onChange,
   title,
 }) => {
-  const currentDevice = devices.find(obj => obj.deviceId === value);
-  const currentOption = {label: currentDevice.label, value: currentDevice.deviceId};
-  const getOptionsFromDevices = devices.map(({deviceId, label}) => ({
+  const devicesList = devices.map(({deviceId, label}) => ({
     label: label || defaultDeviceName,
     value: deviceId,
   }));
+  const currentValue = devicesList.find(device => device.value === value);
   const lessThanTwoDevices = devices.length < 2;
   const disabled = lessThanTwoDevices || isRequesting;
+
   return (
     <div
       className={cx('preferences-option', {
@@ -59,17 +59,13 @@ const DeviceSelect: React.FC<DeviceSelectProps> = ({
       <div className="preferences-option-icon preferences-av-select-icon">
         <DeviceIcon />
       </div>
-      <div
-        css={{
-          width: '550px',
-        }}
-      >
+      <div css={{width: '550px'}}>
         <Select
           id={uieName}
           onChange={onChange}
           dataUieName={uieName}
-          options={getOptionsFromDevices}
-          value={currentOption}
+          options={devicesList}
+          value={currentValue}
           label={title}
           disabled={disabled}
         />
