@@ -538,3 +538,5 @@ const AppLock: React.FC<AppLockProps> = ({
 };
 
 registerReactComponent('app-lock-container', AppLock);
+
+export default AppLock;
