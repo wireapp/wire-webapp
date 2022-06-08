@@ -18,7 +18,6 @@
  */
 
 import React, {useEffect, useState} from 'react';
-import {createRoot} from 'react-dom/client';
 import {container} from 'tsyringe';
 import cx from 'classnames';
 import {amplify} from 'amplify';
@@ -33,7 +32,7 @@ import {SearchRepository} from '../../../search/SearchRepository';
 import {TeamRepository} from '../../../team/TeamRepository';
 import {TeamState} from '../../../team/TeamState';
 import {UserState} from '../../../user/UserState';
-import {useKoSubscribableChildren} from 'Util/ComponentUtil';
+import {registerReactComponent, useKoSubscribableChildren} from 'Util/ComponentUtil';
 import ModalComponent from 'Components/ModalComponent';
 import SearchInput from 'Components/SearchInput';
 import UserSearchableList from 'Components/UserSearchableList';
@@ -387,19 +386,4 @@ const GroupCreationModal: React.FC<GroupCreationModalProps> = ({
   );
 };
 
-export default {
-  GroupCreationModal,
-  init: (
-    conversationRepository: ConversationRepository,
-    searchRepository: SearchRepository,
-    teamRepository: TeamRepository,
-  ) => {
-    createRoot(document.getElementById('group-creation-modal-container')).render(
-      <GroupCreationModal
-        conversationRepository={conversationRepository}
-        searchRepository={searchRepository}
-        teamRepository={teamRepository}
-      />,
-    );
-  },
-};
+registerReactComponent('group-creation-modal', GroupCreationModal);

@@ -37,6 +37,7 @@ import 'Components/calling/FullscreenVideoCall';
 import 'Components/avatar/GroupAvatar';
 import 'Components/MessagesList';
 import '../page/message-list/MessageTimerButton';
+import '../page/Modals/GroupCreation/GroupCreationModal';
 import 'Components/modal';
 import 'Components/panel/ServiceDetails';
 import 'Components/panel/UserDetails';
