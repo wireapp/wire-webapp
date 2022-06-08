@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [19.6.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/compare/@wireapp/api-client@19.5.0...@wireapp/api-client@19.6.0) (2022-06-08)
+
+
+### Features
+
+* **api-client:** Add support for creating mls based conversations (FS-554) ([#4288](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/issues/4288)) ([42664b0](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/commit/42664b0dc3286c205f60190453a3aa37e1bf29e0))
+
+
+
+
+
 # [19.5.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/compare/@wireapp/api-client@19.4.0...@wireapp/api-client@19.5.0) (2022-06-07)
 
 
