@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [27.3.3](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/compare/@wireapp/core@27.3.2...@wireapp/core@27.3.3) (2022-06-08)
+
+
+### Bug Fixes
+
+* **core:** Abort notification stream handling when websocket is disconnected ([#4285](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/issues/4285)) ([e674a38](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/commit/e674a3827f4e107f9d6ef39e26fa8d94c58986d7))
+
+
+
+
+
 ## [27.3.2](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/compare/@wireapp/core@27.3.1...@wireapp/core@27.3.2) (2022-06-07)
 
 **Note:** Version bump only for package @wireapp/core
