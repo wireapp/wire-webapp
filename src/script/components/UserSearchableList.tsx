@@ -159,7 +159,7 @@ const UserSearchableList: React.FC<UserListProps> = ({onUpdateSelectedUsers, ...
   };
 
   const userList = foundUserEntities();
-  const userListIsEmpty = userList.length === 0;
+  const isEmptyUserList = !!userList.length;
   const hasUsers = !!users.length;
   const noResultsDataUieName = hasUsers ? 'status-no-matches' : 'status-all-added';
   const noResultsTranslationText = hasUsers ? 'searchListNoMatches' : 'searchListEveryoneParticipates';
