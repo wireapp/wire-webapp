@@ -50,15 +50,15 @@
         #include('panel/message-details.htm')
       </div>
     </div>
-    <calling-overlay-container params="
-      multitasking: $root.mainViewModel.multitasking,
-      callingRepository: $root.repositories.calling,
-      mediaRepository: $root.repositories.media,
-      ">
-    </calling-overlay-container>
     #include('detail-view.htm')
     <div id="warnings"></div>
     #include('modals.htm')
     <div id="applock"></div>
-  <!-- /ko -->
+    <!-- /ko -->
+    <calling-overlay-container params="
+      multitasking: $root.multitasking,
+      callingRepository: $root.content.repositories.calling,
+      mediaRepository: $root.content.repositories.media,
+      ">
+    </calling-overlay-container>
 </main>
