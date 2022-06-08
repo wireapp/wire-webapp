@@ -380,7 +380,7 @@ const GroupCreationModal: React.FC<GroupCreationModalProps> = ({
                   isDisabled={false}
                   name={t('readReceiptsToggleName')}
                 />
-                {!isMLSEnabled && (
+                {isMLSEnabled && (
                   <InfoToggle
                     className="modal-style"
                     dataUieName="mls"
