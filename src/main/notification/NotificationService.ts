@@ -147,6 +147,26 @@ export class NotificationService extends EventEmitter {
     }
   }
 
+  /**
+   * Checks if an event should be ignored.
+   * An event that has a date prior to that last event that we have parsed should be ignored
+   *
+   * @param event
+   * @param source
+   * @param lastEventDate?
+   */
+  private isOutdatedEvent(event: {time: string}, source: PayloadBundleSource, lastEventDate?: Date) {
+    const isFromNotificationStream = source === PayloadBundleSource.NOTIFICATION_STREAM;
+    const shouldCheckEventDate = !!event.time && isFromNotificationStream && lastEventDate;
+
+    if (shouldCheckEventDate) {
+      /** This check prevents duplicated "You joined" system messages. */
+      const isOutdated = lastEventDate.getTime() >= new Date(event.time).getTime();
+      return isOutdated;
+    }
+    return false;
+  }
+
   public async *handleNotification(
     notification: Notification,
     source: PayloadBundleSource,
@@ -154,6 +174,14 @@ export class NotificationService extends EventEmitter {
   ): AsyncGenerator<HandledEventPayload> {
     for (const event of notification.payload) {
       this.logger.log(`Handling event of type "${event.type}" for notification with ID "${notification.id}"`, event);
+      let lastEventDate: Date | undefined = undefined;
+      try {
+        lastEventDate = await this.database.getLastEventDate();
+      } catch {}
+      if ('time' in event && this.isOutdatedEvent(event, source, lastEventDate)) {
+        this.logger.info(`Ignored outdated event type: '${event.type}'`);
+        continue;
+      }
       try {
         const data = await this.handleEvent(event, source, dryRun);
         yield {
