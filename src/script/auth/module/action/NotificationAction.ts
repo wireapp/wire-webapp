@@ -42,7 +42,7 @@ export class NotificationAction {
 
   setLastEventDate = (lastEventDate: Date): ThunkAction => {
     return async (dispatch, getState, {core}) => {
-      core.service.notification.setLastEventDate(lastEventDate);
+      await core.service.notification.setLastEventDate(lastEventDate);
     };
   };
 }
