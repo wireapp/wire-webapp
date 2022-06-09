@@ -161,8 +161,8 @@ const UserSearchableList: React.FC<UserListProps> = ({onUpdateSelectedUsers, ...
   const userList = foundUserEntities();
   const isEmptyUserList = userList.length === 0;
   const hasUsers = users.length === 0;
-  const noResultsDataUieName = hasUsers ? 'status-no-matches' : 'status-all-added';
-  const noResultsTranslationText = hasUsers ? 'searchListNoMatches' : 'searchListEveryoneParticipates';
+  const noResultsDataUieName = hasUsers ? 'status-all-added' : 'status-no-matches';
+  const noResultsTranslationText = hasUsers ? 'searchListEveryoneParticipates' : 'searchListNoMatches';
 
   return (
     <div className="user-list-wrapper">
