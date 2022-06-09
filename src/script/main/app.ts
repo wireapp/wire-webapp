@@ -91,8 +91,6 @@ import {URLParameter} from '../auth/URLParameter';
 import {SIGN_OUT_REASON} from '../auth/SignOutReason';
 import {ClientRepository} from '../client/ClientRepository';
 import {ContentViewModel} from '../view_model/ContentViewModel';
-import AppLock from '../page/AppLock';
-import GroupCreationModal from '../page/Modals/GroupCreation/GroupCreationModal';
 import {CacheRepository} from '../cache/CacheRepository';
 import {SelfService} from '../self/SelfService';
 import {PropertiesRepository} from '../properties/PropertiesRepository';
@@ -121,7 +119,6 @@ import {AssetRepository} from '../assets/AssetRepository';
 import type {BaseError} from '../error/BaseError';
 import type {User} from '../entity/User';
 import {MessageRepository} from '../conversation/MessageRepository';
-import CallingContainer from 'Components/calling/CallingOverlayContainer';
 import {TeamError} from '../error/TeamError';
 import Warnings from '../view_model/WarningsContainer';
 import {Core} from '../service/CoreSingleton';
@@ -386,7 +383,6 @@ class App {
         client: clientRepository,
         connection: connectionRepository,
         conversation: conversationRepository,
-        search: searchRepository,
         cryptography: cryptographyRepository,
         event: eventRepository,
         eventTracker: eventTrackerRepository,
@@ -470,8 +466,6 @@ class App {
 
       telemetry.timeStep(AppInitTimingsStep.APP_LOADED);
       this._showInterface();
-      AppLock.init(clientRepository);
-      GroupCreationModal.init(conversationRepository, searchRepository, teamRepository);
 
       loadingView.removeFromView();
       telemetry.report();
@@ -720,13 +714,6 @@ class App {
     this.repository.properties.checkPrivacyPermission().then(() => {
       window.setTimeout(() => this.repository.notification.checkPermission(), App.CONFIG.NOTIFICATION_CHECK);
     });
-
-    CallingContainer.init(
-      mainView.multitasking,
-      this.repository.calling,
-      this.repository.media.streamHandler,
-      this.repository.media.devicesHandler,
-    );
   }
 
   /**

@@ -41,7 +41,7 @@ jest.mock('libsodium-wrappers-sumo', () => ({
 
 class AppLockPage extends TestPage<AppLockProps> {
   constructor(props?: AppLockProps) {
-    super(AppLock.AppLock, props);
+    super(AppLock, props);
   }
 
   getAppLockModal = () => this.get('div[data-uie-name="applock-modal"]');

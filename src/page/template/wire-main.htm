@@ -29,7 +29,11 @@
           <h1 class="visually-hidden" data-bind="text: t('accessibility.headings.historyImport')"></h1>
           #include('content/history-import.htm')
         <!-- /ko -->
-        <div id="group-creation-modal-container"></div>
+        <group-creation-modal params="
+          conversationRepository: $root.repositories.conversation,
+          searchRepository: $root.repositories.search,
+          teamRepository: $root.repositories.team,
+        "></group-creation-modal>
         #include('modal/user-modal.htm')
         #include('modal/service-modal.htm')
         #include('modal/invite-modal.htm')
@@ -51,9 +55,14 @@
       </div>
     </div>
     #include('detail-view.htm')
-    <div id="warnings"></div>
     #include('modals.htm')
-    <div id="applock"></div>
-  <!-- /ko -->
-  <div id="calling-overlay-container"></div>
+    <!-- /ko -->
+    <app-lock-container params="clientRepository: $root.content.repositories.client"></app-lock-container>
+    <warnings-container></warnings-container>
+    <calling-overlay-container params="
+      multitasking: $root.multitasking,
+      callingRepository: $root.content.repositories.calling,
+      mediaRepository: $root.content.repositories.media,
+      ">
+    </calling-overlay-container>
 </main>

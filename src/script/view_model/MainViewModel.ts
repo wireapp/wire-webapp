@@ -60,7 +60,6 @@ import type {AuthRepository} from '../auth/AuthRepository';
 import type {EventTrackingRepository} from '../tracking/EventTrackingRepository';
 import type {MessageRepository} from '../conversation/MessageRepository';
 import {UserState} from '../user/UserState';
-import Warnings from './WarningsContainer';
 import {Core} from '../service/CoreSingleton';
 
 export interface ViewModelRepositories {
@@ -191,7 +190,6 @@ export class MainViewModel {
     );
     this.title = new WindowTitleViewModel(this);
     this.favicon = new FaviconViewModel(amplify);
-    Warnings.init();
 
     this.mainClasses = ko.pureComputed(() => {
       if (this.selfUser()) {
