@@ -90,6 +90,8 @@
         </div>
         <mention-suggestions params="suggestions: mentionSuggestions, targetInputSelector: '#conversation-input-bar-text', onSelectionValidated: addMention"></mention-suggestions>
 
+        <input-bar-controls params="input: input"></input-bar-controls>
+        <!-- ko if: false -->
         <ul class="controls-right buttons-group">
           <!-- ko ifnot: isEditing() -->
             <!-- ko if: showGiphyButton() && isFileSharingSendingEnabled() -->
@@ -167,6 +169,7 @@
             </button>
           </li>
         </ul>
+      <!-- /ko -->
       <!-- /ko -->
     <!-- /ko -->
 
