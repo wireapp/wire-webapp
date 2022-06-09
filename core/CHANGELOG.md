@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [27.3.5](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/compare/@wireapp/core@27.3.4...@wireapp/core@27.3.5) (2022-06-09)
+
+
+### Bug Fixes
+
+* Do not process outdated events ([#4289](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/issues/4289)) ([e817f8f](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/commit/e817f8f3351d8b9c016bf94a2668278d9dc14514))
+
+
+
+
+
 ## [27.3.4](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/compare/@wireapp/core@27.3.3...@wireapp/core@27.3.4) (2022-06-08)
 
 **Note:** Version bump only for package @wireapp/core
