@@ -75,7 +75,7 @@ const LoginForm = ({isFetching, onSubmit}: LoginFormProps) => {
   };
 
   return (
-    <InputBlock>
+    <div>
       <Input
         name="email"
         onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
@@ -92,40 +92,42 @@ const LoginForm = ({isFetching, onSubmit}: LoginFormProps) => {
         required
         data-uie-name="enter-email"
       />
-      <InputSubmitCombo>
-        <Input
-          name="password-login"
-          onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-            setPassword(event.target.value);
-            setValidPasswordInput(true);
-          }}
-          ref={passwordInput}
-          markInvalid={!validPasswordInput}
-          value={password}
-          autoComplete="section-login password"
-          type="password"
-          placeholder={_(loginStrings.passwordPlaceholder)}
-          pattern={'.{1,1024}'}
-          required
-          data-uie-name="enter-password"
-        />
-        {isFetching ? (
-          <Loading size={32} />
-        ) : (
-          <RoundIconButton
-            style={{marginLeft: 16}}
-            disabled={!email || !password}
-            type="submit"
-            formNoValidate
-            onClick={handleSubmit}
-            aria-label={_(loginStrings.headline)}
-            data-uie-name="do-sign-in"
-          >
-            <ArrowIcon />
-          </RoundIconButton>
-        )}
-      </InputSubmitCombo>
-    </InputBlock>
+      <InputBlock>
+        <InputSubmitCombo>
+          <Input
+            name="password-login"
+            onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+              setPassword(event.target.value);
+              setValidPasswordInput(true);
+            }}
+            ref={passwordInput}
+            markInvalid={!validPasswordInput}
+            value={password}
+            autoComplete="section-login password"
+            type="password"
+            placeholder={_(loginStrings.passwordPlaceholder)}
+            pattern={'.{1,1024}'}
+            required
+            data-uie-name="enter-password"
+          />
+          {isFetching ? (
+            <Loading size={32} />
+          ) : (
+            <RoundIconButton
+              style={{marginLeft: 16}}
+              disabled={!email || !password}
+              type="submit"
+              formNoValidate
+              onClick={handleSubmit}
+              aria-label={_(loginStrings.headline)}
+              data-uie-name="do-sign-in"
+            >
+              <ArrowIcon />
+            </RoundIconButton>
+          )}
+        </InputSubmitCombo>
+      </InputBlock>
+    </div>
   );
 };
 

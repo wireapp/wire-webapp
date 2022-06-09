@@ -51,7 +51,7 @@ const PhoneLoginForm = ({isFetching, onSubmit}: LoginFormProps) => {
   };
 
   return (
-    <InputBlock>
+    <div>
       <Select
         // style={{height: 57, marginBottom: 0}}
         id=""
@@ -84,51 +84,53 @@ const PhoneLoginForm = ({isFetching, onSubmit}: LoginFormProps) => {
           </option>
         ))}
       </Select> */}
-      <InputSubmitCombo style={{background: 'none', boxShadow: 'inset 16px 16px 0 #fff, inset -100px -16px 0 #fff'}}>
-        <Input
-          style={{marginRight: 1, width: 80}}
-          ref={countryCodeInput}
-          value={`+${countryCode}`}
-          onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-            const {value} = event.target;
-            const codeNumbers = value.replace(/\D/g, '');
-            setCountryCode(codeNumbers);
-            setCountry(codeNumbers ? getCountryByCode(codeNumbers) || 'X1' : 'X0');
-          }}
-          data-uie-name="enter-country-code"
-        />
-        <Input
-          name="phone-login"
-          onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-            setPhoneNumber(event.target.value);
-            setValidInput(true);
-          }}
-          ref={phoneInput}
-          markInvalid={!validInput}
-          value={phoneNumber}
-          autoComplete="section-login phone"
-          pattern={'.{1,1024}'}
-          type="tel"
-          required
-          placeholder="phone number"
-          data-uie-name="enter-phone"
-        />
-        {isFetching ? (
-          <Loading size={32} />
-        ) : (
-          <RoundIconButton
-            style={{marginLeft: 16}}
-            disabled={!phoneNumber}
-            type="submit"
-            formNoValidate
-            onClick={handleSubmit}
-            data-uie-name="do-sign-in-phone"
-          >
-            <ArrowIcon />
-          </RoundIconButton>
-        )}
-      </InputSubmitCombo>
-    </InputBlock>
+      <InputBlock>
+        <InputSubmitCombo style={{background: 'none', boxShadow: 'inset 16px 16px 0 #fff, inset -100px -16px 0 #fff'}}>
+          <Input
+            style={{marginRight: 1, width: 80}}
+            ref={countryCodeInput}
+            value={`+${countryCode}`}
+            onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+              const {value} = event.target;
+              const codeNumbers = value.replace(/\D/g, '');
+              setCountryCode(codeNumbers);
+              setCountry(codeNumbers ? getCountryByCode(codeNumbers) || 'X1' : 'X0');
+            }}
+            data-uie-name="enter-country-code"
+          />
+          <Input
+            name="phone-login"
+            onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+              setPhoneNumber(event.target.value);
+              setValidInput(true);
+            }}
+            ref={phoneInput}
+            markInvalid={!validInput}
+            value={phoneNumber}
+            autoComplete="section-login phone"
+            pattern={'.{1,1024}'}
+            type="tel"
+            required
+            placeholder="phone number"
+            data-uie-name="enter-phone"
+          />
+          {isFetching ? (
+            <Loading size={32} />
+          ) : (
+            <RoundIconButton
+              style={{marginLeft: 16}}
+              disabled={!phoneNumber}
+              type="submit"
+              formNoValidate
+              onClick={handleSubmit}
+              data-uie-name="do-sign-in-phone"
+            >
+              <ArrowIcon />
+            </RoundIconButton>
+          )}
+        </InputSubmitCombo>
+      </InputBlock>
+    </div>
   );
 };
 export default PhoneLoginForm;

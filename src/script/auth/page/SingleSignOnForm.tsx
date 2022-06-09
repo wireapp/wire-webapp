@@ -29,6 +29,7 @@ import {
   ErrorMessage,
   Form,
   Input,
+  InputBlock,
   InputSubmitCombo,
   RoundIconButton,
   Loading,
@@ -241,41 +242,43 @@ const SingleSignOnForm = ({
   ) : (
     <Form style={{marginTop: 30}} data-uie-name="sso" onSubmit={handleSubmit}>
       {!isValidLink && <Redirect to={ROUTE.CONVERSATION_JOIN_INVALID} />}
-      <InputSubmitCombo>
-        <Input
-          name={
-            Config.getConfig().FEATURE.ENABLE_DOMAIN_DISCOVERY
-              ? ValidationError.FIELD.SSO_EMAIL_CODE.name
-              : ValidationError.FIELD.SSO_CODE.name
-          }
-          onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-            setCodeOrMail(event.target.value);
-            setIsCodeOrMailInputValid(true);
-          }}
-          ref={codeOrMailInput}
-          markInvalid={!isCodeOrMailInputValid}
-          placeholder={_(
-            Config.getConfig().FEATURE.ENABLE_DOMAIN_DISCOVERY
-              ? ssoLoginStrings.codeOrMailInputPlaceholder
-              : ssoLoginStrings.codeInputPlaceholder,
-          )}
-          value={codeOrMail}
-          autoComplete="section-login sso-code"
-          maxLength={1024}
-          pattern={
-            Config.getConfig().FEATURE.ENABLE_DOMAIN_DISCOVERY
-              ? `(${SSO_CODE_PREFIX_REGEX}${PATTERN.UUID_V4}|${PATTERN.EMAIL})`
-              : `${SSO_CODE_PREFIX_REGEX}${PATTERN.UUID_V4}`
-          }
-          type="text"
-          required
-          disabled={disableInput}
-          data-uie-name="enter-code"
-        />
-        <RoundIconButton disabled={!codeOrMail} type="submit" formNoValidate data-uie-name="do-sso-sign-in">
-          <ArrowIcon />
-        </RoundIconButton>
-      </InputSubmitCombo>
+      <InputBlock>
+        <InputSubmitCombo>
+          <Input
+            name={
+              Config.getConfig().FEATURE.ENABLE_DOMAIN_DISCOVERY
+                ? ValidationError.FIELD.SSO_EMAIL_CODE.name
+                : ValidationError.FIELD.SSO_CODE.name
+            }
+            onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+              setCodeOrMail(event.target.value);
+              setIsCodeOrMailInputValid(true);
+            }}
+            ref={codeOrMailInput}
+            markInvalid={!isCodeOrMailInputValid}
+            placeholder={_(
+              Config.getConfig().FEATURE.ENABLE_DOMAIN_DISCOVERY
+                ? ssoLoginStrings.codeOrMailInputPlaceholder
+                : ssoLoginStrings.codeInputPlaceholder,
+            )}
+            value={codeOrMail}
+            autoComplete="section-login sso-code"
+            maxLength={1024}
+            pattern={
+              Config.getConfig().FEATURE.ENABLE_DOMAIN_DISCOVERY
+                ? `(${SSO_CODE_PREFIX_REGEX}${PATTERN.UUID_V4}|${PATTERN.EMAIL})`
+                : `${SSO_CODE_PREFIX_REGEX}${PATTERN.UUID_V4}`
+            }
+            type="text"
+            required
+            disabled={disableInput}
+            data-uie-name="enter-code"
+          />
+          <RoundIconButton disabled={!codeOrMail} type="submit" formNoValidate data-uie-name="do-sso-sign-in">
+            <ArrowIcon />
+          </RoundIconButton>
+        </InputSubmitCombo>
+      </InputBlock>
       {validationError ? (
         parseValidationErrors([validationError])
       ) : loginError ? (
