@@ -92,7 +92,7 @@ const Index = ({defaultSSOCode}: Props & ConnectedProps & DispatchProps) => {
               type="button"
               onClick={() => history.push(ROUTE.SET_ACCOUNT_TYPE)}
               block
-              style={{fontSize: '13px'}}
+              // style={{fontSize: '13px'}}
               data-uie-name="go-set-account-type"
             >
               {_(indexStrings.createAccount)}
@@ -101,9 +101,7 @@ const Index = ({defaultSSOCode}: Props & ConnectedProps & DispatchProps) => {
               type="button"
               onClick={() => history.push(ROUTE.LOGIN)}
               block
-              backgroundColor={'transparent'}
-              color={COLOR.BLUE}
-              style={{border: `1px solid ${COLOR.BLUE}`, fontSize: '13px'}}
+              // style={{fontSize: '13px'}}
               data-uie-name="go-login"
             >
               {_(indexStrings.logIn)}
@@ -121,11 +119,10 @@ const Index = ({defaultSSOCode}: Props & ConnectedProps & DispatchProps) => {
             {(Config.getConfig().FEATURE.ENABLE_SSO || Config.getConfig().FEATURE.ENABLE_DOMAIN_DISCOVERY) && (
               <Button
                 type="button"
+                variant={'secondary'}
                 onClick={() => history.push(ROUTE.SSO)}
                 block
-                color={COLOR.TEXT}
-                backgroundColor={COLOR.GRAY_LIGHTEN_64}
-                style={{fontSize: '13px', marginTop: '120px'}}
+                style={{marginTop: '120px'}}
                 data-uie-name="go-sso-login"
               >
                 {_(
