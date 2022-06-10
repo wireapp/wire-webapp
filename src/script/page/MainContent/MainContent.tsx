@@ -17,7 +17,7 @@
  *
  */
 
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import {CSSTransition, SwitchTransition} from 'react-transition-group';
 import {registerReactComponent, useKoSubscribableChildren} from 'Util/ComponentUtil';
 
@@ -34,7 +34,10 @@ import AVPreferences from './panels/preferences/AVPreferences';
 import {container} from 'tsyringe';
 import {ClientState} from '../../client/ClientState';
 import {UserState} from '../../user/UserState';
-import {StyledApp} from '@wireapp/react-ui-kit';
+import {StyledApp, THEME_ID} from '@wireapp/react-ui-kit';
+import {amplify} from 'amplify';
+import {WebAppEvents} from '@wireapp/webapp-events';
+import {WebappProperties} from '@wireapp/api-client/src/user/data/';
 
 type LeftSidebarProps = {
   contentViewModel: ContentViewModel;
@@ -55,6 +58,27 @@ const MainContent: React.FC<LeftSidebarProps> = ({
   const {state} = useKoSubscribableChildren(contentViewModel, ['state']);
   const {activeConversation} = useKoSubscribableChildren(conversationState, ['activeConversation']);
   const repositories = contentViewModel.repositories;
+
+  const {
+    properties: {settings},
+  } = repositories.properties;
+
+  const [optionDarkMode, setOptionDarkMode] = useState<Boolean>(settings.interface.theme === 'dark');
+
+  useEffect(() => {
+    const updateProperties = ({settings}: WebappProperties): void => {
+      setOptionDarkMode(settings.interface.theme === 'dark');
+    };
+    const updateDarkMode = (newDarkMode: boolean) => setOptionDarkMode(newDarkMode);
+
+    amplify.subscribe(WebAppEvents.PROPERTIES.UPDATE.INTERFACE.USE_DARK_MODE, updateDarkMode);
+    amplify.subscribe(WebAppEvents.PROPERTIES.UPDATED, updateProperties);
+
+    return () => {
+      amplify.unsubscribe(WebAppEvents.PROPERTIES.UPDATE.INTERFACE.USE_DARK_MODE, updateDarkMode);
+      amplify.unsubscribe(WebAppEvents.PROPERTIES.UPDATED, updateProperties);
+    };
+  }, []);
 
   const isFederated = contentViewModel.isFederated;
 
@@ -148,7 +172,7 @@ const MainContent: React.FC<LeftSidebarProps> = ({
   return (
     <>
       <h1 className="visually-hidden">{title}</h1>
-      <StyledApp>
+      <StyledApp themeId={optionDarkMode ? THEME_ID.DARK : THEME_ID.LIGHT}>
         <SwitchTransition>
           <Animated key={state}>{content}</Animated>
         </SwitchTransition>
