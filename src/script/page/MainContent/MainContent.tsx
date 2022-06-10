@@ -37,7 +37,6 @@ import {UserState} from '../../user/UserState';
 import {StyledApp, THEME_ID} from '@wireapp/react-ui-kit';
 import {amplify} from 'amplify';
 import {WebAppEvents} from '@wireapp/webapp-events';
-import {WebappProperties} from '@wireapp/api-client/src/user/data/';
 
 type LeftSidebarProps = {
   contentViewModel: ContentViewModel;
@@ -58,25 +57,19 @@ const MainContent: React.FC<LeftSidebarProps> = ({
   const {state} = useKoSubscribableChildren(contentViewModel, ['state']);
   const {activeConversation} = useKoSubscribableChildren(conversationState, ['activeConversation']);
   const repositories = contentViewModel.repositories;
+  const theme = repositories.properties?.properties.settings.interface.theme;
 
-  const {
-    properties: {settings},
-  } = repositories.properties;
-
-  const [optionDarkMode, setOptionDarkMode] = useState<Boolean>(settings.interface.theme === 'dark');
+  const [uiKitTheme, setUiKitTheme] = useState<THEME_ID>(theme === 'dark' ? THEME_ID.DARK : THEME_ID.LIGHT);
 
   useEffect(() => {
-    const updateProperties = ({settings}: WebappProperties): void => {
-      setOptionDarkMode(settings.interface.theme === 'dark');
+    const updateTheme = (theme: string) => {
+      setUiKitTheme(theme === 'dark' ? THEME_ID.DARK : THEME_ID.LIGHT);
     };
-    const updateDarkMode = (newDarkMode: boolean) => setOptionDarkMode(newDarkMode);
 
-    amplify.subscribe(WebAppEvents.PROPERTIES.UPDATE.INTERFACE.USE_DARK_MODE, updateDarkMode);
-    amplify.subscribe(WebAppEvents.PROPERTIES.UPDATED, updateProperties);
+    amplify.subscribe(WebAppEvents.PROPERTIES.UPDATE.INTERFACE.THEME, updateTheme);
 
     return () => {
-      amplify.unsubscribe(WebAppEvents.PROPERTIES.UPDATE.INTERFACE.USE_DARK_MODE, updateDarkMode);
-      amplify.unsubscribe(WebAppEvents.PROPERTIES.UPDATED, updateProperties);
+      amplify.unsubscribe(WebAppEvents.PROPERTIES.UPDATE.INTERFACE.THEME, updateTheme);
     };
   }, []);
 
@@ -172,7 +165,7 @@ const MainContent: React.FC<LeftSidebarProps> = ({
   return (
     <>
       <h1 className="visually-hidden">{title}</h1>
-      <StyledApp themeId={optionDarkMode ? THEME_ID.DARK : THEME_ID.LIGHT}>
+      <StyledApp themeId={uiKitTheme}>
         <SwitchTransition>
           <Animated key={state}>{content}</Animated>
         </SwitchTransition>
