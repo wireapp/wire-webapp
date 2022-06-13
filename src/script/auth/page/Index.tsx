@@ -92,18 +92,11 @@ const Index = ({defaultSSOCode}: Props & ConnectedProps & DispatchProps) => {
               type="button"
               onClick={() => history.push(ROUTE.SET_ACCOUNT_TYPE)}
               block
-              // style={{fontSize: '13px'}}
               data-uie-name="go-set-account-type"
             >
               {_(indexStrings.createAccount)}
             </Button>
-            <Button
-              type="button"
-              onClick={() => history.push(ROUTE.LOGIN)}
-              block
-              // style={{fontSize: '13px'}}
-              data-uie-name="go-login"
-            >
+            <Button type="button" onClick={() => history.push(ROUTE.LOGIN)} block data-uie-name="go-login">
               {_(indexStrings.logIn)}
             </Button>
             {logoutReason && (
