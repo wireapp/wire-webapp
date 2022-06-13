@@ -63,9 +63,7 @@ const InputBarControls: React.FC<InputBarControlsProps> = ({input}) => {
                 data-bind="click: clickToPing, disabled: pingDisabled(), attr: {'title': pingTooltip, 'aria-label': pingTooltip}, css: {'disabled': pingDisabled()}"
                 data-uie-name="do-ping"
               >
-                <span aria-hidden="true">
-                  <Icon.Ping />
-                </span>
+                <Icon.Ping />
               </button>
             </li>
 
@@ -75,9 +73,7 @@ const InputBarControls: React.FC<InputBarControlsProps> = ({input}) => {
                   htmlFor="conversation-input-bar-photo"
                   className="controls-right-button no-radius button-icon-large"
                 >
-                  <span aria-hidden="true">
-                    <Icon.Image />
-                  </span>
+                  <Icon.Image />
                   <input
                     tabIndex={-1}
                     id="conversation-input-bar-photo"
@@ -96,9 +92,7 @@ const InputBarControls: React.FC<InputBarControlsProps> = ({input}) => {
                   htmlFor="conversation-input-bar-files"
                   className="controls-right-button no-radius button-icon-large"
                 >
-                  <span aria-hidden="true">
-                    <Icon.Attachment />
-                  </span>
+                  <Icon.Attachment />
                   <input
                     id="conversation-input-bar-files"
                     data-bind="attr: inputFileAttr, file_select: uploadFiles"
@@ -130,9 +124,7 @@ const InputBarControls: React.FC<InputBarControlsProps> = ({input}) => {
               data-bind="click: clickToShowGiphy"
               data-uie-name="do-giphy-popover"
             >
-              <span aria-hidden="true">
-                <Icon.Gif />
-              </span>
+              <Icon.Gif />
             </button>
           </li>
         )}
