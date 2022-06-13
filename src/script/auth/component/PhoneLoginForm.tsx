@@ -22,7 +22,7 @@ import {ArrowIcon, Input, InputBlock, InputSubmitCombo, Loading, RoundIconButton
 import React, {useRef, useState} from 'react';
 import {useIntl} from 'react-intl';
 import {COUNTRY_CODES, getCountryByCode, getCountryCode} from 'Util/CountryCodes';
-// import {phoneLoginStrings} from '../../strings';
+import {phoneLoginStrings} from '../../strings';
 
 interface LoginFormProps {
   isFetching: boolean;
@@ -37,11 +37,15 @@ const PhoneLoginForm = ({isFetching, onSubmit}: LoginFormProps) => {
   const [validInput, setValidInput] = useState(true);
   const phoneInput = useRef();
   const countryCodeInput = useRef();
-  const countryList = COUNTRY_CODES.map(({iso, name}) => ({
-    label: name,
-    value: iso,
-  }));
-
+  const countryList = [
+    {label: _(phoneLoginStrings.accountCountryCode), value: 'X0'},
+    {label: _(phoneLoginStrings.errorCountryCodeInvalid), value: 'X1'},
+  ].concat(
+    COUNTRY_CODES.map(({iso, name}) => ({
+      label: name,
+      value: iso,
+    })),
+  );
   const handleSubmit = (event: React.FormEvent) => {
     event.preventDefault();
     if (isFetching) {
@@ -53,7 +57,6 @@ const PhoneLoginForm = ({isFetching, onSubmit}: LoginFormProps) => {
   return (
     <div>
       <Select
-        // style={{height: 57, marginBottom: 0}}
         id=""
         onChange={(selectedCountry: string) => {
           setCountry(selectedCountry);
@@ -63,27 +66,6 @@ const PhoneLoginForm = ({isFetching, onSubmit}: LoginFormProps) => {
         options={countryList}
         value={{label: country, value: countryCode}}
       />
-      {/* <Select
-        style={{height: 57, marginBottom: 0}}
-        value={country}
-        onChange={(event: React.ChangeEvent<HTMLSelectElement>) => {
-          const {value} = event.target;
-          setCountry(value);
-          setCountryCode((getCountryCode(value) || 'X2').toString(10));
-        }}
-      >
-        <option value="X0" style={{display: 'none'}}>
-          {_(phoneLoginStrings.accountCountryCode)}
-        </option>
-        <option value="X1" style={{display: 'none'}}>
-          {_(phoneLoginStrings.errorCountryCodeInvalid)}
-        </option>
-        {COUNTRY_CODES.map(({iso, name}) => (
-          <option key={iso} value={iso}>
-            {name}
-          </option>
-        ))}
-      </Select> */}
       <InputBlock>
         <InputSubmitCombo style={{background: 'none', boxShadow: 'inset 16px 16px 0 #fff, inset -100px -16px 0 #fff'}}>
           <Input
