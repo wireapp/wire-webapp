@@ -22,33 +22,37 @@ import React, {useEffect} from 'react';
 import {useIntl} from 'react-intl';
 import {connect} from 'react-redux';
 import {AnyAction, Dispatch} from 'redux';
-import useReactRouter from 'use-react-router';
 import {Config} from '../../Config';
 import {clientManagerStrings} from '../../strings';
 import ClientList from '../component/ClientList';
 import {actionRoot as ROOT_ACTIONS} from '../module/action/';
 import {RootState, bindActionCreators} from '../module/reducer';
-import {ROUTE} from '../route';
+import {QUERY_KEY} from '../route';
 import Page from './Page';
 
 interface Props extends React.HTMLProps<HTMLDivElement> {}
 
 const ClientManager = ({doGetAllClients, doLogout}: Props & ConnectedProps & DispatchProps) => {
   const {formatMessage: _} = useIntl();
-  const {history} = useReactRouter();
+  const SFAcode = localStorage.getItem(QUERY_KEY.CONVERSATION_CODE);
   useEffect(() => {
     doGetAllClients();
+    if (SFAcode) {
+      startTimeout();
+    }
   }, []);
 
   const logout = async () => {
     try {
       await doLogout();
-      history.push(ROUTE.INDEX);
     } catch (error) {}
   };
 
-  // Automatically log the user out if ten minutes passes.
-  useTimeout(logout, 1000 * 60 * 10);
+  // Automatically log the user out if ten minutes passes and they are a 2fa user.
+  const {startTimeout} = useTimeout(() => {
+    localStorage.removeItem(QUERY_KEY.CONVERSATION_CODE);
+    logout();
+  }, 1000 * 60 * 10);
 
   return (
     <Page>
