@@ -24,6 +24,7 @@ import MessageTimerButton from '../MessageTimerButton';
 import {registerReactComponent} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 import {Conversation} from 'src/script/entity/Conversation';
+import {Config} from '../../../Config';
 
 const config = {
   GIPHY_TEXT_LENGTH: 256,
@@ -31,26 +32,39 @@ const config = {
 type InputBarControlsProps = {
   input: string;
   conversation: Conversation;
-  onPing: () => void;
+  disablePing?: boolean;
+  disableFilesharing?: boolean;
+  isEditing?: boolean;
+  onClickPing: () => void;
   onSelectFiles: (files: File[]) => void;
   onSelectImages: (files: File[]) => void;
+  onCancelEditing: () => void;
+  onClickGif: () => void;
   onSend: () => void;
 };
 
 const InputBarControls: React.FC<InputBarControlsProps> = ({
   input,
   conversation,
-  onPing,
+  disablePing: pingDisabled,
+  isEditing,
+  disableFilesharing,
+  onClickPing,
   onSelectFiles,
   onSelectImages,
+  onCancelEditing,
+  onClickGif,
   onSend,
 }) => {
-  const isEditing = false;
   const showGiphyButton = input.length > 0 && input.length <= config.GIPHY_TEXT_LENGTH;
-  const isFileSharingSendingEnabled = true;
+
+  const acceptedImageTypes = Config.getConfig().ALLOWED_IMAGE_TYPES.join(',');
+  const acceptedFileTypes = Config.getConfig().FEATURE.ALLOWED_FILE_UPLOAD_EXTENSIONS.join(',');
 
   const imageRef = useRef<HTMLInputElement>(null!);
   const fileRef = useRef<HTMLInputElement>(null!);
+
+  const pingTooltip = t('tooltipConversationPing');
 
   let buttons;
   if (isEditing) {
@@ -59,26 +73,26 @@ const InputBarControls: React.FC<InputBarControlsProps> = ({
         <button
           type="button"
           className="controls-right-button button-icon-large"
-          data-bind="click: cancelMessageEditing"
+          onClick={onCancelEditing}
           data-uie-name="do-cancel-edit"
         >
-          <span aria-hidden="true">
-            <Icon.Close />
-          </span>
+          <Icon.Close />
         </button>
       </li>
     );
   } else if (input.length === 0) {
     buttons = (
       <>
-        {isFileSharingSendingEnabled && (
+        {!disableFilesharing && (
           <>
             <li>
               <button
                 className="controls-right-button button-icon-large buttons-group-button-left"
                 type="button"
-                onClick={onPing}
-                data-bind="disabled: pingDisabled(), attr: {'title': pingTooltip, 'aria-label': pingTooltip}, css: {'disabled': pingDisabled()}"
+                onClick={onClickPing}
+                disabled={pingDisabled}
+                title={pingTooltip}
+                aria-label={pingTooltip}
                 data-uie-name="do-ping"
               >
                 <Icon.Ping />
@@ -89,15 +103,16 @@ const InputBarControls: React.FC<InputBarControlsProps> = ({
               <button
                 type="button"
                 aria-label={t('tooltipConversationAddImage')}
+                title={t('tooltipConversationAddImage')}
                 className="conversation-button controls-right-button no-radius button-icon-large"
                 onClick={() => imageRef.current?.click()}
               >
                 <Icon.Image />
                 <input
                   ref={imageRef}
+                  accept={acceptedImageTypes}
                   tabIndex={-1}
                   id="conversation-input-bar-photo"
-                  data-bind="attr: {accept: acceptedImageTypes}"
                   onChange={event => onSelectImages(Array.from(event.target.files))}
                   type="file"
                   data-uie-name="do-share-image"
@@ -109,14 +124,15 @@ const InputBarControls: React.FC<InputBarControlsProps> = ({
               <button
                 type="button"
                 aria-label={t('tooltipConversationFile')}
+                title={t('tooltipConversationFile')}
                 className="conversation-button controls-right-button no-radius button-icon-large"
                 onClick={() => fileRef.current?.click()}
               >
                 <Icon.Attachment />
                 <input
                   ref={fileRef}
+                  accept={acceptedFileTypes ?? null}
                   id="conversation-input-bar-files"
-                  data-bind="attr: inputFileAttr"
                   tabIndex={-1}
                   onChange={event => onSelectFiles(Array.from(event.target.files))}
                   type="file"
@@ -134,14 +150,14 @@ const InputBarControls: React.FC<InputBarControlsProps> = ({
   } else {
     buttons = (
       <>
-        {showGiphyButton && isFileSharingSendingEnabled && (
+        {showGiphyButton && !disableFilesharing && (
           <li>
             <button
               type="button"
               className="controls-right-button button-icon-large"
               title={t('extensionsBubbleButtonGif')}
               aria-label={t('extensionsBubbleButtonGif')}
-              data-bind="click: clickToShowGiphy"
+              onClick={onClickGif}
               data-uie-name="do-giphy-popover"
             >
               <Icon.Gif />

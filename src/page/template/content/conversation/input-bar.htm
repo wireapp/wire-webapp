@@ -93,10 +93,17 @@
         <input-bar-controls
           style="display: flex"
           params="
+            conversation: conversationEntity,
             input: input,
+            isEditing: isEditing,
+            disablePing: pingDisabled(),
+            disableFilesharing: !isFileSharingSendingEnabled(),
             onSend: onInputEnter,
             onSelectFiles: uploadFiles,
-            onSelectImages: uploadImages
+            onSelectImages: uploadImages,
+            onCancelEditing: cancelMessageEditing,
+            onClickGif: clickToShowGiphy,
+            onClickPing: clickToPing,
           "
         ></input-bar-controls>
         <!-- ko if: false -->
