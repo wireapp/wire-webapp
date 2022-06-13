@@ -18,7 +18,7 @@
  */
 
 import Icon from 'Components/Icon';
-import React from 'react';
+import React, {useRef} from 'react';
 import MessageTimerButton from '../MessageTimerButton';
 import {registerReactComponent} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
@@ -34,6 +34,9 @@ const InputBarControls: React.FC<InputBarControlsProps> = ({input}) => {
   const isEditing = false;
   const showGiphyButton = input.length > 0 && input.length <= config.GIPHY_TEXT_LENGTH;
   const isFileSharingSendingEnabled = true;
+
+  const imageRef = useRef<HTMLInputElement>(null!);
+  const fileRef = useRef<HTMLInputElement>(null!);
 
   let buttons;
   if (isEditing) {
@@ -68,40 +71,40 @@ const InputBarControls: React.FC<InputBarControlsProps> = ({input}) => {
             </li>
 
             <li>
-              <button type="button" aria-label={t('tooltipConversationAddImage')} className="conversation-button">
-                <label
-                  htmlFor="conversation-input-bar-photo"
-                  className="controls-right-button no-radius button-icon-large"
-                >
-                  <Icon.Image />
-                  <input
-                    tabIndex={-1}
-                    id="conversation-input-bar-photo"
-                    data-bind="attr: {accept: acceptedImageTypes}, file_select: uploadImages"
-                    type="file"
-                    multiple="multiple"
-                    data-uie-name="do-share-image"
-                  />
-                </label>
+              <button
+                type="button"
+                aria-label={t('tooltipConversationAddImage')}
+                className="conversation-button controls-right-button no-radius button-icon-large"
+                onClick={() => imageRef.current?.click()}
+              >
+                <Icon.Image />
+                <input
+                  ref={imageRef}
+                  tabIndex={-1}
+                  id="conversation-input-bar-photo"
+                  data-bind="attr: {accept: acceptedImageTypes}, file_select: uploadImages"
+                  type="file"
+                  data-uie-name="do-share-image"
+                />
               </button>
             </li>
 
             <li>
-              <button type="button" aria-label={t('tooltipConversationFile')} className="conversation-button">
-                <label
-                  htmlFor="conversation-input-bar-files"
-                  className="controls-right-button no-radius button-icon-large"
-                >
-                  <Icon.Attachment />
-                  <input
-                    id="conversation-input-bar-files"
-                    data-bind="attr: inputFileAttr, file_select: uploadFiles"
-                    tabIndex={-1}
-                    type="file"
-                    multiple="multiple"
-                    data-uie-name="do-share-file"
-                  />
-                </label>
+              <button
+                type="button"
+                aria-label={t('tooltipConversationFile')}
+                className="conversation-button controls-right-button no-radius button-icon-large"
+                onClick={() => fileRef.current?.click()}
+              >
+                <Icon.Attachment />
+                <input
+                  ref={fileRef}
+                  id="conversation-input-bar-files"
+                  data-bind="attr: inputFileAttr, file_select: uploadFiles"
+                  tabIndex={-1}
+                  type="file"
+                  data-uie-name="do-share-file"
+                />
               </button>
             </li>
           </>
