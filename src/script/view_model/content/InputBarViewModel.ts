@@ -632,7 +632,7 @@ export class InputBarViewModel {
     this.cancelMessageReply();
   };
 
-  readonly onInputEnter = (data: unknown, event: Event): void | boolean => {
+  readonly onInputEnter = (data: unknown, event?: Event): void | boolean => {
     if (this.pastedFile()) {
       return this.sendPastedFile();
     }
@@ -663,7 +663,9 @@ export class InputBarViewModel {
     }
 
     this._resetDraftState();
-    $(event.target).focus();
+    if (event) {
+      $(event.target).focus();
+    }
   };
 
   readonly onInputKeyDown = (data: unknown, keyboardEvent: KeyboardEvent): void | boolean => {

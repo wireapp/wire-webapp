@@ -90,7 +90,10 @@
         </div>
         <mention-suggestions params="suggestions: mentionSuggestions, targetInputSelector: '#conversation-input-bar-text', onSelectionValidated: addMention"></mention-suggestions>
 
-        <input-bar-controls style="display: flex" params="input: input"></input-bar-controls>
+        <input-bar-controls
+          style="display: flex"
+          params="input: input, onSend: onInputEnter"
+        ></input-bar-controls>
         <!-- ko if: false -->
         <ul class="controls-right buttons-group">
           <!-- ko ifnot: isEditing() -->
