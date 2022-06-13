@@ -32,8 +32,8 @@ type InputBarControlsProps = {
   input: string;
   conversation: Conversation;
   onPing: () => void;
-  onUploadFile: () => void;
-  onUploadImage: () => void;
+  onSelectFiles: (files: File[]) => void;
+  onSelectImages: (files: File[]) => void;
   onSend: () => void;
 };
 
@@ -41,8 +41,8 @@ const InputBarControls: React.FC<InputBarControlsProps> = ({
   input,
   conversation,
   onPing,
-  onUploadFile,
-  onUploadImage,
+  onSelectFiles,
+  onSelectImages,
   onSend,
 }) => {
   const isEditing = false;
@@ -98,7 +98,7 @@ const InputBarControls: React.FC<InputBarControlsProps> = ({
                   tabIndex={-1}
                   id="conversation-input-bar-photo"
                   data-bind="attr: {accept: acceptedImageTypes}"
-                  onChange={onUploadImage}
+                  onChange={event => onSelectImages(Array.from(event.target.files))}
                   type="file"
                   data-uie-name="do-share-image"
                 />
@@ -118,7 +118,7 @@ const InputBarControls: React.FC<InputBarControlsProps> = ({
                   id="conversation-input-bar-files"
                   data-bind="attr: inputFileAttr"
                   tabIndex={-1}
-                  onChange={onUploadFile}
+                  onChange={event => onSelectFiles(Array.from(event.target.files))}
                   type="file"
                   data-uie-name="do-share-file"
                 />

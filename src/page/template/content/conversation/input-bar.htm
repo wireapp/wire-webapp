@@ -92,7 +92,12 @@
 
         <input-bar-controls
           style="display: flex"
-          params="input: input, onSend: onInputEnter"
+          params="
+            input: input,
+            onSend: onInputEnter,
+            onSelectFiles: uploadFiles,
+            onSelectImages: uploadImages
+          "
         ></input-bar-controls>
         <!-- ko if: false -->
         <ul class="controls-right buttons-group">
