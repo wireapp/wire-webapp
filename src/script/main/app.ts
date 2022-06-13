@@ -123,6 +123,7 @@ import {TeamError} from '../error/TeamError';
 import Warnings from '../view_model/WarningsContainer';
 import {Core} from '../service/CoreSingleton';
 import {migrateToQualifiedSessionIds} from './sessionIdMigrator';
+import {showUserModal} from '../page/Modals/UserModal/UserModal';
 
 function doRedirect(signOutReason: SIGN_OUT_REASON) {
   let url = `/auth/${location.search}`;
@@ -703,7 +704,12 @@ class App {
       '/preferences/devices': () => mainView.list.openPreferencesDevices(),
       '/preferences/options': () => mainView.list.openPreferencesOptions(),
       '/user/:userId(/:domain)': (userId: string, domain?: string) => {
-        mainView.content.userModal.showUser({domain, id: userId}, () => router.navigate('/'));
+        showUserModal({
+          actionsViewModel: mainView.actions,
+          onClose: () => router.navigate('/'),
+          userId: {domain, id: userId},
+          userRepository: this.repository.user,
+        });
       },
     });
     initRouterBindings(router);

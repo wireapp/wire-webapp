@@ -41,6 +41,7 @@ import {UserRepository} from 'src/script/user/UserRepository';
 import {User} from 'src/script/entity/User';
 import {Conversation} from 'src/script/entity/Conversation';
 import {ServiceEntity} from 'src/script/integration/ServiceEntity';
+import {showUserModal} from '../../../../page/Modals/UserModal/UserModal';
 
 type StartUIProps = {
   conversationRepository: ConversationRepository;
@@ -114,9 +115,14 @@ const StartUI: React.FC<StartUIProps> = ({
 
   const openOther = (user: User) => {
     if (user.isOutgoingRequest()) {
-      return openContact(user);
+      openContact(user);
+      return;
     }
-    return mainViewModel.content.userModal.showUser(user);
+    showUserModal({
+      actionsViewModel: mainViewModel.actions,
+      userId: {domain: user.domain, id: user.id},
+      userRepository: userRepository,
+    });
   };
   const openService = (service: ServiceEntity) => {
     mainViewModel.content.serviceModal.showService(service);

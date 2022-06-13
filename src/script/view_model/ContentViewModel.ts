@@ -29,7 +29,6 @@ import {container} from 'tsyringe';
 
 import {Config} from '../Config';
 import {MessageListViewModel} from './content/MessageListViewModel';
-import {UserModalViewModel} from './content/UserModalViewModel';
 import {LegalHoldModalViewModel} from './content/LegalHoldModalViewModel';
 import {EmojiInputViewModel} from './content/EmojiInputViewModel';
 import {ModalsViewModel} from './ModalsViewModel';
@@ -117,7 +116,6 @@ export class ContentViewModel {
   state: ko.Observable<ContentState>;
   State: typeof ContentViewModel.STATE;
   titleBar: TitleBarViewModel;
-  userModal: UserModalViewModel;
   userRepository: UserRepository;
 
   static get STATE() {
@@ -169,7 +167,6 @@ export class ContentViewModel {
       repositories.storage,
       repositories.message,
     );
-    this.userModal = new UserModalViewModel(repositories.user, mainViewModel.actions);
     this.serviceModal = new ServiceModalViewModel(repositories.integration, mainViewModel.actions);
     this.inviteModal = new InviteModalViewModel();
     this.legalHoldModal = new LegalHoldModalViewModel(
