@@ -56,8 +56,6 @@ const InputBarControls: React.FC<InputBarControlsProps> = ({
   onClickGif,
   onSend,
 }) => {
-  const showGiphyButton = input.length > 0 && input.length <= config.GIPHY_TEXT_LENGTH;
-
   const acceptedImageTypes = Config.getConfig().ALLOWED_IMAGE_TYPES.join(',');
   const acceptedFileTypes = Config.getConfig().FEATURE.ALLOWED_FILE_UPLOAD_EXTENSIONS.join(',');
 
@@ -148,6 +146,8 @@ const InputBarControls: React.FC<InputBarControlsProps> = ({
       </>
     );
   } else {
+    const showGiphyButton = input.length <= config.GIPHY_TEXT_LENGTH;
+
     buttons = (
       <>
         {showGiphyButton && !disableFilesharing && (
