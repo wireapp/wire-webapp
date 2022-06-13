@@ -18,19 +18,33 @@
  */
 
 import Icon from 'Components/Icon';
+import cx from 'classnames';
 import React, {useRef} from 'react';
 import MessageTimerButton from '../MessageTimerButton';
 import {registerReactComponent} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
+import {Conversation} from 'src/script/entity/Conversation';
 
 const config = {
   GIPHY_TEXT_LENGTH: 256,
 };
 type InputBarControlsProps = {
   input: string;
+  conversation: Conversation;
+  onPing: () => void;
+  onUploadFile: () => void;
+  onUploadImage: () => void;
+  onSend: () => void;
 };
 
-const InputBarControls: React.FC<InputBarControlsProps> = ({input}) => {
+const InputBarControls: React.FC<InputBarControlsProps> = ({
+  input,
+  conversation,
+  onPing,
+  onUploadFile,
+  onUploadImage,
+  onSend,
+}) => {
   const isEditing = false;
   const showGiphyButton = input.length > 0 && input.length <= config.GIPHY_TEXT_LENGTH;
   const isFileSharingSendingEnabled = true;
@@ -63,7 +77,8 @@ const InputBarControls: React.FC<InputBarControlsProps> = ({input}) => {
               <button
                 className="controls-right-button button-icon-large buttons-group-button-left"
                 type="button"
-                data-bind="click: clickToPing, disabled: pingDisabled(), attr: {'title': pingTooltip, 'aria-label': pingTooltip}, css: {'disabled': pingDisabled()}"
+                onClick={onPing}
+                data-bind="disabled: pingDisabled(), attr: {'title': pingTooltip, 'aria-label': pingTooltip}, css: {'disabled': pingDisabled()}"
                 data-uie-name="do-ping"
               >
                 <Icon.Ping />
@@ -82,7 +97,8 @@ const InputBarControls: React.FC<InputBarControlsProps> = ({input}) => {
                   ref={imageRef}
                   tabIndex={-1}
                   id="conversation-input-bar-photo"
-                  data-bind="attr: {accept: acceptedImageTypes}, file_select: uploadImages"
+                  data-bind="attr: {accept: acceptedImageTypes}"
+                  onChange={onUploadImage}
                   type="file"
                   data-uie-name="do-share-image"
                 />
@@ -100,8 +116,9 @@ const InputBarControls: React.FC<InputBarControlsProps> = ({input}) => {
                 <input
                   ref={fileRef}
                   id="conversation-input-bar-files"
-                  data-bind="attr: inputFileAttr, file_select: uploadFiles"
+                  data-bind="attr: inputFileAttr"
                   tabIndex={-1}
+                  onChange={onUploadFile}
                   type="file"
                   data-uie-name="do-share-file"
                 />
@@ -110,7 +127,7 @@ const InputBarControls: React.FC<InputBarControlsProps> = ({input}) => {
           </>
         )}
         <li>
-          <MessageTimerButton conversation={undefined} />
+          <MessageTimerButton conversation={conversation} />
         </li>
       </>
     );
@@ -141,13 +158,14 @@ const InputBarControls: React.FC<InputBarControlsProps> = ({input}) => {
       <li>
         <button
           type="button"
-          className="controls-right-button controls-right-button--send"
-          data-bind="click: onInputEnter, disable: input().length === 0, css: {'active': input().length !== 0}, attr: {'title': t('tooltipConversationSendMessage'), 'aria-label': t('tooltipConversationSendMessage')}"
+          className={cx('controls-right-button controls-right-button--send')}
+          disabled={input.length === 0}
+          title={t('tooltipConversationSendMessage')}
+          aria-label={t('tooltipConversationSendMessage')}
+          onClick={onSend}
           data-uie-name="do-send-message"
         >
-          <span aria-hidden="true">
-            <Icon.Send />
-          </span>
+          <Icon.Send />
         </button>
       </li>
     </ul>
