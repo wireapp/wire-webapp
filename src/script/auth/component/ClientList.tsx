@@ -60,8 +60,8 @@ const ClientList = ({
   };
 
   const removeClient = async (clientId: string, password?: string) => {
-    const SFAcode = ((await getLocalStorage(QUERY_KEY.CONVERSATION_CODE)) as string) ?? undefined;
     try {
+      const SFAcode = (await getLocalStorage(QUERY_KEY.CONVERSATION_CODE)) ?? undefined;
       setShowLoading(true);
       await doRemoveClient(clientId, password);
       const persist = getLocalStorage(LocalStorageAction.LocalStorageKey.AUTH.PERSIST);
@@ -71,6 +71,7 @@ const ClientList = ({
       logger.error(error);
     } finally {
       removeLocalStorage(QUERY_KEY.CONVERSATION_CODE);
+      removeLocalStorage(QUERY_KEY.JOIN_EXPIRES);
       setShowLoading(false);
     }
   };

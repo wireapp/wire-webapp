@@ -48,6 +48,7 @@ import * as LanguageSelector from '../module/selector/LanguageSelector';
 import {pathWithParams} from '../util/urlUtil';
 import Page from './Page';
 import Exception from '../component/Exception';
+import {QUERY_KEY} from '../route';
 
 interface Props extends React.HTMLProps<HTMLDivElement> {}
 
@@ -59,6 +60,7 @@ const InitialInvite = ({
   invite,
   isTeamFlow,
   doFlushDatabase,
+  removeLocalStorage,
 }: Props & ConnectedProps & DispatchProps) => {
   const {formatMessage: _} = useIntl();
   const emailInput = React.useRef<HTMLInputElement>();
@@ -67,6 +69,8 @@ const InitialInvite = ({
 
   const onInviteDone = async () => {
     await doFlushDatabase();
+    // Remove local storage item for 2FA logout if token expires.
+    removeLocalStorage(QUERY_KEY.JOIN_EXPIRES);
     window.location.replace(pathWithParams(EXTERNAL_ROUTE.WEBAPP));
   };
 
@@ -203,6 +207,7 @@ const mapDispatchToProps = (dispatch: Dispatch<AnyAction>) =>
     {
       doFlushDatabase: ROOT_ACTIONS.authAction.doFlushDatabase,
       invite: ROOT_ACTIONS.invitationAction.invite,
+      removeLocalStorage: ROOT_ACTIONS.localStorageAction.deleteLocalStorage,
       resetInviteErrors: ROOT_ACTIONS.invitationAction.resetInviteErrors,
     },
     dispatch,
