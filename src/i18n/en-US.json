@@ -98,6 +98,8 @@
   "accessibility.openConversation": "Open {{name}} conversation",
   "accessibility.rightPanel.GoBack": "Go back",
   "accessibility.rightPanel.close": "Close conversation info",
+  "accessibility.giphyModal.close": "Close conversation info",
+  "accessibility.giphyModal.loading": "Loading giphy",
   "accountForm.emailPersonalPlaceholder": "you@email.com",
   "accountForm.emailTeamPlaceholder": "you@yourcompany.com",
   "accountForm.namePlaceholder": "Name",
