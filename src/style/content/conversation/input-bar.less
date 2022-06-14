@@ -128,7 +128,6 @@
 
   .conversation-button {
     padding: 0;
-    border: none;
   }
 }
 
@@ -144,6 +143,7 @@
     height: 40px;
     border: 0;
     margin-left: 10px;
+    background-color: var(--accent-color-500) !important;
     border-radius: 50%;
     color: var(--white) !important;
 
@@ -154,10 +154,6 @@
     &[disabled]:not([disabled='false']) {
       background-color: var(--gray-70) !important;
       color: var(--white) !important;
-    }
-
-    &.active {
-      background-color: var(--accent-color-500) !important;
     }
 
     body.theme-dark & {

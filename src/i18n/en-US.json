@@ -1117,7 +1117,7 @@
   "tooltipConversationInputPlaceholder": "Type a message",
   "tooltipConversationPeople": "People ({{shortcut}})",
   "tooltipConversationPicture": "Add picture",
-  "tooltipConversationPing": "Ping ({{shortcut}})",
+  "tooltipConversationPing": "Ping",
   "tooltipConversationSearch": "Search",
   "tooltipConversationSendMessage": "Send message",
   "tooltipConversationVideoCall": "Video Call",

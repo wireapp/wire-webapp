@@ -35,6 +35,9 @@ import {container} from 'tsyringe';
 import {ClientState} from '../../client/ClientState';
 import {UserState} from '../../user/UserState';
 
+// Ko imported components
+import '../message-list/InputBarControls';
+
 type LeftSidebarProps = {
   contentViewModel: ContentViewModel;
   conversationState?: ConversationState;
