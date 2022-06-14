@@ -239,6 +239,18 @@ const SingleSignOnForm = ({
 
   const enableDomainDiscovery = Config.getConfig().FEATURE.ENABLE_DOMAIN_DISCOVERY;
 
+  const inputName = enableDomainDiscovery
+    ? ValidationError.FIELD.SSO_EMAIL_CODE.name
+    : ValidationError.FIELD.SSO_CODE.name;
+
+  const inputPlaceholder = enableDomainDiscovery
+    ? ssoLoginStrings.codeOrMailInputPlaceholder
+    : ssoLoginStrings.codeInputPlaceholder;
+
+  const inputPattern = enableDomainDiscovery
+    ? `(${SSO_CODE_PREFIX_REGEX}${PATTERN.UUID_V4}|${PATTERN.EMAIL})`
+    : `${SSO_CODE_PREFIX_REGEX}${PATTERN.UUID_V4}`;
+
   return isLoading ? (
     <Loading style={{marginTop: '24px'}} />
   ) : (
@@ -247,27 +259,19 @@ const SingleSignOnForm = ({
       <InputBlock>
         <InputSubmitCombo>
           <Input
-            id={enableDomainDiscovery ? ValidationError.FIELD.SSO_EMAIL_CODE.name : ValidationError.FIELD.SSO_CODE.name}
-            name={
-              enableDomainDiscovery ? ValidationError.FIELD.SSO_EMAIL_CODE.name : ValidationError.FIELD.SSO_CODE.name
-            }
+            id={inputName}
+            name={inputName}
             onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
               setCodeOrMail(event.target.value);
               setIsCodeOrMailInputValid(true);
             }}
             ref={codeOrMailInput}
             markInvalid={!isCodeOrMailInputValid}
-            placeholder={_(
-              enableDomainDiscovery ? ssoLoginStrings.codeOrMailInputPlaceholder : ssoLoginStrings.codeInputPlaceholder,
-            )}
+            placeholder={_(inputPlaceholder)}
             value={codeOrMail}
             autoComplete="section-login sso-code"
             maxLength={1024}
-            pattern={
-              enableDomainDiscovery
-                ? `(${SSO_CODE_PREFIX_REGEX}${PATTERN.UUID_V4}|${PATTERN.EMAIL})`
-                : `${SSO_CODE_PREFIX_REGEX}${PATTERN.UUID_V4}`
-            }
+            pattern={inputPattern}
             type="text"
             required
             disabled={disableInput}

@@ -42,9 +42,9 @@ const PhoneLoginForm = ({isFetching, onSubmit}: LoginFormProps) => {
     value: iso,
   }));
   const expandedCountryList = [
-    ...countryList,
     {label: _(phoneLoginStrings.accountCountryCode), value: 'X0'},
     {label: _(phoneLoginStrings.errorCountryCodeInvalid), value: 'X1'},
+    ...countryList,
   ];
   const currentSelectValue = expandedCountryList.find(selectedCountry => selectedCountry.value === country);
 
