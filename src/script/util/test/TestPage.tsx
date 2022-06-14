@@ -35,6 +35,7 @@ export default class TestPage<T> {
     return this.driver;
   }
 
+  findByTestId = (selector: string) => this.driver.findByTestId(selector);
   get = (selector: string) => this.driver.container.querySelector(selector);
   getAll = (selector: string) => this.driver.container.querySelectorAll(selector);
 
