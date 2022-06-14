@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [8.5.4](https://github.com/wireapp/wire-web-packages/tree/main/packages/react-ui-kit/compare/@wireapp/react-ui-kit@8.5.3...@wireapp/react-ui-kit@8.5.4) (2022-06-14)
+
+
+### Bug Fixes
+
+* Improve Checkbox and Select behaviors ([#4286](https://github.com/wireapp/wire-web-packages/tree/main/packages/react-ui-kit/issues/4286)) ([3ebe6a2](https://github.com/wireapp/wire-web-packages/tree/main/packages/react-ui-kit/commit/3ebe6a27021e49c5e13c818a031d91fdb6cb83e6))
+
+
+
+
+
 ## [8.5.3](https://github.com/wireapp/wire-web-packages/tree/main/packages/react-ui-kit/compare/@wireapp/react-ui-kit@8.5.2...@wireapp/react-ui-kit@8.5.3) (2022-06-10)
 
 **Note:** Version bump only for package @wireapp/react-ui-kit
