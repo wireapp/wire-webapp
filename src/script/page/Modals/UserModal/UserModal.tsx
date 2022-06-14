@@ -124,7 +124,7 @@ const UserModalComponent: React.FC<UserModalProps> = ({
                   {t('modalUserBlockedForLegalHold', {}, replaceLinkLegalHold)}
                 </div>
               )}
-              {isBlockedLegalHold && (
+              {!isBlockedLegalHold && (
                 <UserActions
                   user={user}
                   actionsViewModel={actionsViewModel}
