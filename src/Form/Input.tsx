@@ -35,6 +35,7 @@ export interface InputProps<T = HTMLInputElement> extends TextProps<T> {
   markInvalid?: boolean;
   helperText?: string;
   placeholderTextTransform?: Property.TextTransform;
+  wrapperCSS?: CSSObject;
 }
 
 export const inputStyle: <T>(theme: Theme, props: InputProps<T>, hasError?: boolean) => CSSObject = (
@@ -96,7 +97,7 @@ const centerInputAction: CSSObject = {
 export const Input: React.FC<InputProps<HTMLInputElement>> = React.forwardRef<
   HTMLInputElement,
   InputProps<HTMLInputElement>
->(({type, label, error, helperText, ...props}, ref) => {
+>(({type, label, error, helperText, wrapperCSS = {}, className = '', ...props}, ref) => {
   const [togglePassword, setTogglePassword] = useState<boolean>(false);
 
   const hasError = !!error;
@@ -110,9 +111,11 @@ export const Input: React.FC<InputProps<HTMLInputElement>> = React.forwardRef<
       className={INPUT_GROUP}
       css={{
         marginBottom: hasError ? '2px' : '20px',
+        width: '100%',
         '&:focus-within label': {
           color: COLOR_V2.BLUE,
         },
+        ...wrapperCSS,
       }}
     >
       {label && (

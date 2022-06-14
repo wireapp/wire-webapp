@@ -1,7 +1,7 @@
 Demo:
 
 ```js
-import {Fragment} from 'react';
+import {Fragment, useState} from 'react';
 import {Columns, Column, ErrorMessage, Select} from '@wireapp/react-ui-kit';
 
 const options = [
@@ -13,6 +13,10 @@ const options = [
   {value: '6', label: 'Option 6'},
 ];
 
+const [firstSelectOption, setFirstSelectOption] = useState(options[0].value);
+const [secondSelectOption, setSecondSelectOption] = useState(null);
+const [thirdSelectOption, setThirdSelectOption] = useState(null);
+
 <Fragment>
   <Columns>
     <Column>Select</Column>
@@ -22,8 +26,8 @@ const options = [
         label="Select"
         id="firstSelect"
         options={options}
-        value={options[0]}
-        onChange={selectedOption => console.log('Selected option', selectedOption)}
+        value={firstSelectOption ? options.find(option => option.value === firstSelectOption) : null}
+        onChange={setFirstSelectOption}
         dataUieName="select"
       />
     </Column>
@@ -53,7 +57,8 @@ const options = [
         required
         id="requiredSelect"
         options={options}
-        onChange={selectedOption => console.log('Selected option', selectedOption)}
+        value={secondSelectOption ? options.find(option => option.value === secondSelectOption) : null}
+        onChange={setSecondSelectOption}
         dataUieName="required-select"
       />
     </Column>
@@ -70,7 +75,8 @@ const options = [
         required
         error={<ErrorMessage>Error message</ErrorMessage>}
         options={options}
-        onChange={selectedOption => console.log('Selected option', selectedOption)}
+        value={thirdSelectOption ? options.find(option => option.value === thirdSelectOption) : null}
+        onChange={setThirdSelectOption}
         dataUieName="invalid-select"
       />
     </Column>

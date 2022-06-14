@@ -27,23 +27,25 @@ import {inputStyle} from './Input';
 import React, {ReactElement, useEffect, useRef, useState} from 'react';
 import InputLabel from './InputLabel';
 
-type Option = {
+export type SelectOption = {
   value: string | number;
   label: string;
+  description?: string;
 };
 
-export interface SelectProps {
+export interface SelectProps<T extends SelectOption = SelectOption> {
   id: string;
-  onChange: (selectedOption: string | number) => void;
+  onChange: (selectedOption: T['value']) => void;
   dataUieName: string;
-  options: Option[];
-  value?: Option | null;
+  options: T[];
+  value?: T | null;
   helperText?: string;
   label?: string;
   disabled?: boolean;
   required?: boolean;
   markInvalid?: boolean;
   error?: ReactElement;
+  wrapperCSS?: CSSObject;
 }
 
 const ArrowDown = (theme: Theme) => `
@@ -135,7 +137,7 @@ const filterSelectProps = props => filterProps(props, ['markInvalid']);
 
 const placeholderText = '- Please select -';
 
-export const Select = ({
+export const Select = <T extends SelectOption = SelectOption>({
   id,
   label,
   error,
@@ -146,16 +148,18 @@ export const Select = ({
   required,
   markInvalid,
   dataUieName,
+  wrapperCSS = {},
   ...props
-}: SelectProps) => {
+}: SelectProps<T>) => {
+  const currentOption = options.findIndex(option => option.value === value?.value);
+
   const selectContainerRef = useRef<HTMLDivElement>(null);
   const listRef = useRef<HTMLUListElement>(null);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const [selectedOption, setSelectedOption] = useState<number | null>(() =>
-    value ? options.findIndex(option => option.value === value.value) : null,
-  );
+  const [selectedOption, setSelectedOption] = useState<number | null>(currentOption === -1 ? null : currentOption);
 
-  const onToggleDropdown = () => setIsDropdownOpen(prevState => !prevState);
+  const hasSelectedOption = selectedOption !== null;
+  const hasError = !!error;
 
   const scrollToCurrentOption = (idx: number) => {
     if (listRef.current) {
@@ -168,6 +172,8 @@ export const Select = ({
       });
     }
   };
+
+  const onToggleDropdown = () => setIsDropdownOpen(prevState => !prevState);
 
   const onOptionSelect = (idx: number) => {
     setSelectedOption(idx);
@@ -226,10 +232,6 @@ export const Select = ({
     }
   };
 
-  const hasError = !!error;
-
-  const hasSelectedOption = options && !!options[selectedOption];
-
   const handleOutsideClick = (event: MouseEvent) => {
     if (selectContainerRef.current && !selectContainerRef.current.contains(event.target as Node)) {
       setIsDropdownOpen(false);
@@ -244,20 +246,15 @@ export const Select = ({
     };
   }, []);
 
-  useEffect(() => {
-    if (value) {
-      const valueIdx = options.findIndex(option => option.value === value.value);
-      setSelectedOption(valueIdx);
-    }
-  }, [options, value]);
-
   return (
     <div
       css={{
         marginBottom: markInvalid ? '2px' : '20px',
+        width: '100%',
         '&:focus-within label': {
           color: COLOR_V2.BLUE,
         },
+        ...wrapperCSS,
       }}
       data-uie-name={dataUieName}
       ref={selectContainerRef}
@@ -271,7 +268,7 @@ export const Select = ({
       <div css={{position: 'relative'}}>
         <button
           type="button"
-          aria-activedescendant={hasSelectedOption ? options[selectedOption].label : ''}
+          aria-activedescendant={hasSelectedOption ? value.label : ''}
           aria-expanded={isDropdownOpen}
           aria-haspopup="listbox"
           aria-labelledby={id}
@@ -282,7 +279,7 @@ export const Select = ({
           {...filterSelectProps(props)}
           data-uie-name={dataUieName}
         >
-          {hasSelectedOption ? options[selectedOption].label : placeholderText}
+          {hasSelectedOption ? value.label : placeholderText}
         </button>
 
         <ul
@@ -297,7 +294,7 @@ export const Select = ({
           })}
         >
           {options.map((option, index) => {
-            const isSelected = selectedOption == index;
+            const isSelected = currentOption == index;
 
             return (
               <li
@@ -315,6 +312,18 @@ export const Select = ({
                 })}
               >
                 {option.label}
+
+                {option.description && (
+                  <p
+                    css={{
+                      marginBottom: 0,
+                      fontSize: '14px',
+                      color: isSelected ? COLOR_V2.WHITE : COLOR_V2.GRAY_80,
+                    }}
+                  >
+                    {option.description}
+                  </p>
+                )}
               </li>
             );
           })}

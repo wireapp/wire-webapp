@@ -31,6 +31,7 @@ export enum ButtonVariant {
   PRIMARY = 'primary',
   SECONDARY = 'secondary',
   TERTIARY = 'tertiary',
+  QUATERNARY = 'quaternary',
   SEND = 'send',
 }
 
@@ -97,7 +98,7 @@ export const buttonStyle: <T>(theme: Theme, props: ButtonProps<T>) => CSSObject 
     }),
   }),
   ...(variant === ButtonVariant.PRIMARY && {
-    backgroundColor: backgroundColor || disabled ? COLOR_V2.GRAY_50 : COLOR_V2.BLUE,
+    backgroundColor: backgroundColor || (disabled ? COLOR_V2.GRAY_50 : COLOR_V2.BLUE),
     color: disabled ? COLOR_V2.GRAY_80 : COLOR_V2.WHITE,
     ...(!disabled && {
       '&:hover, &:focus': {
@@ -112,7 +113,7 @@ export const buttonStyle: <T>(theme: Theme, props: ButtonProps<T>) => CSSObject 
     }),
   }),
   ...(variant === ButtonVariant.SECONDARY && {
-    backgroundColor: backgroundColor || disabled ? COLOR_V2.GRAY_20 : COLOR_V2.WHITE,
+    backgroundColor: backgroundColor || (disabled ? COLOR_V2.GRAY_20 : COLOR_V2.WHITE),
     border: `1px solid ${COLOR_V2.GRAY_40}`,
     color: disabled ? COLOR_V2.GRAY_60 : COLOR_V2.BLACK,
     ...(!disabled && {
@@ -141,8 +142,24 @@ export const buttonStyle: <T>(theme: Theme, props: ButtonProps<T>) => CSSObject 
       },
     }),
   }),
+  ...(variant === ButtonVariant.QUATERNARY && {
+    backgroundColor: backgroundColor || (disabled ? COLOR_V2.GRAY_50 : COLOR_V2.GREEN),
+    color: disabled ? COLOR_V2.GRAY_80 : COLOR_V2.WHITE,
+    lineHeight: '24px',
+    ...(!disabled && {
+      '&:hover, &:focus': {
+        backgroundColor: COLOR_V2.GREEN_LIGHT_600,
+      },
+      '&:focus': {
+        border: `1px solid ${COLOR_V2.GREEN_LIGHT_700}`,
+      },
+      '&:active': {
+        backgroundColor: COLOR_V2.GREEN_LIGHT_700,
+      },
+    }),
+  }),
   ...(variant === ButtonVariant.SEND && {
-    backgroundColor: backgroundColor || disabled ? COLOR_V2.GRAY_70 : COLOR_V2.BLUE,
+    backgroundColor: backgroundColor || (disabled ? COLOR_V2.GRAY_70 : COLOR_V2.BLUE),
     width: '40px',
     ...(!disabled && {
       '&:hover, &:focus': {
