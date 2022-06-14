@@ -51,8 +51,6 @@ import {MessageRepository, OutgoingQuote} from '../../conversation/MessageReposi
 import {ModalsViewModel} from '../ModalsViewModel';
 import {QuoteEntity} from '../../message/QuoteEntity';
 import {SearchRepository} from '../../search/SearchRepository';
-import {Shortcut} from '../../ui/Shortcut';
-import {ShortcutType} from '../../ui/ShortcutType';
 import {StorageKey} from '../../storage/StorageKey';
 import {StorageRepository} from '../../storage';
 import {Text} from '../../entity/message/Text';
@@ -140,16 +138,6 @@ export class InputBarViewModel {
   ) {
     this.shadowInput = null;
     this.textarea = null;
-    this.acceptedImageTypes = Config.getConfig().ALLOWED_IMAGE_TYPES.join(',');
-    this.allowedFileTypes = Config.getConfig().FEATURE.ALLOWED_FILE_UPLOAD_EXTENSIONS.join(',');
-    this.inputFileAttr = ko.observable(
-      this.allowedFileTypes === '*'
-        ? {title: t('tooltipConversationFile')}
-        : {
-            accept: this.allowedFileTypes,
-            title: t('tooltipConversationFile'),
-          },
-    );
     this.isConnectionRequest = ko.pureComputed(
       () =>
         this.conversationEntity() &&
@@ -323,9 +311,6 @@ export class InputBarViewModel {
     this.showGiphyButton = ko.pureComputed(() => {
       return this.hasTextInput() && this.input().length <= InputBarViewModel.CONFIG.GIPHY_TEXT_LENGTH;
     });
-
-    const pingShortcut = Shortcut.getShortcutTooltip(ShortcutType.PING);
-    this.pingTooltip = t('tooltipConversationPing', pingShortcut);
 
     this.isEditing.subscribe(isEditing => {
       if (isEditing) {
@@ -632,7 +617,7 @@ export class InputBarViewModel {
     this.cancelMessageReply();
   };
 
-  readonly onInputEnter = (data: unknown, event: Event): void | boolean => {
+  readonly onInputEnter = (data: unknown, event?: Event): void | boolean => {
     if (this.pastedFile()) {
       return this.sendPastedFile();
     }
@@ -663,7 +648,9 @@ export class InputBarViewModel {
     }
 
     this._resetDraftState();
-    $(event.target).focus();
+    if (event) {
+      $(event.target).focus();
+    }
   };
 
   readonly onInputKeyDown = (data: unknown, keyboardEvent: KeyboardEvent): void | boolean => {

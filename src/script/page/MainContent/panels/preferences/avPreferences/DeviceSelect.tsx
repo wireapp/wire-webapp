@@ -19,6 +19,7 @@
 
 import React from 'react';
 import cx from 'classnames';
+import {Select} from '@wireapp/react-ui-kit';
 
 interface DeviceSelectProps {
   defaultDeviceName?: string;
@@ -41,8 +42,14 @@ const DeviceSelect: React.FC<DeviceSelectProps> = ({
   onChange,
   title,
 }) => {
+  const devicesList = devices.map(({deviceId, label}) => ({
+    label: label || defaultDeviceName,
+    value: deviceId,
+  }));
+  const currentValue = devicesList.find(device => device.value === value);
   const lessThanTwoDevices = devices.length < 2;
   const disabled = lessThanTwoDevices || isRequesting;
+
   return (
     <div
       className={cx('preferences-option', {
@@ -52,27 +59,16 @@ const DeviceSelect: React.FC<DeviceSelectProps> = ({
       <div className="preferences-option-icon preferences-av-select-icon">
         <DeviceIcon />
       </div>
-      <div className="input-select">
-        <label className="label-medium" htmlFor={uieName}>
-          {title}
-        </label>
-        <select
-          className={cx('preferences-av-select', {'preferences-av-select-disabled': disabled})}
-          name="select"
-          disabled={disabled}
-          value={value}
-          data-uie-name={uieName}
+      <div css={{width: '550px'}}>
+        <Select
           id={uieName}
-          onChange={({target}) => onChange(target.value)}
-          aria-label={title}
-        >
-          {devices.map(({deviceId, label}) => (
-            <option key={deviceId} value={deviceId}>
-              {label || defaultDeviceName}
-            </option>
-          ))}
-        </select>
-        {!lessThanTwoDevices && <span className="icon-down preferences-av-label" />}
+          onChange={onChange}
+          dataUieName={uieName}
+          options={devicesList}
+          value={currentValue}
+          label={title}
+          disabled={disabled}
+        />
       </div>
     </div>
   );

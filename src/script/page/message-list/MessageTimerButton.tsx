@@ -23,7 +23,7 @@ import cx from 'classnames';
 import {t} from 'Util/LocalizerUtil';
 import {formatDuration, DurationUnit} from 'Util/TimeUtil';
 import Icon from 'Components/Icon';
-import {registerReactComponent, useKoSubscribableChildren} from 'Util/ComponentUtil';
+import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 
 import {EphemeralTimings} from '../../ephemeral/EphemeralTimings';
 import {showContextMenu} from '../../ui/ContextMenu';
@@ -112,4 +112,3 @@ export const MessageTimerButton: React.FC<MessageTimerButtonProps> = ({
 };
 
 export default MessageTimerButton;
-registerReactComponent('message-timer-button', MessageTimerButton);

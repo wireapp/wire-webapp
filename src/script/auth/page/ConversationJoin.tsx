@@ -149,6 +149,10 @@ const ConversationJoin = ({
         entropyData && new Uint8Array(entropyData.filter(Boolean).flat()),
       );
       const conversationEvent = await doJoinConversationByCode(conversationKey, conversationCode);
+      /* When we join a conversation, we create the join event before loading the webapp.
+       * That means that when the webapp loads and tries to fetch the notificationStream is will get the join event once again and will try to handle it
+       * Here we set the core's lastEventDate so that it knows that this duplicated event should be skipped
+       */
       await setLastEventDate(new Date(conversationEvent.time));
 
       routeToApp(conversationEvent.conversation, conversationEvent.qualified_conversation.domain);

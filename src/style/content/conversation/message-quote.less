@@ -1,7 +1,7 @@
 .message-quote {
   position: relative;
   padding-right: @conversation-message-timestamp-width;
-  padding-left: 88px;
+  padding-left: @conversation-message-sender-width + 16;
   margin-bottom: 10px;
   font-size: 14px;
   line-height: 1.5em;
@@ -10,7 +10,7 @@
     position: absolute;
     top: 0;
     bottom: 0;
-    left: 72px;
+    left: @conversation-message-sender-width;
     display: block;
     width: 4px;
     height: 100%;
