@@ -204,6 +204,7 @@ const Login = ({
             const login: LoginData = {...formLoginData, clientType: loginData.clientType};
             setTwoFactorLoginData(login);
             doSendTwoFactorCode(login.email);
+            doSetLocalStorage(QUERY_KEY.JOIN_EXPIRES, Date.now() + 1000 * 60 * 10);
             break;
           }
           case BackendError.LABEL.CODE_AUTHENTICATION_FAILED: {
