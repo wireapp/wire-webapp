@@ -37,6 +37,16 @@ const PhoneLoginForm = ({isFetching, onSubmit}: LoginFormProps) => {
   const [validInput, setValidInput] = useState(true);
   const phoneInput = useRef();
   const countryCodeInput = useRef();
+  const countryList = COUNTRY_CODES.map(({iso, name}) => ({
+    label: name,
+    value: iso,
+  }));
+  const expandedCountryList = [
+    {label: _(phoneLoginStrings.accountCountryCode), value: 'X0'},
+    {label: _(phoneLoginStrings.errorCountryCodeInvalid), value: 'X1'},
+    ...countryList,
+  ];
+  const currentSelectValue = expandedCountryList.find(selectedCountry => selectedCountry.value === country);
 
   const handleSubmit = (event: React.FormEvent) => {
     event.preventDefault();
@@ -47,73 +57,67 @@ const PhoneLoginForm = ({isFetching, onSubmit}: LoginFormProps) => {
   };
 
   return (
-    <InputBlock>
+    <div>
       <Select
-        style={{height: 57, marginBottom: 0}}
-        value={country}
-        onChange={(event: React.ChangeEvent<HTMLSelectElement>) => {
-          const {value} = event.target;
-          setCountry(value);
-          setCountryCode((getCountryCode(value) || 'X2').toString(10));
+        id="select-phone"
+        onChange={(selectedCountry: string) => {
+          setCountry(selectedCountry);
+          setCountryCode((getCountryCode(selectedCountry) || 'X2').toString(10));
         }}
-      >
-        <option value="X0" style={{display: 'none'}}>
-          {_(phoneLoginStrings.accountCountryCode)}
-        </option>
-        <option value="X1" style={{display: 'none'}}>
-          {_(phoneLoginStrings.errorCountryCodeInvalid)}
-        </option>
-        {COUNTRY_CODES.map(({iso, name}) => (
-          <option key={iso} value={iso}>
-            {name}
-          </option>
-        ))}
-      </Select>
-      <InputSubmitCombo style={{background: 'none', boxShadow: 'inset 16px 16px 0 #fff, inset -100px -16px 0 #fff'}}>
-        <Input
-          style={{marginRight: 1, width: 80}}
-          ref={countryCodeInput}
-          value={`+${countryCode}`}
-          onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-            const {value} = event.target;
-            const codeNumbers = value.replace(/\D/g, '');
-            setCountryCode(codeNumbers);
-            setCountry(codeNumbers ? getCountryByCode(codeNumbers) || 'X1' : 'X0');
-          }}
-          data-uie-name="enter-country-code"
-        />
-        <Input
-          name="phone-login"
-          onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-            setPhoneNumber(event.target.value);
-            setValidInput(true);
-          }}
-          ref={phoneInput}
-          markInvalid={!validInput}
-          value={phoneNumber}
-          autoComplete="section-login phone"
-          pattern={'.{1,1024}'}
-          type="tel"
-          required
-          placeholder="phone number"
-          data-uie-name="enter-phone"
-        />
-        {isFetching ? (
-          <Loading size={32} />
-        ) : (
-          <RoundIconButton
-            style={{marginLeft: 16}}
-            disabled={!phoneNumber}
-            type="submit"
-            formNoValidate
-            onClick={handleSubmit}
-            data-uie-name="do-sign-in-phone"
-          >
-            <ArrowIcon />
-          </RoundIconButton>
-        )}
-      </InputSubmitCombo>
-    </InputBlock>
+        dataUieName="select-phone"
+        options={expandedCountryList}
+        value={currentSelectValue}
+      />
+
+      <InputBlock>
+        <InputSubmitCombo style={{background: 'none', boxShadow: 'inset 16px 16px 0 #fff, inset -100px -16px 0 #fff'}}>
+          <Input
+            id="enter-country-code"
+            ref={countryCodeInput}
+            value={`+${countryCode}`}
+            onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+              const {value} = event.target;
+              const codeNumbers = value.replace(/\D/g, '');
+              setCountryCode(codeNumbers);
+              setCountry(codeNumbers ? getCountryByCode(codeNumbers) || 'X1' : 'X0');
+            }}
+            data-uie-name="enter-country-code"
+          />
+          <Input
+            id="enter-phone"
+            name="phone-login"
+            onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+              setPhoneNumber(event.target.value);
+              setValidInput(true);
+            }}
+            style={{width: 260}}
+            ref={phoneInput}
+            markInvalid={!validInput}
+            value={phoneNumber}
+            autoComplete="section-login phone"
+            pattern={'.{1,1024}'}
+            type="tel"
+            required
+            placeholder="phone number"
+            data-uie-name="enter-phone"
+          />
+          {isFetching ? (
+            <Loading size={32} />
+          ) : (
+            <RoundIconButton
+              style={{marginLeft: 16}}
+              disabled={!phoneNumber}
+              type="submit"
+              formNoValidate
+              onClick={handleSubmit}
+              data-uie-name="do-sign-in-phone"
+            >
+              <ArrowIcon />
+            </RoundIconButton>
+          )}
+        </InputSubmitCombo>
+      </InputBlock>
+    </div>
   );
 };
 export default PhoneLoginForm;
