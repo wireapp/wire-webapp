@@ -24,6 +24,7 @@ const mockConfig = {
   ALLOWED_IMAGE_TYPES: ['image/gif', 'image/avif'],
   FEATURE: {ALLOWED_FILE_UPLOAD_EXTENSIONS: ['*']},
 };
+
 jest.mock('../../../Config', () => ({
   Config: {getConfig: () => mockConfig},
 }));
