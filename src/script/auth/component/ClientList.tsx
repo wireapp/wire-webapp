@@ -71,6 +71,7 @@ const ClientList = ({
       logger.error(error);
     } finally {
       removeLocalStorage(QUERY_KEY.CONVERSATION_CODE);
+      removeLocalStorage(QUERY_KEY.JOIN_EXPIRES);
       setShowLoading(false);
     }
   };

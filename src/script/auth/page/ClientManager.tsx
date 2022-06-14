@@ -37,6 +37,16 @@ const ClientManager = ({doGetAllClients, doLogout}: Props & ConnectedProps & Dis
   const SFAcode = localStorage.getItem(QUERY_KEY.CONVERSATION_CODE);
   const timeRemaining = JSON.parse(localStorage.getItem(QUERY_KEY.JOIN_EXPIRES))?.data ?? Date.now();
 
+  // Automatically log the user out if ten minutes passes and they are a 2fa user.
+  const {startTimeout} = useTimeout(
+    () => {
+      localStorage.removeItem(QUERY_KEY.CONVERSATION_CODE);
+      localStorage.removeItem(QUERY_KEY.JOIN_EXPIRES);
+      logout();
+    },
+    timeRemaining - Date.now() > 0 ? timeRemaining - Date.now() : 0,
+  );
+
   useEffect(() => {
     doGetAllClients();
     if (SFAcode) {
@@ -49,16 +59,6 @@ const ClientManager = ({doGetAllClients, doLogout}: Props & ConnectedProps & Dis
       await doLogout();
     } catch (error) {}
   };
-
-  // Automatically log the user out if ten minutes passes and they are a 2fa user.
-  const {startTimeout} = useTimeout(
-    () => {
-      localStorage.removeItem(QUERY_KEY.CONVERSATION_CODE);
-      localStorage.removeItem(QUERY_KEY.JOIN_EXPIRES);
-      logout();
-    },
-    timeRemaining - Date.now() > 0 ? timeRemaining - Date.now() : 0,
-  );
 
   return (
     <Page>
