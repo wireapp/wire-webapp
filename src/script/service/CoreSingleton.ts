@@ -35,6 +35,7 @@ export class Core extends Account {
 
         return createStorageEngine(storeName, dbType);
       },
+      enableMLS: true,
       nbPrekeys: 100,
     });
   }
