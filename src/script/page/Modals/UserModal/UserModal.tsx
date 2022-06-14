@@ -40,13 +40,14 @@ import {User} from '../../../entity/User';
 import {noop} from 'Util/util';
 import {Core} from '../../../service/CoreSingleton';
 
-interface UserModalProps {
+export interface UserModalProps {
   userId: QualifiedId;
   userRepository: UserRepository;
   actionsViewModel: ActionsViewModel;
   onClose?: () => void;
   userState?: UserState;
   teamState?: TeamState;
+  core?: Core;
 }
 
 const brandName = Config.getConfig().BRAND_NAME;
@@ -56,6 +57,7 @@ const UserModalComponent: React.FC<UserModalProps> = ({
   onClose = noop,
   userRepository,
   actionsViewModel,
+  core = container.resolve(Core),
   userState = container.resolve(UserState),
   teamState = container.resolve(TeamState),
 }) => {
@@ -72,7 +74,7 @@ const UserModalComponent: React.FC<UserModalProps> = ({
   const {classifiedDomains} = useKoSubscribableChildren(teamState, ['classifiedDomains']);
   const {self, isActivatedAccount} = useKoSubscribableChildren(userState, ['self', 'isActivatedAccount']);
   const {is_verified: isSelfVerified} = useKoSubscribableChildren(self, ['is_verified']);
-  const isFederated = container.resolve(Core).backendFeatures.isFederated;
+  const isFederated = core.backendFeatures?.isFederated;
   const replaceLinkLegalHold = replaceLink(Config.getConfig().URL.SUPPORT.LEGAL_HOLD_BLOCK, '', 'read-more-legal-hold');
 
   useEffect(() => {
@@ -81,7 +83,8 @@ const UserModalComponent: React.FC<UserModalProps> = ({
         .getUserById(userId)
         .then(user => {
           if (user.isDeleted) {
-            return setUserNotFound(true);
+            setUserNotFound(true);
+            return;
           }
           setUser(user);
         })
@@ -93,7 +96,7 @@ const UserModalComponent: React.FC<UserModalProps> = ({
       setUser(null);
       setUserNotFound(false);
     };
-  }, [userId.id, userId.domain]);
+  }, [userId?.id, userId?.domain]);
 
   return (
     <div className="user-modal">
