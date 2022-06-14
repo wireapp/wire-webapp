@@ -37,15 +37,17 @@ const PhoneLoginForm = ({isFetching, onSubmit}: LoginFormProps) => {
   const [validInput, setValidInput] = useState(true);
   const phoneInput = useRef();
   const countryCodeInput = useRef();
-  const countryList = [
+  const countryList = COUNTRY_CODES.map(({iso, name}) => ({
+    label: name,
+    value: iso,
+  }));
+  const expandedCountryList = [
+    ...countryList,
     {label: _(phoneLoginStrings.accountCountryCode), value: 'X0'},
     {label: _(phoneLoginStrings.errorCountryCodeInvalid), value: 'X1'},
-  ].concat(
-    COUNTRY_CODES.map(({iso, name}) => ({
-      label: name,
-      value: iso,
-    })),
-  );
+  ];
+  const currentSelectValue = expandedCountryList.find(selectedCountry => selectedCountry.value === country);
+
   const handleSubmit = (event: React.FormEvent) => {
     event.preventDefault();
     if (isFetching) {
@@ -57,19 +59,20 @@ const PhoneLoginForm = ({isFetching, onSubmit}: LoginFormProps) => {
   return (
     <div>
       <Select
-        id=""
+        id="select-phone"
         onChange={(selectedCountry: string) => {
           setCountry(selectedCountry);
           setCountryCode((getCountryCode(selectedCountry) || 'X2').toString(10));
         }}
-        dataUieName=""
-        options={countryList}
-        value={{label: country, value: countryCode}}
+        dataUieName="select-phone"
+        options={expandedCountryList}
+        value={currentSelectValue}
       />
+
       <InputBlock>
         <InputSubmitCombo style={{background: 'none', boxShadow: 'inset 16px 16px 0 #fff, inset -100px -16px 0 #fff'}}>
           <Input
-            style={{marginRight: 1, width: 80}}
+            id="enter-country-code"
             ref={countryCodeInput}
             value={`+${countryCode}`}
             onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
@@ -81,11 +84,13 @@ const PhoneLoginForm = ({isFetching, onSubmit}: LoginFormProps) => {
             data-uie-name="enter-country-code"
           />
           <Input
+            id="enter-phone"
             name="phone-login"
             onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
               setPhoneNumber(event.target.value);
               setValidInput(true);
             }}
+            style={{width: 260}}
             ref={phoneInput}
             markInvalid={!validInput}
             value={phoneNumber}

@@ -57,15 +57,15 @@ const MainContent: React.FC<LeftSidebarProps> = ({
   const {state} = useKoSubscribableChildren(contentViewModel, ['state']);
   const {activeConversation} = useKoSubscribableChildren(conversationState, ['activeConversation']);
   const repositories = contentViewModel.repositories;
-  const theme = repositories.properties?.properties.settings.interface.theme;
+  const currentTheme = repositories.properties?.properties.settings.interface.theme;
 
-  const [uiKitTheme, setUiKitTheme] = useState<THEME_ID>(theme === 'dark' ? THEME_ID.DARK : THEME_ID.LIGHT);
+  const [uiKitTheme, setUiKitTheme] = useState<THEME_ID>(currentTheme === 'dark' ? THEME_ID.DARK : THEME_ID.LIGHT);
+
+  const updateTheme = (theme: string) => {
+    setUiKitTheme(theme === 'dark' ? THEME_ID.DARK : THEME_ID.LIGHT);
+  };
 
   useEffect(() => {
-    const updateTheme = (theme: string) => {
-      setUiKitTheme(theme === 'dark' ? THEME_ID.DARK : THEME_ID.LIGHT);
-    };
-
     amplify.subscribe(WebAppEvents.PROPERTIES.UPDATE.INTERFACE.THEME, updateTheme);
 
     return () => {

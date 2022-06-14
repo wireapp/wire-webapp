@@ -237,6 +237,8 @@ const SingleSignOnForm = ({
   const stripPrefix = (prefixedCode: string) =>
     prefixedCode && prefixedCode.trim().toLowerCase().replace(SSO_CODE_PREFIX, '');
 
+  const enableDomainDiscovery = Config.getConfig().FEATURE.ENABLE_DOMAIN_DISCOVERY;
+
   return isLoading ? (
     <Loading style={{marginTop: '24px'}} />
   ) : (
@@ -245,10 +247,9 @@ const SingleSignOnForm = ({
       <InputBlock>
         <InputSubmitCombo>
           <Input
+            id={enableDomainDiscovery ? ValidationError.FIELD.SSO_EMAIL_CODE.name : ValidationError.FIELD.SSO_CODE.name}
             name={
-              Config.getConfig().FEATURE.ENABLE_DOMAIN_DISCOVERY
-                ? ValidationError.FIELD.SSO_EMAIL_CODE.name
-                : ValidationError.FIELD.SSO_CODE.name
+              enableDomainDiscovery ? ValidationError.FIELD.SSO_EMAIL_CODE.name : ValidationError.FIELD.SSO_CODE.name
             }
             onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
               setCodeOrMail(event.target.value);
@@ -257,15 +258,13 @@ const SingleSignOnForm = ({
             ref={codeOrMailInput}
             markInvalid={!isCodeOrMailInputValid}
             placeholder={_(
-              Config.getConfig().FEATURE.ENABLE_DOMAIN_DISCOVERY
-                ? ssoLoginStrings.codeOrMailInputPlaceholder
-                : ssoLoginStrings.codeInputPlaceholder,
+              enableDomainDiscovery ? ssoLoginStrings.codeOrMailInputPlaceholder : ssoLoginStrings.codeInputPlaceholder,
             )}
             value={codeOrMail}
             autoComplete="section-login sso-code"
             maxLength={1024}
             pattern={
-              Config.getConfig().FEATURE.ENABLE_DOMAIN_DISCOVERY
+              enableDomainDiscovery
                 ? `(${SSO_CODE_PREFIX_REGEX}${PATTERN.UUID_V4}|${PATTERN.EMAIL})`
                 : `${SSO_CODE_PREFIX_REGEX}${PATTERN.UUID_V4}`
             }

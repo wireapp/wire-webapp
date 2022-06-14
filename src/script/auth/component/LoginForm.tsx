@@ -77,6 +77,7 @@ const LoginForm = ({isFetching, onSubmit}: LoginFormProps) => {
   return (
     <div>
       <Input
+        id="email"
         name="email"
         onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
           setEmail(event.target.value);
@@ -93,6 +94,7 @@ const LoginForm = ({isFetching, onSubmit}: LoginFormProps) => {
         data-uie-name="enter-email"
       />
       <Input
+        id="password-login"
         name="password-login"
         onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
           setPassword(event.target.value);
@@ -108,6 +110,7 @@ const LoginForm = ({isFetching, onSubmit}: LoginFormProps) => {
         required
         data-uie-name="enter-password"
       />
+
       {isFetching ? (
         <Loading size={32} />
       ) : (
