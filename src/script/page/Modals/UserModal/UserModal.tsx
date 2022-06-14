@@ -68,6 +68,7 @@ const UserModalComponent: React.FC<UserModalProps> = ({
     setUserNotFound(false);
     onClose();
   };
+  const {isBlockedLegalHold} = useKoSubscribableChildren(user, ['isBlockedLegalHold']);
   const {classifiedDomains} = useKoSubscribableChildren(teamState, ['classifiedDomains']);
   const {self, isActivatedAccount} = useKoSubscribableChildren(userState, ['self', 'isActivatedAccount']);
   const {is_verified: isSelfVerified} = useKoSubscribableChildren(self, ['is_verified']);
@@ -115,12 +116,12 @@ const UserModalComponent: React.FC<UserModalProps> = ({
             <>
               <UserDetails participant={user} isSelfVerified={isSelfVerified} classifiedDomains={classifiedDomains} />
               <EnrichedFields user={user} showDomain={isFederated} />
-              {user.isBlockedLegalHold() && (
+              {isBlockedLegalHold && (
                 <div className="modal__message" data-uie-name="status-blocked-legal-hold">
                   {t('modalUserBlockedForLegalHold', {}, replaceLinkLegalHold)}
                 </div>
               )}
-              {user.isBlockedLegalHold() && (
+              {isBlockedLegalHold && (
                 <UserActions
                   user={user}
                   actionsViewModel={actionsViewModel}
