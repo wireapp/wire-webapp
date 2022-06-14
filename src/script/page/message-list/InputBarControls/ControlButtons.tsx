@@ -104,6 +104,7 @@ const ControlButtons: React.FC<ControlButtonsProps> = ({
                 onClick={() => imageRef.current?.click()}
               >
                 <Icon.Image />
+
                 <input
                   ref={imageRef}
                   accept={acceptedImageTypes}
@@ -125,6 +126,7 @@ const ControlButtons: React.FC<ControlButtonsProps> = ({
                 onClick={() => fileRef.current?.click()}
               >
                 <Icon.Attachment />
+
                 <input
                   ref={fileRef}
                   accept={acceptedFileTypes ?? null}
@@ -138,12 +140,14 @@ const ControlButtons: React.FC<ControlButtonsProps> = ({
             </li>
           </>
         )}
+
         <li>
           <MessageTimerButton conversation={conversation} />
         </li>
       </>
     );
   }
+
   const showGiphyButton = input.length <= config.GIPHY_TEXT_LENGTH;
 
   return (

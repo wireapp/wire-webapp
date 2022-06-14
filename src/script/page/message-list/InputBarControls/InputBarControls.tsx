@@ -32,6 +32,7 @@ const InputBarControls: React.FC<InputBarControlsProps> = ({onSend, ...props}) =
   return (
     <ul className="controls-right buttons-group">
       <ControlButtons {...props} />
+
       <li>
         <button
           type="button"
