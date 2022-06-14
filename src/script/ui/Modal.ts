@@ -65,6 +65,12 @@ export class Modal {
     }
   }
 
+  focus(): void {
+    if (this.modal) {
+      this.modal.focus();
+    }
+  }
+
   hide(callback?: () => void): void {
     this.callOptional(this.beforeHideCallback);
 

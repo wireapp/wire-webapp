@@ -1,4 +1,4 @@
-<div id="giphy-modal" data-bind="with: $root.giphy" class="giphy-modal modal modal-large">
+<div id="giphy-modal" role="dialog" aria-labelledby="giphy-name" data-bind="with: $root.giphy" class="giphy-modal modal modal-large" tabindex="0">
   <div class="modal-content">
     <div class="giphy-modal-header modal-header">
       <!-- ko if: isStateResult() -->
@@ -10,12 +10,14 @@
       <!-- ko ifnot: isResultState() || isStateNoSearchResults() -->
         <span class="giphy-modal-header-button"></span>
       <!-- /ko -->
-      <span class="label-xs" data-bind="text: query" data-uie-name="giphy-query"></span>
-      <span class="button-icon icon-close pull-right" data-bind="click: clickOnClose" data-uie-name="do-close"></span>
+      <span id="giphy-name" class="label-xs" data-bind="text: query" data-uie-name="giphy-query"></span>
+      <button type="button" class="icon-button" data-bind="click: clickOnClose, attr: {'aria-label': t('accessibility.giphyModal.close')}" data-uie-name="do-close-giphy-modal">
+        <close-icon aria-hidden="true"></close-icon>
+      </button>
     </div>
-    <div class="giphy-modal-center modal-center">
+    <div class="giphy-modal-center modal-center" tabindex="0">
       <div class="gif-container-spinner" data-bind="visible: isStateLoading()">
-        <div class="icon-spinner spin"></div>
+        <div class="icon-spinner spin" aria-live="polite" data-bind="attr:{ 'aria-busy': isStateLoading(), 'aria-label': loadingTxt() }"></div>
       </div>
       <div class="gif-container"
            data-bind="foreach: gifs, visible: isResultState(), css: {'gif-container-grid': gifs().length > 1}">
@@ -37,13 +39,15 @@
         <span class="gif-container-error-message" data-bind="text: t('extensionsGiphyNoGifs')"></span>
       </div>
     </div>
-    <div class="giphy-modal-footer modal-footer">
-      <div class="button button-inverted"
-           data-bind="click: clickOnTryAnother, text: t('extensionsGiphyButtonMore'), css: {'button-disabled': gifs().length === 0}"
-           data-uie-name="do-try-another"></div>
-      <div class="button"
-           data-bind="click: clickToSend, text: t('extensionsGiphyButtonOk'), css: {'button-disabled': !selectedGif()}"
-           data-uie-name="do-send-gif"></div>
-    </div>
+    <footer class="giphy-modal-footer modal-footer">
+      <button type="button" class="button button-inverted"
+        data-bind="click: clickOnTryAnother, text: t('extensionsGiphyButtonMore'), attr:{ 'aria-disabled': !hasGifs()},
+        css: {'button-disabled': !hasGifs()}"
+        data-uie-name="do-try-another"></button>
+      <button type="button" class="button"
+        data-bind="click: clickToSend, text: t('extensionsGiphyButtonOk'), attr:{ 'aria-disabled': !selectedGif()},
+        css: {'button-disabled': !selectedGif()}"
+        data-uie-name="do-send-gif"></button>
+    </footer>
   </div>
 </div>

@@ -44,6 +44,8 @@ export class GiphyViewModel {
   private readonly selectedGif: ko.Observable<Gif>;
   public isStateError: ko.PureComputed<boolean>;
   public isStateLoading: ko.PureComputed<boolean>;
+  public loadingTxt: ko.PureComputed<string>;
+  public hasGifs: ko.PureComputed<boolean>;
   public isStateResult: ko.PureComputed<boolean>;
   public isStateResults: ko.PureComputed<boolean>;
   public isResultState: ko.PureComputed<boolean>;
@@ -66,9 +68,11 @@ export class GiphyViewModel {
 
     this.isStateError = ko.pureComputed(() => [GiphyState.ERROR, GiphyState.NO_SEARCH_RESULT].includes(this.state()));
     this.isStateLoading = ko.pureComputed(() => this.state() === GiphyState.LOADING);
+    this.loadingTxt = ko.pureComputed(() => (this.state() === GiphyState.LOADING ? 'Loading gif' : ''));
     this.isStateResult = ko.pureComputed(() => this.state() === GiphyState.RESULT);
     this.isStateResults = ko.pureComputed(() => this.state() === GiphyState.RESULTS);
     this.isStateNoSearchResults = ko.pureComputed(() => this.state() === GiphyState.NO_SEARCH_RESULT);
+    this.hasGifs = ko.pureComputed(() => this.gifs().length > 0);
 
     this.isResultState = ko.pureComputed(() => {
       return [GiphyState.RESULT, GiphyState.RESULTS].includes(this.state());
@@ -148,6 +152,7 @@ export class GiphyViewModel {
     }
 
     this.modal.show();
+    this.modal.focus();
   };
 
   private readonly clearGifs = (): void => {
