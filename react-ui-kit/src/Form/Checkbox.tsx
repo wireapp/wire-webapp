@@ -19,13 +19,13 @@
 
 /** @jsx jsx */
 import {jsx} from '@emotion/react';
-import React, {useId} from 'react';
+import React from 'react';
 
 import {COLOR, COLOR_V2} from '../Identity';
 import {Theme} from '../Layout';
 import {Text, TextProps, textStyle, textLinkStyle} from '../Text';
 import {filterProps} from '../util';
-import {INPUT_CLASSNAME, Input, InputProps} from './Input';
+import {INPUT_CLASSNAME, InputProps} from './Input';
 
 export interface StyledLabelProps<T = HTMLLabelElement> extends React.HTMLProps<T> {
   disabled?: boolean;
@@ -93,10 +93,11 @@ interface CheckboxProps<T = HTMLInputElement> extends InputProps<T> {
 
 const filterCheckboxProps = (props: CheckboxProps) => filterProps(props, ['markInvalid']);
 
+// We use Math.random..., because some of apps doesn't migrated to newest version of React.
 export const Checkbox: React.FC<CheckboxProps<HTMLInputElement>> = React.forwardRef<
   HTMLInputElement,
   CheckboxProps<HTMLInputElement>
->(({id = useId(), children, style, disabled, ...props}, ref) => (
+>(({id = Math.random().toString(), children, style, disabled, ...props}, ref) => (
   <div
     css={{
       alignItems: 'center',
@@ -105,8 +106,8 @@ export const Checkbox: React.FC<CheckboxProps<HTMLInputElement>> = React.forward
     }}
     style={style}
   >
-    <Input
-      type={'checkbox'}
+    <input
+      type="checkbox"
       id={id}
       style={{
         height: '22px',
@@ -116,8 +117,10 @@ export const Checkbox: React.FC<CheckboxProps<HTMLInputElement>> = React.forward
       }}
       disabled={disabled}
       ref={ref}
+      className={INPUT_CLASSNAME}
       {...filterCheckboxProps(props)}
     />
+
     <StyledLabel htmlFor={id} disabled={disabled} markInvalid={props.markInvalid}>
       {children}
     </StyledLabel>

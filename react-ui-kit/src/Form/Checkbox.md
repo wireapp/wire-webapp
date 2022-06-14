@@ -8,7 +8,7 @@ import {Column, Columns, Checkbox, CheckboxLabel, Link} from '@wireapp/react-ui-
   <Columns>
     <Column>Checkbox</Column>
     <Column>
-      <Checkbox id="ToU">
+      <Checkbox id="ToU" checked>
         <CheckboxLabel>{'ToU'}</CheckboxLabel>
       </Checkbox>
     </Column>

@@ -9,6 +9,7 @@ exports[`"Select" renders 1`] = `
 
 .emotion-1 {
   margin-bottom: 20px;
+  width: 100%;
 }
 
 .emotion-1:focus-within label {
@@ -144,6 +145,7 @@ exports[`"Select" renders as disabled 1`] = `
 
 .emotion-1 {
   margin-bottom: 20px;
+  width: 100%;
 }
 
 .emotion-1:focus-within label {
@@ -271,6 +273,7 @@ exports[`"Select" renders as invalid 1`] = `
 
 .emotion-1 {
   margin-bottom: 2px;
+  width: 100%;
 }
 
 .emotion-1:focus-within label {
