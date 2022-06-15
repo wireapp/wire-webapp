@@ -24,7 +24,7 @@ import {
   Input,
   Link,
   Loading,
-  COLOR,
+  COLOR_V2,
   InputSubmitCombo,
   RoundIconButton,
   ShowIcon,
@@ -50,7 +50,7 @@ const inputContainer = css`
   flex-direction: column;
 
   &:focus-within label {
-    color: ${COLOR.BLUE};
+    color: ${COLOR_V2.BLUE};
   }
 
   label {
@@ -152,7 +152,7 @@ const LoginForm = ({isFetching, onSubmit}: LoginFormProps) => {
           />
 
           <RoundIconButton type="button" onClick={toggleIsPasswordVisible} style={{backgroundColor: 'transparent'}}>
-            {isPasswordVisible ? <HideIcon color={COLOR.BLACK} /> : <ShowIcon color={COLOR.BLACK} />}
+            {isPasswordVisible ? <HideIcon color={COLOR_V2.BLACK} /> : <ShowIcon color={COLOR_V2.BLACK} />}
           </RoundIconButton>
         </InputSubmitCombo>
 
@@ -165,7 +165,7 @@ const LoginForm = ({isFetching, onSubmit}: LoginFormProps) => {
           target="_blank"
           fontSize="16px"
           bold={false}
-          color={COLOR.BLUE}
+          color={COLOR_V2.BLUE}
           style={{marginTop: '8px', textDecoration: 'underline'}}
           data-uie-name="go-forgot-password"
           textTransform="none"

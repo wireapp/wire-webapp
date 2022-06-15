@@ -105,14 +105,17 @@ const PhoneLogin = ({
       <IsMobile>
         <div style={{margin: 16}}>{backArrow}</div>
       </IsMobile>
+
       <Container centerText verticalCenter style={{width: '100%'}}>
         <AppAlreadyOpen />
+
         <Columns>
           <IsMobile not>
             <Column style={{display: 'flex'}}>
               <div style={{margin: 'auto'}}>{backArrow}</div>
             </Column>
           </IsMobile>
+
           <Column style={{flexBasis: 384, flexGrow: 0, padding: 0}}>
             <ContainerXS
               centerText
@@ -120,8 +123,10 @@ const PhoneLogin = ({
             >
               <div>
                 <H1 center>{_(phoneLoginStrings.loginHead)}</H1>
+
                 <Form style={{marginTop: 30}} data-uie-name="login">
                   <PhoneLoginForm isFetching={isFetching} onSubmit={handleSubmit} />
+
                   {!error ? (
                     <div style={{marginTop: '4px'}}>&nbsp;</div>
                   ) : isValidationError(error) ? (
@@ -129,6 +134,7 @@ const PhoneLogin = ({
                   ) : (
                     parseError(error)
                   )}
+
                   {!Runtime.isDesktopApp() && (
                     <Checkbox
                       onChange={(event: React.ChangeEvent<HTMLInputElement>) => {

@@ -22,6 +22,7 @@ import {ClientType} from '@wireapp/api-client/src/client/index';
 import {
   ArrowIcon,
   COLOR,
+  COLOR_V2,
   Checkbox,
   CheckboxLabel,
   CodeInput,
@@ -361,7 +362,7 @@ const Login = ({
                             data-uie-name="go-sign-in-phone"
                             fontSize="16px"
                             bold={false}
-                            color={COLOR.BLACK}
+                            color={COLOR_V2.BLUE}
                             style={{textDecoration: 'underline'}}
                             textTransform="none"
                           >

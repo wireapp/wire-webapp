@@ -18,7 +18,7 @@
  */
 
 import {ClientType} from '@wireapp/api-client/src/client';
-import {Button, ContainerXS, H1, Link, Paragraph, COLOR} from '@wireapp/react-ui-kit';
+import {Button, ContainerXS, H1, Link, Paragraph, COLOR_V2} from '@wireapp/react-ui-kit';
 import React from 'react';
 import {FormattedMessage, useIntl} from 'react-intl';
 import {connect} from 'react-redux';
@@ -78,6 +78,7 @@ const HistoryInfo = ({hasHistory, clients, currentSelfClient, isNewCurrentSelfCl
           type="button"
           onClick={onContinue}
           data-uie-name="do-history-confirm"
+          backgroundColor={COLOR_V2.BLUE}
           onKeyDown={(event: React.KeyboardEvent) => {
             if (event.key === KEY.ENTER) {
               onContinue();
@@ -96,7 +97,7 @@ const HistoryInfo = ({hasHistory, clients, currentSelfClient, isNewCurrentSelfCl
               textTransform="none"
               bold={false}
               style={{fontSize: '16px', textDecoration: 'underline'}}
-              color={COLOR.BLUE}
+              color={COLOR_V2.BLUE_LIGHT_600}
             >
               {_(historyInfoStrings.learnMore)}
             </Link>
