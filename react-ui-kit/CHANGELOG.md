@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [8.6.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/react-ui-kit/compare/@wireapp/react-ui-kit@8.5.4...@wireapp/react-ui-kit@8.6.0) (2022-06-15)
+
+
+### Features
+
+* Add current value for select-component ([#4291](https://github.com/wireapp/wire-web-packages/tree/main/packages/react-ui-kit/issues/4291)) ([1fa426e](https://github.com/wireapp/wire-web-packages/tree/main/packages/react-ui-kit/commit/1fa426e5422e92e5f2ffb273e8a48ceb59975fb0))
+
+
+
+
+
 ## [8.5.4](https://github.com/wireapp/wire-web-packages/tree/main/packages/react-ui-kit/compare/@wireapp/react-ui-kit@8.5.3...@wireapp/react-ui-kit@8.5.4) (2022-06-14)
 
 
