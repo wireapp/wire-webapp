@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [27.3.9](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/compare/@wireapp/core@27.3.8...@wireapp/core@27.3.9) (2022-06-15)
+
+
+### Bug Fixes
+
+* **core:** Make sure access token is valid before connecting to websocket ([#4293](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/issues/4293)) ([1ef45a5](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/commit/1ef45a5a60a086d4ebe0a512813d4677e7b99ded))
+
+
+
+
+
 ## [27.3.8](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/compare/@wireapp/core@27.3.7...@wireapp/core@27.3.8) (2022-06-15)
 
 **Note:** Version bump only for package @wireapp/core
