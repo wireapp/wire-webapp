@@ -168,7 +168,7 @@ const MainContent: React.FC<LeftSidebarProps> = ({
   return (
     <>
       <h1 className="visually-hidden">{title}</h1>
-      <StyledApp themeId={uiKitTheme}>
+      <StyledApp themeId={uiKitTheme} style={{height: '100%'}}>
         <SwitchTransition>
           <Animated key={state}>{content}</Animated>
         </SwitchTransition>
