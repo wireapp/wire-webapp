@@ -79,14 +79,22 @@
       background-color: var(--gray-95);
       outline: 1px solid var(--gray-90);
     }
+    &.active {
+      .button-active();
+      color: var(--black);
+
+      svg {
+        fill: var(--black);
+      }
+    }
   }
 
   &.active {
     .button-active();
-    color: var(--black);
+    color: var(--white);
 
     svg {
-      fill: var(--black);
+      fill: var(--white);
     }
   }
 }
