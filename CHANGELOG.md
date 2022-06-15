@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [19.6.4](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/compare/@wireapp/api-client@19.6.3...@wireapp/api-client@19.6.4) (2022-06-15)
+
+
+### Bug Fixes
+
+* **core:** Make sure access token is valid before connecting to websocket ([#4293](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/issues/4293)) ([1ef45a5](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/commit/1ef45a5a60a086d4ebe0a512813d4677e7b99ded))
+
+
+
+
+
 ## [19.6.3](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/compare/@wireapp/api-client@19.6.2...@wireapp/api-client@19.6.3) (2022-06-15)
 
 **Note:** Version bump only for package @wireapp/api-client
