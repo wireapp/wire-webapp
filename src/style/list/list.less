@@ -254,9 +254,12 @@ body.theme-dark {
 
     &--active,
     &--active:hover {
-      border: 1px solid var(--accent-color-600) !important;
-      background-color: var(--accent-color-700) !important;
-      color: @white;
+      background-color: var(--accent-color-600) !important;
+      color: var(--black);
+
+      .left-column-icon > svg {
+        fill: var(--black);
+      }
     }
   }
 }
