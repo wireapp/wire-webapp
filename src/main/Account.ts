@@ -493,9 +493,8 @@ export class Account extends EventEmitter {
     await this.apiClient.connect(onBeforeConnect);
 
     return () => {
+      this.apiClient.transport.ws.removeAllListeners();
       this.apiClient.disconnect();
-      this.apiClient.transport.ws.removeAllListeners(WebSocketClient.TOPIC.ON_MESSAGE);
-      this.apiClient.transport.ws.removeListener(WebSocketClient.TOPIC.ON_STATE_CHANGE, onConnectionStateChanged);
     };
   }
 
