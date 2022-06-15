@@ -35,6 +35,11 @@ export class AccessTokenStore extends EventEmitter {
 
   public static readonly TOPIC = TOPIC;
   public accessToken?: AccessTokenData;
+  /**
+   * The date at which the token will be invalid. This value should be use with a grain of salt as there might be some time shift between browser and server time
+   * It is suggested to add an error margin
+   */
+  public tokenExpirationDate?: number;
 
   constructor() {
     super();
@@ -48,11 +53,13 @@ export class AccessTokenStore extends EventEmitter {
   public async delete(): Promise<void> {
     this.logger.log('Deleting local access token');
     this.accessToken = undefined;
+    this.tokenExpirationDate = undefined;
   }
 
   public async updateToken(accessToken: AccessTokenData): Promise<AccessTokenData> {
     if (this.accessToken !== accessToken) {
       this.logger.log('Saving local access token');
+      this.tokenExpirationDate = Date.now() + accessToken.expires_in * 1000;
       this.accessToken = accessToken;
       this.emit(AccessTokenStore.TOPIC.ACCESS_TOKEN_REFRESH, this.accessToken);
     }

@@ -37,6 +37,7 @@ const fakeHttpClient: any = {
     accessToken: accessTokenPayload,
   },
   refreshAccessToken: () => Promise.resolve(accessTokenPayload),
+  hasValidAccessToken: () => true,
 };
 
 const invalidTokenHttpClient: any = {
@@ -44,6 +45,7 @@ const invalidTokenHttpClient: any = {
     accessToken: accessTokenPayload,
   },
   refreshAccessToken: () => Promise.reject(new InvalidTokenError('Invalid token')),
+  hasValidAccessToken: () => true,
 };
 
 const fakeSocket = {
