@@ -19,6 +19,7 @@
 
 import {LoginData} from '@wireapp/api-client/src/auth';
 import {ClientType} from '@wireapp/api-client/src/client/index';
+import {useTitle} from 'react-use';
 import {
   ArrowIcon,
   COLOR,
@@ -65,6 +66,7 @@ import {parseError, parseValidationErrors} from '../util/errorUtil';
 import {UrlUtil} from '@wireapp/commons';
 import Page from './Page';
 import EntropyContainer from './EntropyContainer';
+import {t} from 'Util/LocalizerUtil';
 
 interface Props extends React.HTMLProps<HTMLDivElement> {}
 
@@ -117,6 +119,7 @@ const Login = ({
       }
     : undefined;
 
+  useTitle(`${t('authLoginTitle')} . ${Config.getConfig().BRAND_NAME}`);
   useEffect(() => {
     const queryClientType = UrlUtil.getURLParameter(QUERY_KEY.CLIENT_TYPE);
     if (queryClientType === ClientType.TEMPORARY) {

@@ -34,6 +34,7 @@ import {
 import React from 'react';
 import {useIntl} from 'react-intl';
 import {Redirect} from 'react-router';
+import {useTitle} from 'react-use';
 import {Config} from '../../Config';
 import {setAccountTypeStrings} from '../../strings';
 import RouterLink from '../component/RouterLink';
@@ -41,12 +42,14 @@ import {ROUTE} from '../route';
 import {Runtime} from '@wireapp/commons';
 import {pathWithParams} from '../util/urlUtil';
 import Page from './Page';
+import {t} from 'Util/LocalizerUtil';
 
 interface Props extends React.HTMLProps<HTMLDivElement> {}
 
 const SetAccountType = ({}: Props) => {
   const {formatMessage: _} = useIntl();
   const isMacOsWrapper = Runtime.isDesktopApp() && Runtime.isMacOS();
+  useTitle(`${t('authAccCreationTitle')} . ${Config.getConfig().BRAND_NAME}`);
 
   const backArrow = (
     <RouterLink to={ROUTE.INDEX} data-uie-name="go-index" aria-label={_(setAccountTypeStrings.goBack)}>

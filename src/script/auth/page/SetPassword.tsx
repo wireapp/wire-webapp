@@ -25,6 +25,7 @@ import {connect} from 'react-redux';
 import {AnyAction, Dispatch} from 'redux';
 import useReactRouter from 'use-react-router';
 import {Config} from '../../Config';
+import {useTitle} from 'react-use';
 import {accountFormStrings, setPasswordStrings} from '../../strings';
 import Exception from '../component/Exception';
 import {actionRoot} from '../module/action';
@@ -33,6 +34,7 @@ import {RootState, bindActionCreators} from '../module/reducer';
 import * as SelfSelector from '../module/selector/SelfSelector';
 import {ROUTE} from '../route';
 import Page from './Page';
+import {t} from 'Util/LocalizerUtil';
 
 interface Props extends React.HTMLProps<HTMLDivElement> {}
 
@@ -49,6 +51,7 @@ const SetPassword = ({
   const [isValidPassword, setIsValidPassword] = useState(true);
   const [password, setPassword] = useState('');
   const {history} = useReactRouter();
+  useTitle(`${t('authForgotPasswordTitle')} . ${Config.getConfig().BRAND_NAME}`);
 
   const onSetPassword = async (event: React.FormEvent): Promise<void> => {
     event.preventDefault();
