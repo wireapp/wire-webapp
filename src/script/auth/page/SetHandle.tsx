@@ -24,6 +24,7 @@ import {
   Form,
   H1,
   Input,
+  InputBlock,
   InputSubmitCombo,
   Muted,
   RoundIconButton,
@@ -105,30 +106,33 @@ const SetHandle = ({
         <H1 center>{_(chooseHandleStrings.headline)}</H1>
         <Muted center>{_(chooseHandleStrings.subhead)}</Muted>
         <Form style={{marginTop: 30}} onSubmit={onSetHandle}>
-          <InputSubmitCombo style={{paddingLeft: 0}}>
-            <Text center style={{minWidth: 38}}>
-              {'@'}
-            </Text>
-            <Input
-              name="handle"
-              placeholder={_(chooseHandleStrings.handlePlaceholder)}
-              type="text"
-              onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-                setError(null);
-                setHandle(event.target.value);
-              }}
-              value={handle}
-              data-uie-name="enter-handle"
-            />
-            <RoundIconButton
-              disabled={!handle || isFetching}
-              type="submit"
-              data-uie-name="do-send-handle"
-              formNoValidate
-            >
-              <ArrowIcon />
-            </RoundIconButton>
-          </InputSubmitCombo>
+          <InputBlock>
+            <InputSubmitCombo style={{paddingLeft: 0}}>
+              <Text center style={{minWidth: 38}}>
+                {'@'}
+              </Text>
+              <Input
+                id="handle"
+                name="handle"
+                placeholder={_(chooseHandleStrings.handlePlaceholder)}
+                type="text"
+                onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                  setError(null);
+                  setHandle(event.target.value);
+                }}
+                value={handle}
+                data-uie-name="enter-handle"
+              />
+              <RoundIconButton
+                disabled={!handle || isFetching}
+                type="submit"
+                data-uie-name="do-send-handle"
+                formNoValidate
+              >
+                <ArrowIcon />
+              </RoundIconButton>
+            </InputSubmitCombo>
+          </InputBlock>
         </Form>
         {error && parseError(error)}
       </ContainerXS>
