@@ -200,6 +200,11 @@ const ConversationJoin = ({
     setIsValidName(true);
   };
 
+  const onNameChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    resetErrors();
+    setEnteredName(event.target.value);
+  };
+
   const isFullConversation =
     conversationError &&
     conversationError.label &&
@@ -250,10 +255,7 @@ const ConversationJoin = ({
                       autoComplete="username"
                       value={enteredName}
                       ref={nameInput}
-                      onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-                        resetErrors();
-                        setEnteredName(event.target.value);
-                      }}
+                      onChange={onNameChange}
                       placeholder={_(conversationJoinStrings.namePlaceholder)}
                       maxLength={64}
                       minLength={2}

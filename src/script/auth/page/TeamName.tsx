@@ -104,6 +104,11 @@ const TeamName = ({
     teamNameInput.current.focus();
   };
 
+  const onTeamNameChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    resetErrors();
+    setEnteredTeamName(event.target.value);
+  };
+
   const backArrow = (
     <RouterLink to={ROUTE.SET_ACCOUNT_TYPE} data-uie-name="go-register-team">
       <ArrowIcon direction="left" color={COLOR.TEXT} style={{opacity: 0.56}} />
@@ -137,10 +142,7 @@ const TeamName = ({
                         id="enter-team-name"
                         value={enteredTeamName}
                         ref={teamNameInput}
-                        onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-                          resetErrors();
-                          setEnteredTeamName(event.target.value);
-                        }}
+                        onChange={onTeamNameChange}
                         placeholder={_(teamNameStrings.teamNamePlaceholder)}
                         pattern=".{2,256}"
                         maxLength={256}

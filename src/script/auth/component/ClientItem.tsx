@@ -180,6 +180,11 @@ const ClientItem = ({selected, onClientRemoval, onClick, client, clientError, re
       });
   };
 
+  const onPasswordChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setPassword(event.target.value);
+    setIsValidPassword(true);
+  };
+
   const animationPosition = animationStep / CONFIG.animationSteps;
   const height = animationPosition * 56;
   const marginTop = animationPosition * 16;
@@ -244,10 +249,7 @@ const ClientItem = ({selected, onClientRemoval, onClick, client, clientError, re
                     data-uie-name="remove-device-password"
                     ref={passwordInput}
                     name="password"
-                    onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-                      setPassword(event.target.value);
-                      setIsValidPassword(true);
-                    }}
+                    onChange={onPasswordChange}
                     pattern=".{1,1024}"
                     placeholder={_(clientItemStrings.passwordPlaceholder)}
                     required

@@ -96,6 +96,11 @@ const SetHandle = ({
     }
   };
 
+  const onHandleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setError(null);
+    setHandle(event.target.value);
+  };
+
   if (hasSelfHandle) {
     return null;
   }
@@ -116,10 +121,7 @@ const SetHandle = ({
                 name="handle"
                 placeholder={_(chooseHandleStrings.handlePlaceholder)}
                 type="text"
-                onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-                  setError(null);
-                  setHandle(event.target.value);
-                }}
+                onChange={onHandleChange}
                 value={handle}
                 data-uie-name="enter-handle"
               />

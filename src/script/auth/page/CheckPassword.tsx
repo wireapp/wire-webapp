@@ -107,6 +107,7 @@ const CheckPassword = ({loginData, doLogin, resetAuthError, isFetching}: Props &
       }
     }
   };
+  const onPasswordChange = (event: React.ChangeEvent<HTMLInputElement>) => setPassword(event.target.value);
 
   return (
     <Page>
@@ -121,7 +122,7 @@ const CheckPassword = ({loginData, doLogin, resetAuthError, isFetching}: Props &
             <InputSubmitCombo>
               <Input
                 id="password-login"
-                onChange={(event: React.ChangeEvent<HTMLInputElement>) => setPassword(event.target.value)}
+                onChange={onPasswordChange}
                 type="password"
                 name="password-login"
                 autoComplete="section-login password"

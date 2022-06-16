@@ -137,6 +137,11 @@ const InitialInvite = ({
     return null;
   }
 
+  const onEmailChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    resetErrors();
+    setEnteredEmail(event.target.value);
+  };
+
   return (
     <Page>
       <ContainerXS
@@ -158,10 +163,7 @@ const InitialInvite = ({
                   name="email"
                   placeholder={_(inviteStrings.emailPlaceholder)}
                   type="email"
-                  onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-                    resetErrors();
-                    setEnteredEmail(event.target.value);
-                  }}
+                  onChange={onEmailChange}
                   // Note: Curser issues when using controlled input
                   // value={enteredEmail}
                   ref={emailInput}
