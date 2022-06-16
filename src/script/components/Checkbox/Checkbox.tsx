@@ -68,7 +68,7 @@ const Checkbox: React.FC<CheckboxProps> = ({disabled, label, isChecked, name, on
           <path
             d="M1 4.5L5 9L14 1"
             strokeWidth="2"
-            stroke={isChecked ? 'var(--white)' : 'none'} // only show the checkmark when `isCheck` is `true`
+            stroke={isChecked ? 'var(--app-bg)' : 'none'} // only show the checkmark when `isCheck` is `true`
           />
         </svg>
 
