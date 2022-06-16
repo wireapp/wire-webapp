@@ -31,6 +31,7 @@ import {
   PlaneIcon,
   RoundIconButton,
   Text,
+  InputBlock,
 } from '@wireapp/react-ui-kit';
 import React, {useState} from 'react';
 import {useIntl} from 'react-intl';
@@ -136,6 +137,11 @@ const InitialInvite = ({
     return null;
   }
 
+  const onEmailChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    resetErrors();
+    setEnteredEmail(event.target.value);
+  };
+
   return (
     <Page>
       <ContainerXS
@@ -150,29 +156,29 @@ const InitialInvite = ({
         <div style={{margin: '18px 0', minHeight: 220}}>
           {invites.map(({email}) => renderEmail(email))}
           <Form onSubmit={handleSubmit}>
-            <InputSubmitCombo>
-              <Input
-                name="email"
-                placeholder={_(inviteStrings.emailPlaceholder)}
-                type="email"
-                onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-                  resetErrors();
-                  setEnteredEmail(event.target.value);
-                }}
-                // Note: Curser issues when using controlled input
-                // value={enteredEmail}
-                ref={emailInput}
-                data-uie-name="enter-invite-email"
-              />
-              <RoundIconButton
-                disabled={isFetching || !enteredEmail}
-                type="submit"
-                data-uie-name="do-send-invite"
-                formNoValidate
-              >
-                <PlaneIcon />
-              </RoundIconButton>
-            </InputSubmitCombo>
+            <InputBlock>
+              <InputSubmitCombo>
+                <Input
+                  id="enter-invite-email"
+                  name="email"
+                  placeholder={_(inviteStrings.emailPlaceholder)}
+                  type="email"
+                  onChange={onEmailChange}
+                  // Note: Curser issues when using controlled input
+                  // value={enteredEmail}
+                  ref={emailInput}
+                  data-uie-name="enter-invite-email"
+                />
+                <RoundIconButton
+                  disabled={isFetching || !enteredEmail}
+                  type="submit"
+                  data-uie-name="do-send-invite"
+                  formNoValidate
+                >
+                  <PlaneIcon />
+                </RoundIconButton>
+              </InputSubmitCombo>
+            </InputBlock>
           </Form>
           <Exception errors={[error, inviteError]} />
         </div>

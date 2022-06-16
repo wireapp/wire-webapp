@@ -143,6 +143,11 @@ const SingleSignOnForm = ({
     }
   }, [shouldAutoLogin, clientType, initialCode, codeOrMail]);
 
+  const onCodeChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setCodeOrMail(event.target.value);
+    setIsCodeOrMailInputValid(true);
+  };
+
   const handleSubmit = async (event?: React.FormEvent): Promise<void> => {
     if (event) {
       event.preventDefault();
@@ -261,10 +266,7 @@ const SingleSignOnForm = ({
           <Input
             id={inputName}
             name={inputName}
-            onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-              setCodeOrMail(event.target.value);
-              setIsCodeOrMailInputValid(true);
-            }}
+            onChange={onCodeChange}
             ref={codeOrMailInput}
             markInvalid={!isCodeOrMailInputValid}
             placeholder={_(inputPlaceholder)}
