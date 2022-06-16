@@ -119,12 +119,13 @@ const UserModalComponent: React.FC<UserModalProps> = ({
             <>
               <UserDetails participant={user} isSelfVerified={isSelfVerified} classifiedDomains={classifiedDomains} />
               <EnrichedFields user={user} showDomain={isFederated} />
-              {isBlockedLegalHold && (
-                <div className="modal__message" data-uie-name="status-blocked-legal-hold">
-                  {t('modalUserBlockedForLegalHold', {}, replaceLinkLegalHold)}
-                </div>
-              )}
-              {!isBlockedLegalHold && (
+              {isBlockedLegalHold ? (
+                <div
+                  className="modal__message"
+                  data-uie-name="status-blocked-legal-hold"
+                  dangerouslySetInnerHTML={{__html: t('modalUserBlockedForLegalHold', {}, replaceLinkLegalHold)}}
+                ></div>
+              ) : (
                 <UserActions
                   user={user}
                   actionsViewModel={actionsViewModel}
