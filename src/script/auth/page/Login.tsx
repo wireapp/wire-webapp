@@ -19,7 +19,6 @@
 
 import {LoginData} from '@wireapp/api-client/src/auth';
 import {ClientType} from '@wireapp/api-client/src/client/index';
-import {useTitle} from 'react-use';
 import {
   ArrowIcon,
   COLOR,
@@ -68,7 +67,10 @@ import Page from './Page';
 import EntropyContainer from './EntropyContainer';
 import {t} from 'Util/LocalizerUtil';
 
-interface Props extends React.HTMLProps<HTMLDivElement> {}
+interface Props extends React.HTMLProps<HTMLDivElement> {
+  changeTitle: (title: string) => void;
+  title: string;
+}
 
 const Login = ({
   loginError,
@@ -86,6 +88,8 @@ const Login = ({
   loginData,
   defaultSSOCode,
   isSendingTwoFactorCode,
+  changeTitle,
+  title,
 }: Props & ConnectedProps & DispatchProps) => {
   const logger = getLogger('Login');
   const {formatMessage: _} = useIntl();
@@ -118,8 +122,10 @@ const Login = ({
         });
       }
     : undefined;
+  useEffect(() => {
+    changeTitle(`${t('authLoginTitle')} . ${Config.getConfig().BRAND_NAME}`);
+  }, [title]);
 
-  useTitle(`${t('authLoginTitle')} . ${Config.getConfig().BRAND_NAME}`);
   useEffect(() => {
     const queryClientType = UrlUtil.getURLParameter(QUERY_KEY.CLIENT_TYPE);
     if (queryClientType === ClientType.TEMPORARY) {

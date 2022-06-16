@@ -23,7 +23,6 @@ import {Button, ButtonVariant, COLOR, ContainerXS, ErrorMessage, Text} from '@wi
 import React, {useEffect, useState} from 'react';
 import {FormattedMessage, useIntl} from 'react-intl';
 import useReactRouter from 'use-react-router';
-import {useTitle} from 'react-use';
 import {Config} from '../../Config';
 import '../../localization/Localizer';
 import {indexStrings, logoutReasonStrings} from '../../strings';
@@ -36,14 +35,20 @@ import SVGProvider from '../util/SVGProvider';
 import {SVGIcon} from '@wireapp/react-ui-kit/src/Icon/SVGIcon';
 import {t} from 'Util/LocalizerUtil';
 
-interface Props extends React.HTMLProps<HTMLDivElement> {}
+interface Props extends React.HTMLProps<HTMLDivElement> {
+  changeTitle: (title: string) => void;
+  title: string;
+}
 
-const Index = ({defaultSSOCode}: Props & ConnectedProps & DispatchProps) => {
+const Index = ({defaultSSOCode, changeTitle, title}: Props & ConnectedProps & DispatchProps) => {
   const {formatMessage: _} = useIntl();
   const {history} = useReactRouter();
   const [logoutReason, setLogoutReason] = useState<string>();
 
-  useTitle(`${t('authLandingPageTitleP1')} ${Config.getConfig().BRAND_NAME} - ${t('authLandingPageTitleP2')}`);
+  useEffect(() => {
+    changeTitle(`${t('authLandingPageTitleP1')} ${Config.getConfig().BRAND_NAME} - ${t('authLandingPageTitleP2')}`);
+  }, [title]);
+
   useEffect(() => {
     // Redirect to prefilled SSO login if default SSO code is set on backend
     if (defaultSSOCode) {

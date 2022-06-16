@@ -52,8 +52,6 @@ import {Runtime} from '@wireapp/commons';
 import {parseError, parseValidationErrors} from '../util/errorUtil';
 import {Redirect} from 'react-router';
 import {getSearchParams} from '../util/urlUtil';
-import {useTitle} from 'react-use';
-import {t} from 'Util/LocalizerUtil';
 
 export interface SingleSignOnFormProps extends React.HTMLAttributes<HTMLDivElement> {
   doLogin: (code: string) => Promise<void>;
@@ -92,8 +90,6 @@ const SingleSignOnForm = ({
   const [isValidLink, setIsValidLink] = useState(true);
 
   const [shouldAutoLogin, setShouldAutoLogin] = useState(false);
-
-  useTitle(`${t('authSSOLoginTitle')} . ${Config.getConfig().BRAND_NAME}`);
 
   useEffect(() => {
     const queryAutoLogin = UrlUtil.hasURLParameter(QUERY_KEY.SSO_AUTO_LOGIN);
