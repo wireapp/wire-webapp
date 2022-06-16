@@ -102,6 +102,7 @@ const ControlButtons: React.FC<ControlButtonsProps> = ({
                 title={t('tooltipConversationAddImage')}
                 className="conversation-button controls-right-button no-radius button-icon-large"
                 onClick={() => imageRef.current?.click()}
+                data-uie-name="do-share-image"
               >
                 <Icon.Image />
 
@@ -112,7 +113,6 @@ const ControlButtons: React.FC<ControlButtonsProps> = ({
                   id="conversation-input-bar-photo"
                   onChange={event => onSelectImages(Array.from(event.target.files))}
                   type="file"
-                  data-uie-name="do-share-image"
                 />
               </button>
             </li>
@@ -124,6 +124,7 @@ const ControlButtons: React.FC<ControlButtonsProps> = ({
                 title={t('tooltipConversationFile')}
                 className="conversation-button controls-right-button no-radius button-icon-large"
                 onClick={() => fileRef.current?.click()}
+                data-uie-name="do-share-file"
               >
                 <Icon.Attachment />
 
@@ -134,7 +135,6 @@ const ControlButtons: React.FC<ControlButtonsProps> = ({
                   tabIndex={-1}
                   onChange={event => onSelectFiles(Array.from(event.target.files))}
                   type="file"
-                  data-uie-name="do-share-file"
                 />
               </button>
             </li>
