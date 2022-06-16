@@ -27,6 +27,7 @@ import {
   Form,
   H1,
   Input,
+  InputBlock,
   InputSubmitCombo,
   IsMobile,
   Link,
@@ -130,31 +131,34 @@ const TeamName = ({
                 <H1 center>{_(teamNameStrings.headline)}</H1>
                 <Muted>{_(teamNameStrings.subhead)}</Muted>
                 <Form style={{marginTop: 30}}>
-                  <InputSubmitCombo>
-                    <Input
-                      value={enteredTeamName}
-                      ref={teamNameInput}
-                      onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-                        resetErrors();
-                        setEnteredTeamName(event.target.value);
-                      }}
-                      placeholder={_(teamNameStrings.teamNamePlaceholder)}
-                      pattern=".{2,256}"
-                      maxLength={256}
-                      minLength={2}
-                      required
-                      data-uie-name="enter-team-name"
-                    />
-                    <RoundIconButton
-                      disabled={!enteredTeamName || !isValidTeamName}
-                      type="submit"
-                      formNoValidate
-                      onClick={handleSubmit}
-                      data-uie-name="do-next"
-                    >
-                      <ArrowIcon />
-                    </RoundIconButton>
-                  </InputSubmitCombo>
+                  <InputBlock>
+                    <InputSubmitCombo>
+                      <Input
+                        id="enter-team-name"
+                        value={enteredTeamName}
+                        ref={teamNameInput}
+                        onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                          resetErrors();
+                          setEnteredTeamName(event.target.value);
+                        }}
+                        placeholder={_(teamNameStrings.teamNamePlaceholder)}
+                        pattern=".{2,256}"
+                        maxLength={256}
+                        minLength={2}
+                        required
+                        data-uie-name="enter-team-name"
+                      />
+                      <RoundIconButton
+                        disabled={!enteredTeamName || !isValidTeamName}
+                        type="submit"
+                        formNoValidate
+                        onClick={handleSubmit}
+                        data-uie-name="do-next"
+                      >
+                        <ArrowIcon />
+                      </RoundIconButton>
+                    </InputSubmitCombo>
+                  </InputBlock>
                   {error ? parseValidationErrors(error) : parseError(authError)}
                 </Form>
               </div>

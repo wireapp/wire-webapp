@@ -24,6 +24,7 @@ import {
   Form,
   H2,
   Input,
+  InputBlock,
   InputSubmitCombo,
   Link,
   RoundIconButton,
@@ -241,33 +242,36 @@ const ConversationJoin = ({
                 <FormattedMessage {...conversationJoinStrings.subhead} />
               </Text>
               <Form style={{marginTop: 30}}>
-                <InputSubmitCombo>
-                  <Input
-                    name="name"
-                    autoComplete="username"
-                    value={enteredName}
-                    ref={nameInput}
-                    onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-                      resetErrors();
-                      setEnteredName(event.target.value);
-                    }}
-                    placeholder={_(conversationJoinStrings.namePlaceholder)}
-                    maxLength={64}
-                    minLength={2}
-                    pattern=".{2,64}"
-                    required
-                    data-uie-name="enter-name"
-                  />
-                  <RoundIconButton
-                    disabled={!enteredName || !isValidName}
-                    type="submit"
-                    formNoValidate
-                    onClick={checkNameValidity}
-                    data-uie-name="do-next"
-                  >
-                    <ArrowIcon />
-                  </RoundIconButton>
-                </InputSubmitCombo>
+                <InputBlock>
+                  <InputSubmitCombo>
+                    <Input
+                      id="enter-name"
+                      name="name"
+                      autoComplete="username"
+                      value={enteredName}
+                      ref={nameInput}
+                      onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                        resetErrors();
+                        setEnteredName(event.target.value);
+                      }}
+                      placeholder={_(conversationJoinStrings.namePlaceholder)}
+                      maxLength={64}
+                      minLength={2}
+                      pattern=".{2,64}"
+                      required
+                      data-uie-name="enter-name"
+                    />
+                    <RoundIconButton
+                      disabled={!enteredName || !isValidName}
+                      type="submit"
+                      formNoValidate
+                      onClick={checkNameValidity}
+                      data-uie-name="do-next"
+                    >
+                      <ArrowIcon />
+                    </RoundIconButton>
+                  </InputSubmitCombo>
+                </InputBlock>
                 {error ? parseValidationErrors(error) : parseError(conversationError)}
               </Form>
               {!isPwaEnabled && (
