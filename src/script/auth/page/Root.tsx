@@ -105,7 +105,7 @@ const Root: React.FC<RootProps & ConnectedProps & DispatchProps> = ({
 
   const ProtectedSetHandle = () => isAuthenticatedCheck(<SetHandle />);
   const ProtectedSetEmail = () => isAuthenticatedCheck(<SetEmail />);
-  const ProtectedSetPassword = () => isAuthenticatedCheck(<SetPassword />);
+  const ProtectedSetPassword = () => isAuthenticatedCheck(<SetPassword title={title} changeTitle={changeTitle} />);
 
   return (
     <IntlProvider locale={normalizeLanguage(language)} messages={loadLanguage(language)}>
@@ -140,7 +140,7 @@ const Root: React.FC<RootProps & ConnectedProps & DispatchProps> = ({
               <Route path={ROUTE.SET_EMAIL} component={ProtectedSetEmail} />
               <Route path={ROUTE.SET_HANDLE} component={ProtectedSetHandle} />
               <Route path={ROUTE.SET_PASSWORD}>
-                <ProtectedSetPassword title={title} changeTitle={changeTitle} />
+                <ProtectedSetPassword />
               </Route>
               <Route path={`${ROUTE.SSO}/:code?`}>
                 <SingleSignOn title={title} changeTitle={changeTitle} />

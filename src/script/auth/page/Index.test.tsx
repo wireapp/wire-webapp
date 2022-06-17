@@ -32,6 +32,7 @@ import {createMemoryHistory} from 'history';
 import waitForExpect from 'wait-for-expect';
 import {ROUTE} from '../route';
 import {initialAuthState} from '../module/reducer/authReducer';
+import {t} from 'Util/LocalizerUtil';
 
 jest.mock('../util/SVGProvider');
 
@@ -42,7 +43,16 @@ class IndexPage {
     store: MockStoreEnhanced<TypeUtil.RecursivePartial<RootState>, ThunkDispatch<RootState, Api, AnyAction>>,
     history?: History<any>,
   ) {
-    this.driver = mountComponent(<Index />, store, history);
+    this.driver = mountComponent(
+      <Index
+        title=""
+        changeTitle={title => {
+          document.title = title;
+        }}
+      />,
+      store,
+      history,
+    );
   }
 
   getCreateAccountButton = () => this.driver.find('button[data-uie-name="go-set-account-type"]');
@@ -57,6 +67,25 @@ class IndexPage {
 }
 
 describe('when visiting the index page', () => {
+  it('shows the title', async () => {
+    const indexTitle = `${t('authLandingPageTitleP1')} ${Config.getConfig().BRAND_NAME} - ${t(
+      'authLandingPageTitleP2',
+    )}`;
+    new IndexPage(
+      mockStoreFactory()({
+        ...initialRootState,
+        runtimeState: {
+          hasCookieSupport: true,
+          hasIndexedDbSupport: true,
+          isSupportedBrowser: true,
+        },
+      }),
+    );
+    await waitForExpect(() => {
+      expect(global.window.document.title).toBe(indexTitle);
+    });
+  });
+
   it('shows the logo', () => {
     const indexPage = new IndexPage(
       mockStoreFactory()({
