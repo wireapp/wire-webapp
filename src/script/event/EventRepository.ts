@@ -395,7 +395,10 @@ export class EventRepository {
   ): Promise<EventRecord | undefined> {
     if (decryptionError) {
       this.logger.warn(`Decryption Error: (${decryptionError.code}) ${decryptionError.message}`, decryptionError);
-      const ignoredCodes = [208, 209];
+      const ignoredCodes = [
+        208, // Outated event decyption error (see https://github.com/wireapp/wire-web-core/blob/5c8c56097eadfa55e79856cd6745087f0fd12e24/packages/proteus/README.md#decryption-errors)
+        209, // Duplicate event decryption error (see https://github.com/wireapp/wire-web-core/blob/5c8c56097eadfa55e79856cd6745087f0fd12e24/packages/proteus/README.md#decryption-errors)
+      ];
       if (ignoredCodes.includes(decryptionError.code)) {
         return undefined;
       }
