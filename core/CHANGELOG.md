@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [27.4.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/compare/@wireapp/core@27.3.9...@wireapp/core@27.4.0) (2022-06-17)
+
+
+### Features
+
+* **core:** Create MLS capable devices ([#4287](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/issues/4287)) ([8c9c0ca](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/commit/8c9c0ca1c540370aa2fc386407695318f4047f0a))
+
+
+
+
+
 ## [27.3.9](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/compare/@wireapp/core@27.3.8...@wireapp/core@27.3.9) (2022-06-15)
 
 
