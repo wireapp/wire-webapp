@@ -47,6 +47,7 @@ import {TeamService} from './team/';
 import {UserService} from './user/';
 import {AccountService} from './account/';
 import {LinkPreviewService} from './linkPreview';
+import type {CoreCrypto} from '@otak/core-crypto';
 import {WEBSOCKET_STATE} from '@wireapp/api-client/src/tcp/ReconnectingWebsocket';
 
 export type ProcessedEventPayload = HandledEventPayload;
@@ -109,6 +110,7 @@ interface AccountOptions {
    *    - make it likely that all prekeys get consumed while the device is offline and the last resort prekey will be used to create new session
    */
   nbPrekeys?: number;
+  enableMLS?: boolean;
 }
 
 const coreDefaultClient: ClientInfo = {
@@ -123,6 +125,8 @@ export class Account extends EventEmitter {
   private readonly createStore: CreateStoreFn;
   private storeEngine?: CRUDEngine;
   private readonly nbPrekeys: number;
+  private readonly enableMLS: boolean;
+  private coreCryptoClient?: CoreCrypto;
 
   public static readonly TOPIC = TOPIC;
   public service?: {
@@ -148,13 +152,14 @@ export class Account extends EventEmitter {
    */
   constructor(
     apiClient: APIClient = new APIClient(),
-    {createStore = () => undefined, nbPrekeys = 2}: AccountOptions = {},
+    {createStore = () => undefined, nbPrekeys = 2, enableMLS = false}: AccountOptions = {},
   ) {
     super();
     this.apiClient = apiClient;
     this.backendFeatures = this.apiClient.backendFeatures;
     this.nbPrekeys = nbPrekeys;
     this.createStore = createStore;
+    this.enableMLS = enableMLS;
 
     apiClient.on(APIClient.TOPIC.COOKIE_REFRESH, async (cookie?: Cookie) => {
       if (cookie && this.storeEngine) {
@@ -352,8 +357,21 @@ export class Account extends EventEmitter {
     const loadedClient = await this.service!.client.getLocalClient();
     await this.apiClient.api.client.getClient(loadedClient.id);
     this.apiClient.context!.clientId = loadedClient.id;
+    if (this.enableMLS) {
+      this.coreCryptoClient = await this.createMLSClient(loadedClient);
+    }
 
     return loadedClient;
+  }
+
+  private async createMLSClient(client: RegisteredClient): Promise<CoreCrypto> {
+    const {CoreCrypto} = await import('@otak/core-crypto');
+    const {userId, domain} = this.apiClient.context!;
+    return CoreCrypto.init({
+      path: 'path/to/database',
+      key: 'a root identity key (i.e. enclaved encryption key for this device)',
+      clientId: `${userId}:${client.id}@${domain}`,
+    });
   }
 
   private async registerClient(
@@ -364,12 +382,22 @@ export class Account extends EventEmitter {
     if (!this.service) {
       throw new Error('Services are not set.');
     }
+    this.logger.info(`Creating new client {mls: ${!!this.enableMLS}}`);
     const registeredClient = await this.service.client.register(loginData, clientInfo, entropyData);
+    if (this.enableMLS) {
+      this.coreCryptoClient = await this.createMLSClient(registeredClient);
+      await this.service.client.uploadMLSPublicKeys(this.coreCryptoClient.clientPublicKey(), registeredClient.id);
+      await this.service.client.uploadMLSKeyPackages(
+        this.coreCryptoClient.clientKeypackages(this.nbPrekeys),
+        registeredClient.id,
+      );
+    }
     this.apiClient.context!.clientId = registeredClient.id;
-    this.logger.log('Client is created');
+    this.logger.info('Client is created');
 
     await this.service!.notification.initializeNotificationStream();
     await this.service!.client.synchronizeClients();
+    await this.service!.cryptography.initCryptobox();
 
     return {isNewClient: true, localClient: registeredClient};
   }

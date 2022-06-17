@@ -25,6 +25,7 @@ import type {CRUDEngine} from '@wireapp/store-engine';
 
 import type {CryptographyService} from '../cryptography/';
 import {ClientInfo, ClientBackendRepository, ClientDatabaseRepository} from './';
+import {Converter} from 'bazinga64';
 
 export interface MetaClient extends RegisteredClient {
   domain?: string;
@@ -130,9 +131,28 @@ export class ClientService {
     };
 
     const client = await this.backend.postClient(newClient);
+
     await this.createLocalClient(client, this.apiClient.context.domain);
-    await this.cryptographyService.initCryptobox();
 
     return client;
+  }
+
+  /**
+   * Will make the given client mls capable (generate and upload key packages)
+   *
+   * @param mlsClient Intance of the coreCrypto that represents the mls client
+   * @param clientId The id of the client
+   */
+  public async uploadMLSPublicKeys(publicKey: Uint8Array, clientId: string) {
+    return this.backend.putClient(clientId, {
+      mls_public_keys: {ed25519: btoa(Converter.arrayBufferViewToBaselineString(publicKey))},
+    });
+  }
+
+  public async uploadMLSKeyPackages(keypackages: Uint8Array[], clientId: string) {
+    return this.backend.uploadMLSKeyPackages(
+      clientId,
+      keypackages.map(keypackage => btoa(Converter.arrayBufferViewToBaselineString(keypackage))),
+    );
   }
 }
