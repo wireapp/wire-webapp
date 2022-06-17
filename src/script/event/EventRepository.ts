@@ -22,7 +22,6 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 import {amplify} from 'amplify';
 import ko from 'knockout';
 import {USER_EVENT, CONVERSATION_EVENT} from '@wireapp/api-client/src/event/';
-import type {Notification} from '@wireapp/api-client/src/notification/';
 import {container} from 'tsyringe';
 import {getLogger, Logger} from 'Util/Logger';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
@@ -57,18 +56,13 @@ import {PayloadBundleSource} from '@wireapp/core/src/main/conversation';
 
 export class EventRepository {
   logger: Logger;
-  currentClient: ko.Observable<ClientEntity>;
+  currentClient: ko.Observable<ClientEntity> | undefined;
   notificationHandlingState: ko.Observable<NOTIFICATION_HANDLING_STATE>;
-  previousHandlingState: NOTIFICATION_HANDLING_STATE;
+  previousHandlingState: NOTIFICATION_HANDLING_STATE | undefined;
   notificationsHandled: number;
-  notificationsLoaded: ko.Observable<boolean>;
-  notificationsPromises: [(value?: unknown) => void, (value?: unknown) => void];
   notificationsTotal: number;
-  notificationsQueue: ko.ObservableArray<Notification>;
-  lastNotificationId: ko.Observable<string>;
-  notificationsBlocked: boolean;
-  webSocketBuffer: Notification[];
-  lastEventDate: ko.Observable<string>;
+  lastNotificationId: ko.Observable<string | undefined>;
+  lastEventDate: ko.Observable<string | undefined>;
   eventProcessMiddlewares: Function[];
 
   static get CONFIG() {
@@ -186,6 +180,8 @@ export class EventRepository {
     await this.handleTimeDrift();
     const connect = () => {
       this.notificationHandlingState(NOTIFICATION_HANDLING_STATE.STREAM);
+      // We make sure there is only be a single active connection to the WebSocket.
+      this.disconnectWebSocket?.();
       return new Promise<void>(async resolve => {
         this.disconnectWebSocket = await account.listen({
           onConnected: () => {
@@ -293,7 +289,7 @@ export class EventRepository {
    * @param source Source of injection
    * @returns Resolves when the event has been processed
    */
-  async injectEvent(event: EventRecord, source: EventSource = EventSource.INJECTED): Promise<EventRecord> {
+  async injectEvent(event: EventRecord, source: EventSource = EventSource.INJECTED): Promise<EventRecord | undefined> {
     if (!event) {
       throw new EventError(EventError.TYPE.NO_EVENT, EventError.MESSAGE.NO_EVENT);
     }
@@ -360,7 +356,7 @@ export class EventRepository {
   private handleEvent(
     {event, decryptedData, decryptionError}: Omit<ProcessedEventPayload, 'event'> & {event: EventRecord},
     source: EventSource,
-  ): Promise<EventRecord> {
+  ): Promise<EventRecord | undefined> {
     const logObject = {eventJson: JSON.stringify(event), eventObject: event};
     const validationResult = validateEvent(
       event as {time: string; type: CONVERSATION_EVENT | USER_EVENT},
@@ -396,9 +392,16 @@ export class EventRepository {
     source: EventSource,
     decryptedData?: GenericMessage,
     decryptionError?: HandledEventPayload['decryptionError'],
-  ): Promise<EventRecord> {
+  ): Promise<EventRecord | undefined> {
     if (decryptionError) {
       this.logger.warn(`Decryption Error: (${decryptionError.code}) ${decryptionError.message}`, decryptionError);
+      const ignoredCodes = [
+        208, // Outated event decyption error (see https://github.com/wireapp/wire-web-core/blob/5c8c56097eadfa55e79856cd6745087f0fd12e24/packages/proteus/README.md#decryption-errors)
+        209, // Duplicate event decryption error (see https://github.com/wireapp/wire-web-core/blob/5c8c56097eadfa55e79856cd6745087f0fd12e24/packages/proteus/README.md#decryption-errors)
+      ];
+      if (ignoredCodes.includes(decryptionError.code)) {
+        return undefined;
+      }
       amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.E2EE.FAILED_MESSAGE_DECRYPTION, {
         cause: decryptionError.code,
       });
