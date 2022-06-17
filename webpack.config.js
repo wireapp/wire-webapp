@@ -31,6 +31,14 @@ module.exports = {
   externals: {
     'fs-extra': '{}',
   },
+  module: {
+    rules: [
+      {
+        test: /\.js$/,
+        loader: require.resolve('@open-wc/webpack-import-meta-loader'),
+      },
+    ],
+  },
   mode: 'production',
   node: {
     fs: 'empty',
@@ -41,5 +49,9 @@ module.exports = {
     library: projectName,
     path: `${__dirname}/dist`,
   },
-  plugins: [new webpack.BannerPlugin(`${pkg.name} v${pkg.version}`)],
+  plugins: [
+    new webpack.BannerPlugin(`${pkg.name} v${pkg.version}`),
+    /* All wasm files will be ignored from webpack and copied over to the destination folder, they don't need any webpack processing */
+    new webpack.IgnorePlugin({resourceRegExp: /.*\.wasm/}),
+  ],
 };
