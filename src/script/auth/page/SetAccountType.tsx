@@ -31,7 +31,7 @@ import {
   TeamIcon,
   Text,
 } from '@wireapp/react-ui-kit';
-import React, {useEffect} from 'react';
+import React from 'react';
 import {useIntl} from 'react-intl';
 import {Redirect} from 'react-router';
 import {Config} from '../../Config';
@@ -41,20 +41,12 @@ import {ROUTE} from '../route';
 import {Runtime} from '@wireapp/commons';
 import {pathWithParams} from '../util/urlUtil';
 import Page from './Page';
-import {t} from 'Util/LocalizerUtil';
 
-interface Props extends React.HTMLProps<HTMLDivElement> {
-  changeTitle: (title: string) => void;
-  title: string;
-}
+interface Props extends React.HTMLProps<HTMLDivElement> {}
 
-const SetAccountType = ({changeTitle, title}: Props) => {
+const SetAccountType = ({}: Props) => {
   const {formatMessage: _} = useIntl();
   const isMacOsWrapper = Runtime.isDesktopApp() && Runtime.isMacOS();
-
-  useEffect(() => {
-    changeTitle(`${t('authAccCreationTitle')} . ${Config.getConfig().BRAND_NAME}`);
-  }, [title]);
 
   const backArrow = (
     <RouterLink to={ROUTE.INDEX} data-uie-name="go-index" aria-label={_(setAccountTypeStrings.goBack)}>

@@ -19,7 +19,7 @@
 
 import {ValidationUtil} from '@wireapp/commons';
 import {Button, ContainerXS, Form, H1, Input, Small} from '@wireapp/react-ui-kit';
-import React, {useRef, useState, useEffect} from 'react';
+import React, {useRef, useState} from 'react';
 import {useIntl} from 'react-intl';
 import {connect} from 'react-redux';
 import {AnyAction, Dispatch} from 'redux';
@@ -33,20 +33,14 @@ import {RootState, bindActionCreators} from '../module/reducer';
 import * as SelfSelector from '../module/selector/SelfSelector';
 import {ROUTE} from '../route';
 import Page from './Page';
-import {t} from 'Util/LocalizerUtil';
 
-interface Props extends React.HTMLProps<HTMLDivElement> {
-  changeTitle: (title: string) => void;
-  title: string;
-}
+interface Props extends React.HTMLProps<HTMLDivElement> {}
 
 const SetPassword = ({
   isSelfSSOUser,
   hasSelfPassword,
   doSetPassword,
   isFetching,
-  changeTitle,
-  title,
 }: Props & ConnectedProps & DispatchProps) => {
   const {formatMessage: _} = useIntl();
 
@@ -55,10 +49,6 @@ const SetPassword = ({
   const [isValidPassword, setIsValidPassword] = useState(true);
   const [password, setPassword] = useState('');
   const {history} = useReactRouter();
-
-  useEffect(() => {
-    changeTitle(`${t('authForgotPasswordTitle')} . ${Config.getConfig().BRAND_NAME}`);
-  }, [title]);
 
   const onSetPassword = async (event: React.FormEvent): Promise<void> => {
     event.preventDefault();

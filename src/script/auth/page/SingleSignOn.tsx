@@ -33,7 +33,7 @@ import {
   Text,
 } from '@wireapp/react-ui-kit';
 import {WebAppEvents} from '@wireapp/webapp-events';
-import React, {useRef, useState, useEffect} from 'react';
+import React, {useRef, useState} from 'react';
 import {useIntl} from 'react-intl';
 import {connect} from 'react-redux';
 import {AnyAction, Dispatch} from 'redux';
@@ -52,24 +52,16 @@ import Page from './Page';
 import SingleSignOnForm from './SingleSignOnForm';
 import * as AuthSelector from '../module/selector/AuthSelector';
 import {amplify} from 'amplify';
-import {t} from 'Util/LocalizerUtil';
 
-interface Props extends React.HTMLAttributes<HTMLDivElement> {
-  changeTitle: (title: string) => void;
-  title: string;
-}
+interface Props extends React.HTMLAttributes<HTMLDivElement> {}
 
 const logger = getLogger('SingleSignOn');
 
-const SingleSignOn = ({hasDefaultSSOCode, changeTitle, title}: Props & ConnectedProps & DispatchProps) => {
+const SingleSignOn = ({hasDefaultSSOCode}: Props & ConnectedProps & DispatchProps) => {
   const {formatMessage: _} = useIntl();
   const ssoWindowRef = useRef<Window>();
   const {match} = useReactRouter<{code?: string}>();
   const [isOverlayOpen, setIsOverlayOpen] = useState(false);
-
-  useEffect(() => {
-    changeTitle(`${t('authSSOLoginTitle')} . ${Config.getConfig().BRAND_NAME}`);
-  }, [title]);
 
   const handleSSOWindow = (code: string): Promise<void> => {
     const POPUP_HEIGHT = 520;

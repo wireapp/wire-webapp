@@ -33,21 +33,13 @@ import {AnyAction, Dispatch} from 'redux';
 import {connect} from 'react-redux';
 import SVGProvider from '../util/SVGProvider';
 import {SVGIcon} from '@wireapp/react-ui-kit/src/Icon/SVGIcon';
-import {t} from 'Util/LocalizerUtil';
 
-interface Props extends React.HTMLProps<HTMLDivElement> {
-  changeTitle: (title: string) => void;
-  title: string;
-}
+interface Props extends React.HTMLProps<HTMLDivElement> {}
 
-const Index = ({defaultSSOCode, changeTitle, title}: Props & ConnectedProps & DispatchProps) => {
+const Index = ({defaultSSOCode}: Props & ConnectedProps & DispatchProps) => {
   const {formatMessage: _} = useIntl();
   const {history} = useReactRouter();
   const [logoutReason, setLogoutReason] = useState<string>();
-
-  useEffect(() => {
-    changeTitle(`${t('authLandingPageTitleP1')} ${Config.getConfig().BRAND_NAME} - ${t('authLandingPageTitleP2')}`);
-  }, [title]);
 
   useEffect(() => {
     // Redirect to prefilled SSO login if default SSO code is set on backend

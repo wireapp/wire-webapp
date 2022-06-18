@@ -19,7 +19,7 @@
 
 import {pathWithParams} from '@wireapp/commons/src/main/util/UrlUtil';
 import {StyledApp, Loading, ContainerXS} from '@wireapp/react-ui-kit';
-import React, {useEffect, useState} from 'react';
+import React, {useEffect} from 'react';
 import {IntlProvider} from 'react-intl';
 import {connect} from 'react-redux';
 import {HashRouter as Router, Redirect, Route, Switch} from 'react-router-dom';
@@ -54,6 +54,7 @@ import VerifyEmailLink from './VerifyEmailLink';
 import VerifyPhoneCode from './VerifyPhoneCode';
 import CustomEnvironmentRedirect from './CustomEnvironmentRedirect';
 import SetEntropyPage from './SetEntropyPage';
+import {t} from 'Util/LocalizerUtil';
 
 interface RootProps {}
 
@@ -66,8 +67,6 @@ const Root: React.FC<RootProps & ConnectedProps & DispatchProps> = ({
   stopPolling,
   doGetSSOSettings,
 }) => {
-  const [title, setTitle] = useState('Wire');
-
   useEffect(() => {
     startPolling();
     window.onbeforeunload = () => {
@@ -79,14 +78,6 @@ const Root: React.FC<RootProps & ConnectedProps & DispatchProps> = ({
   useEffect(() => {
     doGetSSOSettings();
   }, []);
-
-  const changeTitle = (title = 'Wire') => {
-    setTitle(title);
-  };
-
-  useEffect(() => {
-    document.title = title;
-  }, [title]);
 
   const loadLanguage = (language: string) => {
     return require(`I18n/${mapLanguage(language)}.json`);
@@ -105,7 +96,7 @@ const Root: React.FC<RootProps & ConnectedProps & DispatchProps> = ({
 
   const ProtectedSetHandle = () => isAuthenticatedCheck(<SetHandle />);
   const ProtectedSetEmail = () => isAuthenticatedCheck(<SetEmail />);
-  const ProtectedSetPassword = () => isAuthenticatedCheck(<SetPassword title={title} changeTitle={changeTitle} />);
+  const ProtectedSetPassword = () => isAuthenticatedCheck(<SetPassword />);
 
   return (
     <IntlProvider locale={normalizeLanguage(language)} messages={loadLanguage(language)}>
@@ -117,9 +108,16 @@ const Root: React.FC<RootProps & ConnectedProps & DispatchProps> = ({
         ) : (
           <Router hashType="noslash">
             <Switch>
-              <Route exact path={ROUTE.INDEX}>
-                <Index title={title} changeTitle={changeTitle} />
-              </Route>
+              <Route
+                exact
+                path={ROUTE.INDEX}
+                render={() => {
+                  document.title = `${t('authLandingPageTitleP1')} ${Config.getConfig().BRAND_NAME} . ${t(
+                    'authLandingPageTitleP2',
+                  )}`;
+                  return <Index />;
+                }}
+              />
               <Route path={ROUTE.CHECK_PASSWORD} component={CheckPassword} />
               <Route path={ROUTE.CLIENTS} component={ProtectedClientManager} />
               <Route path={ROUTE.CONVERSATION_JOIN_INVALID} component={ConversationJoinInvalid} />
@@ -130,21 +128,37 @@ const Root: React.FC<RootProps & ConnectedProps & DispatchProps> = ({
               />
               <Route path={ROUTE.HISTORY_INFO} component={ProtectedHistoryInfo} />
               <Route path={ROUTE.INITIAL_INVITE} component={ProtectedInitialInvite} />
-              <Route path={ROUTE.LOGIN}>
-                <Login title={title} changeTitle={changeTitle} />
-              </Route>
+              <Route
+                path={ROUTE.LOGIN}
+                render={() => {
+                  document.title = `${t('authLoginTitle')} . ${Config.getConfig().BRAND_NAME}`;
+                  return <Login />;
+                }}
+              />
               <Route path={ROUTE.LOGIN_PHONE} component={PhoneLogin} />
-              <Route path={ROUTE.SET_ACCOUNT_TYPE}>
-                <SetAccountType title={title} changeTitle={changeTitle} />
-              </Route>
+              <Route
+                path={ROUTE.SET_ACCOUNT_TYPE}
+                render={() => {
+                  document.title = `${t('authAccCreationTitle')} . ${Config.getConfig().BRAND_NAME}`;
+                  return <SetAccountType />;
+                }}
+              />
               <Route path={ROUTE.SET_EMAIL} component={ProtectedSetEmail} />
               <Route path={ROUTE.SET_HANDLE} component={ProtectedSetHandle} />
-              <Route path={ROUTE.SET_PASSWORD}>
-                <ProtectedSetPassword />
-              </Route>
-              <Route path={`${ROUTE.SSO}/:code?`}>
-                <SingleSignOn title={title} changeTitle={changeTitle} />
-              </Route>
+              <Route
+                path={ROUTE.SET_PASSWORD}
+                render={() => {
+                  document.title = `${t('authForgotPasswordTitle')} . ${Config.getConfig().BRAND_NAME}`;
+                  return <ProtectedSetPassword />;
+                }}
+              />
+              <Route
+                path={`${ROUTE.SSO}/:code?`}
+                render={() => {
+                  document.title = `${t('authSSOLoginTitle')} . ${Config.getConfig().BRAND_NAME}`;
+                  return <SingleSignOn />;
+                }}
+              />
               <Route path={ROUTE.VERIFY_EMAIL_LINK} component={VerifyEmailLink} />
               <Route path={ROUTE.VERIFY_PHONE_CODE} component={VerifyPhoneCode} />
               <Route path={ROUTE.CUSTOM_ENV_REDIRECT} component={CustomEnvironmentRedirect} />

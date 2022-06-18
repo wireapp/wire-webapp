@@ -65,12 +65,8 @@ import {parseError, parseValidationErrors} from '../util/errorUtil';
 import {UrlUtil} from '@wireapp/commons';
 import Page from './Page';
 import EntropyContainer from './EntropyContainer';
-import {t} from 'Util/LocalizerUtil';
 
-interface Props extends React.HTMLProps<HTMLDivElement> {
-  changeTitle: (title: string) => void;
-  title: string;
-}
+interface Props extends React.HTMLProps<HTMLDivElement> {}
 
 const Login = ({
   loginError,
@@ -88,8 +84,6 @@ const Login = ({
   loginData,
   defaultSSOCode,
   isSendingTwoFactorCode,
-  changeTitle,
-  title,
 }: Props & ConnectedProps & DispatchProps) => {
   const logger = getLogger('Login');
   const {formatMessage: _} = useIntl();
@@ -122,9 +116,6 @@ const Login = ({
         });
       }
     : undefined;
-  useEffect(() => {
-    changeTitle(`${t('authLoginTitle')} . ${Config.getConfig().BRAND_NAME}`);
-  }, [title]);
 
   useEffect(() => {
     const queryClientType = UrlUtil.getURLParameter(QUERY_KEY.CLIENT_TYPE);
