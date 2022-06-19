@@ -1954,6 +1954,16 @@
     "@nodelib/fs.scandir" "2.1.4"
     fastq "^1.6.0"
 
+"@open-wc/webpack-import-meta-loader@0.4.7":
+  version "0.4.7"
+  resolved "https://registry.yarnpkg.com/@open-wc/webpack-import-meta-loader/-/webpack-import-meta-loader-0.4.7.tgz#d8212640a386a66bf06a2a4c101936467839b5a1"
+  integrity sha512-F3d1EHRckk2+ZpgEEAgVITp8BU9DYLBhKOhNMREeQ1BwILRIhrt+V1bebpnd0Mz595jzd7Yh1wSibLsXibkCpg==
+
+"@otak/core-crypto@0.2.0-beta-3":
+  version "0.2.0-beta-3"
+  resolved "https://registry.yarnpkg.com/@otak/core-crypto/-/core-crypto-0.2.0-beta-3.tgz#1863e9b4152e7db4c96e245cffdfef0ddade670a"
+  integrity sha512-KWh9a1Zi+NRgMnouquQVkmuONq630LP9YUcNtuhM39kIfSg6XRFUhIyPhidCb9QGb2zPylls1pHjxrsjHOUcvg==
+
 "@protobufjs/aspromise@^1.1.1", "@protobufjs/aspromise@^1.1.2":
   version "1.1.2"
   resolved "https://registry.yarnpkg.com/@protobufjs/aspromise/-/aspromise-1.1.2.tgz#9b8b0cc663d669a7d8f6f5d0893a14d348f30fbf"
@@ -3145,11 +3155,13 @@
     logdown "3.3.1"
     rimraf "3.0.2"
 
-"@wireapp/core@27.3.9":
-  version "27.3.9"
-  resolved "https://registry.yarnpkg.com/@wireapp/core/-/core-27.3.9.tgz#2c30ce7599a44f808af626e023c43968887ce7d1"
-  integrity sha512-uGU2sunP5RkI+beyZ9g72lMt6XJiOBEVrw/IeKbgoP0wy5O8WzC0v/kwpAFgWq3oS2+alZJVhGENf0YHMMMmHA==
+"@wireapp/core@27.4.0":
+  version "27.4.0"
+  resolved "https://registry.yarnpkg.com/@wireapp/core/-/core-27.4.0.tgz#6983d40a7e89f49fd4bb384ba4ea4e44f7737226"
+  integrity sha512-7cwehPKcmQG4PmhAmVmqo+64TNDKp41X4MfOA+Crs9byXcoPCyZHW7ObUjNzbi+EC2tSyoiNfslDGQwvYHl/9w==
   dependencies:
+    "@open-wc/webpack-import-meta-loader" "0.4.7"
+    "@otak/core-crypto" "0.2.0-beta-3"
     "@types/long" "4.0.1"
     "@types/node" "~14"
     "@wireapp/api-client" "19.6.4"
