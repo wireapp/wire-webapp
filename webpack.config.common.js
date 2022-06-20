@@ -20,6 +20,7 @@
 const path = require('path');
 const webpack = require('webpack');
 const WorkboxPlugin = require('workbox-webpack-plugin');
+const CopyPlugin = require('copy-webpack-plugin');
 const {ROOT_PATH, DIST_PATH, SRC_PATH} = require('./locations');
 
 const dist = path.resolve(DIST_PATH, 'static');
@@ -102,6 +103,11 @@ module.exports = {
       swDest: path.resolve(dist, 'sw.js'),
       swSrc: path.resolve(SRC_PATH, 'sw.js'),
     }),
+    /* All wasm files will be ignored from webpack and copied over to the destination folder, they don't need any webpack processing */
+    new CopyPlugin({
+      patterns: [{context: 'node_modules/@otak/core-crypto/platforms/web', from: 'assets/*', to: `${dist}`}],
+    }),
+    new webpack.IgnorePlugin({resourceRegExp: /.*\.wasm/}),
   ],
   resolve: {
     alias: {
