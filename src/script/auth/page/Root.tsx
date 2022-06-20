@@ -88,6 +88,10 @@ const Root: React.FC<RootProps & ConnectedProps & DispatchProps> = ({
     return null;
   };
 
+  const setTitle = (title = 'Wire') => {
+    document.title = title;
+  };
+
   const isAuthenticatedCheck = (page: any): any => (page ? (isAuthenticated ? page : navigate('/auth')) : null);
 
   const ProtectedHistoryInfo = () => isAuthenticatedCheck(<HistoryInfo />);
@@ -112,9 +116,9 @@ const Root: React.FC<RootProps & ConnectedProps & DispatchProps> = ({
                 exact
                 path={ROUTE.INDEX}
                 render={() => {
-                  document.title = `${t('authLandingPageTitleP1')} ${Config.getConfig().BRAND_NAME} . ${t(
-                    'authLandingPageTitleP2',
-                  )}`;
+                  setTitle(
+                    `${t('authLandingPageTitleP1')} ${Config.getConfig().BRAND_NAME} . ${t('authLandingPageTitleP2')}`,
+                  );
                   return <Index />;
                 }}
               />
@@ -131,7 +135,7 @@ const Root: React.FC<RootProps & ConnectedProps & DispatchProps> = ({
               <Route
                 path={ROUTE.LOGIN}
                 render={() => {
-                  document.title = `${t('authLoginTitle')} . ${Config.getConfig().BRAND_NAME}`;
+                  setTitle(`${t('authLoginTitle')} . ${Config.getConfig().BRAND_NAME}`);
                   return <Login />;
                 }}
               />
@@ -139,7 +143,7 @@ const Root: React.FC<RootProps & ConnectedProps & DispatchProps> = ({
               <Route
                 path={ROUTE.SET_ACCOUNT_TYPE}
                 render={() => {
-                  document.title = `${t('authAccCreationTitle')} . ${Config.getConfig().BRAND_NAME}`;
+                  setTitle(`${t('authAccCreationTitle')} . ${Config.getConfig().BRAND_NAME}`);
                   return <SetAccountType />;
                 }}
               />
@@ -148,14 +152,14 @@ const Root: React.FC<RootProps & ConnectedProps & DispatchProps> = ({
               <Route
                 path={ROUTE.SET_PASSWORD}
                 render={() => {
-                  document.title = `${t('authForgotPasswordTitle')} . ${Config.getConfig().BRAND_NAME}`;
+                  setTitle(`${t('authForgotPasswordTitle')} . ${Config.getConfig().BRAND_NAME}`);
                   return <ProtectedSetPassword />;
                 }}
               />
               <Route
                 path={`${ROUTE.SSO}/:code?`}
                 render={() => {
-                  document.title = `${t('authSSOLoginTitle')} . ${Config.getConfig().BRAND_NAME}`;
+                  setTitle(`${t('authSSOLoginTitle')} . ${Config.getConfig().BRAND_NAME}`);
                   return <SingleSignOn />;
                 }}
               />
