@@ -33,7 +33,6 @@ import {LegalHoldModalViewModel} from './content/LegalHoldModalViewModel';
 import {EmojiInputViewModel} from './content/EmojiInputViewModel';
 import {ModalsViewModel} from './ModalsViewModel';
 import {ServiceModalViewModel} from './content/ServiceModalViewModel';
-import {InviteModalViewModel} from './content/InviteModalViewModel';
 import {ConversationError} from '../error/ConversationError';
 import {ConnectRequestsViewModel} from './content/ConnectRequestsViewModel';
 import {GiphyViewModel} from './content/GiphyViewModel';
@@ -104,7 +103,6 @@ export class ContentViewModel {
   historyExport: HistoryExportViewModel;
   historyImport: HistoryImportViewModel;
   inputBar: InputBarViewModel;
-  inviteModal: InviteModalViewModel;
   legalHoldModal: LegalHoldModalViewModel;
   logger: Logger;
   readonly isFederated?: boolean;
@@ -168,7 +166,6 @@ export class ContentViewModel {
       repositories.message,
     );
     this.serviceModal = new ServiceModalViewModel(repositories.integration, mainViewModel.actions);
-    this.inviteModal = new InviteModalViewModel();
     this.legalHoldModal = new LegalHoldModalViewModel(
       repositories.conversation,
       repositories.team,
