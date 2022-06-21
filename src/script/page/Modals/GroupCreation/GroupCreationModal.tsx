@@ -44,7 +44,7 @@ import {User} from '../../../entity/User';
 import {ACCESS_STATE} from '../../../conversation/AccessState';
 import Icon from 'Components/Icon';
 import {t} from 'Util/LocalizerUtil';
-import {onEscKey, offEscKey} from 'Util/KeyboardUtil';
+import {onEscKey, offEscKey, KEY} from 'Util/KeyboardUtil';
 import {
   ACCESS_TYPES,
   teamPermissionsForAccessState,
@@ -319,11 +319,12 @@ const GroupCreationModal: React.FC<GroupCreationModalProps> = ({
             )}
           </div>
         )}
-
+        {/* eslint-disable */}
         {stateIsPreferences && (
           <>
             <div className="modal-input-wrapper">
               <TextInputForwarded
+                autoFocus
                 label={t('groupCreationPreferencesPlaceholder')}
                 placeholder={t('groupCreationPreferencesPlaceholder')}
                 uieName="enter-group-name"
@@ -336,11 +337,17 @@ const GroupCreationModal: React.FC<GroupCreationModalProps> = ({
                   const trimmedName = value.trim();
                   setGroupName(trimmedName);
                 }}
+                onKeyDown={(event: React.KeyboardEvent<HTMLInputElement>) => {
+                  if (event.key === KEY.ENTER) {
+                    clickOnNext();
+                  }
+                }}
                 value={groupName}
                 isError={nameError.length > 0}
                 errorMessage={nameError}
               />
             </div>
+            {/* eslint-enable */}
             {isTeam && (
               <>
                 <div
