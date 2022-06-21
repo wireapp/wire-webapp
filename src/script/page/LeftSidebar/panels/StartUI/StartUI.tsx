@@ -42,6 +42,7 @@ import {User} from 'src/script/entity/User';
 import {Conversation} from 'src/script/entity/Conversation';
 import {ServiceEntity} from 'src/script/integration/ServiceEntity';
 import {showUserModal} from '../../../../page/Modals/UserModal/UserModal';
+import {showServiceModal} from '../../../../page/Modals/ServiceModal/ServiceModal';
 
 type StartUIProps = {
   conversationRepository: ConversationRepository;
@@ -124,8 +125,13 @@ const StartUI: React.FC<StartUIProps> = ({
       userRepository: userRepository,
     });
   };
+
   const openService = (service: ServiceEntity) => {
-    mainViewModel.content.serviceModal.showService(service);
+    showServiceModal({
+      actionsViewModel: mainViewModel.actions,
+      integrationRepository: integrationRepository,
+      service: service,
+    });
   };
 
   const openConversation = (conversation: Conversation): Promise<void> => {
