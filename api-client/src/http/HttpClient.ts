@@ -279,4 +279,15 @@ export class HttpClient extends EventEmitter {
     };
     return this.sendRequest<T>(config, false, isSynchronousRequest);
   }
+
+  public sendProtocolMls<T>(
+    config: AxiosRequestConfig,
+    isSynchronousRequest: boolean = false,
+  ): Promise<AxiosResponse<T>> {
+    config.headers = {
+      ...config.headers,
+      'Content-Type': ContentType.MESSAGES_MLS,
+    };
+    return this.sendRequest<T>(config, false, isSynchronousRequest);
+  }
 }
