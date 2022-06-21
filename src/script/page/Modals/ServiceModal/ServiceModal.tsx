@@ -101,7 +101,7 @@ let reactRoot: Root;
 const cleanUp = () => {
   if (modalContainer) {
     reactRoot.unmount();
-    document.body.removeChild(modalContainer);
+    document.getElementById('wire-main').removeChild(modalContainer);
     modalContainer = undefined;
   }
 };
@@ -112,7 +112,7 @@ export const showServiceModal = (props: ServiceModalProps) => {
   cleanUp();
   integrationRepository.addProviderNameToParticipant(service);
   modalContainer = document.createElement('div');
-  document.body.appendChild(modalContainer);
+  document.getElementById('wire-main').appendChild(modalContainer);
   reactRoot = createRoot(modalContainer);
   reactRoot.render(<ServiceModal {...props} onClose={cleanUp} />);
 };
