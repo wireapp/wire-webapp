@@ -7,7 +7,7 @@
     "@otak/core-crypto": "0.2.0-beta-3",
     "@types/long": "4.0.1",
     "@types/node": "~14",
-    "@wireapp/api-client": "19.6.4",
+    "@wireapp/api-client": "19.7.0",
     "@wireapp/cryptobox": "12.8.0",
     "bazinga64": "5.10.0",
     "hash.js": "1.1.7",
@@ -71,5 +71,5 @@
     "test:project": "yarn dist && yarn test",
     "test:node": "nyc jasmine --config=jasmine.json"
   },
-  "version": "27.4.0"
+  "version": "27.4.1"
 }
