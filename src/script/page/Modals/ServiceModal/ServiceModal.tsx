@@ -106,7 +106,7 @@ const cleanUp = () => {
   }
 };
 
-export const showServiceModal = (props: ServiceModalProps) => {
+export const showServiceModal = (props: Omit<ServiceModalProps, 'onClose'>) => {
   const {integrationRepository, service} = props;
   console.info('bardia showServiceModal', props);
   cleanUp();
