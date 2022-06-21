@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [19.7.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/compare/@wireapp/api-client@19.6.4...@wireapp/api-client@19.7.0) (2022-06-21)
+
+
+### Features
+
+* **api-client:** Add new MLS endpoints (FS-652) ([#4292](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/issues/4292)) ([788873e](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/commit/788873e482e81517908d59fe9fbb310b06fd63d9))
+
+
+
+
+
 ## [19.6.4](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/compare/@wireapp/api-client@19.6.3...@wireapp/api-client@19.6.4) (2022-06-15)
 
 
