@@ -94,6 +94,7 @@ declare global {
           ENABLE_ENFORCE_DESKTOP_APPLICATION_ONLY: boolean;
           ENABLE_EXTRA_CLIENT_ENTROPY: boolean;
           ENABLE_MEDIA_EMBEDS: boolean;
+          ENABLE_MLS: boolean;
           ENABLE_PHONE_LOGIN: boolean;
           ENABLE_SSO: boolean;
           ENFORCE_CONSTANT_BITRATE: boolean;
