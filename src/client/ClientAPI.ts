@@ -25,6 +25,16 @@ import {ClientCapabilityRemovedError} from './ClientError';
 import {BackendError, BackendErrorLabel, HttpClient} from '../http/';
 import {ClientCapabilityData} from './ClientCapabilityData';
 
+type ClaimedKeyPackages = {
+  key_packages: {
+    client: string;
+    domain: string;
+    key_package: string;
+    key_package_ref: string;
+    user: string;
+  }[];
+};
+
 export class ClientAPI {
   constructor(private readonly client: HttpClient) {}
 
@@ -125,8 +135,9 @@ export class ClientAPI {
 
   /**
    * Will upload keypackages for an MLS capable client
-   * see https://staging-nginz-https.zinfra.io/api/swagger-ui/#/default/post_mls_key_packages_self__client_
-   * @param  {string} clientId
+   * @see https://staging-nginz-https.zinfra.io/api/swagger-ui/#/default/post_mls_key_packages_self__client_
+   * @param {string} clientId The client to upload the key packages for
+   * @param {string[]} keyPackages The key packages to upload
    */
   public async uploadMLSKeyPackages(clientId: string, keyPackages: string[]) {
     const config: AxiosRequestConfig = {
@@ -136,5 +147,38 @@ export class ClientAPI {
     };
 
     await this.client.sendJSON<PreKeyBundle>(config, true);
+  }
+
+  /**
+   * Claim one key package for each client of the given user
+   * @param  {string} userId The user to claim the key packages for
+   * @param {string} userDomain The domain of the user
+   * @param  {string} skipOwn Do not claim a key package for the given own client
+   * @see https://staging-nginz-https.zinfra.io/api/swagger-ui/#/default/post_mls_key_packages_claim__user_domain___user_
+   */
+  public async claimMLSKeyPackages(userId: string, userDomain: string, skipOwn: string): Promise<ClaimedKeyPackages> {
+    const config: AxiosRequestConfig = {
+      method: 'POST',
+      url: `/${ClientAPI.URL.MLS_CLIENTS}/${ClientAPI.URL.MLS_KEY_PACKAGES}/claim/${userDomain}/${userId}${
+        skipOwn ? `?skip_own=${skipOwn}` : ''
+      }`,
+    };
+    const response = await this.client.sendJSON<ClaimedKeyPackages>(config, true);
+    return response.data;
+  }
+
+  /**
+   * Get the number of unused key packages for the given client
+   * @param {string} clientId
+   * @see https://staging-nginz-https.zinfra.io/api/swagger-ui/#/default/get_mls_key_packages_self__client__count
+   */
+  public async getMLSKeyPackageCount(clientId: string): Promise<number> {
+    const config: AxiosRequestConfig = {
+      method: 'GET',
+      url: `/${ClientAPI.URL.MLS_CLIENTS}/${ClientAPI.URL.MLS_KEY_PACKAGES}/self/${clientId}/count`,
+    };
+
+    const response = await this.client.sendJSON<{count: number}>(config, true);
+    return response.data.count;
   }
 }
