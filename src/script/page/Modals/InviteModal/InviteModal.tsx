@@ -100,7 +100,7 @@ let reactRoot: Root;
 const cleanUp = () => {
   if (modalContainer) {
     reactRoot.unmount();
-    document.body.removeChild(modalContainer);
+    document.getElementById('wire-main').removeChild(modalContainer);
     modalContainer = undefined;
   }
 };
