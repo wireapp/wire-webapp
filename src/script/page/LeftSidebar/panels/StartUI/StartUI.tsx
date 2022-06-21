@@ -42,6 +42,7 @@ import {User} from 'src/script/entity/User';
 import {Conversation} from 'src/script/entity/Conversation';
 import {ServiceEntity} from 'src/script/integration/ServiceEntity';
 import {showUserModal} from '../../../../page/Modals/UserModal/UserModal';
+import {showServiceModal} from '../../../../page/Modals/ServiceModal/ServiceModal';
 import {showInviteModal} from '../../../../page/Modals/InviteModal/InviteModal';
 
 type StartUIProps = {
@@ -128,7 +129,11 @@ const StartUI: React.FC<StartUIProps> = ({
   };
 
   const openService = (service: ServiceEntity) => {
-    mainViewModel.content.serviceModal.showService(service);
+    showServiceModal({
+      actionsViewModel: mainViewModel.actions,
+      integrationRepository: integrationRepository,
+      service: service,
+    });
   };
 
   const openInviteModal = () => showInviteModal({userState});
