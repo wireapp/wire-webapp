@@ -108,15 +108,13 @@ const cleanUp = () => {
 export const showInviteModal = (props: InviteModalProps) => {
   cleanUp();
   modalContainer = document.createElement('div');
-  document.body.appendChild(modalContainer);
+  document.getElementById('wire-main').appendChild(modalContainer);
   reactRoot = createRoot(modalContainer);
-  reactRoot.render(
-    <InviteModalComponent
-      {...props}
-      onClose={() => {
-        cleanUp();
-        props.onClose?.();
-      }}
-    />,
-  );
+
+  const onClose = () => {
+    cleanUp();
+    props.onClose?.();
+  };
+
+  reactRoot.render(<InviteModalComponent {...props} onClose={onClose} />);
 };

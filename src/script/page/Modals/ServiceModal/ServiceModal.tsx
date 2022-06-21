@@ -108,7 +108,6 @@ const cleanUp = () => {
 
 export const showServiceModal = (props: Omit<ServiceModalProps, 'onClose'>) => {
   const {integrationRepository, service} = props;
-  console.info('bardia showServiceModal', props);
   cleanUp();
   integrationRepository.addProviderNameToParticipant(service);
   modalContainer = document.createElement('div');
