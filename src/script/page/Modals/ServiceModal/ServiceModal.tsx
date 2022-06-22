@@ -17,8 +17,6 @@
  *
  */
 
-import {createRoot, Root} from 'react-dom/client';
-
 import Avatar, {AVATAR_SIZE} from 'Components/Avatar';
 import Icon from 'Components/Icon';
 import ModalComponent from 'Components/ModalComponent';
@@ -28,6 +26,7 @@ import {ServiceEntity} from '../../../integration/ServiceEntity';
 import {ActionsViewModel} from '../../../view_model/ActionsViewModel';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
+import renderModal from 'Util/renderModal';
 
 interface ServiceModalProps {
   readonly onClose: () => void;
@@ -95,23 +94,4 @@ const ServiceModal: React.FC<ServiceModalProps> = ({
 
 export default ServiceModal;
 
-let modalContainer: HTMLDivElement;
-let reactRoot: Root;
-
-const cleanUp = () => {
-  if (modalContainer) {
-    reactRoot.unmount();
-    document.getElementById('wire-main').removeChild(modalContainer);
-    modalContainer = undefined;
-  }
-};
-
-export const showServiceModal = (props: Omit<ServiceModalProps, 'onClose'>) => {
-  const {integrationRepository, service} = props;
-  cleanUp();
-  integrationRepository.addProviderNameToParticipant(service);
-  modalContainer = document.createElement('div');
-  document.getElementById('wire-main').appendChild(modalContainer);
-  reactRoot = createRoot(modalContainer);
-  reactRoot.render(<ServiceModal {...props} onClose={cleanUp} />);
-};
+export const showServiceModal = renderModal<ServiceModalProps>(ServiceModal);

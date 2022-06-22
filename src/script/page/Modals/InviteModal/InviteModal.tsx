@@ -18,7 +18,6 @@
  */
 
 import React, {useState} from 'react';
-import {createRoot, Root} from 'react-dom/client';
 import {Runtime} from '@wireapp/commons';
 
 import {t} from 'Util/LocalizerUtil';
@@ -28,6 +27,7 @@ import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import Icon from 'Components/Icon';
 import {Config} from '../../../Config';
 import {UserState} from '../../../user/UserState';
+import renderModal from 'Util/renderModal';
 
 export interface InviteModalProps {
   readonly userState: UserState;
@@ -94,27 +94,4 @@ const InviteModalComponent: React.FC<InviteModalProps> = ({userState, onClose}) 
 
 export default InviteModalComponent;
 
-let modalContainer: HTMLDivElement;
-let reactRoot: Root;
-
-const cleanUp = () => {
-  if (modalContainer) {
-    reactRoot.unmount();
-    document.getElementById('wire-main').removeChild(modalContainer);
-    modalContainer = undefined;
-  }
-};
-
-export const showInviteModal = (props: InviteModalProps) => {
-  cleanUp();
-  modalContainer = document.createElement('div');
-  document.getElementById('wire-main').appendChild(modalContainer);
-  reactRoot = createRoot(modalContainer);
-
-  const onClose = () => {
-    cleanUp();
-    props.onClose?.();
-  };
-
-  reactRoot.render(<InviteModalComponent {...props} onClose={onClose} />);
-};
+export const showInviteModal = renderModal<InviteModalProps>(InviteModalComponent);

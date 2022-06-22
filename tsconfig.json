@@ -28,6 +28,7 @@
     // Must be in sync with jest.config.js >> moduleNameMapper
     "paths": {
       "Components/*": ["./src/script/components/*"],
+      "Modals/*": ["./src/script/page/Modals/*"],
       "I18n/*": ["./src/i18n/*"],
       "Resource/*": ["./resource/*"],
       "Util/*": ["./src/script/util/*"]

@@ -41,9 +41,10 @@ import {UserRepository} from 'src/script/user/UserRepository';
 import {User} from 'src/script/entity/User';
 import {Conversation} from 'src/script/entity/Conversation';
 import {ServiceEntity} from 'src/script/integration/ServiceEntity';
-import {showUserModal} from '../../../../page/Modals/UserModal/UserModal';
-import {showServiceModal} from '../../../../page/Modals/ServiceModal/ServiceModal';
-import {showInviteModal} from '../../../../page/Modals/InviteModal/InviteModal';
+// import {showUserModal, showServiceModal, showInviteModal} from 'Modals';
+import showUserModal from 'Modals/UserModal';
+import showServiceModal from 'Modals/ServiceModal';
+import showInviteModal from 'Modals/InviteModal';
 
 type StartUIProps = {
   conversationRepository: ConversationRepository;
