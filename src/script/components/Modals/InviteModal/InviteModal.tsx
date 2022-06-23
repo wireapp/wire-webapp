@@ -81,11 +81,10 @@ const InviteModalComponent: React.FC<InviteModalProps> = ({userState, onClose}) 
             onBlur={onBlur}
             className="modal__input reset-textarea invite-modal__message"
             dir="auto"
+            data-uie-name="invite-modal-message"
           />
 
-          <div className="modal__info invite-modal__info" data-bind="text: inviteHint">
-            {inviteHint}
-          </div>
+          <div className="modal__info invite-modal__info">{inviteHint}</div>
         </div>
       </ModalComponent>
     </div>

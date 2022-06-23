@@ -113,7 +113,6 @@ module.exports = {
     alias: {
       Components: path.resolve(srcScript, 'components'),
       I18n: path.resolve(SRC_PATH, 'i18n'),
-      Modals: path.resolve(srcScript, 'page/Modals'),
       Resource: path.resolve(ROOT_PATH, 'resource'),
       Util: path.resolve(srcScript, 'util'),
     },

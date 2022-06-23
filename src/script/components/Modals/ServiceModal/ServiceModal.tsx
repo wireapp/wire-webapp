@@ -29,11 +29,11 @@ import {t} from 'Util/LocalizerUtil';
 import renderModal from 'Util/renderModal';
 
 interface ServiceModalProps {
-  readonly onClose: () => void;
   readonly service: ServiceEntity;
-  readonly avatarSize?: AVATAR_SIZE;
   readonly integrationRepository: IntegrationRepository;
   readonly actionsViewModel: ActionsViewModel;
+  readonly onClose?: () => void;
+  readonly avatarSize?: AVATAR_SIZE;
 }
 
 const ServiceModal: React.FC<ServiceModalProps> = ({
