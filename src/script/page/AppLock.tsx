@@ -272,7 +272,7 @@ const AppLock: React.FC<AppLockProps> = ({
   return (
     <ModalComponent isShown={isVisible} showLoading={isLoading} onClosed={onClosed} data-uie-name="applock-modal">
       <div className="modal__header">
-        {!isAppLockEnforced && !APPLOCK_STATE.LOCKED && (
+        {!isAppLockEnforced && !isAppLockActivated && (
           <button type="button" className="modal__header__button" onClick={onCancelAppLock} data-uie-name="do-close">
             <span aria-hidden="true">
               <Icon.Close />

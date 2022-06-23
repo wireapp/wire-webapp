@@ -123,7 +123,7 @@ import {TeamError} from '../error/TeamError';
 import Warnings from '../view_model/WarningsContainer';
 import {Core} from '../service/CoreSingleton';
 import {migrateToQualifiedSessionIds} from './sessionIdMigrator';
-import {showUserModal} from '../page/Modals/UserModal/UserModal';
+import showUserModal from 'Components/Modals/UserModal';
 
 function doRedirect(signOutReason: SIGN_OUT_REASON) {
   let url = `/auth/${location.search}`;
