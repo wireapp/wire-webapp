@@ -50,7 +50,7 @@ const ServiceModal: React.FC<ServiceModalProps> = ({
   const {providerName, name} = useKoSubscribableChildren(service, ['name', 'providerName']);
 
   return (
-    <div className="service-modal">
+    <div className="service-modal" data-uie-name="modal-service">
       <ModalComponent isShown onClosed={onClose} onBgClick={onClose} data-uie-name="group-creation-label">
         {service && (
           <>
