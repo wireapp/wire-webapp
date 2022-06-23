@@ -109,9 +109,10 @@
         display: flex;
         min-width: 0; // this will ensure that ellipses is working
         height: @avatar-diameter-m;
+        flex-direction: column;
         flex-grow: 1;
-        align-items: center;
-        justify-content: flex-start;
+        align-items: flex-start;
+        justify-content: center;
         font-size: @font-size-medium;
         font-weight: @font-weight-medium;
       }
@@ -164,7 +165,6 @@
         .ellipsis;
         display: flex;
         width: 100%;
-        justify-content: flex-end;
         margin-top: 4px;
         font-size: 0;
 
