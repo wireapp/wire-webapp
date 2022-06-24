@@ -70,7 +70,9 @@ const MainContent: React.FC<LeftSidebarProps> = ({
     general: {
       backgroundColor: 'var(--app-bg)',
       color: 'var(--main-color)',
-      themeColor: 'var(--accent-color)',
+      contrastTextColor: 'var(--text-input-background)',
+      disabledColor: 'var(--text-input-placeholder)',
+      primaryColor: 'var(--accent-color)',
     },
   };
 
