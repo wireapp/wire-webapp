@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [19.7.1](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/compare/@wireapp/api-client@19.7.0...@wireapp/api-client@19.7.1) (2022-06-27)
+
+
+### Bug Fixes
+
+* incorrect param for delete idp (SQSERVICES-1387) ([#4303](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/issues/4303)) ([542960c](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/commit/542960c3e50923efdd6291ae54003e5f0bf4ac58))
+
+
+
+
+
 # [19.7.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/compare/@wireapp/api-client@19.6.4...@wireapp/api-client@19.7.0) (2022-06-21)
 
 
