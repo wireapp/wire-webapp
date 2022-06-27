@@ -143,6 +143,13 @@ export const handleKeyDown = (event: React.KeyboardEvent<HTMLElement> | Keyboard
   return true;
 };
 
+export const handleEnterDown = (event: React.KeyboardEvent<HTMLElement> | KeyboardEvent, callback: () => void) => {
+  if (event.key === KEY.ENTER) {
+    callback();
+  }
+  return true;
+};
+
 const handleDebugKey = () => {
   const removeDebugInfo = (els: NodeListOf<HTMLElement>) => els.forEach(el => el.parentNode.removeChild(el));
 
