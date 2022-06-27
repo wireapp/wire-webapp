@@ -199,6 +199,21 @@
         margin-bottom: 25px;
       }
 
+      body.theme-dark & {
+        input {
+          & + span {
+            &::before {
+              border: 1px solid var(--gray-60);
+              background-color: var(--gray-90);
+            }
+          }
+          &:checked + span::before {
+            border: 6px solid var(--accent-color-600);
+            background-color: var(--gray-90);
+          }
+        }
+      }
+
       input {
         display: none;
 
@@ -214,6 +229,7 @@
             box-sizing: border-box;
             border: 1px solid var(--gray-80);
             margin-right: 16px;
+            background-color: var(--white);
             border-radius: 50%;
             content: '';
             cursor: pointer;
@@ -223,6 +239,7 @@
 
         &:checked + span::before {
           border: 6px solid var(--accent-color-500);
+          background-color: var(--white);
         }
 
         &:disabled {
@@ -370,7 +387,6 @@
 
     &__title {
       .heading-h3;
-      text-transform: uppercase;
 
       &:first-child {
         flex-grow: 1;

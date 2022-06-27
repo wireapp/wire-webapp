@@ -23,6 +23,7 @@ import {container, singleton} from 'tsyringe';
 import {APIClient} from './APIClientSingleton';
 import {createStorageEngine, DatabaseTypes} from './StoreEngineProvider';
 import {isTemporaryClientAndNonPersistent} from 'Util/util';
+import {Config} from '../Config';
 
 @singleton()
 export class Core extends Account {
@@ -35,6 +36,7 @@ export class Core extends Account {
 
         return createStorageEngine(storeName, dbType);
       },
+      enableMLS: Config.getConfig().FEATURE.ENABLE_MLS,
       nbPrekeys: 100,
     });
   }

@@ -64,7 +64,7 @@
   label::before {
     width: 22px;
     height: 22px;
-    border: 2px solid var(--gray-80);
+    border: 1px solid var(--gray-80);
     background: var(--gray-20);
     transition: all 0.15s;
   }
@@ -88,19 +88,19 @@ body.theme-dark {
     }
 
     label::before {
-      border: 2px solid var(--gray-60);
-      background: var(--gray-90);
+      border: 1px solid var(--gray-60);
+      background-color: var(--gray-90);
     }
 
     input[type='radio']:checked + label::before {
       border-color: var(--accent-color-600);
-      background-color: var(--white);
+      background-color: var(--gray-90) !important;
     }
 
     input[type='radio']:focus + label::before,
     input[type='radio']:focus-visible + label::before {
-      border-color: var(--accent-color-700);
-      outline: 1px solid var(--accent-color-700);
+      border-color: var(--accent-color-500);
+      outline: 1px solid var(--accent-color-500);
     }
   }
 }

@@ -36,7 +36,7 @@ import 'Components/toggle/InfoToggle';
 import 'Components/calling/FullscreenVideoCall';
 import 'Components/avatar/GroupAvatar';
 import 'Components/MessagesList';
-import '../page/Modals/GroupCreation/GroupCreationModal';
+import 'Components/Modals/GroupCreation/GroupCreationModal';
 import '../page/AppLock';
 import 'Components/modal';
 import 'Components/panel/ServiceDetails';
@@ -94,6 +94,7 @@ declare global {
           ENABLE_ENFORCE_DESKTOP_APPLICATION_ONLY: boolean;
           ENABLE_EXTRA_CLIENT_ENTROPY: boolean;
           ENABLE_MEDIA_EMBEDS: boolean;
+          ENABLE_MLS: boolean;
           ENABLE_PHONE_LOGIN: boolean;
           ENABLE_SSO: boolean;
           ENFORCE_CONSTANT_BITRATE: boolean;

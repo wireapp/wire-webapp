@@ -113,7 +113,8 @@
         flex-grow: 1;
         align-items: flex-start;
         justify-content: center;
-        .text-medium;
+        font-size: @font-size-medium;
+        font-weight: @font-weight-medium;
       }
 
       &__chevron {
@@ -156,6 +157,12 @@
         white-space: nowrap;
       }
 
+      &__username {
+        .ellipsis;
+        max-width: 100%;
+        white-space: nowrap;
+      }
+
       &__self-indicator {
         margin-left: 4px;
       }
@@ -163,17 +170,12 @@
       &__info {
         .ellipsis;
         display: flex;
-        max-width: 100%;
+        width: 100%;
         margin-top: 4px;
         font-size: 0;
 
         * {
           .subline;
-        }
-
-        &__username {
-          .ellipsis;
-          display: block;
         }
       }
 

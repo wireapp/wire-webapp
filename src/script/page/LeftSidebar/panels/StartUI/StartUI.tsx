@@ -41,7 +41,9 @@ import {UserRepository} from 'src/script/user/UserRepository';
 import {User} from 'src/script/entity/User';
 import {Conversation} from 'src/script/entity/Conversation';
 import {ServiceEntity} from 'src/script/integration/ServiceEntity';
-import {showUserModal} from '../../../../page/Modals/UserModal/UserModal';
+import showUserModal from 'Components/Modals/UserModal';
+import showServiceModal from 'Components/Modals/ServiceModal';
+import showInviteModal from 'Components/Modals/InviteModal';
 
 type StartUIProps = {
   conversationRepository: ConversationRepository;
@@ -118,15 +120,23 @@ const StartUI: React.FC<StartUIProps> = ({
       openContact(user);
       return;
     }
+
     showUserModal({
       actionsViewModel: mainViewModel.actions,
       userId: {domain: user.domain, id: user.id},
       userRepository: userRepository,
     });
   };
+
   const openService = (service: ServiceEntity) => {
-    mainViewModel.content.serviceModal.showService(service);
+    showServiceModal({
+      actionsViewModel: mainViewModel.actions,
+      integrationRepository: integrationRepository,
+      service: service,
+    });
   };
+
+  const openInviteModal = () => showInviteModal({userState});
 
   const openConversation = (conversation: Conversation): Promise<void> => {
     return actions.openGroupConversation(conversation).then(close);
@@ -205,11 +215,7 @@ const StartUI: React.FC<StartUIProps> = ({
     );
 
   const footer = !isTeam ? (
-    <button
-      className="start-ui-import"
-      onClick={() => mainViewModel.content.inviteModal.show()}
-      data-uie-name="show-invite-modal"
-    >
+    <button className="start-ui-import" onClick={openInviteModal} data-uie-name="show-invite-modal">
       <span className="icon-invite start-ui-import-icon"></span>
       <span>{t('searchInvite', brandName)}</span>
     </button>

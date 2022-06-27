@@ -18,7 +18,6 @@
  */
 
 import React, {useState, useEffect} from 'react';
-import {createRoot, Root} from 'react-dom/client';
 import {container} from 'tsyringe';
 import cx from 'classnames';
 import {QualifiedId} from '@wireapp/api-client/src/user';
@@ -39,6 +38,7 @@ import {Config} from '../../../Config';
 import {User} from '../../../entity/User';
 import {noop} from 'Util/util';
 import {Core} from '../../../service/CoreSingleton';
+import renderModal from 'Util/renderModal';
 
 export interface UserModalProps {
   userId: QualifiedId;
@@ -112,19 +112,23 @@ const UserModalComponent: React.FC<UserModalProps> = ({
               {t('userNotFoundTitle', brandName)}
             </h2>
           )}
+
           <Icon.Close className="modal__header__button" onClick={hide} data-uie-name="do-close" />
         </div>
+
         <div className={cx('modal__body user-modal__wrapper', {'user-modal__wrapper--max': !user && !userNotFound})}>
           {user && (
             <>
               <UserDetails participant={user} isSelfVerified={isSelfVerified} classifiedDomains={classifiedDomains} />
+
               <EnrichedFields user={user} showDomain={isFederated} />
+
               {isBlockedLegalHold ? (
                 <div
                   className="modal__message"
                   data-uie-name="status-blocked-legal-hold"
                   dangerouslySetInnerHTML={{__html: t('modalUserBlockedForLegalHold', {}, replaceLinkLegalHold)}}
-                ></div>
+                />
               ) : (
                 <UserActions
                   user={user}
@@ -141,15 +145,17 @@ const UserModalComponent: React.FC<UserModalProps> = ({
               <Icon.Loading aria-hidden="true" />
             </div>
           )}
+
           {userNotFound && (
             <>
               <div className="modal__message" data-uie-name="status-modal-text">
                 {t('userNotFoundMessage', brandName)}
               </div>
+
               <div className="modal__buttons">
-                <div className="modal__button modal__button--confirm" data-uie-name="do-ok" onClick={hide}>
+                <button className="modal__button modal__button--confirm" data-uie-name="do-ok" onClick={hide}>
                   {t('modalAcknowledgeAction')}
-                </div>
+                </button>
               </div>
             </>
           )}
@@ -161,29 +167,4 @@ const UserModalComponent: React.FC<UserModalProps> = ({
 
 export default UserModalComponent;
 
-let modalContainer: HTMLDivElement;
-let reactRoot: Root;
-
-const cleanUp = () => {
-  if (modalContainer) {
-    reactRoot.unmount();
-    document.body.removeChild(modalContainer);
-    modalContainer = undefined;
-  }
-};
-
-export const showUserModal = (props: UserModalProps) => {
-  cleanUp();
-  modalContainer = document.createElement('div');
-  document.body.appendChild(modalContainer);
-  reactRoot = createRoot(modalContainer);
-  reactRoot.render(
-    <UserModalComponent
-      {...props}
-      onClose={() => {
-        cleanUp();
-        props.onClose?.();
-      }}
-    />,
-  );
-};
+export const showUserModal = renderModal<UserModalProps>(UserModalComponent);

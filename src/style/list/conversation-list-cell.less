@@ -53,6 +53,9 @@
     .conversation-list-cell-right {
       border-bottom: 0 !important;
     }
+    .call-ui__button--join {
+      outline: 1px solid var(--app-bg-secondary);
+    }
   }
 }
 
@@ -110,11 +113,12 @@
 
   .availability-state-label {
     .ellipsis-nowrap;
-    .text-medium;
-
     padding-bottom: 2px;
     margin-right: 4px;
     margin-bottom: -2px;
+
+    font-size: @font-size-medium;
+    font-weight: @font-weight-medium;
 
     &--active {
       color: var(--white);
@@ -124,11 +128,11 @@
 
 .conversation-list-cell-name {
   .ellipsis-nowrap;
-  .text-medium;
-
   padding-bottom: 2px;
   margin-right: 4px;
   margin-bottom: -2px;
+  font-size: @font-size-medium;
+  font-weight: @font-weight-medium;
 
   &--active {
     color: var(--white);

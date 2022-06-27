@@ -54,6 +54,7 @@ import VerifyEmailLink from './VerifyEmailLink';
 import VerifyPhoneCode from './VerifyPhoneCode';
 import CustomEnvironmentRedirect from './CustomEnvironmentRedirect';
 import SetEntropyPage from './SetEntropyPage';
+import {t} from 'Util/LocalizerUtil';
 
 interface RootProps {}
 
@@ -87,6 +88,10 @@ const Root: React.FC<RootProps & ConnectedProps & DispatchProps> = ({
     return null;
   };
 
+  const setTitle = (title = 'Wire') => {
+    document.title = title;
+  };
+
   const isAuthenticatedCheck = (page: any): any => (page ? (isAuthenticated ? page : navigate('/auth')) : null);
 
   const ProtectedHistoryInfo = () => isAuthenticatedCheck(<HistoryInfo />);
@@ -107,7 +112,16 @@ const Root: React.FC<RootProps & ConnectedProps & DispatchProps> = ({
         ) : (
           <Router hashType="noslash">
             <Switch>
-              <Route exact path={ROUTE.INDEX} component={Index} />
+              <Route
+                exact
+                path={ROUTE.INDEX}
+                render={() => {
+                  setTitle(
+                    `${t('authLandingPageTitleP1')} ${Config.getConfig().BRAND_NAME} . ${t('authLandingPageTitleP2')}`,
+                  );
+                  return <Index />;
+                }}
+              />
               <Route path={ROUTE.CHECK_PASSWORD} component={CheckPassword} />
               <Route path={ROUTE.CLIENTS} component={ProtectedClientManager} />
               <Route path={ROUTE.CONVERSATION_JOIN_INVALID} component={ConversationJoinInvalid} />
@@ -118,13 +132,37 @@ const Root: React.FC<RootProps & ConnectedProps & DispatchProps> = ({
               />
               <Route path={ROUTE.HISTORY_INFO} component={ProtectedHistoryInfo} />
               <Route path={ROUTE.INITIAL_INVITE} component={ProtectedInitialInvite} />
-              <Route path={ROUTE.LOGIN} component={Login} />
+              <Route
+                path={ROUTE.LOGIN}
+                render={() => {
+                  setTitle(`${t('authLoginTitle')} . ${Config.getConfig().BRAND_NAME}`);
+                  return <Login />;
+                }}
+              />
               <Route path={ROUTE.LOGIN_PHONE} component={PhoneLogin} />
-              <Route path={ROUTE.SET_ACCOUNT_TYPE} component={SetAccountType} />
+              <Route
+                path={ROUTE.SET_ACCOUNT_TYPE}
+                render={() => {
+                  setTitle(`${t('authAccCreationTitle')} . ${Config.getConfig().BRAND_NAME}`);
+                  return <SetAccountType />;
+                }}
+              />
               <Route path={ROUTE.SET_EMAIL} component={ProtectedSetEmail} />
               <Route path={ROUTE.SET_HANDLE} component={ProtectedSetHandle} />
-              <Route path={ROUTE.SET_PASSWORD} component={ProtectedSetPassword} />
-              <Route path={`${ROUTE.SSO}/:code?`} component={SingleSignOn} />
+              <Route
+                path={ROUTE.SET_PASSWORD}
+                render={() => {
+                  setTitle(`${t('authForgotPasswordTitle')} . ${Config.getConfig().BRAND_NAME}`);
+                  return <ProtectedSetPassword />;
+                }}
+              />
+              <Route
+                path={`${ROUTE.SSO}/:code?`}
+                render={() => {
+                  setTitle(`${t('authSSOLoginTitle')} . ${Config.getConfig().BRAND_NAME}`);
+                  return <SingleSignOn />;
+                }}
+              />
               <Route path={ROUTE.VERIFY_EMAIL_LINK} component={VerifyEmailLink} />
               <Route path={ROUTE.VERIFY_PHONE_CODE} component={VerifyPhoneCode} />
               <Route path={ROUTE.CUSTOM_ENV_REDIRECT} component={CustomEnvironmentRedirect} />
