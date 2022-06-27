@@ -320,12 +320,12 @@ const GroupCreationModal: React.FC<GroupCreationModalProps> = ({
             )}
           </div>
         )}
-
+        {/* eslint jsx-a11y/no-autofocus : "off" */}
         {stateIsPreferences && (
           <>
             <div className="modal-input-wrapper">
               <TextInputForwarded
-                autofocus
+                autoFocus
                 label={t('groupCreationPreferencesPlaceholder')}
                 placeholder={t('groupCreationPreferencesPlaceholder')}
                 uieName="enter-group-name"
