@@ -44,7 +44,7 @@ import {User} from '../../../entity/User';
 import {ACCESS_STATE} from '../../../conversation/AccessState';
 import Icon from 'Components/Icon';
 import {t} from 'Util/LocalizerUtil';
-import {onEscKey, offEscKey, KEY} from 'Util/KeyboardUtil';
+import {onEscKey, offEscKey, handleEnterDown} from 'Util/KeyboardUtil';
 import {
   ACCESS_TYPES,
   teamPermissionsForAccessState,
@@ -340,9 +340,7 @@ const GroupCreationModal: React.FC<GroupCreationModalProps> = ({
                   setGroupName(trimmedName);
                 }}
                 onKeyDown={(event: React.KeyboardEvent<HTMLInputElement>) => {
-                  if (event.key === KEY.ENTER) {
-                    clickOnNext();
-                  }
+                  handleEnterDown(event, clickOnNext);
                 }}
                 value={groupName}
                 isError={nameError.length > 0}
