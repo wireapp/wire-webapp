@@ -63,7 +63,7 @@ const CameraPreferences: React.FC<CameraPreferencesProps> = ({
   const requestStream = async () => {
     setIsRequesting(true);
     try {
-      // we should be able to change camera from prefrences page in middle of the call
+      // we should be able to change camera from preferences page in middle of the call
       if (hasActiveCameraStream) {
         const refreshedStream = await refreshStream();
         if (!refreshedStream) {
@@ -126,7 +126,7 @@ const CameraPreferences: React.FC<CameraPreferencesProps> = ({
 
       {isRequesting ? (
         <div className="preferences-av-video-disabled">
-          <div className="icon-spinner spin accent-text"></div>
+          <div className="icon-spinner spin accent-text" />
         </div>
       ) : (
         <>
@@ -144,14 +144,14 @@ const CameraPreferences: React.FC<CameraPreferencesProps> = ({
                       "<a href='https://support.wire.com/hc/articles/202935412' data-uie-name='go-no-camera-faq' target='_blank' rel='noopener noreferrer'>",
                   }),
                 }}
-              ></div>
-              <div
-                className="preferences-av-video-disabled__try-again"
+              />
+              <button
+                className="button-reset-default preferences-av-video-disabled__try-again"
                 onClick={requestStream}
                 data-uie-name="do-try-again-preferences-av"
               >
                 {t('preferencesAVTryAgain')}
-              </div>
+              </button>
             </div>
           )}
         </>
