@@ -226,6 +226,7 @@ const GroupCreationModal: React.FC<GroupCreationModalProps> = ({
   const participantsActionText = selectedContacts.length
     ? t('groupCreationParticipantsActionCreate')
     : t('groupCreationParticipantsActionSkip');
+  const isInputValid = groupNameLength && !nameError.length;
 
   return (
     <div id="group-creation-modal" className="group-creation__modal">
@@ -280,9 +281,9 @@ const GroupCreationModal: React.FC<GroupCreationModalProps> = ({
                 id="group-go-next"
                 className={cx('group-creation__action', {
                   'accent-text': groupNameLength,
-                  enabled: groupNameLength && !nameError.length,
+                  enabled: isInputValid,
                 })}
-                disabled={!groupNameLength || nameError.length > 0}
+                disabled={!isInputValid}
                 type="button"
                 onClick={clickOnNext}
                 aria-label={t('groupCreationPreferencesAction')}
