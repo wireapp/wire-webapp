@@ -44,7 +44,7 @@ import {User} from '../../../entity/User';
 import {ACCESS_STATE} from '../../../conversation/AccessState';
 import Icon from 'Components/Icon';
 import {t} from 'Util/LocalizerUtil';
-import {onEscKey, offEscKey} from 'Util/KeyboardUtil';
+import {onEscKey, offEscKey, KEY} from 'Util/KeyboardUtil';
 import {
   ACCESS_TYPES,
   teamPermissionsForAccessState,
@@ -282,6 +282,7 @@ const GroupCreationModal: React.FC<GroupCreationModalProps> = ({
                   'accent-text': groupNameLength,
                   enabled: groupNameLength && !nameError.length,
                 })}
+                disabled={!groupNameLength || nameError.length > 0}
                 type="button"
                 onClick={clickOnNext}
                 aria-label={t('groupCreationPreferencesAction')}
@@ -324,6 +325,7 @@ const GroupCreationModal: React.FC<GroupCreationModalProps> = ({
           <>
             <div className="modal-input-wrapper">
               <TextInputForwarded
+                autofocus
                 label={t('groupCreationPreferencesPlaceholder')}
                 placeholder={t('groupCreationPreferencesPlaceholder')}
                 uieName="enter-group-name"
@@ -335,6 +337,11 @@ const GroupCreationModal: React.FC<GroupCreationModalProps> = ({
                   const {value} = event.target as HTMLInputElement;
                   const trimmedName = value.trim();
                   setGroupName(trimmedName);
+                }}
+                onKeyDown={(event: React.KeyboardEvent<HTMLInputElement>) => {
+                  if (event.key === KEY.ENTER) {
+                    clickOnNext();
+                  }
                 }}
                 value={groupName}
                 isError={nameError.length > 0}

@@ -31,6 +31,7 @@ import {
 } from 'Components/TextInput/TextInput.styles';
 
 export interface UserInputProps {
+  autofocus?: boolean;
   disabled?: boolean;
   errorMessage?: string;
   isError?: boolean;
@@ -52,6 +53,7 @@ const SUCCESS_DISMISS_TIMEOUT = 2500;
 
 const TextInput: React.ForwardRefRenderFunction<HTMLDivElement, UserInputProps> = (
   {
+    autofocus,
     disabled,
     errorMessage,
     isError,
@@ -96,7 +98,9 @@ const TextInput: React.ForwardRefRenderFunction<HTMLDivElement, UserInputProps> 
         </span>
       )}
 
+      {/* eslint-disable */}
       <input
+        autoFocus={autofocus}
         className="text-input"
         css={getInputCSS(disabled, changedColor)}
         disabled={disabled}
@@ -109,6 +113,7 @@ const TextInput: React.ForwardRefRenderFunction<HTMLDivElement, UserInputProps> 
         placeholder={placeholder}
         data-uie-name={uieName}
       />
+      {/* eslint-enable */}
       <label className="label-medium" css={getLabelCSS(changedColor)} htmlFor={name}>
         {label}
       </label>
