@@ -52,14 +52,14 @@ export class IdentityProviderAPI {
     return response.data;
   }
 
-  public async deleteIdentityProvider(identityProviderId: string, force?: boolean): Promise<void> {
+  public async deleteIdentityProvider(identityProviderId: string, purge?: boolean): Promise<void> {
     const config: AxiosRequestConfig = {
       method: 'delete',
       url: `${IdentityProviderAPI.URL.PROVIDER}/${identityProviderId}`,
     };
 
-    if (force) {
-      config.params = {force};
+    if (purge) {
+      config.params = {purge};
     }
 
     await this.client.sendJSON(config);
