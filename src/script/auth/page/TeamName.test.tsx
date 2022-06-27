@@ -18,7 +18,6 @@
  */
 
 import {ReactWrapper} from 'enzyme';
-import React from 'react';
 import {initialRootState, RootState, Api} from '../module/reducer';
 import {mockStoreFactory} from '../util/test/mockStoreFactory';
 import {mountComponent} from '../util/test/TestUtil';
@@ -161,7 +160,7 @@ describe('when entering a team name', () => {
       expect(setTeamNamePage.getTeamNameInput().props().value).toBe(expectedTeamName);
       setTeamNamePage.clickNextButton();
 
-      expect(setTeamNamePage.getErrorMessage(ValidationError.FIELD.NAME.PATTERN_MISMATCH).exists()).toBe(true);
+      expect(setTeamNamePage.getErrorMessage(ValidationError.FIELD.NAME.PATTERN_MISMATCH)).not.toBeNull();
     });
 
     it('appears when input gets trimmed', () => {
@@ -183,7 +182,7 @@ describe('when entering a team name', () => {
       expect(setTeamNamePage.getTeamNameInput().props().value).toBe(expectedTeamName);
       setTeamNamePage.clickNextButton();
 
-      expect(setTeamNamePage.getErrorMessage(ValidationError.FIELD.NAME.VALUE_MISSING).exists()).toBe(true);
+      expect(setTeamNamePage.getErrorMessage(ValidationError.FIELD.NAME.VALUE_MISSING)).not.toBeNull();
     });
   });
 });

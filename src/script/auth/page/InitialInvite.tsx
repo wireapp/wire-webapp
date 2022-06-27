@@ -31,6 +31,7 @@ import {
   PlaneIcon,
   RoundIconButton,
   Text,
+  InputBlock,
 } from '@wireapp/react-ui-kit';
 import React, {useState} from 'react';
 import {useIntl} from 'react-intl';
@@ -48,6 +49,7 @@ import * as LanguageSelector from '../module/selector/LanguageSelector';
 import {pathWithParams} from '../util/urlUtil';
 import Page from './Page';
 import Exception from '../component/Exception';
+import {QUERY_KEY} from '../route';
 
 interface Props extends React.HTMLProps<HTMLDivElement> {}
 
@@ -59,6 +61,7 @@ const InitialInvite = ({
   invite,
   isTeamFlow,
   doFlushDatabase,
+  removeLocalStorage,
 }: Props & ConnectedProps & DispatchProps) => {
   const {formatMessage: _} = useIntl();
   const emailInput = React.useRef<HTMLInputElement>();
@@ -67,6 +70,8 @@ const InitialInvite = ({
 
   const onInviteDone = async () => {
     await doFlushDatabase();
+    // Remove local storage item for 2FA logout if token expires.
+    removeLocalStorage(QUERY_KEY.JOIN_EXPIRES);
     window.location.replace(pathWithParams(EXTERNAL_ROUTE.WEBAPP));
   };
 
@@ -132,6 +137,11 @@ const InitialInvite = ({
     return null;
   }
 
+  const onEmailChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    resetErrors();
+    setEnteredEmail(event.target.value);
+  };
+
   return (
     <Page>
       <ContainerXS
@@ -146,36 +156,35 @@ const InitialInvite = ({
         <div style={{margin: '18px 0', minHeight: 220}}>
           {invites.map(({email}) => renderEmail(email))}
           <Form onSubmit={handleSubmit}>
-            <InputSubmitCombo>
-              <Input
-                name="email"
-                placeholder={_(inviteStrings.emailPlaceholder)}
-                type="email"
-                onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-                  resetErrors();
-                  setEnteredEmail(event.target.value);
-                }}
-                // Note: Curser issues when using controlled input
-                // value={enteredEmail}
-                ref={emailInput}
-                autoFocus
-                data-uie-name="enter-invite-email"
-              />
-              <RoundIconButton
-                disabled={isFetching || !enteredEmail}
-                type="submit"
-                data-uie-name="do-send-invite"
-                formNoValidate
-              >
-                <PlaneIcon />
-              </RoundIconButton>
-            </InputSubmitCombo>
+            <InputBlock>
+              <InputSubmitCombo>
+                <Input
+                  id="enter-invite-email"
+                  name="email"
+                  placeholder={_(inviteStrings.emailPlaceholder)}
+                  type="email"
+                  onChange={onEmailChange}
+                  // Note: Curser issues when using controlled input
+                  // value={enteredEmail}
+                  ref={emailInput}
+                  data-uie-name="enter-invite-email"
+                />
+                <RoundIconButton
+                  disabled={isFetching || !enteredEmail}
+                  type="submit"
+                  data-uie-name="do-send-invite"
+                  formNoValidate
+                >
+                  <PlaneIcon />
+                </RoundIconButton>
+              </InputSubmitCombo>
+            </InputBlock>
           </Form>
           <Exception errors={[error, inviteError]} />
         </div>
         <div>
           {invites.length ? (
-            <Button onClick={onInviteDone} data-uie-name="do-next">
+            <Button type="button" onClick={onInviteDone} data-uie-name="do-next">
               {_(inviteStrings.nextButton)}
             </Button>
           ) : (
@@ -204,6 +213,7 @@ const mapDispatchToProps = (dispatch: Dispatch<AnyAction>) =>
     {
       doFlushDatabase: ROOT_ACTIONS.authAction.doFlushDatabase,
       invite: ROOT_ACTIONS.invitationAction.invite,
+      removeLocalStorage: ROOT_ACTIONS.localStorageAction.deleteLocalStorage,
       resetInviteErrors: ROOT_ACTIONS.invitationAction.resetInviteErrors,
     },
     dispatch,

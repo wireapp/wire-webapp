@@ -25,6 +25,7 @@ import {
   Form,
   H1,
   Input,
+  InputBlock,
   InputSubmitCombo,
   Link,
   Loading,
@@ -106,6 +107,7 @@ const CheckPassword = ({loginData, doLogin, resetAuthError, isFetching}: Props &
       }
     }
   };
+  const onPasswordChange = (event: React.ChangeEvent<HTMLInputElement>) => setPassword(event.target.value);
 
   return (
     <Page>
@@ -116,39 +118,39 @@ const CheckPassword = ({loginData, doLogin, resetAuthError, isFetching}: Props &
       >
         <H1 center>{_(phoneLoginStrings.verifyPasswordHeadline)}</H1>
         <Form style={{marginTop: 30}} data-uie-name="login">
-          <InputSubmitCombo>
-            <Input
-              onChange={(event: React.ChangeEvent<HTMLInputElement>) => setPassword(event.target.value)}
-              tabIndex={1}
-              type="password"
-              name="password-login"
-              autoComplete="section-login password"
-              placeholder={_(loginStrings.passwordPlaceholder)}
-              pattern={'.{1,1024}'}
-              data-uie-name="enter-password"
-              required
-              autoFocus
-              ref={passwordInput}
-              markInvalid={!validPasswordInput}
-              value={password}
-            />
-            {isFetching ? (
-              <Loading size={32} />
-            ) : (
-              <RoundIconButton
-                style={{marginLeft: 16}}
-                tabIndex={2}
-                type="submit"
-                formNoValidate
-                onClick={handleLogin}
-                disabled={isFetching || !password}
-                showLoading={isFetching}
-                data-uie-name="do-sign-in"
-              >
-                <ArrowIcon />
-              </RoundIconButton>
-            )}
-          </InputSubmitCombo>
+          <InputBlock>
+            <InputSubmitCombo>
+              <Input
+                id="password-login"
+                onChange={onPasswordChange}
+                type="password"
+                name="password-login"
+                autoComplete="section-login password"
+                placeholder={_(loginStrings.passwordPlaceholder)}
+                pattern=".{1,1024}"
+                data-uie-name="enter-password"
+                required
+                ref={passwordInput}
+                markInvalid={!validPasswordInput}
+                value={password}
+              />
+              {isFetching ? (
+                <Loading size={32} />
+              ) : (
+                <RoundIconButton
+                  style={{marginLeft: 16}}
+                  type="submit"
+                  formNoValidate
+                  onClick={handleLogin}
+                  disabled={isFetching || !password}
+                  showLoading={isFetching}
+                  data-uie-name="do-sign-in"
+                >
+                  <ArrowIcon />
+                </RoundIconButton>
+              )}
+            </InputSubmitCombo>
+          </InputBlock>
           <Exception errors={[error]} />
         </Form>
         <Link

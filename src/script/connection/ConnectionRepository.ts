@@ -234,6 +234,7 @@ export class ConnectionRepository {
     try {
       const connectionData = await this.connectionService.getConnections();
       const newConnectionEntities = ConnectionMapper.mapConnectionsFromJson(connectionData);
+
       return newConnectionEntities.length
         ? await this.updateConnections(newConnectionEntities)
         : Object.values(this.connectionState.connectionEntities());
@@ -286,6 +287,7 @@ export class ConnectionRepository {
       allConnections[connectionEntity.userId.id] = connectionEntity;
       return allConnections;
     }, this.connectionState.connectionEntities());
+
     this.connectionState.connectionEntities(updatedConnections);
     await this.userRepository.updateUsersFromConnections(connectionEntities);
     return Object.values(this.connectionState.connectionEntities());

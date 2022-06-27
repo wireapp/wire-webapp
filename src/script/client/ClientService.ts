@@ -18,7 +18,7 @@
  */
 
 import type {
-  NewClient,
+  CreateClientPayload,
   RegisteredClient,
   QualifiedUserClientMap,
   ClientCapabilityData,
@@ -83,15 +83,6 @@ export class ClientService {
   }
 
   /**
-   * Deletes the temporary client of a user.
-   * @param clientId ID of the temporary client to be deleted
-   * @returns Resolves once the deletion of the temporary client is complete
-   */
-  deleteTemporaryClient(clientId: string): Promise<void> {
-    return this.apiClient.api.client.deleteClient(clientId);
-  }
-
-  /**
    * Retrieves meta information about a specific client.
    * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/users/getClients
    *
@@ -132,7 +123,7 @@ export class ClientService {
    * @param newClient Client payload
    * @returns Resolves with the registered client information
    */
-  postClients(newClient: NewClient): Promise<RegisteredClient> {
+  postClients(newClient: CreateClientPayload): Promise<RegisteredClient> {
     return this.apiClient.api.client.postClient(newClient);
   }
 

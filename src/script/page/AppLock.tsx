@@ -1,5 +1,23 @@
+/*
+ * Wire
+ * Copyright (C) 2022 Wire Swiss GmbH
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ *
+ */
+
 import React, {useState, useEffect, useRef, useCallback} from 'react';
-import ReactDOM from 'react-dom';
 import {ValidationUtil} from '@wireapp/commons';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import {container} from 'tsyringe';
@@ -15,8 +33,9 @@ import {SIGN_OUT_REASON} from '../auth/SignOutReason';
 import {ClientState} from '../client/ClientState';
 import {AppLockState} from '../user/AppLockState';
 import {AppLockRepository} from '../user/AppLockRepository';
-import {useKoSubscribableChildren} from 'Util/ComponentUtil';
+import {registerReactComponent, useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {ModalsViewModel} from '../view_model/ModalsViewModel';
+import Icon from 'Components/Icon';
 
 export enum APPLOCK_STATE {
   FORGOT = 'applock.forgot',
@@ -58,9 +77,10 @@ const AppLock: React.FC<AppLockProps> = ({
   const [setupPassphrase, setSetupPassphrase] = useState('');
   const [inactivityTimeoutId, setInactivityTimeoutId] = useState<number>();
   const [scheduledTimeoutId, setScheduledTimeoutId] = useState<number>();
-  const {isAppLockActivated, isAppLockEnabled} = useKoSubscribableChildren(appLockState, [
+  const {isAppLockActivated, isAppLockEnabled, isAppLockEnforced} = useKoSubscribableChildren(appLockState, [
     'isAppLockActivated',
     'isAppLockEnabled',
+    'isAppLockEnforced',
   ]);
 
   const focusElement = (input: HTMLInputElement) => setTimeout(() => input?.focus());
@@ -225,6 +245,10 @@ const AppLock: React.FC<AppLockProps> = ({
     setState(APPLOCK_STATE.NONE);
     setSetupPassphrase('');
   };
+  const onCancelAppLock = () => {
+    appLockRepository.setEnabled(false);
+    setIsVisible(false);
+  };
 
   const headerText = () => {
     switch (state) {
@@ -248,6 +272,13 @@ const AppLock: React.FC<AppLockProps> = ({
   return (
     <ModalComponent isShown={isVisible} showLoading={isLoading} onClosed={onClosed} data-uie-name="applock-modal">
       <div className="modal__header">
+        {!isAppLockEnforced && !isAppLockActivated && (
+          <button type="button" className="modal__header__button" onClick={onCancelAppLock} data-uie-name="do-close">
+            <span aria-hidden="true">
+              <Icon.Close />
+            </span>
+          </button>
+        )}
         <h2 className="modal__header__title" data-uie-name="applock-modal-header">
           {headerText()}
         </h2>
@@ -312,6 +343,16 @@ const AppLock: React.FC<AppLockProps> = ({
               {t('modalAppLockSetupSpecial')}
             </div>
             <div className="modal__buttons">
+              {!isAppLockEnforced && (
+                <button
+                  type="button"
+                  className="modal__button modal__button--secondary"
+                  data-uie-name="do-cancel-applock"
+                  onClick={onCancelAppLock}
+                >
+                  {t('modalConfirmSecondary')}
+                </button>
+              )}
               <button
                 type="submit"
                 className="modal__button modal__button--primary modal__button--full"
@@ -496,9 +537,6 @@ const AppLock: React.FC<AppLockProps> = ({
   );
 };
 
-export default {
-  AppLock,
-  init: (clientRepository: ClientRepository) => {
-    ReactDOM.render(<AppLock clientRepository={clientRepository} />, document.getElementById('applock'));
-  },
-};
+registerReactComponent('app-lock-container', AppLock);
+
+export default AppLock;

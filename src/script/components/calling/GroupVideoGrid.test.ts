@@ -33,7 +33,7 @@ class GroupVideoGridPage extends TestPage<GroupVideoGripProps> {
   getThumbnail = () => this.get('div[data-uie-name="self-video-thumbnail-wrapper"]');
   getThumbnailMutedIcon = () => this.get('[data-uie-name="status-call-audio-muted"]');
 
-  doubleClickOnGridFirstChild = () => this.doubleClick(this.getGridsWrapper().childAt(0));
+  doubleClickOnGridFirstChild = () => this.doubleClick(this.getGridsWrapper().children[0]);
 }
 
 describe('GroupVideoGrid', () => {
@@ -52,8 +52,8 @@ describe('GroupVideoGrid', () => {
       setMaximizedParticipant: () => undefined,
     });
 
-    expect(groupVideoGrid.getGridsWrapper().exists()).toBe(true);
-    expect(groupVideoGrid.getGridsWrapper().children().length).toBe(2);
+    expect(groupVideoGrid.getGridsWrapper()).not.toBeNull();
+    expect(groupVideoGrid.getGridsWrapper().children.length).toBe(2);
   });
 
   it('maximizes a grid on double click', async () => {
@@ -78,7 +78,7 @@ describe('GroupVideoGrid', () => {
     };
     const groupVideoGrid = new GroupVideoGridPage(props);
 
-    expect(groupVideoGrid.getGridsWrapper().children().length).toBe(2);
+    expect(groupVideoGrid.getGridsWrapper().children.length).toBe(2);
     groupVideoGrid.doubleClickOnGridFirstChild();
     expect(maximizedParticipant.user.id).toBe(participantTwo.user.id);
   });
@@ -99,7 +99,7 @@ describe('GroupVideoGrid', () => {
       setMaximizedParticipant: () => undefined,
     });
 
-    expect(groupVideoGrid.getPausedGrid().exists()).toBe(true);
+    expect(groupVideoGrid.getPausedGrid()).not.toBeNull();
   });
 
   it('renders thumbnail', async () => {
@@ -119,8 +119,8 @@ describe('GroupVideoGrid', () => {
       setMaximizedParticipant: () => undefined,
     });
 
-    expect(groupVideoGrid.getThumbnail().exists()).toBe(true);
-    expect(groupVideoGrid.getThumbnailMutedIcon().exists()).toBe(true);
+    expect(groupVideoGrid.getThumbnail()).not.toBeNull();
+    expect(groupVideoGrid.getThumbnailMutedIcon()).not.toBeNull();
   });
 
   it('renders muted thumbnail', async () => {
@@ -140,6 +140,6 @@ describe('GroupVideoGrid', () => {
       setMaximizedParticipant: () => undefined,
     });
 
-    expect(groupVideoGrid.getThumbnailMutedIcon().exists()).toBe(true);
+    expect(groupVideoGrid.getThumbnailMutedIcon()).not.toBeNull();
   });
 });

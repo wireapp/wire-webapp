@@ -72,6 +72,7 @@ const TemporaryGuestAvatar: React.FunctionComponent<TemporaryGuestAvatarProps> =
       {!noBadge && shouldShowBadge(avatarSize, state) && <AvatarBadge state={state} />}
       <AvatarBorder />
       <svg
+        aria-hidden="true"
         css={{
           ...CSS_FILL_PARENT,
           position: 'absolute',

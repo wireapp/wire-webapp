@@ -28,37 +28,57 @@
 
   & + button,
   & + label {
-    position: relative;
-    display: block;
-    width: 48px;
-    height: 24px;
-    background-color: var(--foreground-fade-24);
-    border-radius: 14px;
-    line-height: 24px;
-    text-indent: 60px;
-    transition: @animation-timing-faster ease-in-out;
+    display: flex;
+    align-items: center;
 
-    &::after {
-      position: absolute;
-      top: 4px;
-      left: 4px;
+    .button-label__switch {
+      position: relative;
       display: block;
-      width: 16px;
-      height: 16px;
-      background-color: #fff;
-      border-radius: 50%;
-      box-shadow: 0 2px 6px 0 fade(#000, 32%), 0 0 2px 0 fade(#000, 16%);
-      content: '';
+      width: 48px;
+      height: 24px;
+      background-color: var(--gray-70);
+      border-radius: 12px;
       transition: @animation-timing-faster ease-in-out;
+
+      &::after {
+        position: absolute;
+        top: 50%;
+        left: 4px;
+        display: block;
+        width: 16px;
+        height: 16px;
+        border: 0.5px solid rgba(0, 0, 0, 0.1);
+        background-color: var(--white);
+        border-radius: 50%;
+        box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.16);
+        content: '';
+        transform: translateY(-50%);
+        transition: @animation-timing-faster ease-in-out;
+      }
+
+      body.theme-dark & {
+        border: 1px solid var(--gray-60);
+      }
+    }
+
+    .button-label__text {
+      margin-left: 8px;
     }
   }
 
   &:checked + button,
   &:checked + label {
-    background-color: @w-green;
+    .button-label__switch {
+      background-color: var(--green-500);
 
-    &::after {
-      left: 27px;
+      body.theme-dark & {
+        border: 1px solid var(--green-500);
+        background-color: @green-dark-700;
+      }
+
+      &::after {
+        left: 27px;
+      }
     }
   }
 }

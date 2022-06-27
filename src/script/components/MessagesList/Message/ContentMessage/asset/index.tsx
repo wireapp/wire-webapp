@@ -17,7 +17,6 @@
  *
  */
 
-import React from 'react';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 
 import {QualifiedId} from '@wireapp/api-client/src/user';
@@ -84,21 +83,23 @@ const ContentAsset = ({
     case AssetType.FILE:
       if ((asset as FileAsset).isFile()) {
         return (
-          <div className={`message-asset ${isObfuscated && 'ephemeral-asset-expired icon-file'}`}>
+          <div className={`message-asset ${isObfuscated ? 'ephemeral-asset-expired icon-file' : ''}`}>
             <FileAssetComponent message={message} />
           </div>
         );
       }
+
       if ((asset as FileAsset).isAudio()) {
         return (
-          <div className={`message-asset ${isObfuscated && 'ephemeral-asset-expired'}`}>
+          <div className={`message-asset ${isObfuscated ? 'ephemeral-asset-expired' : ''}`}>
             <AudioAssetComponent message={message} />
           </div>
         );
       }
+
       if ((asset as FileAsset).isVideo()) {
         return (
-          <div className={`message-asset ${isObfuscated && 'ephemeral-asset-expired icon-movie'}`}>
+          <div className={`message-asset ${isObfuscated ? 'ephemeral-asset-expired icon-movie' : ''}`}>
             <VideoAssetComponent message={message} />
           </div>
         );

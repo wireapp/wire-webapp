@@ -54,8 +54,8 @@ describe('MessageTimerButton', () => {
       teamState: mockTeamState as TeamState,
     });
 
-    expect(messageTimerButtonPage.getMessageTimerButton().exists()).toBe(false);
-    expect(messageTimerButtonPage.getMessageTimerIcon().exists()).toBe(false);
+    expect(messageTimerButtonPage.getMessageTimerButton()).toBeNull();
+    expect(messageTimerButtonPage.getMessageTimerIcon()).toBeNull();
   });
 
   it('shows the inactive message timer button', () => {
@@ -73,8 +73,8 @@ describe('MessageTimerButton', () => {
       teamState: mockTeamState as TeamState,
     });
 
-    expect(messageTimerButtonPage.getMessageTimerButton().exists()).toBe(false);
-    expect(messageTimerButtonPage.getMessageTimerIcon().exists()).toBe(true);
+    expect(messageTimerButtonPage.getMessageTimerButton()).toBeNull();
+    expect(messageTimerButtonPage.getMessageTimerIcon()).not.toBeNull();
   });
 
   it('activates the context menu', () => {
@@ -94,7 +94,7 @@ describe('MessageTimerButton', () => {
       teamState: mockTeamState as TeamState,
     });
 
-    expect(messageTimerButtonPage.getMessageTimerElement().prop('data-uie-value')).toBe('enabled');
+    expect(messageTimerButtonPage.getMessageTimerElement().getAttribute('data-uie-value')).toBe('enabled');
 
     expect(Context.showContextMenu).toHaveBeenCalledTimes(0);
     messageTimerButtonPage.clickMessageTimerElement();
@@ -119,11 +119,11 @@ describe('MessageTimerButton', () => {
       teamState: mockTeamState as TeamState,
     });
 
-    expect(messageTimerButtonPage.getMessageTimerButton().exists()).toBe(true);
-    expect(messageTimerButtonPage.getMessageTimerIcon().exists()).toBe(false);
-    expect(messageTimerButtonPage.getMessageTimerButtonValue().text()).toBe(minutes.toString());
-    expect(messageTimerButtonPage.getMessageTimerButtonSymbol().text()).toBe('m');
-    expect(messageTimerButtonPage.getMessageTimerElement().prop('data-uie-value')).toBe('enabled');
+    expect(messageTimerButtonPage.getMessageTimerButton()).not.toBeNull();
+    expect(messageTimerButtonPage.getMessageTimerIcon()).toBeNull();
+    expect(messageTimerButtonPage.getMessageTimerButtonValue().textContent).toBe(minutes.toString());
+    expect(messageTimerButtonPage.getMessageTimerButtonSymbol().textContent).toBe('m');
+    expect(messageTimerButtonPage.getMessageTimerElement().getAttribute('data-uie-value')).toBe('enabled');
   });
 
   it('shows the disabled message timer button when conversation message timer is set', () => {
@@ -144,11 +144,11 @@ describe('MessageTimerButton', () => {
       teamState: mockTeamState as TeamState,
     });
 
-    expect(messageTimerButtonPage.getMessageTimerButton().exists()).toBe(true);
-    expect(messageTimerButtonPage.getMessageTimerIcon().exists()).toBe(false);
-    expect(messageTimerButtonPage.getMessageTimerButtonValue().text()).toBe(minutes.toString());
-    expect(messageTimerButtonPage.getMessageTimerButtonSymbol().text()).toBe('m');
-    expect(messageTimerButtonPage.getMessageTimerElement().prop('data-uie-value')).toBe('disabled');
+    expect(messageTimerButtonPage.getMessageTimerButton()).not.toBeNull();
+    expect(messageTimerButtonPage.getMessageTimerIcon()).toBeNull();
+    expect(messageTimerButtonPage.getMessageTimerButtonValue().textContent).toBe(minutes.toString());
+    expect(messageTimerButtonPage.getMessageTimerButtonSymbol().textContent).toBe('m');
+    expect(messageTimerButtonPage.getMessageTimerElement().getAttribute('data-uie-value')).toBe('disabled');
   });
 
   it('shows the disabled message timer button when team message timer is enforced', () => {
@@ -170,11 +170,11 @@ describe('MessageTimerButton', () => {
       teamState: mockTeamState as TeamState,
     });
 
-    expect(messageTimerButtonPage.getMessageTimerButton().exists()).toBe(true);
-    expect(messageTimerButtonPage.getMessageTimerIcon().exists()).toBe(false);
-    expect(messageTimerButtonPage.getMessageTimerButtonValue().text()).toBe(minutes.toString());
-    expect(messageTimerButtonPage.getMessageTimerButtonSymbol().text()).toBe('m');
-    expect(messageTimerButtonPage.getMessageTimerElement().prop('data-uie-value')).toBe('disabled');
+    expect(messageTimerButtonPage.getMessageTimerButton()).not.toBeNull();
+    expect(messageTimerButtonPage.getMessageTimerIcon()).toBeNull();
+    expect(messageTimerButtonPage.getMessageTimerButtonValue().textContent).toBe(minutes.toString());
+    expect(messageTimerButtonPage.getMessageTimerButtonSymbol().textContent).toBe('m');
+    expect(messageTimerButtonPage.getMessageTimerElement().getAttribute('data-uie-value')).toBe('disabled');
   });
 
   it(`doesn't activate the context menu on a disabled message timer button`, () => {
@@ -196,7 +196,7 @@ describe('MessageTimerButton', () => {
       teamState: mockTeamState as TeamState,
     });
 
-    expect(messageTimerButtonPage.getMessageTimerElement().prop('data-uie-value')).toBe('disabled');
+    expect(messageTimerButtonPage.getMessageTimerElement().getAttribute('data-uie-value')).toBe('disabled');
 
     expect(Context.showContextMenu).toHaveBeenCalledTimes(0);
     messageTimerButtonPage.clickMessageTimerElement();

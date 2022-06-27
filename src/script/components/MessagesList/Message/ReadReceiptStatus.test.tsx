@@ -19,7 +19,6 @@
 
 import ko from 'knockout';
 import TestPage from 'Util/test/TestPage';
-import Icon from 'Components/Icon';
 import {Message as MessageEntity} from 'src/script/entity/message/Message';
 import ReadReceiptStatus, {ReadReceiptStatusProps} from './ReadReceiptStatus';
 import {ReadReceipt} from 'src/script/storage';
@@ -33,7 +32,7 @@ class ReadReceiptStatusPage extends TestPage<ReadReceiptStatusProps> {
   getReadReceiptStatus = () => this.get('span[data-uie-name="status-message-read-receipts"]');
   getReadReceiptStatusCount = () => this.get('span[data-uie-name="status-message-read-receipt-count"]');
   getReadReceiptStatusDelivered = () => this.get('span[data-uie-name="status-message-read-receipt-delivered"]');
-  getReadIcon = () => this.get(Icon.Read);
+  getReadIcon = () => this.get('[data-uie-name=status-message-read-receipts]');
 
   clickReadReceiptStatus = () => this.click(this.getReadReceiptStatus());
 }
@@ -58,7 +57,7 @@ describe('ReadReceiptStatus', () => {
       onClickReceipts: jest.fn(),
     });
 
-    expect(readReceiptStatusPage.getReadReceiptStatusDelivered().exists()).toBe(false);
+    expect(readReceiptStatusPage.getReadReceiptStatusDelivered()).toBeNull();
   });
 
   it('shows "delivered" when noone read the message', () => {
@@ -71,8 +70,8 @@ describe('ReadReceiptStatus', () => {
       onClickReceipts: jest.fn(),
     });
 
-    expect(readReceiptStatusPage.getReadReceiptStatusDelivered().exists()).toBe(true);
-    expect(readReceiptStatusPage.getReadIcon().exists()).toBe(false);
+    expect(readReceiptStatusPage.getReadReceiptStatusDelivered()).not.toBeNull();
+    expect(readReceiptStatusPage.getReadIcon()).toBeNull();
   });
 
   it('shows the read icon', () => {
@@ -85,8 +84,8 @@ describe('ReadReceiptStatus', () => {
       onClickReceipts: jest.fn(),
     });
 
-    expect(readReceiptStatusPage.getReadReceiptStatus().exists()).toBe(true);
-    expect(readReceiptStatusPage.getReadIcon().exists()).toBe(true);
+    expect(readReceiptStatusPage.getReadReceiptStatus()).not.toBeNull();
+    expect(readReceiptStatusPage.getReadIcon()).not.toBeNull();
   });
 
   describe('1to1 conversation', () => {
@@ -102,7 +101,7 @@ describe('ReadReceiptStatus', () => {
         onClickReceipts: onClickReceiptsSpy,
       });
 
-      expect(readReceiptStatusPage.getReadReceiptStatus().exists()).toBe(true);
+      expect(readReceiptStatusPage.getReadReceiptStatus()).not.toBeNull();
 
       readReceiptStatusPage.clickReadReceiptStatus();
       expect(onClickReceiptsSpy).toHaveBeenCalledTimes(0);
@@ -118,9 +117,9 @@ describe('ReadReceiptStatus', () => {
         }),
       });
 
-      expect(readReceiptStatusPage.getReadReceiptStatus().exists()).toBe(true);
-      expect(readReceiptStatusPage.getReadReceiptStatusCount().exists()).toBe(true);
-      expect(readReceiptStatusPage.getReadReceiptStatusCount().text()).toBe(formatTimeShort(readReceiptTime));
+      expect(readReceiptStatusPage.getReadReceiptStatus()).not.toBeNull();
+      expect(readReceiptStatusPage.getReadReceiptStatusCount()).not.toBeNull();
+      expect(readReceiptStatusPage.getReadReceiptStatusCount().textContent).toBe(formatTimeShort(readReceiptTime));
     });
   });
 
@@ -137,7 +136,7 @@ describe('ReadReceiptStatus', () => {
         onClickReceipts: onClickReceiptsSpy,
       });
 
-      expect(readReceiptStatusPage.getReadReceiptStatus().exists()).toBe(true);
+      expect(readReceiptStatusPage.getReadReceiptStatus()).not.toBeNull();
 
       readReceiptStatusPage.clickReadReceiptStatus();
       expect(onClickReceiptsSpy).toHaveBeenCalledTimes(1);
@@ -153,9 +152,9 @@ describe('ReadReceiptStatus', () => {
         onClickReceipts: null,
       });
 
-      expect(readReceiptStatusPage.getReadReceiptStatus().exists()).toBe(true);
-      expect(readReceiptStatusPage.getReadReceiptStatusCount().exists()).toBe(true);
-      expect(readReceiptStatusPage.getReadReceiptStatusCount().text()).toEqual('2');
+      expect(readReceiptStatusPage.getReadReceiptStatus()).not.toBeNull();
+      expect(readReceiptStatusPage.getReadReceiptStatusCount()).not.toBeNull();
+      expect(readReceiptStatusPage.getReadReceiptStatusCount().textContent).toEqual('2');
     });
   });
 });

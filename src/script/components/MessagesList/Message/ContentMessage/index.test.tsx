@@ -17,10 +17,9 @@
  *
  */
 
-import React from 'react';
 import ko from 'knockout';
 import ContentMessageComponent, {ContentMessageProps} from './index';
-import {act, render, waitFor} from '@testing-library/react';
+import {render, waitFor} from '@testing-library/react';
 import {ContentMessage} from '../../../../entity/message/ContentMessage';
 import {Conversation} from '../../../../entity/Conversation';
 import {createRandomUuid} from '../../../../util/util';
@@ -87,11 +86,9 @@ describe('message', () => {
     message.user(new User(createRandomUuid()));
     message.quote(new QuoteEntity({messageId: quotedMessage.id, userId: ''}));
 
-    await act(async () => {
-      const {getByText} = render(
-        <ContentMessageComponent {...defaultParams} message={message} findMessage={findMessage} />,
-      );
-      await waitFor(() => getByText(quoteText));
-    });
+    const {getByText} = render(
+      <ContentMessageComponent {...defaultParams} message={message} findMessage={findMessage} />,
+    );
+    await waitFor(() => getByText(quoteText));
   });
 });

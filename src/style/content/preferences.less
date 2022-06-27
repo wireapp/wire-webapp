@@ -24,20 +24,22 @@
 }
 
 .preferences-titlebar {
-  .label-bold-xs;
+  .heading-h3;
+  .flex-center;
 
   position: relative;
-  display: flex;
   width: 100%;
-  height: @content-title-bar-height;
-  flex: 0 0 auto;
-  align-items: center;
-  justify-content: center;
+  min-height: @content-title-bar-height;
   padding: 0;
-  border-bottom: 1px solid var(--foreground-fade-8);
   margin: 0;
-  background-color: var(--app-bg);
-  color: var(--background);
+  background-color: var(--sidebar-bg);
+  color: @black;
+}
+
+body.theme-dark {
+  .preferences-titlebar {
+    color: @white;
+  }
 }
 
 .preferences-content {
@@ -58,11 +60,20 @@
 }
 
 .preferences-detail {
-  width: 380px;
-  margin: 0;
-  color: var(--foreground);
-  font-size: @font-size-xs;
-  line-height: @line-height-sm;
+  margin-top: 10px;
+  color: var(--gray-90);
+  font-size: @font-size-small;
+  line-height: 14px;
+
+  &-intended {
+    margin-left: 28.5px;
+  }
+}
+
+body.theme-dark {
+  .preferences-detail {
+    color: @gray-20;
+  }
 }
 
 .preferences-detail-bold {
@@ -76,11 +87,12 @@
 }
 
 .preferences-header {
-  .label-bold-xs;
-
+  .heading-h4;
   margin-bottom: 16px;
   color: var(--background);
   line-height: @line-height-sm;
+
+  text-transform: uppercase;
 }
 
 .preferences-hint {
@@ -88,7 +100,13 @@
 }
 
 .preferences-label {
-  color: var(--background);
+  color: var(--gray-80);
+}
+
+body.theme-dark {
+  .preferences-label {
+    color: var(--white);
+  }
 }
 
 .preferences-info {
@@ -98,15 +116,34 @@
 
 .preferences-link {
   .button-reset-default;
+
   display: inline-block;
+  margin-bottom: 10px;
+  color: @black;
   cursor: pointer;
-  font-size: @font-size-sm;
-  line-height: @line-height-xl;
+  font-size: @font-size-base;
+  line-height: @line-height-lg;
+
+  &:hover {
+    .accent-text;
+    text-decoration: underline;
+  }
+}
+
+body.theme-dark {
+  .preferences-link {
+    color: @white;
+
+    &:hover {
+      .accent-text;
+      text-decoration: underline;
+    }
+  }
 }
 
 .preferences-option {
+  position: relative;
   display: flex;
-  margin-bottom: 16px;
 
   input:disabled {
     &,
@@ -117,7 +154,7 @@
   }
 
   & ~ & {
-    margin-top: 32px;
+    margin-top: 24px;
   }
 }
 
@@ -128,7 +165,7 @@
 .preferences-option-icon {
   height: @line-height-sm;
   padding-right: 18px;
-  margin: 0 0 0 -34px;
+  margin: 0;
   font-size: @font-size-sm;
   line-height: @line-height-sm;
 
@@ -163,15 +200,18 @@
 }
 
 .preferences-separator {
-  width: 100%;
+  width: 560px;
   height: 1px;
   border: 0;
-  margin: 0;
-  margin-bottom: 32px;
-  background: @separator-color;
+  margin: 22px 0 22px;
+  background: @gray-50;
 }
 
 .preferences-about-list {
   .list-unstyled;
   margin: 0;
+}
+
+.preferences-history-restore-button {
+  margin-top: 20px;
 }

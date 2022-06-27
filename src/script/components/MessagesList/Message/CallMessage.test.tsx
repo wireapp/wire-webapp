@@ -19,9 +19,17 @@
 
 import ko from 'knockout';
 import TestPage from 'Util/test/TestPage';
-import Icon from 'Components/Icon';
 import {CallMessage as CallMessageEntity} from 'src/script/entity/message/CallMessage';
 import CallMessage, {CallMessageProps} from './CallMessage';
+
+jest.mock('Components/Icon', () => ({
+  Hangup: function HangupIcon() {
+    return <span className="hangupicon"></span>;
+  },
+  Pickup: function PickupIcon() {
+    return <span className="pickupicon"></span>;
+  },
+}));
 
 class CallMessagePage extends TestPage<CallMessageProps> {
   constructor(props?: CallMessageProps) {
@@ -30,8 +38,8 @@ class CallMessagePage extends TestPage<CallMessageProps> {
 
   getCallMessage = (completed: 'completed' | 'not_completed') =>
     this.get(`[data-uie-name="element-message-call"]${completed ? `[data-uie-value="${completed}"]` : ''}`);
-  getPickupIcon = () => this.get(Icon.Pickup);
-  getHangupIcon = () => this.get(Icon.Hangup);
+  getPickupIcon = () => this.get('.pickupicon');
+  getHangupIcon = () => this.get('.hangupicon');
 }
 
 const createCallMessage = (partialCallMessage: Partial<CallMessageEntity>) => {
@@ -54,8 +62,8 @@ describe('CallMessage', () => {
       }),
     });
 
-    expect(callMessagePage.getCallMessage('completed').exists()).toBe(true);
-    expect(callMessagePage.getPickupIcon().exists()).toBe(true);
+    expect(callMessagePage.getCallMessage('completed')).not.toBeNull();
+    expect(callMessagePage.getPickupIcon()).not.toBeNull();
   });
 
   it('shows red hangup icon for incompleted calls', async () => {
@@ -65,7 +73,7 @@ describe('CallMessage', () => {
       }),
     });
 
-    expect(callMessagePage.getCallMessage('not_completed').exists()).toBe(true);
-    expect(callMessagePage.getHangupIcon().exists()).toBe(true);
+    expect(callMessagePage.getCallMessage('not_completed')).not.toBeNull();
+    expect(callMessagePage.getHangupIcon()).not.toBeNull();
   });
 });

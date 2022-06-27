@@ -131,9 +131,6 @@ type EntityObject = {conversationEntity: Conversation; messageEntity: Message};
 type IncomingEvent = ConversationEvent | ClientConversationEvent;
 
 export class ConversationRepository {
-  private init_handled: number;
-  private init_promise?: {rejectFn: (reason?: any) => void; resolveFn: (value?: unknown) => void};
-  private init_total: number;
   private isBlockingNotificationHandling: boolean;
   private readonly conversationsWithNewEvents: Map<any, any>;
   private readonly ephemeralHandler: ConversationEphemeralHandler;
@@ -249,10 +246,6 @@ export class ConversationRepository {
 
     this.teamState.isTeam.subscribe(() => this.mapGuestStatusSelf());
     this.receiving_queue = new PromiseQueue({name: 'ConversationRepository.Receiving'});
-
-    this.init_handled = 0;
-    this.init_promise = undefined;
-    this.init_total = 0;
 
     this.initSubscriptions();
 
@@ -444,7 +437,7 @@ export class ConversationRepository {
     }
 
     try {
-      const response = await this.conversation_service.postConversations(payload);
+      const response = await this.core.service!.conversation.createConversation(payload);
       const {conversationEntity} = await this.onCreate({
         conversation: response.id,
         data: {
@@ -519,7 +512,7 @@ export class ConversationRepository {
   public async getConversations(): Promise<Conversation[]> {
     const remoteConversationsPromise = this.conversation_service.getAllConversations().catch(error => {
       this.logger.error(`Failed to get all conversations from backend: ${error.message}`);
-      return [];
+      return {found: []};
     });
 
     const [localConversations, remoteConversations] = await Promise.all([
@@ -527,7 +520,7 @@ export class ConversationRepository {
       remoteConversationsPromise,
     ]);
     let conversationsData: any[];
-    if (!remoteConversations.length) {
+    if (!remoteConversations.found.length) {
       conversationsData = localConversations;
     } else {
       const data = ConversationMapper.mergeConversation(localConversations, remoteConversations);
@@ -1067,15 +1060,8 @@ export class ConversationRepository {
     }
   }
 
-  initializeConversations(): Promise<unknown> | undefined {
+  initializeConversations(): void {
     this.initStateUpdates();
-    this.init_total = this.receiving_queue.getLength();
-
-    if (this.init_total > 5) {
-      this.logger.log(`Handling '${this.init_total}' additional messages on app start`);
-      return new Promise((resolve, reject) => (this.init_promise = {rejectFn: reject, resolveFn: resolve}));
-    }
-    return undefined;
   }
 
   /**
@@ -1084,8 +1070,8 @@ export class ConversationRepository {
    *
    * @param event Custom event containing join key/code
    */
-  private readonly onConversationJoin = async (event: {detail: {code: string; key: string}}) => {
-    const {key, code} = event.detail;
+  private readonly onConversationJoin = async (event: {detail: {code: string; key: string; domain?: string}}) => {
+    const {key, code, domain} = event.detail;
 
     const showNoConversationModal = () => {
       const titleText = t('modalConversationJoinNotFoundHeadline');
@@ -1113,7 +1099,10 @@ export class ConversationRepository {
           action: async () => {
             try {
               const response = await this.conversation_service.postConversationJoin(key, code);
-              const conversationEntity = await this.getConversationById({domain: '', id: conversationId});
+              const conversationEntity = await this.getConversationById({
+                domain: domain ?? this.userState.self().domain,
+                id: conversationId,
+              });
               if (response) {
                 await this.onMemberJoin(conversationEntity, response);
               }
@@ -1857,7 +1846,10 @@ export class ConversationRepository {
     return this.pushToReceivingQueue(eventJson, eventSource);
   };
 
-  private handleConversationEvent(eventJson: IncomingEvent, eventSource = EventRepository.SOURCE.STREAM) {
+  private handleConversationEvent(
+    eventJson: IncomingEvent,
+    eventSource: EventSource = EventSource.NOTIFICATION_STREAM,
+  ) {
     if (!eventJson) {
       return Promise.reject(new Error('Conversation Repository Event Handling: Event missing'));
     }
@@ -1897,7 +1889,7 @@ export class ConversationRepository {
           // Check if conversation was archived
           previouslyArchived = conversationEntity.is_archived();
 
-          const isBackendTimestamp = eventSource !== EventRepository.SOURCE.INJECTED;
+          const isBackendTimestamp = eventSource !== EventSource.INJECTED;
           conversationEntity.updateTimestampServer(eventJson.server_time || eventJson.time, isBackendTimestamp);
         }
 
@@ -2192,38 +2184,7 @@ export class ConversationRepository {
    * @param source Source of event
    */
   private pushToReceivingQueue(eventJson: IncomingEvent, source: EventSource) {
-    this.receiving_queue
-      .push(() => this.handleConversationEvent(eventJson, source))
-      .then(() => {
-        if (this.init_promise) {
-          const eventFromStream = source === EventRepository.SOURCE.STREAM;
-          if (eventFromStream) {
-            this.init_handled = this.init_handled + 1;
-            if (this.init_handled % 5 === 0 || this.init_handled < 5) {
-              const content = {
-                handled: this.init_handled,
-                total: this.init_total,
-              };
-              const progress = (this.init_handled / this.init_total) * 20 + 75;
-
-              amplify.publish(WebAppEvents.APP.UPDATE_PROGRESS, progress, t('initEvents'), content);
-            }
-          }
-
-          if (!this.receiving_queue.getLength() || !eventFromStream) {
-            this.init_promise.resolveFn();
-            this.init_promise = undefined;
-          }
-        }
-      })
-      .catch(error => {
-        if (this.init_promise) {
-          this.init_promise.rejectFn(error);
-          this.init_promise = undefined;
-        } else {
-          throw error;
-        }
-      });
+    this.receiving_queue.push(() => this.handleConversationEvent(eventJson, source));
   }
 
   /**

@@ -47,7 +47,4 @@ const RestrictedVideo: React.FC<RestrictedVideoProps> = ({showMessage = true, is
 
 export default RestrictedVideo;
 
-registerReactComponent<RestrictedVideoProps>('video-restricted', {
-  component: RestrictedVideo,
-  template: '<div data-bind="react: {className, showMessage, isSmall}"></div>',
-});
+registerReactComponent('video-restricted', RestrictedVideo);

@@ -41,7 +41,7 @@ describe('LegalHoldDot', () => {
       legalHoldModal,
     });
 
-    const isPending = legalHoldDotPage.getPendingIcon().exists();
+    const isPending = legalHoldDotPage.getPendingIcon() !== null;
     expect(isPending).toBe(true);
   });
 });

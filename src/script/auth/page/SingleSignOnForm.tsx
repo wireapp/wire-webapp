@@ -29,6 +29,7 @@ import {
   ErrorMessage,
   Form,
   Input,
+  InputBlock,
   InputSubmitCombo,
   RoundIconButton,
   Loading,
@@ -142,6 +143,11 @@ const SingleSignOnForm = ({
     }
   }, [shouldAutoLogin, clientType, initialCode, codeOrMail]);
 
+  const onCodeChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setCodeOrMail(event.target.value);
+    setIsCodeOrMailInputValid(true);
+  };
+
   const handleSubmit = async (event?: React.FormEvent): Promise<void> => {
     if (event) {
       event.preventDefault();
@@ -236,47 +242,48 @@ const SingleSignOnForm = ({
   const stripPrefix = (prefixedCode: string) =>
     prefixedCode && prefixedCode.trim().toLowerCase().replace(SSO_CODE_PREFIX, '');
 
+  const enableDomainDiscovery = Config.getConfig().FEATURE.ENABLE_DOMAIN_DISCOVERY;
+
+  const inputName = enableDomainDiscovery
+    ? ValidationError.FIELD.SSO_EMAIL_CODE.name
+    : ValidationError.FIELD.SSO_CODE.name;
+
+  const inputPlaceholder = enableDomainDiscovery
+    ? ssoLoginStrings.codeOrMailInputPlaceholder
+    : ssoLoginStrings.codeInputPlaceholder;
+
+  const inputPattern = enableDomainDiscovery
+    ? `(${SSO_CODE_PREFIX_REGEX}${PATTERN.UUID_V4}|${PATTERN.EMAIL})`
+    : `${SSO_CODE_PREFIX_REGEX}${PATTERN.UUID_V4}`;
+
   return isLoading ? (
     <Loading style={{marginTop: '24px'}} />
   ) : (
     <Form style={{marginTop: 30}} data-uie-name="sso" onSubmit={handleSubmit}>
       {!isValidLink && <Redirect to={ROUTE.CONVERSATION_JOIN_INVALID} />}
-      <InputSubmitCombo>
-        <Input
-          name={
-            Config.getConfig().FEATURE.ENABLE_DOMAIN_DISCOVERY
-              ? ValidationError.FIELD.SSO_EMAIL_CODE.name
-              : ValidationError.FIELD.SSO_CODE.name
-          }
-          onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-            setCodeOrMail(event.target.value);
-            setIsCodeOrMailInputValid(true);
-          }}
-          ref={codeOrMailInput}
-          markInvalid={!isCodeOrMailInputValid}
-          placeholder={_(
-            Config.getConfig().FEATURE.ENABLE_DOMAIN_DISCOVERY
-              ? ssoLoginStrings.codeOrMailInputPlaceholder
-              : ssoLoginStrings.codeInputPlaceholder,
-          )}
-          value={codeOrMail}
-          autoComplete="section-login sso-code"
-          maxLength={1024}
-          pattern={
-            Config.getConfig().FEATURE.ENABLE_DOMAIN_DISCOVERY
-              ? `(${SSO_CODE_PREFIX_REGEX}${PATTERN.UUID_V4}|${PATTERN.EMAIL})`
-              : `${SSO_CODE_PREFIX_REGEX}${PATTERN.UUID_V4}`
-          }
-          autoFocus
-          type="text"
-          required
-          disabled={disableInput}
-          data-uie-name="enter-code"
-        />
-        <RoundIconButton disabled={!codeOrMail} type="submit" formNoValidate data-uie-name="do-sso-sign-in">
-          <ArrowIcon />
-        </RoundIconButton>
-      </InputSubmitCombo>
+      <InputBlock>
+        <InputSubmitCombo>
+          <Input
+            id={inputName}
+            name={inputName}
+            onChange={onCodeChange}
+            ref={codeOrMailInput}
+            markInvalid={!isCodeOrMailInputValid}
+            placeholder={_(inputPlaceholder)}
+            value={codeOrMail}
+            autoComplete="section-login sso-code"
+            maxLength={1024}
+            pattern={inputPattern}
+            type="text"
+            required
+            disabled={disableInput}
+            data-uie-name="enter-code"
+          />
+          <RoundIconButton disabled={!codeOrMail} type="submit" formNoValidate data-uie-name="do-sso-sign-in">
+            <ArrowIcon />
+          </RoundIconButton>
+        </InputSubmitCombo>
+      </InputBlock>
       {validationError ? (
         parseValidationErrors([validationError])
       ) : loginError ? (

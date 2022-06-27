@@ -23,7 +23,6 @@ import type {
   ClientMismatch,
   Conversation as BackendConversation,
   ConversationCode,
-  NewConversation,
   NewOTRMessage,
 } from '@wireapp/api-client/src/conversation';
 import type {
@@ -70,23 +69,6 @@ export class ConversationService {
   }
 
   //##############################################################################
-  // Create conversations
-  //##############################################################################
-
-  /**
-   * Create a group conversation.
-   *
-   * @note Do not include yourself as the requestor
-   * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/conversations/createGroupConversation
-   *
-   * @param payload Payload object for group creation
-   * @returns Resolves when the conversation was created
-   */
-  postConversations(payload: NewConversation): Promise<BackendConversation> {
-    return this.apiClient.api.conversation.postConversation(payload);
-  }
-
-  //##############################################################################
   // Get conversations
   //##############################################################################
 
@@ -94,7 +76,7 @@ export class ConversationService {
    * Retrieves all the conversations of a user.
    * @returns Resolves with the conversation information
    */
-  async getAllConversations(): Promise<BackendConversation[]> {
+  async getAllConversations() {
     return this.apiClient.api.conversation.getConversationList();
   }
 

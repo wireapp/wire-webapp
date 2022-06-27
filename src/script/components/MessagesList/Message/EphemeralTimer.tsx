@@ -36,7 +36,7 @@ const EphemeralTimer: React.FC<EphemeralTimerProps> = ({message}) => {
   const duration = Number(expires) - started;
 
   return (
-    <svg className="ephemeral-timer" viewBox="0 0 8 8" width={8} height={8}>
+    <svg aria-hidden="true" className="ephemeral-timer" viewBox="0 0 8 8" width={8} height={8}>
       <circle className="ephemeral-timer__background" cx={4} cy={4} r={3.5} />
       <circle
         data-uie-name="ephemeral-timer-circle"

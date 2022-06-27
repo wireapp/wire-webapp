@@ -245,7 +245,9 @@ export class UserRepository {
   async updateUsersFromConnections(connectionEntities: ConnectionEntity[]): Promise<User[]> {
     // TODO(Federation): Include domain as soon as connections to federated backends are supported.
     const userIds = connectionEntities.map(connectionEntity => connectionEntity.userId);
+
     const userEntities = await this.getUsersById(userIds);
+
     userEntities.forEach(userEntity => {
       const connectionEntity = connectionEntities.find(({userId}) => matchQualifiedIds(userId, userEntity));
       userEntity.connection(connectionEntity);
@@ -443,6 +445,25 @@ export class UserRepository {
         const response = await this.userService.getUsers(chunkOfUserIds);
         return response ? this.userMapper.mapUsersFromJson(response) : [];
       } catch (error) {
+        if (error.label === BackendErrorLabel.FEDERATION_NOT_AVAILABLE) {
+          this.logger.warn('loading federated users failed: trying loading same backend users only');
+          const [sameBackendUsers, federatedUsers] = partition(
+            chunkOfUserIds,
+            userId => userId.domain === this.userState.self().domain,
+          );
+          const users = await getUsers(sameBackendUsers);
+
+          return users.concat(
+            federatedUsers.map(userId => {
+              /* When a federated backend is unreachable, we generate fake users locally with some default values
+               * This allows the webapp to load correctly and display conversations with those federated users
+               */
+              const fakeUser = new User(userId.id, userId.domain);
+              fakeUser.name(t('unavailableUser'));
+              return fakeUser;
+            }),
+          );
+        }
         const isNotFound =
           (isAxiosError(error) && error.response?.status === HTTP_STATUS.NOT_FOUND) ||
           Number((error as BackendError).code) === HTTP_STATUS.NOT_FOUND;

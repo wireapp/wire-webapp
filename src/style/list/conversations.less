@@ -30,8 +30,8 @@
   height: @conversation-input-min-height;
   align-items: center;
   justify-content: space-between;
-  padding-right: 12px;
-  padding-left: 12px;
+  padding-left: 0;
+  border-top: 1px solid var(--sidebar-border-color);
   margin: 0;
   color: #fff;
 
@@ -40,6 +40,62 @@
 
     margin-left: 16px;
     color: #fff;
+  }
+}
+
+.conversations-footer-list-item {
+  height: 100%;
+  flex: 1;
+  padding: 2px 0;
+}
+
+.conversations-footer-btn {
+  .button-reset-default;
+  .label-small-medium;
+  display: flex;
+  width: 100%;
+  min-width: 76px;
+  height: 100%;
+  flex-direction: column;
+  align-items: center;
+  padding: 8px;
+  border-radius: 6px;
+  color: var(--main-color);
+  text-transform: capitalize;
+
+  svg {
+    margin-bottom: 4px;
+  }
+
+  .button-states();
+
+  &:focus-visible {
+    background-color: var(--white);
+    outline: 1px solid var(--gray-40);
+  }
+
+  body.theme-dark & {
+    &:focus-visible {
+      background-color: var(--gray-95);
+      outline: 1px solid var(--gray-90);
+    }
+    &.active {
+      .button-active();
+      color: var(--black);
+
+      svg {
+        fill: var(--black);
+      }
+    }
+  }
+
+  &.active {
+    .button-active();
+    color: var(--white);
+
+    svg {
+      fill: var(--white);
+    }
   }
 }
 
@@ -80,9 +136,8 @@
 }
 
 .conversations-hint-text {
-  .text-white;
-
   margin-bottom: 24px;
+  color: var(--main-color);
   font-size: @font-size-lg;
   font-weight: @font-weight-regular;
 }

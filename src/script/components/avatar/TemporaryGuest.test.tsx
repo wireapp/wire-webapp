@@ -50,7 +50,7 @@ describe('TemporaryGuestAvatar', () => {
       state: STATE.NONE,
     });
 
-    expect(temporaryGuestAvatar.getGuestExpirationCircle().exists()).toBe(true);
+    expect(temporaryGuestAvatar.getGuestExpirationCircle()).not.toBeNull();
   });
 
   it('shows participant initials', async () => {
@@ -64,8 +64,8 @@ describe('TemporaryGuestAvatar', () => {
       state: STATE.NONE,
     });
 
-    expect(temporaryGuestAvatar.getInitials().exists()).toBe(true);
-    expect(temporaryGuestAvatar.getInitials().text()).toBe('AB');
+    expect(temporaryGuestAvatar.getInitials()).not.toBeNull();
+    expect(temporaryGuestAvatar.getInitials().textContent).toBe('AB');
   });
 
   it('does not show avatar badge in default state', async () => {
@@ -79,7 +79,7 @@ describe('TemporaryGuestAvatar', () => {
       state: STATE.NONE,
     });
 
-    expect(temporaryGuestAvatar.getUserBadgeIcon().exists()).toBe(false);
+    expect(temporaryGuestAvatar.getUserBadgeIcon()).toBeNull();
   });
 
   it('shows avatar badge for blocked user', async () => {
@@ -93,6 +93,6 @@ describe('TemporaryGuestAvatar', () => {
       state: STATE.BLOCKED,
     });
 
-    expect(temporaryGuestAvatar.getUserBadgeIcon(STATE.BLOCKED).exists()).toBe(true);
+    expect(temporaryGuestAvatar.getUserBadgeIcon(STATE.BLOCKED)).not.toBeNull();
   });
 });

@@ -36,15 +36,15 @@ const GroupAvatar: React.FC<GroupAvatarProps> = ({users, isLight = false, classN
       className={className}
       css={{
         ...CSS_SQUARE(32),
-        border: isLight ? '1px solid var(--background-fade-8)' : '1px solid hsla(0, 0%, 100%, 0.12)',
+        border: isLight ? '1px solid var(--gray-50)' : '1px solid hsla(0, 0%, 100%, 0.12)',
         borderRadius: 6,
       }}
     >
       <div
         css={{
           ...CSS_SQUARE(28),
-          backgroundColor: isLight ? 'var(--background-fade-16)' : 'rgba(0, 0, 0, 0.4)',
-          borderRadius: 4,
+          backgroundColor: '#34383B',
+          borderRadius: 5,
           display: 'flex',
           flexWrap: 'wrap',
           margin: 1,
@@ -56,7 +56,6 @@ const GroupAvatar: React.FC<GroupAvatarProps> = ({users, isLight = false, classN
           <div
             key={user.id}
             className="group-avatar-box"
-            aria-hidden="true"
             css={{
               ...CSS_FLEX_CENTER,
               ...CSS_SQUARE(14),

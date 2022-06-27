@@ -20,20 +20,19 @@
 import {QualifiedId} from '@wireapp/api-client/src/user';
 import {CALL_TYPE, STATE as CALL_STATE} from '@wireapp/avs';
 import React, {Fragment, useEffect} from 'react';
-import ReactDOM from 'react-dom';
 import {container} from 'tsyringe';
 
-import {useKoSubscribableChildren} from 'Util/ComponentUtil';
+import {registerReactComponent, useKoSubscribableChildren} from 'Util/ComponentUtil';
 
 import {Call} from '../../calling/Call';
 import {CallingRepository} from '../../calling/CallingRepository';
+import {MediaRepository} from '../../media/MediaRepository';
 import {CallState, MuteState} from '../../calling/CallState';
 import {Participant} from '../../calling/Participant';
 import {useVideoGrid} from '../../calling/videoGridHandler';
 import {ConversationState} from '../../conversation/ConversationState';
 import {Conversation} from '../../entity/Conversation';
-import {ElectronDesktopCapturerSource, MediaDevicesHandler} from '../../media/MediaDevicesHandler';
-import {MediaStreamHandler} from '../../media/MediaStreamHandler';
+import {ElectronDesktopCapturerSource} from '../../media/MediaDevicesHandler';
 import {Multitasking} from '../../notification/NotificationRepository';
 import {CallViewTab} from '../../view_model/CallingViewModel';
 import ChooseScreen, {Screen} from './ChooseScreen';
@@ -41,21 +40,20 @@ import FullscreenVideoCall from './FullscreenVideoCall';
 
 export interface CallingContainerProps {
   readonly callingRepository: CallingRepository;
+  readonly mediaRepository: MediaRepository;
   readonly callState?: CallState;
   readonly conversationState?: ConversationState;
-  readonly mediaDevicesHandler: MediaDevicesHandler;
-  readonly mediaStreamHandler: MediaStreamHandler;
   readonly multitasking: Multitasking;
 }
 
 const CallingContainer: React.FC<CallingContainerProps> = ({
   multitasking,
+  mediaRepository,
   callingRepository,
-  mediaStreamHandler,
-  mediaDevicesHandler,
   callState = container.resolve(CallState),
   conversationState = container.resolve(ConversationState),
 }) => {
+  const {streamHandler: mediaStreamHandler, devicesHandler: mediaDevicesHandler} = mediaRepository;
   const {isMinimized} = useKoSubscribableChildren(multitasking, ['isMinimized']);
   const {activeCallViewTab, joinedCall, selectableScreens, selectableWindows, isChoosingScreen} =
     useKoSubscribableChildren(callState, [
@@ -204,22 +202,4 @@ const CallingContainer: React.FC<CallingContainerProps> = ({
   );
 };
 
-export default {
-  CallingContainer,
-  init: (
-    multitasking: Multitasking,
-    callingRepository: CallingRepository,
-    mediaStreamHandler: MediaStreamHandler,
-    mediaDevicesHandler: MediaDevicesHandler,
-  ) => {
-    ReactDOM.render(
-      <CallingContainer
-        multitasking={multitasking}
-        callingRepository={callingRepository}
-        mediaStreamHandler={mediaStreamHandler}
-        mediaDevicesHandler={mediaDevicesHandler}
-      />,
-      document.getElementById('calling-overlay-container'),
-    );
-  },
-};
+registerReactComponent('calling-overlay-container', CallingContainer);

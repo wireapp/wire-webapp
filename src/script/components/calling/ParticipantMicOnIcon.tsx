@@ -18,7 +18,7 @@
  */
 
 import React from 'react';
-import {keyframes} from '@emotion/core';
+import {keyframes} from '@emotion/react';
 import {registerReactComponent} from 'Util/ComponentUtil';
 import SVGProvider from '../../auth/util/SVGProvider';
 import {UserState} from '../../user/UserState';
@@ -66,7 +66,4 @@ const ParticipantMicOnIcon: React.FC<ParticipantMicOnIconProps> = ({
 
 export default ParticipantMicOnIcon;
 
-registerReactComponent('participant-mic-on-icon', {
-  component: ParticipantMicOnIcon,
-  template: '<span data-bind="react: {className, isActive: ko.unwrap(isActive), color}"></span>',
-});
+registerReactComponent('participant-mic-on-icon', ParticipantMicOnIcon);

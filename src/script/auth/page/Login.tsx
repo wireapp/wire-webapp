@@ -191,7 +191,7 @@ const Login = ({
         switch (backendError.label) {
           case BackendError.LABEL.TOO_MANY_CLIENTS: {
             resetAuthError();
-            if (isEntropyRequired && formLoginData?.verificationCode) {
+            if (formLoginData?.verificationCode) {
               doSetLocalStorage(QUERY_KEY.CONVERSATION_CODE, formLoginData.verificationCode);
             }
             if (entropy.current) {
@@ -204,6 +204,7 @@ const Login = ({
             const login: LoginData = {...formLoginData, clientType: loginData.clientType};
             setTwoFactorLoginData(login);
             doSendTwoFactorCode(login.email);
+            doSetLocalStorage(QUERY_KEY.JOIN_EXPIRES, Date.now() + 1000 * 60 * 10);
             break;
           }
           case BackendError.LABEL.CODE_AUTHENTICATION_FAILED: {
@@ -285,10 +286,11 @@ const Login = ({
                 {twoFactorLoginData ? (
                   <div>
                     <H2 center>{_(loginStrings.twoFactorLoginTitle)}</H2>
-                    <Text>{_(loginStrings.twoFactorLoginSubHead, {email: twoFactorLoginData.email})}</Text>
+                    <Text data-uie-name="label-with-email">
+                      {_(loginStrings.twoFactorLoginSubHead, {email: twoFactorLoginData.email})}
+                    </Text>
                     <Label markInvalid={!!twoFactorSubmitError}>
                       <CodeInput
-                        autoFocus
                         style={{marginTop: 60}}
                         onCodeComplete={submitTwoFactorLogin}
                         data-uie-name="enter-code"
@@ -300,7 +302,7 @@ const Login = ({
                       {isSendingTwoFactorCode ? (
                         <Loading size={20} />
                       ) : (
-                        <TextLink onClick={resendTwoFactorCode} center>
+                        <TextLink onClick={resendTwoFactorCode} center data-uie-name="do-resend-code">
                           {_(verifyStrings.resendCode)}
                         </TextLink>
                       )}

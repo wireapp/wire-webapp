@@ -145,6 +145,7 @@ const Conversations: React.FC<ConversationsProps> = ({
       >
         <Icon.Settings />
       </button>
+
       {teamState.isTeam() ? (
         <>
           <button
@@ -159,11 +160,13 @@ const Conversations: React.FC<ConversationsProps> = ({
               label={userName}
             />
           </button>
+
           {(isOnLegalHold || hasPendingLegalHold) && (
             <LegalHoldDot
               isPending={hasPendingLegalHold}
               dataUieName={hasPendingLegalHold ? 'status-legal-hold-pending' : 'status-legal-hold'}
               legalHoldModal={listViewModel.contentViewModel.legalHoldModal}
+              showText
             />
           )}
         </>
@@ -177,57 +180,70 @@ const Conversations: React.FC<ConversationsProps> = ({
 
   const footer = (
     <section className="conversations-footer">
-      <ul className="conversations-footer-list">
-        <li className="conversations-footer-list-item">
-          <button
-            type="button"
-            className="button-icon-large"
-            onClick={() => switchList(ListState.START_UI)}
-            title={t('tooltipConversationsStart', Shortcut.getShortcutTooltip(ShortcutType.START))}
-            data-uie-name="go-people"
-          >
-            <Icon.People />
-          </button>
-        </li>
-
-        <li className="conversations-footer-list-item">
-          <button
-            type="button"
-            className={`button-icon-large ${viewStyle === ConverationViewStyle.RECENT ? 'accent-fill' : ''}`}
-            onClick={() => setViewStyle(ConverationViewStyle.RECENT)}
-            title={t('conversationViewTooltip')}
-            data-uie-name="go-recent-view"
-            data-uie-status={viewStyle === ConverationViewStyle.RECENT ? 'active' : 'inactive'}
-          >
-            <Icon.ConversationsRecent />
-          </button>
-        </li>
-        <li className="conversations-footer-list-item">
-          <button
-            type="button"
-            className={`button-icon-large ${viewStyle === ConverationViewStyle.FOLDER ? 'accent-fill' : ''}`}
-            onClick={() => setViewStyle(ConverationViewStyle.FOLDER)}
-            title={t('folderViewTooltip')}
-            data-uie-name="go-folder-view"
-            data-uie-status={viewStyle === ConverationViewStyle.FOLDER ? 'active' : 'inactive'}
-          >
-            <Icon.ConversationsFolder />
-          </button>
-        </li>
-        {archivedConversations.length > 0 && (
+      <div role="tablist" aria-owns="tab-1 tab-2 tab-3">
+        <ul className="conversations-footer-list">
           <li className="conversations-footer-list-item">
             <button
+              id="tab-1"
               type="button"
-              className="button-icon-large"
-              data-uie-name="go-archive"
-              onClick={() => switchList(ListState.ARCHIVE)}
-              title={t('tooltipConversationsArchived', archivedConversations.length)}
+              className="conversations-footer-btn"
+              onClick={() => switchList(ListState.START_UI)}
+              title={t('tooltipConversationsStart', Shortcut.getShortcutTooltip(ShortcutType.START))}
+              data-uie-name="go-people"
             >
-              <Icon.Archive />
+              <Icon.People />
+              {t('conversationFooterContacts')}
             </button>
           </li>
-        )}
-      </ul>
+
+          <li className="conversations-footer-list-item">
+            <button
+              id="tab-2"
+              type="button"
+              role="tab"
+              className={`conversations-footer-btn ${viewStyle === ConverationViewStyle.RECENT ? 'active' : ''}`}
+              onClick={() => setViewStyle(ConverationViewStyle.RECENT)}
+              title={t('conversationViewTooltip')}
+              data-uie-name="go-recent-view"
+              data-uie-status={viewStyle === ConverationViewStyle.RECENT ? 'active' : 'inactive'}
+              aria-selected={viewStyle === ConverationViewStyle.RECENT}
+            >
+              <Icon.ConversationsRecent />
+              {t('conversationViewTooltip')}
+            </button>
+          </li>
+          <li className="conversations-footer-list-item">
+            <button
+              id="tab-3"
+              type="button"
+              role="tab"
+              className={`conversations-footer-btn ${viewStyle === ConverationViewStyle.FOLDER ? 'active' : ''}`}
+              onClick={() => setViewStyle(ConverationViewStyle.FOLDER)}
+              title={t('folderViewTooltip')}
+              data-uie-name="go-folder-view"
+              data-uie-status={viewStyle === ConverationViewStyle.FOLDER ? 'active' : 'inactive'}
+              aria-selected={viewStyle === ConverationViewStyle.FOLDER}
+            >
+              <Icon.ConversationsFolder />
+              {t('folderViewTooltip')}
+            </button>
+          </li>
+          {archivedConversations.length > 0 && (
+            <li className="conversations-footer-list-item">
+              <button
+                type="button"
+                className="conversations-footer-btn"
+                data-uie-name="go-archive"
+                onClick={() => switchList(ListState.ARCHIVE)}
+                title={t('tooltipConversationsArchived', archivedConversations.length)}
+              >
+                <Icon.Archive />
+                {t('conversationFooterArchive')}
+              </button>
+            </li>
+          )}
+        </ul>
+      </div>
     </section>
   );
 

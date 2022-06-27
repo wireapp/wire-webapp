@@ -23,15 +23,15 @@ import 'core-js/es7/reflect';
 import ko from 'knockout';
 import platform from 'platform';
 import {container} from 'tsyringe';
+import {ClientType} from '@wireapp/api-client/src/client/';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import {amplify} from 'amplify';
-import type {SQLeetEngine} from '@wireapp/store-engine-sqleet';
 import Dexie from 'dexie';
 import {Runtime} from '@wireapp/commons';
 
 import {getLogger, Logger} from 'Util/Logger';
 import {t} from 'Util/LocalizerUtil';
-import {checkIndexedDb, createRandomUuid, isTemporaryClientAndNonPersistent} from 'Util/util';
+import {checkIndexedDb, createRandomUuid} from 'Util/util';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 import {enableLogging} from 'Util/LoggerUtil';
 import {Environment} from 'Util/Environment';
@@ -67,7 +67,6 @@ import {EventService} from '../event/EventService';
 import {NotificationService} from '../event/NotificationService';
 import {QuotedMessageMiddleware} from '../event/preprocessor/QuotedMessageMiddleware';
 import {ServiceMiddleware} from '../event/preprocessor/ServiceMiddleware';
-import {WebSocketService} from '../event/WebSocketService';
 import {ConversationService} from '../conversation/ConversationService';
 import {SingleInstanceHandler} from './SingleInstanceHandler';
 import {AppInitStatisticsValue} from '../telemetry/app_init/AppInitStatisticsValue';
@@ -92,7 +91,6 @@ import {URLParameter} from '../auth/URLParameter';
 import {SIGN_OUT_REASON} from '../auth/SignOutReason';
 import {ClientRepository} from '../client/ClientRepository';
 import {ContentViewModel} from '../view_model/ContentViewModel';
-import AppLock from '../page/AppLock';
 import {CacheRepository} from '../cache/CacheRepository';
 import {SelfService} from '../self/SelfService';
 import {PropertiesRepository} from '../properties/PropertiesRepository';
@@ -115,17 +113,17 @@ import {TeamService} from '../team/TeamService';
 import {SearchService} from '../search/SearchService';
 import {CryptographyService} from '../cryptography/CryptographyService';
 import {AccessTokenError, ACCESS_TOKEN_ERROR_TYPE} from '../error/AccessTokenError';
-import {ClientError} from '../error/ClientError';
+import {ClientError, CLIENT_ERROR_TYPE} from '../error/ClientError';
 import {AuthError} from '../error/AuthError';
 import {AssetRepository} from '../assets/AssetRepository';
 import type {BaseError} from '../error/BaseError';
 import type {User} from '../entity/User';
 import {MessageRepository} from '../conversation/MessageRepository';
-import CallingContainer from 'Components/calling/CallingOverlayContainer';
 import {TeamError} from '../error/TeamError';
 import Warnings from '../view_model/WarningsContainer';
 import {Core} from '../service/CoreSingleton';
 import {migrateToQualifiedSessionIds} from './sessionIdMigrator';
+import showUserModal from 'Components/Modals/UserModal';
 
 function doRedirect(signOutReason: SIGN_OUT_REASON) {
   let url = `/auth/${location.search}`;
@@ -145,6 +143,7 @@ function doRedirect(signOutReason: SIGN_OUT_REASON) {
 
 class App {
   static readonly LOCAL_STORAGE_LOGIN_REDIRECT_KEY = 'LOGIN_REDIRECT_KEY';
+  static readonly LOCAL_STORAGE_LOGIN_CONVERSATION_KEY = 'LOGIN_CONVERSATION_KEY';
   logger: Logger;
   service: {
     asset: AssetService;
@@ -153,7 +152,6 @@ class App {
     integration: IntegrationService;
     notification: NotificationService;
     storage: StorageService;
-    webSocket: WebSocketService;
   };
   repository: ViewModelRepositories = {} as ViewModelRepositories;
   debug: DebugUtil;
@@ -189,8 +187,8 @@ class App {
    */
   constructor(
     private readonly appContainer: HTMLElement,
+    private readonly core: Core,
     private readonly apiClient: APIClient,
-    options?: {storageEngine?: SQLeetEngine},
   ) {
     this.apiClient.on(APIClient.TOPIC.ON_LOGOUT, () => this.logout(SIGN_OUT_REASON.NOT_SIGNED_IN, false));
     this.logger = getLogger('App');
@@ -198,7 +196,7 @@ class App {
 
     new WindowHandler();
 
-    this.service = this._setupServices(options.storageEngine);
+    this.service = this._setupServices();
     this.repository = this._setupRepositories();
     if (Config.getConfig().FEATURE.ENABLE_DEBUG) {
       import('Util/DebugUtil').then(({DebugUtil}) => {
@@ -213,7 +211,6 @@ class App {
     this.singleInstanceHandler = new SingleInstanceHandler(onExtraInstanceStarted);
 
     this._subscribeToEvents();
-    this.initApp();
     this.initServiceWorker();
   }
 
@@ -252,13 +249,7 @@ class App {
       repositories.properties,
     );
     repositories.connection = new ConnectionRepository(new ConnectionService(), repositories.user);
-    repositories.event = new EventRepository(
-      this.service.event,
-      this.service.notification,
-      this.service.webSocket,
-      repositories.cryptography,
-      serverTimeHandler,
-    );
+    repositories.event = new EventRepository(this.service.event, this.service.notification, serverTimeHandler);
     repositories.search = new SearchRepository(new SearchService(), repositories.user);
     repositories.team = new TeamRepository(new TeamService(), repositories.user, repositories.asset);
 
@@ -328,8 +319,8 @@ class App {
    * @param Encrypted database handler
    * @returns All services
    */
-  private _setupServices(encryptedEngine: SQLeetEngine) {
-    container.registerInstance(StorageService, new StorageService(encryptedEngine));
+  private _setupServices() {
+    container.registerInstance(StorageService, new StorageService());
     const storageService = container.resolve(StorageService);
     const eventService = Runtime.isEdge() ? new EventServiceNoCompound() : new EventService();
 
@@ -340,7 +331,6 @@ class App {
       integration: new IntegrationService(),
       notification: new NotificationService(),
       storage: storageService,
-      webSocket: new WebSocketService(),
     };
   }
 
@@ -374,9 +364,9 @@ class App {
    *   Any failure in the Promise chain will result in a logout.
    * @todo Check if we really need to logout the user in all these error cases or how to recover from them
    *
-   * @param App init after page reload
+   * @param clientType
    */
-  async initApp() {
+  async initApp(clientType: ClientType) {
     // add body information
     const osCssClass = Runtime.isMacOS() ? 'os-mac' : 'os-pc';
     const platformCssClass = Runtime.isDesktopApp() ? 'platform-electron' : 'platform-web';
@@ -389,7 +379,6 @@ class App {
     const telemetry = new AppInitTelemetry();
     try {
       const {
-        auth: authRepository,
         audio: audioRepository,
         calling: callingRepository,
         client: clientRepository,
@@ -406,7 +395,13 @@ class App {
       this._registerSingleInstance();
       loadingView.updateProgress(2.5);
       telemetry.timeStep(AppInitTimingsStep.RECEIVED_ACCESS_TOKEN);
-      const {clientType} = await authRepository.init();
+
+      try {
+        await this.core.init(clientType);
+      } catch (error) {
+        throw new ClientError(CLIENT_ERROR_TYPE.NO_VALID_CLIENT, 'Client has been deleted on backend');
+      }
+
       const selfUser = await this.initiateSelfUser();
       if (this.apiClient.backendFeatures.isFederated) {
         // Migrate all existing session to fully qualified ids (if need be)
@@ -423,9 +418,7 @@ class App {
       telemetry.timeStep(AppInitTimingsStep.VALIDATED_CLIENT);
       telemetry.addStatistic(AppInitStatisticsValue.CLIENT_TYPE, clientEntity().type);
 
-      const core = container.resolve(Core);
-      await core.init(clientType, undefined, this.service.storage['engine']);
-      await cryptographyRepository.init(core.service!.cryptography.cryptobox, clientEntity);
+      await cryptographyRepository.init(this.core.service!.cryptography.cryptobox, clientEntity);
 
       loadingView.updateProgress(10);
       telemetry.timeStep(AppInitTimingsStep.INITIALIZED_CRYPTOGRAPHY);
@@ -435,24 +428,21 @@ class App {
       const conversationEntities = await conversationRepository.getConversations();
       const connectionEntities = await connectionRepository.getConnections();
       loadingView.updateProgress(25, t('initReceivedUserData'));
-
       telemetry.timeStep(AppInitTimingsStep.RECEIVED_USER_DATA);
       telemetry.addStatistic(AppInitStatisticsValue.CONVERSATIONS, conversationEntities.length, 50);
       telemetry.addStatistic(AppInitStatisticsValue.CONNECTIONS, connectionEntities.length, 50);
-
-      await Promise.all(
-        conversationRepository.mapConnections(
-          Object.values(connectionRepository['connectionState'].connectionEntities()),
-        ),
-      );
+      if (connectionEntities.length) {
+        await Promise.allSettled(conversationRepository.mapConnections(connectionEntities));
+      }
       this._subscribeToUnloadEvents();
 
       await conversationRepository.conversationRoleRepository.loadTeamRoles();
 
       await userRepository.loadUsers();
 
-      await eventRepository.connectWebSocket();
-      eventRepository.watchNetworkStatus();
+      await eventRepository.connectWebSocket(this.core, ({done, total}) => {
+        loadingView.updateProgress(25 + 50 * (done / total), t('initDecryption'), {handled: done, total});
+      });
       const notificationsCount = eventRepository.notificationsTotal;
 
       telemetry.timeStep(AppInitTimingsStep.UPDATED_FROM_NOTIFICATIONS);
@@ -477,7 +467,6 @@ class App {
 
       telemetry.timeStep(AppInitTimingsStep.APP_LOADED);
       this._showInterface();
-      AppLock.init(clientRepository);
 
       loadingView.removeFromView();
       telemetry.report();
@@ -550,6 +539,10 @@ class App {
 
     if (navigator.onLine === true) {
       switch (type) {
+        case CLIENT_ERROR_TYPE.NO_VALID_CLIENT: {
+          this.logger.warn(`Redirecting to login: ${error.message}`, error);
+          return this._redirectToLogin(SIGN_OUT_REASON.CLIENT_REMOVED);
+        }
         case AccessTokenError.TYPE.NOT_FOUND_IN_CACHE:
         case AccessTokenError.TYPE.RETRIES_EXCEEDED:
         case AccessTokenError.TYPE.REQUEST_FORBIDDEN: {
@@ -610,7 +603,7 @@ class App {
       }
     }
 
-    await container.resolve(StorageService).init(userEntity.id);
+    await container.resolve(StorageService).init(this.core.storage);
     this.repository.client.init(userEntity);
     await this.repository.properties.init(userEntity);
     this._checkUserInformation(userEntity);
@@ -695,6 +688,13 @@ class App {
       window.location.replace(redirect);
     }
 
+    const conversationRedirect = localStorage.getItem(App.LOCAL_STORAGE_LOGIN_CONVERSATION_KEY);
+    if (conversationRedirect) {
+      const {conversation, domain} = JSON.parse(conversationRedirect)?.data;
+      localStorage.removeItem(App.LOCAL_STORAGE_LOGIN_CONVERSATION_KEY);
+      window.location.replace(`#/conversation/${conversation}${domain ? `/${domain}` : ''}`);
+    }
+
     const router = new Router({
       '/conversation/:conversationId(/:domain)': (conversationId: string, domain?: string) =>
         mainView.content.showConversation(conversationId, {}, domain),
@@ -704,7 +704,12 @@ class App {
       '/preferences/devices': () => mainView.list.openPreferencesDevices(),
       '/preferences/options': () => mainView.list.openPreferencesOptions(),
       '/user/:userId(/:domain)': (userId: string, domain?: string) => {
-        mainView.content.userModal.showUser({domain, id: userId}, () => router.navigate('/'));
+        showUserModal({
+          actionsViewModel: mainView.actions,
+          onClose: () => router.navigate('/'),
+          userId: {domain, id: userId},
+          userRepository: this.repository.user,
+        });
       },
     });
     initRouterBindings(router);
@@ -715,13 +720,6 @@ class App {
     this.repository.properties.checkPrivacyPermission().then(() => {
       window.setTimeout(() => this.repository.notification.checkPermission(), App.CONFIG.NOTIFICATION_CHECK);
     });
-
-    CallingContainer.init(
-      mainView.multitasking,
-      this.repository.calling,
-      this.repository.media.streamHandler,
-      this.repository.media.devicesHandler,
-    );
   }
 
   /**
@@ -900,6 +898,7 @@ class App {
 $(async () => {
   const apiClient = container.resolve(APIClient);
   await apiClient.useVersion(Config.getConfig().SUPPORTED_API_VERSIONS);
+  const core = container.resolve(Core);
 
   enableLogging(Config.getConfig().FEATURE.ENABLE_DEBUG);
   exposeWrapperGlobals();
@@ -914,10 +913,9 @@ $(async () => {
     if (shouldPersist === undefined) {
       doRedirect(SIGN_OUT_REASON.NOT_SIGNED_IN);
     } else {
-      const storageEngine = isTemporaryClientAndNonPersistent(shouldPersist)
-        ? await StorageService.getUninitializedEngine()
-        : undefined;
-      window.wire.app = new App(appContainer, apiClient, {storageEngine});
+      const app = new App(appContainer, core, apiClient);
+      window.wire.app = app;
+      app.initApp(shouldPersist ? ClientType.PERMANENT : ClientType.TEMPORARY);
     }
   }
 });

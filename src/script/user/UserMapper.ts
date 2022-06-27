@@ -95,7 +95,7 @@ export class UserMapper {
     const isNewUser = userEntity.id === '' && userData.id !== '';
     if (isNewUser) {
       userEntity.id = userData.id;
-      userEntity.joaatHash = joaatHash(userData.id);
+      userEntity.joaatHash = joaatHash(userData.id ?? '');
     }
 
     if (userData.qualified_id) {

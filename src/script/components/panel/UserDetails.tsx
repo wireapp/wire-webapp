@@ -87,7 +87,7 @@ const UserDetails: React.FC<UserDetailsProps> = ({
       </div>
 
       {participant.handle && (
-        <div className="panel-participant__user-name" data-uie-name="status-username">
+        <div className="panel-participant__user-name" data-uie-name="status-username" title={participant.handle}>
           {participant.handle}
         </div>
       )}
@@ -146,8 +146,4 @@ const UserDetails: React.FC<UserDetailsProps> = ({
 
 export default UserDetails;
 
-registerReactComponent('panel-user-details', {
-  component: UserDetails,
-  template:
-    '<div data-bind="react: {badge: ko.unwrap(badge), isGroupAdmin: ko.unwrap(isGroupAdmin), isSelfVerified: ko.unwrap(isSelfVerified), isVerified: ko.unwrap(isVerified), participant: ko.unwrap(participant), classifiedDomains: ko.unwrap(classifiedDomains)}"></div>',
-});
+registerReactComponent('panel-user-details', UserDetails);

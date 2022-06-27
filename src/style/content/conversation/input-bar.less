@@ -28,6 +28,7 @@
   &__input {
     z-index: 10;
     display: flex;
+    padding-right: 8px;
     background-color: var(--app-bg-secondary);
 
     &--editing {
@@ -61,7 +62,11 @@
     .label-xs;
 
     padding-left: 8px;
-    color: var(--foreground-fade-48);
+    color: var(--gray-70);
+
+    body.theme-dark & {
+      color: var(--gray-60);
+    }
   }
 
   &--accent::placeholder {
@@ -71,7 +76,7 @@
 
 @supports (caret-color: #000) {
   .conversation-input-bar-text {
-    caret-color: var(--background);
+    caret-color: var(--accent-color);
     color: transparent;
   }
 }
@@ -114,29 +119,50 @@
 
 .controls-right {
   .list-unstyled;
+
   display: flex;
   min-width: @conversation-message-timestamp-width;
   align-items: center;
   justify-content: flex-end;
-
   margin: 0;
+
+  .conversation-button {
+    padding: 0;
+  }
 }
 
 .controls-right-button {
-  .button-reset-default;
-  position: relative;
-  display: flex;
-  width: 32px;
-  height: 32px;
-  flex: 0 0 auto;
-  align-items: center;
-  justify-content: center;
-  margin-right: 12px;
-  margin-left: 12px;
-  line-height: 0;
+  .button-icon-primary;
 
-  svg path {
-    fill: var(--background);
+  &.no-radius {
+    border-radius: 0;
+  }
+
+  &--send {
+    width: 40px;
+    height: 40px;
+    border: 0;
+    margin-left: 10px;
+    background-color: var(--accent-color-500) !important;
+    border-radius: 50%;
+    color: var(--white) !important;
+
+    > * {
+      display: flex;
+    }
+
+    &[disabled]:not([disabled='false']) {
+      background-color: var(--gray-70) !important;
+      color: var(--white) !important;
+    }
+
+    body.theme-dark & {
+      color: #34383b !important;
+
+      &[disabled]:not([disabled='false']) {
+        color: #34383b !important;
+      }
+    }
   }
 }
 
@@ -322,7 +348,7 @@
     }
 
     .message-mention {
-      font-weight: @font-weight-bold;
+      .text-medium;
     }
 
     &__image img {

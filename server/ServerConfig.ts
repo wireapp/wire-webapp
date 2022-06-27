@@ -1,3 +1,22 @@
+/*
+ * Wire
+ * Copyright (C) 2022 Wire Swiss GmbH
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ *
+ */
+
 export interface ServerConfig {
   CLIENT: {
     ANALYTICS_API_KEY: string;
@@ -18,6 +37,7 @@ export interface ServerConfig {
       ENABLE_ACCOUNT_REGISTRATION: boolean;
       ENABLE_ACCOUNT_REGISTRATION_ACCEPT_TERMS_AND_PRIVACY_POLICY: boolean;
       ENABLE_DEBUG: boolean;
+      ENABLE_MLS: boolean;
       ENABLE_DOMAIN_DISCOVERY: boolean;
       ENABLE_ENFORCE_DESKTOP_APPLICATION_ONLY: boolean;
       ENABLE_EXTRA_CLIENT_ENTROPY: boolean;

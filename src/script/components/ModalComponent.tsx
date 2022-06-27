@@ -17,16 +17,17 @@
  *
  */
 
-import {CSSObject} from '@emotion/core';
+import {CSSObject} from '@emotion/react';
 import React, {useEffect, useState} from 'react';
 import {noop} from 'Util/util';
 import Icon from './Icon';
 
 interface ModalComponentProps {
+  children: React.ReactNode;
   isShown: boolean;
   onBgClick?: () => void;
   onClosed?: () => void;
-  showLoading: boolean;
+  showLoading?: boolean;
 }
 
 const ModalOverlayStyles: CSSObject = {
@@ -61,7 +62,7 @@ const ModalContentStyles: CSSObject = {
   flexDirection: 'column',
   fontSize: 14,
   margin: 'auto',
-  maxHeight: 480,
+  maxHeight: 560,
   overflow: 'hidden',
   overflowY: 'hidden',
   padding: 16,
@@ -106,6 +107,9 @@ const ModalComponent: React.FC<ModalComponentProps> = ({
       onClick={onBgClick}
       css={hasVisibleClass ? ModalOverlayVisibleStyles : ModalOverlayStyles}
       style={{display: displayNone ? 'none' : 'flex'}}
+      tabIndex={0}
+      role="button"
+      onKeyDown={onBgClick}
       {...rest}
     >
       {showLoading ? (
@@ -113,9 +117,12 @@ const ModalComponent: React.FC<ModalComponentProps> = ({
       ) : (
         <div
           onClick={event => event.stopPropagation()}
+          role="button"
+          tabIndex={-1}
+          onKeyDown={event => event.stopPropagation()}
           css={hasVisibleClass ? ModalContentVisibleStyles : ModalContentStyles}
         >
-          {children}
+          {hasVisibleClass ? children : null}
         </div>
       )}
     </div>

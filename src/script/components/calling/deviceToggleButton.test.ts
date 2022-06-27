@@ -25,7 +25,7 @@ class DeviceToggleButtonPage extends TestPage<DeviceToggleButtonProps> {
     super(DeviceToggleButton, props);
   }
 
-  getDots = () => this.get('span[data-uie-name="device-toggle-button-indicator-dot"]');
+  getDots = () => this.getAll('span[data-uie-name="device-toggle-button-indicator-dot"]');
   getActiveDot = () => this.get('span[data-uie-value="active"]');
   getButton = () => this.get('div[data-uie-name="device-toggle-button-indicator"]');
 
@@ -47,7 +47,7 @@ describe('deviceToggleButton', () => {
 
     const activeDot = deviceToggleButton.getActiveDot();
 
-    expect(activeDot.exists()).toBe(true);
+    expect(activeDot).not.toBeNull();
     expect(activeDot).not.toBe(null);
   });
 
@@ -60,7 +60,7 @@ describe('deviceToggleButton', () => {
     };
     const deviceToggleButton = new DeviceToggleButtonPage(props);
 
-    expect(deviceToggleButton.getButton().exists()).toBe(true);
+    expect(deviceToggleButton.getButton()).not.toBeNull();
 
     deviceToggleButton.clickOnButton();
 

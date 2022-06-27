@@ -16,6 +16,7 @@
  * along with this program. If not, see http://www.gnu.org/licenses/.
  *
  */
+
 import ko from 'knockout';
 import {ConnectionStatus} from '@wireapp/api-client/src/connection/';
 
@@ -39,7 +40,7 @@ class UserActionsPage extends TestPage<UserActionsProps> {
   getAllActions = () =>
     Object.values(ActionIdentifier)
       .map(this.getAction)
-      .filter(action => action.exists());
+      .filter(action => action !== null);
 }
 describe('UserActions', () => {
   it('generates actions for self user profile', () => {
@@ -61,7 +62,7 @@ describe('UserActions', () => {
     expect(userActions.getAllActions().length).toEqual(2);
     [Actions.OPEN_PROFILE, Actions.LEAVE].forEach(action => {
       const identifier = ActionIdentifier[action];
-      expect(userActions.getAction(identifier).exists()).toBe(true);
+      expect(userActions.getAction(identifier)).not.toBeNull();
     });
   });
   it('generates actions for self user profile when user is not activated', () => {
@@ -82,7 +83,7 @@ describe('UserActions', () => {
     expect(userActions.getAllActions().length).toEqual(1);
 
     const identifier = ActionIdentifier[Actions.OPEN_PROFILE];
-    expect(userActions.getAction(identifier).exists()).toBe(true);
+    expect(userActions.getAction(identifier)).not.toBeNull();
   });
   it('generates actions for another user profile to which I am connected', () => {
     const user = new User('', null);
@@ -102,7 +103,7 @@ describe('UserActions', () => {
     expect(userActions.getAllActions().length).toEqual(2);
     [Actions.OPEN_CONVERSATION, Actions.BLOCK].forEach(action => {
       const identifier = ActionIdentifier[action];
-      expect(userActions.getAction(identifier).exists()).toBe(true);
+      expect(userActions.getAction(identifier)).not.toBeNull();
     });
   });
 });

@@ -47,7 +47,7 @@ import {CallState, MuteState} from '../../calling/CallState';
 import {useFadingScrollbar} from '../../ui/fadingScrollbar';
 import {CallActions, CallViewTab} from '../../view_model/CallingViewModel';
 import {showContextMenu, ContextMenuEntry} from '../../ui/ContextMenu';
-import type {ClientId, Participant, UserId} from '../../calling/Participant';
+import type {Participant} from '../../calling/Participant';
 import ClassifiedBar from 'Components/input/ClassifiedBar';
 
 export interface CallingCellProps {
@@ -152,8 +152,7 @@ const ConversationListCallingCell: React.FC<CallingCellProps> = ({
     event.preventDefault();
 
     const muteParticipant = {
-      click: () =>
-        callingRepository.sendModeratorMute(conversation.qualifiedId, {[participant.user.id]: [participant.clientId]}),
+      click: () => callingRepository.sendModeratorMute(conversation.qualifiedId, [participant]),
       icon: 'mic-off-icon',
       identifier: `moderator-mute-participant`,
       isDisabled: participant.isMuted(),
@@ -162,13 +161,10 @@ const ConversationListCallingCell: React.FC<CallingCellProps> = ({
 
     const muteOthers: ContextMenuEntry = {
       click: () => {
-        const recipients = participants
-          .filter(p => p !== participant)
-          .reduce((acc, {user, clientId}) => {
-            acc[user.id] = [...(acc[user.id] || []), clientId];
-            return acc;
-          }, {} as Record<UserId, ClientId[]>);
-        callingRepository.sendModeratorMute(conversation.qualifiedId, recipients);
+        callingRepository.sendModeratorMute(
+          conversation.qualifiedId,
+          participants.filter(p => p !== participant),
+        );
       },
       icon: 'mic-off-icon',
       identifier: 'moderator-mute-others',
@@ -211,6 +207,7 @@ const ConversationListCallingCell: React.FC<CallingCellProps> = ({
           {t('callJoin')}
         </button>
       )}
+
       {conversation && !isDeclined && (
         <div
           className="conversation-list-calling-cell-background"
@@ -228,7 +225,7 @@ const ConversationListCallingCell: React.FC<CallingCellProps> = ({
               onKeyDown={createNavigateKeyboard(conversationUrl)}
               tabIndex={0}
               role="button"
-              aria-label={`${t('callGoToLabel')} ${conversationName}`}
+              aria-label={t('accessibility.openConversation', conversationName)}
             >
               {!temporaryUserStyle && (
                 <div className="conversation-list-cell-left">
@@ -278,6 +275,7 @@ const ConversationListCallingCell: React.FC<CallingCellProps> = ({
                 )}
               </div>
             </div>
+
             <div className="conversation-list-cell-right">
               {isConnecting ||
                 (isOngoing && (
@@ -293,6 +291,7 @@ const ConversationListCallingCell: React.FC<CallingCellProps> = ({
                 ))}
             </div>
           </div>
+
           {(isOngoing || selfHasActiveVideo) && isMinimized && !!videoGrid?.grid?.length ? (
             <div
               className="group-video__minimized-wrapper"
@@ -339,11 +338,14 @@ const ConversationListCallingCell: React.FC<CallingCellProps> = ({
                       data-uie-value={isMuted ? 'active' : 'inactive'}
                       title={t('videoCallOverlayMicrophone')}
                       type="button"
+                      role="switch"
+                      aria-checked={!isMuted}
                       disabled={isConnecting}
                     >
                       {isMuted ? <Icon.MicOff className="small-icon" /> : <Icon.MicOn className="small-icon" />}
                     </button>
                   </li>
+
                   {showVideoButton && (
                     <li className="conversation-list-calling-cell-controls-item">
                       <button
@@ -353,6 +355,8 @@ const ConversationListCallingCell: React.FC<CallingCellProps> = ({
                         data-uie-name="do-toggle-video"
                         title={t('videoCallOverlayCamera')}
                         type="button"
+                        role="switch"
+                        aria-checked={selfSharesCamera}
                         data-uie-value={selfSharesCamera ? 'active' : 'inactive'}
                       >
                         {selfSharesCamera ? (
@@ -363,6 +367,7 @@ const ConversationListCallingCell: React.FC<CallingCellProps> = ({
                       </button>
                     </li>
                   )}
+
                   {isOngoing && (
                     <li className="conversation-list-calling-cell-controls-item">
                       <button
@@ -402,10 +407,11 @@ const ConversationListCallingCell: React.FC<CallingCellProps> = ({
                         aria-pressed={showParticipants}
                       >
                         <span>{t('callParticipants', participants.length)}</span>
-                        <Icon.Chevron className="chevron" />
+                        <Icon.ChevronRight className="chevron" />
                       </button>
                     </li>
                   )}
+
                   {(isIncoming || isOutgoing) && (
                     <li className="conversation-list-calling-cell-controls-item">
                       <button
@@ -419,6 +425,7 @@ const ConversationListCallingCell: React.FC<CallingCellProps> = ({
                       </button>
                     </li>
                   )}
+
                   {isIncoming && (
                     <li className="conversation-list-calling-cell-controls-item">
                       <button
@@ -435,6 +442,7 @@ const ConversationListCallingCell: React.FC<CallingCellProps> = ({
                   )}
                 </ul>
               </div>
+
               <div
                 className={cx('call-ui__participant-list__wrapper', {
                   'call-ui__participant-list__wrapper--active': showParticipants,

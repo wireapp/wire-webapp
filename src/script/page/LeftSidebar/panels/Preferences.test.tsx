@@ -17,18 +17,17 @@
  *
  */
 
-import React from 'react';
 import ko from 'knockout';
 import {render} from '@testing-library/react';
 import Preferences from './Preferences';
-import {ContentViewModel} from 'src/script/view_model/ContentViewModel';
+import {ContentViewModel, ContentState} from 'src/script/view_model/ContentViewModel';
 
 import {Runtime} from '@wireapp/commons';
 
 describe('Preferences', () => {
   const defaultParams = {
     contentViewModel: {
-      state: ko.observable(''),
+      state: ko.observable(ContentState.PREFERENCES_ABOUT),
     } as ContentViewModel,
     onClose: jest.fn(),
     teamRepository: {getTeam: jest.fn()},

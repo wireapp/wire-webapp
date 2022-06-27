@@ -36,7 +36,4 @@ const LoadingBar: React.FC<LoadingBarProps> = ({progress, message}) => (
 
 export default LoadingBar;
 
-registerReactComponent('loading-bar', {
-  component: LoadingBar,
-  template: '<div data-bind="react: {message: ko.unwrap(message), progress: ko.unwrap(progress)}"></div>',
-});
+registerReactComponent('loading-bar', LoadingBar);

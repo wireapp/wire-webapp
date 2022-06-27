@@ -14,26 +14,14 @@
     "z": true,
     "RTCAudioSource": true
   },
-  "ignorePatterns": [
-    ".git/",
-    "docs/",
-    "node_modules/",
-    "resource/",
-    "server/bin/",
-    "server/dist/",
-    "server/node_modules/",
-    "src/ext/",
-    "src/script/localization/**/webapp*.js",
-    "src/worker/",
-    "electron/node_modules",
-    "electron/build"
-  ],
+  "plugins": ["sort-keys-fix"],
+  "ignorePatterns": [".git/", "docs/", "bin/", "node_modules/", "resource/", "server/bin/", "server/dist/", "server/node_modules/", "src/ext/", "src/script/localization/**/webapp*.js", "src/worker/"],
   "overrides": [
     {
       "files": ["*.ts", "*.tsx"],
       "parser": "@typescript-eslint/parser",
       "parserOptions": {
-        "project": ["./tsconfig.json", "./server/tsconfig.json", "./electron/tsconfig.json"]
+        "project": ["./tsconfig.json", "./server/tsconfig.json"]
       },
       "rules": {
         "@typescript-eslint/no-floating-promises": "off",
@@ -58,12 +46,14 @@
     "sort-keys-fix/sort-keys-fix": "warn",
     "jsx-a11y/click-events-have-key-events": "warn",
     "jsx-a11y/no-static-element-interactions": "warn",
-    "jsx-a11y/interactive-supports-focus": "warn",
-    "jsx-a11y/no-autofocus": "warn",
     "jsx-a11y/anchor-is-valid": "warn",
-    "jsx-a11y/label-has-associated-control": "warn",
     "jsx-a11y/no-noninteractive-element-interactions": "warn",
     "jsx-a11y/media-has-caption": "warn",
-    "jsx-a11y/tabindex-no-positive": "warn"
+    "react/react-in-jsx-scope": "off"
+  },
+  "settings": {
+    "react": {
+      "version": "detect"
+    }
   }
 }

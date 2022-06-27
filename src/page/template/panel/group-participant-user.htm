@@ -1,8 +1,14 @@
 <div id="group-participant-user" class="panel__page group-participant" data-bind="with: $root.subViews[$root.STATE.GROUP_PARTICIPANT_USER]">
   <!-- ko if: isVisible() -->
     <div class="panel__header">
-      <arrow-left-icon class="icon-button" data-bind="clickOrDrag: onGoBack" data-uie-name="go-back-group-participant"></arrow-left-icon>
-      <close-icon class="icon-button" data-bind="clickOrDrag: onClose" data-uie-name="do-close"></close-icon>
+      <button type="button" class="icon-button" 
+        data-bind="clickOrDrag: onGoBack, attr: { title: t('accessibility.rightPanel.GoBack'), 'aria-label': t('accessibility.rightPanel.GoBack') }"
+        data-uie-name="go-back-group-participant">
+        <arrow-left-icon aria-hidden="true"></arrow-left-icon>
+      </button>
+      <button type="button" class="icon-button" data-bind="clickOrDrag: onClose, attr: { title: t('accessibility.rightPanel.close'), 'aria-label': t('accessibility.rightPanel.close') }" data-uie-name="do-close">
+        <close-icon aria-hidden="true"></close-icon>
+      </button>
     </div>
     <div class="panel__content" data-bind="fadingscrollbar">
       <!-- ko if: selectedParticipant() -->
@@ -10,19 +16,23 @@
       <!-- /ko -->
       <!-- ko if: showActionDevices(selectedParticipant()) -->
         <div class="panel__action-item conversation-details__devices" data-bind="click: clickOnDevices" data-uie-name="go-devices">
-          <devices-icon class="panel__action-item__icon"></devices-icon>
+          <devices-icon aria-hidden="true" class="panel__action-item__icon"></devices-icon>
           <div class="panel__action-item__text" data-bind="text: t('conversationDetailsActionDevices')"></div>
-          <disclose-icon class="disclose-icon"></disclose-icon>
+          <disclose-icon aria-hidden="true" class="disclose-icon"></disclose-icon>
         </div>
       <!-- /ko -->
       <!-- ko if: canChangeRole() -->
         <div class="panel__action-item conversation-details__admin" data-uie-name="toggle-admin">
-          <group-admin-icon class="panel__action-item__icon"></group-admin-icon>
-          <div class="panel__action-item__text" data-bind="text: t('conversationDetailsGroupAdmin')"></div>
-          <div class="slider">
-            <input class="slider-input" type="checkbox" name="toggle" id="toggle" data-bind="checked: isAdmin">
-            <label class="button-label" for="toggle" data-bind="click: onToggleAdmin, attr: {'data-uie-value': isAdmin() ? 'checked': 'unchecked'}, css:{'disabled': selectedParticipant().isFederated}" data-uie-name="do-toggle-admin"></label>
-          </div>
+          <group-admin-icon aria-hidden="true" class="panel__action-item__icon"></group-admin-icon>
+          <base-toggle
+            class="modal-style"
+            params="
+              isChecked: isAdmin(),
+              setIsChecked: onToggleAdmin,
+              toggleName: t('conversationDetailsGroupAdmin'),
+              toggleId: 'admin',
+              isDisabled: selectedParticipant().isFederated"
+          ></base-toggle>
         </div>
         <div class="panel__action-item panel__info-text" data-bind="text: t('conversationDetailsGroupAdminInfo')"></div>
       <!-- /ko -->

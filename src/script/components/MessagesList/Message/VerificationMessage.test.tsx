@@ -59,8 +59,8 @@ describe('VerificationMessage', () => {
         }),
       });
 
-      expect(verificationMessagePage.getVerificationMessage(VerificationMessageType.VERIFIED).exists()).toBe(true);
-      expect(verificationMessagePage.getVerifiedIcon().exists()).toBe(true);
+      expect(verificationMessagePage.getVerificationMessage(VerificationMessageType.VERIFIED)).not.toBeNull();
+      expect(verificationMessagePage.getVerifiedIcon()).not.toBeNull();
     });
 
     it('shows unverified icon when message is not verified', async () => {
@@ -68,8 +68,8 @@ describe('VerificationMessage', () => {
         message: createVerificationMessage({}),
       });
 
-      expect(verificationMessagePage.getVerificationMessage().exists()).toBe(true);
-      expect(verificationMessagePage.getNotVerifiedIcon().exists()).toBe(true);
+      expect(verificationMessagePage.getVerificationMessage()).not.toBeNull();
+      expect(verificationMessagePage.getNotVerifiedIcon()).not.toBeNull();
     });
   });
 
@@ -81,9 +81,9 @@ describe('VerificationMessage', () => {
         }),
       });
 
-      expect(verificationMessagePage.getVerificationMessage(VerificationMessageType.UNVERIFIED).exists()).toBe(true);
-      expect(verificationMessagePage.getVerifiedIcon().exists()).toBe(false);
-      expect(verificationMessagePage.getNotVerifiedIcon().exists()).toBe(true);
+      expect(verificationMessagePage.getVerificationMessage(VerificationMessageType.UNVERIFIED)).not.toBeNull();
+      expect(verificationMessagePage.getVerifiedIcon()).toBeNull();
+      expect(verificationMessagePage.getNotVerifiedIcon()).not.toBeNull();
     });
   });
 
@@ -95,9 +95,9 @@ describe('VerificationMessage', () => {
         }),
       });
 
-      expect(verificationMessagePage.getVerificationMessage(VerificationMessageType.NEW_DEVICE).exists()).toBe(true);
-      expect(verificationMessagePage.getVerifiedIcon().exists()).toBe(false);
-      expect(verificationMessagePage.getNotVerifiedIcon().exists()).toBe(true);
+      expect(verificationMessagePage.getVerificationMessage(VerificationMessageType.NEW_DEVICE)).not.toBeNull();
+      expect(verificationMessagePage.getVerifiedIcon()).toBeNull();
+      expect(verificationMessagePage.getNotVerifiedIcon()).not.toBeNull();
     });
   });
 
@@ -109,9 +109,9 @@ describe('VerificationMessage', () => {
         }),
       });
 
-      expect(verificationMessagePage.getVerificationMessage(VerificationMessageType.NEW_MEMBER).exists()).toBe(true);
-      expect(verificationMessagePage.getVerifiedIcon().exists()).toBe(false);
-      expect(verificationMessagePage.getNotVerifiedIcon().exists()).toBe(true);
+      expect(verificationMessagePage.getVerificationMessage(VerificationMessageType.NEW_MEMBER)).not.toBeNull();
+      expect(verificationMessagePage.getVerifiedIcon()).toBeNull();
+      expect(verificationMessagePage.getNotVerifiedIcon()).not.toBeNull();
     });
   });
 });

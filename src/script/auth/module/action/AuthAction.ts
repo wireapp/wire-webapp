@@ -29,7 +29,6 @@ import {VerificationActionType} from '@wireapp/api-client/src/auth/VerificationA
 
 import {isTemporaryClientAndNonPersistent} from 'Util/util';
 import {currentCurrency, currentLanguage} from '../../localeConfig';
-import {provideTemporaryAndNonPersistentEngine} from '../../StoreEngineProvider';
 import type {Api, RootState, ThunkAction, ThunkDispatch} from '../reducer';
 import type {RegistrationDataState} from '../reducer/authReducer';
 import {COOKIE_NAME_APP_OPENED} from '../selector/CookieSelector';
@@ -65,8 +64,22 @@ export class AuthAction {
   ): ThunkAction => {
     const onBeforeLogin: LoginLifecycleFunction = async (dispatch, getState, {actions: {authAction}}) =>
       dispatch(authAction.doSilentLogout());
-    const onAfterLogin: LoginLifecycleFunction = async (dispatch, getState, {actions: {conversationAction}}) => {
-      await dispatch(conversationAction.doJoinConversationByCode(key, code, uri));
+    const onAfterLogin: LoginLifecycleFunction = async (
+      dispatch,
+      getState,
+      {actions: {localStorageAction, conversationAction}},
+    ) => {
+      const conversation = await dispatch(conversationAction.doJoinConversationByCode(key, code, uri));
+      const domain = conversation?.qualified_conversation?.domain;
+      return (
+        conversation &&
+        (await dispatch(
+          localStorageAction.setLocalStorage(LocalStorageKey.AUTH.LOGIN_CONVERSATION_KEY, {
+            conversation: conversation.conversation,
+            domain,
+          }),
+        ))
+      );
     };
 
     return this.doLoginPlain(loginData, onBeforeLogin, onAfterLogin, getEntropy);
@@ -86,9 +99,6 @@ export class AuthAction {
       dispatch(AuthActionCreator.startLogin());
       try {
         await onBeforeLogin(dispatch, getState, global);
-        if (isTemporaryClientAndNonPersistent(loginData.clientType === ClientType.PERMANENT)) {
-          (core as any).storeEngineProvider = provideTemporaryAndNonPersistentEngine;
-        }
         await core.login(loginData, false, clientAction.generateClientPayload(loginData.clientType));
         await this.persistAuthData(loginData.clientType, core, dispatch, localStorageAction);
         await dispatch(
@@ -161,10 +171,8 @@ export class AuthAction {
     ) => {
       dispatch(AuthActionCreator.startLogin());
       try {
-        if (isTemporaryClientAndNonPersistent(clientType === ClientType.PERMANENT)) {
-          (core as any).storeEngineProvider = provideTemporaryAndNonPersistentEngine;
-        }
-        await core.init(clientType);
+        // we first init the core without initializing the client for now (this will be done later on)
+        await core.init(clientType, undefined, false);
         await this.persistAuthData(clientType, core, dispatch, localStorageAction);
         await dispatch(selfAction.fetchSelf());
         await dispatch(cookieAction.setCookie(COOKIE_NAME_APP_OPENED, {appInstanceId: getConfig().APP_INSTANCE_ID}));
@@ -325,9 +333,6 @@ export class AuthAction {
       dispatch(AuthActionCreator.startRegisterWireless());
       try {
         await dispatch(authAction.doSilentLogout());
-        if (isTemporaryClientAndNonPersistent(false)) {
-          (core as any).storeEngineProvider = provideTemporaryAndNonPersistentEngine;
-        }
         await core.register(registrationData, clientType);
         await this.persistAuthData(clientType, core, dispatch, localStorageAction);
         await dispatch(cookieAction.setCookie(COOKIE_NAME_APP_OPENED, {appInstanceId: getConfig().APP_INSTANCE_ID}));
@@ -356,10 +361,7 @@ export class AuthAction {
           throw new Error(`Could not find value for '${LocalStorageKey.AUTH.PERSIST}'`);
         }
         const clientType = persist ? ClientType.PERMANENT : ClientType.TEMPORARY;
-        if (isTemporaryClientAndNonPersistent(clientType === ClientType.PERMANENT)) {
-          (core as any).storeEngineProvider = provideTemporaryAndNonPersistentEngine;
-        }
-        await core.init(clientType);
+        await core.init(clientType, undefined, false);
         await this.persistAuthData(clientType, core, dispatch, localStorageAction);
 
         if (options.shouldValidateLocalClient) {

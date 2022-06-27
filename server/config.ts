@@ -34,6 +34,18 @@ const VERSION_FILE = path.join(__dirname, 'version');
 
 dotenv.load();
 
+const federation = process.env.FEDERATION;
+
+let APP_BASE = process.env.APP_BASE;
+let BACKEND_REST = process.env.BACKEND_REST;
+let BACKEND_WS = process.env.BACKEND_WS;
+
+if (federation) {
+  APP_BASE = `https://local.${federation}.wire.link:8081`;
+  BACKEND_REST = `https://nginz-https.${federation}.wire.link`;
+  BACKEND_WS = `wss://nginz-ssl.${federation}.wire.link`;
+}
+
 const defaultCSP = {
   connectSrc: [
     "'self'",
@@ -97,8 +109,8 @@ function mergedCSP(): Record<string, Iterable<string>> {
   const csp = {
     connectSrc: [
       ...defaultCSP.connectSrc,
-      process.env.BACKEND_REST,
-      process.env.BACKEND_WS,
+      BACKEND_REST,
+      BACKEND_WS,
       ...parseCommaSeparatedList(process.env.CSP_EXTRA_CONNECT_SRC),
     ],
     defaultSrc: [...defaultCSP.defaultSrc, ...parseCommaSeparatedList(process.env.CSP_EXTRA_DEFAULT_SRC)],
@@ -123,8 +135,8 @@ const config: ServerConfig = {
     ANALYTICS_API_KEY: process.env.ANALYTICS_API_KEY,
     APP_NAME: process.env.APP_NAME,
     BACKEND_NAME: process.env.BACKEND_NAME,
-    BACKEND_REST: process.env.BACKEND_REST,
-    BACKEND_WS: process.env.BACKEND_WS,
+    BACKEND_REST,
+    BACKEND_WS,
     BRAND_NAME: process.env.BRAND_NAME,
     CHROME_ORIGIN_TRIAL_TOKEN: process.env.CHROME_ORIGIN_TRIAL_TOKEN,
     COUNTLY_API_KEY: process.env.COUNTLY_API_KEY,
@@ -147,6 +159,7 @@ const config: ServerConfig = {
       ENABLE_ENFORCE_DESKTOP_APPLICATION_ONLY: process.env.FEATURE_ENABLE_ENFORCE_DESKTOP_APPLICATION_ONLY == 'true',
       ENABLE_EXTRA_CLIENT_ENTROPY: process.env.FEATURE_ENABLE_EXTRA_CLIENT_ENTROPY != 'false',
       ENABLE_MEDIA_EMBEDS: process.env.FEATURE_ENABLE_MEDIA_EMBEDS != 'false',
+      ENABLE_MLS: process.env.FEATURE_ENABLE_MLS == 'true',
       ENABLE_PHONE_LOGIN: process.env.FEATURE_ENABLE_PHONE_LOGIN != 'false',
       ENABLE_SSO: process.env.FEATURE_ENABLE_SSO == 'true',
       ENFORCE_CONSTANT_BITRATE: process.env.FEATURE_ENFORCE_CONSTANT_BITRATE == 'true',
@@ -189,7 +202,7 @@ const config: ServerConfig = {
   },
   COMMIT: readFile(COMMIT_FILE, ''),
   SERVER: {
-    APP_BASE: process.env.APP_BASE,
+    APP_BASE,
     CACHE_DURATION_SECONDS: 300,
     CSP: mergedCSP(),
     DEVELOPMENT: nodeEnvironment === 'development',

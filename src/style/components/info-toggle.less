@@ -23,8 +23,12 @@
   flex-direction: column;
 
   .info-toggle__name {
+    .text-medium;
     margin: 0;
+    color: var(--black);
     cursor: pointer;
+    font-weight: @font-weight-light;
+    line-height: @line-height-lg;
   }
 
   .info-toggle__row {
@@ -39,7 +43,6 @@
   .info-toggle__details {
     margin-top: 16px;
     margin-bottom: 0;
-    color: #8d989f;
     font-size: 11px;
     line-height: 16px;
   }
@@ -50,18 +53,33 @@
   }
 
   .modal-style & {
-    margin-bottom: 24px;
+    margin-bottom: 16px;
 
     .info-toggle__row {
-      padding: 12px;
+      padding: 10px;
       border: none;
       margin: 0 -8px;
-      background-color: var(--foreground-fade-8);
       border-radius: 4px;
     }
 
     .info-toggle__details {
-      margin: 8px 4px 0;
+      margin: 0 2px 0;
+      color: var(--gray-90);
+      font-size: @font-size-small;
+      line-height: 14px;
+    }
+  }
+}
+
+body.theme-dark {
+  .base-toggle,
+  .info-toggle {
+    .info-toggle__name {
+      color: var(--white);
+    }
+
+    .info-toggle__details {
+      color: var(--gray-20);
     }
   }
 }

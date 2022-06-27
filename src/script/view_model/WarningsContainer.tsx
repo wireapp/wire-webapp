@@ -18,7 +18,6 @@
  */
 
 import {WebAppEvents} from '@wireapp/webapp-events';
-import ReactDOM from 'react-dom';
 import {amplify} from 'amplify';
 import cx from 'classnames';
 
@@ -34,6 +33,7 @@ import {Runtime} from '@wireapp/commons';
 
 import React, {useEffect, useState} from 'react';
 import Icon from 'Components/Icon';
+import {registerReactComponent} from 'Util/ComponentUtil';
 
 const WarningsContainer: React.FC = () => {
   const logger = getLogger('WarningsViewModel');
@@ -157,7 +157,6 @@ const WarningsContainer: React.FC = () => {
           <span className="warning-bar-close icon-close button-icon" onClick={closeWarning} />
         </div>
       )}
-
       {visibleWarning === type.DENIED_CAMERA && (
         <div className="warning-bar warning-bar-feature">
           <div className="warning-bar-message">
@@ -174,7 +173,6 @@ const WarningsContainer: React.FC = () => {
           <span className="warning-bar-close icon-close button-round button-round-dark" onClick={closeWarning} />
         </div>
       )}
-
       {visibleWarning === type.REQUEST_MICROPHONE && (
         <div className="warning-bar warning-bar-feature">
           <div className="warning-bar-message">
@@ -184,7 +182,6 @@ const WarningsContainer: React.FC = () => {
           <span className="warning-bar-close icon-close button-round button-round-dark" onClick={closeWarning} />
         </div>
       )}
-
       {visibleWarning === type.DENIED_MICROPHONE && (
         <div className="warning-bar warning-bar-feature">
           <div className="warning-bar-message">
@@ -201,7 +198,6 @@ const WarningsContainer: React.FC = () => {
           <span className="warning-bar-close icon-close button-round button-round-dark" onClick={closeWarning} />
         </div>
       )}
-
       {visibleWarning === type.REQUEST_SCREEN && (
         <div className="warning-bar warning-bar-feature">
           <div
@@ -217,7 +213,6 @@ const WarningsContainer: React.FC = () => {
           <span className="warning-bar-close icon-close button-icon" onClick={closeWarning} />
         </div>
       )}
-
       {visibleWarning === type.DENIED_SCREEN && (
         <div className="warning-bar warning-bar-feature">
           <div className="warning-bar-message">
@@ -234,7 +229,6 @@ const WarningsContainer: React.FC = () => {
           <span className="warning-bar-close icon-close button-round button-round-dark" onClick={closeWarning} />
         </div>
       )}
-
       {visibleWarning === type.NOT_FOUND_CAMERA && (
         <div className="warning-bar warning-bar-feature">
           <div className="warning-bar-message">
@@ -251,7 +245,6 @@ const WarningsContainer: React.FC = () => {
           <span className="warning-bar-close icon-close button-round button-round-dark" onClick={closeWarning} />
         </div>
       )}
-
       {visibleWarning === type.NOT_FOUND_MICROPHONE && (
         <div className="warning-bar warning-bar-feature">
           <div className="warning-bar-message">
@@ -268,7 +261,6 @@ const WarningsContainer: React.FC = () => {
           <span className="warning-bar-close icon-close button-round button-round-dark" onClick={closeWarning} />
         </div>
       )}
-
       {visibleWarning === type.REQUEST_NOTIFICATION && (
         <div className="warning-bar warning-bar-feature">
           <div
@@ -288,7 +280,6 @@ const WarningsContainer: React.FC = () => {
           />
         </div>
       )}
-
       {visibleWarning === type.UNSUPPORTED_INCOMING_CALL && (
         <div className="warning-bar warning-bar-feature">
           {!Runtime.isChrome() && (
@@ -324,7 +315,6 @@ const WarningsContainer: React.FC = () => {
           <span className="warning-bar-close icon-close button-round button-round-dark" onClick={closeWarning} />
         </div>
       )}
-
       {visibleWarning === type.UNSUPPORTED_OUTGOING_CALL && (
         <div className="warning-bar warning-bar-feature">
           {!Runtime.isChrome() && (
@@ -360,7 +350,6 @@ const WarningsContainer: React.FC = () => {
           <span className="warning-bar-close icon-close button-round button-round-dark" onClick={closeWarning} />
         </div>
       )}
-
       {visibleWarning === type.CONNECTIVITY_RECONNECT && (
         <div className="warning-bar warning-bar-connection">
           <div className="warning-bar-message">
@@ -369,7 +358,6 @@ const WarningsContainer: React.FC = () => {
           </div>
         </div>
       )}
-
       {visibleWarning === type.CALL_QUALITY_POOR && (
         <div className="warning-bar warning-bar-connection warning-bar-poor-call-quality">
           <div className="warning-bar-message">
@@ -377,15 +365,12 @@ const WarningsContainer: React.FC = () => {
           </div>
         </div>
       )}
-
       {visibleWarning === type.CONNECTIVITY_RECOVERY && <div className="warning-bar warning-bar-progress"></div>}
-
       {visibleWarning === type.NO_INTERNET && (
         <div className="warning-bar warning-bar-connection">
           <div className="warning-bar-message">{t('warningConnectivityNoInternet')}</div>
         </div>
       )}
-
       {visibleWarning === type.LIFECYCLE_UPDATE && (
         <div className="warning-bar warning-bar-connection">
           <div className="warning-bar-message">
@@ -443,9 +428,8 @@ const CONFIG = {
 const Warnings = {
   CONFIG,
   TYPE,
-  init: () => {
-    ReactDOM.render(<WarningsContainer />, document.getElementById('warnings'));
-  },
 };
 
 export default Warnings;
+
+registerReactComponent('warnings-container', WarningsContainer);

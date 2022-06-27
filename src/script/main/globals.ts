@@ -27,26 +27,23 @@ import type {NotificationService} from '../event/NotificationService';
 
 import '../Config';
 
-import '../page/AccentColorPicker';
 import 'Components/CopyToClipboard';
-import '../page/LeftSidebar/panels/StartUI/components/GroupList';
 import 'Components/UserSearchableList';
 import 'Components/toggle/BaseToggle';
 import 'Components/icons';
 import 'Components/Image';
 import 'Components/toggle/InfoToggle';
-import '../page/preferences/avPreferences/InputLevel';
 import 'Components/calling/FullscreenVideoCall';
-import '../page/collection/Collection';
 import 'Components/avatar/GroupAvatar';
 import 'Components/MessagesList';
-import '../page/message-list/MessageTimerButton';
+import 'Components/Modals/GroupCreation/GroupCreationModal';
+import '../page/AppLock';
 import 'Components/modal';
 import 'Components/panel/ServiceDetails';
 import 'Components/panel/UserDetails';
 import 'Components/ServiceList';
-import '../page/LeftSidebar/panels/StartUI/components/TopPeople';
-import 'Components/UserInput';
+import 'Components/SearchInput';
+import 'Components/calling/CallingOverlayContainer';
 
 import 'Util/LocalizerUtil';
 
@@ -55,7 +52,6 @@ import '../view_model/bindings/CommonBindings';
 import '../view_model/bindings/ConversationListBindings';
 import '../view_model/bindings/MessageListBindings';
 import '../view_model/bindings/VideoCallingBindings';
-import '../view_model/bindings/ReactBindings';
 
 import '../view_model/MainViewModel';
 import '../view_model/PanelViewModel';
@@ -98,6 +94,7 @@ declare global {
           ENABLE_ENFORCE_DESKTOP_APPLICATION_ONLY: boolean;
           ENABLE_EXTRA_CLIENT_ENTROPY: boolean;
           ENABLE_MEDIA_EMBEDS: boolean;
+          ENABLE_MLS: boolean;
           ENABLE_PHONE_LOGIN: boolean;
           ENABLE_SSO: boolean;
           ENFORCE_CONSTANT_BITRATE: boolean;

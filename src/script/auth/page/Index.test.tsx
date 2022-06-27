@@ -19,7 +19,6 @@
 
 import {TypeUtil} from '@wireapp/commons';
 import {ReactWrapper} from 'enzyme';
-import React from 'react';
 import {Config, Configuration} from '../../Config';
 import {initialRootState, RootState, Api} from '../module/reducer';
 import {mockStoreFactory} from '../util/test/mockStoreFactory';
@@ -114,7 +113,7 @@ describe('when visiting the index page', () => {
       }),
     );
 
-    expect(indexPage.getWelcomeText().exists()).toBe(true);
+    expect(indexPage.getWelcomeText()).not.toBeNull();
 
     expect(indexPage.getWelcomeText().text()).toContain(Config.getConfig().BRAND_NAME);
   });
@@ -138,7 +137,7 @@ describe('when visiting the index page', () => {
       }),
     );
 
-    expect(indexPage.getWelcomeText().exists()).toBe(true);
+    expect(indexPage.getWelcomeText()).not.toBeNull();
 
     expect(indexPage.getWelcomeText().text()).toContain(customBackendName);
   });
@@ -159,7 +158,7 @@ describe('when visiting the index page', () => {
       history,
     );
 
-    expect(indexPage.getLoginButton().exists()).toBe(true);
+    expect(indexPage.getLoginButton()).not.toBeNull();
     indexPage.clickLoginButton();
 
     await waitForExpect(() => {
@@ -189,7 +188,7 @@ describe('when visiting the index page', () => {
       history,
     );
 
-    expect(indexPage.getSSOLoginButton().exists()).toBe(true);
+    expect(indexPage.getSSOLoginButton()).not.toBeNull();
     indexPage.clickSSOLoginButton();
 
     await waitForExpect(() => {

@@ -20,21 +20,45 @@
 .group-creation {
   &__modal {
     .modal-input-wrapper {
-      min-height: 48px;
+      min-height: 67px;
     }
     .modal__content {
       height: 490px;
     }
 
+    .search-outer {
+      overflow: visible;
+    }
+
     .modal__info {
-      margin: 8px 4px 24px;
+      margin: 8px 4px 22px;
+    }
+
+    .modal__header {
+      margin-bottom: 35px;
+      line-height: @line-height-lg;
+    }
+
+    &__separator {
+      width: 100%;
+      border: none;
+      border-bottom: 1px solid var(--gray-50);
+      margin: 0 0 20px;
     }
   }
 
   &__action {
     .button-reset-default;
+    color: var(--black);
+    font-size: @font-size-base;
+    font-weight: @font-weight-bold;
+    line-height: @line-height-lg;
     opacity: 0.32;
     transition: all 0.25s ease-in-out;
+
+    &:hover {
+      text-decoration: underline;
+    }
 
     &.enabled {
       cursor: pointer;
@@ -54,5 +78,13 @@
     margin: 12px -16px -16px;
     overflow-x: hidden;
     overflow-y: auto;
+  }
+}
+
+body.theme-dark {
+  .group-creation {
+    &__action {
+      color: var(--white);
+    }
   }
 }

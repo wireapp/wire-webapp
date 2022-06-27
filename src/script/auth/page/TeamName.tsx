@@ -27,6 +27,7 @@ import {
   Form,
   H1,
   Input,
+  InputBlock,
   InputSubmitCombo,
   IsMobile,
   Link,
@@ -103,6 +104,11 @@ const TeamName = ({
     teamNameInput.current.focus();
   };
 
+  const onTeamNameChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    resetErrors();
+    setEnteredTeamName(event.target.value);
+  };
+
   const backArrow = (
     <RouterLink to={ROUTE.SET_ACCOUNT_TYPE} data-uie-name="go-register-team">
       <ArrowIcon direction="left" color={COLOR.TEXT} style={{opacity: 0.56}} />
@@ -130,32 +136,31 @@ const TeamName = ({
                 <H1 center>{_(teamNameStrings.headline)}</H1>
                 <Muted>{_(teamNameStrings.subhead)}</Muted>
                 <Form style={{marginTop: 30}}>
-                  <InputSubmitCombo>
-                    <Input
-                      value={enteredTeamName}
-                      ref={teamNameInput}
-                      onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-                        resetErrors();
-                        setEnteredTeamName(event.target.value);
-                      }}
-                      placeholder={_(teamNameStrings.teamNamePlaceholder)}
-                      pattern=".{2,256}"
-                      maxLength={256}
-                      minLength={2}
-                      required
-                      autoFocus
-                      data-uie-name="enter-team-name"
-                    />
-                    <RoundIconButton
-                      disabled={!enteredTeamName || !isValidTeamName}
-                      type="submit"
-                      formNoValidate
-                      onClick={handleSubmit}
-                      data-uie-name="do-next"
-                    >
-                      <ArrowIcon />
-                    </RoundIconButton>
-                  </InputSubmitCombo>
+                  <InputBlock>
+                    <InputSubmitCombo>
+                      <Input
+                        id="enter-team-name"
+                        value={enteredTeamName}
+                        ref={teamNameInput}
+                        onChange={onTeamNameChange}
+                        placeholder={_(teamNameStrings.teamNamePlaceholder)}
+                        pattern=".{2,256}"
+                        maxLength={256}
+                        minLength={2}
+                        required
+                        data-uie-name="enter-team-name"
+                      />
+                      <RoundIconButton
+                        disabled={!enteredTeamName || !isValidTeamName}
+                        type="submit"
+                        formNoValidate
+                        onClick={handleSubmit}
+                        data-uie-name="do-next"
+                      >
+                        <ArrowIcon />
+                      </RoundIconButton>
+                    </InputSubmitCombo>
+                  </InputBlock>
                   {error ? parseValidationErrors(error) : parseError(authError)}
                 </Form>
               </div>

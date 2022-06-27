@@ -18,12 +18,14 @@
  */
 
 import React, {useEffect, useMemo, useState} from 'react';
-import ReactDOM from 'react-dom';
+import {createRoot, Root} from 'react-dom/client';
 import cx from 'classnames';
 import Icon from 'Components/Icon';
 import {isEnterKey, isEscapeKey, isKey, isOneOfKeys, isSpaceKey, KEY} from 'Util/KeyboardUtil';
+import {Availability} from '@wireapp/protocol-messaging';
 
 export interface ContextMenuEntry {
+  availability?: Availability.Type;
   click?: (event?: MouseEvent) => void;
   icon?: string;
   identifier?: string;
@@ -43,10 +45,11 @@ interface ContextMenuProps {
 
 let container: HTMLDivElement;
 let previouslyFocused: HTMLElement;
+let reactRoot: Root;
 
 const cleanUp = () => {
   if (container) {
-    ReactDOM.unmountComponentAtNode(container);
+    reactRoot.unmount();
     document.body.removeChild(container);
     container = undefined;
   }
@@ -145,6 +148,7 @@ const ContextMenu: React.FC<ContextMenuProps> = ({entries, defaultIdentifier = '
             <button
               id={getButtonId(entry.label)}
               className="ctx-menu__button"
+              type="button"
               data-uie-name={entry.identifier || defaultIdentifier}
               title={entry.title || entry.label}
               {...(entry.isDisabled
@@ -184,8 +188,8 @@ export const showContextMenu = (
 
   container = document.createElement('div');
   document.body.appendChild(container);
-  ReactDOM.render(
+  reactRoot = createRoot(container);
+  reactRoot.render(
     <ContextMenu entries={entries} defaultIdentifier={identifier} posX={event.clientX} posY={event.clientY} />,
-    container,
   );
 };

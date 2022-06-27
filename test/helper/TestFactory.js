@@ -42,7 +42,6 @@ import {EventRepository} from 'src/script/event/EventRepository';
 import {EventServiceNoCompound} from 'src/script/event/EventServiceNoCompound';
 import {EventService} from 'src/script/event/EventService';
 import {NotificationService} from 'src/script/event/NotificationService';
-import {WebSocketService} from 'src/script/event/WebSocketService';
 import {ConnectionService} from 'src/script/connection/ConnectionService';
 import {ConnectionRepository} from 'src/script/connection/ConnectionRepository';
 import {CryptographyRepository} from 'src/script/cryptography/CryptographyRepository';
@@ -72,6 +71,7 @@ import {TeamState} from 'src/script/team/TeamState';
 import {ConversationState} from 'src/script/conversation/ConversationState';
 import {AssetService} from 'src/script/assets/AssetService';
 import {entities} from '../api/payloads';
+import {createStorageEngine, DatabaseTypes} from 'src/script/service/StoreEngineProvider';
 
 export class TestFactory {
   constructor() {
@@ -92,7 +92,8 @@ export class TestFactory {
     container.registerInstance(StorageService, new StorageService());
     this.storage_service = container.resolve(StorageService);
     if (!this.storage_service.db) {
-      this.storage_service.init(entities.user.john_doe.id, false);
+      const engine = await createStorageEngine('test', DatabaseTypes.PERMANENT);
+      this.storage_service.init(engine);
     }
     this.storage_repository = singleton(StorageRepository, this.storage_service);
 
@@ -189,7 +190,6 @@ export class TestFactory {
   async exposeEventActors() {
     await this.exposeUserActors();
 
-    this.web_socket_service = new WebSocketService();
     this.event_service = new EventService(this.storage_service);
     this.event_service_no_compound = new EventServiceNoCompound(this.storage_service);
     this.notification_service = new NotificationService(this.storage_service);
@@ -198,8 +198,6 @@ export class TestFactory {
     this.event_repository = new EventRepository(
       this.event_service,
       this.notification_service,
-      this.web_socket_service,
-      this.cryptography_repository,
       serverTimeHandler,
       this.user_repository['userState'],
     );

@@ -95,7 +95,7 @@
 
   .message-mention {
     color: var(--accent-color);
-    font-weight: @font-weight-bold;
+    .text-medium;
 
     .mention-at-sign {
       font-size: 14px;
@@ -217,27 +217,6 @@
 
 .message-header-label-sender {
   .label-nocase-bold-xs;
-  &.accent-color-1 {
-    color: fade(@accent_colors-1, 80%);
-  }
-  &.accent-color-2 {
-    color: fade(@accent_colors-2, 72%);
-  }
-  &.accent-color-3 {
-    color: @accent_colors-3;
-  }
-  &.accent-color-4 {
-    color: fade(@accent_colors-4, 72%);
-  }
-  &.accent-color-5 {
-    color: fade(@accent_colors-5, 80%);
-  }
-  &.accent-color-6 {
-    color: fade(@accent_colors-6, 80%);
-  }
-  &.accent-color-7 {
-    color: fade(@accent_colors-7, 64%);
-  }
 }
 
 .message-header-label-icon {
@@ -449,6 +428,15 @@
   line-height: @avatar-diameter-xs;
 }
 
+.message-footer-text {
+  color: var(--gray-70);
+  font-size: 11px;
+
+  body.theme-dark & {
+    color: var(--gray-60);
+  }
+}
+
 .message-footer-icon {
   .flex-center;
 
@@ -502,7 +490,8 @@
   transition-property: opacity;
   transition-timing-function: @ease-out-quart;
 
-  .message:hover & {
+  .message:hover &,
+  .message:focus-visible & {
     opacity: 1;
     transition-delay: @animation-timing-faster + 0.05;
   }
@@ -531,15 +520,18 @@
 
   // CONTEXT MENU
   .context-menu {
-    .button-reset-default;
-    .square(16px);
     .action-pill-style;
-
+    .button-icon-secondary;
+    .square(16px);
     position: absolute;
     left: 8px;
+
+    min-width: 0;
+    min-height: 0;
     justify-content: center;
 
-    &:focus {
+    &:focus,
+    &:focus-visible {
       opacity: 1 !important;
     }
   }
@@ -562,10 +554,15 @@
     .action-pill-style;
     position: absolute;
     bottom: 3px;
-    color: var(--background-fade-40);
-    font-size: @font-size-xs;
+    color: var(--gray-70);
     pointer-events: none;
     user-select: none;
+
+    .subline;
+
+    body.theme-dark & {
+      color: var(--gray-60);
+    }
 
     &--clickable {
       cursor: pointer;
@@ -631,9 +628,12 @@
 .message-connected-provider-name,
 .message-connected-username {
   margin-bottom: 16px;
-  color: var(--foreground);
-  font-size: @font-size-xs;
-  line-height: @line-height-sm;
+  .subline;
+  color: var(--gray-90);
+
+  body.theme-dark & {
+    color: var(--white);
+  }
 }
 
 .message-connected-avatar {

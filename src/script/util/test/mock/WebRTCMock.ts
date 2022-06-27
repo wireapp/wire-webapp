@@ -17,8 +17,8 @@
  *
  */
 
-const wrtc = require('wrtc');
-const {RTCAudioSource} = require('wrtc').nonstandard;
+const wrtc = require('@koush/wrtc');
+const {RTCAudioSource} = wrtc.nonstandard;
 
 Object.defineProperty(window, 'MediaStream', {
   value: wrtc.MediaStream,

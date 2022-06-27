@@ -19,8 +19,7 @@
 
 import React, {useEffect} from 'react';
 import {CSSTransition, SwitchTransition} from 'react-transition-group';
-import {css} from '@emotion/core';
-import {registerStaticReactComponent, useKoSubscribableChildren} from 'Util/ComponentUtil';
+import {registerReactComponent, useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {container} from 'tsyringe';
 
 import {ListViewModel, ListState} from '../../view_model/ListViewModel';
@@ -29,7 +28,6 @@ import {AssetRepository} from '../../assets/AssetRepository';
 
 import Preferences from './panels/Preferences';
 import Archive from './panels/Archive';
-import Background from './Background';
 import Conversations from './panels/Conversations';
 import TemporaryGuestConversations from './panels/TemporatyGuestConversations';
 import {amplify} from 'amplify';
@@ -41,7 +39,7 @@ type LeftSidebarProps = {
   listViewModel: ListViewModel;
   selfUser: User;
 };
-const Animated: React.FC = ({children, ...rest}) => {
+const Animated: React.FC<{children: React.ReactNode}> = ({children, ...rest}) => {
   return (
     <CSSTransition classNames="fade-in-out" timeout={{enter: 700, exit: 300}} {...rest}>
       {children}
@@ -132,8 +130,7 @@ const LeftSidebar: React.FC<LeftSidebarProps> = ({
   }
   return (
     <>
-      <Background selfUser={selfUser} assetRepository={assetRepository} />
-      <SwitchTransition css={css({height: '100%'})}>
+      <SwitchTransition>
         <Animated key={state}>{content}</Animated>
       </SwitchTransition>
     </>
@@ -142,4 +139,4 @@ const LeftSidebar: React.FC<LeftSidebarProps> = ({
 
 export default LeftSidebar;
 
-registerStaticReactComponent('left-sidebar', LeftSidebar);
+registerReactComponent('left-sidebar', LeftSidebar);

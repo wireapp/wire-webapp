@@ -44,7 +44,4 @@ const RestrictedImage: React.FC<RestrictedImageProps> = ({showMessage = true, is
 
 export default RestrictedImage;
 
-registerReactComponent<RestrictedImageProps>('image-restricted', {
-  component: RestrictedImage,
-  template: '<span data-bind="react: {className, showMessage}"></span>',
-});
+registerReactComponent('image-restricted', RestrictedImage);

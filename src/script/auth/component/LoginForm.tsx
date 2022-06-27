@@ -18,7 +18,7 @@
  */
 
 import {LoginData} from '@wireapp/api-client/src/auth';
-import {ArrowIcon, Input, InputBlock, InputSubmitCombo, Loading, RoundIconButton} from '@wireapp/react-ui-kit';
+import {Input, Loading, Button} from '@wireapp/react-ui-kit';
 import React, {useRef, useState} from 'react';
 import {useIntl} from 'react-intl';
 
@@ -75,8 +75,9 @@ const LoginForm = ({isFetching, onSubmit}: LoginFormProps) => {
   };
 
   return (
-    <InputBlock>
+    <div>
       <Input
+        id="email"
         name="email"
         onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
           setEmail(event.target.value);
@@ -92,40 +93,40 @@ const LoginForm = ({isFetching, onSubmit}: LoginFormProps) => {
         required
         data-uie-name="enter-email"
       />
-      <InputSubmitCombo>
-        <Input
-          name="password-login"
-          onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-            setPassword(event.target.value);
-            setValidPasswordInput(true);
-          }}
-          ref={passwordInput}
-          markInvalid={!validPasswordInput}
-          value={password}
-          autoComplete="section-login password"
-          type="password"
-          placeholder={_(loginStrings.passwordPlaceholder)}
-          pattern={'.{1,1024}'}
-          required
-          data-uie-name="enter-password"
-        />
-        {isFetching ? (
-          <Loading size={32} />
-        ) : (
-          <RoundIconButton
-            style={{marginLeft: 16}}
-            disabled={!email || !password}
-            type="submit"
-            formNoValidate
-            onClick={handleSubmit}
-            aria-label={_(loginStrings.headline)}
-            data-uie-name="do-sign-in"
-          >
-            <ArrowIcon />
-          </RoundIconButton>
-        )}
-      </InputSubmitCombo>
-    </InputBlock>
+      <Input
+        id="password-login"
+        name="password-login"
+        onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+          setPassword(event.target.value);
+          setValidPasswordInput(true);
+        }}
+        ref={passwordInput}
+        markInvalid={!validPasswordInput}
+        value={password}
+        autoComplete="section-login password"
+        type="password"
+        placeholder={_(loginStrings.passwordPlaceholder)}
+        pattern={'.{1,1024}'}
+        required
+        data-uie-name="enter-password"
+      />
+
+      {isFetching ? (
+        <Loading size={32} />
+      ) : (
+        <Button
+          block
+          type="submit"
+          disabled={!email || !password}
+          formNoValidate
+          onClick={handleSubmit}
+          aria-label={_(loginStrings.headline)}
+          data-uie-name="do-sign-in"
+        >
+          {_(loginStrings.headline)}
+        </Button>
+      )}
+    </div>
   );
 };
 

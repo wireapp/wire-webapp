@@ -1,3 +1,22 @@
+/*
+ * Wire
+ * Copyright (C) 2022 Wire Swiss GmbH
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ *
+ */
+
 import React, {useEffect, useLayoutEffect, useRef, useState} from 'react';
 import {ConversationRepository} from 'src/script/conversation/ConversationRepository';
 import {MessageRepository} from 'src/script/conversation/MessageRepository';
@@ -8,7 +27,7 @@ import {MemberMessage} from 'src/script/entity/message/MemberMessage';
 import {Message as MessageEntity} from 'src/script/entity/message/Message';
 import {User} from 'src/script/entity/User';
 import {StatusType} from '../../message/StatusType';
-import {registerStaticReactComponent, useKoSubscribableChildren} from 'Util/ComponentUtil';
+import {registerReactComponent, useKoSubscribableChildren} from 'Util/ComponentUtil';
 import Message from './Message';
 import {Text} from 'src/script/entity/message/Text';
 import {useResizeObserver} from '../../ui/resizeObserver';
@@ -160,9 +179,10 @@ const MessagesList: React.FC<MessagesListParams> = ({
     const isLastDeliveredMessage = lastDeliveredMessage?.id === message.id;
 
     const visibleCallback = getVisibleCallback(conversation, message);
+    const key = (message.id || 'message-') + message.timestamp();
     return (
       <Message
-        key={message.id}
+        key={key}
         onVisible={visibleCallback}
         message={message}
         previousMessage={previousMessage}
@@ -220,4 +240,4 @@ const MessagesList: React.FC<MessagesListParams> = ({
 
 export default MessagesList;
 
-registerStaticReactComponent('messages-list', MessagesList);
+registerReactComponent('messages-list', MessagesList);

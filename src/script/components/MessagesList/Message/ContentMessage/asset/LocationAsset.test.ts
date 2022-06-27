@@ -29,7 +29,7 @@ class LocationAssetPage extends TestPage<LocationAssetProps> {
   }
 
   getMapsElement = () => this.get('[data-uie-name="location-asset-link"]');
-  getMapsLink = () => this.getMapsElement().props().href;
+  getMapsLink = () => this.getMapsElement().getAttribute('href');
   getLocationElement = () => this.get('[data-uie-name="location-name"]');
 }
 
@@ -47,6 +47,6 @@ describe('LocationAsset', () => {
     const locationAsset = new LocationAssetPage({asset: location as Location});
     const locationName = locationAsset.getLocationElement();
 
-    expect(locationName.text()).toBe(location.name);
+    expect(locationName.textContent).toBe(location.name);
   });
 });

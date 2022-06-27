@@ -24,6 +24,7 @@ import {
   DeviceIcon,
   Form,
   Input,
+  InputBlock,
   InputSubmitCombo,
   Line,
   RoundIconButton,
@@ -179,6 +180,11 @@ const ClientItem = ({selected, onClientRemoval, onClick, client, clientError, re
       });
   };
 
+  const onPasswordChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setPassword(event.target.value);
+    setIsValidPassword(true);
+  };
+
   const animationPosition = animationStep / CONFIG.animationSteps;
   const height = animationPosition * 56;
   const marginTop = animationPosition * 16;
@@ -235,36 +241,35 @@ const ClientItem = ({selected, onClientRemoval, onClick, client, clientError, re
         {requirePassword && (isSelected || isAnimating) && (
           <ContainerXS style={{maxHeight: `${height}px`, overflow: 'hidden', padding: `${paddingHorizontal}px 0`}}>
             <Form>
-              <InputSubmitCombo style={{background: 'transparent', boxShadow: 'none', marginBottom: '0'}}>
-                <Input
-                  autoComplete="section-login password"
-                  autoFocus
-                  data-uie-name="remove-device-password"
-                  ref={passwordInput}
-                  name="password"
-                  onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-                    setPassword(event.target.value);
-                    setIsValidPassword(true);
-                  }}
-                  pattern={'.{1,1024}'}
-                  placeholder={_(clientItemStrings.passwordPlaceholder)}
-                  required
-                  style={{background: 'transparent'}}
-                  type="password"
-                  value={password}
-                />
-                <RoundIconButton
-                  color={COLOR.RED}
-                  data-uie-name="do-remove-device"
-                  disabled={!password || !isValidPassword}
-                  formNoValidate
-                  onClick={handleSubmit}
-                  style={{marginBottom: '-4px'}}
-                  type="submit"
-                >
-                  <TrashIcon />
-                </RoundIconButton>
-              </InputSubmitCombo>
+              <InputBlock>
+                <InputSubmitCombo style={{background: 'transparent', boxShadow: 'none', marginBottom: '0'}}>
+                  <Input
+                    id="remove-device-password"
+                    autoComplete="section-login password"
+                    data-uie-name="remove-device-password"
+                    ref={passwordInput}
+                    name="password"
+                    onChange={onPasswordChange}
+                    pattern=".{1,1024}"
+                    placeholder={_(clientItemStrings.passwordPlaceholder)}
+                    required
+                    style={{background: 'transparent'}}
+                    type="password"
+                    value={password}
+                  />
+                  <RoundIconButton
+                    color={COLOR.RED}
+                    data-uie-name="do-remove-device"
+                    disabled={!password || !isValidPassword}
+                    formNoValidate
+                    onClick={handleSubmit}
+                    style={{marginBottom: '-4px'}}
+                    type="submit"
+                  >
+                    <TrashIcon />
+                  </RoundIconButton>
+                </InputSubmitCombo>
+              </InputBlock>
             </Form>
           </ContainerXS>
         )}

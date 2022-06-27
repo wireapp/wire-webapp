@@ -18,7 +18,6 @@
  */
 
 import {Button, Column, Columns, Container, H3, Modal, Text} from '@wireapp/react-ui-kit';
-import React from 'react';
 import {useIntl} from 'react-intl';
 import {connect} from 'react-redux';
 import {AnyAction, Dispatch} from 'redux';
@@ -47,6 +46,7 @@ const AppAlreadyOpen = ({isAppAlreadyOpen, fullscreen, removeCookie}: AppAlready
           <Columns style={{marginTop: '20px'}}>
             <Column style={{textAlign: 'center'}}>
               <Button
+                type="button"
                 block
                 onClick={() => removeCookie(CookieSelector.COOKIE_NAME_APP_OPENED)}
                 style={{marginBottom: '10px'}}

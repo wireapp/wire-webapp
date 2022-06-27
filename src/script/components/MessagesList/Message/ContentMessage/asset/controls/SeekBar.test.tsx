@@ -19,7 +19,7 @@
 
 import {act} from '@testing-library/react';
 import TestPage from 'Util/test/TestPage';
-import SeekBar, {SeekBarCSS, SeekBarProps} from './SeekBar';
+import SeekBar, {SeekBarProps} from './SeekBar';
 
 class SeekBarPage extends TestPage<SeekBarProps> {
   constructor(props?: SeekBarProps) {
@@ -27,7 +27,10 @@ class SeekBarPage extends TestPage<SeekBarProps> {
   }
 
   getSeekBar = () => this.get('input[data-uie-name="asset-control-media-seek-bar"]');
-  getProgress = (): string => (this.getSeekBar().props().style as SeekBarCSS)['--seek-bar-progress'];
+  getProgress = (): string =>
+    this.getSeekBar()
+      .getAttribute('style')
+      .replace(/--seek-bar-progress: (.*);/, '$1');
 }
 
 describe('SeekBar', () => {

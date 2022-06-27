@@ -83,7 +83,7 @@ export const truncate = (string: string, outputLength: number, wordBoundary = tr
     if (wordBoundary && string.lastIndexOf(' ', outputLength - 1) > outputLength - 25) {
       truncateIndex = string.lastIndexOf(' ', outputLength - 1);
     }
-    string = `${string.substr(0, truncateIndex)}…`;
+    string = `${string.slice(0, truncateIndex)}…`;
   }
   return string;
 };

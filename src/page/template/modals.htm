@@ -3,22 +3,24 @@
     params="isShown: isModalVisible(), onBgClick: content().onBgClick, onClosed: onModalHidden, ariaDescribedBy: 'modal-description'"
     data-bind="attr: {'data-uie-name': content().modalUie}"
   >
+    <!-- ko if: isModalVisible() -->
     <div class="modal__header" data-uie-name="status-modal-title">
       <h2 class="modal__header__title" id="modal-title" data-bind="text: content().titleText"></h2>
-      <!-- ko if: content().showClose -->
-        <close-icon class="modal__header__button" data-bind="click: hide" data-uie-name="do-close"></close-icon>
-      <!-- /ko -->
-
+      <button type="button" class="modal__header__button" data-bind="click: hide" data-uie-name="do-close">
+        <close-icon class="modal__header__button" aria-hidden="true"></close-icon>
+      </button>
     </div>
     <div class="modal__body" data-bind="fadingscrollbar">
-      <div class="modal__text" data-uie-name="status-modal-text">
-        <!-- ko if: content().messageHtml -->
-          <div id="modal-description" data-bind="html: content().messageHtml"></div>
+      <!-- ko if: content().messageHtml || content().messageText -->
+        <div class="modal__text" data-uie-name="status-modal-text">
+          <!-- ko if: content().messageHtml -->
+            <div id="modal-description" data-bind="html: content().messageHtml"></div>
+          <!-- /ko -->
+          <!-- ko if: content().messageText -->
+            <div id="modal-description" data-bind="text: content().messageText"></div>
+          <!-- /ko -->
+        </div>
         <!-- /ko -->
-        <!-- ko if: content().messageText -->
-          <div id="modal-description" data-bind="text: content().messageText"></div>
-        <!-- /ko -->
-      </div>
       <!-- ko if: hasPassword() -->
         <form data-bind="submit: () => doAction(confirm, content().closeOnConfirm)">
           <input class="modal__input" type="password" data-bind="textInput: passwordValue, attr: {placeholder: content().inputPlaceholder}, hasFocus: inputFocus"/>
@@ -51,5 +53,6 @@
         <!-- /ko -->
       </div>
     </div>
+    <!-- /ko -->
   </modal-dialog>
 </div>

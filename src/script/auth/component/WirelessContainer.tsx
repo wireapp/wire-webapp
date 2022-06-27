@@ -27,11 +27,12 @@ import SVGProvider from '../util/SVGProvider';
 import {Config} from '../../Config';
 
 export interface Props extends React.HTMLAttributes<HTMLDivElement> {
+  children: React.ReactNode;
   onCookiePolicyBannerClose?: (event: React.MouseEvent<HTMLElement>) => void;
   showCookiePolicyBanner?: boolean;
 }
 
-export const WirelessContainer: React.SFC<Props> = ({showCookiePolicyBanner, onCookiePolicyBannerClose, children}) => {
+export const WirelessContainer: React.FC<Props> = ({showCookiePolicyBanner, onCookiePolicyBannerClose, children}) => {
   const {formatMessage: _} = useIntl();
   return (
     <div
@@ -66,12 +67,13 @@ export const WirelessContainer: React.SFC<Props> = ({showCookiePolicyBanner, onC
                 values={{
                   newline: <br />,
                   // eslint-disable-next-line react/display-name
-                  strong: (...chunks: any[]) => <strong>{chunks}</strong>,
+                  strong: ((...chunks: any[]) => <strong>{chunks}</strong>) as any,
                 }}
               />
             </Link>
           </div>
           <button
+            type="button"
             onClick={(event: React.MouseEvent<HTMLButtonElement>) => onCookiePolicyBannerClose(event)}
             style={{
               background: 'none',
@@ -90,7 +92,7 @@ export const WirelessContainer: React.SFC<Props> = ({showCookiePolicyBanner, onC
       )}
       <Content>
         <Header style={{height: '40px', marginLeft: '8px', marginTop: '20px'}}>
-          <SVGIcon scale={0.9} realWidth={78} realHeight={25}>
+          <SVGIcon aria-hidden="true" scale={0.9} realWidth={78} realHeight={25}>
             <g dangerouslySetInnerHTML={{__html: SVGProvider['logo-full-icon']?.documentElement?.innerHTML}} />
           </SVGIcon>
         </Header>

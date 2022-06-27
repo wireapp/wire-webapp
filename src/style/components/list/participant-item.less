@@ -21,41 +21,32 @@
   position: relative;
   display: block;
 
+  &[role='button'] {
+    .button-reset-default();
+    .text-medium;
+
+    &:not(.no-interaction) {
+      .button-states();
+    }
+  }
+
   &:not(.no-underline)::after {
     position: absolute;
     right: 0;
     bottom: 0;
     left: @left-list-item-left-width;
-    height: 1px;
-    background-color: currentColor;
+    border-bottom: 1px solid var(--gray-40);
     content: '';
-    opacity: 0.06;
   }
 
-  .camera-icon,
-  .disclose-icon,
-  .federation-icon,
-  .guest-icon,
-  .mic-off-icon,
-  .mic-on-icon,
-  .participant-mic-on-icon,
-  .partner-icon,
-  .screenshare-icon,
-  .verified-icon {
-    display: flex;
-    margin-left: 16px;
-  }
+  &:hover {
+    .participant-item {
+      background: var(--white);
+    }
 
-  .camera-icon {
-    width: 12px !important;
-    height: 9px;
-  }
-
-  .mic-off-icon,
-  .mic-on-icon,
-  .participant-mic-on-icon,
-  .screenshare-icon {
-    height: 12px;
+    &::after {
+      border-bottom: none;
+    }
   }
 
   .camera-icon,
@@ -63,21 +54,22 @@
   .guest-icon svg,
   .mic-off-icon,
   .mic-on-icon,
+  .participant-mic-on-icon,
   .partner-icon svg,
   .screenshare-icon {
+    margin-left: 8px;
     fill: currentColor;
-    opacity: 0.48;
-  }
-
-  svg[data-uie-name='mic-icon-on'][data-uie-active='inactive'] path {
-    fill: #9c9fa0;
   }
 
   .disclose-icon {
     display: flex;
 
     path {
-      fill: var(--background-fade-40);
+      fill: var(--gray-90);
+
+      body.theme-dark & {
+        fill: var(--white);
+      }
     }
   }
 
@@ -118,11 +110,11 @@
         min-width: 0; // this will ensure that ellipses is working
         height: @avatar-diameter-m;
         flex-direction: column;
+        flex-grow: 1;
         align-items: flex-start;
         justify-content: center;
-        font-size: 14px;
-        font-weight: 400;
-        line-height: 16px;
+        font-size: @font-size-medium;
+        font-weight: @font-weight-medium;
       }
 
       &__chevron {
@@ -165,6 +157,12 @@
         white-space: nowrap;
       }
 
+      &__username {
+        .ellipsis;
+        max-width: 100%;
+        white-space: nowrap;
+      }
+
       &__self-indicator {
         margin-left: 4px;
       }
@@ -172,19 +170,12 @@
       &__info {
         .ellipsis;
         display: flex;
-        max-width: 100%;
-        margin-top: 2px;
+        width: 100%;
+        margin-top: 4px;
         font-size: 0;
-        line-height: 16px;
-        opacity: 0.56;
 
         * {
-          font-size: 12px;
-        }
-
-        &__username {
-          .ellipsis;
-          display: block;
+          .subline;
         }
       }
 
@@ -198,6 +189,20 @@
 
   &.no-interaction .participant-item {
     cursor: default;
+  }
+}
+
+body.theme-dark {
+  .participant-item-wrapper {
+    &:not(.no-underline)::after {
+      border-bottom-color: var(--gray-90);
+    }
+  }
+
+  .participant-item-wrapper:hover {
+    .participant-item {
+      background: #26272c;
+    }
   }
 }
 

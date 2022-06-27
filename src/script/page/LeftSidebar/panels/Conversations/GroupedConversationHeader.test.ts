@@ -51,7 +51,7 @@ describe('GroupedConversationHeader', () => {
     });
 
     let unreadBadge = groupedConversationHeader.getUnreadBadge();
-    expect(unreadBadge.exists()).toBe(false);
+    expect(unreadBadge).toBeNull();
 
     const conversation: Partial<Conversation> = {hasUnread: ko.pureComputed(() => true)};
     conversationLabel.conversations.push(conversation as Conversation, conversation as Conversation);
@@ -59,7 +59,7 @@ describe('GroupedConversationHeader', () => {
     groupedConversationHeader.setProps({conversationLabel, isOpen: false});
 
     unreadBadge = groupedConversationHeader.getUnreadBadge();
-    expect(unreadBadge.exists()).toBe(true);
-    expect(unreadBadge.text()).toBe('2');
+    expect(unreadBadge).not.toBeNull();
+    expect(unreadBadge.textContent).toBe('2');
   });
 });

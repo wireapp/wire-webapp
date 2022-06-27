@@ -35,7 +35,7 @@ export function validateEvent(
   }
 
   const eventTime = event.time;
-  const isFromNotificationStream = source === EventSource.STREAM;
+  const isFromNotificationStream = source === EventSource.NOTIFICATION_STREAM;
   const shouldCheckEventDate = !!eventTime && isFromNotificationStream && lastEventDate;
 
   if (shouldCheckEventDate) {

@@ -50,8 +50,8 @@ describe('MessageButton', () => {
       message: message as CompositeMessage,
     });
 
-    expect(messageButton.getError().exists()).toBe(true);
-    expect(messageButton.getError().text()).toBe(messageError);
+    expect(messageButton.getError()).not.toBeNull();
+    expect(messageButton.getError().textContent).toBe(messageError);
   });
 
   it('renders selected button', async () => {
@@ -68,7 +68,7 @@ describe('MessageButton', () => {
       message: message as CompositeMessage,
     });
 
-    expect(messageButton.getError().exists()).toBe(false);
-    expect((messageButton.getButtonWithId(messageId).props() as any)['data-uie-selected']).toBe(true);
+    expect(messageButton.getError()).toBeNull();
+    expect(messageButton.getButtonWithId(messageId).getAttribute('data-uie-selected')).toBe('true');
   });
 });

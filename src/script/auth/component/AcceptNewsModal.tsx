@@ -44,7 +44,7 @@ const AcceptNewsModal = ({onConfirm, onDecline}: Props) => {
                 {...acceptNewsModalStrings.privacyDescription}
                 values={{
                   // eslint-disable-next-line react/display-name
-                  strong: (...chunks: any[]) => <strong>{chunks}</strong>,
+                  strong: ((...chunks: any[]) => <strong>{chunks}</strong>) as any,
                 }}
               />
             </Text>
@@ -52,12 +52,17 @@ const AcceptNewsModal = ({onConfirm, onDecline}: Props) => {
         </div>
         <Columns style={{margin: '20px 0 10px'}}>
           <Column style={{textAlign: 'center'}}>
-            <Button onClick={onDecline} backgroundColor={COLOR.GRAY} data-uie-name="do-decline-marketing-consent">
+            <Button
+              type="button"
+              onClick={onDecline}
+              backgroundColor={COLOR.GRAY}
+              data-uie-name="do-decline-marketing-consent"
+            >
               {_(acceptNewsModalStrings.declineButton)}
             </Button>
           </Column>
           <Column style={{textAlign: 'center'}}>
-            <Button onClick={onConfirm} data-uie-name="do-confirm-marketing-consent">
+            <Button type="button" onClick={onConfirm} data-uie-name="do-confirm-marketing-consent">
               {_(acceptNewsModalStrings.confirmButton)}
             </Button>
           </Column>

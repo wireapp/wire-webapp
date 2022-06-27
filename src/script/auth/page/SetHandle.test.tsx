@@ -18,7 +18,6 @@
  */
 
 import {ReactWrapper} from 'enzyme';
-import React from 'react';
 import {actionRoot} from '../module/action';
 import {initialRootState, RootState, Api} from '../module/reducer';
 import {mockStoreFactory} from '../util/test/mockStoreFactory';
@@ -67,9 +66,9 @@ describe('SetHandle', () => {
       }),
     );
 
-    expect(setHandlePage.getHandleInput().exists()).toBe(true);
+    expect(setHandlePage.getHandleInput()).not.toBeNull();
 
-    expect(setHandlePage.getSetHandleButton().exists()).toBe(true);
+    expect(setHandlePage.getSetHandleButton()).not.toBeNull();
 
     expect(setHandlePage.getSetHandleButton().props().disabled).toBe(true);
     setHandlePage.enterHandle('e');

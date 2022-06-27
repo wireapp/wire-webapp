@@ -17,8 +17,7 @@
  *
  */
 
-import React, {Fragment} from 'react';
-import {createRandomUuid} from 'Util/util';
+import React, {useId} from 'react';
 import cx from 'classnames';
 import {registerReactComponent} from 'Util/ComponentUtil';
 
@@ -28,18 +27,29 @@ export interface InfoToggleProps {
   isChecked: boolean;
   isDisabled: boolean;
   name: string;
+  className?: string;
   setIsChecked: (checked: boolean) => void;
 }
 
-const InfoToggle: React.FC<InfoToggleProps> = ({dataUieName, info, isChecked, isDisabled, name, setIsChecked}) => {
+const InfoToggle: React.FC<InfoToggleProps> = ({
+  dataUieName,
+  className = '',
+  info,
+  isChecked,
+  isDisabled,
+  name,
+  setIsChecked,
+}) => {
   const dataUieNameInfoText = `status-info-toggle-${dataUieName}`;
   const dataUieNameLabelText = `do-toggle-${dataUieName}`;
-  const {current: inputId} = React.useRef(createRandomUuid());
+  const inputId = useId();
 
   return (
-    <Fragment>
+    <div className={cx('info-toggle', className)}>
       <div className="info-toggle__row">
-        <div>{name}</div>
+        <label htmlFor={inputId} className="info-toggle__name">
+          {name}
+        </label>
         <div className={cx('slider', {disabled: isDisabled})}>
           <input
             className="slider-input"
@@ -50,25 +60,25 @@ const InfoToggle: React.FC<InfoToggleProps> = ({dataUieName, info, isChecked, is
             type="checkbox"
             data-uie-name="info-toggle-input"
           />
-          <label
-            htmlFor={inputId}
+          <button
             className="button-label"
+            aria-pressed={isChecked}
+            onClick={() => setIsChecked(!isChecked)}
             data-uie-name={dataUieNameLabelText}
             data-uie-value={isChecked ? 'checked' : 'unchecked'}
-          />
+          >
+            <span className="button-label__switch" />
+            <span className="visually-hidden">{name}</span>
+          </button>
         </div>
       </div>
-      <div className="info-toggle__details" data-uie-name={dataUieNameInfoText}>
+      <p className="info-toggle__details" data-uie-name={dataUieNameInfoText}>
         {info}
-      </div>
-    </Fragment>
+      </p>
+    </div>
   );
 };
 
 export default InfoToggle;
 
-registerReactComponent('info-toggle', {
-  component: InfoToggle,
-  template:
-    '<div class="info-toggle" data-bind="react: {isChecked: ko.unwrap(isChecked), setIsChecked: isChecked, dataUieName, info, isDisabled, name}"></div>',
-});
+registerReactComponent('info-toggle', InfoToggle);

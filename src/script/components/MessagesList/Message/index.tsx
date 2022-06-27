@@ -107,12 +107,10 @@ const Message: React.FC<
 
   const content = <MessageWrapper {...props} hasMarker={markerType !== MessageMarkerType.NONE} />;
   const wrappedContent = props.onVisible ? <InViewport onVisible={props.onVisible}>{content}</InViewport> : content;
-
   return (
     <div
       className={`message ${isMarked ? 'message-marked' : ''}`}
       ref={messageElementRef}
-      key={message.id}
       data-uie-uid={message.id}
       data-uie-value={message.super_type}
       data-uie-expired-status={ephemeral_expires}

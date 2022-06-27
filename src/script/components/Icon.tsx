@@ -51,7 +51,7 @@ const createSvgComponent = (svg: HTMLElement, displayName: string): React.FC<Ico
       ...oProps,
     };
 
-    return <svg {...props} dangerouslySetInnerHTML={{__html: svg.innerHTML}} />;
+    return <svg {...props} aria-hidden="true" dangerouslySetInnerHTML={{__html: svg.innerHTML}} />;
   };
   SVGComponent.displayName = displayName;
   return SVGComponent;

@@ -35,7 +35,7 @@ ko.components.register('modal-dialog', {
   template: `
     <div class="modal" data-bind="style: {display: displayNone() ? 'none': 'flex', zIndex: 10000001}, attr: displayNone() ? {} : {id: id, 'aria-labelledby': ariaLabelBy, 'aria-describedby': ariaDescribedBy}" tabIndex="-1" aria-modal="true" role="dialog" aria-modal="true">
       <!-- ko if: showLoading() -->
-        <loading-icon class="modal__loading"></loading-icon>
+        <loading-icon aria-hidden="true" class="modal__loading"></loading-icon>
       <!-- /ko -->
       <!-- ko ifnot: showLoading() -->
         <div class="modal__content" data-bind="css: {'modal__content--large': large, 'modal__content--visible':  hasVisibleClass() && !showLoading()}, fadingscrollbar">

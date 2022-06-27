@@ -23,21 +23,26 @@ import type {Conversation} from '../entity/Conversation';
 import type {LegalHoldModalViewModel} from '../view_model/content/LegalHoldModalViewModel';
 import Icon from 'Components/Icon';
 import {registerReactComponent} from 'Util/ComponentUtil';
+import {t} from 'Util/LocalizerUtil';
 
 export interface LegalHoldDotProps {
   className?: string;
   conversation?: Conversation;
   dataUieName?: string;
   isPending?: boolean;
+  isMessage?: boolean;
   large?: boolean;
+  showText?: boolean;
   legalHoldModal?: LegalHoldModalViewModel;
 }
 
 const LegalHoldDot: React.FC<LegalHoldDotProps> = ({
   conversation,
   isPending,
+  isMessage = false,
   large,
   legalHoldModal,
+  showText = false,
   className = '',
   dataUieName = 'legal-hold-dot-pending-icon',
 }) => {
@@ -63,20 +68,18 @@ const LegalHoldDot: React.FC<LegalHoldDotProps> = ({
             'legal-hold-dot--active': !isPending,
             'legal-hold-dot--interactive': isInteractive,
             'legal-hold-dot--large': large,
+            'legal-hold-dot--message': isMessage,
           },
           className,
         )}
       >
         {isPending && <Icon.Pending className="pending-icon" />}
       </span>
+      {showText && <span className="visibility-hidden legal-hold-dot--text">{t('legalHoldHeadline')}</span>}
     </button>
   );
 };
 
 export default LegalHoldDot;
 
-registerReactComponent<LegalHoldDotProps>('legal-hold-dot', {
-  component: LegalHoldDot,
-  template:
-    '<div data-bind="react: {conversation, isPending: ko.unwrap(isPending), large, className, legalHoldModal}"></div>',
-});
+registerReactComponent('legal-hold-dot', LegalHoldDot);

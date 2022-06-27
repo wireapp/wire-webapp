@@ -18,12 +18,29 @@
  */
 
 import {Account} from '@wireapp/core';
+import {ClientType} from '@wireapp/api-client/src/client/';
 import {container, singleton} from 'tsyringe';
 import {APIClient} from './APIClientSingleton';
+import {createStorageEngine, DatabaseTypes} from './StoreEngineProvider';
+import {isTemporaryClientAndNonPersistent} from 'Util/util';
+import {Config} from '../Config';
 
 @singleton()
 export class Core extends Account {
   constructor(apiClient = container.resolve(APIClient)) {
-    super(apiClient);
+    super(apiClient, {
+      createStore: (storeName, context) => {
+        const dbType = isTemporaryClientAndNonPersistent(context.clientType === ClientType.PERMANENT)
+          ? DatabaseTypes.ENCRYPTED
+          : DatabaseTypes.PERMANENT;
+
+        return createStorageEngine(storeName, dbType);
+      },
+      enableMLS: Config.getConfig().FEATURE.ENABLE_MLS,
+      nbPrekeys: 100,
+    });
+  }
+  get storage() {
+    return this['storeEngine'];
   }
 }

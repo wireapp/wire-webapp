@@ -18,7 +18,6 @@
  */
 
 import {ReactWrapper} from 'enzyme';
-import React from 'react';
 import waitForExpect from 'wait-for-expect';
 import {actionRoot} from '../module/action';
 import {ValidationError} from '../module/action/ValidationError';
@@ -69,9 +68,9 @@ describe('SetEmail', () => {
       }),
     );
 
-    expect(setEmailPage.getEmailInput().exists()).toBe(true);
+    expect(setEmailPage.getEmailInput()).not.toBeNull();
 
-    expect(setEmailPage.getVerifyEmailButton().exists()).toBe(true);
+    expect(setEmailPage.getVerifyEmailButton()).not.toBeNull();
 
     expect(setEmailPage.getVerifyEmailButton().props().disabled).toBe(true);
     setEmailPage.enterEmail('e');

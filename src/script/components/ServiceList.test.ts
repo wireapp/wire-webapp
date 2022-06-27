@@ -48,8 +48,8 @@ describe('ServiceList', () => {
     const serviceElement1 = serviceList.getServiceElement(serviceEntity1.id);
     const serviceElement2 = serviceList.getServiceElement(serviceEntity2.id);
 
-    expect(serviceElement1.exists()).toBe(true);
-    expect(serviceElement2.exists()).toBe(true);
+    expect(serviceElement1).not.toBeNull();
+    expect(serviceElement2).not.toBeNull();
   });
 
   it('shows the "no results found" element when there are no services', () => {
@@ -63,6 +63,6 @@ describe('ServiceList', () => {
 
     const noResultsElement = serviceList.getNoResultsElement();
 
-    expect(noResultsElement.exists()).toBe(true);
+    expect(noResultsElement).not.toBeNull();
   });
 });

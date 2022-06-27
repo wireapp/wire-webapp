@@ -63,7 +63,7 @@ type MessageRepositoryDependencies = {
   userState: UserState;
 };
 
-function buildMessageRepository(): [MessageRepository, MessageRepositoryDependencies] {
+async function buildMessageRepository(): Promise<[MessageRepository, MessageRepositoryDependencies]> {
   const userState = new UserState();
   userState.self(selfUser);
   const clientState = new ClientState();
@@ -71,12 +71,12 @@ function buildMessageRepository(): [MessageRepository, MessageRepositoryDependen
   const core = container.resolve(Core);
   const messageSender = new MessageSender();
   messageSender.pauseQueue(false);
-  core.initServices({} as any);
+  await core.initServices({} as any);
   /* eslint-disable sort-keys-fix/sort-keys-fix */
   const dependencies = {
     conversationRepository: () => ({} as ConversationRepository),
     cryptographyRepository: new CryptographyRepository({} as any),
-    eventRepository: new EventRepository(new EventService({} as any), {} as any, {} as any, {} as any, {} as any),
+    eventRepository: new EventRepository(new EventService({} as any), {} as any, {} as any, {} as any),
     messageSender,
     propertiesRepository: new PropertiesRepository({} as any, {} as any),
     serverTimeHandler: serverTimeHandler,
@@ -113,7 +113,7 @@ describe('MessageRepository', () => {
 
   describe('sendPing', () => {
     it('sends a ping', async () => {
-      const [messageRepository, {core}] = buildMessageRepository();
+      const [messageRepository, {core}] = await buildMessageRepository();
       spyOn(core.service!.conversation, 'send').and.returnValue(Promise.resolve());
       const conversation = generateConversation();
 
@@ -134,7 +134,7 @@ describe('MessageRepository', () => {
 
   describe('sendMessageEdit', () => {
     it('sends an edit message if original message exists', async () => {
-      const [messageRepository, {core}] = buildMessageRepository();
+      const [messageRepository, {core}] = await buildMessageRepository();
       spyOn(core.service!.conversation, 'send').and.returnValue(
         Promise.resolve({state: PayloadBundleState.OUTGOING_SENT}),
       );
@@ -161,7 +161,7 @@ describe('MessageRepository', () => {
 
   describe('sendTextWithLinkPreview', () => {
     it('sends a text message', async () => {
-      const [messageRepository, {eventRepository, core, propertiesRepository}] = buildMessageRepository();
+      const [messageRepository, {eventRepository, core, propertiesRepository}] = await buildMessageRepository();
       spyOn(propertiesRepository, 'getPreference').and.returnValue(false);
       spyOn(core.service!.conversation, 'send').and.returnValue(
         Promise.resolve({state: PayloadBundleState.OUTGOING_SENT}),
@@ -191,7 +191,7 @@ describe('MessageRepository', () => {
       const msgToDelete = new Message(createRandomUuid());
       msgToDelete.user(sender);
       conversation.addMessage(msgToDelete);
-      const [messageRepository, {core}] = buildMessageRepository();
+      const [messageRepository, {core}] = await buildMessageRepository();
       spyOn(core.service!.conversation, 'deleteMessageEveryone');
 
       await expect(messageRepository.deleteMessageForEveryone(conversation, msgToDelete)).rejects.toMatchObject({
@@ -208,7 +208,7 @@ describe('MessageRepository', () => {
       messageToDelete.user(selfUser);
       conversation.addMessage(messageToDelete);
 
-      const [messageRepository, {core, eventRepository}] = buildMessageRepository();
+      const [messageRepository, {core, eventRepository}] = await buildMessageRepository();
       spyOn(core.service!.conversation, 'deleteMessageEveryone');
       spyOn(eventRepository.eventService, 'deleteEvent').and.returnValue(Promise.resolve());
 
@@ -226,7 +226,7 @@ describe('MessageRepository', () => {
 
   describe('resetSession', () => {
     it('resets the session with another device', async () => {
-      const [messageRepository, {cryptographyRepository, core}] = buildMessageRepository();
+      const [messageRepository, {cryptographyRepository, core}] = await buildMessageRepository();
       jest.spyOn(core.service!.conversation, 'send').mockResolvedValue({} as any);
       spyOn(cryptographyRepository, 'deleteSession');
       const conversation = generateConversation();

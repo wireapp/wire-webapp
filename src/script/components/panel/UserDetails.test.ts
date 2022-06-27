@@ -50,13 +50,13 @@ describe('UserDetails', () => {
       isVerified: false,
       participant,
     });
-    expect(userDetails.getName().text()).toBe(name);
-    expect(userDetails.getUsername().text()).toBe(`@${userName}`);
-    expect(userDetails.getVerifiedIcon().exists()).toBeFalsy();
-    expect(userDetails.getExternal().exists()).toBeFalsy();
-    expect(userDetails.getGuest().exists()).toBeFalsy();
-    expect(userDetails.getTemporaryGuestText().exists()).toBeFalsy();
-    expect(userDetails.getAdmin().exists()).toBeFalsy();
+    expect(userDetails.getName().textContent).toBe(name);
+    expect(userDetails.getUsername().textContent).toBe(`@${userName}`);
+    expect(userDetails.getVerifiedIcon()).toBeNull();
+    expect(userDetails.getExternal()).toBeNull();
+    expect(userDetails.getGuest()).toBeNull();
+    expect(userDetails.getTemporaryGuestText()).toBeNull();
+    expect(userDetails.getAdmin()).toBeNull();
   });
 
   it('shows a verified icon when all clients from the self user are verified and all clients of the other participant are verified', () => {
@@ -65,8 +65,8 @@ describe('UserDetails', () => {
     verifiedClient.meta.isVerified(true);
     otherParticipant.devices.push(verifiedClient);
     const userDetails = new UserDetailsPage({isGroupAdmin: true, isSelfVerified: true, participant: otherParticipant});
-    expect(userDetails.getVerifiedIcon().exists()).toBeTruthy();
-    expect(userDetails.getAdmin().exists()).toBeTruthy();
+    expect(userDetails.getVerifiedIcon()).not.toBeNull();
+    expect(userDetails.getAdmin()).not.toBeNull();
   });
 
   it('renders the badge for a user', () => {
@@ -79,7 +79,7 @@ describe('UserDetails', () => {
       isVerified: false,
       participant,
     });
-    expect(userDetails.getExternal().text()).toBe(badge);
+    expect(userDetails.getExternal().textContent).toBe(badge);
   });
 
   it('renders the badge for a guest', () => {
@@ -94,7 +94,7 @@ describe('UserDetails', () => {
       isVerified: false,
       participant,
     });
-    expect(userDetails.getGuest().exists()).toBeTruthy();
-    expect(userDetails.getTemporaryGuestText().text()).toBe(expirationText);
+    expect(userDetails.getGuest()).not.toBeNull();
+    expect(userDetails.getTemporaryGuestText().textContent).toBe(expirationText);
   });
 });

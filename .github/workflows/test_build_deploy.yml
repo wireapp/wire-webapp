@@ -9,13 +9,13 @@ on:
   pull_request:
     branches: [master, dev, edge, avs, mobile]
 
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   test_build_deploy:
     runs-on: ubuntu-latest
-
-    strategy:
-      matrix:
-        DISTRIBUTION: ['DISTRIBUTION_0', 'DISTRIBUTION_1']
 
     env:
       TEST_COVERAGE_FAIL_THRESHOLD: 45
@@ -28,24 +28,20 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           fetch-depth: 0
 
       - name: Use latest Node.js v16
-        uses: actions/setup-node@v2
+        uses: actions/setup-node@v3
         with:
           node-version: 16.x
 
       - name: Set environment variables
-        env:
-          # DISTRIBUTIONS are saved in the format `distribution-{name}`
-          DISTRIBUTION: ${{secrets[matrix.DISTRIBUTION]}}
         run: |
           echo "BRANCH_NAME=$(git branch --show-current)" >> $GITHUB_ENV
           echo "TAG=$(git tag --points-at ${{github.sha}})" >> $GITHUB_ENV
           echo "PR_LAST_COMMIT_MESSAGE=$(git log --format=%B -n 1 ${{github.event.after}} | head -n 1)" >> $GITHUB_ENV
-          echo "DISTRIBUTION=${DISTRIBUTION/distribution-/}" >> $GITHUB_ENV
 
       - name: Set TITLE and BUILD_DESKTOP
         env:
@@ -70,11 +66,6 @@ jobs:
           contains(env.TITLE || env.PR_LAST_COMMIT_MESSAGE, '[ci skip]')
         uses: andymckay/cancel-action@0.2
 
-      - name: Cancel Previous Runs
-        uses: styfle/cancel-workflow-action@0.5.0
-        with:
-          access_token: ${{github.token}}
-
       - name: Yarn cache
         uses: c-hive/gha-yarn-cache@v2.1.0
 
@@ -84,38 +75,26 @@ jobs:
         run: echo "machine github.com login ${GH_TOKEN}" > ~/.netrc
 
       - name: Install JS dependencies
-        # Run for all PRs with DISTRIBUTION == 'wire', all pushes to master/dev
-        # and when a desktop version should be built
-        if: |
-          matrix.DISTRIBUTION == 'DISTRIBUTION_0' ||
-          github.event_name != 'pull_request' ||
-          env.BUILD_DESKTOP == 'true'
         run: yarn --frozen-lockfile
 
       - name: Test
-        # Run for all PRs and pushes to master/dev with DISTRIBUTION == 'wire'
-        if: matrix.DISTRIBUTION == 'DISTRIBUTION_0'
         run: yarn test --coverage --coverage-reporters=lcov --detectOpenHandles=false
 
       - name: Monitor coverage
-        # Run for all PRs and merges with DISTRIBUTION == 'wire'
-        if: matrix.DISTRIBUTION == 'DISTRIBUTION_0'
-        uses: codecov/codecov-action@v1.3.2
+        uses: codecov/codecov-action@v3.1.0
         with:
           fail_ci_if_error: false
           files: ./coverage/lcov.info
           flags: unittests
 
       - name: Build
-        # Run for all pushes to master/dev with DISTRIBUTION == 'wire'
-        # and when a desktop version should be built
         if: |
           github.event_name != 'pull_request' ||
           env.BUILD_DESKTOP == 'true'
         run: yarn build:prod
 
       - name: Assembling release information
-        if: contains(env.TAG, 'production') && matrix.DISTRIBUTION == 'DISTRIBUTION_0'
+        if: contains(env.TAG, 'production')
         # NOTE: always using 'master' config, since release version is only consumed at
         #       'production' stage for now
         shell: bash
@@ -126,16 +105,16 @@ jobs:
           echo "{\"imageTag\": \"${containerImageTag}\", \"releaseName\": \"${TAG:-v${packageVersion}}\"}" > ./release-info.json
 
       - name: Storing release information
-        if: contains(env.TAG, 'production') && matrix.DISTRIBUTION == 'DISTRIBUTION_0'
-        uses: actions/upload-artifact@v2
+        if: contains(env.TAG, 'production')
+        uses: actions/upload-artifact@v3
         with:
           name: release-info.json
           path: ./release-info.json
 
       # https://wire-webapp-avs.zinfra.io/
       - name: Deploy avs build to Elastic Beanstalk
-        if: env.BRANCH_NAME == 'avs' && matrix.DISTRIBUTION == 'DISTRIBUTION_0'
-        uses: einaregilsson/beanstalk-deploy@v14
+        if: env.BRANCH_NAME == 'avs'
+        uses: einaregilsson/beanstalk-deploy@v20
         with:
           application_name: ${{env.AWS_APPLICATION_NAME}}
           aws_access_key: ${{secrets.WEBTEAM_AWS_ACCESS_KEY_ID}}
@@ -151,8 +130,8 @@ jobs:
 
       # Stage 1: https://wire-webapp-edge.zinfra.io/
       - name: Deploy edge build to Elastic Beanstalk
-        if: env.BRANCH_NAME == 'edge' && matrix.DISTRIBUTION == 'DISTRIBUTION_0'
-        uses: einaregilsson/beanstalk-deploy@v14
+        if: env.BRANCH_NAME == 'edge'
+        uses: einaregilsson/beanstalk-deploy@v20
         with:
           application_name: ${{env.AWS_APPLICATION_NAME}}
           aws_access_key: ${{secrets.WEBTEAM_AWS_ACCESS_KEY_ID}}
@@ -168,8 +147,8 @@ jobs:
 
       # Stage 2: https://wire-webapp-dev.zinfra.io/
       - name: Deploy dev build to Elastic Beanstalk
-        if: env.BRANCH_NAME == 'dev' && matrix.DISTRIBUTION == 'DISTRIBUTION_0'
-        uses: einaregilsson/beanstalk-deploy@v14
+        if: env.BRANCH_NAME == 'dev'
+        uses: einaregilsson/beanstalk-deploy@v20
         with:
           application_name: ${{env.AWS_APPLICATION_NAME}}
           aws_access_key: ${{secrets.WEBTEAM_AWS_ACCESS_KEY_ID}}
@@ -185,8 +164,8 @@ jobs:
 
       # Stage 3: https://wire-webapp-staging.zinfra.io/
       - name: Deploy staging build to Elastic Beanstalk
-        if: contains(env.TAG, 'staging') && matrix.DISTRIBUTION == 'DISTRIBUTION_0'
-        uses: einaregilsson/beanstalk-deploy@v14
+        if: contains(env.TAG, 'staging')
+        uses: einaregilsson/beanstalk-deploy@v20
         with:
           application_name: ${{env.AWS_APPLICATION_NAME}}
           aws_access_key: ${{secrets.WEBTEAM_AWS_ACCESS_KEY_ID}}
@@ -202,8 +181,8 @@ jobs:
 
       # Stage 4: https://wire-webapp-master.zinfra.io/
       - name: Deploy master build to Elastic Beanstalk
-        if: env.BRANCH_NAME == 'master' && matrix.DISTRIBUTION == 'DISTRIBUTION_0'
-        uses: einaregilsson/beanstalk-deploy@v14
+        if: env.BRANCH_NAME == 'master'
+        uses: einaregilsson/beanstalk-deploy@v20
         with:
           application_name: ${{env.AWS_APPLICATION_NAME}}
           aws_access_key: ${{secrets.WEBTEAM_AWS_ACCESS_KEY_ID}}
@@ -219,8 +198,8 @@ jobs:
 
       # Stage 5: https://app.wire.com/
       - name: Deploy production build to Elastic Beanstalk
-        if: contains(env.TAG, 'production') && matrix.DISTRIBUTION == 'DISTRIBUTION_0'
-        uses: einaregilsson/beanstalk-deploy@v14
+        if: contains(env.TAG, 'production')
+        uses: einaregilsson/beanstalk-deploy@v20
         with:
           application_name: ${{env.AWS_APPLICATION_NAME}}
           aws_access_key: ${{secrets.WEBTEAM_AWS_ACCESS_KEY_ID}}
@@ -236,8 +215,8 @@ jobs:
 
       # Stage 6: https://mobile.wire.com
       - name: Deploy mobile build to Elastic Beanstalk
-        if: env.BRANCH_NAME == 'mobile' && matrix.DISTRIBUTION == 'DISTRIBUTION_0'
-        uses: einaregilsson/beanstalk-deploy@v14
+        if: env.BRANCH_NAME == 'mobile'
+        uses: einaregilsson/beanstalk-deploy@v20
         with:
           application_name: ${{env.AWS_APPLICATION_NAME}}
           aws_access_key: ${{secrets.WEBTEAM_AWS_ACCESS_KEY_ID}}
@@ -260,42 +239,29 @@ jobs:
         env:
           DOCKER_PASSWORD: ${{secrets.WEBTEAM_QUAY_PASSWORD}}
           DOCKER_USERNAME: ${{secrets.WEBTEAM_QUAY_USERNAME}}
-        run: |
-          if [ "$DISTRIBUTION" == "wire" ]; then
-            yarn docker '' "${{env.BRANCH_NAME}}"
-          fi
+        run: yarn docker '' "${{env.BRANCH_NAME}}"
 
       - name: Push staging Docker image
         if: contains(env.TAG, 'staging')
         env:
           DOCKER_PASSWORD: ${{secrets.WEBTEAM_QUAY_PASSWORD}}
           DOCKER_USERNAME: ${{secrets.WEBTEAM_QUAY_USERNAME}}
-        run: |
-          if [ "$DISTRIBUTION" == "wire" ]; then
-            yarn docker '' staging "$TAG"
-          else
-            yarn docker "$DISTRIBUTION" staging "$TAG"
-          fi
+        run: yarn docker '' staging "$TAG"
 
       - name: Push production Docker image
         if: contains(env.TAG, 'production')
         env:
           DOCKER_PASSWORD: ${{secrets.WEBTEAM_QUAY_PASSWORD}}
           DOCKER_USERNAME: ${{secrets.WEBTEAM_QUAY_USERNAME}}
-        run: |
-          if [ "$DISTRIBUTION" == "wire" ]; then
-            yarn docker '' production "$TAG"
-          else
-            yarn docker "$DISTRIBUTION" production "$TAG"
-          fi
+        run: yarn docker '' production "$TAG"
 
       - name: Generate changelog for production release
-        if: contains(env.TAG, 'production') && matrix.DISTRIBUTION == 'DISTRIBUTION_0'
+        if: contains(env.TAG, 'production')
         run: yarn changelog:ci
 
       - name: Create GitHub production release
         id: create_release_production
-        if: contains(env.TAG, 'production') && matrix.DISTRIBUTION == 'DISTRIBUTION_0'
+        if: contains(env.TAG, 'production')
         uses: softprops/action-gh-release@v1
         env:
           GITHUB_TOKEN: ${{github.token}}
@@ -307,7 +273,7 @@ jobs:
           prerelease: false
 
       - name: Announce production release
-        if: contains(env.TAG, 'production') && matrix.DISTRIBUTION == 'DISTRIBUTION_0'
+        if: contains(env.TAG, 'production')
         uses: wireapp/github-action-wire-messenger@v2.0.0
         with:
           email: ${{secrets.WIRE_BOT_EMAIL}}
@@ -316,12 +282,12 @@ jobs:
           send_text: 'The web team just rolled out a new version of [Wire for Web](https://app.wire.com/). You can find what has changed in our [GitHub release notes](https://github.com/wireapp/wire-webapp/releases/latest).\n\nPlease note that the rollout can take up to 30 minutes to be fully deployed on all nodes. You can check here if you get already served our latest version from today: https://app.wire.com/version'
 
       - name: Generate changelog for staging release
-        if: contains(env.TAG, 'staging') && matrix.DISTRIBUTION == 'DISTRIBUTION_0'
+        if: contains(env.TAG, 'staging')
         run: yarn changelog:dev
 
       - name: Create GitHub staging release
         id: create_release_staging
-        if: contains(env.TAG, 'staging') && matrix.DISTRIBUTION == 'DISTRIBUTION_0'
+        if: contains(env.TAG, 'staging')
         uses: softprops/action-gh-release@v1
         env:
           GITHUB_TOKEN: ${{github.token}}
@@ -332,7 +298,7 @@ jobs:
           prerelease: true
 
       - name: Announce staging release
-        if: contains(env.TAG, 'staging') && matrix.DISTRIBUTION == 'DISTRIBUTION_0'
+        if: contains(env.TAG, 'staging')
         uses: wireapp/github-action-wire-messenger@v2.0.0
         with:
           email: ${{secrets.WIRE_BOT_EMAIL}}
@@ -342,7 +308,7 @@ jobs:
           send_text: 'Staging bump for commit **${{github.sha}}** ("${{env.TITLE}}") done! 🏁'
 
       - name: Notify CI error
-        if: failure() && github.event_name != 'pull_request' && matrix.DISTRIBUTION == 'DISTRIBUTION_0'
+        if: failure() && github.event_name != 'pull_request'
         uses: wireapp/github-action-wire-messenger@v2.0.0
         with:
           email: ${{secrets.WIRE_BOT_EMAIL}}
@@ -350,13 +316,9 @@ jobs:
           conversation: 'b2cc7120-4154-4be4-b0c0-45a8c361c4d1'
           send_text: '${{env.COMMITTER}} broke the "${{env.BRANCH_NAME}}" branch on "${{github.repository}}" with [${{env.TITLE}}](${{env.COMMIT_URL}}) 🌵'
 
-      - name: Build config.js file for desktop
-        if: env.BUILD_DESKTOP == 'true'
-        run: node electron/bin/build-config.js
-
       - name: Upload WebApp artifacts
         if: env.BUILD_DESKTOP == 'true'
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: webapp-dist
           path: ./server/dist
@@ -376,7 +338,7 @@ jobs:
       #       run all subsequent steps.
       - name: Obtaining release information artifact
         id: release-info-artifact
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v3
         continue-on-error: true
         with:
           name: release-info.json
@@ -390,7 +352,7 @@ jobs:
           echo "::set-output name=releaseInfo::$(cat ${ARTIFACT_LOCAL_PATH})"
 
       - name: Checking out 'wire-server'
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         if: ${{ steps.release-info-file.outputs.exists == 'true' }}
         with:
           repository: 'wireapp/wire-server'
@@ -410,7 +372,7 @@ jobs:
       - name: Creating Pull Request
         id: create-pr
         if: ${{ steps.release-info-file.outputs.exists == 'true' }}
-        uses: peter-evans/create-pull-request@v3
+        uses: peter-evans/create-pull-request@v4
         with:
           draft: false
           token: ${{ secrets.ZEBOT_GH_TOKEN }}
@@ -429,6 +391,8 @@ jobs:
           echo "PR: ${{ steps.create-pr.outputs.pull-request-url }}"
 
   cleanup_artifacts:
+    permissions:
+      contents: none
     name: Cleanup artifacts
     needs: update_helm_chart
     runs-on: ubuntu-latest

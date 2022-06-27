@@ -17,7 +17,7 @@
  *
  */
 
-import React, {Fragment} from 'react';
+import React from 'react';
 
 import {registerReactComponent} from 'Util/ComponentUtil';
 import Icon from '../Icon';
@@ -35,24 +35,23 @@ export interface PanelActionsProps {
 
 const PanelActions: React.FC<PanelActionsProps> = ({items}) => {
   return (
-    <Fragment>
+    <ul className="panel-actions">
       {items.map(({click, identifier, icon, label}) => (
-        <div className="panel__action-item" key={identifier} onClick={click} data-uie-name={identifier}>
-          <div className="panel__action-item__icon">
-            <Icon name={icon} />
-          </div>
-          <div data-uie-name={`${identifier}-item-text`} className="panel__action-item__text">
-            {label}
-          </div>
-        </div>
+        <li key={identifier}>
+          <button className="panel__action-item" onClick={click} data-uie-name={identifier} type="button">
+            <span className="panel__action-item__icon">
+              <Icon name={icon} />
+            </span>
+            <span data-uie-name={`${identifier}-item-text`} className="panel__action-item__text">
+              {label}
+            </span>
+          </button>
+        </li>
       ))}
-    </Fragment>
+    </ul>
   );
 };
 
 export default PanelActions;
 
-registerReactComponent('panel-actions', {
-  component: PanelActions,
-  template: '<div class="panel-actions" data-bind="react: {items: ko.unwrap(items)}"></div>',
-});
+registerReactComponent('panel-actions', PanelActions);

@@ -39,7 +39,7 @@ const AssetLoader: React.FC<AssetLoaderProps> = ({large, loadProgress, onCancel}
 
   return (
     <div className="media-button" onClick={onClick} data-uie-name="status-loading-media">
-      <svg viewBox={viewBox} data-uie-name="asset-loader-svg">
+      <svg aria-hidden="true" viewBox={viewBox} data-uie-name="asset-loader-svg">
         <circle
           className="accent-stroke"
           style={{strokeDasharray: progress}}

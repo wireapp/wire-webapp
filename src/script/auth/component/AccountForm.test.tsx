@@ -18,7 +18,6 @@
  */
 
 import {ReactWrapper} from 'enzyme';
-import React from 'react';
 import {initialRootState} from '../module/reducer';
 import {mockStoreFactory} from '../util/test/mockStoreFactory';
 import {mountComponent} from '../util/test/TestUtil';
@@ -27,7 +26,7 @@ import AccountForm from './AccountForm';
 describe('when entering account data', () => {
   let wrapper: ReactWrapper;
 
-  const nameInput = () => wrapper.find('[data-uie-name="enter-name"]').first();
+  const nameInput = () => wrapper.find('[data-uie-name="enter-name"] input').first();
   const emailInput = () => wrapper.find('[data-uie-name="enter-email"]').first();
   const passwordInput = () => wrapper.find('[data-uie-name="enter-password"]').first();
   const doNextButton = () => wrapper.find('[data-uie-name="do-next"]').first();
@@ -84,7 +83,7 @@ describe('when entering account data', () => {
   describe('an error message', () => {
     it('appears if too few characters are entered in the name field', () => {
       const expectedName = 'M';
-      const expectedErrorMessage = '!Enter a name with at least 2 characters';
+      const expectedErrorMessage = 'Enter a name with at least 2 characters';
 
       wrapper = mountComponent(
         <AccountForm onSubmit={() => {}} />,
@@ -93,6 +92,7 @@ describe('when entering account data', () => {
           authState: {
             account: {
               email: 'email@email.com',
+              name: '',
               password: 'Ab1!Ab1!Ab1!Ab1!Ab1!',
               termsAccepted: true,
             },
@@ -118,7 +118,7 @@ describe('when entering account data', () => {
     it('appears when input gets trimmed', () => {
       const actualName = '  ';
       const expectedName = '  ';
-      const expectedErrorMessage = '!Enter a name with at least 2 characters';
+      const expectedErrorMessage = 'Enter a name with at least 2 characters';
 
       wrapper = mountComponent(
         <AccountForm onSubmit={() => {}} />,
@@ -127,6 +127,7 @@ describe('when entering account data', () => {
           authState: {
             account: {
               email: 'email@email.com',
+              name: '',
               password: 'Ab1!Ab1!Ab1!Ab1!Ab1!',
               termsAccepted: true,
             },

@@ -70,16 +70,10 @@ const HistoryInfo = ({hasHistory, clients, currentSelfClient, isNewCurrentSelfCl
             }}
           />
         </Paragraph>
-        {!hasHistory && (
-          <Paragraph center style={{marginBottom: 40}}>
-            <Link href={Config.getConfig().URL.SUPPORT.HISTORY} target="_blank" data-uie-name="do-history-learn-more">
-              {_(historyInfoStrings.learnMore)}
-            </Link>
-          </Paragraph>
-        )}
         <Button
+          style={{margin: 'auto', width: 200}}
+          type="button"
           onClick={onContinue}
-          autoFocus
           data-uie-name="do-history-confirm"
           onKeyDown={(event: React.KeyboardEvent) => {
             if (event.key === KEY.ENTER) {
@@ -89,6 +83,13 @@ const HistoryInfo = ({hasHistory, clients, currentSelfClient, isNewCurrentSelfCl
         >
           {_(historyInfoStrings.ok)}
         </Button>
+        {!hasHistory && (
+          <Paragraph center style={{marginTop: 40}}>
+            <Link href={Config.getConfig().URL.SUPPORT.HISTORY} target="_blank" data-uie-name="do-history-learn-more">
+              {_(historyInfoStrings.learnMore)}
+            </Link>
+          </Paragraph>
+        )}
       </ContainerXS>
     </Page>
   );

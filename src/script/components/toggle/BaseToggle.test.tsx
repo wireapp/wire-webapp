@@ -26,9 +26,7 @@ class BasePage extends TestPage<BaseToggleProps> {
     super(BaseToggle, props);
   }
 
-  getInput = () => this.get('input[data-uie-name="allow-toggle-input"]');
-
-  changeInputValue = (value: boolean) => this.changeCheckboxValue(this.getInput(), value);
+  getInput = () => this.get('input[data-uie-name="allow-base-toggle-input"]');
 }
 
 describe('BaseToggle', () => {
@@ -43,7 +41,7 @@ describe('BaseToggle', () => {
     };
 
     const baseTogglePage = new BasePage(props);
-    baseTogglePage.changeInputValue(!isChecked);
+    baseTogglePage.click(baseTogglePage.getInput());
     expect(isChecked).toBe(true);
   });
 });

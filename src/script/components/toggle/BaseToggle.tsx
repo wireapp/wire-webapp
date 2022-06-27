@@ -17,23 +17,24 @@
  *
  */
 
-import React from 'react';
+import React, {useId} from 'react';
 import cx from 'classnames';
 
 import {registerReactComponent} from 'Util/ComponentUtil';
-import {createRandomUuid} from 'Util/util';
 
 export interface BaseToggleProps {
-  extendedInfo?: string;
+  extendedInfo?: boolean;
   extendedInfoText?: string;
+  className?: string;
   infoText?: string;
   isChecked: boolean;
   isDisabled?: boolean;
   setIsChecked: (isChecked: boolean) => void;
+  toggleId?: string;
   toggleName?: string;
 }
 
-const defaultToggleName = 'toggle';
+const defaultToggleName = 'base-toggle';
 
 const BaseToggle: React.FC<BaseToggleProps> = ({
   extendedInfo,
@@ -41,14 +42,16 @@ const BaseToggle: React.FC<BaseToggleProps> = ({
   isDisabled,
   setIsChecked,
   extendedInfoText,
+  toggleId = defaultToggleName,
   toggleName = defaultToggleName,
+  className,
   infoText,
 }) => {
-  const uuid = React.useMemo(() => createRandomUuid(), []);
-  const labelUuid = React.useMemo(() => createRandomUuid(), []);
+  const uuid = useId();
+  const labelUuid = useId();
   const inputRef = React.useRef<HTMLInputElement>();
   return (
-    <>
+    <div className={cx(defaultToggleName, className)}>
       <div className="info-toggle__row">
         <label htmlFor={uuid} id={labelUuid} className="info-toggle__name">
           {toggleName}
@@ -66,30 +69,28 @@ const BaseToggle: React.FC<BaseToggleProps> = ({
             id={uuid}
             onChange={(event: React.ChangeEvent<HTMLInputElement>) => setIsChecked(event.target.checked)}
             checked={isChecked}
-            data-uie-name={`allow-${toggleName?.toLowerCase()}-input`}
+            data-uie-name={`allow-${toggleId}-input`}
           />
           <button
             className="button-label"
             aria-pressed={isChecked}
             type="button"
             onClick={() => setIsChecked(inputRef.current.checked)}
-            aria-labelledby={labelUuid}
-            data-uie-name={`do-allow-${toggleName?.toLowerCase()}`}
+            data-uie-name={`do-allow-${toggleId}`}
             data-uie-value={isChecked ? 'checked' : 'unchecked'}
-          ></button>
+          >
+            <span className="button-label__switch" />
+            <span className="visually-hidden">{toggleName}</span>
+          </button>
         </div>
       </div>
-      <p className="info-toggle__details" data-uie-name="status-guest-toggle">
+      <p className="info-toggle__details" data-uie-name={`status-${toggleId}`}>
         {extendedInfo ? extendedInfoText : infoText}
       </p>
-    </>
+    </div>
   );
 };
 
 export default BaseToggle;
 
-registerReactComponent('base-toggle', {
-  component: BaseToggle,
-  template:
-    '<div class="base-toggle" data-bind="react: {isChecked: ko.unwrap(isChecked), isDisabled: ko.unwrap(isDisabled), setIsChecked: onToggle, toggleName: toggleName, infoText: infoText, extendedInfoText: extendedInfoText, extendedInfo }"></div>',
-});
+registerReactComponent('base-toggle', BaseToggle);

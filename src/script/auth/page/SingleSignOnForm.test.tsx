@@ -19,7 +19,6 @@
 
 import {ReactWrapper} from 'enzyme';
 import {createMemoryHistory} from 'history';
-import React from 'react';
 import waitForExpect from 'wait-for-expect';
 import {actionRoot} from '../module/action';
 import {initialRootState, RootState, Api} from '../module/reducer';
@@ -85,7 +84,7 @@ describe('SingleSignOnForm', () => {
       {doLogin, initialCode},
     );
 
-    expect(singleSignOnFormPage.getCodeOrEmailInput().exists()).toBe(true);
+    expect(singleSignOnFormPage.getCodeOrEmailInput()).not.toBeNull();
 
     expect(singleSignOnFormPage.getCodeOrEmailInput().props().value).toEqual(initialCode);
 
@@ -122,7 +121,7 @@ describe('SingleSignOnForm', () => {
       history,
     );
 
-    expect(singleSignOnFormPage.getCodeOrEmailInput().exists()).toBe(true);
+    expect(singleSignOnFormPage.getCodeOrEmailInput()).not.toBeNull();
 
     singleSignOnFormPage.enterCodeOrEmail(code);
     singleSignOnFormPage.clickSubmitButton();
@@ -158,7 +157,7 @@ describe('SingleSignOnForm', () => {
       {doLogin: () => Promise.reject()},
     );
 
-    expect(singleSignOnFormPage.getCodeOrEmailInput().exists()).toBe(true);
+    expect(singleSignOnFormPage.getCodeOrEmailInput()).not.toBeNull();
 
     expect(singleSignOnFormPage.getSubmitButton().props().disabled).toBe(true);
 
@@ -193,7 +192,7 @@ describe('SingleSignOnForm', () => {
       {doLogin: () => Promise.reject()},
     );
 
-    expect(singleSignOnFormPage.getCodeOrEmailInput().exists()).toBe(true);
+    expect(singleSignOnFormPage.getCodeOrEmailInput()).not.toBeNull();
 
     expect(singleSignOnFormPage.getSubmitButton().props().disabled).toBe(true);
 
@@ -203,7 +202,7 @@ describe('SingleSignOnForm', () => {
 
     singleSignOnFormPage.clickSubmitButton();
 
-    expect(singleSignOnFormPage.getErrorMessage(ValidationError.FIELD.SSO_CODE.PATTERN_MISMATCH).exists()).toBe(true);
+    expect(singleSignOnFormPage.getErrorMessage(ValidationError.FIELD.SSO_CODE.PATTERN_MISMATCH)).not.toBeNull();
   });
 
   it('successfully redirects with registered domain and permanent client', async () => {
@@ -235,7 +234,7 @@ describe('SingleSignOnForm', () => {
       {doLogin: () => Promise.reject()},
     );
 
-    expect(singleSignOnFormPage.getCodeOrEmailInput().exists()).toBe(true);
+    expect(singleSignOnFormPage.getCodeOrEmailInput()).not.toBeNull();
 
     expect(singleSignOnFormPage.getSubmitButton().props().disabled).toBe(true);
 
@@ -281,7 +280,7 @@ describe('SingleSignOnForm', () => {
       {doLogin: () => Promise.reject()},
     );
 
-    expect(singleSignOnFormPage.getCodeOrEmailInput().exists()).toBe(true);
+    expect(singleSignOnFormPage.getCodeOrEmailInput()).not.toBeNull();
 
     expect(singleSignOnFormPage.getSubmitButton().props().disabled).toBe(true);
 
