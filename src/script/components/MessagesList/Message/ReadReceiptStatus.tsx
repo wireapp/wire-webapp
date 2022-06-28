@@ -67,8 +67,8 @@ const ReadReceiptStatus: React.FC<ReadReceiptStatusProps> = ({
         </span>
       )}
       {showEyeIndicator && (
-        <span
-          className={cx('message-status-read', {
+        <button
+          className={cx('button-reset-default', 'message-status-read', {
             'message-status-read--clickable': !is1to1Conversation,
             'message-status-read--visible': isLastDeliveredMessage,
             'with-tooltip with-tooltip--receipt': readReceiptTooltip,
@@ -81,7 +81,7 @@ const ReadReceiptStatus: React.FC<ReadReceiptStatusProps> = ({
           <span className="message-status-read__count" data-uie-name="status-message-read-receipt-count">
             {readReceiptText}
           </span>
-        </span>
+        </button>
       )}
     </>
   );
