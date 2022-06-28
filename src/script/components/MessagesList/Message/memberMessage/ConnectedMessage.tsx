@@ -61,13 +61,13 @@ const ConnectedMessage: React.FC<ConnectedMessageProps> = ({
         className="message-connected-avatar cursor-default"
       />
       {isOutgoingRequest && (
-        <div
-          className="message-connected-cancel accent-text"
+        <button
+          className="button-reset-default message-connected-cancel accent-text"
           onClick={onClickCancelRequest}
           data-uie-name="do-cancel-request"
         >
           {t('conversationConnectionCancelRequest')}
-        </div>
+        </button>
       )}
       {showServicesWarning && (
         <div className="message-services-warning" data-uie-name="label-services-warning">
