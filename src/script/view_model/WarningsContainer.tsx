@@ -136,6 +136,15 @@ const WarningsContainer: React.FC = () => {
     };
   });
 
+  const closeButton = (
+    <button
+      type="button"
+      data-uie-name="do-close-warning"
+      className="warning-bar-close icon-close button-round button-round-dark button-reset-default"
+      onClick={closeWarning}
+    />
+  );
+
   if (warnings.length === 0) {
     return null;
   }
@@ -154,7 +163,7 @@ const WarningsContainer: React.FC = () => {
               ),
             }}
           />
-          <CloseWarningButton onClick={closeWarning} />
+          {closeButton}
         </div>
       )}
       {visibleWarning === type.DENIED_CAMERA && (
@@ -170,7 +179,7 @@ const WarningsContainer: React.FC = () => {
               {t('warningLearnMore')}
             </a>
           </div>
-          <CloseWarningButton onClick={closeWarning} />
+          {closeButton}
         </div>
       )}
       {visibleWarning === type.REQUEST_MICROPHONE && (
@@ -179,7 +188,7 @@ const WarningsContainer: React.FC = () => {
             <Icon.MicOn className="warning-bar-icon" />
             <span dangerouslySetInnerHTML={{__html: t('warningPermissionRequestMicrophone', {}, {icon: ''})}} />
           </div>
-          <CloseWarningButton onClick={closeWarning} />
+          {closeButton}
         </div>
       )}
       {visibleWarning === type.DENIED_MICROPHONE && (
@@ -195,7 +204,7 @@ const WarningsContainer: React.FC = () => {
               {t('warningLearnMore')}
             </a>
           </div>
-          <CloseWarningButton onClick={closeWarning} />
+          {closeButton}
         </div>
       )}
       {visibleWarning === type.REQUEST_SCREEN && (
@@ -210,7 +219,7 @@ const WarningsContainer: React.FC = () => {
               ),
             }}
           />
-          <CloseWarningButton onClick={closeWarning} />
+          {closeButton}
         </div>
       )}
       {visibleWarning === type.DENIED_SCREEN && (
@@ -226,7 +235,7 @@ const WarningsContainer: React.FC = () => {
               {t('warningLearnMore')}
             </a>
           </div>
-          <CloseWarningButton onClick={closeWarning} />
+          {closeButton}
         </div>
       )}
       {visibleWarning === type.NOT_FOUND_CAMERA && (
@@ -242,7 +251,7 @@ const WarningsContainer: React.FC = () => {
               {t('warningLearnMore')}
             </a>
           </div>
-          <CloseWarningButton onClick={closeWarning} />
+          {closeButton}
         </div>
       )}
       {visibleWarning === type.NOT_FOUND_MICROPHONE && (
@@ -258,7 +267,7 @@ const WarningsContainer: React.FC = () => {
               {t('warningLearnMore')}
             </a>
           </div>
-          <CloseWarningButton onClick={closeWarning} />
+          {closeButton}
         </div>
       )}
       {visibleWarning === type.REQUEST_NOTIFICATION && (
@@ -273,7 +282,7 @@ const WarningsContainer: React.FC = () => {
               ),
             }}
           />
-          <CloseWarningButton onClick={closeWarning} />
+          {closeButton}
         </div>
       )}
       {visibleWarning === type.UNSUPPORTED_INCOMING_CALL && (
@@ -308,7 +317,7 @@ const WarningsContainer: React.FC = () => {
               <span>{t('warningCallUpgradeBrowser')}</span>
             </div>
           )}
-          <CloseWarningButton onClick={closeWarning} />
+          {closeButton}
         </div>
       )}
       {visibleWarning === type.UNSUPPORTED_OUTGOING_CALL && (
@@ -343,7 +352,7 @@ const WarningsContainer: React.FC = () => {
               <span>{t('warningCallUpgradeBrowser')}</span>
             </div>
           )}
-          <CloseWarningButton onClick={closeWarning} />
+          {closeButton}
         </div>
       )}
       {visibleWarning === type.CONNECTIVITY_RECONNECT && (
@@ -395,18 +404,6 @@ const WarningsContainer: React.FC = () => {
     </div>
   );
 };
-
-interface CloseWarningButtonProps {
-  onClick: () => void;
-}
-const CloseWarningButton = ({onClick}: CloseWarningButtonProps) => (
-  <button
-    type="button"
-    data-uie-name="do-close-warning"
-    className="warning-bar-close icon-close button-round button-round-dark button-reset-default"
-    onClick={onClick}
-  />
-);
 
 const TYPE = {
   CALL_QUALITY_POOR: 'call_quality_poor',
