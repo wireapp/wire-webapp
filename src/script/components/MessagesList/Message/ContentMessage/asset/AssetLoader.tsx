@@ -20,6 +20,7 @@
 import React from 'react';
 
 import Icon from '../../../../Icon';
+import {handleKeyDown} from 'Util/KeyboardUtil';
 
 export interface AssetLoaderProps {
   large?: boolean;
@@ -38,7 +39,14 @@ const AssetLoader: React.FC<AssetLoaderProps> = ({large, loadProgress, onCancel}
   };
 
   return (
-    <div className="media-button" onClick={onClick} data-uie-name="status-loading-media">
+    <div
+      role="button"
+      tabIndex={0}
+      className="media-button"
+      onClick={onClick}
+      onKeyDown={e => handleKeyDown(e, onClick.bind(null, e))}
+      data-uie-name="status-loading-media"
+    >
       <svg aria-hidden="true" viewBox={viewBox} data-uie-name="asset-loader-svg">
         <circle
           className="accent-stroke"
