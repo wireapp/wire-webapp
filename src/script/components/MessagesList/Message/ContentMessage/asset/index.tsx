@@ -41,6 +41,7 @@ import {StatusType} from '../../../../../message/StatusType';
 import {includesOnlyEmojis} from 'Util/EmojiUtil';
 import {ContentMessage} from 'src/script/entity/message/ContentMessage';
 import {MessageActions} from '../..';
+import {handleKeyDown} from 'Util/KeyboardUtil';
 
 const ContentAsset = ({
   asset,
@@ -64,14 +65,17 @@ const ContentAsset = ({
         <>
           {(asset as Text).should_render_text() && (
             <div
+              role="button"
+              tabIndex={0}
               className={`text ${includesOnlyEmojis((asset as Text).text) ? 'text-large' : ''} ${
                 status === StatusType.SENDING ? 'text-foreground' : ''
               } ${isObfuscated ? 'ephemeral-message-obfuscated' : ''}`}
               dangerouslySetInnerHTML={{__html: (asset as Text).render(selfId, message.accent_color())}}
               onClick={event => onClickMessage(asset as Text, event)}
+              onKeyDown={event => handleKeyDown(event, onClickMessage.bind(this, asset as Text, event))}
               onAuxClick={event => onClickMessage(asset as Text, event)}
               dir="auto"
-            ></div>
+            />
           )}
           {(asset as Text).previews().map(preview => (
             <div key={preview.url} className="message-asset">
