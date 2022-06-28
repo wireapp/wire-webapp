@@ -76,6 +76,7 @@ const MediaButton: React.FC<MediaButtonProps> = ({
     >
       {isUploaded && !isPlaying && mediaElement && (
         <button
+          type="button"
           className="button-reset-default media-button media-button-play icon-play"
           onClick={play}
           data-uie-name="do-play-media"
@@ -83,6 +84,7 @@ const MediaButton: React.FC<MediaButtonProps> = ({
       )}
       {isUploaded && isPlaying && (
         <button
+          type="button"
           className="button-reset-default media-button media-button-pause icon-pause"
           onClick={pause}
           data-uie-name="do-pause-media"

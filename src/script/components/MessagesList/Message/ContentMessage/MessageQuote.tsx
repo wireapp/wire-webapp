@@ -183,6 +183,7 @@ const QuotedMessage: React.FC<QuotedMessageProps> = ({
     <>
       <div className="message-quote__sender">
         <button
+          type="button"
           className="button-reset-default"
           onClick={() => showUserDetails(quotedUser)}
           data-uie-name="label-name-quote"
@@ -226,6 +227,7 @@ const QuotedMessage: React.FC<QuotedMessageProps> = ({
               />
               {canShowMore && (
                 <button
+                  type="button"
                   className="button-reset-default message-quote__text__show-more"
                   onClick={() => setShowFullText(!showFullText)}
                   data-uie-name="do-show-more-quote"
@@ -266,6 +268,7 @@ const QuotedMessage: React.FC<QuotedMessageProps> = ({
         </React.Fragment>
       ))}
       <button
+        type="button"
         className="button-reset-default message-quote__timestamp"
         onClick={() => {
           if (quotedMessage) {

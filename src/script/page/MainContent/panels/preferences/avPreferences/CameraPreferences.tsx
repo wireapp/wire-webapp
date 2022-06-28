@@ -146,6 +146,7 @@ const CameraPreferences: React.FC<CameraPreferencesProps> = ({
                 }}
               />
               <button
+                type="button"
                 className="button-reset-default preferences-av-video-disabled__try-again"
                 onClick={requestStream}
                 data-uie-name="do-try-again-preferences-av"

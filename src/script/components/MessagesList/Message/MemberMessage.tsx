@@ -143,6 +143,7 @@ const MemberMessage: React.FC<MemberMessageProps> = ({
             <div className="message-member-footer">
               <div>{t('guestRoomConversationHead')}</div>
               <button
+                type="button"
                 onClick={onClickInvitePeople}
                 className="button-reset-default message-member-footer-button"
                 data-uie-name="do-invite-people"

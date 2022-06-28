@@ -53,6 +53,7 @@ const SelfFingerprint: React.FC<SelfFingerprintProps> = ({
       </div>
       <div>
         <button
+          type="button"
           className="button-reset-default participant-devices__link accent-text"
           onClick={() => amplify.publish(WebAppEvents.PREFERENCES.MANAGE_DEVICES)}
         >

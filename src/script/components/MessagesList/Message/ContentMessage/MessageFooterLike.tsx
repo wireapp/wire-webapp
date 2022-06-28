@@ -45,6 +45,7 @@ const MessageFooterLike: React.FC<MessageFooterLikeProps> = ({message, is1to1Con
         <MessageLike className="like-button" message={message} onLike={onLike} />
       </div>
       <button
+        type="button"
         className={cx('button-reset-default', 'message-footer-label', {
           'cursor-pointer': !is1to1Conversation,
         })}

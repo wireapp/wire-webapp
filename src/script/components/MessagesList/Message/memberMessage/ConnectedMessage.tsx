@@ -62,6 +62,7 @@ const ConnectedMessage: React.FC<ConnectedMessageProps> = ({
       />
       {isOutgoingRequest && (
         <button
+          type="button"
           className="button-reset-default message-connected-cancel accent-text"
           onClick={onClickCancelRequest}
           data-uie-name="do-cancel-request"

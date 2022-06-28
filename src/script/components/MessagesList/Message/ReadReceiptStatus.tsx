@@ -68,6 +68,7 @@ const ReadReceiptStatus: React.FC<ReadReceiptStatusProps> = ({
       )}
       {showEyeIndicator && (
         <button
+          type="button"
           className={cx('button-reset-default', 'message-status-read', {
             'message-status-read--clickable': !is1to1Conversation,
             'message-status-read--visible': isLastDeliveredMessage,

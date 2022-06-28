@@ -70,6 +70,7 @@ const VerificationMessage: React.FC<VerificationMessageProps> = ({message}) => {
             <span className="message-header-sender-name">{unsafeSenderName}</span>
             <span className="ellipsis">{t('conversationDeviceUnverified')}</span>
             <button
+              type="button"
               className="button-reset-default message-verification-action accent-text"
               onClick={showDevice}
               data-uie-name="go-devices"
@@ -87,6 +88,7 @@ const VerificationMessage: React.FC<VerificationMessageProps> = ({message}) => {
               {hasMultipleUsers ? t('conversationDeviceStartedUsingMany') : t('conversationDeviceStartedUsingOne')}
             </span>
             <button
+              type="button"
               className="button-reset-default message-verification-action accent-text"
               onClick={showDevice}
               data-uie-name="go-devices"
@@ -100,6 +102,7 @@ const VerificationMessage: React.FC<VerificationMessageProps> = ({message}) => {
             <span className="ellipsis">{t('conversationDeviceNewPeopleJoined')}</span>
             &nbsp;
             <button
+              type="button"
               className="button-reset-default message-verification-action accent-text"
               onClick={showDevice}
               data-uie-name="go-devices"

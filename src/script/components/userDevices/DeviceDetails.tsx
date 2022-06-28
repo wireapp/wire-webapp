@@ -98,6 +98,7 @@ const DeviceDetails: React.FC<DeviceDetailsProps> = ({
   return (
     <div className={cx('participant-devices__header', {'participant-devices__header--padding': !noPadding})}>
       <button
+        type="button"
         className="button-reset-default participant-devices__link participant-devices__show-self-fingerprint accent-text"
         onClick={clickToShowSelfFingerprint}
       >
@@ -148,6 +149,7 @@ const DeviceDetails: React.FC<DeviceDetailsProps> = ({
             data-uie-name="status-loading"
           />
           <button
+            type="button"
             className="button-reset-default button-label participant-devices__reset-session accent-text ellipsis"
             onClick={clickToResetSession}
             style={{display: isResettingSession ? 'none' : 'initial'}}

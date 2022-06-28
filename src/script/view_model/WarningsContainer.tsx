@@ -382,6 +382,7 @@ const WarningsContainer: React.FC = () => {
             </a>
             &nbsp;·&nbsp;
             <button
+              type="button"
               className="warning-bar-link button-reset-default"
               onClick={() => amplify.publish(lifeCycleRefresh)}
               data-uie-name="do-update"
@@ -400,6 +401,7 @@ interface CloseWarningButtonProps {
 }
 const CloseWarningButton = ({onClick}: CloseWarningButtonProps) => (
   <button
+    type="button"
     data-uie-name="do-close-warning"
     className="warning-bar-close icon-close button-round button-round-dark button-reset-default"
     onClick={onClick}

@@ -442,6 +442,7 @@ const AppLock: React.FC<AppLockProps> = ({
             </div>
 
             <button
+              type="button"
               className="button-reset-default block modal__cta"
               data-uie-name="go-forgot-passphrase"
               onClick={onClickForgot}
@@ -467,6 +468,7 @@ const AppLock: React.FC<AppLockProps> = ({
               {t('modalAppLockForgotMessage')}
             </div>
             <button
+              type="button"
               className="button-reset-default block modal__cta"
               onClick={onClickWipe}
               data-uie-name="go-wipe-database"
