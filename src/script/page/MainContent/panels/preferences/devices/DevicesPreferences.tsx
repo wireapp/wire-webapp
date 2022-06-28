@@ -35,6 +35,7 @@ import DetailedDevice from './components/DetailedDevice';
 import DeviceDetailsPreferences from './DeviceDetailsPreferences';
 import {Conversation} from '../../../../../entity/Conversation';
 import {FormattedId} from './components/FormattedId';
+import {handleKeyDown} from 'Util/KeyboardUtil';
 
 interface DevicesPreferencesProps {
   clientState: ClientState;
@@ -55,7 +56,13 @@ const Device: React.FC<{
   const {isVerified} = useKoSubscribableChildren(device.meta, ['isVerified']);
 
   return (
-    <div className="preferences-devices-card" onClick={() => onSelect(device)}>
+    <div
+      role="button"
+      tabIndex={0}
+      className="preferences-devices-card"
+      onClick={() => onSelect(device)}
+      onKeyDown={e => handleKeyDown(e, onSelect.bind(null, device))}
+    >
       <div className="preferences-devices-card-data">
         <div className="preferences-devices-card-icon" data-uie-value={device.id} data-uie-name="device-id">
           <VerifiedIcon data-uie-name={`user-device-${isVerified ? '' : 'not-'}verified`} isVerified={isVerified} />
@@ -87,7 +94,7 @@ const Device: React.FC<{
             <Icon.Delete />
           </button>
         )}
-        <div className="icon-forward preferences-devices-card-action__forward" data-uie-name="go-device-details"></div>
+        <div className="icon-forward preferences-devices-card-action__forward" data-uie-name="go-device-details" />
       </div>
     </div>
   );

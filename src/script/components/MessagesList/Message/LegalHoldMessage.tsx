@@ -48,9 +48,13 @@ const LegalHoldMessage: React.FC<LegalHoldMessageProps> = ({
         {message.isActivationMessage ? (
           <>
             <span data-uie-name="status-legalhold-activated">{t('legalHoldActivated')}</span>
-            <span className="message-header-label__learn-more" onClick={showLegalHold}>
+            <button
+              type="button"
+              className="button-reset-default message-header-label__learn-more"
+              onClick={showLegalHold}
+            >
               {t('legalHoldActivatedLearnMore')}
-            </span>
+            </button>
           </>
         ) : (
           <span className="message-header-label" data-uie-name="status-legalhold-deactivated">

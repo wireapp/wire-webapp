@@ -46,6 +46,7 @@ const MessageButton: React.FC<MessageButtonProps> = ({id, label, message, onClic
   return (
     <>
       <button
+        type="button"
         className={classNames('message-button', {
           'message-button--selected': isSelected,
         })}

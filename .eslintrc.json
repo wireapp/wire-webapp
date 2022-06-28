@@ -44,10 +44,6 @@
     "jest/no-disabled-tests": "warn",
     "jest/no-conditional-expect": "warn",
     "sort-keys-fix/sort-keys-fix": "warn",
-    "jsx-a11y/click-events-have-key-events": "warn",
-    "jsx-a11y/no-static-element-interactions": "warn",
-    "jsx-a11y/anchor-is-valid": "warn",
-    "jsx-a11y/no-noninteractive-element-interactions": "warn",
     "jsx-a11y/media-has-caption": "warn",
     "react/react-in-jsx-scope": "off"
   },
