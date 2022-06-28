@@ -400,6 +400,7 @@ interface CloseWarningButtonProps {
 }
 const CloseWarningButton = ({onClick}: CloseWarningButtonProps) => (
   <button
+    data-uie-name="do-close-warning"
     className="warning-bar-close icon-close button-round button-round-dark button-reset-default"
     onClick={onClick}
   />
