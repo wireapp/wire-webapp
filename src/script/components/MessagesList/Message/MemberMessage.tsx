@@ -112,7 +112,6 @@ const MemberMessage: React.FC<MemberMessageProps> = ({
               <h2 className="message-group-creation-header-name">{name}</h2>
             </div>
           )}
-
           {hasUsers && (
             <div className="message-header">
               <div className="message-header-icon message-header-icon--svg text-foreground">
@@ -140,17 +139,16 @@ const MemberMessage: React.FC<MemberMessageProps> = ({
               {t('conversationServicesWarning')}
             </div>
           )}
-
           {isGroupCreation && shouldShowInvitePeople && (
             <div className="message-member-footer">
               <div>{t('guestRoomConversationHead')}</div>
-              <div
+              <button
                 onClick={onClickInvitePeople}
-                className="message-member-footer-button"
+                className="button-reset-default message-member-footer-button"
                 data-uie-name="do-invite-people"
               >
                 {t('guestRoomConversationButton')}
-              </div>
+              </button>
             </div>
           )}
           {isGroupCreation && isSelfTemporaryGuest && (
@@ -170,7 +168,6 @@ const MemberMessage: React.FC<MemberMessageProps> = ({
               </div>
             </div>
           )}
-
           {isMemberLeave && user.isMe && isSelfTemporaryGuest && (
             <div className="message-member-footer">
               <div className="message-member-footer-description">{t('temporaryGuestLeaveDescription')}</div>
