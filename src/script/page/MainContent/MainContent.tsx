@@ -17,7 +17,7 @@
  *
  */
 
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import {CSSTransition, SwitchTransition} from 'react-transition-group';
 import {registerReactComponent, useKoSubscribableChildren} from 'Util/ComponentUtil';
 
@@ -35,6 +35,8 @@ import {container} from 'tsyringe';
 import {ClientState} from '../../client/ClientState';
 import {UserState} from '../../user/UserState';
 import {StyledApp} from '@wireapp/react-ui-kit';
+import {amplify} from 'amplify';
+import {WebAppEvents} from '@wireapp/webapp-events';
 
 // Ko imported components
 import '../message-list/InputBarControls';
@@ -58,6 +60,21 @@ const MainContent: React.FC<LeftSidebarProps> = ({
   const {state} = useKoSubscribableChildren(contentViewModel, ['state']);
   const {activeConversation} = useKoSubscribableChildren(conversationState, ['activeConversation']);
   const repositories = contentViewModel.repositories;
+  const currentTheme = repositories.properties?.properties.settings.interface.theme;
+
+  const [darkMode, setDarkMode] = useState<boolean>(currentTheme === 'dark');
+
+  const updateTheme = (theme: string) => {
+    setDarkMode(theme === 'dark');
+  };
+
+  useEffect(() => {
+    amplify.subscribe(WebAppEvents.PROPERTIES.UPDATE.INTERFACE.THEME, updateTheme);
+
+    return () => {
+      amplify.unsubscribe(WebAppEvents.PROPERTIES.UPDATE.INTERFACE.THEME, updateTheme);
+    };
+  }, []);
 
   const isFederated = contentViewModel.isFederated;
 
@@ -67,12 +84,16 @@ const MainContent: React.FC<LeftSidebarProps> = ({
       backgroundColorDisabled: 'var(--app-bg)',
       placeholderColor: 'var(--text-input-label)',
     },
+    darkMode: darkMode,
     general: {
       backgroundColor: 'var(--app-bg)',
       color: 'var(--main-color)',
+      primaryColor: 'var(--accent-color)',
+    },
+    select: {
       contrastTextColor: 'var(--text-input-background)',
       disabledColor: 'var(--text-input-placeholder)',
-      primaryColor: 'var(--accent-color)',
+      fillColor: 'var(--checkbox-fill-color)',
     },
   };
 
