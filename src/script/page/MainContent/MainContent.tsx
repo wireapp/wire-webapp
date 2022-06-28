@@ -82,7 +82,8 @@ const MainContent: React.FC<LeftSidebarProps> = ({
     Input: {
       backgroundColor: 'var(--app-bg-secondary)',
       backgroundColorDisabled: 'var(--sidebar-bg)',
-      placeholderColor: 'var(--text-input-label)',
+      labelColor: 'var(--text-input-label)',
+      placeholderColor: 'var(--text-input-placeholder)',
     },
     darkMode: darkMode,
     general: {
