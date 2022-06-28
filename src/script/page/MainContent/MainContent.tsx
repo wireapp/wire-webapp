@@ -81,7 +81,7 @@ const MainContent: React.FC<LeftSidebarProps> = ({
   const theme = {
     Input: {
       backgroundColor: 'var(--app-bg-secondary)',
-      backgroundColorDisabled: 'var(--app-bg)',
+      backgroundColorDisabled: 'var(--sidebar-bg)',
       placeholderColor: 'var(--text-input-label)',
     },
     darkMode: darkMode,
@@ -91,6 +91,7 @@ const MainContent: React.FC<LeftSidebarProps> = ({
       primaryColor: 'var(--accent-color)',
     },
     select: {
+      borderColor: 'var(--border-color)',
       contrastTextColor: 'var(--text-input-background)',
       disabledColor: 'var(--text-input-placeholder)',
       fillColor: 'var(--checkbox-fill-color)',
