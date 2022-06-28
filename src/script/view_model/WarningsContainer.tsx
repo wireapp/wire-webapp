@@ -154,7 +154,7 @@ const WarningsContainer: React.FC = () => {
               ),
             }}
           />
-          <button className="warning-bar-close icon-close button-icon button-reset-default" onClick={closeWarning} />
+          <CloseWarningButton onClick={closeWarning} />
         </div>
       )}
       {visibleWarning === type.DENIED_CAMERA && (
@@ -170,10 +170,7 @@ const WarningsContainer: React.FC = () => {
               {t('warningLearnMore')}
             </a>
           </div>
-          <button
-            className="warning-bar-close icon-close button-round button-round-dark button-reset-default"
-            onClick={closeWarning}
-          />
+          <CloseWarningButton onClick={closeWarning} />
         </div>
       )}
       {visibleWarning === type.REQUEST_MICROPHONE && (
@@ -182,10 +179,7 @@ const WarningsContainer: React.FC = () => {
             <Icon.MicOn className="warning-bar-icon" />
             <span dangerouslySetInnerHTML={{__html: t('warningPermissionRequestMicrophone', {}, {icon: ''})}} />
           </div>
-          <button
-            className="warning-bar-close icon-close button-round button-round-dark button-reset-default"
-            onClick={closeWarning}
-          />
+          <CloseWarningButton onClick={closeWarning} />
         </div>
       )}
       {visibleWarning === type.DENIED_MICROPHONE && (
@@ -201,10 +195,7 @@ const WarningsContainer: React.FC = () => {
               {t('warningLearnMore')}
             </a>
           </div>
-          <button
-            className="warning-bar-close icon-close button-round button-round-dark button-reset-default"
-            onClick={closeWarning}
-          />
+          <CloseWarningButton onClick={closeWarning} />
         </div>
       )}
       {visibleWarning === type.REQUEST_SCREEN && (
@@ -219,7 +210,7 @@ const WarningsContainer: React.FC = () => {
               ),
             }}
           />
-          <button className="warning-bar-close icon-close button-icon button-reset-default" onClick={closeWarning} />
+          <CloseWarningButton onClick={closeWarning} />
         </div>
       )}
       {visibleWarning === type.DENIED_SCREEN && (
@@ -235,10 +226,7 @@ const WarningsContainer: React.FC = () => {
               {t('warningLearnMore')}
             </a>
           </div>
-          <button
-            className="warning-bar-close icon-close button-round button-round-dark button-reset-default"
-            onClick={closeWarning}
-          />
+          <CloseWarningButton onClick={closeWarning} />
         </div>
       )}
       {visibleWarning === type.NOT_FOUND_CAMERA && (
@@ -254,10 +242,7 @@ const WarningsContainer: React.FC = () => {
               {t('warningLearnMore')}
             </a>
           </div>
-          <button
-            className="warning-bar-close icon-close button-round button-round-dark button-reset-default"
-            onClick={closeWarning}
-          />
+          <CloseWarningButton onClick={closeWarning} />
         </div>
       )}
       {visibleWarning === type.NOT_FOUND_MICROPHONE && (
@@ -273,10 +258,7 @@ const WarningsContainer: React.FC = () => {
               {t('warningLearnMore')}
             </a>
           </div>
-          <button
-            className="warning-bar-close icon-close button-round button-round-dark button-reset-default"
-            onClick={closeWarning}
-          />
+          <CloseWarningButton onClick={closeWarning} />
         </div>
       )}
       {visibleWarning === type.REQUEST_NOTIFICATION && (
@@ -291,11 +273,7 @@ const WarningsContainer: React.FC = () => {
               ),
             }}
           />
-          <button
-            className="warning-bar-close icon-close button-round button-round-dark button-reset-default"
-            onClick={closeWarning}
-            data-uie-name="do-close-warning"
-          />
+          <CloseWarningButton onClick={closeWarning} />
         </div>
       )}
       {visibleWarning === type.UNSUPPORTED_INCOMING_CALL && (
@@ -330,10 +308,7 @@ const WarningsContainer: React.FC = () => {
               <span>{t('warningCallUpgradeBrowser')}</span>
             </div>
           )}
-          <button
-            className="warning-bar-close icon-close button-round button-round-dark button-reset-default"
-            onClick={closeWarning}
-          />
+          <CloseWarningButton onClick={closeWarning} />
         </div>
       )}
       {visibleWarning === type.UNSUPPORTED_OUTGOING_CALL && (
@@ -368,10 +343,7 @@ const WarningsContainer: React.FC = () => {
               <span>{t('warningCallUpgradeBrowser')}</span>
             </div>
           )}
-          <button
-            className="warning-bar-close icon-close button-round button-round-dark button-reset-default"
-            onClick={closeWarning}
-          />
+          <CloseWarningButton onClick={closeWarning} />
         </div>
       )}
       {visibleWarning === type.CONNECTIVITY_RECONNECT && (
@@ -422,6 +394,16 @@ const WarningsContainer: React.FC = () => {
     </div>
   );
 };
+
+interface CloseWarningButtonProps {
+  onClick: () => void;
+}
+const CloseWarningButton = ({onClick}: CloseWarningButtonProps) => (
+  <button
+    className="warning-bar-close icon-close button-round button-round-dark button-reset-default"
+    onClick={onClick}
+  />
+);
 
 const TYPE = {
   CALL_QUALITY_POOR: 'call_quality_poor',
