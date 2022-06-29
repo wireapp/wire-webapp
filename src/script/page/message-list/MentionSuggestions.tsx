@@ -92,7 +92,7 @@ const MentionSuggestionList: React.FunctionComponent<MentionSuggestionListProps>
     return () => {
       targetInput?.removeEventListener('keydown', onInput);
     };
-  }, [isVisible, suggestions.length, selectedSuggestionIndex]);
+  }, [isVisible, suggestions, selectedSuggestionIndex]);
 
   return isVisible ? (
     <div
