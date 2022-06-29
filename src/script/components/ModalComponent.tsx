@@ -18,8 +18,8 @@
  */
 
 import {CSSObject} from '@emotion/react';
-import React, {useEffect, useRef, useState} from 'react';
-import {noop} from 'Util/util';
+import React, {useEffect, useId, useRef, useState, useCallback} from 'react';
+import {noop, preventFocusOutside} from 'Util/util';
 import Icon from './Icon';
 
 interface ModalComponentProps {
@@ -88,6 +88,26 @@ const ModalComponent: React.FC<ModalComponentProps> = ({
   const [displayNone, setDisplayNone] = useState<boolean>(!isShown);
   const hasVisibleClass = isShown && !displayNone;
   const isMounting = useRef<boolean>(true);
+  const trapId = useId();
+
+  const trapFocus = useCallback(
+    (event: KeyboardEvent): void => {
+      preventFocusOutside(event, trapId);
+    },
+    [trapId],
+  );
+
+  useEffect(() => {
+    if (isShown) {
+      document.addEventListener('keydown', trapFocus);
+    } else {
+      document.removeEventListener('keydown', trapFocus);
+    }
+    return () => {
+      document.removeEventListener('keydown', trapFocus);
+    };
+  }, [isShown, onkeydown]);
+
   useEffect(() => {
     let timeoutId = 0;
     const mounting = isMounting.current;
@@ -125,10 +145,11 @@ const ModalComponent: React.FC<ModalComponentProps> = ({
         <Icon.Loading width="48" height="48" css={{path: {fill: 'var(--modal-bg)'}}} />
       ) : (
         <div
+          id={trapId}
           onClick={event => event.stopPropagation()}
           role="button"
           tabIndex={-1}
-          onKeyDown={event => event.stopPropagation()}
+          onKeyDown={noop}
           css={hasVisibleClass ? ModalContentVisibleStyles : ModalContentStyles}
         >
           {hasVisibleClass ? children : null}
