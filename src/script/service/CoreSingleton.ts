@@ -25,6 +25,15 @@ import {createStorageEngine, DatabaseTypes} from './StoreEngineProvider';
 import {isTemporaryClientAndNonPersistent} from 'Util/util';
 import {Config} from '../Config';
 
+declare global {
+  interface Window {
+    secretsCrypto?: {
+      decrypt: (value: Uint8Array) => Promise<Uint8Array>;
+      encrypt: (encrypted: Uint8Array) => Promise<Uint8Array>;
+    };
+  }
+}
+
 @singleton()
 export class Core extends Account {
   constructor(apiClient = container.resolve(APIClient)) {
@@ -38,6 +47,7 @@ export class Core extends Account {
       },
       enableMLS: Config.getConfig().FEATURE.ENABLE_MLS,
       nbPrekeys: 100,
+      secretsCrypto: window.secretsCrypto,
     });
   }
   get storage() {
