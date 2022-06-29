@@ -19,7 +19,7 @@
 
 import {CSSObject} from '@emotion/react';
 import React, {useEffect, useRef, useState} from 'react';
-import {noop} from 'Util/util';
+import {noop, preventFocusOutside} from 'Util/util';
 import Icon from './Icon';
 
 interface ModalComponentProps {
@@ -88,6 +88,22 @@ const ModalComponent: React.FC<ModalComponentProps> = ({
   const [displayNone, setDisplayNone] = useState<boolean>(!isShown);
   const hasVisibleClass = isShown && !displayNone;
   const isMounting = useRef<boolean>(true);
+
+  const onKeyDown = (event: KeyboardEvent): void => {
+    preventFocusOutside(event, 'trap');
+  };
+
+  useEffect(() => {
+    if (isShown) {
+      document.addEventListener('keydown', onKeyDown);
+    } else {
+      document.removeEventListener('keydown', onKeyDown);
+    }
+    return () => {
+      document.removeEventListener('keydown', onKeyDown);
+    };
+  }, [isShown]);
+
   useEffect(() => {
     let timeoutId = 0;
     const mounting = isMounting.current;
@@ -128,10 +144,10 @@ const ModalComponent: React.FC<ModalComponentProps> = ({
           onClick={event => event.stopPropagation()}
           role="button"
           tabIndex={-1}
-          onKeyDown={event => event.stopPropagation()}
+          onKeyDown={noop}
           css={hasVisibleClass ? ModalContentVisibleStyles : ModalContentStyles}
         >
-          {hasVisibleClass ? children : null}
+          {hasVisibleClass ? <div id="trap">{children}</div> : null}
         </div>
       )}
     </div>
