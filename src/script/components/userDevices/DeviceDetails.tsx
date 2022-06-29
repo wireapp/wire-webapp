@@ -97,18 +97,19 @@ const DeviceDetails: React.FC<DeviceDetailsProps> = ({
 
   return (
     <div className={cx('participant-devices__header', {'participant-devices__header--padding': !noPadding})}>
-      <div
-        className="participant-devices__link participant-devices__show-self-fingerprint accent-text"
+      <button
+        type="button"
+        className="button-reset-default participant-devices__link participant-devices__show-self-fingerprint accent-text"
         onClick={clickToShowSelfFingerprint}
       >
         {t('participantDevicesDetailShowMyDevice')}
-      </div>
+      </button>
       <div
         className="panel__info-text"
         dangerouslySetInnerHTML={{
           __html: user ? t('participantDevicesDetailHeadline', {user: userName}) : '',
         }}
-      ></div>
+      />
       <a
         className="participant-devices__link accent-text"
         href={getPrivacyHowUrl()}
@@ -147,14 +148,15 @@ const DeviceDetails: React.FC<DeviceDetailsProps> = ({
             style={{display: isResettingSession ? 'initial' : 'none'}}
             data-uie-name="status-loading"
           />
-          <span
-            className="button-label accent-text ellipsis"
+          <button
+            type="button"
+            className="button-reset-default button-label participant-devices__reset-session accent-text ellipsis"
             onClick={clickToResetSession}
             style={{display: isResettingSession ? 'none' : 'initial'}}
             data-uie-name="do-reset-session"
           >
             {t('participantDevicesDetailResetSession')}
-          </span>
+          </button>
         </div>
       </div>
     </div>

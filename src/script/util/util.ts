@@ -351,6 +351,10 @@ export const preventFocusOutside = (event: KeyboardEvent, parentId: string): voi
   const parent = document.getElementById(parentId);
   const focusableContent = [...parent.querySelectorAll(focusableElements)];
   const focusedItemIndex = focusableContent.indexOf(document.activeElement);
+  if (event.shiftKey && focusedItemIndex != 0) {
+    (focusableContent[focusedItemIndex - 1] as HTMLElement)?.focus();
+    return;
+  }
   if (event.shiftKey && focusedItemIndex === 0) {
     (focusableContent[focusableContent.length - 1] as HTMLElement)?.focus();
     return;

@@ -28,6 +28,7 @@ import type {ClientEntity} from '../../client/ClientEntity';
 import Icon from '../Icon';
 import LegalHoldDot from '../LegalHoldDot';
 import VerifiedIcon from '../VerifiedIcon';
+import {handleKeyDown} from 'Util/KeyboardUtil';
 
 export interface DeviceCardProps {
   click?: (device: ClientEntity) => void;
@@ -58,8 +59,11 @@ const DeviceCard: React.FC<DeviceCardProps> = ({
 
   return (
     <div
+      role={clickable && 'button'}
+      tabIndex={clickable ? 0 : -1}
       className={cx('device-card', {'device-card__no-hover': !clickable})}
       onClick={clickOnDevice}
+      onKeyDown={e => handleKeyDown(e, clickOnDevice)}
       data-uie-uid={id}
       data-uie-name="device-card"
     >

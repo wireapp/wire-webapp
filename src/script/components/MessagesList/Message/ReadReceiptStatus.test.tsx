@@ -29,7 +29,7 @@ class ReadReceiptStatusPage extends TestPage<ReadReceiptStatusProps> {
     super(ReadReceiptStatus, props);
   }
 
-  getReadReceiptStatus = () => this.get('span[data-uie-name="status-message-read-receipts"]');
+  getReadReceiptStatus = () => this.get('button[data-uie-name="status-message-read-receipts"]');
   getReadReceiptStatusCount = () => this.get('span[data-uie-name="status-message-read-receipt-count"]');
   getReadReceiptStatusDelivered = () => this.get('span[data-uie-name="status-message-read-receipt-delivered"]');
   getReadIcon = () => this.get('[data-uie-name=status-message-read-receipts]');
