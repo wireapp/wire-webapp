@@ -18,7 +18,7 @@
  */
 
 import {CSSObject} from '@emotion/react';
-import React, {useEffect, useRef, useState} from 'react';
+import React, {useEffect, useId, useRef, useState} from 'react';
 import {noop, preventFocusOutside} from 'Util/util';
 import Icon from './Icon';
 
@@ -88,9 +88,10 @@ const ModalComponent: React.FC<ModalComponentProps> = ({
   const [displayNone, setDisplayNone] = useState<boolean>(!isShown);
   const hasVisibleClass = isShown && !displayNone;
   const isMounting = useRef<boolean>(true);
+  const trapId = useId();
 
   const onKeyDown = (event: KeyboardEvent): void => {
-    preventFocusOutside(event, 'trap');
+    preventFocusOutside(event, trapId);
   };
 
   useEffect(() => {
@@ -141,13 +142,14 @@ const ModalComponent: React.FC<ModalComponentProps> = ({
         <Icon.Loading width="48" height="48" css={{path: {fill: 'var(--modal-bg)'}}} />
       ) : (
         <div
+          id={trapId}
           onClick={event => event.stopPropagation()}
           role="button"
           tabIndex={-1}
           onKeyDown={noop}
           css={hasVisibleClass ? ModalContentVisibleStyles : ModalContentStyles}
         >
-          {hasVisibleClass ? <div id="trap">{children}</div> : null}
+          {hasVisibleClass ? children : null}
         </div>
       )}
     </div>
