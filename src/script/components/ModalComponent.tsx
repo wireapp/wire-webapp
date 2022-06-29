@@ -18,7 +18,7 @@
  */
 
 import {CSSObject} from '@emotion/react';
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import {noop} from 'Util/util';
 import Icon from './Icon';
 
@@ -87,11 +87,20 @@ const ModalComponent: React.FC<ModalComponentProps> = ({
 }) => {
   const [displayNone, setDisplayNone] = useState<boolean>(!isShown);
   const hasVisibleClass = isShown && !displayNone;
+  const isFirstRender = useRef<boolean>(true);
   useEffect(() => {
     let timeoutId = 0;
+    const firstRender = isFirstRender.current;
+    isFirstRender.current = false;
     if (isShown) {
       return setDisplayNone(false);
     }
+
+    if (firstRender) {
+      // Avoid triggering the onClose event for the first render
+      return;
+    }
+
     timeoutId = window.setTimeout(() => {
       setDisplayNone(true);
       onClosed();
