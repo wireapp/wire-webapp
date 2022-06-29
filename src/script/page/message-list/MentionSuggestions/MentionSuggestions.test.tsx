@@ -21,7 +21,7 @@ import MentionSuggestionList from './MentionSuggestions';
 
 import {render, fireEvent, screen} from '@testing-library/react';
 
-import {User} from '../../entity/User';
+import {User} from '../../../entity/User';
 import {createRandomUuid} from 'Util/util';
 
 //text field's id
