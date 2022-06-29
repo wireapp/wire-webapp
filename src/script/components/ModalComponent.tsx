@@ -18,7 +18,7 @@
  */
 
 import {CSSObject} from '@emotion/react';
-import React, {useEffect, useId, useRef, useState} from 'react';
+import React, {useEffect, useId, useRef, useState, useCallback} from 'react';
 import {noop, preventFocusOutside} from 'Util/util';
 import Icon from './Icon';
 
@@ -90,20 +90,23 @@ const ModalComponent: React.FC<ModalComponentProps> = ({
   const isMounting = useRef<boolean>(true);
   const trapId = useId();
 
-  const onKeyDown = (event: KeyboardEvent): void => {
-    preventFocusOutside(event, trapId);
-  };
+  const trapFocus = useCallback(
+    (event: KeyboardEvent): void => {
+      preventFocusOutside(event, trapId);
+    },
+    [trapId],
+  );
 
   useEffect(() => {
     if (isShown) {
-      document.addEventListener('keydown', onKeyDown);
+      document.addEventListener('keydown', trapFocus);
     } else {
-      document.removeEventListener('keydown', onKeyDown);
+      document.removeEventListener('keydown', trapFocus);
     }
     return () => {
-      document.removeEventListener('keydown', onKeyDown);
+      document.removeEventListener('keydown', trapFocus);
     };
-  }, [isShown]);
+  }, [isShown, onkeydown]);
 
   useEffect(() => {
     let timeoutId = 0;
