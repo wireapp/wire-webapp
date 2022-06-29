@@ -20,7 +20,8 @@
 import React from 'react';
 
 import {registerReactComponent} from 'Util/ComponentUtil';
-import Icon from '../Icon';
+import Icon from '../../Icon';
+import {listCSS} from './PanelActions.styles';
 
 export interface MenuItem {
   click: () => void;
@@ -35,7 +36,7 @@ export interface PanelActionsProps {
 
 const PanelActions: React.FC<PanelActionsProps> = ({items}) => {
   return (
-    <ul className="panel-actions">
+    <ul css={listCSS}>
       {items.map(({click, identifier, icon, label}) => (
         <li key={identifier}>
           <button className="panel__action-item" onClick={click} data-uie-name={identifier} type="button">

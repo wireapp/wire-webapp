@@ -78,13 +78,14 @@ const DecryptErrorMessage: React.FC<DecryptErrorMessageProps> = ({message, onCli
             {isResettingSession ? (
               <Icon.Loading className="accent-fill" data-uie-name="status-loading" />
             ) : (
-              <span
-                className="message-header-decrypt-reset-session-action button-label accent-text"
+              <button
+                type="button"
+                className="button-reset-default message-header-decrypt-reset-session-action button-label accent-text"
                 onClick={() => onClickResetSession(message)}
                 data-uie-name="do-reset-encryption-session"
               >
                 {t('conversationUnableToDecryptResetSession')}
-              </span>
+              </button>
             )}
           </div>
         )}
