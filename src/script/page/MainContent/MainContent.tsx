@@ -85,6 +85,15 @@ const MainContent: React.FC<LeftSidebarProps> = ({
       labelColor: 'var(--text-input-label)',
       placeholderColor: 'var(--text-input-placeholder)',
     },
+    checkbox: {
+      background: 'var(--checkbox-background)',
+      border: 'var(--checkbox-border)',
+      borderFocused: 'blue',
+      disableBgColor: 'var(@checkbox-background-disabled)',
+      disableBorderColor: 'var(checkbox-border-disabled)',
+      disablecheckedBgColor: 'var(--checkbox-background-disabled-selected)',
+      invalidBorderColor: 'var(--checkbox-alert)',
+    },
     darkMode: darkMode,
     general: {
       backgroundColor: 'var(--app-bg)',
