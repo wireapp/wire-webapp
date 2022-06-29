@@ -87,17 +87,17 @@ const ModalComponent: React.FC<ModalComponentProps> = ({
 }) => {
   const [displayNone, setDisplayNone] = useState<boolean>(!isShown);
   const hasVisibleClass = isShown && !displayNone;
-  const isFirstRender = useRef<boolean>(true);
+  const isMounting = useRef<boolean>(true);
   useEffect(() => {
     let timeoutId = 0;
-    const firstRender = isFirstRender.current;
-    isFirstRender.current = false;
+    const mounting = isMounting.current;
+    isMounting.current = false;
     if (isShown) {
       return setDisplayNone(false);
     }
 
-    if (firstRender) {
-      // Avoid triggering the onClose event for the first render
+    if (mounting) {
+      // Avoid triggering the onClose event when component is mounting
       return;
     }
 
