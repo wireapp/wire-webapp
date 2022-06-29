@@ -57,7 +57,7 @@ import {Text} from '../../entity/message/Text';
 import {User} from '../../entity/User';
 import {UserState} from '../../user/UserState';
 import {TeamState} from '../../team/TeamState';
-import '../../page/message-list/MentionSuggestions/MentionSuggestions';
+import '../../page/message-list/MentionSuggestions';
 import {InputHTMLAttributes} from 'react';
 
 interface DraftMessage {
