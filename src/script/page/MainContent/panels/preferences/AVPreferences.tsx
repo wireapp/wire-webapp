@@ -30,7 +30,6 @@ import CameraPreferences from './avPreferences/CameraPreferences';
 import MicrophonePreferences from './avPreferences/MicrophonePreferences';
 import AudioOutPreferences from './avPreferences/AudioOutPreferences';
 import PreferencesPage from './components/PreferencesPage';
-import {Checkbox} from '@wireapp/react-ui-kit';
 
 interface AVPreferencesProps {
   callingRepository: CallingRepository;
@@ -51,7 +50,6 @@ const AVPreferences: React.FC<AVPreferencesProps> = ({
 
   return (
     <PreferencesPage title={t('preferencesAV')}>
-      <Checkbox></Checkbox>
       {deviceSupport.audioInput && (
         <MicrophonePreferences
           {...{devicesHandler, streamHandler}}
