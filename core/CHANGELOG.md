@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [27.5.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/compare/@wireapp/core@27.4.2...@wireapp/core@27.5.0) (2022-06-30)
+
+
+### Features
+
+* Add encrypted storage for coreCrypto database key [FS-565] ([#4302](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/issues/4302)) ([5c16877](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/commit/5c16877eae4a85eedfd876160446994d98bbcd85))
+
+
+
+
+
 ## [27.4.2](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/compare/@wireapp/core@27.4.1...@wireapp/core@27.4.2) (2022-06-27)
 
 **Note:** Version bump only for package @wireapp/core
