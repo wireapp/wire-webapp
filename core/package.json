@@ -73,5 +73,5 @@
     "test:project": "yarn dist && yarn test",
     "test:node": "nyc jasmine --config=jasmine.json"
   },
-  "version": "27.5.0"
+  "version": "27.6.0"
 }

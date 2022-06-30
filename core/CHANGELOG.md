@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [27.6.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/compare/@wireapp/core@27.5.0...@wireapp/core@27.6.0) (2022-06-30)
+
+
+### Features
+
+* Give proper database name to corecrypto db ([#4306](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/issues/4306)) ([50c7a7a](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/commit/50c7a7a6ca97a0e848a0bb7d9a781e5410909368))
+
+
+
+
+
 # [27.5.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/compare/@wireapp/core@27.4.2...@wireapp/core@27.5.0) (2022-06-30)
 
 
