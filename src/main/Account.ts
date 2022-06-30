@@ -50,6 +50,7 @@ import {LinkPreviewService} from './linkPreview';
 import type {CoreCrypto} from '@otak/core-crypto';
 import {WEBSOCKET_STATE} from '@wireapp/api-client/src/tcp/ReconnectingWebsocket';
 import {createCustomEncryptedStore, createEncryptedStore} from './util/encryptedStore';
+import {Encoder} from 'bazinga64';
 
 export type ProcessedEventPayload = HandledEventPayload;
 
@@ -392,8 +393,8 @@ export class Account<T = unknown> extends EventEmitter {
     }
     const {userId, domain} = this.apiClient.context!;
     return CoreCrypto.init({
-      path: 'path/to/database',
-      key: new TextDecoder().decode(key),
+      path: `corecrypto-${this.generateDbName(context)}`,
+      key: Encoder.toBase64(key).asString,
       clientId: `${userId}:${client.id}@${domain}`,
     });
   }
