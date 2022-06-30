@@ -47,6 +47,11 @@ export class Core extends Account {
       },
       enableMLS: Config.getConfig().FEATURE.ENABLE_MLS,
       nbPrekeys: 100,
+      /*
+       * When in an electron context, the window.secretsCrypto will be populated by the renderer process.
+       * We then give those crypto primitives to the core that will use them when encrypting MLS secrets.
+       * When in an browser context, then this secrtesCrypto will be undefined and the core will then use it's internal encryption system
+       */
       secretsCrypto: window.secretsCrypto,
     });
   }
