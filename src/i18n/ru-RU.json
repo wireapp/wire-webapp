@@ -938,7 +938,7 @@
   "preferencesAccountDataTelemetry": "Данные об использовании позволяют {{brandName}} определить, как используется приложение и как его можно улучшить. Эти данные анонимны и не включают в себя содержимое ваших сообщений (например, сообщения, файлы или звонки).",
   "preferencesAccountDataTelemetryCheckbox": "Отправка анонимных данных об использовании",
   "preferencesAccountDelete": "Удалить аккаунт",
-  "preferencesAccountDisplayname": "Отображаемое имя",
+  "preferencesAccountDisplayname": "Название профиля",
   "preferencesAccountDomain": "Домен",
   "preferencesAccountEmail": "Email",
   "preferencesAccountEmailPlaceholder": "Ваш адрес email",
