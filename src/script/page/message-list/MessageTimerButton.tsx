@@ -73,41 +73,43 @@ export const MessageTimerButton: React.FC<MessageTimerButtonProps> = ({
     showContextMenu(event, entries, 'message-timer-menu');
   };
 
+  if (!isSelfDeletingMessagesEnabled) {
+    return null;
+  }
+
   return (
-    isSelfDeletingMessagesEnabled && (
-      <button
-        id="conversation-input-bar-message-timer"
-        className="controls-right-button buttons-group-button-right conversation-input-bar-message-timer"
-        onClick={isTimerDisabled ? undefined : onClick}
-        title={t('tooltipConversationEphemeral')}
-        data-uie-value={isTimerDisabled ? 'disabled' : 'enabled'}
-        data-uie-name="do-set-ephemeral-timer"
-        type="button"
-      >
-        {hasMessageTimer ? (
-          conversation && (
-            <div
-              className={cx(
-                'message-timer-button',
-                isTimerDisabled ? 'message-timer-button--disabled' : 'message-timer-button--enabled',
-              )}
-              data-uie-name="message-timer-button"
-            >
-              <span className="message-timer-button-unit" data-uie-name="message-timer-button-symbol">
-                {duration.symbol}
-              </span>
-              <span className="full-screen" data-uie-name="message-timer-button-value">
-                {duration.value}
-              </span>
-            </div>
-          )
-        ) : (
-          <span className={cx({disabled: isTimerDisabled})}>
-            <Icon.Timer data-uie-name="message-timer-icon" />
-          </span>
-        )}
-      </button>
-    )
+    <button
+      id="conversation-input-bar-message-timer"
+      className="controls-right-button buttons-group-button-right conversation-input-bar-message-timer"
+      onClick={isTimerDisabled ? undefined : onClick}
+      title={t('tooltipConversationEphemeral')}
+      data-uie-value={isTimerDisabled ? 'disabled' : 'enabled'}
+      data-uie-name="do-set-ephemeral-timer"
+      type="button"
+    >
+      {hasMessageTimer ? (
+        conversation && (
+          <div
+            className={cx(
+              'message-timer-button',
+              isTimerDisabled ? 'message-timer-button--disabled' : 'message-timer-button--enabled',
+            )}
+            data-uie-name="message-timer-button"
+          >
+            <span className="message-timer-button-unit" data-uie-name="message-timer-button-symbol">
+              {duration.symbol}
+            </span>
+            <span className="full-screen" data-uie-name="message-timer-button-value">
+              {duration.value}
+            </span>
+          </div>
+        )
+      ) : (
+        <span className={cx({disabled: isTimerDisabled})}>
+          <Icon.Timer data-uie-name="message-timer-icon" />
+        </span>
+      )}
+    </button>
   );
 };
 
