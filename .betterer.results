@@ -1157,10 +1157,6 @@ exports[`stricter compilation`] = {
     "src/script/components/toggle/BaseToggle.test.tsx:917864535": [
       [43, 25, 25, "Argument of type \'Element | null\' is not assignable to parameter of type \'Element\'.\\n  Type \'null\' is not assignable to type \'Element\'.", "2875532638"]
     ],
-    "src/script/components/toggle/BaseToggle.tsx:4077699567": [
-      [64, 12, 3, "Type \'MutableRefObject<HTMLInputElement | undefined>\' is not assignable to type \'LegacyRef<HTMLInputElement> | undefined\'.", "193432436"],
-      [77, 40, 16, "Object is possibly \'undefined\'.", "4019370437"]
-    ],
     "src/script/components/toggle/InfoToggle.test.tsx:1025969366": [
       [48, 11, 31, "Object is possibly \'null\'.", "756876288"],
       [49, 21, 21, "Argument of type \'Element | null\' is not assignable to parameter of type \'Element\'.\\n  Type \'null\' is not assignable to type \'Element\'.", "1763299350"]
