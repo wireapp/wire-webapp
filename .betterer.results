@@ -1182,21 +1182,6 @@ exports[`stricter compilation`] = {
     "src/script/components/toggle/ReceiptModeToggle.tsx:3019625326": [
       [57, 10, 3, "Type \'MutableRefObject<HTMLInputElement | undefined>\' is not assignable to type \'LegacyRef<HTMLInputElement> | undefined\'.", "193432436"]
     ],
-    "src/script/components/userDevices/DeviceCard.test.ts:2605028463": [
-      [54, 10, 10, "Type \'Observable<false>\' is not assignable to type \'Observable<boolean>\'.", "3231345145"],
-      [68, 10, 10, "Type \'Observable<false>\' is not assignable to type \'Observable<boolean>\'.", "3231345145"],
-      [83, 10, 10, "Type \'Observable<false>\' is not assignable to type \'Observable<boolean>\'.", "3231345145"],
-      [97, 10, 10, "Type \'Observable<true>\' is not assignable to type \'Observable<boolean>\'.", "3231345145"],
-      [112, 10, 10, "Type \'Observable<false>\' is not assignable to type \'Observable<boolean>\'.", "3231345145"]
-    ],
-    "src/script/components/userDevices/DeviceCard.tsx:2886933329": [
-      [61, 6, 4, "Type \'false | \\"button\\"\' is not assignable to type \'AriaRole | undefined\'.\\n  Type \'false\' is not assignable to type \'AriaRole | undefined\'.", "2088305233"],
-      [88, 49, 10, "Cannot invoke an object which is possibly \'undefined\'.", "3231345145"]
-    ],
-    "src/script/components/userDevices/DeviceDetails.tsx:3950414303": [
-      [92, 57, 12, "Argument of type \'Conversation | null | undefined\' is not assignable to parameter of type \'Conversation\'.\\n  Type \'undefined\' is not assignable to type \'Conversation\'.", "1670678216"],
-      [124, 18, 8, "Type \'string | undefined\' is not assignable to type \'string\'.\\n  Type \'undefined\' is not assignable to type \'string\'.", "1602964848"]
-    ],
     "src/script/components/utils/InViewport.tsx:2602655444": [
       [60, 6, 21, "Argument of type \'HTMLElement | null\' is not assignable to parameter of type \'HTMLElement\'.\\n  Type \'null\' is not assignable to type \'HTMLElement\'.", "2791404919"],
       [70, 9, 3, "Type \'MutableRefObject<HTMLDivElement | undefined>\' is not assignable to type \'LegacyRef<HTMLDivElement> | undefined\'.\\n  Type \'MutableRefObject<HTMLDivElement | undefined>\' is not assignable to type \'RefObject<HTMLDivElement>\'.\\n    Types of property \'current\' are incompatible.\\n      Type \'HTMLDivElement | undefined\' is not assignable to type \'HTMLDivElement | null\'.\\n        Type \'undefined\' is not assignable to type \'HTMLDivElement | null\'.", "193432436"]
