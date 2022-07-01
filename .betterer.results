@@ -873,10 +873,6 @@ exports[`stricter compilation`] = {
     "src/script/components/MessagesList/Message/MemberMessage.test.tsx:819448386": [
       [56, 56, 4, "Argument of type \'null\' is not assignable to parameter of type \'string | undefined\'.", "2087897566"]
     ],
-    "src/script/components/MessagesList/Message/MemberMessage.tsx:210312751": [
-      [79, 73, 4, "Argument of type \'null\' is not assignable to parameter of type \'Element | undefined\'.", "2087897566"],
-      [121, 19, 3, "Type \'(node: Element) => void\' is not assignable to type \'LegacyRef<HTMLDivElement> | undefined\'.", "193432436"]
-    ],
     "src/script/components/MessagesList/Message/MessageWrapper.tsx:4264065369": [
       [157, 8, 15, "Type \'Message | undefined\' is not assignable to type \'Message\'.\\n  Type \'undefined\' is not assignable to type \'Message\'.", "1976601247"],
       [165, 8, 13, "Type \'(message: CompositeMessage, buttonId: string) => void\' is not assignable to type \'(message: ContentMessage, assetId: string) => void\'.\\n  Types of parameters \'message\' and \'message\' are incompatible.\\n    Type \'ContentMessage\' is missing the following properties from type \'CompositeMessage\': errorButtonId, errorMessage, selectedButtonId, waitingButtonId, and 3 more.", "2671775388"]
