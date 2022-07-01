@@ -894,9 +894,6 @@ exports[`stricter compilation`] = {
       [151, 8, 15, "Type \'null\' is not assignable to type \'((message: Message) => void) | undefined\'.", "2393653541"],
       [156, 13, 49, "Object is possibly \'null\'.", "2963204748"]
     ],
-    "src/script/components/MessagesList/Message/ReadReceiptStatus.tsx:3083018950": [
-      [77, 47, 15, "Cannot invoke an object which is possibly \'undefined\'.", "2393653541"]
-    ],
     "src/script/components/MessagesList/Message/VerificationMessage.test.tsx:3256909500": [
       [44, 4, 12, "Type \'ObservableArray<never>\' is not assignable to type \'ObservableArray<User>\'.", "3158614633"],
       [45, 4, 7, "Type \'ObservableArray<never>\' is not assignable to type \'ObservableArray<string | QualifiedUserId>\'.\\n  Types of parameters \'value\' and \'value\' are incompatible.\\n    Type \'(string | QualifiedUserId)[] | null | undefined\' is not assignable to type \'never[] | null | undefined\'.\\n      Type \'(string | QualifiedUserId)[]\' is not assignable to type \'never[]\'.\\n        Type \'string | QualifiedUserId\' is not assignable to type \'never\'.\\n          Type \'string\' is not assignable to type \'never\'.", "2414311946"],
