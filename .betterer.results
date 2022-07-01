@@ -990,9 +990,6 @@ exports[`stricter compilation`] = {
       [176, 10, 20, "Type \'undefined\' is not assignable to type \'Participant\'.", "942864568"],
       [179, 10, 9, "Type \'undefined\' is not assignable to type \'MuteState\'.", "3616862203"]
     ],
-    "src/script/components/calling/DeviceToggleButton.tsx:46682170": [
-      [57, 69, 1, "No overload matches this call.\\n  Overload 1 of 6, \'(this: (this: null, arg0: MouseEvent<HTMLDivElement, MouseEvent>) => void, thisArg: null, arg0: MouseEvent<HTMLDivElement, MouseEvent>): () => void\', gave the following error.\\n    Argument of type \'KeyboardEvent<HTMLDivElement>\' is not assignable to parameter of type \'MouseEvent<HTMLDivElement, MouseEvent>\'.\\n  Overload 2 of 6, \'(this: (this: null, ...args: MouseEvent<HTMLDivElement, MouseEvent>[]) => void, thisArg: null, ...args: MouseEvent<HTMLDivElement, MouseEvent>[]): (...args: MouseEvent<...>[]) => void\', gave the following error.\\n    Argument of type \'KeyboardEvent<HTMLDivElement>\' is not assignable to parameter of type \'MouseEvent<HTMLDivElement, MouseEvent>\'.", "177600"]
-    ],
     "src/script/components/calling/FullscreenVideoCall.tsx:3337270414": [
       [245, 46, 4, "Argument of type \'null\' is not assignable to parameter of type \'Participant\'.", "2087897566"]
     ],
