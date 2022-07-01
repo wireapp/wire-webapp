@@ -957,16 +957,6 @@ exports[`stricter compilation`] = {
       [66, 38, 3, "Type \'MutableRefObject<HTMLDivElement | undefined>\' is not assignable to type \'LegacyRef<HTMLDivElement> | undefined\'.", "193432436"],
       [83, 12, 3, "Type \'MutableRefObject<HTMLInputElement | undefined>\' is not assignable to type \'LegacyRef<HTMLInputElement> | undefined\'.\\n  Type \'MutableRefObject<HTMLInputElement | undefined>\' is not assignable to type \'RefObject<HTMLInputElement>\'.\\n    Types of property \'current\' are incompatible.\\n      Type \'HTMLInputElement | undefined\' is not assignable to type \'HTMLInputElement | null\'.\\n        Type \'undefined\' is not assignable to type \'HTMLInputElement | null\'.", "193432436"]
     ],
-    "src/script/components/TextInput/TextInput.styles.ts:1761831861": [
-      [55, 2, 9, "Type \'{ borderColor: false | \\"var(--text-input-border-hover)\\"; }\' is not assignable to type \'CSSInterpolation\'.\\n  Types of property \'borderColor\' are incompatible.\\n    Type \'false | \\"var(--text-input-border-hover)\\"\' is not assignable to type \'BorderColor | (BorderColor | undefined)[] | BorderColor[] | undefined\'.\\n      Type \'false\' is not assignable to type \'BorderColor | (BorderColor | undefined)[] | BorderColor[] | undefined\'.", "1736274335"],
-      [58, 2, 36, "Type \'{ \'& + label\': { color: false | \\"var(--accent-color-500)\\"; }; borderColor: false | \\"var(--accent-color-500)\\"; }\' is not assignable to type \'CSSInterpolation\'.\\n  Types of property \'\'& + label\'\' are incompatible.\\n    Type \'{ color: false | \\"var(--accent-color-500)\\"; }\' is not assignable to type \'CSSInterpolation\'.\\n      Types of property \'color\' are incompatible.\\n        Type \'false | \\"var(--accent-color-500)\\"\' is not assignable to type \'Color | (Color | undefined)[] | Color[] | undefined\'.\\n          Type \'false\' is not assignable to type \'Color | (Color | undefined)[] | Color[] | undefined\'.", "507716502"]
-    ],
-    "src/script/components/TextInput/TextInput.tsx:1217040429": [
-      [104, 35, 12, "Argument of type \'string | null\' is not assignable to parameter of type \'string | undefined\'.\\n  Type \'null\' is not assignable to type \'string | undefined\'.", "4008345754"],
-      [115, 55, 12, "Argument of type \'string | null\' is not assignable to parameter of type \'string | undefined\'.", "4008345754"],
-      [123, 59, 12, "Argument of type \'string | null\' is not assignable to parameter of type \'string | undefined\'.", "4008345754"],
-      [124, 56, 12, "Argument of type \'string | null\' is not assignable to parameter of type \'string | undefined\'.", "4008345754"]
-    ],
     "src/script/components/UserDevices.tsx:1074292287": [
       [120, 74, 5, "Object is of type \'unknown\'.", "165548477"],
       [128, 42, 8, "Argument of type \'string | undefined\' is not assignable to parameter of type \'string\'.\\n  Type \'undefined\' is not assignable to type \'string\'.", "4039656867"],
@@ -1178,9 +1168,6 @@ exports[`stricter compilation`] = {
     "src/script/components/toggle/ReceiptModeToggle.test.ts:3769197722": [
       [42, 11, 8, "Object is possibly \'null\'.", "2071428406"],
       [53, 11, 8, "Object is possibly \'null\'.", "2071428406"]
-    ],
-    "src/script/components/toggle/ReceiptModeToggle.tsx:3019625326": [
-      [57, 10, 3, "Type \'MutableRefObject<HTMLInputElement | undefined>\' is not assignable to type \'LegacyRef<HTMLInputElement> | undefined\'.", "193432436"]
     ],
     "src/script/components/utils/InViewport.tsx:2602655444": [
       [60, 6, 21, "Argument of type \'HTMLElement | null\' is not assignable to parameter of type \'HTMLElement\'.\\n  Type \'null\' is not assignable to type \'HTMLElement\'.", "2791404919"],
