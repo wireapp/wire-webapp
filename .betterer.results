@@ -1108,9 +1108,6 @@ exports[`stricter compilation`] = {
       [43, 11, 15, "Object is possibly \'null\'.", "3285363318"],
       [63, 11, 15, "Object is possibly \'null\'.", "3285363318"]
     ],
-    "src/script/components/panel/PanelActions/PanelActions.tsx:1779366507": [
-      [39, 7, 5, "Object is possibly \'undefined\'.", "179721187"]
-    ],
     "src/script/components/panel/ServiceDetails.test.ts:1343420477": [
       [43, 11, 24, "Object is possibly \'null\'.", "1690512676"],
       [44, 11, 28, "Object is possibly \'null\'.", "449714402"],
