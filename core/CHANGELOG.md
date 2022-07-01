@@ -3,6 +3,22 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [28.0.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/compare/@wireapp/core@27.6.0...@wireapp/core@28.0.0) (2022-07-01)
+
+
+### Features
+
+* Use mls config object ([#4307](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/issues/4307)) ([3d510d0](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/commit/3d510d0e041a3d049282e6a312ffa880d9bafd89))
+
+
+### BREAKING CHANGES
+
+* the enableMLS flag has been removed in favor of a config object. If the config object is set, then MLS will be activated
+
+
+
+
+
 # [27.6.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/compare/@wireapp/core@27.5.0...@wireapp/core@27.6.0) (2022-06-30)
 
 
