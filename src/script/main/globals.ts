@@ -36,7 +36,7 @@ import 'Components/toggle/InfoToggle';
 import 'Components/calling/FullscreenVideoCall';
 import 'Components/avatar/GroupAvatar';
 import 'Components/MessagesList';
-import '../page/Modals/GroupCreation/GroupCreationModal';
+import 'Components/Modals/GroupCreation/GroupCreationModal';
 import '../page/AppLock';
 import 'Components/modal';
 import 'Components/panel/ServiceDetails';

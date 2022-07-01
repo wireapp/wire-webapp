@@ -42,6 +42,7 @@ import FileAssetComponent from './asset/FileAssetComponent';
 import LocationAsset from './asset/LocationAsset';
 import useEffectRef from 'Util/useEffectRef';
 import {Text} from 'src/script/entity/message/Text';
+import {handleKeyDown} from 'Util/KeyboardUtil';
 
 export interface QuoteProps {
   conversation: Conversation;
@@ -181,9 +182,14 @@ const QuotedMessage: React.FC<QuotedMessageProps> = ({
   return (
     <>
       <div className="message-quote__sender">
-        <span onClick={() => showUserDetails(quotedUser)} data-uie-name="label-name-quote">
+        <button
+          type="button"
+          className="button-reset-default"
+          onClick={() => showUserDetails(quotedUser)}
+          data-uie-name="label-name-quote"
+        >
           {headerSenderName}
-        </span>
+        </button>
         {was_edited && (
           <span data-uie-name="message-edited-quote" title={quotedMessage.displayEditedTimestamp()}>
             <Icon.Edit />
@@ -206,19 +212,23 @@ const QuotedMessage: React.FC<QuotedMessageProps> = ({
           {asset.isText() && (
             <>
               <div
+                role="button"
+                tabIndex={0}
                 className={cx('message-quote__text', {
                   'message-quote__text--full': showFullText,
                   'message-quote__text--large': includesOnlyEmojis(asset.text),
                 })}
                 ref={setTextQuoteElement}
                 onClick={event => handleClickOnMessage(asset, event)}
+                onKeyDown={event => handleKeyDown(event, handleClickOnMessage.bind(this, asset, event))}
                 dangerouslySetInnerHTML={{__html: asset.render(selfId)}}
                 dir="auto"
                 data-uie-name="media-text-quote"
               />
               {canShowMore && (
-                <div
-                  className="message-quote__text__show-more"
+                <button
+                  type="button"
+                  className="button-reset-default message-quote__text__show-more"
                   onClick={() => setShowFullText(!showFullText)}
                   data-uie-name="do-show-more-quote"
                 >
@@ -228,7 +238,7 @@ const QuotedMessage: React.FC<QuotedMessageProps> = ({
                       'upside-down': showFullText,
                     })}
                   />
-                </div>
+                </button>
               )}
             </>
           )}
@@ -257,8 +267,9 @@ const QuotedMessage: React.FC<QuotedMessageProps> = ({
           {asset.isLocation() && <LocationAsset asset={asset} data-uie-name="media-location-quote" />}
         </React.Fragment>
       ))}
-      <div
-        className="message-quote__timestamp"
+      <button
+        type="button"
+        className="button-reset-default message-quote__timestamp"
         onClick={() => {
           if (quotedMessage) {
             focusMessage(quotedMessage.id);
@@ -269,7 +280,7 @@ const QuotedMessage: React.FC<QuotedMessageProps> = ({
         {isBeforeToday(timestamp)
           ? t('replyQuoteTimeStampDate', formatDateNumeral(timestamp))
           : t('replyQuoteTimeStampTime', formatTimeShort(timestamp))}
-      </div>
+      </button>
     </>
   );
 };

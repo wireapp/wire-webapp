@@ -136,6 +136,15 @@ const WarningsContainer: React.FC = () => {
     };
   });
 
+  const closeButton = (
+    <button
+      type="button"
+      data-uie-name="do-close-warning"
+      className="warning-bar-close icon-close button-round button-round-dark button-reset-default"
+      onClick={closeWarning}
+    />
+  );
+
   if (warnings.length === 0) {
     return null;
   }
@@ -154,7 +163,7 @@ const WarningsContainer: React.FC = () => {
               ),
             }}
           />
-          <span className="warning-bar-close icon-close button-icon" onClick={closeWarning} />
+          {closeButton}
         </div>
       )}
       {visibleWarning === type.DENIED_CAMERA && (
@@ -170,16 +179,16 @@ const WarningsContainer: React.FC = () => {
               {t('warningLearnMore')}
             </a>
           </div>
-          <span className="warning-bar-close icon-close button-round button-round-dark" onClick={closeWarning} />
+          {closeButton}
         </div>
       )}
       {visibleWarning === type.REQUEST_MICROPHONE && (
         <div className="warning-bar warning-bar-feature">
           <div className="warning-bar-message">
-            <Icon.MicOn className="warning-bar-icon"></Icon.MicOn>
+            <Icon.MicOn className="warning-bar-icon" />
             <span dangerouslySetInnerHTML={{__html: t('warningPermissionRequestMicrophone', {}, {icon: ''})}} />
           </div>
-          <span className="warning-bar-close icon-close button-round button-round-dark" onClick={closeWarning} />
+          {closeButton}
         </div>
       )}
       {visibleWarning === type.DENIED_MICROPHONE && (
@@ -195,7 +204,7 @@ const WarningsContainer: React.FC = () => {
               {t('warningLearnMore')}
             </a>
           </div>
-          <span className="warning-bar-close icon-close button-round button-round-dark" onClick={closeWarning} />
+          {closeButton}
         </div>
       )}
       {visibleWarning === type.REQUEST_SCREEN && (
@@ -210,7 +219,7 @@ const WarningsContainer: React.FC = () => {
               ),
             }}
           />
-          <span className="warning-bar-close icon-close button-icon" onClick={closeWarning} />
+          {closeButton}
         </div>
       )}
       {visibleWarning === type.DENIED_SCREEN && (
@@ -226,7 +235,7 @@ const WarningsContainer: React.FC = () => {
               {t('warningLearnMore')}
             </a>
           </div>
-          <span className="warning-bar-close icon-close button-round button-round-dark" onClick={closeWarning} />
+          {closeButton}
         </div>
       )}
       {visibleWarning === type.NOT_FOUND_CAMERA && (
@@ -242,7 +251,7 @@ const WarningsContainer: React.FC = () => {
               {t('warningLearnMore')}
             </a>
           </div>
-          <span className="warning-bar-close icon-close button-round button-round-dark" onClick={closeWarning} />
+          {closeButton}
         </div>
       )}
       {visibleWarning === type.NOT_FOUND_MICROPHONE && (
@@ -258,7 +267,7 @@ const WarningsContainer: React.FC = () => {
               {t('warningLearnMore')}
             </a>
           </div>
-          <span className="warning-bar-close icon-close button-round button-round-dark" onClick={closeWarning} />
+          {closeButton}
         </div>
       )}
       {visibleWarning === type.REQUEST_NOTIFICATION && (
@@ -272,12 +281,8 @@ const WarningsContainer: React.FC = () => {
                 {icon: "<span class='warning-bar-icon icon-envelope'></span>"},
               ),
             }}
-          ></div>
-          <span
-            className="warning-bar-close icon-close button-round button-round-dark"
-            onClick={closeWarning}
-            data-uie-name="do-close-warning"
           />
+          {closeButton}
         </div>
       )}
       {visibleWarning === type.UNSUPPORTED_INCOMING_CALL && (
@@ -312,7 +317,7 @@ const WarningsContainer: React.FC = () => {
               <span>{t('warningCallUpgradeBrowser')}</span>
             </div>
           )}
-          <span className="warning-bar-close icon-close button-round button-round-dark" onClick={closeWarning} />
+          {closeButton}
         </div>
       )}
       {visibleWarning === type.UNSUPPORTED_OUTGOING_CALL && (
@@ -347,14 +352,14 @@ const WarningsContainer: React.FC = () => {
               <span>{t('warningCallUpgradeBrowser')}</span>
             </div>
           )}
-          <span className="warning-bar-close icon-close button-round button-round-dark" onClick={closeWarning} />
+          {closeButton}
         </div>
       )}
       {visibleWarning === type.CONNECTIVITY_RECONNECT && (
         <div className="warning-bar warning-bar-connection">
           <div className="warning-bar-message">
             <span>{t('warningConnectivityConnectionLost', brandName)}</span>
-            <Icon.Loading className="warning-bar-spinner" data-uie-name="status-loading"></Icon.Loading>
+            <Icon.Loading className="warning-bar-spinner" data-uie-name="status-loading" />
           </div>
         </div>
       )}
@@ -365,7 +370,7 @@ const WarningsContainer: React.FC = () => {
           </div>
         </div>
       )}
-      {visibleWarning === type.CONNECTIVITY_RECOVERY && <div className="warning-bar warning-bar-progress"></div>}
+      {visibleWarning === type.CONNECTIVITY_RECOVERY && <div className="warning-bar warning-bar-progress" />}
       {visibleWarning === type.NO_INTERNET && (
         <div className="warning-bar warning-bar-connection">
           <div className="warning-bar-message">{t('warningConnectivityNoInternet')}</div>
@@ -385,15 +390,14 @@ const WarningsContainer: React.FC = () => {
               {t('warningLifecycleUpdateNotes')}
             </a>
             &nbsp;·&nbsp;
-            <a
-              className="warning-bar-link"
+            <button
+              type="button"
+              className="warning-bar-link button-reset-default"
               onClick={() => amplify.publish(lifeCycleRefresh)}
-              rel="nofollow noopener noreferrer"
-              target="_blank"
               data-uie-name="do-update"
             >
               {t('warningLifecycleUpdateLink')}
-            </a>
+            </button>
           </div>
         </div>
       )}

@@ -17,8 +17,6 @@
  *
  */
 
-import {createRoot, Root} from 'react-dom/client';
-
 import Avatar, {AVATAR_SIZE} from 'Components/Avatar';
 import Icon from 'Components/Icon';
 import ModalComponent from 'Components/ModalComponent';
@@ -28,13 +26,14 @@ import {ServiceEntity} from '../../../integration/ServiceEntity';
 import {ActionsViewModel} from '../../../view_model/ActionsViewModel';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
+import renderModal from 'Util/renderModal';
 
 interface ServiceModalProps {
-  readonly onClose: () => void;
   readonly service: ServiceEntity;
-  readonly avatarSize?: AVATAR_SIZE;
   readonly integrationRepository: IntegrationRepository;
   readonly actionsViewModel: ActionsViewModel;
+  readonly onClose?: () => void;
+  readonly avatarSize?: AVATAR_SIZE;
 }
 
 const ServiceModal: React.FC<ServiceModalProps> = ({
@@ -51,7 +50,7 @@ const ServiceModal: React.FC<ServiceModalProps> = ({
   const {providerName, name} = useKoSubscribableChildren(service, ['name', 'providerName']);
 
   return (
-    <div className="service-modal">
+    <div className="service-modal" data-uie-name="modal-service">
       <ModalComponent isShown onClosed={onClose} onBgClick={onClose} data-uie-name="group-creation-label">
         {service && (
           <>
@@ -95,24 +94,4 @@ const ServiceModal: React.FC<ServiceModalProps> = ({
 
 export default ServiceModal;
 
-let modalContainer: HTMLDivElement;
-let reactRoot: Root;
-
-const cleanUp = () => {
-  if (modalContainer) {
-    reactRoot.unmount();
-    document.getElementById('wire-main').removeChild(modalContainer);
-    modalContainer = undefined;
-  }
-};
-
-export const showServiceModal = (props: Omit<ServiceModalProps, 'onClose'>) => {
-  const {integrationRepository, service} = props;
-  console.info('bardia showServiceModal', props);
-  cleanUp();
-  integrationRepository.addProviderNameToParticipant(service);
-  modalContainer = document.createElement('div');
-  document.getElementById('wire-main').appendChild(modalContainer);
-  reactRoot = createRoot(modalContainer);
-  reactRoot.render(<ServiceModal {...props} onClose={cleanUp} />);
-};
+export const showServiceModal = renderModal<ServiceModalProps>(ServiceModal);
