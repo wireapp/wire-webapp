@@ -706,11 +706,6 @@ exports[`stricter compilation`] = {
       [49, 11, 13, "Object is possibly \'null\'.", "2433726607"],
       [50, 11, 13, "Object is possibly \'null\'.", "2433726607"]
     ],
-    "src/script/components/CopyToClipboard.tsx:1568430381": [
-      [32, 6, 21, "Object is possibly \'null\'.", "3831905776"],
-      [33, 6, 21, "Object is possibly \'null\'.", "3831905776"],
-      [44, 58, 1, "No overload matches this call.\\n  Overload 1 of 6, \'(this: (this: null, arg0: MouseEvent<HTMLDivElement, MouseEvent>) => void, thisArg: null, arg0: MouseEvent<HTMLDivElement, MouseEvent>): () => void\', gave the following error.\\n    Argument of type \'KeyboardEvent<HTMLDivElement>\' is not assignable to parameter of type \'MouseEvent<HTMLDivElement, MouseEvent>\'.\\n  Overload 2 of 6, \'(this: (this: null, ...args: MouseEvent<HTMLDivElement, MouseEvent>[]) => void, thisArg: null, ...args: MouseEvent<HTMLDivElement, MouseEvent>[]): (...args: MouseEvent<...>[]) => void\', gave the following error.\\n    Argument of type \'KeyboardEvent<HTMLDivElement>\' is not assignable to parameter of type \'MouseEvent<HTMLDivElement, MouseEvent>\'.", "177600"]
-    ],
     "src/script/components/Icon.tsx:3124821771": [
       [44, 11, 5, "Property \'width\' does not exist on type \'{ [key: string]: string; } | undefined\'.", "191264035"],
       [44, 18, 6, "Property \'height\' does not exist on type \'{ [key: string]: string; } | undefined\'.", "1581003770"],
