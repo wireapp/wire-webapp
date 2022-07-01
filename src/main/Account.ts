@@ -102,14 +102,24 @@ type SecretCrypto<T> = {
   decrypt: (payload: T) => Promise<Uint8Array>;
 };
 
-interface AccountOptions<T> {
-  /** Used to store info in the database (will create a inMemory engine if returns undefined) */
-  createStore?: CreateStoreFn;
-
-  /** encrypt/decrypt function pair that will be called before storing/fetching secrets in the secrets database.
+interface MLSConfig<T = any> {
+  /**
+   * encrypt/decrypt function pair that will be called before storing/fetching secrets in the secrets database.
    * If not provided will use the built in encryption mechanism
    */
   secretsCrypto?: SecretCrypto<T>;
+
+  /**
+   * path on the public server to the core crypto wasm file.
+   * This file will be downloaded lazily when corecrypto is needed.
+   * It, thus, needs to know where, on the server, the file can be found
+   */
+  coreCrypoWasmFilePath: string;
+}
+
+interface AccountOptions<T> {
+  /** Used to store info in the database (will create a inMemory engine if returns undefined) */
+  createStore?: CreateStoreFn;
 
   /** Number of prekeys to generate when creating a new device (defaults to 2)
    * Prekeys are Diffie-Hellmann public keys which allow offline initiation of a secure Proteus session between two devices.
@@ -121,7 +131,11 @@ interface AccountOptions<T> {
    *    - make it likely that all prekeys get consumed while the device is offline and the last resort prekey will be used to create new session
    */
   nbPrekeys?: number;
-  enableMLS?: boolean;
+
+  /**
+   * Config for MLS devices. Will not load corecrypt or create MLS devices if undefined
+   */
+  mlsConfig?: MLSConfig<T>;
 }
 
 const coreDefaultClient: ClientInfo = {
@@ -135,9 +149,8 @@ export class Account<T = unknown> extends EventEmitter {
   private readonly logger: logdown.Logger;
   private readonly createStore: CreateStoreFn;
   private storeEngine?: CRUDEngine;
-  private readonly secretsCrypto?: SecretCrypto<T>;
   private readonly nbPrekeys: number;
-  private readonly enableMLS: boolean;
+  private readonly mlsConfig?: MLSConfig<T>;
   private coreCryptoClient?: CoreCrypto;
 
   public static readonly TOPIC = TOPIC;
@@ -164,15 +177,14 @@ export class Account<T = unknown> extends EventEmitter {
    */
   constructor(
     apiClient: APIClient = new APIClient(),
-    {createStore = () => undefined, nbPrekeys = 2, secretsCrypto, enableMLS = false}: AccountOptions<T> = {},
+    {createStore = () => undefined, nbPrekeys = 2, mlsConfig}: AccountOptions<T> = {},
   ) {
     super();
     this.apiClient = apiClient;
     this.backendFeatures = this.apiClient.backendFeatures;
-    this.secretsCrypto = secretsCrypto;
+    this.mlsConfig = this.mlsConfig;
     this.nbPrekeys = nbPrekeys;
     this.createStore = createStore;
-    this.enableMLS = enableMLS;
 
     apiClient.on(APIClient.TOPIC.COOKIE_REFRESH, async (cookie?: Cookie) => {
       if (cookie && this.storeEngine) {
@@ -370,20 +382,20 @@ export class Account<T = unknown> extends EventEmitter {
     const loadedClient = await this.service!.client.getLocalClient();
     await this.apiClient.api.client.getClient(loadedClient.id);
     this.apiClient.context!.clientId = loadedClient.id;
-    if (this.enableMLS) {
-      this.coreCryptoClient = await this.createMLSClient(loadedClient, this.apiClient.context!);
+    if (this.mlsConfig) {
+      this.coreCryptoClient = await this.createMLSClient(loadedClient, this.apiClient.context!, this.mlsConfig);
     }
 
     return loadedClient;
   }
 
-  private async createMLSClient(client: RegisteredClient, context: Context): Promise<CoreCrypto> {
+  private async createMLSClient(client: RegisteredClient, context: Context, mlsConfig: MLSConfig): Promise<CoreCrypto> {
     const coreCryptoKeyId = 'corecrypto-key';
     const {CoreCrypto} = await import('@otak/core-crypto');
     const dbName = `secrets-${this.generateDbName(context)}`;
 
-    const secretStore = this.secretsCrypto
-      ? await createCustomEncryptedStore(dbName, this.secretsCrypto)
+    const secretStore = mlsConfig.secretsCrypto
+      ? await createCustomEncryptedStore(dbName, mlsConfig.secretsCrypto)
       : await createEncryptedStore(dbName);
 
     let key = await secretStore.getsecretValue(coreCryptoKeyId);
@@ -407,10 +419,10 @@ export class Account<T = unknown> extends EventEmitter {
     if (!this.service) {
       throw new Error('Services are not set.');
     }
-    this.logger.info(`Creating new client {mls: ${!!this.enableMLS}}`);
+    this.logger.info(`Creating new client {mls: ${!!this.mlsConfig}}`);
     const registeredClient = await this.service.client.register(loginData, clientInfo, entropyData);
-    if (this.enableMLS) {
-      this.coreCryptoClient = await this.createMLSClient(registeredClient, this.apiClient.context!);
+    if (this.mlsConfig) {
+      this.coreCryptoClient = await this.createMLSClient(registeredClient, this.apiClient.context!, this.mlsConfig);
       await this.service.client.uploadMLSPublicKeys(this.coreCryptoClient.clientPublicKey(), registeredClient.id);
       await this.service.client.uploadMLSKeyPackages(
         this.coreCryptoClient.clientKeypackages(this.nbPrekeys),
