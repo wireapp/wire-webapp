@@ -144,7 +144,7 @@ const coreDefaultClient: ClientInfo = {
   model: '@wireapp/core',
 };
 
-export class Account<T = unknown> extends EventEmitter {
+export class Account<T = any> extends EventEmitter {
   private readonly apiClient: APIClient;
   private readonly logger: logdown.Logger;
   private readonly createStore: CreateStoreFn;
