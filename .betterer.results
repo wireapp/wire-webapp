@@ -678,9 +678,6 @@ exports[`stricter compilation`] = {
       [26, 2, 7, "Property \'clients\' has no initializer and is not definitely assigned in the constructor.", "3676208751"],
       [31, 4, 18, "Type \'Observable<ClientEntity | undefined>\' is not assignable to type \'Observable<ClientEntity>\'.\\n  The types returned by \'peek()\' are incompatible between these types.\\n    Type \'ClientEntity | undefined\' is not assignable to type \'ClientEntity\'.\\n      Type \'undefined\' is not assignable to type \'ClientEntity\'.", "2551882557"]
     ],
-    "src/script/components/AvailabilityState.tsx:2012314105": [
-      [75, 6, 7, "Cannot invoke an object which is possibly \'undefined\'.", "4055953994"]
-    ],
     "src/script/components/Avatar.test.tsx:1834172511": [
       [38, 37, 31, "Argument of type \'Element | null\' is not assignable to parameter of type \'Element\'.\\n  Type \'null\' is not assignable to type \'Element\'.", "4162123045"],
       [43, 39, 4, "Argument of type \'null\' is not assignable to parameter of type \'string | undefined\'.", "2087897566"],
