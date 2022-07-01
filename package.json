@@ -62,6 +62,8 @@
     "@babel/preset-env": "7.18.2",
     "@babel/preset-react": "7.17.12",
     "@babel/preset-typescript": "7.17.12",
+    "@betterer/cli": "^5.3.6",
+    "@betterer/typescript": "5.3.6",
     "@faker-js/faker": "6.3.1",
     "@formatjs/cli": "4.8.4",
     "@koush/wrtc": "0.5.3",
@@ -237,7 +239,9 @@
     "translate:extract": "i18next-scanner 'src/{page,script}/**/*.{js,html,htm}'",
     "translate:merge": "formatjs extract --format './bin/translations_extract_formatter.js' --out-file './src/i18n/en-US.json' './src/script/strings.ts'",
     "translate:upload": "yarn translate:merge && ts-node ./bin/translations_upload.ts",
-    "translate:download": "ts-node ./bin/translations_download.ts"
+    "translate:download": "ts-node ./bin/translations_download.ts",
+    "betterer": "betterer",
+    "betterer:conflict": "betterer merge"
   },
   "version": "0.18.0"
 }
