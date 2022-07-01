@@ -182,8 +182,10 @@ const AccountInput: React.FC<AccountInputProps> = ({
         </>
       )}
 
+      {/* eslint jsx-a11y/no-autofocus : "off" */}
       {isEditing && (
         <TextInput
+          autoFocus
           uieName={`enter-${fieldName}-input`}
           label={label}
           name={valueUie}
