@@ -45,14 +45,18 @@ export class Core extends Account {
 
         return createStorageEngine(storeName, dbType);
       },
-      enableMLS: Config.getConfig().FEATURE.ENABLE_MLS,
+      mlsConfig: Config.getConfig().FEATURE.ENABLE_MLS
+        ? {
+            coreCrypoWasmFilePath: '/assets/core-crypto.wasm',
+            /*
+             * When in an electron context, the window.secretsCrypto will be populated by the renderer process.
+             * We then give those crypto primitives to the core that will use them when encrypting MLS secrets.
+             * When in an browser context, then this secretsCrypto will be undefined and the core will then use it's internal encryption system
+             */
+            secretsCrypto: window.secretsCrypto,
+          }
+        : undefined,
       nbPrekeys: 100,
-      /*
-       * When in an electron context, the window.secretsCrypto will be populated by the renderer process.
-       * We then give those crypto primitives to the core that will use them when encrypting MLS secrets.
-       * When in an browser context, then this secretsCrypto will be undefined and the core will then use it's internal encryption system
-       */
-      secretsCrypto: window.secretsCrypto,
     });
   }
   get storage() {
