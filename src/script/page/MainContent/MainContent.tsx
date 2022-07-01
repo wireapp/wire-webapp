@@ -88,8 +88,8 @@ const MainContent: React.FC<LeftSidebarProps> = ({
       background: 'var(--checkbox-background)',
       border: 'var(--checkbox-border)',
       borderFocused: 'blue',
-      disableBgColor: 'var(@checkbox-background-disabled)',
-      disableBorderColor: 'var(checkbox-border-disabled)',
+      disableBgColor: 'var(--checkbox-background-disabled)',
+      disableBorderColor: 'var(--checkbox-border-disabled)',
       disablecheckedBgColor: 'var(--checkbox-background-disabled-selected)',
       invalidBorderColor: 'var(--checkbox-alert)',
     },
@@ -102,7 +102,6 @@ const MainContent: React.FC<LeftSidebarProps> = ({
     select: {
       contrastTextColor: 'var(--text-input-background)',
       disabledColor: 'var(--text-input-placeholder)',
-      fillColor: 'var(--checkbox-fill-color)',
     },
   };
 
