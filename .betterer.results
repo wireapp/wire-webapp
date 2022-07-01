@@ -728,9 +728,6 @@ exports[`stricter compilation`] = {
       [33, 39, 22, "Argument of type \'Element | null\' is not assignable to parameter of type \'Element\'.\\n  Type \'null\' is not assignable to type \'Element\'.", "1768242196"],
       [34, 31, 14, "Argument of type \'Element | null\' is not assignable to parameter of type \'Element\'.\\n  Type \'null\' is not assignable to type \'Element\'.", "3477072529"]
     ],
-    "src/script/components/MessagesList/Message/ContentMessage/MessageFooterLike.tsx:2085723443": [
-      [51, 8, 7, "Type \'(() => void) | null\' is not assignable to type \'MouseEventHandler<HTMLButtonElement> | undefined\'.\\n  Type \'null\' is not assignable to type \'MouseEventHandler<HTMLButtonElement> | undefined\'.", "4055953994"]
-    ],
     "src/script/components/MessagesList/Message/ContentMessage/MessageQuote.tsx:3969532892": [
       [68, 53, 11, "Argument of type \'Error | undefined\' is not assignable to parameter of type \'string | Error | (() => string | Error)\'.\\n  Type \'undefined\' is not assignable to type \'string | Error | (() => string | Error)\'.", "2014657417"],
       [118, 10, 13, "Type \'ContentMessage | undefined\' is not assignable to type \'ContentMessage\'.\\n  Type \'undefined\' is not assignable to type \'ContentMessage\'.", "2555417520"],
