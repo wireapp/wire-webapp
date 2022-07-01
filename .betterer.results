@@ -950,13 +950,6 @@ exports[`stricter compilation`] = {
       [53, 20, 4, "Argument of type \'null\' is not assignable to parameter of type \'string | undefined\'.", "2087897566"],
       [54, 20, 4, "Argument of type \'null\' is not assignable to parameter of type \'string | undefined\'.", "2087897566"]
     ],
-    "src/script/components/SearchInput.tsx:3792000228": [
-      [53, 4, 20, "Object is possibly \'undefined\'.", "2860176586"],
-      [54, 4, 20, "Object is possibly \'undefined\'.", "1100706242"],
-      [54, 37, 20, "Object is possibly \'undefined\'.", "2860176586"],
-      [66, 38, 3, "Type \'MutableRefObject<HTMLDivElement | undefined>\' is not assignable to type \'LegacyRef<HTMLDivElement> | undefined\'.", "193432436"],
-      [83, 12, 3, "Type \'MutableRefObject<HTMLInputElement | undefined>\' is not assignable to type \'LegacyRef<HTMLInputElement> | undefined\'.\\n  Type \'MutableRefObject<HTMLInputElement | undefined>\' is not assignable to type \'RefObject<HTMLInputElement>\'.\\n    Types of property \'current\' are incompatible.\\n      Type \'HTMLInputElement | undefined\' is not assignable to type \'HTMLInputElement | null\'.\\n        Type \'undefined\' is not assignable to type \'HTMLInputElement | null\'.", "193432436"]
-    ],
     "src/script/components/UserDevices.tsx:1074292287": [
       [120, 74, 5, "Object is of type \'unknown\'.", "165548477"],
       [128, 42, 8, "Argument of type \'string | undefined\' is not assignable to parameter of type \'string\'.\\n  Type \'undefined\' is not assignable to type \'string\'.", "4039656867"],
