@@ -35,7 +35,7 @@ declare global {
 }
 
 @singleton()
-export class Core extends Account {
+export class Core extends Account<Uint8Array> {
   constructor(apiClient = container.resolve(APIClient)) {
     super(apiClient, {
       createStore: (storeName, context) => {

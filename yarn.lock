@@ -3274,10 +3274,10 @@
     logdown "3.3.1"
     rimraf "3.0.2"
 
-"@wireapp/core@27.6.0":
-  version "27.6.0"
-  resolved "https://registry.yarnpkg.com/@wireapp/core/-/core-27.6.0.tgz#acd859cc8a8ee5396fdb4078fa3c4bb739f98f6a"
-  integrity sha512-7MXPQC5ZgII7t25ga06yZfmY8jvEgvIjgXVXlClRl5DEweuLBdwVgSMRbI7V7M0pqTrawD3yVcE+9fi1mL+95w==
+"@wireapp/core@28.0.0":
+  version "28.0.0"
+  resolved "https://registry.yarnpkg.com/@wireapp/core/-/core-28.0.0.tgz#325fc4f913a9b454c435b3f335f990d1cd54b580"
+  integrity sha512-YHpLQAaUg4dGXm05as3wFfTF1m6e7JmNHUuRd3T1sBIbXG01vuyhAThEya3X0nHQgz4VJs6d+1lihiheGa2tEA==
   dependencies:
     "@open-wc/webpack-import-meta-loader" "0.4.7"
     "@otak/core-crypto" "0.2.0-beta-3"
