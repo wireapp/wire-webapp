@@ -1100,9 +1100,6 @@ exports[`stricter compilation`] = {
       [95, 9, 7, "Property \'dispose\' does not exist on type \'{} | Config\'.\\n  Property \'dispose\' does not exist on type \'{}\'.", "2810921618"],
       [98, 11, 15, "Property \'hasVisibleClass\' does not exist on type \'{} | Config\'.\\n  Property \'hasVisibleClass\' does not exist on type \'{}\'.", "2672704031"]
     ],
-    "src/script/components/panel/EnrichedFields.tsx:57735554": [
-      [77, 6, 14, "Type \'({ onFieldsLoaded, showDomain, richProfileRepository, user, }: EnrichedFieldsProps) => false | Element\' is not assignable to type \'FC<EnrichedFieldsProps>\'.\\n  Type \'false | Element\' is not assignable to type \'ReactElement<any, any> | null\'.\\n    Type \'boolean\' is not assignable to type \'ReactElement<any, any>\'.", "3281877902"]
-    ],
     "src/script/components/panel/PanelActions/PanelActions.test.ts:3957570535": [
       [30, 55, 30, "Argument of type \'Element | null\' is not assignable to parameter of type \'Element\'.\\n  Type \'null\' is not assignable to type \'Element\'.", "923794636"],
       [43, 11, 15, "Object is possibly \'null\'.", "3285363318"],
