@@ -8,7 +8,7 @@ exports[`"Title" renders (dark theme) 1`] = `
 }
 
 .emotion-1 {
-  color: #696c6e;
+  color: #fff;
   display: block;
   font-size: 32px;
   font-weight: 600;
@@ -36,7 +36,7 @@ exports[`"Title" renders 1`] = `
 }
 
 .emotion-1 {
-  color: #696c6e;
+  color: rgb(29, 30, 31);
   display: block;
   font-size: 32px;
   font-weight: 600;

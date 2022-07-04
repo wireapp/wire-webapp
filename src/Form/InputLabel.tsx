@@ -20,6 +20,7 @@
 /** @jsx jsx */
 import {jsx} from '@emotion/react';
 import {COLOR_V2} from '../Identity';
+import type {Theme} from '../Layout';
 import React, {FC, ReactNode} from 'react';
 
 export interface InputLabelProps {
@@ -32,12 +33,12 @@ export interface InputLabelProps {
 const InputLabel: FC<InputLabelProps> = ({htmlFor, markInvalid, isRequired, children, ...props}) => (
   <label
     htmlFor={htmlFor}
-    css={{
+    css={(theme: Theme) => ({
       fontSize: '14px',
       fontWeight: 400,
       lineHeight: '16px',
-      color: markInvalid ? COLOR_V2.RED_LIGHT_500 : COLOR_V2.GRAY_80,
-    }}
+      color: markInvalid ? COLOR_V2.RED_LIGHT_500 : theme.Input.labelColor,
+    })}
     {...props}
   >
     {children}

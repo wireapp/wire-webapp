@@ -20,23 +20,38 @@ exports[`"Checkbox" renders (dark theme) 1`] = `
   -ms-flex-pack: start;
   -webkit-justify-content: flex-start;
   justify-content: flex-start;
+  position: relative;
+  left: -0.3rem;
 }
 
 .emotion-2 {
-  line-height: 22px;
+  position: relative;
+  line-height: 1.4;
   display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
   display: flex;
   opacity: 1;
+  cursor: pointer;
 }
 
 .wireinput:checked+.emotion-2::before {
-  background: #0667c8 url('data:image/svg+xml; utf8, <svg width="15" height="13" viewBox="0 0 16 13" xmlns="http://www.w3.org/2000/svg"><path d="M5.65685 12.0711L15.9842 1.62738L14.57 0.213167L5.65685 9.24264L1.41421 5L0 6.41421L5.65685 12.0711Z" fill="white"/></svg>') no-repeat center;
+  background: #0667c8;
   border-color: #0667c8;
 }
 
-.wireinput:focus+.emotion-2::before {
+.wireinput:checked+.emotion-2>svg {
+  fill: #000;
+}
+
+.wireinput+.emotion-2>svg {
+  fill: none;
+  position: absolute;
+  left: -0.75rem;
+  top: 0.25rem;
+}
+
+.wireinput:focus-visible+.emotion-2::before {
   border-color: #0667c8;
 }
 
@@ -44,7 +59,7 @@ exports[`"Checkbox" renders (dark theme) 1`] = `
   border-color: #0667c8;
 }
 
-.emotion-2::before {
+.wireinput+.emotion-2::before {
   background: #edeff0;
   border: 1.5px solid #54585f;
   border-radius: 3px;
@@ -52,9 +67,10 @@ exports[`"Checkbox" renders (dark theme) 1`] = `
   content: "";
   display: inline-block;
   height: 22px;
-  line-height: 22px;
+  line-height: 1.4;
   margin: 0 8px 0 -16px;
   width: 22px;
+  color: #fff;
 }
 
 .emotion-2 a {
@@ -92,6 +108,7 @@ exports[`"Checkbox" renders (dark theme) 1`] = `
       id="1"
       style={
         Object {
+          "cursor": "pointer",
           "height": "22px",
           "marginBottom": "0",
           "opacity": 0,
@@ -105,6 +122,16 @@ exports[`"Checkbox" renders (dark theme) 1`] = `
       htmlFor="1"
     >
       Checkbox
+      <svg
+        height="13"
+        viewBox="0 0 16 13"
+        width="15"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <path
+          d="M5.65685 12.0711L15.9842 1.62738L14.57 0.213167L5.65685 9.24264L1.41421 5L0 6.41421L5.65685 12.0711Z"
+        />
+      </svg>
     </label>
   </div>
 </div>
@@ -130,23 +157,38 @@ exports[`"Checkbox" renders 1`] = `
   -ms-flex-pack: start;
   -webkit-justify-content: flex-start;
   justify-content: flex-start;
+  position: relative;
+  left: -0.3rem;
 }
 
 .emotion-2 {
-  line-height: 22px;
+  position: relative;
+  line-height: 1.4;
   display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
   display: flex;
   opacity: 1;
+  cursor: pointer;
 }
 
 .wireinput:checked+.emotion-2::before {
-  background: #0667c8 url('data:image/svg+xml; utf8, <svg width="15" height="13" viewBox="0 0 16 13" xmlns="http://www.w3.org/2000/svg"><path d="M5.65685 12.0711L15.9842 1.62738L14.57 0.213167L5.65685 9.24264L1.41421 5L0 6.41421L5.65685 12.0711Z" fill="white"/></svg>') no-repeat center;
+  background: #0667c8;
   border-color: #0667c8;
 }
 
-.wireinput:focus+.emotion-2::before {
+.wireinput:checked+.emotion-2>svg {
+  fill: rgb(237, 237, 238);
+}
+
+.wireinput+.emotion-2>svg {
+  fill: none;
+  position: absolute;
+  left: -0.75rem;
+  top: 0.25rem;
+}
+
+.wireinput:focus-visible+.emotion-2::before {
   border-color: #0667c8;
 }
 
@@ -154,17 +196,18 @@ exports[`"Checkbox" renders 1`] = `
   border-color: #0667c8;
 }
 
-.emotion-2::before {
+.wireinput+.emotion-2::before {
   background: #edeff0;
-  border: 1.5px solid #54585f;
+  border: 1.5px solid #edeff0;
   border-radius: 3px;
   box-sizing: border-box;
   content: "";
   display: inline-block;
   height: 22px;
-  line-height: 22px;
+  line-height: 1.4;
   margin: 0 8px 0 -16px;
   width: 22px;
+  color: rgb(29, 30, 31);
 }
 
 .emotion-2 a {
@@ -202,6 +245,7 @@ exports[`"Checkbox" renders 1`] = `
       id="1"
       style={
         Object {
+          "cursor": "pointer",
           "height": "22px",
           "marginBottom": "0",
           "opacity": 0,
@@ -215,6 +259,16 @@ exports[`"Checkbox" renders 1`] = `
       htmlFor="1"
     >
       Check
+      <svg
+        height="13"
+        viewBox="0 0 16 13"
+        width="15"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <path
+          d="M5.65685 12.0711L15.9842 1.62738L14.57 0.213167L5.65685 9.24264L1.41421 5L0 6.41421L5.65685 12.0711Z"
+        />
+      </svg>
     </label>
   </div>
 </div>
@@ -240,23 +294,38 @@ exports[`"Checkbox" renders as invalid 1`] = `
   -ms-flex-pack: start;
   -webkit-justify-content: flex-start;
   justify-content: flex-start;
+  position: relative;
+  left: -0.3rem;
 }
 
 .emotion-2 {
-  line-height: 22px;
+  position: relative;
+  line-height: 1.4;
   display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
   display: flex;
   opacity: 1;
+  cursor: pointer;
 }
 
 .wireinput:checked+.emotion-2::before {
-  background: #0667c8 url('data:image/svg+xml; utf8, <svg width="15" height="13" viewBox="0 0 16 13" xmlns="http://www.w3.org/2000/svg"><path d="M5.65685 12.0711L15.9842 1.62738L14.57 0.213167L5.65685 9.24264L1.41421 5L0 6.41421L5.65685 12.0711Z" fill="white"/></svg>') no-repeat center;
+  background: #0667c8;
   border-color: #0667c8;
 }
 
-.wireinput:focus+.emotion-2::before {
+.wireinput:checked+.emotion-2>svg {
+  fill: rgb(237, 237, 238);
+}
+
+.wireinput+.emotion-2>svg {
+  fill: none;
+  position: absolute;
+  left: -0.75rem;
+  top: 0.25rem;
+}
+
+.wireinput:focus-visible+.emotion-2::before {
   border-color: #0667c8;
 }
 
@@ -264,7 +333,7 @@ exports[`"Checkbox" renders as invalid 1`] = `
   border-color: #0667c8;
 }
 
-.emotion-2::before {
+.wireinput+.emotion-2::before {
   background: #edeff0;
   border: 1.5px solid #c20013;
   border-radius: 3px;
@@ -272,9 +341,10 @@ exports[`"Checkbox" renders as invalid 1`] = `
   content: "";
   display: inline-block;
   height: 22px;
-  line-height: 22px;
+  line-height: 1.4;
   margin: 0 8px 0 -16px;
   width: 22px;
+  color: rgb(29, 30, 31);
 }
 
 .emotion-2 a {
@@ -312,6 +382,7 @@ exports[`"Checkbox" renders as invalid 1`] = `
       id="1"
       style={
         Object {
+          "cursor": "pointer",
           "height": "22px",
           "marginBottom": "0",
           "opacity": 0,
@@ -325,6 +396,16 @@ exports[`"Checkbox" renders as invalid 1`] = `
       htmlFor="1"
     >
       Check
+      <svg
+        height="13"
+        viewBox="0 0 16 13"
+        width="15"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <path
+          d="M5.65685 12.0711L15.9842 1.62738L14.57 0.213167L5.65685 9.24264L1.41421 5L0 6.41421L5.65685 12.0711Z"
+        />
+      </svg>
     </label>
   </div>
 </div>
@@ -350,33 +431,49 @@ exports[`"Checkbox" renders disabled 1`] = `
   -ms-flex-pack: start;
   -webkit-justify-content: flex-start;
   justify-content: flex-start;
+  position: relative;
+  left: -0.3rem;
 }
 
 .emotion-2 {
-  line-height: 22px;
+  position: relative;
+  line-height: 1.4;
   display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
   display: flex;
   opacity: 0.56;
+  cursor: not-allowed;
 }
 
 .wireinput:checked+.emotion-2::before {
-  background: #9fa1a7 url('data:image/svg+xml; utf8, <svg width="15" height="13" viewBox="0 0 16 13" xmlns="http://www.w3.org/2000/svg"><path d="M5.65685 12.0711L15.9842 1.62738L14.57 0.213167L5.65685 9.24264L1.41421 5L0 6.41421L5.65685 12.0711Z" fill="white"/></svg>') no-repeat center;
+  background: #edeff0;
   border-color: #0667c8;
 }
 
-.emotion-2::before {
-  background: #fafafa;
+.wireinput:checked+.emotion-2>svg {
+  fill: rgb(237, 237, 238);
+}
+
+.wireinput+.emotion-2>svg {
+  fill: none;
+  position: absolute;
+  left: -0.75rem;
+  top: 0.25rem;
+}
+
+.wireinput+.emotion-2::before {
+  background: #edeff0;
   border: 1.5px solid #9fa1a7;
   border-radius: 3px;
   box-sizing: border-box;
   content: "";
   display: inline-block;
   height: 22px;
-  line-height: 22px;
+  line-height: 1.4;
   margin: 0 8px 0 -16px;
   width: 22px;
+  color: rgb(29, 30, 31);
 }
 
 .emotion-2 a {
@@ -415,6 +512,7 @@ exports[`"Checkbox" renders disabled 1`] = `
       id="1"
       style={
         Object {
+          "cursor": "not-allowed",
           "height": "22px",
           "marginBottom": "0",
           "opacity": 0,
@@ -429,6 +527,16 @@ exports[`"Checkbox" renders disabled 1`] = `
       htmlFor="1"
     >
       Check
+      <svg
+        height="13"
+        viewBox="0 0 16 13"
+        width="15"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <path
+          d="M5.65685 12.0711L15.9842 1.62738L14.57 0.213167L5.65685 9.24264L1.41421 5L0 6.41421L5.65685 12.0711Z"
+        />
+      </svg>
     </label>
   </div>
 </div>
