@@ -996,7 +996,9 @@ export class ConversationService {
       );
     }
     await Promise.all(sendingPromises);
-    return newConversation;
+
+    // We fetch the fresh version of the conversation created on backend with the newly added users
+    return this.getConversations(newConversation.id);
   }
 
   public async getConversations(conversationId: string): Promise<Conversation>;
