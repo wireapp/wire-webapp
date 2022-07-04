@@ -2144,11 +2144,6 @@ exports[`stricter compilation`] = {
     "src/script/page/LeftSidebar/panels/StartUI/components/GroupList.test.tsx:87150494": [
       [34, 63, 38, "Argument of type \'Element | null\' is not assignable to parameter of type \'Element\'.\\n  Type \'null\' is not assignable to type \'Element\'.", "495210063"]
     ],
-    "src/script/page/LeftSidebar/panels/StartUI/components/topPeople/TopContact.tsx:3148560411": [
-      [53, 8, 11, "Cannot invoke an object which is possibly \'undefined\'.", "110900827"],
-      [55, 48, 11, "Object is possibly \'undefined\'.", "110900827"],
-      [55, 48, 11, "No overload matches this call.\\n  Overload 1 of 6, \'(this: (this: undefined, arg0: User, arg1: MouseEvent<Element, MouseEvent>) => void, thisArg: undefined, arg0: User, arg1: MouseEvent<Element, MouseEvent>): () => void\', gave the following error.\\n    The \'this\' context of type \'((userEntity: User, event: MouseEvent<Element, MouseEvent>) => void) | undefined\' is not assignable to method\'s \'this\' of type \'(this: undefined, arg0: User, arg1: MouseEvent<Element, MouseEvent>) => void\'.\\n      Type \'undefined\' is not assignable to type \'(this: undefined, arg0: User, arg1: MouseEvent<Element, MouseEvent>) => void\'.\\n  Overload 2 of 6, \'(this: (this: undefined, ...args: User[]) => void, thisArg: undefined, ...args: User[]): (...args: User[]) => void\', gave the following error.\\n    The \'this\' context of type \'((userEntity: User, event: MouseEvent<Element, MouseEvent>) => void) | undefined\' is not assignable to method\'s \'this\' of type \'(this: undefined, ...args: User[]) => void\'.\\n      Type \'undefined\' is not assignable to type \'(this: undefined, ...args: User[]) => void\'.", "110900827"]
-    ],
     "src/script/page/MainContent/MainContent.tsx:3648818950": [
       [85, 28, 12, "Type \'Conversation | null\' is not assignable to type \'Conversation\'.\\n  Type \'null\' is not assignable to type \'Conversation\'.", "1670678216"]
     ],
