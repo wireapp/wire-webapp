@@ -153,10 +153,10 @@ export class ClientAPI {
    * Claim one key package for each client of the given user
    * @param  {string} userId The user to claim the key packages for
    * @param {string} userDomain The domain of the user
-   * @param  {string} skipOwn Do not claim a key package for the given own client
+   * @param  {string} skipOwn Do not claim a key package for the given own client id
    * @see https://staging-nginz-https.zinfra.io/api/swagger-ui/#/default/post_mls_key_packages_claim__user_domain___user_
    */
-  public async claimMLSKeyPackages(userId: string, userDomain: string, skipOwn: string): Promise<ClaimedKeyPackages> {
+  public async claimMLSKeyPackages(userId: string, userDomain: string, skipOwn?: string): Promise<ClaimedKeyPackages> {
     const config: AxiosRequestConfig = {
       method: 'POST',
       url: `/${ClientAPI.URL.MLS_CLIENTS}/${ClientAPI.URL.MLS_KEY_PACKAGES}/claim/${userDomain}/${userId}${
