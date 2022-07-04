@@ -730,13 +730,6 @@ exports[`stricter compilation`] = {
     "src/script/components/MessagesList/Message/ContentMessage/asset/FileAssetComponent.test.tsx:1016943020": [
       [34, 22, 39, "Object is possibly \'null\'.", "1572638209"]
     ],
-    "src/script/components/MessagesList/Message/ContentMessage/asset/FileAssetComponent.tsx:2719195984": [
-      [43, 6, 18, "Type \'({ message, hasHeader, teamState, }: FileAssetProps) => false | Element\' is not assignable to type \'FC<FileAssetProps>\'.\\n  Type \'false | Element\' is not assignable to type \'ReactElement<any, any> | null\'.\\n    Type \'boolean\' is not assignable to type \'ReactElement<any, any>\'.", "3519699612"],
-      [62, 22, 14, "Object is possibly \'undefined\'.", "2156033467"],
-      [62, 44, 14, "Object is possibly \'undefined\'.", "2156033467"],
-      [106, 31, 12, "Type \'number | undefined\' is not assignable to type \'number\'.\\n  Type \'undefined\' is not assignable to type \'number\'.", "3813716702"],
-      [109, 45, 12, "Type \'number | undefined\' is not assignable to type \'number\'.\\n  Type \'undefined\' is not assignable to type \'number\'.", "3813716702"]
-    ],
     "src/script/components/MessagesList/Message/ContentMessage/asset/ImageAsset.test.ts:3331662495": [
       [54, 19, 17, "Object is possibly \'null\'.", "901686138"],
       [80, 21, 17, "Object is possibly \'null\'.", "901686138"]
@@ -2090,18 +2083,6 @@ exports[`stricter compilation`] = {
     "src/script/page/LeftSidebar/panels/Conversations/GroupedConversationHeader.test.ts:3219319072": [
       [62, 11, 11, "Object is possibly \'null\'.", "3168726921"]
     ],
-    "src/script/page/LeftSidebar/panels/Conversations/GroupedConversations.tsx:3926241606": [
-      [106, 25, 2, "Property \'id\' does not exist on type \'0 | ConversationLabel\'.\\n  Property \'id\' does not exist on type \'0\'.", "5861160"],
-      [106, 38, 13, "Property \'conversations\' does not exist on type \'0 | ConversationLabel\'.\\n  Property \'conversations\' does not exist on type \'0\'.", "3592773563"],
-      [107, 10, 6, "Type \'0 | ConversationLabel\' is not assignable to type \'ConversationLabel\'.\\n  Type \'number\' is not assignable to type \'ConversationLabel\'.", "1353197619"]
-    ],
-    "src/script/page/LeftSidebar/panels/ListWrapper.tsx:4099755336": [
-      [87, 44, 8, "No overload matches this call.\\n  Overload 1 of 2, \'(type: \\"scroll\\", listener: (this: HTMLDivElement, ev: Event) => any, options?: boolean | AddEventListenerOptions | undefined): void\', gave the following error.\\n    Argument of type \'(event: MouseEvent) => void\' is not assignable to parameter of type \'(this: HTMLDivElement, ev: Event) => any\'.\\n      Types of parameters \'event\' and \'ev\' are incompatible.\\n        Type \'Event\' is not assignable to type \'MouseEvent\'.\\n  Overload 2 of 2, \'(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | AddEventListenerOptions | undefined): void\', gave the following error.\\n    Argument of type \'(event: MouseEvent) => void\' is not assignable to parameter of type \'EventListenerOrEventListenerObject\'.", "1317952297"],
-      [89, 60, 8, "No overload matches this call.\\n  Overload 1 of 2, \'(type: \\"scroll\\", listener: (this: HTMLDivElement, ev: Event) => any, options?: boolean | EventListenerOptions | undefined): void\', gave the following error.\\n    Argument of type \'(event: MouseEvent) => void\' is not assignable to parameter of type \'(this: HTMLDivElement, ev: Event) => any\'.\\n      Types of parameters \'event\' and \'ev\' are incompatible.\\n        Type \'Event\' is missing the following properties from type \'MouseEvent\': altKey, button, buttons, clientX, and 21 more.\\n  Overload 2 of 2, \'(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | EventListenerOptions | undefined): void\', gave the following error.\\n    Argument of type \'(event: MouseEvent) => void\' is not assignable to parameter of type \'EventListenerOrEventListenerObject\'.\\n      Type \'(event: MouseEvent) => void\' is not assignable to type \'EventListener\'.\\n        Types of parameters \'event\' and \'evt\' are incompatible.\\n          Type \'Event\' is not assignable to type \'MouseEvent\'.", "1317952297"]
-    ],
-    "src/script/page/LeftSidebar/panels/StartUI/ServicesTab.tsx:702522318": [
-      [44, 18, 7, "Argument of type \'ServiceEntity[] | undefined\' is not assignable to parameter of type \'SetStateAction<ServiceEntity[]>\'.\\n  Type \'undefined\' is not assignable to type \'SetStateAction<ServiceEntity[]>\'.", "1366156959"]
-    ],
     "src/script/page/LeftSidebar/panels/StartUI/components/GroupList.test.tsx:87150494": [
       [34, 63, 38, "Argument of type \'Element | null\' is not assignable to parameter of type \'Element\'.\\n  Type \'null\' is not assignable to type \'Element\'.", "495210063"]
     ],
@@ -2156,9 +2137,6 @@ exports[`stricter compilation`] = {
       [64, 82, 5, "Object is of type \'unknown\'.", "165548477"],
       [65, 16, 4, "Argument of type \'null\' is not assignable to parameter of type \'SetStateAction<MediaStream | undefined>\'.", "2087897566"],
       [109, 84, 11, "Type \'MediaStream | undefined\' is not assignable to type \'MediaStream\'.\\n  Type \'undefined\' is not assignable to type \'MediaStream\'.", "4175552125"]
-    ],
-    "src/script/page/MainContent/panels/preferences/components/PreferencesCheckbox.tsx:2721392659": [
-      [49, 10, 7, "Type \'string | undefined\' is not assignable to type \'string\'.\\n  Type \'undefined\' is not assignable to type \'string\'.", "3123876731"]
     ],
     "src/script/page/MainContent/panels/preferences/devices/DeviceDetailsPreferences.test.tsx:2030460021": [
       [34, 41, 22, "Cannot invoke an object which is possibly \'undefined\'.", "1980738780"],
