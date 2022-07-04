@@ -60,7 +60,12 @@ export interface FeatureClassifiedDomainsConfig extends FeatureConfig {
   domains: string[];
 }
 export interface FeatureMLSConfig extends FeatureConfig {
-  allowList: string[];
+  config: {
+    allowedCipherSuites: number[];
+    defaultCipherSuite: number;
+    defaultProtocol: 'proteus' | 'mls';
+    protocolToggleUsers: string[];
+  };
 }
 
 export type FeatureAppLock = Feature<FeatureAppLockConfig>;
