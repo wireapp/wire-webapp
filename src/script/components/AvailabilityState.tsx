@@ -73,12 +73,10 @@ const AvailabilityState: React.FC<AvailabilityStateProps> = ({
         clientY: top + height,
       });
 
-      if (onClick) {
-        onClick({
-          ...event,
-          nativeEvent: newEvent,
-        } as unknown as React.MouseEvent<Element, MouseEvent>);
-      }
+      onClick?.({
+        ...event,
+        nativeEvent: newEvent,
+      } as unknown as React.MouseEvent<Element, MouseEvent>);
     }
   };
 
