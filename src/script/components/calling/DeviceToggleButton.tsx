@@ -28,9 +28,7 @@ export interface DeviceToggleButtonProps {
 }
 
 const DeviceToggleButton: React.FC<DeviceToggleButtonProps> = ({currentDevice, devices, onChooseDevice, styles}) => {
-  const selectNextDevice = (
-    event: React.MouseEvent<HTMLDivElement, MouseEvent> | React.KeyboardEvent<HTMLDivElement>,
-  ) => {
+  const selectNextDevice = (event: React.UIEvent) => {
     event.preventDefault();
     event.stopPropagation();
     const currentDeviceIndex = devices.indexOf(currentDevice);

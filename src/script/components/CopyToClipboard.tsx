@@ -26,9 +26,7 @@ export interface CopyToClipboardProps {
 }
 
 const CopyToClipboard: React.FC<CopyToClipboardProps> = ({text}) => {
-  const onClick = ({
-    currentTarget,
-  }: React.MouseEvent<HTMLDivElement, MouseEvent> | React.KeyboardEvent<HTMLDivElement>) => {
+  const onClick = ({currentTarget}: React.UIEvent) => {
     if (window.getSelection) {
       const selectionRange = document.createRange();
       selectionRange.selectNode(currentTarget);
