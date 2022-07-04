@@ -114,10 +114,6 @@ exports[`stricter compilation`] = {
       [85, 8, 3, "Type \'MutableRefObject<HTMLInputElement | undefined>\' is not assignable to type \'((instance: HTMLInputElement | null) => void) | RefObject<HTMLInputElement> | null | undefined\'.", "193432436"],
       [102, 8, 3, "Type \'MutableRefObject<HTMLInputElement | undefined>\' is not assignable to type \'((instance: HTMLInputElement | null) => void) | RefObject<HTMLInputElement> | null | undefined\'.", "193432436"]
     ],
-    "src/script/auth/component/PhoneLoginForm.tsx:1266572804": [
-      [89, 12, 3, "Type \'MutableRefObject<undefined>\' is not assignable to type \'((instance: HTMLInputElement | null) => void) | RefObject<HTMLInputElement> | null | undefined\'.\\n  Type \'MutableRefObject<undefined>\' is not assignable to type \'RefObject<HTMLInputElement>\'.\\n    Types of property \'current\' are incompatible.\\n      Type \'undefined\' is not assignable to type \'HTMLInputElement | null\'.", "193432436"],
-      [99, 12, 3, "Type \'MutableRefObject<undefined>\' is not assignable to type \'((instance: HTMLInputElement | null) => void) | RefObject<HTMLInputElement> | null | undefined\'.", "193432436"]
-    ],
     "src/script/auth/component/RouterLink.tsx:4241768683": [
       [26, 59, 43, "Type \'(theme: Theme) => CSSObject\' is not assignable to type \'Interpolation<Theme>\'.\\n  Type \'(theme: Theme) => CSSObject\' is not assignable to type \'FunctionInterpolation<Theme>\'.\\n    Types of parameters \'theme\' and \'props\' are incompatible.\\n      Type \'import(\\"wire-webapp/node_modules/@emotion/react/types/index\\").Theme\' is not assignable to type \'import(\\"wire-webapp/node_modules/@wireapp/react-ui-kit/src/Layout/Theme\\").Theme\'.", "1560990654"]
     ],
