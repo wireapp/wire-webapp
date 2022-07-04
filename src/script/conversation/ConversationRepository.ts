@@ -396,10 +396,7 @@ export class ConversationRepository {
      * we need to add this creator_client to conversation creation payload
      * for creating MLS conversations
      */
-    if (
-      this.teamState.isMLSEnabled() ||
-      true // @todo remove hard code
-    ) {
+    if (this.teamState.isMLSEnabled()) {
       payload.creator_client = this.clientState.currentClient().id;
       payload.selfUserId = this.userState.self().qualifiedId;
     }
