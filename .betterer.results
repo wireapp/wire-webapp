@@ -2106,9 +2106,6 @@ exports[`stricter compilation`] = {
       [52, 10, 5, "Type \'HTMLInputElement | null\' is not assignable to type \'HTMLInputElement\'.\\n  Type \'null\' is not assignable to type \'HTMLInputElement\'.", "178805363"],
       [93, 12, 5, "Type \'HTMLInputElement | null\' is not assignable to type \'HTMLInputElement\'.\\n  Type \'null\' is not assignable to type \'HTMLInputElement\'.", "178805363"]
     ],
-    "src/script/page/AccentColorPicker.tsx:609208269": [
-      [56, 38, 34, "Argument of type \'(key: keyof typeof ACCENT_ID) => EmotionJSX.Element\' is not assignable to parameter of type \'(value: string, index: number, array: string[]) => Element\'.\\n  Types of parameters \'key\' and \'value\' are incompatible.\\n    Type \'string\' is not assignable to type \'\\"AMBER\\" | \\"BLUE\\" | \\"GREEN\\" | \\"PURPLE\\" | \\"RED\\" | \\"TURQUOISE\\"\'.", "2706456082"]
-    ],
     "src/script/page/AppLock.test.ts:262111532": [
       [50, 59, 22, "Argument of type \'Element | null\' is not assignable to parameter of type \'Element\'.\\n  Type \'null\' is not assignable to type \'Element\'.", "316356198"],
       [52, 33, 14, "Argument of type \'Element | null\' is not assignable to parameter of type \'Element\'.\\n  Type \'null\' is not assignable to type \'Element\'.", "3534045292"],
