@@ -2205,12 +2205,6 @@ exports[`stricter compilation`] = {
       [56, 10, 5, "Object is of type \'unknown\'.", "165548477"],
       [59, 10, 5, "Object is of type \'unknown\'.", "165548477"]
     ],
-    "src/script/page/MainContent/panels/preferences/accountPreferences/FileInput.tsx:2008057001": [
-      [27, 6, 9, "Type \'ForwardRefExoticComponent<Pick<FileInputProps, \\"start\\" | \\"hidden\\" | \\"color\\" | \\"content\\" | \\"size\\" | \\"style\\" | \\"default\\" | \\"wrap\\" | \\"open\\" | \\"height\\" | \\"translate\\" | \\"width\\" | \\"multiple\\" | ... 348 more ... | \\"onFileChange\\"> & RefAttributes<...>>\' is not assignable to type \'FC<FileInputProps>\'.\\n  Types of parameters \'props\' and \'props\' are incompatible.\\n    Type \'FileInputProps\' is not assignable to type \'Pick<FileInputProps, \\"start\\" | \\"hidden\\" | \\"color\\" | \\"content\\" | \\"size\\" | \\"style\\" | \\"default\\" | \\"wrap\\" | \\"open\\" | \\"height\\" | \\"translate\\" | \\"width\\" | \\"multiple\\" | ... 348 more ... | \\"onFileChange\\"> & RefAttributes<...>\'.\\n      Type \'FileInputProps\' is not assignable to type \'RefAttributes<HTMLInputElement>\'.\\n        Types of property \'ref\' are incompatible.\\n          Type \'LegacyRef<HTMLInputElement> | undefined\' is not assignable to type \'Ref<HTMLInputElement> | undefined\'.\\n            Type \'string\' is not assignable to type \'Ref<HTMLInputElement> | undefined\'.", "3080892789"],
-      [34, 12, 12, "Object is possibly \'null\'.", "3895849327"],
-      [35, 25, 12, "Argument of type \'FileList | null\' is not assignable to parameter of type \'FileList\'.\\n  Type \'null\' is not assignable to type \'FileList\'.", "3895849327"],
-      [37, 12, 12, "Type \'null\' is not assignable to type \'string\'.", "3877145201"]
-    ],
     "src/script/page/MainContent/panels/preferences/avPreferences/CameraPreferences.tsx:147485328": [
       [80, 82, 5, "Object is of type \'unknown\'.", "165548477"],
       [81, 16, 4, "Argument of type \'null\' is not assignable to parameter of type \'SetStateAction<MediaStream | undefined>\'.", "2087897566"],
