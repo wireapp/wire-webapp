@@ -2211,9 +2211,6 @@ exports[`stricter compilation`] = {
       [35, 25, 12, "Argument of type \'FileList | null\' is not assignable to parameter of type \'FileList\'.\\n  Type \'null\' is not assignable to type \'FileList\'.", "3895849327"],
       [37, 12, 12, "Type \'null\' is not assignable to type \'string\'.", "3877145201"]
     ],
-    "src/script/page/MainContent/panels/preferences/accountPreferences/HistoryBackupSection.tsx:3752447778": [
-      [36, 4, 20, "Object is possibly \'null\'.", "2235498147"]
-    ],
     "src/script/page/MainContent/panels/preferences/avPreferences/CameraPreferences.tsx:147485328": [
       [80, 82, 5, "Object is of type \'unknown\'.", "165548477"],
       [81, 16, 4, "Argument of type \'null\' is not assignable to parameter of type \'SetStateAction<MediaStream | undefined>\'.", "2087897566"],
