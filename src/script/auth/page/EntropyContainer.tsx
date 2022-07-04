@@ -34,7 +34,7 @@ interface Props extends React.HTMLProps<HTMLDivElement> {
 const EntropyContainer = ({onSetEntropy}: Props) => {
   const {formatMessage: _} = useIntl();
   const [entropy, setEntropy] = useState<[number, number][]>([]);
-  const [pause, setPause] = useState<boolean>(undefined);
+  const [pause, setPause] = useState<boolean>();
   const [percent, setPercent] = useState(0);
 
   const frames = entropy.filter(Boolean).length;
@@ -82,7 +82,7 @@ const EntropyContainer = ({onSetEntropy}: Props) => {
             onSetEntropy={onSetEntropy}
             onProgress={onProgress}
           />
-          <ProgressBar error={pause} width={256} percent={percent} />
+          <ProgressBar error={!!pause} width={256} percent={percent} />
           <Text data-uie-name="element-entropy-percent" center>
             {percent}%
           </Text>

@@ -54,7 +54,7 @@ const AccentColorPicker: React.FunctionComponent<AccentColorPickerProps> = ({use
             justifyContent: 'space-between',
           }}
         >
-          {Object.keys(ACCENT_ID).map((key: keyof typeof ACCENT_ID) => {
+          {(Object.keys(ACCENT_ID) as (keyof typeof ACCENT_ID)[]).map(key => {
             const id = ACCENT_ID[key];
             const name = t(`preferencesAccountAccentColor${key}`);
             const color = User.ACCENT_COLOR[id];

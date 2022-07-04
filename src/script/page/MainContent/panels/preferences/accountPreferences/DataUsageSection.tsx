@@ -68,7 +68,7 @@ const DataUsageSection: React.FC<DataUsageSectionProps> = ({
   return (
     <PreferencesSection hasSeparator title={t('preferencesAccountData')} className="preferences-section-data-usage">
       <PreferencesCheckbox
-        checked={optionPrivacy}
+        checked={!!optionPrivacy}
         onChange={checked => {
           propertiesRepository.savePreference(PROPERTIES_TYPE.PRIVACY, checked);
           setOptionPrivacy(checked);
@@ -80,7 +80,7 @@ const DataUsageSection: React.FC<DataUsageSectionProps> = ({
 
       {isTeam && isCountlyEnabled && (
         <PreferencesCheckbox
-          checked={optionTelemetry}
+          checked={!!optionTelemetry}
           onChange={checked => {
             propertiesRepository.savePreference(PROPERTIES_TYPE.TELEMETRY_SHARING, checked);
             setOptionTelemetry(checked);
