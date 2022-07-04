@@ -2132,11 +2132,6 @@ exports[`stricter compilation`] = {
     "src/script/page/LeftSidebar/panels/Conversations/GroupedConversationHeader.test.ts:3219319072": [
       [62, 11, 11, "Object is possibly \'null\'.", "3168726921"]
     ],
-    "src/script/page/LeftSidebar/panels/Conversations/GroupedConversations.tsx:3926241606": [
-      [106, 25, 2, "Property \'id\' does not exist on type \'0 | ConversationLabel\'.\\n  Property \'id\' does not exist on type \'0\'.", "5861160"],
-      [106, 38, 13, "Property \'conversations\' does not exist on type \'0 | ConversationLabel\'.\\n  Property \'conversations\' does not exist on type \'0\'.", "3592773563"],
-      [107, 10, 6, "Type \'0 | ConversationLabel\' is not assignable to type \'ConversationLabel\'.\\n  Type \'number\' is not assignable to type \'ConversationLabel\'.", "1353197619"]
-    ],
     "src/script/page/LeftSidebar/panels/StartUI/components/GroupList.test.tsx:87150494": [
       [34, 63, 38, "Argument of type \'Element | null\' is not assignable to parameter of type \'Element\'.\\n  Type \'null\' is not assignable to type \'Element\'.", "495210063"]
     ],
