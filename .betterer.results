@@ -74,9 +74,6 @@ exports[`stricter compilation`] = {
       [226, 8, 3, "Type \'MutableRefObject<HTMLInputElement | undefined>\' is not assignable to type \'((instance: HTMLInputElement | null) => void) | RefObject<HTMLInputElement> | null | undefined\'.\\n  Type \'MutableRefObject<HTMLInputElement | undefined>\' is not assignable to type \'RefObject<HTMLInputElement>\'.", "193432436"],
       [228, 10, 20, "Object is possibly \'undefined\'.", "3805711124"]
     ],
-    "src/script/auth/component/AppAlreadyOpen.tsx:1094893852": [
-      [78, 60, 14, "Argument of type \'({ isAppAlreadyOpen, fullscreen, removeCookie }: AppAlreadyOpenProps) => false | EmotionJSX.Element\' is not assignable to parameter of type \'ComponentType<never>\'.\\n  Type \'({ isAppAlreadyOpen, fullscreen, removeCookie }: AppAlreadyOpenProps) => false | EmotionJSX.Element\' is not assignable to type \'FunctionComponent<never>\'.\\n    Type \'false | Element\' is not assignable to type \'ReactElement<any, any> | null\'.", "158714422"]
-    ],
     "src/script/auth/component/ClientItem.tsx:281272235": [
       [149, 9, 21, "Object is possibly \'undefined\'.", "4077427211"],
       [151, 8, 21, "Object is possibly \'undefined\'.", "4077427211"],
@@ -323,9 +320,7 @@ exports[`stricter compilation`] = {
       [186, 30, 17, "Object is possibly \'undefined\'.", "2878566579"],
       [187, 9, 17, "Object is possibly \'undefined\'.", "2878566579"],
       [188, 61, 17, "Object is possibly \'undefined\'.", "2878566579"],
-      [236, 30, 10, "Type \'boolean | undefined\' is not assignable to type \'never\'.\\n  Type \'undefined\' is not assignable to type \'never\'.", "1476830426"],
       [256, 22, 3, "Type \'MutableRefObject<HTMLInputElement | undefined>\' is not assignable to type \'((instance: HTMLInputElement | null) => void) | RefObject<HTMLInputElement> | null | undefined\'.", "193432436"],
-      [294, 28, 10, "Type \'boolean | undefined\' is not assignable to type \'never\'.\\n  Type \'undefined\' is not assignable to type \'never\'.", "1476830426"],
       [311, 75, 15, "Argument of type \'string | undefined\' is not assignable to parameter of type \'string\'.\\n  Type \'undefined\' is not assignable to type \'string\'.", "4110106687"],
       [312, 61, 40, "Object is possibly \'undefined\'.", "2139501078"]
     ],
@@ -351,13 +346,11 @@ exports[`stricter compilation`] = {
       [210, 36, 5, "Argument of type \'unknown\' is not assignable to parameter of type \'SetStateAction<string>\'.", "165548477"],
       [234, 32, 18, "Object is possibly \'undefined\'.", "1981014711"],
       [234, 32, 24, "Argument of type \'string | undefined\' is not assignable to parameter of type \'string\'.\\n  Type \'undefined\' is not assignable to type \'string\'.", "3055772661"],
-      [269, 11, 14, "Type \'{}\' is not assignable to type \'never\'.", "158714422"],
       [294, 24, 14, "Type \'(code: string) => void\' is not assignable to type \'(completeCode?: string | undefined) => void\'.\\n  Types of parameters \'code\' and \'completeCode\' are incompatible.\\n    Type \'string | undefined\' is not assignable to type \'string\'.\\n      Type \'undefined\' is not assignable to type \'string\'.", "2059828224"]
     ],
     "src/script/auth/page/PhoneLogin.tsx:2964526712": [
       [86, 19, 5, "Argument of type \'unknown\' is not assignable to parameter of type \'SetStateAction<undefined>\'.", "165548477"],
-      [90, 19, 5, "Argument of type \'unknown\' is not assignable to parameter of type \'SetStateAction<undefined>\'.", "165548477"],
-      [108, 9, 14, "Type \'{}\' is not assignable to type \'never\'.", "158714422"]
+      [90, 19, 5, "Argument of type \'unknown\' is not assignable to parameter of type \'SetStateAction<undefined>\'.", "165548477"]
     ],
     "src/script/auth/page/Root.tsx:3928022086": [
       [130, 16, 9, "No overload matches this call.\\n  Overload 1 of 2, \'(props: (RouteProps<string, { [x: string]: string | undefined; }> & OmitNative<{}, keyof RouteProps<string, { [x: string]: string | undefined; }>>) | Readonly<...>): Route<...>\', gave the following error.\\n    Type \'false | ConnectedComponent<({ teamName, enterTeamCreationFlow, resetInviteErrors, pushAccountRegistrationData, authError, }: Props & { authError: Error; teamName: string; } & { enterTeamCreationFlow: () => Promise<void>; pushAccountRegistrationData: (registration: Partial<RegistrationDataState>) => Promise<...>; res...\' is not assignable to type \'ComponentType<any> | ComponentType<RouteComponentProps<any, StaticContext, unknown>> | undefined\'.\\n      Type \'false\' is not assignable to type \'ComponentType<any> | ComponentType<RouteComponentProps<any, StaticContext, unknown>> | undefined\'.\\n  Overload 2 of 2, \'(props: RouteProps<string, { [x: string]: string | undefined; }> & OmitNative<{}, keyof RouteProps<string, { [x: string]: string | undefined; }>>, context: any): Route<...>\', gave the following error.\\n    Type \'false | ConnectedComponent<({ teamName, enterTeamCreationFlow, resetInviteErrors, pushAccountRegistrationData, authError, }: Props & { authError: Error; teamName: string; } & { enterTeamCreationFlow: () => Promise<void>; pushAccountRegistrationData: (registration: Partial<RegistrationDataState>) => Promise<...>; res...\' is not assignable to type \'ComponentType<any> | ComponentType<RouteComponentProps<any, StaticContext, unknown>> | undefined\'.", "4247110506"],
@@ -404,8 +397,7 @@ exports[`stricter compilation`] = {
       [71, 10, 7, "Type \'undefined\' is not assignable to type \'number\'.", "1978261647"],
       [72, 10, 27, "Type \'undefined\' is not assignable to type \'(event: MessageEvent<any>) => void\'.", "667134498"],
       [73, 10, 19, "Type \'undefined\' is not assignable to type \'(event: Event) => void\'.", "568100674"],
-      [129, 6, 20, "Type \'Window | null\' is not assignable to type \'Window | undefined\'.\\n  Type \'null\' is not assignable to type \'Window | undefined\'.", "2747308432"],
-      [243, 9, 14, "Type \'{}\' is not assignable to type \'never\'.", "158714422"]
+      [129, 6, 20, "Type \'Window | null\' is not assignable to type \'Window | undefined\'.\\n  Type \'null\' is not assignable to type \'Window | undefined\'.", "2747308432"]
     ],
     "src/script/auth/page/SingleSignOnForm.tsx:2490051983": [
       [80, 59, 4, "Argument of type \'null\' is not assignable to parameter of type \'ClientType | (() => ClientType)\'.", "2087897566"],
@@ -765,7 +757,7 @@ exports[`stricter compilation`] = {
       [71, 11, 40, "Object is possibly \'null\'.", "95183934"]
     ],
     "src/script/components/MessagesList/Message/ContentMessage/asset/VideoAsset.tsx:48342831": [
-      [45, 6, 10, "Type \'({ message, isQuote, teamState, assetRepository, }: VideoAssetProps) => false | Element\' is not assignable to type \'FC<VideoAssetProps>\'.\\n  Type \'false | Element\' is not assignable to type \'ReactElement<any, any> | null\'.", "1844198436"],
+      [45, 6, 10, "Type \'({ message, isQuote, teamState, assetRepository, }: VideoAssetProps) => false | Element\' is not assignable to type \'FC<VideoAssetProps>\'.\\n  Type \'false | Element\' is not assignable to type \'ReactElement<any, any> | null\'.\\n    Type \'boolean\' is not assignable to type \'ReactElement<any, any>\'.", "1844198436"],
       [56, 59, 4, "Argument of type \'null\' is not assignable to parameter of type \'string | (() => string)\'.", "2087897566"],
       [57, 51, 4, "Argument of type \'null\' is not assignable to parameter of type \'string | (() => string)\'.", "2087897566"],
       [70, 105, 4, "Argument of type \'Blob | undefined\' is not assignable to parameter of type \'Blob | MediaSource\'.", "2087735462"],
@@ -1191,7 +1183,7 @@ exports[`stricter compilation`] = {
       [91, 45, 49, "Argument of type \'([key, value]: [keyof Conversation, string]) => void\' is not assignable to parameter of type \'(value: [string, any], index: number, array: [string, any][]) => void\'.\\n  Types of parameters \'__0\' and \'value\' are incompatible.\\n    Type \'[string, any]\' is not assignable to type \'[keyof Conversation, string]\'.\\n      Type at position 0 in source is not compatible with type at position 0 in target.\\n        Type \'string\' is not assignable to type \'keyof Conversation\'.", "2065920092"],
       [133, 39, 24, "Argument of type \'boolean | undefined\' is not assignable to parameter of type \'boolean\'.", "81006062"],
       [166, 36, 21, "Argument of type \'number | undefined\' is not assignable to parameter of type \'number\'.\\n  Type \'undefined\' is not assignable to type \'number\'.", "3907016453"],
-      [185, 41, 26, "No overload matches this call.\\n  Overload 1 of 4, \'(value: string | number | Date): Date\', gave the following error.\\n    Argument of type \'string | undefined\' is not assignable to parameter of type \'string | number | Date\'.\\n      Type \'undefined\' is not assignable to type \'string | number | Date\'.\\n  Overload 2 of 4, \'(value: string | number): Date\', gave the following error.\\n    Argument of type \'string | undefined\' is not assignable to parameter of type \'string | number\'.", "582302494"],
+      [185, 41, 26, "No overload matches this call.\\n  Overload 1 of 4, \'(value: string | number | Date): Date\', gave the following error.\\n    Argument of type \'string | undefined\' is not assignable to parameter of type \'string | number | Date\'.\\n      Type \'undefined\' is not assignable to type \'string | number | Date\'.\\n  Overload 2 of 4, \'(value: string | number): Date\', gave the following error.\\n    Argument of type \'string | undefined\' is not assignable to parameter of type \'string | number\'.\\n      Type \'undefined\' is not assignable to type \'string | number\'.", "582302494"],
       [191, 38, 23, "No overload matches this call.\\n  Overload 1 of 4, \'(value: string | number | Date): Date\', gave the following error.\\n    Argument of type \'string | undefined\' is not assignable to parameter of type \'string | number | Date\'.\\n  Overload 2 of 4, \'(value: string | number): Date\', gave the following error.\\n    Argument of type \'string | undefined\' is not assignable to parameter of type \'string | number\'.", "4035274933"],
       [274, 11, 25, "Object is possibly \'undefined\'.", "4293153287"],
       [275, 11, 94, "Argument of type \'(remoteConversationData: ConversationBackendData & {    receipt_mode: number;}, index: number) => ConversationDatabaseData\' is not assignable to parameter of type \'(value: Conversation, index: number, array: Conversation[]) => ConversationDatabaseData\'.\\n  Types of parameters \'remoteConversationData\' and \'value\' are incompatible.\\n    Type \'Conversation\' is not assignable to type \'Conversation & { receipt_mode: number; }\'.\\n      Type \'Conversation\' is not assignable to type \'{ receipt_mode: number; }\'.\\n        Types of property \'receipt_mode\' are incompatible.\\n          Type \'import(\\"wire-webapp/node_modules/@wireapp/api-client/src/conversation/data/ConversationReceiptModeUpdateData\\").RECEIPT_MODE | undefined\' is not assignable to type \'number\'.\\n            Type \'undefined\' is not assignable to type \'number\'.", "310849300"],
@@ -2117,10 +2109,6 @@ exports[`stricter compilation`] = {
       [92, 79, 34, "Argument of type \'boolean | undefined\' is not assignable to parameter of type \'boolean\'.", "212151669"],
       [120, 6, 9, "Argument of type \'undefined\' is not assignable to parameter of type \'string\'.", "2620553983"]
     ],
-    "src/script/page/MainContent/panels/preferences/OptionPreferences.tsx:3886393057": [
-      [107, 10, 8, "Type \'(audioPreference: AudioPreference) => void\' is not assignable to type \'(newValue: string) => void\'.\\n  Types of parameters \'audioPreference\' and \'newValue\' are incompatible.\\n    Type \'string\' is not assignable to type \'AudioPreference\'.", "707514658"],
-      [135, 14, 8, "Type \'(notificationsPreference: NotificationPreference) => void\' is not assignable to type \'(newValue: string) => void\'.\\n  Types of parameters \'notificationsPreference\' and \'newValue\' are incompatible.\\n    Type \'string\' is not assignable to type \'NotificationPreference\'.", "707514658"]
-    ],
     "src/script/page/MainContent/panels/preferences/accountPreferences/AccountInput.tsx:1546355455": [
       [188, 10, 4, "Type \'string | undefined\' is not assignable to type \'string\'.\\n  Type \'undefined\' is not assignable to type \'string\'.", "2087876002"],
       [189, 10, 5, "Type \'string | undefined\' is not assignable to type \'string\'.\\n  Type \'undefined\' is not assignable to type \'string\'.", "189936718"],
@@ -2133,7 +2121,8 @@ exports[`stricter compilation`] = {
     "src/script/page/MainContent/panels/preferences/accountPreferences/AvatarInput.tsx:919643938": [
       [50, 69, 9, "Argument of type \'undefined\' is not assignable to parameter of type \'string\'.", "2620553983"],
       [91, 4, 16, "Object is possibly \'null\'.", "4019370437"],
-      [116, 23, 14, "Argument of type \'File | null\' is not assignable to parameter of type \'File\'.\\n  Type \'null\' is not assignable to type \'File\'.", "1073819172"]
+      [109, 10, 2, "Type \'{ ref: MutableRefObject<null>; id: string; \\"data-uie-name\\": string; fileTypes: string[]; tabIndex: number; onFileChange: (files: any) => void; }\' is not assignable to type \'IntrinsicAttributes & RefAttributes<HTMLInputElement>\'.\\n  Property \'id\' does not exist on type \'IntrinsicAttributes & RefAttributes<HTMLInputElement>\'.", "5861160"],
+      [113, 24, 5, "Parameter \'files\' implicitly has an \'any\' type.", "171232592"]
     ],
     "src/script/page/MainContent/panels/preferences/accountPreferences/EmailInput.tsx:542696972": [
       [56, 10, 5, "Object is of type \'unknown\'.", "165548477"],
