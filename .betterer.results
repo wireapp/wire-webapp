@@ -2214,15 +2214,6 @@ exports[`stricter compilation`] = {
     "src/script/page/MainContent/panels/preferences/accountPreferences/HistoryBackupSection.tsx:3752447778": [
       [36, 4, 20, "Object is possibly \'null\'.", "2235498147"]
     ],
-    "src/script/page/MainContent/panels/preferences/accountPreferences/UsernameInput.tsx:3610323435": [
-      [39, 55, 4, "Argument of type \'null\' is not assignable to parameter of type \'string | (() => string)\'.", "2087897566"],
-      [41, 61, 4, "Argument of type \'null\' is not assignable to parameter of type \'string | (() => string)\'.", "2087897566"],
-      [42, 61, 4, "Argument of type \'null\' is not assignable to parameter of type \'string | (() => string)\'.", "2087897566"],
-      [49, 27, 4, "Argument of type \'null\' is not assignable to parameter of type \'SetStateAction<string>\'.", "2087897566"],
-      [85, 20, 4, "Argument of type \'null\' is not assignable to parameter of type \'SetStateAction<string>\'.", "2087897566"],
-      [95, 22, 4, "Argument of type \'null\' is not assignable to parameter of type \'SetStateAction<string>\'.", "2087897566"],
-      [99, 30, 5, "Object is of type \'unknown\'.", "165548477"]
-    ],
     "src/script/page/MainContent/panels/preferences/avPreferences/CameraPreferences.tsx:147485328": [
       [80, 82, 5, "Object is of type \'unknown\'.", "165548477"],
       [81, 16, 4, "Argument of type \'null\' is not assignable to parameter of type \'SetStateAction<MediaStream | undefined>\'.", "2087897566"],

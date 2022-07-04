@@ -31,10 +31,10 @@ interface HistoryBackupSectionProps {
 }
 
 const HistoryBackupSection: React.FC<HistoryBackupSectionProps> = ({brandName}) => {
-  const fileInputRef = React.useRef(null);
+  const fileInputRef = React.useRef<HTMLInputElement>(null);
 
   const fileInputClick = () => {
-    fileInputRef.current.click();
+    fileInputRef.current?.click();
   };
 
   return (
