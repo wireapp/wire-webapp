@@ -20,30 +20,32 @@
 import React from 'react';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 
-interface FileInputProps extends React.HTMLProps<HTMLInputElement> {
+interface FileInputProps {
   fileTypes?: string[];
   onFileChange?: (files: FileList) => void;
 }
 
-const FileInput: React.FC<FileInputProps> = React.forwardRef(({fileTypes = ['*'], onFileChange, ...rest}, ref) => {
-  return (
-    <input
-      ref={ref}
-      type="file"
-      accept={fileTypes.join(',')}
-      onChange={({target: {files, value}}) => {
-        if (files && files.length > 0) {
-          onFileChange?.(files);
-          window.setTimeout(() => {
-            value = '';
-          }, TIME_IN_MILLIS.SECOND);
-        }
-      }}
-      onFocus={({target}) => target.blur()}
-      {...rest}
-    />
-  );
-});
+const FileInput = React.forwardRef<HTMLInputElement>(
+  ({fileTypes = ['*'], onFileChange, ...rest}: FileInputProps, ref) => {
+    return (
+      <input
+        ref={ref}
+        type="file"
+        accept={fileTypes.join(',')}
+        onChange={({target: {files, value}}) => {
+          if (files && files.length > 0) {
+            onFileChange?.(files);
+            window.setTimeout(() => {
+              value = '';
+            }, TIME_IN_MILLIS.SECOND);
+          }
+        }}
+        onFocus={({target}) => target.blur()}
+        {...rest}
+      />
+    );
+  },
+);
 
 FileInput.displayName = 'FileInput';
 
