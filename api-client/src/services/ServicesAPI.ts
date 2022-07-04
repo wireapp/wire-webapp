@@ -33,11 +33,7 @@ import type {PreKey} from '../auth';
 import {AssetOptions, AssetAPI} from '../asset';
 
 export class ServicesAPI {
-  private readonly assetAPI: AssetAPI;
-
-  constructor(private readonly client: HttpClient) {
-    this.assetAPI = new AssetAPI(this.client);
-  }
+  constructor(private readonly client: HttpClient, private readonly assetAPI: AssetAPI) {}
 
   public static readonly URL = {
     ASSETS: 'assets',

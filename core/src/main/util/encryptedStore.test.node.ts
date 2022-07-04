@@ -39,7 +39,7 @@ describe('encryptedStore', () => {
 
   describe('Store and restore secret values with custom encryption', () => {
     it('Stores secret values', async () => {
-      const store = await createCustomEncryptedStore('test', {
+      const store = await createCustomEncryptedStore('test-custom', {
         encrypt: (value: Uint8Array) => Promise.resolve(value),
         decrypt: (value: Uint8Array) => Promise.resolve(value),
       });

@@ -79,6 +79,9 @@ export class FeatureAPI {
     return response.data;
   }
 
+  /**
+   * @deprecated use getAllFeatures() instead
+   */
   public async getLegalholdFeature(): Promise<FeatureLegalhold> {
     const config: AxiosRequestConfig = {
       method: 'get',
@@ -88,6 +91,10 @@ export class FeatureAPI {
     const response = await this.client.sendJSON<FeatureLegalhold>(config);
     return response.data;
   }
+
+  /**
+   * @deprecated use getAllFeatures() instead
+   */
   public async getConversationGuestLinkFeature(): Promise<FeatureConversationGuestLink> {
     const config: AxiosRequestConfig = {
       method: 'get',
@@ -121,6 +128,9 @@ export class FeatureAPI {
     }
   }
 
+  /**
+   * @deprecated use getAllFeatures() instead
+   */
   public async getConferenceCallingFeature(): Promise<FeatureConferenceCalling> {
     const config: AxiosRequestConfig = {
       method: 'get',
@@ -154,6 +164,9 @@ export class FeatureAPI {
     }
   }
 
+  /**
+   * @deprecated use getAllFeatures() instead
+   */
   public async getVideoCallingFeature(): Promise<FeatureVideoCalling> {
     const config: AxiosRequestConfig = {
       method: 'get',
@@ -187,6 +200,9 @@ export class FeatureAPI {
     }
   }
 
+  /**
+   * @deprecated use getAllFeatures() instead
+   */
   public async getSelfDeletingMessagesFeature(): Promise<FeatureSelfDeletingMessages> {
     const config: AxiosRequestConfig = {
       method: 'get',
@@ -220,6 +236,9 @@ export class FeatureAPI {
     }
   }
 
+  /**
+   * @deprecated use getAllFeatures() instead
+   */
   public async getFileSharingFeature(): Promise<FeatureFileSharing> {
     const config: AxiosRequestConfig = {
       method: 'get',
@@ -253,6 +272,9 @@ export class FeatureAPI {
     }
   }
 
+  /**
+   * @deprecated use getAllFeatures() instead
+   */
   public async getSndFactorPasswordFeature(): Promise<FeatureSndFactorPassword> {
     const config: AxiosRequestConfig = {
       method: 'get',
@@ -263,6 +285,9 @@ export class FeatureAPI {
     return response.data;
   }
 
+  /**
+   * @deprecated use getAllFeatures() instead
+   */
   public async getSSOFeature(): Promise<FeatureSSO> {
     const config: AxiosRequestConfig = {
       method: 'get',
@@ -273,6 +298,9 @@ export class FeatureAPI {
     return response.data;
   }
 
+  /**
+   * @deprecated use getAllFeatures() instead
+   */
   public async getMLSFeature(): Promise<FeatureMLS> {
     const config: AxiosRequestConfig = {
       method: 'get',
@@ -283,6 +311,9 @@ export class FeatureAPI {
     return response.data;
   }
 
+  /**
+   * @deprecated use getAllFeatures() instead
+   */
   public async getDigitalSignatureFeature(teamId: string): Promise<FeatureDigitalSignature> {
     const config: AxiosRequestConfig = {
       method: 'get',
@@ -293,6 +324,9 @@ export class FeatureAPI {
     return response.data;
   }
 
+  /**
+   * @deprecated use getAllFeatures() instead
+   */
   public async getAppLockFeature(): Promise<FeatureAppLock> {
     const config: AxiosRequestConfig = {
       method: 'get',
