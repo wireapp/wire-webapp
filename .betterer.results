@@ -685,9 +685,6 @@ exports[`stricter compilation`] = {
       [86, 39, 4, "Argument of type \'null\' is not assignable to parameter of type \'string | undefined\'.", "2087897566"],
       [98, 39, 4, "Argument of type \'null\' is not assignable to parameter of type \'string | undefined\'.", "2087897566"]
     ],
-    "src/script/components/Avatar.tsx:3497736425": [
-      [97, 33, 30, "Argument of type \'ParentNode | null\' is not assignable to parameter of type \'Node\'.\\n  Type \'null\' is not assignable to type \'Node\'.", "3446886669"]
-    ],
     "src/script/components/Checkbox/Checkbox.styles.ts:4183813824": [
       [22, 2, 9, "Type \'{ cursor: false | \\"pointer\\"; }\' is not assignable to type \'CSSInterpolation\'.\\n  Types of property \'cursor\' are incompatible.\\n    Type \'false | \\"pointer\\"\' is not assignable to type \'Cursor | (Cursor | undefined)[] | Cursor[] | undefined\'.\\n      Type \'false\' is not assignable to type \'Cursor | (Cursor | undefined)[] | Cursor[] | undefined\'.", "1736274335"],
       [25, 2, 13, "Type \'{ borderColor: false | \\"var(--accent-color-500)\\"; }\' is not assignable to type \'CSSInterpolation\'.\\n  Types of property \'borderColor\' are incompatible.\\n    Type \'false | \\"var(--accent-color-500)\\"\' is not assignable to type \'BorderColor | (BorderColor | undefined)[] | BorderColor[] | undefined\'.\\n      Type \'false\' is not assignable to type \'BorderColor | (BorderColor | undefined)[] | BorderColor[] | undefined\'.", "3854155997"],
