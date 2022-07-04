@@ -86,7 +86,6 @@ const MainContent: React.FC<LeftSidebarProps> = ({
       borderColor: 'var(--border-color)',
       contrastTextColor: 'var(--text-input-background)',
       disabledColor: 'var(--text-input-placeholder)',
-      fillColor: 'var(--checkbox-fill-color)',
     },
   };
 
