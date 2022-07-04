@@ -17,6 +17,7 @@
  *
  */
 
+import type {CoreCrypto} from '@otak/core-crypto';
 import {APIClient} from '@wireapp/api-client';
 import {ClientType} from '@wireapp/api-client/src/client';
 import {LegalHoldStatus} from '@wireapp/protocol-messaging';
@@ -43,6 +44,7 @@ describe('ConversationService', () => {
       {
         useQualifiedIds: federated,
       },
+      () => ({} as CoreCrypto),
     );
   }
 
