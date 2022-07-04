@@ -28,7 +28,7 @@ interface DeviceSelectProps {
   isRequesting?: boolean;
   onChange: (deviceId: string) => void;
   title: string;
-  uieName?: string;
+  uieName: string;
   value: string;
 }
 

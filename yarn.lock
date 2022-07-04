@@ -2009,10 +2009,10 @@
   resolved "https://registry.yarnpkg.com/@open-wc/webpack-import-meta-loader/-/webpack-import-meta-loader-0.4.7.tgz#d8212640a386a66bf06a2a4c101936467839b5a1"
   integrity sha512-F3d1EHRckk2+ZpgEEAgVITp8BU9DYLBhKOhNMREeQ1BwILRIhrt+V1bebpnd0Mz595jzd7Yh1wSibLsXibkCpg==
 
-"@otak/core-crypto@0.2.0-beta-3":
-  version "0.2.0-beta-3"
-  resolved "https://registry.yarnpkg.com/@otak/core-crypto/-/core-crypto-0.2.0-beta-3.tgz#1863e9b4152e7db4c96e245cffdfef0ddade670a"
-  integrity sha512-KWh9a1Zi+NRgMnouquQVkmuONq630LP9YUcNtuhM39kIfSg6XRFUhIyPhidCb9QGb2zPylls1pHjxrsjHOUcvg==
+"@otak/core-crypto@0.3.0-beta-1":
+  version "0.3.0-beta-1"
+  resolved "https://registry.yarnpkg.com/@otak/core-crypto/-/core-crypto-0.3.0-beta-1.tgz#5d423b207251672b7657ce83e133b563e670c362"
+  integrity sha512-33ZjvaqXpZFIgNJpZjXygt8zfFGnrUVTjEr4FQXBD7KHFkDKfNsV0q7kWnLExn9EoN6BOhgrOdssYaQEDkYkSA==
 
 "@phenomnomnominal/debug@^0.2.5":
   version "0.2.5"
@@ -3145,10 +3145,10 @@
   resolved "https://registry.yarnpkg.com/@wireapp/antiscroll-2/-/antiscroll-2-1.3.1.tgz#bcb66f72c6dadc306e43235256b768ed3f89039c"
   integrity sha512-vWmWYAzSdyxs+xlgSPGtiNSTCM1z0nxM+jSPa/xz1/kuFKy80BrJP5xaGwNNLljBAz8ymlSPUUZlylUd0tFr1Q==
 
-"@wireapp/api-client@19.7.2":
-  version "19.7.2"
-  resolved "https://registry.yarnpkg.com/@wireapp/api-client/-/api-client-19.7.2.tgz#38d833d565b1bb6d1afbc9bafe65a29fcf0f9fa8"
-  integrity sha512-BCFIf1VMsUvu2qXS7KCWHbpUk6yFXtItodXcwIMM0LFfUJeXmOlr3kIozTCtmJwblHDyMKIwNK5mzN45R32Sqw==
+"@wireapp/api-client@19.9.0":
+  version "19.9.0"
+  resolved "https://registry.yarnpkg.com/@wireapp/api-client/-/api-client-19.9.0.tgz#92e5d026bd2e302a98cf095b53c2d71f11705a10"
+  integrity sha512-g/YOdbuh9/x5/SAy31r6GRkqwI9K/dmqz0MOxYvbiwtXpq7eZB1c1IT78GBONwLKD4/TX+cOPqOa1hJ09dAWEA==
   dependencies:
     "@types/node" "~14"
     "@types/spark-md5" "3.0.2"
@@ -3202,16 +3202,16 @@
     logdown "3.3.1"
     rimraf "3.0.2"
 
-"@wireapp/core@28.0.0":
-  version "28.0.0"
-  resolved "https://registry.yarnpkg.com/@wireapp/core/-/core-28.0.0.tgz#325fc4f913a9b454c435b3f335f990d1cd54b580"
-  integrity sha512-YHpLQAaUg4dGXm05as3wFfTF1m6e7JmNHUuRd3T1sBIbXG01vuyhAThEya3X0nHQgz4VJs6d+1lihiheGa2tEA==
+"@wireapp/core@28.2.0":
+  version "28.2.0"
+  resolved "https://registry.yarnpkg.com/@wireapp/core/-/core-28.2.0.tgz#72bc962a19b3c230a66de49d3353a13912097e4d"
+  integrity sha512-6hhGyRDWHDPDmKqcVpIdQxxOBlGsE0NWtK9a8gh+Isl34G83wL/lvVz/mOrCR48GW9v9C0ofmsFgMzUhpOUS8A==
   dependencies:
     "@open-wc/webpack-import-meta-loader" "0.4.7"
-    "@otak/core-crypto" "0.2.0-beta-3"
+    "@otak/core-crypto" "0.3.0-beta-1"
     "@types/long" "4.0.1"
     "@types/node" "~14"
-    "@wireapp/api-client" "19.7.2"
+    "@wireapp/api-client" "19.9.0"
     "@wireapp/cryptobox" "12.8.0"
     bazinga64 "5.10.0"
     hash.js "1.1.7"
