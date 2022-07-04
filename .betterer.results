@@ -2121,15 +2121,11 @@ exports[`stricter compilation`] = {
     "src/script/page/MainContent/panels/preferences/accountPreferences/AvatarInput.tsx:919643938": [
       [50, 69, 9, "Argument of type \'undefined\' is not assignable to parameter of type \'string\'.", "2620553983"],
       [91, 4, 16, "Object is possibly \'null\'.", "4019370437"],
-      [109, 10, 2, "Type \'{ ref: MutableRefObject<null>; id: string; \\"data-uie-name\\": string; fileTypes: string[]; tabIndex: number; onFileChange: (files: any) => void; }\' is not assignable to type \'IntrinsicAttributes & RefAttributes<HTMLInputElement>\'.\\n  Property \'id\' does not exist on type \'IntrinsicAttributes & RefAttributes<HTMLInputElement>\'.", "5861160"],
-      [113, 24, 5, "Parameter \'files\' implicitly has an \'any\' type.", "171232592"]
+      [116, 23, 14, "Argument of type \'File | null\' is not assignable to parameter of type \'File\'.\\n  Type \'null\' is not assignable to type \'File\'.", "1073819172"]
     ],
     "src/script/page/MainContent/panels/preferences/accountPreferences/EmailInput.tsx:542696972": [
       [56, 10, 5, "Object is of type \'unknown\'.", "165548477"],
       [59, 10, 5, "Object is of type \'unknown\'.", "165548477"]
-    ],
-    "src/script/page/MainContent/panels/preferences/accountPreferences/HistoryBackupSection.tsx:3752447778": [
-      [36, 4, 20, "Object is possibly \'null\'.", "2235498147"]
     ],
     "src/script/page/MainContent/panels/preferences/avPreferences/CameraPreferences.tsx:147485328": [
       [80, 82, 5, "Object is of type \'unknown\'.", "165548477"],
