@@ -755,13 +755,6 @@ exports[`stricter compilation`] = {
     "src/script/components/MessagesList/Message/ContentMessage/asset/FileAssetComponent.test.tsx:1016943020": [
       [34, 22, 39, "Object is possibly \'null\'.", "1572638209"]
     ],
-    "src/script/components/MessagesList/Message/ContentMessage/asset/FileAssetComponent.tsx:2719195984": [
-      [43, 6, 18, "Type \'({ message, hasHeader, teamState, }: FileAssetProps) => false | Element\' is not assignable to type \'FC<FileAssetProps>\'.\\n  Type \'false | Element\' is not assignable to type \'ReactElement<any, any> | null\'.\\n    Type \'boolean\' is not assignable to type \'ReactElement<any, any>\'.", "3519699612"],
-      [62, 22, 14, "Object is possibly \'undefined\'.", "2156033467"],
-      [62, 44, 14, "Object is possibly \'undefined\'.", "2156033467"],
-      [106, 31, 12, "Type \'number | undefined\' is not assignable to type \'number\'.\\n  Type \'undefined\' is not assignable to type \'number\'.", "3813716702"],
-      [109, 45, 12, "Type \'number | undefined\' is not assignable to type \'number\'.\\n  Type \'undefined\' is not assignable to type \'number\'.", "3813716702"]
-    ],
     "src/script/components/MessagesList/Message/ContentMessage/asset/ImageAsset.test.ts:3331662495": [
       [54, 19, 17, "Object is possibly \'null\'.", "901686138"],
       [80, 21, 17, "Object is possibly \'null\'.", "901686138"]
@@ -2011,10 +2004,6 @@ exports[`stricter compilation`] = {
     ],
     "src/script/hooks/usePausableTimeout.ts:3967169248": [
       [38, 6, 20, "Cannot invoke an object which is possibly \'undefined\'.", "2491310661"]
-    ],
-    "src/script/hooks/useRelativeTimestamp.tsx:4133986382": [
-      [65, 79, 5, "Argument of type \'boolean | undefined\' is not assignable to parameter of type \'boolean\'.", "170515051"],
-      [69, 47, 5, "Argument of type \'boolean | undefined\' is not assignable to parameter of type \'boolean\'.", "170515051"]
     ],
     "src/script/integration/IntegrationRepository.ts:1781170224": [
       [72, 4, 13, "Type \'ObservableArray<never>\' is not assignable to type \'ObservableArray<ServiceEntity>\'.\\n  Types of parameters \'value\' and \'value\' are incompatible.\\n    Type \'ServiceEntity[] | null | undefined\' is not assignable to type \'never[] | null | undefined\'.\\n      Type \'ServiceEntity[]\' is not assignable to type \'never[]\'.\\n        Type \'ServiceEntity\' is not assignable to type \'never\'.", "4242441731"],
