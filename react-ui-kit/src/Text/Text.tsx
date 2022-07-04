@@ -69,7 +69,7 @@ export const textStyle: <T>(theme: Theme, props: TextProps<T>) => CSSObject = (
     truncate = false,
   },
 ) => ({
-  color: muted ? COLOR.GRAY : color,
+  color: muted ? COLOR.GRAY : theme.general.color,
   display: block ? 'block' : 'inline',
   fontSize: fontSize,
   fontWeight: bold ? 600 : light ? 200 : 300,

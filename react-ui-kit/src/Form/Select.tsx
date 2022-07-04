@@ -20,9 +20,8 @@
 /** @jsx jsx */
 import {CSSObject, jsx} from '@emotion/react';
 
-import {COLOR_V2} from '../Identity';
 import type {Theme} from '../Layout';
-import {filterProps, inlineSVG} from '../util';
+import {filterProps} from '../util';
 import {inputStyle} from './Input';
 import React, {ReactElement, useEffect, useRef, useState} from 'react';
 import InputLabel from './InputLabel';
@@ -48,11 +47,11 @@ export interface SelectProps<T extends SelectOption = SelectOption> {
   wrapperCSS?: CSSObject;
 }
 
-const ArrowDown = (theme: Theme) => `
-    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
-        <path fill="${theme.general.color}" fill-rule="evenodd" clip-rule="evenodd" d="M7.99963 12.5711L15.6565 4.91421L14.2423 3.5L7.99963 9.74264L1.75699 3.5L0.342773 4.91421L7.99963 12.5711Z"/>
-    </svg>
-`;
+const ArrowDown = (
+  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
+    <path d="M7.99963 12.5711L15.6565 4.91421L14.2423 3.5L7.99963 9.74264L1.75699 3.5L0.342773 4.91421L7.99963 12.5711Z" />
+  </svg>
+);
 
 export const selectStyle: <T>(theme: Theme, props, error?: boolean) => CSSObject = (
   theme,
@@ -65,30 +64,36 @@ export const selectStyle: <T>(theme: Theme, props, error?: boolean) => CSSObject
     textShadow: '0 0 0 #000',
   },
   '&:disabled': {
-    color: COLOR_V2.GRAY,
+    color: theme.select.disabledColor,
   },
   appearance: 'none',
-  background: disabled
-    ? `${theme.Input.backgroundColorDisabled} center right 16px no-repeat url("${inlineSVG(ArrowDown(theme))}")`
-    : `${theme.Input.backgroundColor} center right 16px no-repeat url("${inlineSVG(ArrowDown(theme))}")`,
-  boxShadow: markInvalid ? `0 0 0 1px ${COLOR_V2.RED}` : `0 0 0 1px ${COLOR_V2.GRAY_40}`,
+  boxShadow: markInvalid ? `0 0 0 1px ${theme.general.dangerColor}` : `0 0 0 1px ${theme.select.borderColor}`,
   cursor: disabled ? 'normal' : 'pointer',
   fontSize: '16px',
   fontWeight: 300,
   paddingRight: '30px',
   textAlign: 'left',
+  textOverflow: 'ellipsis',
+  overflow: 'hidden',
+  whiteSpace: 'nowrap',
   marginBottom: error && '8px',
   '&:invalid, option:first-of-type': {
-    color: COLOR_V2.RED,
+    color: theme.general.dangerColor,
   },
   ...(!disabled && {
     '&:hover': {
-      boxShadow: `0 0 0 1px ${COLOR_V2.GRAY_60}`,
+      boxShadow: `0 0 0 1px ${theme.select.borderColor}`,
     },
     '&:focus, &:active': {
-      boxShadow: `0 0 0 1px ${COLOR_V2.BLUE}`,
+      boxShadow: `0 0 0 1px ${theme.general.primaryColor}`,
     },
   }),
+  '& > svg': {
+    fill: disabled ? theme.Input.placeholderColor : theme.general.color,
+    position: 'absolute',
+    top: '1rem',
+    right: '1rem',
+  },
 });
 
 const dropdownStyles = (theme: Theme, isDropdownOpen: boolean): CSSObject => ({
@@ -97,7 +102,7 @@ const dropdownStyles = (theme: Theme, isDropdownOpen: boolean): CSSObject => ({
   margin: '3px 0 0',
   padding: 0,
   borderRadius: '10px',
-  border: `1px solid ${COLOR_V2.BLUE}`,
+  border: `1px solid ${theme.general.primaryColor}`,
   position: 'absolute',
   top: '100%',
   left: 0,
@@ -108,7 +113,7 @@ const dropdownStyles = (theme: Theme, isDropdownOpen: boolean): CSSObject => ({
 });
 
 const dropdownOptionStyles = (theme: Theme, isSelected: boolean): CSSObject => ({
-  background: isSelected ? COLOR_V2.BLUE : COLOR_V2.WHITE,
+  background: isSelected ? theme.general.primaryColor : theme.general.backgroundColor,
   listStyle: 'none',
   padding: '10px 20px 14px',
   cursor: 'pointer',
@@ -116,7 +121,7 @@ const dropdownOptionStyles = (theme: Theme, isSelected: boolean): CSSObject => (
   fontWeight: 300,
   lineHeight: '24px',
   letterSpacing: '0.05px',
-  color: isSelected ? COLOR_V2.WHITE : COLOR_V2.BLACK,
+  color: isSelected ? theme.select.contrastTextColor : theme.general.color,
   '&:first-of-type': {
     borderRadius: '10px 10px 0 0',
   },
@@ -124,12 +129,15 @@ const dropdownOptionStyles = (theme: Theme, isSelected: boolean): CSSObject => (
     borderRadius: '0 0 10px 10px',
   },
   '&:not(:last-of-type)': {
-    borderBottom: `1px solid ${COLOR_V2.GRAY_40}`,
+    borderBottom: `1px solid ${theme.select.borderColor}`,
+  },
+  '&:not(:first-of-type)': {
+    borderTop: `1px solid ${theme.select.borderColor}`,
   },
   '&:hover, &:active, &:focus': {
-    background: COLOR_V2.BLUE,
-    borderColor: COLOR_V2.BLUE,
-    color: COLOR_V2.WHITE,
+    background: theme.general.primaryColor,
+    borderColor: theme.general.primaryColor,
+    color: theme.select.contrastTextColor,
   },
 });
 
@@ -248,14 +256,14 @@ export const Select = <T extends SelectOption = SelectOption>({
 
   return (
     <div
-      css={{
+      css={(theme: Theme) => ({
         marginBottom: markInvalid ? '2px' : '20px',
         width: '100%',
         '&:focus-within label': {
-          color: COLOR_V2.BLUE,
+          color: theme.general.primaryColor,
         },
         ...wrapperCSS,
-      }}
+      })}
       data-uie-name={dataUieName}
       ref={selectContainerRef}
     >
@@ -283,6 +291,7 @@ export const Select = <T extends SelectOption = SelectOption>({
           })}
         >
           {hasSelectedOption ? value.label : placeholderText}
+          {ArrowDown}
         </button>
 
         <ul
@@ -318,11 +327,11 @@ export const Select = <T extends SelectOption = SelectOption>({
 
                 {option.description && (
                   <p
-                    css={{
+                    css={(theme: Theme) => ({
                       marginBottom: 0,
                       fontSize: '14px',
-                      color: isSelected ? COLOR_V2.WHITE : COLOR_V2.GRAY_80,
-                    }}
+                      color: isSelected ? theme.general.color : theme.Input.labelColor,
+                    })}
                   >
                     {option.description}
                   </p>
@@ -334,7 +343,9 @@ export const Select = <T extends SelectOption = SelectOption>({
       </div>
 
       {!hasError && helperText && (
-        <p css={{fontSize: '12px', fontWeight: 400, color: COLOR_V2.GRAY_80, marginTop: 8}}>{helperText}</p>
+        <p css={(theme: Theme) => ({fontSize: '12px', fontWeight: 400, color: theme.Input.labelColor, marginTop: 8})}>
+          {helperText}
+        </p>
       )}
 
       {error}

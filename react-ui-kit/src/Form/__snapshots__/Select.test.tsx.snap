@@ -21,7 +21,7 @@ exports[`"Select" renders 1`] = `
 }
 
 .emotion-3 {
-  background: #fff center right 16px no-repeat url("data:image/svg+xml;utf8,%0A%20%20%20%20%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2216%22%20height%3D%2216%22%20viewBox%3D%220%200%2016%2016%22%3E%0A%20%20%20%20%20%20%20%20%3Cpath%20fill%3D%22rgb(29%2C%2030%2C%2031)%22%20fill-rule%3D%22evenodd%22%20clip-rule%3D%22evenodd%22%20d%3D%22M7.99963%2012.5711L15.6565%204.91421L14.2423%203.5L7.99963%209.74264L1.75699%203.5L0.342773%204.91421L7.99963%2012.5711Z%22%2F%3E%0A%20%20%20%20%3C%2Fsvg%3E%0A");
+  background: #fff;
   border: none;
   border-radius: 4px;
   box-shadow: 0 0 0 1px #dce0e3;
@@ -41,6 +41,9 @@ exports[`"Select" renders 1`] = `
   font-size: 16px;
   padding-right: 30px;
   text-align: left;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
 }
 
 .emotion-3::-moz-placeholder {
@@ -75,18 +78,29 @@ exports[`"Select" renders 1`] = `
   text-shadow: 0 0 0 #000;
 }
 
+.emotion-3:disabled {
+  color: #676b71;
+}
+
 .emotion-3:invalid,
 .emotion-3 option:first-of-type {
   color: #c20013;
 }
 
 .emotion-3:hover {
-  box-shadow: 0 0 0 1px #9fa1a7;
+  box-shadow: 0 0 0 1px #dce0e3;
 }
 
 .emotion-3:focus,
 .emotion-3:active {
   box-shadow: 0 0 0 1px #0667c8;
+}
+
+.emotion-3>svg {
+  fill: rgb(29, 30, 31);
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
 }
 
 .emotion-4 {
@@ -124,6 +138,16 @@ exports[`"Select" renders 1`] = `
         type="button"
       >
         - Please select -
+        <svg
+          height="16"
+          viewBox="0 0 16 16"
+          width="16"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            d="M7.99963 12.5711L15.6565 4.91421L14.2423 3.5L7.99963 9.74264L1.75699 3.5L0.342773 4.91421L7.99963 12.5711Z"
+          />
+        </svg>
       </button>
       <ul
         className="emotion-4"
@@ -157,7 +181,7 @@ exports[`"Select" renders as disabled 1`] = `
 }
 
 .emotion-3 {
-  background: #edeff0 center right 16px no-repeat url("data:image/svg+xml;utf8,%0A%20%20%20%20%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2216%22%20height%3D%2216%22%20viewBox%3D%220%200%2016%2016%22%3E%0A%20%20%20%20%20%20%20%20%3Cpath%20fill%3D%22rgb(29%2C%2030%2C%2031)%22%20fill-rule%3D%22evenodd%22%20clip-rule%3D%22evenodd%22%20d%3D%22M7.99963%2012.5711L15.6565%204.91421L14.2423%203.5L7.99963%209.74264L1.75699%203.5L0.342773%204.91421L7.99963%2012.5711Z%22%2F%3E%0A%20%20%20%20%3C%2Fsvg%3E%0A");
+  background: #fff;
   border: none;
   border-radius: 4px;
   box-shadow: 0 0 0 1px #dce0e3;
@@ -177,6 +201,9 @@ exports[`"Select" renders as disabled 1`] = `
   font-size: 16px;
   padding-right: 30px;
   text-align: left;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
 }
 
 .emotion-3::-moz-placeholder {
@@ -211,9 +238,20 @@ exports[`"Select" renders as disabled 1`] = `
   text-shadow: 0 0 0 #000;
 }
 
+.emotion-3:disabled {
+  color: #676b71;
+}
+
 .emotion-3:invalid,
 .emotion-3 option:first-of-type {
   color: #c20013;
+}
+
+.emotion-3>svg {
+  fill: rgb(80, 82, 84);
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
 }
 
 .emotion-4 {
@@ -252,6 +290,16 @@ exports[`"Select" renders as disabled 1`] = `
         type="button"
       >
         - Please select -
+        <svg
+          height="16"
+          viewBox="0 0 16 16"
+          width="16"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            d="M7.99963 12.5711L15.6565 4.91421L14.2423 3.5L7.99963 9.74264L1.75699 3.5L0.342773 4.91421L7.99963 12.5711Z"
+          />
+        </svg>
       </button>
       <ul
         className="emotion-4"
@@ -285,7 +333,7 @@ exports[`"Select" renders as invalid 1`] = `
 }
 
 .emotion-3 {
-  background: #fff center right 16px no-repeat url("data:image/svg+xml;utf8,%0A%20%20%20%20%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2216%22%20height%3D%2216%22%20viewBox%3D%220%200%2016%2016%22%3E%0A%20%20%20%20%20%20%20%20%3Cpath%20fill%3D%22rgb(29%2C%2030%2C%2031)%22%20fill-rule%3D%22evenodd%22%20clip-rule%3D%22evenodd%22%20d%3D%22M7.99963%2012.5711L15.6565%204.91421L14.2423%203.5L7.99963%209.74264L1.75699%203.5L0.342773%204.91421L7.99963%2012.5711Z%22%2F%3E%0A%20%20%20%20%3C%2Fsvg%3E%0A");
+  background: #fff;
   border: none;
   border-radius: 4px;
   box-shadow: 0 0 0 1px #dce0e3;
@@ -305,6 +353,9 @@ exports[`"Select" renders as invalid 1`] = `
   font-size: 16px;
   padding-right: 30px;
   text-align: left;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
 }
 
 .emotion-3::-moz-placeholder {
@@ -339,18 +390,29 @@ exports[`"Select" renders as invalid 1`] = `
   text-shadow: 0 0 0 #000;
 }
 
+.emotion-3:disabled {
+  color: #676b71;
+}
+
 .emotion-3:invalid,
 .emotion-3 option:first-of-type {
   color: #c20013;
 }
 
 .emotion-3:hover {
-  box-shadow: 0 0 0 1px #9fa1a7;
+  box-shadow: 0 0 0 1px #dce0e3;
 }
 
 .emotion-3:focus,
 .emotion-3:active {
   box-shadow: 0 0 0 1px #0667c8;
+}
+
+.emotion-3>svg {
+  fill: rgb(29, 30, 31);
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
 }
 
 .emotion-4 {
@@ -388,6 +450,16 @@ exports[`"Select" renders as invalid 1`] = `
         type="button"
       >
         - Please select -
+        <svg
+          height="16"
+          viewBox="0 0 16 16"
+          width="16"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            d="M7.99963 12.5711L15.6565 4.91421L14.2423 3.5L7.99963 9.74264L1.75699 3.5L0.342773 4.91421L7.99963 12.5711Z"
+          />
+        </svg>
       </button>
       <ul
         className="emotion-4"
