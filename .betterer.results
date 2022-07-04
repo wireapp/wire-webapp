@@ -2252,10 +2252,6 @@ exports[`stricter compilation`] = {
     "src/script/page/MainContent/panels/preferences/devices/components/DetailedDevice.tsx:3712575264": [
       [46, 78, 11, "Argument of type \'string | undefined\' is not assignable to parameter of type \'string | number\'.\\n  Type \'undefined\' is not assignable to type \'string | number\'.", "1754256582"]
     ],
-    "src/script/page/message-list/InputBarControls/ControlButtons.tsx:59214157": [
-      [113, 63, 18, "No overload matches this call.\\n  Overload 1 of 4, \'(iterable: Iterable<File> | ArrayLike<File>): File[]\', gave the following error.\\n    Argument of type \'FileList | null\' is not assignable to parameter of type \'Iterable<File> | ArrayLike<File>\'.\\n      Type \'null\' is not assignable to type \'Iterable<File> | ArrayLike<File>\'.\\n  Overload 2 of 4, \'(arrayLike: ArrayLike<File>): File[]\', gave the following error.\\n    Argument of type \'FileList | null\' is not assignable to parameter of type \'ArrayLike<File>\'.\\n      Type \'null\' is not assignable to type \'ArrayLike<File>\'.", "2593443629"],
-      [135, 62, 18, "No overload matches this call.\\n  Overload 1 of 4, \'(iterable: Iterable<File> | ArrayLike<File>): File[]\', gave the following error.\\n    Argument of type \'FileList | null\' is not assignable to parameter of type \'Iterable<File> | ArrayLike<File>\'.\\n  Overload 2 of 4, \'(arrayLike: ArrayLike<File>): File[]\', gave the following error.\\n    Argument of type \'FileList | null\' is not assignable to parameter of type \'ArrayLike<File>\'.\\n      Type \'null\' is not assignable to type \'ArrayLike<File>\'.", "2593443629"]
-    ],
     "src/script/page/message-list/InputBarControls/InputBarControls.test.tsx:2517377529": [
       [33, 2, 12, "Type \'undefined\' is not assignable to type \'Conversation\'.", "1670678216"]
     ],
