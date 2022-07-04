@@ -96,7 +96,7 @@ exports[`stricter compilation`] = {
       [93, 20, 6, "Object is possibly \'null\'.", "1537472717"]
     ],
     "src/script/auth/component/LinkButton.tsx:522804603": [
-      [32, 8, 67, "Type \'(theme: Theme) => CSSObject\' is not assignable to type \'Interpolation<Theme>\'.\\n  Type \'(theme: Theme) => CSSObject\' is not assignable to type \'FunctionInterpolation<Theme>\'.\\n    Types of parameters \'theme\' and \'props\' are incompatible.\\n      Type \'Theme\' is missing the following properties from type \'Theme\': general, Input", "530872600"]
+      [32, 8, 67, "Type \'(theme: Theme) => CSSObject\' is not assignable to type \'Interpolation<Theme>\'.\\n  Type \'(theme: Theme) => CSSObject\' is not assignable to type \'FunctionInterpolation<Theme>\'.\\n    Types of parameters \'theme\' and \'props\' are incompatible.\\n      Type \'Theme\' is missing the following properties from type \'Theme\': general, Input, select, checkbox", "530872600"]
     ],
     "src/script/auth/component/LoginForm.tsx:1467603633": [
       [49, 4, 18, "Object is possibly \'undefined\'.", "3955986040"],
@@ -2152,8 +2152,8 @@ exports[`stricter compilation`] = {
       [55, 48, 11, "Object is possibly \'undefined\'.", "110900827"],
       [55, 48, 11, "No overload matches this call.\\n  Overload 1 of 6, \'(this: (this: undefined, arg0: User, arg1: MouseEvent<Element, MouseEvent>) => void, thisArg: undefined, arg0: User, arg1: MouseEvent<Element, MouseEvent>): () => void\', gave the following error.\\n    The \'this\' context of type \'((userEntity: User, event: MouseEvent<Element, MouseEvent>) => void) | undefined\' is not assignable to method\'s \'this\' of type \'(this: undefined, arg0: User, arg1: MouseEvent<Element, MouseEvent>) => void\'.\\n      Type \'undefined\' is not assignable to type \'(this: undefined, arg0: User, arg1: MouseEvent<Element, MouseEvent>) => void\'.\\n  Overload 2 of 6, \'(this: (this: undefined, ...args: User[]) => void, thisArg: undefined, ...args: User[]): (...args: User[]) => void\', gave the following error.\\n    The \'this\' context of type \'((userEntity: User, event: MouseEvent<Element, MouseEvent>) => void) | undefined\' is not assignable to method\'s \'this\' of type \'(this: undefined, ...args: User[]) => void\'.\\n      Type \'undefined\' is not assignable to type \'(this: undefined, ...args: User[]) => void\'.", "110900827"]
     ],
-    "src/script/page/MainContent/MainContent.tsx:3648818950": [
-      [85, 28, 12, "Type \'Conversation | null\' is not assignable to type \'Conversation\'.\\n  Type \'null\' is not assignable to type \'Conversation\'.", "1670678216"]
+    "src/script/page/MainContent/MainContent.tsx:2280911018": [
+      [96, 28, 12, "Type \'Conversation | null\' is not assignable to type \'Conversation\'.\\n  Type \'null\' is not assignable to type \'Conversation\'.", "1670678216"]
     ],
     "src/script/page/MainContent/panels/Collection/Collection.test.tsx:1028939995": [
       [122, 12, 5, "Type \'HTMLInputElement | null\' is not assignable to type \'HTMLInputElement\'.\\n  Type \'null\' is not assignable to type \'HTMLInputElement\'.", "178805363"]
