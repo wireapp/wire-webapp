@@ -24,7 +24,7 @@ import {container} from 'tsyringe';
 import {AssetRepository} from '../../../../../assets/AssetRepository';
 
 interface TopPeopleProps {
-  clickOnUser: (user: User, event: React.MouseEvent) => void;
+  clickOnUser: (user: User, event: React.UIEvent) => void;
   max?: number;
   users: User[];
 }

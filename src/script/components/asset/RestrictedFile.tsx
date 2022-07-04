@@ -29,11 +29,11 @@ export interface RestrictedFileProps extends React.HTMLProps<HTMLDivElement> {
 }
 
 const RestrictedFile: React.FC<RestrictedFileProps> = ({asset}) => {
-  const fileName = trimFileExtension(asset?.file_name);
+  const fileName = asset?.file_name && trimFileExtension(asset.file_name);
   return (
     <div className="file">
       <div className="file__icon icon-file" data-uie-name="file-icon">
-        <span className="file__icon__ext icon-block"></span>
+        <span className="file__icon__ext icon-block" />
       </div>
       <div className="file__desc">
         {fileName && (

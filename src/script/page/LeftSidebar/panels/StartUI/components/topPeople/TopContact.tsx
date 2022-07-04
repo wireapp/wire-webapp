@@ -28,7 +28,7 @@ import {handleKeyDown} from 'Util/KeyboardUtil';
 
 export interface TopContactProps {
   assetRepository: AssetRepository;
-  clickOnUser?: (userEntity: User, event: React.MouseEvent) => void;
+  clickOnUser?: (userEntity: User, event: React.UIEvent) => void;
   user: User;
 }
 
@@ -51,9 +51,9 @@ const TopContact: React.FC<TopContactProps> = ({assetRepository, user, clickOnUs
       role="button"
       tabIndex={0}
       onClick={event => {
-        clickOnUser(user, event);
+        clickOnUser?.(user, event);
       }}
-      onKeyPress={event => handleKeyDown(event, clickOnUser.bind(this, user, event))}
+      onKeyPress={event => clickOnUser && handleKeyDown(event, clickOnUser.bind(this, user, event))}
     >
       <Avatar avatarSize={AVATAR_SIZE.LARGE} className="search-list-item-image" participant={user} />
       <div className="search-list-item-content">

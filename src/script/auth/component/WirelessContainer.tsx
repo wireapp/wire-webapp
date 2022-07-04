@@ -54,7 +54,7 @@ export const WirelessContainer: React.FC<Props> = ({showCookiePolicyBanner, onCo
         >
           <div style={{margin: '16px 40px', textAlign: 'center', width: '100%'}}>
             <Link
-              onClick={(event: React.MouseEvent<HTMLAnchorElement>) => onCookiePolicyBannerClose(event)}
+              onClick={(event: React.MouseEvent<HTMLAnchorElement>) => onCookiePolicyBannerClose?.(event)}
               href={Config.getConfig().URL.PRIVACY_POLICY}
               style={{fontSize: '16px'}}
               target="_blank"
@@ -74,7 +74,7 @@ export const WirelessContainer: React.FC<Props> = ({showCookiePolicyBanner, onCo
           </div>
           <button
             type="button"
-            onClick={(event: React.MouseEvent<HTMLButtonElement>) => onCookiePolicyBannerClose(event)}
+            onClick={(event: React.MouseEvent<HTMLButtonElement>) => onCookiePolicyBannerClose?.(event)}
             style={{
               background: 'none',
               border: 'none',
