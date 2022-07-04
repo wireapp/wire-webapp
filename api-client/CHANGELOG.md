@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [19.9.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/compare/@wireapp/api-client@19.8.0...@wireapp/api-client@19.9.0) (2022-07-04)
+
+
+### Features
+
+* **core, api-client:** Add MLS group creation ([#4295](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/issues/4295)) ([9755e03](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/commit/9755e03bee6a01860b932c4da5f713809551241f))
+
+
+
+
+
 # [19.8.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/compare/@wireapp/api-client@19.7.2...@wireapp/api-client@19.8.0) (2022-07-04)
 
 
