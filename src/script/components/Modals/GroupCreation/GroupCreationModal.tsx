@@ -79,7 +79,7 @@ const GroupCreationModal: React.FC<GroupCreationModalProps> = ({
   const [isShown, setIsShown] = useState<boolean>(false);
   const [selectedContacts, setSelectedContacts] = useState<User[]>([]);
   const [enableReadReceipts, setEnableReadReceipts] = useState<boolean>(false);
-  const [enableMls, setEnableMls] = useState<boolean>(true);
+  const [enableMls, setEnableMls] = useState<boolean>(false);
   const [showContacts, setShowContacts] = useState<boolean>(false);
   const [isCreatingConversation, setIsCreatingConversation] = useState<boolean>(false);
   const [accessState, setAccessState] = useState<ACCESS_STATE>(ACCESS_STATE.TEAM.GUESTS_SERVICES);
@@ -96,8 +96,8 @@ const GroupCreationModal: React.FC<GroupCreationModalProps> = ({
   const maxSize = ConversationRepository.CONFIG.GROUP.MAX_SIZE;
 
   const onEscape = () => setIsShown(false);
-  const {isTeam} = useKoSubscribableChildren(teamState, ['isTeam']);
-  const isMLSEnabled = true;
+  const {isTeam, isMLSEnabled} = useKoSubscribableChildren(teamState, ['isTeam', 'isMLSEnabled']);
+
   useEffect(() => {
     const showCreateGroup = (_: string, userEntity: User) => {
       setEnableReadReceipts(isTeam);
