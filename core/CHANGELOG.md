@@ -3,6 +3,22 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [28.1.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/compare/@wireapp/core@28.0.0...@wireapp/core@28.1.0) (2022-07-04)
+
+
+### Bug Fixes
+
+* **core:** More suited types for Account ([051b4f3](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/commit/051b4f35be7164624f3ed7913366010bdf8b17c4))
+
+
+### Features
+
+* **api-client:** Adapt to api version 2 ([#4308](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/issues/4308)) ([2ac928d](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/commit/2ac928d0b812080faa81e2cd9de12c959eb59276))
+
+
+
+
+
 # [28.0.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/compare/@wireapp/core@27.6.0...@wireapp/core@28.0.0) (2022-07-01)
 
 
