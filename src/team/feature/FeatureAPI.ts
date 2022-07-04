@@ -67,7 +67,7 @@ export class FeatureAPI {
   }
 
   /**
-   * @deprecated Use `getAllFeatures()` instead.
+   * @deprecated Use `getAllFeatures()` instead. It is teamId agnostic.
    */
   public async getAllTeamFeatures(teamId: string): Promise<FeatureList> {
     const config: AxiosRequestConfig = {
@@ -79,26 +79,20 @@ export class FeatureAPI {
     return response.data;
   }
 
-  /**
-   * @deprecated use getAllFeatures() instead
-   */
-  public async getLegalholdFeature(): Promise<FeatureLegalhold> {
+  public async getLegalholdFeature(teamId: string): Promise<FeatureLegalhold> {
     const config: AxiosRequestConfig = {
       method: 'get',
-      url: `${FeatureAPI.URL.FEATURE_CONFIGS}/${FeatureAPI.URL.LEGAL_HOLD}`,
+      url: `${FeatureAPI.URL.TEAMS}/${teamId}/${FeatureAPI.URL.FEATURES}/${FeatureAPI.URL.LEGAL_HOLD}`,
     };
 
     const response = await this.client.sendJSON<FeatureLegalhold>(config);
     return response.data;
   }
 
-  /**
-   * @deprecated use getAllFeatures() instead
-   */
-  public async getConversationGuestLinkFeature(): Promise<FeatureConversationGuestLink> {
+  public async getConversationGuestLinkFeature(teamId: string): Promise<FeatureConversationGuestLink> {
     const config: AxiosRequestConfig = {
       method: 'get',
-      url: `${FeatureAPI.URL.FEATURE_CONFIGS}/${FeatureAPI.URL.CONVERSATION_GUEST_LINKS}`,
+      url: `${FeatureAPI.URL.TEAMS}/${teamId}/${FeatureAPI.URL.FEATURES}/${FeatureAPI.URL.CONVERSATION_GUEST_LINKS}`,
     };
 
     const response = await this.client.sendJSON<FeatureConversationGuestLink>(config);
@@ -128,13 +122,10 @@ export class FeatureAPI {
     }
   }
 
-  /**
-   * @deprecated use getAllFeatures() instead
-   */
-  public async getConferenceCallingFeature(): Promise<FeatureConferenceCalling> {
+  public async getConferenceCallingFeature(teamId: string): Promise<FeatureConferenceCalling> {
     const config: AxiosRequestConfig = {
       method: 'get',
-      url: `${FeatureAPI.URL.FEATURE_CONFIGS}/${FeatureAPI.URL.CALLING_CONFERENCE}`,
+      url: `${FeatureAPI.URL.TEAMS}/${teamId}/${FeatureAPI.URL.FEATURES}/${FeatureAPI.URL.CALLING_CONFERENCE}`,
     };
 
     const response = await this.client.sendJSON<FeatureConferenceCalling>(config);
@@ -165,18 +156,21 @@ export class FeatureAPI {
   }
 
   /**
-   * @deprecated use getAllFeatures() instead
+   * Unimplemented endpoint, may exist in a future release
    */
-  public async getVideoCallingFeature(): Promise<FeatureVideoCalling> {
+  public async getVideoCallingFeature(teamId: string): Promise<FeatureVideoCalling> {
     const config: AxiosRequestConfig = {
       method: 'get',
-      url: `${FeatureAPI.URL.FEATURE_CONFIGS}/${FeatureAPI.URL.CALLING_VIDEO}`,
+      url: `${FeatureAPI.URL.TEAMS}/${teamId}/${FeatureAPI.URL.FEATURES}/${FeatureAPI.URL.CALLING_VIDEO}`,
     };
 
     const response = await this.client.sendJSON<FeatureConferenceCalling>(config);
     return response.data;
   }
 
+  /**
+   * Unimplemented endpoint, may exist in a future release
+   */
   public async putVideoCallingFeature(
     teamId: string,
     videoCallingFeature: Omit<FeatureVideoCalling, 'lockStatus'>,
@@ -200,13 +194,10 @@ export class FeatureAPI {
     }
   }
 
-  /**
-   * @deprecated use getAllFeatures() instead
-   */
-  public async getSelfDeletingMessagesFeature(): Promise<FeatureSelfDeletingMessages> {
+  public async getSelfDeletingMessagesFeature(teamId: string): Promise<FeatureSelfDeletingMessages> {
     const config: AxiosRequestConfig = {
       method: 'get',
-      url: `${FeatureAPI.URL.FEATURE_CONFIGS}/${FeatureAPI.URL.SELF_DELETING_MESSAGES}`,
+      url: `${FeatureAPI.URL.TEAMS}/${teamId}/${FeatureAPI.URL.FEATURES}/${FeatureAPI.URL.SELF_DELETING_MESSAGES}`,
     };
 
     const response = await this.client.sendJSON<FeatureSelfDeletingMessages>(config);
@@ -236,13 +227,10 @@ export class FeatureAPI {
     }
   }
 
-  /**
-   * @deprecated use getAllFeatures() instead
-   */
-  public async getFileSharingFeature(): Promise<FeatureFileSharing> {
+  public async getFileSharingFeature(teamId: string): Promise<FeatureFileSharing> {
     const config: AxiosRequestConfig = {
       method: 'get',
-      url: `${FeatureAPI.URL.FEATURE_CONFIGS}/${FeatureAPI.URL.FILE_SHARING}`,
+      url: `${FeatureAPI.URL.TEAMS}/${teamId}/${FeatureAPI.URL.FEATURES}/${FeatureAPI.URL.FILE_SHARING}`,
     };
 
     const response = await this.client.sendJSON<FeatureFileSharing>(config);
@@ -272,48 +260,47 @@ export class FeatureAPI {
     }
   }
 
-  /**
-   * @deprecated use getAllFeatures() instead
-   */
-  public async getSndFactorPasswordFeature(): Promise<FeatureSndFactorPassword> {
+  public async getSndFactorPasswordFeature(teamId: string): Promise<FeatureSndFactorPassword> {
     const config: AxiosRequestConfig = {
       method: 'get',
-      url: `${FeatureAPI.URL.FEATURE_CONFIGS}/${FeatureAPI.URL.SND_FACTOR_PASSWORD}`,
+      url: `${FeatureAPI.URL.TEAMS}/${teamId}/${FeatureAPI.URL.FEATURES}/${FeatureAPI.URL.SND_FACTOR_PASSWORD}`,
     };
 
     const response = await this.client.sendJSON<FeatureSndFactorPassword>(config);
     return response.data;
   }
 
-  /**
-   * @deprecated use getAllFeatures() instead
-   */
-  public async getSSOFeature(): Promise<FeatureSSO> {
+  public async getSSOFeature(teamId: string): Promise<FeatureSSO> {
     const config: AxiosRequestConfig = {
       method: 'get',
-      url: `${FeatureAPI.URL.FEATURE_CONFIGS}/${FeatureAPI.URL.SSO}`,
+      url: `${FeatureAPI.URL.TEAMS}/${teamId}/${FeatureAPI.URL.FEATURES}/${FeatureAPI.URL.SSO}`,
     };
 
     const response = await this.client.sendJSON<FeatureSSO>(config);
     return response.data;
   }
 
-  /**
-   * @deprecated use getAllFeatures() instead
-   */
-  public async getMLSFeature(): Promise<FeatureMLS> {
+  public async getMLSFeature(teamId: string): Promise<FeatureMLS> {
     const config: AxiosRequestConfig = {
       method: 'get',
-      url: `${FeatureAPI.URL.FEATURE_CONFIGS}/${FeatureAPI.URL.MLS}`,
+      url: `${FeatureAPI.URL.TEAMS}/${teamId}/${FeatureAPI.URL.FEATURES}/${FeatureAPI.URL.MLS}`,
     };
 
     const response = await this.client.sendJSON<FeatureMLS>(config);
     return response.data;
   }
 
-  /**
-   * @deprecated use getAllFeatures() instead
-   */
+  public async putMLSFeature(teamId: string, mlsFeature: Omit<FeatureMLS, 'lockStatus'>): Promise<FeatureMLS> {
+    const config: AxiosRequestConfig = {
+      data: mlsFeature,
+      method: 'put',
+      url: `${FeatureAPI.URL.TEAMS}/${teamId}/${FeatureAPI.URL.FEATURES}${FeatureAPI.URL.MLS}`,
+    };
+
+    const response = await this.client.sendJSON<FeatureMLS>(config);
+    return response.data;
+  }
+
   public async getDigitalSignatureFeature(teamId: string): Promise<FeatureDigitalSignature> {
     const config: AxiosRequestConfig = {
       method: 'get',
@@ -324,13 +311,10 @@ export class FeatureAPI {
     return response.data;
   }
 
-  /**
-   * @deprecated use getAllFeatures() instead
-   */
-  public async getAppLockFeature(): Promise<FeatureAppLock> {
+  public async getAppLockFeature(teamId: string): Promise<FeatureAppLock> {
     const config: AxiosRequestConfig = {
       method: 'get',
-      url: `${FeatureAPI.URL.FEATURE_CONFIGS}/${FeatureAPI.URL.APPLOCK}`,
+      url: `${FeatureAPI.URL.TEAMS}/${teamId}/${FeatureAPI.URL.FEATURES}/${FeatureAPI.URL.APPLOCK}`,
     };
 
     const response = await this.client.sendJSON<FeatureAppLock>(config);
