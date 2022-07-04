@@ -923,9 +923,6 @@ exports[`stricter compilation`] = {
       [151, 8, 13, "Object is possibly \'undefined\'.", "3172385806"],
       [153, 34, 13, "Type \'User[] | undefined\' must have a \'[Symbol.iterator]()\' method that returns an iterator.", "3172385806"]
     ],
-    "src/script/components/asset/RestrictedFile.tsx:3277010298": [
-      [31, 37, 16, "Argument of type \'string | undefined\' is not assignable to parameter of type \'string\'.\\n  Type \'undefined\' is not assignable to type \'string\'.", "2539792794"]
-    ],
     "src/script/components/avatar/AvatarImage.test.tsx:132044584": [
       [46, 39, 4, "Argument of type \'null\' is not assignable to parameter of type \'string | undefined\'.", "2087897566"],
       [71, 39, 4, "Argument of type \'null\' is not assignable to parameter of type \'string | undefined\'.", "2087897566"],
