@@ -33,6 +33,7 @@ import {isValidToken, isValidUUID} from './AssetUtil';
 import {RequestCancellationError} from '../user';
 import {unsafeAlphanumeric} from '../shims/node/random';
 import type {AssetUploadData} from './AssetUploadData';
+import {BackendFeatures} from '../APIClient';
 
 export interface CipherOptions {
   /** Set a custom algorithm for encryption */
@@ -53,15 +54,18 @@ export interface AssetResponse {
   mimeType: string;
 }
 
-export class AssetAPI {
-  private static readonly ASSET_V3_URL = '/assets/v3';
-  private static readonly ASSET_V4_URL = '/assets/v4';
-  private static readonly ASSET_SERVICE_URL = '/bot/assets';
-  private static readonly ASSET_V2_URL = '/otr/assets';
-  private static readonly ASSET_V2_CONVERSATION_URL = '/conversations';
-  private static readonly ASSET_V1_URL = '/assets';
+const ASSET_URLS = {
+  ASSET_V3_URL: '/assets/v3',
+  ASSET_V4_URL: '/assets/v4',
+  ASSET_SERVICE_URL: '/bot/assets',
+  ASSET_V2_URL: '/otr/assets',
+  ASSET_V2_CONVERSATION_URL: '/conversations',
+  ASSET_V1_URL: '/assets',
+  ASSETS_URL: '/assets',
+} as const;
 
-  constructor(private readonly client: HttpClient) {}
+export class AssetAPI {
+  constructor(private readonly client: HttpClient, private readonly backendFeatures: BackendFeatures) {}
 
   private getAssetShared(
     assetUrl: string,
@@ -198,7 +202,7 @@ export class AssetAPI {
         conv_id: conversationId,
       },
       responseType: 'arraybuffer',
-      url: `${AssetAPI.ASSET_V1_URL}/${assetId}`,
+      url: `${ASSET_URLS.ASSET_V1_URL}/${assetId}`,
     };
 
     if (forceCaching) {
@@ -249,7 +253,7 @@ export class AssetAPI {
       onUploadProgress: handleProgressEvent(progressCallback),
       params: {},
       responseType: 'arraybuffer',
-      url: `${AssetAPI.ASSET_V2_CONVERSATION_URL}/${conversationId}${AssetAPI.ASSET_V2_URL}/${assetId}`,
+      url: `${ASSET_URLS.ASSET_V2_CONVERSATION_URL}/${conversationId}${ASSET_URLS.ASSET_V2_URL}/${assetId}`,
     };
 
     if (forceCaching) {
@@ -287,8 +291,8 @@ export class AssetAPI {
       throw new TypeError(`Expected asset ID "${assetId}" to only contain alphanumeric values and dashes.`);
     }
 
-    const assetBaseUrl = `${AssetAPI.ASSET_V3_URL}/${assetId}`;
-    return this.getAssetShared(assetBaseUrl, token, forceCaching, progressCallback);
+    const assetBaseUrl = this.backendFeatures.version >= 2 ? ASSET_URLS.ASSETS_URL : ASSET_URLS.ASSET_V3_URL;
+    return this.getAssetShared(`${assetBaseUrl}/${assetId}`, token, forceCaching, progressCallback);
   }
 
   getAssetV4(
@@ -302,8 +306,8 @@ export class AssetAPI {
       throw new TypeError(`Expected asset ID "${assetId}" to only contain alphanumeric values and dashes.`);
     }
 
-    const assetBaseUrl = `${AssetAPI.ASSET_V4_URL}/${assetDomain}/${assetId}`;
-    return this.getAssetShared(assetBaseUrl, token, forceCaching, progressCallback);
+    const assetBaseUrl = this.backendFeatures.version >= 2 ? ASSET_URLS.ASSETS_URL : ASSET_URLS.ASSET_V4_URL;
+    return this.getAssetShared(`${assetBaseUrl}/${assetDomain}/${assetId}`, token, forceCaching, progressCallback);
   }
 
   getServiceAsset(
@@ -316,7 +320,7 @@ export class AssetAPI {
       throw new TypeError(`Expected asset ID "${assetId}" to only contain alphanumeric values and dashes.`);
     }
 
-    const assetBaseUrl = `${AssetAPI.ASSET_SERVICE_URL}/${assetId}`;
+    const assetBaseUrl = `${ASSET_URLS.ASSET_SERVICE_URL}/${assetId}`;
     return this.getAssetShared(assetBaseUrl, token, forceCaching, progressCallback);
   }
 
@@ -328,11 +332,12 @@ export class AssetAPI {
    * @param progressCallback? Will be called at every progress of the upload
    */
   postAsset(asset: Uint8Array, options?: AssetOptions, progressCallback?: ProgressCallback) {
-    return this.postAssetShared(AssetAPI.ASSET_V3_URL, asset, options, progressCallback);
+    const baseUrl = this.backendFeatures.version >= 2 ? ASSET_URLS.ASSETS_URL : ASSET_URLS.ASSET_V3_URL;
+    return this.postAssetShared(baseUrl, asset, options, progressCallback);
   }
 
   postServiceAsset(asset: Uint8Array, options?: AssetOptions, progressCallback?: ProgressCallback) {
-    const assetBaseUrl = AssetAPI.ASSET_SERVICE_URL;
+    const assetBaseUrl = ASSET_URLS.ASSET_SERVICE_URL;
     return this.postAssetShared(assetBaseUrl, asset, options, progressCallback);
   }
 }

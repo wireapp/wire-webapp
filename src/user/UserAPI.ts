@@ -567,7 +567,10 @@ export class UserAPI {
     const config: AxiosRequestConfig = {
       data: userIdList,
       method: 'post',
-      url: `${UserAPI.URL.USERS}/${UserAPI.URL.LIST_CLIENTS}/${UserAPI.URL.V2}`,
+      url:
+        this.backendFeatures.version >= 2
+          ? `${UserAPI.URL.USERS}/${UserAPI.URL.LIST_CLIENTS}`
+          : `${UserAPI.URL.USERS}/${UserAPI.URL.LIST_CLIENTS}/${UserAPI.URL.V2}`,
     };
 
     const response = await this.client.sendJSON<QualifiedPublicClients>(config);

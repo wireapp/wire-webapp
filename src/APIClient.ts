@@ -126,7 +126,7 @@ export type BackendFeatures = {
   isFederated: boolean;
 };
 
-export type BackendVersionResponse = {supported: number[]; federation?: boolean};
+export type BackendVersionResponse = {supported: number[]; federation?: boolean; development?: number[]};
 export class APIClient extends EventEmitter {
   private readonly logger: logdown.Logger;
 
@@ -186,11 +186,12 @@ export class APIClient extends EventEmitter {
 
   private configureApis(backendFeatures: BackendFeatures): Apis {
     this.logger.info('configuring APIs with config', backendFeatures);
+    const assetAPI = new AssetAPI(this.transport.http, backendFeatures);
     return {
       account: new AccountAPI(this.transport.http),
-      asset: new AssetAPI(this.transport.http),
+      asset: assetAPI,
       auth: new AuthAPI(this.transport.http),
-      services: new ServicesAPI(this.transport.http),
+      services: new ServicesAPI(this.transport.http, assetAPI),
       broadcast: new BroadcastAPI(this.transport.http),
       client: new ClientAPI(this.transport.http),
       connection: new ConnectionAPI(this.transport.http, backendFeatures),
@@ -245,7 +246,9 @@ export class APIClient extends EventEmitter {
     try {
       backendVersions = (await this.transport.http.sendRequest<BackendVersionResponse>({url: '/api-version'})).data;
     } catch (error) {}
+    const devVersions = backendVersions.development ?? [];
     const highestCommonVersion = backendVersions.supported
+      .concat(devVersions)
       .sort()
       .reverse()
       .find(version => acceptedVersions.includes(version));
