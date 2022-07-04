@@ -43,7 +43,7 @@ const ServiceModal: React.FC<ServiceModalProps> = ({
   onClose,
 }) => {
   const onOpenService = () => {
-    onClose();
+    onClose?.();
     actionsViewModel.open1to1ConversationWithService(service);
   };
 

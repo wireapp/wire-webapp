@@ -83,7 +83,7 @@ const ControlButtons: React.FC<ControlButtonsProps> = ({
           <>
             <li>
               <button
-                className="controls-right-button button-icon-large buttons-group-button-left"
+                className="controls-right-button buttons-group-button-left"
                 type="button"
                 onClick={onClickPing}
                 disabled={disablePing}
@@ -100,7 +100,7 @@ const ControlButtons: React.FC<ControlButtonsProps> = ({
                 type="button"
                 aria-label={t('tooltipConversationAddImage')}
                 title={t('tooltipConversationAddImage')}
-                className="conversation-button controls-right-button no-radius button-icon-large"
+                className="conversation-button controls-right-button no-radius file-button"
                 onClick={() => imageRef.current?.click()}
                 data-uie-name="do-share-image"
               >
@@ -122,7 +122,7 @@ const ControlButtons: React.FC<ControlButtonsProps> = ({
                 type="button"
                 aria-label={t('tooltipConversationFile')}
                 title={t('tooltipConversationFile')}
-                className="conversation-button controls-right-button no-radius button-icon-large"
+                className="conversation-button controls-right-button no-radius file-button"
                 onClick={() => fileRef.current?.click()}
                 data-uie-name="do-share-file"
               >

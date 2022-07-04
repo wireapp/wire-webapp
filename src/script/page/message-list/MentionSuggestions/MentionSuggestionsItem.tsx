@@ -25,6 +25,7 @@ import Icon from 'Components/Icon';
 import Avatar, {AVATAR_SIZE} from 'Components/Avatar';
 
 import {User} from '../../../entity/User';
+import {handleKeyDown} from 'Util/KeyboardUtil';
 
 type MentionSuggestionsItemProps = {
   isSelected: boolean;
@@ -41,12 +42,18 @@ const MentionSuggestionsItem: React.ForwardRefRenderFunction<HTMLDivElement, Men
     suggestion,
     ['name', 'expirationRemainingText', 'isTemporaryGuest', 'isExternal', 'isDirectGuest'],
   );
+
+  const onClick = (event: React.UIEvent) => {
+    event.preventDefault();
+    onSuggestionClick();
+  };
+
   return (
     <div
-      onClick={event => {
-        event.preventDefault();
-        onSuggestionClick();
-      }}
+      role="button"
+      tabIndex={0}
+      onClick={onClick}
+      onKeyDown={e => handleKeyDown(e, onClick.bind(null, e))}
       onMouseEnter={onMouseEnter}
       className={cx('mention-suggestion-list__item', {'mention-suggestion-list__item--highlighted': isSelected})}
       data-uie-name="item-mention-suggestion"
