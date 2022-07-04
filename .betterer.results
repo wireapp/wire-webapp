@@ -2197,10 +2197,6 @@ exports[`stricter compilation`] = {
       [91, 4, 16, "Object is possibly \'null\'.", "4019370437"],
       [116, 23, 14, "Argument of type \'File | null\' is not assignable to parameter of type \'File\'.\\n  Type \'null\' is not assignable to type \'File\'.", "1073819172"]
     ],
-    "src/script/page/MainContent/panels/preferences/accountPreferences/DataUsageSection.tsx:1594199724": [
-      [70, 8, 7, "Type \'boolean | undefined\' is not assignable to type \'boolean\'.", "3837137090"],
-      [82, 10, 7, "Type \'boolean | undefined\' is not assignable to type \'boolean\'.", "3837137090"]
-    ],
     "src/script/page/MainContent/panels/preferences/accountPreferences/EmailInput.tsx:542696972": [
       [56, 10, 5, "Object is of type \'unknown\'.", "165548477"],
       [59, 10, 5, "Object is of type \'unknown\'.", "165548477"]
