@@ -70,7 +70,6 @@ const CallOptions: React.FC<CallOptionsProps> = ({constraintsHandler, properties
           checked={vbrEncoding}
           data-uie-name="status-preference-vbr-encoding"
           disabled={isCbrEncodingEnforced}
-          style={{marginTop: '12px'}}
         >
           <CheckboxLabel htmlFor="status-preference-vbr-encoding">
             {t('preferencesOptionsEnableVbrCheckbox')}
@@ -78,7 +77,7 @@ const CallOptions: React.FC<CallOptionsProps> = ({constraintsHandler, properties
         </Checkbox>
         <div className="preferences-detail preferences-detail-intended">{t('preferencesOptionsEnableVbrDetails')}</div>
       </div>
-      <div>
+      <div className="checkbox-margin">
         <Checkbox
           onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
             const isChecked = event.target.checked;
@@ -87,18 +86,12 @@ const CallOptions: React.FC<CallOptionsProps> = ({constraintsHandler, properties
           }}
           checked={agcEnabled}
           data-uie-name="status-preference-agc"
-          disabled={isCbrEncodingEnforced}
-          style={{marginTop: '12px'}}
         >
-          <CheckboxLabel htmlFor="status-preference-agc">
-            {t('preferencesOptionsEnableSoundlessIncomingCalls')}
-          </CheckboxLabel>
+          <CheckboxLabel htmlFor="status-preference-agc">{t('preferencesOptionsEnableAgcCheckbox')}</CheckboxLabel>
         </Checkbox>
-        <div className="preferences-detail preferences-detail-intended">
-          {t('preferencesOptionsEnableSoundlessIncomingCallsDetails')}
-        </div>
+        <div className="preferences-detail preferences-detail-intended">{t('preferencesOptionsEnableAgcDetails')}</div>
       </div>
-      <div>
+      <div className="checkbox-margin">
         <Checkbox
           onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
             const isChecked = event.target.checked;
@@ -108,7 +101,6 @@ const CallOptions: React.FC<CallOptionsProps> = ({constraintsHandler, properties
           checked={soundlessCallsEnabled}
           data-uie-name="status-preference-soundless-incoming-calls"
           disabled={isCbrEncodingEnforced}
-          style={{marginTop: '12px'}}
         >
           <CheckboxLabel htmlFor="status-preference-soundless-incoming-calls">
             {t('preferencesOptionsEnableSoundlessIncomingCalls')}

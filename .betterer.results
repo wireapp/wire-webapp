@@ -2152,7 +2152,7 @@ exports[`stricter compilation`] = {
       [55, 48, 11, "Object is possibly \'undefined\'.", "110900827"],
       [55, 48, 11, "No overload matches this call.\\n  Overload 1 of 6, \'(this: (this: undefined, arg0: User, arg1: MouseEvent<Element, MouseEvent>) => void, thisArg: undefined, arg0: User, arg1: MouseEvent<Element, MouseEvent>): () => void\', gave the following error.\\n    The \'this\' context of type \'((userEntity: User, event: MouseEvent<Element, MouseEvent>) => void) | undefined\' is not assignable to method\'s \'this\' of type \'(this: undefined, arg0: User, arg1: MouseEvent<Element, MouseEvent>) => void\'.\\n      Type \'undefined\' is not assignable to type \'(this: undefined, arg0: User, arg1: MouseEvent<Element, MouseEvent>) => void\'.\\n  Overload 2 of 6, \'(this: (this: undefined, ...args: User[]) => void, thisArg: undefined, ...args: User[]): (...args: User[]) => void\', gave the following error.\\n    The \'this\' context of type \'((userEntity: User, event: MouseEvent<Element, MouseEvent>) => void) | undefined\' is not assignable to method\'s \'this\' of type \'(this: undefined, ...args: User[]) => void\'.\\n      Type \'undefined\' is not assignable to type \'(this: undefined, ...args: User[]) => void\'.", "110900827"]
     ],
-    "src/script/page/MainContent/MainContent.tsx:2280911018": [
+    "src/script/page/MainContent/MainContent.tsx:203244906": [
       [96, 28, 12, "Type \'Conversation | null\' is not assignable to type \'Conversation\'.\\n  Type \'null\' is not assignable to type \'Conversation\'.", "1670678216"]
     ],
     "src/script/page/MainContent/panels/Collection/Collection.test.tsx:1028939995": [
@@ -2175,7 +2175,7 @@ exports[`stricter compilation`] = {
       [92, 79, 34, "Argument of type \'boolean | undefined\' is not assignable to parameter of type \'boolean\'.", "212151669"],
       [120, 6, 9, "Argument of type \'undefined\' is not assignable to parameter of type \'string\'.", "2620553983"]
     ],
-    "src/script/page/MainContent/panels/preferences/OptionPreferences.tsx:3886393057": [
+    "src/script/page/MainContent/panels/preferences/OptionPreferences.tsx:1811942185": [
       [107, 10, 8, "Type \'(audioPreference: AudioPreference) => void\' is not assignable to type \'(newValue: string) => void\'.\\n  Types of parameters \'audioPreference\' and \'newValue\' are incompatible.\\n    Type \'string\' is not assignable to type \'AudioPreference\'.", "707514658"],
       [135, 14, 8, "Type \'(notificationsPreference: NotificationPreference) => void\' is not assignable to type \'(newValue: string) => void\'.\\n  Types of parameters \'notificationsPreference\' and \'newValue\' are incompatible.\\n    Type \'string\' is not assignable to type \'NotificationPreference\'.", "707514658"]
     ],
@@ -2196,10 +2196,6 @@ exports[`stricter compilation`] = {
       [50, 69, 9, "Argument of type \'undefined\' is not assignable to parameter of type \'string\'.", "2620553983"],
       [91, 4, 16, "Object is possibly \'null\'.", "4019370437"],
       [116, 23, 14, "Argument of type \'File | null\' is not assignable to parameter of type \'File\'.\\n  Type \'null\' is not assignable to type \'File\'.", "1073819172"]
-    ],
-    "src/script/page/MainContent/panels/preferences/accountPreferences/DataUsageSection.tsx:1594199724": [
-      [70, 8, 7, "Type \'boolean | undefined\' is not assignable to type \'boolean\'.", "3837137090"],
-      [82, 10, 7, "Type \'boolean | undefined\' is not assignable to type \'boolean\'.", "3837137090"]
     ],
     "src/script/page/MainContent/panels/preferences/accountPreferences/EmailInput.tsx:542696972": [
       [56, 10, 5, "Object is of type \'unknown\'.", "165548477"],
