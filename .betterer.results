@@ -2188,10 +2188,6 @@ exports[`stricter compilation`] = {
       [70, 6, 9, "Argument of type \'undefined\' is not assignable to parameter of type \'string\'.", "2620553983"],
       [104, 40, 43, "Argument of type \'string | undefined\' is not assignable to parameter of type \'string\'.\\n  Type \'undefined\' is not assignable to type \'string\'.", "1072333434"]
     ],
-    "src/script/page/MainContent/panels/preferences/accountPreferences/AvailabilityButtons.tsx:2655666562": [
-      [123, 29, 10, "Cannot invoke an object which is possibly \'undefined\'.", "2097453872"],
-      [125, 21, 17, "Type \'undefined\' cannot be used as an index type.", "2478873583"]
-    ],
     "src/script/page/MainContent/panels/preferences/accountPreferences/AvatarInput.tsx:919643938": [
       [50, 69, 9, "Argument of type \'undefined\' is not assignable to parameter of type \'string\'.", "2620553983"],
       [91, 4, 16, "Object is possibly \'null\'.", "4019370437"],
