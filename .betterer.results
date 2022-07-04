@@ -121,10 +121,6 @@ exports[`stricter compilation`] = {
     "src/script/auth/component/RouterLink.tsx:4241768683": [
       [26, 59, 43, "Type \'(theme: Theme) => CSSObject\' is not assignable to type \'Interpolation<Theme>\'.\\n  Type \'(theme: Theme) => CSSObject\' is not assignable to type \'FunctionInterpolation<Theme>\'.\\n    Types of parameters \'theme\' and \'props\' are incompatible.\\n      Type \'import(\\"wire-webapp/node_modules/@emotion/react/types/index\\").Theme\' is not assignable to type \'import(\\"wire-webapp/node_modules/@wireapp/react-ui-kit/src/Layout/Theme\\").Theme\'.", "1560990654"]
     ],
-    "src/script/auth/component/WirelessContainer.tsx:3024259460": [
-      [56, 71, 25, "Cannot invoke an object which is possibly \'undefined\'.", "1570949058"],
-      [76, 69, 25, "Cannot invoke an object which is possibly \'undefined\'.", "1570949058"]
-    ],
     "src/script/auth/localeConfig.ts:2649740668": [
       [47, 2, 59, "Type \'string | undefined\' is not assignable to type \'string\'.\\n  Type \'undefined\' is not assignable to type \'string\'.", "576197098"]
     ],
