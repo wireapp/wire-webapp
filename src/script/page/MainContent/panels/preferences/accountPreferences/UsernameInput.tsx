@@ -37,10 +37,10 @@ interface UsernameInputProps {
 }
 
 const UsernameInput: React.FC<UsernameInputProps> = ({username, domain, userRepository, canEditProfile}) => {
-  const [errorState, setErrorState] = useState<string>(null);
+  const [errorState, setErrorState] = useState<string | null>(null);
   const [isEditing, setIsEditing] = useState<boolean>(false);
-  const [requestedName, setRequestedName] = useState<string>(null);
-  const [submittedName, setSubmittedName] = useState<string>(null);
+  const [requestedName, setRequestedName] = useState<string | null>(null);
+  const [submittedName, setSubmittedName] = useState<string | null>(null);
   const usernameInputDone = useInputDone();
 
   const verifyUsername = (enteredUsername: string): void => {
@@ -97,10 +97,12 @@ const UsernameInput: React.FC<UsernameInputProps> = ({username, domain, userRepo
         usernameInputDone.done();
       }
     } catch (error) {
-      const isUsernameTaken = error.type === UserError.TYPE.USERNAME_TAKEN;
-      const isCurrentRequest = requestedName === submittedName;
-      if (isUsernameTaken && isCurrentRequest) {
-        setErrorState(UserNameState.TAKEN);
+      if (error instanceof UserError) {
+        const isUsernameTaken = error.type === UserError.TYPE.USERNAME_TAKEN;
+        const isCurrentRequest = requestedName === submittedName;
+        if (isUsernameTaken && isCurrentRequest) {
+          setErrorState(UserNameState.TAKEN);
+        }
       }
     }
   };
