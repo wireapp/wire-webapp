@@ -813,9 +813,6 @@ exports[`stricter compilation`] = {
       [33, 39, 20, "Argument of type \'Element | null\' is not assignable to parameter of type \'Element\'.\\n  Type \'null\' is not assignable to type \'Element\'.", "2187624904"],
       [34, 40, 21, "Argument of type \'Element | null\' is not assignable to parameter of type \'Element\'.\\n  Type \'null\' is not assignable to type \'Element\'.", "2102968254"]
     ],
-    "src/script/components/MessagesList/Message/ContentMessage/asset/controls/MediaButton.tsx:3223205614": [
-      [92, 51, 12, "Type \'number | undefined\' is not assignable to type \'number\'.\\n  Type \'undefined\' is not assignable to type \'number\'.", "3813716702"]
-    ],
     "src/script/components/MessagesList/Message/ContentMessage/asset/controls/SeekBar.test.tsx:4106938805": [
       [30, 4, 17, "Object is possibly \'null\'.", "780973491"],
       [30, 4, 46, "Object is possibly \'null\'.", "4284107"]
