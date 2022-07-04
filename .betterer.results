@@ -2152,8 +2152,8 @@ exports[`stricter compilation`] = {
       [55, 48, 11, "Object is possibly \'undefined\'.", "110900827"],
       [55, 48, 11, "No overload matches this call.\\n  Overload 1 of 6, \'(this: (this: undefined, arg0: User, arg1: MouseEvent<Element, MouseEvent>) => void, thisArg: undefined, arg0: User, arg1: MouseEvent<Element, MouseEvent>): () => void\', gave the following error.\\n    The \'this\' context of type \'((userEntity: User, event: MouseEvent<Element, MouseEvent>) => void) | undefined\' is not assignable to method\'s \'this\' of type \'(this: undefined, arg0: User, arg1: MouseEvent<Element, MouseEvent>) => void\'.\\n      Type \'undefined\' is not assignable to type \'(this: undefined, arg0: User, arg1: MouseEvent<Element, MouseEvent>) => void\'.\\n  Overload 2 of 6, \'(this: (this: undefined, ...args: User[]) => void, thisArg: undefined, ...args: User[]): (...args: User[]) => void\', gave the following error.\\n    The \'this\' context of type \'((userEntity: User, event: MouseEvent<Element, MouseEvent>) => void) | undefined\' is not assignable to method\'s \'this\' of type \'(this: undefined, ...args: User[]) => void\'.\\n      Type \'undefined\' is not assignable to type \'(this: undefined, ...args: User[]) => void\'.", "110900827"]
     ],
-    "src/script/page/MainContent/MainContent.tsx:203244906": [
-      [96, 28, 12, "Type \'Conversation | null\' is not assignable to type \'Conversation\'.\\n  Type \'null\' is not assignable to type \'Conversation\'.", "1670678216"]
+    "src/script/page/MainContent/MainContent.tsx:276069288": [
+      [97, 28, 12, "Type \'Conversation | null\' is not assignable to type \'Conversation\'.\\n  Type \'null\' is not assignable to type \'Conversation\'.", "1670678216"]
     ],
     "src/script/page/MainContent/panels/Collection/Collection.test.tsx:1028939995": [
       [122, 12, 5, "Type \'HTMLInputElement | null\' is not assignable to type \'HTMLInputElement\'.\\n  Type \'null\' is not assignable to type \'HTMLInputElement\'.", "178805363"]

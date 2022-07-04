@@ -80,6 +80,7 @@ const MainContent: React.FC<LeftSidebarProps> = ({
     general: {
       backgroundColor: 'var(--app-bg)',
       color: 'var(--main-color)',
+      dangerColor: 'var(--res-500)',
       primaryColor: 'var(--accent-color)',
     },
     select: {
