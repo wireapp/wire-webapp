@@ -33,7 +33,8 @@ const AssetLoader: React.FC<AssetLoaderProps> = ({large, loadProgress, onCancel}
   const progress = `${loadProgress * elementScale} ${100 * elementScale}`;
   const viewBoxSize = 32 * elementScale;
   const viewBox = `0 0 ${viewBoxSize} ${viewBoxSize}`;
-  const onClick = (event: React.MouseEvent<HTMLDivElement>) => {
+
+  const onClick = (event: React.UIEvent) => {
     event.bubbles = false;
     onCancel();
   };

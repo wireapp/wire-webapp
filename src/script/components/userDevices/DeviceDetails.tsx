@@ -89,10 +89,12 @@ const DeviceDetails: React.FC<DeviceDetailsProps> = ({
     const _resetProgress = () => window.setTimeout(() => setIsResettingSession(false), MotionDuration.LONG);
     const conversation = user.isMe ? conversationState.self_conversation() : conversationState.activeConversation();
     setIsResettingSession(true);
-    messageRepository
-      .resetSession(user.qualifiedId, selectedClient.id, conversation)
-      .then(_resetProgress)
-      .catch(_resetProgress);
+    if (conversation) {
+      messageRepository
+        .resetSession(user.qualifiedId, selectedClient.id, conversation)
+        .then(_resetProgress)
+        .catch(_resetProgress);
+    }
   };
 
   return (
@@ -121,9 +123,11 @@ const DeviceDetails: React.FC<DeviceDetailsProps> = ({
       <div className="participant-devices__single-client">
         <DeviceCard device={selectedClient} />
       </div>
-      <div className="participant-devices__fingerprint" data-uie-name="status-fingerprint">
-        <DeviceId deviceId={fingerprintRemote} />
-      </div>
+      {fingerprintRemote && (
+        <div className="participant-devices__fingerprint" data-uie-name="status-fingerprint">
+          <DeviceId deviceId={fingerprintRemote} />
+        </div>
+      )}
 
       <div className="participant-devices__verify">
         <div className="slider" data-uie-name="do-toggle-verified">
