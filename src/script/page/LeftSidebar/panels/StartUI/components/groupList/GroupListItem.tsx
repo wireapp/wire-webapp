@@ -25,6 +25,7 @@ import type {Conversation} from '../../../../../../entity/Conversation';
 import {generateConversationUrl} from '../../../../../../router/routeGenerator';
 import {Router} from '../../../../../../router/Router';
 import GroupAvatar from 'Components/avatar/GroupAvatar';
+import {handleKeyDown} from 'Util/KeyboardUtil';
 
 export interface GroupListItemProps {
   assetRepository: AssetRepository;
@@ -40,16 +41,21 @@ const GroupListItem: React.FC<GroupListItemProps> = ({assetRepository, click, gr
     is1to1,
   } = useKoSubscribableChildren(group, ['display_name', 'participating_user_ets', 'is1to1']);
 
+  const onClick = () => {
+    click(group);
+    router.navigate(generateConversationUrl(group.id, group.domain));
+  };
+
   return (
     <div
+      role="button"
+      tabIndex={0}
       key={group.id}
       data-uie-name="item-group"
       className="search-list-item"
       data-uie-uid={`${group.id}`}
-      onClick={() => {
-        click(group);
-        router.navigate(generateConversationUrl(group.id, group.domain));
-      }}
+      onClick={onClick}
+      onKeyDown={e => handleKeyDown(e, onClick)}
       data-uie-value={displayName}
     >
       <div className="search-list-item-image">

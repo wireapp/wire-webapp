@@ -67,21 +67,22 @@ const ReadReceiptStatus: React.FC<ReadReceiptStatusProps> = ({
         </span>
       )}
       {showEyeIndicator && (
-        <span
-          className={cx('message-status-read', {
+        <button
+          type="button"
+          className={cx('button-reset-default', 'message-status-read', {
             'message-status-read--clickable': !is1to1Conversation,
             'message-status-read--visible': isLastDeliveredMessage,
             'with-tooltip with-tooltip--receipt': readReceiptTooltip,
           })}
           data-tooltip={readReceiptTooltip}
-          onClick={!is1to1Conversation ? () => onClickReceipts(message) : undefined}
+          onClick={!is1to1Conversation && onClickReceipts ? () => onClickReceipts(message) : undefined}
           data-uie-name="status-message-read-receipts"
         >
           <Icon.Read />
           <span className="message-status-read__count" data-uie-name="status-message-read-receipt-count">
             {readReceiptText}
           </span>
-        </span>
+        </button>
       )}
     </>
   );
