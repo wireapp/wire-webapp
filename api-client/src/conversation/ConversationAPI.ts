@@ -531,7 +531,7 @@ export class ConversationAPI {
   /**
    * Create a new conversation
    * @param conversationData The new conversation
-   * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/conversations/createGroupConversation
+   * @see https://staging-nginz-https.zinfra.io/api/swagger-ui/#/default/post_conversations
    */
   public async postConversation(conversationData: NewConversation): Promise<Conversation> {
     const config: AxiosRequestConfig = {

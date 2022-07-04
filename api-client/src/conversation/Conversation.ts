@@ -88,4 +88,7 @@ export interface Conversation {
 
   /** Users of a conversation */
   members: ConversationMembers;
+
+  /** MLS conversations only */
+  group_id?: string;
 }

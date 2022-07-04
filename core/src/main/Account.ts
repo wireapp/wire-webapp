@@ -182,7 +182,7 @@ export class Account<T = any> extends EventEmitter {
     super();
     this.apiClient = apiClient;
     this.backendFeatures = this.apiClient.backendFeatures;
-    this.mlsConfig = this.mlsConfig;
+    this.mlsConfig = mlsConfig;
     this.nbPrekeys = nbPrekeys;
     this.createStore = createStore;
 
@@ -348,10 +348,15 @@ export class Account<T = any> extends EventEmitter {
     const connectionService = new ConnectionService(this.apiClient);
     const giphyService = new GiphyService(this.apiClient);
     const linkPreviewService = new LinkPreviewService(assetService);
-    const conversationService = new ConversationService(this.apiClient, cryptographyService, {
-      // We can use qualified ids to send messages as long as the backend supports federated endpoints
-      useQualifiedIds: this.backendFeatures.federationEndpoints,
-    });
+    const conversationService = new ConversationService(
+      this.apiClient,
+      cryptographyService,
+      {
+        // We can use qualified ids to send messages as long as the backend supports federated endpoints
+        useQualifiedIds: this.backendFeatures.federationEndpoints,
+      },
+      () => this.coreCryptoClient!,
+    );
     const notificationService = new NotificationService(this.apiClient, cryptographyService, this.storeEngine);
     const selfService = new SelfService(this.apiClient);
     const teamService = new TeamService(this.apiClient);
@@ -405,9 +410,10 @@ export class Account<T = any> extends EventEmitter {
     }
     const {userId, domain} = this.apiClient.context!;
     return CoreCrypto.init({
-      path: `corecrypto-${this.generateDbName(context)}`,
+      databaseName: `corecrypto-${this.generateDbName(context)}`,
       key: Encoder.toBase64(key).asString,
       clientId: `${userId}:${client.id}@${domain}`,
+      wasmFilePath: mlsConfig.coreCrypoWasmFilePath,
     });
   }
 
@@ -425,7 +431,7 @@ export class Account<T = any> extends EventEmitter {
       this.coreCryptoClient = await this.createMLSClient(registeredClient, this.apiClient.context!, this.mlsConfig);
       await this.service.client.uploadMLSPublicKeys(this.coreCryptoClient.clientPublicKey(), registeredClient.id);
       await this.service.client.uploadMLSKeyPackages(
-        this.coreCryptoClient.clientKeypackages(this.nbPrekeys),
+        await this.coreCryptoClient.clientKeypackages(this.nbPrekeys),
         registeredClient.id,
       );
     }

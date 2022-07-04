@@ -35,5 +35,7 @@ export interface NewConversation
   receipt_mode: RECEIPT_MODE | null;
   protocol?: ConversationProtocol;
   team?: TeamInfo;
-  users: string[];
+  users?: string[]; // users must be empty for creating MLS conversations
+  creator_client?: string; // client id of self user, used for creating MLS conversations
+  selfUserId?: QualifiedId;
 }

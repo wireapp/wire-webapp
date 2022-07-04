@@ -17,6 +17,8 @@
  *
  */
 
+import type {CoreCrypto, Invitee} from '@otak/core-crypto';
+import {Decoder} from 'bazinga64';
 import type {APIClient} from '@wireapp/api-client';
 import {
   MessageSendingStatus,
@@ -28,6 +30,7 @@ import {
   QualifiedUserClients,
   UserClients,
   ClientMismatch,
+  ConversationProtocol,
 } from '@wireapp/api-client/src/conversation';
 import {CONVERSATION_TYPING, ConversationMemberUpdateData} from '@wireapp/api-client/src/conversation/data';
 import type {ConversationMemberLeaveEvent} from '@wireapp/api-client/src/event';
@@ -161,6 +164,7 @@ export class ConversationService {
     private readonly apiClient: APIClient,
     cryptographyService: CryptographyService,
     private readonly config: {useQualifiedIds?: boolean},
+    private readonly coreCryptoClientProvider: () => CoreCrypto,
   ) {
     this.messageTimer = new MessageTimer();
     this.messageService = new MessageService(this.apiClient, cryptographyService);
@@ -916,7 +920,83 @@ export class ConversationService {
       payload = conversationData;
     }
 
+    if (typeof conversationData !== 'string' && conversationData.protocol === ConversationProtocol.MLS) {
+      return this.createMLSConversation(conversationData);
+    }
+
     return this.apiClient.api.conversation.postConversation(payload);
+  }
+
+  private async createMLSConversation(conversationData: NewConversation): Promise<Conversation> {
+    /**
+     * @note For creating MLS conversations the users & qualified_users
+     * field must be empty as backend is not aware which users
+     * are in a MLS conversation because of the MLS architecture.
+     */
+    const newConversation = await this.apiClient.api.conversation.postConversation({
+      ...conversationData,
+      users: undefined,
+      qualified_users: undefined,
+    });
+    const {group_id: groupId} = newConversation;
+    const groupIdDecodedFromBase64 = Decoder.fromBase64(groupId!).asBytes;
+    const {qualified_users: qualifiedUsers = [], selfUserId} = conversationData;
+    if (!selfUserId) {
+      throw new Error('You need to pass self user qualified id in order to create an MLS conversation');
+    }
+
+    /**
+     * @note We need to fetch key packages for all the users
+     * we want to add to the new MLS conversations,
+     * includes self user too.
+     */
+    const keyPackages = await Promise.all([
+      this.apiClient.api.client.claimMLSKeyPackages(
+        selfUserId.id,
+        selfUserId.domain,
+        /**
+         * we should skip fetching key packages for current self client,
+         * it's already added by the backend on the group creation time
+         */
+        conversationData.creator_client,
+      ),
+      ...qualifiedUsers.map(qualifiedId =>
+        this.apiClient.api.client.claimMLSKeyPackages(qualifiedId.id, qualifiedId.domain),
+      ),
+    ]);
+    const coreCryptoClient = this.coreCryptoClientProvider();
+    const coreCryptoKeyPackagesPayload = keyPackages.reduce<Invitee[]>((previousValue, currentValue) => {
+      // skip users that have not uploaded their MLS key packages
+      if (currentValue.key_packages.length > 0) {
+        return [
+          ...previousValue,
+          ...currentValue.key_packages.map(keyPackage => ({
+            id: new TextEncoder().encode(keyPackage.client),
+            kp: Decoder.fromBase64(keyPackage.key_package).asBytes,
+          })),
+        ];
+      }
+      return previousValue;
+    }, []);
+
+    await coreCryptoClient.createConversation(groupIdDecodedFromBase64);
+    const memberAddedMessages = await coreCryptoClient.addClientsToConversation(
+      groupIdDecodedFromBase64,
+      coreCryptoKeyPackagesPayload,
+    );
+    const sendingPromises: Promise<unknown>[] = [];
+    if (memberAddedMessages?.welcome) {
+      sendingPromises.push(
+        this.apiClient.api.conversation.postMlsWelcomeMessage(Uint8Array.from(memberAddedMessages.welcome)),
+      );
+    }
+    if (memberAddedMessages?.message) {
+      sendingPromises.push(
+        this.apiClient.api.conversation.postMlsMessage(Uint8Array.from(memberAddedMessages.message)),
+      );
+    }
+    await Promise.all(sendingPromises);
+    return newConversation;
   }
 
   public async getConversations(conversationId: string): Promise<Conversation>;
