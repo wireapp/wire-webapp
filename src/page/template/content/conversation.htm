@@ -4,7 +4,18 @@
   data-bind="drop_file: $root.inputBar.onDropFiles, css: { loading: !$root.messageList.conversationLoaded() }"
 >
   <!-- ko if: $root.conversationRepository.conversationState.activeConversation() -->
-  #include('content/conversation/title-bar.htm')
+  <title-bar
+    id="conversation-title-bar"
+    class="conversation-title-bar"
+    params="
+      root: $root,
+      conversationEntity: $root.conversationState.activeConversation(),
+      legalHoldModal: $root.titleBar.contentViewModel.legalHoldModal,
+      callingRepository: $root.repositories.calling,
+    "
+  >
+  </title-bar>
+
   <messages-list
     id="message-list"
     class="message-list"
@@ -28,7 +39,9 @@
     getVisibleCallback: $root.messageList.getInViewportCallback,
   "
   ></messages-list>
+
   #include('content/conversation/input-bar.htm')
+
   <div class="conversation-loading">
     <div class="icon-spinner spin accent-text"></div>
   </div>
