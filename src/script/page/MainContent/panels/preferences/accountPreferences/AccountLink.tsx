@@ -47,10 +47,12 @@ const AccountLink: React.FC<AccountLinkProps> = ({label, value, ...rest}) => {
         }}
       >
         <label
-          className="label"
+          className="label preferences-label"
           css={{
+            alignItems: 'center',
             color: 'var(--text-input-label)',
-            marginBottom: 2,
+            display: 'flex',
+            height: 48,
           }}
           data-uie-name="label-profile-link"
         >
