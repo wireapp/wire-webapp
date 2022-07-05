@@ -715,12 +715,11 @@ export class MessageRepository {
       syncTimestamp: true,
     },
   ) {
-    if (true) {
-      return this.conversationService.sendMLSMessage(
-        'y/mFe5AoQWwquKo+t7nvXUY/30FVfLNzTZG0+v9PvI4=' /** TODO map group_id */,
-        Uint8Array.from([1, 2, 3]),
-      );
+    if (conversation.groupId) {
+      await this.conversationService.sendMLSMessage(conversation.groupId, payload);
+      return payload;
     }
+
     const userIds = await this.generateRecipients(conversation, recipients, skipSelf);
 
     const injectOptimisticEvent: MessageSendingCallbacks['onStart'] = async genericMessage => {
