@@ -7,12 +7,12 @@
   <title-bar
     params="
       conversationEntity: $root.conversationState.activeConversation(),
-      legalHoldModal: $root.titleBar.contentViewModel.legalHoldModal,
+      legalHoldModal: $root.legalHoldModal,
       panelViewModel: $root.mainViewModel.panel,
-      showConversationDetails: $root.titleBar.showDetails,
       callingRepository: $root.repositories.calling,
       callActions: $root.mainViewModel.calling.callActions,
-      isPanelVisible: $root.mainViewModel.panel.isVisible,
+      panelViewModel: $root.mainViewModel.panel,
+      root: $root,
     "
   >
   </title-bar>

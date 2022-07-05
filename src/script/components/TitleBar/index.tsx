@@ -19,9 +19,9 @@
 
 import {WebAppEvents} from '@wireapp/webapp-events';
 import {amplify} from 'amplify';
-import React, {useMemo} from 'react';
-import {registerReactComponent} from 'Util/ComponentUtil';
-import {t} from 'Util/LocalizerUtil';
+import React, {useMemo, useEffect, useCallback} from 'react';
+import {registerReactComponent, useKoSubscribableChildren} from 'Util/ComponentUtil';
+import {StringIdentifer, t} from 'Util/LocalizerUtil';
 import {ConversationVerificationState} from '../../conversation/ConversationVerificationState';
 import LegalHoldDot from 'Components/LegalHoldDot';
 import Icon from 'Components/Icon';
@@ -37,18 +37,18 @@ import {TeamState} from '../../team/TeamState';
 import {container} from 'tsyringe';
 import {LegalHoldModalViewModel} from '../../view_model/content/LegalHoldModalViewModel';
 import {ConversationFilter} from '../../conversation/ConversationFilter';
-import {generateWarningBadgeKey} from '../../view_model/content/TitleBarViewModel';
 import {matchQualifiedIds} from 'Util/QualifiedId';
 import {CallActions} from '../../view_model/CallingViewModel';
 import {handleKeyDown} from 'Util/KeyboardUtil';
+import {PanelViewModel} from '../../view_model/PanelViewModel';
+import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 
 export interface TitleBarProps {
   conversationEntity: Conversation;
   legalHoldModal: LegalHoldModalViewModel;
-  showConversationDetails: (addParticipants: boolean) => void;
   callingRepository: CallingRepository;
   callActions: CallActions;
-  isPanelVisible: boolean;
+  panelViewModel: PanelViewModel;
   userState: UserState;
   callState: CallState;
   teamState: TeamState;
@@ -57,60 +57,127 @@ export interface TitleBarProps {
 const TitleBar: React.FC<TitleBarProps> = ({
   conversationEntity,
   legalHoldModal,
-  showConversationDetails,
   callingRepository,
   callActions,
-  isPanelVisible,
+  panelViewModel,
   userState = container.resolve(UserState),
   callState = container.resolve(CallState),
   teamState = container.resolve(TeamState),
 }) => {
+  const {
+    is1to1,
+    isRequest,
+    isActiveParticipant,
+    isGroup,
+    hasExternal,
+    hasDirectGuest,
+    hasService,
+    hasFederatedUsers,
+    firstUserEntity,
+    hasLegalHold,
+    display_name: displayName,
+  } = useKoSubscribableChildren(conversationEntity, [
+    'is1to1',
+    'isRequest',
+    'isActiveParticipant',
+    'isGroup',
+    'hasExternal',
+    'hasDirectGuest',
+    'hasService',
+    'hasFederatedUsers',
+    'firstUserEntity',
+    'hasLegalHold',
+    'display_name',
+  ]);
+
+  const {isVisible: isPanelVisible} = useKoSubscribableChildren(panelViewModel, ['isVisible']);
+
+  const {isActivatedAccount} = useKoSubscribableChildren(userState, ['isActivatedAccount']);
+  const {joinedCall} = useKoSubscribableChildren(callState, ['joinedCall']);
+  const {isVideoCallingEnabled} = useKoSubscribableChildren(teamState, ['isVideoCallingEnabled']);
+
   const badgeLabelCopy = useMemo(() => {
-    if (conversationEntity.is1to1() && conversationEntity.isRequest()) {
+    if (is1to1 && isRequest) {
       return '';
     }
 
-    const hasExternal = conversationEntity.hasExternal();
-    const hasGuest = conversationEntity.hasDirectGuest();
-    const hasService = conversationEntity.hasService();
-    const hasFederated = conversationEntity.hasFederatedUsers();
-    const translationKey = generateWarningBadgeKey({hasExternal, hasFederated, hasGuest, hasService});
+    const translationKey = generateWarningBadgeKey({
+      hasExternal,
+      hasFederated: hasFederatedUsers,
+      hasGuest: hasDirectGuest,
+      hasService,
+    });
 
     if (translationKey) {
       return t(translationKey);
     }
 
     return '';
-  }, [conversationEntity]);
+  }, [hasDirectGuest, hasExternal, hasFederatedUsers, hasService, is1to1, isRequest]);
 
   const hasCall = useMemo(() => {
-    const joinedCall = callState.joinedCall();
-    const hasEntities = conversationEntity && !!joinedCall;
+    const hasEntities = !!joinedCall;
     return hasEntities && matchQualifiedIds(conversationEntity.qualifiedId, joinedCall.conversationId);
-  }, [callState, conversationEntity]);
+  }, [conversationEntity, joinedCall]);
 
-  const showCallControls = conversationEntity && ConversationFilter.showCallControls(conversationEntity, hasCall);
+  const showCallControls = ConversationFilter.showCallControls(conversationEntity, hasCall);
 
-  const isActivatedAccount = userState.isActivatedAccount();
+  const supportsVideoCall = conversationEntity.supportsVideoCall(callingRepository.supportsConferenceCalling);
 
-  const supportsVideoCall = conversationEntity?.supportsVideoCall(callingRepository.supportsConferenceCalling);
-
-  const isVideoCallingEnabled = teamState.isVideoCallingEnabled();
-
-  const conversationSubtitle =
-    conversationEntity.is1to1() && conversationEntity.firstUserEntity?.()?.isFederated
-      ? conversationEntity.firstUserEntity()?.handle ?? ''
-      : '';
+  const conversationSubtitle = is1to1 && firstUserEntity.isFederated ? firstUserEntity.handle ?? '' : '';
 
   const shortcut = Shortcut.getShortcutTooltip(ShortcutType.PEOPLE);
   const peopleTooltip = t('tooltipConversationPeople', shortcut);
+
+  const showDetails = useCallback(
+    (addParticipants: boolean): void => {
+      const panelId = addParticipants
+        ? PanelViewModel.STATE.ADD_PARTICIPANTS
+        : PanelViewModel.STATE.CONVERSATION_DETAILS;
+      panelViewModel.togglePanel(panelId, {entity: conversationEntity});
+    },
+    [conversationEntity, panelViewModel],
+  );
+
+  const showAddParticipant = useCallback(() => {
+    if (!isActiveParticipant) {
+      return showDetails(false);
+    }
+
+    if (isGroup) {
+      showDetails(true);
+    } else {
+      amplify.publish(WebAppEvents.CONVERSATION.CREATE_GROUP, 'conversation_details', firstUserEntity);
+    }
+  }, [firstUserEntity, isActiveParticipant, isGroup, showDetails]);
+
+  useEffect(() => {
+    // TODO remove the titlebar for now to ensure that buttons are clickable in macOS wrappers
+    window.setTimeout(() => $('.titlebar').remove(), TIME_IN_MILLIS.SECOND);
+
+    window.setTimeout(() => {
+      amplify.subscribe(WebAppEvents.SHORTCUT.PEOPLE, () => showDetails(false));
+      amplify.subscribe(WebAppEvents.SHORTCUT.ADD_PEOPLE, () => {
+        if (isActivatedAccount) {
+          showAddParticipant();
+        }
+      });
+    }, 50);
+
+    return () => {
+      amplify.unsubscribeAll(WebAppEvents.SHORTCUT.PEOPLE);
+      amplify.unsubscribeAll(WebAppEvents.SHORTCUT.ADD_PEOPLE);
+    };
+  }, [isActivatedAccount, showAddParticipant, showDetails]);
 
   const onClickCollectionButton = () => {
     amplify.publish(WebAppEvents.CONTENT.SWITCH, ContentViewModel.STATE.COLLECTION);
   };
 
   const onClickDetails = () => {
-    showConversationDetails(false);
+    const panelId = PanelViewModel.STATE.CONVERSATION_DETAILS;
+    panelViewModel.togglePanel(panelId, {entity: conversationEntity});
+    showDetails(false);
   };
 
   return (
@@ -145,7 +212,7 @@ const TitleBar: React.FC<TitleBarProps> = ({
               data-uie-name="do-participants"
             >
               <div className="conversation-title-bar-name-label--wrapper">
-                {conversationEntity.hasLegalHold() && (
+                {hasLegalHold && (
                   <LegalHoldDot
                     dataUieName="status-legal-hold-conversation"
                     className="conversation-title-bar-legal-hold"
@@ -159,7 +226,7 @@ const TitleBar: React.FC<TitleBarProps> = ({
                 )}
 
                 <h2 className="conversation-title-bar-name-label" data-uie-name="status-conversation-title-bar-label">
-                  {conversationEntity.display_name()}
+                  {displayName}
                 </h2>
               </div>
 
@@ -220,6 +287,40 @@ const TitleBar: React.FC<TitleBarProps> = ({
     </ul>
   );
 };
+
+export function generateWarningBadgeKey({
+  hasFederated,
+  hasExternal,
+  hasGuest,
+  hasService,
+}: {
+  hasExternal?: boolean;
+  hasFederated?: boolean;
+  hasGuest?: boolean;
+  hasService?: boolean;
+}): StringIdentifer {
+  const baseKey = 'guestRoomConversationBadge';
+  const extras = [];
+  if (hasGuest && !hasExternal && !hasService && !hasFederated) {
+    return baseKey;
+  }
+  if (hasFederated) {
+    extras.push('Federated');
+  }
+  if (hasExternal) {
+    extras.push('External');
+  }
+  if (hasGuest) {
+    extras.push('Guest');
+  }
+  if (hasService) {
+    extras.push('Service');
+  }
+  if (!extras.length) {
+    return '';
+  }
+  return `${baseKey}${extras.join('And')}` as StringIdentifer;
+}
 
 export default TitleBar;
 
