@@ -41,6 +41,7 @@ import {
   CONVERSATION_TYPE,
   NewConversation,
   Conversation as BackendConversation,
+  ConversationProtocol,
 } from '@wireapp/api-client/src/conversation/';
 import {container} from 'tsyringe';
 import {ConversationReceiptModeUpdateData} from '@wireapp/api-client/src/conversation/data/';
@@ -396,7 +397,7 @@ export class ConversationRepository {
      * we need to add this creator_client to conversation creation payload
      * for creating MLS conversations
      */
-    if (this.teamState.isMLSEnabled()) {
+    if (options.protocol === ConversationProtocol.MLS) {
       payload.creator_client = this.clientState.currentClient().id;
       payload.selfUserId = this.userState.self().qualifiedId;
     }
