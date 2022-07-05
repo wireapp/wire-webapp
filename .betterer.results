@@ -1351,7 +1351,7 @@ exports[`stricter compilation`] = {
       [1182, 12, 35, "Object is possibly \'undefined\'.", "901544345"],
       [1184, 13, 35, "Object is possibly \'undefined\'.", "901544345"]
     ],
-    "src/script/conversation/ConversationRepository.ts:3174583672": [
+    "src/script/conversation/ConversationRepository.ts:500063414": [
       [179, 8, 29, "Argument of type \'(User | undefined)[] | undefined\' is not assignable to parameter of type \'User[] | undefined\'.\\n  Type \'(User | undefined)[]\' is not assignable to type \'User[]\'.", "1506995572"],
       [185, 75, 13, "No overload matches this call.\\n  Overload 1 of 4, \'(value: string | number | Date): Date\', gave the following error.\\n    Argument of type \'string | undefined\' is not assignable to parameter of type \'string | number | Date\'.\\n  Overload 2 of 4, \'(value: string | number): Date\', gave the following error.\\n    Argument of type \'string | undefined\' is not assignable to parameter of type \'string | number\'.", "2642562490"],
       [204, 16, 24, "Argument of type \'string | undefined\' is not assignable to parameter of type \'string\'.\\n  Type \'undefined\' is not assignable to type \'string\'.", "2322605270"],
@@ -1411,7 +1411,7 @@ exports[`stricter compilation`] = {
       [65, 6, 27, "Object is possibly \'undefined\'.", "2595125417"],
       [93, 54, 4, "Argument of type \'null\' is not assignable to parameter of type \'string | undefined\'.", "2087897566"]
     ],
-    "src/script/conversation/ConversationService.ts:112701748": [
+    "src/script/conversation/ConversationService.ts:3614282690": [
       [348, 4, 92, "Type \'Promise<T | undefined>\' is not assignable to type \'Promise<T>\'.\\n  Type \'T | undefined\' is not assignable to type \'T\'.\\n    \'T\' could be instantiated with an arbitrary type which could be unrelated to \'T | undefined\'.", "1764067179"]
     ],
     "src/script/conversation/ConversationState.ts:3761486215": [
@@ -1995,7 +1995,7 @@ exports[`stricter compilation`] = {
     "src/script/main/SingleInstanceHandler.ts:305503035": [
       [118, 6, 27, "Cannot invoke an object which is possibly \'undefined\'.", "107936000"]
     ],
-    "src/script/main/app.ts:1711472333": [
+    "src/script/main/app.ts:3587239796": [
       [156, 2, 5, "Property \'debug\' has no initializer and is not definitely assigned in the constructor.", "164124116"],
       [157, 2, 4, "Property \'util\' has no initializer and is not definitely assigned in the constructor.", "2087972225"],
       [349, 87, 5, "Object is of type \'unknown\'.", "165548477"],
@@ -2004,10 +2004,9 @@ exports[`stricter compilation`] = {
       [418, 65, 19, "Argument of type \'import(\\"wire-webapp/node_modules/@wireapp/api-client/src/client/ClientType\\").ClientType | undefined\' is not assignable to parameter of type \'string | number\'.\\n  Type \'undefined\' is not assignable to type \'string | number\'.", "1723063280"],
       [485, 27, 5, "Argument of type \'unknown\' is not assignable to parameter of type \'BaseError\'.", "165548477"],
       [503, 36, 11, "Object is possibly \'undefined\'.", "3663176296"],
-      [699, 62, 6, "Argument of type \'string | undefined\' is not assignable to parameter of type \'string | null\'.", "1127975365"],
-      [776, 12, 5, "Object is of type \'unknown\'.", "165548477"],
-      [830, 81, 5, "Object is of type \'unknown\'.", "165548477"],
-      [874, 37, 15, "Argument of type \'string | undefined\' is not assignable to parameter of type \'string | URL\'.\\n  Type \'undefined\' is not assignable to type \'string | URL\'.", "1529230466"]
+      [778, 12, 5, "Object is of type \'unknown\'.", "165548477"],
+      [832, 81, 5, "Object is of type \'unknown\'.", "165548477"],
+      [876, 37, 15, "Argument of type \'string | undefined\' is not assignable to parameter of type \'string | URL\'.\\n  Type \'undefined\' is not assignable to type \'string | URL\'.", "1529230466"]
     ],
     "src/script/media/MediaConstraintsHandler.test.ts:456751395": [
       [43, 47, 4, "Argument of type \'null\' is not assignable to parameter of type \'string | undefined\'.", "2087897566"]

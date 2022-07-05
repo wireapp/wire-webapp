@@ -1352,7 +1352,7 @@ export class ConversationRepository {
     const userIds = userEntities.map(userEntity => userEntity.qualifiedId);
 
     try {
-      const response = await this.conversation_service.postMembers(conversationEntity.id, userIds);
+      const response = await this.conversation_service.postMembers(conversationEntity.qualifiedId, userIds);
       if (response) {
         this.eventRepository.injectEvent(response, EventRepository.SOURCE.BACKEND_RESPONSE);
       }
