@@ -40,6 +40,7 @@ import {ConversationFilter} from '../../conversation/ConversationFilter';
 import {generateWarningBadgeKey} from '../../view_model/content/TitleBarViewModel';
 import {matchQualifiedIds} from 'Util/QualifiedId';
 import {CallActions} from '../../view_model/CallingViewModel';
+import {handleKeyDown} from 'Util/KeyboardUtil';
 
 export interface TitleBarProps {
   conversationEntity: Conversation;
@@ -137,7 +138,7 @@ const TitleBar: React.FC<TitleBarProps> = ({
               onClick={onClickDetails}
               title={peopleTooltip}
               aria-label={peopleTooltip}
-              onKeyDown={onClickDetails}
+              onKeyDown={e => handleKeyDown(e, onClickDetails)}
               data-placement="bottom"
               role="button"
               tabIndex={0}
@@ -147,6 +148,7 @@ const TitleBar: React.FC<TitleBarProps> = ({
                 {conversationEntity.hasLegalHold() && (
                   <LegalHoldDot
                     dataUieName="status-legal-hold-conversation"
+                    className="conversation-title-bar-legal-hold"
                     legalHoldModal={legalHoldModal}
                     conversation={conversationEntity}
                   />
