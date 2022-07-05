@@ -1030,7 +1030,7 @@ export class ConversationService {
   }
 
   public async addUser(
-    conversationId: string,
+    conversationId: QualifiedId,
     userIds: string | string[] | QualifiedId | QualifiedId[],
   ): Promise<QualifiedId[]> {
     const ids = Array.isArray(userIds) ? userIds : [userIds];

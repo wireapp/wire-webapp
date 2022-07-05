@@ -20,7 +20,7 @@
 import type {Conversation, UserClients} from '@wireapp/api-client/src/conversation';
 import {CONVERSATION_TYPING} from '@wireapp/api-client/src/conversation/data';
 import type {ConversationEvent, TeamEvent, UserEvent} from '@wireapp/api-client/src/event';
-import type {User} from '@wireapp/api-client/src/user/';
+import type {QualifiedId, User} from '@wireapp/api-client/src/user/';
 import type {Account} from '@wireapp/core';
 import type {PayloadBundle, ReactionType} from '@wireapp/core/src/main/conversation/';
 import type {
@@ -47,7 +47,7 @@ export abstract class MessageHandler {
 
   abstract handleEvent(payload: PayloadBundle | ConversationEvent | UserEvent | TeamEvent): void;
 
-  async addUser(conversationId: string, userId: string): Promise<void> {
+  async addUser(conversationId: QualifiedId, userId: string): Promise<void> {
     if (this.account?.service) {
       await this.account.service.conversation.addUser(conversationId, userId);
     }
