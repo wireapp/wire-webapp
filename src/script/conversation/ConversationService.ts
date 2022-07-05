@@ -327,7 +327,7 @@ export class ConversationService {
    * @param userIds IDs of users to be added to the conversation
    * @returns Resolves with the server response
    */
-  postMembers(conversationId: string, userIds: QualifiedId[]): Promise<ConversationMemberJoinEvent> {
+  postMembers(conversationId: QualifiedId, userIds: QualifiedId[]): Promise<ConversationMemberJoinEvent> {
     return this.apiClient.api.conversation.postMembers(conversationId, userIds);
   }
 
