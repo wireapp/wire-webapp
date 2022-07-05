@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [12.1.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/bot-api/compare/@wireapp/bot-api@12.0.40...@wireapp/bot-api@12.1.0) (2022-07-05)
+
+
+### Features
+
+* Upgrade conversation member endpoint to v2 ([#4312](https://github.com/wireapp/wire-web-packages/tree/main/packages/bot-api/issues/4312)) ([f68e812](https://github.com/wireapp/wire-web-packages/tree/main/packages/bot-api/commit/f68e812e6c4d7601d4d4c194e4f853a76bff39e5))
+
+
+
+
+
 ## [12.0.40](https://github.com/wireapp/wire-web-packages/tree/main/packages/bot-api/compare/@wireapp/bot-api@12.0.39...@wireapp/bot-api@12.0.40) (2022-07-05)
 
 **Note:** Version bump only for package @wireapp/bot-api
