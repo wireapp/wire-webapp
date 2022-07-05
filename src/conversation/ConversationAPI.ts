@@ -988,10 +988,10 @@ export class ConversationAPI {
    * @param conversationId The conversation ID to add the users to
    * @param users List of users to add to a conversation
    */
-  public async postMembers(conversationId: string, users: QualifiedId[]): Promise<ConversationMemberJoinEvent> {
+  public async postMembers(conversationId: QualifiedId, users: QualifiedId[]): Promise<ConversationMemberJoinEvent> {
     if (!this.backendFeatures.federationEndpoints) {
       return this.postMembersV0(
-        conversationId,
+        conversationId.id,
         users.map(user => user.id),
       );
     }
@@ -1004,8 +1004,8 @@ export class ConversationAPI {
       method: 'post',
       url:
         this.backendFeatures.version >= 2
-          ? `${ConversationAPI.URL.CONVERSATIONS}/${conversationId}/${ConversationAPI.URL.MEMBERS}`
-          : `${ConversationAPI.URL.CONVERSATIONS}/${conversationId}/${ConversationAPI.URL.MEMBERS}/${ConversationAPI.URL.V2}`,
+          ? `${ConversationAPI.URL.CONVERSATIONS}/${conversationId.domain}/${conversationId.id}/${ConversationAPI.URL.MEMBERS}`
+          : `${ConversationAPI.URL.CONVERSATIONS}/${conversationId.id}/${ConversationAPI.URL.MEMBERS}/${ConversationAPI.URL.V2}`,
     };
 
     try {
