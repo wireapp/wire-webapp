@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [8.7.1](https://github.com/wireapp/wire-web-packages/tree/main/packages/react-ui-kit/compare/@wireapp/react-ui-kit@8.7.0...@wireapp/react-ui-kit@8.7.1) (2022-07-05)
+
+
+### Bug Fixes
+
+* restore missing data-uie on input ([#4311](https://github.com/wireapp/wire-web-packages/tree/main/packages/react-ui-kit/issues/4311)) ([4dcf500](https://github.com/wireapp/wire-web-packages/tree/main/packages/react-ui-kit/commit/4dcf500745efd4721b8ae10f987500f6594bb183))
+
+
+
+
+
 # [8.7.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/react-ui-kit/compare/@wireapp/react-ui-kit@8.6.0...@wireapp/react-ui-kit@8.7.0) (2022-07-04)
 
 
