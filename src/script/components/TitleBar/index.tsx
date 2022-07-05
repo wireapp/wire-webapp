@@ -76,6 +76,7 @@ const TitleBar: React.FC<TitleBarProps> = ({
     firstUserEntity,
     hasLegalHold,
     display_name: displayName,
+    verification_state: verificationState,
   } = useKoSubscribableChildren(conversationEntity, [
     'is1to1',
     'isRequest',
@@ -88,6 +89,7 @@ const TitleBar: React.FC<TitleBarProps> = ({
     'firstUserEntity',
     'hasLegalHold',
     'display_name',
+    'verification_state',
   ]);
 
   const {isVisible: isPanelVisible} = useKoSubscribableChildren(panelViewModel, ['isVisible']);
@@ -221,7 +223,7 @@ const TitleBar: React.FC<TitleBarProps> = ({
                   />
                 )}
 
-                {conversationEntity.verification_state() === ConversationVerificationState.VERIFIED && (
+                {verificationState === ConversationVerificationState.VERIFIED && (
                   <Icon.Verified className="conversation-title-bar-name--verified" />
                 )}
 
