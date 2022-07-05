@@ -59,7 +59,7 @@ const MainContent: React.FC<LeftSidebarProps> = ({
   const {activeConversation} = useKoSubscribableChildren(conversationState, ['activeConversation']);
   const repositories = contentViewModel.repositories;
 
-  const isFederated = contentViewModel.isFederated;
+  const {isFederated} = contentViewModel;
 
   const theme = {
     Input: {
