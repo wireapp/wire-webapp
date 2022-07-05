@@ -938,7 +938,7 @@
   "preferencesAccountDataTelemetry": "Les données d'utilisation permettent à {{brandName}} de comprendre comment l'application est utilisée et comment elle peut être améliorée. Les données sont anonymes et n'incluent pas le contenu de vos communications (messages, fichiers ou appels).",
   "preferencesAccountDataTelemetryCheckbox": "Envoyer des données d'utilisation anonymes",
   "preferencesAccountDelete": "Supprimer le compte",
-  "preferencesAccountDisplayname": "Displayname",
+  "preferencesAccountDisplayname": "Profile name",
   "preferencesAccountDomain": "Domain",
   "preferencesAccountEmail": "Email",
   "preferencesAccountEmailPlaceholder": "Votre adresse e-mail",

@@ -35,8 +35,8 @@ const PhoneLoginForm = ({isFetching, onSubmit}: LoginFormProps) => {
   const [countryCode, setCountryCode] = useState('1');
   const [country, setCountry] = useState('US');
   const [validInput, setValidInput] = useState(true);
-  const phoneInput = useRef();
-  const countryCodeInput = useRef();
+  const phoneInput = useRef(null);
+  const countryCodeInput = useRef(null);
   const countryList = COUNTRY_CODES.map(({iso, name}) => ({
     label: name,
     value: iso,

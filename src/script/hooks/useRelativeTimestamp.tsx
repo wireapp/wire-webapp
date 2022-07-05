@@ -34,7 +34,7 @@ import {
 } from 'Util/TimeUtil';
 import {useEffect, useState} from 'react';
 
-export function useRelativeTimestamp(timestamp: number, asDay?: boolean) {
+export function useRelativeTimestamp(timestamp: number, asDay = false) {
   const calculateTimestamp = (ts: number, isDay: boolean) => {
     const date = fromUnixTime(ts / TIME_IN_MILLIS.SECOND);
     if (isYoungerThan2Minutes(date)) {

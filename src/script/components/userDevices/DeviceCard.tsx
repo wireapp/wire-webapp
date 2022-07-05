@@ -59,7 +59,7 @@ const DeviceCard: React.FC<DeviceCardProps> = ({
 
   return (
     <div
-      role={clickable && 'button'}
+      role={clickable ? 'button' : undefined}
       tabIndex={clickable ? 0 : -1}
       className={cx('device-card', {'device-card__no-hover': !clickable})}
       onClick={clickOnDevice}
@@ -86,7 +86,7 @@ const DeviceCard: React.FC<DeviceCardProps> = ({
           </span>
         </div>
       </div>
-      {showVerified && <VerifiedIcon isVerified={isVerified()} />}
+      {showVerified && <VerifiedIcon isVerified={!!isVerified && isVerified()} />}
       {clickable && <Icon.ChevronRight className="disclose-icon" data-uie-name="disclose-icon" />}
     </div>
   );
