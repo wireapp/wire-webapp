@@ -19,7 +19,7 @@
 
 import {WebAppEvents} from '@wireapp/webapp-events';
 import {amplify} from 'amplify';
-import React from 'react';
+import React, {useMemo} from 'react';
 import {registerReactComponent} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 import {ConversationVerificationState} from '../../conversation/ConversationVerificationState';
@@ -30,10 +30,8 @@ import {Shortcut} from '../../ui/Shortcut';
 import {ShortcutType} from '../../ui/ShortcutType';
 import cx from 'classnames';
 import {Conversation} from '../../entity/Conversation';
-import {PanelViewModel} from '../../view_model/PanelViewModel';
 import {CallingRepository} from '../../calling/CallingRepository';
 import {UserState} from '../../user/UserState';
-import {ConversationState} from '../../conversation/ConversationState';
 import {CallState} from '../../calling/CallState';
 import {TeamState} from '../../team/TeamState';
 import {container} from 'tsyringe';
@@ -41,33 +39,33 @@ import {LegalHoldModalViewModel} from '../../view_model/content/LegalHoldModalVi
 import {ConversationFilter} from '../../conversation/ConversationFilter';
 import {generateWarningBadgeKey} from '../../view_model/content/TitleBarViewModel';
 import {matchQualifiedIds} from 'Util/QualifiedId';
+import {CallActions} from '../../view_model/CallingViewModel';
 
-interface TitleBarProps {
+export interface TitleBarProps {
   conversationEntity: Conversation;
   legalHoldModal: LegalHoldModalViewModel;
-  readonly panelViewModel: PanelViewModel;
-  readonly contentViewModel: ContentViewModel;
-  readonly callingRepository: CallingRepository;
-  readonly userState: UserState;
-  readonly conversationState: ConversationState;
-  readonly callState: CallState;
-  readonly teamState: TeamState;
+  showConversationDetails: (addParticipants: boolean) => void;
+  callingRepository: CallingRepository;
+  callActions: CallActions;
+  isPanelVisible: boolean;
+  userState: UserState;
+  callState: CallState;
+  teamState: TeamState;
 }
 
 const TitleBar: React.FC<TitleBarProps> = ({
   conversationEntity,
   legalHoldModal,
+  showConversationDetails,
   callingRepository,
+  callActions,
+  isPanelVisible,
   userState = container.resolve(UserState),
-  conversationState = container.resolve(ConversationState),
   callState = container.resolve(CallState),
   teamState = container.resolve(TeamState),
 }) => {
-  const {is1to1, firstUserEntity, isRequest} = conversationEntity;
-  const isActivatedAccount = userState.isActivatedAccount();
-
-  const badgeLabelCopy = () => {
-    if (is1to1() && isRequest()) {
+  const badgeLabelCopy = useMemo(() => {
+    if (conversationEntity.is1to1() && conversationEntity.isRequest()) {
       return '';
     }
 
@@ -82,26 +80,26 @@ const TitleBar: React.FC<TitleBarProps> = ({
     }
 
     return '';
-  };
+  }, [conversationEntity]);
 
-  const hasCall = () => {
-    return (
-      !!conversationEntity &&
-      !!callState?.joinedCall?.() &&
-      matchQualifiedIds(conversationEntity.qualifiedId, callState.joinedCall().conversationId)
-    );
-  };
+  const hasCall = useMemo(() => {
+    const joinedCall = callState.joinedCall();
+    const hasEntities = conversationEntity && !!joinedCall;
+    return hasEntities && matchQualifiedIds(conversationEntity.qualifiedId, joinedCall.conversationId);
+  }, [callState, conversationEntity]);
 
-  const showCallControls = () =>
-    conversationEntity && ConversationFilter.showCallControls(conversationEntity, hasCall());
+  const showCallControls = conversationEntity && ConversationFilter.showCallControls(conversationEntity, hasCall);
+
+  const isActivatedAccount = userState.isActivatedAccount();
 
   const supportsVideoCall = conversationEntity?.supportsVideoCall(callingRepository.supportsConferenceCalling);
 
   const isVideoCallingEnabled = teamState.isVideoCallingEnabled();
 
-  const panelIsVisible = true;
-  const conversation: any = null;
-  const conversationSubtitle = is1to1() && firstUserEntity?.()?.isFederated ? firstUserEntity()?.handle ?? '' : '';
+  const conversationSubtitle =
+    conversationEntity.is1to1() && conversationEntity.firstUserEntity?.()?.isFederated
+      ? conversationEntity.firstUserEntity()?.handle ?? ''
+      : '';
 
   const shortcut = Shortcut.getShortcutTooltip(ShortcutType.PEOPLE);
   const peopleTooltip = t('tooltipConversationPeople', shortcut);
@@ -110,119 +108,114 @@ const TitleBar: React.FC<TitleBarProps> = ({
     amplify.publish(WebAppEvents.CONTENT.SWITCH, ContentViewModel.STATE.COLLECTION);
   };
 
-  const onClickDetails = () => {};
-
-  const callActions = {
-    startAudio: (conversationEntity: Conversation) => {},
-    startVideo: (conversationEntity: Conversation) => {},
+  const onClickDetails = () => {
+    showConversationDetails(false);
   };
 
   return (
-    <>
-      <ul id="conversation-title-bar" className="conversation-title-bar">
-        {conversationEntity && (
-          <>
-            <li className="conversation-title-bar-library">
-              {isActivatedAccount && (
-                <button
-                  className="conversation-title-bar-icon icon-search"
-                  type="button"
-                  title={t('tooltipConversationSearch')}
-                  aria-label={t('tooltipConversationSearch')}
-                  onClick={onClickCollectionButton}
-                  data-uie-name="do-collections"
-                >
-                  <span className="visually-hidden">{t('tooltipConversationSearch')}</span>
-                </button>
-              )}
-            </li>
-
-            <li className="conversation-title-bar-name">
-              <div
-                id="show-participants"
-                onClick={onClickDetails}
-                title={peopleTooltip}
-                aria-label={peopleTooltip}
-                onKeyDown={onClickDetails}
-                data-placement="bottom"
-                role="button"
-                tabIndex={0}
-                data-uie-name="do-participants"
+    <ul id="conversation-title-bar" className="conversation-title-bar">
+      {conversationEntity && (
+        <>
+          <li className="conversation-title-bar-library">
+            {isActivatedAccount && (
+              <button
+                className="conversation-title-bar-icon icon-search"
+                type="button"
+                title={t('tooltipConversationSearch')}
+                aria-label={t('tooltipConversationSearch')}
+                onClick={onClickCollectionButton}
+                data-uie-name="do-collections"
               >
-                <div className="conversation-title-bar-name-label--wrapper">
-                  {conversationEntity.hasLegalHold() && (
-                    <LegalHoldDot
-                      dataUieName="status-legal-hold-conversation"
-                      legalHoldModal={legalHoldModal}
-                      conversation={conversation}
-                    />
-                  )}
+                <span className="visually-hidden">{t('tooltipConversationSearch')}</span>
+              </button>
+            )}
+          </li>
 
-                  {conversationEntity.verification_state() === ConversationVerificationState.VERIFIED && (
-                    <Icon.Verified className="conversation-title-bar-name--verified" />
-                  )}
-
-                  <h2 className="conversation-title-bar-name-label" data-uie-name="status-conversation-title-bar-label">
-                    {conversationEntity.display_name()}
-                  </h2>
-                </div>
-
-                {conversationSubtitle && (
-                  <div className="conversation-title-bar-name--subtitle">{conversationSubtitle}</div>
+          <li className="conversation-title-bar-name">
+            <div
+              id="show-participants"
+              onClick={onClickDetails}
+              title={peopleTooltip}
+              aria-label={peopleTooltip}
+              onKeyDown={onClickDetails}
+              data-placement="bottom"
+              role="button"
+              tabIndex={0}
+              data-uie-name="do-participants"
+            >
+              <div className="conversation-title-bar-name-label--wrapper">
+                {conversationEntity.hasLegalHold() && (
+                  <LegalHoldDot
+                    dataUieName="status-legal-hold-conversation"
+                    legalHoldModal={legalHoldModal}
+                    conversation={conversationEntity}
+                  />
                 )}
+
+                {conversationEntity.verification_state() === ConversationVerificationState.VERIFIED && (
+                  <Icon.Verified className="conversation-title-bar-name--verified" />
+                )}
+
+                <h2 className="conversation-title-bar-name-label" data-uie-name="status-conversation-title-bar-label">
+                  {conversationEntity.display_name()}
+                </h2>
               </div>
-            </li>
 
-            <li className="conversation-title-bar-icons">
-              {showCallControls() && (
-                <div className="buttons-group">
-                  {supportsVideoCall && isVideoCallingEnabled && (
-                    <button
-                      type="button"
-                      className="conversation-title-bar-icon"
-                      title={t('tooltipConversationVideoCall')}
-                      aria-label={t('tooltipConversationVideoCall')}
-                      onClick={() => callActions.startVideo(conversationEntity)}
-                      data-uie-name="do-video-call"
-                    >
-                      <Icon.Camera />
-                    </button>
-                  )}
+              {conversationSubtitle && (
+                <div className="conversation-title-bar-name--subtitle">{conversationSubtitle}</div>
+              )}
+            </div>
+          </li>
 
+          <li className="conversation-title-bar-icons">
+            {showCallControls && (
+              <div className="buttons-group">
+                {supportsVideoCall && isVideoCallingEnabled && (
                   <button
                     type="button"
                     className="conversation-title-bar-icon"
-                    title={t('tooltipConversationCall')}
-                    aria-label={t('tooltipConversationCall')}
-                    onClick={() => callActions.startAudio(conversationEntity)}
-                    data-uie-name="do-call"
+                    title={t('tooltipConversationVideoCall')}
+                    aria-label={t('tooltipConversationVideoCall')}
+                    onClick={() => callActions.startVideo(conversationEntity)}
+                    data-uie-name="do-video-call"
                   >
-                    <Icon.Pickup />
+                    <Icon.Camera />
                   </button>
-                </div>
-              )}
+                )}
 
-              <button
-                type="button"
-                title={t('tooltipConversationInfo')}
-                aria-label={t('tooltipConversationInfo')}
-                onClick={onClickDetails}
-                className={cx('conversation-title-bar-icon', {active: panelIsVisible})}
-                data-uie-name="do-open-info"
-              >
-                <Icon.Info />
-              </button>
-            </li>
-
-            {badgeLabelCopy() && (
-              <li className="conversation-title-bar-indication-badge" data-uie-name="status-indication-badge">
-                {badgeLabelCopy()}
-              </li>
+                <button
+                  type="button"
+                  className="conversation-title-bar-icon"
+                  title={t('tooltipConversationCall')}
+                  aria-label={t('tooltipConversationCall')}
+                  onClick={() => callActions.startAudio(conversationEntity)}
+                  data-uie-name="do-call"
+                >
+                  <Icon.Pickup />
+                </button>
+              </div>
             )}
-          </>
-        )}
-      </ul>
-    </>
+
+            <button
+              type="button"
+              title={t('tooltipConversationInfo')}
+              aria-label={t('tooltipConversationInfo')}
+              onClick={onClickDetails}
+              className={cx('conversation-title-bar-icon', {active: isPanelVisible})}
+              data-uie-name="do-open-info"
+            >
+              <Icon.Info />
+            </button>
+          </li>
+
+          {badgeLabelCopy && (
+            <li className="conversation-title-bar-indication-badge" data-uie-name="status-indication-badge">
+              {badgeLabelCopy}
+            </li>
+          )}
+        </>
+      )}
+    </ul>
   );
 };
 
