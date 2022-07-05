@@ -696,14 +696,16 @@ class App {
     }
 
     const router = new Router({
-      '/conversation/:conversationId(/:domain)': (conversationId: string, domain?: string) =>
-        mainView.content.showConversation(conversationId, {}, domain),
+      '/conversation/:conversationId(/:domain)': (
+        conversationId: string,
+        domain: string = this.apiClient.context?.domain ?? '',
+      ) => mainView.content.showConversation(conversationId, {}, domain),
       '/preferences/about': () => mainView.list.openPreferencesAbout(),
       '/preferences/account': () => mainView.list.openPreferencesAccount(),
       '/preferences/av': () => mainView.list.openPreferencesAudioVideo(),
       '/preferences/devices': () => mainView.list.openPreferencesDevices(),
       '/preferences/options': () => mainView.list.openPreferencesOptions(),
-      '/user/:userId(/:domain)': (userId: string, domain: string = this.apiClient.context!.domain ?? '') => {
+      '/user/:userId(/:domain)': (userId: string, domain: string = this.apiClient.context?.domain ?? '') => {
         showUserModal({
           actionsViewModel: mainView.actions,
           onClose: () => router.navigate('/'),
