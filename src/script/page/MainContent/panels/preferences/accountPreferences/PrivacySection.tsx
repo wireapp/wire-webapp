@@ -76,8 +76,7 @@ const PrivacySection: React.FC<PrivacySectionProps> = ({
         <div className="checkbox-margin">
           <Checkbox
             onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-              const isChecked = event.target.checked;
-              appLockRepository.setEnabled(isChecked);
+              appLockRepository.setEnabled(event.target.checked);
             }}
             checked={isAppLockEnabled}
             disabled={isAppLockEnforced}

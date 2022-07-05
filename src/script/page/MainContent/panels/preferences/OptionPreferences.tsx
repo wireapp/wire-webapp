@@ -129,6 +129,7 @@ const OptionPreferences: React.FC<OptionPreferencesProps> = ({
       {isActivatedAccount && (
         <>
           <hr className="preferences-separator" />
+
           <PreferencesSection title={t('preferencesOptionsNotifications')}>
             <PreferencesRadio
               name="preferences-options-notification"
@@ -154,12 +155,13 @@ const OptionPreferences: React.FC<OptionPreferencesProps> = ({
               ]}
             />
           </PreferencesSection>
+
           <hr className="preferences-separator" />
+
           <PreferencesSection title={t('preferencesOptionsPopular')}>
             <Checkbox
               onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-                const isChecked = event.target.checked;
-                saveOptionNewTheme(isChecked);
+                saveOptionNewTheme(event.target.checked);
               }}
               checked={optionDarkMode}
               data-uie-name="status-preference-use-dark-mode"
@@ -168,11 +170,11 @@ const OptionPreferences: React.FC<OptionPreferencesProps> = ({
                 {t('preferencesOptionsUseDarkMode')}
               </CheckboxLabel>
             </Checkbox>
+
             <div className="checkbox-margin">
               <Checkbox
                 onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-                  const isChecked = event.target.checked;
-                  saveOptionEmojiPreference(isChecked);
+                  saveOptionEmojiPreference(event.target.checked);
                 }}
                 checked={optionReplaceInlineEmoji}
                 data-uie-name="status-preference-emoji-replace"
@@ -181,6 +183,7 @@ const OptionPreferences: React.FC<OptionPreferencesProps> = ({
                   {t('preferencesOptionsEmojiReplaceCheckbox')}
                 </CheckboxLabel>
               </Checkbox>
+
               <div
                 className="preferences-detail preferences-detail-intended"
                 aria-hidden="true"
@@ -193,11 +196,11 @@ const OptionPreferences: React.FC<OptionPreferencesProps> = ({
                 }}
               />
             </div>
+
             <div className="checkbox-margin">
               <Checkbox
                 onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-                  const isChecked = event.target.checked;
-                  saveOptionSendPreviewsPreference(isChecked);
+                  saveOptionSendPreviewsPreference(event.target.checked);
                 }}
                 checked={optionSendPreviews}
                 data-uie-name="status-preference-previews-send"
@@ -206,6 +209,7 @@ const OptionPreferences: React.FC<OptionPreferencesProps> = ({
                   {t('preferencesOptionsPreviewsSendCheckbox')}
                 </CheckboxLabel>
               </Checkbox>
+
               <div className="preferences-detail preferences-detail-intended">
                 {t('preferencesOptionsPreviewsSendDetail')}
               </div>

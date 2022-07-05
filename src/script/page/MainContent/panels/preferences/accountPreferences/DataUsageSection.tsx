@@ -83,6 +83,7 @@ const DataUsageSection: React.FC<DataUsageSectionProps> = ({
           {t('preferencesAccountDataDetail', brandName)}
         </div>
       </>
+
       {isTeam && isCountlyEnabled && (
         <div className="checkbox-margin">
           <Checkbox
