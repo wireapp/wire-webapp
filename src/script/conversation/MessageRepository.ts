@@ -32,6 +32,7 @@ import {
   QualifiedUserClients,
   MessageSendingStatus,
   UserClients,
+  ConversationProtocol,
 } from '@wireapp/api-client/src/conversation';
 import {QualifiedId, RequestCancellationError, User as APIClientUser} from '@wireapp/api-client/src/user';
 import {WebAppEvents} from '@wireapp/webapp-events';
@@ -749,6 +750,10 @@ export class MessageRepository {
       updateOptimisticEvent(genericMessage, sentTime);
     };
 
+    const conversationService = this.conversationService;
+    // Configure ephemeral messages
+    conversationService.messageTimer.setConversationLevelTimer(conversation.id, conversation.messageTimer());
+
     if (groupId) {
       return this.messageSender.queueMessage(() =>
         this.conversationService.send({
@@ -756,28 +761,22 @@ export class MessageRepository {
           onStart: injectOptimisticEvent,
           onSuccess: handleSuccess,
           payload,
+          protocol: ConversationProtocol.MLS,
         }),
       );
     }
 
-    const userIds = await this.generateRecipients(conversation, recipients, skipSelf);
-
-    const conversationService = this.conversationService;
-    // Configure ephemeral messages
-    conversationService.messageTimer.setConversationLevelTimer(conversation.id, conversation.messageTimer());
-
     return this.messageSender.queueMessage(() =>
       this.conversationService.send({
-        callbacks: {
-          onClientMismatch: mismatch => this.onClientMismatch?.(mismatch, conversation, silentDegradationWarning),
-          onStart: injectOptimisticEvent,
-          onSuccess: handleSuccess,
-        },
         conversationDomain: conversation.domain || undefined,
         nativePush,
-        payloadBundle: payload,
+        onClientMismatch: mismatch => this.onClientMismatch?.(mismatch, conversation, silentDegradationWarning),
+        onStart: injectOptimisticEvent,
+        onSuccess: handleSuccess,
+        payload,
+        protocol: ConversationProtocol.PROTEUS,
         targetMode,
-        userIds,
+        userIds: this.generateRecipients(conversation, recipients, skipSelf),
       }),
     );
   }
@@ -835,7 +834,8 @@ export class MessageRepository {
     await this.messageSender.queueMessage(() =>
       this.conversationService.send({
         conversationDomain: this.core.backendFeatures.federationEndpoints ? conversation.domain : undefined,
-        payloadBundle: sessionReset,
+        payload: sessionReset,
+        protocol: ConversationProtocol.PROTEUS,
         targetMode: MessageTargetMode.USERS_CLIENTS,
         userIds: this.core.backendFeatures.federationEndpoints ? {[userId.domain]: userClient} : userClient, // we target this message to the specific client of the user (no need for mismatch handling here)
       }),
