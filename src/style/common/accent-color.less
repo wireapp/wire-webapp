@@ -189,9 +189,13 @@ body {
 each(.colors(), .(@color-key, @color-name) {
   @name: @color-name;
   @accent-color: '@{name}-500';
+  @accent-color-highlight: '@{name}-50';
+  @accent-color-border: '@{name}-300';
 
   .main-accent-color-@{color-key} {
     --accent-color: @@accent-color;
+    --accent-color-highlight: @@accent-color-highlight;
+    --accent-color-border: @@accent-color-border;
     --accent-color-fade-16: fade(@@accent-color, 16%);
     --accent-color-fade-24: fade(@@accent-color, 24%);
     --accent-color-darken-16: darken(@@accent-color, 16%);
@@ -207,9 +211,13 @@ each(.colors(), .(@color-key, @color-name) {
 
   body.theme-dark {
     @accent-color-dark: '@{name}-dark-500';
+    @accent-color-highlight-dark: '@{name}-dark-800';
+    @accent-color-border-dark: '@{name}-dark-600';
 
     .main-accent-color-@{color-key} {
       --accent-color: @@accent-color-dark;
+      --accent-color-highlight: @@accent-color-highlight-dark;
+      --accent-color-border: @@accent-color-border-dark;
       each(@color-index, {
         @accent-color: '@{name}-dark-@{value}';
         --accent-color-@{value}: @@accent-color;
