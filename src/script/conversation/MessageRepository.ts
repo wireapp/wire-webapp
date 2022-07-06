@@ -715,12 +715,7 @@ export class MessageRepository {
       syncTimestamp: true,
     },
   ) {
-    if (conversation.groupId) {
-      await this.conversationService.sendMLSMessage(conversation.groupId, payload);
-      return payload;
-    }
-
-    const userIds = await this.generateRecipients(conversation, recipients, skipSelf);
+    const {groupId} = conversation;
 
     const injectOptimisticEvent: MessageSendingCallbacks['onStart'] = async genericMessage => {
       if (playPingAudio) {
@@ -747,6 +742,26 @@ export class MessageRepository {
       this.updateMessageAsSent(conversation, genericMessage.messageId, syncTimestamp ? sentTime : undefined);
     };
 
+    const handleSuccess = async (genericMessage: GenericMessage, sentTime?: string) => {
+      const preMessageTimestamp = new Date(new Date(sentTime).getTime() - 10).toISOString();
+      // Trigger an empty mismatch to check for users that have no devices and that could have been removed from the team
+      await this.onClientMismatch?.({time: preMessageTimestamp}, conversation, silentDegradationWarning);
+      updateOptimisticEvent(genericMessage, sentTime);
+    };
+
+    if (groupId) {
+      return this.messageSender.queueMessage(() =>
+        this.conversationService.sendMLSMessage({
+          groupId,
+          onStart: injectOptimisticEvent,
+          onSuccess: handleSuccess,
+          payload,
+        }),
+      );
+    }
+
+    const userIds = await this.generateRecipients(conversation, recipients, skipSelf);
+
     const conversationService = this.conversationService;
     // Configure ephemeral messages
     conversationService.messageTimer.setConversationLevelTimer(conversation.id, conversation.messageTimer());
@@ -756,12 +771,7 @@ export class MessageRepository {
         callbacks: {
           onClientMismatch: mismatch => this.onClientMismatch?.(mismatch, conversation, silentDegradationWarning),
           onStart: injectOptimisticEvent,
-          onSuccess: async (genericMessage, sentTime) => {
-            const preMessageTimestamp = new Date(new Date(sentTime).getTime() - 10).toISOString();
-            // Trigger an empty mismatch to check for users that have no devices and that could have been removed from the team
-            await this.onClientMismatch?.({time: preMessageTimestamp}, conversation, silentDegradationWarning);
-            updateOptimisticEvent(genericMessage, sentTime);
-          },
+          onSuccess: handleSuccess,
         },
         conversationDomain: conversation.domain || undefined,
         nativePush,
