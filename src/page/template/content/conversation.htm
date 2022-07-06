@@ -6,7 +6,7 @@
   <!-- ko if: $root.conversationRepository.conversationState.activeConversation() -->
   <title-bar
     params="
-      conversationEntity: $root.conversationState.activeConversation(),
+      conversation: $root.conversationState.activeConversation(),
       legalHoldModal: $root.legalHoldModal,
       panelViewModel: $root.mainViewModel.panel,
       callingRepository: $root.repositories.calling,

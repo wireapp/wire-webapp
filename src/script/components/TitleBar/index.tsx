@@ -44,7 +44,7 @@ import {PanelViewModel} from '../../view_model/PanelViewModel';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 
 export interface TitleBarProps {
-  conversationEntity: Conversation;
+  conversation: Conversation;
   legalHoldModal: LegalHoldModalViewModel;
   callingRepository: CallingRepository;
   callActions: CallActions;
@@ -55,7 +55,7 @@ export interface TitleBarProps {
 }
 
 const TitleBar: React.FC<TitleBarProps> = ({
-  conversationEntity,
+  conversation,
   legalHoldModal,
   callingRepository,
   callActions,
@@ -77,7 +77,7 @@ const TitleBar: React.FC<TitleBarProps> = ({
     hasLegalHold,
     display_name: displayName,
     verification_state: verificationState,
-  } = useKoSubscribableChildren(conversationEntity, [
+  } = useKoSubscribableChildren(conversation, [
     'is1to1',
     'isRequest',
     'isActiveParticipant',
@@ -119,12 +119,12 @@ const TitleBar: React.FC<TitleBarProps> = ({
 
   const hasCall = useMemo(() => {
     const hasEntities = !!joinedCall;
-    return hasEntities && matchQualifiedIds(conversationEntity.qualifiedId, joinedCall.conversationId);
-  }, [conversationEntity, joinedCall]);
+    return hasEntities && matchQualifiedIds(conversation.qualifiedId, joinedCall.conversationId);
+  }, [conversation, joinedCall]);
 
-  const showCallControls = ConversationFilter.showCallControls(conversationEntity, hasCall);
+  const showCallControls = ConversationFilter.showCallControls(conversation, hasCall);
 
-  const supportsVideoCall = conversationEntity.supportsVideoCall(callingRepository.supportsConferenceCalling);
+  const supportsVideoCall = conversation.supportsVideoCall(callingRepository.supportsConferenceCalling);
 
   const conversationSubtitle = is1to1 && firstUserEntity.isFederated ? firstUserEntity.handle ?? '' : '';
 
@@ -136,9 +136,9 @@ const TitleBar: React.FC<TitleBarProps> = ({
       const panelId = addParticipants
         ? PanelViewModel.STATE.ADD_PARTICIPANTS
         : PanelViewModel.STATE.CONVERSATION_DETAILS;
-      panelViewModel.togglePanel(panelId, {entity: conversationEntity});
+      panelViewModel.togglePanel(panelId, {entity: conversation});
     },
-    [conversationEntity, panelViewModel],
+    [conversation, panelViewModel],
   );
 
   const showAddParticipant = useCallback(() => {
@@ -178,7 +178,7 @@ const TitleBar: React.FC<TitleBarProps> = ({
 
   const onClickDetails = () => {
     const panelId = PanelViewModel.STATE.CONVERSATION_DETAILS;
-    panelViewModel.togglePanel(panelId, {entity: conversationEntity});
+    panelViewModel.togglePanel(panelId, {entity: conversation});
     showDetails(false);
   };
 
@@ -218,7 +218,7 @@ const TitleBar: React.FC<TitleBarProps> = ({
                   dataUieName="status-legal-hold-conversation"
                   className="conversation-title-bar-legal-hold"
                   legalHoldModal={legalHoldModal}
-                  conversation={conversationEntity}
+                  conversation={conversation}
                 />
               )}
 
@@ -246,7 +246,7 @@ const TitleBar: React.FC<TitleBarProps> = ({
                   className="conversation-title-bar-icon"
                   title={t('tooltipConversationVideoCall')}
                   aria-label={t('tooltipConversationVideoCall')}
-                  onClick={() => callActions.startVideo(conversationEntity)}
+                  onClick={() => callActions.startVideo(conversation)}
                   data-uie-name="do-video-call"
                 >
                   <Icon.Camera />
@@ -258,7 +258,7 @@ const TitleBar: React.FC<TitleBarProps> = ({
                 className="conversation-title-bar-icon"
                 title={t('tooltipConversationCall')}
                 aria-label={t('tooltipConversationCall')}
-                onClick={() => callActions.startAudio(conversationEntity)}
+                onClick={() => callActions.startAudio(conversation)}
                 data-uie-name="do-call"
               >
                 <Icon.Pickup />
