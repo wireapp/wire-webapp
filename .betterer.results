@@ -22,9 +22,9 @@ exports[`stricter compilation`] = {
     "src/script/assets/AssetCrypto.test.ts:2635946620": [
       [38, 55, 4, "Argument of type \'null\' is not assignable to parameter of type \'ArrayBuffer\'.", "2087897566"]
     ],
-    "src/script/assets/AssetMapper.ts:137626173": [
-      [49, 10, 6, "Type \'AssetRemoteData | undefined\' is not assignable to type \'AssetRemoteData\'.\\n  Type \'undefined\' is not assignable to type \'AssetRemoteData\'.", "1468438424"],
-      [49, 31, 7, "Type \'AssetRemoteData | undefined\' is not assignable to type \'AssetRemoteData\'.\\n  Type \'undefined\' is not assignable to type \'AssetRemoteData\'.", "1793644015"]
+    "src/script/assets/AssetMapper.ts:297607081": [
+      [51, 10, 6, "Type \'AssetRemoteData | undefined\' is not assignable to type \'AssetRemoteData\'.\\n  Type \'undefined\' is not assignable to type \'AssetRemoteData\'.", "1468438424"],
+      [51, 31, 7, "Type \'AssetRemoteData | undefined\' is not assignable to type \'AssetRemoteData\'.\\n  Type \'undefined\' is not assignable to type \'AssetRemoteData\'.", "1793644015"]
     ],
     "src/script/assets/AssetRemoteData.ts:2909057294": [
       [75, 8, 10, "Type \'string | undefined\' is not assignable to type \'string\'.\\n  Type \'undefined\' is not assignable to type \'string\'.", "2264616494"],
@@ -1974,14 +1974,11 @@ exports[`stricter compilation`] = {
     "src/script/hooks/usePausableTimeout.ts:3967169248": [
       [38, 6, 20, "Cannot invoke an object which is possibly \'undefined\'.", "2491310661"]
     ],
-    "src/script/integration/IntegrationRepository.ts:1781170224": [
-      [72, 4, 13, "Type \'ObservableArray<never>\' is not assignable to type \'ObservableArray<ServiceEntity>\'.\\n  Types of parameters \'value\' and \'value\' are incompatible.\\n    Type \'ServiceEntity[] | null | undefined\' is not assignable to type \'never[] | null | undefined\'.\\n      Type \'ServiceEntity[]\' is not assignable to type \'never[]\'.\\n        Type \'ServiceEntity\' is not assignable to type \'never\'.", "4242441731"],
-      [85, 56, 17, "Argument of type \'string | undefined\' is not assignable to parameter of type \'string\'.\\n  Type \'undefined\' is not assignable to type \'string\'.", "2786638268"],
-      [86, 26, 14, "Object is possibly \'undefined\'.", "2727665343"],
-      [101, 4, 50, "Type \'ServiceEntity | undefined\' is not assignable to type \'ServiceEntity\'.\\n  Type \'undefined\' is not assignable to type \'ServiceEntity\'.", "3311380496"],
-      [101, 31, 10, "Argument of type \'string | undefined\' is not assignable to parameter of type \'string\'.\\n  Type \'undefined\' is not assignable to type \'string\'.", "4118455337"],
-      [238, 77, 24, "Argument of type \'string | undefined\' is not assignable to parameter of type \'string\'.\\n  Type \'undefined\' is not assignable to type \'string\'.", "2322605270"],
-      [249, 57, 5, "Object is of type \'unknown\'.", "165548477"]
+    "src/script/integration/IntegrationRepository.ts:3537015114": [
+      [84, 56, 17, "Argument of type \'string | undefined\' is not assignable to parameter of type \'string\'.\\n  Type \'undefined\' is not assignable to type \'string\'.", "2786638268"],
+      [85, 26, 14, "Object is possibly \'undefined\'.", "2727665343"],
+      [100, 31, 10, "Argument of type \'string | undefined\' is not assignable to parameter of type \'string\'.\\n  Type \'undefined\' is not assignable to type \'string\'.", "4118455337"],
+      [240, 57, 5, "Object is of type \'unknown\'.", "165548477"]
     ],
     "src/script/integration/ServiceEntity.ts:2862427254": [
       [58, 4, 26, "Type \'Observable<AssetRemoteData | undefined>\' is not assignable to type \'Observable<AssetRemoteData>\'.", "2039859734"],
@@ -2212,7 +2209,7 @@ exports[`stricter compilation`] = {
     "src/script/team/TeamEntity.ts:781860466": [
       [48, 6, 7, "Type \'string | boolean\' is not assignable to type \'boolean\'.\\n  Type \'string\' is not assignable to type \'boolean\'.", "814555284"]
     ],
-    "src/script/team/TeamRepository.ts:2238095787": [
+    "src/script/team/TeamRepository.ts:2469907748": [
       [204, 4, 159, "Type \'(User | undefined)[]\' is not assignable to type \'User[]\'.\\n  Type \'User | undefined\' is not assignable to type \'User\'.\\n    Type \'undefined\' is not assignable to type \'User\'.", "587279576"],
       [210, 53, 24, "Argument of type \'string | undefined\' is not assignable to parameter of type \'string\'.\\n  Type \'undefined\' is not assignable to type \'string\'.", "2322605270"],
       [304, 4, 9, "Type \'(string | undefined)[]\' is not assignable to type \'string[]\'.\\n  Type \'string | undefined\' is not assignable to type \'string\'.\\n    Type \'undefined\' is not assignable to type \'string\'.", "3264882315"],
@@ -2307,7 +2304,7 @@ exports[`stricter compilation`] = {
       [221, 13, 15, "Object is possibly \'undefined\'.", "52415216"],
       [222, 13, 15, "Object is possibly \'undefined\'.", "52415216"]
     ],
-    "src/script/user/UserMapper.ts:450957740": [
+    "src/script/user/UserMapper.ts:1842788905": [
       [47, 4, 63, "Type \'User | undefined\' is not assignable to type \'User\'.\\n  Type \'undefined\' is not assignable to type \'User\'.", "55227688"],
       [47, 50, 4, "Argument of type \'null\' is not assignable to parameter of type \'string | undefined\'.", "2087897566"],
       [51, 62, 4, "Argument of type \'null\' is not assignable to parameter of type \'string | undefined\'.", "2087897566"],
@@ -2315,8 +2312,8 @@ exports[`stricter compilation`] = {
       [57, 6, 10, "Object is possibly \'undefined\'.", "50227919"],
       [60, 4, 18, "Type \'User | undefined\' is not assignable to type \'User\'.\\n  Type \'undefined\' is not assignable to type \'User\'.", "1723739806"],
       [96, 6, 13, "Type \'string | undefined\' is not assignable to type \'string\'.\\n  Type \'undefined\' is not assignable to type \'string\'.", "1154411948"],
-      [135, 8, 15, "Object is possibly \'undefined\'.", "696735433"],
-      [141, 55, 16, "Argument of type \'Picture[] | undefined\' is not assignable to parameter of type \'Picture[]\'.\\n  Type \'undefined\' is not assignable to type \'Picture[]\'.", "1145520518"]
+      [133, 62, 15, "Argument of type \'UserAsset[] | undefined\' is not assignable to parameter of type \'UserAsset[]\'.\\n  Type \'undefined\' is not assignable to type \'UserAsset[]\'.", "696735433"],
+      [135, 55, 16, "Argument of type \'Picture[] | undefined\' is not assignable to parameter of type \'Picture[]\'.\\n  Type \'undefined\' is not assignable to type \'Picture[]\'.", "1145520518"]
     ],
     "src/script/user/UserPermission.ts:1999060110": [
       [173, 2, 395, "Type \'Record<string, (role: ROLE) => boolean>\' is not assignable to type \'Record<string, (role?: ROLE | undefined) => boolean>\'.\\n  \'string\' index signatures are incompatible.\\n    Type \'(role: ROLE) => boolean\' is not assignable to type \'(role?: ROLE | undefined) => boolean\'.", "3736070641"]
@@ -2749,7 +2746,7 @@ exports[`stricter compilation`] = {
     "src/script/view_model/panel/BasePanelViewModel.ts:1781850387": [
       [57, 4, 23, "Type \'Observable<Conversation | null>\' is not assignable to type \'Observable<Conversation>\'.", "233634092"]
     ],
-    "src/script/view_model/panel/ConversationDetailsViewModel.ts:1232323692": [
+    "src/script/view_model/panel/ConversationDetailsViewModel.ts:1231015426": [
       [137, 4, 20, "Type \'Observable<ServiceEntity | undefined>\' is not assignable to type \'Observable<ServiceEntity>\'.", "3275208665"],
       [158, 21, 36, "Argument of type \'User | undefined\' is not assignable to parameter of type \'User\'.\\n  Type \'undefined\' is not assignable to type \'User\'.", "1354386287"],
       [179, 4, 18, "Type \'Observable<false>\' is not assignable to type \'Observable<boolean>\'.", "2548422508"],
@@ -2761,7 +2758,7 @@ exports[`stricter compilation`] = {
       [61, 4, 21, "Type \'Observable<never[]>\' is not assignable to type \'Observable<User[]>\'.", "3284804734"],
       [71, 46, 6, "Type \'null\' is not assignable to type \'PanelEntity\'.", "1164306878"]
     ],
-    "src/script/view_model/panel/GroupParticipantServiceViewModel.ts:516410094": [
+    "src/script/view_model/panel/GroupParticipantServiceViewModel.ts:3233069914": [
       [52, 4, 24, "Type \'Observable<undefined>\' is not assignable to type \'Observable<User>\'.", "3514586203"],
       [53, 4, 20, "Type \'Observable<undefined>\' is not assignable to type \'Observable<ServiceEntity>\'.\\n  Types of property \'equalityComparer\' are incompatible.\\n    Type \'(a: undefined, b: undefined) => boolean\' is not assignable to type \'(a: ServiceEntity, b: ServiceEntity) => boolean\'.\\n      Types of parameters \'a\' and \'a\' are incompatible.\\n        Type \'ServiceEntity\' is not assignable to type \'undefined\'.", "3275208665"],
       [55, 4, 14, "Type \'Observable<false>\' is not assignable to type \'Observable<boolean>\'.", "878538421"],
