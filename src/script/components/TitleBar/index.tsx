@@ -155,7 +155,7 @@ const TitleBar: React.FC<TitleBarProps> = ({
 
   useEffect(() => {
     // TODO remove the titlebar for now to ensure that buttons are clickable in macOS wrappers
-    window.setTimeout(() => document.querySelector('.titlebar').remove(), TIME_IN_MILLIS.SECOND);
+    window.setTimeout(() => document.querySelector('.titlebar')?.remove(), TIME_IN_MILLIS.SECOND);
 
     window.setTimeout(() => {
       amplify.subscribe(WebAppEvents.SHORTCUT.PEOPLE, () => showDetails(false));
