@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [4.3.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/commons/compare/@wireapp/commons@4.2.13...@wireapp/commons@4.3.0) (2022-07-06)
+
+
+### Features
+
+* **commons:** Add XOR type utility ([#4317](https://github.com/wireapp/wire-web-packages/tree/main/packages/commons/issues/4317)) ([26c73b5](https://github.com/wireapp/wire-web-packages/tree/main/packages/commons/commit/26c73b5cf48b0c74ff81f9264374e53fc5e8984c))
+
+
+
+
+
 ## [4.2.13](https://github.com/wireapp/wire-web-packages/tree/main/packages/commons/compare/@wireapp/commons@4.2.12...@wireapp/commons@4.2.13) (2021-09-29)
 
 
