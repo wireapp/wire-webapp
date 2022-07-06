@@ -29,16 +29,7 @@ export class IntegrationService {
     return this.apiClient.api.teams.service.getProvider(providerId);
   }
 
-  async getProviderServices(providerId: string): Promise<Service[]> {
-    const servicesChunk = await this.apiClient.api.teams.service.getProviderServices(providerId);
-    return servicesChunk.services;
-  }
-
   getService(providerId: string, serviceId: string): Promise<Service> {
     return this.apiClient.api.teams.service.getService(providerId, serviceId);
-  }
-
-  getServices(tags: string[] | string, start: string): Promise<any> {
-    return this.apiClient.api.teams.service.getServices(undefined, start, tags);
   }
 }
