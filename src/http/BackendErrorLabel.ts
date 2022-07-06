@@ -77,6 +77,7 @@ export enum BackendErrorLabel {
   NO_OTHER_OWNER = 'no-other-owner',
   /** This error is thrown when an owner tries to delete themself */
   NO_SELF_DELETE_FOR_TEAM_OWNER = 'no-self-delete-for-team-owner',
+  CANNOT_DELETE_OWN_IDP = 'cannot-delete-own-idp',
   NO_TEAM = 'no-team',
   NO_TEAM_MEMBER = 'no-team-member',
   TOO_MANY_TEAM_MEMBERS = 'too-many-team-members',
