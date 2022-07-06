@@ -181,8 +181,15 @@ export class ContentViewModel {
     this.historyImport = new HistoryImportViewModel(repositories.backup);
 
     this.state.subscribe(state => {
-      if (state === ContentViewModel.STATE.PREFERENCES_ACCOUNT) {
-        this.popNotification();
+      switch (state) {
+        case ContentViewModel.STATE.CONVERSATION:
+          this.inputBar.addedToView();
+          break;
+        case ContentViewModel.STATE.PREFERENCES_ACCOUNT:
+          this.popNotification();
+          break;
+        default:
+          this.inputBar.removedFromView();
       }
     });
 
