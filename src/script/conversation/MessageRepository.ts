@@ -751,7 +751,7 @@ export class MessageRepository {
 
     if (groupId) {
       return this.messageSender.queueMessage(() =>
-        this.conversationService.sendMLSMessage({
+        this.conversationService.send({
           groupId,
           onStart: injectOptimisticEvent,
           onSuccess: handleSuccess,
