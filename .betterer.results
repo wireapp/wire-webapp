@@ -1359,6 +1359,8 @@ exports[`stricter compilation`] = {
       [225, 10, 12, "Object is possibly \'undefined\'.", "1670678216"],
       [320, 6, 18, "Argument of type \'Conversation | undefined\' is not assignable to parameter of type \'Conversation\'.\\n  Type \'undefined\' is not assignable to type \'Conversation\'.", "1508601427"],
       [334, 43, 15, "Argument of type \'string | undefined\' is not assignable to parameter of type \'string\'.\\n  Type \'undefined\' is not assignable to type \'string\'.", "1177570679"],
+      [399, 14, 14, "Property \'creator_client\' does not exist on type \'NewConversation & { conversation_role: string; }\'.", "2928040639"],
+      [400, 14, 10, "Property \'selfUserId\' does not exist on type \'NewConversation & { conversation_role: string; }\'.", "1576755397"],
       [467, 8, 5, "Argument of type \'unknown\' is not assignable to parameter of type \'BackendClientError\'.", "165548477"],
       [507, 10, 13, "Object is of type \'unknown\'.", "2758364324"],
       [513, 8, 13, "Argument of type \'unknown\' is not assignable to parameter of type \'Error | undefined\'.", "2758364324"],
@@ -1412,6 +1414,7 @@ exports[`stricter compilation`] = {
       [93, 54, 4, "Argument of type \'null\' is not assignable to parameter of type \'string | undefined\'.", "2087897566"]
     ],
     "src/script/conversation/ConversationService.ts:3614282690": [
+      [330, 55, 14, "Argument of type \'QualifiedId\' is not assignable to parameter of type \'string\'.", "2597408709"],
       [348, 4, 92, "Type \'Promise<T | undefined>\' is not assignable to type \'Promise<T>\'.\\n  Type \'T | undefined\' is not assignable to type \'T\'.\\n    \'T\' could be instantiated with an arbitrary type which could be unrelated to \'T | undefined\'.", "1764067179"]
     ],
     "src/script/conversation/ConversationState.ts:3761486215": [
