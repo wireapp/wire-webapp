@@ -282,9 +282,11 @@ const TitleBar: React.FC<TitleBarProps> = ({
         </li>
 
         {badgeLabelCopy && (
-          <li className="conversation-title-bar-indication-badge" data-uie-name="status-indication-badge">
-            {badgeLabelCopy}
-          </li>
+          <li
+            className="conversation-title-bar-indication-badge"
+            data-uie-name="status-indication-badge"
+            dangerouslySetInnerHTML={{__html: badgeLabelCopy}}
+          />
         )}
       </>
     </ul>
