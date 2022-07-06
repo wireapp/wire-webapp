@@ -19,7 +19,7 @@
 
 /* eslint-disable no-unused-expressions */
 
-import {RecursivePartial, OptionalKeys, RequiredKeys} from './TypeUtil';
+import {RecursivePartial, OptionalKeys, RequiredKeys, XOR} from './TypeUtil';
 
 interface UserSettings {
   one: {
@@ -48,7 +48,23 @@ const requiredKeys: RequiredKeys<MessageSettings>[] = ['content'];
 // @ts-expect-error
 const invalidKeys: OptionalKeys<MessageSettings>[] = ['content'];
 
+const xorKeys: XOR<MessageSettings, UserSettings> = {
+  content: 'test',
+  recipient: 'test',
+};
+
+const invalidXorKeys: XOR<MessageSettings, UserSettings> = {
+  content: 'test',
+  recipient: 'test',
+  // @ts-expect-error
+  one: {
+    four: 3,
+  },
+};
+
 allPartial;
 optionalKeys;
 requiredKeys;
 invalidKeys;
+xorKeys;
+invalidXorKeys;

@@ -47,3 +47,10 @@ export type OptionalKeys<T> = {
 export type RequiredKeys<T> = {
   [K in keyof T]-?: {} extends Pick<T, K> ? never : K;
 }[keyof T];
+
+export type Without<T, U> = {[P in Exclude<keyof T, keyof U>]?: never};
+
+/**
+ * Only allows one type or the other, but not a mix of types
+ */
+export type XOR<T, U> = T | U extends object ? (Without<T, U> & U) | (Without<U, T> & T) : T | U;
