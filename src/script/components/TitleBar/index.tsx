@@ -223,7 +223,10 @@ const TitleBar: React.FC<TitleBarProps> = ({
               )}
 
               {verificationState === ConversationVerificationState.VERIFIED && (
-                <Icon.Verified className="conversation-title-bar-name--verified" />
+                <Icon.Verified
+                  data-uie-name="conversation-title-bar-verified-icon"
+                  className="conversation-title-bar-name--verified"
+                />
               )}
 
               <h2 className="conversation-title-bar-name-label" data-uie-name="status-conversation-title-bar-label">
