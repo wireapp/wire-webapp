@@ -141,7 +141,7 @@ export const Input: React.FC<InputProps<HTMLInputElement>> = React.forwardRef<
         {isPasswordInput && (
           <button
             type="button"
-            data-uie-name="do-show-password"
+            data-uie-name={!togglePassword ? 'do-show-password' : 'do-hide-password'}
             css={{...centerInputAction, background: 'transparent', border: 'none', cursor: 'pointer', padding: 0}}
             onClick={toggleSetPassword}
             title="Toggle password visibility"
