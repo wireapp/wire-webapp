@@ -30,7 +30,7 @@ exports[`"Title" renders (dark theme) 1`] = `
 
 exports[`"Title" renders 1`] = `
 .emotion-0 {
-  background: rgb(237, 237, 238);
+  background: #edeff0;
   -webkit-transition: background 0.15s;
   transition: background 0.15s;
 }

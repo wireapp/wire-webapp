@@ -2,7 +2,7 @@
 
 exports[`"TextArea" renders 1`] = `
 .emotion-0 {
-  background: rgb(237, 237, 238);
+  background: #edeff0;
   -webkit-transition: background 0.15s;
   transition: background 0.15s;
 }
@@ -63,7 +63,7 @@ exports[`"TextArea" renders 1`] = `
 
 exports[`"TextArea" renders as disabled 1`] = `
 .emotion-0 {
-  background: rgb(237, 237, 238);
+  background: #edeff0;
   -webkit-transition: background 0.15s;
   transition: background 0.15s;
 }
@@ -125,7 +125,7 @@ exports[`"TextArea" renders as disabled 1`] = `
 
 exports[`"TextArea" renders as invalid 1`] = `
 .emotion-0 {
-  background: rgb(237, 237, 238);
+  background: #edeff0;
   -webkit-transition: background 0.15s;
   transition: background 0.15s;
 }
@@ -182,7 +182,7 @@ exports[`"TextArea" renders as invalid 1`] = `
 
 exports[`"TextArea" renders with placeholderTextTransform 1`] = `
 .emotion-0 {
-  background: rgb(237, 237, 238);
+  background: #edeff0;
   -webkit-transition: background 0.15s;
   transition: background 0.15s;
 }
