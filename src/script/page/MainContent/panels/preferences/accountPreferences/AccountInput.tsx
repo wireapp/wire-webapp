@@ -135,7 +135,6 @@ const AccountInput: React.FC<AccountInputProps> = ({
               alignItems: 'center',
               display: 'flex',
               lineHeight: '14px',
-              // marginBottom: 16,
               position: 'relative',
             }}
             data-uie-name={labelUie}
