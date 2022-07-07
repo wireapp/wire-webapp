@@ -93,7 +93,7 @@ exports[`stricter compilation`] = {
       [93, 20, 6, "Object is possibly \'null\'.", "1537472717"]
     ],
     "src/script/auth/component/LinkButton.tsx:522804603": [
-      [32, 8, 67, "Type \'(theme: Theme) => CSSObject\' is not assignable to type \'Interpolation<Theme>\'.\\n  Type \'(theme: Theme) => CSSObject\' is not assignable to type \'FunctionInterpolation<Theme>\'.\\n    Types of parameters \'theme\' and \'props\' are incompatible.\\n      Type \'Theme\' is missing the following properties from type \'Theme\': general, Input, select, checkbox", "530872600"]
+      [32, 8, 67, "Type \'(theme: Theme) => CSSObject\' is not assignable to type \'Interpolation<Theme>\'.\\n  Type \'(theme: Theme) => CSSObject\' is not assignable to type \'FunctionInterpolation<Theme>\'.\\n    Types of parameters \'theme\' and \'props\' are incompatible.\\n      Type \'Theme\' is missing the following properties from type \'Theme\': IconButton, Checkbox, general, Input, Select", "530872600"]
     ],
     "src/script/auth/component/LoginForm.tsx:1467603633": [
       [49, 4, 18, "Object is possibly \'undefined\'.", "3955986040"],
