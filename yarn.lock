@@ -3145,10 +3145,10 @@
   resolved "https://registry.yarnpkg.com/@wireapp/antiscroll-2/-/antiscroll-2-1.3.1.tgz#bcb66f72c6dadc306e43235256b768ed3f89039c"
   integrity sha512-vWmWYAzSdyxs+xlgSPGtiNSTCM1z0nxM+jSPa/xz1/kuFKy80BrJP5xaGwNNLljBAz8ymlSPUUZlylUd0tFr1Q==
 
-"@wireapp/api-client@19.9.0":
-  version "19.9.0"
-  resolved "https://registry.yarnpkg.com/@wireapp/api-client/-/api-client-19.9.0.tgz#92e5d026bd2e302a98cf095b53c2d71f11705a10"
-  integrity sha512-g/YOdbuh9/x5/SAy31r6GRkqwI9K/dmqz0MOxYvbiwtXpq7eZB1c1IT78GBONwLKD4/TX+cOPqOa1hJ09dAWEA==
+"@wireapp/api-client@19.11.0":
+  version "19.11.0"
+  resolved "https://registry.yarnpkg.com/@wireapp/api-client/-/api-client-19.11.0.tgz#cee107273c6b8e160c2eae5cbf443f852415a362"
+  integrity sha512-0EfJt3nPyQvAFaSkaZ0AVg3C4Ee2qybnjsDv5rMClo8busGgrIW5MzLH7Cf05ZA2zcME/O8UW4VrQSYd3hGe3g==
   dependencies:
     "@types/node" "~14"
     "@types/spark-md5" "3.0.2"
@@ -3202,16 +3202,16 @@
     logdown "3.3.1"
     rimraf "3.0.2"
 
-"@wireapp/core@28.2.0":
-  version "28.2.0"
-  resolved "https://registry.yarnpkg.com/@wireapp/core/-/core-28.2.0.tgz#72bc962a19b3c230a66de49d3353a13912097e4d"
-  integrity sha512-6hhGyRDWHDPDmKqcVpIdQxxOBlGsE0NWtK9a8gh+Isl34G83wL/lvVz/mOrCR48GW9v9C0ofmsFgMzUhpOUS8A==
+"@wireapp/core@28.3.0":
+  version "28.3.0"
+  resolved "https://registry.yarnpkg.com/@wireapp/core/-/core-28.3.0.tgz#6f408731f476ba0d5ed92216f2fd5005e707a771"
+  integrity sha512-CmMnUVTViiEKqJsVhK8n0E8ubiUF3INTILDymcG6d2B0OOgcaF/qtG5Cjabg7e0QgojZ8eLXVkPMJzl/5ULPbA==
   dependencies:
     "@open-wc/webpack-import-meta-loader" "0.4.7"
     "@otak/core-crypto" "0.3.0-beta-1"
     "@types/long" "4.0.1"
     "@types/node" "~14"
-    "@wireapp/api-client" "19.9.0"
+    "@wireapp/api-client" "19.11.0"
     "@wireapp/cryptobox" "12.8.0"
     bazinga64 "5.10.0"
     hash.js "1.1.7"
@@ -3284,6 +3284,7 @@
   version "8.8.0"
   resolved "https://registry.yarnpkg.com/@wireapp/react-ui-kit/-/react-ui-kit-8.8.0.tgz#2a1555995e15fe15f33ea59293bb5401d1e022ae"
   integrity sha512-EX+zBiTrLvbtP+IoSg/VObptk0GH7zQGEDptxVh7Z9ySlFh85rxCwgYbhHy6uoNOgkfVWctRFyPFqVkK+jvbDw==
+
   dependencies:
     "@emotion/react" "11.9.0"
     "@types/color" "3.0.2"
