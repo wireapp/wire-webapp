@@ -40,7 +40,7 @@ const StyledLabel = (props: StyledLabelProps) => {
     <label
       css={(theme: Theme) => ({
         [`.${INPUT_CLASSNAME}:checked + &::before`]: {
-          background: `${disabled ? theme.checkbox.disablecheckedBgColor : theme.general.primaryColor}`,
+          background: `${disabled ? theme.Checkbox.disablecheckedBgColor : theme.general.primaryColor}`,
           borderColor: theme.general.primaryColor,
         },
         [`.${INPUT_CLASSNAME}:checked + & > svg`]: {
@@ -58,15 +58,15 @@ const StyledLabel = (props: StyledLabelProps) => {
           },
         }),
         [`.${INPUT_CLASSNAME} + &::before`]: {
-          background: disabled ? theme.checkbox.disableBgColor : theme.checkbox.background,
+          background: disabled ? theme.Checkbox.disableBgColor : theme.Checkbox.background,
           ...(!disabled
             ? {
                 border: markInvalid
-                  ? `1.5px solid ${theme.checkbox.invalidBorderColor}`
-                  : `1.5px solid ${theme.checkbox.border}`,
+                  ? `1.5px solid ${theme.Checkbox.invalidBorderColor}`
+                  : `1.5px solid ${theme.Checkbox.border}`,
               }
             : {
-                border: `1.5px solid ${theme.checkbox.disableBorderColor}`,
+                border: `1.5px solid ${theme.Checkbox.disableBorderColor}`,
               }),
           borderRadius: '3px',
           boxSizing: 'border-box',

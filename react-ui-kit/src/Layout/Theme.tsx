@@ -31,6 +31,28 @@ export enum THEME_ID {
 }
 
 export interface Theme {
+  IconButton: {
+    activePrimaryBgColor?: string;
+    activePrimaryBorderColor?: string;
+    focusBorderColor?: string;
+    hoverPrimaryBgColor?: string;
+    primaryActiveFillColor?: string;
+    primaryBgColor?: string;
+    primaryBorderColor?: string;
+    primaryDisabledBgColor?: string;
+    primaryDisabledBorderColor?: string;
+    primaryHoverBorderColor?: string;
+    secondaryActiveBorderColor?: string;
+  };
+  Checkbox: {
+    background?: string;
+    border?: string;
+    borderFocused?: string;
+    disableBgColor?: string;
+    disableBorderColor?: string;
+    disablecheckedBgColor?: string;
+    invalidBorderColor?: string;
+  };
   general: {
     backgroundColor: string;
     color: string;
@@ -43,24 +65,27 @@ export interface Theme {
     placeholderColor: string;
     labelColor: string;
   };
-  select: {
+  Select: {
     disabledColor?: string;
     contrastTextColor?: string;
     borderColor?: string;
-  };
-  checkbox: {
-    background?: string;
-    border?: string;
-    borderFocused?: string;
-    disableBgColor?: string;
-    disableBorderColor?: string;
-    disablecheckedBgColor?: string;
-    invalidBorderColor?: string;
   };
 }
 
 export const themes: {[themeId in THEME_ID]: Theme} = {
   [THEME_ID.LIGHT]: {
+    IconButton: {
+      activePrimaryBgColor: COLOR_V2.BLUE_LIGHT_50,
+      focusBorderColor: COLOR_V2.BLUE_LIGHT_500,
+      hoverPrimaryBgColor: COLOR_V2.GRAY_20,
+      primaryActiveFillColor: COLOR_V2.BLUE,
+      primaryBgColor: COLOR_V2.WHITE,
+      primaryBorderColor: COLOR_V2.GRAY_40,
+      primaryDisabledBgColor: COLOR_V2.GRAY_20,
+      primaryDisabledBorderColor: COLOR_V2.GRAY_40,
+      primaryHoverBorderColor: COLOR_V2.GRAY_50,
+      secondaryActiveBorderColor: 'none',
+    },
     Input: {
       backgroundColor: COLOR.WHITE,
       backgroundColorDisabled: COLOR_V2.GRAY_20,
@@ -73,12 +98,12 @@ export const themes: {[themeId in THEME_ID]: Theme} = {
       primaryColor: COLOR_V2.BLUE,
       dangerColor: COLOR_V2.RED,
     },
-    select: {
+    Select: {
       disabledColor: COLOR_V2.GRAY_70,
       contrastTextColor: COLOR.WHITE,
       borderColor: COLOR_V2.GRAY_40,
     },
-    checkbox: {
+    Checkbox: {
       background: COLOR_V2.GRAY_20,
       border: COLOR_V2.GRAY_80,
       borderFocused: BASE_LIGHT_COLOR.BLUE,
@@ -89,6 +114,18 @@ export const themes: {[themeId in THEME_ID]: Theme} = {
     },
   },
   [THEME_ID.DARK]: {
+    IconButton: {
+      activePrimaryBgColor: COLOR_V2.BLUE_DARK_800,
+      focusBorderColor: COLOR_V2.BLUE_DARK_600,
+      hoverPrimaryBgColor: COLOR_V2.GRAY_80,
+      primaryActiveFillColor: COLOR.WHITE,
+      primaryBgColor: COLOR_V2.GRAY_90,
+      primaryBorderColor: COLOR_V2.GRAY_100,
+      primaryDisabledBgColor: COLOR_V2.GRAY_95,
+      primaryDisabledBorderColor: COLOR_V2.GRAY_90,
+      primaryHoverBorderColor: COLOR_V2.GRAY_70,
+      secondaryActiveBorderColor: COLOR_V2.BLUE_DARK_800,
+    },
     Input: {
       backgroundColor: COLOR.BLACK_LIGHTEN_24,
       backgroundColorDisabled: COLOR.GRAY_100,
@@ -101,12 +138,12 @@ export const themes: {[themeId in THEME_ID]: Theme} = {
       primaryColor: COLOR_V2.BLUE,
       dangerColor: COLOR_V2.RED,
     },
-    select: {
+    Select: {
       disabledColor: COLOR_V2.GRAY_60,
       contrastTextColor: COLOR.BLACK,
       borderColor: COLOR_V2.GRAY_90,
     },
-    checkbox: {
+    Checkbox: {
       background: COLOR_V2.GRAY_20,
       border: COLOR_V2.GRAY_60,
       borderFocused: BASE_DARK_COLOR.BLUE,

@@ -20,13 +20,12 @@
 /** @jsx jsx */
 import {CSSObject, jsx} from '@emotion/react';
 
-import {COLOR_V2} from '../Identity';
 import {defaultTransition} from '../Identity/motions';
 import type {Theme} from '../Layout';
 import {TextProps, filterTextProps} from '../Text';
 import {filterProps} from '../util';
 
-enum IconButtonVariant {
+export enum IconButtonVariant {
   PRIMARY = 'primary',
   SECONDARY = 'secondary',
 }
@@ -58,45 +57,51 @@ export const iconButtonStyle: <T>(theme: Theme, props: IconButtonProps<T>) => CS
     textDecoration: 'none',
   },
   ...(variant === IconButtonVariant.PRIMARY && {
-    backgroundColor: disabled ? COLOR_V2.GRAY_20 : backgroundColor || COLOR_V2.WHITE,
-    border: `1px solid ${COLOR_V2.GRAY_40}`,
+    backgroundColor: disabled
+      ? theme.IconButton.primaryDisabledBgColor
+      : backgroundColor || theme.IconButton.primaryBgColor,
+    border: disabled
+      ? `1px solid ${theme.IconButton.primaryDisabledBorderColor}`
+      : `1px solid ${theme.IconButton.primaryBorderColor}`,
     svg: {
-      fill: disabled ? COLOR_V2.GRAY_70 : COLOR_V2.BLACK,
+      fill: disabled ? theme.Input.placeholderColor : theme.general.color,
     },
     ...(!disabled && {
       '&:hover, &:focus': {
-        backgroundColor: COLOR_V2.GRAY_20,
+        backgroundColor: theme.IconButton.hoverPrimaryBgColor,
       },
       '&:hover': {
-        borderColor: COLOR_V2.GRAY_50,
+        borderColor: theme.IconButton.primaryHoverBorderColor,
       },
       '&:focus': {
-        borderColor: COLOR_V2.GRAY_60,
+        borderColor: theme.IconButton.focusBorderColor,
       },
       '&:active': {
-        backgroundColor: COLOR_V2.BLUE_LIGHT_50,
-        borderColor: COLOR_V2.BLUE_LIGHT_300,
+        backgroundColor: theme.IconButton.activePrimaryBgColor,
+        borderColor: theme.IconButton.focusBorderColor,
         svg: {
-          fill: COLOR_V2.BLUE,
+          fill: theme.general.primaryColor,
         },
       },
     }),
   }),
   ...(variant === IconButtonVariant.SECONDARY && {
+    backgroundColor: 'inherit',
     svg: {
-      fill: disabled ? COLOR_V2.GRAY_60 : COLOR_V2.BLACK,
+      fill: disabled ? theme.Input.placeholderColor : theme.general.color,
     },
     ...(!disabled && {
       '&:hover, &:focus, &:active': {
         svg: {
-          fill: COLOR_V2.BLUE,
+          fill: theme.general.primaryColor,
         },
       },
       '&:focus': {
-        border: `1px solid ${COLOR_V2.BLUE_LIGHT_300}`,
+        border: `1px solid ${theme.IconButton.focusBorderColor}`,
       },
       '&:active': {
-        backgroundColor: COLOR_V2.GRAY_10,
+        border: `1px solid ${theme.IconButton.secondaryActiveBorderColor}`,
+        backgroundColor: theme.Input.backgroundColor,
       },
     }),
   }),
