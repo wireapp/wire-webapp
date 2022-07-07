@@ -78,6 +78,7 @@ const MainContent: React.FC<LeftSidebarProps> = ({
       primaryActiveFillColor: 'var(--icon-primary-active-fill)',
       primaryBgColor: 'var(--icon-button-primary-enabled-bg)',
       primaryBorderColor: 'var(--icon-button-primary-border)',
+      primaryDisabledBgColor: 'var(--icon-button-primary-disabled-bg)',
       primaryDisabledBorderColor: 'var(--icon-button-primary-disabled-border)',
       primaryHoverBorderColor: 'var(--icon-button-primary-hover-border)',
       secondaryActiveBorderColor: 'var(--icon-secondary-active-border)',
