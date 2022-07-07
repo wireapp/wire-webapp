@@ -37,11 +37,11 @@ import {CryptographyRepository} from '../../../cryptography/CryptographyReposito
 import {MessageRepository} from '../../../conversation/MessageRepository';
 import {UserState} from '../../../user/UserState';
 import {registerReactComponent, useKoSubscribableChildren} from 'Util/ComponentUtil';
-import {LegalHoldModalViewModel} from '../../../view_model/content/LegalHoldModalViewModel';
 import {splitFingerprint} from 'Util/StringUtil';
 import {Conversation} from '../../../entity/Conversation';
 import {User} from '../../../entity/User';
 import {SearchRepository} from '../../../search/SearchRepository';
+import {LegalHoldModalState} from '../../../legal-hold/LegalHoldModalState';
 
 interface LegalHoldModalProps {
   readonly userState?: UserState;
@@ -257,20 +257,18 @@ const LegalHoldModal: FC<LegalHoldModalProps> = ({
   };
 
   useEffect(() => {
-    amplify.subscribe(LegalHoldModalViewModel.SHOW_REQUEST, (fingerprint?: string) =>
-      showRequestModal(false, fingerprint),
-    );
-    amplify.subscribe(LegalHoldModalViewModel.HIDE_REQUEST, hideModal);
-    amplify.subscribe(LegalHoldModalViewModel.SHOW_DETAILS, showUsers);
-    amplify.subscribe(LegalHoldModalViewModel.HIDE_DETAILS, hideLegalHoldModal);
+    amplify.subscribe(LegalHoldModalState.SHOW_REQUEST, (fingerprint?: string) => showRequestModal(false, fingerprint));
+    amplify.subscribe(LegalHoldModalState.HIDE_REQUEST, hideModal);
+    amplify.subscribe(LegalHoldModalState.SHOW_DETAILS, showUsers);
+    amplify.subscribe(LegalHoldModalState.HIDE_DETAILS, hideLegalHoldModal);
 
     return () => {
-      amplify.unsubscribe(LegalHoldModalViewModel.SHOW_REQUEST, (fingerprint?: string) =>
+      amplify.unsubscribe(LegalHoldModalState.SHOW_REQUEST, (fingerprint?: string) =>
         showRequestModal(false, fingerprint),
       );
-      amplify.unsubscribe(LegalHoldModalViewModel.HIDE_REQUEST, hideModal);
-      amplify.unsubscribe(LegalHoldModalViewModel.SHOW_DETAILS, showUsers);
-      amplify.unsubscribe(LegalHoldModalViewModel.HIDE_DETAILS, hideLegalHoldModal);
+      amplify.unsubscribe(LegalHoldModalState.HIDE_REQUEST, hideModal);
+      amplify.unsubscribe(LegalHoldModalState.SHOW_DETAILS, showUsers);
+      amplify.unsubscribe(LegalHoldModalState.HIDE_DETAILS, hideLegalHoldModal);
     };
   }, []);
 

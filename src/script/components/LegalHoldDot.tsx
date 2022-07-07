@@ -22,6 +22,7 @@ import {amplify} from 'amplify';
 import cx from 'classnames';
 import type {Conversation} from '../entity/Conversation';
 import {LegalHoldModalViewModel} from '../view_model/content/LegalHoldModalViewModel';
+import {LegalHoldModalState} from '../legal-hold/LegalHoldModalState';
 import Icon from 'Components/Icon';
 import {registerReactComponent} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
@@ -52,12 +53,12 @@ const LegalHoldDot: React.FC<LegalHoldDotProps> = ({
     event.stopPropagation();
     if (isInteractive) {
       if (isPending) {
-        amplify.publish(LegalHoldModalViewModel.SHOW_REQUEST);
+        amplify.publish(LegalHoldModalState.SHOW_REQUEST);
 
         return;
       }
 
-      amplify.publish(LegalHoldModalViewModel.SHOW_DETAILS, conversation);
+      amplify.publish(LegalHoldModalState.SHOW_DETAILS, conversation);
     }
   };
 
