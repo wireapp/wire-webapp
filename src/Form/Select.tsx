@@ -64,10 +64,10 @@ export const selectStyle: <T>(theme: Theme, props, error?: boolean) => CSSObject
     textShadow: '0 0 0 #000',
   },
   '&:disabled': {
-    color: theme.select.disabledColor,
+    color: theme.Select.disabledColor,
   },
   appearance: 'none',
-  boxShadow: markInvalid ? `0 0 0 1px ${theme.general.dangerColor}` : `0 0 0 1px ${theme.select.borderColor}`,
+  boxShadow: markInvalid ? `0 0 0 1px ${theme.general.dangerColor}` : `0 0 0 1px ${theme.Select.borderColor}`,
   cursor: disabled ? 'normal' : 'pointer',
   fontSize: '16px',
   fontWeight: 300,
@@ -82,7 +82,7 @@ export const selectStyle: <T>(theme: Theme, props, error?: boolean) => CSSObject
   },
   ...(!disabled && {
     '&:hover': {
-      boxShadow: `0 0 0 1px ${theme.select.borderColor}`,
+      boxShadow: `0 0 0 1px ${theme.Select.borderColor}`,
     },
     '&:focus, &:active': {
       boxShadow: `0 0 0 1px ${theme.general.primaryColor}`,
@@ -121,7 +121,7 @@ const dropdownOptionStyles = (theme: Theme, isSelected: boolean): CSSObject => (
   fontWeight: 300,
   lineHeight: '24px',
   letterSpacing: '0.05px',
-  color: isSelected ? theme.select.contrastTextColor : theme.general.color,
+  color: isSelected ? theme.Select.contrastTextColor : theme.general.color,
   '&:first-of-type': {
     borderRadius: '10px 10px 0 0',
   },
@@ -129,15 +129,15 @@ const dropdownOptionStyles = (theme: Theme, isSelected: boolean): CSSObject => (
     borderRadius: '0 0 10px 10px',
   },
   '&:not(:last-of-type)': {
-    borderBottom: `1px solid ${theme.select.borderColor}`,
+    borderBottom: `1px solid ${theme.Select.borderColor}`,
   },
   '&:not(:first-of-type)': {
-    borderTop: `1px solid ${theme.select.borderColor}`,
+    borderTop: `1px solid ${theme.Select.borderColor}`,
   },
   '&:hover, &:active, &:focus': {
     background: theme.general.primaryColor,
     borderColor: theme.general.primaryColor,
-    color: theme.select.contrastTextColor,
+    color: theme.Select.contrastTextColor,
   },
 });
 
