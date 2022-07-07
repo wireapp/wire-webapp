@@ -35,7 +35,6 @@ const headerStyles: CSSObject = {
   margin: '20px 0 6px',
   padding: 0,
   textAlign: 'center',
-  textTransform: 'uppercase',
 };
 
 const AccentColorPicker: React.FunctionComponent<AccentColorPickerProps> = ({user, doSetAccentColor}) => {
