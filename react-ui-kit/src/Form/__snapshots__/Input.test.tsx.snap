@@ -2,7 +2,7 @@
 
 exports[`"Input" renders 1`] = `
 .emotion-0 {
-  background: rgb(237, 237, 238);
+  background: #edeff0;
   -webkit-transition: background 0.15s;
   transition: background 0.15s;
 }
@@ -81,7 +81,7 @@ exports[`"Input" renders 1`] = `
 
 exports[`"Input" renders as disabled 1`] = `
 .emotion-0 {
-  background: rgb(237, 237, 238);
+  background: #edeff0;
   -webkit-transition: background 0.15s;
   transition: background 0.15s;
 }
@@ -161,7 +161,7 @@ exports[`"Input" renders as disabled 1`] = `
 
 exports[`"Input" renders as invalid 1`] = `
 .emotion-0 {
-  background: rgb(237, 237, 238);
+  background: #edeff0;
   -webkit-transition: background 0.15s;
   transition: background 0.15s;
 }
@@ -236,7 +236,7 @@ exports[`"Input" renders as invalid 1`] = `
 
 exports[`"Input" renders with placeholderTextTransform 1`] = `
 .emotion-0 {
-  background: rgb(237, 237, 238);
+  background: #edeff0;
   -webkit-transition: background 0.15s;
   transition: background 0.15s;
 }

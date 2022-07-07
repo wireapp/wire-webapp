@@ -40,7 +40,7 @@ exports[`"Heading" renders H! (dark theme) 1`] = `
 
 exports[`"Heading" renders H1 1`] = `
 .emotion-0 {
-  background: rgb(237, 237, 238);
+  background: #edeff0;
   -webkit-transition: background 0.15s;
   transition: background 0.15s;
 }
@@ -78,7 +78,7 @@ exports[`"Heading" renders H1 1`] = `
 
 exports[`"Heading" renders H1 2`] = `
 .emotion-0 {
-  background: rgb(237, 237, 238);
+  background: #edeff0;
   -webkit-transition: background 0.15s;
   transition: background 0.15s;
 }
@@ -116,7 +116,7 @@ exports[`"Heading" renders H1 2`] = `
 
 exports[`"Heading" renders H2 1`] = `
 .emotion-0 {
-  background: rgb(237, 237, 238);
+  background: #edeff0;
   -webkit-transition: background 0.15s;
   transition: background 0.15s;
 }
@@ -155,7 +155,7 @@ exports[`"Heading" renders H2 1`] = `
 
 exports[`"Heading" renders H3 1`] = `
 .emotion-0 {
-  background: rgb(237, 237, 238);
+  background: #edeff0;
   -webkit-transition: background 0.15s;
   transition: background 0.15s;
 }
@@ -183,7 +183,7 @@ exports[`"Heading" renders H3 1`] = `
 
 exports[`"Heading" renders H4 1`] = `
 .emotion-0 {
-  background: rgb(237, 237, 238);
+  background: #edeff0;
   -webkit-transition: background 0.15s;
   transition: background 0.15s;
 }

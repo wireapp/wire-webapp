@@ -24,8 +24,15 @@ exports[`"Checkbox" renders (dark theme) 1`] = `
   left: -0.3rem;
 }
 
+.emotion-1 .wireinput:focus-visible+label {
+  outline: 1px solid #0667c8;
+  outline-offset: 0.4rem;
+}
+
 .emotion-2 {
   position: relative;
+  margin: 0 0 0 -16px;
+  width: 100%;
   line-height: 1.4;
   display: -webkit-box;
   display: -webkit-flex;
@@ -47,12 +54,8 @@ exports[`"Checkbox" renders (dark theme) 1`] = `
 .wireinput+.emotion-2>svg {
   fill: none;
   position: absolute;
-  left: -0.75rem;
+  left: 0.25rem;
   top: 0.25rem;
-}
-
-.wireinput:focus-visible+.emotion-2::before {
-  border-color: #0667c8;
 }
 
 .wireinput:hover+.emotion-2::before {
@@ -61,15 +64,15 @@ exports[`"Checkbox" renders (dark theme) 1`] = `
 
 .wireinput+.emotion-2::before {
   background: #edeff0;
-  border: 1.5px solid #54585f;
+  border: 1.5px solid #9fa1a7;
   border-radius: 3px;
   box-sizing: border-box;
   content: "";
   display: inline-block;
+  width: 22px;
   height: 22px;
   line-height: 1.4;
-  margin: 0 8px 0 -16px;
-  width: 22px;
+  margin: 0 8px 0 0px;
   color: #fff;
 }
 
@@ -139,7 +142,7 @@ exports[`"Checkbox" renders (dark theme) 1`] = `
 
 exports[`"Checkbox" renders 1`] = `
 .emotion-0 {
-  background: rgb(237, 237, 238);
+  background: #edeff0;
   -webkit-transition: background 0.15s;
   transition: background 0.15s;
 }
@@ -161,8 +164,15 @@ exports[`"Checkbox" renders 1`] = `
   left: -0.3rem;
 }
 
+.emotion-1 .wireinput:focus-visible+label {
+  outline: 1px solid #0667c8;
+  outline-offset: 0.4rem;
+}
+
 .emotion-2 {
   position: relative;
+  margin: 0 0 0 -16px;
+  width: 100%;
   line-height: 1.4;
   display: -webkit-box;
   display: -webkit-flex;
@@ -178,18 +188,14 @@ exports[`"Checkbox" renders 1`] = `
 }
 
 .wireinput:checked+.emotion-2>svg {
-  fill: rgb(237, 237, 238);
+  fill: #edeff0;
 }
 
 .wireinput+.emotion-2>svg {
   fill: none;
   position: absolute;
-  left: -0.75rem;
+  left: 0.25rem;
   top: 0.25rem;
-}
-
-.wireinput:focus-visible+.emotion-2::before {
-  border-color: #0667c8;
 }
 
 .wireinput:hover+.emotion-2::before {
@@ -198,15 +204,15 @@ exports[`"Checkbox" renders 1`] = `
 
 .wireinput+.emotion-2::before {
   background: #edeff0;
-  border: 1.5px solid #edeff0;
+  border: 1.5px solid #54585f;
   border-radius: 3px;
   box-sizing: border-box;
   content: "";
   display: inline-block;
+  width: 22px;
   height: 22px;
   line-height: 1.4;
-  margin: 0 8px 0 -16px;
-  width: 22px;
+  margin: 0 8px 0 0px;
   color: rgb(29, 30, 31);
 }
 
@@ -276,7 +282,7 @@ exports[`"Checkbox" renders 1`] = `
 
 exports[`"Checkbox" renders as invalid 1`] = `
 .emotion-0 {
-  background: rgb(237, 237, 238);
+  background: #edeff0;
   -webkit-transition: background 0.15s;
   transition: background 0.15s;
 }
@@ -298,8 +304,15 @@ exports[`"Checkbox" renders as invalid 1`] = `
   left: -0.3rem;
 }
 
+.emotion-1 .wireinput:focus-visible+label {
+  outline: 1px solid #0667c8;
+  outline-offset: 0.4rem;
+}
+
 .emotion-2 {
   position: relative;
+  margin: 0 0 0 -16px;
+  width: 100%;
   line-height: 1.4;
   display: -webkit-box;
   display: -webkit-flex;
@@ -315,18 +328,14 @@ exports[`"Checkbox" renders as invalid 1`] = `
 }
 
 .wireinput:checked+.emotion-2>svg {
-  fill: rgb(237, 237, 238);
+  fill: #edeff0;
 }
 
 .wireinput+.emotion-2>svg {
   fill: none;
   position: absolute;
-  left: -0.75rem;
+  left: 0.25rem;
   top: 0.25rem;
-}
-
-.wireinput:focus-visible+.emotion-2::before {
-  border-color: #0667c8;
 }
 
 .wireinput:hover+.emotion-2::before {
@@ -340,10 +349,10 @@ exports[`"Checkbox" renders as invalid 1`] = `
   box-sizing: border-box;
   content: "";
   display: inline-block;
+  width: 22px;
   height: 22px;
   line-height: 1.4;
-  margin: 0 8px 0 -16px;
-  width: 22px;
+  margin: 0 8px 0 0px;
   color: rgb(29, 30, 31);
 }
 
@@ -413,7 +422,7 @@ exports[`"Checkbox" renders as invalid 1`] = `
 
 exports[`"Checkbox" renders disabled 1`] = `
 .emotion-0 {
-  background: rgb(237, 237, 238);
+  background: #edeff0;
   -webkit-transition: background 0.15s;
   transition: background 0.15s;
 }
@@ -435,8 +444,15 @@ exports[`"Checkbox" renders disabled 1`] = `
   left: -0.3rem;
 }
 
+.emotion-1 .wireinput:focus-visible+label {
+  outline: 1px solid #0667c8;
+  outline-offset: 0.4rem;
+}
+
 .emotion-2 {
   position: relative;
+  margin: 0 0 0 -16px;
+  width: 100%;
   line-height: 1.4;
   display: -webkit-box;
   display: -webkit-flex;
@@ -452,13 +468,13 @@ exports[`"Checkbox" renders disabled 1`] = `
 }
 
 .wireinput:checked+.emotion-2>svg {
-  fill: rgb(237, 237, 238);
+  fill: #edeff0;
 }
 
 .wireinput+.emotion-2>svg {
   fill: none;
   position: absolute;
-  left: -0.75rem;
+  left: 0.25rem;
   top: 0.25rem;
 }
 
@@ -469,10 +485,10 @@ exports[`"Checkbox" renders disabled 1`] = `
   box-sizing: border-box;
   content: "";
   display: inline-block;
+  width: 22px;
   height: 22px;
   line-height: 1.4;
-  margin: 0 8px 0 -16px;
-  width: 22px;
+  margin: 0 8px 0 0px;
   color: rgb(29, 30, 31);
 }
 
@@ -544,7 +560,7 @@ exports[`"Checkbox" renders disabled 1`] = `
 
 exports[`"CheckboxLabel" renders 1`] = `
 .emotion-0 {
-  background: rgb(237, 237, 238);
+  background: #edeff0;
   -webkit-transition: background 0.15s;
   transition: background 0.15s;
 }

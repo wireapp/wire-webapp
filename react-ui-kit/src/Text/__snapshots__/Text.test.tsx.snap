@@ -29,7 +29,7 @@ exports[`"Text" renders (dark theme) 1`] = `
 
 exports[`"Text" renders 1`] = `
 .emotion-0 {
-  background: rgb(237, 237, 238);
+  background: #edeff0;
   -webkit-transition: background 0.15s;
   transition: background 0.15s;
 }
@@ -56,7 +56,7 @@ exports[`"Text" renders 1`] = `
 
 exports[`"Text" renders as block 1`] = `
 .emotion-0 {
-  background: rgb(237, 237, 238);
+  background: #edeff0;
   -webkit-transition: background 0.15s;
   transition: background 0.15s;
 }
@@ -83,7 +83,7 @@ exports[`"Text" renders as block 1`] = `
 
 exports[`"Text" renders bold 1`] = `
 .emotion-0 {
-  background: rgb(237, 237, 238);
+  background: #edeff0;
   -webkit-transition: background 0.15s;
   transition: background 0.15s;
 }
@@ -110,7 +110,7 @@ exports[`"Text" renders bold 1`] = `
 
 exports[`"Text" renders centered 1`] = `
 .emotion-0 {
-  background: rgb(237, 237, 238);
+  background: #edeff0;
   -webkit-transition: background 0.15s;
   transition: background 0.15s;
 }
@@ -137,7 +137,7 @@ exports[`"Text" renders centered 1`] = `
 
 exports[`"Text" renders light 1`] = `
 .emotion-0 {
-  background: rgb(237, 237, 238);
+  background: #edeff0;
   -webkit-transition: background 0.15s;
   transition: background 0.15s;
 }
@@ -164,7 +164,7 @@ exports[`"Text" renders light 1`] = `
 
 exports[`"Text" renders muted 1`] = `
 .emotion-0 {
-  background: rgb(237, 237, 238);
+  background: #edeff0;
   -webkit-transition: background 0.15s;
   transition: background 0.15s;
 }
@@ -191,7 +191,7 @@ exports[`"Text" renders muted 1`] = `
 
 exports[`"Text" renders no wrap 1`] = `
 .emotion-0 {
-  background: rgb(237, 237, 238);
+  background: #edeff0;
   -webkit-transition: background 0.15s;
   transition: background 0.15s;
 }
@@ -219,7 +219,7 @@ exports[`"Text" renders no wrap 1`] = `
 
 exports[`"Text" renders with color 1`] = `
 .emotion-0 {
-  background: rgb(237, 237, 238);
+  background: #edeff0;
   -webkit-transition: background 0.15s;
   transition: background 0.15s;
 }
@@ -246,7 +246,7 @@ exports[`"Text" renders with color 1`] = `
 
 exports[`"Text" renders with size 1`] = `
 .emotion-0 {
-  background: rgb(237, 237, 238);
+  background: #edeff0;
   -webkit-transition: background 0.15s;
   transition: background 0.15s;
 }
@@ -273,7 +273,7 @@ exports[`"Text" renders with size 1`] = `
 
 exports[`"Text" renders with textTransform 1`] = `
 .emotion-0 {
-  background: rgb(237, 237, 238);
+  background: #edeff0;
   -webkit-transition: background 0.15s;
   transition: background 0.15s;
 }
@@ -300,7 +300,7 @@ exports[`"Text" renders with textTransform 1`] = `
 
 exports[`"Text" renders with truncation 1`] = `
 .emotion-0 {
-  background: rgb(237, 237, 238);
+  background: #edeff0;
   -webkit-transition: background 0.15s;
   transition: background 0.15s;
 }
@@ -327,7 +327,7 @@ exports[`"Text" renders with truncation 1`] = `
 
 exports[`Utility components renders Bold 1`] = `
 .emotion-0 {
-  background: rgb(237, 237, 238);
+  background: #edeff0;
   -webkit-transition: background 0.15s;
   transition: background 0.15s;
 }
@@ -354,7 +354,7 @@ exports[`Utility components renders Bold 1`] = `
 
 exports[`Utility components renders Large 1`] = `
 .emotion-0 {
-  background: rgb(237, 237, 238);
+  background: #edeff0;
   -webkit-transition: background 0.15s;
   transition: background 0.15s;
 }
@@ -381,7 +381,7 @@ exports[`Utility components renders Large 1`] = `
 
 exports[`Utility components renders Muted 1`] = `
 .emotion-0 {
-  background: rgb(237, 237, 238);
+  background: #edeff0;
   -webkit-transition: background 0.15s;
   transition: background 0.15s;
 }
@@ -408,7 +408,7 @@ exports[`Utility components renders Muted 1`] = `
 
 exports[`Utility components renders Small 1`] = `
 .emotion-0 {
-  background: rgb(237, 237, 238);
+  background: #edeff0;
   -webkit-transition: background 0.15s;
   transition: background 0.15s;
 }
@@ -435,7 +435,7 @@ exports[`Utility components renders Small 1`] = `
 
 exports[`Utility components renders Uppercase 1`] = `
 .emotion-0 {
-  background: rgb(237, 237, 238);
+  background: #edeff0;
   -webkit-transition: background 0.15s;
   transition: background 0.15s;
 }
