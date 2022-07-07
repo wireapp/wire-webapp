@@ -34,9 +34,19 @@
           searchRepository: $root.repositories.search,
           teamRepository: $root.repositories.team,
         "></group-creation-modal>
-        #include('modal/legal-hold.htm')
+
+        <legal-hold-modal params="
+          conversationRepository: $root.repositories.conversation,
+          searchRepository: $root.repositories.search,
+          teamRepository: $root.repositories.team,
+          clientRepository: $root.repositories.client,
+          cryptographyRepository: $root.repositories.cryptography,
+          messageRepository: $root.repositories.message,
+        "></legal-hold-modal>
+
         <div class="center-column__overlay"></div>
       </div>
+
       <div id="right-column" class="right-column">
         #include('panel/conversation-details.htm')
         #include('panel/conversation-participants.htm')

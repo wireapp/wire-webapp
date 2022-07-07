@@ -18,9 +18,10 @@
  */
 
 import React from 'react';
+import {amplify} from 'amplify';
 import cx from 'classnames';
 import type {Conversation} from '../entity/Conversation';
-import type {LegalHoldModalViewModel} from '../view_model/content/LegalHoldModalViewModel';
+import {LegalHoldModalViewModel} from '../view_model/content/LegalHoldModalViewModel';
 import Icon from 'Components/Icon';
 import {registerReactComponent} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
@@ -51,11 +52,12 @@ const LegalHoldDot: React.FC<LegalHoldDotProps> = ({
     event.stopPropagation();
     if (isInteractive) {
       if (isPending) {
-        legalHoldModal.showRequestModal(true);
+        amplify.publish(LegalHoldModalViewModel.SHOW_REQUEST);
+
         return;
       }
 
-      legalHoldModal.showUsers(conversation);
+      amplify.publish(LegalHoldModalViewModel.SHOW_DETAILS, conversation);
     }
   };
 
@@ -75,6 +77,7 @@ const LegalHoldDot: React.FC<LegalHoldDotProps> = ({
       >
         {isPending && <Icon.Pending className="pending-icon" />}
       </span>
+
       {showText && <span className="visibility-hidden legal-hold-dot--text">{t('legalHoldHeadline')}</span>}
     </button>
   );
