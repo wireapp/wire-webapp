@@ -190,9 +190,13 @@ each(.colors(), .(@color-key, @color-name) {
   @name: @color-name;
   @accent-color: '@{name}-500';
   @accent-color-highlight: '@{name}-50';
-  @accent-color-border: '@{name}-300';
+  @accent-color-border: '@{name}-500';
+  @icon-primary-active-fill: '@{name}-500';
+  @icon-secondary-active-border: 'accent_colors-0';
 
   .main-accent-color-@{color-key} {
+    --icon-primary-active-fill: @@icon-primary-active-fill;
+    --icon-secondary-active-border: @@icon-secondary-active-border;
     --accent-color: @@accent-color;
     --accent-color-highlight: @@accent-color-highlight;
     --accent-color-border: @@accent-color-border;
@@ -213,8 +217,11 @@ each(.colors(), .(@color-key, @color-name) {
     @accent-color-dark: '@{name}-dark-500';
     @accent-color-highlight-dark: '@{name}-dark-800';
     @accent-color-border-dark: '@{name}-dark-600';
-
+    @icon-primary-active-fill-dark: 'w-white';
+    @icon-secondary-active-border-dark: '@{name}-dark-800' ;
     .main-accent-color-@{color-key} {
+      --icon-primary-active-fill: @@icon-primary-active-fill-dark;
+      --icon-secondary-active-border: @@icon-secondary-active-border-dark;
       --accent-color: @@accent-color-dark;
       --accent-color-highlight: @@accent-color-highlight-dark;
       --accent-color-border: @@accent-color-border-dark;

@@ -73,9 +73,14 @@ const MainContent: React.FC<LeftSidebarProps> = ({
     },
     IconButton: {
       activePrimaryBgColor: 'var(--accent-color-highlight)',
-      activePrimaryBorderColor: 'var(--accent-color-border)',
+      focusBorderColor: 'var(--accent-color-border)',
       hoverPrimaryBgColor: 'var(--icon-button-primary-hover-bg)',
+      primaryActiveFillColor: 'var(--icon-primary-active-fill)',
       primaryBgColor: 'var(--icon-button-primary-enabled-bg)',
+      primaryBorderColor: 'var(--icon-button-primary-border)',
+      primaryDisabledBorderColor: 'var(--icon-button-primary-disabled-border)',
+      primaryHoverBorderColor: 'var(--icon-button-primary-hover-border)',
+      secondaryActiveBorderColor: 'var(--icon-secondary-active-border)',
     },
     Input: {
       backgroundColor: 'var(--app-bg-secondary)',
