@@ -159,12 +159,12 @@ export const Select = <T extends SelectOption = SelectOption>({
   wrapperCSS = {},
   ...props
 }: SelectProps<T>) => {
-  const currentOption = options.findIndex(option => option.value === value?.value);
+  const currentOptionIdx = options.findIndex(option => option.value === value?.value);
+  const selectedOption = currentOptionIdx === -1 ? null : currentOptionIdx;
 
   const selectContainerRef = useRef<HTMLDivElement>(null);
   const listRef = useRef<HTMLUListElement>(null);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const [selectedOption, setSelectedOption] = useState<number | null>(currentOption === -1 ? null : currentOption);
 
   const hasSelectedOption = selectedOption !== null;
   const hasError = !!error;
@@ -184,7 +184,6 @@ export const Select = <T extends SelectOption = SelectOption>({
   const onToggleDropdown = () => setIsDropdownOpen(prevState => !prevState);
 
   const onOptionSelect = (idx: number) => {
-    setSelectedOption(idx);
     onChange(options[idx].value);
     scrollToCurrentOption(idx);
   };
@@ -306,7 +305,7 @@ export const Select = <T extends SelectOption = SelectOption>({
           })}
         >
           {options.map((option, index) => {
-            const isSelected = currentOption == index;
+            const isSelected = currentOptionIdx == index;
 
             return (
               <li
