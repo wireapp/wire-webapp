@@ -23,7 +23,6 @@ import {FC, useEffect, useState} from 'react';
 import ko from 'knockout';
 import {amplify} from 'amplify';
 import cx from 'classnames';
-import {container} from 'tsyringe';
 import ModalComponent from 'Components/ModalComponent';
 import Icon from 'Components/Icon';
 import {t} from 'Util/LocalizerUtil';
@@ -44,7 +43,7 @@ import {SearchRepository} from '../../../search/SearchRepository';
 import {LegalHoldModalState} from '../../../legal-hold/LegalHoldModalState';
 
 export interface LegalHoldModalProps {
-  readonly userState?: UserState;
+  userState: UserState;
   conversationRepository: ConversationRepository;
   searchRepository: SearchRepository;
   teamRepository: TeamRepository;
@@ -54,7 +53,7 @@ export interface LegalHoldModalProps {
 }
 
 const LegalHoldModal: FC<LegalHoldModalProps> = ({
-  userState = container.resolve(UserState),
+  userState,
   conversationRepository,
   searchRepository,
   teamRepository,
@@ -74,7 +73,7 @@ const LegalHoldModal: FC<LegalHoldModalProps> = ({
   const [passwordValue, setPasswordValue] = useState<string>('');
   const [requestError, setRequestError] = useState<string>('');
 
-  const [userDevices, setUserDevices] = useState<User>(undefined);
+  const [userDevices, setUserDevices] = useState<User | undefined>(undefined);
 
   const [users, setUsers] = useState<User[]>([]);
 
@@ -130,7 +129,11 @@ const LegalHoldModal: FC<LegalHoldModalProps> = ({
     setIsSendingApprove(true);
 
     try {
-      const password = requiresPassword ? passwordValue : undefined;
+      if (!selfUser.teamId) {
+        return;
+      }
+
+      const password = requiresPassword ? passwordValue : '';
       await teamRepository.teamService.sendLegalHoldApproval(selfUser.teamId, selfUser.id, password);
 
       onClose();
@@ -150,7 +153,7 @@ const LegalHoldModal: FC<LegalHoldModalProps> = ({
           break;
         }
         default: {
-          setRequestError(message);
+          setRequestError(message as string);
         }
       }
 
@@ -181,6 +184,10 @@ const LegalHoldModal: FC<LegalHoldModalProps> = ({
     }
 
     if (!fingerprint) {
+      if (!selfUser.teamId) {
+        return;
+      }
+
       const response = await teamRepository.teamService.getLegalHoldState(selfUser.teamId, selfUser.id);
 
       if (response.status === LegalHoldMemberStatus.PENDING) {
@@ -200,7 +207,7 @@ const LegalHoldModal: FC<LegalHoldModalProps> = ({
     setIsShown(true);
     setIsLoading(false);
 
-    const formattedFingerprint = splitFingerprint(fingerprint)
+    const formattedFingerprint = splitFingerprint(fingerprint || '')
       .map(part => `<span>${part} </span>`)
       .join('');
 
@@ -310,16 +317,18 @@ const LegalHoldModal: FC<LegalHoldModalProps> = ({
           {showRequest && (
             <>
               <div className="modal__text" data-uie-name="status-modal-text">
-                <div>
-                  {t(
-                    'legalHoldModalText',
-                    {},
-                    {
-                      br: '<br>',
-                      fingerprint: `<span class="legal-hold-modal__fingerprint" data-uie-name="status-modal-fingerprint">${requestFingerprint}</span>`,
-                    },
-                  )}
-                </div>
+                <p
+                  dangerouslySetInnerHTML={{
+                    __html: t(
+                      'legalHoldModalText',
+                      {},
+                      {
+                        br: '<br>',
+                        fingerprint: `<span class="legal-hold-modal__fingerprint" data-uie-name="status-modal-fingerprint">${requestFingerprint}</span>`,
+                      },
+                    ),
+                  }}
+                />
 
                 {requiresPassword && <div>{t('legalHoldModalTextPassword')}</div>}
               </div>
@@ -341,22 +350,24 @@ const LegalHoldModal: FC<LegalHoldModalProps> = ({
               )}
 
               <div className="modal__buttons">
-                <div
+                <button
+                  type="button"
                   className="modal__button modal__button--secondary"
                   data-uie-name="do-secondary"
                   onClick={closeRequest}
                 >
                   {t('legalHoldModalSecondaryAction')}
-                </div>
+                </button>
 
                 {!isSendingApprove ? (
-                  <div
+                  <button
+                    type="button"
                     className={cx('modal__button modal__button--primary', {'modal__button--disabled': disableSubmit})}
                     data-uie-name="do-action"
                     onClick={acceptRequest}
                   >
                     {t('legalHoldModalPrimaryAction')}
-                  </div>
+                  </button>
                 ) : (
                   <div className="modal__button modal__button--primary legal-hold-modal__loading-button">
                     <Icon.Loading />
@@ -401,7 +412,7 @@ const LegalHoldModal: FC<LegalHoldModalProps> = ({
               clientRepository={clientRepository}
               cryptographyRepository={cryptographyRepository}
               messageRepository={messageRepository}
-              user={userDevices}
+              user={userDevices as User}
               current={userDevicesHistory.current}
               goTo={userDevicesHistory.goTo}
               noPadding

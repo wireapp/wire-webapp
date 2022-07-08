@@ -24,6 +24,7 @@ import LegalHoldModal from './LegalHoldModal';
 
 import {CallingRepository} from '../../../calling/CallingRepository';
 import {ClientRepository} from '../../../client/ClientRepository';
+import {ConversationRepository} from '../../../conversation/ConversationRepository';
 import {MessageRepository} from '../../../conversation/MessageRepository';
 import {CryptographyRepository} from '../../../cryptography/CryptographyRepository';
 import {LegalHoldModalState} from '../../../legal-hold/LegalHoldModalState';
@@ -31,34 +32,36 @@ import {SearchRepository} from '../../../search/SearchRepository';
 import {SearchService} from '../../../search/SearchService';
 import {TeamRepository} from '../../../team/TeamRepository';
 import {UserRepository} from '../../../user/UserRepository';
+import {UserState} from '../../../user/UserState';
 
 import {TestFactory} from '../../../../../test/helper/TestFactory';
 
 const userRepository = {} as UserRepository;
 const testFactory = new TestFactory();
-let callingRepository: CallingRepository;
+let callRepository: CallingRepository;
 
 beforeAll(() => {
   testFactory.exposeCallingActors().then(injectedCallingRepository => {
-    callingRepository = injectedCallingRepository;
-    return callingRepository;
+    callRepository = injectedCallingRepository;
+    return callRepository;
   });
 });
 
-const defaultProps = {
+const defaultProps = (callingRepository: CallingRepository) => ({
   callingRepository,
   clientRepository: {} as ClientRepository,
-  conversationRepository: testFactory.conversation_repository,
+  conversationRepository: testFactory.conversation_repository as ConversationRepository,
   cryptographyRepository: new CryptographyRepository({} as any),
   messageRepository: {} as MessageRepository,
   searchRepository: new SearchRepository(new SearchService(), userRepository),
   teamRepository: {} as TeamRepository,
-};
+  userState: new UserState(),
+});
 
 describe('LegalHoldModal', () => {
   it('is showRequestModal', async () => {
     spyOn(amplify, 'subscribe').and.returnValue(undefined);
-    await render(<LegalHoldModal {...defaultProps} />);
+    await render(<LegalHoldModal {...defaultProps(callRepository)} />);
     await waitFor(() => {
       expect(amplify.subscribe).toHaveBeenCalledWith(LegalHoldModalState.SHOW_REQUEST, expect.anything());
     });
@@ -66,7 +69,7 @@ describe('LegalHoldModal', () => {
 
   it('is showUser', async () => {
     spyOn(amplify, 'subscribe').and.returnValue(undefined);
-    await render(<LegalHoldModal {...defaultProps} />);
+    await render(<LegalHoldModal {...defaultProps(callRepository)} />);
     await waitFor(() => {
       expect(amplify.subscribe).toHaveBeenCalledWith(LegalHoldModalState.SHOW_DETAILS, expect.anything());
     });
