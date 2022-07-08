@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [12.2.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/bot-api/compare/@wireapp/bot-api@12.1.6...@wireapp/bot-api@12.2.0) (2022-07-08)
+
+
+### Features
+
+* **core:** Send MLS messages (FS-560) ([#4314](https://github.com/wireapp/wire-web-packages/tree/main/packages/bot-api/issues/4314)) ([2f29052](https://github.com/wireapp/wire-web-packages/tree/main/packages/bot-api/commit/2f2905233b29c31294ec64e97c1e84998e28821f))
+
+
+
+
+
 ## [12.1.6](https://github.com/wireapp/wire-web-packages/tree/main/packages/bot-api/compare/@wireapp/bot-api@12.1.5...@wireapp/bot-api@12.1.6) (2022-07-08)
 
 **Note:** Version bump only for package @wireapp/bot-api
