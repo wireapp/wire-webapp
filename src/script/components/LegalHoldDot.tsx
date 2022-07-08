@@ -51,15 +51,13 @@ const LegalHoldDot: React.FC<LegalHoldDotProps> = ({
   const isInteractive = !!legalHoldModal;
   const onClick = (event: React.MouseEvent) => {
     event.stopPropagation();
-    if (isInteractive) {
-      if (isPending) {
-        amplify.publish(LegalHoldModalState.SHOW_REQUEST);
+    if (isPending) {
+      amplify.publish(LegalHoldModalState.SHOW_REQUEST);
 
-        return;
-      }
-
-      amplify.publish(LegalHoldModalState.SHOW_DETAILS, conversation);
+      return;
     }
+
+    amplify.publish(LegalHoldModalState.SHOW_DETAILS, conversation);
   };
 
   return (

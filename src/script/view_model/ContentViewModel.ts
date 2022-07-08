@@ -29,7 +29,6 @@ import {container} from 'tsyringe';
 
 import {Config} from '../Config';
 import {MessageListViewModel} from './content/MessageListViewModel';
-import {LegalHoldModalViewModel} from './content/LegalHoldModalViewModel';
 import {EmojiInputViewModel} from './content/EmojiInputViewModel';
 import {ModalsViewModel} from './ModalsViewModel';
 import {ConversationError} from '../error/ConversationError';
@@ -59,6 +58,8 @@ import {
 } from '../notification/PreferenceNotificationRepository';
 import {modals} from '../view_model/ModalsViewModel';
 import {MessageRepository} from '../conversation/MessageRepository';
+import {LegalHoldModalState} from '../legal-hold/LegalHoldModalState';
+import {LegalHoldModalViewModel} from './content/LegalHoldModalViewModel';
 
 interface ShowConversationOptions {
   exposeMessage?: Message;
@@ -216,7 +217,7 @@ export class ContentViewModel {
 
     this._initSubscriptions();
     if (this.teamState.supportsLegalHold()) {
-      this.legalHoldModal.showRequestModal();
+      amplify.publish(LegalHoldModalState.SHOW_REQUEST);
     }
     ko.applyBindings(this, document.getElementById(this.elementId));
   }

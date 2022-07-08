@@ -89,7 +89,7 @@ const LeftSidebar: React.FC<LeftSidebarProps> = ({
           contentViewModel={listViewModel.contentViewModel}
           teamRepository={repositories.team}
           onClose={goHome}
-        ></Preferences>
+        />
       );
       break;
 
@@ -100,7 +100,7 @@ const LeftSidebar: React.FC<LeftSidebarProps> = ({
           conversationRepository={conversationRepository}
           listViewModel={listViewModel}
           onClose={goHome}
-        ></Archive>
+        />
       );
       break;
 

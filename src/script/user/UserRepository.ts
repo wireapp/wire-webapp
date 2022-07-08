@@ -54,7 +54,6 @@ import {ClientMapper} from '../client/ClientMapper';
 import {Config} from '../Config';
 import {ConsentValue} from './ConsentValue';
 import {EventRepository} from '../event/EventRepository';
-import {LegalHoldModalViewModel} from '../view_model/content/LegalHoldModalViewModel';
 import {mapProfileAssetsV1} from '../assets/AssetMapper';
 import {valueFromType} from './AvailabilityMapper';
 import {showAvailabilityModal} from './AvailabilityModal';
@@ -74,6 +73,7 @@ import type {UserService} from './UserService';
 import {fixWebsocketString} from 'Util/StringUtil';
 import {matchQualifiedIds} from 'Util/QualifiedId';
 import {flattenUserClientsQualifiedIds} from '../conversation/userClientsUtils';
+import {LegalHoldModalState} from '../legal-hold/LegalHoldModalState';
 
 interface UserAvailabilityEvent {
   data: {availability: Availability.Type};
@@ -309,7 +309,7 @@ export class UserRepository {
       if (clientEntity.isLegalHold()) {
         const isSelfUser = userId.id === this.userState.self().id;
         if (isSelfUser) {
-          amplify.publish(LegalHoldModalViewModel.SHOW_DETAILS);
+          amplify.publish(LegalHoldModalState.SHOW_DETAILS);
         }
       }
       if (publishClient) {
@@ -380,7 +380,7 @@ export class UserRepository {
   private onLegalHoldRequestCanceled(eventJson: UserLegalHoldDisableEvent): void {
     if (this.userState.self().id === eventJson.id) {
       this.userState.self().hasPendingLegalHold(false);
-      amplify.publish(LegalHoldModalViewModel.HIDE_REQUEST);
+      amplify.publish(LegalHoldModalState.HIDE_REQUEST);
     } else {
       /*
        * TODO:
@@ -408,7 +408,7 @@ export class UserRepository {
       clientId,
       last_prekey,
     );
-    amplify.publish(LegalHoldModalViewModel.SHOW_REQUEST, fingerprint);
+    amplify.publish(LegalHoldModalState.SHOW_REQUEST, fingerprint);
   }
 
   /**

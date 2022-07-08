@@ -43,7 +43,7 @@ import {User} from '../../../entity/User';
 import {SearchRepository} from '../../../search/SearchRepository';
 import {LegalHoldModalState} from '../../../legal-hold/LegalHoldModalState';
 
-interface LegalHoldModalProps {
+export interface LegalHoldModalProps {
   readonly userState?: UserState;
   conversationRepository: ConversationRepository;
   searchRepository: SearchRepository;
