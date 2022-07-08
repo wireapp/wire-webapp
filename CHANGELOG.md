@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [19.13.1](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/compare/@wireapp/api-client@19.13.0...@wireapp/api-client@19.13.1) (2022-07-08)
+
+
+### Bug Fixes
+
+* issue with mls typing ([#4322](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/issues/4322)) ([a5dad86](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/commit/a5dad86e728ed986c4e068d7b8842bd5278734ba))
+
+
+
+
+
 # [19.13.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/compare/@wireapp/api-client@19.12.2...@wireapp/api-client@19.13.0) (2022-07-08)
 
 
