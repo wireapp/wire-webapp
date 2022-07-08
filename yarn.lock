@@ -3165,10 +3165,10 @@
     tough-cookie "4.0.0"
     ws "7.5.3"
 
-"@wireapp/avs@8.1.17":
-  version "8.1.17"
-  resolved "https://registry.yarnpkg.com/@wireapp/avs/-/avs-8.1.17.tgz#db83c6ffe81888e2ab607fe3eab72350987366a6"
-  integrity sha512-qSfdywoGRFnNdoxJU8RfVPN2TQ09kG3z+wFLyhNsFuBwjcqeDvhz9301am7qLsWlEKZxANzwt9yrfwbdIGcRtQ==
+"@wireapp/avs@8.2.2":
+  version "8.2.2"
+  resolved "https://registry.yarnpkg.com/@wireapp/avs/-/avs-8.2.2.tgz#97654047d38cd7b558ee3da19343d3dc7ae50e88"
+  integrity sha512-6rcVCETyJV1LlaDsJz3BWbD1VR3mLZZT7VZblKmUb4q49f7Rz2iR0NJUaQ3QLyzVM2dS6oPfujq2JedJSQfxaA==
 
 "@wireapp/cbor@4.7.3":
   version "4.7.3"
@@ -3284,7 +3284,6 @@
   version "8.8.0"
   resolved "https://registry.yarnpkg.com/@wireapp/react-ui-kit/-/react-ui-kit-8.8.0.tgz#2a1555995e15fe15f33ea59293bb5401d1e022ae"
   integrity sha512-EX+zBiTrLvbtP+IoSg/VObptk0GH7zQGEDptxVh7Z9ySlFh85rxCwgYbhHy6uoNOgkfVWctRFyPFqVkK+jvbDw==
-
   dependencies:
     "@emotion/react" "11.9.0"
     "@types/color" "3.0.2"
