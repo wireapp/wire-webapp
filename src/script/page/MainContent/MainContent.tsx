@@ -17,7 +17,7 @@
  *
  */
 
-import React, {useEffect, useState} from 'react';
+import React from 'react';
 import {CSSTransition, SwitchTransition} from 'react-transition-group';
 import {registerReactComponent, useKoSubscribableChildren} from 'Util/ComponentUtil';
 
@@ -34,9 +34,7 @@ import AVPreferences from './panels/preferences/AVPreferences';
 import {container} from 'tsyringe';
 import {ClientState} from '../../client/ClientState';
 import {UserState} from '../../user/UserState';
-import {StyledApp, THEME_ID} from '@wireapp/react-ui-kit';
-import {amplify} from 'amplify';
-import {WebAppEvents} from '@wireapp/webapp-events';
+import {StyledApp} from '@wireapp/react-ui-kit';
 
 // Ko imported components
 import '../message-list/InputBarControls';
@@ -60,23 +58,49 @@ const MainContent: React.FC<LeftSidebarProps> = ({
   const {state} = useKoSubscribableChildren(contentViewModel, ['state']);
   const {activeConversation} = useKoSubscribableChildren(conversationState, ['activeConversation']);
   const repositories = contentViewModel.repositories;
-  const currentTheme = repositories.properties?.properties.settings.interface.theme;
 
-  const [uiKitTheme, setUiKitTheme] = useState<THEME_ID>(currentTheme === 'dark' ? THEME_ID.DARK : THEME_ID.LIGHT);
+  const {isFederated} = contentViewModel;
 
-  const updateTheme = (theme: string) => {
-    setUiKitTheme(theme === 'dark' ? THEME_ID.DARK : THEME_ID.LIGHT);
+  const theme = {
+    Checkbox: {
+      background: 'var(--checkbox-background)',
+      border: 'var(--checkbox-border)',
+      borderFocused: 'blue',
+      disableBgColor: 'var(--checkbox-background-disabled)',
+      disableBorderColor: 'var(--checkbox-border-disabled)',
+      disablecheckedBgColor: 'var(--checkbox-background-disabled-selected)',
+      invalidBorderColor: 'var(--checkbox-alert)',
+    },
+    IconButton: {
+      activePrimaryBgColor: 'var(--accent-color-highlight)',
+      focusBorderColor: 'var(--accent-color-border)',
+      hoverPrimaryBgColor: 'var(--icon-button-primary-hover-bg)',
+      primaryActiveFillColor: 'var(--icon-primary-active-fill)',
+      primaryBgColor: 'var(--icon-button-primary-enabled-bg)',
+      primaryBorderColor: 'var(--icon-button-primary-border)',
+      primaryDisabledBgColor: 'var(--icon-button-primary-disabled-bg)',
+      primaryDisabledBorderColor: 'var(--icon-button-primary-disabled-border)',
+      primaryHoverBorderColor: 'var(--icon-button-primary-hover-border)',
+      secondaryActiveBorderColor: 'var(--icon-secondary-active-border)',
+    },
+    Input: {
+      backgroundColor: 'var(--app-bg-secondary)',
+      backgroundColorDisabled: 'var(--sidebar-bg)',
+      labelColor: 'var(--text-input-label)',
+      placeholderColor: 'var(--text-input-placeholder)',
+    },
+    Select: {
+      borderColor: 'var(--border-color)',
+      contrastTextColor: 'var(--text-input-background)',
+      disabledColor: 'var(--text-input-placeholder)',
+    },
+    general: {
+      backgroundColor: 'var(--app-bg)',
+      color: 'var(--main-color)',
+      dangerColor: 'var(--res-500)',
+      primaryColor: 'var(--accent-color)',
+    },
   };
-
-  useEffect(() => {
-    amplify.subscribe(WebAppEvents.PROPERTIES.UPDATE.INTERFACE.THEME, updateTheme);
-
-    return () => {
-      amplify.unsubscribe(WebAppEvents.PROPERTIES.UPDATE.INTERFACE.THEME, updateTheme);
-    };
-  }, []);
-
-  const isFederated = contentViewModel.isFederated;
 
   let title = '';
   let content = null;
@@ -168,7 +192,7 @@ const MainContent: React.FC<LeftSidebarProps> = ({
   return (
     <>
       <h1 className="visually-hidden">{title}</h1>
-      <StyledApp themeId={uiKitTheme} css={{backgroundColor: 'unset', height: '100%'}}>
+      <StyledApp theme={theme} css={{backgroundColor: 'unset', height: '100%'}}>
         <SwitchTransition>
           <Animated key={state}>{content}</Animated>
         </SwitchTransition>

@@ -83,7 +83,7 @@ const ControlButtons: React.FC<ControlButtonsProps> = ({
           <>
             <li>
               <button
-                className="controls-right-button button-icon-large buttons-group-button-left"
+                className="controls-right-button buttons-group-button-left"
                 type="button"
                 onClick={onClickPing}
                 disabled={disablePing}
@@ -100,7 +100,7 @@ const ControlButtons: React.FC<ControlButtonsProps> = ({
                 type="button"
                 aria-label={t('tooltipConversationAddImage')}
                 title={t('tooltipConversationAddImage')}
-                className="conversation-button controls-right-button no-radius button-icon-large"
+                className="conversation-button controls-right-button no-radius file-button"
                 onClick={() => imageRef.current?.click()}
                 data-uie-name="do-share-image"
               >
@@ -111,7 +111,7 @@ const ControlButtons: React.FC<ControlButtonsProps> = ({
                   accept={acceptedImageTypes}
                   tabIndex={-1}
                   id="conversation-input-bar-photo"
-                  onChange={event => onSelectImages(Array.from(event.target.files))}
+                  onChange={({target: {files}}) => files && onSelectImages(Array.from(files))}
                   type="file"
                 />
               </button>
@@ -122,7 +122,7 @@ const ControlButtons: React.FC<ControlButtonsProps> = ({
                 type="button"
                 aria-label={t('tooltipConversationFile')}
                 title={t('tooltipConversationFile')}
-                className="conversation-button controls-right-button no-radius button-icon-large"
+                className="conversation-button controls-right-button no-radius file-button"
                 onClick={() => fileRef.current?.click()}
                 data-uie-name="do-share-file"
               >
@@ -133,7 +133,7 @@ const ControlButtons: React.FC<ControlButtonsProps> = ({
                   accept={acceptedFileTypes ?? null}
                   id="conversation-input-bar-files"
                   tabIndex={-1}
-                  onChange={event => onSelectFiles(Array.from(event.target.files))}
+                  onChange={({target: {files}}) => files && onSelectFiles(Array.from(files))}
                   type="file"
                 />
               </button>

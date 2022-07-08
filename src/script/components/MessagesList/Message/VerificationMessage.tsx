@@ -69,11 +69,16 @@ const VerificationMessage: React.FC<VerificationMessageProps> = ({message}) => {
           <>
             <span className="message-header-sender-name">{unsafeSenderName}</span>
             <span className="ellipsis">{t('conversationDeviceUnverified')}</span>
-            <span className="message-verification-action accent-text" onClick={showDevice} data-uie-name="go-devices">
+            <button
+              type="button"
+              className="button-reset-default message-verification-action accent-text"
+              onClick={showDevice}
+              data-uie-name="go-devices"
+            >
               {isSelfClient
                 ? t('conversationDeviceYourDevices')
                 : t('conversationDeviceUserDevices', userEntities[0]?.name())}
-            </span>
+            </button>
           </>
         )}
         {isTypeNewDevice && (
@@ -82,18 +87,28 @@ const VerificationMessage: React.FC<VerificationMessageProps> = ({message}) => {
             <span className="ellipsis">
               {hasMultipleUsers ? t('conversationDeviceStartedUsingMany') : t('conversationDeviceStartedUsingOne')}
             </span>
-            <span className="message-verification-action accent-text" onClick={showDevice} data-uie-name="go-devices">
+            <button
+              type="button"
+              className="button-reset-default message-verification-action accent-text"
+              onClick={showDevice}
+              data-uie-name="go-devices"
+            >
               {hasMultipleUsers ? t('conversationDeviceNewDeviceMany') : t('conversationDeviceNewDeviceOne')}
-            </span>
+            </button>
           </>
         )}
         {isTypeNewMember && (
           <>
             <span className="ellipsis">{t('conversationDeviceNewPeopleJoined')}</span>
             &nbsp;
-            <span className="message-verification-action accent-text" onClick={showDevice} data-uie-name="go-devices">
+            <button
+              type="button"
+              className="button-reset-default message-verification-action accent-text"
+              onClick={showDevice}
+              data-uie-name="go-devices"
+            >
               {t('conversationDeviceNewPeopleJoinedVerify')}
-            </span>
+            </button>
           </>
         )}
         <hr className="message-header-line" />

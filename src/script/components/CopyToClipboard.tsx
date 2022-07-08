@@ -19,24 +19,34 @@
 
 import React from 'react';
 import {registerReactComponent} from 'Util/ComponentUtil';
+import {handleKeyDown} from 'Util/KeyboardUtil';
 
 export interface CopyToClipboardProps {
   text: string;
 }
 
 const CopyToClipboard: React.FC<CopyToClipboardProps> = ({text}) => {
+  const onClick = ({currentTarget}: React.UIEvent) => {
+    if (window.getSelection) {
+      const selectionRange = document.createRange();
+      selectionRange.selectNode(currentTarget);
+      const selection = window.getSelection();
+
+      if (selection) {
+        selection.removeAllRanges();
+        selection.addRange(selectionRange);
+      }
+    }
+  };
+
   return (
     <div
+      role="button"
+      tabIndex={0}
       data-uie-name="copy-to-clipboard"
       className="copy-to-clipboard"
-      onClick={({currentTarget}) => {
-        if (window.getSelection) {
-          const selectionRange = document.createRange();
-          selectionRange.selectNode(currentTarget);
-          window.getSelection().removeAllRanges();
-          window.getSelection().addRange(selectionRange);
-        }
-      }}
+      onClick={onClick}
+      onKeyDown={e => handleKeyDown(e, onClick.bind(null, e))}
     >
       {text}
     </div>

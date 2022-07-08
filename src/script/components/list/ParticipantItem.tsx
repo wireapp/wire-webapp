@@ -17,7 +17,7 @@
  *
  */
 
-import React, {Fragment} from 'react';
+import React from 'react';
 import cx from 'classnames';
 
 import {registerReactComponent, useKoSubscribableChildren} from 'Util/ComponentUtil';
@@ -177,25 +177,23 @@ const ParticipantItem = <UserType extends User | ServiceEntity>(
                   )}
                   {isSelf && <div className="participant-item__content__self-indicator">{selfString}</div>}
                 </div>
-                <div className="participant-item__content__info">
-                  {contentInfoText && (
-                    <Fragment>
-                      <span
-                        className={cx('participant-item__content__username label-username-notext', {
-                          'label-username': hasUsernameInfo,
-                        })}
-                        data-uie-name="status-username"
-                      >
-                        {contentInfoText}
+                {contentInfoText && (
+                  <div className="participant-item__content__info">
+                    <span
+                      className={cx('participant-item__content__username label-username-notext', {
+                        'label-username': hasUsernameInfo,
+                      })}
+                      data-uie-name="status-username"
+                    >
+                      {contentInfoText}
+                    </span>
+                    {hasUsernameInfo && badge && (
+                      <span className="participant-item__content__badge" data-uie-name="status-partner">
+                        {badge}
                       </span>
-                      {hasUsernameInfo && badge && (
-                        <span className="participant-item__content__badge" data-uie-name="status-partner">
-                          {badge}
-                        </span>
-                      )}
-                    </Fragment>
-                  )}
-                </div>
+                    )}
+                  </div>
+                )}
               </div>
               {showDropdown && (
                 <button

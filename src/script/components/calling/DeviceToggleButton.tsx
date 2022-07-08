@@ -19,6 +19,7 @@
 
 import React from 'react';
 import {css, SerializedStyles} from '@emotion/react';
+import {handleKeyDown} from 'Util/KeyboardUtil';
 export interface DeviceToggleButtonProps {
   currentDevice: string;
   devices: string[];
@@ -27,7 +28,7 @@ export interface DeviceToggleButtonProps {
 }
 
 const DeviceToggleButton: React.FC<DeviceToggleButtonProps> = ({currentDevice, devices, onChooseDevice, styles}) => {
-  const selectNextDevice = (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+  const selectNextDevice = (event: React.UIEvent) => {
     event.preventDefault();
     event.stopPropagation();
     const currentDeviceIndex = devices.indexOf(currentDevice);
@@ -49,9 +50,12 @@ const DeviceToggleButton: React.FC<DeviceToggleButtonProps> = ({currentDevice, d
       `}
     >
       <div
+        role="button"
+        tabIndex={0}
         className="device-toggle-button-indicator"
         data-uie-name="device-toggle-button-indicator"
         onClick={selectNextDevice}
+        onKeyDown={e => handleKeyDown(e, selectNextDevice.bind(null, e))}
         css={{
           display: 'flex',
           marginTop: 8,

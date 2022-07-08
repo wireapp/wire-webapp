@@ -137,7 +137,6 @@ const AccountPreferences: React.FC<AccountPreferencesProps> = ({
           title={name}
           css={{
             marginBottom: 16,
-            textTransform: 'uppercase',
             width: '100%',
           }}
         >

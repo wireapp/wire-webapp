@@ -290,7 +290,7 @@ const AppLock: React.FC<AppLockProps> = ({
               className="modal__text"
               dangerouslySetInnerHTML={{__html: t('modalAppLockSetupMessage', {}, {br: '<br><br>'})}}
               data-uie-name="label-applock-set-text"
-            ></div>
+            />
             <div className="modal__text modal__label" data-uie-name="label-applock-unlock-text">
               {t('modalAppLockPasscode')}
             </div>
@@ -376,7 +376,7 @@ const AppLock: React.FC<AppLockProps> = ({
                 ),
               }}
               data-uie-name="label-applock-set-text"
-            ></div>
+            />
             <div className="modal__text modal__label" data-uie-name="label-applock-unlock-text">
               {t('modalAppLockPasscode')}
             </div>
@@ -441,9 +441,14 @@ const AppLock: React.FC<AppLockProps> = ({
               {unlockError}
             </div>
 
-            <div className="modal__cta" data-uie-name="go-forgot-passphrase" onClick={onClickForgot}>
+            <button
+              type="button"
+              className="button-reset-default block modal__cta"
+              data-uie-name="go-forgot-passphrase"
+              onClick={onClickForgot}
+            >
               {t('modalAppLockLockedForgotCTA')}
-            </div>
+            </button>
 
             <div className="modal__buttons">
               <button
@@ -462,9 +467,14 @@ const AppLock: React.FC<AppLockProps> = ({
             <div className="modal__text" data-uie-name="label-applock-forgot-text">
               {t('modalAppLockForgotMessage')}
             </div>
-            <div className="modal__cta" onClick={onClickWipe} data-uie-name="go-wipe-database">
+            <button
+              type="button"
+              className="button-reset-default block modal__cta"
+              onClick={onClickWipe}
+              data-uie-name="go-wipe-database"
+            >
               {t('modalAppLockForgotWipeCTA')}
-            </div>
+            </button>
             <div className="modal__buttons">
               <button
                 onClick={onGoBack}

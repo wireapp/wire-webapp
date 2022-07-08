@@ -52,12 +52,13 @@ const SelfFingerprint: React.FC<SelfFingerprintProps> = ({
         <DeviceId deviceId={fingerprintLocal} />
       </div>
       <div>
-        <span
-          className="participant-devices__link accent-text"
+        <button
+          type="button"
+          className="button-reset-default participant-devices__link accent-text"
           onClick={() => amplify.publish(WebAppEvents.PREFERENCES.MANAGE_DEVICES)}
         >
           {t('participantDevicesSelfAllDevices')}
-        </span>
+        </button>
       </div>
     </div>
   );

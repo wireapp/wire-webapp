@@ -124,6 +124,7 @@ import {matchQualifiedIds} from 'Util/QualifiedId';
 import {ConversationVerificationState} from './ConversationVerificationState';
 import {extractClientDiff} from './ClientMismatchUtil';
 import {Core} from '../service/CoreSingleton';
+import {ClientState} from '../client/ClientState';
 
 type ConversationDBChange = {obj: EventRecord; oldObj: EventRecord};
 type FetchPromise = {rejectFn: (error: ConversationError) => void; resolveFn: (conversation: Conversation) => void};
@@ -168,6 +169,7 @@ export class ConversationRepository {
     private readonly teamState = container.resolve(TeamState),
     private readonly conversationState = container.resolve(ConversationState),
     private readonly core = container.resolve(Core),
+    private readonly clientState = container.resolve(ClientState),
   ) {
     this.eventService = eventRepository.eventService;
     // we register a client mismatch handler agains the message repository so that we can react to missing members
@@ -389,6 +391,15 @@ export class ConversationRepository {
       ...usersPayload,
       ...options,
     };
+
+    /**
+     * we need to add this creator_client to conversation creation payload
+     * for creating MLS conversations
+     */
+    if (this.teamState.isMLSEnabled()) {
+      payload.creator_client = this.clientState.currentClient().id;
+      payload.selfUserId = this.userState.self().qualifiedId;
+    }
 
     if (this.teamState.team().id) {
       payload.team = {
@@ -1341,7 +1352,7 @@ export class ConversationRepository {
     const userIds = userEntities.map(userEntity => userEntity.qualifiedId);
 
     try {
-      const response = await this.conversation_service.postMembers(conversationEntity.id, userIds);
+      const response = await this.conversation_service.postMembers(conversationEntity.qualifiedId, userIds);
       if (response) {
         this.eventRepository.injectEvent(response, EventRepository.SOURCE.BACKEND_RESPONSE);
       }

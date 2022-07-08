@@ -44,16 +44,17 @@ const MessageFooterLike: React.FC<MessageFooterLikeProps> = ({message, is1to1Con
       <div className="message-footer-icon">
         <MessageLike className="like-button" message={message} onLike={onLike} />
       </div>
-      <div
-        className={cx('message-footer-label', {
+      <button
+        type="button"
+        className={cx('button-reset-default', 'message-footer-label', {
           'cursor-pointer': !is1to1Conversation,
         })}
-        onClick={is1to1Conversation ? null : () => onClickLikes(message)}
+        onClick={is1to1Conversation ? undefined : () => onClickLikes(message)}
       >
         <span className="message-footer-text" data-uie-name="message-liked-names" data-uie-value={reactionsUserIds}>
           {likeCaption}
         </span>
-      </div>
+      </button>
     </div>
   );
 };

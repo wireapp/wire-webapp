@@ -16,6 +16,9 @@
  * along with this program. If not, see http://www.gnu.org/licenses/.
  *
  */
+#show-participants {
+  min-width: 0; //needed for the truncation of long titles to work properly in flex-boxes
+}
 
 .conversation-title-bar {
   .flex-center;
@@ -34,14 +37,17 @@
 
   display: flex;
   height: 100%;
-  flex-direction: column;
   flex-grow: 1;
-  cursor: pointer;
+  margin-left: 10px;
   user-select: none;
 
   &--verified {
     margin: 4px 16px 0 0;
   }
+}
+
+.conversation-title-bar-legal-hold {
+  margin-right: 6px;
 }
 body.theme-dark {
   .conversation-title-bar-indication-badge {
@@ -70,7 +76,6 @@ body.theme-dark {
 .conversation-title-bar-icons,
 .conversation-title-bar-library {
   display: flex;
-  width: 112px;
   height: 100%;
   align-items: center;
 }
@@ -107,6 +112,8 @@ body.theme-dark {
 .conversation-title-bar-name-label {
   .heading-h3;
   overflow: hidden;
+  margin: 0.15em;
+  cursor: pointer;
   text-overflow: ellipsis;
   &--wrapper {
     .flex-center;

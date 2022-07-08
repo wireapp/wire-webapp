@@ -37,6 +37,7 @@ import GroupAvatar from 'Components/avatar/GroupAvatar';
 import {ContentViewModel} from '../../../../view_model/ContentViewModel';
 import {ConverationViewStyle} from './Conversations';
 import {User} from 'src/script/entity/User';
+import {handleKeyDown} from 'Util/KeyboardUtil';
 
 export const ConversationsList: React.FC<{
   callState: CallState;
@@ -73,6 +74,10 @@ export const ConversationsList: React.FC<{
       return false;
     }
     return !conversation.removed_from_conversation();
+  };
+
+  const onConnectionRequestClick = () => {
+    listViewModel.contentViewModel.switchContent(ContentViewModel.STATE.CONNECTION_REQUESTS);
   };
 
   const conversationView =
@@ -114,34 +119,39 @@ export const ConversationsList: React.FC<{
 
   const connectionRequests =
     connectRequests.length === 0 ? null : (
-      <li
-        className={`conversation-list-cell ${isShowingConnectionRequests ? 'conversation-list-cell-active' : ''}`}
-        onClick={() => listViewModel.contentViewModel.switchContent(ContentViewModel.STATE.CONNECTION_REQUESTS)}
-      >
-        <div className="conversation-list-cell-left">
-          {connectRequests.length === 1 ? (
-            <div className="avatar-halo">
-              <Avatar participant={connectRequests[0]} avatarSize={AVATAR_SIZE.SMALL} />
-            </div>
-          ) : (
-            <GroupAvatar users={connectRequests} />
-          )}
-        </div>
+      <li>
+        <div
+          role="button"
+          tabIndex={0}
+          className={`conversation-list-cell ${isShowingConnectionRequests ? 'conversation-list-cell-active' : ''}`}
+          onClick={onConnectionRequestClick}
+          onKeyDown={e => handleKeyDown(e, onConnectionRequestClick)}
+        >
+          <div className="conversation-list-cell-left">
+            {connectRequests.length === 1 ? (
+              <div className="avatar-halo">
+                <Avatar participant={connectRequests[0]} avatarSize={AVATAR_SIZE.SMALL} />
+              </div>
+            ) : (
+              <GroupAvatar users={connectRequests} />
+            )}
+          </div>
 
-        <div className="conversation-list-cell-center">
-          <span
-            className={`conversation-list-cell-name ${isShowingConnectionRequests ? 'accent-text' : ''}`}
-            data-uie-name="item-pending-requests"
-          >
-            {connectionText}
-          </span>
-        </div>
+          <div className="conversation-list-cell-center">
+            <span
+              className={`conversation-list-cell-name ${isShowingConnectionRequests ? 'accent-text' : ''}`}
+              data-uie-name="item-pending-requests"
+            >
+              {connectionText}
+            </span>
+          </div>
 
-        <div className="conversation-list-cell-right">
-          <span
-            className="conversation-list-cell-badge cell-badge-dark icon-pending"
-            data-uie-name="status-pending"
-          ></span>
+          <div className="conversation-list-cell-right">
+            <span
+              className="conversation-list-cell-badge cell-badge-dark icon-pending"
+              data-uie-name="status-pending"
+            />
+          </div>
         </div>
       </li>
     );

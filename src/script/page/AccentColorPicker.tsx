@@ -35,7 +35,6 @@ const headerStyles: CSSObject = {
   margin: '20px 0 6px',
   padding: 0,
   textAlign: 'center',
-  textTransform: 'uppercase',
 };
 
 const AccentColorPicker: React.FunctionComponent<AccentColorPickerProps> = ({user, doSetAccentColor}) => {
@@ -54,24 +53,14 @@ const AccentColorPicker: React.FunctionComponent<AccentColorPickerProps> = ({use
             justifyContent: 'space-between',
           }}
         >
-          {Object.keys(ACCENT_ID).map((key: keyof typeof ACCENT_ID) => {
+          {(Object.keys(ACCENT_ID) as (keyof typeof ACCENT_ID)[]).map(key => {
             const id = ACCENT_ID[key];
             const name = t(`preferencesAccountAccentColor${key}`);
             const color = User.ACCENT_COLOR[id];
             const isChecked = accentId === id;
 
             return (
-              <div
-                data-uie-name="element-accent-color-label"
-                data-uie-value={id}
-                key={id}
-                css={{
-                  alignItems: 'center',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  justifyContent: 'center',
-                }}
-              >
+              <div data-uie-name="element-accent-color-label" data-uie-value={id} key={id}>
                 <input
                   id={String(id)}
                   type="radio"
@@ -81,51 +70,63 @@ const AccentColorPicker: React.FunctionComponent<AccentColorPickerProps> = ({use
                   data-uie-name="do-set-accent-color"
                   data-uie-value={id}
                   css={{
-                    '& + span': {
+                    '& + label > span:first-child': {
                       color: color,
                       cursor: 'pointer',
                       display: 'inline-block',
                       position: 'relative',
                     },
-                    '& + span::after': {
+                    '& + label > span:first-child::after': {
                       ...CSS_SQUARE(10),
                       background: 'currentColor',
                       left: '-5px',
                       top: '-5px',
                     },
-                    '& + span::before': {
+                    '& + label > span:first-child::before': {
                       ...CSS_SQUARE(16),
                       left: '-8px',
                       top: '-8px',
                     },
-                    '& + span::before, & + span::after': {
+                    '& + label > span:first-child::before, & + label > span:first-child::after': {
                       borderRadius: '50%',
                       content: '""',
                       display: 'inline-block',
                       position: 'absolute',
                       transition: 'all 0.15s ease-out',
                     },
-                    '&:checked + span::after': {
+                    '&:checked + label > span:first-child::after': {
                       left: '-5px',
                       top: '-5px',
                     },
-                    '&:checked + span::before': {
+                    '&:checked + label > span:first-child::before': {
                       border: '1px solid currentColor',
                     },
-                    '&:focus + span::before': {
+                    '&:focus + label > span:first-child::before': {
                       ...CSS_SQUARE(16),
                       outline: '1px solid Highlight',
                     },
                     opacity: 0,
                   }}
                 />
-                <span onClick={() => doSetAccentColor(id)} />
                 <label
                   htmlFor={String(id)}
-                  onClick={() => doSetAccentColor(id)}
-                  style={{cursor: 'pointer', fontSize: '11px', marginTop: '14px', textTransform: 'capitalize'}}
+                  style={{
+                    alignItems: 'center',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    flexDirection: 'column',
+                  }}
                 >
-                  {name}
+                  <span />
+                  <span
+                    style={{
+                      fontSize: '11px',
+                      marginTop: '14px',
+                      textTransform: 'capitalize',
+                    }}
+                  >
+                    {name}
+                  </span>
                 </label>
               </div>
             );

@@ -43,14 +43,14 @@ const ServiceModal: React.FC<ServiceModalProps> = ({
   onClose,
 }) => {
   const onOpenService = () => {
-    onClose();
+    onClose?.();
     actionsViewModel.open1to1ConversationWithService(service);
   };
 
   const {providerName, name} = useKoSubscribableChildren(service, ['name', 'providerName']);
 
   return (
-    <div className="service-modal">
+    <div className="service-modal" data-uie-name="modal-service">
       <ModalComponent isShown onClosed={onClose} onBgClick={onClose} data-uie-name="group-creation-label">
         {service && (
           <>
