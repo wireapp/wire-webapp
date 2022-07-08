@@ -203,13 +203,13 @@
         input {
           & + span {
             &::before {
-              border: @radio-border-size solid var(--gray-60);
+              border: @radio-border-width solid var(--gray-60);
               background-color: var(--gray-90);
             }
           }
 
           &:checked + span::before {
-            border: 6px solid var(--accent-color-500);
+            border: @radio-selected-border-width solid var(--accent-color-500);
             background-color: var(--gray-90);
           }
 
@@ -229,10 +229,10 @@
 
           &::before {
             display: inline-block;
-            width: 22px;
-            height: 22px;
+            width: @radio-size;
+            height: @radio-size;
             box-sizing: border-box;
-            border: @radio-border-size solid var(--gray-80);
+            border: @radio-border-width solid var(--gray-80);
             margin-right: 16px;
             background-color: var(--white);
             border-radius: 50%;
@@ -243,7 +243,7 @@
         }
 
         &:checked + span::before {
-          border: 6px solid var(--accent-color-500);
+          border: @radio-selected-border-width solid var(--accent-color-500);
           background-color: var(--white);
         }
 
