@@ -29,5 +29,6 @@
     "test:node": "exit 0",
     "test:project": "yarn dist && yarn test"
   },
-  "version": "0.4.247"
+  "version": "0.4.247",
+  "gitHead": "5339f01fe01ef0871da8c8bc8662fbe9e604754a"
 }
