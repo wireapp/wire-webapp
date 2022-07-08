@@ -30,6 +30,7 @@ import os from 'os';
 import path from 'path';
 import type {AxiosError} from 'axios';
 import {MessageBuilder} from '@wireapp/core/src/main/conversation/message/MessageBuilder';
+import {ConversationProtocol} from '@wireapp/api-client/src/conversation';
 
 dotenv.config();
 
@@ -113,7 +114,7 @@ account.on(PayloadBundleType.TEXT, textMessage => {
     const message = data.toString().trim();
     if (account.service) {
       const payload = MessageBuilder.createText({conversationId, from: userId, text: message}).build();
-      await account.service.conversation.send({payloadBundle: payload});
+      await account.service.conversation.send({protocol: ConversationProtocol.PROTEUS, payload});
     }
   });
 })().catch((error: Error) => {

@@ -30,6 +30,7 @@ import {LegalHoldStatus, Confirmation} from '@wireapp/protocol-messaging';
 import {AssetContent} from '../main/conversation/content/AssetContent';
 import {LinkPreviewUploadedContent} from '../main/conversation/content';
 import {MessageBuilder} from '../main/conversation/message/MessageBuilder';
+import {ConversationProtocol} from '@wireapp/api-client/src/conversation';
 
 const logger = logdown('@wireapp/core/demo/echo.js', {
   logger: console,
@@ -118,7 +119,10 @@ const {WIRE_EMAIL, WIRE_PASSWORD, WIRE_BACKEND = 'staging'} = process.env;
         `Sending: "${deliveredPayload.type}" ("${deliveredPayload.id}") in "${conversationId}"`,
         deliveredPayload.content,
       );
-      await account.service.conversation.send({payloadBundle: deliveredPayload});
+      await account.service?.conversation.send({
+        protocol: ConversationProtocol.PROTEUS,
+        payload: deliveredPayload,
+      });
 
       if (content.expectsReadConfirmation) {
         const readPayload = MessageBuilder.createConfirmation({
@@ -128,14 +132,14 @@ const {WIRE_EMAIL, WIRE_PASSWORD, WIRE_BACKEND = 'staging'} = process.env;
           type: Confirmation.Type.READ,
         });
         logger.log(`Sending: "${readPayload.type}" ("${readPayload.id}") in "${conversationId}"`, readPayload.content);
-        await account.service.conversation.send({payloadBundle: readPayload});
+        await account.service?.conversation.send({protocol: ConversationProtocol.PROTEUS, payload: readPayload});
       }
 
       if (messageTimer) {
         logger.log(
           `Sending: "PayloadBundleType.MESSAGE_DELETE" in "${conversationId}" for "${messageId}" (encrypted for "${from}")`,
         );
-        await account.service.conversation.deleteMessageEveryone(conversationId, messageId, [from]);
+        await account.service?.conversation.deleteMessageEveryone(conversationId, messageId, [from]);
       }
     }
   };
@@ -150,9 +154,9 @@ const {WIRE_EMAIL, WIRE_PASSWORD, WIRE_BACKEND = 'staging'} = process.env;
       messageTimer ? `(ephemeral message, ${messageTimer} ms timeout)` : '',
     );
 
-    account.service.conversation.messageTimer.setMessageLevelTimer(conversationId, messageTimer);
-    await account.service.conversation.send({payloadBundle: payload});
-    account.service.conversation.messageTimer.setMessageLevelTimer(conversationId, 0);
+    account.service?.conversation.messageTimer.setMessageLevelTimer(conversationId, messageTimer);
+    await account.service?.conversation.send({protocol: ConversationProtocol.PROTEUS, payload});
+    account.service?.conversation.messageTimer.setMessageLevelTimer(conversationId, 0);
   };
 
   const buildLinkPreviews = async originalLinkPreviews => {
@@ -165,7 +169,7 @@ const {WIRE_EMAIL, WIRE_PASSWORD, WIRE_BACKEND = 'staging'} = process.env;
       let linkPreviewImage;
 
       if (originalLinkPreviewImage) {
-        const imageBuffer = await account.service.conversation.getAsset(originalLinkPreviewImage.uploaded);
+        const imageBuffer = await account.service?.conversation.getAsset(originalLinkPreviewImage.uploaded);
 
         linkPreviewImage = {
           data: imageBuffer,
@@ -173,7 +177,7 @@ const {WIRE_EMAIL, WIRE_PASSWORD, WIRE_BACKEND = 'staging'} = process.env;
           type: originalLinkPreviewImage.original.mimeType,
           width: originalLinkPreviewImage.original.image.width,
         };
-        linkPreviewImage = await account.service.linkPreview.uploadLinkPreviewImage(linkPreviewImage);
+        linkPreviewImage = await account.service?.linkPreview.uploadLinkPreviewImage(linkPreviewImage);
       }
 
       newLinkPreviews.push({...originalLinkPreview, imageUploaded: linkPreviewImage});
@@ -241,7 +245,7 @@ const {WIRE_EMAIL, WIRE_PASSWORD, WIRE_BACKEND = 'staging'} = process.env;
       return;
     }
 
-    const fileBuffer = await account.service.conversation.getAsset((content as AssetContent).uploaded);
+    const fileBuffer = await account.service?.conversation.getAsset((content as AssetContent).uploaded);
 
     await handleIncomingMessage(data);
 
@@ -249,7 +253,7 @@ const {WIRE_EMAIL, WIRE_PASSWORD, WIRE_BACKEND = 'staging'} = process.env;
       conversationId,
       from: account.userId,
       metaData: {
-        length: fileBuffer.length,
+        length: fileBuffer?.length ?? 0,
         name: cacheOriginal.name,
         type: cacheOriginal.mimeType,
       },
@@ -425,9 +429,9 @@ const {WIRE_EMAIL, WIRE_PASSWORD, WIRE_BACKEND = 'staging'} = process.env;
     await handleIncomingMessage(data);
 
     if (status === CONVERSATION_TYPING.STARTED) {
-      await account.service.conversation.sendTypingStart(conversationId);
+      await account.service?.conversation.sendTypingStart(conversationId);
     } else {
-      await account.service.conversation.sendTypingStop(conversationId);
+      await account.service?.conversation.sendTypingStop(conversationId);
     }
   });
 
@@ -440,7 +444,7 @@ const {WIRE_EMAIL, WIRE_PASSWORD, WIRE_BACKEND = 'staging'} = process.env;
     await handleIncomingMessage(data);
 
     if (messageIdCache[originalMessageId]) {
-      await account.service.conversation.deleteMessageEveryone(conversationId, messageIdCache[originalMessageId]);
+      await account.service?.conversation.deleteMessageEveryone(conversationId, messageIdCache[originalMessageId]);
 
       delete messageIdCache[originalMessageId];
     }
@@ -527,11 +531,11 @@ const {WIRE_EMAIL, WIRE_PASSWORD, WIRE_BACKEND = 'staging'} = process.env;
 
   account.on(Account.TOPIC.ERROR, error => logger.error(error));
 
-  const name = await account.service.self.getName();
+  const name = await account.service?.self.getName();
 
   logger.log('Name', name);
-  logger.log('User ID', account['apiClient'].context.userId);
-  logger.log('Client ID', account['apiClient'].context.clientId);
-  logger.log('Domain', account['apiClient'].context.domain);
+  logger.log('User ID', account['apiClient'].context?.userId);
+  logger.log('Client ID', account['apiClient'].context?.clientId);
+  logger.log('Domain', account['apiClient'].context?.domain);
   logger.log('Listening for messages ...');
 })().catch(error => logger.error(error));

@@ -28,6 +28,7 @@ import type {ButtonActionContent, ButtonActionConfirmationContent} from '../main
 
 import 'dotenv-defaults/config';
 import {MessageBuilder} from '../main/conversation/message/MessageBuilder';
+import {ConversationProtocol} from '@wireapp/api-client/src/conversation';
 
 const args = process.argv.slice(2);
 const conversationId = args[0] || process.env.WIRE_CONVERSATION;
@@ -69,10 +70,14 @@ const login: LoginData = {
     };
     const buttonActionConfirmationMessage = MessageBuilder.createButtonActionConfirmationMessage({
       conversationId: conversation,
-      from: clientId,
+      from: clientId ?? '',
       content: buttonActionConfirmationContent,
     });
-    await account.service!.conversation.send({payloadBundle: buttonActionConfirmationMessage, userIds: [from]});
+    await account.service!.conversation.send({
+      protocol: ConversationProtocol.PROTEUS,
+      payload: buttonActionConfirmationMessage,
+      userIds: [from],
+    });
 
     console.info(
       `Confirmed button click on "${buttonId}" for poll "${referenceMessageId}" by user "${from}" in conversation "${conversation}".`,
@@ -87,7 +92,7 @@ const login: LoginData = {
       .addButton('No')
       .build();
 
-    await account.service.conversation.send({payloadBundle: pollMessage});
+    await account.service.conversation.send({protocol: ConversationProtocol.PROTEUS, payload: pollMessage});
 
     // Send button action
     const buttonItems = pollMessage.content.items!.filter(item => typeof item.button === 'object');
@@ -98,9 +103,12 @@ const login: LoginData = {
     };
     const buttonActionMessage = MessageBuilder.createButtonActionMessage({
       conversationId,
-      from: clientId,
+      from: clientId ?? '',
       content: buttonActionContent,
     });
-    await account.service.conversation.send({payloadBundle: buttonActionMessage});
+    await account.service.conversation.send({
+      protocol: ConversationProtocol.PROTEUS,
+      payload: buttonActionMessage,
+    });
   }
 })().catch(error => console.error('Error', error.message));

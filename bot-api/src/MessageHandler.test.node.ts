@@ -25,6 +25,7 @@ import {ClientType} from '@wireapp/api-client/src/client';
 import {TextMessage} from '@wireapp/core/src/main/conversation/message/OtrMessage';
 import {Connection} from '@wireapp/api-client/src/connection';
 import {MessageBuilder} from '@wireapp/core/src/main/conversation/message/MessageBuilder';
+import {ConversationProtocol} from '@wireapp/api-client/src/conversation';
 
 describe('MessageHandler', () => {
   let mainHandler: MessageHandler;
@@ -103,7 +104,8 @@ describe('MessageHandler', () => {
       });
       expect(mainHandler.account!.service!.conversation.send).toHaveBeenCalledWith(
         jasmine.objectContaining({
-          payloadBundle: jasmine.objectContaining({
+          protocol: ConversationProtocol.PROTEUS,
+          payload: jasmine.objectContaining({
             content: jasmine.objectContaining({mentions: mentionData, text: messageText}),
           }),
         }),
@@ -125,7 +127,8 @@ describe('MessageHandler', () => {
       });
       expect(mainHandler.account!.service!.conversation.send).toHaveBeenCalledWith(
         jasmine.objectContaining({
-          payloadBundle: jasmine.objectContaining({content: jasmine.objectContaining({text: message})}),
+          protocol: ConversationProtocol.PROTEUS,
+          payload: jasmine.objectContaining({content: jasmine.objectContaining({text: message})}),
         }),
       );
     });
@@ -146,7 +149,8 @@ describe('MessageHandler', () => {
       });
       expect(mainHandler.account!.service!.conversation.send).toHaveBeenCalledWith(
         jasmine.objectContaining({
-          payloadBundle: jasmine.objectContaining({content: jasmine.objectContaining({text: message})}),
+          protocol: ConversationProtocol.PROTEUS,
+          payload: jasmine.objectContaining({content: jasmine.objectContaining({text: message})}),
           userIds,
         }),
       );

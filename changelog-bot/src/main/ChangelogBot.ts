@@ -27,6 +27,7 @@ import logdown from 'logdown';
 
 import type {ChangelogData, LoginDataBackend} from './Interfaces';
 import {MessageBuilder} from '@wireapp/core/src/main/conversation/message/MessageBuilder';
+import {ConversationProtocol} from '@wireapp/api-client/src/conversation';
 
 const logger = logdown('@wireapp/changelog-bot/ChangelogBot', {
   logger: console,
@@ -82,7 +83,7 @@ export class ChangelogBot {
           from: account.userId,
           text: this.message,
         }).build();
-        await account.service.conversation.send({payloadBundle: textPayload});
+        await account.service.conversation.send({protocol: ConversationProtocol.PROTEUS, payload: textPayload});
       }
     }
   }

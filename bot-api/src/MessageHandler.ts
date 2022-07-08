@@ -17,7 +17,7 @@
  *
  */
 
-import type {Conversation, UserClients} from '@wireapp/api-client/src/conversation';
+import {Conversation, ConversationProtocol, UserClients} from '@wireapp/api-client/src/conversation';
 import {CONVERSATION_TYPING} from '@wireapp/api-client/src/conversation/data';
 import type {ConversationEvent, TeamEvent, UserEvent} from '@wireapp/api-client/src/event';
 import type {QualifiedId, User} from '@wireapp/api-client/src/user/';
@@ -115,7 +115,11 @@ export abstract class MessageHandler {
         content: buttonActionConfirmationContent,
       });
 
-      await this.account.service.conversation.send({payloadBundle: buttonActionConfirmationMessage, userIds: [userId]});
+      await this.account.service.conversation.send({
+        protocol: ConversationProtocol.PROTEUS,
+        payload: buttonActionConfirmationMessage,
+        userIds: [userId],
+      });
     }
   }
 
@@ -125,7 +129,11 @@ export abstract class MessageHandler {
   async sendCall(conversationId: string, content: CallingContent, userIds?: string[] | UserClients): Promise<void> {
     if (this.account?.service) {
       const callPayload = MessageBuilder.createCall({conversationId, from: this.account.userId, content});
-      await this.account.service.conversation.send({payloadBundle: callPayload, userIds});
+      await this.account.service.conversation.send({
+        protocol: ConversationProtocol.PROTEUS,
+        payload: callPayload,
+        userIds,
+      });
     }
   }
 
@@ -143,7 +151,11 @@ export abstract class MessageHandler {
         Text.create({content: text}),
       );
       buttons.forEach(button => message.addButton(button));
-      await this.account.service.conversation.send({payloadBundle: message.build(), userIds});
+      await this.account.service.conversation.send({
+        protocol: ConversationProtocol.PROTEUS,
+        payload: message.build(),
+        userIds,
+      });
     }
   }
 
@@ -162,7 +174,11 @@ export abstract class MessageHandler {
         firstMessageId,
         type: Confirmation.Type.DELIVERED,
       });
-      await this.account.service.conversation.send({payloadBundle: confirmationPayload, userIds});
+      await this.account.service.conversation.send({
+        protocol: ConversationProtocol.PROTEUS,
+        payload: confirmationPayload,
+        userIds,
+      });
     }
   }
 
@@ -203,7 +219,11 @@ export abstract class MessageHandler {
         .withMentions(newMentions)
         .build();
 
-      const editedMessage = await this.account.service.conversation.send({payloadBundle: editedPayload, userIds});
+      const editedMessage = await this.account.service.conversation.send({
+        protocol: ConversationProtocol.PROTEUS,
+        payload: editedPayload,
+        userIds,
+      });
 
       if (newLinkPreview) {
         const editedWithPreviewPayload = MessageBuilder.createEditedText({
@@ -217,7 +237,11 @@ export abstract class MessageHandler {
           .withMentions(newMentions)
           .build();
 
-        await this.account.service.conversation.send({payloadBundle: editedWithPreviewPayload, userIds});
+        await this.account.service.conversation.send({
+          protocol: ConversationProtocol.PROTEUS,
+          payload: editedWithPreviewPayload,
+          userIds,
+        });
       }
     }
   }
@@ -255,7 +279,11 @@ export abstract class MessageHandler {
         metaData: metadata,
         from: this.account.userId,
       });
-      await this.account.service.conversation.send({payloadBundle: metadataPayload, userIds});
+      await this.account.service.conversation.send({
+        protocol: ConversationProtocol.PROTEUS,
+        payload: metadataPayload,
+        userIds,
+      });
 
       try {
         const filePayload = MessageBuilder.createFileData({
@@ -265,7 +293,11 @@ export abstract class MessageHandler {
           asset: await (await this.account.service!.asset.uploadAsset(file.data)).response,
           originalMessageId: metadataPayload.id,
         });
-        await this.account.service.conversation.send({payloadBundle: filePayload, userIds});
+        await this.account.service.conversation.send({
+          protocol: ConversationProtocol.PROTEUS,
+          payload: filePayload,
+          userIds,
+        });
       } catch (error) {
         const abortPayload = await MessageBuilder.createFileAbort({
           conversationId,
@@ -273,7 +305,11 @@ export abstract class MessageHandler {
           reason: Asset.NotUploaded.FAILED,
           originalMessageId: metadataPayload.id,
         });
-        await this.account.service.conversation.send({payloadBundle: abortPayload, userIds});
+        await this.account.service.conversation.send({
+          protocol: ConversationProtocol.PROTEUS,
+          payload: abortPayload,
+          userIds,
+        });
       }
     }
   }
@@ -289,7 +325,11 @@ export abstract class MessageHandler {
         image,
         asset: await (await this.account.service!.asset.uploadAsset(image.data)).response,
       });
-      await this.account.service.conversation.send({payloadBundle: imagePayload, userIds});
+      await this.account.service.conversation.send({
+        protocol: ConversationProtocol.PROTEUS,
+        payload: imagePayload,
+        userIds,
+      });
     }
   }
 
@@ -307,7 +347,11 @@ export abstract class MessageHandler {
         from: this.account.userId,
         location,
       });
-      await this.account.service.conversation.send({payloadBundle: locationPayload, userIds});
+      await this.account.service.conversation.send({
+        protocol: ConversationProtocol.PROTEUS,
+        payload: locationPayload,
+        userIds,
+      });
     }
   }
 
@@ -317,7 +361,11 @@ export abstract class MessageHandler {
   async sendPing(conversationId: string, userIds?: string[] | UserClients): Promise<void> {
     if (this.account?.service) {
       const pingPayload = MessageBuilder.createPing({conversationId, from: this.account.userId});
-      await this.account.service.conversation.send({payloadBundle: pingPayload, userIds});
+      await this.account.service.conversation.send({
+        protocol: ConversationProtocol.PROTEUS,
+        payload: pingPayload,
+        userIds,
+      });
     }
   }
 
@@ -339,7 +387,11 @@ export abstract class MessageHandler {
           type,
         },
       });
-      await this.account.service.conversation.send({payloadBundle: reactionPayload, userIds});
+      await this.account.service.conversation.send({
+        protocol: ConversationProtocol.PROTEUS,
+        payload: reactionPayload,
+        userIds,
+      });
     }
   }
 
@@ -353,7 +405,11 @@ export abstract class MessageHandler {
       const replyPayload = MessageBuilder.createText({conversationId, text, from: this.account.userId})
         .withQuote(quotedMessage)
         .build();
-      await this.account.service.conversation.send({payloadBundle: replyPayload, userIds});
+      await this.account.service.conversation.send({
+        protocol: ConversationProtocol.PROTEUS,
+        payload: replyPayload,
+        userIds,
+      });
     }
   }
 
@@ -383,7 +439,11 @@ export abstract class MessageHandler {
       const payload = MessageBuilder.createText({conversationId, text, from: this.account.userId})
         .withMentions(mentions)
         .build();
-      const sentMessage = await this.account.service.conversation.send({payloadBundle: payload, userIds});
+      const sentMessage = await this.account.service.conversation.send({
+        protocol: ConversationProtocol.PROTEUS,
+        payload: payload,
+        userIds,
+      });
 
       if (linkPreview) {
         const editedWithPreviewPayload = MessageBuilder.createText({
@@ -396,7 +456,11 @@ export abstract class MessageHandler {
           .withMentions(mentions)
           .build();
 
-        await this.account.service.conversation.send({payloadBundle: editedWithPreviewPayload, userIds});
+        await this.account.service.conversation.send({
+          protocol: ConversationProtocol.PROTEUS,
+          payload: editedWithPreviewPayload,
+          userIds,
+        });
       }
     }
   }
