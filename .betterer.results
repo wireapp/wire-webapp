@@ -2428,7 +2428,7 @@ exports[`stricter compilation`] = {
       [166, 51, 4, "Argument of type \'string | null\' is not assignable to parameter of type \'string\'.\\n  Type \'null\' is not assignable to type \'string\'.", "2087822780"],
       [204, 71, 22, "Argument of type \'Token[] | null\' is not assignable to parameter of type \'Token[]\'.\\n  Type \'null\' is not assignable to type \'Token[]\'.", "525880250"]
     ],
-    "src/script/util/renderModal.ts:2732089643": [
+    "src/script/util/renderModal.ts:1796177515": [
       [29, 4, 14, "Type \'undefined\' is not assignable to type \'HTMLDivElement\'.", "4001065193"]
     ],
     "src/script/util/test/TestPage.tsx:1772987669": [
