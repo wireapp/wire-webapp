@@ -40,7 +40,7 @@ export enum FEATURE_KEY {
   DIGITAL_SIGNATURES = 'digitalSignatures',
   FILE_SHARING = 'fileSharing',
   LEGALHOLD = 'legalhold',
-  MLS = 'MLS',
+  MLS = 'mls',
   SEARCH_VISIBILITY = 'searchVisibility',
   SELF_DELETING_MESSAGES = 'selfDeletingMessages',
   SND_FACTOR_PASSWORD = 'sndFactorPasswordChallenge',
