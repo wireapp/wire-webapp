@@ -294,7 +294,7 @@ export class FeatureAPI {
     const config: AxiosRequestConfig = {
       data: mlsFeature,
       method: 'put',
-      url: `${FeatureAPI.URL.TEAMS}/${teamId}/${FeatureAPI.URL.FEATURES}${FeatureAPI.URL.MLS}`,
+      url: `${FeatureAPI.URL.TEAMS}/${teamId}/${FeatureAPI.URL.FEATURES}/${FeatureAPI.URL.MLS}`,
     };
 
     const response = await this.client.sendJSON<FeatureMLS>(config);
