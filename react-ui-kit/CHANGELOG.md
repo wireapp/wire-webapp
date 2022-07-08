@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [8.8.1](https://github.com/wireapp/wire-web-packages/tree/main/packages/react-ui-kit/compare/@wireapp/react-ui-kit@8.8.0...@wireapp/react-ui-kit@8.8.1) (2022-07-08)
+
+
+### Bug Fixes
+
+* **react-ui-kit:** fix select component current value empty ([#4324](https://github.com/wireapp/wire-web-packages/tree/main/packages/react-ui-kit/issues/4324)) ([6bbe8e2](https://github.com/wireapp/wire-web-packages/tree/main/packages/react-ui-kit/commit/6bbe8e27e2a02586a294ce751a8ecd7ee0d8b57a))
+
+
+
+
+
 # [8.8.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/react-ui-kit/compare/@wireapp/react-ui-kit@8.7.3...@wireapp/react-ui-kit@8.8.0) (2022-07-07)
 
 
