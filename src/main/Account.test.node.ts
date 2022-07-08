@@ -63,7 +63,11 @@ describe('Account', () => {
   };
 
   beforeAll(async () => {
+    jasmine.clock().install();
     await Proteus.init();
+  });
+  afterAll(() => {
+    jasmine.clock().uninstall();
   });
 
   beforeEach(() => {
@@ -135,6 +139,9 @@ describe('Account', () => {
 
   describe('"createText"', () => {
     it('creates a text payload', async () => {
+      const date = new Date(Date.UTC(2017, 0, 1, 0, 0, 0));
+      jasmine.clock().mockDate(date);
+
       const account = await createAccount();
 
       await account.login({
@@ -148,7 +155,7 @@ describe('Account', () => {
       const text = 'FIFA World Cup';
       const payload = MessageBuilder.createText({conversationId: '', from: '', text}).build();
 
-      expect(payload.timestamp).toBeGreaterThan(0);
+      expect(payload.timestamp).toEqual(date.getTime());
     });
   });
 

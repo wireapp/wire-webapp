@@ -17,9 +17,11 @@
  *
  */
 
-import type {CoreCrypto} from '@otak/core-crypto';
+import {CoreCrypto} from '@otak/core-crypto/platforms/web/corecrypto';
 import {APIClient} from '@wireapp/api-client';
 import {ClientType} from '@wireapp/api-client/src/client';
+import {ConversationProtocol} from '@wireapp/api-client/src/conversation';
+import {MlsEvent} from '@wireapp/api-client/src/conversation/data/MlsEventData';
 import {LegalHoldStatus} from '@wireapp/protocol-messaging';
 import {MemoryEngine} from '@wireapp/store-engine';
 import {ConversationService, MessageTargetMode, PayloadBundleSource, PayloadBundleState, PayloadBundleType} from '.';
@@ -31,8 +33,17 @@ import {MessageBuilder} from './message/MessageBuilder';
 import {OtrMessage} from './message/OtrMessage';
 
 describe('ConversationService', () => {
+  beforeAll(() => {
+    jasmine.clock().install();
+  });
+  afterAll(() => {
+    jasmine.clock().uninstall();
+  });
+
   function buildConversationService(federated?: boolean) {
     const client = new APIClient({urls: APIClient.BACKEND.STAGING});
+    spyOn(client.api.conversation, 'postMlsMessage').and.returnValue(Promise.resolve([] as unknown as MlsEvent));
+
     client.context = {
       clientType: ClientType.NONE,
       userId: PayloadHelper.getUUID(),
@@ -44,11 +55,14 @@ describe('ConversationService', () => {
       {
         useQualifiedIds: federated,
       },
-      () => ({} as CoreCrypto),
+      () =>
+        ({
+          encryptMessage: async () => Uint8Array.from([1, 2, 3]),
+        } as unknown as CoreCrypto),
     );
   }
 
-  describe('"send"', () => {
+  describe('"send PROTEUS"', () => {
     const baseMessage = {
       conversation: PayloadHelper.getUUID(),
       from: PayloadHelper.getUUID(),
@@ -70,17 +84,23 @@ describe('ConversationService', () => {
       it(`calls callbacks when sending '${payloadBundle.type}' message is starting and successful`, async () => {
         const conversationService = buildConversationService();
         const sentTime = new Date().toISOString();
+        const onStart = jasmine.createSpy().and.returnValue(Promise.resolve(true));
+        const onSuccess = jasmine.createSpy();
+
         spyOn<any>(conversationService, 'sendGenericMessage').and.returnValue(Promise.resolve({time: sentTime}));
-        const callbacks = {onStart: jasmine.createSpy(), onSuccess: jasmine.createSpy()};
+        // const onReconnect = jasmine.createSpy().and.returnValue(getServerAddress());
+
         const promise = conversationService.send({
-          callbacks,
-          payloadBundle,
+          protocol: ConversationProtocol.PROTEUS,
+          onStart,
+          onSuccess,
+          payload: payloadBundle,
         });
 
-        expect(callbacks.onStart).toHaveBeenCalled();
-        expect(callbacks.onSuccess).not.toHaveBeenCalled();
+        expect(onStart).toHaveBeenCalled();
+        expect(onSuccess).not.toHaveBeenCalled();
         await promise;
-        expect(callbacks.onSuccess).toHaveBeenCalledWith(jasmine.any(Object), sentTime);
+        expect(onSuccess).toHaveBeenCalledWith(jasmine.any(Object), sentTime);
       });
     });
 
@@ -90,7 +110,8 @@ describe('ConversationService', () => {
         const conversationService = buildConversationService();
         conversationService
           .send({
-            payloadBundle: message,
+            protocol: ConversationProtocol.PROTEUS,
+            payload: message,
             targetMode: MessageTargetMode.USERS,
           })
           .catch(error => {
@@ -105,7 +126,8 @@ describe('ConversationService', () => {
           spyOn<any>(conversationService, 'getRecipientsForConversation').and.returnValue(Promise.resolve({} as any));
           spyOn(conversationService['messageService'], 'sendMessage').and.returnValue(Promise.resolve({} as any));
           await conversationService.send({
-            payloadBundle: message,
+            protocol: ConversationProtocol.PROTEUS,
+            payload: message,
             targetMode: MessageTargetMode.USERS,
             userIds: recipients,
           });
@@ -136,8 +158,9 @@ describe('ConversationService', () => {
             Promise.resolve({} as any),
           );
           await conversationService.send({
+            protocol: ConversationProtocol.PROTEUS,
             conversationDomain: 'domain1',
-            payloadBundle: message,
+            payload: message,
             targetMode: MessageTargetMode.USERS,
             userIds: recipients,
           });
@@ -163,7 +186,8 @@ describe('ConversationService', () => {
           spyOn<any>(conversationService, 'getRecipientsForConversation').and.returnValue(Promise.resolve({} as any));
           spyOn(conversationService['messageService'], 'sendMessage').and.returnValue(Promise.resolve({} as any));
           await conversationService.send({
-            payloadBundle: message,
+            protocol: ConversationProtocol.PROTEUS,
+            payload: message,
             targetMode: MessageTargetMode.USERS_CLIENTS,
             userIds: recipients,
           });
@@ -194,8 +218,9 @@ describe('ConversationService', () => {
             Promise.resolve({} as any),
           );
           await conversationService.send({
+            protocol: ConversationProtocol.PROTEUS,
             conversationDomain: 'domain1',
-            payloadBundle: message,
+            payload: message,
             targetMode: MessageTargetMode.USERS_CLIENTS,
             userIds: recipients,
           });
@@ -216,13 +241,16 @@ describe('ConversationService', () => {
       const conversationService = buildConversationService();
       spyOn<any>(conversationService, 'sendGenericMessage');
       const message: OtrMessage = {...baseMessage, type: PayloadBundleType.TEXT, content: {text: 'test'}};
-      const callbacks = {onStart: () => Promise.resolve(false), onSuccess: jasmine.createSpy()};
+      const onStart = jasmine.createSpy().and.returnValue(Promise.resolve(false));
+      const onSuccess = jasmine.createSpy();
       const payloadBundle = await conversationService.send({
-        callbacks,
-        payloadBundle: message,
+        onStart,
+        onSuccess,
+        protocol: ConversationProtocol.PROTEUS,
+        payload: message,
       });
 
-      expect(callbacks.onSuccess).not.toHaveBeenCalled();
+      expect(onSuccess).not.toHaveBeenCalled();
       expect(conversationService['sendGenericMessage']).not.toHaveBeenCalled();
       expect(payloadBundle.state).toBe(PayloadBundleState.CANCELLED);
     });
@@ -231,14 +259,62 @@ describe('ConversationService', () => {
       const conversationService = buildConversationService();
       spyOn<any>(conversationService, 'sendGenericMessage').and.returnValue(Promise.resolve({time: '', errored: true}));
       const message: OtrMessage = {...baseMessage, type: PayloadBundleType.TEXT, content: {text: 'test'}};
-      const callbacks = {onSuccess: jasmine.createSpy()};
+      const onSuccess = jasmine.createSpy();
       const payloadBundle = await conversationService.send({
-        callbacks,
-        payloadBundle: message,
+        onSuccess,
+        payload: message,
+        protocol: ConversationProtocol.PROTEUS,
       });
 
-      expect(callbacks.onSuccess).not.toHaveBeenCalled();
+      expect(onSuccess).not.toHaveBeenCalled();
       expect(payloadBundle.state).toBe(PayloadBundleState.CANCELLED);
+    });
+  });
+
+  describe('"send MLS"', () => {
+    const groupId = PayloadHelper.getUUID();
+    const baseMessage = {
+      conversation: PayloadHelper.getUUID(),
+      from: PayloadHelper.getUUID(),
+      id: PayloadHelper.getUUID(),
+      timestamp: 0,
+      source: PayloadBundleSource.LOCAL,
+      state: PayloadBundleState.OUTGOING_UNSENT,
+    };
+    const messages: OtrMessage[] = [
+      {...baseMessage, type: PayloadBundleType.TEXT, content: {text: 'test'}},
+      {
+        ...baseMessage,
+        type: PayloadBundleType.CONFIRMATION,
+        content: {type: 1, firstMessageId: PayloadHelper.getUUID()},
+      },
+      {...baseMessage, type: PayloadBundleType.PING, content: {hotKnock: false}},
+      {
+        ...baseMessage,
+        type: PayloadBundleType.ASSET_IMAGE,
+        content: generateImage(),
+      },
+    ];
+    messages.forEach(payload => {
+      it(`calls callbacks when sending '${payload.type}' message is starting and successful`, async () => {
+        jasmine.clock().mockDate(new Date(0));
+        const conversationService = buildConversationService();
+        const onStart = jasmine.createSpy().and.returnValue(Promise.resolve(true));
+        const onSuccess = jasmine.createSpy();
+
+        const promise = conversationService.send({
+          protocol: ConversationProtocol.MLS,
+          groupId,
+          onStart,
+          onSuccess,
+          payload,
+        });
+
+        expect(onStart).toHaveBeenCalled();
+        expect(onSuccess).not.toHaveBeenCalled();
+        await promise;
+        expect(onSuccess).toHaveBeenCalledWith(jasmine.any(Object), new Date(0).toISOString());
+      });
     });
   });
 
@@ -330,28 +406,13 @@ describe('ConversationService', () => {
 
     it('uploads link previews', async () => {
       const url = 'http://example.com';
-      const image = {
-        data: Buffer.from([]),
-        height: 123,
-        type: 'image/jpeg',
-        width: 456,
-      };
       const text = url;
       const urlOffset = 0;
 
       const linkPreview: LinkPreviewUploadedContent = {
         url,
         urlOffset,
-        imageUploaded: {
-          image,
-          asset: {
-            cipherText: Buffer.from([]),
-            key: '',
-            keyBytes: Buffer.from([]),
-            sha256: Buffer.from([]),
-            token: '',
-          },
-        },
+        imageUploaded: generateImage(),
       };
       const textMessage = MessageBuilder.createText({conversationId: '', from: '', text})
         .withLinkPreviews([linkPreview])
@@ -446,3 +507,22 @@ describe('ConversationService', () => {
     });
   });
 });
+
+function generateImage() {
+  const image = {
+    data: Buffer.from([]),
+    height: 123,
+    type: 'image/jpeg',
+    width: 456,
+  };
+  return {
+    image,
+    asset: {
+      cipherText: Buffer.from([]),
+      key: '',
+      keyBytes: Buffer.from([]),
+      sha256: Buffer.from([]),
+      token: '',
+    },
+  };
+}

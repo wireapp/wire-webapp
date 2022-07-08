@@ -64,7 +64,7 @@ import {
   PayloadBundleState,
   PayloadBundleType,
 } from '../conversation/';
-import type {AssetContent, ClearedContent, DeletedContent, HiddenContent, RemoteData} from '../conversation/content/';
+import type {ClearedContent, DeletedContent, HiddenContent, RemoteData} from '../conversation/content/';
 import type {CryptographyService} from '../cryptography/';
 import {decryptAsset} from '../cryptography/AssetCryptography';
 import {isStringArray, isQualifiedIdArray, isQualifiedUserClients, isUserClients} from '../util/TypePredicateUtil';
@@ -92,12 +92,37 @@ import type {
   ResetSessionMessage,
   TextMessage,
 } from './message/OtrMessage';
+import {XOR} from '@wireapp/commons/src/main/util/TypeUtil';
 
 export enum MessageTargetMode {
   NONE,
   USERS,
   USERS_CLIENTS,
 }
+
+interface SendCommonParams<T> {
+  protocol: ConversationProtocol;
+  payload: T;
+  onStart?: (message: GenericMessage) => void | boolean | Promise<boolean>;
+  onSuccess?: (message: GenericMessage, sentTime?: string) => void;
+}
+
+function isMLS<T>(params: SendProteusMessageParams<T> | SendMlsMessageParams<T>): params is SendMlsMessageParams<T> {
+  return params.protocol === ConversationProtocol.MLS;
+}
+
+type SendProteusMessageParams<T> = SendCommonParams<T> &
+  MessageSendingOptions & {
+    userIds?: string[] | QualifiedId[] | UserClients | QualifiedUserClients;
+    onClientMismatch?: (
+      status: ClientMismatch | MessageSendingStatus,
+      wasSent: boolean,
+    ) => void | boolean | Promise<boolean>;
+  };
+
+type SendMlsMessageParams<T> = SendCommonParams<T> & {
+  groupId: string;
+};
 
 interface MessageSendingOptions {
   /**
@@ -531,10 +556,7 @@ export class ConversationService {
     return expireAfterMillis > 0 ? this.createEphemeral(genericMessage, expireAfterMillis) : genericMessage;
   }
 
-  private generateImageGenericMessage(payloadBundle: ImageAssetMessageOutgoing): {
-    content: AssetContent;
-    genericMessage: GenericMessage;
-  } {
+  private generateAsset(payloadBundle: ImageAssetMessageOutgoing): Asset {
     if (!payloadBundle.content) {
       throw new Error('No content for sendImage provided.');
     }
@@ -570,8 +592,17 @@ export class ConversationService {
 
     assetMessage.status = AssetTransferState.UPLOADED;
 
+    return assetMessage;
+  }
+
+  private generateImageGenericMessage(payloadBundle: ImageAssetMessageOutgoing): {
+    content: Asset;
+    genericMessage: GenericMessage;
+  } {
+    const imageAsset = this.generateAsset(payloadBundle);
+
     let genericMessage = GenericMessage.create({
-      [GenericMessageType.ASSET]: assetMessage,
+      [GenericMessageType.ASSET]: imageAsset,
       messageId: payloadBundle.id,
     });
 
@@ -579,7 +610,8 @@ export class ConversationService {
     if (expireAfterMillis) {
       genericMessage = this.createEphemeral(genericMessage, expireAfterMillis);
     }
-    return {content: assetMessage as AssetContent, genericMessage};
+
+    return {genericMessage, content: imageAsset};
   }
 
   private generateLocationGenericMessage(payloadBundle: LocationMessage): GenericMessage {
@@ -1046,98 +1078,65 @@ export class ConversationService {
   }
 
   /**
-   * Sends a message to a conversation
+   * Sends a mls message to a conversation
    *
-   * @param params.payloadBundle The message to send to the conversation
-   * @param params.userIds? Can be either a QualifiedId[], string[], UserClients or QualfiedUserClients. The type has some effect on the behavior of the method.
+   * @param params.payload The message to send to the conversation
+   * @param params.protocol The protocol to use to send the message (MLS or Proteus)
+   * @param params.groupId? The groupId of the conversation to send the message to (Needed only for MLS)
+   * @return resolves with the sent message
+   */
+  private async sendMlsMessage<T extends OtrMessage>(
+    params: SendMlsMessageParams<T>,
+    genericMessage: GenericMessage,
+    content: T['content'],
+  ): Promise<T> {
+    const {groupId, onSuccess, payload} = params;
+    const groupIdBytes = Decoder.fromBase64(groupId).asBytes;
+
+    const coreCryptoClient = this.coreCryptoClientProvider();
+    const encrypted = await coreCryptoClient.encryptMessage(
+      groupIdBytes,
+      GenericMessage.encode(genericMessage).finish(),
+    );
+
+    try {
+      await this.apiClient.api.conversation.postMlsMessage(encrypted);
+      onSuccess?.(genericMessage, new Date().toISOString());
+      return {
+        ...payload,
+        content,
+        messageTimer: genericMessage.ephemeral?.expireAfterMillis || 0,
+        state: PayloadBundleState.OUTGOING_SENT,
+      };
+    } catch {
+      return {
+        ...payload,
+        content,
+        messageTimer: genericMessage.ephemeral?.expireAfterMillis || 0,
+        state: PayloadBundleState.CANCELLED,
+      };
+    }
+  }
+
+  /**
+   * Sends a proteus message to a conversation
+   * @param params.userIds? Can be either a QualifiedId[], string[], UserClients or QualfiedUserClients. The type has some effect on the behavior of the method. (Needed only for Proteus)
    *    When given a QualifiedId[] or string[] the method will fetch the freshest list of devices for those users (since they are not given by the consumer). As a consequence no ClientMismatch error will trigger and we will ignore missing clients when sending
    *    When given a QualifiedUserClients or UserClients the method will only send to the clients listed in the userIds. This could lead to ClientMismatch (since the given list of devices might not be the freshest one and new clients could have been created)
    *    When given a QualifiedId[] or QualifiedUserClients the method will send the message through the federated API endpoint
    *    When given a string[] or UserClients the method will send the message through the old API endpoint
    * @return resolves with the sent message
    */
-  public async send<T extends OtrMessage = OtrMessage>({
-    payloadBundle,
-    userIds,
-    sendAsProtobuf,
-    conversationDomain,
-    nativePush,
-    targetMode,
-    callbacks,
-  }: {
-    payloadBundle: T;
-    userIds?: string[] | QualifiedId[] | UserClients | QualifiedUserClients;
-    callbacks?: MessageSendingCallbacks;
-  } & MessageSendingOptions): Promise<T> {
-    let genericMessage: GenericMessage;
-    let processedContent: AssetContent | undefined = undefined;
-
-    switch (payloadBundle.type) {
-      case PayloadBundleType.ASSET:
-        genericMessage = this.generateFileDataGenericMessage(payloadBundle);
-        break;
-      case PayloadBundleType.ASSET_ABORT:
-        genericMessage = this.generateFileAbortGenericMessage(payloadBundle);
-        break;
-      case PayloadBundleType.ASSET_META:
-        genericMessage = this.generateFileMetaDataGenericMessage(payloadBundle);
-        break;
-      case PayloadBundleType.ASSET_IMAGE:
-        const res = this.generateImageGenericMessage(payloadBundle as ImageAssetMessageOutgoing);
-        genericMessage = res.genericMessage;
-        processedContent = res.content;
-        break;
-      case PayloadBundleType.BUTTON_ACTION:
-        genericMessage = this.generateButtonActionGenericMessage(payloadBundle);
-        break;
-      case PayloadBundleType.BUTTON_ACTION_CONFIRMATION:
-        genericMessage = this.generateButtonActionConfirmationGenericMessage(payloadBundle);
-        break;
-      case PayloadBundleType.CALL:
-        genericMessage = this.generateCallGenericMessage(payloadBundle);
-        break;
-      case PayloadBundleType.CLIENT_ACTION: {
-        if (payloadBundle.content.clientAction !== ClientAction.RESET_SESSION) {
-          throw new Error(
-            `No send method implemented for "${payloadBundle.type}" and ClientAction "${payloadBundle.content}".`,
-          );
-        }
-        genericMessage = this.generateSessionResetGenericMessage(payloadBundle);
-        break;
-      }
-      case PayloadBundleType.COMPOSITE:
-        genericMessage = this.generateCompositeGenericMessage(payloadBundle);
-        break;
-      case PayloadBundleType.CONFIRMATION:
-        genericMessage = this.generateConfirmationGenericMessage(payloadBundle);
-        break;
-      case PayloadBundleType.LOCATION:
-        genericMessage = this.generateLocationGenericMessage(payloadBundle);
-        break;
-      case PayloadBundleType.MESSAGE_EDIT:
-        genericMessage = this.generateEditedTextGenericMessage(payloadBundle);
-        break;
-      case PayloadBundleType.PING:
-        genericMessage = this.generatePingGenericMessage(payloadBundle);
-        break;
-      case PayloadBundleType.REACTION:
-        genericMessage = this.generateReactionGenericMessage(payloadBundle);
-        break;
-      case PayloadBundleType.TEXT:
-        genericMessage = this.generateTextGenericMessage(payloadBundle);
-        break;
-      default:
-        throw new Error(`No send method implemented for "${payloadBundle['type']}".`);
-    }
-
-    if ((await callbacks?.onStart?.(genericMessage)) === false) {
-      // If the onStart call returns false, it means the consumer wants to cancel the message sending
-      return {...payloadBundle, state: PayloadBundleState.CANCELLED};
-    }
-
+  private async sendProteusMessage<T extends OtrMessage>(
+    params: SendProteusMessageParams<T>,
+    genericMessage: GenericMessage,
+    content: T['content'],
+  ): Promise<T> {
+    const {userIds, sendAsProtobuf, conversationDomain, nativePush, targetMode, payload, onClientMismatch, onSuccess} =
+      params;
     const response = await this.sendGenericMessage(
       this.apiClient.validatedClientId,
-      payloadBundle.conversation,
+      payload.conversation,
       genericMessage,
       {
         userIds,
@@ -1145,24 +1144,43 @@ export class ConversationService {
         conversationDomain,
         nativePush,
         targetMode,
-        onClientMismatch: callbacks?.onClientMismatch,
+        onClientMismatch,
       },
     );
 
     if (!response.errored) {
       if (!this.isClearFromMismatch(response)) {
         // We warn the consumer that there is a mismatch that did not prevent message sending
-        await callbacks?.onClientMismatch?.(response, true);
+        await onClientMismatch?.(response, true);
       }
-      callbacks?.onSuccess?.(genericMessage, response.time);
+      onSuccess?.(genericMessage, response.time);
     }
 
     return {
-      ...payloadBundle,
-      content: processedContent || payloadBundle.content,
+      ...payload,
+      content,
       messageTimer: genericMessage.ephemeral?.expireAfterMillis || 0,
       state: response.errored ? PayloadBundleState.CANCELLED : PayloadBundleState.OUTGOING_SENT,
     };
+  }
+
+  /**
+   * Sends a message to a conversation
+   * @return resolves with the sent message
+   */
+  public async send<T extends OtrMessage>(
+    params: XOR<SendMlsMessageParams<T>, SendProteusMessageParams<T>>,
+  ): Promise<T> {
+    const {payload, onStart} = params;
+    const {genericMessage, content} = this.generateGenericMessage(payload);
+    if ((await onStart?.(genericMessage)) === false) {
+      // If the onStart call returns false, it means the consumer wants to cancel the message sending
+      return {...payload, state: PayloadBundleState.CANCELLED};
+    }
+
+    return isMLS(params)
+      ? this.sendMlsMessage(params, genericMessage, content)
+      : this.sendProteusMessage(params, genericMessage, content);
   }
 
   public sendTypingStart(conversationId: string): Promise<void> {
@@ -1223,5 +1241,70 @@ export class ConversationService {
     const hasRedundant = Object.keys(mismatch.redundant || {}).length > 0;
     const hasFailed = Object.keys((mismatch as MessageSendingStatus).failed_to_send || {}).length > 0;
     return !hasMissing && !hasDeleted && !hasRedundant && !hasFailed;
+  }
+
+  private generateGenericMessage<T extends OtrMessage>(
+    payload: T,
+  ): {
+    content: T['content'];
+    genericMessage: GenericMessage;
+  } {
+    let genericMessage: GenericMessage;
+    const content = payload.content;
+    switch (payload.type) {
+      case PayloadBundleType.ASSET:
+        genericMessage = this.generateFileDataGenericMessage(payload);
+        return {genericMessage, content};
+      case PayloadBundleType.ASSET_ABORT:
+        genericMessage = this.generateFileAbortGenericMessage(payload);
+        return {genericMessage, content};
+      case PayloadBundleType.ASSET_META:
+        genericMessage = this.generateFileMetaDataGenericMessage(payload);
+        return {genericMessage, content};
+      case PayloadBundleType.ASSET_IMAGE:
+        return this.generateImageGenericMessage(payload as ImageAssetMessageOutgoing);
+      case PayloadBundleType.BUTTON_ACTION:
+        genericMessage = this.generateButtonActionGenericMessage(payload);
+        return {genericMessage, content};
+      case PayloadBundleType.BUTTON_ACTION_CONFIRMATION:
+        genericMessage = this.generateButtonActionConfirmationGenericMessage(payload);
+        return {genericMessage, content};
+      case PayloadBundleType.CALL:
+        genericMessage = this.generateCallGenericMessage(payload);
+        return {genericMessage, content};
+      case PayloadBundleType.CLIENT_ACTION: {
+        if (payload.content.clientAction !== ClientAction.RESET_SESSION) {
+          throw new Error(`No send method implemented for "${payload.type}" and ClientAction "${payload.content}".`);
+        }
+        genericMessage = this.generateSessionResetGenericMessage(payload);
+        return {genericMessage, content};
+      }
+      case PayloadBundleType.COMPOSITE:
+        genericMessage = this.generateCompositeGenericMessage(payload);
+        return {genericMessage, content};
+      case PayloadBundleType.CONFIRMATION:
+        genericMessage = this.generateConfirmationGenericMessage(payload);
+        return {genericMessage, content};
+      case PayloadBundleType.LOCATION:
+        genericMessage = this.generateLocationGenericMessage(payload);
+        return {genericMessage, content};
+      case PayloadBundleType.MESSAGE_EDIT:
+        genericMessage = this.generateEditedTextGenericMessage(payload);
+        return {genericMessage, content};
+      case PayloadBundleType.PING:
+        genericMessage = this.generatePingGenericMessage(payload);
+        return {genericMessage, content};
+      case PayloadBundleType.REACTION:
+        genericMessage = this.generateReactionGenericMessage(payload);
+        return {genericMessage, content};
+      case PayloadBundleType.TEXT:
+        genericMessage = this.generateTextGenericMessage(payload);
+        return {genericMessage, content};
+      /**
+       * ToDo: Create Generic implementation for everything else
+       */
+      default:
+        throw new Error(`No send method implemented for "${payload['type']}".`);
+    }
   }
 }
