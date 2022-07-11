@@ -26,7 +26,7 @@ let reactRoot: Root;
 const cleanUp = () => {
   if (modalContainer) {
     reactRoot.unmount();
-    document.body.removeChild(modalContainer);
+    document.getElementById('wire-main')?.removeChild(modalContainer);
     modalContainer = undefined;
   }
 };
@@ -40,7 +40,7 @@ const renderModal =
   (props: T) => {
     cleanUp();
     modalContainer = document.createElement('div');
-    document.body.appendChild(modalContainer);
+    document.getElementById('wire-main')?.appendChild(modalContainer);
 
     reactRoot = createRoot(modalContainer);
     const onClose = () => {

@@ -148,7 +148,7 @@ const AccountInput: React.FC<AccountInputProps> = ({
                 css={{
                   margin: '0.5rem',
                 }}
-                data-uie-name={`${iconUiePrefix}-icon-check`}
+                data-uie-name={`go-edit-${fieldName}`}
                 onClick={() => {
                   setIsEditingExternal?.(true);
                   setIsEditing(true);
