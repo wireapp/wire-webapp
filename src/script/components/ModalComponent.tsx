@@ -138,7 +138,7 @@ const ModalComponent: React.FC<ModalComponentProps> = ({
       style={{display: displayNone ? 'none' : 'flex'}}
       tabIndex={0}
       role="button"
-      onKeyDown={onBgClick}
+      onKeyDown={noop}
       {...rest}
     >
       {showLoading ? (
