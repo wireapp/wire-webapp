@@ -79,6 +79,6 @@
     "watch": "tsc ---watch",
     "test:watch": "nodemon --ext ts --exec 'yarn test:node'"
   },
-  "version": "28.4.4",
+  "version": "28.4.5",
   "gitHead": "5339f01fe01ef0871da8c8bc8662fbe9e604754a"
 }
