@@ -18,7 +18,7 @@
  */
 
 import type {CoreCrypto, Invitee} from '@otak/core-crypto';
-import {Decoder} from 'bazinga64';
+import {Decoder, Encoder} from 'bazinga64';
 import type {APIClient} from '@wireapp/api-client';
 import {
   MessageSendingStatus,
@@ -1003,7 +1003,7 @@ export class ConversationService {
         return [
           ...previousValue,
           ...currentValue.key_packages.map(keyPackage => ({
-            id: new TextEncoder().encode(keyPackage.client),
+            id: Encoder.toBase64(keyPackage.client).asBytes,
             kp: Decoder.fromBase64(keyPackage.key_package).asBytes,
           })),
         ];
