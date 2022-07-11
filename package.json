@@ -177,7 +177,7 @@
     "webpack-cli": "4.10.0",
     "webpack-dev-middleware": "5.3.3",
     "webpack-hot-middleware": "2.25.1",
-    "workbox-webpack-plugin": "6.4.2"
+    "workbox-webpack-plugin": "6.5.3"
   },
   "engines": {
     "yarn": ">= 1.0.0",
