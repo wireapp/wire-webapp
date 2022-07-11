@@ -52,6 +52,7 @@ import {
 } from '../../../conversation/ConversationAccessPermission';
 import useEffectRef from 'Util/useEffectRef';
 import {useFadingScrollbar} from '../../../ui/fadingScrollbar';
+import {Config} from '../../../Config';
 
 interface GroupCreationModalProps {
   conversationRepository: ConversationRepository;
@@ -79,7 +80,7 @@ const GroupCreationModal: React.FC<GroupCreationModalProps> = ({
   const [isShown, setIsShown] = useState<boolean>(false);
   const [selectedContacts, setSelectedContacts] = useState<User[]>([]);
   const [enableReadReceipts, setEnableReadReceipts] = useState<boolean>(false);
-  const [enableMls, setEnableMls] = useState<boolean>(false);
+  const [enableMls, setEnableMls] = useState<boolean>(Config.getConfig().FEATURE.ENABLE_MLS);
   const [showContacts, setShowContacts] = useState<boolean>(false);
   const [isCreatingConversation, setIsCreatingConversation] = useState<boolean>(false);
   const [accessState, setAccessState] = useState<ACCESS_STATE>(ACCESS_STATE.TEAM.GUESTS_SERVICES);
