@@ -197,7 +197,7 @@ const ClientItem = ({selected, onClientRemoval, onClick, client, clientError, re
           ['&:focus-within']: {
             boxShadow: `0 0 0 1px ${COLOR.BLUE}`,
           },
-          backgroundColor: selected ? 'white' : '',
+          backgroundColor: selected ? '#DCE0E3' : '',
           borderRadius: '4px',
           transition: 'background-color .35s linear',
         }}
@@ -225,7 +225,7 @@ const ClientItem = ({selected, onClientRemoval, onClick, client, clientError, re
             </div>
             {!requirePassword && (
               <RoundIconButton
-                color={COLOR.RED}
+                backgroundColor={COLOR.RED}
                 data-uie-name="do-remove-device"
                 formNoValidate
                 onClick={handlePasswordlessClientDeletion}
@@ -239,10 +239,10 @@ const ClientItem = ({selected, onClientRemoval, onClick, client, clientError, re
           <Line color="rgba(51, 55, 58, .04)" style={{backgroundColor: 'transparent', margin: '4px 0 0 0'}} />
         </ContainerXS>
         {requirePassword && (isSelected || isAnimating) && (
-          <ContainerXS style={{maxHeight: `${height}px`, overflow: 'hidden', padding: `${paddingHorizontal}px 0`}}>
+          <ContainerXS style={{overflow: 'hidden', padding: `${paddingHorizontal}px 0`}}>
             <Form>
-              <InputBlock>
-                <InputSubmitCombo style={{background: 'transparent', boxShadow: 'none', marginBottom: '0'}}>
+              <InputBlock style={{margin: '12px'}}>
+                <InputSubmitCombo style={{background: 'white', boxShadow: 'none', marginBottom: '0'}}>
                   <Input
                     id="remove-device-password"
                     autoComplete="section-login password"
@@ -258,7 +258,7 @@ const ClientItem = ({selected, onClientRemoval, onClick, client, clientError, re
                     value={password}
                   />
                   <RoundIconButton
-                    color={COLOR.RED}
+                    backgroundColor={COLOR.RED}
                     data-uie-name="do-remove-device"
                     disabled={!password || !isValidPassword}
                     formNoValidate
