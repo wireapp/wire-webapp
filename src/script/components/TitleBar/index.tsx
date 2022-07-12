@@ -126,7 +126,7 @@ const TitleBar: React.FC<TitleBarProps> = ({
 
   const supportsVideoCall = conversation.supportsVideoCall(callingRepository.supportsConferenceCalling);
 
-  const conversationSubtitle = is1to1 && firstUserEntity.isFederated ? firstUserEntity.handle ?? '' : '';
+  const conversationSubtitle = is1to1 && firstUserEntity?.isFederated ? firstUserEntity?.handle ?? '' : '';
 
   const shortcut = Shortcut.getShortcutTooltip(ShortcutType.PEOPLE);
   const peopleTooltip = t('tooltipConversationPeople', shortcut);

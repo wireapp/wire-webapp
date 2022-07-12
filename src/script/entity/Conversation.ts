@@ -100,6 +100,7 @@ export class Conversation {
   public readonly connection: ko.Observable<ConnectionEntity>;
   // TODO(Federation): Currently the 'creator' just refers to a user id but it has to become a qualified id
   public creator: string;
+  public groupId?: string;
   public readonly display_name: ko.PureComputed<string>;
   public readonly firstUserEntity: ko.PureComputed<User>;
   public readonly enforcedTeamMessageTimer: ko.PureComputed<number>;
