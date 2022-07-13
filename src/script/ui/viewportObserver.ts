@@ -24,7 +24,8 @@ const tolerance = 0.8;
 
 const onIntersect: IntersectionObserverCallback = entries => {
   entries.forEach(({intersectionRatio, intersectionRect, isIntersecting, target: element, rootBounds}) => {
-    const {onVisible, onChange, fullyInView, container, allowBiggerThanViewport} = observedElements.get(element) || {};
+    const {onVisible, onChange, requireFullyInView, container, allowBiggerThanViewport} =
+      observedElements.get(element) || {};
     const isFullyInView = () => {
       if (container) {
         const minHeight = Math.min(container.clientHeight, element.clientHeight) * tolerance;
@@ -41,7 +42,7 @@ const onIntersect: IntersectionObserverCallback = entries => {
       );
     };
 
-    const isVisible = isIntersecting && (!fullyInView || isFullyInView() || isBiggerThanRoot());
+    const isVisible = isIntersecting && (!requireFullyInView || isFullyInView() || isBiggerThanRoot());
 
     if (onChange) {
       onChange(isVisible);
@@ -63,18 +64,18 @@ const observer = new IntersectionObserver(onIntersect, options);
  *
  * @param element the element to observe
  * @param onVisible the callback to call when the element appears
- * @param fullyInView should the element be fully in view
+ * @param requireFullyInView should the element be fully in view
  * @param allowBiggerThanViewport should fire when element is bigger than viewport
  * @param container the element containing the element
  */
 const onElementInViewport = (
   element: HTMLElement,
   onVisible: Function,
-  fullyInView?: boolean,
+  requireFullyInView?: boolean,
   allowBiggerThanViewport?: boolean,
   container?: HTMLElement,
 ): void => {
-  observedElements.set(element, {allowBiggerThanViewport, container, fullyInView, onVisible});
+  observedElements.set(element, {allowBiggerThanViewport, container, onVisible, requireFullyInView});
   return observer.observe(element);
 };
 
@@ -83,19 +84,19 @@ const onElementInViewport = (
  *
  * @param element the element to observe
  * @param onChange the callback to call when the element intersects or not
- * @param fullyInView should the element be fully in view
+ * @param requireFullyInView should the element be fully in view
  * @param allowBiggerThanViewport should fire when element is bigger than viewport
  * @param container the element containing the element
  */
 const trackElement = (
   element: HTMLElement,
   onChange: Function,
-  fullyInView: boolean,
-  allowBiggerThanViewport: boolean,
+  requireFullyInView = false,
+  allowBiggerThanViewport = false,
   container?: HTMLElement,
 ): void => {
   if (element) {
-    observedElements.set(element, {allowBiggerThanViewport, container, fullyInView, onChange});
+    observedElements.set(element, {allowBiggerThanViewport, container, onChange, requireFullyInView});
     return observer.observe(element);
   }
 };
@@ -116,18 +117,12 @@ export const viewportObserver = {
 export const useViewPortObserver = (elementRef: HTMLElement, defaultIsVisible: boolean = false): boolean => {
   const [isInViewport, setIsInViewport] = useState(defaultIsVisible);
   useEffect(() => {
-    viewportObserver.trackElement(
-      elementRef,
-      (isInViewport: boolean) => {
-        if (isInViewport) {
-          setIsInViewport(true);
-          viewportObserver.removeElement(elementRef);
-        }
-      },
-      false,
-      false,
-      undefined,
-    );
+    viewportObserver.trackElement(elementRef, (isInViewport: boolean) => {
+      if (isInViewport) {
+        setIsInViewport(true);
+        viewportObserver.removeElement(elementRef);
+      }
+    });
     return () => {
       viewportObserver.removeElement(elementRef);
     };
