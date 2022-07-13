@@ -91,9 +91,9 @@ const onElementInViewport = (
 const trackElement = (
   element: HTMLElement,
   onChange: Function,
+  container?: HTMLElement,
   requireFullyInView = false,
   allowBiggerThanViewport = false,
-  container?: HTMLElement,
 ): void => {
   if (element) {
     observedElements.set(element, {allowBiggerThanViewport, container, onChange, requireFullyInView});

@@ -64,9 +64,9 @@ const InViewport: React.FC<InViewportParams> = ({
         inViewport = isInViewport;
         triggerCallbackIfVisible();
       },
+      element.parentElement || undefined,
       requireFullyInView,
       allowBiggerThanViewport,
-      element.parentElement || undefined,
     );
     overlayedObserver.trackElement(element, isVisible => {
       visible = isVisible;
