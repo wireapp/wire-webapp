@@ -850,13 +850,13 @@ exports[`stricter compilation`] = {
       [93, 10, 23, "Type \'Observable<VerificationMessageType.NEW_DEVICE>\' is not assignable to type \'Observable<VerificationMessageType>\'.\\n  Types of parameters \'value\' and \'value\' are incompatible.\\n    Type \'VerificationMessageType\' is not assignable to type \'VerificationMessageType.NEW_DEVICE\'.", "3608773647"],
       [107, 10, 23, "Type \'Observable<VerificationMessageType.NEW_MEMBER>\' is not assignable to type \'Observable<VerificationMessageType>\'.\\n  Types of parameters \'value\' and \'value\' are incompatible.\\n    Type \'VerificationMessageType\' is not assignable to type \'VerificationMessageType.NEW_MEMBER\'.", "3608773647"]
     ],
-    "src/script/components/MessagesList/Message/index.tsx:360781890": [
+    "src/script/components/MessagesList/Message/index.tsx:2435315203": [
       [87, 51, 15, "Argument of type \'Message | undefined\' is not assignable to parameter of type \'Message\'.\\n  Type \'undefined\' is not assignable to type \'Message\'.", "1976601247"],
       [91, 6, 14, "Cannot invoke an object which is possibly \'undefined\'.", "4289202771"],
       [91, 36, 7, "Type \'HTMLDivElement | undefined\' is not assignable to type \'HTMLElement\'.\\n  Type \'undefined\' is not assignable to type \'HTMLElement\'.", "4115912507"],
       [93, 6, 14, "Cannot invoke an object which is possibly \'undefined\'.", "4289202771"],
       [93, 22, 7, "Type \'HTMLDivElement | undefined\' is not assignable to type \'HTMLElement\'.\\n  Type \'undefined\' is not assignable to type \'HTMLElement\'.", "4115912507"],
-      [112, 6, 3, "Type \'MutableRefObject<HTMLDivElement | undefined>\' is not assignable to type \'LegacyRef<HTMLDivElement> | undefined\'.", "193432436"]
+      [118, 6, 3, "Type \'MutableRefObject<HTMLDivElement | undefined>\' is not assignable to type \'LegacyRef<HTMLDivElement> | undefined\'.\\n  Type \'MutableRefObject<HTMLDivElement | undefined>\' is not assignable to type \'RefObject<HTMLDivElement>\'.\\n    Types of property \'current\' are incompatible.\\n      Type \'HTMLDivElement | undefined\' is not assignable to type \'HTMLDivElement | null\'.\\n        Type \'undefined\' is not assignable to type \'HTMLDivElement | null\'.", "193432436"]
     ],
     "src/script/components/MessagesList/index.test.tsx:3039094850": [
       [41, 4, 14, "Type \'undefined\' is not assignable to type \'Message\'.", "1306210352"],
@@ -893,7 +893,7 @@ exports[`stricter compilation`] = {
       [128, 42, 8, "Argument of type \'string | undefined\' is not assignable to parameter of type \'string\'.\\n  Type \'undefined\' is not assignable to type \'string\'.", "4039656867"],
       [144, 9, 13, "Type \'{ clickToShowSelfFingerprint: () => void; clientRepository: ClientRepository; cryptographyRepository: CryptographyRepository; logger: Logger; messageRepository: MessageRepository; noPadding: boolean; selectedClient: ClientEntity | undefined; user: User; }\' is not assignable to type \'DeviceDetailsProps\'.\\n  Types of property \'selectedClient\' are incompatible.\\n    Type \'ClientEntity | undefined\' is not assignable to type \'ClientEntity\'.\\n      Type \'undefined\' is not assignable to type \'ClientEntity\'.", "538994175"]
     ],
-    "src/script/components/UserList.tsx:541400935": [
+    "src/script/components/UserList.tsx:2117159562": [
       [97, 28, 12, "Argument of type \'Conversation | undefined\' is not assignable to parameter of type \'Partial<Record<\\"roles\\", Subscribable<any>>>\'.\\n  Type \'undefined\' is not assignable to type \'Partial<Record<\\"roles\\", Subscribable<any>>>\'.", "1670678216"]
     ],
     "src/script/components/UserSearchableList.tsx:1290904950": [
@@ -1082,10 +1082,6 @@ exports[`stricter compilation`] = {
     "src/script/components/toggle/ReceiptModeToggle.test.ts:3769197722": [
       [42, 11, 8, "Object is possibly \'null\'.", "2071428406"],
       [53, 11, 8, "Object is possibly \'null\'.", "2071428406"]
-    ],
-    "src/script/components/utils/InViewport.tsx:2602655444": [
-      [60, 6, 21, "Argument of type \'HTMLElement | null\' is not assignable to parameter of type \'HTMLElement\'.\\n  Type \'null\' is not assignable to type \'HTMLElement\'.", "2791404919"],
-      [70, 9, 3, "Type \'MutableRefObject<HTMLDivElement | undefined>\' is not assignable to type \'LegacyRef<HTMLDivElement> | undefined\'.\\n  Type \'MutableRefObject<HTMLDivElement | undefined>\' is not assignable to type \'RefObject<HTMLDivElement>\'.\\n    Types of property \'current\' are incompatible.\\n      Type \'HTMLDivElement | undefined\' is not assignable to type \'HTMLDivElement | null\'.\\n        Type \'undefined\' is not assignable to type \'HTMLDivElement | null\'.", "193432436"]
     ],
     "src/script/connection/ConnectionEntity.ts:2779957789": [
       [41, 4, 19, "Type \'null\' is not assignable to type \'QualifiedId\'.", "59414957"],
@@ -2278,9 +2274,6 @@ exports[`stricter compilation`] = {
     "src/script/ui/resizeObserver.ts:1962447755": [
       [47, 48, 8, "Argument of type \'(element: Element) => void\' is not assignable to parameter of type \'(...args: unknown[]) => void\'.\\n  Types of parameters \'element\' and \'args\' are incompatible.\\n    Type \'unknown\' is not assignable to type \'Element\'.", "3760058444"]
     ],
-    "src/script/ui/viewportObserver.ts:8326502": [
-      [109, 6, 9, "Argument of type \'undefined\' is not assignable to parameter of type \'HTMLElement\'.", "2620553983"]
-    ],
     "src/script/user/AppLockRepository.ts:968558871": [
       [48, 38, 59, "Type \'string | null\' is not assignable to type \'string\'.\\n  Type \'null\' is not assignable to type \'string\'.", "2029474882"],
       [50, 35, 56, "Type \'string | null\' is not assignable to type \'string\'.\\n  Type \'null\' is not assignable to type \'string\'.", "4278102955"],
@@ -2561,7 +2554,7 @@ exports[`stricter compilation`] = {
       [51, 4, 22, "Type \'Observable<false>\' is not assignable to type \'Observable<boolean>\'.", "2603921936"],
       [89, 31, 43, "Object is possibly \'null\'.", "1853768633"]
     ],
-    "src/script/view_model/bindings/CommonBindings.ts:3939643793": [
+    "src/script/view_model/bindings/CommonBindings.ts:4259167057": [
       [44, 6, 32, "Object is possibly \'null\'.", "3763860455"],
       [83, 63, 13, "Object is possibly \'null\'.", "115063321"],
       [83, 86, 13, "Object is possibly \'null\'.", "115063321"],
