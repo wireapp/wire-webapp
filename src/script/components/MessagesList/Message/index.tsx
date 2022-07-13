@@ -106,7 +106,13 @@ const Message: React.FC<
   };
 
   const content = <MessageWrapper {...props} hasMarker={markerType !== MessageMarkerType.NONE} />;
-  const wrappedContent = props.onVisible ? <InViewport onVisible={props.onVisible}>{content}</InViewport> : content;
+  const wrappedContent = props.onVisible ? (
+    <InViewport allowBiggerThanViewport onVisible={props.onVisible}>
+      {content}
+    </InViewport>
+  ) : (
+    content
+  );
   return (
     <div
       className={`message ${isMarked ? 'message-marked' : ''}`}
