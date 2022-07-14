@@ -19,14 +19,15 @@
 
 import {QualifiedId} from '@wireapp/api-client/src/user';
 
-import TestPage from 'Util/test/TestPage';
-import {UserState} from 'src/script/user/UserState';
-import {TeamState} from 'src/script/team/TeamState';
-import {Core} from 'src/script/service/CoreSingleton';
-import UserModal, {UserModalProps} from './UserModal';
-import {UserRepository} from 'src/script/user/UserRepository';
-import {ActionsViewModel} from 'src/script/view_model/ActionsViewModel';
 import {User} from 'src/script/entity/User';
+import {Core} from 'src/script/service/CoreSingleton';
+import {TeamState} from 'src/script/team/TeamState';
+import {UserRepository} from 'src/script/user/UserRepository';
+import {UserState} from 'src/script/user/UserState';
+import {ActionsViewModel} from 'src/script/view_model/ActionsViewModel';
+import TestPage from 'Util/test/TestPage';
+
+import UserModal, {UserModalProps} from './UserModal';
 
 class UserModalPage extends TestPage<UserModalProps> {
   constructor(props?: UserModalProps) {

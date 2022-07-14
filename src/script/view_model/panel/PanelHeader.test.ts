@@ -17,9 +17,9 @@
  *
  */
 
-import PanelHeader, {PanelHeaderProps} from './PanelHeader';
-
 import TestPage from 'Util/test/TestPage';
+
+import PanelHeader, {PanelHeaderProps} from './PanelHeader';
 
 const goBackUie = 'back-button';
 const closeUie = 'close-button';

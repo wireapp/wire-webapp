@@ -21,6 +21,7 @@ import {Button, Column, Columns, Container, H3, Modal, Text} from '@wireapp/reac
 import {useIntl} from 'react-intl';
 import {connect} from 'react-redux';
 import {AnyAction, Dispatch} from 'redux';
+
 import {Config} from '../../Config';
 import {appAlreadyOpenStrings} from '../../strings';
 import {actionRoot as ROOT_ACTIONS} from '../module/action/';

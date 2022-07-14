@@ -17,22 +17,23 @@
  *
  */
 
-import {amplify} from 'amplify';
-import {WebAppEvents} from '@wireapp/webapp-events';
 import {Runtime} from '@wireapp/commons';
+import {WebAppEvents} from '@wireapp/webapp-events';
+import {amplify} from 'amplify';
 
 import {getLogger, Logger} from 'Util/Logger';
 
-import {MediaError} from '../error/MediaError';
-import {PermissionError} from '../error/PermissionError';
-import type {PermissionRepository} from '../permission/PermissionRepository';
-import {PermissionStatusState} from '../permission/PermissionStatusState';
-import {PermissionType} from '../permission/PermissionType';
 import {MediaConstraintsHandler, ScreensharingMethods} from './MediaConstraintsHandler';
 import {MEDIA_STREAM_ERROR} from './MediaStreamError';
 import {MEDIA_STREAM_ERROR_TYPES} from './MediaStreamErrorTypes';
 import {MediaType} from './MediaType';
+
+import {MediaError} from '../error/MediaError';
 import {NoAudioInputError} from '../error/NoAudioInputError';
+import {PermissionError} from '../error/PermissionError';
+import type {PermissionRepository} from '../permission/PermissionRepository';
+import {PermissionStatusState} from '../permission/PermissionStatusState';
+import {PermissionType} from '../permission/PermissionType';
 import Warnings from '../view_model/WarningsContainer';
 
 export class MediaStreamHandler {

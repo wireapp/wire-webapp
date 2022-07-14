@@ -18,6 +18,7 @@
  */
 
 import {ConnectionStatus, Connection} from '@wireapp/api-client/src/connection/';
+
 import {ConnectionMapper} from './ConnectionMapper';
 
 describe('ConnectionMapper', () => {

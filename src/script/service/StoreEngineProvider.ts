@@ -18,15 +18,15 @@
  */
 
 import type {CRUDEngine} from '@wireapp/store-engine';
+import {MemoryEngine} from '@wireapp/store-engine';
 import {IndexedDBEngine} from '@wireapp/store-engine-dexie';
 import {SQLeetEngine} from '@wireapp/store-engine-sqleet';
-import {MemoryEngine} from '@wireapp/store-engine';
 import Dexie from 'dexie';
 
 import {saveRandomEncryptionKey} from 'Util/ephemeralValueStore';
 
-import {SQLeetSchemata} from '../storage/SQLeetSchemata';
 import {DexieDatabase} from '../storage/DexieDatabase';
+import {SQLeetSchemata} from '../storage/SQLeetSchemata';
 
 export enum DatabaseTypes {
   /** a permament storage that will still live after logout */

@@ -18,10 +18,12 @@
  */
 
 import {ReactWrapper} from 'enzyme';
+
+import AccountForm from './AccountForm';
+
 import {initialRootState} from '../module/reducer';
 import {mockStoreFactory} from '../util/test/mockStoreFactory';
 import {mountComponent} from '../util/test/TestUtil';
-import AccountForm from './AccountForm';
 
 describe('when entering account data', () => {
   let wrapper: ReactWrapper;

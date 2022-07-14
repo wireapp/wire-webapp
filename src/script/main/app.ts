@@ -19,74 +19,71 @@
 
 // Polyfill for "tsyringe" dependency injection
 import 'core-js/es7/reflect';
-
+import Dexie from 'dexie';
 import ko from 'knockout';
 import platform from 'platform';
 import {container} from 'tsyringe';
 import {ClientType} from '@wireapp/api-client/src/client/';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import {amplify} from 'amplify';
-import Dexie from 'dexie';
 import {Runtime} from '@wireapp/commons';
 
-import {getLogger, Logger} from 'Util/Logger';
-import {t} from 'Util/LocalizerUtil';
-import {checkIndexedDb, createRandomUuid} from 'Util/util';
-import {TIME_IN_MILLIS} from 'Util/TimeUtil';
-import {enableLogging} from 'Util/LoggerUtil';
-import {Environment} from 'Util/Environment';
 import {DebugUtil} from 'Util/DebugUtil';
-import {exposeWrapperGlobals} from 'Util/wrapper';
-import {includesString} from 'Util/StringUtil';
-import {appendParameter} from 'Util/UrlUtil';
+import {Environment} from 'Util/Environment';
+import {t} from 'Util/LocalizerUtil';
+import {getLogger, Logger} from 'Util/Logger';
+import {enableLogging} from 'Util/LoggerUtil';
 import {loadValue} from 'Util/StorageUtil';
+import {includesString} from 'Util/StringUtil';
+import {TIME_IN_MILLIS} from 'Util/TimeUtil';
+import {appendParameter} from 'Util/UrlUtil';
+import {checkIndexedDb, createRandomUuid} from 'Util/util';
+import {exposeWrapperGlobals} from 'Util/wrapper';
 
-import {Config} from '../Config';
-import {startNewVersionPolling} from '../lifecycle/newVersionHandler';
-import {LoadingViewModel} from '../view_model/LoadingViewModel';
-import {PreferenceNotificationRepository} from '../notification/PreferenceNotificationRepository';
-import * as UserPermission from '../user/UserPermission';
-import {UserRepository} from '../user/UserRepository';
-import {serverTimeHandler} from '../time/serverTimeHandler';
-import {CallingRepository} from '../calling/CallingRepository';
+import {SingleInstanceHandler} from './SingleInstanceHandler';
+
 import {BackupRepository} from '../backup/BackupRepository';
-import {NotificationRepository} from '../notification/NotificationRepository';
-import {IntegrationRepository} from '../integration/IntegrationRepository';
-import {IntegrationService} from '../integration/IntegrationService';
-import {StorageRepository} from '../storage/StorageRepository';
-import {StorageKey} from '../storage/StorageKey';
-import {EventTrackingRepository} from '../tracking/EventTrackingRepository';
+import {CallingRepository} from '../calling/CallingRepository';
+import {Config} from '../Config';
 import {ConnectionRepository} from '../connection/ConnectionRepository';
-import {CryptographyRepository} from '../cryptography/CryptographyRepository';
-import {TeamRepository} from '../team/TeamRepository';
-import {SearchRepository} from '../search/SearchRepository';
 import {ConversationRepository} from '../conversation/ConversationRepository';
+import {ConversationService} from '../conversation/ConversationService';
+import {CryptographyRepository} from '../cryptography/CryptographyRepository';
 import {EventRepository} from '../event/EventRepository';
-import {EventServiceNoCompound} from '../event/EventServiceNoCompound';
 import {EventService} from '../event/EventService';
+import {EventServiceNoCompound} from '../event/EventServiceNoCompound';
 import {NotificationService} from '../event/NotificationService';
 import {QuotedMessageMiddleware} from '../event/preprocessor/QuotedMessageMiddleware';
 import {ServiceMiddleware} from '../event/preprocessor/ServiceMiddleware';
-import {ConversationService} from '../conversation/ConversationService';
-import {SingleInstanceHandler} from './SingleInstanceHandler';
-import {AppInitStatisticsValue} from '../telemetry/app_init/AppInitStatisticsValue';
-import {AppInitTimingsStep} from '../telemetry/app_init/AppInitTimingsStep';
-import {AppInitTelemetry} from '../telemetry/app_init/AppInitTelemetry';
-import {MainViewModel, ViewModelRepositories} from '../view_model/MainViewModel';
-import {ThemeViewModel} from '../view_model/ThemeViewModel';
-import {WindowHandler} from '../ui/WindowHandler';
+import {IntegrationRepository} from '../integration/IntegrationRepository';
+import {IntegrationService} from '../integration/IntegrationService';
+import {startNewVersionPolling} from '../lifecycle/newVersionHandler';
+import {NotificationRepository} from '../notification/NotificationRepository';
+import {PreferenceNotificationRepository} from '../notification/PreferenceNotificationRepository';
 import {Router} from '../router/Router';
 import {initRouterBindings} from '../router/routerBindings';
+import {SearchRepository} from '../search/SearchRepository';
+import {StorageKey} from '../storage/StorageKey';
+import {StorageRepository} from '../storage/StorageRepository';
+import {TeamRepository} from '../team/TeamRepository';
+import {AppInitStatisticsValue} from '../telemetry/app_init/AppInitStatisticsValue';
+import {AppInitTelemetry} from '../telemetry/app_init/AppInitTelemetry';
+import {AppInitTimingsStep} from '../telemetry/app_init/AppInitTimingsStep';
+import {serverTimeHandler} from '../time/serverTimeHandler';
+import {EventTrackingRepository} from '../tracking/EventTrackingRepository';
+import {WindowHandler} from '../ui/WindowHandler';
+import * as UserPermission from '../user/UserPermission';
+import {UserRepository} from '../user/UserRepository';
+import {LoadingViewModel} from '../view_model/LoadingViewModel';
+import {MainViewModel, ViewModelRepositories} from '../view_model/MainViewModel';
+import {ThemeViewModel} from '../view_model/ThemeViewModel';
 
 import './globals';
 
 import {ReceiptsMiddleware} from '../event/preprocessor/ReceiptsMiddleware';
-
 import {getWebsiteUrl} from '../externalRoute';
-
 import {modals} from '../view_model/ModalsViewModel';
 import {showInitialModal} from '../user/AvailabilityModal';
-
 import {URLParameter} from '../auth/URLParameter';
 import {SIGN_OUT_REASON} from '../auth/SignOutReason';
 import {ClientRepository} from '../client/ClientRepository';
@@ -122,7 +119,9 @@ import {MessageRepository} from '../conversation/MessageRepository';
 import {TeamError} from '../error/TeamError';
 import Warnings from '../view_model/WarningsContainer';
 import {Core} from '../service/CoreSingleton';
+
 import {migrateToQualifiedSessionIds} from './sessionIdMigrator';
+
 import showUserModal from 'Components/Modals/UserModal';
 
 function doRedirect(signOutReason: SIGN_OUT_REASON) {

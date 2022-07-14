@@ -17,16 +17,19 @@
  *
  */
 
+import React from 'react';
+
 import {WebAppEvents} from '@wireapp/webapp-events';
 import {amplify} from 'amplify';
-import React from 'react';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 
-import {ModalsViewModel} from '../../../../../view_model/ModalsViewModel';
-import AccountInput, {useInputDone} from './AccountInput';
-import {getLogger} from 'Util/Logger';
 import {t} from 'Util/LocalizerUtil';
+import {getLogger} from 'Util/Logger';
+
+import AccountInput, {useInputDone} from './AccountInput';
+
 import {UserRepository} from '../../../../../user/UserRepository';
+import {ModalsViewModel} from '../../../../../view_model/ModalsViewModel';
 
 interface EmailInputProps {
   canEditProfile: boolean;

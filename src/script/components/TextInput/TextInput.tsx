@@ -18,9 +18,10 @@
  */
 
 import React, {useEffect} from 'react';
-import {registerReactComponent} from 'Util/ComponentUtil';
-import Icon from 'Components/Icon';
+
 import {CheckIcon, COLOR} from '@wireapp/react-ui-kit';
+
+import Icon from 'Components/Icon';
 import {
   cancelButtonCSS,
   containerCSS,
@@ -29,6 +30,7 @@ import {
   getInputCSS,
   getLabelCSS,
 } from 'Components/TextInput/TextInput.styles';
+import {registerReactComponent} from 'Util/ComponentUtil';
 
 export interface UserInputProps {
   autoFocus?: boolean;

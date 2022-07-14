@@ -18,12 +18,14 @@
  */
 
 import {Article, LinkPreview, Mention} from '@wireapp/protocol-messaging';
-import {createRandomUuid, arrayToBase64} from 'Util/util';
-import {Conversation} from 'src/script/entity/Conversation';
-import {EventMapper} from 'src/script/conversation/EventMapper';
+
 import {AssetType} from 'src/script/assets/AssetType';
+import {EventMapper} from 'src/script/conversation/EventMapper';
+import {Conversation} from 'src/script/entity/Conversation';
 import {ClientEvent} from 'src/script/event/Client';
 import {MentionEntity} from 'src/script/message/MentionEntity';
+import {createRandomUuid, arrayToBase64} from 'Util/util';
+
 import {TestFactory} from '../../helper/TestFactory';
 
 describe('Event Mapper', () => {

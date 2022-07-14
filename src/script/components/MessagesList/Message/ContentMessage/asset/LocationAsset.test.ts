@@ -17,11 +17,10 @@
  *
  */
 
+import type {Location} from 'src/script/entity/message/Location';
 import TestPage from 'Util/test/TestPage';
 
 import LocationAsset, {LocationAssetProps} from './LocationAsset';
-
-import type {Location} from 'src/script/entity/message/Location';
 
 class LocationAssetPage extends TestPage<LocationAssetProps> {
   constructor(props?: LocationAssetProps) {

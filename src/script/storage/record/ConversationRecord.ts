@@ -17,8 +17,6 @@
  *
  */
 
-import {ConversationStatus} from '../../conversation/ConversationStatus';
-import {ConversationVerificationState} from '../../conversation/ConversationVerificationState';
 import {
   ACCESS_ROLE_V2,
   DefaultConversationRoleName,
@@ -26,9 +24,12 @@ import {
   CONVERSATION_ACCESS_ROLE,
   CONVERSATION_TYPE,
 } from '@wireapp/api-client/src/conversation';
+import {RECEIPT_MODE} from '@wireapp/api-client/src/conversation/data';
 import type {QualifiedId} from '@wireapp/api-client/src/user/';
 import {LegalHoldStatus} from '@wireapp/protocol-messaging';
-import {RECEIPT_MODE} from '@wireapp/api-client/src/conversation/data';
+
+import {ConversationStatus} from '../../conversation/ConversationStatus';
+import {ConversationVerificationState} from '../../conversation/ConversationVerificationState';
 
 export interface ConversationRecord {
   access: CONVERSATION_ACCESS[];

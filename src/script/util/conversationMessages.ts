@@ -17,8 +17,9 @@
  *
  */
 
-import {Message} from '../entity/message/Message';
 import {isSameDay, differenceInMinutes} from 'Util/TimeUtil';
+
+import {Message} from '../entity/message/Message';
 
 export enum MessageMarkerType {
   /** The message should be displayed standalone and should not create any section*/

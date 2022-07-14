@@ -26,9 +26,10 @@ import {singleton} from 'tsyringe';
 import {Logger, getLogger} from 'Util/Logger';
 import {loadValue, storeValue} from 'Util/StorageUtil';
 
-import {StorageSchemata} from './StorageSchemata';
-import {StorageError} from '../error/StorageError';
 import {DexieDatabase} from './DexieDatabase';
+import {StorageSchemata} from './StorageSchemata';
+
+import {StorageError} from '../error/StorageError';
 
 interface DatabaseListener {
   callback: DatabaseListenerCallback;

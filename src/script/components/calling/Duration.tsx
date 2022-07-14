@@ -18,6 +18,7 @@
  */
 
 import React, {useState, useEffect} from 'react';
+
 import {formatSeconds} from 'Util/TimeUtil';
 
 export interface DurationProps {

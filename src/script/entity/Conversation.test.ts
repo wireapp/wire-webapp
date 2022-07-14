@@ -20,30 +20,28 @@
 //@ts-check
 
 import {ConnectionStatus} from '@wireapp/api-client/src/connection/';
-import {CONVERSATION_EVENT} from '@wireapp/api-client/src/event/';
 import {CONVERSATION_TYPE} from '@wireapp/api-client/src/conversation/';
+import {CONVERSATION_EVENT} from '@wireapp/api-client/src/event/';
 
+import {ClientEntity} from 'src/script/client/ClientEntity';
+import {ConnectionMapper} from 'src/script/connection/ConnectionMapper';
+import {ConversationMapper} from 'src/script/conversation/ConversationMapper';
+import {NOTIFICATION_STATE} from 'src/script/conversation/NotificationSetting';
 import 'src/script/localization/Localizer';
+import {CALL_MESSAGE_TYPE} from 'src/script/message/CallMessageType';
+import {MentionEntity} from 'src/script/message/MentionEntity';
+import {StatusType} from 'src/script/message/StatusType';
 import {createRandomUuid} from 'Util/util';
 
 import {Conversation} from './Conversation';
-import {ContentMessage} from './message/ContentMessage';
 import {CallMessage} from './message/CallMessage';
+import {ContentMessage} from './message/ContentMessage';
+import {MemberMessage} from './message/MemberMessage';
 import {Message} from './message/Message';
 import {PingMessage} from './message/PingMessage';
-import {User} from './User';
 import {Text} from './message/Text';
-import {MemberMessage} from './message/MemberMessage';
+import {User} from './User';
 
-import {ConversationMapper} from 'src/script/conversation/ConversationMapper';
-import {NOTIFICATION_STATE} from 'src/script/conversation/NotificationSetting';
-
-import {StatusType} from 'src/script/message/StatusType';
-import {CALL_MESSAGE_TYPE} from 'src/script/message/CallMessageType';
-
-import {ConnectionMapper} from 'src/script/connection/ConnectionMapper';
-import {ClientEntity} from 'src/script/client/ClientEntity';
-import {MentionEntity} from 'src/script/message/MentionEntity';
 import {entities} from '../../../test/api/payloads';
 
 describe('Conversation', () => {

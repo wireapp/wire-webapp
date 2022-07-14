@@ -18,10 +18,12 @@
  */
 
 import ko from 'knockout';
-import TestPage from 'Util/test/TestPage';
-import VerificationMessage, {VerificationMessageProps} from './VerificationMessage';
+
 import {VerificationMessage as VerificationMessageEntity} from 'src/script/entity/message/VerificationMessage';
 import {VerificationMessageType} from 'src/script/message/VerificationMessageType';
+import TestPage from 'Util/test/TestPage';
+
+import VerificationMessage, {VerificationMessageProps} from './VerificationMessage';
 
 class VerificationMessagePage extends TestPage<VerificationMessageProps> {
   constructor(props?: VerificationMessageProps) {

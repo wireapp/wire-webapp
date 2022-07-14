@@ -20,6 +20,7 @@
 import {container} from 'tsyringe';
 
 import {Logger, getLogger} from 'Util/Logger';
+
 import {APIClient} from '../service/APIClientSingleton';
 
 export class AuthRepository {

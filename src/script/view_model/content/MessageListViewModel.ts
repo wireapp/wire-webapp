@@ -17,38 +17,38 @@
  *
  */
 
-import {amplify} from 'amplify';
-import {container} from 'tsyringe';
-import {groupBy} from 'underscore';
 import {WebAppEvents} from '@wireapp/webapp-events';
+import {amplify} from 'amplify';
 import $ from 'jquery';
 import ko from 'knockout';
+import {container} from 'tsyringe';
+import {groupBy} from 'underscore';
 
+import {t} from 'Util/LocalizerUtil';
 import {getLogger, Logger} from 'Util/Logger';
 import {safeWindowOpen, safeMailOpen} from 'Util/SanitizationUtil';
-import {t} from 'Util/LocalizerUtil';
 
-import {ActionsViewModel} from '../ActionsViewModel';
-import {ContentMessage} from '../../entity/message/ContentMessage';
-import {Conversation} from '../../entity/Conversation';
 import {ConversationRepository} from '../../conversation/ConversationRepository';
 import {ConversationState} from '../../conversation/ConversationState';
+import type {MessageRepository} from '../../conversation/MessageRepository';
+import {Conversation} from '../../entity/Conversation';
+import {ContentMessage} from '../../entity/message/ContentMessage';
 import {DecryptErrorMessage} from '../../entity/message/DecryptErrorMessage';
-import {IntegrationRepository} from '../../integration/IntegrationRepository';
-import {MainViewModel} from '../MainViewModel';
 import {MemberMessage} from '../../entity/message/MemberMessage';
 import {Message} from '../../entity/message/Message';
-import {MessageCategory} from '../../message/MessageCategory';
-import {ModalsViewModel} from '../ModalsViewModel';
-import {MotionDuration} from '../../motion/MotionDuration';
-import {PanelViewModel} from '../PanelViewModel';
-import {ServerTimeHandler} from '../../time/serverTimeHandler';
 import {Text} from '../../entity/message/Text';
 import {User} from '../../entity/User';
 import {UserError} from '../../error/UserError';
+import {IntegrationRepository} from '../../integration/IntegrationRepository';
+import {MessageCategory} from '../../message/MessageCategory';
+import {MotionDuration} from '../../motion/MotionDuration';
+import {ServerTimeHandler} from '../../time/serverTimeHandler';
 import {UserRepository} from '../../user/UserRepository';
 import {UserState} from '../../user/UserState';
-import type {MessageRepository} from '../../conversation/MessageRepository';
+import {ActionsViewModel} from '../ActionsViewModel';
+import {MainViewModel} from '../MainViewModel';
+import {ModalsViewModel} from '../ModalsViewModel';
+import {PanelViewModel} from '../PanelViewModel';
 
 /*
  * Message list rendering view model.

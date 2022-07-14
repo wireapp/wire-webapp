@@ -17,8 +17,9 @@
  *
  */
 
-import type {ThunkAction} from '../reducer';
 import {LocalStorageActionCreator} from './creator/';
+
+import type {ThunkAction} from '../reducer';
 
 export const LocalStorageKey = {
   AUTH: {

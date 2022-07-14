@@ -17,6 +17,8 @@
  *
  */
 
+import {CONVERSATION_EVENT} from '@wireapp/api-client/src/event/';
+import {ReactionType} from '@wireapp/core/src/main/conversation/';
 import {
   Asset,
   Availability,
@@ -35,16 +37,14 @@ import {
   Text,
 } from '@wireapp/protocol-messaging';
 import {isObject} from 'underscore';
-import {CONVERSATION_EVENT} from '@wireapp/api-client/src/event/';
-import {ReactionType} from '@wireapp/core/src/main/conversation/';
 
-import {GENERIC_MESSAGE_TYPE} from 'src/script/cryptography/GenericMessageType';
-import {CryptographyMapper} from 'src/script/cryptography/CryptographyMapper';
-import {arrayToBase64, createRandomUuid} from 'Util/util';
 import {encryptAesAsset} from 'src/script/assets/AssetCrypto';
-import {ClientEvent} from 'src/script/event/Client';
+import {CryptographyMapper} from 'src/script/cryptography/CryptographyMapper';
+import {GENERIC_MESSAGE_TYPE} from 'src/script/cryptography/GenericMessageType';
 import {PROTO_MESSAGE_TYPE} from 'src/script/cryptography/ProtoMessageType';
 import {CryptographyError} from 'src/script/error/CryptographyError';
+import {ClientEvent} from 'src/script/event/Client';
+import {arrayToBase64, createRandomUuid} from 'Util/util';
 
 describe('CryptographyMapper', () => {
   const mapper = new CryptographyMapper();

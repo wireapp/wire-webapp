@@ -20,14 +20,15 @@
 import ko from 'knockout';
 
 import {Logger, getLogger} from 'Util/Logger';
+import {matchQualifiedIds} from 'Util/QualifiedId';
 
 import {BasePanelViewModel, PanelViewModelProps} from './BasePanelViewModel';
+
+import type {User} from '../../entity/User';
+import type {IntegrationRepository} from '../../integration/IntegrationRepository';
 import type {ServiceEntity} from '../../integration/ServiceEntity';
 import type {ActionsViewModel} from '../ActionsViewModel';
-import type {IntegrationRepository} from '../../integration/IntegrationRepository';
-import type {User} from '../../entity/User';
 import type {PanelParams} from '../PanelViewModel';
-import {matchQualifiedIds} from 'Util/QualifiedId';
 
 export class GroupParticipantServiceViewModel extends BasePanelViewModel {
   integrationRepository: IntegrationRepository;

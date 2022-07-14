@@ -17,32 +17,31 @@
  *
  */
 
-import ko from 'knockout';
-import {amplify} from 'amplify';
-
 import {WebAppEvents} from '@wireapp/webapp-events';
+import {amplify} from 'amplify';
+import ko from 'knockout';
+import {container} from 'tsyringe';
 
+import {ContentViewModel} from './ContentViewModel';
+import type {MainViewModel, ViewModelRepositories} from './MainViewModel';
 import {AddParticipantsViewModel} from './panel/AddParticipantsViewModel';
+import type {BasePanelViewModel} from './panel/BasePanelViewModel';
 import {ConversationDetailsViewModel} from './panel/ConversationDetailsViewModel';
 import {ConversationParticipantsViewModel} from './panel/ConversationParticipantsViewModel';
 import {GroupParticipantServiceViewModel} from './panel/GroupParticipantServiceViewModel';
 import {GroupParticipantUserViewModel} from './panel/GroupParticipantUserViewModel';
 import {GuestsAndServicesViewModel} from './panel/GuestsAndServicesViewModel';
 import {MessageDetailsViewModel} from './panel/MessageDetailsViewModel';
-import {MotionDuration} from '../motion/MotionDuration';
-import {ContentViewModel} from './ContentViewModel';
-import type {MainViewModel, ViewModelRepositories} from './MainViewModel';
-import type {Conversation} from '../entity/Conversation';
-import type {User} from '../entity/User';
-import type {Message} from '../entity/message/Message';
-import type {BasePanelViewModel} from './panel/BasePanelViewModel';
-import type {ServiceEntity} from '../integration/ServiceEntity';
-import {ConversationState} from '../conversation/ConversationState';
-import {container} from 'tsyringe';
-
 import './panel/TimedMessagesPanel';
 import './panel/ParticipantDevicesPanel';
 import './panel/NotificationsPanel';
+
+import {ConversationState} from '../conversation/ConversationState';
+import type {Conversation} from '../entity/Conversation';
+import type {Message} from '../entity/message/Message';
+import type {User} from '../entity/User';
+import type {ServiceEntity} from '../integration/ServiceEntity';
+import {MotionDuration} from '../motion/MotionDuration';
 
 export const OPEN_CONVERSATION_DETAILS = 'PanelViewModel.OPEN_CONVERSATION_DETAILS';
 

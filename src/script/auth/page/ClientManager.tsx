@@ -17,18 +17,21 @@
  *
  */
 
-import {ContainerXS, H1, Link, Muted, useTimeout} from '@wireapp/react-ui-kit';
 import React, {useEffect} from 'react';
+
+import {ContainerXS, H1, Link, Muted, useTimeout} from '@wireapp/react-ui-kit';
 import {useIntl} from 'react-intl';
 import {connect} from 'react-redux';
 import {AnyAction, Dispatch} from 'redux';
+
+import Page from './Page';
+
 import {Config} from '../../Config';
 import {clientManagerStrings} from '../../strings';
 import ClientList from '../component/ClientList';
 import {actionRoot as ROOT_ACTIONS} from '../module/action/';
 import {RootState, bindActionCreators} from '../module/reducer';
 import {QUERY_KEY} from '../route';
-import Page from './Page';
 
 interface Props extends React.HTMLProps<HTMLDivElement> {}
 

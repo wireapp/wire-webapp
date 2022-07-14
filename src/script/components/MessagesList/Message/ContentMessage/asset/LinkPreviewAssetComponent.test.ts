@@ -18,10 +18,11 @@
  */
 
 import {ContentMessage} from 'src/script/entity/message/ContentMessage';
-import TestPage from 'Util/test/TestPage';
 import {LinkPreview} from 'src/script/entity/message/LinkPreview';
 import {Text} from 'src/script/entity/message/Text';
 import {StatusType} from 'src/script/message/StatusType';
+import TestPage from 'Util/test/TestPage';
+
 import LinkPreviewAssetComponent, {LinkPreviewAssetProps} from './LinkPreviewAssetComponent';
 
 class LinkPreviewAssetComponentTestPage extends TestPage<LinkPreviewAssetProps> {

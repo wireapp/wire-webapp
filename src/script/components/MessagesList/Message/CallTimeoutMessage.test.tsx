@@ -17,11 +17,13 @@
  *
  */
 
-import ko from 'knockout';
-import TestPage from 'Util/test/TestPage';
-import {CallingTimeoutMessage as CallTimeoutMessageEntity} from 'src/script/entity/message/CallingTimeoutMessage';
-import CallTimeoutMessage, {CallTimeoutMessageProps} from './CallTimeoutMessage';
 import {REASON} from '@wireapp/avs';
+import ko from 'knockout';
+
+import {CallingTimeoutMessage as CallTimeoutMessageEntity} from 'src/script/entity/message/CallingTimeoutMessage';
+import TestPage from 'Util/test/TestPage';
+
+import CallTimeoutMessage, {CallTimeoutMessageProps} from './CallTimeoutMessage';
 
 class CallTimeoutMessagePage extends TestPage<CallTimeoutMessageProps> {
   constructor(props?: CallTimeoutMessageProps) {

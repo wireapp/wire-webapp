@@ -19,8 +19,9 @@
 
 import TestPage from 'Util/test/TestPage';
 
-import {ServiceEntity} from '../../integration/ServiceEntity';
 import ServiceDetails, {ServiceDetailsProps} from './ServiceDetails';
+
+import {ServiceEntity} from '../../integration/ServiceEntity';
 
 class ServiceDetailsPage extends TestPage<ServiceDetailsProps> {
   constructor(props: ServiceDetailsProps) {

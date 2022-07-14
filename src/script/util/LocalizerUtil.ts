@@ -18,11 +18,13 @@
  */
 
 import {escape} from 'underscore';
+
 import en from 'I18n/en-US.json';
 
-import type {User} from '../entity/User';
 import {getSelfName} from './SanitizationUtil';
 import {sortUsersByPriority} from './StringUtil';
+
+import type {User} from '../entity/User';
 
 type Substitutes = Record<string, string> | string | number;
 

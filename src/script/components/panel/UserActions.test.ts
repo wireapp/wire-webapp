@@ -17,17 +17,17 @@
  *
  */
 
-import ko from 'knockout';
 import {ConnectionStatus} from '@wireapp/api-client/src/connection/';
+import ko from 'knockout';
 
+import {ConversationRoleRepository} from 'src/script/conversation/ConversationRoleRepository';
+import {Conversation} from 'src/script/entity/Conversation';
+import {User} from 'src/script/entity/User';
+import {ActionsViewModel} from 'src/script/view_model/ActionsViewModel';
 import TestPage from 'Util/test/TestPage';
 import {noop} from 'Util/util';
 
 import UserActions, {UserActionsProps, ActionIdentifier, Actions} from './UserActions';
-import {User} from 'src/script/entity/User';
-import {Conversation} from 'src/script/entity/Conversation';
-import {ConversationRoleRepository} from 'src/script/conversation/ConversationRoleRepository';
-import {ActionsViewModel} from 'src/script/view_model/ActionsViewModel';
 
 const actionsViewModel = {} as ActionsViewModel;
 

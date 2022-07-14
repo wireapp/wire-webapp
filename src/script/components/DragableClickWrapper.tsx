@@ -18,6 +18,7 @@
  */
 
 import React from 'react';
+
 import {Runtime} from '@wireapp/commons';
 
 interface DragableClickWrapperProps {

@@ -17,8 +17,9 @@
  *
  */
 
-import TestPage from 'Util/test/TestPage';
 import {FileTypeRestrictedMessage as FileTypeRestrictedMessageEntity} from 'src/script/entity/message/FileTypeRestrictedMessage';
+import TestPage from 'Util/test/TestPage';
+
 import FileTypeRestrictedMessage, {FileTypeRestrictedMessageProps} from './FileTypeRestrictedMessage';
 
 class FileTypeRestrictedMessagePage extends TestPage<FileTypeRestrictedMessageProps> {

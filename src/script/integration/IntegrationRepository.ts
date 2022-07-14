@@ -17,30 +17,31 @@
  *
  */
 
-import ko from 'knockout';
-import {amplify} from 'amplify';
-import {WebAppEvents} from '@wireapp/webapp-events';
 import type {ConversationMemberJoinEvent} from '@wireapp/api-client/src/event/';
+import {WebAppEvents} from '@wireapp/webapp-events';
+import {amplify} from 'amplify';
+import ko from 'knockout';
 import {container} from 'tsyringe';
 
 import {t} from 'Util/LocalizerUtil';
 import {Logger, getLogger} from 'Util/Logger';
 import {compareTransliteration, sortByPriority} from 'Util/StringUtil';
 
-import {ACCESS_STATE} from '../conversation/AccessState';
-import type {ConversationRepository} from '../conversation/ConversationRepository';
-import type {Conversation} from '../entity/Conversation';
-import type {User} from '../entity/User';
-import type {TeamRepository} from '../team/TeamRepository';
-import {ModalsViewModel} from '../view_model/ModalsViewModel';
 import {IntegrationMapper} from './IntegrationMapper';
 import type {IntegrationService} from './IntegrationService';
-import {ServiceEntity} from './ServiceEntity';
-import {ConversationError} from '../error/ConversationError';
 import {ProviderEntity} from './ProviderEntity';
-import {MemberLeaveEvent} from '../conversation/EventBuilder';
-import {TeamState} from '../team/TeamState';
+import {ServiceEntity} from './ServiceEntity';
+
+import {ACCESS_STATE} from '../conversation/AccessState';
+import type {ConversationRepository} from '../conversation/ConversationRepository';
 import {ConversationState} from '../conversation/ConversationState';
+import {MemberLeaveEvent} from '../conversation/EventBuilder';
+import type {Conversation} from '../entity/Conversation';
+import type {User} from '../entity/User';
+import {ConversationError} from '../error/ConversationError';
+import type {TeamRepository} from '../team/TeamRepository';
+import {TeamState} from '../team/TeamState';
+import {ModalsViewModel} from '../view_model/ModalsViewModel';
 
 export class IntegrationRepository {
   private readonly logger: Logger;

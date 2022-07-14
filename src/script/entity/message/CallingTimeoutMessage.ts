@@ -18,8 +18,10 @@
  */
 
 import {REASON as AVS_REASON} from '@wireapp/avs';
-import {SuperType} from '../../message/SuperType';
+
 import {Message} from './Message';
+
+import {SuperType} from '../../message/SuperType';
 
 export class CallingTimeoutMessage extends Message {
   constructor(public reason: AVS_REASON.NOONE_JOINED | AVS_REASON.EVERYONE_LEFT, time: number) {

@@ -20,17 +20,18 @@
 import React, {useEffect, useState} from 'react';
 
 import Icon from 'Components/Icon';
-import {t} from 'Util/LocalizerUtil';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
-import useEffectRef from 'Util/useEffectRef';
+import {t} from 'Util/LocalizerUtil';
 import {getLogger} from 'Util/Logger';
+import useEffectRef from 'Util/useEffectRef';
+
+import DeviceSelect from './DeviceSelect';
 
 import {Config} from '../../../../../Config';
-import PreferencesSection from '../components/PreferencesSection';
-import DeviceSelect from './DeviceSelect';
 import {DeviceTypes, MediaDevicesHandler} from '../../../../../media/MediaDevicesHandler';
 import {MediaStreamHandler} from '../../../../../media/MediaStreamHandler';
 import {MediaType} from '../../../../../media/MediaType';
+import PreferencesSection from '../components/PreferencesSection';
 
 const logger = getLogger('CameraPreferences');
 

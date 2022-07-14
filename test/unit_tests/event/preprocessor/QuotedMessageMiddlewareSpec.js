@@ -19,12 +19,12 @@
 
 import {Quote} from '@wireapp/protocol-messaging';
 
-import {arrayToBase64} from 'Util/util';
-
 import {ClientEvent} from 'src/script/event/Client';
 import {QuotedMessageMiddleware} from 'src/script/event/preprocessor/QuotedMessageMiddleware';
-import {QuoteEntity} from 'src/script/message/QuoteEntity';
 import {MessageHasher} from 'src/script/message/MessageHasher';
+import {QuoteEntity} from 'src/script/message/QuoteEntity';
+import {arrayToBase64} from 'Util/util';
+
 import {TestFactory} from '../../../helper/TestFactory';
 
 describe('QuotedMessageMiddleware', () => {

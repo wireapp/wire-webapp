@@ -18,9 +18,9 @@
  */
 
 import {skipWaiting, clientsClaim} from 'workbox-core';
+import {ExpirationPlugin} from 'workbox-expiration';
 import {registerRoute} from 'workbox-routing';
 import {CacheFirst} from 'workbox-strategies';
-import {ExpirationPlugin} from 'workbox-expiration';
 
 skipWaiting();
 clientsClaim();

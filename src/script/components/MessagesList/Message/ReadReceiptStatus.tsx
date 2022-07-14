@@ -18,12 +18,13 @@
  */
 
 import React, {useEffect, useState} from 'react';
-import Icon from 'Components/Icon';
 
+import cx from 'classnames';
+
+import Icon from 'Components/Icon';
+import {Message} from 'src/script/entity/message/Message';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
-import cx from 'classnames';
-import {Message} from 'src/script/entity/message/Message';
 import {formatDateNumeral, formatTimeShort} from 'Util/TimeUtil';
 
 export interface ReadReceiptStatusProps {

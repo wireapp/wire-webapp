@@ -17,14 +17,16 @@
  *
  */
 
-import {CloseIcon, Content, Footer, Header, Link, Small} from '@wireapp/react-ui-kit';
 import React from 'react';
+
+import {CloseIcon, Content, Footer, Header, Link, Small} from '@wireapp/react-ui-kit';
+import {SVGIcon} from '@wireapp/react-ui-kit/src/Icon/SVGIcon';
 import {FormattedMessage, useIntl} from 'react-intl';
+
+import {Config} from '../../Config';
 import {cookiePolicyStrings, footerStrings} from '../../strings';
 import {EXTERNAL_ROUTE} from '../externalRoute';
-import {SVGIcon} from '@wireapp/react-ui-kit/src/Icon/SVGIcon';
 import SVGProvider from '../util/SVGProvider';
-import {Config} from '../../Config';
 
 export interface Props extends React.HTMLAttributes<HTMLDivElement> {
   children: React.ReactNode;

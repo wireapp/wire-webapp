@@ -18,8 +18,10 @@
  */
 
 import ko from 'knockout';
-import TestPage from 'Util/test/TestPage';
+
 import {PingMessage as PingMessageEntity} from 'src/script/entity/message/PingMessage';
+import TestPage from 'Util/test/TestPage';
+
 import PingMessage, {PingMessageProps} from './PingMessage';
 
 class PingMessagePage extends TestPage<PingMessageProps> {

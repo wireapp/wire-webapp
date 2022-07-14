@@ -18,6 +18,7 @@
  */
 
 import {act, render} from '@testing-library/react';
+
 import Duration from './Duration';
 
 describe('Duration', () => {

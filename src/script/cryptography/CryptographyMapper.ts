@@ -51,13 +51,12 @@ import {base64ToArray, arrayToBase64, createRandomUuid} from 'Util/util';
 
 import {decryptAesAsset} from '../assets/AssetCrypto';
 import {AssetTransferState} from '../assets/AssetTransferState';
-
+import {ConversationEphemeralHandler} from '../conversation/ConversationEphemeralHandler';
+import {GENERIC_MESSAGE_TYPE} from '../cryptography/GenericMessageType';
+import {PROTO_MESSAGE_TYPE} from '../cryptography/ProtoMessageType';
+import {CryptographyError} from '../error/CryptographyError';
 import {ClientEvent, CONVERSATION} from '../event/Client';
 import {StatusType} from '../message/StatusType';
-import {PROTO_MESSAGE_TYPE} from '../cryptography/ProtoMessageType';
-import {GENERIC_MESSAGE_TYPE} from '../cryptography/GenericMessageType';
-import {ConversationEphemeralHandler} from '../conversation/ConversationEphemeralHandler';
-import {CryptographyError} from '../error/CryptographyError';
 import {EventRecord} from '../storage';
 
 export interface MappedText {

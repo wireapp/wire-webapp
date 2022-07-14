@@ -17,8 +17,9 @@
  *
  */
 
-import TestPage from 'Util/test/TestPage';
 import {LegalHoldMessage as LegalHoldMessageEntity} from 'src/script/entity/message/LegalHoldMessage';
+import TestPage from 'Util/test/TestPage';
+
 import LegalHoldMessage, {LegalHoldMessageProps} from './LegalHoldMessage';
 
 class LegalHoldMessagePage extends TestPage<LegalHoldMessageProps> {

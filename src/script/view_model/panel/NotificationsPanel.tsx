@@ -18,17 +18,19 @@
  */
 
 import React, {useState} from 'react';
+
 import {container} from 'tsyringe';
 
+import {registerReactComponent, useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 import useEffectRef from 'Util/useEffectRef';
-import {registerReactComponent, useKoSubscribableChildren} from 'Util/ComponentUtil';
 
-import {useFadingScrollbar} from '../../ui/fadingScrollbar';
-import {NOTIFICATION_STATE, getNotificationText} from '../../conversation/NotificationSetting';
-import {ViewModelRepositories} from '../MainViewModel';
 import PanelHeader from './PanelHeader';
+
 import {ConversationState} from '../../conversation/ConversationState';
+import {NOTIFICATION_STATE, getNotificationText} from '../../conversation/NotificationSetting';
+import {useFadingScrollbar} from '../../ui/fadingScrollbar';
+import {ViewModelRepositories} from '../MainViewModel';
 
 export interface NotificationsPanelProps {
   conversationState?: ConversationState;

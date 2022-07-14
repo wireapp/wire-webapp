@@ -17,9 +17,10 @@
  *
  */
 
+import React from 'react';
+
 import Avatar, {AVATAR_SIZE} from 'Components/Avatar';
 import ClassifiedBar from 'Components/input/ClassifiedBar';
-import React from 'react';
 import {User} from 'src/script/entity/User';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';

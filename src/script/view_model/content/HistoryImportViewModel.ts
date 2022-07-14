@@ -21,18 +21,18 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 import {amplify} from 'amplify';
 import ko from 'knockout';
 
-import {getLogger, Logger} from 'Util/Logger';
 import {t} from 'Util/LocalizerUtil';
+import {getLogger, Logger} from 'Util/Logger';
 import {loadFileBuffer} from 'Util/util';
 import {WebWorker} from 'Util/worker';
 import 'Components/LoadingBar';
 
+import {BackupRepository} from '../../backup/BackupRepository';
+import {CancelError, DifferentAccountError, ImportError, IncompatibleBackupError} from '../../backup/Error';
 import {Config} from '../../Config';
 import {MotionDuration} from '../../motion/MotionDuration';
-import {ContentViewModel} from '../ContentViewModel';
-import {CancelError, DifferentAccountError, ImportError, IncompatibleBackupError} from '../../backup/Error';
-import {BackupRepository} from '../../backup/BackupRepository';
 import {formatDuration} from '../../util/TimeUtil';
+import {ContentViewModel} from '../ContentViewModel';
 
 export class HistoryImportViewModel {
   private readonly error: ko.Observable<Error>;

@@ -17,14 +17,17 @@
  *
  */
 
+import React from 'react';
+
 import {WebAppEvents} from '@wireapp/webapp-events';
 import {amplify} from 'amplify';
-import React from 'react';
+
+import {handleKeyDown} from 'Util/KeyboardUtil';
+import {t} from 'Util/LocalizerUtil';
+
 import {HistoryExportViewModel} from '../../../../../view_model/content/HistoryExportViewModel';
 import {ContentViewModel} from '../../../../../view_model/ContentViewModel';
-import {t} from 'Util/LocalizerUtil';
 import PreferencesSection from '../components/PreferencesSection';
-import {handleKeyDown} from 'Util/KeyboardUtil';
 
 interface HistoryBackupSectionProps {
   brandName: string;

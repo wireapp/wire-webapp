@@ -19,13 +19,15 @@
 
 import {ConnectionStatus} from '@wireapp/api-client/src/connection/';
 import {WebAppEvents} from '@wireapp/webapp-events';
-import {createRandomUuid} from 'Util/util';
-import {Conversation} from 'src/script/entity/Conversation';
-import {User} from 'src/script/entity/User';
+
 import {ConnectionEntity} from 'src/script/connection/ConnectionEntity';
-import {TestFactory} from '../../helper/TestFactory';
 import {ConnectionRepository} from 'src/script/connection/ConnectionRepository';
 import {ConnectionState} from 'src/script/connection/ConnectionState';
+import {Conversation} from 'src/script/entity/Conversation';
+import {User} from 'src/script/entity/User';
+import {createRandomUuid} from 'Util/util';
+
+import {TestFactory} from '../../helper/TestFactory';
 
 describe('ConnectionRepository', () => {
   let server = undefined;

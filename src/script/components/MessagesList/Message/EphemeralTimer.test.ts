@@ -18,8 +18,10 @@
  */
 
 import TestPage from 'Util/test/TestPage';
-import {Message} from '../../../entity/message/Message';
+
 import EphemeralTimer, {EphemeralTimerProps} from './EphemeralTimer';
+
+import {Message} from '../../../entity/message/Message';
 
 class EphemeralTimerPage extends TestPage<EphemeralTimerProps> {
   constructor(props?: EphemeralTimerProps) {

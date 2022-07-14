@@ -17,17 +17,19 @@
  *
  */
 
+import {TypeUtil} from '@wireapp/commons';
 import {ReactWrapper} from 'enzyme';
+import {History} from 'history';
+import {AnyAction} from 'redux';
+import {MockStoreEnhanced} from 'redux-mock-store';
+import {ThunkDispatch} from 'redux-thunk';
+
+import CustomEnvironmentRedirect from './CustomEnvironmentRedirect';
+
 import {actionRoot} from '../module/action';
 import {initialRootState, RootState, Api} from '../module/reducer';
 import {mockStoreFactory} from '../util/test/mockStoreFactory';
 import {mountComponent} from '../util/test/TestUtil';
-import {TypeUtil} from '@wireapp/commons';
-import {MockStoreEnhanced} from 'redux-mock-store';
-import {ThunkDispatch} from 'redux-thunk';
-import {AnyAction} from 'redux';
-import {History} from 'history';
-import CustomEnvironmentRedirect from './CustomEnvironmentRedirect';
 
 jest.mock('../util/SVGProvider');
 

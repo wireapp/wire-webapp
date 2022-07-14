@@ -18,9 +18,11 @@
  */
 
 import ko from 'knockout';
+
+import {Message} from './Message';
+
 import {SuperType} from '../../message/SuperType';
 import {SystemMessageType} from '../../message/SystemMessageType';
-import {Message} from './Message';
 
 export class SystemMessage extends Message {
   public caption: ko.PureComputed<string>;

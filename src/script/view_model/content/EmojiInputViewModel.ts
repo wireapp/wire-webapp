@@ -17,19 +17,21 @@
  *
  */
 
-import {WebAppEvents} from '@wireapp/webapp-events';
 import type {WebappProperties} from '@wireapp/api-client/src/user/data/';
+import {WebAppEvents} from '@wireapp/webapp-events';
 import {amplify} from 'amplify';
 import ko from 'knockout';
-import {loadValue, storeValue} from 'Util/StorageUtil';
-import {getCursorPixelPosition} from 'Util/PopupUtil';
+
+import {PropertiesRepository} from 'src/script/properties/PropertiesRepository';
 import {KEY, isKey, isEnterKey} from 'Util/KeyboardUtil';
+import {getCursorPixelPosition} from 'Util/PopupUtil';
+import {loadValue, storeValue} from 'Util/StorageUtil';
 import {sortByPriority} from 'Util/StringUtil';
 
 import emojiBindings from './emoji.json';
+
 import {PROPERTIES_TYPE} from '../../properties/PropertiesType';
 import {StorageKey} from '../../storage/StorageKey';
-import {PropertiesRepository} from 'src/script/properties/PropertiesRepository';
 
 export interface EmojiData {
   aliases: string[];

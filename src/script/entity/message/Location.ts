@@ -17,8 +17,9 @@
  *
  */
 
-import {AssetType} from '../../assets/AssetType';
 import {Asset} from './Asset';
+
+import {AssetType} from '../../assets/AssetType';
 
 export class Location extends Asset {
   public latitude: string;

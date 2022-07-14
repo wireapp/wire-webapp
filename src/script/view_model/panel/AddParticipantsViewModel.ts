@@ -20,25 +20,25 @@
 import ko from 'knockout';
 import {container} from 'tsyringe';
 
-import {Logger, getLogger} from 'Util/Logger';
 import {t} from 'Util/LocalizerUtil';
+import {Logger, getLogger} from 'Util/Logger';
+import {matchQualifiedIds} from 'Util/QualifiedId';
 import {safeWindowOpen} from 'Util/SanitizationUtil';
 import {sortUsersByPriority} from 'Util/StringUtil';
 
 import {BasePanelViewModel, PanelViewModelProps} from './BasePanelViewModel';
-import {getManageServicesUrl} from '../../externalRoute';
-import {MotionDuration} from '../../motion/MotionDuration';
 
 import type {ConversationRepository} from '../../conversation/ConversationRepository';
-import type {IntegrationRepository} from '../../integration/IntegrationRepository';
-import type {SearchRepository} from '../../search/SearchRepository';
-import type {ServiceEntity} from '../../integration/ServiceEntity';
 import type {User} from '../../entity/User';
-import {PanelViewModel} from '../PanelViewModel';
-import {UserState} from '../../user/UserState';
-import {TeamState} from '../../team/TeamState';
+import {getManageServicesUrl} from '../../externalRoute';
+import type {IntegrationRepository} from '../../integration/IntegrationRepository';
+import type {ServiceEntity} from '../../integration/ServiceEntity';
+import {MotionDuration} from '../../motion/MotionDuration';
+import type {SearchRepository} from '../../search/SearchRepository';
 import {TeamRepository} from '../../team/TeamRepository';
-import {matchQualifiedIds} from 'Util/QualifiedId';
+import {TeamState} from '../../team/TeamState';
+import {UserState} from '../../user/UserState';
+import {PanelViewModel} from '../PanelViewModel';
 
 export class AddParticipantsViewModel extends BasePanelViewModel {
   private readonly userState: UserState;

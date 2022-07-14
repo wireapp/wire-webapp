@@ -19,23 +19,25 @@
 
 import {WebAppEvents} from '@wireapp/webapp-events';
 import {amplify} from 'amplify';
-import {t} from 'Util/LocalizerUtil';
 import {container} from 'tsyringe';
 
-import {ModalsViewModel} from './ModalsViewModel';
-import {NOTIFICATION_STATE} from '../conversation/NotificationSetting';
-import {BackendClientError} from '../error/BackendClientError';
+import {t} from 'Util/LocalizerUtil';
+
 import type {MainViewModel} from './MainViewModel';
+import {ModalsViewModel} from './ModalsViewModel';
+
+import type {ClientEntity} from '../client/ClientEntity';
 import type {ClientRepository} from '../client/ClientRepository';
 import type {ConnectionRepository} from '../connection/ConnectionRepository';
 import type {ConversationRepository} from '../conversation/ConversationRepository';
-import type {IntegrationRepository} from '../integration/IntegrationRepository';
-import type {User} from '../entity/User';
-import type {Conversation} from '../entity/Conversation';
-import type {ClientEntity} from '../client/ClientEntity';
-import type {Message} from '../entity/message/Message';
-import type {ServiceEntity} from '../integration/ServiceEntity';
 import type {MessageRepository} from '../conversation/MessageRepository';
+import {NOTIFICATION_STATE} from '../conversation/NotificationSetting';
+import type {Conversation} from '../entity/Conversation';
+import type {Message} from '../entity/message/Message';
+import type {User} from '../entity/User';
+import {BackendClientError} from '../error/BackendClientError';
+import type {IntegrationRepository} from '../integration/IntegrationRepository';
+import type {ServiceEntity} from '../integration/ServiceEntity';
 import {UserState} from '../user/UserState';
 
 export class ActionsViewModel {

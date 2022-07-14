@@ -17,47 +17,51 @@
  *
  */
 
-import {amplify} from 'amplify';
 import {Availability} from '@wireapp/protocol-messaging';
-import {container} from 'tsyringe';
-import {escape} from 'underscore';
 import {WebAppEvents} from '@wireapp/webapp-events';
-import ko from 'knockout';
+import {amplify} from 'amplify';
 
-import {afterRender, formatBytes} from 'Util/util';
-import {allowsAllFiles, hasAllowedExtension, getFileExtensionOrName} from 'Util/FileTypeUtil';
 import {AVATAR_SIZE} from 'Components/Avatar';
 import 'Components/input/ClassifiedBar';
-import {KEY, isFunctionKey, insertAtCaret} from 'Util/KeyboardUtil';
-import {renderMessage} from 'Util/messageRenderer';
-import {t} from 'Util/LocalizerUtil';
-import {TIME_IN_MILLIS, formatLocale} from 'Util/TimeUtil';
 
-import {Asset} from '../../entity/message/Asset';
+import ko from 'knockout';
+import {container} from 'tsyringe';
+import {escape} from 'underscore';
+
+import {allowsAllFiles, hasAllowedExtension, getFileExtensionOrName} from 'Util/FileTypeUtil';
+import {KEY, isFunctionKey, insertAtCaret} from 'Util/KeyboardUtil';
+import {t} from 'Util/LocalizerUtil';
+import {renderMessage} from 'Util/messageRenderer';
+import {TIME_IN_MILLIS, formatLocale} from 'Util/TimeUtil';
+import {afterRender, formatBytes} from 'Util/util';
+
+import {EmojiInputViewModel} from './EmojiInputViewModel';
+
 import {AssetRepository} from '../../assets/AssetRepository';
 import {Config} from '../../Config';
-import {ContentMessage} from '../../entity/message/ContentMessage';
-import {Conversation} from '../../entity/Conversation';
-import {ConversationError} from '../../error/ConversationError';
 import {ConversationRepository} from '../../conversation/ConversationRepository';
 import {ConversationState} from '../../conversation/ConversationState';
-import {EmojiInputViewModel} from './EmojiInputViewModel';
-import {EventRepository} from '../../event/EventRepository';
+import {MessageRepository, OutgoingQuote} from '../../conversation/MessageRepository';
+import {Conversation} from '../../entity/Conversation';
+import {Asset} from '../../entity/message/Asset';
+import {ContentMessage} from '../../entity/message/ContentMessage';
 import {FileAsset} from '../../entity/message/FileAsset';
 import {MediumImage} from '../../entity/message/MediumImage';
-import {MentionEntity} from '../../message/MentionEntity';
-import {MessageHasher} from '../../message/MessageHasher';
-import {MessageRepository, OutgoingQuote} from '../../conversation/MessageRepository';
-import {ModalsViewModel} from '../ModalsViewModel';
-import {QuoteEntity} from '../../message/QuoteEntity';
-import {SearchRepository} from '../../search/SearchRepository';
-import {StorageKey} from '../../storage/StorageKey';
-import {StorageRepository} from '../../storage';
 import {Text} from '../../entity/message/Text';
 import {User} from '../../entity/User';
-import {UserState} from '../../user/UserState';
+import {ConversationError} from '../../error/ConversationError';
+import {EventRepository} from '../../event/EventRepository';
+import {MentionEntity} from '../../message/MentionEntity';
+import {MessageHasher} from '../../message/MessageHasher';
+import {QuoteEntity} from '../../message/QuoteEntity';
+import {SearchRepository} from '../../search/SearchRepository';
+import {StorageRepository} from '../../storage';
+import {StorageKey} from '../../storage/StorageKey';
 import {TeamState} from '../../team/TeamState';
+import {UserState} from '../../user/UserState';
+import {ModalsViewModel} from '../ModalsViewModel';
 import '../../page/message-list/MentionSuggestions';
+
 import {InputHTMLAttributes} from 'react';
 
 interface DraftMessage {

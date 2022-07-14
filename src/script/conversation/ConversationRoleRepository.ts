@@ -22,12 +22,13 @@ import {container} from 'tsyringe';
 
 import {Logger, getLogger} from 'Util/Logger';
 
+import type {ConversationService} from './ConversationService';
+
 import type {Conversation} from '../entity/Conversation';
 import type {User} from '../entity/User';
 import type {TeamRepository} from '../team/TeamRepository';
-import type {ConversationService} from './ConversationService';
-import {UserState} from '../user/UserState';
 import {TeamState} from '../team/TeamState';
+import {UserState} from '../user/UserState';
 
 export enum Permissions {
   addParticipants = 'add_conversation_member',

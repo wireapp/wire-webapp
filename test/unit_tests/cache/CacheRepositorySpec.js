@@ -18,10 +18,10 @@
  */
 
 import {amplify} from 'amplify';
-import {createRandomUuid} from 'Util/util';
 
-import {StorageKey} from 'src/script/storage/StorageKey';
 import {CacheRepository} from 'src/script/cache/CacheRepository';
+import {StorageKey} from 'src/script/storage/StorageKey';
+import {createRandomUuid} from 'Util/util';
 
 describe('CacheRepository', () => {
   const TEMP_KEY = 'should_be_deleted';

@@ -20,40 +20,38 @@
 import {amplify} from 'amplify';
 import jQuery from 'jquery';
 import ko from 'knockout';
-import type {t} from 'Util/LocalizerUtil';
 
-import type {AssetService} from '../assets/AssetService';
-import type {NotificationService} from '../event/NotificationService';
-
-import '../Config';
-
+import 'Components/avatar/GroupAvatar';
+import 'Components/calling/CallingOverlayContainer';
+import 'Components/calling/FullscreenVideoCall';
 import 'Components/CopyToClipboard';
-import 'Components/UserSearchableList';
-import 'Components/toggle/BaseToggle';
 import 'Components/icons';
 import 'Components/Image';
-import 'Components/toggle/InfoToggle';
-import 'Components/calling/FullscreenVideoCall';
-import 'Components/avatar/GroupAvatar';
 import 'Components/MessagesList';
 import 'Components/TitleBar';
 import 'Components/Modals/GroupCreation/GroupCreationModal';
+
 import '../page/AppLock';
+
 import 'Components/modal';
 import 'Components/panel/ServiceDetails';
 import 'Components/panel/UserDetails';
 import 'Components/ServiceList';
 import 'Components/SearchInput';
-import 'Components/calling/CallingOverlayContainer';
-
+import 'Components/toggle/BaseToggle';
+import 'Components/toggle/InfoToggle';
+import 'Components/UserSearchableList';
 import 'Util/LocalizerUtil';
+import type {t} from 'Util/LocalizerUtil';
 
+import type {AssetService} from '../assets/AssetService';
+import '../Config';
+import type {NotificationService} from '../event/NotificationService';
 import '../localization/Localizer';
 import '../view_model/bindings/CommonBindings';
 import '../view_model/bindings/ConversationListBindings';
 import '../view_model/bindings/MessageListBindings';
 import '../view_model/bindings/VideoCallingBindings';
-
 import '../view_model/MainViewModel';
 import '../view_model/PanelViewModel';
 

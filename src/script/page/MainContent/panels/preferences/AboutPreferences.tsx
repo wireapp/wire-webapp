@@ -18,15 +18,19 @@
  */
 
 import React, {useMemo} from 'react';
+
 import {container} from 'tsyringe';
+
 import {t} from 'Util/LocalizerUtil';
+
+import PreferencesLink from './components/PreferencesLink';
+import PreferencesPage from './components/PreferencesPage';
+import PreferencesSection from './components/PreferencesSection';
+
 import {Config} from '../../../../Config';
 import {getPrivacyPolicyUrl, getTermsOfUsePersonalUrl, getTermsOfUseTeamUrl, URL} from '../../../../externalRoute';
 import {UserState} from '../../../../user/UserState';
 import {useKoSubscribableChildren} from '../../../../util/ComponentUtil';
-import PreferencesLink from './components/PreferencesLink';
-import PreferencesPage from './components/PreferencesPage';
-import PreferencesSection from './components/PreferencesSection';
 
 interface AboutPreferencesProps {
   userState?: UserState;

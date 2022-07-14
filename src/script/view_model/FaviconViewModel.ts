@@ -18,8 +18,8 @@
  */
 
 import {WebAppEvents} from '@wireapp/webapp-events';
-import ko from 'knockout';
 import {amplify} from 'amplify';
+import ko from 'knockout';
 
 /**
  * The FaviconViewModel is responsible for updating the favicon according to unread messages.

@@ -17,18 +17,19 @@
  *
  */
 
-import {createRandomUuid} from 'Util/util';
+import type {QualifiedId} from '@wireapp/api-client/src/user/';
 
+import {DegradedMessageEventData, EventBuilder, GroupCreationEventData} from 'src/script/conversation/EventBuilder';
 import {EventMapper} from 'src/script/conversation/EventMapper';
 import {Conversation} from 'src/script/entity/Conversation';
 import {User} from 'src/script/entity/User';
 import {ClientEvent} from 'src/script/event/Client';
-import {DegradedMessageEventData, EventBuilder, GroupCreationEventData} from 'src/script/conversation/EventBuilder';
-import type {QualifiedId} from '@wireapp/api-client/src/user/';
-import {VerificationMessageType} from 'src/script/message/VerificationMessageType';
 import {SuperType} from 'src/script/message/SuperType';
-import {EventRecord} from '../storage';
+import {VerificationMessageType} from 'src/script/message/VerificationMessageType';
+import {createRandomUuid} from 'Util/util';
+
 import {VerificationMessage} from '../entity/message/VerificationMessage';
+import {EventRecord} from '../storage';
 
 describe('EventBuilder', () => {
   let event_mapper: EventMapper = undefined;

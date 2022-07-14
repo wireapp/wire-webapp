@@ -21,11 +21,11 @@ import React from 'react';
 
 import Avatar, {AVATAR_SIZE} from 'Components/Avatar';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
-import {formatDateShort} from 'Util/TimeUtil';
 import {handleKeyDown} from 'Util/KeyboardUtil';
+import {formatDateShort} from 'Util/TimeUtil';
 
-import type {Text} from '../../../../../entity/message/Text';
 import type {ContentMessage} from '../../../../../entity/message/ContentMessage';
+import type {Text} from '../../../../../entity/message/Text';
 
 interface FullSearchItemProps {
   formatText: (text: string) => {matches: number; parts: string[]};

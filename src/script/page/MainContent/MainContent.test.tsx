@@ -17,10 +17,12 @@
  *
  */
 
-import ko from 'knockout';
 import {act, render, waitFor} from '@testing-library/react';
-import MainContent from './MainContent';
+import ko from 'knockout';
+
 import {ContentViewModel, ContentState} from 'src/script/view_model/ContentViewModel';
+
+import MainContent from './MainContent';
 
 jest.mock(
   './panels/preferences/AccountPreferences',

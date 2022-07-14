@@ -18,20 +18,21 @@
  */
 
 import {PasswordExistsError} from '@wireapp/api-client/src/auth';
+import {TypeUtil} from '@wireapp/commons';
 import {ReactWrapper} from 'enzyme';
-import {createMemoryHistory} from 'history';
+import {createMemoryHistory, History} from 'history';
+import {AnyAction} from 'redux';
+import {MockStoreEnhanced} from 'redux-mock-store';
+import {ThunkDispatch} from 'redux-thunk';
 import waitForExpect from 'wait-for-expect';
+
+import PhoneLogin from './PhoneLogin';
+
 import {actionRoot} from '../module/action';
 import {initialRootState, RootState, Api} from '../module/reducer';
 import {ROUTE} from '../route';
 import {mockStoreFactory} from '../util/test/mockStoreFactory';
 import {mountComponent} from '../util/test/TestUtil';
-import PhoneLogin from './PhoneLogin';
-import {MockStoreEnhanced} from 'redux-mock-store';
-import {TypeUtil} from '@wireapp/commons';
-import {ThunkDispatch} from 'redux-thunk';
-import {AnyAction} from 'redux';
-import {History} from 'history';
 
 jest.mock('../util/SVGProvider');
 

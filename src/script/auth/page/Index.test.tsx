@@ -19,19 +19,20 @@
 
 import {TypeUtil} from '@wireapp/commons';
 import {ReactWrapper} from 'enzyme';
+import {History, createMemoryHistory} from 'history';
+import {AnyAction} from 'redux';
+import {MockStoreEnhanced} from 'redux-mock-store';
+import {ThunkDispatch} from 'redux-thunk';
+import waitForExpect from 'wait-for-expect';
+
+import Index from './Index';
+
 import {Config, Configuration} from '../../Config';
 import {initialRootState, RootState, Api} from '../module/reducer';
+import {initialAuthState} from '../module/reducer/authReducer';
+import {ROUTE} from '../route';
 import {mockStoreFactory} from '../util/test/mockStoreFactory';
 import {mountComponent} from '../util/test/TestUtil';
-import Index from './Index';
-import {MockStoreEnhanced} from 'redux-mock-store';
-import {AnyAction} from 'redux';
-import {ThunkDispatch} from 'redux-thunk';
-import {History} from 'history';
-import {createMemoryHistory} from 'history';
-import waitForExpect from 'wait-for-expect';
-import {ROUTE} from '../route';
-import {initialAuthState} from '../module/reducer/authReducer';
 
 jest.mock('../util/SVGProvider');
 

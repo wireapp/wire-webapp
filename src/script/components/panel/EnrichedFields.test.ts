@@ -20,10 +20,12 @@
 import {waitFor} from '@testing-library/react';
 import type {RichInfo} from '@wireapp/api-client/src/user/';
 import {act} from 'react-dom/test-utils';
+
 import {User} from 'src/script/entity/User';
 import {RichProfileRepository} from 'src/script/user/RichProfileRepository';
 import TestPage from 'Util/test/TestPage';
 import {createRandomUuid} from 'Util/util';
+
 import EnrichedFields, {EnrichedFieldsProps} from './EnrichedFields';
 
 class EnrichedFieldsPage extends TestPage<EnrichedFieldsProps> {

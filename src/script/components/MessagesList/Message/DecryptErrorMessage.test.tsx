@@ -18,10 +18,12 @@
  */
 
 import ko from 'knockout';
-import TestPage from 'Util/test/TestPage';
-import {DecryptErrorMessage as DecryptErrorMessageEntity} from 'src/script/entity/message/DecryptErrorMessage';
-import DecryptErrorMessage, {DecryptErrorMessageProps} from './DecryptErrorMessage';
 import {act} from 'react-dom/test-utils';
+
+import {DecryptErrorMessage as DecryptErrorMessageEntity} from 'src/script/entity/message/DecryptErrorMessage';
+import TestPage from 'Util/test/TestPage';
+
+import DecryptErrorMessage, {DecryptErrorMessageProps} from './DecryptErrorMessage';
 
 class DecryptErrorMessagePage extends TestPage<DecryptErrorMessageProps> {
   constructor(props?: DecryptErrorMessageProps) {

@@ -18,6 +18,7 @@
  */
 
 import React from 'react';
+
 import {registerReactComponent} from 'Util/ComponentUtil';
 
 export interface LoadingBarProps {

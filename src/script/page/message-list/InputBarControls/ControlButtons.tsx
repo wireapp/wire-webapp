@@ -17,12 +17,14 @@
  *
  */
 
-import Icon from 'Components/Icon';
 import React, {useRef} from 'react';
-import MessageTimerButton from '../MessageTimerButton';
-import {t} from 'Util/LocalizerUtil';
+
+import Icon from 'Components/Icon';
 import {Conversation} from 'src/script/entity/Conversation';
+import {t} from 'Util/LocalizerUtil';
+
 import {Config} from '../../../Config';
+import MessageTimerButton from '../MessageTimerButton';
 
 export type ControlButtonsProps = {
   input: string;

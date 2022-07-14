@@ -17,27 +17,28 @@
  *
  */
 
-import ko from 'knockout';
-import {amplify} from 'amplify';
 import {WebAppEvents} from '@wireapp/webapp-events';
+import {amplify} from 'amplify';
+import ko from 'knockout';
 import {container} from 'tsyringe';
 
-import {Logger, getLogger} from 'Util/Logger';
 import {copyText} from 'Util/ClipboardUtil';
 import {t} from 'Util/LocalizerUtil';
+import {Logger, getLogger} from 'Util/Logger';
+
+import {BasePanelViewModel, PanelViewModelProps} from './BasePanelViewModel';
 
 import {Config} from '../../Config';
-import {BasePanelViewModel, PanelViewModelProps} from './BasePanelViewModel';
-import {ModalsViewModel} from '../ModalsViewModel';
 import {ACCESS_STATE} from '../../conversation/AccessState';
-import type {ConversationStateHandler} from '../../conversation/ConversationStateHandler';
-import type {Conversation} from '../../entity/Conversation';
-import {TeamState} from '../../team/TeamState';
 import {
   ACCESS_TYPES,
   teamPermissionsForAccessState,
   toggleFeature,
 } from '../../conversation/ConversationAccessPermission';
+import type {ConversationStateHandler} from '../../conversation/ConversationStateHandler';
+import type {Conversation} from '../../entity/Conversation';
+import {TeamState} from '../../team/TeamState';
+import {ModalsViewModel} from '../ModalsViewModel';
 
 export class GuestsAndServicesViewModel extends BasePanelViewModel {
   private readonly teamState: TeamState;

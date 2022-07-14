@@ -18,6 +18,7 @@
  */
 
 import {ContentMessage} from 'src/script/entity/message/ContentMessage';
+
 import {MessageCategory} from '../../../../message/MessageCategory';
 
 export type Category = 'images' | 'links' | 'files' | 'audio';

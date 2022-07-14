@@ -17,9 +17,11 @@
  *
  */
 
-const commonConfig = require('./webpack.config.common');
-const path = require('path');
 const webpack = require('webpack');
+
+const path = require('path');
+
+const commonConfig = require('./webpack.config.common');
 
 const srcScript = 'src/script/';
 

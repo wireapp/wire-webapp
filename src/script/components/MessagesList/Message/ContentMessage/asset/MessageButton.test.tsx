@@ -18,8 +18,10 @@
  */
 
 import ko from 'knockout';
+
 import {CompositeMessage} from 'src/script/entity/message/CompositeMessage';
 import TestPage from 'Util/test/TestPage';
+
 import MessageButton, {MessageButtonProps} from './MessageButton';
 
 class MessageButtonPage extends TestPage<MessageButtonProps> {

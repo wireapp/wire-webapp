@@ -17,27 +17,28 @@
  *
  */
 
-import ko from 'knockout';
-import {Article, LinkPreview} from '@wireapp/protocol-messaging';
 import {CONVERSATION_EVENT, ConversationMessageTimerUpdateEvent} from '@wireapp/api-client/src/event/';
+import {Article, LinkPreview} from '@wireapp/protocol-messaging';
+import ko from 'knockout';
 
 import {Logger, getLogger} from 'Util/Logger';
-import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 import {clamp} from 'Util/NumberUtil';
-import {arrayToBase64, noop} from 'Util/util';
 import {obfuscate} from 'Util/StringUtil';
+import {TIME_IN_MILLIS} from 'Util/TimeUtil';
+import {arrayToBase64, noop} from 'Util/util';
 
+import {AbstractConversationEventHandler} from './AbstractConversationEventHandler';
+import {ConversationMapper} from './ConversationMapper';
+
+import type {Conversation} from '../entity/Conversation';
+import type {ContentMessage} from '../entity/message/ContentMessage';
+import {MediumImage} from '../entity/message/MediumImage';
+import type {Message} from '../entity/message/Message';
+import {Text} from '../entity/message/Text';
+import type {EventService} from '../event/EventService';
 import {EphemeralStatusType} from '../message/EphemeralStatusType';
 import {StatusType} from '../message/StatusType';
-import {Text} from '../entity/message/Text';
-import {AbstractConversationEventHandler} from './AbstractConversationEventHandler';
-import type {EventService} from '../event/EventService';
-import {ConversationMapper} from './ConversationMapper';
-import type {Message} from '../entity/message/Message';
-import type {ContentMessage} from '../entity/message/ContentMessage';
-import type {Conversation} from '../entity/Conversation';
 import type {EventRecord} from '../storage';
-import {MediumImage} from '../entity/message/MediumImage';
 
 export class ConversationEphemeralHandler extends AbstractConversationEventHandler {
   eventListeners: Record<string, (...args: any[]) => void>;

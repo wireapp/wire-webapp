@@ -17,30 +17,30 @@
  *
  */
 
-import ko from 'knockout';
-import {amplify} from 'amplify';
 import {DefaultConversationRoleName as DefaultRole} from '@wireapp/api-client/src/conversation/';
 import {WebAppEvents} from '@wireapp/webapp-events';
+import {amplify} from 'amplify';
+import ko from 'knockout';
 import {container} from 'tsyringe';
 
-import {Logger, getLogger} from 'Util/Logger';
-
 import {Actions} from 'Components/panel/UserActions';
+import {Logger, getLogger} from 'Util/Logger';
 import 'Components/panel/EnrichedFields';
 import 'Components/panel/UserDetails';
 
-import type {ConversationRoleRepository} from '../../conversation/ConversationRoleRepository';
 import {BasePanelViewModel, PanelViewModelProps} from './BasePanelViewModel';
-import type {ActionsViewModel} from '../ActionsViewModel';
-import type {TeamRepository} from '../../team/TeamRepository';
+
 import type {ConversationRepository} from '../../conversation/ConversationRepository';
-import type {User} from '../../entity/User';
-import {PanelViewModel} from '../PanelViewModel';
-import type {PanelParams} from '../PanelViewModel';
-import {ClientEvent} from '../../event/Client';
+import type {ConversationRoleRepository} from '../../conversation/ConversationRoleRepository';
 import type {MemberLeaveEvent} from '../../conversation/EventBuilder';
-import {UserState} from '../../user/UserState';
+import type {User} from '../../entity/User';
+import {ClientEvent} from '../../event/Client';
+import type {TeamRepository} from '../../team/TeamRepository';
 import {TeamState} from '../../team/TeamState';
+import {UserState} from '../../user/UserState';
+import type {ActionsViewModel} from '../ActionsViewModel';
+import type {PanelParams} from '../PanelViewModel';
+import {PanelViewModel} from '../PanelViewModel';
 
 export class GroupParticipantUserViewModel extends BasePanelViewModel {
   private readonly userState: UserState;

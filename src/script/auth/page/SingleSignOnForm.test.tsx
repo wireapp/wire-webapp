@@ -17,22 +17,23 @@
  *
  */
 
+import {TypeUtil} from '@wireapp/commons';
 import {ReactWrapper} from 'enzyme';
-import {createMemoryHistory} from 'history';
+import {createMemoryHistory, History} from 'history';
+import {AnyAction} from 'redux';
+import {MockStoreEnhanced} from 'redux-mock-store';
+import {ThunkDispatch} from 'redux-thunk';
 import waitForExpect from 'wait-for-expect';
+
+import SingleSignOnForm, {SingleSignOnFormProps} from './SingleSignOnForm';
+
+import {Config, Configuration} from '../../Config';
 import {actionRoot} from '../module/action';
+import {ValidationError} from '../module/action/ValidationError';
 import {initialRootState, RootState, Api} from '../module/reducer';
 import {ROUTE, QUERY_KEY} from '../route';
 import {mockStoreFactory} from '../util/test/mockStoreFactory';
 import {mountComponent} from '../util/test/TestUtil';
-import SingleSignOnForm, {SingleSignOnFormProps} from './SingleSignOnForm';
-import {ValidationError} from '../module/action/ValidationError';
-import {TypeUtil} from '@wireapp/commons';
-import {Config, Configuration} from '../../Config';
-import {MockStoreEnhanced} from 'redux-mock-store';
-import {ThunkDispatch} from 'redux-thunk';
-import {AnyAction} from 'redux';
-import {History} from 'history';
 
 class SingleSignOnFormPage {
   private readonly driver: ReactWrapper;

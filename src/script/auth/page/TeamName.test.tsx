@@ -17,18 +17,20 @@
  *
  */
 
+import {TypeUtil} from '@wireapp/commons';
 import {ReactWrapper} from 'enzyme';
+import {History} from 'history';
+import {AnyAction} from 'redux';
+import {MockStoreEnhanced} from 'redux-mock-store';
+import {ThunkDispatch} from 'redux-thunk';
+
+import TeamName from './TeamName';
+
+import {ValidationError} from '../module/action/ValidationError';
 import {initialRootState, RootState, Api} from '../module/reducer';
+import {initialAuthState} from '../module/reducer/authReducer';
 import {mockStoreFactory} from '../util/test/mockStoreFactory';
 import {mountComponent} from '../util/test/TestUtil';
-import TeamName from './TeamName';
-import {MockStoreEnhanced} from 'redux-mock-store';
-import {TypeUtil} from '@wireapp/commons';
-import {ThunkDispatch} from 'redux-thunk';
-import {AnyAction} from 'redux';
-import {History} from 'history';
-import {initialAuthState} from '../module/reducer/authReducer';
-import {ValidationError} from '../module/action/ValidationError';
 
 jest.mock('../util/SVGProvider');
 

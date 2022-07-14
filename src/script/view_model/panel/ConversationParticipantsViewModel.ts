@@ -21,6 +21,8 @@ import ko from 'knockout';
 
 import {sortUsersByPriority} from 'Util/StringUtil';
 
+import {BasePanelViewModel, PanelViewModelProps} from './BasePanelViewModel';
+
 import type {ConversationRepository} from '../../conversation/ConversationRepository';
 import type {User} from '../../entity/User';
 import {MotionDuration} from '../../motion/MotionDuration';
@@ -28,7 +30,6 @@ import type {SearchRepository} from '../../search/SearchRepository';
 import type {TeamRepository} from '../../team/TeamRepository';
 import {PanelViewModel} from '../PanelViewModel';
 import type {PanelParams} from '../PanelViewModel';
-import {BasePanelViewModel, PanelViewModelProps} from './BasePanelViewModel';
 
 export class ConversationParticipantsViewModel extends BasePanelViewModel {
   searchRepository: SearchRepository;

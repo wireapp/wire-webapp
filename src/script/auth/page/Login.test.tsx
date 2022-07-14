@@ -17,23 +17,24 @@
  *
  */
 
-import {ReactWrapper} from 'enzyme';
-import {initialRootState, RootState, Api} from '../module/reducer';
-import {mockStoreFactory} from '../util/test/mockStoreFactory';
-import {mountComponent} from '../util/test/TestUtil';
-import Login from './Login';
-import {Config, Configuration} from '../../Config';
+import {ClientType} from '@wireapp/api-client/src/client';
 import {TypeUtil} from '@wireapp/commons';
+import {ReactWrapper} from 'enzyme';
+import {History, createMemoryHistory} from 'history';
+import {AnyAction} from 'redux';
 import {MockStoreEnhanced} from 'redux-mock-store';
 import {ThunkDispatch} from 'redux-thunk';
-import {AnyAction} from 'redux';
-import {History} from 'history';
-import {actionRoot} from '../module/action';
 import waitForExpect from 'wait-for-expect';
-import {createMemoryHistory} from 'history';
-import {ROUTE} from '../route';
-import {ClientType} from '@wireapp/api-client/src/client';
+
+import Login from './Login';
+
+import {Config, Configuration} from '../../Config';
+import {actionRoot} from '../module/action';
 import {BackendError} from '../module/action/BackendError';
+import {initialRootState, RootState, Api} from '../module/reducer';
+import {ROUTE} from '../route';
+import {mockStoreFactory} from '../util/test/mockStoreFactory';
+import {mountComponent} from '../util/test/TestUtil';
 
 jest.mock('../util/SVGProvider');
 

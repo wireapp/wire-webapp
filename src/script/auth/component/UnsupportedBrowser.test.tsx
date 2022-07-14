@@ -17,18 +17,19 @@
  *
  */
 
+import {TypeUtil, Runtime} from '@wireapp/commons';
 import {ReactWrapper} from 'enzyme';
+import {History} from 'history';
+import {AnyAction} from 'redux';
+import {MockStoreEnhanced} from 'redux-mock-store';
+import {ThunkDispatch} from 'redux-thunk';
+
+import UnsupportedBrowser, {UnsupportedBrowserProps} from './UnsupportedBrowser';
+
+import {Config, Configuration} from '../../Config';
 import {initialRootState, RootState, Api} from '../module/reducer';
 import {mockStoreFactory} from '../util/test/mockStoreFactory';
 import {mountComponent} from '../util/test/TestUtil';
-import UnsupportedBrowser, {UnsupportedBrowserProps} from './UnsupportedBrowser';
-import {TypeUtil} from '@wireapp/commons';
-import {MockStoreEnhanced} from 'redux-mock-store';
-import {ThunkDispatch} from 'redux-thunk';
-import {AnyAction} from 'redux';
-import {History} from 'history';
-import {Config, Configuration} from '../../Config';
-import {Runtime} from '@wireapp/commons';
 
 jest.mock('../util/SVGProvider');
 

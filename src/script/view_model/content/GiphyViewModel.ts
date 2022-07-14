@@ -17,14 +17,15 @@
  *
  */
 
-import {getLogger, Logger} from 'Util/Logger';
+import {WebAppEvents} from '@wireapp/webapp-events';
 import {amplify} from 'amplify';
 import ko from 'knockout';
-import {WebAppEvents} from '@wireapp/webapp-events';
 
-import {Modal} from '../../ui/Modal';
-import {GiphyRepository, Gif} from '../../extension/GiphyRepository';
 import {t} from 'Util/LocalizerUtil';
+import {getLogger, Logger} from 'Util/Logger';
+
+import {GiphyRepository, Gif} from '../../extension/GiphyRepository';
+import {Modal} from '../../ui/Modal';
 
 enum GiphyState {
   DEFAULT = '',

@@ -19,14 +19,16 @@
 
 import {render} from '@testing-library/react';
 
-import CollectionDetails from './CollectionDetails';
-import {ContentMessage} from 'src/script/entity/message/ContentMessage';
 import {Conversation} from 'src/script/entity/Conversation';
-import {createRandomUuid} from 'Util/util';
-import {MediumImage} from 'src/script/entity/message/MediumImage';
+import {ContentMessage} from 'src/script/entity/message/ContentMessage';
 import {FileAsset} from 'src/script/entity/message/FileAsset';
-import {MessageCategory} from 'src/script/message/MessageCategory';
 import {LinkPreview} from 'src/script/entity/message/LinkPreview';
+import {MediumImage} from 'src/script/entity/message/MediumImage';
+import {MessageCategory} from 'src/script/message/MessageCategory';
+import {createRandomUuid} from 'Util/util';
+
+import CollectionDetails from './CollectionDetails';
+
 import {Text} from '../../../../entity/message/Text';
 
 jest.mock(

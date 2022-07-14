@@ -18,10 +18,12 @@
  */
 
 import {Dexie, Table, Transaction} from 'dexie';
-import {StorageSchemata} from './StorageSchemata';
+
 import {getLogger, Logger} from 'Util/Logger';
-import {ClientRecord} from './record/ClientRecord';
+
 import {AmplifyRecord, ConversationRecord, CryptoboxRecord, EventRecord, UserRecord} from './record';
+import {ClientRecord} from './record/ClientRecord';
+import {StorageSchemata} from './StorageSchemata';
 
 /**
  * TypeScript representation of local IndexedDB schema managed with Dexie.

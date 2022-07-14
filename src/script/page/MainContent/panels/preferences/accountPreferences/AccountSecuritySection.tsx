@@ -17,10 +17,17 @@
  *
  */
 
+import React from 'react';
+
 import {Runtime} from '@wireapp/commons';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import {amplify} from 'amplify';
-import React from 'react';
+import {container} from 'tsyringe';
+
+import {useKoSubscribableChildren} from 'Util/ComponentUtil';
+import {t} from 'Util/LocalizerUtil';
+import {safeWindowOpen} from 'Util/SanitizationUtil';
+
 import {User} from '../../../../../entity/User';
 import {getAccountPagesUrl, getCreateTeamUrl, getManageTeamUrl, URL_PATH} from '../../../../../externalRoute';
 import {TeamState} from '../../../../../team/TeamState';
@@ -28,12 +35,8 @@ import {AppLockState} from '../../../../../user/AppLockState';
 import {FEATURES, hasAccessToFeature} from '../../../../../user/UserPermission';
 import {UserRepository} from '../../../../../user/UserRepository';
 import {modals, ModalsViewModel} from '../../../../../view_model/ModalsViewModel';
-import {container} from 'tsyringe';
-import {useKoSubscribableChildren} from 'Util/ComponentUtil';
-import {t} from 'Util/LocalizerUtil';
-import {safeWindowOpen} from 'Util/SanitizationUtil';
-import PreferencesSection from '../components/PreferencesSection';
 import PreferencesLink from '../components/PreferencesLink';
+import PreferencesSection from '../components/PreferencesSection';
 
 interface AccountSecuritySectionProps {
   appLockState?: AppLockState;

@@ -18,7 +18,9 @@
  */
 
 import {act} from '@testing-library/react';
+
 import TestPage from 'Util/test/TestPage';
+
 import SeekBar, {SeekBarProps} from './SeekBar';
 
 class SeekBarPage extends TestPage<SeekBarProps> {

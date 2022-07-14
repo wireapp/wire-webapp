@@ -17,10 +17,13 @@
  *
  */
 
-import {fireEvent, render, screen, act} from '@testing-library/react';
 import React from 'react';
-import {withIntl, withTheme} from '../util/test/TestUtil';
+
+import {fireEvent, render, screen, act} from '@testing-library/react';
+
 import EntropyCanvas from './EntropyCanvas';
+
+import {withIntl, withTheme} from '../util/test/TestUtil';
 require('jest-canvas-mock');
 
 describe('EntropyCanvas', () => {

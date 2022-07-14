@@ -18,25 +18,23 @@
  */
 
 import React, {useEffect, useMemo} from 'react';
+
 import cx from 'classnames';
 
-import {noop} from 'Util/util';
-import {t} from 'Util/LocalizerUtil';
+import AvailabilityState from 'Components/AvailabilityState';
+import Avatar, {AVATAR_SIZE} from 'Components/Avatar';
+import GroupAvatar from 'Components/avatar/GroupAvatar';
+import Icon from 'Components/Icon';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
+import {KEY} from 'Util/KeyboardUtil';
+import {t} from 'Util/LocalizerUtil';
 import useEffectRef from 'Util/useEffectRef';
-
-import {AVATAR_SIZE} from 'Components/Avatar';
+import {noop} from 'Util/util';
 
 import {generateCellState} from '../../conversation/ConversationCellState';
 import {ConversationStatusIcon} from '../../conversation/ConversationStatusIcon';
 import type {Conversation} from '../../entity/Conversation';
 import {MediaType} from '../../media/MediaType';
-
-import Avatar from 'Components/Avatar';
-import GroupAvatar from 'Components/avatar/GroupAvatar';
-import AvailabilityState from 'Components/AvailabilityState';
-import Icon from 'Components/Icon';
-import {KEY} from 'Util/KeyboardUtil';
 
 export interface ConversationListCellProps {
   conversation: Conversation;

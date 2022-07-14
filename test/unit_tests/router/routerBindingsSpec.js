@@ -18,6 +18,7 @@
  */
 
 import {initRouterBindings} from 'src/script/router/routerBindings';
+
 import {bindHtml} from '../../helper/knockoutHelpers';
 
 describe('routerBindings', () => {

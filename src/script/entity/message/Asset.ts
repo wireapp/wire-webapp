@@ -17,11 +17,12 @@
  *
  */
 
-import {AssetType} from '../../assets/AssetType';
 import type {FileAsset} from './FileAsset';
 import type {Location as LocationAsset} from './Location';
 import type {MediumImage as MediumImageAsset} from './MediumImage';
 import type {Text as TextAsset} from './Text';
+
+import {AssetType} from '../../assets/AssetType';
 
 export interface AssetPayload {
   id: string;

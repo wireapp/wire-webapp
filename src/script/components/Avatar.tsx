@@ -19,13 +19,14 @@
 
 import React from 'react';
 
-import {User} from '../entity/User';
-import {ServiceEntity} from '../integration/ServiceEntity';
 import {registerReactComponent, useKoSubscribableChildren} from 'Util/ComponentUtil';
 
-import UserAvatar from './avatar/UserAvatar';
 import ServiceAvatar from './avatar/ServiceAvatar';
 import TemporaryGuestAvatar from './avatar/TemporaryGuestAvatar';
+import UserAvatar from './avatar/UserAvatar';
+
+import {User} from '../entity/User';
+import {ServiceEntity} from '../integration/ServiceEntity';
 
 export enum AVATAR_SIZE {
   LARGE = 'avatar-l',

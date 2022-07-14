@@ -17,8 +17,9 @@
  *
  */
 
-import DeviceToggleButton, {DeviceToggleButtonProps} from './DeviceToggleButton';
 import TestPage from 'Util/test/TestPage';
+
+import DeviceToggleButton, {DeviceToggleButtonProps} from './DeviceToggleButton';
 
 class DeviceToggleButtonPage extends TestPage<DeviceToggleButtonProps> {
   constructor(props?: DeviceToggleButtonProps) {

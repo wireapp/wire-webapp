@@ -19,8 +19,9 @@
 
 import type {ConversationEvent} from '@wireapp/api-client/src/event/';
 
-import type {ThunkAction} from '../reducer';
 import {ConversationActionCreator} from './creator/';
+
+import type {ThunkAction} from '../reducer';
 
 export class ConversationAction {
   doCheckConversationCode = (key: string, code: string, uri?: string): ThunkAction => {

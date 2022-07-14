@@ -18,11 +18,14 @@
  */
 
 import React from 'react';
+
 import {keyframes} from '@emotion/react';
+import {container} from 'tsyringe';
+
 import {registerReactComponent} from 'Util/ComponentUtil';
+
 import SVGProvider from '../../auth/util/SVGProvider';
 import {UserState} from '../../user/UserState';
-import {container} from 'tsyringe';
 
 const fadeAnimation = keyframes`
   0%   { opacity: 0.2; }

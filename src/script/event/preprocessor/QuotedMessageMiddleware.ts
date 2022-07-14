@@ -22,11 +22,11 @@ import {Quote} from '@wireapp/protocol-messaging';
 import {getLogger, Logger} from 'Util/Logger';
 import {base64ToArray} from 'Util/util';
 
-import {ClientEvent} from '../Client';
-import {QuoteEntity} from '../../message/QuoteEntity';
 import {MessageHasher} from '../../message/MessageHasher';
-import type {EventService} from '../EventService';
+import {QuoteEntity} from '../../message/QuoteEntity';
 import {EventRecord} from '../../storage/record/EventRecord';
+import {ClientEvent} from '../Client';
+import type {EventService} from '../EventService';
 
 export class QuotedMessageMiddleware {
   private readonly eventService: EventService;

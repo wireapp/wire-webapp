@@ -17,12 +17,14 @@
  *
  */
 
-import {actionRoot} from '.';
+import {InvitationActionCreator} from './creator';
+
 import {mockStoreFactory} from '../../util/test/mockStoreFactory';
 import {initialInvitationState} from '../reducer/inviteReducer';
 import {initialLanguageState} from '../reducer/languageReducer';
 import {initialSelfState} from '../reducer/selfReducer';
-import {InvitationActionCreator} from './creator';
+
+import {actionRoot} from '.';
 
 describe('InvitationAction', () => {
   it('invites by email', async () => {

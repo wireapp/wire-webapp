@@ -18,18 +18,19 @@
  */
 
 import React from 'react';
-import cx from 'classnames';
 
-import {t} from 'Util/LocalizerUtil';
-import {formatDuration, DurationUnit} from 'Util/TimeUtil';
+import cx from 'classnames';
+import {container} from 'tsyringe';
+
 import Icon from 'Components/Icon';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
+import {t} from 'Util/LocalizerUtil';
+import {formatDuration, DurationUnit} from 'Util/TimeUtil';
 
-import {EphemeralTimings} from '../../ephemeral/EphemeralTimings';
-import {showContextMenu} from '../../ui/ContextMenu';
 import type {Conversation} from '../../entity/Conversation';
-import {container} from 'tsyringe';
+import {EphemeralTimings} from '../../ephemeral/EphemeralTimings';
 import {TeamState} from '../../team/TeamState';
+import {showContextMenu} from '../../ui/ContextMenu';
 
 export interface MessageTimerButtonProps {
   conversation: Conversation;

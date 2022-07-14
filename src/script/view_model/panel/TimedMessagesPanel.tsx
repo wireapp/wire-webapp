@@ -18,17 +18,20 @@
  */
 
 import React, {useEffect, useState} from 'react';
-import {useFadingScrollbar} from '../../ui/fadingScrollbar';
+
 import {container} from 'tsyringe';
+
 import {registerReactComponent, useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 import {formatDuration} from 'Util/TimeUtil';
 import useEffectRef from 'Util/useEffectRef';
 
+import PanelHeader from './PanelHeader';
+
 import {ConversationState} from '../../conversation/ConversationState';
 import {EphemeralTimings} from '../../ephemeral/EphemeralTimings';
+import {useFadingScrollbar} from '../../ui/fadingScrollbar';
 import {ViewModelRepositories} from '../MainViewModel';
-import PanelHeader from './PanelHeader';
 
 interface TimedMessagesPanelProps {
   onClose: () => void;

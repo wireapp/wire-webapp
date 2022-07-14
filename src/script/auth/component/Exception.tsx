@@ -17,11 +17,13 @@
  *
  */
 
-import {ErrorMessage} from '@wireapp/react-ui-kit';
 import {Fragment} from 'react';
+
+import {ErrorMessage} from '@wireapp/react-ui-kit';
 import {FormattedMessage} from 'react-intl';
-import {errorHandlerStrings, validationErrorStrings} from '../../strings';
+
 import {Config} from '../../Config';
+import {errorHandlerStrings, validationErrorStrings} from '../../strings';
 
 interface ExceptionProps {
   errors: any[];

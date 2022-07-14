@@ -19,10 +19,11 @@
 
 import ko from 'knockout';
 
-import {createRandomUuid} from 'Util/util';
 import TestPage from 'Util/test/TestPage';
+import {createRandomUuid} from 'Util/util';
 
 import GroupedConversationHeader, {GroupedConversationHeaderProps} from './GroupedConversationHeader';
+
 import {ConversationLabel, LabelType} from '../../../../conversation/ConversationLabelRepository';
 import {Conversation} from '../../../../entity/Conversation';
 

@@ -17,36 +17,37 @@
  *
  */
 
-import ko from 'knockout';
-import {amplify} from 'amplify';
 import {RECEIPT_MODE} from '@wireapp/api-client/src/conversation/data/';
 import {WebAppEvents} from '@wireapp/webapp-events';
+import {amplify} from 'amplify';
+import ko from 'knockout';
 import {container} from 'tsyringe';
 
+import type {MenuItem} from 'Components/panel/PanelActions';
 import 'Components/toggle/ReceiptModeToggle';
 import 'Components/panel/PanelActions';
-import {Logger, getLogger} from 'Util/Logger';
 import {t} from 'Util/LocalizerUtil';
-import {formatDuration} from 'Util/TimeUtil';
+import {Logger, getLogger} from 'Util/Logger';
 import {removeLineBreaks, sortUsersByPriority} from 'Util/StringUtil';
+import {formatDuration} from 'Util/TimeUtil';
 
 import {BasePanelViewModel, PanelViewModelProps} from './BasePanelViewModel';
-import {getNotificationText} from '../../conversation/NotificationSetting';
-import {ConversationVerificationState} from '../../conversation/ConversationVerificationState';
-import {Shortcut} from '../../ui/Shortcut';
-import {ShortcutType} from '../../ui/ShortcutType';
+
 import {ConversationRepository} from '../../conversation/ConversationRepository';
+import {ConversationVerificationState} from '../../conversation/ConversationVerificationState';
+import {getNotificationText} from '../../conversation/NotificationSetting';
+import type {Conversation} from '../../entity/Conversation';
+import type {User} from '../../entity/User';
 import type {IntegrationRepository} from '../../integration/IntegrationRepository';
+import type {ServiceEntity} from '../../integration/ServiceEntity';
 import type {SearchRepository} from '../../search/SearchRepository';
 import type {TeamRepository} from '../../team/TeamRepository';
-import type {ActionsViewModel} from '../ActionsViewModel';
-import type {ServiceEntity} from '../../integration/ServiceEntity';
-import type {User} from '../../entity/User';
-import type {Conversation} from '../../entity/Conversation';
-import {PanelViewModel} from '../PanelViewModel';
-import {UserState} from '../../user/UserState';
 import {TeamState} from '../../team/TeamState';
-import type {MenuItem} from 'Components/panel/PanelActions';
+import {Shortcut} from '../../ui/Shortcut';
+import {ShortcutType} from '../../ui/ShortcutType';
+import {UserState} from '../../user/UserState';
+import type {ActionsViewModel} from '../ActionsViewModel';
+import {PanelViewModel} from '../PanelViewModel';
 
 export class ConversationDetailsViewModel extends BasePanelViewModel {
   private readonly userState: UserState;

@@ -20,8 +20,8 @@
 import {Logger, getLogger} from 'Util/Logger';
 
 import {AppInitStatistics, AppStatistics} from './AppInitStatistics';
-import {AppInitTimings} from './AppInitTimings';
 import type {AppInitStatisticsValue} from './AppInitStatisticsValue';
+import {AppInitTimings} from './AppInitTimings';
 import type {AppInitTimingsStep} from './AppInitTimingsStep';
 
 export class AppInitTelemetry {

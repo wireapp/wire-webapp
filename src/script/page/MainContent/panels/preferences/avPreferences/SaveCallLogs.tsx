@@ -17,19 +17,21 @@
  *
  */
 
-import {amplify} from 'amplify';
 import React from 'react';
+
 import {WebAppEvents} from '@wireapp/webapp-events';
+import {amplify} from 'amplify';
 import {container} from 'tsyringe';
 
 import {t} from 'Util/LocalizerUtil';
 import {getCurrentDate} from 'Util/TimeUtil';
 import {downloadBlob} from 'Util/util';
-import {Config} from '../../../../../Config';
-import PreferencesSection from '../components/PreferencesSection';
+
 import type {CallingRepository} from '../../../../../calling/CallingRepository';
-import {ModalsViewModel} from '../../../../../view_model/ModalsViewModel';
+import {Config} from '../../../../../Config';
 import {UserState} from '../../../../../user/UserState';
+import {ModalsViewModel} from '../../../../../view_model/ModalsViewModel';
+import PreferencesSection from '../components/PreferencesSection';
 
 interface SaveCallLogsProps {
   callingRepository: CallingRepository;

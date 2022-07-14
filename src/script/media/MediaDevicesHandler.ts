@@ -17,13 +17,13 @@
  *
  */
 
+import {Runtime} from '@wireapp/commons';
 import ko from 'knockout';
 
 import {Logger, getLogger} from 'Util/Logger';
 import {loadValue, storeValue} from 'Util/StorageUtil';
 
 import {MediaDeviceType} from './MediaDeviceType';
-import {Runtime} from '@wireapp/commons';
 
 declare global {
   interface Window {

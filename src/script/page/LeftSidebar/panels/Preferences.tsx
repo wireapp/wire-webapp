@@ -18,14 +18,17 @@
  */
 
 import React, {useEffect} from 'react';
-import {t} from 'Util/LocalizerUtil';
 
 import {Runtime} from '@wireapp/commons';
+
 import Icon from 'Components/Icon';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
-import {ContentViewModel} from '../../../view_model/ContentViewModel';
+import {t} from 'Util/LocalizerUtil';
+
 import ListWrapper from './ListWrapper';
+
 import {TeamRepository} from '../../../team/TeamRepository';
+import {ContentViewModel} from '../../../view_model/ContentViewModel';
 
 type PreferencesProps = {
   contentViewModel: ContentViewModel;

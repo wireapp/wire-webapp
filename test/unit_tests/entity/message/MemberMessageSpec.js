@@ -17,17 +17,15 @@
  *
  */
 
-import {createRandomUuid} from 'Util/util';
-import 'src/script/localization/Localizer';
-
-import {User} from 'src/script/entity/User';
-import {Text} from 'src/script/entity/message/Text';
-import {MemberMessage} from 'src/script/entity/message/MemberMessage';
-import {ContentMessage} from 'src/script/entity/message/ContentMessage';
 import {AssetTransferState} from 'src/script/assets/AssetTransferState';
-
-import {StatusType} from 'src/script/message/StatusType';
+import {ContentMessage} from 'src/script/entity/message/ContentMessage';
 import {FileAsset} from 'src/script/entity/message/FileAsset';
+import {MemberMessage} from 'src/script/entity/message/MemberMessage';
+import {Text} from 'src/script/entity/message/Text';
+import {User} from 'src/script/entity/User';
+import 'src/script/localization/Localizer';
+import {StatusType} from 'src/script/message/StatusType';
+import {createRandomUuid} from 'Util/util';
 
 describe('Member Message', () => {
   describe('generateNameString', () => {

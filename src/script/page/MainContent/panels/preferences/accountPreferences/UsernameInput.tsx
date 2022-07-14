@@ -18,12 +18,16 @@
  */
 
 import React, {useState} from 'react';
+
 import cx from 'classnames';
+
+import {t} from 'Util/LocalizerUtil';
+
+import AccountInput, {useInputDone} from './AccountInput';
+
 import {UserError} from '../../../../../error/UserError';
 import {validateHandle} from '../../../../../user/UserHandleGenerator';
 import {UserRepository} from '../../../../../user/UserRepository';
-import {t} from 'Util/LocalizerUtil';
-import AccountInput, {useInputDone} from './AccountInput';
 
 enum UserNameState {
   AVAILABLE = 'AVAILABLE',

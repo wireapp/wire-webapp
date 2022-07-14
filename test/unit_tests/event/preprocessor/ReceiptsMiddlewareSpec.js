@@ -17,11 +17,9 @@
  *
  */
 
-import {noop} from 'Util/util';
-import {createRandomUuid} from 'Util/util';
-
-import {ReceiptsMiddleware} from 'src/script/event/preprocessor/ReceiptsMiddleware';
 import {ClientEvent} from 'src/script/event/Client';
+import {ReceiptsMiddleware} from 'src/script/event/preprocessor/ReceiptsMiddleware';
+import {noop, createRandomUuid} from 'Util/util';
 
 describe('ReceiptsMiddleware', () => {
   const selfId = createRandomUuid();

@@ -17,6 +17,7 @@
  *
  */
 
+import {Conversation} from 'src/script/entity/Conversation';
 import {
   arrayToBase64,
   base64ToArray,
@@ -31,8 +32,6 @@ import {
   trimFileExtension,
   zeroPadding,
 } from 'Util/util';
-
-import {Conversation} from 'src/script/entity/Conversation';
 
 describe('base64ToBlob', () => {
   it('encodes Base64 data URI to blob', () => {

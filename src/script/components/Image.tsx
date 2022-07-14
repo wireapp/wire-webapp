@@ -18,16 +18,19 @@
  */
 
 import React, {useEffect, useState} from 'react';
+
 import cx from 'classnames';
 import {container} from 'tsyringe';
 
 import {registerReactComponent, useKoSubscribableChildren} from 'Util/ComponentUtil';
+import useEffectRef from 'Util/useEffectRef';
+
+import RestrictedImage from './asset/RestrictedImage';
+
 import {AssetRemoteData} from '../assets/AssetRemoteData';
 import {AssetRepository} from '../assets/AssetRepository';
-import {useViewPortObserver} from '../ui/viewportObserver';
 import {TeamState} from '../team/TeamState';
-import RestrictedImage from './asset/RestrictedImage';
-import useEffectRef from 'Util/useEffectRef';
+import {useViewPortObserver} from '../ui/viewportObserver';
 
 export interface ImageProps extends React.HTMLProps<HTMLDivElement> {
   aspectRatio?: number;

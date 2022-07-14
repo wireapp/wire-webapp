@@ -18,16 +18,18 @@
  */
 
 import React from 'react';
+
 import cx from 'classnames';
 
-import {t} from 'Util/LocalizerUtil';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
+import {t} from 'Util/LocalizerUtil';
 
-import {Config} from '../../Config';
-import {getPrivacyWhyUrl} from '../../externalRoute';
 import DeviceCard from './DeviceCard';
-import type {User} from '../../entity/User';
+
 import type {ClientEntity} from '../../client/ClientEntity';
+import {Config} from '../../Config';
+import type {User} from '../../entity/User';
+import {getPrivacyWhyUrl} from '../../externalRoute';
 
 interface DeviceListProps {
   clickOnDevice: (client: ClientEntity) => void;

@@ -18,24 +18,26 @@
  */
 
 import {render, waitFor, fireEvent} from '@testing-library/react';
-import ko from 'knockout';
-import TitleBar from 'Components/TitleBar';
+import {QualifiedId} from '@wireapp/api-client/src/user';
+import {Runtime} from '@wireapp/commons';
 import {WebAppEvents} from '@wireapp/webapp-events';
-import {UserState} from '../../user/UserState';
-import {CallState} from '../../calling/CallState';
-import {TeamState} from '../../team/TeamState';
+import {amplify} from 'amplify';
+import ko from 'knockout';
+
+import TitleBar from 'Components/TitleBar';
+import {createRandomUuid} from 'Util/util';
+
 import {TestFactory} from '../../../../test/helper/TestFactory';
 import {CallingRepository} from '../../calling/CallingRepository';
-import {Conversation} from '../../entity/Conversation';
-import {createRandomUuid} from 'Util/util';
-import {LegalHoldModalViewModel} from '../../view_model/content/LegalHoldModalViewModel';
-import {Runtime} from '@wireapp/commons';
-import {PanelViewModel} from '../../view_model/PanelViewModel';
+import {CallState} from '../../calling/CallState';
 import {ConversationVerificationState} from '../../conversation/ConversationVerificationState';
+import {Conversation} from '../../entity/Conversation';
 import {User} from '../../entity/User';
-import {QualifiedId} from '@wireapp/api-client/src/user';
-import {amplify} from 'amplify';
+import {TeamState} from '../../team/TeamState';
+import {UserState} from '../../user/UserState';
+import {LegalHoldModalViewModel} from '../../view_model/content/LegalHoldModalViewModel';
 import {ContentViewModel} from '../../view_model/ContentViewModel';
+import {PanelViewModel} from '../../view_model/PanelViewModel';
 
 jest.spyOn(Runtime, 'isSupportingConferenceCalling').mockReturnValue(true);
 

@@ -17,17 +17,17 @@
  *
  */
 
-import {amplify} from 'amplify';
 import {WebAppEvents} from '@wireapp/webapp-events';
+import {amplify} from 'amplify';
 
 import {t} from 'Util/LocalizerUtil';
 
 import {ConversationVerificationState} from '../conversation/ConversationVerificationState';
 import type {Conversation} from '../entity/Conversation';
-import {ModalsViewModel} from '../view_model/ModalsViewModel';
-import {OPEN_CONVERSATION_DETAILS} from '../view_model/PanelViewModel';
 import {ConversationError} from '../error/ConversationError';
 import {LegalHoldModalViewModel} from '../view_model/content/LegalHoldModalViewModel';
+import {ModalsViewModel} from '../view_model/ModalsViewModel';
+import {OPEN_CONVERSATION_DETAILS} from '../view_model/PanelViewModel';
 
 export const showLegalHoldWarningModal = (
   conversationEntity: Conversation,

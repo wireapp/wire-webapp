@@ -18,17 +18,18 @@
  */
 
 import React from 'react';
+
 import {CSS_FILL_PARENT} from 'Util/CSSMixin';
 
-import {User} from '../../entity/User';
-
-import {AVATAR_SIZE, STATE, DIAMETER} from '../Avatar';
 import AvatarBackground from './AvatarBackground';
-import AvatarInitials from './AvatarInitials';
 import AvatarBadge from './AvatarBadge';
 import AvatarBorder from './AvatarBorder';
+import AvatarInitials from './AvatarInitials';
 import AvatarWrapper from './AvatarWrapper';
 import {shouldShowBadge} from './UserAvatar';
+
+import {User} from '../../entity/User';
+import {AVATAR_SIZE, STATE, DIAMETER} from '../Avatar';
 
 export interface TemporaryGuestAvatarProps extends React.HTMLProps<HTMLDivElement> {
   avatarSize: AVATAR_SIZE;

@@ -17,17 +17,19 @@
  *
  */
 
+import React from 'react';
+
 import {RecursivePartial} from '@wireapp/commons/src/main/util/TypeUtil';
 import {StyledApp, THEME_ID} from '@wireapp/react-ui-kit';
 import {mount} from 'enzyme';
 import {History, createMemoryHistory} from 'history';
-import React from 'react';
 import {IntlProvider} from 'react-intl';
 import {Provider} from 'react-redux';
 import {Router} from 'react-router';
 import {AnyAction} from 'redux';
 import {MockStoreEnhanced} from 'redux-mock-store';
 import {ThunkDispatch} from 'redux-thunk';
+
 import {Api, RootState} from '../../module/reducer';
 
 export const withStore = (

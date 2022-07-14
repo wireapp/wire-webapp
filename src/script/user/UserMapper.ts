@@ -17,8 +17,8 @@
  *
  */
 
-import type {User as APIClientUser} from '@wireapp/api-client/src/user/';
 import type {Self as APIClientSelf} from '@wireapp/api-client/src/self/';
+import type {User as APIClientUser} from '@wireapp/api-client/src/user/';
 
 import {joaatHash} from 'Util/Crypto';
 import {Logger, getLogger} from 'Util/Logger';
@@ -27,7 +27,9 @@ import {mapProfileAssets, mapProfileAssetsV1, updateUserEntityAssets} from '../a
 import {User} from '../entity/User';
 import type {ServerTimeHandler} from '../time/serverTimeHandler';
 import '../view_model/bindings/CommonBindings';
+
 import {container} from 'tsyringe';
+
 import {UserState} from './UserState';
 
 export class UserMapper {

@@ -17,16 +17,17 @@
  *
  */
 
+import {render, waitFor, act} from '@testing-library/react';
 import ko from 'knockout';
 
 import {Call} from 'src/script/calling/Call';
 import {Participant} from 'src/script/calling/Participant';
+import {Grid} from 'src/script/calling/videoGridHandler';
 import {Conversation} from 'src/script/entity/Conversation';
 import {User} from 'src/script/entity/User';
-import FullscreenVideoCall, {FullscreenVideoCallProps} from './FullscreenVideoCall';
-import {Grid} from 'src/script/calling/videoGridHandler';
 import {MediaDevicesHandler} from 'src/script/media/MediaDevicesHandler';
-import {render, waitFor, act} from '@testing-library/react';
+
+import FullscreenVideoCall, {FullscreenVideoCallProps} from './FullscreenVideoCall';
 
 describe('fullscreenVideoCall', () => {
   const createProps = (): FullscreenVideoCallProps => {

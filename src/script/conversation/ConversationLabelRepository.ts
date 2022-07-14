@@ -17,19 +17,19 @@
  *
  */
 
-import {amplify} from 'amplify';
-import {WebAppEvents} from '@wireapp/webapp-events';
 import {USER_EVENT} from '@wireapp/api-client/src/event/';
+import {WebAppEvents} from '@wireapp/webapp-events';
+import {amplify} from 'amplify';
 import ko from 'knockout';
 
 import {t} from 'Util/LocalizerUtil';
 import {Logger, getLogger} from 'Util/Logger';
+import {TypedEventTarget} from 'Util/TypedEventTarget';
 import {createRandomUuid} from 'Util/util';
 
 import type {Conversation} from '../entity/Conversation';
 import type {PropertiesService} from '../properties/PropertiesService';
 import {ModalsViewModel} from '../view_model/ModalsViewModel';
-import {TypedEventTarget} from 'Util/TypedEventTarget';
 
 export enum LabelType {
   Custom = 0,

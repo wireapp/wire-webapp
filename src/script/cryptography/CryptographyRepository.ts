@@ -17,22 +17,23 @@
  *
  */
 
-import ko from 'knockout';
-import {amplify} from 'amplify';
+import type {PreKey as BackendPreKey} from '@wireapp/api-client/src/auth/';
 import type {QualifiedId} from '@wireapp/api-client/src/user/';
 import {Cryptobox, CryptoboxSession} from '@wireapp/cryptobox';
 import {WebAppEvents} from '@wireapp/webapp-events';
-import type {PreKey as BackendPreKey} from '@wireapp/api-client/src/auth/';
+import {amplify} from 'amplify';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
+import ko from 'knockout';
+import {container} from 'tsyringe';
 
 import {getLogger, Logger} from 'Util/Logger';
 import {base64ToArray} from 'Util/util';
 
 import {CryptographyMapper} from './CryptographyMapper';
+import type {CryptographyService} from './CryptographyService';
+
 import {ClientEntity} from '../client/ClientEntity';
 import {UserError} from '../error/UserError';
-import type {CryptographyService} from './CryptographyService';
-import {container} from 'tsyringe';
 import {Core} from '../service/CoreSingleton';
 
 export interface SignalingKeys {

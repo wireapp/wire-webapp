@@ -17,6 +17,8 @@
  *
  */
 
+import React, {useEffect, useState} from 'react';
+
 import {RegisteredClient} from '@wireapp/api-client/src/client/index';
 import {
   COLOR,
@@ -32,9 +34,10 @@ import {
   Text,
   TrashIcon,
 } from '@wireapp/react-ui-kit';
-import React, {useEffect, useState} from 'react';
 import {useIntl} from 'react-intl';
+
 import {splitFingerprint} from 'Util/StringUtil';
+
 import {clientItemStrings} from '../../strings';
 import {ValidationError} from '../module/action/ValidationError';
 import {parseError, parseValidationErrors} from '../util/errorUtil';

@@ -18,6 +18,7 @@
  */
 
 const jQuery = require('jquery');
+
 import {amplify} from 'amplify';
 
 import '../event/Client';

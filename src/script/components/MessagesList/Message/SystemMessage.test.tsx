@@ -18,12 +18,14 @@
  */
 
 import ko from 'knockout';
+
 import {DeleteConversationMessage} from 'src/script/entity/message/DeleteConversationMessage';
 import {MessageTimerUpdateMessage} from 'src/script/entity/message/MessageTimerUpdateMessage';
 import {ReceiptModeUpdateMessage} from 'src/script/entity/message/ReceiptModeUpdateMessage';
 import {RenameMessage} from 'src/script/entity/message/RenameMessage';
 import {SystemMessageType} from 'src/script/message/SystemMessageType';
 import TestPage from 'Util/test/TestPage';
+
 import SystemMessage, {SystemMessageProps} from './SystemMessage';
 
 jest.mock('Components/Icon', () => ({

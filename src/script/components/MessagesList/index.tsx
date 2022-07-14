@@ -18,20 +18,23 @@
  */
 
 import React, {useEffect, useLayoutEffect, useRef, useState} from 'react';
+
 import {ConversationRepository} from 'src/script/conversation/ConversationRepository';
 import {MessageRepository} from 'src/script/conversation/MessageRepository';
-import {Conversation} from '../../entity/Conversation';
 import {ContentMessage} from 'src/script/entity/message/ContentMessage';
 import {DecryptErrorMessage} from 'src/script/entity/message/DecryptErrorMessage';
 import {MemberMessage} from 'src/script/entity/message/MemberMessage';
 import {Message as MessageEntity} from 'src/script/entity/message/Message';
-import {User} from 'src/script/entity/User';
-import {StatusType} from '../../message/StatusType';
-import {registerReactComponent, useKoSubscribableChildren} from 'Util/ComponentUtil';
-import Message from './Message';
 import {Text} from 'src/script/entity/message/Text';
-import {useResizeObserver} from '../../ui/resizeObserver';
+import {User} from 'src/script/entity/User';
+import {registerReactComponent, useKoSubscribableChildren} from 'Util/ComponentUtil';
 import useEffectRef from 'Util/useEffectRef';
+
+import Message from './Message';
+
+import {Conversation} from '../../entity/Conversation';
+import {StatusType} from '../../message/StatusType';
+import {useResizeObserver} from '../../ui/resizeObserver';
 
 type FocusedElement = {center?: boolean; element: Element};
 interface MessagesListParams {

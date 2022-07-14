@@ -17,23 +17,24 @@
  *
  */
 
+import React, {useEffect, useState} from 'react';
+
+import {Runtime} from '@wireapp/commons';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import {amplify} from 'amplify';
 import cx from 'classnames';
 
-import {getLogger} from 'Util/Logger';
+import Icon from 'Components/Icon';
+import {registerReactComponent} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
+import {getLogger} from 'Util/Logger';
 import {safeWindowOpen} from 'Util/SanitizationUtil';
 import {afterRender} from 'Util/util';
 
-import {Config} from '../Config';
 import {ModalsViewModel} from './ModalsViewModel';
-import {PermissionState} from '../notification/PermissionState';
-import {Runtime} from '@wireapp/commons';
 
-import React, {useEffect, useState} from 'react';
-import Icon from 'Components/Icon';
-import {registerReactComponent} from 'Util/ComponentUtil';
+import {Config} from '../Config';
+import {PermissionState} from '../notification/PermissionState';
 
 const WarningsContainer: React.FC = () => {
   const logger = getLogger('WarningsViewModel');

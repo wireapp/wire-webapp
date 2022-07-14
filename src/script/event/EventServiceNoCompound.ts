@@ -27,9 +27,10 @@ import {
   compareEventsByTime,
   compareEventsByConversation,
 } from './EventService';
-import {StorageSchemata} from '../storage/StorageSchemata';
-import {EventRecord, StorageService} from '../storage';
+
 import {MessageCategory} from '../message/MessageCategory';
+import {EventRecord, StorageService} from '../storage';
+import {StorageSchemata} from '../storage/StorageSchemata';
 
 // TODO: These types should be moved to a more appropriate place (e.g. EventService) once it has been migrated to TS
 type DateComparator = (dateA: Date, dateB: Date) => boolean;

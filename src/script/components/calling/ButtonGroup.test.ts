@@ -18,6 +18,7 @@
  */
 
 import TestPage from 'Util/test/TestPage';
+
 import ButtonGroup, {ButtonGroupProps} from './ButtonGroup';
 
 class ButtonGroupPage extends TestPage<ButtonGroupProps> {

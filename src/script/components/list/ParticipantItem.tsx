@@ -18,25 +18,24 @@
  */
 
 import React from 'react';
+
 import cx from 'classnames';
 
-import {registerReactComponent, useKoSubscribableChildren} from 'Util/ComponentUtil';
+import AvailabilityState from 'Components/AvailabilityState';
 import Avatar, {AVATAR_SIZE} from 'Components/Avatar';
+import ParticipantMicOnIcon from 'Components/calling/ParticipantMicOnIcon';
+import Icon from 'Components/Icon';
 import {UserlistMode} from 'Components/UserList';
+import {registerReactComponent, useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 import {capitalizeFirstChar} from 'Util/StringUtil';
+import useEffectRef from 'Util/useEffectRef';
 import {noop} from 'Util/util';
 
+import {Participant} from '../../calling/Participant';
 import {User} from '../../entity/User';
 import {ServiceEntity} from '../../integration/ServiceEntity';
 import {useViewPortObserver} from '../../ui/viewportObserver';
-
-import 'Components/AvailabilityState';
-import {Participant} from '../../calling/Participant';
-import AvailabilityState from 'Components/AvailabilityState';
-import ParticipantMicOnIcon from 'Components/calling/ParticipantMicOnIcon';
-import Icon from 'Components/Icon';
-import useEffectRef from 'Util/useEffectRef';
 
 export interface ParticipantItemProps<UserType> extends Omit<React.HTMLProps<HTMLDivElement>, 'onClick' | 'onKeyDown'> {
   badge?: boolean;

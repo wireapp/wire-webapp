@@ -17,23 +17,24 @@
  *
  */
 
-import {amplify} from 'amplify';
+import type {QualifiedId} from '@wireapp/api-client/src/user/';
 import {WebAppEvents} from '@wireapp/webapp-events';
+import {amplify} from 'amplify';
 import {container} from 'tsyringe';
 
 import {Logger, getLogger} from 'Util/Logger';
+import {matchQualifiedIds} from 'Util/QualifiedId';
 
+import {ConversationState} from './ConversationState';
 import {ConversationVerificationState} from './ConversationVerificationState';
-import {EventBuilder} from '../conversation/EventBuilder';
-import type {QualifiedId} from '@wireapp/api-client/src/user/';
-import {EventRecord} from '../storage';
-import {VerificationMessageType} from '../message/VerificationMessageType';
+
 import type {ClientEntity} from '../client/ClientEntity';
+import {EventBuilder} from '../conversation/EventBuilder';
 import type {Conversation} from '../entity/Conversation';
 import type {EventRepository} from '../event/EventRepository';
+import {VerificationMessageType} from '../message/VerificationMessageType';
+import {EventRecord} from '../storage';
 import {UserState} from '../user/UserState';
-import {ConversationState} from './ConversationState';
-import {matchQualifiedIds} from 'Util/QualifiedId';
 
 export class ConversationVerificationStateHandler {
   private readonly logger: Logger;

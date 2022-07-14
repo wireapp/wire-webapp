@@ -17,8 +17,10 @@
  *
  */
 
-const path = require('path');
 const {format} = require('date-fns');
+
+const path = require('path');
+
 const {SRC_PATH, DIST_PATH} = require('./locations');
 
 module.exports = grunt => {

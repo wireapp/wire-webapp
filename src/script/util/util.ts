@@ -17,20 +17,21 @@
  *
  */
 
+import {UrlUtil, Runtime} from '@wireapp/commons';
 import {Decoder, Encoder} from 'bazinga64';
-import UUID from 'uuidjs';
-import {UrlUtil} from '@wireapp/commons';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
-import {Runtime} from '@wireapp/commons';
 import type {ObservableArray} from 'knockout';
+import UUID from 'uuidjs';
+
+import {isTabKey} from 'Util/KeyboardUtil';
+
+import {loadValue} from './StorageUtil';
 
 import {QUERY_KEY} from '../auth/route';
 import {Config} from '../Config';
-import {StorageKey} from '../storage/StorageKey';
-import {loadValue} from './StorageUtil';
-import {AuthError} from '../error/AuthError';
 import type {Conversation} from '../entity/Conversation';
-import {isTabKey} from 'Util/KeyboardUtil';
+import {AuthError} from '../error/AuthError';
+import {StorageKey} from '../storage/StorageKey';
 
 export const isTemporaryClientAndNonPersistent = (persist: boolean): boolean => {
   if (persist === undefined) {

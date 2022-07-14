@@ -17,10 +17,11 @@
  *
  */
 
-import type {PermissionRepository} from '../permission/PermissionRepository';
 import {MediaConstraintsHandler} from './MediaConstraintsHandler';
 import {MediaDevicesHandler} from './MediaDevicesHandler';
 import {MediaStreamHandler} from './MediaStreamHandler';
+
+import type {PermissionRepository} from '../permission/PermissionRepository';
 
 export class MediaRepository {
   public constraintsHandler: MediaConstraintsHandler;

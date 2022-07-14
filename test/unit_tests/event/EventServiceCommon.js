@@ -17,14 +17,14 @@
  *
  */
 
-import {createRandomUuid} from 'Util/util';
-
-import {MessageCategory} from 'src/script/message/MessageCategory';
 import {AssetTransferState} from 'src/script/assets/AssetTransferState';
-import {StorageSchemata} from 'src/script/storage/StorageSchemata';
-import {TestFactory} from '../../helper/TestFactory';
 import {ConversationError} from 'src/script/error/ConversationError';
 import {StorageError} from 'src/script/error/StorageError';
+import {MessageCategory} from 'src/script/message/MessageCategory';
+import {StorageSchemata} from 'src/script/storage/StorageSchemata';
+import {createRandomUuid} from 'Util/util';
+
+import {TestFactory} from '../../helper/TestFactory';
 
 const testEventServiceClass = (testedServiceName, className) => {
   // eslint-disable-next-line jest/valid-title

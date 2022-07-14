@@ -18,10 +18,12 @@
  */
 
 import ko from 'knockout';
-import TestPage from 'Util/test/TestPage';
+
 import {MemberMessage as MemberMessageEntity} from 'src/script/entity/message/MemberMessage';
-import MemberMessage, {MemberMessageProps} from './MemberMessage';
 import {User} from 'src/script/entity/User';
+import TestPage from 'Util/test/TestPage';
+
+import MemberMessage, {MemberMessageProps} from './MemberMessage';
 
 class MemberMessagePage extends TestPage<MemberMessageProps> {
   constructor(props?: MemberMessageProps) {

@@ -18,11 +18,13 @@
  */
 
 import ko from 'knockout';
-import TestPage from 'Util/test/TestPage';
+
 import {Message as MessageEntity} from 'src/script/entity/message/Message';
-import ReadReceiptStatus, {ReadReceiptStatusProps} from './ReadReceiptStatus';
 import {ReadReceipt} from 'src/script/storage';
+import TestPage from 'Util/test/TestPage';
 import {formatTimeShort} from 'Util/TimeUtil';
+
+import ReadReceiptStatus, {ReadReceiptStatusProps} from './ReadReceiptStatus';
 
 class ReadReceiptStatusPage extends TestPage<ReadReceiptStatusProps> {
   constructor(props?: ReadReceiptStatusProps) {

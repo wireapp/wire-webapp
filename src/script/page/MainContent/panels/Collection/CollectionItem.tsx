@@ -18,15 +18,18 @@
  */
 
 import React from 'react';
+
+import {WebAppEvents} from '@wireapp/webapp-events';
+import {amplify} from 'amplify';
+
 import Image from 'Components/Image';
-import FileAssetComponent from 'Components/MessagesList/Message/ContentMessage/asset/FileAssetComponent';
 import AudioAsset from 'Components/MessagesList/Message/ContentMessage/asset/AudioAsset';
+import FileAssetComponent from 'Components/MessagesList/Message/ContentMessage/asset/FileAssetComponent';
 import LinkPreviewAssetComponent from 'Components/MessagesList/Message/ContentMessage/asset/LinkPreviewAssetComponent';
 import {ContentMessage} from 'src/script/entity/message/ContentMessage';
 import {MediumImage} from 'src/script/entity/message/MediumImage';
-import {amplify} from 'amplify';
-import {WebAppEvents} from '@wireapp/webapp-events';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
+
 import {isOfCategory} from './utils';
 
 const CollectionItem: React.FC<{allMessages: ContentMessage[]; message: ContentMessage}> = ({message, allMessages}) => {

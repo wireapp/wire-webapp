@@ -17,11 +17,11 @@
  *
  */
 
-import {MediumImage} from 'src/script/entity/message/MediumImage';
-import {StatusType} from 'src/script/message/StatusType';
-import {FileAsset} from 'src/script/entity/message/FileAsset';
 import {ContentMessage} from 'src/script/entity/message/ContentMessage';
+import {FileAsset} from 'src/script/entity/message/FileAsset';
+import {MediumImage} from 'src/script/entity/message/MediumImage';
 import {Text} from 'src/script/entity/message/Text';
+import {StatusType} from 'src/script/message/StatusType';
 
 describe('Message Entities', () => {
   let message_et = null;

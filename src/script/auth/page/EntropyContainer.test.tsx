@@ -18,8 +18,10 @@
  */
 
 import {render} from '@testing-library/react';
-import {withIntl, withTheme} from '../util/test/TestUtil';
+
 import EntropyContainer from './EntropyContainer';
+
+import {withIntl, withTheme} from '../util/test/TestUtil';
 require('jest-canvas-mock');
 
 describe('EntropyContainer', () => {

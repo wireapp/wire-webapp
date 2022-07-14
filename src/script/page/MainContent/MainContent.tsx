@@ -18,23 +18,26 @@
  */
 
 import React from 'react';
-import {CSSTransition, SwitchTransition} from 'react-transition-group';
-import {registerReactComponent, useKoSubscribableChildren} from 'Util/ComponentUtil';
 
-import {ContentViewModel, ContentState} from '../../view_model/ContentViewModel';
-import {t} from 'Util/LocalizerUtil';
+import {StyledApp} from '@wireapp/react-ui-kit';
+import {CSSTransition, SwitchTransition} from 'react-transition-group';
+import {container} from 'tsyringe';
+
 import Icon from 'Components/Icon';
-import AboutPreferences from './panels/preferences/AboutPreferences';
+import {registerReactComponent, useKoSubscribableChildren} from 'Util/ComponentUtil';
+import {t} from 'Util/LocalizerUtil';
+
 import Collection from './panels/Collection';
+import AboutPreferences from './panels/preferences/AboutPreferences';
 import AccountPreferences from './panels/preferences/AccountPreferences';
+import AVPreferences from './panels/preferences/AVPreferences';
 import DevicesPreferences from './panels/preferences/devices/DevicesPreferences';
 import OptionPreferences from './panels/preferences/OptionPreferences';
-import {ConversationState} from '../../conversation/ConversationState';
-import AVPreferences from './panels/preferences/AVPreferences';
-import {container} from 'tsyringe';
+
 import {ClientState} from '../../client/ClientState';
+import {ConversationState} from '../../conversation/ConversationState';
 import {UserState} from '../../user/UserState';
-import {StyledApp} from '@wireapp/react-ui-kit';
+import {ContentViewModel, ContentState} from '../../view_model/ContentViewModel';
 
 // Ko imported components
 import '../message-list/InputBarControls';

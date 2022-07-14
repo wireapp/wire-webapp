@@ -18,10 +18,12 @@
  */
 
 import ko from 'knockout';
-import TestPage from 'Util/test/TestPage';
+
 import {DeleteMessage as DeleteMessageEntity} from 'src/script/entity/message/DeleteMessage';
-import DeleteMessage, {DeleteMessageProps} from './DeleteMessage';
 import {User} from 'src/script/entity/User';
+import TestPage from 'Util/test/TestPage';
+
+import DeleteMessage, {DeleteMessageProps} from './DeleteMessage';
 
 class DeleteMessagePage extends TestPage<DeleteMessageProps> {
   constructor(props?: DeleteMessageProps) {

@@ -18,7 +18,9 @@
  */
 
 import {render, fireEvent, screen} from '@testing-library/react';
+
 import AccountLink from './AccountLink';
+
 import * as utils from '../../../../../util/ClipboardUtil';
 
 test('copies correct text', async () => {

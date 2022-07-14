@@ -24,9 +24,10 @@ import {KEY} from 'Util/KeyboardUtil';
 import {clamp} from 'Util/NumberUtil';
 import useEffectRef from 'Util/useEffectRef';
 
-import {useFadingScrollbar} from '../../../ui/fadingScrollbar';
 import MentionSuggestionsItem from './MentionSuggestionsItem';
+
 import {User} from '../../../entity/User';
+import {useFadingScrollbar} from '../../../ui/fadingScrollbar';
 
 type MentionSuggestionListProps = {
   onSelectionValidated: (data: User, element: HTMLInputElement) => void;

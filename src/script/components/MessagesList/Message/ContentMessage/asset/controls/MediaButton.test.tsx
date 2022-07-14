@@ -18,10 +18,12 @@
  */
 
 import ko from 'knockout';
+
 import {AssetTransferState} from 'src/script/assets/AssetTransferState';
-import TestPage from 'Util/test/TestPage';
-import MediaButton, {MediaButtonProps} from './MediaButton';
 import {FileAsset} from 'src/script/entity/message/FileAsset';
+import TestPage from 'Util/test/TestPage';
+
+import MediaButton, {MediaButtonProps} from './MediaButton';
 
 class MediaButtonTestPage extends TestPage<MediaButtonProps> {
   constructor(props?: MediaButtonProps) {

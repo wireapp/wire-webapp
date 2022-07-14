@@ -17,16 +17,16 @@
  *
  */
 
-import {amplify} from 'amplify';
-import {escape} from 'underscore';
 import {WebAppEvents} from '@wireapp/webapp-events';
+import {amplify} from 'amplify';
 import ko from 'knockout';
+import {escape} from 'underscore';
 
-import {getLogger, Logger} from 'Util/Logger';
-import {replaceLink, t} from 'Util/LocalizerUtil';
-import {noop, afterRender} from 'Util/util';
-import {formatLocale} from 'Util/TimeUtil';
 import {onEscKey, offEscKey, isEnterKey, isSpaceKey} from 'Util/KeyboardUtil';
+import {replaceLink, t} from 'Util/LocalizerUtil';
+import {getLogger, Logger} from 'Util/Logger';
+import {formatLocale} from 'Util/TimeUtil';
+import {noop, afterRender} from 'Util/util';
 
 import {Config} from '../Config';
 import {ClientNotificationData} from '../notification/PreferenceNotificationRepository';

@@ -17,17 +17,18 @@
  *
  */
 
-import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 import {RECEIPT_MODE} from '@wireapp/api-client/src/conversation/data';
+import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 
-import {ConsentValue} from 'src/script/user/ConsentValue';
-import {PropertiesRepository} from 'src/script/properties/PropertiesRepository';
+import {ClientMapper} from 'src/script/client/ClientMapper';
 import {User} from 'src/script/entity/User';
 import {EventRepository} from 'src/script/event/EventRepository';
+import {PropertiesRepository} from 'src/script/properties/PropertiesRepository';
+import {ConsentValue} from 'src/script/user/ConsentValue';
 import {UserRepository} from 'src/script/user/UserRepository';
-import {ClientMapper} from 'src/script/client/ClientMapper';
-import {TestFactory} from '../../helper/TestFactory';
+
 import {entities} from '../../api/payloads';
+import {TestFactory} from '../../helper/TestFactory';
 
 describe('UserRepository', () => {
   let server = null;

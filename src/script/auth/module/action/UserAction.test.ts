@@ -17,9 +17,11 @@
  *
  */
 
-import {actionRoot} from '.';
-import {mockStoreFactory} from '../../util/test/mockStoreFactory';
 import {UserActionCreator} from './creator';
+
+import {mockStoreFactory} from '../../util/test/mockStoreFactory';
+
+import {actionRoot} from '.';
 
 describe('UserAction', () => {
   it('requests activation code', async () => {

@@ -18,23 +18,26 @@
  */
 
 import React, {useCallback, useEffect, useState} from 'react';
-import {container} from 'tsyringe';
-import cx from 'classnames';
 
-import {AssetTransferState} from '../../../../../assets/AssetTransferState';
-import type {ContentMessage} from '../../../../../entity/message/ContentMessage';
-import type {FileAsset} from '../../../../../entity/message/FileAsset';
-import {useAssetTransfer} from './AbstractAssetTransferStateTracker';
-import {TeamState} from '../../../../../team/TeamState';
+import {useTimeout} from '@wireapp/react-ui-kit';
+import cx from 'classnames';
+import {container} from 'tsyringe';
+
+import RestrictedVideo from 'Components/asset/RestrictedVideo';
 import {registerReactComponent, useKoSubscribableChildren} from 'Util/ComponentUtil';
-import SeekBar from './controls/SeekBar';
-import MediaButton from './controls/MediaButton';
 import {t} from 'Util/LocalizerUtil';
 import {formatSeconds} from 'Util/TimeUtil';
 import useEffectRef from 'Util/useEffectRef';
+
+import {useAssetTransfer} from './AbstractAssetTransferStateTracker';
+import MediaButton from './controls/MediaButton';
+import SeekBar from './controls/SeekBar';
+
 import {AssetRepository} from '../../../../../assets/AssetRepository';
-import {useTimeout} from '@wireapp/react-ui-kit';
-import RestrictedVideo from 'Components/asset/RestrictedVideo';
+import {AssetTransferState} from '../../../../../assets/AssetTransferState';
+import type {ContentMessage} from '../../../../../entity/message/ContentMessage';
+import type {FileAsset} from '../../../../../entity/message/FileAsset';
+import {TeamState} from '../../../../../team/TeamState';
 
 interface VideoAssetProps {
   assetRepository?: AssetRepository;

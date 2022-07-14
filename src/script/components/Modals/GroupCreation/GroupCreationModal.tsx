@@ -18,41 +18,42 @@
  */
 
 import React, {useEffect, useState} from 'react';
-import {container} from 'tsyringe';
-import cx from 'classnames';
-import {amplify} from 'amplify';
-import {WebAppEvents} from '@wireapp/webapp-events';
+
 import {RECEIPT_MODE} from '@wireapp/api-client/src/conversation/data/ConversationReceiptModeUpdateData';
 import {ConversationProtocol} from '@wireapp/api-client/src/conversation/NewConversation';
+import {WebAppEvents} from '@wireapp/webapp-events';
+import {amplify} from 'amplify';
+import cx from 'classnames';
+import {container} from 'tsyringe';
 
-import {getLogger} from 'Util/Logger';
-import {sortUsersByPriority} from 'Util/StringUtil';
-import {ConversationRepository} from '../../../conversation/ConversationRepository';
-
-import {SearchRepository} from '../../../search/SearchRepository';
-import {TeamRepository} from '../../../team/TeamRepository';
-import {TeamState} from '../../../team/TeamState';
-import {UserState} from '../../../user/UserState';
-import {registerReactComponent, useKoSubscribableChildren} from 'Util/ComponentUtil';
+import Icon from 'Components/Icon';
 import ModalComponent from 'Components/ModalComponent';
 import SearchInput from 'Components/SearchInput';
-import UserSearchableList from 'Components/UserSearchableList';
 import TextInputForwarded from 'Components/TextInput/TextInput';
 import BaseToggle from 'Components/toggle/BaseToggle';
 import InfoToggle from 'Components/toggle/InfoToggle';
-import {User} from '../../../entity/User';
-import {ACCESS_STATE} from '../../../conversation/AccessState';
-import Icon from 'Components/Icon';
-import {t} from 'Util/LocalizerUtil';
+import UserSearchableList from 'Components/UserSearchableList';
+import {registerReactComponent, useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {onEscKey, offEscKey, handleEnterDown} from 'Util/KeyboardUtil';
+import {t} from 'Util/LocalizerUtil';
+import {getLogger} from 'Util/Logger';
+import {sortUsersByPriority} from 'Util/StringUtil';
+import useEffectRef from 'Util/useEffectRef';
+
+import {Config} from '../../../Config';
+import {ACCESS_STATE} from '../../../conversation/AccessState';
 import {
   ACCESS_TYPES,
   teamPermissionsForAccessState,
   toggleFeature,
 } from '../../../conversation/ConversationAccessPermission';
-import useEffectRef from 'Util/useEffectRef';
+import {ConversationRepository} from '../../../conversation/ConversationRepository';
+import {User} from '../../../entity/User';
+import {SearchRepository} from '../../../search/SearchRepository';
+import {TeamRepository} from '../../../team/TeamRepository';
+import {TeamState} from '../../../team/TeamState';
 import {useFadingScrollbar} from '../../../ui/fadingScrollbar';
-import {Config} from '../../../Config';
+import {UserState} from '../../../user/UserState';
 
 interface GroupCreationModalProps {
   conversationRepository: ConversationRepository;

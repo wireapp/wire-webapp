@@ -23,9 +23,9 @@ import {container} from 'tsyringe';
 import {Logger, getLogger} from 'Util/Logger';
 
 import type {User} from '../entity/User';
+import {APIClient} from '../service/APIClientSingleton';
 import {StorageSchemata} from '../storage/StorageSchemata';
 import {StorageService} from '../storage/StorageService';
-import {APIClient} from '../service/APIClientSingleton';
 import {constructUserPrimaryKey} from '../util/StorageUtil';
 
 export class UserService {

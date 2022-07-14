@@ -17,11 +17,14 @@
  *
  */
 
-import Icon from 'Components/Icon';
-import cx from 'classnames';
 import React from 'react';
+
+import cx from 'classnames';
+
+import Icon from 'Components/Icon';
 import {registerReactComponent} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
+
 import ControlButtons, {ControlButtonsProps} from './ControlButtons';
 
 type InputBarControlsProps = ControlButtonsProps & {

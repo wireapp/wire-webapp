@@ -17,11 +17,13 @@
  *
  */
 
-import ko from 'knockout';
 import React from 'react';
 
-import type {Router} from './Router';
+import ko from 'knockout';
+
 import {KEY} from 'Util/KeyboardUtil';
+
+import type {Router} from './Router';
 
 let router: Router;
 

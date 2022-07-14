@@ -17,8 +17,9 @@
  *
  */
 
-import TestPage from 'Util/test/TestPage';
 import LegalHoldDot, {LegalHoldDotProps} from 'Components/LegalHoldDot';
+import TestPage from 'Util/test/TestPage';
+
 import {LegalHoldModalViewModel} from '../view_model/content/LegalHoldModalViewModel';
 
 class LegalHoldDotPage extends TestPage<LegalHoldDotProps> {

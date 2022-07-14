@@ -18,6 +18,7 @@
  */
 
 import {act, fireEvent} from '@testing-library/react';
+
 import {FileAsset} from 'src/script/entity/message/FileAsset';
 import TestPage from 'Util/test/TestPage';
 

@@ -19,8 +19,6 @@
 
 import JSZip from 'jszip';
 
-import {noop} from 'Util/util';
-
 import {BackupRepository} from 'src/script/backup/BackupRepository';
 import {
   CancelError,
@@ -30,6 +28,8 @@ import {
 } from 'src/script/backup/Error';
 import {ClientEvent} from 'src/script/event/Client';
 import {StorageSchemata} from 'src/script/storage/StorageSchemata';
+import {noop} from 'Util/util';
+
 import {TestFactory} from '../../helper/TestFactory';
 
 const conversationId = '35a9a89d-70dc-4d9e-88a2-4d8758458a6a';

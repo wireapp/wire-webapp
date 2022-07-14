@@ -17,12 +17,13 @@
  *
  */
 
-import MentionSuggestionList from './MentionSuggestions';
-
 import {render, fireEvent, screen} from '@testing-library/react';
 
-import {User} from '../../../entity/User';
 import {createRandomUuid} from 'Util/util';
+
+import MentionSuggestionList from './MentionSuggestions';
+
+import {User} from '../../../entity/User';
 
 //text field's id
 const targetInputId = 'test';

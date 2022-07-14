@@ -18,6 +18,7 @@
  */
 
 import TestPage from 'Util/test/TestPage';
+
 import CopyToClipboard, {CopyToClipboardProps} from './CopyToClipboard';
 
 class CopyToClipboardPage extends TestPage<CopyToClipboardProps> {

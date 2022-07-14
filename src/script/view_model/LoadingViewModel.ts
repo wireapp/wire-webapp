@@ -18,8 +18,11 @@
  */
 
 import ko from 'knockout';
+
 import {t} from 'Util/LocalizerUtil';
+
 import {Config} from '../Config';
+
 import 'Components/LoadingBar';
 
 export class LoadingViewModel {

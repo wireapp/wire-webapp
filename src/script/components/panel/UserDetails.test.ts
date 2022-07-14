@@ -19,9 +19,11 @@
 
 import TestPage from 'Util/test/TestPage';
 import {createRandomUuid} from 'Util/util';
-import {User} from '../../entity/User';
+
 import UserDetails, {UserDetailsProps} from './UserDetails';
+
 import {ClientEntity} from '../../client/ClientEntity';
+import {User} from '../../entity/User';
 
 class UserDetailsPage extends TestPage<UserDetailsProps> {
   constructor(props: UserDetailsProps) {

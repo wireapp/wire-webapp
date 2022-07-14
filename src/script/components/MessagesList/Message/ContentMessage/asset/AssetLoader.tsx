@@ -19,8 +19,9 @@
 
 import React from 'react';
 
-import Icon from '../../../../Icon';
 import {handleKeyDown} from 'Util/KeyboardUtil';
+
+import Icon from '../../../../Icon';
 
 export interface AssetLoaderProps {
   large?: boolean;

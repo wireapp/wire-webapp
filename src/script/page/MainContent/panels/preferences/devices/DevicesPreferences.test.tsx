@@ -18,15 +18,16 @@
  */
 
 import {render} from '@testing-library/react';
+import ko from 'knockout';
 
-import DevicesPreferences from './DevicesPreferences';
+import {ClientEntity} from 'src/script/client/ClientEntity';
 import {ClientState} from 'src/script/client/ClientState';
 import {ConversationState} from 'src/script/conversation/ConversationState';
-import {UserState} from 'src/script/user/UserState';
 import {CryptographyRepository} from 'src/script/cryptography/CryptographyRepository';
-import {ClientEntity} from 'src/script/client/ClientEntity';
+import {UserState} from 'src/script/user/UserState';
 import {createRandomUuid} from 'Util/util';
-import ko from 'knockout';
+
+import DevicesPreferences from './DevicesPreferences';
 
 function createDevice(): ClientEntity {
   const device = new ClientEntity(true, '', createRandomUuid());

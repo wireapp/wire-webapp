@@ -17,13 +17,13 @@
  *
  */
 
-import {container} from 'tsyringe';
 import {StatusCodes as HTTP_STATUS, ReasonPhrases as HTTP_MESSAGE} from 'http-status-codes';
+import {container} from 'tsyringe';
 
+import {Config} from 'src/script/Config';
 import {GiphyRepository} from 'src/script/extension/GiphyRepository';
 import {GiphyService} from 'src/script/extension/GiphyService';
 import {APIClient} from 'src/script/service/APIClientSingleton';
-import {Config} from 'src/script/Config';
 
 jest.deepUnmock('axios');
 

@@ -18,23 +18,23 @@
  */
 
 import React, {Fragment, useState} from 'react';
+
 import cx from 'classnames';
-
 import {container} from 'tsyringe';
-import {isEnterKey, isSpaceKey} from 'Util/KeyboardUtil';
 
+import ParticipantItem from 'Components/list/ParticipantItem';
+import {useKoSubscribableChildren} from 'Util/ComponentUtil';
+import {isEnterKey, isSpaceKey} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
 
+import InViewport from './utils/InViewport';
+
 import type {ConversationRepository} from '../conversation/ConversationRepository';
+import {ConversationState} from '../conversation/ConversationState';
 import type {Conversation} from '../entity/Conversation';
 import type {User} from '../entity/User';
-
-import {UserState} from '../user/UserState';
-import {ConversationState} from '../conversation/ConversationState';
-import {useKoSubscribableChildren} from 'Util/ComponentUtil';
-import ParticipantItem from 'Components/list/ParticipantItem';
 import {TeamState} from '../team/TeamState';
-import InViewport from './utils/InViewport';
+import {UserState} from '../user/UserState';
 
 export enum UserlistMode {
   COMPACT = 'UserlistMode.COMPACT',

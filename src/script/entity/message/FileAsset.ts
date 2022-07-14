@@ -23,6 +23,7 @@ import ko from 'knockout';
 import {Logger, getLogger} from 'Util/Logger';
 
 import {Asset} from './Asset';
+
 import type {AssetRemoteData} from '../../assets/AssetRemoteData';
 import {AssetTransferState} from '../../assets/AssetTransferState';
 import {AssetType} from '../../assets/AssetType';

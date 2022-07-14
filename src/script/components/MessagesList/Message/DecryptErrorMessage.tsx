@@ -18,11 +18,13 @@
  */
 
 import React from 'react';
+
+import DeviceId from 'Components/DeviceId';
 import Icon from 'Components/Icon';
-import {DecryptErrorMessage as DecryptErrorMessageEntity} from '../../../entity/message/DecryptErrorMessage';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
-import DeviceId from 'Components/DeviceId';
+
+import {DecryptErrorMessage as DecryptErrorMessageEntity} from '../../../entity/message/DecryptErrorMessage';
 
 export interface DecryptErrorMessageProps {
   message: DecryptErrorMessageEntity;

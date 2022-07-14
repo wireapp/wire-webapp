@@ -17,24 +17,25 @@
  *
  */
 
-import ko from 'knockout';
+import type {QualifiedId} from '@wireapp/api-client/src/user/';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import {amplify} from 'amplify';
+import ko from 'knockout';
 
 import {t} from 'Util/LocalizerUtil';
 import {formatLocale} from 'Util/TimeUtil';
 
 import {BasePanelViewModel, PanelViewModelProps} from './BasePanelViewModel';
-import {SuperType} from '../../message/SuperType';
-import type {Message} from '../../entity/message/Message';
+
 import type {ConversationRepository} from '../../conversation/ConversationRepository';
-import type {TeamRepository} from '../../team/TeamRepository';
-import type {User} from '../../entity/User';
 import type {ContentMessage} from '../../entity/message/ContentMessage';
 import type {MemberMessage} from '../../entity/message/MemberMessage';
-import type {PanelParams} from '../PanelViewModel';
+import type {Message} from '../../entity/message/Message';
+import type {User} from '../../entity/User';
+import {SuperType} from '../../message/SuperType';
 import type {ReadReceipt} from '../../storage/record/EventRecord';
-import type {QualifiedId} from '@wireapp/api-client/src/user/';
+import type {TeamRepository} from '../../team/TeamRepository';
+import type {PanelParams} from '../PanelViewModel';
 
 export class MessageDetailsViewModel extends BasePanelViewModel {
   conversationRepository: ConversationRepository;

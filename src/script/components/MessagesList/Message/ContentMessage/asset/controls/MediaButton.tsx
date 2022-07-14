@@ -17,13 +17,16 @@
  *
  */
 
-import cx from 'classnames';
-import AssetLoader from '../AssetLoader';
 import React, {useEffect, useState} from 'react';
-import type {FileAsset} from '../../../../../../entity/message/FileAsset';
-import {AssetTransferState} from '../../../../../../assets/AssetTransferState';
-import {noop} from 'Util/util';
+
+import cx from 'classnames';
+
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
+import {noop} from 'Util/util';
+
+import {AssetTransferState} from '../../../../../../assets/AssetTransferState';
+import type {FileAsset} from '../../../../../../entity/message/FileAsset';
+import AssetLoader from '../AssetLoader';
 
 export interface MediaButtonProps {
   asset: FileAsset;

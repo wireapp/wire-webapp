@@ -20,15 +20,15 @@
 import ko from 'knockout';
 import {container} from 'tsyringe';
 
-import {scrollToBottom} from 'Util/scroll-helpers';
-import {isLastItem} from 'Util/ArrayUtil';
 import {AVATAR_SIZE} from 'Components/Avatar';
+import {isLastItem} from 'Util/ArrayUtil';
+import {scrollToBottom} from 'Util/scroll-helpers';
 
-import {MainViewModel} from '../MainViewModel';
-import {ActionsViewModel} from '../ActionsViewModel';
 import {User} from '../../entity/User';
-import {UserState} from '../../user/UserState';
 import {TeamState} from '../../team/TeamState';
+import {UserState} from '../../user/UserState';
+import {ActionsViewModel} from '../ActionsViewModel';
+import {MainViewModel} from '../MainViewModel';
 
 export class ConnectRequestsViewModel {
   actionsViewModel: ActionsViewModel;

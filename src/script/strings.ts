@@ -17,7 +17,6 @@
  *
  */
 
-import {BackendClientError} from './error/BackendClientError';
 /*
  * Wire
  * Copyright (C) 2018 Wire Swiss GmbH
@@ -44,6 +43,7 @@ import {BackendError} from './auth/module/action/BackendError';
 import {LabeledError} from './auth/module/action/LabeledError';
 import {ValidationError} from './auth/module/action/ValidationError';
 import {LOGOUT_REASON} from './auth/route';
+import {BackendClientError} from './error/BackendClientError';
 
 export const footerStrings = defineMessages({
   copy: {

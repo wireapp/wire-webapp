@@ -18,12 +18,15 @@
  */
 
 import ko from 'knockout';
+
 import {ContentMessage} from 'src/script/entity/message/ContentMessage';
-import TestPage from 'Util/test/TestPage';
-import FileAssetComponent, {FileAssetProps} from './FileAssetComponent';
 import {FileAsset} from 'src/script/entity/message/FileAsset';
-import {StatusType} from '../../../../../message/StatusType';
 import {TeamState} from 'src/script/team/TeamState';
+import TestPage from 'Util/test/TestPage';
+
+import FileAssetComponent, {FileAssetProps} from './FileAssetComponent';
+
+import {StatusType} from '../../../../../message/StatusType';
 
 class FileAssetComponentTestPage extends TestPage<FileAssetProps> {
   constructor(props?: FileAssetProps) {

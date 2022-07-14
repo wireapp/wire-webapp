@@ -18,7 +18,9 @@
  */
 
 import React from 'react';
+
 import {css, SerializedStyles} from '@emotion/react';
+
 import {handleKeyDown} from 'Util/KeyboardUtil';
 export interface DeviceToggleButtonProps {
   currentDevice: string;

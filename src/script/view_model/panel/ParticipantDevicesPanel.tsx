@@ -19,14 +19,15 @@
 
 import React from 'react';
 
+import UserDevices, {UserDevicesState, useUserDevicesHistory} from 'Components/UserDevices';
 import {registerReactComponent} from 'Util/ComponentUtil';
 import useEffectRef from 'Util/useEffectRef';
-import UserDevices, {UserDevicesState, useUserDevicesHistory} from 'Components/UserDevices';
+
+import PanelHeader from './PanelHeader';
 
 import type {User} from '../../entity/User';
-import {ViewModelRepositories} from '../MainViewModel';
-import PanelHeader from './PanelHeader';
 import {useFadingScrollbar} from '../../ui/fadingScrollbar';
+import {ViewModelRepositories} from '../MainViewModel';
 
 interface ParticipantDevicesPanelProps {
   onClose: () => void;

@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2019 Wire Swiss GmbH
+ * Copyright (C) 2022 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,9 +17,9 @@
  *
  */
 
-import {bindHtml} from '../../../helper/knockoutHelpers';
-
 import 'src/script/view_model/bindings/MessageListBindings';
+
+import {bindHtml} from '../../../helper/knockoutHelpers';
 
 describe('messageListBindings', () => {
   describe('ko.bindingHandlers.infinite_scroll', () => {

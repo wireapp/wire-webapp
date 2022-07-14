@@ -18,12 +18,15 @@
  */
 
 import React from 'react';
+
+import {CSSObject} from '@emotion/serialize';
+
+import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {CSS_SQUARE} from 'Util/CSSMixin';
 import {t} from 'Util/LocalizerUtil';
-import {CSSObject} from '@emotion/serialize';
-import {User} from '../entity/User';
-import {useKoSubscribableChildren} from 'Util/ComponentUtil';
+
 import {ACCENT_ID} from '../Config';
+import {User} from '../entity/User';
 
 export interface AccentColorPickerProps {
   doSetAccentColor: (id: number) => void;

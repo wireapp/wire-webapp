@@ -18,26 +18,28 @@
  */
 
 import 'jsdom-worker';
-
 import ko, {Subscription} from 'knockout';
 import {amplify} from 'amplify';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import {CONV_TYPE, CALL_TYPE, STATE as CALL_STATE, REASON, Wcall} from '@wireapp/avs';
-import {CallingRepository} from 'src/script/calling/CallingRepository';
-import {EventRepository} from 'src/script/event/EventRepository';
-import {Participant} from 'src/script/calling/Participant';
-import {Call} from 'src/script/calling/Call';
-import {CallState} from 'src/script/calling/CallState';
-import {User} from 'src/script/entity/User';
-import {MediaType} from 'src/script/media/MediaType';
-import {Conversation} from 'src/script/entity/Conversation';
-import {ModalsViewModel} from 'src/script/view_model/ModalsViewModel';
-import {serverTimeHandler} from 'src/script/time/serverTimeHandler';
-import {createRandomUuid} from 'Util/util';
 import {TestFactory} from 'test/helper/TestFactory';
-import {MediaDevicesHandler} from '../media/MediaDevicesHandler';
+
+import {Call} from 'src/script/calling/Call';
+import {CallingRepository} from 'src/script/calling/CallingRepository';
+import {CallState} from 'src/script/calling/CallState';
+import {Participant} from 'src/script/calling/Participant';
+import {Conversation} from 'src/script/entity/Conversation';
+import {User} from 'src/script/entity/User';
+import {EventRepository} from 'src/script/event/EventRepository';
+import {MediaType} from 'src/script/media/MediaType';
+import {serverTimeHandler} from 'src/script/time/serverTimeHandler';
+import {ModalsViewModel} from 'src/script/view_model/ModalsViewModel';
+import {createRandomUuid} from 'Util/util';
+
 import {CALL_MESSAGE_TYPE} from './enum/CallMessageType';
+
 import {CALL} from '../event/Client';
+import {MediaDevicesHandler} from '../media/MediaDevicesHandler';
 
 const createSelfParticipant = () => {
   const selfUser = new User();

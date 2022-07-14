@@ -19,15 +19,16 @@
 
 import type {Data as OpenGraphResult} from 'open-graph';
 
-import {base64ToArray, getContentTypeFromDataUrl} from 'Util/util';
-import {getLogger} from 'Util/Logger';
-
-import {getFirstLinkWithOffset} from './helpers';
-import {isBlacklisted} from './blackList';
-import {LinkPreviewError} from './LinkPreviewError';
 import {deArrayify} from 'Util/ArrayUtil';
-import {isTweetUrl} from 'Util/ValidationUtil';
+import {getLogger} from 'Util/Logger';
 import {truncate} from 'Util/StringUtil';
+import {base64ToArray, getContentTypeFromDataUrl} from 'Util/util';
+import {isTweetUrl} from 'Util/ValidationUtil';
+
+import {isBlacklisted} from './blackList';
+import {getFirstLinkWithOffset} from './helpers';
+import {LinkPreviewError} from './LinkPreviewError';
+
 import {Config} from '../../Config';
 
 type LinkPreviewContent = {

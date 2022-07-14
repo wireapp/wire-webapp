@@ -17,9 +17,11 @@
  *
  */
 
-import {CSSObject} from '@emotion/react';
 import {MouseEvent, useRef, useEffect, useState} from 'react';
+
+import {CSSObject} from '@emotion/react';
 import {flushSync} from 'react-dom';
+
 import {usePausableInterval} from '../../hooks/usePausableInterval';
 
 interface CanvasProps {

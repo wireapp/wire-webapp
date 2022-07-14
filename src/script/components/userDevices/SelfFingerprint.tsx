@@ -18,18 +18,20 @@
  */
 
 import React, {useMemo} from 'react';
-import {container} from 'tsyringe';
-import {WebAppEvents} from '@wireapp/webapp-events';
-import cx from 'classnames';
 
-import {t} from 'Util/LocalizerUtil';
+import {WebAppEvents} from '@wireapp/webapp-events';
+import {amplify} from 'amplify';
+import cx from 'classnames';
+import {container} from 'tsyringe';
+
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
+import {t} from 'Util/LocalizerUtil';
 
 import DeviceCard from './DeviceCard';
-import DeviceId from '../DeviceId';
-import type {CryptographyRepository} from '../../cryptography/CryptographyRepository';
+
 import {ClientState} from '../../client/ClientState';
-import {amplify} from 'amplify';
+import type {CryptographyRepository} from '../../cryptography/CryptographyRepository';
+import DeviceId from '../DeviceId';
 
 interface SelfFingerprintProps {
   clientState?: ClientState;

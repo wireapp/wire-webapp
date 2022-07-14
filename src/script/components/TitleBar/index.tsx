@@ -17,31 +17,34 @@
  *
  */
 
+import React, {useMemo, useEffect, useCallback} from 'react';
+
 import {WebAppEvents} from '@wireapp/webapp-events';
 import {amplify} from 'amplify';
-import React, {useMemo, useEffect, useCallback} from 'react';
-import {registerReactComponent, useKoSubscribableChildren} from 'Util/ComponentUtil';
-import {StringIdentifer, t} from 'Util/LocalizerUtil';
-import {ConversationVerificationState} from '../../conversation/ConversationVerificationState';
-import LegalHoldDot from 'Components/LegalHoldDot';
+import cx from 'classnames';
+import {container} from 'tsyringe';
+
 import Icon from 'Components/Icon';
-import {ContentViewModel} from '../../view_model/ContentViewModel';
+import LegalHoldDot from 'Components/LegalHoldDot';
+import {registerReactComponent, useKoSubscribableChildren} from 'Util/ComponentUtil';
+import {handleKeyDown} from 'Util/KeyboardUtil';
+import {StringIdentifer, t} from 'Util/LocalizerUtil';
+import {matchQualifiedIds} from 'Util/QualifiedId';
+import {TIME_IN_MILLIS} from 'Util/TimeUtil';
+
+import {CallingRepository} from '../../calling/CallingRepository';
+import {CallState} from '../../calling/CallState';
+import {ConversationFilter} from '../../conversation/ConversationFilter';
+import {ConversationVerificationState} from '../../conversation/ConversationVerificationState';
+import {Conversation} from '../../entity/Conversation';
+import {TeamState} from '../../team/TeamState';
 import {Shortcut} from '../../ui/Shortcut';
 import {ShortcutType} from '../../ui/ShortcutType';
-import cx from 'classnames';
-import {Conversation} from '../../entity/Conversation';
-import {CallingRepository} from '../../calling/CallingRepository';
 import {UserState} from '../../user/UserState';
-import {CallState} from '../../calling/CallState';
-import {TeamState} from '../../team/TeamState';
-import {container} from 'tsyringe';
-import {LegalHoldModalViewModel} from '../../view_model/content/LegalHoldModalViewModel';
-import {ConversationFilter} from '../../conversation/ConversationFilter';
-import {matchQualifiedIds} from 'Util/QualifiedId';
 import {CallActions} from '../../view_model/CallingViewModel';
-import {handleKeyDown} from 'Util/KeyboardUtil';
+import {LegalHoldModalViewModel} from '../../view_model/content/LegalHoldModalViewModel';
+import {ContentViewModel} from '../../view_model/ContentViewModel';
 import {PanelViewModel} from '../../view_model/PanelViewModel';
-import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 
 export interface TitleBarProps {
   conversation: Conversation;

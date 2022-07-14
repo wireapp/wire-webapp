@@ -18,6 +18,7 @@
  */
 
 import {render} from '@testing-library/react';
+
 import InputBarControls from './InputBarControls';
 
 const mockConfig = {

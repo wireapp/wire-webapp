@@ -20,26 +20,26 @@
 import {ConversationCode} from '@wireapp/api-client/src/conversation/';
 import {ConversationAccessUpdateData, ConversationAccessV2UpdateData} from '@wireapp/api-client/src/conversation/data/';
 import {CONVERSATION_EVENT} from '@wireapp/api-client/src/event/';
-import {amplify} from 'amplify';
 import {WebAppEvents} from '@wireapp/webapp-events';
+import {amplify} from 'amplify';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 
 import {t} from 'Util/LocalizerUtil';
 
-import {ModalsViewModel} from '../view_model/ModalsViewModel';
-
-import type {Conversation} from '../entity/Conversation';
 import {AbstractConversationEventHandler, EventHandlingConfig} from './AbstractConversationEventHandler';
 import {ACCESS_STATE} from './AccessState';
-import {ConversationMapper} from './ConversationMapper';
-import type {ConversationService} from './ConversationService';
-import {ConversationEvent} from './EventBuilder';
 import {
   ACCESS_MODES,
   featureFromStateChange,
   isGettingAccessToFeature,
   updateAccessRights,
 } from './ConversationAccessPermission';
+import {ConversationMapper} from './ConversationMapper';
+import type {ConversationService} from './ConversationService';
+import {ConversationEvent} from './EventBuilder';
+
+import type {Conversation} from '../entity/Conversation';
+import {ModalsViewModel} from '../view_model/ModalsViewModel';
 
 export class ConversationStateHandler extends AbstractConversationEventHandler {
   private readonly conversationService: ConversationService;

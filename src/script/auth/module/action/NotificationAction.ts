@@ -17,8 +17,9 @@
  *
  */
 
-import type {ThunkAction} from '../reducer';
 import {NotificationActionCreator} from './creator/';
+
+import type {ThunkAction} from '../reducer';
 
 export class NotificationAction {
   checkHistory = (): ThunkAction => {

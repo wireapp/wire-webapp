@@ -17,9 +17,9 @@
  *
  */
 
+import {renderHook, act} from '@testing-library/react';
 import ko from 'knockout';
 
-import {renderHook, act} from '@testing-library/react';
 import {useKoSubscribableChildren} from './ComponentUtil';
 
 describe('ComponentUtil', () => {

@@ -18,6 +18,7 @@
  */
 
 import {useLayoutEffect} from 'react';
+
 import {debounce} from 'underscore';
 
 export const useFadingScrollbar = (element?: HTMLElement): void => {

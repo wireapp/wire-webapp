@@ -18,7 +18,9 @@
  */
 
 import React from 'react';
+
 import {t} from 'Util/LocalizerUtil';
+
 import type {ClientRepository} from '../../../../../client/ClientRepository';
 
 interface LogoutSectionProps {

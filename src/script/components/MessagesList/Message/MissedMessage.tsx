@@ -18,6 +18,7 @@
  */
 
 import React from 'react';
+
 import {t} from 'Util/LocalizerUtil';
 
 export interface MissedMessageProps {}

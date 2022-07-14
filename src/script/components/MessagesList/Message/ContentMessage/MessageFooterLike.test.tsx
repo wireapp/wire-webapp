@@ -18,8 +18,10 @@
  */
 
 import ko from 'knockout';
-import TestPage from 'Util/test/TestPage';
+
 import {ContentMessage} from 'src/script/entity/message/ContentMessage';
+import TestPage from 'Util/test/TestPage';
+
 import MessageFooterLike, {MessageFooterLikeProps} from './MessageFooterLike';
 
 class MessageFooterLikePage extends TestPage<MessageFooterLikeProps> {

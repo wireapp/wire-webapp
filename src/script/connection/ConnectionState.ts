@@ -17,8 +17,9 @@
  *
  */
 
-import {singleton} from 'tsyringe';
 import ko from 'knockout';
+import {singleton} from 'tsyringe';
+
 import {ConnectionEntity} from './ConnectionEntity';
 
 @singleton()

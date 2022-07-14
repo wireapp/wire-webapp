@@ -18,14 +18,15 @@
  */
 
 import React, {forwardRef} from 'react';
+
 import cx from 'classnames';
 
-import {useKoSubscribableChildren} from 'Util/ComponentUtil';
-import Icon from 'Components/Icon';
 import Avatar, {AVATAR_SIZE} from 'Components/Avatar';
+import Icon from 'Components/Icon';
+import {useKoSubscribableChildren} from 'Util/ComponentUtil';
+import {handleKeyDown} from 'Util/KeyboardUtil';
 
 import {User} from '../../../entity/User';
-import {handleKeyDown} from 'Util/KeyboardUtil';
 
 type MentionSuggestionsItemProps = {
   isSelected: boolean;

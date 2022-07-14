@@ -17,15 +17,15 @@
  *
  */
 
-import {container} from 'tsyringe';
 import ko from 'knockout';
+import {container} from 'tsyringe';
 
 import {ConversationState} from '../../conversation/ConversationState';
 import type {Conversation} from '../../entity/Conversation';
+import type {User} from '../../entity/User';
+import type {ServiceEntity} from '../../integration/ServiceEntity';
 import type {MainViewModel, ViewModelRepositories} from '../MainViewModel';
 import type {PanelParams} from '../PanelViewModel';
-import type {ServiceEntity} from '../../integration/ServiceEntity';
-import type {User} from '../../entity/User';
 
 export interface PanelViewModelProps {
   isVisible: ko.PureComputed<boolean>;

@@ -18,11 +18,14 @@
  */
 
 import React, {useEffect, useState, useRef} from 'react';
-import Icon from 'Components/Icon';
-import useIsMounted from 'Util/useIsMounted';
-import {MotionDuration} from '../../../../../motion/MotionDuration';
-import TextInput from 'Components/TextInput';
+
 import {IconButton, IconButtonVariant} from '@wireapp/react-ui-kit';
+
+import Icon from 'Components/Icon';
+import TextInput from 'Components/TextInput';
+import useIsMounted from 'Util/useIsMounted';
+
+import {MotionDuration} from '../../../../../motion/MotionDuration';
 
 interface AccountInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   allowedChars?: string;

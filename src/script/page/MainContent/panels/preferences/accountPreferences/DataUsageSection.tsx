@@ -18,21 +18,22 @@
  */
 
 import React, {useEffect, useState} from 'react';
+
+import {WebappProperties} from '@wireapp/api-client/src/user/data/';
+import {Checkbox, CheckboxLabel} from '@wireapp/react-ui-kit';
+import {WebAppEvents} from '@wireapp/webapp-events';
 import {amplify} from 'amplify';
 import {container} from 'tsyringe';
-import {WebappProperties} from '@wireapp/api-client/src/user/data/';
-import {WebAppEvents} from '@wireapp/webapp-events';
 
+import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 
+import {Config} from '../../../../../Config';
 import {PropertiesRepository} from '../../../../../properties/PropertiesRepository';
 import {PROPERTIES_TYPE} from '../../../../../properties/PropertiesType';
 import {TeamState} from '../../../../../team/TeamState';
-import {useKoSubscribableChildren} from 'Util/ComponentUtil';
-import {Config} from '../../../../../Config';
 import {ConsentValue} from '../../../../../user/ConsentValue';
 import PreferencesSection from '../components/PreferencesSection';
-import {Checkbox, CheckboxLabel} from '@wireapp/react-ui-kit';
 
 interface DataUsageSectionProps {
   brandName: string;

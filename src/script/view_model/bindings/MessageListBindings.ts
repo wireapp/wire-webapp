@@ -33,8 +33,8 @@ import {
 } from 'Util/KeyboardUtil';
 import {noop} from 'Util/util';
 
-import {viewportObserver} from '../../ui/viewportObserver';
 import {AssetRepository} from '../../assets/AssetRepository';
+import {viewportObserver} from '../../ui/viewportObserver';
 
 /**
  * Focus input field when user starts typing if no other input field or textarea is selected.

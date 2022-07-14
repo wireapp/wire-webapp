@@ -18,6 +18,7 @@
  */
 
 import React from 'react';
+
 import {act, fireEvent, render, RenderResult} from '@testing-library/react';
 
 export default class TestPage<T> {

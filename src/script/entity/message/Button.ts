@@ -17,8 +17,9 @@
  *
  */
 
-import {AssetType} from '../../assets/AssetType';
 import {Asset} from './Asset';
+
+import {AssetType} from '../../assets/AssetType';
 
 export class Button extends Asset {
   public readonly text: string;

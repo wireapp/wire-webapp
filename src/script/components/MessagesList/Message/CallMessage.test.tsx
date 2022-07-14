@@ -18,8 +18,10 @@
  */
 
 import ko from 'knockout';
-import TestPage from 'Util/test/TestPage';
+
 import {CallMessage as CallMessageEntity} from 'src/script/entity/message/CallMessage';
+import TestPage from 'Util/test/TestPage';
+
 import CallMessage, {CallMessageProps} from './CallMessage';
 
 jest.mock('Components/Icon', () => ({

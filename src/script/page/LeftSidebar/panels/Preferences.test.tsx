@@ -17,12 +17,13 @@
  *
  */
 
-import ko from 'knockout';
 import {render} from '@testing-library/react';
-import Preferences from './Preferences';
+import {Runtime} from '@wireapp/commons';
+import ko from 'knockout';
+
 import {ContentViewModel, ContentState} from 'src/script/view_model/ContentViewModel';
 
-import {Runtime} from '@wireapp/commons';
+import Preferences from './Preferences';
 
 describe('Preferences', () => {
   const defaultParams = {

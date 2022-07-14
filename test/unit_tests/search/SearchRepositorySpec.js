@@ -18,6 +18,7 @@
  */
 
 import {User} from 'src/script/entity/User';
+
 import {TestFactory} from '../../helper/TestFactory';
 
 describe('SearchRepository', () => {

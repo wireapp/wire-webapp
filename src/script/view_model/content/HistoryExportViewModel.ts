@@ -22,19 +22,17 @@ import {amplify} from 'amplify';
 import ko from 'knockout';
 import {container} from 'tsyringe';
 
-import {getLogger, Logger} from 'Util/Logger';
 import {t} from 'Util/LocalizerUtil';
+import {getLogger, Logger} from 'Util/Logger';
 import {getCurrentDate} from 'Util/TimeUtil';
 import {downloadBlob} from 'Util/util';
 import 'Components/LoadingBar';
 
-import {ContentViewModel} from '../ContentViewModel';
-import {Config} from '../../Config';
-
-import {CancelError} from '../../backup/Error';
-
 import {BackupRepository} from '../../backup/BackupRepository';
+import {CancelError} from '../../backup/Error';
+import {Config} from '../../Config';
 import {UserState} from '../../user/UserState';
+import {ContentViewModel} from '../ContentViewModel';
 
 export class HistoryExportViewModel {
   private readonly logger: Logger;

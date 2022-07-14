@@ -20,8 +20,8 @@
 import React from 'react';
 
 import DragableClickWrapper from 'Components/DragableClickWrapper';
-import {t} from 'Util/LocalizerUtil';
 import Icon from 'Components/Icon';
+import {t} from 'Util/LocalizerUtil';
 
 export interface PanelHeaderProps {
   closeUie?: string;

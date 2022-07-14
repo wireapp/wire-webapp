@@ -17,47 +17,48 @@
  *
  */
 
-import {WebAppEvents} from '@wireapp/webapp-events';
 import {ConnectionStatus} from '@wireapp/api-client/src/connection/';
-
-import {getLogger, Logger} from 'Util/Logger';
-import {t} from 'Util/LocalizerUtil';
-import {alias} from 'Util/util';
-import ko from 'knockout';
+import {WebAppEvents} from '@wireapp/webapp-events';
 import {amplify} from 'amplify';
+import ko from 'knockout';
 import {container} from 'tsyringe';
 
-import {Config} from '../Config';
-import {MessageListViewModel} from './content/MessageListViewModel';
-import {LegalHoldModalViewModel} from './content/LegalHoldModalViewModel';
-import {EmojiInputViewModel} from './content/EmojiInputViewModel';
-import {ModalsViewModel} from './ModalsViewModel';
-import {ConversationError} from '../error/ConversationError';
-import {ConnectRequestsViewModel} from './content/ConnectRequestsViewModel';
-import {GiphyViewModel} from './content/GiphyViewModel';
-import {HistoryImportViewModel} from './content/HistoryImportViewModel';
-import {HistoryExportViewModel} from './content/HistoryExportViewModel';
-import {InputBarViewModel} from './content/InputBarViewModel';
-import {PanelViewModel} from './PanelViewModel';
-import type {MainViewModel, ViewModelRepositories} from './MainViewModel';
-import type {ConversationRepository} from '../conversation/ConversationRepository';
-import type {UserRepository} from '../user/UserRepository';
+import {t} from 'Util/LocalizerUtil';
+import {getLogger, Logger} from 'Util/Logger';
+import {matchQualifiedIds} from 'Util/QualifiedId';
+import {isConversationEntity} from 'Util/TypePredicateUtil';
+import {alias} from 'Util/util';
+
 import type {Conversation} from '../entity/Conversation';
 import type {Message} from '../entity/message/Message';
-import {UserState} from '../user/UserState';
+import {ConversationError} from '../error/ConversationError';
 import {TeamState} from '../team/TeamState';
+import type {UserRepository} from '../user/UserRepository';
+import {UserState} from '../user/UserState';
+
+import {ConnectRequestsViewModel} from './content/ConnectRequestsViewModel';
+import {EmojiInputViewModel} from './content/EmojiInputViewModel';
+import {GiphyViewModel} from './content/GiphyViewModel';
+import {HistoryExportViewModel} from './content/HistoryExportViewModel';
+import {HistoryImportViewModel} from './content/HistoryImportViewModel';
+import {InputBarViewModel} from './content/InputBarViewModel';
+import {LegalHoldModalViewModel} from './content/LegalHoldModalViewModel';
+import {MessageListViewModel} from './content/MessageListViewModel';
+import type {MainViewModel, ViewModelRepositories} from './MainViewModel';
+import {ModalsViewModel, modals} from './ModalsViewModel';
+import {PanelViewModel} from './PanelViewModel';
+
+import {Config} from '../Config';
+import type {ConversationRepository} from '../conversation/ConversationRepository';
 import {ConversationState} from '../conversation/ConversationState';
-import {isConversationEntity} from 'Util/TypePredicateUtil';
-import {matchQualifiedIds} from 'Util/QualifiedId';
 import '../page/LeftSidebar';
 import '../page/MainContent';
+import {MessageRepository} from '../conversation/MessageRepository';
 import {
   PreferenceNotificationRepository,
   Notification,
   ClientNotificationData,
 } from '../notification/PreferenceNotificationRepository';
-import {modals} from '../view_model/ModalsViewModel';
-import {MessageRepository} from '../conversation/MessageRepository';
 
 interface ShowConversationOptions {
   exposeMessage?: Message;

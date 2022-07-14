@@ -17,9 +17,11 @@
  *
  */
 
+import React, {useEffect, useRef, useState} from 'react';
+
 import {ClientType} from '@wireapp/api-client/src/client/index';
 import {BackendErrorLabel} from '@wireapp/api-client/src/http';
-import {UrlUtil} from '@wireapp/commons';
+import {UrlUtil, Runtime} from '@wireapp/commons';
 import {pathWithParams} from '@wireapp/commons/src/main/util/UrlUtil';
 import {PATTERN, isValidEmail} from '@wireapp/commons/src/main/util/ValidationUtil';
 import {
@@ -34,11 +36,12 @@ import {
   RoundIconButton,
   Loading,
 } from '@wireapp/react-ui-kit';
-import React, {useEffect, useRef, useState} from 'react';
 import {FormattedMessage, useIntl} from 'react-intl';
 import {connect} from 'react-redux';
+import {Redirect} from 'react-router';
 import {AnyAction, Dispatch} from 'redux';
 import useReactRouter from 'use-react-router';
+
 import {Config} from '../../Config';
 import {loginStrings, logoutReasonStrings, ssoLoginStrings} from '../../strings';
 import {actionRoot as ROOT_ACTIONS} from '../module/action/';
@@ -48,9 +51,7 @@ import {RootState, bindActionCreators} from '../module/reducer';
 import * as AuthSelector from '../module/selector/AuthSelector';
 import * as ClientSelector from '../module/selector/ClientSelector';
 import {QUERY_KEY, ROUTE} from '../route';
-import {Runtime} from '@wireapp/commons';
 import {parseError, parseValidationErrors} from '../util/errorUtil';
-import {Redirect} from 'react-router';
 import {getSearchParams} from '../util/urlUtil';
 
 export interface SingleSignOnFormProps extends React.HTMLAttributes<HTMLDivElement> {

@@ -18,10 +18,13 @@
  */
 
 import {VIDEO_STATE} from '@wireapp/avs';
-import GroupVideoGrid, {GroupVideoGripProps} from './GroupVideoGrid';
+
 import TestPage from 'Util/test/TestPage';
-import {User} from '../../entity/User';
+
+import GroupVideoGrid, {GroupVideoGripProps} from './GroupVideoGrid';
+
 import {Participant} from '../../calling/Participant';
+import {User} from '../../entity/User';
 
 class GroupVideoGridPage extends TestPage<GroupVideoGripProps> {
   constructor(props?: GroupVideoGripProps) {

@@ -17,14 +17,6 @@
  *
  */
 
-import {loadValue, storeValue} from 'Util/StorageUtil';
-import {getParameter} from 'Util/UrlUtil';
-import {DEFAULT_LOCALE, setLocale, setStrings} from 'Util/LocalizerUtil';
-import {setDateLocale, LocaleType} from 'Util/TimeUtil';
-
-import {URLParameter} from '../auth/URLParameter';
-import {StorageKey} from '../storage/StorageKey';
-
 import cs from 'I18n/cs-CZ.json';
 import da from 'I18n/da-DK.json';
 import de from 'I18n/de-DE.json';
@@ -47,6 +39,13 @@ import sk from 'I18n/sk-SK.json';
 import sl from 'I18n/sl-SI.json';
 import tr from 'I18n/tr-TR.json';
 import uk from 'I18n/uk-UA.json';
+import {DEFAULT_LOCALE, setLocale, setStrings} from 'Util/LocalizerUtil';
+import {loadValue, storeValue} from 'Util/StorageUtil';
+import {setDateLocale, LocaleType} from 'Util/TimeUtil';
+import {getParameter} from 'Util/UrlUtil';
+
+import {URLParameter} from '../auth/URLParameter';
+import {StorageKey} from '../storage/StorageKey';
 
 window.z = window.z || {};
 
