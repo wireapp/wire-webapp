@@ -18,6 +18,5 @@
  */
 
 export interface GroupIdRecord {
-  id: string;
   value: string;
 }
