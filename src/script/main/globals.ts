@@ -28,16 +28,13 @@ import 'Components/CopyToClipboard';
 import 'Components/icons';
 import 'Components/Image';
 import 'Components/MessagesList';
-import 'Components/TitleBar';
-import 'Components/Modals/GroupCreation/GroupCreationModal';
-
-import '../page/AppLock';
-
 import 'Components/modal';
+import 'Components/Modals/GroupCreation/GroupCreationModal';
 import 'Components/panel/ServiceDetails';
 import 'Components/panel/UserDetails';
-import 'Components/ServiceList';
 import 'Components/SearchInput';
+import 'Components/ServiceList';
+import 'Components/TitleBar';
 import 'Components/toggle/BaseToggle';
 import 'Components/toggle/InfoToggle';
 import 'Components/UserSearchableList';
@@ -48,6 +45,7 @@ import type {AssetService} from '../assets/AssetService';
 import '../Config';
 import type {NotificationService} from '../event/NotificationService';
 import '../localization/Localizer';
+import '../page/AppLock';
 import '../view_model/bindings/CommonBindings';
 import '../view_model/bindings/ConversationListBindings';
 import '../view_model/bindings/MessageListBindings';

@@ -18,12 +18,11 @@
  */
 
 // Polyfill "Object.entries" & "Object.values"
+import React from 'react';
+
 import 'core-js/es7/object';
 import 'core-js/es7/reflect';
 import cookieStore from 'js-cookie';
-
-import React from 'react';
-
 import {createRoot} from 'react-dom/client';
 import {Provider, ConnectedComponent} from 'react-redux';
 import {container} from 'tsyringe';

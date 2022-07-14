@@ -23,10 +23,10 @@ import {amplify} from 'amplify';
 import ko from 'knockout';
 import {container} from 'tsyringe';
 
-import {Actions} from 'Components/panel/UserActions';
-import {Logger, getLogger} from 'Util/Logger';
 import 'Components/panel/EnrichedFields';
+import {Actions} from 'Components/panel/UserActions';
 import 'Components/panel/UserDetails';
+import {Logger, getLogger} from 'Util/Logger';
 
 import {BasePanelViewModel, PanelViewModelProps} from './BasePanelViewModel';
 

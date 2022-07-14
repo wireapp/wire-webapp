@@ -17,8 +17,6 @@
  *
  */
 
-const jQuery = require('jquery');
-
 import {amplify} from 'amplify';
 
 import '../event/Client';
@@ -27,6 +25,7 @@ import '../message/MessageCategory';
 import '../service/BackendEnvironment';
 import '../storage/StorageSchemata';
 
+const jQuery = require('jquery');
 window.amplify = amplify;
 window.jQuery = jQuery;
 window.$ = jQuery;

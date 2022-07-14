@@ -17,11 +17,11 @@
  *
  */
 
+import {CONV_TYPE, CALL_TYPE, STATE as CALL_STATE, REASON, Wcall} from '@wireapp/avs';
+import {WebAppEvents} from '@wireapp/webapp-events';
+import {amplify} from 'amplify';
 import 'jsdom-worker';
 import ko, {Subscription} from 'knockout';
-import {amplify} from 'amplify';
-import {WebAppEvents} from '@wireapp/webapp-events';
-import {CONV_TYPE, CALL_TYPE, STATE as CALL_STATE, REASON, Wcall} from '@wireapp/avs';
 import {TestFactory} from 'test/helper/TestFactory';
 
 import {Call} from 'src/script/calling/Call';

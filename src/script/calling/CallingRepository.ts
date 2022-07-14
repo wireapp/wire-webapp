@@ -49,16 +49,14 @@ import {amplify} from 'amplify';
 import axios from 'axios';
 import ko from 'knockout';
 import {container} from 'tsyringe';
+import 'webrtc-adapter';
 
 import {flatten} from 'Util/ArrayUtil';
 import {t} from 'Util/LocalizerUtil';
-import {matchQualifiedIds} from 'Util/QualifiedId';
-
-import 'webrtc-adapter';
-
 import {Logger, getLogger} from 'Util/Logger';
-import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 import {roundLogarithmic} from 'Util/NumberUtil';
+import {matchQualifiedIds} from 'Util/QualifiedId';
+import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 
 import {Call, SerializedConversationId} from './Call';
 import {CallState, MuteState} from './CallState';

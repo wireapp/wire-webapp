@@ -21,11 +21,11 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 import {amplify} from 'amplify';
 import ko from 'knockout';
 
+import 'Components/LoadingBar';
 import {t} from 'Util/LocalizerUtil';
 import {getLogger, Logger} from 'Util/Logger';
 import {loadFileBuffer} from 'Util/util';
 import {WebWorker} from 'Util/worker';
-import 'Components/LoadingBar';
 
 import {BackupRepository} from '../../backup/BackupRepository';
 import {CancelError, DifferentAccountError, ImportError, IncompatibleBackupError} from '../../backup/Error';

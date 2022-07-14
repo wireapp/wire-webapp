@@ -17,9 +17,9 @@
  *
  */
 
+import 'jquery-mousewheel';
 import ko from 'knockout';
 import {container} from 'tsyringe';
-import 'jquery-mousewheel';
 
 import {
   isArrowKey,

@@ -47,26 +47,26 @@ jest.mock('axios', () => {
 });
 
 require('test/api/payloads');
-
+const testLib = require('@testing-library/react');
 const Adapter = require('@wojtekmaj/enzyme-adapter-react-17');
+const {amplify} = require('amplify');
 const {configure} = require('enzyme');
+const jQuery = require('jquery');
+const ko = require('knockout');
+const sinon = require('sinon');
+const encoding = require('text-encoding');
 
 configure({adapter: new Adapter()});
 
-const encoding = require('text-encoding');
 window.TextEncoder = encoding.TextEncoder;
 window.TextDecoder = encoding.TextDecoder;
 
-const sinon = require('sinon');
 window.sinon = sinon;
 
-const ko = require('knockout');
 window.ko = ko;
 
-const {amplify} = require('amplify');
 window.amplify = amplify;
 
-const jQuery = require('jquery');
 window.jQuery = jQuery;
 window.$ = jQuery;
 
@@ -78,5 +78,4 @@ window.wire = {
 
 window.z = {userPermission: {}};
 
-const testLib = require('@testing-library/react');
 testLib.configure({testIdAttribute: 'data-uie-name'});

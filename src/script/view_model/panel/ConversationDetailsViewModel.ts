@@ -24,8 +24,8 @@ import ko from 'knockout';
 import {container} from 'tsyringe';
 
 import type {MenuItem} from 'Components/panel/PanelActions';
-import 'Components/toggle/ReceiptModeToggle';
 import 'Components/panel/PanelActions';
+import 'Components/toggle/ReceiptModeToggle';
 import {t} from 'Util/LocalizerUtil';
 import {Logger, getLogger} from 'Util/Logger';
 import {removeLineBreaks, sortUsersByPriority} from 'Util/StringUtil';

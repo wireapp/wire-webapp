@@ -22,9 +22,10 @@
 /* eslint no-undef: "off" */
 
 // Polyfill for "tsyringe" dependency injection
+import {ClientClassification, ClientType} from '@wireapp/api-client/src/client/';
+import {Cryptobox} from '@wireapp/cryptobox';
 import 'core-js/es7/reflect';
 import ko from 'knockout';
-import {ClientClassification, ClientType} from '@wireapp/api-client/src/client/';
 import {container} from 'tsyringe';
 
 import {AssetRepository} from 'src/script/assets/AssetRepository';
@@ -68,9 +69,6 @@ import {TeamState} from 'src/script/team/TeamState';
 import {serverTimeHandler} from 'src/script/time/serverTimeHandler';
 import {EventTrackingRepository} from 'src/script/tracking/EventTrackingRepository';
 import {UserRepository} from 'src/script/user/UserRepository';
-
-import {Cryptobox} from '@wireapp/cryptobox';
-
 import {UserService} from 'src/script/user/UserService';
 import {UserState} from 'src/script/user/UserState';
 

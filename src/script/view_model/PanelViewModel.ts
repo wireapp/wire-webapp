@@ -32,9 +32,9 @@ import {GroupParticipantServiceViewModel} from './panel/GroupParticipantServiceV
 import {GroupParticipantUserViewModel} from './panel/GroupParticipantUserViewModel';
 import {GuestsAndServicesViewModel} from './panel/GuestsAndServicesViewModel';
 import {MessageDetailsViewModel} from './panel/MessageDetailsViewModel';
-import './panel/TimedMessagesPanel';
-import './panel/ParticipantDevicesPanel';
 import './panel/NotificationsPanel';
+import './panel/ParticipantDevicesPanel';
+import './panel/TimedMessagesPanel';
 
 import {ConversationState} from '../conversation/ConversationState';
 import type {Conversation} from '../entity/Conversation';

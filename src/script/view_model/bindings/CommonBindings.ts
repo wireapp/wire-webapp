@@ -17,11 +17,12 @@
  *
  */
 
+import '@wireapp/antiscroll-2/dist/antiscroll-2';
+import {Runtime} from '@wireapp/commons';
 import $ from 'jquery';
 import ko from 'knockout';
 import SimpleBar from 'simplebar';
 import {debounce, throttle} from 'underscore';
-import '@wireapp/antiscroll-2/dist/antiscroll-2';
 
 import {isEnterKey} from 'Util/KeyboardUtil';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
@@ -29,8 +30,6 @@ import {stripUrlWrapper} from 'Util/util';
 
 import {overlayedObserver} from '../../ui/overlayedObserver';
 import {viewportObserver} from '../../ui/viewportObserver';
-
-import {Runtime} from '@wireapp/commons';
 
 type KOEvent<T = Event> = JQuery.Event & {currentTarget: Element; originalEvent: T};
 

@@ -17,17 +17,17 @@
  *
  */
 
+import {InputHTMLAttributes} from 'react';
+
 import {Availability} from '@wireapp/protocol-messaging';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import {amplify} from 'amplify';
-
-import {AVATAR_SIZE} from 'Components/Avatar';
-import 'Components/input/ClassifiedBar';
-
 import ko from 'knockout';
 import {container} from 'tsyringe';
 import {escape} from 'underscore';
 
+import {AVATAR_SIZE} from 'Components/Avatar';
+import 'Components/input/ClassifiedBar';
 import {allowsAllFiles, hasAllowedExtension, getFileExtensionOrName} from 'Util/FileTypeUtil';
 import {KEY, isFunctionKey, insertAtCaret} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
@@ -54,15 +54,13 @@ import {EventRepository} from '../../event/EventRepository';
 import {MentionEntity} from '../../message/MentionEntity';
 import {MessageHasher} from '../../message/MessageHasher';
 import {QuoteEntity} from '../../message/QuoteEntity';
+import '../../page/message-list/MentionSuggestions';
 import {SearchRepository} from '../../search/SearchRepository';
 import {StorageRepository} from '../../storage';
 import {StorageKey} from '../../storage/StorageKey';
 import {TeamState} from '../../team/TeamState';
 import {UserState} from '../../user/UserState';
 import {ModalsViewModel} from '../ModalsViewModel';
-import '../../page/message-list/MentionSuggestions';
-
-import {InputHTMLAttributes} from 'react';
 
 interface DraftMessage {
   mentions: MentionEntity[];

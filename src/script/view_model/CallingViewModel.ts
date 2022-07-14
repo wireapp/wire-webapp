@@ -17,6 +17,7 @@
  *
  */
 
+import {QualifiedId} from '@wireapp/api-client/src/user';
 import {CALL_TYPE, CONV_TYPE, REASON as CALL_REASON, STATE as CALL_STATE} from '@wireapp/avs';
 import {Availability} from '@wireapp/protocol-messaging';
 import {WebAppEvents} from '@wireapp/webapp-events';
@@ -50,8 +51,6 @@ import {PROPERTIES_TYPE} from '../properties/PropertiesType';
 import type {TeamRepository} from '../team/TeamRepository';
 import {TeamState} from '../team/TeamState';
 import {ROLE} from '../user/UserPermission';
-
-import {QualifiedId} from '@wireapp/api-client/src/user';
 
 export interface CallActions {
   answer: (call: Call) => void;

@@ -17,8 +17,6 @@
  *
  */
 
-import 'util/test/mock/resizeObserver.mock';
-
 import React from 'react';
 
 import {act, render, waitFor} from '@testing-library/react';
@@ -26,6 +24,7 @@ import {act, render, waitFor} from '@testing-library/react';
 import {Conversation} from 'src/script/entity/Conversation';
 import {ContentMessage} from 'src/script/entity/message/ContentMessage';
 import {User} from 'src/script/entity/User';
+import 'Util/test/mock/resizeObserver.mock';
 import {createRandomUuid} from 'Util/util';
 
 import {Text} from '../../entity/message/Text';

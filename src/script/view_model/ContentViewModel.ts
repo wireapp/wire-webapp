@@ -29,13 +29,6 @@ import {matchQualifiedIds} from 'Util/QualifiedId';
 import {isConversationEntity} from 'Util/TypePredicateUtil';
 import {alias} from 'Util/util';
 
-import type {Conversation} from '../entity/Conversation';
-import type {Message} from '../entity/message/Message';
-import {ConversationError} from '../error/ConversationError';
-import {TeamState} from '../team/TeamState';
-import type {UserRepository} from '../user/UserRepository';
-import {UserState} from '../user/UserState';
-
 import {ConnectRequestsViewModel} from './content/ConnectRequestsViewModel';
 import {EmojiInputViewModel} from './content/EmojiInputViewModel';
 import {GiphyViewModel} from './content/GiphyViewModel';
@@ -51,14 +44,20 @@ import {PanelViewModel} from './PanelViewModel';
 import {Config} from '../Config';
 import type {ConversationRepository} from '../conversation/ConversationRepository';
 import {ConversationState} from '../conversation/ConversationState';
-import '../page/LeftSidebar';
-import '../page/MainContent';
 import {MessageRepository} from '../conversation/MessageRepository';
+import type {Conversation} from '../entity/Conversation';
+import type {Message} from '../entity/message/Message';
+import {ConversationError} from '../error/ConversationError';
 import {
   PreferenceNotificationRepository,
   Notification,
   ClientNotificationData,
 } from '../notification/PreferenceNotificationRepository';
+import '../page/LeftSidebar';
+import '../page/MainContent';
+import {TeamState} from '../team/TeamState';
+import type {UserRepository} from '../user/UserRepository';
+import {UserState} from '../user/UserState';
 
 interface ShowConversationOptions {
   exposeMessage?: Message;

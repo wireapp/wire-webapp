@@ -19,11 +19,10 @@
 
 import ko from 'knockout';
 
+import 'Components/LoadingBar';
 import {t} from 'Util/LocalizerUtil';
 
 import {Config} from '../Config';
-
-import 'Components/LoadingBar';
 
 export class LoadingViewModel {
   loadingMessage: ko.Observable<string>;
