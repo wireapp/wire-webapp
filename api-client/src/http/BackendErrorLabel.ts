@@ -104,6 +104,7 @@ export enum BackendErrorLabel {
 
   // Legalhold errors
   LEGAL_HOLD_MISSING_CONSENT = 'missing-legalhold-consent',
+  LEGAL_HOLD_SERVICE_UNAVAILABLE = 'legalhold-unavailable',
 
   // Service errors
   SERVICE_DISABLED = 'service-disabled',
