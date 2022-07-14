@@ -24,16 +24,16 @@ import {
   DeviceIcon,
   Form,
   Input,
-  InputBlock,
-  InputSubmitCombo,
   Line,
   RoundIconButton,
   Small,
   Text,
   TrashIcon,
+  FlexBox,
 } from '@wireapp/react-ui-kit';
 import React, {useEffect, useState} from 'react';
 import {useIntl} from 'react-intl';
+import {t} from 'Util/LocalizerUtil';
 import {splitFingerprint} from 'Util/StringUtil';
 import {clientItemStrings} from '../../strings';
 import {ValidationError} from '../module/action/ValidationError';
@@ -186,7 +186,7 @@ const ClientItem = ({selected, onClientRemoval, onClick, client, clientError, re
   };
 
   const animationPosition = animationStep / CONFIG.animationSteps;
-  const height = animationPosition * 56;
+  const height = animationPosition * 70;
   const marginTop = animationPosition * 16;
   const paddingHorizontal = animationPosition * 2;
 
@@ -197,8 +197,8 @@ const ClientItem = ({selected, onClientRemoval, onClick, client, clientError, re
           ['&:focus-within']: {
             boxShadow: `0 0 0 1px ${COLOR.BLUE}`,
           },
-          backgroundColor: selected ? '#DCE0E3' : '',
-          borderRadius: '4px',
+          backgroundColor: selected ? '#FFF' : '',
+          borderRadius: '12px',
           transition: 'background-color .35s linear',
         }}
         data-uie-value={client.model}
@@ -225,7 +225,7 @@ const ClientItem = ({selected, onClientRemoval, onClick, client, clientError, re
             </div>
             {!requirePassword && (
               <RoundIconButton
-                backgroundColor={COLOR.RED}
+                aria-label={t('modalAccountRemoveDeviceAction')}
                 data-uie-name="do-remove-device"
                 formNoValidate
                 onClick={handlePasswordlessClientDeletion}
@@ -241,8 +241,8 @@ const ClientItem = ({selected, onClientRemoval, onClick, client, clientError, re
         {requirePassword && (isSelected || isAnimating) && (
           <ContainerXS style={{overflow: 'hidden', padding: `${paddingHorizontal}px 0`}}>
             <Form>
-              <InputBlock style={{margin: '12px'}}>
-                <InputSubmitCombo style={{background: 'white', boxShadow: 'none', marginBottom: '0'}}>
+              <FlexBox css={{alignItems: 'center', margin: '10px 10px 10px 0', maxHeight: height}}>
+                <FlexBox css={{flexGrow: 1, marginRight: '12px'}}>
                   <Input
                     id="remove-device-password"
                     autoComplete="section-login password"
@@ -253,23 +253,22 @@ const ClientItem = ({selected, onClientRemoval, onClick, client, clientError, re
                     pattern=".{1,1024}"
                     placeholder={_(clientItemStrings.passwordPlaceholder)}
                     required
-                    style={{background: 'transparent'}}
                     type="password"
                     value={password}
                   />
-                  <RoundIconButton
-                    backgroundColor={COLOR.RED}
-                    data-uie-name="do-remove-device"
-                    disabled={!password || !isValidPassword}
-                    formNoValidate
-                    onClick={handleSubmit}
-                    style={{marginBottom: '-4px'}}
-                    type="submit"
-                  >
-                    <TrashIcon />
-                  </RoundIconButton>
-                </InputSubmitCombo>
-              </InputBlock>
+                </FlexBox>
+                <RoundIconButton
+                  aria-label={t('modalAccountRemoveDeviceAction')}
+                  data-uie-name="do-remove-device"
+                  disabled={!password || !isValidPassword}
+                  formNoValidate
+                  css={{marginBottom: 20}}
+                  onClick={handleSubmit}
+                  type="submit"
+                >
+                  <TrashIcon />
+                </RoundIconButton>
+              </FlexBox>
             </Form>
           </ContainerXS>
         )}
