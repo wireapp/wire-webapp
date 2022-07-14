@@ -29,13 +29,21 @@ export interface PanelHeaderProps {
   onClose: () => void;
   onGoBack: () => void;
   title?: string;
+  goBackTitle?: string;
 }
 
-const PanelHeader: React.FC<PanelHeaderProps> = ({onGoBack, onClose, title, goBackUie, closeUie = 'do-close'}) => {
+const PanelHeader: React.FC<PanelHeaderProps> = ({
+  onGoBack,
+  onClose,
+  title,
+  goBackUie,
+  closeUie = 'do-close',
+  goBackTitle = t('index.goBack'),
+}) => {
   return (
     <div className="panel__header">
       <DragableClickWrapper onClick={onGoBack}>
-        <button className="icon-button" data-uie-name={goBackUie} title={t('index.goBack')}>
+        <button className="icon-button" data-uie-name={goBackUie} title={goBackTitle}>
           <Icon.ArrowLeft />
         </button>
       </DragableClickWrapper>

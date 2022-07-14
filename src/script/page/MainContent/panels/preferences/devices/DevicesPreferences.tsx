@@ -52,23 +52,30 @@ const Device: React.FC<{
   isSSO: boolean;
   onRemove: (device: ClientEntity) => void;
   onSelect: (device: ClientEntity) => void;
-}> = ({device, isSSO, onSelect, onRemove}) => {
+  deviceNumber: number;
+}> = ({device, isSSO, onSelect, onRemove, deviceNumber}) => {
   const {isVerified} = useKoSubscribableChildren(device.meta, ['isVerified']);
-
+  const deviceAriaLabel = `${t('preferencesDevice')} ${deviceNumber}, ${device.getName()}, ${
+    isVerified ? t('preferencesDevicesVerification') : t('preferencesDeviceNotVerified')
+  }, `;
   return (
     <div
-      role="button"
-      tabIndex={0}
       className="preferences-devices-card"
       onClick={() => onSelect(device)}
       onKeyDown={e => handleKeyDown(e, onSelect.bind(null, device))}
+      tabIndex={0}
+      role="button"
     >
       <div className="preferences-devices-card-data">
         <div className="preferences-devices-card-icon" data-uie-value={device.id} data-uie-name="device-id">
           <VerifiedIcon data-uie-name={`user-device-${isVerified ? '' : 'not-'}verified`} isVerified={isVerified} />
         </div>
         <div className="preferences-devices-card-info">
-          <div className="preferences-devices-model" data-uie-name="preferences-device-active-model">
+          <div
+            className="preferences-devices-model"
+            data-uie-name="preferences-device-active-model"
+            aria-label={deviceAriaLabel}
+          >
             {device.getName()}
           </div>
           <div className="preferences-devices-id">
@@ -94,7 +101,11 @@ const Device: React.FC<{
             <Icon.Delete />
           </button>
         )}
-        <div className="icon-forward preferences-devices-card-action__forward" data-uie-name="go-device-details" />
+        <div
+          className="icon-forward preferences-devices-card-action__forward"
+          data-uie-name="go-device-details"
+          aria-hidden={true}
+        />
       </div>
     </div>
   );
@@ -148,13 +159,14 @@ const DevicesPreferences: React.FC<DevicesPreferencesProps> = ({
         {clients.length > 0 && (
           <fieldset className="preferences-section">
             <legend className="preferences-header">{t('preferencesDevicesActive')}</legend>
-            {clients.map(device => (
+            {clients.map((device, index) => (
               <Device
                 device={device}
                 key={device.id}
                 isSSO={isSSO}
                 onSelect={setSelectedDevice}
                 onRemove={removeDevice}
+                deviceNumber={++index}
               />
             ))}
             <div className="preferences-detail">{t('preferencesDevicesActiveDetail')}</div>

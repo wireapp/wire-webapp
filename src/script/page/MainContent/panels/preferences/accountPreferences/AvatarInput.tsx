@@ -97,7 +97,7 @@ const AvatarInput: React.FC<AvatarInputProps> = ({selfUser, isActivatedAccount, 
       tabIndex={0}
       role="button"
       onKeyDown={(event: React.KeyboardEvent<HTMLElement>) => handleKeyDown(event, inputClick)}
-      aria-label={t('tooltipPreferencesPicture')}
+      aria-label={`${t('userProfileImageAlt')} ${selfUser.name()}, ${t('tooltipPreferencesPicture')}`}
     >
       <label
         className="preferences-account-picture-button"

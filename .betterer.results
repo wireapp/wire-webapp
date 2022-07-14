@@ -2113,7 +2113,7 @@ exports[`stricter compilation`] = {
       [70, 6, 9, "Argument of type \'undefined\' is not assignable to parameter of type \'string\'.", "2620553983"],
       [104, 40, 43, "Argument of type \'string | undefined\' is not assignable to parameter of type \'string\'.\\n  Type \'undefined\' is not assignable to type \'string\'.", "1072333434"]
     ],
-    "src/script/page/MainContent/panels/preferences/accountPreferences/AvatarInput.tsx:919643938": [
+    "src/script/page/MainContent/panels/preferences/accountPreferences/AvatarInput.tsx:2284917208": [
       [50, 69, 9, "Argument of type \'undefined\' is not assignable to parameter of type \'string\'.", "2620553983"],
       [91, 4, 16, "Object is possibly \'null\'.", "4019370437"],
       [116, 23, 14, "Argument of type \'File | null\' is not assignable to parameter of type \'File\'.\\n  Type \'null\' is not assignable to type \'File\'.", "1073819172"]
@@ -2136,10 +2136,10 @@ exports[`stricter compilation`] = {
       [34, 41, 22, "Cannot invoke an object which is possibly \'undefined\'.", "1980738780"],
       [41, 21, 12, "Argument of type \'string | undefined\' is not assignable to parameter of type \'Matcher\'.\\n  Type \'undefined\' is not assignable to type \'Matcher\'.", "2075561852"]
     ],
-    "src/script/page/MainContent/panels/preferences/devices/DevicesPreferences.tsx:3136549338": [
-      [67, 90, 10, "Type \'undefined\' is not assignable to type \'boolean\'.", "3231345145"],
-      [124, 8, 14, "Type \'(device: ClientEntity) => Promise<string | undefined>\' is not assignable to type \'(device: ClientEntity) => Promise<string>\'.\\n  Type \'Promise<string | undefined>\' is not assignable to type \'Promise<string>\'.\\n    Type \'string | undefined\' is not assignable to type \'string\'.\\n      Type \'undefined\' is not assignable to type \'string\'.", "223037395"],
-      [131, 73, 37, "Argument of type \'Conversation | undefined\' is not assignable to parameter of type \'Conversation\'.\\n  Type \'undefined\' is not assignable to type \'Conversation\'.", "3769528030"]
+    "src/script/page/MainContent/panels/preferences/devices/DevicesPreferences.tsx:1887463636": [
+      [70, 90, 10, "Type \'undefined\' is not assignable to type \'boolean\'.", "3231345145"],
+      [135, 8, 14, "Type \'(device: ClientEntity) => Promise<string | undefined>\' is not assignable to type \'(device: ClientEntity) => Promise<string>\'.\\n  Type \'Promise<string | undefined>\' is not assignable to type \'Promise<string>\'.\\n    Type \'string | undefined\' is not assignable to type \'string\'.\\n      Type \'undefined\' is not assignable to type \'string\'.", "223037395"],
+      [142, 73, 37, "Argument of type \'Conversation | undefined\' is not assignable to parameter of type \'Conversation\'.\\n  Type \'undefined\' is not assignable to type \'Conversation\'.", "3769528030"]
     ],
     "src/script/page/message-list/InputBarControls/InputBarControls.test.tsx:2517377529": [
       [33, 2, 12, "Type \'undefined\' is not assignable to type \'Conversation\'.", "1670678216"]
@@ -2782,9 +2782,9 @@ exports[`stricter compilation`] = {
       [38, 54, 29, "Argument of type \'Element | null\' is not assignable to parameter of type \'Element\'.\\n  Type \'null\' is not assignable to type \'Element\'.", "1262202094"],
       [76, 20, 77, "Argument of type \'Element | null\' is not assignable to parameter of type \'Document | Node | Element | Window\'.", "1971299222"]
     ],
-    "src/script/view_model/panel/NotificationsPanel.tsx:3967190560": [
+    "src/script/view_model/panel/NotificationsPanel.tsx:3185514146": [
       [46, 56, 18, "Argument of type \'Conversation | null\' is not assignable to parameter of type \'Partial<Record<\\"notificationState\\", Subscribable<any>>>\'.\\n  Type \'null\' is not assignable to type \'Partial<Record<\\"notificationState\\", Subscribable<any>>>\'.", "2242649668"],
-      [78, 77, 18, "Argument of type \'Conversation | null\' is not assignable to parameter of type \'Conversation\'.\\n  Type \'null\' is not assignable to type \'Conversation\'.", "2242649668"]
+      [79, 77, 18, "Argument of type \'Conversation | null\' is not assignable to parameter of type \'Conversation\'.\\n  Type \'null\' is not assignable to type \'Conversation\'.", "2242649668"]
     ],
     "src/script/view_model/panel/PanelHeader.test.ts:4232255009": [
       [33, 39, 22, "Argument of type \'Element | null\' is not assignable to parameter of type \'Element\'.\\n  Type \'null\' is not assignable to type \'Element\'.", "3474761039"],

@@ -30,6 +30,7 @@ import AvatarInitials from './AvatarInitials';
 import AvatarBadge from './AvatarBadge';
 import AvatarBorder from './AvatarBorder';
 import AvatarWrapper from './AvatarWrapper';
+import {t} from 'Util/LocalizerUtil';
 
 export interface UserAvatarProps extends React.HTMLProps<HTMLDivElement> {
   avatarSize: AVATAR_SIZE;
@@ -77,7 +78,7 @@ const UserAvatar: React.FunctionComponent<UserAvatarProps> = ({
       <AvatarInitials avatarSize={avatarSize} initials={participant.initials()} />
       <AvatarImage
         avatarSize={avatarSize}
-        avatarAlt={participant.name()}
+        avatarAlt={`${t('userProfileImageAlt')} ${participant.name()}`}
         backgroundColor={backgroundColor}
         isGrey={isImageGrey}
         mediumPicture={mediumPictureResource}

@@ -62,6 +62,7 @@ const NotificationsPanel: React.FC<NotificationsPanelProps> = ({
         onGoBack={onGoBack}
         onClose={onClose}
         goBackUie="go-back-notification-options"
+        goBackTitle={t('notificationSettings.goBack')}
         title={t('notificationSettingsTitle')}
       />
       <div className="panel__content" ref={setScrollbarRef}>
