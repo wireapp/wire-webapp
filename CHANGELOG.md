@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [19.14.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/compare/@wireapp/api-client@19.13.4...@wireapp/api-client@19.14.0) (2022-07-14)
+
+
+### Features
+
+* **api-client:** add LEGAL_HOLD_SERVICE_UNAVAILABLE backend error label ([#4329](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/issues/4329)) ([017b389](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/commit/017b3899210b3372171d6f5300e042cc83eb37e3))
+
+
+
+
+
 ## [19.13.4](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/compare/@wireapp/api-client@19.13.3...@wireapp/api-client@19.13.4) (2022-07-08)
 
 **Note:** Version bump only for package @wireapp/api-client
