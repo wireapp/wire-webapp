@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [8.8.2](https://github.com/wireapp/wire-web-packages/tree/main/packages/react-ui-kit/compare/@wireapp/react-ui-kit@8.8.1...@wireapp/react-ui-kit@8.8.2) (2022-07-15)
+
+
+### Bug Fixes
+
+* centre align auth screen checkbox(ACC-207) ([#4330](https://github.com/wireapp/wire-web-packages/tree/main/packages/react-ui-kit/issues/4330)) ([8936691](https://github.com/wireapp/wire-web-packages/tree/main/packages/react-ui-kit/commit/8936691f86ecb36e40c4652e376188dfa84aba33))
+
+
+
+
+
 ## [8.8.1](https://github.com/wireapp/wire-web-packages/tree/main/packages/react-ui-kit/compare/@wireapp/react-ui-kit@8.8.0...@wireapp/react-ui-kit@8.8.1) (2022-07-08)
 
 
