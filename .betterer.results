@@ -340,7 +340,7 @@ exports[`stricter compilation`] = {
     ],
     "src/script/auth/page/Login.tsx:2293216844": [
       [172, 24, 16, "Argument of type \'Error[]\' is not assignable to parameter of type \'SetStateAction<never[]>\'.", "2735526245"],
-      [174, 50, 10, "Type \'ClientType | undefined\' is not assignable to type \'ClientType\'.\\n  Type \'undefined\' is not assignable to type \'ClientType\'.", "3013398820"],
+      [174, 50, 10, "Type \'ClientType | undefined\' is not assignable to type \'ClientType\'.", "3013398820"],
       [203, 56, 10, "Type \'ClientType | undefined\' is not assignable to type \'ClientType\'.", "3013398820"],
       [205, 32, 11, "Argument of type \'string | undefined\' is not assignable to parameter of type \'string\'.\\n  Type \'undefined\' is not assignable to type \'string\'.", "2331572484"],
       [210, 36, 5, "Argument of type \'unknown\' is not assignable to parameter of type \'SetStateAction<string>\'.", "165548477"],
@@ -1374,6 +1374,7 @@ exports[`stricter compilation`] = {
       [1620, 101, 5, "Object is of type \'unknown\'.", "165548477"],
       [1719, 44, 9, "Argument of type \'number | undefined\' is not assignable to parameter of type \'number\'.\\n  Type \'undefined\' is not assignable to type \'number\'.", "2548743275"],
       [1818, 18, 12, "Object is possibly \'undefined\'.", "1670678216"],
+      [1887, 27, 19, "Property \'MLS_WELCOME_MESSAGE\' does not exist on type \'typeof CONVERSATION_EVENT\'.", "3904815270"],
       [1906, 12, 39, "Argument of type \'(conversationEntity: Conversation) => Conversation\' is not assignable to parameter of type \'((value: Conversation) => Conversation | PromiseLike<Conversation>) & ((value: null) => Conversation | PromiseLike<...>)\'.\\n  Type \'(conversationEntity: Conversation) => Conversation\' is not assignable to type \'(value: null) => Conversation | PromiseLike<Conversation>\'.\\n    Types of parameters \'conversationEntity\' and \'value\' are incompatible.\\n      Type \'null\' is not assignable to type \'Conversation\'.", "3862325245"],
       [2002, 52, 9, "Argument of type \'IncomingEvent\' is not assignable to parameter of type \'MappedEvent\'.\\n  Type \'ConversationCodeDeleteEvent\' is not assignable to type \'MappedEvent\'.\\n    Type \'ConversationCodeDeleteEvent\' is not assignable to type \'{ data?: string | MappedEventData | undefined; type: CONVERSATION_EVENT | CONVERSATION; }\'.\\n      Types of property \'data\' are incompatible.\\n        Type \'null\' is not assignable to type \'string | MappedEventData | undefined\'.", "1945995409"],
       [2007, 6, 9, "Argument of type \'IncomingEvent\' is not assignable to parameter of type \'MappedEvent\'.", "1945995409"],
@@ -2064,6 +2065,7 @@ exports[`stricter compilation`] = {
     "src/script/page/AppLock.tsx:2707199433": [
       [163, 28, 36, "Argument of type \'Element | null\' is not assignable to parameter of type \'Node\'.\\n  Type \'null\' is not assignable to type \'Node\'.", "3019440182"],
       [167, 26, 30, "Argument of type \'Element | null\' is not assignable to parameter of type \'Node\'.\\n  Type \'null\' is not assignable to type \'Node\'.", "1790131128"],
+      [195, 59, 37, "Object is possibly \'null\'.", "3700925542"],
       [216, 94, 4, "Argument of type \'unknown\' is not assignable to parameter of type \'StatusCodes\'.", "2087770728"],
       [219, 19, 7, "Argument of type \'unknown\' is not assignable to parameter of type \'SetStateAction<string>\'.", "1236122734"]
     ],
