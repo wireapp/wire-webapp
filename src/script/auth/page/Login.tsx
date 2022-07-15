@@ -332,7 +332,7 @@ const Login = ({
                             checked={loginData.clientType === ClientType.TEMPORARY}
                             data-uie-name="enter-public-computer-sign-in"
                             style={{justifyContent: 'center', marginTop: '12px'}}
-                            alignCenter
+                            aligncenter
                           >
                             <CheckboxLabel htmlFor="enter-public-computer-sign-in">
                               {_(loginStrings.publicComputer)}

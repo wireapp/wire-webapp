@@ -45,7 +45,7 @@ exports[`stricter compilation`] = {
     "src/script/auth/AuthRepository.ts:219478500": [
       [52, 60, 5, "Object is of type \'unknown\'.", "165548477"]
     ],
-    "src/script/auth/component/AccountForm.tsx:259264838": [
+    "src/script/auth/component/AccountForm.tsx:4117596454": [
       [90, 8, 16, "Object is possibly \'undefined\'.", "3859911866"],
       [90, 33, 16, "Object is possibly \'undefined\'.", "3859911866"],
       [92, 11, 16, "Object is possibly \'undefined\'.", "3859911866"],
@@ -338,7 +338,7 @@ exports[`stricter compilation`] = {
       [115, 16, 5, "Object is of type \'unknown\'.", "165548477"],
       [168, 18, 3, "Type \'MutableRefObject<HTMLInputElement | undefined>\' is not assignable to type \'((instance: HTMLInputElement | null) => void) | RefObject<HTMLInputElement> | null | undefined\'.", "193432436"]
     ],
-    "src/script/auth/page/Login.tsx:877256236": [
+    "src/script/auth/page/Login.tsx:2293216844": [
       [172, 24, 16, "Argument of type \'Error[]\' is not assignable to parameter of type \'SetStateAction<never[]>\'.", "2735526245"],
       [174, 50, 10, "Type \'ClientType | undefined\' is not assignable to type \'ClientType\'.", "3013398820"],
       [203, 56, 10, "Type \'ClientType | undefined\' is not assignable to type \'ClientType\'.", "3013398820"],
@@ -348,7 +348,7 @@ exports[`stricter compilation`] = {
       [234, 32, 24, "Argument of type \'string | undefined\' is not assignable to parameter of type \'string\'.\\n  Type \'undefined\' is not assignable to type \'string\'.", "3055772661"],
       [294, 24, 14, "Type \'(code: string) => void\' is not assignable to type \'(completeCode?: string | undefined) => void\'.\\n  Types of parameters \'code\' and \'completeCode\' are incompatible.\\n    Type \'string | undefined\' is not assignable to type \'string\'.\\n      Type \'undefined\' is not assignable to type \'string\'.", "2059828224"]
     ],
-    "src/script/auth/page/PhoneLogin.tsx:2040611796": [
+    "src/script/auth/page/PhoneLogin.tsx:2985384116": [
       [86, 19, 5, "Argument of type \'unknown\' is not assignable to parameter of type \'SetStateAction<undefined>\'.", "165548477"],
       [90, 19, 5, "Argument of type \'unknown\' is not assignable to parameter of type \'SetStateAction<undefined>\'.", "165548477"]
     ],
@@ -399,7 +399,7 @@ exports[`stricter compilation`] = {
       [73, 10, 19, "Type \'undefined\' is not assignable to type \'(event: Event) => void\'.", "568100674"],
       [129, 6, 20, "Type \'Window | null\' is not assignable to type \'Window | undefined\'.\\n  Type \'null\' is not assignable to type \'Window | undefined\'.", "2747308432"]
     ],
-    "src/script/auth/page/SingleSignOnForm.tsx:3538322659": [
+    "src/script/auth/page/SingleSignOnForm.tsx:695857283": [
       [80, 59, 4, "Argument of type \'null\' is not assignable to parameter of type \'ClientType | (() => ClientType)\'.", "2087897566"],
       [159, 30, 23, "Object is possibly \'undefined\'.", "1793578893"],
       [160, 4, 23, "Object is possibly \'undefined\'.", "1793578893"],
