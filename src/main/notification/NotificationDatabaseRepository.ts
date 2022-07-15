@@ -23,6 +23,12 @@ import type {CRUDEngine} from '@wireapp/store-engine';
 
 import {CryptographyDatabaseRepository} from '../cryptography/CryptographyDatabaseRepository';
 
+type CompoundGroupIdParams = {
+  groupId: string;
+  conversationId: string;
+  conversationDomain: string;
+};
+
 export enum DatabaseStores {
   EVENTS = 'events',
 }
@@ -33,42 +39,62 @@ export enum DatabaseKeys {
 }
 
 const STORE_AMPLIFY = CryptographyDatabaseRepository.STORES.AMPLIFY;
+const STORE_GROUPIDS = CryptographyDatabaseRepository.STORES.GROUP_IDS;
 
 export class NotificationDatabaseRepository {
   constructor(private readonly storeEngine: CRUDEngine) {}
 
-  public getNotificationEventList(): Promise<BackendEvent[]> {
+  public getNotificationEventList() {
     return this.storeEngine.readAll<BackendEvent>(DatabaseStores.EVENTS);
   }
 
-  public async getLastEventDate(): Promise<Date> {
+  public async getLastEventDate() {
     const {value} = await this.storeEngine.read<{
       value: string;
     }>(STORE_AMPLIFY, DatabaseKeys.PRIMARY_KEY_LAST_EVENT);
     return new Date(value);
   }
 
-  public async updateLastEventDate(eventDate: Date): Promise<Date> {
+  public async updateLastEventDate(eventDate: Date) {
     await this.storeEngine.update(STORE_AMPLIFY, DatabaseKeys.PRIMARY_KEY_LAST_EVENT, {value: eventDate.toISOString()});
     return eventDate;
   }
 
-  public async createLastEventDate(eventDate: Date): Promise<Date> {
+  public async createLastEventDate(eventDate: Date) {
     await this.storeEngine.create(STORE_AMPLIFY, DatabaseKeys.PRIMARY_KEY_LAST_EVENT, {value: eventDate.toISOString()});
     return eventDate;
   }
 
-  public async getLastNotificationId(): Promise<string> {
+  public async getLastNotificationId() {
     const {value} = await this.storeEngine.read<{
       value: string;
     }>(STORE_AMPLIFY, DatabaseKeys.PRIMARY_KEY_LAST_NOTIFICATION);
     return value;
   }
 
-  public async updateLastNotificationId(lastNotification: Notification): Promise<string> {
+  public async updateLastNotificationId(lastNotification: Notification) {
     await this.storeEngine.updateOrCreate(STORE_AMPLIFY, DatabaseKeys.PRIMARY_KEY_LAST_NOTIFICATION, {
       value: lastNotification.id,
     });
     return lastNotification.id;
+  }
+
+  private generateCompoundGroupIdPrimaryKey({
+    conversationId,
+    conversationDomain,
+  }: Omit<CompoundGroupIdParams, 'groupId'>) {
+    return `${conversationId}@${conversationDomain}`;
+  }
+
+  public async addCompoundGroupId(params: CompoundGroupIdParams) {
+    await this.storeEngine.updateOrCreate(
+      STORE_GROUPIDS,
+      this.generateCompoundGroupIdPrimaryKey(params),
+      params.groupId,
+    );
+  }
+
+  public async getCompoundGroupId(params: Omit<CompoundGroupIdParams, 'groupId'>) {
+    return this.storeEngine.read<string>(STORE_GROUPIDS, this.generateCompoundGroupIdPrimaryKey(params));
   }
 }

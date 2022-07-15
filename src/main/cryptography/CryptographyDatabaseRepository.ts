@@ -25,6 +25,7 @@ export enum DatabaseStores {
   KEYS = 'keys',
   PRE_KEYS = 'prekeys',
   SESSIONS = 'sessions',
+  GROUP_IDS = 'group_ids',
 }
 
 export class CryptographyDatabaseRepository {
@@ -39,6 +40,7 @@ export class CryptographyDatabaseRepository {
       this.storeEngine.deleteAll(CryptographyDatabaseRepository.STORES.KEYS),
       this.storeEngine.deleteAll(CryptographyDatabaseRepository.STORES.SESSIONS),
       this.storeEngine.deleteAll(CryptographyDatabaseRepository.STORES.PRE_KEYS),
+      this.storeEngine.deleteAll(CryptographyDatabaseRepository.STORES.GROUP_IDS),
     ]);
   }
 }

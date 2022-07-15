@@ -76,6 +76,7 @@ export enum PayloadBundleType {
   MESSAGE_DELETE = 'PayloadBundleType.MESSAGE_DELETE',
   MESSAGE_EDIT = 'PayloadBundleType.MESSAGE_EDIT',
   MESSAGE_HIDE = 'PayloadBundleType.MESSAGE_HIDE',
+  MLS_WELCOME_MESSAGE = 'PayloadBundleType.MLS_WELCOME',
   PING = 'PayloadBundleType.PING',
   REACTION = 'PayloadBundleType.REACTION',
   TEAM_CONVERSATION_CREATE = 'PayloadBundleType.TEAM_CONVERSATION_CREATE',

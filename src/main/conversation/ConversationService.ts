@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2018 Wire Swiss GmbH
+ * Copyright (C) 2022 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -93,6 +93,7 @@ import type {
   TextMessage,
 } from './message/OtrMessage';
 import {XOR} from '@wireapp/commons/src/main/util/TypeUtil';
+import type {NotificationService} from '../notification';
 
 export enum MessageTargetMode {
   NONE,
@@ -101,7 +102,13 @@ export enum MessageTargetMode {
 }
 
 interface SendCommonParams<T> {
+  /**
+   * The protocol to use to send the message (MLS or Proteus)
+   */
   protocol: ConversationProtocol;
+  /**
+   * The message to send to the conversation
+   */
   payload: T;
   onStart?: (message: GenericMessage) => void | boolean | Promise<boolean>;
   onSuccess?: (message: GenericMessage, sentTime?: string) => void;
@@ -113,6 +120,13 @@ function isMLS<T>(params: SendProteusMessageParams<T> | SendMlsMessageParams<T>)
 
 type SendProteusMessageParams<T> = SendCommonParams<T> &
   MessageSendingOptions & {
+    /**
+     * Can be either a QualifiedId[], string[], UserClients or QualfiedUserClients. The type has some effect on the behavior of the method. (Needed only for Proteus)
+     *    When given a QualifiedId[] or string[] the method will fetch the freshest list of devices for those users (since they are not given by the consumer). As a consequence no ClientMismatch error will trigger and we will ignore missing clients when sending
+     *    When given a QualifiedUserClients or UserClients the method will only send to the clients listed in the userIds. This could lead to ClientMismatch (since the given list of devices might not be the freshest one and new clients could have been created)
+     *    When given a QualifiedId[] or QualifiedUserClients the method will send the message through the federated API endpoint
+     *    When given a string[] or UserClients the method will send the message through the old API endpoint
+     */
     userIds?: string[] | QualifiedId[] | UserClients | QualifiedUserClients;
     onClientMismatch?: (
       status: ClientMismatch | MessageSendingStatus,
@@ -121,6 +135,9 @@ type SendProteusMessageParams<T> = SendCommonParams<T> &
   };
 
 type SendMlsMessageParams<T> = SendCommonParams<T> & {
+  /**
+   * The groupId of the conversation to send the message to (Needed only for MLS)
+   */
   groupId: string;
 };
 
@@ -190,6 +207,7 @@ export class ConversationService {
     cryptographyService: CryptographyService,
     private readonly config: {useQualifiedIds?: boolean},
     private readonly coreCryptoClientProvider: () => CoreCrypto,
+    private readonly notificationService: NotificationService,
   ) {
     this.messageTimer = new MessageTimer();
     this.messageService = new MessageService(this.apiClient, cryptographyService);
@@ -1029,6 +1047,7 @@ export class ConversationService {
     }
     await Promise.all(sendingPromises);
 
+    await this.notificationService.saveConversationGroupId(newConversation);
     // We fetch the fresh version of the conversation created on backend with the newly added users
     return this.getConversations(newConversation.id);
   }
@@ -1077,14 +1096,6 @@ export class ConversationService {
     return userId;
   }
 
-  /**
-   * Sends a mls message to a conversation
-   *
-   * @param params.payload The message to send to the conversation
-   * @param params.protocol The protocol to use to send the message (MLS or Proteus)
-   * @param params.groupId? The groupId of the conversation to send the message to (Needed only for MLS)
-   * @return resolves with the sent message
-   */
   private async sendMlsMessage<T extends OtrMessage>(
     params: SendMlsMessageParams<T>,
     genericMessage: GenericMessage,
@@ -1118,15 +1129,6 @@ export class ConversationService {
     }
   }
 
-  /**
-   * Sends a proteus message to a conversation
-   * @param params.userIds? Can be either a QualifiedId[], string[], UserClients or QualfiedUserClients. The type has some effect on the behavior of the method. (Needed only for Proteus)
-   *    When given a QualifiedId[] or string[] the method will fetch the freshest list of devices for those users (since they are not given by the consumer). As a consequence no ClientMismatch error will trigger and we will ignore missing clients when sending
-   *    When given a QualifiedUserClients or UserClients the method will only send to the clients listed in the userIds. This could lead to ClientMismatch (since the given list of devices might not be the freshest one and new clients could have been created)
-   *    When given a QualifiedId[] or QualifiedUserClients the method will send the message through the federated API endpoint
-   *    When given a string[] or UserClients the method will send the message through the old API endpoint
-   * @return resolves with the sent message
-   */
   private async sendProteusMessage<T extends OtrMessage>(
     params: SendProteusMessageParams<T>,
     genericMessage: GenericMessage,
