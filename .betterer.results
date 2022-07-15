@@ -2061,12 +2061,12 @@ exports[`stricter compilation`] = {
       [106, 37, 12, "Argument of type \'Element | null\' is not assignable to parameter of type \'Element\'.\\n  Type \'null\' is not assignable to type \'Element\'.", "1912908196"],
       [178, 35, 12, "Argument of type \'Element | null\' is not assignable to parameter of type \'Element\'.\\n  Type \'null\' is not assignable to type \'Element\'.", "1912908196"]
     ],
-    "src/script/page/AppLock.tsx:3251659106": [
-      [166, 28, 36, "Argument of type \'Element | null\' is not assignable to parameter of type \'Node\'.\\n  Type \'null\' is not assignable to type \'Node\'.", "3019440182"],
-      [170, 26, 30, "Argument of type \'Element | null\' is not assignable to parameter of type \'Node\'.\\n  Type \'null\' is not assignable to type \'Node\'.", "1790131128"],
-      [198, 59, 37, "Object is possibly \'null\'.", "3700925542"],
-      [219, 94, 4, "Argument of type \'unknown\' is not assignable to parameter of type \'StatusCodes\'.", "2087770728"],
-      [222, 19, 7, "Argument of type \'unknown\' is not assignable to parameter of type \'SetStateAction<string>\'.", "1236122734"]
+    "src/script/page/AppLock.tsx:2707199433": [
+      [163, 28, 36, "Argument of type \'Element | null\' is not assignable to parameter of type \'Node\'.\\n  Type \'null\' is not assignable to type \'Node\'.", "3019440182"],
+      [167, 26, 30, "Argument of type \'Element | null\' is not assignable to parameter of type \'Node\'.\\n  Type \'null\' is not assignable to type \'Node\'.", "1790131128"],
+      [195, 59, 37, "Object is possibly \'null\'.", "3700925542"],
+      [216, 94, 4, "Argument of type \'unknown\' is not assignable to parameter of type \'StatusCodes\'.", "2087770728"],
+      [219, 19, 7, "Argument of type \'unknown\' is not assignable to parameter of type \'SetStateAction<string>\'.", "1236122734"]
     ],
     "src/script/page/LeftSidebar/panels/Conversations/ConversationsList.tsx:3232925700": [
       [104, 10, 15, "Type \'(conversation: Conversation) => boolean\' is not assignable to type \'(conversationId: QualifiedId) => boolean\'.\\n  Types of parameters \'conversation\' and \'conversationId\' are incompatible.\\n    Type \'QualifiedId\' is missing the following properties from type \'Conversation\': teamState, archivedState, incomingMessages, isManaged, and 118 more.", "1629494677"]
