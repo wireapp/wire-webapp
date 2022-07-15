@@ -607,8 +607,8 @@ ko.bindingHandlers.in_viewport = {
         inViewport = isInViewport;
         triggerCallbackIfVisible();
       },
-      true,
       container,
+      true,
     );
     overlayedObserver.trackElement(element, isVisible => {
       visible = isVisible;

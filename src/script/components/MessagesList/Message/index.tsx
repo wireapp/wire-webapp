@@ -76,7 +76,7 @@ export interface MessageParams extends MessageActions {
 const Message: React.FC<
   MessageParams & {scrollTo?: (elm: {center?: boolean; element: HTMLElement}, isUnread?: boolean) => void}
 > = props => {
-  const {message, previousMessage, isMarked, lastReadTimestamp} = props;
+  const {message, previousMessage, isMarked, lastReadTimestamp, onVisible} = props;
   const messageElementRef = useRef<HTMLDivElement>();
   const {status, ephemeral_expires, timestamp} = useKoSubscribableChildren(message, [
     'status',
@@ -106,7 +106,13 @@ const Message: React.FC<
   };
 
   const content = <MessageWrapper {...props} hasMarker={markerType !== MessageMarkerType.NONE} />;
-  const wrappedContent = props.onVisible ? <InViewport onVisible={props.onVisible}>{content}</InViewport> : content;
+  const wrappedContent = onVisible ? (
+    <InViewport allowBiggerThanViewport onVisible={onVisible}>
+      {content}
+    </InViewport>
+  ) : (
+    content
+  );
   return (
     <div
       className={`message ${isMarked ? 'message-marked' : ''}`}
