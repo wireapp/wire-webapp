@@ -77,11 +77,11 @@ const Root: React.FC<RootProps & ConnectedProps & DispatchProps> = ({
       safelyRemoveCookie(CookieSelector.COOKIE_NAME_APP_OPENED, Config.getConfig().APP_INSTANCE_ID);
       stopPolling();
     };
-  }, []);
+  }, [safelyRemoveCookie, startPolling, stopPolling]);
 
   useEffect(() => {
     doGetSSOSettings();
-  }, []);
+  }, [doGetSSOSettings]);
 
   const loadLanguage = (language: string) => {
     return require(`I18n/${mapLanguage(language)}.json`);

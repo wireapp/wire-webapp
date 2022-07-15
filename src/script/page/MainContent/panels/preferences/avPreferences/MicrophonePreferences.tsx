@@ -17,7 +17,7 @@
  *
  */
 
-import React, {useEffect, useState} from 'react';
+import React, {useCallback, useEffect, useState} from 'react';
 
 import Icon from 'Components/Icon';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
@@ -58,7 +58,7 @@ const MicrophonePreferences: React.FC<MicrophonePreferencesProps> = ({
 
   const {URL: urls} = Config.getConfig();
 
-  const requestStream = async () => {
+  const requestStream = useCallback(async () => {
     setIsRequesting(true);
     try {
       setStream(await refreshStream());
@@ -68,11 +68,11 @@ const MicrophonePreferences: React.FC<MicrophonePreferencesProps> = ({
     } finally {
       setIsRequesting(false);
     }
-  };
+  }, [refreshStream]);
 
   useEffect(() => {
     requestStream();
-  }, [currentDeviceId]);
+  }, [currentDeviceId, requestStream]);
 
   useEffect(
     () => () => {
@@ -80,7 +80,7 @@ const MicrophonePreferences: React.FC<MicrophonePreferencesProps> = ({
         streamHandler.releaseTracksFromStream(stream);
       }
     },
-    [stream],
+    [stream, streamHandler],
   );
 
   return (

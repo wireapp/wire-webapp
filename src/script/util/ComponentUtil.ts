@@ -117,6 +117,7 @@ export const useKoSubscribableChildren = <
       children,
     );
     return () => subscription.dispose();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [parent]);
 
   return state;

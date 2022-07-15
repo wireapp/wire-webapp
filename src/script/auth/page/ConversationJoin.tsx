@@ -117,7 +117,7 @@ const ConversationJoin = ({
       .catch(error => {
         setIsValidLink(false);
       });
-  }, []);
+  }, [doCheckConversationCode, doInit]);
 
   useEffect(() => {
     const isEnabled =

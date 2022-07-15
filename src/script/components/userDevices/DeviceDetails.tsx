@@ -78,7 +78,7 @@ const DeviceDetails: React.FC<DeviceDetailsProps> = ({
         .getRemoteFingerprint(user.qualifiedId, selectedClient.id)
         .then(remoteFingerprint => setFingerprintRemote(remoteFingerprint));
     }
-  }, [selectedClient]);
+  }, [cryptographyRepository, selectedClient, user.qualifiedId]);
 
   const clickToToggleDeviceVerification = () => {
     const toggleVerified = !isVerified;

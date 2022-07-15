@@ -96,7 +96,7 @@ const AudioAsset: React.FC<AudioAssetProps> = ({
     return () => {
       window.URL.revokeObjectURL(audioSrc);
     };
-  }, []);
+  }, [audioSrc]);
 
   return (
     <div className={cx('audio-asset', className)} data-uie-name="audio-asset" data-uie-value={asset.file_name}>

@@ -93,9 +93,10 @@ const ConversationListCell: React.FC<ConversationListCellProps> = ({
     return () => {
       viewportElementRef?.removeEventListener('contextmenu', handleRightClick);
     };
-  }, [viewportElementRef]);
+  }, [conversation, rightClick, viewportElementRef]);
 
-  const cellState = useMemo(() => generateCellState(conversation), [unreadState, mutedState, isRequest]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const cellState = useMemo(() => generateCellState(conversation), [unreadState, mutedState, isRequest, conversation]);
 
   const onClickJoinCall = (event: React.MouseEvent) => {
     event.preventDefault();

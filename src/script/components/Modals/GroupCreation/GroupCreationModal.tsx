@@ -112,7 +112,7 @@ const GroupCreationModal: React.FC<GroupCreationModalProps> = ({
     };
 
     amplify.subscribe(WebAppEvents.CONVERSATION.CREATE_GROUP, showCreateGroup);
-  }, []);
+  }, [isTeam, selectedContacts]);
 
   const onClose = () => {
     setIsCreatingConversation(false);

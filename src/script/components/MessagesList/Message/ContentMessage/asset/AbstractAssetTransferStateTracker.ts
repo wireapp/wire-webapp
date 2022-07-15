@@ -39,7 +39,7 @@ export const useAssetTransfer = (message: ContentMessage, assetRepository = cont
     return () => {
       subscription.dispose();
     };
-  }, [message]);
+  }, [assetRepository, message]);
   const {status} = useKoSubscribableChildren(asset, ['status']);
   const transferState = uploadProgress > -1 ? AssetTransferState.UPLOADING : status;
   return {

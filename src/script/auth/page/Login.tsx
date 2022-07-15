@@ -17,7 +17,7 @@
  *
  */
 
-import React, {useEffect, useRef, useState} from 'react';
+import React, {useEffect, useRef, useState, useCallback, useMemo} from 'react';
 
 import {LoginData} from '@wireapp/api-client/src/auth';
 import {ClientType} from '@wireapp/api-client/src/client/index';
@@ -105,34 +105,38 @@ const Login = ({
 
   const onEntropyGenerated = useRef<((entropy: Uint8Array) => void) | undefined>();
   const entropy = useRef<Uint8Array | undefined>();
-  const getEntropy = isEntropyRequired
-    ? () => {
-        // This is somewhat hacky. When the login action detects a new device and that entropy is required, then we give back a promise to the login action.
-        // This way we can just halt the login process, wait for the user to generate entropy and then give back the resulting entropy to the login action.
-        setShowEntropyForm(true);
-        return new Promise<Uint8Array>(resolve => {
-          // we need to keep a reference to the resolve function of the promise as it's going to be called by the entropyContainer callback
-          onEntropyGenerated.current = entropyData => {
-            entropy.current = entropyData;
-            resolve(entropyData);
-          };
-        });
-      }
-    : undefined;
+  const getEntropy = useMemo(
+    () =>
+      isEntropyRequired
+        ? () => {
+            // This is somewhat hacky. When the login action detects a new device and that entropy is required, then we give back a promise to the login action.
+            // This way we can just halt the login process, wait for the user to generate entropy and then give back the resulting entropy to the login action.
+            setShowEntropyForm(true);
+            return new Promise<Uint8Array>(resolve => {
+              // we need to keep a reference to the resolve function of the promise as it's going to be called by the entropyContainer callback
+              onEntropyGenerated.current = entropyData => {
+                entropy.current = entropyData;
+                resolve(entropyData);
+              };
+            });
+          }
+        : undefined,
+    [isEntropyRequired],
+  );
 
   useEffect(() => {
     const queryClientType = UrlUtil.getURLParameter(QUERY_KEY.CLIENT_TYPE);
     if (queryClientType === ClientType.TEMPORARY) {
       pushLoginData({clientType: ClientType.TEMPORARY});
     }
-  }, []);
+  }, [pushLoginData]);
 
   useEffect(() => {
     // Redirect to prefilled SSO login if default SSO code is set on backend
     if (defaultSSOCode) {
       history.push(`${ROUTE.SSO}/${defaultSSOCode}`);
     }
-  }, [defaultSSOCode]);
+  }, [defaultSSOCode, history]);
 
   useEffect(() => {
     const queryConversationCode = UrlUtil.getURLParameter(QUERY_KEY.CONVERSATION_CODE) || null;
@@ -148,7 +152,18 @@ const Login = ({
         setIsValidLink(false);
       });
     }
-  }, []);
+  }, [doCheckConversationCode, logger]);
+
+  const immediateLogin = useCallback(async () => {
+    try {
+      await doInit({isImmediateLogin: true, shouldValidateLocalClient: false});
+      const entropyData = await getEntropy?.();
+      await doInitializeClient(ClientType.PERMANENT, undefined, undefined, entropyData);
+      return history.push(ROUTE.HISTORY_INFO);
+    } catch (error) {
+      logger.error('Unable to login immediately', error);
+    }
+  }, [doInit, doInitializeClient, getEntropy, history, logger]);
 
   useEffect(() => {
     resetAuthError();
@@ -159,18 +174,7 @@ const Login = ({
     return () => {
       resetAuthError();
     };
-  }, []);
-
-  const immediateLogin = async () => {
-    try {
-      await doInit({isImmediateLogin: true, shouldValidateLocalClient: false});
-      const entropyData = await getEntropy?.();
-      await doInitializeClient(ClientType.PERMANENT, undefined, undefined, entropyData);
-      return history.push(ROUTE.HISTORY_INFO);
-    } catch (error) {
-      logger.error('Unable to login immediately', error);
-    }
-  };
+  }, [immediateLogin, resetAuthError]);
 
   const handleSubmit = async (formLoginData: Partial<LoginData>, validationErrors: Error[] = []) => {
     setValidationErrors(validationErrors);

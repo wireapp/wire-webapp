@@ -105,7 +105,7 @@ const Quote: React.FC<QuoteProps> = ({
           throw error;
         });
     }
-  }, [quote, error]);
+  }, [quote, error, findMessage, conversation]);
 
   return !quotedMessage && !error ? (
     <div />

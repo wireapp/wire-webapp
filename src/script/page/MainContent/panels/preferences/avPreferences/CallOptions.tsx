@@ -55,7 +55,7 @@ const CallOptions: React.FC<CallOptionsProps> = ({constraintsHandler, properties
     return () => {
       amplify.unsubscribe(WebAppEvents.PROPERTIES.UPDATED, updateProperties);
     };
-  }, []);
+  }, [isCbrEncodingEnforced]);
 
   return (
     <PreferencesSection title={t('preferencesOptionsCall')}>

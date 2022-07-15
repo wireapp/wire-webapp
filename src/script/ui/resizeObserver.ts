@@ -51,5 +51,5 @@ export const useResizeObserver = (element: Element | undefined, callback: (eleme
       observedElements.delete(element);
       resizeObserver.unobserve(element);
     };
-  }, [element]);
+  }, [callback, element]);
 };

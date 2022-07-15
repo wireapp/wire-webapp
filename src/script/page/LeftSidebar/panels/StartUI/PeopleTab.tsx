@@ -17,7 +17,7 @@
  *
  */
 
-import React, {useEffect, useRef, useState} from 'react';
+import React, {useCallback, useEffect, useRef, useState} from 'react';
 
 import {BackendErrorLabel} from '@wireapp/api-client/src/http';
 import {WebAppEvents} from '@wireapp/webapp-events';
@@ -134,7 +134,7 @@ export const PeopleTab: React.FC<{
     };
   };
 
-  const getTopPeople = () => {
+  const getTopPeople = useCallback(() => {
     return conversationRepository
       .getMostActiveConversations()
       .then(conversationEntities => {
@@ -145,13 +145,13 @@ export const PeopleTab: React.FC<{
       })
       .then(userIds => userRepository.getUsersById(userIds))
       .then(userEntities => userEntities.filter(user => !user.isBlocked()));
-  };
+  }, [conversationRepository, userRepository]);
 
   useEffect(() => {
     if (!isTeam) {
       getTopPeople().then(setTopPeople);
     }
-  }, []);
+  }, [getTopPeople, isTeam]);
 
   useDebounce(
     async () => {
@@ -224,7 +224,7 @@ export const PeopleTab: React.FC<{
       currentSearchQuery.current = '';
       onSearchResults(undefined);
     };
-  }, [searchQuery]);
+  }, [onSearchResults, searchQuery]);
 
   return (
     <>

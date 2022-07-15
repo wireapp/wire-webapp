@@ -17,7 +17,7 @@
  *
  */
 
-import React, {useEffect, useState} from 'react';
+import React, {useCallback, useEffect, useState} from 'react';
 
 import Icon from 'Components/Icon';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
@@ -61,7 +61,7 @@ const CameraPreferences: React.FC<CameraPreferencesProps> = ({
 
   const {URL: urls, BRAND_NAME: brandName} = Config.getConfig();
 
-  const requestStream = async () => {
+  const requestStream = useCallback(async () => {
     setIsRequesting(true);
     try {
       // we should be able to change camera from preferences page in middle of the call
@@ -84,11 +84,11 @@ const CameraPreferences: React.FC<CameraPreferencesProps> = ({
     } finally {
       setIsRequesting(false);
     }
-  };
+  }, [hasActiveCameraStream, refreshStream, streamHandler]);
 
   useEffect(() => {
     requestStream();
-  }, [currentDeviceId]);
+  }, [currentDeviceId, requestStream]);
 
   useEffect(() => {
     if (videoElement) {
@@ -102,7 +102,7 @@ const CameraPreferences: React.FC<CameraPreferencesProps> = ({
         streamHandler.releaseTracksFromStream(stream);
       }
     },
-    [stream],
+    [hasActiveCameraStream, stream, streamHandler],
   );
 
   return (

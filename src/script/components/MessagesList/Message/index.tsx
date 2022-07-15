@@ -94,7 +94,7 @@ const Message: React.FC<
     } else if (markerType === MessageMarkerType.UNREAD) {
       props.scrollTo({element: messageElementRef.current}, true);
     }
-  }, [isMarked, messageElementRef]);
+  }, [isMarked, markerType, messageElementRef, props]);
 
   const getTimestampClass = (): string => {
     const classes = {

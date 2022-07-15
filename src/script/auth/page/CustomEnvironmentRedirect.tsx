@@ -63,7 +63,7 @@ const CustomEnvironmentRedirect = ({doNavigate, doSendNavigationEvent}: Dispatch
     return () => {
       window.clearTimeout(redirectTimeoutId);
     };
-  }, [destinationUrl]);
+  }, [destinationUrl, doNavigate, doSendNavigationEvent]);
 
   return (
     <Page>

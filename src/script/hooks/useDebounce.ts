@@ -23,7 +23,7 @@ const useDebounce = (callback: () => void, time: number, deps?: DependencyList) 
   useEffect(() => {
     const timeoutId = setTimeout(() => callback(), time);
     return () => clearTimeout(timeoutId);
-  }, deps);
+  }, [callback, time, deps]);
 };
 
 export default useDebounce;

@@ -17,7 +17,7 @@
  *
  */
 
-import React, {useEffect, useState} from 'react';
+import React, {useCallback, useEffect, useState} from 'react';
 
 import {RegisteredClient} from '@wireapp/api-client/src/client/index';
 import {
@@ -66,6 +66,28 @@ const ClientItem = ({selected, onClientRemoval, onClick, client, clientError, re
   const [isValidPassword, setIsValidPassword] = useState(true);
   const [validationError, setValidationError] = useState<ValidationError | null>(null);
 
+  const executeAnimateIn = useCallback(() => {
+    setAnimationStep(step => {
+      if (step < CONFIG.animationSteps) {
+        window.requestAnimationFrame(executeAnimateIn);
+        return step + 1;
+      }
+      setIsAnimating(false);
+      return step;
+    });
+  }, [CONFIG.animationSteps]);
+
+  const executeAnimateOut = useCallback(() => {
+    setAnimationStep(step => {
+      if (step > 0) {
+        window.requestAnimationFrame(executeAnimateOut);
+        return step - 1;
+      }
+      setIsAnimating(false);
+      return step;
+    });
+  }, []);
+
   useEffect(() => {
     if (!selected && isSelected) {
       setIsAnimating(true);
@@ -78,31 +100,9 @@ const ClientItem = ({selected, onClientRemoval, onClick, client, clientError, re
     } else {
       setAnimationStep(0);
     }
-  }, [selected]);
+  }, [executeAnimateIn, executeAnimateOut, isSelected, selected]);
 
   const formatId = (id = '?') => splitFingerprint(id).join(' ');
-
-  const executeAnimateIn = (): void => {
-    setAnimationStep(step => {
-      if (step < CONFIG.animationSteps) {
-        window.requestAnimationFrame(executeAnimateIn);
-        return step + 1;
-      }
-      setIsAnimating(false);
-      return step;
-    });
-  };
-
-  const executeAnimateOut = (): void => {
-    setAnimationStep(step => {
-      if (step > 0) {
-        window.requestAnimationFrame(executeAnimateOut);
-        return step - 1;
-      }
-      setIsAnimating(false);
-      return step;
-    });
-  };
 
   const formatDate = (dateString: string): string =>
     dateString

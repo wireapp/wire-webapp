@@ -17,7 +17,7 @@
  *
  */
 
-import React, {useCallback, useEffect, useState} from 'react';
+import React, {useEffect, useMemo, useState} from 'react';
 
 import {container} from 'tsyringe';
 import {debounce} from 'underscore';
@@ -82,19 +82,20 @@ const UserSearchableList: React.FC<UserListProps> = ({onUpdateSelectedUsers, ...
    * Try to load additional members from the backend.
    * This is needed for large teams (>= 2000 members)
    */
-  const fetchMembersFromBackend = useCallback(
-    debounce(async (query: string, isHandle: boolean, ignoreMembers: User[]) => {
-      const resultUsers = await searchRepository!.searchByName(query, isHandle);
-      const selfTeamId = userState.self().teamId;
-      const foundMembers = resultUsers.filter(user => user.teamId === selfTeamId);
-      const ignoreIds = ignoreMembers.map(member => member.id);
-      const uniqueMembers = foundMembers.filter(member => !ignoreIds.includes(member.id));
+  const fetchMembersFromBackend = useMemo(
+    () =>
+      debounce(async (query: string, isHandle: boolean, ignoreMembers: User[]) => {
+        const resultUsers = await searchRepository!.searchByName(query, isHandle);
+        const selfTeamId = userState.self().teamId;
+        const foundMembers = resultUsers.filter(user => user.teamId === selfTeamId);
+        const ignoreIds = ignoreMembers.map(member => member.id);
+        const uniqueMembers = foundMembers.filter(member => !ignoreIds.includes(member.id));
 
-      // We shouldn't show any members that have the 'external' role and are not already locally known.
-      const nonExternalMembers = await teamRepository.filterExternals(uniqueMembers);
-      setRemoteTeamMembers(nonExternalMembers);
-    }, 300),
-    [],
+        // We shouldn't show any members that have the 'external' role and are not already locally known.
+        const nonExternalMembers = await teamRepository.filterExternals(uniqueMembers);
+        setRemoteTeamMembers(nonExternalMembers);
+      }, 300),
+    [searchRepository, teamRepository, userState],
   );
 
   // Filter all list items if a filter is provided
@@ -135,7 +136,16 @@ const UserSearchableList: React.FC<UserListProps> = ({onUpdateSelectedUsers, ...
     // make sure the self user is the first one in the list
     const [selfUser, otherUsers] = partition(resultUsers, user => user.isMe);
     setFilteredUsers(selfUser.concat(otherUsers));
-  }, [filter, users.length]);
+  }, [
+    conversationState,
+    fetchMembersFromBackend,
+    filter,
+    searchRepository,
+    selfFirst,
+    selfInTeam,
+    teamRepository,
+    users,
+  ]);
 
   const foundUserEntities = () => {
     if (!remoteTeamMembers.length) {

@@ -97,7 +97,7 @@ const UserModalComponent: React.FC<UserModalProps> = ({
       setUser(null);
       setUserNotFound(false);
     };
-  }, [userId?.id, userId?.domain]);
+  }, [userId?.id, userId?.domain, userId, userRepository]);
 
   return (
     <div className="user-modal">

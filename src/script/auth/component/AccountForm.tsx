@@ -17,7 +17,7 @@
  *
  */
 
-import React from 'react';
+import React, {useMemo} from 'react';
 
 import {ValidationUtil} from '@wireapp/commons';
 import {Button, Checkbox, CheckboxLabel, Form, Input, InputBlock, Small} from '@wireapp/react-ui-kit';
@@ -46,13 +46,21 @@ interface Props extends React.HTMLProps<HTMLFormElement> {
 
 const AccountForm = ({account, ...props}: Props & ConnectedProps & DispatchProps) => {
   const {formatMessage: _} = useIntl();
-  const [registrationData, setRegistrationData] = React.useState({
-    accent_id: AccentColor.random().id,
-    email: account.email || '',
-    name: account.name || '',
-    password: account.password || '',
-    termsAccepted: account.termsAccepted || false,
-  });
+
+  const accent_id = useMemo(() => AccentColor.random().id, []);
+  const {email = '', name = '', password = '', termsAccepted = false} = account;
+  const initialRegisterData = useMemo(
+    () => ({
+      accent_id,
+      email,
+      name,
+      password,
+      termsAccepted,
+    }),
+    [accent_id, email, name, password, termsAccepted],
+  );
+
+  const [registrationData, setRegistrationData] = React.useState(initialRegisterData);
 
   const [validInputs, setValidInputs] = React.useState<Record<string, boolean>>({
     email: true,
@@ -71,18 +79,8 @@ const AccountForm = ({account, ...props}: Props & ConnectedProps & DispatchProps
   };
 
   React.useEffect(() => {
-    setRegistrationData({
-      ...registrationData,
-      email: account.email,
-    });
-  }, [account.email]);
-
-  React.useEffect(() => {
-    setRegistrationData({
-      ...registrationData,
-      name: account.name,
-    });
-  }, [account.name]);
+    setRegistrationData(initialRegisterData);
+  }, [initialRegisterData]);
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();

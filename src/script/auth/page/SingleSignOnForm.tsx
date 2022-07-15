@@ -17,7 +17,7 @@
  *
  */
 
-import React, {useEffect, useRef, useState} from 'react';
+import React, {useCallback, useEffect, useRef, useState} from 'react';
 
 import {ClientType} from '@wireapp/api-client/src/client/index';
 import {BackendErrorLabel} from '@wireapp/api-client/src/http';
@@ -97,7 +97,7 @@ const SingleSignOnForm = ({
     if (queryAutoLogin === true && initialCode) {
       setShouldAutoLogin(true);
     }
-  }, []);
+  }, [initialCode]);
 
   useEffect(() => {
     const queryClientType = UrlUtil.getURLParameter(QUERY_KEY.CLIENT_TYPE);
@@ -129,116 +129,133 @@ const SingleSignOnForm = ({
         setIsValidLink(false);
       });
     }
-  }, []);
+  }, [doCheckConversationCode]);
 
   useEffect(() => {
     if (initialCode && initialCode !== codeOrMail) {
       setCodeOrMail(initialCode);
       setDisableInput(true);
     }
-  }, [initialCode]);
-
-  useEffect(() => {
-    if (shouldAutoLogin && clientType && initialCode && initialCode === codeOrMail) {
-      handleSubmit();
-    }
-  }, [shouldAutoLogin, clientType, initialCode, codeOrMail]);
+  }, [codeOrMail, initialCode]);
 
   const onCodeChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setCodeOrMail(event.target.value);
     setIsCodeOrMailInputValid(true);
   };
 
-  const handleSubmit = async (event?: React.FormEvent): Promise<void> => {
-    if (event) {
-      event.preventDefault();
-    }
-    resetAuthError();
-    if (isFetching) {
-      return;
-    }
-
-    const currentlyDisabled = codeOrMailInput.current.disabled;
-    codeOrMailInput.current.disabled = false;
-
-    codeOrMailInput.current.value = codeOrMailInput.current.value.trim();
-    const currentValidationError = codeOrMailInput.current.checkValidity()
-      ? null
-      : ValidationError.handleValidationState(codeOrMailInput.current.name, codeOrMailInput.current.validity);
-
-    setValidationError(currentValidationError);
-    setIsCodeOrMailInputValid(codeOrMailInput.current.validity.valid);
-
-    codeOrMailInput.current.disabled = currentlyDisabled;
-
-    try {
-      if (currentValidationError) {
-        throw currentValidationError;
+  const handleSubmit = useCallback(
+    async (event?: React.FormEvent): Promise<void> => {
+      if (event) {
+        event.preventDefault();
       }
-      const email = codeOrMail.trim();
-      if (isValidEmail(email)) {
-        const domain = email.split('@')[1];
-        const {webapp_welcome_url} = await doGetDomainInfo(domain);
-        const [path, query = ''] = webapp_welcome_url.split('?');
-        const welcomeUrl = pathWithParams(
-          path,
-          {[QUERY_KEY.CLIENT_TYPE]: clientType, [QUERY_KEY.SSO_AUTO_LOGIN]: true},
-          null,
-          query,
-        );
-
-        // This refreshes the page as we replace the whole URL.
-        // This works for now as we don't need anything from the state anymore at this point.
-        // Ideal would be to abandon the HashRouter (in the near future) and use something that
-        // allows us to pass search query parameters.
-        // https://reacttraining.com/react-router/web/api/HashRouter
-        doNavigate(
-          `/auth?${getSearchParams({[QUERY_KEY.DESTINATION_URL]: encodeURIComponent(welcomeUrl)})}#${
-            ROUTE.CUSTOM_ENV_REDIRECT
-          }`,
-        );
-      } else {
-        setIsLoading(true);
-        const strippedCode = stripPrefix(codeOrMail);
-        await validateSSOCode(strippedCode);
-        await doLogin(strippedCode);
-        await doFinalizeSSOLogin({clientType});
-        const hasKeyAndCode = conversationKey && conversationCode;
-        if (hasKeyAndCode) {
-          await doJoinConversationByCode(conversationKey, conversationCode);
-        }
-
-        history.push(ROUTE.HISTORY_INFO);
+      resetAuthError();
+      if (isFetching) {
+        return;
       }
-    } catch (error) {
-      setIsLoading(false);
-      switch (error.label) {
-        case BackendError.LABEL.TOO_MANY_CLIENTS: {
-          resetAuthError();
-          history.push(ROUTE.CLIENTS);
-          break;
+
+      const currentlyDisabled = codeOrMailInput.current.disabled;
+      codeOrMailInput.current.disabled = false;
+
+      codeOrMailInput.current.value = codeOrMailInput.current.value.trim();
+      const currentValidationError = codeOrMailInput.current.checkValidity()
+        ? null
+        : ValidationError.handleValidationState(codeOrMailInput.current.name, codeOrMailInput.current.validity);
+
+      setValidationError(currentValidationError);
+      setIsCodeOrMailInputValid(codeOrMailInput.current.validity.valid);
+
+      codeOrMailInput.current.disabled = currentlyDisabled;
+
+      try {
+        if (currentValidationError) {
+          throw currentValidationError;
         }
-        case BackendErrorLabel.CUSTOM_BACKEND_NOT_FOUND: {
-          setSsoError(error);
-          break;
-        }
-        case BackendError.LABEL.SSO_USER_CANCELLED_ERROR:
-        case BackendError.LABEL.SSO_NOT_FOUND: {
-          break;
-        }
-        default: {
-          setSsoError(error);
-          const isValidationError = Object.values(ValidationError.ERROR).some(
-            errorType => error.label && error.label.endsWith(errorType),
+        const email = codeOrMail.trim();
+        if (isValidEmail(email)) {
+          const domain = email.split('@')[1];
+          const {webapp_welcome_url} = await doGetDomainInfo(domain);
+          const [path, query = ''] = webapp_welcome_url.split('?');
+          const welcomeUrl = pathWithParams(
+            path,
+            {[QUERY_KEY.CLIENT_TYPE]: clientType, [QUERY_KEY.SSO_AUTO_LOGIN]: true},
+            null,
+            query,
           );
-          if (!isValidationError) {
-            console.warn('SSO authentication error', JSON.stringify(Object.entries(error)), error);
+
+          // This refreshes the page as we replace the whole URL.
+          // This works for now as we don't need anything from the state anymore at this point.
+          // Ideal would be to abandon the HashRouter (in the near future) and use something that
+          // allows us to pass search query parameters.
+          // https://reacttraining.com/react-router/web/api/HashRouter
+          doNavigate(
+            `/auth?${getSearchParams({[QUERY_KEY.DESTINATION_URL]: encodeURIComponent(welcomeUrl)})}#${
+              ROUTE.CUSTOM_ENV_REDIRECT
+            }`,
+          );
+        } else {
+          setIsLoading(true);
+          const strippedCode = stripPrefix(codeOrMail);
+          await validateSSOCode(strippedCode);
+          await doLogin(strippedCode);
+          await doFinalizeSSOLogin({clientType});
+          const hasKeyAndCode = conversationKey && conversationCode;
+          if (hasKeyAndCode) {
+            await doJoinConversationByCode(conversationKey, conversationCode);
           }
-          break;
+
+          history.push(ROUTE.HISTORY_INFO);
+        }
+      } catch (error) {
+        setIsLoading(false);
+        switch (error.label) {
+          case BackendError.LABEL.TOO_MANY_CLIENTS: {
+            resetAuthError();
+            history.push(ROUTE.CLIENTS);
+            break;
+          }
+          case BackendErrorLabel.CUSTOM_BACKEND_NOT_FOUND: {
+            setSsoError(error);
+            break;
+          }
+          case BackendError.LABEL.SSO_USER_CANCELLED_ERROR:
+          case BackendError.LABEL.SSO_NOT_FOUND: {
+            break;
+          }
+          default: {
+            setSsoError(error);
+            const isValidationError = Object.values(ValidationError.ERROR).some(
+              errorType => error.label && error.label.endsWith(errorType),
+            );
+            if (!isValidationError) {
+              console.warn('SSO authentication error', JSON.stringify(Object.entries(error)), error);
+            }
+            break;
+          }
         }
       }
+    },
+    [
+      clientType,
+      codeOrMail,
+      conversationCode,
+      conversationKey,
+      doFinalizeSSOLogin,
+      doGetDomainInfo,
+      doJoinConversationByCode,
+      doLogin,
+      doNavigate,
+      history,
+      isFetching,
+      resetAuthError,
+      validateSSOCode,
+    ],
+  );
+
+  useEffect(() => {
+    if (shouldAutoLogin && clientType && initialCode && initialCode === codeOrMail) {
+      handleSubmit();
     }
-  };
+  }, [shouldAutoLogin, clientType, initialCode, codeOrMail, handleSubmit]);
 
   const stripPrefix = (prefixedCode: string) =>
     prefixedCode && prefixedCode.trim().toLowerCase().replace(SSO_CODE_PREFIX, '');

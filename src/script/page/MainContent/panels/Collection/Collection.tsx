@@ -80,7 +80,7 @@ const Collection: React.FC<CollectionDetailsProps> = ({conversation, conversatio
     conversationRepository
       .getEventsForCategory(conversation, MessageCategory.LINK_PREVIEW)
       .then(allMessages => setMessages(allMessages as ContentMessage[]));
-  }, []);
+  }, [conversation, conversationRepository]);
 
   useEffect(() => {
     const addItem = (message: ContentMessage) => {
@@ -107,7 +107,7 @@ const Collection: React.FC<CollectionDetailsProps> = ({conversation, conversatio
       amplify.unsubscribe(WebAppEvents.CONVERSATION.MESSAGE.ADDED, addItem);
       amplify.unsubscribe(WebAppEvents.CONVERSATION.MESSAGE.REMOVED, removeItem);
     };
-  }, []);
+  }, [conversation.id]);
 
   const categories = splitIntoCategories(messages);
   const {images, audio, links, files} = categories;

@@ -56,7 +56,7 @@ const MentionSuggestionList: React.FunctionComponent<MentionSuggestionListProps>
   const isVisible = suggestions.length > 0;
   const bottom = useMemo(
     () => (isVisible ? window.innerHeight - targetInput.getBoundingClientRect().top + 24 : 0),
-    [isVisible],
+    [isVisible, targetInput],
   );
 
   useEffect(() => {
@@ -93,7 +93,7 @@ const MentionSuggestionList: React.FunctionComponent<MentionSuggestionListProps>
     return () => {
       targetInput?.removeEventListener('keydown', onInput);
     };
-  }, [isVisible, suggestions, selectedSuggestionIndex]);
+  }, [isVisible, suggestions, selectedSuggestionIndex, onSelectionValidated, targetInput]);
 
   return isVisible ? (
     <div

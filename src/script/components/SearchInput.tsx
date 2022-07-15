@@ -61,7 +61,7 @@ const SearchInput: React.FC<SearchInputProps> = ({
 
   useEffect(() => {
     setInput('');
-  }, [selectedUsers.length]);
+  }, [selectedUsers.length, setInput]);
 
   const placeHolderText = emptyInput && noSelectedUsers ? placeholder : '';
 

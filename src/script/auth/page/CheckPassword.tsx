@@ -67,7 +67,7 @@ const CheckPassword = ({loginData, doLogin, resetAuthError, isFetching}: Props &
     if (!loginData.phone) {
       history.push(ROUTE.LOGIN_PHONE);
     }
-  }, []);
+  }, [history, loginData.phone]);
 
   const handleLogin = async () => {
     let validationError: Error;

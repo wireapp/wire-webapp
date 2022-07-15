@@ -17,7 +17,7 @@
  *
  */
 
-import React, {Fragment, useState} from 'react';
+import React, {useState} from 'react';
 
 import cx from 'classnames';
 import {container} from 'tsyringe';
@@ -145,7 +145,7 @@ const UserList: React.FC<UserListProps> = ({
     content = (
       <>
         {(admins.length > 0 || showEmptyAdmin) && (
-          <Fragment>
+          <>
             <div className="user-list__header" data-uie-name="label-conversation-admins">
               {t('searchListAdmins', adminCount)}
             </div>
@@ -177,10 +177,10 @@ const UserList: React.FC<UserListProps> = ({
                 {t('searchListNoAdmins')}
               </div>
             )}
-          </Fragment>
+          </>
         )}
         {members.length > 0 && maxShownUsers > admins.length && (
-          <Fragment>
+          <>
             <div className="user-list__header" data-uie-name="label-conversation-members">
               {t('searchListMembers', memberCount)}
             </div>
@@ -204,7 +204,7 @@ const UserList: React.FC<UserListProps> = ({
                 </li>
               ))}
             </ul>
-          </Fragment>
+          </>
         )}
       </>
     );

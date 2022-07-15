@@ -77,7 +77,7 @@ const VideoAsset: React.FC<VideoAssetProps> = ({
       window.URL.revokeObjectURL(videoPreview);
       window.URL.revokeObjectURL(videoSrc);
     };
-  }, []);
+  }, [assetPreviewResource, assetRepository, isFileSharingReceivingEnabled, videoPreview, videoSrc]);
 
   const onPlayButtonClicked = async (): Promise<void> => {
     if (isFileSharingReceivingEnabled) {

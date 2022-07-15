@@ -55,7 +55,7 @@ const ClientManager = ({doGetAllClients, doLogout}: Props & ConnectedProps & Dis
     if (SFAcode) {
       startTimeout();
     }
-  }, []);
+  }, [SFAcode, doGetAllClients, startTimeout]);
 
   const logout = async () => {
     try {

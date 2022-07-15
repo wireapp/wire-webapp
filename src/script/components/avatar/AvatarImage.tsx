@@ -82,7 +82,9 @@ const AvatarImage: React.FunctionComponent<AvatarImageProps> = ({
         }
       })();
     }
-  }, [previewPicture, mediumPicture, avatarSize]);
+    // ToDo: refactor this part to not change state inside useEffect
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [previewPicture, mediumPicture, avatarSize, devicePixelRatio, assetRepository]);
 
   const transitionImageStyles: Record<string, CSSObject> = {
     entered: {opacity: 1, transform: 'scale(1)'},

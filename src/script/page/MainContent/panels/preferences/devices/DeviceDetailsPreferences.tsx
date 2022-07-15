@@ -65,7 +65,7 @@ const DeviceDetailsPreferences: React.FC<DevicesPreferencesProps> = ({
 
   useEffect(() => {
     getFingerprint(device).then(setFingerprint);
-  }, []);
+  }, [device, getFingerprint]);
 
   return (
     <div

@@ -17,7 +17,7 @@
  *
  */
 
-import React, {Fragment, useEffect} from 'react';
+import React, {useEffect} from 'react';
 
 import {QualifiedId} from '@wireapp/api-client/src/user';
 import {CALL_TYPE, STATE as CALL_STATE} from '@wireapp/avs';
@@ -81,7 +81,7 @@ const CallingContainer: React.FC<CallingContainerProps> = ({
     if (currentCallState === undefined) {
       multitasking.isMinimized(true);
     }
-  }, [currentCallState]);
+  }, [currentCallState, joinedCall.initialType, multitasking]);
 
   const videoGrid = useVideoGrid(joinedCall);
 
@@ -166,7 +166,7 @@ const CallingContainer: React.FC<CallingContainerProps> = ({
   }
 
   return (
-    <Fragment>
+    <>
       {!isMinimized && !!videoGrid?.grid.length && (
         <FullscreenVideoCall
           key={joinedCall.conversationId.id}
@@ -200,7 +200,7 @@ const CallingContainer: React.FC<CallingContainerProps> = ({
           windows={selectableWindows as unknown as Screen[]}
         />
       )}
-    </Fragment>
+    </>
   );
 };
 

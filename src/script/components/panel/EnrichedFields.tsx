@@ -72,7 +72,7 @@ export const useEnrichedFields = (
     return () => {
       cancel = true;
     };
-  }, [user, addEmail && email]);
+  }, [addDomain, addEmail, email, onFieldsLoaded, richProfileRepository, user]);
   return fields;
 };
 

@@ -70,7 +70,7 @@ const SetHandle = ({
     if (hasSelfHandle) {
       history.push(ROUTE.INITIAL_INVITE);
     }
-  }, [hasSelfHandle]);
+  }, [hasSelfHandle, history]);
 
   useEffect(() => {
     (async () => {
@@ -83,7 +83,7 @@ const SetHandle = ({
         setError(error);
       }
     })();
-  }, []);
+  }, [checkHandles, doGetConsents, name]);
 
   const updateConsent = (consentType: ConsentType, value: number): Promise<void> => doSetConsent(consentType, value);
 

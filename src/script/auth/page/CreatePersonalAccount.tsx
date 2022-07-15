@@ -45,7 +45,7 @@ const CreatePersonalAccount = ({isPersonalFlow, enterPersonalCreationFlow}: Prop
   const isMacOsWrapper = Runtime.isDesktopApp() && Runtime.isMacOS();
   React.useEffect(() => {
     enterPersonalCreationFlow();
-  }, []);
+  }, [enterPersonalCreationFlow]);
 
   const pageContent = (
     <ContainerXS

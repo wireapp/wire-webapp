@@ -42,7 +42,7 @@ const VerifyEmailLink = ({hasSelfEmail}: Props & ConnectedProps) => {
     if (hasSelfEmail) {
       history.push(ROUTE.SET_PASSWORD);
     }
-  }, [hasSelfEmail]);
+  }, [hasSelfEmail, history]);
 
   if (hasSelfEmail) {
     return null;

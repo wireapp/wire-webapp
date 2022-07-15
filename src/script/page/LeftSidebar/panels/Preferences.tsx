@@ -66,7 +66,7 @@ const Preferences: React.FC<PreferencesProps> = ({contentViewModel, teamReposito
   useEffect(() => {
     // Update local team
     teamRepository.getTeam();
-  }, []);
+  }, [teamRepository]);
 
   const isDesktop = Runtime.isDesktopApp();
   const supportsCalling = Runtime.isSupportingLegacyCalling();

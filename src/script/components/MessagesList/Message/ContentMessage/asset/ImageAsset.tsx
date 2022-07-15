@@ -80,7 +80,7 @@ const ImageAsset: React.FC<ImageAssetProps> = ({asset, message, onClick, teamSta
       };
     }
     return undefined;
-  }, [isInViewport, resource, isFileSharingReceivingEnabled]);
+  }, [isInViewport, resource, isFileSharingReceivingEnabled, imageUrl, loadAsset]);
 
   const dummyImageUrl = `data:image/svg+xml;utf8,<svg aria-hidden="true" xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1 1' width='${asset.width}' height='${asset.height}'></svg>`;
 

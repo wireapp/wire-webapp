@@ -120,7 +120,7 @@ const Conversations: React.FC<ConversationsProps> = ({
     return () => {
       amplify.unsubscribe(WebAppEvents.CONTENT.EXPAND_FOLDER, openFolder);
     };
-  }, [activeConversation]);
+  }, [activeConversation, conversationLabelRepository, isFolderOpen, openFolder]);
 
   useEffect(() => {
     const openFavorites = () => openFolder(DefaultLabelIds.Favorites);
@@ -128,14 +128,14 @@ const Conversations: React.FC<ConversationsProps> = ({
     return () => {
       conversationLabelRepository.removeEventListener('conversation-favorited', openFavorites);
     };
-  }, []);
+  }, [conversationLabelRepository, openFolder]);
 
   useEffect(() => {
     propertiesRepository.savePreference(
       PROPERTIES_TYPE.INTERFACE.VIEW_FOLDERS,
       viewStyle === ConverationViewStyle.FOLDER,
     );
-  }, [viewStyle]);
+  }, [propertiesRepository, viewStyle]);
 
   const header = (
     <>

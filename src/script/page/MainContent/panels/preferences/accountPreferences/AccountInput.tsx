@@ -102,7 +102,7 @@ const AccountInput: React.FC<AccountInputProps> = ({
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
     };
-  }, [textInputRef]);
+  }, [setIsEditingExternal, textInputRef, value]);
 
   const updateInput = (value: string) => {
     if (allowedChars) {

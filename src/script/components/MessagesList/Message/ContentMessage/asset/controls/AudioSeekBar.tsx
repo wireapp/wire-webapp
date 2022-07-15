@@ -17,7 +17,7 @@
  *
  */
 
-import React, {useState, useEffect, useRef} from 'react';
+import React, {useState, useEffect, useRef, useCallback} from 'react';
 
 import cx from 'classnames';
 
@@ -41,6 +41,12 @@ const AudioSeekBar: React.FC<AudioSeekBarProps> = ({asset, audioElement, disable
   const svgNode = useRef<SVGSVGElement>();
   const [clipId] = useState(`clip-${createRandomUuid()}`);
 
+  const onTimeUpdate = useCallback(() => {
+    if (audioElement.duration) {
+      setPosition(audioElement.currentTime / audioElement.duration);
+    }
+  }, [audioElement.currentTime, audioElement.duration]);
+
   useEffect(() => {
     window.addEventListener('resize', updateSvgWidth);
     return () => window.removeEventListener('resize', updateSvgWidth);
@@ -59,8 +65,9 @@ const AudioSeekBar: React.FC<AudioSeekBarProps> = ({asset, audioElement, disable
       audioElement?.removeEventListener('ended', onAudioEnded);
       audioElement?.removeEventListener('timeupdate', onTimeUpdate);
     };
-  }, [audioElement]);
+  }, [audioElement, onTimeUpdate]);
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => updateSvgWidth(), [svgNode.current]);
 
   useEffect(() => {
@@ -80,7 +87,7 @@ const AudioSeekBar: React.FC<AudioSeekBarProps> = ({asset, audioElement, disable
       })
       .join('');
     setPath(newPath);
-  }, [svgWidth]);
+  }, [loudness, svgWidth]);
 
   const updateSvgWidth = () => setSvgWidth(svgNode.current?.clientWidth ?? 0);
 
@@ -93,12 +100,6 @@ const AudioSeekBar: React.FC<AudioSeekBarProps> = ({asset, audioElement, disable
   };
 
   const onAudioEnded = () => setPosition(0);
-
-  const onTimeUpdate = () => {
-    if (audioElement.duration) {
-      setPosition(audioElement.currentTime / audioElement.duration);
-    }
-  };
 
   return (
     <svg

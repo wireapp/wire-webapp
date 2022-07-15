@@ -59,7 +59,7 @@ const EntropyCanvas = (props: CanvasProps) => {
     if (frames >= 100) {
       clearInterval();
     }
-  }, [percent, percent]);
+  }, [clearInterval, frames, pauseInterval, percent, startInterval]);
 
   const onMouseLeave = () => {
     onProgress(entropy, percent, true);

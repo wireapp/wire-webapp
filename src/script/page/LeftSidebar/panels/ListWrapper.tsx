@@ -90,7 +90,7 @@ const ListWrapper: React.FC<LeftListWrapperProps> = ({
     scrollbarRef.addEventListener('scroll', onScroll);
 
     return () => scrollbarRef.removeEventListener('scroll', onScroll);
-  }, [scrollbarRef]);
+  }, [calculateBorders, scrollbarRef]);
 
   return (
     <div id={id} className={`left-list-${id} ${id}`} css={style}>

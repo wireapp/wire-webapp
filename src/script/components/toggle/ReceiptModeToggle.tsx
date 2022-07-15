@@ -17,7 +17,7 @@
  *
  */
 
-import React, {Fragment} from 'react';
+import React from 'react';
 
 import {RECEIPT_MODE} from '@wireapp/api-client/src/conversation/data';
 
@@ -40,7 +40,7 @@ const ReceiptModeToggle: React.FC<ReceiptModeToggleProps> = ({receiptMode, onRec
   const inputRef = React.useRef<HTMLInputElement>(null);
   const isChecked = receiptMode !== RECEIPT_MODE.OFF;
   return (
-    <Fragment>
+    <>
       <div className="panel__action-item panel__action-item--toggle">
         <label
           htmlFor="receipt-toggle-input"
@@ -78,7 +78,7 @@ const ReceiptModeToggle: React.FC<ReceiptModeToggleProps> = ({receiptMode, onRec
       <p className="panel__info-text panel__info-text--margin" data-uie-name="status-info-toggle-receipt-mode">
         {t('receiptToggleInfo')}
       </p>
-    </Fragment>
+    </>
   );
 };
 

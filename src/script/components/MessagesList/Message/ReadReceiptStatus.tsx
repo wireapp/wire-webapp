@@ -49,7 +49,7 @@ const ReadReceiptStatus: React.FC<ReadReceiptStatusProps> = ({
       const text = is1to1Conversation ? formatTimeShort(readReceipts[0].time) : readReceipts.length.toString(10);
       setReadReceiptText(text);
     }
-  }, [is1to1Conversation, readReceipts]);
+  }, [is1to1Conversation, message.expectsReadConfirmation, readReceipts]);
 
   useEffect(() => {
     if (readReceipts.length && is1to1Conversation) {

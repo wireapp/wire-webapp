@@ -17,7 +17,7 @@
  *
  */
 
-import React, {Fragment} from 'react';
+import React from 'react';
 
 import cx from 'classnames';
 
@@ -57,7 +57,7 @@ const ServiceList: React.FC<ServiceListProps> = ({
   };
 
   return (
-    <Fragment>
+    <>
       <ul className={cx('search-list', mode === MODE.COMPACT ? 'search-list-sm' : 'search-list-lg')}>
         {services.map(service => (
           <li key={service.id}>
@@ -78,7 +78,7 @@ const ServiceList: React.FC<ServiceListProps> = ({
           {t('searchListNoMatches')}
         </div>
       )}
-    </Fragment>
+    </>
   );
 };
 

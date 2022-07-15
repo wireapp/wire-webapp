@@ -70,7 +70,7 @@ const LeftSidebar: React.FC<LeftSidebarProps> = ({
     amplify.subscribe(WebAppEvents.SHORTCUT.START, () => {
       listViewModel.switchList(ListViewModel.STATE.START_UI);
     });
-  }, []);
+  }, [listViewModel]);
 
   switch (state) {
     case ListState.CONVERSATIONS:

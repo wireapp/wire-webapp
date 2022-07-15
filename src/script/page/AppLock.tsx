@@ -105,10 +105,10 @@ const AppLock: React.FC<AppLockProps> = ({
     }),
   );
 
-  const getInactivityAppLockTimeoutInSeconds = () => {
+  const getInactivityAppLockTimeoutInSeconds = useCallback(() => {
     const backendTimeout = appLockState.appLockInactivityTimeoutSecs();
     return Number.isFinite(backendTimeout) ? backendTimeout : DEFAULT_INACTIVITY_APP_LOCK_TIMEOUT_IN_SEC;
-  };
+  }, [appLockState]);
 
   const getScheduledAppLockTimeoutInSeconds = () => {
     const configTimeout = Config.getConfig().FEATURE?.APPLOCK_SCHEDULED_TIMEOUT;
@@ -119,11 +119,16 @@ const AppLock: React.FC<AppLockProps> = ({
     return getScheduledAppLockTimeoutInSeconds() !== null;
   };
 
+  const showAppLock = useCallback(() => {
+    setState(appLockState.hasPassphrase() ? APPLOCK_STATE.LOCKED : APPLOCK_STATE.SETUP);
+    setIsVisible(true);
+  }, [appLockState]);
+
   const startAppLockTimeout = useCallback(() => {
     window.clearTimeout(inactivityTimeoutId);
     const id = window.setTimeout(showAppLock, getInactivityAppLockTimeoutInSeconds() * 1000);
     setInactivityTimeoutId(id);
-  }, [inactivityTimeoutId]);
+  }, [getInactivityAppLockTimeoutInSeconds, inactivityTimeoutId, showAppLock]);
 
   const clearAppLockTimeout = useCallback(() => {
     window.clearTimeout(inactivityTimeoutId);
@@ -145,7 +150,7 @@ const AppLock: React.FC<AppLockProps> = ({
         },
       });
     }
-  }, [isAppLockEnabled]);
+  }, [appLockRepository, appLockState, isAppLockEnabled, showAppLock]);
 
   useEffect(() => {
     if (isAppLockActivated) {
@@ -174,12 +179,7 @@ const AppLock: React.FC<AppLockProps> = ({
       modalObserver.disconnect();
       appObserver.disconnect();
     };
-  }, [state, isVisible]);
-
-  const showAppLock = () => {
-    setState(appLockState.hasPassphrase() ? APPLOCK_STATE.LOCKED : APPLOCK_STATE.SETUP);
-    setIsVisible(true);
-  };
+  }, [state, isVisible, modalObserver, appObserver]);
 
   const onUnlock = async (event: React.FormEvent) => {
     event.preventDefault();
@@ -464,7 +464,7 @@ const AppLock: React.FC<AppLockProps> = ({
         )}
 
         {state === APPLOCK_STATE.FORGOT && (
-          <React.Fragment>
+          <>
             <div className="modal__text" data-uie-name="label-applock-forgot-text">
               {t('modalAppLockForgotMessage')}
             </div>
@@ -485,11 +485,11 @@ const AppLock: React.FC<AppLockProps> = ({
                 {t('modalAppLockForgotGoBackButton')}
               </button>
             </div>
-          </React.Fragment>
+          </>
         )}
 
         {state === APPLOCK_STATE.WIPE_CONFIRM && (
-          <React.Fragment>
+          <>
             <div className="modal__text" data-uie-name="label-applock-wipe-confirm-text">
               {t('modalAppLockWipeConfirmMessage')}
             </div>
@@ -505,7 +505,7 @@ const AppLock: React.FC<AppLockProps> = ({
                 {t('modalAppLockWipeConfirmConfirmButton')}
               </button>
             </div>
-          </React.Fragment>
+          </>
         )}
 
         {state === APPLOCK_STATE.WIPE_PASSWORD && (

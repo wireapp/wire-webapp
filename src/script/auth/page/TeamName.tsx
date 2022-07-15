@@ -76,7 +76,7 @@ const TeamName = ({
 
   useEffect(() => {
     enterTeamCreationFlow();
-  }, []);
+  }, [enterTeamCreationFlow]);
 
   const resetErrors = () => {
     setError(null);

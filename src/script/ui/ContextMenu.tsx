@@ -77,7 +77,7 @@ const ContextMenu: React.FC<ContextMenuProps> = ({entries, defaultIdentifier = '
       top,
       visibility: mainElement ? 'unset' : 'hidden',
     };
-  }, [mainElement]);
+  }, [mainElement, posX, posY]);
 
   useEffect(() => {
     if (selected) {
@@ -131,7 +131,7 @@ const ContextMenu: React.FC<ContextMenuProps> = ({entries, defaultIdentifier = '
       window.removeEventListener('mousedown', onMouseDown);
       window.removeEventListener('resize', cleanUp);
     };
-  }, [mainElement, selected]);
+  }, [entries, mainElement, selected]);
 
   return (
     <ul className="ctx-menu" ref={setMainElement} style={{maxHeight: window.innerHeight, ...style}}>

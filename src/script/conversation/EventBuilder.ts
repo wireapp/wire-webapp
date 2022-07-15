@@ -69,12 +69,6 @@ export interface BackendEventMessage<T> extends Omit<BaseEvent, 'id'> {
   type: string;
 }
 
-export interface ErrorEvent extends BaseEvent {
-  error: string;
-  error_code: number | string;
-  type: CONVERSATION;
-}
-
 export interface VoiceChannelActivateEvent extends BaseEvent {
   protocol_version: number;
   type: CONVERSATION.VOICE_CHANNEL_ACTIVATE;

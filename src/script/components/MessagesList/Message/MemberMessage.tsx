@@ -93,7 +93,7 @@ const MemberMessage: React.FC<MemberMessageProps> = ({
       }
     }
     return undefined;
-  }, [messageHeaderLabelRef]);
+  }, [highlightedUsers, messageHeaderLabelRef, onClickParticipants]);
 
   return (
     <>

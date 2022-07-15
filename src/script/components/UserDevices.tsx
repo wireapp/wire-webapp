@@ -122,7 +122,7 @@ const UserDevices: React.FC<UserDevicesProps> = ({
         logger.error(`Unable to retrieve clients for user '${user.id}': ${error.message || error}`);
       }
     })();
-  }, [user]);
+  }, [clientRepository, logger, user]);
 
   const clickOnDevice = (clientEntity: ClientEntity) => {
     setSelectedClient(clientEntity);

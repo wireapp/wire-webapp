@@ -40,7 +40,7 @@ const GroupedConversationHeader: React.FC<GroupedConversationHeaderProps> = ({on
     const unreadSubscriptions = conversations?.map(c => c.hasUnread.subscribe(updateBadge));
     updateBadge();
     return () => unreadSubscriptions?.forEach(s => s.dispose());
-  }, [conversations?.length]);
+  }, [conversations, conversations.length]);
 
   return (
     <button

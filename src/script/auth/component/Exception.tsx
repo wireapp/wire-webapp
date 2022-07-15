@@ -17,8 +17,6 @@
  *
  */
 
-import {Fragment} from 'react';
-
 import {ErrorMessage} from '@wireapp/react-ui-kit';
 import {FormattedMessage} from 'react-intl';
 
@@ -31,7 +29,7 @@ interface ExceptionProps {
 
 const Exception = ({errors = []}: ExceptionProps) => {
   return (
-    <Fragment>
+    <>
       {errors.map(error => {
         const translatedErrors = {...validationErrorStrings, ...errorHandlerStrings};
         if (!error) {
@@ -61,7 +59,7 @@ const Exception = ({errors = []}: ExceptionProps) => {
           </ErrorMessage>
         );
       })}
-    </Fragment>
+    </>
   );
 };
 

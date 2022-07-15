@@ -62,7 +62,7 @@ const Archive: React.FC<ArchiveProps> = ({
   useEffect(() => {
     // will eventually load missing events from the db
     conversationRepository.updateArchivedConversations();
-  }, []);
+  }, [conversationRepository]);
 
   return (
     <ListWrapper id="archive" header={t('archiveHeader')} onClose={onClose}>

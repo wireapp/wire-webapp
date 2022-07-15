@@ -109,7 +109,8 @@ const ModalComponent: React.FC<ModalComponentProps> = ({
     return () => {
       document.removeEventListener('keydown', trapFocus);
     };
-  }, [isShown, onkeydown]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isShown, onkeydown, trapFocus]);
 
   useEffect(() => {
     let timeoutId = 0;
@@ -132,7 +133,7 @@ const ModalComponent: React.FC<ModalComponentProps> = ({
     return () => {
       window.clearTimeout(timeoutId);
     };
-  }, [isShown]);
+  }, [isShown, onClosed]);
 
   return (
     <div

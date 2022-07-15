@@ -78,7 +78,7 @@ const useHideElement = (timeout: number, skipClass?: string) => {
       ref.removeEventListener('keydown', onKeyDown);
       ref.classList.remove(hideControlsClass);
     };
-  }, [ref]);
+  }, [ref, skipClass, timeout]);
 
   return setRef;
 };

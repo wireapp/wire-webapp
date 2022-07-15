@@ -80,7 +80,7 @@ const Image: React.FC<ImageProps> = ({
         window.URL.revokeObjectURL(assetSrc);
       }
     };
-  }, [isInViewport]);
+  }, [asset, assetRepository, assetSrc, isFileSharingReceivingEnabled, isInViewport]);
 
   const style = aspectRatio ? {aspectRatio: aspectRatio.toString(), width: '100%'} : undefined;
   return !isFileSharingReceivingEnabled ? (

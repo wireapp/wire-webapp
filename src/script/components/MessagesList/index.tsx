@@ -17,7 +17,7 @@
  *
  */
 
-import React, {useEffect, useLayoutEffect, useRef, useState} from 'react';
+import React, {useCallback, useEffect, useLayoutEffect, useRef, useState} from 'react';
 
 import {ConversationRepository} from 'src/script/conversation/ConversationRepository';
 import {MessageRepository} from 'src/script/conversation/MessageRepository';
@@ -98,13 +98,16 @@ const MessagesList: React.FC<MessagesListParams> = ({
   const shouldShowInvitePeople =
     conversation.isActiveParticipant() && conversation.inTeam() && (isGuestRoom || isGuestAndServicesRoom);
 
-  const loadConversation = async (conversation: Conversation, message?: MessageEntity): Promise<MessageEntity[]> => {
-    await conversationRepository.updateParticipatingUserEntities(conversation, false, true);
+  const loadConversation = useCallback(
+    async (conversation: Conversation, message?: MessageEntity): Promise<MessageEntity[]> => {
+      await conversationRepository.updateParticipatingUserEntities(conversation, false, true);
 
-    return message
-      ? conversationRepository.getMessagesWithOffset(conversation, message)
-      : conversationRepository.getPrecedingMessages(conversation);
-  };
+      return message
+        ? conversationRepository.getMessagesWithOffset(conversation, message)
+        : conversationRepository.getPrecedingMessages(conversation);
+    },
+    [conversationRepository],
+  );
 
   const verticallyCenterMessage = (): boolean => {
     if (messages.length === 1) {
@@ -120,38 +123,41 @@ const MessagesList: React.FC<MessagesListParams> = ({
   const focusedElement = useRef<FocusedElement | null>(null);
   const conversationLastReadTimestamp = useRef(conversation.last_read_timestamp());
 
-  const updateScroll = (container: Element | null) => {
-    const scrollingContainer = container?.parentElement;
-    if (!scrollingContainer || !loaded) {
-      return;
-    }
-    const lastMessage = messages[messages.length - 1];
-    const previousScrollHeight = scrollHeight.current;
-    const scrollBottomPosition = scrollingContainer.scrollTop + scrollingContainer.clientHeight;
-    const shouldStickToBottom = previousScrollHeight - scrollBottomPosition < 100;
+  const updateScroll = useCallback(
+    (container: Element | null) => {
+      const scrollingContainer = container?.parentElement;
+      if (!scrollingContainer || !loaded) {
+        return;
+      }
+      const lastMessage = messages[messages.length - 1];
+      const previousScrollHeight = scrollHeight.current;
+      const scrollBottomPosition = scrollingContainer.scrollTop + scrollingContainer.clientHeight;
+      const shouldStickToBottom = previousScrollHeight - scrollBottomPosition < 100;
 
-    if (focusedElement.current) {
-      // If we have an element we want to focus
-      const {element, center} = focusedElement.current;
-      const elementPosition = element.getBoundingClientRect();
-      const containerPosition = scrollingContainer.getBoundingClientRect();
-      const scrollBy = scrollingContainer.scrollTop + elementPosition.top - containerPosition.top;
-      scrollingContainer.scrollTo({top: scrollBy - (center ? scrollingContainer.offsetHeight / 2 : 0)});
-    } else if (scrollingContainer.scrollTop === 0 && scrollingContainer.scrollHeight > previousScrollHeight) {
-      // If we hit the top and new messages were loaded, we keep the scroll position stable
-      scrollingContainer.scrollTop = scrollingContainer.scrollHeight - previousScrollHeight;
-    } else if (shouldStickToBottom) {
-      // We only want to animate the scroll if there are new messages in the list
-      const behavior = nbMessages.current !== messages.length ? 'smooth' : 'auto';
-      // Simple content update, we just scroll to bottom if we are in the stick to bottom threshold
-      scrollingContainer.scrollTo?.({behavior, top: scrollingContainer.scrollHeight});
-    } else if (lastMessage && lastMessage.status() === StatusType.SENDING && lastMessage.user().id === selfUser.id) {
-      // The self user just sent a message, we scroll straight to the bottom
-      scrollingContainer.scrollTo?.({behavior: 'smooth', top: scrollingContainer.scrollHeight});
-    }
-    scrollHeight.current = scrollingContainer.scrollHeight;
-    nbMessages.current = messages.length;
-  };
+      if (focusedElement.current) {
+        // If we have an element we want to focus
+        const {element, center} = focusedElement.current;
+        const elementPosition = element.getBoundingClientRect();
+        const containerPosition = scrollingContainer.getBoundingClientRect();
+        const scrollBy = scrollingContainer.scrollTop + elementPosition.top - containerPosition.top;
+        scrollingContainer.scrollTo({top: scrollBy - (center ? scrollingContainer.offsetHeight / 2 : 0)});
+      } else if (scrollingContainer.scrollTop === 0 && scrollingContainer.scrollHeight > previousScrollHeight) {
+        // If we hit the top and new messages were loaded, we keep the scroll position stable
+        scrollingContainer.scrollTop = scrollingContainer.scrollHeight - previousScrollHeight;
+      } else if (shouldStickToBottom) {
+        // We only want to animate the scroll if there are new messages in the list
+        const behavior = nbMessages.current !== messages.length ? 'smooth' : 'auto';
+        // Simple content update, we just scroll to bottom if we are in the stick to bottom threshold
+        scrollingContainer.scrollTo?.({behavior, top: scrollingContainer.scrollHeight});
+      } else if (lastMessage && lastMessage.status() === StatusType.SENDING && lastMessage.user().id === selfUser.id) {
+        // The self user just sent a message, we scroll straight to the bottom
+        scrollingContainer.scrollTo?.({behavior: 'smooth', top: scrollingContainer.scrollHeight});
+      }
+      scrollHeight.current = scrollingContainer.scrollHeight;
+      nbMessages.current = messages.length;
+    },
+    [loaded, messages, selfUser.id],
+  );
 
   // Listen to resizes of the the container element (if it's resized it means something has changed in the message list)
   useResizeObserver(messagesContainer, () => updateScroll(messagesContainer));
@@ -161,7 +167,7 @@ const MessagesList: React.FC<MessagesListParams> = ({
     if (messagesContainer) {
       updateScroll(messagesContainer);
     }
-  }, [messages.length, messagesContainer]);
+  }, [messages.length, messagesContainer, updateScroll]);
 
   useEffect(() => {
     onLoading(true);
@@ -171,7 +177,7 @@ const MessagesList: React.FC<MessagesListParams> = ({
         onLoading(false);
       }, 10);
     });
-  }, []);
+  }, [conversation, initialMessage, loadConversation, onLoading]);
 
   if (!loaded) {
     return null;

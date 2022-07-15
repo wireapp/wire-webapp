@@ -17,7 +17,7 @@
  *
  */
 
-import React, {Fragment, useEffect} from 'react';
+import React, {useEffect} from 'react';
 
 import {t} from 'Util/LocalizerUtil';
 
@@ -65,10 +65,10 @@ const ChooseScreen: React.FC<ChooseScreenProps> = ({cancel, choose, screens = []
       <div className="label-xs text-white">{t('callChooseSharedScreen')}</div>
       <div className="choose-screen-list">{renderPreviews(screens, 'item-screen')}</div>
       {windows.length > 0 && (
-        <Fragment>
+        <>
           <div className="label-xs text-white">{t('callChooseSharedWindow')}</div>
           <div className="choose-screen-list">{renderPreviews(windows, 'item-window')}</div>
-        </Fragment>
+        </>
       )}
       <div id="choose-screen-controls" className="choose-screen-controls">
         <button

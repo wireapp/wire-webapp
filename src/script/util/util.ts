@@ -326,8 +326,8 @@ export function throttle(callback: Function, wait: number, immediate = false) {
 
   return function () {
     const callNow = immediate && initialCall;
-    const next = () => {
-      callback.apply(this, arguments);
+    const next = (...args: unknown[]) => {
+      callback.apply(this, args);
       timeout = null;
     };
 

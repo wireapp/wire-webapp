@@ -49,7 +49,7 @@ const Index = ({defaultSSOCode}: Props & ConnectedProps & DispatchProps) => {
     if (defaultSSOCode) {
       history.push(`${ROUTE.SSO}/wire-${defaultSSOCode}`);
     }
-  }, [defaultSSOCode]);
+  }, [defaultSSOCode, history]);
 
   useEffect(() => {
     const queryLogoutReason = UrlUtil.getURLParameter(QUERY_KEY.LOGOUT_REASON) || null;
@@ -67,7 +67,7 @@ const Index = ({defaultSSOCode}: Props & ConnectedProps & DispatchProps) => {
     ) {
       history.push(ROUTE.LOGIN);
     }
-  }, []);
+  }, [history]);
   return (
     <Page>
       <ContainerXS centerText verticalCenter style={{width: '380px'}}>

@@ -56,7 +56,7 @@ const VerifyPhoneCode = ({
     if (!loginData.phone) {
       history.push(ROUTE.LOGIN_PHONE);
     }
-  }, []);
+  }, [history, loginData.phone]);
 
   const resendCode = async () => {
     try {
