@@ -40,7 +40,7 @@ describe('NotificationService', () => {
       const apiClient = new APIClient({urls: MOCK_BACKEND});
 
       const cryptographyService = {} as unknown as CryptographyService;
-      const notificationService = new NotificationService(apiClient, cryptographyService, storeEngine);
+      const notificationService = new NotificationService(apiClient, cryptographyService, storeEngine, () => undefined);
 
       spyOn<any>(notificationService, 'handleEvent').and.throwError('Test error');
 
@@ -71,7 +71,12 @@ describe('NotificationService', () => {
       await storeEngine.init('NotificationService.test');
 
       const apiClient = new APIClient({urls: MOCK_BACKEND});
-      const notificationService = new NotificationService(apiClient, {} as unknown as CryptographyService, storeEngine);
+      const notificationService = new NotificationService(
+        apiClient,
+        {} as unknown as CryptographyService,
+        storeEngine,
+        () => undefined,
+      );
 
       spyOn<any>(notificationService, 'handleEvent').and.returnValue({});
       const spySetLastNotificationId = spyOn<any>(notificationService, 'setLastNotificationId').and.returnValue({});
@@ -97,7 +102,12 @@ describe('NotificationService', () => {
       await storeEngine.init('NotificationService.test');
 
       const apiClient = new APIClient({urls: MOCK_BACKEND});
-      const notificationService = new NotificationService(apiClient, {} as unknown as CryptographyService, storeEngine);
+      const notificationService = new NotificationService(
+        apiClient,
+        {} as unknown as CryptographyService,
+        storeEngine,
+        () => undefined,
+      );
 
       spyOn<any>(notificationService, 'handleEvent').and.returnValue({});
       const spySetLastNotificationId = spyOn<any>(notificationService, 'setLastNotificationId').and.returnValue({});
@@ -121,7 +131,12 @@ describe('NotificationService', () => {
       await storeEngine.init('NotificationService.test');
 
       const apiClient = new APIClient({urls: MOCK_BACKEND});
-      const notificationService = new NotificationService(apiClient, {} as unknown as CryptographyService, storeEngine);
+      const notificationService = new NotificationService(
+        apiClient,
+        {} as unknown as CryptographyService,
+        storeEngine,
+        () => undefined,
+      );
       notificationService.on(NotificationService.TOPIC.NOTIFICATION_ERROR, notificationError => {
         expect(notificationError.error.message).toBe('Test error');
         expect(spySetLastNotificationId.calls.count()).toBe(0);

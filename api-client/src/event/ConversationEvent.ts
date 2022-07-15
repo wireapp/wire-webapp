@@ -30,6 +30,8 @@ import type {
   ConversationReceiptModeUpdateData,
   ConversationRenameData,
   ConversationTypingData,
+  ConversationMLSWelcomeData,
+  ConversationMLSMessageAddData,
 } from '../conversation/data/';
 import {QualifiedId} from '../user';
 
@@ -45,6 +47,8 @@ export enum CONVERSATION_EVENT {
   MEMBER_UPDATE = 'conversation.member-update',
   MESSAGE_TIMER_UPDATE = 'conversation.message-timer-update',
   OTR_MESSAGE_ADD = 'conversation.otr-message-add',
+  MLS_MESSAGE_ADD = 'conversation.mls-message-add',
+  MLS_WELCOME_MESSAGE = 'conversation.mls-welcome',
   RECEIPT_MODE_UPDATE = 'conversation.receipt-mode-update',
   RENAME = 'conversation.rename',
   TYPING = 'conversation.typing',
@@ -60,6 +64,8 @@ export type ConversationEventData =
   | ConversationMemberUpdateData
   | ConversationMessageTimerUpdateData
   | ConversationOtrMessageAddData
+  | ConversationMLSWelcomeData
+  | ConversationMLSMessageAddData
   | ConversationReceiptModeUpdateData
   | ConversationRenameData
   | ConversationTypingData
@@ -76,6 +82,8 @@ export type ConversationEvent =
   | ConversationMemberUpdateEvent
   | ConversationMessageTimerUpdateEvent
   | ConversationOtrMessageAddEvent
+  | ConversationMLSMessageAddEvent
+  | ConversationMLSWelcomeEvent
   | ConversationReceiptModeUpdateEvent
   | ConversationRenameEvent
   | ConversationTypingEvent;
@@ -144,6 +152,16 @@ export interface ConversationMessageTimerUpdateEvent extends BaseConversationEve
 export interface ConversationOtrMessageAddEvent extends BaseConversationEvent {
   data: ConversationOtrMessageAddData;
   type: CONVERSATION_EVENT.OTR_MESSAGE_ADD;
+}
+
+export interface ConversationMLSMessageAddEvent extends BaseConversationEvent {
+  data: ConversationMLSMessageAddData;
+  type: CONVERSATION_EVENT.MLS_MESSAGE_ADD;
+}
+
+export interface ConversationMLSWelcomeEvent extends BaseConversationEvent {
+  data: ConversationMLSWelcomeData;
+  type: CONVERSATION_EVENT.MLS_WELCOME_MESSAGE;
 }
 
 export interface ConversationReceiptModeUpdateEvent extends BaseConversationEvent {
