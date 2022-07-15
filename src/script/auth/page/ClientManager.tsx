@@ -17,7 +17,7 @@
  *
  */
 
-import {ContainerXS, H1, Link, Muted, useTimeout} from '@wireapp/react-ui-kit';
+import {Button, ButtonVariant, ContainerXS, H1, Muted, useTimeout} from '@wireapp/react-ui-kit';
 import React, {useEffect} from 'react';
 import {useIntl} from 'react-intl';
 import {connect} from 'react-redux';
@@ -74,9 +74,14 @@ const ClientManager = ({doGetAllClients, doLogout}: Props & ConnectedProps & Dis
           {_(clientManagerStrings.subhead, {brandName: Config.getConfig().BRAND_NAME})}
         </Muted>
         <ClientList />
-        <Link onClick={logout} style={{alignSelf: 'center', margin: '48px 0 80px 0'}} data-uie-name="go-sign-out">
+        <Button
+          variant={ButtonVariant.SECONDARY}
+          onClick={logout}
+          style={{alignSelf: 'center', margin: '48px 0 80px 0'}}
+          data-uie-name="go-sign-out"
+        >
           {_(clientManagerStrings.logout)}
-        </Link>
+        </Button>
       </ContainerXS>
     </Page>
   );

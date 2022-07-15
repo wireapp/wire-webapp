@@ -25,7 +25,7 @@ import {
   Form,
   Input,
   Line,
-  RoundIconButton,
+  IconButton,
   Small,
   Text,
   TrashIcon,
@@ -189,6 +189,7 @@ const ClientItem = ({selected, onClientRemoval, onClick, client, clientError, re
   const height = animationPosition * 70;
   const marginTop = animationPosition * 16;
   const paddingHorizontal = animationPosition * 2;
+  const isOpen = requirePassword && (isSelected || isAnimating);
 
   return (
     <ContainerXS>
@@ -212,11 +213,16 @@ const ClientItem = ({selected, onClientRemoval, onClick, client, clientError, re
           }}
           data-uie-name="go-remove-device"
         >
-          <div style={{display: 'flex', flexDirection: 'row'}}>
-            <div style={{flexBasis: '32px', margin: 'auto'}}>
+          <FlexBox>
+            <div
+              style={{
+                flexBasis: '32px',
+                margin: isOpen ? '12px 0 0 0' : 'auto',
+              }}
+            >
               <DeviceIcon color="#323639" />
             </div>
-            <div style={{flexGrow: 1}}>
+            <div style={{flexGrow: 1, marginTop: isOpen ? '12px' : 0}}>
               <Text bold block color="#323639" data-uie-name="device-header-model">
                 {formatName(client.model, client.class)}
               </Text>
@@ -224,7 +230,7 @@ const ClientItem = ({selected, onClientRemoval, onClick, client, clientError, re
               <Small block>{formatDate(client.time)}</Small>
             </div>
             {!requirePassword && (
-              <RoundIconButton
+              <IconButton
                 aria-label={t('modalAccountRemoveDeviceAction')}
                 data-uie-name="do-remove-device"
                 formNoValidate
@@ -233,15 +239,15 @@ const ClientItem = ({selected, onClientRemoval, onClick, client, clientError, re
                 type="submit"
               >
                 <TrashIcon />
-              </RoundIconButton>
+              </IconButton>
             )}
-          </div>
-          <Line color="rgba(51, 55, 58, .04)" style={{backgroundColor: 'transparent', margin: '4px 0 0 0'}} />
+          </FlexBox>
+          <Line color="rgba(51, 55, 58, .04)" style={{backgroundColor: 'transparent', margin: '4px 0 0 32px'}} />
         </ContainerXS>
-        {requirePassword && (isSelected || isAnimating) && (
+        {isOpen && (
           <ContainerXS style={{overflow: 'hidden', padding: `${paddingHorizontal}px 0`}}>
             <Form>
-              <FlexBox css={{alignItems: 'center', margin: '10px 10px 10px 0', maxHeight: height}}>
+              <FlexBox css={{alignItems: 'center', margin: '10px 16px 10px 48px', maxHeight: height}}>
                 <FlexBox css={{flexGrow: 1, marginRight: '12px'}}>
                   <Input
                     id="remove-device-password"
@@ -249,6 +255,7 @@ const ClientItem = ({selected, onClientRemoval, onClick, client, clientError, re
                     data-uie-name="remove-device-password"
                     ref={passwordInput}
                     name="password"
+                    label={t('modalAccountRemoveDevicePlaceholder')}
                     onChange={onPasswordChange}
                     pattern=".{1,1024}"
                     placeholder={_(clientItemStrings.passwordPlaceholder)}
@@ -257,17 +264,17 @@ const ClientItem = ({selected, onClientRemoval, onClick, client, clientError, re
                     value={password}
                   />
                 </FlexBox>
-                <RoundIconButton
+                <IconButton
                   aria-label={t('modalAccountRemoveDeviceAction')}
                   data-uie-name="do-remove-device"
                   disabled={!password || !isValidPassword}
                   formNoValidate
-                  css={{marginBottom: 20}}
+                  css={{margin: '0 8px'}}
                   onClick={handleSubmit}
                   type="submit"
                 >
                   <TrashIcon />
-                </RoundIconButton>
+                </IconButton>
               </FlexBox>
             </Form>
           </ContainerXS>
