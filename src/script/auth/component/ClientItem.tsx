@@ -185,10 +185,20 @@ const ClientItem = ({selected, onClientRemoval, onClick, client, clientError, re
     setIsValidPassword(true);
   };
 
+  const spacing = {
+    l: 32,
+    m: 16,
+    s: 12,
+    xl: 48,
+    xs: 8,
+    xxs: 4,
+  };
+
+  const inputContainerHeight = 104;
+
   const animationPosition = animationStep / CONFIG.animationSteps;
-  const height = animationPosition * 70;
-  const marginTop = animationPosition * 16;
-  const paddingHorizontal = animationPosition * 2;
+  const smoothHeight = animationPosition * inputContainerHeight;
+  const smoothMarginTop = animationPosition * spacing.m;
   const isOpen = requirePassword && (isSelected || isAnimating);
 
   return (
@@ -208,21 +218,21 @@ const ClientItem = ({selected, onClientRemoval, onClick, client, clientError, re
           onClick={(event: React.MouseEvent<HTMLDivElement>) => requirePassword && wrappedOnClick(event)}
           style={{
             cursor: requirePassword ? 'pointer' : 'auto',
-            margin: `${marginTop}px 0 0 0`,
-            padding: '5px 16px 0 16px',
+            margin: `${smoothMarginTop}px 0 0 0`,
+            padding: `0 ${spacing.m}px`,
           }}
           data-uie-name="go-remove-device"
         >
           <FlexBox>
             <div
               style={{
-                flexBasis: '32px',
-                margin: isOpen ? '12px 0 0 0' : 'auto',
+                flexBasis: spacing.l,
+                margin: isOpen ? `${18 - smoothMarginTop / 2}px 0 0 0` : 'auto',
               }}
             >
               <DeviceIcon color="#323639" />
             </div>
-            <div style={{flexGrow: 1, marginTop: isOpen ? '12px' : 0}}>
+            <div style={{flexGrow: 1, marginTop: isOpen ? smoothMarginTop : 0}}>
               <Text bold block color="#323639" data-uie-name="device-header-model">
                 {formatName(client.model, client.class)}
               </Text>
@@ -242,13 +252,22 @@ const ClientItem = ({selected, onClientRemoval, onClick, client, clientError, re
               </IconButton>
             )}
           </FlexBox>
-          <Line color="rgba(51, 55, 58, .04)" style={{backgroundColor: 'transparent', margin: '4px 0 0 32px'}} />
+          <Line
+            color="rgba(51, 55, 58, .04)"
+            style={{backgroundColor: 'transparent', margin: `${spacing.xxs}px 0 0 ${spacing.l}px`}}
+          />
         </ContainerXS>
         {isOpen && (
-          <ContainerXS style={{overflow: 'hidden', padding: `${paddingHorizontal}px 0`}}>
+          <ContainerXS style={{overflow: 'hidden'}}>
             <Form>
-              <FlexBox css={{alignItems: 'center', margin: '10px 16px 10px 48px', maxHeight: height}}>
-                <FlexBox css={{flexGrow: 1, marginRight: '12px'}}>
+              <FlexBox
+                css={{
+                  alignItems: 'center',
+                  margin: `${spacing.s}px ${spacing.m}px 0px ${spacing.xl}px`,
+                  maxHeight: smoothHeight,
+                }}
+              >
+                <FlexBox css={{flexGrow: 1, marginRight: `${spacing.s}px`}}>
                   <Input
                     id="remove-device-password"
                     autoComplete="section-login password"
@@ -269,7 +288,7 @@ const ClientItem = ({selected, onClientRemoval, onClick, client, clientError, re
                   data-uie-name="do-remove-device"
                   disabled={!password || !isValidPassword}
                   formNoValidate
-                  css={{margin: '0 8px'}}
+                  css={{margin: `0 ${spacing.xs}px`}}
                   onClick={handleSubmit}
                   type="submit"
                 >
@@ -281,9 +300,9 @@ const ClientItem = ({selected, onClientRemoval, onClick, client, clientError, re
         )}
       </ContainerXS>
       {validationError && selected ? (
-        <div style={{margin: '16px 0 0 0'}}>{parseValidationErrors(validationError)}</div>
+        <div style={{margin: `${spacing.m}px 0 0 0`}}>{parseValidationErrors(validationError)}</div>
       ) : clientError && selected ? (
-        <div style={{margin: '16px 0 0 0'}} data-uie-name="error-message">
+        <div style={{margin: `${spacing.m}px 0 0 0`}} data-uie-name="error-message">
           {parseError(clientError)}
         </div>
       ) : null}
