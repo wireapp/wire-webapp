@@ -28,6 +28,8 @@ export * from './ConversationMemberUpdateData';
 export * from './ConversationMessageTimerUpdateData';
 export * from './ConversationNameUpdateData';
 export * from './ConversationOtrMessageAddData';
+export * from './ConversationMLSWelcomeData';
+export * from './ConversationMLSMessageAddData';
 export * from './ConversationReceiptModeUpdateData';
 export * from './ConversationRenameData';
 export * from './ConversationTypingData';
