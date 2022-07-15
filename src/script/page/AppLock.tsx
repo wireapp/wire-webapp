@@ -158,6 +158,7 @@ const AppLock: React.FC<AppLockProps> = ({
   useEffect(() => {
     const app = window.document.querySelector<HTMLDivElement>('#app');
     app?.style.setProperty('filter', isVisible ? 'blur(100px)' : '', 'important');
+    app?.style.setProperty('pointer-events', isVisible ? 'none' : 'auto', 'important');
 
     if (isVisible) {
       modalObserver.observe(document.querySelector('#wire-main'), {
