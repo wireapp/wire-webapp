@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [19.15.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/compare/@wireapp/api-client@19.14.1...@wireapp/api-client@19.15.0) (2022-07-15)
+
+
+### Features
+
+* Decrypt incoming MLS messages ([#4315](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/issues/4315)) ([c93b0ae](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/commit/c93b0aea0a43f5eef204d5a20ca047215d6998d6))
+
+
+
+
+
 ## [19.14.1](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/compare/@wireapp/api-client@19.14.0...@wireapp/api-client@19.14.1) (2022-07-15)
 
 **Note:** Version bump only for package @wireapp/api-client
