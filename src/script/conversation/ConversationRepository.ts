@@ -1878,7 +1878,15 @@ export class ConversationRepository {
     const selfConversation = this.conversationState.self_conversation();
     const inSelfConversation = selfConversation && matchQualifiedIds(conversationId, selfConversation.qualifiedId);
     if (inSelfConversation) {
-      const typesInSelfConversation = [CONVERSATION_EVENT.MEMBER_UPDATE, ClientEvent.CONVERSATION.MESSAGE_HIDDEN];
+      const typesInSelfConversation = [
+        CONVERSATION_EVENT.MEMBER_UPDATE,
+        ClientEvent.CONVERSATION.MESSAGE_HIDDEN,
+        /**
+         * As of today (07/07/2022) the backend sends `WELCOME` message to the user's own
+         * conversation (not the actual conversation that the welcome should be part of)
+         */
+        CONVERSATION_EVENT.MLS_WELCOME_MESSAGE,
+      ];
 
       const isExpectedType = typesInSelfConversation.includes(type);
       if (!isExpectedType) {
