@@ -2569,35 +2569,25 @@
   resolved "https://registry.yarnpkg.com/@types/minimist/-/minimist-1.2.1.tgz#283f669ff76d7b8260df8ab7a4262cc83d988256"
   integrity sha512-fZQQafSREFyuZcdWFAExYjBiCL7AUCdgsk80iO0q4yihYYdcIiH28CcuPTGFgLOCC8RlW49GSQxdHwZP+I7CNg==
 
-"@types/node@*", "@types/node@>=13.7.0":
-  version "17.0.13"
-  resolved "https://registry.yarnpkg.com/@types/node/-/node-17.0.13.tgz#5ed7ed7c662948335fcad6c412bb42d99ea754e3"
-  integrity sha512-Y86MAxASe25hNzlDbsviXl8jQHb0RDvKt4c40ZJQ1Don0AAL0STLZSs4N+6gLEO55pedy7r2cLwS+ZDxPm/2Bw==
+"@types/node@*", "@types/node@14 || 16 || 17", "@types/node@>=13.7.0":
+  version "17.0.45"
+  resolved "https://registry.yarnpkg.com/@types/node/-/node-17.0.45.tgz#2c0fafd78705e7a18b7906b5201a522719dc5190"
+  integrity sha512-w+tIMs3rq2afQdsPJlODhoUEKzFP1ayaoyl1CcnwtIlsVe7K7bA1NGm4s3PraqTLlXnbIN84zuBlxBWo1u9BLw==
 
 "@types/node@13.13.4":
   version "13.13.4"
   resolved "https://registry.yarnpkg.com/@types/node/-/node-13.13.4.tgz#1581d6c16e3d4803eb079c87d4ac893ee7501c2c"
   integrity sha512-x26ur3dSXgv5AwKS0lNfbjpCakGIduWU1DU91Zz58ONRWrIKGunmZBNv4P7N+e27sJkiGDsw/3fT4AtsqQBrBA==
 
-"@types/node@14":
+"@types/node@14", "@types/node@~14":
   version "14.18.21"
   resolved "https://registry.yarnpkg.com/@types/node/-/node-14.18.21.tgz#0155ee46f6be28b2ff0342ca1a9b9fd4468bef41"
   integrity sha512-x5W9s+8P4XteaxT/jKF0PSb7XEvo5VmqEWgsMlyeY4ZlLK8I6aH6g5TPPyDlLAep+GYf4kefb7HFyc7PAO3m+Q==
-
-"@types/node@14 || 16 || 17":
-  version "17.0.45"
-  resolved "https://registry.yarnpkg.com/@types/node/-/node-17.0.45.tgz#2c0fafd78705e7a18b7906b5201a522719dc5190"
-  integrity sha512-w+tIMs3rq2afQdsPJlODhoUEKzFP1ayaoyl1CcnwtIlsVe7K7bA1NGm4s3PraqTLlXnbIN84zuBlxBWo1u9BLw==
 
 "@types/node@^13.7.0":
   version "13.13.39"
   resolved "https://registry.yarnpkg.com/@types/node/-/node-13.13.39.tgz#237d071fb593d3aaa96f655a8eb2f91e0fb1480c"
   integrity sha512-wct+WgRTTkBm2R3vbrFOqyZM5w0g+D8KnhstG9463CJBVC3UVZHMToge7iMBR1vDl/I+NWFHUeK9X+JcF0rWKw==
-
-"@types/node@~14":
-  version "14.14.20"
-  resolved "https://registry.yarnpkg.com/@types/node/-/node-14.14.20.tgz#f7974863edd21d1f8a494a73e8e2b3658615c340"
-  integrity sha512-Y93R97Ouif9JEOWPIUyU+eyIdyRqQR0I8Ez1dzku4hDx34NWh4HbtIc3WNzwB1Y9ULvNGeu5B8h8bVL5cAk4/A==
 
 "@types/normalize-package-data@^2.4.0":
   version "2.4.0"
@@ -3167,10 +3157,10 @@
   resolved "https://registry.yarnpkg.com/@wireapp/antiscroll-2/-/antiscroll-2-1.3.1.tgz#bcb66f72c6dadc306e43235256b768ed3f89039c"
   integrity sha512-vWmWYAzSdyxs+xlgSPGtiNSTCM1z0nxM+jSPa/xz1/kuFKy80BrJP5xaGwNNLljBAz8ymlSPUUZlylUd0tFr1Q==
 
-"@wireapp/api-client@19.15.0":
-  version "19.15.0"
-  resolved "https://registry.yarnpkg.com/@wireapp/api-client/-/api-client-19.15.0.tgz#74634c08783b5447d333f01fb4303bebcf996d83"
-  integrity sha512-ruWsq2I+/fDCE+hupbR7jIXQpCIku8PS2oof+bZgXyKlmND0CNKq9YFR63ces81YkzaWbjgoy2rk9nZ5AytSFw==
+"@wireapp/api-client@19.15.1":
+  version "19.15.1"
+  resolved "https://registry.yarnpkg.com/@wireapp/api-client/-/api-client-19.15.1.tgz#89863c2b3aea9484e781c6e1a3a2612bf371a91e"
+  integrity sha512-ynYSJp9w4gTPdQF46Uka/J1F0ZSvSZT41JJvwLLpkzHKZxk7ZvTNQQRsdtd7DQYpi58z6/NuUPXw9oc1BN2hcQ==
   dependencies:
     "@types/node" "~14"
     "@types/spark-md5" "3.0.2"
@@ -3224,16 +3214,16 @@
     logdown "3.3.1"
     rimraf "3.0.2"
 
-"@wireapp/core@28.5.0":
-  version "28.5.0"
-  resolved "https://registry.yarnpkg.com/@wireapp/core/-/core-28.5.0.tgz#3ceaf392b5b679c3c20c6fc47bfcb912c9391fef"
-  integrity sha512-hHbe7NgCEU44nY0HmpiJtJcaUqHI0UYg0ZcmKNq7UAgOpR1AfOeHOWUyTlfZMpkwW2suPh609BZFbtjwHHfJZA==
+"@wireapp/core@28.5.1":
+  version "28.5.1"
+  resolved "https://registry.yarnpkg.com/@wireapp/core/-/core-28.5.1.tgz#af27d65e9e61a112fe04de077b30bdd98c911eb4"
+  integrity sha512-84DQIugF7++OhuG0ErRyvSjPZIauwkmOHuneyJngMZ7vmNLWCRp/8yVrSPjbiZtlCNatEr6l16b915+EGuMG5g==
   dependencies:
     "@open-wc/webpack-import-meta-loader" "0.4.7"
     "@otak/core-crypto" "0.3.0-beta-1"
     "@types/long" "4.0.1"
     "@types/node" "~14"
-    "@wireapp/api-client" "19.15.0"
+    "@wireapp/api-client" "19.15.1"
     "@wireapp/commons" "4.3.0"
     "@wireapp/cryptobox" "12.8.0"
     "@wireapp/store-engine-dexie" "1.6.10"
