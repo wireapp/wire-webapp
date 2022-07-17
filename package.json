@@ -150,7 +150,7 @@
     "less": "3.13.1",
     "lint-staged": "12.4.2",
     "load-grunt-tasks": "5.1.0",
-    "node-fetch": "2.6.7",
+    "node-fetch": "3.2.8",
     "os-browserify": "0.3.0",
     "path-browserify": "1.0.1",
     "postcss-cssnext": "3.1.1",
