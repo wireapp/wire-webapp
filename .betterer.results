@@ -87,10 +87,8 @@ exports[`stricter compilation`] = {
       [67, 31, 7, "This condition will always return true since this \'Promise<any>\' is always defined.", "2364942655"],
       [93, 10, 11, "Type \'false | Error\' is not assignable to type \'Error\'.\\n  Type \'boolean\' is not assignable to type \'Error\'.", "674912356"]
     ],
-    "src/script/auth/component/EntropyCanvas.tsx:2599807788": [
-      [65, 16, 10, "Type \'[number, number] | null\' is not assignable to type \'[number, number]\'.\\n  Type \'null\' is not assignable to type \'[number, number]\'.", "3284027968"],
-      [65, 28, 4, "Type \'null\' is not assignable to type \'[number, number]\'.", "2087897566"],
-      [93, 20, 6, "Object is possibly \'null\'.", "1537472717"]
+    "src/script/auth/component/EntropyCanvas.tsx:2676346219": [
+      [91, 20, 6, "Object is possibly \'null\'.", "1537472717"]
     ],
     "src/script/auth/component/LinkButton.tsx:522804603": [
       [32, 8, 67, "Type \'(theme: Theme) => CSSObject\' is not assignable to type \'Interpolation<Theme>\'.\\n  Type \'(theme: Theme) => CSSObject\' is not assignable to type \'FunctionInterpolation<Theme>\'.\\n    Types of parameters \'theme\' and \'props\' are incompatible.\\n      Type \'Theme\' is missing the following properties from type \'Theme\': IconButton, Checkbox, general, Input, Select", "530872600"]

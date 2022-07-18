@@ -62,8 +62,6 @@ const EntropyCanvas = (props: CanvasProps) => {
   const onMouseLeave = () => {
     onProgress(entropy, percent, true);
     pauseInterval();
-
-    setEntropy([...entropy, null]);
   };
 
   const draw = (ctx: CanvasRenderingContext2D, entropy: [number, number][]) => {
