@@ -21,7 +21,6 @@ import {CoreCrypto} from '@otak/core-crypto/platforms/web/corecrypto';
 import {APIClient} from '@wireapp/api-client';
 import {ClientType} from '@wireapp/api-client/src/client';
 import {ConversationProtocol} from '@wireapp/api-client/src/conversation';
-import {MlsEvent} from '@wireapp/api-client/src/conversation/data/MlsEventData';
 import {LegalHoldStatus} from '@wireapp/protocol-messaging';
 import {MemoryEngine} from '@wireapp/store-engine';
 import {ConversationService, MessageTargetMode, PayloadBundleSource, PayloadBundleState, PayloadBundleType} from '.';
@@ -36,6 +35,7 @@ import {OtrMessage} from './message/OtrMessage';
 describe('ConversationService', () => {
   beforeAll(() => {
     jasmine.clock().install();
+    jasmine.clock().mockDate(new Date(0));
   });
   afterAll(() => {
     jasmine.clock().uninstall();
@@ -43,7 +43,12 @@ describe('ConversationService', () => {
 
   function buildConversationService(federated?: boolean) {
     const client = new APIClient({urls: APIClient.BACKEND.STAGING});
-    spyOn(client.api.conversation, 'postMlsMessage').and.returnValue(Promise.resolve([] as unknown as MlsEvent));
+    spyOn(client.api.conversation, 'postMlsMessage').and.returnValue(
+      Promise.resolve({
+        events: [],
+        time: new Date().toISOString(),
+      }),
+    );
 
     client.context = {
       clientType: ClientType.NONE,
@@ -299,11 +304,9 @@ describe('ConversationService', () => {
     ];
     messages.forEach(payload => {
       it(`calls callbacks when sending '${payload.type}' message is starting and successful`, async () => {
-        jasmine.clock().mockDate(new Date(0));
         const conversationService = buildConversationService();
         const onStart = jasmine.createSpy().and.returnValue(Promise.resolve(true));
         const onSuccess = jasmine.createSpy();
-
         const promise = conversationService.send({
           protocol: ConversationProtocol.MLS,
           groupId,
