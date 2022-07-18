@@ -1111,8 +1111,8 @@ export class ConversationService {
     );
 
     try {
-      await this.apiClient.api.conversation.postMlsMessage(encrypted);
-      onSuccess?.(genericMessage, new Date().toISOString());
+      const {time = ''} = await this.apiClient.api.conversation.postMlsMessage(encrypted);
+      onSuccess?.(genericMessage, time?.length > 0 ? time : new Date().toISOString());
       return {
         ...payload,
         content,
