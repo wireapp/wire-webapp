@@ -70,6 +70,11 @@ import {BackendFeatures} from '../APIClient';
 import {chunk} from '@wireapp/commons/src/main/util/ArrayUtil';
 import {MlsEvent} from './data/MlsEventData';
 
+export type PostMlsMessageResponse = {
+  events: MlsEvent[];
+  time: string;
+};
+
 type ConversationGuestLinkStatus = {status: 'enabled' | 'disabled'};
 
 export class ConversationAPI {
@@ -807,14 +812,14 @@ export class ConversationAPI {
    * @see https://messaginglayersecurity.rocks/mls-protocol/draft-ietf-mls-protocol.html#name-message-framing
    * @see https://staging-nginz-https.zinfra.io/api/swagger-ui/#/default/post_mls_messages
    */
-  public async postMlsMessage(messageData: Uint8Array): Promise<MlsEvent> {
+  public async postMlsMessage(messageData: Uint8Array) {
     const config: AxiosRequestConfig = {
       data: messageData,
       method: 'post',
       url: `${ConversationAPI.URL.MLS}/${ConversationAPI.URL.MESSAGES}`,
     };
 
-    const response = await this.client.sendProtocolMls<MlsEvent>(config, true);
+    const response = await this.client.sendProtocolMls<PostMlsMessageResponse>(config, true);
     return response.data;
   }
 
