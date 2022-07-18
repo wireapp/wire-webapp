@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [19.16.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/compare/@wireapp/api-client@19.15.2...@wireapp/api-client@19.16.0) (2022-07-18)
+
+
+### Features
+
+* **core, api-client:** Use backend timestamp for mls messages ([#4332](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/issues/4332)) ([10f7a13](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/commit/10f7a13e05eebd546beaeb394a2b3eeb54047ad5))
+
+
+
+
+
 ## [19.15.2](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/compare/@wireapp/api-client@19.15.1...@wireapp/api-client@19.15.2) (2022-07-18)
 
 **Note:** Version bump only for package @wireapp/api-client
