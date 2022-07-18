@@ -185,7 +185,7 @@ const ClientItem = ({selected, onClientRemoval, onClick, client, clientError, re
     setIsValidPassword(true);
   };
 
-  const spacing = {
+  const animatedCardSpacing = {
     l: 32,
     m: 16,
     s: 12,
