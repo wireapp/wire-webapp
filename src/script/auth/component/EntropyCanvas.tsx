@@ -35,26 +35,29 @@ const EntropyCanvas = (props: CanvasProps) => {
   const {sizeX, sizeY, onSetEntropy, onProgress, css, ...rest} = props;
   const canvasRef = useRef(null);
   const [percent, setPercent] = useState(0);
+  const [lastFramesCount, setLastFramesCount] = useState(0);
+  const [timedPercent, setTimePercent] = useState(0);
   const [entropy, setEntropy] = useState<[number, number][]>([]);
   const frames = entropy.filter(Boolean).length;
+  // minimum number of frames
+  const MIN_FRAMES = 300;
+  // minimum duration in seconds
+  const MIN_DURATION = 30;
 
   const {clearInterval, startInterval, pauseInterval} = usePausableInterval(() => {
     // This prevents automatic batching of state updates from react 18. https://github.com/reactwg/react-18/discussions/21
     flushSync(() => {
-      setPercent(percent => percent + 1);
+      if (lastFramesCount != frames) {
+        setTimePercent(timedPercent => timedPercent + 1);
+        setLastFramesCount(frames);
+        setPercent(Math.ceil(Math.min(timedPercent, (100 * frames) / MIN_FRAMES)));
+      }
     });
     onProgress(entropy, percent, false);
-  }, 300);
+  }, MIN_DURATION * 10); // = MIN_DURATION / 100 * 1000
 
   useEffect(() => {
-    if (frames <= 300 && percent > 95) {
-      setPercent(95);
-      pauseInterval();
-    }
-    if (frames > 300) {
-      startInterval();
-    }
-    if (frames >= 100) {
+    if (percent >= MIN_FRAMES) {
       clearInterval();
     }
   }, [percent, percent]);

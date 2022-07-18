@@ -88,7 +88,7 @@ const EntropyContainer = ({onSetEntropy}: Props) => {
           </Text>
         </>
       )}
-      {percent === 95 && frames < 300 && <Muted center>{_(setEntropyStrings.moreEntropyNeeded)}</Muted>}
+      {percent >= 95 && percent < 100 && <Muted center>{_(setEntropyStrings.moreEntropyNeeded)}</Muted>}
     </ContainerXS>
   );
 };
