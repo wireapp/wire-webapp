@@ -18,11 +18,11 @@
     "@emotion/babel-plugin": "11.9.2",
     "@emotion/jest": "11.9.1",
     "@hot-loader/react-dom": "17.0.1",
+    "@testing-library/jest-dom": "5.16.4",
+    "@testing-library/react": "13.3.0",
     "@types/jest": "26.0.24",
     "@types/react": "18.0.9",
     "@types/webpack-env": "1.16.2",
-    "@testing-library/react": "13.3.0",
-    "@testing-library/jest-dom": "5.16.4",
     "babel-jest": "27.0.6",
     "babel-loader": "8.2.2",
     "jest": "26.6.1",
@@ -69,5 +69,5 @@
     "test:update": "yarn test --updateSnapshot",
     "test:project": "yarn dist && yarn test"
   },
-  "version": "8.8.3"
+  "version": "8.8.4"
 }
