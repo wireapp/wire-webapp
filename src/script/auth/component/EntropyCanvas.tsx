@@ -99,6 +99,10 @@ const EntropyCanvas = (props: CanvasProps) => {
       event.pageX - event.currentTarget?.getBoundingClientRect()?.x,
       event.pageY - event.currentTarget?.getBoundingClientRect()?.y,
     ];
+    // skip duplicate entries
+    if (entropy.length > 1 && entropy[entropy.length - 1] == newEntropy) {
+      return;
+    }
     setEntropy(entropy => [...entropy, newEntropy]);
   };
 

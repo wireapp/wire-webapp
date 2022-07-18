@@ -87,7 +87,7 @@ exports[`stricter compilation`] = {
       [67, 31, 7, "This condition will always return true since this \'Promise<any>\' is always defined.", "2364942655"],
       [93, 10, 11, "Type \'false | Error\' is not assignable to type \'Error\'.\\n  Type \'boolean\' is not assignable to type \'Error\'.", "674912356"]
     ],
-    "src/script/auth/component/EntropyCanvas.tsx:2676346219": [
+    "src/script/auth/component/EntropyCanvas.tsx:1286603327": [
       [91, 20, 6, "Object is possibly \'null\'.", "1537472717"]
     ],
     "src/script/auth/component/LinkButton.tsx:522804603": [
