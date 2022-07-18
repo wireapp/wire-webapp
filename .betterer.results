@@ -340,7 +340,7 @@ exports[`stricter compilation`] = {
     ],
     "src/script/auth/page/Login.tsx:2293216844": [
       [172, 24, 16, "Argument of type \'Error[]\' is not assignable to parameter of type \'SetStateAction<never[]>\'.", "2735526245"],
-      [174, 50, 10, "Type \'ClientType | undefined\' is not assignable to type \'ClientType\'.\\n  Type \'undefined\' is not assignable to type \'ClientType\'.", "3013398820"],
+      [174, 50, 10, "Type \'ClientType | undefined\' is not assignable to type \'ClientType\'.", "3013398820"],
       [203, 56, 10, "Type \'ClientType | undefined\' is not assignable to type \'ClientType\'.", "3013398820"],
       [205, 32, 11, "Argument of type \'string | undefined\' is not assignable to parameter of type \'string\'.\\n  Type \'undefined\' is not assignable to type \'string\'.", "2331572484"],
       [210, 36, 5, "Argument of type \'unknown\' is not assignable to parameter of type \'SetStateAction<string>\'.", "165548477"],
@@ -1120,7 +1120,7 @@ exports[`stricter compilation`] = {
       [61, 4, 91, "Type \'number | null\' is not assignable to type \'number\'.\\n  Type \'null\' is not assignable to type \'number\'.", "187276181"],
       [72, 6, 41, "Type of computed property\'s value is \'(conversationEntity: Conversation, eventJson: ConversationMessageTimerUpdateEvent) => Promise<Conversation>\', which is not assignable to type \'(conversationEntity: Conversation) => void | Promise<void>\'.", "2358639438"],
       [77, 4, 18, "Type \'ObservableArray<never>\' is not assignable to type \'ObservableArray<ContentMessage>\'.\\n  Types of parameters \'value\' and \'value\' are incompatible.\\n    Type \'ContentMessage[] | null | undefined\' is not assignable to type \'never[] | null | undefined\'.\\n      Type \'ContentMessage[]\' is not assignable to type \'never[]\'.\\n        Type \'ContentMessage\' is not assignable to type \'never\'.", "2087948420"],
-      [84, 29, 16, "No overload matches this call.\\n  Overload 1 of 2, \'(id?: number | undefined): void\', gave the following error.\\n    Argument of type \'number | null\' is not assignable to parameter of type \'number | undefined\'.\\n  Overload 2 of 2, \'(intervalId: Timeout): void\', gave the following error.\\n    Argument of type \'number | null\' is not assignable to parameter of type \'Timeout\'.\\n      Type \'null\' is not assignable to type \'Timeout\'.", "1776967942"],
+      [84, 29, 16, "No overload matches this call.\\n  Overload 1 of 2, \'(id?: number | undefined): void\', gave the following error.\\n    Argument of type \'number | null\' is not assignable to parameter of type \'number | undefined\'.\\n  Overload 2 of 2, \'(intervalId: Timeout | undefined): void\', gave the following error.\\n    Argument of type \'number | null\' is not assignable to parameter of type \'Timeout | undefined\'.\\n      Type \'null\' is not assignable to type \'Timeout | undefined\'.", "1776967942"],
       [129, 38, 25, "Argument of type \'string | undefined\' is not assignable to parameter of type \'string\'.\\n  Type \'undefined\' is not assignable to type \'string\'.", "1762572671"],
       [178, 34, 25, "Argument of type \'string | undefined\' is not assignable to parameter of type \'string\'.\\n  Type \'undefined\' is not assignable to type \'string\'.", "1762572671"],
       [197, 34, 25, "Argument of type \'string | undefined\' is not assignable to parameter of type \'string\'.\\n  Type \'undefined\' is not assignable to type \'string\'.", "1762572671"],
