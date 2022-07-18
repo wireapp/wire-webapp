@@ -340,7 +340,7 @@ exports[`stricter compilation`] = {
     ],
     "src/script/auth/page/Login.tsx:2293216844": [
       [172, 24, 16, "Argument of type \'Error[]\' is not assignable to parameter of type \'SetStateAction<never[]>\'.", "2735526245"],
-      [174, 50, 10, "Type \'ClientType | undefined\' is not assignable to type \'ClientType\'.", "3013398820"],
+      [174, 50, 10, "Type \'ClientType | undefined\' is not assignable to type \'ClientType\'.\\n  Type \'undefined\' is not assignable to type \'ClientType\'.", "3013398820"],
       [203, 56, 10, "Type \'ClientType | undefined\' is not assignable to type \'ClientType\'.", "3013398820"],
       [205, 32, 11, "Argument of type \'string | undefined\' is not assignable to parameter of type \'string\'.\\n  Type \'undefined\' is not assignable to type \'string\'.", "2331572484"],
       [210, 36, 5, "Argument of type \'unknown\' is not assignable to parameter of type \'SetStateAction<string>\'.", "165548477"],
@@ -2064,7 +2064,6 @@ exports[`stricter compilation`] = {
     "src/script/page/AppLock.tsx:588408162": [
       [163, 28, 36, "Argument of type \'Element | null\' is not assignable to parameter of type \'Node\'.\\n  Type \'null\' is not assignable to type \'Node\'.", "3019440182"],
       [167, 26, 30, "Argument of type \'Element | null\' is not assignable to parameter of type \'Node\'.\\n  Type \'null\' is not assignable to type \'Node\'.", "1790131128"],
-      [195, 59, 37, "Object is possibly \'null\'.", "3700925542"],
       [216, 94, 4, "Argument of type \'unknown\' is not assignable to parameter of type \'StatusCodes\'.", "2087770728"],
       [219, 19, 7, "Argument of type \'unknown\' is not assignable to parameter of type \'SetStateAction<string>\'.", "1236122734"]
     ],
