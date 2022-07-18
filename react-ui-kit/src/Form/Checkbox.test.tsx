@@ -19,8 +19,11 @@
 
 import React from 'react';
 import {THEME_ID} from '../Layout';
-import {matchComponent} from '../test/testUtil';
 import {Checkbox, CheckboxLabel} from './Checkbox';
+import {StyledApp} from '../../src/Layout/StyledApp';
+import {render, fireEvent} from '@testing-library/react';
+import '@testing-library/jest-dom/extend-expect';
+import {matchComponent} from '../test/testUtil';
 
 describe('"Checkbox"', () => {
   it('renders', () => matchComponent(<Checkbox id="1">Check</Checkbox>));
@@ -41,4 +44,17 @@ describe('"Checkbox"', () => {
 
 describe('"CheckboxLabel"', () => {
   it('renders', () => matchComponent(<CheckboxLabel>Label</CheckboxLabel>));
+});
+
+//TODO: - create custom render for UI-Kit with a styledapp wrapper(SQSERVICES-1672)
+test('account creation terms and condition checkbox is checked/unchecked', () => {
+  const {getByTestId} = render(
+    <StyledApp themeId={THEME_ID.LIGHT}>
+      <Checkbox id="1" data-testid="do-terms"></Checkbox>
+    </StyledApp>,
+  );
+  const checkbox = getByTestId('do-terms');
+  expect(checkbox).not.toBeChecked();
+  fireEvent.click(checkbox);
+  expect(checkbox).toBeChecked();
 });
