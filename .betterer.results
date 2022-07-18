@@ -74,13 +74,13 @@ exports[`stricter compilation`] = {
       [226, 8, 3, "Type \'MutableRefObject<HTMLInputElement | undefined>\' is not assignable to type \'((instance: HTMLInputElement | null) => void) | RefObject<HTMLInputElement> | null | undefined\'.\\n  Type \'MutableRefObject<HTMLInputElement | undefined>\' is not assignable to type \'RefObject<HTMLInputElement>\'.", "193432436"],
       [228, 10, 20, "Object is possibly \'undefined\'.", "3805711124"]
     ],
-    "src/script/auth/component/ClientItem.tsx:1621350644": [
+    "src/script/auth/component/ClientItem.tsx:1403845945": [
       [149, 9, 21, "Object is possibly \'undefined\'.", "4077427211"],
       [151, 8, 21, "Object is possibly \'undefined\'.", "4077427211"],
       [152, 8, 21, "Object is possibly \'undefined\'.", "4077427211"],
       [155, 23, 21, "Object is possibly \'undefined\'.", "4077427211"],
       [236, 28, 12, "Argument of type \'string | undefined\' is not assignable to parameter of type \'string\'.\\n  Type \'undefined\' is not assignable to type \'string\'.", "3597007453"],
-      [274, 20, 3, "Type \'MutableRefObject<HTMLInputElement | undefined>\' is not assignable to type \'((instance: HTMLInputElement | null) => void) | RefObject<HTMLInputElement> | null | undefined\'.", "193432436"]
+      [277, 20, 3, "Type \'MutableRefObject<HTMLInputElement | undefined>\' is not assignable to type \'((instance: HTMLInputElement | null) => void) | RefObject<HTMLInputElement> | null | undefined\'.", "193432436"]
     ],
     "src/script/auth/component/ClientList.tsx:3233905927": [
       [56, 4, 8, "Type \'string | null\' is not assignable to type \'string\'.\\n  Type \'null\' is not assignable to type \'string\'.", "1055803537"],

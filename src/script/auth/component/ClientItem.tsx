@@ -198,7 +198,7 @@ const ClientItem = ({selected, onClientRemoval, onClick, client, clientError, re
 
   const animationPosition = animationStep / CONFIG.animationSteps;
   const smoothHeight = animationPosition * inputContainerHeight;
-  const smoothMarginTop = animationPosition * spacing.m;
+  const smoothMarginTop = animationPosition * animatedCardSpacing.m;
   const isOpen = requirePassword && (isSelected || isAnimating);
 
   return (
@@ -219,14 +219,14 @@ const ClientItem = ({selected, onClientRemoval, onClick, client, clientError, re
           style={{
             cursor: requirePassword ? 'pointer' : 'auto',
             margin: `${smoothMarginTop}px 0 0 0`,
-            padding: `0 ${spacing.m}px`,
+            padding: `0 ${animatedCardSpacing.m}px`,
           }}
           data-uie-name="go-remove-device"
         >
           <FlexBox>
             <div
               style={{
-                flexBasis: spacing.l,
+                flexBasis: animatedCardSpacing.l,
                 margin: isOpen ? `${18 - smoothMarginTop / 2}px 0 0 0` : 'auto',
               }}
             >
@@ -254,7 +254,10 @@ const ClientItem = ({selected, onClientRemoval, onClick, client, clientError, re
           </FlexBox>
           <Line
             color="rgba(51, 55, 58, .04)"
-            style={{backgroundColor: 'transparent', margin: `${spacing.xxs}px 0 0 ${spacing.l}px`}}
+            style={{
+              backgroundColor: 'transparent',
+              margin: `${animatedCardSpacing.xxs}px 0 0 ${animatedCardSpacing.l}px`,
+            }}
           />
         </ContainerXS>
         {isOpen && (
@@ -263,11 +266,11 @@ const ClientItem = ({selected, onClientRemoval, onClick, client, clientError, re
               <FlexBox
                 css={{
                   alignItems: 'center',
-                  margin: `${spacing.s}px ${spacing.m}px 0px ${spacing.xl}px`,
+                  margin: `${animatedCardSpacing.s}px ${animatedCardSpacing.m}px 0px ${animatedCardSpacing.xl}px`,
                   maxHeight: smoothHeight,
                 }}
               >
-                <FlexBox css={{flexGrow: 1, marginRight: `${spacing.s}px`}}>
+                <FlexBox css={{flexGrow: 1, marginRight: `${animatedCardSpacing.s}px`}}>
                   <Input
                     id="remove-device-password"
                     autoComplete="section-login password"
@@ -288,7 +291,7 @@ const ClientItem = ({selected, onClientRemoval, onClick, client, clientError, re
                   data-uie-name="do-remove-device"
                   disabled={!password || !isValidPassword}
                   formNoValidate
-                  css={{margin: `0 ${spacing.xs}px`}}
+                  css={{margin: `0 ${animatedCardSpacing.xs}px`}}
                   onClick={handleSubmit}
                   type="submit"
                 >
@@ -300,9 +303,9 @@ const ClientItem = ({selected, onClientRemoval, onClick, client, clientError, re
         )}
       </ContainerXS>
       {validationError && selected ? (
-        <div style={{margin: `${spacing.m}px 0 0 0`}}>{parseValidationErrors(validationError)}</div>
+        <div style={{margin: `${animatedCardSpacing.m}px 0 0 0`}}>{parseValidationErrors(validationError)}</div>
       ) : clientError && selected ? (
-        <div style={{margin: `${spacing.m}px 0 0 0`}} data-uie-name="error-message">
+        <div style={{margin: `${animatedCardSpacing.m}px 0 0 0`}} data-uie-name="error-message">
           {parseError(clientError)}
         </div>
       ) : null}
