@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [28.6.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/compare/@wireapp/core@28.5.2...@wireapp/core@28.6.0) (2022-07-18)
+
+
+### Features
+
+* **core, api-client:** Use backend timestamp for mls messages ([#4332](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/issues/4332)) ([10f7a13](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/commit/10f7a13e05eebd546beaeb394a2b3eeb54047ad5))
+
+
+
+
+
 ## [28.5.2](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/compare/@wireapp/core@28.5.1...@wireapp/core@28.5.2) (2022-07-18)
 
 **Note:** Version bump only for package @wireapp/core
