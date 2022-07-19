@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [8.9.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/react-ui-kit/compare/@wireapp/react-ui-kit@8.8.4...@wireapp/react-ui-kit@8.9.0) (2022-07-19)
+
+
+### Features
+
+* **react-ui-kit:** add DropFileInput component (#SQSERVICES-758) ([#4334](https://github.com/wireapp/wire-web-packages/tree/main/packages/react-ui-kit/issues/4334)) ([e3dbe38](https://github.com/wireapp/wire-web-packages/tree/main/packages/react-ui-kit/commit/e3dbe38a57be5f9d5d235d6b60c240d4cf2e3752)), closes [#SQSERVICES-758](https://github.com/wireapp/wire-web-packages/tree/main/packages/react-ui-kit/issues/SQSERVICES-758)
+
+
+
+
+
 ## [8.8.4](https://github.com/wireapp/wire-web-packages/tree/main/packages/react-ui-kit/compare/@wireapp/react-ui-kit@8.8.3...@wireapp/react-ui-kit@8.8.4) (2022-07-18)
 
 **Note:** Version bump only for package @wireapp/react-ui-kit
