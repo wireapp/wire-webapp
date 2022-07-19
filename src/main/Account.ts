@@ -578,7 +578,7 @@ export class Account<T = any> extends EventEmitter {
 
   private generateDbName(context: Context) {
     const clientType = context.clientType === ClientType.NONE ? '' : `@${context.clientType}`;
-    return `wire@${this.apiClient.config.urls.name}@${context.userId}@${context.clientId}${clientType}`;
+    return `wire@${this.apiClient.config.urls.name}@${context.userId}${clientType}`;
   }
 
   private async initEngine(context: Context): Promise<CRUDEngine> {
