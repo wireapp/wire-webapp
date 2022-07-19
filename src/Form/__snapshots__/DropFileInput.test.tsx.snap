@@ -1,0 +1,169 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`"DropFileInput" matches snapshot 1`] = `
+.emotion-0 {
+  background: #edeff0;
+  -webkit-transition: background 0.15s;
+  transition: background 0.15s;
+}
+
+.emotion-2 {
+  max-width: 330px;
+}
+
+.emotion-3 {
+  width: 100%;
+  padding: 28px 12px;
+  border: 1px dashed #0667c8;
+  border-bottom-width: 2px;
+  border-radius: 6px;
+  text-align: center;
+  background-color: #fff;
+  font-weight: 400;
+  font-size: 12px;
+  line-height: 13px;
+  color: #696c6e;
+}
+
+.emotion-4 {
+  -webkit-align-items: center;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-flex-direction: row;
+  -ms-flex-direction: row;
+  flex-direction: row;
+  -webkit-box-flex-wrap: wrap;
+  -webkit-flex-wrap: wrap;
+  -ms-flex-wrap: wrap;
+  flex-wrap: wrap;
+  -webkit-box-pack: center;
+  -ms-flex-pack: center;
+  -webkit-justify-content: center;
+  justify-content: center;
+  max-width: 280px;
+  margin: 0 auto;
+}
+
+.emotion-5 {
+  fill: rgb(29, 30, 31);
+  overflow: visible;
+  margin: 12px 0;
+}
+
+.emotion-6 {
+  max-width: 160px;
+  margin: 0 25px;
+}
+
+.emotion-7 {
+  display: block;
+  white-space: pre-line;
+}
+
+.emotion-8 {
+  color: #0667c8;
+  cursor: pointer;
+}
+
+.emotion-8:focus-within {
+  outline: 1px solid #0667c8;
+}
+
+.emotion-8:hover {
+  -webkit-text-decoration: underline;
+  text-decoration: underline;
+}
+
+.emotion-9 {
+  clip: rect(0 0 0 0);
+  -webkit-clip-path: inset(50%);
+  clip-path: inset(50%);
+  height: 1px;
+  overflow: hidden;
+  position: absolute;
+  white-space: nowrap;
+  width: 1px;
+}
+
+.emotion-10 {
+  margin-top: 12px;
+  font-weight: 400;
+  font-size: 10px;
+  line-height: 13px;
+  color: #696c6e;
+  white-space: pre-line;
+}
+
+<div
+  className="emotion-0"
+>
+  <div
+    className="emotion-0"
+  >
+    <div
+      className="emotion-2"
+    >
+      <div
+        className="emotion-3"
+        data-testid="dropzone"
+        onDragLeave={[Function]}
+        onDragOver={[Function]}
+        onDrop={[Function]}
+      >
+        <div
+          className="emotion-4"
+        >
+          <svg
+            className="emotion-5"
+            height={16}
+            viewBox="0 0 16 16"
+            width={16}
+          >
+            <g>
+              <path
+                d="M0 14H16V16H0V14ZM7 11H9V4H13L8 0L3 4H7V11Z"
+              />
+            </g>
+          </svg>
+          <div
+            className="emotion-6"
+          >
+            <span
+              className="emotion-7"
+            >
+              Drag & Drop an image 
+or
+            </span>
+            <label
+              aria-label="Drag & Drop an image 
+or select one from your device (Image (JPG/PNG) size up to 1 MB, minimum 200 x 600 px)"
+              className="emotion-8"
+            >
+              <span>
+                select one from your device
+              </span>
+              <input
+                accept="image/png, image/jpeg"
+                className="emotion-9"
+                data-testid="file-input"
+                onChange={[Function]}
+                type="file"
+              />
+            </label>
+          </div>
+        </div>
+      </div>
+      <p
+        className="emotion-10"
+      >
+        Image (JPG/PNG) size up to 1 MB, minimum 200 x 600 px
+      </p>
+    </div>
+  </div>
+</div>
+`;

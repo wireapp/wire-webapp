@@ -78,6 +78,7 @@ import {
   HideIcon,
   TriangleIcon,
   TwitterIcon,
+  UploadIcon,
   WireIcon,
 } from '@wireapp/react-ui-kit';
 
@@ -141,6 +142,7 @@ const icons = [
   TeamIcon,
   TimedIcon,
   TrashIcon,
+  UploadIcon,
   TrashCrossIcon,
   TriangleIcon,
   HideIcon,
