@@ -107,11 +107,10 @@ export class AuthAction {
         await dispatch(selfAction.fetchSelf());
         let entropyData: Uint8Array | undefined = undefined;
         if (getEntropy) {
+          entropyData = await getEntropy();
           try {
-            await core.loadAndValidateLocalClient();
-          } catch (e) {
-            entropyData = await getEntropy();
-          }
+            await core.loadAndValidateLocalClient(entropyData);
+          } catch (e) {}
         }
         await onAfterLogin(dispatch, getState, global);
         await dispatch(
@@ -361,6 +360,7 @@ export class AuthAction {
           throw new Error(`Could not find value for '${LocalStorageKey.AUTH.PERSIST}'`);
         }
         const clientType = persist ? ClientType.PERMANENT : ClientType.TEMPORARY;
+
         await core.init(clientType, undefined, false);
         await this.persistAuthData(clientType, core, dispatch, localStorageAction);
 
@@ -385,7 +385,10 @@ export class AuthAction {
     return async (dispatch, getState, {core}) => {
       dispatch(AuthActionCreator.startValidateLocalClient());
       try {
-        await core.loadAndValidateLocalClient();
+        const {
+          authState: {entropy},
+        } = getState();
+        await core.loadAndValidateLocalClient(entropy);
         dispatch(AuthActionCreator.successfulValidateLocalClient());
       } catch (error) {
         dispatch(AuthActionCreator.failedValidateLocalClient(error));

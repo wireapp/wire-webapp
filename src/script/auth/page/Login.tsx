@@ -160,8 +160,8 @@ const Login = ({
 
   const immediateLogin = async () => {
     try {
-      await doInit({isImmediateLogin: true, shouldValidateLocalClient: false});
       const entropyData = await getEntropy?.();
+      await doInit({isImmediateLogin: true, shouldValidateLocalClient: false});
       await doInitializeClient(ClientType.PERMANENT, undefined, undefined, entropyData);
       return history.push(ROUTE.HISTORY_INFO);
     } catch (error) {
