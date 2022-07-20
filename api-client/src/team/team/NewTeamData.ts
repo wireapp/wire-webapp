@@ -29,4 +29,6 @@ export interface NewTeamData {
   /** Initial team member IDs (between 1 and 127) */
   members?: MemberData[];
   name: string;
+  /** Team Splash Screen (asset key) */
+  splash_screen?: string;
 }

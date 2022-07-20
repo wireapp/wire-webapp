@@ -24,4 +24,6 @@ export interface UpdateTeamData {
   icon_key?: string;
   /** New team name */
   name?: string;
+  /** New Splash Screen (asset key) */
+  splash_screen?: string;
 }
