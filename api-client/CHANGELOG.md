@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [19.17.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/compare/@wireapp/api-client@19.16.1...@wireapp/api-client@19.17.0) (2022-07-20)
+
+
+### Features
+
+* **api-client:** add 'splash_screen' field to TeamData model ([#4338](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/issues/4338)) ([83e4f0c](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/commit/83e4f0cc5353fe9adcd09fac6860b68d46aaf3a5))
+
+
+
+
+
 ## [19.16.1](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/compare/@wireapp/api-client@19.16.0...@wireapp/api-client@19.16.1) (2022-07-19)
 
 **Note:** Version bump only for package @wireapp/api-client
