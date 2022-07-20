@@ -39,6 +39,5 @@
     "strict": true,
     "typeRoots": ["src/types", "node_modules/@types"]
   },
-  "include": ["src/**/*", "test/**/*"],
   "exclude": ["node_modules", "server", "src/sw.js"]
 }

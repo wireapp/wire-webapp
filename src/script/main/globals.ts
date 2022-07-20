@@ -18,9 +18,10 @@
  */
 
 import {amplify} from 'amplify';
+import jQuery from 'jquery';
 import ko from 'knockout';
 
-import '../script/Config';
+import '../Config';
 
 import 'Components/CopyToClipboard';
 import 'Components/UserSearchableList';
@@ -33,7 +34,7 @@ import 'Components/avatar/GroupAvatar';
 import 'Components/MessagesList';
 import 'Components/TitleBar';
 import 'Components/Modals/GroupCreation/GroupCreationModal';
-import '../script/page/AppLock';
+import '../page/AppLock';
 import 'Components/modal';
 import 'Components/panel/ServiceDetails';
 import 'Components/panel/UserDetails';
@@ -43,14 +44,14 @@ import 'Components/calling/CallingOverlayContainer';
 
 import 'Util/LocalizerUtil';
 
-import '../script/localization/Localizer';
-import '../script/view_model/bindings/CommonBindings';
-import '../script/view_model/bindings/ConversationListBindings';
-import '../script/view_model/bindings/MessageListBindings';
-import '../script/view_model/bindings/VideoCallingBindings';
+import '../localization/Localizer';
+import '../view_model/bindings/CommonBindings';
+import '../view_model/bindings/ConversationListBindings';
+import '../view_model/bindings/MessageListBindings';
+import '../view_model/bindings/VideoCallingBindings';
 
-import '../script/view_model/MainViewModel';
-import '../script/view_model/PanelViewModel';
+import '../view_model/MainViewModel';
+import '../view_model/PanelViewModel';
 
 window.amplify = amplify;
 // we need to publish jQuery on the window so that knockout can use it
