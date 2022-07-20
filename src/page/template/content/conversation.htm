@@ -40,11 +40,26 @@
   "
   ></messages-list>
 
-  #include('content/conversation/input-bar.htm')
+  <input-bar
+    params="
+      assetRepository: $root.repositories.asset,
+      conversationEntity: $root.conversationState.activeConversation(),
+      conversationRepository: $root.repositories.conversation,
+      emojiInput: $root.emojiInput,
+      eventRepository: $root.repositories.event,
+      messageRepository: $root.repositories.message,
+      searchRepository: $root.repositories.search,
+      storageRepository: $root.repositories.storage,
+      teamState: $root.teamState,
+      userState: $root.userState,
+    ">
+  </input-bar>
+
 
   <div class="conversation-loading">
     <div class="icon-spinner spin accent-text"></div>
   </div>
   <!-- /ko -->
+
   #include('modal/giphy.htm')
 </div>

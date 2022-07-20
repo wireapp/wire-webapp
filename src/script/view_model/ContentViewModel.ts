@@ -37,7 +37,6 @@ import {ConnectRequestsViewModel} from './content/ConnectRequestsViewModel';
 import {GiphyViewModel} from './content/GiphyViewModel';
 import {HistoryImportViewModel} from './content/HistoryImportViewModel';
 import {HistoryExportViewModel} from './content/HistoryExportViewModel';
-import {InputBarViewModel} from './content/InputBarViewModel';
 import {PanelViewModel} from './PanelViewModel';
 import type {MainViewModel, ViewModelRepositories} from './MainViewModel';
 import type {ConversationRepository} from '../conversation/ConversationRepository';
@@ -100,7 +99,6 @@ export class ContentViewModel {
   giphy: GiphyViewModel;
   historyExport: HistoryExportViewModel;
   historyImport: HistoryImportViewModel;
-  inputBar: InputBarViewModel;
   legalHoldModal: LegalHoldModalViewModel;
   logger: Logger;
   readonly isFederated?: boolean;
@@ -152,15 +150,6 @@ export class ContentViewModel {
     this.connectRequests = new ConnectRequestsViewModel(mainViewModel);
     this.emojiInput = new EmojiInputViewModel(repositories.properties);
     this.giphy = new GiphyViewModel(repositories.giphy);
-    this.inputBar = new InputBarViewModel(
-      this.emojiInput,
-      repositories.asset,
-      repositories.event,
-      repositories.conversation,
-      repositories.search,
-      repositories.storage,
-      repositories.message,
-    );
     this.legalHoldModal = new LegalHoldModalViewModel(
       repositories.conversation,
       repositories.team,
@@ -183,13 +172,15 @@ export class ContentViewModel {
     this.state.subscribe(state => {
       switch (state) {
         case ContentViewModel.STATE.CONVERSATION:
-          this.inputBar.addedToView();
+          // TODO: Check if works without this
+          // this.inputBar.addedToView();
           break;
         case ContentViewModel.STATE.PREFERENCES_ACCOUNT:
           this.popNotification();
           break;
         default:
-          this.inputBar.removedFromView();
+        // TODO: Check if works without this
+        // this.inputBar.removedFromView();
       }
     });
 

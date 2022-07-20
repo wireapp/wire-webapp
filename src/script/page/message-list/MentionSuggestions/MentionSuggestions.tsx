@@ -47,27 +47,26 @@ const MentionSuggestionList: React.FunctionComponent<MentionSuggestionListProps>
     [selectedItem, suggestions.length],
   );
 
-  const targetInput = useMemo(
-    () => document.querySelector<HTMLInputElement>(targetInputSelector),
-    [targetInputSelector],
-  );
-
+  const targetInput = document.querySelector<HTMLInputElement>(targetInputSelector);
   const isVisible = suggestions.length > 0;
+
   const bottom = useMemo(
-    () => (isVisible ? window.innerHeight - targetInput.getBoundingClientRect().top + 24 : 0),
-    [isVisible],
+    () => (isVisible ? window.innerHeight - targetInput?.getBoundingClientRect().top + 24 : 0),
+    [isVisible, targetInput],
   );
 
   useEffect(() => {
     const updateSelectedIndex = (delta: number = 0) => {
       setSelectedSuggestionIndex(curr => clamp(curr + delta, 0, suggestions.length - 1));
     };
+
     const onInput = (event: KeyboardEvent) => {
       const moveSelection = (delta: number) => {
         updateSelectedIndex(delta);
         event.preventDefault();
         event.stopPropagation();
       };
+
       const validateSelection = () => {
         if (!event.shiftKey) {
           onSelectionValidated(suggestions[selectedSuggestionIndex], targetInput);
@@ -75,6 +74,7 @@ const MentionSuggestionList: React.FunctionComponent<MentionSuggestionListProps>
           event.stopPropagation();
         }
       };
+
       const actions = {
         [KEY.ARROW_UP]: () => moveSelection(1),
         [KEY.ARROW_DOWN]: () => moveSelection(-1),
@@ -88,7 +88,9 @@ const MentionSuggestionList: React.FunctionComponent<MentionSuggestionListProps>
     if (isVisible) {
       targetInput?.addEventListener('keydown', onInput);
     }
+
     updateSelectedIndex();
+
     return () => {
       targetInput?.removeEventListener('keydown', onInput);
     };
