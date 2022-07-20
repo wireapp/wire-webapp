@@ -24,8 +24,8 @@ import Cookies, {CookiesStatic} from 'js-cookie';
 import configureStore from 'redux-mock-store';
 import thunk from 'redux-thunk';
 
-import type {RootState, ThunkDispatch} from '../..//module/reducer';
 import {ActionRoot, actionRoot} from '../../module/action/';
+import type {RootState, ThunkDispatch} from '../../module/reducer';
 
 export interface MockStoreParameters {
   actions?: TypeUtil.RecursivePartial<ActionRoot>;
