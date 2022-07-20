@@ -37,7 +37,6 @@ const EntropyContainer = ({onSetEntropy}: Props) => {
   const [pause, setPause] = useState<boolean>();
   const [percent, setPercent] = useState(0);
 
-  const frames = entropy.filter(Boolean).length;
   const onProgress = (entropyData: [number, number][], percentage: number, pause: boolean) => {
     setEntropy(entropyData);
     setPause(pause);
@@ -51,7 +50,7 @@ const EntropyContainer = ({onSetEntropy}: Props) => {
       style={{display: 'flex', flexDirection: 'column', justifyContent: 'space-around', minHeight: 428}}
     >
       <H1 center>{_(setEntropyStrings.headline)}</H1>
-      {frames > 300 && percent >= 100 ? (
+      {percent >= 100 ? (
         <>
           <CheckRoundIcon width={64} height={64} css={{alignSelf: 'center', marginBottom: 64}} />
           <Muted center style={{marginBottom: 40}}>
@@ -88,7 +87,6 @@ const EntropyContainer = ({onSetEntropy}: Props) => {
           </Text>
         </>
       )}
-      {percent >= 95 && percent < 100 && <Muted center>{_(setEntropyStrings.moreEntropyNeeded)}</Muted>}
     </ContainerXS>
   );
 };
