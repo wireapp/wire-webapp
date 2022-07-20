@@ -31,4 +31,6 @@ export interface TeamData {
   icon_key?: string;
   id: string;
   name: string;
+  /** Team Splash Screen (asset key) */
+  splash_screen?: string;
 }
