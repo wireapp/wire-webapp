@@ -43,8 +43,7 @@ export class Configuration {
   readonly ENVIRONMENT = env.ENVIRONMENT || 'production';
   readonly FEATURE = {
     ...env.FEATURE,
-    ENABLE_EXTRA_CLIENT_ENTROPY:
-      env.FEATURE.ENABLE_EXTRA_CLIENT_ENTROPY && (this.ENVIRONMENT !== 'production' || Runtime.isWindows()),
+    ENABLE_EXTRA_CLIENT_ENTROPY: env.FEATURE.ENABLE_EXTRA_CLIENT_ENTROPY && Runtime.isWindows(),
   };
   readonly MAX_GROUP_PARTICIPANTS = env.MAX_GROUP_PARTICIPANTS || 500;
   readonly MAX_VIDEO_PARTICIPANTS = env.MAX_VIDEO_PARTICIPANTS || 4;
