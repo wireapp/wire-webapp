@@ -289,7 +289,7 @@ export class Account<T = any> extends EventEmitter {
     }
 
     try {
-      const localClient = await this.loadAndValidateLocalClient();
+      const localClient = await this.loadAndValidateLocalClient(entropyData);
       return {isNewClient: false, localClient};
     } catch (error) {
       if (!clientInfo) {
@@ -388,20 +388,30 @@ export class Account<T = any> extends EventEmitter {
     };
   }
 
-  public async loadAndValidateLocalClient(): Promise<RegisteredClient> {
+  public async loadAndValidateLocalClient(entropyData?: Uint8Array): Promise<RegisteredClient> {
     await this.service!.cryptography.initCryptobox();
 
     const loadedClient = await this.service!.client.getLocalClient();
     await this.apiClient.api.client.getClient(loadedClient.id);
     this.apiClient.context!.clientId = loadedClient.id;
     if (this.mlsConfig) {
-      this.coreCryptoClient = await this.createMLSClient(loadedClient, this.apiClient.context!, this.mlsConfig);
+      this.coreCryptoClient = await this.createMLSClient(
+        loadedClient,
+        this.apiClient.context!,
+        this.mlsConfig,
+        entropyData,
+      );
     }
 
     return loadedClient;
   }
 
-  private async createMLSClient(client: RegisteredClient, context: Context, mlsConfig: MLSConfig): Promise<CoreCrypto> {
+  private async createMLSClient(
+    client: RegisteredClient,
+    context: Context,
+    mlsConfig: MLSConfig,
+    entropyData?: Uint8Array,
+  ) {
     const coreCryptoKeyId = 'corecrypto-key';
     const {CoreCrypto} = await import('@otak/core-crypto');
     const dbName = `secrets-${this.generateDbName(context)}`;
@@ -421,6 +431,7 @@ export class Account<T = any> extends EventEmitter {
       key: Encoder.toBase64(key).asString,
       clientId: `${userId}:${client.id}@${domain}`,
       wasmFilePath: mlsConfig.coreCrypoWasmFilePath,
+      entropySeed: entropyData,
     });
   }
 
@@ -435,8 +446,13 @@ export class Account<T = any> extends EventEmitter {
     this.logger.info(`Creating new client {mls: ${!!this.mlsConfig}}`);
     const registeredClient = await this.service.client.register(loginData, clientInfo, entropyData);
     if (this.mlsConfig) {
-      this.coreCryptoClient = await this.createMLSClient(registeredClient, this.apiClient.context!, this.mlsConfig);
-      await this.service.client.uploadMLSPublicKeys(this.coreCryptoClient.clientPublicKey(), registeredClient.id);
+      this.coreCryptoClient = await this.createMLSClient(
+        registeredClient,
+        this.apiClient.context!,
+        this.mlsConfig,
+        entropyData,
+      );
+      await this.service.client.uploadMLSPublicKeys(await this.coreCryptoClient.clientPublicKey(), registeredClient.id);
       await this.service.client.uploadMLSKeyPackages(
         await this.coreCryptoClient.clientKeypackages(this.nbPrekeys),
         registeredClient.id,
