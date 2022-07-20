@@ -121,28 +121,28 @@ exports[`stricter compilation`] = {
       [65, 13, 31, "Argument of type \'HTMLElement | null\' is not assignable to parameter of type \'Element | DocumentFragment\'.\\n  Type \'null\' is not assignable to type \'Element | DocumentFragment\'.", "223522320"],
       [69, 9, 4, "Argument of type \'ConnectedComponent<FC<RootProps & { isAuthenticated: boolean; isFetchingSSOSettings: boolean; language: string; } & { doGetSSOSettings: () => Promise<void>; safelyRemoveCookie: (name: string, value: string) => Promise<...>; startPolling: (name?: string | undefined, interval?: number | undefined, asJSON?: boolean | u...\' is not assignable to parameter of type \'ConnectedComponent<FunctionComponent<{}>, any>\'.\\n  Type \'ComponentClass<Omit<RootProps & { isAuthenticated: boolean; isFetchingSSOSettings: boolean; language: string; } & { doGetSSOSettings: () => Promise<void>; safelyRemoveCookie: (name: string, value: string) => Promise<...>; startPolling: (name?: string | undefined, interval?: number | undefined, asJSON?: boolean | und...\' is not assignable to type \'ConnectedComponent<FunctionComponent<{}>, any>\'.\\n    Type \'ComponentClass<Omit<RootProps & { isAuthenticated: boolean; isFetchingSSOSettings: boolean; language: string; } & { doGetSSOSettings: () => Promise<void>; safelyRemoveCookie: (name: string, value: string) => Promise<...>; startPolling: (name?: string | undefined, interval?: number | undefined, asJSON?: boolean | und...\' is not assignable to type \'ComponentClass<any, any> & NonReactStatics<FunctionComponent<{}>, {}> & { WrappedComponent: FunctionComponent<{}>; }\'.\\n      Type \'ComponentClass<Omit<RootProps & { isAuthenticated: boolean; isFetchingSSOSettings: boolean; language: string; } & { doGetSSOSettings: () => Promise<void>; safelyRemoveCookie: (name: string, value: string) => Promise<...>; startPolling: (name?: string | undefined, interval?: number | undefined, asJSON?: boolean | und...\' is not assignable to type \'{ WrappedComponent: FunctionComponent<{}>; }\'.\\n        Types of property \'WrappedComponent\' are incompatible.\\n          Type \'FC<RootProps & { isAuthenticated: boolean; isFetchingSSOSettings: boolean; language: string; } & { doGetSSOSettings: () => Promise<void>; safelyRemoveCookie: (name: string, value: string) => Promise<...>; startPolling: (name?: string | undefined, interval?: number | undefined, asJSON?: boolean | undefined) => Promis...\' is not assignable to type \'FunctionComponent<{}>\'.\\n            Types of parameters \'props\' and \'props\' are incompatible.\\n              Type \'{}\' is not assignable to type \'RootProps & { isAuthenticated: boolean; isFetchingSSOSettings: boolean; language: string; } & { doGetSSOSettings: () => Promise<void>; safelyRemoveCookie: (name: string, value: string) => Promise<...>; startPolling: (name?: string | undefined, interval?: number | undefined, asJSON?: boolean | undefined) => Promise<....\'.\\n                Type \'{}\' is not assignable to type \'{ isAuthenticated: boolean; isFetchingSSOSettings: boolean; language: string; }\'.", "2089387715"]
     ],
-    "src/script/auth/module/action/AuthAction.ts:3569464432": [
-      [126, 12, 5, "Object is of type \'unknown\'.", "165548477"],
-      [132, 49, 5, "Argument of type \'unknown\' is not assignable to parameter of type \'Error\'.", "165548477"],
-      [146, 60, 5, "Argument of type \'unknown\' is not assignable to parameter of type \'Error\'.", "165548477"],
-      [159, 59, 5, "Argument of type \'unknown\' is not assignable to parameter of type \'Error\'.", "165548477"],
-      [181, 12, 5, "Object is of type \'unknown\'.", "165548477"],
-      [184, 49, 5, "Argument of type \'unknown\' is not assignable to parameter of type \'Error\'.", "165548477"],
-      [269, 27, 18, "Object is possibly \'undefined\'.", "1666073462"],
+    "src/script/auth/module/action/AuthAction.ts:624441579": [
+      [125, 12, 5, "Object is of type \'unknown\'.", "165548477"],
+      [131, 49, 5, "Argument of type \'unknown\' is not assignable to parameter of type \'Error\'.", "165548477"],
+      [145, 60, 5, "Argument of type \'unknown\' is not assignable to parameter of type \'Error\'.", "165548477"],
+      [158, 59, 5, "Argument of type \'unknown\' is not assignable to parameter of type \'Error\'.", "165548477"],
+      [180, 12, 5, "Object is of type \'unknown\'.", "165548477"],
+      [183, 49, 5, "Argument of type \'unknown\' is not assignable to parameter of type \'Error\'.", "165548477"],
+      [268, 27, 18, "Object is possibly \'undefined\'.", "1666073462"],
+      [269, 6, 17, "Object is possibly \'undefined\'.", "2392383015"],
       [270, 6, 17, "Object is possibly \'undefined\'.", "2392383015"],
       [271, 6, 17, "Object is possibly \'undefined\'.", "2392383015"],
       [272, 6, 17, "Object is possibly \'undefined\'.", "2392383015"],
-      [273, 6, 17, "Object is possibly \'undefined\'.", "2392383015"],
-      [273, 31, 17, "Object is possibly \'undefined\'.", "2392383015"],
-      [285, 54, 5, "Argument of type \'unknown\' is not assignable to parameter of type \'Error\'.", "165548477"],
-      [300, 27, 18, "Object is possibly \'undefined\'.", "1666073462"],
-      [312, 58, 5, "Argument of type \'unknown\' is not assignable to parameter of type \'Error\'.", "165548477"],
-      [344, 58, 5, "Argument of type \'unknown\' is not assignable to parameter of type \'Error\'.", "165548477"],
+      [272, 31, 17, "Object is possibly \'undefined\'.", "2392383015"],
+      [284, 54, 5, "Argument of type \'unknown\' is not assignable to parameter of type \'Error\'.", "165548477"],
+      [299, 27, 18, "Object is possibly \'undefined\'.", "1666073462"],
+      [311, 58, 5, "Argument of type \'unknown\' is not assignable to parameter of type \'Error\'.", "165548477"],
+      [343, 58, 5, "Argument of type \'unknown\' is not assignable to parameter of type \'Error\'.", "165548477"],
       [378, 49, 5, "Argument of type \'unknown\' is not assignable to parameter of type \'Error\'.", "165548477"],
-      [390, 61, 5, "Argument of type \'unknown\' is not assignable to parameter of type \'Error\'.", "165548477"],
-      [409, 56, 5, "Argument of type \'unknown\' is not assignable to parameter of type \'Error\'.", "165548477"],
-      [430, 48, 5, "Argument of type \'unknown\' is not assignable to parameter of type \'Error\'.", "165548477"],
-      [444, 48, 5, "Argument of type \'unknown\' is not assignable to parameter of type \'Error\'.", "165548477"]
+      [393, 61, 5, "Argument of type \'unknown\' is not assignable to parameter of type \'Error\'.", "165548477"],
+      [412, 56, 5, "Argument of type \'unknown\' is not assignable to parameter of type \'Error\'.", "165548477"],
+      [433, 48, 5, "Argument of type \'unknown\' is not assignable to parameter of type \'Error\'.", "165548477"],
+      [447, 48, 5, "Argument of type \'unknown\' is not assignable to parameter of type \'Error\'.", "165548477"]
     ],
     "src/script/auth/module/action/BackendError.ts:3652889880": [
       [28, 4, 10, "Type \'string | undefined\' is not assignable to type \'string\'.\\n  Type \'undefined\' is not assignable to type \'string\'.", "3983565867"],
@@ -339,7 +339,7 @@ exports[`stricter compilation`] = {
       [168, 18, 3, "Type \'MutableRefObject<HTMLInputElement | undefined>\' is not assignable to type \'((instance: HTMLInputElement | null) => void) | RefObject<HTMLInputElement> | null | undefined\'.", "193432436"]
     ],
     "src/script/auth/page/Login.tsx:4154401356": [
-      [172, 24, 16, "Argument of type \'Error[]\' is not assignable to parameter of type \'SetStateAction<never[]>\'.", "2735526245"],
+      [172, 24, 16, "Argument of type \'Error[]\' is not assignable to parameter of type \'SetStateAction<never[]>\'.\\n  Type \'Error[]\' is not assignable to type \'never[]\'.\\n    Type \'Error\' is not assignable to type \'never\'.", "2735526245"],
       [174, 50, 10, "Type \'ClientType | undefined\' is not assignable to type \'ClientType\'.\\n  Type \'undefined\' is not assignable to type \'ClientType\'.", "3013398820"],
       [203, 56, 10, "Type \'ClientType | undefined\' is not assignable to type \'ClientType\'.", "3013398820"],
       [205, 32, 11, "Argument of type \'string | undefined\' is not assignable to parameter of type \'string\'.\\n  Type \'undefined\' is not assignable to type \'string\'.", "2331572484"],
@@ -566,7 +566,6 @@ exports[`stricter compilation`] = {
     "src/script/calling/Participant.ts:1539597594": [
       [46, 4, 15, "Type \'Observable<VIDEO_STATE.STOPPED>\' is not assignable to type \'Observable<VIDEO_STATE>\'.\\n  Types of parameters \'value\' and \'value\' are incompatible.\\n    Type \'VIDEO_STATE\' is not assignable to type \'VIDEO_STATE.STOPPED\'.", "4277239019"],
       [61, 4, 23, "Type \'Observable<false>\' is not assignable to type \'Observable<boolean>\'.\\n  Types of parameters \'value\' and \'value\' are incompatible.\\n    Type \'boolean\' is not assignable to type \'false\'.", "2555908354"],
-      [62, 4, 27, "Type \'Observable<number | undefined>\' is not assignable to type \'Observable<number>\'.\\n  The types returned by \'peek()\' are incompatible between these types.\\n    Type \'number | undefined\' is not assignable to type \'number\'.\\n      Type \'undefined\' is not assignable to type \'number\'.", "3324051133"],
       [63, 4, 12, "Type \'Observable<false>\' is not assignable to type \'Observable<boolean>\'.", "3089409914"],
       [64, 4, 19, "Type \'Observable<false>\' is not assignable to type \'Observable<boolean>\'.", "2641705914"],
       [71, 23, 18, "Argument of type \'MediaStream | undefined\' is not assignable to parameter of type \'MediaStream\'.\\n  Type \'undefined\' is not assignable to type \'MediaStream\'.", "2024190982"],
@@ -653,8 +652,7 @@ exports[`stricter compilation`] = {
       [458, 52, 23, "Argument of type \'string | undefined\' is not assignable to parameter of type \'string\'.\\n  Type \'undefined\' is not assignable to type \'string\'.", "4244912389"]
     ],
     "src/script/client/ClientState.ts:2521520538": [
-      [26, 2, 7, "Property \'clients\' has no initializer and is not definitely assigned in the constructor.", "3676208751"],
-      [31, 4, 18, "Type \'Observable<ClientEntity | undefined>\' is not assignable to type \'Observable<ClientEntity>\'.\\n  The types returned by \'peek()\' are incompatible between these types.\\n    Type \'ClientEntity | undefined\' is not assignable to type \'ClientEntity\'.\\n      Type \'undefined\' is not assignable to type \'ClientEntity\'.", "2551882557"]
+      [26, 2, 7, "Property \'clients\' has no initializer and is not definitely assigned in the constructor.", "3676208751"]
     ],
     "src/script/components/Avatar.test.tsx:1834172511": [
       [38, 37, 31, "Argument of type \'Element | null\' is not assignable to parameter of type \'Element\'.\\n  Type \'null\' is not assignable to type \'Element\'.", "4162123045"],
@@ -1644,12 +1642,8 @@ exports[`stricter compilation`] = {
     ],
     "src/script/entity/Conversation.ts:3335605014": [
       [105, 18, 24, "Property \'enforcedTeamMessageTimer\' has no initializer and is not definitely assigned in the constructor.", "3799921350"],
-      [180, 4, 16, "Type \'Observable<PERSONAL | TEAM | OTHER | undefined>\' is not assignable to type \'Observable<ACCESS_STATE>\'.\\n  The types returned by \'peek()\' are incompatible between these types.\\n    Type \'PERSONAL | TEAM | OTHER | undefined\' is not assignable to type \'ACCESS_STATE\'.", "3665501182"],
-      [181, 4, 15, "Type \'Observable<string | undefined>\' is not assignable to type \'Observable<string>\'.", "761254596"],
       [182, 4, 12, "Type \'undefined\' is not assignable to type \'string\'.", "2242477105"],
-      [183, 4, 9, "Type \'Observable<string | undefined>\' is not assignable to type \'Observable<string>\'.", "1162129866"],
       [184, 4, 12, "Type \'undefined\' is not assignable to type \'string\'.", "1264629218"],
-      [185, 4, 9, "Type \'Observable<CONVERSATION_TYPE | undefined>\' is not assignable to type \'Observable<CONVERSATION_TYPE>\'.\\n  The types returned by \'peek()\' are incompatible between these types.\\n    Type \'CONVERSATION_TYPE | undefined\' is not assignable to type \'CONVERSATION_TYPE\'.", "1162754997"],
       [187, 4, 14, "Type \'Observable<false>\' is not assignable to type \'Observable<boolean>\'.", "3558292847"],
       [188, 4, 15, "Type \'Observable<false>\' is not assignable to type \'Observable<boolean>\'.", "1584403895"],
       [190, 4, 27, "Type \'ObservableArray<never>\' is not assignable to type \'ObservableArray<User>\'.", "957208303"],
@@ -1692,8 +1686,6 @@ exports[`stricter compilation`] = {
     ],
     "src/script/entity/User.ts:3591817769": [
       [132, 4, 17, "Type \'Observable<undefined>\' is not assignable to type \'Observable<string>\'.\\n  Types of property \'equalityComparer\' are incompatible.\\n    Type \'(a: undefined, b: undefined) => boolean\' is not assignable to type \'(a: string, b: string) => boolean\'.\\n      Types of parameters \'a\' and \'a\' are incompatible.\\n        Type \'string\' is not assignable to type \'undefined\'.", "2198912395"],
-      [140, 4, 10, "Type \'Observable<string | undefined>\' is not assignable to type \'Observable<string>\'.", "3993952993"],
-      [141, 4, 10, "Type \'Observable<string | undefined>\' is not assignable to type \'Observable<string>\'.", "4016447089"],
       [174, 4, 11, "Type \'Observable<false>\' is not assignable to type \'Observable<boolean>\'.", "2812049175"],
       [175, 4, 12, "Type \'Observable<false>\' is not assignable to type \'Observable<boolean>\'.", "3072930663"],
       [179, 4, 21, "Type \'Observable<false>\' is not assignable to type \'Observable<boolean>\'.", "4210022876"],
@@ -1717,7 +1709,6 @@ exports[`stricter compilation`] = {
     "src/script/entity/message/ContentMessage.ts:2244220679": [
       [56, 4, 11, "Type \'ObservableArray<never>\' is not assignable to type \'ObservableArray<FileAsset | Asset | MediumImage | Text>\'.\\n  Types of parameters \'value\' and \'value\' are incompatible.\\n    Type \'(FileAsset | Asset | MediumImage | Text)[] | null | undefined\' is not assignable to type \'never[] | null | undefined\'.\\n      Type \'(FileAsset | Asset | MediumImage | Text)[]\' is not assignable to type \'never[]\'.\\n        Type \'FileAsset | Asset | MediumImage | Text\' is not assignable to type \'never\'.", "3137859118"],
       [59, 4, 21, "Type \'Observable<number | null>\' is not assignable to type \'Observable<number>\'.\\n  The types returned by \'peek()\' are incompatible between these types.\\n    Type \'number | null\' is not assignable to type \'number\'.\\n      Type \'null\' is not assignable to type \'number\'.", "1015589921"],
-      [71, 4, 10, "Type \'Observable<QuoteEntity | undefined>\' is not assignable to type \'Observable<QuoteEntity>\'.\\n  The types returned by \'peek()\' are incompatible between these types.\\n    Type \'QuoteEntity | undefined\' is not assignable to type \'QuoteEntity\'.\\n      Type \'undefined\' is not assignable to type \'QuoteEntity\'.", "4017089943"],
       [72, 4, 17, "Type \'ObservableArray<never>\' is not assignable to type \'ObservableArray<ReadReceipt>\'.", "1540688880"],
       [74, 4, 23, "Type \'Observable<boolean | null>\' is not assignable to type \'Observable<boolean>\'.\\n  The types returned by \'peek()\' are incompatible between these types.\\n    Type \'boolean | null\' is not assignable to type \'boolean\'.", "1490518748"],
       [80, 34, 4, "Argument of type \'null\' is not assignable to parameter of type \'boolean\'.", "2087897566"]
@@ -1728,14 +1719,7 @@ exports[`stricter compilation`] = {
     ],
     "src/script/entity/message/FileAsset.ts:2276294258": [
       [45, 9, 14, "Property \'conversationId\' has no initializer and is not definitely assigned in the constructor.", "2597408709"],
-      [46, 9, 14, "Property \'correlation_id\' has no initializer and is not definitely assigned in the constructor.", "1441381135"],
-      [54, 4, 11, "Type \'Observable<AssetTransferState | undefined>\' is not assignable to type \'Observable<AssetTransferState>\'.\\n  The types returned by \'peek()\' are incompatible between these types.\\n    Type \'AssetTransferState | undefined\' is not assignable to type \'AssetTransferState\'.", "3642829209"],
-      [64, 4, 22, "Type \'Observable<AssetRemoteData | undefined>\' is not assignable to type \'Observable<AssetRemoteData>\'.\\n  The types returned by \'peek()\' are incompatible between these types.\\n    Type \'AssetRemoteData | undefined\' is not assignable to type \'AssetRemoteData\'.\\n      Type \'undefined\' is not assignable to type \'AssetRemoteData\'.", "1979595329"],
-      [65, 4, 21, "Type \'Observable<AssetRemoteData | undefined>\' is not assignable to type \'Observable<AssetRemoteData>\'.", "2294021202"],
-      [81, 4, 25, "Type \'Observable<NotUploaded | undefined>\' is not assignable to type \'Observable<NotUploaded>\'.\\n  The types returned by \'peek()\' are incompatible between these types.\\n    Type \'NotUploaded | undefined\' is not assignable to type \'NotUploaded\'.", "890696937"]
-    ],
-    "src/script/entity/message/MediumImage.ts:426001127": [
-      [41, 4, 13, "Type \'Observable<AssetRemoteData | undefined>\' is not assignable to type \'Observable<AssetRemoteData>\'.", "752547655"]
+      [46, 9, 14, "Property \'correlation_id\' has no initializer and is not definitely assigned in the constructor.", "1441381135"]
     ],
     "src/script/entity/message/MemberMessage.ts:3711207890": [
       [53, 9, 6, "Property \'reason\' has no initializer and is not definitely assigned in the constructor.", "2124277697"],
@@ -1759,7 +1743,6 @@ exports[`stricter compilation`] = {
       [25, 9, 7, "Property \'caption\' has no initializer and is not definitely assigned in the constructor.", "3511518411"]
     ],
     "src/script/entity/message/VerificationMessage.ts:1055991539": [
-      [40, 4, 28, "Type \'Observable<VerificationMessageType | undefined>\' is not assignable to type \'Observable<VerificationMessageType>\'.\\n  The types returned by \'peek()\' are incompatible between these types.\\n    Type \'VerificationMessageType | undefined\' is not assignable to type \'VerificationMessageType\'.", "1551103719"],
       [47, 27, 13, "Argument of type \'string | false | QualifiedUserId\' is not assignable to parameter of type \'string | QualifiedId\'.\\n  Type \'boolean\' is not assignable to type \'string | QualifiedId\'.", "2678465042"]
     ],
     "src/script/error/BackendClientError.ts:4157618261": [
@@ -1976,10 +1959,6 @@ exports[`stricter compilation`] = {
       [100, 31, 10, "Argument of type \'string | undefined\' is not assignable to parameter of type \'string\'.\\n  Type \'undefined\' is not assignable to type \'string\'.", "4118455337"],
       [240, 57, 5, "Object is of type \'unknown\'.", "165548477"]
     ],
-    "src/script/integration/ServiceEntity.ts:2862427254": [
-      [58, 4, 26, "Type \'Observable<AssetRemoteData | undefined>\' is not assignable to type \'Observable<AssetRemoteData>\'.", "2039859734"],
-      [59, 4, 27, "Type \'Observable<AssetRemoteData | undefined>\' is not assignable to type \'Observable<AssetRemoteData>\'.", "4198396353"]
-    ],
     "src/script/legal-hold/LegalHoldEvaluator.ts:3764190125": [
       [45, 43, 23, "Argument of type \'User | undefined\' is not assignable to parameter of type \'User\'.\\n  Type \'undefined\' is not assignable to type \'User\'.", "153688682"],
       [57, 2, 49, "Type \'string | boolean | undefined\' is not assignable to type \'boolean\'.\\n  Type \'undefined\' is not assignable to type \'boolean\'.", "265606130"],
@@ -2167,7 +2146,6 @@ exports[`stricter compilation`] = {
       [48, 6, 30, "Type of computed property\'s value is \'Observable<PermissionStatusState.PROMPT>\', which is not assignable to type \'Observable<PermissionState | PermissionStatusState>\'.", "338556256"]
     ],
     "src/script/properties/PropertiesRepository.ts:274184231": [
-      [97, 4, 13, "Type \'Observable<User | undefined>\' is not assignable to type \'Observable<User>\'.\\n  The types returned by \'peek()\' are incompatible between these types.\\n    Type \'User | undefined\' is not assignable to type \'User\'.\\n      Type \'undefined\' is not assignable to type \'User\'.", "311178912"],
       [100, 4, 21, "Type \'Observable<ConsentValue>\' is not assignable to type \'Observable<boolean | ConsentValue>\'.\\n  Types of parameters \'value\' and \'value\' are incompatible.\\n    Type \'boolean | ConsentValue\' is not assignable to type \'ConsentValue\'.", "1820233671"]
     ],
     "src/script/router/Router.ts:4158324241": [
@@ -2225,9 +2203,7 @@ exports[`stricter compilation`] = {
       [606, 64, 14, "Property \'hasOwnProperty\' does not exist on type \'never\'.", "547572878"]
     ],
     "src/script/team/TeamState.ts:2129239601": [
-      [59, 4, 9, "Type \'Observable<TeamEntity | undefined>\' is not assignable to type \'Observable<TeamEntity>\'.\\n  The types returned by \'peek()\' are incompatible between these types.\\n    Type \'TeamEntity | undefined\' is not assignable to type \'TeamEntity\'.\\n      Type \'undefined\' is not assignable to type \'TeamEntity\'.", "1162784912"],
       [62, 4, 18, "Type \'Observable<false>\' is not assignable to type \'Observable<boolean>\'.", "173607415"],
-      [68, 4, 17, "Type \'Observable<FeatureList | undefined>\' is not assignable to type \'Observable<FeatureList>\'.\\n  The types returned by \'peek()\' are incompatible between these types.\\n    Type \'FeatureList | undefined\' is not assignable to type \'FeatureList\'.\\n      Type \'undefined\' is not assignable to type \'FeatureList\'.", "54583831"],
       [80, 4, 22, "Type \'Observable<false>\' is not assignable to type \'Observable<boolean>\'.", "1357312573"],
       [96, 13, 38, "Object is possibly \'undefined\'.", "3672246717"],
       [97, 10, 37, "Object is possibly \'undefined\'.", "1981238082"],
@@ -2336,9 +2312,7 @@ exports[`stricter compilation`] = {
       [817, 81, 5, "Object is of type \'unknown\'.", "165548477"]
     ],
     "src/script/user/UserState.ts:1636460432": [
-      [44, 4, 9, "Type \'Observable<User | undefined>\' is not assignable to type \'Observable<User>\'.", "1162883985"],
-      [45, 4, 10, "Type \'ObservableArray<never>\' is not assignable to type \'ObservableArray<User>\'.\\n  Types of parameters \'value\' and \'value\' are incompatible.\\n    Type \'User[] | null | undefined\' is not assignable to type \'never[] | null | undefined\'.\\n      Type \'User[]\' is not assignable to type \'never[]\'.\\n        Type \'User\' is not assignable to type \'never\'.", "4012712079"],
-      [62, 4, 11, "Type \'Observable<boolean | undefined>\' is not assignable to type \'PureComputed<boolean> | Observable<boolean>\'.\\n  Type \'Observable<boolean | undefined>\' is not assignable to type \'Observable<boolean>\'.\\n    The types returned by \'peek()\' are incompatible between these types.\\n      Type \'boolean | undefined\' is not assignable to type \'boolean\'.", "2825893770"]
+      [45, 4, 10, "Type \'ObservableArray<never>\' is not assignable to type \'ObservableArray<User>\'.\\n  Types of parameters \'value\' and \'value\' are incompatible.\\n    Type \'User[] | null | undefined\' is not assignable to type \'never[] | null | undefined\'.\\n      Type \'User[]\' is not assignable to type \'never[]\'.\\n        Type \'User\' is not assignable to type \'never\'.", "4012712079"]
     ],
     "src/script/util/ArrayUtil.ts:1796804857": [
       [109, 47, 42, "Type \'undefined\' cannot be used as an index type.", "3231080782"]
@@ -2464,10 +2438,7 @@ exports[`stricter compilation`] = {
     "src/script/view_model/ImageDetailViewViewModel.ts:1576396674": [
       [58, 4, 11, "Type \'undefined\' is not assignable to type \'string\'.", "3652784592"],
       [60, 4, 15, "Type \'undefined\' is not assignable to type \'Modal\'.", "4236294625"],
-      [61, 4, 13, "Type \'Observable<string | undefined>\' is not assignable to type \'Observable<string>\'.", "236598504"],
       [63, 4, 17, "Type \'Observable<false>\' is not assignable to type \'Observable<boolean>\'.", "3331382116"],
-      [65, 4, 23, "Type \'Observable<Conversation | undefined>\' is not assignable to type \'Observable<Conversation>\'.\\n  The types returned by \'peek()\' are incompatible between these types.\\n    Type \'Conversation | undefined\' is not assignable to type \'Conversation\'.\\n      Type \'undefined\' is not assignable to type \'Conversation\'.", "2356679995"],
-      [67, 4, 18, "Type \'Observable<ContentMessage | undefined>\' is not assignable to type \'Observable<ContentMessage>\'.", "3462443997"],
       [93, 18, 9, "Argument of type \'undefined\' is not assignable to parameter of type \'string\'.", "2620553983"],
       [95, 23, 9, "Argument of type \'undefined\' is not assignable to parameter of type \'ContentMessage\'.", "2620553983"],
       [96, 4, 11, "Type \'undefined\' is not assignable to type \'string\'.", "3652784592"],
@@ -2476,7 +2447,6 @@ exports[`stricter compilation`] = {
     ],
     "src/script/view_model/ListViewModel.ts:4038366115": [
       [119, 4, 10, "Type \'Observable<ListState>\' is not assignable to type \'Observable<string>\'.\\n  Types of parameters \'value\' and \'value\' are incompatible.\\n    Type \'string\' is not assignable to type \'ListState\'.", "4014904506"],
-      [120, 4, 15, "Type \'Observable<number | undefined>\' is not assignable to type \'Observable<number>\'.", "3261786582"],
       [121, 4, 17, "Type \'Observable<false>\' is not assignable to type \'Observable<boolean>\'.", "3342042619"],
       [185, 8, 6, "Type \'Conversation | null\' is not assignable to type \'PanelEntity\'.", "1164306878"],
       [433, 48, 18, "Argument of type \'Conversation | null\' is not assignable to parameter of type \'Conversation\'.\\n  Type \'null\' is not assignable to type \'Conversation\'.", "1508601427"],
@@ -2540,8 +2510,6 @@ exports[`stricter compilation`] = {
       [69, 2, 13, "Property \'currentEntity\' has no initializer and is not definitely assigned in the constructor.", "32305655"],
       [139, 4, 23, "Type \'Observable<Conversation | null>\' is not assignable to type \'Observable<Conversation>\'.", "2356679995"],
       [142, 4, 16, "Type \'Observable<false>\' is not assignable to type \'Observable<boolean>\'.", "2985846665"],
-      [143, 4, 10, "Type \'Observable<string | undefined>\' is not assignable to type \'Observable<string>\'.", "4014904506"],
-      [145, 4, 17, "Type \'Observable<string | undefined>\' is not assignable to type \'Observable<string>\'.", "2911337818"],
       [213, 15, 9, "Argument of type \'undefined\' is not assignable to parameter of type \'string\'.", "2620553983"],
       [215, 4, 18, "Type \'undefined\' is not assignable to type \'PanelEntity\'.", "2173061407"],
       [276, 22, 9, "Argument of type \'undefined\' is not assignable to parameter of type \'string\'.", "2620553983"],
@@ -2607,8 +2575,6 @@ exports[`stricter compilation`] = {
     "src/script/view_model/content/GiphyViewModel.ts:931654924": [
       [57, 4, 10, "Type \'undefined\' is not assignable to type \'Modal\'.", "3985246182"],
       [58, 4, 10, "Type \'Observable<GiphyState.DEFAULT>\' is not assignable to type \'Observable<GiphyState>\'.\\n  Types of parameters \'value\' and \'value\' are incompatible.\\n    Type \'GiphyState\' is not assignable to type \'GiphyState.DEFAULT\'.", "4014904506"],
-      [61, 4, 15, "Type \'Observable<Gif | undefined>\' is not assignable to type \'Observable<Gif>\'.\\n  The types returned by \'peek()\' are incompatible between these types.\\n    Type \'Gif | undefined\' is not assignable to type \'Gif\'.\\n      Type \'undefined\' is not assignable to type \'Gif\'.", "2624948332"],
-      [67, 4, 16, "Type \'Observable<Gif | undefined>\' is not assignable to type \'Observable<Gif>\'.", "2966715820"],
       [112, 24, 19, "No overload matches this call.\\n  The last overload gave the following error.\\n    Argument of type \'EventTarget | null\' is not assignable to parameter of type \'PlainObject<any>\'.\\n      Type \'null\' is not assignable to type \'PlainObject<any>\'.", "3586053823"],
       [113, 31, 6, "Property \'parent\' does not exist on type \'JQueryStatic\'.", "1898500505"],
       [116, 10, 4, "\'this\' implicitly has type \'any\' because it does not have a type annotation.", "2087959715"],
@@ -2639,13 +2605,8 @@ exports[`stricter compilation`] = {
       [140, 4, 24, "Type \'PureComputed<boolean | null>\' is not assignable to type \'PureComputed<boolean>\'.\\n  The types returned by \'peek()\' are incompatible between these types.\\n    Type \'boolean | null\' is not assignable to type \'boolean\'.", "902354832"],
       [143, 9, 25, "Object is possibly \'null\'.", "2329039674"],
       [144, 10, 25, "Object is possibly \'null\'.", "2329039674"],
-      [155, 4, 22, "Type \'Observable<ContentMessage | undefined>\' is not assignable to type \'Observable<ContentMessage>\'.\\n  The types returned by \'peek()\' are incompatible between these types.\\n    Type \'ContentMessage | undefined\' is not assignable to type \'ContentMessage\'.\\n      Type \'undefined\' is not assignable to type \'ContentMessage\'.", "127474017"],
-      [156, 4, 23, "Type \'Observable<ContentMessage | undefined>\' is not assignable to type \'Observable<ContentMessage>\'.", "2477632015"],
       [159, 4, 22, "Type \'PureComputed<string[] | undefined>\' is not assignable to type \'PureComputed<string[]>\'.\\n  The types returned by \'peek()\' are incompatible between these types.\\n    Type \'string[] | undefined\' is not assignable to type \'string[]\'.\\n      Type \'undefined\' is not assignable to type \'string[]\'.", "1145910007"],
       [163, 32, 9, "Argument of type \'undefined\' is not assignable to parameter of type \'ContentMessage\'.", "2620553983"],
-      [197, 4, 15, "Type \'Observable<File | undefined>\' is not assignable to type \'Observable<File>\'.\\n  The types returned by \'peek()\' are incompatible between these types.\\n    Type \'File | undefined\' is not assignable to type \'File\'.\\n      Type \'undefined\' is not assignable to type \'File\'.", "2328486812"],
-      [198, 4, 25, "Type \'Observable<string | undefined>\' is not assignable to type \'Observable<string>\'.\\n  The types returned by \'peek()\' are incompatible between these types.\\n    Type \'string | undefined\' is not assignable to type \'string\'.\\n      Type \'undefined\' is not assignable to type \'string\'.", "4170687229"],
-      [199, 4, 19, "Type \'Observable<string | undefined>\' is not assignable to type \'Observable<string>\'.", "3727263643"],
       [201, 4, 17, "Type \'Observable<false>\' is not assignable to type \'Observable<boolean>\'.", "2409749581"],
       [203, 4, 18, "Type \'Observable<undefined>\' is not assignable to type \'Observable<{ startIndex: number; term: string; }>\'.\\n  Types of property \'equalityComparer\' are incompatible.\\n    Type \'(a: undefined, b: undefined) => boolean\' is not assignable to type \'(a: { startIndex: number; term: string; }, b: { startIndex: number; term: string; }) => boolean\'.\\n      Types of parameters \'a\' and \'a\' are incompatible.\\n        Type \'{ startIndex: number; term: string; }\' is not assignable to type \'undefined\'.", "1081038602"],
       [237, 25, 25, "Object is possibly \'null\'.", "2329039674"],
@@ -2695,7 +2656,6 @@ exports[`stricter compilation`] = {
       [73, 4, 16, "Type \'Observable<false>\' is not assignable to type \'Observable<boolean>\'.", "4203184287"],
       [75, 4, 15, "Type \'Observable<false>\' is not assignable to type \'Observable<boolean>\'.", "1690488901"],
       [76, 4, 10, "Type \'Observable<never[]>\' is not assignable to type \'Observable<User[]>\'.", "4012712079"],
-      [77, 4, 16, "Type \'Observable<User | undefined>\' is not assignable to type \'Observable<User>\'.", "3229850487"],
       [79, 4, 21, "Type \'Observable<true>\' is not assignable to type \'Observable<boolean>\'.", "2630150188"],
       [82, 4, 14, "Type \'Observable<false>\' is not assignable to type \'Observable<boolean>\'.", "333392401"],
       [83, 4, 21, "Type \'Observable<false>\' is not assignable to type \'Observable<boolean>\'.", "3098275876"],
@@ -2728,7 +2688,6 @@ exports[`stricter compilation`] = {
     "src/script/view_model/panel/AddParticipantsViewModel.ts:978446956": [
       [100, 4, 27, "Type \'Observable<true>\' is not assignable to type \'Observable<boolean>\'.", "527027962"],
       [102, 4, 21, "Type \'ObservableArray<never>\' is not assignable to type \'ObservableArray<User>\'.", "2199671479"],
-      [103, 4, 20, "Type \'Observable<ServiceEntity | undefined>\' is not assignable to type \'Observable<ServiceEntity>\'.\\n  The types returned by \'peek()\' are incompatible between these types.\\n    Type \'ServiceEntity | undefined\' is not assignable to type \'ServiceEntity\'.\\n      Type \'undefined\' is not assignable to type \'ServiceEntity\'.", "3275208665"],
       [108, 4, 21, "Type \'PureComputed<boolean | undefined>\' is not assignable to type \'PureComputed<boolean>\'.", "3187656643"],
       [196, 25, 9, "Argument of type \'undefined\' is not assignable to parameter of type \'ServiceEntity\'.", "2620553983"]
     ],
@@ -2736,7 +2695,6 @@ exports[`stricter compilation`] = {
       [57, 4, 23, "Type \'Observable<Conversation | null>\' is not assignable to type \'Observable<Conversation>\'.\\n  The types returned by \'peek()\' are incompatible between these types.\\n    Type \'Conversation | null\' is not assignable to type \'Conversation\'.\\n      Type \'null\' is not assignable to type \'Conversation\'.", "233634092"]
     ],
     "src/script/view_model/panel/ConversationDetailsViewModel.ts:1231015426": [
-      [137, 4, 20, "Type \'Observable<ServiceEntity | undefined>\' is not assignable to type \'Observable<ServiceEntity>\'.", "3275208665"],
       [158, 21, 36, "Argument of type \'User | undefined\' is not assignable to parameter of type \'User\'.\\n  Type \'undefined\' is not assignable to type \'User\'.", "1354386287"],
       [179, 4, 18, "Type \'Observable<false>\' is not assignable to type \'Observable<boolean>\'.", "2548422508"],
       [201, 4, 21, "Type \'PureComputed<boolean | \\"\\">\' is not assignable to type \'PureComputed<boolean>\'.\\n  The types returned by \'peek()\' are incompatible between these types.\\n    Type \'string | boolean\' is not assignable to type \'boolean\'.", "1116588846"],
@@ -2763,7 +2721,6 @@ exports[`stricter compilation`] = {
     ],
     "src/script/view_model/panel/MessageDetailsViewModel.ts:906474120": [
       [71, 4, 19, "Type \'Observable<true>\' is not assignable to type \'Observable<boolean>\'.", "1452458508"],
-      [72, 4, 14, "Type \'Observable<string | undefined>\' is not assignable to type \'Observable<string>\'.", "116181579"],
       [102, 13, 14, "Object is possibly \'undefined\'.", "116180423"],
       [114, 63, 14, "Object is possibly \'undefined\'.", "116180423"],
       [120, 12, 7, "Type \'{ domain: string | undefined; id: string; }[]\' is not assignable to type \'QualifiedId[]\'.\\n  Type \'{ domain: string | undefined; id: string; }\' is not assignable to type \'QualifiedId\'.\\n    Types of property \'domain\' are incompatible.\\n      Type \'string | undefined\' is not assignable to type \'string\'.\\n        Type \'undefined\' is not assignable to type \'string\'.", "2414311946"],

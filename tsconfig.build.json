@@ -36,9 +36,7 @@
     "rootDirs": ["src/script"],
     "sourceMap": true,
     "target": "es2017",
-    "strict": true,
     "typeRoots": ["src/types", "node_modules/@types"]
   },
-  "include": ["src/**/*", "test/**/*"],
   "exclude": ["node_modules", "server", "src/sw.js"]
 }
