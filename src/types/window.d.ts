@@ -24,37 +24,6 @@ import ko from 'knockout';
 import type {AssetService} from '../script/assets/AssetService';
 import type {NotificationService} from '../script/event/NotificationService';
 
-import '../script/Config';
-
-import 'Components/CopyToClipboard';
-import 'Components/UserSearchableList';
-import 'Components/toggle/BaseToggle';
-import 'Components/icons';
-import 'Components/Image';
-import 'Components/toggle/InfoToggle';
-import 'Components/calling/FullscreenVideoCall';
-import 'Components/avatar/GroupAvatar';
-import 'Components/MessagesList';
-import 'Components/TitleBar';
-import 'Components/Modals/GroupCreation/GroupCreationModal';
-import '../script/page/AppLock';
-import 'Components/modal';
-import 'Components/panel/ServiceDetails';
-import 'Components/panel/UserDetails';
-import 'Components/ServiceList';
-import 'Components/SearchInput';
-import 'Components/calling/CallingOverlayContainer';
-
-import 'Util/LocalizerUtil';
-
-import '../script/localization/Localizer';
-import '../script/view_model/bindings/CommonBindings';
-import '../script/view_model/bindings/ConversationListBindings';
-import '../script/view_model/bindings/MessageListBindings';
-import '../script/view_model/bindings/VideoCallingBindings';
-
-import '../script/view_model/MainViewModel';
-import '../script/view_model/PanelViewModel';
 import {t} from '../script/util/LocalizerUtil';
 
 declare global {
