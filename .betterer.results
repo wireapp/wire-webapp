@@ -2470,10 +2470,10 @@ exports[`stricter compilation`] = {
     "src/script/view_model/ImageDetailViewViewModel.ts:1576396674": [
       [58, 4, 11, "Type \'undefined\' is not assignable to type \'string\'.", "3652784592"],
       [60, 4, 15, "Type \'undefined\' is not assignable to type \'Modal\'.", "4236294625"],
-      [61, 4, 13, "Type \'Observable<string | undefined>\' is not assignable to type \'Observable<string>\'.", "236598504"],
+      [61, 4, 13, "Type \'Observable<string | undefined>\' is not assignable to type \'Observable<string>\'.\\n  The types returned by \'peek()\' are incompatible between these types.\\n    Type \'string | undefined\' is not assignable to type \'string\'.\\n      Type \'undefined\' is not assignable to type \'string\'.", "236598504"],
       [63, 4, 17, "Type \'Observable<false>\' is not assignable to type \'Observable<boolean>\'.", "3331382116"],
       [65, 4, 23, "Type \'Observable<Conversation | undefined>\' is not assignable to type \'Observable<Conversation>\'.\\n  The types returned by \'peek()\' are incompatible between these types.\\n    Type \'Conversation | undefined\' is not assignable to type \'Conversation\'.\\n      Type \'undefined\' is not assignable to type \'Conversation\'.", "2356679995"],
-      [67, 4, 18, "Type \'Observable<ContentMessage | undefined>\' is not assignable to type \'Observable<ContentMessage>\'.", "3462443997"],
+      [67, 4, 18, "Type \'Observable<ContentMessage | undefined>\' is not assignable to type \'Observable<ContentMessage>\'.\\n  The types returned by \'peek()\' are incompatible between these types.\\n    Type \'ContentMessage | undefined\' is not assignable to type \'ContentMessage\'.\\n      Type \'undefined\' is not assignable to type \'ContentMessage\'.", "3462443997"],
       [93, 18, 9, "Argument of type \'undefined\' is not assignable to parameter of type \'string\'.", "2620553983"],
       [95, 23, 9, "Argument of type \'undefined\' is not assignable to parameter of type \'ContentMessage\'.", "2620553983"],
       [96, 4, 11, "Type \'undefined\' is not assignable to type \'string\'.", "3652784592"],
