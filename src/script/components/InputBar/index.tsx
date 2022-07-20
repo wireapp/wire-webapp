@@ -26,14 +26,9 @@ import {container} from 'tsyringe';
 import ko from 'knockout';
 
 import ClassifiedBar from 'Components/input/ClassifiedBar';
-import Icon from 'Components/Icon';
-import Image from 'Components/Image';
-import RestrictedVideo from 'Components/asset/RestrictedVideo';
-import ParticipantMicOnIcon from 'Components/calling/ParticipantMicOnIcon';
 import Avatar, {AVATAR_SIZE} from 'Components/Avatar';
 
 import {registerReactComponent, useKoSubscribableChildren} from 'Util/ComponentUtil';
-import {renderMessage} from 'Util/messageRenderer';
 import {insertAtCaret, isFunctionKey, KEY} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
 import {afterRender, formatBytes} from 'Util/util';
@@ -61,6 +56,8 @@ import {MessageHasher} from '../../message/MessageHasher';
 import {QuoteEntity} from '../../message/QuoteEntity';
 import {Text as TextAsset} from '../../entity/message/Text';
 import {User} from '../../entity/User';
+import PastedFileControls from './PastedFileControls';
+import ReplyBar from './ReplyBar';
 
 const findMentionAtPosition = (position: number, mentions: MentionEntity[]) =>
   mentions.find(({startIndex, endIndex}) => position > startIndex && position < endIndex);
@@ -69,11 +66,19 @@ const _generateStorageKey = (conversationEntity: Conversation): string => {
   return `${StorageKey.CONVERSATION.INPUT}|${conversationEntity.id}`;
 };
 
+const CONFIG = {
+  ...Config.getConfig(),
+  ASSETS: {
+    CONCURRENT_UPLOAD_LIMIT: 10,
+  },
+  PING_TIMEOUT: TIME_IN_MILLIS.SECOND * 2,
+};
+
 const showUploadWarning = (image: File) => {
   const isGif = image.type === 'image/gif';
-  const maxSize = Config.getConfig().MAXIMUM_IMAGE_FILE_SIZE / 1024 / 1024;
-  const message = isGif ? t('modalGifTooLargeMessage', maxSize) : t('modalPictureTooLargeMessage', maxSize);
-  const title = isGif ? t('modalGifTooLargeHeadline') : t('modalPictureTooLargeHeadline');
+  const maxSize = CONFIG.MAXIMUM_IMAGE_FILE_SIZE / 1024 / 1024;
+  const message = t(isGif ? 'modalGifTooLargeMessage' : 'modalPictureTooLargeMessage', maxSize);
+  const title = t(isGif ? 'modalGifTooLargeHeadline' : 'modalPictureTooLargeHeadline');
 
   const modalOptions = {
     text: {
@@ -83,13 +88,6 @@ const showUploadWarning = (image: File) => {
   };
 
   amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.ACKNOWLEDGE, modalOptions);
-};
-
-const CONFIG = {
-  ASSETS: {
-    CONCURRENT_UPLOAD_LIMIT: 10,
-  },
-  PING_TIMEOUT: TIME_IN_MILLIS.SECOND * 2,
 };
 
 interface DraftMessage {
@@ -202,7 +200,6 @@ const InputBar: FC<InputBarProps> = ({
 
   const isEditing = !!editMessageEntity;
   const isReplying = !!replyMessageEntity;
-  const replyAsset = replyMessageEntity?.assets?.()[0];
 
   const [inputValue, setInputValue] = useState<string>('');
 
@@ -217,10 +214,6 @@ const InputBar: FC<InputBarProps> = ({
   const [editedMention, setEditedMention] = useState<{startIndex: number; term: string} | undefined>(undefined);
 
   const [pastedFile, setPastedFile] = useState<File | null>(null);
-  const [pastedFileName, setPastedFileName] = useState<string>('');
-  const [pastedFilePreviewUrl, setPastedFilePreviewUrl] = useState<string>('');
-
-  const participantAvatarSize = AVATAR_SIZE.X_SMALL;
 
   const mentionSuggestions = useMemo(() => {
     if (!editedMention) {
@@ -284,8 +277,6 @@ const InputBar: FC<InputBarProps> = ({
 
   const clearPastedFile = () => {
     setPastedFile(null);
-    setPastedFileName('');
-    setPastedFilePreviewUrl('');
   };
 
   const _isHittingUploadLimit = (files: File[]): boolean => {
@@ -327,10 +318,8 @@ const InputBar: FC<InputBarProps> = ({
       return;
     }
 
-    const allowedImageTypes = Config.getConfig().ALLOWED_IMAGE_TYPES;
-
     Array.from([pastedFile]).forEach((file): void | number => {
-      const isSupportedImage = allowedImageTypes.includes(file.type);
+      const isSupportedImage = CONFIG.ALLOWED_IMAGE_TYPES.includes(file.type);
 
       if (isSupportedImage) {
         return images.push(file);
@@ -453,32 +442,27 @@ const InputBar: FC<InputBarProps> = ({
     return findMentionAtPosition(checkPosition, currentMentions);
   };
 
-  const resetDraftState = useCallback(() => {
+  const resetDraftState = () => {
     setCurrentMentions([]);
     setInputValue('');
-  }, []);
+  };
 
-  const cancelMessageReply = useCallback(
-    (resetDraft = true) => {
-      setReplyMessageEntity(null);
+  const cancelMessageReply = (resetDraft = true) => {
+    setReplyMessageEntity(null);
 
-      if (resetDraft) {
-        resetDraftState();
-      }
-    },
-    [resetDraftState],
-  );
+    if (resetDraft) {
+      resetDraftState();
+    }
+  };
 
-  const cancelMessageEditing = useCallback(
-    (resetDraft = true) => {
-      setEditMessageEntity(null);
-      setReplyMessageEntity(null);
-      if (resetDraft) {
-        resetDraftState();
-      }
-    },
-    [resetDraftState],
-  );
+  const cancelMessageEditing = (resetDraft = true) => {
+    setEditMessageEntity(null);
+    setReplyMessageEntity(null);
+
+    if (resetDraft) {
+      resetDraftState();
+    }
+  };
 
   const handleCancelReply = () => {
     if (!mentionSuggestions.length) {
@@ -500,36 +484,26 @@ const InputBar: FC<InputBarProps> = ({
     });
   }, [updateSelectionState]);
 
-  const editMessage = useCallback(
-    (messageEntity: ContentMessage) => {
-      if (messageEntity?.isEditable() && messageEntity !== editMessageEntity) {
-        const firstAsset = messageEntity.getFirstAsset() as TextAsset;
-        const newMentions = firstAsset.mentions().slice();
+  const editMessage = (messageEntity: ContentMessage) => {
+    if (messageEntity?.isEditable() && messageEntity !== editMessageEntity) {
+      const firstAsset = messageEntity.getFirstAsset() as TextAsset;
+      const newMentions = firstAsset.mentions().slice();
 
-        cancelMessageReply();
-        cancelMessageEditing();
-        setEditMessageEntity(messageEntity);
-        setInputValue(firstAsset.text);
-        setCurrentMentions(newMentions);
+      cancelMessageReply();
+      cancelMessageEditing();
+      setEditMessageEntity(messageEntity);
+      setInputValue(firstAsset.text);
+      setCurrentMentions(newMentions);
 
-        if (messageEntity.quote() && conversationEntity) {
-          messageRepository
-            .getMessageInConversationById(conversationEntity, messageEntity.quote().messageId)
-            .then(quotedMessage => setReplyMessageEntity(quotedMessage));
-        }
-
-        moveCursorToEnd();
+      if (messageEntity.quote() && conversationEntity) {
+        messageRepository
+          .getMessageInConversationById(conversationEntity, messageEntity.quote().messageId)
+          .then(quotedMessage => setReplyMessageEntity(quotedMessage));
       }
-    },
-    [
-      cancelMessageEditing,
-      cancelMessageReply,
-      conversationEntity,
-      editMessageEntity,
-      messageRepository,
-      moveCursorToEnd,
-    ],
-  );
+
+      moveCursorToEnd();
+    }
+  };
 
   const replyMessage = (messageEntity: ContentMessage): void => {
     if (messageEntity?.isReplyable() && messageEntity !== replyMessageEntity) {
@@ -546,7 +520,6 @@ const InputBar: FC<InputBarProps> = ({
     updateSelectionState();
   }, [updateSelectionState]);
 
-  // TODO: Fix updating mentions
   const updateMentions = (event: KeyboardEvent<HTMLTextAreaElement>) => {
     const textarea = event.currentTarget;
     const value = textarea.value;
@@ -718,12 +691,12 @@ const InputBar: FC<InputBarProps> = ({
 
     const messageText = messageTrimmedStart.trimRight();
 
-    const isMessageTextTooLong = messageText.length > Config.getConfig().MAXIMUM_MESSAGE_LENGTH;
+    const isMessageTextTooLong = messageText.length > CONFIG.MAXIMUM_MESSAGE_LENGTH;
 
     if (isMessageTextTooLong) {
       return amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.ACKNOWLEDGE, {
         text: {
-          message: t('modalConversationMessageTooLongMessage', Config.getConfig().MAXIMUM_MESSAGE_LENGTH),
+          message: t('modalConversationMessageTooLongMessage', CONFIG.MAXIMUM_MESSAGE_LENGTH),
           title: t('modalConversationMessageTooLongHeadline'),
         },
       });
@@ -777,9 +750,7 @@ const InputBar: FC<InputBarProps> = ({
       }
     }
 
-    const uploadLimit = inTeam
-      ? Config.getConfig().MAXIMUM_ASSET_FILE_SIZE_TEAM
-      : Config.getConfig().MAXIMUM_ASSET_FILE_SIZE_PERSONAL;
+    const uploadLimit = inTeam ? CONFIG.MAXIMUM_ASSET_FILE_SIZE_TEAM : CONFIG.MAXIMUM_ASSET_FILE_SIZE_PERSONAL;
 
     if (!isHittingUploadLimit(files)) {
       for (const file of fileArray) {
@@ -807,7 +778,7 @@ const InputBar: FC<InputBarProps> = ({
   const uploadImages = (images: File[]) => {
     if (!isHittingUploadLimit(images)) {
       for (const image of Array.from(images)) {
-        const isImageTooLarge = image.size > Config.getConfig().MAXIMUM_IMAGE_FILE_SIZE;
+        const isImageTooLarge = image.size > CONFIG.MAXIMUM_IMAGE_FILE_SIZE;
 
         if (isImageTooLarge) {
           return showUploadWarning(image);
@@ -851,17 +822,11 @@ const InputBar: FC<InputBarProps> = ({
     }
 
     const [pastedFile] = pastedFiles;
-    const {lastModified, type: fileType} = pastedFile;
-    const isSupportedFileType = Config.getConfig().ALLOWED_IMAGE_TYPES.includes(fileType);
-
-    if (isSupportedFileType && pastedFile) {
-      setPastedFilePreviewUrl(URL.createObjectURL(pastedFile));
-    }
+    const {lastModified} = pastedFile;
 
     const date = formatLocale(lastModified || new Date(), 'PP, pp');
     const fileName = t('conversationSendPastedFile', date);
 
-    setPastedFileName(fileName);
     const newFile = new File([pastedFile], fileName, {
       type: pastedFile.type,
     });
@@ -869,7 +834,7 @@ const InputBar: FC<InputBarProps> = ({
     setPastedFile(newFile);
   };
 
-  const _saveDraftState = async (): Promise<void> => {
+  const _saveDraftState = useCallback(async (): Promise<void> => {
     if (isEditing) {
       return;
     }
@@ -883,7 +848,7 @@ const InputBar: FC<InputBarProps> = ({
       reply: storeReply,
       text: draftMessage.text,
     });
-  };
+  }, [draftMessage, storageRepository]);
 
   const _loadDraftState = async (conversationEntity: Conversation): Promise<DraftMessage> => {
     const storageKey = _generateStorageKey(conversationEntity);
@@ -919,31 +884,28 @@ const InputBar: FC<InputBarProps> = ({
     return draftMessage;
   };
 
-  const loadInitialStateForConversation = useCallback(
-    async (conversationEntity: Conversation): Promise<void> => {
-      setConversationHasFocus(true);
-      setPastedFile(null);
-      cancelMessageEditing();
-      cancelMessageReply();
-      endMentionFlow();
+  const loadInitialStateForConversation = useCallback(async (): Promise<void> => {
+    setConversationHasFocus(true);
+    setPastedFile(null);
+    cancelMessageEditing();
+    cancelMessageReply();
+    endMentionFlow();
 
-      if (conversationEntity) {
-        const previousSessionData = await _loadDraftState(conversationEntity);
-        setInputValue(previousSessionData.text);
-        setCurrentMentions(previousSessionData.mentions);
-        updateSelectionState();
+    if (conversationEntity) {
+      const previousSessionData = await _loadDraftState(conversationEntity);
+      setInputValue(previousSessionData.text);
+      setCurrentMentions(previousSessionData.mentions);
+      updateSelectionState();
 
-        if (previousSessionData.replyEntityPromise) {
-          previousSessionData.replyEntityPromise.then(replyEntity => {
-            if (replyEntity?.isReplyable()) {
-              setReplyMessageEntity(replyEntity);
-            }
-          });
-        }
+      if (previousSessionData.replyEntityPromise) {
+        previousSessionData.replyEntityPromise.then(replyEntity => {
+          if (replyEntity?.isReplyable()) {
+            setReplyMessageEntity(replyEntity);
+          }
+        });
       }
-    },
-    [conversationEntity],
-  );
+    }
+  }, [conversationEntity]);
 
   const sendGiphy = (gifUrl: string, tag: string): void => {
     _generateQuote().then(quoteEntity => {
@@ -984,12 +946,12 @@ const InputBar: FC<InputBarProps> = ({
   }, []);
 
   useEffect(() => {
-    loadInitialStateForConversation(conversationEntity);
-  }, [loadInitialStateForConversation, conversationEntity]);
+    loadInitialStateForConversation();
+  }, [loadInitialStateForConversation]);
 
   useEffect(() => {
     _saveDraftState();
-  }, [draftMessage]);
+  }, [_saveDraftState]);
 
   const resizeTarget = () => {
     if (shadowInputRef.current && shadowInputRef.current) {
@@ -1090,89 +1052,17 @@ const InputBar: FC<InputBarProps> = ({
         <ClassifiedBar users={participatingUserEts} classifiedDomains={classifiedDomains} />
       )}
 
-      {isReplying && !isEditing && (
-        <div className="input-bar__reply" data-uie-name="input-bar-reply-box">
-          <button
-            type="button"
-            className="button-reset-default"
-            onClick={handleCancelReply}
-            data-uie-name="do-close-reply-box"
-          >
-            <Icon.Close fill="white" />
-          </button>
-
-          <div className="input-bar__reply__body">
-            <div className="input-bar__reply__vert-bar"></div>
-
-            <div className="input-bar__reply__text">
-              <div className="input-bar__reply__sender-name">
-                <span data-uie-name="label-name-reply-box">{replyMessageEntity?.headerSenderName()}</span>
-
-                {replyMessageEntity?.was_edited() && <Icon.Edit data-uie-name="message-edited-reply-box" />}
-              </div>
-
-              {replyAsset?.isText() && (
-                <div
-                  className="input-bar__reply__message input-bar__reply__message__text"
-                  data-uie-name="media-text-reply-box"
-                  dangerouslySetInnerHTML={{__html: renderMessage(replyAsset.text, null, replyAsset.mentions())}}
-                />
-              )}
-
-              {replyAsset?.isImage() && (
-                <div data-uie-name="media-picture-reply-box">
-                  <Image
-                    className="bar__reply__message input-bar__reply__message__image"
-                    asset={replyAsset.resource()}
-                    isQuote
-                  />
-                </div>
-              )}
-
-              {replyAsset?.isVideo() && (
-                <div data-uie-name="media-video-reply-box">
-                  <RestrictedVideo className="input-bar__reply__message" showMessage={false} isSmall />
-                </div>
-              )}
-
-              {replyAsset?.isAudio() && (
-                <div className="input-bar__reply__message" data-uie-name="media-audio-reply-box">
-                  <ParticipantMicOnIcon className="input-bar__reply__icon" />
-
-                  <span>{t('replyAudioMessage')}</span>
-                </div>
-              )}
-
-              {replyAsset?.isFile() && (
-                <div className="input-bar__reply__message" data-uie-name="media-file-reply-box">
-                  <Icon.File className="input-bar__reply__icon" />
-
-                  <span>{replyAsset.file_name}</span>
-                </div>
-              )}
-
-              {replyAsset?.isLocation() && (
-                <div className="input-bar__reply__message" data-uie-name="media-location-reply-box">
-                  <Icon.Location className="input-bar__reply__icon" />
-
-                  <span>{replyAsset.name}</span>
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
-      )}
+      {isReplying && !isEditing && <ReplyBar replyMessageEntity={replyMessageEntity} onCancel={handleCancelReply} />}
 
       <div className={cx('conversation-input-bar__input', {'conversation-input-bar__input--editing': isEditing})}>
         {!isOutgoingRequest && (
           <>
             <div className="controls-left">
               {!!inputValue.length && (
-                <Avatar className="cursor-default" participant={selfUser} avatarSize={participantAvatarSize} />
+                <Avatar className="cursor-default" participant={selfUser} avatarSize={AVATAR_SIZE.X_SMALL} />
               )}
             </div>
 
-            {/* TODO: Fix height for textarea/shadowInput, fix bug for no message */}
             {!removedFromConversation && (
               <>
                 <div className="controls-center">
@@ -1230,40 +1120,7 @@ const InputBar: FC<InputBarProps> = ({
           </>
         )}
 
-        {pastedFile && (
-          <div className="conversation-input-bar-paste-modal">
-            <div className="controls-left"></div>
-
-            <div className="controls-center">
-              {pastedFilePreviewUrl ? (
-                <img
-                  className="conversation-input-bar-paste-image conversation-input-bar-paste-icon"
-                  src={pastedFilePreviewUrl}
-                  alt={pastedFileName}
-                />
-              ) : (
-                <span className="conversation-input-bar-paste-icon">
-                  <Icon.File />
-                </span>
-              )}
-              <span>{pastedFileName}</span>
-            </div>
-
-            <div className="controls-right">
-              <button
-                type="button"
-                className="conversation-input-bar-paste-cancel button-icon-large"
-                onClick={clearPastedFile}
-              >
-                <Icon.Close />
-              </button>
-
-              <button type="button" className="conversation-input-bar-paste-send" onClick={sendPastedFile}>
-                <Icon.Send />
-              </button>
-            </div>
-          </div>
-        )}
+        {pastedFile && <PastedFileControls pastedFile={pastedFile} onClear={clearPastedFile} onSend={sendPastedFile} />}
       </div>
     </div>
   );

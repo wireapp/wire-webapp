@@ -42,17 +42,23 @@ const MentionSuggestionList: React.FunctionComponent<MentionSuggestionListProps>
   useFadingScrollbar(scrollbarRef);
   const [selectedSuggestionIndex, setSelectedSuggestionIndex] = useState(0);
   const [selectedItem, setSelectedItem] = useEffectRef();
-  useEffect(
-    () => selectedItem?.scrollIntoView({behavior: 'auto', block: 'nearest'}),
-    [selectedItem, suggestions.length],
-  );
 
   const targetInput = document.querySelector<HTMLInputElement>(targetInputSelector);
   const isVisible = suggestions.length > 0;
 
-  const bottom = useMemo(
-    () => (isVisible ? window.innerHeight - targetInput?.getBoundingClientRect().top + 24 : 0),
-    [isVisible, targetInput],
+  const bottom = useMemo(() => {
+    const boundingClientRect = targetInput?.getBoundingClientRect?.();
+
+    if (!isVisible || !boundingClientRect) {
+      return 0;
+    }
+
+    return window.innerHeight - boundingClientRect.top + 24;
+  }, [isVisible, targetInput]);
+
+  useEffect(
+    () => selectedItem?.scrollIntoView({behavior: 'auto', block: 'nearest'}),
+    [selectedItem, suggestions.length],
   );
 
   useEffect(() => {
