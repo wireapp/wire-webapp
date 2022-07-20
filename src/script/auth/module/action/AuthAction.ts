@@ -107,10 +107,11 @@ export class AuthAction {
         await dispatch(selfAction.fetchSelf());
         let entropyData: Uint8Array | undefined = undefined;
         if (getEntropy) {
-          entropyData = await getEntropy();
           try {
-            await core.loadAndValidateLocalClient(entropyData);
-          } catch (e) {}
+            await core.loadAndValidateLocalClient();
+          } catch (e) {
+            entropyData = await getEntropy();
+          }
         }
         await onAfterLogin(dispatch, getState, global);
         await dispatch(
@@ -385,10 +386,7 @@ export class AuthAction {
     return async (dispatch, getState, {core}) => {
       dispatch(AuthActionCreator.startValidateLocalClient());
       try {
-        const {
-          authState: {entropy},
-        } = getState();
-        await core.loadAndValidateLocalClient(entropy);
+        await core.loadAndValidateLocalClient();
         dispatch(AuthActionCreator.successfulValidateLocalClient());
       } catch (error) {
         dispatch(AuthActionCreator.failedValidateLocalClient(error));

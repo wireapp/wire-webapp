@@ -240,7 +240,7 @@
     "translate:merge": "formatjs extract --format './bin/translations_extract_formatter.js' --out-file './src/i18n/en-US.json' './src/script/strings.ts'",
     "translate:upload": "yarn translate:merge && ts-node ./bin/translations_upload.ts",
     "translate:download": "ts-node ./bin/translations_download.ts",
-    "betterer": "betterer",
+    "betterer": "betterer precommit",
     "betterer:conflict": "betterer merge"
   },
   "version": "0.18.0"

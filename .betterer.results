@@ -121,28 +121,28 @@ exports[`stricter compilation`] = {
       [65, 13, 31, "Argument of type \'HTMLElement | null\' is not assignable to parameter of type \'Element | DocumentFragment\'.\\n  Type \'null\' is not assignable to type \'Element | DocumentFragment\'.", "223522320"],
       [69, 9, 4, "Argument of type \'ConnectedComponent<FC<RootProps & { isAuthenticated: boolean; isFetchingSSOSettings: boolean; language: string; } & { doGetSSOSettings: () => Promise<void>; safelyRemoveCookie: (name: string, value: string) => Promise<...>; startPolling: (name?: string | undefined, interval?: number | undefined, asJSON?: boolean | u...\' is not assignable to parameter of type \'ConnectedComponent<FunctionComponent<{}>, any>\'.\\n  Type \'ComponentClass<Omit<RootProps & { isAuthenticated: boolean; isFetchingSSOSettings: boolean; language: string; } & { doGetSSOSettings: () => Promise<void>; safelyRemoveCookie: (name: string, value: string) => Promise<...>; startPolling: (name?: string | undefined, interval?: number | undefined, asJSON?: boolean | und...\' is not assignable to type \'ConnectedComponent<FunctionComponent<{}>, any>\'.\\n    Type \'ComponentClass<Omit<RootProps & { isAuthenticated: boolean; isFetchingSSOSettings: boolean; language: string; } & { doGetSSOSettings: () => Promise<void>; safelyRemoveCookie: (name: string, value: string) => Promise<...>; startPolling: (name?: string | undefined, interval?: number | undefined, asJSON?: boolean | und...\' is not assignable to type \'ComponentClass<any, any> & NonReactStatics<FunctionComponent<{}>, {}> & { WrappedComponent: FunctionComponent<{}>; }\'.\\n      Type \'ComponentClass<Omit<RootProps & { isAuthenticated: boolean; isFetchingSSOSettings: boolean; language: string; } & { doGetSSOSettings: () => Promise<void>; safelyRemoveCookie: (name: string, value: string) => Promise<...>; startPolling: (name?: string | undefined, interval?: number | undefined, asJSON?: boolean | und...\' is not assignable to type \'{ WrappedComponent: FunctionComponent<{}>; }\'.\\n        Types of property \'WrappedComponent\' are incompatible.\\n          Type \'FC<RootProps & { isAuthenticated: boolean; isFetchingSSOSettings: boolean; language: string; } & { doGetSSOSettings: () => Promise<void>; safelyRemoveCookie: (name: string, value: string) => Promise<...>; startPolling: (name?: string | undefined, interval?: number | undefined, asJSON?: boolean | undefined) => Promis...\' is not assignable to type \'FunctionComponent<{}>\'.\\n            Types of parameters \'props\' and \'props\' are incompatible.\\n              Type \'{}\' is not assignable to type \'RootProps & { isAuthenticated: boolean; isFetchingSSOSettings: boolean; language: string; } & { doGetSSOSettings: () => Promise<void>; safelyRemoveCookie: (name: string, value: string) => Promise<...>; startPolling: (name?: string | undefined, interval?: number | undefined, asJSON?: boolean | undefined) => Promise<....\'.\\n                Type \'{}\' is not assignable to type \'{ isAuthenticated: boolean; isFetchingSSOSettings: boolean; language: string; }\'.", "2089387715"]
     ],
-    "src/script/auth/module/action/AuthAction.ts:624441579": [
-      [125, 12, 5, "Object is of type \'unknown\'.", "165548477"],
-      [131, 49, 5, "Argument of type \'unknown\' is not assignable to parameter of type \'Error\'.", "165548477"],
-      [145, 60, 5, "Argument of type \'unknown\' is not assignable to parameter of type \'Error\'.", "165548477"],
-      [158, 59, 5, "Argument of type \'unknown\' is not assignable to parameter of type \'Error\'.", "165548477"],
-      [180, 12, 5, "Object is of type \'unknown\'.", "165548477"],
-      [183, 49, 5, "Argument of type \'unknown\' is not assignable to parameter of type \'Error\'.", "165548477"],
-      [268, 27, 18, "Object is possibly \'undefined\'.", "1666073462"],
-      [269, 6, 17, "Object is possibly \'undefined\'.", "2392383015"],
+    "src/script/auth/module/action/AuthAction.ts:1972172538": [
+      [126, 12, 5, "Object is of type \'unknown\'.", "165548477"],
+      [132, 49, 5, "Argument of type \'unknown\' is not assignable to parameter of type \'Error\'.", "165548477"],
+      [146, 60, 5, "Argument of type \'unknown\' is not assignable to parameter of type \'Error\'.", "165548477"],
+      [159, 59, 5, "Argument of type \'unknown\' is not assignable to parameter of type \'Error\'.", "165548477"],
+      [181, 12, 5, "Object is of type \'unknown\'.", "165548477"],
+      [184, 49, 5, "Argument of type \'unknown\' is not assignable to parameter of type \'Error\'.", "165548477"],
+      [269, 27, 18, "Object is possibly \'undefined\'.", "1666073462"],
       [270, 6, 17, "Object is possibly \'undefined\'.", "2392383015"],
       [271, 6, 17, "Object is possibly \'undefined\'.", "2392383015"],
       [272, 6, 17, "Object is possibly \'undefined\'.", "2392383015"],
-      [272, 31, 17, "Object is possibly \'undefined\'.", "2392383015"],
-      [284, 54, 5, "Argument of type \'unknown\' is not assignable to parameter of type \'Error\'.", "165548477"],
-      [299, 27, 18, "Object is possibly \'undefined\'.", "1666073462"],
-      [311, 58, 5, "Argument of type \'unknown\' is not assignable to parameter of type \'Error\'.", "165548477"],
-      [343, 58, 5, "Argument of type \'unknown\' is not assignable to parameter of type \'Error\'.", "165548477"],
-      [378, 49, 5, "Argument of type \'unknown\' is not assignable to parameter of type \'Error\'.", "165548477"],
-      [393, 61, 5, "Argument of type \'unknown\' is not assignable to parameter of type \'Error\'.", "165548477"],
-      [412, 56, 5, "Argument of type \'unknown\' is not assignable to parameter of type \'Error\'.", "165548477"],
-      [433, 48, 5, "Argument of type \'unknown\' is not assignable to parameter of type \'Error\'.", "165548477"],
-      [447, 48, 5, "Argument of type \'unknown\' is not assignable to parameter of type \'Error\'.", "165548477"]
+      [273, 6, 17, "Object is possibly \'undefined\'.", "2392383015"],
+      [273, 31, 17, "Object is possibly \'undefined\'.", "2392383015"],
+      [285, 54, 5, "Argument of type \'unknown\' is not assignable to parameter of type \'Error\'.", "165548477"],
+      [300, 27, 18, "Object is possibly \'undefined\'.", "1666073462"],
+      [312, 58, 5, "Argument of type \'unknown\' is not assignable to parameter of type \'Error\'.", "165548477"],
+      [344, 58, 5, "Argument of type \'unknown\' is not assignable to parameter of type \'Error\'.", "165548477"],
+      [379, 49, 5, "Argument of type \'unknown\' is not assignable to parameter of type \'Error\'.", "165548477"],
+      [391, 61, 5, "Argument of type \'unknown\' is not assignable to parameter of type \'Error\'.", "165548477"],
+      [410, 56, 5, "Argument of type \'unknown\' is not assignable to parameter of type \'Error\'.", "165548477"],
+      [431, 48, 5, "Argument of type \'unknown\' is not assignable to parameter of type \'Error\'.", "165548477"],
+      [445, 48, 5, "Argument of type \'unknown\' is not assignable to parameter of type \'Error\'.", "165548477"]
     ],
     "src/script/auth/module/action/BackendError.ts:3652889880": [
       [28, 4, 10, "Type \'string | undefined\' is not assignable to type \'string\'.\\n  Type \'undefined\' is not assignable to type \'string\'.", "3983565867"],
@@ -338,7 +338,7 @@ exports[`stricter compilation`] = {
       [115, 16, 5, "Object is of type \'unknown\'.", "165548477"],
       [168, 18, 3, "Type \'MutableRefObject<HTMLInputElement | undefined>\' is not assignable to type \'((instance: HTMLInputElement | null) => void) | RefObject<HTMLInputElement> | null | undefined\'.", "193432436"]
     ],
-    "src/script/auth/page/Login.tsx:4154401356": [
+    "src/script/auth/page/Login.tsx:2293216844": [
       [172, 24, 16, "Argument of type \'Error[]\' is not assignable to parameter of type \'SetStateAction<never[]>\'.", "2735526245"],
       [174, 50, 10, "Type \'ClientType | undefined\' is not assignable to type \'ClientType\'.", "3013398820"],
       [203, 56, 10, "Type \'ClientType | undefined\' is not assignable to type \'ClientType\'.", "3013398820"],
