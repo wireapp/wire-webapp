@@ -340,7 +340,7 @@ exports[`stricter compilation`] = {
     ],
     "src/script/auth/page/Login.tsx:2293216844": [
       [172, 24, 16, "Argument of type \'Error[]\' is not assignable to parameter of type \'SetStateAction<never[]>\'.", "2735526245"],
-      [174, 50, 10, "Type \'ClientType | undefined\' is not assignable to type \'ClientType\'.", "3013398820"],
+      [174, 50, 10, "Type \'ClientType | undefined\' is not assignable to type \'ClientType\'.\\n  Type \'undefined\' is not assignable to type \'ClientType\'.", "3013398820"],
       [203, 56, 10, "Type \'ClientType | undefined\' is not assignable to type \'ClientType\'.", "3013398820"],
       [205, 32, 11, "Argument of type \'string | undefined\' is not assignable to parameter of type \'string\'.\\n  Type \'undefined\' is not assignable to type \'string\'.", "2331572484"],
       [210, 36, 5, "Argument of type \'unknown\' is not assignable to parameter of type \'SetStateAction<string>\'.", "165548477"],
@@ -2450,16 +2450,16 @@ exports[`stricter compilation`] = {
       [87, 11, 17, "Property \'activeCallViewTab\' has no initializer and is not definitely assigned in the constructor.", "1323835793"],
       [319, 4, 63, "Type \'Conversation | undefined\' is not assignable to type \'Conversation\'.\\n  Type \'undefined\' is not assignable to type \'Conversation\'.", "62763745"]
     ],
-    "src/script/view_model/ContentViewModel.ts:978292951": [
-      [268, 65, 6, "Type \'string | null\' is not assignable to type \'string\'.\\n  Type \'null\' is not assignable to type \'string\'.", "1127975365"],
-      [305, 68, 13, "Argument of type \'Message | undefined\' is not assignable to parameter of type \'Message\'.\\n  Type \'undefined\' is not assignable to type \'Message\'.", "2065728181"],
-      [311, 10, 6, "Type \'Conversation | null\' is not assignable to type \'PanelEntity\'.", "1164306878"],
-      [315, 37, 5, "Object is of type \'unknown\'.", "165548477"],
-      [325, 10, 9, "Argument of type \'undefined\' is not assignable to parameter of type \'string\'.", "2620553983"],
-      [408, 50, 9, "Argument of type \'undefined\' is not assignable to parameter of type \'Conversation\'.", "2620553983"],
-      [436, 12, 9, "Argument of type \'undefined\' is not assignable to parameter of type \'string\'.", "2620553983"],
-      [445, 20, 29, "Object is possibly \'undefined\'.", "1398699454"],
-      [448, 12, 9, "Argument of type \'undefined\' is not assignable to parameter of type \'string\'.", "2620553983"]
+    "src/script/view_model/ContentViewModel.ts:1215263035": [
+      [265, 65, 6, "Type \'string | null\' is not assignable to type \'string\'.\\n  Type \'null\' is not assignable to type \'string\'.", "1127975365"],
+      [302, 68, 13, "Argument of type \'Message | undefined\' is not assignable to parameter of type \'Message\'.\\n  Type \'undefined\' is not assignable to type \'Message\'.", "2065728181"],
+      [308, 10, 6, "Type \'Conversation | null\' is not assignable to type \'PanelEntity\'.", "1164306878"],
+      [312, 37, 5, "Object is of type \'unknown\'.", "165548477"],
+      [322, 10, 9, "Argument of type \'undefined\' is not assignable to parameter of type \'string\'.", "2620553983"],
+      [405, 50, 9, "Argument of type \'undefined\' is not assignable to parameter of type \'Conversation\'.", "2620553983"],
+      [433, 12, 9, "Argument of type \'undefined\' is not assignable to parameter of type \'string\'.", "2620553983"],
+      [442, 20, 29, "Object is possibly \'undefined\'.", "1398699454"],
+      [445, 12, 9, "Argument of type \'undefined\' is not assignable to parameter of type \'string\'.", "2620553983"]
     ],
     "src/script/view_model/ImageDetailViewViewModel.ts:1576396674": [
       [58, 4, 11, "Type \'undefined\' is not assignable to type \'string\'.", "3652784592"],
@@ -2554,7 +2554,7 @@ exports[`stricter compilation`] = {
       [51, 4, 22, "Type \'Observable<false>\' is not assignable to type \'Observable<boolean>\'.", "2603921936"],
       [89, 31, 43, "Object is possibly \'null\'.", "1853768633"]
     ],
-    "src/script/view_model/bindings/CommonBindings.ts:4259167057": [
+    "src/script/view_model/bindings/CommonBindings.ts:1802825733": [
       [44, 6, 32, "Object is possibly \'null\'.", "3763860455"],
       [83, 63, 13, "Object is possibly \'null\'.", "115063321"],
       [83, 86, 13, "Object is possibly \'null\'.", "115063321"],
@@ -2563,12 +2563,10 @@ exports[`stricter compilation`] = {
       [279, 10, 40, "Object is possibly \'null\'.", "525534827"],
       [280, 29, 4, "\'this\' implicitly has type \'any\' because it does not have a type annotation.", "2087959715"],
       [285, 30, 4, "Argument of type \'null\' is not assignable to parameter of type \'string | number | string[] | ((this: EventTarget, index: number, value: string) => string)\'.", "2087897566"],
-      [327, 10, 5, "Type \'undefined\' is not assignable to type \'HTMLImageElement\'.", "178823234"],
-      [336, 10, 12, "Type \'undefined\' is not assignable to type \'((this: GlobalEventHandlers, ev: Event) => any) | null\'.", "1696577579"],
-      [379, 6, 3, "Object is possibly \'null\'.", "193416522"],
-      [380, 6, 3, "Object is possibly \'null\'.", "193416522"],
-      [381, 13, 3, "Object is possibly \'null\'.", "193416522"],
-      [523, 8, 12, "Type \'undefined\' is not assignable to type \'number\'.", "2583042145"]
+      [353, 6, 3, "Object is possibly \'null\'.", "193416522"],
+      [354, 6, 3, "Object is possibly \'null\'.", "193416522"],
+      [355, 13, 3, "Object is possibly \'null\'.", "193416522"],
+      [497, 8, 12, "Type \'undefined\' is not assignable to type \'number\'.", "2583042145"]
     ],
     "src/script/view_model/bindings/ConversationListBindings.ts:3095649748": [
       [29, 0, 32, "Type \'{ init(element: HTMLElement): void; update(element: HTMLElement, valueAccessor: PureComputed<string> | ObservableArray<Conversation>): void; }\' is not assignable to type \'BindingHandler<any>\'.\\n  Types of property \'update\' are incompatible.\\n    Type \'(element: HTMLElement, valueAccessor: PureComputed<string> | ObservableArray<Conversation>) => void\' is not assignable to type \'(element: any, valueAccessor: () => any, allBindings: AllBindings, viewModel: any, bindingContext: BindingContext<any>) => void\'.\\n      Types of parameters \'valueAccessor\' and \'valueAccessor\' are incompatible.\\n        Type \'() => any\' is not assignable to type \'PureComputed<string> | ObservableArray<Conversation>\'.\\n          Type \'() => any\' is missing the following properties from type \'PureComputed<string>\': equalityComparer, peek, dispose, isActive, and 7 more.", "1716760283"]
@@ -2603,20 +2601,6 @@ exports[`stricter compilation`] = {
       [387, 80, 4, "Property \'name\' does not exist on type \'never\'.", "2087876002"],
       [402, 31, 22, "Object is possibly \'undefined\'.", "4272920130"],
       [431, 38, 9, "Argument of type \'number | null\' is not assignable to parameter of type \'number | undefined\'.", "3834073445"]
-    ],
-    "src/script/view_model/content/GiphyViewModel.ts:931654924": [
-      [57, 4, 10, "Type \'undefined\' is not assignable to type \'Modal\'.", "3985246182"],
-      [58, 4, 10, "Type \'Observable<GiphyState.DEFAULT>\' is not assignable to type \'Observable<GiphyState>\'.\\n  Types of parameters \'value\' and \'value\' are incompatible.\\n    Type \'GiphyState\' is not assignable to type \'GiphyState.DEFAULT\'.", "4014904506"],
-      [61, 4, 15, "Type \'Observable<Gif | undefined>\' is not assignable to type \'Observable<Gif>\'.\\n  The types returned by \'peek()\' are incompatible between these types.\\n    Type \'Gif | undefined\' is not assignable to type \'Gif\'.\\n      Type \'undefined\' is not assignable to type \'Gif\'.", "2624948332"],
-      [67, 4, 16, "Type \'Observable<Gif | undefined>\' is not assignable to type \'Observable<Gif>\'.", "2966715820"],
-      [112, 24, 19, "No overload matches this call.\\n  The last overload gave the following error.\\n    Argument of type \'EventTarget | null\' is not assignable to parameter of type \'PlainObject<any>\'.\\n      Type \'null\' is not assignable to type \'PlainObject<any>\'.", "3586053823"],
-      [113, 31, 6, "Property \'parent\' does not exist on type \'JQueryStatic\'.", "1898500505"],
-      [116, 10, 4, "\'this\' implicitly has type \'any\' because it does not have a type annotation.", "2087959715"],
-      [120, 10, 4, "\'this\' implicitly has type \'any\' because it does not have a type annotation.", "2087959715"],
-      [125, 25, 9, "Argument of type \'undefined\' is not assignable to parameter of type \'Gif\'.", "2620553983"],
-      [138, 23, 9, "Argument of type \'undefined\' is not assignable to parameter of type \'Gif\'.", "2620553983"],
-      [151, 8, 10, "Type \'undefined\' is not assignable to type \'Modal\'.", "3985246182"],
-      [162, 21, 9, "Argument of type \'undefined\' is not assignable to parameter of type \'Gif\'.", "2620553983"]
     ],
     "src/script/view_model/content/HistoryExportViewModel.ts:1810820018": [
       [72, 4, 13, "Type \'Observable<false>\' is not assignable to type \'Observable<boolean>\'.", "1143683791"],

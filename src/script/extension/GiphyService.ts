@@ -57,7 +57,7 @@ export class GiphyService {
   /**
    * Search GIFs for a word or phrase.
    */
-  getSearch(options: GiphySearchOptions): Promise<GiphyMultipleResult> {
+  async getSearch(options: GiphySearchOptions): Promise<GiphyMultipleResult> {
     return this.apiClient.api.giphy.getGiphySearch(options);
   }
 
