@@ -550,6 +550,10 @@ export const errorHandlerStrings = defineMessages({
     defaultMessage: 'Please try again later',
     id: 'BackendError.LABEL.TOO_MANY_LOGINS',
   },
+  [BackendError.LABEL.TOO_MANY_REQUESTS]: {
+    defaultMessage: 'Too many requests, please try again later.',
+    id: 'BackendError.LABEL.TOO_MANY_REQUESTS',
+  },
   [BackendError.LABEL.BAD_REQUEST]: {
     defaultMessage: 'Invalid input',
     id: 'BackendError.LABEL.BAD_REQUEST',
