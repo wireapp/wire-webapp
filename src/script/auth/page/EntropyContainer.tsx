@@ -22,22 +22,22 @@ import React, {useState} from 'react';
 
 import {historyInfoStrings, setEntropyStrings} from '../../strings';
 import {useIntl} from 'react-intl';
-import EntropyCanvas from '../component/EntropyCanvas';
+import EntropyCanvas, {EntropyData} from '../component/EntropyCanvas';
 
 import {ProgressBar} from '../component/ProgressBar';
 import {KEY} from 'Util/KeyboardUtil';
 
 interface Props extends React.HTMLProps<HTMLDivElement> {
-  onSetEntropy: (entropyData: [number, number][]) => void;
+  onSetEntropy: (entropyData: Uint8Array) => void;
 }
 
 const EntropyContainer = ({onSetEntropy}: Props) => {
   const {formatMessage: _} = useIntl();
-  const [entropy, setEntropy] = useState<[number, number][]>([]);
+  const [entropy, setEntropy] = useState<EntropyData>(new EntropyData());
   const [pause, setPause] = useState<boolean>();
   const [percent, setPercent] = useState(0);
 
-  const onProgress = (entropyData: [number, number][], percentage: number, pause: boolean) => {
+  const onProgress = (entropyData: EntropyData, percentage: number, pause: boolean) => {
     setEntropy(entropyData);
     setPause(pause);
     setPercent(percentage);
@@ -57,11 +57,11 @@ const EntropyContainer = ({onSetEntropy}: Props) => {
             {_(setEntropyStrings.success)}
           </Muted>
           <Button
-            onClick={() => onSetEntropy(entropy)}
+            onClick={() => onSetEntropy(entropy.entropyData)}
             data-uie-name="do-entropy-confirm"
             onKeyDown={(event: React.KeyboardEvent) => {
               if (event.key === KEY.ENTER) {
-                onSetEntropy(entropy);
+                onSetEntropy(entropy.entropyData);
               }
             }}
           >
@@ -78,8 +78,9 @@ const EntropyContainer = ({onSetEntropy}: Props) => {
             data-uie-name="element-entropy-canvas"
             sizeX={256}
             sizeY={256}
-            onSetEntropy={onSetEntropy}
             onProgress={onProgress}
+            min_duration={30}
+            min_frames={300}
           />
           <ProgressBar error={!!pause} width={256} percent={percent} />
           <Text data-uie-name="element-entropy-percent" center>

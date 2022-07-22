@@ -20,12 +20,10 @@
 import {fireEvent, render, screen, act} from '@testing-library/react';
 import React from 'react';
 import {withIntl, withTheme} from '../util/test/TestUtil';
-import EntropyCanvas from './EntropyCanvas';
+import EntropyCanvas, {EntropyData} from './EntropyCanvas';
 require('jest-canvas-mock');
 
 describe('EntropyCanvas', () => {
-  const mockonSetEntropy = jest.fn().mockImplementation(() => {});
-
   afterEach(() => {
     jest.clearAllMocks();
   });
@@ -41,7 +39,7 @@ describe('EntropyCanvas', () => {
   const [, setEntropy] = useStateMock([]);
   const [, setError] = useErrorMock(null);
 
-  const mockOnProgress = jest.fn((entropyData: [number, number][], percent: number, pause: boolean) => {
+  const mockOnProgress = jest.fn((entropyData: EntropyData, percent: number, pause: boolean) => {
     setEntropy(entropyData);
     setError(pause);
   });
@@ -49,7 +47,9 @@ describe('EntropyCanvas', () => {
   it('reacts to drawing', async () => {
     render(
       withTheme(
-        withIntl(<EntropyCanvas onSetEntropy={mockonSetEntropy} onProgress={mockOnProgress} sizeX={256} sizeY={256} />),
+        withIntl(
+          <EntropyCanvas onProgress={mockOnProgress} sizeX={256} sizeY={256} min_duration={30} min_frames={300} />,
+        ),
       ),
     );
     const canvas = screen.getByTestId('element-entropy-canvas');
@@ -59,13 +59,15 @@ describe('EntropyCanvas', () => {
       fireEvent.mouseLeave(canvas);
     });
     expect(setEntropy).toHaveBeenCalledTimes(1);
-    expect(setError).toHaveBeenCalledTimes(4);
+    expect(setError).toHaveBeenCalledTimes(7);
   });
 
   it('starts drawing again after leaving canvas', async () => {
     render(
       withTheme(
-        withIntl(<EntropyCanvas onSetEntropy={mockonSetEntropy} onProgress={mockOnProgress} sizeX={256} sizeY={256} />),
+        withIntl(
+          <EntropyCanvas onProgress={mockOnProgress} sizeX={256} sizeY={256} min_duration={30} min_frames={300} />,
+        ),
       ),
     );
     const canvas = screen.getByTestId('element-entropy-canvas');
@@ -78,6 +80,6 @@ describe('EntropyCanvas', () => {
       fireEvent.mouseLeave(canvas);
     });
     expect(setEntropy).toHaveBeenCalledTimes(2);
-    expect(setError).toHaveBeenCalledTimes(8);
+    expect(setError).toHaveBeenCalledTimes(14);
   });
 });

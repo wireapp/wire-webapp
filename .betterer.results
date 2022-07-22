@@ -87,9 +87,6 @@ exports[`stricter compilation`] = {
       [67, 31, 7, "This condition will always return true since this \'Promise<any>\' is always defined.", "2364942655"],
       [93, 10, 11, "Type \'false | Error\' is not assignable to type \'Error\'.\\n  Type \'boolean\' is not assignable to type \'Error\'.", "674912356"]
     ],
-    "src/script/auth/component/EntropyCanvas.tsx:4024758654": [
-      [94, 20, 6, "Object is possibly \'null\'.", "1537472717"]
-    ],
     "src/script/auth/component/LinkButton.tsx:522804603": [
       [32, 8, 67, "Type \'(theme: Theme) => CSSObject\' is not assignable to type \'Interpolation<Theme>\'.\\n  Type \'(theme: Theme) => CSSObject\' is not assignable to type \'FunctionInterpolation<Theme>\'.\\n    Types of parameters \'theme\' and \'props\' are incompatible.\\n      Type \'Theme\' is missing the following properties from type \'Theme\': IconButton, Checkbox, general, Input, Select", "530872600"]
     ],
@@ -306,7 +303,7 @@ exports[`stricter compilation`] = {
     "src/script/auth/page/ClientManager.tsx:4245719798": [
       [37, 35, 44, "Argument of type \'string | null\' is not assignable to parameter of type \'string\'.\\n  Type \'null\' is not assignable to type \'string\'.", "2692881484"]
     ],
-    "src/script/auth/page/ConversationJoin.tsx:2738577097": [
+    "src/script/auth/page/ConversationJoin.tsx:2931482776": [
       [121, 20, 9, "Argument of type \'boolean | \\"\\"\' is not assignable to parameter of type \'SetStateAction<boolean | undefined>\'.\\n  Type \'\\"\\"\' is not assignable to type \'SetStateAction<boolean | undefined>\'.", "984770170"],
       [138, 19, 11, "Object is possibly \'undefined\'.", "3519972619"],
       [151, 63, 15, "Argument of type \'string | undefined\' is not assignable to parameter of type \'string\'.\\n  Type \'undefined\' is not assignable to type \'string\'.", "4110106687"],
@@ -336,7 +333,7 @@ exports[`stricter compilation`] = {
       [115, 16, 5, "Object is of type \'unknown\'.", "165548477"],
       [168, 18, 3, "Type \'MutableRefObject<HTMLInputElement | undefined>\' is not assignable to type \'((instance: HTMLInputElement | null) => void) | RefObject<HTMLInputElement> | null | undefined\'.", "193432436"]
     ],
-    "src/script/auth/page/Login.tsx:2293216844": [
+    "src/script/auth/page/Login.tsx:3834497936": [
       [172, 24, 16, "Argument of type \'Error[]\' is not assignable to parameter of type \'SetStateAction<never[]>\'.", "2735526245"],
       [174, 50, 10, "Type \'ClientType | undefined\' is not assignable to type \'ClientType\'.", "3013398820"],
       [203, 56, 10, "Type \'ClientType | undefined\' is not assignable to type \'ClientType\'.", "3013398820"],
@@ -344,7 +341,7 @@ exports[`stricter compilation`] = {
       [210, 36, 5, "Argument of type \'unknown\' is not assignable to parameter of type \'SetStateAction<string>\'.", "165548477"],
       [234, 32, 18, "Object is possibly \'undefined\'.", "1981014711"],
       [234, 32, 24, "Argument of type \'string | undefined\' is not assignable to parameter of type \'string\'.\\n  Type \'undefined\' is not assignable to type \'string\'.", "3055772661"],
-      [294, 24, 14, "Type \'(code: string) => void\' is not assignable to type \'(completeCode?: string | undefined) => void\'.\\n  Types of parameters \'code\' and \'completeCode\' are incompatible.\\n    Type \'string | undefined\' is not assignable to type \'string\'.\\n      Type \'undefined\' is not assignable to type \'string\'.", "2059828224"]
+      [295, 24, 14, "Type \'(code: string) => void\' is not assignable to type \'(completeCode?: string | undefined) => void\'.\\n  Types of parameters \'code\' and \'completeCode\' are incompatible.\\n    Type \'string | undefined\' is not assignable to type \'string\'.\\n      Type \'undefined\' is not assignable to type \'string\'.", "2059828224"]
     ],
     "src/script/auth/page/PhoneLogin.tsx:2985384116": [
       [86, 19, 5, "Argument of type \'unknown\' is not assignable to parameter of type \'SetStateAction<undefined>\'.", "165548477"],
