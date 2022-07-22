@@ -5,19 +5,19 @@
 //
 exports[`stricter compilation`] = {
   value: `{
-    "src/script/Config.ts:1589755822": [
-      [51, 4, 40, "\'ACCOUNT_BASE\' is specified more than once, so this usage will be overwritten.", "2150385420"],
-      [52, 4, 15, "\'MOBILE_BASE\' is specified more than once, so this usage will be overwritten.", "437120469"],
-      [53, 4, 12, "\'PRICING\' is specified more than once, so this usage will be overwritten.", "1004628660"],
-      [54, 4, 65, "\'PRIVACY_POLICY\' is specified more than once, so this usage will be overwritten.", "3718416051"],
-      [55, 4, 889, "\'SUPPORT\' is specified more than once, so this usage will be overwritten.", "162157357"],
-      [70, 4, 36, "\'TEAMS_BASE\' is specified more than once, so this usage will be overwritten.", "1602627884"],
-      [71, 4, 47, "\'TEAMS_BILLING\' is specified more than once, so this usage will be overwritten.", "1546117942"],
-      [72, 4, 79, "\'TEAMS_CREATE\' is specified more than once, so this usage will be overwritten.", "3896973981"],
-      [73, 4, 84, "\'TERMS_OF_USE_PERSONAL\' is specified more than once, so this usage will be overwritten.", "4120462090"],
-      [74, 4, 78, "\'TERMS_OF_USE_TEAMS\' is specified more than once, so this usage will be overwritten.", "2894167402"],
-      [75, 4, 32, "\'WEBSITE_BASE\' is specified more than once, so this usage will be overwritten.", "41464345"],
-      [76, 4, 61, "\'WHATS_NEW\' is specified more than once, so this usage will be overwritten.", "608611251"]
+    "src/script/Config.ts:3362009592": [
+      [52, 4, 40, "\'ACCOUNT_BASE\' is specified more than once, so this usage will be overwritten.", "2150385420"],
+      [53, 4, 15, "\'MOBILE_BASE\' is specified more than once, so this usage will be overwritten.", "437120469"],
+      [54, 4, 12, "\'PRICING\' is specified more than once, so this usage will be overwritten.", "1004628660"],
+      [55, 4, 65, "\'PRIVACY_POLICY\' is specified more than once, so this usage will be overwritten.", "3718416051"],
+      [56, 4, 889, "\'SUPPORT\' is specified more than once, so this usage will be overwritten.", "162157357"],
+      [71, 4, 36, "\'TEAMS_BASE\' is specified more than once, so this usage will be overwritten.", "1602627884"],
+      [72, 4, 47, "\'TEAMS_BILLING\' is specified more than once, so this usage will be overwritten.", "1546117942"],
+      [73, 4, 79, "\'TEAMS_CREATE\' is specified more than once, so this usage will be overwritten.", "3896973981"],
+      [74, 4, 84, "\'TERMS_OF_USE_PERSONAL\' is specified more than once, so this usage will be overwritten.", "4120462090"],
+      [75, 4, 78, "\'TERMS_OF_USE_TEAMS\' is specified more than once, so this usage will be overwritten.", "2894167402"],
+      [76, 4, 32, "\'WEBSITE_BASE\' is specified more than once, so this usage will be overwritten.", "41464345"],
+      [77, 4, 61, "\'WHATS_NEW\' is specified more than once, so this usage will be overwritten.", "608611251"]
     ],
     "src/script/assets/AssetCrypto.test.ts:2635946620": [
       [38, 55, 4, "Argument of type \'null\' is not assignable to parameter of type \'ArrayBuffer\'.", "2087897566"]
