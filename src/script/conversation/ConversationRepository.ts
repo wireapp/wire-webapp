@@ -1224,6 +1224,7 @@ export class ConversationRepository {
    */
   mapConnections(connectionEntities: ConnectionEntity[]): Promise<Conversation>[] {
     this.logger.info(`Mapping '${connectionEntities.length}' user connection(s) to conversations`, connectionEntities);
+
     return connectionEntities.map(connectionEntity => this.mapConnection(connectionEntity));
   }
 
@@ -1353,12 +1354,18 @@ export class ConversationRepository {
     const userIds = userEntities.map(userEntity => userEntity.qualifiedId);
 
     try {
-      const response = await this.core.service!.conversation.addUsers(conversationEntity.qualifiedId, userIds);
+      const response = await this.core.service!.conversation.addUsers({
+        conversationId: conversationEntity,
+        protocol: ConversationProtocol.PROTEUS,
+        userIds: userIds,
+      });
       if (response) {
         this.eventRepository.injectEvent(response, EventRepository.SOURCE.BACKEND_RESPONSE);
       }
     } catch (error) {
-      return this.handleAddToConversationError(error, conversationEntity, userIds);
+      if (error instanceof BackendClientError) {
+        this.handleAddToConversationError(error, conversationEntity, userIds);
+      }
     }
   }
 

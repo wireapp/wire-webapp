@@ -206,7 +206,7 @@ export class AddParticipantsViewModel extends BasePanelViewModel {
     }
   };
 
-  private async addUsers(): Promise<void> {
+  private async addUsers() {
     const activeConversation = this.activeConversation();
     const userEntities = this.selectedContacts().slice();
 
