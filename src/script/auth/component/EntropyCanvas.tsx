@@ -29,8 +29,8 @@ interface CanvasProps {
   sizeY: number;
   // minimum number of frames
   min_frames: number;
-  // minimum duration in seconds
-  min_duration: number;
+  // minimum bits of overall estimated entropy
+  min_entropy_bits: number;
 }
 
 export interface EntropyFrame {
@@ -58,6 +58,21 @@ export class EntropyData {
     );
   }
 
+  // calculate shannon entropy
+  get entropyBits(): number {
+    const entropyData = this.entropyData;
+    const len = entropyData.length;
+    const frequencies = entropyData.reduce((freq: Map<number, number>, c: number) => {
+      freq.set(c, (freq.get(c) || 0) + 1);
+      return freq;
+    }, new Map<number, number>());
+    let sum = 0;
+    for (const f of frequencies.values()) {
+      sum -= (f / len) * Math.log2(f / len);
+    }
+    return sum * len;
+  }
+
   addFrame(value: EntropyFrame): void {
     // skip duplicate entries
     if (this.frames.length > 0 && this.frames[this.frames.length - 1] === value) {
@@ -68,27 +83,22 @@ export class EntropyData {
 }
 
 const EntropyCanvas = (props: CanvasProps) => {
-  const {sizeX, sizeY, onProgress, css, min_duration, min_frames, ...rest} = props;
+  const {sizeX, sizeY, onProgress, css, min_entropy_bits, min_frames, ...rest} = props;
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [percent, setPercent] = useState(0);
-  const [lastFramesCount, setLastFramesCount] = useState(0);
-  const [timedPercent, setTimePercent] = useState(0);
   const [entropy] = useState<EntropyData>(new EntropyData());
   const [previousPoint, setPreviousPoint] = useState<EntropyFrame | null>(null);
   const [lastPoint, setLastPoint] = useState<EntropyFrame | null>(null);
 
   const {clearInterval, startInterval, pauseInterval} = usePausableInterval(() => {
-    if (lastFramesCount != entropy.length) {
-      setTimePercent(timedPercent => timedPercent + 1);
-      setLastFramesCount(entropy.length);
-      setPercent(Math.ceil(Math.min(timedPercent, (100 * entropy.length) / min_frames)));
-    }
+    setPercent(Math.ceil(100 * Math.min(entropy.entropyBits / min_entropy_bits, entropy.length / min_frames)));
     onProgress(entropy, percent, false);
-  }, min_duration * 10); // = duration / 100 * 1000
+  }, 100);
 
   useEffect(() => {
     if (percent >= 100) {
       clearInterval();
+      onProgress(entropy, percent, false);
     }
   }, [clearInterval, percent]);
 

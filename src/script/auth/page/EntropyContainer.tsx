@@ -79,7 +79,7 @@ const EntropyContainer = ({onSetEntropy}: Props) => {
             sizeX={256}
             sizeY={256}
             onProgress={onProgress}
-            min_duration={30}
+            min_entropy_bits={3000}
             min_frames={300}
           />
           <ProgressBar error={!!pause} width={256} percent={percent} />
