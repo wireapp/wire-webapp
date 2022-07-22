@@ -3,6 +3,22 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [29.0.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/compare/@wireapp/core@28.7.1...@wireapp/core@29.0.0) (2022-07-22)
+
+
+### Features
+
+* **core:** prepare conversationService addUsers() for MLS and Proteus Versions, clean up code, fix scripts (FS-815) ([#4339](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/issues/4339)) ([8f1aeec](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/commit/8f1aeecf3391052ca741419577e1e11a393eab39))
+
+
+### BREAKING CHANGES
+
+* **core:** * The addUser() function in ConversationService.ts has been renamed to addUsers(), and its API changed in preparation for the MLS and Proteus split.
+
+
+
+
+
 ## [28.7.1](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/compare/@wireapp/core@28.7.0...@wireapp/core@28.7.1) (2022-07-20)
 
 **Note:** Version bump only for package @wireapp/core
