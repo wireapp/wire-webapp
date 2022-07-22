@@ -47,9 +47,13 @@ export abstract class MessageHandler {
 
   abstract handleEvent(payload: PayloadBundle | ConversationEvent | UserEvent | TeamEvent): void;
 
-  async addUser(conversationId: QualifiedId, userId: string): Promise<void> {
+  async addUser(conversationId: QualifiedId, userId: string) {
     if (this.account?.service) {
-      await this.account.service.conversation.addUser(conversationId, userId);
+      await this.account.service.conversation.addUsers({
+        conversationId,
+        userIds: [{domain: '', id: userId}],
+        protocol: ConversationProtocol.PROTEUS,
+      });
     }
   }
 

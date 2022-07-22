@@ -33,7 +33,7 @@ import {
   ConversationTypingData,
 } from '@wireapp/api-client/src/conversation/data';
 import {ConversationMapper} from './ConversationMapper';
-import {PayloadBundle, PayloadBundleSource, PayloadBundleState, PayloadBundleType} from './message/PayloadBundle';
+import {PayloadBundle, PayloadBundleSource, PayloadBundleState, PayloadBundleType} from '../message/PayloadBundle';
 
 describe('ConversationMapper', () => {
   describe('"mapConversationEvent"', () => {

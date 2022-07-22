@@ -63,14 +63,14 @@ import {
   PayloadBundleSource,
   PayloadBundleState,
   PayloadBundleType,
-} from '../conversation/';
-import type {ClearedContent, DeletedContent, HiddenContent, RemoteData} from '../conversation/content/';
-import type {CryptographyService} from '../cryptography/';
-import {decryptAsset} from '../cryptography/AssetCryptography';
-import {isStringArray, isQualifiedIdArray, isQualifiedUserClients, isUserClients} from '../util/TypePredicateUtil';
-import {MessageBuilder} from './message/MessageBuilder';
-import {MessageService} from './message/MessageService';
-import {MessageToProtoMapper} from './message/MessageToProtoMapper';
+} from '../../conversation/';
+import type {ClearedContent, DeletedContent, HiddenContent, RemoteData} from '../../conversation/content/';
+import type {CryptographyService} from '../../cryptography/';
+import {decryptAsset} from '../../cryptography/AssetCryptography';
+import {isStringArray, isQualifiedIdArray, isQualifiedUserClients, isUserClients} from '../../util/TypePredicateUtil';
+import {MessageBuilder} from '../message/MessageBuilder';
+import {MessageService} from '../message/MessageService';
+import {MessageToProtoMapper} from '../message/MessageToProtoMapper';
 import type {
   ButtonActionConfirmationMessage,
   ButtonActionMessage,
@@ -91,111 +91,17 @@ import type {
   ReactionMessage,
   ResetSessionMessage,
   TextMessage,
-} from './message/OtrMessage';
+} from '../message/OtrMessage';
 import {XOR} from '@wireapp/commons/src/main/util/TypeUtil';
-import type {NotificationService} from '../notification';
-
-export enum MessageTargetMode {
-  NONE,
-  USERS,
-  USERS_CLIENTS,
-}
-
-interface SendCommonParams<T> {
-  /**
-   * The protocol to use to send the message (MLS or Proteus)
-   */
-  protocol: ConversationProtocol;
-  /**
-   * The message to send to the conversation
-   */
-  payload: T;
-  onStart?: (message: GenericMessage) => void | boolean | Promise<boolean>;
-  onSuccess?: (message: GenericMessage, sentTime?: string) => void;
-}
-
-function isMLS<T>(params: SendProteusMessageParams<T> | SendMlsMessageParams<T>): params is SendMlsMessageParams<T> {
-  return params.protocol === ConversationProtocol.MLS;
-}
-
-type SendProteusMessageParams<T> = SendCommonParams<T> &
-  MessageSendingOptions & {
-    /**
-     * Can be either a QualifiedId[], string[], UserClients or QualfiedUserClients. The type has some effect on the behavior of the method. (Needed only for Proteus)
-     *    When given a QualifiedId[] or string[] the method will fetch the freshest list of devices for those users (since they are not given by the consumer). As a consequence no ClientMismatch error will trigger and we will ignore missing clients when sending
-     *    When given a QualifiedUserClients or UserClients the method will only send to the clients listed in the userIds. This could lead to ClientMismatch (since the given list of devices might not be the freshest one and new clients could have been created)
-     *    When given a QualifiedId[] or QualifiedUserClients the method will send the message through the federated API endpoint
-     *    When given a string[] or UserClients the method will send the message through the old API endpoint
-     */
-    userIds?: string[] | QualifiedId[] | UserClients | QualifiedUserClients;
-    onClientMismatch?: (
-      status: ClientMismatch | MessageSendingStatus,
-      wasSent: boolean,
-    ) => void | boolean | Promise<boolean>;
-  };
-
-type SendMlsMessageParams<T> = SendCommonParams<T> & {
-  /**
-   * The groupId of the conversation to send the message to (Needed only for MLS)
-   */
-  groupId: string;
-};
-
-interface MessageSendingOptions {
-  /**
-   * The federated domain the server runs on. Should only be set for federation enabled envs
-   */
-  conversationDomain?: string;
-
-  /**
-   * can be either a QualifiedId[] or QualfiedUserClients or undefined. The type has some effect on the behavior of the method.
-   *    When given undefined the method will fetch both the members of the conversations and their devices. No ClientMismatch can happen in that case
-   *    When given a QualifiedId[] the method will fetch the freshest list of devices for those users (since they are not given by the consumer). As a consequence no ClientMismatch error will trigger and we will ignore missing clients when sending
-   *    When given a QualifiedUserClients the method will only send to the clients listed in the userIds. This could lead to ClientMismatch (since the given list of devices might not be the freshest one and new clients could have been created)
-   */
-  userIds?: string[] | QualifiedId[] | UserClients | QualifiedUserClients;
-
-  /**
-   * Will send the message as a protobuf payload
-   */
-  sendAsProtobuf?: boolean;
-  nativePush?: boolean;
-
-  /**
-   * Will be called whenever there is a clientmismatch returned from the server. Needs to be combined with a userIds of type QualifiedUserClients
-   */
-  onClientMismatch?: MessageSendingCallbacks['onClientMismatch'];
-
-  /**
-   * Defines the behavior to use when a mismatch happens on backend side:
-   *     - NONE -> Not a targetted message, we want to send to all the users/clients in the conversation. Will report all missing users and clients (default mode)
-   *     - USERS -> A message targetted to all the clients of the given users (according to params.userIds). Will ignore missing users and only report missing clients for the given params.userIds
-   *     - USERS_CLIENTS -> A message targetted at some specific clients of specific users (according to params.userIds). Will force sending the message even if users or clients are missing
-   */
-  targetMode?: MessageTargetMode;
-}
-
-export interface MessageSendingCallbacks {
-  /**
-   * Will be called before a message is actually sent. Returning 'false' will prevent the message from being sent
-   * @param message The message being sent
-   * @return true or undefined if the message should be sent, false if the message sending should be cancelled
-   */
-  onStart?: (message: GenericMessage) => void | boolean | Promise<boolean>;
-
-  onSuccess?: (message: GenericMessage, sentTime?: string) => void;
-  /**
-   * Called whenever there is a clientmismatch returned from the server. Will also indicate the sending status of the message (if it was already sent or not)
-   *
-   * @param status The mismatch info
-   * @param wasSent Indicate whether the message was already sent or if it can still be canceled
-   * @return
-   */
-  onClientMismatch?: (
-    status: ClientMismatch | MessageSendingStatus,
-    wasSent: boolean,
-  ) => void | boolean | Promise<boolean>;
-}
+import type {NotificationService} from '../../notification';
+import {
+  AddUsersParams,
+  MessageSendingCallbacks,
+  MessageSendingOptions,
+  MessageTargetMode,
+  SendMlsMessageParams,
+  SendProteusMessageParams,
+} from './ConversationService.types';
 
 export class ConversationService {
   public readonly messageTimer: MessageTimer;
@@ -1080,15 +986,20 @@ export class ConversationService {
     return (await request.response).buffer;
   }
 
-  public async addUser(
-    conversationId: QualifiedId,
-    userIds: string | string[] | QualifiedId | QualifiedId[],
-  ): Promise<QualifiedId[]> {
-    const ids = Array.isArray(userIds) ? userIds : [userIds];
-    const qualifiedIds = isStringArray(ids) ? ids.map(id => ({id, domain: ''} as QualifiedId)) : (ids as QualifiedId[]);
-    await this.apiClient.api.conversation.postMembers(conversationId, qualifiedIds);
+  private async addUsersToProteusGroup({conversationId, userIds}: Omit<AddUsersParams, 'protocol'>) {
+    const response = await this.apiClient.api.conversation.postMembers(conversationId, userIds);
 
-    return qualifiedIds;
+    return response;
+  }
+
+  private async addUsersToMLSGroup({conversationId, userIds}: Omit<AddUsersParams, 'protocol'>) {
+    return console.info('addUsersToMLSGroup', conversationId, userIds);
+  }
+
+  public async addUsers({conversationId, protocol, userIds}: AddUsersParams) {
+    return protocol === ConversationProtocol.MLS
+      ? this.addUsersToMLSGroup({conversationId, userIds})
+      : this.addUsersToProteusGroup({conversationId, userIds});
   }
 
   public async removeUser(conversationId: string, userId: string): Promise<string> {
@@ -1170,9 +1081,13 @@ export class ConversationService {
    * Sends a message to a conversation
    * @return resolves with the sent message
    */
-  public async send<T extends OtrMessage>(
-    params: XOR<SendMlsMessageParams<T>, SendProteusMessageParams<T>>,
-  ): Promise<T> {
+  public async send<T extends OtrMessage>(params: XOR<SendMlsMessageParams<T>, SendProteusMessageParams<T>>) {
+    function isMLS<T>(
+      params: SendProteusMessageParams<T> | SendMlsMessageParams<T>,
+    ): params is SendMlsMessageParams<T> {
+      return params.protocol === ConversationProtocol.MLS;
+    }
+
     const {payload, onStart} = params;
     const {genericMessage, content} = this.generateGenericMessage(payload);
     if ((await onStart?.(genericMessage)) === false) {

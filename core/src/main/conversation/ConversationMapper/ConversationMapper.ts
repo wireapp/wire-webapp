@@ -19,8 +19,8 @@
 
 import {CONVERSATION_EVENT, ConversationEvent} from '@wireapp/api-client/src/event';
 
-import {MessageBuilder} from './message/MessageBuilder';
-import {PayloadBundle, PayloadBundleSource, PayloadBundleState, PayloadBundleType} from './message/PayloadBundle';
+import {MessageBuilder} from '../message/MessageBuilder';
+import {PayloadBundle, PayloadBundleSource, PayloadBundleState, PayloadBundleType} from '../message/PayloadBundle';
 
 export class ConversationMapper {
   public static mapConversationEvent(event: ConversationEvent, source: PayloadBundleSource): PayloadBundle {
