@@ -20,7 +20,7 @@
 import {Button, CheckRoundIcon, ContainerXS, H1, Muted, Text} from '@wireapp/react-ui-kit';
 import React, {useState} from 'react';
 
-import {historyInfoStrings, setEntropyStrings} from '../../strings';
+import {setEntropyStrings} from '../../strings';
 import {useIntl} from 'react-intl';
 import EntropyCanvas, {EntropyData} from '../component/EntropyCanvas';
 
@@ -65,7 +65,7 @@ const EntropyContainer = ({onSetEntropy}: Props) => {
               }
             }}
           >
-            {_(historyInfoStrings.ok)}
+            {_(setEntropyStrings.continue)}
           </Button>
         </>
       ) : (
