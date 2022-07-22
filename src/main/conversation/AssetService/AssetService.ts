@@ -21,8 +21,8 @@ import type {APIClient} from '@wireapp/api-client';
 import type {AssetOptions} from '@wireapp/api-client/src/asset';
 import type {ProgressCallback, RequestCancelable} from '@wireapp/api-client/src/http';
 
-import type {EncryptedAssetUploaded} from '../cryptography/';
-import {encryptAsset} from '../cryptography/AssetCryptography';
+import type {EncryptedAssetUploaded} from '../../cryptography';
+import {encryptAsset} from '../../cryptography/AssetCryptography';
 
 export interface AssetDataV4 {
   assetKey: string;

@@ -23,14 +23,15 @@ import {ClientType} from '@wireapp/api-client/src/client';
 import {ConversationProtocol} from '@wireapp/api-client/src/conversation';
 import {LegalHoldStatus} from '@wireapp/protocol-messaging';
 import {MemoryEngine} from '@wireapp/store-engine';
-import {ConversationService, MessageTargetMode, PayloadBundleSource, PayloadBundleState, PayloadBundleType} from '.';
+import {ConversationService, PayloadBundleSource, PayloadBundleState, PayloadBundleType} from '../';
 
-import {CryptographyService} from '../cryptography';
-import {NotificationService} from '../notification';
-import * as PayloadHelper from '../test/PayloadHelper';
-import {LinkPreviewUploadedContent, MentionContent, QuoteContent} from './content';
-import {MessageBuilder} from './message/MessageBuilder';
-import {OtrMessage} from './message/OtrMessage';
+import {CryptographyService} from '../../cryptography';
+import {NotificationService} from '../../notification';
+import * as PayloadHelper from '../../test/PayloadHelper';
+import {LinkPreviewUploadedContent, MentionContent, QuoteContent} from '../content';
+import {MessageTargetMode} from './ConversationService.types';
+import {MessageBuilder} from '../message/MessageBuilder';
+import {OtrMessage} from '../message/OtrMessage';
 
 describe('ConversationService', () => {
   beforeAll(() => {
