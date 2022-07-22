@@ -76,13 +76,13 @@ const EntropyContainer = ({onSetEntropy}: Props) => {
           <EntropyCanvas
             css={{border: pause ? 'red 2px solid' : 'black 2px solid'}}
             data-uie-name="element-entropy-canvas"
-            sizeX={256}
-            sizeY={256}
+            sizeX={512}
+            sizeY={512}
             onProgress={onProgress}
             min_entropy_bits={3000}
             min_frames={300}
           />
-          <ProgressBar error={!!pause} width={256} percent={percent} />
+          <ProgressBar error={!!pause} width={512} percent={percent} />
           <Text data-uie-name="element-entropy-percent" center>
             {percent}%
           </Text>

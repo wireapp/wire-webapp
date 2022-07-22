@@ -138,11 +138,15 @@ const EntropyCanvas = (props: CanvasProps) => {
 
   const onMouseMove = (event: MouseEvent<HTMLCanvasElement>) => {
     startInterval();
+    const boundingRect = event.currentTarget?.getBoundingClientRect();
     const newEntropy: EntropyFrame = {
-      x: event.pageX - event.currentTarget?.getBoundingClientRect()?.x,
-      y: event.pageY - event.currentTarget?.getBoundingClientRect()?.y,
+      x: event.pageX - boundingRect.x,
+      y: event.pageY - boundingRect.y,
     };
-    entropy.addFrame(newEntropy);
+    entropy.addFrame({
+      x: (255 * newEntropy.x) / boundingRect.width,
+      y: (255 * newEntropy.y) / boundingRect.height,
+    });
     setPreviousPoint(lastPoint);
     setLastPoint(newEntropy);
   };
