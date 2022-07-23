@@ -2,7 +2,7 @@
   "dependencies": {
     "@types/node": "*",
     "@wireapp/core": "29.0.0",
-    "file-type": "16.5.2",
+    "file-type": "16.5.4",
     "uuidjs": "4.2.8"
   },
   "devDependencies": {
