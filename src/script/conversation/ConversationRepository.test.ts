@@ -88,7 +88,7 @@ describe('ConversationRepository', () => {
 
     return testFactory.exposeConversationActors().then((conversation_repository: ConversationRepository) => {
       amplify.publish(WebAppEvents.EVENT.NOTIFICATION_HANDLING_STATE, NOTIFICATION_HANDLING_STATE.WEB_SOCKET);
-      storage_service = conversation_repository['conversation_service']['storageService'];
+      storage_service = conversation_repository['conversationService']['storageService'];
 
       spyOn(testFactory.event_repository, 'injectEvent').and.returnValue(Promise.resolve({}));
       conversation_et = _generateConversation(CONVERSATION_TYPE.SELF);
