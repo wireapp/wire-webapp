@@ -29,13 +29,13 @@ interface CanvasProps {
   sizeX: number;
   sizeY: number;
   // minimum number of frames
-  min_frames: number;
+  minFrames: number;
   // minimum bits of overall estimated entropy
-  min_entropy_bits: number;
+  minEntropyBits: number;
 }
 
 const EntropyCanvas = (props: CanvasProps) => {
-  const {sizeX, sizeY, onProgress, css, min_entropy_bits, min_frames, ...rest} = props;
+  const {sizeX, sizeY, onProgress, css, minEntropyBits, minFrames, ...rest} = props;
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [percent, setPercent] = useState(0);
   const [entropy] = useState<EntropyData>(new EntropyData());
@@ -43,7 +43,7 @@ const EntropyCanvas = (props: CanvasProps) => {
   const [lastPoint, setLastPoint] = useState<EntropyFrame | null>(null);
 
   const {clearInterval, startInterval, pauseInterval} = usePausableInterval(() => {
-    setPercent(Math.floor(100 * Math.min(entropy.entropyBits / min_entropy_bits, entropy.length / min_frames)));
+    setPercent(Math.floor(100 * Math.min(entropy.entropyBits / minEntropyBits, entropy.length / minFrames)));
     onProgress(entropy, percent, false);
   }, 100);
 
@@ -92,7 +92,6 @@ const EntropyCanvas = (props: CanvasProps) => {
     startInterval();
     const boundingRect = event.currentTarget?.getBoundingClientRect();
     const drawPoint: EntropyFrame = {
-      t: 0,
       x: event.pageX - boundingRect.x,
       y: event.pageY - boundingRect.y,
     };

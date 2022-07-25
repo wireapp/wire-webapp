@@ -19,8 +19,6 @@
 
 import {EntropyData, shannonEntropy, calculateDeltaValues} from './Entropy';
 
-//import {joaatHash} from './Crypto';
-
 describe('Entropy', () => {
   describe(`Shannon entropy`, () => {
     it.each([

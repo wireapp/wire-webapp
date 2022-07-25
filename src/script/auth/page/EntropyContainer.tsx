@@ -80,8 +80,8 @@ const EntropyContainer = ({onSetEntropy}: Props) => {
             sizeX={512}
             sizeY={512}
             onProgress={onProgress}
-            min_entropy_bits={1024}
-            min_frames={300}
+            minEntropyBits={1024}
+            minFrames={300}
           />
           <ProgressBar error={!!pause} width={512} percent={percent} />
           <Text data-uie-name="element-entropy-percent" center>

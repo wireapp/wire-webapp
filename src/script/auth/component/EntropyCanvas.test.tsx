@@ -50,13 +50,7 @@ describe('EntropyCanvas', () => {
     render(
       withTheme(
         withIntl(
-          <EntropyCanvas
-            onProgress={mockOnProgress}
-            sizeX={256}
-            sizeY={256}
-            min_entropy_bits={3000}
-            min_frames={300}
-          />,
+          <EntropyCanvas onProgress={mockOnProgress} sizeX={256} sizeY={256} minEntropyBits={3000} minFrames={300} />,
         ),
       ),
     );
@@ -74,13 +68,7 @@ describe('EntropyCanvas', () => {
     render(
       withTheme(
         withIntl(
-          <EntropyCanvas
-            onProgress={mockOnProgress}
-            sizeX={256}
-            sizeY={256}
-            min_entropy_bits={3000}
-            min_frames={300}
-          />,
+          <EntropyCanvas onProgress={mockOnProgress} sizeX={256} sizeY={256} minEntropyBits={3000} minFrames={300} />,
         ),
       ),
     );

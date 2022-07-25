@@ -20,11 +20,11 @@
 export interface EntropyFrame {
   x: number;
   y: number;
-  t: number;
+  t?: number;
 }
 
 // calculate shannon entropy over a set of uint8 values
-export function shannonEntropy<T>(entropyData: Uint8Array): number {
+export function shannonEntropy(entropyData: Uint8Array): number {
   const len = entropyData.length;
   const frequencies = entropyData.reduce((freq: Map<number, number>, c: number) => {
     freq.set(c, (freq.get(c) || 0) + 1);
@@ -68,7 +68,7 @@ export class EntropyData {
       this.frames.reduce((acc: number[], val: EntropyFrame) => {
         acc.push(val.x);
         acc.push(val.y);
-        acc.push(val.t);
+        acc.push(val.t || 0);
         return acc;
       }, []),
     );
