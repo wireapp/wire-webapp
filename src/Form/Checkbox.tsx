@@ -111,7 +111,7 @@ const filterCheckboxProps = (props: CheckboxProps) => filterProps(props, ['markI
 export const Checkbox: React.FC<CheckboxProps<HTMLInputElement>> = React.forwardRef<
   HTMLInputElement,
   CheckboxProps<HTMLInputElement>
->(({id = Math.random().toString(), children, style, disabled, ...props}, ref) => (
+>(({id = Math.random().toString(), children, style, disabled, wrapperCSS = {}, ...props}, ref) => (
   <div
     css={(theme: Theme) => ({
       alignItems: 'center',
@@ -123,6 +123,7 @@ export const Checkbox: React.FC<CheckboxProps<HTMLInputElement>> = React.forward
         outline: `1px solid ${theme.general.primaryColor}`,
         outlineOffset: '0.4rem',
       },
+      ...wrapperCSS,
     })}
     style={style}
   >

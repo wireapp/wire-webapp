@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2018 Wire Swiss GmbH
+ * Copyright (C) 2022 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,21 +17,11 @@
  *
  */
 
-export * from './Button';
-export * from './ButtonLink';
-export * from './Checkbox';
-export * from './CodeInput';
-export * from './DropFileInput';
-export * from './ErrorMessage';
-export * from './Form';
-export * from './Input';
-export * from './InputBlock';
-export * from './InputSubmitCombo';
-export * from './RoundIconButton';
-export * from './Select';
-export * from './ShakeBox';
-export * from './Switch';
-export * from './TextArea';
-export * from './Tooltip';
-export * from './InputLabel';
-export * from './Select';
+import React from 'react';
+import {SVGIcon, SVGIconProps} from './SVGIcon';
+
+export const ArrowDown = ({...props}: SVGIconProps) => (
+  <SVGIcon realWidth={16} realHeight={16} {...props}>
+    <path d="M7.99963 12.5711L15.6565 4.91421L14.2423 3.5L7.99963 9.74264L1.75699 3.5L0.342773 4.91421L7.99963 12.5711Z" />
+  </SVGIcon>
+);

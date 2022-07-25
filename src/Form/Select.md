@@ -1,34 +1,37 @@
 Demo:
 
 ```js
-import {Fragment, useState} from 'react';
-import {Columns, Column, ErrorMessage, Select} from '@wireapp/react-ui-kit';
+import {Container, Columns, Column, ErrorMessage, Select} from '@wireapp/react-ui-kit';
 
-const options = [
-  {value: '1', label: 'Option 1'},
-  {value: '2', label: 'Option 2'},
-  {value: '3', label: 'Option 3'},
-  {value: '4', label: 'Option 4'},
+const selectOptions = [
+  {value: '1', label: 'Option 1 long long long long name long name to trunckate this test - should work'},
+  {value: '2', label: 'Option 2 longest name'},
+  {value: '3', label: 'Option 3', description: 'Custom description for select option'},
+  {value: '4', label: 'Option 4', isDisabled: true},
   {value: '5', label: 'Option 5'},
   {value: '6', label: 'Option 6'},
 ];
 
-const [firstSelectOption, setFirstSelectOption] = useState(options[0].value);
-const [secondSelectOption, setSecondSelectOption] = useState(null);
-const [thirdSelectOption, setThirdSelectOption] = useState(null);
-
-<Fragment>
+<Container>
   <Columns>
     <Column>Select</Column>
 
     <Column>
+      <Select label="Select" id="firstSelect" options={selectOptions} dataUieName="select" />
+    </Column>
+  </Columns>
+
+  <Columns>
+    <Column>MultiSelect</Column>
+
+    <Column>
       <Select
         label="Select"
-        id="firstSelect"
-        options={options}
-        value={firstSelectOption ? options.find(option => option.value === firstSelectOption) : null}
-        onChange={setFirstSelectOption}
-        dataUieName="select"
+        id="firstMultiSelect"
+        options={selectOptions}
+        defaultValue={[selectOptions[0], selectOptions[1]]}
+        dataUieName="firstMultipleSelect"
+        isMulti
       />
     </Column>
   </Columns>
@@ -38,10 +41,10 @@ const [thirdSelectOption, setThirdSelectOption] = useState(null);
 
     <Column>
       <Select
-        disabled
+        isDisabled
         label="Disabled select"
         id="disabledSelect"
-        options={options}
+        options={selectOptions}
         onChange={selectedOption => console.log('Selected option', selectedOption)}
         dataUieName="disabled-select"
       />
@@ -56,9 +59,7 @@ const [thirdSelectOption, setThirdSelectOption] = useState(null);
         label="Required select"
         required
         id="requiredSelect"
-        options={options}
-        value={secondSelectOption ? options.find(option => option.value === secondSelectOption) : null}
-        onChange={setSecondSelectOption}
+        options={selectOptions}
         dataUieName="required-select"
       />
     </Column>
@@ -74,12 +75,10 @@ const [thirdSelectOption, setThirdSelectOption] = useState(null);
         id="invalidSelect"
         required
         error={<ErrorMessage>Error message</ErrorMessage>}
-        options={options}
-        value={thirdSelectOption ? options.find(option => option.value === thirdSelectOption) : null}
-        onChange={setThirdSelectOption}
+        options={selectOptions}
         dataUieName="invalid-select"
       />
     </Column>
   </Columns>
-</Fragment>;
+</Container>;
 ```

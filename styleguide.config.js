@@ -37,6 +37,8 @@ module.exports = {
         'src/Form/InputBlock.tsx',
         'src/Form/RoundIconButton.tsx',
         'src/Form/InputSubmitCombo.tsx',
+        'src/Form/SelectComponents.tsx',
+        'src/Form/SelectStyles.tsx',
       ],
       name: 'Forms',
     },

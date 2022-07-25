@@ -69,6 +69,7 @@ export interface Theme {
     disabledColor?: string;
     contrastTextColor?: string;
     borderColor?: string;
+    focusedDescriptionColor?: string;
   };
 }
 
@@ -102,6 +103,7 @@ export const themes: {[themeId in THEME_ID]: Theme} = {
       disabledColor: COLOR_V2.GRAY_70,
       contrastTextColor: COLOR.WHITE,
       borderColor: COLOR_V2.GRAY_40,
+      focusedDescriptionColor: COLOR_V2.WHITE,
     },
     Checkbox: {
       background: COLOR_V2.GRAY_20,
@@ -142,6 +144,7 @@ export const themes: {[themeId in THEME_ID]: Theme} = {
       disabledColor: COLOR_V2.GRAY_60,
       contrastTextColor: COLOR.BLACK,
       borderColor: COLOR_V2.GRAY_90,
+      focusedDescriptionColor: COLOR_V2.GRAY_40,
     },
     Checkbox: {
       background: COLOR_V2.GRAY_20,

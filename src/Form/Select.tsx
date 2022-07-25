@@ -19,239 +19,52 @@
 
 /** @jsx jsx */
 import {CSSObject, jsx} from '@emotion/react';
+import {useTheme} from '@emotion/react';
+import React, {FC, ReactElement} from 'react';
+import ReactSelect from 'react-select';
+import {StylesConfig} from 'react-select/dist/declarations/src/styles';
+import {StateManagerProps} from 'react-select/dist/declarations/src/useStateManager';
 
+import {customStyles} from './SelectStyles';
+import {CustomOption, DropdownIndicator, IndicatorsContainer, Menu, ValueContainer} from './SelectComponents';
 import type {Theme} from '../Layout';
-import {filterProps} from '../util';
-import {inputStyle} from './Input';
-import React, {ReactElement, useEffect, useRef, useState} from 'react';
 import InputLabel from './InputLabel';
 
-export type SelectOption = {
+export type Option = {
   value: string | number;
   label: string;
   description?: string;
+  isDisabled?: boolean;
 };
 
-export interface SelectProps<T extends SelectOption = SelectOption> {
+interface SelectProps extends StateManagerProps<Option> {
   id: string;
-  onChange: (selectedOption: T['value']) => void;
   dataUieName: string;
-  options: T[];
-  value?: T | null;
-  helperText?: string;
-  label?: string;
-  disabled?: boolean;
-  required?: boolean;
-  markInvalid?: boolean;
-  error?: ReactElement;
+  options: Option[];
   wrapperCSS?: CSSObject;
+  label?: string;
+  helperText?: string;
+  error?: ReactElement;
+  markInvalid?: boolean;
+  required?: boolean;
+  isMulti?: boolean;
 }
 
-const ArrowDown = (
-  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
-    <path d="M7.99963 12.5711L15.6565 4.91421L14.2423 3.5L7.99963 9.74264L1.75699 3.5L0.342773 4.91421L7.99963 12.5711Z" />
-  </svg>
-);
-
-export const selectStyle: <T>(theme: Theme, props, error?: boolean) => CSSObject = (
-  theme,
-  {disabled = false, markInvalid, ...props},
-  error = false,
-) => ({
-  ...inputStyle(theme, props),
-  '&:-moz-focusring': {
-    color: 'transparent',
-    textShadow: '0 0 0 #000',
-  },
-  '&:disabled': {
-    color: theme.Select.disabledColor,
-  },
-  appearance: 'none',
-  boxShadow: markInvalid ? `0 0 0 1px ${theme.general.dangerColor}` : `0 0 0 1px ${theme.Select.borderColor}`,
-  cursor: disabled ? 'normal' : 'pointer',
-  fontSize: '16px',
-  fontWeight: 300,
-  paddingRight: '30px',
-  textAlign: 'left',
-  textOverflow: 'ellipsis',
-  overflow: 'hidden',
-  whiteSpace: 'nowrap',
-  marginBottom: error && '8px',
-  '&:invalid, option:first-of-type': {
-    color: theme.general.dangerColor,
-  },
-  ...(!disabled && {
-    '&:hover': {
-      boxShadow: `0 0 0 1px ${theme.Select.borderColor}`,
-    },
-    '&:focus, &:active': {
-      boxShadow: `0 0 0 1px ${theme.general.primaryColor}`,
-    },
-  }),
-  '& > svg': {
-    fill: disabled ? theme.Input.placeholderColor : theme.general.color,
-    position: 'absolute',
-    top: '1rem',
-    right: '1rem',
-  },
-});
-
-const dropdownStyles = (theme: Theme, isDropdownOpen: boolean): CSSObject => ({
-  height: isDropdownOpen ? 'auto' : 0,
-  visibility: isDropdownOpen ? 'visible' : 'hidden',
-  margin: '3px 0 0',
-  padding: 0,
-  borderRadius: '10px',
-  border: `1px solid ${theme.general.primaryColor}`,
-  position: 'absolute',
-  top: '100%',
-  left: 0,
-  width: '100%',
-  maxHeight: '240px',
-  overflowY: 'auto',
-  zIndex: 9,
-});
-
-const dropdownOptionStyles = (theme: Theme, isSelected: boolean): CSSObject => ({
-  background: isSelected ? theme.general.primaryColor : theme.general.backgroundColor,
-  listStyle: 'none',
-  padding: '10px 20px 14px',
-  cursor: 'pointer',
-  fontSize: '16px',
-  fontWeight: 300,
-  lineHeight: '24px',
-  letterSpacing: '0.05px',
-  color: isSelected ? theme.Select.contrastTextColor : theme.general.color,
-  '&:first-of-type': {
-    borderRadius: '10px 10px 0 0',
-  },
-  '&:last-of-type': {
-    borderRadius: '0 0 10px 10px',
-  },
-  '&:not(:last-of-type)': {
-    borderBottom: `1px solid ${theme.Select.borderColor}`,
-  },
-  '&:not(:first-of-type)': {
-    borderTop: `1px solid ${theme.Select.borderColor}`,
-  },
-  '&:hover, &:active, &:focus': {
-    background: theme.general.primaryColor,
-    borderColor: theme.general.primaryColor,
-    color: theme.Select.contrastTextColor,
-  },
-});
-
-const filterSelectProps = props => filterProps(props, ['markInvalid']);
-
-const placeholderText = '- Please select -';
-
-export const Select = <T extends SelectOption = SelectOption>({
+export const Select: FC<SelectProps> = ({
   id,
   label,
   error,
   helperText,
-  options = [],
-  value = null,
-  onChange,
-  required,
-  markInvalid,
   dataUieName,
+  options,
   wrapperCSS = {},
+  markInvalid = false,
+  required = false,
+  isMulti = false,
   ...props
-}: SelectProps<T>) => {
-  const currentOptionIdx = options.findIndex(option => option.value === value?.value);
-  const selectedOption = currentOptionIdx === -1 ? null : currentOptionIdx;
-
-  const selectContainerRef = useRef<HTMLDivElement>(null);
-  const listRef = useRef<HTMLUListElement>(null);
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-
-  const hasSelectedOption = selectedOption !== null;
+}) => {
+  const theme = useTheme();
   const hasError = !!error;
-
-  const scrollToCurrentOption = (idx: number) => {
-    if (listRef.current) {
-      const listSelectedOption = listRef.current.children[idx] as HTMLLIElement;
-      const getYPosition = listSelectedOption && listSelectedOption.offsetTop;
-
-      listRef.current.scroll({
-        top: getYPosition ?? 0,
-        behavior: 'smooth',
-      });
-    }
-  };
-
-  const onToggleDropdown = () => setIsDropdownOpen(prevState => !prevState);
-
-  const onOptionSelect = (idx: number) => {
-    onChange(options[idx].value);
-    scrollToCurrentOption(idx);
-  };
-
-  const onOptionChange = (idx: number) => {
-    onOptionSelect(idx);
-    setIsDropdownOpen(false);
-  };
-
-  const handleListKeyDown = e => {
-    switch (e.key) {
-      case 'Escape':
-        e.preventDefault();
-        setIsDropdownOpen(false);
-        break;
-      case 'ArrowUp':
-      case 'ArrowLeft':
-        if (!isDropdownOpen) {
-          setIsDropdownOpen(true);
-        }
-
-        e.preventDefault();
-        onOptionSelect(selectedOption - 1 >= 0 ? selectedOption - 1 : options.length - 1);
-        break;
-      case 'ArrowDown':
-      case 'ArrowRight':
-        if (!isDropdownOpen) {
-          setIsDropdownOpen(true);
-        }
-
-        e.preventDefault();
-        if (selectedOption === null) {
-          onOptionSelect(0);
-        } else {
-          onOptionSelect(selectedOption === options.length - 1 ? 0 : selectedOption + 1);
-        }
-        break;
-      default:
-        break;
-    }
-  };
-
-  const handleKeyDown = index => e => {
-    switch (e.key) {
-      case ' ':
-      case 'SpaceBar':
-      case 'Enter':
-        e.preventDefault();
-        onOptionChange(index);
-        break;
-      default:
-        break;
-    }
-  };
-
-  const handleOutsideClick = (event: MouseEvent) => {
-    if (selectContainerRef.current && !selectContainerRef.current.contains(event.target as Node)) {
-      setIsDropdownOpen(false);
-    }
-  };
-
-  useEffect(() => {
-    window.addEventListener('click', handleOutsideClick);
-
-    return () => {
-      window.removeEventListener('click', handleOutsideClick);
-    };
-  }, []);
 
   return (
     <div
@@ -264,82 +77,31 @@ export const Select = <T extends SelectOption = SelectOption>({
         ...wrapperCSS,
       })}
       data-uie-name={dataUieName}
-      ref={selectContainerRef}
     >
       {label && (
-        <InputLabel htmlFor={id} isRequired={required} markInvalid={markInvalid}>
+        <InputLabel htmlFor={id} markInvalid={markInvalid} isRequired={required}>
           {label}
         </InputLabel>
       )}
 
-      <div css={{position: 'relative'}}>
-        <button
-          type="button"
-          aria-activedescendant={hasSelectedOption ? value.label : ''}
-          aria-expanded={isDropdownOpen}
-          aria-haspopup="listbox"
-          aria-labelledby={id}
-          id={id}
-          onClick={onToggleDropdown}
-          onKeyDown={handleListKeyDown}
-          css={(theme: Theme) => selectStyle(theme, props, hasError)}
-          {...filterSelectProps(props)}
-          data-uie-name={dataUieName}
-          {...(hasSelectedOption && {
-            'data-value': value.value,
-          })}
-        >
-          {hasSelectedOption ? value.label : placeholderText}
-          {ArrowDown}
-        </button>
-
-        <ul
-          ref={listRef}
-          role="listbox"
-          aria-labelledby={id}
-          tabIndex={-1}
-          onKeyDown={handleListKeyDown}
-          css={(theme: Theme) => dropdownStyles(theme, isDropdownOpen)}
-          {...(dataUieName && {
-            'data-uie-name': `dropdown-${dataUieName}`,
-          })}
-        >
-          {options.map((option, index) => {
-            const isSelected = currentOptionIdx == index;
-
-            return (
-              <li
-                key={option.value}
-                id={option.value.toString()}
-                role="option"
-                aria-selected={isSelected}
-                tabIndex={0}
-                onKeyDown={handleKeyDown(index)}
-                onClick={() => onOptionChange(index)}
-                css={(theme: Theme) => dropdownOptionStyles(theme, isSelected)}
-                {...(dataUieName && {
-                  'data-uie-name': `option-${dataUieName}`,
-                  'data-uie-value': option.value,
-                })}
-              >
-                {option.label}
-
-                {option.description && (
-                  <p
-                    css={(theme: Theme) => ({
-                      marginBottom: 0,
-                      fontSize: '14px',
-                      color: isSelected ? theme.general.color : theme.Input.labelColor,
-                    })}
-                  >
-                    {option.description}
-                  </p>
-                )}
-              </li>
-            );
-          })}
-        </ul>
-      </div>
+      <ReactSelect
+        id={id}
+        styles={customStyles(theme as Theme, markInvalid) as StylesConfig}
+        components={{
+          DropdownIndicator,
+          Option: CustomOption(dataUieName),
+          Menu: Menu(dataUieName),
+          ValueContainer,
+          IndicatorsContainer,
+        }}
+        hideSelectedOptions={false}
+        isSearchable={false}
+        isClearable={false}
+        closeMenuOnSelect={!isMulti}
+        isMulti={isMulti}
+        options={options}
+        {...props}
+      />
 
       {!hasError && helperText && (
         <p css={(theme: Theme) => ({fontSize: '12px', fontWeight: 400, color: theme.Input.labelColor, marginTop: 8})}>

@@ -1,14 +1,16 @@
 Demo:
 
 ```js
-import {Fragment} from 'react';
+import {Fragment, useState} from 'react';
 import {Column, Columns, Checkbox, CheckboxLabel, Link} from '@wireapp/react-ui-kit';
+
+const [isChecked, setIsChecked] = useState(true);
 
 <Fragment>
   <Columns>
     <Column>Checkbox</Column>
     <Column>
-      <Checkbox id="ToU" checked>
+      <Checkbox id="ToU" checked={isChecked} onChange={ev => setIsChecked(ev.target.checked)}>
         <CheckboxLabel>{'ToU'}</CheckboxLabel>
       </Checkbox>
     </Column>
