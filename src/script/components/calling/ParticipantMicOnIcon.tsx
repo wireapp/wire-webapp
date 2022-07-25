@@ -38,7 +38,7 @@ interface ParticipantMicOnIconProps {
 const ParticipantMicOnIcon: React.FC<ParticipantMicOnIconProps> = ({
   className,
   isActive = false,
-  color = '#fff',
+  color = 'currentColor',
   ...props
 }) => {
   const userState = container.resolve(UserState);
