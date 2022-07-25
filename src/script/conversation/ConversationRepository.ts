@@ -450,20 +450,32 @@ export class ConversationRepository {
 
     try {
       const response = await this.core.service!.conversation.createConversation(payload);
-      const {conversationEntity} = await this.onCreate({
-        conversation: response.id,
-        data: {
-          last_event: '0.0',
-          last_event_time: '1970-01-01T00:00:00.000Z',
-          receipt_mode: undefined,
-          ...response,
-        },
-        from: this.userState.self().id,
-        qualified_conversation: response.qualified_id,
-        time: new Date().toISOString(),
-        type: CONVERSATION_EVENT.CREATE,
-      });
-      return conversationEntity as Conversation;
+      /**
+       * Todo: Event generation for MLS gets done somewhere else
+       * We need to refresh the conversation list after creating a new conversation in case of MLS
+       */
+
+      switch (payload.protocol) {
+        case ConversationProtocol.MLS:
+          return undefined;
+        case ConversationProtocol.PROTEUS:
+          const {conversationEntity} = await this.onCreate({
+            conversation: response.id,
+            data: {
+              last_event: '0.0',
+              last_event_time: '1970-01-01T00:00:00.000Z',
+              receipt_mode: undefined,
+              ...response,
+            },
+            from: this.userState.self().id,
+            qualified_conversation: response.qualified_id,
+            time: new Date().toISOString(),
+            type: CONVERSATION_EVENT.CREATE,
+          });
+          return conversationEntity as Conversation;
+        default:
+          return undefined;
+      }
     } catch (error) {
       this.handleConversationCreateError(
         error,
@@ -1350,21 +1362,35 @@ export class ConversationRepository {
    * @param userEntities Users to be added to the conversation
    * @returns Resolves when members were added
    */
-  async addUsers(conversationEntity: Conversation, userEntities: User[]) {
+  async addUsers(conversation: Conversation, userEntities: User[]) {
     const userIds = userEntities.map(userEntity => userEntity.qualifiedId);
 
     try {
-      const response = await this.core.service!.conversation.addUsers({
-        conversationId: conversationEntity,
-        protocol: ConversationProtocol.PROTEUS,
-        userIds: userIds,
-      });
-      if (response) {
-        this.eventRepository.injectEvent(response, EventRepository.SOURCE.BACKEND_RESPONSE);
+      if (conversation.groupId) {
+        const response = await this.core.service!.conversation.addUsers(
+          conversation.qualifiedId,
+          userIds,
+          conversation.groupId,
+        );
+        const selfId = conversation.selfUser()?.qualifiedId;
+        /**
+         * Todo: Event generation for MLS gets done somewhere else
+         * We need to refresh the conversation list after adding the user
+         */
+
+        if (response && selfId) {
+          // const event = EventBuilder.buildMemberJoin(conversation, selfId, userIds);
+          // this.eventRepository.injectEvent(event);
+        }
+      } else {
+        const response = await this.core.service!.conversation.addUsers(conversation.qualifiedId, userIds);
+        if (response) {
+          this.eventRepository.injectEvent(response, EventRepository.SOURCE.BACKEND_RESPONSE);
+        }
       }
     } catch (error) {
       if (error instanceof BackendClientError) {
-        this.handleAddToConversationError(error, conversationEntity, userIds);
+        this.handleAddToConversationError(error, conversation, userIds);
       }
     }
   }
