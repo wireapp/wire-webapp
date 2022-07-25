@@ -17,6 +17,8 @@
  *
  */
 
+import {CSSObject} from '@emotion/react';
+
 export const noop = () => {};
 
 export const inlineSVG = (svg: string) => `data:image/svg+xml;utf8,${encodeURIComponent(svg)}`;
@@ -30,3 +32,9 @@ export const filterProps: <T extends Record<string, any>>(props: T, propsToFilte
     {},
   );
 };
+
+export const manySelectors = (selectors: string[], css: CSSObject) =>
+  selectors.reduce((acc, selector) => {
+    acc[selector] = css;
+    return acc;
+  }, {});

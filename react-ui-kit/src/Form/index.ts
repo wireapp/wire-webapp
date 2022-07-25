@@ -27,6 +27,7 @@ export * from './Form';
 export * from './Input';
 export * from './InputBlock';
 export * from './InputSubmitCombo';
+export * from './RangeInput';
 export * from './RoundIconButton';
 export * from './Select';
 export * from './ShakeBox';
