@@ -145,7 +145,7 @@
 
   margin-top: 2px;
   margin-right: 4px;
-  color: var(--gray-90);
+  color: var(--background);
 
   &--active {
     color: var(--white);
@@ -154,7 +154,9 @@
 
 body.theme-dark {
   .conversation-list-cell-description {
-    color: var(--gray-20);
+    &--active {
+      color: var(--black);
+    }
   }
   .conversation-list-cell-name {
     &--active {
