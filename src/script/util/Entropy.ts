@@ -20,6 +20,7 @@
 export interface EntropyFrame {
   x: number;
   y: number;
+  t: number;
 }
 
 // calculate shannon entropy over a set of uint8 values
@@ -67,6 +68,7 @@ export class EntropyData {
       this.frames.reduce((acc: number[], val: EntropyFrame) => {
         acc.push(val.x);
         acc.push(val.y);
+        acc.push(val.t);
         return acc;
       }, []),
     );
