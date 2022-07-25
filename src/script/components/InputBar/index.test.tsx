@@ -17,56 +17,90 @@
  *
  */
 
-// eslint-disable jest/no-commented-out-tests
-// TODO: Write tests
-// import {createRandomUuid} from 'Util/util';
-//
-// import {User} from 'src/script/entity/User';
-// import {InputBarViewModel} from 'src/script/view_model/content/InputBarViewModel';
-// import {Config} from 'src/script/Config';
-// import {TestFactory} from '../../../../test/helper/TestFactory';
-//
-// describe('InputBarViewModel', () => {
-//   const testFactory = new TestFactory();
-//   let viewModel;
-//
-//   beforeAll(() => {
-//     testFactory.exposeSearchActors().then(() => testFactory.exposeConversationActors());
-//     spyOn(Config, 'getConfig').and.returnValue({
-//       ALLOWED_IMAGE_TYPES: [],
-//       FEATURE: {ALLOWED_FILE_UPLOAD_EXTENSIONS: ['*']},
-//     });
-//   });
-//
-//   beforeEach(() => {
-//     viewModel = new InputBarViewModel(
-//       undefined,
-//       testFactory.assetRepository,
-//       testFactory.event_repository,
-//       testFactory.conversation_repository,
-//       testFactory.search_repository,
-//       testFactory.storage_repository,
-//       testFactory.user_repository,
-//     );
-//   });
-//
-//   describe('_createMentionEntity', () => {
-//     it('matches multibyte characters in mentioned user names', () => {
-//       const selectionStart = 5;
-//       const selectionEnd = 5;
-//       const inputValue = 'Hi @n';
-//       const userName = 'nqa1👨‍👩‍👧‍👦👨‍👩‍👦‍👦👨‍👩‍👧‍👧';
-//
-//       const mentionCandidate = viewModel.getMentionCandidate(selectionStart, selectionEnd, inputValue);
-//       viewModel.editedMention(mentionCandidate);
-//
-//       const userEntity = new User(createRandomUuid());
-//       userEntity.name(userName);
-//
-//       const mentionEntity = viewModel._createMentionEntity(userEntity);
-//
-//       expect(mentionEntity.startIndex).toBe(3);
-//       expect(mentionEntity.length).toBe(38);
-//     });
-//   });
-// });
+import {act, fireEvent, render, waitFor} from '@testing-library/react';
+import {createRandomUuid} from 'Util/util';
+
+import {Config} from 'src/script/Config';
+import {TestFactory} from '../../../../test/helper/TestFactory';
+import {UserState} from '../../user/UserState';
+import {TeamState} from '../../team/TeamState';
+import {AssetRepository} from '../../assets/AssetRepository';
+import {AssetService} from '../../assets/AssetService';
+import {Conversation} from '../../entity/Conversation';
+import {ConversationRepository} from '../../conversation/ConversationRepository';
+import {EventRepository} from '../../event/EventRepository';
+import {SearchRepository} from '../../search/SearchRepository';
+import {StorageRepository} from '../../storage';
+import InputBar from 'Components/InputBar/index';
+import {EmojiInputViewModel} from '../../view_model/content/EmojiInputViewModel';
+import {MessageRepository} from '../../conversation/MessageRepository';
+import {User} from '../../entity/User';
+
+const testFactory = new TestFactory();
+let conversationRepository: ConversationRepository;
+let eventRepository: EventRepository;
+let searchRepository: SearchRepository;
+let storageRepository: StorageRepository;
+
+beforeAll(() => {
+  testFactory.exposeConversationActors().then(factory => {
+    conversationRepository = factory;
+    return conversationRepository;
+  });
+
+  testFactory.exposeEventActors().then(factory => {
+    eventRepository = factory;
+    return eventRepository;
+  });
+
+  testFactory.exposeSearchActors().then(factory => {
+    searchRepository = factory;
+    return searchRepository;
+  });
+
+  testFactory.exposeStorageActors().then(factory => {
+    storageRepository = factory;
+    return storageRepository;
+  });
+
+  spyOn(Config, 'getConfig').and.returnValue({
+    ALLOWED_IMAGE_TYPES: [],
+    FEATURE: {ALLOWED_FILE_UPLOAD_EXTENSIONS: ['*']},
+  });
+});
+
+const getDefaultProps = () => ({
+  assetRepository: new AssetRepository(new AssetService()),
+  conversationEntity: new Conversation(createRandomUuid()),
+  conversationRepository,
+  emojiInput: {} as EmojiInputViewModel,
+  eventRepository,
+  messageRepository: {} as MessageRepository,
+  searchRepository,
+  storageRepository,
+  teamState: new TeamState(),
+  userState: {
+    self: () => new User('id'),
+  } as UserState,
+});
+
+describe('InputBar', () => {
+  const testMessage = 'Write custom text message';
+
+  it('has passed value', async () => {
+    const promise = Promise.resolve();
+    const props = getDefaultProps();
+    const {container} = render(<InputBar {...props} />);
+    await act(() => promise);
+
+    const textArea = await container.querySelector('textarea[data-uie-name="input-message"]');
+
+    if (textArea) {
+      fireEvent.change(textArea, {target: {value: testMessage}});
+    }
+
+    await waitFor(() => {
+      expect((textArea as HTMLTextAreaElement).value).toBe(testMessage);
+    });
+  });
+});

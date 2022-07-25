@@ -92,7 +92,8 @@ const Avatar: React.FunctionComponent<AvatarProps> = ({
     'isCanceled',
     'isUnknown',
   ]);
-  const isMe = (participant as User).isMe;
+
+  const isMe = (participant as User)?.isMe;
 
   const clickHandler = (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
     if (event.currentTarget.parentNode) {

@@ -1,7 +1,7 @@
 <div
   id="conversation"
   class="conversation"
-  data-bind="drop_file: $root.inputBar.onDropFiles, css: { loading: !$root.messageList.conversationLoaded() }"
+  data-bind="css: { loading: !$root.messageList.conversationLoaded() }"
 >
   <!-- ko if: $root.conversationRepository.conversationState.activeConversation() -->
   <title-bar

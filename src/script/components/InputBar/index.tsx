@@ -19,7 +19,16 @@
 
 import {Availability} from '@wireapp/protocol-messaging';
 import {WebAppEvents} from '@wireapp/webapp-events';
-import {ClipboardEvent, FC, KeyboardEvent, useCallback, useEffect, useMemo, useRef, useState} from 'react';
+import {
+  ClipboardEvent,
+  FC,
+  KeyboardEvent as ReactKeyboardEvent,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import {amplify} from 'amplify';
 import cx from 'classnames';
 import {container} from 'tsyringe';
@@ -29,7 +38,18 @@ import ClassifiedBar from 'Components/input/ClassifiedBar';
 import Avatar, {AVATAR_SIZE} from 'Components/Avatar';
 
 import {registerReactComponent, useKoSubscribableChildren} from 'Util/ComponentUtil';
-import {insertAtCaret, isFunctionKey, KEY} from 'Util/KeyboardUtil';
+import {
+  insertAtCaret,
+  isArrowKey,
+  isEnterKey,
+  isFunctionKey,
+  isMetaKey,
+  isPageUpDownKey,
+  isPasteAction,
+  isSpaceKey,
+  isTabKey,
+  KEY,
+} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
 import {afterRender, formatBytes} from 'Util/util';
 import {formatLocale, TIME_IN_MILLIS} from 'Util/TimeUtil';
@@ -298,11 +318,7 @@ const InputBar: FC<InputBarProps> = ({
     return isHittingUploadLimit;
   };
 
-  const sendPastedFile = () => {
-    if (!pastedFile) {
-      return;
-    }
-
+  const onDropOrPastedFile = (droppedFiles: File[]) => {
     const images: File[] = [];
     const files: File[] = [];
 
@@ -312,13 +328,13 @@ const InputBar: FC<InputBarProps> = ({
       return;
     }
 
-    const tooManyConcurrentUploads = _isHittingUploadLimit([pastedFile]);
+    const tooManyConcurrentUploads = _isHittingUploadLimit(droppedFiles);
 
     if (tooManyConcurrentUploads) {
       return;
     }
 
-    Array.from([pastedFile]).forEach((file): void | number => {
+    Array.from(droppedFiles).forEach((file): void | number => {
       const isSupportedImage = CONFIG.ALLOWED_IMAGE_TYPES.includes(file.type);
 
       if (isSupportedImage) {
@@ -330,6 +346,14 @@ const InputBar: FC<InputBarProps> = ({
 
     uploadImages(images);
     uploadFiles(files);
+  };
+
+  const sendPastedFile = () => {
+    if (!pastedFile) {
+      return;
+    }
+
+    onDropOrPastedFile([pastedFile]);
 
     clearPastedFile();
   };
@@ -520,7 +544,7 @@ const InputBar: FC<InputBarProps> = ({
     updateSelectionState();
   }, [updateSelectionState]);
 
-  const updateMentions = (event: KeyboardEvent<HTMLTextAreaElement>) => {
+  const updateMentions = (event: ReactKeyboardEvent<HTMLTextAreaElement>) => {
     const textarea = event.currentTarget;
     const value = textarea.value;
     const previousValue = inputValue;
@@ -535,7 +559,7 @@ const InputBar: FC<InputBarProps> = ({
     }
   };
 
-  const onTextAreaKeyDown = (keyboardEvent: KeyboardEvent<HTMLTextAreaElement>): void | boolean => {
+  const onTextAreaKeyDown = (keyboardEvent: ReactKeyboardEvent<HTMLTextAreaElement>): void | boolean => {
     const inputHandledByEmoji = !editedMention && emojiInput.onInputKeyDown(keyboardEvent);
 
     if (!inputHandledByEmoji) {
@@ -586,7 +610,7 @@ const InputBar: FC<InputBarProps> = ({
     }
   };
 
-  const onTextareaKeyUp = (keyboardEvent: KeyboardEvent<HTMLTextAreaElement>): void => {
+  const onTextareaKeyUp = (keyboardEvent: ReactKeyboardEvent<HTMLTextAreaElement>): void => {
     if (!editedMention) {
       emojiInput.onInputKeyUp(keyboardEvent);
     }
@@ -610,7 +634,7 @@ const InputBar: FC<InputBarProps> = ({
     return remainingMentions;
   };
 
-  const onChange = (e: KeyboardEvent<HTMLTextAreaElement>) => {
+  const onChange = (e: ReactKeyboardEvent<HTMLTextAreaElement>) => {
     e.preventDefault();
 
     setInputValue(e.currentTarget.value);
@@ -893,8 +917,14 @@ const InputBar: FC<InputBarProps> = ({
 
     if (conversationEntity) {
       const previousSessionData = await _loadDraftState(conversationEntity);
-      setInputValue(previousSessionData.text);
-      setCurrentMentions(previousSessionData.mentions);
+      if (previousSessionData?.text) {
+        setInputValue(previousSessionData.text);
+      }
+
+      if (previousSessionData?.mentions.length > 0) {
+        setCurrentMentions(previousSessionData.mentions);
+      }
+
       updateSelectionState();
 
       if (previousSessionData.replyEntityPromise) {
@@ -1037,14 +1067,72 @@ const InputBar: FC<InputBarProps> = ({
     return () => undefined;
   }, []);
 
+  // Temporarily functionality for dropping files on conversation container
+  useEffect(() => {
+    const getConversationContainer = document.querySelector('#conversation');
+
+    const onDragOver = (event: Event) => event.preventDefault();
+
+    const onDropFiles = (event: Event) => {
+      event.preventDefault();
+
+      const {dataTransfer} = event as DragEvent;
+      const eventDataTransfer = dataTransfer || {};
+      const files = (eventDataTransfer as DataTransfer).files || new FileList();
+
+      if (files.length > 0) {
+        onDropOrPastedFile([files[0]]);
+      }
+    };
+
+    if (getConversationContainer) {
+      getConversationContainer.addEventListener('drop', onDropFiles);
+      getConversationContainer.addEventListener('dragover', onDragOver);
+
+      return () => {
+        getConversationContainer.removeEventListener('drop', onDropFiles);
+        getConversationContainer.removeEventListener('dragover', onDragOver);
+      };
+    }
+
+    return () => undefined;
+  }, []);
+
+  const handleFocusTextarea = (event: KeyboardEvent) => {
+    const detailViewModal = document.querySelector('#detail-view');
+
+    if (detailViewModal?.classList.contains('modal-show')) {
+      return;
+    }
+
+    const isActiveInputElement =
+      document.activeElement && ['INPUT', 'TEXTAREA'].includes(document.activeElement.tagName);
+    const isPageupDownKeyPressed = isPageUpDownKey(event);
+
+    if (isPageupDownKeyPressed) {
+      (document.activeElement as HTMLElement).blur();
+    } else if (
+      !isActiveInputElement &&
+      !isArrowKey(event) &&
+      !isTabKey(event) &&
+      !isEnterKey(event) &&
+      !isSpaceKey(event) &&
+      !isFunctionKey(event)
+    ) {
+      if (!isMetaKey(event) || isPasteAction(event)) {
+        focusTextArea();
+      }
+    }
+  };
+
   // TODO: Add on keydown for automatically textarea focus
-  // useEffect(() => {
-  //   document.addEventListener('keydown', focusTextArea);
-  //
-  //   return () => {
-  //     document.removeEventListener('keydown', focusTextArea);
-  //   };
-  // }, []);
+  useEffect(() => {
+    window.addEventListener('keydown', handleFocusTextarea);
+
+    return () => {
+      window.removeEventListener('keydown', handleFocusTextarea);
+    };
+  }, []);
 
   return (
     <div id="conversation-input-bar" className="conversation-input-bar">

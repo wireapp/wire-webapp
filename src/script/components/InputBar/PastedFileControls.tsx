@@ -20,6 +20,7 @@
 import {FC, useMemo} from 'react';
 import Icon from 'Components/Icon';
 import {Config} from '../../Config';
+import {t} from 'Util/LocalizerUtil';
 
 interface PastedFileControlsProps {
   pastedFile: File;
@@ -58,15 +59,26 @@ const PastedFileControls: FC<PastedFileControlsProps> = ({pastedFile, onClear, o
             <Icon.File />
           </span>
         )}
+
         <span>{pastedFile.name}</span>
       </div>
 
       <div className="controls-right">
-        <button type="button" className="conversation-input-bar-paste-cancel button-icon-large" onClick={onClear}>
+        <button
+          type="button"
+          className="conversation-input-bar-paste-cancel button-icon-large"
+          onClick={onClear}
+          aria-label={t('pastedFileCloseMessage')}
+        >
           <Icon.Close />
         </button>
 
-        <button type="button" className="conversation-input-bar-paste-send" onClick={onSend}>
+        <button
+          type="button"
+          className="conversation-input-bar-paste-send"
+          onClick={onSend}
+          aria-label={t('pastedFileSendMessage')}
+        >
           <Icon.Send />
         </button>
       </div>

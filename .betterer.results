@@ -340,7 +340,7 @@ exports[`stricter compilation`] = {
     ],
     "src/script/auth/page/Login.tsx:2417473152": [
       [172, 24, 16, "Argument of type \'Error[]\' is not assignable to parameter of type \'SetStateAction<never[]>\'.", "2735526245"],
-      [174, 50, 10, "Type \'ClientType | undefined\' is not assignable to type \'ClientType\'.", "3013398820"],
+      [174, 50, 10, "Type \'ClientType | undefined\' is not assignable to type \'ClientType\'.\\n  Type \'undefined\' is not assignable to type \'ClientType\'.", "3013398820"],
       [203, 56, 10, "Type \'ClientType | undefined\' is not assignable to type \'ClientType\'.", "3013398820"],
       [205, 32, 11, "Argument of type \'string | undefined\' is not assignable to parameter of type \'string\'.\\n  Type \'undefined\' is not assignable to type \'string\'.", "2331572484"],
       [210, 36, 5, "Argument of type \'unknown\' is not assignable to parameter of type \'SetStateAction<string>\'.", "165548477"],
@@ -2560,21 +2560,17 @@ exports[`stricter compilation`] = {
       [51, 4, 22, "Type \'Observable<false>\' is not assignable to type \'Observable<boolean>\'.", "2603921936"],
       [89, 31, 43, "Object is possibly \'null\'.", "1853768633"]
     ],
-    "src/script/view_model/bindings/CommonBindings.ts:3939643793": [
-      [44, 6, 32, "Object is possibly \'null\'.", "3763860455"],
-      [83, 63, 13, "Object is possibly \'null\'.", "115063321"],
-      [83, 86, 13, "Object is possibly \'null\'.", "115063321"],
-      [97, 31, 38, "Type \'File | null\' is not assignable to type \'BlobPart\'.\\n  Type \'null\' is not assignable to type \'BlobPart\'.", "2527675968"],
-      [254, 24, 4, "\'this\' implicitly has type \'any\' because it does not have a type annotation.", "2087959715"],
-      [279, 10, 40, "Object is possibly \'null\'.", "525534827"],
-      [280, 29, 4, "\'this\' implicitly has type \'any\' because it does not have a type annotation.", "2087959715"],
-      [285, 30, 4, "Argument of type \'null\' is not assignable to parameter of type \'string | number | string[] | ((this: EventTarget, index: number, value: string) => string)\'.", "2087897566"],
-      [327, 10, 5, "Type \'undefined\' is not assignable to type \'HTMLImageElement\'.", "178823234"],
-      [336, 10, 12, "Type \'undefined\' is not assignable to type \'((this: GlobalEventHandlers, ev: Event) => any) | null\'.", "1696577579"],
-      [379, 6, 3, "Object is possibly \'null\'.", "193416522"],
-      [380, 6, 3, "Object is possibly \'null\'.", "193416522"],
-      [381, 13, 3, "Object is possibly \'null\'.", "193416522"],
-      [523, 8, 12, "Type \'undefined\' is not assignable to type \'number\'.", "2583042145"]
+    "src/script/view_model/bindings/CommonBindings.ts:1432442525": [
+      [99, 24, 4, "\'this\' implicitly has type \'any\' because it does not have a type annotation.", "2087959715"],
+      [124, 10, 40, "Object is possibly \'null\'.", "525534827"],
+      [125, 29, 4, "\'this\' implicitly has type \'any\' because it does not have a type annotation.", "2087959715"],
+      [130, 30, 4, "Argument of type \'null\' is not assignable to parameter of type \'string | number | string[] | ((this: EventTarget, index: number, value: string) => string)\'.", "2087897566"],
+      [172, 10, 5, "Type \'undefined\' is not assignable to type \'HTMLImageElement\'.", "178823234"],
+      [181, 10, 12, "Type \'undefined\' is not assignable to type \'((this: GlobalEventHandlers, ev: Event) => any) | null\'.", "1696577579"],
+      [224, 6, 3, "Object is possibly \'null\'.", "193416522"],
+      [225, 6, 3, "Object is possibly \'null\'.", "193416522"],
+      [226, 13, 3, "Object is possibly \'null\'.", "193416522"],
+      [368, 8, 12, "Type \'undefined\' is not assignable to type \'number\'.", "2583042145"]
     ],
     "src/script/view_model/bindings/ConversationListBindings.ts:3095649748": [
       [29, 0, 32, "Type \'{ init(element: HTMLElement): void; update(element: HTMLElement, valueAccessor: PureComputed<string> | ObservableArray<Conversation>): void; }\' is not assignable to type \'BindingHandler<any>\'.\\n  Types of property \'update\' are incompatible.\\n    Type \'(element: HTMLElement, valueAccessor: PureComputed<string> | ObservableArray<Conversation>) => void\' is not assignable to type \'(element: any, valueAccessor: () => any, allBindings: AllBindings, viewModel: any, bindingContext: BindingContext<any>) => void\'.\\n      Types of parameters \'valueAccessor\' and \'valueAccessor\' are incompatible.\\n        Type \'() => any\' is not assignable to type \'PureComputed<string> | ObservableArray<Conversation>\'.\\n          Type \'() => any\' is missing the following properties from type \'PureComputed<string>\': equalityComparer, peek, dispose, isActive, and 7 more.", "1716760283"]

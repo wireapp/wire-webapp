@@ -25,6 +25,7 @@ import ParticipantMicOnIcon from 'Components/calling/ParticipantMicOnIcon';
 
 import {renderMessage} from 'Util/messageRenderer';
 import {t} from 'Util/LocalizerUtil';
+
 import {ContentMessage} from '../../entity/message/ContentMessage';
 
 interface ReplyBarProps {
@@ -37,7 +38,13 @@ const ReplyBar: FC<ReplyBarProps> = ({replyMessageEntity, onCancel}) => {
 
   return (
     <div className="input-bar__reply" data-uie-name="input-bar-reply-box">
-      <button type="button" className="button-reset-default" onClick={onCancel} data-uie-name="do-close-reply-box">
+      <button
+        aria-label={t('replyBarCancelMessage')}
+        type="button"
+        className="button-reset-default"
+        onClick={onCancel}
+        data-uie-name="do-close-reply-box"
+      >
         <Icon.Close fill="white" />
       </button>
 
@@ -48,7 +55,9 @@ const ReplyBar: FC<ReplyBarProps> = ({replyMessageEntity, onCancel}) => {
           <div className="input-bar__reply__sender-name">
             <span data-uie-name="label-name-reply-box">{replyMessageEntity?.headerSenderName()}</span>
 
-            {replyMessageEntity?.was_edited() && <Icon.Edit data-uie-name="message-edited-reply-box" />}
+            {replyMessageEntity?.was_edited() && (
+              <Icon.Edit data-uie-name="message-edited-reply-box" aria-label={t('replyBarEditMessage')} />
+            )}
           </div>
 
           {replyAsset?.isText() && (
