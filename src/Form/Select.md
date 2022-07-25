@@ -4,7 +4,7 @@ Demo:
 import {Container, Columns, Column, ErrorMessage, Select} from '@wireapp/react-ui-kit';
 
 const selectOptions = [
-  {value: '1', label: 'Option 1 long long long long name long name to trunckate this test - should work'},
+  {value: '1', label: 'Option1longlonlongonnamlongnameotrunckatethistestshouldwork'},
   {value: '2', label: 'Option 2 longest name'},
   {value: '3', label: 'Option 3', description: 'Custom description for select option'},
   {value: '4', label: 'Option 4', isDisabled: true},

@@ -69,7 +69,7 @@ export const CustomOption = (dataUieName: string) => (props: OptionProps<Option>
           />
         )}
 
-        <span css={{gridArea: 'label'}}>{children}</span>
+        <div css={{gridArea: 'label', overflowWrap: 'break-word', overflow: 'hidden'}}>{children}</div>
 
         {data && data.description && (
           <p

@@ -48,6 +48,8 @@ interface SelectProps extends StateManagerProps<Option> {
   markInvalid?: boolean;
   required?: boolean;
   isMulti?: boolean;
+  /**In the multi-select case, onChange's value will be an array of all the currently selected values. */
+  onChange?: (value: Option | Option[]) => void;
 }
 
 export const Select: FC<SelectProps> = ({
