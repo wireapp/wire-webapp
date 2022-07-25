@@ -318,19 +318,6 @@ export class ConversationService {
     return this.apiClient.api.conversation.postOTRMessage(payload.sender, conversationId.id, payload, ignoreMissing);
   }
 
-  /**
-   * Add users to an existing conversation.
-   *
-   * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/conversations/addMembers
-   *
-   * @param conversationId ID of conversation to add users to
-   * @param userIds IDs of users to be added to the conversation
-   * @returns Resolves with the server response
-   */
-  postMembers(conversationId: QualifiedId, userIds: QualifiedId[]): Promise<ConversationMemberJoinEvent> {
-    return this.apiClient.api.conversation.postMembers(conversationId, userIds);
-  }
-
   //##############################################################################
   // Database interactions
   //##############################################################################

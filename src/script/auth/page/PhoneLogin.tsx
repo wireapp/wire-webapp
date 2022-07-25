@@ -137,6 +137,7 @@ const PhoneLogin = ({
                       checked={loginData.clientType === ClientType.TEMPORARY}
                       data-uie-name="enter-public-computer-phone-sign-in"
                       style={{justifyContent: 'center', marginTop: '12px'}}
+                      aligncenter
                     >
                       <CheckboxLabel>{_(loginStrings.publicComputer)}</CheckboxLabel>
                     </Checkbox>

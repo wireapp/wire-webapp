@@ -42,6 +42,7 @@
   "BackendError.LABEL.SSO_UNSUPPORTED_SAML": "Something went wrong. Please contact your team administrator for details (Error 1).",
   "BackendError.LABEL.SUSPENDED": "This account is no longer authorized to log in",
   "BackendError.LABEL.TOO_MANY_LOGINS": "Please try again later",
+  "BackendError.LABEL.TOO_MANY_REQUESTS": "Too many requests, please try again later",
   "BackendError.LABEL.TOO_MANY_MEMBERS": "This team has reached its maximum size",
   "BackendError.LABEL.UNAUTHORIZED": "Something went wrong. Please reload the page and try again",
   "BackendError.learnMore": "Learn more",

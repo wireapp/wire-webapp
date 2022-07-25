@@ -80,7 +80,7 @@ const GroupCreationModal: React.FC<GroupCreationModalProps> = ({
   const [isShown, setIsShown] = useState<boolean>(false);
   const [selectedContacts, setSelectedContacts] = useState<User[]>([]);
   const [enableReadReceipts, setEnableReadReceipts] = useState<boolean>(false);
-  const [enableMls, setEnableMls] = useState<boolean>(Config.getConfig().FEATURE.ENABLE_MLS);
+  const [enableMls, setEnableMls] = useState<boolean>(false);
   const [showContacts, setShowContacts] = useState<boolean>(false);
   const [isCreatingConversation, setIsCreatingConversation] = useState<boolean>(false);
   const [accessState, setAccessState] = useState<ACCESS_STATE>(ACCESS_STATE.TEAM.GUESTS_SERVICES);
@@ -97,7 +97,8 @@ const GroupCreationModal: React.FC<GroupCreationModalProps> = ({
   const maxSize = ConversationRepository.CONFIG.GROUP.MAX_SIZE;
 
   const onEscape = () => setIsShown(false);
-  const {isTeam, isMLSEnabled} = useKoSubscribableChildren(teamState, ['isTeam', 'isMLSEnabled']);
+  const {isTeam, isMLSEnabled: isMLSEnabledForTeam} = useKoSubscribableChildren(teamState, ['isTeam', 'isMLSEnabled']);
+  const enableMlsCheckbox = isMLSEnabledForTeam || Config.getConfig().FEATURE.ENABLE_MLS;
 
   useEffect(() => {
     const showCreateGroup = (_: string, userEntity: User) => {
@@ -387,7 +388,7 @@ const GroupCreationModal: React.FC<GroupCreationModalProps> = ({
                   isDisabled={false}
                   name={t('readReceiptsToggleName')}
                 />
-                {isMLSEnabled && (
+                {enableMlsCheckbox && (
                   <InfoToggle
                     className="modal-style"
                     dataUieName="mls"

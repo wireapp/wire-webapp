@@ -255,7 +255,7 @@ class App {
 
     repositories.message = new MessageRepository(
       /*
-       * FIXME there is a cyclic dependency between message and conversation repos.
+       * ToDo: there is a cyclic dependency between message and conversation repos.
        * MessageRepository should NOT depend upon ConversationRepository.
        * We need to remove all usages of conversationRepository inside the messageRepository
        */
