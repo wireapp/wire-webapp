@@ -20,6 +20,7 @@
 import {CSSObject} from '@emotion/react';
 import {MouseEvent, useRef, useEffect, useState} from 'react';
 import {usePausableInterval} from '../../hooks/usePausableInterval';
+import {EntropyData, EntropyFrame} from '../../util/Entropy';
 
 interface CanvasProps {
   css?: CSSObject;
@@ -33,55 +34,6 @@ interface CanvasProps {
   min_entropy_bits: number;
 }
 
-export interface EntropyFrame {
-  x: number;
-  y: number;
-}
-
-export class EntropyData {
-  readonly frames: EntropyFrame[];
-  constructor() {
-    this.frames = [];
-  }
-
-  get length(): number {
-    return this.frames.length;
-  }
-
-  get entropyData(): Uint8Array {
-    return new Uint8Array(
-      this.frames.reduce((acc: number[], val: EntropyFrame) => {
-        acc.push(val.x);
-        acc.push(val.y);
-        return acc;
-      }, []),
-    );
-  }
-
-  // calculate shannon entropy
-  get entropyBits(): number {
-    const entropyData = this.entropyData;
-    const len = entropyData.length;
-    const frequencies = entropyData.reduce((freq: Map<number, number>, c: number) => {
-      freq.set(c, (freq.get(c) || 0) + 1);
-      return freq;
-    }, new Map<number, number>());
-    let sum = 0;
-    for (const f of frequencies.values()) {
-      sum -= (f / len) * Math.log2(f / len);
-    }
-    return sum * len;
-  }
-
-  addFrame(value: EntropyFrame): void {
-    // skip duplicate entries
-    if (this.frames.length > 0 && this.frames[this.frames.length - 1] === value) {
-      return;
-    }
-    this.frames.push(value);
-  }
-}
-
 const EntropyCanvas = (props: CanvasProps) => {
   const {sizeX, sizeY, onProgress, css, min_entropy_bits, min_frames, ...rest} = props;
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -91,7 +43,7 @@ const EntropyCanvas = (props: CanvasProps) => {
   const [lastPoint, setLastPoint] = useState<EntropyFrame | null>(null);
 
   const {clearInterval, startInterval, pauseInterval} = usePausableInterval(() => {
-    setPercent(Math.ceil(100 * Math.min(entropy.entropyBits / min_entropy_bits, entropy.length / min_frames)));
+    setPercent(Math.floor(100 * Math.min(entropy.entropyBits / min_entropy_bits, entropy.length / min_frames)));
     onProgress(entropy, percent, false);
   }, 100);
 
@@ -139,16 +91,16 @@ const EntropyCanvas = (props: CanvasProps) => {
   const onMouseMove = (event: MouseEvent<HTMLCanvasElement>) => {
     startInterval();
     const boundingRect = event.currentTarget?.getBoundingClientRect();
-    const newEntropy: EntropyFrame = {
+    const drawPoint: EntropyFrame = {
       x: event.pageX - boundingRect.x,
       y: event.pageY - boundingRect.y,
     };
     entropy.addFrame({
-      x: (255 * newEntropy.x) / boundingRect.width,
-      y: (255 * newEntropy.y) / boundingRect.height,
+      x: (255 * drawPoint.x) / boundingRect.width,
+      y: (255 * drawPoint.y) / boundingRect.height,
     });
     setPreviousPoint(lastPoint);
-    setLastPoint(newEntropy);
+    setLastPoint(drawPoint);
   };
 
   return (

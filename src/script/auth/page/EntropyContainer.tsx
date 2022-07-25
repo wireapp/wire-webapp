@@ -22,7 +22,8 @@ import React, {useState} from 'react';
 
 import {setEntropyStrings} from '../../strings';
 import {useIntl} from 'react-intl';
-import EntropyCanvas, {EntropyData} from '../component/EntropyCanvas';
+import EntropyCanvas from '../component/EntropyCanvas';
+import {EntropyData} from '../../util/Entropy';
 
 import {ProgressBar} from '../component/ProgressBar';
 import {KEY} from 'Util/KeyboardUtil';
@@ -79,7 +80,7 @@ const EntropyContainer = ({onSetEntropy}: Props) => {
             sizeX={512}
             sizeY={512}
             onProgress={onProgress}
-            min_entropy_bits={3000}
+            min_entropy_bits={1024}
             min_frames={300}
           />
           <ProgressBar error={!!pause} width={512} percent={percent} />

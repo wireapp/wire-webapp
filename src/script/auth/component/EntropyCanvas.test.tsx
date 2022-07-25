@@ -20,7 +20,9 @@
 import {fireEvent, render, screen, act} from '@testing-library/react';
 import React from 'react';
 import {withIntl, withTheme} from '../util/test/TestUtil';
-import EntropyCanvas, {EntropyData} from './EntropyCanvas';
+import EntropyCanvas from './EntropyCanvas';
+import {EntropyData} from '../../util/Entropy';
+
 require('jest-canvas-mock');
 
 describe('EntropyCanvas', () => {
