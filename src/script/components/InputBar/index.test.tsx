@@ -98,9 +98,8 @@ describe('InputBar', () => {
 
     const textArea = await container.querySelector('textarea[data-uie-name="input-message"]');
 
-    if (textArea) {
-      fireEvent.change(textArea, {target: {value: testMessage}});
-    }
+    expect(textArea).not.toBeNull();
+    fireEvent.change(textArea!, {target: {value: testMessage}});
 
     await waitFor(() => {
       expect((textArea as HTMLTextAreaElement).value).toBe(testMessage);
@@ -115,14 +114,14 @@ describe('InputBar', () => {
 
     const textArea = await container.querySelector('textarea[data-uie-name="input-message"]');
 
-    if (textArea) {
-      fireEvent.paste(textArea, {
-        clipboardData: {
-          files: [pngFile],
-          types: ['image/png'],
-        },
-      });
-    }
+    expect(textArea).not.toBeNull();
+
+    fireEvent.paste(textArea!, {
+      clipboardData: {
+        files: [pngFile],
+        types: ['image/png'],
+      },
+    });
 
     await waitFor(() => {
       const pastedFileControls = container.querySelector('[data-uie-name="pasted-file-controls"]');
