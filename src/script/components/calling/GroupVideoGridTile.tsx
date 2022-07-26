@@ -84,8 +84,9 @@ const GroupVideoGridTile: React.FC<GroupVideoGridTileProps> = ({
         <div
           css={{
             alignItems: 'center',
-            backgroundColor: '#33373a',
-            boxShadow: participantCount > 1 ? 'inset 0px 0px 0px 1px #000' : 'initial',
+            backgroundColor: 'var(--group-video-bg)',
+            borderRadius: '8px',
+            boxShadow: participantCount > 1 ? 'inset 0px 0px 0px 1px var(--group-video-bg)' : 'initial',
             display: 'flex',
             height: '100%',
             justifyContent: 'center',
@@ -97,11 +98,12 @@ const GroupVideoGridTile: React.FC<GroupVideoGridTileProps> = ({
       )}
       <div
         css={{
+          borderRadius: '8px',
           bottom: 0,
           boxShadow:
             participantCount > 2 && isActivelySpeaking
-              ? `inset 0px 0px 0px 2px ${selfColor}`
-              : `inset 0px 0px 0px 0px ${selfColor}`,
+              ? `inset 0px 0px 0px 1px var(--group-video-bg), inset 0px 0px 0px 4px ${selfColor}, inset 0px 0px 0px 7px var(--app-bg-secondary)`
+              : `inset 0px 0px 0px 0px`,
           left: 0,
           position: 'absolute',
           right: 0,

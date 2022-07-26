@@ -117,7 +117,7 @@ const GroupVideoGrid: React.FunctionComponent<GroupVideoGripProps> = ({
     <div className="group-video">
       <div
         className="group-video-grid"
-        css={{backgroundColor: '#000'}}
+        css={{backgroundColor: 'var(--group-video-bg)'}}
         style={rowsAndColumns}
         data-uie-name="grids-wrapper"
       >
