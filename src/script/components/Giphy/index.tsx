@@ -30,7 +30,7 @@ import {Modal} from '../../ui/Modal';
 import {Gif, GiphyRepository} from '../../extension/GiphyRepository';
 import {getLogger, Logger} from 'Util/Logger';
 
-enum GiphyState {
+export enum GiphyState {
   DEFAULT = '',
   ERROR = 'GiphyViewModel.STATE.ERROR',
   LOADING = 'GiphyViewModel.STATE.LOADING',
@@ -41,17 +41,18 @@ enum GiphyState {
 
 interface GiphyProps {
   readonly giphyRepository: GiphyRepository;
+  defaultGiphyState?: GiphyState;
 }
 
-const Giphy: FC<GiphyProps> = ({giphyRepository}) => {
+const Giphy: FC<GiphyProps> = ({giphyRepository, defaultGiphyState = GiphyState.DEFAULT}) => {
   const logger: Logger = getLogger('GiphyViewModel');
 
-  const [query, setQuery] = useState<string>('');
+  const [currentQuery, setCurrentQuery] = useState<string>('');
   const [gifs, setGifs] = useState<Gif[]>([]);
   const [selectedGif, setSelectedGif] = useState<Gif | null>(null);
   const [currentGif, setCurrentGif] = useState<Gif | null>(null);
 
-  const [giphyState, setGiphyState] = useState<GiphyState>(GiphyState.DEFAULT);
+  const [giphyState, setGiphyState] = useState<GiphyState>(defaultGiphyState);
   const isErrorState = giphyState === GiphyState.ERROR;
   const isLoadingState = giphyState === GiphyState.LOADING;
   const isResultState = giphyState === GiphyState.RESULT;
@@ -73,7 +74,7 @@ const Giphy: FC<GiphyProps> = ({giphyRepository}) => {
     setGiphyState(GiphyState.LOADING);
   };
 
-  const getGifs = async (displaySingleResult = false): Promise<void> => {
+  const getGifs = async (query: string, displaySingleResult = false): Promise<void> => {
     const isStateError = giphyState === GiphyState.ERROR;
 
     if (isStateError) {
@@ -110,14 +111,14 @@ const Giphy: FC<GiphyProps> = ({giphyRepository}) => {
     }
   };
 
-  const onGridClick = async () => getGifs();
+  const onGridClick = async () => getGifs(currentQuery);
 
   const onBackClick = () => {
     if (currentGif) {
       setGifs([currentGif]);
       setSelectedGif(currentGif);
+      setGiphyState(GiphyState.RESULT);
     }
-    setGiphyState(GiphyState.RESULT);
   };
 
   const onCloseClick = () => {
@@ -126,9 +127,9 @@ const Giphy: FC<GiphyProps> = ({giphyRepository}) => {
   };
 
   const showGiphy = async (query: string) => {
-    setQuery(query);
+    setCurrentQuery(query);
     setGiphyState(GiphyState.DEFAULT);
-    await getGifs(true);
+    await getGifs(query, true);
 
     giphyModal.show();
     giphyModal.focus();
@@ -142,7 +143,7 @@ const Giphy: FC<GiphyProps> = ({giphyRepository}) => {
     clearGifs();
 
     try {
-      const gif = await giphyRepository.getRandomGif({tag: query});
+      const gif = await giphyRepository.getRandomGif({tag: currentQuery});
       setCurrentGif(gif);
       setGifs([gif]);
       setSelectedGif(gif);
@@ -155,7 +156,7 @@ const Giphy: FC<GiphyProps> = ({giphyRepository}) => {
 
   const onSend = () => {
     if (selectedGif) {
-      amplify.publish(WebAppEvents.EXTENSIONS.GIPHY.SEND, selectedGif.animated, query);
+      amplify.publish(WebAppEvents.EXTENSIONS.GIPHY.SEND, selectedGif.animated, currentQuery);
       setSelectedGif(null);
 
       giphyModal.hide();
@@ -188,16 +189,28 @@ const Giphy: FC<GiphyProps> = ({giphyRepository}) => {
     >
       <div className="modal-content">
         <div className="giphy-modal-header modal-header">
-          {isResultState && <button className="button-icon icon-grid" onClick={onGridClick} />}
+          {isResultState && (
+            <button
+              className="button-icon icon-grid"
+              onClick={onGridClick}
+              aria-label={t('accessibility.giphyModal.showGifs')}
+              data-uie-name="do-open-giphs"
+            />
+          )}
 
           {(isResultsState || isNoSearchResultState) && (
-            <button className="button-icon icon-back" onClick={onBackClick} data-uie-name="do-close" />
+            <button
+              className="button-icon icon-back"
+              onClick={onBackClick}
+              data-uie-name="do-close"
+              aria-label={t('accessibility.giphyModal.showSingleGif')}
+            />
           )}
 
           {!(areResultsState || isNoSearchResultState) && <span className="giphy-modal-header-button" />}
 
           <span id="giphy-name" className="label-xs" data-uie-name="giphy-query">
-            {query}
+            {currentQuery}
           </span>
 
           <button
@@ -261,6 +274,7 @@ const Giphy: FC<GiphyProps> = ({giphyRepository}) => {
                       'gif-container-item-unselected': gif.url !== selectedGif?.url,
                     })}
                     onClick={() => onSelectGif(gif)}
+                    aria-label={t('accessibility.giphyModal.selectGif')}
                   >
                     {renderImage(gifs.length > 1)}
                   </button>
@@ -271,7 +285,9 @@ const Giphy: FC<GiphyProps> = ({giphyRepository}) => {
 
           {isErrorState && (
             <div className="gif-container-error">
-              <span className="gif-container-error-message">{t('extensionsGiphyNoGifs')}</span>
+              <span className="gif-container-error-message" data-uie-name="giphy-error-message">
+                {t('extensionsGiphyNoGifs')}
+              </span>
             </div>
           )}
         </div>
@@ -283,6 +299,7 @@ const Giphy: FC<GiphyProps> = ({giphyRepository}) => {
             aria-disabled={!hasGifs}
             onClick={getRandomGif}
             data-uie-name="do-try-another"
+            aria-label={t('accessibility.giphyModal.tryAnother')}
           >
             {t('extensionsGiphyButtonMore')}
           </button>
@@ -293,6 +310,7 @@ const Giphy: FC<GiphyProps> = ({giphyRepository}) => {
             aria-disabled={!selectedGif}
             onClick={onSend}
             data-uie-name="do-send-gif"
+            aria-label={t('accessibility.giphyModal.sendGif')}
           >
             {t('extensionsGiphyButtonOk')}
           </button>
