@@ -154,6 +154,9 @@
 
     .modal-checkbox {
       margin-right: 4px;
+      & input {
+        .checkbox;
+      }
     }
   }
 
@@ -314,10 +317,20 @@
       align-items: center;
       justify-content: center;
       cursor: pointer;
+
+      &:hover {
+        fill: var(--accent-color);
+      }
+
       &__left {
         right: unset;
         left: -6px;
       }
+    }
+    &__icon {
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
 
     &--list {
@@ -337,7 +350,7 @@
   }
 
   &__body {
-    overflow-y: auto;
+    overflow: visible;
   }
 
   &__buttons {

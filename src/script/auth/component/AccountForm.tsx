@@ -231,6 +231,7 @@ const AccountForm = ({account, ...props}: Props & ConnectedProps & DispatchProps
           setValidInputs({...validInputs, terms: true});
         }}
         markInvalid={!validInputs.terms}
+        aligncenter
         name="accept"
         id="accept"
         required
