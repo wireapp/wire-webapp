@@ -38,18 +38,15 @@ import ClassifiedBar from 'Components/input/ClassifiedBar';
 import Avatar, {AVATAR_SIZE} from 'Components/Avatar';
 
 import {registerReactComponent, useKoSubscribableChildren} from 'Util/ComponentUtil';
+import {loadDraftState, saveDraftState} from 'Util/DraftStateUtil';
+import {insertAtCaret, isFunctionKey, KEY} from 'Util/KeyboardUtil';
 import {
-  insertAtCaret,
-  isArrowKey,
-  isEnterKey,
-  isFunctionKey,
-  isMetaKey,
-  isPageUpDownKey,
-  isPasteAction,
-  isSpaceKey,
-  isTabKey,
-  KEY,
-} from 'Util/KeyboardUtil';
+  createMentionEntity,
+  detectMentionEdgeDeletion,
+  findMentionAtPosition,
+  getMentionCandidate,
+  updateMentionRanges,
+} from 'Util/MentionUtil';
 import {t} from 'Util/LocalizerUtil';
 import {afterRender, formatBytes} from 'Util/util';
 import {formatLocale, TIME_IN_MILLIS} from 'Util/TimeUtil';
@@ -67,7 +64,7 @@ import {AssetRepository} from '../../assets/AssetRepository';
 import {ConversationRepository} from '../../conversation/ConversationRepository';
 import {EventRepository} from '../../event/EventRepository';
 import {MessageRepository, OutgoingQuote} from '../../conversation/MessageRepository';
-import {StorageKey, StorageRepository} from '../../storage';
+import {StorageRepository} from '../../storage';
 import {MentionEntity} from '../../message/MentionEntity';
 import {Config} from '../../Config';
 import {ModalsViewModel} from '../../view_model/ModalsViewModel';
@@ -78,13 +75,9 @@ import {Text as TextAsset} from '../../entity/message/Text';
 import {User} from '../../entity/User';
 import PastedFileControls from './PastedFileControls';
 import ReplyBar from './ReplyBar';
-
-const findMentionAtPosition = (position: number, mentions: MentionEntity[]) =>
-  mentions.find(({startIndex, endIndex}) => position > startIndex && position < endIndex);
-
-const _generateStorageKey = (conversationEntity: Conversation): string => {
-  return `${StorageKey.CONVERSATION.INPUT}|${conversationEntity.id}`;
-};
+import useScrollSync from '../../hooks/useScrollSync';
+import useResizeTarget from '../../hooks/useResizeTarget';
+import useTextAreaFocus from '../../hooks/useTextAreaFocus';
 
 const CONFIG = {
   ...Config.getConfig(),
@@ -93,35 +86,6 @@ const CONFIG = {
   },
   PING_TIMEOUT: TIME_IN_MILLIS.SECOND * 2,
 };
-
-const showUploadWarning = (image: File) => {
-  const isGif = image.type === 'image/gif';
-  const maxSize = CONFIG.MAXIMUM_IMAGE_FILE_SIZE / 1024 / 1024;
-  const message = t(isGif ? 'modalGifTooLargeMessage' : 'modalPictureTooLargeMessage', maxSize);
-  const title = t(isGif ? 'modalGifTooLargeHeadline' : 'modalPictureTooLargeHeadline');
-
-  const modalOptions = {
-    text: {
-      message,
-      title,
-    },
-  };
-
-  amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.ACKNOWLEDGE, modalOptions);
-};
-
-interface DraftMessage {
-  mentions: MentionEntity[];
-  reply: ContentMessage;
-  replyEntityPromise?: Promise<ContentMessage>;
-  text: string;
-}
-
-interface Draft {
-  mentions: MentionEntity[];
-  reply: {messageId?: string};
-  text: string;
-}
 
 interface InputBarProps {
   readonly assetRepository: AssetRepository;
@@ -183,8 +147,6 @@ const InputBar: FC<InputBarProps> = ({
     'isIncomingRequest',
   ]);
 
-  const isConnectionRequest = isOutgoingRequest || isIncomingRequest;
-
   const showAvailabilityTooltip = useMemo(() => {
     if (firstUserEntity) {
       const availabilityIsNone = availability === Availability.Type.NONE;
@@ -209,17 +171,12 @@ const InputBar: FC<InputBarProps> = ({
     return messageTimer ? t('tooltipConversationEphemeral') : t('tooltipConversationInputPlaceholder');
   }, [availability, messageTimer, showAvailabilityTooltip]);
 
-  const hasLocalEphemeralTimer = isSelfDeletingMessagesEnabled && localMessageTimer && !hasGlobalMessageTimer;
-
   const shadowInputRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const isReplyingToMessagePrevRef = useRef<boolean>(false);
 
   const [editMessageEntity, setEditMessageEntity] = useState<ContentMessage | null>(null);
   const [replyMessageEntity, setReplyMessageEntity] = useState<ContentMessage | null>(null);
-
-  const isEditing = !!editMessageEntity;
-  const isReplying = !!replyMessageEntity;
 
   const [inputValue, setInputValue] = useState<string>('');
 
@@ -229,7 +186,6 @@ const InputBar: FC<InputBarProps> = ({
   const [currentMentions, setCurrentMentions] = useState<MentionEntity[]>([]);
   const [pingDisabled, setIsPingDisabled] = useState<boolean>(false);
   const [conversationHasFocus, setConversationHasFocus] = useState<boolean>(true);
-  const hasFocus = isEditing || conversationHasFocus;
 
   const [editedMention, setEditedMention] = useState<{startIndex: number; term: string} | undefined>(undefined);
 
@@ -254,10 +210,21 @@ const InputBar: FC<InputBarProps> = ({
     [currentMentions, inputValue, replyMessageEntity],
   );
 
+  const isEditing = !!editMessageEntity;
+  const isReplying = !!replyMessageEntity;
+  const hasFocus = isEditing || conversationHasFocus;
+  const isConnectionRequest = isOutgoingRequest || isIncomingRequest;
+  const hasLocalEphemeralTimer = isSelfDeletingMessagesEnabled && localMessageTimer && !hasGlobalMessageTimer;
+
   const focusTextArea = () => {
     if (textareaRef.current) {
       textareaRef.current.focus();
     }
+  };
+
+  const resetDraftState = () => {
+    setCurrentMentions([]);
+    setInputValue('');
   };
 
   const getRichTextInput = () => {
@@ -295,9 +262,7 @@ const InputBar: FC<InputBarProps> = ({
 
   const richTextInput = getRichTextInput();
 
-  const clearPastedFile = () => {
-    setPastedFile(null);
-  };
+  const clearPastedFile = () => setPastedFile(null);
 
   const _isHittingUploadLimit = (files: File[]): boolean => {
     const concurrentUploadLimit = CONFIG.ASSETS.CONCURRENT_UPLOAD_LIMIT;
@@ -354,22 +319,16 @@ const InputBar: FC<InputBarProps> = ({
     }
 
     onDropOrPastedFile([pastedFile]);
-
     clearPastedFile();
   };
 
-  const _createMentionEntity = (userEntity: User): MentionEntity | null => {
-    const mentionLength = userEntity.name().length + 1;
-
-    if (typeof editedMention?.startIndex === 'number') {
-      return new MentionEntity(editedMention.startIndex, mentionLength, userEntity.id, userEntity.domain);
-    }
-
-    return null;
+  const endMentionFlow = () => {
+    setEditedMention(undefined);
+    updateSelectionState();
   };
 
   const addMention = (userEntity: User, inputElement: HTMLInputElement): void => {
-    const mentionEntity = _createMentionEntity(userEntity);
+    const mentionEntity = createMentionEntity(userEntity, editedMention);
 
     if (!mentionEntity || !editedMention?.term) {
       return;
@@ -394,32 +353,10 @@ const InputBar: FC<InputBarProps> = ({
     endMentionFlow();
   };
 
-  const getMentionCandidate = (selectionStart: number, selectionEnd: number, value: string) => {
-    const textInSelection = value.substring(selectionStart, selectionEnd);
-    const wordBeforeSelection = value.substring(0, selectionStart).replace(/[^]*\s/, '');
-    const isSpaceSelected = /\s/.test(textInSelection);
-
-    const startOffset = wordBeforeSelection.length ? wordBeforeSelection.length - 1 : 1;
-    const isSelectionStartMention = findMentionAtPosition(selectionStart - startOffset, currentMentions);
-    const isSelectionEndMention = findMentionAtPosition(selectionEnd, currentMentions);
-    const isOverMention = isSelectionStartMention || isSelectionEndMention;
-    const isOverValidMentionString = /^@\S*$/.test(wordBeforeSelection);
-
-    if (!isSpaceSelected && !isOverMention && isOverValidMentionString) {
-      const wordAfterSelection = value.substring(selectionEnd).replace(/\s[^]*/, '');
-
-      const term = `${wordBeforeSelection.replace(/^@/, '')}${textInSelection}${wordAfterSelection}`;
-      const startIndex = selectionStart - wordBeforeSelection.length;
-      return {startIndex, term};
-    }
-
-    return undefined;
-  };
-
   const handleMentionFlow = () => {
     if (textareaRef.current) {
       const {selectionStart, selectionEnd, value} = textareaRef.current;
-      const mentionCandidate = getMentionCandidate(selectionStart, selectionEnd, value);
+      const mentionCandidate = getMentionCandidate(currentMentions, selectionStart, selectionEnd, value);
 
       setEditedMention(mentionCandidate);
       updateSelectionState();
@@ -450,25 +387,6 @@ const InputBar: FC<InputBarProps> = ({
 
     setSelectionStart(newStart);
     setSelectionEnd(newEnd);
-  };
-
-  const detectMentionEdgeDeletion = (textarea: HTMLTextAreaElement, lengthDifference: number) => {
-    const hadSelection = selectionStart !== selectionEnd;
-
-    if (hadSelection || lengthDifference >= 0) {
-      return null;
-    }
-
-    const currentSelectionStart = textarea.selectionStart;
-    const forwardDeleted = currentSelectionStart === selectionStart;
-    const checkPosition = forwardDeleted ? currentSelectionStart + 1 : currentSelectionStart;
-
-    return findMentionAtPosition(checkPosition, currentMentions);
-  };
-
-  const resetDraftState = () => {
-    setCurrentMentions([]);
-    setInputValue('');
   };
 
   const cancelMessageReply = (resetDraft = true) => {
@@ -539,18 +457,19 @@ const InputBar: FC<InputBarProps> = ({
     }
   };
 
-  const endMentionFlow = useCallback(() => {
-    setEditedMention(undefined);
-    updateSelectionState();
-  }, [updateSelectionState]);
-
   const updateMentions = (event: ReactKeyboardEvent<HTMLTextAreaElement>) => {
     const textarea = event.currentTarget;
     const value = textarea.value;
     const previousValue = inputValue;
 
     const lengthDifference = value.length - previousValue.length;
-    const edgeMention = detectMentionEdgeDeletion(textarea, lengthDifference - 1);
+    const edgeMention = detectMentionEdgeDeletion(
+      textarea,
+      currentMentions,
+      selectionStart,
+      selectionEnd,
+      lengthDifference - 1,
+    );
 
     if (edgeMention) {
       textarea.value = inputValue;
@@ -620,20 +539,6 @@ const InputBar: FC<InputBarProps> = ({
     }
   };
 
-  const updateMentionRanges = (start: number, end: number, difference: number): MentionEntity[] => {
-    const remainingMentions = currentMentions.filter(
-      ({startIndex, endIndex}) => endIndex <= start || startIndex >= end,
-    );
-
-    remainingMentions.forEach(mention => {
-      if (mention.startIndex >= end) {
-        mention.startIndex += difference;
-      }
-    });
-
-    return remainingMentions;
-  };
-
   const onChange = (e: ReactKeyboardEvent<HTMLTextAreaElement>) => {
     e.preventDefault();
 
@@ -643,11 +548,11 @@ const InputBar: FC<InputBarProps> = ({
     const inputValueLength = inputValue.length;
     const difference = currentValueLength - inputValueLength;
 
-    const updatedMentions = updateMentionRanges(selectionStart, selectionEnd, difference);
+    const updatedMentions = updateMentionRanges(currentMentions, selectionStart, selectionEnd, difference);
     setCurrentMentions(updatedMentions);
   };
 
-  const _generateQuote = (): Promise<OutgoingQuote | undefined> => {
+  const generateQuote = (): Promise<OutgoingQuote | undefined> => {
     return !replyMessageEntity
       ? Promise.resolve(undefined)
       : eventRepository.eventService
@@ -669,7 +574,7 @@ const InputBar: FC<InputBarProps> = ({
 
     const mentionEntities = currentMentions.slice(0);
 
-    _generateQuote().then(quoteEntity => {
+    generateQuote().then(quoteEntity => {
       messageRepository.sendTextWithLinkPreview(conversationEntity, messageText, mentionEntities, quoteEntity);
       cancelMessageReply();
     });
@@ -696,11 +601,6 @@ const InputBar: FC<InputBarProps> = ({
     }
   };
 
-  const _resetDraftState = (): void => {
-    setCurrentMentions([]);
-    setInputValue('');
-  };
-
   const onSend = (): void | boolean => {
     if (pastedFile) {
       return sendPastedFile();
@@ -710,7 +610,7 @@ const InputBar: FC<InputBarProps> = ({
     const messageTrimmedStart = inputValue.trimLeft();
     const afterLength = messageTrimmedStart.length;
 
-    const updatedMentions = updateMentionRanges(0, 0, afterLength - beforeLength);
+    const updatedMentions = updateMentionRanges(currentMentions, 0, 0, afterLength - beforeLength);
     setCurrentMentions(updatedMentions);
 
     const messageText = messageTrimmedStart.trimRight();
@@ -732,8 +632,7 @@ const InputBar: FC<InputBarProps> = ({
       sendMessage(messageText);
     }
 
-    _resetDraftState();
-
+    resetDraftState();
     focusTextArea();
   };
 
@@ -805,7 +704,19 @@ const InputBar: FC<InputBarProps> = ({
         const isImageTooLarge = image.size > CONFIG.MAXIMUM_IMAGE_FILE_SIZE;
 
         if (isImageTooLarge) {
-          return showUploadWarning(image);
+          const isGif = image.type === 'image/gif';
+          const maxSize = CONFIG.MAXIMUM_IMAGE_FILE_SIZE / 1024 / 1024;
+
+          const modalOptions = {
+            text: {
+              message: t(isGif ? 'modalGifTooLargeMessage' : 'modalPictureTooLargeMessage', maxSize),
+              title: t(isGif ? 'modalGifTooLargeHeadline' : 'modalPictureTooLargeHeadline'),
+            },
+          };
+
+          amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.ACKNOWLEDGE, modalOptions);
+
+          return;
         }
       }
 
@@ -813,9 +724,7 @@ const InputBar: FC<InputBarProps> = ({
     }
   };
 
-  const onGifClick = () => {
-    amplify.publish(WebAppEvents.EXTENSIONS.GIPHY.SHOW, inputValue);
-  };
+  const onGifClick = () => amplify.publish(WebAppEvents.EXTENSIONS.GIPHY.SHOW, inputValue);
 
   const onPingClick = () => {
     if (conversationEntity && !pingDisabled) {
@@ -837,6 +746,10 @@ const InputBar: FC<InputBarProps> = ({
   };
 
   const onPasteFiles = (event: ClipboardEvent): void => {
+    if (event.clipboardData.types.includes('text/plain')) {
+      return;
+    }
+
     const pastedFiles = event.clipboardData.files;
 
     if (!isFileSharingSendingEnabled) {
@@ -858,57 +771,7 @@ const InputBar: FC<InputBarProps> = ({
     setPastedFile(newFile);
   };
 
-  const _saveDraftState = useCallback(async (): Promise<void> => {
-    if (isEditing) {
-      return;
-    }
-
-    // we only save state for newly written messages
-    const storeReply = draftMessage.reply?.id ? {messageId: draftMessage.reply.id} : {};
-    const storageKey = _generateStorageKey(conversationEntity);
-
-    await storageRepository.storageService.saveToSimpleStorage<Draft>(storageKey, {
-      mentions: draftMessage.mentions,
-      reply: storeReply,
-      text: draftMessage.text,
-    });
-  }, [draftMessage, storageRepository]);
-
-  const _loadDraftState = async (conversationEntity: Conversation): Promise<DraftMessage> => {
-    const storageKey = _generateStorageKey(conversationEntity);
-    const storageValue = await storageRepository.storageService.loadFromSimpleStorage<Draft>(storageKey);
-
-    if (typeof storageValue === 'undefined') {
-      return {mentions: [], reply: {} as ContentMessage, text: ''};
-    }
-
-    if (typeof storageValue === 'string') {
-      return {mentions: [], reply: {} as ContentMessage, text: storageValue};
-    }
-
-    const draftMessage: DraftMessage = {...(storageValue as DraftMessage)};
-
-    draftMessage.mentions = draftMessage.mentions.map(mention => {
-      return new MentionEntity(mention.startIndex, mention.length, mention.userId, mention.domain);
-    });
-
-    const replyMessageId = draftMessage.reply
-      ? (draftMessage.reply as unknown as {messageId: string}).messageId
-      : undefined;
-
-    if (replyMessageId) {
-      draftMessage.replyEntityPromise = messageRepository.getMessageInConversationById(
-        conversationEntity,
-        replyMessageId,
-        false,
-        true,
-      );
-    }
-
-    return draftMessage;
-  };
-
-  const loadInitialStateForConversation = useCallback(async (): Promise<void> => {
+  const loadInitialStateForConversation = async (): Promise<void> => {
     setConversationHasFocus(true);
     setPastedFile(null);
     cancelMessageEditing();
@@ -916,7 +779,8 @@ const InputBar: FC<InputBarProps> = ({
     endMentionFlow();
 
     if (conversationEntity) {
-      const previousSessionData = await _loadDraftState(conversationEntity);
+      const previousSessionData = await loadDraftState(conversationEntity, storageRepository, messageRepository);
+
       if (previousSessionData?.text) {
         setInputValue(previousSessionData.text);
       }
@@ -935,10 +799,10 @@ const InputBar: FC<InputBarProps> = ({
         });
       }
     }
-  }, [conversationEntity]);
+  };
 
   const sendGiphy = (gifUrl: string, tag: string): void => {
-    _generateQuote().then(quoteEntity => {
+    generateQuote().then(quoteEntity => {
       if (!quoteEntity) {
         return;
       }
@@ -952,9 +816,11 @@ const InputBar: FC<InputBarProps> = ({
     const ignoredParent = (event.target as HTMLElement).closest(
       '.conversation-input-bar, .conversation-input-bar-mention-suggestion, .ctx-menu',
     );
+
     if (ignoredParent) {
       return;
     }
+
     cancelMessageEditing();
     cancelMessageReply();
   };
@@ -977,54 +843,27 @@ const InputBar: FC<InputBarProps> = ({
 
   useEffect(() => {
     loadInitialStateForConversation();
-  }, [loadInitialStateForConversation]);
+  }, []);
 
   useEffect(() => {
-    _saveDraftState();
-  }, [_saveDraftState]);
-
-  const resizeTarget = () => {
-    if (shadowInputRef.current && shadowInputRef.current) {
-      if (!textareaRef.current?.offsetHeight) {
-        return;
-      }
-
-      const {offsetHeight: shadowInputHeight, scrollHeight: shadowInputScrollHeight} = shadowInputRef.current;
-      const {offsetHeight: textAreaOffsetHeight} = textareaRef.current;
-
-      if (shadowInputHeight !== textAreaOffsetHeight) {
-        textareaRef.current.style.height = `${shadowInputScrollHeight}px`;
-      }
+    if (!isEditing) {
+      saveDraftState(storageRepository, conversationEntity, draftMessage);
     }
-  };
+  }, [isEditing, draftMessage]);
 
-  useEffect(() => {
-    if (textareaRef.current && shadowInputRef.current) {
-      const syncScroll = () => {
-        if (textareaRef.current?.scrollTop && shadowInputRef.current?.scrollTop) {
-          shadowInputRef.current.scrollTop = textareaRef.current.scrollTop;
-        }
-      };
+  useTextAreaFocus(focusTextArea);
 
-      resizeTarget();
+  useScrollSync(textareaRef.current, shadowInputRef.current, [
+    textareaRef.current,
+    shadowInputRef.current,
+    richTextInput,
+  ]);
 
-      window.addEventListener('resize', () => {
-        resizeTarget();
-        syncScroll();
-      });
-      textareaRef.current?.addEventListener('scroll', syncScroll);
-
-      return () => {
-        window.removeEventListener('resize', () => {
-          resizeTarget();
-          syncScroll();
-        });
-        textareaRef.current?.removeEventListener('scroll', syncScroll);
-      };
-    }
-
-    return () => undefined;
-  }, [textareaRef.current, shadowInputRef.current, richTextInput]);
+  useResizeTarget(shadowInputRef.current, textareaRef.current, [
+    textareaRef.current,
+    shadowInputRef.current,
+    richTextInput,
+  ]);
 
   const handleRepliedMessageDeleted = (messageId: string) => {
     if (replyMessageEntity?.id === messageId) {
@@ -1065,9 +904,9 @@ const InputBar: FC<InputBarProps> = ({
     }
 
     return () => undefined;
-  }, []);
+  }, [isEditing]);
 
-  // Temporarily functionality for dropping files on conversation container
+  // Temporarily functionality for dropping files on conversation container, should be moved to Conversation Component
   useEffect(() => {
     const getConversationContainer = document.querySelector('#conversation');
 
@@ -1098,41 +937,8 @@ const InputBar: FC<InputBarProps> = ({
     return () => undefined;
   }, []);
 
-  const handleFocusTextarea = (event: KeyboardEvent) => {
-    const detailViewModal = document.querySelector('#detail-view');
-
-    if (detailViewModal?.classList.contains('modal-show')) {
-      return;
-    }
-
-    const isActiveInputElement =
-      document.activeElement && ['INPUT', 'TEXTAREA'].includes(document.activeElement.tagName);
-    const isPageupDownKeyPressed = isPageUpDownKey(event);
-
-    if (isPageupDownKeyPressed) {
-      (document.activeElement as HTMLElement).blur();
-    } else if (
-      !isActiveInputElement &&
-      !isArrowKey(event) &&
-      !isTabKey(event) &&
-      !isEnterKey(event) &&
-      !isSpaceKey(event) &&
-      !isFunctionKey(event)
-    ) {
-      if (!isMetaKey(event) || isPasteAction(event)) {
-        focusTextArea();
-      }
-    }
-  };
-
-  // TODO: Add on keydown for automatically textarea focus
-  useEffect(() => {
-    window.addEventListener('keydown', handleFocusTextarea);
-
-    return () => {
-      window.removeEventListener('keydown', handleFocusTextarea);
-    };
-  }, []);
+  // console.log('przemvs isReplying', isReplying);
+  // console.log('przemvs isEditing', isEditing);
 
   return (
     <div id="conversation-input-bar" className="conversation-input-bar">

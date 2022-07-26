@@ -18,6 +18,7 @@
  */
 
 import {act, fireEvent, render, waitFor} from '@testing-library/react';
+
 import {createRandomUuid} from 'Util/util';
 
 import {Config} from 'src/script/Config';
@@ -35,6 +36,7 @@ import InputBar from 'Components/InputBar/index';
 import {EmojiInputViewModel} from '../../view_model/content/EmojiInputViewModel';
 import {MessageRepository} from '../../conversation/MessageRepository';
 import {User} from '../../entity/User';
+import {createMentionEntity, getMentionCandidate} from 'Util/MentionUtil';
 
 const testFactory = new TestFactory();
 let conversationRepository: ConversationRepository;
@@ -86,6 +88,7 @@ const getDefaultProps = () => ({
 
 describe('InputBar', () => {
   const testMessage = 'Write custom text message';
+  const pngFile = new File(['(⌐□_□)'], 'wire-example-image.png', {type: 'image/png'});
 
   it('has passed value', async () => {
     const promise = Promise.resolve();
@@ -102,5 +105,45 @@ describe('InputBar', () => {
     await waitFor(() => {
       expect((textArea as HTMLTextAreaElement).value).toBe(testMessage);
     });
+  });
+
+  it('has pasted image', async () => {
+    const promise = Promise.resolve();
+    const props = getDefaultProps();
+    const {container} = render(<InputBar {...props} />);
+    await act(() => promise);
+
+    const textArea = await container.querySelector('textarea[data-uie-name="input-message"]');
+
+    if (textArea) {
+      fireEvent.paste(textArea, {
+        clipboardData: {
+          files: [pngFile],
+          types: ['image/png'],
+        },
+      });
+    }
+
+    await waitFor(() => {
+      const pastedFileControls = container.querySelector('[data-uie-name="pasted-file-controls"]');
+      expect(pastedFileControls).toBeDefined();
+    });
+  });
+
+  it('matches multibyte characters in mentioned user names', () => {
+    const selectionStart = 5;
+    const selectionEnd = 5;
+    const inputValue = 'Hi @p';
+    const userName = 'rzemvs';
+
+    const mentionCandidate = getMentionCandidate([], selectionStart, selectionEnd, inputValue);
+
+    const userEntity = new User(createRandomUuid());
+    userEntity.name(userName);
+
+    const mentionEntity = createMentionEntity(userEntity, mentionCandidate);
+
+    expect(mentionEntity?.startIndex).toBe(3);
+    expect(mentionEntity?.length).toBe(7);
   });
 });

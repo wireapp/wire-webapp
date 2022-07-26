@@ -349,7 +349,7 @@ export const preventFocusOutside = (event: KeyboardEvent, parentId: string): voi
   const focusableElements =
     'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
   const parent = document.getElementById(parentId);
-  const focusableContent = [...parent.querySelectorAll(focusableElements)];
+  const focusableContent = parent ? [...parent.querySelectorAll(focusableElements)] : [];
   const focusedItemIndex = focusableContent.indexOf(document.activeElement);
   if (event.shiftKey && focusedItemIndex != 0) {
     (focusableContent[focusedItemIndex - 1] as HTMLElement)?.focus();
@@ -365,3 +365,6 @@ export const preventFocusOutside = (event: KeyboardEvent, parentId: string): voi
   }
   (focusableContent[focusedItemIndex + 1] as HTMLElement)?.focus();
 };
+
+export const generateConversationInputStorageKey = (conversationEntity: Conversation): string =>
+  `${StorageKey.CONVERSATION.INPUT}|${conversationEntity.id}`;

@@ -171,16 +171,10 @@ export class ContentViewModel {
 
     this.state.subscribe(state => {
       switch (state) {
-        case ContentViewModel.STATE.CONVERSATION:
-          // TODO: Check if works without this
-          // this.inputBar.addedToView();
-          break;
         case ContentViewModel.STATE.PREFERENCES_ACCOUNT:
           this.popNotification();
           break;
         default:
-        // TODO: Check if works without this
-        // this.inputBar.removedFromView();
       }
     });
 

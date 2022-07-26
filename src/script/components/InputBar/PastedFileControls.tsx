@@ -44,7 +44,7 @@ const PastedFileControls: FC<PastedFileControlsProps> = ({pastedFile, onClear, o
   }, [pastedFile]);
 
   return (
-    <div className="conversation-input-bar-paste-modal">
+    <div className="conversation-input-bar-paste-modal" data-uie-name="pasted-file-controls">
       <div className="controls-left"></div>
 
       <div className="controls-center">
