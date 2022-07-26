@@ -31,7 +31,7 @@
             <enriched-fields params="user: firstParticipant, showDomain: $root.isFederated"></enriched-fields>
             <!-- ko if: firstParticipant().isConnected() || firstParticipant().inTeam() -->
               <div class="conversation-details__devices">
-                <button class="panel__action-item" data-bind="click: clickOnDevices" data-uie-name="go-devices" type="button" aria-label={t('accessibility.conversationDetailsActionDevicesLabel')}>
+                <button class="panel__action-item" data-bind="click: clickOnDevices, attr: {'aria-label': t('accessibility.conversationDetailsActionDevicesLabel')}" data-uie-name="go-devices" type="button">
                   <devices-icon aria-hidden="true" class="panel__action-item__icon"></devices-icon>
                   <span class="panel__action-item__text" data-bind="text: t('conversationDetailsActionDevices')"></span>
                   <chevron-right aria-hidden="true" class="chevron-right-icon"></chevron-right>
@@ -160,7 +160,7 @@
                 <button class="panel__action-item" data-bind="click: clickOnNotifications" data-uie-name="go-notifications" type="button">
                   <notification-icon aria-hidden="true" class="panel__action-item__icon"></notification-icon>
                   <span class="panel__action-item__summary">
-                    <span class="panel__action-item__text" data-bind="text: t('conversationDetailsActionNotifications')"></span>
+                    <span class="panel__action-item__text" data-bind="text: t('conversationDetailsActionNotifications'), aria-label: t('accessibility.conversationDetailsActionNotificationsLabel')"></span>
                     <span
                       class="panel__action-item__status"
                       data-bind="text: notificationStatusText"
@@ -246,7 +246,7 @@
             <button class="panel__action-item" data-bind="click: clickOnNotifications" data-uie-name="go-notifications" type="button">
               <notification-icon aria-hidden="true" class="panel__action-item__icon"></notification-icon>
               <span class="panel__action-item__summary">
-                <span class="panel__action-item__text" data-bind="text: t('conversationDetailsActionNotifications')"></span>
+                <span class="panel__action-item__text" data-bind="text: t('conversationDetailsActionNotifications'), aria-label: t('accessibility.conversationDetailsActionNotificationsLabel')"></span>
                 <span
                   class="panel__action-item__status"
                   data-bind="text: notificationStatusText"

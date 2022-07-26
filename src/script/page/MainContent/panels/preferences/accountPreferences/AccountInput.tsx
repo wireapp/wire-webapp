@@ -78,8 +78,10 @@ const AccountInput: React.FC<AccountInputProps> = ({
   valueUie,
   ...rest
 }) => {
-  const textInputRef = useRef<HTMLDivElement>(null);
-  const [input, setInput] = useState<string>();
+  const textInputRef = useRef<HTMLInputElement>(null);
+  const inputWrapperRef = useRef<HTMLDivElement>(null);
+
+  const [input, setInput] = useState<string>('');
   const [isEditing, setIsEditing] = useState(false);
   useEffect(() => {
     setInput(value);
@@ -87,7 +89,7 @@ const AccountInput: React.FC<AccountInputProps> = ({
 
   useEffect(() => {
     const handleClickOutside = (event: any) => {
-      if (textInputRef.current && !textInputRef.current.contains(event.target)) {
+      if (inputWrapperRef.current && !inputWrapperRef.current.contains(event.target)) {
         setInput(value);
         setIsEditingExternal?.(false);
         setIsEditing(false);
@@ -99,7 +101,7 @@ const AccountInput: React.FC<AccountInputProps> = ({
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
     };
-  }, [textInputRef]);
+  }, [inputWrapperRef]);
 
   const updateInput = (value: string) => {
     if (allowedChars) {
@@ -182,20 +184,32 @@ const AccountInput: React.FC<AccountInputProps> = ({
           label={label}
           name={valueUie}
           value={input}
+          inputWrapperRef={inputWrapperRef}
           onChange={({target}) => updateInput(target.value)}
-          onCancel={() => updateInput('')}
+          onCancel={() => {
+            updateInput('');
+            textInputRef.current?.focus();
+            setIsEditing(true);
+          }}
           onKeyDown={event => {
             if (event.key === 'Enter' && !event.shiftKey && !event.altKey) {
               event.preventDefault();
               onValueChange?.(input);
               (event.target as HTMLInputElement).blur();
+              // on enter save changes and close the editable field
+              setIsEditing(false);
+            } else if (event.key === 'Tab' && !!!input) {
+              // after clearing the input i.e field value is empty when user press tab,
+              // revert to the last saved value, close the editable field and focus on the next field
+              setInput(value);
+              setIsEditing(false);
             }
           }}
           onBlur={() => {
             setInput(value);
             setIsEditingExternal?.(false);
-            setIsEditing(false);
           }}
+          setIsEditing={setIsEditing}
           ref={textInputRef}
         />
       )}

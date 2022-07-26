@@ -30,6 +30,7 @@ export interface PanelHeaderProps {
   onGoBack: () => void;
   title?: string;
   goBackTitle?: string;
+  closeBtnTitle?: string;
 }
 
 const PanelHeader: React.FC<PanelHeaderProps> = ({
@@ -39,6 +40,7 @@ const PanelHeader: React.FC<PanelHeaderProps> = ({
   goBackUie,
   closeUie = 'do-close',
   goBackTitle = t('index.goBack'),
+  closeBtnTitle = t('accessibility.rightPanel.close'),
 }) => {
   return (
     <div className="panel__header">
@@ -51,7 +53,7 @@ const PanelHeader: React.FC<PanelHeaderProps> = ({
       <div className="panel__header__title">{title}</div>
 
       <DragableClickWrapper onClick={onClose}>
-        <button className="icon-button" data-uie-name={closeUie} title={t('accessibility.rightPanel.close')}>
+        <button className="icon-button" data-uie-name={closeUie} title={closeBtnTitle}>
           <Icon.Close className="right-panel-close" />
         </button>
       </DragableClickWrapper>

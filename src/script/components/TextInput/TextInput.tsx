@@ -29,6 +29,7 @@ import {
   getInputCSS,
   getLabelCSS,
 } from 'Components/TextInput/TextInput.styles';
+import {t} from 'Util/LocalizerUtil';
 
 export interface UserInputProps {
   autoFocus?: boolean;
@@ -37,21 +38,23 @@ export interface UserInputProps {
   isError?: boolean;
   isSuccess?: boolean;
   label: string;
-  name: string;
+  name?: string;
   onBlur?: React.FocusEventHandler<HTMLInputElement>;
   onCancel: () => void;
   onChange: React.ChangeEventHandler<HTMLInputElement>;
   onKeyDown?: React.KeyboardEventHandler<HTMLInputElement>;
   onSuccessDismissed?: () => void;
   placeholder?: string;
-  value: string;
+  value?: string;
   uieName?: string;
   errorUieName?: string;
+  inputWrapperRef: React.RefObject<HTMLDivElement>;
+  setIsEditing: (x: boolean) => void;
 }
 
 const SUCCESS_DISMISS_TIMEOUT = 2500;
 
-const TextInput: React.ForwardRefRenderFunction<HTMLDivElement, UserInputProps> = (
+const TextInput: React.ForwardRefRenderFunction<HTMLInputElement, UserInputProps> = (
   {
     autoFocus,
     disabled,
@@ -69,8 +72,10 @@ const TextInput: React.ForwardRefRenderFunction<HTMLDivElement, UserInputProps> 
     value,
     uieName,
     errorUieName,
+    inputWrapperRef,
+    setIsEditing,
   }: UserInputProps,
-  ref: React.ForwardedRef<HTMLDivElement>,
+  ref: React.ForwardedRef<HTMLInputElement>,
 ) => {
   const isFilled = Boolean(value);
 
@@ -91,7 +96,7 @@ const TextInput: React.ForwardRefRenderFunction<HTMLDivElement, UserInputProps> 
   }
 
   return (
-    <div css={containerCSS} ref={ref}>
+    <div css={containerCSS} ref={inputWrapperRef}>
       {isError && errorMessage && (
         <span className="label" css={errorMessageCSS} data-uie-name={errorUieName}>
           {errorMessage}
@@ -111,13 +116,28 @@ const TextInput: React.ForwardRefRenderFunction<HTMLDivElement, UserInputProps> 
         onBlur={onBlur}
         onKeyDown={onKeyDown}
         placeholder={placeholder}
+        ref={ref}
         data-uie-name={uieName}
       />
       <label className="label-medium" css={getLabelCSS(changedColor)} htmlFor={name}>
         {label}
       </label>
       {isFilled && !isSuccess && !isError && (
-        <button type="button" css={cancelButtonCSS} onClick={onCancel}>
+        <button
+          type="button"
+          css={cancelButtonCSS}
+          onClick={onCancel}
+          aria-label={t('accessibility.userProfileDeleteEntry')}
+          onKeyDown={event => {
+            if (event.shiftKey && event.key === 'Tab') {
+              // shift+tab from clear button should focus on the input field
+              setIsEditing(true);
+            } else if (event.key === 'Tab') {
+              // tab from clear button should close the editable field
+              setIsEditing(false);
+            }
+          }}
+        >
           <Icon.Close css={{fill: 'var(--text-input-background)', height: 8, width: 8}} />
         </button>
       )}
