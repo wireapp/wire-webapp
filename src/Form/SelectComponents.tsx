@@ -41,7 +41,7 @@ export const DropdownIndicator = props => {
 
 // eslint-disable-next-line react/display-name
 export const CustomOption = (dataUieName: string) => (props: OptionProps<Option>) => {
-  const {children, data, isFocused, isMulti, isSelected} = props;
+  const {children, data, isFocused, isMulti, isSelected, options} = props;
 
   return (
     <components.Option {...props}>
@@ -57,7 +57,7 @@ export const CustomOption = (dataUieName: string) => (props: OptionProps<Option>
         }}
         {...(dataUieName && {
           'data-uie-name': `option-${dataUieName}`,
-          'data-uie-value': children,
+          'data-uie-value': (options as Option[]).find(option => option.label === children)?.value,
         })}
       >
         {isMulti && (
