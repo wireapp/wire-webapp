@@ -5,7 +5,7 @@
 //
 exports[`stricter compilation`] = {
   value: `{
-    "src/script/Config.ts:3362009592": [
+    "src/script/Config.ts:3287170438": [
       [52, 4, 40, "\'ACCOUNT_BASE\' is specified more than once, so this usage will be overwritten.", "2150385420"],
       [53, 4, 15, "\'MOBILE_BASE\' is specified more than once, so this usage will be overwritten.", "437120469"],
       [54, 4, 12, "\'PRICING\' is specified more than once, so this usage will be overwritten.", "1004628660"],
