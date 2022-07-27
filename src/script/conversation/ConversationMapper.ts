@@ -212,8 +212,12 @@ export class ConversationMapper {
       throw new ConversationError(BASE_ERROR_TYPE.INVALID_PARAMETER, BaseError.MESSAGE.INVALID_PARAMETER);
     }
 
-    const {creator, id, members, name, others, qualified_others, type, group_id} = conversationData;
-    let conversationEntity = new Conversation(id, conversationData.domain || conversationData.qualified_id?.domain);
+    const {creator, id, members, name, others, qualified_others, type, group_id, protocol} = conversationData;
+    let conversationEntity = new Conversation(
+      id,
+      conversationData.domain || conversationData.qualified_id?.domain,
+      protocol,
+    );
     conversationEntity.roles(conversationData.roles || {});
 
     conversationEntity.creator = creator;
@@ -296,6 +300,7 @@ export class ConversationMapper {
           team,
           type,
           group_id,
+          protocol,
         } = remoteConversationData;
         const {others: othersStates, self: selfState} = members;
 
@@ -308,6 +313,7 @@ export class ConversationMapper {
           group_id,
           message_timer,
           name,
+          protocol,
           receipt_mode,
           roles: {},
           status: (selfState as any).status,

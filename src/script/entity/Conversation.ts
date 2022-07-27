@@ -21,6 +21,7 @@ import {amplify} from 'amplify';
 import ko from 'knockout';
 import {Availability, LegalHoldStatus} from '@wireapp/protocol-messaging';
 import {QualifiedId} from '@wireapp/api-client/src/user';
+import {ConversationProtocol} from '@wireapp/api-client/src/conversation/NewConversation';
 import {Cancelable, debounce} from 'underscore';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import {
@@ -101,6 +102,7 @@ export class Conversation {
   // TODO(Federation): Currently the 'creator' just refers to a user id but it has to become a qualified id
   public creator: string;
   public groupId?: string;
+  public readonly isUsingMLSProtocol: boolean;
   public readonly display_name: ko.PureComputed<string>;
   public readonly firstUserEntity: ko.PureComputed<User>;
   public readonly enforcedTeamMessageTimer: ko.PureComputed<number>;
@@ -170,7 +172,12 @@ export class Conversation {
     return TIMESTAMP_TYPE;
   }
 
-  constructor(conversation_id: string = '', domain: string = '', teamState = container.resolve(TeamState)) {
+  constructor(
+    conversation_id: string = '',
+    domain: string = '',
+    public readonly protocol = ConversationProtocol.PROTEUS,
+    teamState = container.resolve(TeamState),
+  ) {
     this.teamState = teamState;
     this.id = conversation_id;
 
@@ -184,6 +191,13 @@ export class Conversation {
     this.name = ko.observable();
     this.team_id = undefined;
     this.type = ko.observable();
+
+    /**
+     * If a conversation has the groupId property it means that it
+     * is MLS protocol based as this property is for MLS conversations only.
+     * @returns boolean
+     */
+    this.isUsingMLSProtocol = protocol === ConversationProtocol.MLS;
 
     this.is_loaded = ko.observable(false);
     this.is_pending = ko.observable(false);
@@ -985,6 +999,7 @@ export class Conversation {
       domain: this.domain,
       ephemeral_timer: this.localMessageTimer(),
       global_message_timer: this.globalMessageTimer(),
+      group_id: this.groupId,
       id: this.id,
       is_guest: this.isGuest(),
       is_managed: this.isManaged,
@@ -995,6 +1010,7 @@ export class Conversation {
       muted_state: this.mutedState(),
       muted_timestamp: this.mutedTimestamp(),
       name: this.name(),
+      protocol: this.protocol,
       others: this.participating_user_ids().map(user => user.id),
       qualified_others: this.participating_user_ids(),
       receipt_mode: this.receiptMode(),
