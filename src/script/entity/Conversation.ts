@@ -101,6 +101,7 @@ export class Conversation {
   // TODO(Federation): Currently the 'creator' just refers to a user id but it has to become a qualified id
   public creator: string;
   public groupId?: string;
+  public readonly isUsingMLSProtocol: boolean;
   public readonly display_name: ko.PureComputed<string>;
   public readonly firstUserEntity: ko.PureComputed<User>;
   public readonly enforcedTeamMessageTimer: ko.PureComputed<number>;
@@ -184,6 +185,13 @@ export class Conversation {
     this.name = ko.observable();
     this.team_id = undefined;
     this.type = ko.observable();
+
+    /**
+     * If a conversation has the groupId property it means that it
+     * is MLS protocol based as this property is for MLS conversations only.
+     * @returns boolean
+     */
+    this.isUsingMLSProtocol = !!this.groupId;
 
     this.is_loaded = ko.observable(false);
     this.is_pending = ko.observable(false);
@@ -972,15 +980,6 @@ export class Conversation {
 
   readonly isShowingLastReceivedMessage = (): boolean => {
     return this.getLastMessage()?.timestamp() ? this.getLastMessage().timestamp() >= this.last_event_timestamp() : true;
-  };
-
-  /**
-   * If a conversation has the groupId property it means that it
-   * is MLS protocol based as this property is for MLS conversations only.
-   * @returns boolean
-   */
-  readonly isUsingMLSProtocol = (): boolean => {
-    return !!this.groupId;
   };
 
   serialize(): ConversationRecord {
