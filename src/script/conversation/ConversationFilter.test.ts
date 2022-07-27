@@ -22,6 +22,7 @@ import {ConversationFilter} from './ConversationFilter';
 import {ConversationDatabaseData, ConversationMapper} from './ConversationMapper';
 import {ConversationStatus} from './ConversationStatus';
 import {CONVERSATION_ACCESS, CONVERSATION_ACCESS_ROLE, CONVERSATION_TYPE} from '@wireapp/api-client/src/conversation';
+import {ConversationProtocol} from '@wireapp/api-client/src/conversation/NewConversation';
 
 describe('ConversationFilter', () => {
   describe('showCallControls', () => {
@@ -54,6 +55,7 @@ describe('ConversationFilter', () => {
         muted_state: 0,
         muted_timestamp: 0,
         name: 'Florian@Staging11',
+        protocol: ConversationProtocol.PROTEUS,
         others: ['71e25be1-5433-4647-964d-03a5d9e7c970'],
         qualified_others: undefined,
         receipt_mode: null,
@@ -100,6 +102,7 @@ describe('ConversationFilter', () => {
         message_timer: null,
         muted_state: 0,
         muted_timestamp: 0,
+        protocol: ConversationProtocol.PROTEUS,
         name: 'Florian@Staging11',
         others: ['71e25be1-5433-4647-964d-03a5d9e7c970'],
         qualified_others: undefined,

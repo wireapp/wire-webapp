@@ -21,6 +21,7 @@ import {amplify} from 'amplify';
 import ko from 'knockout';
 import {Availability, LegalHoldStatus} from '@wireapp/protocol-messaging';
 import {QualifiedId} from '@wireapp/api-client/src/user';
+import {ConversationProtocol} from '@wireapp/api-client/src/conversation/NewConversation';
 import {Cancelable, debounce} from 'underscore';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import {
@@ -171,7 +172,12 @@ export class Conversation {
     return TIMESTAMP_TYPE;
   }
 
-  constructor(conversation_id: string = '', domain: string = '', teamState = container.resolve(TeamState)) {
+  constructor(
+    conversation_id: string = '',
+    domain: string = '',
+    public readonly protocol = ConversationProtocol.PROTEUS,
+    teamState = container.resolve(TeamState),
+  ) {
     this.teamState = teamState;
     this.id = conversation_id;
 
@@ -191,7 +197,7 @@ export class Conversation {
      * is MLS protocol based as this property is for MLS conversations only.
      * @returns boolean
      */
-    this.isUsingMLSProtocol = !!this.groupId;
+    this.isUsingMLSProtocol = protocol === ConversationProtocol.MLS;
 
     this.is_loaded = ko.observable(false);
     this.is_pending = ko.observable(false);
@@ -1004,6 +1010,7 @@ export class Conversation {
       muted_state: this.mutedState(),
       muted_timestamp: this.mutedTimestamp(),
       name: this.name(),
+      protocol: this.protocol,
       others: this.participating_user_ids().map(user => user.id),
       qualified_others: this.participating_user_ids(),
       receipt_mode: this.receiptMode(),
