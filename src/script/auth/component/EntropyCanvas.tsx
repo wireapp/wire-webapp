@@ -26,11 +26,13 @@ interface CanvasProps {
   css?: CSSObject;
   'data-uie-name'?: string;
   onProgress: (entropyData: EntropyData, percent: number, pause: boolean) => void;
+  /** width of the canvas in px*/
   sizeX: number;
+  /** height of the canvas in px*/
   sizeY: number;
-  // minimum number of frames
+  /** minimum number of frames (good default: 300) */
   minFrames: number;
-  // minimum bits of overall estimated entropy
+  /** minimum bits of overall estimated entropy (good default: 1024) */
   minEntropyBits: number;
 }
 

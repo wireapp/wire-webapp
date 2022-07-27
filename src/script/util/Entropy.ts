@@ -23,7 +23,9 @@ export interface EntropyFrame {
   t?: number;
 }
 
-// calculate shannon entropy over a set of uint8 values
+/**
+ * calculate shannon entropy over a set of uint8 values
+ */
 export function shannonEntropy(entropyData: Uint8Array): number {
   const len = entropyData.length;
   const frequencies = entropyData.reduce((freq: Map<number, number>, c: number) => {
@@ -37,7 +39,11 @@ export function shannonEntropy(entropyData: Uint8Array): number {
   return sum;
 }
 
-// calculate the delta of every n-th element
+/**
+ * calculate the difference between every n-th element in a flattened list
+ * @param data The list of elements to calculate the differences on, containing a multipe of `n` elements
+ * @param n The number of different elements representing one flattened object
+ */
 export function calculateDeltaValues(data: Uint8Array, n: number): Uint8Array {
   const prev = Array<number | null>(3);
   const result = new Array<number>();
