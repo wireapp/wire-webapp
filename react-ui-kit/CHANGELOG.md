@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [8.11.3](https://github.com/wireapp/wire-web-packages/tree/main/packages/react-ui-kit/compare/@wireapp/react-ui-kit@8.11.2...@wireapp/react-ui-kit@8.11.3) (2022-07-27)
+
+
+### Bug Fixes
+
+* **react-ui-kit:** fix missmatching media queries ([#4350](https://github.com/wireapp/wire-web-packages/tree/main/packages/react-ui-kit/issues/4350)) ([2fde6af](https://github.com/wireapp/wire-web-packages/tree/main/packages/react-ui-kit/commit/2fde6af815f92aa14ae434f0bb6ff0734c79fb7d))
+
+
+
+
+
 ## [8.11.2](https://github.com/wireapp/wire-web-packages/tree/main/packages/react-ui-kit/compare/@wireapp/react-ui-kit@8.11.1...@wireapp/react-ui-kit@8.11.2) (2022-07-26)
 
 
