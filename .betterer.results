@@ -5,19 +5,19 @@
 //
 exports[`stricter compilation`] = {
   value: `{
-    "src/script/Config.ts:1589755822": [
-      [51, 4, 40, "\'ACCOUNT_BASE\' is specified more than once, so this usage will be overwritten.", "2150385420"],
-      [52, 4, 15, "\'MOBILE_BASE\' is specified more than once, so this usage will be overwritten.", "437120469"],
-      [53, 4, 12, "\'PRICING\' is specified more than once, so this usage will be overwritten.", "1004628660"],
-      [54, 4, 65, "\'PRIVACY_POLICY\' is specified more than once, so this usage will be overwritten.", "3718416051"],
-      [55, 4, 889, "\'SUPPORT\' is specified more than once, so this usage will be overwritten.", "162157357"],
-      [70, 4, 36, "\'TEAMS_BASE\' is specified more than once, so this usage will be overwritten.", "1602627884"],
-      [71, 4, 47, "\'TEAMS_BILLING\' is specified more than once, so this usage will be overwritten.", "1546117942"],
-      [72, 4, 79, "\'TEAMS_CREATE\' is specified more than once, so this usage will be overwritten.", "3896973981"],
-      [73, 4, 84, "\'TERMS_OF_USE_PERSONAL\' is specified more than once, so this usage will be overwritten.", "4120462090"],
-      [74, 4, 78, "\'TERMS_OF_USE_TEAMS\' is specified more than once, so this usage will be overwritten.", "2894167402"],
-      [75, 4, 32, "\'WEBSITE_BASE\' is specified more than once, so this usage will be overwritten.", "41464345"],
-      [76, 4, 61, "\'WHATS_NEW\' is specified more than once, so this usage will be overwritten.", "608611251"]
+    "src/script/Config.ts:3287170438": [
+      [52, 4, 40, "\'ACCOUNT_BASE\' is specified more than once, so this usage will be overwritten.", "2150385420"],
+      [53, 4, 15, "\'MOBILE_BASE\' is specified more than once, so this usage will be overwritten.", "437120469"],
+      [54, 4, 12, "\'PRICING\' is specified more than once, so this usage will be overwritten.", "1004628660"],
+      [55, 4, 65, "\'PRIVACY_POLICY\' is specified more than once, so this usage will be overwritten.", "3718416051"],
+      [56, 4, 889, "\'SUPPORT\' is specified more than once, so this usage will be overwritten.", "162157357"],
+      [71, 4, 36, "\'TEAMS_BASE\' is specified more than once, so this usage will be overwritten.", "1602627884"],
+      [72, 4, 47, "\'TEAMS_BILLING\' is specified more than once, so this usage will be overwritten.", "1546117942"],
+      [73, 4, 79, "\'TEAMS_CREATE\' is specified more than once, so this usage will be overwritten.", "3896973981"],
+      [74, 4, 84, "\'TERMS_OF_USE_PERSONAL\' is specified more than once, so this usage will be overwritten.", "4120462090"],
+      [75, 4, 78, "\'TERMS_OF_USE_TEAMS\' is specified more than once, so this usage will be overwritten.", "2894167402"],
+      [76, 4, 32, "\'WEBSITE_BASE\' is specified more than once, so this usage will be overwritten.", "41464345"],
+      [77, 4, 61, "\'WHATS_NEW\' is specified more than once, so this usage will be overwritten.", "608611251"]
     ],
     "src/script/assets/AssetCrypto.test.ts:2635946620": [
       [38, 55, 4, "Argument of type \'null\' is not assignable to parameter of type \'ArrayBuffer\'.", "2087897566"]
@@ -86,11 +86,6 @@ exports[`stricter compilation`] = {
       [56, 4, 8, "Type \'string | null\' is not assignable to type \'string\'.\\n  Type \'null\' is not assignable to type \'string\'.", "1055803537"],
       [67, 31, 7, "This condition will always return true since this \'Promise<any>\' is always defined.", "2364942655"],
       [93, 10, 11, "Type \'false | Error\' is not assignable to type \'Error\'.\\n  Type \'boolean\' is not assignable to type \'Error\'.", "674912356"]
-    ],
-    "src/script/auth/component/EntropyCanvas.tsx:2599807788": [
-      [65, 16, 10, "Type \'[number, number] | null\' is not assignable to type \'[number, number]\'.\\n  Type \'null\' is not assignable to type \'[number, number]\'.", "3284027968"],
-      [65, 28, 4, "Type \'null\' is not assignable to type \'[number, number]\'.", "2087897566"],
-      [93, 20, 6, "Object is possibly \'null\'.", "1537472717"]
     ],
     "src/script/auth/component/LinkButton.tsx:522804603": [
       [32, 8, 67, "Type \'(theme: Theme) => CSSObject\' is not assignable to type \'Interpolation<Theme>\'.\\n  Type \'(theme: Theme) => CSSObject\' is not assignable to type \'FunctionInterpolation<Theme>\'.\\n    Types of parameters \'theme\' and \'props\' are incompatible.\\n      Type \'Theme\' is missing the following properties from type \'Theme\': IconButton, Checkbox, general, Input, Select", "530872600"]
@@ -308,7 +303,7 @@ exports[`stricter compilation`] = {
     "src/script/auth/page/ClientManager.tsx:2167154494": [
       [37, 35, 44, "Argument of type \'string | null\' is not assignable to parameter of type \'string\'.\\n  Type \'null\' is not assignable to type \'string\'.", "2692881484"]
     ],
-    "src/script/auth/page/ConversationJoin.tsx:2738577097": [
+    "src/script/auth/page/ConversationJoin.tsx:2931482776": [
       [121, 20, 9, "Argument of type \'boolean | \\"\\"\' is not assignable to parameter of type \'SetStateAction<boolean | undefined>\'.\\n  Type \'\\"\\"\' is not assignable to type \'SetStateAction<boolean | undefined>\'.", "984770170"],
       [138, 19, 11, "Object is possibly \'undefined\'.", "3519972619"],
       [151, 63, 15, "Argument of type \'string | undefined\' is not assignable to parameter of type \'string\'.\\n  Type \'undefined\' is not assignable to type \'string\'.", "4110106687"],
@@ -338,7 +333,7 @@ exports[`stricter compilation`] = {
       [115, 16, 5, "Object is of type \'unknown\'.", "165548477"],
       [168, 18, 3, "Type \'MutableRefObject<HTMLInputElement | undefined>\' is not assignable to type \'((instance: HTMLInputElement | null) => void) | RefObject<HTMLInputElement> | null | undefined\'.", "193432436"]
     ],
-    "src/script/auth/page/Login.tsx:3512716389": [
+    "src/script/auth/page/Login.tsx:2043279151": [
       [173, 24, 16, "Argument of type \'Error[]\' is not assignable to parameter of type \'SetStateAction<never[]>\'.", "2735526245"],
       [175, 50, 10, "Type \'ClientType | undefined\' is not assignable to type \'ClientType\'.", "3013398820"],
       [204, 56, 10, "Type \'ClientType | undefined\' is not assignable to type \'ClientType\'.", "3013398820"],
