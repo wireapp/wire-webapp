@@ -1080,6 +1080,7 @@
   "setEmail.emailPlaceholder": "E-Mail-Adresse",
   "setEmail.headline": "E-Mail-Adresse festlegen",
   "setEmail.tryAgain": "Erneut versuchen",
+  "setEntropy.continue": "Weiter",
   "setEntropy.headline": "Entropie erstellen",
   "setEntropy.moreEntropyNeeded": "Bitte bewegen Sie Ihre Maus weiterhin innerhalb des Fensters, um genügend Entropie zu erzeugen.",
   "setEntropy.subheadline": "Bewegen Sie Ihre Maus so zufällig wie möglich im unteren Fenster, bis der Fortschrittsbalken zu 100 % gefüllt ist. Dadurch wird eine Zufallszahl erzeugt, die zum Schutz Ihres Benutzerkontos beiträgt und die allgemeine Sicherheit erhöht.",

@@ -46,7 +46,7 @@ export const ProgressBar = ({width, percent, error, style}: ProgressProps) => {
           backgroundColor: error ? 'red' : 'blue',
           borderRadius: '5px',
           height: 'inherit',
-          transition: '0.5s ease-in',
+          transition: 'ease-in',
           width: `${progress}px`,
         }}
       />
