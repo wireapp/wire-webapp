@@ -1084,7 +1084,7 @@
   "setEntropy.continue": "Continue",
   "setEntropy.headline": "Create Entropy",
   "setEntropy.moreEntropyNeeded": "Please continue moving your mouse within the window to create enough entropy.",
-  "setEntropy.subheadline": "Move your mouse as randomly as possible within the window below until the progress bar is 100% filled. This increases the quality of the random numbers which are used to create your cryptographic long term secrets and therefore increases the overall security of your Wire client.",
+  "setEntropy.subheadline": "Move your mouse as randomly as possible within the window below until the progress bar is 100% filled. This increases the quality of the random numbers which are used to create your cryptographic long term secrets and therefore increases the overall security of this device.",
   "setEntropy.success": "Entropy successfully created",
   "setPassword.button": "Set password",
   "setPassword.headline": "Set password",
