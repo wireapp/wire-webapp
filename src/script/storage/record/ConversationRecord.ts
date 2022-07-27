@@ -31,8 +31,8 @@ import {LegalHoldStatus} from '@wireapp/protocol-messaging';
 import {RECEIPT_MODE} from '@wireapp/api-client/src/conversation/data';
 
 export interface ConversationRecord {
-  access: CONVERSATION_ACCESS[];
   access_role: CONVERSATION_ACCESS_ROLE | ACCESS_ROLE_V2[];
+  access: CONVERSATION_ACCESS[];
   archived_state: boolean;
   archived_timestamp: number;
   cleared_timestamp: number;
@@ -40,6 +40,7 @@ export interface ConversationRecord {
   domain: string | null;
   ephemeral_timer: number;
   global_message_timer: number;
+  group_id: string;
   id: string;
   is_guest: boolean;
   is_managed: boolean;

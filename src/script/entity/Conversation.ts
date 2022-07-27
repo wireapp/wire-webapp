@@ -974,6 +974,15 @@ export class Conversation {
     return this.getLastMessage()?.timestamp() ? this.getLastMessage().timestamp() >= this.last_event_timestamp() : true;
   };
 
+  /**
+   * If a conversation has the groupId property it means that it
+   * is MLS protocol based as this property is for MLS conversations only.
+   * @returns boolean
+   */
+  readonly isUsingMLSProtocol = (): boolean => {
+    return !!this.groupId;
+  };
+
   serialize(): ConversationRecord {
     return {
       access: this.accessModes,
@@ -985,6 +994,7 @@ export class Conversation {
       domain: this.domain,
       ephemeral_timer: this.localMessageTimer(),
       global_message_timer: this.globalMessageTimer(),
+      group_id: this.groupId,
       id: this.id,
       is_guest: this.isGuest(),
       is_managed: this.isManaged,
