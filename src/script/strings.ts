@@ -292,17 +292,17 @@ export const setEmailStrings = defineMessages({
 });
 
 export const setEntropyStrings = defineMessages({
+  continue: {
+    defaultMessage: 'Continue',
+    id: 'setEntropy.continue',
+  },
   headline: {
     defaultMessage: 'Create Entropy',
     id: 'setEntropy.headline',
   },
-  moreEntropyNeeded: {
-    defaultMessage: 'Please continue moving your mouse within the window to create enough entropy.',
-    id: 'setEntropy.moreEntropyNeeded',
-  },
   subheadline: {
     defaultMessage:
-      'Move your mouse as randomly as possible within the window below until the progress bar is 100% filled. This creates a random number which helps to protect your account and increases the overall security.',
+      'Move your mouse as randomly as possible within the window below until the progress bar is 100% filled. This increases the quality of the random numbers which are used to create your cryptographic long term secrets and therefore increases the overall security of your Wire client.',
     id: 'setEntropy.subheadline',
   },
   success: {
