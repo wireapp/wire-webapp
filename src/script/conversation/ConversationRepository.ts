@@ -449,14 +449,20 @@ export class ConversationRepository {
     }
 
     try {
-      const response = await this.core.service!.conversation.createConversation(payload);
       /**
-       * Todo: Event generation for MLS gets done somewhere else
-       * We need to refresh the conversation list after creating a new conversation in case of MLS
+       * ToDo: Fetch all MLS Events from backend before doing anything else
+       * Needs to be done to receive the latest epoch and avoid epoch mismatch errors
        */
+
+      const response = await this.core.service!.conversation.createConversation(payload);
 
       switch (payload.protocol) {
         case ConversationProtocol.MLS:
+          /**
+           * Todo: Event generation for MLS is done in Backend
+           * We need to fetch the latest events from backend and then update the local state
+           * After that we need to redirect the user to the new conversation
+           */
           return undefined;
         case ConversationProtocol.PROTEUS:
           const {conversationEntity} = await this.onCreate({
@@ -1363,6 +1369,11 @@ export class ConversationRepository {
    * @returns Resolves when members were added
    */
   async addUsers(conversation: Conversation, userEntities: User[]) {
+    /**
+     * ToDo: Fetch all MLS Events from backend before doing anything else
+     * Needs to be done to receive the latest epoch and avoid epoch mismatch errors
+     */
+
     const userIds = userEntities.map(userEntity => userEntity.qualifiedId);
 
     try {
@@ -1372,15 +1383,11 @@ export class ConversationRepository {
           userIds,
           conversation.groupId,
         );
-        const selfId = conversation.selfUser()?.qualifiedId;
-        /**
-         * Todo: Event generation for MLS gets done somewhere else
-         * We need to refresh the conversation list after adding the user
-         */
-
-        if (response && selfId) {
-          // const event = EventBuilder.buildMemberJoin(conversation, selfId, userIds);
-          // this.eventRepository.injectEvent(event);
+        if (response) {
+          /**
+           * Todo: Event generation for MLS is done in Backend
+           * We need to fetch the latest events from backend and then update the local state
+           */
         }
       } else {
         const response = await this.core.service!.conversation.addUsers(conversation.qualifiedId, userIds);
