@@ -18,8 +18,9 @@
  */
 
 /** @jsx jsx */
+/* @jsxFrag React.Fragment */
 import {jsx} from '@emotion/react';
-import React, {ReactFragment, useEffect, useState} from 'react';
+import React, {ReactFragment, useEffect, useMemo, useState} from 'react';
 
 import {QUERY, QueryKeys} from '../mediaQueries';
 
@@ -31,16 +32,18 @@ export interface MatchMediaProps extends React.HTMLProps<ReactFragment> {
 }
 
 export const useMatchMedia = (query: Query) => {
-  const matchMedia = window.matchMedia(`(${query})`);
+  const matchMedia = useMemo(() => window.matchMedia(`(${query})`), [query]);
 
   const [isMatching, setIsMatching] = useState(matchMedia.matches);
 
-  const updateMatching = () => setIsMatching(matchMedia.matches);
+  const updateMatching = (event: MediaQueryListEvent) => {
+    setIsMatching(event.matches);
+  };
 
   useEffect(() => {
-    matchMedia.addListener(updateMatching);
-    return () => matchMedia.removeListener(updateMatching);
-  });
+    matchMedia.addEventListener('change', updateMatching);
+    return () => matchMedia.removeEventListener('change', updateMatching);
+  }, [matchMedia]);
 
   return isMatching;
 };
@@ -48,7 +51,7 @@ export const useMatchMedia = (query: Query) => {
 export const MatchMedia: React.FC<MatchMediaProps> = ({query, children, not}) => {
   const matchQuery = useMatchMedia(QUERY[query] || query);
   const isMatching = not ? !matchQuery : matchQuery;
-  return <React.Fragment>{isMatching ? children : null}</React.Fragment>;
+  return isMatching ? <>{children}</> : null;
 };
 
 export type NamedMatchMediaProps = Omit<MatchMediaProps, 'query'>;
