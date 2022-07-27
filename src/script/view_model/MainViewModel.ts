@@ -216,7 +216,7 @@ export class MainViewModel {
     document.querySelector('#app').classList.remove('app--panel-open');
     this.isPanelOpen(false);
   }
-
+q
   readonly togglePanel = (forceState: string): Promise<void> => {
     const app = document.querySelector<HTMLElement>('#app');
     const panel = document.querySelector<HTMLElement>('.right-column');
