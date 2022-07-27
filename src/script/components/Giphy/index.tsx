@@ -18,7 +18,7 @@
  */
 
 import {WebAppEvents} from '@wireapp/webapp-events';
-import {MouseEvent, FC, useEffect, useState} from 'react';
+import {FC, useEffect, useState} from 'react';
 import {amplify} from 'amplify';
 import cx from 'classnames';
 
@@ -28,7 +28,7 @@ import {registerReactComponent} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 import {Modal} from '../../ui/Modal';
 import {Gif, GiphyRepository} from '../../extension/GiphyRepository';
-import {getLogger, Logger} from 'Util/Logger';
+import GifImage from 'Components/Giphy/GifImage';
 
 export enum GiphyState {
   DEFAULT = '',
@@ -45,8 +45,6 @@ interface GiphyProps {
 }
 
 const Giphy: FC<GiphyProps> = ({giphyRepository, defaultGiphyState = GiphyState.DEFAULT}) => {
-  const logger: Logger = getLogger('GiphyViewModel');
-
   const [currentQuery, setCurrentQuery] = useState<string>('');
   const [gifs, setGifs] = useState<Gif[]>([]);
   const [selectedGif, setSelectedGif] = useState<Gif | null>(null);
@@ -54,15 +52,14 @@ const Giphy: FC<GiphyProps> = ({giphyRepository, defaultGiphyState = GiphyState.
 
   const [giphyState, setGiphyState] = useState<GiphyState>(defaultGiphyState);
   const isErrorState = giphyState === GiphyState.ERROR;
-  const isLoadingState = giphyState === GiphyState.LOADING;
-  const isResultState = giphyState === GiphyState.RESULT;
-  const isResultsState = giphyState === GiphyState.RESULTS;
-  const areResultsState = [GiphyState.RESULT, GiphyState.RESULTS].includes(giphyState);
-  const isNoSearchResultState = giphyState === GiphyState.NO_SEARCH_RESULT;
+  const isLoading = giphyState === GiphyState.LOADING;
+  const isSingleGif = giphyState === GiphyState.RESULT;
+  const isMultipleGifs = giphyState === GiphyState.RESULTS;
+  const noSearchResults = giphyState === GiphyState.NO_SEARCH_RESULT;
 
   const hasGifs = gifs.length > 0;
 
-  const loadingTxt = isLoadingState ? t('accessibility.giphyModal.loading') : '';
+  const loadingTxt = isLoading ? t('accessibility.giphyModal.loading') : '';
 
   const giphyModal = new Modal('#giphy-modal', () => {
     giphyRepository.resetOffset();
@@ -75,9 +72,7 @@ const Giphy: FC<GiphyProps> = ({giphyRepository, defaultGiphyState = GiphyState.
   };
 
   const getGifs = async (query: string, displaySingleResult = false): Promise<void> => {
-    const isStateError = giphyState === GiphyState.ERROR;
-
-    if (isStateError) {
+    if (isErrorState) {
       return;
     }
 
@@ -106,8 +101,6 @@ const Giphy: FC<GiphyProps> = ({giphyRepository, defaultGiphyState = GiphyState.
     } catch (error) {
       console.warn(error);
       setGiphyState(GiphyState.ERROR);
-
-      logger.warn(error);
     }
   };
 
@@ -149,7 +142,6 @@ const Giphy: FC<GiphyProps> = ({giphyRepository, defaultGiphyState = GiphyState.
       setSelectedGif(gif);
       setGiphyState(GiphyState.RESULT);
     } catch (error) {
-      logger.warn(error);
       setGiphyState(GiphyState.ERROR);
     }
   };
@@ -181,15 +173,10 @@ const Giphy: FC<GiphyProps> = ({giphyRepository, defaultGiphyState = GiphyState.
   }, []);
 
   return (
-    <div
-      role="dialog"
-      aria-labelledby="giphy-name"
-      // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex
-      tabIndex={0}
-    >
+    <div role="dialog" aria-labelledby="giphy-name">
       <div className="modal-content">
         <div className="giphy-modal-header modal-header">
-          {isResultState && (
+          {isSingleGif && (
             <button
               className="button-icon icon-grid"
               onClick={onGridClick}
@@ -198,7 +185,7 @@ const Giphy: FC<GiphyProps> = ({giphyRepository, defaultGiphyState = GiphyState.
             />
           )}
 
-          {(isResultsState || isNoSearchResultState) && (
+          {(isMultipleGifs || noSearchResults) && (
             <button
               className="button-icon icon-back"
               onClick={onBackClick}
@@ -207,7 +194,7 @@ const Giphy: FC<GiphyProps> = ({giphyRepository, defaultGiphyState = GiphyState.
             />
           )}
 
-          {!(areResultsState || isNoSearchResultState) && <span className="giphy-modal-header-button" />}
+          {!(isSingleGif || isMultipleGifs || noSearchResults) && <span className="giphy-modal-header-button" />}
 
           <span id="giphy-name" className="label-xs" data-uie-name="giphy-query">
             {currentQuery}
@@ -224,62 +211,35 @@ const Giphy: FC<GiphyProps> = ({giphyRepository, defaultGiphyState = GiphyState.
           </button>
         </div>
 
-        {/* eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex */}
-        <div className="giphy-modal-center modal-center" tabIndex={0}>
-          {isLoadingState && (
+        <div className="giphy-modal-center modal-center">
+          {isLoading && (
             <div className="gif-container-spinner">
-              <div
-                className="icon-spinner spin"
-                aria-live="polite"
-                aria-busy={isLoadingState}
-                aria-label={loadingTxt}
-              />
+              <div className="icon-spinner spin" aria-live="polite" aria-busy={isLoading} aria-label={loadingTxt} />
             </div>
           )}
 
-          {areResultsState && (
-            <div className={cx('gif-container', {'gif-container-grid': gifs.length > 1})}>
-              {gifs.map(gif => {
-                const currentGifUrl = gifs.length === 1 ? gif.animated : gif.static;
+          {isSingleGif && currentGif && (
+            <div className="gif-container">
+              <div className="button-reset-default gif-container-item">
+                <GifImage src={currentGif.animated} />
+              </div>
+            </div>
+          )}
 
-                const renderImage = (mouseActions = false) => (
-                  <img
-                    src={currentGifUrl}
-                    alt=""
-                    css={{height: '100%', objectFit: gifs.length === 1 ? 'contain' : 'cover', width: '100%'}}
-                    {...(mouseActions && {
-                      onMouseOut: (e: MouseEvent<HTMLImageElement>) => {
-                        e.currentTarget.src = gif.static;
-                      },
-                      onMouseOver: (e: MouseEvent<HTMLImageElement>) => {
-                        e.currentTarget.src = gif.animated;
-                      },
-                    })}
-                  />
-                );
-
-                return gifs.length === 1 ? (
-                  <div
-                    key={gif.url}
-                    className={cx('button-reset-default gif-container-item', {
-                      'gif-container-item-unselected': gif.url !== selectedGif?.url,
-                    })}
-                  >
-                    {renderImage()}
-                  </div>
-                ) : (
-                  <button
-                    key={gif.url}
-                    className={cx('button-reset-default gif-container-item', {
-                      'gif-container-item-unselected': gif.url !== selectedGif?.url,
-                    })}
-                    onClick={() => onSelectGif(gif)}
-                    aria-label={t('accessibility.giphyModal.selectGif')}
-                  >
-                    {renderImage(gifs.length > 1)}
-                  </button>
-                );
-              })}
+          {isMultipleGifs && (
+            <div className="gif-container gif-container-grid">
+              {gifs.map(gif => (
+                <button
+                  key={gif.url}
+                  className={cx('button-reset-default gif-container-item', {
+                    'gif-container-item-unselected': gif.url !== selectedGif?.url,
+                  })}
+                  onClick={() => onSelectGif(gif)}
+                  aria-label={t('accessibility.giphyModal.selectGif')}
+                >
+                  <GifImage src={gif.static} animatedSrc={gif.animated} objectFit="cover" title={gif.title} />
+                </button>
+              ))}
             </div>
           )}
 
