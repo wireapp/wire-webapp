@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [19.18.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/compare/@wireapp/api-client@19.17.4...@wireapp/api-client@19.18.0) (2022-07-27)
+
+
+### Features
+
+* **api-client:** add protocol to conversation ([#4349](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/issues/4349)) ([7332878](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/commit/733287816e4509f553f2a865e3aa14db1d5bcede))
+
+
+
+
+
 ## [19.17.4](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/compare/@wireapp/api-client@19.17.3...@wireapp/api-client@19.17.4) (2022-07-26)
 
 **Note:** Version bump only for package @wireapp/api-client
