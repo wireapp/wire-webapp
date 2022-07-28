@@ -45,7 +45,6 @@ export interface SelfStatusUpdateDatabaseData {
   archived_timestamp: number;
   cleared_timestamp: number;
   ephemeral_timer: number;
-  last_event_type: string;
   last_event_timestamp: number;
   last_read_timestamp: number;
   last_server_timestamp: number;
@@ -132,7 +131,7 @@ export class ConversationMapper {
 
     if (archived_timestamp) {
       conversationEntity.setTimestamp(archived_timestamp, Conversation.TIMESTAMP_TYPE.ARCHIVED);
-      conversationEntity.archivedState(selfState.archived_state);
+      conversationEntity.archivedState(selfState.archived_state ?? false);
     }
 
     if (cleared_timestamp !== undefined) {
@@ -225,7 +224,6 @@ export class ConversationMapper {
     conversationEntity.groupId = group_id;
     conversationEntity.type(type);
     conversationEntity.name(name || '');
-    conversationEntity.last_event_type(conversationData.last_event || '');
 
     const selfState = members?.self || conversationData;
     conversationEntity = ConversationMapper.updateSelfStatus(conversationEntity, selfState as any);

@@ -1235,7 +1235,10 @@ export class ConversationRepository {
    * @param initialTimestamp Initial server and event timestamp
    * @returns Mapped conversation/s
    */
-  mapConversations(payload: BackendConversation[], initialTimestamp = this.getLatestEventTimestamp()): Conversation[] {
+  mapConversations(
+    payload: BackendConversation[],
+    initialTimestamp = this.getLatestEventTimestamp(true),
+  ): Conversation[] {
     const entities = ConversationMapper.mapConversations(payload as ConversationDatabaseData[], initialTimestamp);
     entities.forEach(conversationEntity => {
       this._mapGuestStatusSelf(conversationEntity);
@@ -1912,9 +1915,10 @@ export class ConversationRepository {
           previouslyArchived = conversationEntity.is_archived();
 
           const isBackendTimestamp = eventSource !== EventSource.INJECTED;
-          conversationEntity.updateTimestampServer(eventJson.server_time || eventJson.time, isBackendTimestamp);
+          if (type !== CONVERSATION_EVENT.MEMBER_JOIN && type !== CONVERSATION_EVENT.MEMBER_LEAVE) {
+            conversationEntity.updateTimestampServer(eventJson.server_time || eventJson.time, isBackendTimestamp);
+          }
         }
-
         return conversationEntity;
       })
       .then(conversationEntity => this.checkLegalHoldStatus(conversationEntity, eventJson))
