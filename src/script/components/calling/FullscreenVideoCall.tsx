@@ -103,9 +103,11 @@ const videoControlDisabledStyles = css`
 `;
 
 const paginationButtonStyles: CSSObject = {
+  ['& svg > path']: {
+    fill: 'var(--main-color)',
+  },
   alignItems: 'center',
-  backdropFilter: 'blur(10px)',
-  backgroundColor: 'rgba(255, 255, 255, 0.24)',
+  backgroundColor: 'var(--app-bg-secondary)',
   cursor: 'pointer',
   display: 'flex',
   height: 56,
@@ -242,14 +244,59 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
       </div>
 
       {/* {!isChoosingScreen && <div className="video-element-overlay"></div>} */}
-
+      {!maximizedParticipant && activeCallViewTab === CallViewTab.ALL && totalPages > 1 && (
+        <>
+          {currentPage !== totalPages - 1 && (
+            <button
+              data-uie-name="pagination-next"
+              onClick={() => changePage(currentPage + 1, call)}
+              type="button"
+              className="button-reset-default"
+              css={{
+                ...paginationButtonStyles,
+                borderBottomLeftRadius: 32,
+                borderTopLeftRadius: 32,
+                right: 0,
+              }}
+            >
+              <Icon.ArrowNext css={{left: 4, position: 'relative'}} />
+            </button>
+          )}
+          {currentPage !== 0 && (
+            <button
+              data-uie-name="pagination-previous"
+              type="button"
+              onClick={() => changePage(currentPage - 1, call)}
+              className="button-reset-default"
+              css={{
+                ...paginationButtonStyles,
+                borderBottomRightRadius: 32,
+                borderTopRightRadius: 32,
+                left: 0,
+              }}
+            >
+              <Icon.ArrowNext css={{position: 'relative', right: 4, transform: 'rotate(180deg)'}} />
+            </button>
+          )}
+          <div
+            // className="hide-controls-hidden"
+            css={{bottom: 110, display: 'flex', justifyContent: 'center', position: 'absolute', width: '100%'}}
+          >
+            <Pagination
+              totalPages={totalPages}
+              currentPage={currentPage}
+              onChangePage={newPage => changePage(newPage, call)}
+            />
+          </div>
+        </>
+      )}
       {!isChoosingScreen && (
         <div id="video-controls" className="video-controls">
-          {(videoGrid.grid.length > 1 || maximizedParticipant) && (
+          {/* {(videoGrid.grid.length > 1 || maximizedParticipant) && (
             <div className="video-controls__fit-info" data-uie-name="label-fit-fill-info">
               {maximizedParticipant ? t('videoCallOverlayFitVideoLabelGoBack') : t('videoCallOverlayFitVideoLabel')}
             </div>
-          )}
+          )} */}
           <ul className="video-controls__wrapper">
             <li className="video-controls__item">
               <button
@@ -397,52 +444,6 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
             </div>
           </ul>
         </div>
-      )}
-      {!maximizedParticipant && activeCallViewTab === CallViewTab.ALL && totalPages > 1 && (
-        <>
-          <div
-            // className="hide-controls-hidden"
-            css={{bottom: 16, display: 'flex', justifyContent: 'center', position: 'absolute', width: '100%'}}
-          >
-            <Pagination
-              totalPages={totalPages}
-              currentPage={currentPage}
-              onChangePage={newPage => changePage(newPage, call)}
-            />
-          </div>
-          {currentPage !== totalPages - 1 && (
-            <button
-              data-uie-name="pagination-next"
-              onClick={() => changePage(currentPage + 1, call)}
-              type="button"
-              className="button-reset-default"
-              css={{
-                ...paginationButtonStyles,
-                borderBottomLeftRadius: 32,
-                borderTopLeftRadius: 32,
-                right: 0,
-              }}
-            >
-              <Icon.ArrowNext css={{left: 4, position: 'relative'}} />
-            </button>
-          )}
-          {currentPage !== 0 && (
-            <button
-              data-uie-name="pagination-previous"
-              type="button"
-              onClick={() => changePage(currentPage - 1, call)}
-              className="button-reset-default"
-              css={{
-                ...paginationButtonStyles,
-                borderBottomRightRadius: 32,
-                borderTopRightRadius: 32,
-                left: 0,
-              }}
-            >
-              <Icon.ArrowNext css={{position: 'relative', right: 4, transform: 'rotate(180deg)'}} />
-            </button>
-          )}
-        </>
       )}
     </div>
   );

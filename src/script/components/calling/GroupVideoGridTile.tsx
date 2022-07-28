@@ -85,7 +85,7 @@ const GroupVideoGridTile: React.FC<GroupVideoGridTileProps> = ({
             alignItems: 'center',
             backgroundColor: 'var(--group-video-tile-bg)',
             borderRadius: '8px',
-            boxShadow: participantCount > 1 ? 'inset 0px 0px 0px 2px var(--group-video-bg)' : 'initial',
+            // boxShadow: participantCount > 1 ? 'inset 0px 0px 0px 2px var(--group-video-bg)' : 'initial',
             display: 'flex',
             height: '100%',
             justifyContent: 'center',
@@ -101,7 +101,9 @@ const GroupVideoGridTile: React.FC<GroupVideoGridTileProps> = ({
           bottom: 0,
           boxShadow: isActivelySpeaking
             ? `inset 0px 0px 0px 1px var(--group-video-bg), inset 0px 0px 0px 4px var(--accent-color), inset 0px 0px 0px 7px var(--app-bg-secondary)`
-            : `inset 0px 0px 0px 0px`,
+            : participantCount > 1
+            ? 'inset 0px 0px 0px 2px var(--group-video-bg)'
+            : 'initial',
           left: 0,
           position: 'absolute',
           right: 0,
@@ -110,7 +112,12 @@ const GroupVideoGridTile: React.FC<GroupVideoGridTileProps> = ({
         }}
       />
       {!minimized && (
-        <div className="group-video-grid__element__label">
+        <div
+          className="group-video-grid__element__label"
+          css={{
+            backgroundColor: isActivelySpeaking ? 'var(--accent-color)' : 'var(--black)',
+          }}
+        >
           {isMuted ? (
             <span className="group-video-grid__element__label__icon">
               <Icon.MicOff data-uie-name="mic-icon-off" />
@@ -123,6 +130,9 @@ const GroupVideoGridTile: React.FC<GroupVideoGridTileProps> = ({
               isActivelySpeaking ? 'status-active-speaking' : isMuted ? 'status-audio-off' : 'status-audio-on'
             }
             className="group-video-grid__element__label__name"
+            css={{
+              color: isActivelySpeaking ? 'var(--app-bg-secondary)' : 'var(--white)',
+            }}
           >
             {name}
           </span>

@@ -111,6 +111,7 @@
       }
 
       &__label {
+        .label-small-medium;
         position: absolute;
         bottom: 0;
         display: flex;
@@ -118,27 +119,15 @@
         align-items: center;
         padding: 8px;
         margin: 8px;
-        backdrop-filter: blur(10px);
-        background-color: rgba(128, 128, 128, 0.24);
-        border-radius: 100px;
-        color: #fff;
-        font-size: 12px;
+        background-color: var(--black);
+        border-radius: 3px;
         line-height: 1em;
-        opacity: 0;
         white-space: nowrap;
-
-        .hide-controls & {
-          opacity: 1;
-          transition: opacity 0.25s ease-in-out;
-        }
 
         &__icon {
           margin-right: 8px;
           svg {
             width: 16px;
-            path {
-              fill: #fff;
-            }
           }
         }
 
