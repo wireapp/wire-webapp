@@ -15,7 +15,14 @@
         <main-content params="contentViewModel: $root"></main-content>
         <!-- ko if: state() === State.CONNECTION_REQUESTS -->
           <h1 class="visually-hidden" data-bind="text: t('accessibility.headings.connectionRequests')"></h1>
-          #include('content/connect-requests.htm')
+
+          <connect-requests
+            params="
+                actionsViewModel: $root.mainViewModel.actions,
+                userState: $root.userState,
+                teamState: $root.teamState,
+              "
+          ></connect-requests>
         <!-- /ko -->
         <!-- ko if: state() === State.CONVERSATION -->
           <h1 class="visually-hidden" data-bind="text: t('accessibility.headings.conversation')"></h1>
