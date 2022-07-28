@@ -36,11 +36,13 @@ export interface ButtonGroupProps {
 const buttonGroupWrapperStyles: CSSObject = {
   alignItems: 'center',
   'button:first-of-type': {
+    border: '1px solid var(--border-color)',
     borderBottomLeftRadius: 12,
     borderTopLeftRadius: 12,
     paddingLeft: '14px !important',
   },
   'button:last-of-type': {
+    border: '1px solid var(--border-color)',
     borderBottomRightRadius: 12,
     borderTopRightRadius: 12,
     paddingRight: '14px !important',
@@ -50,8 +52,8 @@ const buttonGroupWrapperStyles: CSSObject = {
 
 const buttonGroupItemStyles: CSSObject = {
   backdropFilter: 'blur(16px)',
-  backgroundColor: 'rgba(255, 255, 255, 0.16)',
-  color: '#fff',
+  backgroundColor: 'var(--text-input-background)',
+  color: 'var(--main-color)',
   cursor: 'pointer',
   fontSize: 11,
   fontWeight: 500,
@@ -61,8 +63,8 @@ const buttonGroupItemStyles: CSSObject = {
 
 const buttonGroupItemActiveStyles: CSSObject = {
   ...buttonGroupItemStyles,
-  backgroundColor: '#fff',
-  color: '#33373a',
+  backgroundColor: 'var(--main-color)',
+  color: 'var(--text-input-background)',
 };
 
 const ButtonGroup: React.FC<ButtonGroupProps> = ({style, items, currentItem, onChangeItem, textSubstitute}) => {
