@@ -20,15 +20,15 @@
 import {proteus as ProtobufOTR} from '@wireapp/protocol-messaging/web/otr';
 import type {AxiosError, AxiosRequestConfig} from 'axios';
 
-import {ValidationError} from '../validation/';
-import {DefaultConversationRoleName} from './ConversationRole';
-import type {
+import {ValidationError} from '../../validation';
+import {
   ClientMismatch,
   Conversation,
   ConversationCode,
   ConversationIds,
   ConversationRolesList,
   Conversations,
+  DefaultConversationRoleName,
   Invite,
   Member,
   MessageSendingStatus,
@@ -36,7 +36,7 @@ import type {
   NewOTRMessage,
   QualifiedConversationIds,
   RemoteConversations,
-} from './';
+} from '..';
 import type {
   ConversationAccessUpdateEvent,
   ConversationCodeDeleteEvent,
@@ -47,8 +47,8 @@ import type {
   ConversationMessageTimerUpdateEvent,
   ConversationReceiptModeUpdateEvent,
   ConversationRenameEvent,
-} from '../event/';
-import {BackendError, BackendErrorLabel, HttpClient} from '../http/';
+} from '../../event';
+import {BackendError, BackendErrorLabel, HttpClient} from '../../http';
 import type {
   ConversationAccessUpdateData,
   ConversationAccessV2UpdateData,
@@ -59,16 +59,16 @@ import type {
   ConversationOtherMemberUpdateData,
   ConversationReceiptModeUpdateData,
   ConversationTypingData,
-} from './data';
+} from '../data';
 import {
   ConversationFullError,
   ConversationCodeNotFoundError,
   ConversationLegalholdMissingConsentError,
-} from './ConversationError';
-import {QualifiedId} from '../user';
-import {BackendFeatures} from '../APIClient';
+} from '../ConversationError';
+import {QualifiedId} from '../../user';
+import {BackendFeatures} from '../../APIClient';
 import {chunk} from '@wireapp/commons/src/main/util/ArrayUtil';
-import {MlsEvent} from './data/MlsEventData';
+import {MlsEvent} from '../data/MlsEventData';
 
 export type PostMlsMessageResponse = {
   events: MlsEvent[];
@@ -104,7 +104,7 @@ export class ConversationAPI {
     V2: 'v2',
   };
 
-  constructor(private readonly client: HttpClient, private readonly backendFeatures: BackendFeatures) {}
+  constructor(protected readonly client: HttpClient, protected readonly backendFeatures: BackendFeatures) {}
 
   /**
    * Delete a conversation code.
@@ -961,10 +961,9 @@ export class ConversationAPI {
   /**
    * Add users to an existing conversation.
    * @param conversationId The conversation ID to add the users to
-   * @param userIds List of user IDs to add to a conversation
-   * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/conversations/addMembers
+   * @param users List of users to add to a conversation
    */
-  private async postMembersV0(conversationId: string, userIds: string[]): Promise<ConversationMemberJoinEvent> {
+  private async postMembersV0(conversationId: string, userIds: string[]) {
     const config: AxiosRequestConfig = {
       data: {
         conversation_role: DefaultConversationRoleName.WIRE_MEMBER,
@@ -989,11 +988,11 @@ export class ConversationAPI {
   }
 
   /**
-   * Add qualified members to an existing conversation.
+   * Add qualified members to an existing Proteus conversation.
    * @param conversationId The conversation ID to add the users to
    * @param users List of users to add to a conversation
    */
-  public async postMembers(conversationId: QualifiedId, users: QualifiedId[]): Promise<ConversationMemberJoinEvent> {
+  public async postMembers(conversationId: QualifiedId, users: QualifiedId[]) {
     if (!this.backendFeatures.federationEndpoints) {
       return this.postMembersV0(
         conversationId.id,

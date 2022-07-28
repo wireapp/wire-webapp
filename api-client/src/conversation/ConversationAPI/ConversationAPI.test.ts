@@ -17,7 +17,7 @@
  *
  */
 
-import {HttpClient} from '../http';
+import {HttpClient} from '../../http';
 import {ConversationAPI} from './ConversationAPI';
 
 const httpClientMock = jasmine.createSpyObj('httpClient', {sendJSON: () => ({data: ''})});
