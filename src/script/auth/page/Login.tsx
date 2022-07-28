@@ -246,8 +246,8 @@ const Login = ({
     handleSubmit({...twoFactorLoginData, verificationCode: code}, []);
   };
 
-  const storeEntropy = async (entropyData: [number, number][]) => {
-    onEntropyGenerated.current?.(new Uint8Array(entropyData.filter(Boolean).flat()));
+  const storeEntropy = async (entropyData: Uint8Array) => {
+    onEntropyGenerated.current?.(entropyData);
   };
 
   const backArrow = (

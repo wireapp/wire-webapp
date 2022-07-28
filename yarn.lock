@@ -3257,10 +3257,10 @@
   resolved "https://registry.yarnpkg.com/@webpack-cli/serve/-/serve-1.7.0.tgz#e1993689ac42d2b16e9194376cfb6753f6254db1"
   integrity sha512-oxnCNGj88fL+xzV+dacXs44HcDwf1ovs3AuEzvP7mqXw7fQntqIhQ1BRmynh4qEKQSSSRSWVyXRjmTbZIX9V2Q==
 
-"@wireapp/api-client@19.17.0":
-  version "19.17.0"
-  resolved "https://registry.yarnpkg.com/@wireapp/api-client/-/api-client-19.17.0.tgz#f5b047d0a45599ed90d5b5bb50f169ce6a8bb09e"
-  integrity sha512-pEcuIkT9Z+kUbDqgcXMnyzncexAQQmXD7QJ8R3IGD4kB+YpBshT5dkpGQsQTxoxkQQRKtlWBaOMDIsjGv9FxVA==
+"@wireapp/api-client@19.18.0":
+  version "19.18.0"
+  resolved "https://registry.yarnpkg.com/@wireapp/api-client/-/api-client-19.18.0.tgz#e9ce5580fddfc3718828ba522c334e8f8baf3052"
+  integrity sha512-qK7iPOBZr32lhU8Cwwy+YlBR0/FfuLObAM/aZFiGjJR5B2abB++sZyq/+75TRhuGepwilhCKj9jhyx9JzpOCpw==
   dependencies:
     "@types/node" "~14"
     "@types/spark-md5" "3.0.2"
@@ -3314,16 +3314,16 @@
     logdown "3.3.1"
     rimraf "3.0.2"
 
-"@wireapp/core@29.0.0":
-  version "29.0.0"
-  resolved "https://registry.yarnpkg.com/@wireapp/core/-/core-29.0.0.tgz#1b4162a71ff49702526574b7caa58f4d09a17b8a"
-  integrity sha512-NsV2Q4XPmIxJYdO5ee10LpKvcWHLvXJOsBLxR9MksN+cSB2oPSwYSpG9Vg4KwYbKkCv/Vtr5Rc/UGeE/pD+CPg==
+"@wireapp/core@29.0.5":
+  version "29.0.5"
+  resolved "https://registry.yarnpkg.com/@wireapp/core/-/core-29.0.5.tgz#4b13f803918fbd1017fb3fca228b3639c84b9372"
+  integrity sha512-ghyyFHLKbw7U20r0sdaAISOjME6MoJoHqGC9pTR9oTcYZieBVGL5LqC5Lx6Heu1+NFu3IaalrYynmUTHwTC4Pw==
   dependencies:
     "@open-wc/webpack-import-meta-loader" "0.4.7"
     "@otak/core-crypto" "0.3.0-beta-2"
     "@types/long" "4.0.1"
     "@types/node" "~14"
-    "@wireapp/api-client" "19.17.0"
+    "@wireapp/api-client" "19.18.0"
     "@wireapp/commons" "4.3.0"
     "@wireapp/cryptobox" "12.8.0"
     "@wireapp/store-engine-dexie" "1.6.10"

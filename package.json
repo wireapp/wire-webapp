@@ -2,7 +2,7 @@
   "dependencies": {
     "@emotion/react": "11.9.0",
     "@wireapp/avs": "8.2.2",
-    "@wireapp/core": "29.0.0",
+    "@wireapp/core": "29.0.5",
     "@wireapp/react-ui-kit": "8.9.0",
     "@wireapp/store-engine-dexie": "1.6.10",
     "@wireapp/store-engine-sqleet": "1.7.14",
