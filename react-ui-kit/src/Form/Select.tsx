@@ -20,7 +20,7 @@
 /** @jsx jsx */
 import {CSSObject, jsx} from '@emotion/react';
 import {useTheme} from '@emotion/react';
-import React, {FC, ReactElement} from 'react';
+import React, {ReactElement} from 'react';
 import ReactSelect from 'react-select';
 import {StylesConfig} from 'react-select/dist/declarations/src/styles';
 import {StateManagerProps} from 'react-select/dist/declarations/src/useStateManager';
@@ -37,7 +37,7 @@ export type Option = {
   isDisabled?: boolean;
 };
 
-interface SelectProps extends StateManagerProps<Option> {
+interface SelectProps<IsMulti extends boolean> extends StateManagerProps<Option, IsMulti> {
   id: string;
   dataUieName: string;
   options: Option[];
@@ -47,22 +47,22 @@ interface SelectProps extends StateManagerProps<Option> {
   error?: ReactElement;
   markInvalid?: boolean;
   required?: boolean;
-  isMulti?: boolean;
+  isMulti?: IsMulti;
 }
 
-export const Select: FC<SelectProps> = ({
+export const Select = <IsMulti extends boolean = false>({
   id,
   label,
   error,
   helperText,
   dataUieName,
   options,
+  isMulti,
   wrapperCSS = {},
   markInvalid = false,
   required = false,
-  isMulti = false,
   ...props
-}) => {
+}: SelectProps<IsMulti>) => {
   const theme = useTheme();
   const hasError = !!error;
 
