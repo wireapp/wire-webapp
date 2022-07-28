@@ -126,6 +126,7 @@ import {ConversationVerificationState} from './ConversationVerificationState';
 import {extractClientDiff} from './ClientMismatchUtil';
 import {Core} from '../service/CoreSingleton';
 import {ClientState} from '../client/ClientState';
+import {MLSReturnType} from '.yalc/@wireapp/core/src/main/conversation';
 
 type ConversationDBChange = {obj: EventRecord; oldObj: EventRecord};
 type FetchPromise = {rejectFn: (error: ConversationError) => void; resolveFn: (conversation: Conversation) => void};
@@ -453,40 +454,27 @@ export class ConversationRepository {
        * ToDo: Fetch all MLS Events from backend before doing anything else
        * Needs to be done to receive the latest epoch and avoid epoch mismatch errors
        */
-
+      let response: MLSReturnType;
       if (payload.protocol === ConversationProtocol.MLS) {
-        const {conversation: backendConversation, events} = await this.core.service!.conversation.createMLSConversation(
-          payload,
-        );
-
-        events.forEach(event => this.eventRepository.injectEvent(event));
-
-        console.info('injected events', events, backendConversation);
-
-        return undefined;
+        response = await this.core.service!.conversation.createMLSConversation(payload);
+      } else {
+        response = {conversation: await this.core.service!.conversation.createProteusConversation(payload), events: []};
       }
-      const backendConversation = await this.core.service!.conversation.createProteusConversation(payload);
 
       const {conversationEntity} = await this.onCreate({
-        conversation: backendConversation.id,
+        conversation: response.conversation.qualified_id.id,
         data: {
           last_event: '0.0',
           last_event_time: '1970-01-01T00:00:00.000Z',
           receipt_mode: undefined,
-          ...backendConversation,
+          ...response.conversation,
         },
         from: this.userState.self().id,
-        qualified_conversation: backendConversation.qualified_id,
+        qualified_conversation: response.conversation.qualified_id,
         time: new Date().toISOString(),
         type: CONVERSATION_EVENT.CREATE,
       });
       return conversationEntity;
-
-      /**
-       * Todo: Event generation for MLS is done in Backend
-       * We need to fetch the latest events from backend and then update the local state
-       * After that we need to redirect the user to the new conversation
-       */
     } catch (error) {
       this.handleConversationCreateError(
         error,
@@ -1385,16 +1373,13 @@ export class ConversationRepository {
 
     try {
       if (conversation.isUsingMLSProtocol) {
-        const backendConversation = await this.core.service!.conversation.addUsersToMLSConversation({
+        const {events} = await this.core.service!.conversation.addUsersToMLSConversation({
           conversationId,
           groupId,
           qualifiedUserIds,
         });
-        if (backendConversation) {
-          /**
-           * Todo: Event generation for MLS is done in Backend
-           * We need to fetch the latest events from backend and then update the local state
-           */
+        if (!!events.length) {
+          events.forEach(event => this.eventRepository.injectEvent(event));
         }
       } else {
         const conversationMemberJoinEvent = await this.core.service!.conversation.addUsersToProteusConversation({
