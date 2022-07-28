@@ -54,7 +54,6 @@ const GroupVideoGridTile: React.FC<GroupVideoGridTileProps> = ({
     'videoState',
   ]);
   const {name} = useKoSubscribableChildren(participant?.user, ['name']);
-  const {accent_color: selfColor} = useKoSubscribableChildren(selfParticipant?.user, ['accent_color']);
 
   const sharesScreen = videoState === VIDEO_STATE.SCREENSHARE;
   const sharesCamera = [VIDEO_STATE.STARTED, VIDEO_STATE.PAUSED].includes(videoState);
@@ -84,9 +83,9 @@ const GroupVideoGridTile: React.FC<GroupVideoGridTileProps> = ({
         <div
           css={{
             alignItems: 'center',
-            backgroundColor: 'var(--group-video-bg)',
+            backgroundColor: 'var(--group-video-tile-bg)',
             borderRadius: '8px',
-            boxShadow: participantCount > 1 ? 'inset 0px 0px 0px 1px var(--group-video-bg)' : 'initial',
+            boxShadow: participantCount > 1 ? 'inset 0px 0px 0px 2px var(--group-video-bg)' : 'initial',
             display: 'flex',
             height: '100%',
             justifyContent: 'center',
@@ -100,10 +99,9 @@ const GroupVideoGridTile: React.FC<GroupVideoGridTileProps> = ({
         css={{
           borderRadius: '8px',
           bottom: 0,
-          boxShadow:
-            participantCount > 2 && isActivelySpeaking
-              ? `inset 0px 0px 0px 1px var(--group-video-bg), inset 0px 0px 0px 4px ${selfColor}, inset 0px 0px 0px 7px var(--app-bg-secondary)`
-              : `inset 0px 0px 0px 0px`,
+          boxShadow: isActivelySpeaking
+            ? `inset 0px 0px 0px 1px var(--group-video-bg), inset 0px 0px 0px 4px var(--accent-color), inset 0px 0px 0px 7px var(--app-bg-secondary)`
+            : `inset 0px 0px 0px 0px`,
           left: 0,
           position: 'absolute',
           right: 0,
