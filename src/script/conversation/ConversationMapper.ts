@@ -278,7 +278,7 @@ export class ConversationMapper {
     );
 
     return remoteConversations.found
-      .map((remoteConversationData: ConversationBackendData & {receipt_mode: number}, index: number) => {
+      .map((remoteConversationData: ConversationBackendData, index: number) => {
         const remoteConversationId: QualifiedEntity = remoteConversationData.qualified_id || {
           domain: '',
           id: remoteConversationData.id,
@@ -301,7 +301,6 @@ export class ConversationMapper {
           type,
           group_id,
           protocol,
-          last_event,
         } = remoteConversationData;
         const {others: othersStates, self: selfState} = members;
 
@@ -312,7 +311,6 @@ export class ConversationMapper {
           creator,
           domain: qualified_id?.domain,
           group_id,
-          last_event: last_event || '',
           message_timer,
           name,
           protocol,
