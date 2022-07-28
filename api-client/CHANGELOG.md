@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [19.19.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/compare/@wireapp/api-client@19.18.1...@wireapp/api-client@19.19.0) (2022-07-28)
+
+
+### Features
+
+* add users to mls conversation (FS-851) ([#4340](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/issues/4340)) ([2889385](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/commit/28893855ec9c42d59e1394142e8cf31252f2503a))
+
+
+
+
+
 ## [19.18.1](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/compare/@wireapp/api-client@19.18.0...@wireapp/api-client@19.18.1) (2022-07-27)
 
 **Note:** Version bump only for package @wireapp/api-client

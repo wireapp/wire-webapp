@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [13.1.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/bot-api/compare/@wireapp/bot-api@13.0.6...@wireapp/bot-api@13.1.0) (2022-07-28)
+
+
+### Features
+
+* add users to mls conversation (FS-851) ([#4340](https://github.com/wireapp/wire-web-packages/tree/main/packages/bot-api/issues/4340)) ([2889385](https://github.com/wireapp/wire-web-packages/tree/main/packages/bot-api/commit/28893855ec9c42d59e1394142e8cf31252f2503a))
+
+
+
+
+
 ## [13.0.6](https://github.com/wireapp/wire-web-packages/tree/main/packages/bot-api/compare/@wireapp/bot-api@13.0.5...@wireapp/bot-api@13.0.6) (2022-07-27)
 
 **Note:** Version bump only for package @wireapp/bot-api
