@@ -18,7 +18,16 @@
  */
 
 import {LoginData} from '@wireapp/api-client/src/auth';
-import {ArrowIcon, Input, InputBlock, InputSubmitCombo, Loading, RoundIconButton, Select} from '@wireapp/react-ui-kit';
+import {
+  ArrowIcon,
+  Input,
+  InputBlock,
+  InputSubmitCombo,
+  Loading,
+  RoundIconButton,
+  Select,
+  Option,
+} from '@wireapp/react-ui-kit';
 import React, {useRef, useState} from 'react';
 import {useIntl} from 'react-intl';
 import {COUNTRY_CODES, getCountryByCode, getCountryCode} from 'Util/CountryCodes';
@@ -48,11 +57,6 @@ const PhoneLoginForm = ({isFetching, onSubmit}: LoginFormProps) => {
   ];
   const currentSelectValue = expandedCountryList.find(selectedCountry => selectedCountry.value === country);
 
-  const onSelectCountry = (selectedCountry: string) => {
-    setCountry(selectedCountry);
-    setCountryCode((getCountryCode(selectedCountry) || 'X2').toString(10));
-  };
-
   const onCountryCodeChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const {value} = event.target;
     const codeNumbers = value.replace(/\D/g, '');
@@ -77,7 +81,12 @@ const PhoneLoginForm = ({isFetching, onSubmit}: LoginFormProps) => {
     <div>
       <Select
         id="select-phone"
-        onChange={onSelectCountry}
+        onChange={country => {
+          const selectedCountry = country as Option;
+          const selectedCountryValue = selectedCountry.value as string;
+          setCountry(selectedCountryValue);
+          setCountryCode((getCountryCode(selectedCountryValue) || 'X2').toString(10));
+        }}
         dataUieName="select-phone"
         options={expandedCountryList}
         value={currentSelectValue}
