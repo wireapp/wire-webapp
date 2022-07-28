@@ -137,6 +137,7 @@ export class Conversation {
   public readonly isSelf: ko.PureComputed<boolean>;
   public readonly isTeamOnly: ko.PureComputed<boolean>;
   public readonly last_event_timestamp: ko.Observable<number>;
+  public readonly last_event_type: ko.Observable<string>;
   public readonly last_read_timestamp: ko.Observable<number>;
   public readonly legalHoldStatus: ko.Observable<LegalHoldStatus>;
   public readonly localMessageTimer: ko.Observable<number>;
@@ -276,6 +277,7 @@ export class Conversation {
     this.archivedTimestamp = ko.observable(0);
     this.cleared_timestamp = ko.observable(0);
     this.last_event_timestamp = ko.observable(0);
+    this.last_event_type = ko.observable('');
     this.last_read_timestamp = ko.observable(0);
     this.last_server_timestamp = ko.observable(0);
     this.mutedTimestamp = ko.observable(0);

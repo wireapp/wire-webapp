@@ -1363,7 +1363,7 @@ export class ConversationRepository {
         this.eventRepository.injectEvent(response, EventRepository.SOURCE.BACKEND_RESPONSE);
       }
     } catch (error) {
-      this.handleAddToConversationError(error as BackendClientError, conversationEntity, userIds);
+      return this.handleAddToConversationError(error as BackendClientError, conversationEntity, userIds);
     }
   }
 

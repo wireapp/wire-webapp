@@ -45,6 +45,7 @@ export interface SelfStatusUpdateDatabaseData {
   archived_timestamp: number;
   cleared_timestamp: number;
   ephemeral_timer: number;
+  last_event_type: string;
   last_event_timestamp: number;
   last_read_timestamp: number;
   last_server_timestamp: number;
@@ -224,6 +225,7 @@ export class ConversationMapper {
     conversationEntity.groupId = group_id;
     conversationEntity.type(type);
     conversationEntity.name(name || '');
+    conversationEntity.last_event_type(conversationData.last_event || '');
 
     const selfState = members?.self || conversationData;
     conversationEntity = ConversationMapper.updateSelfStatus(conversationEntity, selfState as any);
@@ -301,6 +303,7 @@ export class ConversationMapper {
           type,
           group_id,
           protocol,
+          last_event,
         } = remoteConversationData;
         const {others: othersStates, self: selfState} = members;
 
@@ -311,6 +314,7 @@ export class ConversationMapper {
           creator,
           domain: qualified_id?.domain,
           group_id,
+          last_event: last_event || '',
           message_timer,
           name,
           protocol,

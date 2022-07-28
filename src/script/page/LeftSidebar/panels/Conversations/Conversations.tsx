@@ -88,7 +88,7 @@ const Conversations: React.FC<ConversationsProps> = ({
   const {conversations_archived: archivedConversations, conversations_unarchived: conversations} =
     useKoSubscribableChildren(conversationState, ['conversations_archived', 'conversations_unarchived']);
   const {notifications} = useKoSubscribableChildren(preferenceNotificationRepository, ['notifications']);
-
+  console.log(conversations);
   const {activeCalls} = useKoSubscribableChildren(callState, ['activeCalls']);
   const initialViewStyle = propertiesRepository.getPreference(PROPERTIES_TYPE.INTERFACE.VIEW_FOLDERS)
     ? ConverationViewStyle.FOLDER
