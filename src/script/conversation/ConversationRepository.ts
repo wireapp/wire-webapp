@@ -126,7 +126,7 @@ import {ConversationVerificationState} from './ConversationVerificationState';
 import {extractClientDiff} from './ClientMismatchUtil';
 import {Core} from '../service/CoreSingleton';
 import {ClientState} from '../client/ClientState';
-import {MLSReturnType} from '.yalc/@wireapp/core/src/main/conversation';
+import {MLSReturnType} from '@wireapp/core/src/main/conversation';
 
 type ConversationDBChange = {obj: EventRecord; oldObj: EventRecord};
 type FetchPromise = {rejectFn: (error: ConversationError) => void; resolveFn: (conversation: Conversation) => void};
