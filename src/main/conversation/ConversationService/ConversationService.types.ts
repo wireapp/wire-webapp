@@ -24,8 +24,10 @@ import {
   ConversationProtocol,
   MessageSendingStatus,
   UserClients,
+  Conversation,
 } from '@wireapp/api-client/src/conversation';
 import {QualifiedId} from '@wireapp/api-client/src/user';
+import {MlsEvent} from '@wireapp/api-client/src/conversation/data/MlsEventData';
 
 export enum MessageTargetMode {
   NONE,
@@ -133,7 +135,12 @@ export type SendMlsMessageParams<T> = SendCommonParams<T> & {
   groupId: string;
 };
 
-export type AddUsersParams = ProtocolParam & {
+export type QualifiedUsers = QualifiedId & {skipOwn?: string};
+
+export type AddUsersParams = {
   conversationId: QualifiedId;
-  userIds: QualifiedId[];
+  qualifiedUserIds: QualifiedId[];
+  groupId?: string;
 };
+
+export type MLSReturnType = {events: MlsEvent[]; conversation: Conversation};
