@@ -1391,8 +1391,8 @@ export class ConversationRepository {
         }
       }
     } catch (error) {
-      if (error instanceof BackendClientError) {
-        this.handleAddToConversationError(error, conversation, qualifiedUserIds);
+      if (error) {
+        this.handleAddToConversationError(error as BackendClientError, conversation, qualifiedUserIds);
       }
     }
   }
