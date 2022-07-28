@@ -19,14 +19,14 @@
 
 import React from 'react';
 import cx from 'classnames';
-import {Select, Option} from '@wireapp/react-ui-kit';
+import {Select} from '@wireapp/react-ui-kit';
 
 interface DeviceSelectProps {
   defaultDeviceName?: string;
   devices: MediaDeviceInfo[];
   icon: React.ComponentType;
   isRequesting?: boolean;
-  onChange: (deviceOption: string) => void;
+  onChange: (deviceId: string) => void;
   title: string;
   uieName: string;
   value: string;
@@ -63,10 +63,7 @@ const DeviceSelect: React.FC<DeviceSelectProps> = ({
       <div css={{width: '550px'}}>
         <Select
           id={uieName}
-          onChange={device => {
-            const deviceOption = device as Option;
-            onChange(deviceOption.value as string);
-          }}
+          onChange={option => onChange(option?.value as string)}
           dataUieName={uieName}
           options={devicesList}
           defaultValue={currentValue}

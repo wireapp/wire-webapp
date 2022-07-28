@@ -18,16 +18,7 @@
  */
 
 import {LoginData} from '@wireapp/api-client/src/auth';
-import {
-  ArrowIcon,
-  Input,
-  InputBlock,
-  InputSubmitCombo,
-  Loading,
-  RoundIconButton,
-  Select,
-  Option,
-} from '@wireapp/react-ui-kit';
+import {ArrowIcon, Input, InputBlock, InputSubmitCombo, Loading, RoundIconButton, Select} from '@wireapp/react-ui-kit';
 import React, {useRef, useState} from 'react';
 import {useIntl} from 'react-intl';
 import {COUNTRY_CODES, getCountryByCode, getCountryCode} from 'Util/CountryCodes';
@@ -82,8 +73,7 @@ const PhoneLoginForm = ({isFetching, onSubmit}: LoginFormProps) => {
       <Select
         id="select-phone"
         onChange={country => {
-          const selectedCountry = country as Option;
-          const selectedCountryValue = selectedCountry.value as string;
+          const selectedCountryValue = country?.value as string;
           setCountry(selectedCountryValue);
           setCountryCode((getCountryCode(selectedCountryValue) || 'X2').toString(10));
         }}
