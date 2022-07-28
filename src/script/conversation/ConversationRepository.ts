@@ -2899,7 +2899,7 @@ export class ConversationRepository {
    * @param conversationEntity Conversation that contains the message
    * @param timestamp Timestamp as upper bound which messages to remove
    */
-  private deleteMessages(conversationEntity: Conversation, timestamp: number) {
+  private deleteMessages(conversationEntity: Conversation, timestamp?: number) {
     conversationEntity.hasCreationMessage = false;
 
     const iso_date = timestamp ? new Date(timestamp).toISOString() : undefined;
