@@ -18,14 +18,14 @@
  */
 
 import React from 'react';
-// import {keyframes} from '@emotion/react';
+import {keyframes} from '@emotion/react';
 import {registerReactComponent} from 'Util/ComponentUtil';
 import SVGProvider from '../../auth/util/SVGProvider';
 
-// const fadeAnimation = keyframes`
-//   0%   { opacity: 0.2; }
-//   100% { opacity: 1; }
-// `;
+const fadeAnimation = keyframes`
+  0%   { opacity: 0.2; }
+  100% { opacity: 1; }
+`;
 
 interface ParticipantMicOnIconProps {
   className?: string;
@@ -42,7 +42,7 @@ const ParticipantMicOnIcon: React.FC<ParticipantMicOnIconProps> = ({
   return (
     <span
       css={{
-        // animation: isActive ? `${fadeAnimation} 0.7s steps(7) infinite alternate` : 'initial',
+        animation: isActive ? `${fadeAnimation} 0.7s steps(7) infinite alternate` : 'initial',
         border: isActive ? '1px solid var(--accent-color)' : '1px solid transparent',
         borderRadius: '50%',
         padding: '2px',

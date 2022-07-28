@@ -941,8 +941,8 @@ exports[`stricter compilation`] = {
       [176, 10, 20, "Type \'undefined\' is not assignable to type \'Participant\'.", "942864568"],
       [179, 10, 9, "Type \'undefined\' is not assignable to type \'MuteState\'.", "3616862203"]
     ],
-    "src/script/components/calling/FullscreenVideoCall.tsx:3337270414": [
-      [245, 46, 4, "Argument of type \'null\' is not assignable to parameter of type \'Participant\'.", "2087897566"]
+    "src/script/components/calling/FullscreenVideoCall.tsx:3330548254": [
+      [389, 50, 4, "Argument of type \'null\' is not assignable to parameter of type \'Participant\'.", "2087897566"]
     ],
     "src/script/components/calling/GroupVideoGrid.test.ts:1931211751": [
       [35, 55, 22, "Object is possibly \'null\'.", "1458310722"],
@@ -960,7 +960,7 @@ exports[`stricter compilation`] = {
       [126, 32, 4, "Argument of type \'null\' is not assignable to parameter of type \'string | undefined\'.", "2087897566"],
       [136, 6, 20, "Type \'null\' is not assignable to type \'Participant\'.", "942864568"]
     ],
-    "src/script/components/calling/GroupVideoGrid.tsx:1118629158": [
+    "src/script/components/calling/GroupVideoGrid.tsx:1024839238": [
       [83, 46, 14, "Argument of type \'Participant | null\' is not assignable to parameter of type \'Partial<Record<\\"videoStream\\" | \\"hasActiveVideo\\" | \\"sharesScreen\\", Subscribable<any>>>\'.\\n  Type \'null\' is not assignable to type \'Partial<Record<\\"videoStream\\" | \\"hasActiveVideo\\" | \\"sharesScreen\\", Subscribable<any>>>\'.", "446802655"],
       [92, 30, 4, "Argument of type \'null\' is not assignable to parameter of type \'Participant\'.", "2087897566"],
       [100, 28, 11, "Argument of type \'Participant | undefined\' is not assignable to parameter of type \'Participant\'.\\n  Type \'undefined\' is not assignable to type \'Participant\'.", "2457692186"]
