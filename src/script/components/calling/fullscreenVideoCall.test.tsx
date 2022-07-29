@@ -114,9 +114,9 @@ describe('fullscreenVideoCall', () => {
     props.call.addParticipant(new Participant(new User('e', null), 'f'));
 
     const {getByText} = render(<FullscreenVideoCall {...props} />);
-    await waitFor(() => getByText('videoSpeakersTabSpeakers'));
+    await waitFor(() => getByText('videoSpeakersTabSpeakers'.toUpperCase()));
 
-    getByText('videoSpeakersTabSpeakers').click();
+    getByText('videoSpeakersTabSpeakers'.toUpperCase()).click();
 
     expect(setMaximizedSpy).toHaveBeenCalledWith(props.call, null);
   });

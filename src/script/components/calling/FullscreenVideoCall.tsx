@@ -214,14 +214,11 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
 
   return (
     <div id="video-calling" className="video-calling" ref={setWrapper}>
-      <div id="video-title" className="video-title conversation-title-bar">
+      <div id="video-title" className="video-title">
+        <div className="video-remote-name">{conversationName}</div>
         {muteState === MuteState.REMOTE_MUTED && (
           <div className="video-title__info-bar">{t('muteStateRemoteMute')}</div>
         )}
-        <div className="video-remote-name conversation-title-bar-name">{conversationName}</div>
-        <div data-uie-name="video-timer" className="video-timer label-xs">
-          <Duration startedAt={startedAt} />
-        </div>
         {classifiedDomains && (
           <ClassifiedBar
             users={conversationParticipants}
@@ -229,6 +226,9 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
             style={{display: 'inline-block', lineHeight: '1.5em', margin: '1em 0', padding: '0 1em', width: 'auto'}}
           />
         )}
+        <div data-uie-name="video-timer" className="video-timer label-xs">
+          <Duration startedAt={startedAt} />
+        </div>
       </div>
 
       <div id="video-element-remote" className="video-element-remote">
@@ -246,7 +246,6 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
           setMaximizedParticipant={participant => setMaximizedParticipant(call, participant)}
         />
       </div>
-
       {/* {!isChoosingScreen && <div className="video-element-overlay"></div>} */}
       {!maximizedParticipant && activeCallViewTab === CallViewTab.ALL && totalPages > 1 && (
         <>

@@ -107,10 +107,10 @@ const GroupVideoGrid: React.FunctionComponent<GroupVideoGripProps> = ({
     setRowsAndColumns(calculateRowsAndColumns(participants.length));
   }, [participants.length]);
 
-  // const {isMuted: selfIsMuted, isActivelySpeaking: selfIsActivelySpeaking} = useKoSubscribableChildren(
-  //   selfParticipant,
-  //   ['isMuted', 'isActivelySpeaking'],
-  // );
+  const {isMuted: selfIsMuted, isActivelySpeaking: selfIsActivelySpeaking} = useKoSubscribableChildren(
+    selfParticipant,
+    ['isMuted', 'isActivelySpeaking'],
+  );
   // const {name: selfName} = useKoSubscribableChildren(selfParticipant?.user, ['name']);
 
   return (
@@ -169,21 +169,22 @@ const GroupVideoGrid: React.FunctionComponent<GroupVideoGripProps> = ({
             }}
             srcObject={thumbnail.videoStream}
           />
-          {/* <div className="group-video-grid__element__label" css={{padding: 4}}>
+          <div className="group-video-grid__element__label" css={{padding: 4}}>
             {selfIsMuted ? (
               <span
                 className="group-video-grid__element__label__icon"
                 css={{'> svg': {width: 12}, height: 12}}
                 data-uie-name="status-call-audio-muted"
               >
-                <Icon.MicOff data-uie-name="mic-icon-off" />
+                {/* <Icon.MicOff data-uie-name="mic-icon-off" /> */}
               </span>
             ) : (
-              <ParticipantMicOnIcon
-                isActive={selfIsActivelySpeaking}
-                className="group-video-grid__element__label__icon"
-                css={{'> svg': {width: 12}}}
-              />
+              <span />
+              // <ParticipantMicOnIcon
+              //   isActive={selfIsActivelySpeaking}
+              //   className="group-video-grid__element__label__icon"
+              //   css={{'> svg': {width: 12}}}
+              // />
             )}
             <span
               data-uie-name={
@@ -192,9 +193,9 @@ const GroupVideoGrid: React.FunctionComponent<GroupVideoGripProps> = ({
               className="group-video-grid__element__label__name"
               css={{fontSize: 10}}
             >
-              {selfName}
+              {/* {selfName} */}
             </span>
-          </div> */}
+          </div>
         </GroupVideoThumbnailWrapper>
       )}
       {!!grid.thumbnail && !thumbnail.hasActiveVideo && !!selfParticipant && (
