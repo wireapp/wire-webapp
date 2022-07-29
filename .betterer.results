@@ -451,6 +451,9 @@ exports[`stricter compilation`] = {
       [46, 51, 5, "Property \'label\' does not exist on type \'never\'.", "173467459"],
       [47, 59, 5, "Property \'label\' does not exist on type \'never\'.", "173467459"]
     ],
+    "src/script/auth/util/test/mockStoreFactory.ts:2039904096": [
+      [40, 32, 13, "Argument of type \'import(\\"wire-webapp/node_modules/@wireapp/api-client/src/APIClient\\").APIClient\' is not assignable to parameter of type \'import(\\"wire-webapp/node_modules/@wireapp/core/node_modules/@wireapp/api-client/src/APIClient\\").APIClient\'.\\n  Types of property \'on\' are incompatible.\\n    Type \'{ (event: TOPIC.ON_LOGOUT, listener: (error: import(\\"wire-webapp/node_modules/@wireapp/api-client/src/auth/AuthenticationError\\").InvalidTokenError) => void): import(\\"wire-webapp/node_modules/@wireapp/api-client/src/APIClient\\").APIClient; (event: TOPIC.COOKIE_REFRESH, lis...\' is not assignable to type \'{ (event: TOPIC.ON_LOGOUT, listener: (error: import(\\"wire-webapp/node_modules/@wireapp/core/node_modules/@wireapp/api-client/src/auth/AuthenticationError\\").InvalidTokenError) => void): import(\\"wire-webapp/node_modules/@wireapp/core/node_modules/@wireapp/api-client/src/AP...\'.\\n      Types of parameters \'event\' and \'event\' are incompatible.\\n        Type \'TOPIC.COOKIE_REFRESH\' is not assignable to type \'TOPIC.ON_LOGOUT\'.", "3721704567"]
+    ],
     "src/script/auth/util/urlUtil.ts:2936167840": [
       [61, 2, 17, "Type \'Window | null\' is not assignable to type \'Window\'.\\n  Type \'null\' is not assignable to type \'Window\'.", "211185092"]
     ],
@@ -2159,6 +2162,9 @@ exports[`stricter compilation`] = {
       [124, 28, 4, "Property \'user\' does not exist on type \'never\'.", "2087973204"],
       [133, 44, 5, "Argument of type \'string | undefined\' is not assignable to parameter of type \'string\'.\\n  Type \'undefined\' is not assignable to type \'string\'.", "189936718"]
     ],
+    "src/script/service/CoreSingleton.ts:3592004582": [
+      [39, 10, 9, "Argument of type \'import(\\"wire-webapp/src/script/service/APIClientSingleton\\").APIClient\' is not assignable to parameter of type \'import(\\"wire-webapp/node_modules/@wireapp/core/node_modules/@wireapp/api-client/src/APIClient\\").APIClient\'.\\n  Types of property \'on\' are incompatible.\\n    Type \'{ (event: TOPIC.ON_LOGOUT, listener: (error: import(\\"wire-webapp/node_modules/@wireapp/api-client/src/auth/AuthenticationError\\").InvalidTokenError) => void): import(\\"wire-webapp/src/script/service/APIClientSingleton\\").APIClient; (event: TOPIC.COOKIE_REFRESH, listener: (c...\' is not assignable to type \'{ (event: TOPIC.ON_LOGOUT, listener: (error: import(\\"wire-webapp/node_modules/@wireapp/core/node_modules/@wireapp/api-client/src/auth/AuthenticationError\\").InvalidTokenError) => void): import(\\"wire-webapp/node_modules/@wireapp/core/node_modules/@wireapp/api-client/src/AP...\'.\\n      Types of parameters \'event\' and \'event\' are incompatible.\\n        Type \'TOPIC.COOKIE_REFRESH\' is not assignable to type \'TOPIC.ON_LOGOUT\'.", "42097444"]
+    ],
     "src/script/storage/StorageSchemata.ts:3711490368": [
       [125, 8, 7, "Type \'(transaction: Transaction, database: Dexie) => void\' is not assignable to type \'(transaction: Transaction, database?: Dexie | undefined) => void\'.\\n  Types of parameters \'database\' and \'database\' are incompatible.\\n    Type \'Dexie | undefined\' is not assignable to type \'Dexie\'.\\n      Type \'undefined\' is not assignable to type \'Dexie\'.", "2225706901"],
       [305, 8, 7, "Type \'(transaction: Transaction, database: Dexie) => void\' is not assignable to type \'(transaction: Transaction, database?: Dexie | undefined) => void\'.\\n  Types of parameters \'database\' and \'database\' are incompatible.\\n    Type \'Dexie | undefined\' is not assignable to type \'Dexie\'.\\n      Type \'undefined\' is not assignable to type \'Dexie\'.", "2225706901"]
@@ -2178,24 +2184,24 @@ exports[`stricter compilation`] = {
     "src/script/team/TeamEntity.ts:781860466": [
       [48, 6, 7, "Type \'string | boolean\' is not assignable to type \'boolean\'.\\n  Type \'string\' is not assignable to type \'boolean\'.", "814555284"]
     ],
-    "src/script/team/TeamRepository.ts:2469907748": [
-      [204, 4, 159, "Type \'(User | undefined)[]\' is not assignable to type \'User[]\'.\\n  Type \'User | undefined\' is not assignable to type \'User\'.\\n    Type \'undefined\' is not assignable to type \'User\'.", "587279576"],
-      [210, 53, 24, "Argument of type \'string | undefined\' is not assignable to parameter of type \'string\'.\\n  Type \'undefined\' is not assignable to type \'string\'.", "2322605270"],
-      [304, 4, 9, "Type \'(string | undefined)[]\' is not assignable to type \'string[]\'.\\n  Type \'string | undefined\' is not assignable to type \'string\'.\\n    Type \'undefined\' is not assignable to type \'string\'.", "3264882315"],
-      [325, 53, 13, "Argument of type \'string | undefined\' is not assignable to parameter of type \'string\'.\\n  Type \'undefined\' is not assignable to type \'string\'.", "3345044032"],
-      [334, 66, 9, "Argument of type \'{ domain: string; id: string | undefined; }[]\' is not assignable to parameter of type \'QualifiedId[]\'.\\n  Type \'{ domain: string; id: string | undefined; }\' is not assignable to type \'QualifiedId\'.\\n    Types of property \'id\' are incompatible.\\n      Type \'string | undefined\' is not assignable to type \'string\'.\\n        Type \'undefined\' is not assignable to type \'string\'.", "3264882315"],
-      [468, 28, 45, "Object is possibly \'undefined\'.", "1991114915"],
-      [469, 23, 40, "Object is possibly \'undefined\'.", "841513102"],
-      [536, 6, 76, "Argument of type \'string | null\' is not assignable to parameter of type \'string\'.\\n  Type \'null\' is not assignable to type \'string\'.", "563963699"],
-      [588, 34, 14, "No overload matches this call.\\n  Overload 1 of 2, \'(...items: ConcatArray<never>[]): never[]\', gave the following error.\\n    Argument of type \'TeamMemberEntity | TeamMemberEntity[]\' is not assignable to parameter of type \'ConcatArray<never>\'.\\n      Type \'TeamMemberEntity\' is missing the following properties from type \'ConcatArray<never>\': length, join, slice\\n  Overload 2 of 2, \'(...items: ConcatArray<never>[]): never[]\', gave the following error.\\n    Argument of type \'TeamMemberEntity | TeamMemberEntity[]\' is not assignable to parameter of type \'ConcatArray<never>\'.\\n      Type \'TeamMemberEntity\' is not assignable to type \'ConcatArray<never>\'.", "3525779144"],
-      [590, 56, 6, "Property \'userId\' does not exist on type \'never\'.", "1765117785"],
-      [592, 45, 11, "Property \'permissions\' does not exist on type \'never\'.", "524793117"],
-      [597, 25, 6, "Property \'userId\' does not exist on type \'never\'.", "1765117785"],
-      [597, 42, 11, "Property \'permissions\' does not exist on type \'never\'.", "524793117"],
-      [597, 87, 11, "Property \'permissions\' does not exist on type \'never\'.", "524793117"],
-      [602, 25, 6, "Property \'userId\' does not exist on type \'never\'.", "1765117785"],
-      [602, 42, 9, "Property \'invitedBy\' does not exist on type \'never\'.", "1955064691"],
-      [606, 64, 14, "Property \'hasOwnProperty\' does not exist on type \'never\'.", "547572878"]
+    "src/script/team/TeamRepository.ts:1750032496": [
+      [207, 4, 159, "Type \'(User | undefined)[]\' is not assignable to type \'User[]\'.\\n  Type \'User | undefined\' is not assignable to type \'User\'.\\n    Type \'undefined\' is not assignable to type \'User\'.", "587279576"],
+      [213, 53, 24, "Argument of type \'string | undefined\' is not assignable to parameter of type \'string\'.\\n  Type \'undefined\' is not assignable to type \'string\'.", "2322605270"],
+      [307, 4, 9, "Type \'(string | undefined)[]\' is not assignable to type \'string[]\'.\\n  Type \'string | undefined\' is not assignable to type \'string\'.\\n    Type \'undefined\' is not assignable to type \'string\'.", "3264882315"],
+      [328, 53, 13, "Argument of type \'string | undefined\' is not assignable to parameter of type \'string\'.\\n  Type \'undefined\' is not assignable to type \'string\'.", "3345044032"],
+      [337, 66, 9, "Argument of type \'{ domain: string; id: string | undefined; }[]\' is not assignable to parameter of type \'QualifiedId[]\'.\\n  Type \'{ domain: string; id: string | undefined; }\' is not assignable to type \'QualifiedId\'.\\n    Types of property \'id\' are incompatible.\\n      Type \'string | undefined\' is not assignable to type \'string\'.\\n        Type \'undefined\' is not assignable to type \'string\'.", "3264882315"],
+      [533, 28, 45, "Object is possibly \'undefined\'.", "1991114915"],
+      [534, 23, 40, "Object is possibly \'undefined\'.", "841513102"],
+      [601, 6, 76, "Argument of type \'string | null\' is not assignable to parameter of type \'string\'.\\n  Type \'null\' is not assignable to type \'string\'.", "563963699"],
+      [653, 34, 14, "No overload matches this call.\\n  Overload 1 of 2, \'(...items: ConcatArray<never>[]): never[]\', gave the following error.\\n    Argument of type \'TeamMemberEntity | TeamMemberEntity[]\' is not assignable to parameter of type \'ConcatArray<never>\'.\\n      Type \'TeamMemberEntity\' is missing the following properties from type \'ConcatArray<never>\': length, join, slice\\n  Overload 2 of 2, \'(...items: ConcatArray<never>[]): never[]\', gave the following error.\\n    Argument of type \'TeamMemberEntity | TeamMemberEntity[]\' is not assignable to parameter of type \'ConcatArray<never>\'.\\n      Type \'TeamMemberEntity\' is not assignable to type \'ConcatArray<never>\'.", "3525779144"],
+      [655, 56, 6, "Property \'userId\' does not exist on type \'never\'.", "1765117785"],
+      [657, 45, 11, "Property \'permissions\' does not exist on type \'never\'.", "524793117"],
+      [662, 25, 6, "Property \'userId\' does not exist on type \'never\'.", "1765117785"],
+      [662, 42, 11, "Property \'permissions\' does not exist on type \'never\'.", "524793117"],
+      [662, 87, 11, "Property \'permissions\' does not exist on type \'never\'.", "524793117"],
+      [667, 25, 6, "Property \'userId\' does not exist on type \'never\'.", "1765117785"],
+      [667, 42, 9, "Property \'invitedBy\' does not exist on type \'never\'.", "1955064691"],
+      [671, 64, 14, "Property \'hasOwnProperty\' does not exist on type \'never\'.", "547572878"]
     ],
     "src/script/team/TeamState.ts:2129239601": [
       [59, 4, 9, "Type \'Observable<TeamEntity | undefined>\' is not assignable to type \'Observable<TeamEntity>\'.\\n  The types returned by \'peek()\' are incompatible between these types.\\n    Type \'TeamEntity | undefined\' is not assignable to type \'TeamEntity\'.\\n      Type \'undefined\' is not assignable to type \'TeamEntity\'.", "1162784912"],

@@ -26,14 +26,12 @@ export const searchVisibilityOutboundConfigToLabelText = (
 ) => {
   const labels = {
     [FeatureStatus.ENABLED]: {
-      [FeatureSearchVisibilityConfig.STANDARD]: t(
-        'featureConfigChangeModalSearchVisibilityOutboundDescriptionEnabledStandard',
-      ),
+      [FeatureSearchVisibilityConfig.STANDARD]: t('featureConfigSearchVisibilityOutboundDescriptionEnabledStandard'),
       [FeatureSearchVisibilityConfig.NO_NAME_OUTSIDE_TEAM]: t(
-        'featureConfigChangeModalSearchVisibilityOutboundDescriptionEnabledNoNameOutsideTeam',
+        'featureConfigSearchVisibilityOutboundDescriptionEnabledNoNameOutsideTeam',
       ),
     },
-    [FeatureStatus.DISABLED]: t('featureConfigChangeModalSearchVisibilityOutboundDescriptionDisabled'),
+    [FeatureStatus.DISABLED]: t('featureConfigSearchVisibilityOutboundDescriptionDisabled'),
   };
 
   return status === FeatureStatus.ENABLED && config ? labels[status][config] : labels[status];
@@ -45,14 +43,12 @@ export const searchVisibilityInboundConfigToLabelText = (
 ) => {
   const labels = {
     [FeatureStatus.ENABLED]: {
-      [FeatureSearchVisibilityConfig.STANDARD]: t(
-        'featureConfigChangeModalSearchVisibilityInboundDescriptionEnabledStandard',
-      ),
+      [FeatureSearchVisibilityConfig.STANDARD]: t('featureConfigSearchVisibilityInboundDescriptionEnabledStandard'),
       [FeatureSearchVisibilityConfig.NO_NAME_OUTSIDE_TEAM]: t(
-        'featureConfigChangeModalSearchVisibilityInboundDescriptionEnabledNoNameOutsideTeam',
+        'featureConfigSearchVisibilityInboundDescriptionEnabledNoNameOutsideTeam',
       ),
     },
-    [FeatureStatus.DISABLED]: t('featureConfigChangeModalSearchVisibilityInboundDescriptionDisabled'),
+    [FeatureStatus.DISABLED]: t('featureConfigSearchVisibilityInboundDescriptionDisabled'),
   };
 
   return status === FeatureStatus.ENABLED && config ? labels[status][config] : labels[status];

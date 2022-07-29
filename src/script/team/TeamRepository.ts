@@ -505,7 +505,7 @@ export class TeamRepository {
     amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.ACKNOWLEDGE, {
       text: {
         htmlMessage: htmlMessages.join('</br></br>'),
-        title: t('featureConfigChangeModalSearchVisibilityHeadline'),
+        title: t('featureConfigSearchVisibilityHeadline'),
       },
     });
   };
