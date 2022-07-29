@@ -44,6 +44,14 @@ import {ServiceEntity} from 'src/script/integration/ServiceEntity';
 import showUserModal from 'Components/Modals/UserModal';
 import showServiceModal from 'Components/Modals/ServiceModal';
 import showInviteModal from 'Components/Modals/InviteModal';
+import Icon from 'Components/Icon';
+import {ModalsViewModel} from '../../../../view_model/ModalsViewModel';
+import {amplify} from 'amplify';
+import {WebAppEvents} from '@wireapp/webapp-events';
+import {
+  searchVisibilityInboundConfigToLabelText,
+  searchVisibilityOutboundConfigToLabelText,
+} from '../../../../team/TeamSearchVisibilitySetting';
 
 type StartUIProps = {
   conversationRepository: ConversationRepository;
@@ -79,6 +87,7 @@ const StartUI: React.FC<StartUIProps> = ({
 }) => {
   const brandName = Config.getConfig().BRAND_NAME;
   const {self: selfUser} = useKoSubscribableChildren(userState, ['self']);
+  const {isTeam, teamName, teamFeatures} = useKoSubscribableChildren(teamState, ['isTeam', 'teamName', 'teamFeatures']);
   const {
     canInviteTeamMembers,
     canSearchUnconnectedUsers,
@@ -89,8 +98,6 @@ const StartUI: React.FC<StartUIProps> = ({
   } = generatePermissionHelpers(selfUser.teamRole());
 
   const actions = mainViewModel.actions;
-  const isTeam = teamState.isTeam();
-  const teamName = teamState.teamName();
 
   const [searchQuery, setSearchQuery] = useState('');
   const [activeTab, setActiveTab] = useState(Tabs.PEOPLE);
@@ -142,17 +149,54 @@ const StartUI: React.FC<StartUIProps> = ({
     return actions.openGroupConversation(conversation).then(close);
   };
 
+  const openSearchVisibilityStatusModal = () => {
+    const {searchVisibilityInbound, searchVisibilityOutbound} = teamFeatures;
+
+    const htmlMessages = [];
+
+    if (searchVisibilityOutbound) {
+      htmlMessages.push(
+        searchVisibilityOutboundConfigToLabelText(searchVisibilityOutbound.status, searchVisibilityOutbound.config),
+      );
+    }
+
+    if (searchVisibilityInbound) {
+      htmlMessages.push(
+        searchVisibilityInboundConfigToLabelText(searchVisibilityInbound.status, searchVisibilityInbound.config),
+      );
+    }
+
+    if (htmlMessages.length > 0) {
+      amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.ACKNOWLEDGE, {
+        text: {
+          htmlMessage: htmlMessages.join('</br></br>'),
+          title: t('featureConfigChangeModalSearchVisibilityHeadline'),
+        },
+      });
+    }
+  };
+
   const before = (
     <div id="start-ui-header" className={cx('start-ui-header', {'start-ui-header-integrations': isTeam})}>
-      <div className="start-ui-header-user-input" data-uie-name="enter-search">
-        <SearchInput
-          input={searchQuery}
-          placeholder={isFederated ? t('searchPlaceholderFederation') : t('searchPlaceholder')}
-          selectedUsers={[]}
-          setInput={setSearchQuery}
-          enter={openFirstConversation}
-          forceDark
-        />
+      <div className="start-ui-header-user-input-wrapper">
+        <button
+          onClick={openSearchVisibilityStatusModal}
+          type="button"
+          className="button-reset-default start-ui-header-user-info-button"
+          aria-label={t('featureConfigChangeModalSearchVisibilityHeadline')}
+        >
+          <Icon.Info />
+        </button>
+        <div className="start-ui-header-user-input" data-uie-name="enter-search">
+          <SearchInput
+            input={searchQuery}
+            placeholder={isFederated ? t('searchPlaceholderFederation') : t('searchPlaceholder')}
+            selectedUsers={[]}
+            setInput={setSearchQuery}
+            enter={openFirstConversation}
+            forceDark
+          />
+        </div>
       </div>
       {isTeam && canChatWithServices() && (
         <ul className="start-ui-list-tabs">
@@ -216,7 +260,7 @@ const StartUI: React.FC<StartUIProps> = ({
 
   const footer = !isTeam ? (
     <button className="start-ui-import" onClick={openInviteModal} data-uie-name="show-invite-modal">
-      <span className="icon-invite start-ui-import-icon"></span>
+      <span aria-hidden={true} className="icon-invite start-ui-import-icon" />
       <span>{t('searchInvite', brandName)}</span>
     </button>
   ) : undefined;
