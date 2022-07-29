@@ -36,13 +36,19 @@ export interface ButtonGroupProps {
 const buttonGroupWrapperStyles: CSSObject = {
   alignItems: 'center',
   'button:first-of-type': {
-    border: '1px solid var(--border-color)',
+    '&:focus-visible': {
+      outline: '1px solid var(--accent-color-focus)',
+    },
+    border: '1px solid var(--text-input-border)',
     borderBottomLeftRadius: 12,
     borderTopLeftRadius: 12,
     paddingLeft: '14px !important',
   },
   'button:last-of-type': {
-    border: '1px solid var(--border-color)',
+    '&:focus-visible': {
+      outline: '1px solid var(--accent-color-focus)',
+    },
+    border: '1px solid var(--text-input-border)',
     borderBottomRightRadius: 12,
     borderTopRightRadius: 12,
     paddingRight: '14px !important',
@@ -51,20 +57,18 @@ const buttonGroupWrapperStyles: CSSObject = {
 };
 
 const buttonGroupItemStyles: CSSObject = {
-  backdropFilter: 'blur(16px)',
-  backgroundColor: 'var(--text-input-background)',
+  backgroundColor: 'var(--app-bg-secondary)',
   color: 'var(--main-color)',
   cursor: 'pointer',
   fontSize: 11,
   fontWeight: 500,
-  padding: '4px 12px',
-  textTransform: 'uppercase',
+  padding: '10px 12px',
 };
 
 const buttonGroupItemActiveStyles: CSSObject = {
   ...buttonGroupItemStyles,
   backgroundColor: 'var(--main-color)',
-  color: 'var(--text-input-background)',
+  color: 'var(--app-bg-secondary)',
 };
 
 const ButtonGroup: React.FC<ButtonGroupProps> = ({style, items, currentItem, onChangeItem, textSubstitute}) => {

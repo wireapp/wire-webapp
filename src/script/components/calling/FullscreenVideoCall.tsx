@@ -85,12 +85,16 @@ const videoControlActiveStyles = css`
 
 const videoControlInActiveStyles = css`
   background-color: var(--group-video-bg);
+  border: 1px solid var(--gray-40);
   svg > path,
   svg > g > path {
     fill: var(--main-color);
   }
   &:hover {
     background-color: var(--icon-button-primary-hover-bg);
+  }
+  body.theme-dark & {
+    border: none;
   }
 `;
 
@@ -428,7 +432,7 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
                 </button>
               </li>
             </div>
-            <div css={{display: 'flex', width: '180px'}}>
+            <div css={{display: 'flex', minWidth: '76px'}}>
               {participants.length > 2 && (
                 <ButtonGroup
                   items={Object.values(CallViewTabs)}
