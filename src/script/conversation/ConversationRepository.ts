@@ -640,11 +640,6 @@ export class ConversationRepository {
             }
           }
 
-          // We know that we injected the creation message in this case, so we can remove it from the list
-          if (conversationEntity.isCreatedBySelf()) {
-            conversationEntity.hasCreationMessage = true;
-          }
-
           if (!conversationEntity.hasCreationMessage) {
             console.info('adrian', 'add message', conversationEntity.hasCreationMessage);
             this.addCreationMessage(conversationEntity, this.userState.self().isTemporaryGuest());
@@ -652,6 +647,7 @@ export class ConversationRepository {
         }
       }
     }
+    console.info('adrian', mappedMessageEntities);
     return mappedMessageEntities;
   }
 
