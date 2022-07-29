@@ -25,7 +25,6 @@ import Icon from 'Components/Icon';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 
 import Video from './Video';
-import ParticipantMicOnIcon from './ParticipantMicOnIcon';
 import type {Participant} from '../../calling/Participant';
 import Avatar, {AVATAR_SIZE} from 'Components/Avatar';
 import {QualifiedId} from '@wireapp/api-client/src/user';
@@ -111,6 +110,11 @@ const GroupVideoGridTile: React.FC<GroupVideoGridTileProps> = ({
           transition: 'box-shadow 0.3s ease-in-out',
         }}
       />
+      {!minimized && isMuted && (
+        <span className="group-video-grid__element__label__icon">
+          <Icon.MicOff data-uie-name="mic-icon-off" />
+        </span>
+      )}
       {!minimized && (
         <div
           className="group-video-grid__element__label"
@@ -118,13 +122,6 @@ const GroupVideoGridTile: React.FC<GroupVideoGridTileProps> = ({
             backgroundColor: isActivelySpeaking ? 'var(--accent-color)' : 'var(--black)',
           }}
         >
-          {isMuted ? (
-            <span className="group-video-grid__element__label__icon">
-              <Icon.MicOff data-uie-name="mic-icon-off" />
-            </span>
-          ) : (
-            <ParticipantMicOnIcon isActive={isActivelySpeaking} className="group-video-grid__element__label__icon" />
-          )}
           <span
             data-uie-name={
               isActivelySpeaking ? 'status-active-speaking' : isMuted ? 'status-audio-off' : 'status-audio-on'

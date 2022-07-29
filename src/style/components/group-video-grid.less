@@ -114,20 +114,31 @@
         .label-small-medium;
         position: absolute;
         bottom: 0;
+        left: 50%;
         display: flex;
         max-width: calc(100% - 16px);
+        height: 20px;
         align-items: center;
         padding: 8px;
-        margin: 8px;
+        margin: 8px 0;
         background-color: var(--black);
         border-radius: 3px;
-        line-height: 1em;
+        transform: translate(-50%);
         white-space: nowrap;
 
         &__icon {
-          margin-right: 8px;
+          position: absolute;
+          bottom: 0;
+          display: flex;
+          padding: 4px;
+          margin: 8px;
+          background-color: var(--app-bg-secondary);
+          border-radius: 4px;
           svg {
             width: 16px;
+            & path {
+              fill: var(--red-500);
+            }
           }
         }
 
