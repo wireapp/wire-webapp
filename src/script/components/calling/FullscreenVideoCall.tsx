@@ -110,6 +110,9 @@ const paginationButtonStyles: CSSObject = {
   ['& svg > path']: {
     fill: 'var(--main-color)',
   },
+  ['&:focus-visible']: {
+    outline: '1px solid var(--accent-color-focus)',
+  },
   alignItems: 'center',
   backgroundColor: 'var(--app-bg-secondary)',
   cursor: 'pointer',
