@@ -27,7 +27,7 @@ import type {Grid} from '../../calling/videoGridHandler';
 import Video from './Video';
 import type {Participant} from '../../calling/Participant';
 import GroupVideoGridTile from './GroupVideoGridTile';
-import ParticipantMicOnIcon from './ParticipantMicOnIcon';
+// import ParticipantMicOnIcon from './ParticipantMicOnIcon';
 import Avatar, {AVATAR_SIZE} from 'Components/Avatar';
 import {QualifiedId} from '@wireapp/api-client/src/user';
 
@@ -62,9 +62,9 @@ const GroupVideoThumbnailWrapper: React.FC<{children?: React.ReactNode; minimize
             top: 8px;
             right: 8px;
             bottom: unset;
-            width: 80px;
-            height: 60px;
-            box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.16);
+            width: 70px;
+            height: 40px;
+            box-shadow: 0 0 0 1px var(--gray-90);
           `
         : undefined
     }
@@ -107,11 +107,11 @@ const GroupVideoGrid: React.FunctionComponent<GroupVideoGripProps> = ({
     setRowsAndColumns(calculateRowsAndColumns(participants.length));
   }, [participants.length]);
 
-  const {isMuted: selfIsMuted, isActivelySpeaking: selfIsActivelySpeaking} = useKoSubscribableChildren(
-    selfParticipant,
-    ['isMuted', 'isActivelySpeaking'],
-  );
-  const {name: selfName} = useKoSubscribableChildren(selfParticipant?.user, ['name']);
+  // const {isMuted: selfIsMuted, isActivelySpeaking: selfIsActivelySpeaking} = useKoSubscribableChildren(
+  //   selfParticipant,
+  //   ['isMuted', 'isActivelySpeaking'],
+  // );
+  // const {name: selfName} = useKoSubscribableChildren(selfParticipant?.user, ['name']);
 
   return (
     <div className="group-video">
@@ -169,7 +169,7 @@ const GroupVideoGrid: React.FunctionComponent<GroupVideoGripProps> = ({
             }}
             srcObject={thumbnail.videoStream}
           />
-          <div className="group-video-grid__element__label" css={{padding: 4}}>
+          {/* <div className="group-video-grid__element__label" css={{padding: 4}}>
             {selfIsMuted ? (
               <span
                 className="group-video-grid__element__label__icon"
@@ -194,7 +194,7 @@ const GroupVideoGrid: React.FunctionComponent<GroupVideoGripProps> = ({
             >
               {selfName}
             </span>
-          </div>
+          </div> */}
         </GroupVideoThumbnailWrapper>
       )}
       {!!grid.thumbnail && !thumbnail.hasActiveVideo && !!selfParticipant && (

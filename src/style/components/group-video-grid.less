@@ -183,20 +183,21 @@
 
   &__thumbnail {
     position: absolute;
-    top: 32px;
-    right: 32px;
+    top: 12px;
+    right: 12px;
     display: flex;
     overflow: hidden;
-    width: 160px;
+    width: 200px;
     height: 120px;
     background-color: #54585a;
     border-radius: 4px;
-    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.16);
+    box-shadow: 0 0 0 1px var(--gray-90);
     line-height: 0;
 
     &-video {
       width: 100%;
       border-radius: 4px;
+      object-fit: cover;
     }
   }
 }
