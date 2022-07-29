@@ -489,6 +489,17 @@
   "extensionsGiphyMessage": "{{tag}} • via giphy.com",
   "extensionsGiphyNoGifs": "Oops, no gifs",
   "extensionsGiphyRandom": "Random",
+
+  "featureConfigChangeModalSearchVisibilityHeadline": "Search rules in your team",
+
+  "featureConfigChangeModalSearchVisibilityOutboundDescriptionDisabled": "You are not authorized to find people outside your team.",
+  "featureConfigChangeModalSearchVisibilityOutboundDescriptionEnabledStandard": "You are allowed to find people outside your team by display name or username.",
+  "featureConfigChangeModalSearchVisibilityOutboundDescriptionEnabledNoNameOutsideTeam": "You are allowed to find people outside your team by username only.",
+
+  "featureConfigChangeModalSearchVisibilityInboundDescriptionDisabled": "People outside your team are not authorized to find you.",
+  "featureConfigChangeModalSearchVisibilityInboundDescriptionEnabledStandard": "People outside your team are allowed to find you by display name or username.",
+  "featureConfigChangeModalSearchVisibilityInboundDescriptionEnabledNoNameOutsideTeam": "People outside your team are allowed to find you by username only.",
+
   "featureConfigChangeModalApplock": "Mandatory app lock is now disabled. You do not need a passcode or biometric authentication when returning to the app.",
   "featureConfigChangeModalApplockHeadline": "Team settings changed",
   "featureConfigChangeModalAudioVideoDescriptionItemCameraDisabled": "Camera in calls is disabled",

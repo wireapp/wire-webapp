@@ -27,6 +27,7 @@ import {FeatureStatus, FEATURE_KEY} from '@wireapp/api-client/src/team/feature/'
 import {container} from 'tsyringe';
 
 import {APIClient} from '../service/APIClientSingleton';
+import {FeatureSearchVisibilityConfig} from '../../../.yalc/@wireapp/api-client/src/team';
 
 export class TeamService {
   constructor(private readonly apiClient = container.resolve(APIClient)) {}
@@ -101,9 +102,6 @@ export class TeamService {
         [FEATURE_KEY.LEGALHOLD]: {
           status: FeatureStatus.ENABLED,
         },
-        [FEATURE_KEY.SEARCH_VISIBILITY]: {
-          status: FeatureStatus.ENABLED,
-        },
         [FEATURE_KEY.SSO]: {
           status: FeatureStatus.ENABLED,
         },
@@ -112,6 +110,14 @@ export class TeamService {
           status: FeatureStatus.ENABLED,
         },
         [FEATURE_KEY.VIDEO_CALLING]: {
+          status: FeatureStatus.ENABLED,
+        },
+        [FEATURE_KEY.SEARCH_VISIBILITY_OUTBOUND]: {
+          config: FeatureSearchVisibilityConfig.STANDARD,
+          status: FeatureStatus.ENABLED,
+        },
+        [FEATURE_KEY.SEARCH_VISIBILITY_INBOUND]: {
+          config: FeatureSearchVisibilityConfig.STANDARD,
           status: FeatureStatus.ENABLED,
         },
       };

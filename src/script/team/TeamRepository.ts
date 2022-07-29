@@ -24,8 +24,8 @@ import type {TeamData} from '@wireapp/api-client/src/team/team/TeamData';
 import {Availability} from '@wireapp/protocol-messaging';
 import {TEAM_EVENT} from '@wireapp/api-client/src/event/TeamEvent';
 import type {FeatureList} from '@wireapp/api-client/src/team/feature/';
-import {FeatureStatus, FEATURE_KEY, SelfDeletingTimeout} from '@wireapp/api-client/src/team/feature/';
-import {formatDuration} from 'Util/TimeUtil';
+import {FEATURE_KEY, SelfDeletingTimeout} from '@wireapp/api-client/src/team/feature/';
+import {formatDuration, TIME_IN_MILLIS} from 'Util/TimeUtil';
 import type {
   TeamConversationDeleteEvent,
   TeamDeleteEvent,
@@ -38,21 +38,19 @@ import type {
 import {Runtime} from '@wireapp/commons';
 import {container} from 'tsyringe';
 
-import {Logger, getLogger} from 'Util/Logger';
+import {getLogger, Logger} from 'Util/Logger';
 import {replaceLink, t} from 'Util/LocalizerUtil';
 import {loadDataUrl} from 'Util/util';
-import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 import {Environment} from 'Util/Environment';
 
 import {TeamMapper} from './TeamMapper';
 import {TeamEntity} from './TeamEntity';
-import {roleFromTeamPermissions, ROLE} from '../user/UserPermission';
+import {ROLE, ROLE as TEAM_ROLE, roleFromTeamPermissions} from '../user/UserPermission';
 
 import {IntegrationMapper} from '../integration/IntegrationMapper';
 import {SIGN_OUT_REASON} from '../auth/SignOutReason';
 import {User} from '../entity/User';
 import {TeamService} from './TeamService';
-import {ROLE as TEAM_ROLE} from '../user/UserPermission';
 import {UserRepository} from '../user/UserRepository';
 import {TeamMemberEntity} from './TeamMemberEntity';
 import {ServiceEntity} from '../integration/ServiceEntity';
@@ -63,6 +61,11 @@ import {NOTIFICATION_HANDLING_STATE} from '../event/NotificationHandlingState';
 import {EventSource} from '../event/EventSource';
 import {ModalsViewModel} from '../view_model/ModalsViewModel';
 import {Config} from '../Config';
+import {FeatureStatus} from '../../../.yalc/@wireapp/api-client/src/team';
+import {
+  searchVisibilityInboundConfigToLabelText,
+  searchVisibilityOutboundConfigToLabelText,
+} from './TeamSearchVisibilitySetting';
 
 export interface AccountInfo {
   accentID: number;
@@ -425,6 +428,7 @@ export class TeamRepository {
       this.handleSelfDeletingMessagesFeatureChange(previousConfig, featureConfigList);
       this.handleConferenceCallingFeatureChange(previousConfig, featureConfigList);
       this.handleGuestLinkFeatureChange(previousConfig, featureConfigList);
+      this.handleSearchVisibilityFeatureChange(previousConfig, featureConfigList);
     }
     this.saveFeatureConfig(featureConfigList);
   };
@@ -443,6 +447,67 @@ export class TeamRepository {
         },
       });
     }
+  };
+
+  private readonly handleSearchVisibilityFeatureChange = (previousConfig: FeatureList, newConfig: FeatureList) => {
+    //outbound
+    const hasSearchVisibilityOutboundStatusChanged =
+      previousConfig.searchVisibilityOutbound?.status !== newConfig.searchVisibilityOutbound?.status;
+
+    const hasSearchVisibilityOutboundStatusChangedToDisabled =
+      hasSearchVisibilityOutboundStatusChanged && newConfig.searchVisibilityOutbound?.status === FeatureStatus.DISABLED;
+
+    const hasSearchVisibilityOutboundConfigChanged =
+      previousConfig.searchVisibilityOutbound?.config !== newConfig.searchVisibilityOutbound?.config;
+
+    //inbound
+    const hasSearchVisibilityInboundStatusChanged =
+      previousConfig.searchVisibilityInbound?.status !== newConfig.searchVisibilityInbound?.status;
+
+    const hasSearchVisibilityInboundStatusChangedToDisabled =
+      hasSearchVisibilityInboundStatusChanged && newConfig.searchVisibilityInbound?.status === FeatureStatus.DISABLED;
+
+    const hasSearchVisibilityInboundConfigChanged =
+      previousConfig.searchVisibilityInbound?.config !== newConfig.searchVisibilityInbound?.config;
+
+    const hasSearchVisibilityChanged =
+      hasSearchVisibilityOutboundStatusChanged ||
+      hasSearchVisibilityOutboundConfigChanged ||
+      hasSearchVisibilityInboundStatusChanged ||
+      hasSearchVisibilityInboundConfigChanged;
+
+    if (!hasSearchVisibilityChanged) {
+      return;
+    }
+
+    const htmlMessages = [];
+
+    if (hasSearchVisibilityOutboundStatusChanged || hasSearchVisibilityOutboundConfigChanged) {
+      if (hasSearchVisibilityOutboundStatusChangedToDisabled) {
+        htmlMessages.push(searchVisibilityOutboundConfigToLabelText(FeatureStatus.DISABLED));
+      } else if (newConfig.searchVisibilityOutbound?.config) {
+        htmlMessages.push(
+          searchVisibilityOutboundConfigToLabelText(FeatureStatus.ENABLED, newConfig.searchVisibilityOutbound.config),
+        );
+      }
+    }
+
+    if (hasSearchVisibilityInboundStatusChanged || hasSearchVisibilityInboundConfigChanged) {
+      if (hasSearchVisibilityInboundStatusChangedToDisabled) {
+        htmlMessages.push(searchVisibilityInboundConfigToLabelText(FeatureStatus.DISABLED));
+      } else if (newConfig.searchVisibilityInbound?.config) {
+        htmlMessages.push(
+          searchVisibilityInboundConfigToLabelText(FeatureStatus.ENABLED, newConfig.searchVisibilityInbound.config),
+        );
+      }
+    }
+
+    amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.ACKNOWLEDGE, {
+      text: {
+        htmlMessage: htmlMessages.join('</br></br>'),
+        title: t('featureConfigChangeModalSearchVisibilityHeadline'),
+      },
+    });
   };
 
   private readonly handleGuestLinkFeatureChange = (previousConfig: FeatureList, newConfig: FeatureList) => {
