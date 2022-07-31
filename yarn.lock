@@ -1178,7 +1178,7 @@
   resolved "https://registry.yarnpkg.com/@bcoe/v8-coverage/-/v8-coverage-0.2.3.tgz#75a2e8b51cb758a7553d6804a5932d7aace75c39"
   integrity sha512-0hYQ8SB4Db5zvZB4axdMHGwEaQjkZzFjQiN9LVYvIFB2nSUHW9tYpxWriPrWDASIxiaXax83REcLxuSdnGPZtw==
 
-"@betterer/betterer@^5.3.6", "@betterer/betterer@^5.3.7":
+"@betterer/betterer@^5.3.7":
   version "5.3.7"
   resolved "https://registry.yarnpkg.com/@betterer/betterer/-/betterer-5.3.7.tgz#f7db0c1b854781247c9c535d5dcdf17d896e105d"
   integrity sha512-y9GJYbRQuKWNmXI21onwG1yUt+HwUw3PlC4FIRNlVD9gsA/RycMrq1S58/ff8nFdLGTAmoiBeg2AzsCAMixQAQ==
@@ -1270,12 +1270,12 @@
     chalk "^4.1.2"
     tslib "^2.3.1"
 
-"@betterer/typescript@5.3.6":
-  version "5.3.6"
-  resolved "https://registry.yarnpkg.com/@betterer/typescript/-/typescript-5.3.6.tgz#fa446839d9c579f9dc505ebecc9ac1ae82060837"
-  integrity sha512-3A8PHjQ+z5TgM07gpt2zQWcowZKZdtLrqvPv5tIX51w0nrcEojBo9zey+6+YRZC2SuBzUql8XpEc+eF9nBkauw==
+"@betterer/typescript@5.3.7":
+  version "5.3.7"
+  resolved "https://registry.yarnpkg.com/@betterer/typescript/-/typescript-5.3.7.tgz#1c53d27b608ae91eac636125c6d2c35855e8be6f"
+  integrity sha512-VELniH6+jgSSZp5MQPLI9IxMj6ev73EMql10ghpggWmdoH55hIcox18CJMmPJYjr40kcEDax6Xfeuevev398IA==
   dependencies:
-    "@betterer/betterer" "^5.3.6"
+    "@betterer/betterer" "^5.3.7"
     "@betterer/errors" "^5.3.0"
     tslib "^2.3.1"
 
