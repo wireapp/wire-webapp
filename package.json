@@ -160,7 +160,7 @@
     "raf": "3.4.1",
     "redux-devtools-extension": "2.13.9",
     "redux-mock-store": "1.5.4",
-    "simple-git": "3.10.0",
+    "simple-git": "3.11.0",
     "sinon": "13.0.2",
     "snabbdom": "3.5.1",
     "stylelint": "13.13.1",
