@@ -1178,15 +1178,15 @@
   resolved "https://registry.yarnpkg.com/@bcoe/v8-coverage/-/v8-coverage-0.2.3.tgz#75a2e8b51cb758a7553d6804a5932d7aace75c39"
   integrity sha512-0hYQ8SB4Db5zvZB4axdMHGwEaQjkZzFjQiN9LVYvIFB2nSUHW9tYpxWriPrWDASIxiaXax83REcLxuSdnGPZtw==
 
-"@betterer/betterer@^5.3.6":
-  version "5.3.6"
-  resolved "https://registry.yarnpkg.com/@betterer/betterer/-/betterer-5.3.6.tgz#1793aeb45284d69beb2490a2db05273f7904fc1a"
-  integrity sha512-FpdVFdrSWLSPZRssuneI0uhqtbzbnQzBYz9hU8Nvl9v1XOILvMuD+lZOywlY9aPsLXuZmzQyxdlY7txHqN6jvg==
+"@betterer/betterer@^5.3.6", "@betterer/betterer@^5.3.7":
+  version "5.3.7"
+  resolved "https://registry.yarnpkg.com/@betterer/betterer/-/betterer-5.3.7.tgz#f7db0c1b854781247c9c535d5dcdf17d896e105d"
+  integrity sha512-y9GJYbRQuKWNmXI21onwG1yUt+HwUw3PlC4FIRNlVD9gsA/RycMrq1S58/ff8nFdLGTAmoiBeg2AzsCAMixQAQ==
   dependencies:
     "@betterer/constraints" "^5.3.0"
     "@betterer/errors" "^5.3.0"
     "@betterer/logger" "^5.3.4"
-    "@betterer/reporter" "^5.3.6"
+    "@betterer/reporter" "^5.3.7"
     "@phenomnomnominal/debug" "^0.2.5"
     "@phenomnomnominal/worker-require" "^0.0.34"
     chokidar "^3.3.1"
@@ -1201,12 +1201,12 @@
   optionalDependencies:
     typescript ">=2.7"
 
-"@betterer/cli@^5.3.6":
-  version "5.3.6"
-  resolved "https://registry.yarnpkg.com/@betterer/cli/-/cli-5.3.6.tgz#dced55e2bac2422af4e8657d7292aa45ec09140d"
-  integrity sha512-OgBNPuCnd1/gV9KG2sFhwkHv+kPWdxnVb5xY5SMmo9NK780KIm2GANv1bYQzWoqCDiOdbRl/OCDlvNDV1pb7/g==
+"@betterer/cli@^5.3.7":
+  version "5.3.7"
+  resolved "https://registry.yarnpkg.com/@betterer/cli/-/cli-5.3.7.tgz#ae6e9b2543bb7bb9565eb2a1e457ba2d5ac7029f"
+  integrity sha512-JqBHNYM7xRA+VCxvopvxKvDm8FXOyTShvw0XSZFGZfMWJGJoi9UXvp0DL2OPl35/dwKRN5vB4ac9bDErvUrwgQ==
   dependencies:
-    "@betterer/betterer" "^5.3.6"
+    "@betterer/betterer" "^5.3.7"
     "@betterer/errors" "^5.3.0"
     "@betterer/render" "^5.3.4"
     "@betterer/tasks" "^5.3.6"
@@ -1247,12 +1247,12 @@
   resolved "https://registry.yarnpkg.com/@betterer/render/-/render-5.3.4.tgz#1e668202b006bb71bca5ee316c114cef85ae4812"
   integrity sha512-zc91zlLxWafGxG25/kUsCDmxLvQhUb4PNIq4MRU/VpnncyhdelMY5OxaIAxu9IXhJFoC6FRJhL3I7eGdND64zQ==
 
-"@betterer/reporter@^5.3.6":
-  version "5.3.6"
-  resolved "https://registry.yarnpkg.com/@betterer/reporter/-/reporter-5.3.6.tgz#a2f1e72fd4016f6abf63e68dbcfbd77a8b4f8850"
-  integrity sha512-6KTwgjfWi6MKav22utjd97NtVANfxRnWDdMMo10t9mto0Ez71XuOf/Xt0D+2cZ8mhXMfOOCZbzbqQ6+IaTCSlQ==
+"@betterer/reporter@^5.3.7":
+  version "5.3.7"
+  resolved "https://registry.yarnpkg.com/@betterer/reporter/-/reporter-5.3.7.tgz#5f7996ab086597b892331a35d66ca56bc8d621df"
+  integrity sha512-OkaVKE1ZVm3iZUAxebUWJFHAZUUPC23l3iygmhtymQeAinWHfqxEHrWOvg8g+ozwYECwiSfl0CVHbazp/J5EUA==
   dependencies:
-    "@betterer/betterer" "^5.3.6"
+    "@betterer/betterer" "^5.3.7"
     "@betterer/errors" "^5.3.0"
     "@betterer/logger" "^5.3.4"
     "@betterer/render" "^5.3.4"
@@ -12994,7 +12994,7 @@ tsconfig-paths@^3.14.1:
     minimist "^1.2.6"
     strip-bom "^3.0.0"
 
-tslib@2.4.0, tslib@^2.0.3, tslib@^2.3.1:
+tslib@2.4.0, tslib@^2.0.3, tslib@^2.1.0, tslib@^2.3.1:
   version "2.4.0"
   resolved "https://registry.yarnpkg.com/tslib/-/tslib-2.4.0.tgz#7cecaa7f073ce680a05847aa77be941098f36dc3"
   integrity sha512-d6xOpEDfsi2CZVlPQzGeux8XMwLT9hssAsaPYExaQMuYskwb+x1x7J371tWlbBdWHroy99KnVB6qIkUbs5X3UQ==
@@ -13003,11 +13003,6 @@ tslib@^1.10.0, tslib@^1.8.1, tslib@^1.9.0, tslib@^1.9.3:
   version "1.14.1"
   resolved "https://registry.yarnpkg.com/tslib/-/tslib-1.14.1.tgz#cf2d38bdc34a134bcaf1091c41f6619e2f672d00"
   integrity sha512-Xni35NKzjgMrwevysHTCArtLDpPvye8zV/0E4EyYn43P7/7qvQwPh9BGkHewbMulVntbigmcT7rdX3BNo9wRJg==
-
-tslib@^2.1.0:
-  version "2.3.1"
-  resolved "https://registry.yarnpkg.com/tslib/-/tslib-2.3.1.tgz#e8a335add5ceae51aa261d32a490158ef042ef01"
-  integrity sha512-77EbyPPpMz+FRFRuAFlWMtmgUWGe9UOG2Z25NqCwiIjRhOf5iKGuzSe5P2w1laq+FkRy4p+PCuVkJSGkzTEKVw==
 
 tsutils@^3.21.0:
   version "3.21.0"
