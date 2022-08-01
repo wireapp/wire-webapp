@@ -19,6 +19,13 @@
 
 import {FeatureSearchVisibilityConfig, FeatureStatus} from '@wireapp/api-client/src/team';
 import {t} from 'Util/LocalizerUtil';
+import {ModalsViewModel} from '../view_model/ModalsViewModel';
+import {
+  FeatureSearchVisibilityInbound,
+  FeatureSearchVisibilityOutbound,
+} from '../../../.yalc/@wireapp/api-client/src/team';
+import {amplify} from 'amplify';
+import {WebAppEvents} from '@wireapp/webapp-events';
 
 export const searchVisibilityOutboundConfigToLabelText = (
   status: FeatureStatus,
@@ -52,4 +59,37 @@ export const searchVisibilityInboundConfigToLabelText = (
   };
 
   return status === FeatureStatus.ENABLED && config ? labels[status][config] : labels[status];
+};
+
+interface ShowSearchVisibilityModalProps {
+  searchVisibilityOutbound?: FeatureSearchVisibilityOutbound;
+  searchVisibilityInbound?: FeatureSearchVisibilityInbound;
+}
+
+export const showSearchVisibilityModal = ({
+  searchVisibilityInbound,
+  searchVisibilityOutbound,
+}: ShowSearchVisibilityModalProps) => {
+  const htmlMessages = [];
+
+  if (searchVisibilityOutbound) {
+    htmlMessages.push(
+      searchVisibilityOutboundConfigToLabelText(searchVisibilityOutbound.status, searchVisibilityOutbound.config),
+    );
+  }
+
+  if (searchVisibilityInbound) {
+    htmlMessages.push(
+      searchVisibilityInboundConfigToLabelText(searchVisibilityInbound.status, searchVisibilityInbound.config),
+    );
+  }
+
+  if (htmlMessages.length > 0) {
+    amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.ACKNOWLEDGE, {
+      text: {
+        htmlMessage: htmlMessages.join('</br></br>'),
+        title: t('featureConfigSearchVisibilityHeadline'),
+      },
+    });
+  }
 };

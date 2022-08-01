@@ -45,13 +45,7 @@ import showUserModal from 'Components/Modals/UserModal';
 import showServiceModal from 'Components/Modals/ServiceModal';
 import showInviteModal from 'Components/Modals/InviteModal';
 import Icon from 'Components/Icon';
-import {ModalsViewModel} from '../../../../view_model/ModalsViewModel';
-import {amplify} from 'amplify';
-import {WebAppEvents} from '@wireapp/webapp-events';
-import {
-  searchVisibilityInboundConfigToLabelText,
-  searchVisibilityOutboundConfigToLabelText,
-} from '../../../../team/TeamSearchVisibilitySetting';
+import {showSearchVisibilityModal} from '../../../../team/TeamSearchVisibilitySetting';
 
 type StartUIProps = {
   conversationRepository: ConversationRepository;
@@ -150,30 +144,7 @@ const StartUI: React.FC<StartUIProps> = ({
   };
 
   const openSearchVisibilityStatusModal = () => {
-    const {searchVisibilityInbound, searchVisibilityOutbound} = teamFeatures;
-
-    const htmlMessages = [];
-
-    if (searchVisibilityOutbound) {
-      htmlMessages.push(
-        searchVisibilityOutboundConfigToLabelText(searchVisibilityOutbound.status, searchVisibilityOutbound.config),
-      );
-    }
-
-    if (searchVisibilityInbound) {
-      htmlMessages.push(
-        searchVisibilityInboundConfigToLabelText(searchVisibilityInbound.status, searchVisibilityInbound.config),
-      );
-    }
-
-    if (htmlMessages.length > 0) {
-      amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.ACKNOWLEDGE, {
-        text: {
-          htmlMessage: htmlMessages.join('</br></br>'),
-          title: t('featureConfigSearchVisibilityHeadline'),
-        },
-      });
-    }
+    showSearchVisibilityModal(teamFeatures);
   };
 
   const before = (
