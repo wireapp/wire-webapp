@@ -131,7 +131,7 @@ export class ConversationMapper {
 
     if (archived_timestamp) {
       conversationEntity.setTimestamp(archived_timestamp, Conversation.TIMESTAMP_TYPE.ARCHIVED);
-      conversationEntity.archivedState(selfState.archived_state);
+      conversationEntity.archivedState(selfState.archived_state ?? false);
     }
 
     if (cleared_timestamp !== undefined) {
@@ -278,7 +278,7 @@ export class ConversationMapper {
     );
 
     return remoteConversations.found
-      .map((remoteConversationData: ConversationBackendData & {receipt_mode: number}, index: number) => {
+      .map((remoteConversationData: ConversationBackendData, index: number) => {
         const remoteConversationId: QualifiedEntity = remoteConversationData.qualified_id || {
           domain: '',
           id: remoteConversationData.id,
