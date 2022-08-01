@@ -30,9 +30,10 @@ import {KEY} from 'Util/KeyboardUtil';
 
 interface Props extends React.HTMLProps<HTMLDivElement> {
   onSetEntropy: (entropyData: Uint8Array) => void;
+  containerSize?: number;
 }
 
-const EntropyContainer = ({onSetEntropy}: Props) => {
+const EntropyContainer = ({onSetEntropy, containerSize = 400}: Props) => {
   const {formatMessage: _} = useIntl();
   const [entropy, setEntropy] = useState<EntropyData>(new EntropyData());
   const [pause, setPause] = useState<boolean>();
@@ -48,7 +49,13 @@ const EntropyContainer = ({onSetEntropy}: Props) => {
     <ContainerSM
       centerText
       verticalCenter
-      style={{display: 'flex', flexDirection: 'column', justifyContent: 'space-around', minHeight: 428}}
+      style={{
+        alignItems: 'center',
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'space-around',
+        minHeight: 428,
+      }}
     >
       <H1 center css={{marginBottom: 16}}>
         {_(setEntropyStrings.headline)}
@@ -60,6 +67,7 @@ const EntropyContainer = ({onSetEntropy}: Props) => {
             {_(setEntropyStrings.success)}
           </Muted>
           <Button
+            css={{width: '70%'}}
             onClick={() => onSetEntropy(entropy.entropyData)}
             data-uie-name="do-entropy-confirm"
             onKeyDown={(event: React.KeyboardEvent) => {
@@ -79,13 +87,13 @@ const EntropyContainer = ({onSetEntropy}: Props) => {
           <EntropyCanvas
             css={{border: pause ? 'red 2px solid' : 'black 2px solid'}}
             data-uie-name="element-entropy-canvas"
-            sizeX={400}
-            sizeY={400}
+            sizeX={containerSize}
+            sizeY={containerSize}
             onProgress={onProgress}
             minEntropyBits={1024}
             minFrames={300}
           />
-          <ProgressBar error={!!pause} width={512} percent={percent} />
+          <ProgressBar error={!!pause} width={containerSize} percent={percent} />
           <Text data-uie-name="element-entropy-percent" center>
             {percent}%
           </Text>
