@@ -79,13 +79,11 @@ const AccentColorPicker: React.FunctionComponent<AccentColorPickerProps> = ({use
                     '& + label > span:first-child::after': {
                       ...CSS_SQUARE(10),
                       background: 'currentColor',
-                      left: '-5px',
-                      top: '-5px',
+                      transform: 'translate(-50%, -50%)',
                     },
                     '& + label > span:first-child::before': {
                       ...CSS_SQUARE(16),
-                      left: '-8px',
-                      top: '-8px',
+                      transform: 'translate(-50%, -50%)',
                     },
                     '& + label > span:first-child::before, & + label > span:first-child::after': {
                       borderRadius: '50%',
@@ -95,8 +93,7 @@ const AccentColorPicker: React.FunctionComponent<AccentColorPickerProps> = ({use
                       transition: 'all 0.15s ease-out',
                     },
                     '&:checked + label > span:first-child::after': {
-                      left: '-5px',
-                      top: '-5px',
+                      transform: 'translate(-50%, -50%)',
                     },
                     '&:checked + label > span:first-child::before': {
                       border: '1px solid currentColor',
