@@ -44,10 +44,9 @@ import {ServiceEntity} from 'src/script/integration/ServiceEntity';
 import showUserModal from 'Components/Modals/UserModal';
 import showServiceModal from 'Components/Modals/ServiceModal';
 import showInviteModal from 'Components/Modals/InviteModal';
-import Icon from 'Components/Icon';
-import {showSearchVisibilityModal} from '../../../../team/TeamSearchVisibilitySetting';
+import UserSearchInputInfoButton from 'Components/UserSearchInputInfoButton';
 
-type StartUIProps = {
+export type StartUIProps = {
   conversationRepository: ConversationRepository;
   conversationState?: ConversationState;
   integrationRepository: IntegrationRepository;
@@ -143,21 +142,10 @@ const StartUI: React.FC<StartUIProps> = ({
     return actions.openGroupConversation(conversation).then(close);
   };
 
-  const openSearchVisibilityStatusModal = () => {
-    showSearchVisibilityModal(teamFeatures);
-  };
-
   const before = (
     <div id="start-ui-header" className={cx('start-ui-header', {'start-ui-header-integrations': isTeam})}>
       <div className="start-ui-header-user-input-wrapper">
-        <button
-          onClick={openSearchVisibilityStatusModal}
-          type="button"
-          className="button-reset-default start-ui-header-user-info-button"
-          aria-label={t('featureConfigSearchVisibilityHeadline')}
-        >
-          <Icon.Info />
-        </button>
+        <UserSearchInputInfoButton teamFeatures={teamFeatures} />
         <div className="start-ui-header-user-input" data-uie-name="enter-search">
           <SearchInput
             input={searchQuery}

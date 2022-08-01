@@ -20,10 +20,7 @@
 import {FeatureSearchVisibilityConfig, FeatureStatus} from '@wireapp/api-client/src/team';
 import {t} from 'Util/LocalizerUtil';
 import {ModalsViewModel} from '../view_model/ModalsViewModel';
-import {
-  FeatureSearchVisibilityInbound,
-  FeatureSearchVisibilityOutbound,
-} from '../../../.yalc/@wireapp/api-client/src/team';
+import {FeatureSearchVisibilityInbound, FeatureSearchVisibilityOutbound} from '@wireapp/api-client/src/team';
 import {amplify} from 'amplify';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
