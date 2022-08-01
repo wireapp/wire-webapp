@@ -1169,6 +1169,7 @@ exports[`stricter compilation`] = {
       [185, 41, 26, "No overload matches this call.\\n  Overload 1 of 4, \'(value: string | number | Date): Date\', gave the following error.\\n    Argument of type \'string | undefined\' is not assignable to parameter of type \'string | number | Date\'.\\n      Type \'undefined\' is not assignable to type \'string | number | Date\'.\\n  Overload 2 of 4, \'(value: string | number): Date\', gave the following error.\\n    Argument of type \'string | undefined\' is not assignable to parameter of type \'string | number\'.\\n      Type \'undefined\' is not assignable to type \'string | number\'.", "582302494"],
       [191, 38, 23, "No overload matches this call.\\n  Overload 1 of 4, \'(value: string | number | Date): Date\', gave the following error.\\n    Argument of type \'string | undefined\' is not assignable to parameter of type \'string | number | Date\'.\\n  Overload 2 of 4, \'(value: string | number): Date\', gave the following error.\\n    Argument of type \'string | undefined\' is not assignable to parameter of type \'string | number\'.", "4035274933"],
       [279, 11, 25, "Object is possibly \'undefined\'.", "4293153287"],
+      [302, 10, 8, "Property \'protocol\' does not exist on type \'Conversation\'.", "3739415859"],
       [328, 10, 24, "Type \'(QualifiedId | undefined)[]\' is not assignable to type \'QualifiedId[]\'.\\n  Type \'QualifiedId | undefined\' is not assignable to type \'QualifiedId\'.\\n    Type \'undefined\' is not assignable to type \'QualifiedId\'.", "125758031"],
       [332, 61, 13, "Object is possibly \'undefined\'.", "1863462798"],
       [333, 10, 13, "Object is possibly \'undefined\'.", "1863462798"],
@@ -1334,6 +1335,7 @@ exports[`stricter compilation`] = {
       [1187, 13, 35, "Object is possibly \'undefined\'.", "901544345"]
     ],
     "src/script/conversation/ConversationRepository.ts:4237265023": [
+      [128, 8, 13, "Module \'\\"@wireapp/core/src/main/conversation\\"\' has no exported member \'MLSReturnType\'.", "2259975781"],
       [181, 8, 29, "Argument of type \'(User | undefined)[] | undefined\' is not assignable to parameter of type \'User[] | undefined\'.\\n  Type \'(User | undefined)[]\' is not assignable to type \'User[]\'.", "1506995572"],
       [187, 75, 13, "No overload matches this call.\\n  Overload 1 of 4, \'(value: string | number | Date): Date\', gave the following error.\\n    Argument of type \'string | undefined\' is not assignable to parameter of type \'string | number | Date\'.\\n  Overload 2 of 4, \'(value: string | number): Date\', gave the following error.\\n    Argument of type \'string | undefined\' is not assignable to parameter of type \'string | number\'.", "2642562490"],
       [206, 16, 24, "Argument of type \'string | undefined\' is not assignable to parameter of type \'string\'.\\n  Type \'undefined\' is not assignable to type \'string\'.", "2322605270"],
@@ -1341,6 +1343,8 @@ exports[`stricter compilation`] = {
       [227, 10, 12, "Object is possibly \'undefined\'.", "1670678216"],
       [322, 6, 18, "Argument of type \'Conversation | undefined\' is not assignable to parameter of type \'Conversation\'.\\n  Type \'undefined\' is not assignable to type \'Conversation\'.", "1508601427"],
       [336, 43, 15, "Argument of type \'string | undefined\' is not assignable to parameter of type \'string\'.\\n  Type \'undefined\' is not assignable to type \'string\'.", "1177570679"],
+      [458, 57, 21, "Property \'createMLSConversation\' is private and only accessible within class \'ConversationService\'.", "2496571934"],
+      [460, 72, 25, "Property \'createProteusConversation\' does not exist on type \'ConversationService\'.", "3895255094"],
       [479, 8, 5, "Argument of type \'unknown\' is not assignable to parameter of type \'BackendClientError\'.", "165548477"],
       [519, 10, 13, "Object is of type \'unknown\'.", "2758364324"],
       [525, 8, 13, "Argument of type \'unknown\' is not assignable to parameter of type \'Error | undefined\'.", "2758364324"],
@@ -1356,6 +1360,9 @@ exports[`stricter compilation`] = {
       [1133, 22, 5, "Object is of type \'unknown\'.", "165548477"],
       [1159, 14, 5, "Object is of type \'unknown\'.", "165548477"],
       [1238, 4, 88, "Type \'Promise<Conversation | undefined>[]\' is not assignable to type \'Promise<Conversation>[]\'.\\n  Type \'Promise<Conversation | undefined>\' is not assignable to type \'Promise<Conversation>\'.\\n    Type \'Conversation | undefined\' is not assignable to type \'Conversation\'.\\n      Type \'undefined\' is not assignable to type \'Conversation\'.", "909551372"],
+      [1378, 63, 25, "Property \'addUsersToMLSConversation\' does not exist on type \'ConversationService\'.", "2055832130"],
+      [1384, 25, 5, "Parameter \'event\' implicitly has an \'any\' type.", "165702089"],
+      [1387, 82, 29, "Property \'addUsersToProteusConversation\' does not exist on type \'ConversationService\'.", "2370560362"],
       [1655, 101, 5, "Object is of type \'unknown\'.", "165548477"],
       [1853, 18, 12, "Object is possibly \'undefined\'.", "1670678216"],
       [1941, 12, 39, "Argument of type \'(conversationEntity: Conversation) => Conversation\' is not assignable to parameter of type \'((value: Conversation) => Conversation | PromiseLike<Conversation>) & ((value: null) => Conversation | PromiseLike<...>)\'.\\n  Type \'(conversationEntity: Conversation) => Conversation\' is not assignable to type \'(value: null) => Conversation | PromiseLike<Conversation>\'.\\n    Types of parameters \'conversationEntity\' and \'value\' are incompatible.\\n      Type \'null\' is not assignable to type \'Conversation\'.", "3862325245"],
@@ -2068,11 +2075,6 @@ exports[`stricter compilation`] = {
     "src/script/page/MainContent/panels/preferences/AccountPreferences.tsx:2831120992": [
       [92, 79, 34, "Argument of type \'boolean | undefined\' is not assignable to parameter of type \'boolean\'.", "212151669"],
       [120, 6, 9, "Argument of type \'undefined\' is not assignable to parameter of type \'string\'.", "2620553983"]
-    ],
-    "src/script/page/MainContent/panels/preferences/accountPreferences/AccountInput.tsx:3399271415": [
-      [182, 10, 4, "Type \'string | undefined\' is not assignable to type \'string\'.\\n  Type \'undefined\' is not assignable to type \'string\'.", "2087876002"],
-      [183, 10, 5, "Type \'string | undefined\' is not assignable to type \'string\'.\\n  Type \'undefined\' is not assignable to type \'string\'.", "189936718"],
-      [189, 30, 5, "Argument of type \'string | undefined\' is not assignable to parameter of type \'string\'.\\n  Type \'undefined\' is not assignable to type \'string\'.", "178805363"]
     ],
     "src/script/page/MainContent/panels/preferences/accountPreferences/AccountSecuritySection.tsx:851375994": [
       [70, 6, 9, "Argument of type \'undefined\' is not assignable to parameter of type \'string\'.", "2620553983"],
