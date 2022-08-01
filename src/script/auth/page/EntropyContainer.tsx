@@ -17,7 +17,7 @@
  *
  */
 
-import {Button, CheckRoundIcon, ContainerXS, H1, Muted, Text} from '@wireapp/react-ui-kit';
+import {Button, CheckRoundIcon, ContainerSM, H1, Muted, Text} from '@wireapp/react-ui-kit';
 import React, {useState} from 'react';
 
 import {setEntropyStrings} from '../../strings';
@@ -45,12 +45,14 @@ const EntropyContainer = ({onSetEntropy}: Props) => {
   };
 
   return (
-    <ContainerXS
+    <ContainerSM
       centerText
       verticalCenter
       style={{display: 'flex', flexDirection: 'column', justifyContent: 'space-around', minHeight: 428}}
     >
-      <H1 center>{_(setEntropyStrings.headline)}</H1>
+      <H1 center css={{marginBottom: 16}}>
+        {_(setEntropyStrings.headline)}
+      </H1>
       {percent >= 100 ? (
         <>
           <CheckRoundIcon width={64} height={64} css={{alignSelf: 'center', marginBottom: 64}} />
@@ -89,7 +91,7 @@ const EntropyContainer = ({onSetEntropy}: Props) => {
           </Text>
         </>
       )}
-    </ContainerXS>
+    </ContainerSM>
   );
 };
 
