@@ -2184,24 +2184,24 @@ exports[`stricter compilation`] = {
     "src/script/team/TeamEntity.ts:781860466": [
       [48, 6, 7, "Type \'string | boolean\' is not assignable to type \'boolean\'.\\n  Type \'string\' is not assignable to type \'boolean\'.", "814555284"]
     ],
-    "src/script/team/TeamRepository.ts:3026198002": [
-      [207, 4, 159, "Type \'(User | undefined)[]\' is not assignable to type \'User[]\'.\\n  Type \'User | undefined\' is not assignable to type \'User\'.\\n    Type \'undefined\' is not assignable to type \'User\'.", "587279576"],
-      [213, 53, 24, "Argument of type \'string | undefined\' is not assignable to parameter of type \'string\'.\\n  Type \'undefined\' is not assignable to type \'string\'.", "2322605270"],
-      [307, 4, 9, "Type \'(string | undefined)[]\' is not assignable to type \'string[]\'.\\n  Type \'string | undefined\' is not assignable to type \'string\'.\\n    Type \'undefined\' is not assignable to type \'string\'.", "3264882315"],
-      [328, 53, 13, "Argument of type \'string | undefined\' is not assignable to parameter of type \'string\'.\\n  Type \'undefined\' is not assignable to type \'string\'.", "3345044032"],
-      [337, 66, 9, "Argument of type \'{ domain: string; id: string | undefined; }[]\' is not assignable to parameter of type \'QualifiedId[]\'.\\n  Type \'{ domain: string; id: string | undefined; }\' is not assignable to type \'QualifiedId\'.\\n    Types of property \'id\' are incompatible.\\n      Type \'string | undefined\' is not assignable to type \'string\'.\\n        Type \'undefined\' is not assignable to type \'string\'.", "3264882315"],
-      [533, 28, 45, "Object is possibly \'undefined\'.", "1991114915"],
-      [534, 23, 40, "Object is possibly \'undefined\'.", "841513102"],
-      [601, 6, 76, "Argument of type \'string | null\' is not assignable to parameter of type \'string\'.\\n  Type \'null\' is not assignable to type \'string\'.", "563963699"],
-      [653, 34, 14, "No overload matches this call.\\n  Overload 1 of 2, \'(...items: ConcatArray<never>[]): never[]\', gave the following error.\\n    Argument of type \'TeamMemberEntity | TeamMemberEntity[]\' is not assignable to parameter of type \'ConcatArray<never>\'.\\n      Type \'TeamMemberEntity\' is missing the following properties from type \'ConcatArray<never>\': length, join, slice\\n  Overload 2 of 2, \'(...items: ConcatArray<never>[]): never[]\', gave the following error.\\n    Argument of type \'TeamMemberEntity | TeamMemberEntity[]\' is not assignable to parameter of type \'ConcatArray<never>\'.\\n      Type \'TeamMemberEntity\' is not assignable to type \'ConcatArray<never>\'.", "3525779144"],
-      [655, 56, 6, "Property \'userId\' does not exist on type \'never\'.", "1765117785"],
-      [657, 45, 11, "Property \'permissions\' does not exist on type \'never\'.", "524793117"],
-      [662, 25, 6, "Property \'userId\' does not exist on type \'never\'.", "1765117785"],
-      [662, 42, 11, "Property \'permissions\' does not exist on type \'never\'.", "524793117"],
-      [662, 87, 11, "Property \'permissions\' does not exist on type \'never\'.", "524793117"],
-      [667, 25, 6, "Property \'userId\' does not exist on type \'never\'.", "1765117785"],
-      [667, 42, 9, "Property \'invitedBy\' does not exist on type \'never\'.", "1955064691"],
-      [671, 64, 14, "Property \'hasOwnProperty\' does not exist on type \'never\'.", "547572878"]
+    "src/script/team/TeamRepository.ts:3798593424": [
+      [204, 4, 159, "Type \'(User | undefined)[]\' is not assignable to type \'User[]\'.\\n  Type \'User | undefined\' is not assignable to type \'User\'.\\n    Type \'undefined\' is not assignable to type \'User\'.", "587279576"],
+      [210, 53, 24, "Argument of type \'string | undefined\' is not assignable to parameter of type \'string\'.\\n  Type \'undefined\' is not assignable to type \'string\'.", "2322605270"],
+      [304, 4, 9, "Type \'(string | undefined)[]\' is not assignable to type \'string[]\'.\\n  Type \'string | undefined\' is not assignable to type \'string\'.\\n    Type \'undefined\' is not assignable to type \'string\'.", "3264882315"],
+      [325, 53, 13, "Argument of type \'string | undefined\' is not assignable to parameter of type \'string\'.\\n  Type \'undefined\' is not assignable to type \'string\'.", "3345044032"],
+      [334, 66, 9, "Argument of type \'{ domain: string; id: string | undefined; }[]\' is not assignable to parameter of type \'QualifiedId[]\'.\\n  Type \'{ domain: string; id: string | undefined; }\' is not assignable to type \'QualifiedId\'.\\n    Types of property \'id\' are incompatible.\\n      Type \'string | undefined\' is not assignable to type \'string\'.\\n        Type \'undefined\' is not assignable to type \'string\'.", "3264882315"],
+      [505, 28, 45, "Object is possibly \'undefined\'.", "1991114915"],
+      [506, 23, 40, "Object is possibly \'undefined\'.", "841513102"],
+      [573, 6, 76, "Argument of type \'string | null\' is not assignable to parameter of type \'string\'.\\n  Type \'null\' is not assignable to type \'string\'.", "563963699"],
+      [625, 34, 14, "No overload matches this call.\\n  Overload 1 of 2, \'(...items: ConcatArray<never>[]): never[]\', gave the following error.\\n    Argument of type \'TeamMemberEntity | TeamMemberEntity[]\' is not assignable to parameter of type \'ConcatArray<never>\'.\\n      Type \'TeamMemberEntity\' is missing the following properties from type \'ConcatArray<never>\': length, join, slice\\n  Overload 2 of 2, \'(...items: ConcatArray<never>[]): never[]\', gave the following error.\\n    Argument of type \'TeamMemberEntity | TeamMemberEntity[]\' is not assignable to parameter of type \'ConcatArray<never>\'.\\n      Type \'TeamMemberEntity\' is not assignable to type \'ConcatArray<never>\'.", "3525779144"],
+      [627, 56, 6, "Property \'userId\' does not exist on type \'never\'.", "1765117785"],
+      [629, 45, 11, "Property \'permissions\' does not exist on type \'never\'.", "524793117"],
+      [634, 25, 6, "Property \'userId\' does not exist on type \'never\'.", "1765117785"],
+      [634, 42, 11, "Property \'permissions\' does not exist on type \'never\'.", "524793117"],
+      [634, 87, 11, "Property \'permissions\' does not exist on type \'never\'.", "524793117"],
+      [639, 25, 6, "Property \'userId\' does not exist on type \'never\'.", "1765117785"],
+      [639, 42, 9, "Property \'invitedBy\' does not exist on type \'never\'.", "1955064691"],
+      [643, 64, 14, "Property \'hasOwnProperty\' does not exist on type \'never\'.", "547572878"]
     ],
     "src/script/team/TeamState.ts:2129239601": [
       [59, 4, 9, "Type \'Observable<TeamEntity | undefined>\' is not assignable to type \'Observable<TeamEntity>\'.\\n  The types returned by \'peek()\' are incompatible between these types.\\n    Type \'TeamEntity | undefined\' is not assignable to type \'TeamEntity\'.\\n      Type \'undefined\' is not assignable to type \'TeamEntity\'.", "1162784912"],

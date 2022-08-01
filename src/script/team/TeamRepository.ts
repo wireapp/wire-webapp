@@ -62,10 +62,7 @@ import {EventSource} from '../event/EventSource';
 import {ModalsViewModel} from '../view_model/ModalsViewModel';
 import {Config} from '../Config';
 import {FeatureStatus} from '@wireapp/api-client/src/team/feature';
-import {
-  searchVisibilityInboundConfigToLabelText,
-  searchVisibilityOutboundConfigToLabelText,
-} from './TeamSearchVisibilitySetting';
+import {showSearchVisibilityModal} from './TeamSearchVisibilitySetting';
 
 export interface AccountInfo {
   accentID: number;
@@ -454,60 +451,35 @@ export class TeamRepository {
     const hasSearchVisibilityOutboundStatusChanged =
       previousConfig.searchVisibilityOutbound?.status !== newConfig.searchVisibilityOutbound?.status;
 
-    const hasSearchVisibilityOutboundStatusChangedToDisabled =
-      hasSearchVisibilityOutboundStatusChanged && newConfig.searchVisibilityOutbound?.status === FeatureStatus.DISABLED;
+    const isSearchVisibilityOutboundStatusEnabled =
+      newConfig.searchVisibilityOutbound?.status === FeatureStatus.ENABLED;
 
     const hasSearchVisibilityOutboundConfigChanged =
       previousConfig.searchVisibilityOutbound?.config !== newConfig.searchVisibilityOutbound?.config;
+
+    const hasSearchVisibilityOutboundChanged =
+      hasSearchVisibilityOutboundStatusChanged ||
+      (isSearchVisibilityOutboundStatusEnabled && hasSearchVisibilityOutboundConfigChanged);
 
     //inbound
     const hasSearchVisibilityInboundStatusChanged =
       previousConfig.searchVisibilityInbound?.status !== newConfig.searchVisibilityInbound?.status;
 
-    const hasSearchVisibilityInboundStatusChangedToDisabled =
-      hasSearchVisibilityInboundStatusChanged && newConfig.searchVisibilityInbound?.status === FeatureStatus.DISABLED;
+    const isSearchVisibilityInboundStatusEnabled = newConfig.searchVisibilityInbound?.status === FeatureStatus.ENABLED;
 
     const hasSearchVisibilityInboundConfigChanged =
       previousConfig.searchVisibilityInbound?.config !== newConfig.searchVisibilityInbound?.config;
 
-    const hasSearchVisibilityChanged =
-      hasSearchVisibilityOutboundStatusChanged ||
-      hasSearchVisibilityOutboundConfigChanged ||
+    const hasSearchVisibilityInboundChanged =
       hasSearchVisibilityInboundStatusChanged ||
-      hasSearchVisibilityInboundConfigChanged;
+      (isSearchVisibilityInboundStatusEnabled && hasSearchVisibilityInboundConfigChanged);
 
-    if (!hasSearchVisibilityChanged) {
-      return;
-    }
+    const changedSearchVisibilityState = {
+      searchVisibilityInbound: hasSearchVisibilityInboundChanged ? newConfig.searchVisibilityInbound : undefined,
+      searchVisibilityOutbound: hasSearchVisibilityOutboundChanged ? newConfig.searchVisibilityOutbound : undefined,
+    };
 
-    const htmlMessages = [];
-
-    if (hasSearchVisibilityOutboundStatusChanged || hasSearchVisibilityOutboundConfigChanged) {
-      if (hasSearchVisibilityOutboundStatusChangedToDisabled) {
-        htmlMessages.push(searchVisibilityOutboundConfigToLabelText(FeatureStatus.DISABLED));
-      } else if (newConfig.searchVisibilityOutbound?.config) {
-        htmlMessages.push(
-          searchVisibilityOutboundConfigToLabelText(FeatureStatus.ENABLED, newConfig.searchVisibilityOutbound.config),
-        );
-      }
-    }
-
-    if (hasSearchVisibilityInboundStatusChanged || hasSearchVisibilityInboundConfigChanged) {
-      if (hasSearchVisibilityInboundStatusChangedToDisabled) {
-        htmlMessages.push(searchVisibilityInboundConfigToLabelText(FeatureStatus.DISABLED));
-      } else if (newConfig.searchVisibilityInbound?.config) {
-        htmlMessages.push(
-          searchVisibilityInboundConfigToLabelText(FeatureStatus.ENABLED, newConfig.searchVisibilityInbound.config),
-        );
-      }
-    }
-
-    amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.ACKNOWLEDGE, {
-      text: {
-        htmlMessage: htmlMessages.join('</br></br>'),
-        title: t('featureConfigSearchVisibilityHeadline'),
-      },
-    });
+    showSearchVisibilityModal(changedSearchVisibilityState);
   };
 
   private readonly handleGuestLinkFeatureChange = (previousConfig: FeatureList, newConfig: FeatureList) => {
