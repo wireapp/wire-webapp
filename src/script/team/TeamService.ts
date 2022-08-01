@@ -27,7 +27,7 @@ import {FeatureStatus, FEATURE_KEY} from '@wireapp/api-client/src/team/feature/'
 import {container} from 'tsyringe';
 
 import {APIClient} from '../service/APIClientSingleton';
-import {FeatureSearchVisibilityConfig} from '../../../.yalc/@wireapp/api-client/src/team';
+import {FeatureSearchVisibilityConfig} from '@wireapp/api-client/src/team';
 
 export class TeamService {
   constructor(private readonly apiClient = container.resolve(APIClient)) {}

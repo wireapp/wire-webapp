@@ -17,7 +17,7 @@
  *
  */
 
-import {FeatureSearchVisibilityConfig, FeatureStatus} from '../../../.yalc/@wireapp/api-client/src/team';
+import {FeatureSearchVisibilityConfig, FeatureStatus} from '@wireapp/api-client/src/team';
 import {t} from 'Util/LocalizerUtil';
 
 export const searchVisibilityOutboundConfigToLabelText = (

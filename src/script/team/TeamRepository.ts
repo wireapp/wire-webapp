@@ -61,7 +61,7 @@ import {NOTIFICATION_HANDLING_STATE} from '../event/NotificationHandlingState';
 import {EventSource} from '../event/EventSource';
 import {ModalsViewModel} from '../view_model/ModalsViewModel';
 import {Config} from '../Config';
-import {FeatureStatus} from '../../../.yalc/@wireapp/api-client/src/team';
+import {FeatureStatus} from '@wireapp/api-client/src/team/feature';
 import {
   searchVisibilityInboundConfigToLabelText,
   searchVisibilityOutboundConfigToLabelText,
