@@ -92,26 +92,29 @@ const AccentColorPicker: React.FunctionComponent<AccentColorPickerProps> = ({use
                       position: 'absolute',
                       transition: 'all 0.15s ease-out',
                     },
-                    '&:checked + label > span:first-child::after': {
-                      transform: 'translate(-50%, -50%)',
-                    },
                     '&:checked + label > span:first-child::before': {
                       border: '1px solid currentColor',
                     },
-                    '&:focus + label > span:first-child::before': {
-                      ...CSS_SQUARE(16),
+                    '&:focus-visible + label': {
                       outline: '1px solid Highlight',
                     },
+                    '&:hover + label > span:first-child::after': {
+                      ...CSS_SQUARE(11),
+                    },
                     opacity: 0,
+                    position: 'absolute',
                   }}
                 />
                 <label
                   htmlFor={String(id)}
                   style={{
                     alignItems: 'center',
+                    borderRadius: '4px',
                     cursor: 'pointer',
                     display: 'flex',
                     flexDirection: 'column',
+                    minWidth: '50px',
+                    paddingTop: '10px',
                   }}
                 >
                   <span />
@@ -119,7 +122,6 @@ const AccentColorPicker: React.FunctionComponent<AccentColorPickerProps> = ({use
                     style={{
                       fontSize: '11px',
                       marginTop: '14px',
-                      textTransform: 'capitalize',
                     }}
                   >
                     {name}
