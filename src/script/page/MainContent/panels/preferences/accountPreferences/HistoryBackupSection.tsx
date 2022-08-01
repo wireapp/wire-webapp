@@ -20,7 +20,7 @@
 import {WebAppEvents} from '@wireapp/webapp-events';
 import {amplify} from 'amplify';
 import React from 'react';
-import {HistoryExportViewModel} from '../../../../../view_model/content/HistoryExportViewModel';
+import {CONFIG as HistoryExportConfig} from '../../../../../components/HistoryExport';
 import {ContentViewModel} from '../../../../../view_model/ContentViewModel';
 import {t} from 'Util/LocalizerUtil';
 import PreferencesSection from '../components/PreferencesSection';
@@ -47,10 +47,8 @@ const HistoryBackupSection: React.FC<HistoryBackupSectionProps> = ({brandName}) 
       <button
         className="button-text-primary"
         onClick={() => {
-          {
-            amplify.publish(WebAppEvents.CONTENT.SWITCH, ContentViewModel.STATE.HISTORY_EXPORT);
-            amplify.publish(WebAppEvents.BACKUP.EXPORT.START);
-          }
+          amplify.publish(WebAppEvents.BACKUP.EXPORT.START);
+          amplify.publish(WebAppEvents.CONTENT.SWITCH, ContentViewModel.STATE.HISTORY_EXPORT);
         }}
         data-uie-name="do-backup-export"
         aria-describedby="preferences-history-describe-1"
@@ -80,7 +78,7 @@ const HistoryBackupSection: React.FC<HistoryBackupSectionProps> = ({brandName}) 
             ref={fileInputRef}
             tabIndex={-1}
             type="file"
-            accept={`.${HistoryExportViewModel.CONFIG.FILE_EXTENSION}`}
+            accept={`.${HistoryExportConfig.FILE_EXTENSION}`}
             onChange={(event: any) => {
               const file = event.target.files[0];
               if (file) {

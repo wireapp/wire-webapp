@@ -35,7 +35,6 @@ import {ModalsViewModel} from './ModalsViewModel';
 import {ConversationError} from '../error/ConversationError';
 import {ConnectRequestsViewModel} from './content/ConnectRequestsViewModel';
 import {HistoryImportViewModel} from './content/HistoryImportViewModel';
-import {HistoryExportViewModel} from './content/HistoryExportViewModel';
 import {InputBarViewModel} from './content/InputBarViewModel';
 import {PanelViewModel} from './PanelViewModel';
 import type {MainViewModel, ViewModelRepositories} from './MainViewModel';
@@ -96,7 +95,6 @@ export class ContentViewModel {
   elementId: string;
   sidebarId: string;
   emojiInput: EmojiInputViewModel;
-  historyExport: HistoryExportViewModel;
   historyImport: HistoryImportViewModel;
   inputBar: InputBarViewModel;
   legalHoldModal: LegalHoldModalViewModel;
@@ -174,7 +172,6 @@ export class ContentViewModel {
       repositories.message,
     );
 
-    this.historyExport = new HistoryExportViewModel(repositories.backup);
     this.historyImport = new HistoryImportViewModel(repositories.backup);
 
     this.state.subscribe(state => {
