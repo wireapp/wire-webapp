@@ -169,10 +169,11 @@ const GroupVideoGrid: React.FunctionComponent<GroupVideoGripProps> = ({
             }}
             srcObject={thumbnail.videoStream}
           />
-          <div className="group-video-grid__element__label" css={{padding: 4}}>
+          {/* <div className="group-video-grid__element__label" css={{padding: 4}}> */}
+          <div>
             {selfIsMuted ? (
               <span
-                className="group-video-grid__element__label__icon"
+                // className="group-video-grid__element__label__icon"
                 css={{'> svg': {width: 12}, height: 12}}
                 data-uie-name="status-call-audio-muted"
               >
@@ -190,7 +191,7 @@ const GroupVideoGrid: React.FunctionComponent<GroupVideoGripProps> = ({
               data-uie-name={
                 selfIsActivelySpeaking ? 'status-active-speaking' : selfIsMuted ? 'status-audio-off' : 'status-audio-on'
               }
-              className="group-video-grid__element__label__name"
+              // className="group-video-grid__element__label__name"
               css={{fontSize: 10}}
             >
               {/* {selfName} */}
