@@ -18,10 +18,12 @@
  */
 
 import {FC} from 'react';
+import {FeatureList} from '@wireapp/api-client/src/team';
+
 import {t} from 'Util/LocalizerUtil';
 import Icon from 'Components/Icon';
+
 import {showSearchVisibilityModal} from '../team/TeamSearchVisibilitySetting';
-import {FeatureList} from '@wireapp/api-client/src/team';
 
 interface UserSearchInputInfoButtonProps {
   teamFeatures: FeatureList;

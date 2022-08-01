@@ -17,11 +17,12 @@
  *
  */
 
-import {render, fireEvent} from '@testing-library/react';
-import UserSearchInputInfoButton from 'Components/UserSearchInputInfoButton';
 import {FeatureSearchVisibilityConfig, FeatureStatus} from '@wireapp/api-client/src/team';
 import {WebAppEvents} from '@wireapp/webapp-events';
+import {render, fireEvent} from '@testing-library/react';
 import {amplify} from 'amplify';
+
+import UserSearchInputInfoButton from 'Components/UserSearchInputInfoButton';
 import {ModalsViewModel} from '../view_model/ModalsViewModel';
 
 describe('UserSearchInputInfoButton', () => {

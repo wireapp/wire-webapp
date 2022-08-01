@@ -45,7 +45,7 @@ import {Environment} from 'Util/Environment';
 
 import {TeamMapper} from './TeamMapper';
 import {TeamEntity} from './TeamEntity';
-import {ROLE, ROLE as TEAM_ROLE, roleFromTeamPermissions} from '../user/UserPermission';
+import {ROLE, roleFromTeamPermissions} from '../user/UserPermission';
 
 import {IntegrationMapper} from '../integration/IntegrationMapper';
 import {SIGN_OUT_REASON} from '../auth/SignOutReason';
@@ -70,7 +70,7 @@ export interface AccountInfo {
   name: string;
   picture?: string;
   teamID?: string;
-  teamRole: TEAM_ROLE;
+  teamRole: ROLE;
   userID: string;
 }
 
@@ -447,7 +447,6 @@ export class TeamRepository {
   };
 
   private readonly handleSearchVisibilityFeatureChange = (previousConfig: FeatureList, newConfig: FeatureList) => {
-    //outbound
     const hasSearchVisibilityOutboundStatusChanged =
       previousConfig.searchVisibilityOutbound?.status !== newConfig.searchVisibilityOutbound?.status;
 
@@ -461,7 +460,6 @@ export class TeamRepository {
       hasSearchVisibilityOutboundStatusChanged ||
       (isSearchVisibilityOutboundStatusEnabled && hasSearchVisibilityOutboundConfigChanged);
 
-    //inbound
     const hasSearchVisibilityInboundStatusChanged =
       previousConfig.searchVisibilityInbound?.status !== newConfig.searchVisibilityInbound?.status;
 
@@ -475,8 +473,8 @@ export class TeamRepository {
       (isSearchVisibilityInboundStatusEnabled && hasSearchVisibilityInboundConfigChanged);
 
     const changedSearchVisibilityState = {
-      searchVisibilityInbound: hasSearchVisibilityInboundChanged ? newConfig.searchVisibilityInbound : undefined,
-      searchVisibilityOutbound: hasSearchVisibilityOutboundChanged ? newConfig.searchVisibilityOutbound : undefined,
+      ...(hasSearchVisibilityInboundChanged && {searchVisibilityInbound: newConfig.searchVisibilityInbound}),
+      ...(hasSearchVisibilityOutboundChanged && {searchVisibilityOutbound: newConfig.searchVisibilityOutbound}),
     };
 
     showSearchVisibilityModal(changedSearchVisibilityState);
