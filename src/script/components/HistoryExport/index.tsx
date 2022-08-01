@@ -103,7 +103,9 @@ const HistoryExport: FC<HistoryExportProps> = ({backupRepository, userState = co
   const onError = (error: Error) => {
     if (error instanceof CancelError) {
       logger.log('History export was cancelled');
-      return dismissExport();
+      dismissExport();
+
+      return;
     }
 
     setHasError(true);
@@ -140,14 +142,13 @@ const HistoryExport: FC<HistoryExportProps> = ({backupRepository, userState = co
 
       onSuccess(archiveBlob);
       logger.log(`Completed export of '${numberOfRecords}' records from history`);
-      //  TODO: Fix error type
-    } catch (error: any) {
-      onError(error);
+    } catch (error) {
+      onError(error as Error);
     }
   };
 
   useEffect(() => {
-    amplify.subscribe(WebAppEvents.BACKUP.EXPORT.START, exportHistory);
+    exportHistory();
   }, []);
 
   return (

@@ -47,7 +47,6 @@ const HistoryBackupSection: React.FC<HistoryBackupSectionProps> = ({brandName}) 
       <button
         className="button-text-primary"
         onClick={() => {
-          amplify.publish(WebAppEvents.BACKUP.EXPORT.START);
           amplify.publish(WebAppEvents.CONTENT.SWITCH, ContentViewModel.STATE.HISTORY_EXPORT);
         }}
         data-uie-name="do-backup-export"
