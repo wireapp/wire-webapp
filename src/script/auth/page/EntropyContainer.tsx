@@ -79,8 +79,8 @@ const EntropyContainer = ({onSetEntropy}: Props) => {
           <EntropyCanvas
             css={{border: pause ? 'red 2px solid' : 'black 2px solid'}}
             data-uie-name="element-entropy-canvas"
-            sizeX={512}
-            sizeY={512}
+            sizeX={400}
+            sizeY={400}
             onProgress={onProgress}
             minEntropyBits={1024}
             minFrames={300}
