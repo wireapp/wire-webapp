@@ -22,7 +22,7 @@ import React, {useEffect, useState} from 'react';
 import Icon from 'Components/Icon';
 import {t} from 'Util/LocalizerUtil';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
-import useEffectRef from 'Util/useEffectRef';
+import useElementState from 'Util/useElementState';
 import {getLogger} from 'Util/Logger';
 
 import {Config} from '../../../../../Config';
@@ -49,7 +49,7 @@ const CameraPreferences: React.FC<CameraPreferencesProps> = ({
 }) => {
   const [isRequesting, setIsRequesting] = useState(false);
   const [stream, setStream] = useState<MediaStream>();
-  const [videoElement, setVideoElement] = useEffectRef<HTMLVideoElement>();
+  const [videoElement, setVideoElement] = useElementState<HTMLVideoElement>();
   const {[DeviceTypes.VIDEO_INPUT]: availableDevices} = useKoSubscribableChildren(devicesHandler?.availableDevices, [
     DeviceTypes.VIDEO_INPUT,
   ]);

@@ -25,7 +25,7 @@ import {handleKeyDown} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
 
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
-import useEffectRef from 'Util/useEffectRef';
+import useElementState from 'Util/useElementState';
 
 import {Config} from '../../../../../Config';
 import {ContentMessage} from '../../../../../entity/message/ContentMessage';
@@ -48,7 +48,7 @@ const ImageAsset: React.FC<ImageAssetProps> = ({asset, message, onClick, teamSta
   const {resource} = useKoSubscribableChildren(asset, ['resource']);
   const {isObfuscated, visible} = useKoSubscribableChildren(message, ['isObfuscated', 'visible']);
   const {isFileSharingReceivingEnabled} = useKoSubscribableChildren(teamState, ['isFileSharingReceivingEnabled']);
-  const [viewportElementRef, setViewportElementRef] = useEffectRef<HTMLDivElement>();
+  const [viewportElementRef, setViewportElementRef] = useElementState<HTMLDivElement>();
   const isInViewport = useViewPortObserver(viewportElementRef);
   const {isUploading, uploadProgress, cancelUpload, loadAsset} = useAssetTransfer(message);
 

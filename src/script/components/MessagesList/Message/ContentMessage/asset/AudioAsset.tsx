@@ -36,7 +36,7 @@ import AssetHeader from './AssetHeader';
 import MediaButton from './controls/MediaButton';
 
 import Icon from 'Components/Icon';
-import useEffectRef from 'Util/useEffectRef';
+import useElementState from 'Util/useElementState';
 import {useAssetTransfer} from './AbstractAssetTransferStateTracker';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 
@@ -57,14 +57,14 @@ const AudioAsset: React.FC<AudioAssetProps> = ({
   teamState = container.resolve(TeamState),
 }) => {
   const asset = message.getFirstAsset() as FileAsset;
-  const [audioElement, setAudioElement] = useEffectRef<HTMLAudioElement>();
+  const [audioElement, setAudioElement] = useElementState<HTMLAudioElement>();
   const {isFileSharingReceivingEnabled} = useKoSubscribableChildren(teamState, ['isFileSharingReceivingEnabled']);
   const {isObfuscated} = useKoSubscribableChildren(message, ['isObfuscated']);
   const {transferState, uploadProgress, cancelUpload, loadAsset} = useAssetTransfer(message);
-  const [audioTime, setAudioTime] = useState<number>(asset?.meta?.duration || 0);
+  const [audioTime, setAudioTime] = useState<number>(asset?.meta?.duration ?? 0);
   const [audioSrc, setAudioSrc] = useState<string>();
-  const onTimeupdate = () => setAudioTime(audioElement.currentTime);
-  const showLoudnessPreview = !!(asset.meta?.loudness?.length > 0);
+  const onTimeupdate = () => setAudioTime(audioElement?.currentTime ?? 0);
+  const showLoudnessPreview = !!asset.meta?.loudness?.length;
   const onPauseButtonClicked = () => audioElement?.pause();
 
   const onPlayButtonClicked = async () => {
@@ -94,7 +94,7 @@ const AudioAsset: React.FC<AudioAssetProps> = ({
 
   useEffect(() => {
     return () => {
-      window.URL.revokeObjectURL(audioSrc);
+      window.URL.revokeObjectURL(audioSrc ?? '');
     };
   }, []);
 

@@ -23,7 +23,7 @@ import cx from 'classnames';
 import {noop} from 'Util/util';
 import {t} from 'Util/LocalizerUtil';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
-import useEffectRef from 'Util/useEffectRef';
+import useElementState from 'Util/useElementState';
 
 import {AVATAR_SIZE} from 'Components/Avatar';
 
@@ -83,7 +83,7 @@ const ConversationListCell: React.FC<ConversationListCellProps> = ({
 
   const isActive = isSelected(conversation);
 
-  const [viewportElementRef, setViewportElementRef] = useEffectRef<HTMLElement>();
+  const [viewportElementRef, setViewportElementRef] = useElementState<HTMLElement>();
 
   useEffect(() => {
     const handleRightClick = (event: MouseEvent) => {

@@ -22,7 +22,7 @@ import React, {useEffect, useMemo, useRef, useState} from 'react';
 import {t} from 'Util/LocalizerUtil';
 import {noop} from 'Util/util';
 import {isScrolledBottom} from 'Util/scroll-helpers';
-import useEffectRef from 'Util/useEffectRef';
+import useElementState from 'Util/useElementState';
 
 import type {Message} from '../../../../entity/message/Message';
 import useDebounce from '../../../../hooks/useDebounce';
@@ -47,7 +47,7 @@ const FullSearch: React.FC<FullSearchProps> = ({searchProvider, click = noop, ch
   const [messages, setMessages] = useState<ContentMessage[]>([]);
   const [messageCount, setMessageCount] = useState(0);
   const [hasNoResults, setHasNoResults] = useState(false);
-  const [element, setElement] = useEffectRef<HTMLDivElement>();
+  const [element, setElement] = useElementState<HTMLDivElement>();
 
   useDebounce(
     async () => {

@@ -25,7 +25,7 @@ import MessageTime from './MessageTime';
 import {t} from 'Util/LocalizerUtil';
 import ConnectedMessage from './memberMessage/ConnectedMessage';
 import {User} from 'src/script/entity/User';
-import useEffectRef from 'Util/useEffectRef';
+import useElementState from 'Util/useElementState';
 
 export interface MemberMessageProps {
   classifiedDomains?: string[];
@@ -77,7 +77,7 @@ const MemberMessage: React.FC<MemberMessageProps> = ({
   const isMemberLeave = message.isMemberLeave();
   const isMemberChange = message.isMemberChange();
 
-  const [messageHeaderLabelRef, setMessageHeaderLabelRef] = useEffectRef<HTMLDivElement>();
+  const [messageHeaderLabelRef, setMessageHeaderLabelRef] = useElementState<HTMLDivElement>();
   useEffect(() => {
     if (messageHeaderLabelRef) {
       const link = messageHeaderLabelRef.querySelector('.message-header-show-more');

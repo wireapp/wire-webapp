@@ -27,7 +27,7 @@ import {AssetRepository} from '../assets/AssetRepository';
 import {useViewPortObserver} from '../ui/viewportObserver';
 import {TeamState} from '../team/TeamState';
 import RestrictedImage from './asset/RestrictedImage';
-import useEffectRef from 'Util/useEffectRef';
+import useElementState from 'Util/useElementState';
 
 export interface ImageProps extends React.HTMLProps<HTMLDivElement> {
   aspectRatio?: number;
@@ -48,7 +48,7 @@ const Image: React.FC<ImageProps> = ({
   aspectRatio,
   ...props
 }) => {
-  const [viewportElementRef, setViewportElementRef] = useEffectRef<HTMLDivElement>();
+  const [viewportElementRef, setViewportElementRef] = useElementState<HTMLDivElement>();
   const isInViewport = useViewPortObserver(viewportElementRef);
 
   const [assetIsLoading, setAssetIsLoading] = useState<boolean>(false);

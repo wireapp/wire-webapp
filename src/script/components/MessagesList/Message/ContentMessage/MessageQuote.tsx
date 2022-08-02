@@ -40,7 +40,7 @@ import VideoAsset from './asset/VideoAsset';
 import AudioAsset from './asset/AudioAsset';
 import FileAssetComponent from './asset/FileAssetComponent';
 import LocationAsset from './asset/LocationAsset';
-import useEffectRef from 'Util/useEffectRef';
+import useElementState from 'Util/useElementState';
 import {Text} from 'src/script/entity/message/Text';
 import {handleKeyDown} from 'Util/KeyboardUtil';
 
@@ -162,7 +162,7 @@ const QuotedMessage: React.FC<QuotedMessageProps> = ({
   ]);
   const [canShowMore, setCanShowMore] = useState(false);
   const [showFullText, setShowFullText] = useState(false);
-  const [textQuoteElement, setTextQuoteElement] = useEffectRef();
+  const [textQuoteElement, setTextQuoteElement] = useElementState();
 
   useEffect(() => {
     setShowFullText(false);

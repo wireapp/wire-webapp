@@ -19,6 +19,6 @@
 
 import {useState} from 'react';
 
-export default function useEffectRef<T extends Element>(value?: T): [T | undefined, (node: T) => void] {
+export default function useElementState<T extends Element>(value?: T): [T | undefined, (node: T) => void] {
   return useState<T | undefined>(value);
 }

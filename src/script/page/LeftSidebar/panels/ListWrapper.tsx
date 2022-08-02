@@ -24,7 +24,7 @@ import {throttle} from 'underscore';
 import {isScrollable, isScrolledBottom, isScrolledTop} from 'Util/scroll-helpers';
 import Icon from 'Components/Icon';
 import {t} from 'Util/LocalizerUtil';
-import useEffectRef from 'Util/useEffectRef';
+import useElementState from 'Util/useElementState';
 import {useFadingScrollbar} from '../../../ui/fadingScrollbar';
 
 type LeftListWrapperProps = {
@@ -64,7 +64,7 @@ const ListWrapper: React.FC<LeftListWrapperProps> = ({
   before,
   headerUieName,
 }) => {
-  const [scrollbarRef, setScrollbarRef] = useEffectRef<HTMLDivElement>();
+  const [scrollbarRef, setScrollbarRef] = useElementState<HTMLDivElement>();
   useFadingScrollbar(scrollbarRef);
 
   const calculateBorders = throttle((element: HTMLElement) => {

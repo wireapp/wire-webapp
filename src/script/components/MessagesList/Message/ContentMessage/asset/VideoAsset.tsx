@@ -31,7 +31,7 @@ import SeekBar from './controls/SeekBar';
 import MediaButton from './controls/MediaButton';
 import {t} from 'Util/LocalizerUtil';
 import {formatSeconds} from 'Util/TimeUtil';
-import useEffectRef from 'Util/useEffectRef';
+import useElementState from 'Util/useElementState';
 import {AssetRepository} from '../../../../../assets/AssetRepository';
 import {useTimeout} from '@wireapp/react-ui-kit';
 import RestrictedVideo from 'Components/asset/RestrictedVideo';
@@ -54,9 +54,9 @@ const VideoAsset: React.FC<VideoAssetProps> = ({
   const {preview_resource: assetPreviewResource} = useKoSubscribableChildren(asset, ['preview_resource']);
   const [videoPlaybackError, setVideoPlaybackError] = useState(null);
   const [videoTimeRest, setVideoTimeRest] = useState<number>();
-  const [videoPreview, setVideoPreview] = useState<string>(null);
-  const [videoSrc, setVideoSrc] = useState<string>(null);
-  const [videoElement, setVideoElement] = useEffectRef<HTMLVideoElement>();
+  const [videoPreview, setVideoPreview] = useState<string>('');
+  const [videoSrc, setVideoSrc] = useState<string>('');
+  const [videoElement, setVideoElement] = useElementState<HTMLVideoElement>();
   const [isVideoLoaded, setIsVideoLoaded] = useState(false);
   const {isFileSharingReceivingEnabled} = useKoSubscribableChildren(teamState, ['isFileSharingReceivingEnabled']);
   const [displaySmall, setDisplaySmall] = useState(!!isQuote);
@@ -80,8 +80,8 @@ const VideoAsset: React.FC<VideoAssetProps> = ({
     if (isFileSharingReceivingEnabled) {
       setDisplaySmall(false);
 
-      if (videoSrc) {
-        videoElement.play();
+      if (!!videoSrc.length) {
+        videoElement?.play();
       } else {
         asset.status(AssetTransferState.DOWNLOADING);
 

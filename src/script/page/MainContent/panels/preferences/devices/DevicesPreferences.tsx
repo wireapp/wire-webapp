@@ -30,7 +30,7 @@ import VerifiedIcon from 'Components/VerifiedIcon';
 import Icon from 'Components/Icon';
 import {CryptographyRepository} from 'src/script/cryptography/CryptographyRepository';
 import {useFadingScrollbar} from '../../../../../ui/fadingScrollbar';
-import useEffectRef from 'Util/useEffectRef';
+import useElementState from 'Util/useElementState';
 import DetailedDevice from './components/DetailedDevice';
 import DeviceDetailsPreferences from './DeviceDetailsPreferences';
 import {Conversation} from '../../../../../entity/Conversation';
@@ -113,7 +113,7 @@ const DevicesPreferences: React.FC<DevicesPreferencesProps> = ({
   const {clients, currentClient} = useKoSubscribableChildren(clientState, ['clients', 'currentClient']);
   const {self} = useKoSubscribableChildren(userState, ['self']);
   const isSSO = self?.isNoPasswordSSO;
-  const [scrollbarRef, setScrollbarRef] = useEffectRef<HTMLDivElement>();
+  const [scrollbarRef, setScrollbarRef] = useElementState<HTMLDivElement>();
   const getFingerprint = (device: ClientEntity) =>
     cryptographyRepository.getRemoteFingerprint(self.qualifiedId, device.id);
   useFadingScrollbar(scrollbarRef);

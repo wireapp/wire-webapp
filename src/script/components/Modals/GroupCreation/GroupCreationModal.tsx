@@ -50,7 +50,7 @@ import {
   teamPermissionsForAccessState,
   toggleFeature,
 } from '../../../conversation/ConversationAccessPermission';
-import useEffectRef from 'Util/useEffectRef';
+import useElementState from 'Util/useElementState';
 import {useFadingScrollbar} from '../../../ui/fadingScrollbar';
 import {Config} from '../../../Config';
 
@@ -90,7 +90,7 @@ const GroupCreationModal: React.FC<GroupCreationModalProps> = ({
   const [groupCreationState, setGroupCreationState] = useState<GroupCreationModalState>(
     GroupCreationModalState.DEFAULT,
   );
-  const [scrollbarRef, setScrollbarRef] = useEffectRef<HTMLDivElement>();
+  const [scrollbarRef, setScrollbarRef] = useElementState<HTMLDivElement>();
   useFadingScrollbar(scrollbarRef);
 
   const maxNameLength = ConversationRepository.CONFIG.GROUP.MAX_NAME_LENGTH;

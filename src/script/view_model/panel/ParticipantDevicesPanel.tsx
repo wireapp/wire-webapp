@@ -20,7 +20,7 @@
 import React from 'react';
 
 import {registerReactComponent} from 'Util/ComponentUtil';
-import useEffectRef from 'Util/useEffectRef';
+import useElementState from 'Util/useElementState';
 import UserDevices, {UserDevicesState, useUserDevicesHistory} from 'Components/UserDevices';
 
 import type {User} from '../../entity/User';
@@ -36,7 +36,7 @@ interface ParticipantDevicesPanelProps {
 }
 
 const ParticipantDevicesPanel: React.FC<ParticipantDevicesPanelProps> = ({repositories, onClose, onGoBack, user}) => {
-  const [scrollbarRef, setScrollbarRef] = useEffectRef<HTMLDivElement>();
+  const [scrollbarRef, setScrollbarRef] = useElementState<HTMLDivElement>();
   useFadingScrollbar(scrollbarRef);
   const history = useUserDevicesHistory();
   return (

@@ -23,7 +23,7 @@ import {container} from 'tsyringe';
 import {registerReactComponent, useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 import {formatDuration} from 'Util/TimeUtil';
-import useEffectRef from 'Util/useEffectRef';
+import useElementState from 'Util/useElementState';
 
 import {ConversationState} from '../../conversation/ConversationState';
 import {EphemeralTimings} from '../../ephemeral/EphemeralTimings';
@@ -46,7 +46,7 @@ const TimedMessagesPanel: React.FC<TimedMessagesPanelProps> = ({onClose, onGoBac
   const conversationState = container.resolve(ConversationState);
   const [currentMessageTimer, setCurrentMessageTimer] = useState(0);
   const [messageTimes, setMessageTimes] = useState<MessageTime[]>([]);
-  const [scrollbarRef, setScrollbarRef] = useEffectRef<HTMLDivElement>();
+  const [scrollbarRef, setScrollbarRef] = useElementState<HTMLDivElement>();
   useFadingScrollbar(scrollbarRef);
 
   const {activeConversation} = useKoSubscribableChildren(conversationState, ['activeConversation']);

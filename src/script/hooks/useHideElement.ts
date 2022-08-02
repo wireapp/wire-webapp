@@ -19,12 +19,12 @@
 
 import {useEffect} from 'react';
 import {KEY} from 'Util/KeyboardUtil';
-import useEffectRef from 'Util/useEffectRef';
+import useElementState from 'Util/useElementState';
 
 const hideControlsClass = 'hide-controls';
 
 const useHideElement = (timeout: number, skipClass?: string) => {
-  const [ref, setRef] = useEffectRef<HTMLDivElement>();
+  const [ref, setRef] = useElementState<HTMLDivElement>();
 
   useEffect(() => {
     if (!ref) {

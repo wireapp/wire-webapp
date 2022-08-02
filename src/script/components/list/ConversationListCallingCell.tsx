@@ -33,7 +33,7 @@ import Duration from 'Components/calling/Duration';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 import {sortUsersByPriority} from 'Util/StringUtil';
-import useEffectRef from 'Util/useEffectRef';
+import useElementState from 'Util/useElementState';
 
 import type {Call} from '../../calling/Call';
 import type {CallingRepository} from '../../calling/CallingRepository';
@@ -77,7 +77,7 @@ const ConversationListCallingCell: React.FC<CallingCellProps> = ({
   teamState = container.resolve(TeamState),
   callState = container.resolve(CallState),
 }) => {
-  const [scrollbarRef, setScrollbarRef] = useEffectRef<HTMLDivElement>();
+  const [scrollbarRef, setScrollbarRef] = useElementState<HTMLDivElement>();
   useFadingScrollbar(scrollbarRef);
 
   const {reason, state, isCbrEnabled, startedAt, participants, maximizedParticipant, muteState} =

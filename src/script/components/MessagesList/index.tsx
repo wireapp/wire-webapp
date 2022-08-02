@@ -31,7 +31,7 @@ import {registerReactComponent, useKoSubscribableChildren} from 'Util/ComponentU
 import Message from './Message';
 import {Text} from 'src/script/entity/message/Text';
 import {useResizeObserver} from '../../ui/resizeObserver';
-import useEffectRef from 'Util/useEffectRef';
+import useElementState from 'Util/useElementState';
 
 type FocusedElement = {center?: boolean; element: Element};
 interface MessagesListParams {
@@ -111,7 +111,7 @@ const MessagesList: React.FC<MessagesListParams> = ({
     return false;
   };
 
-  const [messagesContainer, setContainer] = useEffectRef<HTMLDivElement | null>(null);
+  const [messagesContainer, setContainer] = useElementState<HTMLDivElement>();
   const scrollHeight = useRef(0);
   const nbMessages = useRef(0);
   const focusedElement = useRef<FocusedElement | null>(null);
@@ -151,9 +151,9 @@ const MessagesList: React.FC<MessagesListParams> = ({
   };
 
   // Listen to resizes of the the container element (if it's resized it means something has changed in the message list)
-  useResizeObserver(messagesContainer, () => updateScroll(messagesContainer));
+  useResizeObserver(messagesContainer, () => updateScroll(messagesContainer ?? null));
   // Also listen to the scrolling container resizes (when the window resizes or the inputBar changes)
-  useResizeObserver(messagesContainer?.parentElement, () => updateScroll(messagesContainer));
+  useResizeObserver(messagesContainer?.parentElement, () => updateScroll(messagesContainer ?? null));
   useLayoutEffect(() => {
     if (messagesContainer) {
       updateScroll(messagesContainer);
@@ -199,7 +199,7 @@ const MessagesList: React.FC<MessagesListParams> = ({
           }
           focusedElement.current = {center, element};
           setTimeout(() => (focusedElement.current = null), 1000);
-          updateScroll(messagesContainer);
+          updateScroll(messagesContainer ?? null);
         }}
         isSelfTemporaryGuest={selfUser.isTemporaryGuest()}
         messageRepository={messageRepository}

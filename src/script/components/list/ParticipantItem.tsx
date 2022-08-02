@@ -36,7 +36,7 @@ import {Participant} from '../../calling/Participant';
 import AvailabilityState from 'Components/AvailabilityState';
 import ParticipantMicOnIcon from 'Components/calling/ParticipantMicOnIcon';
 import Icon from 'Components/Icon';
-import useEffectRef from 'Util/useEffectRef';
+import useElementState from 'Util/useElementState';
 
 export interface ParticipantItemProps<UserType> extends Omit<React.HTMLProps<HTMLDivElement>, 'onClick' | 'onKeyDown'> {
   badge?: boolean;
@@ -83,7 +83,7 @@ const ParticipantItem = <UserType extends User | ServiceEntity>(
     onClick = noop,
     onKeyDown = noop,
   } = props;
-  const [viewportElementRef, setViewportElementRef] = useEffectRef<HTMLDivElement>();
+  const [viewportElementRef, setViewportElementRef] = useElementState<HTMLDivElement>();
   const isInViewport = useViewPortObserver(viewportElementRef);
   const isUser = participant instanceof User && !participant.isService;
   const isService = participant instanceof ServiceEntity || participant.isService;

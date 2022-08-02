@@ -22,7 +22,7 @@ import React, {useEffect, useMemo, useState} from 'react';
 import {registerReactComponent} from 'Util/ComponentUtil';
 import {KEY} from 'Util/KeyboardUtil';
 import {clamp} from 'Util/NumberUtil';
-import useEffectRef from 'Util/useEffectRef';
+import useElementState from 'Util/useElementState';
 
 import {useFadingScrollbar} from '../../../ui/fadingScrollbar';
 import MentionSuggestionsItem from './MentionSuggestionsItem';
@@ -38,10 +38,10 @@ const MentionSuggestionList: React.FunctionComponent<MentionSuggestionListProps>
   onSelectionValidated,
   targetInputSelector,
 }) => {
-  const [scrollbarRef, setScrollbarRef] = useEffectRef<HTMLDivElement>();
+  const [scrollbarRef, setScrollbarRef] = useElementState<HTMLDivElement>();
   useFadingScrollbar(scrollbarRef);
   const [selectedSuggestionIndex, setSelectedSuggestionIndex] = useState(0);
-  const [selectedItem, setSelectedItem] = useEffectRef();
+  const [selectedItem, setSelectedItem] = useElementState();
   useEffect(
     () => selectedItem?.scrollIntoView({behavior: 'auto', block: 'nearest'}),
     [selectedItem, suggestions.length],
