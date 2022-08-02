@@ -71,7 +71,7 @@ const AudioAsset: React.FC<AudioAssetProps> = ({
 
   const onPlayButtonClicked = async () => {
     if (audioSrc) {
-      audioElement.current?.play();
+      audio?.play();
     } else {
       asset.status(AssetTransferState.DOWNLOADING);
       try {
