@@ -625,7 +625,7 @@ export class ConversationRepository {
     conversationEntity.hasAdditionalMessages(hasAdditionalMessages);
     if (!hasAdditionalMessages) {
       const allMessages = conversationEntity.getAllMessages();
-      if (!!allMessages.length) {
+      if (allMessages.length) {
         const firstMessage = allMessages[0];
         if (isMemberMessage(firstMessage)) {
           const checkCreationMessage = firstMessage.isMember() && firstMessage.isCreation();

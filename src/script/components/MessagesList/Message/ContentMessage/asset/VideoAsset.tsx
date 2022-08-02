@@ -79,7 +79,7 @@ const VideoAsset: React.FC<VideoAssetProps> = ({
     if (isFileSharingReceivingEnabled) {
       setDisplaySmall(false);
 
-      if (!!videoSrc.length) {
+      if (videoSrc.length) {
         videoElement.current?.play();
       } else {
         asset.status(AssetTransferState.DOWNLOADING);
@@ -200,7 +200,7 @@ const VideoAsset: React.FC<VideoAssetProps> = ({
                             )}
                           </div>
 
-                          {isVideoLoaded && videoTimeRest && (
+                          {isVideoLoaded && (
                             <div className="video-asset__controls__bottom">
                               <SeekBar
                                 className="video-asset__controls__bottom__seekbar"
@@ -211,7 +211,7 @@ const VideoAsset: React.FC<VideoAssetProps> = ({
                                 className="video-asset__controls__bottom__time label-xs"
                                 data-uie-name="status-video-time"
                               >
-                                {formatSeconds(videoTimeRest)}
+                                {formatSeconds(videoTimeRest ?? 0)}
                               </span>
                             </div>
                           )}

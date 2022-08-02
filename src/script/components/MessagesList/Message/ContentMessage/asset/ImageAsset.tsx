@@ -105,9 +105,9 @@ const ImageAsset: React.FC<ImageAssetProps> = ({asset, message, onClick, teamSta
           aria-label={imageAltText}
           ref={viewportElement}
         >
-          {isUploading && !!uploadProgress && (
+          {isUploading && (
             <div className="asset-loader">
-              <AssetLoader loadProgress={uploadProgress} onCancel={cancelUpload} />
+              <AssetLoader loadProgress={uploadProgress ?? 0} onCancel={cancelUpload} />
             </div>
           )}
 

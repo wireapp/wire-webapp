@@ -733,7 +733,7 @@ exports[`stricter compilation`] = {
       [62, 6, 15, "Type \'Observable<string>\' is not assignable to type \'Observable<string | undefined>\'.", "4105372853"],
       [71, 11, 40, "Object is possibly \'null\'.", "95183934"]
     ],
-    "src/script/components/MessagesList/Message/ContentMessage/asset/VideoAsset.tsx:3122528675": [
+    "src/script/components/MessagesList/Message/ContentMessage/asset/VideoAsset.tsx:78282983": [
       [44, 6, 10, "Type \'({ message, isQuote, teamState, assetRepository, }: VideoAssetProps) => false | Element\' is not assignable to type \'FC<VideoAssetProps>\'.\\n  Type \'false | Element\' is not assignable to type \'ReactElement<any, any> | null\'.\\n    Type \'boolean\' is not assignable to type \'ReactElement<any, any>\'.", "1844198436"],
       [69, 105, 4, "Argument of type \'Blob | undefined\' is not assignable to parameter of type \'Blob | MediaSource\'.", "2087735462"],
       [88, 49, 4, "Argument of type \'Blob | undefined\' is not assignable to parameter of type \'Blob | MediaSource\'.", "2087735462"],
@@ -1297,7 +1297,7 @@ exports[`stricter compilation`] = {
       [1185, 12, 35, "Object is possibly \'undefined\'.", "901544345"],
       [1187, 13, 35, "Object is possibly \'undefined\'.", "901544345"]
     ],
-    "src/script/conversation/ConversationRepository.ts:1300489232": [
+    "src/script/conversation/ConversationRepository.ts:2890439216": [
       [182, 8, 29, "Argument of type \'(User | undefined)[] | undefined\' is not assignable to parameter of type \'User[] | undefined\'.\\n  Type \'(User | undefined)[]\' is not assignable to type \'User[]\'.", "1506995572"],
       [188, 75, 13, "No overload matches this call.\\n  Overload 1 of 4, \'(value: string | number | Date): Date\', gave the following error.\\n    Argument of type \'string | undefined\' is not assignable to parameter of type \'string | number | Date\'.\\n  Overload 2 of 4, \'(value: string | number): Date\', gave the following error.\\n    Argument of type \'string | undefined\' is not assignable to parameter of type \'string | number\'.", "2642562490"],
       [207, 16, 24, "Argument of type \'string | undefined\' is not assignable to parameter of type \'string\'.\\n  Type \'undefined\' is not assignable to type \'string\'.", "2322605270"],
