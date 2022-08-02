@@ -31,6 +31,7 @@ import {registerReactComponent, useKoSubscribableChildren} from 'Util/ComponentU
 import Message from './Message';
 import {Text} from 'src/script/entity/message/Text';
 import {useResizeObserver} from '../../ui/resizeObserver';
+import classNames from 'classnames';
 
 type FocusedElement = {center?: boolean; element: Element};
 interface MessagesListParams {
@@ -233,7 +234,7 @@ const MessagesList: React.FC<MessagesListParams> = ({
   });
 
   return (
-    <div ref={messagesContainerElement} className={`messages ${verticallyCenterMessage() ? 'flex-center' : ''}`}>
+    <div ref={messagesContainerElement} className={classNames('messages', {'flex-center': verticallyCenterMessage()})}>
       {messageViews}
     </div>
   );

@@ -51,7 +51,7 @@ const VideoAsset: React.FC<VideoAssetProps> = ({
   const asset = message.getFirstAsset() as FileAsset;
   const {isObfuscated} = useKoSubscribableChildren(message, ['isObfuscated']);
   const {preview_resource: assetPreviewResource} = useKoSubscribableChildren(asset, ['preview_resource']);
-  const [videoPlaybackError, setVideoPlaybackError] = useState(null);
+  const [videoPlaybackError, setVideoPlaybackError] = useState(false);
   const [videoTimeRest, setVideoTimeRest] = useState<number>();
   const [videoPreview, setVideoPreview] = useState<string>('');
   const [videoSrc, setVideoSrc] = useState<string>('');
@@ -107,6 +107,12 @@ const VideoAsset: React.FC<VideoAssetProps> = ({
     }
   };
 
+  const setRemainingVideoTime = (): void => {
+    if (videoElement.current) {
+      setVideoTimeRest(videoElement.current?.duration - videoElement.current?.currentTime);
+    }
+  };
+
   useEffect(() => {
     if (videoSrc && videoElement.current) {
       const playPromise = videoElement.current.play();
@@ -142,16 +148,8 @@ const VideoAsset: React.FC<VideoAssetProps> = ({
                   console.error('Video cannot be played', event);
                 }}
                 onPlaying={onVideoPlaying}
-                onTimeUpdate={() => {
-                  if (videoElement.current) {
-                    setVideoTimeRest(videoElement.current?.duration - videoElement.current?.currentTime);
-                  }
-                }}
-                onLoadedMetadata={() => {
-                  if (videoElement.current) {
-                    setVideoTimeRest(videoElement.current?.duration - videoElement.current?.currentTime);
-                  }
-                }}
+                onTimeUpdate={setRemainingVideoTime}
+                onLoadedMetadata={setRemainingVideoTime}
                 style={{
                   backgroundColor: videoPreview ? '#000' : '',
                   visibility: transferState === AssetTransferState.UPLOADING ? 'hidden' : undefined,

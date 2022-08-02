@@ -127,7 +127,7 @@ import {extractClientDiff} from './ClientMismatchUtil';
 import {Core} from '../service/CoreSingleton';
 import {ClientState} from '../client/ClientState';
 import {MLSReturnType} from '@wireapp/core/src/main/conversation';
-import {SystemMessage} from '../entity/message/SystemMessage';
+import {isMemberMessage} from '../guards/Message';
 
 type ConversationDBChange = {obj: EventRecord; oldObj: EventRecord};
 type FetchPromise = {rejectFn: (error: ConversationError) => void; resolveFn: (conversation: Conversation) => void};
@@ -616,10 +616,6 @@ export class ConversationRepository {
     conversationEntity: Conversation,
   ): Promise<ContentMessage[]> {
     const hasAdditionalMessages = events.length === Config.getConfig().MESSAGES_FETCH_LIMIT;
-
-    const isMemberMessage = (
-      message: Message | ContentMessage | MemberMessage | SystemMessage,
-    ): message is MemberMessage => message.super_type === SuperType.MEMBER;
 
     const mappedMessageEntities = await this.addEventsToConversation(events, conversationEntity);
     conversationEntity.hasAdditionalMessages(hasAdditionalMessages);
