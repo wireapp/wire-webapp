@@ -67,7 +67,7 @@ const AudioAsset: React.FC<AudioAssetProps> = ({
 
   const onTimeupdate = () => setAudioTime(audio?.currentTime ?? 0);
   const showLoudnessPreview = !!asset.meta?.loudness?.length;
-  const onPauseButtonClicked = () => audioElement.current?.pause();
+  const onPauseButtonClicked = () => audio?.pause();
 
   const onPlayButtonClicked = async () => {
     if (audioSrc) {
@@ -85,14 +85,14 @@ const AudioAsset: React.FC<AudioAssetProps> = ({
   };
 
   useEffect(() => {
-    if (audioSrc && audioElement) {
+    if (audioSrc && audioElement.current) {
       const playPromise = audioElement.current?.play();
 
       playPromise?.catch(error => {
         logger.error('Failed to load audio asset ', error);
       });
     }
-  }, [audioElement, audioSrc]);
+  }, [audioElement.current, audioSrc]);
 
   useEffect(() => {
     return () => {
