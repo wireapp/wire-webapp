@@ -17,7 +17,7 @@
  *
  */
 
-import React from 'react';
+import React, {useRef} from 'react';
 import cx from 'classnames';
 
 import {registerReactComponent, useKoSubscribableChildren} from 'Util/ComponentUtil';
@@ -36,7 +36,6 @@ import {Participant} from '../../calling/Participant';
 import AvailabilityState from 'Components/AvailabilityState';
 import ParticipantMicOnIcon from 'Components/calling/ParticipantMicOnIcon';
 import Icon from 'Components/Icon';
-import useElementState from 'Util/useElementState';
 
 export interface ParticipantItemProps<UserType> extends Omit<React.HTMLProps<HTMLDivElement>, 'onClick' | 'onKeyDown'> {
   badge?: boolean;
@@ -83,8 +82,8 @@ const ParticipantItem = <UserType extends User | ServiceEntity>(
     onClick = noop,
     onKeyDown = noop,
   } = props;
-  const [viewportElementRef, setViewportElementRef] = useElementState<HTMLDivElement>();
-  const isInViewport = useViewPortObserver(viewportElementRef);
+  const viewportElement = useRef<HTMLDivElement>(null);
+  const isInViewport = useViewPortObserver(viewportElement.current);
   const isUser = participant instanceof User && !participant.isService;
   const isService = participant instanceof ServiceEntity || participant.isService;
   const isSelf = !!(participant as User).isMe;
@@ -150,7 +149,7 @@ const ParticipantItem = <UserType extends User | ServiceEntity>(
         className="participant-item"
         data-uie-name={isUser ? 'item-user' : 'item-service'}
         data-uie-value={participantName}
-        ref={setViewportElementRef}
+        ref={viewportElement}
       >
         {isInViewport && (
           <>

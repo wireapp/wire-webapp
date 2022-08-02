@@ -17,10 +17,9 @@
  *
  */
 
-import React from 'react';
+import React, {useRef} from 'react';
 
 import {registerReactComponent} from 'Util/ComponentUtil';
-import useElementState from 'Util/useElementState';
 import UserDevices, {UserDevicesState, useUserDevicesHistory} from 'Components/UserDevices';
 
 import type {User} from '../../entity/User';
@@ -36,8 +35,8 @@ interface ParticipantDevicesPanelProps {
 }
 
 const ParticipantDevicesPanel: React.FC<ParticipantDevicesPanelProps> = ({repositories, onClose, onGoBack, user}) => {
-  const [scrollbarRef, setScrollbarRef] = useElementState<HTMLDivElement>();
-  useFadingScrollbar(scrollbarRef);
+  const scrollbarElement = useRef<HTMLDivElement>(null);
+  useFadingScrollbar(scrollbarElement.current);
   const history = useUserDevicesHistory();
   return (
     <>
@@ -53,7 +52,7 @@ const ParticipantDevicesPanel: React.FC<ParticipantDevicesPanelProps> = ({reposi
         goBackUie="go-back-participant-devices"
       />
 
-      <div className="panel__content" ref={setScrollbarRef}>
+      <div className="panel__content" ref={scrollbarElement}>
         <UserDevices
           clientRepository={repositories.client}
           cryptographyRepository={repositories.cryptography}

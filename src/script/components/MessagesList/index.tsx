@@ -31,7 +31,6 @@ import {registerReactComponent, useKoSubscribableChildren} from 'Util/ComponentU
 import Message from './Message';
 import {Text} from 'src/script/entity/message/Text';
 import {useResizeObserver} from '../../ui/resizeObserver';
-import useElementState from 'Util/useElementState';
 
 type FocusedElement = {center?: boolean; element: Element};
 interface MessagesListParams {
@@ -111,7 +110,7 @@ const MessagesList: React.FC<MessagesListParams> = ({
     return false;
   };
 
-  const [messagesContainer, setContainer] = useElementState<HTMLDivElement>();
+  const messagesContainerElement = useRef<HTMLDivElement>(null);
   const scrollHeight = useRef(0);
   const nbMessages = useRef(0);
   const focusedElement = useRef<FocusedElement | null>(null);
@@ -149,6 +148,8 @@ const MessagesList: React.FC<MessagesListParams> = ({
     scrollHeight.current = scrollingContainer.scrollHeight;
     nbMessages.current = messages.length;
   };
+
+  const messagesContainer = messagesContainerElement.current;
 
   // Listen to resizes of the the container element (if it's resized it means something has changed in the message list)
   useResizeObserver(messagesContainer, () => updateScroll(messagesContainer ?? null));
@@ -232,7 +233,7 @@ const MessagesList: React.FC<MessagesListParams> = ({
   });
 
   return (
-    <div ref={setContainer} className={`messages ${verticallyCenterMessage() ? 'flex-center' : ''}`}>
+    <div ref={messagesContainerElement} className={`messages ${verticallyCenterMessage() ? 'flex-center' : ''}`}>
       {messageViews}
     </div>
   );

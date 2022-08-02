@@ -17,7 +17,7 @@
  *
  */
 
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import cx from 'classnames';
 import {container} from 'tsyringe';
 
@@ -27,7 +27,6 @@ import {AssetRepository} from '../assets/AssetRepository';
 import {useViewPortObserver} from '../ui/viewportObserver';
 import {TeamState} from '../team/TeamState';
 import RestrictedImage from './asset/RestrictedImage';
-import useElementState from 'Util/useElementState';
 
 export interface ImageProps extends React.HTMLProps<HTMLDivElement> {
   aspectRatio?: number;
@@ -48,8 +47,8 @@ const Image: React.FC<ImageProps> = ({
   aspectRatio,
   ...props
 }) => {
-  const [viewportElementRef, setViewportElementRef] = useElementState<HTMLDivElement>();
-  const isInViewport = useViewPortObserver(viewportElementRef);
+  const viewPortElement = useRef<HTMLDivElement>(null);
+  const isInViewport = useViewPortObserver(viewPortElement.current);
 
   const [assetIsLoading, setAssetIsLoading] = useState<boolean>(false);
   const [assetSrc, setAssetSrc] = useState<string>();
@@ -83,7 +82,7 @@ const Image: React.FC<ImageProps> = ({
   return !isFileSharingReceivingEnabled ? (
     <RestrictedImage className={className} showMessage={!isQuote} isSmall={isQuote} />
   ) : (
-    <div ref={setViewportElementRef} className={cx('image-wrapper', className)} {...props}>
+    <div ref={viewPortElement} className={cx('image-wrapper', className)} {...props}>
       {assetSrc ? (
         <img style={style} onClick={onClick} src={assetSrc} role="presentation" alt="" />
       ) : (

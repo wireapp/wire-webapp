@@ -17,8 +17,7 @@
  *
  */
 
-import React from 'react';
-import useElementState from 'Util/useElementState';
+import React, {useRef} from 'react';
 import {useFadingScrollbar} from '../../../../../ui/fadingScrollbar';
 
 interface PreferencesPageProps {
@@ -27,13 +26,13 @@ interface PreferencesPageProps {
 }
 
 const PreferencesPage: React.FC<PreferencesPageProps> = ({title, children}) => {
-  const [scrollbarRef, setScrollbarRef] = useElementState<HTMLDivElement>();
-  useFadingScrollbar(scrollbarRef);
+  const scrollbarElement = useRef<HTMLDivElement>(null);
+  useFadingScrollbar(scrollbarElement.current);
 
   return (
     <div style={{display: 'flex', flexDirection: 'column', height: '100vh'}}>
       <h2 className="preferences-titlebar">{title}</h2>
-      <div className="preferences-content" ref={setScrollbarRef}>
+      <div className="preferences-content" ref={scrollbarElement}>
         {children}
       </div>
     </div>

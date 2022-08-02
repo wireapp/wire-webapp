@@ -17,7 +17,7 @@
  *
  */
 
-import React, {useCallback, useEffect, useState} from 'react';
+import React, {useCallback, useEffect, useRef, useState} from 'react';
 import {container} from 'tsyringe';
 import cx from 'classnames';
 
@@ -31,7 +31,6 @@ import SeekBar from './controls/SeekBar';
 import MediaButton from './controls/MediaButton';
 import {t} from 'Util/LocalizerUtil';
 import {formatSeconds} from 'Util/TimeUtil';
-import useElementState from 'Util/useElementState';
 import {AssetRepository} from '../../../../../assets/AssetRepository';
 import {useTimeout} from '@wireapp/react-ui-kit';
 import RestrictedVideo from 'Components/asset/RestrictedVideo';
@@ -56,7 +55,7 @@ const VideoAsset: React.FC<VideoAssetProps> = ({
   const [videoTimeRest, setVideoTimeRest] = useState<number>();
   const [videoPreview, setVideoPreview] = useState<string>('');
   const [videoSrc, setVideoSrc] = useState<string>('');
-  const [videoElement, setVideoElement] = useElementState<HTMLVideoElement>();
+  const videoElement = useRef<HTMLVideoElement>(null);
   const [isVideoLoaded, setIsVideoLoaded] = useState(false);
   const {isFileSharingReceivingEnabled} = useKoSubscribableChildren(teamState, ['isFileSharingReceivingEnabled']);
   const [displaySmall, setDisplaySmall] = useState(!!isQuote);
@@ -81,7 +80,7 @@ const VideoAsset: React.FC<VideoAssetProps> = ({
       setDisplaySmall(false);
 
       if (!!videoSrc.length) {
-        videoElement?.play();
+        videoElement.current?.play();
       } else {
         asset.status(AssetTransferState.DOWNLOADING);
 
@@ -99,22 +98,24 @@ const VideoAsset: React.FC<VideoAssetProps> = ({
   };
 
   const onPauseButtonClicked = (): void => {
-    videoElement?.pause();
+    videoElement.current?.pause();
   };
 
   const onVideoPlaying = (): void => {
-    videoElement.style.backgroundColor = '#000';
+    if (videoElement.current) {
+      videoElement.current.style.backgroundColor = '#000';
+    }
   };
 
   useEffect(() => {
-    if (videoSrc && videoElement) {
-      const playPromise = videoElement.play();
+    if (videoSrc && videoElement.current) {
+      const playPromise = videoElement.current.play();
 
       playPromise?.catch(error => {
         console.error('Failed to load video asset ', error);
       });
     }
-  }, [videoElement, videoSrc]);
+  }, [videoElement.current, videoSrc]);
 
   return (
     !isObfuscated && (
@@ -132,7 +133,7 @@ const VideoAsset: React.FC<VideoAssetProps> = ({
               }}
             >
               <video
-                ref={setVideoElement}
+                ref={videoElement}
                 playsInline
                 src={videoSrc}
                 poster={videoPreview}
@@ -141,13 +142,23 @@ const VideoAsset: React.FC<VideoAssetProps> = ({
                   console.error('Video cannot be played', event);
                 }}
                 onPlaying={onVideoPlaying}
-                onTimeUpdate={() => setVideoTimeRest(videoElement.duration - videoElement.currentTime)}
-                onLoadedMetadata={() => setVideoTimeRest(videoElement.duration - videoElement.currentTime)}
+                onTimeUpdate={() => {
+                  if (videoElement.current) {
+                    setVideoTimeRest(videoElement.current?.duration - videoElement.current?.currentTime);
+                  }
+                }}
+                onLoadedMetadata={() => {
+                  if (videoElement.current) {
+                    setVideoTimeRest(videoElement.current?.duration - videoElement.current?.currentTime);
+                  }
+                }}
                 style={{
                   backgroundColor: videoPreview ? '#000' : '',
                   visibility: transferState === AssetTransferState.UPLOADING ? 'hidden' : undefined,
                 }}
-              />
+              >
+                <track kind="captions"></track>
+              </video>
               {videoPlaybackError ? (
                 <div className="video-asset__playback-error label-xs">{t('conversationPlaybackError')}</div>
               ) : (
@@ -155,52 +166,58 @@ const VideoAsset: React.FC<VideoAssetProps> = ({
                   {transferState === AssetTransferState.UPLOAD_PENDING ? (
                     <div className="asset-placeholder loading-dots" />
                   ) : (
-                    <div
-                      className={cx('video-asset__controls', {
-                        'video-asset__controls--hidden': isVideoLoaded && hideControls,
-                      })}
-                    >
-                      <div className="video-asset__controls-center">
-                        {displaySmall ? (
-                          <MediaButton
-                            mediaElement={videoElement}
-                            asset={asset}
-                            play={onPlayButtonClicked}
-                            transferState={transferState}
-                            uploadProgress={uploadProgress}
-                          />
-                        ) : (
-                          <MediaButton
-                            mediaElement={videoElement}
-                            large
-                            asset={asset}
-                            play={onPlayButtonClicked}
-                            pause={onPauseButtonClicked}
-                            cancel={() =>
-                              transferState === AssetTransferState.UPLOADING ? cancelUpload() : asset.cancelDownload()
-                            }
-                            transferState={transferState}
-                            uploadProgress={uploadProgress}
-                          />
-                        )}
-                      </div>
+                    <>
+                      {videoElement.current && (
+                        <div
+                          className={cx('video-asset__controls', {
+                            'video-asset__controls--hidden': isVideoLoaded && hideControls,
+                          })}
+                        >
+                          <div className="video-asset__controls-center">
+                            {displaySmall ? (
+                              <MediaButton
+                                mediaElement={videoElement.current}
+                                asset={asset}
+                                play={onPlayButtonClicked}
+                                transferState={transferState}
+                                uploadProgress={uploadProgress}
+                              />
+                            ) : (
+                              <MediaButton
+                                mediaElement={videoElement.current}
+                                large
+                                asset={asset}
+                                play={onPlayButtonClicked}
+                                pause={onPauseButtonClicked}
+                                cancel={() =>
+                                  transferState === AssetTransferState.UPLOADING
+                                    ? cancelUpload()
+                                    : asset.cancelDownload()
+                                }
+                                transferState={transferState}
+                                uploadProgress={uploadProgress}
+                              />
+                            )}
+                          </div>
 
-                      {isVideoLoaded && (
-                        <div className="video-asset__controls__bottom">
-                          <SeekBar
-                            className="video-asset__controls__bottom__seekbar"
-                            data-uie-name="status-video-seekbar"
-                            mediaElement={videoElement}
-                          />
-                          <span
-                            className="video-asset__controls__bottom__time label-xs"
-                            data-uie-name="status-video-time"
-                          >
-                            {formatSeconds(videoTimeRest)}
-                          </span>
+                          {isVideoLoaded && videoTimeRest && (
+                            <div className="video-asset__controls__bottom">
+                              <SeekBar
+                                className="video-asset__controls__bottom__seekbar"
+                                data-uie-name="status-video-seekbar"
+                                mediaElement={videoElement.current}
+                              />
+                              <span
+                                className="video-asset__controls__bottom__time label-xs"
+                                data-uie-name="status-video-time"
+                              >
+                                {formatSeconds(videoTimeRest)}
+                              </span>
+                            </div>
+                          )}
                         </div>
                       )}
-                    </div>
+                    </>
                   )}
                 </>
               )}

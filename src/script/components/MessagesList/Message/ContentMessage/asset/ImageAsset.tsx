@@ -18,14 +18,13 @@
  */
 
 import Icon from 'Components/Icon';
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import {container} from 'tsyringe';
 import cx from 'classnames';
 import {handleKeyDown} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
 
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
-import useElementState from 'Util/useElementState';
 
 import {Config} from '../../../../../Config';
 import {ContentMessage} from '../../../../../entity/message/ContentMessage';
@@ -48,8 +47,8 @@ const ImageAsset: React.FC<ImageAssetProps> = ({asset, message, onClick, teamSta
   const {resource} = useKoSubscribableChildren(asset, ['resource']);
   const {isObfuscated, visible} = useKoSubscribableChildren(message, ['isObfuscated', 'visible']);
   const {isFileSharingReceivingEnabled} = useKoSubscribableChildren(teamState, ['isFileSharingReceivingEnabled']);
-  const [viewportElementRef, setViewportElementRef] = useElementState<HTMLDivElement>();
-  const isInViewport = useViewPortObserver(viewportElementRef);
+  const viewportElement = useRef<HTMLDivElement>(null);
+  const isInViewport = useViewPortObserver(viewportElement.current);
   const {isUploading, uploadProgress, cancelUpload, loadAsset} = useAssetTransfer(message);
 
   useEffect(() => {
@@ -104,9 +103,9 @@ const ImageAsset: React.FC<ImageAssetProps> = ({asset, message, onClick, teamSta
           role="button"
           data-uie-name="go-image-detail"
           aria-label={imageAltText}
-          ref={setViewportElementRef}
+          ref={viewportElement}
         >
-          {isUploading && (
+          {isUploading && !!uploadProgress && (
             <div className="asset-loader">
               <AssetLoader loadProgress={uploadProgress} onCancel={cancelUpload} />
             </div>
