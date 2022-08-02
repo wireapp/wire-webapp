@@ -172,6 +172,7 @@ export class ContentViewModel {
       repositories.serverTime,
       repositories.user,
       repositories.message,
+      repositories.asset,
     );
 
     this.historyExport = new HistoryExportViewModel(repositories.backup);
