@@ -102,7 +102,9 @@ const AudioAsset: React.FC<AudioAssetProps> = ({
 
   return (
     <div className={cx('audio-asset', className)} data-uie-name="audio-asset" data-uie-value={asset.file_name}>
-      <audio ref={audioElement} src={audioSrc} onTimeUpdate={onTimeupdate} />
+      <audio ref={audioElement} src={audioSrc} onTimeUpdate={onTimeupdate}>
+        <track kind="captions"></track>
+      </audio>
 
       {!isObfuscated ? (
         <>
