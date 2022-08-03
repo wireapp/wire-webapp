@@ -32,6 +32,7 @@ import Message from './Message';
 import {Text} from 'src/script/entity/message/Text';
 import {useResizeObserver} from '../../ui/resizeObserver';
 import useEffectRef from 'Util/useEffectRef';
+import {isMemberMessage} from 'src/script/guards/Message';
 
 type FocusedElement = {center?: boolean; element: Element};
 interface MessagesListParams {
@@ -62,15 +63,14 @@ interface MessagesListParams {
 const filterSpecificDuplicatedMemberMessages = (messages: MessageEntity[]) => {
   const typesToFilter = ['conversation.member-join', 'conversation.group-creation'];
   return messages.reduce<MessageEntity[]>((acc, message) => {
-    // ToDo: Replace with isMemberMessage typeguard
-    if (message.super_type === 'member') {
-      const existingMemberMessages = acc.filter(m => m.super_type === 'member') as MemberMessage[];
+    if (isMemberMessage(message)) {
+      const existingMemberMessages = acc.filter(isMemberMessage);
       if (typesToFilter.includes(message.type) && existingMemberMessages.length) {
         switch (message.type) {
           case 'conversation.group-creation':
             return acc;
           case 'conversation.member-join':
-            return existingMemberMessages.some(m => m.htmlCaption() === (message as MemberMessage).htmlCaption())
+            return existingMemberMessages.some(m => m.htmlCaption() === message.htmlCaption())
               ? acc
               : [...acc, message];
           default:

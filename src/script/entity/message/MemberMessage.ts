@@ -31,12 +31,6 @@ import {SystemMessage} from './SystemMessage';
 import {Config} from '../../Config';
 import type {QualifiedId} from '@wireapp/api-client/src/user/';
 import {matchQualifiedIds} from 'Util/QualifiedId';
-import {Message} from './Message';
-import {ContentMessage} from './ContentMessage';
-
-type IsMemberMessageParam = Message | ContentMessage | MemberMessage | SystemMessage;
-export const isMemberMessage = (message: IsMemberMessageParam): message is MemberMessage =>
-  message instanceof MemberMessage;
 
 export class MemberMessage extends SystemMessage {
   public allTeamMembers: User[];

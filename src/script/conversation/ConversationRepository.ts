@@ -109,7 +109,7 @@ import {User} from '../entity/User';
 import {EventService} from '../event/EventService';
 import {ConnectionEntity} from '../connection/ConnectionEntity';
 import {EventSource} from '../event/EventSource';
-import {isMemberMessage, MemberMessage} from '../entity/message/MemberMessage';
+import {MemberMessage} from '../entity/message/MemberMessage';
 import {FileAsset} from '../entity/message/FileAsset';
 import type {EventRecord} from '../storage';
 import {MessageRepository} from './MessageRepository';
@@ -127,6 +127,7 @@ import {extractClientDiff} from './ClientMismatchUtil';
 import {Core} from '../service/CoreSingleton';
 import {ClientState} from '../client/ClientState';
 import {MLSReturnType} from '@wireapp/core/src/main/conversation';
+import {isMemberMessage} from '../guards/Message';
 
 type ConversationDBChange = {obj: EventRecord; oldObj: EventRecord};
 type FetchPromise = {rejectFn: (error: ConversationError) => void; resolveFn: (conversation: Conversation) => void};
@@ -2901,8 +2902,7 @@ export class ConversationRepository {
       id: messageEntity.from,
     });
     messageEntity.user(userEntity);
-    const isMemberMessage = messageEntity.isMember();
-    if (isMemberMessage || messageEntity.hasOwnProperty('userEntities')) {
+    if (isMemberMessage(messageEntity) || messageEntity.hasOwnProperty('userEntities')) {
       return this.userRepository.getUsersById((messageEntity as MemberMessage).userIds()).then(userEntities => {
         userEntities.sort(sortUsersByPriority);
         (messageEntity as MemberMessage).userEntities(userEntities);
