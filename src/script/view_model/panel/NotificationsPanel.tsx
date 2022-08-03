@@ -17,7 +17,7 @@
  *
  */
 
-import React, {useState} from 'react';
+import React, {useState, useRef, useEffect} from 'react';
 import {container} from 'tsyringe';
 
 import {t} from 'Util/LocalizerUtil';
@@ -29,6 +29,8 @@ import {NOTIFICATION_STATE, getNotificationText} from '../../conversation/Notifi
 import {ViewModelRepositories} from '../MainViewModel';
 import PanelHeader from './PanelHeader';
 import {ConversationState} from '../../conversation/ConversationState';
+import PreferencesRadio from '../../page/MainContent/panels/preferences/components/PreferencesRadio';
+import {KEY} from 'Util/KeyboardUtil';
 
 export interface NotificationsPanelProps {
   conversationState?: ConversationState;
@@ -44,17 +46,39 @@ const NotificationsPanel: React.FC<NotificationsPanelProps> = ({
   conversationState = container.resolve(ConversationState),
 }) => {
   const {activeConversation} = useKoSubscribableChildren(conversationState, ['activeConversation']);
-  const {notificationState} = useKoSubscribableChildren(activeConversation, ['notificationState']);
-
+  const {notificationState} = useKoSubscribableChildren(activeConversation!, ['notificationState']);
+  const saveOptionNotificationPreference = (value: number) => {
+    repositories.conversation.setNotificationState(activeConversation!, value);
+  };
   const [scrollbarRef, setScrollbarRef] = useEffectRef<HTMLDivElement>();
   useFadingScrollbar(scrollbarRef);
 
   const [settings] = useState(
-    Object.values(NOTIFICATION_STATE).map(status => ({
-      text: getNotificationText(status),
-      value: status,
-    })),
+    Object.values(NOTIFICATION_STATE).map(status => {
+      return {
+        label: getNotificationText(status),
+        value: status,
+      };
+    }),
   );
+
+  const [tabIndex, setTabIndex] = useState(-1);
+  const [btnFocus, setBtnFocus] = useState(false);
+  const btnRef = useRef<HTMLButtonElement>(null);
+
+  useEffect(() => {
+    if (btnFocus) {
+      btnRef.current?.focus();
+    }
+  }, [btnFocus]);
+
+  const handleKeyDown = (event: React.KeyboardEvent) => {
+    if (event.key === KEY.TAB && !event.shiftKey && !event.altKey) {
+      event.preventDefault();
+      setTabIndex(2);
+      setBtnFocus(true);
+    }
+  };
 
   return (
     <>
@@ -63,25 +87,28 @@ const NotificationsPanel: React.FC<NotificationsPanelProps> = ({
         onClose={onClose}
         goBackUie="go-back-notification-options"
         title={t('notificationSettingsTitle')}
+        tabIndex={tabIndex}
+        ref={btnRef}
+        handleBlur={() => setBtnFocus(false)}
       />
       <div className="panel__content" ref={setScrollbarRef}>
-        {settings.map(({text, value}) => (
-          <label
-            key={value}
-            className="panel__action-item panel__action-item__option"
-            data-uie-name="item-notification-option"
-          >
-            <input
-              type="radio"
-              name="notification-settings"
-              value={value}
-              checked={notificationState === value}
-              onChange={() => repositories.conversation.setNotificationState(activeConversation, value)}
-            />
-            <span>{text}</span>
-          </label>
-        ))}
-        <div className="panel__info-text notification-settings__disclaimer">{t('notificationSettingsDisclaimer')}</div>
+        <fieldset className="notification-section">
+          <PreferencesRadio
+            name="preferences-options-notifications"
+            selectedValue={notificationState}
+            onChange={saveOptionNotificationPreference}
+            options={settings}
+          />
+        </fieldset>
+        {/* eslint-disable-next-line jsx-a11y/no-static-element-interactions*/}
+        <div
+          className="panel__info-text notification-settings__disclaimer"
+          // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex
+          tabIndex={0}
+          onKeyDown={handleKeyDown}
+        >
+          {t('notificationSettingsDisclaimer')}
+        </div>
       </div>
     </>
   );

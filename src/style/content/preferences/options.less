@@ -52,6 +52,12 @@
     }
   }
 
+  input[type='radio']:focus-visible + label {
+    border-radius: 4px;
+    outline: 1px solid var(--accent-color);
+    outline-offset: 0.4rem;
+  }
+
   label::before,
   label::after {
     box-sizing: border-box;
