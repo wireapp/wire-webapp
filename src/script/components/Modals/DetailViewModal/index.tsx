@@ -109,6 +109,11 @@ const DetailViewModal: FC<DetailViewModalProps> = ({
 
   const iterateImage = (reverse = false) => {
     const currentIndex = items.findIndex(item => item.id === currentMessageEntityId.current);
+
+    if (currentIndex === -1) {
+      return;
+    }
+
     const lastIndex = items.length - 1;
     let nextIndex = currentIndex;
 
