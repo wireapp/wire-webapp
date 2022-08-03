@@ -864,7 +864,7 @@ exports[`stricter compilation`] = {
       [45, 6, 6, "Type \'null\' is not assignable to type \'QualifiedId\'.", "1765117785"],
       [49, 11, 29, "Object is possibly \'null\'.", "3523845355"]
     ],
-    "src/script/components/Modals/UserModal/UserModal.tsx:2112661617": [
+    "src/script/components/Modals/UserModal/UserModal.tsx:1339029028": [
       [72, 57, 4, "Argument of type \'User | null\' is not assignable to parameter of type \'Partial<Record<\\"isBlockedLegalHold\\", Subscribable<any>>>\'.\\n  Type \'null\' is not assignable to type \'Partial<Record<\\"isBlockedLegalHold\\", Subscribable<any>>>\'.", "2087973204"]
     ],
     "src/script/components/SearchInput.test.tsx:3374298949": [
@@ -2046,7 +2046,7 @@ exports[`stricter compilation`] = {
     "src/script/page/LeftSidebar/panels/StartUI/components/GroupList.test.tsx:87150494": [
       [34, 63, 38, "Argument of type \'Element | null\' is not assignable to parameter of type \'Element\'.\\n  Type \'null\' is not assignable to type \'Element\'.", "495210063"]
     ],
-    "src/script/page/MainContent/MainContent.tsx:1144210882": [
+    "src/script/page/MainContent/MainContent.tsx:1885346683": [
       [109, 28, 12, "Type \'Conversation | null\' is not assignable to type \'Conversation\'.\\n  Type \'null\' is not assignable to type \'Conversation\'.", "1670678216"]
     ],
     "src/script/page/MainContent/panels/Collection/Collection.test.tsx:1028939995": [
@@ -2065,9 +2065,9 @@ exports[`stricter compilation`] = {
       [31, 13, 16, "Object is possibly \'undefined\'.", "3400861264"],
       [34, 8, 16, "Object is possibly \'undefined\'.", "3400861264"]
     ],
-    "src/script/page/MainContent/panels/preferences/AccountPreferences.tsx:2831120992": [
-      [92, 79, 34, "Argument of type \'boolean | undefined\' is not assignable to parameter of type \'boolean\'.", "212151669"],
-      [120, 6, 9, "Argument of type \'undefined\' is not assignable to parameter of type \'string\'.", "2620553983"]
+    "src/script/page/MainContent/panels/preferences/AccountPreferences.tsx:2099369935": [
+      [95, 79, 34, "Argument of type \'boolean | undefined\' is not assignable to parameter of type \'boolean\'.", "212151669"],
+      [124, 6, 9, "Argument of type \'undefined\' is not assignable to parameter of type \'string\'.", "2620553983"]
     ],
     "src/script/page/MainContent/panels/preferences/accountPreferences/AccountInput.tsx:3399271415": [
       [182, 10, 4, "Type \'string | undefined\' is not assignable to type \'string\'.\\n  Type \'undefined\' is not assignable to type \'string\'.", "2087876002"],
@@ -2385,9 +2385,6 @@ exports[`stricter compilation`] = {
       [165, 6, 10, "Object is possibly \'undefined\'.", "393830728"],
       [166, 51, 4, "Argument of type \'string | null\' is not assignable to parameter of type \'string\'.\\n  Type \'null\' is not assignable to type \'string\'.", "2087822780"],
       [204, 71, 22, "Argument of type \'Token[] | null\' is not assignable to parameter of type \'Token[]\'.\\n  Type \'null\' is not assignable to type \'Token[]\'.", "525880250"]
-    ],
-    "src/script/util/renderModal.ts:1796177515": [
-      [29, 4, 14, "Type \'undefined\' is not assignable to type \'HTMLDivElement\'.", "4001065193"]
     ],
     "src/script/util/test/TestPage.tsx:1772987669": [
       [28, 4, 10, "Type \'T | undefined\' is not assignable to type \'T\'.\\n  \'T\' could be instantiated with an arbitrary type which could be unrelated to \'T | undefined\'.", "4016349795"],

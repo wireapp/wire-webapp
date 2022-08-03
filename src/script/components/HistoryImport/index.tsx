@@ -24,7 +24,6 @@ import {FC, useEffect, useState} from 'react';
 import Icon from 'Components/Icon';
 import LoadingBar from 'Components/LoadingBar';
 
-import {registerReactComponent} from 'Util/ComponentUtil';
 import {getLogger} from 'Util/Logger';
 import {t} from 'Util/LocalizerUtil';
 import {formatDuration} from 'Util/TimeUtil';
@@ -36,6 +35,7 @@ import {BackupRepository} from '../../backup/BackupRepository';
 import {CancelError, DifferentAccountError, ImportError, IncompatibleBackupError} from '../../backup/Error';
 import {MotionDuration} from '../../motion/MotionDuration';
 import {ContentViewModel} from '../../view_model/ContentViewModel';
+import renderElement from 'Util/renderElement';
 
 export enum HistoryImportState {
   DONE = 'HistoryImportState.STATE.DONE',
@@ -45,9 +45,11 @@ export enum HistoryImportState {
 
 interface HistoryImportProps {
   readonly backupRepository: BackupRepository;
+  file: File;
+  onClose?: () => void;
 }
 
-const HistoryImport: FC<HistoryImportProps> = ({backupRepository}) => {
+const HistoryImport: FC<HistoryImportProps> = ({backupRepository, file, onClose}) => {
   const logger = getLogger('HistoryImportViewModel');
 
   const [historyImportState, setHistoryImportState] = useState(HistoryImportState.PREPARING);
@@ -77,7 +79,10 @@ const HistoryImport: FC<HistoryImportProps> = ({backupRepository}) => {
   const loadingMessage = historyImportMessages?.[historyImportState] || '';
 
   const onCancel = () => backupRepository.cancelAction();
-  const dismissImport = () => amplify.publish(WebAppEvents.CONTENT.SWITCH, ContentViewModel.STATE.PREFERENCES_ACCOUNT);
+  const dismissImport = () => {
+    onClose?.();
+    amplify.publish(WebAppEvents.CONTENT.SWITCH, ContentViewModel.STATE.PREFERENCES_ACCOUNT);
+  };
 
   const onInit = (numberOfRecords: number) => {
     setHistoryImportState(HistoryImportState.IMPORTING);
@@ -148,59 +153,62 @@ const HistoryImport: FC<HistoryImportProps> = ({backupRepository}) => {
   };
 
   useEffect(() => {
-    amplify.subscribe(WebAppEvents.BACKUP.IMPORT.START, importHistory);
+    importHistory(file);
   }, []);
 
   return (
-    <div id="history-import">
-      {isPreparing && <LoadingBar progress={loadingProgress} message={loadingMessage} />}
+    <>
+      <h1 className="visually-hidden">{t('accessibility.headings.historyImport')}</h1>
 
-      {isImporting && (
-        <>
-          {/*// @ts-ignore Merge this stuff after finish history export */}
-          <LoadingBar progress={loadingProgress} message={loadingMessage} className="with-cancel" />
+      <div id="history-import">
+        {isPreparing && <LoadingBar progress={loadingProgress} message={loadingMessage} />}
 
-          <button
-            type="button"
-            className="cancel-button accent-text"
-            onClick={onCancel}
-            data-uie-name="do-cancel-history-import"
-          >
-            {t('backupCancel')}
-          </button>
-        </>
-      )}
+        {isImporting && (
+          <>
+            <LoadingBar progress={loadingProgress} message={loadingMessage} className="with-cancel" />
 
-      {isDone && (
-        <div className="history-message">
-          <Icon.Check />
-          <h2 className="history-message__headline" data-uie-name="status-history-import-success">
-            {t('backupImportSuccessHeadline')}
-          </h2>
-        </div>
-      )}
-
-      {hasError && (
-        <div className="history-message">
-          <h2 className="history-message__headline" data-uie-name="status-history-import-error-headline">
-            {errorHeadline}
-          </h2>
-
-          <p className="history-message__info" data-uie-name="status-history-import-error-info">
-            {errorSecondary}
-          </p>
-
-          <div className="history-message__buttons">
-            <button className="button" onClick={dismissImport} data-uie-name="do-dismiss-history-import-error">
+            <button
+              type="button"
+              className="cancel-button accent-text"
+              onClick={onCancel}
+              data-uie-name="do-cancel-history-import"
+            >
               {t('backupCancel')}
             </button>
+          </>
+        )}
+
+        {isDone && (
+          <div className="history-message">
+            <Icon.Check />
+            <h2 className="history-message__headline" data-uie-name="status-history-import-success">
+              {t('backupImportSuccessHeadline')}
+            </h2>
           </div>
-        </div>
-      )}
-    </div>
+        )}
+
+        {hasError && (
+          <div className="history-message">
+            <h2 className="history-message__headline" data-uie-name="status-history-import-error-headline">
+              {errorHeadline}
+            </h2>
+
+            <p className="history-message__info" data-uie-name="status-history-import-error-info">
+              {errorSecondary}
+            </p>
+
+            <div className="history-message__buttons">
+              <button className="button" onClick={dismissImport} data-uie-name="do-dismiss-history-import-error">
+                {t('backupCancel')}
+              </button>
+            </div>
+          </div>
+        )}
+      </div>
+    </>
   );
 };
 
 export default HistoryImport;
 
-registerReactComponent('history-import', HistoryImport);
+export const importHistoryFile = renderElement<HistoryImportProps>(HistoryImport, 'center-column', {height: '100%'});

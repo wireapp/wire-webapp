@@ -25,11 +25,7 @@
           <h1 class="visually-hidden" data-bind="text: t('accessibility.headings.historyExport')"></h1>
           #include('content/history-export.htm')
         <!-- /ko -->
-        <!-- ko if: state() === State.HISTORY_IMPORT -->
-          <h1 class="visually-hidden" data-bind="text: t('accessibility.headings.historyImport')"></h1>
 
-          <history-import params="backupRepository: $root.repositories.backup"></history-import>
-        <!-- /ko -->
         <group-creation-modal params="
           conversationRepository: $root.repositories.conversation,
           searchRepository: $root.repositories.search,
