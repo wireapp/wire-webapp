@@ -624,7 +624,6 @@ export class ConversationRepository {
       if (!!allMessages.length) {
         const firstMessage = allMessages[0];
         if (isMemberMessage(firstMessage)) {
-          console.info('adrian', conversationEntity, firstMessage, allMessages);
           const checkCreationMessage = firstMessage.isMember() && firstMessage.isCreation();
           if (checkCreationMessage) {
             const groupCreationMessageIn1to1 = conversationEntity.is1to1() && firstMessage.isGroupCreation();
@@ -641,13 +640,12 @@ export class ConversationRepository {
           }
 
           if (!conversationEntity.hasCreationMessage) {
-            console.info('adrian', 'add message', conversationEntity.hasCreationMessage);
             this.addCreationMessage(conversationEntity, this.userState.self().isTemporaryGuest());
           }
         }
       }
     }
-    console.info('adrian', mappedMessageEntities);
+
     return mappedMessageEntities;
   }
 
