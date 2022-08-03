@@ -94,8 +94,8 @@ const EntropyCanvas = (props: CanvasProps) => {
     startInterval();
     const boundingRect = event.currentTarget?.getBoundingClientRect();
     const drawPoint: EntropyFrame = {
-      x: event.pageX - boundingRect.x,
-      y: event.pageY - boundingRect.y,
+      x: event.clientX - boundingRect.x,
+      y: event.clientY - boundingRect.y,
     };
     entropy.addFrame({
       t: Date.now(),
