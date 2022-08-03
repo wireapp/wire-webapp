@@ -32,7 +32,7 @@ import Message from './Message';
 import {Text} from 'src/script/entity/message/Text';
 import {useResizeObserver} from '../../ui/resizeObserver';
 import useEffectRef from 'Util/useEffectRef';
-import {isMemberMessage} from 'src/script/guards/Message';
+import {isMemberMessage} from '../../guards/Message';
 
 type FocusedElement = {center?: boolean; element: Element};
 interface MessagesListParams {

@@ -23,6 +23,7 @@ import {MemberMessage} from '../entity/message/MemberMessage';
 import {SystemMessage} from '../entity/message/SystemMessage';
 import {SuperType} from '../message/SuperType';
 
-export const isMemberMessage = (
-  message: Message | ContentMessage | MemberMessage | SystemMessage,
-): message is MemberMessage => message.super_type === SuperType.MEMBER;
+const isMemberMessage = (message: Message | ContentMessage | MemberMessage | SystemMessage): message is MemberMessage =>
+  message.super_type === SuperType.MEMBER;
+
+export {isMemberMessage};

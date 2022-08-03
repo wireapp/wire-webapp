@@ -852,7 +852,7 @@ exports[`stricter compilation`] = {
       [41, 4, 14, "Type \'undefined\' is not assignable to type \'Message\'.", "1306210352"],
       [47, 4, 17, "Type \'undefined\' is not assignable to type \'MessageRepository\'.", "1843982700"]
     ],
-    "src/script/components/MessagesList/index.tsx:798106000": [
+    "src/script/components/MessagesList/index.tsx:651131421": [
       [143, 57, 21, "Type \'HTMLDivElement | null\' does not satisfy the constraint \'Element\'.\\n  Type \'null\' is not assignable to type \'Element\'.", "723935770"],
       [183, 20, 17, "Argument of type \'HTMLDivElement | null | undefined\' is not assignable to parameter of type \'Element | undefined\'.\\n  Type \'null\' is not assignable to type \'Element | undefined\'.", "3615360346"],
       [183, 58, 17, "Argument of type \'HTMLDivElement | null | undefined\' is not assignable to parameter of type \'Element | null\'.\\n  Type \'undefined\' is not assignable to type \'Element | null\'.", "3615360346"],
