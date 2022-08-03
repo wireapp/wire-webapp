@@ -84,25 +84,24 @@ const videoControlActiveStyles = css`
 `;
 
 const videoControlInActiveStyles = css`
-  background-color: var(--group-video-bg);
-  border: 1px solid var(--gray-40);
+  background-color: var(--inactive-call-button-bg);
+  border: 1px solid var(--inactive-call-button-border);
   svg > path,
   svg > g > path {
     fill: var(--main-color);
   }
   &:hover {
-    background-color: var(--icon-button-primary-hover-bg);
-  }
-  body.theme-dark & {
-    border: none;
+    background-color: var(--inactive-call-button-hover-bg);
+    border: 1px solid var(--inactive-call-button-hover-border);
   }
 `;
 
 const videoControlDisabledStyles = css`
-  ${videoControlActiveStyles};
   cursor: default;
+  background-color: var(--disabled-call-button-bg);
+  border: 1px solid var(--disabled-call-button-border);
   svg {
-    opacity: 0.4;
+    fill: var(--disabled-call-button-svg);
   }
 `;
 

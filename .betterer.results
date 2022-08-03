@@ -941,8 +941,8 @@ exports[`stricter compilation`] = {
       [176, 10, 20, "Type \'undefined\' is not assignable to type \'Participant\'.", "942864568"],
       [179, 10, 9, "Type \'undefined\' is not assignable to type \'MuteState\'.", "3616862203"]
     ],
-    "src/script/components/calling/FullscreenVideoCall.tsx:4019592296": [
-      [442, 50, 4, "Argument of type \'null\' is not assignable to parameter of type \'Participant\'.", "2087897566"]
+    "src/script/components/calling/FullscreenVideoCall.tsx:3629092896": [
+      [441, 50, 4, "Argument of type \'null\' is not assignable to parameter of type \'Participant\'.", "2087897566"]
     ],
     "src/script/components/calling/GroupVideoGrid.test.ts:1931211751": [
       [35, 55, 22, "Object is possibly \'null\'.", "1458310722"],
@@ -1348,6 +1348,7 @@ exports[`stricter compilation`] = {
       [226, 10, 12, "Object is possibly \'undefined\'.", "1670678216"],
       [321, 6, 18, "Argument of type \'Conversation | undefined\' is not assignable to parameter of type \'Conversation\'.\\n  Type \'undefined\' is not assignable to type \'Conversation\'.", "1508601427"],
       [335, 43, 15, "Argument of type \'string | undefined\' is not assignable to parameter of type \'string\'.\\n  Type \'undefined\' is not assignable to type \'string\'.", "1177570679"],
+      [451, 61, 18, "Property \'createConversation\' does not exist on type \'ConversationService\'. Did you mean \'clearConversation\'?", "2745192300"],
       [468, 8, 5, "Argument of type \'unknown\' is not assignable to parameter of type \'BackendClientError\'.", "165548477"],
       [508, 10, 13, "Object is of type \'unknown\'.", "2758364324"],
       [514, 8, 13, "Argument of type \'unknown\' is not assignable to parameter of type \'Error | undefined\'.", "2758364324"],
@@ -1363,6 +1364,7 @@ exports[`stricter compilation`] = {
       [1122, 22, 5, "Object is of type \'unknown\'.", "165548477"],
       [1148, 14, 5, "Object is of type \'unknown\'.", "165548477"],
       [1227, 4, 88, "Type \'Promise<Conversation | undefined>[]\' is not assignable to type \'Promise<Conversation>[]\'.\\n  Type \'Promise<Conversation | undefined>\' is not assignable to type \'Promise<Conversation>\'.\\n    Type \'Conversation | undefined\' is not assignable to type \'Conversation\'.\\n      Type \'undefined\' is not assignable to type \'Conversation\'.", "909551372"],
+      [1356, 61, 8, "Property \'addUsers\' does not exist on type \'ConversationService\'.", "2498058406"],
       [1624, 101, 5, "Object is of type \'unknown\'.", "165548477"],
       [1723, 44, 9, "Argument of type \'number | undefined\' is not assignable to parameter of type \'number\'.\\n  Type \'undefined\' is not assignable to type \'number\'.", "2548743275"],
       [1822, 18, 12, "Object is possibly \'undefined\'.", "1670678216"],
