@@ -32,6 +32,7 @@ import Message from './Message';
 import {Text} from 'src/script/entity/message/Text';
 import {useResizeObserver} from '../../ui/resizeObserver';
 import useEffectRef from 'Util/useEffectRef';
+import {isMemberMessage} from 'src/script/guards/Message';
 
 type FocusedElement = {center?: boolean; element: Element};
 interface MessagesListParams {
@@ -58,6 +59,29 @@ interface MessagesListParams {
   showParticipants: (users: User[]) => void;
   showUserDetails: (user: User) => void;
 }
+
+const filterSpecificDuplicatedMemberMessages = (messages: MessageEntity[]) => {
+  const typesToFilter = ['conversation.member-join', 'conversation.group-creation'];
+  return messages.reduce<MessageEntity[]>((acc, message) => {
+    if (isMemberMessage(message)) {
+      const existingMemberMessages = acc.filter(isMemberMessage);
+      if (typesToFilter.includes(message.type) && existingMemberMessages.length) {
+        switch (message.type) {
+          case 'conversation.group-creation':
+            return acc;
+          case 'conversation.member-join':
+            return existingMemberMessages.some(m => m.htmlCaption() === message.htmlCaption())
+              ? acc
+              : [...acc, message];
+          default:
+        }
+      }
+    }
+    return [...acc, message];
+  }, []);
+};
+
+const filterHiddenMessages = (messages: MessageEntity[]) => messages.filter(message => message.visible());
 
 const MessagesList: React.FC<MessagesListParams> = ({
   conversation,
@@ -88,9 +112,15 @@ const MessagesList: React.FC<MessagesListParams> = ({
     'isGuestRoom',
     'isGuestAndServicesRoom',
   ]);
-  const messages = allMessages.filter(message => message.visible());
   const [loaded, setLoaded] = useState(false);
   const [focusedMessage, setFocusedMessage] = useState<string | undefined>(initialMessage?.id);
+  const [filteredMessages, setFilteredMessages] = useState<MessageEntity[]>([]);
+
+  useEffect(() => {
+    const visibleMessages = filterHiddenMessages(allMessages);
+    const uniqueMessages = filterSpecificDuplicatedMemberMessages(visibleMessages);
+    setFilteredMessages(uniqueMessages);
+  }, [allMessages.length]);
 
   const shouldShowInvitePeople =
     conversation.isActiveParticipant() && conversation.inTeam() && (isGuestRoom || isGuestAndServicesRoom);
@@ -104,8 +134,8 @@ const MessagesList: React.FC<MessagesListParams> = ({
   };
 
   const verticallyCenterMessage = (): boolean => {
-    if (messages.length === 1) {
-      const [firstMessage] = messages;
+    if (filteredMessages.length === 1) {
+      const [firstMessage] = filteredMessages;
       return firstMessage.isMember() && firstMessage.isConnection();
     }
     return false;
@@ -122,7 +152,7 @@ const MessagesList: React.FC<MessagesListParams> = ({
     if (!scrollingContainer || !loaded) {
       return;
     }
-    const lastMessage = messages[messages.length - 1];
+    const lastMessage = filteredMessages[filteredMessages.length - 1];
     const previousScrollHeight = scrollHeight.current;
     const scrollBottomPosition = scrollingContainer.scrollTop + scrollingContainer.clientHeight;
     const shouldStickToBottom = previousScrollHeight - scrollBottomPosition < 100;
@@ -139,7 +169,7 @@ const MessagesList: React.FC<MessagesListParams> = ({
       scrollingContainer.scrollTop = scrollingContainer.scrollHeight - previousScrollHeight;
     } else if (shouldStickToBottom) {
       // We only want to animate the scroll if there are new messages in the list
-      const behavior = nbMessages.current !== messages.length ? 'smooth' : 'auto';
+      const behavior = nbMessages.current !== filteredMessages.length ? 'smooth' : 'auto';
       // Simple content update, we just scroll to bottom if we are in the stick to bottom threshold
       scrollingContainer.scrollTo?.({behavior, top: scrollingContainer.scrollHeight});
     } else if (lastMessage && lastMessage.status() === StatusType.SENDING && lastMessage.user().id === selfUser.id) {
@@ -147,7 +177,7 @@ const MessagesList: React.FC<MessagesListParams> = ({
       scrollingContainer.scrollTo?.({behavior: 'smooth', top: scrollingContainer.scrollHeight});
     }
     scrollHeight.current = scrollingContainer.scrollHeight;
-    nbMessages.current = messages.length;
+    nbMessages.current = filteredMessages.length;
   };
 
   // Listen to resizes of the the container element (if it's resized it means something has changed in the message list)
@@ -158,7 +188,7 @@ const MessagesList: React.FC<MessagesListParams> = ({
     if (messagesContainer) {
       updateScroll(messagesContainer);
     }
-  }, [messages.length, messagesContainer]);
+  }, [filteredMessages.length, messagesContainer]);
 
   useEffect(() => {
     onLoading(true);
@@ -174,8 +204,8 @@ const MessagesList: React.FC<MessagesListParams> = ({
     return null;
   }
 
-  const messageViews = messages.map((message, index) => {
-    const previousMessage = messages[index - 1];
+  const messageViews = filteredMessages.map((message, index) => {
+    const previousMessage = filteredMessages[index - 1];
     const isLastDeliveredMessage = lastDeliveredMessage?.id === message.id;
 
     const visibleCallback = getVisibleCallback(conversation, message);
