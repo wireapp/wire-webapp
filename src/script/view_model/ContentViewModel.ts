@@ -34,7 +34,6 @@ import {EmojiInputViewModel} from './content/EmojiInputViewModel';
 import {ModalsViewModel} from './ModalsViewModel';
 import {ConversationError} from '../error/ConversationError';
 import {ConnectRequestsViewModel} from './content/ConnectRequestsViewModel';
-import {GiphyViewModel} from './content/GiphyViewModel';
 import {HistoryImportViewModel} from './content/HistoryImportViewModel';
 import {HistoryExportViewModel} from './content/HistoryExportViewModel';
 import {PanelViewModel} from './PanelViewModel';
@@ -96,7 +95,6 @@ export class ContentViewModel {
   elementId: string;
   sidebarId: string;
   emojiInput: EmojiInputViewModel;
-  giphy: GiphyViewModel;
   historyExport: HistoryExportViewModel;
   historyImport: HistoryImportViewModel;
   legalHoldModal: LegalHoldModalViewModel;
@@ -149,7 +147,6 @@ export class ContentViewModel {
     // Nested view models
     this.connectRequests = new ConnectRequestsViewModel(mainViewModel);
     this.emojiInput = new EmojiInputViewModel(repositories.properties);
-    this.giphy = new GiphyViewModel(repositories.giphy);
     this.legalHoldModal = new LegalHoldModalViewModel(
       repositories.conversation,
       repositories.team,

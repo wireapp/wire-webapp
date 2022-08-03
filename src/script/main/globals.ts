@@ -34,6 +34,7 @@ import 'Components/avatar/GroupAvatar';
 import 'Components/TitleBar';
 import 'Components/MessagesList';
 import 'Components/InputBar';
+import 'Components/Giphy';
 import 'Components/Modals/GroupCreation/GroupCreationModal';
 import '../page/AppLock';
 import 'Components/modal';

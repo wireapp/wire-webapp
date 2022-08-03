@@ -126,6 +126,7 @@ import {ConversationVerificationState} from './ConversationVerificationState';
 import {extractClientDiff} from './ClientMismatchUtil';
 import {Core} from '../service/CoreSingleton';
 import {ClientState} from '../client/ClientState';
+import {MLSReturnType} from '@wireapp/core/src/main/conversation';
 
 type ConversationDBChange = {obj: EventRecord; oldObj: EventRecord};
 type FetchPromise = {rejectFn: (error: ConversationError) => void; resolveFn: (conversation: Conversation) => void};
@@ -449,21 +450,31 @@ export class ConversationRepository {
     }
 
     try {
-      const response = await this.core.service!.conversation.createConversation(payload);
+      /**
+       * ToDo: Fetch all MLS Events from backend before doing anything else
+       * Needs to be done to receive the latest epoch and avoid epoch mismatch errors
+       */
+      let response: MLSReturnType;
+      if (payload.protocol === ConversationProtocol.MLS) {
+        response = await this.core.service!.conversation.createMLSConversation(payload);
+      } else {
+        response = {conversation: await this.core.service!.conversation.createProteusConversation(payload), events: []};
+      }
+
       const {conversationEntity} = await this.onCreate({
-        conversation: response.id,
+        conversation: response.conversation.qualified_id.id,
         data: {
           last_event: '0.0',
           last_event_time: '1970-01-01T00:00:00.000Z',
           receipt_mode: undefined,
-          ...response,
+          ...response.conversation,
         },
         from: this.userState.self().id,
-        qualified_conversation: response.qualified_id,
+        qualified_conversation: response.conversation.qualified_id,
         time: new Date().toISOString(),
         type: CONVERSATION_EVENT.CREATE,
       });
-      return conversationEntity as Conversation;
+      return conversationEntity;
     } catch (error) {
       this.handleConversationCreateError(
         error,
@@ -1235,7 +1246,10 @@ export class ConversationRepository {
    * @param initialTimestamp Initial server and event timestamp
    * @returns Mapped conversation/s
    */
-  mapConversations(payload: BackendConversation[], initialTimestamp = this.getLatestEventTimestamp()): Conversation[] {
+  mapConversations(
+    payload: BackendConversation[],
+    initialTimestamp = this.getLatestEventTimestamp(true),
+  ): Conversation[] {
     const entities = ConversationMapper.mapConversations(payload as ConversationDatabaseData[], initialTimestamp);
     entities.forEach(conversationEntity => {
       this._mapGuestStatusSelf(conversationEntity);
@@ -1350,21 +1364,38 @@ export class ConversationRepository {
    * @param userEntities Users to be added to the conversation
    * @returns Resolves when members were added
    */
-  async addUsers(conversationEntity: Conversation, userEntities: User[]) {
-    const userIds = userEntities.map(userEntity => userEntity.qualifiedId);
+  async addUsers(conversation: Conversation, userEntities: User[]) {
+    /**
+     * ToDo: Fetch all MLS Events from backend before doing anything else
+     * Needs to be done to receive the latest epoch and avoid epoch mismatch errors
+     */
+
+    const qualifiedUserIds = userEntities.map(userEntity => userEntity.qualifiedId);
+
+    const {qualifiedId: conversationId, groupId} = conversation;
 
     try {
-      const response = await this.core.service!.conversation.addUsers({
-        conversationId: conversationEntity,
-        protocol: ConversationProtocol.PROTEUS,
-        userIds: userIds,
-      });
-      if (response) {
-        this.eventRepository.injectEvent(response, EventRepository.SOURCE.BACKEND_RESPONSE);
+      if (conversation.isUsingMLSProtocol) {
+        const {events} = await this.core.service!.conversation.addUsersToMLSConversation({
+          conversationId,
+          groupId,
+          qualifiedUserIds,
+        });
+        if (!!events.length) {
+          events.forEach(event => this.eventRepository.injectEvent(event));
+        }
+      } else {
+        const conversationMemberJoinEvent = await this.core.service!.conversation.addUsersToProteusConversation({
+          conversationId,
+          qualifiedUserIds,
+        });
+        if (conversationMemberJoinEvent) {
+          this.eventRepository.injectEvent(conversationMemberJoinEvent, EventRepository.SOURCE.BACKEND_RESPONSE);
+        }
       }
     } catch (error) {
-      if (error instanceof BackendClientError) {
-        this.handleAddToConversationError(error, conversationEntity, userIds);
+      if (error) {
+        this.handleAddToConversationError(error as BackendClientError, conversation, qualifiedUserIds);
       }
     }
   }
@@ -1914,9 +1945,10 @@ export class ConversationRepository {
           previouslyArchived = conversationEntity.is_archived();
 
           const isBackendTimestamp = eventSource !== EventSource.INJECTED;
-          conversationEntity.updateTimestampServer(eventJson.server_time || eventJson.time, isBackendTimestamp);
+          if (type !== CONVERSATION_EVENT.MEMBER_JOIN && type !== CONVERSATION_EVENT.MEMBER_LEAVE) {
+            conversationEntity.updateTimestampServer(eventJson.server_time || eventJson.time, isBackendTimestamp);
+          }
         }
-
         return conversationEntity;
       })
       .then(conversationEntity => this.checkLegalHoldStatus(conversationEntity, eventJson))
@@ -2897,7 +2929,7 @@ export class ConversationRepository {
    * @param conversationEntity Conversation that contains the message
    * @param timestamp Timestamp as upper bound which messages to remove
    */
-  private deleteMessages(conversationEntity: Conversation, timestamp: number) {
+  private deleteMessages(conversationEntity: Conversation, timestamp?: number) {
     conversationEntity.hasCreationMessage = false;
 
     const iso_date = timestamp ? new Date(timestamp).toISOString() : undefined;
