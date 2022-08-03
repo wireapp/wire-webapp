@@ -18,7 +18,7 @@
  */
 
 import Icon from 'Components/Icon';
-import React, {useEffect, useRef, useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {container} from 'tsyringe';
 import cx from 'classnames';
 import {handleKeyDown} from 'Util/KeyboardUtil';
@@ -47,8 +47,8 @@ const ImageAsset: React.FC<ImageAssetProps> = ({asset, message, onClick, teamSta
   const {resource} = useKoSubscribableChildren(asset, ['resource']);
   const {isObfuscated, visible} = useKoSubscribableChildren(message, ['isObfuscated', 'visible']);
   const {isFileSharingReceivingEnabled} = useKoSubscribableChildren(teamState, ['isFileSharingReceivingEnabled']);
-  const viewportElement = useRef<HTMLDivElement>(null);
-  const isInViewport = useViewPortObserver(viewportElement.current);
+  const [viewportElement, setViewportElement] = useState<HTMLDivElement | null>(null);
+  const isInViewport = useViewPortObserver(viewportElement);
   const {isUploading, uploadProgress, cancelUpload, loadAsset} = useAssetTransfer(message);
 
   useEffect(() => {
@@ -103,7 +103,7 @@ const ImageAsset: React.FC<ImageAssetProps> = ({asset, message, onClick, teamSta
           role="button"
           data-uie-name="go-image-detail"
           aria-label={imageAltText}
-          ref={viewportElement}
+          ref={setViewportElement}
         >
           {isUploading && (
             <div className="asset-loader">

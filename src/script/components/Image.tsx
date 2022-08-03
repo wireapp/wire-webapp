@@ -17,7 +17,7 @@
  *
  */
 
-import React, {useEffect, useRef, useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import cx from 'classnames';
 import {container} from 'tsyringe';
 
@@ -47,8 +47,8 @@ const Image: React.FC<ImageProps> = ({
   aspectRatio,
   ...props
 }) => {
-  const viewPortElement = useRef<HTMLDivElement>(null);
-  const isInViewport = useViewPortObserver(viewPortElement.current);
+  const [viewportElement, setViewportElement] = useState<HTMLDivElement | null>(null);
+  const isInViewport = useViewPortObserver(viewportElement);
 
   const [assetIsLoading, setAssetIsLoading] = useState<boolean>(false);
   const [assetSrc, setAssetSrc] = useState<string>();
@@ -82,7 +82,7 @@ const Image: React.FC<ImageProps> = ({
   return !isFileSharingReceivingEnabled ? (
     <RestrictedImage className={className} showMessage={!isQuote} isSmall={isQuote} />
   ) : (
-    <div ref={viewPortElement} className={cx('image-wrapper', className)} {...props}>
+    <div ref={setViewportElement} className={cx('image-wrapper', className)} {...props}>
       {assetSrc ? (
         <img style={style} onClick={onClick} src={assetSrc} role="presentation" alt="" />
       ) : (
