@@ -394,22 +394,11 @@
   transition: background-color 0.15s ease-in-out;
 
   &:hover {
-    background-color: var(--white);
+    background-color: var(--app-bg-secondary);
   }
 
   &:focus-visible {
-    background-color: var(--white);
-    outline: 1px solid var(--accent-color-200);
-  }
-
-  body.theme-dark & {
-    &:hover {
-      background-color: var(--gray-95);
-    }
-
-    &:focus-visible {
-      background-color: var(--gray-95);
-      outline: 1px solid var(--accent-color-800);
-    }
+    background-color: var(--app-bg-secondary);
+    outline: 1px solid var(--accent-color-focus);
   }
 }
