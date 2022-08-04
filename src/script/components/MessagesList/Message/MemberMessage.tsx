@@ -17,7 +17,7 @@
  *
  */
 
-import React, {useEffect, useRef} from 'react';
+import React, {useEffect} from 'react';
 import Icon from 'Components/Icon';
 import {MemberMessage as MemberMessageEntity} from '../../../entity/message/MemberMessage';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
@@ -25,6 +25,7 @@ import MessageTime from './MessageTime';
 import {t} from 'Util/LocalizerUtil';
 import ConnectedMessage from './memberMessage/ConnectedMessage';
 import {User} from 'src/script/entity/User';
+import useEffectRef from 'Util/useEffectRef';
 
 export interface MemberMessageProps {
   classifiedDomains?: string[];
@@ -76,10 +77,10 @@ const MemberMessage: React.FC<MemberMessageProps> = ({
   const isMemberLeave = message.isMemberLeave();
   const isMemberChange = message.isMemberChange();
 
-  const messageHeaderLabelElement = useRef<HTMLDivElement>(null);
+  const [messageHeaderLabelRef, setMessageHeaderLabelRef] = useEffectRef<HTMLDivElement>();
   useEffect(() => {
-    if (messageHeaderLabelElement.current) {
-      const link = messageHeaderLabelElement.current.querySelector('.message-header-show-more');
+    if (messageHeaderLabelRef) {
+      const link = messageHeaderLabelRef.querySelector('.message-header-show-more');
       if (link) {
         const listener = () => onClickParticipants(highlightedUsers);
         link.addEventListener('click', listener);
@@ -89,7 +90,7 @@ const MemberMessage: React.FC<MemberMessageProps> = ({
       }
     }
     return undefined;
-  }, [messageHeaderLabelElement.current]);
+  }, [messageHeaderLabelRef]);
 
   return (
     <>
@@ -118,7 +119,7 @@ const MemberMessage: React.FC<MemberMessageProps> = ({
                 {isMemberRemoval && <span className="icon-minus" />}
                 {isMemberJoin && <span className="icon-plus" />}
               </div>
-              <div ref={messageHeaderLabelElement} className="message-header-label">
+              <div ref={setMessageHeaderLabelRef} className="message-header-label">
                 <span className="message-header-caption" dangerouslySetInnerHTML={{__html: htmlCaption}} />
                 <hr className="message-header-line" />
               </div>

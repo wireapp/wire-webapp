@@ -17,22 +17,23 @@
  *
  */
 
-import {useEffect, useState} from 'react';
+import {useEffect} from 'react';
 import {KEY} from 'Util/KeyboardUtil';
+import useEffectRef from 'Util/useEffectRef';
 
 const hideControlsClass = 'hide-controls';
 
 const useHideElement = (timeout: number, skipClass?: string) => {
-  const [element, setElement] = useState<HTMLDivElement | null>(null);
+  const [ref, setRef] = useEffectRef<HTMLDivElement>();
 
   useEffect(() => {
-    if (!element) {
+    if (!ref) {
       return undefined;
     }
 
     let hideTimeout: number;
 
-    const hideElement = () => element.classList.add(hideControlsClass);
+    const hideElement = () => ref.classList.add(hideControlsClass);
 
     const startTimer = () => {
       hideTimeout = window.setTimeout(hideElement, timeout);
@@ -40,11 +41,11 @@ const useHideElement = (timeout: number, skipClass?: string) => {
 
     const resetTimer = (target: Element) => {
       window.clearTimeout(hideTimeout);
-      element.classList.remove(hideControlsClass);
+      ref.classList.remove(hideControlsClass);
 
       if (skipClass) {
         const closest = (target as Element).closest(`.${skipClass}`);
-        if (element.contains(closest)) {
+        if (ref.contains(closest)) {
           return;
         }
       }
@@ -62,23 +63,23 @@ const useHideElement = (timeout: number, skipClass?: string) => {
       }
     };
 
-    element.addEventListener('mouseleave', hideElement);
-    element.addEventListener('mouseout', hideElement);
-    element.addEventListener('mousemove', onMouseMove);
-    element.addEventListener('keydown', onKeyDown);
+    ref.addEventListener('mouseleave', hideElement);
+    ref.addEventListener('mouseout', hideElement);
+    ref.addEventListener('mousemove', onMouseMove);
+    ref.addEventListener('keydown', onKeyDown);
 
     startTimer();
     return () => {
       window.clearTimeout(hideTimeout);
-      element.removeEventListener('mouseleave', hideElement);
-      element.removeEventListener('mouseout', hideElement);
-      element.removeEventListener('mousemove', onMouseMove);
-      element.removeEventListener('keydown', onKeyDown);
-      element.classList.remove(hideControlsClass);
+      ref.removeEventListener('mouseleave', hideElement);
+      ref.removeEventListener('mouseout', hideElement);
+      ref.removeEventListener('mousemove', onMouseMove);
+      ref.removeEventListener('keydown', onKeyDown);
+      ref.classList.remove(hideControlsClass);
     };
-  }, [element]);
+  }, [ref]);
 
-  return setElement;
+  return setRef;
 };
 
 export default useHideElement;

@@ -22,6 +22,7 @@ import React, {useEffect, useMemo, useRef, useState} from 'react';
 import {t} from 'Util/LocalizerUtil';
 import {noop} from 'Util/util';
 import {isScrolledBottom} from 'Util/scroll-helpers';
+import useEffectRef from 'Util/useEffectRef';
 
 import type {Message} from '../../../../entity/message/Message';
 import useDebounce from '../../../../hooks/useDebounce';
@@ -42,11 +43,11 @@ const FullSearch: React.FC<FullSearchProps> = ({searchProvider, click = noop, ch
   const MAX_OFFSET_INDEX = 30;
 
   const [input, setInput] = useState('');
-  const inputRef = useRef<HTMLInputElement>(null);
+  const inputRef = useRef<HTMLInputElement>();
   const [messages, setMessages] = useState<ContentMessage[]>([]);
   const [messageCount, setMessageCount] = useState(0);
   const [hasNoResults, setHasNoResults] = useState(false);
-  const searchElement = useRef<HTMLDivElement>(null);
+  const [element, setElement] = useEffectRef<HTMLDivElement>();
 
   useDebounce(
     async () => {
@@ -70,7 +71,7 @@ const FullSearch: React.FC<FullSearchProps> = ({searchProvider, click = noop, ch
   );
 
   useEffect(() => {
-    const parent = searchElement.current?.closest('.collection-list') as HTMLDivElement;
+    const parent = element?.closest('.collection-list') as HTMLDivElement;
     const onScroll = () => {
       const showAdditionalMessages = isScrolledBottom(parent) && messages.length;
       if (showAdditionalMessages) {
@@ -81,7 +82,7 @@ const FullSearch: React.FC<FullSearchProps> = ({searchProvider, click = noop, ch
     return () => {
       parent?.removeEventListener('scroll', onScroll);
     };
-  }, [searchElement.current, messages]);
+  }, [element, messages]);
 
   useEffect(() => {
     if (inputRef.current) {
@@ -94,34 +95,29 @@ const FullSearch: React.FC<FullSearchProps> = ({searchProvider, click = noop, ch
 
     return (text: string) => {
       const matches = [...text.matchAll(regex)];
-      let parts: string[] = [];
-      let firstIndex: number | undefined;
-      if (Boolean(matches.length)) {
-        firstIndex = matches[0].index;
+      const firstIndex = matches[0]?.index;
+      let firstPart = text.substring(0, firstIndex ?? text.length);
+      if (firstIndex > MAX_OFFSET_INDEX && text.length > MAX_TEXT_LENGTH) {
+        let splitOffset = firstIndex - 1;
+        const firstSpace = firstPart.indexOf(' ', splitOffset - PRE_MARKED_OFFSET);
+        splitOffset = firstSpace > -1 ? firstSpace : splitOffset;
+        firstPart = `…${firstPart.substring(splitOffset)}`;
       }
-      if (firstIndex) {
-        let firstPart = text.substring(0, firstIndex);
-        if (firstIndex > MAX_OFFSET_INDEX && text.length > MAX_TEXT_LENGTH) {
-          let splitOffset = firstIndex - 1;
-          const firstSpace = firstPart.indexOf(' ', splitOffset - PRE_MARKED_OFFSET);
-          splitOffset = firstSpace > -1 ? firstSpace : splitOffset;
-          firstPart = `…${firstPart.substring(splitOffset)}`;
-        }
-        parts = matches.reduce(
-          (acc, match, i) => [
-            ...acc,
-            match[0],
-            text.substring(match.index + match[0].length, matches[i + 1]?.index ?? text.length),
-          ],
-          [firstPart],
-        );
-      }
+      const parts = matches.reduce(
+        (acc, match, i) => [
+          ...acc,
+          match[0],
+          text.substring(match.index + match[0].length, matches[i + 1]?.index ?? text.length),
+        ],
+        [firstPart],
+      );
+
       return {matches: matches.length, parts};
     };
   }, [input]);
 
   return (
-    <div className="full-search" ref={searchElement}>
+    <div className="full-search" ref={setElement}>
       <header className="full-search__header">
         <span className="full-search__header__icon icon-search" />
         <div className="full-search__header__input">

@@ -17,12 +17,13 @@
  *
  */
 
-import React, {useEffect, useMemo, useRef} from 'react';
+import React, {useEffect, useMemo} from 'react';
 import cx from 'classnames';
 
 import {noop} from 'Util/util';
 import {t} from 'Util/LocalizerUtil';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
+import useEffectRef from 'Util/useEffectRef';
 
 import {AVATAR_SIZE} from 'Components/Avatar';
 
@@ -82,7 +83,7 @@ const ConversationListCell: React.FC<ConversationListCellProps> = ({
 
   const isActive = isSelected(conversation);
 
-  const viewportElement = useRef<HTMLLIElement>(null);
+  const [viewportElementRef, setViewportElementRef] = useEffectRef<HTMLElement>();
 
   useEffect(() => {
     const handleRightClick = (event: MouseEvent) => {
@@ -90,11 +91,11 @@ const ConversationListCell: React.FC<ConversationListCellProps> = ({
       event.preventDefault();
       rightClick(conversation, event);
     };
-    viewportElement.current?.addEventListener('contextmenu', handleRightClick);
+    viewportElementRef?.addEventListener('contextmenu', handleRightClick);
     return () => {
-      viewportElement.current?.removeEventListener('contextmenu', handleRightClick);
+      viewportElementRef?.removeEventListener('contextmenu', handleRightClick);
     };
-  }, [viewportElement.current]);
+  }, [viewportElementRef]);
 
   const cellState = useMemo(() => generateCellState(conversation), [unreadState, mutedState, isRequest]);
 
@@ -125,7 +126,7 @@ const ConversationListCell: React.FC<ConversationListCellProps> = ({
   };
 
   return (
-    <li ref={viewportElement}>
+    <li ref={setViewportElementRef}>
       <div
         data-uie-name={dataUieName}
         data-uie-uid={conversation.id}
