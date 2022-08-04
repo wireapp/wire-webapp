@@ -17,12 +17,13 @@
  *
  */
 
-import React, {useEffect, useRef, useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {useFadingScrollbar} from '../../ui/fadingScrollbar';
 import {container} from 'tsyringe';
 import {registerReactComponent, useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 import {formatDuration} from 'Util/TimeUtil';
+import useEffectRef from 'Util/useEffectRef';
 
 import {ConversationState} from '../../conversation/ConversationState';
 import {EphemeralTimings} from '../../ephemeral/EphemeralTimings';
@@ -45,8 +46,8 @@ const TimedMessagesPanel: React.FC<TimedMessagesPanelProps> = ({onClose, onGoBac
   const conversationState = container.resolve(ConversationState);
   const [currentMessageTimer, setCurrentMessageTimer] = useState(0);
   const [messageTimes, setMessageTimes] = useState<MessageTime[]>([]);
-  const scrollbarElement = useRef<HTMLDivElement>(null);
-  useFadingScrollbar(scrollbarElement.current);
+  const [scrollbarRef, setScrollbarRef] = useEffectRef<HTMLDivElement>();
+  useFadingScrollbar(scrollbarRef);
 
   const {activeConversation} = useKoSubscribableChildren(conversationState, ['activeConversation']);
   const {globalMessageTimer} = useKoSubscribableChildren(activeConversation, ['globalMessageTimer']);
@@ -77,9 +78,10 @@ const TimedMessagesPanel: React.FC<TimedMessagesPanelProps> = ({onClose, onGoBac
   }, [globalMessageTimer]);
 
   const timedMessageChange = (value: number): void => {
-    if (activeConversation && value !== 0) {
-      activeConversation.globalMessageTimer(value);
-      repositories.conversation.updateConversationMessageTimer(activeConversation, value);
+    if (activeConversation) {
+      const finalTimer = value === 0 ? null : value;
+      activeConversation.globalMessageTimer(finalTimer);
+      repositories.conversation.updateConversationMessageTimer(activeConversation, finalTimer);
     }
   };
   return (
@@ -90,7 +92,7 @@ const TimedMessagesPanel: React.FC<TimedMessagesPanelProps> = ({onClose, onGoBac
         title={t('timedMessagesTitle')}
         goBackUie="go-back-timed-messages-options"
       />
-      <div ref={scrollbarElement} className="panel__content">
+      <div ref={setScrollbarRef} className="panel__content">
         {messageTimes.map(({text, isCustom, value}) => (
           <label
             key={value}

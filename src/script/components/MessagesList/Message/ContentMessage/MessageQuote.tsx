@@ -17,7 +17,7 @@
  *
  */
 
-import React, {useRef} from 'react';
+import React from 'react';
 import cx from 'classnames';
 import {amplify} from 'amplify';
 import {WebAppEvents} from '@wireapp/webapp-events';
@@ -40,6 +40,7 @@ import VideoAsset from './asset/VideoAsset';
 import AudioAsset from './asset/AudioAsset';
 import FileAssetComponent from './asset/FileAssetComponent';
 import LocationAsset from './asset/LocationAsset';
+import useEffectRef from 'Util/useEffectRef';
 import {Text} from 'src/script/entity/message/Text';
 import {handleKeyDown} from 'Util/KeyboardUtil';
 
@@ -161,23 +162,22 @@ const QuotedMessage: React.FC<QuotedMessageProps> = ({
   ]);
   const [canShowMore, setCanShowMore] = useState(false);
   const [showFullText, setShowFullText] = useState(false);
-  const textQuoteElement = useRef<HTMLDivElement>(null);
+  const [textQuoteElement, setTextQuoteElement] = useEffectRef();
 
   useEffect(() => {
     setShowFullText(false);
   }, [quotedMessage]);
 
   useEffect(() => {
-    if (textQuoteElement.current) {
-      const {current} = textQuoteElement;
-      const preNode = current.querySelector('pre');
-      const width = Math.max(current.scrollWidth, preNode ? preNode.scrollWidth : 0);
-      const height = Math.max(current.scrollHeight, preNode ? preNode.scrollHeight : 0);
-      const isWider = width > current.clientWidth;
-      const isHigher = height > current.clientHeight;
+    if (textQuoteElement) {
+      const preNode = textQuoteElement.querySelector('pre');
+      const width = Math.max(textQuoteElement.scrollWidth, preNode ? preNode.scrollWidth : 0);
+      const height = Math.max(textQuoteElement.scrollHeight, preNode ? preNode.scrollHeight : 0);
+      const isWider = width > textQuoteElement.clientWidth;
+      const isHigher = height > textQuoteElement.clientHeight;
       setCanShowMore(isWider || isHigher);
     }
-  }, [textQuoteElement.current, edited_timestamp]);
+  }, [textQuoteElement, edited_timestamp]);
 
   return (
     <>
@@ -218,7 +218,7 @@ const QuotedMessage: React.FC<QuotedMessageProps> = ({
                   'message-quote__text--full': showFullText,
                   'message-quote__text--large': includesOnlyEmojis(asset.text),
                 })}
-                ref={textQuoteElement}
+                ref={setTextQuoteElement}
                 onClick={event => handleClickOnMessage(asset, event)}
                 onKeyDown={event => handleKeyDown(event, handleClickOnMessage.bind(this, asset, event))}
                 dangerouslySetInnerHTML={{__html: asset.render(selfId)}}

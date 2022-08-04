@@ -17,11 +17,12 @@
  *
  */
 
-import React, {useEffect, useRef, useState} from 'react';
+import React, {useEffect, useState} from 'react';
 
 import Icon from 'Components/Icon';
 import {t} from 'Util/LocalizerUtil';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
+import useEffectRef from 'Util/useEffectRef';
 import {getLogger} from 'Util/Logger';
 
 import {Config} from '../../../../../Config';
@@ -47,8 +48,8 @@ const CameraPreferences: React.FC<CameraPreferencesProps> = ({
   hasActiveCameraStream,
 }) => {
   const [isRequesting, setIsRequesting] = useState(false);
-  const [stream, setStream] = useState<MediaStream | null>(null);
-  const videoElement = useRef<HTMLVideoElement>(null);
+  const [stream, setStream] = useState<MediaStream>();
+  const [videoElement, setVideoElement] = useEffectRef<HTMLVideoElement>();
   const {[DeviceTypes.VIDEO_INPUT]: availableDevices} = useKoSubscribableChildren(devicesHandler?.availableDevices, [
     DeviceTypes.VIDEO_INPUT,
   ]);
@@ -89,10 +90,10 @@ const CameraPreferences: React.FC<CameraPreferencesProps> = ({
   }, [currentDeviceId]);
 
   useEffect(() => {
-    if (videoElement.current) {
-      videoElement.current.srcObject = stream;
+    if (videoElement) {
+      videoElement.srcObject = stream;
     }
-  }, [videoElement.current, stream]);
+  }, [videoElement, stream]);
 
   useEffect(
     () => () => {
@@ -130,7 +131,7 @@ const CameraPreferences: React.FC<CameraPreferencesProps> = ({
       ) : (
         <>
           {stream ? (
-            <video className="preferences-av-video mirror" autoPlay playsInline muted ref={videoElement} />
+            <video className="preferences-av-video mirror" autoPlay playsInline muted ref={setVideoElement} />
           ) : (
             <div className="preferences-av-video-disabled">
               <div

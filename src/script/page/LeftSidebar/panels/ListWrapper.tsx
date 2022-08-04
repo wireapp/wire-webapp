@@ -17,13 +17,14 @@
  *
  */
 
-import React, {ReactElement, useEffect, useRef} from 'react';
+import React, {ReactElement, useEffect} from 'react';
 
 import {css} from '@emotion/react';
 import {throttle} from 'underscore';
 import {isScrollable, isScrolledBottom, isScrolledTop} from 'Util/scroll-helpers';
 import Icon from 'Components/Icon';
 import {t} from 'Util/LocalizerUtil';
+import useEffectRef from 'Util/useEffectRef';
 import {useFadingScrollbar} from '../../../ui/fadingScrollbar';
 
 type LeftListWrapperProps = {
@@ -63,8 +64,8 @@ const ListWrapper: React.FC<LeftListWrapperProps> = ({
   before,
   headerUieName,
 }) => {
-  const scrollbarElement = useRef<HTMLDivElement>(null);
-  useFadingScrollbar(scrollbarElement.current);
+  const [scrollbarRef, setScrollbarRef] = useEffectRef<HTMLDivElement>();
+  useFadingScrollbar(scrollbarRef);
 
   const calculateBorders = throttle((element: HTMLElement) => {
     window.requestAnimationFrame(() => {
@@ -79,15 +80,15 @@ const ListWrapper: React.FC<LeftListWrapperProps> = ({
   }, 100);
 
   useEffect(() => {
-    if (!scrollbarElement.current) {
+    if (!scrollbarRef) {
       return undefined;
     }
     const onScroll = (event: Event) => calculateBorders(event.target as HTMLElement);
-    calculateBorders(scrollbarElement.current);
-    scrollbarElement.current.addEventListener('scroll', onScroll);
+    calculateBorders(scrollbarRef);
+    scrollbarRef.addEventListener('scroll', onScroll);
 
-    return () => scrollbarElement.current?.removeEventListener('scroll', onScroll);
-  }, [scrollbarElement.current]);
+    return () => scrollbarRef.removeEventListener('scroll', onScroll);
+  }, [scrollbarRef]);
 
   return (
     <div id={id} className={`left-list-${id} ${id}`} css={style}>
@@ -112,7 +113,7 @@ const ListWrapper: React.FC<LeftListWrapperProps> = ({
         )}
       </section>
       {before ?? null}
-      <section css={scrollStyle} ref={scrollbarElement}>
+      <section css={scrollStyle} ref={setScrollbarRef}>
         {children}
       </section>
       {footer ?? null}
