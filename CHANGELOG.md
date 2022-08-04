@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [19.19.2](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/compare/@wireapp/api-client@19.19.1...@wireapp/api-client@19.19.2) (2022-08-04)
+
+
+### Bug Fixes
+
+* **api-client:** remove federated user from group ([#4355](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/issues/4355)) ([09f0a81](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/commit/09f0a81bd0de62f19897550033928f1cea49a6e8))
+
+
+
+
+
 ## [19.19.1](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/compare/@wireapp/api-client@19.19.0...@wireapp/api-client@19.19.1) (2022-07-28)
 
 **Note:** Version bump only for package @wireapp/api-client
