@@ -33,7 +33,11 @@ const PastedFileControls: FC<PastedFileControlsProps> = ({pastedFile, onClear, o
   const pastedFilePreviewUrl = isSupportedFileType ? URL.createObjectURL(pastedFile) : '';
 
   return (
-    <div className="conversation-input-bar-paste-modal" data-uie-name="pasted-file-controls">
+    <div
+      className="conversation-input-bar-paste-modal"
+      data-uie-name="pasted-file-controls"
+      aria-label={pastedFile.name}
+    >
       <div className="controls-left"></div>
 
       <div className="controls-center">
@@ -49,7 +53,8 @@ const PastedFileControls: FC<PastedFileControlsProps> = ({pastedFile, onClear, o
           </span>
         )}
 
-        <span>{pastedFile.name}</span>
+        {/* eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex */}
+        <span tabIndex={0}>{pastedFile.name}</span>
       </div>
 
       <div className="controls-right">

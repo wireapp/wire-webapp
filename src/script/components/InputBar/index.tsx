@@ -19,7 +19,14 @@
 
 import {Availability} from '@wireapp/protocol-messaging';
 import {WebAppEvents} from '@wireapp/webapp-events';
-import {ClipboardEvent, KeyboardEvent as ReactKeyboardEvent, useEffect, useMemo, useRef, useState} from 'react';
+import {
+  ClipboardEvent as ReactClipboardEvent,
+  KeyboardEvent as ReactKeyboardEvent,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import {amplify} from 'amplify';
 import cx from 'classnames';
 import {container} from 'tsyringe';
@@ -629,8 +636,8 @@ const InputBar = ({
     });
   };
 
-  const onPasteFiles = (event: ClipboardEvent): void => {
-    if (event.clipboardData.types.includes('text/plain')) {
+  const onPasteFiles = (event: ClipboardEvent | ReactClipboardEvent): void => {
+    if (event?.clipboardData?.types.includes('text/plain')) {
       return;
     }
 
@@ -640,18 +647,20 @@ const InputBar = ({
       return;
     }
 
-    const pastedFiles = event.clipboardData.files;
-    const [pastedFile] = pastedFiles;
-    const {lastModified} = pastedFile;
+    const pastedFiles = event?.clipboardData?.files;
+    if (pastedFiles) {
+      const [pastedFile] = pastedFiles;
+      const {lastModified} = pastedFile;
 
-    const date = formatLocale(lastModified || new Date(), 'PP, pp');
-    const fileName = t('conversationSendPastedFile', date);
+      const date = formatLocale(lastModified || new Date(), 'PP, pp');
+      const fileName = t('conversationSendPastedFile', date);
 
-    const newFile = new File([pastedFile], fileName, {
-      type: pastedFile.type,
-    });
+      const newFile = new File([pastedFile], fileName, {
+        type: pastedFile.type,
+      });
 
-    setPastedFile(newFile);
+      setPastedFile(newFile);
+    }
   };
 
   const loadInitialStateForConversation = async (): Promise<void> => {
@@ -783,6 +792,11 @@ const InputBar = ({
   // Temporarily functionality for dropping files on conversation container, should be moved to Conversation Component
   useDropFiles('#conversation', onDropOrPastedFile);
 
+  useEffect(() => {
+    document.addEventListener('paste', onPasteFiles);
+    return () => document.removeEventListener('paste', onPasteFiles);
+  }, []);
+
   return (
     <div id="conversation-input-bar" className="conversation-input-bar">
       {classifiedDomains && !isConnectionRequest && (
@@ -800,7 +814,7 @@ const InputBar = ({
               )}
             </div>
 
-            {!removedFromConversation && (
+            {!removedFromConversation && !pastedFile && (
               <>
                 <div className="controls-center">
                   <textarea
