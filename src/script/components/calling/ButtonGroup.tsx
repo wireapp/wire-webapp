@@ -39,7 +39,7 @@ const buttonGroupWrapperStyles: CSSObject = {
     '&:focus-visible': {
       outline: '1px solid var(--accent-color-focus)',
     },
-    border: '1px solid var(--text-input-border)',
+    border: '1px solid var(--border-color)',
     borderBottomLeftRadius: 12,
     borderTopLeftRadius: 12,
     paddingLeft: '14px !important',
@@ -48,7 +48,7 @@ const buttonGroupWrapperStyles: CSSObject = {
     '&:focus-visible': {
       outline: '1px solid var(--accent-color-focus)',
     },
-    border: '1px solid var(--text-input-border)',
+    border: '1px solid var(--border-color)',
     borderBottomRightRadius: 12,
     borderTopRightRadius: 12,
     paddingRight: '14px !important',
@@ -57,6 +57,9 @@ const buttonGroupWrapperStyles: CSSObject = {
 };
 
 const buttonGroupItemStyles: CSSObject = {
+  '&:hover': {
+    backgroundColor: 'var(--button-group-left-hover)',
+  },
   backgroundColor: 'var(--app-bg-secondary)',
   color: 'var(--main-color)',
   cursor: 'pointer',
@@ -67,6 +70,9 @@ const buttonGroupItemStyles: CSSObject = {
 
 const buttonGroupItemActiveStyles: CSSObject = {
   ...buttonGroupItemStyles,
+  '&:hover': {
+    backgroundColor: 'var(--button-group-right-hover)',
+  },
   backgroundColor: 'var(--main-color)',
   color: 'var(--app-bg-secondary)',
 };
