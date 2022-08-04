@@ -157,7 +157,7 @@ export class ConversationAPI {
 
     const isFederated = this.backendFeatures.federationEndpoints && convId.domain && uId.domain;
 
-    const url = isFederated
+    const url = !isFederated
       ? `${ConversationAPI.URL.CONVERSATIONS}/${convId.id}/${ConversationAPI.URL.MEMBERS}/${uId.id}`
       : `${ConversationAPI.URL.CONVERSATIONS}/${convId.domain}/${convId.id}/${ConversationAPI.URL.MEMBERS}/${uId.domain}/${uId.id}`;
 
