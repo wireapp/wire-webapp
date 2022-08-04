@@ -31,7 +31,7 @@ import {registerReactComponent, useKoSubscribableChildren} from 'Util/ComponentU
 import Message from './Message';
 import {Text} from 'src/script/entity/message/Text';
 import {useResizeObserver} from '../../ui/resizeObserver';
-import useEffectRef from 'Util/useEffectRef';
+import classNames from 'classnames';
 
 type FocusedElement = {center?: boolean; element: Element};
 interface MessagesListParams {
@@ -111,7 +111,7 @@ const MessagesList: React.FC<MessagesListParams> = ({
     return false;
   };
 
-  const [messagesContainer, setContainer] = useEffectRef<HTMLDivElement | null>(null);
+  const [messagesContainerElement, setMessagesContainerElement] = useState<HTMLDivElement | null>(null);
   const scrollHeight = useRef(0);
   const nbMessages = useRef(0);
   const focusedElement = useRef<FocusedElement | null>(null);
@@ -151,14 +151,14 @@ const MessagesList: React.FC<MessagesListParams> = ({
   };
 
   // Listen to resizes of the the container element (if it's resized it means something has changed in the message list)
-  useResizeObserver(messagesContainer, () => updateScroll(messagesContainer));
+  useResizeObserver(messagesContainerElement, () => updateScroll(messagesContainerElement ?? null));
   // Also listen to the scrolling container resizes (when the window resizes or the inputBar changes)
-  useResizeObserver(messagesContainer?.parentElement, () => updateScroll(messagesContainer));
+  useResizeObserver(messagesContainerElement?.parentElement, () => updateScroll(messagesContainerElement ?? null));
   useLayoutEffect(() => {
-    if (messagesContainer) {
-      updateScroll(messagesContainer);
+    if (messagesContainerElement) {
+      updateScroll(messagesContainerElement);
     }
-  }, [messages.length, messagesContainer]);
+  }, [messages.length, messagesContainerElement]);
 
   useEffect(() => {
     onLoading(true);
@@ -192,14 +192,14 @@ const MessagesList: React.FC<MessagesListParams> = ({
         isLastDeliveredMessage={isLastDeliveredMessage}
         isMarked={!!focusedMessage && focusedMessage === message.id}
         scrollTo={({element, center}, isUnread) => {
-          if (isUnread && messagesContainer) {
+          if (isUnread && messagesContainerElement) {
             // if it's a new unread message, but we are not on the first render of the list,
             // we do not need to scroll to the unread message
             return;
           }
           focusedElement.current = {center, element};
           setTimeout(() => (focusedElement.current = null), 1000);
-          updateScroll(messagesContainer);
+          updateScroll(messagesContainerElement ?? null);
         }}
         isSelfTemporaryGuest={selfUser.isTemporaryGuest()}
         messageRepository={messageRepository}
@@ -232,7 +232,10 @@ const MessagesList: React.FC<MessagesListParams> = ({
   });
 
   return (
-    <div ref={setContainer} className={`messages ${verticallyCenterMessage() ? 'flex-center' : ''}`}>
+    <div
+      ref={setMessagesContainerElement}
+      className={classNames('messages', {'flex-center': verticallyCenterMessage()})}
+    >
       {messageViews}
     </div>
   );

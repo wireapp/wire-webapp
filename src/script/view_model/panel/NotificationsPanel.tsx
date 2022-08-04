@@ -17,11 +17,10 @@
  *
  */
 
-import React, {useState} from 'react';
+import React, {useRef, useState} from 'react';
 import {container} from 'tsyringe';
 
 import {t} from 'Util/LocalizerUtil';
-import useEffectRef from 'Util/useEffectRef';
 import {registerReactComponent, useKoSubscribableChildren} from 'Util/ComponentUtil';
 
 import {useFadingScrollbar} from '../../ui/fadingScrollbar';
@@ -46,8 +45,8 @@ const NotificationsPanel: React.FC<NotificationsPanelProps> = ({
   const {activeConversation} = useKoSubscribableChildren(conversationState, ['activeConversation']);
   const {notificationState} = useKoSubscribableChildren(activeConversation, ['notificationState']);
 
-  const [scrollbarRef, setScrollbarRef] = useEffectRef<HTMLDivElement>();
-  useFadingScrollbar(scrollbarRef);
+  const scrollbarElement = useRef<HTMLDivElement>(null);
+  useFadingScrollbar(scrollbarElement.current);
 
   const [settings] = useState(
     Object.values(NOTIFICATION_STATE).map(status => ({
@@ -64,7 +63,7 @@ const NotificationsPanel: React.FC<NotificationsPanelProps> = ({
         goBackUie="go-back-notification-options"
         title={t('notificationSettingsTitle')}
       />
-      <div className="panel__content" ref={setScrollbarRef}>
+      <div className="panel__content" ref={scrollbarElement}>
         {settings.map(({text, value}) => (
           <label
             key={value}

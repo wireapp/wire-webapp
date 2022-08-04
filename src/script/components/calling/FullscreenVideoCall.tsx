@@ -167,7 +167,7 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
     [videoInput],
   );
   const showSwitchCamera = selfSharesCamera && availableCameras.length > 1;
-  const setWrapper = useHideElement(FullscreenVideoCallConfig.HIDE_CONTROLS_TIMEOUT, 'video-controls__button');
+  const wrapperElement = useHideElement(FullscreenVideoCallConfig.HIDE_CONTROLS_TIMEOUT, 'video-controls__button');
 
   const [hasUnreadMessages, setHasUnreadMessages] = useState(false);
   const updateUnreadCount = (unreadCount: number) => setHasUnreadMessages(unreadCount > 0);
@@ -200,7 +200,7 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
   }, []);
 
   return (
-    <div id="video-calling" className="video-calling" ref={setWrapper}>
+    <div id="video-calling" className="video-calling" ref={wrapperElement}>
       <div id="video-element-remote" className="video-element-remote">
         <GroupVideoGrid
           maximizedParticipant={maximizedParticipant}

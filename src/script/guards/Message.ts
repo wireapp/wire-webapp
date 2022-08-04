@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2021 Wire Swiss GmbH
+ * Copyright (C) 2022 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,8 +17,12 @@
  *
  */
 
-import {useState} from 'react';
+import {ContentMessage} from '../entity/message/ContentMessage';
+import {Message} from '../entity/message/Message';
+import {MemberMessage} from '../entity/message/MemberMessage';
+import {SystemMessage} from '../entity/message/SystemMessage';
+import {SuperType} from '../message/SuperType';
 
-export default function useEffectRef<T extends Element>(value?: T): [T | undefined, (node: T) => void] {
-  return useState<T | undefined>(value);
-}
+export const isMemberMessage = (
+  message: Message | ContentMessage | MemberMessage | SystemMessage,
+): message is MemberMessage => message.super_type === SuperType.MEMBER;

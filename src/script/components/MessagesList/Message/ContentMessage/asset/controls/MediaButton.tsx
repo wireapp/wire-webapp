@@ -33,7 +33,7 @@ export interface MediaButtonProps {
   pause?: () => void;
   play: () => void;
   transferState: AssetTransferState;
-  uploadProgress: number;
+  uploadProgress?: number;
 }
 
 const MediaButton: React.FC<MediaButtonProps> = ({
@@ -91,9 +91,9 @@ const MediaButton: React.FC<MediaButtonProps> = ({
         />
       )}
       {isDownloading && (
-        <AssetLoader large={large} loadProgress={unwrappedAsset.downloadProgress || 0} onCancel={cancel} />
+        <AssetLoader large={large} loadProgress={unwrappedAsset.downloadProgress ?? 0} onCancel={cancel} />
       )}
-      {isUploading && <AssetLoader large={large} loadProgress={uploadProgress} onCancel={cancel} />}
+      {isUploading && <AssetLoader large={large} loadProgress={uploadProgress ?? 0} onCancel={cancel} />}
     </div>
   );
 };

@@ -17,7 +17,7 @@
  *
  */
 
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import {container} from 'tsyringe';
 import cx from 'classnames';
 import {amplify} from 'amplify';
@@ -50,7 +50,6 @@ import {
   teamPermissionsForAccessState,
   toggleFeature,
 } from '../../../conversation/ConversationAccessPermission';
-import useEffectRef from 'Util/useEffectRef';
 import {useFadingScrollbar} from '../../../ui/fadingScrollbar';
 import {Config} from '../../../Config';
 
@@ -90,8 +89,8 @@ const GroupCreationModal: React.FC<GroupCreationModalProps> = ({
   const [groupCreationState, setGroupCreationState] = useState<GroupCreationModalState>(
     GroupCreationModalState.DEFAULT,
   );
-  const [scrollbarRef, setScrollbarRef] = useEffectRef<HTMLDivElement>();
-  useFadingScrollbar(scrollbarRef);
+  const scrollbarElement = useRef<HTMLDivElement>(null);
+  useFadingScrollbar(scrollbarElement.current);
 
   const maxNameLength = ConversationRepository.CONFIG.GROUP.MAX_NAME_LENGTH;
   const maxSize = ConversationRepository.CONFIG.GROUP.MAX_SIZE;
@@ -308,7 +307,7 @@ const GroupCreationModal: React.FC<GroupCreationModalProps> = ({
         )}
 
         {stateIsParticipants && (
-          <div className="group-creation__list" ref={setScrollbarRef}>
+          <div className="group-creation__list" ref={scrollbarElement}>
             {getContacts().length > 0 && (
               <UserSearchableList
                 users={getContacts()}
