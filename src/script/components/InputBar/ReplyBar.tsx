@@ -102,7 +102,7 @@ const ReplyBar: FC<ReplyBarProps> = ({replyMessageEntity, onCancel}) => {
 
           {replyAsset?.isLocation() && (
             <div className="input-bar__reply__message" data-uie-name="media-location-reply-box">
-              <Icon.Location className="input-bar__reply__icon" />
+              <Icon.Location className="input-bar__reply__icon" aria-label={t('replyBarLocation')} />
 
               <span>{replyAsset.name}</span>
             </div>

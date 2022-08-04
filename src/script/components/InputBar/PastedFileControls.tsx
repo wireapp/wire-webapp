@@ -17,7 +17,7 @@
  *
  */
 
-import {FC, useMemo} from 'react';
+import {FC} from 'react';
 import Icon from 'Components/Icon';
 import {Config} from '../../Config';
 import {t} from 'Util/LocalizerUtil';
@@ -29,19 +29,8 @@ interface PastedFileControlsProps {
 }
 
 const PastedFileControls: FC<PastedFileControlsProps> = ({pastedFile, onClear, onSend}) => {
-  const pastedFilePreviewUrl = useMemo(() => {
-    if (!pastedFile) {
-      return '';
-    }
-
-    const isSupportedFileType = Config.getConfig().ALLOWED_IMAGE_TYPES.includes(pastedFile.type);
-
-    if (isSupportedFileType) {
-      return URL.createObjectURL(pastedFile);
-    }
-
-    return '';
-  }, [pastedFile]);
+  const isSupportedFileType = Config.getConfig().ALLOWED_IMAGE_TYPES.includes(pastedFile.type);
+  const pastedFilePreviewUrl = isSupportedFileType ? URL.createObjectURL(pastedFile) : '';
 
   return (
     <div className="conversation-input-bar-paste-modal" data-uie-name="pasted-file-controls">

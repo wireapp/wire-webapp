@@ -1031,6 +1031,7 @@
   "replyAudioMessage": "Audio Message",
   "replyBarCancelMessage": "Cancel answer",
   "replyBarEditMessage": "Edit",
+  "replyBarLocation": "Edit",
   "pastedFileCloseMessage": "Close",
   "pastedFileSendMessage": "Send",
   "replyQuoteError": "You cannot see this message.",

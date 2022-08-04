@@ -19,26 +19,17 @@
 
 import {Availability} from '@wireapp/protocol-messaging';
 import {WebAppEvents} from '@wireapp/webapp-events';
-import {
-  ClipboardEvent,
-  FC,
-  KeyboardEvent as ReactKeyboardEvent,
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from 'react';
+import {ClipboardEvent, KeyboardEvent as ReactKeyboardEvent, useEffect, useMemo, useRef, useState} from 'react';
 import {amplify} from 'amplify';
 import cx from 'classnames';
 import {container} from 'tsyringe';
-import ko from 'knockout';
 
 import ClassifiedBar from 'Components/input/ClassifiedBar';
 import Avatar, {AVATAR_SIZE} from 'Components/Avatar';
 
 import {registerReactComponent, useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {loadDraftState, saveDraftState} from 'Util/DraftStateUtil';
+import isHittingUploadLimit from 'Util/isHittingUploadLimit';
 import {insertAtCaret, isFunctionKey, KEY} from 'Util/KeyboardUtil';
 import {
   createMentionEntity,
@@ -48,10 +39,11 @@ import {
   updateMentionRanges,
 } from 'Util/MentionUtil';
 import {t} from 'Util/LocalizerUtil';
-import {afterRender, formatBytes} from 'Util/util';
+import {formatBytes} from 'Util/util';
 import {formatLocale, TIME_IN_MILLIS} from 'Util/TimeUtil';
 import {allowsAllFiles, getFileExtensionOrName, hasAllowedExtension} from 'Util/FileTypeUtil';
 
+import getRichTextInput from './getRichTextInput';
 import MentionSuggestionList from '../../page/message-list/MentionSuggestions';
 import {TeamState} from '../../team/TeamState';
 import {UserState} from '../../user/UserState';
@@ -78,12 +70,10 @@ import ReplyBar from './ReplyBar';
 import useScrollSync from '../../hooks/useScrollSync';
 import useResizeTarget from '../../hooks/useResizeTarget';
 import useTextAreaFocus from '../../hooks/useTextAreaFocus';
+import useDropFiles from '../../hooks/useDropFiles';
 
 const CONFIG = {
   ...Config.getConfig(),
-  ASSETS: {
-    CONCURRENT_UPLOAD_LIMIT: 10,
-  },
   PING_TIMEOUT: TIME_IN_MILLIS.SECOND * 2,
 };
 
@@ -100,7 +90,7 @@ interface InputBarProps {
   readonly userState: UserState;
 }
 
-const InputBar: FC<InputBarProps> = ({
+const InputBar = ({
   assetRepository,
   conversationEntity,
   conversationRepository,
@@ -111,7 +101,7 @@ const InputBar: FC<InputBarProps> = ({
   storageRepository,
   userState = container.resolve(UserState),
   teamState = container.resolve(TeamState),
-}) => {
+}: InputBarProps) => {
   const {classifiedDomains, isSelfDeletingMessagesEnabled, isFileSharingSendingEnabled} = useKoSubscribableChildren(
     teamState,
     ['classifiedDomains', 'isSelfDeletingMessagesEnabled', 'isFileSharingSendingEnabled'],
@@ -147,30 +137,6 @@ const InputBar: FC<InputBarProps> = ({
     'isIncomingRequest',
   ]);
 
-  const showAvailabilityTooltip = useMemo(() => {
-    if (firstUserEntity) {
-      const availabilityIsNone = availability === Availability.Type.NONE;
-
-      return inTeam && is1to1 && !availabilityIsNone;
-    }
-
-    return false;
-  }, [availability, firstUserEntity, inTeam, is1to1]);
-
-  const inputPlaceholder = useMemo(() => {
-    if (showAvailabilityTooltip) {
-      const availabilityStrings: Record<string, string> = {
-        [Availability.Type.AVAILABLE]: t('userAvailabilityAvailable'),
-        [Availability.Type.AWAY]: t('userAvailabilityAway'),
-        [Availability.Type.BUSY]: t('userAvailabilityBusy'),
-      };
-
-      return availabilityStrings[availability];
-    }
-
-    return messageTimer ? t('tooltipConversationEphemeral') : t('tooltipConversationInputPlaceholder');
-  }, [availability, messageTimer, showAvailabilityTooltip]);
-
   const shadowInputRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const isReplyingToMessagePrevRef = useRef<boolean>(false);
@@ -185,21 +151,29 @@ const InputBar: FC<InputBarProps> = ({
 
   const [currentMentions, setCurrentMentions] = useState<MentionEntity[]>([]);
   const [pingDisabled, setIsPingDisabled] = useState<boolean>(false);
-  const [conversationHasFocus, setConversationHasFocus] = useState<boolean>(true);
 
   const [editedMention, setEditedMention] = useState<{startIndex: number; term: string} | undefined>(undefined);
 
   const [pastedFile, setPastedFile] = useState<File | null>(null);
 
-  const mentionSuggestions = useMemo(() => {
-    if (!editedMention) {
-      return [];
+  const availabilityIsNone = availability === Availability.Type.NONE;
+  const showAvailabilityTooltip = firstUserEntity && inTeam && is1to1 && !availabilityIsNone;
+  const availabilityStrings: Record<string, string> = {
+    [Availability.Type.AVAILABLE]: t('userAvailabilityAvailable'),
+    [Availability.Type.AWAY]: t('userAvailabilityAway'),
+    [Availability.Type.BUSY]: t('userAvailabilityBusy'),
+  };
+
+  const inputPlaceholder = useMemo(() => {
+    if (showAvailabilityTooltip) {
+      return availabilityStrings[availability];
     }
 
-    const candidates = participatingUserEts.filter(userEntity => !userEntity.isService);
+    return messageTimer ? t('tooltipConversationEphemeral') : t('tooltipConversationInputPlaceholder');
+  }, [availability, messageTimer, showAvailabilityTooltip]);
 
-    return searchRepository.searchUserInSet(editedMention.term, candidates);
-  }, [editedMention, participatingUserEts]);
+  const candidates = participatingUserEts.filter(userEntity => !userEntity.isService);
+  const mentionSuggestions = !editedMention ? [] : searchRepository.searchUserInSet(editedMention.term, candidates);
 
   const draftMessage = useMemo(
     () => ({
@@ -212,76 +186,19 @@ const InputBar: FC<InputBarProps> = ({
 
   const isEditing = !!editMessageEntity;
   const isReplying = !!replyMessageEntity;
-  const hasFocus = isEditing || conversationHasFocus;
   const isConnectionRequest = isOutgoingRequest || isIncomingRequest;
   const hasLocalEphemeralTimer = isSelfDeletingMessagesEnabled && localMessageTimer && !hasGlobalMessageTimer;
 
-  const focusTextArea = () => {
-    if (textareaRef.current) {
-      textareaRef.current.focus();
-    }
-  };
+  const richTextInput = getRichTextInput(currentMentions, inputValue);
+
+  const focusTextArea = () => textareaRef.current?.focus();
 
   const resetDraftState = () => {
     setCurrentMentions([]);
     setInputValue('');
   };
 
-  const getRichTextInput = () => {
-    const mentionAttributes = ' class="input-mention" data-uie-name="item-input-mention"';
-
-    const pieces = currentMentions
-      .slice()
-      .reverse()
-      .reduce(
-        (currentPieces, mentionEntity) => {
-          const currentPiece = currentPieces.shift();
-
-          if (currentPiece) {
-            currentPieces.unshift(currentPiece.slice(mentionEntity.endIndex));
-            currentPieces.unshift(
-              currentPiece.slice(mentionEntity.startIndex, mentionEntity.startIndex + mentionEntity.length),
-            );
-            currentPieces.unshift(currentPiece.slice(0, mentionEntity.startIndex));
-          }
-
-          return currentPieces;
-        },
-        [inputValue],
-      );
-
-    return pieces
-      .map((piece, index) => {
-        const textPiece = piece.replace(/[\r\n]/g, '<br>');
-
-        return `<span${index % 2 ? mentionAttributes : ''}>${textPiece}</span>`;
-      })
-      .join('')
-      .replace(/<br><\/span>$/, '<br>&nbsp;</span>');
-  };
-
-  const richTextInput = getRichTextInput();
-
   const clearPastedFile = () => setPastedFile(null);
-
-  const _isHittingUploadLimit = (files: File[]): boolean => {
-    const concurrentUploadLimit = CONFIG.ASSETS.CONCURRENT_UPLOAD_LIMIT;
-    const concurrentUploads = files.length + assetRepository.getNumberOfOngoingUploads();
-    const isHittingUploadLimit = concurrentUploads > concurrentUploadLimit;
-
-    if (isHittingUploadLimit) {
-      const modalOptions = {
-        text: {
-          message: t('modalAssetParallelUploadsMessage', concurrentUploadLimit),
-          title: t('modalAssetParallelUploadsHeadline'),
-        },
-      };
-
-      amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.ACKNOWLEDGE, modalOptions);
-    }
-
-    return isHittingUploadLimit;
-  };
 
   const onDropOrPastedFile = (droppedFiles: File[]) => {
     const images: File[] = [];
@@ -293,33 +210,27 @@ const InputBar: FC<InputBarProps> = ({
       return;
     }
 
-    const tooManyConcurrentUploads = _isHittingUploadLimit(droppedFiles);
+    if (!isHittingUploadLimit(droppedFiles, assetRepository)) {
+      Array.from(droppedFiles).forEach((file): void | number => {
+        const isSupportedImage = CONFIG.ALLOWED_IMAGE_TYPES.includes(file.type);
 
-    if (tooManyConcurrentUploads) {
-      return;
+        if (isSupportedImage) {
+          return images.push(file);
+        }
+
+        files.push(file);
+      });
+
+      uploadImages(images);
+      uploadFiles(files);
     }
-
-    Array.from(droppedFiles).forEach((file): void | number => {
-      const isSupportedImage = CONFIG.ALLOWED_IMAGE_TYPES.includes(file.type);
-
-      if (isSupportedImage) {
-        return images.push(file);
-      }
-
-      files.push(file);
-    });
-
-    uploadImages(images);
-    uploadFiles(files);
   };
 
   const sendPastedFile = () => {
-    if (!pastedFile) {
-      return;
+    if (pastedFile) {
+      onDropOrPastedFile([pastedFile]);
+      clearPastedFile();
     }
-
-    onDropOrPastedFile([pastedFile]);
-    clearPastedFile();
   };
 
   const endMentionFlow = () => {
@@ -330,27 +241,25 @@ const InputBar: FC<InputBarProps> = ({
   const addMention = (userEntity: User, inputElement: HTMLInputElement): void => {
     const mentionEntity = createMentionEntity(userEntity, editedMention);
 
-    if (!mentionEntity || !editedMention?.term) {
-      return;
+    if (mentionEntity && editedMention?.term) {
+      // keep track of what is before and after the mention being edited
+      const beforeMentionPartial = inputValue.slice(0, mentionEntity.startIndex);
+      const afterMentionPartial = inputValue
+        .slice(mentionEntity.startIndex + editedMention.term.length + 1)
+        .replace(/^ /, '');
+
+      // insert the mention in between
+      setInputValue(`${beforeMentionPartial}@${userEntity.name()} ${afterMentionPartial}`);
+
+      setCurrentMentions(prevState =>
+        [...prevState, mentionEntity].sort((mentionA, mentionB) => mentionA.startIndex - mentionB.startIndex),
+      );
+
+      const caretPosition = mentionEntity.endIndex + 1;
+      inputElement.selectionStart = caretPosition;
+      inputElement.selectionEnd = caretPosition;
+      endMentionFlow();
     }
-
-    // keep track of what is before and after the mention being edited
-    const beforeMentionPartial = inputValue.slice(0, mentionEntity.startIndex);
-    const afterMentionPartial = inputValue
-      .slice(mentionEntity.startIndex + editedMention.term.length + 1)
-      .replace(/^ /, '');
-
-    // insert the mention in between
-    setInputValue(`${beforeMentionPartial}@${userEntity.name()} ${afterMentionPartial}`);
-
-    setCurrentMentions(prevState =>
-      [...prevState, mentionEntity].sort((mentionA, mentionB) => mentionA.startIndex - mentionB.startIndex),
-    );
-
-    const caretPosition = mentionEntity.endIndex + 1;
-    inputElement.selectionStart = caretPosition;
-    inputElement.selectionEnd = caretPosition;
-    endMentionFlow();
   };
 
   const handleMentionFlow = () => {
@@ -414,17 +323,14 @@ const InputBar: FC<InputBarProps> = ({
     focusTextArea();
   };
 
-  const moveCursorToEnd = useCallback(() => {
-    //todo
-    afterRender(() => {
-      if (textareaRef.current) {
-        focusTextArea();
-        const endPosition = textareaRef.current.value.length;
-        textareaRef.current.setSelectionRange(endPosition, endPosition);
-        updateSelectionState();
-      }
-    });
-  }, [updateSelectionState]);
+  const moveCursorToEnd = () => {
+    if (textareaRef.current) {
+      focusTextArea();
+      const endPosition = textareaRef.current.value.length;
+      textareaRef.current.setSelectionRange(endPosition, endPosition);
+      updateSelectionState();
+    }
+  };
 
   const editMessage = (messageEntity: ContentMessage) => {
     if (messageEntity?.isEditable() && messageEntity !== editMessageEntity) {
@@ -513,7 +419,6 @@ const InputBar: FC<InputBarProps> = ({
           if (keyboardEvent.altKey || keyboardEvent.metaKey) {
             if (keyboardEvent.target) {
               insertAtCaret(keyboardEvent.target.toString(), '\n');
-              ko.utils.triggerEvent(keyboardEvent.target as Element, 'change');
               keyboardEvent.preventDefault();
             }
           }
@@ -568,16 +473,14 @@ const InputBar: FC<InputBarProps> = ({
   };
 
   const sendMessage = (messageText: string): void => {
-    if (!messageText.length) {
-      return;
+    if (messageText.length) {
+      const mentionEntities = currentMentions.slice(0);
+
+      generateQuote().then(quoteEntity => {
+        messageRepository.sendTextWithLinkPreview(conversationEntity, messageText, mentionEntities, quoteEntity);
+        cancelMessageReply();
+      });
     }
-
-    const mentionEntities = currentMentions.slice(0);
-
-    generateQuote().then(quoteEntity => {
-      messageRepository.sendTextWithLinkPreview(conversationEntity, messageText, mentionEntities, quoteEntity);
-      cancelMessageReply();
-    });
   };
 
   const sendMessageEdit = (messageText: string): void | Promise<any> => {
@@ -636,25 +539,6 @@ const InputBar: FC<InputBarProps> = ({
     focusTextArea();
   };
 
-  const isHittingUploadLimit = (files: File[]) => {
-    const concurrentUploadLimit = CONFIG.ASSETS.CONCURRENT_UPLOAD_LIMIT;
-    const concurrentUploads = files.length + assetRepository.getNumberOfOngoingUploads();
-    const isHittingUploadLimit = concurrentUploads > CONFIG.ASSETS.CONCURRENT_UPLOAD_LIMIT;
-
-    if (isHittingUploadLimit) {
-      const modalOptions = {
-        text: {
-          message: t('modalAssetParallelUploadsMessage', concurrentUploadLimit),
-          title: t('modalAssetParallelUploadsHeadline'),
-        },
-      };
-
-      amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.ACKNOWLEDGE, modalOptions);
-    }
-
-    return isHittingUploadLimit;
-  };
-
   const uploadFiles = (files: File[]) => {
     const fileArray = Array.from(files);
 
@@ -675,7 +559,7 @@ const InputBar: FC<InputBarProps> = ({
 
     const uploadLimit = inTeam ? CONFIG.MAXIMUM_ASSET_FILE_SIZE_TEAM : CONFIG.MAXIMUM_ASSET_FILE_SIZE_PERSONAL;
 
-    if (!isHittingUploadLimit(files)) {
+    if (!isHittingUploadLimit(files, assetRepository)) {
       for (const file of fileArray) {
         const isFileTooLarge = file.size > uploadLimit;
 
@@ -699,7 +583,7 @@ const InputBar: FC<InputBarProps> = ({
   };
 
   const uploadImages = (images: File[]) => {
-    if (!isHittingUploadLimit(images)) {
+    if (!isHittingUploadLimit(images, assetRepository)) {
       for (const image of Array.from(images)) {
         const isImageTooLarge = image.size > CONFIG.MAXIMUM_IMAGE_FILE_SIZE;
 
@@ -750,14 +634,13 @@ const InputBar: FC<InputBarProps> = ({
       return;
     }
 
-    const pastedFiles = event.clipboardData.files;
-
     if (!isFileSharingSendingEnabled) {
       showRestrictedFileSharingModal();
 
       return;
     }
 
+    const pastedFiles = event.clipboardData.files;
     const [pastedFile] = pastedFiles;
     const {lastModified} = pastedFile;
 
@@ -772,7 +655,7 @@ const InputBar: FC<InputBarProps> = ({
   };
 
   const loadInitialStateForConversation = async (): Promise<void> => {
-    setConversationHasFocus(true);
+    focusTextArea();
     setPastedFile(null);
     cancelMessageEditing();
     cancelMessageReply();
@@ -803,12 +686,10 @@ const InputBar: FC<InputBarProps> = ({
 
   const sendGiphy = (gifUrl: string, tag: string): void => {
     generateQuote().then(quoteEntity => {
-      if (!quoteEntity) {
-        return;
+      if (quoteEntity) {
+        messageRepository.sendGif(conversationEntity, gifUrl, tag, quoteEntity);
+        cancelMessageEditing(true);
       }
-
-      messageRepository.sendGif(conversationEntity, gifUrl, tag, quoteEntity);
-      cancelMessageEditing(true);
     });
   };
 
@@ -817,32 +698,25 @@ const InputBar: FC<InputBarProps> = ({
       '.conversation-input-bar, .conversation-input-bar-mention-suggestion, .ctx-menu',
     );
 
-    if (ignoredParent) {
-      return;
+    if (!ignoredParent) {
+      cancelMessageEditing();
+      cancelMessageReply();
     }
-
-    cancelMessageEditing();
-    cancelMessageReply();
   };
 
   useEffect(() => {
+    loadInitialStateForConversation();
+
     amplify.subscribe(WebAppEvents.CONVERSATION.IMAGE.SEND, uploadImages);
     amplify.subscribe(WebAppEvents.CONVERSATION.MESSAGE.EDIT, editMessage);
     amplify.subscribe(WebAppEvents.CONVERSATION.MESSAGE.REPLY, replyMessage);
     amplify.subscribe(WebAppEvents.EXTENSIONS.GIPHY.SEND, sendGiphy);
-    amplify.subscribe(WebAppEvents.SEARCH.SHOW, () => setConversationHasFocus(false));
-    amplify.subscribe(WebAppEvents.SEARCH.HIDE, () => {
-      window.requestAnimationFrame(() => setConversationHasFocus(true));
-    });
+    amplify.subscribe(WebAppEvents.SEARCH.HIDE, () => window.requestAnimationFrame(focusTextArea));
     amplify.subscribe(WebAppEvents.SHORTCUT.PING, onPingClick);
 
     return () => {
       amplify.unsubscribeAll(WebAppEvents.SHORTCUT.PING);
     };
-  }, []);
-
-  useEffect(() => {
-    loadInitialStateForConversation();
   }, []);
 
   useEffect(() => {
@@ -907,38 +781,7 @@ const InputBar: FC<InputBarProps> = ({
   }, [isEditing]);
 
   // Temporarily functionality for dropping files on conversation container, should be moved to Conversation Component
-  useEffect(() => {
-    const getConversationContainer = document.querySelector('#conversation');
-
-    const onDragOver = (event: Event) => event.preventDefault();
-
-    const onDropFiles = (event: Event) => {
-      event.preventDefault();
-
-      const {dataTransfer} = event as DragEvent;
-      const eventDataTransfer = dataTransfer || {};
-      const files = (eventDataTransfer as DataTransfer).files || new FileList();
-
-      if (files.length > 0) {
-        onDropOrPastedFile([files[0]]);
-      }
-    };
-
-    if (getConversationContainer) {
-      getConversationContainer.addEventListener('drop', onDropFiles);
-      getConversationContainer.addEventListener('dragover', onDragOver);
-
-      return () => {
-        getConversationContainer.removeEventListener('drop', onDropFiles);
-        getConversationContainer.removeEventListener('dragover', onDragOver);
-      };
-    }
-
-    return () => undefined;
-  }, []);
-
-  // console.log('przemvs isReplying', isReplying);
-  // console.log('przemvs isEditing', isEditing);
+  useDropFiles('#conversation', onDropOrPastedFile);
 
   return (
     <div id="conversation-input-bar" className="conversation-input-bar">
@@ -961,8 +804,6 @@ const InputBar: FC<InputBarProps> = ({
               <>
                 <div className="controls-center">
                   <textarea
-                    /* eslint-disable-next-line jsx-a11y/no-autofocus */
-                    autoFocus={hasFocus}
                     ref={textareaRef}
                     id="conversation-input-bar-text"
                     className={cx('conversation-input-bar-text', {
