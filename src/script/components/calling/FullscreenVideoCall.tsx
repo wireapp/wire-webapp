@@ -75,11 +75,16 @@ const FullscreenVideoCallConfig = {
 
 const videoControlActiveStyles = css`
   background-color: var(--main-color);
+  border: 1px solid var(--main-color);
   svg > path {
     fill: var(--app-bg-secondary);
   }
   &:hover {
     background-color: var(--background);
+  }
+  &:active {
+    background-color: var(--accent-color-highlight-inversed);
+    border: 1px solid var(--accent-color-focus);
   }
 `;
 
@@ -93,6 +98,10 @@ const videoControlInActiveStyles = css`
   &:hover {
     background-color: var(--inactive-call-button-hover-bg);
     border: 1px solid var(--inactive-call-button-hover-border);
+  }
+  &:active {
+    background-color: var(--accent-color-highlight);
+    border: 1px solid var(--accent-color-focus);
   }
 `;
 
@@ -110,7 +119,13 @@ const paginationButtonStyles: CSSObject = {
     fill: 'var(--main-color)',
   },
   ['&:focus-visible']: {
+    ['& svg > path']: {
+      fill: 'var(--accent-color)',
+    },
     outline: '1px solid var(--accent-color-focus)',
+  },
+  ['&:hover svg > path']: {
+    fill: 'var(--accent-color)',
   },
   alignItems: 'center',
   backgroundColor: 'var(--app-bg-secondary)',
