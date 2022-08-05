@@ -18,12 +18,13 @@
  */
 
 import {render} from '@testing-library/react';
+import {EntropyData} from '../../util/Entropy';
 import {withIntl, withTheme} from '../util/test/TestUtil';
 import EntropyContainer from './EntropyContainer';
 require('jest-canvas-mock');
 
 describe('EntropyContainer', () => {
-  const mockonSetEntropy = jest.fn().mockImplementation((a: [number, number][]) => {
+  const mockonSetEntropy = jest.fn().mockImplementation((a: EntropyData) => {
     // eslint-disable-next-line no-console
     console.log(a);
   });
