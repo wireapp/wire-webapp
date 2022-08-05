@@ -1957,9 +1957,11 @@ export class ConversationRepository {
       .then(
         conversationEntity => this.reactToConversationEvent(conversationEntity, eventJson, eventSource) as EntityObject,
       )
-      .then((entityObject = {} as EntityObject) =>
-        this.handleConversationNotification(entityObject as EntityObject, eventSource, previouslyArchived),
-      )
+      .then((entityObject = {} as EntityObject) => {
+        if (type !== CONVERSATION_EVENT.MEMBER_JOIN && type !== CONVERSATION_EVENT.MEMBER_LEAVE) {
+          this.handleConversationNotification(entityObject as EntityObject, eventSource, previouslyArchived);
+        }
+      })
       .catch((error: BaseError) => {
         const ignoredErrorTypes: string[] = [
           ConversationError.TYPE.MESSAGE_NOT_FOUND,
