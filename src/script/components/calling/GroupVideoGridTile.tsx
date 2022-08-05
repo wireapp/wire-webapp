@@ -84,7 +84,6 @@ const GroupVideoGridTile: React.FC<GroupVideoGridTileProps> = ({
             alignItems: 'center',
             backgroundColor: 'var(--group-video-tile-bg)',
             borderRadius: '8px',
-            // boxShadow: participantCount > 1 ? 'inset 0px 0px 0px 2px var(--group-video-bg)' : 'initial',
             display: 'flex',
             height: '100%',
             justifyContent: 'center',
@@ -114,6 +113,16 @@ const GroupVideoGridTile: React.FC<GroupVideoGridTileProps> = ({
         <span className="group-video-grid__element__label__icon">
           <Icon.MicOff data-uie-name="mic-icon-off" />
         </span>
+      )}
+      {isMaximized && (
+        <div className="group-video-grid__element__overlay">
+          <span className="group-video-grid__element__overlay__label">{t('videoCallOverlayFitVideoLabelGoBack')}</span>
+        </div>
+      )}
+      {!minimized && participantCount > 1 && (
+        <div className="group-video-grid__element__overlay">
+          <span className="group-video-grid__element__overlay__label">{t('videoCallOverlayFitVideoLabel')}</span>
+        </div>
       )}
       {!minimized && (
         <div

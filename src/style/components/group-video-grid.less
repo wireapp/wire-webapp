@@ -96,6 +96,30 @@
       height: calc(100% / var(--rows));
       box-sizing: border-box;
 
+      &__overlay {
+        position: absolute;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        border-radius: 8px;
+        opacity: 0;
+        transition: opacity 0.35s ease-in-out;
+        &:hover {
+          opacity: 1;
+        }
+        &__label {
+          .label-small-medium;
+          position: absolute;
+          top: 7px;
+          right: 7px;
+          padding: 5px 10px;
+          background-color: var(--accent-color);
+          border-radius: 6px;
+          color: var(--app-bg-secondary);
+        }
+      }
+
       &--empty {
         overflow: hidden;
         width: 0;
