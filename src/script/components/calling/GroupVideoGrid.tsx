@@ -107,10 +107,7 @@ const GroupVideoGrid: React.FunctionComponent<GroupVideoGripProps> = ({
     setRowsAndColumns(calculateRowsAndColumns(participants.length));
   }, [participants.length]);
 
-  const {isMuted: selfIsMuted, isActivelySpeaking: selfIsActivelySpeaking} = useKoSubscribableChildren(
-    selfParticipant,
-    ['isMuted', 'isActivelySpeaking'],
-  );
+  const {isMuted: selfIsMuted} = useKoSubscribableChildren(selfParticipant, ['isMuted']);
   // const {name: selfName} = useKoSubscribableChildren(selfParticipant?.user, ['name']);
 
   return (
@@ -169,34 +166,11 @@ const GroupVideoGrid: React.FunctionComponent<GroupVideoGripProps> = ({
             }}
             srcObject={thumbnail.videoStream}
           />
-          {/* <div className="group-video-grid__element__label" css={{padding: 4}}> */}
-          <div>
-            {selfIsMuted ? (
-              <span
-                // className="group-video-grid__element__label__icon"
-                css={{'> svg': {width: 12}, height: 12}}
-                data-uie-name="status-call-audio-muted"
-              >
-                {/* <Icon.MicOff data-uie-name="mic-icon-off" /> */}
-              </span>
-            ) : (
-              <span />
-              // <ParticipantMicOnIcon
-              //   isActive={selfIsActivelySpeaking}
-              //   className="group-video-grid__element__label__icon"
-              //   css={{'> svg': {width: 12}}}
-              // />
-            )}
-            <span
-              data-uie-name={
-                selfIsActivelySpeaking ? 'status-active-speaking' : selfIsMuted ? 'status-audio-off' : 'status-audio-on'
-              }
-              // className="group-video-grid__element__label__name"
-              css={{fontSize: 10}}
-            >
-              {/* {selfName} */}
+          {selfIsMuted && !minimized && (
+            <span className="group-video-grid__element__label__icon" data-uie-name="status-call-audio-muted">
+              <Icon.MicOff data-uie-name="mic-icon-off" />
             </span>
-          </div>
+          )}
         </GroupVideoThumbnailWrapper>
       )}
       {!!grid.thumbnail && !thumbnail.hasActiveVideo && !!selfParticipant && (
@@ -210,6 +184,11 @@ const GroupVideoGrid: React.FunctionComponent<GroupVideoGripProps> = ({
               width: '100%',
             }}
           >
+            {selfIsMuted && !minimized && (
+              <span className="group-video-grid__element__label__icon" data-uie-name="status-call-audio-muted">
+                <Icon.MicOff data-uie-name="mic-icon-off" />
+              </span>
+            )}
             <Avatar
               avatarSize={minimized ? AVATAR_SIZE.SMALL : AVATAR_SIZE.MEDIUM}
               participant={selfParticipant.user}
