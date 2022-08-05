@@ -281,7 +281,6 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
           setMaximizedParticipant={participant => setMaximizedParticipant(call, participant)}
         />
       </div>
-      {/* {!isChoosingScreen && <div className="video-element-overlay"></div>} */}
       {!maximizedParticipant && activeCallViewTab === CallViewTab.ALL && totalPages > 1 && (
         <>
           {currentPage !== totalPages - 1 && (
@@ -316,10 +315,7 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
               <Icon.ArrowNext css={{position: 'relative', right: 4, transform: 'rotate(180deg)'}} />
             </button>
           )}
-          <div
-            // className="hide-controls-hidden"
-            css={{bottom: 110, display: 'flex', justifyContent: 'center', position: 'absolute', width: '100%'}}
-          >
+          <div css={{bottom: 110, display: 'flex', justifyContent: 'center', position: 'absolute', width: '100%'}}>
             <Pagination
               totalPages={totalPages}
               currentPage={currentPage}
@@ -330,11 +326,6 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
       )}
       {!isChoosingScreen && (
         <div id="video-controls" className="video-controls">
-          {/* {(videoGrid.grid.length > 1 || maximizedParticipant) && (
-            <div className="video-controls__fit-info" data-uie-name="label-fit-fill-info">
-              {maximizedParticipant ? t('videoCallOverlayFitVideoLabelGoBack') : t('videoCallOverlayFitVideoLabel')}
-            </div>
-          )} */}
           <ul className="video-controls__wrapper">
             <li className="video-controls__item">
               <button

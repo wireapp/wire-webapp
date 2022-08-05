@@ -27,7 +27,6 @@ import type {Grid} from '../../calling/videoGridHandler';
 import Video from './Video';
 import type {Participant} from '../../calling/Participant';
 import GroupVideoGridTile from './GroupVideoGridTile';
-// import ParticipantMicOnIcon from './ParticipantMicOnIcon';
 import Avatar, {AVATAR_SIZE} from 'Components/Avatar';
 import {QualifiedId} from '@wireapp/api-client/src/user';
 
@@ -108,7 +107,6 @@ const GroupVideoGrid: React.FunctionComponent<GroupVideoGripProps> = ({
   }, [participants.length]);
 
   const {isMuted: selfIsMuted} = useKoSubscribableChildren(selfParticipant, ['isMuted']);
-  // const {name: selfName} = useKoSubscribableChildren(selfParticipant?.user, ['name']);
 
   return (
     <div className="group-video">
