@@ -217,20 +217,38 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
   return (
     <div id="video-calling" className="video-calling" ref={setWrapper}>
       <div id="video-title" className="video-title">
-        <div className="video-remote-name">{conversationName}</div>
-        {muteState === MuteState.REMOTE_MUTED && (
-          <div className="video-title__info-bar">{t('muteStateRemoteMute')}</div>
-        )}
         {classifiedDomains && (
           <ClassifiedBar
             users={conversationParticipants}
             classifiedDomains={classifiedDomains}
-            style={{display: 'inline-block', lineHeight: '1.5em', margin: '1em 0', padding: '0 1em', width: 'auto'}}
+            style={{
+              display: 'inline-block',
+              left: '12px',
+              lineHeight: '1.5em',
+              margin: '1em 0',
+              padding: '0 1em',
+              position: 'absolute',
+              width: 'auto',
+            }}
           />
         )}
-        <div data-uie-name="video-timer" className="video-timer label-xs">
-          <Duration startedAt={startedAt} />
+        <div className="video-remote-name">
+          {conversationName}
+          <div data-uie-name="video-timer" className="video-timer label-xs">
+            <Duration startedAt={startedAt} />
+          </div>
         </div>
+        {muteState === MuteState.REMOTE_MUTED && (
+          <div
+            className="video-title__info-bar"
+            style={{
+              position: 'absolute',
+              right: '12px',
+            }}
+          >
+            {t('muteStateRemoteMute')}
+          </div>
+        )}
       </div>
 
       <div id="video-element-remote" className="video-element-remote">
