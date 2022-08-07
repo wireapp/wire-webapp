@@ -2018,7 +2018,7 @@ exports[`stricter compilation`] = {
       [82, 29, 5, "Type \'string | undefined\' is not assignable to type \'string\'.\\n  Type \'undefined\' is not assignable to type \'string\'.", "174572682"],
       [82, 36, 4, "Type \'string | undefined\' is not assignable to type \'string\'.\\n  Type \'undefined\' is not assignable to type \'string\'.", "2087961072"],
       [82, 42, 4, "Type \'ClientType.PERMANENT | ClientType.TEMPORARY | undefined\' is not assignable to type \'ClientType\'.\\n  Type \'undefined\' is not assignable to type \'ClientType\'.", "2087944093"],
-      [114, 9, 6, "Type \'string | undefined\' is not assignable to type \'string | null\'.", "1127975365"]
+      [114, 9, 6, "Type \'string | undefined\' is not assignable to type \'string | null\'.\\n  Type \'undefined\' is not assignable to type \'string | null\'.", "1127975365"]
     ],
     "src/script/page/AccentColorPicker.test.tsx:2337834610": [
       [52, 10, 5, "Type \'HTMLInputElement | null\' is not assignable to type \'HTMLInputElement\'.\\n  Type \'null\' is not assignable to type \'HTMLInputElement\'.", "178805363"],
@@ -2109,10 +2109,8 @@ exports[`stricter compilation`] = {
     "src/script/page/message-list/InputBarControls/InputBarControls.test.tsx:2517377529": [
       [33, 2, 12, "Type \'undefined\' is not assignable to type \'Conversation\'.", "1670678216"]
     ],
-    "src/script/page/message-list/MentionSuggestions/MentionSuggestions.tsx:175584215": [
-      [77, 69, 11, "Argument of type \'HTMLInputElement | null\' is not assignable to parameter of type \'HTMLInputElement\'.\\n  Type \'null\' is not assignable to type \'HTMLInputElement\'.", "2551690754"],
-      [120, 49, 11, "Argument of type \'HTMLInputElement | null\' is not assignable to parameter of type \'HTMLInputElement\'.\\n  Type \'null\' is not assignable to type \'HTMLInputElement\'.", "2551690754"],
-      [123, 14, 3, "Type \'((node: Element) => void) | undefined\' is not assignable to type \'Ref<HTMLDivElement> | undefined\'.\\n  Type \'(node: Element) => void\' is not assignable to type \'Ref<HTMLDivElement> | undefined\'.\\n    Type \'(node: Element) => void\' is not assignable to type \'(instance: HTMLDivElement | null) => void\'.\\n      Types of parameters \'node\' and \'instance\' are incompatible.\\n        Type \'HTMLDivElement | null\' is not assignable to type \'Element\'.\\n          Type \'null\' is not assignable to type \'Element\'.", "193432436"]
+    "src/script/page/message-list/MentionSuggestions/MentionSuggestions.tsx:236755770": [
+      [122, 14, 3, "Type \'((node: Element) => void) | undefined\' is not assignable to type \'Ref<HTMLDivElement> | undefined\'.\\n  Type \'(node: Element) => void\' is not assignable to type \'Ref<HTMLDivElement> | undefined\'.\\n    Type \'(node: Element) => void\' is not assignable to type \'(instance: HTMLDivElement | null) => void\'.\\n      Types of parameters \'node\' and \'instance\' are incompatible.\\n        Type \'HTMLDivElement | null\' is not assignable to type \'Element\'.\\n          Type \'null\' is not assignable to type \'Element\'.", "193432436"]
     ],
     "src/script/page/message-list/MessageTimerButton.test.ts:254586997": [
       [33, 46, 29, "Argument of type \'Element | null\' is not assignable to parameter of type \'Element\'.\\n  Type \'null\' is not assignable to type \'Element\'.", "4019893960"],
@@ -2342,10 +2340,6 @@ exports[`stricter compilation`] = {
     "src/script/util/FileTypeUtil.ts:2165001675": [
       [48, 68, 29, "Object is possibly \'null\'.", "3648478764"]
     ],
-    "src/script/util/KeyboardUtil.ts:1178337049": [
-      [155, 78, 13, "Object is possibly \'null\'.", "2879944190"],
-      [161, 6, 21, "Type \'string | undefined\' is not assignable to type \'string | null\'.\\n  Type \'undefined\' is not assignable to type \'string | null\'.", "3866716832"]
-    ],
     "src/script/util/PromiseQueue.ts:2903873298": [
       [64, 22, 7, "Object is possibly \'undefined\'.", "717644789"],
       [67, 18, 7, "Object is possibly \'undefined\'.", "717644789"],
@@ -2395,13 +2389,13 @@ exports[`stricter compilation`] = {
     "src/script/util/test/mock/LocalStorageMock.ts:763526660": [
       [30, 4, 15, "Type \'null\' is not assignable to type \'string\'.", "729139267"]
     ],
-    "src/script/util/util.ts:665565464": [
-      [48, 40, 34, "Argument of type \'boolean | undefined\' is not assignable to parameter of type \'boolean\'.", "212151669"],
-      [102, 34, 13, "Argument of type \'string | ArrayBuffer | null\' is not assignable to parameter of type \'string | ArrayBuffer | PromiseLike<string | ArrayBuffer>\'.\\n  Type \'null\' is not assignable to type \'string | ArrayBuffer | PromiseLike<string | ArrayBuffer>\'.", "3216273927"],
-      [120, 41, 8, "Type \'string | null\' is not assignable to type \'string\'.\\n  Type \'null\' is not assignable to type \'string\'.", "3750463409"],
-      [190, 9, 29, "Object is possibly \'null\'.", "3854968340"],
-      [328, 21, 4, "\'this\' implicitly has type \'any\' because it does not have a type annotation.", "2087959715"],
-      [352, 52, 22, "Argument of type \'Element | null\' is not assignable to parameter of type \'Element\'.\\n  Type \'null\' is not assignable to type \'Element\'.", "1093908406"]
+    "src/script/util/util.ts:4200255865": [
+      [50, 40, 34, "Argument of type \'boolean | undefined\' is not assignable to parameter of type \'boolean\'.", "212151669"],
+      [104, 34, 13, "Argument of type \'string | ArrayBuffer | null\' is not assignable to parameter of type \'string | ArrayBuffer | PromiseLike<string | ArrayBuffer>\'.\\n  Type \'null\' is not assignable to type \'string | ArrayBuffer | PromiseLike<string | ArrayBuffer>\'.", "3216273927"],
+      [122, 41, 8, "Type \'string | null\' is not assignable to type \'string\'.\\n  Type \'null\' is not assignable to type \'string\'.", "3750463409"],
+      [192, 9, 29, "Object is possibly \'null\'.", "3854968340"],
+      [330, 21, 4, "\'this\' implicitly has type \'any\' because it does not have a type annotation.", "2087959715"],
+      [354, 52, 22, "Argument of type \'Element | null\' is not assignable to parameter of type \'Element\'.\\n  Type \'null\' is not assignable to type \'Element\'.", "1093908406"]
     ],
     "src/script/view_model/ActionsViewModel.ts:125543468": [
       [117, 82, 22, "Argument of type \'Conversation | undefined\' is not assignable to parameter of type \'Conversation\'.\\n  Type \'undefined\' is not assignable to type \'Conversation\'.", "4075697524"],

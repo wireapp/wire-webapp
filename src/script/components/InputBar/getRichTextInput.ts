@@ -21,26 +21,26 @@ import {MentionEntity} from '../../message/MentionEntity';
 
 const mentionAttributes = ' class="input-mention" data-uie-name="item-input-mention"';
 
-const getPieces = (currentMentions: MentionEntity[], inputValue: string) =>
-  currentMentions
-    .slice()
-    .reverse()
-    .reduce(
-      (currentPieces, mentionEntity) => {
-        const currentPiece = currentPieces.shift();
+const getPieces = (currentMentions: MentionEntity[], inputValue: string) => {
+  const revertedCurrentMentions = currentMentions.slice().reverse();
 
-        if (currentPiece) {
-          currentPieces.unshift(currentPiece.slice(mentionEntity.endIndex));
-          currentPieces.unshift(
-            currentPiece.slice(mentionEntity.startIndex, mentionEntity.startIndex + mentionEntity.length),
-          );
-          currentPieces.unshift(currentPiece.slice(0, mentionEntity.startIndex));
-        }
+  return revertedCurrentMentions.reduce(
+    (currentPieces, mentionEntity) => {
+      const currentPiece = currentPieces.shift();
 
-        return currentPieces;
-      },
-      [inputValue],
-    );
+      if (currentPiece) {
+        currentPieces.unshift(currentPiece.slice(mentionEntity.endIndex));
+        currentPieces.unshift(
+          currentPiece.slice(mentionEntity.startIndex, mentionEntity.startIndex + mentionEntity.length),
+        );
+        currentPieces.unshift(currentPiece.slice(0, mentionEntity.startIndex));
+      }
+
+      return currentPieces;
+    },
+    [inputValue],
+  );
+};
 
 const getRichTextInput = (currentMentions: MentionEntity[], inputValue: string) => {
   const pieces = getPieces(currentMentions, inputValue);

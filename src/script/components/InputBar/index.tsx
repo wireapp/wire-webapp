@@ -22,6 +22,7 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 import {
   ClipboardEvent as ReactClipboardEvent,
   KeyboardEvent as ReactKeyboardEvent,
+  FormEvent,
   useEffect,
   useMemo,
   useRef,
@@ -41,12 +42,11 @@ import {insertAtCaret, isFunctionKey, KEY} from 'Util/KeyboardUtil';
 import {
   createMentionEntity,
   detectMentionEdgeDeletion,
-  findMentionAtPosition,
   getMentionCandidate,
   updateMentionRanges,
 } from 'Util/MentionUtil';
 import {t} from 'Util/LocalizerUtil';
-import {formatBytes} from 'Util/util';
+import {formatBytes, getSelectionPosition} from 'Util/util';
 import {formatLocale, TIME_IN_MILLIS} from 'Util/TimeUtil';
 import {allowsAllFiles, getFileExtensionOrName, hasAllowedExtension} from 'Util/FileTypeUtil';
 
@@ -76,8 +76,8 @@ import PastedFileControls from './PastedFileControls';
 import ReplyBar from './ReplyBar';
 import useScrollSync from '../../hooks/useScrollSync';
 import useResizeTarget from '../../hooks/useResizeTarget';
-import useTextAreaFocus from '../../hooks/useTextAreaFocus';
 import useDropFiles from '../../hooks/useDropFiles';
+import useTextAreaFocus from '../../hooks/useTextAreaFocus';
 
 const CONFIG = {
   ...Config.getConfig(),
@@ -113,10 +113,8 @@ const InputBar = ({
     teamState,
     ['classifiedDomains', 'isSelfDeletingMessagesEnabled', 'isFileSharingSendingEnabled'],
   );
-
   const {self: selfUser} = useKoSubscribableChildren(userState, ['self']);
   const {inTeam} = useKoSubscribableChildren(selfUser, ['inTeam']);
-
   const {
     connection,
     firstUserEntity,
@@ -136,9 +134,7 @@ const InputBar = ({
     'removed_from_conversation',
     'is1to1',
   ]);
-
   const {availability} = useKoSubscribableChildren(firstUserEntity, ['availability']);
-
   const {isOutgoingRequest, isIncomingRequest} = useKoSubscribableChildren(connection, [
     'isOutgoingRequest',
     'isIncomingRequest',
@@ -150,18 +146,13 @@ const InputBar = ({
 
   const [editMessageEntity, setEditMessageEntity] = useState<ContentMessage | null>(null);
   const [replyMessageEntity, setReplyMessageEntity] = useState<ContentMessage | null>(null);
-
+  const [currentMentions, setCurrentMentions] = useState<MentionEntity[]>([]);
+  const [pastedFile, setPastedFile] = useState<File | null>(null);
   const [inputValue, setInputValue] = useState<string>('');
-
   const [selectionStart, setSelectionStart] = useState<number>(0);
   const [selectionEnd, setSelectionEnd] = useState<number>(0);
-
-  const [currentMentions, setCurrentMentions] = useState<MentionEntity[]>([]);
   const [pingDisabled, setIsPingDisabled] = useState<boolean>(false);
-
   const [editedMention, setEditedMention] = useState<{startIndex: number; term: string} | undefined>(undefined);
-
-  const [pastedFile, setPastedFile] = useState<File | null>(null);
 
   const availabilityIsNone = availability === Availability.Type.NONE;
   const showAvailabilityTooltip = firstUserEntity && inTeam && is1to1 && !availabilityIsNone;
@@ -180,16 +171,7 @@ const InputBar = ({
   }, [availability, messageTimer, showAvailabilityTooltip]);
 
   const candidates = participatingUserEts.filter(userEntity => !userEntity.isService);
-  const mentionSuggestions = !editedMention ? [] : searchRepository.searchUserInSet(editedMention.term, candidates);
-
-  const draftMessage = useMemo(
-    () => ({
-      mentions: currentMentions,
-      reply: replyMessageEntity,
-      text: inputValue,
-    }),
-    [currentMentions, inputValue, replyMessageEntity],
-  );
+  const mentionSuggestions = editedMention ? searchRepository.searchUserInSet(editedMention.term, candidates) : [];
 
   const isEditing = !!editMessageEntity;
   const isReplying = !!replyMessageEntity;
@@ -198,7 +180,35 @@ const InputBar = ({
 
   const richTextInput = getRichTextInput(currentMentions, inputValue);
 
-  const focusTextArea = () => textareaRef.current?.focus();
+  const updateSelectionState = (updateOnInit = true) => {
+    if (!updateOnInit) {
+      return;
+    }
+
+    if (!textareaRef.current) {
+      return;
+    }
+
+    const {selectionStart: start, selectionEnd: end} = textareaRef.current;
+    const {newEnd, newStart} = getSelectionPosition(textareaRef.current, currentMentions);
+
+    if (newStart !== start || newEnd !== end) {
+      textareaRef.current.selectionStart = newStart;
+      textareaRef.current.selectionEnd = newEnd;
+    }
+
+    setSelectionStart(newStart);
+    setSelectionEnd(newEnd);
+  };
+
+  const moveCursorToEnd = (updateSelection = true) => {
+    if (textareaRef.current) {
+      const endPosition = textareaRef.current.value.length;
+      textareaRef.current.setSelectionRange(endPosition, endPosition);
+      updateSelectionState(updateSelection);
+      textareaRef.current.focus();
+    }
+  };
 
   const resetDraftState = () => {
     setCurrentMentions([]);
@@ -245,64 +255,50 @@ const InputBar = ({
     updateSelectionState();
   };
 
-  const addMention = (userEntity: User, inputElement: HTMLInputElement): void => {
+  const addMention = (userEntity: User) => {
     const mentionEntity = createMentionEntity(userEntity, editedMention);
 
-    if (mentionEntity && editedMention?.term) {
+    if (mentionEntity && editedMention) {
       // keep track of what is before and after the mention being edited
       const beforeMentionPartial = inputValue.slice(0, mentionEntity.startIndex);
       const afterMentionPartial = inputValue
         .slice(mentionEntity.startIndex + editedMention.term.length + 1)
         .replace(/^ /, '');
 
+      const newInputValue = `${beforeMentionPartial}@${userEntity.name()} ${afterMentionPartial}`;
       // insert the mention in between
-      setInputValue(`${beforeMentionPartial}@${userEntity.name()} ${afterMentionPartial}`);
+      setInputValue(newInputValue);
 
-      setCurrentMentions(prevState =>
-        [...prevState, mentionEntity].sort((mentionA, mentionB) => mentionA.startIndex - mentionB.startIndex),
-      );
+      const currentValueLength = newInputValue.length;
+      const inputValueLength = inputValue.length;
+      const difference = currentValueLength - inputValueLength;
+
+      const updatedMentions = updateMentionRanges(currentMentions, selectionStart, selectionEnd, difference);
+      const newMentions = [...updatedMentions, mentionEntity];
+      setCurrentMentions(newMentions.sort((mentionA, mentionB) => mentionA.startIndex - mentionB.startIndex));
 
       const caretPosition = mentionEntity.endIndex + 1;
-      inputElement.selectionStart = caretPosition;
-      inputElement.selectionEnd = caretPosition;
+
+      if (textareaRef.current) {
+        textareaRef.current.selectionStart = caretPosition;
+        textareaRef.current.selectionEnd = caretPosition;
+      }
+
+      // Need to use setTimeout, because the setSelectionRange works asynchronously
+      setTimeout(() => {
+        textareaRef.current?.setSelectionRange(caretPosition, caretPosition);
+      }, 0);
+
       endMentionFlow();
     }
   };
 
-  const handleMentionFlow = () => {
-    if (textareaRef.current) {
-      const {selectionStart, selectionEnd, value} = textareaRef.current;
-      const mentionCandidate = getMentionCandidate(currentMentions, selectionStart, selectionEnd, value);
+  const handleMentionFlow = (event: ReactKeyboardEvent<HTMLTextAreaElement> | FormEvent<HTMLTextAreaElement>) => {
+    const {selectionStart: start, selectionEnd: end, value} = event.currentTarget;
+    const mentionCandidate = getMentionCandidate(currentMentions, start, end, value);
 
-      setEditedMention(mentionCandidate);
-      updateSelectionState();
-    }
-  };
-
-  const updateSelectionState = () => {
-    if (!textareaRef.current) {
-      return;
-    }
-
-    const {selectionStart, selectionEnd} = textareaRef.current;
-    const defaultRange = {endIndex: 0, startIndex: Infinity};
-
-    const firstMention = findMentionAtPosition(selectionStart, currentMentions) || defaultRange;
-    const lastMention = findMentionAtPosition(selectionEnd, currentMentions) || defaultRange;
-
-    const mentionStart = Math.min(firstMention.startIndex, lastMention.startIndex);
-    const mentionEnd = Math.max(firstMention.endIndex, lastMention.endIndex);
-
-    const newStart = Math.min(mentionStart, selectionStart);
-    const newEnd = Math.max(mentionEnd, selectionEnd);
-
-    if (newStart !== selectionStart || newEnd !== selectionEnd) {
-      textareaRef.current.selectionStart = newStart;
-      textareaRef.current.selectionEnd = newEnd;
-    }
-
-    setSelectionStart(newStart);
-    setSelectionEnd(newEnd);
+    setEditedMention(mentionCandidate);
+    updateSelectionState();
   };
 
   const cancelMessageReply = (resetDraft = true) => {
@@ -327,16 +323,7 @@ const InputBar = ({
       cancelMessageReply();
     }
 
-    focusTextArea();
-  };
-
-  const moveCursorToEnd = () => {
-    if (textareaRef.current) {
-      focusTextArea();
-      const endPosition = textareaRef.current.value.length;
-      textareaRef.current.setSelectionRange(endPosition, endPosition);
-      updateSelectionState();
-    }
+    textareaRef.current?.focus();
   };
 
   const editMessage = (messageEntity: ContentMessage) => {
@@ -366,22 +353,21 @@ const InputBar = ({
       cancelMessageEditing(!!editMessageEntity);
       setReplyMessageEntity(messageEntity);
 
-      focusTextArea();
+      textareaRef.current?.focus();
     }
   };
 
   const updateMentions = (event: ReactKeyboardEvent<HTMLTextAreaElement>) => {
     const textarea = event.currentTarget;
     const value = textarea.value;
-    const previousValue = inputValue;
+    const lengthDifference = value.length - inputValue.length;
 
-    const lengthDifference = value.length - previousValue.length;
     const edgeMention = detectMentionEdgeDeletion(
       textarea,
       currentMentions,
       selectionStart,
       selectionEnd,
-      lengthDifference - 1,
+      lengthDifference,
     );
 
     if (edgeMention) {
@@ -403,7 +389,6 @@ const InputBar = ({
           }
           break;
         }
-
         case KEY.ESC: {
           if (mentionSuggestions.length) {
             endMentionFlow();
@@ -416,7 +401,6 @@ const InputBar = ({
           }
           break;
         }
-
         case KEY.ENTER: {
           if (!keyboardEvent.shiftKey && !keyboardEvent.altKey && !keyboardEvent.metaKey) {
             onSend();
@@ -447,18 +431,19 @@ const InputBar = ({
     }
 
     if (keyboardEvent.key !== KEY.ESC) {
-      handleMentionFlow();
+      handleMentionFlow(keyboardEvent);
     }
   };
 
-  const onChange = (e: ReactKeyboardEvent<HTMLTextAreaElement>) => {
-    e.preventDefault();
+  const onChange = (event: ReactKeyboardEvent<HTMLTextAreaElement>) => {
+    event.preventDefault();
 
-    setInputValue(e.currentTarget.value);
+    const {value: currentValue} = event.currentTarget;
+    setInputValue(currentValue);
 
-    const currentValueLength = e.currentTarget.value.length;
-    const inputValueLength = inputValue.length;
-    const difference = currentValueLength - inputValueLength;
+    const currentValueLength = currentValue.length;
+    const previousValueLength = inputValue.length;
+    const difference = currentValueLength - previousValueLength;
 
     const updatedMentions = updateMentionRanges(currentMentions, selectionStart, selectionEnd, difference);
     setCurrentMentions(updatedMentions);
@@ -543,7 +528,7 @@ const InputBar = ({
     }
 
     resetDraftState();
-    focusTextArea();
+    textareaRef.current?.focus();
   };
 
   const uploadFiles = (files: File[]) => {
@@ -664,7 +649,6 @@ const InputBar = ({
   };
 
   const loadInitialStateForConversation = async (): Promise<void> => {
-    focusTextArea();
     setPastedFile(null);
     cancelMessageEditing();
     cancelMessageReply();
@@ -675,13 +659,14 @@ const InputBar = ({
 
       if (previousSessionData?.text) {
         setInputValue(previousSessionData.text);
+
+        setSelectionStart(previousSessionData.text.length);
+        setSelectionEnd(previousSessionData.text.length);
       }
 
       if (previousSessionData?.mentions.length > 0) {
         setCurrentMentions(previousSessionData.mentions);
       }
-
-      updateSelectionState();
 
       if (previousSessionData.replyEntityPromise) {
         previousSessionData.replyEntityPromise.then(replyEntity => {
@@ -691,6 +676,8 @@ const InputBar = ({
         });
       }
     }
+
+    moveCursorToEnd(false);
   };
 
   const sendGiphy = (gifUrl: string, tag: string): void => {
@@ -720,7 +707,7 @@ const InputBar = ({
     amplify.subscribe(WebAppEvents.CONVERSATION.MESSAGE.EDIT, editMessage);
     amplify.subscribe(WebAppEvents.CONVERSATION.MESSAGE.REPLY, replyMessage);
     amplify.subscribe(WebAppEvents.EXTENSIONS.GIPHY.SEND, sendGiphy);
-    amplify.subscribe(WebAppEvents.SEARCH.HIDE, () => window.requestAnimationFrame(focusTextArea));
+    amplify.subscribe(WebAppEvents.SEARCH.HIDE, () => window.requestAnimationFrame(() => textareaRef.current?.focus()));
     amplify.subscribe(WebAppEvents.SHORTCUT.PING, onPingClick);
 
     return () => {
@@ -730,11 +717,17 @@ const InputBar = ({
 
   useEffect(() => {
     if (!isEditing) {
-      saveDraftState(storageRepository, conversationEntity, draftMessage);
+      saveDraftState(storageRepository, conversationEntity, {
+        mentions: currentMentions,
+        reply: replyMessageEntity,
+        text: inputValue,
+      });
     }
-  }, [isEditing, draftMessage]);
+  }, [isEditing, currentMentions, replyMessageEntity, inputValue]);
 
-  useTextAreaFocus(focusTextArea);
+  useTextAreaFocus(() => {
+    textareaRef.current?.focus();
+  });
 
   useScrollSync(textareaRef.current, shadowInputRef.current, [
     textareaRef.current,
@@ -846,8 +839,8 @@ const InputBar = ({
                 </div>
 
                 <MentionSuggestionList
+                  targetInput={textareaRef.current}
                   suggestions={mentionSuggestions}
-                  targetInputSelector="#conversation-input-bar-text"
                   onSelectionValidated={addMention}
                 />
 

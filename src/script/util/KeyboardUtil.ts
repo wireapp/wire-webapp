@@ -138,9 +138,12 @@ export const offEscKey = (handler: KeyboardHandler) => {
   }
 };
 
-export const handleKeyDown = (event: React.KeyboardEvent<HTMLElement> | KeyboardEvent, callback: () => void) => {
+export const handleKeyDown = (
+  event: React.KeyboardEvent<HTMLElement> | KeyboardEvent,
+  callback: (event?: React.KeyboardEvent<HTMLElement> | KeyboardEvent) => void,
+) => {
   if (event.key === KEY.ENTER || event.key === KEY.SPACE) {
-    callback();
+    callback(event);
   }
   return true;
 };
@@ -153,13 +156,15 @@ export const handleEnterDown = (event: React.KeyboardEvent<HTMLElement> | Keyboa
 };
 
 const handleDebugKey = () => {
-  const removeDebugInfo = (els: NodeListOf<HTMLElement>) => els.forEach(el => el.parentNode.removeChild(el));
+  const removeDebugInfo = (els: NodeListOf<HTMLElement>) => els.forEach(el => el.parentNode?.removeChild(el));
 
   const addDebugInfo = (els: NodeListOf<HTMLElement>) =>
     els.forEach(el => {
       const debugInfo = document.createElement('div');
       debugInfo.classList.add('debug-info');
-      debugInfo.textContent = el.dataset.uieUid;
+      if (el.dataset.uieUid) {
+        debugInfo.textContent = el.dataset.uieUid;
+      }
       el.appendChild(debugInfo);
     });
 

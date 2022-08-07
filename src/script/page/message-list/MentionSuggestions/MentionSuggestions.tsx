@@ -29,21 +29,20 @@ import MentionSuggestionsItem from './MentionSuggestionsItem';
 import {User} from '../../../entity/User';
 
 type MentionSuggestionListProps = {
-  onSelectionValidated: (data: User, element: HTMLInputElement) => void;
+  onSelectionValidated: (data: User) => void;
   suggestions: User[];
-  targetInputSelector: string;
+  targetInput?: HTMLTextAreaElement | null;
 };
 const MentionSuggestionList: React.FunctionComponent<MentionSuggestionListProps> = ({
   suggestions,
   onSelectionValidated,
-  targetInputSelector,
+  targetInput,
 }) => {
   const [scrollbarRef, setScrollbarRef] = useEffectRef<HTMLDivElement>();
   useFadingScrollbar(scrollbarRef);
   const [selectedSuggestionIndex, setSelectedSuggestionIndex] = useState(0);
   const [selectedItem, setSelectedItem] = useEffectRef();
 
-  const targetInput = document.querySelector<HTMLInputElement>(targetInputSelector);
   const isVisible = suggestions.length > 0;
 
   const bottom = useMemo(() => {
@@ -75,7 +74,7 @@ const MentionSuggestionList: React.FunctionComponent<MentionSuggestionListProps>
 
       const validateSelection = () => {
         if (!event.shiftKey) {
-          onSelectionValidated(suggestions[selectedSuggestionIndex], targetInput);
+          onSelectionValidated(suggestions[selectedSuggestionIndex]);
           event.preventDefault();
           event.stopPropagation();
         }
@@ -117,8 +116,8 @@ const MentionSuggestionList: React.FunctionComponent<MentionSuggestionListProps>
               suggestion={suggestion}
               isSelected={index === selectedSuggestionIndex}
               onSuggestionClick={() => {
-                targetInput?.focus();
-                onSelectionValidated(suggestion, targetInput);
+                // targetInput?.focus();
+                onSelectionValidated(suggestion);
               }}
               onMouseEnter={() => setSelectedSuggestionIndex(index)}
               ref={index === selectedSuggestionIndex ? setSelectedItem : undefined}
