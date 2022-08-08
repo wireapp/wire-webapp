@@ -56,12 +56,10 @@ const NotificationsPanel: React.FC<NotificationsPanelProps> = ({
   useFadingScrollbar(scrollbarRef);
 
   const [settings] = useState(
-    Object.values(NOTIFICATION_STATE).map(status => {
-      return {
+    Object.values(NOTIFICATION_STATE).map(status => ({
         label: getNotificationText(status),
         value: status,
-      };
-    }),
+      })),
   );
 
   const [tabIndex, setTabIndex] = useState(-1);
