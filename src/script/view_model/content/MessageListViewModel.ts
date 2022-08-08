@@ -50,6 +50,7 @@ import {UserState} from '../../user/UserState';
 import type {MessageRepository} from '../../conversation/MessageRepository';
 import {showDetailViewModal} from 'Components/Modals/DetailViewModal';
 import {AssetRepository} from '../../assets/AssetRepository';
+import React from 'react';
 
 /*
  * Message list rendering view model.
@@ -199,15 +200,15 @@ export class MessageListViewModel {
     }
   };
 
-  showDetail = async (messageEntity: Message, event: MouseEvent): Promise<void> => {
-    if (messageEntity.isExpired() || $(event.currentTarget).hasClass('image-asset--no-image')) {
+  showDetail = async (messageEntity: ContentMessage, event: React.MouseEvent | React.KeyboardEvent): Promise<void> => {
+    if (messageEntity.isExpired() || event.currentTarget.classList.contains('image-asset--no-image')) {
       return;
     }
 
     showDetailViewModal({
       assetRepository: this.assetRepository,
       conversationRepository: this.conversationRepository,
-      currentMessageEntity: messageEntity as ContentMessage,
+      currentMessageEntity: messageEntity,
       messageRepository: this.messageRepository,
     });
   };

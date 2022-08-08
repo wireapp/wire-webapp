@@ -2626,19 +2626,17 @@ exports[`stricter compilation`] = {
       [195, 28, 7, "Argument of type \'unknown\' is not assignable to parameter of type \'string\'.", "1236122734"],
       [239, 21, 9, "Argument of type \'undefined\' is not assignable to parameter of type \'User\'.", "2620553983"]
     ],
-    "src/script/view_model/content/MessageListViewModel.ts:3521489276": [
-      [96, 19, 12, "Property \'conversation\' does not exist on type \'{ conversation: Conversation; message: Message; } | undefined\'.", "1670678216"],
-      [96, 33, 7, "Property \'message\' does not exist on type \'{ conversation: Conversation; message: Message; } | undefined\'.", "1236122734"],
-      [140, 4, 107, "Type \'number | boolean\' is not assignable to type \'boolean\'.\\n  Type \'number\' is not assignable to type \'boolean\'.", "3357851046"],
-      [164, 37, 18, "Object is possibly \'null\'.", "1508601427"],
-      [164, 68, 18, "Object is possibly \'null\'.", "1508601427"],
-      [168, 8, 6, "Type \'Conversation | null\' is not assignable to type \'PanelEntity\'.\\n  Type \'null\' is not assignable to type \'PanelEntity\'.", "1164306878"],
-      [190, 9, 6, "Type \'string | undefined\' is not assignable to type \'string\'.\\n  Type \'undefined\' is not assignable to type \'string\'.", "1127975365"],
-      [202, 39, 19, "No overload matches this call.\\n  The last overload gave the following error.\\n    Argument of type \'EventTarget | null\' is not assignable to parameter of type \'PlainObject<any>\'.\\n      Type \'null\' is not assignable to type \'PlainObject<any>\'.", "3586053823"],
-      [202, 60, 8, "Property \'hasClass\' does not exist on type \'JQueryStatic\'.", "1121770737"],
-      [220, 83, 18, "Argument of type \'Conversation | null\' is not assignable to parameter of type \'Conversation\'.\\n  Type \'null\' is not assignable to type \'Conversation\'.", "1508601427"],
-      [354, 68, 6, "Type \'string | undefined\' is not assignable to type \'string\'.\\n  Type \'undefined\' is not assignable to type \'string\'.", "1127975365"],
-      [357, 14, 5, "Object is of type \'unknown\'.", "165548477"]
+    "src/script/view_model/content/MessageListViewModel.ts:2712738962": [
+      [97, 19, 12, "Property \'conversation\' does not exist on type \'{ conversation: Conversation; message: Message; } | undefined\'.", "1670678216"],
+      [97, 33, 7, "Property \'message\' does not exist on type \'{ conversation: Conversation; message: Message; } | undefined\'.", "1236122734"],
+      [141, 4, 107, "Type \'number | boolean\' is not assignable to type \'boolean\'.\\n  Type \'number\' is not assignable to type \'boolean\'.", "3357851046"],
+      [165, 37, 18, "Object is possibly \'null\'.", "1508601427"],
+      [165, 68, 18, "Object is possibly \'null\'.", "1508601427"],
+      [169, 8, 6, "Type \'Conversation | null\' is not assignable to type \'PanelEntity\'.\\n  Type \'null\' is not assignable to type \'PanelEntity\'.", "1164306878"],
+      [191, 9, 6, "Type \'string | undefined\' is not assignable to type \'string\'.\\n  Type \'undefined\' is not assignable to type \'string\'.", "1127975365"],
+      [221, 83, 18, "Argument of type \'Conversation | null\' is not assignable to parameter of type \'Conversation\'.\\n  Type \'null\' is not assignable to type \'Conversation\'.", "1508601427"],
+      [355, 68, 6, "Type \'string | undefined\' is not assignable to type \'string\'.\\n  Type \'undefined\' is not assignable to type \'string\'.", "1127975365"],
+      [358, 14, 5, "Object is of type \'unknown\'.", "165548477"]
     ],
     "src/script/view_model/panel/AddParticipantsViewModel.ts:4264095902": [
       [102, 4, 21, "Type \'ObservableArray<never>\' is not assignable to type \'ObservableArray<User>\'.", "2199671479"],

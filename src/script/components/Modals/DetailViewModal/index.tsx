@@ -35,9 +35,9 @@ import {MessageRepository} from '../../../conversation/MessageRepository';
 import {Conversation} from '../../../entity/Conversation';
 import {ContentMessage} from '../../../entity/message/ContentMessage';
 import {MediumImage} from '../../../entity/message/MediumImage';
-import {Message} from '../../../entity/message/Message';
 import {MessageCategory} from '../../../message/MessageCategory';
 import {isOfCategory} from '../../../page/MainContent/panels/Collection/utils';
+import {isContentMessage} from '../../../guards/Message';
 
 interface DetailViewModalProps {
   readonly assetRepository: AssetRepository;
@@ -195,14 +195,13 @@ const DetailViewModal: FC<DetailViewModalProps> = ({
   const messageExpired = (message: ContentMessage) => messageRemoved(message.id, message.conversation_id);
 
   const getAllImages = async (conversation: Conversation) => {
-    const conversationItems: Message[] = await conversationRepository.getEventsForCategory(
-      conversation,
-      MessageCategory.IMAGE,
+    const conversationItems = await conversationRepository.getEventsForCategory(conversation, MessageCategory.IMAGE);
+    const contentMessages = conversationItems.reduce<ContentMessage[]>(
+      (contentMessages, message) => (isContentMessage(message) ? [...contentMessages, message] : contentMessages),
+      [],
     );
 
-    const messageEntities = conversationItems.filter(item => isOfCategory('images', item as ContentMessage));
-
-    setItems(messageEntities as ContentMessage[]);
+    setItems(contentMessages);
   };
 
   useEffect(() => {
