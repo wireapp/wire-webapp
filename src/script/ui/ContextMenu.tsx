@@ -55,9 +55,7 @@ const cleanUp = () => {
   }
 };
 
-const getButtonId = (label: string): string => {
-  return `btn-${label.split(' ').join('-').toLowerCase()}`;
-};
+const getButtonId = (label: string): string => `btn-${label.split(' ').join('-').toLowerCase()}`;
 
 const ContextMenu: React.FC<ContextMenuProps> = ({entries, defaultIdentifier = 'ctx-menu-item', posX, posY}) => {
   const [mainElement, setMainElement] = useState<HTMLUListElement>();

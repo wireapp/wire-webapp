@@ -32,6 +32,8 @@ import {ConversationState} from '../../conversation/ConversationState';
 import PreferencesRadio from '../../page/MainContent/panels/preferences/components/PreferencesRadio';
 import {KEY} from 'Util/KeyboardUtil';
 
+const PANEL_HEADER_BTN_TABINDEX = 2;
+
 export interface NotificationsPanelProps {
   conversationState?: ConversationState;
   onClose: () => void;
@@ -75,7 +77,7 @@ const NotificationsPanel: React.FC<NotificationsPanelProps> = ({
   const handleKeyDown = (event: React.KeyboardEvent) => {
     if (event.key === KEY.TAB && !event.shiftKey && !event.altKey) {
       event.preventDefault();
-      setTabIndex(2);
+      setTabIndex(PANEL_HEADER_BTN_TABINDEX);
       setBtnFocus(true);
     }
   };

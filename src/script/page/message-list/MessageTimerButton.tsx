@@ -54,8 +54,8 @@ export const MessageTimerButton: React.FC<MessageTimerButtonProps> = ({
   const isTimerDisabled = isSelfDeletingMessagesEnforced || hasGlobalMessageTimer;
   const duration = hasMessageTimer ? formatDuration(messageTimer) : ({} as DurationUnit);
 
-  const setEntries = () => {
-    return [
+  const setEntries = () =>
+    [
       {
         click: () => conversation.localMessageTimer(0),
         label: t('ephemeralUnitsNone'),
@@ -70,7 +70,6 @@ export const MessageTimerButton: React.FC<MessageTimerButtonProps> = ({
         };
       }),
     );
-  };
 
   // Click on ephemeral button
   const onClick = (event: React.MouseEvent<HTMLSpanElement>): void => {
