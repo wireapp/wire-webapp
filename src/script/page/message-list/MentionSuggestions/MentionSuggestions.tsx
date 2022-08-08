@@ -115,10 +115,7 @@ const MentionSuggestionList: React.FunctionComponent<MentionSuggestionListProps>
               key={suggestion.id}
               suggestion={suggestion}
               isSelected={index === selectedSuggestionIndex}
-              onSuggestionClick={() => {
-                // targetInput?.focus();
-                onSelectionValidated(suggestion);
-              }}
+              onSuggestionClick={() => onSelectionValidated(suggestion)}
               onMouseEnter={() => setSelectedSuggestionIndex(index)}
               ref={index === selectedSuggestionIndex ? setSelectedItem : undefined}
             />

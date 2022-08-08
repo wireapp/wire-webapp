@@ -54,7 +54,7 @@ describe('MentionSuggestionList', () => {
     );
 
     fireEvent.keyDown(input, {code: 'Tab', key: 'Tab'});
-    expect(onSelectionValidated).toHaveBeenCalledWith(first, input);
+    expect(onSelectionValidated).toHaveBeenCalledWith(first);
 
     //suggestions prop changed, component rerenders (
     rerender(
@@ -66,7 +66,7 @@ describe('MentionSuggestionList', () => {
     );
 
     fireEvent.keyDown(input, {code: 'Tab', key: 'Tab'});
-    expect(onSelectionValidated).toHaveBeenCalledWith(third, input);
+    expect(onSelectionValidated).toHaveBeenCalledWith(third);
   });
 });
 
