@@ -936,8 +936,8 @@ exports[`stricter compilation`] = {
       [176, 10, 20, "Type \'undefined\' is not assignable to type \'Participant\'.", "942864568"],
       [179, 10, 9, "Type \'undefined\' is not assignable to type \'MuteState\'.", "3616862203"]
     ],
-    "src/script/components/calling/FullscreenVideoCall.tsx:3337270414": [
-      [245, 46, 4, "Argument of type \'null\' is not assignable to parameter of type \'Participant\'.", "2087897566"]
+    "src/script/components/calling/FullscreenVideoCall.tsx:1656063968": [
+      [406, 50, 4, "Argument of type \'null\' is not assignable to parameter of type \'Participant\'.", "2087897566"]
     ],
     "src/script/components/calling/GroupVideoGrid.test.ts:1931211751": [
       [35, 55, 22, "Object is possibly \'null\'.", "1458310722"],
@@ -955,10 +955,10 @@ exports[`stricter compilation`] = {
       [126, 32, 4, "Argument of type \'null\' is not assignable to parameter of type \'string | undefined\'.", "2087897566"],
       [136, 6, 20, "Type \'null\' is not assignable to type \'Participant\'.", "942864568"]
     ],
-    "src/script/components/calling/GroupVideoGrid.tsx:610569498": [
-      [83, 46, 14, "Argument of type \'Participant | null\' is not assignable to parameter of type \'Partial<Record<\\"videoStream\\" | \\"hasActiveVideo\\" | \\"sharesScreen\\", Subscribable<any>>>\'.\\n  Type \'null\' is not assignable to type \'Partial<Record<\\"videoStream\\" | \\"hasActiveVideo\\" | \\"sharesScreen\\", Subscribable<any>>>\'.", "446802655"],
-      [92, 30, 4, "Argument of type \'null\' is not assignable to parameter of type \'Participant\'.", "2087897566"],
-      [100, 28, 11, "Argument of type \'Participant | undefined\' is not assignable to parameter of type \'Participant\'.\\n  Type \'undefined\' is not assignable to type \'Participant\'.", "2457692186"]
+    "src/script/components/calling/GroupVideoGrid.tsx:2097709450": [
+      [82, 46, 14, "Argument of type \'Participant | null\' is not assignable to parameter of type \'Partial<Record<\\"videoStream\\" | \\"hasActiveVideo\\" | \\"sharesScreen\\", Subscribable<any>>>\'.\\n  Type \'null\' is not assignable to type \'Partial<Record<\\"videoStream\\" | \\"hasActiveVideo\\" | \\"sharesScreen\\", Subscribable<any>>>\'.", "446802655"],
+      [91, 30, 4, "Argument of type \'null\' is not assignable to parameter of type \'Participant\'.", "2087897566"],
+      [99, 28, 11, "Argument of type \'Participant | undefined\' is not assignable to parameter of type \'Participant\'.\\n  Type \'undefined\' is not assignable to type \'Participant\'.", "2457692186"]
     ],
     "src/script/components/calling/chooseScreen.test.ts:1945034304": [
       [64, 23, 30, "Argument of type \'Element | null\' is not assignable to parameter of type \'Element\'.\\n  Type \'null\' is not assignable to type \'Element\'.", "1127551965"]
@@ -966,7 +966,7 @@ exports[`stricter compilation`] = {
     "src/script/components/calling/deviceToggleButton.test.ts:3520291628": [
       [31, 35, 16, "Argument of type \'Element | null\' is not assignable to parameter of type \'Element\'.\\n  Type \'null\' is not assignable to type \'Element\'.", "733554636"]
     ],
-    "src/script/components/calling/fullscreenVideoCall.test.tsx:3312717523": [
+    "src/script/components/calling/fullscreenVideoCall.test.tsx:2299129286": [
       [34, 34, 4, "Argument of type \'null\' is not assignable to parameter of type \'string | undefined\'.", "2087897566"],
       [110, 60, 4, "Argument of type \'null\' is not assignable to parameter of type \'string | undefined\'.", "2087897566"],
       [111, 60, 4, "Argument of type \'null\' is not assignable to parameter of type \'string | undefined\'.", "2087897566"],
@@ -984,7 +984,7 @@ exports[`stricter compilation`] = {
       [127, 11, 33, "Object is possibly \'null\'.", "1545610583"],
       [132, 11, 33, "Object is possibly \'null\'.", "1545610583"]
     ],
-    "src/script/components/list/ConversationListCallingCell.tsx:1743640908": [
+    "src/script/components/list/ConversationListCallingCell.tsx:2354053925": [
       [115, 90, 6, "Argument of type \'number | undefined\' is not assignable to parameter of type \'REASON\'.\\n  Type \'undefined\' is not assignable to type \'REASON\'.", "2124277697"],
       [128, 67, 8, "No overload matches this call.\\n  Overload 1 of 2, \'(...items: ConcatArray<User>[]): User[]\', gave the following error.\\n    Type \'User | undefined\' is not assignable to type \'User\'.\\n      Type \'undefined\' is not assignable to type \'User\'.\\n  Overload 2 of 2, \'(...items: (User | ConcatArray<User>)[]): User[]\', gave the following error.\\n    Type \'User | undefined\' is not assignable to type \'User\'.\\n      Type \'undefined\' is not assignable to type \'User\'.", "2198230984"],
       [148, 28, 12, "Type \'undefined\' cannot be used as an index type.", "3398917396"],
@@ -2408,7 +2408,7 @@ exports[`stricter compilation`] = {
       [181, 83, 5, "Object is of type \'unknown\'.", "165548477"],
       [195, 8, 9, "Argument of type \'undefined\' is not assignable to parameter of type \'string\'.", "2620553983"]
     ],
-    "src/script/view_model/CallingViewModel.ts:3603774031": [
+    "src/script/view_model/CallingViewModel.ts:3511156749": [
       [87, 11, 17, "Property \'activeCallViewTab\' has no initializer and is not definitely assigned in the constructor.", "1323835793"],
       [319, 4, 63, "Type \'Conversation | undefined\' is not assignable to type \'Conversation\'.\\n  Type \'undefined\' is not assignable to type \'Conversation\'.", "62763745"]
     ],
