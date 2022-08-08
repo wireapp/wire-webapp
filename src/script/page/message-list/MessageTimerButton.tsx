@@ -83,7 +83,7 @@ export const MessageTimerButton: React.FC<MessageTimerButtonProps> = ({
   }
 
   const handleContextKeyDown = (event: React.KeyboardEvent) => {
-    if (event.key === KEY.SPACE || event.key === KEY.ENTER) {
+    if ([KEY.SPACE, KEY.ENTER].includes(event.key)) {
       const newEvent = setContextMenuPosition(event);
       const entries = setEntries();
       showContextMenu(newEvent, entries, 'message-timer-menu');
