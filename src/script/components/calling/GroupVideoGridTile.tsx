@@ -59,7 +59,7 @@ const GroupVideoGridTile: React.FC<GroupVideoGridTileProps> = ({
   const hasPausedVideo = videoState === VIDEO_STATE.PAUSED;
   const hasActiveVideo = (sharesCamera || sharesScreen) && !!videoStream;
   const activelySpeakingBoxShadow = `inset 0px 0px 0px 1px var(--group-video-bg), inset 0px 0px 0px 4px var(--accent-color), inset 0px 0px 0px 7px var(--app-bg-secondary)`;
-  const groupVideoBoxShadow = 'inset 0px 0px 0px 2px var(--group-video-bg)';
+  const groupVideoBoxShadow = participantCount > 1 ? 'inset 0px 0px 0px 2px var(--group-video-bg)' : 'initial';
 
   return (
     <div
@@ -99,11 +99,7 @@ const GroupVideoGridTile: React.FC<GroupVideoGridTileProps> = ({
         css={{
           borderRadius: '8px',
           bottom: 0,
-          boxShadow: isActivelySpeaking
-            ? activelySpeakingBoxShadow
-            : participantCount > 1
-            ? groupVideoBoxShadow
-            : 'initial',
+          boxShadow: isActivelySpeaking ? activelySpeakingBoxShadow : groupVideoBoxShadow,
           left: 0,
           position: 'absolute',
           right: 0,
