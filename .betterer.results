@@ -936,8 +936,8 @@ exports[`stricter compilation`] = {
       [176, 10, 20, "Type \'undefined\' is not assignable to type \'Participant\'.", "942864568"],
       [179, 10, 9, "Type \'undefined\' is not assignable to type \'MuteState\'.", "3616862203"]
     ],
-    "src/script/components/calling/FullscreenVideoCall.tsx:3667721582": [
-      [465, 50, 4, "Argument of type \'null\' is not assignable to parameter of type \'Participant\'.", "2087897566"]
+    "src/script/components/calling/FullscreenVideoCall.tsx:1656063968": [
+      [406, 50, 4, "Argument of type \'null\' is not assignable to parameter of type \'Participant\'.", "2087897566"]
     ],
     "src/script/components/calling/GroupVideoGrid.test.ts:1931211751": [
       [35, 55, 22, "Object is possibly \'null\'.", "1458310722"],
@@ -966,7 +966,7 @@ exports[`stricter compilation`] = {
     "src/script/components/calling/deviceToggleButton.test.ts:3520291628": [
       [31, 35, 16, "Argument of type \'Element | null\' is not assignable to parameter of type \'Element\'.\\n  Type \'null\' is not assignable to type \'Element\'.", "733554636"]
     ],
-    "src/script/components/calling/fullscreenVideoCall.test.tsx:1510388179": [
+    "src/script/components/calling/fullscreenVideoCall.test.tsx:2299129286": [
       [34, 34, 4, "Argument of type \'null\' is not assignable to parameter of type \'string | undefined\'.", "2087897566"],
       [110, 60, 4, "Argument of type \'null\' is not assignable to parameter of type \'string | undefined\'.", "2087897566"],
       [111, 60, 4, "Argument of type \'null\' is not assignable to parameter of type \'string | undefined\'.", "2087897566"],

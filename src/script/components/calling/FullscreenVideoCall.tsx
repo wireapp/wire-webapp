@@ -17,7 +17,7 @@
  *
  */
 
-import {css, CSSObject} from '@emotion/react';
+import {css} from '@emotion/react';
 import {CALL_TYPE, CONV_TYPE} from '@wireapp/avs';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import {amplify} from 'amplify';
@@ -45,6 +45,12 @@ import Pagination from './Pagination';
 import ClassifiedBar from 'Components/input/ClassifiedBar';
 import {KEY} from 'Util/KeyboardUtil';
 import {preventFocusOutside} from 'Util/util';
+import {
+  videoControlActiveStyles,
+  videoControlInActiveStyles,
+  videoControlDisabledStyles,
+  paginationButtonStyles,
+} from './FullscreenVideoCallStyles';
 
 export interface FullscreenVideoCallProps {
   activeCallViewTab: string;
@@ -71,71 +77,6 @@ export interface FullscreenVideoCallProps {
 
 const FullscreenVideoCallConfig = {
   HIDE_CONTROLS_TIMEOUT: TIME_IN_MILLIS.SECOND * 4,
-};
-
-const videoControlActiveStyles = css`
-  background-color: var(--main-color);
-  border: 1px solid var(--main-color);
-  svg > path {
-    fill: var(--app-bg-secondary);
-  }
-  &:hover {
-    background-color: var(--background);
-  }
-  &:active {
-    background-color: var(--accent-color-highlight-inversed);
-    border: 1px solid var(--accent-color-focus);
-  }
-`;
-
-const videoControlInActiveStyles = css`
-  background-color: var(--inactive-call-button-bg);
-  border: 1px solid var(--inactive-call-button-border);
-  svg > path,
-  svg > g > path {
-    fill: var(--main-color);
-  }
-  &:hover {
-    background-color: var(--inactive-call-button-hover-bg);
-    border: 1px solid var(--inactive-call-button-hover-border);
-  }
-  &:active {
-    background-color: var(--accent-color-highlight);
-    border: 1px solid var(--accent-color-focus);
-  }
-`;
-
-const videoControlDisabledStyles = css`
-  cursor: default;
-  background-color: var(--disabled-call-button-bg);
-  border: 1px solid var(--disabled-call-button-border);
-  svg {
-    fill: var(--disabled-call-button-svg);
-  }
-`;
-
-const paginationButtonStyles: CSSObject = {
-  ['& svg > path']: {
-    fill: 'var(--main-color)',
-  },
-  ['&:focus-visible']: {
-    ['& svg > path']: {
-      fill: 'var(--accent-color)',
-    },
-    outline: '1px solid var(--accent-color-focus)',
-  },
-  ['&:hover svg > path']: {
-    fill: 'var(--accent-color)',
-  },
-  alignItems: 'center',
-  backgroundColor: 'var(--app-bg-secondary)',
-  cursor: 'pointer',
-  display: 'flex',
-  height: 56,
-  justifyContent: 'center',
-  position: 'absolute',
-  top: 'calc(50% - 26px)',
-  width: 56,
 };
 
 const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
@@ -378,7 +319,7 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
                     className="video-controls__button"
                     data-uie-value={selfSharesCamera ? 'active' : 'inactive'}
                     onClick={() => toggleCamera(call)}
-                    onKeyDown={e => handleToggleCameraKeydown(e)}
+                    onKeyDown={handleToggleCameraKeydown}
                     role="switch"
                     aria-checked={selfSharesCamera}
                     tabIndex={0}
@@ -466,7 +407,6 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
                     setMaximizedParticipant(call, null);
                   }}
                   currentItem={activeCallViewTab}
-                  // style={{margin: '0 auto', marginBottom: 32, width: 'fit-content'}}
                   textSubstitute={participants.length.toString()}
                 />
               )}
