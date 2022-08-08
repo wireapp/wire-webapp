@@ -53,7 +53,7 @@ const HistoryImport: FC<HistoryImportProps> = ({backupRepository, file, onClose}
   const logger = getLogger('HistoryImportViewModel');
 
   const [historyImportState, setHistoryImportState] = useState(HistoryImportState.PREPARING);
-  const [hasError, setHasError] = useState<Error | null>(null);
+  const [error, setError] = useState<Error | null>(null);
   const [errorHeadline, setErrorHeadline] = useState('');
   const [errorSecondary, setErrorSecondary] = useState('');
 
@@ -61,9 +61,9 @@ const HistoryImport: FC<HistoryImportProps> = ({backupRepository, file, onClose}
   const [numberOfProcessedRecords, setNumberOfProcessedRecords] = useState<number>(0);
   const loadingProgress = Math.floor((numberOfProcessedRecords / numberOfRecords) * 100);
 
-  const isPreparing = !hasError && historyImportState === HistoryImportState.PREPARING;
-  const isImporting = !hasError && historyImportState === HistoryImportState.IMPORTING;
-  const isDone = !hasError && historyImportState === HistoryImportState.DONE;
+  const isPreparing = !error && historyImportState === HistoryImportState.PREPARING;
+  const isImporting = !error && historyImportState === HistoryImportState.IMPORTING;
+  const isDone = !error && historyImportState === HistoryImportState.DONE;
 
   const replacements = {
     processed: numberOfProcessedRecords.toString(),
@@ -93,7 +93,7 @@ const HistoryImport: FC<HistoryImportProps> = ({backupRepository, file, onClose}
   const onProgress = (numberProcessed: number) => setNumberOfProcessedRecords(prevState => prevState + numberProcessed);
 
   const onSuccess = (): void => {
-    setHasError(null);
+    setError(null);
     setHistoryImportState(HistoryImportState.DONE);
 
     window.setTimeout(dismissImport, MotionDuration.X_LONG * 2);
@@ -107,7 +107,7 @@ const HistoryImport: FC<HistoryImportProps> = ({backupRepository, file, onClose}
       return;
     }
 
-    setHasError(error);
+    setError(error);
     logger.error(`Failed to import history: ${error.message}`, error);
 
     if (error instanceof DifferentAccountError) {
@@ -124,7 +124,7 @@ const HistoryImport: FC<HistoryImportProps> = ({backupRepository, file, onClose}
 
   const importHistory = async (file: File) => {
     setHistoryImportState(HistoryImportState.PREPARING);
-    setHasError(null);
+    setError(null);
 
     const fileBuffer = await loadFileBuffer(file);
     const worker = new WebWorker('/worker/jszip-unpack-worker.js');
@@ -187,7 +187,7 @@ const HistoryImport: FC<HistoryImportProps> = ({backupRepository, file, onClose}
           </div>
         )}
 
-        {hasError && (
+        {error && (
           <div className="history-message">
             <h2 className="history-message__headline" data-uie-name="status-history-import-error-headline">
               {errorHeadline}
