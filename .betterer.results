@@ -2214,7 +2214,7 @@ exports[`stricter compilation`] = {
     "src/script/tracking/Helpers.ts:3850783506": [
       [47, 10, 30, "Object is possibly \'undefined\'.", "3185682702"]
     ],
-    "src/script/ui/ContextMenu.tsx:2918813954": [
+    "src/script/ui/ContextMenu.tsx:2095044567": [
       [53, 4, 9, "Type \'undefined\' is not assignable to type \'HTMLDivElement\'.", "1873118818"],
       [143, 29, 3, "Type \'Dispatch<SetStateAction<HTMLUListElement | undefined>>\' is not assignable to type \'LegacyRef<HTMLUListElement> | undefined\'.\\n  Type \'Dispatch<SetStateAction<HTMLUListElement | undefined>>\' is not assignable to type \'(instance: HTMLUListElement | null) => void\'.\\n    Types of parameters \'value\' and \'instance\' are incompatible.\\n      Type \'HTMLUListElement | null\' is not assignable to type \'SetStateAction<HTMLUListElement | undefined>\'.\\n        Type \'null\' is not assignable to type \'SetStateAction<HTMLUListElement | undefined>\'.", "193432436"]
     ],

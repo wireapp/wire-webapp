@@ -56,7 +56,7 @@ const cleanUp = () => {
 };
 
 const getButtonId = (label: string): string => {
-  return `${label.split(' ').join('-').toLowerCase()}`;
+  return `btn-${label.split(' ').join('-').toLowerCase()}`;
 };
 
 const ContextMenu: React.FC<ContextMenuProps> = ({entries, defaultIdentifier = 'ctx-menu-item', posX, posY}) => {
@@ -81,7 +81,7 @@ const ContextMenu: React.FC<ContextMenuProps> = ({entries, defaultIdentifier = '
     if (selected) {
       //context menu options such as 10 seconds etc begings with digit which is an invalid querySelector
       //param append btn- to avoid such errors
-      const selectedButton = document.querySelector(`#btn-${getButtonId(selected.label!)}`) as HTMLButtonElement;
+      const selectedButton = document.querySelector(`#${getButtonId(selected.label!)}`) as HTMLButtonElement;
       selectedButton?.focus();
     }
   }, [selected]);
@@ -155,7 +155,7 @@ const ContextMenu: React.FC<ContextMenuProps> = ({entries, defaultIdentifier = '
             })}
           >
             <button
-              id={`btn-${getButtonId(entry.label!)}`}
+              id={`${getButtonId(entry.label!)}`}
               className="ctx-menu__button"
               type="button"
               data-uie-name={entry.identifier || defaultIdentifier}

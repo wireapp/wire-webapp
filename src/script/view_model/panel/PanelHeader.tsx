@@ -17,7 +17,7 @@
  *
  */
 
-import React from 'react';
+import {forwardRef, ForwardRefRenderFunction, ForwardedRef} from 'react';
 
 import DragableClickWrapper from 'Components/DragableClickWrapper';
 import {t} from 'Util/LocalizerUtil';
@@ -33,9 +33,9 @@ export interface PanelHeaderProps {
   handleBlur?: () => void;
 }
 
-const PanelHeader: React.ForwardRefRenderFunction<HTMLButtonElement, PanelHeaderProps> = (
+const PanelHeader: ForwardRefRenderFunction<HTMLButtonElement, PanelHeaderProps> = (
   {onGoBack, onClose, title, goBackUie, closeUie = 'do-close', tabIndex = 0, handleBlur}: PanelHeaderProps,
-  ref: React.ForwardedRef<HTMLButtonElement>,
+  ref: ForwardedRef<HTMLButtonElement>,
 ) => {
   return (
     <div className="panel__header">
@@ -47,6 +47,7 @@ const PanelHeader: React.ForwardRefRenderFunction<HTMLButtonElement, PanelHeader
           data-uie-name={goBackUie}
           title={t('index.goBack')}
           tabIndex={tabIndex}
+          onBlur={handleBlur}
         >
           <Icon.ArrowLeft />
         </button>
@@ -70,5 +71,4 @@ const PanelHeader: React.ForwardRefRenderFunction<HTMLButtonElement, PanelHeader
   );
 };
 
-const PanelHeaderForwarded = React.forwardRef(PanelHeader);
-export default PanelHeaderForwarded;
+export default forwardRef(PanelHeader);
