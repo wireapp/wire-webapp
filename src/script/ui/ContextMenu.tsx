@@ -155,7 +155,7 @@ const ContextMenu: React.FC<ContextMenuProps> = ({entries, defaultIdentifier = '
             })}
           >
             <button
-              id={`${getButtonId(entry.label!)}`}
+              id={getButtonId(entry.label!)}
               className="ctx-menu__button"
               type="button"
               data-uie-name={entry.identifier || defaultIdentifier}
