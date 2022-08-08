@@ -17,7 +17,7 @@
  *
  */
 
-import React, {useState, useRef, useEffect} from 'react';
+import React, {useState, useRef, useEffect, FC} from 'react';
 import {container} from 'tsyringe';
 
 import {t} from 'Util/LocalizerUtil';
@@ -41,7 +41,7 @@ export interface NotificationsPanelProps {
   repositories: ViewModelRepositories;
 }
 
-const NotificationsPanel: React.FC<NotificationsPanelProps> = ({
+const NotificationsPanel: FC<NotificationsPanelProps> = ({
   onGoBack,
   onClose,
   repositories,
@@ -57,9 +57,9 @@ const NotificationsPanel: React.FC<NotificationsPanelProps> = ({
 
   const [settings] = useState(
     Object.values(NOTIFICATION_STATE).map(status => ({
-        label: getNotificationText(status),
-        value: status,
-      })),
+      label: getNotificationText(status),
+      value: status,
+    })),
   );
 
   const [tabIndex, setTabIndex] = useState(-1);
