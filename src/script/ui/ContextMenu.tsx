@@ -55,9 +55,7 @@ const cleanUp = () => {
   }
 };
 
-const getButtonId = (label: string): string => {
-  return `${label.split(' ').join('-').toLowerCase()}-button`;
-};
+const getButtonId = (label: string): string => `btn-${label.split(' ').join('-').toLowerCase()}`;
 
 const ContextMenu: React.FC<ContextMenuProps> = ({entries, defaultIdentifier = 'ctx-menu-item', posX, posY}) => {
   const [mainElement, setMainElement] = useState<HTMLUListElement>();
@@ -79,7 +77,9 @@ const ContextMenu: React.FC<ContextMenuProps> = ({entries, defaultIdentifier = '
 
   useEffect(() => {
     if (selected) {
-      const selectedButton = document.querySelector(`#${getButtonId(selected.label)}`) as HTMLButtonElement;
+      //context menu options such as 10 seconds etc begings with digit which is an invalid querySelector
+      //param append btn- to avoid such errors
+      const selectedButton = document.querySelector(`#${getButtonId(selected.label!)}`) as HTMLButtonElement;
       selectedButton?.focus();
     }
   }, [selected]);
@@ -93,14 +93,21 @@ const ContextMenu: React.FC<ContextMenuProps> = ({entries, defaultIdentifier = '
         cleanUp();
         previouslyFocused.focus();
       }
-      if (isOneOfKeys(event, [KEY.ARROW_UP, KEY.ARROW_DOWN, KEY.TAB])) {
-        if (!entries.includes(selected)) {
-          const index = isKey(event, KEY.ARROW_DOWN) || isKey(event, KEY.TAB) ? 0 : entries.length - 1;
+      //after opening the menu on first tab press select the first option
+      if (!selected && isKey(event, KEY.TAB)) {
+        setSelected(entries[0]);
+      } else if (isKey(event, KEY.TAB)) {
+        //tab key press while the menu is open will close the menu
+        cleanUp();
+      }
+      if (isOneOfKeys(event, [KEY.ARROW_UP, KEY.ARROW_DOWN])) {
+        if (!entries.includes(selected!)) {
+          const index = isKey(event, KEY.ARROW_DOWN) ? 0 : entries.length - 1;
           setSelected(entries[index]);
           return;
         }
-        const direction = isKey(event, KEY.ARROW_DOWN) || isKey(event, KEY.TAB) ? 1 : -1;
-        const nextIndex = (entries.indexOf(selected) + direction + entries.length) % entries.length;
+        const direction = isKey(event, KEY.ARROW_DOWN) ? 1 : -1;
+        const nextIndex = (entries.indexOf(selected!) + direction + entries.length) % entries.length;
         setSelected(entries[nextIndex]);
       }
       if (isEnterKey(event) || isSpaceKey(event)) {
@@ -146,7 +153,7 @@ const ContextMenu: React.FC<ContextMenuProps> = ({entries, defaultIdentifier = '
             })}
           >
             <button
-              id={getButtonId(entry.label)}
+              id={getButtonId(entry.label!)}
               className="ctx-menu__button"
               type="button"
               data-uie-name={entry.identifier || defaultIdentifier}
