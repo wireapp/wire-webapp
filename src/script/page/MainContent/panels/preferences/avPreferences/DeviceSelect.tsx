@@ -63,7 +63,13 @@ const DeviceSelect: React.FC<DeviceSelectProps> = ({
       <div css={{width: '550px'}}>
         <Select
           id={uieName}
-          onChange={option => onChange(option?.value as string)}
+          onChange={option => {
+            const currentOption = option?.value.toString();
+
+            if (currentOption) {
+              onChange(currentOption);
+            }
+          }}
           dataUieName={uieName}
           options={devicesList}
           defaultValue={currentValue}

@@ -1246,7 +1246,10 @@ export class ConversationRepository {
    * @param initialTimestamp Initial server and event timestamp
    * @returns Mapped conversation/s
    */
-  mapConversations(payload: BackendConversation[], initialTimestamp = this.getLatestEventTimestamp()): Conversation[] {
+  mapConversations(
+    payload: BackendConversation[],
+    initialTimestamp = this.getLatestEventTimestamp(true),
+  ): Conversation[] {
     const entities = ConversationMapper.mapConversations(payload as ConversationDatabaseData[], initialTimestamp);
     entities.forEach(conversationEntity => {
       this._mapGuestStatusSelf(conversationEntity);
@@ -1942,9 +1945,10 @@ export class ConversationRepository {
           previouslyArchived = conversationEntity.is_archived();
 
           const isBackendTimestamp = eventSource !== EventSource.INJECTED;
-          conversationEntity.updateTimestampServer(eventJson.server_time || eventJson.time, isBackendTimestamp);
+          if (type !== CONVERSATION_EVENT.MEMBER_JOIN && type !== CONVERSATION_EVENT.MEMBER_LEAVE) {
+            conversationEntity.updateTimestampServer(eventJson.server_time || eventJson.time, isBackendTimestamp);
+          }
         }
-
         return conversationEntity;
       })
       .then(conversationEntity => this.checkLegalHoldStatus(conversationEntity, eventJson))
@@ -1953,9 +1957,11 @@ export class ConversationRepository {
       .then(
         conversationEntity => this.reactToConversationEvent(conversationEntity, eventJson, eventSource) as EntityObject,
       )
-      .then((entityObject = {} as EntityObject) =>
-        this.handleConversationNotification(entityObject as EntityObject, eventSource, previouslyArchived),
-      )
+      .then((entityObject = {} as EntityObject) => {
+        if (type !== CONVERSATION_EVENT.MEMBER_JOIN && type !== CONVERSATION_EVENT.MEMBER_LEAVE) {
+          this.handleConversationNotification(entityObject as EntityObject, eventSource, previouslyArchived);
+        }
+      })
       .catch((error: BaseError) => {
         const ignoredErrorTypes: string[] = [
           ConversationError.TYPE.MESSAGE_NOT_FOUND,
@@ -2925,7 +2931,7 @@ export class ConversationRepository {
    * @param conversationEntity Conversation that contains the message
    * @param timestamp Timestamp as upper bound which messages to remove
    */
-  private deleteMessages(conversationEntity: Conversation, timestamp: number) {
+  private deleteMessages(conversationEntity: Conversation, timestamp?: number) {
     conversationEntity.hasCreationMessage = false;
 
     const iso_date = timestamp ? new Date(timestamp).toISOString() : undefined;

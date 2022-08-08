@@ -73,9 +73,12 @@ const PhoneLoginForm = ({isFetching, onSubmit}: LoginFormProps) => {
       <Select
         id="select-phone"
         onChange={country => {
-          const selectedCountryValue = country?.value as string;
-          setCountry(selectedCountryValue);
-          setCountryCode((getCountryCode(selectedCountryValue) || 'X2').toString(10));
+          const selectedCountryValue = country?.value.toString();
+
+          if (selectedCountryValue) {
+            setCountry(selectedCountryValue);
+            setCountryCode((getCountryCode(selectedCountryValue) || 'X2').toString(10));
+          }
         }}
         dataUieName="select-phone"
         options={expandedCountryList}
