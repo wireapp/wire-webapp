@@ -22,7 +22,7 @@ import {container} from 'tsyringe';
 import cx from 'classnames';
 import {amplify} from 'amplify';
 import {WebAppEvents} from '@wireapp/webapp-events';
-import {Select, StyledApp} from '@wireapp/react-ui-kit';
+import {Select, StyledApp, Option} from '@wireapp/react-ui-kit';
 import {RECEIPT_MODE} from '@wireapp/api-client/src/conversation/data/ConversationReceiptModeUpdateData';
 import {ConversationProtocol} from '@wireapp/api-client/src/conversation/NewConversation';
 
@@ -115,6 +115,11 @@ const logger = getLogger('GroupCreationModal');
 interface ProtocolOption {
   label: string;
   value: ConversationProtocol;
+}
+
+function isProtocolOption(option?: Option | null): option is ProtocolOption {
+  const protocols = Object.values(ConversationProtocol) as string[];
+  return !!option && typeof option.value === 'string' && protocols.includes(option.value);
 }
 
 const GroupCreationModal: React.FC<GroupCreationModalProps> = ({
@@ -291,7 +296,12 @@ const GroupCreationModal: React.FC<GroupCreationModalProps> = ({
   return (
     <StyledApp theme={theme}>
       <div id="group-creation-modal" className="group-creation__modal">
-        <ModalComponent isShown={isShown} onClosed={onClose} data-uie-name="group-creation-label">
+        <ModalComponent
+          wrapperCSS={{overflow: 'unset', overflowY: 'unset'}}
+          isShown={isShown}
+          onClosed={onClose}
+          data-uie-name="group-creation-label"
+        >
           <div className="modal__header modal__header--list">
             {stateIsParticipants && (
               <>
@@ -452,18 +462,16 @@ const GroupCreationModal: React.FC<GroupCreationModalProps> = ({
                       <Select
                         id="select-protocol"
                         onChange={option => {
-                          const selectedProtocol = option?.value.toString();
-                          if (selectedProtocol) {
-                            setSelectedProtocol(selectedProtocol as ProtocolOption);
+                          if (isProtocolOption(option)) {
+                            setSelectedProtocol(option);
                           }
                         }}
                         dataUieName="select-protocol"
                         options={protocolOptions}
                         value={selectedProtocol}
                         label={t('modalCreateGroupProtocolHeading')}
-                        // menuPlacement="bottom"
                         menuPosition="absolute"
-                        menuIsOpen
+                        wrapperCSS={{marginBottom: 0}}
                       />
                       <div className="modal__info" data-uie-name="status-group-protocol-info">
                         {t('modalCreateGroupProtocolInfo')}

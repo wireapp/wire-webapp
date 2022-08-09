@@ -28,6 +28,7 @@ interface ModalComponentProps {
   onBgClick?: () => void;
   onClosed?: () => void;
   showLoading?: boolean;
+  wrapperCSS?: CSSObject;
 }
 
 const ModalOverlayStyles: CSSObject = {
@@ -82,6 +83,7 @@ const ModalComponent: React.FC<ModalComponentProps> = ({
   onBgClick = noop,
   onClosed = noop,
   showLoading = false,
+  wrapperCSS,
   children,
   ...rest
 }) => {
@@ -150,7 +152,7 @@ const ModalComponent: React.FC<ModalComponentProps> = ({
           role="button"
           tabIndex={-1}
           onKeyDown={noop}
-          css={hasVisibleClass ? ModalContentVisibleStyles : ModalContentStyles}
+          css={{...(hasVisibleClass ? ModalContentVisibleStyles : ModalContentStyles), ...wrapperCSS}}
         >
           {hasVisibleClass ? children : null}
         </div>
