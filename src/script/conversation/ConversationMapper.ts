@@ -30,7 +30,7 @@ import {
   CONVERSATION_TYPE,
   RemoteConversations,
 } from '@wireapp/api-client/src/conversation';
-
+import {QualifiedId} from '@wireapp/api-client/src/user';
 import {ACCESS_STATE} from './AccessState';
 import {ConversationStatus} from './ConversationStatus';
 import {Conversation} from '../entity/Conversation';
@@ -273,12 +273,13 @@ export class ConversationMapper {
   ): ConversationDatabaseData[] {
     localConversations = localConversations.filter(conversationData => conversationData);
 
-    const failedConversations = (remoteConversations.failed ?? [])
-      .map(
-        failedConversationId =>
-          localConversations.find(conversationId => matchQualifiedIds(conversationId, failedConversationId)) ?? false,
-      )
-      .filter(conversationData => conversationData);
+    const failedConversations = (remoteConversations.failed ?? []).reduce(
+      (prev: ConversationDatabaseData[], curr: QualifiedId) => {
+        const convo = localConversations.find(conversationId => matchQualifiedIds(conversationId, curr));
+        return convo ? [...prev, convo] : prev;
+      },
+      [],
+    );
 
     const localArchives = localConversations.filter(
       conversationData =>
@@ -402,7 +403,7 @@ export class ConversationMapper {
 
         return mergedConversation;
       })
-      .concat(failedConversations as ConversationDatabaseData[])
+      .concat(failedConversations)
       .concat(localArchives);
   }
 

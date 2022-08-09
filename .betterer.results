@@ -1163,21 +1163,21 @@ exports[`stricter compilation`] = {
       [569, 34, 18, "Object is possibly \'undefined\'.", "3207599164"],
       [611, 65, 4, "Argument of type \'null\' is not assignable to parameter of type \'RECEIPT_MODE\'.", "2087897566"]
     ],
-    "src/script/conversation/ConversationMapper.ts:3767194278": [
+    "src/script/conversation/ConversationMapper.ts:983223557": [
       [91, 45, 49, "Argument of type \'([key, value]: [keyof Conversation, string]) => void\' is not assignable to parameter of type \'(value: [string, any], index: number, array: [string, any][]) => void\'.\\n  Types of parameters \'__0\' and \'value\' are incompatible.\\n    Type \'[string, any]\' is not assignable to type \'[keyof Conversation, string]\'.\\n      Type at position 0 in source is not compatible with type at position 0 in target.\\n        Type \'string\' is not assignable to type \'keyof Conversation\'.", "2065920092"],
       [166, 36, 21, "Argument of type \'number | undefined\' is not assignable to parameter of type \'number\'.\\n  Type \'undefined\' is not assignable to type \'number\'.", "3907016453"],
       [185, 41, 26, "No overload matches this call.\\n  Overload 1 of 4, \'(value: string | number | Date): Date\', gave the following error.\\n    Argument of type \'string | undefined\' is not assignable to parameter of type \'string | number | Date\'.\\n      Type \'undefined\' is not assignable to type \'string | number | Date\'.\\n  Overload 2 of 4, \'(value: string | number): Date\', gave the following error.\\n    Argument of type \'string | undefined\' is not assignable to parameter of type \'string | number\'.\\n      Type \'undefined\' is not assignable to type \'string | number\'.", "582302494"],
       [191, 38, 23, "No overload matches this call.\\n  Overload 1 of 4, \'(value: string | number | Date): Date\', gave the following error.\\n    Argument of type \'string | undefined\' is not assignable to parameter of type \'string | number | Date\'.\\n  Overload 2 of 4, \'(value: string | number): Date\', gave the following error.\\n    Argument of type \'string | undefined\' is not assignable to parameter of type \'string | number\'.", "4035274933"],
-      [288, 11, 25, "Object is possibly \'undefined\'.", "4293153287"],
-      [337, 10, 24, "Type \'(QualifiedId | undefined)[]\' is not assignable to type \'QualifiedId[]\'.\\n  Type \'QualifiedId | undefined\' is not assignable to type \'QualifiedId\'.\\n    Type \'undefined\' is not assignable to type \'QualifiedId\'.", "125758031"],
-      [341, 61, 13, "Object is possibly \'undefined\'.", "1863462798"],
-      [342, 10, 13, "Object is possibly \'undefined\'.", "1863462798"],
-      [347, 70, 13, "Object is possibly \'undefined\'.", "1863462798"],
-      [348, 12, 13, "Object is possibly \'undefined\'.", "1863462798"],
-      [384, 49, 26, "No overload matches this call.\\n  Overload 1 of 4, \'(value: string | number | Date): Date\', gave the following error.\\n    Argument of type \'string | null\' is not assignable to parameter of type \'string | number | Date\'.\\n      Type \'null\' is not assignable to type \'string | number | Date\'.\\n  Overload 2 of 4, \'(value: string | number): Date\', gave the following error.\\n    Argument of type \'string | null\' is not assignable to parameter of type \'string | number\'.\\n      Type \'null\' is not assignable to type \'string | number\'.", "582302494"],
-      [388, 10, 33, "Type \'boolean | undefined\' is not assignable to type \'boolean\'.", "2524769620"],
-      [393, 46, 23, "No overload matches this call.\\n  Overload 1 of 4, \'(value: string | number | Date): Date\', gave the following error.\\n    Argument of type \'string | null\' is not assignable to parameter of type \'string | number | Date\'.\\n  Overload 2 of 4, \'(value: string | number): Date\', gave the following error.\\n    Argument of type \'string | null\' is not assignable to parameter of type \'string | number\'.", "4035274933"],
-      [398, 10, 30, "Type \'import(\\"wire-webapp/node_modules/@wireapp/api-client/src/conversation/MutedStatus\\").MutedStatus | null\' is not assignable to type \'number\'.\\n  Type \'null\' is not assignable to type \'number\'.", "127436159"]
+      [289, 11, 25, "Object is possibly \'undefined\'.", "4293153287"],
+      [338, 10, 24, "Type \'(QualifiedId | undefined)[]\' is not assignable to type \'QualifiedId[]\'.\\n  Type \'QualifiedId | undefined\' is not assignable to type \'QualifiedId\'.\\n    Type \'undefined\' is not assignable to type \'QualifiedId\'.", "125758031"],
+      [342, 61, 13, "Object is possibly \'undefined\'.", "1863462798"],
+      [343, 10, 13, "Object is possibly \'undefined\'.", "1863462798"],
+      [348, 70, 13, "Object is possibly \'undefined\'.", "1863462798"],
+      [349, 12, 13, "Object is possibly \'undefined\'.", "1863462798"],
+      [385, 49, 26, "No overload matches this call.\\n  Overload 1 of 4, \'(value: string | number | Date): Date\', gave the following error.\\n    Argument of type \'string | null\' is not assignable to parameter of type \'string | number | Date\'.\\n      Type \'null\' is not assignable to type \'string | number | Date\'.\\n  Overload 2 of 4, \'(value: string | number): Date\', gave the following error.\\n    Argument of type \'string | null\' is not assignable to parameter of type \'string | number\'.\\n      Type \'null\' is not assignable to type \'string | number\'.", "582302494"],
+      [389, 10, 33, "Type \'boolean | undefined\' is not assignable to type \'boolean\'.", "2524769620"],
+      [394, 46, 23, "No overload matches this call.\\n  Overload 1 of 4, \'(value: string | number | Date): Date\', gave the following error.\\n    Argument of type \'string | null\' is not assignable to parameter of type \'string | number | Date\'.\\n  Overload 2 of 4, \'(value: string | number): Date\', gave the following error.\\n    Argument of type \'string | null\' is not assignable to parameter of type \'string | number\'.", "4035274933"],
+      [399, 10, 30, "Type \'import(\\"wire-webapp/node_modules/@wireapp/api-client/src/conversation/MutedStatus\\").MutedStatus | null\' is not assignable to type \'number\'.\\n  Type \'null\' is not assignable to type \'number\'.", "127436159"]
     ],
     "src/script/conversation/ConversationRepository.test.ts:705447906": [
       [93, 42, 13, "Argument of type \'string\' is not assignable to parameter of type \'never\'.", "1690980598"],
