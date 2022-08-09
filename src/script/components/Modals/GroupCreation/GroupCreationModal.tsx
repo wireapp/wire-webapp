@@ -17,12 +17,12 @@
  *
  */
 
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useState, useMemo} from 'react';
 import {container} from 'tsyringe';
 import cx from 'classnames';
 import {amplify} from 'amplify';
 import {WebAppEvents} from '@wireapp/webapp-events';
-import {Select, StyledApp, Option} from '@wireapp/react-ui-kit';
+import {Select, StyledApp} from '@wireapp/react-ui-kit';
 import {RECEIPT_MODE} from '@wireapp/api-client/src/conversation/data/ConversationReceiptModeUpdateData';
 import {ConversationProtocol} from '@wireapp/api-client/src/conversation/NewConversation';
 
@@ -55,6 +55,7 @@ import useEffectRef from 'Util/useEffectRef';
 import {useFadingScrollbar} from '../../../ui/fadingScrollbar';
 import {Config} from '../../../Config';
 import {theme} from '../../../page/MainContent/MainContent';
+import {isProtocolOption, ProtocolOption} from '../../../guards/ProtocolOption';
 
 interface GroupCreationModalProps {
   conversationRepository: ConversationRepository;
@@ -72,16 +73,6 @@ enum GroupCreationModalState {
 
 const logger = getLogger('GroupCreationModal');
 
-interface ProtocolOption {
-  label: string;
-  value: ConversationProtocol;
-}
-
-function isProtocolOption(option?: Option | null): option is ProtocolOption {
-  const protocols = Object.values(ConversationProtocol) as string[];
-  return !!option && typeof option.value === 'string' && protocols.includes(option.value);
-}
-
 const GroupCreationModal: React.FC<GroupCreationModalProps> = ({
   conversationRepository,
   searchRepository,
@@ -94,10 +85,7 @@ const GroupCreationModal: React.FC<GroupCreationModalProps> = ({
     value: protocol,
   }));
 
-  const initialProtocol: ProtocolOption = {
-    label: t('modalCreateGroupProtocolSelect.proteus'),
-    value: ConversationProtocol.PROTEUS,
-  };
+  const initialProtocol = protocolOptions.find(protocol => protocol.value === ConversationProtocol.PROTEUS)!;
 
   const [isShown, setIsShown] = useState<boolean>(false);
   const [selectedContacts, setSelectedContacts] = useState<User[]>([]);
@@ -223,7 +211,7 @@ const GroupCreationModal: React.FC<GroupCreationModalProps> = ({
     }
   };
 
-  const getContacts = () => {
+  const contacts = useMemo(() => {
     if (showContacts) {
       if (!isTeam) {
         return userState.connectedUsers();
@@ -236,7 +224,7 @@ const GroupCreationModal: React.FC<GroupCreationModalProps> = ({
       return teamState.teamMembers().sort(sortUsersByPriority);
     }
     return [];
-  };
+  }, [isGuestEnabled, isTeam, showContacts, teamState, userState]);
 
   const clickOnToggle = (feature: number): void => {
     const newAccessState = toggleFeature(feature, accessState);
@@ -338,9 +326,9 @@ const GroupCreationModal: React.FC<GroupCreationModalProps> = ({
 
           {stateIsParticipants && (
             <div className="group-creation__list" ref={setScrollbarRef}>
-              {getContacts().length > 0 && (
+              {contacts.length > 0 && (
                 <UserSearchableList
-                  users={getContacts()}
+                  users={contacts}
                   filter={participantsInput}
                   selected={selectedContacts}
                   onUpdateSelectedUsers={setSelectedContacts}
