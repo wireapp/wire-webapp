@@ -30,9 +30,11 @@ import AvatarInitials from './AvatarInitials';
 import AvatarBadge from './AvatarBadge';
 import AvatarBorder from './AvatarBorder';
 import AvatarWrapper from './AvatarWrapper';
+import {t} from 'Util/LocalizerUtil';
 
 export interface UserAvatarProps extends React.HTMLProps<HTMLDivElement> {
   avatarSize: AVATAR_SIZE;
+  avatarAlt?: string;
   noBadge?: boolean;
   noFilter?: boolean;
   onClick?: (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => void;
@@ -49,6 +51,7 @@ export const shouldShowBadge = (size: AVATAR_SIZE, state: STATE): boolean => {
 const UserAvatar: React.FunctionComponent<UserAvatarProps> = ({
   participant,
   avatarSize,
+  avatarAlt = '',
   noBadge,
   noFilter,
   state,
@@ -70,6 +73,7 @@ const UserAvatar: React.FunctionComponent<UserAvatarProps> = ({
     'name',
     'initials',
   ]);
+  const avatarImgAlt = avatarAlt ? avatarAlt : `${t('userProfileImageAlt')} ${name}`;
 
   return (
     <AvatarWrapper
@@ -86,14 +90,16 @@ const UserAvatar: React.FunctionComponent<UserAvatarProps> = ({
 
       {initials && <AvatarInitials avatarSize={avatarSize} initials={initials} />}
 
-      <AvatarImage
-        avatarSize={avatarSize}
-        avatarAlt={name}
-        backgroundColor={backgroundColor}
-        isGrey={isImageGrey}
-        mediumPicture={mediumPictureResource}
-        previewPicture={previewPictureResource}
-      />
+      <div tabIndex={0} role="button">
+        <AvatarImage
+          avatarSize={avatarSize}
+          avatarAlt={avatarImgAlt}
+          backgroundColor={backgroundColor}
+          isGrey={isImageGrey}
+          mediumPicture={mediumPictureResource}
+          previewPicture={previewPictureResource}
+        />
+      </div>
 
       {!noBadge && shouldShowBadge(avatarSize, state) && <AvatarBadge state={state} />}
 

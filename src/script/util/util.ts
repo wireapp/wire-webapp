@@ -368,6 +368,18 @@ export const preventFocusOutside = (event: KeyboardEvent, parentId: string): voi
   (focusableContent[focusedItemIndex + 1] as HTMLElement)?.focus();
 };
 
+export const setContextMenuPosition = (event: React.KeyboardEvent) => {
+  event.stopPropagation();
+  event.preventDefault();
+
+  const {top, left, height} = (event.target as Element).getBoundingClientRect();
+  return new MouseEvent('MouseEvent', {
+    ...(event as unknown as MouseEvent),
+    clientX: left,
+    clientY: top + height,
+  });
+};
+
 export const generateConversationInputStorageKey = (conversationEntity: Conversation): string =>
   `${StorageKey.CONVERSATION.INPUT}|${conversationEntity.id}`;
 

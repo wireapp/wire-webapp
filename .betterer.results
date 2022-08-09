@@ -936,8 +936,8 @@ exports[`stricter compilation`] = {
       [176, 10, 20, "Type \'undefined\' is not assignable to type \'Participant\'.", "942864568"],
       [179, 10, 9, "Type \'undefined\' is not assignable to type \'MuteState\'.", "3616862203"]
     ],
-    "src/script/components/calling/FullscreenVideoCall.tsx:3337270414": [
-      [245, 46, 4, "Argument of type \'null\' is not assignable to parameter of type \'Participant\'.", "2087897566"]
+    "src/script/components/calling/FullscreenVideoCall.tsx:1656063968": [
+      [406, 50, 4, "Argument of type \'null\' is not assignable to parameter of type \'Participant\'.", "2087897566"]
     ],
     "src/script/components/calling/GroupVideoGrid.test.ts:1931211751": [
       [35, 55, 22, "Object is possibly \'null\'.", "1458310722"],
@@ -955,10 +955,10 @@ exports[`stricter compilation`] = {
       [126, 32, 4, "Argument of type \'null\' is not assignable to parameter of type \'string | undefined\'.", "2087897566"],
       [136, 6, 20, "Type \'null\' is not assignable to type \'Participant\'.", "942864568"]
     ],
-    "src/script/components/calling/GroupVideoGrid.tsx:610569498": [
-      [83, 46, 14, "Argument of type \'Participant | null\' is not assignable to parameter of type \'Partial<Record<\\"videoStream\\" | \\"hasActiveVideo\\" | \\"sharesScreen\\", Subscribable<any>>>\'.\\n  Type \'null\' is not assignable to type \'Partial<Record<\\"videoStream\\" | \\"hasActiveVideo\\" | \\"sharesScreen\\", Subscribable<any>>>\'.", "446802655"],
-      [92, 30, 4, "Argument of type \'null\' is not assignable to parameter of type \'Participant\'.", "2087897566"],
-      [100, 28, 11, "Argument of type \'Participant | undefined\' is not assignable to parameter of type \'Participant\'.\\n  Type \'undefined\' is not assignable to type \'Participant\'.", "2457692186"]
+    "src/script/components/calling/GroupVideoGrid.tsx:2097709450": [
+      [82, 46, 14, "Argument of type \'Participant | null\' is not assignable to parameter of type \'Partial<Record<\\"videoStream\\" | \\"hasActiveVideo\\" | \\"sharesScreen\\", Subscribable<any>>>\'.\\n  Type \'null\' is not assignable to type \'Partial<Record<\\"videoStream\\" | \\"hasActiveVideo\\" | \\"sharesScreen\\", Subscribable<any>>>\'.", "446802655"],
+      [91, 30, 4, "Argument of type \'null\' is not assignable to parameter of type \'Participant\'.", "2087897566"],
+      [99, 28, 11, "Argument of type \'Participant | undefined\' is not assignable to parameter of type \'Participant\'.\\n  Type \'undefined\' is not assignable to type \'Participant\'.", "2457692186"]
     ],
     "src/script/components/calling/chooseScreen.test.ts:1945034304": [
       [64, 23, 30, "Argument of type \'Element | null\' is not assignable to parameter of type \'Element\'.\\n  Type \'null\' is not assignable to type \'Element\'.", "1127551965"]
@@ -966,7 +966,7 @@ exports[`stricter compilation`] = {
     "src/script/components/calling/deviceToggleButton.test.ts:3520291628": [
       [31, 35, 16, "Argument of type \'Element | null\' is not assignable to parameter of type \'Element\'.\\n  Type \'null\' is not assignable to type \'Element\'.", "733554636"]
     ],
-    "src/script/components/calling/fullscreenVideoCall.test.tsx:3312717523": [
+    "src/script/components/calling/fullscreenVideoCall.test.tsx:2299129286": [
       [34, 34, 4, "Argument of type \'null\' is not assignable to parameter of type \'string | undefined\'.", "2087897566"],
       [110, 60, 4, "Argument of type \'null\' is not assignable to parameter of type \'string | undefined\'.", "2087897566"],
       [111, 60, 4, "Argument of type \'null\' is not assignable to parameter of type \'string | undefined\'.", "2087897566"],
@@ -984,16 +984,16 @@ exports[`stricter compilation`] = {
       [127, 11, 33, "Object is possibly \'null\'.", "1545610583"],
       [132, 11, 33, "Object is possibly \'null\'.", "1545610583"]
     ],
-    "src/script/components/list/ConversationListCallingCell.tsx:1743640908": [
+    "src/script/components/list/ConversationListCallingCell.tsx:2354053925": [
       [115, 90, 6, "Argument of type \'number | undefined\' is not assignable to parameter of type \'REASON\'.\\n  Type \'undefined\' is not assignable to type \'REASON\'.", "2124277697"],
       [128, 67, 8, "No overload matches this call.\\n  Overload 1 of 2, \'(...items: ConcatArray<User>[]): User[]\', gave the following error.\\n    Type \'User | undefined\' is not assignable to type \'User\'.\\n      Type \'undefined\' is not assignable to type \'User\'.\\n  Overload 2 of 2, \'(...items: (User | ConcatArray<User>)[]): User[]\', gave the following error.\\n    Type \'User | undefined\' is not assignable to type \'User\'.\\n      Type \'undefined\' is not assignable to type \'User\'.", "2198230984"],
       [148, 28, 12, "Type \'undefined\' cannot be used as an index type.", "3398917396"],
       [173, 10, 7, "Type \'(false | ContextMenuEntry | { click: () => void; icon: string; identifier: string; isDisabled: boolean; label: string; })[]\' is not assignable to type \'ContextMenuEntry[]\'.\\n  Type \'false | ContextMenuEntry | { click: () => void; icon: string; identifier: string; isDisabled: boolean; label: string; }\' is not assignable to type \'ContextMenuEntry\'.\\n    Type \'false\' has no properties in common with type \'ContextMenuEntry\'.", "4061926391"],
       [306, 16, 20, "Type \'Participant | null\' is not assignable to type \'Participant\'.\\n  Type \'null\' is not assignable to type \'Participant\'.", "942864568"]
     ],
-    "src/script/components/list/ConversationListCell.tsx:2515616563": [
-      [128, 8, 3, "Type \'(node: HTMLElement) => void\' is not assignable to type \'LegacyRef<HTMLLIElement> | undefined\'.\\n  Type \'(node: HTMLElement) => void\' is not assignable to type \'(instance: HTMLLIElement | null) => void\'.\\n    Types of parameters \'node\' and \'instance\' are incompatible.\\n      Type \'HTMLLIElement | null\' is not assignable to type \'HTMLElement\'.\\n        Type \'null\' is not assignable to type \'HTMLElement\'.", "193432436"],
-      [158, 23, 8, "Object is possibly \'undefined\'.", "2198230984"]
+    "src/script/components/list/ConversationListCell.tsx:931164040": [
+      [121, 8, 3, "Type \'(node: HTMLElement) => void\' is not assignable to type \'LegacyRef<HTMLLIElement> | undefined\'.\\n  Type \'(node: HTMLElement) => void\' is not assignable to type \'(instance: HTMLLIElement | null) => void\'.\\n    Types of parameters \'node\' and \'instance\' are incompatible.\\n      Type \'HTMLLIElement | null\' is not assignable to type \'HTMLElement\'.\\n        Type \'null\' is not assignable to type \'HTMLElement\'.", "193432436"],
+      [151, 23, 8, "Object is possibly \'undefined\'.", "2198230984"]
     ],
     "src/script/components/list/ParticipantItem.tsx:3591469056": [
       [86, 43, 18, "Argument of type \'HTMLDivElement | undefined\' is not assignable to parameter of type \'HTMLElement\'.\\n  Type \'undefined\' is not assignable to type \'HTMLElement\'.", "4082577534"],
@@ -1333,7 +1333,7 @@ exports[`stricter compilation`] = {
       [1185, 12, 35, "Object is possibly \'undefined\'.", "901544345"],
       [1187, 13, 35, "Object is possibly \'undefined\'.", "901544345"]
     ],
-    "src/script/conversation/ConversationRepository.ts:4237265023": [
+    "src/script/conversation/ConversationRepository.ts:224013631": [
       [181, 8, 29, "Argument of type \'(User | undefined)[] | undefined\' is not assignable to parameter of type \'User[] | undefined\'.\\n  Type \'(User | undefined)[]\' is not assignable to type \'User[]\'.", "1506995572"],
       [187, 75, 13, "No overload matches this call.\\n  Overload 1 of 4, \'(value: string | number | Date): Date\', gave the following error.\\n    Argument of type \'string | undefined\' is not assignable to parameter of type \'string | number | Date\'.\\n  Overload 2 of 4, \'(value: string | number): Date\', gave the following error.\\n    Argument of type \'string | undefined\' is not assignable to parameter of type \'string | number\'.", "2642562490"],
       [206, 16, 24, "Argument of type \'string | undefined\' is not assignable to parameter of type \'string\'.\\n  Type \'undefined\' is not assignable to type \'string\'.", "2322605270"],
@@ -1359,27 +1359,27 @@ exports[`stricter compilation`] = {
       [1655, 101, 5, "Object is of type \'unknown\'.", "165548477"],
       [1853, 18, 12, "Object is possibly \'undefined\'.", "1670678216"],
       [1941, 12, 39, "Argument of type \'(conversationEntity: Conversation) => Conversation\' is not assignable to parameter of type \'((value: Conversation) => Conversation | PromiseLike<Conversation>) & ((value: null) => Conversation | PromiseLike<...>)\'.\\n  Type \'(conversationEntity: Conversation) => Conversation\' is not assignable to type \'(value: null) => Conversation | PromiseLike<Conversation>\'.\\n    Types of parameters \'conversationEntity\' and \'value\' are incompatible.\\n      Type \'null\' is not assignable to type \'Conversation\'.", "3862325245"],
-      [2038, 52, 9, "Argument of type \'IncomingEvent\' is not assignable to parameter of type \'MappedEvent\'.\\n  Type \'ConversationCodeDeleteEvent\' is not assignable to type \'MappedEvent\'.\\n    Type \'ConversationCodeDeleteEvent\' is not assignable to type \'{ data?: string | MappedEventData | undefined; type: CONVERSATION_EVENT | CONVERSATION; }\'.\\n      Types of property \'data\' are incompatible.\\n        Type \'null\' is not assignable to type \'string | MappedEventData | undefined\'.", "1945995409"],
-      [2043, 6, 9, "Argument of type \'IncomingEvent\' is not assignable to parameter of type \'MappedEvent\'.", "1945995409"],
-      [2262, 60, 13, "Argument of type \'ContentMessage | MemberMessage | CallMessage | VerificationMessage | LegalHoldMessage | ... 9 more ... | undefined\' is not assignable to parameter of type \'Message\'.", "2065728181"],
-      [2263, 12, 35, "Argument of type \'(messageEntity: MemberMessage) => { conversationEntity: Conversation; }\' is not assignable to parameter of type \'(value: Message) => { conversationEntity: Conversation; } | PromiseLike<{ conversationEntity: Conversation; }>\'.\\n  Types of parameters \'messageEntity\' and \'value\' are incompatible.\\n    Type \'Message\' is missing the following properties from type \'MemberMessage\': allTeamMembers, exceedsMaxVisibleUsers, hasUsers, hiddenUserCount, and 34 more.", "3695844397"],
-      [2291, 8, 6, "Type \'string | undefined\' is not assignable to type \'string\'.\\n  Type \'undefined\' is not assignable to type \'string\'.", "1127975365"],
-      [2309, 26, 5, "Object is of type \'unknown\'.", "165548477"],
-      [2314, 4, 17, "Type \'undefined\' is not assignable to type \'{ conversationEntity: Conversation; }\'.", "4204377774"],
-      [2331, 6, 16, "Type \'string | undefined\' is not assignable to type \'string\'.\\n  Type \'undefined\' is not assignable to type \'string\'.", "1831201559"],
-      [2340, 70, 13, "Argument of type \'ContentMessage | MemberMessage | CallMessage | VerificationMessage | LegalHoldMessage | ... 9 more ... | undefined\' is not assignable to parameter of type \'Message\'.\\n  Type \'undefined\' is not assignable to type \'Message\'.", "2065728181"],
-      [2379, 12, 6, "Type \'string | null\' is not assignable to type \'string\'.\\n  Type \'null\' is not assignable to type \'string\'.", "1127975365"],
-      [2413, 73, 16, "Argument of type \'(QualifiedId | undefined)[]\' is not assignable to parameter of type \'QualifiedId[]\'.", "2829605732"],
-      [2492, 14, 9, "Type \'undefined\' cannot be used as an index type.", "665809274"],
-      [2517, 60, 9, "Argument of type \'ConversationMemberUpdateData\' is not assignable to parameter of type \'Partial<SelfStatusUpdateDatabaseData>\'.\\n  Types of property \'otr_muted_ref\' are incompatible.\\n    Type \'string | null | undefined\' is not assignable to type \'string | undefined\'.", "1946204345"],
-      [2631, 74, 42, "Object is possibly \'undefined\'.", "4089489462"],
-      [2669, 51, 4, "Property \'type\' does not exist on type \'never\'.", "2087944093"],
-      [2685, 25, 5, "Object is of type \'unknown\'.", "165548477"],
-      [2712, 25, 5, "Object is of type \'unknown\'.", "165548477"],
-      [2765, 98, 7, "Argument of type \'{ domain: string | undefined; id: string; }[] | undefined\' is not assignable to parameter of type \'QualifiedId[] | undefined\'.\\n  Type \'{ domain: string | undefined; id: string; }[]\' is not assignable to type \'QualifiedId[]\'.\\n    Type \'{ domain: string | undefined; id: string; }\' is not assignable to type \'QualifiedId\'.\\n      Types of property \'domain\' are incompatible.\\n        Type \'string | undefined\' is not assignable to type \'string\'.\\n          Type \'undefined\' is not assignable to type \'string\'.", "2414311946"],
-      [2772, 42, 13, "Argument of type \'ContentMessage | MemberMessage | CallMessage | VerificationMessage | LegalHoldMessage | ... 9 more ... | undefined\' is not assignable to parameter of type \'Message\'.", "2065728181"],
-      [2874, 64, 6, "Type \'string | undefined\' is not assignable to type \'string\'.\\n  Type \'undefined\' is not assignable to type \'string\'.", "1127975365"],
-      [2896, 6, 6, "Type \'string | undefined\' is not assignable to type \'string\'.\\n  Type \'undefined\' is not assignable to type \'string\'.", "1127975365"]
+      [2040, 52, 9, "Argument of type \'IncomingEvent\' is not assignable to parameter of type \'MappedEvent\'.\\n  Type \'ConversationCodeDeleteEvent\' is not assignable to type \'MappedEvent\'.\\n    Type \'ConversationCodeDeleteEvent\' is not assignable to type \'{ data?: string | MappedEventData | undefined; type: CONVERSATION_EVENT | CONVERSATION; }\'.\\n      Types of property \'data\' are incompatible.\\n        Type \'null\' is not assignable to type \'string | MappedEventData | undefined\'.", "1945995409"],
+      [2045, 6, 9, "Argument of type \'IncomingEvent\' is not assignable to parameter of type \'MappedEvent\'.", "1945995409"],
+      [2264, 60, 13, "Argument of type \'ContentMessage | MemberMessage | CallMessage | VerificationMessage | LegalHoldMessage | ... 9 more ... | undefined\' is not assignable to parameter of type \'Message\'.", "2065728181"],
+      [2265, 12, 35, "Argument of type \'(messageEntity: MemberMessage) => { conversationEntity: Conversation; }\' is not assignable to parameter of type \'(value: Message) => { conversationEntity: Conversation; } | PromiseLike<{ conversationEntity: Conversation; }>\'.\\n  Types of parameters \'messageEntity\' and \'value\' are incompatible.\\n    Type \'Message\' is missing the following properties from type \'MemberMessage\': allTeamMembers, exceedsMaxVisibleUsers, hasUsers, hiddenUserCount, and 34 more.", "3695844397"],
+      [2293, 8, 6, "Type \'string | undefined\' is not assignable to type \'string\'.\\n  Type \'undefined\' is not assignable to type \'string\'.", "1127975365"],
+      [2311, 26, 5, "Object is of type \'unknown\'.", "165548477"],
+      [2316, 4, 17, "Type \'undefined\' is not assignable to type \'{ conversationEntity: Conversation; }\'.", "4204377774"],
+      [2333, 6, 16, "Type \'string | undefined\' is not assignable to type \'string\'.\\n  Type \'undefined\' is not assignable to type \'string\'.", "1831201559"],
+      [2342, 70, 13, "Argument of type \'ContentMessage | MemberMessage | CallMessage | VerificationMessage | LegalHoldMessage | ... 9 more ... | undefined\' is not assignable to parameter of type \'Message\'.\\n  Type \'undefined\' is not assignable to type \'Message\'.", "2065728181"],
+      [2381, 12, 6, "Type \'string | null\' is not assignable to type \'string\'.\\n  Type \'null\' is not assignable to type \'string\'.", "1127975365"],
+      [2415, 73, 16, "Argument of type \'(QualifiedId | undefined)[]\' is not assignable to parameter of type \'QualifiedId[]\'.", "2829605732"],
+      [2494, 14, 9, "Type \'undefined\' cannot be used as an index type.", "665809274"],
+      [2519, 60, 9, "Argument of type \'ConversationMemberUpdateData\' is not assignable to parameter of type \'Partial<SelfStatusUpdateDatabaseData>\'.\\n  Types of property \'otr_muted_ref\' are incompatible.\\n    Type \'string | null | undefined\' is not assignable to type \'string | undefined\'.", "1946204345"],
+      [2633, 74, 42, "Object is possibly \'undefined\'.", "4089489462"],
+      [2671, 51, 4, "Property \'type\' does not exist on type \'never\'.", "2087944093"],
+      [2687, 25, 5, "Object is of type \'unknown\'.", "165548477"],
+      [2714, 25, 5, "Object is of type \'unknown\'.", "165548477"],
+      [2767, 98, 7, "Argument of type \'{ domain: string | undefined; id: string; }[] | undefined\' is not assignable to parameter of type \'QualifiedId[] | undefined\'.\\n  Type \'{ domain: string | undefined; id: string; }[]\' is not assignable to type \'QualifiedId[]\'.\\n    Type \'{ domain: string | undefined; id: string; }\' is not assignable to type \'QualifiedId\'.\\n      Types of property \'domain\' are incompatible.\\n        Type \'string | undefined\' is not assignable to type \'string\'.\\n          Type \'undefined\' is not assignable to type \'string\'.", "2414311946"],
+      [2774, 42, 13, "Argument of type \'ContentMessage | MemberMessage | CallMessage | VerificationMessage | LegalHoldMessage | ... 9 more ... | undefined\' is not assignable to parameter of type \'Message\'.", "2065728181"],
+      [2876, 64, 6, "Type \'string | undefined\' is not assignable to type \'string\'.\\n  Type \'undefined\' is not assignable to type \'string\'.", "1127975365"],
+      [2898, 6, 6, "Type \'string | undefined\' is not assignable to type \'string\'.\\n  Type \'undefined\' is not assignable to type \'string\'.", "1127975365"]
     ],
     "src/script/conversation/ConversationRoleRepository.test.ts:4040891269": [
       [36, 6, 27, "Argument of type \'TeamRepository | undefined\' is not assignable to parameter of type \'TeamRepository\'.\\n  Type \'undefined\' is not assignable to type \'TeamRepository\'.", "2595125417"],
@@ -2211,13 +2211,9 @@ exports[`stricter compilation`] = {
     "src/script/tracking/Helpers.ts:3850783506": [
       [47, 10, 30, "Object is possibly \'undefined\'.", "3185682702"]
     ],
-    "src/script/ui/ContextMenu.tsx:2048719779": [
+    "src/script/ui/ContextMenu.tsx:3329910082": [
       [53, 4, 9, "Type \'undefined\' is not assignable to type \'HTMLDivElement\'.", "1873118818"],
-      [81, 68, 14, "Argument of type \'string | undefined\' is not assignable to parameter of type \'string\'.\\n  Type \'undefined\' is not assignable to type \'string\'.", "1122698020"],
-      [96, 30, 8, "Argument of type \'ContextMenuEntry | undefined\' is not assignable to parameter of type \'ContextMenuEntry\'.\\n  Type \'undefined\' is not assignable to type \'ContextMenuEntry\'.", "2198592556"],
-      [102, 43, 8, "Argument of type \'ContextMenuEntry | undefined\' is not assignable to parameter of type \'ContextMenuEntry\'.\\n  Type \'undefined\' is not assignable to type \'ContextMenuEntry\'.", "2198592556"],
-      [134, 29, 3, "Type \'Dispatch<SetStateAction<HTMLUListElement | undefined>>\' is not assignable to type \'LegacyRef<HTMLUListElement> | undefined\'.\\n  Type \'Dispatch<SetStateAction<HTMLUListElement | undefined>>\' is not assignable to type \'(instance: HTMLUListElement | null) => void\'.\\n    Types of parameters \'value\' and \'instance\' are incompatible.\\n      Type \'HTMLUListElement | null\' is not assignable to type \'SetStateAction<HTMLUListElement | undefined>\'.\\n        Type \'null\' is not assignable to type \'SetStateAction<HTMLUListElement | undefined>\'.", "193432436"],
-      [148, 30, 11, "Argument of type \'string | undefined\' is not assignable to parameter of type \'string\'.\\n  Type \'undefined\' is not assignable to type \'string\'.", "2169853657"]
+      [141, 29, 3, "Type \'Dispatch<SetStateAction<HTMLUListElement | undefined>>\' is not assignable to type \'LegacyRef<HTMLUListElement> | undefined\'.\\n  Type \'Dispatch<SetStateAction<HTMLUListElement | undefined>>\' is not assignable to type \'(instance: HTMLUListElement | null) => void\'.\\n    Types of parameters \'value\' and \'instance\' are incompatible.\\n      Type \'HTMLUListElement | null\' is not assignable to type \'SetStateAction<HTMLUListElement | undefined>\'.\\n        Type \'null\' is not assignable to type \'SetStateAction<HTMLUListElement | undefined>\'.", "193432436"]
     ],
     "src/script/ui/Modal.ts:2744470243": [
       [35, 4, 10, "Type \'HTMLElement | null\' is not assignable to type \'HTMLElement\'.\\n  Type \'null\' is not assignable to type \'HTMLElement\'.", "3985246182"],
@@ -2389,7 +2385,7 @@ exports[`stricter compilation`] = {
     "src/script/util/test/mock/LocalStorageMock.ts:763526660": [
       [30, 4, 15, "Type \'null\' is not assignable to type \'string\'.", "729139267"]
     ],
-    "src/script/util/util.ts:4200255865": [
+    "src/script/util/util.ts:401163745": [
       [50, 40, 34, "Argument of type \'boolean | undefined\' is not assignable to parameter of type \'boolean\'.", "212151669"],
       [104, 34, 13, "Argument of type \'string | ArrayBuffer | null\' is not assignable to parameter of type \'string | ArrayBuffer | PromiseLike<string | ArrayBuffer>\'.\\n  Type \'null\' is not assignable to type \'string | ArrayBuffer | PromiseLike<string | ArrayBuffer>\'.", "3216273927"],
       [122, 41, 8, "Type \'string | null\' is not assignable to type \'string\'.\\n  Type \'null\' is not assignable to type \'string\'.", "3750463409"],
@@ -2403,7 +2399,7 @@ exports[`stricter compilation`] = {
       [181, 83, 5, "Object is of type \'unknown\'.", "165548477"],
       [195, 8, 9, "Argument of type \'undefined\' is not assignable to parameter of type \'string\'.", "2620553983"]
     ],
-    "src/script/view_model/CallingViewModel.ts:3603774031": [
+    "src/script/view_model/CallingViewModel.ts:3511156749": [
       [87, 11, 17, "Property \'activeCallViewTab\' has no initializer and is not definitely assigned in the constructor.", "1323835793"],
       [319, 4, 63, "Type \'Conversation | undefined\' is not assignable to type \'Conversation\'.\\n  Type \'undefined\' is not assignable to type \'Conversation\'.", "62763745"]
     ],
@@ -2624,10 +2620,6 @@ exports[`stricter compilation`] = {
     "src/script/view_model/panel/NotificationsPanel.test.ts:989279192": [
       [38, 54, 29, "Argument of type \'Element | null\' is not assignable to parameter of type \'Element\'.\\n  Type \'null\' is not assignable to type \'Element\'.", "1262202094"],
       [76, 20, 77, "Argument of type \'Element | null\' is not assignable to parameter of type \'Document | Node | Element | Window\'.", "1971299222"]
-    ],
-    "src/script/view_model/panel/NotificationsPanel.tsx:3967190560": [
-      [46, 56, 18, "Argument of type \'Conversation | null\' is not assignable to parameter of type \'Partial<Record<\\"notificationState\\", Subscribable<any>>>\'.\\n  Type \'null\' is not assignable to type \'Partial<Record<\\"notificationState\\", Subscribable<any>>>\'.", "2242649668"],
-      [78, 77, 18, "Argument of type \'Conversation | null\' is not assignable to parameter of type \'Conversation\'.\\n  Type \'null\' is not assignable to type \'Conversation\'.", "2242649668"]
     ],
     "src/script/view_model/panel/PanelHeader.test.ts:4232255009": [
       [33, 39, 22, "Argument of type \'Element | null\' is not assignable to parameter of type \'Element\'.\\n  Type \'null\' is not assignable to type \'Element\'.", "3474761039"],
