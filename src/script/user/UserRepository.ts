@@ -444,7 +444,7 @@ export class UserRepository {
       try {
         const response = await this.userService.getUsers(chunkOfUserIds);
         return response ? this.userMapper.mapUsersFromJson(response) : [];
-      } catch (error) {
+      } catch (error: any) {
         if (
           error.label === BackendErrorLabel.FEDERATION_NOT_AVAILABLE ||
           error.label === BackendErrorLabel.FEDERATION_BACKEND_NOT_FOUND ||
