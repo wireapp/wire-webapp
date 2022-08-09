@@ -719,8 +719,8 @@ const InputBar = ({
     if (!isEditing) {
       saveDraftState(storageRepository, conversationEntity, {
         mentions: currentMentions,
-        reply: replyMessageEntity,
         text: inputValue,
+        ...(replyMessageEntity && {reply: replyMessageEntity}),
       });
     }
   }, [isEditing, currentMentions, replyMessageEntity, inputValue]);

@@ -17,23 +17,29 @@
  *
  */
 
-import {Conversation} from '../entity/Conversation';
 import {generateConversationInputStorageKey} from 'Util/util';
-import {ContentMessage} from '../entity/message/ContentMessage';
-import {MentionEntity} from '../message/MentionEntity';
+
 import {StorageRepository} from '../storage';
 import {MessageRepository} from '../conversation/MessageRepository';
+import {Conversation} from '../entity/Conversation';
+import {ContentMessage} from '../entity/message/ContentMessage';
+import {isMessageReply} from '../guards/Message';
+import {MentionEntity} from '../message/MentionEntity';
 
 interface DraftMessage {
   mentions: MentionEntity[];
-  reply: ContentMessage | null;
+  reply?: ContentMessage;
   replyEntityPromise?: Promise<ContentMessage>;
   text: string;
 }
 
-interface Draft {
+type Reply = {
+  messageId?: string;
+};
+
+export interface Draft {
   mentions: MentionEntity[];
-  reply: {messageId?: string};
+  reply: Reply;
   text: string;
 }
 
@@ -62,22 +68,21 @@ export const loadDraftState = async (
   const storageValue = await storageRepository.storageService.loadFromSimpleStorage<Draft>(storageKey);
 
   if (typeof storageValue === 'undefined') {
-    return {mentions: [], reply: {} as ContentMessage, text: ''};
+    return {mentions: [], text: ''};
   }
 
   if (typeof storageValue === 'string') {
-    return {mentions: [], reply: {} as ContentMessage, text: storageValue};
+    return {mentions: [], text: storageValue};
   }
 
-  const draftMessage: DraftMessage = {...(storageValue as DraftMessage)};
+  const draftMessage: DraftMessage = {
+    mentions: storageValue.mentions.map(
+      mention => new MentionEntity(mention.startIndex, mention.length, mention.userId, mention.domain),
+    ),
+    text: storageValue.text,
+  };
 
-  draftMessage.mentions = draftMessage.mentions.map(mention => {
-    return new MentionEntity(mention.startIndex, mention.length, mention.userId, mention.domain);
-  });
-
-  const replyMessageId = draftMessage.reply
-    ? (draftMessage.reply as unknown as {messageId: string}).messageId
-    : undefined;
+  const replyMessageId = isMessageReply(storageValue) ? storageValue.reply.messageId : undefined;
 
   if (replyMessageId) {
     draftMessage.replyEntityPromise = messageRepository.getMessageInConversationById(

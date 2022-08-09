@@ -19,23 +19,27 @@
 
 import {useEffect} from 'react';
 
+import {isDragEvent} from '../guards/Event';
+
+const onDragOver = (event: Event) => event.preventDefault();
+
 const useDropFiles = (selector: string, onDropOrPastedFile: (files: File[]) => void) => {
-  useEffect(() => {
-    const container = document.querySelector(selector);
-
-    const onDragOver = (event: Event) => event.preventDefault();
-
-    const onDropFiles = (event: Event) => {
+  const onDropFiles = (event: Event) => {
+    if (isDragEvent(event)) {
       event.preventDefault();
 
-      const {dataTransfer} = event as DragEvent;
-      const eventDataTransfer = dataTransfer || {};
-      const files = (eventDataTransfer as DataTransfer).files || new FileList();
+      const {dataTransfer} = event;
+      const eventDataTransfer: Partial<DataTransfer> = dataTransfer || {};
+      const files = eventDataTransfer.files || new FileList();
 
       if (files.length > 0) {
         onDropOrPastedFile([files[0]]);
       }
-    };
+    }
+  };
+
+  useEffect(() => {
+    const container = document.querySelector(selector);
 
     if (container) {
       container.addEventListener('drop', onDropFiles);
@@ -48,7 +52,7 @@ const useDropFiles = (selector: string, onDropOrPastedFile: (files: File[]) => v
     }
 
     return () => undefined;
-  }, []);
+  }, [selector]);
 };
 
 export default useDropFiles;
