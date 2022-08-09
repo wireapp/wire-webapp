@@ -27,11 +27,11 @@ interface PreferencesRadioProps<T> {
     label: string;
     value: T;
   }[];
-  selectedValue: string;
+  selectedValue: T;
   uieName?: string;
 }
 
-const PreferencesRadio = <T extends string>({
+const PreferencesRadio = <T extends string | number>({
   name,
   selectedValue,
   options,
