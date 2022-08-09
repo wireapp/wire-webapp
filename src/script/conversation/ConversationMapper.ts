@@ -273,8 +273,17 @@ export class ConversationMapper {
   ): ConversationDatabaseData[] {
     localConversations = localConversations.filter(conversationData => conversationData);
 
-    const failedConversations = (remoteConversations.failed ?? []).map(failedConversationId =>
-      localConversations.find(conversationId => matchQualifiedIds(conversationId, failedConversationId)),
+    const failedConversations = (remoteConversations.failed ?? [])
+      .map(
+        failedConversationId =>
+          localConversations.find(conversationId => matchQualifiedIds(conversationId, failedConversationId)) ?? false,
+      )
+      .filter(conversationData => conversationData);
+
+    const localArchives = localConversations.filter(
+      conversationData =>
+        conversationData.archived_state &&
+        remoteConversations.found?.findIndex(remote => remote.qualified_id.id === conversationData.id) === -1,
     );
 
     return remoteConversations.found
@@ -393,7 +402,8 @@ export class ConversationMapper {
 
         return mergedConversation;
       })
-      .concat(failedConversations);
+      .concat(failedConversations as ConversationDatabaseData[])
+      .concat(localArchives);
   }
 
   static mapAccessCode(conversation: Conversation, accessCode: ConversationCode): void {

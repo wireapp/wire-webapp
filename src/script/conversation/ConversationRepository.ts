@@ -1943,7 +1943,13 @@ export class ConversationRepository {
         if (conversationEntity) {
           // Check if conversation was archived
           previouslyArchived = conversationEntity.is_archived();
-
+          if (
+            previouslyArchived &&
+            conversationEntity.status() === ConversationStatus.PAST_MEMBER &&
+            type === CONVERSATION_EVENT.MEMBER_JOIN
+          ) {
+            this.unarchiveConversation(conversationEntity, false, 'event from notification stream');
+          }
           const isBackendTimestamp = eventSource !== EventSource.INJECTED;
           if (type !== CONVERSATION_EVENT.MEMBER_JOIN && type !== CONVERSATION_EVENT.MEMBER_LEAVE) {
             conversationEntity.updateTimestampServer(eventJson.server_time || eventJson.time, isBackendTimestamp);
