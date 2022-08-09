@@ -279,17 +279,15 @@ const InputBar = ({
 
       const caretPosition = mentionEntity.endIndex + 1;
 
-      if (textareaRef.current) {
-        textareaRef.current.selectionStart = caretPosition;
-        textareaRef.current.selectionEnd = caretPosition;
-      }
+      setEditedMention(undefined);
+      setSelectionStart(caretPosition);
+      setSelectionEnd(caretPosition);
 
       // Need to use setTimeout, because the setSelectionRange works asynchronously
       setTimeout(() => {
         textareaRef.current?.setSelectionRange(caretPosition, caretPosition);
+        textareaRef.current?.focus();
       }, 0);
-
-      endMentionFlow();
     }
   };
 
