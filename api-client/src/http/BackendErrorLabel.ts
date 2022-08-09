@@ -114,6 +114,8 @@ export enum BackendErrorLabel {
   FEDERATION_NOT_ALLOWED = 'federation-denied',
   FEDERATION_NOT_AVAILABLE = 'federation-not-available',
   FEDERATION_BACKEND_NOT_FOUND = 'srv-record-not-found',
+  FEDERATION_REMOTE_ERROR = 'federation-remote-error',
+  FEDERATION_TLS_ERROR = 'federation-tls-error',
 }
 
 export enum SyntheticErrorLabel {
