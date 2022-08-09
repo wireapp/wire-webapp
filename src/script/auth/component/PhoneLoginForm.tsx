@@ -48,11 +48,6 @@ const PhoneLoginForm = ({isFetching, onSubmit}: LoginFormProps) => {
   ];
   const currentSelectValue = expandedCountryList.find(selectedCountry => selectedCountry.value === country);
 
-  const onSelectCountry = (selectedCountry: string) => {
-    setCountry(selectedCountry);
-    setCountryCode((getCountryCode(selectedCountry) || 'X2').toString(10));
-  };
-
   const onCountryCodeChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const {value} = event.target;
     const codeNumbers = value.replace(/\D/g, '');
@@ -77,7 +72,14 @@ const PhoneLoginForm = ({isFetching, onSubmit}: LoginFormProps) => {
     <div>
       <Select
         id="select-phone"
-        onChange={onSelectCountry}
+        onChange={country => {
+          const selectedCountryValue = country?.value.toString();
+
+          if (selectedCountryValue) {
+            setCountry(selectedCountryValue);
+            setCountryCode((getCountryCode(selectedCountryValue) || 'X2').toString(10));
+          }
+        }}
         dataUieName="select-phone"
         options={expandedCountryList}
         value={currentSelectValue}
