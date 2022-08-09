@@ -63,6 +63,7 @@ declare global {
           ENABLE_DOMAIN_DISCOVERY: boolean;
           ENABLE_ENFORCE_DESKTOP_APPLICATION_ONLY: boolean;
           ENABLE_EXTRA_CLIENT_ENTROPY: boolean;
+          FORCE_EXTRA_CLIENT_ENTROPY: boolean;
           ENABLE_MEDIA_EMBEDS: boolean;
           ENABLE_MLS: boolean;
           ENABLE_PHONE_LOGIN: boolean;

@@ -131,7 +131,7 @@ export class ConversationMapper {
 
     if (archived_timestamp) {
       conversationEntity.setTimestamp(archived_timestamp, Conversation.TIMESTAMP_TYPE.ARCHIVED);
-      conversationEntity.archivedState(selfState.archived_state);
+      conversationEntity.archivedState(selfState.archived_state ?? false);
     }
 
     if (cleared_timestamp !== undefined) {
@@ -212,8 +212,12 @@ export class ConversationMapper {
       throw new ConversationError(BASE_ERROR_TYPE.INVALID_PARAMETER, BaseError.MESSAGE.INVALID_PARAMETER);
     }
 
-    const {creator, id, members, name, others, qualified_others, type, group_id} = conversationData;
-    let conversationEntity = new Conversation(id, conversationData.domain || conversationData.qualified_id?.domain);
+    const {creator, id, members, name, others, qualified_others, type, group_id, protocol} = conversationData;
+    let conversationEntity = new Conversation(
+      id,
+      conversationData.domain || conversationData.qualified_id?.domain,
+      protocol,
+    );
     conversationEntity.roles(conversationData.roles || {});
 
     conversationEntity.creator = creator;
@@ -274,7 +278,7 @@ export class ConversationMapper {
     );
 
     return remoteConversations.found
-      .map((remoteConversationData: ConversationBackendData & {receipt_mode: number}, index: number) => {
+      .map((remoteConversationData: ConversationBackendData, index: number) => {
         const remoteConversationId: QualifiedEntity = remoteConversationData.qualified_id || {
           domain: '',
           id: remoteConversationData.id,
@@ -296,6 +300,7 @@ export class ConversationMapper {
           team,
           type,
           group_id,
+          protocol,
         } = remoteConversationData;
         const {others: othersStates, self: selfState} = members;
 
@@ -308,6 +313,7 @@ export class ConversationMapper {
           group_id,
           message_timer,
           name,
+          protocol,
           receipt_mode,
           roles: {},
           status: (selfState as any).status,

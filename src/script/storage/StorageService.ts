@@ -224,7 +224,7 @@ export class StorageService {
       .delete();
   }
 
-  async deleteEventsByDate(storeName: string, conversationId: string, isoDate: string): Promise<number> {
+  async deleteEventsByDate(storeName: string, conversationId: string, isoDate?: string): Promise<number> {
     if (this.isTemporaryAndNonPersistent) {
       let deletedRecords = 0;
       const primaryKeys = await this.readAllPrimaryKeys(storeName);

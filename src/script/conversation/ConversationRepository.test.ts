@@ -23,6 +23,7 @@ import {amplify} from 'amplify';
 import {ConnectionStatus} from '@wireapp/api-client/src/connection/';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import {CONVERSATION_TYPE} from '@wireapp/api-client/src/conversation/';
+import {ConversationProtocol} from '@wireapp/api-client/src/conversation/NewConversation';
 import {RECEIPT_MODE} from '@wireapp/api-client/src/conversation/data';
 import {ClientClassification} from '@wireapp/api-client/src/client/';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
@@ -227,6 +228,7 @@ describe('ConversationRepository', () => {
           },
         },
         name: null,
+        protocol: ConversationProtocol.PROTEUS,
         team: 'cf162e22-20b8-4533-a5ab-d3f5dde39d2c',
         type: 0,
       };
@@ -662,6 +664,7 @@ describe('ConversationRepository', () => {
             },
             message_timer: null,
             name: '-, benny_bella',
+            protocol: ConversationProtocol.PROTEUS,
             qualified_id: {
               domain: 'bella.wire.link',
               id: 'c9405f98-e25a-4b1f-ade7-227ea765dff7',

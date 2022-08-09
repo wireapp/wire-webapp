@@ -24,6 +24,7 @@ export interface Gif {
   animated: string;
   static: string;
   url: string;
+  title?: string;
 }
 
 export interface RandomGifOptions {
@@ -130,7 +131,7 @@ export class GiphyRepository {
 
       const result = [];
 
-      for (const {images, url} of gifs) {
+      for (const {images, url, caption} of gifs) {
         const staticGif = images.fixed_width_still;
         const animatedGif = images.downsized;
         const exceedsMaxSize = parseInt(animatedGif.size, 10) > options.maxSize;
@@ -139,6 +140,7 @@ export class GiphyRepository {
           result.push({
             animated: animatedGif.url,
             static: staticGif.url,
+            title: caption,
             url,
           });
         }
