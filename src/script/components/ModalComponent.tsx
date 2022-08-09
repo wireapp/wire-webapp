@@ -62,7 +62,7 @@ const ModalContentStyles: CSSObject = {
   flexDirection: 'column',
   fontSize: 14,
   margin: 'auto',
-  maxHeight: 560,
+  maxHeight: 615,
   overflow: 'hidden',
   overflowY: 'hidden',
   padding: 16,
