@@ -127,6 +127,7 @@ import {extractClientDiff} from './ClientMismatchUtil';
 import {Core} from '../service/CoreSingleton';
 import {ClientState} from '../client/ClientState';
 import {MLSReturnType} from '@wireapp/core/src/main/conversation';
+import {isMemberMessage} from '../guards/Message';
 
 type ConversationDBChange = {obj: EventRecord; oldObj: EventRecord};
 type FetchPromise = {rejectFn: (error: ConversationError) => void; resolveFn: (conversation: Conversation) => void};
@@ -618,27 +619,34 @@ export class ConversationRepository {
 
     const mappedMessageEntities = await this.addEventsToConversation(events, conversationEntity);
     conversationEntity.hasAdditionalMessages(hasAdditionalMessages);
-    if (!hasAdditionalMessages) {
-      const firstMessage = conversationEntity.getFirstMessage() as MemberMessage;
-      const checkCreationMessage = firstMessage?.isMember() && firstMessage.isCreation();
-      if (checkCreationMessage) {
-        const groupCreationMessageIn1to1 = conversationEntity.is1to1() && firstMessage.isGroupCreation();
-        const one2oneConnectionMessageInGroup = conversationEntity.isGroup() && firstMessage.isConnection();
-        const wrongMessageTypeForConversation = groupCreationMessageIn1to1 || one2oneConnectionMessageInGroup;
 
-        if (wrongMessageTypeForConversation) {
-          this.messageRepository.deleteMessage(conversationEntity, firstMessage);
-          conversationEntity.hasCreationMessage = false;
-        } else {
-          conversationEntity.hasCreationMessage = true;
+    if (!hasAdditionalMessages) {
+      const allMessages = conversationEntity.getAllMessages();
+      if (!!allMessages.length) {
+        const firstMessage = allMessages[0];
+        if (isMemberMessage(firstMessage)) {
+          const checkCreationMessage = firstMessage.isMember() && firstMessage.isCreation();
+          if (checkCreationMessage) {
+            const groupCreationMessageIn1to1 = conversationEntity.is1to1() && firstMessage.isGroupCreation();
+
+            const one2oneConnectionMessageInGroup = conversationEntity.isGroup() && firstMessage.isConnection();
+            const wrongMessageTypeForConversation = groupCreationMessageIn1to1 || one2oneConnectionMessageInGroup;
+
+            if (wrongMessageTypeForConversation) {
+              this.messageRepository.deleteMessage(conversationEntity, firstMessage);
+              conversationEntity.hasCreationMessage = false;
+            } else {
+              conversationEntity.hasCreationMessage = true;
+            }
+          }
+
+          if (!conversationEntity.hasCreationMessage) {
+            this.addCreationMessage(conversationEntity, this.userState.self().isTemporaryGuest());
+          }
         }
       }
-
-      const addCreationMessage = !conversationEntity.hasCreationMessage;
-      if (addCreationMessage) {
-        this.addCreationMessage(conversationEntity, this.userState.self().isTemporaryGuest());
-      }
     }
+
     return mappedMessageEntities;
   }
 
@@ -2900,8 +2908,7 @@ export class ConversationRepository {
       id: messageEntity.from,
     });
     messageEntity.user(userEntity);
-    const isMemberMessage = messageEntity.isMember();
-    if (isMemberMessage || messageEntity.hasOwnProperty('userEntities')) {
+    if (isMemberMessage(messageEntity) || messageEntity.hasOwnProperty('userEntities')) {
       return this.userRepository.getUsersById((messageEntity as MemberMessage).userIds()).then(userEntities => {
         userEntities.sort(sortUsersByPriority);
         (messageEntity as MemberMessage).userEntities(userEntities);
