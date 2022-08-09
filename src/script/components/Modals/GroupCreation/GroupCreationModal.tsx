@@ -54,6 +54,7 @@ import {
 import useEffectRef from 'Util/useEffectRef';
 import {useFadingScrollbar} from '../../../ui/fadingScrollbar';
 import {Config} from '../../../Config';
+import {theme} from '../../../page/MainContent/MainContent';
 
 interface GroupCreationModalProps {
   conversationRepository: ConversationRepository;
@@ -68,47 +69,6 @@ enum GroupCreationModalState {
   PARTICIPANTS = 'GroupCreationModal.STATE.PARTICIPANTS',
   PREFERENCES = 'GroupCreationModal.STATE.PREFERENCES',
 }
-
-const theme = {
-  Checkbox: {
-    background: 'var(--checkbox-background)',
-    border: 'var(--checkbox-border)',
-    borderFocused: 'blue',
-    disableBgColor: 'var(--checkbox-background-disabled)',
-    disableBorderColor: 'var(--checkbox-border-disabled)',
-    disablecheckedBgColor: 'var(--checkbox-background-disabled-selected)',
-    invalidBorderColor: 'var(--checkbox-alert)',
-  },
-  IconButton: {
-    activePrimaryBgColor: 'var(--accent-color-highlight)',
-    focusBorderColor: 'var(--accent-color-border)',
-    hoverPrimaryBgColor: 'var(--icon-button-primary-hover-bg)',
-    primaryActiveFillColor: 'var(--icon-primary-active-fill)',
-    primaryBgColor: 'var(--icon-button-primary-enabled-bg)',
-    primaryBorderColor: 'var(--icon-button-primary-border)',
-    primaryDisabledBgColor: 'var(--icon-button-primary-disabled-bg)',
-    primaryDisabledBorderColor: 'var(--icon-button-primary-disabled-border)',
-    primaryHoverBorderColor: 'var(--icon-button-primary-hover-border)',
-    secondaryActiveBorderColor: 'var(--icon-secondary-active-border)',
-  },
-  Input: {
-    backgroundColor: 'var(--app-bg-secondary)',
-    backgroundColorDisabled: 'var(--sidebar-bg)',
-    labelColor: 'var(--text-input-label)',
-    placeholderColor: 'var(--text-input-placeholder)',
-  },
-  Select: {
-    borderColor: 'var(--border-color)',
-    contrastTextColor: 'var(--text-input-background)',
-    disabledColor: 'var(--text-input-placeholder)',
-  },
-  general: {
-    backgroundColor: 'var(--app-bg)',
-    color: 'var(--main-color)',
-    dangerColor: 'var(--res-500)',
-    primaryColor: 'var(--accent-color)',
-  },
-};
 
 const logger = getLogger('GroupCreationModal');
 

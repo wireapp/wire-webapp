@@ -51,6 +51,47 @@ const Animated: React.FC<{children: React.ReactNode}> = ({children, ...rest}) =>
   );
 };
 
+export const theme = {
+  Checkbox: {
+    background: 'var(--checkbox-background)',
+    border: 'var(--checkbox-border)',
+    borderFocused: 'blue',
+    disableBgColor: 'var(--checkbox-background-disabled)',
+    disableBorderColor: 'var(--checkbox-border-disabled)',
+    disablecheckedBgColor: 'var(--checkbox-background-disabled-selected)',
+    invalidBorderColor: 'var(--checkbox-alert)',
+  },
+  IconButton: {
+    activePrimaryBgColor: 'var(--accent-color-highlight)',
+    focusBorderColor: 'var(--accent-color-border)',
+    hoverPrimaryBgColor: 'var(--icon-button-primary-hover-bg)',
+    primaryActiveFillColor: 'var(--icon-primary-active-fill)',
+    primaryBgColor: 'var(--icon-button-primary-enabled-bg)',
+    primaryBorderColor: 'var(--icon-button-primary-border)',
+    primaryDisabledBgColor: 'var(--icon-button-primary-disabled-bg)',
+    primaryDisabledBorderColor: 'var(--icon-button-primary-disabled-border)',
+    primaryHoverBorderColor: 'var(--icon-button-primary-hover-border)',
+    secondaryActiveBorderColor: 'var(--icon-secondary-active-border)',
+  },
+  Input: {
+    backgroundColor: 'var(--app-bg-secondary)',
+    backgroundColorDisabled: 'var(--sidebar-bg)',
+    labelColor: 'var(--text-input-label)',
+    placeholderColor: 'var(--text-input-placeholder)',
+  },
+  Select: {
+    borderColor: 'var(--border-color)',
+    contrastTextColor: 'var(--text-input-background)',
+    disabledColor: 'var(--text-input-placeholder)',
+  },
+  general: {
+    backgroundColor: 'var(--app-bg)',
+    color: 'var(--main-color)',
+    dangerColor: 'var(--res-500)',
+    primaryColor: 'var(--accent-color)',
+  },
+};
+
 const MainContent: React.FC<LeftSidebarProps> = ({
   contentViewModel,
   conversationState = container.resolve(ConversationState),
@@ -60,47 +101,6 @@ const MainContent: React.FC<LeftSidebarProps> = ({
   const repositories = contentViewModel.repositories;
 
   const {isFederated} = contentViewModel;
-
-  const theme = {
-    Checkbox: {
-      background: 'var(--checkbox-background)',
-      border: 'var(--checkbox-border)',
-      borderFocused: 'blue',
-      disableBgColor: 'var(--checkbox-background-disabled)',
-      disableBorderColor: 'var(--checkbox-border-disabled)',
-      disablecheckedBgColor: 'var(--checkbox-background-disabled-selected)',
-      invalidBorderColor: 'var(--checkbox-alert)',
-    },
-    IconButton: {
-      activePrimaryBgColor: 'var(--accent-color-highlight)',
-      focusBorderColor: 'var(--accent-color-border)',
-      hoverPrimaryBgColor: 'var(--icon-button-primary-hover-bg)',
-      primaryActiveFillColor: 'var(--icon-primary-active-fill)',
-      primaryBgColor: 'var(--icon-button-primary-enabled-bg)',
-      primaryBorderColor: 'var(--icon-button-primary-border)',
-      primaryDisabledBgColor: 'var(--icon-button-primary-disabled-bg)',
-      primaryDisabledBorderColor: 'var(--icon-button-primary-disabled-border)',
-      primaryHoverBorderColor: 'var(--icon-button-primary-hover-border)',
-      secondaryActiveBorderColor: 'var(--icon-secondary-active-border)',
-    },
-    Input: {
-      backgroundColor: 'var(--app-bg-secondary)',
-      backgroundColorDisabled: 'var(--sidebar-bg)',
-      labelColor: 'var(--text-input-label)',
-      placeholderColor: 'var(--text-input-placeholder)',
-    },
-    Select: {
-      borderColor: 'var(--border-color)',
-      contrastTextColor: 'var(--text-input-background)',
-      disabledColor: 'var(--text-input-placeholder)',
-    },
-    general: {
-      backgroundColor: 'var(--app-bg)',
-      color: 'var(--main-color)',
-      dangerColor: 'var(--res-500)',
-      primaryColor: 'var(--accent-color)',
-    },
-  };
 
   let title = '';
   let content = null;
