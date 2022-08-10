@@ -190,7 +190,9 @@ each(.colors(), .(@color-key, @color-name) {
   @name: @color-name;
   @accent-color: '@{name}-500';
   @accent-color-highlight: '@{name}-50';
+  @accent-color-highlight-inversed: '@{name}-800';
   @accent-color-border: '@{name}-500';
+  @accent-color-focus: '@{name}-400';
   @icon-primary-active-fill: '@{name}-500';
   @icon-secondary-active-border: 'accent_colors-0';
 
@@ -199,7 +201,9 @@ each(.colors(), .(@color-key, @color-name) {
     --icon-secondary-active-border: @@icon-secondary-active-border;
     --accent-color: @@accent-color;
     --accent-color-highlight: @@accent-color-highlight;
+    --accent-color-highlight-inversed: @@accent-color-highlight-inversed;
     --accent-color-border: @@accent-color-border;
+    --accent-color-focus: @@accent-color-focus;
     --accent-color-fade-16: fade(@@accent-color, 16%);
     --accent-color-fade-24: fade(@@accent-color, 24%);
     --accent-color-darken-16: darken(@@accent-color, 16%);
@@ -216,7 +220,9 @@ each(.colors(), .(@color-key, @color-name) {
   body.theme-dark {
     @accent-color-dark: '@{name}-dark-500';
     @accent-color-highlight-dark: '@{name}-dark-800';
+    @accent-color-highlight-inversed-dark: '@{name}-50';
     @accent-color-border-dark: '@{name}-dark-600';
+    @accent-color-focus-dark: '@{name}-dark-600';
     @icon-primary-active-fill-dark: 'w-white';
     @icon-secondary-active-border-dark: '@{name}-dark-800' ;
     .main-accent-color-@{color-key} {
@@ -224,7 +230,9 @@ each(.colors(), .(@color-key, @color-name) {
       --icon-secondary-active-border: @@icon-secondary-active-border-dark;
       --accent-color: @@accent-color-dark;
       --accent-color-highlight: @@accent-color-highlight-dark;
+      --accent-color-highlight-inversed: @@accent-color-highlight-inversed-dark;
       --accent-color-border: @@accent-color-border-dark;
+      --accent-color-focus: @@accent-color-focus-dark;
       each(@color-index, {
         @accent-color: '@{name}-dark-@{value}';
         --accent-color-@{value}: @@accent-color;
