@@ -299,7 +299,7 @@ export class CallingRepository {
     const conversation = this.conversationState.findConversation(call.conversationId);
     if (!conversation) {
       this.logger.warn(`Unable to find a conversation with id of ${call.conversationId}`);
-      return;
+      return false;
     }
     const allClients = await this.clientRepository.getQualifiedClientsByUserIds(
       conversation.participating_user_ids(),
