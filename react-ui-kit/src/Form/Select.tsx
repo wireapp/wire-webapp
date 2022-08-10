@@ -39,6 +39,7 @@ export type Option = {
 
 interface SelectProps<IsMulti extends boolean> extends StateManagerProps<Option, IsMulti> {
   id: string;
+  disabled: boolean;
   dataUieName: string;
   options: Option[];
   wrapperCSS?: CSSObject;
@@ -55,6 +56,7 @@ export const Select = <IsMulti extends boolean = false>({
   label,
   error,
   helperText,
+  disabled = false,
   dataUieName,
   options,
   isMulti,
@@ -94,6 +96,7 @@ export const Select = <IsMulti extends boolean = false>({
           ValueContainer,
           IndicatorsContainer,
         }}
+        isDisabled={disabled}
         hideSelectedOptions={false}
         isSearchable={false}
         isClearable={false}

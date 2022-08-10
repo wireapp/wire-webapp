@@ -23,30 +23,49 @@ import Color from 'color';
 
 import {COLOR} from '../Identity/colors';
 import {defaultTransition} from '../Identity/motions';
-import type {Theme} from '../Layout';
+import {Theme} from '../Layout';
 import {filterProps} from '../util';
 import {TextProps, filterTextProps, textStyle} from './Text';
 
-export interface LinkProps<T = HTMLAnchorElement> extends TextProps<T> {}
+export enum LinkVariant {
+  PRIMARY = 'primary',
+  SECONDARY = 'secondary',
+}
+
+export interface LinkProps<T = HTMLAnchorElement> extends TextProps<T> {
+  variant?: LinkVariant;
+}
 
 export const linkStyle: <T>(theme: Theme, props: LinkProps<T>) => CSSObject = (
   theme,
-  {bold = true, color = theme.general.color, fontSize = '11px', textTransform = 'uppercase', ...props},
+  {variant = LinkVariant.SECONDARY, color = theme.general.color, ...props},
 ) => {
   const darker = 0.16;
-  const hoverColor = Color(color).mix(Color(COLOR.BLACK), darker).toString();
+  const hoverColor = color === COLOR.TEXT ? Color(color)?.mix(Color(COLOR.BLACK), darker).toString() : COLOR.BLACK;
   return {
-    ...textStyle(theme, {bold, color, fontSize, textTransform, ...props}),
-    '&:hover': {
-      color: hoverColor,
-    },
-    '&:visited, &:link, &:active': {
-      color: color,
-    },
+    ...textStyle(theme, {color, ...props}),
     color: color,
     cursor: 'pointer',
     textDecoration: 'none',
-    transition: defaultTransition,
+    '&:visited, &:link, &:active': {
+      color: color,
+    },
+    ...(variant === LinkVariant.PRIMARY && {
+      '&:hover, &:visited:hover': {
+        color: theme.general.primaryColor,
+      },
+      textDecoration: 'underline',
+      textUnderlineOffset: '2px',
+    }),
+    ...(variant === LinkVariant.SECONDARY && {
+      bold: true,
+      fontSize: '11px',
+      textTransform: 'uppercase',
+      transition: defaultTransition,
+      '&:hover': {
+        color: hoverColor,
+      },
+    }),
   };
 };
 

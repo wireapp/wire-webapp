@@ -225,7 +225,7 @@ exports[`"Text" renders with color 1`] = `
 }
 
 .emotion-1 {
-  color: rgb(29, 30, 31);
+  color: #0772de;
   display: inline;
   font-size: 16px;
   font-weight: 300;

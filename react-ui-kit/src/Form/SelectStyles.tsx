@@ -29,6 +29,7 @@ export const customStyles = (theme: Theme, markInvalid = false) => ({
   }),
   container: (provided, {isDisabled, selectProps}) => {
     const {menuIsOpen} = selectProps;
+    const isSelectDisabled = selectProps.isDisabled;
 
     return {
       ...inputStyle(theme, {disabled: isDisabled, markInvalid}),
@@ -53,13 +54,13 @@ export const customStyles = (theme: Theme, markInvalid = false) => ({
       }),
       ...(!menuIsOpen && {
         '&:hover': {
-          boxShadow: `0 0 0 1px ${theme.Select.borderColor}`,
+          boxShadow: !isSelectDisabled && `0 0 0 1px ${theme.Select.borderColor}`,
         },
         '&:focus, &:active': {
-          boxShadow: `0 0 0 1px ${theme.general.primaryColor}`,
+          boxShadow: !isSelectDisabled && `0 0 0 1px ${theme.general.primaryColor}`,
         },
       }),
-      cursor: 'pointer',
+      cursor: !isSelectDisabled && 'pointer',
     };
   },
   control: () => ({
@@ -70,39 +71,61 @@ export const customStyles = (theme: Theme, markInvalid = false) => ({
     height: 'auto',
     minHeight: '48px',
   }),
+  dropdownIndicator: (provided, selectProps) => {
+    const isSelectDisabled = selectProps.isDisabled;
+    return {
+      ...provided,
+      '& > svg': {
+        fill: isSelectDisabled && theme.Input.placeholderColor,
+      },
+    };
+  },
   menu: provided => ({
     ...provided,
     boxShadow: `0 0 0 1px ${theme.general.primaryColor}, 0 4px 11px hsl(0deg 0% 0% / 10%)`,
     borderRadius: 12,
     marginBottom: 0,
     marginTop: 4,
+    overflowY: 'overlay',
   }),
   menuList: provided => ({
     ...provided,
+    borderRadius: 12,
     paddingBottom: 0,
     paddingTop: 0,
   }),
   option: (provided, {isDisabled, isFocused, isSelected}) => ({
     ...provided,
+    backgroundColor: theme.Input.backgroundColor,
+    color: theme.general.color,
     padding: '10px 18px',
     cursor: isDisabled ? 'not-allowed' : 'pointer',
     fontSize: '16px',
     fontWeight: 300,
     lineHeight: '24px',
-    ...(isSelected && {
-      backgroundColor: 'inherit',
-      color: 'inherit',
-    }),
-    ...(isFocused && {
-      background: theme.general.primaryColor,
-      borderColor: theme.general.primaryColor,
-      color: theme.Select.contrastTextColor,
-    }),
+    ...(isFocused &&
+      !isDisabled && {
+        background: theme.general.primaryColor,
+        borderColor: theme.general.primaryColor,
+        color: theme.Select.contrastTextColor,
+      }),
     '&:hover, &:active, &:focus': {
       background: theme.general.primaryColor,
       borderColor: theme.general.primaryColor,
       color: theme.Select.contrastTextColor,
     },
+    ...(isDisabled && {
+      backgroundColor: theme.Input.backgroundColorDisabled,
+      color: theme.Select.disabledColor,
+      '&:hover, &:active, &:focus': {
+        backgroundColor: theme.Select.borderColor,
+        color: theme.Select.disabledColor,
+      },
+      ...(isFocused && {
+        backgroundColor: theme.Select.borderColor,
+        color: theme.Select.disabledColor,
+      }),
+    }),
     '&:not(:last-of-type)': {
       borderBottom: `1px solid ${theme.Select.borderColor}`,
     },
@@ -119,4 +142,11 @@ export const customStyles = (theme: Theme, markInvalid = false) => ({
     width: '100%',
     display: 'grid',
   }),
+  singleValue: (provided, selectProps) => {
+    const isSelectDisabled = selectProps.isDisabled;
+    return {
+      ...provided,
+      color: isSelectDisabled ? theme.Input.placeholderColor : theme.general.color,
+    };
+  },
 });

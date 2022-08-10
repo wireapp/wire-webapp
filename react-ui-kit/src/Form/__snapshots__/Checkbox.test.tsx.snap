@@ -76,30 +76,6 @@ exports[`"Checkbox" renders (dark theme) 1`] = `
   color: #fff;
 }
 
-.emotion-2 a {
-  color: #0667c8;
-  display: inline;
-  font-size: 16px;
-  font-weight: 300;
-  text-align: left;
-  text-transform: none;
-  cursor: pointer;
-  -webkit-text-decoration: none;
-  text-decoration: none;
-  -webkit-transition: all 0.24s;
-  transition: all 0.24s;
-}
-
-.emotion-2 a:hover {
-  color: rgb(5, 87, 168);
-}
-
-.emotion-2 a:visited,
-.emotion-2 a:link,
-.emotion-2 a:active {
-  color: #0667c8;
-}
-
 <div
   className="emotion-0"
 >
@@ -214,30 +190,6 @@ exports[`"Checkbox" renders 1`] = `
   line-height: 1.4;
   margin: 0 8px 0 0px;
   color: rgb(29, 30, 31);
-}
-
-.emotion-2 a {
-  color: #0667c8;
-  display: inline;
-  font-size: 16px;
-  font-weight: 300;
-  text-align: left;
-  text-transform: none;
-  cursor: pointer;
-  -webkit-text-decoration: none;
-  text-decoration: none;
-  -webkit-transition: all 0.24s;
-  transition: all 0.24s;
-}
-
-.emotion-2 a:hover {
-  color: rgb(5, 87, 168);
-}
-
-.emotion-2 a:visited,
-.emotion-2 a:link,
-.emotion-2 a:active {
-  color: #0667c8;
 }
 
 <div
@@ -356,30 +308,6 @@ exports[`"Checkbox" renders as invalid 1`] = `
   color: rgb(29, 30, 31);
 }
 
-.emotion-2 a {
-  color: #0667c8;
-  display: inline;
-  font-size: 16px;
-  font-weight: 300;
-  text-align: left;
-  text-transform: none;
-  cursor: pointer;
-  -webkit-text-decoration: none;
-  text-decoration: none;
-  -webkit-transition: all 0.24s;
-  transition: all 0.24s;
-}
-
-.emotion-2 a:hover {
-  color: rgb(5, 87, 168);
-}
-
-.emotion-2 a:visited,
-.emotion-2 a:link,
-.emotion-2 a:active {
-  color: #0667c8;
-}
-
 <div
   className="emotion-0"
 >
@@ -492,30 +420,6 @@ exports[`"Checkbox" renders disabled 1`] = `
   color: rgb(29, 30, 31);
 }
 
-.emotion-2 a {
-  color: #0667c8;
-  display: inline;
-  font-size: 16px;
-  font-weight: 300;
-  text-align: left;
-  text-transform: none;
-  cursor: pointer;
-  -webkit-text-decoration: none;
-  text-decoration: none;
-  -webkit-transition: all 0.24s;
-  transition: all 0.24s;
-}
-
-.emotion-2 a:hover {
-  color: rgb(5, 87, 168);
-}
-
-.emotion-2 a:visited,
-.emotion-2 a:link,
-.emotion-2 a:active {
-  color: #0667c8;
-}
-
 <div
   className="emotion-0"
 >
@@ -578,12 +482,6 @@ exports[`"CheckboxLabel" renders 1`] = `
   font-weight: 300;
   text-align: left;
   text-transform: none;
-}
-
-.emotion-1 a {
-  color: rgb(29, 30, 31);
-  -webkit-text-decoration: none;
-  text-decoration: none;
 }
 
 <div

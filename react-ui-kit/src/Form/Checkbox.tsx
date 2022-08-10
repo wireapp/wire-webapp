@@ -21,9 +21,8 @@
 import {jsx} from '@emotion/react';
 import React from 'react';
 
-import {COLOR} from '../Identity';
 import {Theme} from '../Layout';
-import {Text, TextProps, textStyle, textLinkStyle} from '../Text';
+import {Text, TextProps, textStyle} from '../Text';
 import {filterProps} from '../util';
 import {INPUT_CLASSNAME, InputProps} from './Input';
 
@@ -78,9 +77,6 @@ const StyledLabel = (props: StyledLabelProps) => {
           lineHeight: 1.4,
           margin: '0 8px 0 0px',
           color: theme.general.color,
-        },
-        a: {
-          ...textLinkStyle(theme, {}),
         },
         position: 'relative',
         margin: '0 0 0 -16px',
@@ -151,17 +147,12 @@ export const Checkbox: React.FC<CheckboxProps<HTMLInputElement>> = React.forward
 
 export type CheckboxLabelProps<T = HTMLSpanElement> = TextProps<T>;
 
-export const CheckboxLabel = ({color = COLOR.TEXT, ...props}: CheckboxLabelProps) => (
+export const CheckboxLabel = ({...props}: CheckboxLabelProps) => (
   <Text
     css={(theme: Theme) => ({
       ...textStyle(theme, {
-        color,
         ...props,
       }),
-      a: {
-        color: COLOR.LINK,
-        textDecoration: 'none',
-      },
     })}
     {...props}
   />
