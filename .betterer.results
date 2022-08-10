@@ -852,13 +852,13 @@ exports[`stricter compilation`] = {
       [41, 4, 14, "Type \'undefined\' is not assignable to type \'Message\'.", "1306210352"],
       [47, 4, 17, "Type \'undefined\' is not assignable to type \'MessageRepository\'.", "1843982700"]
     ],
-    "src/script/components/MessagesList/index.tsx:1803926038": [
-      [147, 57, 21, "Type \'HTMLDivElement | null\' does not satisfy the constraint \'Element\'.\\n  Type \'null\' is not assignable to type \'Element\'.", "723935770"],
-      [187, 20, 17, "Argument of type \'HTMLDivElement | null | undefined\' is not assignable to parameter of type \'Element | undefined\'.\\n  Type \'null\' is not assignable to type \'Element | undefined\'.", "3615360346"],
-      [187, 58, 17, "Argument of type \'HTMLDivElement | null | undefined\' is not assignable to parameter of type \'Element | null\'.\\n  Type \'undefined\' is not assignable to type \'Element | null\'.", "3615360346"],
-      [189, 20, 32, "Argument of type \'HTMLElement | null | undefined\' is not assignable to parameter of type \'Element | undefined\'.\\n  Type \'null\' is not assignable to type \'Element | undefined\'.", "3459359081"],
-      [189, 73, 17, "Argument of type \'HTMLDivElement | null | undefined\' is not assignable to parameter of type \'Element | null\'.", "3615360346"],
-      [235, 23, 17, "Argument of type \'HTMLDivElement | null | undefined\' is not assignable to parameter of type \'Element | null\'.", "3615360346"]
+    "src/script/components/MessagesList/index.tsx:3545585148": [
+      [148, 57, 21, "Type \'HTMLDivElement | null\' does not satisfy the constraint \'Element\'.\\n  Type \'null\' is not assignable to type \'Element\'.", "723935770"],
+      [188, 20, 17, "Argument of type \'HTMLDivElement | null | undefined\' is not assignable to parameter of type \'Element | undefined\'.\\n  Type \'null\' is not assignable to type \'Element | undefined\'.", "3615360346"],
+      [188, 58, 17, "Argument of type \'HTMLDivElement | null | undefined\' is not assignable to parameter of type \'Element | null\'.\\n  Type \'undefined\' is not assignable to type \'Element | null\'.", "3615360346"],
+      [190, 20, 32, "Argument of type \'HTMLElement | null | undefined\' is not assignable to parameter of type \'Element | undefined\'.\\n  Type \'null\' is not assignable to type \'Element | undefined\'.", "3459359081"],
+      [190, 73, 17, "Argument of type \'HTMLDivElement | null | undefined\' is not assignable to parameter of type \'Element | null\'.", "3615360346"],
+      [236, 23, 17, "Argument of type \'HTMLDivElement | null | undefined\' is not assignable to parameter of type \'Element | null\'.", "3615360346"]
     ],
     "src/script/components/Modals/UserModal/UserModal.test.tsx:2720850156": [
       [45, 6, 6, "Type \'null\' is not assignable to type \'QualifiedId\'.", "1765117785"],

@@ -81,6 +81,7 @@ const filterDuplicatedMemberMessages = (messages: MessageEntity[]) => {
         }
       }
     }
+
     return [...uniqMessages, currentMessage];
   }, []);
 };
