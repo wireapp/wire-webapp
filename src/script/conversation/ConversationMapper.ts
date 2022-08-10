@@ -287,8 +287,8 @@ export class ConversationMapper {
         remoteConversations.found?.findIndex(remote => remote.qualified_id.id === conversationData.id) === -1,
     );
 
-    return remoteConversations.found
-      .map((remoteConversationData: ConversationBackendData, index: number) => {
+    const foundRemoteConversations = remoteConversations.found.map(
+      (remoteConversationData: ConversationBackendData, index: number) => {
         const remoteConversationId: QualifiedEntity = remoteConversationData.qualified_id || {
           domain: '',
           id: remoteConversationData.id,
@@ -402,9 +402,9 @@ export class ConversationMapper {
         }
 
         return mergedConversation;
-      })
-      .concat(failedConversations)
-      .concat(localArchives);
+      },
+    );
+    return [...foundRemoteConversations, ...failedConversations, ...localArchives];
   }
 
   static mapAccessCode(conversation: Conversation, accessCode: ConversationCode): void {

@@ -146,6 +146,7 @@ export class ConversationRepository {
   private readonly logger: Logger;
   public readonly stateHandler: ConversationStateHandler;
   public readonly verificationStateHandler: ConversationVerificationStateHandler;
+  static readonly eventFromStreamMessage = 'event from notification stream';
 
   static get CONFIG() {
     return {
@@ -1738,7 +1739,7 @@ export class ConversationRepository {
   private checkChangedConversations() {
     this.conversationsWithNewEvents.forEach(conversationEntity => {
       if (conversationEntity.shouldUnarchive()) {
-        this.unarchiveConversation(conversationEntity, false, 'event from notification stream');
+        this.unarchiveConversation(conversationEntity, false, ConversationRepository.eventFromStreamMessage);
       }
     });
 
@@ -1943,12 +1944,11 @@ export class ConversationRepository {
         if (conversationEntity) {
           // Check if conversation was archived
           previouslyArchived = conversationEntity.is_archived();
-          if (
-            previouslyArchived &&
-            conversationEntity.status() === ConversationStatus.PAST_MEMBER &&
-            type === CONVERSATION_EVENT.MEMBER_JOIN
-          ) {
-            this.unarchiveConversation(conversationEntity, false, 'event from notification stream');
+          const isPastMemberStatus = conversationEntity.status() === ConversationStatus.PAST_MEMBER;
+          const isMemberJoinType = type === CONVERSATION_EVENT.MEMBER_JOIN;
+
+          if (previouslyArchived && isPastMemberStatus && isMemberJoinType) {
+            this.unarchiveConversation(conversationEntity, false, ConversationRepository.eventFromStreamMessage);
           }
           const isBackendTimestamp = eventSource !== EventSource.INJECTED;
           if (type !== CONVERSATION_EVENT.MEMBER_JOIN && type !== CONVERSATION_EVENT.MEMBER_LEAVE) {
