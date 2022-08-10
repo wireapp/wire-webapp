@@ -11,7 +11,7 @@ exports[`"Link" renders (dark theme) 1`] = `
   color: #fff;
   display: inline;
   font-size: 11px;
-  font-weight: 600;
+  font-weight: 300;
   text-align: left;
   text-transform: uppercase;
   cursor: pointer;
@@ -21,14 +21,14 @@ exports[`"Link" renders (dark theme) 1`] = `
   transition: all 0.24s;
 }
 
-.emotion-1:hover {
-  color: rgb(214, 214, 214);
-}
-
 .emotion-1:visited,
 .emotion-1:link,
 .emotion-1:active {
   color: #fff;
+}
+
+.emotion-1:hover {
+  color: #000;
 }
 
 <div
@@ -54,7 +54,7 @@ exports[`"Link" renders 1`] = `
   color: rgb(29, 30, 31);
   display: inline;
   font-size: 11px;
-  font-weight: 600;
+  font-weight: 300;
   text-align: left;
   text-transform: uppercase;
   cursor: pointer;
@@ -64,14 +64,14 @@ exports[`"Link" renders 1`] = `
   transition: all 0.24s;
 }
 
-.emotion-1:hover {
-  color: rgb(24, 25, 26);
-}
-
 .emotion-1:visited,
 .emotion-1:link,
 .emotion-1:active {
   color: rgb(29, 30, 31);
+}
+
+.emotion-1:hover {
+  color: rgb(24, 25, 26);
 }
 
 <div

@@ -19,7 +19,7 @@ exports[`"Select" renders 1`] = `
 .emotion-2 {
   background: #fff;
   border: none;
-  border-radius: 4px;
+  border-radius: 12px;
   box-shadow: 0 0 0 1px #dce0e3;
   caret-color: #0667c8;
   color: rgb(29, 30, 31);
@@ -58,7 +58,7 @@ exports[`"Select" renders 1`] = `
 }
 
 .emotion-2:invalid:not(:focus) {
-  box-shadow: 0 0 0 1px undefined;
+  box-shadow: 0 0 0 1px #dce0e3;
 }
 
 .emotion-2:-moz-focusring {
@@ -299,12 +299,12 @@ exports[`"Select" renders as disabled 1`] = `
 }
 
 .emotion-2 {
-  background: #fff;
+  background: #edeff0;
   border: none;
-  border-radius: 4px;
+  border-radius: 12px;
   box-shadow: 0 0 0 1px #dce0e3;
   caret-color: #0667c8;
-  color: rgb(29, 30, 31);
+  color: #676b71;
   font-weight: 300;
   height: auto;
   line-height: 24px;
@@ -313,7 +313,7 @@ exports[`"Select" renders as disabled 1`] = `
   width: 100%;
   min-height: 48px;
   position: relative;
-  cursor: pointer;
+  background-color: #edeff0;
 }
 
 .emotion-2::-moz-placeholder {
@@ -340,21 +340,12 @@ exports[`"Select" renders as disabled 1`] = `
 }
 
 .emotion-2:invalid:not(:focus) {
-  box-shadow: 0 0 0 1px undefined;
+  box-shadow: 0 0 0 1px #dce0e3;
 }
 
 .emotion-2:-moz-focusring {
   color: transparent;
   text-shadow: 0 0 0 #000;
-}
-
-.emotion-2:hover {
-  box-shadow: 0 0 0 1px #dce0e3;
-}
-
-.emotion-2:focus,
-.emotion-2:active {
-  box-shadow: 0 0 0 1px #0667c8;
 }
 
 .emotion-3 {
@@ -473,6 +464,10 @@ exports[`"Select" renders as disabled 1`] = `
   color: hsl(0, 0%, 60%);
 }
 
+.emotion-11>svg {
+  fill: rgb(80, 82, 84);
+}
+
 .emotion-12 {
   fill: rgb(29, 30, 31);
   overflow: visible;
@@ -521,7 +516,7 @@ exports[`"Select" renders as disabled 1`] = `
             aria-haspopup={true}
             aria-readonly={true}
             className="emotion-8"
-            disabled={false}
+            disabled={true}
             id="react-select-3-input"
             inputMode="none"
             onBlur={[Function]}
@@ -583,7 +578,7 @@ exports[`"Select" renders as invalid 1`] = `
 .emotion-2 {
   background: #fff;
   border: none;
-  border-radius: 4px;
+  border-radius: 12px;
   box-shadow: 0 0 0 1px #c20013;
   caret-color: #0667c8;
   color: rgb(29, 30, 31);
