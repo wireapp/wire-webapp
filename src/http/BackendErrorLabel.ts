@@ -83,9 +83,13 @@ export enum BackendErrorLabel {
   NO_TEAM_MEMBER = 'no-team-member',
   TOO_MANY_TEAM_MEMBERS = 'too-many-team-members',
   INVITE_EMAIL_EXISTS = 'email-exists',
+  /** @deprecated */
   BINDING_EXISTS = 'binding-exists',
+  /** @deprecated */
   BINDING_TEAM = 'binding-team',
+  /** @deprecated */
   NON_BINDING_TEAM = 'non-binding-team',
+  /** @deprecated */
   NON_BINDING_TEAM_MEMBERS = 'non-binding-team-members',
   INVALID_TEAM_STATUS_UPDATE = 'invalid-team-status-update',
   NO_MANAGED_CONVERSATION = 'no-managed-team-conv',

@@ -57,7 +57,8 @@ export class TeamAPI {
 
     await this.client.sendJSON(config);
   }
-
+  /** @deprecated
+   * from api V2 this endpoint will not work, please use getTeam instead */
   public async getTeams(): Promise<TeamChunkData> {
     const config: AxiosRequestConfig = {
       method: 'get',
