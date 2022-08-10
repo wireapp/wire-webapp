@@ -17,16 +17,26 @@
  *
  */
 
-import {Draft} from 'Util/DraftStateUtil';
+import {useEffect, DependencyList} from 'react';
 
-import {ContentMessage} from '../entity/message/ContentMessage';
-import {Message} from '../entity/message/Message';
-import {MemberMessage} from '../entity/message/MemberMessage';
-import {SystemMessage} from '../entity/message/SystemMessage';
-import {SuperType} from '../message/SuperType';
+const useScrollSync = (element: HTMLElement | null, targetElement: HTMLElement | null, deps?: DependencyList) => {
+  const syncScroll = () => {
+    if (element && targetElement) {
+      if (element?.scrollTop !== targetElement?.scrollTop) {
+        targetElement.scrollTop = element.scrollTop;
+      }
+    }
+  };
 
-export const isContentMessage = (
-  message: Message | ContentMessage | MemberMessage | SystemMessage,
-): message is ContentMessage => message.super_type === SuperType.CONTENT;
+  useEffect(() => {
+    window.addEventListener('resize', syncScroll);
+    element?.addEventListener('scroll', syncScroll);
 
-export const isDraftMessageWithReplyId = (message: Draft): message is Draft => 'messageId' in message.reply;
+    return () => {
+      window.removeEventListener('resize', syncScroll);
+      element?.removeEventListener('scroll', syncScroll);
+    };
+  }, deps);
+};
+
+export default useScrollSync;

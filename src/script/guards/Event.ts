@@ -17,16 +17,4 @@
  *
  */
 
-import {Draft} from 'Util/DraftStateUtil';
-
-import {ContentMessage} from '../entity/message/ContentMessage';
-import {Message} from '../entity/message/Message';
-import {MemberMessage} from '../entity/message/MemberMessage';
-import {SystemMessage} from '../entity/message/SystemMessage';
-import {SuperType} from '../message/SuperType';
-
-export const isContentMessage = (
-  message: Message | ContentMessage | MemberMessage | SystemMessage,
-): message is ContentMessage => message.super_type === SuperType.CONTENT;
-
-export const isDraftMessageWithReplyId = (message: Draft): message is Draft => 'messageId' in message.reply;
+export const isDragEvent = (event: Event): event is DragEvent => 'dataTransfer' in event;

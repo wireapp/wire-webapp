@@ -31,6 +31,8 @@ import {loadValue} from './StorageUtil';
 import {AuthError} from '../error/AuthError';
 import type {Conversation} from '../entity/Conversation';
 import {isTabKey} from 'Util/KeyboardUtil';
+import {findMentionAtPosition} from 'Util/MentionUtil';
+import {MentionEntity} from '../message/MentionEntity';
 
 export const isTemporaryClientAndNonPersistent = (persist: boolean): boolean => {
   if (persist === undefined) {
@@ -349,7 +351,7 @@ export const preventFocusOutside = (event: KeyboardEvent, parentId: string): voi
   const focusableElements =
     'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
   const parent = document.getElementById(parentId);
-  const focusableContent = [...parent.querySelectorAll(focusableElements)];
+  const focusableContent = parent ? [...parent.querySelectorAll(focusableElements)] : [];
   const focusedItemIndex = focusableContent.indexOf(document.activeElement);
   if (event.shiftKey && focusedItemIndex != 0) {
     (focusableContent[focusedItemIndex - 1] as HTMLElement)?.focus();
@@ -364,4 +366,35 @@ export const preventFocusOutside = (event: KeyboardEvent, parentId: string): voi
     return;
   }
   (focusableContent[focusedItemIndex + 1] as HTMLElement)?.focus();
+};
+
+export const setContextMenuPosition = (event: React.KeyboardEvent) => {
+  event.stopPropagation();
+  event.preventDefault();
+
+  const {top, left, height} = (event.target as Element).getBoundingClientRect();
+  return new MouseEvent('MouseEvent', {
+    ...(event as unknown as MouseEvent),
+    clientX: left,
+    clientY: top + height,
+  });
+};
+
+export const generateConversationInputStorageKey = (conversationEntity: Conversation): string =>
+  `${StorageKey.CONVERSATION.INPUT}|${conversationEntity.id}`;
+
+export const getSelectionPosition = (element: HTMLTextAreaElement, currentMentions: MentionEntity[]) => {
+  const {selectionStart: start, selectionEnd: end} = element;
+  const defaultRange = {endIndex: 0, startIndex: Infinity};
+
+  const firstMention = findMentionAtPosition(start, currentMentions) || defaultRange;
+  const lastMention = findMentionAtPosition(end, currentMentions) || defaultRange;
+
+  const mentionStart = Math.min(firstMention.startIndex, lastMention.startIndex);
+  const mentionEnd = Math.max(firstMention.endIndex, lastMention.endIndex);
+
+  const newStart = Math.min(mentionStart, start);
+  const newEnd = Math.max(mentionEnd, end);
+
+  return {newEnd, newStart};
 };
