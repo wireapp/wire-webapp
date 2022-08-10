@@ -142,7 +142,6 @@ const InputBar = ({
 
   const shadowInputRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
-  const isReplyingToMessagePrevRef = useRef<boolean>(false);
 
   const [editMessageEntity, setEditMessageEntity] = useState<ContentMessage | null>(null);
   const [replyMessageEntity, setReplyMessageEntity] = useState<ContentMessage | null>(null);
@@ -462,7 +461,7 @@ const InputBar = ({
           });
   };
 
-  const sendMessage = (messageText: string): void => {
+  const sendMessage = (messageText: string) => {
     if (messageText.length) {
       const mentionEntities = currentMentions.slice(0);
 
@@ -752,21 +751,14 @@ const InputBar = ({
   };
 
   useEffect(() => {
-    const isReplyingToMessage = !!replyMessageEntity;
-    const wasReplyingToMessage = isReplyingToMessagePrevRef.current;
+    amplify.subscribe(WebAppEvents.CONVERSATION.MESSAGE.REMOVED, handleRepliedMessageDeleted);
+    amplify.subscribe(WebAppEvents.CONVERSATION.MESSAGE.UPDATED, handleRepliedMessageUpdated);
 
-    if (isReplyingToMessage !== wasReplyingToMessage) {
-      if (isReplyingToMessage) {
-        amplify.subscribe(WebAppEvents.CONVERSATION.MESSAGE.REMOVED, handleRepliedMessageDeleted);
-        amplify.subscribe(WebAppEvents.CONVERSATION.MESSAGE.UPDATED, handleRepliedMessageUpdated);
-      } else {
-        amplify.unsubscribe(WebAppEvents.CONVERSATION.MESSAGE.REMOVED, handleRepliedMessageDeleted);
-        amplify.unsubscribe(WebAppEvents.CONVERSATION.MESSAGE.UPDATED, handleRepliedMessageUpdated);
-      }
-    }
-
-    isReplyingToMessagePrevRef.current = isReplyingToMessage;
-  }, [replyMessageEntity, isReplyingToMessagePrevRef.current]);
+    return () => {
+      amplify.unsubscribe(WebAppEvents.CONVERSATION.MESSAGE.REMOVED, handleRepliedMessageDeleted);
+      amplify.unsubscribe(WebAppEvents.CONVERSATION.MESSAGE.UPDATED, handleRepliedMessageUpdated);
+    };
+  }, []);
 
   useEffect(() => {
     if (isEditing) {

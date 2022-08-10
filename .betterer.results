@@ -1678,10 +1678,10 @@ exports[`stricter compilation`] = {
       [248, 57, 13, "No overload matches this call.\\n  Overload 1 of 4, \'(value: string | number | Date): Date\', gave the following error.\\n    Argument of type \'string | undefined\' is not assignable to parameter of type \'string | number | Date\'.\\n  Overload 2 of 4, \'(value: string | number): Date\', gave the following error.\\n    Argument of type \'string | undefined\' is not assignable to parameter of type \'string | number\'.", "3452993210"],
       [248, 93, 13, "No overload matches this call.\\n  Overload 1 of 4, \'(value: string | number | Date): Date\', gave the following error.\\n    Argument of type \'string | undefined\' is not assignable to parameter of type \'string | number | Date\'.\\n  Overload 2 of 4, \'(value: string | number): Date\', gave the following error.\\n    Argument of type \'string | undefined\' is not assignable to parameter of type \'string | number\'.", "3563212121"]
     ],
-    "src/script/entity/message/Asset.ts:2714709642": [
-      [36, 9, 4, "Property \'size\' has no initializer and is not definitely assigned in the constructor.", "2088346912"],
-      [68, 67, 14, "Argument of type \'string | undefined\' is not assignable to parameter of type \'string\'.\\n  Type \'undefined\' is not assignable to type \'string\'.", "1931590284"],
-      [79, 67, 14, "Argument of type \'string | undefined\' is not assignable to parameter of type \'string\'.\\n  Type \'undefined\' is not assignable to type \'string\'.", "1931590284"]
+    "src/script/entity/message/Asset.ts:2396001012": [
+      [37, 9, 4, "Property \'size\' has no initializer and is not definitely assigned in the constructor.", "2088346912"],
+      [69, 67, 14, "Argument of type \'string | undefined\' is not assignable to parameter of type \'string\'.\\n  Type \'undefined\' is not assignable to type \'string\'.", "1931590284"],
+      [80, 67, 14, "Argument of type \'string | undefined\' is not assignable to parameter of type \'string\'.\\n  Type \'undefined\' is not assignable to type \'string\'.", "1931590284"]
     ],
     "src/script/entity/message/CallMessage.ts:2179419971": [
       [38, 4, 20, "Type \'TERMINATION_REASON | undefined\' is not assignable to type \'TERMINATION_REASON\'.\\n  Type \'undefined\' is not assignable to type \'TERMINATION_REASON\'.", "773642052"]
