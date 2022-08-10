@@ -37,6 +37,7 @@ import GroupAvatar from 'Components/avatar/GroupAvatar';
 import AvailabilityState from 'Components/AvailabilityState';
 import Icon from 'Components/Icon';
 import {KEY} from 'Util/KeyboardUtil';
+import {setContextMenuPosition} from 'Util/util';
 
 export interface ConversationListCellProps {
   conversation: Conversation;
@@ -112,15 +113,7 @@ const ConversationListCell: React.FC<ConversationListCellProps> = ({
 
   const handleContextKeyDown = (event: React.KeyboardEvent) => {
     if (event.key === KEY.SPACE || event.key === KEY.ENTER) {
-      event.stopPropagation();
-      event.preventDefault();
-
-      const {top, left, height} = (event.target as Element).getBoundingClientRect();
-      const newEvent = new MouseEvent('MouseEvent', {
-        ...(event as unknown as MouseEvent),
-        clientX: left,
-        clientY: top + height,
-      });
+      const newEvent = setContextMenuPosition(event);
       rightClick(conversation, newEvent);
     }
   };
