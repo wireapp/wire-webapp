@@ -62,25 +62,26 @@ interface MessagesListParams {
   showUserDetails: (user: User) => void;
 }
 
-const filterSpecificDuplicatedMemberMessages = (messages: MessageEntity[]) => {
-  const typesToFilter = ['conversation.member-join', 'conversation.group-creation'];
-  return messages.reduce<MessageEntity[]>((acc, message) => {
-    if (isMemberMessage(message)) {
-      const existingMemberMessages = acc.filter(isMemberMessage);
+const filterDuplicatedMemberMessages = (messages: MessageEntity[]) => {
+  const typesToFilter = ['conversation.member-join', 'conversation.group-creation', 'conversation.member-leave'];
+  return messages.reduce<MessageEntity[]>((uniqMessages, currentMessage) => {
+    if (isMemberMessage(currentMessage)) {
+      const uniqMemberMessages = uniqMessages.filter(isMemberMessage);
 
-      if (typesToFilter.includes(message.type) && existingMemberMessages.length) {
-        switch (message.type) {
+      if (typesToFilter.includes(currentMessage.type) && uniqMemberMessages.length) {
+        switch (currentMessage.type) {
           case 'conversation.group-creation':
-            return acc;
+            return uniqMessages;
           case 'conversation.member-join':
           case 'conversation.member-leave':
-            const lastItem = existingMemberMessages.at(-1);
-            return lastItem && lastItem.htmlCaption() === message.htmlCaption() ? acc : [...acc, message];
-          default:
+            const lastUniqueMemberMessage = uniqMemberMessages.at(-1);
+            if (lastUniqueMemberMessage && lastUniqueMemberMessage.htmlCaption() === currentMessage.htmlCaption()) {
+              return uniqMessages;
+            }
         }
       }
     }
-    return [...acc, message];
+    return [...uniqMessages, currentMessage];
   }, []);
 };
 
@@ -121,8 +122,8 @@ const MessagesList: React.FC<MessagesListParams> = ({
 
   useEffect(() => {
     const visibleMessages = filterHiddenMessages(allMessages);
-    const uniqueMessages = filterSpecificDuplicatedMemberMessages(visibleMessages);
-    setFilteredMessages(uniqueMessages);
+    const uniqMessages = filterDuplicatedMemberMessages(visibleMessages);
+    setFilteredMessages(uniqMessages);
   }, [allMessages.length]);
 
   const shouldShowInvitePeople =
