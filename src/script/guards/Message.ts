@@ -22,8 +22,10 @@ import {Message} from '../entity/message/Message';
 import {MemberMessage} from '../entity/message/MemberMessage';
 import {SystemMessage} from '../entity/message/SystemMessage';
 import {SuperType} from '../message/SuperType';
+import {Draft} from 'Util/DraftStateUtil';
 
-const isMemberMessage = (message: Message | ContentMessage | MemberMessage | SystemMessage): message is MemberMessage =>
-  message.super_type === SuperType.MEMBER;
+export const isMemberMessage = (
+  message: Message | ContentMessage | MemberMessage | SystemMessage,
+): message is MemberMessage => message.super_type === SuperType.MEMBER;
 
-export {isMemberMessage};
+export const isDraftMessageWithReplyId = (message: Draft): message is Draft => 'messageId' in message.reply;

@@ -30,9 +30,11 @@ import AvatarInitials from './AvatarInitials';
 import AvatarBadge from './AvatarBadge';
 import AvatarBorder from './AvatarBorder';
 import AvatarWrapper from './AvatarWrapper';
+import {t} from 'Util/LocalizerUtil';
 
 export interface UserAvatarProps extends React.HTMLProps<HTMLDivElement> {
   avatarSize: AVATAR_SIZE;
+  avatarAlt?: string;
   noBadge?: boolean;
   noFilter?: boolean;
   onClick?: (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => void;
@@ -49,6 +51,7 @@ export const shouldShowBadge = (size: AVATAR_SIZE, state: STATE): boolean => {
 const UserAvatar: React.FunctionComponent<UserAvatarProps> = ({
   participant,
   avatarSize,
+  avatarAlt = '',
   noBadge,
   noFilter,
   state,
@@ -57,33 +60,49 @@ const UserAvatar: React.FunctionComponent<UserAvatarProps> = ({
 }) => {
   const isImageGrey = !noFilter && [STATE.BLOCKED, STATE.IGNORED, STATE.PENDING, STATE.UNKNOWN].includes(state);
   const backgroundColor = state === STATE.UNKNOWN ? COLOR.GRAY : undefined;
-  const {mediumPictureResource, previewPictureResource} = useKoSubscribableChildren(participant, [
+  const {
+    mediumPictureResource,
+    previewPictureResource,
+    accent_color: accentColor,
+    name,
+    initials,
+  } = useKoSubscribableChildren(participant, [
     'mediumPictureResource',
     'previewPictureResource',
+    'accent_color',
+    'name',
+    'initials',
   ]);
+  const avatarImgAlt = avatarAlt ? avatarAlt : `${t('userProfileImageAlt')} ${name}`;
 
   return (
     <AvatarWrapper
       avatarSize={avatarSize}
-      color={participant.accent_color()}
+      color={accentColor}
       data-uie-name="element-avatar-user"
       data-uie-value={participant.id}
       data-uie-status={state}
       onClick={onClick}
-      title={participant.name()}
+      title={name}
       {...props}
     >
       <AvatarBackground backgroundColor={backgroundColor} />
-      <AvatarInitials avatarSize={avatarSize} initials={participant.initials()} />
-      <AvatarImage
-        avatarSize={avatarSize}
-        avatarAlt={participant.name()}
-        backgroundColor={backgroundColor}
-        isGrey={isImageGrey}
-        mediumPicture={mediumPictureResource}
-        previewPicture={previewPictureResource}
-      />
+
+      {initials && <AvatarInitials avatarSize={avatarSize} initials={initials} />}
+
+      <div tabIndex={0} role="button">
+        <AvatarImage
+          avatarSize={avatarSize}
+          avatarAlt={avatarImgAlt}
+          backgroundColor={backgroundColor}
+          isGrey={isImageGrey}
+          mediumPicture={mediumPictureResource}
+          previewPicture={previewPictureResource}
+        />
+      </div>
+
       {!noBadge && shouldShowBadge(avatarSize, state) && <AvatarBadge state={state} />}
+
       {!isImageGrey && <AvatarBorder />}
     </AvatarWrapper>
   );
