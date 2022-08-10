@@ -17,7 +17,6 @@
  *
  */
 
-import {User} from '../entity/User';
 import {ServiceEntity} from '../integration/ServiceEntity';
 
-export const isUser = (participant: User | ServiceEntity): participant is User => !participant.isService;
+export const isServiceEntity = (entity: any): entity is ServiceEntity => 'isService' in entity && entity.isService;

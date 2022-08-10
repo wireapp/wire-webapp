@@ -25,9 +25,9 @@ const onDragOver = (event: Event) => event.preventDefault();
 
 const useDropFiles = (selector: string, onDropOrPastedFile: (files: File[]) => void) => {
   const onDropFiles = (event: Event) => {
-    if (isDragEvent(event)) {
-      event.preventDefault();
+    event.preventDefault();
 
+    if (isDragEvent(event)) {
       const {dataTransfer} = event;
       const eventDataTransfer: Partial<DataTransfer> = dataTransfer || {};
       const files = eventDataTransfer.files || new FileList();

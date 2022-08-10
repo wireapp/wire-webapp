@@ -22,7 +22,7 @@ import {FC, HTMLProps, MouseEvent as ReactMouseEvent} from 'react';
 import {registerReactComponent, useKoSubscribableChildren} from 'Util/ComponentUtil';
 
 import {User} from '../entity/User';
-import {isUser} from '../guards/User';
+import {isServiceEntity} from '../guards/Service';
 import {ServiceEntity} from '../integration/ServiceEntity';
 
 import ServiceAvatar from './avatar/ServiceAvatar';
@@ -91,7 +91,7 @@ const Avatar: FC<AvatarProps> = ({
     }
   };
 
-  if (!isUser(participant)) {
+  if (isServiceEntity(participant)) {
     return <ServiceAvatar avatarSize={avatarSize} participant={participant} onClick={clickHandler} {...props} />;
   }
 

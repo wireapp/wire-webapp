@@ -19,4 +19,4 @@
 
 import {Draft} from 'Util/DraftStateUtil';
 
-export const isMessageReply = (message: Draft): message is Draft => 'messageId' in message.reply;
+export const isDraftMessageWithReplyId = (message: Draft): message is Draft => 'messageId' in message.reply;

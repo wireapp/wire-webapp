@@ -23,7 +23,7 @@ import {StorageRepository} from '../storage';
 import {MessageRepository} from '../conversation/MessageRepository';
 import {Conversation} from '../entity/Conversation';
 import {ContentMessage} from '../entity/message/ContentMessage';
-import {isMessageReply} from '../guards/Message';
+import {isDraftMessageWithReplyId} from '../guards/Message';
 import {MentionEntity} from '../message/MentionEntity';
 
 interface DraftMessage {
@@ -82,7 +82,7 @@ export const loadDraftState = async (
     text: storageValue.text,
   };
 
-  const replyMessageId = isMessageReply(storageValue) ? storageValue.reply.messageId : undefined;
+  const replyMessageId = isDraftMessageWithReplyId(storageValue) ? storageValue.reply.messageId : undefined;
 
   if (replyMessageId) {
     draftMessage.replyEntityPromise = messageRepository.getMessageInConversationById(
