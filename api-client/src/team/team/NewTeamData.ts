@@ -20,7 +20,8 @@
 import type {MemberData} from '../member/MemberData';
 
 export interface NewTeamData {
-  /** User binding team */
+  /** User binding team
+   *  @deprecated */
   binding?: boolean;
   /** Team icon (asset ID) */
   icon: string;

@@ -20,8 +20,9 @@
 import type {SupportedCurrency} from '../payment/';
 
 export interface TeamData {
-  /** User binding team */
-  binding: boolean;
+  /** User binding team
+   *  @deprecated */
+  binding?: boolean;
   /** Team creator's user ID */
   creator: string;
   currency?: SupportedCurrency;
