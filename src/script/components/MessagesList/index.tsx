@@ -68,14 +68,13 @@ const filterDuplicatedMemberMessages = (messages: MessageEntity[]) => {
     if (isMemberMessage(currentMessage)) {
       const uniqMemberMessages = uniqMessages.filter(isMemberMessage);
 
-      if (typesToFilter.includes(currentMessage.type) && uniqMemberMessages.length) {
+      if (uniqMemberMessages.length && typesToFilter.includes(currentMessage.type)) {
         switch (currentMessage.type) {
           case 'conversation.group-creation':
             return uniqMessages;
           case 'conversation.member-join':
           case 'conversation.member-leave':
-            const lastUniqueMemberMessage = uniqMemberMessages.at(-1);
-            if (lastUniqueMemberMessage && lastUniqueMemberMessage.htmlCaption() === currentMessage.htmlCaption()) {
+            if (uniqMemberMessages.at(-1)?.htmlCaption() === currentMessage.htmlCaption()) {
               return uniqMessages;
             }
         }
