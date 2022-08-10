@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [19.21.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/compare/@wireapp/api-client@19.20.1...@wireapp/api-client@19.21.0) (2022-08-10)
+
+
+### Features
+
+* **api-client:** remove/deprecate binding teams ([#4357](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/issues/4357)) ([dca0085](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/commit/dca00852cad9cf7c7b725af6b9e9a5f4c331f9e3))
+
+
+
+
+
 ## [19.20.1](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/compare/@wireapp/api-client@19.20.0...@wireapp/api-client@19.20.1) (2022-08-10)
 
 **Note:** Version bump only for package @wireapp/api-client
