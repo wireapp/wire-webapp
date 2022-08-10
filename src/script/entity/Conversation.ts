@@ -96,7 +96,7 @@ export class Conversation {
   public readonly accessState: ko.Observable<ACCESS_STATE>;
   public readonly archivedTimestamp: ko.Observable<number>;
   public readonly availabilityOfUser: ko.PureComputed<Availability.Type>;
-  public readonly call: ko.Observable<Call>;
+  public readonly call: ko.Observable<Call | null>;
   public readonly cleared_timestamp: ko.Observable<number>;
   public readonly connection: ko.Observable<ConnectionEntity>;
   // TODO(Federation): Currently the 'creator' just refers to a user id but it has to become a qualified id

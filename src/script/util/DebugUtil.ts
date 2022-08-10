@@ -48,7 +48,6 @@ import {EventRecord, StorageRepository} from '../storage';
 import {UserRepository} from '../user/UserRepository';
 import {Conversation} from '../entity/Conversation';
 import {User} from '../entity/User';
-import {UserId} from '../calling/Participant';
 import type {MessageRepository} from '../conversation/MessageRepository';
 import {ClientState} from '../client/ClientState';
 import {UserState} from '../user/UserState';
@@ -264,7 +263,7 @@ export class DebugUtil {
     return this.callingRepository['callLog'].join('\n');
   }
 
-  getActiveCallStats(): Promise<{stats: RTCStatsReport; userid: UserId}[]> {
+  getActiveCallStats() {
     const activeCall = this.callState.joinedCall();
     if (!activeCall) {
       throw new Error('no active call found');
