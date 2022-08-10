@@ -34,6 +34,8 @@ import {useResizeObserver} from '../../ui/resizeObserver';
 import useEffectRef from 'Util/useEffectRef';
 import {isMemberMessage} from '../../guards/Message';
 
+let uniq = 0;
+
 type FocusedElement = {center?: boolean; element: Element};
 interface MessagesListParams {
   cancelConnectionRequest: (message: MemberMessage) => void;
@@ -65,14 +67,15 @@ const filterSpecificDuplicatedMemberMessages = (messages: MessageEntity[]) => {
   return messages.reduce<MessageEntity[]>((acc, message) => {
     if (isMemberMessage(message)) {
       const existingMemberMessages = acc.filter(isMemberMessage);
+
       if (typesToFilter.includes(message.type) && existingMemberMessages.length) {
         switch (message.type) {
           case 'conversation.group-creation':
             return acc;
           case 'conversation.member-join':
-            return existingMemberMessages.some(m => m.htmlCaption() === message.htmlCaption())
-              ? acc
-              : [...acc, message];
+          case 'conversation.member-leave':
+            const lastItem = existingMemberMessages.at(-1);
+            return lastItem && lastItem.htmlCaption() === message.htmlCaption() ? acc : [...acc, message];
           default:
         }
       }
@@ -209,7 +212,7 @@ const MessagesList: React.FC<MessagesListParams> = ({
     const isLastDeliveredMessage = lastDeliveredMessage?.id === message.id;
 
     const visibleCallback = getVisibleCallback(conversation, message);
-    const key = (message.id || 'message-') + message.timestamp();
+    const key = `${message.id || 'message'}-${message.timestamp()}-${uniq++}`;
     return (
       <Message
         key={key}
