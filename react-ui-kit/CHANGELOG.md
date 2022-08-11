@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [8.13.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/react-ui-kit/compare/@wireapp/react-ui-kit@8.12.0...@wireapp/react-ui-kit@8.13.0) (2022-08-11)
+
+
+### Features
+
+* move the theme in ui-kit and expose css variables ([#4358](https://github.com/wireapp/wire-web-packages/tree/main/packages/react-ui-kit/issues/4358)) ([2a7ad70](https://github.com/wireapp/wire-web-packages/tree/main/packages/react-ui-kit/commit/2a7ad70b17072d24960c2e36c3409a858d4b5891))
+
+
+
+
+
 # [8.12.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/react-ui-kit/compare/@wireapp/react-ui-kit@8.11.4...@wireapp/react-ui-kit@8.12.0) (2022-08-10)
 
 
