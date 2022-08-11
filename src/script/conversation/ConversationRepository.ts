@@ -620,34 +620,27 @@ export class ConversationRepository {
 
     const mappedMessageEntities = await this.addEventsToConversation(events, conversationEntity);
     conversationEntity.hasAdditionalMessages(hasAdditionalMessages);
-
     if (!hasAdditionalMessages) {
-      const allMessages = conversationEntity.getAllMessages();
-      if (!!allMessages.length) {
-        const firstMessage = allMessages[0];
-        if (isMemberMessage(firstMessage)) {
-          const checkCreationMessage = firstMessage.isMember() && firstMessage.isCreation();
-          if (checkCreationMessage) {
-            const groupCreationMessageIn1to1 = conversationEntity.is1to1() && firstMessage.isGroupCreation();
+      const firstMessage = conversationEntity.getFirstMessage() as MemberMessage;
+      const checkCreationMessage = firstMessage?.isMember() && firstMessage.isCreation();
+      if (checkCreationMessage) {
+        const groupCreationMessageIn1to1 = conversationEntity.is1to1() && firstMessage.isGroupCreation();
+        const one2oneConnectionMessageInGroup = conversationEntity.isGroup() && firstMessage.isConnection();
+        const wrongMessageTypeForConversation = groupCreationMessageIn1to1 || one2oneConnectionMessageInGroup;
 
-            const one2oneConnectionMessageInGroup = conversationEntity.isGroup() && firstMessage.isConnection();
-            const wrongMessageTypeForConversation = groupCreationMessageIn1to1 || one2oneConnectionMessageInGroup;
-
-            if (wrongMessageTypeForConversation) {
-              this.messageRepository.deleteMessage(conversationEntity, firstMessage);
-              conversationEntity.hasCreationMessage = false;
-            } else {
-              conversationEntity.hasCreationMessage = true;
-            }
-          }
-
-          if (!conversationEntity.hasCreationMessage) {
-            this.addCreationMessage(conversationEntity, this.userState.self().isTemporaryGuest());
-          }
+        if (wrongMessageTypeForConversation) {
+          this.messageRepository.deleteMessage(conversationEntity, firstMessage);
+          conversationEntity.hasCreationMessage = false;
+        } else {
+          conversationEntity.hasCreationMessage = true;
         }
       }
-    }
 
+      const addCreationMessage = !conversationEntity.hasCreationMessage;
+      if (addCreationMessage) {
+        this.addCreationMessage(conversationEntity, this.userState.self().isTemporaryGuest());
+      }
+    }
     return mappedMessageEntities;
   }
 
