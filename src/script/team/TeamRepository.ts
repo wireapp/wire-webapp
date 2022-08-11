@@ -147,7 +147,7 @@ export class TeamRepository {
     }, TIME_IN_MILLIS.DAY);
   };
 
-  getTeam = async (): Promise<TeamEntity> => {
+  async getTeam(): Promise<TeamEntity> {
     const selfTeamId = this.userState.self().teamId;
     const teamData = !!selfTeamId && (await this.getTeamById(selfTeamId));
 
@@ -159,7 +159,7 @@ export class TeamRepository {
     // doesn't need to be awaited because it publishes the account info over amplify.
     this.sendAccountInfo();
     return teamEntity;
-  };
+  }
 
   async getTeamMember(teamId: string, userId: string): Promise<TeamMemberEntity> {
     const memberResponse = await this.teamService.getTeamMember(teamId, userId);

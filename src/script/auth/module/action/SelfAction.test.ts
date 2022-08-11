@@ -28,7 +28,7 @@ describe('SelfAction', () => {
   it('fetches the self user', async () => {
     const selfUser = {assets: [], id: 'selfUserId'} as unknown as Self;
     const team = {teams: [{id: 'team'}]};
-    const expectedSelfUser = {assets: [], id: 'selfUserId', team: 'team'} as unknown as Self;
+    const expectedSelfUser = {assets: [], id: 'selfUserId'} as unknown as Self;
     const spies = {
       doCheckPasswordState: jasmine.createSpy().and.returnValue(() => Promise.resolve()),
     };
