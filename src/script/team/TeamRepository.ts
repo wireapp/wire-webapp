@@ -149,7 +149,7 @@ export class TeamRepository {
 
   getTeam = async (): Promise<TeamEntity> => {
     const selfTeamId = this.userState.self().teamId;
-    const teamData = selfTeamId ? await this.getTeamById(selfTeamId) : await this.getBindingTeam();
+    const teamData = !!selfTeamId && (await this.getTeamById(selfTeamId));
 
     const teamEntity = teamData ? this.teamMapper.mapTeamFromObject(teamData, this.teamState.team()) : new TeamEntity();
     this.teamState.team(teamEntity);
@@ -348,16 +348,6 @@ export class TeamRepository {
 
   private getTeamById(teamId: string): Promise<TeamData> {
     return this.teamService.getTeamById(teamId);
-  }
-
-  private getBindingTeam(): Promise<TeamData | undefined> {
-    return this.teamService.getTeams().then(({teams}) => {
-      const [team] = teams;
-      if (team && team.binding) {
-        return team;
-      }
-      return undefined;
-    });
   }
 
   private onDelete(eventJson: TeamDeleteEvent | TeamMemberLeaveEvent): void {

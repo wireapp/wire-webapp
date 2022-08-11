@@ -45,7 +45,6 @@ const unsetRegistrationData: RegistrationDataState = {
 };
 
 const unsetTeam: TeamData = {
-  binding: undefined,
   creator: undefined,
   icon: undefined,
   id: undefined,

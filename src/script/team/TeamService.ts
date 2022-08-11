@@ -22,7 +22,7 @@ import type {MemberData, Members} from '@wireapp/api-client/src/team/member/';
 import type {FeatureList} from '@wireapp/api-client/src/team/feature/';
 import type {Services} from '@wireapp/api-client/src/team/service/';
 import type {ConversationRolesList} from '@wireapp/api-client/src/conversation/ConversationRole';
-import type {TeamChunkData, TeamData} from '@wireapp/api-client/src/team/team/';
+import type {TeamData} from '@wireapp/api-client/src/team/team/';
 import {FeatureStatus, FEATURE_KEY} from '@wireapp/api-client/src/team/feature/';
 import {container} from 'tsyringe';
 
@@ -57,10 +57,6 @@ export class TeamService {
 
   getTeamMembersByIds(teamId: string, userIds: string[]): Promise<MemberData[]> {
     return this.apiClient.api.teams.member.getMembers(teamId, {ids: userIds});
-  }
-
-  getTeams(): Promise<TeamChunkData> {
-    return this.apiClient.api.teams.team.getTeams();
   }
 
   getWhitelistedServices(teamId: string): Promise<Services> {

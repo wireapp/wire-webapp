@@ -89,7 +89,6 @@ const TeamName = ({
       try {
         await pushAccountRegistrationData({
           team: {
-            binding: undefined,
             creator: undefined,
             icon: undefined,
             id: undefined,

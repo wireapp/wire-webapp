@@ -116,7 +116,7 @@ exports[`stricter compilation`] = {
       [65, 13, 31, "Argument of type \'HTMLElement | null\' is not assignable to parameter of type \'Element | DocumentFragment\'.\\n  Type \'null\' is not assignable to type \'Element | DocumentFragment\'.", "223522320"],
       [69, 9, 4, "Argument of type \'ConnectedComponent<FC<RootProps & { isAuthenticated: boolean; isFetchingSSOSettings: boolean; language: string; } & { doGetSSOSettings: () => Promise<void>; safelyRemoveCookie: (name: string, value: string) => Promise<...>; startPolling: (name?: string | undefined, interval?: number | undefined, asJSON?: boolean | u...\' is not assignable to parameter of type \'ConnectedComponent<FunctionComponent<{}>, any>\'.\\n  Type \'ComponentClass<Omit<RootProps & { isAuthenticated: boolean; isFetchingSSOSettings: boolean; language: string; } & { doGetSSOSettings: () => Promise<void>; safelyRemoveCookie: (name: string, value: string) => Promise<...>; startPolling: (name?: string | undefined, interval?: number | undefined, asJSON?: boolean | und...\' is not assignable to type \'ConnectedComponent<FunctionComponent<{}>, any>\'.\\n    Type \'ComponentClass<Omit<RootProps & { isAuthenticated: boolean; isFetchingSSOSettings: boolean; language: string; } & { doGetSSOSettings: () => Promise<void>; safelyRemoveCookie: (name: string, value: string) => Promise<...>; startPolling: (name?: string | undefined, interval?: number | undefined, asJSON?: boolean | und...\' is not assignable to type \'ComponentClass<any, any> & NonReactStatics<FunctionComponent<{}>, {}> & { WrappedComponent: FunctionComponent<{}>; }\'.\\n      Type \'ComponentClass<Omit<RootProps & { isAuthenticated: boolean; isFetchingSSOSettings: boolean; language: string; } & { doGetSSOSettings: () => Promise<void>; safelyRemoveCookie: (name: string, value: string) => Promise<...>; startPolling: (name?: string | undefined, interval?: number | undefined, asJSON?: boolean | und...\' is not assignable to type \'{ WrappedComponent: FunctionComponent<{}>; }\'.\\n        Types of property \'WrappedComponent\' are incompatible.\\n          Type \'FC<RootProps & { isAuthenticated: boolean; isFetchingSSOSettings: boolean; language: string; } & { doGetSSOSettings: () => Promise<void>; safelyRemoveCookie: (name: string, value: string) => Promise<...>; startPolling: (name?: string | undefined, interval?: number | undefined, asJSON?: boolean | undefined) => Promis...\' is not assignable to type \'FunctionComponent<{}>\'.\\n            Types of parameters \'props\' and \'props\' are incompatible.\\n              Type \'{}\' is not assignable to type \'RootProps & { isAuthenticated: boolean; isFetchingSSOSettings: boolean; language: string; } & { doGetSSOSettings: () => Promise<void>; safelyRemoveCookie: (name: string, value: string) => Promise<...>; startPolling: (name?: string | undefined, interval?: number | undefined, asJSON?: boolean | undefined) => Promise<....\'.\\n                Type \'{}\' is not assignable to type \'{ isAuthenticated: boolean; isFetchingSSOSettings: boolean; language: string; }\'.", "2089387715"]
     ],
-    "src/script/auth/module/action/AuthAction.ts:1972172538": [
+    "src/script/auth/module/action/AuthAction.ts:2805695565": [
       [126, 12, 5, "Object is of type \'unknown\'.", "165548477"],
       [132, 49, 5, "Argument of type \'unknown\' is not assignable to parameter of type \'Error\'.", "165548477"],
       [146, 60, 5, "Argument of type \'unknown\' is not assignable to parameter of type \'Error\'.", "165548477"],
@@ -127,17 +127,16 @@ exports[`stricter compilation`] = {
       [270, 6, 17, "Object is possibly \'undefined\'.", "2392383015"],
       [271, 6, 17, "Object is possibly \'undefined\'.", "2392383015"],
       [272, 6, 17, "Object is possibly \'undefined\'.", "2392383015"],
-      [273, 6, 17, "Object is possibly \'undefined\'.", "2392383015"],
-      [273, 31, 17, "Object is possibly \'undefined\'.", "2392383015"],
-      [285, 54, 5, "Argument of type \'unknown\' is not assignable to parameter of type \'Error\'.", "165548477"],
-      [300, 27, 18, "Object is possibly \'undefined\'.", "1666073462"],
-      [312, 58, 5, "Argument of type \'unknown\' is not assignable to parameter of type \'Error\'.", "165548477"],
-      [344, 58, 5, "Argument of type \'unknown\' is not assignable to parameter of type \'Error\'.", "165548477"],
-      [379, 49, 5, "Argument of type \'unknown\' is not assignable to parameter of type \'Error\'.", "165548477"],
-      [391, 61, 5, "Argument of type \'unknown\' is not assignable to parameter of type \'Error\'.", "165548477"],
-      [410, 56, 5, "Argument of type \'unknown\' is not assignable to parameter of type \'Error\'.", "165548477"],
-      [431, 48, 5, "Argument of type \'unknown\' is not assignable to parameter of type \'Error\'.", "165548477"],
-      [445, 48, 5, "Argument of type \'unknown\' is not assignable to parameter of type \'Error\'.", "165548477"]
+      [272, 31, 17, "Object is possibly \'undefined\'.", "2392383015"],
+      [284, 54, 5, "Argument of type \'unknown\' is not assignable to parameter of type \'Error\'.", "165548477"],
+      [299, 27, 18, "Object is possibly \'undefined\'.", "1666073462"],
+      [311, 58, 5, "Argument of type \'unknown\' is not assignable to parameter of type \'Error\'.", "165548477"],
+      [343, 58, 5, "Argument of type \'unknown\' is not assignable to parameter of type \'Error\'.", "165548477"],
+      [378, 49, 5, "Argument of type \'unknown\' is not assignable to parameter of type \'Error\'.", "165548477"],
+      [390, 61, 5, "Argument of type \'unknown\' is not assignable to parameter of type \'Error\'.", "165548477"],
+      [409, 56, 5, "Argument of type \'unknown\' is not assignable to parameter of type \'Error\'.", "165548477"],
+      [430, 48, 5, "Argument of type \'unknown\' is not assignable to parameter of type \'Error\'.", "165548477"],
+      [444, 48, 5, "Argument of type \'unknown\' is not assignable to parameter of type \'Error\'.", "165548477"]
     ],
     "src/script/auth/module/action/BackendError.ts:3293868569": [
       [28, 4, 10, "Type \'string | undefined\' is not assignable to type \'string\'.\\n  Type \'undefined\' is not assignable to type \'string\'.", "3983565867"],
@@ -176,15 +175,15 @@ exports[`stricter compilation`] = {
       [30, 62, 5, "Argument of type \'unknown\' is not assignable to parameter of type \'Error\'.", "165548477"],
       [44, 12, 12, "Object is possibly \'undefined\'.", "3283681133"]
     ],
-    "src/script/auth/module/action/SelfAction.ts:2089396225": [
-      [43, 51, 5, "Argument of type \'unknown\' is not assignable to parameter of type \'Error\'.", "165548477"],
-      [57, 51, 5, "Argument of type \'unknown\' is not assignable to parameter of type \'Error\'.", "165548477"],
-      [74, 53, 5, "Argument of type \'unknown\' is not assignable to parameter of type \'Error\'.", "165548477"],
-      [96, 52, 5, "Argument of type \'unknown\' is not assignable to parameter of type \'Error\'.", "165548477"],
-      [109, 57, 5, "Argument of type \'unknown\' is not assignable to parameter of type \'Error\'.", "165548477"],
-      [122, 54, 5, "Argument of type \'unknown\' is not assignable to parameter of type \'Error\'.", "165548477"],
-      [136, 12, 5, "Object is of type \'unknown\'.", "165548477"],
-      [140, 58, 5, "Argument of type \'unknown\' is not assignable to parameter of type \'Error\'.", "165548477"]
+    "src/script/auth/module/action/SelfAction.ts:320059285": [
+      [40, 51, 5, "Argument of type \'unknown\' is not assignable to parameter of type \'Error\'.", "165548477"],
+      [54, 51, 5, "Argument of type \'unknown\' is not assignable to parameter of type \'Error\'.", "165548477"],
+      [71, 53, 5, "Argument of type \'unknown\' is not assignable to parameter of type \'Error\'.", "165548477"],
+      [93, 52, 5, "Argument of type \'unknown\' is not assignable to parameter of type \'Error\'.", "165548477"],
+      [106, 57, 5, "Argument of type \'unknown\' is not assignable to parameter of type \'Error\'.", "165548477"],
+      [119, 54, 5, "Argument of type \'unknown\' is not assignable to parameter of type \'Error\'.", "165548477"],
+      [133, 12, 5, "Object is of type \'unknown\'.", "165548477"],
+      [137, 58, 5, "Argument of type \'unknown\' is not assignable to parameter of type \'Error\'.", "165548477"]
     ],
     "src/script/auth/module/action/UserAction.ts:2835118030": [
       [38, 60, 5, "Argument of type \'unknown\' is not assignable to parameter of type \'Error\'.", "165548477"]
@@ -262,7 +261,7 @@ exports[`stricter compilation`] = {
       [65, 8, 5, "Type \'null\' is not assignable to type \'Error\'.", "165548477"],
       [78, 8, 5, "Type \'null\' is not assignable to type \'Error\'.", "165548477"]
     ],
-    "src/script/auth/module/selector/AuthSelector.ts:941636495": [
+    "src/script/auth/module/selector/AuthSelector.ts:153636648": [
       [33, 2, 5, "Type \'undefined\' is not assignable to type \'string\'.", "165454089"],
       [34, 2, 10, "Type \'undefined\' is not assignable to type \'string\'.", "1013483035"],
       [35, 2, 15, "Type \'undefined\' is not assignable to type \'string\'.", "3770638438"],
@@ -273,11 +272,10 @@ exports[`stricter compilation`] = {
       [40, 2, 5, "Type \'undefined\' is not assignable to type \'string\'.", "187940249"],
       [41, 2, 10, "Type \'undefined\' is not assignable to type \'string\'.", "1244982411"],
       [42, 2, 4, "Type \'undefined\' is not assignable to type \'TeamData\'.", "2087956856"],
-      [47, 2, 7, "Type \'undefined\' is not assignable to type \'boolean\'.", "2643464100"],
-      [48, 2, 7, "Type \'undefined\' is not assignable to type \'string\'.", "3920213849"],
-      [49, 2, 4, "Type \'undefined\' is not assignable to type \'string\'.", "2087846158"],
-      [50, 2, 2, "Type \'undefined\' is not assignable to type \'string\'.", "5861160"],
-      [51, 2, 4, "Type \'undefined\' is not assignable to type \'string\'.", "2087876002"]
+      [47, 2, 7, "Type \'undefined\' is not assignable to type \'string\'.", "3920213849"],
+      [48, 2, 4, "Type \'undefined\' is not assignable to type \'string\'.", "2087846158"],
+      [49, 2, 2, "Type \'undefined\' is not assignable to type \'string\'.", "5861160"],
+      [50, 2, 4, "Type \'undefined\' is not assignable to type \'string\'.", "2087876002"]
     ],
     "src/script/auth/module/selector/SelfSelector.ts:104386324": [
       [29, 2, 2, "Type \'undefined\' is not assignable to type \'string\'.", "5861160"],
@@ -414,19 +412,18 @@ exports[`stricter compilation`] = {
       [233, 83, 5, "No overload matches this call.\\n  Overload 1 of 2, \'(o: ArrayLike<unknown> | { [s: string]: unknown; }): [string, unknown][]\', gave the following error.\\n    Argument of type \'unknown\' is not assignable to parameter of type \'ArrayLike<unknown> | { [s: string]: unknown; }\'.\\n  Overload 2 of 2, \'(o: {}): [string, any][]\', gave the following error.\\n    Argument of type \'unknown\' is not assignable to parameter of type \'{}\'.", "165548477"],
       [269, 12, 3, "Type \'MutableRefObject<HTMLInputElement | undefined>\' is not assignable to type \'((instance: HTMLInputElement | null) => void) | RefObject<HTMLInputElement> | null | undefined\'.", "193432436"]
     ],
-    "src/script/auth/page/TeamName.tsx:158592421": [
+    "src/script/auth/page/TeamName.tsx:3361621698": [
       [83, 4, 21, "Object is possibly \'undefined\'.", "173618382"],
       [83, 34, 21, "Object is possibly \'undefined\'.", "173618382"],
       [84, 9, 21, "Object is possibly \'undefined\'.", "173618382"],
       [85, 15, 77, "Argument of type \'ValidationError | null\' is not assignable to parameter of type \'SetStateAction<null>\'.", "190261043"],
       [85, 61, 21, "Object is possibly \'undefined\'.", "173618382"],
-      [91, 12, 7, "Type \'undefined\' is not assignable to type \'boolean\'.", "2643464100"],
-      [92, 12, 7, "Type \'undefined\' is not assignable to type \'string\'.", "3920213849"],
-      [93, 12, 4, "Type \'undefined\' is not assignable to type \'string\'.", "2087846158"],
-      [94, 12, 2, "Type \'undefined\' is not assignable to type \'string\'.", "5861160"],
-      [95, 18, 21, "Object is possibly \'undefined\'.", "173618382"],
-      [103, 4, 21, "Object is possibly \'undefined\'.", "173618382"],
-      [143, 24, 3, "Type \'MutableRefObject<HTMLInputElement | undefined>\' is not assignable to type \'((instance: HTMLInputElement | null) => void) | RefObject<HTMLInputElement> | null | undefined\'.", "193432436"]
+      [91, 12, 7, "Type \'undefined\' is not assignable to type \'string\'.", "3920213849"],
+      [92, 12, 4, "Type \'undefined\' is not assignable to type \'string\'.", "2087846158"],
+      [93, 12, 2, "Type \'undefined\' is not assignable to type \'string\'.", "5861160"],
+      [94, 18, 21, "Object is possibly \'undefined\'.", "173618382"],
+      [102, 4, 21, "Object is possibly \'undefined\'.", "173618382"],
+      [142, 24, 3, "Type \'MutableRefObject<HTMLInputElement | undefined>\' is not assignable to type \'((instance: HTMLInputElement | null) => void) | RefObject<HTMLInputElement> | null | undefined\'.", "193432436"]
     ],
     "src/script/auth/page/VerifyEmailCode.tsx:4216359015": [
       [73, 61, 11, "Argument of type \'Uint8Array | undefined\' is not assignable to parameter of type \'Uint8Array\'.\\n  Type \'undefined\' is not assignable to type \'Uint8Array\'.", "432650366"],
@@ -2170,24 +2167,24 @@ exports[`stricter compilation`] = {
     "src/script/team/TeamEntity.ts:781860466": [
       [48, 6, 7, "Type \'string | boolean\' is not assignable to type \'boolean\'.\\n  Type \'string\' is not assignable to type \'boolean\'.", "814555284"]
     ],
-    "src/script/team/TeamRepository.ts:2469907748": [
+    "src/script/team/TeamRepository.ts:2431090345": [
       [204, 4, 159, "Type \'(User | undefined)[]\' is not assignable to type \'User[]\'.\\n  Type \'User | undefined\' is not assignable to type \'User\'.\\n    Type \'undefined\' is not assignable to type \'User\'.", "587279576"],
       [210, 53, 24, "Argument of type \'string | undefined\' is not assignable to parameter of type \'string\'.\\n  Type \'undefined\' is not assignable to type \'string\'.", "2322605270"],
       [304, 4, 9, "Type \'(string | undefined)[]\' is not assignable to type \'string[]\'.\\n  Type \'string | undefined\' is not assignable to type \'string\'.\\n    Type \'undefined\' is not assignable to type \'string\'.", "3264882315"],
       [325, 53, 13, "Argument of type \'string | undefined\' is not assignable to parameter of type \'string\'.\\n  Type \'undefined\' is not assignable to type \'string\'.", "3345044032"],
       [334, 66, 9, "Argument of type \'{ domain: string; id: string | undefined; }[]\' is not assignable to parameter of type \'QualifiedId[]\'.\\n  Type \'{ domain: string; id: string | undefined; }\' is not assignable to type \'QualifiedId\'.\\n    Types of property \'id\' are incompatible.\\n      Type \'string | undefined\' is not assignable to type \'string\'.\\n        Type \'undefined\' is not assignable to type \'string\'.", "3264882315"],
-      [468, 28, 45, "Object is possibly \'undefined\'.", "1991114915"],
-      [469, 23, 40, "Object is possibly \'undefined\'.", "841513102"],
-      [536, 6, 76, "Argument of type \'string | null\' is not assignable to parameter of type \'string\'.\\n  Type \'null\' is not assignable to type \'string\'.", "563963699"],
-      [588, 34, 14, "No overload matches this call.\\n  Overload 1 of 2, \'(...items: ConcatArray<never>[]): never[]\', gave the following error.\\n    Argument of type \'TeamMemberEntity | TeamMemberEntity[]\' is not assignable to parameter of type \'ConcatArray<never>\'.\\n      Type \'TeamMemberEntity\' is missing the following properties from type \'ConcatArray<never>\': length, join, slice\\n  Overload 2 of 2, \'(...items: ConcatArray<never>[]): never[]\', gave the following error.\\n    Argument of type \'TeamMemberEntity | TeamMemberEntity[]\' is not assignable to parameter of type \'ConcatArray<never>\'.\\n      Type \'TeamMemberEntity\' is not assignable to type \'ConcatArray<never>\'.", "3525779144"],
-      [590, 56, 6, "Property \'userId\' does not exist on type \'never\'.", "1765117785"],
-      [592, 45, 11, "Property \'permissions\' does not exist on type \'never\'.", "524793117"],
-      [597, 25, 6, "Property \'userId\' does not exist on type \'never\'.", "1765117785"],
-      [597, 42, 11, "Property \'permissions\' does not exist on type \'never\'.", "524793117"],
-      [597, 87, 11, "Property \'permissions\' does not exist on type \'never\'.", "524793117"],
-      [602, 25, 6, "Property \'userId\' does not exist on type \'never\'.", "1765117785"],
-      [602, 42, 9, "Property \'invitedBy\' does not exist on type \'never\'.", "1955064691"],
-      [606, 64, 14, "Property \'hasOwnProperty\' does not exist on type \'never\'.", "547572878"]
+      [458, 28, 45, "Object is possibly \'undefined\'.", "1991114915"],
+      [459, 23, 40, "Object is possibly \'undefined\'.", "841513102"],
+      [526, 6, 76, "Argument of type \'string | null\' is not assignable to parameter of type \'string\'.\\n  Type \'null\' is not assignable to type \'string\'.", "563963699"],
+      [578, 34, 14, "No overload matches this call.\\n  Overload 1 of 2, \'(...items: ConcatArray<never>[]): never[]\', gave the following error.\\n    Argument of type \'TeamMemberEntity | TeamMemberEntity[]\' is not assignable to parameter of type \'ConcatArray<never>\'.\\n      Type \'TeamMemberEntity\' is missing the following properties from type \'ConcatArray<never>\': length, join, slice\\n  Overload 2 of 2, \'(...items: ConcatArray<never>[]): never[]\', gave the following error.\\n    Argument of type \'TeamMemberEntity | TeamMemberEntity[]\' is not assignable to parameter of type \'ConcatArray<never>\'.\\n      Type \'TeamMemberEntity\' is not assignable to type \'ConcatArray<never>\'.", "3525779144"],
+      [580, 56, 6, "Property \'userId\' does not exist on type \'never\'.", "1765117785"],
+      [582, 45, 11, "Property \'permissions\' does not exist on type \'never\'.", "524793117"],
+      [587, 25, 6, "Property \'userId\' does not exist on type \'never\'.", "1765117785"],
+      [587, 42, 11, "Property \'permissions\' does not exist on type \'never\'.", "524793117"],
+      [587, 87, 11, "Property \'permissions\' does not exist on type \'never\'.", "524793117"],
+      [592, 25, 6, "Property \'userId\' does not exist on type \'never\'.", "1765117785"],
+      [592, 42, 9, "Property \'invitedBy\' does not exist on type \'never\'.", "1955064691"],
+      [596, 64, 14, "Property \'hasOwnProperty\' does not exist on type \'never\'.", "547572878"]
     ],
     "src/script/team/TeamState.ts:2129239601": [
       [59, 4, 9, "Type \'Observable<TeamEntity | undefined>\' is not assignable to type \'Observable<TeamEntity>\'.\\n  The types returned by \'peek()\' are incompatible between these types.\\n    Type \'TeamEntity | undefined\' is not assignable to type \'TeamEntity\'.\\n      Type \'undefined\' is not assignable to type \'TeamEntity\'.", "1162784912"],

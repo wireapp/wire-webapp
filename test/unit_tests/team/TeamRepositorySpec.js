@@ -53,11 +53,11 @@ describe('TeamRepository', () => {
   /* eslint sort-keys-fix/sort-keys-fix: "off" */
 
   describe('getTeam()', () => {
-    it('returns the binding team entity', async () => {
+    it('returns the team entity', async () => {
       const userState = new UserState();
-      userState.self({id: 'self-id'});
+      userState.self({id: 'self-id', team: 'team-id'});
       const teamService = {
-        getTeams: jest.fn(() => Promise.resolve(teams_data)),
+        getTeam: jest.fn(team => Promise.resolve(teams_data)),
       };
       const teamRepo = new TeamRepository(
         teamService,
