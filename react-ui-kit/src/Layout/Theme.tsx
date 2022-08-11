@@ -28,6 +28,7 @@ import {filterProps} from '../util';
 export enum THEME_ID {
   DARK = 'THEME_DARK',
   LIGHT = 'THEME_LIGHT',
+  DEFAULT = 'THEME_DEFAULT',
 }
 
 export interface Theme {
@@ -74,6 +75,46 @@ export interface Theme {
 }
 
 export const themes: {[themeId in THEME_ID]: Theme} = {
+  [THEME_ID.DEFAULT]: {
+    Checkbox: {
+      background: 'var(--checkbox-background)',
+      border: 'var(--checkbox-border)',
+      borderFocused: 'var(--accent-color)',
+      disableBgColor: 'var(--checkbox-background-disabled)',
+      disableBorderColor: 'var(--checkbox-border-disabled)',
+      disablecheckedBgColor: 'var(--checkbox-background-disabled-selected)',
+      invalidBorderColor: 'var(--danger-color)',
+    },
+    IconButton: {
+      activePrimaryBgColor: 'var(--accent-color-highlight)',
+      focusBorderColor: 'var(--accent-color-border)',
+      hoverPrimaryBgColor: 'var(--icon-button-primary-hover-bg)',
+      primaryActiveFillColor: 'var(--icon-primary-active-fill)',
+      primaryBgColor: 'var(--icon-button-primary-enabled-bg)',
+      primaryBorderColor: 'var(--icon-button-primary-border)',
+      primaryDisabledBgColor: 'var(--icon-button-primary-disabled-bg)',
+      primaryDisabledBorderColor: 'var(--icon-button-primary-disabled-border)',
+      primaryHoverBorderColor: 'var(--icon-button-primary-hover-border)',
+      secondaryActiveBorderColor: 'var(--icon-secondary-active-border)',
+    },
+    Input: {
+      backgroundColor: 'var(--text-input-background)',
+      backgroundColorDisabled: 'var(--text-input-disabled)',
+      labelColor: 'var(--text-input-label)',
+      placeholderColor: 'var(--text-input-placeholder)',
+    },
+    Select: {
+      borderColor: 'var(--text-input-border)',
+      contrastTextColor: 'var(--text-input-background)',
+      disabledColor: 'var(--text-input-placeholder)',
+    },
+    general: {
+      backgroundColor: 'var(--app-bg)',
+      color: 'var(--main-color)',
+      dangerColor: 'var(--danger-color)',
+      primaryColor: 'var(--accent-color)',
+    },
+  },
   [THEME_ID.LIGHT]: {
     IconButton: {
       activePrimaryBgColor: COLOR_V2.BLUE_LIGHT_50,

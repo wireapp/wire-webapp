@@ -20,6 +20,7 @@
 /** @jsx jsx */
 import {Global, CSSObject, css, jsx, withTheme} from '@emotion/react';
 import emotionNormalize from 'emotion-normalize';
+import {GlobalCssVariables} from './GlobalCssVariables';
 
 import type {Theme} from './Layout';
 import {textLinkStyle} from './Text/TextLink';
@@ -35,6 +36,7 @@ const globalStyles: (theme: Theme) => CSSObject = (theme: Theme) => ({
     fontWeight: 600,
   },
   body: {
+    ...GlobalCssVariables.accentColors(),
     MozOsxFontSmoothing: 'grayscale',
     WebkitFontSmoothing: 'antialiased',
     background: theme.general.backgroundColor,
@@ -46,6 +48,12 @@ const globalStyles: (theme: Theme) => CSSObject = (theme: Theme) => ({
     lineHeight: 1.5,
     minHeight: '100vh',
     transition: 'background 0.15s',
+  },
+  'body, body.theme-default': {
+    ...GlobalCssVariables.light(),
+  },
+  'body.theme-dark': {
+    ...GlobalCssVariables.dark(),
   },
   html: {
     background: theme.general.backgroundColor,
