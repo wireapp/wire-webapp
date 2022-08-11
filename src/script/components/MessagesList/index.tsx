@@ -34,6 +34,8 @@ import {useResizeObserver} from '../../ui/resizeObserver';
 import useEffectRef from 'Util/useEffectRef';
 import {isMemberMessage} from '../../guards/Message';
 
+let uniq = 0;
+
 type FocusedElement = {center?: boolean; element: Element};
 interface MessagesListParams {
   cancelConnectionRequest: (message: MemberMessage) => void;
@@ -60,24 +62,30 @@ interface MessagesListParams {
   showUserDetails: (user: User) => void;
 }
 
-const filterSpecificDuplicatedMemberMessages = (messages: MessageEntity[]) => {
-  const typesToFilter = ['conversation.member-join', 'conversation.group-creation'];
-  return messages.reduce<MessageEntity[]>((acc, message) => {
-    if (isMemberMessage(message)) {
-      const existingMemberMessages = acc.filter(isMemberMessage);
-      if (typesToFilter.includes(message.type) && existingMemberMessages.length) {
-        switch (message.type) {
+const filterDuplicatedMemberMessages = (messages: MessageEntity[]) => {
+  const typesToFilter = ['conversation.member-join', 'conversation.group-creation', 'conversation.member-leave'];
+  return messages.reduce<MessageEntity[]>((uniqMessages, currentMessage) => {
+    if (isMemberMessage(currentMessage)) {
+      const uniqMemberMessages = uniqMessages.filter(isMemberMessage);
+
+      if (!!uniqMemberMessages.length && typesToFilter.includes(currentMessage.type)) {
+        switch (currentMessage.type) {
           case 'conversation.group-creation':
-            return acc;
+            // Dont show duplicated group creation messages
+            if (uniqMemberMessages.some(m => m.type === currentMessage.type)) {
+              return uniqMessages;
+            }
           case 'conversation.member-join':
-            return existingMemberMessages.some(m => m.htmlCaption() === message.htmlCaption())
-              ? acc
-              : [...acc, message];
-          default:
+          case 'conversation.member-leave':
+            // Dont show duplicated member join/leave messages that follow each other
+            if (uniqMemberMessages.at(-1)?.htmlCaption() === currentMessage.htmlCaption()) {
+              return uniqMessages;
+            }
         }
       }
     }
-    return [...acc, message];
+
+    return [...uniqMessages, currentMessage];
   }, []);
 };
 
@@ -118,8 +126,8 @@ const MessagesList: React.FC<MessagesListParams> = ({
 
   useEffect(() => {
     const visibleMessages = filterHiddenMessages(allMessages);
-    const uniqueMessages = filterSpecificDuplicatedMemberMessages(visibleMessages);
-    setFilteredMessages(uniqueMessages);
+    const uniqMessages = filterDuplicatedMemberMessages(visibleMessages);
+    setFilteredMessages(uniqMessages);
   }, [allMessages.length]);
 
   const shouldShowInvitePeople =
@@ -209,7 +217,7 @@ const MessagesList: React.FC<MessagesListParams> = ({
     const isLastDeliveredMessage = lastDeliveredMessage?.id === message.id;
 
     const visibleCallback = getVisibleCallback(conversation, message);
-    const key = (message.id || 'message-') + message.timestamp();
+    const key = `${message.id || 'message'}-${message.timestamp()}-${uniq++}`;
     return (
       <Message
         key={key}
