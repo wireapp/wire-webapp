@@ -1332,7 +1332,7 @@ exports[`stricter compilation`] = {
       [1185, 12, 35, "Object is possibly \'undefined\'.", "901544345"],
       [1187, 13, 35, "Object is possibly \'undefined\'.", "901544345"]
     ],
-    "src/script/conversation/ConversationRepository.ts:70760263": [
+    "src/script/conversation/ConversationRepository.ts:987339060": [
       [183, 8, 29, "Argument of type \'(User | undefined)[] | undefined\' is not assignable to parameter of type \'User[] | undefined\'.\\n  Type \'(User | undefined)[]\' is not assignable to type \'User[]\'.", "1506995572"],
       [189, 75, 13, "No overload matches this call.\\n  Overload 1 of 4, \'(value: string | number | Date): Date\', gave the following error.\\n    Argument of type \'string | undefined\' is not assignable to parameter of type \'string | number | Date\'.\\n  Overload 2 of 4, \'(value: string | number): Date\', gave the following error.\\n    Argument of type \'string | undefined\' is not assignable to parameter of type \'string | number\'.", "2642562490"],
       [208, 16, 24, "Argument of type \'string | undefined\' is not assignable to parameter of type \'string\'.\\n  Type \'undefined\' is not assignable to type \'string\'.", "2322605270"],
