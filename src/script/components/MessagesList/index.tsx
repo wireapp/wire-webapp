@@ -125,11 +125,8 @@ const MessagesList: React.FC<MessagesListParams> = ({
   const [filteredMessages, setFilteredMessages] = useState<MessageEntity[]>([]);
 
   useEffect(() => {
-    console.info('adrian', 'allmessages', allMessages);
     const visibleMessages = filterHiddenMessages(allMessages);
-    console.info('adrian', 'visibleMessages', visibleMessages);
     const uniqMessages = filterDuplicatedMemberMessages(visibleMessages);
-    console.info('adrian', 'uniqMessages', uniqMessages);
     setFilteredMessages(uniqMessages);
   }, [allMessages.length]);
 
