@@ -39,7 +39,7 @@ export type Option = {
 
 interface SelectProps<IsMulti extends boolean> extends StateManagerProps<Option, IsMulti> {
   id: string;
-  disabled: boolean;
+  disabled?: boolean;
   dataUieName: string;
   options: Option[];
   wrapperCSS?: CSSObject;
