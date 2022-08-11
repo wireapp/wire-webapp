@@ -71,11 +71,13 @@ const filterDuplicatedMemberMessages = (messages: MessageEntity[]) => {
       if (!!uniqMemberMessages.length && typesToFilter.includes(currentMessage.type)) {
         switch (currentMessage.type) {
           case 'conversation.group-creation':
+            // Dont show duplicated group creation messages
             if (uniqMemberMessages.some(m => m.type === currentMessage.type)) {
               return uniqMessages;
             }
           case 'conversation.member-join':
           case 'conversation.member-leave':
+            // Dont show duplicated member join/leave messages that follow each other
             if (uniqMemberMessages.at(-1)?.htmlCaption() === currentMessage.htmlCaption()) {
               return uniqMessages;
             }
