@@ -34,7 +34,7 @@ import AVPreferences from './panels/preferences/AVPreferences';
 import {container} from 'tsyringe';
 import {ClientState} from '../../client/ClientState';
 import {UserState} from '../../user/UserState';
-import {StyledApp} from '@wireapp/react-ui-kit';
+import {StyledApp, THEME_ID} from '@wireapp/react-ui-kit';
 
 // Ko imported components
 import '../message-list/InputBarControls';
@@ -192,7 +192,7 @@ const MainContent: React.FC<LeftSidebarProps> = ({
   return (
     <>
       <h1 className="visually-hidden">{title}</h1>
-      <StyledApp theme={theme} css={{backgroundColor: 'unset', height: '100%'}}>
+      <StyledApp themeId={THEME_ID.DEFAULT} css={{backgroundColor: 'unset', height: '100%'}}>
         <SwitchTransition>
           <Animated key={state}>{content}</Animated>
         </SwitchTransition>

@@ -30,7 +30,7 @@ import {
   CONVERSATION_TYPE,
   RemoteConversations,
 } from '@wireapp/api-client/src/conversation';
-
+import {QualifiedId} from '@wireapp/api-client/src/user';
 import {ACCESS_STATE} from './AccessState';
 import {ConversationStatus} from './ConversationStatus';
 import {Conversation} from '../entity/Conversation';
@@ -273,12 +273,22 @@ export class ConversationMapper {
   ): ConversationDatabaseData[] {
     localConversations = localConversations.filter(conversationData => conversationData);
 
-    const failedConversations = (remoteConversations.failed ?? []).map(failedConversationId =>
-      localConversations.find(conversationId => matchQualifiedIds(conversationId, failedConversationId)),
+    const failedConversations = (remoteConversations.failed ?? []).reduce(
+      (prev: ConversationDatabaseData[], curr: QualifiedId) => {
+        const convo = localConversations.find(conversationId => matchQualifiedIds(conversationId, curr));
+        return convo ? [...prev, convo] : prev;
+      },
+      [],
     );
 
-    return remoteConversations.found
-      .map((remoteConversationData: ConversationBackendData, index: number) => {
+    const localArchives = localConversations.filter(
+      conversationData =>
+        conversationData.archived_state &&
+        remoteConversations.found?.findIndex(remote => remote.qualified_id.id === conversationData.id) === -1,
+    );
+
+    const foundRemoteConversations = remoteConversations.found.map(
+      (remoteConversationData: ConversationBackendData, index: number) => {
         const remoteConversationId: QualifiedEntity = remoteConversationData.qualified_id || {
           domain: '',
           id: remoteConversationData.id,
@@ -392,8 +402,9 @@ export class ConversationMapper {
         }
 
         return mergedConversation;
-      })
-      .concat(failedConversations);
+      },
+    );
+    return [...foundRemoteConversations, ...failedConversations, ...localArchives];
   }
 
   static mapAccessCode(conversation: Conversation, accessCode: ConversationCode): void {
