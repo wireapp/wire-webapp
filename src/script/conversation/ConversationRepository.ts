@@ -147,6 +147,7 @@ export class ConversationRepository {
   private readonly logger: Logger;
   public readonly stateHandler: ConversationStateHandler;
   public readonly verificationStateHandler: ConversationVerificationStateHandler;
+  static readonly eventFromStreamMessage = 'event from notification stream';
 
   static get CONFIG() {
     return {
@@ -621,29 +622,23 @@ export class ConversationRepository {
     conversationEntity.hasAdditionalMessages(hasAdditionalMessages);
 
     if (!hasAdditionalMessages) {
-      const allMessages = conversationEntity.getAllMessages();
-      if (!!allMessages.length) {
-        const firstMessage = allMessages[0];
-        if (isMemberMessage(firstMessage)) {
-          const checkCreationMessage = firstMessage.isMember() && firstMessage.isCreation();
-          if (checkCreationMessage) {
-            const groupCreationMessageIn1to1 = conversationEntity.is1to1() && firstMessage.isGroupCreation();
+      const firstMessage = conversationEntity.getFirstMessage();
+      const checkCreationMessage = isMemberMessage(firstMessage) && firstMessage.isCreation();
+      if (checkCreationMessage) {
+        const groupCreationMessageIn1to1 = conversationEntity.is1to1() && firstMessage.isGroupCreation();
+        const one2oneConnectionMessageInGroup = conversationEntity.isGroup() && firstMessage.isConnection();
+        const wrongMessageTypeForConversation = groupCreationMessageIn1to1 || one2oneConnectionMessageInGroup;
 
-            const one2oneConnectionMessageInGroup = conversationEntity.isGroup() && firstMessage.isConnection();
-            const wrongMessageTypeForConversation = groupCreationMessageIn1to1 || one2oneConnectionMessageInGroup;
-
-            if (wrongMessageTypeForConversation) {
-              this.messageRepository.deleteMessage(conversationEntity, firstMessage);
-              conversationEntity.hasCreationMessage = false;
-            } else {
-              conversationEntity.hasCreationMessage = true;
-            }
-          }
-
-          if (!conversationEntity.hasCreationMessage) {
-            this.addCreationMessage(conversationEntity, this.userState.self().isTemporaryGuest());
-          }
+        if (wrongMessageTypeForConversation) {
+          this.messageRepository.deleteMessage(conversationEntity, firstMessage);
+          conversationEntity.hasCreationMessage = false;
+        } else {
+          conversationEntity.hasCreationMessage = true;
         }
+      }
+      const addCreationMessage = !conversationEntity.hasCreationMessage;
+      if (addCreationMessage) {
+        this.addCreationMessage(conversationEntity, this.userState.self().isTemporaryGuest());
       }
     }
 
@@ -1763,7 +1758,7 @@ export class ConversationRepository {
   private checkChangedConversations() {
     this.conversationsWithNewEvents.forEach(conversationEntity => {
       if (conversationEntity.shouldUnarchive()) {
-        this.unarchiveConversation(conversationEntity, false, 'event from notification stream');
+        this.unarchiveConversation(conversationEntity, false, ConversationRepository.eventFromStreamMessage);
       }
     });
 
@@ -1968,7 +1963,12 @@ export class ConversationRepository {
         if (conversationEntity) {
           // Check if conversation was archived
           previouslyArchived = conversationEntity.is_archived();
+          const isPastMemberStatus = conversationEntity.status() === ConversationStatus.PAST_MEMBER;
+          const isMemberJoinType = type === CONVERSATION_EVENT.MEMBER_JOIN;
 
+          if (previouslyArchived && isPastMemberStatus && isMemberJoinType) {
+            this.unarchiveConversation(conversationEntity, false, ConversationRepository.eventFromStreamMessage);
+          }
           const isBackendTimestamp = eventSource !== EventSource.INJECTED;
           if (type !== CONVERSATION_EVENT.MEMBER_JOIN && type !== CONVERSATION_EVENT.MEMBER_LEAVE) {
             conversationEntity.updateTimestampServer(eventJson.server_time || eventJson.time, isBackendTimestamp);
@@ -1982,9 +1982,11 @@ export class ConversationRepository {
       .then(
         conversationEntity => this.reactToConversationEvent(conversationEntity, eventJson, eventSource) as EntityObject,
       )
-      .then((entityObject = {} as EntityObject) =>
-        this.handleConversationNotification(entityObject as EntityObject, eventSource, previouslyArchived),
-      )
+      .then((entityObject = {} as EntityObject) => {
+        if (type !== CONVERSATION_EVENT.MEMBER_JOIN && type !== CONVERSATION_EVENT.MEMBER_LEAVE) {
+          this.handleConversationNotification(entityObject as EntityObject, eventSource, previouslyArchived);
+        }
+      })
       .catch((error: BaseError) => {
         const ignoredErrorTypes: string[] = [
           ConversationError.TYPE.MESSAGE_NOT_FOUND,

@@ -87,13 +87,13 @@ describe('fullscreenVideoCall', () => {
       props.call.startedAt(Date.now());
     });
 
-    await waitFor(() => getByText('00:00'));
+    await waitFor(() => expect(getByText('00:00')).toBeDefined());
 
     act(() => {
       jest.advanceTimersByTime(1001);
     });
 
-    await waitFor(() => getByText('00:01'));
+    await waitFor(() => expect(getByText('00:01')).toBeDefined());
   });
 
   it('has no active speaker toggle for calls with more less than 3 participants', () => {
@@ -114,9 +114,10 @@ describe('fullscreenVideoCall', () => {
     props.call.addParticipant(new Participant(new User('e', null), 'f'));
 
     const {getByText} = render(<FullscreenVideoCall {...props} />);
-    await waitFor(() => getByText('videoSpeakersTabSpeakers'));
+    const speakersButtonLabel = 'videoSpeakersTabSpeakers'.toUpperCase();
+    await waitFor(() => getByText(speakersButtonLabel));
 
-    getByText('videoSpeakersTabSpeakers').click();
+    getByText(speakersButtonLabel).click();
 
     expect(setMaximizedSpy).toHaveBeenCalledWith(props.call, null);
   });
