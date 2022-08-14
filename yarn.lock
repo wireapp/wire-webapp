@@ -1153,15 +1153,15 @@
   resolved "https://registry.yarnpkg.com/@bcoe/v8-coverage/-/v8-coverage-0.2.3.tgz#75a2e8b51cb758a7553d6804a5932d7aace75c39"
   integrity sha512-0hYQ8SB4Db5zvZB4axdMHGwEaQjkZzFjQiN9LVYvIFB2nSUHW9tYpxWriPrWDASIxiaXax83REcLxuSdnGPZtw==
 
-"@betterer/betterer@^5.3.7":
-  version "5.3.7"
-  resolved "https://registry.yarnpkg.com/@betterer/betterer/-/betterer-5.3.7.tgz#f7db0c1b854781247c9c535d5dcdf17d896e105d"
-  integrity sha512-y9GJYbRQuKWNmXI21onwG1yUt+HwUw3PlC4FIRNlVD9gsA/RycMrq1S58/ff8nFdLGTAmoiBeg2AzsCAMixQAQ==
+"@betterer/betterer@^5.3.7", "@betterer/betterer@^5.4.0":
+  version "5.4.0"
+  resolved "https://registry.yarnpkg.com/@betterer/betterer/-/betterer-5.4.0.tgz#5b81ed06bd84d81b94b0da4b32335e44972a2c57"
+  integrity sha512-t91JDLdUv5t70TPn1rzTiYA2WhtehDV23/KKkePMDo2Q/7QaHyHiTDG40+BnDh9LB7bW0Q4jOZXClf0tupOXNQ==
   dependencies:
     "@betterer/constraints" "^5.3.0"
     "@betterer/errors" "^5.3.0"
     "@betterer/logger" "^5.3.4"
-    "@betterer/reporter" "^5.3.7"
+    "@betterer/reporter" "^5.4.0"
     "@phenomnomnominal/debug" "^0.2.5"
     "@phenomnomnominal/worker-require" "^0.0.34"
     chokidar "^3.3.1"
@@ -1176,12 +1176,12 @@
   optionalDependencies:
     typescript ">=2.7"
 
-"@betterer/cli@^5.3.7":
-  version "5.3.7"
-  resolved "https://registry.yarnpkg.com/@betterer/cli/-/cli-5.3.7.tgz#ae6e9b2543bb7bb9565eb2a1e457ba2d5ac7029f"
-  integrity sha512-JqBHNYM7xRA+VCxvopvxKvDm8FXOyTShvw0XSZFGZfMWJGJoi9UXvp0DL2OPl35/dwKRN5vB4ac9bDErvUrwgQ==
+"@betterer/cli@^5.4.0":
+  version "5.4.0"
+  resolved "https://registry.yarnpkg.com/@betterer/cli/-/cli-5.4.0.tgz#609adc910848ab9fd5d94545b52f5474126cf711"
+  integrity sha512-FtXbNLoxsg54w9LQWngXNuGNZj8BHG9qPv6r2Hvr5FYw1ZblAsTW9Vya9NlbOtSxIVrVf/aM9FVTIltTPhFHfA==
   dependencies:
-    "@betterer/betterer" "^5.3.7"
+    "@betterer/betterer" "^5.4.0"
     "@betterer/errors" "^5.3.0"
     "@betterer/render" "^5.3.4"
     "@betterer/tasks" "^5.3.6"
@@ -1222,12 +1222,12 @@
   resolved "https://registry.yarnpkg.com/@betterer/render/-/render-5.3.4.tgz#1e668202b006bb71bca5ee316c114cef85ae4812"
   integrity sha512-zc91zlLxWafGxG25/kUsCDmxLvQhUb4PNIq4MRU/VpnncyhdelMY5OxaIAxu9IXhJFoC6FRJhL3I7eGdND64zQ==
 
-"@betterer/reporter@^5.3.7":
-  version "5.3.7"
-  resolved "https://registry.yarnpkg.com/@betterer/reporter/-/reporter-5.3.7.tgz#5f7996ab086597b892331a35d66ca56bc8d621df"
-  integrity sha512-OkaVKE1ZVm3iZUAxebUWJFHAZUUPC23l3iygmhtymQeAinWHfqxEHrWOvg8g+ozwYECwiSfl0CVHbazp/J5EUA==
+"@betterer/reporter@^5.4.0":
+  version "5.4.0"
+  resolved "https://registry.yarnpkg.com/@betterer/reporter/-/reporter-5.4.0.tgz#c6f21ce914a8d642c505c56a3cf153d38ee0328e"
+  integrity sha512-+NB/zDkPv4q4oObWhvVpKghskf0K520NIm8rjfoBPAm75Y/PHWh2JSBeTSo6li25HRdvF5wZ+8tIJr1UAennmQ==
   dependencies:
-    "@betterer/betterer" "^5.3.7"
+    "@betterer/betterer" "^5.4.0"
     "@betterer/errors" "^5.3.0"
     "@betterer/logger" "^5.3.4"
     "@betterer/render" "^5.3.4"
