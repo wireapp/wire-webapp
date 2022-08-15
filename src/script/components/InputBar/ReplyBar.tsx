@@ -49,7 +49,7 @@ const ReplyBar: FC<ReplyBarProps> = ({replyMessageEntity, onCancel}) => {
         onClick={onCancel}
         data-uie-name="do-close-reply-box"
       >
-        <Icon.Close className="close-icon" />
+        <Icon.Close fill="white" />
       </button>
 
       <div className="input-bar__reply__body">
