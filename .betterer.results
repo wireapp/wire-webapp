@@ -45,34 +45,11 @@ exports[`stricter compilation`] = {
     "src/script/auth/AuthRepository.ts:219478500": [
       [52, 60, 5, "Object is of type \'unknown\'.", "165548477"]
     ],
-    "src/script/auth/component/AccountForm.tsx:4117596454": [
-      [90, 8, 16, "Object is possibly \'undefined\'.", "3859911866"],
-      [90, 33, 16, "Object is possibly \'undefined\'.", "3859911866"],
-      [92, 11, 16, "Object is possibly \'undefined\'.", "3859911866"],
-      [93, 20, 87, "Argument of type \'ValidationError | null\' is not assignable to parameter of type \'Error\'.\\n  Type \'null\' is not assignable to type \'Error\'.", "612674422"],
-      [93, 58, 16, "Object is possibly \'undefined\'.", "3859911866"],
-      [93, 81, 16, "Object is possibly \'undefined\'.", "3859911866"],
-      [95, 33, 16, "Object is possibly \'undefined\'.", "3859911866"],
-      [98, 24, 6, "Argument of type \'Error[]\' is not assignable to parameter of type \'SetStateAction<never[]>\'.\\n  Type \'Error[]\' is not assignable to type \'never[]\'.\\n    Type \'Error\' is not assignable to type \'never\'.", "1168132398"],
-      [108, 19, 5, "Object is of type \'unknown\'.", "165548477"],
-      [109, 16, 5, "Object is of type \'unknown\'.", "165548477"],
-      [114, 12, 20, "Object is possibly \'undefined\'.", "4048796933"],
-      [114, 51, 5, "Object is of type \'unknown\'.", "165548477"],
-      [120, 12, 20, "Object is possibly \'undefined\'.", "4048796933"],
-      [120, 51, 5, "Object is of type \'unknown\'.", "165548477"],
-      [121, 12, 23, "Object is possibly \'undefined\'.", "23329910"],
-      [121, 54, 5, "Object is of type \'unknown\'.", "165548477"],
-      [127, 14, 5, "Object is of type \'unknown\'.", "165548477"],
-      [147, 14, 19, "Object is possibly \'undefined\'.", "3911565646"],
-      [151, 12, 3, "Type \'MutableRefObject<HTMLInputElement | undefined>\' is not assignable to type \'((instance: HTMLInputElement | null) => void) | RefObject<HTMLInputElement> | null | undefined\'.", "193432436"],
-      [158, 16, 20, "Object is possibly \'undefined\'.", "4048796933"],
-      [171, 14, 20, "Object is possibly \'undefined\'.", "4048796933"],
-      [175, 12, 3, "Type \'MutableRefObject<HTMLInputElement | undefined>\' is not assignable to type \'((instance: HTMLInputElement | null) => void) | RefObject<HTMLInputElement> | null | undefined\'.", "193432436"],
-      [186, 16, 23, "Object is possibly \'undefined\'.", "23329910"],
-      [198, 14, 23, "Object is possibly \'undefined\'.", "23329910"],
-      [202, 12, 3, "Type \'MutableRefObject<HTMLInputElement | undefined>\' is not assignable to type \'((instance: HTMLInputElement | null) => void) | RefObject<HTMLInputElement> | null | undefined\'.", "193432436"],
-      [226, 8, 3, "Type \'MutableRefObject<HTMLInputElement | undefined>\' is not assignable to type \'((instance: HTMLInputElement | null) => void) | RefObject<HTMLInputElement> | null | undefined\'.\\n  Type \'MutableRefObject<HTMLInputElement | undefined>\' is not assignable to type \'RefObject<HTMLInputElement>\'.\\n    Types of property \'current\' are incompatible.\\n      Type \'HTMLInputElement | undefined\' is not assignable to type \'HTMLInputElement | null\'.\\n        Type \'undefined\' is not assignable to type \'HTMLInputElement | null\'.", "193432436"],
-      [228, 10, 20, "Object is possibly \'undefined\'.", "3805711124"]
+    "src/script/auth/component/AccountForm.tsx:761869425": [
+      [155, 12, 3, "Type \'MutableRefObject<HTMLInputElement | undefined>\' is not assignable to type \'((instance: HTMLInputElement | null) => void) | RefObject<HTMLInputElement> | null | undefined\'.", "193432436"],
+      [179, 12, 3, "Type \'MutableRefObject<HTMLInputElement | undefined>\' is not assignable to type \'((instance: HTMLInputElement | null) => void) | RefObject<HTMLInputElement> | null | undefined\'.", "193432436"],
+      [206, 12, 3, "Type \'MutableRefObject<HTMLInputElement | undefined>\' is not assignable to type \'((instance: HTMLInputElement | null) => void) | RefObject<HTMLInputElement> | null | undefined\'.", "193432436"],
+      [230, 8, 3, "Type \'MutableRefObject<HTMLInputElement | undefined>\' is not assignable to type \'((instance: HTMLInputElement | null) => void) | RefObject<HTMLInputElement> | null | undefined\'.\\n  Type \'MutableRefObject<HTMLInputElement | undefined>\' is not assignable to type \'RefObject<HTMLInputElement>\'.\\n    Types of property \'current\' are incompatible.\\n      Type \'HTMLInputElement | undefined\' is not assignable to type \'HTMLInputElement | null\'.\\n        Type \'undefined\' is not assignable to type \'HTMLInputElement | null\'.", "193432436"]
     ],
     "src/script/auth/component/ClientItem.tsx:1403845945": [
       [149, 9, 21, "Object is possibly \'undefined\'.", "4077427211"],
@@ -333,7 +310,7 @@ exports[`stricter compilation`] = {
       [168, 18, 3, "Type \'MutableRefObject<HTMLInputElement | undefined>\' is not assignable to type \'((instance: HTMLInputElement | null) => void) | RefObject<HTMLInputElement> | null | undefined\'.", "193432436"]
     ],
     "src/script/auth/page/Login.tsx:2043279151": [
-      [173, 24, 16, "Argument of type \'Error[]\' is not assignable to parameter of type \'SetStateAction<never[]>\'.", "2735526245"],
+      [173, 24, 16, "Argument of type \'Error[]\' is not assignable to parameter of type \'SetStateAction<never[]>\'.\\n  Type \'Error[]\' is not assignable to type \'never[]\'.\\n    Type \'Error\' is not assignable to type \'never\'.", "2735526245"],
       [175, 50, 10, "Type \'ClientType | undefined\' is not assignable to type \'ClientType\'.", "3013398820"],
       [204, 56, 10, "Type \'ClientType | undefined\' is not assignable to type \'ClientType\'.", "3013398820"],
       [206, 32, 11, "Argument of type \'string | undefined\' is not assignable to parameter of type \'string\'.\\n  Type \'undefined\' is not assignable to type \'string\'.", "2331572484"],

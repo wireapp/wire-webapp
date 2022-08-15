@@ -17,7 +17,6 @@
  *
  */
 
-import {ServiceEntity} from '../integration/ServiceEntity';
+import {ValidationError} from '../auth/module/action/ValidationError';
 
-export const isServiceEntity = (entity: any | undefined | null): entity is ServiceEntity =>
-  entity && 'isService' in entity && entity.isService;
+export const isValidationError = (error: any | undefined | null): error is ValidationError => error && 'label' in error;
