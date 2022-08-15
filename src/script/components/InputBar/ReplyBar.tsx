@@ -18,30 +18,27 @@
  */
 
 import {FC} from 'react';
-
 import Icon from 'Components/Icon';
 import Image from 'Components/Image';
 import RestrictedVideo from 'Components/asset/RestrictedVideo';
 import ParticipantMicOnIcon from 'Components/calling/ParticipantMicOnIcon';
 
-import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {renderMessage} from 'Util/messageRenderer';
 import {t} from 'Util/LocalizerUtil';
 
 import {ContentMessage} from '../../entity/message/ContentMessage';
 
 interface ReplyBarProps {
-  replyMessageEntity: ContentMessage;
+  replyMessageEntity: ContentMessage | null;
   onCancel: () => void;
 }
 
 const ReplyBar: FC<ReplyBarProps> = ({replyMessageEntity, onCancel}) => {
-  const {
-    assets,
-    headerSenderName,
-    was_edited: wasEdited,
-  } = useKoSubscribableChildren(replyMessageEntity, ['assets', 'headerSenderName', 'was_edited']);
-  const replyAsset = assets?.[0];
+  const replyAsset = replyMessageEntity?.assets?.()[0];
+
+  if (!replyAsset) {
+    return null;
+  }
 
   return (
     <div className="input-bar__reply" data-uie-name="input-bar-reply-box">
@@ -61,10 +58,10 @@ const ReplyBar: FC<ReplyBarProps> = ({replyMessageEntity, onCancel}) => {
         <div className="input-bar__reply__text">
           <div className="input-bar__reply__sender-name">
             <span data-uie-name="label-name-reply-box" tabIndex={0}>
-              {headerSenderName}
+              {replyMessageEntity?.headerSenderName()}
             </span>
 
-            {wasEdited && (
+            {replyMessageEntity?.was_edited() && (
               <Icon.Edit data-uie-name="message-edited-reply-box" aria-label={t('replyBarEditMessage')} tabIndex={0} />
             )}
           </div>

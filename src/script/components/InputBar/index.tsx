@@ -209,12 +209,13 @@ const InputBar = ({
     setSelectionEnd(newEnd);
   };
 
-  const moveCursorToEnd = (endPosition: number, updateSelection = true) => {
-    updateSelectionState(updateSelection);
-    setTimeout(() => {
-      textareaRef.current?.setSelectionRange(endPosition, endPosition);
-      textareaRef.current?.focus();
-    }, 0);
+  const moveCursorToEnd = (updateSelection = true) => {
+    if (textareaRef.current) {
+      const endPosition = textareaRef.current.value.length;
+      textareaRef.current.setSelectionRange(endPosition, endPosition);
+      updateSelectionState(updateSelection);
+      textareaRef.current.focus();
+    }
   };
 
   const resetDraftState = () => {
@@ -351,7 +352,7 @@ const InputBar = ({
           .then(quotedMessage => setReplyMessageEntity(quotedMessage));
       }
 
-      moveCursorToEnd(firstAsset.text.length);
+      moveCursorToEnd();
     }
   };
 
@@ -663,9 +664,9 @@ const InputBar = ({
           }
         });
       }
-
-      moveCursorToEnd(previousSessionData.text.length, false);
     }
+
+    moveCursorToEnd(false);
   };
 
   const sendGiphy = (gifUrl: string, tag: string): void => {
@@ -749,7 +750,7 @@ const InputBar = ({
       amplify.unsubscribe(WebAppEvents.CONVERSATION.MESSAGE.REMOVED, handleRepliedMessageDeleted);
       amplify.unsubscribe(WebAppEvents.CONVERSATION.MESSAGE.UPDATED, handleRepliedMessageUpdated);
     };
-  }, [replyMessageEntity]);
+  }, []);
 
   useEffect(() => {
     if (isEditing) {
