@@ -17,7 +17,7 @@
  *
  */
 
-import React, {useEffect, useRef} from 'react';
+import React, {useEffect, useState} from 'react';
 import Icon from 'Components/Icon';
 import {MemberMessage as MemberMessageEntity} from '../../../entity/message/MemberMessage';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
@@ -76,10 +76,10 @@ const MemberMessage: React.FC<MemberMessageProps> = ({
   const isMemberLeave = message.isMemberLeave();
   const isMemberChange = message.isMemberChange();
 
-  const messageHeaderLabelElement = useRef<HTMLDivElement>(null);
+  const [messageHeaderLabelElement, setMessageHeaderLabelElement] = useState<HTMLDivElement | null>(null);
   useEffect(() => {
-    if (messageHeaderLabelElement.current) {
-      const link = messageHeaderLabelElement.current.querySelector('.message-header-show-more');
+    if (messageHeaderLabelElement) {
+      const link = messageHeaderLabelElement.querySelector('.message-header-show-more');
       if (link) {
         const listener = () => onClickParticipants(highlightedUsers);
         link.addEventListener('click', listener);
@@ -89,7 +89,7 @@ const MemberMessage: React.FC<MemberMessageProps> = ({
       }
     }
     return undefined;
-  }, [messageHeaderLabelElement.current]);
+  }, [messageHeaderLabelElement]);
 
   return (
     <>
@@ -118,7 +118,7 @@ const MemberMessage: React.FC<MemberMessageProps> = ({
                 {isMemberRemoval && <span className="icon-minus" />}
                 {isMemberJoin && <span className="icon-plus" />}
               </div>
-              <div ref={messageHeaderLabelElement} className="message-header-label">
+              <div ref={setMessageHeaderLabelElement} className="message-header-label">
                 <span className="message-header-caption" dangerouslySetInnerHTML={{__html: htmlCaption}} />
                 <hr className="message-header-line" />
               </div>

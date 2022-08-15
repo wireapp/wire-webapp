@@ -17,7 +17,7 @@
  *
  */
 
-import React, {useEffect, useRef, useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {TeamState} from '../../../../../team/TeamState';
 import {container} from 'tsyringe';
 import cx from 'classnames';
@@ -56,22 +56,20 @@ const AudioAsset: React.FC<AudioAssetProps> = ({
   teamState = container.resolve(TeamState),
 }) => {
   const asset = message.getFirstAsset() as FileAsset;
-  const audioElement = useRef<HTMLAudioElement>(null);
+  const [audioElement, setAudioElement] = useState<HTMLAudioElement | null>(null);
   const {isFileSharingReceivingEnabled} = useKoSubscribableChildren(teamState, ['isFileSharingReceivingEnabled']);
   const {isObfuscated} = useKoSubscribableChildren(message, ['isObfuscated']);
   const {transferState, uploadProgress, cancelUpload, loadAsset} = useAssetTransfer(message);
   const [audioTime, setAudioTime] = useState<number>(asset?.meta?.duration ?? 0);
   const [audioSrc, setAudioSrc] = useState<string>();
 
-  const audio = audioElement.current;
-
-  const onTimeupdate = () => setAudioTime(audio?.currentTime ?? 0);
+  const onTimeupdate = () => setAudioTime(audioElement?.currentTime ?? 0);
   const showLoudnessPreview = !!asset.meta?.loudness?.length;
-  const onPauseButtonClicked = () => audio?.pause();
+  const onPauseButtonClicked = () => audioElement?.pause();
 
   const onPlayButtonClicked = async () => {
     if (audioSrc) {
-      audio?.play();
+      audioElement?.play();
     } else {
       asset.status(AssetTransferState.DOWNLOADING);
       try {
@@ -85,14 +83,14 @@ const AudioAsset: React.FC<AudioAssetProps> = ({
   };
 
   useEffect(() => {
-    if (audioSrc && audioElement.current) {
-      const playPromise = audioElement.current?.play();
+    if (audioSrc && audioElement) {
+      const playPromise = audioElement?.play();
 
       playPromise?.catch(error => {
         logger.error('Failed to load audio asset ', error);
       });
     }
-  }, [audioElement.current, audioSrc]);
+  }, [audioElement, audioSrc]);
 
   useEffect(() => {
     return () => {
@@ -102,7 +100,7 @@ const AudioAsset: React.FC<AudioAssetProps> = ({
 
   return (
     <div className={cx('audio-asset', className)} data-uie-name="audio-asset" data-uie-value={asset.file_name}>
-      <audio ref={audioElement} src={audioSrc} onTimeUpdate={onTimeupdate}>
+      <audio ref={setAudioElement} src={audioSrc} onTimeUpdate={onTimeupdate}>
         <track kind="captions"></track>
       </audio>
 
@@ -121,7 +119,7 @@ const AudioAsset: React.FC<AudioAssetProps> = ({
               {transferState !== AssetTransferState.UPLOAD_PENDING && (
                 <div className="audio-controls">
                   <MediaButton
-                    mediaElement={audio ?? undefined}
+                    mediaElement={audioElement ?? undefined}
                     asset={asset}
                     play={onPlayButtonClicked}
                     pause={onPauseButtonClicked}
@@ -130,15 +128,20 @@ const AudioAsset: React.FC<AudioAssetProps> = ({
                     uploadProgress={uploadProgress}
                   />
 
-                  {transferState !== AssetTransferState.UPLOADING && audio && (
+                  {transferState !== AssetTransferState.UPLOADING && audioElement && (
                     <>
                       <span className="audio-controls-time label-xs" data-uie-name="status-audio-time">
                         {formatSeconds(audioTime)}
                       </span>
                       {showLoudnessPreview ? (
-                        <AudioSeekBar audioElement={audio} asset={asset} disabled={!audioSrc} />
+                        <AudioSeekBar audioElement={audioElement} asset={asset} disabled={!audioSrc} />
                       ) : (
-                        <SeekBar dark mediaElement={audio} disabled={!audioSrc} data-uie-name="status-audio-seekbar" />
+                        <SeekBar
+                          dark
+                          mediaElement={audioElement}
+                          disabled={!audioSrc}
+                          data-uie-name="status-audio-seekbar"
+                        />
                       )}
                     </>
                   )}

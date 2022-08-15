@@ -38,16 +38,19 @@ const SetEmail = ({hasSelfEmail, isSelfSSOUser, doSetEmail, isFetching}: Props &
   const {formatMessage: _} = useIntl();
 
   const emailInput = useRef<HTMLInputElement>();
-  const [error, setError] = useState();
+  const [error, setError] = useState<ValidationError | null>();
   const [isValidEmail, setIsValidEmail] = useState(true);
   const [email, setEmail] = useState('');
   const {history} = useReactRouter();
 
   const onSetEmail = async (event: React.FormEvent): Promise<void> => {
     event.preventDefault();
-    let validationError: Error;
+    let validationError: ValidationError | null = null;
 
     const currentInputNode = emailInput.current;
+    if (!currentInputNode) {
+      return;
+    }
     currentInputNode.value = currentInputNode.value.trim();
     currentInputNode.focus();
     if (!currentInputNode.checkValidity()) {
@@ -61,7 +64,7 @@ const SetEmail = ({hasSelfEmail, isSelfSSOUser, doSetEmail, isFetching}: Props &
       await doSetEmail(currentInputNode.value);
       history.push(ROUTE.VERIFY_EMAIL_LINK);
     } catch (error) {
-      setError(error);
+      setError(error as ValidationError);
     }
   };
 
@@ -83,7 +86,7 @@ const SetEmail = ({hasSelfEmail, isSelfSSOUser, doSetEmail, isFetching}: Props &
             placeholder={_(setEmailStrings.emailPlaceholder)}
             type="email"
             onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-              emailInput.current.setCustomValidity('');
+              emailInput.current?.setCustomValidity('');
               setEmail(event.target.value);
               setError(null);
               setIsValidEmail(true);

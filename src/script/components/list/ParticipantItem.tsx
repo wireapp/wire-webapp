@@ -17,7 +17,7 @@
  *
  */
 
-import React, {useState} from 'react';
+import React from 'react';
 import cx from 'classnames';
 
 import {registerReactComponent, useKoSubscribableChildren} from 'Util/ComponentUtil';
@@ -83,8 +83,7 @@ const ParticipantItem = <UserType extends User | ServiceEntity>(
     onKeyDown = noop,
   } = props;
 
-  const [viewportElement, setViewportElement] = useState<HTMLDivElement | null>(null);
-  const isInViewport = useViewPortObserver(viewportElement);
+  const {isInViewport, setViewportElement} = useViewPortObserver();
   const isUser = participant instanceof User && !participant.isService;
   const isService = participant instanceof ServiceEntity || participant.isService;
   const isSelf = !!(participant as User).isMe;

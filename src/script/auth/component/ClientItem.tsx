@@ -147,13 +147,13 @@ const ClientItem = ({selected, onClientRemoval, onClick, client, clientError, re
   const handleSubmit = (event: React.FormEvent): Promise<void> => {
     event.preventDefault();
     let localValidationError = null;
-    if (!passwordInput.current.checkValidity()) {
-      localValidationError = ValidationError.handleValidationState(
-        passwordInput.current.name,
-        passwordInput.current.validity,
-      );
+    const pwInput = passwordInput.current;
+    if (!pwInput?.checkValidity()) {
+      if (pwInput?.name && pwInput?.validity) {
+        localValidationError = ValidationError.handleValidationState(pwInput.name, pwInput.validity);
+      }
     }
-    setIsValidPassword(passwordInput.current.validity.valid);
+    setIsValidPassword(passwordInput.current?.validity.valid ?? false);
     setValidationError(localValidationError);
     return Promise.resolve(localValidationError)
       .then(error => {

@@ -17,7 +17,7 @@
  *
  */
 
-import React, {useCallback, useEffect, useRef, useState} from 'react';
+import React, {useCallback, useEffect, useState} from 'react';
 import {container} from 'tsyringe';
 import cx from 'classnames';
 
@@ -55,7 +55,7 @@ const VideoAsset: React.FC<VideoAssetProps> = ({
   const [videoTimeRest, setVideoTimeRest] = useState<number>();
   const [videoPreview, setVideoPreview] = useState<string>('');
   const [videoSrc, setVideoSrc] = useState<string>('');
-  const videoElement = useRef<HTMLVideoElement>(null);
+  const [videoElement, setVideoElement] = useState<HTMLVideoElement | null>(null);
   const [isVideoLoaded, setIsVideoLoaded] = useState(false);
   const {isFileSharingReceivingEnabled} = useKoSubscribableChildren(teamState, ['isFileSharingReceivingEnabled']);
   const [displaySmall, setDisplaySmall] = useState(!!isQuote);
@@ -80,7 +80,7 @@ const VideoAsset: React.FC<VideoAssetProps> = ({
       setDisplaySmall(false);
 
       if (videoSrc.length) {
-        videoElement.current?.play();
+        videoElement?.play();
       } else {
         asset.status(AssetTransferState.DOWNLOADING);
 
@@ -98,30 +98,30 @@ const VideoAsset: React.FC<VideoAssetProps> = ({
   };
 
   const onPauseButtonClicked = (): void => {
-    videoElement.current?.pause();
+    videoElement?.pause();
   };
 
   const onVideoPlaying = (): void => {
-    if (videoElement.current) {
-      videoElement.current.style.backgroundColor = '#000';
+    if (videoElement) {
+      videoElement.style.backgroundColor = '#000';
     }
   };
 
   const setRemainingVideoTime = (): void => {
-    if (videoElement.current) {
-      setVideoTimeRest(videoElement.current?.duration - videoElement.current?.currentTime);
+    if (videoElement) {
+      setVideoTimeRest(videoElement?.duration - videoElement?.currentTime);
     }
   };
 
   useEffect(() => {
-    if (videoSrc && videoElement.current) {
-      const playPromise = videoElement.current.play();
+    if (videoSrc && videoElement) {
+      const playPromise = videoElement.play();
 
       playPromise?.catch(error => {
         console.error('Failed to load video asset ', error);
       });
     }
-  }, [videoElement.current, videoSrc]);
+  }, [videoElement, videoSrc]);
 
   return (
     !isObfuscated && (
@@ -139,7 +139,7 @@ const VideoAsset: React.FC<VideoAssetProps> = ({
               }}
             >
               <video
-                ref={videoElement}
+                ref={setVideoElement}
                 playsInline
                 src={videoSrc}
                 poster={videoPreview}
@@ -165,7 +165,7 @@ const VideoAsset: React.FC<VideoAssetProps> = ({
                     <div className="asset-placeholder loading-dots" />
                   ) : (
                     <>
-                      {videoElement.current && (
+                      {videoElement && (
                         <div
                           className={cx('video-asset__controls', {
                             'video-asset__controls--hidden': isVideoLoaded && hideControls,
@@ -174,7 +174,7 @@ const VideoAsset: React.FC<VideoAssetProps> = ({
                           <div className="video-asset__controls-center">
                             {displaySmall ? (
                               <MediaButton
-                                mediaElement={videoElement.current}
+                                mediaElement={videoElement}
                                 asset={asset}
                                 play={onPlayButtonClicked}
                                 transferState={transferState}
@@ -182,7 +182,7 @@ const VideoAsset: React.FC<VideoAssetProps> = ({
                               />
                             ) : (
                               <MediaButton
-                                mediaElement={videoElement.current}
+                                mediaElement={videoElement}
                                 large
                                 asset={asset}
                                 play={onPlayButtonClicked}
@@ -203,7 +203,7 @@ const VideoAsset: React.FC<VideoAssetProps> = ({
                               <SeekBar
                                 className="video-asset__controls__bottom__seekbar"
                                 data-uie-name="status-video-seekbar"
-                                mediaElement={videoElement.current}
+                                mediaElement={videoElement}
                               />
                               <span
                                 className="video-asset__controls__bottom__time label-xs"

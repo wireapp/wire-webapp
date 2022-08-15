@@ -23,7 +23,7 @@ import {KEY} from 'Util/KeyboardUtil';
 const hideControlsClass = 'hide-controls';
 
 const useHideElement = (timeout: number, skipClass?: string) => {
-  const [element, setElement] = useState<HTMLDivElement | null>(null);
+  const [element, setElementToHide] = useState<HTMLDivElement | null>(null);
 
   useEffect(() => {
     if (!element) {
@@ -78,7 +78,7 @@ const useHideElement = (timeout: number, skipClass?: string) => {
     };
   }, [element]);
 
-  return setElement;
+  return {setElementToHide};
 };
 
 export default useHideElement;

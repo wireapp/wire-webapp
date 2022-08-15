@@ -47,8 +47,7 @@ const Image: React.FC<ImageProps> = ({
   aspectRatio,
   ...props
 }) => {
-  const [viewportElement, setViewportElement] = useState<HTMLDivElement | null>(null);
-  const isInViewport = useViewPortObserver(viewportElement);
+  const {isInViewport, setViewportElement} = useViewPortObserver();
 
   const [assetIsLoading, setAssetIsLoading] = useState<boolean>(false);
   const [assetSrc, setAssetSrc] = useState<string>();

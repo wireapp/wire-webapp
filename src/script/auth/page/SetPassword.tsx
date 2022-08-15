@@ -45,16 +45,19 @@ const SetPassword = ({
   const {formatMessage: _} = useIntl();
 
   const passwordInput = useRef<HTMLInputElement>();
-  const [error, setError] = useState();
+  const [error, setError] = useState<ValidationError>();
   const [isValidPassword, setIsValidPassword] = useState(true);
   const [password, setPassword] = useState('');
   const {history} = useReactRouter();
 
   const onSetPassword = async (event: React.FormEvent): Promise<void> => {
     event.preventDefault();
-    let validationError: Error;
+    let validationError: ValidationError | null = null;
 
     const currentInputNode = passwordInput.current;
+    if (!currentInputNode) {
+      return;
+    }
     currentInputNode.focus();
     if (!currentInputNode.checkValidity()) {
       validationError = ValidationError.handleValidationState(currentInputNode.name, currentInputNode.validity);

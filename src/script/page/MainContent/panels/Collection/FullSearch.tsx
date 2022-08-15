@@ -46,7 +46,7 @@ const FullSearch: React.FC<FullSearchProps> = ({searchProvider, click = noop, ch
   const [messages, setMessages] = useState<ContentMessage[]>([]);
   const [messageCount, setMessageCount] = useState(0);
   const [hasNoResults, setHasNoResults] = useState(false);
-  const searchElement = useRef<HTMLDivElement>(null);
+  const [searchElement, setSearchElement] = useState<HTMLDivElement | null>(null);
 
   useDebounce(
     async () => {
@@ -70,7 +70,7 @@ const FullSearch: React.FC<FullSearchProps> = ({searchProvider, click = noop, ch
   );
 
   useEffect(() => {
-    const parent = searchElement.current?.closest('.collection-list') as HTMLDivElement;
+    const parent = searchElement?.closest('.collection-list') as HTMLDivElement;
     const onScroll = () => {
       const showAdditionalMessages = isScrolledBottom(parent) && messages.length;
       if (showAdditionalMessages) {
@@ -81,7 +81,7 @@ const FullSearch: React.FC<FullSearchProps> = ({searchProvider, click = noop, ch
     return () => {
       parent?.removeEventListener('scroll', onScroll);
     };
-  }, [searchElement.current, messages]);
+  }, [searchElement, messages]);
 
   useEffect(() => {
     if (inputRef.current) {
@@ -121,7 +121,7 @@ const FullSearch: React.FC<FullSearchProps> = ({searchProvider, click = noop, ch
   }, [input]);
 
   return (
-    <div className="full-search" ref={searchElement}>
+    <div className="full-search" ref={setSearchElement}>
       <header className="full-search__header">
         <span className="full-search__header__icon icon-search" />
         <div className="full-search__header__input">

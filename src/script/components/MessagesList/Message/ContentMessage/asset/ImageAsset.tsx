@@ -47,8 +47,7 @@ const ImageAsset: React.FC<ImageAssetProps> = ({asset, message, onClick, teamSta
   const {resource} = useKoSubscribableChildren(asset, ['resource']);
   const {isObfuscated, visible} = useKoSubscribableChildren(message, ['isObfuscated', 'visible']);
   const {isFileSharingReceivingEnabled} = useKoSubscribableChildren(teamState, ['isFileSharingReceivingEnabled']);
-  const [viewportElement, setViewportElement] = useState<HTMLDivElement | null>(null);
-  const isInViewport = useViewPortObserver(viewportElement);
+  const {isInViewport, setViewportElement} = useViewPortObserver();
   const {isUploading, uploadProgress, cancelUpload, loadAsset} = useAssetTransfer(message);
 
   useEffect(() => {

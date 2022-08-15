@@ -17,7 +17,7 @@
  *
  */
 
-import React, {useEffect, useMemo, useRef} from 'react';
+import React, {useEffect, useMemo, useState} from 'react';
 import cx from 'classnames';
 
 import {noop} from 'Util/util';
@@ -83,7 +83,7 @@ const ConversationListCell: React.FC<ConversationListCellProps> = ({
 
   const isActive = isSelected(conversation);
 
-  const viewportElement = useRef<HTMLLIElement>(null);
+  const [viewportElement, setViewportElement] = useState<HTMLLIElement | null>(null);
 
   useEffect(() => {
     const handleRightClick = (event: MouseEvent) => {
@@ -91,11 +91,11 @@ const ConversationListCell: React.FC<ConversationListCellProps> = ({
       event.preventDefault();
       rightClick(conversation, event);
     };
-    viewportElement.current?.addEventListener('contextmenu', handleRightClick);
+    viewportElement?.addEventListener('contextmenu', handleRightClick);
     return () => {
-      viewportElement.current?.removeEventListener('contextmenu', handleRightClick);
+      viewportElement?.removeEventListener('contextmenu', handleRightClick);
     };
-  }, [viewportElement.current]);
+  }, [viewportElement]);
 
   const cellState = useMemo(() => generateCellState(conversation), [unreadState, mutedState, isRequest]);
 
@@ -118,7 +118,7 @@ const ConversationListCell: React.FC<ConversationListCellProps> = ({
   };
 
   return (
-    <li ref={viewportElement}>
+    <li ref={setViewportElement}>
       <div
         data-uie-name={dataUieName}
         data-uie-uid={conversation.id}

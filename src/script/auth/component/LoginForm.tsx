@@ -43,26 +43,34 @@ const LoginForm = ({isFetching, onSubmit}: LoginFormProps) => {
   const [password, setPassword] = useState('');
 
   const handleSubmit = (event: React.FormEvent): void => {
+    const currentEmailInput = emailInput.current;
+    const currentPasswordInput = passwordInput.current;
     event.preventDefault();
     if (isFetching) {
       return undefined;
     }
-    emailInput.current.value = emailInput.current.value.trim();
-    const validationErrors: Error[] = [];
+    const validationErrors: ValidationError[] = [];
+    if (currentEmailInput) {
+      currentEmailInput.value = currentEmailInput.value.trim();
+      if (!currentEmailInput.checkValidity()) {
+        const error = ValidationError.handleValidationState(currentEmailInput.name, currentEmailInput.validity);
+        if (error) {
+          validationErrors.push(error);
+        }
+      }
+      setValidEmailInput(currentEmailInput.validity.valid);
+    }
+    if (currentPasswordInput) {
+      if (!currentPasswordInput.checkValidity()) {
+        const error = ValidationError.handleValidationState(currentPasswordInput.name, currentPasswordInput.validity);
+        if (error) {
+          validationErrors.push(error);
+        }
+      }
+      setValidPasswordInput(currentPasswordInput.validity.valid);
+    }
 
-    if (!emailInput.current.checkValidity()) {
-      validationErrors.push(
-        ValidationError.handleValidationState(emailInput.current.name, emailInput.current.validity),
-      );
-    }
-    setValidEmailInput(emailInput.current.validity.valid);
-    if (!passwordInput.current.checkValidity()) {
-      validationErrors.push(
-        ValidationError.handleValidationState(passwordInput.current.name, passwordInput.current.validity),
-      );
-    }
     const loginData: Partial<LoginData> = {password};
-    setValidPasswordInput(passwordInput.current.validity.valid);
     const localEmail = email.trim();
     if (isValidEmail(localEmail)) {
       loginData.email = localEmail;

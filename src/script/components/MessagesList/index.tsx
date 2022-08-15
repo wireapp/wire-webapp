@@ -196,7 +196,7 @@ const MessagesList: React.FC<MessagesListParams> = ({
     if (messagesContainerElement) {
       updateScroll(messagesContainerElement);
     }
-  }, [filteredMessages.length, messagesContainer]);
+  }, [filteredMessages.length, messagesContainerElement]);
 
   useEffect(() => {
     onLoading(true);
