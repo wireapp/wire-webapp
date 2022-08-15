@@ -17,7 +17,7 @@
  *
  */
 
-import React, {useRef, useState} from 'react';
+import React, {useState} from 'react';
 import {ClientEntity} from 'src/script/client/ClientEntity';
 import {ClientState} from '../../../../../client/ClientState';
 import {UserState} from '../../../../../user/UserState';
@@ -112,10 +112,9 @@ const DevicesPreferences: React.FC<DevicesPreferencesProps> = ({
   const {clients, currentClient} = useKoSubscribableChildren(clientState, ['clients', 'currentClient']);
   const {self} = useKoSubscribableChildren(userState, ['self']);
   const isSSO = self?.isNoPasswordSSO;
-  const scrollbarElement = useRef<HTMLDivElement>(null);
   const getFingerprint = (device: ClientEntity) =>
     cryptographyRepository.getRemoteFingerprint(self.qualifiedId, device.id);
-  useFadingScrollbar(scrollbarElement.current);
+  const {setScrollbarElement} = useFadingScrollbar();
 
   if (selectedDevice) {
     return (
@@ -136,7 +135,7 @@ const DevicesPreferences: React.FC<DevicesPreferencesProps> = ({
   return (
     <div id="preferences-devices" className="preferences-page preferences-devices">
       <h2 className="preferences-titlebar">{t('preferencesDevices')}</h2>
-      <div className="preferences-content" ref={scrollbarElement}>
+      <div className="preferences-content" ref={setScrollbarElement}>
         <fieldset className="preferences-section" data-uie-name="preferences-device-current">
           <legend className="preferences-header">{t('preferencesDevicesCurrent')}</legend>
           <DetailedDevice device={currentClient} fingerprint={cryptographyRepository.getLocalFingerprint()} />

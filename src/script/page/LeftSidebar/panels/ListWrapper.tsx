@@ -17,7 +17,7 @@
  *
  */
 
-import React, {ReactElement, useEffect, useRef} from 'react';
+import React, {ReactElement, useEffect} from 'react';
 
 import {css} from '@emotion/react';
 import {throttle} from 'underscore';
@@ -63,8 +63,7 @@ const ListWrapper: React.FC<LeftListWrapperProps> = ({
   before,
   headerUieName,
 }) => {
-  const scrollbarElement = useRef<HTMLDivElement>(null);
-  useFadingScrollbar(scrollbarElement.current);
+  const {setScrollbarElement, scrollbarElement} = useFadingScrollbar();
 
   const calculateBorders = throttle((element: HTMLElement) => {
     window.requestAnimationFrame(() => {
@@ -79,15 +78,15 @@ const ListWrapper: React.FC<LeftListWrapperProps> = ({
   }, 100);
 
   useEffect(() => {
-    if (!scrollbarElement.current) {
+    if (!scrollbarElement) {
       return undefined;
     }
     const onScroll = (event: Event) => calculateBorders(event.target as HTMLElement);
-    calculateBorders(scrollbarElement.current);
-    scrollbarElement.current.addEventListener('scroll', onScroll);
+    calculateBorders(scrollbarElement);
+    scrollbarElement.addEventListener('scroll', onScroll);
 
-    return () => scrollbarElement.current?.removeEventListener('scroll', onScroll);
-  }, [scrollbarElement.current]);
+    return () => scrollbarElement?.removeEventListener('scroll', onScroll);
+  }, [scrollbarElement]);
 
   return (
     <div id={id} className={`left-list-${id} ${id}`} css={style}>
@@ -112,7 +111,7 @@ const ListWrapper: React.FC<LeftListWrapperProps> = ({
         )}
       </section>
       {before ?? null}
-      <section css={scrollStyle} ref={scrollbarElement}>
+      <section css={scrollStyle} ref={(e: HTMLDivElement) => setScrollbarElement(e)}>
         {children}
       </section>
       {footer ?? null}

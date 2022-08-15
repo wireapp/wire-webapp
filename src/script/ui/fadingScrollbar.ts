@@ -17,12 +17,13 @@
  *
  */
 
-import {useLayoutEffect} from 'react';
+import {useLayoutEffect, useState} from 'react';
 import {debounce} from 'underscore';
 
-export const useFadingScrollbar = (element?: HTMLElement | null): void => {
+export const useFadingScrollbar = () => {
+  const [scrollbarElement, setScrollbarElement] = useState<HTMLDivElement | null>(null);
   useLayoutEffect(() => {
-    if (!element) {
+    if (!scrollbarElement) {
       return undefined;
     }
     const animationSpeed = 0.05;
@@ -36,7 +37,7 @@ export const useFadingScrollbar = (element?: HTMLElement | null): void => {
       return [+r, +g, +b, +a];
     }
 
-    const initialColor = parseColor(window.getComputedStyle(element).getPropertyValue('--scrollbar-color'));
+    const initialColor = parseColor(window.getComputedStyle(scrollbarElement).getPropertyValue('--scrollbar-color'));
     const currentColor = initialColor.slice();
     let state = 'idle';
     let animating = false;
@@ -74,7 +75,7 @@ export const useFadingScrollbar = (element?: HTMLElement | null): void => {
         return setAnimationState('idle');
       }
       currentColor[3] += delta;
-      element.style.setProperty('--scrollbar-color', `rgba(${currentColor})`);
+      scrollbarElement.style.setProperty('--scrollbar-color', `rgba(${currentColor})`);
     };
     const fadeIn = () => setAnimationState('fadein');
     const fadeOut = () => setAnimationState('fadeout');
@@ -91,9 +92,13 @@ export const useFadingScrollbar = (element?: HTMLElement | null): void => {
       scroll: fadeInIdle,
     };
 
-    Object.entries(events).forEach(([eventName, handler]) => element.addEventListener(eventName, handler));
+    Object.entries(events).forEach(([eventName, handler]) => scrollbarElement.addEventListener(eventName, handler));
 
     return () =>
-      Object.entries(events).forEach(([eventName, handler]) => element.removeEventListener(eventName, handler));
-  }, [element]);
+      Object.entries(events).forEach(([eventName, handler]) =>
+        scrollbarElement.removeEventListener(eventName, handler),
+      );
+  }, [scrollbarElement]);
+
+  return {scrollbarElement, setScrollbarElement};
 };

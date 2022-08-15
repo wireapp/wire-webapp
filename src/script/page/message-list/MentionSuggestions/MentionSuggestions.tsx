@@ -17,7 +17,7 @@
  *
  */
 
-import React, {useEffect, useMemo, useRef, useState} from 'react';
+import React, {useEffect, useMemo, useState} from 'react';
 
 import {registerReactComponent} from 'Util/ComponentUtil';
 import {KEY} from 'Util/KeyboardUtil';
@@ -28,34 +28,34 @@ import MentionSuggestionsItem from './MentionSuggestionsItem';
 import {User} from '../../../entity/User';
 
 type MentionSuggestionListProps = {
-  onSelectionValidated: (data: User, element: HTMLInputElement | null) => void;
+  onSelectionValidated: (data: User) => void;
   suggestions: User[];
-  targetInputSelector: string;
+  targetInput?: HTMLTextAreaElement | null;
 };
 const MentionSuggestionList: React.FunctionComponent<MentionSuggestionListProps> = ({
   suggestions,
   onSelectionValidated,
-  targetInputSelector,
+  targetInput,
 }) => {
-  const selectedItemElement = useRef<HTMLDivElement>(null);
-  const scrollbarElement = useRef<HTMLDivElement>(null);
-  useFadingScrollbar(scrollbarElement.current);
+  const [selectedItemElement, setSelectedItemElement] = useState<HTMLDivElement | null>(null);
   const [selectedSuggestionIndex, setSelectedSuggestionIndex] = useState(0);
-
-  useEffect(
-    () => selectedItemElement.current?.scrollIntoView({behavior: 'auto', block: 'nearest'}),
-    [selectedItemElement.current, suggestions.length],
-  );
-
-  const targetInput = useMemo(
-    () => document.querySelector<HTMLInputElement>(targetInputSelector),
-    [targetInputSelector],
-  );
+  const {setScrollbarElement} = useFadingScrollbar();
 
   const isVisible = suggestions.length > 0;
-  const bottom = useMemo(
-    () => (isVisible && targetInput ? window.innerHeight - targetInput.getBoundingClientRect().top + 24 : 0),
-    [isVisible, targetInput],
+
+  const bottom = useMemo(() => {
+    const boundingClientRect = targetInput?.getBoundingClientRect?.();
+
+    if (!isVisible || !boundingClientRect) {
+      return 0;
+    }
+
+    return window.innerHeight - boundingClientRect.top + 24;
+  }, [isVisible, targetInput]);
+
+  useEffect(
+    () => selectedItemElement?.scrollIntoView({behavior: 'auto', block: 'nearest'}),
+    [selectedItemElement, suggestions.length],
   );
 
   useEffect(() => {
@@ -69,13 +69,15 @@ const MentionSuggestionList: React.FunctionComponent<MentionSuggestionListProps>
         event.preventDefault();
         event.stopPropagation();
       };
+
       const validateSelection = () => {
-        if (!event.shiftKey && targetInput) {
-          onSelectionValidated(suggestions[selectedSuggestionIndex], targetInput);
+        if (!event.shiftKey) {
+          onSelectionValidated(suggestions[selectedSuggestionIndex]);
           event.preventDefault();
           event.stopPropagation();
         }
       };
+
       const actions = {
         [KEY.ARROW_UP]: () => moveSelection(1),
         [KEY.ARROW_DOWN]: () => moveSelection(-1),
@@ -89,7 +91,9 @@ const MentionSuggestionList: React.FunctionComponent<MentionSuggestionListProps>
     if (isVisible && targetInput) {
       targetInput.addEventListener('keydown', onInput);
     }
+
     updateSelectedIndex();
+
     return () => {
       if (targetInput) {
         targetInput.removeEventListener('keydown', onInput);
@@ -102,7 +106,7 @@ const MentionSuggestionList: React.FunctionComponent<MentionSuggestionListProps>
       className="conversation-input-bar-mention-suggestion"
       style={{bottom, overflowY: 'auto'}}
       data-uie-name="list-mention-suggestions"
-      ref={scrollbarElement}
+      ref={setScrollbarElement}
     >
       <div className="mention-suggestion-list">
         {suggestions
@@ -111,12 +115,9 @@ const MentionSuggestionList: React.FunctionComponent<MentionSuggestionListProps>
               key={suggestion.id}
               suggestion={suggestion}
               isSelected={index === selectedSuggestionIndex}
-              onSuggestionClick={() => {
-                targetInput?.focus();
-                onSelectionValidated(suggestion, targetInput);
-              }}
+              onSuggestionClick={() => onSelectionValidated(suggestion)}
               onMouseEnter={() => setSelectedSuggestionIndex(index)}
-              ref={index === selectedSuggestionIndex ? selectedItemElement : undefined}
+              ref={index === selectedSuggestionIndex ? setSelectedItemElement : undefined}
             />
           ))
           .reverse()}

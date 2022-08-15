@@ -144,6 +144,12 @@
   &__info-text {
     .subline;
 
+    &:focus-visible {
+      .focus-outline;
+      .focus-offset;
+      .focus-border-radius;
+    }
+
     color: var(--gray-90);
 
     body.theme-dark & {
@@ -397,6 +403,12 @@
     &__title {
       .heading-h3;
 
+      &:focus-visible {
+        .focus-outline;
+        .focus-offset;
+        .focus-border-radius;
+      }
+
       &:first-child {
         flex-grow: 1;
         margin-left: @content-title-bar-height;
@@ -478,4 +490,10 @@ button.panel__action-item {
   100% {
     opacity: 1;
   }
+}
+
+.notification-section {
+  padding: 0 1rem;
+  border: none;
+  margin-top: 1.5rem;
 }

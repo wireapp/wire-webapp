@@ -17,7 +17,7 @@
  *
  */
 
-import React, {useState, useCallback, useRef} from 'react';
+import React, {useState, useCallback} from 'react';
 import {container} from 'tsyringe';
 import {CALL_TYPE, CONV_TYPE, REASON as CALL_REASON, STATE as CALL_STATE} from '@wireapp/avs';
 import cx from 'classnames';
@@ -76,8 +76,7 @@ const ConversationListCallingCell: React.FC<CallingCellProps> = ({
   teamState = container.resolve(TeamState),
   callState = container.resolve(CallState),
 }) => {
-  const scrollbarElement = useRef<HTMLDivElement>(null);
-  useFadingScrollbar(scrollbarElement.current);
+  const {setScrollbarElement} = useFadingScrollbar();
 
   const {reason, state, isCbrEnabled, startedAt, participants, maximizedParticipant, muteState} =
     useKoSubscribableChildren(call, [
@@ -217,7 +216,7 @@ const ConversationListCallingCell: React.FC<CallingCellProps> = ({
           {muteState === MuteState.REMOTE_MUTED && (
             <div className="conversation-list-calling-cell__info-bar">{t('muteStateRemoteMute')}</div>
           )}
-          <div className="conversation-list-calling-cell conversation-list-cell">
+          <div className="conversation-list-calling-cell">
             <div
               className="conversation-list-cell conversation-list-cell-button"
               onClick={createNavigate(conversationUrl)}
@@ -447,7 +446,7 @@ const ConversationListCallingCell: React.FC<CallingCellProps> = ({
                   'call-ui__participant-list__wrapper--active': showParticipants,
                 })}
               >
-                <div ref={scrollbarElement} className="call-ui__participant-list__container">
+                <div ref={setScrollbarElement} className="call-ui__participant-list__container">
                   <ul className="call-ui__participant-list" data-uie-name="list-call-ui-participants">
                     {participants
                       .slice()
