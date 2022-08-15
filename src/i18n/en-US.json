@@ -298,6 +298,8 @@
   "conversationDetailsActionCreateGroup": "Create group",
   "conversationDetailsActionDelete": "Delete group",
   "conversationDetailsActionDevices": "Devices",
+  "accessibility.conversationDetailsActionDevicesLabel": "Show Devices",
+  "accessibility.conversationDetailsActionGroupAdminLabel": "Set group admin",
   "conversationDetailsActionGuestOptions": "Guests",
   "conversationDetailsActionLeave": "Leave group",
   "conversationDetailsActionNotifications": "Notifications",

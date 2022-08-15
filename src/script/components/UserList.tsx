@@ -200,6 +200,7 @@ const UserList: React.FC<UserListProps> = ({
                     selfInTeam={selfInTeam}
                     isSelfVerified={isSelfVerified}
                     onClick={onClickOrKeyPressed}
+                    onKeyDown={onUserKeyPressed}
                   />
                 </li>
               ))}

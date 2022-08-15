@@ -451,6 +451,9 @@ exports[`stricter compilation`] = {
       [46, 51, 5, "Property \'label\' does not exist on type \'never\'.", "173467459"],
       [47, 59, 5, "Property \'label\' does not exist on type \'never\'.", "173467459"]
     ],
+    "src/script/auth/util/test/TestUtil.tsx:1653578349": [
+      [39, 86, 7, "Property \'DEFAULT\' does not exist on type \'typeof THEME_ID\'.", "2783041582"]
+    ],
     "src/script/auth/util/urlUtil.ts:2936167840": [
       [61, 2, 17, "Type \'Window | null\' is not assignable to type \'Window\'.\\n  Type \'null\' is not assignable to type \'Window\'.", "211185092"]
     ],
@@ -883,7 +886,7 @@ exports[`stricter compilation`] = {
       [128, 42, 8, "Argument of type \'string | undefined\' is not assignable to parameter of type \'string\'.\\n  Type \'undefined\' is not assignable to type \'string\'.", "4039656867"],
       [144, 9, 13, "Type \'{ clickToShowSelfFingerprint: () => void; clientRepository: ClientRepository; cryptographyRepository: CryptographyRepository; logger: Logger; messageRepository: MessageRepository; noPadding: boolean; selectedClient: ClientEntity | undefined; user: User; }\' is not assignable to type \'DeviceDetailsProps\'.\\n  Types of property \'selectedClient\' are incompatible.\\n    Type \'ClientEntity | undefined\' is not assignable to type \'ClientEntity\'.\\n      Type \'undefined\' is not assignable to type \'ClientEntity\'.", "538994175"]
     ],
-    "src/script/components/UserList.tsx:2117159562": [
+    "src/script/components/UserList.tsx:1768505054": [
       [97, 28, 12, "Argument of type \'Conversation | undefined\' is not assignable to parameter of type \'Partial<Record<\\"roles\\", Subscribable<any>>>\'.\\n  Type \'undefined\' is not assignable to type \'Partial<Record<\\"roles\\", Subscribable<any>>>\'.", "1670678216"]
     ],
     "src/script/components/UserSearchableList.tsx:1290904950": [
@@ -2046,7 +2049,8 @@ exports[`stricter compilation`] = {
       [34, 63, 38, "Argument of type \'Element | null\' is not assignable to parameter of type \'Element\'.\\n  Type \'null\' is not assignable to type \'Element\'.", "495210063"]
     ],
     "src/script/page/MainContent/MainContent.tsx:2029280374": [
-      [68, 28, 12, "Type \'Conversation | null\' is not assignable to type \'Conversation\'.\\n  Type \'null\' is not assignable to type \'Conversation\'.", "1670678216"]
+      [68, 28, 12, "Type \'Conversation | null\' is not assignable to type \'Conversation\'.\\n  Type \'null\' is not assignable to type \'Conversation\'.", "1670678216"],
+      [153, 35, 7, "Property \'DEFAULT\' does not exist on type \'typeof THEME_ID\'.", "2783041582"]
     ],
     "src/script/page/MainContent/panels/Collection/Collection.test.tsx:1028939995": [
       [122, 12, 5, "Type \'HTMLInputElement | null\' is not assignable to type \'HTMLInputElement\'.\\n  Type \'null\' is not assignable to type \'HTMLInputElement\'.", "178805363"]
