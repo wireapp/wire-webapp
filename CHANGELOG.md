@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [29.2.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/compare/@wireapp/core@29.1.7...@wireapp/core@29.2.0) (2022-08-16)
+
+
+### Features
+
+* Upgrade @otak/core-crypto from 0.3.0-beta-2 to 0.3.0 ([#4360](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/issues/4360)) ([87035a2](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/commit/87035a28856a28f32484791e193f8018ef69fd24))
+
+
+
+
+
 ## [29.1.7](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/compare/@wireapp/core@29.1.6...@wireapp/core@29.1.7) (2022-08-11)
 
 **Note:** Version bump only for package @wireapp/core
