@@ -1147,8 +1147,12 @@ export class ConversationService {
     if (memberAddedMessages?.welcome) {
       await this.apiClient.api.conversation.postMlsWelcomeMessage(Uint8Array.from(memberAddedMessages.welcome));
     }
-    if (memberAddedMessages?.message) {
-      return this.apiClient.api.conversation.postMlsMessage(Uint8Array.from(memberAddedMessages.message));
+    if (memberAddedMessages?.commit) {
+      const messageResponse = await this.apiClient.api.conversation.postMlsMessage(
+        Uint8Array.from(memberAddedMessages.commit),
+      );
+      await coreCryptoClient.commitAccepted(groupIdDecodedFromBase64);
+      return messageResponse;
     }
     return null;
   }

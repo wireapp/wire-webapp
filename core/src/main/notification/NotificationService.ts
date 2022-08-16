@@ -241,13 +241,11 @@ export class NotificationService extends EventEmitter {
     dryRun: boolean = false,
   ): Promise<HandledEventPayload> {
     const coreCryptoClient = this.coreCryptoClientProvider();
-
+    if (!coreCryptoClient) {
+      throw new Error('Unable to access core crypto client');
+    }
     switch (event.type) {
       case Events.CONVERSATION_EVENT.MLS_WELCOME_MESSAGE:
-        if (!coreCryptoClient) {
-          // TODO throw proper error
-          throw new Error('TODO');
-        }
         const data = Decoder.fromBase64(event.data).asBytes;
         // We extract the groupId from the welcome message and let coreCrypto store this group
         const newGroupId = await coreCryptoClient.processWelcomeMessage(data);
@@ -259,21 +257,20 @@ export class NotificationService extends EventEmitter {
         };
 
       case Events.CONVERSATION_EVENT.MLS_MESSAGE_ADD:
-        if (!coreCryptoClient) {
-          // TODO throw proper error
-          throw new Error('TODO');
-        }
         const encryptedData = Decoder.fromBase64(event.data).asBytes;
 
         const groupId = await this.getUint8ArrayFromConversationGroupId(
           event.qualified_conversation || {id: event.conversation, domain: ''},
         );
         const rawData = await coreCryptoClient.decryptMessage(groupId, encryptedData);
-        if (!rawData) {
-          // TODO
-          throw new Error('empty message');
+        if (!rawData.message) {
+          throw new Error(`MLS message received from ${source} was empty`);
         }
-        const decryptedData = GenericMessage.decode(rawData);
+        const decryptedData = GenericMessage.decode(rawData.message);
+        /**
+         * @todo Find a proper solution to add mappedEvent to this return
+         * otherwise event.data will be base64 raw data of the received event
+         */
         return {event, decryptedData};
 
       // Encrypted Proteus events
