@@ -4,7 +4,7 @@
   },
   "dependencies": {
     "@open-wc/webpack-import-meta-loader": "0.4.7",
-    "@otak/core-crypto": "0.3.0-beta-2",
+    "@otak/core-crypto": "0.3.0-es2017",
     "@types/long": "4.0.1",
     "@types/node": "~14",
     "@wireapp/api-client": "19.21.2",
