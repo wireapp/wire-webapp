@@ -2098,10 +2098,10 @@ exports[`stricter compilation`] = {
       [34, 41, 22, "Cannot invoke an object which is possibly \'undefined\'.", "1980738780"],
       [41, 21, 12, "Argument of type \'string | undefined\' is not assignable to parameter of type \'Matcher\'.\\n  Type \'undefined\' is not assignable to type \'Matcher\'.", "2075561852"]
     ],
-    "src/script/page/MainContent/panels/preferences/devices/DevicesPreferences.tsx:3136549338": [
-      [67, 90, 10, "Type \'undefined\' is not assignable to type \'boolean\'.", "3231345145"],
-      [124, 8, 14, "Type \'(device: ClientEntity) => Promise<string | undefined>\' is not assignable to type \'(device: ClientEntity) => Promise<string>\'.\\n  Type \'Promise<string | undefined>\' is not assignable to type \'Promise<string>\'.\\n    Type \'string | undefined\' is not assignable to type \'string\'.\\n      Type \'undefined\' is not assignable to type \'string\'.", "223037395"],
-      [131, 73, 37, "Argument of type \'Conversation | undefined\' is not assignable to parameter of type \'Conversation\'.\\n  Type \'undefined\' is not assignable to type \'Conversation\'.", "3769528030"]
+    "src/script/page/MainContent/panels/preferences/devices/DevicesPreferences.tsx:1032054856": [
+      [77, 90, 10, "Type \'undefined\' is not assignable to type \'boolean\'.", "3231345145"],
+      [141, 8, 14, "Type \'(device: ClientEntity) => Promise<string | undefined>\' is not assignable to type \'(device: ClientEntity) => Promise<string>\'.\\n  Type \'Promise<string | undefined>\' is not assignable to type \'Promise<string>\'.\\n    Type \'string | undefined\' is not assignable to type \'string\'.\\n      Type \'undefined\' is not assignable to type \'string\'.", "223037395"],
+      [148, 73, 37, "Argument of type \'Conversation | undefined\' is not assignable to parameter of type \'Conversation\'.\\n  Type \'undefined\' is not assignable to type \'Conversation\'.", "3769528030"]
     ],
     "src/script/page/message-list/InputBarControls/InputBarControls.test.tsx:2517377529": [
       [33, 2, 12, "Type \'undefined\' is not assignable to type \'Conversation\'.", "1670678216"]
