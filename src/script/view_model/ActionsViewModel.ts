@@ -210,6 +210,7 @@ export class ActionsViewModel {
             text: t('modalConversationDeleteMessageAction'),
           },
           text: {
+            closeBtnLabel: t('modalConversationDeleteMessageCloseBtn'),
             message: t('modalConversationDeleteMessageMessage'),
             title: t('modalConversationDeleteMessageHeadline'),
           },
@@ -232,6 +233,7 @@ export class ActionsViewModel {
             text: t('modalConversationDeleteMessageEveryoneAction'),
           },
           text: {
+            closeBtnLabel: t('modalConversationDeleteMessageAllCloseBtn'),
             message: t('modalConversationDeleteMessageEveryoneMessage'),
             title: t('modalConversationDeleteMessageEveryoneHeadline'),
           },

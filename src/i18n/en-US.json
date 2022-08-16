@@ -771,6 +771,8 @@
   "modalConversationDeleteMessageEveryoneHeadline": "Delete for everyone?",
   "modalConversationDeleteMessageEveryoneMessage": "This cannot be undone.",
   "modalConversationDeleteMessageHeadline": "Delete only for me?",
+  "modalConversationDeleteMessageCloseBtn": "Close window delete only for me",
+  "modalConversationDeleteMessageAllCloseBtn": "Close window delete for everyone",
   "modalConversationDeleteMessageMessage": "This cannot be undone.",
   "modalConversationGuestOptionsGetCodeMessage": "Could not get access link.",
   "modalConversationGuestOptionsRequestCodeMessage": "Could not request access link. Please try again.",
