@@ -25,7 +25,7 @@ import {container} from 'tsyringe';
 import {registerReactComponent, useKoSubscribableChildren} from 'Util/ComponentUtil';
 
 import {Call} from '../../calling/Call';
-import {CallingRepository} from '../../calling/CallingRepository';
+import {CallingRepository, LEAVE_CALL_REASON} from '../../calling/CallingRepository';
 import {MediaRepository} from '../../media/MediaRepository';
 import {CallState, MuteState} from '../../calling/CallState';
 import {Participant} from '../../calling/Participant';
@@ -97,7 +97,7 @@ const CallingContainer: React.FC<CallingContainerProps> = ({
   };
 
   const leave = (call: Call) => {
-    callingRepository.leaveCall(call.conversationId);
+    callingRepository.leaveCall(call.conversationId, LEAVE_CALL_REASON.MANUAL_LEAVE_BY_UI_CLICK);
     callState.activeCallViewTab(CallViewTab.ALL);
     call.maximizedParticipant(null);
   };

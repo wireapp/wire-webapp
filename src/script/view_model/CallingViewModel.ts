@@ -29,7 +29,7 @@ import {replaceLink, t} from 'Util/LocalizerUtil';
 
 import {AudioType} from '../audio/AudioType';
 import type {Call} from '../calling/Call';
-import type {CallingRepository} from '../calling/CallingRepository';
+import {CallingRepository, LEAVE_CALL_REASON} from '../calling/CallingRepository';
 import type {User} from '../entity/User';
 import type {ElectronDesktopCapturerSource, MediaDevicesHandler} from '../media/MediaDevicesHandler';
 import type {MediaStreamHandler} from '../media/MediaStreamHandler';
@@ -185,7 +185,7 @@ export class CallingViewModel {
         this.callingRepository.changeCallPage(newPage, call);
       },
       leave: (call: Call) => {
-        this.callingRepository.leaveCall(call.conversationId);
+        this.callingRepository.leaveCall(call.conversationId, LEAVE_CALL_REASON.MANUAL_LEAVE_BY_UI_CLICK);
         callState.activeCallViewTab(CallViewTab.ALL);
       },
       reject: (call: Call) => {

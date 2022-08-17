@@ -23,7 +23,7 @@ import ko, {Subscription} from 'knockout';
 import {amplify} from 'amplify';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import {CONV_TYPE, CALL_TYPE, STATE as CALL_STATE, REASON, Wcall} from '@wireapp/avs';
-import {CallingRepository} from 'src/script/calling/CallingRepository';
+import {CallingRepository, LEAVE_CALL_REASON} from 'src/script/calling/CallingRepository';
 import {EventRepository} from 'src/script/event/EventRepository';
 import {Participant} from 'src/script/calling/Participant';
 import {Call} from 'src/script/calling/Call';
@@ -467,7 +467,7 @@ describe.skip('E2E audio call', () => {
           });
 
           expect(client['callState'].joinedCall()).toBeDefined();
-          client.leaveCall(conversationId);
+          client.leaveCall(conversationId, LEAVE_CALL_REASON.MANUAL_LEAVE_BY_UI_CLICK);
         })
         .catch(done.fail);
     };
@@ -488,7 +488,7 @@ describe.skip('E2E audio call', () => {
           audioStats.forEach(stats => {
             expect(stats.bytesFlowing).toBeGreaterThan(0);
           });
-          client.leaveCall(conversationId);
+          client.leaveCall(conversationId, LEAVE_CALL_REASON.MANUAL_LEAVE_BY_UI_CLICK);
         })
         .catch(done.fail);
     };
