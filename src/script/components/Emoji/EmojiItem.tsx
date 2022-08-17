@@ -20,8 +20,10 @@
 import cx from 'classnames';
 import {FC} from 'react';
 
+import {EmojiListItem} from './useEmoji';
+
 interface EmojiItemProps {
-  emoji: any;
+  emoji: EmojiListItem;
   onClick: () => void;
   onMouseEnter: () => void;
   selectedEmoji?: boolean;

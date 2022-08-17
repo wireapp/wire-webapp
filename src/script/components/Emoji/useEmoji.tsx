@@ -74,7 +74,7 @@ export interface EmojiData {
 
 type EmojiBinding = Record<string, EmojiData>;
 
-type EmojiListItem = {
+export type EmojiListItem = {
   icon: string;
   name: string;
 };
