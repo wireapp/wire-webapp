@@ -1,5 +1,8 @@
 FROM node:12-alpine
 
+# Get security updates
+RUN apk update && apk upgrade
+
 # For some extra dependencies...
 RUN apk add --no-cache dumb-init git bash
 
