@@ -20,7 +20,7 @@
 export const BASE_LIGHT_COLOR: Record<string, string> = {
   BLUE: '#0667c8',
   GREEN: '#1d7833',
-  PETROL: '#01718e',
+  TURQUOISE: '#01718e',
   PURPLE: '#8944ab',
   RED: '#c20013',
   AMBER: '#a25915',
@@ -29,7 +29,7 @@ export const BASE_LIGHT_COLOR: Record<string, string> = {
 export const BASE_DARK_COLOR: Record<string, string> = {
   BLUE: '#54a6ff',
   GREEN: '#30db5b',
-  PETROL: '#5de6ff',
+  TURQUOISE: '#5de6ff',
   PURPLE: '#da8fff',
   RED: '#ff7770',
   AMBER: '#ffd426',
@@ -87,30 +87,30 @@ const DARK_GREEN: Record<string, string> = {
   GREEN_DARK_900: '#0e421b',
 };
 
-const LIGHT_PETROL: Record<string, string> = {
-  PETROL_LIGHT_50: '#e5f1f3',
-  PETROL_LIGHT_100: '#cce2e7',
-  PETROL_LIGHT_200: '#99c6d0',
-  PETROL_LIGHT_300: '#67a9b8',
-  PETROL_LIGHT_400: '#348da1',
-  PETROL_LIGHT_500: BASE_LIGHT_COLOR.PETROL,
-  PETROL_LIGHT_600: '#015a6e',
-  PETROL_LIGHT_700: '#014352',
-  PETROL_LIGHT_800: '#002d37',
-  PETROL_LIGHT_900: '#1c454d',
+const LIGHT_TURQUOISE: Record<string, string> = {
+  TURQUOISE_LIGHT_50: '#e5f1f3',
+  TURQUOISE_LIGHT_100: '#cce2e7',
+  TURQUOISE_LIGHT_200: '#99c6d0',
+  TURQUOISE_LIGHT_300: '#67a9b8',
+  TURQUOISE_LIGHT_400: '#348da1',
+  TURQUOISE_LIGHT_500: BASE_LIGHT_COLOR.TURQUOISE,
+  TURQUOISE_LIGHT_600: '#015a6e',
+  TURQUOISE_LIGHT_700: '#014352',
+  TURQUOISE_LIGHT_800: '#002d37',
+  TURQUOISE_LIGHT_900: '#1c454d',
 };
 
-const DARK_PETROL: Record<string, string> = {
-  PETROL_DARK_50: '#effdff',
-  PETROL_DARK_100: '#dffaff',
-  PETROL_DARK_200: '#bef5ff',
-  PETROL_DARK_300: '#9ef0ff',
-  PETROL_DARK_400: '#7debff',
-  PETROL_DARK_500: BASE_DARK_COLOR.PETROL,
-  PETROL_DARK_600: '#4Ab8cc',
-  PETROL_DARK_700: '#388a99',
-  PETROL_DARK_800: '#255c66',
-  PETROL_DARK_900: '#1c454d',
+const DARK_TURQUOISE: Record<string, string> = {
+  TURQUOISE_DARK_50: '#effdff',
+  TURQUOISE_DARK_100: '#dffaff',
+  TURQUOISE_DARK_200: '#bef5ff',
+  TURQUOISE_DARK_300: '#9ef0ff',
+  TURQUOISE_DARK_400: '#7debff',
+  TURQUOISE_DARK_500: BASE_DARK_COLOR.TURQUOISE,
+  TURQUOISE_DARK_600: '#4Ab8cc',
+  TURQUOISE_DARK_700: '#388a99',
+  TURQUOISE_DARK_800: '#255c66',
+  TURQUOISE_DARK_900: '#1c454d',
 };
 
 const LIGHT_PURPLE: Record<string, string> = {
@@ -194,7 +194,7 @@ const DARK_AMBER: Record<string, string> = {
 const DARK: Record<string, string> = {
   ...DARK_BLUE,
   ...DARK_GREEN,
-  ...DARK_PETROL,
+  ...DARK_TURQUOISE,
   ...DARK_PURPLE,
   ...DARK_RED,
   ...DARK_AMBER,
@@ -203,7 +203,7 @@ const DARK: Record<string, string> = {
 const LIGHT: Record<string, string> = {
   ...LIGHT_BLUE,
   ...LIGHT_GREEN,
-  ...LIGHT_PETROL,
+  ...LIGHT_TURQUOISE,
   ...LIGHT_PURPLE,
   ...LIGHT_RED,
   ...LIGHT_AMBER,

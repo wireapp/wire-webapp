@@ -19,9 +19,7 @@
 
 /** @jsx jsx */
 import {CSSObject, jsx} from '@emotion/react';
-import Color from 'color';
 
-import {COLOR} from '../../Identity';
 import {defaultTransition} from '../../Identity/motions';
 import {QueryKeys, media} from '../../mediaQueries';
 import {TextProps, textStyle} from '../../Text';
@@ -32,7 +30,7 @@ type MenuSubLinkProps<T = HTMLDivElement> = TextProps<T>;
 export const menuSubLinkStyle: <T>(theme: Theme, props: MenuSubLinkProps<T>) => CSSObject = (theme, props) => ({
   ...textStyle(theme, props),
   '&:hover': {
-    color: Color(theme.general.color).mix(Color(COLOR.BLACK), 0.16).toString(),
+    filter: 'brightness(70%)',
   },
   color: theme.general.color,
   cursor: 'pointer',
