@@ -127,6 +127,7 @@ import {extractClientDiff} from './ClientMismatchUtil';
 import {Core} from '../service/CoreSingleton';
 import {ClientState} from '../client/ClientState';
 import {MLSReturnType} from '@wireapp/core/src/main/conversation';
+import {isMemberMessage} from '../guards/Message';
 
 type ConversationDBChange = {obj: EventRecord; oldObj: EventRecord};
 type FetchPromise = {rejectFn: (error: ConversationError) => void; resolveFn: (conversation: Conversation) => void};
@@ -620,8 +621,8 @@ export class ConversationRepository {
     const mappedMessageEntities = await this.addEventsToConversation(events, conversationEntity);
     conversationEntity.hasAdditionalMessages(hasAdditionalMessages);
     if (!hasAdditionalMessages) {
-      const firstMessage = conversationEntity.getFirstMessage() as MemberMessage;
-      const checkCreationMessage = firstMessage?.isMember() && firstMessage.isCreation();
+      const firstMessage = conversationEntity.getFirstMessage();
+      const checkCreationMessage = isMemberMessage(firstMessage) && firstMessage.isCreation();
       if (checkCreationMessage) {
         const groupCreationMessageIn1to1 = conversationEntity.is1to1() && firstMessage.isGroupCreation();
         const one2oneConnectionMessageInGroup = conversationEntity.isGroup() && firstMessage.isConnection();
@@ -2906,8 +2907,7 @@ export class ConversationRepository {
       id: messageEntity.from,
     });
     messageEntity.user(userEntity);
-    const isMemberMessage = messageEntity.isMember();
-    if (isMemberMessage || messageEntity.hasOwnProperty('userEntities')) {
+    if (isMemberMessage(messageEntity) || messageEntity.hasOwnProperty('userEntities')) {
       return this.userRepository.getUsersById((messageEntity as MemberMessage).userIds()).then(userEntities => {
         userEntities.sort(sortUsersByPriority);
         (messageEntity as MemberMessage).userEntities(userEntities);
