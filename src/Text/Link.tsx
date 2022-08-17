@@ -44,7 +44,6 @@ export const linkStyle: <T>(theme: Theme, props: LinkProps<T>) => CSSObject = (
     ...props
   },
 ) => {
-  const darker = 0.16;
   return {
     ...textStyle(theme, {bold, color, fontSize, textTransform, ...props}),
     color: color,
@@ -58,6 +57,7 @@ export const linkStyle: <T>(theme: Theme, props: LinkProps<T>) => CSSObject = (
         color: theme.general.primaryColor,
       },
       fontSize: '16px',
+      fontWeight: 400,
       textTransform: 'none',
       textDecoration: 'underline',
       textUnderlineOffset: '2px',

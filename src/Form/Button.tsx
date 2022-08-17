@@ -141,6 +141,9 @@ export const buttonStyle: <T>(theme: Theme, props: ButtonProps<T>) => CSSObject 
     fontWeight: 700,
     lineHeight: '24px',
     padding: '4px 8px',
+    '& > svg > path': {
+      fill: disabled ? theme.Input.placeholderColor : theme.general.color,
+    },
     ...(!disabled && {
       '&:hover, &:focus': {
         backgroundColor: theme.Button.tertiaryHoverBg,
@@ -152,6 +155,9 @@ export const buttonStyle: <T>(theme: Theme, props: ButtonProps<T>) => CSSObject 
       '&:active': {
         backgroundColor: theme.Button.tertiaryActiveBg,
         color: theme.IconButton.primaryActiveFillColor,
+        '& > svg > path': {
+          fill: theme.IconButton.primaryActiveFillColor,
+        },
       },
     }),
   }),

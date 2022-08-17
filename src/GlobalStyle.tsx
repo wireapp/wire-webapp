@@ -23,14 +23,10 @@ import emotionNormalize from 'emotion-normalize';
 import {GlobalCssVariables} from './GlobalCssVariables';
 
 import type {Theme} from './Layout';
-import {textLinkStyle} from './Text/TextLink';
 
 const globalStyles: (theme: Theme) => CSSObject = (theme: Theme) => ({
   '*': {
     boxSizing: 'border-box',
-  },
-  a: {
-    ...textLinkStyle(theme, {}),
   },
   'b, strong': {
     fontWeight: 600,
