@@ -863,8 +863,7 @@ export class CallingRepository {
   }
 
   readonly leaveCall = (conversationId: QualifiedId, reason: LEAVE_CALL_REASON): void => {
-    // eslint-disable-next-line no-console
-    this.logger.info(`Ending call with reason ${reason} \n Stack trace: `, console.trace());
+    this.logger.info(`Ending call with reason ${reason} \n Stack trace: `, new Error().stack);
     const conversationIdStr = this.serializeQualifiedId(conversationId);
     delete this.poorCallQualityUsers[conversationIdStr];
     this.wCall.end(this.wUser, conversationIdStr);
