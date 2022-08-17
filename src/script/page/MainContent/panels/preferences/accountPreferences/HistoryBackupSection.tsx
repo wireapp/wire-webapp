@@ -25,6 +25,7 @@ import {importHistoryFile} from 'Components/HistoryImport';
 
 import {t} from 'Util/LocalizerUtil';
 import {handleKeyDown} from 'Util/KeyboardUtil';
+import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
 
 import PreferencesSection from '../components/PreferencesSection';
 
@@ -51,8 +52,8 @@ const HistoryBackupSection: React.FC<HistoryBackupSectionProps> = ({backupReposi
       className="preferences-section-conversation-history"
       aria-label={t('preferencesOptionsBackupExportHeadline')}
     >
-      <button
-        className="button-text-primary"
+      <Button
+        variant={ButtonVariant.TERTIARY}
         onClick={() => {
           amplify.publish(WebAppEvents.CONTENT.SWITCH, ContentViewModel.STATE.HISTORY_EXPORT);
           amplify.publish(WebAppEvents.BACKUP.EXPORT.START);
@@ -62,14 +63,15 @@ const HistoryBackupSection: React.FC<HistoryBackupSectionProps> = ({backupReposi
         type="button"
       >
         {t('preferencesOptionsBackupExportHeadline')}
-      </button>
+      </Button>
 
       <p id="preferences-history-describe-1" className="preferences-detail">
         {t('preferencesOptionsBackupExportSecondary', brandName)}
       </p>
 
-      <div
-        className="button-text-primary preferences-history-restore-button"
+      <Button
+        variant={ButtonVariant.TERTIARY}
+        className="preferences-history-restore-button"
         role="button"
         tabIndex={0}
         onKeyDown={(event: React.KeyboardEvent<HTMLElement>) => handleKeyDown(event, fileInputClick)}
@@ -105,7 +107,7 @@ const HistoryBackupSection: React.FC<HistoryBackupSectionProps> = ({backupReposi
             aria-describedby="preferences-history-describe-2"
           />
         </label>
-      </div>
+      </Button>
       <p id="preferences-history-describe-2" className="preferences-detail">
         {t('preferencesOptionsBackupImportSecondary')}
       </p>

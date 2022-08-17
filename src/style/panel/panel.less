@@ -170,6 +170,12 @@
     }
   }
 
+  &__item-offset {
+    &:focus-visible {
+      outline-offset: -0.2rem;
+    }
+  }
+
   &__action-item {
     .button-reset-default();
     display: flex;
@@ -481,6 +487,12 @@
 button.panel__action-item {
   .button-states();
   .text-medium;
+}
+
+button.panel__action-item:focus-visible {
+  .focus-outline;
+  outline-offset: -0.2rem;
+  .focus-border-radius;
 }
 
 @keyframes headerfadein {
