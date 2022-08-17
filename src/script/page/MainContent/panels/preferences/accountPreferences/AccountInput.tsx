@@ -79,7 +79,7 @@ const AccountInput: React.FC<AccountInputProps> = ({
   ...rest
 }) => {
   const textInputRef = useRef<HTMLDivElement>(null);
-  const [input, setInput] = useState<string>();
+  const [input, setInput] = useState<string>('');
   const [isEditing, setIsEditing] = useState(false);
   useEffect(() => {
     setInput(value);
@@ -121,8 +121,7 @@ const AccountInput: React.FC<AccountInputProps> = ({
       css={{
         display: 'flex',
         flexDirection: 'column',
-        height: 56,
-        marginBottom: 40,
+        height: 100,
         padding: 8,
         width: 280,
       }}
@@ -134,6 +133,7 @@ const AccountInput: React.FC<AccountInputProps> = ({
             css={{
               alignItems: 'center',
               display: 'flex',
+              height: 32,
               lineHeight: '14px',
               position: 'relative',
             }}
@@ -146,7 +146,7 @@ const AccountInput: React.FC<AccountInputProps> = ({
               <IconButton
                 variant={IconButtonVariant.SECONDARY}
                 css={{
-                  margin: '0.5rem',
+                  margin: '0 0.5rem',
                 }}
                 data-uie-name={`go-edit-${fieldName}`}
                 onClick={() => {
@@ -180,7 +180,7 @@ const AccountInput: React.FC<AccountInputProps> = ({
           autoFocus
           uieName={`enter-${fieldName}-input`}
           label={label}
-          name={valueUie}
+          name={valueUie ? valueUie : fieldName}
           value={input}
           onChange={({target}) => updateInput(target.value)}
           onCancel={() => updateInput('')}
