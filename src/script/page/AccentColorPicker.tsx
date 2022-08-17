@@ -96,7 +96,7 @@ const AccentColorPicker: React.FunctionComponent<AccentColorPickerProps> = ({use
                       border: '1px solid currentColor',
                     },
                     '&:focus-visible + label': {
-                      outline: '1px solid Highlight',
+                      outline: '1px solid var(--accent-color-focus)',
                     },
                     '&:hover + label > span:first-child::after': {
                       ...CSS_SQUARE(11),
