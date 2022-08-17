@@ -10,10 +10,10 @@ exports[`"TextLink" renders (dark theme) 1`] = `
 .emotion-1 {
   color: #0667c8;
   display: inline;
-  font-size: 11px;
+  font-size: 16px;
   font-weight: 300;
   text-align: left;
-  text-transform: uppercase;
+  text-transform: none;
   cursor: pointer;
   -webkit-text-decoration: none;
   text-decoration: none;
@@ -28,7 +28,8 @@ exports[`"TextLink" renders (dark theme) 1`] = `
 }
 
 .emotion-1:hover {
-  color: #000;
+  -webkit-filter: brightness(70%);
+  filter: brightness(70%);
 }
 
 <div
@@ -53,10 +54,10 @@ exports[`"TextLink" renders 1`] = `
 .emotion-1 {
   color: #0667c8;
   display: inline;
-  font-size: 11px;
+  font-size: 16px;
   font-weight: 300;
   text-align: left;
-  text-transform: uppercase;
+  text-transform: none;
   cursor: pointer;
   -webkit-text-decoration: none;
   text-decoration: none;
@@ -71,7 +72,8 @@ exports[`"TextLink" renders 1`] = `
 }
 
 .emotion-1:hover {
-  color: #000;
+  -webkit-filter: brightness(70%);
+  filter: brightness(70%);
 }
 
 <div

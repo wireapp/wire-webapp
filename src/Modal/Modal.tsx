@@ -36,7 +36,7 @@ export interface ModalBodyProps<T = HTMLDivElement> extends React.HTMLProps<T> {
 
 const modalBodyStyle: <T>(theme: Theme, props: ModalBodyProps<T>) => CSSObject = (theme, {fullscreen = false}) => ({
   alignItems: 'center',
-  backgroundColor: COLOR.tint(theme.general.backgroundColor, 0.16),
+  backgroundColor: theme.general.backgroundColor,
   borderRadius: fullscreen ? 0 : '8px',
   bottom: fullscreen ? 0 : undefined,
   boxShadow: fullscreen ? 'none' : '0 16px 64px 0 rgba(0, 0, 0, 0.16)',

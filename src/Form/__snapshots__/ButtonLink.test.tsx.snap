@@ -8,7 +8,6 @@ exports[`"ButtonLink" renders (dark theme) 1`] = `
 }
 
 .emotion-1 {
-  color: #fff;
   display: -webkit-inline-box!important;
   display: -webkit-inline-flex!important;
   display: -ms-inline-flexbox!important;
@@ -44,20 +43,22 @@ exports[`"ButtonLink" renders (dark theme) 1`] = `
   line-height: 48px;
   max-width: 100%;
   min-width: 125px;
-  background-color: #0667c8;
+  background-color: var(--accent-color);
 }
 
 .emotion-1:hover,
 .emotion-1:focus {
-  background-color: #0552a0;
+  background-color: var(--button-primary-hover);
 }
 
 .emotion-1:focus {
-  border: 1px solid #043e78;
+  border: 1px solid var(--button-primary-focus-border);
 }
 
 .emotion-1:active {
-  background-color: #043e78;
+  background-color: var(--button-primary-active);
+  border: 1px solid var(--button-primary-active-border);
+  color: #fff;
 }
 
 <div
@@ -79,7 +80,6 @@ exports[`"ButtonLink" renders 1`] = `
 }
 
 .emotion-1 {
-  color: #fff;
   display: -webkit-inline-box!important;
   display: -webkit-inline-flex!important;
   display: -ms-inline-flexbox!important;
@@ -115,20 +115,22 @@ exports[`"ButtonLink" renders 1`] = `
   line-height: 48px;
   max-width: 100%;
   min-width: 125px;
-  background-color: #0667c8;
+  background-color: var(--accent-color);
 }
 
 .emotion-1:hover,
 .emotion-1:focus {
-  background-color: #0552a0;
+  background-color: var(--button-primary-hover);
 }
 
 .emotion-1:focus {
-  border: 1px solid #043e78;
+  border: 1px solid var(--button-primary-focus-border);
 }
 
 .emotion-1:active {
-  background-color: #043e78;
+  background-color: var(--button-primary-active);
+  border: 1px solid var(--button-primary-active-border);
+  color: #fff;
 }
 
 <div
@@ -176,7 +178,6 @@ exports[`"ButtonLink" renders in loading state 1`] = `
 }
 
 .emotion-1 {
-  color: #fff;
   display: -webkit-inline-box!important;
   display: -webkit-inline-flex!important;
   display: -ms-inline-flexbox!important;
@@ -212,20 +213,22 @@ exports[`"ButtonLink" renders in loading state 1`] = `
   line-height: 48px;
   max-width: 100%;
   min-width: 125px;
-  background-color: #0667c8;
+  background-color: var(--accent-color);
 }
 
 .emotion-1:hover,
 .emotion-1:focus {
-  background-color: #0552a0;
+  background-color: var(--button-primary-hover);
 }
 
 .emotion-1:focus {
-  border: 1px solid #043e78;
+  border: 1px solid var(--button-primary-focus-border);
 }
 
 .emotion-1:active {
-  background-color: #043e78;
+  background-color: var(--button-primary-active);
+  border: 1px solid var(--button-primary-active-border);
+  color: #fff;
 }
 
 .emotion-2 {

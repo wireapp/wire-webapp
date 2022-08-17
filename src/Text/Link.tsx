@@ -19,9 +19,6 @@
 
 /** @jsx jsx */
 import {CSSObject, jsx} from '@emotion/react';
-import Color from 'color';
-
-import {COLOR} from '../Identity/colors';
 import {defaultTransition} from '../Identity/motions';
 import {Theme} from '../Layout';
 import {filterProps} from '../util';
@@ -38,12 +35,18 @@ export interface LinkProps<T = HTMLAnchorElement> extends TextProps<T> {
 
 export const linkStyle: <T>(theme: Theme, props: LinkProps<T>) => CSSObject = (
   theme,
-  {variant = LinkVariant.SECONDARY, color = theme.general.color, ...props},
+  {
+    bold = true,
+    fontSize = '11px',
+    textTransform = 'uppercase',
+    variant = LinkVariant.SECONDARY,
+    color = theme.general.color,
+    ...props
+  },
 ) => {
   const darker = 0.16;
-  const hoverColor = color === COLOR.TEXT ? Color(color)?.mix(Color(COLOR.BLACK), darker).toString() : COLOR.BLACK;
   return {
-    ...textStyle(theme, {color, ...props}),
+    ...textStyle(theme, {bold, color, fontSize, textTransform, ...props}),
     color: color,
     cursor: 'pointer',
     textDecoration: 'none',
@@ -54,16 +57,15 @@ export const linkStyle: <T>(theme: Theme, props: LinkProps<T>) => CSSObject = (
       '&:hover, &:visited:hover': {
         color: theme.general.primaryColor,
       },
+      fontSize: '16px',
+      textTransform: 'none',
       textDecoration: 'underline',
       textUnderlineOffset: '2px',
     }),
     ...(variant === LinkVariant.SECONDARY && {
-      bold: true,
-      fontSize: '11px',
-      textTransform: 'uppercase',
       transition: defaultTransition,
       '&:hover': {
-        color: hoverColor,
+        filter: 'brightness(70%)',
       },
     }),
   };

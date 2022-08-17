@@ -8,7 +8,6 @@ exports[`"Button" renders (dark theme) 1`] = `
 }
 
 .emotion-1 {
-  color: #fff;
   display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
@@ -44,20 +43,22 @@ exports[`"Button" renders (dark theme) 1`] = `
   line-height: 48px;
   max-width: 100%;
   min-width: 125px;
-  background-color: #0667c8;
+  background-color: var(--accent-color);
 }
 
 .emotion-1:hover,
 .emotion-1:focus {
-  background-color: #0552a0;
+  background-color: var(--button-primary-hover);
 }
 
 .emotion-1:focus {
-  border: 1px solid #043e78;
+  border: 1px solid var(--button-primary-focus-border);
 }
 
 .emotion-1:active {
-  background-color: #043e78;
+  background-color: var(--button-primary-active);
+  border: 1px solid var(--button-primary-active-border);
+  color: #fff;
 }
 
 <div
@@ -79,7 +80,6 @@ exports[`"Button" renders 1`] = `
 }
 
 .emotion-1 {
-  color: #fff;
   display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
@@ -115,20 +115,22 @@ exports[`"Button" renders 1`] = `
   line-height: 48px;
   max-width: 100%;
   min-width: 125px;
-  background-color: #0667c8;
+  background-color: var(--accent-color);
 }
 
 .emotion-1:hover,
 .emotion-1:focus {
-  background-color: #0552a0;
+  background-color: var(--button-primary-hover);
 }
 
 .emotion-1:focus {
-  border: 1px solid #043e78;
+  border: 1px solid var(--button-primary-focus-border);
 }
 
 .emotion-1:active {
-  background-color: #043e78;
+  background-color: var(--button-primary-active);
+  border: 1px solid var(--button-primary-active-border);
+  color: #fff;
 }
 
 <div
@@ -150,7 +152,6 @@ exports[`"Button" renders as block 1`] = `
 }
 
 .emotion-1 {
-  color: #fff;
   display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
@@ -186,20 +187,22 @@ exports[`"Button" renders as block 1`] = `
   line-height: 48px;
   max-width: 100%;
   min-width: 125px;
-  background-color: #0667c8;
+  background-color: var(--accent-color);
 }
 
 .emotion-1:hover,
 .emotion-1:focus {
-  background-color: #0552a0;
+  background-color: var(--button-primary-hover);
 }
 
 .emotion-1:focus {
-  border: 1px solid #043e78;
+  border: 1px solid var(--button-primary-focus-border);
 }
 
 .emotion-1:active {
-  background-color: #043e78;
+  background-color: var(--button-primary-active);
+  border: 1px solid var(--button-primary-active-border);
+  color: #fff;
 }
 
 <div
@@ -247,7 +250,6 @@ exports[`"Button" renders in loading state 1`] = `
 }
 
 .emotion-1 {
-  color: #fff;
   display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
@@ -283,20 +285,22 @@ exports[`"Button" renders in loading state 1`] = `
   line-height: 48px;
   max-width: 100%;
   min-width: 125px;
-  background-color: #0667c8;
+  background-color: var(--accent-color);
 }
 
 .emotion-1:hover,
 .emotion-1:focus {
-  background-color: #0552a0;
+  background-color: var(--button-primary-hover);
 }
 
 .emotion-1:focus {
-  border: 1px solid #043e78;
+  border: 1px solid var(--button-primary-focus-border);
 }
 
 .emotion-1:active {
-  background-color: #043e78;
+  background-color: var(--button-primary-active);
+  border: 1px solid var(--button-primary-active-border);
+  color: #fff;
 }
 
 .emotion-2 {
@@ -353,7 +357,7 @@ exports[`"Button" renders when disabled 1`] = `
 }
 
 .emotion-1 {
-  color: #54585f;
+  color: var(--button-primary-disabled-text);
   display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
@@ -389,7 +393,7 @@ exports[`"Button" renders when disabled 1`] = `
   line-height: 48px;
   max-width: 100%;
   min-width: 125px;
-  background-color: #cbced1;
+  background-color: var(--button-primary-disabled-bg);
 }
 
 .emotion-1:hover,

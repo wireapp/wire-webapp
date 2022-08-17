@@ -74,8 +74,8 @@ exports[`"LabelLink" renders (dark theme) 1`] = `
 .emotion-1 {
   color: #fff;
   display: inline;
-  font-size: 11px;
-  font-weight: 300;
+  font-size: 12px;
+  font-weight: 600;
   text-align: left;
   text-transform: uppercase;
   cursor: pointer;
@@ -92,7 +92,8 @@ exports[`"LabelLink" renders (dark theme) 1`] = `
 }
 
 .emotion-1:hover {
-  color: #000;
+  -webkit-filter: brightness(70%);
+  filter: brightness(70%);
 }
 
 <div
@@ -116,8 +117,8 @@ exports[`"LabelLink" renders 1`] = `
 .emotion-1 {
   color: rgb(29, 30, 31);
   display: inline;
-  font-size: 11px;
-  font-weight: 300;
+  font-size: 12px;
+  font-weight: 600;
   text-align: left;
   text-transform: uppercase;
   cursor: pointer;
@@ -134,7 +135,8 @@ exports[`"LabelLink" renders 1`] = `
 }
 
 .emotion-1:hover {
-  color: rgb(24, 25, 26);
+  -webkit-filter: brightness(70%);
+  filter: brightness(70%);
 }
 
 <div

@@ -98,17 +98,19 @@ export const buttonStyle: <T>(theme: Theme, props: ButtonProps<T>) => CSSObject 
     }),
   }),
   ...(variant === ButtonVariant.PRIMARY && {
-    backgroundColor: backgroundColor || (disabled ? COLOR_V2.GRAY_50 : COLOR_V2.BLUE),
-    color: disabled ? COLOR_V2.GRAY_80 : COLOR_V2.WHITE,
+    backgroundColor: backgroundColor || (disabled ? theme.Button.primaryDisabledBg : theme.Button.primaryBg),
+    color: disabled ? theme.Button.primaryDisabledText : theme.general.contrastColor,
     ...(!disabled && {
       '&:hover, &:focus': {
-        backgroundColor: COLOR_V2.BLUE_LIGHT_600,
+        backgroundColor: theme.Button.primaryHoverBg,
       },
       '&:focus': {
-        border: `1px solid ${COLOR_V2.BLUE_LIGHT_700}`,
+        border: `1px solid ${theme.Button.primaryFocusBorder}`,
       },
       '&:active': {
-        backgroundColor: COLOR_V2.BLUE_LIGHT_700,
+        backgroundColor: theme.Button.primaryActiveBg,
+        border: `1px solid ${theme.Button.primaryActiveBorder}`,
+        color: COLOR.WHITE,
       },
     }),
   }),
@@ -131,14 +133,25 @@ export const buttonStyle: <T>(theme: Theme, props: ButtonProps<T>) => CSSObject 
     }),
   }),
   ...(variant === ButtonVariant.TERTIARY && {
-    color: disabled ? COLOR_V2.GRAY_60 : COLOR_V2.BLACK,
+    backgroundColor: backgroundColor || (disabled ? theme.Button.tertiarydisabledBg : theme.Button.tertiaryBg),
+    border: disabled ? `1px solid ${theme.Button.tertiaryDisabledBorder}` : `1px solid ${theme.Button.tertiaryBorder}`,
+    borderRadius: '12px',
+    color: disabled ? theme.Input.placeholderColor : theme.general.color,
+    fontSize: '14px',
+    fontWeight: 700,
     lineHeight: '24px',
+    padding: '4px 8px',
     ...(!disabled && {
       '&:hover, &:focus': {
-        color: COLOR_V2.BLUE,
+        backgroundColor: theme.Button.tertiaryHoverBg,
+        border: `1px solid ${theme.Button.tertiaryHoverBorder}`,
       },
       '&:focus': {
-        border: `1px solid ${COLOR_V2.BLUE_LIGHT_300}`,
+        border: `1px solid ${theme.general.focusColor}`,
+      },
+      '&:active': {
+        backgroundColor: theme.Button.tertiaryActiveBg,
+        color: theme.IconButton.primaryActiveFillColor,
       },
     }),
   }),

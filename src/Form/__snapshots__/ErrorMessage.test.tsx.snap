@@ -52,10 +52,10 @@ exports[`"ErrorMessage" renders 1`] = `
 .emotion-1 a {
   color: rgb(29, 30, 31);
   display: inline;
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 300;
   text-align: left;
-  text-transform: uppercase;
+  text-transform: none;
   cursor: pointer;
   -webkit-text-decoration: none;
   text-decoration: none;
@@ -70,7 +70,8 @@ exports[`"ErrorMessage" renders 1`] = `
 }
 
 .emotion-1 a:hover {
-  color: rgb(24, 25, 26);
+  -webkit-filter: brightness(70%);
+  filter: brightness(70%);
 }
 
 .emotion-2 {
