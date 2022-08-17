@@ -29,6 +29,7 @@ interface LogoutSectionProps {
 const LogoutSection: React.FC<LogoutSectionProps> = ({clientRepository}) => (
   <section className="preferences-section">
     <Link
+      tabIndex={0}
       variant={LinkVariant.PRIMARY}
       onClick={() => clientRepository.logoutClient()}
       data-uie-name="do-logout"
