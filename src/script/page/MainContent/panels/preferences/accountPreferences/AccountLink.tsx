@@ -46,6 +46,7 @@ const AccountLink: React.FC<AccountLinkProps> = ({label, value, ...rest}) => {
           className="label preferences-label"
           css={{
             alignItems: 'center',
+            color: 'inherit',
             display: 'flex',
             height: 32,
           }}
@@ -66,6 +67,7 @@ const AccountLink: React.FC<AccountLinkProps> = ({label, value, ...rest}) => {
         <Button
           variant={ButtonVariant.TERTIARY}
           type="button"
+          role="button"
           data-uie-name="do-copy-profile-link"
           onClick={() => copyText(value)}
           className="text-bold-small"
