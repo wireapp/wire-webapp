@@ -127,6 +127,7 @@ import {extractClientDiff} from './ClientMismatchUtil';
 import {Core} from '../service/CoreSingleton';
 import {ClientState} from '../client/ClientState';
 import {MLSReturnType} from '@wireapp/core/src/main/conversation';
+import {isMemberMessage} from '../guards/Message';
 
 type ConversationDBChange = {obj: EventRecord; oldObj: EventRecord};
 type FetchPromise = {rejectFn: (error: ConversationError) => void; resolveFn: (conversation: Conversation) => void};
@@ -146,6 +147,7 @@ export class ConversationRepository {
   private readonly logger: Logger;
   public readonly stateHandler: ConversationStateHandler;
   public readonly verificationStateHandler: ConversationVerificationStateHandler;
+  static readonly eventFromStreamMessage = 'event from notification stream';
 
   static get CONFIG() {
     return {
@@ -619,8 +621,8 @@ export class ConversationRepository {
     const mappedMessageEntities = await this.addEventsToConversation(events, conversationEntity);
     conversationEntity.hasAdditionalMessages(hasAdditionalMessages);
     if (!hasAdditionalMessages) {
-      const firstMessage = conversationEntity.getFirstMessage() as MemberMessage;
-      const checkCreationMessage = firstMessage?.isMember() && firstMessage.isCreation();
+      const firstMessage = conversationEntity.getFirstMessage();
+      const checkCreationMessage = isMemberMessage(firstMessage) && firstMessage.isCreation();
       if (checkCreationMessage) {
         const groupCreationMessageIn1to1 = conversationEntity.is1to1() && firstMessage.isGroupCreation();
         const one2oneConnectionMessageInGroup = conversationEntity.isGroup() && firstMessage.isConnection();
@@ -1738,7 +1740,7 @@ export class ConversationRepository {
   private checkChangedConversations() {
     this.conversationsWithNewEvents.forEach(conversationEntity => {
       if (conversationEntity.shouldUnarchive()) {
-        this.unarchiveConversation(conversationEntity, false, 'event from notification stream');
+        this.unarchiveConversation(conversationEntity, false, ConversationRepository.eventFromStreamMessage);
       }
     });
 
@@ -1943,7 +1945,12 @@ export class ConversationRepository {
         if (conversationEntity) {
           // Check if conversation was archived
           previouslyArchived = conversationEntity.is_archived();
+          const isPastMemberStatus = conversationEntity.status() === ConversationStatus.PAST_MEMBER;
+          const isMemberJoinType = type === CONVERSATION_EVENT.MEMBER_JOIN;
 
+          if (previouslyArchived && isPastMemberStatus && isMemberJoinType) {
+            this.unarchiveConversation(conversationEntity, false, ConversationRepository.eventFromStreamMessage);
+          }
           const isBackendTimestamp = eventSource !== EventSource.INJECTED;
           if (type !== CONVERSATION_EVENT.MEMBER_JOIN && type !== CONVERSATION_EVENT.MEMBER_LEAVE) {
             conversationEntity.updateTimestampServer(eventJson.server_time || eventJson.time, isBackendTimestamp);
@@ -2900,8 +2907,7 @@ export class ConversationRepository {
       id: messageEntity.from,
     });
     messageEntity.user(userEntity);
-    const isMemberMessage = messageEntity.isMember();
-    if (isMemberMessage || messageEntity.hasOwnProperty('userEntities')) {
+    if (isMemberMessage(messageEntity) || messageEntity.hasOwnProperty('userEntities')) {
       return this.userRepository.getUsersById((messageEntity as MemberMessage).userIds()).then(userEntities => {
         userEntities.sort(sortUsersByPriority);
         (messageEntity as MemberMessage).userEntities(userEntities);
