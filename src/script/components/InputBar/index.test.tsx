@@ -77,7 +77,7 @@ const getDefaultProps = () => ({
   conversationRepository,
   eventRepository,
   messageRepository: {} as MessageRepository,
-  propertiesRepository: {} as PropertiesRepository,
+  propertiesRepository: new PropertiesRepository({} as any, {} as any),
   searchRepository,
   storageRepository,
   teamState: new TeamState(),
