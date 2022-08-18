@@ -34,6 +34,7 @@ import {container} from 'tsyringe';
 
 import ClassifiedBar from 'Components/input/ClassifiedBar';
 import Avatar, {AVATAR_SIZE} from 'Components/Avatar';
+import useEmoji from 'Components/Emoji/useEmoji';
 
 import {registerReactComponent, useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {loadDraftState, saveDraftState} from 'Util/DraftStateUtil';
@@ -57,7 +58,6 @@ import {UserState} from '../../user/UserState';
 import {SearchRepository} from '../../search/SearchRepository';
 import {ContentMessage} from '../../entity/message/ContentMessage';
 import InputBarControls from '../../page/message-list/InputBarControls';
-import {EmojiInputViewModel} from '../../view_model/content/EmojiInputViewModel';
 import {Conversation} from '../../entity/Conversation';
 import {AssetRepository} from '../../assets/AssetRepository';
 import {ConversationRepository} from '../../conversation/ConversationRepository';
@@ -72,8 +72,11 @@ import {MessageHasher} from '../../message/MessageHasher';
 import {QuoteEntity} from '../../message/QuoteEntity';
 import {Text as TextAsset} from '../../entity/message/Text';
 import {User} from '../../entity/User';
+import {PropertiesRepository} from '../../properties/PropertiesRepository';
+
 import PastedFileControls from './PastedFileControls';
 import ReplyBar from './ReplyBar';
+
 import useScrollSync from '../../hooks/useScrollSync';
 import useResizeTarget from '../../hooks/useResizeTarget';
 import useDropFiles from '../../hooks/useDropFiles';
@@ -97,9 +100,9 @@ interface InputBarProps {
   readonly assetRepository: AssetRepository;
   readonly conversationEntity: Conversation;
   readonly conversationRepository: ConversationRepository;
-  readonly emojiInput: EmojiInputViewModel;
   readonly eventRepository: EventRepository;
   readonly messageRepository: MessageRepository;
+  readonly propertiesRepository: PropertiesRepository;
   readonly searchRepository: SearchRepository;
   readonly storageRepository: StorageRepository;
   readonly teamState: TeamState;
@@ -110,9 +113,9 @@ const InputBar = ({
   assetRepository,
   conversationEntity,
   conversationRepository,
-  emojiInput,
   eventRepository,
   messageRepository,
+  propertiesRepository,
   searchRepository,
   storageRepository,
   userState = container.resolve(UserState),
@@ -161,6 +164,12 @@ const InputBar = ({
   const [selectionEnd, setSelectionEnd] = useState<number>(0);
   const [pingDisabled, setIsPingDisabled] = useState<boolean>(false);
   const [editedMention, setEditedMention] = useState<{startIndex: number; term: string} | undefined>(undefined);
+
+  const {
+    onInputKeyDown: emojiKeyDown,
+    onInputKeyUp: emojiKeyUp,
+    renderEmojiComponent,
+  } = useEmoji(propertiesRepository, setInputValue, textareaRef.current);
 
   const availabilityIsNone = availability === Availability.Type.NONE;
   const showAvailabilityTooltip = firstUserEntity && inTeam && is1to1 && !availabilityIsNone;
@@ -386,7 +395,7 @@ const InputBar = ({
   };
 
   const onTextAreaKeyDown = (keyboardEvent: ReactKeyboardEvent<HTMLTextAreaElement>): void | boolean => {
-    const inputHandledByEmoji = !editedMention && emojiInput.onInputKeyDown(keyboardEvent);
+    const inputHandledByEmoji = !editedMention && emojiKeyDown(keyboardEvent);
 
     if (!inputHandledByEmoji) {
       switch (keyboardEvent.key) {
@@ -435,7 +444,8 @@ const InputBar = ({
 
   const onTextareaKeyUp = (keyboardEvent: ReactKeyboardEvent<HTMLTextAreaElement>): void => {
     if (!editedMention) {
-      emojiInput.onInputKeyUp(keyboardEvent);
+      emojiKeyUp(keyboardEvent);
+      // emojiInput.onInputKeyUp(keyboardEvent);
     }
 
     if (keyboardEvent.key !== KEY.ESC) {
@@ -790,6 +800,8 @@ const InputBar = ({
 
             {!removedFromConversation && !pastedFile && (
               <>
+                {renderEmojiComponent()}
+
                 <div className="controls-center">
                   <textarea
                     ref={textareaRef}
