@@ -370,12 +370,6 @@ const useEmoji = (
       return false;
     }
 
-    // Handling inline emoji in the whole text
-    // if (isEnterKey(keyboardEvent)) {
-    //   keyboardEvent.preventDefault();
-    //   replaceAllInlineEmoji(input);
-    // }
-
     return false;
   };
 
