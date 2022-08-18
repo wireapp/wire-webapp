@@ -82,6 +82,7 @@ export type EmojiListItem = {
 const useEmoji = (
   propertiesRepository: PropertiesRepository,
   updateText: (text: string) => void,
+  onSend: (text: string) => void,
   textareaElement?: HTMLTextAreaElement | null,
 ) => {
   const emojiWrapperRef = useRef<HTMLDivElement>(null);
@@ -209,12 +210,8 @@ const useEmoji = (
         }
       }
 
-      updateText(`${textBeforeCursor}${textAfterCursor}`);
-
-      setTimeout(() => {
-        textareaElement?.setSelectionRange(textBeforeCursor.length + 1, textBeforeCursor.length + 1);
-        textareaElement?.focus();
-      }, 0);
+      const updatedText = `${textBeforeCursor}${textAfterCursor}`;
+      onSend(updatedText);
     }
   };
 
@@ -326,6 +323,12 @@ const useEmoji = (
         break;
       }
 
+      case KEY.ENTER: {
+        keyboardEvent.preventDefault();
+        replaceAllInlineEmoji(input);
+        return true;
+      }
+
       default:
         break;
     }
@@ -361,11 +364,6 @@ const useEmoji = (
         default:
           break;
       }
-    }
-
-    // Handling inline emoji in the whole text
-    if (isEnterKey(keyboardEvent)) {
-      replaceAllInlineEmoji(input);
     }
 
     return false;
