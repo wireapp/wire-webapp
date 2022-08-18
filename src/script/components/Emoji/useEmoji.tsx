@@ -393,14 +393,14 @@ const useEmoji = (
     ) : null;
 
   useEffect(() => {
-    if (!isVisible) {
-      return;
+    if (isVisible) {
+      window.addEventListener('click', removeEmojiPopup);
     }
 
-    window.addEventListener('click', removeEmojiPopup);
-
     return () => {
-      window.removeEventListener('click', removeEmojiPopup);
+      if (isVisible) {
+        window.removeEventListener('click', removeEmojiPopup);
+      }
     };
   }, [isVisible]);
 
