@@ -17,6 +17,7 @@
  *
  */
 
+import {Link, LinkVariant} from '@wireapp/react-ui-kit';
 import React, {useMemo} from 'react';
 import {container} from 'tsyringe';
 import {t} from 'Util/LocalizerUtil';
@@ -24,7 +25,6 @@ import {Config} from '../../../../Config';
 import {getPrivacyPolicyUrl, getTermsOfUsePersonalUrl, getTermsOfUseTeamUrl, URL} from '../../../../externalRoute';
 import {UserState} from '../../../../user/UserState';
 import {useKoSubscribableChildren} from '../../../../util/ComponentUtil';
-import PreferencesLink from './components/PreferencesLink';
 import PreferencesPage from './components/PreferencesPage';
 import PreferencesSection from './components/PreferencesSection';
 
@@ -54,14 +54,24 @@ const AboutPreferences: React.FC<AboutPreferencesProps> = ({userState = containe
         <PreferencesSection title={t('preferencesAboutSupport')}>
           <ul className="preferences-about-list">
             <li className="preferences-about-list-item">
-              <PreferencesLink href={config.URL.SUPPORT.INDEX} uie="go-support">
+              <Link
+                variant={LinkVariant.PRIMARY}
+                targetBlank
+                href={config.URL.SUPPORT.INDEX}
+                data-uie-name="go-support"
+              >
                 {t('preferencesAboutSupportWebsite')}
-              </PreferencesLink>
+              </Link>
             </li>
             <li className="preferences-about-list-item">
-              <PreferencesLink href={config.URL.SUPPORT.CONTACT} uie="go-contact-support">
+              <Link
+                variant={LinkVariant.PRIMARY}
+                targetBlank
+                href={config.URL.SUPPORT.CONTACT}
+                data-uie-name="go-contact-support"
+              >
                 {t('preferencesAboutSupportContact')}
-              </PreferencesLink>
+              </Link>
             </li>
           </ul>
         </PreferencesSection>
@@ -71,23 +81,23 @@ const AboutPreferences: React.FC<AboutPreferencesProps> = ({userState = containe
           <ul className="preferences-about-list">
             {termsOfUseUrl && (
               <li className="preferences-about-list-item">
-                <PreferencesLink href={termsOfUseUrl} uie="go-legal">
+                <Link variant={LinkVariant.PRIMARY} targetBlank href={termsOfUseUrl} data-uie-name="go-legal">
                   {t('preferencesAboutTermsOfUse')}
-                </PreferencesLink>
+                </Link>
               </li>
             )}
             {privacyPolicyUrl && (
               <li className="preferences-about-list-item">
-                <PreferencesLink href={privacyPolicyUrl} uie="go-privacy">
+                <Link variant={LinkVariant.PRIMARY} targetBlank href={privacyPolicyUrl} data-uie-name="go-privacy">
                   {t('preferencesAboutPrivacyPolicy')}
-                </PreferencesLink>
+                </Link>
               </li>
             )}
             {websiteUrl && (
               <li className="preferences-about-list-item">
-                <PreferencesLink href={websiteUrl} uie="go-wire-dot-com">
+                <Link variant={LinkVariant.PRIMARY} targetBlank href={websiteUrl} data-uie-name="go-wire-dot-com">
                   {t('preferencesAboutWebsite', config.BRAND_NAME)}
-                </PreferencesLink>
+                </Link>
               </li>
             )}
           </ul>
