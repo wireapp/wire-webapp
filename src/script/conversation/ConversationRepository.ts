@@ -124,6 +124,7 @@ import {matchQualifiedIds} from 'Util/QualifiedId';
 import {ConversationVerificationState} from './ConversationVerificationState';
 import {extractClientDiff} from './ClientMismatchUtil';
 import {Core} from '../service/CoreSingleton';
+import {LEAVE_CALL_REASON} from '../calling/enum/LeaveCallReason';
 
 type ConversationDBChange = {obj: EventRecord; oldObj: EventRecord};
 type FetchPromise = {rejectFn: (error: ConversationError) => void; resolveFn: (conversation: Conversation) => void};
@@ -138,7 +139,7 @@ export class ConversationRepository {
   public readonly conversationRoleRepository: ConversationRoleRepository;
   private readonly event_mapper: EventMapper;
   private readonly eventService: EventService;
-  public leaveCall: (conversationId: QualifiedId) => void;
+  public leaveCall: (conversationId: QualifiedId, reason: LEAVE_CALL_REASON) => void;
   private readonly receiving_queue: PromiseQueue;
   private readonly logger: Logger;
   public readonly stateHandler: ConversationStateHandler;
@@ -1432,7 +1433,7 @@ export class ConversationRepository {
 
     if (leaveConversation) {
       conversationEntity.status(ConversationStatus.PAST_MEMBER);
-      this.leaveCall(conversationEntity.qualifiedId);
+      this.leaveCall(conversationEntity.qualifiedId, LEAVE_CALL_REASON.USER_MANUALY_LEFT_CONVERSATION);
     }
 
     this.messageRepository.updateClearedTimestamp(conversationEntity);
@@ -2378,7 +2379,10 @@ export class ConversationRepository {
 
     if (removesSelfUser) {
       conversationEntity.status(ConversationStatus.PAST_MEMBER);
-      this.leaveCall(conversationEntity.qualifiedId);
+      this.leaveCall(
+        conversationEntity.qualifiedId,
+        LEAVE_CALL_REASON.USER_IS_REMOVED_BY_AN_ADMIN_OR_LEFT_ON_ANOTHER_CLIENT,
+      );
       if (this.userState.self().isTemporaryGuest()) {
         eventJson.from = this.userState.self().id;
       }
