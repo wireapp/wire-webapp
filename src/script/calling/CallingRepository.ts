@@ -1065,9 +1065,10 @@ export class CallingRepository {
       };
     }
 
-    this.sendCallingMessage(conversationId, payload, options).catch(() =>
-      this.abortCall(conversationId, LEAVE_CALL_REASON.ABORTED_BECAUSE_FAILED_TO_SEND_CALLING_MESSAGE),
-    );
+    this.sendCallingMessage(conversationId, payload, options).catch(error => {
+      this.logger.warn('Failed to send calling message, aborting call', error);
+      this.abortCall(conversationId, LEAVE_CALL_REASON.ABORTED_BECAUSE_FAILED_TO_SEND_CALLING_MESSAGE);
+    });
     return 0;
   };
 
