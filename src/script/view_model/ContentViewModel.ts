@@ -30,7 +30,6 @@ import {container} from 'tsyringe';
 import {Config} from '../Config';
 import {MessageListViewModel} from './content/MessageListViewModel';
 import {LegalHoldModalViewModel} from './content/LegalHoldModalViewModel';
-import {EmojiInputViewModel} from './content/EmojiInputViewModel';
 import {ModalsViewModel} from './ModalsViewModel';
 import {ConversationError} from '../error/ConversationError';
 import {ConnectRequestsViewModel} from './content/ConnectRequestsViewModel';
@@ -94,7 +93,6 @@ export class ContentViewModel {
   messageRepository: MessageRepository;
   elementId: string;
   sidebarId: string;
-  emojiInput: EmojiInputViewModel;
   historyExport: HistoryExportViewModel;
   historyImport: HistoryImportViewModel;
   legalHoldModal: LegalHoldModalViewModel;
@@ -146,7 +144,6 @@ export class ContentViewModel {
 
     // Nested view models
     this.connectRequests = new ConnectRequestsViewModel(mainViewModel);
-    this.emojiInput = new EmojiInputViewModel(repositories.properties);
     this.legalHoldModal = new LegalHoldModalViewModel(
       repositories.conversation,
       repositories.team,

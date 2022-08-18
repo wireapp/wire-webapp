@@ -33,10 +33,10 @@ import {EventRepository} from '../../event/EventRepository';
 import {SearchRepository} from '../../search/SearchRepository';
 import {StorageRepository} from '../../storage';
 import InputBar from 'Components/InputBar/index';
-import {EmojiInputViewModel} from '../../view_model/content/EmojiInputViewModel';
 import {MessageRepository} from '../../conversation/MessageRepository';
 import {User} from '../../entity/User';
 import {createMentionEntity, getMentionCandidate} from 'Util/MentionUtil';
+import {PropertiesRepository} from '../../properties/PropertiesRepository';
 
 const testFactory = new TestFactory();
 let conversationRepository: ConversationRepository;
@@ -75,9 +75,9 @@ const getDefaultProps = () => ({
   assetRepository: new AssetRepository(new AssetService()),
   conversationEntity: new Conversation(createRandomUuid()),
   conversationRepository,
-  emojiInput: {} as EmojiInputViewModel,
   eventRepository,
   messageRepository: {} as MessageRepository,
+  propertiesRepository: new PropertiesRepository({} as any, {} as any),
   searchRepository,
   storageRepository,
   teamState: new TeamState(),
