@@ -32,11 +32,12 @@ interface EmojiItemProps {
 const EmojiItem: FC<EmojiItemProps> = ({emoji, onClick, onMouseEnter, selectedEmoji = false}) => (
   <button
     type="button"
-    key={emoji.name}
     className={cx('button-reset-default emoji', {selected: selectedEmoji})}
     css={{alignItems: 'flex-start', display: 'flex', flexDirection: 'column', width: '100%'}}
     onMouseEnter={onMouseEnter}
     onClick={onClick}
+    aria-label={emoji.name}
+    tabIndex={0}
   >
     <span className="symbol">{emoji.icon}</span>
     <span className="name">{emoji.name}</span>

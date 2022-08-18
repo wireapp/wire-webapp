@@ -806,10 +806,10 @@ const InputBar = ({
               )}
             </div>
 
-            {renderEmojiComponent()}
-
             {!removedFromConversation && !pastedFile && (
               <>
+                {renderEmojiComponent()}
+
                 <div className="controls-center">
                   <textarea
                     ref={textareaRef}

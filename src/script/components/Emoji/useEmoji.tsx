@@ -377,7 +377,7 @@ const useEmoji = (
         {mappedEmojiList.map((emoji, index) => {
           return (
             <EmojiItem
-              key={index}
+              key={emoji.name}
               selectedEmoji={selectedEmojiIndex === index}
               emoji={emoji}
               onMouseEnter={() => setSelectedEmojiIndex(index)}
@@ -393,14 +393,14 @@ const useEmoji = (
     ) : null;
 
   useEffect(() => {
-    if (isVisible) {
-      window.addEventListener('click', removeEmojiPopup);
+    if (!isVisible) {
+      return;
     }
 
+    window.addEventListener('click', removeEmojiPopup);
+
     return () => {
-      if (isVisible) {
-        window.removeEventListener('click', removeEmojiPopup);
-      }
+      window.removeEventListener('click', removeEmojiPopup);
     };
   }, [isVisible]);
 
