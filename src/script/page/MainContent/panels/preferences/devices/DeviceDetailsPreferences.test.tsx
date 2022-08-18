@@ -21,6 +21,7 @@ import {act, render, waitFor} from '@testing-library/react';
 import DeviceDetailsPreferences from './DeviceDetailsPreferences';
 import {ClientEntity} from 'src/script/client/ClientEntity';
 import {createRandomUuid} from 'Util/util';
+import {StyledApp, THEME_ID} from '@wireapp/react-ui-kit';
 
 describe('DeviceDetailsPreferences', () => {
   const device = new ClientEntity(true, '', createRandomUuid());
@@ -36,14 +37,22 @@ describe('DeviceDetailsPreferences', () => {
   };
 
   it('shows device details', async () => {
-    const {getByText, getAllByText} = render(<DeviceDetailsPreferences {...defaultParams} />);
+    const {getByText, getAllByText} = render(
+      <StyledApp themeId={THEME_ID.DEFAULT}>
+        <DeviceDetailsPreferences {...defaultParams} />
+      </StyledApp>,
+    );
     await waitFor(() => getAllByText('00'));
 
     expect(getByText(device.model)).toBeDefined();
   });
 
   it('resets session with device', async () => {
-    const {getByText, getAllByText, queryByText} = render(<DeviceDetailsPreferences {...defaultParams} />);
+    const {getByText, getAllByText, queryByText} = render(
+      <StyledApp themeId={THEME_ID.DEFAULT}>
+        <DeviceDetailsPreferences {...defaultParams} />
+      </StyledApp>,
+    );
     await waitFor(() => getAllByText('00'));
     jest.useFakeTimers();
     act(() => {
@@ -68,7 +77,11 @@ describe('DeviceDetailsPreferences', () => {
   });
 
   it('toggles verification', async () => {
-    const {getByText, getAllByText} = render(<DeviceDetailsPreferences {...defaultParams} />);
+    const {getByText, getAllByText} = render(
+      <StyledApp themeId={THEME_ID.DEFAULT}>
+        <DeviceDetailsPreferences {...defaultParams} />
+      </StyledApp>,
+    );
     await waitFor(() => getAllByText('00'));
 
     act(() => {

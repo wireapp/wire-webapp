@@ -2089,9 +2089,9 @@ exports[`stricter compilation`] = {
       [65, 16, 4, "Argument of type \'null\' is not assignable to parameter of type \'SetStateAction<MediaStream | undefined>\'.", "2087897566"],
       [109, 84, 11, "Type \'MediaStream | undefined\' is not assignable to type \'MediaStream\'.\\n  Type \'undefined\' is not assignable to type \'MediaStream\'.", "4175552125"]
     ],
-    "src/script/page/MainContent/panels/preferences/devices/DeviceDetailsPreferences.test.tsx:2030460021": [
-      [34, 41, 22, "Cannot invoke an object which is possibly \'undefined\'.", "1980738780"],
-      [41, 21, 12, "Argument of type \'string | undefined\' is not assignable to parameter of type \'Matcher\'.\\n  Type \'undefined\' is not assignable to type \'Matcher\'.", "2075561852"]
+    "src/script/page/MainContent/panels/preferences/devices/DeviceDetailsPreferences.test.tsx:1105630234": [
+      [35, 41, 22, "Cannot invoke an object which is possibly \'undefined\'.", "1980738780"],
+      [46, 21, 12, "Argument of type \'string | undefined\' is not assignable to parameter of type \'Matcher\'.\\n  Type \'undefined\' is not assignable to type \'Matcher\'.", "2075561852"]
     ],
     "src/script/page/MainContent/panels/preferences/devices/DevicesPreferences.tsx:3136549338": [
       [67, 90, 10, "Type \'undefined\' is not assignable to type \'boolean\'.", "3231345145"],
