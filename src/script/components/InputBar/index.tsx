@@ -165,12 +165,6 @@ const InputBar = ({
   const [pingDisabled, setIsPingDisabled] = useState<boolean>(false);
   const [editedMention, setEditedMention] = useState<{startIndex: number; term: string} | undefined>(undefined);
 
-  const {
-    onInputKeyDown: emojiKeyDown,
-    onInputKeyUp: emojiKeyUp,
-    renderEmojiComponent,
-  } = useEmoji(propertiesRepository, setInputValue, textareaRef.current);
-
   const availabilityIsNone = availability === Availability.Type.NONE;
   const showAvailabilityTooltip = firstUserEntity && inTeam && is1to1 && !availabilityIsNone;
   const availabilityStrings: Record<string, string> = {
@@ -421,7 +415,7 @@ const InputBar = ({
         case KEY.ENTER: {
           if (!keyboardEvent.shiftKey && !keyboardEvent.altKey && !keyboardEvent.metaKey) {
             keyboardEvent.preventDefault();
-            onSend();
+            onSend(inputValue);
           }
 
           if (keyboardEvent.altKey || keyboardEvent.metaKey) {
@@ -445,7 +439,6 @@ const InputBar = ({
   const onTextareaKeyUp = (keyboardEvent: ReactKeyboardEvent<HTMLTextAreaElement>): void => {
     if (!editedMention) {
       emojiKeyUp(keyboardEvent);
-      // emojiInput.onInputKeyUp(keyboardEvent);
     }
 
     if (keyboardEvent.key !== KEY.ESC) {
@@ -514,13 +507,13 @@ const InputBar = ({
     }
   };
 
-  const onSend = (): void | boolean => {
+  const onSend = (text: string): void | boolean => {
     if (pastedFile) {
       return sendPastedFile();
     }
 
-    const beforeLength = inputValue.length;
-    const messageText = inputValue.trim();
+    const beforeLength = text.length;
+    const messageText = text.trim();
     const afterLength = messageText.length;
     const isMessageTextTooLong = afterLength > CONFIG.MAXIMUM_MESSAGE_LENGTH;
 
@@ -545,6 +538,12 @@ const InputBar = ({
     resetDraftState();
     textareaRef.current?.focus();
   };
+
+  const {
+    onInputKeyDown: emojiKeyDown,
+    onInputKeyUp: emojiKeyUp,
+    renderEmojiComponent,
+  } = useEmoji(propertiesRepository, setInputValue, onSend, textareaRef.current);
 
   const uploadFiles = (files: File[]) => {
     const fileArray = Array.from(files);
@@ -843,7 +842,7 @@ const InputBar = ({
                   isEditing={isEditing}
                   disablePing={pingDisabled}
                   disableFilesharing={!isFileSharingSendingEnabled}
-                  onSend={onSend}
+                  onSend={() => onSend(inputValue)}
                   onSelectFiles={uploadFiles}
                   onSelectImages={uploadImages}
                   onCancelEditing={cancelMessageEditing}
