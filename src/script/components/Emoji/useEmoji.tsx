@@ -210,8 +210,7 @@ const useEmoji = (
         }
       }
 
-      const updatedText = `${textBeforeCursor}${textAfterCursor}`;
-      onSend(updatedText);
+      onSend(`${textBeforeCursor}${textAfterCursor}`);
     }
   };
 
@@ -324,9 +323,12 @@ const useEmoji = (
       }
 
       case KEY.ENTER: {
-        keyboardEvent.preventDefault();
-        replaceAllInlineEmoji(input);
-        return true;
+        if (!isVisible) {
+          keyboardEvent.preventDefault();
+          replaceAllInlineEmoji(input);
+          return true;
+        }
+        break;
       }
 
       default:
@@ -364,7 +366,15 @@ const useEmoji = (
         default:
           break;
       }
+
+      return false;
     }
+
+    // Handling inline emoji in the whole text
+    // if (isEnterKey(keyboardEvent)) {
+    //   keyboardEvent.preventDefault();
+    //   replaceAllInlineEmoji(input);
+    // }
 
     return false;
   };
