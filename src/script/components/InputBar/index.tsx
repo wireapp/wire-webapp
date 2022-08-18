@@ -34,6 +34,7 @@ import {container} from 'tsyringe';
 
 import ClassifiedBar from 'Components/input/ClassifiedBar';
 import Avatar, {AVATAR_SIZE} from 'Components/Avatar';
+import useEmoji from 'Components/Emoji/useEmoji';
 
 import {registerReactComponent, useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {loadDraftState, saveDraftState} from 'Util/DraftStateUtil';
@@ -57,7 +58,6 @@ import {UserState} from '../../user/UserState';
 import {SearchRepository} from '../../search/SearchRepository';
 import {ContentMessage} from '../../entity/message/ContentMessage';
 import InputBarControls from '../../page/message-list/InputBarControls';
-import {EmojiInputViewModel} from '../../view_model/content/EmojiInputViewModel';
 import {Conversation} from '../../entity/Conversation';
 import {AssetRepository} from '../../assets/AssetRepository';
 import {ConversationRepository} from '../../conversation/ConversationRepository';
@@ -72,8 +72,11 @@ import {MessageHasher} from '../../message/MessageHasher';
 import {QuoteEntity} from '../../message/QuoteEntity';
 import {Text as TextAsset} from '../../entity/message/Text';
 import {User} from '../../entity/User';
+import {PropertiesRepository} from '../../properties/PropertiesRepository';
+
 import PastedFileControls from './PastedFileControls';
 import ReplyBar from './ReplyBar';
+
 import useScrollSync from '../../hooks/useScrollSync';
 import useResizeTarget from '../../hooks/useResizeTarget';
 import useDropFiles from '../../hooks/useDropFiles';
@@ -84,13 +87,22 @@ const CONFIG = {
   PING_TIMEOUT: TIME_IN_MILLIS.SECOND * 2,
 };
 
+const showWarningModal = (title: string, message: string): void => {
+  // Timeout needed for display warning modal - we need to update modal
+  setTimeout(() => {
+    amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.ACKNOWLEDGE, {
+      text: {message, title},
+    });
+  }, 0);
+};
+
 interface InputBarProps {
   readonly assetRepository: AssetRepository;
   readonly conversationEntity: Conversation;
   readonly conversationRepository: ConversationRepository;
-  readonly emojiInput: EmojiInputViewModel;
   readonly eventRepository: EventRepository;
   readonly messageRepository: MessageRepository;
+  readonly propertiesRepository: PropertiesRepository;
   readonly searchRepository: SearchRepository;
   readonly storageRepository: StorageRepository;
   readonly teamState: TeamState;
@@ -101,9 +113,9 @@ const InputBar = ({
   assetRepository,
   conversationEntity,
   conversationRepository,
-  emojiInput,
   eventRepository,
   messageRepository,
+  propertiesRepository,
   searchRepository,
   storageRepository,
   userState = container.resolve(UserState),
@@ -153,6 +165,12 @@ const InputBar = ({
   const [pingDisabled, setIsPingDisabled] = useState<boolean>(false);
   const [editedMention, setEditedMention] = useState<{startIndex: number; term: string} | undefined>(undefined);
 
+  const {
+    onInputKeyDown: emojiKeyDown,
+    onInputKeyUp: emojiKeyUp,
+    renderEmojiComponent,
+  } = useEmoji(propertiesRepository, setInputValue, textareaRef.current);
+
   const availabilityIsNone = availability === Availability.Type.NONE;
   const showAvailabilityTooltip = firstUserEntity && inTeam && is1to1 && !availabilityIsNone;
   const availabilityStrings: Record<string, string> = {
@@ -200,13 +218,12 @@ const InputBar = ({
     setSelectionEnd(newEnd);
   };
 
-  const moveCursorToEnd = (updateSelection = true) => {
-    if (textareaRef.current) {
-      const endPosition = textareaRef.current.value.length;
-      textareaRef.current.setSelectionRange(endPosition, endPosition);
-      updateSelectionState(updateSelection);
-      textareaRef.current.focus();
-    }
+  const moveCursorToEnd = (endPosition: number, updateSelection = true) => {
+    updateSelectionState(updateSelection);
+    setTimeout(() => {
+      textareaRef.current?.setSelectionRange(endPosition, endPosition);
+      textareaRef.current?.focus();
+    }, 0);
   };
 
   const resetDraftState = () => {
@@ -221,7 +238,10 @@ const InputBar = ({
     const files: File[] = [];
 
     if (!isFileSharingSendingEnabled) {
-      showRestrictedFileSharingModal();
+      showWarningModal(
+        t('conversationModalRestrictedFileSharingHeadline'),
+        t('conversationModalRestrictedFileSharingDescription'),
+      );
 
       return;
     }
@@ -340,7 +360,7 @@ const InputBar = ({
           .then(quotedMessage => setReplyMessageEntity(quotedMessage));
       }
 
-      moveCursorToEnd();
+      moveCursorToEnd(firstAsset.text.length);
     }
   };
 
@@ -375,7 +395,7 @@ const InputBar = ({
   };
 
   const onTextAreaKeyDown = (keyboardEvent: ReactKeyboardEvent<HTMLTextAreaElement>): void | boolean => {
-    const inputHandledByEmoji = !editedMention && emojiInput.onInputKeyDown(keyboardEvent);
+    const inputHandledByEmoji = !editedMention && emojiKeyDown(keyboardEvent);
 
     if (!inputHandledByEmoji) {
       switch (keyboardEvent.key) {
@@ -400,14 +420,14 @@ const InputBar = ({
         }
         case KEY.ENTER: {
           if (!keyboardEvent.shiftKey && !keyboardEvent.altKey && !keyboardEvent.metaKey) {
-            onSend();
             keyboardEvent.preventDefault();
+            onSend();
           }
 
           if (keyboardEvent.altKey || keyboardEvent.metaKey) {
             if (keyboardEvent.target) {
-              insertAtCaret(keyboardEvent.target.toString(), '\n');
               keyboardEvent.preventDefault();
+              insertAtCaret(keyboardEvent.target.toString(), '\n');
             }
           }
 
@@ -424,7 +444,8 @@ const InputBar = ({
 
   const onTextareaKeyUp = (keyboardEvent: ReactKeyboardEvent<HTMLTextAreaElement>): void => {
     if (!editedMention) {
-      emojiInput.onInputKeyUp(keyboardEvent);
+      emojiKeyUp(keyboardEvent);
+      // emojiInput.onInputKeyUp(keyboardEvent);
     }
 
     if (keyboardEvent.key !== KEY.ESC) {
@@ -499,24 +520,21 @@ const InputBar = ({
     }
 
     const beforeLength = inputValue.length;
-    const messageTrimmedStart = inputValue.trimLeft();
-    const afterLength = messageTrimmedStart.length;
+    const messageText = inputValue.trim();
+    const afterLength = messageText.length;
+    const isMessageTextTooLong = afterLength > CONFIG.MAXIMUM_MESSAGE_LENGTH;
+
+    if (isMessageTextTooLong) {
+      showWarningModal(
+        t('modalConversationMessageTooLongHeadline'),
+        t('modalConversationMessageTooLongMessage', CONFIG.MAXIMUM_MESSAGE_LENGTH),
+      );
+
+      return;
+    }
 
     const updatedMentions = updateMentionRanges(currentMentions, 0, 0, afterLength - beforeLength);
     setCurrentMentions(updatedMentions);
-
-    const messageText = messageTrimmedStart.trimRight();
-
-    const isMessageTextTooLong = messageText.length > CONFIG.MAXIMUM_MESSAGE_LENGTH;
-
-    if (isMessageTextTooLong) {
-      return amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.ACKNOWLEDGE, {
-        text: {
-          message: t('modalConversationMessageTooLongMessage', CONFIG.MAXIMUM_MESSAGE_LENGTH),
-          title: t('modalConversationMessageTooLongHeadline'),
-        },
-      });
-    }
 
     if (isEditing) {
       sendMessageEdit(messageText);
@@ -541,7 +559,7 @@ const InputBar = ({
             getFileExtensionOrName(file.name),
           );
 
-          return false;
+          return;
         }
       }
     }
@@ -554,21 +572,14 @@ const InputBar = ({
 
         if (isFileTooLarge) {
           const fileSize = formatBytes(uploadLimit);
-          const options = {
-            text: {
-              message: t('modalAssetTooLargeMessage', fileSize),
-              title: t('modalAssetTooLargeHeadline'),
-            },
-          };
+          showWarningModal(t('modalAssetTooLargeHeadline'), t('modalAssetTooLargeMessage', fileSize));
 
-          return amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.ACKNOWLEDGE, options);
+          return;
         }
       }
 
       messageRepository.uploadFiles(conversationEntity, files);
     }
-
-    return false;
   };
 
   const uploadImages = (images: File[]) => {
@@ -580,14 +591,10 @@ const InputBar = ({
           const isGif = image.type === 'image/gif';
           const maxSize = CONFIG.MAXIMUM_IMAGE_FILE_SIZE / 1024 / 1024;
 
-          const modalOptions = {
-            text: {
-              message: t(isGif ? 'modalGifTooLargeMessage' : 'modalPictureTooLargeMessage', maxSize),
-              title: t(isGif ? 'modalGifTooLargeHeadline' : 'modalPictureTooLargeHeadline'),
-            },
-          };
-
-          amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.ACKNOWLEDGE, modalOptions);
+          showWarningModal(
+            t(isGif ? 'modalGifTooLargeHeadline' : 'modalPictureTooLargeHeadline'),
+            t(isGif ? 'modalGifTooLargeMessage' : 'modalPictureTooLargeMessage', maxSize),
+          );
 
           return;
         }
@@ -609,22 +616,16 @@ const InputBar = ({
     }
   };
 
-  const showRestrictedFileSharingModal = (): void => {
-    amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.ACKNOWLEDGE, {
-      text: {
-        message: t('conversationModalRestrictedFileSharingDescription'),
-        title: t('conversationModalRestrictedFileSharingHeadline'),
-      },
-    });
-  };
-
   const onPasteFiles = (event: ClipboardEvent | ReactClipboardEvent): void => {
     if (event?.clipboardData?.types.includes('text/plain')) {
       return;
     }
 
     if (!isFileSharingSendingEnabled) {
-      showRestrictedFileSharingModal();
+      showWarningModal(
+        t('conversationModalRestrictedFileSharingHeadline'),
+        t('conversationModalRestrictedFileSharingDescription'),
+      );
 
       return;
     }
@@ -672,9 +673,9 @@ const InputBar = ({
           }
         });
       }
-    }
 
-    moveCursorToEnd(false);
+      moveCursorToEnd(previousSessionData.text.length, false);
+    }
   };
 
   const sendGiphy = (gifUrl: string, tag: string): void => {
@@ -758,7 +759,7 @@ const InputBar = ({
       amplify.unsubscribe(WebAppEvents.CONVERSATION.MESSAGE.REMOVED, handleRepliedMessageDeleted);
       amplify.unsubscribe(WebAppEvents.CONVERSATION.MESSAGE.UPDATED, handleRepliedMessageUpdated);
     };
-  }, []);
+  }, [replyMessageEntity]);
 
   useEffect(() => {
     if (isEditing) {
@@ -799,6 +800,8 @@ const InputBar = ({
 
             {!removedFromConversation && !pastedFile && (
               <>
+                {renderEmojiComponent()}
+
                 <div className="controls-center">
                   <textarea
                     ref={textareaRef}

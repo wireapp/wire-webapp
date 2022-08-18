@@ -37,7 +37,7 @@ export const withStore = (
 
 export const withIntl = (component: React.ReactNode) => <IntlProvider locale="en">{component}</IntlProvider>;
 
-export const withTheme = (component: React.ReactNode) => <StyledApp themeId={THEME_ID.LIGHT}>{component}</StyledApp>;
+export const withTheme = (component: React.ReactNode) => <StyledApp themeId={THEME_ID.DEFAULT}>{component}</StyledApp>;
 
 export const withRouter = (component: React.ReactNode, history: History) => (
   <Router history={history}>{component}</Router>
