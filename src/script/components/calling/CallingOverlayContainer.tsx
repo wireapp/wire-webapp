@@ -37,7 +37,7 @@ import {Multitasking} from '../../notification/NotificationRepository';
 import {CallViewTab} from '../../view_model/CallingViewModel';
 import ChooseScreen, {Screen} from './ChooseScreen';
 import FullscreenVideoCall from './FullscreenVideoCall';
-import {LEAVE_CALL_REASON} from 'src/script/calling/enum/LeaveCallReason';
+import {LEAVE_CALL_REASON} from '../../calling/enum/LeaveCallReason';
 
 export interface CallingContainerProps {
   readonly callingRepository: CallingRepository;

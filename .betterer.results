@@ -926,7 +926,7 @@ exports[`stricter compilation`] = {
       [63, 11, 29, "Object is possibly \'null\'.", "373716495"],
       [66, 11, 29, "Object is possibly \'null\'.", "373716495"]
     ],
-    "src/script/components/calling/CallingOverlayContainer.tsx:300168631": [
+    "src/script/components/calling/CallingOverlayContainer.tsx:1514620666": [
       [71, 32, 10, "Argument of type \'Call | undefined\' is not assignable to parameter of type \'Partial<Record<\\"state\\" | \\"muteState\\" | \\"maximizedParticipant\\", Subscribable<any>>>\'.\\n  Type \'undefined\' is not assignable to type \'Partial<Record<\\"state\\" | \\"muteState\\" | \\"maximizedParticipant\\", Subscribable<any>>>\'.", "4286110980"],
       [76, 55, 10, "Object is possibly \'undefined\'.", "4286110980"],
       [84, 33, 10, "Argument of type \'Call | undefined\' is not assignable to parameter of type \'Call\'.\\n  Type \'undefined\' is not assignable to type \'Call\'.", "4286110980"],
