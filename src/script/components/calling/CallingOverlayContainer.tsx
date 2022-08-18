@@ -25,7 +25,7 @@ import {container} from 'tsyringe';
 import {registerReactComponent, useKoSubscribableChildren} from 'Util/ComponentUtil';
 
 import {Call} from '../../calling/Call';
-import {CallingRepository, LEAVE_CALL_REASON} from '../../calling/CallingRepository';
+import {CallingRepository} from '../../calling/CallingRepository';
 import {MediaRepository} from '../../media/MediaRepository';
 import {CallState, MuteState} from '../../calling/CallState';
 import {Participant} from '../../calling/Participant';
@@ -37,6 +37,7 @@ import {Multitasking} from '../../notification/NotificationRepository';
 import {CallViewTab} from '../../view_model/CallingViewModel';
 import ChooseScreen, {Screen} from './ChooseScreen';
 import FullscreenVideoCall from './FullscreenVideoCall';
+import {LEAVE_CALL_REASON} from 'src/script/calling/enum/LeaveCallReason';
 
 export interface CallingContainerProps {
   readonly callingRepository: CallingRepository;

@@ -128,7 +128,7 @@ import {Core} from '../service/CoreSingleton';
 import {ClientState} from '../client/ClientState';
 import {MLSReturnType} from '@wireapp/core/src/main/conversation';
 import {isMemberMessage} from '../guards/Message';
-import {LEAVE_CALL_REASON} from '../calling/CallingRepository';
+import {LEAVE_CALL_REASON} from '../calling/enum/LeaveCallReason';
 
 type ConversationDBChange = {obj: EventRecord; oldObj: EventRecord};
 type FetchPromise = {rejectFn: (error: ConversationError) => void; resolveFn: (conversation: Conversation) => void};

@@ -23,7 +23,7 @@ import ko, {Subscription} from 'knockout';
 import {amplify} from 'amplify';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import {CONV_TYPE, CALL_TYPE, STATE as CALL_STATE, REASON, Wcall} from '@wireapp/avs';
-import {CallingRepository, LEAVE_CALL_REASON} from 'src/script/calling/CallingRepository';
+import {CallingRepository} from 'src/script/calling/CallingRepository';
 import {EventRepository} from 'src/script/event/EventRepository';
 import {Participant} from 'src/script/calling/Participant';
 import {Call} from 'src/script/calling/Call';
@@ -38,6 +38,7 @@ import {TestFactory} from 'test/helper/TestFactory';
 import {MediaDevicesHandler} from '../media/MediaDevicesHandler';
 import {CALL_MESSAGE_TYPE} from './enum/CallMessageType';
 import {CALL} from '../event/Client';
+import {LEAVE_CALL_REASON} from './enum/LeaveCallReason';
 
 const createSelfParticipant = () => {
   const selfUser = new User();
