@@ -68,13 +68,14 @@ const DeviceToggleButton: React.FC<DeviceToggleButtonProps> = ({currentDevice, d
             data-uie-name="device-toggle-button-indicator-dot"
             data-uie-value={device === currentDevice ? 'active' : 'inactive'}
             css={{
-              '&:not(:last-child)': {marginRight: 8},
-              backgroundColor: device === currentDevice ? 'currentColor' : 'var(--foreground-fade-24)',
+              '&:not(:last-child)': {marginRight: 5},
+              backgroundColor: device === currentDevice ? 'var(--accent-color)' : 'var(--app-bg-secondary)',
+              border: device === currentDevice ? '1px solid var(--accent-color)' : '1px solid var(--foreground)',
               borderRadius: '50%',
               color: '#fff',
               display: 'inline-block',
-              height: 8,
-              width: 8,
+              height: 10,
+              width: 10,
             }}
           />
         ))}

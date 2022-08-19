@@ -934,8 +934,8 @@ exports[`stricter compilation`] = {
       [177, 10, 20, "Type \'undefined\' is not assignable to type \'Participant\'.", "942864568"],
       [180, 10, 9, "Type \'undefined\' is not assignable to type \'MuteState\'.", "3616862203"]
     ],
-    "src/script/components/calling/FullscreenVideoCall.tsx:677417589": [
-      [401, 50, 4, "Argument of type \'null\' is not assignable to parameter of type \'Participant\'.", "2087897566"]
+    "src/script/components/calling/FullscreenVideoCall.tsx:2795856065": [
+      [406, 50, 4, "Argument of type \'null\' is not assignable to parameter of type \'Participant\'.", "2087897566"]
     ],
     "src/script/components/calling/GroupVideoGrid.test.ts:1931211751": [
       [35, 55, 22, "Object is possibly \'null\'.", "1458310722"],

@@ -256,7 +256,7 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
               <Icon.ArrowNext css={{position: 'relative', right: 4, transform: 'rotate(180deg)'}} />
             </button>
           )}
-          <div css={{bottom: 110, display: 'flex', justifyContent: 'center', position: 'absolute', width: '100%'}}>
+          <div css={{bottom: 108, display: 'flex', justifyContent: 'center', position: 'absolute', width: '100%'}}>
             <Pagination
               totalPages={totalPages}
               currentPage={currentPage}
@@ -333,11 +333,15 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
                       <Icon.CameraOff width={16} height={16} />
                     )}
 
-                    {showSwitchCamera ? (
+                    <span id="video-label" className="video-controls__button__label">
+                      {t('videoCallOverlayCamera')}
+                    </span>
+
+                    {showSwitchCamera && (
                       <DeviceToggleButton
                         styles={css`
                           position: absolute;
-                          bottom: -16px;
+                          bottom: -38px;
                           left: 50%;
                           transform: translateX(-50%);
                         `}
@@ -345,10 +349,6 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
                         devices={availableCameras}
                         onChooseDevice={deviceId => switchCameraInput(call, deviceId)}
                       />
-                    ) : (
-                      <span id="video-label" className="video-controls__button__label">
-                        {t('videoCallOverlayCamera')}
-                      </span>
                     )}
                   </div>
                 </li>
