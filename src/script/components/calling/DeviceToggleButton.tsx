@@ -61,24 +61,28 @@ const DeviceToggleButton: React.FC<DeviceToggleButtonProps> = ({currentDevice, d
           marginTop: 8,
         }}
       >
-        {devices.map(device => (
-          <span
-            key={device}
-            className="device-toggle-button-indicator-dot"
-            data-uie-name="device-toggle-button-indicator-dot"
-            data-uie-value={device === currentDevice ? 'active' : 'inactive'}
-            css={{
-              '&:not(:last-child)': {marginRight: 5},
-              backgroundColor: device === currentDevice ? 'var(--accent-color)' : 'var(--app-bg-secondary)',
-              border: device === currentDevice ? '1px solid var(--accent-color)' : '1px solid var(--foreground)',
-              borderRadius: '50%',
-              color: '#fff',
-              display: 'inline-block',
-              height: 10,
-              width: 10,
-            }}
-          />
-        ))}
+        {devices.map(device => {
+          const isCurrentDevice = device === currentDevice;
+
+          return (
+            <span
+              key={device}
+              className="device-toggle-button-indicator-dot"
+              data-uie-name="device-toggle-button-indicator-dot"
+              data-uie-value={isCurrentDevice ? 'active' : 'inactive'}
+              css={{
+                '&:not(:last-child)': {marginRight: 5},
+                backgroundColor: isCurrentDevice ? 'var(--accent-color)' : 'var(--app-bg-secondary)',
+                border: isCurrentDevice ? '1px solid var(--accent-color)' : '1px solid var(--foreground)',
+                borderRadius: '50%',
+                color: '#fff',
+                display: 'inline-block',
+                height: 10,
+                width: 10,
+              }}
+            />
+          );
+        })}
       </div>
     </div>
   );
