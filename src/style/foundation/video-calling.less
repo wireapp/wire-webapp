@@ -155,11 +155,13 @@
         body.theme-dark & {
           background-color: #ff928d;
         }
-      }
-      &:active {
-        border: 1px solid var(--accent-color);
-        body.theme-dark & {
-          border: 1px solid var(--accent-color);
+        &:active {
+          border: 1px solid #74000b;
+          background-color: var(--red-500);
+          body.theme-dark & {
+            border: 1px solid #ffc9c6;
+            background-color: var(--red-500);
+          }
         }
       }
     }
