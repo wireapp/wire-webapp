@@ -145,6 +145,7 @@
     }
 
     &--red {
+      border: 1px solid var(--red-500);
       background-color: var(--red-500);
       svg > path {
         fill: var(--app-bg-secondary);
@@ -153,6 +154,12 @@
         background-color: #9b000f;
         body.theme-dark & {
           background-color: #ff928d;
+        }
+      }
+      &:active {
+        border: 1px solid var(--accent-color);
+        body.theme-dark & {
+          border: 1px solid var(--accent-color);
         }
       }
     }
