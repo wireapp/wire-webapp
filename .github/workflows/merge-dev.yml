@@ -1,0 +1,17 @@
+name: Merge dev into acc
+on:
+  push:
+    branches:
+      - 'dev'
+jobs:
+  merge-branch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@master
+
+      - name: Merge dev -> acc
+        uses: devmasx/merge-branch@master
+        with:
+          type: now
+          target_branch: acc
+          github_token: ${{ github.token }}
