@@ -418,7 +418,7 @@ const InputBar = ({
             onSend(inputValue);
           }
 
-          if (keyboardEvent.altKey || keyboardEvent.metaKey || keyboardEvent.metaKey) {
+          if (keyboardEvent.altKey || keyboardEvent.metaKey) {
             if (keyboardEvent.target) {
               keyboardEvent.preventDefault();
               insertAtCaret(keyboardEvent.target.toString(), '\n');
