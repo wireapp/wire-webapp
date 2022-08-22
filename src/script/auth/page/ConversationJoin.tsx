@@ -134,7 +134,7 @@ const ConversationJoin = ({
     window.location.replace(redirectLocation);
   };
 
-  const handleSubmit = async (entropyData?: [number, number][]) => {
+  const handleSubmit = async (entropyData?: Uint8Array) => {
     try {
       const name = enteredName.trim();
       const registrationData = {
@@ -147,7 +147,7 @@ const ConversationJoin = ({
         {
           shouldInitializeClient: !isPwaEnabled,
         },
-        entropyData && new Uint8Array(entropyData.filter(Boolean).flat()),
+        entropyData,
       );
       const conversationEvent = await doJoinConversationByCode(conversationKey, conversationCode);
       /* When we join a conversation, we create the join event before loading the webapp.

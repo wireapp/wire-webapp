@@ -31,11 +31,10 @@ interface Props extends React.HTMLProps<HTMLDivElement> {}
 
 const SetEntropyPage = ({pushEntropyData}: Props & ConnectedProps & DispatchProps) => {
   const {history} = useReactRouter();
-  // const [entropy, setEntropy] = useState<[number, number][]>([]);
 
-  const onSetEntropy = async (entropyData: [number, number][]): Promise<void> => {
+  const onSetEntropy = async (entropyData: Uint8Array): Promise<void> => {
     try {
-      await pushEntropyData(new Uint8Array(entropyData.filter(Boolean).flat()));
+      await pushEntropyData(entropyData);
       history.push(ROUTE.VERIFY_EMAIL_CODE);
     } catch (error) {
       console.warn(error);

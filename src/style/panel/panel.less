@@ -144,6 +144,12 @@
   &__info-text {
     .subline;
 
+    &:focus-visible {
+      .focus-outline;
+      .focus-offset;
+      .focus-border-radius;
+    }
+
     color: var(--gray-90);
 
     body.theme-dark & {
@@ -161,6 +167,12 @@
     &--head {
       font-weight: @font-weight-bold;
       text-transform: uppercase;
+    }
+  }
+
+  &__item-offset {
+    &:focus-visible {
+      outline-offset: -0.2rem;
     }
   }
 
@@ -397,6 +409,12 @@
     &__title {
       .heading-h3;
 
+      &:focus-visible {
+        .focus-outline;
+        .focus-offset;
+        .focus-border-radius;
+      }
+
       &:first-child {
         flex-grow: 1;
         margin-left: @content-title-bar-height;
@@ -471,6 +489,12 @@ button.panel__action-item {
   .text-medium;
 }
 
+button.panel__action-item:focus-visible {
+  .focus-outline;
+  outline-offset: -0.2rem;
+  .focus-border-radius;
+}
+
 @keyframes headerfadein {
   0% {
     opacity: 0;
@@ -478,4 +502,10 @@ button.panel__action-item {
   100% {
     opacity: 1;
   }
+}
+
+.notification-section {
+  padding: 0 1rem;
+  border: none;
+  margin-top: 1.5rem;
 }

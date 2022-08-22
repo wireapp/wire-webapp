@@ -444,8 +444,13 @@ export class UserRepository {
       try {
         const response = await this.userService.getUsers(chunkOfUserIds);
         return response ? this.userMapper.mapUsersFromJson(response) : [];
-      } catch (error) {
-        if (error.label === BackendErrorLabel.FEDERATION_NOT_AVAILABLE) {
+      } catch (error: any) {
+        if (
+          error.label === BackendErrorLabel.FEDERATION_NOT_AVAILABLE ||
+          error.label === BackendErrorLabel.FEDERATION_BACKEND_NOT_FOUND ||
+          error.label === BackendErrorLabel.FEDERATION_REMOTE_ERROR ||
+          error.label === BackendErrorLabel.FEDERATION_TLS_ERROR
+        ) {
           this.logger.warn('loading federated users failed: trying loading same backend users only');
           const [sameBackendUsers, federatedUsers] = partition(
             chunkOfUserIds,

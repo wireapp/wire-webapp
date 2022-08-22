@@ -23,7 +23,7 @@ body.theme-default {
   // Common Colors
   // ----------------------------------------------------------------------------
   @foreground: @gray-70;
-  @background: #323639;
+  @background: @gray-90;
 
   // -------------------------------------------
   // Framework
@@ -37,6 +37,21 @@ body.theme-default {
   @conversation-list-bg-opacity: fade(#000, 64%);
   @sidebar-box-shadow: #eee;
   @sidebar-box-shadow-lg: rgba(0, 0, 0, 0.12);
+
+  // ----------------------------------------------------------------------------
+  // Calling
+  // ----------------------------------------------------------------------------
+  @group-video-bg: var(--gray-10);
+  @group-video-tile-bg: var(--gray-90);
+  @inactive-call-button-bg: var(--white);
+  @inactive-call-button-border: var(--gray-40);
+  @inactive-call-button-hover-bg: var(--gray-20);
+  @inactive-call-button-hover-border: var(--gray-50);
+  @disabled-call-button-bg: var(--gray-20);
+  @disabled-call-button-border: var(--gray-40);
+  @disabled-call-button-svg: var(--gray-60);
+  @button-group-left-hover: var(--gray-20);
+  @button-group-right-hover: var(--gray-90);
 
   // ----------------------------------------------------------------------------
   // Modal
@@ -76,16 +91,6 @@ body.theme-default {
   @checkbox-alert: @red-500;
 
   // ----------------------------------------------------------------------------
-  // Button
-  // ----------------------------------------------------------------------------
-  @icon-button-primary-enabled-bg: @white;
-  @icon-button-primary-hover-bg: @gray-20;
-  @icon-button-primary-border: @gray-40;
-  @icon-button-primary-disabled-bg: @gray-20;
-  @icon-button-primary-disabled-border: @gray-40;
-  @icon-button-primary-hover-border: @gray-50;
-
-  // ----------------------------------------------------------------------------
   // Message Quote Vertical Bar
   // ----------------------------------------------------------------------------
   @message-quote-bg: #cfcfcf;
@@ -111,7 +116,7 @@ body.theme-dark {
   // Common Colors
   // ----------------------------------------------------------------------------
   @foreground: @gray-60;
-  @background: #feffff;
+  @background: @gray-20;
 
   // ----------------------------------------------------------------------------
   // Framework
@@ -123,6 +128,21 @@ body.theme-dark {
   @border-color: var(--gray-90);
   @app-bg-secondary: var(--black);
   @conversation-list-bg-opacity: fade(#000, 78%);
+
+  // ----------------------------------------------------------------------------
+  // Calling
+  // ----------------------------------------------------------------------------
+  @group-video-bg: var(--gray-100);
+  @group-video-tile-bg: var(--gray-95);
+  @inactive-call-button-bg: var(--gray-90);
+  @inactive-call-button-border: var(--gray-100);
+  @inactive-call-button-hover-bg: var(--gray-80);
+  @inactive-call-button-hover-border: var(--gray-70);
+  @disabled-call-button-bg: var(--gray-95);
+  @disabled-call-button-border: var(--gray-95);
+  @disabled-call-button-svg: var(--gray-70);
+  @button-group-left-hover: var(--gray-100);
+  @button-group-right-hover: var(--gray-30);
 
   // ----------------------------------------------------------------------------
   // Modal
@@ -160,16 +180,6 @@ body.theme-dark {
   @checkbox-border-hover: @blue-dark-500;
   @checkbox-border-disabled: @gray-70;
   @checkbox-alert: @red-dark-500;
-
-  // ----------------------------------------------------------------------------
-  // Button
-  // ----------------------------------------------------------------------------
-  @icon-button-primary-enabled-bg: @gray-90;
-  @icon-button-primary-hover-bg: @gray-80;
-  @icon-button-primary-border: @gray-100;
-  @icon-button-primary-disabled-bg: @gray-95;
-  @icon-button-primary-disabled-border: @gray-90;
-  @icon-button-primary-hover-border: @gray-70;
 
   // ----------------------------------------------------------------------------
   // Message Quote Vertical Bar

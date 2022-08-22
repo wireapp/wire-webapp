@@ -2,4 +2,4 @@
 . "$(dirname "$0")/_/husky.sh"
 
 npx --no-install lint-staged
-yarn betterer precommit --cache
+yarn betterer

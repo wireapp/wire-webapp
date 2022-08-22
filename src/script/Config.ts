@@ -43,7 +43,8 @@ export class Configuration {
   readonly ENVIRONMENT = env.ENVIRONMENT || 'production';
   readonly FEATURE = {
     ...env.FEATURE,
-    ENABLE_EXTRA_CLIENT_ENTROPY: env.FEATURE.ENABLE_EXTRA_CLIENT_ENTROPY && Runtime.isWindows(),
+    ENABLE_EXTRA_CLIENT_ENTROPY:
+      env.FEATURE.ENABLE_EXTRA_CLIENT_ENTROPY && (Runtime.isWindows() || env.FEATURE.FORCE_EXTRA_CLIENT_ENTROPY),
   };
   readonly MAX_GROUP_PARTICIPANTS = env.MAX_GROUP_PARTICIPANTS || 500;
   readonly MAX_VIDEO_PARTICIPANTS = env.MAX_VIDEO_PARTICIPANTS || 4;
@@ -65,6 +66,7 @@ export class Configuration {
       INDEX: 'https://support.wire.com/',
       LEGAL_HOLD_BLOCK: '#',
       MICROPHONE_ACCESS_DENIED: 'https://support.wire.com/hc/articles/202590081',
+      PRIVACY_VERIFY_FINGERPRINT: 'https://support.wire.com/hc/en-us/articles/207692235',
       SCREEN_ACCESS_DENIED: 'https://support.wire.com/hc/articles/202935412',
     },
     TEAMS_BASE: 'https://teams.wire.com',

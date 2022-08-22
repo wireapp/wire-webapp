@@ -1,7 +1,7 @@
 <div
   id="conversation"
   class="conversation"
-  data-bind="drop_file: $root.inputBar.onDropFiles, css: { loading: !$root.messageList.conversationLoaded() }"
+  data-bind="css: { loading: !$root.messageList.conversationLoaded() }"
 >
   <!-- ko if: $root.conversationRepository.conversationState.activeConversation() -->
   <title-bar
@@ -40,11 +40,30 @@
   "
   ></messages-list>
 
-  #include('content/conversation/input-bar.htm')
+  <input-bar
+    params="
+      assetRepository: $root.repositories.asset,
+      conversationEntity: $root.conversationState.activeConversation(),
+      conversationRepository: $root.repositories.conversation,
+      eventRepository: $root.repositories.event,
+      messageRepository: $root.repositories.message,
+      propertiesRepository: $root.repositories.properties,
+      searchRepository: $root.repositories.search,
+      storageRepository: $root.repositories.storage,
+      teamState: $root.teamState,
+      userState: $root.userState,
+    ">
+  </input-bar>
+
 
   <div class="conversation-loading">
     <div class="icon-spinner spin accent-text"></div>
   </div>
   <!-- /ko -->
-  #include('modal/giphy.htm')
+
+  <giphy
+    id="giphy-modal"
+    class="giphy-modal modal modal-large"
+    params="giphyRepository: $root.repositories.giphy"
+  ></giphy>
 </div>

@@ -46,7 +46,7 @@
 }
 
 body {
-  color: var(--background);
+  color: var(--main-color);
   font-family: @font-family-base;
   font-size: @font-size-sm;
   font-weight: 300;
@@ -67,6 +67,8 @@ body {
 
   &:focus-visible {
     outline: 1px solid #9bc2e9;
+    .focus-outline;
+    .focus-border-radius;
   }
 }
 

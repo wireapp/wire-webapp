@@ -81,7 +81,11 @@ const ServiceModal: React.FC<ServiceModalProps> = ({
             </div>
 
             <div className="service-modal__footer">
-              <button className="service-modal__button" onClick={onOpenService} data-uie-name="do-service-confirm">
+              <button
+                className="service-modal__button modal__button--primary"
+                onClick={onOpenService}
+                data-uie-name="do-service-confirm"
+              >
                 {t('searchServiceConfirmButton')}
               </button>
             </div>

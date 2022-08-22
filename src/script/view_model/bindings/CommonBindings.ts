@@ -34,109 +34,6 @@ import {Runtime} from '@wireapp/commons';
 type KOEvent<T = Event> = JQuery.Event & {currentTarget: Element; originalEvent: T};
 
 /**
- * Use it on the drop area.
- */
-ko.bindingHandlers.drop_file = {
-  init(element, valueAccessor, _allBindings, _data, context) {
-    const onDragLeave = (_: unknown, event: KOEvent) => event.currentTarget.classList.remove('drag-hover');
-
-    const onDragOver = (_: unknown, event: KOEvent<DragEvent>) => {
-      event.preventDefault();
-      event.originalEvent.dataTransfer.dropEffect = 'copy';
-      event.currentTarget.classList.add('drag-hover');
-    };
-
-    const onDrop = (_: unknown, event: KOEvent<DragEvent> | DragEvent) => {
-      event.preventDefault();
-      (event.currentTarget as Element).classList.remove('drag-hover');
-
-      const {originalEvent} = event as KOEvent<DragEvent>;
-      const {dataTransfer} = event as DragEvent;
-      const eventDataTransfer = dataTransfer || originalEvent?.dataTransfer || {};
-      const files = (eventDataTransfer as DataTransfer).files || new FileList();
-
-      if (files.length > 0) {
-        valueAccessor()(files);
-      }
-    };
-
-    ko.applyBindingsToNode(
-      element,
-      {
-        event: {
-          dragleave: onDragLeave,
-          dragover: onDragOver,
-          drop: onDrop,
-        },
-      },
-      context,
-    );
-  },
-};
-
-/**
- * Capture pasted files.
- */
-ko.bindingHandlers.paste_file = {
-  init(_element, valueAccessor, _allBindings, _data, context) {
-    const onPaste = (_: unknown, event: KOEvent<ClipboardEvent>) => {
-      const clipboardData = event.originalEvent.clipboardData;
-      const items: (DataTransferItem | File)[] = [].slice.call(clipboardData.items || clipboardData.files);
-
-      // MS Word for Mac not only puts the copied text into the clipboard
-      // but also a rendered PNG representation of that text.
-      // This breaks our naïve file paste detection. So we identify a paste
-      // from Word and ignore that there is a file in there.
-      const msWordTypes = ['text/plain', 'text/html', 'text/rtf', 'image/png'];
-      const isMsWordPaste = msWordTypes.every((type, index) => items[index] && items[index].type === type);
-      if (isMsWordPaste) {
-        return true;
-      }
-
-      const files = items
-        .filter(item => (item as DataTransferItem).kind === 'file')
-        .map(item => new Blob([(item as DataTransferItem).getAsFile()], {type: item.type}))
-        .filter(item => item && item.size !== 4); // Pasted files result in 4 byte blob (OSX)
-
-      if (files.length > 0) {
-        valueAccessor()(files);
-        return false;
-      }
-      return true;
-    };
-
-    ko.applyBindingsToNode(
-      window.document,
-      {
-        event: {
-          paste: onPaste,
-        },
-      },
-      context,
-    );
-  },
-};
-
-/**
- * Blocks the default behavior when dropping a file on the element.
- * @note If a child element is listening to drag events, than this will be triggered after
- */
-ko.bindingHandlers.ignore_drop_file = {
-  init(element, _valueAccessor, _allBindings, _data, context) {
-    ko.applyBindingsToNode(
-      element,
-      {
-        event: {
-          dragover: (_: unknown, event: KOEvent<DragEvent>) => event.preventDefault(),
-          drop: (_: unknown, event: KOEvent<DragEvent>) => event.preventDefault(),
-        },
-      },
-      context,
-    );
-  },
-};
-
-/**
  * Indicate that the current binding loop should not try to bind this element's children.
  * @see http://www.knockmeout.net/2012/05/quick-tip-skip-binding.html
  */
@@ -186,58 +83,6 @@ ko.bindingHandlers.resize = {
       },
       context,
     );
-  },
-};
-
-ko.bindingHandlers.heightSync = {
-  init(element, valueAccessor) {
-    const params = ko.unwrap(valueAccessor()) || {};
-
-    const targetElement = document.querySelector(params.target);
-    const triggerValue = params.trigger;
-
-    const resizeTarget = () => {
-      const sourceHeight = element.offsetHeight;
-      const targetHeight = targetElement.offsetHeight;
-      if (sourceHeight !== targetHeight) {
-        targetElement.style.height = `${element.scrollHeight}px`;
-      }
-
-      const isScrolling = targetElement.scrollHeight > targetElement.offsetHeight;
-      element.style.overflowY = isScrolling ? 'scroll' : 'auto';
-      element.style.maxHeight = isScrolling ? `${targetElement.offsetHeight}px` : '';
-    };
-
-    // initial resize
-    resizeTarget();
-    const heightSync = () => window.requestAnimationFrame(resizeTarget);
-    const valueSubscription = triggerValue.subscribe(heightSync);
-    window.addEventListener('resize', heightSync);
-
-    ko.utils.domNodeDisposal.addDisposeCallback(element, () => {
-      window.removeEventListener('resize', heightSync);
-      valueSubscription.dispose();
-    });
-  },
-};
-
-/**
- * Syncs scrolling to another element.
- */
-ko.bindingHandlers.scrollSync = {
-  init(element, valueAccessor) {
-    const selector = valueAccessor();
-    const anchorElement = document.querySelector(selector);
-    const syncScroll = () => (element.scrollTop = anchorElement.scrollTop);
-    if (anchorElement) {
-      anchorElement.addEventListener('scroll', syncScroll);
-      window.addEventListener('resize', syncScroll);
-
-      ko.utils.domNodeDisposal.addDisposeCallback(element, () => {
-        anchorElement.removeEventListener('scroll', syncScroll);
-        window.removeEventListener('resize', syncScroll);
-      });
-    }
   },
 };
 
@@ -312,32 +157,6 @@ ko.bindingHandlers.loadImage = {
     const image = new Image();
     image.onload = () => (element.style.backgroundImage = `url(${image_src})`);
     image.src = image_src;
-  },
-};
-
-/**
- * Load image when hovering over element.
- */
-ko.bindingHandlers.load_image_on_hover = {
-  init(element) {
-    const hoverable_item = $(element);
-    const static_image = hoverable_item.data('src');
-    const animated_gif = hoverable_item.data('hover');
-
-    if (animated_gif) {
-      let image: HTMLImageElement = undefined;
-      hoverable_item
-        .on('mouseover', function () {
-          const item = $(this);
-          image = new Image();
-          image.onload = () => item.css({backgroundImage: `url(${animated_gif})`});
-          image.src = animated_gif;
-        })
-        .on('mouseout', function () {
-          image.onload = undefined;
-          $(this).css({backgroundImage: `url(${static_image})`});
-        });
-    }
   },
 };
 
@@ -607,8 +426,8 @@ ko.bindingHandlers.in_viewport = {
         inViewport = isInViewport;
         triggerCallbackIfVisible();
       },
-      true,
       container,
+      true,
     );
     overlayedObserver.trackElement(element, isVisible => {
       visible = isVisible;

@@ -47,7 +47,7 @@ export class Core extends Account<Uint8Array> {
       },
       mlsConfig: Config.getConfig().FEATURE.ENABLE_MLS
         ? {
-            coreCrypoWasmFilePath: '/assets/core-crypto.wasm',
+            coreCrypoWasmFilePath: '/min/core-crypto.wasm',
             /*
              * When in an electron context, the window.secretsCrypto will be populated by the renderer process.
              * We then give those crypto primitives to the core that will use them when encrypting MLS secrets.

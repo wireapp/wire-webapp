@@ -29,14 +29,11 @@ import {container} from 'tsyringe';
 
 import {Config} from '../Config';
 import {MessageListViewModel} from './content/MessageListViewModel';
-import {EmojiInputViewModel} from './content/EmojiInputViewModel';
 import {ModalsViewModel} from './ModalsViewModel';
 import {ConversationError} from '../error/ConversationError';
 import {ConnectRequestsViewModel} from './content/ConnectRequestsViewModel';
-import {GiphyViewModel} from './content/GiphyViewModel';
 import {HistoryImportViewModel} from './content/HistoryImportViewModel';
 import {HistoryExportViewModel} from './content/HistoryExportViewModel';
-import {InputBarViewModel} from './content/InputBarViewModel';
 import {PanelViewModel} from './PanelViewModel';
 import type {MainViewModel, ViewModelRepositories} from './MainViewModel';
 import type {ConversationRepository} from '../conversation/ConversationRepository';
@@ -58,7 +55,6 @@ import {
 import {modals} from '../view_model/ModalsViewModel';
 import {MessageRepository} from '../conversation/MessageRepository';
 import {LegalHoldModalState} from '../legal-hold/LegalHoldModalState';
-import {LegalHoldModalViewModel} from './content/LegalHoldModalViewModel';
 
 interface ShowConversationOptions {
   exposeMessage?: Message;
@@ -97,12 +93,8 @@ export class ContentViewModel {
   messageRepository: MessageRepository;
   elementId: string;
   sidebarId: string;
-  emojiInput: EmojiInputViewModel;
-  giphy: GiphyViewModel;
   historyExport: HistoryExportViewModel;
   historyImport: HistoryImportViewModel;
-  inputBar: InputBarViewModel;
-  legalHoldModal: LegalHoldModalViewModel;
   logger: Logger;
   readonly isFederated?: boolean;
   mainViewModel: MainViewModel;
@@ -151,24 +143,6 @@ export class ContentViewModel {
 
     // Nested view models
     this.connectRequests = new ConnectRequestsViewModel(mainViewModel);
-    this.emojiInput = new EmojiInputViewModel(repositories.properties);
-    this.giphy = new GiphyViewModel(repositories.giphy);
-    this.inputBar = new InputBarViewModel(
-      this.emojiInput,
-      repositories.asset,
-      repositories.event,
-      repositories.conversation,
-      repositories.search,
-      repositories.storage,
-      repositories.message,
-    );
-    this.legalHoldModal = new LegalHoldModalViewModel(
-      repositories.conversation,
-      repositories.team,
-      repositories.client,
-      repositories.cryptography,
-      repositories.message,
-    );
     this.messageList = new MessageListViewModel(
       mainViewModel,
       repositories.conversation,
@@ -183,14 +157,10 @@ export class ContentViewModel {
 
     this.state.subscribe(state => {
       switch (state) {
-        case ContentViewModel.STATE.CONVERSATION:
-          this.inputBar.addedToView();
-          break;
         case ContentViewModel.STATE.PREFERENCES_ACCOUNT:
           this.popNotification();
           break;
         default:
-          this.inputBar.removedFromView();
       }
     });
 

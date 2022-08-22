@@ -109,7 +109,7 @@ module.exports = {
         {
           context: 'node_modules/@otak/core-crypto/platforms/web/assets',
           from: '*.wasm',
-          to: `${dist}/assets/core-crypto.wasm`,
+          to: `${dist}/min/core-crypto.wasm`,
         },
       ],
     }),
