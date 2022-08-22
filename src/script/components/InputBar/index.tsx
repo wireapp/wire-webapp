@@ -20,6 +20,7 @@
 import {Availability} from '@wireapp/protocol-messaging';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import {
+  ChangeEvent,
   ClipboardEvent as ReactClipboardEvent,
   KeyboardEvent as ReactKeyboardEvent,
   FormEvent,
@@ -82,6 +83,15 @@ import useTextAreaFocus from '../../hooks/useTextAreaFocus';
 const CONFIG = {
   ...Config.getConfig(),
   PING_TIMEOUT: TIME_IN_MILLIS.SECOND * 2,
+};
+
+const showWarningModal = (title: string, message: string): void => {
+  // Timeout needed for display warning modal - we need to update modal
+  setTimeout(() => {
+    amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.ACKNOWLEDGE, {
+      text: {message, title},
+    });
+  }, 0);
 };
 
 interface InputBarProps {
@@ -220,7 +230,10 @@ const InputBar = ({
     const files: File[] = [];
 
     if (!isFileSharingSendingEnabled) {
-      showRestrictedFileSharingModal();
+      showWarningModal(
+        t('conversationModalRestrictedFileSharingHeadline'),
+        t('conversationModalRestrictedFileSharingDescription'),
+      );
 
       return;
     }
@@ -399,14 +412,14 @@ const InputBar = ({
         }
         case KEY.ENTER: {
           if (!keyboardEvent.shiftKey && !keyboardEvent.altKey && !keyboardEvent.metaKey) {
-            onSend();
             keyboardEvent.preventDefault();
+            onSend();
           }
 
           if (keyboardEvent.altKey || keyboardEvent.metaKey) {
             if (keyboardEvent.target) {
-              insertAtCaret(keyboardEvent.target.toString(), '\n');
               keyboardEvent.preventDefault();
+              insertAtCaret(keyboardEvent.target.toString(), '\n');
             }
           }
 
@@ -431,7 +444,7 @@ const InputBar = ({
     }
   };
 
-  const onChange = (event: ReactKeyboardEvent<HTMLTextAreaElement>) => {
+  const onChange = (event: ChangeEvent<HTMLTextAreaElement>) => {
     event.preventDefault();
 
     const {value: currentValue} = event.currentTarget;
@@ -498,24 +511,21 @@ const InputBar = ({
     }
 
     const beforeLength = inputValue.length;
-    const messageTrimmedStart = inputValue.trimLeft();
-    const afterLength = messageTrimmedStart.length;
+    const messageText = inputValue.trim();
+    const afterLength = messageText.length;
+    const isMessageTextTooLong = afterLength > CONFIG.MAXIMUM_MESSAGE_LENGTH;
+
+    if (isMessageTextTooLong) {
+      showWarningModal(
+        t('modalConversationMessageTooLongHeadline'),
+        t('modalConversationMessageTooLongMessage', CONFIG.MAXIMUM_MESSAGE_LENGTH),
+      );
+
+      return;
+    }
 
     const updatedMentions = updateMentionRanges(currentMentions, 0, 0, afterLength - beforeLength);
     setCurrentMentions(updatedMentions);
-
-    const messageText = messageTrimmedStart.trimRight();
-
-    const isMessageTextTooLong = messageText.length > CONFIG.MAXIMUM_MESSAGE_LENGTH;
-
-    if (isMessageTextTooLong) {
-      return amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.ACKNOWLEDGE, {
-        text: {
-          message: t('modalConversationMessageTooLongMessage', CONFIG.MAXIMUM_MESSAGE_LENGTH),
-          title: t('modalConversationMessageTooLongHeadline'),
-        },
-      });
-    }
 
     if (isEditing) {
       sendMessageEdit(messageText);
@@ -540,7 +550,7 @@ const InputBar = ({
             getFileExtensionOrName(file.name),
           );
 
-          return false;
+          return;
         }
       }
     }
@@ -553,21 +563,14 @@ const InputBar = ({
 
         if (isFileTooLarge) {
           const fileSize = formatBytes(uploadLimit);
-          const options = {
-            text: {
-              message: t('modalAssetTooLargeMessage', fileSize),
-              title: t('modalAssetTooLargeHeadline'),
-            },
-          };
+          showWarningModal(t('modalAssetTooLargeHeadline'), t('modalAssetTooLargeMessage', fileSize));
 
-          return amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.ACKNOWLEDGE, options);
+          return;
         }
       }
 
       messageRepository.uploadFiles(conversationEntity, files);
     }
-
-    return false;
   };
 
   const uploadImages = (images: File[]) => {
@@ -579,14 +582,10 @@ const InputBar = ({
           const isGif = image.type === 'image/gif';
           const maxSize = CONFIG.MAXIMUM_IMAGE_FILE_SIZE / 1024 / 1024;
 
-          const modalOptions = {
-            text: {
-              message: t(isGif ? 'modalGifTooLargeMessage' : 'modalPictureTooLargeMessage', maxSize),
-              title: t(isGif ? 'modalGifTooLargeHeadline' : 'modalPictureTooLargeHeadline'),
-            },
-          };
-
-          amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.ACKNOWLEDGE, modalOptions);
+          showWarningModal(
+            t(isGif ? 'modalGifTooLargeHeadline' : 'modalPictureTooLargeHeadline'),
+            t(isGif ? 'modalGifTooLargeMessage' : 'modalPictureTooLargeMessage', maxSize),
+          );
 
           return;
         }
@@ -608,22 +607,16 @@ const InputBar = ({
     }
   };
 
-  const showRestrictedFileSharingModal = (): void => {
-    amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.ACKNOWLEDGE, {
-      text: {
-        message: t('conversationModalRestrictedFileSharingDescription'),
-        title: t('conversationModalRestrictedFileSharingHeadline'),
-      },
-    });
-  };
-
   const onPasteFiles = (event: ClipboardEvent | ReactClipboardEvent): void => {
     if (event?.clipboardData?.types.includes('text/plain')) {
       return;
     }
 
     if (!isFileSharingSendingEnabled) {
-      showRestrictedFileSharingModal();
+      showWarningModal(
+        t('conversationModalRestrictedFileSharingHeadline'),
+        t('conversationModalRestrictedFileSharingDescription'),
+      );
 
       return;
     }
