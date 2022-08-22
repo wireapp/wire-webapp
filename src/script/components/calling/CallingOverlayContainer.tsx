@@ -37,6 +37,7 @@ import {Multitasking} from '../../notification/NotificationRepository';
 import {CallViewTab} from '../../view_model/CallingViewModel';
 import ChooseScreen, {Screen} from './ChooseScreen';
 import FullscreenVideoCall from './FullscreenVideoCall';
+import {LEAVE_CALL_REASON} from '../../calling/enum/LeaveCallReason';
 
 export interface CallingContainerProps {
   readonly callingRepository: CallingRepository;
@@ -97,7 +98,7 @@ const CallingContainer: React.FC<CallingContainerProps> = ({
   };
 
   const leave = (call: Call) => {
-    callingRepository.leaveCall(call.conversationId);
+    callingRepository.leaveCall(call.conversationId, LEAVE_CALL_REASON.MANUAL_LEAVE_BY_UI_CLICK);
     callState.activeCallViewTab(CallViewTab.ALL);
     call.maximizedParticipant(null);
   };
