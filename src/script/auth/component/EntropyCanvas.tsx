@@ -19,89 +19,91 @@
 
 import {CSSObject} from '@emotion/react';
 import {MouseEvent, useRef, useEffect, useState} from 'react';
-import {flushSync} from 'react-dom';
 import {usePausableInterval} from '../../hooks/usePausableInterval';
+import {EntropyData, EntropyFrame} from '../../util/Entropy';
 
 interface CanvasProps {
   css?: CSSObject;
   'data-uie-name'?: string;
-  onProgress: (entropyData: [number, number][], percent: number, pause: boolean) => void;
-  onSetEntropy: (entropyData: [number, number][]) => void;
+  onProgress: (entropyData: EntropyData, percent: number, pause: boolean) => void;
+  /** width of the canvas in px*/
   sizeX: number;
+  /** height of the canvas in px*/
   sizeY: number;
+  /** minimum number of frames (good default: 300) */
+  minFrames: number;
+  /** minimum bits of overall estimated entropy (good default: 1024) */
+  minEntropyBits: number;
 }
 
 const EntropyCanvas = (props: CanvasProps) => {
-  const {sizeX, sizeY, onSetEntropy, onProgress, css, ...rest} = props;
-  const canvasRef = useRef(null);
+  const {sizeX, sizeY, onProgress, css, minEntropyBits, minFrames, ...rest} = props;
+  const canvasRef = useRef<HTMLCanvasElement>(null);
   const [percent, setPercent] = useState(0);
-  const [entropy, setEntropy] = useState<[number, number][]>([]);
-  const frames = entropy.filter(Boolean).length;
+  const [entropy] = useState<EntropyData>(new EntropyData());
+  const [previousPoint, setPreviousPoint] = useState<EntropyFrame | null>(null);
+  const [lastPoint, setLastPoint] = useState<EntropyFrame | null>(null);
 
   const {clearInterval, startInterval, pauseInterval} = usePausableInterval(() => {
-    // This prevents automatic batching of state updates from react 18. https://github.com/reactwg/react-18/discussions/21
-    flushSync(() => {
-      setPercent(percent => percent + 1);
-    });
+    setPercent(Math.floor(100 * Math.min(entropy.entropyBits / minEntropyBits, entropy.length / minFrames)));
     onProgress(entropy, percent, false);
-  }, 300);
+  }, 100);
 
   useEffect(() => {
-    if (frames <= 300 && percent > 95) {
-      setPercent(95);
-      pauseInterval();
-    }
-    if (frames > 300) {
-      startInterval();
-    }
-    if (frames >= 100) {
+    if (percent >= 100) {
       clearInterval();
+      onProgress(entropy, percent, false);
     }
-  }, [percent, percent]);
+  }, [clearInterval, percent]);
 
   const onMouseLeave = () => {
     onProgress(entropy, percent, true);
     pauseInterval();
-
-    setEntropy([...entropy, null]);
+    // add null value to prevent render artifacts when the mouse leaves on one side and enters at a different position
+    setPreviousPoint(lastPoint);
+    setLastPoint(null);
   };
 
-  const draw = (ctx: CanvasRenderingContext2D, entropy: [number, number][]) => {
-    if (entropy.length > 2) {
-      const previousPoint = entropy[entropy.length - 2];
-      const lastPoint = entropy[entropy.length - 1];
-      ctx.beginPath();
-      if (!previousPoint) {
-        ctx.moveTo(...lastPoint);
-      } else {
-        ctx.moveTo(...previousPoint);
-      }
-      ctx.lineJoin = 'round';
-      ctx.lineCap = 'round';
-      ctx.lineWidth = 2;
-      ctx.strokeStyle = 'blue';
-      if (!lastPoint) {
-        ctx.lineTo(...previousPoint);
-      } else {
-        ctx.lineTo(...lastPoint);
-      }
-      ctx.stroke();
+  const draw = (ctx: CanvasRenderingContext2D) => {
+    if (!previousPoint || !lastPoint) {
+      return;
     }
+    ctx.beginPath();
+    ctx.moveTo(previousPoint.x, previousPoint.y);
+    ctx.lineJoin = 'round';
+    ctx.lineCap = 'round';
+    ctx.lineWidth = 2;
+    ctx.strokeStyle = 'blue';
+    ctx.lineTo(lastPoint.x, lastPoint.y);
+    ctx.stroke();
   };
 
   useEffect(() => {
     const canvas = canvasRef.current;
+    if (!canvas) {
+      return;
+    }
     const context = canvas.getContext('2d');
-    draw(context, entropy);
-  }, [entropy]);
+    if (!context) {
+      return;
+    }
+    draw(context);
+  }, [lastPoint]);
 
   const onMouseMove = (event: MouseEvent<HTMLCanvasElement>) => {
     startInterval();
-    const newEntropy: [number, number] = [
-      event.pageX - event.currentTarget?.getBoundingClientRect()?.x,
-      event.pageY - event.currentTarget?.getBoundingClientRect()?.y,
-    ];
-    setEntropy(entropy => [...entropy, newEntropy]);
+    const boundingRect = event.currentTarget?.getBoundingClientRect();
+    const drawPoint: EntropyFrame = {
+      x: event.clientX - boundingRect.x,
+      y: event.clientY - boundingRect.y,
+    };
+    entropy.addFrame({
+      t: Date.now(),
+      x: (255 * drawPoint.x) / boundingRect.width,
+      y: (255 * drawPoint.y) / boundingRect.height,
+    });
+    setPreviousPoint(lastPoint);
+    setLastPoint(drawPoint);
   };
 
   return (
