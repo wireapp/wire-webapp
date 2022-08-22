@@ -449,9 +449,6 @@ exports[`stricter compilation`] = {
       [46, 51, 5, "Property \'label\' does not exist on type \'never\'.", "173467459"],
       [47, 59, 5, "Property \'label\' does not exist on type \'never\'.", "173467459"]
     ],
-    "src/script/auth/util/test/TestUtil.tsx:1653578349": [
-      [39, 86, 7, "Property \'DEFAULT\' does not exist on type \'typeof THEME_ID\'.", "2783041582"]
-    ],
     "src/script/auth/util/urlUtil.ts:2936167840": [
       [61, 2, 17, "Type \'Window | null\' is not assignable to type \'Window\'.\\n  Type \'null\' is not assignable to type \'Window\'.", "211185092"]
     ],
@@ -691,7 +688,7 @@ exports[`stricter compilation`] = {
       [68, 53, 11, "Argument of type \'Error | undefined\' is not assignable to parameter of type \'string | Error | (() => string | Error)\'.\\n  Type \'undefined\' is not assignable to type \'string | Error | (() => string | Error)\'.", "2014657417"],
       [118, 10, 13, "Type \'ContentMessage | undefined\' is not assignable to type \'ContentMessage\'.\\n  Type \'undefined\' is not assignable to type \'ContentMessage\'.", "2555417520"],
       [121, 10, 20, "Type \'(message: ContentMessage, event: MouseEvent<Element, MouseEvent>) => void\' is not assignable to type \'(message: Text | ContentMessage, event: MouseEvent<Element, MouseEvent>) => void\'.\\n  Types of parameters \'message\' and \'message\' are incompatible.\\n    Type \'Text | ContentMessage\' is not assignable to type \'ContentMessage\'.\\n      Type \'Text\' is missing the following properties from type \'ContentMessage\': isLikedProvisional, reactions_user_ets, assets, is_liked, and 75 more.", "2936827179"],
-      [220, 16, 3, "Type \'(node: Element) => void\' is not assignable to type \'LegacyRef<HTMLDivElement> | undefined\'.\\n  Type \'(node: Element) => void\' is not assignable to type \'(instance: HTMLDivElement | null) => void\'.\\n    Types of parameters \'node\' and \'instance\' are incompatible.\\n      Type \'HTMLDivElement | null\' is not assignable to type \'Element\'.\\n        Type \'null\' is not assignable to type \'Element\'.", "193432436"],
+      [220, 16, 3, "Type \'(node: Element) => void\' is not assignable to type \'LegacyRef<HTMLDivElement> | undefined\'.\\n  Type \'(node: Element) => void\' is not assignable to type \'(instance: HTMLDivElement | null) => void\'.", "193432436"],
       [222, 57, 45, "No overload matches this call.\\n  Overload 1 of 6, \'(this: (this: undefined, arg0: Text, arg1: MouseEvent<Element, MouseEvent>) => void, thisArg: undefined, arg0: Text, arg1: MouseEvent<Element, MouseEvent>): () => void\', gave the following error.\\n    Argument of type \'KeyboardEvent<HTMLDivElement>\' is not assignable to parameter of type \'MouseEvent<Element, MouseEvent>\'.\\n      Type \'KeyboardEvent<HTMLDivElement>\' is missing the following properties from type \'MouseEvent<Element, MouseEvent>\': button, buttons, clientX, clientY, and 7 more.\\n  Overload 2 of 6, \'(this: (this: undefined, ...args: Text[]) => void, thisArg: undefined, ...args: Text[]): (...args: Text[]) => void\', gave the following error.\\n    The \'this\' context of type \'(message: Text | ContentMessage, event: MouseEvent<Element, MouseEvent>) => void\' is not assignable to method\'s \'this\' of type \'(this: undefined, ...args: Text[]) => void\'.\\n      Types of parameters \'event\' and \'args\' are incompatible.\\n        Type \'Text\' is missing the following properties from type \'MouseEvent<Element, MouseEvent>\': altKey, button, buttons, clientX, and 28 more.", "3928016927"]
     ],
     "src/script/components/MessagesList/Message/ContentMessage/asset/AbstractAssetTransferStateTracker.ts:1402358935": [
@@ -2046,7 +2043,6 @@ exports[`stricter compilation`] = {
     "src/script/page/LeftSidebar/panels/StartUI/components/GroupList.test.tsx:87150494": [
       [34, 63, 38, "Argument of type \'Element | null\' is not assignable to parameter of type \'Element\'.\\n  Type \'null\' is not assignable to type \'Element\'.", "495210063"]
     ],
-
     "src/script/page/MainContent/MainContent.tsx:2394694771": [
       [109, 28, 12, "Type \'Conversation | null\' is not assignable to type \'Conversation\'.\\n  Type \'null\' is not assignable to type \'Conversation\'.", "1670678216"]
     ],
@@ -2111,7 +2107,7 @@ exports[`stricter compilation`] = {
       [33, 2, 12, "Type \'undefined\' is not assignable to type \'Conversation\'.", "1670678216"]
     ],
     "src/script/page/message-list/MentionSuggestions/MentionSuggestions.tsx:217067853": [
-      [119, 14, 3, "Type \'((node: Element) => void) | undefined\' is not assignable to type \'Ref<HTMLDivElement> | undefined\'.\\n  Type \'(node: Element) => void\' is not assignable to type \'Ref<HTMLDivElement> | undefined\'.\\n    Type \'(node: Element) => void\' is not assignable to type \'(instance: HTMLDivElement | null) => void\'.", "193432436"]
+      [119, 14, 3, "Type \'((node: Element) => void) | undefined\' is not assignable to type \'Ref<HTMLDivElement> | undefined\'.\\n  Type \'(node: Element) => void\' is not assignable to type \'Ref<HTMLDivElement> | undefined\'.\\n    Type \'(node: Element) => void\' is not assignable to type \'(instance: HTMLDivElement | null) => void\'.\\n      Types of parameters \'node\' and \'instance\' are incompatible.\\n        Type \'HTMLDivElement | null\' is not assignable to type \'Element\'.\\n          Type \'null\' is not assignable to type \'Element\'.", "193432436"]
     ],
     "src/script/page/message-list/MessageTimerButton.test.ts:254586997": [
       [33, 46, 29, "Argument of type \'Element | null\' is not assignable to parameter of type \'Element\'.\\n  Type \'null\' is not assignable to type \'Element\'.", "4019893960"],

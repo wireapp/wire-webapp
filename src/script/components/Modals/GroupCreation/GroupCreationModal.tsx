@@ -22,7 +22,7 @@ import {container} from 'tsyringe';
 import cx from 'classnames';
 import {amplify} from 'amplify';
 import {WebAppEvents} from '@wireapp/webapp-events';
-import {Select, StyledApp} from '@wireapp/react-ui-kit';
+import {Select, StyledApp, THEME_ID} from '@wireapp/react-ui-kit';
 import {RECEIPT_MODE} from '@wireapp/api-client/src/conversation/data/ConversationReceiptModeUpdateData';
 import {ConversationProtocol} from '@wireapp/api-client/src/conversation/NewConversation';
 
@@ -54,7 +54,6 @@ import {
 import useEffectRef from 'Util/useEffectRef';
 import {useFadingScrollbar} from '../../../ui/fadingScrollbar';
 import {Config} from '../../../Config';
-import {theme} from '../../../page/MainContent/MainContent';
 import {isProtocolOption, ProtocolOption} from '../../../guards/ProtocolOption';
 
 interface GroupCreationModalProps {
@@ -242,7 +241,7 @@ const GroupCreationModal: React.FC<GroupCreationModalProps> = ({
   const isInputValid = groupNameLength && !nameError.length;
 
   return (
-    <StyledApp theme={theme}>
+    <StyledApp themeId={THEME_ID.DEFAULT}>
       <div id="group-creation-modal" className="group-creation__modal">
         <ModalComponent
           wrapperCSS={{overflow: 'unset', overflowY: 'unset'}}
