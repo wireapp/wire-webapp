@@ -286,7 +286,7 @@ const useEmoji = (
       return;
     }
 
-    const input = keyboardEvent.target;
+    const input = keyboardEvent.currentTarget;
     const {selectionStart: selection, value: text} = input;
 
     if (text) {
