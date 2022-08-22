@@ -34,8 +34,6 @@ import {useResizeObserver} from '../../ui/resizeObserver';
 import useEffectRef from 'Util/useEffectRef';
 import {isMemberMessage} from '../../guards/Message';
 
-let uniq = 0;
-
 type FocusedElement = {center?: boolean; element: Element};
 interface MessagesListParams {
   cancelConnectionRequest: (message: MemberMessage) => void;
@@ -217,7 +215,7 @@ const MessagesList: React.FC<MessagesListParams> = ({
     const isLastDeliveredMessage = lastDeliveredMessage?.id === message.id;
 
     const visibleCallback = getVisibleCallback(conversation, message);
-    const key = `${message.id || 'message'}-${message.timestamp()}-${uniq++}`;
+    const key = `${message.id || 'message'}-${message.timestamp()}`;
     return (
       <Message
         key={key}
