@@ -100,6 +100,7 @@ export class MessageListViewModel {
         }
       });
 
+    // done.
     this.showInvitePeople = ko.pureComputed(() => {
       return (
         this.conversation().isActiveParticipant() &&
@@ -109,6 +110,7 @@ export class MessageListViewModel {
     });
   }
 
+  // done.
   readonly releaseConversation = (conversation_et: Conversation): void => {
     if (conversation_et) {
       conversation_et.release();
@@ -135,10 +137,12 @@ export class MessageListViewModel {
     });
   };
 
+  // done.
   private readonly isLastReceivedMessage = (messageEntity: Message, conversationEntity: Conversation): boolean => {
     return messageEntity.timestamp() && messageEntity.timestamp() >= conversationEntity.last_event_timestamp();
   };
 
+  // done.
   loadPrecedingMessages = async (): Promise<void> => {
     const shouldPullMessages = !this.conversation().is_pending() && this.conversation().hasAdditionalMessages();
     if (shouldPullMessages) {
@@ -146,6 +150,7 @@ export class MessageListViewModel {
     }
   };
 
+  // done.
   readonly loadFollowingMessages = () => {
     const lastMessage = this.conversation().getLastMessage();
 
@@ -157,6 +162,7 @@ export class MessageListViewModel {
     }
   };
 
+  // done.
   readonly showUserDetails = (userEntity: User): void => {
     userEntity = ko.unwrap(userEntity);
     const conversationEntity = this.conversationState.activeConversation();
@@ -176,6 +182,7 @@ export class MessageListViewModel {
     this.mainViewModel.panel.togglePanel(panelId, params);
   };
 
+  // done.
   onSessionResetClick = async (messageEntity: DecryptErrorMessage): Promise<void> => {
     const resetProgress = () =>
       window.setTimeout(() => {
@@ -197,6 +204,7 @@ export class MessageListViewModel {
     }
   };
 
+  // done.
   showDetail = async (messageEntity: Message, event: MouseEvent): Promise<void> => {
     if (messageEntity.isExpired() || $(event.currentTarget).hasClass('image-asset--no-image')) {
       return;
@@ -214,24 +222,24 @@ export class MessageListViewModel {
     amplify.publish(WebAppEvents.CONVERSATION.DETAIL_VIEW.SHOW, imageMessageEntity || messageEntity, messageEntities);
   };
 
+  // done, not used.
   readonly isLastDeliveredMessage = (messageEntity: Message): boolean => {
     return this.conversation().getLastDeliveredMessage() === messageEntity;
   };
 
+  // done.
   readonly clickOnCancelRequest = (messageEntity: MemberMessage): void => {
     const conversationEntity = this.conversationState.activeConversation();
     const nextConversationEntity = this.conversationRepository.getNextConversation(conversationEntity);
     this.actionsViewModel.cancelConnectionRequest(messageEntity.otherUser(), true, nextConversationEntity);
   };
 
+  // done, not used/
   readonly clickOnLike = (messageEntity: ContentMessage): void => {
     this.messageRepository.toggleLike(this.conversation(), messageEntity);
   };
 
-  readonly clickOnInvitePeople = (conversation: Conversation): void => {
-    this.mainViewModel.panel.togglePanel(PanelViewModel.STATE.GUEST_OPTIONS, {entity: conversation});
-  };
-
+  // done.
   readonly getInViewportCallback = (
     conversationEntity: Conversation,
     messageEntity: MemberMessage | ContentMessage,
@@ -302,6 +310,7 @@ export class MessageListViewModel {
     };
   };
 
+  // done.
   readonly updateConversationLastRead = (conversationEntity: Conversation, messageEntity: Message): void => {
     const conversationLastRead = conversationEntity.last_read_timestamp();
     const lastKnownTimestamp = conversationEntity.getLastKnownTimestamp(this.serverTimeHandler.toServerTimestamp());
@@ -312,6 +321,7 @@ export class MessageListViewModel {
     }
   };
 
+  // done.
   readonly handleClickOnMessage = (messageEntity: ContentMessage | Text, event: MouseEvent): boolean => {
     if (event.button === 2) {
       // Default browser behavior on right click
@@ -368,6 +378,7 @@ export class MessageListViewModel {
     return true;
   };
 
+  // done.
   readonly showParticipants = (participants: User[]): void => {
     this.mainViewModel.panel.togglePanel(PanelViewModel.STATE.CONVERSATION_PARTICIPANTS, {
       entity: this.conversation(),
@@ -375,6 +386,7 @@ export class MessageListViewModel {
     });
   };
 
+  // done.
   readonly showMessageDetails = (message: Message, showLikes: boolean): void => {
     if (!this.conversation().is1to1()) {
       this.mainViewModel.panel.togglePanel(PanelViewModel.STATE.MESSAGE_DETAILS, {

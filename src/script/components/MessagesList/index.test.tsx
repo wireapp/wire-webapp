@@ -29,6 +29,7 @@ import {User} from 'src/script/entity/User';
 
 const getDefaultParams = (): React.ComponentProps<typeof MessagesList> => {
   const conversation = new Conversation(createRandomUuid());
+
   return {
     cancelConnectionRequest: jest.fn(),
     conversation,
@@ -36,16 +37,22 @@ const getDefaultParams = (): React.ComponentProps<typeof MessagesList> => {
       expectReadReceipt: jest.fn(() => false),
       getMessagesWithOffset: jest.fn(),
       getPrecedingMessages: jest.fn(),
+      getSubsequentMessages: jest.fn(),
       updateParticipatingUserEntities: jest.fn(),
     },
     getVisibleCallback: jest.fn(),
     initialMessage: undefined,
     invitePeople: jest.fn(),
+    isLastReceivedMessage: jest.fn(),
     messageActions: {
       deleteMessage: jest.fn(),
       deleteMessageEveryone: jest.fn(),
     },
-    messageRepository: undefined,
+    messageRepository: {
+      getMessageInConversationById: jest.fn(),
+      sendButtonAction: jest.fn(),
+      toggleLike: jest.fn(),
+    },
     onClickMessage: jest.fn(),
     onLoading: jest.fn(),
     resetSession: jest.fn(),

@@ -26,7 +26,16 @@
         <!-- /ko -->
         <!-- ko if: state() === State.CONVERSATION -->
           <h1 class="visually-hidden" data-bind="text: t('accessibility.headings.conversation')"></h1>
-          #include('content/conversation.htm')
+
+          <conversation params="
+            root: $root,
+            emojiInput: $root.emojiInput,
+            mainViewModel: $root.mainViewModel,
+            repositories: $root.repositories,
+            teamState: $root.teamState,
+            userState: $root.userState,
+            userRepository: $root.userRepository,
+          "></conversation>
         <!-- /ko -->
         <!-- ko if: state() === State.HISTORY_EXPORT -->
           <h1 class="visually-hidden" data-bind="text: t('accessibility.headings.historyExport')"></h1>

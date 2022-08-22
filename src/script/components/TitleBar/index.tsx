@@ -50,7 +50,7 @@ export interface TitleBarProps {
   callActions: CallActions;
   panelViewModel: PanelViewModel;
   userState: UserState;
-  callState: CallState;
+  callState?: CallState;
   teamState: TeamState;
 }
 

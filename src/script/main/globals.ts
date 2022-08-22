@@ -32,6 +32,7 @@ import 'Components/Image';
 import 'Components/toggle/InfoToggle';
 import 'Components/calling/FullscreenVideoCall';
 import 'Components/avatar/GroupAvatar';
+import 'Components/Conversation';
 import 'Components/TitleBar';
 import 'Components/MessagesList';
 import 'Components/InputBar';

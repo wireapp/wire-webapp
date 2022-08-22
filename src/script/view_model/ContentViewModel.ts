@@ -28,7 +28,6 @@ import {amplify} from 'amplify';
 import {container} from 'tsyringe';
 
 import {Config} from '../Config';
-import {MessageListViewModel} from './content/MessageListViewModel';
 import {LegalHoldModalViewModel} from './content/LegalHoldModalViewModel';
 import {ModalsViewModel} from './ModalsViewModel';
 import {ConversationError} from '../error/ConversationError';
@@ -97,7 +96,6 @@ export class ContentViewModel {
   logger: Logger;
   readonly isFederated?: boolean;
   mainViewModel: MainViewModel;
-  messageList: MessageListViewModel;
   previousConversation: Conversation | null = null;
   previousState: string | null = null;
   state: ko.Observable<ContentState>;
@@ -146,14 +144,6 @@ export class ContentViewModel {
       repositories.team,
       repositories.client,
       repositories.cryptography,
-      repositories.message,
-    );
-    this.messageList = new MessageListViewModel(
-      mainViewModel,
-      repositories.conversation,
-      repositories.integration,
-      repositories.serverTime,
-      repositories.user,
       repositories.message,
     );
 
@@ -279,7 +269,7 @@ export class ContentViewModel {
         await this.conversationRepository.unarchiveConversation(conversationEntity);
       }
 
-      await this.messageList.changeConversation(conversationEntity, messageEntity);
+      // await this.messageList.changeConversation(conversationEntity, messageEntity);
 
       this.showContent(ContentViewModel.STATE.CONVERSATION);
       this.previousConversation = this.conversationState.activeConversation();
@@ -382,7 +372,7 @@ export class ContentViewModel {
         this.conversationState.activeConversation(null);
       }
 
-      return this.messageList.releaseConversation(undefined);
+      // return this.messageList.releaseConversation(undefined);
     }
   };
 

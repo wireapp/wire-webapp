@@ -65,7 +65,7 @@ export interface MessageParams extends MessageActions {
     deleteMessage: (conversation: Conversation, message: BaseMessage) => void;
     deleteMessageEveryone: (conversation: Conversation, message: BaseMessage) => void;
   };
-  messageRepository: MessageRepository;
+  messageRepository: Pick<MessageRepository, 'getMessageInConversationById' | 'sendButtonAction' | 'toggleLike'>;
   onVisible?: () => void;
   previousMessage?: BaseMessage;
   selfId: QualifiedId;

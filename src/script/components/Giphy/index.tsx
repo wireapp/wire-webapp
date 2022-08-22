@@ -173,108 +173,110 @@ const Giphy: FC<GiphyProps> = ({giphyRepository, defaultGiphyState = GiphyState.
   }, []);
 
   return (
-    <div role="dialog" aria-labelledby="giphy-name">
-      <div className="modal-content">
-        <div className="giphy-modal-header modal-header">
-          {isSingleGif && (
+    <div id="giphy-modal" className="giphy-modal modal modal-large">
+      <div role="dialog" aria-labelledby="giphy-name">
+        <div className="modal-content">
+          <div className="giphy-modal-header modal-header">
+            {isSingleGif && (
+              <button
+                className="button-icon icon-grid"
+                onClick={onGridClick}
+                aria-label={t('accessibility.giphyModal.showGifs')}
+                data-uie-name="do-open-giphs"
+              />
+            )}
+
+            {(isMultipleGifs || noSearchResults) && (
+              <button
+                className="button-icon icon-back"
+                onClick={onBackClick}
+                data-uie-name="do-close"
+                aria-label={t('accessibility.giphyModal.showSingleGif')}
+              />
+            )}
+
+            {!(isSingleGif || isMultipleGifs || noSearchResults) && <span className="giphy-modal-header-button" />}
+
+            <span id="giphy-name" className="label-xs" data-uie-name="giphy-query">
+              {currentQuery}
+            </span>
+
             <button
-              className="button-icon icon-grid"
-              onClick={onGridClick}
-              aria-label={t('accessibility.giphyModal.showGifs')}
-              data-uie-name="do-open-giphs"
-            />
-          )}
+              type="button"
+              className="icon-button"
+              aria-label={t('accessibility.giphyModal.close')}
+              onClick={onCloseClick}
+              data-uie-name="do-close-giphy-modal"
+            >
+              <Icon.Close />
+            </button>
+          </div>
 
-          {(isMultipleGifs || noSearchResults) && (
-            <button
-              className="button-icon icon-back"
-              onClick={onBackClick}
-              data-uie-name="do-close"
-              aria-label={t('accessibility.giphyModal.showSingleGif')}
-            />
-          )}
-
-          {!(isSingleGif || isMultipleGifs || noSearchResults) && <span className="giphy-modal-header-button" />}
-
-          <span id="giphy-name" className="label-xs" data-uie-name="giphy-query">
-            {currentQuery}
-          </span>
-
-          <button
-            type="button"
-            className="icon-button"
-            aria-label={t('accessibility.giphyModal.close')}
-            onClick={onCloseClick}
-            data-uie-name="do-close-giphy-modal"
-          >
-            <Icon.Close />
-          </button>
-        </div>
-
-        <div className="giphy-modal-center modal-center">
-          {isLoading && (
-            <div className="gif-container-spinner">
-              <div className="icon-spinner spin" aria-live="polite" aria-busy={isLoading} aria-label={loadingTxt} />
-            </div>
-          )}
-
-          {isSingleGif && currentGif && (
-            <div className="gif-container">
-              <div className="button-reset-default gif-container-item">
-                <GifImage src={currentGif.animated} />
+          <div className="giphy-modal-center modal-center">
+            {isLoading && (
+              <div className="gif-container-spinner">
+                <div className="icon-spinner spin" aria-live="polite" aria-busy={isLoading} aria-label={loadingTxt} />
               </div>
-            </div>
-          )}
+            )}
 
-          {isMultipleGifs && (
-            <div className="gif-container gif-container-grid">
-              {gifs.map(gif => (
-                <button
-                  key={gif.url}
-                  className={cx('button-reset-default gif-container-item', {
-                    'gif-container-item-unselected': gif.url !== selectedGif?.url,
-                  })}
-                  onClick={() => onSelectGif(gif)}
-                  aria-label={t('accessibility.giphyModal.selectGif')}
-                >
-                  <GifImage src={gif.static} animatedSrc={gif.animated} objectFit="cover" title={gif.title} />
-                </button>
-              ))}
-            </div>
-          )}
+            {isSingleGif && currentGif && (
+              <div className="gif-container">
+                <div className="button-reset-default gif-container-item">
+                  <GifImage src={currentGif.animated} />
+                </div>
+              </div>
+            )}
 
-          {isErrorState && (
-            <div className="gif-container-error">
-              <span className="gif-container-error-message" data-uie-name="giphy-error-message">
-                {t('extensionsGiphyNoGifs')}
-              </span>
-            </div>
-          )}
+            {isMultipleGifs && (
+              <div className="gif-container gif-container-grid">
+                {gifs.map(gif => (
+                  <button
+                    key={gif.url}
+                    className={cx('button-reset-default gif-container-item', {
+                      'gif-container-item-unselected': gif.url !== selectedGif?.url,
+                    })}
+                    onClick={() => onSelectGif(gif)}
+                    aria-label={t('accessibility.giphyModal.selectGif')}
+                  >
+                    <GifImage src={gif.static} animatedSrc={gif.animated} objectFit="cover" title={gif.title} />
+                  </button>
+                ))}
+              </div>
+            )}
+
+            {isErrorState && (
+              <div className="gif-container-error">
+                <span className="gif-container-error-message" data-uie-name="giphy-error-message">
+                  {t('extensionsGiphyNoGifs')}
+                </span>
+              </div>
+            )}
+          </div>
+
+          <footer className="giphy-modal-footer modal-footer">
+            <button
+              type="button"
+              className={cx('button button-inverted', {'button-disabled': !hasGifs})}
+              aria-disabled={!hasGifs}
+              onClick={getRandomGif}
+              data-uie-name="do-try-another"
+              aria-label={t('accessibility.giphyModal.tryAnother')}
+            >
+              {t('extensionsGiphyButtonMore')}
+            </button>
+
+            <button
+              type="button"
+              className={cx('button', {'button-disabled': !selectedGif})}
+              aria-disabled={!selectedGif}
+              onClick={onSend}
+              data-uie-name="do-send-gif"
+              aria-label={t('accessibility.giphyModal.sendGif')}
+            >
+              {t('extensionsGiphyButtonOk')}
+            </button>
+          </footer>
         </div>
-
-        <footer className="giphy-modal-footer modal-footer">
-          <button
-            type="button"
-            className={cx('button button-inverted', {'button-disabled': !hasGifs})}
-            aria-disabled={!hasGifs}
-            onClick={getRandomGif}
-            data-uie-name="do-try-another"
-            aria-label={t('accessibility.giphyModal.tryAnother')}
-          >
-            {t('extensionsGiphyButtonMore')}
-          </button>
-
-          <button
-            type="button"
-            className={cx('button', {'button-disabled': !selectedGif})}
-            aria-disabled={!selectedGif}
-            onClick={onSend}
-            data-uie-name="do-send-gif"
-            aria-label={t('accessibility.giphyModal.sendGif')}
-          >
-            {t('extensionsGiphyButtonOk')}
-          </button>
-        </footer>
       </div>
     </div>
   );
