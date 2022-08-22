@@ -82,6 +82,7 @@ export type EmojiListItem = {
 const useEmoji = (
   propertiesRepository: PropertiesRepository,
   updateText: (text: string) => void,
+  onSend: (text: string) => void,
   textareaElement?: HTMLTextAreaElement | null,
 ) => {
   const emojiWrapperRef = useRef<HTMLDivElement>(null);
@@ -112,13 +113,16 @@ const useEmoji = (
     setMappedEmojiList([]);
   };
 
-  const enterEmoji = (input: HTMLInputElement | HTMLTextAreaElement, emojiIcon: string) => {
+  const enterEmoji = (
+    input: HTMLInputElement | HTMLTextAreaElement,
+    emojiIcon: string,
+    inlineEmojiStartPosition = emojiStartPosition,
+  ) => {
     const {selectionStart: selection, value: text} = input;
 
     if (selection) {
-      const textBeforeEmoji = text.substring(0, emojiStartPosition - 1);
+      const textBeforeEmoji = text.substring(0, inlineEmojiStartPosition - 1);
       const textAfterEmoji = text.slice(selection);
-
       const updatedText = `${textBeforeEmoji}${emojiIcon}${textAfterEmoji}`;
       const newCursorPosition = updatedText.length;
 
@@ -149,8 +153,7 @@ const useEmoji = (
           const validInlineEmojiRegEx = new RegExp(`(^|\\s)${escapeRegexp(replacement.shortcut)}$`);
 
           if (validInlineEmojiRegEx.test(textUntilCursor)) {
-            setEmojiStartPosition(selection - replacement.shortcut.length + 1);
-            enterEmoji(input, icon);
+            enterEmoji(input, icon, selection - replacement.shortcut.length + 1);
 
             return true;
           }
@@ -176,19 +179,15 @@ const useEmoji = (
     storeValue(StorageKey.CONVERSATION.EMOJI_USAGE_COUNT, emojiUsageCount);
   };
 
-  const enterEmojiPopupLine = (input: HTMLInputElement | HTMLTextAreaElement): void => {
-    const selectedEmoji = mappedEmojiList.find((emoji, index) => index === selectedEmojiIndex);
+  const enterEmojiPopupLine = (input: HTMLInputElement | HTMLTextAreaElement, selectedEmoji: EmojiListItem): void => {
+    const emojiIcon = selectedEmoji.icon;
+    const emojiName = selectedEmoji.name.toLowerCase();
 
-    if (selectedEmoji) {
-      const emojiIcon = selectedEmoji.icon;
-      const emojiName = selectedEmoji.name.toLowerCase();
-
-      enterEmoji(input, emojiIcon);
-      increaseUsageCount(emojiName); // only emojis selected from the list should affect the count
-    }
+    enterEmoji(input, emojiIcon);
+    increaseUsageCount(emojiName); // only emojis selected from the list should affect the count
   };
 
-  const replaceAllInlineEmoji = (input: HTMLInputElement | HTMLTextAreaElement) => {
+  const replaceAllInlineEmoji = (input: HTMLInputElement | HTMLTextAreaElement, shiftKeyPressed = false) => {
     if (!shouldReplaceEmoji) {
       return;
     }
@@ -209,12 +208,13 @@ const useEmoji = (
         }
       }
 
-      updateText(`${textBeforeCursor}${textAfterCursor}`);
+      const updatedText = `${textBeforeCursor}${textAfterCursor}`;
 
-      setTimeout(() => {
-        textareaElement?.setSelectionRange(textBeforeCursor.length + 1, textBeforeCursor.length + 1);
-        textareaElement?.focus();
-      }, 0);
+      if (shiftKeyPressed) {
+        updateText(updatedText);
+      } else {
+        onSend(updatedText);
+      }
     }
   };
 
@@ -286,7 +286,7 @@ const useEmoji = (
       return;
     }
 
-    const input = keyboardEvent.target;
+    const input = keyboardEvent.currentTarget;
     const {selectionStart: selection, value: text} = input;
 
     if (text) {
@@ -354,7 +354,13 @@ const useEmoji = (
           }
 
           keyboardEvent.preventDefault();
-          enterEmojiPopupLine(input);
+
+          const emoji = mappedEmojiList.find((emoji, index) => index === selectedEmojiIndex);
+
+          if (emoji) {
+            enterEmojiPopupLine(input, emoji);
+          }
+
           return true;
         }
 
@@ -363,9 +369,17 @@ const useEmoji = (
       }
     }
 
-    // Handling inline emoji in the whole text
     if (isEnterKey(keyboardEvent)) {
+      if (keyboardEvent.shiftKey) {
+        replaceAllInlineEmoji(input, keyboardEvent.shiftKey);
+
+        return false;
+      }
+
+      keyboardEvent.preventDefault();
       replaceAllInlineEmoji(input);
+
+      return true;
     }
 
     return false;
@@ -383,7 +397,7 @@ const useEmoji = (
               onMouseEnter={() => setSelectedEmojiIndex(index)}
               onClick={() => {
                 if (textareaElement) {
-                  enterEmojiPopupLine(textareaElement);
+                  enterEmojiPopupLine(textareaElement, emoji);
                 }
               }}
             />
