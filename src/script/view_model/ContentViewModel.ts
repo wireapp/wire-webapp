@@ -32,7 +32,6 @@ import {MessageListViewModel} from './content/MessageListViewModel';
 import {LegalHoldModalViewModel} from './content/LegalHoldModalViewModel';
 import {ModalsViewModel} from './ModalsViewModel';
 import {ConversationError} from '../error/ConversationError';
-import {ConnectRequestsViewModel} from './content/ConnectRequestsViewModel';
 import {HistoryExportViewModel} from './content/HistoryExportViewModel';
 import {PanelViewModel} from './PanelViewModel';
 import type {MainViewModel, ViewModelRepositories} from './MainViewModel';
@@ -87,7 +86,6 @@ export class ContentViewModel {
   private readonly teamState: TeamState;
   private readonly conversationState: ConversationState;
 
-  connectRequests: ConnectRequestsViewModel;
   conversationRepository: ConversationRepository;
   messageRepository: MessageRepository;
   elementId: string;
@@ -141,7 +139,6 @@ export class ContentViewModel {
     this.state = ko.observable(ContentViewModel.STATE.WATERMARK);
 
     // Nested view models
-    this.connectRequests = new ConnectRequestsViewModel(mainViewModel);
     this.legalHoldModal = new LegalHoldModalViewModel(
       repositories.conversation,
       repositories.team,

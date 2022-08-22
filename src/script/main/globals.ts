@@ -24,6 +24,7 @@ import ko from 'knockout';
 import '../Config';
 
 import 'Components/CopyToClipboard';
+import 'Components/ConnectRequests';
 import 'Components/HistoryImport';
 import 'Components/UserSearchableList';
 import 'Components/toggle/BaseToggle';
