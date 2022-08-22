@@ -22,6 +22,7 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 import {
   ClipboardEvent as ReactClipboardEvent,
   KeyboardEvent as ReactKeyboardEvent,
+  ChangeEvent,
   FormEvent,
   useEffect,
   useMemo,
@@ -446,7 +447,7 @@ const InputBar = ({
     }
   };
 
-  const onChange = (event: ReactKeyboardEvent<HTMLTextAreaElement>) => {
+  const onChange = (event: ChangeEvent<HTMLTextAreaElement>) => {
     event.preventDefault();
 
     const {value: currentValue} = event.currentTarget;
