@@ -20,6 +20,7 @@
 import {Availability} from '@wireapp/protocol-messaging';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import {
+  ChangeEvent,
   ClipboardEvent as ReactClipboardEvent,
   KeyboardEvent as ReactKeyboardEvent,
   FormEvent,
@@ -443,7 +444,7 @@ const InputBar = ({
     }
   };
 
-  const onChange = (event: ReactKeyboardEvent<HTMLTextAreaElement>) => {
+  const onChange = (event: ChangeEvent<HTMLTextAreaElement>) => {
     event.preventDefault();
 
     const {value: currentValue} = event.currentTarget;

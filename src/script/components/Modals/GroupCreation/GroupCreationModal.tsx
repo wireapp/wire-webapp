@@ -54,7 +54,7 @@ import {
 import useEffectRef from 'Util/useEffectRef';
 import {useFadingScrollbar} from '../../../ui/fadingScrollbar';
 import {Config} from '../../../Config';
-import {isProtocolOption, ProtocolOption} from '../../../guards/ProtocolOption';
+import {isProtocolOption, ProtocolOption} from '../../../guards/Protocol';
 
 interface GroupCreationModalProps {
   conversationRepository: ConversationRepository;
@@ -201,6 +201,8 @@ const GroupCreationModal: React.FC<GroupCreationModalProps> = ({
   };
 
   const groupNameLength = groupName.length;
+
+  const hasNameError = nameError.length > 0;
 
   const clickOnNext = (): void => {
     const nameTooLong = groupNameLength > maxNameLength;
@@ -361,7 +363,7 @@ const GroupCreationModal: React.FC<GroupCreationModalProps> = ({
                     handleEnterDown(event, clickOnNext);
                   }}
                   value={groupName}
-                  isError={nameError.length > 0}
+                  isError={hasNameError}
                   errorMessage={nameError}
                 />
               </div>
@@ -369,7 +371,7 @@ const GroupCreationModal: React.FC<GroupCreationModalProps> = ({
                 <>
                   <div
                     className="modal__info"
-                    style={{visibility: nameError.length > 0 ? 'hidden' : 'visible'}}
+                    style={{visibility: hasNameError ? 'hidden' : 'visible'}}
                     data-uie-name="status-group-size-info"
                   >
                     {t('groupSizeInfo', maxSize)}

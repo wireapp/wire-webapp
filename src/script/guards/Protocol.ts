@@ -18,14 +18,13 @@
  */
 
 import {ConversationProtocol} from '@wireapp/api-client/src/conversation/NewConversation';
-import {Option} from '@wireapp/react-ui-kit';
 
 export interface ProtocolOption {
   label: string;
   value: ConversationProtocol;
 }
 
-export function isProtocolOption(option?: Option | null): option is ProtocolOption {
+export const isProtocolOption = (option: any): option is ProtocolOption => {
   const protocols = Object.values(ConversationProtocol) as string[];
-  return !!option && typeof option.value === 'string' && protocols.includes(option.value);
-}
+  return typeof option?.value === 'string' && protocols.includes(option.value);
+};
