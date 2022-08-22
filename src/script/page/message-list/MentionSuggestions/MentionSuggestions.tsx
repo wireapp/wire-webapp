@@ -29,57 +29,52 @@ import MentionSuggestionsItem from './MentionSuggestionsItem';
 import {User} from '../../../entity/User';
 
 type MentionSuggestionListProps = {
-  onSelectionValidated: (data: User) => void;
+  onSelectionValidated: (data: User, element: HTMLInputElement) => void;
   suggestions: User[];
-  targetInput?: HTMLTextAreaElement | null;
+  targetInputSelector: string;
 };
 const MentionSuggestionList: React.FunctionComponent<MentionSuggestionListProps> = ({
   suggestions,
   onSelectionValidated,
-  targetInput,
+  targetInputSelector,
 }) => {
   const [scrollbarRef, setScrollbarRef] = useEffectRef<HTMLDivElement>();
   useFadingScrollbar(scrollbarRef);
   const [selectedSuggestionIndex, setSelectedSuggestionIndex] = useState(0);
   const [selectedItem, setSelectedItem] = useEffectRef();
-
-  const isVisible = suggestions.length > 0;
-
-  const bottom = useMemo(() => {
-    const boundingClientRect = targetInput?.getBoundingClientRect?.();
-
-    if (!isVisible || !boundingClientRect) {
-      return 0;
-    }
-
-    return window.innerHeight - boundingClientRect.top + 24;
-  }, [isVisible, targetInput]);
-
   useEffect(
     () => selectedItem?.scrollIntoView({behavior: 'auto', block: 'nearest'}),
     [selectedItem, suggestions.length],
+  );
+
+  const targetInput = useMemo(
+    () => document.querySelector<HTMLInputElement>(targetInputSelector),
+    [targetInputSelector],
+  );
+
+  const isVisible = suggestions.length > 0;
+  const bottom = useMemo(
+    () => (isVisible ? window.innerHeight - targetInput.getBoundingClientRect().top + 24 : 0),
+    [isVisible],
   );
 
   useEffect(() => {
     const updateSelectedIndex = (delta: number = 0) => {
       setSelectedSuggestionIndex(curr => clamp(curr + delta, 0, suggestions.length - 1));
     };
-
     const onInput = (event: KeyboardEvent) => {
       const moveSelection = (delta: number) => {
         updateSelectedIndex(delta);
         event.preventDefault();
         event.stopPropagation();
       };
-
       const validateSelection = () => {
         if (!event.shiftKey) {
-          onSelectionValidated(suggestions[selectedSuggestionIndex]);
+          onSelectionValidated(suggestions[selectedSuggestionIndex], targetInput);
           event.preventDefault();
           event.stopPropagation();
         }
       };
-
       const actions = {
         [KEY.ARROW_UP]: () => moveSelection(1),
         [KEY.ARROW_DOWN]: () => moveSelection(-1),
@@ -93,9 +88,7 @@ const MentionSuggestionList: React.FunctionComponent<MentionSuggestionListProps>
     if (isVisible) {
       targetInput?.addEventListener('keydown', onInput);
     }
-
     updateSelectedIndex();
-
     return () => {
       targetInput?.removeEventListener('keydown', onInput);
     };
@@ -115,7 +108,10 @@ const MentionSuggestionList: React.FunctionComponent<MentionSuggestionListProps>
               key={suggestion.id}
               suggestion={suggestion}
               isSelected={index === selectedSuggestionIndex}
-              onSuggestionClick={() => onSelectionValidated(suggestion)}
+              onSuggestionClick={() => {
+                targetInput?.focus();
+                onSelectionValidated(suggestion, targetInput);
+              }}
               onMouseEnter={() => setSelectedSuggestionIndex(index)}
               ref={index === selectedSuggestionIndex ? setSelectedItem : undefined}
             />
