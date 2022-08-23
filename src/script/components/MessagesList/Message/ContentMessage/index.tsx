@@ -40,6 +40,8 @@ import {t} from 'Util/LocalizerUtil';
 import {MessageActions} from '..';
 import {Message} from 'src/script/entity/message/Message';
 import ContentAsset from './asset';
+import {KEY} from 'Util/KeyboardUtil';
+import {setContextMenuPosition} from 'Util/util';
 
 export interface ContentMessageProps extends Omit<MessageActions, 'onClickResetSession'> {
   contextMenu: {entries: ko.Subscribable<ContextMenuEntry[]>};
@@ -144,6 +146,13 @@ const ContentMessageComponent: React.FC<ContentMessageProps> = ({
     </div>
   ) : null;
 
+  const handleContextKeyDown = (event: React.KeyboardEvent) => {
+    if ([KEY.SPACE, KEY.ENTER].includes(event.key)) {
+      const newEvent = setContextMenuPosition(event);
+      showContextMenu(newEvent, menuEntries, 'message-options-menu');
+    }
+  };
+
   return (
     <>
       {avatarSection}
@@ -193,6 +202,7 @@ const ContentMessageComponent: React.FC<ContentMessageProps> = ({
             <button
               className="context-menu icon-more font-size-xs"
               aria-label={t('accessibility.conversationContextMenuOpenLabel')}
+              onKeyDown={handleContextKeyDown}
               onClick={event => showContextMenu(event, menuEntries, 'message-options-menu')}
             ></button>
           )}
