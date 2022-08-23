@@ -355,10 +355,15 @@ const InputBar = ({
           .getMessageInConversationById(conversationEntity, messageEntity.quote().messageId)
           .then(quotedMessage => setReplyMessageEntity(quotedMessage));
       }
-
-      moveCursorToEnd(firstAsset.text.length);
     }
   };
+
+  useEffect(() => {
+    if (editMessageEntity?.isEditable()) {
+      const firstAsset = editMessageEntity.getFirstAsset() as TextAsset;
+      moveCursorToEnd(firstAsset.text.length);
+    }
+  }, [editMessageEntity]);
 
   const replyMessage = (messageEntity: ContentMessage): void => {
     if (messageEntity?.isReplyable() && messageEntity !== replyMessageEntity) {
@@ -448,7 +453,7 @@ const InputBar = ({
     }
   };
 
-  const onChange = (event: ChangeEvent<HTMLTextAreaElement>) => {
+  const onChange = (event: ChangeEvent<HTMLTextAreaElement>, start: number, end: number) => {
     event.preventDefault();
 
     const {value: currentValue} = event.currentTarget;
@@ -458,7 +463,7 @@ const InputBar = ({
     const previousValueLength = inputValue.length;
     const difference = currentValueLength - previousValueLength;
 
-    const updatedMentions = updateMentionRanges(currentMentions, selectionStart, selectionEnd, difference);
+    const updatedMentions = updateMentionRanges(currentMentions, start, end, difference);
     setCurrentMentions(updatedMentions);
   };
 
@@ -811,7 +816,9 @@ const InputBar = ({
                     onKeyUp={onTextareaKeyUp}
                     onClick={handleMentionFlow}
                     onInput={updateMentions}
-                    onChange={onChange}
+                    onChange={(event: ChangeEvent<HTMLTextAreaElement>) =>
+                      onChange(event, selectionStart, selectionEnd)
+                    }
                     onPaste={onPasteFiles}
                     value={inputValue}
                     placeholder={inputPlaceholder}
