@@ -1,7 +1,7 @@
 {
   "dependencies": {
     "@types/node": "*",
-    "@wireapp/core": "29.2.3",
+    "@wireapp/core": "29.2.4",
     "file-type": "16.5.4",
     "uuidjs": "4.2.8"
   },
@@ -34,6 +34,6 @@
     "test:node": "nyc jasmine --config=jasmine.json",
     "test:project": "yarn dist && yarn test"
   },
-  "version": "13.1.11",
+  "version": "13.1.12",
   "gitHead": "5339f01fe01ef0871da8c8bc8662fbe9e604754a"
 }
