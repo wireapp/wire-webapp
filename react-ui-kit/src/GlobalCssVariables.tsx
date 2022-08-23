@@ -56,6 +56,9 @@ const light: () => CSSObject = () => ({
   '--text-input-disabled': COLOR_V2.GRAY_20,
   '--text-input-label': COLOR_V2.GRAY_80,
 
+  // Select
+  '--select-focused-description': COLOR_V2.WHITE,
+
   // General
   '--danger-color': COLOR_V2.RED_LIGHT_500,
   '--app-bg': COLOR_V2.GRAY_10,
@@ -96,6 +99,9 @@ const dark: () => CSSObject = () => ({
   '--text-input-placeholder': COLOR_V2.GRAY_60,
   '--text-input-disabled': COLOR_V2.GRAY_100,
   '--text-input-label': COLOR_V2.GRAY_40,
+
+  // Select
+  '--select-focused-description': COLOR_V2.GRAY_40,
 
   // General
   '--danger-color': COLOR_V2.RED_DARK_500,
