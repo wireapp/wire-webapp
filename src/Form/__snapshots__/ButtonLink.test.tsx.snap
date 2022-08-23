@@ -8,6 +8,7 @@ exports[`"ButtonLink" renders (dark theme) 1`] = `
 }
 
 .emotion-1 {
+  color: var(--text-input-background);
   display: -webkit-inline-box!important;
   display: -webkit-inline-flex!important;
   display: -ms-inline-flexbox!important;
@@ -80,6 +81,7 @@ exports[`"ButtonLink" renders 1`] = `
 }
 
 .emotion-1 {
+  color: var(--text-input-background);
   display: -webkit-inline-box!important;
   display: -webkit-inline-flex!important;
   display: -ms-inline-flexbox!important;
@@ -178,6 +180,7 @@ exports[`"ButtonLink" renders in loading state 1`] = `
 }
 
 .emotion-1 {
+  color: var(--text-input-background);
   display: -webkit-inline-box!important;
   display: -webkit-inline-flex!important;
   display: -ms-inline-flexbox!important;

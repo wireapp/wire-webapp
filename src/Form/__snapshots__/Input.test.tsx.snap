@@ -54,11 +54,17 @@ exports[`"Input" renders 1`] = `
   text-transform: none;
 }
 
-.emotion-3:focus {
+.emotion-3:hover {
+  box-shadow: 0 0 0 1px var(--text-input-border-hover);
+}
+
+.emotion-3:focus-visible,
+.emotion-3:focus,
+.emotion-3:active {
   box-shadow: 0 0 0 1px #0667c8;
 }
 
-.emotion-3:invalid:not(:focus) {
+.emotion-3:invalid:not(:focus, :hover) {
   box-shadow: 0 0 0 1px #dce0e3;
 }
 
@@ -133,11 +139,13 @@ exports[`"Input" renders as disabled 1`] = `
   text-transform: none;
 }
 
-.emotion-3:focus {
+.emotion-3:focus-visible,
+.emotion-3:focus,
+.emotion-3:active {
   box-shadow: 0 0 0 1px #0667c8;
 }
 
-.emotion-3:invalid:not(:focus) {
+.emotion-3:invalid:not(:focus, :hover) {
   box-shadow: 0 0 0 1px #dce0e3;
 }
 
@@ -213,7 +221,13 @@ exports[`"Input" renders as invalid 1`] = `
   text-transform: none;
 }
 
-.emotion-3:focus {
+.emotion-3:hover {
+  box-shadow: 0 0 0 1px var(--text-input-border-hover);
+}
+
+.emotion-3:focus-visible,
+.emotion-3:focus,
+.emotion-3:active {
   box-shadow: 0 0 0 1px #0667c8;
 }
 
@@ -288,11 +302,17 @@ exports[`"Input" renders with placeholderTextTransform 1`] = `
   text-transform: uppercase;
 }
 
-.emotion-3:focus {
+.emotion-3:hover {
+  box-shadow: 0 0 0 1px var(--text-input-border-hover);
+}
+
+.emotion-3:focus-visible,
+.emotion-3:focus,
+.emotion-3:active {
   box-shadow: 0 0 0 1px #0667c8;
 }
 
-.emotion-3:invalid:not(:focus) {
+.emotion-3:invalid:not(:focus, :hover) {
   box-shadow: 0 0 0 1px #dce0e3;
 }
 

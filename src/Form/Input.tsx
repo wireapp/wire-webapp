@@ -58,10 +58,13 @@ export const inputStyle: <T>(theme: Theme, props: InputProps<T>, hasError?: bool
     '&::-webkit-input-placeholder': {
       ...placeholderStyle,
     },
-    '&:focus': {
+    '&:hover': {
+      boxShadow: !disabled && `0 0 0 1px ${theme.Input.borderHover}`,
+    },
+    '&:focus-visible, &:focus, &:active': {
       boxShadow: `0 0 0 1px ${theme.general.primaryColor}`,
     },
-    '&:invalid:not(:focus)': !markInvalid
+    '&:invalid:not(:focus, :hover)': !markInvalid
       ? {
           boxShadow: `0 0 0 1px ${theme.Select.borderColor}`,
         }

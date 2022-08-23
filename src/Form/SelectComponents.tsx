@@ -27,6 +27,14 @@ import {IndicatorsContainerProps} from 'react-select/dist/declarations/src/compo
 import {Theme} from '../Layout';
 import {Option} from './Select';
 import {ArrowDown} from '../Icon/ArrowDown';
+// SelectContainer
+export const SelectContainer = props => {
+  return (
+    <components.SelectContainer {...props}>
+      <div tabIndex={0}>{props.children}</div>
+    </components.SelectContainer>
+  );
+};
 
 export const DropdownIndicator = props => {
   const {menuIsOpen} = props.selectProps;

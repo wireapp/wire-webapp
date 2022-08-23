@@ -8,6 +8,7 @@ exports[`"Button" renders (dark theme) 1`] = `
 }
 
 .emotion-1 {
+  color: var(--text-input-background);
   display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
@@ -80,6 +81,7 @@ exports[`"Button" renders 1`] = `
 }
 
 .emotion-1 {
+  color: var(--text-input-background);
   display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
@@ -152,6 +154,7 @@ exports[`"Button" renders as block 1`] = `
 }
 
 .emotion-1 {
+  color: var(--text-input-background);
   display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
@@ -250,6 +253,7 @@ exports[`"Button" renders in loading state 1`] = `
 }
 
 .emotion-1 {
+  color: var(--text-input-background);
   display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;

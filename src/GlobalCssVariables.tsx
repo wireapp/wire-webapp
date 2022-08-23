@@ -41,7 +41,7 @@ const light: () => CSSObject = () => ({
   '--button-primary-disabled-bg': COLOR_V2.GRAY_50,
   '--button-primary-disabled-text': COLOR_V2.GRAY_80,
 
-  '--button-tertiary-bg': COLOR_V2.GRAY_10,
+  '--button-tertiary-bg': COLOR.WHITE,
   '--button-tertiary-border': COLOR_V2.GRAY_40,
   '--button-tertiary-hover-bg': COLOR_V2.GRAY_20,
   '--button-tertiary-hover-border': COLOR_V2.GRAY_50,
