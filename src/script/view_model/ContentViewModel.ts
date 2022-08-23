@@ -33,7 +33,6 @@ import {LegalHoldModalViewModel} from './content/LegalHoldModalViewModel';
 import {ModalsViewModel} from './ModalsViewModel';
 import {ConversationError} from '../error/ConversationError';
 import {HistoryImportViewModel} from './content/HistoryImportViewModel';
-import {HistoryExportViewModel} from './content/HistoryExportViewModel';
 import {PanelViewModel} from './PanelViewModel';
 import type {MainViewModel, ViewModelRepositories} from './MainViewModel';
 import type {ConversationRepository} from '../conversation/ConversationRepository';
@@ -91,7 +90,6 @@ export class ContentViewModel {
   messageRepository: MessageRepository;
   elementId: string;
   sidebarId: string;
-  historyExport: HistoryExportViewModel;
   historyImport: HistoryImportViewModel;
   legalHoldModal: LegalHoldModalViewModel;
   logger: Logger;
@@ -157,7 +155,6 @@ export class ContentViewModel {
       repositories.message,
     );
 
-    this.historyExport = new HistoryExportViewModel(repositories.backup);
     this.historyImport = new HistoryImportViewModel(repositories.backup);
 
     this.state.subscribe(state => {

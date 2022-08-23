@@ -2394,16 +2394,16 @@ exports[`stricter compilation`] = {
       [88, 11, 17, "Property \'activeCallViewTab\' has no initializer and is not definitely assigned in the constructor.", "1323835793"],
       [320, 4, 63, "Type \'Conversation | undefined\' is not assignable to type \'Conversation\'.\\n  Type \'undefined\' is not assignable to type \'Conversation\'.", "62763745"]
     ],
-    "src/script/view_model/ContentViewModel.ts:4141679295": [
-      [244, 65, 6, "Type \'string | null\' is not assignable to type \'string\'.\\n  Type \'null\' is not assignable to type \'string\'.", "1127975365"],
-      [281, 68, 13, "Argument of type \'Message | undefined\' is not assignable to parameter of type \'Message\'.\\n  Type \'undefined\' is not assignable to type \'Message\'.", "2065728181"],
-      [287, 10, 6, "Type \'Conversation | null\' is not assignable to type \'PanelEntity\'.", "1164306878"],
-      [291, 37, 5, "Object is of type \'unknown\'.", "165548477"],
-      [301, 10, 9, "Argument of type \'undefined\' is not assignable to parameter of type \'string\'.", "2620553983"],
-      [384, 50, 9, "Argument of type \'undefined\' is not assignable to parameter of type \'Conversation\'.", "2620553983"],
-      [412, 12, 9, "Argument of type \'undefined\' is not assignable to parameter of type \'string\'.", "2620553983"],
-      [421, 20, 29, "Object is possibly \'undefined\'.", "1398699454"],
-      [424, 12, 9, "Argument of type \'undefined\' is not assignable to parameter of type \'string\'.", "2620553983"]
+    "src/script/view_model/ContentViewModel.ts:2174865074": [
+      [241, 65, 6, "Type \'string | null\' is not assignable to type \'string\'.\\n  Type \'null\' is not assignable to type \'string\'.", "1127975365"],
+      [278, 68, 13, "Argument of type \'Message | undefined\' is not assignable to parameter of type \'Message\'.\\n  Type \'undefined\' is not assignable to type \'Message\'.", "2065728181"],
+      [284, 10, 6, "Type \'Conversation | null\' is not assignable to type \'PanelEntity\'.", "1164306878"],
+      [288, 37, 5, "Object is of type \'unknown\'.", "165548477"],
+      [298, 10, 9, "Argument of type \'undefined\' is not assignable to parameter of type \'string\'.", "2620553983"],
+      [381, 50, 9, "Argument of type \'undefined\' is not assignable to parameter of type \'Conversation\'.", "2620553983"],
+      [409, 12, 9, "Argument of type \'undefined\' is not assignable to parameter of type \'string\'.", "2620553983"],
+      [418, 20, 29, "Object is possibly \'undefined\'.", "1398699454"],
+      [421, 12, 9, "Argument of type \'undefined\' is not assignable to parameter of type \'string\'.", "2620553983"]
     ],
     "src/script/view_model/ImageDetailViewViewModel.ts:1576396674": [
       [58, 4, 11, "Type \'undefined\' is not assignable to type \'string\'.", "3652784592"],
@@ -2510,10 +2510,6 @@ exports[`stricter compilation`] = {
     "src/script/view_model/bindings/VideoCallingBindings.ts:456425467": [
       [23, 2, 6, "Type \'(element: HTMLMediaElement, valueAccessor: Observable<MediaStream>) => void\' is not assignable to type \'(element: any, valueAccessor: () => any, allBindings: AllBindings, viewModel: any, bindingContext: BindingContext<any>) => void\'.\\n  Types of parameters \'valueAccessor\' and \'valueAccessor\' are incompatible.\\n    Type \'() => any\' is missing the following properties from type \'Observable<MediaStream>\': equalityComparer, peek, valueHasMutated, valueWillMutate, and 5 more.", "1759213236"],
       [31, 2, 6, "Type \'(element: HTMLMediaElement, valueAccessor: Observable<MediaStream>) => void\' is not assignable to type \'(element: any, valueAccessor: () => any, allBindings: AllBindings, viewModel: any, bindingContext: BindingContext<any>) => void\'.\\n  Types of parameters \'valueAccessor\' and \'valueAccessor\' are incompatible.\\n    Type \'() => any\' is not assignable to type \'Observable<MediaStream>\'.", "1759213236"]
-    ],
-    "src/script/view_model/content/HistoryExportViewModel.ts:1810820018": [
-      [89, 4, 16, "Type \'Observable<Blob | null>\' is not assignable to type \'Observable<Blob>\'.\\n  The types returned by \'peek()\' are incompatible between these types.\\n    Type \'Blob | null\' is not assignable to type \'Blob\'.\\n      Type \'null\' is not assignable to type \'Blob\'.", "340013420"],
-      [128, 19, 5, "Argument of type \'unknown\' is not assignable to parameter of type \'Error\'.", "165548477"]
     ],
     "src/script/view_model/content/HistoryImportViewModel.ts:2154234816": [
       [61, 4, 10, "Type \'Observable<Error | null>\' is not assignable to type \'Observable<Error>\'.\\n  The types returned by \'peek()\' are incompatible between these types.\\n    Type \'Error | null\' is not assignable to type \'Error\'.\\n      Type \'null\' is not assignable to type \'Error\'.", "3994891413"],

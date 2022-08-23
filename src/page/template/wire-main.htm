@@ -13,6 +13,7 @@
       </div>
       <div id="center-column" class="center-column">
         <main-content params="contentViewModel: $root"></main-content>
+
         <!-- ko if: state() === State.CONNECTION_REQUESTS -->
           <h1 class="visually-hidden" data-bind="text: t('accessibility.headings.connectionRequests')"></h1>
 
@@ -30,7 +31,14 @@
         <!-- /ko -->
         <!-- ko if: state() === State.HISTORY_EXPORT -->
           <h1 class="visually-hidden" data-bind="text: t('accessibility.headings.historyExport')"></h1>
-          #include('content/history-export.htm')
+
+          <history-export
+            style="height: 100%;"
+            params="
+              backupRepository: $root.repositories.backup,
+              userState: $root.userState,
+            "
+          ></history-export>
         <!-- /ko -->
         <!-- ko if: state() === State.HISTORY_IMPORT -->
           <h1 class="visually-hidden" data-bind="text: t('accessibility.headings.historyImport')"></h1>

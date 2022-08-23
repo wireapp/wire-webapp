@@ -25,6 +25,7 @@ import '../Config';
 
 import 'Components/CopyToClipboard';
 import 'Components/ConnectRequests';
+import 'Components/HistoryExport';
 import 'Components/UserSearchableList';
 import 'Components/toggle/BaseToggle';
 import 'Components/icons';
