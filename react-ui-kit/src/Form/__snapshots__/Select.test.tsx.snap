@@ -16,7 +16,7 @@ exports[`"Select" renders 1`] = `
   color: #0667c8;
 }
 
-.emotion-2 {
+.emotion-2>div {
   background: #fff;
   border: none;
   border-radius: 12px;
@@ -34,44 +34,46 @@ exports[`"Select" renders 1`] = `
   cursor: pointer;
 }
 
-.emotion-2::-moz-placeholder {
+.emotion-2>div::-moz-placeholder {
   color: rgb(80, 82, 84);
   font-size: 16px;
   text-transform: none;
   opacity: 1;
 }
 
-.emotion-2::-ms-input-placeholder {
+.emotion-2>div::-ms-input-placeholder {
   color: rgb(80, 82, 84);
   font-size: 16px;
   text-transform: none;
 }
 
-.emotion-2::-webkit-input-placeholder {
+.emotion-2>div::-webkit-input-placeholder {
   color: rgb(80, 82, 84);
   font-size: 16px;
   text-transform: none;
 }
 
-.emotion-2:focus {
+.emotion-2>div:hover {
+  box-shadow: 0 0 0 1px var(--text-input-border-hover);
+}
+
+.emotion-2>div:focus-visible,
+.emotion-2>div:focus,
+.emotion-2>div:active {
   box-shadow: 0 0 0 1px #0667c8;
 }
 
-.emotion-2:invalid:not(:focus) {
+.emotion-2>div:invalid:not(:focus, :hover) {
   box-shadow: 0 0 0 1px #dce0e3;
 }
 
-.emotion-2:-moz-focusring {
+.emotion-2>div:-moz-focusring {
   color: transparent;
   text-shadow: 0 0 0 #000;
 }
 
-.emotion-2:hover {
-  box-shadow: 0 0 0 1px #dce0e3;
-}
-
-.emotion-2:focus,
-.emotion-2:active {
+.emotion-2>div:focus:visible,
+.emotion-2>div active {
   box-shadow: 0 0 0 1px #0667c8;
 }
 
@@ -207,73 +209,77 @@ exports[`"Select" renders 1`] = `
       className=" emotion-2"
       onKeyDown={[Function]}
     >
-      <span
-        className="emotion-3"
-        id="react-select-2-live-region"
-      />
-      <span
-        aria-atomic="false"
-        aria-live="polite"
-        aria-relevant="additions text"
-        className="emotion-3"
-      />
       <div
-        className=" emotion-5"
-        onMouseDown={[Function]}
-        onTouchEnd={[Function]}
+        tabIndex={0}
       >
+        <span
+          className="emotion-3"
+          id="react-select-2-live-region"
+        />
+        <span
+          aria-atomic="false"
+          aria-live="polite"
+          aria-relevant="additions text"
+          className="emotion-3"
+        />
         <div
-          className=" emotion-6"
+          className=" emotion-5"
+          onMouseDown={[Function]}
+          onTouchEnd={[Function]}
         >
           <div
-            className=" emotion-7"
-            id="react-select-2-placeholder"
+            className=" emotion-6"
           >
-            Select...
-          </div>
-           
-          <input
-            aria-autocomplete="list"
-            aria-describedby="react-select-2-placeholder"
-            aria-expanded={false}
-            aria-haspopup={true}
-            aria-readonly={true}
-            className="emotion-8"
-            disabled={false}
-            id="react-select-2-input"
-            inputMode="none"
-            onBlur={[Function]}
-            onChange={[Function]}
-            onFocus={[Function]}
-            role="combobox"
-            tabIndex={0}
-            value=""
-          />
-        </div>
-        <div
-          className=" emotion-9"
-        >
-          <span
-            className=" emotion-10"
-          />
-          <div
-            aria-hidden="true"
-            className=" emotion-11"
-            onMouseDown={[Function]}
-            onTouchEnd={[Function]}
-          >
-            <svg
-              className="emotion-12"
-              height={16}
-              viewBox="0 0 16 16"
-              width={16}
+            <div
+              className=" emotion-7"
+              id="react-select-2-placeholder"
             >
-              <g>
-                <path
-                  d="M7.99963 12.5711L15.6565 4.91421L14.2423 3.5L7.99963 9.74264L1.75699 3.5L0.342773 4.91421L7.99963 12.5711Z"
-                />
-              </g>
-            </svg>
+              Select...
+            </div>
+             
+            <input
+              aria-autocomplete="list"
+              aria-describedby="react-select-2-placeholder"
+              aria-expanded={false}
+              aria-haspopup={true}
+              aria-readonly={true}
+              className="emotion-8"
+              disabled={false}
+              id="react-select-2-input"
+              inputMode="none"
+              onBlur={[Function]}
+              onChange={[Function]}
+              onFocus={[Function]}
+              role="combobox"
+              tabIndex={-1}
+              value=""
+            />
+          </div>
+          <div
+            className=" emotion-9"
+          >
+            <span
+              className=" emotion-10"
+            />
+            <div
+              aria-hidden="true"
+              className=" emotion-11"
+              onMouseDown={[Function]}
+              onTouchEnd={[Function]}
+            >
+              <svg
+                className="emotion-12"
+                height={16}
+                viewBox="0 0 16 16"
+                width={16}
+              >
+                <g>
+                  <path
+                    d="M7.99963 12.5711L15.6565 4.91421L14.2423 3.5L7.99963 9.74264L1.75699 3.5L0.342773 4.91421L7.99963 12.5711Z"
+                  />
+                </g>
+              </svg>
+            </div>
           </div>
         </div>
       </div>
@@ -298,7 +304,7 @@ exports[`"Select" renders as disabled 1`] = `
   color: #0667c8;
 }
 
-.emotion-2 {
+.emotion-2>div {
   background: #edeff0;
   border: none;
   border-radius: 12px;
@@ -316,34 +322,36 @@ exports[`"Select" renders as disabled 1`] = `
   background-color: #edeff0;
 }
 
-.emotion-2::-moz-placeholder {
+.emotion-2>div::-moz-placeholder {
   color: rgb(80, 82, 84);
   font-size: 16px;
   text-transform: none;
   opacity: 1;
 }
 
-.emotion-2::-ms-input-placeholder {
+.emotion-2>div::-ms-input-placeholder {
   color: rgb(80, 82, 84);
   font-size: 16px;
   text-transform: none;
 }
 
-.emotion-2::-webkit-input-placeholder {
+.emotion-2>div::-webkit-input-placeholder {
   color: rgb(80, 82, 84);
   font-size: 16px;
   text-transform: none;
 }
 
-.emotion-2:focus {
+.emotion-2>div:focus-visible,
+.emotion-2>div:focus,
+.emotion-2>div:active {
   box-shadow: 0 0 0 1px #0667c8;
 }
 
-.emotion-2:invalid:not(:focus) {
+.emotion-2>div:invalid:not(:focus, :hover) {
   box-shadow: 0 0 0 1px #dce0e3;
 }
 
-.emotion-2:-moz-focusring {
+.emotion-2>div:-moz-focusring {
   color: transparent;
   text-shadow: 0 0 0 #000;
 }
@@ -484,73 +492,77 @@ exports[`"Select" renders as disabled 1`] = `
       className=" emotion-2"
       onKeyDown={[Function]}
     >
-      <span
-        className="emotion-3"
-        id="react-select-3-live-region"
-      />
-      <span
-        aria-atomic="false"
-        aria-live="polite"
-        aria-relevant="additions text"
-        className="emotion-3"
-      />
       <div
-        className=" emotion-5"
-        onMouseDown={[Function]}
-        onTouchEnd={[Function]}
+        tabIndex={0}
       >
+        <span
+          className="emotion-3"
+          id="react-select-3-live-region"
+        />
+        <span
+          aria-atomic="false"
+          aria-live="polite"
+          aria-relevant="additions text"
+          className="emotion-3"
+        />
         <div
-          className=" emotion-6"
+          className=" emotion-5"
+          onMouseDown={[Function]}
+          onTouchEnd={[Function]}
         >
           <div
-            className=" emotion-7"
-            id="react-select-3-placeholder"
+            className=" emotion-6"
           >
-            Select...
-          </div>
-           
-          <input
-            aria-autocomplete="list"
-            aria-describedby="react-select-3-placeholder"
-            aria-expanded={false}
-            aria-haspopup={true}
-            aria-readonly={true}
-            className="emotion-8"
-            disabled={true}
-            id="react-select-3-input"
-            inputMode="none"
-            onBlur={[Function]}
-            onChange={[Function]}
-            onFocus={[Function]}
-            role="combobox"
-            tabIndex={0}
-            value=""
-          />
-        </div>
-        <div
-          className=" emotion-9"
-        >
-          <span
-            className=" emotion-10"
-          />
-          <div
-            aria-hidden="true"
-            className=" emotion-11"
-            onMouseDown={[Function]}
-            onTouchEnd={[Function]}
-          >
-            <svg
-              className="emotion-12"
-              height={16}
-              viewBox="0 0 16 16"
-              width={16}
+            <div
+              className=" emotion-7"
+              id="react-select-3-placeholder"
             >
-              <g>
-                <path
-                  d="M7.99963 12.5711L15.6565 4.91421L14.2423 3.5L7.99963 9.74264L1.75699 3.5L0.342773 4.91421L7.99963 12.5711Z"
-                />
-              </g>
-            </svg>
+              Select...
+            </div>
+             
+            <input
+              aria-autocomplete="list"
+              aria-describedby="react-select-3-placeholder"
+              aria-expanded={false}
+              aria-haspopup={true}
+              aria-readonly={true}
+              className="emotion-8"
+              disabled={true}
+              id="react-select-3-input"
+              inputMode="none"
+              onBlur={[Function]}
+              onChange={[Function]}
+              onFocus={[Function]}
+              role="combobox"
+              tabIndex={-1}
+              value=""
+            />
+          </div>
+          <div
+            className=" emotion-9"
+          >
+            <span
+              className=" emotion-10"
+            />
+            <div
+              aria-hidden="true"
+              className=" emotion-11"
+              onMouseDown={[Function]}
+              onTouchEnd={[Function]}
+            >
+              <svg
+                className="emotion-12"
+                height={16}
+                viewBox="0 0 16 16"
+                width={16}
+              >
+                <g>
+                  <path
+                    d="M7.99963 12.5711L15.6565 4.91421L14.2423 3.5L7.99963 9.74264L1.75699 3.5L0.342773 4.91421L7.99963 12.5711Z"
+                  />
+                </g>
+              </svg>
+            </div>
           </div>
         </div>
       </div>
@@ -575,7 +587,7 @@ exports[`"Select" renders as invalid 1`] = `
   color: #0667c8;
 }
 
-.emotion-2 {
+.emotion-2>div {
   background: #fff;
   border: none;
   border-radius: 12px;
@@ -593,40 +605,42 @@ exports[`"Select" renders as invalid 1`] = `
   cursor: pointer;
 }
 
-.emotion-2::-moz-placeholder {
+.emotion-2>div::-moz-placeholder {
   color: rgb(80, 82, 84);
   font-size: 16px;
   text-transform: none;
   opacity: 1;
 }
 
-.emotion-2::-ms-input-placeholder {
+.emotion-2>div::-ms-input-placeholder {
   color: rgb(80, 82, 84);
   font-size: 16px;
   text-transform: none;
 }
 
-.emotion-2::-webkit-input-placeholder {
+.emotion-2>div::-webkit-input-placeholder {
   color: rgb(80, 82, 84);
   font-size: 16px;
   text-transform: none;
 }
 
-.emotion-2:focus {
+.emotion-2>div:hover {
+  box-shadow: 0 0 0 1px var(--text-input-border-hover);
+}
+
+.emotion-2>div:focus-visible,
+.emotion-2>div:focus,
+.emotion-2>div:active {
   box-shadow: 0 0 0 1px #0667c8;
 }
 
-.emotion-2:-moz-focusring {
+.emotion-2>div:-moz-focusring {
   color: transparent;
   text-shadow: 0 0 0 #000;
 }
 
-.emotion-2:hover {
-  box-shadow: 0 0 0 1px #dce0e3;
-}
-
-.emotion-2:focus,
-.emotion-2:active {
+.emotion-2>div:focus:visible,
+.emotion-2>div active {
   box-shadow: 0 0 0 1px #0667c8;
 }
 
@@ -762,73 +776,77 @@ exports[`"Select" renders as invalid 1`] = `
       className=" emotion-2"
       onKeyDown={[Function]}
     >
-      <span
-        className="emotion-3"
-        id="react-select-4-live-region"
-      />
-      <span
-        aria-atomic="false"
-        aria-live="polite"
-        aria-relevant="additions text"
-        className="emotion-3"
-      />
       <div
-        className=" emotion-5"
-        onMouseDown={[Function]}
-        onTouchEnd={[Function]}
+        tabIndex={0}
       >
+        <span
+          className="emotion-3"
+          id="react-select-4-live-region"
+        />
+        <span
+          aria-atomic="false"
+          aria-live="polite"
+          aria-relevant="additions text"
+          className="emotion-3"
+        />
         <div
-          className=" emotion-6"
+          className=" emotion-5"
+          onMouseDown={[Function]}
+          onTouchEnd={[Function]}
         >
           <div
-            className=" emotion-7"
-            id="react-select-4-placeholder"
+            className=" emotion-6"
           >
-            Select...
-          </div>
-           
-          <input
-            aria-autocomplete="list"
-            aria-describedby="react-select-4-placeholder"
-            aria-expanded={false}
-            aria-haspopup={true}
-            aria-readonly={true}
-            className="emotion-8"
-            disabled={false}
-            id="react-select-4-input"
-            inputMode="none"
-            onBlur={[Function]}
-            onChange={[Function]}
-            onFocus={[Function]}
-            role="combobox"
-            tabIndex={0}
-            value=""
-          />
-        </div>
-        <div
-          className=" emotion-9"
-        >
-          <span
-            className=" emotion-10"
-          />
-          <div
-            aria-hidden="true"
-            className=" emotion-11"
-            onMouseDown={[Function]}
-            onTouchEnd={[Function]}
-          >
-            <svg
-              className="emotion-12"
-              height={16}
-              viewBox="0 0 16 16"
-              width={16}
+            <div
+              className=" emotion-7"
+              id="react-select-4-placeholder"
             >
-              <g>
-                <path
-                  d="M7.99963 12.5711L15.6565 4.91421L14.2423 3.5L7.99963 9.74264L1.75699 3.5L0.342773 4.91421L7.99963 12.5711Z"
-                />
-              </g>
-            </svg>
+              Select...
+            </div>
+             
+            <input
+              aria-autocomplete="list"
+              aria-describedby="react-select-4-placeholder"
+              aria-expanded={false}
+              aria-haspopup={true}
+              aria-readonly={true}
+              className="emotion-8"
+              disabled={false}
+              id="react-select-4-input"
+              inputMode="none"
+              onBlur={[Function]}
+              onChange={[Function]}
+              onFocus={[Function]}
+              role="combobox"
+              tabIndex={-1}
+              value=""
+            />
+          </div>
+          <div
+            className=" emotion-9"
+          >
+            <span
+              className=" emotion-10"
+            />
+            <div
+              aria-hidden="true"
+              className=" emotion-11"
+              onMouseDown={[Function]}
+              onTouchEnd={[Function]}
+            >
+              <svg
+                className="emotion-12"
+                height={16}
+                viewBox="0 0 16 16"
+                width={16}
+              >
+                <g>
+                  <path
+                    d="M7.99963 12.5711L15.6565 4.91421L14.2423 3.5L7.99963 9.74264L1.75699 3.5L0.342773 4.91421L7.99963 12.5711Z"
+                  />
+                </g>
+              </svg>
+            </div>
           </div>
         </div>
       </div>

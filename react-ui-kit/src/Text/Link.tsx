@@ -31,6 +31,7 @@ export enum LinkVariant {
 
 export interface LinkProps<T = HTMLAnchorElement> extends TextProps<T> {
   variant?: LinkVariant;
+  targetBlank?: Boolean;
 }
 
 export const linkStyle: <T>(theme: Theme, props: LinkProps<T>) => CSSObject = (
@@ -75,7 +76,12 @@ export const filterLinkProps = (props: LinkProps) => filterProps(filterTextProps
 
 export const Link = (props: LinkProps) => {
   return (
-    <a css={(theme: Theme) => linkStyle(theme, props)} rel="noopener noreferrer" {...filterLinkProps(props)}>
+    <a
+      css={(theme: Theme) => linkStyle(theme, props)}
+      target={props.targetBlank && '_blank'}
+      rel="noopener noreferrer"
+      {...filterLinkProps(props)}
+    >
       {props.children}
     </a>
   );

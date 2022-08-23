@@ -33,62 +33,64 @@ export enum THEME_ID {
 
 export interface Theme {
   Button?: {
-    primaryBg?: String;
-    primaryHoverBg?: String;
-    primaryActiveBg?: String;
-    primaryActiveBorder?: String;
-    primaryFocusBorder?: String;
-    primaryDisabledBg?: String;
-    primaryDisabledText?: String;
-    tertiaryBg?: String;
-    tertiaryBorder?: String;
-    tertiaryHoverBg?: String;
-    tertiaryHoverBorder?: String;
-    tertiarydisabledBg?: String;
-    tertiaryDisabledBorder?: String;
-    tertiaryActiveBg?: String;
+    primaryBg: String;
+    primaryHoverBg: String;
+    primaryActiveBg: String;
+    primaryActiveBorder: String;
+    primaryFocusBorder: String;
+    primaryDisabledBg: String;
+    primaryDisabledText: String;
+    tertiaryBg: String;
+    tertiaryBorder: String;
+    tertiaryHoverBg: String;
+    tertiaryHoverBorder: String;
+    tertiarydisabledBg: String;
+    tertiaryDisabledBorder: String;
+    tertiaryActiveBg: String;
   };
   IconButton: {
-    activePrimaryBgColor?: string;
-    activePrimaryBorderColor?: string;
-    focusBorderColor?: string;
-    hoverPrimaryBgColor?: string;
-    primaryActiveFillColor?: string;
-    primaryBgColor?: string;
-    primaryBorderColor?: string;
-    primaryDisabledBgColor?: string;
-    primaryDisabledBorderColor?: string;
-    primaryHoverBorderColor?: string;
-    secondaryActiveBorderColor?: string;
+    activePrimaryBgColor: string;
+    focusBorderColor: string;
+    hoverPrimaryBgColor: string;
+    primaryActiveFillColor: string;
+    primaryBgColor: string;
+    primaryBorderColor: string;
+    primaryDisabledBgColor: string;
+    primaryDisabledBorderColor: string;
+    primaryHoverBorderColor: string;
+    secondaryActiveBorderColor: string;
   };
   Checkbox: {
-    background?: string;
-    border?: string;
-    borderFocused?: string;
-    disableBgColor?: string;
-    disableBorderColor?: string;
-    disablecheckedBgColor?: string;
-    invalidBorderColor?: string;
+    background: string;
+    border: string;
+    borderFocused: string;
+    disableBgColor: string;
+    disableBorderColor: string;
+    disablecheckedBgColor: string;
+    invalidBorderColor: string;
   };
   general: {
     backgroundColor: string;
     color: string;
-    contrastColor?: String;
-    dangerColor?: string;
-    focusColor?: String;
-    primaryColor?: string;
+    contrastColor: String;
+    dangerColor: string;
+    focusColor: String;
+    primaryColor: string;
   };
   Input: {
     backgroundColor: string;
     backgroundColorDisabled: string;
     placeholderColor: string;
     labelColor: string;
+    borderHover: string;
   };
   Select: {
-    disabledColor?: string;
-    contrastTextColor?: string;
-    borderColor?: string;
+    disabledColor: string;
+    contrastTextColor: string;
+    borderColor: string;
     focusedDescriptionColor?: string;
+    optionHoverBg: string;
+    selectedActiveBg: String;
   };
 }
 
@@ -136,11 +138,14 @@ export const themes: {[themeId in THEME_ID]: Theme} = {
       backgroundColorDisabled: 'var(--text-input-disabled)',
       labelColor: 'var(--text-input-label)',
       placeholderColor: 'var(--text-input-placeholder)',
+      borderHover: 'var(--text-input-border-hover)',
     },
     Select: {
       borderColor: 'var(--text-input-border)',
       contrastTextColor: 'var(--text-input-background)',
       disabledColor: 'var(--text-input-placeholder)',
+      optionHoverBg: 'var(--accent-color-highlight)',
+      selectedActiveBg: 'var(--button-primary-hover)',
     },
     general: {
       backgroundColor: 'var(--app-bg)',
@@ -160,6 +165,12 @@ export const themes: {[themeId in THEME_ID]: Theme} = {
       primaryFocusBorder: 'var(--button-primary-focus-border)',
       primaryDisabledBg: 'var(--button-primary-disabled-bg)',
       primaryDisabledText: 'var(--button-primary-disabled-text)',
+      tertiaryBg: 'var(--button-tertiary-bg)',
+      tertiaryBorder: 'var(--button-tertiary-border)',
+      tertiaryHoverBg: 'var(--button-tertiary-hover-bg)',
+      tertiaryHoverBorder: 'var(--button-tertiary-hover-border)',
+      tertiarydisabledBg: 'var(--button-tertiary-disabled-bg)',
+      tertiaryDisabledBorder: 'var(--button-tertiary-disabled-border)',
       tertiaryActiveBg: 'var(--accent-color-highlight)',
     },
     IconButton: {
@@ -179,18 +190,23 @@ export const themes: {[themeId in THEME_ID]: Theme} = {
       backgroundColorDisabled: COLOR_V2.GRAY_20,
       placeholderColor: COLOR.GRAY_DARKEN_24,
       labelColor: COLOR_V2.GRAY_80,
+      borderHover: 'var(--text-input-border-hover)',
     },
     general: {
       backgroundColor: COLOR_V2.GRAY_20,
       color: COLOR.TEXT,
       primaryColor: COLOR_V2.BLUE,
       dangerColor: COLOR_V2.RED,
+      contrastColor: 'var(--text-input-background)',
+      focusColor: 'var(--accent-color-focus)',
     },
     Select: {
       disabledColor: COLOR_V2.GRAY_70,
       contrastTextColor: COLOR.WHITE,
       borderColor: COLOR_V2.GRAY_40,
       focusedDescriptionColor: COLOR_V2.WHITE,
+      optionHoverBg: 'var(--accent-color-highlight)',
+      selectedActiveBg: 'var(--button-primary-hover)',
     },
     Checkbox: {
       background: COLOR_V2.GRAY_20,
@@ -211,6 +227,12 @@ export const themes: {[themeId in THEME_ID]: Theme} = {
       primaryFocusBorder: 'var(--button-primary-focus-border)',
       primaryDisabledBg: 'var(--button-primary-disabled-bg)',
       primaryDisabledText: 'var(--button-primary-disabled-text)',
+      tertiaryBg: 'var(--button-tertiary-bg)',
+      tertiaryBorder: 'var(--button-tertiary-border)',
+      tertiaryHoverBg: 'var(--button-tertiary-hover-bg)',
+      tertiaryHoverBorder: 'var(--button-tertiary-hover-border)',
+      tertiarydisabledBg: 'var(--button-tertiary-disabled-bg)',
+      tertiaryDisabledBorder: 'var(--button-tertiary-disabled-border)',
       tertiaryActiveBg: 'var(--accent-color-highlight)',
     },
     IconButton: {
@@ -230,18 +252,23 @@ export const themes: {[themeId in THEME_ID]: Theme} = {
       backgroundColorDisabled: COLOR.GRAY_100,
       placeholderColor: COLOR.GRAY_LIGHTEN_88,
       labelColor: COLOR_V2.GRAY_40,
+      borderHover: 'var(--text-input-border-hover)',
     },
     general: {
       backgroundColor: COLOR.BLACK,
       color: COLOR.WHITE,
       primaryColor: COLOR_V2.BLUE,
       dangerColor: COLOR_V2.RED,
+      contrastColor: 'var(--text-input-background)',
+      focusColor: 'var(--accent-color-focus)',
     },
     Select: {
       disabledColor: COLOR_V2.GRAY_60,
       contrastTextColor: COLOR.BLACK,
       borderColor: COLOR_V2.GRAY_90,
       focusedDescriptionColor: COLOR_V2.GRAY_40,
+      optionHoverBg: 'var(--accent-color-highlight)',
+      selectedActiveBg: 'var(--button-primary-active)',
     },
     Checkbox: {
       background: COLOR_V2.GRAY_20,

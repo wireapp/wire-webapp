@@ -26,7 +26,14 @@ import {StylesConfig} from 'react-select/dist/declarations/src/styles';
 import {StateManagerProps} from 'react-select/dist/declarations/src/useStateManager';
 
 import {customStyles} from './SelectStyles';
-import {CustomOption, DropdownIndicator, IndicatorsContainer, Menu, ValueContainer} from './SelectComponents';
+import {
+  CustomOption,
+  DropdownIndicator,
+  IndicatorsContainer,
+  Menu,
+  SelectContainer,
+  ValueContainer,
+} from './SelectComponents';
 import type {Theme} from '../Layout';
 import InputLabel from './InputLabel';
 
@@ -90,12 +97,14 @@ export const Select = <IsMulti extends boolean = false>({
         id={id}
         styles={customStyles(theme as Theme, markInvalid) as StylesConfig}
         components={{
+          SelectContainer,
           DropdownIndicator,
           Option: CustomOption(dataUieName),
           Menu: Menu(dataUieName),
           ValueContainer,
           IndicatorsContainer,
         }}
+        tabIndex={-1}
         isDisabled={disabled}
         hideSelectedOptions={false}
         isSearchable={false}

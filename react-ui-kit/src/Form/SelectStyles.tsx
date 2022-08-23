@@ -32,35 +32,35 @@ export const customStyles = (theme: Theme, markInvalid = false) => ({
     const isSelectDisabled = selectProps.isDisabled;
 
     return {
-      ...inputStyle(theme, {disabled: isDisabled, markInvalid}),
-      padding: 0,
-      height: 'auto',
-      minHeight: '48px',
-      '&:-moz-focusring': {
-        color: 'transparent',
-        textShadow: '0 0 0 #000',
-      },
-      position: 'relative',
-      ...(isDisabled && {
-        backgroundColor: theme.Input.backgroundColorDisabled,
-        color: theme.Select.disabledColor,
-        cursor: 'default',
-      }),
-      ...(markInvalid && {
-        boxShadow: `0 0 0 1px ${theme.general.dangerColor}`,
-      }),
-      ...(menuIsOpen && {
-        boxShadow: `0 0 0 1px ${theme.general.primaryColor}`,
-      }),
-      ...(!menuIsOpen && {
-        '&:hover': {
-          boxShadow: !isSelectDisabled && `0 0 0 1px ${theme.Select.borderColor}`,
+      '& > div': {
+        ...inputStyle(theme, {disabled: isSelectDisabled, markInvalid}),
+        padding: 0,
+        height: 'auto',
+        minHeight: '48px',
+        '&:-moz-focusring': {
+          color: 'transparent',
+          textShadow: '0 0 0 #000',
         },
-        '&:focus, &:active': {
+        position: 'relative',
+        ...(isDisabled && {
+          backgroundColor: theme.Input.backgroundColorDisabled,
+          color: theme.Select.disabledColor,
+          cursor: 'default',
+        }),
+        ...(markInvalid && {
+          boxShadow: `0 0 0 1px ${theme.general.dangerColor}`,
+        }),
+        ...(menuIsOpen && {
+          boxShadow: `0 0 0 1px ${theme.general.primaryColor}`,
+          '&:hover': {
+            boxShadow: `0 0 0 1px ${theme.general.primaryColor}`,
+          },
+        }),
+        cursor: !isSelectDisabled && 'pointer',
+        '&:focus:visible, active': {
           boxShadow: !isSelectDisabled && `0 0 0 1px ${theme.general.primaryColor}`,
         },
-      }),
-      cursor: !isSelectDisabled && 'pointer',
+      },
     };
   },
   control: () => ({
@@ -94,7 +94,7 @@ export const customStyles = (theme: Theme, markInvalid = false) => ({
     paddingBottom: 0,
     paddingTop: 0,
   }),
-  option: (provided, {isDisabled, isFocused, isSelected}) => ({
+  option: (provided, {isMulti, isDisabled, isFocused, isSelected}) => ({
     ...provided,
     backgroundColor: theme.Input.backgroundColor,
     color: theme.general.color,
@@ -103,17 +103,45 @@ export const customStyles = (theme: Theme, markInvalid = false) => ({
     fontSize: '16px',
     fontWeight: 300,
     lineHeight: '24px',
-    ...(isFocused &&
-      !isDisabled && {
+    ...(isSelected &&
+      !isDisabled &&
+      !isMulti && {
         background: theme.general.primaryColor,
         borderColor: theme.general.primaryColor,
         color: theme.Select.contrastTextColor,
+        '&:hover': {
+          backgroundColor: theme.Select.selectedActiveBg,
+        },
+        '&:active': {
+          backgroundColor: theme.general.primaryColor,
+          boxShadow: `inset 0 0 0 1px ${theme.Select.selectedActiveBg}`,
+          color: theme.general.contrastColor,
+        },
       }),
-    '&:hover, &:active, &:focus': {
-      background: theme.general.primaryColor,
-      borderColor: theme.general.primaryColor,
-      color: theme.Select.contrastTextColor,
-    },
+    ...(isFocused &&
+      !isDisabled &&
+      !isSelected && {
+        backgroundColor: theme.Select.optionHoverBg,
+        borderColor: theme.Select.optionHoverBg,
+        color: theme.general.color,
+        '&:active': {
+          background: theme.Select.optionHoverBg,
+          boxShadow: `inset 0 0 0 1px ${theme.Select.selectedActiveBg}`,
+          color: theme.general.color,
+        },
+      }),
+    ...(isMulti &&
+      isSelected && {
+        backgroundColor: theme.Input.backgroundColor,
+        '&:hover': {
+          backgroundColor: theme.Select.optionHoverBg,
+        },
+        '&:active': {
+          background: theme.Select.optionHoverBg,
+          boxShadow: `inset 0 0 0 1px ${theme.Select.selectedActiveBg}`,
+          color: theme.general.color,
+        },
+      }),
     ...(isDisabled && {
       backgroundColor: theme.Input.backgroundColorDisabled,
       color: theme.Select.disabledColor,
