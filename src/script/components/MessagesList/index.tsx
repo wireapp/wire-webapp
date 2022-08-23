@@ -17,7 +17,7 @@
  *
  */
 
-import React, {useEffect, useLayoutEffect, useMemo, useRef, useState} from 'react';
+import React, {useEffect, useLayoutEffect, useRef, useState} from 'react';
 import {ConversationRepository} from 'src/script/conversation/ConversationRepository';
 import {MessageRepository} from 'src/script/conversation/MessageRepository';
 import {Conversation} from '../../entity/Conversation';
@@ -120,10 +120,7 @@ const MessagesList: React.FC<MessagesListParams> = ({
   const [loaded, setLoaded] = useState(false);
   const [focusedMessage, setFocusedMessage] = useState<string | undefined>(initialMessage?.id);
 
-  const filteredMessages = useMemo(
-    () => filterDuplicatedMemberMessages(filterHiddenMessages(allMessages)),
-    [allMessages.length],
-  );
+  const filteredMessages = filterDuplicatedMemberMessages(filterHiddenMessages(allMessages));
 
   const shouldShowInvitePeople =
     conversation.isActiveParticipant() && conversation.inTeam() && (isGuestRoom || isGuestAndServicesRoom);
