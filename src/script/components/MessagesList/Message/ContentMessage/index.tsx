@@ -101,7 +101,12 @@ const ContentMessageComponent: React.FC<ContentMessageProps> = ({
   const avatarSection = shouldShowAvatar() ? (
     <div className="message-header">
       <div className="message-header-icon">
-        <Avatar participant={message.user()} onAvatarClick={onClickAvatar} avatarSize={AVATAR_SIZE.X_SMALL} />
+        <Avatar
+          tabIndex={0}
+          participant={message.user()}
+          onAvatarClick={onClickAvatar}
+          avatarSize={AVATAR_SIZE.X_SMALL}
+        />
       </div>
       <div className="message-header-label">
         <span className={`message-header-label-sender ${message.accent_color()}`} data-uie-name="sender-name">
