@@ -88,7 +88,7 @@ export interface Theme {
     disabledColor: string;
     contrastTextColor: string;
     borderColor: string;
-    focusedDescriptionColor?: string;
+    focusedDescriptionColor: string;
     optionHoverBg: string;
     selectedActiveBg: String;
   };
@@ -144,6 +144,7 @@ export const themes: {[themeId in THEME_ID]: Theme} = {
       borderColor: 'var(--text-input-border)',
       contrastTextColor: 'var(--text-input-background)',
       disabledColor: 'var(--text-input-placeholder)',
+      focusedDescriptionColor: 'var(--select-focused-description)',
       optionHoverBg: 'var(--accent-color-highlight)',
       selectedActiveBg: 'var(--button-primary-hover)',
     },
