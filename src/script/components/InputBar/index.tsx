@@ -289,7 +289,8 @@ const InputBar = ({
 
       const updatedMentions = updateMentionRanges(currentMentions, selectionStart, selectionEnd, difference);
       const newMentions = [...updatedMentions, mentionEntity];
-      setCurrentMentions(newMentions.sort((mentionA, mentionB) => mentionA.startIndex - mentionB.startIndex));
+      const sortedMentions = newMentions.sort((mentionA, mentionB) => mentionA.startIndex - mentionB.startIndex);
+      setCurrentMentions(sortedMentions);
 
       const caretPosition = mentionEntity.endIndex + 1;
 
@@ -476,9 +477,9 @@ const InputBar = ({
           });
   };
 
-  const sendMessage = (messageText: string) => {
+  const sendMessage = (messageText: string, mentions: MentionEntity[]) => {
     if (messageText.length) {
-      const mentionEntities = currentMentions.slice(0);
+      const mentionEntities = mentions.slice(0);
 
       generateQuote().then(quoteEntity => {
         messageRepository.sendTextWithLinkPreview(conversationEntity, messageText, mentionEntities, quoteEntity);
@@ -487,8 +488,8 @@ const InputBar = ({
     }
   };
 
-  const sendMessageEdit = (messageText: string): void | Promise<any> => {
-    const mentionEntities = currentMentions.slice(0);
+  const sendMessageEdit = (messageText: string, mentions: MentionEntity[]): void | Promise<any> => {
+    const mentionEntities = mentions.slice(0);
     cancelMessageEditing();
 
     if (!messageText.length && editMessageEntity) {
@@ -514,8 +515,8 @@ const InputBar = ({
     }
 
     const beforeLength = text.length;
-    const messageText = text.trim();
-    const afterLength = messageText.length;
+    const messageTrimmedStart = text.trimLeft();
+    const afterLength = messageTrimmedStart.length;
     const isMessageTextTooLong = afterLength > CONFIG.MAXIMUM_MESSAGE_LENGTH;
 
     if (isMessageTextTooLong) {
@@ -526,14 +527,13 @@ const InputBar = ({
 
       return;
     }
-
     const updatedMentions = updateMentionRanges(currentMentions, 0, 0, afterLength - beforeLength);
-    setCurrentMentions(updatedMentions);
+    const messageText = messageTrimmedStart.trimRight();
 
     if (isEditing) {
-      sendMessageEdit(messageText);
+      sendMessageEdit(messageText, updatedMentions);
     } else {
-      sendMessage(messageText);
+      sendMessage(messageText, updatedMentions);
     }
 
     resetDraftState();
@@ -723,9 +723,7 @@ const InputBar = ({
     }
   }, [isEditing, currentMentions, replyMessageEntity, inputValue]);
 
-  useTextAreaFocus(() => {
-    textareaRef.current?.focus();
-  });
+  useTextAreaFocus(() => textareaRef.current?.focus());
 
   useScrollSync(textareaRef.current, shadowInputRef.current, [
     textareaRef.current,
