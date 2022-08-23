@@ -17,7 +17,7 @@
  *
  */
 
-import React, {useEffect, useLayoutEffect, useRef, useState} from 'react';
+import React, {useEffect, useLayoutEffect, useMemo, useRef, useState} from 'react';
 import {ConversationRepository} from 'src/script/conversation/ConversationRepository';
 import {MessageRepository} from 'src/script/conversation/MessageRepository';
 import {Conversation} from '../../entity/Conversation';
@@ -31,7 +31,6 @@ import {registerReactComponent, useKoSubscribableChildren} from 'Util/ComponentU
 import Message from './Message';
 import {Text} from 'src/script/entity/message/Text';
 import {useResizeObserver} from '../../ui/resizeObserver';
-import useEffectRef from 'Util/useEffectRef';
 import {isMemberMessage} from '../../guards/Message';
 
 type FocusedElement = {center?: boolean; element: Element};
@@ -120,13 +119,11 @@ const MessagesList: React.FC<MessagesListParams> = ({
   ]);
   const [loaded, setLoaded] = useState(false);
   const [focusedMessage, setFocusedMessage] = useState<string | undefined>(initialMessage?.id);
-  const [filteredMessages, setFilteredMessages] = useState<MessageEntity[]>([]);
 
-  useEffect(() => {
-    const visibleMessages = filterHiddenMessages(allMessages);
-    const uniqMessages = filterDuplicatedMemberMessages(visibleMessages);
-    setFilteredMessages(uniqMessages);
-  }, [allMessages.length]);
+  const filteredMessages = useMemo(
+    () => filterDuplicatedMemberMessages(filterHiddenMessages(allMessages)),
+    [allMessages.length],
+  );
 
   const shouldShowInvitePeople =
     conversation.isActiveParticipant() && conversation.inTeam() && (isGuestRoom || isGuestAndServicesRoom);
@@ -147,7 +144,7 @@ const MessagesList: React.FC<MessagesListParams> = ({
     return false;
   };
 
-  const [messagesContainer, setContainer] = useEffectRef<HTMLDivElement | null>(null);
+  const [messagesContainer, setContainer] = useState<HTMLDivElement | null>(null);
   const scrollHeight = useRef(0);
   const nbMessages = useRef(0);
   const focusedElement = useRef<FocusedElement | null>(null);
