@@ -221,9 +221,12 @@ const InputBar = ({
     }, 0);
   };
 
-  const resetDraftState = () => {
+  const resetDraftState = (keepInputValue = true) => {
     setCurrentMentions([]);
-    setInputValue('');
+
+    if (!keepInputValue) {
+      setInputValue('');
+    }
   };
 
   const clearPastedFile = () => setPastedFile(null);
@@ -318,7 +321,7 @@ const InputBar = ({
     setReplyMessageEntity(null);
 
     if (resetDraft) {
-      resetDraftState();
+      resetDraftState(false);
     }
   };
 
@@ -333,7 +336,7 @@ const InputBar = ({
 
   const handleCancelReply = () => {
     if (!mentionSuggestions.length) {
-      cancelMessageReply();
+      cancelMessageReply(false);
     }
 
     textareaRef.current?.focus();
