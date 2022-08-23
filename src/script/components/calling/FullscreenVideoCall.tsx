@@ -256,7 +256,7 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
               <Icon.ArrowNext css={{position: 'relative', right: 4, transform: 'rotate(180deg)'}} />
             </button>
           )}
-          <div css={{bottom: 108, display: 'flex', justifyContent: 'center', position: 'absolute', width: '100%'}}>
+          <div css={{bottom: 110, display: 'flex', justifyContent: 'center', position: 'absolute', width: '100%'}}>
             <Pagination
               totalPages={totalPages}
               currentPage={currentPage}
@@ -268,7 +268,7 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
       {!isChoosingScreen && (
         <div id="video-controls" className="video-controls">
           <ul className="video-controls__wrapper">
-            <li className="video-controls__item">
+            <li className="video-controls__item__minimize">
               <button
                 className="video-controls__button"
                 css={videoControlInActiveStyles}
@@ -333,15 +333,11 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
                       <Icon.CameraOff width={16} height={16} />
                     )}
 
-                    <span id="video-label" className="video-controls__button__label">
-                      {t('videoCallOverlayCamera')}
-                    </span>
-
-                    {showSwitchCamera && (
+                    {showSwitchCamera ? (
                       <DeviceToggleButton
                         styles={css`
                           position: absolute;
-                          bottom: -38px;
+                          bottom: -16px;
                           left: 50%;
                           transform: translateX(-50%);
                         `}
@@ -349,6 +345,10 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
                         devices={availableCameras}
                         onChooseDevice={deviceId => switchCameraInput(call, deviceId)}
                       />
+                    ) : (
+                      <span id="video-label" className="video-controls__button__label">
+                        {t('videoCallOverlayCamera')}
+                      </span>
                     )}
                   </div>
                 </li>
