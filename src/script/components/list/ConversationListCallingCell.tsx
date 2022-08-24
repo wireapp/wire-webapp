@@ -454,7 +454,7 @@ const ConversationListCallingCell: React.FC<CallingCellProps> = ({
                       .slice()
                       .sort((participantA, participantB) => sortUsersByPriority(participantA.user, participantB.user))
                       .map(participant => (
-                        <li key={participant.clientId}>
+                        <li key={participant.clientId} className="call-ui__participant-list__participant">
                           <ParticipantItem
                             key={participant.clientId}
                             participant={participant.user}

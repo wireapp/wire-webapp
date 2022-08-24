@@ -20,6 +20,7 @@
 .participant-item-wrapper {
   position: relative;
   display: block;
+  margin: 1px;
 
   &[role='button'] {
     .button-reset-default();
@@ -39,10 +40,9 @@
     content: '';
   }
 
-  &:hover {
-    .participant-item {
-      background: var(--gray-20);
-    }
+  &:hover,
+  &:focus {
+    background: var(--app-bg-secondary);
 
     &::after {
       border-bottom: none;
@@ -200,11 +200,18 @@ body.theme-dark {
       border-bottom-color: var(--gray-90);
     }
   }
+}
 
-  .participant-item-wrapper:hover {
-    .participant-item {
-      background: var(--gray-95);
+.call-ui__participant-list__participant {
+  & > .participant-item-wrapper[role='button'] {
+    &:hover,
+    &:focus,
+    &:focus-visible {
+      background-color: var(--disabled-call-button-bg);
     }
+  }
+  &:last-of-type > .participant-item-wrapper {
+    border-radius: 0 0 0 8px;
   }
 }
 
