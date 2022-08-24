@@ -1523,31 +1523,27 @@ export class ConversationRepository {
 
     const {groupId, qualifiedId} = conversationEntity;
 
-    try {
-      if (conversationEntity.isUsingMLSProtocol) {
-        const {events} = await this.core.service!.conversation.removeUsersFromMLSConversation({
-          conversationId: qualifiedId,
-          groupId,
-          qualifiedUserIds: [userId],
-        });
+    if (conversationEntity.isUsingMLSProtocol) {
+      const {events} = await this.core.service!.conversation.removeUsersFromMLSConversation({
+        conversationId: qualifiedId,
+        groupId,
+        qualifiedUserIds: [userId],
+      });
 
-        if (!!events.length) {
-          events.forEach(event => this.eventRepository.injectEvent(event));
-        }
-      } else {
-        const response = await this.core.service!.conversation.removeUserFromProteusConversation(
-          conversationEntity.qualifiedId.id,
-          userId.id,
-        );
-        const roles = conversationEntity.roles();
-        delete roles[userId.id];
-        conversationEntity.roles(roles);
-        const currentTimestamp = this.serverTimeHandler.toServerTimestamp();
-        const event = response || EventBuilder.buildMemberLeave(conversationEntity, userId, true, currentTimestamp);
-        this.eventRepository.injectEvent(event, EventRepository.SOURCE.BACKEND_RESPONSE);
+      if (!!events.length) {
+        events.forEach(event => this.eventRepository.injectEvent(event));
       }
-    } catch (error) {
-      console.error(error);
+    } else {
+      const response = await this.core.service!.conversation.removeUserFromProteusConversation(
+        conversationEntity.qualifiedId.id,
+        userId.id,
+      );
+      const roles = conversationEntity.roles();
+      delete roles[userId.id];
+      conversationEntity.roles(roles);
+      const currentTimestamp = this.serverTimeHandler.toServerTimestamp();
+      const event = response || EventBuilder.buildMemberLeave(conversationEntity, userId, true, currentTimestamp);
+      this.eventRepository.injectEvent(event, EventRepository.SOURCE.BACKEND_RESPONSE);
     }
   }
 
