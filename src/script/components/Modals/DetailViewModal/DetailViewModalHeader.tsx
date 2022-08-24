@@ -33,7 +33,11 @@ interface DetailViewModalHeaderProps {
 }
 
 const DetailViewModalHeader: FC<DetailViewModalHeaderProps> = ({messageEntity, onCloseClick}) => {
-  const {user, timestamp} = useKoSubscribableChildren(messageEntity, ['user', 'timestamp']);
+  const {user, timestamp, unsafeSenderName} = useKoSubscribableChildren(messageEntity, [
+    'user',
+    'timestamp',
+    'unsafeSenderName',
+  ]);
 
   return (
     <header className="detail-view-header">
@@ -44,7 +48,7 @@ const DetailViewModalHeader: FC<DetailViewModalHeaderProps> = ({messageEntity, o
           data-uie-uid={user.id}
           data-uie-value={user.username()}
         >
-          {messageEntity.unsafeSenderName()}
+          {unsafeSenderName}
           {messageEntity.id}
         </div>
 
