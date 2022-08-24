@@ -86,7 +86,7 @@ const AccountSecuritySection: React.FC<AccountSecuritySectionProps> = ({
       )}
 
       {createTeamUrl && !isMacOsWrapper && (
-        <Link variant={LinkVariant.PRIMARY} href={createTeamUrl} data-uie-name="do-create-team">
+        <Link variant={LinkVariant.PRIMARY} targetBlank href={createTeamUrl} data-uie-name="do-create-team">
           {t('preferencesAccountCreateTeam')}
         </Link>
       )}

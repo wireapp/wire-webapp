@@ -221,9 +221,12 @@ const InputBar = ({
     }, 0);
   };
 
-  const resetDraftState = () => {
+  const resetDraftState = (resetInputValue = false) => {
     setCurrentMentions([]);
-    setInputValue('');
+
+    if (resetInputValue) {
+      setInputValue('');
+    }
   };
 
   const clearPastedFile = () => setPastedFile(null);
@@ -242,14 +245,14 @@ const InputBar = ({
     }
 
     if (!isHittingUploadLimit(droppedFiles, assetRepository)) {
-      Array.from(droppedFiles).forEach((file): void | number => {
+      Array.from(droppedFiles).forEach(file => {
         const isSupportedImage = CONFIG.ALLOWED_IMAGE_TYPES.includes(file.type);
 
         if (isSupportedImage) {
-          return images.push(file);
+          images.push(file);
+        } else {
+          files.push(file);
         }
-
-        files.push(file);
       });
 
       uploadImages(images);
@@ -289,7 +292,8 @@ const InputBar = ({
 
       const updatedMentions = updateMentionRanges(currentMentions, selectionStart, selectionEnd, difference);
       const newMentions = [...updatedMentions, mentionEntity];
-      setCurrentMentions(newMentions.sort((mentionA, mentionB) => mentionA.startIndex - mentionB.startIndex));
+      const sortedMentions = newMentions.sort((mentionA, mentionB) => mentionA.startIndex - mentionB.startIndex);
+      setCurrentMentions(sortedMentions);
 
       const caretPosition = mentionEntity.endIndex + 1;
 
@@ -321,18 +325,18 @@ const InputBar = ({
     }
   };
 
-  const cancelMessageEditing = (resetDraft = true) => {
+  const cancelMessageEditing = (resetDraft = true, resetInputValue = false) => {
     setEditMessageEntity(null);
     setReplyMessageEntity(null);
 
     if (resetDraft) {
-      resetDraftState();
+      resetDraftState(resetInputValue);
     }
   };
 
   const handleCancelReply = () => {
     if (!mentionSuggestions.length) {
-      cancelMessageReply();
+      cancelMessageReply(false);
     }
 
     textareaRef.current?.focus();
@@ -344,7 +348,7 @@ const InputBar = ({
       const newMentions = firstAsset.mentions().slice();
 
       cancelMessageReply();
-      cancelMessageEditing();
+      cancelMessageEditing(true, true);
       setEditMessageEntity(messageEntity);
       setInputValue(firstAsset.text);
       setCurrentMentions(newMentions);
@@ -354,10 +358,15 @@ const InputBar = ({
           .getMessageInConversationById(conversationEntity, messageEntity.quote().messageId)
           .then(quotedMessage => setReplyMessageEntity(quotedMessage));
       }
-
-      moveCursorToEnd(firstAsset.text.length);
     }
   };
+
+  useEffect(() => {
+    if (editMessageEntity?.isEditable()) {
+      const firstAsset = editMessageEntity.getFirstAsset() as TextAsset;
+      moveCursorToEnd(firstAsset.text.length);
+    }
+  }, [editMessageEntity]);
 
   const replyMessage = (messageEntity: ContentMessage): void => {
     if (messageEntity?.isReplyable() && messageEntity !== replyMessageEntity) {
@@ -407,7 +416,7 @@ const InputBar = ({
           } else if (pastedFile) {
             setPastedFile(null);
           } else if (isEditing) {
-            cancelMessageEditing();
+            cancelMessageEditing(true, true);
           } else if (isReplying) {
             cancelMessageReply(false);
           }
@@ -452,7 +461,6 @@ const InputBar = ({
 
     const {value: currentValue} = event.currentTarget;
     setInputValue(currentValue);
-
     const currentValueLength = currentValue.length;
     const previousValueLength = inputValue.length;
     const difference = currentValueLength - previousValueLength;
@@ -476,9 +484,9 @@ const InputBar = ({
           });
   };
 
-  const sendMessage = (messageText: string) => {
+  const sendMessage = (messageText: string, mentions: MentionEntity[]) => {
     if (messageText.length) {
-      const mentionEntities = currentMentions.slice(0);
+      const mentionEntities = mentions.slice(0);
 
       generateQuote().then(quoteEntity => {
         messageRepository.sendTextWithLinkPreview(conversationEntity, messageText, mentionEntities, quoteEntity);
@@ -487,9 +495,9 @@ const InputBar = ({
     }
   };
 
-  const sendMessageEdit = (messageText: string): void | Promise<any> => {
-    const mentionEntities = currentMentions.slice(0);
-    cancelMessageEditing();
+  const sendMessageEdit = (messageText: string, mentions: MentionEntity[]): void | Promise<any> => {
+    const mentionEntities = mentions.slice(0);
+    cancelMessageEditing(true, true);
 
     if (!messageText.length && editMessageEntity) {
       return messageRepository.deleteMessageForEveryone(conversationEntity, editMessageEntity);
@@ -514,9 +522,10 @@ const InputBar = ({
     }
 
     const beforeLength = text.length;
-    const messageText = text.trim();
-    const afterLength = messageText.length;
-    const isMessageTextTooLong = afterLength > CONFIG.MAXIMUM_MESSAGE_LENGTH;
+    const messageTrimmedStart = text.trimLeft();
+    const trimmedStartLength = messageTrimmedStart.length;
+    const messageText = messageTrimmedStart.trimRight();
+    const isMessageTextTooLong = messageText.length > CONFIG.MAXIMUM_MESSAGE_LENGTH;
 
     if (isMessageTextTooLong) {
       showWarningModal(
@@ -526,17 +535,15 @@ const InputBar = ({
 
       return;
     }
-
-    const updatedMentions = updateMentionRanges(currentMentions, 0, 0, afterLength - beforeLength);
-    setCurrentMentions(updatedMentions);
+    const updatedMentions = updateMentionRanges(currentMentions, 0, 0, trimmedStartLength - beforeLength);
 
     if (isEditing) {
-      sendMessageEdit(messageText);
+      sendMessageEdit(messageText, updatedMentions);
     } else {
-      sendMessage(messageText);
+      sendMessage(messageText, updatedMentions);
     }
 
-    resetDraftState();
+    resetDraftState(true);
     textareaRef.current?.focus();
   };
 
@@ -544,7 +551,7 @@ const InputBar = ({
     onInputKeyDown: emojiKeyDown,
     onInputKeyUp: emojiKeyUp,
     renderEmojiComponent,
-  } = useEmoji(propertiesRepository, setInputValue, onSend, textareaRef.current);
+  } = useEmoji(propertiesRepository, setInputValue, onSend, currentMentions, setCurrentMentions, textareaRef.current);
 
   const uploadFiles = (files: File[]) => {
     const fileArray = Array.from(files);
@@ -648,7 +655,7 @@ const InputBar = ({
 
   const loadInitialStateForConversation = async (): Promise<void> => {
     setPastedFile(null);
-    cancelMessageEditing();
+    cancelMessageEditing(true, true);
     cancelMessageReply();
     endMentionFlow();
 
@@ -682,7 +689,7 @@ const InputBar = ({
     generateQuote().then(quoteEntity => {
       if (quoteEntity) {
         messageRepository.sendGif(conversationEntity, gifUrl, tag, quoteEntity);
-        cancelMessageEditing(true);
+        cancelMessageEditing(true, true);
       }
     });
   };
@@ -693,7 +700,7 @@ const InputBar = ({
     );
 
     if (!ignoredParent) {
-      cancelMessageEditing();
+      cancelMessageEditing(true, true);
       cancelMessageReply();
     }
   };
@@ -723,9 +730,7 @@ const InputBar = ({
     }
   }, [isEditing, currentMentions, replyMessageEntity, inputValue]);
 
-  useTextAreaFocus(() => {
-    textareaRef.current?.focus();
-  });
+  useTextAreaFocus(() => textareaRef.current?.focus());
 
   useScrollSync(textareaRef.current, shadowInputRef.current, [
     textareaRef.current,
@@ -774,7 +779,7 @@ const InputBar = ({
   }, [isEditing]);
 
   // Temporarily functionality for dropping files on conversation container, should be moved to Conversation Component
-  useDropFiles('#conversation', onDropOrPastedFile);
+  useDropFiles('#conversation', onDropOrPastedFile, [isFileSharingSendingEnabled]);
 
   useEffect(() => {
     document.addEventListener('paste', onPasteFiles);

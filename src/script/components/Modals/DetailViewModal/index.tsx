@@ -24,7 +24,7 @@ import {FC, KeyboardEvent as ReactKeyboardEvent, useEffect, useRef, useState} fr
 
 import {handleKeyDown, KEY} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
-import renderModal from 'Util/renderModal';
+import renderElement from 'Util/renderElement';
 
 import DetailViewModalFooter from './DetailViewModalFooter';
 import DetailViewModalHeader from './DetailViewModalHeader';
@@ -270,4 +270,4 @@ const DetailViewModal: FC<DetailViewModalProps> = ({
 
 export default DetailViewModal;
 
-export const showDetailViewModal = renderModal<DetailViewModalProps>(DetailViewModal);
+export const showDetailViewModal = renderElement<DetailViewModalProps>(DetailViewModal);

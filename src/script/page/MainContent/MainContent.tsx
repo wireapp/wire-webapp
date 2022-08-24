@@ -91,6 +91,7 @@ const MainContent: React.FC<LeftSidebarProps> = ({
         <div id="preferences-account" className="preferences-page preferences-account">
           <AccountPreferences
             showDomain={isFederated}
+            backupRepository={repositories.backup}
             clientRepository={repositories.client}
             conversationRepository={repositories.conversation}
             propertiesRepository={repositories.properties}
