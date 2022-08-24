@@ -410,3 +410,5 @@ const GroupCreationModal: React.FC<GroupCreationModalProps> = ({
 };
 
 registerReactComponent('group-creation-modal', GroupCreationModal);
+
+export default GroupCreationModal;

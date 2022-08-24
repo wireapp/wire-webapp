@@ -23,6 +23,8 @@ import ko from 'knockout';
 
 import '../Config';
 
+import '../page/CenterColumn';
+
 import 'Components/CopyToClipboard';
 import 'Components/ConnectRequests';
 import 'Components/HistoryExport';

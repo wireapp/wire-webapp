@@ -11,9 +11,13 @@
           <left-sidebar params="listViewModel: $root, selfUser: selfUser"></left-sidebar>
         <!-- /ko -->
       </div>
-      <div id="center-column" class="center-column">
-        <main-content params="contentViewModel: $root"></main-content>
+      <center-column
+        id="center-column"
+        class="center-column"
+        params="contentViewModel: $root"
+      ></center-column>
 
+      <div id="center-column" class="center-column">
         <!-- ko if: state() === State.CONNECTION_REQUESTS -->
           <h1 class="visually-hidden" data-bind="text: t('accessibility.headings.connectionRequests')"></h1>
 
