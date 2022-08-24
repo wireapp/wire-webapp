@@ -221,9 +221,12 @@ const InputBar = ({
     }, 0);
   };
 
-  const resetDraftState = () => {
+  const resetDraftState = (keepInputValue = true) => {
     setCurrentMentions([]);
-    setInputValue('');
+
+    if (!keepInputValue) {
+      setInputValue('');
+    }
   };
 
   const clearPastedFile = () => setPastedFile(null);
@@ -289,7 +292,8 @@ const InputBar = ({
 
       const updatedMentions = updateMentionRanges(currentMentions, selectionStart, selectionEnd, difference);
       const newMentions = [...updatedMentions, mentionEntity];
-      setCurrentMentions(newMentions.sort((mentionA, mentionB) => mentionA.startIndex - mentionB.startIndex));
+      const sortedMentions = newMentions.sort((mentionA, mentionB) => mentionA.startIndex - mentionB.startIndex);
+      setCurrentMentions(sortedMentions);
 
       const caretPosition = mentionEntity.endIndex + 1;
 
@@ -317,7 +321,7 @@ const InputBar = ({
     setReplyMessageEntity(null);
 
     if (resetDraft) {
-      resetDraftState();
+      resetDraftState(false);
     }
   };
 
@@ -332,7 +336,7 @@ const InputBar = ({
 
   const handleCancelReply = () => {
     if (!mentionSuggestions.length) {
-      cancelMessageReply();
+      cancelMessageReply(false);
     }
 
     textareaRef.current?.focus();
@@ -354,10 +358,15 @@ const InputBar = ({
           .getMessageInConversationById(conversationEntity, messageEntity.quote().messageId)
           .then(quotedMessage => setReplyMessageEntity(quotedMessage));
       }
-
-      moveCursorToEnd(firstAsset.text.length);
     }
   };
+
+  useEffect(() => {
+    if (editMessageEntity?.isEditable()) {
+      const firstAsset = editMessageEntity.getFirstAsset() as TextAsset;
+      moveCursorToEnd(firstAsset.text.length);
+    }
+  }, [editMessageEntity]);
 
   const replyMessage = (messageEntity: ContentMessage): void => {
     if (messageEntity?.isReplyable() && messageEntity !== replyMessageEntity) {
@@ -447,7 +456,7 @@ const InputBar = ({
     }
   };
 
-  const onChange = (event: ChangeEvent<HTMLTextAreaElement>) => {
+  const onChange = (event: ChangeEvent<HTMLTextAreaElement>, start: number, end: number) => {
     event.preventDefault();
 
     const {value: currentValue} = event.currentTarget;
@@ -457,7 +466,7 @@ const InputBar = ({
     const previousValueLength = inputValue.length;
     const difference = currentValueLength - previousValueLength;
 
-    const updatedMentions = updateMentionRanges(currentMentions, selectionStart, selectionEnd, difference);
+    const updatedMentions = updateMentionRanges(currentMentions, start, end, difference);
     setCurrentMentions(updatedMentions);
   };
 
@@ -476,9 +485,9 @@ const InputBar = ({
           });
   };
 
-  const sendMessage = (messageText: string) => {
+  const sendMessage = (messageText: string, mentions: MentionEntity[]) => {
     if (messageText.length) {
-      const mentionEntities = currentMentions.slice(0);
+      const mentionEntities = mentions.slice(0);
 
       generateQuote().then(quoteEntity => {
         messageRepository.sendTextWithLinkPreview(conversationEntity, messageText, mentionEntities, quoteEntity);
@@ -487,8 +496,8 @@ const InputBar = ({
     }
   };
 
-  const sendMessageEdit = (messageText: string): void | Promise<any> => {
-    const mentionEntities = currentMentions.slice(0);
+  const sendMessageEdit = (messageText: string, mentions: MentionEntity[]): void | Promise<any> => {
+    const mentionEntities = mentions.slice(0);
     cancelMessageEditing();
 
     if (!messageText.length && editMessageEntity) {
@@ -514,8 +523,8 @@ const InputBar = ({
     }
 
     const beforeLength = text.length;
-    const messageText = text.trim();
-    const afterLength = messageText.length;
+    const messageTrimmedStart = text.trimLeft();
+    const afterLength = messageTrimmedStart.length;
     const isMessageTextTooLong = afterLength > CONFIG.MAXIMUM_MESSAGE_LENGTH;
 
     if (isMessageTextTooLong) {
@@ -526,14 +535,13 @@ const InputBar = ({
 
       return;
     }
-
     const updatedMentions = updateMentionRanges(currentMentions, 0, 0, afterLength - beforeLength);
-    setCurrentMentions(updatedMentions);
+    const messageText = messageTrimmedStart.trimRight();
 
     if (isEditing) {
-      sendMessageEdit(messageText);
+      sendMessageEdit(messageText, updatedMentions);
     } else {
-      sendMessage(messageText);
+      sendMessage(messageText, updatedMentions);
     }
 
     resetDraftState();
@@ -723,9 +731,7 @@ const InputBar = ({
     }
   }, [isEditing, currentMentions, replyMessageEntity, inputValue]);
 
-  useTextAreaFocus(() => {
-    textareaRef.current?.focus();
-  });
+  useTextAreaFocus(() => textareaRef.current?.focus());
 
   useScrollSync(textareaRef.current, shadowInputRef.current, [
     textareaRef.current,
@@ -813,7 +819,9 @@ const InputBar = ({
                     onKeyUp={onTextareaKeyUp}
                     onClick={handleMentionFlow}
                     onInput={updateMentions}
-                    onChange={onChange}
+                    onChange={(event: ChangeEvent<HTMLTextAreaElement>) =>
+                      onChange(event, selectionStart, selectionEnd)
+                    }
                     onPaste={onPasteFiles}
                     value={inputValue}
                     placeholder={inputPlaceholder}

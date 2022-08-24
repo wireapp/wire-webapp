@@ -18,20 +18,20 @@
  */
 
 import {WebAppEvents} from '@wireapp/webapp-events';
+import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
 import {amplify} from 'amplify';
 import React, {ChangeEvent} from 'react';
 
+import {CONFIG as HistoryExportConfig} from 'Components/HistoryExport';
 import {importHistoryFile} from 'Components/HistoryImport';
 
 import {t} from 'Util/LocalizerUtil';
 import {handleKeyDown} from 'Util/KeyboardUtil';
-import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
 
 import PreferencesSection from '../components/PreferencesSection';
 
 import {BackupRepository} from '../../../../../backup/BackupRepository';
 import {ContentViewModel} from '../../../../../view_model/ContentViewModel';
-import {HistoryExportViewModel} from '../../../../../view_model/content/HistoryExportViewModel';
 
 interface HistoryBackupSectionProps {
   backupRepository: BackupRepository;
@@ -56,7 +56,6 @@ const HistoryBackupSection: React.FC<HistoryBackupSectionProps> = ({backupReposi
         variant={ButtonVariant.TERTIARY}
         onClick={() => {
           amplify.publish(WebAppEvents.CONTENT.SWITCH, ContentViewModel.STATE.HISTORY_EXPORT);
-          amplify.publish(WebAppEvents.BACKUP.EXPORT.START);
         }}
         data-uie-name="do-backup-export"
         aria-describedby="preferences-history-describe-1"
@@ -89,10 +88,9 @@ const HistoryBackupSection: React.FC<HistoryBackupSectionProps> = ({backupReposi
             ref={fileInputRef}
             tabIndex={-1}
             type="file"
-            accept={`.${HistoryExportViewModel.CONFIG.FILE_EXTENSION}`}
+            accept={`.${HistoryExportConfig.FILE_EXTENSION}`}
             onChange={(event: ChangeEvent<HTMLInputElement>) => {
               const file = event.target.files?.[0];
-
               if (file) {
                 amplify.publish(WebAppEvents.CONTENT.SWITCH, ContentViewModel.STATE.HISTORY_IMPORT);
 
