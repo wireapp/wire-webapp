@@ -221,10 +221,10 @@ const InputBar = ({
     }, 0);
   };
 
-  const resetDraftState = (keepInputValue = true) => {
+  const resetDraftState = (resetInputValue = false) => {
     setCurrentMentions([]);
 
-    if (!keepInputValue) {
+    if (resetInputValue) {
       setInputValue('');
     }
   };
@@ -245,14 +245,14 @@ const InputBar = ({
     }
 
     if (!isHittingUploadLimit(droppedFiles, assetRepository)) {
-      Array.from(droppedFiles).forEach((file): void | number => {
+      Array.from(droppedFiles).forEach(file => {
         const isSupportedImage = CONFIG.ALLOWED_IMAGE_TYPES.includes(file.type);
 
         if (isSupportedImage) {
-          return images.push(file);
+          images.push(file);
+        } else {
+          files.push(file);
         }
-
-        files.push(file);
       });
 
       uploadImages(images);
@@ -321,16 +321,16 @@ const InputBar = ({
     setReplyMessageEntity(null);
 
     if (resetDraft) {
-      resetDraftState(false);
+      resetDraftState();
     }
   };
 
-  const cancelMessageEditing = (resetDraft = true) => {
+  const cancelMessageEditing = (resetDraft = true, resetInputValue = false) => {
     setEditMessageEntity(null);
     setReplyMessageEntity(null);
 
     if (resetDraft) {
-      resetDraftState();
+      resetDraftState(resetInputValue);
     }
   };
 
@@ -348,7 +348,7 @@ const InputBar = ({
       const newMentions = firstAsset.mentions().slice();
 
       cancelMessageReply();
-      cancelMessageEditing();
+      cancelMessageEditing(true, true);
       setEditMessageEntity(messageEntity);
       setInputValue(firstAsset.text);
       setCurrentMentions(newMentions);
@@ -416,7 +416,7 @@ const InputBar = ({
           } else if (pastedFile) {
             setPastedFile(null);
           } else if (isEditing) {
-            cancelMessageEditing();
+            cancelMessageEditing(true, true);
           } else if (isReplying) {
             cancelMessageReply(false);
           }
@@ -456,17 +456,16 @@ const InputBar = ({
     }
   };
 
-  const onChange = (event: ChangeEvent<HTMLTextAreaElement>, start: number, end: number) => {
+  const onChange = (event: ChangeEvent<HTMLTextAreaElement>) => {
     event.preventDefault();
 
     const {value: currentValue} = event.currentTarget;
     setInputValue(currentValue);
-
     const currentValueLength = currentValue.length;
     const previousValueLength = inputValue.length;
     const difference = currentValueLength - previousValueLength;
 
-    const updatedMentions = updateMentionRanges(currentMentions, start, end, difference);
+    const updatedMentions = updateMentionRanges(currentMentions, selectionStart, selectionEnd, difference);
     setCurrentMentions(updatedMentions);
   };
 
@@ -498,7 +497,7 @@ const InputBar = ({
 
   const sendMessageEdit = (messageText: string, mentions: MentionEntity[]): void | Promise<any> => {
     const mentionEntities = mentions.slice(0);
-    cancelMessageEditing();
+    cancelMessageEditing(true, true);
 
     if (!messageText.length && editMessageEntity) {
       return messageRepository.deleteMessageForEveryone(conversationEntity, editMessageEntity);
@@ -524,8 +523,9 @@ const InputBar = ({
 
     const beforeLength = text.length;
     const messageTrimmedStart = text.trimLeft();
-    const afterLength = messageTrimmedStart.length;
-    const isMessageTextTooLong = afterLength > CONFIG.MAXIMUM_MESSAGE_LENGTH;
+    const trimmedStartLength = messageTrimmedStart.length;
+    const messageText = messageTrimmedStart.trimRight();
+    const isMessageTextTooLong = messageText.length > CONFIG.MAXIMUM_MESSAGE_LENGTH;
 
     if (isMessageTextTooLong) {
       showWarningModal(
@@ -535,8 +535,7 @@ const InputBar = ({
 
       return;
     }
-    const updatedMentions = updateMentionRanges(currentMentions, 0, 0, afterLength - beforeLength);
-    const messageText = messageTrimmedStart.trimRight();
+    const updatedMentions = updateMentionRanges(currentMentions, 0, 0, trimmedStartLength - beforeLength);
 
     if (isEditing) {
       sendMessageEdit(messageText, updatedMentions);
@@ -544,7 +543,7 @@ const InputBar = ({
       sendMessage(messageText, updatedMentions);
     }
 
-    resetDraftState();
+    resetDraftState(true);
     textareaRef.current?.focus();
   };
 
@@ -552,7 +551,7 @@ const InputBar = ({
     onInputKeyDown: emojiKeyDown,
     onInputKeyUp: emojiKeyUp,
     renderEmojiComponent,
-  } = useEmoji(propertiesRepository, setInputValue, onSend, textareaRef.current);
+  } = useEmoji(propertiesRepository, setInputValue, onSend, currentMentions, setCurrentMentions, textareaRef.current);
 
   const uploadFiles = (files: File[]) => {
     const fileArray = Array.from(files);
@@ -656,7 +655,7 @@ const InputBar = ({
 
   const loadInitialStateForConversation = async (): Promise<void> => {
     setPastedFile(null);
-    cancelMessageEditing();
+    cancelMessageEditing(true, true);
     cancelMessageReply();
     endMentionFlow();
 
@@ -690,7 +689,7 @@ const InputBar = ({
     generateQuote().then(quoteEntity => {
       if (quoteEntity) {
         messageRepository.sendGif(conversationEntity, gifUrl, tag, quoteEntity);
-        cancelMessageEditing(true);
+        cancelMessageEditing(true, true);
       }
     });
   };
@@ -701,7 +700,7 @@ const InputBar = ({
     );
 
     if (!ignoredParent) {
-      cancelMessageEditing();
+      cancelMessageEditing(true, true);
       cancelMessageReply();
     }
   };
@@ -780,7 +779,7 @@ const InputBar = ({
   }, [isEditing]);
 
   // Temporarily functionality for dropping files on conversation container, should be moved to Conversation Component
-  useDropFiles('#conversation', onDropOrPastedFile);
+  useDropFiles('#conversation', onDropOrPastedFile, [isFileSharingSendingEnabled]);
 
   useEffect(() => {
     document.addEventListener('paste', onPasteFiles);
@@ -819,9 +818,7 @@ const InputBar = ({
                     onKeyUp={onTextareaKeyUp}
                     onClick={handleMentionFlow}
                     onInput={updateMentions}
-                    onChange={(event: ChangeEvent<HTMLTextAreaElement>) =>
-                      onChange(event, selectionStart, selectionEnd)
-                    }
+                    onChange={onChange}
                     onPaste={onPasteFiles}
                     value={inputValue}
                     placeholder={inputPlaceholder}
