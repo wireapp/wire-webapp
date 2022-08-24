@@ -88,19 +88,15 @@ const UserAvatar: React.FunctionComponent<UserAvatarProps> = ({
     >
       <AvatarBackground backgroundColor={backgroundColor} />
 
-      {initials && <AvatarInitials avatarSize={avatarSize} initials={initials} />}
-
-      <div tabIndex={0} role="button">
-        <AvatarImage
-          avatarSize={avatarSize}
-          avatarAlt={avatarImgAlt}
-          backgroundColor={backgroundColor}
-          isGrey={isImageGrey}
-          mediumPicture={mediumPictureResource}
-          previewPicture={previewPictureResource}
-        />
-      </div>
-
+      <AvatarInitials avatarSize={avatarSize} initials={participant.initials()} />
+      <AvatarImage
+        avatarSize={avatarSize}
+        avatarAlt={avatarImgAlt}
+        backgroundColor={backgroundColor}
+        isGrey={isImageGrey}
+        mediumPicture={mediumPictureResource}
+        previewPicture={previewPictureResource}
+      />
       {!noBadge && shouldShowBadge(avatarSize, state) && <AvatarBadge state={state} />}
 
       {!isImageGrey && <AvatarBorder />}
