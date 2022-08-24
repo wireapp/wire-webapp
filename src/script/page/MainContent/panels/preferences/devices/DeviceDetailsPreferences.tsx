@@ -24,6 +24,7 @@ import {t} from 'Util/LocalizerUtil';
 import DetailedDevice from './components/DetailedDevice';
 import {MotionDuration} from '../../../../../motion/MotionDuration';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
+import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
 
 interface DevicesPreferencesProps {
   device: ClientEntity;
@@ -80,7 +81,6 @@ const DeviceDetailsPreferences: React.FC<DevicesPreferencesProps> = ({
               onClick={onClose}
               data-uie-name="go-back"
             />
-            <span>{t('preferencesDevices')}</span>
           </legend>
           <DetailedDevice device={device} fingerprint={fingerprint} />
 
@@ -113,14 +113,15 @@ const DeviceDetailsPreferences: React.FC<DevicesPreferencesProps> = ({
           <div className="preferences-info">{t('preferencesDevicesSessionDetail')}</div>
           <div className="preferences-devices-session" data-uie-name="preferences-device-details-session">
             {resetState === SessionResetState.RESET && (
-              <button
+              <Button
+                variant={ButtonVariant.TERTIARY}
                 type="button"
-                className="preferences-button button button-small button-fluid"
+                className="preferences-button"
                 onClick={resetSession}
                 data-uie-name="do-session-reset"
               >
                 {t('preferencesDevicesSessionReset')}
-              </button>
+              </Button>
             )}
             {resetState === SessionResetState.ONGOING && (
               <div className="preferences-devices-session-reset">{t('preferencesDevicesSessionOngoing')}</div>
@@ -136,14 +137,15 @@ const DeviceDetailsPreferences: React.FC<DevicesPreferencesProps> = ({
         {!device.isLegalHold() && (
           <section className="preferences-section">
             <div className="preferences-info">{t('preferencesDevicesRemoveDetail')}</div>
-            <button
+            <Button
+              variant={ButtonVariant.TERTIARY}
               type="button"
-              className="preferences-button button button-small button-fluid"
+              className="preferences-button"
               onClick={() => onRemove(device)}
               data-uie-name="go-remove-device"
             >
               {t('preferencesDevicesRemove')}
-            </button>
+            </Button>
           </section>
         )}
       </div>
