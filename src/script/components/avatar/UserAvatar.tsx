@@ -88,7 +88,7 @@ const UserAvatar: React.FunctionComponent<UserAvatarProps> = ({
     >
       <AvatarBackground backgroundColor={backgroundColor} />
 
-      <AvatarInitials avatarSize={avatarSize} initials={participant.initials()} />
+      {initials && <AvatarInitials avatarSize={avatarSize} initials={initials} />}
       <AvatarImage
         avatarSize={avatarSize}
         avatarAlt={avatarImgAlt}

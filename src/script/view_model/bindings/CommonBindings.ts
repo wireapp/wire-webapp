@@ -21,7 +21,6 @@ import ko from 'knockout';
 import $ from 'jquery';
 import SimpleBar from 'simplebar';
 import {debounce, throttle} from 'underscore';
-import '@wireapp/antiscroll-2/dist/antiscroll-2';
 
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 import {stripUrlWrapper} from 'Util/util';
@@ -261,43 +260,6 @@ ko.bindingHandlers.fadingscrollbar = {
       element.removeEventListener('scroll', fadeIn);
       element.removeEventListener('scroll', debouncedFadeOut);
     });
-  },
-};
-
-/**
- * Render antiscroll scrollbar.
- */
-ko.bindingHandlers.antiscroll = {
-  init(element, valueAccessor) {
-    ($(element) as any).antiscroll({
-      autoHide: true,
-      autoWrap: true,
-      debug: false,
-      notHorizontal: true,
-    });
-
-    const parentElement = $(element).parent();
-    const antiscroll = parentElement.data('antiscroll');
-
-    if (antiscroll) {
-      const observer = new ResizeObserver(throttle(() => antiscroll.rebuild(), 100));
-      observer.observe(parentElement[0], {box: 'border-box'});
-      observer.observe(element, {box: 'border-box'});
-
-      let triggerSubscription: ko.Subscription;
-      const triggerValue = valueAccessor();
-      if (ko.isObservable(triggerValue)) {
-        triggerSubscription = triggerValue.subscribe(() => {
-          antiscroll.rebuild();
-        });
-      }
-
-      ko.utils.domNodeDisposal.addDisposeCallback(element, () => {
-        antiscroll.destroy();
-        observer.disconnect();
-        triggerSubscription?.dispose();
-      });
-    }
   },
 };
 

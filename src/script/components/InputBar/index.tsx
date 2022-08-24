@@ -20,6 +20,7 @@
 import {Availability} from '@wireapp/protocol-messaging';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import {
+  ChangeEvent,
   ClipboardEvent as ReactClipboardEvent,
   KeyboardEvent as ReactKeyboardEvent,
   FormEvent,
@@ -34,6 +35,7 @@ import {container} from 'tsyringe';
 
 import ClassifiedBar from 'Components/input/ClassifiedBar';
 import Avatar, {AVATAR_SIZE} from 'Components/Avatar';
+import useEmoji from 'Components/Emoji/useEmoji';
 
 import {registerReactComponent, useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {loadDraftState, saveDraftState} from 'Util/DraftStateUtil';
@@ -57,7 +59,6 @@ import {UserState} from '../../user/UserState';
 import {SearchRepository} from '../../search/SearchRepository';
 import {ContentMessage} from '../../entity/message/ContentMessage';
 import InputBarControls from '../../page/message-list/InputBarControls';
-import {EmojiInputViewModel} from '../../view_model/content/EmojiInputViewModel';
 import {Conversation} from '../../entity/Conversation';
 import {AssetRepository} from '../../assets/AssetRepository';
 import {ConversationRepository} from '../../conversation/ConversationRepository';
@@ -72,8 +73,11 @@ import {MessageHasher} from '../../message/MessageHasher';
 import {QuoteEntity} from '../../message/QuoteEntity';
 import {Text as TextAsset} from '../../entity/message/Text';
 import {User} from '../../entity/User';
+import {PropertiesRepository} from '../../properties/PropertiesRepository';
+
 import PastedFileControls from './PastedFileControls';
 import ReplyBar from './ReplyBar';
+
 import useScrollSync from '../../hooks/useScrollSync';
 import useResizeTarget from '../../hooks/useResizeTarget';
 import useDropFiles from '../../hooks/useDropFiles';
@@ -97,9 +101,9 @@ interface InputBarProps {
   readonly assetRepository: AssetRepository;
   readonly conversationEntity: Conversation;
   readonly conversationRepository: ConversationRepository;
-  readonly emojiInput: EmojiInputViewModel;
   readonly eventRepository: EventRepository;
   readonly messageRepository: MessageRepository;
+  readonly propertiesRepository: PropertiesRepository;
   readonly searchRepository: SearchRepository;
   readonly storageRepository: StorageRepository;
   readonly teamState: TeamState;
@@ -110,9 +114,9 @@ const InputBar = ({
   assetRepository,
   conversationEntity,
   conversationRepository,
-  emojiInput,
   eventRepository,
   messageRepository,
+  propertiesRepository,
   searchRepository,
   storageRepository,
   userState = container.resolve(UserState),
@@ -217,9 +221,12 @@ const InputBar = ({
     }, 0);
   };
 
-  const resetDraftState = () => {
+  const resetDraftState = (keepInputValue = true) => {
     setCurrentMentions([]);
-    setInputValue('');
+
+    if (!keepInputValue) {
+      setInputValue('');
+    }
   };
 
   const clearPastedFile = () => setPastedFile(null);
@@ -285,7 +292,8 @@ const InputBar = ({
 
       const updatedMentions = updateMentionRanges(currentMentions, selectionStart, selectionEnd, difference);
       const newMentions = [...updatedMentions, mentionEntity];
-      setCurrentMentions(newMentions.sort((mentionA, mentionB) => mentionA.startIndex - mentionB.startIndex));
+      const sortedMentions = newMentions.sort((mentionA, mentionB) => mentionA.startIndex - mentionB.startIndex);
+      setCurrentMentions(sortedMentions);
 
       const caretPosition = mentionEntity.endIndex + 1;
 
@@ -313,7 +321,7 @@ const InputBar = ({
     setReplyMessageEntity(null);
 
     if (resetDraft) {
-      resetDraftState();
+      resetDraftState(false);
     }
   };
 
@@ -328,7 +336,7 @@ const InputBar = ({
 
   const handleCancelReply = () => {
     if (!mentionSuggestions.length) {
-      cancelMessageReply();
+      cancelMessageReply(false);
     }
 
     textareaRef.current?.focus();
@@ -350,10 +358,15 @@ const InputBar = ({
           .getMessageInConversationById(conversationEntity, messageEntity.quote().messageId)
           .then(quotedMessage => setReplyMessageEntity(quotedMessage));
       }
-
-      moveCursorToEnd(firstAsset.text.length);
     }
   };
+
+  useEffect(() => {
+    if (editMessageEntity?.isEditable()) {
+      const firstAsset = editMessageEntity.getFirstAsset() as TextAsset;
+      moveCursorToEnd(firstAsset.text.length);
+    }
+  }, [editMessageEntity]);
 
   const replyMessage = (messageEntity: ContentMessage): void => {
     if (messageEntity?.isReplyable() && messageEntity !== replyMessageEntity) {
@@ -386,7 +399,7 @@ const InputBar = ({
   };
 
   const onTextAreaKeyDown = (keyboardEvent: ReactKeyboardEvent<HTMLTextAreaElement>): void | boolean => {
-    const inputHandledByEmoji = !editedMention && emojiInput.onInputKeyDown(keyboardEvent);
+    const inputHandledByEmoji = !editedMention && emojiKeyDown(keyboardEvent);
 
     if (!inputHandledByEmoji) {
       switch (keyboardEvent.key) {
@@ -412,7 +425,7 @@ const InputBar = ({
         case KEY.ENTER: {
           if (!keyboardEvent.shiftKey && !keyboardEvent.altKey && !keyboardEvent.metaKey) {
             keyboardEvent.preventDefault();
-            onSend();
+            onSend(inputValue);
           }
 
           if (keyboardEvent.altKey || keyboardEvent.metaKey) {
@@ -435,7 +448,7 @@ const InputBar = ({
 
   const onTextareaKeyUp = (keyboardEvent: ReactKeyboardEvent<HTMLTextAreaElement>): void => {
     if (!editedMention) {
-      emojiInput.onInputKeyUp(keyboardEvent);
+      emojiKeyUp(keyboardEvent);
     }
 
     if (keyboardEvent.key !== KEY.ESC) {
@@ -443,7 +456,7 @@ const InputBar = ({
     }
   };
 
-  const onChange = (event: ReactKeyboardEvent<HTMLTextAreaElement>) => {
+  const onChange = (event: ChangeEvent<HTMLTextAreaElement>, start: number, end: number) => {
     event.preventDefault();
 
     const {value: currentValue} = event.currentTarget;
@@ -453,7 +466,7 @@ const InputBar = ({
     const previousValueLength = inputValue.length;
     const difference = currentValueLength - previousValueLength;
 
-    const updatedMentions = updateMentionRanges(currentMentions, selectionStart, selectionEnd, difference);
+    const updatedMentions = updateMentionRanges(currentMentions, start, end, difference);
     setCurrentMentions(updatedMentions);
   };
 
@@ -472,9 +485,9 @@ const InputBar = ({
           });
   };
 
-  const sendMessage = (messageText: string) => {
+  const sendMessage = (messageText: string, mentions: MentionEntity[]) => {
     if (messageText.length) {
-      const mentionEntities = currentMentions.slice(0);
+      const mentionEntities = mentions.slice(0);
 
       generateQuote().then(quoteEntity => {
         messageRepository.sendTextWithLinkPreview(conversationEntity, messageText, mentionEntities, quoteEntity);
@@ -483,8 +496,8 @@ const InputBar = ({
     }
   };
 
-  const sendMessageEdit = (messageText: string): void | Promise<any> => {
-    const mentionEntities = currentMentions.slice(0);
+  const sendMessageEdit = (messageText: string, mentions: MentionEntity[]): void | Promise<any> => {
+    const mentionEntities = mentions.slice(0);
     cancelMessageEditing();
 
     if (!messageText.length && editMessageEntity) {
@@ -504,14 +517,14 @@ const InputBar = ({
     }
   };
 
-  const onSend = (): void | boolean => {
+  const onSend = (text: string): void | boolean => {
     if (pastedFile) {
       return sendPastedFile();
     }
 
-    const beforeLength = inputValue.length;
-    const messageText = inputValue.trim();
-    const afterLength = messageText.length;
+    const beforeLength = text.length;
+    const messageTrimmedStart = text.trimLeft();
+    const afterLength = messageTrimmedStart.length;
     const isMessageTextTooLong = afterLength > CONFIG.MAXIMUM_MESSAGE_LENGTH;
 
     if (isMessageTextTooLong) {
@@ -522,19 +535,24 @@ const InputBar = ({
 
       return;
     }
-
     const updatedMentions = updateMentionRanges(currentMentions, 0, 0, afterLength - beforeLength);
-    setCurrentMentions(updatedMentions);
+    const messageText = messageTrimmedStart.trimRight();
 
     if (isEditing) {
-      sendMessageEdit(messageText);
+      sendMessageEdit(messageText, updatedMentions);
     } else {
-      sendMessage(messageText);
+      sendMessage(messageText, updatedMentions);
     }
 
     resetDraftState();
     textareaRef.current?.focus();
   };
+
+  const {
+    onInputKeyDown: emojiKeyDown,
+    onInputKeyUp: emojiKeyUp,
+    renderEmojiComponent,
+  } = useEmoji(propertiesRepository, setInputValue, onSend, textareaRef.current);
 
   const uploadFiles = (files: File[]) => {
     const fileArray = Array.from(files);
@@ -713,9 +731,7 @@ const InputBar = ({
     }
   }, [isEditing, currentMentions, replyMessageEntity, inputValue]);
 
-  useTextAreaFocus(() => {
-    textareaRef.current?.focus();
-  });
+  useTextAreaFocus(() => textareaRef.current?.focus());
 
   useScrollSync(textareaRef.current, shadowInputRef.current, [
     textareaRef.current,
@@ -790,6 +806,8 @@ const InputBar = ({
 
             {!removedFromConversation && !pastedFile && (
               <>
+                {renderEmojiComponent()}
+
                 <div className="controls-center">
                   <textarea
                     ref={textareaRef}
@@ -801,7 +819,9 @@ const InputBar = ({
                     onKeyUp={onTextareaKeyUp}
                     onClick={handleMentionFlow}
                     onInput={updateMentions}
-                    onChange={onChange}
+                    onChange={(event: ChangeEvent<HTMLTextAreaElement>) =>
+                      onChange(event, selectionStart, selectionEnd)
+                    }
                     onPaste={onPasteFiles}
                     value={inputValue}
                     placeholder={inputPlaceholder}
@@ -831,7 +851,7 @@ const InputBar = ({
                   isEditing={isEditing}
                   disablePing={pingDisabled}
                   disableFilesharing={!isFileSharingSendingEnabled}
-                  onSend={onSend}
+                  onSend={() => onSend(inputValue)}
                   onSelectFiles={uploadFiles}
                   onSelectImages={uploadImages}
                   onCancelEditing={cancelMessageEditing}
