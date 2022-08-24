@@ -23,7 +23,7 @@ import {isDragEvent} from '../guards/Event';
 
 const onDragOver = (event: Event) => event.preventDefault();
 
-const useDropFiles = (selector: string, onDropOrPastedFile: (files: File[]) => void) => {
+const useDropFiles = (selector: string, onDropOrPastedFile: (files: File[]) => void, deps: unknown[] = []) => {
   const onDropFiles = (event: Event) => {
     event.preventDefault();
 
@@ -52,7 +52,7 @@ const useDropFiles = (selector: string, onDropOrPastedFile: (files: File[]) => v
     }
 
     return () => undefined;
-  }, [selector]);
+  }, [selector, ...deps]);
 };
 
 export default useDropFiles;
