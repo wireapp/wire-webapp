@@ -18,7 +18,6 @@
  */
 
 import {Runtime} from '@wireapp/commons';
-import type {KeyboardEvent as ReactKeyboardEvent} from 'react';
 
 export const KEY = {
   ARROW_DOWN: Runtime.isEdge() ? 'Down' : 'ArrowDown',
@@ -48,21 +47,20 @@ export const isArrowKey = (keyboardEvent: KeyboardEvent): boolean =>
 export const isPageUpDownKey = (keyboardEvent: KeyboardEvent): boolean =>
   isOneOfKeys(keyboardEvent, [KEY.PAGE_UP, KEY.PAGE_DOWN]);
 
-export const isKey = (keyboardEvent?: KeyboardEvent | ReactKeyboardEvent, expectedKey = '') => {
+export const isKey = (keyboardEvent?: KeyboardEvent, expectedKey = '') => {
   const eventKey = keyboardEvent?.key?.toLowerCase() || '';
   return eventKey === expectedKey.toLowerCase();
 };
 
 export const isTabKey = (keyboardEvent: KeyboardEvent): boolean => isKey(keyboardEvent, KEY.TAB);
 
-export const isEnterKey = (keyboardEvent: KeyboardEvent | ReactKeyboardEvent): boolean =>
-  isKey(keyboardEvent, KEY.ENTER);
+export const isEnterKey = (keyboardEvent: KeyboardEvent): boolean => isKey(keyboardEvent, KEY.ENTER);
 
 export const isSpaceKey = (keyboardEvent: KeyboardEvent): boolean => isKey(keyboardEvent, KEY.SPACE);
 
 export const isEscapeKey = (keyboardEvent: KeyboardEvent): boolean => isKey(keyboardEvent, KEY.ESC);
 
-export const isFunctionKey = (keyboardEvent: KeyboardEvent | ReactKeyboardEvent): boolean =>
+export const isFunctionKey = (keyboardEvent: KeyboardEvent): boolean =>
   keyboardEvent.altKey || keyboardEvent.ctrlKey || keyboardEvent.metaKey || keyboardEvent.shiftKey;
 
 /** On macOS the meta key is '⌘', which represents 'Ctrl' in the Windows world: https://www.oreilly.com/library/view/switching-to-the/9781449372927/ch01s08.html */
@@ -138,12 +136,9 @@ export const offEscKey = (handler: KeyboardHandler) => {
   }
 };
 
-export const handleKeyDown = (
-  event: React.KeyboardEvent<HTMLElement> | KeyboardEvent,
-  callback: (event?: React.KeyboardEvent<HTMLElement> | KeyboardEvent) => void,
-) => {
+export const handleKeyDown = (event: React.KeyboardEvent<HTMLElement> | KeyboardEvent, callback: () => void) => {
   if (event.key === KEY.ENTER || event.key === KEY.SPACE) {
-    callback(event);
+    callback();
   }
   return true;
 };
@@ -156,15 +151,13 @@ export const handleEnterDown = (event: React.KeyboardEvent<HTMLElement> | Keyboa
 };
 
 const handleDebugKey = () => {
-  const removeDebugInfo = (els: NodeListOf<HTMLElement>) => els.forEach(el => el.parentNode?.removeChild(el));
+  const removeDebugInfo = (els: NodeListOf<HTMLElement>) => els.forEach(el => el.parentNode.removeChild(el));
 
   const addDebugInfo = (els: NodeListOf<HTMLElement>) =>
     els.forEach(el => {
       const debugInfo = document.createElement('div');
       debugInfo.classList.add('debug-info');
-      if (el.dataset.uieUid) {
-        debugInfo.textContent = el.dataset.uieUid;
-      }
+      debugInfo.textContent = el.dataset.uieUid;
       el.appendChild(debugInfo);
     });
 

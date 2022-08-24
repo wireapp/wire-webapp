@@ -907,6 +907,8 @@
   "participantDevicesDetailResetSession": "Reset session",
   "participantDevicesDetailShowMyDevice": "Show my device fingerprint",
   "participantDevicesDetailVerify": "Verified",
+  "preferencesDeviceNotVerified": "not verified",
+  "preferencesDevice": "Device",
   "participantDevicesHeader": "Devices",
   "participantDevicesHeadline": "{{brandName}} gives every device a unique fingerprint. Compare them with {{user}} and verify your conversation.",
   "participantDevicesLearnMore": "Learn more",
