@@ -1361,7 +1361,6 @@ export class ConversationRepository {
   // Send events
   //##############################################################################
 
-  //herere
   /**
    * Add users to an existing conversation.
    *
@@ -1509,7 +1508,6 @@ export class ConversationRepository {
     }
   }
 
-  //herere
   /**
    * Remove member from conversation.
    *
@@ -1523,23 +1521,30 @@ export class ConversationRepository {
      * Needs to be done to receive the latest epoch and avoid epoch mismatch errors
      */
 
-    const {groupId} = conversationEntity;
+    const {groupId, qualifiedId} = conversationEntity;
 
-    if (conversationEntity.isUsingMLSProtocol) {
-      const response = await this.core.service!.conversation.removeUsersFromMLSConversation({
-        groupId,
-        qualifiedUserIds: [userId],
-      });
-      //todo
-    } else {
-      const response = await this.core.service!.conversation.removeUser(conversationEntity.qualifiedId.id, userId.id);
-      const roles = conversationEntity.roles();
-      delete roles[userId.id];
-      conversationEntity.roles(roles);
-      const currentTimestamp = this.serverTimeHandler.toServerTimestamp();
-      const event = response || EventBuilder.buildMemberLeave(conversationEntity, userId, true, currentTimestamp);
-      this.eventRepository.injectEvent(event, EventRepository.SOURCE.BACKEND_RESPONSE);
-      return event;
+    try {
+      if (conversationEntity.isUsingMLSProtocol) {
+        const {events} = await this.core.service!.conversation.removeUsersFromMLSConversation({
+          conversationId: qualifiedId,
+          groupId,
+          qualifiedUserIds: [userId],
+        });
+
+        if (!!events.length) {
+          events.forEach(event => this.eventRepository.injectEvent(event));
+        }
+      } else {
+        const response = await this.core.service!.conversation.removeUser(conversationEntity.qualifiedId.id, userId.id);
+        const roles = conversationEntity.roles();
+        delete roles[userId.id];
+        conversationEntity.roles(roles);
+        const currentTimestamp = this.serverTimeHandler.toServerTimestamp();
+        const event = response || EventBuilder.buildMemberLeave(conversationEntity, userId, true, currentTimestamp);
+        this.eventRepository.injectEvent(event, EventRepository.SOURCE.BACKEND_RESPONSE);
+      }
+    } catch (error) {
+      console.error(error);
     }
   }
 
