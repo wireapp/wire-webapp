@@ -32,7 +32,6 @@ import {MessageListViewModel} from './content/MessageListViewModel';
 import {LegalHoldModalViewModel} from './content/LegalHoldModalViewModel';
 import {ModalsViewModel} from './ModalsViewModel';
 import {ConversationError} from '../error/ConversationError';
-import {HistoryImportViewModel} from './content/HistoryImportViewModel';
 import {PanelViewModel} from './PanelViewModel';
 import type {MainViewModel, ViewModelRepositories} from './MainViewModel';
 import type {ConversationRepository} from '../conversation/ConversationRepository';
@@ -90,7 +89,6 @@ export class ContentViewModel {
   messageRepository: MessageRepository;
   elementId: string;
   sidebarId: string;
-  historyImport: HistoryImportViewModel;
   legalHoldModal: LegalHoldModalViewModel;
   logger: Logger;
   readonly isFederated?: boolean;
@@ -154,8 +152,6 @@ export class ContentViewModel {
       repositories.user,
       repositories.message,
     );
-
-    this.historyImport = new HistoryImportViewModel(repositories.backup);
 
     this.state.subscribe(state => {
       switch (state) {

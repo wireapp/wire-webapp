@@ -40,10 +40,7 @@
             "
           ></history-export>
         <!-- /ko -->
-        <!-- ko if: state() === State.HISTORY_IMPORT -->
-          <h1 class="visually-hidden" data-bind="text: t('accessibility.headings.historyImport')"></h1>
-          #include('content/history-import.htm')
-        <!-- /ko -->
+
         <group-creation-modal params="
           conversationRepository: $root.repositories.conversation,
           searchRepository: $root.repositories.search,

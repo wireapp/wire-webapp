@@ -854,7 +854,7 @@ exports[`stricter compilation`] = {
       [45, 6, 6, "Type \'null\' is not assignable to type \'QualifiedId\'.", "1765117785"],
       [49, 11, 29, "Object is possibly \'null\'.", "3523845355"]
     ],
-    "src/script/components/Modals/UserModal/UserModal.tsx:2112661617": [
+    "src/script/components/Modals/UserModal/UserModal.tsx:1339029028": [
       [72, 57, 4, "Argument of type \'User | null\' is not assignable to parameter of type \'Partial<Record<\\"isBlockedLegalHold\\", Subscribable<any>>>\'.\\n  Type \'null\' is not assignable to type \'Partial<Record<\\"isBlockedLegalHold\\", Subscribable<any>>>\'.", "2087973204"]
     ],
     "src/script/components/SearchInput.test.tsx:3374298949": [
@@ -2035,7 +2035,7 @@ exports[`stricter compilation`] = {
     "src/script/page/LeftSidebar/panels/StartUI/components/GroupList.test.tsx:87150494": [
       [34, 63, 38, "Argument of type \'Element | null\' is not assignable to parameter of type \'Element\'.\\n  Type \'null\' is not assignable to type \'Element\'.", "495210063"]
     ],
-    "src/script/page/MainContent/MainContent.tsx:2029280374": [
+    "src/script/page/MainContent/MainContent.tsx:1318405039": [
       [68, 28, 12, "Type \'Conversation | null\' is not assignable to type \'Conversation\'.\\n  Type \'null\' is not assignable to type \'Conversation\'.", "1670678216"]
     ],
     "src/script/page/MainContent/panels/Collection/Collection.test.tsx:1028939995": [
@@ -2054,9 +2054,9 @@ exports[`stricter compilation`] = {
       [31, 13, 16, "Object is possibly \'undefined\'.", "3400861264"],
       [34, 8, 16, "Object is possibly \'undefined\'.", "3400861264"]
     ],
-    "src/script/page/MainContent/panels/preferences/AccountPreferences.tsx:3579461216": [
-      [92, 79, 34, "Argument of type \'boolean | undefined\' is not assignable to parameter of type \'boolean\'.", "212151669"],
-      [120, 6, 9, "Argument of type \'undefined\' is not assignable to parameter of type \'string\'.", "2620553983"]
+    "src/script/page/MainContent/panels/preferences/AccountPreferences.tsx:487388879": [
+      [95, 79, 34, "Argument of type \'boolean | undefined\' is not assignable to parameter of type \'boolean\'.", "212151669"],
+      [124, 6, 9, "Argument of type \'undefined\' is not assignable to parameter of type \'string\'.", "2620553983"]
     ],
     "src/script/page/MainContent/panels/preferences/accountPreferences/AccountSecuritySection.tsx:281427554": [
       [70, 6, 9, "Argument of type \'undefined\' is not assignable to parameter of type \'string\'.", "2620553983"],
@@ -2358,9 +2358,6 @@ exports[`stricter compilation`] = {
       [166, 51, 4, "Argument of type \'string | null\' is not assignable to parameter of type \'string\'.\\n  Type \'null\' is not assignable to type \'string\'.", "2087822780"],
       [204, 71, 22, "Argument of type \'Token[] | null\' is not assignable to parameter of type \'Token[]\'.\\n  Type \'null\' is not assignable to type \'Token[]\'.", "525880250"]
     ],
-    "src/script/util/renderModal.ts:1796177515": [
-      [29, 4, 14, "Type \'undefined\' is not assignable to type \'HTMLDivElement\'.", "4001065193"]
-    ],
     "src/script/util/test/TestPage.tsx:1772987669": [
       [28, 4, 10, "Type \'T | undefined\' is not assignable to type \'T\'.\\n  \'T\' could be instantiated with an arbitrary type which could be unrelated to \'T | undefined\'.", "4016349795"],
       [29, 4, 14, "Type \'FC<T> | ComponentClass<T, any>\' is not assignable to type \'FC<{}> | ComponentClass<{}, any>\'.\\n  Type \'FC<T>\' is not assignable to type \'FC<{}> | ComponentClass<{}, any>\'.\\n    Type \'FunctionComponent<T>\' is not assignable to type \'FC<{}>\'.\\n      Types of parameters \'props\' and \'props\' are incompatible.\\n        Type \'{}\' is not assignable to type \'T\'.\\n          \'T\' could be instantiated with an arbitrary type which could be unrelated to \'{}\'.", "2825119042"]
@@ -2386,16 +2383,16 @@ exports[`stricter compilation`] = {
       [88, 11, 17, "Property \'activeCallViewTab\' has no initializer and is not definitely assigned in the constructor.", "1323835793"],
       [320, 4, 63, "Type \'Conversation | undefined\' is not assignable to type \'Conversation\'.\\n  Type \'undefined\' is not assignable to type \'Conversation\'.", "62763745"]
     ],
-    "src/script/view_model/ContentViewModel.ts:2174865074": [
-      [241, 65, 6, "Type \'string | null\' is not assignable to type \'string\'.\\n  Type \'null\' is not assignable to type \'string\'.", "1127975365"],
-      [278, 68, 13, "Argument of type \'Message | undefined\' is not assignable to parameter of type \'Message\'.\\n  Type \'undefined\' is not assignable to type \'Message\'.", "2065728181"],
-      [284, 10, 6, "Type \'Conversation | null\' is not assignable to type \'PanelEntity\'.", "1164306878"],
-      [288, 37, 5, "Object is of type \'unknown\'.", "165548477"],
-      [298, 10, 9, "Argument of type \'undefined\' is not assignable to parameter of type \'string\'.", "2620553983"],
-      [381, 50, 9, "Argument of type \'undefined\' is not assignable to parameter of type \'Conversation\'.", "2620553983"],
-      [409, 12, 9, "Argument of type \'undefined\' is not assignable to parameter of type \'string\'.", "2620553983"],
-      [418, 20, 29, "Object is possibly \'undefined\'.", "1398699454"],
-      [421, 12, 9, "Argument of type \'undefined\' is not assignable to parameter of type \'string\'.", "2620553983"]
+    "src/script/view_model/ContentViewModel.ts:316767445": [
+      [237, 65, 6, "Type \'string | null\' is not assignable to type \'string\'.\\n  Type \'null\' is not assignable to type \'string\'.", "1127975365"],
+      [274, 68, 13, "Argument of type \'Message | undefined\' is not assignable to parameter of type \'Message\'.\\n  Type \'undefined\' is not assignable to type \'Message\'.", "2065728181"],
+      [280, 10, 6, "Type \'Conversation | null\' is not assignable to type \'PanelEntity\'.", "1164306878"],
+      [284, 37, 5, "Object is of type \'unknown\'.", "165548477"],
+      [294, 10, 9, "Argument of type \'undefined\' is not assignable to parameter of type \'string\'.", "2620553983"],
+      [377, 50, 9, "Argument of type \'undefined\' is not assignable to parameter of type \'Conversation\'.", "2620553983"],
+      [405, 12, 9, "Argument of type \'undefined\' is not assignable to parameter of type \'string\'.", "2620553983"],
+      [414, 20, 29, "Object is possibly \'undefined\'.", "1398699454"],
+      [417, 12, 9, "Argument of type \'undefined\' is not assignable to parameter of type \'string\'.", "2620553983"]
     ],
     "src/script/view_model/ImageDetailViewViewModel.ts:1576396674": [
       [58, 4, 11, "Type \'undefined\' is not assignable to type \'string\'.", "3652784592"],
@@ -2502,12 +2499,6 @@ exports[`stricter compilation`] = {
     "src/script/view_model/bindings/VideoCallingBindings.ts:456425467": [
       [23, 2, 6, "Type \'(element: HTMLMediaElement, valueAccessor: Observable<MediaStream>) => void\' is not assignable to type \'(element: any, valueAccessor: () => any, allBindings: AllBindings, viewModel: any, bindingContext: BindingContext<any>) => void\'.\\n  Types of parameters \'valueAccessor\' and \'valueAccessor\' are incompatible.\\n    Type \'() => any\' is missing the following properties from type \'Observable<MediaStream>\': equalityComparer, peek, valueHasMutated, valueWillMutate, and 5 more.", "1759213236"],
       [31, 2, 6, "Type \'(element: HTMLMediaElement, valueAccessor: Observable<MediaStream>) => void\' is not assignable to type \'(element: any, valueAccessor: () => any, allBindings: AllBindings, viewModel: any, bindingContext: BindingContext<any>) => void\'.\\n  Types of parameters \'valueAccessor\' and \'valueAccessor\' are incompatible.\\n    Type \'() => any\' is not assignable to type \'Observable<MediaStream>\'.", "1759213236"]
-    ],
-    "src/script/view_model/content/HistoryImportViewModel.ts:2154234816": [
-      [61, 4, 10, "Type \'Observable<Error | null>\' is not assignable to type \'Observable<Error>\'.\\n  The types returned by \'peek()\' are incompatible between these types.\\n    Type \'Error | null\' is not assignable to type \'Error\'.\\n      Type \'null\' is not assignable to type \'Error\'.", "3994891413"],
-      [115, 15, 4, "Argument of type \'null\' is not assignable to parameter of type \'Error\'.", "2087897566"],
-      [136, 19, 5, "Argument of type \'unknown\' is not assignable to parameter of type \'Error\'.", "165548477"],
-      [151, 15, 4, "Argument of type \'null\' is not assignable to parameter of type \'Error\'.", "2087897566"]
     ],
     "src/script/view_model/content/LegalHoldModalViewModel.ts:3913530676": [
       [76, 4, 10, "Type \'Observable<never[]>\' is not assignable to type \'Observable<User[]>\'.", "4012712079"],
