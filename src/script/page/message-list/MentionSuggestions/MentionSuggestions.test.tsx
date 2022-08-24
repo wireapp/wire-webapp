@@ -24,6 +24,10 @@ import {render, fireEvent, screen} from '@testing-library/react';
 import {User} from '../../../entity/User';
 import {createRandomUuid} from 'Util/util';
 
+//text field's id
+const targetInputId = 'test';
+const targetInputSelector = `#${targetInputId}`;
+
 // mocked data
 const first = generateUser('patryktest1', 'patryktest1');
 const second = generateUser('patryktest2', 'patryktest2');
@@ -37,36 +41,36 @@ const onSelectionValidated = jest.fn();
 beforeAll(() => {
   //component uses textArea element by accessing it via querySelector, we need to insert it to the DOM
   const input = document.createElement('textarea');
+  input.id = targetInputId;
   document.body.appendChild(input);
   Element.prototype.scrollIntoView = jest.fn();
 });
 
 describe('MentionSuggestionList', () => {
   it("properly selects mentioned user when only array's order changes", async () => {
-    const input = screen.getByRole('textbox') as HTMLTextAreaElement;
-
     const {rerender} = render(
       <MentionSuggestionList
         onSelectionValidated={onSelectionValidated}
         suggestions={sortedSuggestions}
-        targetInput={input}
+        targetInputSelector={targetInputSelector}
       />,
     );
 
+    const input = screen.getByRole('textbox') as HTMLTextAreaElement;
     fireEvent.keyDown(input, {code: 'Tab', key: 'Tab'});
-    expect(onSelectionValidated).toHaveBeenCalledWith(first);
+    expect(onSelectionValidated).toHaveBeenCalledWith(first, input);
 
     //suggestions prop changed, component rerenders (
     rerender(
       <MentionSuggestionList
         onSelectionValidated={onSelectionValidated}
         suggestions={suggestions}
-        targetInput={input}
+        targetInputSelector={targetInputSelector}
       />,
     );
 
     fireEvent.keyDown(input, {code: 'Tab', key: 'Tab'});
-    expect(onSelectionValidated).toHaveBeenCalledWith(third);
+    expect(onSelectionValidated).toHaveBeenCalledWith(third, input);
   });
 });
 

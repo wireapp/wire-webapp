@@ -40,7 +40,7 @@ const skipFirstCall = (fn: (...args: unknown[]) => void) => {
   };
 };
 
-export const useResizeObserver = (element: Element | undefined, callback: (element: Element) => void) => {
+export const useResizeObserver = (element: Element | undefined | null, callback: (element: Element) => void) => {
   useEffect(() => {
     if (!element) {
       return () => {};

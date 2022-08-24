@@ -19,7 +19,6 @@
 
 import {WebAppEvents} from '@wireapp/webapp-events';
 import type {WebappProperties} from '@wireapp/api-client/src/user/data/';
-import type {KeyboardEvent} from 'react';
 import {amplify} from 'amplify';
 import ko from 'knockout';
 import {loadValue, storeValue} from 'Util/StorageUtil';
@@ -181,8 +180,8 @@ export class EmojiInputViewModel {
     this.initSubscriptions();
   }
 
-  readonly onInputKeyDown = (keyboardEvent: KeyboardEvent<HTMLTextAreaElement>): boolean => {
-    const input = keyboardEvent.currentTarget;
+  readonly onInputKeyDown = (data: unknown, keyboardEvent: KeyboardEvent): boolean => {
+    const input = keyboardEvent.target as HTMLInputElement;
 
     // Handling just entered inline emoji
     switch (keyboardEvent.key) {
@@ -246,7 +245,7 @@ export class EmojiInputViewModel {
     return false;
   };
 
-  readonly onInputKeyUp = (keyboardEvent: KeyboardEvent): boolean => {
+  readonly onInputKeyUp = (data: unknown, keyboardEvent: KeyboardEvent): boolean => {
     if (this.suppressKeyUp) {
       this.suppressKeyUp = false;
       return true;
@@ -285,7 +284,7 @@ export class EmojiInputViewModel {
     this.shouldReplaceEmoji = preference;
   };
 
-  private readonly tryReplaceInlineEmoji = (input: HTMLTextAreaElement): boolean => {
+  private readonly tryReplaceInlineEmoji = (input: HTMLInputElement): boolean => {
     const {selectionStart: selection, value: text} = input;
 
     if (this.shouldReplaceEmoji && text) {
@@ -312,7 +311,7 @@ export class EmojiInputViewModel {
     return false;
   };
 
-  private readonly replaceAllInlineEmoji = (input: HTMLInputElement | HTMLTextAreaElement): void | boolean => {
+  private readonly replaceAllInlineEmoji = (input: HTMLInputElement): void | boolean => {
     if (!this.shouldReplaceEmoji) {
       return false;
     }
@@ -416,7 +415,7 @@ export class EmojiInputViewModel {
   };
 
   private readonly enterEmojiPopupLine = (
-    input: HTMLInputElement | HTMLTextAreaElement,
+    input: HTMLInputElement,
     emojiLine: JQuery<HTMLElement> | JQuery<Document>,
   ): void => {
     const emojiIcon = emojiLine.find('.symbol').text();
@@ -426,7 +425,7 @@ export class EmojiInputViewModel {
     this.increaseUsageCount(emojiName); // only emojis selected from the list should affect the count
   };
 
-  private readonly enterEmoji = (input: HTMLInputElement | HTMLTextAreaElement, emojiIcon: string): void => {
+  private readonly enterEmoji = (input: HTMLInputElement, emojiIcon: string): void => {
     const {selectionStart: selection, value: text} = input;
 
     const textBeforeEmoji = text.substring(0, this.emojiStartPosition - 1);
