@@ -1535,7 +1535,10 @@ export class ConversationRepository {
           events.forEach(event => this.eventRepository.injectEvent(event));
         }
       } else {
-        const response = await this.core.service!.conversation.removeUser(conversationEntity.qualifiedId.id, userId.id);
+        const response = await this.core.service!.conversation.removeUserFromProteusConversation(
+          conversationEntity.qualifiedId.id,
+          userId.id,
+        );
         const roles = conversationEntity.roles();
         delete roles[userId.id];
         conversationEntity.roles(roles);
