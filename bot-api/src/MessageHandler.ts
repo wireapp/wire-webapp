@@ -78,9 +78,9 @@ export abstract class MessageHandler {
     return this.account!.service!.user.getUsers(userIds);
   }
 
-  async removeUser(conversationId: string, userId: string): Promise<void> {
+  async removeUser(conversationId: QualifiedId, userId: QualifiedId): Promise<void> {
     if (this.account?.service) {
-      await this.account.service.conversation.removeUser(conversationId, userId);
+      await this.account.service.conversation.removeUserFromProteusConversation(conversationId, userId);
     }
   }
 

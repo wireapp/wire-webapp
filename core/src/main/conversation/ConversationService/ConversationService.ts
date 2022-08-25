@@ -62,6 +62,7 @@ import {
   PayloadBundleSource,
   PayloadBundleState,
   PayloadBundleType,
+  RemoveUsersParams,
 } from '../../conversation/';
 import type {ClearedContent, DeletedContent, HiddenContent, RemoteData} from '../content';
 import type {CryptographyService} from '../../cryptography/';
@@ -104,6 +105,14 @@ import {
   SendProteusMessageParams,
 } from './ConversationService.types';
 import {Encoder, Decoder} from 'bazinga64';
+import {mapQualifiedUserClientIdsToFullyQualifiedClientIds} from '../../util/mapQualifiedUserClientIdsToFullyQualifiedClientIds';
+import {CommitBundle} from '@otak/core-crypto/platforms/web/corecrypto';
+
+//@todo: this function is temporary, we wait for the update from core-crypto side
+//they are returning regular array instead of Uint8Array for commit and welcome messages
+const optionalToUint8Array = (array: Uint8Array | []): Uint8Array => {
+  return Array.isArray(array) ? Uint8Array.from(array) : array;
+};
 
 export class ConversationService {
   public readonly messageTimer: MessageTimer;
@@ -829,10 +838,23 @@ export class ConversationService {
     };
   }
 
-  public leaveConversation(conversationId: string): Promise<ConversationMemberLeaveEvent> {
-    return this.apiClient.api.conversation.deleteMember(conversationId, this.apiClient.context!.userId);
+  public leaveConversation(conversationId: QualifiedId): Promise<ConversationMemberLeaveEvent> {
+    if (!this.apiClient.context || !this.apiClient.context.userId || !this.apiClient.context.domain) {
+      throw new Error('Cannot leave conversation without a userId and domain');
+    }
+    return this.apiClient.api.conversation.deleteMember(conversationId, {
+      domain: this.apiClient.context.domain,
+      id: this.apiClient.context.userId,
+    });
   }
 
+  public leaveMLSConversation(conversationId: QualifiedId): Promise<ConversationMemberLeaveEvent> {
+    return this.leaveConversation(conversationId);
+  }
+
+  /**
+   * @depricated seems not to be used and is outdated. use leaveConversation instead
+   */
   public async leaveConversations(conversationIds?: string[]): Promise<ConversationMemberLeaveEvent[]> {
     if (!conversationIds) {
       const conversation = await this.getConversations();
@@ -841,7 +863,11 @@ export class ConversationService {
         .map(conversation => conversation.id);
     }
 
-    return Promise.all(conversationIds.map(conversationId => this.leaveConversation(conversationId)));
+    return Promise.all(
+      conversationIds.map(conversationId =>
+        this.leaveConversation({id: conversationId, domain: this.apiClient.context?.domain ?? ''}),
+      ),
+    );
   }
   /**
    * Create a group conversation.
@@ -910,14 +936,14 @@ export class ConversationService {
   }
 
   public async addUsersToProteusConversation({conversationId, qualifiedUserIds}: Omit<AddUsersParams, 'groupId'>) {
-    const response = await this.apiClient.api.conversation.postMembers(conversationId, qualifiedUserIds);
-
-    return response;
+    return this.apiClient.api.conversation.postMembers(conversationId, qualifiedUserIds);
   }
 
-  public async removeUser(conversationId: string, userId: string): Promise<string> {
-    await this.apiClient.api.conversation.deleteMember(conversationId, userId);
-    return userId;
+  public async removeUserFromProteusConversation(
+    conversationId: QualifiedId,
+    userId: QualifiedId,
+  ): Promise<ConversationMemberLeaveEvent> {
+    return this.apiClient.api.conversation.deleteMember(conversationId, userId);
   }
 
   private async sendProteusMessage<T extends OtrMessage>(
@@ -1145,11 +1171,13 @@ export class ConversationService {
     const memberAddedMessages = await coreCryptoClient.addClientsToConversation(groupIdDecodedFromBase64, invitee);
 
     if (memberAddedMessages?.welcome) {
-      await this.apiClient.api.conversation.postMlsWelcomeMessage(Uint8Array.from(memberAddedMessages.welcome));
+      //@todo: it's temporary - we wait for core-crypto fix to return the actual Uint8Array instead of regular array
+      await this.apiClient.api.conversation.postMlsWelcomeMessage(optionalToUint8Array(memberAddedMessages.welcome));
     }
     if (memberAddedMessages?.commit) {
       const messageResponse = await this.apiClient.api.conversation.postMlsMessage(
-        Uint8Array.from(memberAddedMessages.commit),
+        //@todo: it's temporary - we wait for core-crypto fix to return the actual Uint8Array instead of regular array
+        optionalToUint8Array(memberAddedMessages.commit),
       );
       await coreCryptoClient.commitAccepted(groupIdDecodedFromBase64);
       return messageResponse;
@@ -1261,6 +1289,53 @@ export class ConversationService {
 
     return {
       events: response?.events || [],
+      conversation,
+    };
+  }
+
+  private async sendCommitBundleRemovalMessages(groupIdDecodedFromBase64: Uint8Array, commitBundle?: CommitBundle) {
+    const coreCryptoClient = this.coreCryptoClientProvider();
+
+    if (commitBundle?.welcome) {
+      //@todo: it's temporary - we wait for core-crypto fix to return the actual Uint8Array instead of regular array
+      await this.apiClient.api.conversation.postMlsWelcomeMessage(optionalToUint8Array(commitBundle.welcome));
+    }
+    if (commitBundle?.commit) {
+      const messageResponse = await this.apiClient.api.conversation.postMlsMessage(
+        //@todo: it's temporary - we wait for core-crypto fix to return the actual Uint8Array instead of regular array
+        optionalToUint8Array(commitBundle.commit),
+      );
+      await coreCryptoClient.commitAccepted(groupIdDecodedFromBase64);
+      return messageResponse;
+    }
+    return null;
+  }
+
+  public async removeUsersFromMLSConversation({
+    groupId,
+    conversationId,
+    qualifiedUserIds,
+  }: RemoveUsersParams): Promise<MLSReturnType> {
+    const coreCryptoClient = this.coreCryptoClientProvider();
+    const groupIdDecodedFromBase64 = Decoder.fromBase64(groupId).asBytes;
+
+    const clientsToRemove = await this.apiClient.api.user.postListClients({qualified_users: qualifiedUserIds});
+
+    const fullyQualifiedClientIds = mapQualifiedUserClientIdsToFullyQualifiedClientIds(
+      clientsToRemove.qualified_user_map,
+    );
+
+    const commitBundle = await coreCryptoClient.removeClientsFromConversation(
+      groupIdDecodedFromBase64,
+      fullyQualifiedClientIds,
+    );
+
+    const messageResponse = await this.sendCommitBundleRemovalMessages(groupIdDecodedFromBase64, commitBundle);
+
+    const conversation = await this.getConversations(conversationId.id);
+
+    return {
+      events: messageResponse?.events || [],
       conversation,
     };
   }

@@ -146,20 +146,10 @@ export class ConversationAPI {
    * Remove member from conversation.
    * @param conversationId The conversation ID to remove the user from
    * @param userId The user to remove
-   * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/conversations/removeMember
+   * @see https://staging-nginz-https.zinfra.io/api/swagger-ui/#/default/delete_conversations__cnv_domain___cnv__members__usr_domain___usr_
    */
-  public async deleteMember(
-    conversationId: string | QualifiedId,
-    userId: string | QualifiedId,
-  ): Promise<ConversationMemberLeaveEvent> {
-    const convId = typeof conversationId === 'string' ? {id: conversationId, domain: ''} : conversationId;
-    const uId = typeof userId === 'string' ? {id: userId, domain: ''} : userId;
-
-    const isFederated = this.backendFeatures.federationEndpoints && convId.domain && uId.domain;
-
-    const url = !isFederated
-      ? `${ConversationAPI.URL.CONVERSATIONS}/${convId.id}/${ConversationAPI.URL.MEMBERS}/${uId.id}`
-      : `${ConversationAPI.URL.CONVERSATIONS}/${convId.domain}/${convId.id}/${ConversationAPI.URL.MEMBERS}/${uId.domain}/${uId.id}`;
+  public async deleteMember(conversationId: QualifiedId, userId: QualifiedId): Promise<ConversationMemberLeaveEvent> {
+    const url = `${ConversationAPI.URL.CONVERSATIONS}/${conversationId.domain}/${conversationId.id}/${ConversationAPI.URL.MEMBERS}/${userId.domain}/${userId.id}`;
 
     const response = await this.client.sendJSON<ConversationMemberLeaveEvent>({
       method: 'delete',
