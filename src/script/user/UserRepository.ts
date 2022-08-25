@@ -442,7 +442,9 @@ export class UserRepository {
 
     const getUsers = async (chunkOfUserIds: QualifiedId[]): Promise<User[]> => {
       try {
-        const response = await this.userService.getUsers(chunkOfUserIds);
+        const response = await Promise.all(
+          chunkOfUserIds.map((userId: QualifiedId) => this.userService.getUser(userId)),
+        );
         return response ? this.userMapper.mapUsersFromJson(response) : [];
       } catch (error: any) {
         if (
