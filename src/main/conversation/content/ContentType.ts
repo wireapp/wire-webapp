@@ -19,7 +19,7 @@
 
 import type {Connection} from '@wireapp/api-client/src/connection/';
 
-import type {ClientActionType} from '../';
+import type {ClientActionType} from '..';
 import type {
   AssetContent,
   ClearedContent,
@@ -37,7 +37,7 @@ import type {
   LocationContent,
   ReactionContent,
   TextContent,
-} from '../content/';
+} from '.';
 
 export function isAbortedAssetContent(content: ConversationContent): content is AssetContent {
   return !!(content as AssetContent).abortReason;

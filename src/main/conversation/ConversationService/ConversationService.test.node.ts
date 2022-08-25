@@ -26,12 +26,12 @@ import {MemoryEngine} from '@wireapp/store-engine';
 import {ConversationService, PayloadBundleSource, PayloadBundleState, PayloadBundleType} from '../';
 
 import {CryptographyService} from '../../cryptography';
-import {NotificationService} from '../../notification';
 import * as PayloadHelper from '../../test/PayloadHelper';
 import {LinkPreviewUploadedContent, MentionContent, QuoteContent} from '../content';
 import {MessageTargetMode} from './ConversationService.types';
 import {MessageBuilder} from '../message/MessageBuilder';
 import {OtrMessage} from '../message/OtrMessage';
+import {NotificationService} from '../../notification/NotificationService';
 
 describe('ConversationService', () => {
   beforeAll(() => {
@@ -66,7 +66,9 @@ describe('ConversationService', () => {
         ({
           encryptMessage: async () => Uint8Array.from([1, 2, 3]),
         } as unknown as CoreCrypto),
-      {} as NotificationService,
+      {
+        commitPendingProposals: () => Promise.resolve(),
+      } as unknown as NotificationService,
     );
   }
 

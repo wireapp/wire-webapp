@@ -17,7 +17,7 @@
  *
  */
 
-import type {ClientActionType} from '../';
+import type {ClientActionType} from '..';
 import type {
   AssetContent,
   ButtonActionContent,
@@ -42,7 +42,7 @@ import type {
   LocationContent,
   ReactionContent,
   TextContent,
-} from './';
+} from '.';
 
 export type ConversationContent =
   | AssetContent
