@@ -1509,7 +1509,47 @@ export class ConversationRepository {
   }
 
   /**
-   * Remove member from conversation.
+   * Remove a member from a MLS conversation
+   *
+   * @param conversationEntity Conversation to remove member from
+   * @param userId ID of member to be removed from the conversation
+   * @returns Resolves when member was removed from the conversation
+   */
+  private async removeMemberFromMLSConversation(conversationEntity: Conversation, userId: QualifiedId) {
+    const {groupId, qualifiedId} = conversationEntity;
+    const {events} = await this.core.service!.conversation.removeUsersFromMLSConversation({
+      conversationId: qualifiedId,
+      groupId,
+      qualifiedUserIds: [userId],
+    });
+
+    if (!!events.length) {
+      events.forEach(event => this.eventRepository.injectEvent(event));
+    }
+  }
+
+  /**
+   * Remove a member from a Proteus conversation
+   *
+   * @param conversationEntity Conversation to remove member from
+   * @param userId ID of member to be removed from the conversation
+   * @returns Resolves when member was removed from the conversation
+   */
+  private async removeMemberFromProteusConversation(conversationEntity: Conversation, userId: QualifiedId) {
+    const response = await this.core.service!.conversation.removeUserFromProteusConversation(
+      conversationEntity.qualifiedId,
+      userId,
+    );
+    const roles = conversationEntity.roles();
+    delete roles[userId.id];
+    conversationEntity.roles(roles);
+    const currentTimestamp = this.serverTimeHandler.toServerTimestamp();
+    const event = response || EventBuilder.buildMemberLeave(conversationEntity, userId, true, currentTimestamp);
+    this.eventRepository.injectEvent(event, EventRepository.SOURCE.BACKEND_RESPONSE);
+  }
+
+  /**
+   * Umbrella function to remove a member from a conversation, no matter the protocol or type.
    *
    * @param conversationEntity Conversation to remove member from
    * @param userId ID of member to be removed from the conversation
@@ -1521,29 +1561,10 @@ export class ConversationRepository {
      * Needs to be done to receive the latest epoch and avoid epoch mismatch errors
      */
 
-    const {groupId, qualifiedId} = conversationEntity;
-
     if (conversationEntity.isUsingMLSProtocol) {
-      const {events} = await this.core.service!.conversation.removeUsersFromMLSConversation({
-        conversationId: qualifiedId,
-        groupId,
-        qualifiedUserIds: [userId],
-      });
-
-      if (!!events.length) {
-        events.forEach(event => this.eventRepository.injectEvent(event));
-      }
+      await this.removeMemberFromMLSConversation(conversationEntity, userId);
     } else {
-      const response = await this.core.service!.conversation.removeUserFromProteusConversation(
-        conversationEntity.qualifiedId.id,
-        userId.id,
-      );
-      const roles = conversationEntity.roles();
-      delete roles[userId.id];
-      conversationEntity.roles(roles);
-      const currentTimestamp = this.serverTimeHandler.toServerTimestamp();
-      const event = response || EventBuilder.buildMemberLeave(conversationEntity, userId, true, currentTimestamp);
-      this.eventRepository.injectEvent(event, EventRepository.SOURCE.BACKEND_RESPONSE);
+      await this.removeMemberFromProteusConversation(conversationEntity, userId);
     }
   }
 
