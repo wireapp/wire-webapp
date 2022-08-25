@@ -1549,17 +1549,6 @@ export class ConversationRepository {
   }
 
   /**
-   * Remove the current user from a MLS conversation.
-   *
-   * @param conversationEntity Conversation to remove user from
-   * @param clearContent Should we clear the conversation content from the database?
-   * @returns Resolves when user was removed from the conversation
-   */
-  private async leaveMLSConversation(conversationEntity: Conversation, clearContent: boolean) {
-    console.info('adrian', 'leaveMLSConversation', clearContent);
-  }
-
-  /**
    * Remove the current user from a Proteus conversation.
    *
    * @param conversationEntity Conversation to remove user from
@@ -1585,9 +1574,8 @@ export class ConversationRepository {
     const isMLSConversation = conversationEntity.isUsingMLSProtocol;
 
     if (isUserLeaving) {
-      return isMLSConversation
-        ? this.leaveMLSConversation(conversationEntity, clearContent)
-        : this.leaveProteusConversation(conversationEntity, clearContent);
+      //@todo leaveMLSConversation
+      return this.leaveProteusConversation(conversationEntity, clearContent);
     }
 
     return isMLSConversation
