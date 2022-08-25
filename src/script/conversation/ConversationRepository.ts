@@ -1549,23 +1549,50 @@ export class ConversationRepository {
   }
 
   /**
+   * Remove the current user from a MLS conversation.
+   *
+   * @param conversationEntity Conversation to remove user from
+   * @param clearContent Should we clear the conversation content from the database?
+   * @returns Resolves when user was removed from the conversation
+   */
+  private async leaveMLSConversation(conversationEntity: Conversation, clearContent: boolean) {
+    console.info('adrian', 'leaveMLSConversation', clearContent);
+  }
+
+  /**
+   * Remove the current user from a Proteus conversation.
+   *
+   * @param conversationEntity Conversation to remove user from
+   * @param clearContent Should we clear the conversation content from the database?
+   * @returns Resolves when user was removed from the conversation
+   */
+  private async leaveProteusConversation(conversationEntity: Conversation, clearContent: boolean) {
+    return clearContent
+      ? this.clearConversation(conversationEntity, true)
+      : this.removeMemberFromProteusConversation(conversationEntity, this.userState.self().qualifiedId);
+  }
+
+  /**
    * Umbrella function to remove a member from a conversation, no matter the protocol or type.
    *
    * @param conversationEntity Conversation to remove member from
    * @param userId ID of member to be removed from the conversation
+   * @param clearContent Should we clear the conversation content from the database?
    * @returns Resolves when member was removed from the conversation
    */
-  public async removeMember(conversationEntity: Conversation, userId: QualifiedId) {
-    /**
-     * ToDo: Fetch all MLS Events from backend before doing anything else
-     * Needs to be done to receive the latest epoch and avoid epoch mismatch errors
-     */
+  public async removeMember(conversationEntity: Conversation, userId: QualifiedId, clearContent: boolean = false) {
+    const isUserLeaving = this.userState.self().qualifiedId.id === userId.id;
+    const isMLSConversation = conversationEntity.isUsingMLSProtocol;
 
-    if (conversationEntity.isUsingMLSProtocol) {
-      await this.removeMemberFromMLSConversation(conversationEntity, userId);
-    } else {
-      await this.removeMemberFromProteusConversation(conversationEntity, userId);
+    if (isUserLeaving) {
+      return isMLSConversation
+        ? this.leaveMLSConversation(conversationEntity, clearContent)
+        : this.leaveProteusConversation(conversationEntity, clearContent);
     }
+
+    return isMLSConversation
+      ? this.removeMemberFromMLSConversation(conversationEntity, userId)
+      : this.removeMemberFromProteusConversation(conversationEntity, userId);
   }
 
   /**
