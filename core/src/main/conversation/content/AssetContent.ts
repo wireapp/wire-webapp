@@ -19,9 +19,9 @@
 
 import type {Asset} from '@wireapp/protocol-messaging';
 
-import type {AbortReason, AssetTransferState} from '../../conversation/';
-import type {FileContent, FileMetaDataContent, ImageContent, LegalHoldStatus} from '../../conversation/content/';
-import type {EncryptedAssetUploaded} from '../../cryptography/';
+import type {AbortReason, AssetTransferState} from '..';
+import type {FileContent, FileMetaDataContent, ImageContent, LegalHoldStatus} from '.';
+import type {EncryptedAssetUploaded} from '../../cryptography';
 
 export type ImageMetaData = Asset.IImageMetaData;
 export type VideoMetaData = Asset.IVideoMetaData;

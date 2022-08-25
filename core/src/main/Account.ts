@@ -237,8 +237,12 @@ export class Account<T = any> extends EventEmitter {
   public async init(clientType: ClientType, cookie?: Cookie, initClient: boolean = true): Promise<Context> {
     const context = await this.apiClient.init(clientType, cookie);
     await this.initServices(context);
+
+    // Assumption: client gets only initialized once
     if (initClient) {
       await this.initClient({clientType});
+      // initialize schedulers for pending mls proposals once client is initialized
+      await this.service?.notification.checkExistingPendingProposals();
     }
     return context;
   }

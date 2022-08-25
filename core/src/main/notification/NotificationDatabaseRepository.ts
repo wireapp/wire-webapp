@@ -22,12 +22,7 @@ import type {Notification} from '@wireapp/api-client/src/notification/';
 import type {CRUDEngine} from '@wireapp/store-engine';
 
 import {CryptographyDatabaseRepository} from '../cryptography/CryptographyDatabaseRepository';
-
-type CompoundGroupIdParams = {
-  groupId: string;
-  conversationId: string;
-  conversationDomain: string;
-};
+import {CommonMLS, CompoundGroupIdParams, StorePendingProposalsParams} from './types';
 
 export enum DatabaseStores {
   EVENTS = 'events',
@@ -38,8 +33,9 @@ export enum DatabaseKeys {
   PRIMARY_KEY_LAST_NOTIFICATION = 'z.storage.StorageKey.NOTIFICATION.LAST_ID',
 }
 
-const STORE_AMPLIFY = CryptographyDatabaseRepository.STORES.AMPLIFY;
-const STORE_GROUPIDS = CryptographyDatabaseRepository.STORES.GROUP_IDS;
+const STORES = {
+  ...CryptographyDatabaseRepository.STORES,
+};
 
 export class NotificationDatabaseRepository {
   constructor(private readonly storeEngine: CRUDEngine) {}
@@ -51,29 +47,33 @@ export class NotificationDatabaseRepository {
   public async getLastEventDate() {
     const {value} = await this.storeEngine.read<{
       value: string;
-    }>(STORE_AMPLIFY, DatabaseKeys.PRIMARY_KEY_LAST_EVENT);
+    }>(STORES.AMPLIFY, DatabaseKeys.PRIMARY_KEY_LAST_EVENT);
     return new Date(value);
   }
 
   public async updateLastEventDate(eventDate: Date) {
-    await this.storeEngine.update(STORE_AMPLIFY, DatabaseKeys.PRIMARY_KEY_LAST_EVENT, {value: eventDate.toISOString()});
+    await this.storeEngine.update(STORES.AMPLIFY, DatabaseKeys.PRIMARY_KEY_LAST_EVENT, {
+      value: eventDate.toISOString(),
+    });
     return eventDate;
   }
 
   public async createLastEventDate(eventDate: Date) {
-    await this.storeEngine.create(STORE_AMPLIFY, DatabaseKeys.PRIMARY_KEY_LAST_EVENT, {value: eventDate.toISOString()});
+    await this.storeEngine.create(STORES.AMPLIFY, DatabaseKeys.PRIMARY_KEY_LAST_EVENT, {
+      value: eventDate.toISOString(),
+    });
     return eventDate;
   }
 
   public async getLastNotificationId() {
     const {value} = await this.storeEngine.read<{
       value: string;
-    }>(STORE_AMPLIFY, DatabaseKeys.PRIMARY_KEY_LAST_NOTIFICATION);
+    }>(STORES.AMPLIFY, DatabaseKeys.PRIMARY_KEY_LAST_NOTIFICATION);
     return value;
   }
 
   public async updateLastNotificationId(lastNotification: Notification) {
-    await this.storeEngine.updateOrCreate(STORE_AMPLIFY, DatabaseKeys.PRIMARY_KEY_LAST_NOTIFICATION, {
+    await this.storeEngine.updateOrCreate(STORES.AMPLIFY, DatabaseKeys.PRIMARY_KEY_LAST_NOTIFICATION, {
       value: lastNotification.id,
     });
     return lastNotification.id;
@@ -88,13 +88,46 @@ export class NotificationDatabaseRepository {
 
   public async addCompoundGroupId(params: CompoundGroupIdParams) {
     await this.storeEngine.updateOrCreate(
-      STORE_GROUPIDS,
+      STORES.GROUP_IDS,
       this.generateCompoundGroupIdPrimaryKey(params),
       params.groupId,
     );
+    return params;
   }
 
   public async getCompoundGroupId(params: Omit<CompoundGroupIdParams, 'groupId'>) {
-    return this.storeEngine.read<string>(STORE_GROUPIDS, this.generateCompoundGroupIdPrimaryKey(params));
+    return this.storeEngine.read<string>(STORES.GROUP_IDS, this.generateCompoundGroupIdPrimaryKey(params));
+  }
+
+  /**
+   * ## MLS only ##
+   * Store groupIds with pending proposals and a delay in the DB until the proposals get committed.
+   *
+   * @param groupId groupId of the mls conversation
+   * @param firingDate date when the pending proposals should be committed
+   */
+  public async storePendingProposal(params: StorePendingProposalsParams) {
+    await this.storeEngine.updateOrCreate(STORES.PENDING_PROPOSALS, `${params.groupId}`, params);
+    return true;
+  }
+
+  /**
+   * ## MLS only ##
+   * Delete stored entries for pending proposals that have been committed.
+   *
+   * @param groupId groupId of the mls conversation
+   */
+  public async deletePendingProposal({groupId}: CommonMLS) {
+    await this.storeEngine.delete(STORES.PENDING_PROPOSALS, `${groupId}`);
+    return true;
+  }
+
+  /**
+   * ## MLS only ##
+   * Get all stored entries for pending proposals.
+   *
+   */
+  public async getStoredPendingProposals() {
+    return this.storeEngine.readAll<StorePendingProposalsParams>(STORES.PENDING_PROPOSALS);
   }
 }

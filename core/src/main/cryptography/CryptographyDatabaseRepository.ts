@@ -26,6 +26,7 @@ export enum DatabaseStores {
   PRE_KEYS = 'prekeys',
   SESSIONS = 'sessions',
   GROUP_IDS = 'group_ids',
+  PENDING_PROPOSALS = 'pending_proposals',
 }
 
 export class CryptographyDatabaseRepository {
@@ -34,13 +35,10 @@ export class CryptographyDatabaseRepository {
   constructor(private readonly storeEngine: CRUDEngine) {}
 
   public deleteStores(): Promise<boolean[]> {
-    return Promise.all([
-      this.storeEngine.deleteAll(CryptographyDatabaseRepository.STORES.AMPLIFY),
-      this.storeEngine.deleteAll(CryptographyDatabaseRepository.STORES.CLIENTS),
-      this.storeEngine.deleteAll(CryptographyDatabaseRepository.STORES.KEYS),
-      this.storeEngine.deleteAll(CryptographyDatabaseRepository.STORES.SESSIONS),
-      this.storeEngine.deleteAll(CryptographyDatabaseRepository.STORES.PRE_KEYS),
-      this.storeEngine.deleteAll(CryptographyDatabaseRepository.STORES.GROUP_IDS),
-    ]);
+    return Promise.all(
+      (
+        Object.keys(CryptographyDatabaseRepository.STORES) as (keyof typeof CryptographyDatabaseRepository.STORES)[]
+      ).map(store => this.storeEngine.deleteAll(store)),
+    );
   }
 }

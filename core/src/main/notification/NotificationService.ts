@@ -37,6 +37,8 @@ import type {CoreCrypto} from '@otak/core-crypto/platforms/web/corecrypto';
 import {Decoder, Encoder} from 'bazinga64';
 import {QualifiedId} from '@wireapp/api-client/src/user';
 import {Conversation} from '@wireapp/api-client/src/conversation';
+import {CommitPendingProposalsParams, HandlePendingProposalsParams} from './types';
+import {TaskScheduler} from '../util/TaskScheduler/TaskScheduler';
 
 export type HandledEventPayload = {
   event: Events.BackendEvent;
@@ -260,13 +262,23 @@ export class NotificationService extends EventEmitter {
         const encryptedData = Decoder.fromBase64(event.data).asBytes;
 
         const groupId = await this.getUint8ArrayFromConversationGroupId(
-          event.qualified_conversation || {id: event.conversation, domain: ''},
+          event.qualified_conversation ?? {id: event.conversation, domain: ''},
         );
-        const rawData = await coreCryptoClient.decryptMessage(groupId, encryptedData);
-        if (!rawData.message) {
+
+        // Check if the message includes proposals
+        const {proposals, commitDelay, message} = await coreCryptoClient.decryptMessage(groupId, encryptedData);
+        if (proposals.length > 0) {
+          await this.handlePendingProposals({
+            groupId: groupId.toString(),
+            delayInMs: commitDelay ?? 0,
+            eventTime: event.time,
+          });
+        }
+
+        if (!message) {
           throw new Error(`MLS message received from ${source} was empty`);
         }
-        const decryptedData = GenericMessage.decode(rawData.message);
+        const decryptedData = GenericMessage.decode(message);
         /**
          * @todo Find a proper solution to add mappedEvent to this return
          * otherwise event.data will be base64 raw data of the received event
@@ -322,6 +334,7 @@ export class NotificationService extends EventEmitter {
   }
 
   /**
+   * ## MLS only ##
    * If there is a groupId in the conversation, we need to store the conversationId => groupId pair
    * in order to find the groupId when decrypting messages
    * This is a bit hacky but since mls messages do not embed the groupId we need to keep a mapping of those
@@ -339,6 +352,7 @@ export class NotificationService extends EventEmitter {
   }
 
   /**
+   * ## MLS only ##
    * If there is a matching conversationId => groupId pair in the database,
    * we can find the groupId and return it as a Uint8Array
    *
@@ -355,5 +369,84 @@ export class NotificationService extends EventEmitter {
       throw new Error(`Could not find a group_id for conversation ${conversationId}@${conversationDomain}`);
     }
     return Decoder.fromBase64(groupId).asBytes;
+  }
+
+  /**
+   * ## MLS only ##
+   * If there are pending proposals, we need to either process them,
+   * or save them in the database for later processing
+   *
+   * @param groupId groupId of the mls conversation
+   * @param delayInMs delay in ms before processing proposals
+   * @param eventTime time of the event that had the proposals
+   */
+  private async handlePendingProposals({delayInMs, groupId, eventTime}: HandlePendingProposalsParams) {
+    if (delayInMs > 0) {
+      const eventDate = new Date(eventTime);
+      const firingDate = eventDate.setTime(eventDate.getTime() + delayInMs);
+      try {
+        await this.database.storePendingProposal({
+          groupId,
+          firingDate,
+        });
+      } catch (error) {
+        this.logger.error('Could not store pending proposal', error);
+      } finally {
+        TaskScheduler.addTask({
+          task: () => this.commitPendingProposals({groupId}),
+          firingDate,
+          key: groupId,
+        });
+      }
+    } else {
+      await this.commitPendingProposals({groupId, skipDelete: true});
+    }
+  }
+
+  /**
+   * ## MLS only ##
+   * Commit all pending proposals for a given groupId
+   *
+   * @param groupId groupId of the conversation
+   * @param skipDelete if true, do not delete the pending proposals from the database
+   */
+  public async commitPendingProposals({groupId, skipDelete = false}: CommitPendingProposalsParams) {
+    const coreCryptoClient = this.coreCryptoClientProvider();
+    if (!coreCryptoClient) {
+      throw new Error('Could not get coreCryptoClient');
+    }
+    try {
+      await coreCryptoClient.commitPendingProposals(Decoder.fromBase64(groupId).asBytes);
+
+      if (!skipDelete) {
+        TaskScheduler.cancelTask(groupId);
+        await this.database.deletePendingProposal({groupId});
+      }
+    } catch (error) {
+      this.logger.error(`Error while committing pending proposals for groupId ${groupId}`, error);
+    }
+  }
+
+  /**
+   * ## MLS only ##
+   * Get all pending proposals from the database and schedule them
+   * Function must only be called once, after application start
+   *
+   */
+  public async checkExistingPendingProposals() {
+    try {
+      const pendingProposals = await this.database.getStoredPendingProposals();
+      if (pendingProposals.length > 0) {
+        pendingProposals.forEach(({groupId, firingDate}) =>
+          TaskScheduler.addTask({
+            task: () => this.commitPendingProposals({groupId}),
+            firingDate,
+            key: groupId,
+          }),
+        );
+      }
+    } catch (error) {
+      this.logger.error('Could not get pending proposals', error);
+    }
   }
 }

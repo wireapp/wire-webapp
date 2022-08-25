@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2018 Wire Swiss GmbH
+ * Copyright (C) 2022 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,13 +17,24 @@
  *
  */
 
-import type {IQuote} from '@wireapp/protocol-messaging';
+export type CommonMLS = {
+  groupId: string;
+};
 
-import type {AssetContent, LocationContent, TextContent} from '.';
+export type CompoundGroupIdParams = {
+  conversationId: string;
+  conversationDomain: string;
+} & CommonMLS;
 
-export {IQuote as QuoteContent};
+export type HandlePendingProposalsParams = {
+  delayInMs: number;
+  eventTime: string;
+} & CommonMLS;
 
-export interface QuoteMessageContent {
-  content: AssetContent | LocationContent | TextContent;
-  quotedMessageId: string;
-}
+export type CommitPendingProposalsParams = {
+  skipDelete?: boolean;
+} & CommonMLS;
+
+export type StorePendingProposalsParams = {
+  firingDate: number;
+} & CommonMLS;
