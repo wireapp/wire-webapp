@@ -3,6 +3,49 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [14.0.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/bot-api/compare/@wireapp/bot-api@13.1.13...@wireapp/bot-api@14.0.0) (2022-08-25)
+
+
+### Features
+
+* remove user from MLS conversation (#FS-561) ([#4366](https://github.com/wireapp/wire-web-packages/tree/main/packages/bot-api/issues/4366)) ([89da444](https://github.com/wireapp/wire-web-packages/tree/main/packages/bot-api/commit/89da4449fa3caa0cbe41fbd595326f157e7e4011)), closes [#FS-561](https://github.com/wireapp/wire-web-packages/tree/main/packages/bot-api/issues/FS-561) [#4367](https://github.com/wireapp/wire-web-packages/tree/main/packages/bot-api/issues/4367)
+
+
+### BREAKING CHANGES
+
+* renamed removeUser function to removeUserFromProteusConversation in @wireapp/core and
+changed the types of conversation and user ids in @wireapp/bot-api MessageHandler from string to QualifiedId.
+
+* chore: initial work on remove user from mls convo
+
+* fix: use FQCI ids for client ids
+
+* fix: use FQCI ids for client ids
+
+* runfix: encode client id straight to byte array
+
+* runfix: encode client id straight to byte array
+
+* feat: send client-removal commit messages
+
+* runfix: remove event from remove user from proteus convo func
+
+* refactor: rename proteus remove func
+
+* test: add test for fully qualified ids mapping function
+
+* refactor: more precise name for remove from proteus convo
+
+* refactor: apply CR suggestions
+
+* runfix: don't convert messages twice to uint8arr
+
+* runfix: wrapp commits into uint8arr
+
+
+
+
+
 ## [13.1.13](https://github.com/wireapp/wire-web-packages/tree/main/packages/bot-api/compare/@wireapp/bot-api@13.1.12...@wireapp/bot-api@13.1.13) (2022-08-25)
 
 **Note:** Version bump only for package @wireapp/bot-api
