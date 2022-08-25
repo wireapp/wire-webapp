@@ -621,12 +621,13 @@ export class ConversationRepository {
 
     const mappedMessageEntities = await this.addEventsToConversation(events, conversationEntity);
     conversationEntity.hasAdditionalMessages(hasAdditionalMessages);
+
     if (!hasAdditionalMessages) {
       const firstMessage = conversationEntity.getFirstMessage();
-      const checkCreationMessage = isMemberMessage(firstMessage) && firstMessage.isCreation();
+      const checkCreationMessage = isMemberMessage(firstMessage) && firstMessage?.isCreation();
       if (checkCreationMessage) {
-        const groupCreationMessageIn1to1 = conversationEntity.is1to1() && firstMessage.isGroupCreation();
-        const one2oneConnectionMessageInGroup = conversationEntity.isGroup() && firstMessage.isConnection();
+        const groupCreationMessageIn1to1 = conversationEntity.is1to1() && firstMessage?.isGroupCreation();
+        const one2oneConnectionMessageInGroup = conversationEntity.isGroup() && firstMessage?.isConnection();
         const wrongMessageTypeForConversation = groupCreationMessageIn1to1 || one2oneConnectionMessageInGroup;
 
         if (wrongMessageTypeForConversation) {

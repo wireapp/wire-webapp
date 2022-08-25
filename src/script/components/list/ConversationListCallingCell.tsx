@@ -218,7 +218,7 @@ const ConversationListCallingCell: React.FC<CallingCellProps> = ({
           {muteState === MuteState.REMOTE_MUTED && (
             <div className="conversation-list-calling-cell__info-bar">{t('muteStateRemoteMute')}</div>
           )}
-          <div className="conversation-list-calling-cell">
+          <div className="conversation-list-cell-right__calling">
             <div
               className="conversation-list-cell conversation-list-cell-button"
               onClick={createNavigate(conversationUrl)}

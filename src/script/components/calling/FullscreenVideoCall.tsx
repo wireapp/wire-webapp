@@ -268,7 +268,7 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
       {!isChoosingScreen && (
         <div id="video-controls" className="video-controls">
           <ul className="video-controls__wrapper">
-            <li className="video-controls__item">
+            <li className="video-controls__item__minimize">
               <button
                 className="video-controls__button"
                 css={videoControlInActiveStyles}
@@ -398,7 +398,7 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
                 </button>
               </li>
             </div>
-            <div css={{display: 'flex', minWidth: '76px'}}>
+            <div css={{display: 'flex', minWidth: '145px'}}>
               {participants.length > 2 && (
                 <ButtonGroup
                   items={Object.values(CallViewTabs)}
