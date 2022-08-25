@@ -2144,9 +2144,9 @@ exports[`stricter compilation`] = {
       [124, 28, 4, "Property \'user\' does not exist on type \'never\'.", "2087973204"],
       [133, 44, 5, "Argument of type \'string | undefined\' is not assignable to parameter of type \'string\'.\\n  Type \'undefined\' is not assignable to type \'string\'.", "189936718"]
     ],
-    "src/script/storage/StorageSchemata.ts:3711490368": [
-      [125, 8, 7, "Type \'(transaction: Transaction, database: Dexie) => void\' is not assignable to type \'(transaction: Transaction, database?: Dexie | undefined) => void\'.\\n  Types of parameters \'database\' and \'database\' are incompatible.\\n    Type \'Dexie | undefined\' is not assignable to type \'Dexie\'.\\n      Type \'undefined\' is not assignable to type \'Dexie\'.", "2225706901"],
-      [305, 8, 7, "Type \'(transaction: Transaction, database: Dexie) => void\' is not assignable to type \'(transaction: Transaction, database?: Dexie | undefined) => void\'.\\n  Types of parameters \'database\' and \'database\' are incompatible.\\n    Type \'Dexie | undefined\' is not assignable to type \'Dexie\'.\\n      Type \'undefined\' is not assignable to type \'Dexie\'.", "2225706901"]
+    "src/script/storage/StorageSchemata.ts:880947846": [
+      [126, 8, 7, "Type \'(transaction: Transaction, database: Dexie) => void\' is not assignable to type \'(transaction: Transaction, database?: Dexie | undefined) => void\'.\\n  Types of parameters \'database\' and \'database\' are incompatible.\\n    Type \'Dexie | undefined\' is not assignable to type \'Dexie\'.\\n      Type \'undefined\' is not assignable to type \'Dexie\'.", "2225706901"],
+      [306, 8, 7, "Type \'(transaction: Transaction, database: Dexie) => void\' is not assignable to type \'(transaction: Transaction, database?: Dexie | undefined) => void\'.\\n  Types of parameters \'database\' and \'database\' are incompatible.\\n    Type \'Dexie | undefined\' is not assignable to type \'Dexie\'.\\n      Type \'undefined\' is not assignable to type \'Dexie\'.", "2225706901"]
     ],
     "src/script/storage/StorageService.ts:1411751882": [
       [49, 10, 14, "Property \'hasHookSupport\' has no initializer and is not definitely assigned in the constructor.", "2732954963"],
