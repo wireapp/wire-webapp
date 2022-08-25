@@ -1,0 +1,157 @@
+/*
+ * Wire
+ * Copyright (C) 2022 Wire Swiss GmbH
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ *
+ */
+
+import {
+  mapQualifiedUserClientIdsToFullyQualifiedClientIds,
+  constructFullyQualifiedClientId,
+} from './mapQualifiedUserClientIdsToFullyQualifiedClientIds';
+import {ClientClassification, QualifiedUserClientMap} from '@wireapp/api-client/src/client';
+
+enum MOCKED_DOMAINS {
+  DOMAIN1 = 'domain1.example.com',
+  DOMAIN2 = 'domain2.example.com',
+}
+
+enum MOCKED_USER_IDS {
+  USER1 = '000600d0-000b-9c1a-000d-a4130002c221',
+  USER2 = '000600d0-000b-9c1a-000d-a4130002c222',
+}
+
+enum MOCKED_CLIENT_IDS {
+  CLIENT1 = '4130002c221',
+  CLIENT2 = '4130002c222',
+  CLIENT3 = '4130002c223',
+}
+
+const encoder = new TextEncoder();
+
+describe('constructFullyQualifiedClientId', () => {
+  it('construct fullyQualifiedClientId client id', () => {
+    expect(
+      constructFullyQualifiedClientId(MOCKED_USER_IDS.USER1, MOCKED_CLIENT_IDS.CLIENT1, MOCKED_DOMAINS.DOMAIN1),
+    ).toEqual(`${MOCKED_USER_IDS.USER1}:${MOCKED_CLIENT_IDS.CLIENT1}@${MOCKED_DOMAINS.DOMAIN1}`);
+  });
+});
+
+describe('mapQualifiedUserClientIdsToFullyQualifiedClientIds', () => {
+  it('simple map', () => {
+    const qualified_user_map3: QualifiedUserClientMap = {
+      [MOCKED_DOMAINS.DOMAIN1]: {
+        [MOCKED_USER_IDS.USER1]: [
+          {
+            class: ClientClassification.LEGAL_HOLD,
+            id: MOCKED_CLIENT_IDS.CLIENT1,
+          },
+        ],
+      },
+    };
+
+    const expectedResult = [`${MOCKED_USER_IDS.USER1}:${MOCKED_CLIENT_IDS.CLIENT1}@${MOCKED_DOMAINS.DOMAIN1}`].map(x =>
+      encoder.encode(x),
+    );
+
+    const result = mapQualifiedUserClientIdsToFullyQualifiedClientIds(qualified_user_map3);
+
+    expect(result).toEqual(expectedResult);
+  });
+
+  it('extended map - 1 user', () => {
+    const qualified_user_map3: QualifiedUserClientMap = {
+      [MOCKED_DOMAINS.DOMAIN1]: {
+        [MOCKED_USER_IDS.USER1]: [
+          {
+            class: ClientClassification.LEGAL_HOLD,
+            id: MOCKED_CLIENT_IDS.CLIENT1,
+          },
+        ],
+      },
+      [MOCKED_DOMAINS.DOMAIN2]: {
+        [MOCKED_USER_IDS.USER1]: [
+          {
+            class: ClientClassification.LEGAL_HOLD,
+            id: MOCKED_CLIENT_IDS.CLIENT2,
+          },
+          {
+            class: ClientClassification.LEGAL_HOLD,
+            id: MOCKED_CLIENT_IDS.CLIENT3,
+          },
+        ],
+      },
+    };
+
+    const expectedResult = [
+      `${MOCKED_USER_IDS.USER1}:${MOCKED_CLIENT_IDS.CLIENT1}@${MOCKED_DOMAINS.DOMAIN1}`,
+      `${MOCKED_USER_IDS.USER1}:${MOCKED_CLIENT_IDS.CLIENT2}@${MOCKED_DOMAINS.DOMAIN2}`,
+      `${MOCKED_USER_IDS.USER1}:${MOCKED_CLIENT_IDS.CLIENT3}@${MOCKED_DOMAINS.DOMAIN2}`,
+    ].map(x => encoder.encode(x));
+
+    const result = mapQualifiedUserClientIdsToFullyQualifiedClientIds(qualified_user_map3);
+
+    expect(result).toEqual(expectedResult);
+  });
+
+  it('extended map - 2 users', () => {
+    const qualified_user_map3: QualifiedUserClientMap = {
+      [MOCKED_DOMAINS.DOMAIN1]: {
+        [MOCKED_USER_IDS.USER1]: [
+          {
+            class: ClientClassification.LEGAL_HOLD,
+            id: MOCKED_CLIENT_IDS.CLIENT1,
+          },
+        ],
+        [MOCKED_USER_IDS.USER2]: [
+          {
+            class: ClientClassification.LEGAL_HOLD,
+            id: MOCKED_CLIENT_IDS.CLIENT2,
+          },
+        ],
+      },
+      [MOCKED_DOMAINS.DOMAIN2]: {
+        [MOCKED_USER_IDS.USER1]: [
+          {
+            class: ClientClassification.LEGAL_HOLD,
+            id: MOCKED_CLIENT_IDS.CLIENT2,
+          },
+          {
+            class: ClientClassification.LEGAL_HOLD,
+            id: MOCKED_CLIENT_IDS.CLIENT3,
+          },
+        ],
+        [MOCKED_USER_IDS.USER2]: [
+          {
+            class: ClientClassification.LEGAL_HOLD,
+            id: MOCKED_CLIENT_IDS.CLIENT2,
+          },
+        ],
+      },
+    };
+
+    const expectedResult = [
+      `${MOCKED_USER_IDS.USER1}:${MOCKED_CLIENT_IDS.CLIENT1}@${MOCKED_DOMAINS.DOMAIN1}`,
+      `${MOCKED_USER_IDS.USER2}:${MOCKED_CLIENT_IDS.CLIENT2}@${MOCKED_DOMAINS.DOMAIN1}`,
+      `${MOCKED_USER_IDS.USER1}:${MOCKED_CLIENT_IDS.CLIENT2}@${MOCKED_DOMAINS.DOMAIN2}`,
+      `${MOCKED_USER_IDS.USER1}:${MOCKED_CLIENT_IDS.CLIENT3}@${MOCKED_DOMAINS.DOMAIN2}`,
+      `${MOCKED_USER_IDS.USER2}:${MOCKED_CLIENT_IDS.CLIENT2}@${MOCKED_DOMAINS.DOMAIN2}`,
+    ].map(x => encoder.encode(x));
+
+    const result = mapQualifiedUserClientIdsToFullyQualifiedClientIds(qualified_user_map3);
+
+    expect(result).toEqual(expectedResult);
+  });
+});
