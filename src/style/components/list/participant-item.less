@@ -41,8 +41,13 @@
   }
 
   &:hover,
-  &:focus {
+  &:focus,
+  &:focus-visible {
     background: var(--app-bg-secondary);
+
+    .participant-item__content__chevron {
+      opacity: 1;
+    }
 
     &::after {
       border-bottom: none;
@@ -120,12 +125,16 @@
       &__chevron {
         .button-reset-default;
         display: flex;
+        width: 16px;
+        height: 16px;
+        align-items: center;
+        justify-content: center;
         opacity: 0;
         transition: opacity 0.25s ease-in-out;
 
-        :hover > & {
-          opacity: 1;
-        }
+        // :hover > &, :focus > &, :focus-visible > & {
+        //   opacity: 1;
+        // }
 
         svg {
           width: 8px;
@@ -211,7 +220,7 @@ body.theme-dark {
     }
   }
   &:last-of-type > .participant-item-wrapper {
-    border-radius: 0 0 0 8px;
+    border-radius: 0 0 8px 8px;
   }
 }
 

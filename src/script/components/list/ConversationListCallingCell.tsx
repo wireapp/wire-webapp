@@ -148,7 +148,7 @@ const ConversationListCallingCell: React.FC<CallingCellProps> = ({
   const [showParticipants, setShowParticipants] = useState(false);
   const isModerator = roles[selfUser?.id] === DefaultConversationRoleName.WIRE_ADMIN;
 
-  const getParticipantContext = (event: React.MouseEvent<HTMLDivElement>, participant: Participant) => {
+  const getParticipantContext = (event: React.MouseEvent<HTMLDivElement> | MouseEvent, participant: Participant) => {
     event.preventDefault();
 
     const muteParticipant = {
@@ -172,7 +172,7 @@ const ConversationListCallingCell: React.FC<CallingCellProps> = ({
     };
 
     const entries: ContextMenuEntry[] = [!participant.user.isMe && muteParticipant, muteOthers].filter(Boolean);
-    showContextMenu(event.nativeEvent, entries, 'participant-moderator-menu');
+    showContextMenu(event, entries, 'participant-moderator-menu');
   };
 
   const handleMinimizedKeydown = useCallback(
@@ -466,6 +466,7 @@ const ConversationListCallingCell: React.FC<CallingCellProps> = ({
                             external={teamState.isExternal(participant.user.id)}
                             onContextMenu={isModerator ? event => getParticipantContext(event, participant) : undefined}
                             showDropdown={isModerator}
+                            noInteraction
                           />
                         </li>
                       ))}
