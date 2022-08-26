@@ -148,7 +148,7 @@ const ConversationListCallingCell: React.FC<CallingCellProps> = ({
   const [showParticipants, setShowParticipants] = useState(false);
   const isModerator = roles[selfUser?.id] === DefaultConversationRoleName.WIRE_ADMIN;
 
-  const getParticipantContext = (event: React.MouseEvent<HTMLDivElement> | MouseEvent, participant: Participant) => {
+  const getParticipantContext = (event: React.MouseEvent<HTMLDivElement>, participant: Participant) => {
     event.preventDefault();
 
     const muteParticipant = {
