@@ -905,7 +905,7 @@ exports[`stricter compilation`] = {
       [127, 11, 33, "Object is possibly \'null\'.", "1545610583"],
       [132, 11, 33, "Object is possibly \'null\'.", "1545610583"]
     ],
-    "src/script/components/list/ConversationListCallingCell.tsx:3482388709": [
+    "src/script/components/list/ConversationListCallingCell.tsx:1825680799": [
       [115, 90, 6, "Argument of type \'number | undefined\' is not assignable to parameter of type \'REASON\'.\\n  Type \'undefined\' is not assignable to type \'REASON\'.", "2124277697"],
       [128, 67, 8, "No overload matches this call.\\n  Overload 1 of 2, \'(...items: ConcatArray<User>[]): User[]\', gave the following error.\\n    Type \'User | undefined\' is not assignable to type \'User\'.\\n      Type \'undefined\' is not assignable to type \'User\'.\\n  Overload 2 of 2, \'(...items: (User | ConcatArray<User>)[]): User[]\', gave the following error.\\n    Type \'User | undefined\' is not assignable to type \'User\'.\\n      Type \'undefined\' is not assignable to type \'User\'.", "2198230984"],
       [148, 28, 12, "Type \'undefined\' cannot be used as an index type.", "3398917396"],
@@ -916,8 +916,8 @@ exports[`stricter compilation`] = {
       [121, 8, 3, "Type \'(node: HTMLElement) => void\' is not assignable to type \'LegacyRef<HTMLLIElement> | undefined\'.\\n  Type \'(node: HTMLElement) => void\' is not assignable to type \'(instance: HTMLLIElement | null) => void\'.\\n    Types of parameters \'node\' and \'instance\' are incompatible.\\n      Type \'HTMLLIElement | null\' is not assignable to type \'HTMLElement\'.\\n        Type \'null\' is not assignable to type \'HTMLElement\'.", "193432436"],
       [151, 23, 8, "Object is possibly \'undefined\'.", "2198230984"]
     ],
-    "src/script/components/list/ParticipantItem.tsx:3591469056": [
-      [111, 94, 15, "Argument of type \'Participant | undefined\' is not assignable to parameter of type \'Partial<Record<\\"isMuted\\" | \\"isActivelySpeaking\\" | \\"sharesScreen\\" | \\"sharesCamera\\", Subscribable<any>>>\'.\\n  Type \'undefined\' is not assignable to type \'Partial<Record<\\"isMuted\\" | \\"isActivelySpeaking\\" | \\"sharesScreen\\" | \\"sharesCamera\\", Subscribable<any>>>\'.", "420345688"]
+    "src/script/components/list/ParticipantItem.tsx:2055801931": [
+      [112, 94, 15, "Argument of type \'Participant | undefined\' is not assignable to parameter of type \'Partial<Record<\\"isMuted\\" | \\"isActivelySpeaking\\" | \\"sharesScreen\\" | \\"sharesCamera\\", Subscribable<any>>>\'.\\n  Type \'undefined\' is not assignable to type \'Partial<Record<\\"isMuted\\" | \\"isActivelySpeaking\\" | \\"sharesScreen\\" | \\"sharesCamera\\", Subscribable<any>>>\'.", "420345688"]
     ],
     "src/script/components/modal.ts:282599833": [
       [56, 9, 5, "Property \'large\' does not exist on type \'{} | Config\'.\\n  Property \'large\' does not exist on type \'{}\'.", "173484696"],
@@ -2015,17 +2015,10 @@ exports[`stricter compilation`] = {
       [35, 41, 22, "Cannot invoke an object which is possibly \'undefined\'.", "1980738780"],
       [41, 21, 12, "Argument of type \'string | undefined\' is not assignable to parameter of type \'Matcher\'.\\n  Type \'undefined\' is not assignable to type \'Matcher\'.", "2075561852"]
     ],
-<<<<<<< HEAD
-    "src/script/page/MainContent/panels/preferences/devices/DevicesPreferences.tsx:1032054856": [
-      [77, 90, 10, "Type \'undefined\' is not assignable to type \'boolean\'.", "3231345145"],
-      [141, 8, 14, "Type \'(device: ClientEntity) => Promise<string | undefined>\' is not assignable to type \'(device: ClientEntity) => Promise<string>\'.\\n  Type \'Promise<string | undefined>\' is not assignable to type \'Promise<string>\'.\\n    Type \'string | undefined\' is not assignable to type \'string\'.\\n      Type \'undefined\' is not assignable to type \'string\'.", "223037395"],
-      [148, 73, 37, "Argument of type \'Conversation | undefined\' is not assignable to parameter of type \'Conversation\'.\\n  Type \'undefined\' is not assignable to type \'Conversation\'.", "3769528030"]
-=======
     "src/script/page/MainContent/panels/preferences/devices/DevicesPreferences.tsx:1737777952": [
       [76, 90, 10, "Type \'undefined\' is not assignable to type \'boolean\'.", "3231345145"],
       [140, 8, 14, "Type \'(device: ClientEntity) => Promise<string | undefined>\' is not assignable to type \'(device: ClientEntity) => Promise<string>\'.\\n  Type \'Promise<string | undefined>\' is not assignable to type \'Promise<string>\'.\\n    Type \'string | undefined\' is not assignable to type \'string\'.\\n      Type \'undefined\' is not assignable to type \'string\'.", "223037395"],
       [147, 73, 37, "Argument of type \'Conversation | undefined\' is not assignable to parameter of type \'Conversation\'.\\n  Type \'undefined\' is not assignable to type \'Conversation\'.", "3769528030"]
->>>>>>> 91d588001 (runfix: address changes to preferences acc-79 (#13494))
     ],
     "src/script/page/message-list/InputBarControls/InputBarControls.test.tsx:2517377529": [
       [33, 2, 12, "Type \'undefined\' is not assignable to type \'Conversation\'.", "1670678216"]
