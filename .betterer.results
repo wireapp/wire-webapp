@@ -2261,7 +2261,7 @@ exports[`stricter compilation`] = {
     "src/script/user/UserPermission.ts:1999060110": [
       [173, 2, 395, "Type \'Record<string, (role: ROLE) => boolean>\' is not assignable to type \'Record<string, (role?: ROLE | undefined) => boolean>\'.\\n  \'string\' index signatures are incompatible.\\n    Type \'(role: ROLE) => boolean\' is not assignable to type \'(role?: ROLE | undefined) => boolean\'.", "3736070641"]
     ],
-    "src/script/user/UserRepository.ts:1196545524": [
+    "src/script/user/UserRepository.ts:1917532636": [
       [172, 55, 6, "Type \'string | undefined\' is not assignable to type \'string\'.\\n  Type \'undefined\' is not assignable to type \'string\'.", "1127975365"],
       [217, 24, 6, "Type \'string | null\' is not assignable to type \'string\'.\\n  Type \'null\' is not assignable to type \'string\'.", "1127975365"],
       [228, 32, 6, "Type \'string | null\' is not assignable to type \'string\'.\\n  Type \'null\' is not assignable to type \'string\'.", "1127975365"],
@@ -2269,20 +2269,20 @@ exports[`stricter compilation`] = {
       [252, 28, 16, "Argument of type \'ConnectionEntity | undefined\' is not assignable to parameter of type \'ConnectionEntity\'.\\n  Type \'undefined\' is not assignable to type \'ConnectionEntity\'.", "3456520104"],
       [263, 10, 7, "Type \'{ domain: string | undefined; id: string; }[]\' is not assignable to type \'QualifiedId[]\'.\\n  Type \'{ domain: string | undefined; id: string; }\' is not assignable to type \'QualifiedId\'.\\n    Types of property \'domain\' are incompatible.\\n      Type \'string | undefined\' is not assignable to type \'string\'.\\n        Type \'undefined\' is not assignable to type \'string\'.", "2414311946"],
       [339, 4, 20, "Type \'(ClientEntity | undefined)[]\' is not assignable to type \'ClientEntity[]\'.\\n  Type \'ClientEntity | undefined\' is not assignable to type \'ClientEntity\'.\\n    Type \'undefined\' is not assignable to type \'ClientEntity\'.", "724989886"],
-      [525, 53, 5, "Object is of type \'unknown\'.", "165548477"],
-      [535, 23, 16, "Object is possibly \'undefined\'.", "1145520518"],
-      [536, 21, 15, "Object is possibly \'undefined\'.", "696735433"],
-      [541, 57, 16, "Argument of type \'Picture[] | undefined\' is not assignable to parameter of type \'Picture[]\'.\\n  Type \'undefined\' is not assignable to type \'Picture[]\'.", "1145520518"],
-      [560, 27, 5, "Object is of type \'unknown\'.", "165548477"],
-      [563, 89, 5, "Object is of type \'unknown\'.", "165548477"],
-      [663, 27, 17, "Type \'User | undefined\' is not assignable to type \'User\'.\\n  Type \'undefined\' is not assignable to type \'User\'.", "3641955066"],
-      [678, 101, 4, "Argument of type \'null\' is not assignable to parameter of type \'string | undefined\'.", "2087897566"],
-      [728, 69, 5, "Object is of type \'unknown\'.", "165548477"],
-      [747, 24, 5, "Object is of type \'unknown\'.", "165548477"],
-      [775, 60, 5, "Object is of type \'unknown\'.", "165548477"],
-      [775, 77, 5, "Object is of type \'unknown\'.", "165548477"],
-      [822, 64, 5, "Object is of type \'unknown\'.", "165548477"],
-      [822, 81, 5, "Object is of type \'unknown\'.", "165548477"]
+      [529, 53, 5, "Object is of type \'unknown\'.", "165548477"],
+      [539, 23, 16, "Object is possibly \'undefined\'.", "1145520518"],
+      [540, 21, 15, "Object is possibly \'undefined\'.", "696735433"],
+      [545, 57, 16, "Argument of type \'Picture[] | undefined\' is not assignable to parameter of type \'Picture[]\'.\\n  Type \'undefined\' is not assignable to type \'Picture[]\'.", "1145520518"],
+      [564, 27, 5, "Object is of type \'unknown\'.", "165548477"],
+      [567, 89, 5, "Object is of type \'unknown\'.", "165548477"],
+      [668, 27, 17, "Type \'User | undefined\' is not assignable to type \'User\'.\\n  Type \'undefined\' is not assignable to type \'User\'.", "3641955066"],
+      [683, 101, 4, "Argument of type \'null\' is not assignable to parameter of type \'string | undefined\'.", "2087897566"],
+      [733, 69, 5, "Object is of type \'unknown\'.", "165548477"],
+      [752, 24, 5, "Object is of type \'unknown\'.", "165548477"],
+      [780, 60, 5, "Object is of type \'unknown\'.", "165548477"],
+      [780, 77, 5, "Object is of type \'unknown\'.", "165548477"],
+      [827, 64, 5, "Object is of type \'unknown\'.", "165548477"],
+      [827, 81, 5, "Object is of type \'unknown\'.", "165548477"]
     ],
     "src/script/user/UserState.ts:1636460432": [
       [44, 4, 9, "Type \'Observable<User | undefined>\' is not assignable to type \'Observable<User>\'.", "1162883985"],
