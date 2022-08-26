@@ -1540,12 +1540,14 @@ export class ConversationRepository {
       conversationEntity.qualifiedId,
       userId,
     );
-    const roles = conversationEntity.roles();
-    delete roles[userId.id];
-    conversationEntity.roles(roles);
-    const currentTimestamp = this.serverTimeHandler.toServerTimestamp();
-    const event = response || EventBuilder.buildMemberLeave(conversationEntity, userId, true, currentTimestamp);
-    this.eventRepository.injectEvent(event, EventRepository.SOURCE.BACKEND_RESPONSE);
+    if (response && response.type) {
+      const roles = conversationEntity.roles();
+      delete roles[userId.id];
+      conversationEntity.roles(roles);
+      const currentTimestamp = this.serverTimeHandler.toServerTimestamp();
+      const event = response || EventBuilder.buildMemberLeave(conversationEntity, userId, true, currentTimestamp);
+      this.eventRepository.injectEvent(event, EventRepository.SOURCE.BACKEND_RESPONSE);
+    }
   }
 
   /**
@@ -1557,6 +1559,18 @@ export class ConversationRepository {
    */
   private async leaveMLSConversation(conversationEntity: Conversation, clearContent: boolean) {
     console.info('adrian', 'leaveMLSConversation', clearContent);
+    const {groupId, qualifiedId} = conversationEntity;
+    const userId = this.userState.self().qualifiedId;
+    const response = await this.core.service!.conversation.removeUserFromMLSConversation(qualifiedId, groupId, userId);
+
+    if (response && response.type) {
+      const roles = conversationEntity.roles();
+      delete roles[userId.id];
+      conversationEntity.roles(roles);
+      const currentTimestamp = this.serverTimeHandler.toServerTimestamp();
+      const event = response || EventBuilder.buildMemberLeave(conversationEntity, userId, true, currentTimestamp);
+      this.eventRepository.injectEvent(event, EventRepository.SOURCE.BACKEND_RESPONSE);
+    }
   }
 
   /**
