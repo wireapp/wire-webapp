@@ -974,7 +974,7 @@ exports[`stricter compilation`] = {
       [127, 11, 33, "Object is possibly \'null\'.", "1545610583"],
       [132, 11, 33, "Object is possibly \'null\'.", "1545610583"]
     ],
-    "src/script/components/list/ConversationListCallingCell.tsx:3482388709": [
+    "src/script/components/list/ConversationListCallingCell.tsx:1825680799": [
       [115, 90, 6, "Argument of type \'number | undefined\' is not assignable to parameter of type \'REASON\'.\\n  Type \'undefined\' is not assignable to type \'REASON\'.", "2124277697"],
       [128, 67, 8, "No overload matches this call.\\n  Overload 1 of 2, \'(...items: ConcatArray<User>[]): User[]\', gave the following error.\\n    Type \'User | undefined\' is not assignable to type \'User\'.\\n      Type \'undefined\' is not assignable to type \'User\'.\\n  Overload 2 of 2, \'(...items: (User | ConcatArray<User>)[]): User[]\', gave the following error.\\n    Type \'User | undefined\' is not assignable to type \'User\'.\\n      Type \'undefined\' is not assignable to type \'User\'.", "2198230984"],
       [148, 28, 12, "Type \'undefined\' cannot be used as an index type.", "3398917396"],
@@ -985,9 +985,9 @@ exports[`stricter compilation`] = {
       [121, 8, 3, "Type \'(node: HTMLElement) => void\' is not assignable to type \'LegacyRef<HTMLLIElement> | undefined\'.\\n  Type \'(node: HTMLElement) => void\' is not assignable to type \'(instance: HTMLLIElement | null) => void\'.\\n    Types of parameters \'node\' and \'instance\' are incompatible.\\n      Type \'HTMLLIElement | null\' is not assignable to type \'HTMLElement\'.\\n        Type \'null\' is not assignable to type \'HTMLElement\'.", "193432436"],
       [151, 23, 8, "Object is possibly \'undefined\'.", "2198230984"]
     ],
-    "src/script/components/list/ParticipantItem.tsx:3591469056": [
-      [86, 43, 18, "Argument of type \'HTMLDivElement | undefined\' is not assignable to parameter of type \'HTMLElement\'.\\n  Type \'undefined\' is not assignable to type \'HTMLElement\'.", "4082577534"],
-      [111, 94, 15, "Argument of type \'Participant | undefined\' is not assignable to parameter of type \'Partial<Record<\\"isMuted\\" | \\"isActivelySpeaking\\" | \\"sharesScreen\\" | \\"sharesCamera\\", Subscribable<any>>>\'.\\n  Type \'undefined\' is not assignable to type \'Partial<Record<\\"isMuted\\" | \\"isActivelySpeaking\\" | \\"sharesScreen\\" | \\"sharesCamera\\", Subscribable<any>>>\'.", "420345688"]
+    "src/script/components/list/ParticipantItem.tsx:2055801931": [
+      [87, 43, 18, "Argument of type \'HTMLDivElement | undefined\' is not assignable to parameter of type \'HTMLElement\'.\\n  Type \'undefined\' is not assignable to type \'HTMLElement\'.", "4082577534"],
+      [112, 94, 15, "Argument of type \'Participant | undefined\' is not assignable to parameter of type \'Partial<Record<\\"isMuted\\" | \\"isActivelySpeaking\\" | \\"sharesScreen\\" | \\"sharesCamera\\", Subscribable<any>>>\'.\\n  Type \'undefined\' is not assignable to type \'Partial<Record<\\"isMuted\\" | \\"isActivelySpeaking\\" | \\"sharesScreen\\" | \\"sharesCamera\\", Subscribable<any>>>\'.", "420345688"]
     ],
     "src/script/components/modal.ts:282599833": [
       [56, 9, 5, "Property \'large\' does not exist on type \'{} | Config\'.\\n  Property \'large\' does not exist on type \'{}\'.", "173484696"],
