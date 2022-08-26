@@ -36,8 +36,6 @@ import {isContentMessage} from '../../guards/Message';
 import {useFadingScrollbar} from '../../ui/fadingScrollbar';
 import {isMemberMessage} from '../../guards/Message';
 
-let uniq = 0;
-
 type FocusedElement = {center?: boolean; element: Element};
 
 interface MessagesListParams {
@@ -140,13 +138,8 @@ const MessagesList: React.FC<MessagesListParams> = ({
 
   const [loaded, setLoaded] = useState(false);
   const [focusedMessage, setFocusedMessage] = useState<string | undefined>(initialMessage?.id);
-  const [filteredMessages, setFilteredMessages] = useState<MessageEntity[]>([]);
 
-  useEffect(() => {
-    const visibleMessages = filterHiddenMessages(allMessages);
-    const uniqMessages = filterDuplicatedMemberMessages(visibleMessages);
-    setFilteredMessages(uniqMessages);
-  }, [allMessages.length]);
+  const filteredMessages = filterDuplicatedMemberMessages(filterHiddenMessages(allMessages));
 
   const messageListRef = useRef<HTMLDivElement>(null);
   const messageContainerRef = useRef<HTMLDivElement>(null);
@@ -267,7 +260,7 @@ const MessagesList: React.FC<MessagesListParams> = ({
           const isLastDeliveredMessage = lastDeliveredMessage?.id === message.id;
 
           const visibleCallback = getVisibleCallback(conversation, message);
-          const key = `${message.id || 'message'}-${message.timestamp()}-${uniq++}`;
+          const key = `${message.id || 'message'}-${message.timestamp()}`;
 
           return (
             <Message

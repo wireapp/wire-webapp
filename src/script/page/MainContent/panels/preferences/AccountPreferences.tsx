@@ -28,6 +28,7 @@ import {getLogger} from 'Util/Logger';
 import {loadValue} from 'Util/StorageUtil';
 import {isTemporaryClientAndNonPersistent} from 'Util/util';
 
+import {BackupRepository} from '../../../../backup/BackupRepository';
 import {ClientRepository} from '../../../../client/ClientRepository';
 import {Config} from '../../../../Config';
 import {ConversationRepository} from '../../../../conversation/ConversationRepository';
@@ -56,6 +57,7 @@ import PreferencesPage from './components/PreferencesPage';
 import AccountLink from './accountPreferences/AccountLink';
 
 interface AccountPreferencesProps {
+  backupRepository: BackupRepository;
   clientRepository: ClientRepository;
   conversationRepository: ConversationRepository;
   propertiesRepository: PropertiesRepository;
@@ -70,6 +72,7 @@ interface AccountPreferencesProps {
 const logger = getLogger('AccountPreferences');
 
 const AccountPreferences: React.FC<AccountPreferencesProps> = ({
+  backupRepository,
   clientRepository,
   userRepository,
   propertiesRepository,
@@ -97,6 +100,7 @@ const AccountPreferences: React.FC<AccountPreferencesProps> = ({
 
   const richFields = useEnrichedFields(selfUser, {addDomain: showDomain, addEmail: false});
   const domain = selfUser.domain;
+
   const clickOnLeaveGuestRoom = (): void => {
     modals.showModal(
       ModalsViewModel.TYPE.CONFIRM,
@@ -142,16 +146,20 @@ const AccountPreferences: React.FC<AccountPreferencesProps> = ({
         >
           {name}
         </h3>
+
         <div>
           <AvatarInput {...{isActivatedAccount, selfUser, userRepository}} />
         </div>
+
         {isActivatedAccount && isTeam && <AvailabilityButtons {...{availability}} />}
+
         {isActivatedAccount && (
           <div>
             <AccentColorPicker user={selfUser} doSetAccentColor={id => userRepository.changeAccentColor(id)} />
           </div>
         )}
       </div>
+
       {isActivatedAccount ? (
         <PreferencesSection hasSeparator title={t('preferencesAccountInfo')}>
           <div
@@ -204,9 +212,12 @@ const AccountPreferences: React.FC<AccountPreferencesProps> = ({
       {isConsentCheckEnabled && <DataUsageSection {...{brandName, isActivatedAccount, propertiesRepository}} />}
 
       <PrivacySection {...{propertiesRepository}} />
+
       {isActivatedAccount && (
         <>
-          {!isTemporaryAndNonPersistent.current && <HistoryBackupSection {...{brandName}} />}
+          {!isTemporaryAndNonPersistent.current && (
+            <HistoryBackupSection backupRepository={backupRepository} brandName={brandName} />
+          )}
           <AccountSecuritySection {...{selfUser, userRepository}} />
           {!isDesktop && <LogoutSection {...{clientRepository}} />}
         </>

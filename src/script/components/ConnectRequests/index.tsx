@@ -52,12 +52,11 @@ const ConnectRequests: FC<ConnectRequestsProps> = ({
     actionsViewModel.ignoreConnectionRequest(userEntity);
   };
 
-  const onAcceptClick = async (userEntity: User): Promise<void> => {
+  const onAcceptClick = async (userEntity: User) => {
     await actionsViewModel.acceptConnectionRequest(userEntity);
-
     const conversationEntity = await actionsViewModel.getOrCreate1to1Conversation(userEntity);
 
-    if (connectRequests.indexOf(userEntity) === connectRequests.length - 1) {
+    if (connectRequests.length === 1) {
       /**
        * In the connect request view modal, we show an overview of all incoming connection requests. When there are multiple open connection requests, we want that the user sees them all and can accept them one-by-one. When the last open connection request gets accepted, we want the user to switch to this conversation.
        */
