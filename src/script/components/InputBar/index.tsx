@@ -794,10 +794,11 @@ const InputBar = ({
 
   useEffect(() => {
     if (!pastedFile) {
-      return;
+      return () => undefined;
     }
 
     window.addEventListener('keydown', sendImageOnEnterClick);
+
     return () => {
       window.removeEventListener('keydown', sendImageOnEnterClick);
     };
