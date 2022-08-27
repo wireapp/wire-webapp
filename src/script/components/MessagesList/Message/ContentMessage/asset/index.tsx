@@ -53,7 +53,7 @@ const ContentAsset = ({
 }: {
   asset: Asset;
   message: ContentMessage;
-  onClickButton: (message: ContentMessage, assetId: string) => void;
+  onClickButton: (message: CompositeMessage, buttonId: string) => void;
   onClickImage: MessageActions['onClickImage'];
   onClickMessage: MessageActions['onClickMessage'];
   selfId: QualifiedId;
@@ -113,11 +113,16 @@ const ContentAsset = ({
     case AssetType.LOCATION:
       return <LocationAssetComponent asset={asset as Location} />;
     case AssetType.BUTTON:
+      if (!(message instanceof CompositeMessage && asset instanceof Button && asset.id)) {
+        return null;
+      }
+      const assetId = asset.id;
+
       return (
         <ButtonAssetComponent
-          onClick={() => onClickButton(message, asset.id)}
-          label={(asset as Button).text}
-          id={asset.id}
+          onClick={() => onClickButton(message, assetId)}
+          label={asset.text}
+          id={assetId}
           message={message as CompositeMessage}
         />
       );
