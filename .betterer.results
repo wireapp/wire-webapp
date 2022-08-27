@@ -667,9 +667,6 @@ exports[`stricter compilation`] = {
       [44, 39, 7, "Argument of type \'string | null\' is not assignable to parameter of type \'string\'.\\n  Type \'null\' is not assignable to type \'string\'.", "985028253"],
       [53, 12, 3, "Type \'{ \\"aria-hidden\\": \\"true\\"; dangerouslySetInnerHTML: { __html: string; }; className?: string | undefined; color?: string | undefined; height: any; id?: string | undefined; lang?: string | undefined; ... 463 more ...; key?: Key | ... 1 more ... | undefined; }\' is not assignable to type \'SVGProps<SVGSVGElement> & { css?: Interpolation<Theme>; }\'.\\n  Type \'{ \\"aria-hidden\\": \\"true\\"; dangerouslySetInnerHTML: { __html: string; }; className?: string | undefined; color?: string | undefined; height: any; id?: string | undefined; lang?: string | undefined; ... 463 more ...; key?: Key | ... 1 more ... | undefined; }\' is not assignable to type \'SVGProps<SVGSVGElement>\'.\\n    Types of property \'viewBox\' are incompatible.\\n      Type \'string | null\' is not assignable to type \'string | undefined\'.\\n        Type \'null\' is not assignable to type \'string | undefined\'.", "193432711"]
     ],
-    "src/script/components/Image.tsx:2138055581": [
-      [51, 43, 18, "Argument of type \'HTMLDivElement | undefined\' is not assignable to parameter of type \'HTMLElement\'.\\n  Type \'undefined\' is not assignable to type \'HTMLElement\'.", "4082577534"]
-    ],
     "src/script/components/LoadingBar.test.tsx:2152103384": [
       [34, 11, 31, "Object is possibly \'null\'.", "1466818312"]
     ],
@@ -696,9 +693,6 @@ exports[`stricter compilation`] = {
     "src/script/components/MessagesList/Message/ContentMessage/asset/ImageAsset.test.ts:3331662495": [
       [54, 19, 17, "Object is possibly \'null\'.", "901686138"],
       [80, 21, 17, "Object is possibly \'null\'.", "901686138"]
-    ],
-    "src/script/components/MessagesList/Message/ContentMessage/asset/ImageAsset.tsx:3794627806": [
-      [51, 43, 18, "Argument of type \'HTMLDivElement | undefined\' is not assignable to parameter of type \'HTMLElement\'.\\n  Type \'undefined\' is not assignable to type \'HTMLElement\'.", "4082577534"]
     ],
     "src/script/components/MessagesList/Message/ContentMessage/asset/LinkPreviewAssetComponent.test.ts:3000844988": [
       [116, 11, 21, "Object is possibly \'null\'.", "3265536666"]
@@ -939,7 +933,6 @@ exports[`stricter compilation`] = {
       [151, 23, 8, "Object is possibly \'undefined\'.", "2198230984"]
     ],
     "src/script/components/list/ParticipantItem.tsx:3591469056": [
-      [86, 43, 18, "Argument of type \'HTMLDivElement | undefined\' is not assignable to parameter of type \'HTMLElement\'.\\n  Type \'undefined\' is not assignable to type \'HTMLElement\'.", "4082577534"],
       [111, 94, 15, "Argument of type \'Participant | undefined\' is not assignable to parameter of type \'Partial<Record<\\"isMuted\\" | \\"isActivelySpeaking\\" | \\"sharesScreen\\" | \\"sharesCamera\\", Subscribable<any>>>\'.\\n  Type \'undefined\' is not assignable to type \'Partial<Record<\\"isMuted\\" | \\"isActivelySpeaking\\" | \\"sharesScreen\\" | \\"sharesCamera\\", Subscribable<any>>>\'.", "420345688"]
     ],
     "src/script/components/modal.ts:282599833": [
