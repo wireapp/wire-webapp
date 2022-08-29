@@ -486,7 +486,10 @@ export class UserRepository {
       }
     };
 
-    const chunksOfUserIds = chunk<QualifiedId>(userIds, Config.getConfig().MAXIMUM_USERS_PER_REQUEST);
+    const chunksOfUserIds = chunk<QualifiedId>(
+      userIds.filter(({id}) => !!id),
+      Config.getConfig().MAXIMUM_USERS_PER_REQUEST,
+    );
     const resolveArray = await Promise.all(chunksOfUserIds.map(getUsers));
     const newUserEntities = flatten(resolveArray);
     if (this.userState.isTeam()) {
@@ -499,6 +502,7 @@ export class UserRepository {
       fetchedUserEntities = this.addSuspendedUsers(userIds, fetchedUserEntities);
     }
     await this.getTeamMembersFromUsers(fetchedUserEntities);
+
     return fetchedUserEntities;
   }
 
