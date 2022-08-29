@@ -24,23 +24,19 @@ import {QualifiedId} from '@wireapp/api-client/src/user';
 export class ConnectionService {
   constructor(private readonly apiClient: APIClient) {}
 
-  public getConnections(): Promise<Connection[]> {
-    return this.apiClient.api.connection.getAllConnections();
-  }
-
-  public acceptConnection(userId: string): Promise<Connection> {
+  public acceptConnection(userId: QualifiedId): Promise<Connection> {
     return this.apiClient.api.connection.putConnection(userId, {
       status: ConnectionStatus.ACCEPTED,
     });
   }
 
-  public ignoreConnection(userId: string): Promise<Connection> {
+  public ignoreConnection(userId: QualifiedId): Promise<Connection> {
     return this.apiClient.api.connection.putConnection(userId, {
       status: ConnectionStatus.IGNORED,
     });
   }
 
   public createConnection(userId: QualifiedId): Promise<Connection> {
-    return this.apiClient.api.connection.postConnection(userId, '');
+    return this.apiClient.api.connection.postConnection(userId);
   }
 }
