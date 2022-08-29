@@ -51,8 +51,8 @@ export class ConnectionService {
    * @param name Name of the conversation being initiated (1 256 characters)
    * @returns Promise that resolves when the connection request was created
    */
-  postConnections(userId: QualifiedId, name: string): Promise<Connection> {
-    return this.apiClient.api.connection.postConnection(userId, name);
+  postConnections(userId: QualifiedId): Promise<Connection> {
+    return this.apiClient.api.connection.postConnection(userId);
   }
 
   /**

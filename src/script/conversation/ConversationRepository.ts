@@ -1545,7 +1545,6 @@ export class ConversationRepository {
       return event;
     });
   }
-
   /**
    * Rename conversation.
    *
