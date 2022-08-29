@@ -18,15 +18,14 @@
  */
 
 import type {AxiosRequestConfig} from 'axios';
-import {BackendFeatures} from '../APIClient';
 
-import type {Connection, ConnectionRequest, ConnectionUpdate, UserConnectionList} from '../connection/';
+import type {Connection, ConnectionUpdate} from '../connection/';
 import {BackendError, BackendErrorLabel, HttpClient} from '../http/';
 import {QualifiedId} from '../user';
 import {ConnectionLegalholdMissingConsentError} from './ConnectionError';
 
 export class ConnectionAPI {
-  constructor(private readonly client: HttpClient, private readonly backendFeatures: BackendFeatures) {}
+  constructor(private readonly client: HttpClient) {}
 
   public static readonly URL = {
     CONNECTIONS: '/connections',
@@ -37,12 +36,9 @@ export class ConnectionAPI {
    * @param userId The ID of the other user
    * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/users/connection
    */
-  public async getConnection(userId: string | QualifiedId): Promise<Connection> {
-    const strUserId = typeof userId === 'string' ? userId : userId.id;
-    const url =
-      typeof userId !== 'string' && this.backendFeatures.federationEndpoints
-        ? `${ConnectionAPI.URL.CONNECTIONS}/${userId.domain}/${userId}`
-        : `${ConnectionAPI.URL.CONNECTIONS}/${strUserId}`;
+  public async getConnection({domain, id}: QualifiedId): Promise<Connection> {
+    const url = `${ConnectionAPI.URL.CONNECTIONS}/${domain}/${id}`;
+
     const config: AxiosRequestConfig = {
       method: 'get',
       url,
@@ -53,34 +49,11 @@ export class ConnectionAPI {
   }
 
   /**
-   * List the connections to other users.
-   * @param limit Number of results to return (default 100, max 500)
-   * @param connectionId The connection ID to start from
-   * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/users/connections
-   */
-  public async getConnections(connectionId?: string, limit = 100): Promise<UserConnectionList> {
-    const config: AxiosRequestConfig = {
-      method: 'get',
-      params: {
-        size: limit,
-        start: connectionId,
-      },
-      url: ConnectionAPI.URL.CONNECTIONS,
-    };
-
-    const response = await this.client.sendJSON<UserConnectionList>(config);
-    return response.data;
-  }
-
-  /**
    * Get the list of all the connections to other users (including users that are on federated servers)
    *
    * @see https://nginz-https.anta.wire.link/api/swagger-ui/#/default/post_list_connections
    */
   public getConnectionList(): Promise<Connection[]> {
-    if (!this.backendFeatures.federationEndpoints) {
-      return this.getAllConnections();
-    }
     let allConnections: Connection[] = [];
 
     const getConnectionChunks = async (pagingState?: string): Promise<Connection[]> => {
@@ -117,74 +90,12 @@ export class ConnectionAPI {
   }
 
   /**
-   * Get all connections to other users.
-   * @deprecated use `getConnectionList` instead
-   */
-  public getAllConnections(): Promise<Connection[]> {
-    let allConnections: Connection[] = [];
-
-    const getConnectionChunks = async (connectionId?: string): Promise<Connection[]> => {
-      const connectionsPerRequest = 500;
-      const {connections, has_more} = await this.getConnections(connectionId, connectionsPerRequest);
-
-      if (connections.length) {
-        allConnections = allConnections.concat(connections);
-      }
-
-      if (has_more) {
-        const lastConnection = connections.pop();
-        if (lastConnection) {
-          return getConnectionChunks(lastConnection.to);
-        }
-      }
-
-      return allConnections;
-    };
-
-    return getConnectionChunks();
-  }
-
-  public async postConnection(userId: QualifiedId, name?: string): Promise<Connection> {
-    if (this.backendFeatures.federationEndpoints) {
-      return this.postConnection_v2(userId as QualifiedId);
-    }
-    return this.postConnection_v1({user: userId.id, name} as ConnectionRequest);
-  }
-
-  /**
-   * Create a connection to another user.
-   * Note: You can have no more than 1000 connections in accepted or sent state.
-   * @deprecated use createConnection instead
-   * @param connectionRequestData: The connection request
-   * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/users/createConnection
-   */
-  private async postConnection_v1(connectionRequestData: ConnectionRequest): Promise<Connection> {
-    const config: AxiosRequestConfig = {
-      data: connectionRequestData,
-      method: 'post',
-      url: ConnectionAPI.URL.CONNECTIONS,
-    };
-
-    try {
-      const response = await this.client.sendJSON<Connection>(config);
-      return response.data;
-    } catch (error) {
-      switch ((error as BackendError).label) {
-        case BackendErrorLabel.LEGAL_HOLD_MISSING_CONSENT: {
-          throw new ConnectionLegalholdMissingConsentError((error as BackendError).message);
-        }
-      }
-      throw error;
-    }
-  }
-
-  /**
    * Create a connection to another user.
    * Note: You can have no more than 1000 connections in accepted or sent state.
    * @param qualifiedUserId: The qualified id of the user we want to connect to
    * @see https://nginz-https.anta.wire.link/api/swagger-ui/#/default/post_connections__uid_domain___uid
    */
-  private async postConnection_v2({id, domain}: QualifiedId): Promise<Connection> {
+  public async postConnection({domain, id}: QualifiedId): Promise<Connection> {
     const config: AxiosRequestConfig = {
       method: 'post',
       url: `${ConnectionAPI.URL.CONNECTIONS}/${domain}/${id}`,
@@ -210,12 +121,8 @@ export class ConnectionAPI {
    * @param updatedConnection: The updated connection
    * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/users/updateConnection
    */
-  public async putConnection(userId: string | QualifiedId, updatedConnection: ConnectionUpdate): Promise<Connection> {
-    const strUserId = typeof userId === 'string' ? userId : userId.id;
-    const url =
-      this.backendFeatures.federationEndpoints && typeof userId !== 'string'
-        ? `${ConnectionAPI.URL.CONNECTIONS}/${userId.domain}/${userId.id}`
-        : `${ConnectionAPI.URL.CONNECTIONS}/${strUserId}`;
+  public async putConnection({domain, id}: QualifiedId, updatedConnection: ConnectionUpdate): Promise<Connection> {
+    const url = `${ConnectionAPI.URL.CONNECTIONS}/${domain}/${id}`;
 
     const config: AxiosRequestConfig = {
       data: updatedConnection,
