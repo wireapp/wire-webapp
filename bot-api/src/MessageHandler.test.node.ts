@@ -28,8 +28,9 @@ import {MessageBuilder} from '@wireapp/core/src/main/conversation/message/Messag
 import {ConversationProtocol} from '@wireapp/api-client/src/conversation';
 
 describe('MessageHandler', () => {
-  let mainHandler: MessageHandler;
+  const domainNameMock = 'my-test-domain';
 
+  let mainHandler: MessageHandler;
   const MainHandler = class extends MessageHandler {
     constructor() {
       super();
@@ -49,7 +50,7 @@ describe('MessageHandler', () => {
 
   describe('sendConnectionResponse', () => {
     it('sends the correct data when accepting the connection', async () => {
-      const userId = UUID.genV4().toString();
+      const userId = {id: UUID.genV4().toString(), domain: domainNameMock};
       const acceptConnection = true;
 
       spyOn(mainHandler.account!.service!.connection, 'acceptConnection').and.returnValue(
@@ -65,7 +66,7 @@ describe('MessageHandler', () => {
     });
 
     it('sends the correct data when ignoring the connection', async () => {
-      const userId = UUID.genV4().toString();
+      const userId = {id: UUID.genV4().toString(), domain: domainNameMock};
       const acceptConnection = false;
 
       spyOn(mainHandler.account!.service!.connection, 'acceptConnection').and.returnValue(

@@ -194,7 +194,7 @@ export class APIClient extends EventEmitter {
       services: new ServicesAPI(this.transport.http, assetAPI),
       broadcast: new BroadcastAPI(this.transport.http),
       client: new ClientAPI(this.transport.http),
-      connection: new ConnectionAPI(this.transport.http, backendFeatures),
+      connection: new ConnectionAPI(this.transport.http),
       conversation: new ConversationAPI(this.transport.http, backendFeatures),
       giphy: new GiphyAPI(this.transport.http),
       notification: new NotificationAPI(this.transport.http),
