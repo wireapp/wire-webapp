@@ -243,11 +243,12 @@ export class NotificationService extends EventEmitter {
     dryRun: boolean = false,
   ): Promise<HandledEventPayload> {
     const coreCryptoClient = this.coreCryptoClientProvider();
-    if (!coreCryptoClient) {
-      throw new Error('Unable to access core crypto client');
-    }
+
     switch (event.type) {
       case Events.CONVERSATION_EVENT.MLS_WELCOME_MESSAGE:
+        if (!coreCryptoClient) {
+          throw new Error('Unable to access core crypto client');
+        }
         const data = Decoder.fromBase64(event.data).asBytes;
         // We extract the groupId from the welcome message and let coreCrypto store this group
         const newGroupId = await coreCryptoClient.processWelcomeMessage(data);
@@ -259,6 +260,9 @@ export class NotificationService extends EventEmitter {
         };
 
       case Events.CONVERSATION_EVENT.MLS_MESSAGE_ADD:
+        if (!coreCryptoClient) {
+          throw new Error('Unable to access core crypto client');
+        }
         const encryptedData = Decoder.fromBase64(event.data).asBytes;
 
         const groupId = await this.getUint8ArrayFromConversationGroupId(
