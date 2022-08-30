@@ -14,41 +14,7 @@
       <div id="center-column" class="center-column">
         <main-content params="contentViewModel: $root"></main-content>
 
-        <!-- ko if: state() === State.CONNECTION_REQUESTS -->
-          <h1 class="visually-hidden" data-bind="text: t('accessibility.headings.connectionRequests')"></h1>
-
-          <connect-requests
-            params="
-                actionsViewModel: $root.mainViewModel.actions,
-                userState: $root.userState,
-                teamState: $root.teamState,
-              "
-          ></connect-requests>
-        <!-- /ko -->
-        <!-- ko if: state() === State.CONVERSATION -->
-          <h1 class="visually-hidden" data-bind="text: t('accessibility.headings.conversation')"></h1>
-
-          <conversation params="
-            root: $root,
-            emojiInput: $root.emojiInput,
-            mainViewModel: $root.mainViewModel,
-            repositories: $root.repositories,
-            teamState: $root.teamState,
-            userState: $root.userState,
-            userRepository: $root.userRepository,
-          "></conversation>
-        <!-- /ko -->
-        <!-- ko if: state() === State.HISTORY_EXPORT -->
-          <h1 class="visually-hidden" data-bind="text: t('accessibility.headings.historyExport')"></h1>
-
-          <history-export
-            style="height: 100%;"
-            params="
-              backupRepository: $root.repositories.backup,
-              userState: $root.userState,
-            "
-          ></history-export>
-        <!-- /ko -->
+        <center-column params="contentViewModel: $root"></center-column>
 
         <group-creation-modal params="
           conversationRepository: $root.repositories.conversation,

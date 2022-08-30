@@ -18,7 +18,14 @@
  *
  */
 
-import {FC, MouseEvent as ReactMouseEvent, KeyboardEvent as ReactKeyboardEvent, useEffect, useState} from 'react';
+import {
+  FC,
+  MouseEvent as ReactMouseEvent,
+  KeyboardEvent as ReactKeyboardEvent,
+  useContext,
+  useEffect,
+  useState,
+} from 'react';
 import {amplify} from 'amplify';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import cx from 'classnames';
@@ -32,7 +39,6 @@ import {registerReactComponent, useKoSubscribableChildren} from 'Util/ComponentU
 
 import {Conversation as ConversationEntity} from '../../entity/Conversation';
 
-import {MainViewModel, ViewModelRepositories} from '../../view_model/MainViewModel';
 import {TeamState} from '../../team/TeamState';
 import {UserState} from '../../user/UserState';
 import {PanelViewModel} from '../../view_model/PanelViewModel';
@@ -45,52 +51,50 @@ import {safeMailOpen, safeWindowOpen} from 'Util/SanitizationUtil';
 import {ModalsViewModel} from '../../view_model/ModalsViewModel';
 import {t} from 'Util/LocalizerUtil';
 import {UserError} from '../../error/UserError';
-import {UserRepository} from '../../user/UserRepository';
 import {MessageCategory} from '../../message/MessageCategory';
 import {DecryptErrorMessage} from '../../entity/message/DecryptErrorMessage';
 import {MotionDuration} from '../../motion/MotionDuration';
 import {getLogger} from 'Util/Logger';
+import {RootContext} from '../../page/RootProvider';
 
 type ReadMessageBuffer = {conversation: ConversationEntity; message: Message};
 
 interface ConversationListProps {
-  root: any;
-  repositories: ViewModelRepositories;
-  mainViewModel: MainViewModel;
-  userRepository: UserRepository;
   readonly teamState: TeamState;
   readonly userState: UserState;
 }
 
-const ConversationList: FC<ConversationListProps> = ({
-  root,
-  repositories,
-  mainViewModel,
-  teamState,
-  userState,
-  userRepository,
-}) => {
+const ConversationList: FC<ConversationListProps> = ({teamState, userState}) => {
   const messageListLogger = getLogger('MessageListViewModel');
-
-  const {activeConversation} = useKoSubscribableChildren(root.conversationRepository.conversationState, [
-    'activeConversation',
-  ]);
-  const {is1to1, isRequest} = useKoSubscribableChildren(activeConversation, ['is1to1', 'isRequest']);
-  const {self: selfUser} = useKoSubscribableChildren(userState, ['self']);
 
   // const [initialMessage, setInitialMessage] = useState<Message | undefined>(undefined);
   const initialMessage = undefined;
   const [conversationLoaded, setConversationLoaded] = useState<boolean>(false);
   const [readMessagesBuffer, setReadMessagesBuffer] = useState<ReadMessageBuffer[]>([]);
 
+  const contentViewModel = useContext(RootContext);
+
+  if (!contentViewModel) {
+    return null;
+  }
+
+  const {conversationRepository, repositories, mainViewModel, legalHoldModal} = contentViewModel;
+
+  const conversationState = conversationRepository.getConversationState();
+
+  const {activeConversation} = useKoSubscribableChildren(conversationState, ['activeConversation']);
+  const {is1to1, isRequest} = useKoSubscribableChildren(activeConversation!, ['is1to1', 'isRequest']);
+  const {self: selfUser} = useKoSubscribableChildren(userState, ['self']);
+
   const clickOnInvitePeople = (conversation: ConversationEntity): void => {
     mainViewModel.panel.togglePanel(PanelViewModel.STATE.GUEST_OPTIONS, {entity: conversation});
   };
 
   const clickOnCancelRequest = (messageEntity: MemberMessage): void => {
-    const conversationEntity = root.conversationRepository.conversationState.activeConversation();
-    const nextConversationEntity = root.conversationRepository.getNextConversation(conversationEntity);
-    mainViewModel.actions.cancelConnectionRequest(messageEntity.otherUser(), true, nextConversationEntity);
+    if (activeConversation) {
+      const nextConversationEntity = conversationRepository.getNextConversation(activeConversation);
+      mainViewModel.actions.cancelConnectionRequest(messageEntity.otherUser(), true, nextConversationEntity);
+    }
   };
 
   const showUserDetails = (userEntity: User) => {
@@ -98,7 +102,7 @@ const ConversationList: FC<ConversationListProps> = ({
     // userEntity = ko.unwrap(userEntity);
     const isSingleModeConversation = is1to1 || isRequest;
 
-    if (userEntity.isDeleted || (isSingleModeConversation && !userEntity.isMe)) {
+    if (activeConversation && (userEntity.isDeleted || (isSingleModeConversation && !userEntity.isMe))) {
       return mainViewModel.panel.togglePanel(PanelViewModel.STATE.CONVERSATION_DETAILS, {
         entity: activeConversation,
       });
@@ -113,10 +117,13 @@ const ConversationList: FC<ConversationListProps> = ({
   };
 
   const showParticipants = (participants: User[]) => {
-    mainViewModel.panel.togglePanel(PanelViewModel.STATE.CONVERSATION_PARTICIPANTS, {
-      entity: activeConversation,
-      highlighted: participants,
-    });
+    if (activeConversation) {
+      mainViewModel.panel.togglePanel(PanelViewModel.STATE.CONVERSATION_PARTICIPANTS, {
+        entity: activeConversation,
+        highlighted: participants,
+      });
+    }
+    activeConversation;
   };
 
   const showMessageDetails = (message: Message, showLikes = false) => {
@@ -170,7 +177,7 @@ const ConversationList: FC<ConversationListProps> = ({
     if (userId && domain) {
       (async () => {
         try {
-          const userEntity = await userRepository.getUserById({domain, id: userId});
+          const userEntity = await repositories.user.getUserById({domain, id: userId});
           showUserDetails(userEntity);
           //  TODO: Fix type
         } catch (error: any) {
@@ -190,19 +197,21 @@ const ConversationList: FC<ConversationListProps> = ({
       return;
     }
 
-    const items: Message[] = await root.conversationRepository.getEventsForCategory(
-      activeConversation,
-      MessageCategory.IMAGE,
-    );
+    if (activeConversation) {
+      const items: Message[] = await conversationRepository.getEventsForCategory(
+        activeConversation,
+        MessageCategory.IMAGE,
+      );
 
-    const messageEntities = items.filter(
-      // @ts-ignore
-      item => item.category & MessageCategory.IMAGE && !(item.category & MessageCategory.GIF),
-    );
+      const messageEntities = items.filter(
+        // @ts-ignore
+        item => item.category & MessageCategory.IMAGE && !(item.category & MessageCategory.GIF),
+      );
 
-    const [imageMessageEntity] = messageEntities.filter(item => item.id === messageEntity.id);
+      const [imageMessageEntity] = messageEntities.filter(item => item.id === messageEntity.id);
 
-    amplify.publish(WebAppEvents.CONVERSATION.DETAIL_VIEW.SHOW, imageMessageEntity || messageEntity, messageEntities);
+      amplify.publish(WebAppEvents.CONVERSATION.DETAIL_VIEW.SHOW, imageMessageEntity || messageEntity, messageEntities);
+    }
   };
 
   const onSessionResetClick = async (messageEntity: DecryptErrorMessage): Promise<void> => {
@@ -215,7 +224,7 @@ const ConversationList: FC<ConversationListProps> = ({
     messageEntity.is_resetting_session(true);
 
     try {
-      if (messageEntity.fromDomain) {
+      if (messageEntity.fromDomain && activeConversation) {
         await repositories.message.resetSession(
           {domain: messageEntity.fromDomain, id: messageEntity.from},
           messageEntity.client_id,
@@ -260,7 +269,6 @@ const ConversationList: FC<ConversationListProps> = ({
 
     const sendReadReceipt = () => {
       // add the message in the buffer of read messages (actual read receipt will be sent in the next batch)
-      console.log('przemvs entered');
       setReadMessagesBuffer(prevState => [...prevState, {conversation: conversationEntity, message: messageEntity}]);
     };
 
@@ -283,12 +291,8 @@ const ConversationList: FC<ConversationListProps> = ({
 
     let shouldSendReadReceipt = false;
 
-    console.log('przemvs messageEntity', messageEntity);
-    console.log('przemvs messageEntity.expectsReadConfirmation', messageEntity.expectsReadConfirmation);
-
     if (messageEntity.expectsReadConfirmation) {
       if (conversationEntity.is1to1()) {
-        console.log('entered there');
         shouldSendReadReceipt = repositories.conversation.expectReadReceipt(conversationEntity);
       } else if (
         conversationEntity.isGroup() &&
@@ -348,7 +352,7 @@ const ConversationList: FC<ConversationListProps> = ({
   // };
 
   useEffect(() => {
-    console.log('przemvs readMessagesBuffer', readMessagesBuffer);
+    // console.log('przemvs readMessagesBuffer', readMessagesBuffer);
 
     if (readMessagesBuffer.length) {
       // readMessagesBuffer.forEach(readMessages => {
@@ -392,15 +396,15 @@ const ConversationList: FC<ConversationListProps> = ({
             callActions={mainViewModel.calling.callActions}
             panelViewModel={mainViewModel.panel}
             callingRepository={repositories.calling}
-            legalHoldModal={root.legalHoldModal}
+            legalHoldModal={legalHoldModal}
           />
 
           <MessagesList
             conversation={activeConversation}
             selfUser={selfUser}
             initialMessage={initialMessage}
-            conversationRepository={root.conversationRepository}
-            messageRepository={root.messageRepository}
+            conversationRepository={conversationRepository}
+            messageRepository={repositories.message}
             messageActions={mainViewModel.actions}
             invitePeople={clickOnInvitePeople}
             cancelConnectionRequest={clickOnCancelRequest}
