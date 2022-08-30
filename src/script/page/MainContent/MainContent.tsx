@@ -66,7 +66,14 @@ const MainContent: React.FC<LeftSidebarProps> = ({
   switch (state) {
     case ContentState.COLLECTION:
       title = t('accessibility.headings.collection');
-      content = <Collection conversation={activeConversation} conversationRepository={repositories.conversation} />;
+      content = (
+        <Collection
+          conversation={activeConversation}
+          conversationRepository={repositories.conversation}
+          assetRepository={repositories.asset}
+          messageRepository={repositories.message}
+        />
+      );
       break;
 
     case ContentState.PREFERENCES_ABOUT:
