@@ -17,10 +17,9 @@
  *
  */
 
-export * from './Connection';
-export * from './ConnectionAPI';
-export * from './ConnectionRequest';
-export * from './ConnectionStatus';
-export * from './ConnectionUpdate';
-export * from './UserConnectionList';
-export * from './ConnectionError';
+import type {Connection} from '../connection/';
+
+export interface UserConnectionList {
+  connections: Connection[];
+  has_more: boolean;
+}

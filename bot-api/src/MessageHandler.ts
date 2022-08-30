@@ -191,7 +191,7 @@ export abstract class MessageHandler {
     }
   }
 
-  async sendConnectionResponse(userId: QualifiedId, accept: boolean): Promise<void> {
+  async sendConnectionResponse(userId: string, accept: boolean): Promise<void> {
     if (this.account?.service) {
       if (accept) {
         await this.account.service.connection.acceptConnection(userId);
