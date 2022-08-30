@@ -148,11 +148,13 @@ const DetailViewModal: FC<DetailViewModalProps> = ({
         onCloseClick();
         break;
       }
+
       case KEY.ARROW_DOWN:
       case KEY.ARROW_RIGHT: {
         clickOnShowNext(keyboardEvent);
         break;
       }
+
       case KEY.ARROW_LEFT:
       case KEY.ARROW_UP: {
         clickOnShowPrevious(keyboardEvent);
@@ -196,7 +198,11 @@ const DetailViewModal: FC<DetailViewModalProps> = ({
 
   const getAllImages = async (conversation: Conversation) => {
     const conversationItems = await conversationRepository.getEventsForCategory(conversation, MessageCategory.IMAGE);
-    const contentMessages = conversationItems.reduce<ContentMessage[]>(
+    const filteredImages = conversationItems.filter(
+      message => isContentMessage(message) && isOfCategory('images', message),
+    );
+
+    const contentMessages = filteredImages.reduce<ContentMessage[]>(
       (contentMessages, message) => (isContentMessage(message) ? [...contentMessages, message] : contentMessages),
       [],
     );
@@ -216,7 +222,7 @@ const DetailViewModal: FC<DetailViewModalProps> = ({
       amplify.unsubscribe(WebAppEvents.CONVERSATION.MESSAGE.ADDED, messageAdded);
       amplify.unsubscribe(WebAppEvents.CONVERSATION.MESSAGE.REMOVED, messageRemoved);
     };
-  }, []);
+  }, [conversationEntity]);
 
   useEffect(() => {
     document.addEventListener('keydown', onKeyDownLightBox);
