@@ -38,7 +38,6 @@ import {IntegrationRepository} from '../../integration/IntegrationRepository';
 import {MainViewModel} from '../MainViewModel';
 import {MemberMessage} from '../../entity/message/MemberMessage';
 import {Message} from '../../entity/message/Message';
-import {MessageCategory} from '../../message/MessageCategory';
 import {ModalsViewModel} from '../ModalsViewModel';
 import {MotionDuration} from '../../motion/MotionDuration';
 import {PanelViewModel} from '../PanelViewModel';
@@ -49,6 +48,9 @@ import {UserError} from '../../error/UserError';
 import {UserRepository} from '../../user/UserRepository';
 import {UserState} from '../../user/UserState';
 import type {MessageRepository} from '../../conversation/MessageRepository';
+import {showDetailViewModal} from 'Components/Modals/DetailViewModal';
+import {AssetRepository} from '../../assets/AssetRepository';
+import React from 'react';
 
 /*
  * Message list rendering view model.
@@ -73,6 +75,7 @@ export class MessageListViewModel {
     private readonly serverTimeHandler: ServerTimeHandler,
     private readonly userRepository: UserRepository,
     private readonly messageRepository: MessageRepository,
+    private readonly assetRepository: AssetRepository,
     private readonly userState = container.resolve(UserState),
     private readonly conversationState = container.resolve(ConversationState),
   ) {
@@ -197,21 +200,17 @@ export class MessageListViewModel {
     }
   };
 
-  showDetail = async (messageEntity: Message, event: MouseEvent): Promise<void> => {
-    if (messageEntity.isExpired() || $(event.currentTarget).hasClass('image-asset--no-image')) {
+  showDetail = async (messageEntity: ContentMessage, event: React.MouseEvent | React.KeyboardEvent): Promise<void> => {
+    if (messageEntity.isExpired() || event.currentTarget.classList.contains('image-asset--no-image')) {
       return;
     }
 
-    const items: Message[] = await this.conversationRepository.getEventsForCategory(
-      this.conversation(),
-      MessageCategory.IMAGE,
-    );
-    const messageEntities = items.filter(
-      item => item.category & MessageCategory.IMAGE && !(item.category & MessageCategory.GIF),
-    );
-    const [imageMessageEntity] = messageEntities.filter(item => item.id === messageEntity.id);
-
-    amplify.publish(WebAppEvents.CONVERSATION.DETAIL_VIEW.SHOW, imageMessageEntity || messageEntity, messageEntities);
+    showDetailViewModal({
+      assetRepository: this.assetRepository,
+      conversationRepository: this.conversationRepository,
+      currentMessageEntity: messageEntity,
+      messageRepository: this.messageRepository,
+    });
   };
 
   readonly isLastDeliveredMessage = (messageEntity: Message): boolean => {

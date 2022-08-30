@@ -29,7 +29,8 @@ const CollectionSection: React.FC<{
   messages: ContentMessage[];
   onSelect: () => void;
   uieName: string;
-}> = ({messages, limit, uieName, onSelect, children, label}) => {
+  onImageClick?: (message: ContentMessage) => void;
+}> = ({messages, limit, uieName, onSelect, children, label, onImageClick}) => {
   if (messages.length === 0) {
     return null;
   }
@@ -50,7 +51,7 @@ const CollectionSection: React.FC<{
       </header>
       <div className="collection-images">
         {topMessages.map(message => (
-          <CollectionItem message={message} allMessages={[]} key={message.id} />
+          <CollectionItem message={message} allMessages={[]} key={message.id} onImageClick={onImageClick} />
         ))}
       </div>
     </section>

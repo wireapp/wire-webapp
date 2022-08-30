@@ -151,6 +151,7 @@ export class ContentViewModel {
       repositories.serverTime,
       repositories.user,
       repositories.message,
+      repositories.asset,
     );
 
     this.state.subscribe(state => {

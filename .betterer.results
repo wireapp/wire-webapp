@@ -2035,11 +2035,8 @@ exports[`stricter compilation`] = {
     "src/script/page/LeftSidebar/panels/StartUI/components/GroupList.test.tsx:87150494": [
       [34, 63, 38, "Argument of type \'Element | null\' is not assignable to parameter of type \'Element\'.\\n  Type \'null\' is not assignable to type \'Element\'.", "495210063"]
     ],
-    "src/script/page/MainContent/MainContent.tsx:1318405039": [
-      [68, 28, 12, "Type \'Conversation | null\' is not assignable to type \'Conversation\'.\\n  Type \'null\' is not assignable to type \'Conversation\'.", "1670678216"]
-    ],
-    "src/script/page/MainContent/panels/Collection/Collection.test.tsx:1028939995": [
-      [122, 12, 5, "Type \'HTMLInputElement | null\' is not assignable to type \'HTMLInputElement\'.\\n  Type \'null\' is not assignable to type \'HTMLInputElement\'.", "178805363"]
+    "src/script/page/MainContent/MainContent.tsx:1247306180": [
+      [70, 10, 12, "Type \'Conversation | null\' is not assignable to type \'Conversation\'.\\n  Type \'null\' is not assignable to type \'Conversation\'.", "1670678216"]
     ],
     "src/script/page/MainContent/panels/Collection/FullSearch.tsx:1879516049": [
       [99, 10, 10, "Object is possibly \'undefined\'.", "1962587969"],
@@ -2383,28 +2380,16 @@ exports[`stricter compilation`] = {
       [88, 11, 17, "Property \'activeCallViewTab\' has no initializer and is not definitely assigned in the constructor.", "1323835793"],
       [320, 4, 63, "Type \'Conversation | undefined\' is not assignable to type \'Conversation\'.\\n  Type \'undefined\' is not assignable to type \'Conversation\'.", "62763745"]
     ],
-    "src/script/view_model/ContentViewModel.ts:316767445": [
-      [237, 65, 6, "Type \'string | null\' is not assignable to type \'string\'.\\n  Type \'null\' is not assignable to type \'string\'.", "1127975365"],
-      [274, 68, 13, "Argument of type \'Message | undefined\' is not assignable to parameter of type \'Message\'.\\n  Type \'undefined\' is not assignable to type \'Message\'.", "2065728181"],
-      [280, 10, 6, "Type \'Conversation | null\' is not assignable to type \'PanelEntity\'.", "1164306878"],
-      [284, 37, 5, "Object is of type \'unknown\'.", "165548477"],
-      [294, 10, 9, "Argument of type \'undefined\' is not assignable to parameter of type \'string\'.", "2620553983"],
-      [377, 50, 9, "Argument of type \'undefined\' is not assignable to parameter of type \'Conversation\'.", "2620553983"],
-      [405, 12, 9, "Argument of type \'undefined\' is not assignable to parameter of type \'string\'.", "2620553983"],
-      [414, 20, 29, "Object is possibly \'undefined\'.", "1398699454"],
-      [417, 12, 9, "Argument of type \'undefined\' is not assignable to parameter of type \'string\'.", "2620553983"]
-    ],
-    "src/script/view_model/ImageDetailViewViewModel.ts:1576396674": [
-      [58, 4, 11, "Type \'undefined\' is not assignable to type \'string\'.", "3652784592"],
-      [60, 4, 15, "Type \'undefined\' is not assignable to type \'Modal\'.", "4236294625"],
-      [61, 4, 13, "Type \'Observable<string | undefined>\' is not assignable to type \'Observable<string>\'.\\n  The types returned by \'peek()\' are incompatible between these types.\\n    Type \'string | undefined\' is not assignable to type \'string\'.\\n      Type \'undefined\' is not assignable to type \'string\'.", "236598504"],
-      [65, 4, 23, "Type \'Observable<Conversation | undefined>\' is not assignable to type \'Observable<Conversation>\'.\\n  The types returned by \'peek()\' are incompatible between these types.\\n    Type \'Conversation | undefined\' is not assignable to type \'Conversation\'.\\n      Type \'undefined\' is not assignable to type \'Conversation\'.", "2356679995"],
-      [67, 4, 18, "Type \'Observable<ContentMessage | undefined>\' is not assignable to type \'Observable<ContentMessage>\'.\\n  The types returned by \'peek()\' are incompatible between these types.\\n    Type \'ContentMessage | undefined\' is not assignable to type \'ContentMessage\'.\\n      Type \'undefined\' is not assignable to type \'ContentMessage\'.", "3462443997"],
-      [93, 18, 9, "Argument of type \'undefined\' is not assignable to parameter of type \'string\'.", "2620553983"],
-      [95, 23, 9, "Argument of type \'undefined\' is not assignable to parameter of type \'ContentMessage\'.", "2620553983"],
-      [96, 4, 11, "Type \'undefined\' is not assignable to type \'string\'.", "3652784592"],
-      [146, 20, 22, "Object is possibly \'undefined\'.", "670361899"],
-      [146, 72, 22, "Object is possibly \'undefined\'.", "670361899"]
+    "src/script/view_model/ContentViewModel.ts:3648568297": [
+      [238, 65, 6, "Type \'string | null\' is not assignable to type \'string\'.\\n  Type \'null\' is not assignable to type \'string\'.", "1127975365"],
+      [275, 68, 13, "Argument of type \'Message | undefined\' is not assignable to parameter of type \'Message\'.\\n  Type \'undefined\' is not assignable to type \'Message\'.", "2065728181"],
+      [281, 10, 6, "Type \'Conversation | null\' is not assignable to type \'PanelEntity\'.", "1164306878"],
+      [285, 37, 5, "Object is of type \'unknown\'.", "165548477"],
+      [295, 10, 9, "Argument of type \'undefined\' is not assignable to parameter of type \'string\'.", "2620553983"],
+      [378, 50, 9, "Argument of type \'undefined\' is not assignable to parameter of type \'Conversation\'.", "2620553983"],
+      [406, 12, 9, "Argument of type \'undefined\' is not assignable to parameter of type \'string\'.", "2620553983"],
+      [415, 20, 29, "Object is possibly \'undefined\'.", "1398699454"],
+      [418, 12, 9, "Argument of type \'undefined\' is not assignable to parameter of type \'string\'.", "2620553983"]
     ],
     "src/script/view_model/ListViewModel.ts:4038366115": [
       [119, 4, 10, "Type \'Observable<ListState>\' is not assignable to type \'Observable<string>\'.\\n  Types of parameters \'value\' and \'value\' are incompatible.\\n    Type \'string\' is not assignable to type \'ListState\'.", "4014904506"],
@@ -2419,35 +2404,35 @@ exports[`stricter compilation`] = {
       [60, 21, 14, "Object is possibly \'undefined\'.", "3120882432"],
       [61, 21, 14, "Object is possibly \'undefined\'.", "3120882432"]
     ],
-    "src/script/view_model/MainViewModel.ts:4084606447": [
-      [215, 4, 30, "Object is possibly \'null\'.", "1790131128"],
-      [223, 24, 3, "Object is possibly \'null\'.", "193410244"],
-      [235, 27, 3, "Object is possibly \'null\'.", "193410244"],
-      [237, 29, 3, "Object is possibly \'null\'.", "193410244"],
-      [243, 10, 5, "Object is possibly \'null\'.", "187702867"],
-      [244, 28, 5, "Argument of type \'HTMLElement | null\' is not assignable to parameter of type \'HTMLElement\'.\\n  Type \'null\' is not assignable to type \'HTMLElement\'.", "187702867"],
-      [245, 28, 8, "Argument of type \'HTMLElement | null\' is not assignable to parameter of type \'HTMLElement\'.\\n  Type \'null\' is not assignable to type \'HTMLElement\'.", "277626740"],
-      [246, 28, 5, "Argument of type \'HTMLElement | null\' is not assignable to parameter of type \'HTMLElement\'.\\n  Type \'null\' is not assignable to type \'HTMLElement\'.", "178805363"],
-      [250, 12, 3, "Object is possibly \'null\'.", "193410244"],
-      [252, 12, 7, "Object is possibly \'null\'.", "652303743"],
-      [254, 12, 3, "Object is possibly \'null\'.", "193410244"],
-      [256, 12, 7, "Object is possibly \'null\'.", "652303743"],
-      [265, 6, 5, "Object is possibly \'null\'.", "187702867"],
-      [268, 25, 5, "Argument of type \'HTMLElement | null\' is not assignable to parameter of type \'HTMLElement\'.\\n  Type \'null\' is not assignable to type \'HTMLElement\'.", "187702867"],
-      [270, 27, 8, "Argument of type \'HTMLElement | null\' is not assignable to parameter of type \'HTMLElement\'.\\n  Type \'null\' is not assignable to type \'HTMLElement\'.", "277626740"],
-      [271, 27, 5, "Argument of type \'HTMLElement | null\' is not assignable to parameter of type \'HTMLElement\'.\\n  Type \'null\' is not assignable to type \'HTMLElement\'.", "178805363"],
-      [274, 25, 5, "Argument of type \'HTMLElement | null\' is not assignable to parameter of type \'HTMLElement\'.\\n  Type \'null\' is not assignable to type \'HTMLElement\'.", "187702867"],
-      [276, 27, 8, "Argument of type \'HTMLElement | null\' is not assignable to parameter of type \'HTMLElement\'.\\n  Type \'null\' is not assignable to type \'HTMLElement\'.", "277626740"],
-      [277, 27, 5, "Argument of type \'HTMLElement | null\' is not assignable to parameter of type \'HTMLElement\'.\\n  Type \'null\' is not assignable to type \'HTMLElement\'.", "178805363"],
-      [283, 25, 5, "Argument of type \'HTMLElement | null\' is not assignable to parameter of type \'HTMLElement\'.\\n  Type \'null\' is not assignable to type \'HTMLElement\'.", "187702867"],
-      [284, 25, 8, "Argument of type \'HTMLElement | null\' is not assignable to parameter of type \'HTMLElement\'.\\n  Type \'null\' is not assignable to type \'HTMLElement\'.", "277626740"],
-      [285, 25, 5, "Argument of type \'HTMLElement | null\' is not assignable to parameter of type \'HTMLElement\'.\\n  Type \'null\' is not assignable to type \'HTMLElement\'.", "178805363"],
-      [288, 27, 5, "Argument of type \'HTMLElement | null\' is not assignable to parameter of type \'HTMLElement\'.\\n  Type \'null\' is not assignable to type \'HTMLElement\'.", "187702867"],
-      [290, 29, 8, "Argument of type \'HTMLElement | null\' is not assignable to parameter of type \'HTMLElement\'.\\n  Type \'null\' is not assignable to type \'HTMLElement\'.", "277626740"],
-      [291, 29, 5, "Argument of type \'HTMLElement | null\' is not assignable to parameter of type \'HTMLElement\'.\\n  Type \'null\' is not assignable to type \'HTMLElement\'.", "178805363"],
-      [294, 27, 5, "Argument of type \'HTMLElement | null\' is not assignable to parameter of type \'HTMLElement\'.\\n  Type \'null\' is not assignable to type \'HTMLElement\'.", "187702867"],
-      [296, 29, 8, "Argument of type \'HTMLElement | null\' is not assignable to parameter of type \'HTMLElement\'.\\n  Type \'null\' is not assignable to type \'HTMLElement\'.", "277626740"],
-      [297, 29, 5, "Argument of type \'HTMLElement | null\' is not assignable to parameter of type \'HTMLElement\'.\\n  Type \'null\' is not assignable to type \'HTMLElement\'.", "178805363"]
+    "src/script/view_model/MainViewModel.ts:1374749392": [
+      [207, 4, 30, "Object is possibly \'null\'.", "1790131128"],
+      [215, 24, 3, "Object is possibly \'null\'.", "193410244"],
+      [227, 27, 3, "Object is possibly \'null\'.", "193410244"],
+      [229, 29, 3, "Object is possibly \'null\'.", "193410244"],
+      [235, 10, 5, "Object is possibly \'null\'.", "187702867"],
+      [236, 28, 5, "Argument of type \'HTMLElement | null\' is not assignable to parameter of type \'HTMLElement\'.\\n  Type \'null\' is not assignable to type \'HTMLElement\'.", "187702867"],
+      [237, 28, 8, "Argument of type \'HTMLElement | null\' is not assignable to parameter of type \'HTMLElement\'.\\n  Type \'null\' is not assignable to type \'HTMLElement\'.", "277626740"],
+      [238, 28, 5, "Argument of type \'HTMLElement | null\' is not assignable to parameter of type \'HTMLElement\'.\\n  Type \'null\' is not assignable to type \'HTMLElement\'.", "178805363"],
+      [242, 12, 3, "Object is possibly \'null\'.", "193410244"],
+      [244, 12, 7, "Object is possibly \'null\'.", "652303743"],
+      [246, 12, 3, "Object is possibly \'null\'.", "193410244"],
+      [248, 12, 7, "Object is possibly \'null\'.", "652303743"],
+      [257, 6, 5, "Object is possibly \'null\'.", "187702867"],
+      [260, 25, 5, "Argument of type \'HTMLElement | null\' is not assignable to parameter of type \'HTMLElement\'.\\n  Type \'null\' is not assignable to type \'HTMLElement\'.", "187702867"],
+      [262, 27, 8, "Argument of type \'HTMLElement | null\' is not assignable to parameter of type \'HTMLElement\'.\\n  Type \'null\' is not assignable to type \'HTMLElement\'.", "277626740"],
+      [263, 27, 5, "Argument of type \'HTMLElement | null\' is not assignable to parameter of type \'HTMLElement\'.\\n  Type \'null\' is not assignable to type \'HTMLElement\'.", "178805363"],
+      [266, 25, 5, "Argument of type \'HTMLElement | null\' is not assignable to parameter of type \'HTMLElement\'.\\n  Type \'null\' is not assignable to type \'HTMLElement\'.", "187702867"],
+      [268, 27, 8, "Argument of type \'HTMLElement | null\' is not assignable to parameter of type \'HTMLElement\'.\\n  Type \'null\' is not assignable to type \'HTMLElement\'.", "277626740"],
+      [269, 27, 5, "Argument of type \'HTMLElement | null\' is not assignable to parameter of type \'HTMLElement\'.\\n  Type \'null\' is not assignable to type \'HTMLElement\'.", "178805363"],
+      [275, 25, 5, "Argument of type \'HTMLElement | null\' is not assignable to parameter of type \'HTMLElement\'.\\n  Type \'null\' is not assignable to type \'HTMLElement\'.", "187702867"],
+      [276, 25, 8, "Argument of type \'HTMLElement | null\' is not assignable to parameter of type \'HTMLElement\'.\\n  Type \'null\' is not assignable to type \'HTMLElement\'.", "277626740"],
+      [277, 25, 5, "Argument of type \'HTMLElement | null\' is not assignable to parameter of type \'HTMLElement\'.\\n  Type \'null\' is not assignable to type \'HTMLElement\'.", "178805363"],
+      [280, 27, 5, "Argument of type \'HTMLElement | null\' is not assignable to parameter of type \'HTMLElement\'.\\n  Type \'null\' is not assignable to type \'HTMLElement\'.", "187702867"],
+      [282, 29, 8, "Argument of type \'HTMLElement | null\' is not assignable to parameter of type \'HTMLElement\'.\\n  Type \'null\' is not assignable to type \'HTMLElement\'.", "277626740"],
+      [283, 29, 5, "Argument of type \'HTMLElement | null\' is not assignable to parameter of type \'HTMLElement\'.\\n  Type \'null\' is not assignable to type \'HTMLElement\'.", "178805363"],
+      [286, 27, 5, "Argument of type \'HTMLElement | null\' is not assignable to parameter of type \'HTMLElement\'.\\n  Type \'null\' is not assignable to type \'HTMLElement\'.", "187702867"],
+      [288, 29, 8, "Argument of type \'HTMLElement | null\' is not assignable to parameter of type \'HTMLElement\'.\\n  Type \'null\' is not assignable to type \'HTMLElement\'.", "277626740"],
+      [289, 29, 5, "Argument of type \'HTMLElement | null\' is not assignable to parameter of type \'HTMLElement\'.\\n  Type \'null\' is not assignable to type \'HTMLElement\'.", "178805363"]
     ],
     "src/script/view_model/ModalsViewModel.ts:508741377": [
       [80, 2, 11, "Type \'null\' is not assignable to type \'string\'.", "974495764"],
@@ -2512,21 +2497,17 @@ exports[`stricter compilation`] = {
       [195, 28, 7, "Argument of type \'unknown\' is not assignable to parameter of type \'string\'.", "1236122734"],
       [239, 21, 9, "Argument of type \'undefined\' is not assignable to parameter of type \'User\'.", "2620553983"]
     ],
-    "src/script/view_model/content/MessageListViewModel.ts:1895857150": [
-      [94, 19, 12, "Property \'conversation\' does not exist on type \'{ conversation: Conversation; message: Message; } | undefined\'.", "1670678216"],
-      [94, 33, 7, "Property \'message\' does not exist on type \'{ conversation: Conversation; message: Message; } | undefined\'.", "1236122734"],
-      [138, 4, 107, "Type \'number | boolean\' is not assignable to type \'boolean\'.\\n  Type \'number\' is not assignable to type \'boolean\'.", "3357851046"],
-      [162, 37, 18, "Object is possibly \'null\'.", "1508601427"],
-      [162, 68, 18, "Object is possibly \'null\'.", "1508601427"],
-      [166, 8, 6, "Type \'Conversation | null\' is not assignable to type \'PanelEntity\'.\\n  Type \'null\' is not assignable to type \'PanelEntity\'.", "1164306878"],
-      [188, 9, 6, "Type \'string | undefined\' is not assignable to type \'string\'.\\n  Type \'undefined\' is not assignable to type \'string\'.", "1127975365"],
-      [200, 39, 19, "No overload matches this call.\\n  The last overload gave the following error.\\n    Argument of type \'EventTarget | null\' is not assignable to parameter of type \'PlainObject<any>\'.\\n      Type \'null\' is not assignable to type \'PlainObject<any>\'.", "3586053823"],
-      [200, 60, 8, "Property \'hasClass\' does not exist on type \'JQueryStatic\'.", "1121770737"],
-      [209, 14, 13, "Object is possibly \'undefined\'.", "2217428334"],
-      [209, 57, 13, "Object is possibly \'undefined\'.", "2217428334"],
-      [222, 83, 18, "Argument of type \'Conversation | null\' is not assignable to parameter of type \'Conversation\'.\\n  Type \'null\' is not assignable to type \'Conversation\'.", "1508601427"],
-      [356, 68, 6, "Type \'string | undefined\' is not assignable to type \'string\'.\\n  Type \'undefined\' is not assignable to type \'string\'.", "1127975365"],
-      [359, 14, 5, "Object is of type \'unknown\'.", "165548477"]
+    "src/script/view_model/content/MessageListViewModel.ts:2712738962": [
+      [97, 19, 12, "Property \'conversation\' does not exist on type \'{ conversation: Conversation; message: Message; } | undefined\'.", "1670678216"],
+      [97, 33, 7, "Property \'message\' does not exist on type \'{ conversation: Conversation; message: Message; } | undefined\'.", "1236122734"],
+      [141, 4, 107, "Type \'number | boolean\' is not assignable to type \'boolean\'.\\n  Type \'number\' is not assignable to type \'boolean\'.", "3357851046"],
+      [165, 37, 18, "Object is possibly \'null\'.", "1508601427"],
+      [165, 68, 18, "Object is possibly \'null\'.", "1508601427"],
+      [169, 8, 6, "Type \'Conversation | null\' is not assignable to type \'PanelEntity\'.\\n  Type \'null\' is not assignable to type \'PanelEntity\'.", "1164306878"],
+      [191, 9, 6, "Type \'string | undefined\' is not assignable to type \'string\'.\\n  Type \'undefined\' is not assignable to type \'string\'.", "1127975365"],
+      [221, 83, 18, "Argument of type \'Conversation | null\' is not assignable to parameter of type \'Conversation\'.\\n  Type \'null\' is not assignable to type \'Conversation\'.", "1508601427"],
+      [355, 68, 6, "Type \'string | undefined\' is not assignable to type \'string\'.\\n  Type \'undefined\' is not assignable to type \'string\'.", "1127975365"],
+      [358, 14, 5, "Object is of type \'unknown\'.", "165548477"]
     ],
     "src/script/view_model/panel/AddParticipantsViewModel.ts:4264095902": [
       [102, 4, 21, "Type \'ObservableArray<never>\' is not assignable to type \'ObservableArray<User>\'.", "2199671479"],
@@ -2560,7 +2541,7 @@ exports[`stricter compilation`] = {
       [93, 4, 23, "Type \'PureComputed<boolean | undefined>\' is not assignable to type \'PureComputed<boolean>\'.", "2493661698"]
     ],
     "src/script/view_model/panel/MessageDetailsViewModel.ts:906474120": [
-      [72, 4, 14, "Type \'Observable<string | undefined>\' is not assignable to type \'Observable<string>\'.", "116181579"],
+      [72, 4, 14, "Type \'Observable<string | undefined>\' is not assignable to type \'Observable<string>\'.\\n  The types returned by \'peek()\' are incompatible between these types.\\n    Type \'string | undefined\' is not assignable to type \'string\'.\\n      Type \'undefined\' is not assignable to type \'string\'.", "116181579"],
       [102, 13, 14, "Object is possibly \'undefined\'.", "116180423"],
       [114, 63, 14, "Object is possibly \'undefined\'.", "116180423"],
       [120, 12, 7, "Type \'{ domain: string | undefined; id: string; }[]\' is not assignable to type \'QualifiedId[]\'.\\n  Type \'{ domain: string | undefined; id: string; }\' is not assignable to type \'QualifiedId\'.\\n    Types of property \'domain\' are incompatible.\\n      Type \'string | undefined\' is not assignable to type \'string\'.\\n        Type \'undefined\' is not assignable to type \'string\'.", "2414311946"],

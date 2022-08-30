@@ -786,6 +786,24 @@ const InputBar = ({
     return () => document.removeEventListener('paste', onPasteFiles);
   }, []);
 
+  const sendImageOnEnterClick = (event: KeyboardEvent) => {
+    if (event.key === KEY.ENTER && !event.shiftKey && !event.altKey && !event.metaKey) {
+      sendPastedFile();
+    }
+  };
+
+  useEffect(() => {
+    if (!pastedFile) {
+      return () => undefined;
+    }
+
+    window.addEventListener('keydown', sendImageOnEnterClick);
+
+    return () => {
+      window.removeEventListener('keydown', sendImageOnEnterClick);
+    };
+  }, [pastedFile]);
+
   return (
     <div id="conversation-input-bar" className="conversation-input-bar">
       {classifiedDomains && !isConnectionRequest && (
