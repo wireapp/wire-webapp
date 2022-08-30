@@ -166,31 +166,23 @@ const DetailViewModal: FC<DetailViewModalProps> = ({
   };
 
   const messageRemoved = (messageId: string, conversationId: string) => {
-    if (conversationEntity) {
-      const isCurrentConversation = conversationEntity.id === conversationId;
+    if (conversationEntity?.id === conversationId) {
+      if (currentMessageEntity.id === messageId) {
+        onCloseClick();
 
-      if (isCurrentConversation) {
-        const isVisibleMessage = currentMessageEntity.id === messageId;
-
-        if (isVisibleMessage) {
-          onCloseClick();
-
-          return;
-        }
-
-        setItems(prevState => prevState.filter(message => message.id !== messageId));
+        return;
       }
+
+      setItems(prevState => prevState.filter(message => message.id !== messageId));
     }
   };
 
   const messageAdded = (message: ContentMessage) => {
-    if (conversationEntity) {
-      const isCurrentConversation = conversationEntity.id === message.conversation_id;
-      const isImage = isOfCategory('images', message);
+    const isCurrentConversation = conversationEntity?.id === message.conversation_id;
+    const isImage = isOfCategory('images', message);
 
-      if (isCurrentConversation && isImage) {
-        setItems(prevState => [...prevState, message]);
-      }
+    if (isCurrentConversation && isImage) {
+      setItems(prevState => [...prevState, message]);
     }
   };
 
