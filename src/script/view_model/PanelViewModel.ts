@@ -58,7 +58,6 @@ export type PanelParams = {
 export class PanelViewModel {
   mainViewModel: MainViewModel;
   repositories: ViewModelRepositories;
-  elementId: string;
   conversationEntity: ko.Observable<Conversation>;
   stateHistory: {params: PanelParams; state: string}[];
   isAnimating: ko.Observable<boolean>;
@@ -132,7 +131,6 @@ export class PanelViewModel {
   constructor(mainViewModel: MainViewModel, repositories: ViewModelRepositories) {
     const conversationState = container.resolve(ConversationState);
 
-    this.elementId = 'right-column';
     this.repositories = repositories;
     this.mainViewModel = mainViewModel;
     this.isFederated = mainViewModel.isFederated;
@@ -156,8 +154,6 @@ export class PanelViewModel {
         this.currentEntity = updatedMessageEntity;
       }
     });
-
-    ko.applyBindings(this, document.getElementById(this.elementId));
   }
 
   /**

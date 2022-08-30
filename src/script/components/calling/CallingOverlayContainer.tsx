@@ -22,7 +22,7 @@ import {CALL_TYPE, STATE as CALL_STATE} from '@wireapp/avs';
 import React, {Fragment, useEffect} from 'react';
 import {container} from 'tsyringe';
 
-import {registerReactComponent, useKoSubscribableChildren} from 'Util/ComponentUtil';
+import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 
 import {Call} from '../../calling/Call';
 import {CallingRepository} from '../../calling/CallingRepository';
@@ -47,7 +47,7 @@ export interface CallingContainerProps {
   readonly multitasking: Multitasking;
 }
 
-const CallingContainer: React.FC<CallingContainerProps> = ({
+export const CallingContainer: React.FC<CallingContainerProps> = ({
   multitasking,
   mediaRepository,
   callingRepository,
@@ -202,5 +202,3 @@ const CallingContainer: React.FC<CallingContainerProps> = ({
     </Fragment>
   );
 };
-
-registerReactComponent('calling-overlay-container', CallingContainer);

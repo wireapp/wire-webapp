@@ -17,9 +17,6 @@
  *
  */
 
-// Polyfill for "tsyringe" dependency injection
-import 'core-js/es7/reflect';
-
 import ko from 'knockout';
 import platform from 'platform';
 import {container} from 'tsyringe';
@@ -33,17 +30,13 @@ import {getLogger, Logger} from 'Util/Logger';
 import {t} from 'Util/LocalizerUtil';
 import {checkIndexedDb, createRandomUuid} from 'Util/util';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
-import {enableLogging} from 'Util/LoggerUtil';
 import {Environment} from 'Util/Environment';
 import {DebugUtil} from 'Util/DebugUtil';
-import {exposeWrapperGlobals} from 'Util/wrapper';
 import {includesString} from 'Util/StringUtil';
 import {appendParameter} from 'Util/UrlUtil';
-import {loadValue} from 'Util/StorageUtil';
 
 import {Config} from '../Config';
 import {startNewVersionPolling} from '../lifecycle/newVersionHandler';
-import {LoadingViewModel} from '../view_model/LoadingViewModel';
 import {PreferenceNotificationRepository} from '../notification/PreferenceNotificationRepository';
 import * as UserPermission from '../user/UserPermission';
 import {UserRepository} from '../user/UserRepository';
@@ -72,11 +65,9 @@ import {SingleInstanceHandler} from './SingleInstanceHandler';
 import {AppInitStatisticsValue} from '../telemetry/app_init/AppInitStatisticsValue';
 import {AppInitTimingsStep} from '../telemetry/app_init/AppInitTimingsStep';
 import {AppInitTelemetry} from '../telemetry/app_init/AppInitTelemetry';
-import {MainViewModel, ViewModelRepositories} from '../view_model/MainViewModel';
+import {ViewModelRepositories} from '../view_model/MainViewModel';
 import {ThemeViewModel} from '../view_model/ThemeViewModel';
 import {WindowHandler} from '../ui/WindowHandler';
-import {Router} from '../router/Router';
-import {initRouterBindings} from '../router/routerBindings';
 
 import './globals';
 
@@ -84,13 +75,9 @@ import {ReceiptsMiddleware} from '../event/preprocessor/ReceiptsMiddleware';
 
 import {getWebsiteUrl} from '../externalRoute';
 
-import {modals} from '../view_model/ModalsViewModel';
-import {showInitialModal} from '../user/AvailabilityModal';
-
 import {URLParameter} from '../auth/URLParameter';
 import {SIGN_OUT_REASON} from '../auth/SignOutReason';
 import {ClientRepository} from '../client/ClientRepository';
-import {ContentViewModel} from '../view_model/ContentViewModel';
 import {CacheRepository} from '../cache/CacheRepository';
 import {SelfService} from '../self/SelfService';
 import {PropertiesRepository} from '../properties/PropertiesRepository';
@@ -123,9 +110,8 @@ import {TeamError} from '../error/TeamError';
 import Warnings from '../view_model/WarningsContainer';
 import {Core} from '../service/CoreSingleton';
 import {migrateToQualifiedSessionIds} from './sessionIdMigrator';
-import showUserModal from 'Components/Modals/UserModal';
 
-function doRedirect(signOutReason: SIGN_OUT_REASON) {
+export function doRedirect(signOutReason: SIGN_OUT_REASON) {
   let url = `/auth/${location.search}`;
 
   if (location.hash.startsWith('#/user/') && signOutReason === SIGN_OUT_REASON.NOT_SIGNED_IN) {
@@ -141,7 +127,7 @@ function doRedirect(signOutReason: SIGN_OUT_REASON) {
   window.location.replace(url);
 }
 
-class App {
+export class App {
   static readonly LOCAL_STORAGE_LOGIN_REDIRECT_KEY = 'LOGIN_REDIRECT_KEY';
   static readonly LOCAL_STORAGE_LOGIN_CONVERSATION_KEY = 'LOGIN_CONVERSATION_KEY';
   logger: Logger;
@@ -181,18 +167,12 @@ class App {
   }
 
   /**
-   * @param appContainer DOM element that will hold the app
    * @param encryptedEngine Encrypted database handler
    * @param apiClient Configured backend client
    */
-  constructor(
-    private readonly appContainer: HTMLElement,
-    private readonly core: Core,
-    private readonly apiClient: APIClient,
-  ) {
+  constructor(private readonly core: Core, private readonly apiClient: APIClient) {
     this.apiClient.on(APIClient.TOPIC.ON_LOGOUT, () => this.logout(SIGN_OUT_REASON.NOT_SIGNED_IN, false));
     this.logger = getLogger('App');
-    this.appContainer = appContainer;
 
     new WindowHandler();
 
@@ -366,7 +346,7 @@ class App {
    *
    * @param clientType
    */
-  async initApp(clientType: ClientType) {
+  async initApp(clientType: ClientType, onProgress: (progress: number, message?: string) => void) {
     // add body information
     const osCssClass = Runtime.isMacOS() ? 'os-mac' : 'os-pc';
     const platformCssClass = Runtime.isDesktopApp() ? 'platform-electron' : 'platform-web';
@@ -375,7 +355,6 @@ class App {
     const isReload = this._isReload();
     this.logger.debug(`App init starts (isReload: '${isReload}')`);
     new ThemeViewModel(this.repository.properties);
-    const loadingView = new LoadingViewModel();
     const telemetry = new AppInitTelemetry();
     try {
       const {
@@ -393,7 +372,7 @@ class App {
       } = this.repository;
       await checkIndexedDb();
       this._registerSingleInstance();
-      loadingView.updateProgress(2.5);
+      onProgress(2.5);
       telemetry.timeStep(AppInitTimingsStep.RECEIVED_ACCESS_TOKEN);
 
       try {
@@ -410,24 +389,24 @@ class App {
           this.apiClient.context!.domain,
         );
       }
-      loadingView.updateProgress(5, t('initReceivedSelfUser', selfUser.name()));
+      onProgress(5, t('initReceivedSelfUser', selfUser.name()));
       telemetry.timeStep(AppInitTimingsStep.RECEIVED_SELF_USER);
       const clientEntity = await this._initiateSelfUserClients();
       callingRepository.initAvs(selfUser, clientEntity().id);
-      loadingView.updateProgress(7.5, t('initValidatedClient'));
+      onProgress(7.5, t('initValidatedClient'));
       telemetry.timeStep(AppInitTimingsStep.VALIDATED_CLIENT);
       telemetry.addStatistic(AppInitStatisticsValue.CLIENT_TYPE, clientEntity().type);
 
       await cryptographyRepository.init(this.core.service!.cryptography.cryptobox, clientEntity);
 
-      loadingView.updateProgress(10);
+      onProgress(10);
       telemetry.timeStep(AppInitTimingsStep.INITIALIZED_CRYPTOGRAPHY);
 
       await teamRepository.initTeam();
 
       const conversationEntities = await conversationRepository.getConversations();
       const connectionEntities = await connectionRepository.getConnections();
-      loadingView.updateProgress(25, t('initReceivedUserData'));
+      onProgress(25, t('initReceivedUserData'));
       telemetry.timeStep(AppInitTimingsStep.RECEIVED_USER_DATA);
       telemetry.addStatistic(AppInitStatisticsValue.CONVERSATIONS, conversationEntities.length, 50);
       telemetry.addStatistic(AppInitStatisticsValue.CONNECTIONS, connectionEntities.length, 50);
@@ -441,7 +420,11 @@ class App {
       await userRepository.loadUsers();
 
       await eventRepository.connectWebSocket(this.core, ({done, total}) => {
-        loadingView.updateProgress(25 + 50 * (done / total), t('initDecryption'), {handled: done, total});
+        const baseMessage = t('initDecryption');
+        const extraInfo = Config.getConfig().FEATURE.SHOW_LOADING_INFORMATION
+          ? ` ${t('initProgress', {number1: done.toString(), number2: total.toString()})}`
+          : '';
+        onProgress(25 + 50 * (done / total), `${baseMessage}${extraInfo}`);
       });
       const notificationsCount = eventRepository.notificationsTotal;
 
@@ -450,11 +433,11 @@ class App {
 
       eventTrackerRepository.init(propertiesRepository.properties.settings.privacy.telemetry_sharing);
       await conversationRepository.initializeConversations();
-      loadingView.updateProgress(97.5, t('initUpdatedFromNotifications', Config.getConfig().BRAND_NAME));
+      onProgress(97.5, t('initUpdatedFromNotifications', Config.getConfig().BRAND_NAME));
 
       const clientEntities = await clientRepository.updateClientsForSelf();
 
-      loadingView.updateProgress(99);
+      onProgress(99);
 
       telemetry.addStatistic(AppInitStatisticsValue.CLIENTS, clientEntities.length);
       telemetry.timeStep(AppInitTimingsStep.APP_PRE_LOADED);
@@ -466,13 +449,12 @@ class App {
       await conversationRepository.conversationLabelRepository.loadLabels();
 
       telemetry.timeStep(AppInitTimingsStep.APP_LOADED);
-      this._showInterface();
+      //this._showInterface();
 
-      loadingView.removeFromView();
       telemetry.report();
       amplify.publish(WebAppEvents.LIFECYCLE.LOADED);
-      modals.ready();
-      showInitialModal(userRepository['userState'].self().availability());
+      //modals.ready();
+      //showInitialModal(userRepository['userState'].self().availability());
       telemetry.timeStep(AppInitTimingsStep.UPDATED_CONVERSATIONS);
       if (userRepository['userState'].isActivatedAccount()) {
         // start regularly polling the server to check if there is a new version of Wire
@@ -664,67 +646,6 @@ class App {
   }
 
   /**
-   * Hide the loading spinner and show the application UI.
-   */
-  private _showInterface() {
-    const mainView = new MainViewModel(this.repository);
-    ko.applyBindings(mainView, this.appContainer);
-    this.repository.notification.setContentViewModelStates(mainView.content.state, mainView.multitasking);
-
-    const conversationEntity = this.repository.conversation.getMostRecentConversation();
-
-    this.logger.info('Showing application UI');
-    if (this.repository.user['userState'].isTemporaryGuest()) {
-      mainView.list.showTemporaryGuest();
-    } else if (conversationEntity) {
-      mainView.content.showConversation(conversationEntity, {});
-    } else if (this.repository.user['userState'].connectRequests().length) {
-      amplify.publish(WebAppEvents.CONTENT.SWITCH, ContentViewModel.STATE.CONNECTION_REQUESTS);
-    }
-
-    const redirect = localStorage.getItem(App.LOCAL_STORAGE_LOGIN_REDIRECT_KEY);
-    if (redirect) {
-      localStorage.removeItem(App.LOCAL_STORAGE_LOGIN_REDIRECT_KEY);
-      window.location.replace(redirect);
-    }
-
-    const conversationRedirect = localStorage.getItem(App.LOCAL_STORAGE_LOGIN_CONVERSATION_KEY);
-    if (conversationRedirect) {
-      const {conversation, domain} = JSON.parse(conversationRedirect)?.data;
-      localStorage.removeItem(App.LOCAL_STORAGE_LOGIN_CONVERSATION_KEY);
-      window.location.replace(`#/conversation/${conversation}${domain ? `/${domain}` : ''}`);
-    }
-
-    const router = new Router({
-      '/conversation/:conversationId(/:domain)': (
-        conversationId: string,
-        domain: string = this.apiClient.context?.domain ?? '',
-      ) => mainView.content.showConversation(conversationId, {}, domain),
-      '/preferences/about': () => mainView.list.openPreferencesAbout(),
-      '/preferences/account': () => mainView.list.openPreferencesAccount(),
-      '/preferences/av': () => mainView.list.openPreferencesAudioVideo(),
-      '/preferences/devices': () => mainView.list.openPreferencesDevices(),
-      '/preferences/options': () => mainView.list.openPreferencesOptions(),
-      '/user/:userId(/:domain)': (userId: string, domain: string = this.apiClient.context?.domain ?? '') => {
-        showUserModal({
-          actionsViewModel: mainView.actions,
-          onClose: () => router.navigate('/'),
-          userId: {domain, id: userId},
-          userRepository: this.repository.user,
-        });
-      },
-    });
-    initRouterBindings(router);
-    container.registerInstance(Router, router);
-
-    this.appContainer.dataset.uieValue = 'is-loaded';
-
-    this.repository.properties.checkPrivacyPermission().then(() => {
-      window.setTimeout(() => this.repository.notification.checkPermission(), App.CONFIG.NOTIFICATION_CHECK);
-    });
-  }
-
-  /**
    * Subscribe to 'beforeunload' to stop calls and disconnect the WebSocket.
    */
   private _subscribeToUnloadEvents(): void {
@@ -892,34 +813,3 @@ class App {
     }).subscribe(role => window.z.userPermission(UserPermission.generatePermissionHelpers(role)));
   }
 }
-
-//##############################################################################
-// Setting up the App
-//##############################################################################
-
-$(async () => {
-  const apiClient = container.resolve(APIClient);
-  await apiClient.useVersion(Config.getConfig().SUPPORTED_API_VERSIONS);
-  const core = container.resolve(Core);
-
-  enableLogging(Config.getConfig().FEATURE.ENABLE_DEBUG);
-  exposeWrapperGlobals();
-  const appContainer = document.getElementById('wire-main');
-  if (appContainer) {
-    const enforceDesktopApplication =
-      Config.getConfig().FEATURE.ENABLE_ENFORCE_DESKTOP_APPLICATION_ONLY && !Runtime.isDesktopApp();
-    if (enforceDesktopApplication) {
-      doRedirect(SIGN_OUT_REASON.APP_INIT);
-    }
-    const shouldPersist = loadValue<boolean>(StorageKey.AUTH.PERSIST);
-    if (shouldPersist === undefined) {
-      doRedirect(SIGN_OUT_REASON.NOT_SIGNED_IN);
-    } else {
-      const app = new App(appContainer, core, apiClient);
-      window.wire.app = app;
-      app.initApp(shouldPersist ? ClientType.PERMANENT : ClientType.TEMPORARY);
-    }
-  }
-});
-
-export {App};

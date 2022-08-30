@@ -33,9 +33,8 @@ import {Runtime} from '@wireapp/commons';
 
 import React, {useEffect, useState} from 'react';
 import Icon from 'Components/Icon';
-import {registerReactComponent} from 'Util/ComponentUtil';
 
-const WarningsContainer: React.FC = () => {
+export const WarningsContainer: React.FC = () => {
   const logger = getLogger('WarningsViewModel');
 
   const type = TYPE;
@@ -437,5 +436,3 @@ const Warnings = {
 };
 
 export default Warnings;
-
-registerReactComponent('warnings-container', WarningsContainer);

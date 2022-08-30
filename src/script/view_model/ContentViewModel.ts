@@ -87,7 +87,6 @@ export class ContentViewModel {
 
   conversationRepository: ConversationRepository;
   messageRepository: MessageRepository;
-  elementId: string;
   sidebarId: string;
   legalHoldModal: LegalHoldModalViewModel;
   logger: Logger;
@@ -123,7 +122,6 @@ export class ContentViewModel {
     this.teamState = container.resolve(TeamState);
     this.conversationState = container.resolve(ConversationState);
 
-    this.elementId = 'center-column';
     this.sidebarId = 'left-column';
     this.mainViewModel = mainViewModel;
     this.conversationRepository = repositories.conversation;
@@ -183,7 +181,6 @@ export class ContentViewModel {
     if (this.teamState.supportsLegalHold()) {
       this.legalHoldModal.showRequestModal();
     }
-    ko.applyBindings(this, document.getElementById(this.elementId));
   }
 
   private _initSubscriptions() {

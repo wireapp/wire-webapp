@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2018 Wire Swiss GmbH
+ * Copyright (C) 2022 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,12 +17,4 @@
  *
  */
 
-.loading-screen {
-  .flex-center;
-
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  background-color: var(--app-bg);
-  color: var(--foreground);
-}
+export * from './WireApp';

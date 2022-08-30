@@ -196,6 +196,10 @@ export class MainViewModel {
     document.addEventListener('scroll', () => window.scrollTo(0, 0));
   }
 
+  render(targetElement: Element): void {
+    ko.applyBindings(this, targetElement);
+  }
+
   openPanel(): Promise<void> {
     return this.togglePanel(MainViewModel.PANEL_STATE.OPEN);
   }
@@ -205,7 +209,7 @@ export class MainViewModel {
   }
 
   closePanelImmediately(): void {
-    document.querySelector('#app').classList.remove('app--panel-open');
+    document.querySelector('#app')?.classList.remove('app--panel-open');
     this.isPanelOpen(false);
   }
 
@@ -232,7 +236,7 @@ export class MainViewModel {
 
     return new Promise(resolve => {
       const transitionEndHandler = (event: Event) => {
-        if (event.target === panel) {
+        if (panel && event.target === panel) {
           panel.removeEventListener('transitionend', transitionEndHandler);
           this._clearStyles(panel, ['width', 'transform', 'position', 'right', 'transition']);
           this._clearStyles(titleBar, ['width', 'transition']);

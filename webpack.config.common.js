@@ -37,7 +37,7 @@ module.exports = {
   },
   devtool: 'source-map',
   entry: {
-    app: path.resolve(srcScript, 'main/app.ts'),
+    app: path.resolve(srcScript, 'main/index.tsx'),
     auth: path.resolve(auth, 'main.tsx'),
   },
   externals: {
@@ -52,6 +52,10 @@ module.exports = {
         include: srcScript,
         loader: 'babel-loader',
         test: /\.[tj]sx?$/,
+      },
+      {
+        loader: 'handlebars-loader',
+        test: /\.html?$/i,
       },
       {
         loader: 'svg-inline-loader',
