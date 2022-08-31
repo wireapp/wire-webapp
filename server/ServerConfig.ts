@@ -69,6 +69,7 @@ export interface ServerConfig {
         INDEX: string;
         LEGAL_HOLD_BLOCK: string;
         MICROPHONE_ACCESS_DENIED: string;
+        PRIVACY_VERIFY_FINGERPRINT: string;
         SCREEN_ACCESS_DENIED: string;
       };
       TEAMS_BASE: string;

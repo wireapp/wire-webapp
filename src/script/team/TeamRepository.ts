@@ -211,9 +211,9 @@ export class TeamRepository {
     return this.teamService.getTeamConversationRoles(this.teamState.team().id);
   }
 
-  async getWhitelistedServices(teamId: string): Promise<ServiceEntity[]> {
+  async getWhitelistedServices(teamId: string, domain: string): Promise<ServiceEntity[]> {
     const {services: servicesData} = await this.teamService.getWhitelistedServices(teamId);
-    return IntegrationMapper.mapServicesFromArray(servicesData);
+    return IntegrationMapper.mapServicesFromArray(servicesData, domain);
   }
 
   readonly onTeamEvent = (eventJson: any, source: EventSource): void => {

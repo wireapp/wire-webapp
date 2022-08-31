@@ -146,8 +146,21 @@ body.theme-dark {
     text-align: left;
     transition: background-color 0.15s ease-in-out;
 
-    &:hover {
+    &:hover,
+    &:focus-visible,
+    &--active:focus-visible {
       background: @white;
+      color: @black;
+    }
+
+    &:focus-visible,
+    &--active:focus-visible {
+      outline: 1px solid var(--accent-color);
+      outline-offset: -2px;
+
+      .left-column-icon > svg {
+        fill: @black;
+      }
     }
 
     &--active,
@@ -246,13 +259,24 @@ body.theme-dark {
   }
 
   .left-list-item-button {
-    &:hover {
-      background: @gray-95;
+    &:hover,
+    &:focus-visible,
+    &--active:focus-visible {
+      background: @black;
+      color: @white;
     }
+    &:focus-visible,
+    &--active:focus-visible {
+      outline: 1px solid var(--accent-color);
+      outline-offset: -2px;
 
+      .left-column-icon > svg {
+        fill: @white;
+      }
+    }
     &--active,
     &--active:hover {
-      background-color: var(--accent-color-600) !important;
+      background-color: var(--accent-color-600);
       color: var(--black);
 
       .left-column-icon > svg {

@@ -31,7 +31,7 @@ export interface MenuItem {
 }
 
 export interface PanelActionsProps {
-  items?: MenuItem[];
+  items: MenuItem[];
 }
 
 const PanelActions: React.FC<PanelActionsProps> = ({items}) => {

@@ -82,7 +82,7 @@ const TextInput: React.ForwardRefRenderFunction<HTMLDivElement, UserInputProps> 
     }
   }, [isSuccess, onSuccessDismissed]);
 
-  let changedColor = null;
+  let changedColor = undefined;
   if (isError) {
     changedColor = 'var(--text-input-alert) !important';
   }

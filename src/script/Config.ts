@@ -66,6 +66,7 @@ export class Configuration {
       INDEX: 'https://support.wire.com/',
       LEGAL_HOLD_BLOCK: '#',
       MICROPHONE_ACCESS_DENIED: 'https://support.wire.com/hc/articles/202590081',
+      PRIVACY_VERIFY_FINGERPRINT: 'https://support.wire.com/hc/en-us/articles/207692235',
       SCREEN_ACCESS_DENIED: 'https://support.wire.com/hc/articles/202935412',
     },
     TEAMS_BASE: 'https://teams.wire.com',
@@ -116,7 +117,7 @@ export class Configuration {
   readonly ALLOWED_IMAGE_TYPES = ['image/bmp', 'image/gif', 'image/jpeg', 'image/jpg', 'image/png'];
 
   /** Which versions of the backend api do we support */
-  readonly SUPPORTED_API_VERSIONS = [1, 0];
+  readonly SUPPORTED_API_VERSIONS = [2, 1, 0];
 }
 
 let instance: Configuration;
