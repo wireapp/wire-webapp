@@ -27,7 +27,7 @@ import {MemberMessage} from 'src/script/entity/message/MemberMessage';
 import {Message as MessageEntity} from 'src/script/entity/message/Message';
 import {User} from 'src/script/entity/User';
 import {StatusType} from '../../message/StatusType';
-import {registerReactComponent, useKoSubscribableChildren} from 'Util/ComponentUtil';
+import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import Message from './Message';
 import {Text} from 'src/script/entity/message/Text';
 import {useResizeObserver} from '../../ui/resizeObserver';
@@ -61,7 +61,7 @@ interface MessagesListParams {
   onLoading: (isLoading: boolean) => void;
   resetSession: (messageError: DecryptErrorMessage) => void;
   selfUser: User;
-  showImageDetails: (message: MessageEntity, event: React.MouseEvent | React.KeyboardEvent) => void;
+  showImageDetails: (message: ContentMessage, event: React.MouseEvent | React.KeyboardEvent) => void;
   showMessageDetails: (message: MessageEntity, showLikes?: boolean) => void;
   showParticipants: (users: User[]) => void;
   showUserDetails: (user: User) => void;
@@ -167,7 +167,6 @@ const MessagesList: React.FC<MessagesListParams> = ({
   const focusedElement = useRef<FocusedElement | null>(null);
   const conversationLastReadTimestamp = useRef(conversation.last_read_timestamp());
 
-  // FIXME: Fix update scroll
   const updateScroll = (container: Element | null) => {
     const scrollingContainer = container?.parentElement;
 
@@ -318,5 +317,3 @@ const MessagesList: React.FC<MessagesListParams> = ({
 };
 
 export default MessagesList;
-
-registerReactComponent('messages-list', MessagesList);

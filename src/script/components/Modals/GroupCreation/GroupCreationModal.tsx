@@ -17,7 +17,7 @@
  *
  */
 
-import React, {useEffect, useState} from 'react';
+import React, {useContext, useEffect, useState} from 'react';
 import {container} from 'tsyringe';
 import cx from 'classnames';
 import {amplify} from 'amplify';
@@ -29,11 +29,9 @@ import {getLogger} from 'Util/Logger';
 import {sortUsersByPriority} from 'Util/StringUtil';
 import {ConversationRepository} from '../../../conversation/ConversationRepository';
 
-import {SearchRepository} from '../../../search/SearchRepository';
-import {TeamRepository} from '../../../team/TeamRepository';
 import {TeamState} from '../../../team/TeamState';
 import {UserState} from '../../../user/UserState';
-import {registerReactComponent, useKoSubscribableChildren} from 'Util/ComponentUtil';
+import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import ModalComponent from 'Components/ModalComponent';
 import SearchInput from 'Components/SearchInput';
 import UserSearchableList from 'Components/UserSearchableList';
@@ -53,11 +51,9 @@ import {
 import useEffectRef from 'Util/useEffectRef';
 import {useFadingScrollbar} from '../../../ui/fadingScrollbar';
 import {Config} from '../../../Config';
+import {RootContext} from '../../../page/RootProvider';
 
 interface GroupCreationModalProps {
-  conversationRepository: ConversationRepository;
-  searchRepository: SearchRepository;
-  teamRepository: TeamRepository;
   userState?: UserState;
   teamState?: TeamState;
 }
@@ -71,9 +67,6 @@ enum GroupCreationModalState {
 const logger = getLogger('GroupCreationModal');
 
 const GroupCreationModal: React.FC<GroupCreationModalProps> = ({
-  conversationRepository,
-  searchRepository,
-  teamRepository,
   userState = container.resolve(UserState),
   teamState = container.resolve(TeamState),
 }) => {
@@ -92,6 +85,18 @@ const GroupCreationModal: React.FC<GroupCreationModalProps> = ({
   );
   const [scrollbarRef, setScrollbarRef] = useEffectRef<HTMLDivElement>();
   useFadingScrollbar(scrollbarRef);
+
+  const contentViewModel = useContext(RootContext);
+
+  if (!contentViewModel) {
+    return null;
+  }
+
+  const {
+    conversation: conversationRepository,
+    search: searchRepository,
+    team: teamRepository,
+  } = contentViewModel.repositories;
 
   const maxNameLength = ConversationRepository.CONFIG.GROUP.MAX_NAME_LENGTH;
   const maxSize = ConversationRepository.CONFIG.GROUP.MAX_SIZE;
@@ -409,4 +414,4 @@ const GroupCreationModal: React.FC<GroupCreationModalProps> = ({
   );
 };
 
-registerReactComponent('group-creation-modal', GroupCreationModal);
+export default GroupCreationModal;

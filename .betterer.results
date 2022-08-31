@@ -2031,9 +2031,6 @@ exports[`stricter compilation`] = {
     "src/script/page/LeftSidebar/panels/StartUI/components/GroupList.test.tsx:87150494": [
       [34, 63, 38, "Argument of type \'Element | null\' is not assignable to parameter of type \'Element\'.\\n  Type \'null\' is not assignable to type \'Element\'.", "495210063"]
     ],
-    "src/script/page/MainContent/MainContent.tsx:1247306180": [
-      [70, 10, 12, "Type \'Conversation | null\' is not assignable to type \'Conversation\'.\\n  Type \'null\' is not assignable to type \'Conversation\'.", "1670678216"]
-    ],
     "src/script/page/MainContent/panels/Collection/FullSearch.tsx:1879516049": [
       [99, 10, 10, "Object is possibly \'undefined\'.", "1962587969"],
       [100, 26, 10, "Object is possibly \'undefined\'.", "1962587969"],
@@ -2373,15 +2370,14 @@ exports[`stricter compilation`] = {
       [88, 11, 17, "Property \'activeCallViewTab\' has no initializer and is not definitely assigned in the constructor.", "1323835793"],
       [320, 4, 63, "Type \'Conversation | undefined\' is not assignable to type \'Conversation\'.\\n  Type \'undefined\' is not assignable to type \'Conversation\'.", "62763745"]
     ],
-    "src/script/view_model/ContentViewModel.ts:2477090464": [
-      [235, 65, 6, "Type \'string | null\' is not assignable to type \'string\'.\\n  Type \'null\' is not assignable to type \'string\'.", "1127975365"],
-      [262, 12, 13, "\'messageEntity\' is declared but its value is never read.", "2065728181"],
-      [278, 10, 6, "Type \'Conversation | null\' is not assignable to type \'PanelEntity\'.", "1164306878"],
-      [282, 37, 5, "Object is of type \'unknown\'.", "165548477"],
-      [292, 10, 9, "Argument of type \'undefined\' is not assignable to parameter of type \'string\'.", "2620553983"],
-      [403, 12, 9, "Argument of type \'undefined\' is not assignable to parameter of type \'string\'.", "2620553983"],
-      [412, 20, 29, "Object is possibly \'undefined\'.", "1398699454"],
-      [415, 12, 9, "Argument of type \'undefined\' is not assignable to parameter of type \'string\'.", "2620553983"]
+    "src/script/view_model/ContentViewModel.ts:4208761170": [
+      [232, 65, 6, "Type \'string | null\' is not assignable to type \'string\'.\\n  Type \'null\' is not assignable to type \'string\'.", "1127975365"],
+      [271, 10, 6, "Type \'Conversation | null\' is not assignable to type \'PanelEntity\'.", "1164306878"],
+      [275, 37, 5, "Object is of type \'unknown\'.", "165548477"],
+      [285, 10, 9, "Argument of type \'undefined\' is not assignable to parameter of type \'string\'.", "2620553983"],
+      [396, 12, 9, "Argument of type \'undefined\' is not assignable to parameter of type \'string\'.", "2620553983"],
+      [405, 20, 29, "Object is possibly \'undefined\'.", "1398699454"],
+      [408, 12, 9, "Argument of type \'undefined\' is not assignable to parameter of type \'string\'.", "2620553983"]
     ],
     "src/script/view_model/ListViewModel.ts:4038366115": [
       [119, 4, 10, "Type \'Observable<ListState>\' is not assignable to type \'Observable<string>\'.\\n  Types of parameters \'value\' and \'value\' are incompatible.\\n    Type \'string\' is not assignable to type \'ListState\'.", "4014904506"],
@@ -2488,18 +2484,6 @@ exports[`stricter compilation`] = {
       [178, 66, 15, "Argument of type \'string | undefined\' is not assignable to parameter of type \'string\'.\\n  Type \'undefined\' is not assignable to type \'string\'.", "2249385622"],
       [195, 28, 7, "Argument of type \'unknown\' is not assignable to parameter of type \'string\'.", "1236122734"],
       [239, 21, 9, "Argument of type \'undefined\' is not assignable to parameter of type \'User\'.", "2620553983"]
-    ],
-    "src/script/view_model/content/MessageListViewModel.ts:2220761013": [
-      [97, 19, 12, "Property \'conversation\' does not exist on type \'{ conversation: Conversation; message: Message; } | undefined\'.", "1670678216"],
-      [97, 33, 7, "Property \'message\' does not exist on type \'{ conversation: Conversation; message: Message; } | undefined\'.", "1236122734"],
-      [144, 4, 107, "Type \'number | boolean\' is not assignable to type \'boolean\'.\\n  Type \'number\' is not assignable to type \'boolean\'.", "3357851046"],
-      [171, 37, 18, "Object is possibly \'null\'.", "1508601427"],
-      [171, 68, 18, "Object is possibly \'null\'.", "1508601427"],
-      [175, 8, 6, "Type \'Conversation | null\' is not assignable to type \'PanelEntity\'.", "1164306878"],
-      [198, 9, 6, "Type \'string | undefined\' is not assignable to type \'string\'.\\n  Type \'undefined\' is not assignable to type \'string\'.", "1127975365"],
-      [231, 83, 18, "Argument of type \'Conversation | null\' is not assignable to parameter of type \'Conversation\'.\\n  Type \'null\' is not assignable to type \'Conversation\'.", "1508601427"],
-      [365, 68, 6, "Type \'string | undefined\' is not assignable to type \'string\'.\\n  Type \'undefined\' is not assignable to type \'string\'.", "1127975365"],
-      [368, 14, 5, "Object is of type \'unknown\'.", "165548477"]
     ],
     "src/script/view_model/panel/AddParticipantsViewModel.ts:4264095902": [
       [102, 4, 21, "Type \'ObservableArray<never>\' is not assignable to type \'ObservableArray<User>\'.", "2199671479"],

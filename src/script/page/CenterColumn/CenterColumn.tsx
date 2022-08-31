@@ -17,12 +17,16 @@
  *
  */
 
-import {FC} from 'react';
+import {WebAppEvents} from '@wireapp/webapp-events';
+import {amplify} from 'amplify';
+import {FC, useEffect, useState} from 'react';
 
 import HistoryExport from 'Components/HistoryExport';
 // import HistoryImport from 'Components/HistoryImport';
 import ConnectRequests from 'Components/ConnectRequests';
 import ConversationList from 'Components/Conversation';
+import GroupCreationModal from 'Components/Modals/GroupCreation/GroupCreationModal';
+
 import {registerReactComponent, useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 
@@ -30,56 +34,76 @@ import MainContent from '../MainContent';
 import RootProvider from '../RootProvider';
 
 import {ContentViewModel} from '../../view_model/ContentViewModel';
+import {Conversation} from '../../entity/Conversation';
+import {Message} from '../../entity/message/Message';
+
+interface ShowConversationOptions {
+  exposeMessage?: Message;
+  openFirstSelfMention?: boolean;
+  openNotificationSettings?: boolean;
+}
+
+const statesTitle = {
+  [ContentViewModel.STATE.CONNECTION_REQUESTS]: t('accessibility.headings.connectionRequests'),
+  [ContentViewModel.STATE.CONVERSATION]: t('accessibility.headings.conversation'),
+  [ContentViewModel.STATE.HISTORY_EXPORT]: t('accessibility.headings.historyExport'),
+  [ContentViewModel.STATE.HISTORY_IMPORT]: t('accessibility.headings.historyImport'),
+};
 
 interface CenterColumnProps {
   contentViewModel: ContentViewModel;
 }
 
 const CenterColumn: FC<CenterColumnProps> = ({contentViewModel}) => {
-  const {state: currentState} = useKoSubscribableChildren(contentViewModel, ['state']);
+  const {state} = useKoSubscribableChildren(contentViewModel, ['state']);
+  const {conversationRepository} = contentViewModel;
+  const conversationState = conversationRepository.getConversationState();
+
+  const [initialMessage, setInitialMessage] = useState<Message>();
 
   const teamState = contentViewModel.getTeamState();
   const userState = contentViewModel.getUserState();
+
+  const title = statesTitle[state];
+
+  const onConversationShow = (conversation: Conversation, options: ShowConversationOptions) => {
+    const {exposeMessage: exposeMessageEntity, openFirstSelfMention = false} = options;
+    const messageEntity = openFirstSelfMention ? conversation.getFirstUnreadSelfMention() : exposeMessageEntity;
+
+    const activeConversation = conversationState.activeConversation();
+    activeConversation?.release();
+
+    setInitialMessage(messageEntity);
+  };
+
+  useEffect(() => {
+    amplify.subscribe(WebAppEvents.CONVERSATION.SHOW, onConversationShow);
+  }, []);
 
   return (
     <RootProvider value={contentViewModel}>
       <MainContent contentViewModel={contentViewModel} />
 
-      {currentState === ContentViewModel.STATE.CONNECTION_REQUESTS && (
-        <>
-          <h1 className="visually-hidden">{t('accessibility.headings.connectionRequests')}</h1>
+      <h1 className="visually-hidden">{title}</h1>
 
-          <ConnectRequests
-            actionsViewModel={contentViewModel.mainViewModel.actions}
-            teamState={teamState}
-            userState={userState}
-          />
-        </>
+      {state === ContentViewModel.STATE.CONNECTION_REQUESTS && (
+        <ConnectRequests teamState={teamState} userState={userState} />
       )}
 
-      {currentState === ContentViewModel.STATE.CONVERSATION && (
-        <>
-          <h1 className="visually-hidden">{t('accessibility.headings.conversation')}</h1>
-
-          <ConversationList teamState={teamState} userState={userState} />
-        </>
+      {state === ContentViewModel.STATE.CONVERSATION && (
+        <ConversationList initialMessage={initialMessage} teamState={teamState} userState={userState} />
       )}
 
-      {currentState === ContentViewModel.STATE.HISTORY_EXPORT && (
-        <>
-          <h1 className="visually-hidden">{t('accessibility.headings.historyExport')}</h1>
+      {state === ContentViewModel.STATE.HISTORY_EXPORT && <HistoryExport userState={userState} />}
 
-          <HistoryExport backupRepository={contentViewModel.repositories.backup} userState={userState} />
-        </>
-      )}
-
-      {/*{currentState === ContentViewModel.STATE.HISTORY_IMPORT && (*/}
-      {/*  <>*/}
-      {/*    <h1 className="visually-hidden">{t('accessibility.headings.historyImport')}</h1>*/}
-
-      {/*    <HistoryImport backupRepository={contentViewModel.repositories.backup} />*/}
-      {/*  </>*/}
+      {/* TODO: Move this functionality after migrate '<div id="app" class="app">' to react */}
+      {/*{state === ContentViewModel.STATE.HISTORY_IMPORT && (*/}
+      {/*  <HistoryImport backupRepository={contentViewModel.repositories.backup} />*/}
       {/*)}*/}
+
+      <GroupCreationModal userState={userState} teamState={teamState} />
+
+      <div className="center-column__overlay" />
     </RootProvider>
   );
 };

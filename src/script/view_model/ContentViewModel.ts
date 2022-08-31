@@ -214,17 +214,14 @@ export class ContentViewModel {
    *
    * @param conversation Conversation entity or conversation ID
    * @param options State to open conversation in
+   * @param domain TODO: Add description for domain param
    */
   readonly showConversation: ShowConversationOverload = async (
     conversation: Conversation | string,
     options: ShowConversationOptions,
     domain: string | null = null,
   ) => {
-    const {
-      exposeMessage: exposeMessageEntity,
-      openFirstSelfMention = false,
-      openNotificationSettings = false,
-    } = options;
+    const {openNotificationSettings = false} = options;
 
     if (!conversation) {
       return this.switchContent(ContentViewModel.STATE.CONNECTION_REQUESTS);
@@ -260,8 +257,6 @@ export class ContentViewModel {
         this.conversationState.activeConversation(conversationEntity);
       }
 
-      const messageEntity = openFirstSelfMention ? conversationEntity.getFirstUnreadSelfMention() : exposeMessageEntity;
-
       if (conversationEntity.is_cleared()) {
         conversationEntity.cleared_timestamp(0);
       }
@@ -269,8 +264,6 @@ export class ContentViewModel {
       if (conversationEntity.is_archived()) {
         await this.conversationRepository.unarchiveConversation(conversationEntity);
       }
-
-      // await this.messageList.changeConversation(conversationEntity, messageEntity);
 
       this.showContent(ContentViewModel.STATE.CONVERSATION);
       this.previousConversation = this.conversationState.activeConversation();
@@ -373,7 +366,7 @@ export class ContentViewModel {
         this.conversationState.activeConversation(null);
       }
 
-      // return this.messageList.releaseConversation(undefined);
+      this.conversationState.activeConversation()?.release();
     }
   };
 

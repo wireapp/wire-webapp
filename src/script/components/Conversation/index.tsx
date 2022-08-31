@@ -28,6 +28,7 @@ import {
 } from 'react';
 import {amplify} from 'amplify';
 import {WebAppEvents} from '@wireapp/webapp-events';
+import {groupBy} from 'underscore';
 import cx from 'classnames';
 
 import TitleBar from 'Components/TitleBar';
@@ -35,7 +36,7 @@ import MessagesList from 'Components/MessagesList';
 import InputBar from 'Components/InputBar';
 import Giphy from 'Components/Giphy';
 
-import {registerReactComponent, useKoSubscribableChildren} from 'Util/ComponentUtil';
+import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 
 import {Conversation as ConversationEntity} from '../../entity/Conversation';
 
@@ -51,26 +52,22 @@ import {safeMailOpen, safeWindowOpen} from 'Util/SanitizationUtil';
 import {ModalsViewModel} from '../../view_model/ModalsViewModel';
 import {t} from 'Util/LocalizerUtil';
 import {UserError} from '../../error/UserError';
-import {MessageCategory} from '../../message/MessageCategory';
 import {DecryptErrorMessage} from '../../entity/message/DecryptErrorMessage';
 import {MotionDuration} from '../../motion/MotionDuration';
 import {getLogger} from 'Util/Logger';
 import {RootContext} from '../../page/RootProvider';
+import {showDetailViewModal} from 'Components/Modals/DetailViewModal';
 
 type ReadMessageBuffer = {conversation: ConversationEntity; message: Message};
 
 interface ConversationListProps {
+  initialMessage?: Message;
   readonly teamState: TeamState;
   readonly userState: UserState;
 }
 
-const ConversationList: FC<ConversationListProps> = ({teamState, userState}) => {
-  const messageListLogger = getLogger('MessageListViewModel');
-
-  // const [initialMessage, setInitialMessage] = useState<Message | undefined>(undefined);
-  const initialMessage = undefined;
-  const [conversationLoaded, setConversationLoaded] = useState<boolean>(false);
-  const [readMessagesBuffer, setReadMessagesBuffer] = useState<ReadMessageBuffer[]>([]);
+const ConversationList: FC<ConversationListProps> = ({initialMessage, teamState, userState}) => {
+  const messageListLogger = getLogger('ConversationList');
 
   const contentViewModel = useContext(RootContext);
 
@@ -78,8 +75,10 @@ const ConversationList: FC<ConversationListProps> = ({teamState, userState}) => 
     return null;
   }
 
-  const {conversationRepository, repositories, mainViewModel, legalHoldModal} = contentViewModel;
+  const [isConversationLoaded, setIsConversationLoaded] = useState<boolean>(false);
+  const [readMessagesBuffer, setReadMessagesBuffer] = useState<ReadMessageBuffer[]>([]);
 
+  const {conversationRepository, repositories, mainViewModel, legalHoldModal} = contentViewModel;
   const conversationState = conversationRepository.getConversationState();
 
   const {activeConversation} = useKoSubscribableChildren(conversationState, ['activeConversation']);
@@ -123,7 +122,6 @@ const ConversationList: FC<ConversationListProps> = ({teamState, userState}) => 
         highlighted: participants,
       });
     }
-    activeConversation;
   };
 
   const showMessageDetails = (message: Message, showLikes = false) => {
@@ -192,34 +190,29 @@ const ConversationList: FC<ConversationListProps> = ({teamState, userState}) => 
     return true;
   };
 
-  const showDetail = async (messageEntity: Message, event: ReactMouseEvent | ReactKeyboardEvent): Promise<void> => {
-    if (messageEntity.isExpired() || $(event.currentTarget).hasClass('image-asset--no-image')) {
+  const showDetail = async (
+    messageEntity: ContentMessage,
+    event: ReactMouseEvent | ReactKeyboardEvent,
+  ): Promise<void> => {
+    if (messageEntity.isExpired() || event.currentTarget.classList.contains('image-asset--no-image')) {
       return;
     }
 
-    if (activeConversation) {
-      const items: Message[] = await conversationRepository.getEventsForCategory(
-        activeConversation,
-        MessageCategory.IMAGE,
-      );
-
-      const messageEntities = items.filter(
-        // @ts-ignore
-        item => item.category & MessageCategory.IMAGE && !(item.category & MessageCategory.GIF),
-      );
-
-      const [imageMessageEntity] = messageEntities.filter(item => item.id === messageEntity.id);
-
-      amplify.publish(WebAppEvents.CONVERSATION.DETAIL_VIEW.SHOW, imageMessageEntity || messageEntity, messageEntities);
-    }
+    showDetailViewModal({
+      assetRepository: repositories.asset,
+      conversationRepository: repositories.conversation,
+      currentMessageEntity: messageEntity,
+      messageRepository: repositories.message,
+    });
   };
 
   const onSessionResetClick = async (messageEntity: DecryptErrorMessage): Promise<void> => {
-    const resetProgress = () =>
-      window.setTimeout(() => {
+    const resetProgress = () => {
+      setTimeout(() => {
         messageEntity.is_resetting_session(false);
         amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.SESSION_RESET);
       }, MotionDuration.LONG);
+    };
 
     messageEntity.is_resetting_session(true);
 
@@ -289,7 +282,7 @@ const ConversationList: FC<ConversationListProps> = ({teamState, userState}) => 
     const isUnreadMessage = messageTimestamp > conversationEntity.last_read_timestamp();
     const isNotOwnMessage = !messageEntity.user().isMe;
 
-    let shouldSendReadReceipt = false;
+    let shouldSendReadReceipt = true;
 
     if (messageEntity.expectsReadConfirmation) {
       if (conversationEntity.is1to1()) {
@@ -324,69 +317,29 @@ const ConversationList: FC<ConversationListProps> = ({teamState, userState}) => 
     };
   };
 
-  // const releaseConversation = (conversationEntity: Conversation): void => {
-  //   conversationEntity.release();
-  // };
-
-  // const changeConversation = async (conversationEntity: Conversation, messageEntity: Message) => {
-  //   // Clean up old conversation
-  //   setConversationLoaded(false);
-  //
-  //   if (activeConversation) {
-  //     releaseConversation(activeConversation);
-  //   }
-  //
-  //   // Update new conversation
-  //   setInitialMessage(messageEntity);
-  //   // this.initialMessage(messageEntity);
-  //   // this.conversation(conversationEntity);
-  //
-  //   // return new Promise(resolve => {
-  //   //   const subscription = this.conversationLoaded.subscribe(isLoaded => {
-  //   //     if (isLoaded) {
-  //   //       resolve();
-  //   //       subscription.dispose();
-  //   //     }
-  //   //   });
-  //   // });
-  // };
-
   useEffect(() => {
-    // console.log('przemvs readMessagesBuffer', readMessagesBuffer);
-
     if (readMessagesBuffer.length) {
-      // readMessagesBuffer.forEach(readMessages => {
-      //   if (readMessages.length) {
-      //     const groupedMessages = groupBy<ReadMessageBuffer>(
-      //       readMessages,
-      //       ({conversation, message}) => conversation.id + message.from,
-      //     );
-      //
-      //     Object.values(groupedMessages).forEach(readMessagesBatch => {
-      //       const {conversation, message: firstMessage} = readMessagesBatch.pop();
-      //       const otherMessages = readMessagesBatch.map(({message}) => message);
-      //       repositories.message.sendReadReceipt(conversation, firstMessage, otherMessages);
-      //     });
-      //   }
-      // });
+      const groupedMessagesTest = groupBy(
+        readMessagesBuffer,
+        ({conversation, message}) => conversation.id + message.from,
+      );
+
+      Object.values(groupedMessagesTest).forEach(readMessagesBatch => {
+        const poppedMessage = readMessagesBatch.pop();
+
+        if (poppedMessage) {
+          const {conversation, message: firstMessage} = poppedMessage;
+          const otherMessages = readMessagesBatch.map(({message}) => message);
+          repositories.message.sendReadReceipt(conversation, firstMessage, otherMessages);
+        }
+      });
+
+      setReadMessagesBuffer([]);
     }
-    // his.readMessagesBuffer
-    //   .extend({rateLimit: {method: 'notifyWhenChangesStop', timeout: 500}})
-    //   .subscribe(readMessages => {
-    //     if (readMessages.length) {
-    //       const groupedMessages = groupBy(readMessages, ({conversation, message}) => conversation.id + message.from);
-    //       Object.values(groupedMessages).forEach(readMessagesBatch => {
-    //         const {conversation, message: firstMessage} = readMessagesBatch.pop();
-    //         const otherMessages = readMessagesBatch.map(({message}) => message);
-    //         this.messageRepository.sendReadReceipt(conversation, firstMessage, otherMessages);
-    //       });
-    //       this.readMessagesBuffer.removeAll();
-    //     }
-    //   });
   }, [readMessagesBuffer.length]);
 
   return (
-    <div id="conversation" className={cx('conversation', {loading: !conversationLoaded})}>
+    <div id="conversation" className={cx('conversation', {loading: !isConversationLoaded})}>
       {activeConversation && (
         <>
           <TitleBar
@@ -414,7 +367,7 @@ const ConversationList: FC<ConversationListProps> = ({teamState, userState}) => 
             showImageDetails={showDetail}
             resetSession={onSessionResetClick}
             onClickMessage={handleClickOnMessage}
-            onLoading={loading => setConversationLoaded(!loading)}
+            onLoading={loading => setIsConversationLoaded(!loading)}
             getVisibleCallback={getInViewportCallback}
             isLastReceivedMessage={isLastReceivedMessage}
           />
@@ -444,5 +397,3 @@ const ConversationList: FC<ConversationListProps> = ({teamState, userState}) => 
 };
 
 export default ConversationList;
-
-registerReactComponent('conversation', ConversationList);
