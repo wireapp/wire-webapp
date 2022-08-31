@@ -243,5 +243,5 @@
     "betterer": "betterer precommit",
     "betterer:conflict": "betterer merge"
   },
-  "version": "0.18.0"
+  "version": "0.19.0"
 }
