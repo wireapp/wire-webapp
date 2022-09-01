@@ -71,6 +71,18 @@ const DeviceToggleButton: React.FC<DeviceToggleButtonProps> = ({currentDevice, d
               data-uie-name="device-toggle-button-indicator-dot"
               data-uie-value={isCurrentDevice ? 'active' : 'inactive'}
               css={{
+                '&:hover': {
+                  backgroundColor: isCurrentDevice ? 'var(--toggle-button-hover-bg)' : 'var(--app-bg)',
+                  border: isCurrentDevice
+                    ? '1px solid var(--toggle-button-hover-bg)'
+                    : '1px solid var(--toggle-button-unselected-hover-border)',
+                },
+                /* eslint-disable sort-keys-fix/sort-keys-fix */
+                '&:active': {
+                  /* eslint-enable sort-keys-fix/sort-keys-fix */
+                  backgroundColor: isCurrentDevice ? 'var(--accent-color)' : 'var(--toggle-button-unselected-bg)',
+                  border: '1px solid var(--accent-color)',
+                },
                 '&:not(:last-child)': {marginRight: 5},
                 backgroundColor: isCurrentDevice ? 'var(--accent-color)' : 'var(--app-bg-secondary)',
                 border: isCurrentDevice ? '1px solid var(--accent-color)' : '1px solid var(--foreground)',
