@@ -67,8 +67,17 @@ const Pagination: React.FC<PaginationProps> = ({totalPages, currentPage, onChang
             className="button-reset-default"
             css={{
               ...paginationItemStyles,
+              '&:focus-visible': {
+                backgroundColor: isCurrentPage
+                  ? 'var(--toggle-button-hover-bg)'
+                  : 'var(--toggle-button-unselected-hover-bg)',
+                border: '1px solid var(--accent-color)',
+                outline: 'none',
+              },
               '&:hover': {
-                backgroundColor: isCurrentPage ? 'var(--toggle-button-hover-bg)' : 'var(--app-bg)',
+                backgroundColor: isCurrentPage
+                  ? 'var(--toggle-button-hover-bg)'
+                  : 'var(--toggle-button-unselected-hover-bg)',
                 border: isCurrentPage
                   ? '1px solid var(--toggle-button-hover-bg)'
                   : '1px solid var(--toggle-button-unselected-hover-border)',
