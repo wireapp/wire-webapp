@@ -40,6 +40,7 @@ exports[`"Checkbox" renders (dark theme) 1`] = `
   display: flex;
   opacity: 1;
   cursor: pointer;
+  border-radius: 4px;
 }
 
 .wireinput:checked+.emotion-2::before {
@@ -64,7 +65,7 @@ exports[`"Checkbox" renders (dark theme) 1`] = `
 
 .wireinput+.emotion-2::before {
   background: #edeff0;
-  border: 1.5px solid #9fa1a7;
+  border: 2px solid #9fa1a7;
   border-radius: 3px;
   box-sizing: border-box;
   content: "";
@@ -156,6 +157,7 @@ exports[`"Checkbox" renders 1`] = `
   display: flex;
   opacity: 1;
   cursor: pointer;
+  border-radius: 4px;
 }
 
 .wireinput:checked+.emotion-2::before {
@@ -180,7 +182,7 @@ exports[`"Checkbox" renders 1`] = `
 
 .wireinput+.emotion-2::before {
   background: #edeff0;
-  border: 1.5px solid #54585f;
+  border: 2px solid #54585f;
   border-radius: 3px;
   box-sizing: border-box;
   content: "";
@@ -272,6 +274,7 @@ exports[`"Checkbox" renders as invalid 1`] = `
   display: flex;
   opacity: 1;
   cursor: pointer;
+  border-radius: 4px;
 }
 
 .wireinput:checked+.emotion-2::before {
@@ -296,7 +299,7 @@ exports[`"Checkbox" renders as invalid 1`] = `
 
 .wireinput+.emotion-2::before {
   background: #edeff0;
-  border: 1.5px solid #c20013;
+  border: 2px solid #c20013;
   border-radius: 3px;
   box-sizing: border-box;
   content: "";
@@ -388,6 +391,7 @@ exports[`"Checkbox" renders disabled 1`] = `
   display: flex;
   opacity: 0.56;
   cursor: not-allowed;
+  border-radius: 4px;
 }
 
 .wireinput:checked+.emotion-2::before {
@@ -408,7 +412,7 @@ exports[`"Checkbox" renders disabled 1`] = `
 
 .wireinput+.emotion-2::before {
   background: #edeff0;
-  border: 1.5px solid #9fa1a7;
+  border: 2px solid #9fa1a7;
   border-radius: 3px;
   box-sizing: border-box;
   content: "";

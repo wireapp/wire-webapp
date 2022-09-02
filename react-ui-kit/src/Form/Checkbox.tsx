@@ -62,11 +62,11 @@ const StyledLabel = (props: StyledLabelProps) => {
           ...(!disabled
             ? {
                 border: markInvalid
-                  ? `1.5px solid ${theme.Checkbox.invalidBorderColor}`
-                  : `1.5px solid ${theme.Checkbox.border}`,
+                  ? `2px solid ${theme.Checkbox.invalidBorderColor}`
+                  : `2px solid ${theme.Checkbox.border}`,
               }
             : {
-                border: `1.5px solid ${theme.Checkbox.disableBorderColor}`,
+                border: `2px solid ${theme.Checkbox.disableBorderColor}`,
               }),
           borderRadius: '3px',
           boxSizing: 'border-box',
@@ -85,6 +85,7 @@ const StyledLabel = (props: StyledLabelProps) => {
         display: 'flex',
         opacity: disabled ? 0.56 : 1,
         cursor: disabled ? 'not-allowed' : 'pointer',
+        borderRadius: '4px',
       })}
       {...filterStyledLabelProps(props)}
     >
