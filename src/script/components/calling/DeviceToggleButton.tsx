@@ -52,11 +52,9 @@ const DeviceToggleButton: React.FC<DeviceToggleButtonProps> = ({currentDevice, d
         const isCurrentDevice = device === currentDevice;
 
         return (
-          <div
-            role="button"
-            tabIndex={0}
+          <button
             key={device}
-            className="device-toggle-button-indicator-dot"
+            className="device-toggle-button-indicator-dot button-reset-default"
             data-uie-name="device-toggle-button-indicator-dot"
             data-uie-value={isCurrentDevice ? 'active' : 'inactive'}
             onClick={selectNextDevice}
