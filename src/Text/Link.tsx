@@ -54,7 +54,7 @@ export const linkStyle: <T>(theme: Theme, props: LinkProps<T>) => CSSObject = (
       color: color,
     },
     ...(variant === LinkVariant.PRIMARY && {
-      '&:hover, &:visited:hover': {
+      '&:hover, &:visited:hover, &:focus:active': {
         color: theme.general.primaryColor,
       },
       fontSize: '16px',
