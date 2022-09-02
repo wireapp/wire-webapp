@@ -17,20 +17,4 @@
  *
  */
 
-import {AppLoader} from './AppLoader';
-import {ClientType} from '@wireapp/api-client/src/client/';
-import {WireApp} from './WireApp';
-import type {App} from '../app';
-
-interface AppProps {
-  app: App;
-  clientType: ClientType;
-}
-
-export const AppContainer: React.FC<AppProps> = ({app, clientType}) => {
-  return (
-    <AppLoader init={onProgress => app.initApp(clientType, onProgress)}>
-      {selfUser => <WireApp app={app} selfUser={selfUser} />}
-    </AppLoader>
-  );
-};
+export * from './AppLoader';

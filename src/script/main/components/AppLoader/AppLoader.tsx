@@ -18,16 +18,13 @@
  */
 
 import LoadingBar from 'Components/LoadingBar';
-import {ClientType} from '@wireapp/api-client/src/client';
 import {useEffect, useRef, useState} from 'react';
 import {styles} from './AppLoader.styles';
-import type {App} from '../app';
-import {User} from '../../entity/User';
+import {User} from '../../../entity/User';
 
 interface AppLoaderProps {
-  app: App;
-  clientType: ClientType;
-  children: (repositories: App, selfUser: User) => React.ReactElement;
+  init: (onProgress: (progress: number, message?: string) => void) => Promise<User | undefined>;
+  children: (selfUser: User) => React.ReactElement;
 }
 
 interface LoadingProgress {
@@ -35,7 +32,7 @@ interface LoadingProgress {
   message: string;
 }
 
-export const AppLoader: React.FC<AppLoaderProps> = ({app, clientType, children}) => {
+export const AppLoader: React.FC<AppLoaderProps> = ({init, children}) => {
   const [loadingState, setLoadingState] = useState<LoadingProgress>({message: '', progress: 0});
   const [selfUser, setSelfUser] = useState<User>();
   const isFirstRender = useRef(true);
@@ -46,15 +43,13 @@ export const AppLoader: React.FC<AppLoaderProps> = ({app, clientType, children})
     }
     isFirstRender.current = false;
 
-    app
-      .initApp(clientType, (progress, message) => {
-        setLoadingState(previouState => ({message: message ?? previouState?.message ?? '', progress}));
-      })
-      .then(user => setSelfUser(user));
+    init((progress, message) => {
+      setLoadingState(previouState => ({message: message ?? previouState?.message ?? '', progress}));
+    }).then(user => setSelfUser(user));
   }, []);
 
   if (selfUser) {
-    return children(app, selfUser);
+    return children(selfUser);
   }
 
   return (
