@@ -19,14 +19,14 @@
 
 import 'core-js/es7/reflect';
 
-import {Runtime} from '@wireapp/commons';
 import {createRoot} from 'react-dom/client';
+import {Runtime} from '@wireapp/commons';
+import {ClientType} from '@wireapp/api-client/src/client/';
 import {container} from 'tsyringe';
 import {enableLogging} from 'Util/LoggerUtil';
 import {loadValue} from 'Util/StorageUtil';
 import {exposeWrapperGlobals} from 'Util/wrapper';
 import {SIGN_OUT_REASON} from '../auth/SignOutReason';
-import {ClientType} from '@wireapp/api-client/src/client/';
 import {Config} from '../Config';
 import {APIClient} from '../service/APIClientSingleton';
 import {Core} from '../service/CoreSingleton';
@@ -51,14 +51,15 @@ document.addEventListener('DOMContentLoaded', async () => {
   if (enforceDesktopApplication) {
     doRedirect(SIGN_OUT_REASON.APP_INIT);
   }
+
   const shouldPersist = loadValue<boolean>(StorageKey.AUTH.PERSIST);
   if (shouldPersist === undefined) {
-    doRedirect(SIGN_OUT_REASON.NOT_SIGNED_IN);
-  } else {
-    const app = new App(core, apiClient);
-    window.wire.app = app;
-    createRoot(appContainer).render(
-      <AppContainer app={app} clientType={shouldPersist ? ClientType.PERMANENT : ClientType.TEMPORARY} />,
-    );
+    return doRedirect(SIGN_OUT_REASON.NOT_SIGNED_IN);
   }
+
+  const app = new App(core, apiClient);
+  window.wire.app = app;
+  createRoot(appContainer).render(
+    <AppContainer app={app} clientType={shouldPersist ? ClientType.PERMANENT : ClientType.TEMPORARY} />,
+  );
 });

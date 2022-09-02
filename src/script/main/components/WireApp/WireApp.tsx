@@ -25,15 +25,28 @@ import {container} from 'tsyringe';
 import showUserModal from 'Components/Modals/UserModal';
 import AppLock from '../../../page/AppLock';
 import {WarningsContainer} from '../../../view_model/WarningsContainer';
+import {amplify} from 'amplify';
+import {WebAppEvents} from '@wireapp/webapp-events';
+import {ContentViewModel} from '../../../view_model/ContentViewModel';
+import {App} from '../../app';
+import type {User} from '../../../entity/User';
+import {CallingContainer} from 'Components/calling/CallingOverlayContainer';
 
 const html = require('./template/wire-main.htm');
 interface WireAppProps {
-  repositories: any;
+  app: App;
+  selfUser: User;
 }
 
-export const WireApp: React.FC<WireAppProps> = ({repositories}) => {
+export const WireApp: React.FC<WireAppProps> = ({app, selfUser}) => {
+  const apiContext = app.getAPIContext();
+  if (!apiContext) {
+    throw new Error('API Context has not been set');
+  }
+  const repositories = app.repository;
+  const mainView = new MainViewModel(repositories);
+
   const initKoApp = (appContainer: HTMLDivElement) => {
-    const mainView = new MainViewModel(repositories);
     ko.applyBindings(mainView, appContainer);
 
     repositories.notification.setContentViewModelStates(mainView.content.state, mainView.multitasking);
@@ -45,33 +58,31 @@ export const WireApp: React.FC<WireAppProps> = ({repositories}) => {
     } else if (conversationEntity) {
       mainView.content.showConversation(conversationEntity, {});
     } else if (repositories.user['userState'].connectRequests().length) {
-      //amplify.publish(WebAppEvents.CONTENT.SWITCH, ContentViewModel.STATE.CONNECTION_REQUESTS);
+      amplify.publish(WebAppEvents.CONTENT.SWITCH, ContentViewModel.STATE.CONNECTION_REQUESTS);
     }
 
-    const redirect = false; // localStorage.getItem(App.LOCAL_STORAGE_LOGIN_REDIRECT_KEY);
+    const redirect = localStorage.getItem(App.LOCAL_STORAGE_LOGIN_REDIRECT_KEY);
     if (redirect) {
-      ///localStorage.removeItem(App.LOCAL_STORAGE_LOGIN_REDIRECT_KEY);
+      localStorage.removeItem(App.LOCAL_STORAGE_LOGIN_REDIRECT_KEY);
       window.location.replace(redirect);
     }
 
-    const conversationRedirect = false; // localStorage.getItem(App.LOCAL_STORAGE_LOGIN_CONVERSATION_KEY);
+    const conversationRedirect = localStorage.getItem(App.LOCAL_STORAGE_LOGIN_CONVERSATION_KEY);
     if (conversationRedirect) {
       const {conversation, domain} = JSON.parse(conversationRedirect)?.data;
-      //localStorage.removeItem(App.LOCAL_STORAGE_LOGIN_CONVERSATION_KEY);
+      localStorage.removeItem(App.LOCAL_STORAGE_LOGIN_CONVERSATION_KEY);
       window.location.replace(`#/conversation/${conversation}${domain ? `/${domain}` : ''}`);
     }
 
     const router = new Router({
-      '/conversation/:conversationId(/:domain)': (
-        conversationId: string,
-        domain: string = /*this.apiClient.context?.domain ??*/ '',
-      ) => mainView.content.showConversation(conversationId, {}, domain),
+      '/conversation/:conversationId(/:domain)': (conversationId: string, domain: string = apiContext.domain ?? '') =>
+        mainView.content.showConversation(conversationId, {}, domain),
       '/preferences/about': () => mainView.list.openPreferencesAbout(),
       '/preferences/account': () => mainView.list.openPreferencesAccount(),
       '/preferences/av': () => mainView.list.openPreferencesAudioVideo(),
       '/preferences/devices': () => mainView.list.openPreferencesDevices(),
       '/preferences/options': () => mainView.list.openPreferencesOptions(),
-      '/user/:userId(/:domain)': (userId: string, domain: string = /*this.apiClient.context?.domain ??*/ '') => {
+      '/user/:userId(/:domain)': (userId: string, domain: string = apiContext.domain ?? '') => {
         showUserModal({
           actionsViewModel: mainView.actions,
           onClose: () => router.navigate('/'),
@@ -84,19 +95,20 @@ export const WireApp: React.FC<WireAppProps> = ({repositories}) => {
     container.registerInstance(Router, router);
 
     repositories.properties.checkPrivacyPermission().then(() => {
-      //window.setTimeout(() => repositories.notification.checkPermission(), App.CONFIG.NOTIFICATION_CHECK);
+      window.setTimeout(() => repositories.notification.checkPermission(), App.CONFIG.NOTIFICATION_CHECK);
     });
   };
+
   return (
-    <main className="TODO">
-      <div className="app" dangerouslySetInnerHTML={{__html: html()}} ref={initKoApp} />
+    <main id="wire-main" className={`main-accent-color-${selfUser.accent_id()}`}>
+      <div className={'app'} id="app" dangerouslySetInnerHTML={{__html: html()}} ref={initKoApp} />
       <AppLock clientRepository={repositories.client} />
       <WarningsContainer />
-      {/*<CallingContainer
+      <CallingContainer
         callingRepository={repositories.calling}
         mediaRepository={repositories.media}
-        multitasking={{} as any}
-  />*/}
+        multitasking={mainView.multitasking}
+      />
     </main>
   );
 };

@@ -30,7 +30,7 @@ interface AppProps {
 export const AppContainer: React.FC<AppProps> = ({app, clientType}) => {
   return (
     <AppLoader app={app} clientType={clientType}>
-      {repositories => <WireApp repositories={repositories} />}
+      {(app, selfUser) => <WireApp app={app} selfUser={selfUser} />}
     </AppLoader>
   );
 };

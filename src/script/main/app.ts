@@ -21,6 +21,7 @@ import ko from 'knockout';
 import platform from 'platform';
 import {container} from 'tsyringe';
 import {ClientType} from '@wireapp/api-client/src/client/';
+import {Context} from '@wireapp/api-client/src/auth';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import {amplify} from 'amplify';
 import Dexie from 'dexie';
@@ -314,6 +315,10 @@ export class App {
     };
   }
 
+  getAPIContext(): Context | undefined {
+    return this.apiClient.context;
+  }
+
   /**
    * Subscribe to amplify events.
    */
@@ -346,7 +351,10 @@ export class App {
    *
    * @param clientType
    */
-  async initApp(clientType: ClientType, onProgress: (progress: number, message?: string) => void) {
+  async initApp(
+    clientType: ClientType,
+    onProgress: (progress: number, message?: string) => void,
+  ): Promise<User | undefined> {
     // add body information
     const osCssClass = Runtime.isMacOS() ? 'os-mac' : 'os-pc';
     const platformCssClass = Runtime.isDesktopApp() ? 'platform-electron' : 'platform-web';
@@ -375,8 +383,9 @@ export class App {
       onProgress(2.5);
       telemetry.timeStep(AppInitTimingsStep.RECEIVED_ACCESS_TOKEN);
 
+      let context: Context;
       try {
-        await this.core.init(clientType);
+        context = await this.core.init(clientType);
       } catch (error) {
         throw new ClientError(CLIENT_ERROR_TYPE.NO_VALID_CLIENT, 'Client has been deleted on backend');
       }
@@ -384,10 +393,7 @@ export class App {
       const selfUser = await this.initiateSelfUser();
       if (this.apiClient.backendFeatures.isFederated) {
         // Migrate all existing session to fully qualified ids (if need be)
-        await migrateToQualifiedSessionIds(
-          this.repository.storage.storageService.db.sessions,
-          this.apiClient.context!.domain,
-        );
+        await migrateToQualifiedSessionIds(this.repository.storage.storageService.db.sessions, context.domain ?? '');
       }
       onProgress(5, t('initReceivedSelfUser', selfUser.name()));
       telemetry.timeStep(AppInitTimingsStep.RECEIVED_SELF_USER);
@@ -464,8 +470,10 @@ export class App {
       conversationRepository.cleanupConversations();
       callingRepository.setReady();
       this.logger.info('App fully loaded');
+      return selfUser;
     } catch (error) {
       this._appInitFailure(error, isReload);
+      return undefined;
     }
   }
 

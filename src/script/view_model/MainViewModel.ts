@@ -182,6 +182,7 @@ export class MainViewModel {
 
     this.title = new WindowTitleViewModel(this);
     this.favicon = new FaviconViewModel(amplify);
+    this.modals = modals;
 
     this.mainClasses = ko.pureComputed(() => {
       if (this.selfUser()) {
@@ -212,6 +213,9 @@ export class MainViewModel {
   readonly togglePanel = (forceState: string): Promise<void> => {
     const app = document.querySelector<HTMLElement>('#app');
     const panel = document.querySelector<HTMLElement>('.right-column');
+    if (!panel || !app) {
+      throw new Error('missing DOM elements to toggle panels');
+    }
 
     const isPanelOpen = app.classList.contains('app--panel-open');
     const isAlreadyClosed = forceState === MainViewModel.PANEL_STATE.CLOSED && !isPanelOpen;

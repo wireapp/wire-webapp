@@ -110,7 +110,6 @@ enum ModalType {
 
 export class ModalsViewModel {
   logger: Logger;
-  elementId: 'modals';
   optionChecked: ko.Observable<boolean>;
   passwordValue: ko.Observable<string>;
   inputValue: ko.Observable<string>;
@@ -128,7 +127,6 @@ export class ModalsViewModel {
 
   constructor() {
     this.logger = getLogger('ModalsViewModel');
-    this.elementId = 'modals';
 
     this.optionChecked = ko.observable(false);
     this.passwordValue = ko.observable('');
@@ -163,7 +161,6 @@ export class ModalsViewModel {
   };
 
   readonly ready = () => {
-    ko.applyBindings(this, document.getElementById(this.elementId));
     this.state(States.READY);
     this.unqueue();
   };

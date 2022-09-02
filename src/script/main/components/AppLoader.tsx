@@ -22,11 +22,12 @@ import {ClientType} from '@wireapp/api-client/src/client';
 import {useEffect, useRef, useState} from 'react';
 import {styles} from './AppLoader.styles';
 import type {App} from '../app';
+import {User} from '../../entity/User';
 
 interface AppLoaderProps {
   app: App;
   clientType: ClientType;
-  children: (repositories: any) => any;
+  children: (repositories: App, selfUser: User) => React.ReactElement;
 }
 
 interface LoadingProgress {
@@ -36,21 +37,24 @@ interface LoadingProgress {
 
 export const AppLoader: React.FC<AppLoaderProps> = ({app, clientType, children}) => {
   const [loadingState, setLoadingState] = useState<LoadingProgress>({message: '', progress: 0});
-  const isFirstRender = useRef<boolean>(true);
+  const [selfUser, setSelfUser] = useState<User>();
+  const isFirstRender = useRef(true);
+
   useEffect(() => {
     if (!isFirstRender.current) {
       return;
     }
     isFirstRender.current = false;
+
     app
       .initApp(clientType, (progress, message) => {
         setLoadingState(previouState => ({message: message ?? previouState?.message ?? '', progress}));
       })
-      .then(() => setLoadingState({message: '', progress: 100}));
+      .then(user => setSelfUser(user));
   }, []);
 
-  if (loadingState?.progress === 100) {
-    return children(app.repository);
+  if (selfUser) {
+    return children(app, selfUser);
   }
 
   return (
