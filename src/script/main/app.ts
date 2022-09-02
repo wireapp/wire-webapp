@@ -104,7 +104,7 @@ import {AccessTokenError, ACCESS_TOKEN_ERROR_TYPE} from '../error/AccessTokenErr
 import {ClientError, CLIENT_ERROR_TYPE} from '../error/ClientError';
 import {AuthError} from '../error/AuthError';
 import {AssetRepository} from '../assets/AssetRepository';
-import type {BaseError} from '../error/BaseError';
+import {BaseError} from '../error/BaseError';
 import type {User} from '../entity/User';
 import {MessageRepository} from '../conversation/MessageRepository';
 import {TeamError} from '../error/TeamError';
@@ -141,8 +141,8 @@ export class App {
     storage: StorageService;
   };
   repository: ViewModelRepositories = {} as ViewModelRepositories;
-  debug: DebugUtil;
-  util: {debug: DebugUtil};
+  debug?: DebugUtil;
+  util?: {debug: DebugUtil};
   singleInstanceHandler: SingleInstanceHandler;
 
   static get CONFIG() {
@@ -332,7 +332,10 @@ export class App {
         amplify.publish(WebAppEvents.CONNECTION.ACCESS_TOKEN.RENEWED);
         this.logger.info(`Refreshed access token.`);
       } catch (error) {
-        this.logger.warn(`Logging out user because access token cannot be refreshed: ${error.message}`, error);
+        this.logger.warn(
+          `Logging out user because access token cannot be refreshed: ${(error as Error).message}`,
+          error,
+        );
         this.logout(SIGN_OUT_REASON.NOT_SIGNED_IN, false);
       }
     });
@@ -391,7 +394,7 @@ export class App {
       }
 
       const selfUser = await this.initiateSelfUser();
-      if (this.apiClient.backendFeatures.isFederated) {
+      if (this.apiClient.backendFeatures.isFederated && this.repository.storage.storageService.db) {
         // Migrate all existing session to fully qualified ids (if need be)
         await migrateToQualifiedSessionIds(this.repository.storage.storageService.db.sessions, context.domain ?? '');
       }
@@ -401,7 +404,7 @@ export class App {
       callingRepository.initAvs(selfUser, clientEntity().id);
       onProgress(7.5, t('initValidatedClient'));
       telemetry.timeStep(AppInitTimingsStep.VALIDATED_CLIENT);
-      telemetry.addStatistic(AppInitStatisticsValue.CLIENT_TYPE, clientEntity().type);
+      telemetry.addStatistic(AppInitStatisticsValue.CLIENT_TYPE, clientEntity().type ?? clientType);
 
       await cryptographyRepository.init(this.core.service!.cryptography.cryptobox, clientEntity);
 
@@ -472,7 +475,9 @@ export class App {
       this.logger.info('App fully loaded');
       return selfUser;
     } catch (error) {
-      this._appInitFailure(error, isReload);
+      if (error instanceof BaseError) {
+        this._appInitFailure(error, isReload);
+      }
       return undefined;
     }
   }
@@ -705,7 +710,7 @@ export class App {
       try {
         keepPermanentDatabase = this.repository.client.isCurrentClientPermanent() && !clearData;
       } catch (error) {
-        if (error.type === ClientError.TYPE.CLIENT_NOT_SET) {
+        if (error instanceof ClientError && error.type === ClientError.TYPE.CLIENT_NOT_SET) {
           keepPermanentDatabase = false;
         }
       }
@@ -759,7 +764,7 @@ export class App {
       try {
         return _logout();
       } catch (error) {
-        this.logger.error(`Logout triggered by '${signOutReason}' and errored: ${error.message}.`);
+        this.logger.error(`Logout triggered by '${signOutReason}' and errored: ${(error as Error).message}.`);
         _redirectToLogin();
       }
     }
@@ -803,7 +808,10 @@ export class App {
     const isTemporaryGuestReason = App.CONFIG.SIGN_OUT_REASONS.TEMPORARY_GUEST.includes(signOutReason);
     const isLeavingGuestRoom = isTemporaryGuestReason && this.repository.user['userState'].isTemporaryGuest();
     if (isLeavingGuestRoom) {
-      return window.location.replace(getWebsiteUrl());
+      const websiteUrl = getWebsiteUrl();
+      if (websiteUrl) {
+        return window.location.replace(websiteUrl);
+      }
     }
 
     doRedirect(signOutReason);
