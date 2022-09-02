@@ -31,6 +31,8 @@ import {ContentViewModel} from '../../../view_model/ContentViewModel';
 import {App} from '../../app';
 import type {User} from '../../../entity/User';
 import {CallingContainer} from 'Components/calling/CallingOverlayContainer';
+import {useMemo} from 'react';
+import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 
 const html = require('./template/wire-main.htm');
 interface WireAppProps {
@@ -45,6 +47,7 @@ export const WireApp: React.FC<WireAppProps> = ({app, selfUser}) => {
   }
   const repositories = app.repository;
   const mainView = new MainViewModel(repositories);
+  const {accent_id} = useKoSubscribableChildren(selfUser, ['accent_id']);
 
   const initKoApp = (appContainer: HTMLDivElement) => {
     ko.applyBindings(mainView, appContainer);
@@ -99,9 +102,15 @@ export const WireApp: React.FC<WireAppProps> = ({app, selfUser}) => {
     });
   };
 
+  /* we need to memo the ko initialization to be absolutely sure we do not do the ko bindings more than once */
+  const koApp = useMemo(
+    () => <div className={'app'} id="app" dangerouslySetInnerHTML={{__html: html()}} ref={initKoApp} />,
+    [],
+  );
+
   return (
-    <main id="wire-main" className={`main-accent-color-${selfUser.accent_id()}`}>
-      <div className={'app'} id="app" dangerouslySetInnerHTML={{__html: html()}} ref={initKoApp} />
+    <main id="wire-main" className={`main-accent-color-${accent_id}`}>
+      {koApp}
       <AppLock clientRepository={repositories.client} />
       <WarningsContainer />
       <CallingContainer
