@@ -34,7 +34,7 @@ import {StorageKey} from '../storage';
 import {App, doRedirect} from './app';
 import {AppContainer} from './components/AppContainer';
 
-$(async () => {
+document.addEventListener('DOMContentLoaded', async () => {
   const apiClient = container.resolve(APIClient);
   await apiClient.useVersion(Config.getConfig().SUPPORTED_API_VERSIONS);
   const core = container.resolve(Core);
@@ -42,21 +42,23 @@ $(async () => {
   enableLogging(Config.getConfig().FEATURE.ENABLE_DEBUG);
   exposeWrapperGlobals();
   const appContainer = document.getElementById('wire-app');
-  if (appContainer) {
-    const enforceDesktopApplication =
-      Config.getConfig().FEATURE.ENABLE_ENFORCE_DESKTOP_APPLICATION_ONLY && !Runtime.isDesktopApp();
-    if (enforceDesktopApplication) {
-      doRedirect(SIGN_OUT_REASON.APP_INIT);
-    }
-    const shouldPersist = loadValue<boolean>(StorageKey.AUTH.PERSIST);
-    if (shouldPersist === undefined) {
-      doRedirect(SIGN_OUT_REASON.NOT_SIGNED_IN);
-    } else {
-      const app = new App(core, apiClient);
-      window.wire.app = app;
-      createRoot(appContainer).render(
-        <AppContainer app={app} clientType={shouldPersist ? ClientType.PERMANENT : ClientType.TEMPORARY} />,
-      );
-    }
+  if (!appContainer) {
+    throw new Error('container for application does not exist in the DOM');
+  }
+
+  const enforceDesktopApplication =
+    Config.getConfig().FEATURE.ENABLE_ENFORCE_DESKTOP_APPLICATION_ONLY && !Runtime.isDesktopApp();
+  if (enforceDesktopApplication) {
+    doRedirect(SIGN_OUT_REASON.APP_INIT);
+  }
+  const shouldPersist = loadValue<boolean>(StorageKey.AUTH.PERSIST);
+  if (shouldPersist === undefined) {
+    doRedirect(SIGN_OUT_REASON.NOT_SIGNED_IN);
+  } else {
+    const app = new App(core, apiClient);
+    window.wire.app = app;
+    createRoot(appContainer).render(
+      <AppContainer app={app} clientType={shouldPersist ? ClientType.PERMANENT : ClientType.TEMPORARY} />,
+    );
   }
 });

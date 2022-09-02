@@ -17,8 +17,7 @@
  *
  */
 
-import {useEffect, useRef, useState} from 'react';
-import {AppLoader, LoadingProgress} from './AppLoader';
+import {AppLoader} from './AppLoader';
 import {ClientType} from '@wireapp/api-client/src/client/';
 import {WireApp} from './WireApp';
 import type {App} from '../app';
@@ -29,19 +28,9 @@ interface AppProps {
 }
 
 export const AppContainer: React.FC<AppProps> = ({app, clientType}) => {
-  const [loadingState, setLoadingState] = useState<LoadingProgress | undefined>({message: '', progress: 0});
-  const isFirstRender = useRef<boolean>(true);
-  useEffect(() => {
-    if (!isFirstRender.current) {
-      return;
-    }
-    isFirstRender.current = false;
-    app
-      .initApp(clientType, (progress, message) => {
-        setLoadingState(previouState => ({message: message ?? previouState?.message ?? '', progress}));
-      })
-      .then(() => setLoadingState(undefined));
-  }, []);
-
-  return loadingState ? <AppLoader loadingState={loadingState} /> : <WireApp repositories={app.repository} />;
+  return (
+    <AppLoader app={app} clientType={clientType}>
+      {repositories => <WireApp repositories={repositories} />}
+    </AppLoader>
+  );
 };

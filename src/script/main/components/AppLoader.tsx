@@ -17,18 +17,42 @@
  *
  */
 
-import LoadingBar, {LoadingBarProps} from 'Components/LoadingBar';
+import LoadingBar from 'Components/LoadingBar';
+import {ClientType} from '@wireapp/api-client/src/client';
+import {useEffect, useRef, useState} from 'react';
 import {styles} from './AppLoader.styles';
+import type {App} from '../app';
 
-export interface LoadingProgress {
+interface AppLoaderProps {
+  app: App;
+  clientType: ClientType;
+  children: (repositories: any) => any;
+}
+
+interface LoadingProgress {
   progress: number;
   message: string;
 }
 
-interface AppLoaderProps {
-  loadingState: LoadingBarProps;
-}
-export const AppLoader: React.FC<AppLoaderProps> = ({loadingState}) => {
+export const AppLoader: React.FC<AppLoaderProps> = ({app, clientType, children}) => {
+  const [loadingState, setLoadingState] = useState<LoadingProgress>({message: '', progress: 0});
+  const isFirstRender = useRef<boolean>(true);
+  useEffect(() => {
+    if (!isFirstRender.current) {
+      return;
+    }
+    isFirstRender.current = false;
+    app
+      .initApp(clientType, (progress, message) => {
+        setLoadingState(previouState => ({message: message ?? previouState?.message ?? '', progress}));
+      })
+      .then(() => setLoadingState({message: '', progress: 100}));
+  }, []);
+
+  if (loadingState?.progress === 100) {
+    return children(app.repository);
+  }
+
   return (
     <div css={styles}>
       <LoadingBar {...loadingState} />

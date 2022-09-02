@@ -196,10 +196,6 @@ export class MainViewModel {
     document.addEventListener('scroll', () => window.scrollTo(0, 0));
   }
 
-  render(targetElement: Element): void {
-    ko.applyBindings(this, targetElement);
-  }
-
   openPanel(): Promise<void> {
     return this.togglePanel(MainViewModel.PANEL_STATE.OPEN);
   }

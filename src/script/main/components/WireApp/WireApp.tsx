@@ -17,6 +17,7 @@
  *
  */
 
+import ko from 'knockout';
 import {MainViewModel} from '../../../view_model/MainViewModel';
 import {Router} from '../../../router/Router';
 import {initRouterBindings} from '../../../router/routerBindings';
@@ -33,7 +34,7 @@ interface WireAppProps {
 export const WireApp: React.FC<WireAppProps> = ({repositories}) => {
   const initKoApp = (appContainer: HTMLDivElement) => {
     const mainView = new MainViewModel(repositories);
-    mainView.render(appContainer);
+    ko.applyBindings(mainView, appContainer);
 
     repositories.notification.setContentViewModelStates(mainView.content.state, mainView.multitasking);
 

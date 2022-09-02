@@ -20,11 +20,9 @@
 import React, {useEffect} from 'react';
 import {CSSTransition, SwitchTransition} from 'react-transition-group';
 import {registerReactComponent, useKoSubscribableChildren} from 'Util/ComponentUtil';
-import {container} from 'tsyringe';
 
 import {ListViewModel, ListState} from '../../view_model/ListViewModel';
 import {User} from '../../entity/User';
-import {AssetRepository} from '../../assets/AssetRepository';
 
 import Preferences from './panels/Preferences';
 import Archive from './panels/Archive';
@@ -35,7 +33,6 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 import StartUI from './panels/StartUI';
 
 type LeftSidebarProps = {
-  assetRepository?: AssetRepository;
   listViewModel: ListViewModel;
   selfUser: User;
 };
@@ -47,11 +44,7 @@ const Animated: React.FC<{children: React.ReactNode}> = ({children, ...rest}) =>
   );
 };
 
-const LeftSidebar: React.FC<LeftSidebarProps> = ({
-  listViewModel,
-  assetRepository = container.resolve(AssetRepository),
-  selfUser,
-}) => {
+const LeftSidebar: React.FC<LeftSidebarProps> = ({listViewModel, selfUser}) => {
   const {conversationRepository, propertiesRepository} = listViewModel;
   const repositories = listViewModel.contentViewModel.repositories;
 

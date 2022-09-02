@@ -483,7 +483,7 @@ export class App {
   private _appInitFailure(error: BaseError, isReload: boolean) {
     let logMessage = `Could not initialize app version '${Environment.version(false)}'`;
     if (Runtime.isDesktopApp()) {
-      logMessage += ` - Electron '${platform.os.family}' '${Environment.version()}'`;
+      logMessage += ` - Electron '${platform.os?.family}' '${Environment.version()}'`;
     }
     this.logger.warn(`${logMessage}: ${error.message}`, {error});
 
