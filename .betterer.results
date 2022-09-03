@@ -488,7 +488,7 @@ exports[`stricter compilation`] = {
       [383, 4, 9, "Argument of type \'undefined\' is not assignable to parameter of type \'UserRepository\'.", "2620553983"],
       [549, 4, 7, "Argument of type \'(context: any, conversationId: string, userId: string, clientId: string, destinationUserId: string, destinationClientId: string, payload: string) => number\' is not assignable to parameter of type \'WcallSendHandler\'.\\n  Types of parameters \'destinationUserId\' and \'targets\' are incompatible.\\n    Type \'string | null\' is not assignable to type \'string\'.\\n      Type \'null\' is not assignable to type \'string\'.", "2532445472"]
     ],
-    "src/script/calling/CallingRepository.ts:3192332915": [
+    "src/script/calling/CallingRepository.ts:3331335420": [
       [121, 10, 10, "Property \'avsVersion\' has no initializer and is not definitely assigned in the constructor.", "3071787355"],
       [127, 10, 12, "Property \'selfClientId\' has no initializer and is not definitely assigned in the constructor.", "3576844301"],
       [128, 10, 8, "Property \'selfUser\' has no initializer and is not definitely assigned in the constructor.", "2198230984"],
@@ -1132,7 +1132,7 @@ exports[`stricter compilation`] = {
       [108, 8, 12, "Type \'null\' is not assignable to type \'RECEIPT_MODE\'.", "1234422597"],
       [114, 8, 7, "Type \'null\' is not assignable to type \'string\'.", "1826788170"]
     ],
-    "src/script/conversation/ConversationLabelRepository.ts:2667135542": [
+    "src/script/conversation/ConversationLabelRepository.ts:832459864": [
       [93, 4, 11, "Type \'ObservableArray<never>\' is not assignable to type \'ObservableArray<ConversationLabel>\'.\\n  Types of parameters \'value\' and \'value\' are incompatible.\\n    Type \'ConversationLabel[] | null | undefined\' is not assignable to type \'never[] | null | undefined\'.\\n      Type \'ConversationLabel[]\' is not assignable to type \'never[]\'.\\n        Type \'ConversationLabel\' is not assignable to type \'never\'.", "2608654840"],
       [118, 8, 13, "Type \'ObservableArray<Conversation | undefined>\' is not assignable to type \'ObservableArray<Conversation>\'.\\n  The types returned by \'peek()\' are incompatible between these types.\\n    Type \'(Conversation | undefined)[]\' is not assignable to type \'Conversation[]\'.\\n      Type \'Conversation | undefined\' is not assignable to type \'Conversation\'.\\n        Type \'undefined\' is not assignable to type \'Conversation\'.", "3592773563"],
       [142, 49, 5, "Object is of type \'unknown\'.", "165548477"],
@@ -2033,12 +2033,12 @@ exports[`stricter compilation`] = {
       [106, 37, 12, "Argument of type \'Element | null\' is not assignable to parameter of type \'Element\'.\\n  Type \'null\' is not assignable to type \'Element\'.", "1912908196"],
       [178, 35, 12, "Argument of type \'Element | null\' is not assignable to parameter of type \'Element\'.\\n  Type \'null\' is not assignable to type \'Element\'.", "1912908196"]
     ],
-    "src/script/page/AppLock.tsx:588408162": [
-      [163, 28, 36, "Argument of type \'Element | null\' is not assignable to parameter of type \'Node\'.\\n  Type \'null\' is not assignable to type \'Node\'.", "3019440182"],
-      [167, 26, 30, "Argument of type \'Element | null\' is not assignable to parameter of type \'Node\'.\\n  Type \'null\' is not assignable to type \'Node\'.", "1790131128"],
-      [195, 59, 37, "Object is possibly \'null\'.", "3700925542"],
-      [216, 94, 4, "Argument of type \'unknown\' is not assignable to parameter of type \'StatusCodes\'.", "2087770728"],
-      [219, 19, 7, "Argument of type \'unknown\' is not assignable to parameter of type \'SetStateAction<string>\'.", "1236122734"]
+    "src/script/page/AppLock.tsx:135507464": [
+      [164, 28, 36, "Argument of type \'Element | null\' is not assignable to parameter of type \'Node\'.\\n  Type \'null\' is not assignable to type \'Node\'.", "3019440182"],
+      [168, 26, 30, "Argument of type \'Element | null\' is not assignable to parameter of type \'Node\'.\\n  Type \'null\' is not assignable to type \'Node\'.", "1790131128"],
+      [196, 59, 37, "Object is possibly \'null\'.", "3700925542"],
+      [217, 94, 4, "Argument of type \'unknown\' is not assignable to parameter of type \'StatusCodes\'.", "2087770728"],
+      [220, 19, 7, "Argument of type \'unknown\' is not assignable to parameter of type \'SetStateAction<string>\'.", "1236122734"]
     ],
     "src/script/page/LeftSidebar/panels/Conversations/ConversationsList.tsx:3232925700": [
       [104, 10, 15, "Type \'(conversation: Conversation) => boolean\' is not assignable to type \'(conversationId: QualifiedId) => boolean\'.\\n  Types of parameters \'conversation\' and \'conversationId\' are incompatible.\\n    Type \'QualifiedId\' is missing the following properties from type \'Conversation\': teamState, archivedState, incomingMessages, isManaged, and 121 more.", "1629494677"]
@@ -2055,7 +2055,7 @@ exports[`stricter compilation`] = {
     "src/script/page/MainContent/panels/Collection/Collection.test.tsx:1028939995": [
       [122, 12, 5, "Type \'HTMLInputElement | null\' is not assignable to type \'HTMLInputElement\'.\\n  Type \'null\' is not assignable to type \'HTMLInputElement\'.", "178805363"]
     ],
-    "src/script/page/MainContent/panels/Collection/FullSearch.tsx:1879516049": [
+    "src/script/page/MainContent/panels/Collection/FullSearch.tsx:2917650160": [
       [99, 10, 10, "Object is possibly \'undefined\'.", "1962587969"],
       [100, 26, 10, "Object is possibly \'undefined\'.", "1962587969"],
       [109, 25, 11, "Object is possibly \'undefined\'.", "2591652326"],
@@ -2398,11 +2398,11 @@ exports[`stricter compilation`] = {
       [351, 31, 6, "Object is possibly \'null\'.", "1898500505"],
       [352, 52, 22, "Argument of type \'Element | null\' is not assignable to parameter of type \'Element\'.\\n  Type \'null\' is not assignable to type \'Element\'.", "1093908406"]
     ],
-    "src/script/view_model/ActionsViewModel.ts:4179513965": [
+    "src/script/view_model/ActionsViewModel.ts:1457962265": [
       [117, 82, 22, "Argument of type \'Conversation | undefined\' is not assignable to parameter of type \'Conversation\'.\\n  Type \'undefined\' is not assignable to type \'Conversation\'.", "4075697524"],
       [181, 67, 5, "Object is of type \'unknown\'.", "165548477"],
       [181, 83, 5, "Object is of type \'unknown\'.", "165548477"],
-      [195, 8, 9, "Argument of type \'undefined\' is not assignable to parameter of type \'string\'.", "2620553983"]
+      [196, 8, 9, "Argument of type \'undefined\' is not assignable to parameter of type \'string\'.", "2620553983"]
     ],
     "src/script/view_model/CallingViewModel.ts:3511156749": [
       [87, 11, 17, "Property \'activeCallViewTab\' has no initializer and is not definitely assigned in the constructor.", "1323835793"],
@@ -2678,7 +2678,7 @@ exports[`stricter compilation`] = {
     "src/script/view_model/panel/GroupParticipantUserViewModel.ts:3122532612": [
       [74, 4, 24, "Type \'Observable<undefined>\' is not assignable to type \'Observable<User>\'.", "3514586203"]
     ],
-    "src/script/view_model/panel/GuestsAndServicesViewModel.ts:292948775": [
+    "src/script/view_model/panel/GuestsAndServicesViewModel.ts:1718563438": [
       [93, 4, 23, "Type \'PureComputed<boolean | undefined>\' is not assignable to type \'PureComputed<boolean>\'.", "2493661698"]
     ],
     "src/script/view_model/panel/MessageDetailsViewModel.ts:906474120": [

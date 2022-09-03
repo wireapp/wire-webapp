@@ -188,6 +188,7 @@ export class ActionsViewModel {
             text: t('modalAccountRemoveDeviceAction'),
           },
           text: {
+            closeBtnLabel: t('modalRemoveDeviceCloseBtn', clientEntity.model),
             input: t('modalAccountRemoveDevicePlaceholder'),
             message: t('modalAccountRemoveDeviceMessage'),
             title: t('modalAccountRemoveDeviceHeadline', clientEntity.model),
@@ -270,6 +271,7 @@ export class ActionsViewModel {
           text: t('modalConversationLeaveAction'),
         },
         text: {
+          closeBtnLabel: t('modalConversationLeaveMessageCloseBtn', conversationEntity.display_name()),
           message: t('modalConversationLeaveMessage'),
           option: t('modalConversationLeaveOption'),
           title: t('modalConversationLeaveHeadline', conversationEntity.display_name()),
@@ -363,6 +365,7 @@ export class ActionsViewModel {
             text: t('modalConversationRemoveAction'),
           },
           text: {
+            closeBtnLabel: t('modalConversationRemoveCloseBtn'),
             message: t('modalConversationRemoveMessage', userEntity.name()),
             title: t('modalConversationRemoveHeadline'),
           },
