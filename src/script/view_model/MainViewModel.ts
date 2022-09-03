@@ -31,7 +31,6 @@ import {CallingViewModel} from './CallingViewModel';
 import {ActionsViewModel} from './ActionsViewModel';
 import {ListViewModel} from './ListViewModel';
 import {FaviconViewModel} from './FaviconViewModel';
-import {ImageDetailViewViewModel} from './ImageDetailViewViewModel';
 
 import type {AssetRepository} from '../assets/AssetRepository';
 import type {AudioRepository} from '../audio/AudioRepository';
@@ -95,7 +94,6 @@ export class MainViewModel {
   content: ContentViewModel;
   favicon: FaviconViewModel;
   isPanelOpen: ko.Observable<boolean>;
-  lightbox: ImageDetailViewViewModel;
   list: ListViewModel;
   logger: Logger;
   mainClasses: ko.PureComputed<string | undefined>;
@@ -182,12 +180,6 @@ export class MainViewModel {
     this.content = new ContentViewModel(this, repositories);
     this.list = new ListViewModel(this, repositories);
 
-    this.lightbox = new ImageDetailViewViewModel(
-      this,
-      repositories.conversation,
-      repositories.asset,
-      repositories.message,
-    );
     this.title = new WindowTitleViewModel(this);
     this.favicon = new FaviconViewModel(amplify);
 

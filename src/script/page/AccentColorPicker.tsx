@@ -79,13 +79,11 @@ const AccentColorPicker: React.FunctionComponent<AccentColorPickerProps> = ({use
                     '& + label > span:first-child::after': {
                       ...CSS_SQUARE(10),
                       background: 'currentColor',
-                      left: '-5px',
-                      top: '-5px',
+                      transform: 'translate(-50%, -50%)',
                     },
                     '& + label > span:first-child::before': {
                       ...CSS_SQUARE(16),
-                      left: '-8px',
-                      top: '-8px',
+                      transform: 'translate(-50%, -50%)',
                     },
                     '& + label > span:first-child::before, & + label > span:first-child::after': {
                       borderRadius: '50%',
@@ -94,27 +92,36 @@ const AccentColorPicker: React.FunctionComponent<AccentColorPickerProps> = ({use
                       position: 'absolute',
                       transition: 'all 0.15s ease-out',
                     },
-                    '&:checked + label > span:first-child::after': {
-                      left: '-5px',
-                      top: '-5px',
-                    },
                     '&:checked + label > span:first-child::before': {
                       border: '1px solid currentColor',
                     },
-                    '&:focus + label > span:first-child::before': {
-                      ...CSS_SQUARE(16),
-                      outline: '1px solid Highlight',
+                    '&:focus-visible + label': {
+                      backgroundColor: 'var(--gray-20)',
+                      'body.theme-dark &': {
+                        backgroundColor: 'var(--gray-90)',
+                      },
+                      boxShadow: 'inset 0 0 0 1px var(--accent-color-focus)',
+                    },
+                    '&:hover + label': {
+                      backgroundColor: 'var(--gray-20)',
+                      'body.theme-dark &': {
+                        backgroundColor: 'var(--gray-90)',
+                      },
                     },
                     opacity: 0,
+                    position: 'absolute',
                   }}
                 />
                 <label
                   htmlFor={String(id)}
                   style={{
                     alignItems: 'center',
+                    borderRadius: '4px',
                     cursor: 'pointer',
                     display: 'flex',
                     flexDirection: 'column',
+                    minWidth: '50px',
+                    paddingTop: '10px',
                   }}
                 >
                   <span />
@@ -122,7 +129,6 @@ const AccentColorPicker: React.FunctionComponent<AccentColorPickerProps> = ({use
                     style={{
                       fontSize: '11px',
                       marginTop: '14px',
-                      textTransform: 'capitalize',
                     }}
                   >
                     {name}

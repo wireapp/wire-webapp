@@ -207,8 +207,7 @@ svg.small-icon {
   }
 
   .conversation-list-cell-description {
-    margin-top: 2px;
-    color: var(--gray-90);
+    margin-top: 4px;
     opacity: 1;
     .subline;
   }
@@ -248,23 +247,6 @@ conversation-list-calling-cell:first-of-type {
   border: 1px solid var(--border-color);
   background-color: var(--app-bg-secondary);
   border-radius: 8px;
-}
-
-.conversation-list-calling-cell {
-  position: relative;
-  display: flex;
-  width: 100%;
-  height: 56px;
-  border-radius: 8px 8px 0 0;
-  cursor: pointer;
-  font-weight: @font-weight-regular;
-  & > * {
-    border-radius: 8px;
-  }
-  & > *,
-  & > * > * {
-    border: none;
-  }
 }
 
 .conversation-list-cell-button::after {

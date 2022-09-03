@@ -27,6 +27,17 @@ export interface PaginationProps {
   wrapperStyles?: CSSObject;
 }
 
+const paginationItemStyles: CSSObject = {
+  ':last-child': {
+    marginRight: 4,
+  },
+  borderRadius: '50%',
+  cursor: 'pointer',
+  height: 12,
+  marginLeft: 4,
+  width: 12,
+};
+
 const Pagination: React.FC<PaginationProps> = ({totalPages, currentPage, onChangePage, wrapperStyles = {}}) => {
   const pages = new Array(totalPages).fill(null).map((_, index) => index);
 
@@ -37,34 +48,52 @@ const Pagination: React.FC<PaginationProps> = ({totalPages, currentPage, onChang
         backgroundColor: 'var(--border-color)',
         borderRadius: 12,
         display: 'flex',
-        height: 16,
+        height: 22,
         justifyContent: 'center',
         ...wrapperStyles,
       }}
       data-uie-name="pagination-wrapper"
     >
-      {pages.map(page => (
-        <button
-          data-uie-name="pagination-item"
-          data-uie-status={currentPage === page ? 'active' : 'inactive'}
-          key={page}
-          onClick={() => onChangePage(page)}
-          type="button"
-          className="button-reset-default"
-          css={{
-            ':last-child': {
-              marginRight: 4,
-            },
-            backgroundColor: currentPage === page ? 'var(--accent-color)' : 'var(--app-bg-secondary)',
-            border: currentPage === page ? 'solid 1px var(--accent-color)' : 'solid 1px var(--foreground)',
-            borderRadius: 8,
-            cursor: 'pointer',
-            height: 8,
-            marginLeft: 4,
-            width: 8,
-          }}
-        />
-      ))}
+      {pages.map(page => {
+        const isCurrentPage = currentPage === page;
+
+        return (
+          <button
+            data-uie-name="pagination-item"
+            data-uie-status={isCurrentPage ? 'active' : 'inactive'}
+            key={page}
+            onClick={() => onChangePage(page)}
+            type="button"
+            className="button-reset-default"
+            css={{
+              ...paginationItemStyles,
+              '&:focus-visible': {
+                backgroundColor: isCurrentPage
+                  ? 'var(--toggle-button-hover-bg)'
+                  : 'var(--toggle-button-unselected-hover-bg)',
+                border: '1px solid var(--accent-color)',
+                outline: 'none',
+              },
+              '&:hover': {
+                backgroundColor: isCurrentPage
+                  ? 'var(--toggle-button-hover-bg)'
+                  : 'var(--toggle-button-unselected-hover-bg)',
+                border: isCurrentPage
+                  ? '1px solid var(--toggle-button-hover-bg)'
+                  : '1px solid var(--toggle-button-unselected-hover-border)',
+              },
+              /* eslint-disable sort-keys-fix/sort-keys-fix */
+              '&:active': {
+                /* eslint-enable sort-keys-fix/sort-keys-fix */
+                backgroundColor: isCurrentPage ? 'var(--accent-color)' : 'var(--toggle-button-unselected-bg)',
+                border: '1px solid var(--accent-color)',
+              },
+              backgroundColor: isCurrentPage ? 'var(--accent-color)' : 'var(--app-bg-secondary)',
+              border: isCurrentPage ? 'solid 1px var(--accent-color)' : 'solid 1px var(--foreground)',
+            }}
+          />
+        );
+      })}
     </div>
   );
 };

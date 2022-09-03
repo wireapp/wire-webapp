@@ -1,6 +1,6 @@
 <main id="wire-main"
      class="off"
-     data-bind="css: mainClasses(), ignore_drop_file: true"
+     data-bind="css: mainClasses()"
      data-uie-name="status-webapp"
      data-uie-value="is-loading">
   <!-- ko stopBinding: true -->
@@ -13,9 +13,17 @@
       </div>
       <div id="center-column" class="center-column">
         <main-content params="contentViewModel: $root"></main-content>
+
         <!-- ko if: state() === State.CONNECTION_REQUESTS -->
           <h1 class="visually-hidden" data-bind="text: t('accessibility.headings.connectionRequests')"></h1>
-          #include('content/connect-requests.htm')
+
+          <connect-requests
+            params="
+                actionsViewModel: $root.mainViewModel.actions,
+                userState: $root.userState,
+                teamState: $root.teamState,
+              "
+          ></connect-requests>
         <!-- /ko -->
         <!-- ko if: state() === State.CONVERSATION -->
           <h1 class="visually-hidden" data-bind="text: t('accessibility.headings.conversation')"></h1>
@@ -23,12 +31,16 @@
         <!-- /ko -->
         <!-- ko if: state() === State.HISTORY_EXPORT -->
           <h1 class="visually-hidden" data-bind="text: t('accessibility.headings.historyExport')"></h1>
-          #include('content/history-export.htm')
+
+          <history-export
+            style="height: 100%;"
+            params="
+              backupRepository: $root.repositories.backup,
+              userState: $root.userState,
+            "
+          ></history-export>
         <!-- /ko -->
-        <!-- ko if: state() === State.HISTORY_IMPORT -->
-          <h1 class="visually-hidden" data-bind="text: t('accessibility.headings.historyImport')"></h1>
-          #include('content/history-import.htm')
-        <!-- /ko -->
+
         <group-creation-modal params="
           conversationRepository: $root.repositories.conversation,
           searchRepository: $root.repositories.search,
@@ -51,7 +63,6 @@
         #include('panel/message-details.htm')
       </div>
     </div>
-    #include('detail-view.htm')
     #include('modals.htm')
     <!-- /ko -->
     <app-lock-container params="clientRepository: $root.content.repositories.client"></app-lock-container>

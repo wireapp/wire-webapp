@@ -30,13 +30,8 @@ import {container} from 'tsyringe';
 import {Config} from '../Config';
 import {MessageListViewModel} from './content/MessageListViewModel';
 import {LegalHoldModalViewModel} from './content/LegalHoldModalViewModel';
-import {EmojiInputViewModel} from './content/EmojiInputViewModel';
 import {ModalsViewModel} from './ModalsViewModel';
 import {ConversationError} from '../error/ConversationError';
-import {ConnectRequestsViewModel} from './content/ConnectRequestsViewModel';
-import {HistoryImportViewModel} from './content/HistoryImportViewModel';
-import {HistoryExportViewModel} from './content/HistoryExportViewModel';
-import {InputBarViewModel} from './content/InputBarViewModel';
 import {PanelViewModel} from './PanelViewModel';
 import type {MainViewModel, ViewModelRepositories} from './MainViewModel';
 import type {ConversationRepository} from '../conversation/ConversationRepository';
@@ -90,15 +85,10 @@ export class ContentViewModel {
   private readonly teamState: TeamState;
   private readonly conversationState: ConversationState;
 
-  connectRequests: ConnectRequestsViewModel;
   conversationRepository: ConversationRepository;
   messageRepository: MessageRepository;
   elementId: string;
   sidebarId: string;
-  emojiInput: EmojiInputViewModel;
-  historyExport: HistoryExportViewModel;
-  historyImport: HistoryImportViewModel;
-  inputBar: InputBarViewModel;
   legalHoldModal: LegalHoldModalViewModel;
   logger: Logger;
   readonly isFederated?: boolean;
@@ -147,17 +137,6 @@ export class ContentViewModel {
     this.state = ko.observable(ContentViewModel.STATE.WATERMARK);
 
     // Nested view models
-    this.connectRequests = new ConnectRequestsViewModel(mainViewModel);
-    this.emojiInput = new EmojiInputViewModel(repositories.properties);
-    this.inputBar = new InputBarViewModel(
-      this.emojiInput,
-      repositories.asset,
-      repositories.event,
-      repositories.conversation,
-      repositories.search,
-      repositories.storage,
-      repositories.message,
-    );
     this.legalHoldModal = new LegalHoldModalViewModel(
       repositories.conversation,
       repositories.team,
@@ -172,21 +151,15 @@ export class ContentViewModel {
       repositories.serverTime,
       repositories.user,
       repositories.message,
+      repositories.asset,
     );
-
-    this.historyExport = new HistoryExportViewModel(repositories.backup);
-    this.historyImport = new HistoryImportViewModel(repositories.backup);
 
     this.state.subscribe(state => {
       switch (state) {
-        case ContentViewModel.STATE.CONVERSATION:
-          this.inputBar.addedToView();
-          break;
         case ContentViewModel.STATE.PREFERENCES_ACCOUNT:
           this.popNotification();
           break;
         default:
-          this.inputBar.removedFromView();
       }
     });
 

@@ -18,19 +18,27 @@
  */
 
 import {WebAppEvents} from '@wireapp/webapp-events';
+import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
 import {amplify} from 'amplify';
-import React from 'react';
-import {HistoryExportViewModel} from '../../../../../view_model/content/HistoryExportViewModel';
-import {ContentViewModel} from '../../../../../view_model/ContentViewModel';
+import React, {ChangeEvent} from 'react';
+
+import {CONFIG as HistoryExportConfig} from 'Components/HistoryExport';
+import {importHistoryFile} from 'Components/HistoryImport';
+
 import {t} from 'Util/LocalizerUtil';
-import PreferencesSection from '../components/PreferencesSection';
 import {handleKeyDown} from 'Util/KeyboardUtil';
 
+import PreferencesSection from '../components/PreferencesSection';
+
+import {BackupRepository} from '../../../../../backup/BackupRepository';
+import {ContentViewModel} from '../../../../../view_model/ContentViewModel';
+
 interface HistoryBackupSectionProps {
+  backupRepository: BackupRepository;
   brandName: string;
 }
 
-const HistoryBackupSection: React.FC<HistoryBackupSectionProps> = ({brandName}) => {
+const HistoryBackupSection: React.FC<HistoryBackupSectionProps> = ({backupRepository, brandName}) => {
   const fileInputRef = React.useRef<HTMLInputElement>(null);
 
   const fileInputClick = () => {
@@ -44,25 +52,25 @@ const HistoryBackupSection: React.FC<HistoryBackupSectionProps> = ({brandName}) 
       className="preferences-section-conversation-history"
       aria-label={t('preferencesOptionsBackupExportHeadline')}
     >
-      <button
-        className="button-text-primary"
+      <Button
+        variant={ButtonVariant.TERTIARY}
         onClick={() => {
-          {
-            amplify.publish(WebAppEvents.CONTENT.SWITCH, ContentViewModel.STATE.HISTORY_EXPORT);
-            amplify.publish(WebAppEvents.BACKUP.EXPORT.START);
-          }
+          amplify.publish(WebAppEvents.CONTENT.SWITCH, ContentViewModel.STATE.HISTORY_EXPORT);
         }}
         data-uie-name="do-backup-export"
         aria-describedby="preferences-history-describe-1"
         type="button"
       >
         {t('preferencesOptionsBackupExportHeadline')}
-      </button>
+      </Button>
+
       <p id="preferences-history-describe-1" className="preferences-detail">
         {t('preferencesOptionsBackupExportSecondary', brandName)}
       </p>
-      <div
-        className="button-text-primary preferences-history-restore-button"
+
+      <Button
+        variant={ButtonVariant.TERTIARY}
+        className="preferences-history-restore-button"
         role="button"
         tabIndex={0}
         onKeyDown={(event: React.KeyboardEvent<HTMLElement>) => handleKeyDown(event, fileInputClick)}
@@ -80,12 +88,16 @@ const HistoryBackupSection: React.FC<HistoryBackupSectionProps> = ({brandName}) 
             ref={fileInputRef}
             tabIndex={-1}
             type="file"
-            accept={`.${HistoryExportViewModel.CONFIG.FILE_EXTENSION}`}
-            onChange={(event: any) => {
-              const file = event.target.files[0];
+            accept={`.${HistoryExportConfig.FILE_EXTENSION}`}
+            onChange={(event: ChangeEvent<HTMLInputElement>) => {
+              const file = event.target.files?.[0];
               if (file) {
                 amplify.publish(WebAppEvents.CONTENT.SWITCH, ContentViewModel.STATE.HISTORY_IMPORT);
-                amplify.publish(WebAppEvents.BACKUP.IMPORT.START, file);
+
+                importHistoryFile({
+                  backupRepository,
+                  file,
+                });
               }
             }}
             onFocus={({target}) => target.blur()}
@@ -93,7 +105,7 @@ const HistoryBackupSection: React.FC<HistoryBackupSectionProps> = ({brandName}) 
             aria-describedby="preferences-history-describe-2"
           />
         </label>
-      </div>
+      </Button>
       <p id="preferences-history-describe-2" className="preferences-detail">
         {t('preferencesOptionsBackupImportSecondary')}
       </p>
