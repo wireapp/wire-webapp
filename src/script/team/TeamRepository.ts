@@ -24,8 +24,8 @@ import type {TeamData} from '@wireapp/api-client/src/team/team/TeamData';
 import {Availability} from '@wireapp/protocol-messaging';
 import {TEAM_EVENT} from '@wireapp/api-client/src/event/TeamEvent';
 import type {FeatureList} from '@wireapp/api-client/src/team/feature/';
-import {FeatureStatus, FEATURE_KEY, SelfDeletingTimeout} from '@wireapp/api-client/src/team/feature/';
-import {formatDuration} from 'Util/TimeUtil';
+import {FEATURE_KEY, SelfDeletingTimeout} from '@wireapp/api-client/src/team/feature/';
+import {formatDuration, TIME_IN_MILLIS} from 'Util/TimeUtil';
 import type {
   TeamConversationDeleteEvent,
   TeamDeleteEvent,
@@ -38,21 +38,19 @@ import type {
 import {Runtime} from '@wireapp/commons';
 import {container} from 'tsyringe';
 
-import {Logger, getLogger} from 'Util/Logger';
+import {getLogger, Logger} from 'Util/Logger';
 import {replaceLink, t} from 'Util/LocalizerUtil';
 import {loadDataUrl} from 'Util/util';
-import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 import {Environment} from 'Util/Environment';
 
 import {TeamMapper} from './TeamMapper';
 import {TeamEntity} from './TeamEntity';
-import {roleFromTeamPermissions, ROLE} from '../user/UserPermission';
+import {ROLE, roleFromTeamPermissions} from '../user/UserPermission';
 
 import {IntegrationMapper} from '../integration/IntegrationMapper';
 import {SIGN_OUT_REASON} from '../auth/SignOutReason';
 import {User} from '../entity/User';
 import {TeamService} from './TeamService';
-import {ROLE as TEAM_ROLE} from '../user/UserPermission';
 import {UserRepository} from '../user/UserRepository';
 import {TeamMemberEntity} from './TeamMemberEntity';
 import {ServiceEntity} from '../integration/ServiceEntity';
@@ -63,6 +61,8 @@ import {NOTIFICATION_HANDLING_STATE} from '../event/NotificationHandlingState';
 import {EventSource} from '../event/EventSource';
 import {ModalsViewModel} from '../view_model/ModalsViewModel';
 import {Config} from '../Config';
+import {FeatureStatus} from '@wireapp/api-client/src/team/feature';
+import {showSearchVisibilityModal} from './TeamSearchVisibilitySetting';
 
 export interface AccountInfo {
   accentID: number;
@@ -70,7 +70,7 @@ export interface AccountInfo {
   name: string;
   picture?: string;
   teamID?: string;
-  teamRole: TEAM_ROLE;
+  teamRole: ROLE;
   userID: string;
 }
 
@@ -425,6 +425,7 @@ export class TeamRepository {
       this.handleSelfDeletingMessagesFeatureChange(previousConfig, featureConfigList);
       this.handleConferenceCallingFeatureChange(previousConfig, featureConfigList);
       this.handleGuestLinkFeatureChange(previousConfig, featureConfigList);
+      this.handleSearchVisibilityFeatureChange(previousConfig, featureConfigList);
     }
     this.saveFeatureConfig(featureConfigList);
   };
@@ -443,6 +444,40 @@ export class TeamRepository {
         },
       });
     }
+  };
+
+  private readonly handleSearchVisibilityFeatureChange = (previousConfig: FeatureList, newConfig: FeatureList) => {
+    const hasSearchVisibilityOutboundStatusChanged =
+      previousConfig.searchVisibilityOutbound?.status !== newConfig.searchVisibilityOutbound?.status;
+
+    const isSearchVisibilityOutboundStatusEnabled =
+      newConfig.searchVisibilityOutbound?.status === FeatureStatus.ENABLED;
+
+    const hasSearchVisibilityOutboundConfigChanged =
+      previousConfig.searchVisibilityOutbound?.config !== newConfig.searchVisibilityOutbound?.config;
+
+    const hasSearchVisibilityOutboundChanged =
+      hasSearchVisibilityOutboundStatusChanged ||
+      (isSearchVisibilityOutboundStatusEnabled && hasSearchVisibilityOutboundConfigChanged);
+
+    const hasSearchVisibilityInboundStatusChanged =
+      previousConfig.searchVisibilityInbound?.status !== newConfig.searchVisibilityInbound?.status;
+
+    const isSearchVisibilityInboundStatusEnabled = newConfig.searchVisibilityInbound?.status === FeatureStatus.ENABLED;
+
+    const hasSearchVisibilityInboundConfigChanged =
+      previousConfig.searchVisibilityInbound?.config !== newConfig.searchVisibilityInbound?.config;
+
+    const hasSearchVisibilityInboundChanged =
+      hasSearchVisibilityInboundStatusChanged ||
+      (isSearchVisibilityInboundStatusEnabled && hasSearchVisibilityInboundConfigChanged);
+
+    const changedSearchVisibilityState = {
+      ...(hasSearchVisibilityInboundChanged && {searchVisibilityInbound: newConfig.searchVisibilityInbound}),
+      ...(hasSearchVisibilityOutboundChanged && {searchVisibilityOutbound: newConfig.searchVisibilityOutbound}),
+    };
+
+    showSearchVisibilityModal(changedSearchVisibilityState);
   };
 
   private readonly handleGuestLinkFeatureChange = (previousConfig: FeatureList, newConfig: FeatureList) => {

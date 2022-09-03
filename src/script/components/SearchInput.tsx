@@ -96,13 +96,15 @@ const SearchInput: React.FC<SearchInputProps> = ({
             </button>
           )}
         </div>
-        <div className="search-input-selected">
-          {selectedUsers.map(({name, id}) => (
-            <span key={id} data-uie-name="item-selected">
-              {name()}
-            </span>
-          ))}
-        </div>
+        {selectedUsers.length > 0 && (
+          <div className="search-input-selected">
+            {selectedUsers.map(({name, id}) => (
+              <span key={id} data-uie-name="item-selected">
+                {name()}
+              </span>
+            ))}
+          </div>
+        )}
       </div>
     </form>
   );

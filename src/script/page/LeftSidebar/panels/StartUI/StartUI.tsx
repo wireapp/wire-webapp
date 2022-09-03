@@ -44,8 +44,9 @@ import {ServiceEntity} from 'src/script/integration/ServiceEntity';
 import showUserModal from 'Components/Modals/UserModal';
 import showServiceModal from 'Components/Modals/ServiceModal';
 import showInviteModal from 'Components/Modals/InviteModal';
+import UserSearchInputInfoButton from 'Components/UserSearchInputInfoButton';
 
-type StartUIProps = {
+export type StartUIProps = {
   conversationRepository: ConversationRepository;
   conversationState?: ConversationState;
   integrationRepository: IntegrationRepository;
@@ -79,6 +80,7 @@ const StartUI: React.FC<StartUIProps> = ({
 }) => {
   const brandName = Config.getConfig().BRAND_NAME;
   const {self: selfUser} = useKoSubscribableChildren(userState, ['self']);
+  const {isTeam, teamName, teamFeatures} = useKoSubscribableChildren(teamState, ['isTeam', 'teamName', 'teamFeatures']);
   const {
     canInviteTeamMembers,
     canSearchUnconnectedUsers,
@@ -89,8 +91,6 @@ const StartUI: React.FC<StartUIProps> = ({
   } = generatePermissionHelpers(selfUser.teamRole());
 
   const actions = mainViewModel.actions;
-  const isTeam = teamState.isTeam();
-  const teamName = teamState.teamName();
 
   const [searchQuery, setSearchQuery] = useState('');
   const [activeTab, setActiveTab] = useState(Tabs.PEOPLE);
@@ -144,15 +144,18 @@ const StartUI: React.FC<StartUIProps> = ({
 
   const before = (
     <div id="start-ui-header" className={cx('start-ui-header', {'start-ui-header-integrations': isTeam})}>
-      <div className="start-ui-header-user-input" data-uie-name="enter-search">
-        <SearchInput
-          input={searchQuery}
-          placeholder={isFederated ? t('searchPlaceholderFederation') : t('searchPlaceholder')}
-          selectedUsers={[]}
-          setInput={setSearchQuery}
-          enter={openFirstConversation}
-          forceDark
-        />
+      <div className="start-ui-header-user-input-wrapper">
+        <UserSearchInputInfoButton teamFeatures={teamFeatures} />
+        <div className="start-ui-header-user-input" data-uie-name="enter-search">
+          <SearchInput
+            input={searchQuery}
+            placeholder={isFederated ? t('searchPlaceholderFederation') : t('searchPlaceholder')}
+            selectedUsers={[]}
+            setInput={setSearchQuery}
+            enter={openFirstConversation}
+            forceDark
+          />
+        </div>
       </div>
       {isTeam && canChatWithServices() && (
         <ul className="start-ui-list-tabs">
@@ -216,7 +219,7 @@ const StartUI: React.FC<StartUIProps> = ({
 
   const footer = !isTeam ? (
     <button className="start-ui-import" onClick={openInviteModal} data-uie-name="show-invite-modal">
-      <span className="icon-invite start-ui-import-icon"></span>
+      <span aria-hidden={true} className="icon-invite start-ui-import-icon" />
       <span>{t('searchInvite', brandName)}</span>
     </button>
   ) : undefined;
