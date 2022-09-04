@@ -146,7 +146,7 @@
     "intersection-observer": "0.12.2",
     "jest": "27.5.1",
     "jest-canvas-mock": "2.4.0",
-    "jsdom-worker": "0.2.1",
+    "jsdom-worker": "0.3.0",
     "less": "3.13.1",
     "lint-staged": "12.4.2",
     "load-grunt-tasks": "5.1.0",
