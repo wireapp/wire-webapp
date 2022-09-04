@@ -21,7 +21,6 @@ import {CONVERSATION_TYPE} from '@wireapp/api-client/src/conversation';
 import GroupList, {GroupListProps} from './GroupList';
 import TestPage from 'Util/test/TestPage';
 import {createRandomUuid, noop} from 'Util/util';
-import {AssetRepository} from '../../../../../assets/AssetRepository';
 import {Conversation} from '../../../../../entity/Conversation';
 import {User} from '../../../../../entity/User';
 import {Router} from '../../../../../router/Router';
@@ -32,7 +31,7 @@ class GroupListPage extends TestPage<GroupListProps> {
     super(GroupList, props);
   }
   getGroupConversationItem = (groupId: string) => this.get(`[data-uie-name="item-group"][data-uie-uid="${groupId}"]`);
-  clickGroupConversationItem = (groupId: string) => this.click(this.getGroupConversationItem(groupId));
+  clickGroupConversationItem = (groupId: string) => this.click(this.getGroupConversationItem(groupId)!);
 }
 
 describe('GroupList', () => {
@@ -62,11 +61,9 @@ describe('GroupList', () => {
 
   it('shows group list', () => {
     const groups = [createGroupConversation('groupA'), create1on1Conversation('groupB')];
-    const assetRepository: Partial<AssetRepository> = {};
     const router: Partial<Router> = {};
 
     const groupListPage = new GroupListPage({
-      assetRepository: assetRepository as AssetRepository,
       click: noop,
       groups,
       router: router as Router,
@@ -77,13 +74,11 @@ describe('GroupList', () => {
 
   it('shows group list and navigates conversation on click', () => {
     const groups = [createGroupConversation('groupA'), create1on1Conversation('groupB')];
-    const assetRepository: Partial<AssetRepository> = {};
     const router: Partial<Router> = {
       navigate: jest.fn(),
     };
     const onClickSpy = jest.fn();
     const groupListPage = new GroupListPage({
-      assetRepository: assetRepository as AssetRepository,
       click: onClickSpy,
       groups,
       router: router as Router,

@@ -1,0 +1,26 @@
+<main-content params="contentViewModel: $data"></main-content>
+<!-- ko if: state() === State.CONNECTION_REQUESTS -->
+<h1 class="visually-hidden" data-bind="text: t('accessibility.headings.connectionRequests')"></h1>
+{{> ./content/connect-requests.htm}}
+<!-- /ko -->
+<!-- ko if: state() === State.CONVERSATION -->
+<h1 class="visually-hidden" data-bind="text: t('accessibility.headings.conversation')"></h1>
+{{> './content/conversation.htm'}}
+<!-- /ko -->
+<!-- ko if: state() === State.HISTORY_EXPORT -->
+<h1 class="visually-hidden" data-bind="text: t('accessibility.headings.historyExport')"></h1>
+{{> './content/history-export.htm'}}
+<!-- /ko -->
+<!-- ko if: state() === State.HISTORY_IMPORT -->
+<h1 class="visually-hidden" data-bind="text: t('accessibility.headings.historyImport')"></h1>
+{{> './content/history-import.htm'}}
+<!-- /ko -->
+<group-creation-modal
+  params="
+          conversationRepository: $data.repositories.conversation,
+          searchRepository: $data.repositories.search,
+          teamRepository: $data.repositories.team,
+        "
+></group-creation-modal>
+{{> './modal/legal-hold.htm'}}
+<div class="center-column__overlay"></div>
