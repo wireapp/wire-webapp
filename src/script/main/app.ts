@@ -485,7 +485,7 @@ export class App {
   /**
    * Initialize ServiceWorker if supported.
    */
-  initServiceWorker(): void {
+  private initServiceWorker(): void {
     if (navigator.serviceWorker) {
       navigator.serviceWorker
         .register(`/sw.js?${Environment.version(false)}`)
@@ -692,7 +692,7 @@ export class App {
    * @param signOutReason Cause for logout
    * @param clearData Keep data in database
    */
-  readonly logout = (signOutReason: SIGN_OUT_REASON, clearData: boolean): Promise<void> | void => {
+  private readonly logout = (signOutReason: SIGN_OUT_REASON, clearData: boolean): Promise<void> | void => {
     const _redirectToLogin = () => {
       amplify.publish(WebAppEvents.LIFECYCLE.SIGNED_OUT, clearData);
       this._redirectToLogin(signOutReason);
@@ -780,7 +780,7 @@ export class App {
   /**
    * Refresh the web app or desktop wrapper
    */
-  readonly refresh = (): void => {
+  private readonly refresh = (): void => {
     this.logger.info('Refresh to update started');
     if (Runtime.isDesktopApp()) {
       // if we are in a desktop env, we just warn the wrapper that we need to reload. It then decide what should be done
@@ -795,7 +795,7 @@ export class App {
   /**
    * Notify about found update
    */
-  readonly update = (): void => {
+  private readonly update = (): void => {
     amplify.publish(WebAppEvents.WARNING.SHOW, Warnings.TYPE.LIFECYCLE_UPDATE);
   };
 

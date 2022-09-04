@@ -35,16 +35,17 @@ import {App, doRedirect} from './app';
 import {AppContainer} from './components/AppContainer';
 
 document.addEventListener('DOMContentLoaded', async () => {
+  const appContainer = document.getElementById('wire-app');
+  if (!appContainer) {
+    throw new Error('container for application does not exist in the DOM');
+  }
+
   const apiClient = container.resolve(APIClient);
   await apiClient.useVersion(Config.getConfig().SUPPORTED_API_VERSIONS);
   const core = container.resolve(Core);
 
   enableLogging(Config.getConfig().FEATURE.ENABLE_DEBUG);
   exposeWrapperGlobals();
-  const appContainer = document.getElementById('wire-app');
-  if (!appContainer) {
-    throw new Error('container for application does not exist in the DOM');
-  }
 
   const enforceDesktopApplication =
     Config.getConfig().FEATURE.ENABLE_ENFORCE_DESKTOP_APPLICATION_ONLY && !Runtime.isDesktopApp();
