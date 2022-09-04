@@ -20,16 +20,22 @@
 import {AppLoader} from './AppLoader';
 import {ClientType} from '@wireapp/api-client/src/client/';
 import {WireApp} from './WireApp';
-import type {App} from '../app';
+
+import {Configuration} from '../../Config';
+import {container} from 'tsyringe';
+import {APIClient} from '../../service/APIClientSingleton';
+import {Core} from '../../service/CoreSingleton';
+import {App} from '../app';
 
 interface AppProps {
-  app: App;
+  config: Configuration;
   clientType: ClientType;
 }
 
-export const AppContainer: React.FC<AppProps> = ({app, clientType}) => {
+export const AppContainer: React.FC<AppProps> = ({config, clientType}) => {
+  const app = new App(container.resolve(Core), container.resolve(APIClient));
   return (
-    <AppLoader init={onProgress => app.initApp(clientType, onProgress)}>
+    <AppLoader init={onProgress => app.initApp(clientType, config, onProgress)}>
       {selfUser => <WireApp app={app} selfUser={selfUser} />}
     </AppLoader>
   );

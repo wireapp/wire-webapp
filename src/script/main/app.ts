@@ -36,7 +36,7 @@ import {DebugUtil} from 'Util/DebugUtil';
 import {includesString} from 'Util/StringUtil';
 import {appendParameter} from 'Util/UrlUtil';
 
-import {Config} from '../Config';
+import {Config, Configuration} from '../Config';
 import {startNewVersionPolling} from '../lifecycle/newVersionHandler';
 import {PreferenceNotificationRepository} from '../notification/PreferenceNotificationRepository';
 import * as UserPermission from '../user/UserPermission';
@@ -356,8 +356,11 @@ export class App {
    */
   async initApp(
     clientType: ClientType,
+    config: Configuration,
     onProgress: (progress: number, message?: string) => void,
   ): Promise<User | undefined> {
+    await this.apiClient.useVersion(config.SUPPORTED_API_VERSIONS);
+
     // add body information
     const osCssClass = Runtime.isMacOS() ? 'os-mac' : 'os-pc';
     const platformCssClass = Runtime.isDesktopApp() ? 'platform-electron' : 'platform-web';
