@@ -712,22 +712,6 @@ exports[`stricter compilation`] = {
       [62, 6, 15, "Type \'Observable<string>\' is not assignable to type \'Observable<string | undefined>\'.", "4105372853"],
       [71, 11, 40, "Object is possibly \'null\'.", "95183934"]
     ],
-    "src/script/components/MessagesList/Message/ContentMessage/asset/VideoAsset.tsx:48342831": [
-      [45, 6, 10, "Type \'({ message, isQuote, teamState, assetRepository, }: VideoAssetProps) => false | Element\' is not assignable to type \'FC<VideoAssetProps>\'.\\n  Type \'false | Element\' is not assignable to type \'ReactElement<any, any> | null\'.\\n    Type \'boolean\' is not assignable to type \'ReactElement<any, any>\'.", "1844198436"],
-      [56, 59, 4, "Argument of type \'null\' is not assignable to parameter of type \'string | (() => string)\'.", "2087897566"],
-      [57, 51, 4, "Argument of type \'null\' is not assignable to parameter of type \'string | (() => string)\'.", "2087897566"],
-      [70, 105, 4, "Argument of type \'Blob | undefined\' is not assignable to parameter of type \'Blob | MediaSource\'.\\n  Type \'undefined\' is not assignable to type \'Blob | MediaSource\'.", "2087735462"],
-      [83, 8, 12, "Object is possibly \'undefined\'.", "2287620778"],
-      [89, 49, 4, "Argument of type \'Blob | undefined\' is not assignable to parameter of type \'Blob | MediaSource\'.", "2087735462"],
-      [105, 4, 12, "Object is possibly \'undefined\'.", "2287620778"],
-      [139, 40, 4, "Argument of type \'true\' is not assignable to parameter of type \'SetStateAction<null>\'.", "2087932467"],
-      [143, 53, 12, "Object is possibly \'undefined\'.", "2287620778"],
-      [143, 77, 12, "Object is possibly \'undefined\'.", "2287620778"],
-      [144, 57, 12, "Object is possibly \'undefined\'.", "2287620778"],
-      [144, 81, 12, "Object is possibly \'undefined\'.", "2287620778"],
-      [192, 28, 12, "Type \'HTMLVideoElement | undefined\' is not assignable to type \'HTMLMediaElement\'.\\n  Type \'undefined\' is not assignable to type \'HTMLMediaElement\'.", "780920223"],
-      [198, 43, 13, "Argument of type \'number | undefined\' is not assignable to parameter of type \'number\'.\\n  Type \'undefined\' is not assignable to type \'number\'.", "3979215185"]
-    ],
     "src/script/components/MessagesList/Message/ContentMessage/asset/controls/AudioSeekBar.test.ts:540025694": [
       [63, 32, 26, "Object is possibly \'null\'.", "2291412725"],
       [86, 22, 3, "Argument of type \'Element | null\' is not assignable to parameter of type \'Document | Node | Element | Window\'.\\n  Type \'null\' is not assignable to type \'Document | Node | Element | Window\'.", "193432711"]
@@ -2456,7 +2440,7 @@ exports[`stricter compilation`] = {
     "src/script/view_model/bindings/MessageListBindings.ts:3261685299": [
       [129, 48, 8, "No overload matches this call.\\n  Overload 1 of 2, \'(type: \\"scroll\\", listener: (this: HTMLElement, ev: Event) => any, options?: boolean | AddEventListenerOptions | undefined): void\', gave the following error.\\n    Argument of type \'({ target }: Event & {    target: HTMLElement;}) => void\' is not assignable to parameter of type \'(this: HTMLElement, ev: Event) => any\'.\\n      Types of parameters \'__0\' and \'ev\' are incompatible.\\n        Type \'Event\' is not assignable to type \'Event & { target: HTMLElement; }\'.\\n          Type \'Event\' is not assignable to type \'{ target: HTMLElement; }\'.\\n            Types of property \'target\' are incompatible.\\n              Type \'EventTarget | null\' is not assignable to type \'HTMLElement\'.\\n                Type \'null\' is not assignable to type \'HTMLElement\'.\\n  Overload 2 of 2, \'(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | AddEventListenerOptions | undefined): void\', gave the following error.\\n    Argument of type \'({ target }: Event & {    target: HTMLElement;}) => void\' is not assignable to parameter of type \'EventListenerOrEventListenerObject\'.\\n      Type \'({ target }: Event & {    target: HTMLElement;}) => void\' is not assignable to type \'EventListener\'.\\n        Types of parameters \'__0\' and \'evt\' are incompatible.\\n          Type \'Event\' is not assignable to type \'Event & { target: HTMLElement; }\'.", "1317952297"],
       [133, 53, 8, "No overload matches this call.\\n  Overload 1 of 2, \'(type: \\"scroll\\", listener: (this: HTMLElement, ev: Event) => any, options?: boolean | EventListenerOptions | undefined): void\', gave the following error.\\n    Argument of type \'({ target }: Event & {    target: HTMLElement;}) => void\' is not assignable to parameter of type \'(this: HTMLElement, ev: Event) => any\'.\\n      Types of parameters \'__0\' and \'ev\' are incompatible.\\n        Type \'Event\' is not assignable to type \'Event & { target: HTMLElement; }\'.\\n  Overload 2 of 2, \'(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | EventListenerOptions | undefined): void\', gave the following error.\\n    Argument of type \'({ target }: Event & {    target: HTMLElement;}) => void\' is not assignable to parameter of type \'EventListenerOrEventListenerObject\'.", "1317952297"],
-      [158, 49, 4, "Argument of type \'Blob | undefined\' is not assignable to parameter of type \'Blob | MediaSource\'.", "2087735462"]
+      [158, 49, 4, "Argument of type \'Blob | undefined\' is not assignable to parameter of type \'Blob | MediaSource\'.\\n  Type \'undefined\' is not assignable to type \'Blob | MediaSource\'.", "2087735462"]
     ],
     "src/script/view_model/bindings/VideoCallingBindings.ts:456425467": [
       [23, 2, 6, "Type \'(element: HTMLMediaElement, valueAccessor: Observable<MediaStream>) => void\' is not assignable to type \'(element: any, valueAccessor: () => any, allBindings: AllBindings, viewModel: any, bindingContext: BindingContext<any>) => void\'.\\n  Types of parameters \'valueAccessor\' and \'valueAccessor\' are incompatible.\\n    Type \'() => any\' is missing the following properties from type \'Observable<MediaStream>\': equalityComparer, peek, valueHasMutated, valueWillMutate, and 5 more.", "1759213236"],
