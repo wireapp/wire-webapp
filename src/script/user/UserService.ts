@@ -115,10 +115,7 @@ export class UserService {
     if (userIds.length === 0) {
       return Promise.resolve([]);
     }
-    if (!!userIds[0].domain) {
-      return this.apiClient.api.user.postListUsers({qualified_ids: userIds});
-    }
-    return this.apiClient.api.user.getUsers({ids: userIds.map(userId => userId.id)});
+    return this.apiClient.api.user.postListUsers({qualified_ids: userIds});
   }
 
   /**

@@ -441,8 +441,12 @@ export class UserRepository {
     }
 
     const getUsers = async (chunkOfUserIds: QualifiedId[]): Promise<User[]> => {
+      const selfDomain = this.userState.self().domain;
+
+      const chunkOfQualifiedUserIds = chunkOfUserIds.map(({id, domain}) => ({domain: domain || selfDomain, id}));
+
       try {
-        const response = await this.userService.getUsers(chunkOfUserIds);
+        const response = await this.userService.getUsers(chunkOfQualifiedUserIds);
         return response ? this.userMapper.mapUsersFromJson(response) : [];
       } catch (error: any) {
         if (
@@ -453,8 +457,8 @@ export class UserRepository {
         ) {
           this.logger.warn('loading federated users failed: trying loading same backend users only');
           const [sameBackendUsers, federatedUsers] = partition(
-            chunkOfUserIds,
-            userId => userId.domain === this.userState.self().domain,
+            chunkOfQualifiedUserIds,
+            userId => userId.domain === selfDomain,
           );
           const users = await getUsers(sameBackendUsers);
 
@@ -482,7 +486,10 @@ export class UserRepository {
       }
     };
 
-    const chunksOfUserIds = chunk<QualifiedId>(userIds, Config.getConfig().MAXIMUM_USERS_PER_REQUEST);
+    const chunksOfUserIds = chunk<QualifiedId>(
+      userIds.filter(({id}) => !!id),
+      Config.getConfig().MAXIMUM_USERS_PER_REQUEST,
+    );
     const resolveArray = await Promise.all(chunksOfUserIds.map(getUsers));
     const newUserEntities = flatten(resolveArray);
     if (this.userState.isTeam()) {
@@ -495,6 +502,7 @@ export class UserRepository {
       fetchedUserEntities = this.addSuspendedUsers(userIds, fetchedUserEntities);
     }
     await this.getTeamMembersFromUsers(fetchedUserEntities);
+
     return fetchedUserEntities;
   }
 
@@ -614,7 +622,8 @@ export class UserRepository {
   }
 
   getUserListFromBackend(userIds: QualifiedId[]): Promise<APIClientUser[]> {
-    return this.userService.getUsers(userIds);
+    const qualifiedUserIds = userIds.map(({id, domain}) => ({domain: domain || this.userState.self().domain, id}));
+    return this.userService.getUsers(qualifiedUserIds);
   }
 
   /**
