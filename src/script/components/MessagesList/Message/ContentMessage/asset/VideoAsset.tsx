@@ -128,6 +128,8 @@ const VideoAsset: React.FC<VideoAssetProps> = ({
     }
   }, [videoElement, videoSrc]);
 
+  const syncVideoTimeRest = () => videoElement && setVideoTimeRest(videoElement.duration - videoElement.currentTime);
+
   return !isObfuscated ? (
     <div className="video-asset" data-uie-name="video-asset" data-uie-value={asset.file_name}>
       {!isFileSharingReceivingEnabled ? (
@@ -152,10 +154,8 @@ const VideoAsset: React.FC<VideoAssetProps> = ({
                 console.error('Video cannot be played', event);
               }}
               onPlaying={onVideoPlaying}
-              onTimeUpdate={() => videoElement && setVideoTimeRest(videoElement.duration - videoElement.currentTime)}
-              onLoadedMetadata={() =>
-                videoElement && setVideoTimeRest(videoElement.duration - videoElement.currentTime)
-              }
+              onTimeUpdate={syncVideoTimeRest}
+              onLoadedMetadata={syncVideoTimeRest}
               style={{
                 backgroundColor: videoPreview ? '#000' : '',
                 visibility: transferState === AssetTransferState.UPLOADING ? 'hidden' : undefined,
