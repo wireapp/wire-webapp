@@ -35,6 +35,7 @@ import useEffectRef from 'Util/useEffectRef';
 import {AssetRepository} from '../../../../../assets/AssetRepository';
 import {useTimeout} from '@wireapp/react-ui-kit';
 import RestrictedVideo from 'Components/asset/RestrictedVideo';
+import clx from 'classnames';
 
 interface VideoAssetProps {
   assetRepository?: AssetRepository;
@@ -156,10 +157,8 @@ const VideoAsset: React.FC<VideoAssetProps> = ({
               onPlaying={onVideoPlaying}
               onTimeUpdate={syncVideoTimeRest}
               onLoadedMetadata={syncVideoTimeRest}
-              style={{
-                backgroundColor: videoPreview ? '#000' : '',
-                visibility: transferState === AssetTransferState.UPLOADING ? 'hidden' : undefined,
-              }}
+              className={clx({hidden: transferState === AssetTransferState.UPLOADING})}
+              style={{backgroundColor: videoPreview ? '#000' : ''}}
             />
             {videoPlaybackError ? (
               <div className="video-asset__playback-error label-xs">{t('conversationPlaybackError')}</div>

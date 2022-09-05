@@ -35,11 +35,11 @@ import VideoAssetComponent from './VideoAsset';
 import ButtonAssetComponent from './MessageButton';
 
 import {AssetType} from '../../../../../assets/AssetType';
-import {Button} from 'src/script/entity/message/Button';
-import {CompositeMessage} from 'src/script/entity/message/CompositeMessage';
+import {Button} from '../../../../../entity/message/Button';
+import {CompositeMessage} from '../../../../../entity/message/CompositeMessage';
 import {StatusType} from '../../../../../message/StatusType';
 import {includesOnlyEmojis} from 'Util/EmojiUtil';
-import {ContentMessage} from 'src/script/entity/message/ContentMessage';
+import {ContentMessage} from '../../../../../entity/message/ContentMessage';
 import {MessageActions} from '../..';
 import {handleKeyDown} from 'Util/KeyboardUtil';
 
