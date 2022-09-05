@@ -113,10 +113,10 @@ const ContentAsset = ({
     case AssetType.LOCATION:
       return <LocationAssetComponent asset={asset as Location} />;
     case AssetType.BUTTON:
-      if (!(message instanceof CompositeMessage && asset instanceof Button && asset.id)) {
+      const assetId = asset.id;
+      if (!(message instanceof CompositeMessage && asset instanceof Button && assetId)) {
         return null;
       }
-      const assetId = asset.id;
 
       return (
         <ButtonAssetComponent
