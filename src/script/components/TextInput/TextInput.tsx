@@ -28,7 +28,7 @@ import {
   getIconCSS,
   getInputCSS,
   getLabelCSS,
-} from 'Components/TextInput/TextInput.styles';
+} from './TextInput.styles';
 import {t} from 'Util/LocalizerUtil';
 
 export interface UserInputProps {
