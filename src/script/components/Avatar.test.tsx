@@ -36,7 +36,7 @@ class AvatarPage extends TestPage<AvatarProps> {
   getServiceAvatar = () => this.get('div[data-uie-name="element-avatar-service"]');
   getUserAvatar = () => this.get('div[data-uie-name="element-avatar-user"]');
 
-  clickUserAvatar = () => this.click(this.getUserParticipantAvatar());
+  clickUserAvatar = () => this.click(this.getUserParticipantAvatar()!);
 }
 
 describe('Avatar', () => {
@@ -51,8 +51,8 @@ describe('Avatar', () => {
 
     participantAvatar.clickUserAvatar();
 
-    expect(participantAvatar.getProps().onAvatarClick).toHaveBeenCalledWith(
-      participantAvatar.getProps().participant,
+    expect(participantAvatar.getProps()?.onAvatarClick).toHaveBeenCalledWith(
+      participantAvatar.getProps()?.participant,
       jasmine.anything(),
     );
   });
