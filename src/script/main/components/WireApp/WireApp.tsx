@@ -33,6 +33,7 @@ import type {User} from '../../../entity/User';
 import {CallingContainer} from 'Components/calling/CallingOverlayContainer';
 import {useMemo} from 'react';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
+import {showInitialModal} from '../../../user/AvailabilityModal';
 
 const html = require('./template/wire-main.htm');
 interface WireAppProps {
@@ -51,6 +52,8 @@ export const WireApp: React.FC<WireAppProps> = ({app, selfUser}) => {
 
   const initKoApp = (appContainer: HTMLDivElement) => {
     ko.applyBindings(mainView, appContainer);
+    mainView.modals.ready();
+    showInitialModal(selfUser.availability());
 
     repositories.notification.setContentViewModelStates(mainView.content.state, mainView.multitasking);
 
