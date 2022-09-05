@@ -138,7 +138,7 @@ const VideoAsset: React.FC<VideoAssetProps> = ({
         <>
           <div
             className={cx('video-asset__container', {'video-asset__container--small': displaySmall})}
-            onPointerLeave={() => startTimeout()}
+            onPointerLeave={startTimeout}
             onPointerEnter={() => {
               removeTimeout();
               setHideControls(false);
