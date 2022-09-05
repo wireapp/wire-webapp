@@ -1,7 +1,7 @@
 <div
   id="conversation"
   class="conversation"
-  data-bind="drop_file: $data.inputBar.onDropFiles, css: { loading: !$data.messageList.conversationLoaded() }"
+  data-bind="css: { loading: !$data.messageList.conversationLoaded() }"
 >
   <!-- ko if: $data.conversationRepository.conversationState.activeConversation() -->
   <title-bar
@@ -40,7 +40,21 @@
   "
   ></messages-list>
 
-  {{> './conversation/input-bar.htm' }}
+  <input-bar
+    params="
+      assetRepository: $data.repositories.asset,
+      conversationEntity: $data.conversationState.activeConversation(),
+      conversationRepository: $data.repositories.conversation,
+      eventRepository: $data.repositories.event,
+      messageRepository: $data.repositories.message,
+      propertiesRepository: $data.repositories.properties,
+      searchRepository: $data.repositories.search,
+      storageRepository: $data.repositories.storage,
+      teamState: $data.teamState,
+      userState: $data.userState,
+    ">
+  </input-bar>
+
 
   <div class="conversation-loading">
     <div class="icon-spinner spin accent-text"></div>

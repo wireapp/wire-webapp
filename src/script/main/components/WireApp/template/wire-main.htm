@@ -1,4 +1,4 @@
-<!-- ko with: list-->
+<!-- ko with: list -->
 <div id="left-column" class="left-column" data-bind="css: {'left-column--light-theme': !isActivatedAccount()}">
   <header><h1 class="visually-hidden" data-bind="text: t('accessibility.headings.sidebar')"></h1></header>
   <left-sidebar params="listViewModel: $data, selfUser: selfUser"></left-sidebar>
@@ -7,50 +7,57 @@
 <!-- ko with: content -->
 <div id="center-column" class="center-column">
   <main-content params="contentViewModel: $data"></main-content>
+
   <!-- ko if: state() === State.CONNECTION_REQUESTS -->
-  <h1 class="visually-hidden" data-bind="text: t('accessibility.headings.connectionRequests')"></h1>
-  {{> ./content/connect-requests.htm}}
+    <h1 class="visually-hidden" data-bind="text: t('accessibility.headings.connectionRequests')"></h1>
+
+    <connect-requests
+      params="
+          actionsViewModel: $data.mainViewModel.actions,
+          userState: $data.userState,
+          teamState: $data.teamState,
+        "
+    ></connect-requests>
   <!-- /ko -->
   <!-- ko if: state() === State.CONVERSATION -->
-  <h1 class="visually-hidden" data-bind="text: t('accessibility.headings.conversation')"></h1>
-  {{> './content/conversation.htm'}}
+    <h1 class="visually-hidden" data-bind="text: t('accessibility.headings.conversation')"></h1>
+    {{> 'content/conversation.htm' }}
   <!-- /ko -->
   <!-- ko if: state() === State.HISTORY_EXPORT -->
-  <h1 class="visually-hidden" data-bind="text: t('accessibility.headings.historyExport')"></h1>
-  {{> './content/history-export.htm'}}
+    <h1 class="visually-hidden" data-bind="text: t('accessibility.headings.historyExport')"></h1>
+
+    <history-export
+      style="height: 100%;"
+      params="
+        backupRepository: $data.repositories.backup,
+        userState: $data.userState,
+      "
+    ></history-export>
   <!-- /ko -->
-  <!-- ko if: state() === State.HISTORY_IMPORT -->
-  <h1 class="visually-hidden" data-bind="text: t('accessibility.headings.historyImport')"></h1>
-  {{> './content/history-import.htm'}}
-  <!-- /ko -->
-  <group-creation-modal
-    params="
-          conversationRepository: $data.repositories.conversation,
-          searchRepository: $data.repositories.search,
-          teamRepository: $data.repositories.team,
-        "
-  ></group-creation-modal>
-  {{> './modal/legal-hold.htm'}}
+
+  <group-creation-modal params="
+    conversationRepository: $data.repositories.conversation,
+    searchRepository: $data.repositories.search,
+    teamRepository: $data.repositories.team,
+  "></group-creation-modal>
+  {{> 'modal/legal-hold.htm' }}
   <div class="center-column__overlay"></div>
 </div>
 <!-- /ko -->
 <!-- ko with: panel -->
 <div id="right-column" class="right-column">
-  {{> './panel/conversation-details.htm'}}
-  {{> './panel/conversation-participants.htm'}}
-  {{> './panel/add-participants.htm'}}
-  {{> './panel/group-participant-user.htm'}}
-  {{> './panel/group-participant-service.htm'}}
-  {{> './panel/guest-options.htm'}}
-  {{> './panel/services-options.htm'}}
-  {{> './panel/notifications.htm'}}
-  {{> './panel/participant-devices.htm'}}
-  {{> './panel/timed-messages.htm'}}
-  {{> './panel/message-details.htm'}}
+  {{> 'panel/conversation-details.htm' }}
+  {{> 'panel/conversation-participants.htm' }}
+  {{> 'panel/add-participants.htm' }}
+  {{> 'panel/group-participant-user.htm' }}
+  {{> 'panel/group-participant-service.htm' }}
+  {{> 'panel/guest-options.htm' }}
+  {{> 'panel/services-options.htm' }}
+  {{> 'panel/notifications.htm' }}
+  {{> 'panel/participant-devices.htm' }}
+  {{> 'panel/timed-messages.htm' }}
+  {{> 'panel/message-details.htm' }}
 </div>
-<!-- /ko -->
-<!-- ko with: lightbox -->
-{{> './detail-view.htm'}}
 <!-- /ko -->
 <!-- ko with: modals -->
 {{> './modals.htm'}}

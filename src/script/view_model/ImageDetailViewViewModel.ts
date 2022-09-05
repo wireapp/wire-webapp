@@ -38,13 +38,13 @@ import type {MessageRepository} from '../conversation/MessageRepository';
 
 export class ImageDetailViewViewModel {
   actionsViewModel: ActionsViewModel;
-  source: string;
-  imageModal: Modal;
-  imageSrc: ko.Observable<string>;
+  source?: string;
+  imageModal?: Modal;
+  imageSrc: ko.Observable<string | undefined>;
   imageVisible: ko.Observable<boolean>;
-  conversationEntity: ko.Observable<Conversation>;
+  conversationEntity: ko.Observable<Conversation | undefined>;
   items: ko.ObservableArray<ContentMessage>;
-  messageEntity: ko.Observable<ContentMessage>;
+  messageEntity: ko.Observable<ContentMessage | undefined>;
 
   constructor(
     mainViewModel: MainViewModel,
@@ -66,7 +66,7 @@ export class ImageDetailViewViewModel {
     this.messageEntity.subscribe(messageEntity => {
       if (messageEntity) {
         const conversationId = messageEntity.conversation_id;
-        const isExpectedId = this.conversationEntity() ? conversationId === this.conversationEntity().id : false;
+        const isExpectedId = this.conversationEntity() ? conversationId === this.conversationEntity()?.id : false;
         if (!isExpectedId) {
           this.conversationRepository
             .getConversationById({domain: '', id: conversationId})
@@ -84,7 +84,10 @@ export class ImageDetailViewViewModel {
 
   readonly hideCallback = () => {
     document.removeEventListener('keydown', this.onKeyDownLightBox);
-    window.URL.revokeObjectURL(this.imageSrc());
+    const imageSrc = this.imageSrc();
+    if (imageSrc) {
+      window.URL.revokeObjectURL(imageSrc);
+    }
 
     this.imageSrc(undefined);
     this.items.removeAll();
@@ -138,8 +141,12 @@ export class ImageDetailViewViewModel {
   };
 
   readonly messageAdded = (messageEntity: ContentMessage) => {
-    const isCurrentConversation = this.conversationEntity().id === messageEntity.conversation_id;
-    const isImage = messageEntity.category & MessageCategory.IMAGE && !(messageEntity.category & MessageCategory.GIF);
+    const isCurrentConversation = this.conversationEntity()?.id === messageEntity.conversation_id;
+    const category = messageEntity.category;
+    if (!category) {
+      return;
+    }
+    const isImage = category & MessageCategory.IMAGE && !(category & MessageCategory.GIF);
     if (isCurrentConversation && isImage) {
       this.items.push(messageEntity);
     }
@@ -150,11 +157,11 @@ export class ImageDetailViewViewModel {
   };
 
   readonly messageRemoved = (messageId: string, conversationId: string) => {
-    const isCurrentConversation = this.conversationEntity().id === conversationId;
+    const isCurrentConversation = this.conversationEntity()?.id === conversationId;
     if (isCurrentConversation) {
-      const isVisibleMessage = this.messageEntity().id === messageId;
+      const isVisibleMessage = this.messageEntity()?.id === messageId;
       if (isVisibleMessage) {
-        return this.imageModal.hide();
+        return this.imageModal?.hide();
       }
 
       this.items.remove(messageEntity => messageEntity.id === messageId);
@@ -167,7 +174,7 @@ export class ImageDetailViewViewModel {
 
   private readonly loadImage = () => {
     this.imageVisible(false);
-    this.assetRepository.load((this.messageEntity().getFirstAsset() as MediumImage).resource()).then(blob => {
+    this.assetRepository.load((this.messageEntity()?.getFirstAsset() as MediumImage).resource()).then(blob => {
       if (blob) {
         this.imageSrc(window.URL.createObjectURL(blob));
         this.imageVisible(true);
@@ -180,21 +187,26 @@ export class ImageDetailViewViewModel {
   };
 
   readonly clickOnClose = () => {
-    this.imageModal.hide();
+    this.imageModal?.hide();
   };
 
   readonly clickOnDownload = () => {
-    this.messageEntity().download(this.assetRepository);
+    this.messageEntity()?.download(this.assetRepository);
   };
 
   readonly clickOnLike = () => {
-    this.messageRepository.toggleLike(this.conversationEntity(), this.messageEntity());
+    const conversation = this.conversationEntity();
+    const message = this.messageEntity();
+    if (!conversation || !message) {
+      return;
+    }
+    this.messageRepository.toggleLike(conversation, message);
   };
 
   readonly clickOnReply = () => {
     amplify.publish(WebAppEvents.CONVERSATION.SHOW, this.conversationEntity(), {});
     amplify.publish(WebAppEvents.CONVERSATION.MESSAGE.REPLY, this.messageEntity());
-    this.imageModal.hide();
+    this.imageModal?.hide();
   };
 
   readonly clickOnShowNext = (imageDetailViewViewModel: unknown, event: MouseEvent | KeyboardEvent) => {
