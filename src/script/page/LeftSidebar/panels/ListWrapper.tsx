@@ -83,7 +83,7 @@ const ListWrapper: React.FC<LeftListWrapperProps> = ({
     if (!scrollbarRef) {
       return undefined;
     }
-    const onScroll = (event: Event) => calculateBorders(event.target as HTMLElement);
+    const onScroll = (event: MouseEvent) => calculateBorders(event.target as HTMLElement);
     calculateBorders(scrollbarRef);
     scrollbarRef.addEventListener('scroll', onScroll);
 

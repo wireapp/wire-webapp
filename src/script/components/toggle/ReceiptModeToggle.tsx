@@ -36,7 +36,7 @@ const ReceiptModeToggle: React.FC<ReceiptModeToggleProps> = ({receiptMode, onRec
     onReceiptModeChanged(newReceiptMode);
   };
 
-  const inputRef = React.useRef<HTMLInputElement>(null);
+  const inputRef = React.useRef<HTMLInputElement>();
   const isChecked = receiptMode !== RECEIPT_MODE.OFF;
   return (
     <Fragment>

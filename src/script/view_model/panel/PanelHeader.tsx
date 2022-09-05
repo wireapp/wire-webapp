@@ -17,7 +17,7 @@
  *
  */
 
-import {forwardRef, ForwardRefRenderFunction, ForwardedRef} from 'react';
+import React from 'react';
 
 import DragableClickWrapper from 'Components/DragableClickWrapper';
 import {t} from 'Util/LocalizerUtil';
@@ -29,41 +29,21 @@ export interface PanelHeaderProps {
   onClose: () => void;
   onGoBack: () => void;
   title?: string;
-  tabIndex?: number;
-  handleBlur?: () => void;
 }
 
-const PanelHeader: ForwardRefRenderFunction<HTMLButtonElement, PanelHeaderProps> = (
-  {onGoBack, onClose, title, goBackUie, closeUie = 'do-close', tabIndex = 0, handleBlur}: PanelHeaderProps,
-  ref: ForwardedRef<HTMLButtonElement>,
-) => {
+const PanelHeader: React.FC<PanelHeaderProps> = ({onGoBack, onClose, title, goBackUie, closeUie = 'do-close'}) => {
   return (
     <div className="panel__header">
       <DragableClickWrapper onClick={onGoBack}>
-        <button
-          id="arrowleftiid"
-          ref={ref}
-          className="icon-button"
-          data-uie-name={goBackUie}
-          title={t('index.goBack')}
-          tabIndex={tabIndex}
-          onBlur={handleBlur}
-        >
+        <button className="icon-button" data-uie-name={goBackUie} title={t('index.goBack')}>
           <Icon.ArrowLeft />
         </button>
       </DragableClickWrapper>
-      {/*eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex*/}
-      <div className="panel__header__title" tabIndex={0}>
-        {title}
-      </div>
+
+      <div className="panel__header__title">{title}</div>
+
       <DragableClickWrapper onClick={onClose}>
-        <button
-          className="icon-button"
-          data-uie-name={closeUie}
-          title={t('accessibility.rightPanel.close')}
-          tabIndex={tabIndex}
-          onBlur={handleBlur}
-        >
+        <button className="icon-button" data-uie-name={closeUie} title={t('accessibility.rightPanel.close')}>
           <Icon.Close className="right-panel-close" />
         </button>
       </DragableClickWrapper>
@@ -71,4 +51,4 @@ const PanelHeader: ForwardRefRenderFunction<HTMLButtonElement, PanelHeaderProps>
   );
 };
 
-export default forwardRef(PanelHeader);
+export default PanelHeader;

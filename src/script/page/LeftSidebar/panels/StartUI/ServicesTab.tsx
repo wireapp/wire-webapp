@@ -42,9 +42,7 @@ export const ServicesTab: React.FC<{
   useDebounce(
     async () => {
       const results = await integrationRepository.searchForServices(searchQuery);
-      if (results) {
-        setServices(results);
-      }
+      setServices(results);
     },
     300,
     [searchQuery],

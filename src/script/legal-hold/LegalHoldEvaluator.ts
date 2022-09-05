@@ -25,7 +25,7 @@ import type {User} from '../entity/User';
 import {CONVERSATION} from '../event/Client';
 
 export type MappedEvent = Record<string, any> & {
-  data?: MappedEventData | string;
+  data?: MappedEventData;
   type: CONVERSATION_EVENT | CONVERSATION;
 };
 
@@ -52,7 +52,6 @@ export const hasMessageLegalHoldFlag = (mappedEvent: MappedEvent): boolean => {
   const supportsLegalHoldFlag = [CONVERSATION.MESSAGE_ADD].includes(mappedEvent.type as CONVERSATION);
   const hasLegalHoldFlag =
     mappedEvent.data &&
-    typeof mappedEvent.data !== 'string' &&
     typeof mappedEvent.data.legal_hold_status !== 'undefined' &&
     mappedEvent.data.legal_hold_status !== LegalHoldStatus.UNKNOWN;
   return supportsLegalHoldFlag && hasLegalHoldFlag;
@@ -60,7 +59,7 @@ export const hasMessageLegalHoldFlag = (mappedEvent: MappedEvent): boolean => {
 
 export const renderLegalHoldMessage = (mappedEvent: MappedEvent, localConversationState: LegalHoldStatus): boolean => {
   if (hasMessageLegalHoldFlag(mappedEvent)) {
-    return typeof mappedEvent.data !== 'string' && mappedEvent.data.legal_hold_status !== localConversationState;
+    return mappedEvent.data.legal_hold_status !== localConversationState;
   }
   return false;
 };

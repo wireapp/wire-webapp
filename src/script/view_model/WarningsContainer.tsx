@@ -53,10 +53,8 @@ const WarningsContainer: React.FC = () => {
     const isMiniMode = CONFIG.MINI_MODES.includes(visibleWarning);
 
     const app = document.querySelector('#app');
-    if (app) {
-      app.classList.toggle('app--small-offset', hasOffset && isMiniMode);
-      app.classList.toggle('app--large-offset', hasOffset && !isMiniMode);
-    }
+    app.classList.toggle('app--small-offset', hasOffset && isMiniMode);
+    app.classList.toggle('app--large-offset', hasOffset && !isMiniMode);
 
     afterRender(() => window.dispatchEvent(new Event('resize')));
   }, [warnings]);

@@ -52,37 +52,23 @@ const Device: React.FC<{
   isSSO: boolean;
   onRemove: (device: ClientEntity) => void;
   onSelect: (device: ClientEntity) => void;
-  deviceNumber: number;
-}> = ({device, isSSO, onSelect, onRemove, deviceNumber}) => {
+}> = ({device, isSSO, onSelect, onRemove}) => {
   const {isVerified} = useKoSubscribableChildren(device.meta, ['isVerified']);
-  const deviceAriaLabel = `${t('preferencesDevice')} ${deviceNumber}, ${device.getName()}, ${
-    isVerified ? t('preferencesDevicesVerification') : t('preferencesDeviceNotVerified')
-  }, `;
-  const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
-    e.stopPropagation();
-    onRemove(device);
-  };
-  const handleKeyPress = (e: React.KeyboardEvent<HTMLButtonElement>) => {
-    e.stopPropagation();
-  };
+
   return (
     <div
+      role="button"
+      tabIndex={0}
       className="preferences-devices-card"
       onClick={() => onSelect(device)}
       onKeyDown={e => handleKeyDown(e, onSelect.bind(null, device))}
-      tabIndex={0}
-      role="button"
     >
       <div className="preferences-devices-card-data">
         <div className="preferences-devices-card-icon" data-uie-value={device.id} data-uie-name="device-id">
           <VerifiedIcon data-uie-name={`user-device-${isVerified ? '' : 'not-'}verified`} isVerified={isVerified} />
         </div>
         <div className="preferences-devices-card-info">
-          <div
-            className="preferences-devices-model"
-            data-uie-name="preferences-device-active-model"
-            aria-label={deviceAriaLabel}
-          >
+          <div className="preferences-devices-model" data-uie-name="preferences-device-active-model">
             {device.getName()}
           </div>
           <div className="preferences-devices-id">
@@ -99,19 +85,16 @@ const Device: React.FC<{
             aria-label={t('preferencesDevicesRemove')}
             type="button"
             className={`preferences-devices-card-action__delete ${isSSO && 'svg-red'}`}
-            onClick={handleClick}
-            onKeyDown={handleKeyPress}
+            onClick={event => {
+              event.stopPropagation();
+              onRemove(device);
+            }}
             data-uie-name="do-device-remove"
           >
             <Icon.Delete />
           </button>
         )}
-        <button
-          className="icon-forward preferences-devices-card-action__forward"
-          data-uie-name="go-device-details"
-          aria-label={t('accessibility.headings.preferencesDeviceDetails')}
-          aria-hidden={true}
-        ></button>
+        <div className="icon-forward preferences-devices-card-action__forward" data-uie-name="go-device-details" />
       </div>
     </div>
   );
@@ -165,14 +148,13 @@ const DevicesPreferences: React.FC<DevicesPreferencesProps> = ({
         {clients.length > 0 && (
           <fieldset className="preferences-section">
             <legend className="preferences-header">{t('preferencesDevicesActive')}</legend>
-            {clients.map((device, index) => (
+            {clients.map(device => (
               <Device
                 device={device}
                 key={device.id}
                 isSSO={isSSO}
                 onSelect={setSelectedDevice}
                 onRemove={removeDevice}
-                deviceNumber={++index}
               />
             ))}
             <div className="preferences-detail">{t('preferencesDevicesActiveDetail')}</div>

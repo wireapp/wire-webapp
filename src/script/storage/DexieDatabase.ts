@@ -22,7 +22,6 @@ import {StorageSchemata} from './StorageSchemata';
 import {getLogger, Logger} from 'Util/Logger';
 import {ClientRecord} from './record/ClientRecord';
 import {AmplifyRecord, ConversationRecord, CryptoboxRecord, EventRecord, UserRecord} from './record';
-import {GroupIdRecord} from './record/GroupIdRecord';
 
 /**
  * TypeScript representation of local IndexedDB schema managed with Dexie.
@@ -39,7 +38,6 @@ export class DexieDatabase extends Dexie {
   prekeys: Table<CryptoboxRecord, string>;
   sessions: Table<CryptoboxRecord, string>;
   users: Table<UserRecord, string>;
-  groupIds: Table<GroupIdRecord, string>;
 
   private readonly logger: Logger;
 
@@ -66,6 +64,5 @@ export class DexieDatabase extends Dexie {
     this.prekeys = this.table(StorageSchemata.OBJECT_STORE.PRE_KEYS);
     this.sessions = this.table(StorageSchemata.OBJECT_STORE.SESSIONS);
     this.users = this.table(StorageSchemata.OBJECT_STORE.USERS);
-    this.groupIds = this.table(StorageSchemata.OBJECT_STORE.GROUP_IDS);
   }
 }

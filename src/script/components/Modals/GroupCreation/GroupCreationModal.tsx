@@ -52,7 +52,6 @@ import {
 } from '../../../conversation/ConversationAccessPermission';
 import useEffectRef from 'Util/useEffectRef';
 import {useFadingScrollbar} from '../../../ui/fadingScrollbar';
-import {Config} from '../../../Config';
 
 interface GroupCreationModalProps {
   conversationRepository: ConversationRepository;
@@ -97,8 +96,7 @@ const GroupCreationModal: React.FC<GroupCreationModalProps> = ({
   const maxSize = ConversationRepository.CONFIG.GROUP.MAX_SIZE;
 
   const onEscape = () => setIsShown(false);
-  const {isTeam, isMLSEnabled: isMLSEnabledForTeam} = useKoSubscribableChildren(teamState, ['isTeam', 'isMLSEnabled']);
-  const enableMlsCheckbox = isMLSEnabledForTeam || Config.getConfig().FEATURE.ENABLE_MLS;
+  const {isTeam, isMLSEnabled} = useKoSubscribableChildren(teamState, ['isTeam', 'isMLSEnabled']);
 
   useEffect(() => {
     const showCreateGroup = (_: string, userEntity: User) => {
@@ -388,7 +386,7 @@ const GroupCreationModal: React.FC<GroupCreationModalProps> = ({
                   isDisabled={false}
                   name={t('readReceiptsToggleName')}
                 />
-                {enableMlsCheckbox && (
+                {isMLSEnabled && (
                   <InfoToggle
                     className="modal-style"
                     dataUieName="mls"

@@ -30,7 +30,7 @@ import {
   CONVERSATION_TYPE,
   RemoteConversations,
 } from '@wireapp/api-client/src/conversation';
-import {QualifiedId} from '@wireapp/api-client/src/user';
+
 import {ACCESS_STATE} from './AccessState';
 import {ConversationStatus} from './ConversationStatus';
 import {Conversation} from '../entity/Conversation';
@@ -131,7 +131,7 @@ export class ConversationMapper {
 
     if (archived_timestamp) {
       conversationEntity.setTimestamp(archived_timestamp, Conversation.TIMESTAMP_TYPE.ARCHIVED);
-      conversationEntity.archivedState(selfState.archived_state ?? false);
+      conversationEntity.archivedState(selfState.archived_state);
     }
 
     if (cleared_timestamp !== undefined) {
@@ -212,16 +212,11 @@ export class ConversationMapper {
       throw new ConversationError(BASE_ERROR_TYPE.INVALID_PARAMETER, BaseError.MESSAGE.INVALID_PARAMETER);
     }
 
-    const {creator, id, members, name, others, qualified_others, type, group_id, protocol} = conversationData;
-    let conversationEntity = new Conversation(
-      id,
-      conversationData.domain || conversationData.qualified_id?.domain,
-      protocol,
-    );
+    const {creator, id, members, name, others, qualified_others, type} = conversationData;
+    let conversationEntity = new Conversation(id, conversationData.domain || conversationData.qualified_id?.domain);
     conversationEntity.roles(conversationData.roles || {});
 
     conversationEntity.creator = creator;
-    conversationEntity.groupId = group_id;
     conversationEntity.type(type);
     conversationEntity.name(name || '');
 
@@ -273,22 +268,12 @@ export class ConversationMapper {
   ): ConversationDatabaseData[] {
     localConversations = localConversations.filter(conversationData => conversationData);
 
-    const failedConversations = (remoteConversations.failed ?? []).reduce(
-      (prev: ConversationDatabaseData[], curr: QualifiedId) => {
-        const convo = localConversations.find(conversationId => matchQualifiedIds(conversationId, curr));
-        return convo ? [...prev, convo] : prev;
-      },
-      [],
+    const failedConversations = (remoteConversations.failed ?? []).map(failedConversationId =>
+      localConversations.find(conversationId => matchQualifiedIds(conversationId, failedConversationId)),
     );
 
-    const localArchives = localConversations.filter(
-      conversationData =>
-        conversationData.archived_state &&
-        remoteConversations.found?.findIndex(remote => remote.qualified_id.id === conversationData.id) === -1,
-    );
-
-    const foundRemoteConversations = remoteConversations.found.map(
-      (remoteConversationData: ConversationBackendData, index: number) => {
+    return remoteConversations.found
+      .map((remoteConversationData: ConversationBackendData & {receipt_mode: number}, index: number) => {
         const remoteConversationId: QualifiedEntity = remoteConversationData.qualified_id || {
           domain: '',
           id: remoteConversationData.id,
@@ -309,8 +294,6 @@ export class ConversationMapper {
           name,
           team,
           type,
-          group_id,
-          protocol,
         } = remoteConversationData;
         const {others: othersStates, self: selfState} = members;
 
@@ -320,10 +303,8 @@ export class ConversationMapper {
           accessRoleV2: access_role_v2,
           creator,
           domain: qualified_id?.domain,
-          group_id,
           message_timer,
           name,
-          protocol,
           receipt_mode,
           roles: {},
           status: (selfState as any).status,
@@ -402,9 +383,8 @@ export class ConversationMapper {
         }
 
         return mergedConversation;
-      },
-    );
-    return [...foundRemoteConversations, ...failedConversations, ...localArchives];
+      })
+      .concat(failedConversations);
   }
 
   static mapAccessCode(conversation: Conversation, accessCode: ConversationCode): void {

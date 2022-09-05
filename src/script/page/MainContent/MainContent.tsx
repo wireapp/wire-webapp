@@ -17,7 +17,7 @@
  *
  */
 
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import {CSSTransition, SwitchTransition} from 'react-transition-group';
 import {registerReactComponent, useKoSubscribableChildren} from 'Util/ComponentUtil';
 
@@ -35,6 +35,8 @@ import {container} from 'tsyringe';
 import {ClientState} from '../../client/ClientState';
 import {UserState} from '../../user/UserState';
 import {StyledApp, THEME_ID} from '@wireapp/react-ui-kit';
+import {amplify} from 'amplify';
+import {WebAppEvents} from '@wireapp/webapp-events';
 
 // Ko imported components
 import '../message-list/InputBarControls';
@@ -58,8 +60,23 @@ const MainContent: React.FC<LeftSidebarProps> = ({
   const {state} = useKoSubscribableChildren(contentViewModel, ['state']);
   const {activeConversation} = useKoSubscribableChildren(conversationState, ['activeConversation']);
   const repositories = contentViewModel.repositories;
+  const currentTheme = repositories.properties?.properties.settings.interface.theme;
 
-  const {isFederated} = contentViewModel;
+  const [uiKitTheme, setUiKitTheme] = useState<THEME_ID>(currentTheme === 'dark' ? THEME_ID.DARK : THEME_ID.LIGHT);
+
+  const updateTheme = (theme: string) => {
+    setUiKitTheme(theme === 'dark' ? THEME_ID.DARK : THEME_ID.LIGHT);
+  };
+
+  useEffect(() => {
+    amplify.subscribe(WebAppEvents.PROPERTIES.UPDATE.INTERFACE.THEME, updateTheme);
+
+    return () => {
+      amplify.unsubscribe(WebAppEvents.PROPERTIES.UPDATE.INTERFACE.THEME, updateTheme);
+    };
+  }, []);
+
+  const isFederated = contentViewModel.isFederated;
 
   let title = '';
   let content = null;
@@ -151,7 +168,7 @@ const MainContent: React.FC<LeftSidebarProps> = ({
   return (
     <>
       <h1 className="visually-hidden">{title}</h1>
-      <StyledApp themeId={THEME_ID.DEFAULT} css={{backgroundColor: 'unset', height: '100%'}}>
+      <StyledApp themeId={uiKitTheme} css={{backgroundColor: 'unset', height: '100%'}}>
         <SwitchTransition>
           <Animated key={state}>{content}</Animated>
         </SwitchTransition>

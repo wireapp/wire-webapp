@@ -24,16 +24,16 @@ import {
   DeviceIcon,
   Form,
   Input,
+  InputBlock,
+  InputSubmitCombo,
   Line,
-  IconButton,
+  RoundIconButton,
   Small,
   Text,
   TrashIcon,
-  FlexBox,
 } from '@wireapp/react-ui-kit';
 import React, {useEffect, useState} from 'react';
 import {useIntl} from 'react-intl';
-import {t} from 'Util/LocalizerUtil';
 import {splitFingerprint} from 'Util/StringUtil';
 import {clientItemStrings} from '../../strings';
 import {ValidationError} from '../module/action/ValidationError';
@@ -185,21 +185,10 @@ const ClientItem = ({selected, onClientRemoval, onClick, client, clientError, re
     setIsValidPassword(true);
   };
 
-  const animatedCardSpacing = {
-    l: 32,
-    m: 16,
-    s: 12,
-    xl: 48,
-    xs: 8,
-    xxs: 4,
-  };
-
-  const inputContainerHeight = 104;
-
   const animationPosition = animationStep / CONFIG.animationSteps;
-  const smoothHeight = animationPosition * inputContainerHeight;
-  const smoothMarginTop = animationPosition * animatedCardSpacing.m;
-  const isOpen = requirePassword && (isSelected || isAnimating);
+  const height = animationPosition * 56;
+  const marginTop = animationPosition * 16;
+  const paddingHorizontal = animationPosition * 2;
 
   return (
     <ContainerXS>
@@ -208,8 +197,8 @@ const ClientItem = ({selected, onClientRemoval, onClick, client, clientError, re
           ['&:focus-within']: {
             boxShadow: `0 0 0 1px ${COLOR.BLUE}`,
           },
-          backgroundColor: selected ? '#FFF' : '',
-          borderRadius: '12px',
+          backgroundColor: selected ? 'white' : '',
+          borderRadius: '4px',
           transition: 'background-color .35s linear',
         }}
         data-uie-value={client.model}
@@ -218,21 +207,16 @@ const ClientItem = ({selected, onClientRemoval, onClick, client, clientError, re
           onClick={(event: React.MouseEvent<HTMLDivElement>) => requirePassword && wrappedOnClick(event)}
           style={{
             cursor: requirePassword ? 'pointer' : 'auto',
-            margin: `${smoothMarginTop}px 0 0 0`,
-            padding: `0 ${animatedCardSpacing.m}px`,
+            margin: `${marginTop}px 0 0 0`,
+            padding: '5px 16px 0 16px',
           }}
           data-uie-name="go-remove-device"
         >
-          <FlexBox>
-            <div
-              style={{
-                flexBasis: animatedCardSpacing.l,
-                margin: isOpen ? `${18 - smoothMarginTop / 2}px 0 0 0` : 'auto',
-              }}
-            >
+          <div style={{display: 'flex', flexDirection: 'row'}}>
+            <div style={{flexBasis: '32px', margin: 'auto'}}>
               <DeviceIcon color="#323639" />
             </div>
-            <div style={{flexGrow: 1, marginTop: isOpen ? smoothMarginTop : 0}}>
+            <div style={{flexGrow: 1}}>
               <Text bold block color="#323639" data-uie-name="device-header-model">
                 {formatName(client.model, client.class)}
               </Text>
@@ -240,8 +224,8 @@ const ClientItem = ({selected, onClientRemoval, onClick, client, clientError, re
               <Small block>{formatDate(client.time)}</Small>
             </div>
             {!requirePassword && (
-              <IconButton
-                aria-label={t('modalAccountRemoveDeviceAction')}
+              <RoundIconButton
+                color={COLOR.RED}
                 data-uie-name="do-remove-device"
                 formNoValidate
                 onClick={handlePasswordlessClientDeletion}
@@ -249,63 +233,51 @@ const ClientItem = ({selected, onClientRemoval, onClick, client, clientError, re
                 type="submit"
               >
                 <TrashIcon />
-              </IconButton>
+              </RoundIconButton>
             )}
-          </FlexBox>
-          <Line
-            color="rgba(51, 55, 58, .04)"
-            style={{
-              backgroundColor: 'transparent',
-              margin: `${animatedCardSpacing.xxs}px 0 0 ${animatedCardSpacing.l}px`,
-            }}
-          />
+          </div>
+          <Line color="rgba(51, 55, 58, .04)" style={{backgroundColor: 'transparent', margin: '4px 0 0 0'}} />
         </ContainerXS>
-        {isOpen && (
-          <ContainerXS style={{overflow: 'hidden'}}>
+        {requirePassword && (isSelected || isAnimating) && (
+          <ContainerXS style={{maxHeight: `${height}px`, overflow: 'hidden', padding: `${paddingHorizontal}px 0`}}>
             <Form>
-              <FlexBox
-                css={{
-                  alignItems: 'center',
-                  margin: `${animatedCardSpacing.s}px ${animatedCardSpacing.m}px 0px ${animatedCardSpacing.xl}px`,
-                  maxHeight: smoothHeight,
-                }}
-              >
-                <FlexBox css={{flexGrow: 1, marginRight: `${animatedCardSpacing.s}px`}}>
+              <InputBlock>
+                <InputSubmitCombo style={{background: 'transparent', boxShadow: 'none', marginBottom: '0'}}>
                   <Input
                     id="remove-device-password"
                     autoComplete="section-login password"
                     data-uie-name="remove-device-password"
                     ref={passwordInput}
                     name="password"
-                    label={t('modalAccountRemoveDevicePlaceholder')}
                     onChange={onPasswordChange}
                     pattern=".{1,1024}"
                     placeholder={_(clientItemStrings.passwordPlaceholder)}
                     required
+                    style={{background: 'transparent'}}
                     type="password"
                     value={password}
                   />
-                </FlexBox>
-                <IconButton
-                  aria-label={t('modalAccountRemoveDeviceAction')}
-                  data-uie-name="do-remove-device"
-                  disabled={!password || !isValidPassword}
-                  formNoValidate
-                  css={{margin: `0 ${animatedCardSpacing.xs}px`}}
-                  onClick={handleSubmit}
-                  type="submit"
-                >
-                  <TrashIcon />
-                </IconButton>
-              </FlexBox>
+                  <RoundIconButton
+                    color={COLOR.RED}
+                    data-uie-name="do-remove-device"
+                    disabled={!password || !isValidPassword}
+                    formNoValidate
+                    onClick={handleSubmit}
+                    style={{marginBottom: '-4px'}}
+                    type="submit"
+                  >
+                    <TrashIcon />
+                  </RoundIconButton>
+                </InputSubmitCombo>
+              </InputBlock>
             </Form>
           </ContainerXS>
         )}
       </ContainerXS>
       {validationError && selected ? (
-        <div style={{margin: `${animatedCardSpacing.m}px 0 0 0`}}>{parseValidationErrors(validationError)}</div>
+        <div style={{margin: '16px 0 0 0'}}>{parseValidationErrors(validationError)}</div>
       ) : clientError && selected ? (
-        <div style={{margin: `${animatedCardSpacing.m}px 0 0 0`}} data-uie-name="error-message">
+        <div style={{margin: '16px 0 0 0'}} data-uie-name="error-message">
           {parseError(clientError)}
         </div>
       ) : null}

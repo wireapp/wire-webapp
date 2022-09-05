@@ -144,12 +144,6 @@
   &__info-text {
     .subline;
 
-    &:focus-visible {
-      .focus-outline;
-      .focus-offset;
-      .focus-border-radius;
-    }
-
     color: var(--gray-90);
 
     body.theme-dark & {
@@ -167,12 +161,6 @@
     &--head {
       font-weight: @font-weight-bold;
       text-transform: uppercase;
-    }
-  }
-
-  &__item-offset {
-    &:focus-visible {
-      outline-offset: -0.2rem;
     }
   }
 
@@ -215,18 +203,13 @@
         input {
           & + span {
             &::before {
-              border: @radio-border-width solid var(--gray-60);
+              border: 1px solid var(--gray-60);
               background-color: var(--gray-90);
             }
           }
-
           &:checked + span::before {
-            border: @radio-selected-border-width solid var(--accent-color-500);
+            border: 6px solid var(--accent-color-600);
             background-color: var(--gray-90);
-          }
-
-          &:hover + span::before {
-            border-color: var(--accent-color-500);
           }
         }
       }
@@ -241,10 +224,10 @@
 
           &::before {
             display: inline-block;
-            width: @radio-size;
-            height: @radio-size;
+            width: 22px;
+            height: 22px;
             box-sizing: border-box;
-            border: @radio-border-width solid var(--gray-80);
+            border: 1px solid var(--gray-80);
             margin-right: 16px;
             background-color: var(--white);
             border-radius: 50%;
@@ -255,12 +238,8 @@
         }
 
         &:checked + span::before {
-          border: @radio-selected-border-width solid var(--accent-color-500);
+          border: 6px solid var(--accent-color-500);
           background-color: var(--white);
-        }
-
-        &:hover + span::before {
-          border-color: var(--accent-color-500);
         }
 
         &:disabled {
@@ -409,12 +388,6 @@
     &__title {
       .heading-h3;
 
-      &:focus-visible {
-        .focus-outline;
-        .focus-offset;
-        .focus-border-radius;
-      }
-
       &:first-child {
         flex-grow: 1;
         margin-left: @content-title-bar-height;
@@ -489,12 +462,6 @@ button.panel__action-item {
   .text-medium;
 }
 
-button.panel__action-item:focus-visible {
-  .focus-outline;
-  outline-offset: -0.2rem;
-  .focus-border-radius;
-}
-
 @keyframes headerfadein {
   0% {
     opacity: 0;
@@ -502,10 +469,4 @@ button.panel__action-item:focus-visible {
   100% {
     opacity: 1;
   }
-}
-
-.notification-section {
-  padding: 0 1rem;
-  border: none;
-  margin-top: 1.5rem;
 }

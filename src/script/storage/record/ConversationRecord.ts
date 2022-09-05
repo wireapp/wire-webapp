@@ -29,11 +29,10 @@ import {
 import type {QualifiedId} from '@wireapp/api-client/src/user/';
 import {LegalHoldStatus} from '@wireapp/protocol-messaging';
 import {RECEIPT_MODE} from '@wireapp/api-client/src/conversation/data';
-import {ConversationProtocol} from '@wireapp/api-client/src/conversation/NewConversation';
 
 export interface ConversationRecord {
-  access_role: CONVERSATION_ACCESS_ROLE | ACCESS_ROLE_V2[];
   access: CONVERSATION_ACCESS[];
+  access_role: CONVERSATION_ACCESS_ROLE | ACCESS_ROLE_V2[];
   archived_state: boolean;
   archived_timestamp: number;
   cleared_timestamp: number;
@@ -41,8 +40,6 @@ export interface ConversationRecord {
   domain: string | null;
   ephemeral_timer: number;
   global_message_timer: number;
-  group_id: string;
-  protocol: ConversationProtocol;
   id: string;
   is_guest: boolean;
   is_managed: boolean;

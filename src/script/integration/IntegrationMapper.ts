@@ -50,8 +50,7 @@ export const IntegrationMapper = {
     return providerEntity;
   },
 
-  mapServiceFromObject: (serviceData: ServiceData, domain: string) => {
-    const serviceEntity = new ServiceEntity();
+  mapServiceFromObject: (serviceData: ServiceData, serviceEntity = new ServiceEntity()) => {
     if (serviceData) {
       const {assets, description, id, name, provider: providerId, summary, tags} = serviceData;
 
@@ -60,7 +59,7 @@ export const IntegrationMapper = {
       }
 
       if (assets?.length) {
-        const mappedAssets = mapProfileAssets({domain, id: serviceEntity.id}, assets);
+        const mappedAssets = mapProfileAssets(serviceEntity.id, assets);
         updateUserEntityAssets(serviceEntity, mappedAssets);
       }
 
@@ -88,9 +87,9 @@ export const IntegrationMapper = {
     return serviceEntity;
   },
 
-  mapServicesFromArray: (servicesData: ServiceData[] = [], domain: string) => {
+  mapServicesFromArray: (servicesData: ServiceData[] = []) => {
     return servicesData
       .filter(serviceData => serviceData.enabled)
-      .map(serviceData => IntegrationMapper.mapServiceFromObject(serviceData, domain));
+      .map(serviceData => IntegrationMapper.mapServiceFromObject(serviceData));
   },
 };

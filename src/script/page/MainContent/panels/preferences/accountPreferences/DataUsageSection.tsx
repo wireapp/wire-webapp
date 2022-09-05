@@ -32,7 +32,7 @@ import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {Config} from '../../../../../Config';
 import {ConsentValue} from '../../../../../user/ConsentValue';
 import PreferencesSection from '../components/PreferencesSection';
-import {Checkbox, CheckboxLabel} from '@wireapp/react-ui-kit';
+import PreferencesCheckbox from '../components/PreferencesCheckbox';
 
 interface DataUsageSectionProps {
   brandName: string;
@@ -67,64 +67,43 @@ const DataUsageSection: React.FC<DataUsageSectionProps> = ({
 
   return (
     <PreferencesSection hasSeparator title={t('preferencesAccountData')} className="preferences-section-data-usage">
-      <>
-        <Checkbox
-          onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-            const isChecked = event.target.checked;
-            propertiesRepository.savePreference(PROPERTIES_TYPE.PRIVACY, isChecked);
-            setOptionPrivacy(isChecked);
-          }}
-          checked={optionPrivacy}
-          data-uie-name="status-preference-privacy"
-        >
-          <CheckboxLabel htmlFor="status-preference-privacy">{t('preferencesAccountDataCheckbox')}</CheckboxLabel>
-        </Checkbox>
-        <div className="preferences-detail preferences-detail-intended">
-          {t('preferencesAccountDataDetail', brandName)}
-        </div>
-      </>
+      <PreferencesCheckbox
+        checked={optionPrivacy}
+        onChange={checked => {
+          propertiesRepository.savePreference(PROPERTIES_TYPE.PRIVACY, checked);
+          setOptionPrivacy(checked);
+        }}
+        uieName="status-preference-privacy"
+        label={t('preferencesAccountDataCheckbox')}
+        details={t('preferencesAccountDataDetail', brandName)}
+      />
 
       {isTeam && isCountlyEnabled && (
-        <div className="checkbox-margin">
-          <Checkbox
-            onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-              const isChecked = event.target.checked;
-              propertiesRepository.savePreference(PROPERTIES_TYPE.TELEMETRY_SHARING, isChecked);
-              setOptionTelemetry(isChecked);
-            }}
-            checked={optionTelemetry}
-            data-uie-name="status-preference-telemetry"
-          >
-            <CheckboxLabel htmlFor="status-preference-telemetry">
-              {t('preferencesAccountDataTelemetryCheckbox')}
-            </CheckboxLabel>
-          </Checkbox>
-          <div className="preferences-detail preferences-detail-intended">
-            {t('preferencesAccountDataTelemetry', brandName)}
-          </div>
-        </div>
+        <PreferencesCheckbox
+          checked={optionTelemetry}
+          onChange={checked => {
+            propertiesRepository.savePreference(PROPERTIES_TYPE.TELEMETRY_SHARING, checked);
+            setOptionTelemetry(checked);
+          }}
+          uieName="status-preference-telemetry"
+          label={t('preferencesAccountDataTelemetryCheckbox')}
+          details={t('preferencesAccountDataTelemetry', brandName)}
+        />
       )}
+
       {isActivatedAccount && (
-        <div className="checkbox-margin">
-          <Checkbox
-            onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-              const isChecked = event.target.checked;
-              propertiesRepository.updateProperty(
-                PropertiesRepository.CONFIG.WIRE_MARKETING_CONSENT.key,
-                isChecked ? ConsentValue.GIVEN : ConsentValue.NOT_GIVEN,
-              );
-            }}
-            checked={!!marketingConsent}
-            data-uie-name="status-preference-marketing"
-          >
-            <CheckboxLabel htmlFor="status-preference-marketing">
-              {t('preferencesAccountMarketingConsentCheckbox')}
-            </CheckboxLabel>
-          </Checkbox>
-          <div className="preferences-detail preferences-detail-intended">
-            {t('preferencesAccountMarketingConsentDetail', brandName)}
-          </div>
-        </div>
+        <PreferencesCheckbox
+          checked={!!marketingConsent}
+          onChange={checked =>
+            propertiesRepository.updateProperty(
+              PropertiesRepository.CONFIG.WIRE_MARKETING_CONSENT.key,
+              checked ? ConsentValue.GIVEN : ConsentValue.NOT_GIVEN,
+            )
+          }
+          uieName="status-preference-marketing"
+          label={t('preferencesAccountMarketingConsentCheckbox')}
+          details={t('preferencesAccountMarketingConsentDetail', brandName)}
+        />
       )}
     </PreferencesSection>
   );

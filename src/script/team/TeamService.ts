@@ -107,7 +107,12 @@ export class TeamService {
         [FEATURE_KEY.SSO]: {
           status: FeatureStatus.ENABLED,
         },
-        [FEATURE_KEY.MLS]: undefined,
+        [FEATURE_KEY.MLS]: {
+          config: {
+            allowList: [],
+          },
+          status: FeatureStatus.DISABLED,
+        },
         [FEATURE_KEY.VALIDATE_SAML_EMAILS]: {
           status: FeatureStatus.ENABLED,
         },

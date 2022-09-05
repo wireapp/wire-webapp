@@ -297,10 +297,8 @@ export class ConversationDetailsViewModel extends BasePanelViewModel {
       if (isService) {
         const entity = this.firstParticipant();
         const serviceEntity = await this.integrationRepository.getServiceFromUser(entity);
-        if (serviceEntity) {
-          this.selectedService(serviceEntity);
-          this.integrationRepository.addProviderNameToParticipant(serviceEntity);
-        }
+        this.selectedService(serviceEntity);
+        this.integrationRepository.addProviderNameToParticipant(serviceEntity);
       }
     });
   }

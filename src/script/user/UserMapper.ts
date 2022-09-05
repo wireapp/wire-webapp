@@ -131,7 +131,13 @@ export class UserMapper {
     const hasPicture = picture?.length;
     let mappedAssets;
     if (hasAsset) {
-      mappedAssets = mapProfileAssets(userEntity.qualifiedId, userData.assets);
+      mappedAssets = mapProfileAssets(
+        userEntity.id,
+        userData.assets.map(asset => ({
+          ...asset,
+          domain: userEntity.domain,
+        })),
+      );
     } else if (hasPicture) {
       mappedAssets = mapProfileAssetsV1(userEntity.id, userData.picture);
     }

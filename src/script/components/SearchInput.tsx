@@ -44,17 +44,15 @@ const SearchInput: React.FC<SearchInputProps> = ({
   setInput,
   forceDark,
 }: SearchInputProps) => {
-  const innerElement = useRef<HTMLDivElement>(null);
-  const inputElement = useRef<HTMLInputElement>(null);
+  const innerElement = useRef<HTMLDivElement>();
+  const inputElement = useRef<HTMLInputElement>();
 
   const emptyInput = input.length === 0;
   const noSelectedUsers = selectedUsers.length === 0;
 
   useLayoutEffect(() => {
-    if (inputElement.current && innerElement.current) {
-      inputElement.current.focus();
-      innerElement.current.scrollTop = inputElement.current.scrollHeight;
-    }
+    inputElement.current.focus();
+    innerElement.current.scrollTop = inputElement.current.scrollHeight;
   }, [selectedUsers.length]);
 
   useEffect(() => {

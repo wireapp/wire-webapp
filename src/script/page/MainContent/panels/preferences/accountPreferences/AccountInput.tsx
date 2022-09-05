@@ -22,7 +22,6 @@ import Icon from 'Components/Icon';
 import useIsMounted from 'Util/useIsMounted';
 import {MotionDuration} from '../../../../../motion/MotionDuration';
 import TextInput from 'Components/TextInput';
-import {IconButton, IconButtonVariant} from '@wireapp/react-ui-kit';
 
 interface AccountInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   allowedChars?: string;
@@ -132,9 +131,8 @@ const AccountInput: React.FC<AccountInputProps> = ({
           <label
             className="label preferences-label"
             css={{
-              alignItems: 'center',
-              display: 'flex',
               lineHeight: '14px',
+              marginBottom: 16,
               position: 'relative',
             }}
             data-uie-name={labelUie}
@@ -143,16 +141,22 @@ const AccountInput: React.FC<AccountInputProps> = ({
             {label}
 
             {!readOnly && (
-              <IconButton
-                variant={IconButtonVariant.SECONDARY}
+              <button
+                type="button"
                 css={{
-                  margin: '0.5rem',
+                  background: 'transparent',
+                  border: 'none',
+                  margin: 0,
+                  padding: 0,
+                  position: 'absolute',
+                  svg: {marginLeft: 8},
+                  top: '-1px',
                 }}
-                data-uie-name={`go-edit-${fieldName}`}
                 onClick={() => {
                   setIsEditingExternal?.(true);
                   setIsEditing(true);
                 }}
+                data-uie-name={`go-edit-${fieldName}`}
               >
                 {isDone ? (
                   <Icon.AnimatedCheck
@@ -160,9 +164,13 @@ const AccountInput: React.FC<AccountInputProps> = ({
                     data-uie-name={`${iconUiePrefix}-icon-check`}
                   />
                 ) : (
-                  <Icon.Edit className="edit-icon" data-uie-name={`${iconUiePrefix}-icon`} />
+                  <Icon.Edit
+                    css={{fill: 'var(--foreground)'}}
+                    className="edit-icon"
+                    data-uie-name={`${iconUiePrefix}-icon`}
+                  />
                 )}
-              </IconButton>
+              </button>
             )}
           </label>
 
@@ -174,10 +182,8 @@ const AccountInput: React.FC<AccountInputProps> = ({
         </>
       )}
 
-      {/* eslint jsx-a11y/no-autofocus : "off" */}
       {isEditing && (
         <TextInput
-          autoFocus
           uieName={`enter-${fieldName}-input`}
           label={label}
           name={valueUie}

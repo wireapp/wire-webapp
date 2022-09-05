@@ -87,24 +87,21 @@ const EnrichedFields: React.FC<EnrichedFieldsProps> = ({
     richProfileRepository,
     onFieldsLoaded,
   );
-
-  if (fields?.length < 1) {
-    return null;
-  }
-
   return (
-    <div className="enriched-fields">
-      {fields.map(({type, value}) => (
-        <div key={type} className="enriched-fields__entry">
-          <p className="enriched-fields__entry__key" data-uie-name="item-enriched-key">
-            {type}
-          </p>
-          <p className="enriched-fields__entry__value" data-uie-name="item-enriched-value" data-uie-value={value}>
-            {value}
-          </p>
-        </div>
-      ))}
-    </div>
+    fields?.length > 0 && (
+      <div className="enriched-fields">
+        {fields.map(({type, value}) => (
+          <div key={type} className="enriched-fields__entry">
+            <p className="enriched-fields__entry__key" data-uie-name="item-enriched-key">
+              {type}
+            </p>
+            <p className="enriched-fields__entry__value" data-uie-name="item-enriched-value" data-uie-value={value}>
+              {value}
+            </p>
+          </div>
+        ))}
+      </div>
+    )
   );
 };
 

@@ -105,13 +105,7 @@ module.exports = {
     }),
     /* All wasm files will be ignored from webpack and copied over to the destination folder, they don't need any webpack processing */
     new CopyPlugin({
-      patterns: [
-        {
-          context: 'node_modules/@otak/core-crypto/platforms/web/assets',
-          from: '*.wasm',
-          to: `${dist}/min/core-crypto.wasm`,
-        },
-      ],
+      patterns: [{context: 'node_modules/@otak/core-crypto/platforms/web', from: 'assets/*', to: `${dist}`}],
     }),
     new webpack.IgnorePlugin({resourceRegExp: /.*\.wasm/}),
   ],

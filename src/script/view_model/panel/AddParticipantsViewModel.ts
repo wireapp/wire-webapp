@@ -181,7 +181,7 @@ export class AddParticipantsViewModel extends BasePanelViewModel {
   };
 
   clickToAddParticipants(): void {
-    this.addUsers();
+    this.addMembers();
     this.onGoBack();
   }
 
@@ -206,10 +206,10 @@ export class AddParticipantsViewModel extends BasePanelViewModel {
     }
   };
 
-  private async addUsers() {
+  private async addMembers(): Promise<void> {
     const activeConversation = this.activeConversation();
     const userEntities = this.selectedContacts().slice();
 
-    await this.conversationRepository.addUsers(activeConversation, userEntities);
+    await this.conversationRepository.addMembers(activeConversation, userEntities);
   }
 }

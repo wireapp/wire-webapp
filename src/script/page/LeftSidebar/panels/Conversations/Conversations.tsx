@@ -254,20 +254,18 @@ const Conversations: React.FC<ConversationsProps> = ({
         const callingViewModel = listViewModel.callingViewModel;
         const callingRepository = callingViewModel.callingRepository;
         return (
-          conversation && (
-            <div className="calling-cell" key={conversation.id}>
-              <ConversationListCallingCell
-                classifiedDomains={classifiedDomains}
-                call={call}
-                callActions={callingViewModel.callActions}
-                callingRepository={callingRepository}
-                conversation={conversation}
-                hasAccessToCamera={callingViewModel.hasAccessToCamera()}
-                isSelfVerified={selfUser.is_verified()}
-                multitasking={callingViewModel.multitasking}
-              />
-            </div>
-          )
+          <div className="calling-cell" key={conversation.id}>
+            <ConversationListCallingCell
+              classifiedDomains={classifiedDomains}
+              call={call}
+              callActions={callingViewModel.callActions}
+              callingRepository={callingRepository}
+              conversation={conversation}
+              hasAccessToCamera={callingViewModel.hasAccessToCamera()}
+              isSelfVerified={selfUser.is_verified()}
+              multitasking={callingViewModel.multitasking}
+            />
+          </div>
         );
       })}
     </>

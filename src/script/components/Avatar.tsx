@@ -95,9 +95,7 @@ const Avatar: React.FunctionComponent<AvatarProps> = ({
   const isMe = (participant as User).isMe;
 
   const clickHandler = (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
-    if (event.currentTarget.parentNode) {
-      onAvatarClick?.(participant, event.currentTarget.parentNode);
-    }
+    onAvatarClick?.(participant, event.currentTarget.parentNode);
   };
 
   if (participant instanceof ServiceEntity || participant.isService) {

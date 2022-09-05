@@ -111,7 +111,7 @@ const ControlButtons: React.FC<ControlButtonsProps> = ({
                   accept={acceptedImageTypes}
                   tabIndex={-1}
                   id="conversation-input-bar-photo"
-                  onChange={({target: {files}}) => files && onSelectImages(Array.from(files))}
+                  onChange={event => onSelectImages(Array.from(event.target.files))}
                   type="file"
                 />
               </button>
@@ -133,7 +133,7 @@ const ControlButtons: React.FC<ControlButtonsProps> = ({
                   accept={acceptedFileTypes ?? null}
                   id="conversation-input-bar-files"
                   tabIndex={-1}
-                  onChange={({target: {files}}) => files && onSelectFiles(Array.from(files))}
+                  onChange={event => onSelectFiles(Array.from(event.target.files))}
                   type="file"
                 />
               </button>

@@ -41,15 +41,13 @@ const DetailedDevice: React.FC<DeviceProps> = ({device, fingerprint}) => {
           <FormattedId idSlices={splitFingerprint(device.id)} />
         </span>
       </div>
-      {device.time !== undefined && (
-        <div className="preferences-devices-activated">
-          <div
-            dangerouslySetInnerHTML={{
-              __html: t('preferencesDevicesActivatedOn', {date: formatTimestamp(device.time)}),
-            }}
-          />
-        </div>
-      )}
+      <div className="preferences-devices-activated">
+        <div
+          dangerouslySetInnerHTML={{
+            __html: t('preferencesDevicesActivatedOn', {date: formatTimestamp(device.time)}),
+          }}
+        ></div>
+      </div>
       <div className="label preferences-label preferences-devices-fingerprint-label">
         {t('preferencesDevicesFingerprint')}
       </div>

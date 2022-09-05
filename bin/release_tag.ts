@@ -86,7 +86,7 @@ if (commitId) {
 
 try {
   commitMessage = exec(`git show -s --format=%s ${commitId}`);
-} catch (error: any) {
+} catch (error) {
   logger.error(error.message);
   process.exit(1);
 }

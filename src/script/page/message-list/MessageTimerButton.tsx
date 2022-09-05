@@ -30,8 +30,6 @@ import {showContextMenu} from '../../ui/ContextMenu';
 import type {Conversation} from '../../entity/Conversation';
 import {container} from 'tsyringe';
 import {TeamState} from '../../team/TeamState';
-import {KEY} from 'Util/KeyboardUtil';
-import {setContextMenuPosition} from 'Util/util';
 
 export interface MessageTimerButtonProps {
   conversation: Conversation;
@@ -54,8 +52,9 @@ export const MessageTimerButton: React.FC<MessageTimerButtonProps> = ({
   const isTimerDisabled = isSelfDeletingMessagesEnforced || hasGlobalMessageTimer;
   const duration = hasMessageTimer ? formatDuration(messageTimer) : ({} as DurationUnit);
 
-  const setEntries = () =>
-    [
+  // Click on ephemeral button
+  const onClick = (event: React.MouseEvent<HTMLSpanElement>): void => {
+    const entries = [
       {
         click: () => conversation.localMessageTimer(0),
         label: t('ephemeralUnitsNone'),
@@ -71,58 +70,44 @@ export const MessageTimerButton: React.FC<MessageTimerButtonProps> = ({
       }),
     );
 
-  // Click on ephemeral button
-  const onClick = (event: React.MouseEvent<HTMLSpanElement>): void => {
-    const entries = setEntries();
     showContextMenu(event, entries, 'message-timer-menu');
   };
 
-  if (!isSelfDeletingMessagesEnabled) {
-    return null;
-  }
-
-  const handleContextKeyDown = (event: React.KeyboardEvent) => {
-    if ([KEY.SPACE, KEY.ENTER].includes(event.key)) {
-      const newEvent = setContextMenuPosition(event);
-      const entries = setEntries();
-      showContextMenu(newEvent, entries, 'message-timer-menu');
-    }
-  };
-
   return (
-    <button
-      id="conversation-input-bar-message-timer"
-      className="controls-right-button buttons-group-button-right conversation-input-bar-message-timer"
-      onClick={isTimerDisabled ? undefined : onClick}
-      onKeyDown={handleContextKeyDown}
-      title={t('tooltipConversationEphemeral')}
-      data-uie-value={isTimerDisabled ? 'disabled' : 'enabled'}
-      data-uie-name="do-set-ephemeral-timer"
-      type="button"
-    >
-      {hasMessageTimer ? (
-        conversation && (
-          <div
-            className={cx(
-              'message-timer-button',
-              isTimerDisabled ? 'message-timer-button--disabled' : 'message-timer-button--enabled',
-            )}
-            data-uie-name="message-timer-button"
-          >
-            <span className="message-timer-button-unit" data-uie-name="message-timer-button-symbol">
-              {duration.symbol}
-            </span>
-            <span className="full-screen" data-uie-name="message-timer-button-value">
-              {duration.value}
-            </span>
-          </div>
-        )
-      ) : (
-        <span className={cx({disabled: isTimerDisabled})}>
-          <Icon.Timer data-uie-name="message-timer-icon" />
-        </span>
-      )}
-    </button>
+    isSelfDeletingMessagesEnabled && (
+      <button
+        id="conversation-input-bar-message-timer"
+        className="controls-right-button buttons-group-button-right conversation-input-bar-message-timer"
+        onClick={isTimerDisabled ? undefined : onClick}
+        title={t('tooltipConversationEphemeral')}
+        data-uie-value={isTimerDisabled ? 'disabled' : 'enabled'}
+        data-uie-name="do-set-ephemeral-timer"
+        type="button"
+      >
+        {hasMessageTimer ? (
+          conversation && (
+            <div
+              className={cx(
+                'message-timer-button',
+                isTimerDisabled ? 'message-timer-button--disabled' : 'message-timer-button--enabled',
+              )}
+              data-uie-name="message-timer-button"
+            >
+              <span className="message-timer-button-unit" data-uie-name="message-timer-button-symbol">
+                {duration.symbol}
+              </span>
+              <span className="full-screen" data-uie-name="message-timer-button-value">
+                {duration.value}
+              </span>
+            </div>
+          )
+        ) : (
+          <span className={cx({disabled: isTimerDisabled})}>
+            <Icon.Timer data-uie-name="message-timer-icon" />
+          </span>
+        )}
+      </button>
+    )
   );
 };
 

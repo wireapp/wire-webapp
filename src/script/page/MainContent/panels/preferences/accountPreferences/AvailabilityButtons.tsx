@@ -121,9 +121,9 @@ const AvailabilityButtons: React.FC<AvailabilityInputProps> = ({availability}) =
               })}
               key={item.availability}
               type="button"
-              onClick={() => item.click?.()}
+              onClick={() => item.click()}
             >
-              {item.availability !== undefined && icons[item.availability]}
+              {icons[item.availability]}
               {item.label}
             </button>
           );

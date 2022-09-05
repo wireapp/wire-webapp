@@ -52,7 +52,7 @@ describe('DeviceCard', () => {
       device: createClientEntity({
         class: ClientClassification.DESKTOP,
         meta: {
-          isVerified: ko.observable<boolean>(false),
+          isVerified: ko.observable(false),
         },
       }),
       showIcon: true,
@@ -66,7 +66,7 @@ describe('DeviceCard', () => {
       device: createClientEntity({
         class: ClientClassification.PHONE,
         meta: {
-          isVerified: ko.observable<boolean>(false),
+          isVerified: ko.observable(false),
         },
       }),
       showIcon: true,
@@ -81,7 +81,7 @@ describe('DeviceCard', () => {
       device: createClientEntity({
         class: ClientClassification.PHONE,
         meta: {
-          isVerified: ko.observable<boolean>(false),
+          isVerified: ko.observable(false),
         },
       }),
       showIcon: true,
@@ -95,7 +95,7 @@ describe('DeviceCard', () => {
       device: createClientEntity({
         class: ClientClassification.PHONE,
         meta: {
-          isVerified: ko.observable<boolean>(true),
+          isVerified: ko.observable(true),
         },
       }),
       showIcon: true,
@@ -110,7 +110,7 @@ describe('DeviceCard', () => {
       device: createClientEntity({
         class: ClientClassification.PHONE,
         meta: {
-          isVerified: ko.observable<boolean>(false),
+          isVerified: ko.observable(false),
         },
       }),
       showIcon: true,

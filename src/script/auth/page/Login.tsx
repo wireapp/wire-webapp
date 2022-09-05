@@ -65,7 +65,6 @@ import {parseError, parseValidationErrors} from '../util/errorUtil';
 import {UrlUtil} from '@wireapp/commons';
 import Page from './Page';
 import EntropyContainer from './EntropyContainer';
-import {StatusCodes} from 'http-status-codes';
 
 interface Props extends React.HTMLProps<HTMLDivElement> {}
 
@@ -95,7 +94,7 @@ const Login = ({
   const [isValidLink, setIsValidLink] = useState(true);
   const [validationErrors, setValidationErrors] = useState([]);
 
-  const [twoFactorSubmitError, setTwoFactorSubmitError] = useState<string | Error>('');
+  const [twoFactorSubmitError, setTwoFactorSubmitError] = useState<string>('');
   const [twoFactorLoginData, setTwoFactorLoginData] = useState<LoginData>();
 
   const [showEntropyForm, setShowEntropyForm] = useState(false);
@@ -235,9 +234,7 @@ const Login = ({
     try {
       await doSendTwoFactorCode(twoFactorLoginData.email);
     } catch (error) {
-      setTwoFactorSubmitError(
-        new BackendError({code: StatusCodes.TOO_MANY_REQUESTS, label: BackendError.GENERAL_ERRORS.TOO_MANY_REQUESTS}),
-      );
+      logger.error('Unable to resend two factor code', error);
     }
   };
 
@@ -299,11 +296,9 @@ const Login = ({
                         data-uie-name="enter-code"
                         markInvalid={!!twoFactorSubmitError}
                       />
-                    </Label>
-                    <div style={{display: 'flex', justifyContent: 'center', marginTop: 10}}>
                       {!!twoFactorSubmitError && parseError(twoFactorSubmitError)}
-                    </div>
-                    <div style={{marginTop: 20}}>
+                    </Label>
+                    <div style={{marginTop: 30}}>
                       {isSendingTwoFactorCode ? (
                         <Loading size={20} />
                       ) : (
@@ -337,7 +332,6 @@ const Login = ({
                             checked={loginData.clientType === ClientType.TEMPORARY}
                             data-uie-name="enter-public-computer-sign-in"
                             style={{justifyContent: 'center', marginTop: '12px'}}
-                            aligncenter
                           >
                             <CheckboxLabel htmlFor="enter-public-computer-sign-in">
                               {_(loginStrings.publicComputer)}

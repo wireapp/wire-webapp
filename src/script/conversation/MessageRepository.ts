@@ -32,7 +32,6 @@ import {
   QualifiedUserClients,
   MessageSendingStatus,
   UserClients,
-  ConversationProtocol,
 } from '@wireapp/api-client/src/conversation';
 import {QualifiedId, RequestCancellationError, User as APIClientUser} from '@wireapp/api-client/src/user';
 import {WebAppEvents} from '@wireapp/webapp-events';
@@ -716,7 +715,7 @@ export class MessageRepository {
       syncTimestamp: true,
     },
   ) {
-    const {groupId} = conversation;
+    const userIds = await this.generateRecipients(conversation, recipients, skipSelf);
 
     const injectOptimisticEvent: MessageSendingCallbacks['onStart'] = async genericMessage => {
       if (playPingAudio) {
@@ -743,40 +742,27 @@ export class MessageRepository {
       this.updateMessageAsSent(conversation, genericMessage.messageId, syncTimestamp ? sentTime : undefined);
     };
 
-    const handleSuccess = async (genericMessage: GenericMessage, sentTime?: string) => {
-      const preMessageTimestamp = new Date(new Date(sentTime).getTime() - 10).toISOString();
-      // Trigger an empty mismatch to check for users that have no devices and that could have been removed from the team
-      await this.onClientMismatch?.({time: preMessageTimestamp}, conversation, silentDegradationWarning);
-      updateOptimisticEvent(genericMessage, sentTime);
-    };
-
     const conversationService = this.conversationService;
     // Configure ephemeral messages
     conversationService.messageTimer.setConversationLevelTimer(conversation.id, conversation.messageTimer());
 
-    if (groupId) {
-      return this.messageSender.queueMessage(() =>
-        this.conversationService.send({
-          groupId,
-          onStart: injectOptimisticEvent,
-          onSuccess: handleSuccess,
-          payload,
-          protocol: ConversationProtocol.MLS,
-        }),
-      );
-    }
-
     return this.messageSender.queueMessage(() =>
       this.conversationService.send({
+        callbacks: {
+          onClientMismatch: mismatch => this.onClientMismatch?.(mismatch, conversation, silentDegradationWarning),
+          onStart: injectOptimisticEvent,
+          onSuccess: async (genericMessage, sentTime) => {
+            const preMessageTimestamp = new Date(new Date(sentTime).getTime() - 10).toISOString();
+            // Trigger an empty mismatch to check for users that have no devices and that could have been removed from the team
+            await this.onClientMismatch?.({time: preMessageTimestamp}, conversation, silentDegradationWarning);
+            updateOptimisticEvent(genericMessage, sentTime);
+          },
+        },
         conversationDomain: conversation.domain || undefined,
         nativePush,
-        onClientMismatch: mismatch => this.onClientMismatch?.(mismatch, conversation, silentDegradationWarning),
-        onStart: injectOptimisticEvent,
-        onSuccess: handleSuccess,
-        payload,
-        protocol: ConversationProtocol.PROTEUS,
+        payloadBundle: payload,
         targetMode,
-        userIds: this.generateRecipients(conversation, recipients, skipSelf),
+        userIds,
       }),
     );
   }
@@ -834,8 +820,7 @@ export class MessageRepository {
     await this.messageSender.queueMessage(() =>
       this.conversationService.send({
         conversationDomain: this.core.backendFeatures.federationEndpoints ? conversation.domain : undefined,
-        payload: sessionReset,
-        protocol: ConversationProtocol.PROTEUS,
+        payloadBundle: sessionReset,
         targetMode: MessageTargetMode.USERS_CLIENTS,
         userIds: this.core.backendFeatures.federationEndpoints ? {[userId.domain]: userClient} : userClient, // we target this message to the specific client of the user (no need for mismatch handling here)
       }),

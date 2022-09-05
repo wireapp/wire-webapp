@@ -36,47 +36,33 @@ export interface ButtonGroupProps {
 const buttonGroupWrapperStyles: CSSObject = {
   alignItems: 'center',
   'button:first-of-type': {
-    '&:focus-visible': {
-      outline: '1px solid var(--accent-color-focus)',
-    },
-    border: '1px solid var(--border-color)',
     borderBottomLeftRadius: 12,
     borderTopLeftRadius: 12,
     paddingLeft: '14px !important',
   },
   'button:last-of-type': {
-    '&:focus-visible': {
-      outline: '1px solid var(--accent-color-focus)',
-    },
-    border: '1px solid var(--border-color)',
     borderBottomRightRadius: 12,
     borderTopRightRadius: 12,
     paddingRight: '14px !important',
   },
   display: 'flex',
-  justifyContent: 'center',
-  minWidth: '145px',
 };
 
 const buttonGroupItemStyles: CSSObject = {
-  '&:hover': {
-    backgroundColor: 'var(--button-group-left-hover)',
-  },
-  backgroundColor: 'var(--app-bg-secondary)',
-  color: 'var(--main-color)',
+  backdropFilter: 'blur(16px)',
+  backgroundColor: 'rgba(255, 255, 255, 0.16)',
+  color: '#fff',
   cursor: 'pointer',
   fontSize: 11,
   fontWeight: 500,
-  padding: '10px 12px',
+  padding: '4px 12px',
+  textTransform: 'uppercase',
 };
 
 const buttonGroupItemActiveStyles: CSSObject = {
   ...buttonGroupItemStyles,
-  '&:hover': {
-    backgroundColor: 'var(--button-group-right-hover)',
-  },
-  backgroundColor: 'var(--main-color)',
-  color: 'var(--app-bg-secondary)',
+  backgroundColor: '#fff',
+  color: '#33373a',
 };
 
 const ButtonGroup: React.FC<ButtonGroupProps> = ({style, items, currentItem, onChangeItem, textSubstitute}) => {

@@ -43,7 +43,7 @@ const MentionSuggestionsItem: React.ForwardRefRenderFunction<HTMLDivElement, Men
     ['name', 'expirationRemainingText', 'isTemporaryGuest', 'isExternal', 'isDirectGuest'],
   );
 
-  const onClick = (event: React.UIEvent) => {
+  const onClick = (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
     event.preventDefault();
     onSuggestionClick();
   };

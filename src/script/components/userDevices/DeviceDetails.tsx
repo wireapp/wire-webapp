@@ -33,10 +33,10 @@ import {ConversationState} from '../../conversation/ConversationState';
 import DeviceCard from './DeviceCard';
 import DeviceId from '../DeviceId';
 import {MotionDuration} from '../../motion/MotionDuration';
+import {getPrivacyHowUrl} from '../../externalRoute';
 import type {ClientRepository} from '../../client/ClientRepository';
 import type {MessageRepository} from '../../conversation/MessageRepository';
 import type {DexieError} from 'dexie';
-import {Config} from '../../Config';
 
 interface DeviceDetailsProps {
   clickToShowSelfFingerprint: () => void;
@@ -89,12 +89,10 @@ const DeviceDetails: React.FC<DeviceDetailsProps> = ({
     const _resetProgress = () => window.setTimeout(() => setIsResettingSession(false), MotionDuration.LONG);
     const conversation = user.isMe ? conversationState.self_conversation() : conversationState.activeConversation();
     setIsResettingSession(true);
-    if (conversation) {
-      messageRepository
-        .resetSession(user.qualifiedId, selectedClient.id, conversation)
-        .then(_resetProgress)
-        .catch(_resetProgress);
-    }
+    messageRepository
+      .resetSession(user.qualifiedId, selectedClient.id, conversation)
+      .then(_resetProgress)
+      .catch(_resetProgress);
   };
 
   return (
@@ -114,7 +112,7 @@ const DeviceDetails: React.FC<DeviceDetailsProps> = ({
       />
       <a
         className="participant-devices__link accent-text"
-        href={Config.getConfig().URL.SUPPORT.PRIVACY_VERIFY_FINGERPRINT}
+        href={getPrivacyHowUrl()}
         rel="nofollow noopener noreferrer"
         target="_blank"
       >
@@ -123,11 +121,9 @@ const DeviceDetails: React.FC<DeviceDetailsProps> = ({
       <div className="participant-devices__single-client">
         <DeviceCard device={selectedClient} />
       </div>
-      {fingerprintRemote && (
-        <div className="participant-devices__fingerprint" data-uie-name="status-fingerprint">
-          <DeviceId deviceId={fingerprintRemote} />
-        </div>
-      )}
+      <div className="participant-devices__fingerprint" data-uie-name="status-fingerprint">
+        <DeviceId deviceId={fingerprintRemote} />
+      </div>
 
       <div className="participant-devices__verify">
         <div className="slider" data-uie-name="do-toggle-verified">

@@ -27,20 +27,6 @@ export interface PaginationProps {
   wrapperStyles?: CSSObject;
 }
 
-const paginationItemStyles: CSSObject = {
-  '&:hover': {
-    border: '1px solid var(--accent-color)',
-  },
-  ':last-child': {
-    marginRight: 4,
-  },
-  borderRadius: '50%',
-  cursor: 'pointer',
-  height: 12,
-  marginLeft: 4,
-  width: 12,
-};
-
 const Pagination: React.FC<PaginationProps> = ({totalPages, currentPage, onChangePage, wrapperStyles = {}}) => {
   const pages = new Array(totalPages).fill(null).map((_, index) => index);
 
@@ -48,10 +34,11 @@ const Pagination: React.FC<PaginationProps> = ({totalPages, currentPage, onChang
     <div
       css={{
         alignItems: 'center',
-        backgroundColor: 'var(--border-color)',
+        backdropFilter: 'blur(10px)',
+        backgroundColor: 'rgba(255, 255, 255, 0.24)',
         borderRadius: 12,
         display: 'flex',
-        height: 22,
+        height: 16,
         justifyContent: 'center',
         ...wrapperStyles,
       }}
@@ -66,9 +53,16 @@ const Pagination: React.FC<PaginationProps> = ({totalPages, currentPage, onChang
           type="button"
           className="button-reset-default"
           css={{
-            ...paginationItemStyles,
-            backgroundColor: currentPage === page ? 'var(--accent-color)' : 'var(--app-bg-secondary)',
-            border: currentPage === page ? 'solid 1px var(--accent-color)' : 'solid 1px var(--foreground)',
+            ':last-child': {
+              marginRight: 4,
+            },
+            backgroundColor: currentPage === page ? '#ffffff' : 'initial',
+            border: 'solid 1px #ffffff',
+            borderRadius: 8,
+            cursor: 'pointer',
+            height: 8,
+            marginLeft: 4,
+            width: 8,
           }}
         />
       ))}

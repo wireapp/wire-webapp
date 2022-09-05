@@ -47,12 +47,12 @@ const AccountLink: React.FC<AccountLinkProps> = ({label, value, ...rest}) => {
         }}
       >
         <label
-          className="label preferences-label"
           css={{
-            alignItems: 'center',
-            color: 'var(--text-input-label)',
-            display: 'flex',
-            height: 48,
+            color: 'var(--foreground)',
+            fontSize: '12px',
+            fontWeight: 'normal',
+            lineHeight: '1.33',
+            marginBottom: 2,
           }}
           data-uie-name="label-profile-link"
         >
@@ -67,7 +67,7 @@ const AccountLink: React.FC<AccountLinkProps> = ({label, value, ...rest}) => {
         type="button"
         data-uie-name="do-copy-profile-link"
         onClick={() => copyText(value)}
-        className="text-bold-small"
+        className="text-bold"
         css={{
           '&:hover': {
             color: 'var(--accent-color)',
