@@ -174,26 +174,16 @@ const VideoAsset: React.FC<VideoAssetProps> = ({
                     })}
                   >
                     <div className="video-asset__controls-center">
-                      {displaySmall ? (
-                        <MediaButton
-                          mediaElement={videoElement}
-                          asset={asset}
-                          play={onPlayButtonClicked}
-                          transferState={transferState}
-                          uploadProgress={uploadProgress}
-                        />
-                      ) : (
-                        <MediaButton
-                          mediaElement={videoElement}
-                          large
-                          asset={asset}
-                          play={onPlayButtonClicked}
-                          pause={onPauseButtonClicked}
-                          cancel={() => (isUploading ? cancelUpload() : asset.cancelDownload())}
-                          transferState={transferState}
-                          uploadProgress={uploadProgress}
-                        />
-                      )}
+                      <MediaButton
+                        mediaElement={videoElement}
+                        large={!displaySmall}
+                        asset={asset}
+                        play={onPlayButtonClicked}
+                        pause={onPauseButtonClicked}
+                        cancel={() => (isUploading ? cancelUpload() : asset.cancelDownload())}
+                        transferState={transferState}
+                        uploadProgress={uploadProgress}
+                      />
                     </div>
 
                     {isVideoLoaded && videoElement && (
