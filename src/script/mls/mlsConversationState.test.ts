@@ -20,7 +20,7 @@
 import {ConversationProtocol} from '.yalc/@wireapp/api-client/src/conversation';
 import {createRandomUuid} from 'Util/util';
 import {Conversation} from '../entity/Conversation';
-import {sendExternalToPendingJoin, markAsEstablished, markAsPendingWelcome} from './mlsConversationState';
+import {mlsConversationState} from './mlsConversationState';
 
 describe('mlsPendingStateUtil', () => {
   describe('sendExternalToPendingJoin', () => {
@@ -50,12 +50,12 @@ describe('mlsPendingStateUtil', () => {
     it('sends external proposal to mls conversations that the device is not part of', async () => {
       const {conversations, nbMlsConversations} = createConversations(100);
       const sendExternalProposal = jest.fn();
-      await sendExternalToPendingJoin(conversations, sendExternalProposal);
+      await mlsConversationState.getState().sendExternalToPendingJoin(conversations, sendExternalProposal);
 
       expect(sendExternalProposal).toHaveBeenCalledTimes(nbMlsConversations);
 
       const sendExternalProposal2 = jest.fn();
-      await sendExternalToPendingJoin(conversations, sendExternalProposal2);
+      await mlsConversationState.getState().sendExternalToPendingJoin(conversations, sendExternalProposal2);
       expect(sendExternalProposal2).not.toHaveBeenCalled();
     });
 
@@ -67,11 +67,11 @@ describe('mlsPendingStateUtil', () => {
         new Conversation(createRandomUuid(), '', ConversationProtocol.PROTEUS),
       ];
 
-      markAsEstablished(conversations[1].id);
-      markAsPendingWelcome(conversations[2].id);
+      mlsConversationState.getState().markAsEstablished(conversations[1].id);
+      mlsConversationState.getState().markAsPendingWelcome(conversations[2].id);
 
       const sendExternalProposal = jest.fn();
-      await sendExternalToPendingJoin(conversations, sendExternalProposal);
+      await mlsConversationState.getState().sendExternalToPendingJoin(conversations, sendExternalProposal);
 
       expect(sendExternalProposal).toHaveBeenCalledTimes(1);
     });

@@ -123,7 +123,7 @@ import Warnings from '../view_model/WarningsContainer';
 import {Core} from '../service/CoreSingleton';
 import {migrateToQualifiedSessionIds} from './sessionIdMigrator';
 import showUserModal from 'Components/Modals/UserModal';
-import {sendExternalToPendingJoin} from '../mls/mlsConversationState';
+import {mlsConversationState} from '../mls/mlsConversationState';
 
 function doRedirect(signOutReason: SIGN_OUT_REASON) {
   let url = `/auth/${location.search}`;
@@ -425,12 +425,15 @@ class App {
       await teamRepository.initTeam();
 
       const conversationEntities = await conversationRepository.getConversations();
-      await sendExternalToPendingJoin(conversationEntities, conversation =>
-        this.core.service!.conversation.sendExternalJoinProposalsForPendingToJoinConversation(
-          conversation.groupId,
-          conversation.epoch,
-        ),
-      );
+      // We send external proposal to all the MLS conversations that are in an unknown state (not established nor pendingWelcome)
+      await mlsConversationState
+        .getState()
+        .sendExternalToPendingJoin(conversationEntities, conversation =>
+          this.core.service!.conversation.sendExternalJoinProposalsForPendingToJoinConversation(
+            conversation.groupId,
+            conversation.epoch,
+          ),
+        );
 
       const connectionEntities = await connectionRepository.getConnections();
       loadingView.updateProgress(25, t('initReceivedUserData'));
