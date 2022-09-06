@@ -79,9 +79,7 @@ const DataUsageSection: React.FC<DataUsageSectionProps> = ({
         >
           <CheckboxLabel htmlFor="status-preference-privacy">{t('preferencesAccountDataCheckbox')}</CheckboxLabel>
         </Checkbox>
-        <div className="preferences-detail preferences-detail-intended">
-          {t('preferencesAccountDataDetail', brandName)}
-        </div>
+        <p className="preferences-detail preferences-detail-intended">{t('preferencesAccountDataDetail', brandName)}</p>
       </>
 
       {isTeam && isCountlyEnabled && (
@@ -99,9 +97,9 @@ const DataUsageSection: React.FC<DataUsageSectionProps> = ({
               {t('preferencesAccountDataTelemetryCheckbox')}
             </CheckboxLabel>
           </Checkbox>
-          <div className="preferences-detail preferences-detail-intended">
+          <p className="preferences-detail preferences-detail-intended">
             {t('preferencesAccountDataTelemetry', brandName)}
-          </div>
+          </p>
         </div>
       )}
       {isActivatedAccount && (
@@ -121,9 +119,9 @@ const DataUsageSection: React.FC<DataUsageSectionProps> = ({
               {t('preferencesAccountMarketingConsentCheckbox')}
             </CheckboxLabel>
           </Checkbox>
-          <div className="preferences-detail preferences-detail-intended">
+          <p className="preferences-detail preferences-detail-intended">
             {t('preferencesAccountMarketingConsentDetail', brandName)}
-          </div>
+          </p>
         </div>
       )}
     </PreferencesSection>

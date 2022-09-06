@@ -68,9 +68,7 @@ const PrivacySection: React.FC<PrivacySectionProps> = ({
             {t('preferencesAccountReadReceiptsCheckbox')}
           </CheckboxLabel>
         </Checkbox>
-        <div className="preferences-detail preferences-detail-intended">
-          {t('preferencesAccountReadReceiptsDetail')}
-        </div>
+        <p className="preferences-detail preferences-detail-intended">{t('preferencesAccountReadReceiptsDetail')}</p>
       </>
       {isAppLockAvailable && (
         <div className="checkbox-margin">
@@ -84,9 +82,9 @@ const PrivacySection: React.FC<PrivacySectionProps> = ({
           >
             <CheckboxLabel htmlFor="status-preference-applock">{t('preferencesAccountAppLockCheckbox')}</CheckboxLabel>
           </Checkbox>
-          <div className="preferences-detail preferences-detail-intended">
+          <p className="preferences-detail preferences-detail-intended">
             {t('preferencesAccountAppLockDetail', formatDurationCaption(appLockInactivityTimeoutSecs * 1000))}
-          </div>
+          </p>
         </div>
       )}
     </PreferencesSection>
