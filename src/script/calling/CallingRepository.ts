@@ -81,6 +81,7 @@ import {PayloadBundleState} from '@wireapp/core/src/main/conversation';
 import {Core} from '../service/CoreSingleton';
 import {flattenQualifiedUserClients} from '@wireapp/core/src/main/conversation/message/UserClientsUtil';
 import type {ClientRepository} from '../client/ClientRepository';
+import {LEAVE_CALL_REASON} from './enum/LeaveCallReason';
 
 interface MediaStreamQuery {
   audio?: boolean;
@@ -493,7 +494,7 @@ export class CallingRepository {
       const participant = activeCall.getParticipant(unverifiedUserId, clientId);
 
       if (participant) {
-        this.leaveCall(activeCall.conversationId);
+        this.leaveCall(activeCall.conversationId, LEAVE_CALL_REASON.USER_TURNED_UNVERIFIED);
         amplify.publish(
           WebAppEvents.WARNING.MODAL,
           ModalsViewModel.TYPE.ACKNOWLEDGE,
@@ -516,13 +517,13 @@ export class CallingRepository {
   // Inbound call events
   //##############################################################################
 
-  private abortCall(conversationId: QualifiedId): void {
+  private abortCall(conversationId: QualifiedId, reason: LEAVE_CALL_REASON): void {
     const call = this.findCall(conversationId);
     if (call) {
       // we flag the call in order to prevent sending further messages
       call.blockMessages = true;
     }
-    this.leaveCall(conversationId);
+    this.leaveCall(conversationId, reason);
   }
 
   private warnOutdatedClient(conversationId: QualifiedId) {
@@ -595,7 +596,7 @@ export class CallingRepository {
           );
 
           if (!shouldContinue) {
-            this.abortCall(conversationId);
+            this.abortCall(conversationId, LEAVE_CALL_REASON.ABORTED_BECAUSE_FAILED_TO_UPDATE_MISSING_CLIENTS);
           }
         }
         break;
@@ -608,7 +609,7 @@ export class CallingRepository {
         break;
       }
       case CALL_MESSAGE_TYPE.REMOTE_KICK: {
-        this.leaveCall(conversationId);
+        this.leaveCall(conversationId, LEAVE_CALL_REASON.REMOTE_KICK);
         break;
       }
     }
@@ -672,7 +673,7 @@ export class CallingRepository {
       const callType = withVideo ? CALL_TYPE.VIDEO : CALL_TYPE.NORMAL;
       return (
         (isActiveCall
-          ? this.leaveCall(conversationEntity.qualifiedId)
+          ? this.leaveCall(conversationEntity.qualifiedId, LEAVE_CALL_REASON.ELECTRON_TRAY_MENU_MESSAGE)
           : this.startCall(conversationEntity.qualifiedId, isGroupCall, callType)) && undefined
       );
     }
@@ -877,7 +878,8 @@ export class CallingRepository {
     this.wCall?.requestVideoStreams(this.wUser, convId, VSTREAMS.LIST, JSON.stringify(payload));
   }
 
-  readonly leaveCall = (conversationId: QualifiedId): void => {
+  readonly leaveCall = (conversationId: QualifiedId, reason: LEAVE_CALL_REASON): void => {
+    this.logger.info(`Ending call with reason ${reason} \n Stack trace: `, new Error().stack);
     const conversationIdStr = this.serializeQualifiedId(conversationId);
     delete this.poorCallQualityUsers[conversationIdStr];
     this.wCall?.end(this.wUser, conversationIdStr);
@@ -922,7 +924,7 @@ export class CallingRepository {
 
     if (call && !validStateWithoutCamera.includes(call.state())) {
       this.showNoCameraModal();
-      this.leaveCall(call.conversationId);
+      this.leaveCall(call.conversationId, LEAVE_CALL_REASON.MEDIA_STREAM_ERROR);
       return;
     }
 
@@ -1095,7 +1097,10 @@ export class CallingRepository {
       };
     }
 
-    this.sendCallingMessage(conversationId, payload, options).catch(() => this.abortCall(conversationId));
+    this.sendCallingMessage(conversationId, payload, options).catch(error => {
+      this.logger.warn('Failed to send calling message, aborting call', error);
+      this.abortCall(conversationId, LEAVE_CALL_REASON.ABORTED_BECAUSE_FAILED_TO_SEND_CALLING_MESSAGE);
+    });
     return 0;
   };
 
@@ -1129,7 +1134,10 @@ export class CallingRepository {
     const message = await this.messageRepository.sendCallingMessage(conversation, content, options);
     if (message.state === PayloadBundleState.CANCELLED) {
       // If the user has cancelled message sending because of a degradation warning, we abort the call
-      this.abortCall(conversationId);
+      this.abortCall(
+        conversationId,
+        LEAVE_CALL_REASON.ABORTED_BECAUSE_USER_CANCELLED_MESSAGE_SENDING_BECAUSE_OF_A_DEGRADATION_WARNING,
+      );
     }
   };
 
@@ -1740,7 +1748,7 @@ export class CallingRepository {
             if (activeCall.state() === CALL_STATE.INCOMING) {
               this.rejectCall(activeCall.conversationId);
             } else {
-              this.leaveCall(activeCall.conversationId);
+              this.leaveCall(activeCall.conversationId, LEAVE_CALL_REASON.MANUAL_LEAVE_TO_JOIN_ANOTHER_CALL);
             }
             window.setTimeout(resolve, 1000);
           },

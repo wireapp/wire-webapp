@@ -128,6 +128,7 @@ import {Core} from '../service/CoreSingleton';
 import {ClientState} from '../client/ClientState';
 import {MLSReturnType} from '@wireapp/core/src/main/conversation';
 import {isMemberMessage} from '../guards/Message';
+import {LEAVE_CALL_REASON} from '../calling/enum/LeaveCallReason';
 
 type ConversationDBChange = {obj: EventRecord; oldObj: EventRecord};
 type FetchPromise = {rejectFn: (error: ConversationError) => void; resolveFn: (conversation: Conversation) => void};
@@ -142,7 +143,7 @@ export class ConversationRepository {
   public readonly conversationRoleRepository: ConversationRoleRepository;
   private readonly event_mapper: EventMapper;
   private readonly eventService: EventService;
-  public leaveCall: (conversationId: QualifiedId) => void;
+  public leaveCall: (conversationId: QualifiedId, reason: LEAVE_CALL_REASON) => void;
   private readonly receiving_queue: PromiseQueue;
   private readonly logger: Logger;
   public readonly stateHandler: ConversationStateHandler;
@@ -620,12 +621,13 @@ export class ConversationRepository {
 
     const mappedMessageEntities = await this.addEventsToConversation(events, conversationEntity);
     conversationEntity.hasAdditionalMessages(hasAdditionalMessages);
+
     if (!hasAdditionalMessages) {
       const firstMessage = conversationEntity.getFirstMessage();
-      const checkCreationMessage = isMemberMessage(firstMessage) && firstMessage.isCreation();
+      const checkCreationMessage = isMemberMessage(firstMessage) && firstMessage?.isCreation();
       if (checkCreationMessage) {
-        const groupCreationMessageIn1to1 = conversationEntity.is1to1() && firstMessage.isGroupCreation();
-        const one2oneConnectionMessageInGroup = conversationEntity.isGroup() && firstMessage.isConnection();
+        const groupCreationMessageIn1to1 = conversationEntity.is1to1() && firstMessage?.isGroupCreation();
+        const one2oneConnectionMessageInGroup = conversationEntity.isGroup() && firstMessage?.isConnection();
         const wrongMessageTypeForConversation = groupCreationMessageIn1to1 || one2oneConnectionMessageInGroup;
 
         if (wrongMessageTypeForConversation) {
@@ -635,12 +637,12 @@ export class ConversationRepository {
           conversationEntity.hasCreationMessage = true;
         }
       }
-
       const addCreationMessage = !conversationEntity.hasCreationMessage;
       if (addCreationMessage) {
         this.addCreationMessage(conversationEntity, this.userState.self().isTemporaryGuest());
       }
     }
+
     return mappedMessageEntities;
   }
 
@@ -1484,7 +1486,7 @@ export class ConversationRepository {
 
     if (leaveConversation) {
       conversationEntity.status(ConversationStatus.PAST_MEMBER);
-      this.leaveCall(conversationEntity.qualifiedId);
+      this.leaveCall(conversationEntity.qualifiedId, LEAVE_CALL_REASON.USER_MANUALY_LEFT_CONVERSATION);
     }
 
     this.messageRepository.updateClearedTimestamp(conversationEntity);
@@ -1507,14 +1509,37 @@ export class ConversationRepository {
   }
 
   /**
-   * Remove member from conversation.
+   * Remove a member from a MLS conversation
    *
    * @param conversationEntity Conversation to remove member from
    * @param userId ID of member to be removed from the conversation
    * @returns Resolves when member was removed from the conversation
    */
-  public async removeMember(conversationEntity: Conversation, userId: QualifiedId) {
-    const response = await this.conversationService.deleteMembers(conversationEntity.qualifiedId, userId);
+  private async removeMemberFromMLSConversation(conversationEntity: Conversation, userId: QualifiedId) {
+    const {groupId, qualifiedId} = conversationEntity;
+    const {events} = await this.core.service!.conversation.removeUsersFromMLSConversation({
+      conversationId: qualifiedId,
+      groupId,
+      qualifiedUserIds: [userId],
+    });
+
+    if (!!events.length) {
+      events.forEach(event => this.eventRepository.injectEvent(event));
+    }
+  }
+
+  /**
+   * Remove a member from a Proteus conversation
+   *
+   * @param conversationEntity Conversation to remove member from
+   * @param userId ID of member to be removed from the conversation
+   * @returns Resolves when member was removed from the conversation
+   */
+  private async removeMemberFromProteusConversation(conversationEntity: Conversation, userId: QualifiedId) {
+    const response = await this.core.service!.conversation.removeUserFromProteusConversation(
+      conversationEntity.qualifiedId,
+      userId,
+    );
     const roles = conversationEntity.roles();
     delete roles[userId.id];
     conversationEntity.roles(roles);
@@ -1522,6 +1547,41 @@ export class ConversationRepository {
     const event = response || EventBuilder.buildMemberLeave(conversationEntity, userId, true, currentTimestamp);
     this.eventRepository.injectEvent(event, EventRepository.SOURCE.BACKEND_RESPONSE);
     return event;
+  }
+
+  /**
+   * Remove the current user from a Proteus conversation.
+   *
+   * @param conversationEntity Conversation to remove user from
+   * @param clearContent Should we clear the conversation content from the database?
+   * @returns Resolves when user was removed from the conversation
+   */
+  private async leaveProteusConversation(conversationEntity: Conversation, clearContent: boolean) {
+    return clearContent
+      ? this.clearConversation(conversationEntity, true)
+      : this.removeMemberFromProteusConversation(conversationEntity, this.userState.self().qualifiedId);
+  }
+
+  /**
+   * Umbrella function to remove a member from a conversation, no matter the protocol or type.
+   *
+   * @param conversationEntity Conversation to remove member from
+   * @param userId ID of member to be removed from the conversation
+   * @param clearContent Should we clear the conversation content from the database?
+   * @returns Resolves when member was removed from the conversation
+   */
+  public async removeMember(conversationEntity: Conversation, userId: QualifiedId, clearContent: boolean = false) {
+    const isUserLeaving = this.userState.self().qualifiedId.id === userId.id;
+    const isMLSConversation = conversationEntity.isUsingMLSProtocol;
+
+    if (isUserLeaving) {
+      //@todo leaveMLSConversation
+      return this.leaveProteusConversation(conversationEntity, clearContent);
+    }
+
+    return isMLSConversation
+      ? this.removeMemberFromMLSConversation(conversationEntity, userId)
+      : this.removeMemberFromProteusConversation(conversationEntity, userId);
   }
 
   /**
@@ -2443,7 +2503,10 @@ export class ConversationRepository {
 
     if (removesSelfUser) {
       conversationEntity.status(ConversationStatus.PAST_MEMBER);
-      this.leaveCall(conversationEntity.qualifiedId);
+      this.leaveCall(
+        conversationEntity.qualifiedId,
+        LEAVE_CALL_REASON.USER_IS_REMOVED_BY_AN_ADMIN_OR_LEFT_ON_ANOTHER_CLIENT,
+      );
       if (this.userState.self().isTemporaryGuest()) {
         eventJson.from = this.userState.self().id;
       }

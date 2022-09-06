@@ -44,7 +44,7 @@
 }
 
 .video-element-remote {
-  height: calc(100% - 175px);
+  height: calc(100% - 179px);
   // fade in animation
   animation: video-fade-in @animation-timing-slower @ease-out-quart forwards;
   opacity: 0;
@@ -110,9 +110,14 @@
 
     display: flex;
     width: 100%;
-    justify-content: space-around;
-    padding-top: 32px;
+    justify-content: space-between;
+    padding: 32px 40px 0 40px;
     margin: 0;
+  }
+
+  &__item__minimize {
+    display: flex;
+    min-width: 157px;
   }
 
   &__button {
@@ -145,6 +150,7 @@
     }
 
     &--red {
+      border: 1px solid var(--red-500);
       background-color: var(--red-500);
       svg > path {
         fill: var(--app-bg-secondary);
@@ -153,6 +159,14 @@
         background-color: #9b000f;
         body.theme-dark & {
           background-color: #ff928d;
+        }
+        &:active {
+          border: 1px solid #74000b;
+          background-color: var(--red-500);
+          body.theme-dark & {
+            border: 1px solid #ffc9c6;
+            background-color: var(--red-500);
+          }
         }
       }
     }

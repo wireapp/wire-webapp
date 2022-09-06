@@ -40,6 +40,7 @@ import {CALL_MESSAGE_TYPE} from './enum/CallMessageType';
 import {CALL} from '../event/Client';
 import {ClientRepository} from '../client/ClientRepository';
 import {UserRepository} from '../user/UserRepository';
+import {LEAVE_CALL_REASON} from './enum/LeaveCallReason';
 
 const createSelfParticipant = () => {
   const selfUser = new User();
@@ -492,7 +493,7 @@ describe.skip('E2E audio call', () => {
           });
 
           expect(client['callState'].joinedCall()).toBeDefined();
-          client.leaveCall(conversationId);
+          client.leaveCall(conversationId, LEAVE_CALL_REASON.MANUAL_LEAVE_BY_UI_CLICK);
         })
         .catch(done.fail);
     };
@@ -513,7 +514,7 @@ describe.skip('E2E audio call', () => {
           audioStats.forEach(stats => {
             expect(stats.bytesFlowing).toBeGreaterThan(0);
           });
-          client.leaveCall(conversationId);
+          client.leaveCall(conversationId, LEAVE_CALL_REASON.MANUAL_LEAVE_BY_UI_CLICK);
         })
         .catch(done.fail);
     };

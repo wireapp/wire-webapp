@@ -20,15 +20,17 @@
 import React from 'react';
 import {act, fireEvent, render, RenderResult} from '@testing-library/react';
 
-export default class TestPage<T> {
-  private readonly driver: RenderResult;
-  private readonly props: T;
-  private readonly component: React.FC | React.ComponentClass;
+type ComponentTypes<T> = React.FC<T> | React.ComponentClass<T>;
 
-  constructor(Component: React.FC<T> | React.ComponentClass<T>, props?: T) {
+export default class TestPage<T extends Record<string, any>> {
+  private readonly driver: RenderResult;
+  private readonly props?: T;
+  private readonly component: ComponentTypes<T>;
+
+  constructor(Component: ComponentTypes<T>, props?: T) {
     this.props = props;
     this.component = Component;
-    this.driver = render(<Component {...this.props} />);
+    this.driver = render(<Component {...(props as T)} />);
   }
 
   get renderResults() {

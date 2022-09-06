@@ -31,10 +31,8 @@ import {registerReactComponent, useKoSubscribableChildren} from 'Util/ComponentU
 import Message from './Message';
 import {Text} from 'src/script/entity/message/Text';
 import {useResizeObserver} from '../../ui/resizeObserver';
-import useEffectRef from 'Util/useEffectRef';
 import {isMemberMessage} from '../../guards/Message';
-
-let uniq = 0;
+import {ServiceEntity} from 'src/script/integration/ServiceEntity';
 
 type FocusedElement = {center?: boolean; element: Element};
 interface MessagesListParams {
@@ -52,14 +50,14 @@ interface MessagesListParams {
     deleteMessageEveryone: (conversation: Conversation, message: MessageEntity) => void;
   };
   messageRepository: MessageRepository;
-  onClickMessage: (message: ContentMessage | Text, event: React.MouseEvent) => void;
+  onClickMessage: (message: ContentMessage | Text, event: React.UIEvent) => void;
   onLoading: (isLoading: boolean) => void;
   resetSession: (messageError: DecryptErrorMessage) => void;
   selfUser: User;
-  showImageDetails: (message: MessageEntity, event: React.MouseEvent | React.KeyboardEvent) => void;
+  showImageDetails: (message: MessageEntity, event: React.UIEvent) => void;
   showMessageDetails: (message: MessageEntity, showLikes?: boolean) => void;
   showParticipants: (users: User[]) => void;
-  showUserDetails: (user: User) => void;
+  showUserDetails: (user: User | ServiceEntity) => void;
 }
 
 const filterDuplicatedMemberMessages = (messages: MessageEntity[]) => {
@@ -78,7 +76,7 @@ const filterDuplicatedMemberMessages = (messages: MessageEntity[]) => {
           case 'conversation.member-join':
           case 'conversation.member-leave':
             // Dont show duplicated member join/leave messages that follow each other
-            if (uniqMemberMessages.at(-1)?.htmlCaption() === currentMessage.htmlCaption()) {
+            if (uniqMemberMessages?.[uniqMemberMessages.length - 1]?.htmlCaption() === currentMessage.htmlCaption()) {
               return uniqMessages;
             }
         }
@@ -122,13 +120,8 @@ const MessagesList: React.FC<MessagesListParams> = ({
   ]);
   const [loaded, setLoaded] = useState(false);
   const [focusedMessage, setFocusedMessage] = useState<string | undefined>(initialMessage?.id);
-  const [filteredMessages, setFilteredMessages] = useState<MessageEntity[]>([]);
 
-  useEffect(() => {
-    const visibleMessages = filterHiddenMessages(allMessages);
-    const uniqMessages = filterDuplicatedMemberMessages(visibleMessages);
-    setFilteredMessages(uniqMessages);
-  }, [allMessages.length]);
+  const filteredMessages = filterDuplicatedMemberMessages(filterHiddenMessages(allMessages));
 
   const shouldShowInvitePeople =
     conversation.isActiveParticipant() && conversation.inTeam() && (isGuestRoom || isGuestAndServicesRoom);
@@ -149,7 +142,7 @@ const MessagesList: React.FC<MessagesListParams> = ({
     return false;
   };
 
-  const [messagesContainer, setContainer] = useEffectRef<HTMLDivElement | null>(null);
+  const [messagesContainer, setContainer] = useState<HTMLDivElement | null>(null);
   const scrollHeight = useRef(0);
   const nbMessages = useRef(0);
   const focusedElement = useRef<FocusedElement | null>(null);
@@ -217,7 +210,7 @@ const MessagesList: React.FC<MessagesListParams> = ({
     const isLastDeliveredMessage = lastDeliveredMessage?.id === message.id;
 
     const visibleCallback = getVisibleCallback(conversation, message);
-    const key = `${message.id || 'message'}-${message.timestamp()}-${uniq++}`;
+    const key = `${message.id || 'message'}-${message.timestamp()}`;
     return (
       <Message
         key={key}

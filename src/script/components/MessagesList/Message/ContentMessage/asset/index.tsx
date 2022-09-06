@@ -35,11 +35,11 @@ import VideoAssetComponent from './VideoAsset';
 import ButtonAssetComponent from './MessageButton';
 
 import {AssetType} from '../../../../../assets/AssetType';
-import {Button} from 'src/script/entity/message/Button';
-import {CompositeMessage} from 'src/script/entity/message/CompositeMessage';
+import {Button} from '../../../../../entity/message/Button';
+import {CompositeMessage} from '../../../../../entity/message/CompositeMessage';
 import {StatusType} from '../../../../../message/StatusType';
 import {includesOnlyEmojis} from 'Util/EmojiUtil';
-import {ContentMessage} from 'src/script/entity/message/ContentMessage';
+import {ContentMessage} from '../../../../../entity/message/ContentMessage';
 import {MessageActions} from '../..';
 import {handleKeyDown} from 'Util/KeyboardUtil';
 
@@ -53,7 +53,7 @@ const ContentAsset = ({
 }: {
   asset: Asset;
   message: ContentMessage;
-  onClickButton: (message: ContentMessage, assetId: string) => void;
+  onClickButton: (message: CompositeMessage, buttonId: string) => void;
   onClickImage: MessageActions['onClickImage'];
   onClickMessage: MessageActions['onClickMessage'];
   selfId: QualifiedId;
@@ -72,7 +72,7 @@ const ContentAsset = ({
               } ${isObfuscated ? 'ephemeral-message-obfuscated' : ''}`}
               dangerouslySetInnerHTML={{__html: (asset as Text).render(selfId, message.accent_color())}}
               onClick={event => onClickMessage(asset as Text, event)}
-              onKeyDown={event => handleKeyDown(event, onClickMessage.bind(null, asset as Text, event))}
+              onKeyDown={event => handleKeyDown(event, () => onClickMessage(asset as Text, event))}
               onAuxClick={event => onClickMessage(asset as Text, event)}
               dir="auto"
             />
@@ -113,11 +113,16 @@ const ContentAsset = ({
     case AssetType.LOCATION:
       return <LocationAssetComponent asset={asset as Location} />;
     case AssetType.BUTTON:
+      const assetId = asset.id;
+      if (!(message instanceof CompositeMessage && asset instanceof Button && assetId)) {
+        return null;
+      }
+
       return (
         <ButtonAssetComponent
-          onClick={() => onClickButton(message, asset.id)}
-          label={(asset as Button).text}
-          id={asset.id}
+          onClick={() => onClickButton(message, assetId)}
+          label={asset.text}
+          id={assetId}
           message={message as CompositeMessage}
         />
       );
