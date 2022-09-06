@@ -19,7 +19,7 @@
 
 import {RECEIPT_MODE} from '@wireapp/api-client/src/conversation/data/';
 import cx from 'classnames';
-import {FC, useEffect, useState} from 'react';
+import {FC, useEffect, useRef, useState} from 'react';
 
 import Icon from 'Components/Icon';
 import ServiceDetails from 'Components/panel/ServiceDetails';
@@ -56,6 +56,7 @@ import {ShortcutType} from '../../../ui/ShortcutType';
 import {UserState} from '../../../user/UserState';
 import {ActionsViewModel} from '../../../view_model/ActionsViewModel';
 import {PanelViewModel} from '../../../view_model/PanelViewModel';
+import {useFadingScrollbar} from '../../../ui/fadingScrollbar';
 
 const CONFIG = {
   MAX_USERS_VISIBLE: 7,
@@ -89,6 +90,8 @@ const ConversationDetails: FC<ConversationDetailsProps> = ({
   isFederated = false,
   isVisible = false,
 }) => {
+  const panelContentRef = useRef<HTMLDivElement>(null);
+
   const [selectedService, setSelectedService] = useState<ServiceEntity>();
 
   const [allUsersCount, setAllUsersCount] = useState<number>(0);
@@ -265,6 +268,8 @@ const ConversationDetails: FC<ConversationDetailsProps> = ({
     setUserParticipants(users);
   }, [activeConversation, participatingUserEts.length, removedFromConversation, selfUser]);
 
+  useFadingScrollbar(panelContentRef.current);
+
   return (
     <div
       id="conversation-details"
@@ -278,7 +283,7 @@ const ConversationDetails: FC<ConversationDetailsProps> = ({
         onToggleMute={toggleMute}
       />
 
-      <div className="panel__content" data-bind="fadingscrollbar">
+      <div className="panel__content" ref={panelContentRef}>
         {isSingleUserMode && isServiceMode && selectedService && <ServiceDetails service={selectedService} />}
 
         {isSingleUserMode && !isServiceMode && firstParticipant && (
@@ -348,7 +353,6 @@ const ConversationDetails: FC<ConversationDetailsProps> = ({
                         <button
                           type="button"
                           className="panel__action-item panel__action-item--no-border"
-                          data-bind="click: clickOnShowAll"
                           onClick={showAllParticipants}
                           data-uie-name="go-conversation-participants"
                         >

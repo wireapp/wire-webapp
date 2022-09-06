@@ -48,7 +48,6 @@ const PanelHeader: FC<PanelHeaderProps> = ({
         title={t('accessibility.rightPanel.close')}
         aria-label={t('accessibility.rightPanel.close')}
         onClick={onClose}
-        data-bind="clickOrDrag: onClose"
         data-uie-name="do-close"
       >
         <Icon.Close />
@@ -61,7 +60,6 @@ const PanelHeader: FC<PanelHeaderProps> = ({
           })}
           type="button"
           onClick={onToggleMute}
-          data-bind="clickOrDrag: clickToToggleMute, css: {'right-panel-mute--active': }"
           data-uie-name="do-mute"
         >
           <Icon.Mute />

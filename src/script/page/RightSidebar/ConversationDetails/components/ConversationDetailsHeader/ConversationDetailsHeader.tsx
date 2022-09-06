@@ -105,7 +105,7 @@ const ConversationDetailsHeader: FC<ConversationDetailsHeaderProps> = ({
         textAreaRef.current?.focus();
       }, 0);
     }
-  }, [textAreaRef.current, isEditingName, groupName]);
+  }, [isEditingName, groupName]);
 
   return (
     <div className="conversation-details__header">
@@ -131,12 +131,8 @@ const ConversationDetailsHeader: FC<ConversationDetailsHeaderProps> = ({
               dir="auto"
               spellCheck="false"
               maxLength={ConversationRepository.CONFIG.GROUP.MAX_NAME_LENGTH}
-              // style={{
-              //   height: textareaHeight
-              // }}
               onChange={renameConversation}
               onKeyDown={handleRenameConversation}
-              // resize
               value={groupName}
               data-uie-name="enter-name"
             />
