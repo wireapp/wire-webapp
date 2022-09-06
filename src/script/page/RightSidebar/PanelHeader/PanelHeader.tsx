@@ -36,6 +36,7 @@ export interface PanelHeaderProps {
   isReverse?: boolean;
   closeUie?: string;
   goBackUie?: string;
+  titleDataUieName?: string;
   title?: string;
   tabIndex?: number;
   handleBlur?: () => void;
@@ -52,6 +53,7 @@ const PanelHeader: ForwardRefRenderFunction<HTMLButtonElement, PanelHeaderProps>
     showNotificationsNothing = false,
     goBackUie,
     title = '',
+    titleDataUieName = '',
     closeUie = 'do-close',
     tabIndex = 0,
     handleBlur = noop,
@@ -78,7 +80,7 @@ const PanelHeader: ForwardRefRenderFunction<HTMLButtonElement, PanelHeaderProps>
       )}
 
       {title && (
-        <h3 className="panel__header__title" tabIndex={0}>
+        <h3 className="panel__header__title" tabIndex={0} data-uie-name={titleDataUieName}>
           {title}
         </h3>
       )}

@@ -28,12 +28,12 @@ import {t} from '../util/LocalizerUtil';
 import {KEY} from 'Util/KeyboardUtil';
 
 export interface ServiceListProps {
-  arrow: boolean;
+  services: ServiceEntity[];
   click: (serviceEntity: ServiceEntity) => void;
+  arrow: boolean;
+  noUnderline: boolean;
   isSearching?: boolean;
   mode?: MODE;
-  noUnderline: boolean;
-  services: ServiceEntity[];
 }
 
 export enum MODE {

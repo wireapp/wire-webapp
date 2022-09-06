@@ -35,6 +35,7 @@ import {isUserEntity} from '../../guards/Panel';
 import ParticipantDevices from './ParticipantDevices/ParticipantDevices';
 import Notifications from './Notifications/Notifications';
 import TimedMessages from './TimedMessages';
+import AddParticipants from './AddParticipants';
 
 const migratedPanels = [
   PanelViewModel.STATE.CONVERSATION_DETAILS,
@@ -42,6 +43,7 @@ const migratedPanels = [
   PanelViewModel.STATE.NOTIFICATIONS,
   PanelViewModel.STATE.PARTICIPANT_DEVICES,
   PanelViewModel.STATE.TIMED_MESSAGES,
+  PanelViewModel.STATE.ADD_PARTICIPANTS,
 ];
 
 interface RightSidebarProps {
@@ -124,10 +126,10 @@ const RightSidebar: FC<RightSidebarProps> = ({contentViewModel, teamState, userS
   }, [isMounted, isVisible]);
 
   useEffect(() => {
-    if (isVisible && previousState && migratedPanels.includes(previousState) && activeConversation) {
+    if (isVisible && state && migratedPanels.includes(state) && activeConversation) {
       togglePanel(state, {entity: activeConversation});
     }
-  }, [isVisible, state, activeConversation, previousState]);
+  }, [isVisible, state, activeConversation]);
 
   useEffect(
     () => () => {
@@ -203,6 +205,21 @@ const RightSidebar: FC<RightSidebarProps> = ({contentViewModel, teamState, userS
           repositories={contentViewModel.repositories}
           onClose={onClose}
           onGoBack={backToConversationDetails}
+        />
+      )}
+
+      {currentState === PanelViewModel.STATE.ADD_PARTICIPANTS && activeConversation && (
+        <AddParticipants
+          activeConversation={activeConversation}
+          onBack={backToConversationDetails}
+          onClose={onClose}
+          conversationRepository={conversationRepository}
+          integrationRepository={integrationRepository}
+          searchRepository={searchRepository}
+          togglePanel={togglePanel}
+          teamRepository={teamRepository}
+          teamState={teamState}
+          userState={userState}
         />
       )}
     </>
