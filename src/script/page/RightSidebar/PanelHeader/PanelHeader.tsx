@@ -42,6 +42,7 @@ const PanelHeader: FC<PanelHeaderProps> = ({
 }) => {
   return (
     <div className={cx('panel__header panel__header--reverse', className)}>
+      {/* TODO: ADD clickOrDrag functionality */}
       <button
         className="right-panel-close icon-button"
         type="button"
@@ -53,6 +54,7 @@ const PanelHeader: FC<PanelHeaderProps> = ({
         <Icon.Close />
       </button>
 
+      {/* TODO: ADD clickOrDrag functionality */}
       {showActionMute && (
         <button
           className={cx('right-panel-close icon-button', {
