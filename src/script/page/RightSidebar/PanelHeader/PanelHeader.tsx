@@ -27,21 +27,46 @@ import {noop} from 'Util/util';
 
 interface PanelHeaderProps {
   onClose: () => void;
+  onBack?: () => void;
   onToggleMute?: () => void;
+  title?: string;
   className?: string;
+  backDataUieName?: string;
+  isReversePanel?: boolean;
+  showBackArrow?: boolean;
   showActionMute?: boolean;
   showNotificationsNothing?: boolean;
 }
 
 const PanelHeader: FC<PanelHeaderProps> = ({
+  onBack,
   onClose,
+  title = '',
   className = '',
+  backDataUieName = '',
+  isReversePanel = false,
+  showBackArrow = false,
   showActionMute = false,
   showNotificationsNothing = false,
   onToggleMute = noop,
 }) => {
   return (
-    <div className={cx('panel__header panel__header--reverse', className)}>
+    <div className={cx('panel__header', {'panel__header--reverse': isReversePanel}, className)}>
+      {showBackArrow && (
+        <button
+          className="icon-button"
+          type="button"
+          onClick={onBack}
+          title={t('accessibility.rightPanel.GoBack')}
+          aria-label={t('accessibility.rightPanel.GoBack')}
+          data-uie-name={backDataUieName}
+        >
+          <Icon.ArrowLeft />
+        </button>
+      )}
+
+      {title && <h3 className="panel__header__title">{title}</h3>}
+
       <button
         className="right-panel-close icon-button"
         type="button"

@@ -23,7 +23,6 @@ import {amplify} from 'amplify';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {AddParticipantsViewModel} from './panel/AddParticipantsViewModel';
-import {ConversationParticipantsViewModel} from './panel/ConversationParticipantsViewModel';
 import {GroupParticipantServiceViewModel} from './panel/GroupParticipantServiceViewModel';
 import {GroupParticipantUserViewModel} from './panel/GroupParticipantUserViewModel';
 import {GuestsAndServicesViewModel} from './panel/GuestsAndServicesViewModel';
@@ -102,7 +101,6 @@ export class PanelViewModel {
   buildSubViews() {
     const viewModels = {
       [PanelViewModel.STATE.ADD_PARTICIPANTS]: AddParticipantsViewModel,
-      [PanelViewModel.STATE.CONVERSATION_PARTICIPANTS]: ConversationParticipantsViewModel,
       [PanelViewModel.STATE.GROUP_PARTICIPANT_SERVICE]: GroupParticipantServiceViewModel,
       [PanelViewModel.STATE.GROUP_PARTICIPANT_USER]: GroupParticipantUserViewModel,
       [PanelViewModel.STATE.GUEST_OPTIONS]: GuestsAndServicesViewModel,

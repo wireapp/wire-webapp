@@ -23,6 +23,7 @@ import {container} from 'tsyringe';
 import {registerReactComponent, useKoSubscribableChildren} from 'Util/ComponentUtil';
 
 import ConversationDetails from './ConversationDetails';
+import ConversationParticipants from './ConversationParticipants';
 
 import {ConversationState} from '../../conversation/ConversationState';
 import {UserState} from '../../user/UserState';
@@ -69,6 +70,17 @@ const RightSidebar: FC<RightSidebarProps> = ({contentViewModel, teamState, userS
           userState={userState}
           isFederated={!!contentViewModel.isFederated}
           isVisible={isVisible}
+        />
+      )}
+
+      {state === PanelViewModel.STATE.CONVERSATION_PARTICIPANTS && activeConversation && (
+        <ConversationParticipants
+          activeConversation={activeConversation}
+          conversationRepository={conversationRepository}
+          searchRepository={searchRepository}
+          teamRepository={teamRepository}
+          isVisible={isVisible}
+          togglePanel={panelViewModel.togglePanel}
         />
       )}
     </>
