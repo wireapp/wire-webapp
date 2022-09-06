@@ -42,6 +42,7 @@ export interface ConversationRecord {
   ephemeral_timer: number;
   global_message_timer: number;
   group_id: string;
+  epoch: number;
   protocol: ConversationProtocol;
   id: string;
   is_guest: boolean;
