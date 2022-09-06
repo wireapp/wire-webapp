@@ -44,6 +44,7 @@ export const useAssetTransfer = (message: ContentMessage, assetRepository = cont
     cancelUpload: () => assetRepository.cancelUpload(message.id),
     downloadAsset: (asset: FileAsset) => assetRepository.downloadFile(asset),
     isDownloading: transferState === AssetTransferState.DOWNLOADING,
+    isPendingUpload: transferState === AssetTransferState.UPLOAD_PENDING,
     isUploaded: transferState === AssetTransferState.UPLOADED,
     isUploading: transferState === AssetTransferState.UPLOADING,
     loadAsset: (resource: AssetRemoteData) => assetRepository.load(resource),

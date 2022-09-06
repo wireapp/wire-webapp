@@ -61,7 +61,8 @@ const VideoAsset: React.FC<VideoAssetProps> = ({
   const [isVideoLoaded, setIsVideoLoaded] = useState(false);
   const {isFileSharingReceivingEnabled} = useKoSubscribableChildren(teamState, ['isFileSharingReceivingEnabled']);
   const [displaySmall, setDisplaySmall] = useState(!!isQuote);
-  const {transferState, uploadProgress, cancelUpload, loadAsset} = useAssetTransfer(message);
+  const {transferState, isUploading, isPendingUpload, uploadProgress, cancelUpload, loadAsset} =
+    useAssetTransfer(message);
 
   const [hideControls, setHideControls] = useState(false);
   const hideControlsCallback = useCallback(() => setHideControls(true), []);
@@ -157,14 +158,14 @@ const VideoAsset: React.FC<VideoAssetProps> = ({
               onPlaying={onVideoPlaying}
               onTimeUpdate={syncVideoTimeRest}
               onLoadedMetadata={syncVideoTimeRest}
-              className={clx({hidden: transferState === AssetTransferState.UPLOADING})}
+              className={clx({hidden: isUploading})}
               style={{backgroundColor: videoPreview ? '#000' : ''}}
             />
             {videoPlaybackError ? (
               <div className="video-asset__playback-error label-xs">{t('conversationPlaybackError')}</div>
             ) : (
               <>
-                {transferState === AssetTransferState.UPLOAD_PENDING ? (
+                {isPendingUpload ? (
                   <div className="asset-placeholder loading-dots" />
                 ) : (
                   <div
@@ -188,9 +189,7 @@ const VideoAsset: React.FC<VideoAssetProps> = ({
                           asset={asset}
                           play={onPlayButtonClicked}
                           pause={onPauseButtonClicked}
-                          cancel={() =>
-                            transferState === AssetTransferState.UPLOADING ? cancelUpload() : asset.cancelDownload()
-                          }
+                          cancel={() => (isUploading ? cancelUpload() : asset.cancelDownload())}
                           transferState={transferState}
                           uploadProgress={uploadProgress}
                         />
