@@ -130,7 +130,11 @@ const VideoAsset: React.FC<VideoAssetProps> = ({
     }
   }, [videoElement, videoSrc]);
 
-  const syncVideoTimeRest = () => videoElement && setVideoTimeRest(videoElement.duration - videoElement.currentTime);
+  const syncVideoTimeRest = () => {
+    if (videoElement) {
+      setVideoTimeRest(videoElement.duration - videoElement.currentTime);
+    }
+  };
 
   return !isObfuscated ? (
     <div className="video-asset" data-uie-name="video-asset" data-uie-value={asset.file_name}>
