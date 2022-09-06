@@ -18,39 +18,34 @@
  */
 
 import React, {useState, useRef, useEffect, FC} from 'react';
-import {container} from 'tsyringe';
 
+import {useKoSubscribableChildren} from 'Util/ComponentUtil';
+import {KEY} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
 import useEffectRef from 'Util/useEffectRef';
-import {registerReactComponent, useKoSubscribableChildren} from 'Util/ComponentUtil';
 
-import {useFadingScrollbar} from '../../ui/fadingScrollbar';
-import {NOTIFICATION_STATE, getNotificationText} from '../../conversation/NotificationSetting';
-import {ViewModelRepositories} from '../MainViewModel';
-import PanelHeader from './PanelHeader';
-import {ConversationState} from '../../conversation/ConversationState';
-import PreferencesRadio from '../../page/MainContent/panels/preferences/components/PreferencesRadio';
-import {KEY} from 'Util/KeyboardUtil';
+import PanelHeader from '../PanelHeader';
+
+import PreferencesRadio from '../../MainContent/panels/preferences/components/PreferencesRadio';
+
+import {NOTIFICATION_STATE, getNotificationText} from '../../../conversation/NotificationSetting';
+import {Conversation} from '../../../entity/Conversation';
+import {useFadingScrollbar} from '../../../ui/fadingScrollbar';
+import {ViewModelRepositories} from '../../../view_model/MainViewModel';
 
 const PANEL_HEADER_BTN_TABINDEX = 2;
 
-export interface NotificationsPanelProps {
-  conversationState?: ConversationState;
+export interface NotificationsProps {
+  activeConversation: Conversation;
   onClose: () => void;
   onGoBack: () => void;
   repositories: ViewModelRepositories;
 }
 
-const NotificationsPanel: FC<NotificationsPanelProps> = ({
-  onGoBack,
-  onClose,
-  repositories,
-  conversationState = container.resolve(ConversationState),
-}) => {
-  const {activeConversation} = useKoSubscribableChildren(conversationState, ['activeConversation']);
-  const {notificationState} = useKoSubscribableChildren(activeConversation!, ['notificationState']);
+const Notifications: FC<NotificationsProps> = ({activeConversation, onGoBack, onClose, repositories}) => {
+  const {notificationState} = useKoSubscribableChildren(activeConversation, ['notificationState']);
   const saveOptionNotificationPreference = (value: number) => {
-    repositories.conversation.setNotificationState(activeConversation!, value);
+    repositories.conversation.setNotificationState(activeConversation, value);
   };
   const [scrollbarRef, setScrollbarRef] = useEffectRef<HTMLDivElement>();
   useFadingScrollbar(scrollbarRef);
@@ -81,7 +76,7 @@ const NotificationsPanel: FC<NotificationsPanelProps> = ({
   };
 
   return (
-    <>
+    <div id="notification-settings" className="panel__page notification-settings panel__page--visible">
       <PanelHeader
         onGoBack={onGoBack}
         onClose={onClose}
@@ -91,6 +86,7 @@ const NotificationsPanel: FC<NotificationsPanelProps> = ({
         ref={btnRef}
         handleBlur={() => setBtnFocus(false)}
       />
+
       <div className="panel__content" ref={setScrollbarRef}>
         <fieldset className="notification-section">
           <PreferencesRadio
@@ -100,6 +96,7 @@ const NotificationsPanel: FC<NotificationsPanelProps> = ({
             options={settings}
           />
         </fieldset>
+
         {/* eslint-disable-next-line jsx-a11y/no-static-element-interactions*/}
         <div
           className="panel__info-text notification-settings__disclaimer"
@@ -110,10 +107,8 @@ const NotificationsPanel: FC<NotificationsPanelProps> = ({
           {t('notificationSettingsDisclaimer')}
         </div>
       </div>
-    </>
+    </div>
   );
 };
 
-export default NotificationsPanel;
-
-registerReactComponent('notifications-panel', NotificationsPanel);
+export default Notifications;

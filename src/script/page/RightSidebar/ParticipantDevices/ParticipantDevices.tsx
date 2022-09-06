@@ -17,35 +17,37 @@
  *
  */
 
-import React from 'react';
+import {FC} from 'react';
 
-import {registerReactComponent} from 'Util/ComponentUtil';
 import useEffectRef from 'Util/useEffectRef';
 import UserDevices, {UserDevicesState, useUserDevicesHistory} from 'Components/UserDevices';
 
-import type {User} from '../../entity/User';
-import {ViewModelRepositories} from '../MainViewModel';
-import PanelHeader from './PanelHeader';
-import {useFadingScrollbar} from '../../ui/fadingScrollbar';
+import PanelHeader from '../PanelHeader';
 
-interface ParticipantDevicesPanelProps {
+import type {User} from '../../../entity/User';
+import {ViewModelRepositories} from '../../../view_model/MainViewModel';
+import {useFadingScrollbar} from '../../../ui/fadingScrollbar';
+
+interface ParticipantDevicesProps {
   onClose: () => void;
-  onGoBack: () => void;
+  onGoBack: (userEntity: User) => void;
   repositories: ViewModelRepositories;
   user: User;
 }
 
-const ParticipantDevicesPanel: React.FC<ParticipantDevicesPanelProps> = ({repositories, onClose, onGoBack, user}) => {
+const ParticipantDevices: FC<ParticipantDevicesProps> = ({repositories, onClose, onGoBack, user}) => {
   const [scrollbarRef, setScrollbarRef] = useEffectRef<HTMLDivElement>();
   useFadingScrollbar(scrollbarRef);
   const history = useUserDevicesHistory();
+
   return (
-    <>
+    <div id="participant-devices" className="panel__page participant-devices panel__page--visible">
       <PanelHeader
         onGoBack={() => {
           if (history.current.state === UserDevicesState.DEVICE_LIST) {
-            return onGoBack();
+            return onGoBack(user);
           }
+
           history.goBack();
         }}
         onClose={onClose}
@@ -63,10 +65,8 @@ const ParticipantDevicesPanel: React.FC<ParticipantDevicesPanelProps> = ({reposi
           user={user}
         />
       </div>
-    </>
+    </div>
   );
 };
 
-export default ParticipantDevicesPanel;
-
-registerReactComponent('participant-devices-panel', ParticipantDevicesPanel);
+export default ParticipantDevices;
