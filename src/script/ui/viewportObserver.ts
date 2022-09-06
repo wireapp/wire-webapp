@@ -114,9 +114,12 @@ export const viewportObserver = {
   trackElement,
 };
 
-export const useViewPortObserver = (elementRef: HTMLElement, defaultIsVisible: boolean = false): boolean => {
+export const useViewPortObserver = (elementRef?: HTMLElement, defaultIsVisible: boolean = false): boolean => {
   const [isInViewport, setIsInViewport] = useState(defaultIsVisible);
   useEffect(() => {
+    if (!elementRef) {
+      return () => {};
+    }
     viewportObserver.trackElement(elementRef, (isInViewport: boolean) => {
       if (isInViewport) {
         setIsInViewport(true);

@@ -48,7 +48,7 @@ export interface QuoteProps {
   conversation: Conversation;
   findMessage: (conversation: Conversation, messageId: string) => Promise<ContentMessage | undefined>;
   focusMessage: (id: string) => void;
-  handleClickOnMessage: (message: ContentMessage, event: React.MouseEvent) => void;
+  handleClickOnMessage: (message: Text, event: React.UIEvent) => void;
   quote: QuoteEntity;
   selfId: QualifiedId;
   showDetail: (message: ContentMessage, event: React.MouseEvent) => void;
@@ -66,7 +66,7 @@ const Quote: React.FC<QuoteProps> = ({
   showUserDetails,
 }) => {
   const [quotedMessage, setQuotedMessage] = useState<ContentMessage>();
-  const [error, setError] = useState<Error | string>(quote.error);
+  const [error, setError] = useState<Error | string | undefined>(quote.error);
 
   useEffect(() => {
     const handleQuoteDeleted = (messageId: string) => {
@@ -115,14 +115,16 @@ const Quote: React.FC<QuoteProps> = ({
           {t('replyQuoteError')}
         </div>
       ) : (
-        <QuotedMessage
-          quotedMessage={quotedMessage}
-          selfId={selfId}
-          focusMessage={focusMessage}
-          handleClickOnMessage={handleClickOnMessage}
-          showDetail={showDetail}
-          showUserDetails={showUserDetails}
-        />
+        quotedMessage && (
+          <QuotedMessage
+            quotedMessage={quotedMessage}
+            selfId={selfId}
+            focusMessage={focusMessage}
+            handleClickOnMessage={handleClickOnMessage}
+            showDetail={showDetail}
+            showUserDetails={showUserDetails}
+          />
+        )
       )}
     </div>
   );
@@ -130,7 +132,7 @@ const Quote: React.FC<QuoteProps> = ({
 
 interface QuotedMessageProps {
   focusMessage: (id: string) => void;
-  handleClickOnMessage: (message: ContentMessage | Text, event: React.MouseEvent) => void;
+  handleClickOnMessage: (message: Text, event: React.UIEvent) => void;
   quotedMessage: ContentMessage;
   selfId: QualifiedId;
   showDetail: (message: ContentMessage, event: React.MouseEvent) => void;
@@ -162,7 +164,7 @@ const QuotedMessage: React.FC<QuotedMessageProps> = ({
   ]);
   const [canShowMore, setCanShowMore] = useState(false);
   const [showFullText, setShowFullText] = useState(false);
-  const [textQuoteElement, setTextQuoteElement] = useEffectRef();
+  const [textQuoteElement, setTextQuoteElement] = useEffectRef<HTMLDivElement>();
 
   useEffect(() => {
     setShowFullText(false);
@@ -220,7 +222,7 @@ const QuotedMessage: React.FC<QuotedMessageProps> = ({
                 })}
                 ref={setTextQuoteElement}
                 onClick={event => handleClickOnMessage(asset, event)}
-                onKeyDown={event => handleKeyDown(event, handleClickOnMessage.bind(this, asset, event))}
+                onKeyDown={event => handleKeyDown(event, () => handleClickOnMessage(asset, event))}
                 dangerouslySetInnerHTML={{__html: asset.render(selfId)}}
                 dir="auto"
                 data-uie-name="media-text-quote"
