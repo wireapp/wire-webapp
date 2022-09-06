@@ -873,8 +873,8 @@ exports[`stricter compilation`] = {
       [128, 42, 8, "Argument of type \'string | undefined\' is not assignable to parameter of type \'string\'.\\n  Type \'undefined\' is not assignable to type \'string\'.", "4039656867"],
       [144, 9, 13, "Type \'{ clickToShowSelfFingerprint: () => void; clientRepository: ClientRepository; cryptographyRepository: CryptographyRepository; logger: Logger; messageRepository: MessageRepository; noPadding: boolean; selectedClient: ClientEntity | undefined; user: User; }\' is not assignable to type \'DeviceDetailsProps\'.\\n  Types of property \'selectedClient\' are incompatible.\\n    Type \'ClientEntity | undefined\' is not assignable to type \'ClientEntity\'.\\n      Type \'undefined\' is not assignable to type \'ClientEntity\'.", "538994175"]
     ],
-    "src/script/components/UserList.tsx:1768505054": [
-      [97, 28, 12, "Argument of type \'Conversation | undefined\' is not assignable to parameter of type \'Partial<Record<\\"roles\\", Subscribable<any>>>\'.\\n  Type \'undefined\' is not assignable to type \'Partial<Record<\\"roles\\", Subscribable<any>>>\'.", "1670678216"]
+    "src/script/components/UserList.tsx:2826949433": [
+      [99, 28, 12, "Argument of type \'Conversation | undefined\' is not assignable to parameter of type \'Partial<Record<\\"roles\\", Subscribable<any>>>\'.\\n  Type \'undefined\' is not assignable to type \'Partial<Record<\\"roles\\", Subscribable<any>>>\'.", "1670678216"]
     ],
     "src/script/components/UserSearchableList.tsx:1290904950": [
       [73, 32, 11, "Argument of type \'{ filter?: Observable<string> | undefined; highlightedUsers?: Observable<User[]> | undefined; selected?: ObservableArray<User> | undefined; users: ObservableArray<...>; } | undefined\' is not assignable to parameter of type \'Partial<Record<\\"filter\\" | \\"selected\\" | \\"users\\" | \\"highlightedUsers\\", Subscribable<any>>>\'.\\n  Type \'undefined\' is not assignable to type \'Partial<Record<\\"filter\\" | \\"selected\\" | \\"users\\" | \\"highlightedUsers\\", Subscribable<any>>>\'.", "965633731"],

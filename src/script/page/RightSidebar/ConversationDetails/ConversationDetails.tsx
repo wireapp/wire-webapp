@@ -32,11 +32,11 @@ import {t} from 'Util/LocalizerUtil';
 import {sortUsersByPriority} from 'Util/StringUtil';
 import {formatDuration} from 'Util/TimeUtil';
 
-import getConversationActions from './components/getConversationActions';
 import UserConversationDetails from './components/UserConversationDetails/UserConversationDetails';
 import ConversationDetailsBottomActions from './components/ConversationDetailsBottomActions/ConversationDetailsBottomActions';
 import ConversationDetailsOptions from './components/ConversationDetailsOptions/ConversationDetailsOptions';
 import ConversationDetailsHeader from './components/ConversationDetailsHeader/ConversationDetailsHeader';
+import getConversationActions from './utils/getConversationActions';
 
 import PanelHeader from '../PanelHeader';
 
@@ -338,7 +338,7 @@ const ConversationDetails: FC<ConversationDetailsProps> = ({
                         users={userParticipants}
                         onClick={showUser}
                         noUnderline
-                        // arrow
+                        showArrow
                         searchRepository={searchRepository}
                         teamRepository={teamRepository}
                         conversationRepository={conversationRepository}
