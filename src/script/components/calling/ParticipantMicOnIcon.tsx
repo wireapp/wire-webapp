@@ -19,7 +19,6 @@
 
 import React from 'react';
 import {keyframes} from '@emotion/react';
-import {registerReactComponent} from 'Util/ComponentUtil';
 import SVGProvider from '../../auth/util/SVGProvider';
 
 const fadeAnimation = keyframes`
@@ -66,5 +65,3 @@ const ParticipantMicOnIcon: React.FC<ParticipantMicOnIconProps> = ({
 };
 
 export default ParticipantMicOnIcon;
-
-registerReactComponent('participant-mic-on-icon', ParticipantMicOnIcon);

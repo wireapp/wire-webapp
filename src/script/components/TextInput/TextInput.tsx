@@ -18,7 +18,6 @@
  */
 
 import React, {useEffect} from 'react';
-import {registerReactComponent} from 'Util/ComponentUtil';
 import Icon from 'Components/Icon';
 import {CheckIcon, COLOR} from '@wireapp/react-ui-kit';
 import {
@@ -130,5 +129,3 @@ const TextInput: React.ForwardRefRenderFunction<HTMLDivElement, UserInputProps> 
 const TextInputForwarded = React.forwardRef(TextInput);
 
 export default TextInputForwarded;
-
-registerReactComponent('text-input', TextInputForwarded);
