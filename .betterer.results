@@ -273,7 +273,6 @@ exports[`stricter compilation`] = {
       [40, 2, 5, "Type \'undefined\' is not assignable to type \'string\'.", "187940249"],
       [41, 2, 10, "Type \'undefined\' is not assignable to type \'string\'.", "1244982411"],
       [42, 2, 4, "Type \'undefined\' is not assignable to type \'TeamData\'.", "2087956856"],
-      [47, 2, 7, "Type \'undefined\' is not assignable to type \'boolean\'.", "2643464100"],
       [48, 2, 7, "Type \'undefined\' is not assignable to type \'string\'.", "3920213849"],
       [49, 2, 4, "Type \'undefined\' is not assignable to type \'string\'.", "2087846158"],
       [50, 2, 2, "Type \'undefined\' is not assignable to type \'string\'.", "5861160"],
@@ -348,7 +347,6 @@ exports[`stricter compilation`] = {
       [90, 19, 5, "Argument of type \'unknown\' is not assignable to parameter of type \'SetStateAction<undefined>\'.", "165548477"]
     ],
     "src/script/auth/page/Root.tsx:1368054504": [
-      [106, 35, 7, "Property \'DEFAULT\' does not exist on type \'typeof THEME_ID\'.", "2783041582"],
       [130, 16, 9, "No overload matches this call.\\n  Overload 1 of 2, \'(props: (RouteProps<string, { [x: string]: string | undefined; }> & OmitNative<{}, keyof RouteProps<string, { [x: string]: string | undefined; }>>) | Readonly<...>): Route<...>\', gave the following error.\\n    Type \'false | ConnectedComponent<({ teamName, enterTeamCreationFlow, resetInviteErrors, pushAccountRegistrationData, authError, }: Props & { authError: Error; teamName: string; } & { enterTeamCreationFlow: () => Promise<void>; pushAccountRegistrationData: (registration: Partial<RegistrationDataState>) => Promise<...>; res...\' is not assignable to type \'ComponentType<any> | ComponentType<RouteComponentProps<any, StaticContext, unknown>> | undefined\'.\\n      Type \'false\' is not assignable to type \'ComponentType<any> | ComponentType<RouteComponentProps<any, StaticContext, unknown>> | undefined\'.\\n  Overload 2 of 2, \'(props: RouteProps<string, { [x: string]: string | undefined; }> & OmitNative<{}, keyof RouteProps<string, { [x: string]: string | undefined; }>>, context: any): Route<...>\', gave the following error.\\n    Type \'false | ConnectedComponent<({ teamName, enterTeamCreationFlow, resetInviteErrors, pushAccountRegistrationData, authError, }: Props & { authError: Error; teamName: string; } & { enterTeamCreationFlow: () => Promise<void>; pushAccountRegistrationData: (registration: Partial<RegistrationDataState>) => Promise<...>; res...\' is not assignable to type \'ComponentType<any> | ComponentType<RouteComponentProps<any, StaticContext, unknown>> | undefined\'.", "4247110506"],
       [173, 16, 9, "No overload matches this call.\\n  Overload 1 of 2, \'(props: (RouteProps<string, { [x: string]: string | undefined; }> & OmitNative<{}, keyof RouteProps<string, { [x: string]: string | undefined; }>>) | Readonly<...>): Route<...>\', gave the following error.\\n    Type \'false | ConnectedComponent<({ account, authError, currentFlow, entropyData, doRegisterPersonal, doRegisterTeam, doSendActivationCode, }: Props & { account: RegistrationDataState; authError: Error; currentFlow: string; entropyData: Uint8Array | undefined; } & { ...; }) => Element, Omit<...> & ConnectProps>\' is not assignable to type \'ComponentType<any> | ComponentType<RouteComponentProps<any, StaticContext, unknown>> | undefined\'.\\n      Type \'false\' is not assignable to type \'ComponentType<any> | ComponentType<RouteComponentProps<any, StaticContext, unknown>> | undefined\'.\\n  Overload 2 of 2, \'(props: RouteProps<string, { [x: string]: string | undefined; }> & OmitNative<{}, keyof RouteProps<string, { [x: string]: string | undefined; }>>, context: any): Route<...>\', gave the following error.\\n    Type \'false | ConnectedComponent<({ account, authError, currentFlow, entropyData, doRegisterPersonal, doRegisterTeam, doSendActivationCode, }: Props & { account: RegistrationDataState; authError: Error; currentFlow: string; entropyData: Uint8Array | undefined; } & { ...; }) => Element, Omit<...> & ConnectProps>\' is not assignable to type \'ComponentType<any> | ComponentType<RouteComponentProps<any, StaticContext, unknown>> | undefined\'.", "4247110506"],
       [177, 16, 9, "No overload matches this call.\\n  Overload 1 of 2, \'(props: (RouteProps<string, { [x: string]: string | undefined; }> & OmitNative<{}, keyof RouteProps<string, { [x: string]: string | undefined; }>>) | Readonly<...>): Route<...>\', gave the following error.\\n    Type \'false | ConnectedComponent<({ isPersonalFlow, enterPersonalCreationFlow }: Props & { isPersonalFlow: boolean; } & { enterPersonalCreationFlow: () => Promise<void>; }) => Element, Omit<Props & { isPersonalFlow: boolean; } & { ...; }, \\"enterPersonalCreationFlow\\" | \\"isPersonalFlow\\"> & ConnectProps>\' is not assignable to type \'ComponentType<any> | ComponentType<RouteComponentProps<any, StaticContext, unknown>> | undefined\'.\\n      Type \'false\' is not assignable to type \'ComponentType<any> | ComponentType<RouteComponentProps<any, StaticContext, unknown>> | undefined\'.\\n  Overload 2 of 2, \'(props: RouteProps<string, { [x: string]: string | undefined; }> & OmitNative<{}, keyof RouteProps<string, { [x: string]: string | undefined; }>>, context: any): Route<...>\', gave the following error.\\n    Type \'false | ConnectedComponent<({ isPersonalFlow, enterPersonalCreationFlow }: Props & { isPersonalFlow: boolean; } & { enterPersonalCreationFlow: () => Promise<void>; }) => Element, Omit<Props & { isPersonalFlow: boolean; } & { ...; }, \\"enterPersonalCreationFlow\\" | \\"isPersonalFlow\\"> & ConnectProps>\' is not assignable to type \'ComponentType<any> | ComponentType<RouteComponentProps<any, StaticContext, unknown>> | undefined\'.", "4247110506"],
@@ -421,7 +419,6 @@ exports[`stricter compilation`] = {
       [84, 9, 21, "Object is possibly \'undefined\'.", "173618382"],
       [85, 15, 77, "Argument of type \'ValidationError | null\' is not assignable to parameter of type \'SetStateAction<null>\'.", "190261043"],
       [85, 61, 21, "Object is possibly \'undefined\'.", "173618382"],
-      [91, 12, 7, "Type \'undefined\' is not assignable to type \'boolean\'.", "2643464100"],
       [92, 12, 7, "Type \'undefined\' is not assignable to type \'string\'.", "3920213849"],
       [93, 12, 4, "Type \'undefined\' is not assignable to type \'string\'.", "2087846158"],
       [94, 12, 2, "Type \'undefined\' is not assignable to type \'string\'.", "5861160"],
@@ -451,9 +448,6 @@ exports[`stricter compilation`] = {
       [45, 88, 5, "Property \'label\' does not exist on type \'never\'.", "173467459"],
       [46, 51, 5, "Property \'label\' does not exist on type \'never\'.", "173467459"],
       [47, 59, 5, "Property \'label\' does not exist on type \'never\'.", "173467459"]
-    ],
-    "src/script/auth/util/test/TestUtil.tsx:1653578349": [
-      [39, 86, 7, "Property \'DEFAULT\' does not exist on type \'typeof THEME_ID\'.", "2783041582"]
     ],
     "src/script/auth/util/urlUtil.ts:2936167840": [
       [61, 2, 17, "Type \'Window | null\' is not assignable to type \'Window\'.\\n  Type \'null\' is not assignable to type \'Window\'.", "211185092"]
@@ -2045,8 +2039,7 @@ exports[`stricter compilation`] = {
       [34, 63, 38, "Argument of type \'Element | null\' is not assignable to parameter of type \'Element\'.\\n  Type \'null\' is not assignable to type \'Element\'.", "495210063"]
     ],
     "src/script/page/MainContent/MainContent.tsx:1247306180": [
-      [70, 10, 12, "Type \'Conversation | null\' is not assignable to type \'Conversation\'.\\n  Type \'null\' is not assignable to type \'Conversation\'.", "1670678216"],
-      [161, 35, 7, "Property \'DEFAULT\' does not exist on type \'typeof THEME_ID\'.", "2783041582"]
+      [70, 10, 12, "Type \'Conversation | null\' is not assignable to type \'Conversation\'.\\n  Type \'null\' is not assignable to type \'Conversation\'.", "1670678216"]
     ],
     "src/script/page/MainContent/panels/Collection/FullSearch.tsx:2917650160": [
       [99, 10, 10, "Object is possibly \'undefined\'.", "1962587969"],
@@ -2061,31 +2054,13 @@ exports[`stricter compilation`] = {
       [31, 13, 16, "Object is possibly \'undefined\'.", "3400861264"],
       [34, 8, 16, "Object is possibly \'undefined\'.", "3400861264"]
     ],
-    "src/script/page/MainContent/panels/preferences/AboutPreferences.tsx:3079336655": [
-      [19, 14, 11, "Module \'\\"@wireapp/react-ui-kit\\"\' has no exported member \'LinkVariant\'.", "2728514642"],
-      [57, 16, 7, "Type \'{ children: string; variant: any; targetBlank: true; href: string; \\"data-uie-name\\": string; }\' is not assignable to type \'IntrinsicAttributes & { css?: Interpolation<Theme>; } & LinkProps<HTMLAnchorElement>\'.\\n  Property \'variant\' does not exist on type \'IntrinsicAttributes & { css?: Interpolation<Theme>; } & LinkProps<HTMLAnchorElement>\'.", "643478802"],
-      [67, 16, 7, "Type \'{ children: string; variant: any; targetBlank: true; href: string; \\"data-uie-name\\": string; }\' is not assignable to type \'IntrinsicAttributes & { css?: Interpolation<Theme>; } & LinkProps<HTMLAnchorElement>\'.\\n  Property \'variant\' does not exist on type \'IntrinsicAttributes & { css?: Interpolation<Theme>; } & LinkProps<HTMLAnchorElement>\'.", "643478802"],
-      [83, 22, 7, "Type \'{ children: string; variant: any; targetBlank: true; href: string; \\"data-uie-name\\": string; }\' is not assignable to type \'IntrinsicAttributes & { css?: Interpolation<Theme>; } & LinkProps<HTMLAnchorElement>\'.\\n  Property \'variant\' does not exist on type \'IntrinsicAttributes & { css?: Interpolation<Theme>; } & LinkProps<HTMLAnchorElement>\'.", "643478802"],
-      [90, 22, 7, "Type \'{ children: string; variant: any; targetBlank: true; href: string; \\"data-uie-name\\": string; }\' is not assignable to type \'IntrinsicAttributes & { css?: Interpolation<Theme>; } & LinkProps<HTMLAnchorElement>\'.\\n  Property \'variant\' does not exist on type \'IntrinsicAttributes & { css?: Interpolation<Theme>; } & LinkProps<HTMLAnchorElement>\'.", "643478802"],
-      [97, 22, 7, "Type \'{ children: string; variant: any; targetBlank: true; href: string; \\"data-uie-name\\": string; }\' is not assignable to type \'IntrinsicAttributes & { css?: Interpolation<Theme>; } & LinkProps<HTMLAnchorElement>\'.\\n  Property \'variant\' does not exist on type \'IntrinsicAttributes & { css?: Interpolation<Theme>; } & LinkProps<HTMLAnchorElement>\'.", "643478802"]
-    ],
     "src/script/page/MainContent/panels/preferences/AccountPreferences.tsx:487388879": [
       [95, 79, 34, "Argument of type \'boolean | undefined\' is not assignable to parameter of type \'boolean\'.", "212151669"],
       [124, 6, 9, "Argument of type \'undefined\' is not assignable to parameter of type \'string\'.", "2620553983"]
     ],
-    "src/script/page/MainContent/panels/preferences/accountPreferences/AccountLink.test.tsx:3322973929": [
-      [29, 33, 7, "Property \'DEFAULT\' does not exist on type \'typeof THEME_ID\'.", "2783041582"],
-      [43, 33, 7, "Property \'DEFAULT\' does not exist on type \'typeof THEME_ID\'.", "2783041582"]
-    ],
     "src/script/page/MainContent/panels/preferences/accountPreferences/AccountSecuritySection.tsx:281427554": [
-      [35, 14, 11, "Module \'\\"@wireapp/react-ui-kit\\"\' has no exported member \'LinkVariant\'.", "2728514642"],
       [70, 6, 9, "Argument of type \'undefined\' is not assignable to parameter of type \'string\'.", "2620553983"],
-      [78, 10, 7, "Type \'{ children: string; tabIndex: number; variant: any; onClick: () => Window; \\"data-uie-name\\": string; type: string; }\' is not assignable to type \'IntrinsicAttributes & { css?: Interpolation<Theme>; } & LinkProps<HTMLAnchorElement>\'.\\n  Property \'variant\' does not exist on type \'IntrinsicAttributes & { css?: Interpolation<Theme>; } & LinkProps<HTMLAnchorElement>\'.", "643478802"],
-      [88, 14, 7, "Type \'{ children: string; variant: any; targetBlank: true; href: string; \\"data-uie-name\\": string; }\' is not assignable to type \'IntrinsicAttributes & { css?: Interpolation<Theme>; } & LinkProps<HTMLAnchorElement>\'.\\n  Property \'variant\' does not exist on type \'IntrinsicAttributes & { css?: Interpolation<Theme>; } & LinkProps<HTMLAnchorElement>\'.", "643478802"],
-      [95, 10, 7, "Type \'{ children: string; tabIndex: number; variant: any; onClick: () => boolean; \\"data-uie-name\\": string; type: string; }\' is not assignable to type \'IntrinsicAttributes & { css?: Interpolation<Theme>; } & LinkProps<HTMLAnchorElement>\'.\\n  Property \'variant\' does not exist on type \'IntrinsicAttributes & { css?: Interpolation<Theme>; } & LinkProps<HTMLAnchorElement>\'.", "643478802"],
-      [106, 10, 7, "Type \'{ children: string; tabIndex: number; variant: any; onClick: () => Window; title: string; \\"data-uie-name\\": string; type: string; }\' is not assignable to type \'IntrinsicAttributes & { css?: Interpolation<Theme>; } & LinkProps<HTMLAnchorElement>\'.\\n  Property \'variant\' does not exist on type \'IntrinsicAttributes & { css?: Interpolation<Theme>; } & LinkProps<HTMLAnchorElement>\'.", "643478802"],
-      [107, 40, 43, "Argument of type \'string | undefined\' is not assignable to parameter of type \'string\'.\\n  Type \'undefined\' is not assignable to type \'string\'.", "1072333434"],
-      [119, 10, 7, "Type \'{ children: string; tabIndex: number; variant: any; onClick: () => void; \\"data-uie-name\\": string; type: string; }\' is not assignable to type \'IntrinsicAttributes & { css?: Interpolation<Theme>; } & LinkProps<HTMLAnchorElement>\'.\\n  Property \'variant\' does not exist on type \'IntrinsicAttributes & { css?: Interpolation<Theme>; } & LinkProps<HTMLAnchorElement>\'.", "643478802"]
+      [107, 40, 43, "Argument of type \'string | undefined\' is not assignable to parameter of type \'string\'.\\n  Type \'undefined\' is not assignable to type \'string\'.", "1072333434"]
     ],
     "src/script/page/MainContent/panels/preferences/accountPreferences/AvatarInput.tsx:3583834949": [
       [50, 69, 9, "Argument of type \'undefined\' is not assignable to parameter of type \'string\'.", "2620553983"],
@@ -2095,10 +2070,6 @@ exports[`stricter compilation`] = {
     "src/script/page/MainContent/panels/preferences/accountPreferences/EmailInput.tsx:542696972": [
       [56, 10, 5, "Object is of type \'unknown\'.", "165548477"],
       [59, 10, 5, "Object is of type \'unknown\'.", "165548477"]
-    ],
-    "src/script/page/MainContent/panels/preferences/accountPreferences/LogoutSection.tsx:2586585306": [
-      [22, 14, 11, "Module \'\\"@wireapp/react-ui-kit\\"\' has no exported member \'LinkVariant\'.", "2728514642"],
-      [32, 6, 7, "Type \'{ children: string; tabIndex: number; variant: any; onClick: () => Promise<void>; \\"data-uie-name\\": string; type: string; }\' is not assignable to type \'IntrinsicAttributes & { css?: Interpolation<Theme>; } & LinkProps<HTMLAnchorElement>\'.\\n  Property \'variant\' does not exist on type \'IntrinsicAttributes & { css?: Interpolation<Theme>; } & LinkProps<HTMLAnchorElement>\'.", "643478802"]
     ],
     "src/script/page/MainContent/panels/preferences/avPreferences/CameraPreferences.tsx:147485328": [
       [80, 82, 5, "Object is of type \'unknown\'.", "165548477"],

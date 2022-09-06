@@ -17,7 +17,7 @@
  *
  */
 
-import React, {useEffect} from 'react';
+import React, {ForwardRefRenderFunction, useEffect, useRef} from 'react';
 import {registerReactComponent} from 'Util/ComponentUtil';
 import Icon from 'Components/Icon';
 import {CheckIcon, COLOR} from '@wireapp/react-ui-kit';
@@ -30,6 +30,7 @@ import {
   getLabelCSS,
 } from 'Components/TextInput/TextInput.styles';
 import {t} from 'Util/LocalizerUtil';
+import {isTabKey} from 'Util/KeyboardUtil';
 
 export interface UserInputProps {
   autoFocus?: boolean;
@@ -54,30 +55,28 @@ export interface UserInputProps {
 
 const SUCCESS_DISMISS_TIMEOUT = 2500;
 
-const TextInput: React.ForwardRefRenderFunction<HTMLInputElement, UserInputProps> = (
-  {
-    autoFocus,
-    disabled,
-    errorMessage,
-    isError,
-    isSuccess,
-    label,
-    name,
-    onCancel,
-    onChange,
-    onBlur,
-    onKeyDown,
-    onSuccessDismissed,
-    placeholder,
-    value,
-    uieName,
-    errorUieName,
-    inputWrapperRef,
-    setIsEditing,
-  }: UserInputProps,
-  ref: React.ForwardedRef<HTMLInputElement>,
-) => {
+const TextInput: ForwardRefRenderFunction<HTMLInputElement, UserInputProps> = ({
+  autoFocus,
+  disabled,
+  errorMessage,
+  isError,
+  isSuccess,
+  label,
+  name,
+  onCancel,
+  onChange,
+  onBlur,
+  onKeyDown,
+  onSuccessDismissed,
+  placeholder,
+  value,
+  uieName,
+  errorUieName,
+  inputWrapperRef,
+  setIsEditing,
+}: UserInputProps) => {
   const isFilled = Boolean(value);
+  const textInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (isSuccess && onSuccessDismissed) {
@@ -116,7 +115,7 @@ const TextInput: React.ForwardRefRenderFunction<HTMLInputElement, UserInputProps
         onBlur={onBlur}
         onKeyDown={onKeyDown}
         placeholder={placeholder}
-        ref={ref}
+        ref={textInputRef}
         data-uie-name={uieName}
       />
       <label className="label-medium" css={getLabelCSS(changedColor)} htmlFor={name}>
@@ -126,13 +125,16 @@ const TextInput: React.ForwardRefRenderFunction<HTMLInputElement, UserInputProps
         <button
           type="button"
           css={cancelButtonCSS}
-          onClick={onCancel}
+          onClick={() => {
+            onCancel();
+            textInputRef.current?.focus();
+          }}
           aria-label={t('accessibility.userProfileDeleteEntry')}
-          onKeyDown={event => {
-            if (event.shiftKey && event.key === 'Tab') {
+          onKeyDown={(event: React.KeyboardEvent<HTMLButtonElement>): void => {
+            if (event.shiftKey && isTabKey(event)) {
               // shift+tab from clear button should focus on the input field
               setIsEditing(true);
-            } else if (event.key === 'Tab') {
+            } else if (isTabKey(event)) {
               // tab from clear button should close the editable field
               setIsEditing(false);
             }

@@ -17,14 +17,15 @@
  *
  */
 
-import React, {useEffect, useState, useRef} from 'react';
+import {useEffect, useState, useRef, FC, InputHTMLAttributes} from 'react';
 import Icon from 'Components/Icon';
 import useIsMounted from 'Util/useIsMounted';
 import {MotionDuration} from '../../../../../motion/MotionDuration';
 import TextInput from 'Components/TextInput';
 import {IconButton, IconButtonVariant} from '@wireapp/react-ui-kit';
+import {isTabKey, isEnterKey} from '../../../../../util/KeyboardUtil';
 
-interface AccountInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
+interface AccountInputProps extends InputHTMLAttributes<HTMLInputElement> {
   allowedChars?: string;
   'data-uie-name'?: string;
   forceLowerCase?: boolean;
@@ -61,7 +62,7 @@ export const useInputDone = () => {
   return {done, isDone};
 };
 
-const AccountInput: React.FC<AccountInputProps> = ({
+const AccountInput: FC<AccountInputProps> = ({
   label,
   fieldName,
   value,
@@ -78,7 +79,6 @@ const AccountInput: React.FC<AccountInputProps> = ({
   valueUie,
   ...rest
 }) => {
-  const textInputRef = useRef<HTMLInputElement>(null);
   const inputWrapperRef = useRef<HTMLDivElement>(null);
 
   const [input, setInput] = useState<string>('');
@@ -101,7 +101,7 @@ const AccountInput: React.FC<AccountInputProps> = ({
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
     };
-  }, [inputWrapperRef]);
+  }, []);
 
   const updateInput = (value: string) => {
     if (allowedChars) {
@@ -188,17 +188,16 @@ const AccountInput: React.FC<AccountInputProps> = ({
           onChange={({target}) => updateInput(target.value)}
           onCancel={() => {
             updateInput('');
-            textInputRef.current?.focus();
             setIsEditing(true);
           }}
           onKeyDown={event => {
-            if (event.key === 'Enter' && !event.shiftKey && !event.altKey) {
+            if (isEnterKey(event) && !event.shiftKey && !event.altKey) {
               event.preventDefault();
               onValueChange?.(input);
               (event.target as HTMLInputElement).blur();
               // on enter save changes and close the editable field
               setIsEditing(false);
-            } else if (event.key === 'Tab' && !!!input) {
+            } else if (isTabKey(event) && !!!input) {
               // after clearing the input i.e field value is empty when user press tab,
               // revert to the last saved value, close the editable field and focus on the next field
               setInput(value);
@@ -210,7 +209,6 @@ const AccountInput: React.FC<AccountInputProps> = ({
             setIsEditingExternal?.(false);
           }}
           setIsEditing={setIsEditing}
-          ref={textInputRef}
         />
       )}
     </div>
