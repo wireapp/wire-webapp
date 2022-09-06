@@ -55,9 +55,8 @@ const Device: React.FC<{
   deviceNumber: number;
 }> = ({device, isSSO, onSelect, onRemove, deviceNumber}) => {
   const {isVerified} = useKoSubscribableChildren(device.meta, ['isVerified']);
-  const deviceAriaLabel = `${t('preferencesDevice')} ${deviceNumber}, ${device.getName()}, ${
-    isVerified ? t('preferencesDevicesVerification') : t('preferencesDeviceNotVerified')
-  }, `;
+  const verifiedLabel = isVerified ? t('preferencesDevicesVerification') : t('preferencesDeviceNotVerified');
+  const deviceAriaLabel = `${t('preferencesDevice')} ${deviceNumber}, ${device.getName()}, ${verifiedLabel}`;
   const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.stopPropagation();
     onRemove(device);
@@ -110,7 +109,7 @@ const Device: React.FC<{
           className="icon-forward preferences-devices-card-action__forward"
           data-uie-name="go-device-details"
           aria-label={t('accessibility.headings.preferencesDeviceDetails')}
-          aria-hidden={true}
+          aria-hidden
         ></button>
       </div>
     </div>
