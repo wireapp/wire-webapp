@@ -429,10 +429,7 @@ class App {
       await mlsConversationState
         .getState()
         .sendExternalToPendingJoin(conversationEntities, conversation =>
-          this.core.service!.conversation.sendExternalJoinProposalsForPendingToJoinConversation(
-            conversation.groupId,
-            conversation.epoch,
-          ),
+          this.core.service!.conversation.sendExternalJoinProposal(conversation.groupId, conversation.epoch),
         );
 
       const connectionEntities = await connectionRepository.getConnections();
