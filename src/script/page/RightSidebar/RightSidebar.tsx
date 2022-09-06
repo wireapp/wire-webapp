@@ -18,14 +18,16 @@
  */
 
 import {FC} from 'react';
+import {container} from 'tsyringe';
 
 import {registerReactComponent, useKoSubscribableChildren} from 'Util/ComponentUtil';
 
 import ConversationDetails from './ConversationDetails';
 
-import {ContentViewModel} from '../../view_model/ContentViewModel';
-import {TeamState} from '../../team/TeamState';
+import {ConversationState} from '../../conversation/ConversationState';
 import {UserState} from '../../user/UserState';
+import {TeamState} from '../../team/TeamState';
+import {ContentViewModel} from '../../view_model/ContentViewModel';
 import {PanelViewModel} from '../../view_model/PanelViewModel';
 
 interface RightSidebarProps {
@@ -43,8 +45,8 @@ const RightSidebar: FC<RightSidebarProps> = ({contentViewModel, teamState, userS
   } = contentViewModel.repositories;
 
   const {actions: actionsViewModel, panel: panelViewModel} = contentViewModel.mainViewModel;
+  const conversationState = container.resolve(ConversationState);
 
-  const conversationState = conversationRepository.getConversationState();
   const {isVisible, state} = useKoSubscribableChildren(panelViewModel, ['isVisible', 'state']);
   const {activeConversation} = useKoSubscribableChildren(conversationState, ['activeConversation']);
 
@@ -61,7 +63,6 @@ const RightSidebar: FC<RightSidebarProps> = ({contentViewModel, teamState, userS
           conversationRepository={conversationRepository}
           integrationRepository={integrationRepository}
           panelViewModel={panelViewModel}
-          roleRepository={conversationRepository.conversationRoleRepository}
           searchRepository={searchRepository}
           teamRepository={teamRepository}
           teamState={teamState}

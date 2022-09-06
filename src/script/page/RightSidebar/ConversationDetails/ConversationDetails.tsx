@@ -18,45 +18,44 @@
  */
 
 import {RECEIPT_MODE} from '@wireapp/api-client/src/conversation/data/';
-import {WebAppEvents} from '@wireapp/webapp-events';
-import {amplify} from 'amplify';
 import cx from 'classnames';
 import {FC, useEffect, useState} from 'react';
 
-import ServiceDetails from 'Components/panel/ServiceDetails';
 import Icon from 'Components/Icon';
+import ServiceDetails from 'Components/panel/ServiceDetails';
+import ServiceList from 'Components/ServiceList';
+import PanelActions from 'Components/panel/PanelActions';
+import UserSearchableList from 'Components/UserSearchableList';
 
 import {registerReactComponent, useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
-
-import {Conversation} from '../../../entity/Conversation';
-import {ServiceEntity} from '../../../integration/ServiceEntity';
-import {ConversationVerificationState} from '../../../conversation/ConversationVerificationState';
-import {ConversationRepository} from '../../../conversation/ConversationRepository';
-import {User} from '../../../entity/User';
-import {Shortcut} from '../../../ui/Shortcut';
-import {ShortcutType} from '../../../ui/ShortcutType';
-import UserSearchableList from 'Components/UserSearchableList';
-import {getNotificationText} from '../../../conversation/NotificationSetting';
+import {sortUsersByPriority} from 'Util/StringUtil';
 import {formatDuration} from 'Util/TimeUtil';
-import ServiceList from 'Components/ServiceList';
-import PanelActions, {MenuItem} from 'Components/panel/PanelActions';
+
+import getConversationActions from './components/getConversationActions';
+import UserConversationDetails from './components/UserConversationDetails/UserConversationDetails';
+import ConversationDetailsBottomActions from './components/ConversationDetailsBottomActions/ConversationDetailsBottomActions';
+import ConversationDetailsOptions from './components/ConversationDetailsOptions/ConversationDetailsOptions';
+import ConversationDetailsHeader from './components/ConversationDetailsHeader/ConversationDetailsHeader';
+
 import PanelHeader from '../PanelHeader';
-import {ActionsViewModel} from '../../../view_model/ActionsViewModel';
+
+import {ConversationRepository} from '../../../conversation/ConversationRepository';
+import {ConversationVerificationState} from '../../../conversation/ConversationVerificationState';
+import {getNotificationText} from '../../../conversation/NotificationSetting';
+import {Conversation} from '../../../entity/Conversation';
+import {User} from '../../../entity/User';
+import {isServiceEntity} from '../../../guards/Service';
+import {ServiceEntity} from '../../../integration/ServiceEntity';
 import {IntegrationRepository} from '../../../integration/IntegrationRepository';
-import {ConversationRoleRepository} from '../../../conversation/ConversationRoleRepository';
 import {SearchRepository} from '../../../search/SearchRepository';
 import {TeamRepository} from '../../../team/TeamRepository';
-import {UserState} from '../../../user/UserState';
 import {TeamState} from '../../../team/TeamState';
+import {Shortcut} from '../../../ui/Shortcut';
+import {ShortcutType} from '../../../ui/ShortcutType';
+import {UserState} from '../../../user/UserState';
+import {ActionsViewModel} from '../../../view_model/ActionsViewModel';
 import {PanelViewModel} from '../../../view_model/PanelViewModel';
-import {sortUsersByPriority} from 'Util/StringUtil';
-import {isServiceEntity} from '../../../guards/Service';
-import UserConversationDetails from './UserConversationDetails';
-import ConversationDetailsBottomActions from './ConversationDetailsBottomActions';
-import ConversationDetailsOptions from './ConversationDetailsOptions';
-import ConversationDetailsHeader from './ConversationDetailsHeader';
-import * as UserPermission from '../../../user/UserPermission';
 
 const CONFIG = {
   MAX_USERS_VISIBLE: 7,
@@ -69,7 +68,6 @@ interface ConversationDetailsProps {
   conversationRepository: ConversationRepository;
   integrationRepository: IntegrationRepository;
   panelViewModel: PanelViewModel;
-  roleRepository: ConversationRoleRepository;
   searchRepository: SearchRepository;
   teamRepository: TeamRepository;
   teamState: TeamState;
@@ -84,7 +82,6 @@ const ConversationDetails: FC<ConversationDetailsProps> = ({
   conversationRepository,
   integrationRepository,
   panelViewModel,
-  roleRepository,
   searchRepository,
   teamRepository,
   teamState,
@@ -97,6 +94,8 @@ const ConversationDetails: FC<ConversationDetailsProps> = ({
   const [allUsersCount, setAllUsersCount] = useState<number>(0);
   const [userParticipants, setUserParticipants] = useState<User[]>([]);
   const [serviceParticipants, setServiceParticipants] = useState<ServiceEntity[]>([]);
+
+  const roleRepository = conversationRepository.conversationRoleRepository;
 
   const {
     isMutable,
@@ -115,6 +114,7 @@ const ConversationDetails: FC<ConversationDetailsProps> = ({
     is1to1,
     isRequest,
     participating_user_ets: participatingUserEts,
+    firstUserEntity: firstParticipant,
   } = useKoSubscribableChildren(activeConversation, [
     'isMutable',
     'showNotificationsNothing',
@@ -132,9 +132,9 @@ const ConversationDetails: FC<ConversationDetailsProps> = ({
     'is1to1',
     'isRequest',
     'participating_user_ets',
+    'firstUserEntity',
   ]);
 
-  const firstParticipant = activeConversation.firstUserEntity();
   const teamId = activeConversation.team_id;
 
   const {isTeam, classifiedDomains, team} = useKoSubscribableChildren(teamState, [
@@ -146,7 +146,6 @@ const ConversationDetails: FC<ConversationDetailsProps> = ({
   const {self: selfUser, isActivatedAccount} = useKoSubscribableChildren(userState, ['self', 'isActivatedAccount']);
   const {is_verified: isSelfVerified, teamRole} = useKoSubscribableChildren(selfUser, ['is_verified', 'teamRole']);
 
-  const userPermissions = UserPermission.generatePermissionHelpers(teamRole);
   const isActiveGroupParticipant = isGroup && !removedFromConversation;
 
   const showOptionGuests = isActiveGroupParticipant && !!teamId && roleRepository.canToggleGuests(activeConversation);
@@ -181,28 +180,31 @@ const ConversationDetails: FC<ConversationDetailsProps> = ({
   const canRenameGroup = roleRepository.canRenameGroup(activeConversation);
   const hasReceiptsEnabled = conversationRepository.expectReadReceipt(activeConversation);
 
-  const clickToToggleMute = () => actionsViewModel.toggleMuteConversation(activeConversation);
+  const toggleMute = () => actionsViewModel.toggleMuteConversation(activeConversation);
 
   const onClose = () => panelViewModel.closePanel();
 
-  const onDevicesClick = () =>
+  const openParticipantDevices = () =>
     panelViewModel.togglePanel(PanelViewModel.STATE.PARTICIPANT_DEVICES, {entity: firstParticipant});
 
   const updateConversationName = (conversationName: string) => {
     conversationRepository.renameConversation(activeConversation, conversationName);
   };
 
-  const onAddParticipants = () =>
+  const openAddParticipants = () =>
     panelViewModel.togglePanel(PanelViewModel.STATE.ADD_PARTICIPANTS, {entity: activeConversation});
 
-  const onShowUserClick = (userEntity: User) =>
+  const showUser = (userEntity: User) =>
     panelViewModel.togglePanel(PanelViewModel.STATE.GROUP_PARTICIPANT_USER, {entity: userEntity});
 
-  const onShowService = (serviceEntity: ServiceEntity) =>
+  const showService = (serviceEntity: ServiceEntity) =>
     panelViewModel.togglePanel(PanelViewModel.STATE.GROUP_PARTICIPANT_SERVICE, {entity: serviceEntity});
 
-  const onShowAllClick = () =>
+  const showAllParticipants = () =>
     panelViewModel.togglePanel(PanelViewModel.STATE.CONVERSATION_PARTICIPANTS, {entity: activeConversation});
+
+  const showNotifications = () =>
+    panelViewModel.togglePanel(PanelViewModel.STATE.NOTIFICATIONS, {entity: activeConversation});
 
   const updateConversationReceiptMode = (receiptMode: RECEIPT_MODE) =>
     conversationRepository.updateConversationReceiptMode(activeConversation, {receipt_mode: receiptMode});
@@ -220,98 +222,14 @@ const ConversationDetails: FC<ConversationDetailsProps> = ({
     }
   };
 
-  const getConversationActions = (conversationEntity: Conversation): MenuItem[] => {
-    if (!conversationEntity) {
-      return [];
-    }
-
-    const is1to1Action = conversationEntity.is1to1();
-    const isSingleUser = is1to1Action || conversationEntity.isRequest();
-    const firstUser = conversationEntity.firstUserEntity();
-
-    const allMenuElements = [
-      {
-        condition: userPermissions.canCreateGroupConversation() && is1to1Action && !isServiceMode,
-        item: {
-          click: () =>
-            amplify.publish(WebAppEvents.CONVERSATION.CREATE_GROUP, 'conversation_details', firstParticipant),
-          icon: 'group-icon',
-          identifier: 'go-create-group',
-          label: t('conversationDetailsActionCreateGroup'),
-        },
-      },
-      {
-        condition: true,
-        item: {
-          click: () => actionsViewModel.archiveConversation(activeConversation),
-          icon: 'archive-icon',
-          identifier: 'do-archive',
-          label: t('conversationDetailsActionArchive'),
-        },
-      },
-      {
-        condition: conversationEntity.isRequest(),
-        item: {
-          click: () => {
-            const userEntity = activeConversation.firstUserEntity();
-            const nextConversationEntity = conversationRepository.getNextConversation(activeConversation);
-
-            actionsViewModel.cancelConnectionRequest(userEntity, true, nextConversationEntity);
-          },
-          icon: 'close-icon',
-          identifier: 'do-cancel-request',
-          label: t('conversationDetailsActionCancelRequest'),
-        },
-      },
-      {
-        condition: conversationEntity.isClearable(),
-        item: {
-          click: () => actionsViewModel.clearConversation(activeConversation),
-          icon: 'eraser-icon',
-          identifier: 'do-clear',
-          label: t('conversationDetailsActionClear'),
-        },
-      },
-      {
-        condition: isSingleUser && (firstUser?.isConnected() || firstUser?.isRequest()),
-        item: {
-          click: () => {
-            const userEntity = activeConversation.firstUserEntity();
-            const nextConversationEntity = conversationRepository.getNextConversation(activeConversation);
-
-            actionsViewModel.blockUser(userEntity, true, nextConversationEntity);
-          },
-          icon: 'block-icon',
-          identifier: 'do-block',
-          label: t('conversationDetailsActionBlock'),
-        },
-      },
-      {
-        condition: conversationEntity.isLeavable() && roleRepository.canLeaveGroup(conversationEntity),
-        item: {
-          click: () => actionsViewModel.leaveConversation(activeConversation),
-          icon: 'leave-icon',
-          identifier: 'do-leave',
-          label: t('conversationDetailsActionLeave'),
-        },
-      },
-      {
-        condition:
-          !isSingleUser &&
-          isTeam &&
-          roleRepository.canDeleteGroup(conversationEntity) &&
-          conversationEntity.isCreatedBySelf(),
-        item: {
-          click: () => actionsViewModel.deleteConversation(activeConversation),
-          icon: 'delete-icon',
-          identifier: 'do-delete',
-          label: t('conversationDetailsActionDelete'),
-        },
-      },
-    ];
-
-    return allMenuElements.filter(menuElement => menuElement.condition).map(menuElement => menuElement.item);
-  };
+  const conversationActions = getConversationActions(
+    activeConversation,
+    actionsViewModel,
+    conversationRepository,
+    teamRole,
+    isServiceMode,
+    isTeam,
+  );
 
   useEffect(() => {
     if (isTeam && isSingleUserMode) {
@@ -357,7 +275,7 @@ const ConversationDetails: FC<ConversationDetailsProps> = ({
         onClose={onClose}
         showActionMute={showActionMute}
         showNotificationsNothing={showNotificationsNothing}
-        onToggleMute={clickToToggleMute}
+        onToggleMute={toggleMute}
       />
 
       <div className="panel__content" data-bind="fadingscrollbar">
@@ -371,7 +289,7 @@ const ConversationDetails: FC<ConversationDetailsProps> = ({
             isFederated={isFederated}
             badge={teamRepository.getRoleBadge(firstParticipant.id)}
             classifiedDomains={classifiedDomains}
-            onDevicesClick={onDevicesClick}
+            onDevicesClick={openParticipantDevices}
           />
         )}
 
@@ -395,7 +313,7 @@ const ConversationDetails: FC<ConversationDetailsProps> = ({
                   className="panel__action-item"
                   type="button"
                   title={t('tooltipConversationDetailsAddPeople', Shortcut.getShortcutTooltip(ShortcutType.ADD_PEOPLE))}
-                  onClick={onAddParticipants}
+                  onClick={openAddParticipants}
                   data-uie-name="go-add-people"
                 >
                   <Icon.Plus className="panel__action-item__icon" />
@@ -413,7 +331,7 @@ const ConversationDetails: FC<ConversationDetailsProps> = ({
                       <UserSearchableList
                         data-uie-name="list-users"
                         users={userParticipants}
-                        onClick={onShowUserClick}
+                        onClick={showUser}
                         noUnderline
                         // arrow
                         searchRepository={searchRepository}
@@ -431,7 +349,7 @@ const ConversationDetails: FC<ConversationDetailsProps> = ({
                           type="button"
                           className="panel__action-item panel__action-item--no-border"
                           data-bind="click: clickOnShowAll"
-                          onClick={onShowAllClick}
+                          onClick={showAllParticipants}
                           data-uie-name="go-conversation-participants"
                         >
                           <Icon.People className="panel__action-item__icon" />
@@ -471,7 +389,7 @@ const ConversationDetails: FC<ConversationDetailsProps> = ({
 
                 <ServiceList
                   services={serviceParticipants}
-                  click={onShowService}
+                  click={showService}
                   noUnderline
                   arrow
                   data-uie-name="list-services"
@@ -484,13 +402,14 @@ const ConversationDetails: FC<ConversationDetailsProps> = ({
         {isActivatedAccount && (
           <>
             <ConversationDetailsBottomActions
+              showNotifications={showNotifications}
               notificationStatusText={notificationStatusText}
               showOptionNotifications1To1={showOptionNotifications1To1}
               isSingleUserMode={isSingleUserMode}
               hasReceiptsEnabled={hasReceiptsEnabled}
             />
 
-            <PanelActions items={getConversationActions(activeConversation)} />
+            <PanelActions items={conversationActions} />
           </>
         )}
       </div>

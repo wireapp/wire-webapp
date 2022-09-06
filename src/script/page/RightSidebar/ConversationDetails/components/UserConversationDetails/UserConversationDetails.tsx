@@ -25,7 +25,7 @@ import Icon from 'Components/Icon';
 
 import {t} from 'Util/LocalizerUtil';
 
-import {User} from '../../../entity/User';
+import {User} from '../../../../../entity/User';
 
 interface UserConversationDetailsProps {
   firstParticipant: User;

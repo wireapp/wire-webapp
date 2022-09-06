@@ -18,14 +18,18 @@
  */
 
 import {FC, ChangeEvent, KeyboardEvent, useEffect, useRef, useState} from 'react';
-import {t} from 'Util/LocalizerUtil';
+
 import Icon from 'Components/Icon';
-import {ConversationRepository} from '../../../conversation/ConversationRepository';
-import GroupDetails from './GroupDetails';
+
+import {t} from 'Util/LocalizerUtil';
 import {isEnterKey} from 'Util/KeyboardUtil';
 import {removeLineBreaks} from 'Util/StringUtil';
-import {User} from '../../../entity/User';
-import {ServiceEntity} from '../../../integration/ServiceEntity';
+
+import GroupDetails from '../GroupDetails/GroupDetails';
+
+import {ConversationRepository} from '../../../../../conversation/ConversationRepository';
+import {User} from '../../../../../entity/User';
+import {ServiceEntity} from '../../../../../integration/ServiceEntity';
 
 interface ConversationDetailsHeaderProps {
   isActiveGroupParticipant: boolean;
@@ -63,6 +67,7 @@ const ConversationDetailsHeader: FC<ConversationDetailsHeaderProps> = ({
 
   const renameConversation = (event: ChangeEvent<HTMLTextAreaElement>) => {
     const {value: currentValue} = event.target;
+
     setGroupName(currentValue);
   };
 
@@ -84,10 +89,10 @@ const ConversationDetailsHeader: FC<ConversationDetailsHeaderProps> = ({
     }
   };
 
-  // TODO: Update height of textarea on change
   useEffect(() => {
     if (isEditingName) {
       if (textAreaRef.current) {
+        textAreaRef.current.style.height = `0px`;
         const {scrollHeight} = textAreaRef.current;
         textAreaRef.current.style.height = `${scrollHeight}px`;
       }
@@ -100,7 +105,7 @@ const ConversationDetailsHeader: FC<ConversationDetailsHeaderProps> = ({
         textAreaRef.current?.focus();
       }, 0);
     }
-  }, [textAreaRef, isEditingName, groupName]);
+  }, [textAreaRef.current, isEditingName, groupName]);
 
   return (
     <div className="conversation-details__header">
@@ -126,6 +131,9 @@ const ConversationDetailsHeader: FC<ConversationDetailsHeaderProps> = ({
               dir="auto"
               spellCheck="false"
               maxLength={ConversationRepository.CONFIG.GROUP.MAX_NAME_LENGTH}
+              // style={{
+              //   height: textareaHeight
+              // }}
               onChange={renameConversation}
               onKeyDown={handleRenameConversation}
               // resize

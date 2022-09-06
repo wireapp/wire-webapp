@@ -18,10 +18,12 @@
  */
 
 import {FC} from 'react';
+
 import {t} from 'Util/LocalizerUtil';
-import {ConversationRepository} from '../../../conversation/ConversationRepository';
-import {User} from '../../../entity/User';
-import {ServiceEntity} from '../../../integration/ServiceEntity';
+
+import {ConversationRepository} from '../../../../../conversation/ConversationRepository';
+import {User} from '../../../../../entity/User';
+import {ServiceEntity} from '../../../../../integration/ServiceEntity';
 
 interface GroupDetailsProps {
   userParticipants: User[];

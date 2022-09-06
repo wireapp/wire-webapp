@@ -24,6 +24,7 @@ import Icon from 'Components/Icon';
 import {t} from 'Util/LocalizerUtil';
 
 interface ConversationDetailsBottomActionsProps {
+  showNotifications: () => void;
   showOptionNotifications1To1?: boolean;
   isSingleUserMode?: boolean;
   hasReceiptsEnabled?: boolean;
@@ -31,10 +32,11 @@ interface ConversationDetailsBottomActionsProps {
 }
 
 const ConversationDetailsBottomActions: FC<ConversationDetailsBottomActionsProps> = ({
-  showOptionNotifications1To1,
-  isSingleUserMode,
-  hasReceiptsEnabled,
-  notificationStatusText,
+  showNotifications,
+  showOptionNotifications1To1 = false,
+  isSingleUserMode = false,
+  hasReceiptsEnabled = false,
+  notificationStatusText = '',
 }) => {
   return (
     <ul className="conversation-details__bottom-actions">
@@ -42,7 +44,7 @@ const ConversationDetailsBottomActions: FC<ConversationDetailsBottomActionsProps
         <li className="conversation-details__notifications">
           <button
             className="panel__action-item"
-            data-bind="click: clickOnNotifications"
+            onClick={showNotifications}
             data-uie-name="go-notifications"
             type="button"
           >
