@@ -19,17 +19,7 @@
 
 import {User} from '../entity/User';
 import {PanelParams} from '../view_model/PanelViewModel';
-import {Conversation} from '../entity/Conversation';
 import {ServiceEntity} from '../integration/ServiceEntity';
-import {Message} from '../entity/message/Message';
-
-export const isConversationEntity = (entity: PanelParams['entity']): entity is Conversation => {
-  return typeof entity === 'string';
-};
-
-export const isMessageEntity = (entity: PanelParams['entity']): entity is Message => {
-  return typeof entity === 'string';
-};
 
 export const isServiceEntity = (entity: PanelParams['entity']): entity is ServiceEntity => {
   return 'isService' in entity && entity.isService;
@@ -37,4 +27,8 @@ export const isServiceEntity = (entity: PanelParams['entity']): entity is Servic
 
 export const isUserEntity = (entity: PanelParams['entity']): entity is User => {
   return !isServiceEntity(entity);
+};
+
+export const isUserServiceEntity = (entity: PanelParams['entity']): entity is User => {
+  return isServiceEntity(entity);
 };

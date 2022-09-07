@@ -17,7 +17,7 @@
  *
  */
 
-import {FC, useCallback, useEffect, useState} from 'react';
+import {FC, useEffect} from 'react';
 
 import Icon from 'Components/Icon';
 import ServiceDetails from 'Components/panel/ServiceDetails';
@@ -43,6 +43,7 @@ interface GroupParticipantServiceProps {
   integrationRepository: IntegrationRepository;
   onBack: () => void;
   onClose: () => void;
+  serviceEntity: ServiceEntity;
   userEntity: User;
   userState: UserState;
   isAddMode?: boolean;
@@ -54,14 +55,13 @@ const GroupParticipantService: FC<GroupParticipantServiceProps> = ({
   integrationRepository,
   onBack,
   onClose,
+  serviceEntity,
   userEntity,
   userState,
   isAddMode = false,
 }) => {
   // TODO: Should be added (?)
   // getLogger('GroupParticipantServiceViewModel');
-  const [selectedService, setSelectedService] = useState<ServiceEntity | null>(null);
-
   const {
     inTeam,
     isActiveParticipant,
@@ -77,9 +77,7 @@ const GroupParticipantService: FC<GroupParticipantServiceProps> = ({
   const showActions = isActiveParticipant && selectedInConversation && inTeam;
 
   const onOpen = () => {
-    if (selectedService) {
-      actionsViewModel.open1to1ConversationWithService(selectedService);
-    }
+    actionsViewModel.open1to1ConversationWithService(serviceEntity);
   };
 
   const onRemove = () => {
@@ -88,66 +86,49 @@ const GroupParticipantService: FC<GroupParticipantServiceProps> = ({
   };
 
   const onAdd = () => {
-    if (selectedService) {
-      integrationRepository.addService(activeConversation, selectedService);
-      // this.onGoToRoot();
-    }
+    integrationRepository.addService(activeConversation, serviceEntity);
+    // this.onGoToRoot();
   };
 
-  const showService = useCallback(async () => {
-    const serviceEntity = await integrationRepository.getServiceFromUser(userEntity);
-
-    if (!serviceEntity) {
-      return;
-    }
-
-    setSelectedService(serviceEntity);
-    integrationRepository.addProviderNameToParticipant(serviceEntity);
-  }, [userEntity]);
-
   useEffect(() => {
-    showService();
-  }, [showService]);
+    integrationRepository.addProviderNameToParticipant(serviceEntity);
+  }, [serviceEntity]);
 
   return (
     <div id="group-participant-service" className="panel__page group-participant panel__page--visible">
       <PanelHeader onGoBack={onBack} goBackUie="go-back-group-participant" onClose={onClose} />
 
       <div className="panel__content panel__content--fill" data-bind="fadingscrollbar">
-        {selectedService && (
-          <>
-            <ServiceDetails service={selectedService} />
+        <ServiceDetails service={serviceEntity} />
 
-            {showActions && canChatWithServices() && (
-              <div
-                role="button"
-                tabIndex={0}
-                className="panel__action-item"
-                data-uie-name="go-conversation"
-                onClick={onOpen}
-                onKeyDown={event => handleKeyDown(event, onOpen)}
-              >
-                <Icon.Message className="panel__action-item__icon" />
+        {showActions && canChatWithServices() && (
+          <div
+            role="button"
+            tabIndex={0}
+            className="panel__action-item"
+            data-uie-name="go-conversation"
+            onClick={onOpen}
+            onKeyDown={event => handleKeyDown(event, onOpen)}
+          >
+            <Icon.Message className="panel__action-item__icon" />
 
-                <div className="panel__action-item__text">{t('groupParticipantActionOpenConversation')}</div>
-              </div>
-            )}
+            <div className="panel__action-item__text">{t('groupParticipantActionOpenConversation')}</div>
+          </div>
+        )}
 
-            {showActions && canUpdateGroupParticipants() && (
-              <div
-                role="button"
-                tabIndex={0}
-                className="panel__action-item"
-                data-uie-name="do-remove"
-                onClick={onRemove}
-                onKeyDown={event => handleKeyDown(event, onRemove)}
-              >
-                <Icon.Minus className="panel__action-item__icon" />
+        {showActions && canUpdateGroupParticipants() && (
+          <div
+            role="button"
+            tabIndex={0}
+            className="panel__action-item"
+            data-uie-name="do-remove"
+            onClick={onRemove}
+            onKeyDown={event => handleKeyDown(event, onRemove)}
+          >
+            <Icon.Minus className="panel__action-item__icon" />
 
-                <div className="panel__action-item__text">{t('groupParticipantActionRemove')}</div>
-              </div>
-            )}
-          </>
+            <div className="panel__action-item__text">{t('groupParticipantActionRemove')}</div>
+          </div>
         )}
       </div>
 
