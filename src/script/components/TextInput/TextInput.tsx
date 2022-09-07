@@ -18,7 +18,6 @@
  */
 
 import React, {useEffect} from 'react';
-import {registerReactComponent} from 'Util/ComponentUtil';
 import Icon from 'Components/Icon';
 import {CheckIcon, COLOR} from '@wireapp/react-ui-kit';
 import {
@@ -31,6 +30,7 @@ import {
 } from 'Components/TextInput/TextInput.styles';
 
 export interface UserInputProps {
+  autoFocus?: boolean;
   disabled?: boolean;
   errorMessage?: string;
   isError?: boolean;
@@ -52,6 +52,7 @@ const SUCCESS_DISMISS_TIMEOUT = 2500;
 
 const TextInput: React.ForwardRefRenderFunction<HTMLDivElement, UserInputProps> = (
   {
+    autoFocus,
     disabled,
     errorMessage,
     isError,
@@ -80,7 +81,7 @@ const TextInput: React.ForwardRefRenderFunction<HTMLDivElement, UserInputProps> 
     }
   }, [isSuccess, onSuccessDismissed]);
 
-  let changedColor = null;
+  let changedColor = undefined;
   if (isError) {
     changedColor = 'var(--text-input-alert) !important';
   }
@@ -96,7 +97,9 @@ const TextInput: React.ForwardRefRenderFunction<HTMLDivElement, UserInputProps> 
         </span>
       )}
 
+      {/* eslint jsx-a11y/no-autofocus : "off" */}
       <input
+        autoFocus={autoFocus}
         className="text-input"
         css={getInputCSS(disabled, changedColor)}
         disabled={disabled}
@@ -126,5 +129,3 @@ const TextInput: React.ForwardRefRenderFunction<HTMLDivElement, UserInputProps> 
 const TextInputForwarded = React.forwardRef(TextInput);
 
 export default TextInputForwarded;
-
-registerReactComponent('text-input', TextInputForwarded);

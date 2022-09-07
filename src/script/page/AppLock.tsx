@@ -83,9 +83,6 @@ const AppLock: React.FC<AppLockProps> = ({
     'isAppLockEnforced',
   ]);
 
-  const focusElement = (input: HTMLInputElement) => setTimeout(() => input?.focus());
-  const forceFocus = ({target}: React.FocusEvent<HTMLInputElement>) => focusElement(target);
-
   const {current: appObserver} = useRef(
     new MutationObserver(mutationRecords => {
       const [{attributeName}] = mutationRecords;
@@ -161,6 +158,7 @@ const AppLock: React.FC<AppLockProps> = ({
   useEffect(() => {
     const app = window.document.querySelector<HTMLDivElement>('#app');
     app?.style.setProperty('filter', isVisible ? 'blur(100px)' : '', 'important');
+    app?.style.setProperty('pointer-events', isVisible ? 'none' : 'auto', 'important');
 
     if (isVisible) {
       modalObserver.observe(document.querySelector('#wire-main'), {
@@ -274,7 +272,7 @@ const AppLock: React.FC<AppLockProps> = ({
       <div className="modal__header">
         {!isAppLockEnforced && !isAppLockActivated && (
           <button type="button" className="modal__header__button" onClick={onCancelAppLock} data-uie-name="do-close">
-            <span aria-hidden="true">
+            <span className="modal__header__icon" aria-hidden="true">
               <Icon.Close />
             </span>
           </button>
@@ -290,11 +288,14 @@ const AppLock: React.FC<AppLockProps> = ({
               className="modal__text"
               dangerouslySetInnerHTML={{__html: t('modalAppLockSetupMessage', {}, {br: '<br><br>'})}}
               data-uie-name="label-applock-set-text"
-            ></div>
+            />
             <div className="modal__text modal__label" data-uie-name="label-applock-unlock-text">
               {t('modalAppLockPasscode')}
             </div>
+            {/* eslint jsx-a11y/no-autofocus : "off" */}
             <input
+              aria-label={t('modalAppLockSetupTitle')}
+              autoFocus
               className="modal__input"
               type="password"
               value={setupPassphrase}
@@ -302,8 +303,6 @@ const AppLock: React.FC<AppLockProps> = ({
               data-uie-status={isSetupPassphraseValid ? 'valid' : 'invalid'}
               data-uie-name="input-applock-set-a"
               autoComplete="new-password"
-              onBlur={forceFocus}
-              ref={focusElement}
             />
             <div
               className={`modal__passcode__info ${isSetupPassphraseLength ? 'modal__passcode__info--valid' : ''}`}
@@ -376,11 +375,13 @@ const AppLock: React.FC<AppLockProps> = ({
                 ),
               }}
               data-uie-name="label-applock-set-text"
-            ></div>
+            />
             <div className="modal__text modal__label" data-uie-name="label-applock-unlock-text">
               {t('modalAppLockPasscode')}
             </div>
             <input
+              aria-label={t('modalAppLockSetupChangeTitle')}
+              autoFocus
               className="modal__input"
               type="password"
               value={setupPassphrase}
@@ -388,8 +389,6 @@ const AppLock: React.FC<AppLockProps> = ({
               data-uie-status={isSetupPassphraseValid ? 'valid' : 'invalid'}
               data-uie-name="input-applock-set-a"
               autoComplete="new-password"
-              onBlur={forceFocus}
-              ref={focusElement}
             />
             <div className={`modal__passcode__info ${isSetupPassphraseLength ? 'modal__passcode__info--valid' : ''}`}>
               {t('modalAppLockSetupLong', {
@@ -427,6 +426,8 @@ const AppLock: React.FC<AppLockProps> = ({
               {t('modalAppLockPasscode')}
             </div>
             <input
+              aria-label={t('modalAppLockLockedTitle')}
+              autoFocus
               className="modal__input"
               type="password"
               id={Math.random().toString()}
@@ -434,16 +435,19 @@ const AppLock: React.FC<AppLockProps> = ({
               onKeyDown={clearUnlockError}
               data-uie-name="input-applock-unlock"
               autoComplete="new-password"
-              onBlur={forceFocus}
-              ref={focusElement}
             />
             <div className="modal__input__error" data-uie-name="label-applock-unlock-error">
               {unlockError}
             </div>
 
-            <div className="modal__cta" data-uie-name="go-forgot-passphrase" onClick={onClickForgot}>
+            <button
+              type="button"
+              className="button-reset-default block modal__cta"
+              data-uie-name="go-forgot-passphrase"
+              onClick={onClickForgot}
+            >
               {t('modalAppLockLockedForgotCTA')}
-            </div>
+            </button>
 
             <div className="modal__buttons">
               <button
@@ -462,9 +466,14 @@ const AppLock: React.FC<AppLockProps> = ({
             <div className="modal__text" data-uie-name="label-applock-forgot-text">
               {t('modalAppLockForgotMessage')}
             </div>
-            <div className="modal__cta" onClick={onClickWipe} data-uie-name="go-wipe-database">
+            <button
+              type="button"
+              className="button-reset-default block modal__cta"
+              onClick={onClickWipe}
+              data-uie-name="go-wipe-database"
+            >
               {t('modalAppLockForgotWipeCTA')}
-            </div>
+            </button>
             <div className="modal__buttons">
               <button
                 onClick={onGoBack}
@@ -500,6 +509,8 @@ const AppLock: React.FC<AppLockProps> = ({
         {state === APPLOCK_STATE.WIPE_PASSWORD && (
           <form onSubmit={onWipeDatabase}>
             <input
+              aria-label={t('modalAppLockWipePasswordTitle')}
+              autoFocus
               className="modal__input"
               type="password"
               name="password"
@@ -507,8 +518,6 @@ const AppLock: React.FC<AppLockProps> = ({
               placeholder={t('modalAppLockWipePasswordPlaceholder')}
               onKeyDown={clearWipeError}
               data-uie-name="input-applock-wipe"
-              onBlur={forceFocus}
-              ref={focusElement}
             />
             <div className="modal__input__error" style={{height: 20}} data-uie-name="label-applock-wipe-error">
               {wipeError}

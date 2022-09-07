@@ -23,13 +23,14 @@ import cx from 'classnames';
 import {safeWindowOpen} from 'Util/SanitizationUtil';
 import {cleanURL} from 'Util/UrlUtil';
 import {isTweetUrl} from 'Util/ValidationUtil';
-import {registerReactComponent, useKoSubscribableChildren} from 'Util/ComponentUtil';
+import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 
 import Image from 'Components/Image';
 import AssetHeader from './AssetHeader';
 import type {ContentMessage} from '../../../../../entity/message/ContentMessage';
 import type {Text} from '../../../../../entity/message/Text';
+import {handleKeyDown} from 'Util/KeyboardUtil';
 
 export interface LinkPreviewAssetProps {
   /** Does the asset have a visible header? */
@@ -73,7 +74,13 @@ const LinkPreviewAssetComponent: React.FC<LinkPreviewAssetProps> = ({header = fa
       </div>
     </div>
   ) : (
-    <div className="link-preview-asset" onClick={onClick}>
+    <div
+      role="button"
+      tabIndex={0}
+      className="link-preview-asset"
+      onClick={onClick}
+      onKeyDown={e => handleKeyDown(e, onClick)}
+    >
       <div className="link-preview-image-container">
         {preview && previewImage ? (
           <Image className="link-preview-image" asset={previewImage} data-uie-name="link-preview-image" />
@@ -120,5 +127,3 @@ const LinkPreviewAssetComponent: React.FC<LinkPreviewAssetProps> = ({header = fa
 };
 
 export default LinkPreviewAssetComponent;
-
-registerReactComponent('link-preview-asset', LinkPreviewAssetComponent);

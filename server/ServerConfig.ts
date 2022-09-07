@@ -41,6 +41,7 @@ export interface ServerConfig {
       ENABLE_DOMAIN_DISCOVERY: boolean;
       ENABLE_ENFORCE_DESKTOP_APPLICATION_ONLY: boolean;
       ENABLE_EXTRA_CLIENT_ENTROPY: boolean;
+      FORCE_EXTRA_CLIENT_ENTROPY: boolean;
       ENABLE_MEDIA_EMBEDS: boolean;
       ENABLE_PHONE_LOGIN: boolean;
       ENABLE_SSO: boolean;
@@ -68,6 +69,7 @@ export interface ServerConfig {
         INDEX: string;
         LEGAL_HOLD_BLOCK: string;
         MICROPHONE_ACCESS_DENIED: string;
+        PRIVACY_VERIFY_FINGERPRINT: string;
         SCREEN_ACCESS_DENIED: string;
       };
       TEAMS_BASE: string;

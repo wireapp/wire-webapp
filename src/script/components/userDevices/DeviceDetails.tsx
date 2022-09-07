@@ -33,10 +33,10 @@ import {ConversationState} from '../../conversation/ConversationState';
 import DeviceCard from './DeviceCard';
 import DeviceId from '../DeviceId';
 import {MotionDuration} from '../../motion/MotionDuration';
-import {getPrivacyHowUrl} from '../../externalRoute';
 import type {ClientRepository} from '../../client/ClientRepository';
 import type {MessageRepository} from '../../conversation/MessageRepository';
 import type {DexieError} from 'dexie';
+import {Config} from '../../Config';
 
 interface DeviceDetailsProps {
   clickToShowSelfFingerprint: () => void;
@@ -89,29 +89,32 @@ const DeviceDetails: React.FC<DeviceDetailsProps> = ({
     const _resetProgress = () => window.setTimeout(() => setIsResettingSession(false), MotionDuration.LONG);
     const conversation = user.isMe ? conversationState.self_conversation() : conversationState.activeConversation();
     setIsResettingSession(true);
-    messageRepository
-      .resetSession(user.qualifiedId, selectedClient.id, conversation)
-      .then(_resetProgress)
-      .catch(_resetProgress);
+    if (conversation) {
+      messageRepository
+        .resetSession(user.qualifiedId, selectedClient.id, conversation)
+        .then(_resetProgress)
+        .catch(_resetProgress);
+    }
   };
 
   return (
     <div className={cx('participant-devices__header', {'participant-devices__header--padding': !noPadding})}>
-      <div
-        className="participant-devices__link participant-devices__show-self-fingerprint accent-text"
+      <button
+        type="button"
+        className="button-reset-default participant-devices__link participant-devices__show-self-fingerprint accent-text"
         onClick={clickToShowSelfFingerprint}
       >
         {t('participantDevicesDetailShowMyDevice')}
-      </div>
+      </button>
       <div
         className="panel__info-text"
         dangerouslySetInnerHTML={{
           __html: user ? t('participantDevicesDetailHeadline', {user: userName}) : '',
         }}
-      ></div>
+      />
       <a
         className="participant-devices__link accent-text"
-        href={getPrivacyHowUrl()}
+        href={Config.getConfig().URL.SUPPORT.PRIVACY_VERIFY_FINGERPRINT}
         rel="nofollow noopener noreferrer"
         target="_blank"
       >
@@ -120,9 +123,11 @@ const DeviceDetails: React.FC<DeviceDetailsProps> = ({
       <div className="participant-devices__single-client">
         <DeviceCard device={selectedClient} />
       </div>
-      <div className="participant-devices__fingerprint" data-uie-name="status-fingerprint">
-        <DeviceId deviceId={fingerprintRemote} />
-      </div>
+      {fingerprintRemote && (
+        <div className="participant-devices__fingerprint" data-uie-name="status-fingerprint">
+          <DeviceId deviceId={fingerprintRemote} />
+        </div>
+      )}
 
       <div className="participant-devices__verify">
         <div className="slider" data-uie-name="do-toggle-verified">
@@ -147,14 +152,15 @@ const DeviceDetails: React.FC<DeviceDetailsProps> = ({
             style={{display: isResettingSession ? 'initial' : 'none'}}
             data-uie-name="status-loading"
           />
-          <span
-            className="button-label accent-text ellipsis"
+          <button
+            type="button"
+            className="button-reset-default button-label participant-devices__reset-session accent-text ellipsis"
             onClick={clickToResetSession}
             style={{display: isResettingSession ? 'none' : 'initial'}}
             data-uie-name="do-reset-session"
           >
             {t('participantDevicesDetailResetSession')}
-          </span>
+          </button>
         </div>
       </div>
     </div>

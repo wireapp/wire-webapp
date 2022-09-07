@@ -19,10 +19,7 @@
 
 import React from 'react';
 import {keyframes} from '@emotion/react';
-import {registerReactComponent} from 'Util/ComponentUtil';
 import SVGProvider from '../../auth/util/SVGProvider';
-import {UserState} from '../../user/UserState';
-import {container} from 'tsyringe';
 
 const fadeAnimation = keyframes`
   0%   { opacity: 0.2; }
@@ -38,13 +35,17 @@ interface ParticipantMicOnIconProps {
 const ParticipantMicOnIcon: React.FC<ParticipantMicOnIconProps> = ({
   className,
   isActive = false,
-  color = '#fff',
+  color = isActive ? 'var(--accent-color)' : 'currentColor',
   ...props
 }) => {
-  const userState = container.resolve(UserState);
   return (
     <span
-      css={{animation: isActive ? `${fadeAnimation} 0.7s steps(7) infinite alternate` : 'initial'}}
+      css={{
+        animation: isActive ? `${fadeAnimation} 0.7s steps(7) infinite alternate` : 'initial',
+        border: isActive ? '1px solid var(--accent-color)' : '1px solid transparent',
+        borderRadius: '50%',
+        padding: '2px',
+      }}
       className={className}
       {...props}
     >
@@ -53,9 +54,8 @@ const ParticipantMicOnIcon: React.FC<ParticipantMicOnIconProps> = ({
         data-uie-active={isActive ? 'active' : 'inactive'}
         css={{
           '> path': {
-            fill: isActive ? `${userState.self().accent_color()} !important` : color,
+            fill: color,
           },
-          width: 16,
         }}
         viewBox="0 0 16 16"
         dangerouslySetInnerHTML={{__html: SVGProvider['mic-on-icon']?.documentElement?.innerHTML}}
@@ -65,5 +65,3 @@ const ParticipantMicOnIcon: React.FC<ParticipantMicOnIconProps> = ({
 };
 
 export default ParticipantMicOnIcon;
-
-registerReactComponent('participant-mic-on-icon', ParticipantMicOnIcon);

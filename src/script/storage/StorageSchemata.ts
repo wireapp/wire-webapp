@@ -37,7 +37,9 @@ export class StorageSchemata {
       CONVERSATIONS: 'conversations',
       CONVERSATION_EVENTS: 'conversation_events',
       EVENTS: 'events',
+      GROUP_IDS: 'group_ids',
       KEYS: 'keys',
+      PENDING_PROPOSALS: 'pending_proposals',
       PRE_KEYS: 'prekeys',
       SESSIONS: 'sessions',
       USERS: 'users',
@@ -354,8 +356,43 @@ export class StorageSchemata {
         version: 15,
       },
       {
-        schema: {},
+        schema: {
+          [StorageSchemata.OBJECT_STORE.AMPLIFY]: '',
+          [StorageSchemata.OBJECT_STORE.CLIENTS]: ', meta.primary_key',
+          [StorageSchemata.OBJECT_STORE.CONVERSATION_EVENTS]:
+            ', category, conversation, time, type, [conversation+time], [conversation+category]',
+          [StorageSchemata.OBJECT_STORE.CONVERSATIONS]: ', id, last_event_timestamp',
+          [StorageSchemata.OBJECT_STORE.EVENTS]:
+            '++primary_key, id, category, conversation, time, type, [conversation+time], [conversation+category]',
+          [StorageSchemata.OBJECT_STORE.KEYS]: '',
+          [StorageSchemata.OBJECT_STORE.PRE_KEYS]: '',
+          [StorageSchemata.OBJECT_STORE.SESSIONS]: '',
+          [StorageSchemata.OBJECT_STORE.USERS]: ', id',
+          [StorageSchemata.OBJECT_STORE.GROUP_IDS]: '',
+        },
         version: 16,
+      },
+      {
+        schema: {
+          [StorageSchemata.OBJECT_STORE.AMPLIFY]: '',
+          [StorageSchemata.OBJECT_STORE.CLIENTS]: ', meta.primary_key',
+          [StorageSchemata.OBJECT_STORE.CONVERSATION_EVENTS]:
+            ', category, conversation, time, type, [conversation+time], [conversation+category]',
+          [StorageSchemata.OBJECT_STORE.CONVERSATIONS]: ', id, last_event_timestamp',
+          [StorageSchemata.OBJECT_STORE.EVENTS]:
+            '++primary_key, id, category, conversation, time, type, [conversation+time], [conversation+category]',
+          [StorageSchemata.OBJECT_STORE.KEYS]: '',
+          [StorageSchemata.OBJECT_STORE.PRE_KEYS]: '',
+          [StorageSchemata.OBJECT_STORE.SESSIONS]: '',
+          [StorageSchemata.OBJECT_STORE.USERS]: ', id',
+          [StorageSchemata.OBJECT_STORE.GROUP_IDS]: '',
+          [StorageSchemata.OBJECT_STORE.PENDING_PROPOSALS]: '',
+        },
+        version: 17,
+      },
+      {
+        schema: {},
+        version: 18,
       },
     ];
   }

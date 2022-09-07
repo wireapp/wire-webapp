@@ -124,18 +124,19 @@
     &__container {
       max-height: 184px;
       overflow-x: hidden;
-      overflow-y: scroll;
+      overflow-y: overlay;
     }
 
     &__wrapper {
       overflow: hidden;
       max-height: 0;
+      border-radius: 0 0 8px 8px;
       color: var(--background);
 
       &::before {
         display: block;
-        border-top: 1px solid var(--background-fade-8);
-        margin: 0 16px;
+        border-top: 1px solid var(--border-color);
+        margin: 0;
         content: '';
       }
 
@@ -154,16 +155,20 @@
       }
 
       .verified-icon,
-      .guest-icon {
+      .guest-icon svg {
+        display: flex;
+        width: 12px !important;
         height: 12px !important;
       }
 
       .camera-icon {
+        display: flex;
         width: 12px !important;
         height: 12px !important;
       }
 
       .participant-mic-on-icon svg {
+        display: flex;
         width: 12px !important;
         height: 12px !important;
       }
@@ -202,8 +207,7 @@ svg.small-icon {
   }
 
   .conversation-list-cell-description {
-    margin-top: 2px;
-    color: var(--gray-90);
+    margin-top: 4px;
     opacity: 1;
     .subline;
   }
@@ -240,15 +244,12 @@ conversation-list-calling-cell:first-of-type {
 .conversation-list-calling-cell-background {
   display: flex;
   flex-direction: column;
+  border: 1px solid var(--border-color);
   background-color: var(--app-bg-secondary);
   border-radius: 8px;
 }
 
-.conversation-list-calling-cell {
-  height: 60px;
-}
-
-.conversation-list-calling-cell::after {
+.conversation-list-cell-button::after {
   display: none;
 }
 
@@ -276,15 +277,13 @@ conversation-list-calling-cell:first-of-type {
 }
 
 .conversation-list-calling-cell__info-bar {
-  .text-white;
+  .label-small-medium;
   padding: 4px;
   margin: 8px 8px 0;
   background-color: var(--accent-color);
-  border-radius: 100px;
-  font-size: 11px;
-  font-weight: @font-weight-bold;
+  border-radius: 6px;
+  color: var(--app-bg-secondary);
   text-align: center;
-  text-transform: uppercase;
 }
 
 @keyframes show-call-ui {

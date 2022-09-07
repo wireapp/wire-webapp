@@ -25,7 +25,6 @@ import Icon from 'Components/Icon';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 
 import Video from './Video';
-import ParticipantMicOnIcon from './ParticipantMicOnIcon';
 import type {Participant} from '../../calling/Participant';
 import Avatar, {AVATAR_SIZE} from 'Components/Avatar';
 import {QualifiedId} from '@wireapp/api-client/src/user';
@@ -54,12 +53,13 @@ const GroupVideoGridTile: React.FC<GroupVideoGridTileProps> = ({
     'videoState',
   ]);
   const {name} = useKoSubscribableChildren(participant?.user, ['name']);
-  const {accent_color: selfColor} = useKoSubscribableChildren(selfParticipant?.user, ['accent_color']);
 
   const sharesScreen = videoState === VIDEO_STATE.SCREENSHARE;
   const sharesCamera = [VIDEO_STATE.STARTED, VIDEO_STATE.PAUSED].includes(videoState);
   const hasPausedVideo = videoState === VIDEO_STATE.PAUSED;
   const hasActiveVideo = (sharesCamera || sharesScreen) && !!videoStream;
+  const activelySpeakingBoxShadow = `inset 0px 0px 0px 1px var(--group-video-bg), inset 0px 0px 0px 4px var(--accent-color), inset 0px 0px 0px 7px var(--app-bg-secondary)`;
+  const groupVideoBoxShadow = participantCount > 1 ? 'inset 0px 0px 0px 2px var(--group-video-bg)' : 'initial';
 
   return (
     <div
@@ -84,8 +84,8 @@ const GroupVideoGridTile: React.FC<GroupVideoGridTileProps> = ({
         <div
           css={{
             alignItems: 'center',
-            backgroundColor: '#33373a',
-            boxShadow: participantCount > 1 ? 'inset 0px 0px 0px 1px #000' : 'initial',
+            backgroundColor: 'var(--group-video-tile-bg)',
+            borderRadius: '8px',
             display: 'flex',
             height: '100%',
             justifyContent: 'center',
@@ -97,11 +97,9 @@ const GroupVideoGridTile: React.FC<GroupVideoGridTileProps> = ({
       )}
       <div
         css={{
+          borderRadius: '8px',
           bottom: 0,
-          boxShadow:
-            participantCount > 2 && isActivelySpeaking
-              ? `inset 0px 0px 0px 2px ${selfColor}`
-              : `inset 0px 0px 0px 0px ${selfColor}`,
+          boxShadow: isActivelySpeaking ? activelySpeakingBoxShadow : groupVideoBoxShadow,
           left: 0,
           position: 'absolute',
           right: 0,
@@ -109,20 +107,36 @@ const GroupVideoGridTile: React.FC<GroupVideoGridTileProps> = ({
           transition: 'box-shadow 0.3s ease-in-out',
         }}
       />
+      {!minimized && isMuted && (
+        <span className="group-video-grid__element__label__icon">
+          <Icon.MicOff data-uie-name="mic-icon-off" />
+        </span>
+      )}
+      {isMaximized && (
+        <div className="group-video-grid__element__overlay">
+          <span className="group-video-grid__element__overlay__label">{t('videoCallOverlayFitVideoLabelGoBack')}</span>
+        </div>
+      )}
+      {!minimized && participantCount > 1 && (
+        <div className="group-video-grid__element__overlay">
+          <span className="group-video-grid__element__overlay__label">{t('videoCallOverlayFitVideoLabel')}</span>
+        </div>
+      )}
       {!minimized && (
-        <div className="group-video-grid__element__label">
-          {isMuted ? (
-            <span className="group-video-grid__element__label__icon">
-              <Icon.MicOff data-uie-name="mic-icon-off" />
-            </span>
-          ) : (
-            <ParticipantMicOnIcon isActive={isActivelySpeaking} className="group-video-grid__element__label__icon" />
-          )}
+        <div
+          className="group-video-grid__element__label"
+          css={{
+            backgroundColor: isActivelySpeaking ? 'var(--accent-color)' : 'var(--black)',
+          }}
+        >
           <span
             data-uie-name={
               isActivelySpeaking ? 'status-active-speaking' : isMuted ? 'status-audio-off' : 'status-audio-on'
             }
             className="group-video-grid__element__label__name"
+            css={{
+              color: isActivelySpeaking ? 'var(--app-bg-secondary)' : 'var(--white)',
+            }}
           >
             {name}
           </span>

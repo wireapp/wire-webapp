@@ -75,12 +75,24 @@ const MediaButton: React.FC<MediaButtonProps> = ({
       })}
     >
       {isUploaded && !isPlaying && mediaElement && (
-        <div className="media-button media-button-play icon-play" onClick={play} data-uie-name="do-play-media" />
+        <button
+          type="button"
+          className="button-reset-default media-button media-button-play icon-play"
+          onClick={play}
+          data-uie-name="do-play-media"
+        />
       )}
       {isUploaded && isPlaying && (
-        <div className="media-button media-button-pause icon-pause" onClick={pause} data-uie-name="do-pause-media" />
+        <button
+          type="button"
+          className="button-reset-default media-button media-button-pause icon-pause"
+          onClick={pause}
+          data-uie-name="do-pause-media"
+        />
       )}
-      {isDownloading && <AssetLoader large={large} loadProgress={unwrappedAsset.downloadProgress} onCancel={cancel} />}
+      {isDownloading && (
+        <AssetLoader large={large} loadProgress={unwrappedAsset.downloadProgress || 0} onCancel={cancel} />
+      )}
       {isUploading && <AssetLoader large={large} loadProgress={uploadProgress} onCancel={cancel} />}
     </div>
   );

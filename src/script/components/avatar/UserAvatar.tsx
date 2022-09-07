@@ -30,9 +30,11 @@ import AvatarInitials from './AvatarInitials';
 import AvatarBadge from './AvatarBadge';
 import AvatarBorder from './AvatarBorder';
 import AvatarWrapper from './AvatarWrapper';
+import {t} from 'Util/LocalizerUtil';
 
 export interface UserAvatarProps extends React.HTMLProps<HTMLDivElement> {
   avatarSize: AVATAR_SIZE;
+  avatarAlt?: string;
   noBadge?: boolean;
   noFilter?: boolean;
   onClick?: (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => void;
@@ -49,6 +51,7 @@ export const shouldShowBadge = (size: AVATAR_SIZE, state: STATE): boolean => {
 const UserAvatar: React.FunctionComponent<UserAvatarProps> = ({
   participant,
   avatarSize,
+  avatarAlt = '',
   noBadge,
   noFilter,
   state,
@@ -61,6 +64,7 @@ const UserAvatar: React.FunctionComponent<UserAvatarProps> = ({
     'mediumPictureResource',
     'previewPictureResource',
   ]);
+  const avatarImgAlt = avatarAlt ? avatarAlt : `${t('userProfileImageAlt')} ${participant.name()}`;
 
   return (
     <AvatarWrapper
@@ -77,7 +81,7 @@ const UserAvatar: React.FunctionComponent<UserAvatarProps> = ({
       <AvatarInitials avatarSize={avatarSize} initials={participant.initials()} />
       <AvatarImage
         avatarSize={avatarSize}
-        avatarAlt={participant.name()}
+        avatarAlt={avatarImgAlt}
         backgroundColor={backgroundColor}
         isGrey={isImageGrey}
         mediumPicture={mediumPictureResource}

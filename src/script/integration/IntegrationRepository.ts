@@ -36,7 +36,6 @@ import {ModalsViewModel} from '../view_model/ModalsViewModel';
 import {IntegrationMapper} from './IntegrationMapper';
 import type {IntegrationService} from './IntegrationService';
 import {ServiceEntity} from './ServiceEntity';
-import {ServiceTag} from './ServiceTag';
 import {ConversationError} from '../error/ConversationError';
 import {ProviderEntity} from './ProviderEntity';
 import {MemberLeaveEvent} from '../conversation/EventBuilder';
@@ -70,7 +69,7 @@ export class IntegrationRepository {
     this.logger = getLogger('IntegrationRepository');
 
     this.isTeam = this.teamState.isTeam;
-    this.services = ko.observableArray([]);
+    this.services = ko.observableArray<ServiceEntity>([]);
   }
 
   /**
@@ -94,12 +93,12 @@ export class IntegrationRepository {
    * Get ServiceEntity for entity.
    * @param entity Service or user to resolve to ServiceEntity
    */
-  async getServiceFromUser(entity: ServiceEntity | User): Promise<ServiceEntity> {
+  async getServiceFromUser(entity: ServiceEntity | User): Promise<ServiceEntity | undefined> {
     if (entity instanceof ServiceEntity) {
       return entity;
     }
     const {providerId, serviceId} = entity;
-    return this.getServiceById(providerId, serviceId);
+    return this.getServiceById(providerId, serviceId, entity.qualifiedId.domain);
   }
 
   /**
@@ -195,24 +194,12 @@ export class IntegrationRepository {
     return providerData ? IntegrationMapper.mapProviderFromObject(providerData) : undefined;
   }
 
-  async getServiceById(providerId: string, serviceId: string): Promise<ServiceEntity | undefined> {
+  async getServiceById(providerId: string, serviceId: string, domain: string): Promise<ServiceEntity | undefined> {
     const serviceData = await this.integrationService.getService(providerId, serviceId);
     if (serviceData) {
-      return IntegrationMapper.mapServiceFromObject(serviceData);
+      return IntegrationMapper.mapServiceFromObject(serviceData, domain);
     }
     return undefined;
-  }
-
-  async getServices(tags: ServiceTag | ServiceTag[], start: string): Promise<ServiceEntity[]> {
-    const tagsArray = Array.isArray(tags) ? tags.slice(0, 3) : [ServiceTag.INTEGRATION];
-
-    const {services: servicesData} = await this.integrationService.getServices(tagsArray.join(','), start);
-    return IntegrationMapper.mapServicesFromArray(servicesData);
-  }
-
-  async getServicesByProvider(providerId: string): Promise<ServiceEntity[]> {
-    const servicesData = await this.integrationService.getProviderServices(providerId);
-    return IntegrationMapper.mapServicesFromArray(servicesData);
   }
 
   /**
@@ -235,8 +222,12 @@ export class IntegrationRepository {
   ): Promise<ServiceEntity[] | undefined> {
     const normalizedQuery = IntegrationRepository.normalizeQuery(query);
 
+    const teamId = this.teamState.team().id;
+    if (!teamId) {
+      return undefined;
+    }
     try {
-      let serviceEntities = await this.teamRepository.getWhitelistedServices(this.teamState.team().id);
+      let serviceEntities = await this.teamRepository.getWhitelistedServices(teamId, this.teamState.teamDomain() ?? '');
       const isCurrentQuery =
         !queryObservable || normalizedQuery === IntegrationRepository.normalizeQuery(queryObservable());
       if (isCurrentQuery) {

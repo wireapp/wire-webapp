@@ -40,7 +40,7 @@ void (async () => {
     });
     fs.outputFileSync(outputPath, changelog, 'utf8');
     console.info(`Wrote file to: ${outputPath}`);
-  } catch (error) {
+  } catch (error: any) {
     console.warn(`Could not generate changelog from "${from}" to "${to}": ${error.message}`, error);
   }
 })();

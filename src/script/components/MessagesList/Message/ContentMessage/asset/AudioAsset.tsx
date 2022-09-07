@@ -63,8 +63,8 @@ const AudioAsset: React.FC<AudioAssetProps> = ({
   const {transferState, uploadProgress, cancelUpload, loadAsset} = useAssetTransfer(message);
   const [audioTime, setAudioTime] = useState<number>(asset?.meta?.duration || 0);
   const [audioSrc, setAudioSrc] = useState<string>();
-  const onTimeupdate = () => setAudioTime(audioElement.currentTime);
-  const showLoudnessPreview = !!(asset.meta?.loudness?.length > 0);
+  const onTimeupdate = () => audioElement && setAudioTime(audioElement.currentTime);
+  const showLoudnessPreview = !!(asset.meta?.loudness?.length ?? 0 > 0);
   const onPauseButtonClicked = () => audioElement?.pause();
 
   const onPlayButtonClicked = async () => {
@@ -74,6 +74,9 @@ const AudioAsset: React.FC<AudioAssetProps> = ({
       asset.status(AssetTransferState.DOWNLOADING);
       try {
         const blob = await loadAsset(asset.original_resource());
+        if (!blob) {
+          throw new Error('blob could not be loaded from asset');
+        }
         setAudioSrc(window.URL.createObjectURL(blob));
       } catch (error) {
         logger.error('Failed to load audio asset ', error);
@@ -94,7 +97,9 @@ const AudioAsset: React.FC<AudioAssetProps> = ({
 
   useEffect(() => {
     return () => {
-      window.URL.revokeObjectURL(audioSrc);
+      if (audioSrc) {
+        window.URL.revokeObjectURL(audioSrc);
+      }
     };
   }, []);
 
@@ -126,7 +131,7 @@ const AudioAsset: React.FC<AudioAssetProps> = ({
                     uploadProgress={uploadProgress}
                   />
 
-                  {transferState !== AssetTransferState.UPLOADING && (
+                  {transferState !== AssetTransferState.UPLOADING && audioElement && (
                     <>
                       <span className="audio-controls-time label-xs" data-uie-name="status-audio-time">
                         {formatSeconds(audioTime)}

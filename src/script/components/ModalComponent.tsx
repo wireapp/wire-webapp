@@ -18,8 +18,8 @@
  */
 
 import {CSSObject} from '@emotion/react';
-import React, {useEffect, useState} from 'react';
-import {noop} from 'Util/util';
+import React, {useEffect, useId, useRef, useState, useCallback} from 'react';
+import {noop, preventFocusOutside} from 'Util/util';
 import Icon from './Icon';
 
 interface ModalComponentProps {
@@ -28,6 +28,7 @@ interface ModalComponentProps {
   onBgClick?: () => void;
   onClosed?: () => void;
   showLoading?: boolean;
+  wrapperCSS?: CSSObject;
 }
 
 const ModalOverlayStyles: CSSObject = {
@@ -62,7 +63,7 @@ const ModalContentStyles: CSSObject = {
   flexDirection: 'column',
   fontSize: 14,
   margin: 'auto',
-  maxHeight: 560,
+  maxHeight: 615,
   overflow: 'hidden',
   overflowY: 'hidden',
   padding: 16,
@@ -82,16 +83,46 @@ const ModalComponent: React.FC<ModalComponentProps> = ({
   onBgClick = noop,
   onClosed = noop,
   showLoading = false,
+  wrapperCSS,
   children,
   ...rest
 }) => {
   const [displayNone, setDisplayNone] = useState<boolean>(!isShown);
   const hasVisibleClass = isShown && !displayNone;
+  const isMounting = useRef<boolean>(true);
+  const trapId = useId();
+
+  const trapFocus = useCallback(
+    (event: KeyboardEvent): void => {
+      preventFocusOutside(event, trapId);
+    },
+    [trapId],
+  );
+
+  useEffect(() => {
+    if (isShown) {
+      document.addEventListener('keydown', trapFocus);
+    } else {
+      document.removeEventListener('keydown', trapFocus);
+    }
+    return () => {
+      document.removeEventListener('keydown', trapFocus);
+    };
+  }, [isShown, onkeydown]);
+
   useEffect(() => {
     let timeoutId = 0;
+    const mounting = isMounting.current;
+    isMounting.current = false;
     if (isShown) {
       return setDisplayNone(false);
     }
+
+    if (mounting) {
+      // Avoid triggering the onClose event when component is mounting
+      return;
+    }
+
     timeoutId = window.setTimeout(() => {
       setDisplayNone(true);
       onClosed();
@@ -109,18 +140,19 @@ const ModalComponent: React.FC<ModalComponentProps> = ({
       style={{display: displayNone ? 'none' : 'flex'}}
       tabIndex={0}
       role="button"
-      onKeyDown={onBgClick}
+      onKeyDown={noop}
       {...rest}
     >
       {showLoading ? (
         <Icon.Loading width="48" height="48" css={{path: {fill: 'var(--modal-bg)'}}} />
       ) : (
         <div
+          id={trapId}
           onClick={event => event.stopPropagation()}
           role="button"
           tabIndex={-1}
-          onKeyDown={event => event.stopPropagation()}
-          css={hasVisibleClass ? ModalContentVisibleStyles : ModalContentStyles}
+          onKeyDown={noop}
+          css={{...(hasVisibleClass ? ModalContentVisibleStyles : ModalContentStyles), ...wrapperCSS}}
         >
           {hasVisibleClass ? children : null}
         </div>

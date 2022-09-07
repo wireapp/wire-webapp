@@ -29,7 +29,7 @@ import {AssetRemoteData} from '../../../../../assets/AssetRemoteData';
 
 export const useAssetTransfer = (message: ContentMessage, assetRepository = container.resolve(AssetRepository)) => {
   const asset = message?.getFirstAsset() as FileAsset;
-  const [uploadProgress, setUploadProgress] = useState<number>();
+  const [uploadProgress, setUploadProgress] = useState<number>(0);
   useEffect(() => {
     const progressSubscribable = assetRepository.getUploadProgress(message?.id);
     setUploadProgress(progressSubscribable());
@@ -44,6 +44,7 @@ export const useAssetTransfer = (message: ContentMessage, assetRepository = cont
     cancelUpload: () => assetRepository.cancelUpload(message.id),
     downloadAsset: (asset: FileAsset) => assetRepository.downloadFile(asset),
     isDownloading: transferState === AssetTransferState.DOWNLOADING,
+    isPendingUpload: transferState === AssetTransferState.UPLOAD_PENDING,
     isUploaded: transferState === AssetTransferState.UPLOADED,
     isUploading: transferState === AssetTransferState.UPLOADING,
     loadAsset: (resource: AssetRemoteData) => assetRepository.load(resource),

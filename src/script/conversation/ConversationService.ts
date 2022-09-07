@@ -254,10 +254,7 @@ export class ConversationService {
    * @param userId ID of member to be removed from the the conversation
    * @returns Resolves with the server response
    */
-  deleteMembers(
-    conversationId: string | QualifiedId,
-    userId: string | QualifiedId,
-  ): Promise<ConversationMemberLeaveEvent> {
+  deleteMembers(conversationId: QualifiedId, userId: QualifiedId): Promise<ConversationMemberLeaveEvent> {
     return this.apiClient.api.conversation.deleteMember(conversationId, userId);
   }
 
@@ -316,19 +313,6 @@ export class ConversationService {
 
     // TODO(federation): add domain in the postOTRMessage (?)
     return this.apiClient.api.conversation.postOTRMessage(payload.sender, conversationId.id, payload, ignoreMissing);
-  }
-
-  /**
-   * Add users to an existing conversation.
-   *
-   * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/conversations/addMembers
-   *
-   * @param conversationId ID of conversation to add users to
-   * @param userIds IDs of users to be added to the conversation
-   * @returns Resolves with the server response
-   */
-  postMembers(conversationId: string, userIds: QualifiedId[]): Promise<ConversationMemberJoinEvent> {
-    return this.apiClient.api.conversation.postMembers(conversationId, userIds);
   }
 
   //##############################################################################

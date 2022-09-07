@@ -96,6 +96,23 @@
 
   padding-right: 16px;
   border-bottom: 1px solid var(--border-color);
+
+  &__calling {
+    position: relative;
+    display: flex;
+    width: 100%;
+    height: 56px;
+    border-radius: 8px 8px 0 0;
+    cursor: pointer;
+    font-weight: @font-weight-regular;
+    & > * {
+      border-radius: 8px;
+    }
+    & > *,
+    & > * > * {
+      border: none;
+    }
+  }
 }
 
 .conversation-recent-view-list {
@@ -121,7 +138,7 @@
     font-weight: @font-weight-medium;
 
     &--active {
-      color: var(--white);
+      color: var(--app-bg-secondary);
     }
   }
 }
@@ -135,7 +152,7 @@
   font-weight: @font-weight-medium;
 
   &--active {
-    color: var(--white);
+    color: var(--app-bg-secondary);
   }
 }
 
@@ -145,7 +162,7 @@
 
   margin-top: 2px;
   margin-right: 4px;
-  color: var(--gray-90);
+  color: var(--background);
 
   &--active {
     color: var(--white);
@@ -154,7 +171,9 @@
 
 body.theme-dark {
   .conversation-list-cell-description {
-    color: var(--gray-20);
+    &--active {
+      color: var(--black);
+    }
   }
   .conversation-list-cell-name {
     &--active {
@@ -189,7 +208,7 @@ body.theme-dark {
 
   &--active {
     &::before {
-      border-top-color: var(--white);
+      border-top-color: var(--app-bg-secondary);
     }
   }
 }

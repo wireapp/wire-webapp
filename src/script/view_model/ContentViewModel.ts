@@ -34,10 +34,8 @@ import {EmojiInputViewModel} from './content/EmojiInputViewModel';
 import {ModalsViewModel} from './ModalsViewModel';
 import {ConversationError} from '../error/ConversationError';
 import {ConnectRequestsViewModel} from './content/ConnectRequestsViewModel';
-import {GiphyViewModel} from './content/GiphyViewModel';
 import {HistoryImportViewModel} from './content/HistoryImportViewModel';
 import {HistoryExportViewModel} from './content/HistoryExportViewModel';
-import {TitleBarViewModel} from './content/TitleBarViewModel';
 import {InputBarViewModel} from './content/InputBarViewModel';
 import {PanelViewModel} from './PanelViewModel';
 import type {MainViewModel, ViewModelRepositories} from './MainViewModel';
@@ -98,7 +96,6 @@ export class ContentViewModel {
   elementId: string;
   sidebarId: string;
   emojiInput: EmojiInputViewModel;
-  giphy: GiphyViewModel;
   historyExport: HistoryExportViewModel;
   historyImport: HistoryImportViewModel;
   inputBar: InputBarViewModel;
@@ -111,7 +108,6 @@ export class ContentViewModel {
   previousState: string | null = null;
   state: ko.Observable<ContentState>;
   State: typeof ContentViewModel.STATE;
-  titleBar: TitleBarViewModel;
   userRepository: UserRepository;
 
   static get STATE() {
@@ -153,7 +149,6 @@ export class ContentViewModel {
     // Nested view models
     this.connectRequests = new ConnectRequestsViewModel(mainViewModel);
     this.emojiInput = new EmojiInputViewModel(repositories.properties);
-    this.giphy = new GiphyViewModel(repositories.giphy);
     this.inputBar = new InputBarViewModel(
       this.emojiInput,
       repositories.asset,
@@ -178,7 +173,6 @@ export class ContentViewModel {
       repositories.user,
       repositories.message,
     );
-    this.titleBar = new TitleBarViewModel(mainViewModel.calling, mainViewModel.panel, this, repositories.calling);
 
     this.historyExport = new HistoryExportViewModel(repositories.backup);
     this.historyImport = new HistoryImportViewModel(repositories.backup);
@@ -187,14 +181,12 @@ export class ContentViewModel {
       switch (state) {
         case ContentViewModel.STATE.CONVERSATION:
           this.inputBar.addedToView();
-          this.titleBar.addedToView();
           break;
         case ContentViewModel.STATE.PREFERENCES_ACCOUNT:
           this.popNotification();
           break;
         default:
           this.inputBar.removedFromView();
-          this.titleBar.removedFromView();
       }
     });
 

@@ -39,7 +39,7 @@
     position: absolute;
     top: 50%;
     left: 50%;
-    color: currentColor;
+    color: var(--foreground);
     transform-origin: 0 0;
 
     &:last-child {
@@ -54,12 +54,20 @@
 
 .like-button-liked {
   > span {
-    color: @red-500 !important;
+    color: @red-500;
 
     &:last-child {
       .like-transform-mixin(1);
 
       opacity: 1;
+    }
+  }
+}
+
+body.theme-dark {
+  .like-button-liked {
+    > span {
+      color: @red-dark-500;
     }
   }
 }

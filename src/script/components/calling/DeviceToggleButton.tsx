@@ -19,6 +19,7 @@
 
 import React from 'react';
 import {css, SerializedStyles} from '@emotion/react';
+import {handleKeyDown} from 'Util/KeyboardUtil';
 export interface DeviceToggleButtonProps {
   currentDevice: string;
   devices: string[];
@@ -27,7 +28,7 @@ export interface DeviceToggleButtonProps {
 }
 
 const DeviceToggleButton: React.FC<DeviceToggleButtonProps> = ({currentDevice, devices, onChooseDevice, styles}) => {
-  const selectNextDevice = (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+  const selectNextDevice = (event: React.UIEvent) => {
     event.preventDefault();
     event.stopPropagation();
     const currentDeviceIndex = devices.indexOf(currentDevice);
@@ -49,31 +50,39 @@ const DeviceToggleButton: React.FC<DeviceToggleButtonProps> = ({currentDevice, d
       `}
     >
       <div
+        role="button"
+        tabIndex={0}
         className="device-toggle-button-indicator"
         data-uie-name="device-toggle-button-indicator"
         onClick={selectNextDevice}
+        onKeyDown={e => handleKeyDown(e, selectNextDevice.bind(null, e))}
         css={{
           display: 'flex',
           marginTop: 8,
         }}
       >
-        {devices.map(device => (
-          <span
-            key={device}
-            className="device-toggle-button-indicator-dot"
-            data-uie-name="device-toggle-button-indicator-dot"
-            data-uie-value={device === currentDevice ? 'active' : 'inactive'}
-            css={{
-              '&:not(:last-child)': {marginRight: 8},
-              backgroundColor: device === currentDevice ? 'currentColor' : 'var(--foreground-fade-24)',
-              borderRadius: '50%',
-              color: '#fff',
-              display: 'inline-block',
-              height: 8,
-              width: 8,
-            }}
-          />
-        ))}
+        {devices.map(device => {
+          const isCurrentDevice = device === currentDevice;
+
+          return (
+            <span
+              key={device}
+              className="device-toggle-button-indicator-dot"
+              data-uie-name="device-toggle-button-indicator-dot"
+              data-uie-value={isCurrentDevice ? 'active' : 'inactive'}
+              css={{
+                '&:not(:last-child)': {marginRight: 5},
+                backgroundColor: isCurrentDevice ? 'var(--accent-color)' : 'var(--app-bg-secondary)',
+                border: isCurrentDevice ? '1px solid var(--accent-color)' : '1px solid var(--foreground)',
+                borderRadius: '50%',
+                color: '#fff',
+                display: 'inline-block',
+                height: 10,
+                width: 10,
+              }}
+            />
+          );
+        })}
       </div>
     </div>
   );
