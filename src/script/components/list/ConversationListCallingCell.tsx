@@ -33,7 +33,6 @@ import Duration from 'Components/calling/Duration';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 import {sortUsersByPriority} from 'Util/StringUtil';
-import useEffectRef from 'Util/useEffectRef';
 
 import type {Call} from '../../calling/Call';
 import type {CallingRepository} from '../../calling/CallingRepository';
@@ -44,7 +43,7 @@ import {generateConversationUrl} from '../../router/routeGenerator';
 import {createNavigate, createNavigateKeyboard} from '../../router/routerBindings';
 import {TeamState} from '../../team/TeamState';
 import {CallState, MuteState} from '../../calling/CallState';
-import {useFadingScrollbar} from '../../ui/fadingScrollbar';
+import {initFadingScrollbar} from '../../ui/fadingScrollbar';
 import {CallActions, CallViewTab} from '../../view_model/CallingViewModel';
 import {showContextMenu, ContextMenuEntry} from '../../ui/ContextMenu';
 import type {Participant} from '../../calling/Participant';
@@ -77,9 +76,6 @@ const ConversationListCallingCell: React.FC<CallingCellProps> = ({
   teamState = container.resolve(TeamState),
   callState = container.resolve(CallState),
 }) => {
-  const [scrollbarRef, setScrollbarRef] = useEffectRef<HTMLDivElement>();
-  useFadingScrollbar(scrollbarRef);
-
   const {reason, state, isCbrEnabled, startedAt, participants, maximizedParticipant, muteState} =
     useKoSubscribableChildren(call, [
       'reason',
@@ -448,7 +444,7 @@ const ConversationListCallingCell: React.FC<CallingCellProps> = ({
                   'call-ui__participant-list__wrapper--active': showParticipants,
                 })}
               >
-                <div ref={setScrollbarRef} className="call-ui__participant-list__container">
+                <div ref={initFadingScrollbar} className="call-ui__participant-list__container">
                   <ul className="call-ui__participant-list" data-uie-name="list-call-ui-participants">
                     {participants
                       .slice()
