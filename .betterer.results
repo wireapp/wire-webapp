@@ -850,9 +850,6 @@ exports[`stricter compilation`] = {
       [41, 4, 14, "Type \'undefined\' is not assignable to type \'Message\'.", "1306210352"],
       [47, 4, 17, "Type \'undefined\' is not assignable to type \'MessageRepository\'.", "1843982700"]
     ],
-    "src/script/components/Modals/GroupCreation/GroupCreationModal.tsx:1998557440": [
-      [347, 17, 18, "Type \'{ autoFocus: true; label: string; placeholder: string; uieName: string; name: string; errorUieName: string; onCancel: () => void; onChange: (event: ChangeEvent<HTMLInputElement>) => void; ... 4 more ...; errorMessage: string; }\' is missing the following properties from type \'UserInputProps\': inputWrapperRef, setIsEditing", "1383689972"]
-    ],
     "src/script/components/Modals/UserModal/UserModal.test.tsx:2720850156": [
       [45, 6, 6, "Type \'null\' is not assignable to type \'QualifiedId\'.", "1765117785"],
       [49, 11, 29, "Object is possibly \'null\'.", "3523845355"]

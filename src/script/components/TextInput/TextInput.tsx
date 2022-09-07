@@ -42,8 +42,8 @@ export interface UserInputProps {
   value?: string;
   uieName?: string;
   errorUieName?: string;
-  inputWrapperRef: React.RefObject<HTMLDivElement>;
-  setIsEditing: (x: boolean) => void;
+  inputWrapperRef?: React.RefObject<HTMLDivElement>;
+  setIsEditing?: (x: boolean) => void;
 }
 
 const SUCCESS_DISMISS_TIMEOUT = 2500;
@@ -126,10 +126,10 @@ const TextInput: ForwardRefRenderFunction<HTMLInputElement, UserInputProps> = ({
           onKeyDown={(event: React.KeyboardEvent<HTMLButtonElement>): void => {
             if (event.shiftKey && isTabKey(event)) {
               // shift+tab from clear button should focus on the input field
-              setIsEditing(true);
+              setIsEditing?.(true);
             } else if (isTabKey(event)) {
               // tab from clear button should close the editable field
-              setIsEditing(false);
+              setIsEditing?.(false);
             }
           }}
         >
