@@ -31,25 +31,25 @@ export interface MLSConversationState {
 
 const initialState = loadState();
 
-export const mlsConversationState = createVanilla<
-  MLSConversationState & {
-    isEstablished: (conversationId: string) => boolean;
-    isPendingWelcome: (conversationId: string) => boolean;
-    filterEstablishedConversations: (conversations: Conversation[]) => Conversation[];
-    markAsEstablished: (conversationId: string) => void;
-    markAsPendingWelcome: (conversationId: string) => void;
-    /**
-     * Will send external proposal for all the conversations that are not pendingWelcome or established
-     * @param conversations The conversations that we want to process (only the mls conversations will be considered)
-     * @param sendExternalProposal Callback that will be called with every conversation that needs an external proposal
-     */
-    sendExternalToPendingJoin(
-      conversations: Conversation[],
-      isEstablishedConversation: (conversation: Conversation) => Promise<boolean>,
-      sendExternalProposal: (conversation: Conversation) => Promise<void>,
-    ): Promise<void>;
-  }
->((set, get) => {
+type StoreState = MLSConversationState & {
+  isEstablished: (conversationId: string) => boolean;
+  isPendingWelcome: (conversationId: string) => boolean;
+  filterEstablishedConversations: (conversations: Conversation[]) => Conversation[];
+  markAsEstablished: (conversationId: string) => void;
+  markAsPendingWelcome: (conversationId: string) => void;
+  /**
+   * Will send external proposal for all the conversations that are not pendingWelcome or established
+   * @param conversations The conversations that we want to process (only the mls conversations will be considered)
+   * @param sendExternalProposal Callback that will be called with every conversation that needs an external proposal
+   */
+  sendExternalToPendingJoin(
+    conversations: Conversation[],
+    isEstablishedConversation: (conversation: Conversation) => Promise<boolean>,
+    sendExternalProposal: (conversation: Conversation) => Promise<void>,
+  ): Promise<void>;
+};
+
+export const mlsConversationState = createVanilla<StoreState>((set, get) => {
   return {
     established: initialState.established,
     filterEstablishedConversations: conversations =>
@@ -110,6 +110,6 @@ export const mlsConversationState = createVanilla<
 /**
  * react hook to manipulate the MLS conversation state
  */
-export const useMLSConversationState = create(mlsConversationState);
+export const useMLSConversationState = create<StoreState>(mlsConversationState);
 
 mlsConversationState.subscribe(saveState);

@@ -428,9 +428,7 @@ class App {
       // We send external proposal to all the MLS conversations that are in an unknown state (not established nor pendingWelcome)
       await mlsConversationState.getState().sendExternalToPendingJoin(
         conversationEntities,
-        conversation => {
-          this.core.service!.conversation.isMLSConversationEstablished(conversation.groupId);
-        },
+        conversation => this.core.service!.conversation.isMLSConversationEstablished(conversation.groupId),
         conversation =>
           this.core.service!.conversation.sendExternalJoinProposal(conversation.groupId, conversation.epoch),
       );

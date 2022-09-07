@@ -19,7 +19,7 @@
 
 import {MLSConversationState} from './mlsConversationState';
 
-const storageKey = 'mlsPendingConversation';
+const storageKey = 'mlsConversationsState';
 
 export const loadState = (): MLSConversationState => {
   const storedState = localStorage.getItem(storageKey);
@@ -35,6 +35,7 @@ export const loadState = (): MLSConversationState => {
     pendingWelcome: new Set(parsedState.pendingWelcome),
   };
 };
+
 export const saveState = ({established, pendingWelcome}: MLSConversationState) => {
   localStorage.setItem(
     storageKey,

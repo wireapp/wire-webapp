@@ -41,7 +41,7 @@ import {TeamState} from '../../../../team/TeamState';
 import {AvailabilityContextMenu} from '../../../../ui/AvailabilityContextMenu';
 import {UserState} from '../../../../user/UserState';
 import {ConversationsList} from './ConversationsList';
-import {PreferenceNotificationRepository} from 'src/script/notification/PreferenceNotificationRepository';
+import {PreferenceNotificationRepository} from '../../../../notification/PreferenceNotificationRepository';
 import {useFolderState} from './state';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import {amplify} from 'amplify';
