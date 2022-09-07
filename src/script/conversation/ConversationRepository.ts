@@ -446,7 +446,7 @@ export class ConversationRepository {
         type: CONVERSATION_EVENT.CREATE,
       });
       if (isMLSConversation) {
-        // Mark the conversation as established
+        // since we are the creator of the conversation, we can safely mark it as established
         mlsConversationState.getState().markAsEstablished(conversationEntity.id);
       }
       return conversationEntity;
@@ -2452,7 +2452,7 @@ export class ConversationRepository {
       !mlsConversationState.getState().isEstablished(conversationEntity.id) &&
       (await this.core.service!.conversation.isMLSConversationEstablished(conversationEntity.groupId))
     ) {
-      // mark this conversation as established
+      // If the conversation was not previously marked as established and the core if aware of this conversation, we can mark is as established
       mlsConversationState.getState().markAsEstablished(conversationEntity.id);
     }
 
