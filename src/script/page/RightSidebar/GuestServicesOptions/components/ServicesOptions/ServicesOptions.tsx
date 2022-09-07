@@ -52,8 +52,6 @@ const ServicesOptions: FC<ServicesOptionsProps> = ({
 
   return (
     <div className="guest-options__content">
-      {/*<p className="visibility-hidden">{t('servicesOptionsTitle')}</p>*/}
-
       <BaseToggle
         isChecked={isServicesEnabled}
         setIsChecked={toggleServicesAccessState}
