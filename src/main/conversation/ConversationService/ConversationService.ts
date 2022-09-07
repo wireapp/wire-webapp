@@ -17,7 +17,7 @@
  *
  */
 
-import type {CoreCrypto, Invitee} from '@otak/core-crypto';
+import {CoreCrypto, ExternalProposalType, Invitee} from '@otak/core-crypto';
 import type {APIClient} from '@wireapp/api-client';
 import {
   MessageSendingStatus,
@@ -1338,5 +1338,30 @@ export class ConversationService {
       events: messageResponse?.events || [],
       conversation,
     };
+  }
+
+  /**
+   * Will send an external proposal for the current device to join a specific conversation.
+   * In order for the external proposal to be sent correctly, the underlying mls conversation needs to be in a non-established state
+   * @param conversationGroupId The conversation to join
+   * @param epoch The current epoch of the local conversation
+   */
+  public async sendExternalJoinProposal(conversationGroupId: string, epoch: number) {
+    const coreCryptoClient = this.coreCryptoClientProvider();
+    const groupIdDecodedFromBase64 = Decoder.fromBase64(conversationGroupId!).asBytes;
+    const externalProposal = await coreCryptoClient.newExternalProposal(ExternalProposalType.Add, {
+      epoch,
+      conversationId: groupIdDecodedFromBase64,
+    });
+    await this.apiClient.api.conversation.postMlsMessage(
+      //@todo: it's temporary - we wait for core-crypto fix to return the actual Uint8Array instead of regular array
+      optionalToUint8Array(externalProposal),
+    );
+  }
+
+  public async isMLSConversationEstablished(conversationGroupId: string) {
+    const coreCryptoClient = this.coreCryptoClientProvider();
+    const groupIdDecodedFromBase64 = Decoder.fromBase64(conversationGroupId!).asBytes;
+    return coreCryptoClient.conversationExists(groupIdDecodedFromBase64);
   }
 }
