@@ -64,14 +64,15 @@ export const initFadingScrollbar = (element: HTMLElement | null): void => {
   }
 
   const fadeStep = (delta: number) => {
-    const initialAlpha = initialColor[3];
-    const currentAlpha = currentColor[3];
+    const alphaChanelIndex = 3;
+    const initialAlpha = initialColor[alphaChanelIndex];
+    const currentAlpha = currentColor[alphaChanelIndex];
     const hasAppeared = delta > 0 && currentAlpha >= initialAlpha;
     const hasDisappeared = delta < 0 && currentAlpha <= 0;
     if (hasAppeared || hasDisappeared) {
       return setAnimationState('idle');
     }
-    currentColor[3] += delta;
+    currentColor[alphaChanelIndex] += delta;
     element.style.setProperty('--scrollbar-color', `rgba(${currentColor})`);
   };
   const fadeIn = () => setAnimationState('fadein');
