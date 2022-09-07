@@ -25,7 +25,7 @@ import UserDevices, {UserDevicesState, useUserDevicesHistory} from 'Components/U
 import type {User} from '../../entity/User';
 import {ViewModelRepositories} from '../MainViewModel';
 import PanelHeader from './PanelHeader';
-import {useFadingScrollbar} from '../../ui/fadingScrollbar';
+import {initFadingScrollbar} from '../../ui/fadingScrollbar';
 import {t} from 'Util/LocalizerUtil';
 
 interface ParticipantDevicesPanelProps {
