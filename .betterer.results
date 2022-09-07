@@ -1097,7 +1097,7 @@ exports[`stricter compilation`] = {
       [385, 49, 26, "No overload matches this call.\\n  Overload 1 of 4, \'(value: string | number | Date): Date\', gave the following error.\\n    Argument of type \'string | null\' is not assignable to parameter of type \'string | number | Date\'.\\n      Type \'null\' is not assignable to type \'string | number | Date\'.\\n  Overload 2 of 4, \'(value: string | number): Date\', gave the following error.\\n    Argument of type \'string | null\' is not assignable to parameter of type \'string | number\'.\\n      Type \'null\' is not assignable to type \'string | number\'.", "582302494"],
       [389, 10, 33, "Type \'boolean | undefined\' is not assignable to type \'boolean\'.", "2524769620"],
       [394, 46, 23, "No overload matches this call.\\n  Overload 1 of 4, \'(value: string | number | Date): Date\', gave the following error.\\n    Argument of type \'string | null\' is not assignable to parameter of type \'string | number | Date\'.\\n  Overload 2 of 4, \'(value: string | number): Date\', gave the following error.\\n    Argument of type \'string | null\' is not assignable to parameter of type \'string | number\'.", "4035274933"],
-      [399, 10, 30, "Type \'import(\\"wire-webapp/.yalc/@wireapp/api-client/src/conversation/MutedStatus\\").MutedStatus | null\' is not assignable to type \'number\'.\\n  Type \'null\' is not assignable to type \'number\'.", "127436159"]
+      [399, 10, 30, "Type \'import(\\"wire-webapp/node_modules/@wireapp/api-client/src/conversation/MutedStatus\\").MutedStatus | null\' is not assignable to type \'number\'.\\n  Type \'null\' is not assignable to type \'number\'.", "127436159"]
     ],
     "src/script/conversation/ConversationRepository.test.ts:705447906": [
       [93, 42, 13, "Argument of type \'string\' is not assignable to parameter of type \'never\'.", "1690980598"],
@@ -1882,7 +1882,7 @@ exports[`stricter compilation`] = {
       [349, 87, 5, "Object is of type \'unknown\'.", "165548477"],
       [408, 10, 41, "Object is possibly \'undefined\'.", "1596662938"],
       [409, 10, 30, "Argument of type \'string | undefined\' is not assignable to parameter of type \'string\'.\\n  Type \'undefined\' is not assignable to type \'string\'.", "286595218"],
-      [418, 65, 19, "Argument of type \'import(\\"wire-webapp/.yalc/@wireapp/api-client/src/client/ClientType\\").ClientType | undefined\' is not assignable to parameter of type \'string | number\'.\\n  Type \'undefined\' is not assignable to type \'string | number\'.", "1723063280"],
+      [418, 65, 19, "Argument of type \'import(\\"wire-webapp/node_modules/@wireapp/api-client/src/client/ClientType\\").ClientType | undefined\' is not assignable to parameter of type \'string | number\'.\\n  Type \'undefined\' is not assignable to type \'string | number\'.", "1723063280"],
       [485, 27, 5, "Argument of type \'unknown\' is not assignable to parameter of type \'BaseError\'.", "165548477"],
       [503, 36, 11, "Object is possibly \'undefined\'.", "3663176296"],
       [778, 12, 5, "Object is of type \'unknown\'.", "165548477"],
