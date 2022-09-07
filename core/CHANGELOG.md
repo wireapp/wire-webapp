@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [30.1.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/compare/@wireapp/core@30.0.5...@wireapp/core@30.1.0) (2022-09-07)
+
+
+### Features
+
+* Ability to clear database when logging out ([#4377](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/issues/4377)) ([e5f7a9c](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/commit/e5f7a9c4f36a018d2bd13eca8a0d751cf7f9805c))
+
+
+
+
+
 ## [30.0.5](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/compare/@wireapp/core@30.0.4...@wireapp/core@30.0.5) (2022-09-02)
 
 **Note:** Version bump only for package @wireapp/core
