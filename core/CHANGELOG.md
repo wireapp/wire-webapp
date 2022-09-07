@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [30.3.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/compare/@wireapp/core@30.2.0...@wireapp/core@30.3.0) (2022-09-07)
+
+
+### Features
+
+* Add ability to send external proposal (FS-689) ([#4376](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/issues/4376)) ([bf8e7dd](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/commit/bf8e7ddd7ea4660c8a5b6eea93e27ec14485de6c))
+
+
+
+
+
 # [30.2.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/compare/@wireapp/core@30.1.0...@wireapp/core@30.2.0) (2022-09-07)
 
 

@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [20.1.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/compare/@wireapp/api-client@20.0.4...@wireapp/api-client@20.1.0) (2022-09-07)
+
+
+### Features
+
+* Add ability to send external proposal (FS-689) ([#4376](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/issues/4376)) ([bf8e7dd](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/commit/bf8e7ddd7ea4660c8a5b6eea93e27ec14485de6c))
+
+
+
+
+
 ## [20.0.4](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/compare/@wireapp/api-client@20.0.3...@wireapp/api-client@20.0.4) (2022-09-02)
 
 **Note:** Version bump only for package @wireapp/api-client
