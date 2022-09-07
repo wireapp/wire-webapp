@@ -45,6 +45,7 @@ export const mlsConversationState = createVanilla<
      */
     sendExternalToPendingJoin(
       conversations: Conversation[],
+      isEstablishedConversation: (conversation: Conversation) => Promise<boolean>,
       sendExternalProposal: (conversation: Conversation) => Promise<void>,
     ): Promise<void>;
   }
@@ -72,19 +73,31 @@ export const mlsConversationState = createVanilla<
 
     pendingWelcome: initialState.pendingWelcome,
 
-    async sendExternalToPendingJoin(conversations, sendExternalProposal): Promise<void> {
+    async sendExternalToPendingJoin(conversations, isAlreadyEstablished, sendExternalProposal): Promise<void> {
       const currentState = get();
-      const pendingConversations = conversations.filter(
-        conversation =>
-          conversation.protocol === 'mls' &&
-          !currentState.isEstablished(conversation.id) &&
-          !currentState.isPendingWelcome(conversation.id),
-      );
+      const mlsConversations = conversations.filter(conversation => conversation.isUsingMLSProtocol);
+      const pendingConversations: Conversation[] = [];
+      const alreadyEstablishedConversations: Conversation[] = [];
+
+      for (const conversation of mlsConversations) {
+        if (!currentState.isEstablished(conversation.id) && !currentState.isPendingWelcome(conversation.id)) {
+          if (await isAlreadyEstablished(conversation)) {
+            // check is the conversation is not actually already established
+            alreadyEstablishedConversations.push(conversation);
+          } else {
+            pendingConversations.push(conversation);
+          }
+        }
+      }
 
       await pendingConversations.map(sendExternalProposal);
 
       set({
         ...currentState,
+        established: new Set([
+          ...currentState.established,
+          ...alreadyEstablishedConversations.map(conversation => conversation.id),
+        ]),
         pendingWelcome: new Set([
           ...currentState.pendingWelcome,
           ...pendingConversations.map(conversation => conversation.id),
