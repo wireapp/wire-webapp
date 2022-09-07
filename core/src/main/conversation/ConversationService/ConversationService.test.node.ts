@@ -19,7 +19,7 @@
 
 import {CoreCrypto} from '@otak/core-crypto/platforms/web/corecrypto';
 import {APIClient} from '@wireapp/api-client';
-import {ClientType} from '@wireapp/api-client/src/client';
+import {ClientClassification, ClientType} from '@wireapp/api-client/src/client';
 import {ConversationProtocol} from '@wireapp/api-client/src/conversation';
 import {LegalHoldStatus} from '@wireapp/protocol-messaging';
 import {MemoryEngine} from '@wireapp/store-engine';
@@ -48,6 +48,19 @@ describe('ConversationService', () => {
       Promise.resolve({
         events: [],
         time: new Date().toISOString(),
+      }),
+    );
+    spyOn(client.api.user, 'postListClients').and.returnValue(
+      Promise.resolve({
+        qualified_user_map: {
+          'test-domain': {
+            'test-id-1': [{class: ClientClassification.DESKTOP, id: 'test-client-id-1-user-1'}],
+            'test-id-2': [
+              {class: ClientClassification.DESKTOP, id: 'test-client-id-1-user-2'},
+              {class: ClientClassification.PHONE, id: 'test-client-id-2-user-2'},
+            ],
+          },
+        },
       }),
     );
 
@@ -329,36 +342,18 @@ describe('ConversationService', () => {
   describe('getAllParticipantsClients', () => {
     it('gives the members and clients of a federated conversation', async () => {
       const members = {
-        user1: ['client1', 'client2'],
-        user2: ['client1', 'client2'],
-        user3: ['client1', 'client2'],
+        'test-domain': {
+          ['test-id-1']: ['test-client-id-1-user-1'],
+          ['test-id-2']: ['test-client-id-1-user-2', 'test-client-id-2-user-2'],
+        },
       };
       const conversationService = buildConversationService(true);
-      spyOn(conversationService['messageService'], 'sendMessage').and.callFake(
-        (_client, _recipients, _text, options) => {
-          options?.onClientMismatch?.({missing: members, deleted: {}, redundant: {}, time: ''});
-          return {} as any;
-        },
-      );
+      spyOn<any>(conversationService, 'getConversationQualifiedMembers').and.returnValue([
+        {domain: 'test-domain', id: 'test-id-1'},
+        {domain: 'test-domain', id: 'test-id-2'},
+      ]);
+
       const fetchedMembers = await conversationService.getAllParticipantsClients('convid');
-
-      expect(fetchedMembers).toEqual(members);
-    });
-
-    it('gives the members and clients of a federated conversation', async () => {
-      const members = {
-        domain1: {user1: ['client1', 'client2']},
-        domain2: {user2: ['client1', 'client2'], user3: ['client1', 'client2']},
-      };
-      const conversationService = buildConversationService(true);
-      spyOn(conversationService['messageService'], 'sendFederatedMessage').and.callFake(
-        (_client, _recipients, _text, options) => {
-          options?.onClientMismatch?.({missing: members, deleted: {}, redundant: {}, failed_to_send: {}, time: ''});
-          return {} as any;
-        },
-      );
-      const fetchedMembers = await conversationService.getAllParticipantsClients('convid', 'domain1');
-
       expect(fetchedMembers).toEqual(members);
     });
   });

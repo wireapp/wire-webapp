@@ -17,6 +17,7 @@
  *
  */
 
+import {QualifiedId} from '../user';
 import type {DefaultConversationRoleName, MutedStatus, ServiceRef} from './';
 
 export interface Member {
@@ -40,4 +41,5 @@ export interface Member {
   service: ServiceRef | null;
   status_ref: string;
   status_time: string;
+  qualified_id?: QualifiedId;
 }
