@@ -539,21 +539,21 @@ exports[`stricter compilation`] = {
       [281, 33, 29, "Object is possibly \'undefined\'.", "3944650061"],
       [281, 82, 9, "Argument of type \'undefined\' is not assignable to parameter of type \'QualifiedId\'.", "2620553983"]
     ],
-    "src/script/client/ClientRepository.ts:1756478762": [
-      [72, 4, 13, "Type \'Observable<undefined>\' is not assignable to type \'Observable<User>\'.\\n  Types of property \'equalityComparer\' are incompatible.\\n    Type \'(a: undefined, b: undefined) => boolean\' is not assignable to type \'(a: User, b: User) => boolean\'.\\n      Types of parameters \'a\' and \'a\' are incompatible.\\n        Type \'User\' is not assignable to type \'undefined\'.", "311178912"],
-      [113, 60, 29, "Argument of type \'string | undefined\' is not assignable to parameter of type \'string\'.\\n  Type \'undefined\' is not assignable to type \'string\'.", "4105403112"],
-      [116, 78, 19, "Argument of type \'string | undefined\' is not assignable to parameter of type \'string | null\'.", "3263048159"],
-      [157, 73, 19, "Argument of type \'string | undefined\' is not assignable to parameter of type \'string | null\'.", "3263048159"],
-      [188, 4, 12, "Object is possibly \'undefined\'.", "123060899"],
-      [202, 4, 28, "Cannot invoke an object which is possibly \'undefined\'.", "1515665510"],
-      [257, 33, 5, "Object is of type \'unknown\'.", "165548477"],
-      [259, 64, 5, "Object is of type \'unknown\'.", "165548477"],
-      [259, 78, 5, "Object is of type \'unknown\'.", "165548477"],
-      [272, 6, 45, "Type \'ClientType.PERMANENT | ClientType.TEMPORARY | undefined\' is not assignable to type \'ClientType.PERMANENT | ClientType.TEMPORARY\'.\\n  Type \'undefined\' is not assignable to type \'ClientType.PERMANENT | ClientType.TEMPORARY\'.", "2864978427"],
-      [292, 10, 17, "Object is possibly \'undefined\'.", "985697541"],
-      [386, 66, 23, "Argument of type \'string | undefined\' is not assignable to parameter of type \'string\'.\\n  Type \'undefined\' is not assignable to type \'string\'.", "4244912389"],
-      [387, 32, 6, "Type \'string | undefined\' is not assignable to type \'string | null\'.", "1127975365"],
-      [473, 52, 23, "Argument of type \'string | undefined\' is not assignable to parameter of type \'string\'.\\n  Type \'undefined\' is not assignable to type \'string\'.", "4244912389"]
+    "src/script/client/ClientRepository.ts:3960554774": [
+      [71, 4, 13, "Type \'Observable<undefined>\' is not assignable to type \'Observable<User>\'.\\n  Types of property \'equalityComparer\' are incompatible.\\n    Type \'(a: undefined, b: undefined) => boolean\' is not assignable to type \'(a: User, b: User) => boolean\'.\\n      Types of parameters \'a\' and \'a\' are incompatible.\\n        Type \'User\' is not assignable to type \'undefined\'.", "311178912"],
+      [112, 60, 29, "Argument of type \'string | undefined\' is not assignable to parameter of type \'string\'.\\n  Type \'undefined\' is not assignable to type \'string\'.", "4105403112"],
+      [115, 78, 19, "Argument of type \'string | undefined\' is not assignable to parameter of type \'string | null\'.", "3263048159"],
+      [156, 73, 19, "Argument of type \'string | undefined\' is not assignable to parameter of type \'string | null\'.", "3263048159"],
+      [187, 4, 12, "Object is possibly \'undefined\'.", "123060899"],
+      [201, 4, 28, "Cannot invoke an object which is possibly \'undefined\'.", "1515665510"],
+      [256, 33, 5, "Object is of type \'unknown\'.", "165548477"],
+      [258, 64, 5, "Object is of type \'unknown\'.", "165548477"],
+      [258, 78, 5, "Object is of type \'unknown\'.", "165548477"],
+      [271, 6, 45, "Type \'ClientType.PERMANENT | ClientType.TEMPORARY | undefined\' is not assignable to type \'ClientType.PERMANENT | ClientType.TEMPORARY\'.\\n  Type \'undefined\' is not assignable to type \'ClientType.PERMANENT | ClientType.TEMPORARY\'.", "2864978427"],
+      [291, 10, 17, "Object is possibly \'undefined\'.", "985697541"],
+      [371, 66, 23, "Argument of type \'string | undefined\' is not assignable to parameter of type \'string\'.\\n  Type \'undefined\' is not assignable to type \'string\'.", "4244912389"],
+      [372, 32, 6, "Type \'string | undefined\' is not assignable to type \'string | null\'.", "1127975365"],
+      [458, 52, 23, "Argument of type \'string | undefined\' is not assignable to parameter of type \'string\'.\\n  Type \'undefined\' is not assignable to type \'string\'.", "4244912389"]
     ],
     "src/script/client/ClientState.ts:2521520538": [
       [26, 2, 7, "Property \'clients\' has no initializer and is not definitely assigned in the constructor.", "3676208751"],

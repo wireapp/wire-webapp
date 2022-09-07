@@ -18,7 +18,6 @@
  */
 
 import ko from 'knockout';
-import type {QualifiedUserClients} from '@wireapp/api-client/src/conversation';
 import {ClientType, PublicClient, RegisteredClient, ClientCapability} from '@wireapp/api-client/src/client/';
 import {USER_EVENT, UserClientAddEvent, UserClientRemoveEvent} from '@wireapp/api-client/src/event';
 import {QualifiedId} from '@wireapp/api-client/src/user/';
@@ -365,20 +364,6 @@ export class ClientRepository {
     );
 
     return clientEntityMap;
-  }
-
-  async getQualifiedClientsByUserIds(userIds: QualifiedId[], updateClients: boolean): Promise<QualifiedUserClients> {
-    const qualifiedUserClients: QualifiedUserClients = {};
-    const qualifiedUserClientsMap = await this.clientService.getClientsByUserIds(userIds);
-
-    Object.entries(qualifiedUserClientsMap).map(([domain, userClientMap]) => {
-      Object.entries(userClientMap).map(([userId, clients]) => {
-        qualifiedUserClients[domain] ||= {};
-        qualifiedUserClients[domain][userId] = clients.map(client => client.id);
-      });
-    });
-
-    return qualifiedUserClients;
   }
 
   private async getClientByUserIdFromDb(userQualifiedId: QualifiedId): Promise<ClientRecord[]> {
