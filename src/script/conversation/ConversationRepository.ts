@@ -2450,7 +2450,7 @@ export class ConversationRepository {
 
     if (
       !mlsConversationState.getState().isEstablished(conversationEntity.id) &&
-      !(await this.core.service!.conversation.isMLSConversationEstablished(conversationEntity.groupId))
+      (await this.core.service!.conversation.isMLSConversationEstablished(conversationEntity.groupId))
     ) {
       // mark this conversation as established
       mlsConversationState.getState().markAsEstablished(conversationEntity.id);

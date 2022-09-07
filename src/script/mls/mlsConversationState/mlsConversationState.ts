@@ -35,6 +35,7 @@ export const mlsConversationState = createVanilla<
   MLSConversationState & {
     isEstablished: (conversationId: string) => boolean;
     isPendingWelcome: (conversationId: string) => boolean;
+    filterEstablishedConversations: (conversations: Conversation[]) => Conversation[];
     markAsEstablished: (conversationId: string) => void;
     markAsPendingWelcome: (conversationId: string) => void;
     /**
@@ -47,46 +48,51 @@ export const mlsConversationState = createVanilla<
       sendExternalProposal: (conversation: Conversation) => Promise<void>,
     ): Promise<void>;
   }
->((set, get) => ({
-  established: initialState.established,
-  isEstablished: conversationId => get().established.has(conversationId),
+>((set, get) => {
+  return {
+    established: initialState.established,
+    filterEstablishedConversations: conversations =>
+      conversations.filter(conversation => !conversation.isUsingMLSProtocol || get().isEstablished(conversation.id)),
 
-  isPendingWelcome: conversationId => get().pendingWelcome.has(conversationId),
+    isEstablished: conversationId => get().established.has(conversationId),
 
-  markAsEstablished: conversationId =>
-    set(state => ({
-      ...state,
-      established: state.established.add(conversationId),
-    })),
+    isPendingWelcome: conversationId => get().pendingWelcome.has(conversationId),
 
-  markAsPendingWelcome: conversationId =>
-    set(state => ({
-      ...state,
-      pendingWelcome: state.pendingWelcome.add(conversationId),
-    })),
+    markAsEstablished: conversationId =>
+      set(state => ({
+        ...state,
+        established: state.established.add(conversationId),
+      })),
 
-  pendingWelcome: initialState.pendingWelcome,
+    markAsPendingWelcome: conversationId =>
+      set(state => ({
+        ...state,
+        pendingWelcome: state.pendingWelcome.add(conversationId),
+      })),
 
-  async sendExternalToPendingJoin(conversations, sendExternalProposal): Promise<void> {
-    const currentState = get();
-    const pendingConversations = conversations.filter(
-      conversation =>
-        conversation.protocol === 'mls' &&
-        !currentState.isEstablished(conversation.id) &&
-        !currentState.isPendingWelcome(conversation.id),
-    );
+    pendingWelcome: initialState.pendingWelcome,
 
-    await pendingConversations.map(sendExternalProposal);
+    async sendExternalToPendingJoin(conversations, sendExternalProposal): Promise<void> {
+      const currentState = get();
+      const pendingConversations = conversations.filter(
+        conversation =>
+          conversation.protocol === 'mls' &&
+          !currentState.isEstablished(conversation.id) &&
+          !currentState.isPendingWelcome(conversation.id),
+      );
 
-    set({
-      established: new Set(),
-      pendingWelcome: new Set([
-        ...currentState.pendingWelcome,
-        ...pendingConversations.map(conversation => conversation.id),
-      ]),
-    });
-  },
-}));
+      await pendingConversations.map(sendExternalProposal);
+
+      set({
+        ...currentState,
+        pendingWelcome: new Set([
+          ...currentState.pendingWelcome,
+          ...pendingConversations.map(conversation => conversation.id),
+        ]),
+      });
+    },
+  };
+});
 
 /**
  * react hook to manipulate the MLS conversation state
