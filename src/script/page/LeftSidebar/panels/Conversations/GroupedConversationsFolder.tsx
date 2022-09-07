@@ -55,7 +55,7 @@ const GroupedConversationsFolder: React.FC<GroupedConversationsFolderProps> = ({
   return (
     <li className="conversation-folder" data-uie-name="conversation-folder" data-uie-value={folder.name}>
       <GroupedConversationHeader onClick={() => toggle(folder.id)} conversationLabel={folder} isOpen={isExpanded} />
-      <ul css={css({listStyle: 'none', padding: 0})}>
+      <ul css={css({listStyle: 'none', padding: 0})} id={folder.id}>
         {isExpanded &&
           conversations.map(conversation => (
             <ConversationListCell

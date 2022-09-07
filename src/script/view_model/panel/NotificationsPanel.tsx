@@ -86,7 +86,9 @@ const NotificationsPanel: FC<NotificationsPanelProps> = ({
         onGoBack={onGoBack}
         onClose={onClose}
         goBackUie="go-back-notification-options"
+        goBackTitle={t('accessibility.conversation.goBack')}
         title={t('notificationSettingsTitle')}
+        closeBtnTitle={t('accessibility.closeNotificationsLabel')}
         tabIndex={tabIndex}
         ref={btnRef}
         handleBlur={() => setBtnFocus(false)}

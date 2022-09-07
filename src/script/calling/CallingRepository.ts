@@ -1702,6 +1702,7 @@ export class CallingRepository {
         text: t('modalNoAudioInputAction'),
       },
       text: {
+        closeBtnLabel: t('modalNoAudioCloseBtn'),
         message: t('modalNoAudioInputMessage'),
         title: t('modalNoAudioInputTitle'),
       },
@@ -1712,6 +1713,7 @@ export class CallingRepository {
   private showNoCameraModal(): void {
     const modalOptions = {
       text: {
+        closeBtnLabel: t('modalNoCameraCloseBtn'),
         htmlMessage: t('modalNoCameraMessage', Config.getConfig().BRAND_NAME, {
           '/faqLink': '</a>',
           br: '<br>',

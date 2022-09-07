@@ -54,6 +54,7 @@ const SaveCallLogs: React.FC<SaveCallLogsProps> = ({callingRepository, userState
     } else {
       amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.ACKNOWLEDGE, {
         text: {
+          closeBtnLabel: t('modalCallEmptyLogCloseBtn'),
           message: t('modalCallEmptyLogMessage'),
           title: t('modalCallEmptyLogHeadline'),
         },

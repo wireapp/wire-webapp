@@ -80,6 +80,7 @@ const DeviceDetailsPreferences: React.FC<DevicesPreferencesProps> = ({
               className="preferences-devices-icon icon-back"
               onClick={onClose}
               data-uie-name="go-back"
+              aria-label={t('accessibility.preferencesDeviceDetails.goBack')}
             />
           </legend>
           <DetailedDevice device={device} fingerprint={fingerprint} />
