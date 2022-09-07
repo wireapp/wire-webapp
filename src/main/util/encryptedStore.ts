@@ -17,7 +17,7 @@
  *
  */
 
-import {DBSchema, IDBPDatabase, openDB} from 'idb';
+import {DBSchema, IDBPDatabase, openDB, deleteDB} from 'idb';
 
 interface DefaultEncryptedPayload {
   iv: Uint8Array;
@@ -132,4 +132,8 @@ export async function createCustomEncryptedStore<EncryptedPayload>(
   });
 
   return new EncryptedStore(db, config);
+}
+
+export async function deleteEncryptedStore(dbName: string) {
+  return deleteDB(dbName);
 }
