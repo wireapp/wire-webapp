@@ -19,11 +19,15 @@
 
 import {debounce} from 'underscore';
 
+const config = {
+  ANIMATION_SPEED: 0.05,
+  DEBOUNCE_THRESHOLD: 1000,
+};
+
 export const initFadingScrollbar = (element: HTMLElement | null): void => {
   if (!element) {
     return;
   }
-  const animationSpeed = 0.05;
 
   function parseColor(color: string) {
     const el = document.body.appendChild(document.createElement('thiselementdoesnotexist'));
@@ -49,10 +53,10 @@ export const initFadingScrollbar = (element: HTMLElement | null): void => {
   function animate() {
     switch (state) {
       case 'fadein':
-        fadeStep(animationSpeed);
+        fadeStep(config.ANIMATION_SPEED);
         break;
       case 'fadeout':
-        fadeStep(-animationSpeed);
+        fadeStep(-config.ANIMATION_SPEED);
         break;
 
       default:
@@ -77,7 +81,7 @@ export const initFadingScrollbar = (element: HTMLElement | null): void => {
   };
   const fadeIn = () => setAnimationState('fadein');
   const fadeOut = () => setAnimationState('fadeout');
-  const debouncedFadeOut = debounce(fadeOut, 1000);
+  const debouncedFadeOut = debounce(fadeOut, config.DEBOUNCE_THRESHOLD);
   const fadeInIdle = () => {
     fadeIn();
     debouncedFadeOut();
