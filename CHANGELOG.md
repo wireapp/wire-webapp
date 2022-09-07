@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [30.4.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/compare/@wireapp/core@30.3.0...@wireapp/core@30.4.0) (2022-09-07)
+
+
+### Features
+
+* Update getAllParticipantsClients to use better endpoints without a hack ([#4379](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/issues/4379)) ([f38258d](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/commit/f38258db39e81c4b517126792aa6c605b1ea51c5))
+
+
+
+
+
 # [30.3.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/compare/@wireapp/core@30.2.0...@wireapp/core@30.3.0) (2022-09-07)
 
 
