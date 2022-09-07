@@ -45,6 +45,11 @@ import {amplify} from 'amplify';
 import ko from 'knockout';
 import 'webrtc-adapter';
 import {container} from 'tsyringe';
+import {isQualifiedUserClients} from '@wireapp/core/src/main/util';
+import {
+  flattenQualifiedUserClients,
+  flattenUserClients,
+} from '@wireapp/core/src/main/conversation/message/UserClientsUtil';
 
 import {t} from 'Util/LocalizerUtil';
 import {Logger, getLogger} from 'Util/Logger';
@@ -79,8 +84,6 @@ import {TeamState} from '../team/TeamState';
 import Warnings from '../view_model/WarningsContainer';
 import {PayloadBundleState} from '@wireapp/core/src/main/conversation';
 import {Core} from '../service/CoreSingleton';
-import {flattenQualifiedUserClients} from '@wireapp/core/src/main/conversation/message/UserClientsUtil';
-import type {ClientRepository} from '../client/ClientRepository';
 import {LEAVE_CALL_REASON} from './enum/LeaveCallReason';
 
 interface MediaStreamQuery {
@@ -142,7 +145,6 @@ export class CallingRepository {
   }
 
   constructor(
-    private readonly clientRepository: ClientRepository,
     private readonly messageRepository: MessageRepository,
     private readonly eventRepository: EventRepository,
     private readonly userRepository: UserRepository,
@@ -302,11 +304,12 @@ export class CallingRepository {
       this.logger.warn(`Unable to find a conversation with id of ${call.conversationId}`);
       return false;
     }
-    const allClients = await this.clientRepository.getQualifiedClientsByUserIds(
-      conversation.participating_user_ids(),
-      false,
-    );
-    const qualifiedClients = flattenQualifiedUserClients(allClients);
+    const {id, domain} = call.conversationId;
+    const allClients = await this.core.service!.conversation.getAllParticipantsClients(id, domain);
+    const qualifiedClients = isQualifiedUserClients(allClients)
+      ? flattenQualifiedUserClients(allClients)
+      : flattenUserClients(allClients);
+
     const clients: Clients = flatten(
       qualifiedClients.map(({data, userId}) =>
         data.map(clientid => ({clientid, userid: this.serializeQualifiedId(userId)})),
@@ -585,10 +588,9 @@ export class CallingRepository {
       }
       case CALL_MESSAGE_TYPE.CONFKEY: {
         if (source !== EventRepository.SOURCE.STREAM) {
-          const allClients = await this.clientRepository.getQualifiedClientsByUserIds(
-            conversationEntity.participating_user_ids(),
-            false,
-          );
+          const {id, domain} = conversationId;
+          const allClients = await this.core.service!.conversation.getAllParticipantsClients(id, domain);
+          // We warn the message repository that a mismatch has happened outside of its lifecycle (eventually triggering a conversation degradation)
           const shouldContinue = await this.messageRepository.updateMissingClients(
             conversationEntity,
             allClients,

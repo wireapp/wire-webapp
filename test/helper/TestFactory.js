@@ -333,8 +333,6 @@ export class TestFactory {
   async exposeCallingActors() {
     await this.exposeConversationActors();
     this.calling_repository = new CallingRepository(
-      // @ts-ignore
-      this.client_repository,
       this.message_repository,
       this.event_repository,
       this.user_repository,

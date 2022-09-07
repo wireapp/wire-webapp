@@ -38,7 +38,6 @@ import {TestFactory} from 'test/helper/TestFactory';
 import {MediaDevicesHandler} from '../media/MediaDevicesHandler';
 import {CALL_MESSAGE_TYPE} from './enum/CallMessageType';
 import {CALL} from '../event/Client';
-import {ClientRepository} from '../client/ClientRepository';
 import {UserRepository} from '../user/UserRepository';
 import {LEAVE_CALL_REASON} from './enum/LeaveCallReason';
 
@@ -273,7 +272,6 @@ describe('CallingRepository ISO', () => {
       const conversation = new Conversation(createRandomUuid());
 
       const callingRepo = new CallingRepository(
-        {} as ClientRepository,
         {
           grantMessage: jest.fn(),
         } as any, // MessageRepository
@@ -404,7 +402,6 @@ describe.skip('E2E audio call', () => {
   const eventRepository = {injectEvent: () => {}} as any;
 
   const client = new CallingRepository(
-    {} as ClientRepository,
     messageRepository,
     eventRepository,
     {} as UserRepository,

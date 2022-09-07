@@ -294,7 +294,6 @@ class App {
     ]);
     repositories.backup = new BackupRepository(new BackupService(), repositories.conversation);
     repositories.calling = new CallingRepository(
-      repositories.client,
       repositories.message,
       repositories.event,
       repositories.user,
