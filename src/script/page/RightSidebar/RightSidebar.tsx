@@ -35,6 +35,7 @@ import {isUserEntity} from '../../guards/Panel';
 import ParticipantDevices from './ParticipantDevices/ParticipantDevices';
 import Notifications from './Notifications/Notifications';
 import TimedMessages from './TimedMessages';
+import GroupParticipantService from './GroupParticipantService';
 
 const migratedPanels = [
   PanelViewModel.STATE.CONVERSATION_DETAILS,
@@ -42,6 +43,7 @@ const migratedPanels = [
   PanelViewModel.STATE.NOTIFICATIONS,
   PanelViewModel.STATE.PARTICIPANT_DEVICES,
   PanelViewModel.STATE.TIMED_MESSAGES,
+  PanelViewModel.STATE.GROUP_PARTICIPANT_SERVICE,
 ];
 
 interface RightSidebarProps {
@@ -70,6 +72,7 @@ const RightSidebar: FC<RightSidebarProps> = ({contentViewModel, teamState, userS
   const [previousState, setPreviousState] = useState<string | null>(null);
   const [currentState, setCurrentState] = useState<string | null>(state);
   const [currentEntity, setCurrentEntity] = useState<PanelParams['entity'] | null>(null);
+  const [isAddMode, setIsAddMode] = useState<PanelParams['addMode']>(false);
 
   const goToRoot = () => {
     if (activeConversation) {
@@ -82,6 +85,7 @@ const RightSidebar: FC<RightSidebarProps> = ({contentViewModel, teamState, userS
     setPreviousState(currentState);
     setCurrentState(isMigratedPanel ? panel : null);
     setCurrentEntity(params.entity);
+    setIsAddMode(!!params.addMode);
 
     panelViewModel.togglePanel(panel, params);
   };
@@ -205,6 +209,22 @@ const RightSidebar: FC<RightSidebarProps> = ({contentViewModel, teamState, userS
           onGoBack={backToConversationDetails}
         />
       )}
+
+      {currentState === PanelViewModel.STATE.GROUP_PARTICIPANT_SERVICE &&
+        activeConversation &&
+        currentEntity &&
+        isUserEntity(currentEntity) && (
+          <GroupParticipantService
+            activeConversation={activeConversation}
+            actionsViewModel={actionsViewModel}
+            integrationRepository={integrationRepository}
+            onBack={backToConversationDetails}
+            onClose={onClose}
+            userEntity={currentEntity}
+            userState={userState}
+            isAddMode={isAddMode}
+          />
+        )}
     </>
   );
 };
