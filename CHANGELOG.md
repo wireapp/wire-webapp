@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [20.2.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/compare/@wireapp/api-client@20.1.0...@wireapp/api-client@20.2.0) (2022-09-07)
+
+
+### Features
+
+* Update getAllParticipantsClients to use better endpoints without a hack ([#4379](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/issues/4379)) ([f38258d](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/commit/f38258db39e81c4b517126792aa6c605b1ea51c5))
+
+
+
+
+
 # [20.1.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/compare/@wireapp/api-client@20.0.4...@wireapp/api-client@20.1.0) (2022-09-07)
 
 
