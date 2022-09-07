@@ -261,11 +261,12 @@ export class ActionsViewModel {
       amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.OPTION, {
         primaryAction: {
           action: (clearContent = false) => {
-            if (clearContent) {
-              this.conversationRepository.clearConversation(conversationEntity, true);
-            } else {
-              this.conversationRepository.removeMember(conversationEntity, this.userState.self().qualifiedId);
-            }
+            this.conversationRepository.removeMember(
+              conversationEntity,
+              this.userState.self().qualifiedId,
+              clearContent,
+            );
+
             resolve();
           },
           text: t('modalConversationLeaveAction'),

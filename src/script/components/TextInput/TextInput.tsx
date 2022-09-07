@@ -21,14 +21,7 @@ import React, {ForwardRefRenderFunction, useEffect, useRef} from 'react';
 import {registerReactComponent} from 'Util/ComponentUtil';
 import Icon from 'Components/Icon';
 import {CheckIcon, COLOR} from '@wireapp/react-ui-kit';
-import {
-  cancelButtonCSS,
-  containerCSS,
-  errorMessageCSS,
-  getIconCSS,
-  getInputCSS,
-  getLabelCSS,
-} from './TextInput.styles';
+import {cancelButtonCSS, containerCSS, errorMessageCSS, getIconCSS, getInputCSS, getLabelCSS} from './TextInput.styles';
 import {t} from 'Util/LocalizerUtil';
 import {isTabKey} from 'Util/KeyboardUtil';
 
