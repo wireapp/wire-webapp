@@ -916,7 +916,7 @@ exports[`stricter compilation`] = {
       [121, 8, 3, "Type \'(node: HTMLElement) => void\' is not assignable to type \'LegacyRef<HTMLLIElement> | undefined\'.\\n  Type \'(node: HTMLElement) => void\' is not assignable to type \'(instance: HTMLLIElement | null) => void\'.\\n    Types of parameters \'node\' and \'instance\' are incompatible.\\n      Type \'HTMLLIElement | null\' is not assignable to type \'HTMLElement\'.\\n        Type \'null\' is not assignable to type \'HTMLElement\'.", "193432436"],
       [151, 23, 8, "Object is possibly \'undefined\'.", "2198230984"]
     ],
-    "src/script/components/list/ParticipantItem.tsx:3591469056": [
+    "src/script/components/list/ParticipantItem.tsx:1338044247": [
       [111, 94, 15, "Argument of type \'Participant | undefined\' is not assignable to parameter of type \'Partial<Record<\\"isMuted\\" | \\"isActivelySpeaking\\" | \\"sharesScreen\\" | \\"sharesCamera\\", Subscribable<any>>>\'.\\n  Type \'undefined\' is not assignable to type \'Partial<Record<\\"isMuted\\" | \\"isActivelySpeaking\\" | \\"sharesScreen\\" | \\"sharesCamera\\", Subscribable<any>>>\'.", "420345688"]
     ],
     "src/script/components/modal.ts:282599833": [
