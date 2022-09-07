@@ -26,7 +26,6 @@ import type {REASON as AVS_REASON} from '@wireapp/avs';
 import {createRandomUuid} from 'Util/util';
 
 import {CALL, CONVERSATION, ClientEvent} from '../event/Client';
-import type {Call as CallEntity} from '../calling/Call';
 import {StatusType} from '../message/StatusType';
 import {VerificationMessageType} from '../message/VerificationMessageType';
 import type {Conversation} from '../entity/Conversation';
@@ -35,6 +34,7 @@ import type {User} from '../entity/User';
 import {AssetRecord, EventRecord} from '../storage';
 import {ReactionType} from '@wireapp/core/src/main/conversation';
 import {ConversationOtrMessageAddEvent} from '@wireapp/api-client/src/event';
+import {CALL_MESSAGE_TYPE} from '../calling/enum/CallMessageType';
 
 export interface BaseEvent {
   conversation: string;
@@ -54,7 +54,21 @@ export interface ConversationEvent<T> extends BaseEvent {
 }
 
 export interface CallingEvent {
-  content: CallEntity;
+  /**
+   * content is an object that comes from avs
+   */
+  content: {
+    keys: {
+      idx: number;
+      data: string;
+    }[];
+    resp: boolean;
+    sessid: string;
+    src_clientid: string;
+    src_userid: string;
+    type: CALL_MESSAGE_TYPE;
+    version: string;
+  };
   conversation: string;
   from: string;
   qualified_conversation?: QualifiedId;
@@ -235,22 +249,6 @@ export const EventBuilder = {
       status: StatusType.SENDING,
       time: conversationEntity.getNextIsoDate(currentTimestamp),
       type: ClientEvent.CONVERSATION.ASSET_ADD,
-    };
-  },
-
-  buildCalling(
-    conversationEntity: Conversation,
-    callMessage: CallEntity,
-    userId: string,
-    clientId: string,
-  ): CallingEvent {
-    return {
-      content: callMessage,
-      conversation: conversationEntity.id,
-      from: userId,
-      qualified_conversation: conversationEntity.qualifiedId,
-      sender: clientId,
-      type: ClientEvent.CALL.E_CALL,
     };
   },
 
