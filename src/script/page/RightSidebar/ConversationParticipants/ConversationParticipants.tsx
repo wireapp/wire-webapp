@@ -103,10 +103,9 @@ const ConversationParticipants: FC<ConversationParticipantsProps> = ({
       className={cx('panel__page conversation-participants', {'panel__page--visible': isVisible})}
     >
       <PanelHeader
-        showBackArrow
-        onBack={onBackClick}
+        onGoBack={onBackClick}
         onClose={onClose}
-        backDataUieName="go-back-conversation-participants"
+        goBackUie="go-back-conversation-participants"
         title={t('conversationParticipantsTitle')}
       />
 

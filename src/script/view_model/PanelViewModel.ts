@@ -24,7 +24,6 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {AddParticipantsViewModel} from './panel/AddParticipantsViewModel';
 import {GroupParticipantServiceViewModel} from './panel/GroupParticipantServiceViewModel';
-import {GroupParticipantUserViewModel} from './panel/GroupParticipantUserViewModel';
 import {GuestsAndServicesViewModel} from './panel/GuestsAndServicesViewModel';
 import {MessageDetailsViewModel} from './panel/MessageDetailsViewModel';
 import {MotionDuration} from '../motion/MotionDuration';
@@ -38,9 +37,9 @@ import type {ServiceEntity} from '../integration/ServiceEntity';
 import {ConversationState} from '../conversation/ConversationState';
 import {container} from 'tsyringe';
 
-import './panel/TimedMessagesPanel';
-import './panel/ParticipantDevicesPanel';
-import './panel/NotificationsPanel';
+import '../page/RightSidebar/TimedMessages/TimedMessages';
+import '../page/RightSidebar/ParticipantDevices/ParticipantDevices';
+import '../page/RightSidebar/Notifications/Notifications';
 
 export const OPEN_CONVERSATION_DETAILS = 'PanelViewModel.OPEN_CONVERSATION_DETAILS';
 
@@ -86,23 +85,17 @@ export class PanelViewModel {
 
   elementIds = {
     [PanelViewModel.STATE.ADD_PARTICIPANTS]: 'add-participants',
-    [PanelViewModel.STATE.CONVERSATION_DETAILS]: 'conversation-details',
     [PanelViewModel.STATE.CONVERSATION_PARTICIPANTS]: 'conversation-participants',
     [PanelViewModel.STATE.GROUP_PARTICIPANT_SERVICE]: 'group-participant-service',
-    [PanelViewModel.STATE.GROUP_PARTICIPANT_USER]: 'group-participant-user',
     [PanelViewModel.STATE.GUEST_OPTIONS]: 'guest-options',
     [PanelViewModel.STATE.MESSAGE_DETAILS]: 'message-details',
-    [PanelViewModel.STATE.NOTIFICATIONS]: 'notification-settings',
-    [PanelViewModel.STATE.PARTICIPANT_DEVICES]: 'participant-devices',
     [PanelViewModel.STATE.SERVICES_OPTIONS]: 'services-options',
-    [PanelViewModel.STATE.TIMED_MESSAGES]: 'timed-messages',
   };
 
   buildSubViews() {
     const viewModels = {
       [PanelViewModel.STATE.ADD_PARTICIPANTS]: AddParticipantsViewModel,
       [PanelViewModel.STATE.GROUP_PARTICIPANT_SERVICE]: GroupParticipantServiceViewModel,
-      [PanelViewModel.STATE.GROUP_PARTICIPANT_USER]: GroupParticipantUserViewModel,
       [PanelViewModel.STATE.GUEST_OPTIONS]: GuestsAndServicesViewModel,
       [PanelViewModel.STATE.SERVICES_OPTIONS]: GuestsAndServicesViewModel,
       [PanelViewModel.STATE.MESSAGE_DETAILS]: MessageDetailsViewModel,
@@ -223,6 +216,10 @@ export class PanelViewModel {
     const toHistory = this.stateHistory[this.stateHistory.length - 1];
     const {state, params} = toHistory;
     this._switchState(state, this.state(), params, true);
+  };
+
+  readonly goToRoot = (state: string, params: PanelParams, overrideAnimating: boolean = false): void => {
+    this._openPanel(state, params, overrideAnimating);
   };
 
   private readonly _goToRoot = (): void => {

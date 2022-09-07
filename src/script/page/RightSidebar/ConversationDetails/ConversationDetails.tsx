@@ -18,7 +18,6 @@
  */
 
 import {RECEIPT_MODE} from '@wireapp/api-client/src/conversation/data/';
-import cx from 'classnames';
 import {FC, useEffect, useRef, useState} from 'react';
 
 import Icon from 'Components/Icon';
@@ -27,7 +26,7 @@ import ServiceList from 'Components/ServiceList';
 import PanelActions from 'Components/panel/PanelActions';
 import UserSearchableList from 'Components/UserSearchableList';
 
-import {registerReactComponent, useKoSubscribableChildren} from 'Util/ComponentUtil';
+import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 import {sortUsersByPriority} from 'Util/StringUtil';
 import {formatDuration} from 'Util/TimeUtil';
@@ -51,12 +50,12 @@ import {IntegrationRepository} from '../../../integration/IntegrationRepository'
 import {SearchRepository} from '../../../search/SearchRepository';
 import {TeamRepository} from '../../../team/TeamRepository';
 import {TeamState} from '../../../team/TeamState';
+import {useFadingScrollbar} from '../../../ui/fadingScrollbar';
 import {Shortcut} from '../../../ui/Shortcut';
 import {ShortcutType} from '../../../ui/ShortcutType';
 import {UserState} from '../../../user/UserState';
 import {ActionsViewModel} from '../../../view_model/ActionsViewModel';
-import {PanelViewModel} from '../../../view_model/PanelViewModel';
-import {useFadingScrollbar} from '../../../ui/fadingScrollbar';
+import {PanelParams, PanelViewModel} from '../../../view_model/PanelViewModel';
 
 const CONFIG = {
   MAX_USERS_VISIBLE: 7,
@@ -64,36 +63,37 @@ const CONFIG = {
 };
 
 interface ConversationDetailsProps {
+  onClose: () => void;
+  showDevices: (entity: User) => void;
+  togglePanel: (panel: string, params: PanelParams) => void;
   actionsViewModel: ActionsViewModel;
   activeConversation: Conversation;
   conversationRepository: ConversationRepository;
   integrationRepository: IntegrationRepository;
-  panelViewModel: PanelViewModel;
   searchRepository: SearchRepository;
   teamRepository: TeamRepository;
   teamState: TeamState;
   userState: UserState;
   isFederated?: boolean;
-  isVisible?: boolean;
 }
 
 const ConversationDetails: FC<ConversationDetailsProps> = ({
+  onClose,
+  showDevices,
+  togglePanel,
   actionsViewModel,
   activeConversation,
   conversationRepository,
   integrationRepository,
-  panelViewModel,
   searchRepository,
   teamRepository,
   teamState,
   userState,
   isFederated = false,
-  isVisible = false,
 }) => {
   const panelContentRef = useRef<HTMLDivElement>(null);
 
   const [selectedService, setSelectedService] = useState<ServiceEntity>();
-
   const [allUsersCount, setAllUsersCount] = useState<number>(0);
   const [userParticipants, setUserParticipants] = useState<User[]>([]);
   const [serviceParticipants, setServiceParticipants] = useState<ServiceEntity[]>([]);
@@ -185,29 +185,23 @@ const ConversationDetails: FC<ConversationDetailsProps> = ({
 
   const toggleMute = () => actionsViewModel.toggleMuteConversation(activeConversation);
 
-  const onClose = () => panelViewModel.closePanel();
-
-  const openParticipantDevices = () =>
-    panelViewModel.togglePanel(PanelViewModel.STATE.PARTICIPANT_DEVICES, {entity: firstParticipant});
+  const openParticipantDevices = () => {
+    showDevices(firstParticipant);
+  };
 
   const updateConversationName = (conversationName: string) => {
     conversationRepository.renameConversation(activeConversation, conversationName);
   };
 
-  const openAddParticipants = () =>
-    panelViewModel.togglePanel(PanelViewModel.STATE.ADD_PARTICIPANTS, {entity: activeConversation});
-
-  const showUser = (userEntity: User) =>
-    panelViewModel.togglePanel(PanelViewModel.STATE.GROUP_PARTICIPANT_USER, {entity: userEntity});
+  const openAddParticipants = () => togglePanel(PanelViewModel.STATE.ADD_PARTICIPANTS, {entity: activeConversation});
 
   const showService = (serviceEntity: ServiceEntity) =>
-    panelViewModel.togglePanel(PanelViewModel.STATE.GROUP_PARTICIPANT_SERVICE, {entity: serviceEntity});
+    togglePanel(PanelViewModel.STATE.GROUP_PARTICIPANT_SERVICE, {entity: serviceEntity});
 
   const showAllParticipants = () =>
-    panelViewModel.togglePanel(PanelViewModel.STATE.CONVERSATION_PARTICIPANTS, {entity: activeConversation});
+    togglePanel(PanelViewModel.STATE.CONVERSATION_PARTICIPANTS, {entity: activeConversation});
 
-  const showNotifications = () =>
-    panelViewModel.togglePanel(PanelViewModel.STATE.NOTIFICATIONS, {entity: activeConversation});
+  const showNotifications = () => togglePanel(PanelViewModel.STATE.NOTIFICATIONS, {entity: activeConversation});
 
   const updateConversationReceiptMode = (receiptMode: RECEIPT_MODE) =>
     conversationRepository.updateConversationReceiptMode(activeConversation, {receipt_mode: receiptMode});
@@ -271,12 +265,10 @@ const ConversationDetails: FC<ConversationDetailsProps> = ({
   useFadingScrollbar(panelContentRef.current);
 
   return (
-    <div
-      id="conversation-details"
-      className={cx('panel__page conversation-details', {'panel__page--visible': isVisible})}
-    >
+    <div id="conversation-details" className="panel__page conversation-details panel__page--visible">
       <PanelHeader
-        className="panel__header--reverse"
+        isReverse
+        showBackArrow={false}
         onClose={onClose}
         showActionMute={showActionMute}
         showNotificationsNothing={showNotificationsNothing}
@@ -336,9 +328,8 @@ const ConversationDetails: FC<ConversationDetailsProps> = ({
                       <UserSearchableList
                         data-uie-name="list-users"
                         users={userParticipants}
-                        onClick={showUser}
+                        onClick={showDevices}
                         noUnderline
-                        showArrow
                         searchRepository={searchRepository}
                         teamRepository={teamRepository}
                         conversationRepository={conversationRepository}
@@ -372,7 +363,7 @@ const ConversationDetails: FC<ConversationDetailsProps> = ({
             {showTopActions && showSectionOptions && (
               <ConversationDetailsOptions
                 activeConversation={activeConversation}
-                togglePanel={panelViewModel.togglePanel}
+                togglePanel={togglePanel}
                 receiptMode={receiptMode}
                 guestOptionsText={guestOptionsText}
                 notificationStatusText={notificationStatusText}
@@ -422,5 +413,3 @@ const ConversationDetails: FC<ConversationDetailsProps> = ({
 };
 
 export default ConversationDetails;
-
-registerReactComponent('conversation-details', ConversationDetails);

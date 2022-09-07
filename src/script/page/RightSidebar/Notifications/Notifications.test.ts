@@ -19,27 +19,25 @@
 
 import ko from 'knockout';
 
-import NotificationsPanel, {NotificationsPanelProps} from './NotificationsPanel';
+import Notifications, {NotificationsProps} from './Notifications';
 
 import TestPage from 'Util/test/TestPage';
-import {ViewModelRepositories} from '../MainViewModel';
+import {ViewModelRepositories} from '../../../view_model/MainViewModel';
 import {Conversation} from 'src/script/entity/Conversation';
 import {NOTIFICATION_STATE} from 'src/script/conversation/NotificationSetting';
-import {ConversationState} from 'src/script/conversation/ConversationState';
 import {ConversationRepository} from 'src/script/conversation/ConversationRepository';
 import {fireEvent} from '@testing-library/react';
 
-class NotificationsPanelPage extends TestPage<NotificationsPanelProps> {
-  constructor(props?: NotificationsPanelProps) {
-    super(NotificationsPanel, props);
+class NotificationsPanelPage extends TestPage<NotificationsProps> {
+  constructor(props?: NotificationsProps) {
+    super(Notifications, props);
   }
 
   getCheckedInput = () => this.get('input[checked]') as HTMLInputElement;
   getInputWithValue = (value: number) => this.get(`input[value="${value}"]`);
-  clickInputWithValue = (value: number) => this.click(this.getInputWithValue(value));
 }
 
-describe('NotificationsPanel', () => {
+describe('Notifications', () => {
   const onGoBack = jest.fn();
   const onClose = jest.fn();
 
@@ -48,11 +46,8 @@ describe('NotificationsPanel', () => {
     Object.defineProperty(conversation, 'notificationState', {
       value: ko.observable(NOTIFICATION_STATE.MENTIONS_AND_REPLIES),
     });
-    const conversationState = {
-      activeConversation: ko.observable(conversation),
-    } as ConversationState;
     const notificationsPanel = new NotificationsPanelPage({
-      conversationState,
+      activeConversation: conversation,
       onClose,
       onGoBack,
       repositories: {} as ViewModelRepositories,
@@ -62,19 +57,16 @@ describe('NotificationsPanel', () => {
 
   it('sets the correct new value on the ative conversation', () => {
     const conversation = new Conversation();
-    const conversationState = {
-      activeConversation: ko.observable(conversation),
-    } as ConversationState;
     const conversationRepo = {
       setNotificationState: jest.fn(),
     } as Partial<ConversationRepository>;
     const notificationsPanel = new NotificationsPanelPage({
-      conversationState,
+      activeConversation: conversation,
       onClose,
       onGoBack,
       repositories: {conversation: conversationRepo} as ViewModelRepositories,
     });
-    fireEvent.click(notificationsPanel.getInputWithValue(NOTIFICATION_STATE.MENTIONS_AND_REPLIES));
+    fireEvent.click(notificationsPanel.getInputWithValue(NOTIFICATION_STATE.MENTIONS_AND_REPLIES)!);
     expect(conversationRepo.setNotificationState).toHaveBeenCalledWith(
       conversation,
       NOTIFICATION_STATE.MENTIONS_AND_REPLIES,

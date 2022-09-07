@@ -17,20 +17,21 @@
  *
  */
 
-import React, {useEffect, useState} from 'react';
-import {useFadingScrollbar} from '../../ui/fadingScrollbar';
-import {container} from 'tsyringe';
-import {registerReactComponent, useKoSubscribableChildren} from 'Util/ComponentUtil';
+import {FC, useEffect, useState} from 'react';
+
+import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 import {formatDuration} from 'Util/TimeUtil';
 import useEffectRef from 'Util/useEffectRef';
 
-import {ConversationState} from '../../conversation/ConversationState';
-import {EphemeralTimings} from '../../ephemeral/EphemeralTimings';
-import {ViewModelRepositories} from '../MainViewModel';
-import PanelHeader from './PanelHeader';
+import {Conversation} from '../../../entity/Conversation';
+import {EphemeralTimings} from '../../../ephemeral/EphemeralTimings';
+import {useFadingScrollbar} from '../../../ui/fadingScrollbar';
+import {ViewModelRepositories} from '../../../view_model/MainViewModel';
+import PanelHeader from '../PanelHeader';
 
 interface TimedMessagesPanelProps {
+  activeConversation: Conversation;
   onClose: () => void;
   onGoBack: () => void;
   repositories: ViewModelRepositories;
@@ -42,14 +43,12 @@ interface MessageTime {
   value: number;
 }
 
-const TimedMessagesPanel: React.FC<TimedMessagesPanelProps> = ({onClose, onGoBack, repositories}) => {
-  const conversationState = container.resolve(ConversationState);
+const TimedMessages: FC<TimedMessagesPanelProps> = ({activeConversation, onClose, onGoBack, repositories}) => {
   const [currentMessageTimer, setCurrentMessageTimer] = useState(0);
   const [messageTimes, setMessageTimes] = useState<MessageTime[]>([]);
   const [scrollbarRef, setScrollbarRef] = useEffectRef<HTMLDivElement>();
   useFadingScrollbar(scrollbarRef);
 
-  const {activeConversation} = useKoSubscribableChildren(conversationState, ['activeConversation']);
   const {globalMessageTimer} = useKoSubscribableChildren(activeConversation, ['globalMessageTimer']);
 
   useEffect(() => {
@@ -78,14 +77,16 @@ const TimedMessagesPanel: React.FC<TimedMessagesPanelProps> = ({onClose, onGoBac
   }, [globalMessageTimer]);
 
   const timedMessageChange = (value: number): void => {
-    if (activeConversation) {
-      const finalTimer = value === 0 ? null : value;
+    const finalTimer = value === 0 ? null : value;
+
+    if (finalTimer) {
       activeConversation.globalMessageTimer(finalTimer);
       repositories.conversation.updateConversationMessageTimer(activeConversation, finalTimer);
     }
   };
+
   return (
-    <>
+    <div id="timed-messages" className="panel__page timed-messages panel__page--visible">
       <PanelHeader
         onGoBack={onGoBack}
         onClose={onClose}
@@ -112,10 +113,8 @@ const TimedMessagesPanel: React.FC<TimedMessagesPanelProps> = ({onClose, onGoBac
         ))}
         <div className="panel__info-text timed-messages__disclaimer">{t('timedMessageDisclaimer')}</div>
       </div>
-    </>
+    </div>
   );
 };
 
-export default TimedMessagesPanel;
-
-registerReactComponent('timed-messages-panel', TimedMessagesPanel);
+export default TimedMessages;
