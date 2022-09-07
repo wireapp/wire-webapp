@@ -49,7 +49,7 @@ import {AccountService} from './account/';
 import {LinkPreviewService} from './linkPreview';
 import type {CoreCrypto} from '@otak/core-crypto';
 import {WEBSOCKET_STATE} from '@wireapp/api-client/src/tcp/ReconnectingWebsocket';
-import {createCustomEncryptedStore, createEncryptedStore} from './util/encryptedStore';
+import {createCustomEncryptedStore, createEncryptedStore, deleteEncryptedStore} from './util/encryptedStore';
 import {Encoder} from 'bazinga64';
 
 export type ProcessedEventPayload = HandledEventPayload;
@@ -418,7 +418,7 @@ export class Account<T = any> extends EventEmitter {
   ) {
     const coreCryptoKeyId = 'corecrypto-key';
     const {CoreCrypto} = await import('@otak/core-crypto');
-    const dbName = `secrets-${this.generateDbName(context)}`;
+    const dbName = this.generateSecretsDbName(context);
 
     const secretStore = mlsConfig.secretsCrypto
       ? await createCustomEncryptedStore(dbName, mlsConfig.secretsCrypto)
@@ -477,7 +477,15 @@ export class Account<T = any> extends EventEmitter {
     delete this.service;
   }
 
-  public async logout(): Promise<void> {
+  /**
+   * Will logout the current user
+   * @param clearData if set to `true` will completely wipe any database that was created by the Account
+   */
+  public async logout(clearData: boolean = false): Promise<void> {
+    if (clearData && this.coreCryptoClient) {
+      await this.coreCryptoClient.wipe();
+      await deleteEncryptedStore(this.generateSecretsDbName(this.apiClient.context!));
+    }
     await this.apiClient.logout();
     this.resetContext();
   }
@@ -599,6 +607,10 @@ export class Account<T = any> extends EventEmitter {
   private generateDbName(context: Context) {
     const clientType = context.clientType === ClientType.NONE ? '' : `@${context.clientType}`;
     return `wire@${this.apiClient.config.urls.name}@${context.userId}${clientType}`;
+  }
+
+  private generateSecretsDbName(context: Context) {
+    return `secrets-${this.generateDbName(context)}`;
   }
 
   private async initEngine(context: Context): Promise<CRUDEngine> {
