@@ -591,6 +591,7 @@ export class CallingRepository {
           const {id, domain} = conversationId;
           const allClients = await this.core.service!.conversation.getAllParticipantsClients(id, domain);
           // We warn the message repository that a mismatch has happened outside of its lifecycle (eventually triggering a conversation degradation)
+          // We warn the message repository that a mismatch has happened outside of its lifecycle (eventually triggering a conversation degradation)
           const shouldContinue = await this.messageRepository.updateMissingClients(
             conversationEntity,
             allClients,
