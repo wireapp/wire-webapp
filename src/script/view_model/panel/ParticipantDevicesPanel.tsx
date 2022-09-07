@@ -27,6 +27,7 @@ import type {User} from '../../entity/User';
 import {ViewModelRepositories} from '../MainViewModel';
 import PanelHeader from './PanelHeader';
 import {useFadingScrollbar} from '../../ui/fadingScrollbar';
+import {t} from 'Util/LocalizerUtil';
 
 interface ParticipantDevicesPanelProps {
   onClose: () => void;
@@ -50,6 +51,7 @@ const ParticipantDevicesPanel: React.FC<ParticipantDevicesPanelProps> = ({reposi
         }}
         onClose={onClose}
         title={history.current.headline}
+        goBackTitle={t('groupParticipantActionDevicesGoBack')}
         goBackUie="go-back-participant-devices"
       />
 

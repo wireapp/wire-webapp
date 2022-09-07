@@ -52,7 +52,7 @@ export const isKey = (keyboardEvent?: KeyboardEvent, expectedKey = '') => {
   return eventKey === expectedKey.toLowerCase();
 };
 
-export const isTabKey = (keyboardEvent: KeyboardEvent): boolean => isKey(keyboardEvent, KEY.TAB);
+export const isTabKey = (keyboardEvent: KeyboardEvent | ReactKeyboardEvent): boolean => isKey(keyboardEvent, KEY.TAB);
 
 export const isEnterKey = (keyboardEvent: KeyboardEvent): boolean => isKey(keyboardEvent, KEY.ENTER);
 
