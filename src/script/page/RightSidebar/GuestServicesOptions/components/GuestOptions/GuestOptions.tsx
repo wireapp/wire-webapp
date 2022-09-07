@@ -230,6 +230,7 @@ const GuestOptions: FC<GuestOptionsProps> = ({
                   onClick={requestAccessCode}
                 >
                   <Icon.Link className="panel__action-item__icon" />
+
                   <span className="panel__action-item__text" data-uie-name="do-create-link">
                     {t('guestOptionsCreateLink')}
                   </span>
@@ -241,6 +242,7 @@ const GuestOptions: FC<GuestOptionsProps> = ({
           {!isGuestLinkEnabled && (
             <div className="panel__action-item--info">
               <Icon.Info className="panel__action-item__icon--info" />
+
               <p className="panel__action-item__text--info" data-uie-name="guest-link-disabled-info">
                 {guestLinkDisabledInfo}
               </p>

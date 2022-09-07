@@ -46,7 +46,6 @@ interface GuestServicesOptionsProps {
   isGuest?: boolean;
 }
 
-// STATE.GUEST_OPTIONS
 const GuestServicesOptions: FC<GuestServicesOptionsProps> = ({
   activeConversation,
   conversationRepository,
@@ -56,8 +55,6 @@ const GuestServicesOptions: FC<GuestServicesOptionsProps> = ({
   teamState,
   isGuest = false,
 }) => {
-  // TODO: It's needed here?
-  // getLogger('GuestsAndServicesViewModel')
   const [isRequestOngoing, setIsRequestOngoing] = useState<boolean>(false);
 
   const {accessState, inTeam, isTeamOnly} = useKoSubscribableChildren(activeConversation, [
@@ -66,11 +63,11 @@ const GuestServicesOptions: FC<GuestServicesOptionsProps> = ({
     'isTeamOnly',
   ]);
 
-  const isToggleDisabled = isRequestOngoing || !inTeam;
-
   const {isGuestLinkEnabled: isTeamStateGuestLinkEnabled} = useKoSubscribableChildren(teamState, [
     'isGuestLinkEnabled',
   ]);
+
+  const isToggleDisabled = isRequestOngoing || !inTeam;
 
   const toggleAccessState = async (feature: number, message: string, willAffectMembers: boolean) => {
     if (inTeam) {
