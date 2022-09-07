@@ -144,20 +144,17 @@ export class ConversationService {
     return genericMessage;
   }
 
-  private async getConversationQualifiedMembers(conversationId: QualifiedId): Promise<QualifiedId[]> {
+  private async getConversationQualifiedMembers(conversationId: string | QualifiedId): Promise<QualifiedId[]> {
     const conversation = await this.apiClient.api.conversation.getConversation(conversationId);
     /*
      * If you are sending a message to a conversation, you have to include
      * yourself in the list of users if you want to sync a message also to your
      * other clients.
      */
-    return (
-      conversation.members.others
-        .filter(member => !!member.qualified_id)
-        .map(member => member.qualified_id!)
-        // TODO(Federation): Use 'domain' from 'conversation.members.self' when backend has it implemented
-        .concat({domain: this.apiClient.context!.domain!, id: conversation.members.self.id})
-    );
+    return conversation.members.others
+      .filter(member => !!member.qualified_id)
+      .map(member => member.qualified_id!)
+      .concat(conversation.members.self.qualified_id!);
   }
 
   /**
@@ -724,40 +721,27 @@ export class ConversationService {
 
   /**
    * Get a fresh list from backend of clients for all the participants of the conversation.
-   * This is a hacky way of getting all the clients for a conversation.
-   * The idea is to send an empty message to the backend to absolutely no users and let backend reply with a mismatch error.
-   * We then get the missing members in the mismatch, that is our fresh list of participants' clients.
-   *
    * @param {string} conversationId
    * @param {string} conversationDomain? - If given will send the message to the new qualified endpoint
    */
-  public getAllParticipantsClients(
+  public async getAllParticipantsClients(
     conversationId: string,
     conversationDomain?: string,
   ): Promise<UserClients | QualifiedUserClients> {
-    const sendingClientId = this.apiClient.validatedClientId;
-    const recipients = {};
-    const text = new Uint8Array();
-    return new Promise(async resolve => {
-      const onClientMismatch = (mismatch: ClientMismatch | MessageSendingStatus) => {
-        resolve(mismatch.missing);
-        // When the mismatch happens, we ask the messageService to cancel the sending
-        return false;
-      };
+    const qualifiedMembers = await this.getConversationQualifiedMembers(
+      conversationDomain ? {id: conversationId, domain: conversationDomain} : conversationId,
+    );
+    const allClients = await this.apiClient.api.user.postListClients({qualified_users: qualifiedMembers});
+    const qualifiedUserClients: QualifiedUserClients = {};
 
-      if (conversationDomain && this.config.useQualifiedIds) {
-        await this.messageService.sendFederatedMessage(sendingClientId, recipients, text, {
-          conversationId: {id: conversationId, domain: conversationDomain},
-          onClientMismatch,
-          reportMissing: true,
-        });
-      } else {
-        await this.messageService.sendMessage(sendingClientId, recipients, text, {
-          conversationId,
-          onClientMismatch,
-        });
-      }
-    });
+    Object.entries(allClients.qualified_user_map).map(([domain, userClientMap]) =>
+      Object.entries(userClientMap).map(async ([userId, clients]) => {
+        qualifiedUserClients[domain] ||= {};
+        qualifiedUserClients[domain][userId] = clients.map(client => client.id);
+      }),
+    );
+
+    return qualifiedUserClients;
   }
 
   public async deleteMessageLocal(
