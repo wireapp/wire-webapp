@@ -39,13 +39,15 @@ import 'Components/MessagesList';
 import 'Components/InputBar';
 import 'Components/Giphy';
 import 'Components/Modals/GroupCreation/GroupCreationModal';
-import '../page/AppLock';
 import 'Components/modal';
 import 'Components/panel/ServiceDetails';
 import 'Components/panel/UserDetails';
 import 'Components/ServiceList';
 import 'Components/SearchInput';
 import 'Components/calling/CallingOverlayContainer';
+
+import '../page/AppLock';
+import '../page/RightSidebar';
 
 import 'Util/LocalizerUtil';
 
