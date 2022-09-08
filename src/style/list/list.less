@@ -146,6 +146,20 @@ body.theme-dark {
     text-align: left;
     transition: background-color 0.15s ease-in-out;
 
+    &::after {
+      position: absolute;
+      right: 0;
+      bottom: 0;
+      left: @left-list-item-left-width;
+      height: 1px;
+      background-color: var(--border-color);
+      content: '';
+    }
+
+    &--active:after {
+      opacity: 0;
+    }
+
     &:hover,
     &:focus-visible,
     &--active:focus-visible {
@@ -165,18 +179,12 @@ body.theme-dark {
 
     &--active,
     &--active:hover {
-      border-bottom-width: 0 !important;
       background-color: var(--accent-color);
       color: @white;
 
       .left-column-icon > svg {
         fill: @white;
       }
-    }
-
-    &--active > .center-column,
-    &:hover .center-column {
-      border-bottom-width: 0 !important;
     }
   }
 
@@ -201,7 +209,6 @@ body.theme-dark {
     height: 100%;
     flex: 1 1;
     align-items: center;
-    border-bottom: 1px solid var(--gray-40);
     margin-right: -8px;
     cursor: pointer;
     font-weight: @font-weight-medium;

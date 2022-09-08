@@ -33,7 +33,7 @@ import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 import {safeWindowOpen} from 'Util/SanitizationUtil';
 import PreferencesSection from '../components/PreferencesSection';
-import PreferencesLink from '../components/PreferencesLink';
+import {Link, LinkVariant} from '@wireapp/react-ui-kit';
 
 interface AccountSecuritySectionProps {
   appLockState?: AppLockState;
@@ -74,52 +74,56 @@ const AccountSecuritySection: React.FC<AccountSecuritySectionProps> = ({
   return (
     <PreferencesSection hasSeparator className="preferences-section-account-security">
       {manageTeamUrl && hasAccessToFeature(FEATURES.MANAGE_TEAM, teamRole) && (
-        <button
-          className="preferences-link"
+        <Link
+          tabIndex={0}
+          variant={LinkVariant.PRIMARY}
           onClick={() => safeWindowOpen(manageTeamUrl)}
           data-uie-name="do-manage-team"
           type="button"
         >
           {t('preferencesAccountManageTeam')}
-        </button>
+        </Link>
       )}
 
       {createTeamUrl && !isMacOsWrapper && (
-        <PreferencesLink href={createTeamUrl} uie="do-create-team">
+        <Link variant={LinkVariant.PRIMARY} targetBlank href={createTeamUrl} data-uie-name="do-create-team">
           {t('preferencesAccountCreateTeam')}
-        </PreferencesLink>
+        </Link>
       )}
       {isAppLockActivated && (
-        <button
-          className="preferences-link"
+        <Link
+          tabIndex={0}
+          variant={LinkVariant.PRIMARY}
           onClick={() => amplify.publish(WebAppEvents.PREFERENCES.CHANGE_APP_LOCK_PASSPHRASE)}
           data-uie-name="do-reset-app-lock"
           type="button"
         >
           {t('preferencesAccountResetAppLockPassphrase')}
-        </button>
+        </Link>
       )}
       {!selfUser?.isNoPasswordSSO && (
-        <button
-          className="preferences-link"
+        <Link
+          tabIndex={0}
+          variant={LinkVariant.PRIMARY}
           onClick={() => safeWindowOpen(getAccountPagesUrl(URL_PATH.PASSWORD_RESET))}
           title={t('tooltipPreferencesPassword')}
           data-uie-name="do-reset-password"
           type="button"
         >
           {t('preferencesAccountResetPassword')}
-        </button>
+        </Link>
       )}
 
       {!isTeam && (
-        <button
-          className="preferences-link"
+        <Link
+          tabIndex={0}
+          variant={LinkVariant.PRIMARY}
           onClick={onClickDeleteAccount}
           data-uie-name="go-delete-account"
           type="button"
         >
           {t('preferencesAccountDelete')}
-        </button>
+        </Link>
       )}
     </PreferencesSection>
   );

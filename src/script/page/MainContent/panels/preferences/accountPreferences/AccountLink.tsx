@@ -20,6 +20,8 @@
 import React from 'react';
 import {t} from 'Util/LocalizerUtil';
 import {copyText} from 'Util/ClipboardUtil';
+import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
+import Icon from 'Components/Icon';
 
 interface AccountLinkProps {
   'data-uie-name'?: string;
@@ -37,22 +39,16 @@ const AccountLink: React.FC<AccountLinkProps> = ({label, value, ...rest}) => {
     >
       <div
         css={{
-          backgroundColor: 'transparent',
-          display: 'flex',
-          flexDirection: 'column',
           marginBottom: 8,
-          padding: 8,
-          svg: {marginLeft: 8},
-          width: 280,
         }}
       >
         <label
           className="label preferences-label"
           css={{
             alignItems: 'center',
-            color: 'var(--text-input-label)',
+            color: 'inherit',
             display: 'flex',
-            height: 48,
+            height: 32,
           }}
           data-uie-name="label-profile-link"
         >
@@ -63,27 +59,23 @@ const AccountLink: React.FC<AccountLinkProps> = ({label, value, ...rest}) => {
           {value}
         </div>
       </div>
-      <button
-        type="button"
-        data-uie-name="do-copy-profile-link"
-        onClick={() => copyText(value)}
-        className="text-bold-small"
+      <div
         css={{
-          '&:hover': {
-            color: 'var(--accent-color)',
-          },
-          alignItems: 'center',
-          background: 'none',
-          border: 'none',
-          cursor: 'pointer',
-          display: 'flex',
-          flexDirection: 'row',
-          marginTop: 25,
-          paddingLeft: 8,
+          marginTop: 8,
         }}
       >
-        {t('preferencesAccountCopyLink')}
-      </button>
+        <Button
+          variant={ButtonVariant.TERTIARY}
+          type="button"
+          role="button"
+          data-uie-name="do-copy-profile-link"
+          onClick={() => copyText(value)}
+          className="text-bold-small"
+        >
+          <Icon.Copy width="16" height="16" css={{marginRight: '8px'}} />
+          {t('preferencesAccountCopyLink')}
+        </Button>
+      </div>
     </div>
   );
 };

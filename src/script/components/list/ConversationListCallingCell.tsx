@@ -168,7 +168,7 @@ const ConversationListCallingCell: React.FC<CallingCellProps> = ({
     };
 
     const entries: ContextMenuEntry[] = [!participant.user.isMe && muteParticipant, muteOthers].filter(Boolean);
-    showContextMenu(event.nativeEvent, entries, 'participant-moderator-menu');
+    showContextMenu(event, entries, 'participant-moderator-menu');
   };
 
   const handleMinimizedKeydown = useCallback(
@@ -450,7 +450,7 @@ const ConversationListCallingCell: React.FC<CallingCellProps> = ({
                       .slice()
                       .sort((participantA, participantB) => sortUsersByPriority(participantA.user, participantB.user))
                       .map(participant => (
-                        <li key={participant.clientId}>
+                        <li key={participant.clientId} className="call-ui__participant-list__participant">
                           <ParticipantItem
                             key={participant.clientId}
                             participant={participant.user}
@@ -462,6 +462,7 @@ const ConversationListCallingCell: React.FC<CallingCellProps> = ({
                             external={teamState.isExternal(participant.user.id)}
                             onContextMenu={isModerator ? event => getParticipantContext(event, participant) : undefined}
                             showDropdown={isModerator}
+                            noInteraction
                           />
                         </li>
                       ))}
