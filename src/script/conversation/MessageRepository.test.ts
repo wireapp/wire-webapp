@@ -130,6 +130,7 @@ describe('MessageRepository', () => {
         ...commonSendResponse,
         conversationDomain: undefined,
         nativePush: true,
+        sendAsProtobuf: true,
         payload: expect.objectContaining({
           content: expect.objectContaining({hotKnock: false}),
           conversation: conversation.id,
@@ -157,6 +158,7 @@ describe('MessageRepository', () => {
         ...commonSendResponse,
         conversationDomain: undefined,
         nativePush: true,
+        sendAsProtobuf: true,
         payload: expect.objectContaining({
           content: expect.objectContaining({text: 'new text', originalMessageId: originalMessage.id}),
           conversation: conversation.id,
@@ -181,6 +183,7 @@ describe('MessageRepository', () => {
         ...commonSendResponse,
         conversationDomain: undefined,
         nativePush: true,
+        sendAsProtobuf: true,
         payload: expect.objectContaining({
           content: expect.objectContaining({text: 'hello there'}),
           conversation: conversation.id,
