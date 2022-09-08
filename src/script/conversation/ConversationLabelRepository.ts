@@ -271,6 +271,7 @@ export class ConversationLabelRepository extends TypedEventTarget<{type: 'conver
         text: t('modalCreateFolderAction'),
       },
       text: {
+        closeBtnLabel: t('modalNewFolderCloseBtn'),
         input: t('modalCreateFolderPlaceholder'),
         message: t('modalCreateFolderMessage'),
         title: t('modalCreateFolderHeadline'),

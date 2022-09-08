@@ -35,6 +35,7 @@ import {isUserEntity} from '../../guards/Panel';
 import ParticipantDevices from './ParticipantDevices/ParticipantDevices';
 import Notifications from './Notifications/Notifications';
 import TimedMessages from './TimedMessages';
+import GuestServicesOptions from './GuestServicesOptions/GuestServicesOptions';
 import AddParticipants from './AddParticipants';
 
 const migratedPanels = [
@@ -43,6 +44,8 @@ const migratedPanels = [
   PanelViewModel.STATE.NOTIFICATIONS,
   PanelViewModel.STATE.PARTICIPANT_DEVICES,
   PanelViewModel.STATE.TIMED_MESSAGES,
+  PanelViewModel.STATE.GUEST_OPTIONS,
+  PanelViewModel.STATE.SERVICES_OPTIONS,
   PanelViewModel.STATE.ADD_PARTICIPANTS,
 ];
 
@@ -125,12 +128,6 @@ const RightSidebar: FC<RightSidebarProps> = ({contentViewModel, teamState, userS
     }
   }, [isMounted, isVisible]);
 
-  useEffect(() => {
-    if (isVisible && state && migratedPanels.includes(state) && activeConversation) {
-      togglePanel(state, {entity: activeConversation});
-    }
-  }, [isVisible, state, activeConversation]);
-
   useEffect(
     () => () => {
       onClose();
@@ -207,6 +204,20 @@ const RightSidebar: FC<RightSidebarProps> = ({contentViewModel, teamState, userS
           onGoBack={backToConversationDetails}
         />
       )}
+
+      {(currentState === PanelViewModel.STATE.GUEST_OPTIONS ||
+        currentState === PanelViewModel.STATE.SERVICES_OPTIONS) &&
+        activeConversation && (
+          <GuestServicesOptions
+            isGuest={currentState === PanelViewModel.STATE.GUEST_OPTIONS}
+            activeConversation={activeConversation}
+            conversationRepository={conversationRepository}
+            teamRepository={teamRepository}
+            onClose={onClose}
+            onBack={backToConversationDetails}
+            teamState={teamState}
+          />
+        )}
 
       {currentState === PanelViewModel.STATE.ADD_PARTICIPANTS && activeConversation && (
         <AddParticipants

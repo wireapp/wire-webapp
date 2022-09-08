@@ -35,6 +35,8 @@ export interface PanelHeaderProps {
   showNotificationsNothing?: boolean;
   isReverse?: boolean;
   closeUie?: string;
+  closeBtnTitle?: string;
+  goBackTitle?: string;
   goBackUie?: string;
   titleDataUieName?: string;
   title?: string;
@@ -52,9 +54,11 @@ const PanelHeader: ForwardRefRenderFunction<HTMLButtonElement, PanelHeaderProps>
     showActionMute = false,
     showNotificationsNothing = false,
     goBackUie,
+    goBackTitle = t('accessibility.rightPanel.GoBack'),
     title = '',
     titleDataUieName = '',
     closeUie = 'do-close',
+    closeBtnTitle = t('accessibility.rightPanel.close'),
     tabIndex = 0,
     handleBlur = noop,
     onGoBack = noop,
@@ -70,7 +74,7 @@ const PanelHeader: ForwardRefRenderFunction<HTMLButtonElement, PanelHeaderProps>
             ref={ref}
             className="icon-button"
             data-uie-name={goBackUie}
-            title={t('accessibility.rightPanel.GoBack')}
+            title={goBackTitle}
             tabIndex={tabIndex}
             onBlur={handleBlur}
           >
@@ -89,7 +93,7 @@ const PanelHeader: ForwardRefRenderFunction<HTMLButtonElement, PanelHeaderProps>
         <button
           className="icon-button"
           data-uie-name={closeUie}
-          title={t('accessibility.rightPanel.close')}
+          title={closeBtnTitle}
           tabIndex={tabIndex}
           onBlur={handleBlur}
         >
