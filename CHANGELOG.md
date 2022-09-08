@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [8.13.8](https://github.com/wireapp/wire-web-packages/tree/main/packages/react-ui-kit/compare/@wireapp/react-ui-kit@8.13.7...@wireapp/react-ui-kit@8.13.8) (2022-09-08)
+
+
+### Bug Fixes
+
+* **react-ui-kit:** update CodeInput component to be visible on mobile devices ([#4380](https://github.com/wireapp/wire-web-packages/tree/main/packages/react-ui-kit/issues/4380)) ([876921d](https://github.com/wireapp/wire-web-packages/tree/main/packages/react-ui-kit/commit/876921dd047ca0884b972d24eb83a097fef294cd))
+
+
+
+
+
 ## [8.13.7](https://github.com/wireapp/wire-web-packages/tree/main/packages/react-ui-kit/compare/@wireapp/react-ui-kit@8.13.6...@wireapp/react-ui-kit@8.13.7) (2022-09-02)
 
 **Note:** Version bump only for package @wireapp/react-ui-kit
