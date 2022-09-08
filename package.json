@@ -125,7 +125,7 @@
     "eslint-plugin-sort-keys-fix": "1.1.2",
     "eslint-plugin-typescript-sort-keys": "2.1.0",
     "eslint-plugin-unused-imports": "2.0.0",
-    "fake-indexeddb": "3.1.8",
+    "fake-indexeddb": "4.0.0",
     "generate-changelog": "1.8.0",
     "grunt": "1.5.3",
     "grunt-aws-s3": "2.0.2",
