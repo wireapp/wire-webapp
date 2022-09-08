@@ -69,6 +69,7 @@ const ControlButtons: React.FC<ControlButtonsProps> = ({
           className="controls-right-button button-icon-large"
           onClick={onCancelEditing}
           data-uie-name="do-cancel-edit"
+          aria-label={t('accessibility.cancelMsgEdit')}
         >
           <Icon.Close />
         </button>

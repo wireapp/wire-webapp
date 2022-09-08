@@ -35,6 +35,7 @@ import {isUserEntity, isUserServiceEntity} from '../../guards/Panel';
 import ParticipantDevices from './ParticipantDevices/ParticipantDevices';
 import Notifications from './Notifications/Notifications';
 import TimedMessages from './TimedMessages';
+import GuestServicesOptions from './GuestServicesOptions/GuestServicesOptions';
 import GroupParticipantService from './GroupParticipantService';
 import {isServiceEntity} from '../../guards/Service';
 import {ServiceEntity} from '../../integration/ServiceEntity';
@@ -45,6 +46,8 @@ const migratedPanels = [
   PanelViewModel.STATE.NOTIFICATIONS,
   PanelViewModel.STATE.PARTICIPANT_DEVICES,
   PanelViewModel.STATE.TIMED_MESSAGES,
+  PanelViewModel.STATE.GUEST_OPTIONS,
+  PanelViewModel.STATE.SERVICES_OPTIONS,
   PanelViewModel.STATE.GROUP_PARTICIPANT_SERVICE,
 ];
 
@@ -226,6 +229,20 @@ const RightSidebar: FC<RightSidebarProps> = ({contentViewModel, teamState, userS
           onGoBack={backToConversationDetails}
         />
       )}
+
+      {(currentState === PanelViewModel.STATE.GUEST_OPTIONS ||
+        currentState === PanelViewModel.STATE.SERVICES_OPTIONS) &&
+        activeConversation && (
+          <GuestServicesOptions
+            isGuest={currentState === PanelViewModel.STATE.GUEST_OPTIONS}
+            activeConversation={activeConversation}
+            conversationRepository={conversationRepository}
+            teamRepository={teamRepository}
+            onClose={onClose}
+            onBack={backToConversationDetails}
+            teamState={teamState}
+          />
+        )}
 
       {currentState === PanelViewModel.STATE.GROUP_PARTICIPANT_SERVICE &&
         activeConversation &&
