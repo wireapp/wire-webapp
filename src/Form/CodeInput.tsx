@@ -41,7 +41,7 @@ type DigitInputProps<T = HTMLInputElement> = InputProps<T>;
 const digitInputStyle: <T>(theme: Theme, props: DigitInputProps<T>) => CSSObject = (theme, props) => ({
   ...inputStyle(theme, props),
   '& + &': {
-    marginLeft: '19px',
+    marginLeft: 'min(19px, 2vw)',
   },
   '&:hover': {
     boxShadow: `0 0 0 1px ${COLOR_V2.GRAY_60}`,
@@ -51,7 +51,7 @@ const digitInputStyle: <T>(theme: Theme, props: DigitInputProps<T>) => CSSObject
   borderRadius: '12px',
   padding: 0,
   textAlign: 'center',
-  width: '48px',
+  width: 'min(48px, 13vw)',
   height: '56px',
 });
 
