@@ -222,7 +222,7 @@ export class ConversationMapper {
 
     conversationEntity.creator = creator;
     conversationEntity.groupId = group_id;
-    conversationEntity.epoch = epoch; // TODO live update epoch
+    conversationEntity.epoch = epoch ?? -1;
     conversationEntity.type(type);
     conversationEntity.name(name || '');
 
