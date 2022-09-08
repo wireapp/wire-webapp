@@ -106,7 +106,7 @@ const AccountForm = ({account, ...props}: Props & ConnectedProps & DispatchProps
       await props.doSendActivationCode(registrationData.email);
       return props.onSubmit(event);
     } catch (error) {
-      if (error && error instanceof BackendError && error.label) {
+      if (error && (error instanceof ValidationError || error instanceof BackendError) && error.label) {
         switch (error.label) {
           case BackendError.AUTH_ERRORS.BLACKLISTED_EMAIL:
           case BackendError.AUTH_ERRORS.DOMAIN_BLOCKED_FOR_REGISTRATION:
