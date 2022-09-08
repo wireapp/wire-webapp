@@ -22,6 +22,8 @@ import {FC} from 'react';
 import useEffectRef from 'Util/useEffectRef';
 import UserDevices, {UserDevicesState, useUserDevicesHistory} from 'Components/UserDevices';
 
+import {t} from 'Util/LocalizerUtil';
+
 import PanelHeader from '../PanelHeader';
 
 import type {User} from '../../../entity/User';
@@ -52,6 +54,7 @@ const ParticipantDevices: FC<ParticipantDevicesProps> = ({repositories, onClose,
         }}
         onClose={onClose}
         title={history.current.headline}
+        goBackTitle={t('groupParticipantActionDevicesGoBack')}
         goBackUie="go-back-participant-devices"
       />
 

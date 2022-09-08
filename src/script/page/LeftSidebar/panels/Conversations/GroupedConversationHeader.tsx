@@ -47,6 +47,8 @@ const GroupedConversationHeader: React.FC<GroupedConversationHeaderProps> = ({on
       type="button"
       className={cx('conversation-folder__head', {'conversation-folder__head--open': isOpen})}
       data-uie-name="conversation-folder-head"
+      aria-expanded={isOpen}
+      aria-controls={conversationLabel.id}
     >
       <span className="disclose-icon">
         <Icon.Disclose />

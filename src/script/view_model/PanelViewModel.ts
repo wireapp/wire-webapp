@@ -24,7 +24,6 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {AddParticipantsViewModel} from './panel/AddParticipantsViewModel';
 import {GroupParticipantServiceViewModel} from './panel/GroupParticipantServiceViewModel';
-import {GuestsAndServicesViewModel} from './panel/GuestsAndServicesViewModel';
 import {MessageDetailsViewModel} from './panel/MessageDetailsViewModel';
 import {MotionDuration} from '../motion/MotionDuration';
 import {ContentViewModel} from './ContentViewModel';
@@ -87,17 +86,13 @@ export class PanelViewModel {
     [PanelViewModel.STATE.ADD_PARTICIPANTS]: 'add-participants',
     [PanelViewModel.STATE.CONVERSATION_PARTICIPANTS]: 'conversation-participants',
     [PanelViewModel.STATE.GROUP_PARTICIPANT_SERVICE]: 'group-participant-service',
-    [PanelViewModel.STATE.GUEST_OPTIONS]: 'guest-options',
     [PanelViewModel.STATE.MESSAGE_DETAILS]: 'message-details',
-    [PanelViewModel.STATE.SERVICES_OPTIONS]: 'services-options',
   };
 
   buildSubViews() {
     const viewModels = {
       [PanelViewModel.STATE.ADD_PARTICIPANTS]: AddParticipantsViewModel,
       [PanelViewModel.STATE.GROUP_PARTICIPANT_SERVICE]: GroupParticipantServiceViewModel,
-      [PanelViewModel.STATE.GUEST_OPTIONS]: GuestsAndServicesViewModel,
-      [PanelViewModel.STATE.SERVICES_OPTIONS]: GuestsAndServicesViewModel,
       [PanelViewModel.STATE.MESSAGE_DETAILS]: MessageDetailsViewModel,
     };
 

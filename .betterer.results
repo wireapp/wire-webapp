@@ -486,7 +486,7 @@ exports[`stricter compilation`] = {
       [384, 4, 9, "Argument of type \'undefined\' is not assignable to parameter of type \'UserRepository\'.", "2620553983"],
       [550, 4, 7, "Argument of type \'(context: any, conversationId: string, userId: string, clientId: string, destinationUserId: string, destinationClientId: string, payload: string) => number\' is not assignable to parameter of type \'WcallSendHandler\'.\\n  Types of parameters \'destinationUserId\' and \'targets\' are incompatible.\\n    Type \'string | null\' is not assignable to type \'string\'.\\n      Type \'null\' is not assignable to type \'string\'.", "2532445472"]
     ],
-    "src/script/calling/CallingRepository.ts:1055696798": [
+    "src/script/calling/CallingRepository.ts:4273873777": [
       [122, 10, 10, "Property \'avsVersion\' has no initializer and is not definitely assigned in the constructor.", "3071787355"],
       [128, 10, 12, "Property \'selfClientId\' has no initializer and is not definitely assigned in the constructor.", "3576844301"],
       [129, 10, 8, "Property \'selfUser\' has no initializer and is not definitely assigned in the constructor.", "2198230984"],
@@ -1119,7 +1119,7 @@ exports[`stricter compilation`] = {
       [108, 8, 12, "Type \'null\' is not assignable to type \'RECEIPT_MODE\'.", "1234422597"],
       [114, 8, 7, "Type \'null\' is not assignable to type \'string\'.", "1826788170"]
     ],
-    "src/script/conversation/ConversationLabelRepository.ts:2667135542": [
+    "src/script/conversation/ConversationLabelRepository.ts:832459864": [
       [93, 4, 11, "Type \'ObservableArray<never>\' is not assignable to type \'ObservableArray<ConversationLabel>\'.\\n  Types of parameters \'value\' and \'value\' are incompatible.\\n    Type \'ConversationLabel[] | null | undefined\' is not assignable to type \'never[] | null | undefined\'.\\n      Type \'ConversationLabel[]\' is not assignable to type \'never[]\'.\\n        Type \'ConversationLabel\' is not assignable to type \'never\'.", "2608654840"],
       [118, 8, 13, "Type \'ObservableArray<Conversation | undefined>\' is not assignable to type \'ObservableArray<Conversation>\'.\\n  The types returned by \'peek()\' are incompatible between these types.\\n    Type \'(Conversation | undefined)[]\' is not assignable to type \'Conversation[]\'.\\n      Type \'Conversation | undefined\' is not assignable to type \'Conversation\'.\\n        Type \'undefined\' is not assignable to type \'Conversation\'.", "3592773563"],
       [142, 49, 5, "Object is of type \'unknown\'.", "165548477"],
@@ -1156,7 +1156,7 @@ exports[`stricter compilation`] = {
     "src/script/conversation/ConversationMapper.ts:279241474": [
       [91, 45, 49, "Argument of type \'([key, value]: [keyof Conversation, string]) => void\' is not assignable to parameter of type \'(value: [string, any], index: number, array: [string, any][]) => void\'.\\n  Types of parameters \'__0\' and \'value\' are incompatible.\\n    Type \'[string, any]\' is not assignable to type \'[keyof Conversation, string]\'.\\n      Type at position 0 in source is not compatible with type at position 0 in target.\\n        Type \'string\' is not assignable to type \'keyof Conversation\'.", "2065920092"],
       [166, 36, 21, "Argument of type \'number | undefined\' is not assignable to parameter of type \'number\'.\\n  Type \'undefined\' is not assignable to type \'number\'.", "3907016453"],
-      [185, 41, 26, "No overload matches this call.\\n  Overload 1 of 4, \'(value: string | number | Date): Date\', gave the following error.\\n    Argument of type \'string | undefined\' is not assignable to parameter of type \'string | number | Date\'.\\n      Type \'undefined\' is not assignable to type \'string | number | Date\'.\\n  Overload 2 of 4, \'(value: string | number): Date\', gave the following error.\\n    Argument of type \'string | undefined\' is not assignable to parameter of type \'string | number\'.\\n      Type \'undefined\' is not assignable to type \'string | number\'.", "582302494"],
+      [185, 41, 26, "No overload matches this call.\\n  Overload 1 of 4, \'(value: string | number | Date): Date\', gave the following error.\\n    Argument of type \'string | undefined\' is not assignable to parameter of type \'string | number | Date\'.\\n  Overload 2 of 4, \'(value: string | number): Date\', gave the following error.\\n    Argument of type \'string | undefined\' is not assignable to parameter of type \'string | number\'.", "582302494"],
       [191, 38, 23, "No overload matches this call.\\n  Overload 1 of 4, \'(value: string | number | Date): Date\', gave the following error.\\n    Argument of type \'string | undefined\' is not assignable to parameter of type \'string | number | Date\'.\\n  Overload 2 of 4, \'(value: string | number): Date\', gave the following error.\\n    Argument of type \'string | undefined\' is not assignable to parameter of type \'string | number\'.", "4035274933"],
       [289, 37, 25, "Object is possibly \'undefined\'.", "4293153287"],
       [338, 10, 24, "Type \'(QualifiedId | undefined)[]\' is not assignable to type \'QualifiedId[]\'.\\n  Type \'QualifiedId | undefined\' is not assignable to type \'QualifiedId\'.\\n    Type \'undefined\' is not assignable to type \'QualifiedId\'.", "125758031"],
@@ -1482,7 +1482,7 @@ exports[`stricter compilation`] = {
       [884, 68, 11, "Argument of type \'string | undefined\' is not assignable to parameter of type \'string\'.\\n  Type \'undefined\' is not assignable to type \'string\'.", "2853998291"]
     ],
     "src/script/conversation/MessageRepository.ts:3425977142": [
-      [746, 52, 8, "No overload matches this call.\\n  Overload 1 of 4, \'(value: string | number | Date): Date\', gave the following error.\\n    Argument of type \'string | undefined\' is not assignable to parameter of type \'string | number | Date\'.\\n  Overload 2 of 4, \'(value: string | number): Date\', gave the following error.\\n    Argument of type \'string | undefined\' is not assignable to parameter of type \'string | number\'.", "1948180668"],
+      [746, 52, 8, "No overload matches this call.\\n  Overload 1 of 4, \'(value: string | number | Date): Date\', gave the following error.\\n    Argument of type \'string | undefined\' is not assignable to parameter of type \'string | number | Date\'.\\n      Type \'undefined\' is not assignable to type \'string | number | Date\'.\\n  Overload 2 of 4, \'(value: string | number): Date\', gave the following error.\\n    Argument of type \'string | undefined\' is not assignable to parameter of type \'string | number\'.\\n      Type \'undefined\' is not assignable to type \'string | number\'.", "1948180668"],
       [811, 102, 5, "Object is of type \'unknown\'.", "165548477"],
       [955, 80, 4, "Object is possibly \'undefined\'.", "2087973204"],
       [966, 37, 5, "Object is of type \'unknown\'.", "165548477"],
@@ -2019,12 +2019,12 @@ exports[`stricter compilation`] = {
       [106, 37, 12, "Argument of type \'Element | null\' is not assignable to parameter of type \'Element\'.\\n  Type \'null\' is not assignable to type \'Element\'.", "1912908196"],
       [178, 35, 12, "Argument of type \'Element | null\' is not assignable to parameter of type \'Element\'.\\n  Type \'null\' is not assignable to type \'Element\'.", "1912908196"]
     ],
-    "src/script/page/AppLock.tsx:588408162": [
-      [163, 28, 36, "Argument of type \'Element | null\' is not assignable to parameter of type \'Node\'.\\n  Type \'null\' is not assignable to type \'Node\'.", "3019440182"],
-      [167, 26, 30, "Argument of type \'Element | null\' is not assignable to parameter of type \'Node\'.\\n  Type \'null\' is not assignable to type \'Node\'.", "1790131128"],
-      [195, 59, 37, "Object is possibly \'null\'.", "3700925542"],
-      [216, 94, 4, "Argument of type \'unknown\' is not assignable to parameter of type \'StatusCodes\'.", "2087770728"],
-      [219, 19, 7, "Argument of type \'unknown\' is not assignable to parameter of type \'SetStateAction<string>\'.", "1236122734"]
+    "src/script/page/AppLock.tsx:135507464": [
+      [164, 28, 36, "Argument of type \'Element | null\' is not assignable to parameter of type \'Node\'.\\n  Type \'null\' is not assignable to type \'Node\'.", "3019440182"],
+      [168, 26, 30, "Argument of type \'Element | null\' is not assignable to parameter of type \'Node\'.\\n  Type \'null\' is not assignable to type \'Node\'.", "1790131128"],
+      [196, 59, 37, "Object is possibly \'null\'.", "3700925542"],
+      [217, 94, 4, "Argument of type \'unknown\' is not assignable to parameter of type \'StatusCodes\'.", "2087770728"],
+      [220, 19, 7, "Argument of type \'unknown\' is not assignable to parameter of type \'SetStateAction<string>\'.", "1236122734"]
     ],
     "src/script/page/LeftSidebar/panels/Conversations/ConversationsList.tsx:3232925700": [
       [104, 10, 15, "Type \'(conversation: Conversation) => boolean\' is not assignable to type \'(conversationId: QualifiedId) => boolean\'.\\n  Types of parameters \'conversation\' and \'conversationId\' are incompatible.\\n    Type \'QualifiedId\' is missing the following properties from type \'Conversation\': teamState, archivedState, incomingMessages, isManaged, and 121 more.", "1629494677"]
@@ -2038,7 +2038,7 @@ exports[`stricter compilation`] = {
     "src/script/page/MainContent/MainContent.tsx:1247306180": [
       [70, 10, 12, "Type \'Conversation | null\' is not assignable to type \'Conversation\'.\\n  Type \'null\' is not assignable to type \'Conversation\'.", "1670678216"]
     ],
-    "src/script/page/MainContent/panels/Collection/FullSearch.tsx:1879516049": [
+    "src/script/page/MainContent/panels/Collection/FullSearch.tsx:2917650160": [
       [99, 10, 10, "Object is possibly \'undefined\'.", "1962587969"],
       [100, 26, 10, "Object is possibly \'undefined\'.", "1962587969"],
       [109, 25, 11, "Object is possibly \'undefined\'.", "2591652326"],
@@ -2059,10 +2059,10 @@ exports[`stricter compilation`] = {
       [70, 6, 9, "Argument of type \'undefined\' is not assignable to parameter of type \'string\'.", "2620553983"],
       [107, 40, 43, "Argument of type \'string | undefined\' is not assignable to parameter of type \'string\'.\\n  Type \'undefined\' is not assignable to type \'string\'.", "1072333434"]
     ],
-    "src/script/page/MainContent/panels/preferences/accountPreferences/AvatarInput.tsx:919643938": [
+    "src/script/page/MainContent/panels/preferences/accountPreferences/AvatarInput.tsx:3583834949": [
       [50, 69, 9, "Argument of type \'undefined\' is not assignable to parameter of type \'string\'.", "2620553983"],
       [91, 4, 16, "Object is possibly \'null\'.", "4019370437"],
-      [116, 23, 14, "Argument of type \'File | null\' is not assignable to parameter of type \'File\'.\\n  Type \'null\' is not assignable to type \'File\'.", "1073819172"]
+      [121, 23, 14, "Argument of type \'File | null\' is not assignable to parameter of type \'File\'.\\n  Type \'null\' is not assignable to type \'File\'.", "1073819172"]
     ],
     "src/script/page/MainContent/panels/preferences/accountPreferences/EmailInput.tsx:542696972": [
       [56, 10, 5, "Object is of type \'unknown\'.", "165548477"],
@@ -2374,11 +2374,11 @@ exports[`stricter compilation`] = {
       [330, 21, 4, "\'this\' implicitly has type \'any\' because it does not have a type annotation.", "2087959715"],
       [354, 52, 22, "Argument of type \'Element | null\' is not assignable to parameter of type \'Element\'.\\n  Type \'null\' is not assignable to type \'Element\'.", "1093908406"]
     ],
-    "src/script/view_model/ActionsViewModel.ts:3156374460": [
+    "src/script/view_model/ActionsViewModel.ts:3361396489": [
       [117, 82, 22, "Argument of type \'Conversation | undefined\' is not assignable to parameter of type \'Conversation\'.\\n  Type \'undefined\' is not assignable to type \'Conversation\'.", "4075697524"],
       [181, 67, 5, "Object is of type \'unknown\'.", "165548477"],
       [181, 83, 5, "Object is of type \'unknown\'.", "165548477"],
-      [195, 8, 9, "Argument of type \'undefined\' is not assignable to parameter of type \'string\'.", "2620553983"]
+      [196, 8, 9, "Argument of type \'undefined\' is not assignable to parameter of type \'string\'.", "2620553983"]
     ],
     "src/script/view_model/CallingViewModel.ts:2137718400": [
       [88, 11, 17, "Property \'activeCallViewTab\' has no initializer and is not definitely assigned in the constructor.", "1323835793"],
@@ -2438,31 +2438,31 @@ exports[`stricter compilation`] = {
       [288, 29, 8, "Argument of type \'HTMLElement | null\' is not assignable to parameter of type \'HTMLElement\'.\\n  Type \'null\' is not assignable to type \'HTMLElement\'.", "277626740"],
       [289, 29, 5, "Argument of type \'HTMLElement | null\' is not assignable to parameter of type \'HTMLElement\'.\\n  Type \'null\' is not assignable to type \'HTMLElement\'.", "178805363"]
     ],
-    "src/script/view_model/ModalsViewModel.ts:508741377": [
-      [80, 2, 11, "Type \'null\' is not assignable to type \'string\'.", "974495764"],
-      [138, 4, 14, "Type \'Observable<string | null>\' is not assignable to type \'Observable<string>\'.\\n  The types returned by \'peek()\' are incompatible between these types.\\n    Type \'string | null\' is not assignable to type \'string\'.\\n      Type \'null\' is not assignable to type \'string\'.", "209694601"],
-      [172, 13, 4, "Property \'type\' does not exist on type \'{ id: string; options: ModalOptions; type: ModalType; } | undefined\'.", "2087944093"],
-      [172, 19, 7, "Property \'options\' does not exist on type \'{ id: string; options: ModalOptions; type: ModalType; } | undefined\'.", "717644789"],
-      [172, 28, 2, "Property \'id\' does not exist on type \'{ id: string; options: ModalOptions; type: ModalType; } | undefined\'.", "5861160"],
-      [242, 8, 19, "Type \'string | false | undefined\' is not assignable to type \'string | undefined\'.\\n  Type \'boolean\' is not assignable to type \'string\'.", "1717244404"],
-      [270, 56, 23, "No overload matches this call.\\n  Overload 1 of 2, \'(...items: ConcatArray<never>[]): never[]\', gave the following error.\\n    Argument of type \'Action\' is not assignable to parameter of type \'ConcatArray<never>\'.\\n      Type \'Action\' is missing the following properties from type \'ConcatArray<never>\': length, join, slice\\n  Overload 2 of 2, \'(...items: ConcatArray<never>[]): never[]\', gave the following error.\\n    Argument of type \'Action\' is not assignable to parameter of type \'ConcatArray<never>\'.", "1386143110"],
-      [272, 16, 9, "Spread types may only be created from object types.", "2308002069"],
-      [275, 17, 7, "Argument of type \'{ checkboxLabel: string | undefined; closeFn: Function; closeOnConfirm: boolean; currentType: ModalType; inputPlaceholder: string | undefined; messageHtml: string | undefined; ... 6 more ...; titleText: string | undefined; }\' is not assignable to parameter of type \'Content\'.\\n  Types of property \'checkboxLabel\' are incompatible.\\n    Type \'string | undefined\' is not assignable to type \'string\'.\\n      Type \'undefined\' is not assignable to type \'string\'.", "3716929964"],
-      [277, 19, 2, "Argument of type \'string | undefined\' is not assignable to parameter of type \'string\'.\\n  Type \'undefined\' is not assignable to type \'string\'.", "5861160"],
-      [293, 34, 29, "Argument of type \'boolean | undefined\' is not assignable to parameter of type \'boolean\'.\\n  Type \'undefined\' is not assignable to type \'boolean\'.", "1283406094"],
-      [336, 19, 4, "Argument of type \'null\' is not assignable to parameter of type \'string\'.", "2087897566"]
+    "src/script/view_model/ModalsViewModel.ts:2611374172": [
+      [83, 2, 11, "Type \'null\' is not assignable to type \'string\'.", "974495764"],
+      [141, 4, 14, "Type \'Observable<string | null>\' is not assignable to type \'Observable<string>\'.\\n  The types returned by \'peek()\' are incompatible between these types.\\n    Type \'string | null\' is not assignable to type \'string\'.\\n      Type \'null\' is not assignable to type \'string\'.", "209694601"],
+      [175, 13, 4, "Property \'type\' does not exist on type \'{ id: string; options: ModalOptions; type: ModalType; } | undefined\'.", "2087944093"],
+      [175, 19, 7, "Property \'options\' does not exist on type \'{ id: string; options: ModalOptions; type: ModalType; } | undefined\'.", "717644789"],
+      [175, 28, 2, "Property \'id\' does not exist on type \'{ id: string; options: ModalOptions; type: ModalType; } | undefined\'.", "5861160"],
+      [246, 8, 19, "Type \'string | false | undefined\' is not assignable to type \'string | undefined\'.\\n  Type \'boolean\' is not assignable to type \'string\'.", "1717244404"],
+      [274, 56, 23, "No overload matches this call.\\n  Overload 1 of 2, \'(...items: ConcatArray<never>[]): never[]\', gave the following error.\\n    Argument of type \'Action\' is not assignable to parameter of type \'ConcatArray<never>\'.\\n      Type \'Action\' is missing the following properties from type \'ConcatArray<never>\': length, join, slice\\n  Overload 2 of 2, \'(...items: ConcatArray<never>[]): never[]\', gave the following error.\\n    Argument of type \'Action\' is not assignable to parameter of type \'ConcatArray<never>\'.", "1386143110"],
+      [276, 16, 9, "Spread types may only be created from object types.", "2308002069"],
+      [279, 17, 7, "Argument of type \'{ checkboxLabel: string | undefined; closeBtnTitle: string | undefined; closeFn: Function; closeOnConfirm: boolean; currentType: ModalType; inputPlaceholder: string | undefined; ... 7 more ...; titleText: string | undefined; }\' is not assignable to parameter of type \'Content\'.\\n  Types of property \'checkboxLabel\' are incompatible.\\n    Type \'string | undefined\' is not assignable to type \'string\'.\\n      Type \'undefined\' is not assignable to type \'string\'.", "3716929964"],
+      [281, 19, 2, "Argument of type \'string | undefined\' is not assignable to parameter of type \'string\'.\\n  Type \'undefined\' is not assignable to type \'string\'.", "5861160"],
+      [297, 34, 29, "Argument of type \'boolean | undefined\' is not assignable to parameter of type \'boolean\'.\\n  Type \'undefined\' is not assignable to type \'boolean\'.", "1283406094"],
+      [340, 19, 4, "Argument of type \'null\' is not assignable to parameter of type \'string\'.", "2087897566"]
     ],
-    "src/script/view_model/PanelViewModel.ts:255665097": [
-      [66, 2, 13, "Property \'currentEntity\' has no initializer and is not definitely assigned in the constructor.", "32305655"],
-      [128, 4, 23, "Type \'Observable<Conversation | null>\' is not assignable to type \'Observable<Conversation>\'.", "2356679995"],
-      [132, 4, 10, "Type \'Observable<string | undefined>\' is not assignable to type \'Observable<string>\'.", "4014904506"],
-      [134, 4, 17, "Type \'Observable<string | undefined>\' is not assignable to type \'Observable<string>\'.", "2911337818"],
-      [202, 15, 9, "Argument of type \'undefined\' is not assignable to parameter of type \'string\'.", "2620553983"],
-      [204, 4, 18, "Type \'undefined\' is not assignable to type \'PanelEntity\'.", "2173061407"],
-      [269, 22, 9, "Argument of type \'undefined\' is not assignable to parameter of type \'string\'.", "2620553983"],
-      [289, 24, 9, "Argument of type \'undefined\' is not assignable to parameter of type \'string\'.", "2620553983"],
-      [290, 34, 9, "Argument of type \'undefined\' is not assignable to parameter of type \'string\'.", "2620553983"],
-      [302, 6, 15, "Type \'Element | null\' is not assignable to type \'Element | undefined\'.\\n  Type \'null\' is not assignable to type \'Element | undefined\'.", "2931287914"]
+    "src/script/view_model/PanelViewModel.ts:3202367347": [
+      [65, 2, 13, "Property \'currentEntity\' has no initializer and is not definitely assigned in the constructor.", "32305655"],
+      [123, 4, 23, "Type \'Observable<Conversation | null>\' is not assignable to type \'Observable<Conversation>\'.", "2356679995"],
+      [127, 4, 10, "Type \'Observable<string | undefined>\' is not assignable to type \'Observable<string>\'.", "4014904506"],
+      [129, 4, 17, "Type \'Observable<string | undefined>\' is not assignable to type \'Observable<string>\'.", "2911337818"],
+      [197, 15, 9, "Argument of type \'undefined\' is not assignable to parameter of type \'string\'.", "2620553983"],
+      [199, 4, 18, "Type \'undefined\' is not assignable to type \'PanelEntity\'.", "2173061407"],
+      [264, 22, 9, "Argument of type \'undefined\' is not assignable to parameter of type \'string\'.", "2620553983"],
+      [284, 24, 9, "Argument of type \'undefined\' is not assignable to parameter of type \'string\'.", "2620553983"],
+      [285, 34, 9, "Argument of type \'undefined\' is not assignable to parameter of type \'string\'.", "2620553983"],
+      [297, 6, 15, "Type \'Element | null\' is not assignable to type \'Element | undefined\'.\\n  Type \'null\' is not assignable to type \'Element | undefined\'.", "2931287914"]
     ],
     "src/script/view_model/WindowTitleViewModel.ts:2939646455": [
       [48, 4, 17, "Type \'Observable<ContentState>\' is not assignable to type \'Observable<string>\'.\\n  Types of parameters \'value\' and \'value\' are incompatible.\\n    Type \'string\' is not assignable to type \'ContentState\'.", "3516467027"],
@@ -2526,9 +2526,6 @@ exports[`stricter compilation`] = {
       [52, 4, 24, "Type \'Observable<undefined>\' is not assignable to type \'Observable<User>\'.", "3514586203"],
       [53, 4, 20, "Type \'Observable<undefined>\' is not assignable to type \'Observable<ServiceEntity>\'.\\n  Types of property \'equalityComparer\' are incompatible.\\n    Type \'(a: undefined, b: undefined) => boolean\' is not assignable to type \'(a: ServiceEntity, b: ServiceEntity) => boolean\'.\\n      Types of parameters \'a\' and \'a\' are incompatible.\\n        Type \'ServiceEntity\' is not assignable to type \'undefined\'.", "3275208665"],
       [93, 25, 9, "Argument of type \'undefined\' is not assignable to parameter of type \'ServiceEntity\'.", "2620553983"]
-    ],
-    "src/script/view_model/panel/GuestsAndServicesViewModel.ts:292948775": [
-      [93, 4, 23, "Type \'PureComputed<boolean | undefined>\' is not assignable to type \'PureComputed<boolean>\'.", "2493661698"]
     ],
     "src/script/view_model/panel/MessageDetailsViewModel.ts:906474120": [
       [72, 4, 14, "Type \'Observable<string | undefined>\' is not assignable to type \'Observable<string>\'.\\n  The types returned by \'peek()\' are incompatible between these types.\\n    Type \'string | undefined\' is not assignable to type \'string\'.\\n      Type \'undefined\' is not assignable to type \'string\'.", "116181579"],

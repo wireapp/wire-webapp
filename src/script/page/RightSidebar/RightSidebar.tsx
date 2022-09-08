@@ -36,13 +36,17 @@ import {isUserEntity} from '../../guards/Panel';
 import ParticipantDevices from './ParticipantDevices/ParticipantDevices';
 import Notifications from './Notifications/Notifications';
 import TimedMessages from './TimedMessages';
+import GuestServicesOptions from './GuestServicesOptions/GuestServicesOptions';
 
 const migratedPanels = [
   PanelViewModel.STATE.CONVERSATION_DETAILS,
+  PanelViewModel.STATE.CONVERSATION_PARTICIPANTS,
   PanelViewModel.STATE.GROUP_PARTICIPANT_USER,
   PanelViewModel.STATE.NOTIFICATIONS,
   PanelViewModel.STATE.PARTICIPANT_DEVICES,
   PanelViewModel.STATE.TIMED_MESSAGES,
+  PanelViewModel.STATE.GUEST_OPTIONS,
+  PanelViewModel.STATE.SERVICES_OPTIONS,
 ];
 
 interface RightSidebarProps {
@@ -124,12 +128,6 @@ const RightSidebar: FC<RightSidebarProps> = ({contentViewModel, teamState, userS
     }
   }, [isMounted, isVisible]);
 
-  useEffect(() => {
-    if (isVisible && previousState && migratedPanels.includes(previousState) && activeConversation) {
-      togglePanel(state, {entity: activeConversation});
-    }
-  }, [isVisible, state, activeConversation, previousState]);
-
   useEffect(
     () => () => {
       onClose();
@@ -206,6 +204,20 @@ const RightSidebar: FC<RightSidebarProps> = ({contentViewModel, teamState, userS
           onGoBack={backToConversationDetails}
         />
       )}
+
+      {(currentState === PanelViewModel.STATE.GUEST_OPTIONS ||
+        currentState === PanelViewModel.STATE.SERVICES_OPTIONS) &&
+        activeConversation && (
+          <GuestServicesOptions
+            isGuest={currentState === PanelViewModel.STATE.GUEST_OPTIONS}
+            activeConversation={activeConversation}
+            conversationRepository={conversationRepository}
+            teamRepository={teamRepository}
+            onClose={onClose}
+            onBack={backToConversationDetails}
+            teamState={teamState}
+          />
+        )}
 
       {state === PanelViewModel.STATE.CONVERSATION_PARTICIPANTS && activeConversation && (
         <ConversationParticipants

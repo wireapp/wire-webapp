@@ -6,7 +6,7 @@
     <!-- ko if: isModalVisible() -->
     <div class="modal__header" data-uie-name="status-modal-title">
       <h2 class="modal__header__title" id="modal-title" data-bind="text: content().titleText"></h2>
-      <button type="button" class="modal__header__button" data-bind="click: hide" data-uie-name="do-close">
+      <button type="button" class="modal__header__button" data-bind="click: hide, attr: {'aria-label': content().closeBtnTitle}" data-uie-name="do-close">
         <close-icon class="modal__header__icon" aria-hidden="true"></close-icon>
       </button>
     </div>
