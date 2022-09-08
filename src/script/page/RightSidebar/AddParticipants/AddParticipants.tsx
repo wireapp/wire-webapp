@@ -18,7 +18,7 @@
  */
 
 import cx from 'classnames';
-import {FC, useCallback, useEffect, useMemo, useState} from 'react';
+import {FC, useMemo, useState} from 'react';
 
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import Icon from 'Components/Icon';
@@ -106,10 +106,21 @@ const AddParticipants: FC<AddParticipantsProps> = ({
   const isAddServiceState = currentState === PARTICIPANTS_STATE.ADD_SERVICE;
 
   const [searchInput, setSearchInput] = useState<string>('');
-  const [contacts, setContacts] = useState<User[]>([]);
   const [selectedContacts, setSelectedContacts] = useState<User[]>([]);
 
   const [isInitialServiceSearch, setIsInitialServiceSearch] = useState<boolean>(true);
+
+  const contacts = useMemo(() => {
+    let users: User[] = [];
+
+    if (isTeam) {
+      users = isTeamOnly || isServicesRoom ? teamMembers.sort(sortUsersByPriority) : teamUsers;
+    } else {
+      users = connectedUsers;
+    }
+
+    return users.filter(userEntity => participatingUserIds.find(userId => matchQualifiedIds(userEntity, userId)));
+  }, [isTeam, isTeamOnly, isServicesRoom, teamUsers, connectedUsers, participatingUserIds]);
 
   const enabledAddAction = selectedContacts.length > 0;
 
@@ -169,25 +180,6 @@ const AddParticipants: FC<AddParticipantsProps> = ({
     await searchServices(value);
     setSearchInput(value);
   };
-
-  const getUserEntities = useCallback(() => {
-    let userEntities: User[] = [];
-
-    if (isTeam) {
-      userEntities = isTeamOnly || isServicesRoom ? teamMembers.sort(sortUsersByPriority) : teamUsers;
-    } else {
-      userEntities = connectedUsers;
-    }
-
-    return userEntities.filter(userEntity => {
-      return participatingUserIds.find(userId => matchQualifiedIds(userEntity, userId));
-    });
-  }, [isTeam, isTeamOnly, isServicesRoom, teamUsers, connectedUsers, participatingUserIds]);
-
-  useEffect(() => {
-    const userEntities = getUserEntities();
-    setContacts(userEntities);
-  }, []);
 
   return (
     <div id="add-participants" className="add-participants panel__page panel__page--visible">
