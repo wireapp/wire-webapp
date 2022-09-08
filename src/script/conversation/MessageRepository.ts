@@ -775,6 +775,7 @@ export class MessageRepository {
         onSuccess: handleSuccess,
         payload,
         protocol: ConversationProtocol.PROTEUS,
+        sendAsProtobuf: true,
         targetMode,
         userIds: this.generateRecipients(conversation, recipients, skipSelf),
       }),
@@ -836,8 +837,11 @@ export class MessageRepository {
         conversationDomain: this.core.backendFeatures.federationEndpoints ? conversation.domain : undefined,
         payload: sessionReset,
         protocol: ConversationProtocol.PROTEUS,
+        sendAsProtobuf: true,
+
         targetMode: MessageTargetMode.USERS_CLIENTS,
-        userIds: this.core.backendFeatures.federationEndpoints ? {[userId.domain]: userClient} : userClient, // we target this message to the specific client of the user (no need for mismatch handling here)
+        // we target this message to the specific client of the user (no need for mismatch handling here)
+        userIds: this.core.backendFeatures.federationEndpoints ? {[userId.domain]: userClient} : userClient,
       }),
     );
   }
@@ -1092,7 +1096,7 @@ export class MessageRepository {
       ? this.createQualifiedRecipients(users)
       : this.createRecipients(users);
 
-    this.core.service!.broadcast.broadcastGenericMessage(genericMessage, recipients, false, mismatch => {
+    this.core.service!.broadcast.broadcastGenericMessage(genericMessage, recipients, true, mismatch => {
       this.onClientMismatch?.(mismatch);
     });
   };
