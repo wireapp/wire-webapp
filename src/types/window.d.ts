@@ -69,6 +69,7 @@ declare global {
           ENABLE_PHONE_LOGIN: boolean;
           ENABLE_SSO: boolean;
           ENFORCE_CONSTANT_BITRATE: boolean;
+          MLS_CONFIG_KEYING_MATERIAL_UPDATE_THRESHOLD: number;
           PERSIST_TEMPORARY_CLIENTS: boolean;
           SHOW_LOADING_INFORMATION: boolean;
         };
