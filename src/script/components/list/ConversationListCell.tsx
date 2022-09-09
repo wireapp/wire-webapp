@@ -37,7 +37,6 @@ import AvailabilityState from 'Components/AvailabilityState';
 import Icon from 'Components/Icon';
 import {KEY} from 'Util/KeyboardUtil';
 import {setContextMenuPosition} from 'Util/util';
-import {useDisposableRef} from 'Util/useDisposableRef';
 
 export interface ConversationListCellProps {
   conversation: Conversation;
@@ -84,17 +83,11 @@ const ConversationListCell: React.FC<ConversationListCellProps> = ({
 
   const isActive = isSelected(conversation);
 
-  const initContextMenu = useDisposableRef(element => {
-    const handleRightClick = (event: MouseEvent) => {
-      event.stopPropagation();
-      event.preventDefault();
-      rightClick(conversation, event);
-    };
-    element.addEventListener('contextmenu', handleRightClick);
-    return () => {
-      element.removeEventListener('contextmenu', handleRightClick);
-    };
-  });
+  const openContextMenu = (event: React.MouseEvent) => {
+    event.stopPropagation();
+    event.preventDefault();
+    rightClick(conversation, event.nativeEvent);
+  };
 
   const cellState = useMemo(() => generateCellState(conversation), [unreadState, mutedState, isRequest]);
 
@@ -117,7 +110,7 @@ const ConversationListCell: React.FC<ConversationListCellProps> = ({
   };
 
   return (
-    <li ref={initContextMenu}>
+    <li onContextMenu={openContextMenu}>
       <div
         data-uie-name={dataUieName}
         data-uie-uid={conversation.id}
@@ -147,7 +140,7 @@ const ConversationListCell: React.FC<ConversationListCellProps> = ({
             )}
           </div>
           <div className="conversation-list-cell-center">
-            {is1to1 && selfUser.inTeam() ? (
+            {is1to1 && selfUser?.inTeam() ? (
               <AvailabilityState
                 className="conversation-list-cell-availability"
                 availability={availabilityOfUser}
