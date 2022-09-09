@@ -27,7 +27,6 @@ import {AssetRepository} from '../assets/AssetRepository';
 import {useViewPortObserver} from '../ui/viewportObserver';
 import {TeamState} from '../team/TeamState';
 import RestrictedImage from './asset/RestrictedImage';
-import useEffectRef from 'Util/useEffectRef';
 
 export interface ImageProps extends React.HTMLProps<HTMLDivElement> {
   aspectRatio?: number;
@@ -48,8 +47,8 @@ const Image: React.FC<ImageProps> = ({
   aspectRatio,
   ...props
 }) => {
-  const [viewportElementRef, setViewportElementRef] = useEffectRef<HTMLDivElement>();
-  const isInViewport = useViewPortObserver(viewportElementRef);
+  const [isInViewport, setIsInViewport] = useState(false);
+  const iniViewportObserver = useViewPortObserver(() => setIsInViewport(true));
 
   const [assetIsLoading, setAssetIsLoading] = useState<boolean>(false);
   const [assetSrc, setAssetSrc] = useState<string>();
@@ -83,7 +82,7 @@ const Image: React.FC<ImageProps> = ({
   return !isFileSharingReceivingEnabled ? (
     <RestrictedImage className={className} showMessage={!isQuote} isSmall={isQuote} />
   ) : (
-    <div ref={setViewportElementRef} className={cx('image-wrapper', className)} {...props}>
+    <div ref={iniViewportObserver} className={cx('image-wrapper', className)} {...props}>
       {assetSrc ? (
         <img style={style} onClick={onClick} src={assetSrc} role="presentation" alt="" />
       ) : (

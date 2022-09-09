@@ -17,7 +17,7 @@
  *
  */
 
-import {useEffect, useState} from 'react';
+import {useDisposableRef} from 'Util/useDisposableRef';
 
 const observedElements = new Map();
 const tolerance = 0.8;
@@ -114,22 +114,16 @@ export const viewportObserver = {
   trackElement,
 };
 
-export const useViewPortObserver = (elementRef?: HTMLElement, defaultIsVisible: boolean = false): boolean => {
-  const [isInViewport, setIsInViewport] = useState(defaultIsVisible);
-  useEffect(() => {
-    if (!elementRef) {
-      return () => {};
-    }
-    viewportObserver.trackElement(elementRef, (isInViewport: boolean) => {
+export const useViewPortObserver = (onVisible: () => void) => {
+  return useDisposableRef((element: HTMLElement) => {
+    viewportObserver.trackElement(element, (isInViewport: boolean) => {
       if (isInViewport) {
-        setIsInViewport(true);
-        viewportObserver.removeElement(elementRef);
+        onVisible();
+        viewportObserver.removeElement(element);
       }
     });
     return () => {
-      viewportObserver.removeElement(elementRef);
+      viewportObserver.removeElement(element);
     };
-  }, [elementRef]);
-
-  return isInViewport;
+  });
 };

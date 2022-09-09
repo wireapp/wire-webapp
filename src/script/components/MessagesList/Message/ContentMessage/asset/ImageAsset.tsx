@@ -25,7 +25,6 @@ import {handleKeyDown} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
 
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
-import useEffectRef from 'Util/useEffectRef';
 
 import {Config} from '../../../../../Config';
 import {ContentMessage} from '../../../../../entity/message/ContentMessage';
@@ -48,8 +47,8 @@ const ImageAsset: React.FC<ImageAssetProps> = ({asset, message, onClick, teamSta
   const {resource} = useKoSubscribableChildren(asset, ['resource']);
   const {isObfuscated, visible} = useKoSubscribableChildren(message, ['isObfuscated', 'visible']);
   const {isFileSharingReceivingEnabled} = useKoSubscribableChildren(teamState, ['isFileSharingReceivingEnabled']);
-  const [viewportElementRef, setViewportElementRef] = useEffectRef<HTMLDivElement>();
-  const isInViewport = useViewPortObserver(viewportElementRef);
+  const [isInViewport, setIsInViewport] = useState(false);
+  const initViewportObserver = useViewPortObserver(() => setIsInViewport(true));
   const {isUploading, uploadProgress, cancelUpload, loadAsset} = useAssetTransfer(message);
 
   useEffect(() => {
@@ -104,7 +103,7 @@ const ImageAsset: React.FC<ImageAssetProps> = ({asset, message, onClick, teamSta
           role="button"
           data-uie-name="go-image-detail"
           aria-label={imageAltText}
-          ref={setViewportElementRef}
+          ref={initViewportObserver}
         >
           {isUploading && (
             <div className="asset-loader">

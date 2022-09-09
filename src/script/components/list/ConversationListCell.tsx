@@ -17,13 +17,12 @@
  *
  */
 
-import React, {useEffect, useMemo} from 'react';
+import React, {useMemo} from 'react';
 import cx from 'classnames';
 
 import {noop} from 'Util/util';
 import {t} from 'Util/LocalizerUtil';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
-import useEffectRef from 'Util/useEffectRef';
 
 import {AVATAR_SIZE} from 'Components/Avatar';
 
@@ -38,6 +37,7 @@ import AvailabilityState from 'Components/AvailabilityState';
 import Icon from 'Components/Icon';
 import {KEY} from 'Util/KeyboardUtil';
 import {setContextMenuPosition} from 'Util/util';
+import {useDisposableRef} from 'Util/useDisposableRef';
 
 export interface ConversationListCellProps {
   conversation: Conversation;
@@ -84,19 +84,17 @@ const ConversationListCell: React.FC<ConversationListCellProps> = ({
 
   const isActive = isSelected(conversation);
 
-  const [viewportElementRef, setViewportElementRef] = useEffectRef<HTMLElement>();
-
-  useEffect(() => {
+  const initContextMenu = useDisposableRef(element => {
     const handleRightClick = (event: MouseEvent) => {
       event.stopPropagation();
       event.preventDefault();
       rightClick(conversation, event);
     };
-    viewportElementRef?.addEventListener('contextmenu', handleRightClick);
+    element.addEventListener('contextmenu', handleRightClick);
     return () => {
-      viewportElementRef?.removeEventListener('contextmenu', handleRightClick);
+      element.removeEventListener('contextmenu', handleRightClick);
     };
-  }, [viewportElementRef]);
+  });
 
   const cellState = useMemo(() => generateCellState(conversation), [unreadState, mutedState, isRequest]);
 
@@ -119,7 +117,7 @@ const ConversationListCell: React.FC<ConversationListCellProps> = ({
   };
 
   return (
-    <li ref={setViewportElementRef}>
+    <li ref={initContextMenu}>
       <div
         data-uie-name={dataUieName}
         data-uie-uid={conversation.id}
