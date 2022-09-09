@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [30.5.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/compare/@wireapp/core@30.4.1...@wireapp/core@30.5.0) (2022-09-09)
+
+
+### Features
+
+* **core:** update keys periodically (FS-562) ([#4374](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/issues/4374)) ([9b9d362](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/commit/9b9d362bca320691fb15314cb1a3ef940a51892c))
+
+
+
+
+
 ## [30.4.1](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/compare/@wireapp/core@30.4.0...@wireapp/core@30.4.1) (2022-09-08)
 
 **Note:** Version bump only for package @wireapp/core
