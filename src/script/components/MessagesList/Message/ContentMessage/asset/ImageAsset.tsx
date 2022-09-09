@@ -89,7 +89,6 @@ const ImageAsset: React.FC<ImageAssetProps> = ({asset, message, onClick, teamSta
     <div data-uie-name="image-asset">
       {isFileSharingReceivingEnabled ? (
         <InViewport
-          requireFullyInView={false}
           className={cx('image-asset', {
             'bg-color-ephemeral': isObfuscated,
             'image-asset--no-image': !isObfuscated && !imageUrl,

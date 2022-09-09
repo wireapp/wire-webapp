@@ -31,7 +31,7 @@ const InViewport: React.FC<InViewportParams & React.HTMLProps<HTMLDivElement>> =
   children,
   style,
   onVisible,
-  requireFullyInView = true,
+  requireFullyInView = false,
   allowBiggerThanViewport = false,
 }) => {
   const domNode = useRef<HTMLDivElement>(null);

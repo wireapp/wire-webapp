@@ -81,12 +81,7 @@ const Image: React.FC<ImageProps> = ({
   return !isFileSharingReceivingEnabled ? (
     <RestrictedImage className={className} showMessage={!isQuote} isSmall={isQuote} />
   ) : (
-    <InViewport
-      requireFullyInView={false}
-      onVisible={() => setIsInViewport(true)}
-      className={cx('image-wrapper', className)}
-      {...props}
-    >
+    <InViewport onVisible={() => setIsInViewport(true)} className={cx('image-wrapper', className)} {...props}>
       {assetSrc ? (
         <img style={style} onClick={onClick} src={assetSrc} role="presentation" alt="" />
       ) : (

@@ -153,7 +153,6 @@ const ParticipantItem = <UserType extends User | ServiceEntity>(
       aria-label={t('accessibility.openConversation', participantName)}
     >
       <InViewport
-        requireFullyInView={false}
         className="participant-item"
         data-uie-name={isUser ? 'item-user' : 'item-service'}
         data-uie-value={participantName}
