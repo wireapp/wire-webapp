@@ -22,7 +22,6 @@ import {amplify} from 'amplify';
 
 import {WebAppEvents} from '@wireapp/webapp-events';
 
-import {AddParticipantsViewModel} from './panel/AddParticipantsViewModel';
 import {ConversationParticipantsViewModel} from './panel/ConversationParticipantsViewModel';
 import {MessageDetailsViewModel} from './panel/MessageDetailsViewModel';
 import {MotionDuration} from '../motion/MotionDuration';
@@ -79,14 +78,12 @@ export class PanelViewModel {
   }
 
   elementIds = {
-    [PanelViewModel.STATE.ADD_PARTICIPANTS]: 'add-participants',
     [PanelViewModel.STATE.CONVERSATION_PARTICIPANTS]: 'conversation-participants',
     [PanelViewModel.STATE.MESSAGE_DETAILS]: 'message-details',
   };
 
   buildSubViews() {
     const viewModels = {
-      [PanelViewModel.STATE.ADD_PARTICIPANTS]: AddParticipantsViewModel,
       [PanelViewModel.STATE.CONVERSATION_PARTICIPANTS]: ConversationParticipantsViewModel,
       [PanelViewModel.STATE.MESSAGE_DETAILS]: MessageDetailsViewModel,
     };

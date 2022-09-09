@@ -193,7 +193,9 @@ const ConversationDetails: FC<ConversationDetailsProps> = ({
     conversationRepository.renameConversation(activeConversation, conversationName);
   };
 
-  const openAddParticipants = () => togglePanel(PanelViewModel.STATE.ADD_PARTICIPANTS, {entity: activeConversation});
+  const openAddParticipants = () => {
+    togglePanel(PanelViewModel.STATE.ADD_PARTICIPANTS, {entity: activeConversation});
+  };
 
   const showService = (serviceEntity: ServiceEntity) =>
     togglePanel(PanelViewModel.STATE.GROUP_PARTICIPANT_SERVICE, {entity: serviceEntity});
