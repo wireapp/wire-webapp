@@ -40,6 +40,7 @@ import GuestServicesOptions from './GuestServicesOptions/GuestServicesOptions';
 import GroupParticipantService from './GroupParticipantService';
 import {isServiceEntity} from '../../guards/Service';
 import {ServiceEntity} from '../../integration/ServiceEntity';
+import AddParticipants from './AddParticipants';
 
 const migratedPanels = [
   PanelViewModel.STATE.CONVERSATION_DETAILS,
@@ -51,6 +52,7 @@ const migratedPanels = [
   PanelViewModel.STATE.GUEST_OPTIONS,
   PanelViewModel.STATE.SERVICES_OPTIONS,
   PanelViewModel.STATE.GROUP_PARTICIPANT_SERVICE,
+  PanelViewModel.STATE.ADD_PARTICIPANTS,
 ];
 
 interface RightSidebarProps {
@@ -262,6 +264,21 @@ const RightSidebar: FC<RightSidebarProps> = ({contentViewModel, teamState, userS
             isAddMode={isAddMode}
           />
         )}
+
+      {currentState === PanelViewModel.STATE.ADD_PARTICIPANTS && activeConversation && (
+        <AddParticipants
+          activeConversation={activeConversation}
+          onBack={backToConversationDetails}
+          onClose={onClose}
+          conversationRepository={conversationRepository}
+          integrationRepository={integrationRepository}
+          searchRepository={searchRepository}
+          togglePanel={togglePanel}
+          teamRepository={teamRepository}
+          teamState={teamState}
+          userState={userState}
+        />
+      )}
 
       {state === PanelViewModel.STATE.CONVERSATION_PARTICIPANTS && activeConversation && (
         <ConversationParticipants
