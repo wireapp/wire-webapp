@@ -17,8 +17,6 @@
  *
  */
 
-import {useDisposableRef} from 'Util/useDisposableRef';
-
 const observedElements = new Map();
 const tolerance = 0.8;
 
@@ -112,18 +110,4 @@ export const viewportObserver = {
   onElementInViewport,
   removeElement,
   trackElement,
-};
-
-export const useViewPortObserver = (onVisible: () => void) => {
-  return useDisposableRef((element: HTMLElement) => {
-    viewportObserver.trackElement(element, (isInViewport: boolean) => {
-      if (isInViewport) {
-        onVisible();
-        viewportObserver.removeElement(element);
-      }
-    });
-    return () => {
-      viewportObserver.removeElement(element);
-    };
-  });
 };

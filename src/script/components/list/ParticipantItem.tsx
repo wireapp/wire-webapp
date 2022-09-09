@@ -29,7 +29,6 @@ import {noop, setContextMenuPosition} from 'Util/util';
 
 import {User} from '../../entity/User';
 import {ServiceEntity} from '../../integration/ServiceEntity';
-import {useViewPortObserver} from '../../ui/viewportObserver';
 
 import 'Components/AvailabilityState';
 import {Participant} from '../../calling/Participant';
@@ -37,6 +36,7 @@ import AvailabilityState from 'Components/AvailabilityState';
 import ParticipantMicOnIcon from 'Components/calling/ParticipantMicOnIcon';
 import Icon from 'Components/Icon';
 import {KEY} from 'Util/KeyboardUtil';
+import InViewport from 'Components/utils/InViewport';
 
 export interface ParticipantItemProps<UserType> extends Omit<React.HTMLProps<HTMLDivElement>, 'onClick' | 'onKeyDown'> {
   badge?: boolean;
@@ -84,7 +84,6 @@ const ParticipantItem = <UserType extends User | ServiceEntity>(
     onKeyDown = noop,
   } = props;
   const [isInViewport, setIsInViewport] = useState(false);
-  const initViewportObserver = useViewPortObserver(() => setIsInViewport(true));
   const isUser = participant instanceof User && !participant.isService;
   const isService = participant instanceof ServiceEntity || participant.isService;
   const isSelf = !!(participant as User).isMe;
@@ -153,11 +152,12 @@ const ParticipantItem = <UserType extends User | ServiceEntity>(
       onKeyDown={noInteraction ? handleContextKeyDown : event => onKeyDown(participant, event.nativeEvent)}
       aria-label={t('accessibility.openConversation', participantName)}
     >
-      <div
+      <InViewport
+        requireFullyInView={false}
         className="participant-item"
         data-uie-name={isUser ? 'item-user' : 'item-service'}
         data-uie-value={participantName}
-        ref={initViewportObserver}
+        onVisible={() => setIsInViewport(true)}
       >
         {isInViewport && (
           <>
@@ -276,7 +276,7 @@ const ParticipantItem = <UserType extends User | ServiceEntity>(
             {showArrow && <Icon.ChevronRight className="disclose-icon" />}
           </>
         )}
-      </div>
+      </InViewport>
     </div>
   );
 };

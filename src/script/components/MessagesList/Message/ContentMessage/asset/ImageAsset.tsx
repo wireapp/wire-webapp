@@ -32,8 +32,8 @@ import {MediumImage} from '../../../../../entity/message/MediumImage';
 import {TeamState} from '../../../../../team/TeamState';
 import AssetLoader from './AssetLoader';
 import RestrictedImage from 'Components/asset/RestrictedImage';
-import {useViewPortObserver} from '../../../../../ui/viewportObserver';
 import {useAssetTransfer} from './AbstractAssetTransferStateTracker';
+import InViewport from 'Components/utils/InViewport';
 
 export interface ImageAssetProps {
   asset: MediumImage;
@@ -48,7 +48,6 @@ const ImageAsset: React.FC<ImageAssetProps> = ({asset, message, onClick, teamSta
   const {isObfuscated, visible} = useKoSubscribableChildren(message, ['isObfuscated', 'visible']);
   const {isFileSharingReceivingEnabled} = useKoSubscribableChildren(teamState, ['isFileSharingReceivingEnabled']);
   const [isInViewport, setIsInViewport] = useState(false);
-  const initViewportObserver = useViewPortObserver(() => setIsInViewport(true));
   const {isUploading, uploadProgress, cancelUpload, loadAsset} = useAssetTransfer(message);
 
   useEffect(() => {
@@ -89,7 +88,8 @@ const ImageAsset: React.FC<ImageAssetProps> = ({asset, message, onClick, teamSta
   return (
     <div data-uie-name="image-asset">
       {isFileSharingReceivingEnabled ? (
-        <div
+        <InViewport
+          requireFullyInView={false}
           className={cx('image-asset', {
             'bg-color-ephemeral': isObfuscated,
             'image-asset--no-image': !isObfuscated && !imageUrl,
@@ -103,7 +103,7 @@ const ImageAsset: React.FC<ImageAssetProps> = ({asset, message, onClick, teamSta
           role="button"
           data-uie-name="go-image-detail"
           aria-label={imageAltText}
-          ref={initViewportObserver}
+          onVisible={() => setIsInViewport(true)}
         >
           {isUploading && (
             <div className="asset-loader">
@@ -123,7 +123,7 @@ const ImageAsset: React.FC<ImageAssetProps> = ({asset, message, onClick, teamSta
             src={imageUrl || dummyImageUrl}
             alt={imageAltText}
           />
-        </div>
+        </InViewport>
       ) : (
         <RestrictedImage />
       )}
