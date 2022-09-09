@@ -17,7 +17,7 @@
  *
  */
 
-import {FC, useEffect, useState} from 'react';
+import {FC, useCallback, useEffect, useState} from 'react';
 import {container} from 'tsyringe';
 
 import {registerReactComponent, useKoSubscribableChildren} from 'Util/ComponentUtil';
@@ -31,11 +31,14 @@ import {ContentViewModel} from '../../view_model/ContentViewModel';
 import {PanelParams, PanelViewModel} from '../../view_model/PanelViewModel';
 import GroupParticipantUser from './GroupParticipantUser';
 import {User} from '../../entity/User';
-import {isUserEntity} from '../../guards/Panel';
+import {isUserEntity, isUserServiceEntity} from '../../guards/Panel';
 import ParticipantDevices from './ParticipantDevices/ParticipantDevices';
 import Notifications from './Notifications/Notifications';
 import TimedMessages from './TimedMessages';
 import GuestServicesOptions from './GuestServicesOptions/GuestServicesOptions';
+import GroupParticipantService from './GroupParticipantService';
+import {isServiceEntity} from '../../guards/Service';
+import {ServiceEntity} from '../../integration/ServiceEntity';
 
 const migratedPanels = [
   PanelViewModel.STATE.CONVERSATION_DETAILS,
@@ -45,6 +48,7 @@ const migratedPanels = [
   PanelViewModel.STATE.TIMED_MESSAGES,
   PanelViewModel.STATE.GUEST_OPTIONS,
   PanelViewModel.STATE.SERVICES_OPTIONS,
+  PanelViewModel.STATE.GROUP_PARTICIPANT_SERVICE,
 ];
 
 interface RightSidebarProps {
@@ -73,6 +77,27 @@ const RightSidebar: FC<RightSidebarProps> = ({contentViewModel, teamState, userS
   const [previousState, setPreviousState] = useState<string | null>(null);
   const [currentState, setCurrentState] = useState<string | null>(state);
   const [currentEntity, setCurrentEntity] = useState<PanelParams['entity'] | null>(null);
+  const [currentServiceEntity, setCurrentServiceEntity] = useState<ServiceEntity | null>(null);
+  const [isAddMode, setIsAddMode] = useState<PanelParams['addMode']>(false);
+
+  const userEntity = currentEntity && isUserEntity(currentEntity) ? currentEntity : null;
+  const userServiceEntity = currentEntity && isUserServiceEntity(currentEntity) ? currentEntity : null;
+
+  const getServiceEntity = useCallback(
+    async (entity: PanelParams['entity']) => {
+      if (entity && isServiceEntity(entity)) {
+        const serviceEntity = await integrationRepository.getServiceFromUser(entity);
+
+        if (!serviceEntity) {
+          return;
+        }
+
+        integrationRepository.addProviderNameToParticipant(serviceEntity);
+        setCurrentServiceEntity(serviceEntity);
+      }
+    },
+    [userEntity],
+  );
 
   const goToRoot = () => {
     if (activeConversation) {
@@ -85,6 +110,11 @@ const RightSidebar: FC<RightSidebarProps> = ({contentViewModel, teamState, userS
     setPreviousState(currentState);
     setCurrentState(isMigratedPanel ? panel : null);
     setCurrentEntity(params.entity);
+    setIsAddMode(!!params.addMode);
+
+    if (panel === PanelViewModel.STATE.GROUP_PARTICIPANT_SERVICE) {
+      getServiceEntity(params.entity);
+    }
 
     panelViewModel.togglePanel(panel, params);
   };
@@ -126,12 +156,6 @@ const RightSidebar: FC<RightSidebarProps> = ({contentViewModel, teamState, userS
     }
   }, [isMounted, isVisible]);
 
-  useEffect(() => {
-    if (isVisible && previousState && migratedPanels.includes(previousState) && activeConversation) {
-      // togglePanel(state, {entity: activeConversation});
-    }
-  }, [isVisible, state, activeConversation, previousState]);
-
   useEffect(
     () => () => {
       onClose();
@@ -162,25 +186,22 @@ const RightSidebar: FC<RightSidebarProps> = ({contentViewModel, teamState, userS
         />
       )}
 
-      {currentState === PanelViewModel.STATE.GROUP_PARTICIPANT_USER &&
-        activeConversation &&
-        currentEntity &&
-        isUserEntity(currentEntity) && (
-          <GroupParticipantUser
-            onBack={backToConversationDetails}
-            onClose={onClose}
-            goToRoot={goToRoot}
-            showDevices={showDevices}
-            currentUser={currentEntity}
-            activeConversation={activeConversation}
-            actionsViewModel={actionsViewModel}
-            conversationRoleRepository={conversationRoleRepository}
-            teamRepository={teamRepository}
-            teamState={teamState}
-            userState={userState}
-            isFederated={!!contentViewModel.isFederated}
-          />
-        )}
+      {currentState === PanelViewModel.STATE.GROUP_PARTICIPANT_USER && activeConversation && userEntity && (
+        <GroupParticipantUser
+          onBack={backToConversationDetails}
+          onClose={onClose}
+          goToRoot={goToRoot}
+          showDevices={showDevices}
+          currentUser={userEntity}
+          activeConversation={activeConversation}
+          actionsViewModel={actionsViewModel}
+          conversationRoleRepository={conversationRoleRepository}
+          teamRepository={teamRepository}
+          teamState={teamState}
+          userState={userState}
+          isFederated={!!contentViewModel.isFederated}
+        />
+      )}
 
       {currentState === PanelViewModel.STATE.NOTIFICATIONS && activeConversation && (
         <Notifications
@@ -191,12 +212,12 @@ const RightSidebar: FC<RightSidebarProps> = ({contentViewModel, teamState, userS
         />
       )}
 
-      {currentState === PanelViewModel.STATE.PARTICIPANT_DEVICES && currentEntity && isUserEntity(currentEntity) && (
+      {currentState === PanelViewModel.STATE.PARTICIPANT_DEVICES && userEntity && (
         <ParticipantDevices
           repositories={contentViewModel.repositories}
           onClose={onClose}
           onGoBack={goBackToGroupOrConversationDetails}
-          user={currentEntity}
+          user={userEntity}
         />
       )}
 
@@ -220,6 +241,23 @@ const RightSidebar: FC<RightSidebarProps> = ({contentViewModel, teamState, userS
             onClose={onClose}
             onBack={backToConversationDetails}
             teamState={teamState}
+          />
+        )}
+
+      {currentState === PanelViewModel.STATE.GROUP_PARTICIPANT_SERVICE &&
+        activeConversation &&
+        currentServiceEntity &&
+        userServiceEntity && (
+          <GroupParticipantService
+            activeConversation={activeConversation}
+            actionsViewModel={actionsViewModel}
+            integrationRepository={integrationRepository}
+            onBack={backToConversationDetails}
+            onClose={onClose}
+            serviceEntity={currentServiceEntity}
+            userEntity={userServiceEntity}
+            userState={userState}
+            isAddMode={isAddMode}
           />
         )}
     </>

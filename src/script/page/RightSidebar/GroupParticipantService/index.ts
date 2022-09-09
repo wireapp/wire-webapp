@@ -17,18 +17,4 @@
  *
  */
 
-import {User} from '../entity/User';
-import {PanelParams} from '../view_model/PanelViewModel';
-import {ServiceEntity} from '../integration/ServiceEntity';
-
-export const isServiceEntity = (entity: PanelParams['entity']): entity is ServiceEntity => {
-  return 'isService' in entity && entity.isService;
-};
-
-export const isUserEntity = (entity: PanelParams['entity']): entity is User => {
-  return !isServiceEntity(entity);
-};
-
-export const isUserServiceEntity = (entity: PanelParams['entity']): entity is User => {
-  return isServiceEntity(entity);
-};
+export {default} from './GroupParticipantService';
