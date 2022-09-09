@@ -27,15 +27,8 @@ import {useLayoutEffect, useRef} from 'react';
  */
 export function useDisposableRef(init: (element: HTMLElement) => () => void, dependencies: unknown[] = []) {
   const elementRef = useRef<HTMLElement | null>(null!);
-  const firstRunDispose = useRef<any>(null);
-  const isFirstRun = useRef(true);
 
   useLayoutEffect(() => {
-    if (isFirstRun.current) {
-      // We ignore the first render, since it was dealt directly when the ref was rendered
-      isFirstRun.current = false;
-      return firstRunDispose.current;
-    }
     if (elementRef.current) {
       const dispose = init(elementRef.current);
       return dispose;
@@ -45,10 +38,5 @@ export function useDisposableRef(init: (element: HTMLElement) => () => void, dep
 
   return (element: HTMLElement | null) => {
     elementRef.current = element;
-    if (isFirstRun.current && element) {
-      // we synchronously run the first iteration (to avoid flickering)
-      // useLayoutEffect will run right after
-      firstRunDispose.current = init(element);
-    }
   };
 }
