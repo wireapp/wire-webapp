@@ -25,15 +25,11 @@ import {useLayoutEffect, useRef} from 'react';
  * @param init The function to run on the DOM element pointed as ref
  * @param dependencies List of dependencies that should re trigger the initFunction
  */
-export function useDisposableRef(init: (element: HTMLElement) => () => void, dependencies: unknown[] = []) {
+export function useDisposableRef(init: (element: HTMLElement) => () => void, dependencies?: unknown[]) {
   const elementRef = useRef<HTMLElement | null>(null!);
 
   useLayoutEffect(() => {
-    if (elementRef.current) {
-      const dispose = init(elementRef.current);
-      return dispose;
-    }
-    return () => {};
+    return elementRef.current ? init(elementRef.current) : () => {};
   }, dependencies);
 
   return (element: HTMLElement | null) => {
