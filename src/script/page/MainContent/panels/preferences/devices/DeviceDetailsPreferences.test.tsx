@@ -21,6 +21,7 @@ import {act, render, waitFor} from '@testing-library/react';
 import DeviceDetailsPreferences from './DeviceDetailsPreferences';
 import {ClientEntity} from 'src/script/client/ClientEntity';
 import {createRandomUuid} from 'Util/util';
+import {withTheme} from 'src/script/auth/util/test/TestUtil';
 
 describe('DeviceDetailsPreferences', () => {
   const device = new ClientEntity(true, '', createRandomUuid());
@@ -34,16 +35,15 @@ describe('DeviceDetailsPreferences', () => {
     onResetSession: jest.fn().mockResolvedValue(undefined),
     onVerify: jest.fn((_, isVerified) => device.meta.isVerified(isVerified)),
   };
-
   it('shows device details', async () => {
-    const {getByText, getAllByText} = render(<DeviceDetailsPreferences {...defaultParams} />);
+    const {getByText, getAllByText} = render(withTheme(<DeviceDetailsPreferences {...defaultParams} />));
     await waitFor(() => getAllByText('00'));
 
     expect(getByText(device.model)).toBeDefined();
   });
 
   it('resets session with device', async () => {
-    const {getByText, getAllByText, queryByText} = render(<DeviceDetailsPreferences {...defaultParams} />);
+    const {getByText, getAllByText, queryByText} = render(withTheme(<DeviceDetailsPreferences {...defaultParams} />));
     await waitFor(() => getAllByText('00'));
     jest.useFakeTimers();
     act(() => {
@@ -68,7 +68,7 @@ describe('DeviceDetailsPreferences', () => {
   });
 
   it('toggles verification', async () => {
-    const {getByText, getAllByText} = render(<DeviceDetailsPreferences {...defaultParams} />);
+    const {getByText, getAllByText} = render(withTheme(<DeviceDetailsPreferences {...defaultParams} />));
     await waitFor(() => getAllByText('00'));
 
     act(() => {

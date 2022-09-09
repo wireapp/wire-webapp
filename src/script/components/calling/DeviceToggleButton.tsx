@@ -42,48 +42,58 @@ const DeviceToggleButton: React.FC<DeviceToggleButtonProps> = ({currentDevice, d
       data-uie-name="device-toggle-button"
       css={css`
         align-items: center;
-        flex-direction: column;
         color: #fff;
         cursor: pointer;
         display: inline-flex;
         ${styles};
       `}
     >
-      <div
-        role="button"
-        tabIndex={0}
-        className="device-toggle-button-indicator"
-        data-uie-name="device-toggle-button-indicator"
-        onClick={selectNextDevice}
-        onKeyDown={e => handleKeyDown(e, selectNextDevice.bind(null, e))}
-        css={{
-          display: 'flex',
-          marginTop: 8,
-        }}
-      >
-        {devices.map(device => {
-          const isCurrentDevice = device === currentDevice;
+      {devices.map(device => {
+        const isCurrentDevice = device === currentDevice;
 
-          return (
-            <span
-              key={device}
-              className="device-toggle-button-indicator-dot"
-              data-uie-name="device-toggle-button-indicator-dot"
-              data-uie-value={isCurrentDevice ? 'active' : 'inactive'}
-              css={{
-                '&:not(:last-child)': {marginRight: 5},
-                backgroundColor: isCurrentDevice ? 'var(--accent-color)' : 'var(--app-bg-secondary)',
-                border: isCurrentDevice ? '1px solid var(--accent-color)' : '1px solid var(--foreground)',
-                borderRadius: '50%',
-                color: '#fff',
-                display: 'inline-block',
-                height: 10,
-                width: 10,
-              }}
-            />
-          );
-        })}
-      </div>
+        return (
+          <button
+            key={device}
+            className="device-toggle-button-indicator-dot button-reset-default"
+            data-uie-name="device-toggle-button-indicator-dot"
+            data-uie-value={isCurrentDevice ? 'active' : 'inactive'}
+            onClick={selectNextDevice}
+            onKeyDown={e => handleKeyDown(e, selectNextDevice.bind(null, e))}
+            css={{
+              '&:focus-visible': {
+                backgroundColor: isCurrentDevice
+                  ? 'var(--toggle-button-hover-bg)'
+                  : 'var(--toggle-button-unselected-hover-bg)',
+                border: '1px solid var(--accent-color)',
+                outline: 'none',
+              },
+              '&:hover': {
+                backgroundColor: isCurrentDevice
+                  ? 'var(--toggle-button-hover-bg)'
+                  : 'var(--toggle-button-unselected-hover-bg)',
+                border: isCurrentDevice
+                  ? '1px solid var(--toggle-button-hover-bg)'
+                  : '1px solid var(--toggle-button-unselected-hover-border)',
+              },
+              /* eslint-disable sort-keys-fix/sort-keys-fix */
+              '&:active': {
+                /* eslint-enable sort-keys-fix/sort-keys-fix */
+                backgroundColor: isCurrentDevice ? 'var(--accent-color)' : 'var(--toggle-button-unselected-bg)',
+                border: '1px solid var(--accent-color)',
+              },
+              '&:not(:last-child)': {marginRight: 5},
+              backgroundColor: isCurrentDevice ? 'var(--accent-color)' : 'var(--app-bg-secondary)',
+              border: isCurrentDevice ? '1px solid var(--accent-color)' : '1px solid var(--foreground)',
+              borderRadius: '50%',
+              color: '#fff',
+              display: 'flex',
+              height: 10,
+              marginTop: 8,
+              width: 10,
+            }}
+          />
+        );
+      })}
     </div>
   );
 };

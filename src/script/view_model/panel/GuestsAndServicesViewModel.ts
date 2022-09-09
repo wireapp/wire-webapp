@@ -153,6 +153,7 @@ export class GuestsAndServicesViewModel extends BasePanelViewModel {
             this.requestOngoing(false);
           }
         },
+        closeBtnLabel: t('modalConversationRevokeLinkCloseBtn'),
         text: t('modalConversationRevokeLinkAction'),
       },
       text: {

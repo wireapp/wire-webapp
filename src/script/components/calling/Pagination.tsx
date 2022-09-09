@@ -28,9 +28,6 @@ export interface PaginationProps {
 }
 
 const paginationItemStyles: CSSObject = {
-  '&:hover': {
-    border: '1px solid var(--accent-color)',
-  },
   ':last-child': {
     marginRight: 4,
   },
@@ -57,21 +54,46 @@ const Pagination: React.FC<PaginationProps> = ({totalPages, currentPage, onChang
       }}
       data-uie-name="pagination-wrapper"
     >
-      {pages.map(page => (
-        <button
-          data-uie-name="pagination-item"
-          data-uie-status={currentPage === page ? 'active' : 'inactive'}
-          key={page}
-          onClick={() => onChangePage(page)}
-          type="button"
-          className="button-reset-default"
-          css={{
-            ...paginationItemStyles,
-            backgroundColor: currentPage === page ? 'var(--accent-color)' : 'var(--app-bg-secondary)',
-            border: currentPage === page ? 'solid 1px var(--accent-color)' : 'solid 1px var(--foreground)',
-          }}
-        />
-      ))}
+      {pages.map(page => {
+        const isCurrentPage = currentPage === page;
+
+        return (
+          <button
+            data-uie-name="pagination-item"
+            data-uie-status={isCurrentPage ? 'active' : 'inactive'}
+            key={page}
+            onClick={() => onChangePage(page)}
+            type="button"
+            className="button-reset-default"
+            css={{
+              ...paginationItemStyles,
+              '&:focus-visible': {
+                backgroundColor: isCurrentPage
+                  ? 'var(--toggle-button-hover-bg)'
+                  : 'var(--toggle-button-unselected-hover-bg)',
+                border: '1px solid var(--accent-color)',
+                outline: 'none',
+              },
+              '&:hover': {
+                backgroundColor: isCurrentPage
+                  ? 'var(--toggle-button-hover-bg)'
+                  : 'var(--toggle-button-unselected-hover-bg)',
+                border: isCurrentPage
+                  ? '1px solid var(--toggle-button-hover-bg)'
+                  : '1px solid var(--toggle-button-unselected-hover-border)',
+              },
+              /* eslint-disable sort-keys-fix/sort-keys-fix */
+              '&:active': {
+                /* eslint-enable sort-keys-fix/sort-keys-fix */
+                backgroundColor: isCurrentPage ? 'var(--accent-color)' : 'var(--toggle-button-unselected-bg)',
+                border: '1px solid var(--accent-color)',
+              },
+              backgroundColor: isCurrentPage ? 'var(--accent-color)' : 'var(--app-bg-secondary)',
+              border: isCurrentPage ? 'solid 1px var(--accent-color)' : 'solid 1px var(--foreground)',
+            }}
+          />
+        );
+      })}
     </div>
   );
 };

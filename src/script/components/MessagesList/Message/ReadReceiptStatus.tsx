@@ -77,6 +77,7 @@ const ReadReceiptStatus: React.FC<ReadReceiptStatusProps> = ({
           data-tooltip={readReceiptTooltip}
           onClick={!is1to1Conversation && onClickReceipts ? () => onClickReceipts(message) : undefined}
           data-uie-name="status-message-read-receipts"
+          aria-label={t('accessibility.messageDetailsReadReceipts', readReceiptText)}
         >
           <Icon.Read />
           <span className="message-status-read__count" data-uie-name="status-message-read-receipt-count">
