@@ -398,7 +398,7 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
                 </button>
               </li>
             </div>
-            <div css={{display: 'flex', minWidth: '145px'}}>
+            <div css={{display: 'flex', justifyContent: 'flex-end', minWidth: '157px'}}>
               {participants.length > 2 && (
                 <ButtonGroup
                   items={Object.values(CallViewTabs)}

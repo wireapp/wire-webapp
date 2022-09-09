@@ -97,14 +97,19 @@ const AvatarInput: React.FC<AvatarInputProps> = ({selfUser, isActivatedAccount, 
       tabIndex={0}
       role="button"
       onKeyDown={(event: React.KeyboardEvent<HTMLElement>) => handleKeyDown(event, inputClick)}
-      aria-label={t('tooltipPreferencesPicture')}
+      aria-label={`${t('tooltipPreferencesPicture')}`}
     >
       <label
         className="preferences-account-picture-button"
         htmlFor="self-upload-file-input"
         title={t('tooltipPreferencesPicture')}
       >
-        <Avatar className="see-through" participant={selfUser} avatarSize={AVATAR_SIZE.X_LARGE} />
+        <Avatar
+          className="see-through"
+          participant={selfUser}
+          avatarSize={AVATAR_SIZE.X_LARGE}
+          avatarAlt={t('selfProfileImageAlt')}
+        />
         <FileInput
           ref={inputRef}
           id="self-upload-file-input"

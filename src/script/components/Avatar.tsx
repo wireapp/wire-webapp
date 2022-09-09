@@ -69,6 +69,7 @@ export const INITIALS_SIZE = {
 
 export interface AvatarProps extends React.HTMLProps<HTMLDivElement> {
   avatarSize?: AVATAR_SIZE;
+  avatarAlt?: string;
   noBadge?: boolean;
   noFilter?: boolean;
   onAvatarClick?: (participant: User | ServiceEntity, target: Node) => void;
