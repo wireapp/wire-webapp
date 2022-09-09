@@ -101,7 +101,7 @@ const DeviceDetailsPreferences: React.FC<DevicesPreferencesProps> = ({
             </label>
           </div>
 
-          <div className="preferences-detail">{t('preferencesDevicesFingerprintDetail', brandName)}</div>
+          <p className="preferences-detail">{t('preferencesDevicesFingerprintDetail', brandName)}</p>
         </fieldset>
 
         <section className="preferences-section">
@@ -111,7 +111,7 @@ const DeviceDetailsPreferences: React.FC<DevicesPreferencesProps> = ({
         </section>
 
         <section className="preferences-section">
-          <div className="preferences-info">{t('preferencesDevicesSessionDetail')}</div>
+          <p className="preferences-info">{t('preferencesDevicesSessionDetail')}</p>
           <div className="preferences-devices-session" data-uie-name="preferences-device-details-session">
             {resetState === SessionResetState.RESET && (
               <Button
@@ -125,19 +125,19 @@ const DeviceDetailsPreferences: React.FC<DevicesPreferencesProps> = ({
               </Button>
             )}
             {resetState === SessionResetState.ONGOING && (
-              <div className="preferences-devices-session-reset">{t('preferencesDevicesSessionOngoing')}</div>
+              <p className="preferences-devices-session-reset">{t('preferencesDevicesSessionOngoing')}</p>
             )}
             {resetState === SessionResetState.CONFIRMATION && (
-              <div className="preferences-devices-session-confirmation accent-text">
+              <p className="preferences-devices-session-confirmation accent-text">
                 {t('preferencesDevicesSessionConfirmation')}
-              </div>
+              </p>
             )}
           </div>
         </section>
 
         {!device.isLegalHold() && (
           <section className="preferences-section">
-            <div className="preferences-info">{t('preferencesDevicesRemoveDetail')}</div>
+            <p className="preferences-info">{t('preferencesDevicesRemoveDetail')}</p>
             <Button
               variant={ButtonVariant.TERTIARY}
               type="button"

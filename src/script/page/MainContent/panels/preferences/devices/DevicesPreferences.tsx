@@ -171,7 +171,7 @@ const DevicesPreferences: React.FC<DevicesPreferencesProps> = ({
                 deviceNumber={++index}
               />
             ))}
-            <div className="preferences-detail">{t('preferencesDevicesActiveDetail')}</div>
+            <p className="preferences-detail">{t('preferencesDevicesActiveDetail')}</p>
           </fieldset>
         )}
       </div>
