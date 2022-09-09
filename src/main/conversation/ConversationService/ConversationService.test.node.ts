@@ -17,7 +17,6 @@
  *
  */
 
-import {CoreCrypto} from '@otak/core-crypto/platforms/web/corecrypto';
 import {APIClient} from '@wireapp/api-client';
 import {ClientClassification, ClientType} from '@wireapp/api-client/src/client';
 import {ConversationProtocol} from '@wireapp/api-client/src/conversation';
@@ -32,6 +31,11 @@ import {MessageTargetMode} from './ConversationService.types';
 import {MessageBuilder} from '../message/MessageBuilder';
 import {OtrMessage} from '../message/OtrMessage';
 import {NotificationService} from '../../notification/NotificationService';
+import type {MLSService} from '../../mls';
+
+const mockedMLSService = {
+  encryptMessage: () => {},
+} as unknown as MLSService;
 
 describe('ConversationService', () => {
   beforeAll(() => {
@@ -75,13 +79,10 @@ describe('ConversationService', () => {
       {
         useQualifiedIds: federated,
       },
-      () =>
-        ({
-          encryptMessage: async () => Uint8Array.from([1, 2, 3]),
-        } as unknown as CoreCrypto),
       {
         commitPendingProposals: () => Promise.resolve(),
       } as unknown as NotificationService,
+      mockedMLSService,
     );
   }
 

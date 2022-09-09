@@ -23,6 +23,7 @@ import {MemoryEngine} from '@wireapp/store-engine';
 import {PayloadBundleSource} from '../conversation';
 import {CryptographyService} from '../cryptography';
 import {NotificationService} from './NotificationService';
+import type {MLSService} from '../mls';
 
 const BASE_URL = 'mock-backend.wire.com';
 const MOCK_BACKEND = {
@@ -30,6 +31,9 @@ const MOCK_BACKEND = {
   rest: `https://${BASE_URL}`,
   ws: `wss://${BASE_URL}`,
 };
+
+const mockedMLSService = {} as unknown as MLSService;
+const mockedCryptographyService = {} as unknown as CryptographyService;
 
 describe('NotificationService', () => {
   describe('handleEvent', () => {
@@ -39,8 +43,12 @@ describe('NotificationService', () => {
 
       const apiClient = new APIClient({urls: MOCK_BACKEND});
 
-      const cryptographyService = {} as unknown as CryptographyService;
-      const notificationService = new NotificationService(apiClient, cryptographyService, storeEngine, () => undefined);
+      const notificationService = new NotificationService(
+        apiClient,
+        mockedCryptographyService,
+        mockedMLSService,
+        storeEngine,
+      );
 
       spyOn<any>(notificationService, 'handleEvent').and.throwError('Test error');
 
@@ -73,9 +81,9 @@ describe('NotificationService', () => {
       const apiClient = new APIClient({urls: MOCK_BACKEND});
       const notificationService = new NotificationService(
         apiClient,
-        {} as unknown as CryptographyService,
+        mockedCryptographyService,
+        mockedMLSService,
         storeEngine,
-        () => undefined,
       );
 
       spyOn<any>(notificationService, 'handleEvent').and.returnValue({});
@@ -105,8 +113,8 @@ describe('NotificationService', () => {
       const notificationService = new NotificationService(
         apiClient,
         {} as unknown as CryptographyService,
+        mockedMLSService,
         storeEngine,
-        () => undefined,
       );
 
       spyOn<any>(notificationService, 'handleEvent').and.returnValue({});
@@ -133,9 +141,9 @@ describe('NotificationService', () => {
       const apiClient = new APIClient({urls: MOCK_BACKEND});
       const notificationService = new NotificationService(
         apiClient,
-        {} as unknown as CryptographyService,
+        mockedCryptographyService,
+        mockedMLSService,
         storeEngine,
-        () => undefined,
       );
       notificationService.on(NotificationService.TOPIC.NOTIFICATION_ERROR, notificationError => {
         expect(notificationError.error.message).toBe('Test error');

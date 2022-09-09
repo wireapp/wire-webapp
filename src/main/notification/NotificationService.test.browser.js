@@ -49,7 +49,7 @@ describe('NotificationService', () => {
         urls: APIClient.BACKEND.STAGING,
       });
 
-      const notificationService = new NotificationService(apiClient, {}, engine);
+      const notificationService = new NotificationService(apiClient, {}, {}, engine);
       spyOn(notificationService.database, 'getLastEventDate').and.callThrough();
       spyOn(engine, 'read').and.callThrough();
       spyOn(engine, 'update').and.callThrough();
@@ -77,7 +77,7 @@ describe('NotificationService', () => {
         urls: APIClient.BACKEND.STAGING,
       });
 
-      const notificationService = new NotificationService(apiClient, {}, engine);
+      const notificationService = new NotificationService(apiClient, {}, {}, engine);
       await notificationService.setLastEventDate(new Date(0));
 
       spyOn(notificationService.database, 'getLastEventDate').and.callThrough();
@@ -108,7 +108,7 @@ describe('NotificationService', () => {
       urls: APIClient.BACKEND.STAGING,
     });
 
-    const notificationService = new NotificationService(apiClient, {}, engine);
+    const notificationService = new NotificationService(apiClient, {}, {}, engine);
     const greaterDate = new Date(1);
     const lesserDate = new Date(0);
 
@@ -142,7 +142,7 @@ describe('NotificationService', () => {
       urls: APIClient.BACKEND.STAGING,
     });
 
-    const notificationService = new NotificationService(apiClient, {}, engine);
+    const notificationService = new NotificationService(apiClient, {}, {}, engine);
     spyOn(notificationService.database, 'getLastNotificationId').and.callThrough();
     spyOn(engine, 'read').and.callThrough();
     spyOn(engine, 'update').and.callThrough();
@@ -165,7 +165,7 @@ describe('NotificationService', () => {
       urls: APIClient.BACKEND.STAGING,
     });
 
-    const notificationService = new NotificationService(apiClient, {}, engine);
+    const notificationService = new NotificationService(apiClient, {}, {}, engine);
     await notificationService.setLastNotificationId({id: '12'});
 
     spyOn(notificationService.database, 'getLastNotificationId').and.callThrough();
