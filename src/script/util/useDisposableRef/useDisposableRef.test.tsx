@@ -17,48 +17,49 @@
  *
  */
 
-import {render} from '@testing-library/react';
+import {render, waitFor} from '@testing-library/react';
 import {useDisposableRef} from './useDisposableRef';
 
 const Component: React.FC<{callback: (element: HTMLElement) => () => void; state?: number; otherState?: number}> = ({
   callback,
   state = 0,
-  otherState = 0,
 }) => {
-  const disposableRef = useDisposableRef(callback);
+  const disposableRef = useDisposableRef(callback, [state]);
 
   return (
     <div>
       <div ref={disposableRef}>{state}</div>
-      <div>{otherState}</div>
     </div>
   );
 };
 
 describe('useDisposableRef', () => {
-  it('initialize the function when the component is mounted', () => {
+  it('initialize the function when the component is mounted', async () => {
     const initFn = jest.fn();
     render(<Component callback={initFn} />);
-
-    expect(initFn).toHaveBeenCalled();
+    await waitFor(() => expect(initFn).toHaveBeenCalled());
   });
 
-  it('runs the dispose function when component is unmounted', () => {
+  it('runs the dispose function when component is unmounted', async () => {
     const disposeFn = jest.fn();
-    const initFunction = () => disposeFn;
+    const initFn = jest.fn(() => disposeFn);
 
-    const {unmount} = render(<Component callback={initFunction} />);
+    const {unmount} = render(<Component callback={initFn} />);
+    await waitFor(() => expect(initFn).toHaveBeenCalled());
 
     expect(disposeFn).not.toHaveBeenCalled();
     unmount();
     expect(disposeFn).toHaveBeenCalled();
   });
 
-  it('runs the dispose and the init when element updates', () => {
+  it('runs the dispose and the init when element updates', async () => {
     const disposeFn = jest.fn();
-    const initFn = jest.fn(() => disposeFn);
+    const initFn = jest.fn(e => {
+      return disposeFn;
+    });
 
     const {rerender} = render(<Component callback={initFn} state={0} />);
+    await waitFor(() => expect(initFn).toHaveBeenCalled());
 
     expect(initFn).toHaveBeenCalledTimes(1);
     expect(disposeFn).not.toHaveBeenCalled();
@@ -66,5 +67,21 @@ describe('useDisposableRef', () => {
     rerender(<Component callback={initFn} state={1} />);
     expect(disposeFn).toHaveBeenCalled();
     expect(initFn).toHaveBeenCalledTimes(2);
+  });
+
+  it('does not re-run if component is rerendered but dependencies have not changed', () => {
+    const disposeFn = jest.fn();
+    const initFn = jest.fn(e => {
+      return disposeFn;
+    });
+
+    const {rerender} = render(<Component callback={initFn} />);
+
+    expect(initFn).toHaveBeenCalledTimes(1);
+    expect(disposeFn).not.toHaveBeenCalled();
+
+    rerender(<Component callback={initFn} />);
+    expect(disposeFn).not.toHaveBeenCalled();
+    expect(initFn).toHaveBeenCalledTimes(1);
   });
 });

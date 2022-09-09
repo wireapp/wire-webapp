@@ -153,6 +153,7 @@ const QuotedMessage: React.FC<QuotedMessageProps> = ({
     headerSenderName,
     was_edited,
     timestamp,
+    edited_timestamp,
   } = useKoSubscribableChildren(quotedMessage, [
     'user',
     'assets',
@@ -163,15 +164,18 @@ const QuotedMessage: React.FC<QuotedMessageProps> = ({
   ]);
   const [canShowMore, setCanShowMore] = useState(false);
   const [showFullText, setShowFullText] = useState(false);
-  const detectLongQuotes = useDisposableRef(element => {
-    const preNode = element.querySelector('pre');
-    const width = Math.max(element.scrollWidth, preNode ? preNode.scrollWidth : 0);
-    const height = Math.max(element.scrollHeight, preNode ? preNode.scrollHeight : 0);
-    const isWider = width > element.clientWidth;
-    const isHigher = height > element.clientHeight;
-    setCanShowMore(isWider || isHigher);
-    return () => {};
-  });
+  const detectLongQuotes = useDisposableRef(
+    element => {
+      const preNode = element.querySelector('pre');
+      const width = Math.max(element.scrollWidth, preNode ? preNode.scrollWidth : 0);
+      const height = Math.max(element.scrollHeight, preNode ? preNode.scrollHeight : 0);
+      const isWider = width > element.clientWidth;
+      const isHigher = height > element.clientHeight;
+      setCanShowMore(isWider || isHigher);
+      return () => {};
+    },
+    [edited_timestamp],
+  );
 
   useEffect(() => {
     setShowFullText(false);

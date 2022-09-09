@@ -17,24 +17,38 @@
  *
  */
 
-import {useRef} from 'react';
+import {useLayoutEffect, useRef} from 'react';
 
 /**
  * Hooks that takes an init function that will be ran whenever a DOM element changes
  * The initFunction can return a dispose callback for when the element is removed from the DOM
  * @param init The function to run on the DOM element pointed as ref
+ * @param dependencies List of dependencies that should re trigger the initFunction
  */
-export function useDisposableRef(init: (element: HTMLElement) => () => void) {
-  const elementRef = useRef<HTMLElement>(null!);
-  const disposeFn = useRef<() => void>(null!);
+export function useDisposableRef(init: (element: HTMLElement) => () => void, dependencies: unknown[] = []) {
+  const elementRef = useRef<HTMLElement | null>(null!);
+  const firstRunDispose = useRef<any>(null);
+  const isFirstRun = useRef(true);
+
+  useLayoutEffect(() => {
+    if (isFirstRun.current) {
+      // We ignore the first render, since it was dealt directly when the ref was rendered
+      isFirstRun.current = false;
+      return firstRunDispose.current;
+    }
+    if (elementRef.current) {
+      const dispose = init(elementRef.current);
+      return dispose;
+    }
+    return () => {};
+  }, dependencies);
 
   return (element: HTMLElement | null) => {
-    if (element) {
-      disposeFn.current = init(element);
-      elementRef.current = element;
-    }
-    if (!element && elementRef.current) {
-      disposeFn.current?.();
+    elementRef.current = element;
+    if (isFirstRun.current && element) {
+      // we synchronously run the first iteration (to avoid flickering)
+      // useLayoutEffect will run right after
+      firstRunDispose.current = init(element);
     }
   };
 }
