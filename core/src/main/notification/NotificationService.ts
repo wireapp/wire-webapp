@@ -18,6 +18,7 @@
  */
 
 import type {APIClient} from '@wireapp/api-client';
+import {TimeUtil} from '@wireapp/commons';
 import * as Events from '@wireapp/api-client/src/event';
 import type {Notification} from '@wireapp/api-client/src/notification/';
 import {CRUDEngine, error as StoreEngineError} from '@wireapp/store-engine';
@@ -33,12 +34,13 @@ import {NotificationBackendRepository} from './NotificationBackendRepository';
 import {NotificationDatabaseRepository} from './NotificationDatabaseRepository';
 import {GenericMessage} from '@wireapp/protocol-messaging';
 import {AbortHandler} from '@wireapp/api-client/src/tcp';
-import type {CoreCrypto} from '@otak/core-crypto/platforms/web/corecrypto';
 import {Decoder, Encoder} from 'bazinga64';
 import {QualifiedId} from '@wireapp/api-client/src/user';
 import {Conversation} from '@wireapp/api-client/src/conversation';
-import {CommitPendingProposalsParams, HandlePendingProposalsParams} from './types';
+import {CommitPendingProposalsParams, HandlePendingProposalsParams, LastKeyMaterialUpdateParams} from './types';
 import {TaskScheduler} from '../util/TaskScheduler/TaskScheduler';
+import type {MLSService} from '../mls';
+import {LowPrecisionTaskScheduler} from '../util/LowPrecisionTaskScheduler/LowPrecisionTaskScheduler';
 
 export type HandledEventPayload = {
   event: Events.BackendEvent;
@@ -50,6 +52,8 @@ export type HandledEventPayload = {
 enum TOPIC {
   NOTIFICATION_ERROR = 'NotificationService.TOPIC.NOTIFICATION_ERROR',
 }
+
+const DEFAULT_KEYING_MATERIAL_UPDATE_THRESHOLD = 1000 * 60 * 60 * 24 * 30; //30 days
 
 export type NotificationHandler = (
   notification: Notification,
@@ -75,8 +79,8 @@ export class NotificationService extends EventEmitter {
   constructor(
     apiClient: APIClient,
     cryptographyService: CryptographyService,
+    private readonly mlsService: MLSService,
     storeEngine: CRUDEngine,
-    private readonly coreCryptoClientProvider: () => CoreCrypto | undefined,
   ) {
     super();
     this.apiClient = apiClient;
@@ -242,16 +246,11 @@ export class NotificationService extends EventEmitter {
     source: PayloadBundleSource,
     dryRun: boolean = false,
   ): Promise<HandledEventPayload> {
-    const coreCryptoClient = this.coreCryptoClientProvider();
-
     switch (event.type) {
       case Events.CONVERSATION_EVENT.MLS_WELCOME_MESSAGE:
-        if (!coreCryptoClient) {
-          throw new Error('Unable to access core crypto client');
-        }
         const data = Decoder.fromBase64(event.data).asBytes;
         // We extract the groupId from the welcome message and let coreCrypto store this group
-        const newGroupId = await coreCryptoClient.processWelcomeMessage(data);
+        const newGroupId = await this.mlsService.processWelcomeMessage(data);
         const groupIdStr = Encoder.toBase64(newGroupId).asString;
         // The groupId can then be sent back to the consumer
         return {
@@ -260,9 +259,6 @@ export class NotificationService extends EventEmitter {
         };
 
       case Events.CONVERSATION_EVENT.MLS_MESSAGE_ADD:
-        if (!coreCryptoClient) {
-          throw new Error('Unable to access core crypto client');
-        }
         const encryptedData = Decoder.fromBase64(event.data).asBytes;
 
         const groupId = await this.getUint8ArrayFromConversationGroupId(
@@ -270,7 +266,7 @@ export class NotificationService extends EventEmitter {
         );
 
         // Check if the message includes proposals
-        const {proposals, commitDelay, message} = await coreCryptoClient.decryptMessage(groupId, encryptedData);
+        const {proposals, commitDelay, message} = await this.mlsService.decryptMessage(groupId, encryptedData);
         if (proposals.length > 0) {
           await this.handlePendingProposals({
             groupId: groupId.toString(),
@@ -415,12 +411,8 @@ export class NotificationService extends EventEmitter {
    * @param skipDelete if true, do not delete the pending proposals from the database
    */
   public async commitPendingProposals({groupId, skipDelete = false}: CommitPendingProposalsParams) {
-    const coreCryptoClient = this.coreCryptoClientProvider();
-    if (!coreCryptoClient) {
-      throw new Error('Could not get coreCryptoClient');
-    }
     try {
-      await coreCryptoClient.commitPendingProposals(Decoder.fromBase64(groupId).asBytes);
+      await this.mlsService.commitPendingProposals(Decoder.fromBase64(groupId).asBytes);
 
       if (!skipDelete) {
         TaskScheduler.cancelTask(groupId);
@@ -451,6 +443,80 @@ export class NotificationService extends EventEmitter {
       }
     } catch (error) {
       this.logger.error('Could not get pending proposals', error);
+    }
+  }
+
+  /**
+   * ## MLS only ##
+   * Store groupIds with last key material update dates.
+   *
+   * @param {groupId} params.groupId - groupId of the mls conversation
+   * @param {previousUpdateDate} params.previousUpdateDate - date of the previous key material update
+   */
+  public async storeLastKeyMaterialUpdateDate(params: LastKeyMaterialUpdateParams) {
+    await this.database.storeLastKeyMaterialUpdateDate(params);
+    await this.scheduleTaskToRenewKeyMaterial(params);
+  }
+
+  /**
+   * ## MLS only ##
+   * Renew key material for a given groupId
+   *
+   * @param groupId groupId of the conversation
+   */
+  private async renewKeyMaterial({groupId}: Omit<LastKeyMaterialUpdateParams, 'previousUpdateDate'>) {
+    try {
+      const groupConversationExists = await this.mlsService.conversationExists(Decoder.fromBase64(groupId).asBytes);
+
+      if (!groupConversationExists) {
+        await this.database.deleteLastKeyMaterialUpdateDate({groupId});
+        return;
+      }
+
+      const groupIdDecodedFromBase64 = Decoder.fromBase64(groupId).asBytes;
+      await this.mlsService.updateKeyingMaterial(groupIdDecodedFromBase64);
+
+      const keyRenewalTime = new Date().getTime();
+      const keyMaterialUpdateDate = {groupId, previousUpdateDate: keyRenewalTime};
+      await this.storeLastKeyMaterialUpdateDate(keyMaterialUpdateDate);
+    } catch (error) {
+      this.logger.error(`Error while renewing key material for groupId ${groupId}`, error);
+    }
+  }
+
+  private createKeyMaterialUpdateTaskSchedulerId(groupId: string) {
+    return `renew-key-material-update-${groupId}`;
+  }
+
+  private async scheduleTaskToRenewKeyMaterial({groupId, previousUpdateDate}: LastKeyMaterialUpdateParams) {
+    //given period of time (30 days by default) after last update date renew key material
+    const keyingMaterialUpdateThreshold =
+      this.mlsService.config?.keyingMaterialUpdateThreshold || DEFAULT_KEYING_MATERIAL_UPDATE_THRESHOLD;
+
+    const firingDate = previousUpdateDate + keyingMaterialUpdateThreshold;
+
+    const key = this.createKeyMaterialUpdateTaskSchedulerId(groupId);
+
+    LowPrecisionTaskScheduler.addTask({
+      task: () => this.renewKeyMaterial({groupId}),
+      intervalDelay: TimeUtil.TimeInMillis.MINUTE,
+      firingDate,
+      key,
+    });
+  }
+
+  /**
+   * ## MLS only ##
+   * Get all pending proposals from the database and schedule them
+   * Function must only be called once, after application start
+   *
+   */
+  public async checkForKeyMaterialsUpdate() {
+    try {
+      const keyMaterialUpdateDates = await this.database.getStoredLastKeyMaterialUpdateDates();
+      keyMaterialUpdateDates.forEach(date => this.scheduleTaskToRenewKeyMaterial(date));
+    } catch (error) {
+      this.logger.error('Could not get last key material update dates', error);
     }
   }
 }

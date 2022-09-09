@@ -17,28 +17,4 @@
  *
  */
 
-export type CommonMLS = {
-  groupId: string;
-};
-
-export type CompoundGroupIdParams = {
-  conversationId: string;
-  conversationDomain: string;
-} & CommonMLS;
-
-export type HandlePendingProposalsParams = {
-  delayInMs: number;
-  eventTime: string;
-} & CommonMLS;
-
-export type CommitPendingProposalsParams = {
-  skipDelete?: boolean;
-} & CommonMLS;
-
-export type StorePendingProposalsParams = {
-  firingDate: number;
-} & CommonMLS;
-
-export type LastKeyMaterialUpdateParams = {
-  previousUpdateDate: number;
-} & CommonMLS;
+export * from './MLSService/MLSService';

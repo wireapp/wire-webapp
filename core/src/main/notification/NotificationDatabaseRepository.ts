@@ -22,7 +22,7 @@ import type {Notification} from '@wireapp/api-client/src/notification/';
 import type {CRUDEngine} from '@wireapp/store-engine';
 
 import {CryptographyDatabaseRepository} from '../cryptography/CryptographyDatabaseRepository';
-import {CommonMLS, CompoundGroupIdParams, StorePendingProposalsParams} from './types';
+import {CommonMLS, CompoundGroupIdParams, LastKeyMaterialUpdateParams, StorePendingProposalsParams} from './types';
 
 export enum DatabaseStores {
   EVENTS = 'events',
@@ -129,5 +129,37 @@ export class NotificationDatabaseRepository {
    */
   public async getStoredPendingProposals() {
     return this.storeEngine.readAll<StorePendingProposalsParams>(STORES.PENDING_PROPOSALS);
+  }
+
+  /**
+   * ## MLS only ##
+   * Store groupIds with last key material update dates.
+   *
+   * @param {groupId} params.groupId - groupId of the mls conversation
+   * @param {previousUpdateDate} params.previousUpdateDate - date of the previous key material update
+   */
+  public async storeLastKeyMaterialUpdateDate(params: LastKeyMaterialUpdateParams) {
+    await this.storeEngine.updateOrCreate(STORES.LAST_KEY_MATERIAL_UPDATE_DATES, `${params.groupId}`, params);
+    return true;
+  }
+
+  /**
+   * ## MLS only ##
+   * Delete stored entries for last key materials update dates.
+   *
+   * @param {groupId} groupId - of the mls conversation
+   */
+  public async deleteLastKeyMaterialUpdateDate({groupId}: CommonMLS) {
+    await this.storeEngine.delete(STORES.LAST_KEY_MATERIAL_UPDATE_DATES, `${groupId}`);
+    return true;
+  }
+
+  /**
+   * ## MLS only ##
+   * Get all stored entries for last key materials update dates.
+   *
+   */
+  public async getStoredLastKeyMaterialUpdateDates() {
+    return this.storeEngine.readAll<LastKeyMaterialUpdateParams>(STORES.LAST_KEY_MATERIAL_UPDATE_DATES);
   }
 }
