@@ -19,7 +19,6 @@
 
 import TestPage from 'Util/test/TestPage';
 
-import {viewportObserver} from '../../../../../ui/viewportObserver';
 import {ContentMessage} from 'src/script/entity/message/ContentMessage';
 import {MediumImage} from 'src/script/entity/message/MediumImage';
 import ImageAsset, {ImageAssetProps} from './ImageAsset';
@@ -27,6 +26,15 @@ import {container} from 'tsyringe';
 import {AssetRepository} from 'src/script/assets/AssetRepository';
 import {AssetRemoteData} from 'src/script/assets/AssetRemoteData';
 import waitForExpect from 'wait-for-expect';
+
+jest.mock(
+  'Components/utils/InViewport',
+  () =>
+    function MockInViewport({onVisible, children}: {onVisible: () => void; children: any}) {
+      onVisible();
+      return <div>{children}</div>;
+    },
+);
 
 class ImageAssetTestPage extends TestPage<ImageAssetProps> {
   constructor(props?: ImageAssetProps) {
@@ -41,11 +49,6 @@ describe('image-asset', () => {
     message: new ContentMessage(),
     onClick: () => {},
   };
-  beforeEach(() => {
-    jest.spyOn(viewportObserver, 'trackElement').mockImplementation((element, callback) => {
-      callback(true);
-    });
-  });
 
   it('displays a dummy image when resource is not loaded', () => {
     const image = new MediumImage('image');
