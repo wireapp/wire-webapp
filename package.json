@@ -140,7 +140,7 @@
     "grunt-postcss": "0.9.0",
     "grunt-shell": "4.0.0",
     "husky": "7.0.4",
-    "i18next-scanner": "3.3.0",
+    "i18next-scanner": "4.0.0",
     "intersection-observer": "0.12.2",
     "jest": "27.5.1",
     "jest-canvas-mock": "2.4.0",
