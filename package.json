@@ -74,7 +74,7 @@
     "@types/highlight.js": "10.1.0",
     "@types/jest": "27.5.0",
     "@types/js-cookie": "3.0.2",
-    "@types/jsdom": "16.2.14",
+    "@types/jsdom": "20.0.0",
     "@types/keyboardjs": "2.5.0",
     "@types/libsodium-wrappers-sumo": "0.7.5",
     "@types/linkify-it": "3.0.2",
