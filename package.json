@@ -146,7 +146,7 @@
     "jest-canvas-mock": "2.4.0",
     "jsdom-worker": "0.3.0",
     "less": "3.13.1",
-    "lint-staged": "12.4.2",
+    "lint-staged": "13.0.3",
     "load-grunt-tasks": "5.1.0",
     "node-fetch": "2.6.7",
     "os-browserify": "0.3.0",
