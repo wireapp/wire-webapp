@@ -64,7 +64,7 @@ describe('fullscreenVideoCall', () => {
   };
 
   beforeEach(() => {
-    jest.useFakeTimers('modern');
+    jest.useFakeTimers();
   });
 
   afterEach(() => jest.useRealTimers());
