@@ -1682,7 +1682,7 @@ export class CallingRepository {
       [Segmentation.CONVERSATION.GUESTS_WIRELESS]: roundLogarithmic(guestsWireless, 6),
       [Segmentation.CONVERSATION.SERVICES]: roundLogarithmic(conversationEntity?.servicesCount() || 0, 6),
       [Segmentation.CONVERSATION.SIZE]: roundLogarithmic(
-        [conversationEntity?.participating_user_ets() || []].length,
+        (conversationEntity?.participating_user_ets() || []).length,
         6,
       ),
       [Segmentation.CONVERSATION.TYPE]: trackingHelpers.getConversationType(conversationEntity),
