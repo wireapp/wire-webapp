@@ -37,9 +37,8 @@ export class CryptographyDatabaseRepository {
 
   public deleteStores(): Promise<boolean[]> {
     return Promise.all(
-      (
-        Object.keys(CryptographyDatabaseRepository.STORES) as (keyof typeof CryptographyDatabaseRepository.STORES)[]
-      ).map(store => this.storeEngine.deleteAll(store)),
+      //make sure we use enum's lowercase values, not uppercase keys
+      Object.values(CryptographyDatabaseRepository.STORES).map(store => this.storeEngine.deleteAll(store)),
     );
   }
 }
