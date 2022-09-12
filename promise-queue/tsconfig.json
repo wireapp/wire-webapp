@@ -1,0 +1,9 @@
+{
+  "compilerOptions": {
+    "esModuleInterop": true,
+    "outDir": "lib/",
+    "rootDir": "src/"
+  },
+  "exclude": ["node_modules", "lib"],
+  "extends": "../../tsconfig.json"
+}

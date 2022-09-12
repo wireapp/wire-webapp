@@ -217,6 +217,7 @@ export class UserAPI {
   }
 
   /**
+   * @deprecated use getSearchContacts instead
    * Get information on a user handle.
    * @param handle The user's handle
    * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/users/getUserHandleInfo
@@ -344,6 +345,7 @@ export class UserAPI {
   }
 
   /**
+   * @deprecated use getUser instead
    * List users.
    * Note: The 'ids' and 'handles' parameters are mutually exclusive.
    * @param parameters Multiple user's handles or IDs
@@ -506,6 +508,7 @@ export class UserAPI {
   }
 
   /**
+   * @deprecated use getSearchContacts instead
    * Get a user by fully qualified handle.
    * @param handle The handle of a user to search for
    */

@@ -31,7 +31,7 @@
     "build": "yarn build:node && yarn build:browser",
     "build:browser": "webpack --progress",
     "build:node": "tsc",
-    "clean": "rimraf \"src/(!test)/**/{!(test*).js,*.js.map,*.d.ts}\"",
+    "clean": "rimraf .tmp \"src/main/{!(*.test*).js,*.js.map,*.d.ts}\" \"src/main/test/{*.js.map,*.d.ts}\" \"src/main/!(test)/{!(*.test*).js,*.js.map,*.d.ts}\" \"src/main/**/{!(*.test*|AccountHelper|StoreHelper).js,*.js.map,*.d.ts}\" \"src/main/**/*.node.js\"",
     "dist": "yarn clean && yarn build",
     "test": "yarn build && yarn test:node && yarn test:browser",
     "test:browser": "webpack && karma start",
