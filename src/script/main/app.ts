@@ -101,7 +101,6 @@ import {AudioRepository} from '../audio/AudioRepository';
 import {MessageSender} from '../message/MessageSender';
 import {StorageService} from '../storage';
 import {BackupService} from '../backup/BackupService';
-import {AuthRepository} from '../auth/AuthRepository';
 import {MediaRepository} from '../media/MediaRepository';
 import {GiphyRepository} from '../extension/GiphyRepository';
 import {GiphyService} from '../extension/GiphyService';
@@ -229,7 +228,6 @@ class App {
 
     repositories.asset = container.resolve(AssetRepository);
 
-    repositories.auth = new AuthRepository();
     repositories.giphy = new GiphyRepository(new GiphyService());
     repositories.properties = new PropertiesRepository(new PropertiesService(), selfService);
     repositories.serverTime = serverTimeHandler;
@@ -815,16 +813,13 @@ class App {
         }
       }
 
-      await this.core.logout(clearData);
       return _redirectToLogin();
     };
 
-    const _logoutOnBackend = () => {
+    const _logoutOnBackend = async () => {
       this.logger.info(`Logout triggered by '${signOutReason}': Disconnecting user from the backend.`);
-      return this.repository.auth
-        .logout()
-        .then(() => _logout())
-        .catch(() => _redirectToLogin());
+      await this.core.logout(clearData);
+      _logout();
     };
 
     if (App.CONFIG.SIGN_OUT_REASONS.IMMEDIATE.includes(signOutReason)) {
