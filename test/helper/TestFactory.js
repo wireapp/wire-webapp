@@ -60,7 +60,6 @@ import {BackupService} from 'src/script/backup/BackupService';
 import {StorageService} from 'src/script/storage';
 import {MediaRepository} from 'src/script/media/MediaRepository';
 import {PermissionRepository} from 'src/script/permission/PermissionRepository';
-import {AuthRepository} from 'src/script/auth/AuthRepository';
 import {ClientService} from 'src/script/client/ClientService';
 import {TeamService} from 'src/script/team/TeamService';
 import {SearchService} from 'src/script/search/SearchService';
@@ -76,13 +75,6 @@ import {createStorageEngine, DatabaseTypes} from 'src/script/service/StoreEngine
 export class TestFactory {
   constructor() {
     container.clearInstances();
-  }
-  /**
-   * @returns {Promise<AuthRepository>} The authentication repository.
-   */
-  async exposeAuthActors() {
-    this.auth_repository = new AuthRepository();
-    return this.auth_repository;
   }
 
   /**
