@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.7.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/priority-queue/compare/@wireapp/priority-queue@1.6.39...@wireapp/priority-queue@1.7.0) (2022-09-12)
+
+
+### Features
+
+* add promise queue package ([#4381](https://github.com/wireapp/wire-web-packages/tree/main/packages/priority-queue/issues/4381)) ([3d0e37a](https://github.com/wireapp/wire-web-packages/tree/main/packages/priority-queue/commit/3d0e37ae47af5a844f2ff6df3b73d70fff048863))
+
+
+
+
+
 ## [1.6.39](https://github.com/wireapp/wire-web-packages/tree/main/packages/priority-queue/compare/@wireapp/priority-queue@1.6.38...@wireapp/priority-queue@1.6.39) (2022-03-07)
 
 **Note:** Version bump only for package @wireapp/priority-queue

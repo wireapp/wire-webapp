@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [20.3.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/compare/@wireapp/api-client@20.2.1...@wireapp/api-client@20.3.0) (2022-09-12)
+
+
+### Features
+
+* add promise queue package ([#4381](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/issues/4381)) ([3d0e37a](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/commit/3d0e37ae47af5a844f2ff6df3b73d70fff048863))
+
+
+
+
+
 ## [20.2.1](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/compare/@wireapp/api-client@20.2.0...@wireapp/api-client@20.2.1) (2022-09-08)
 
 **Note:** Version bump only for package @wireapp/api-client
