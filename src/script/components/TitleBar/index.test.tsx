@@ -103,7 +103,7 @@ describe('TitleBar', () => {
 
     spyOn(amplify, 'publish').and.returnValue(undefined);
     fireEvent.click(searchButton);
-    expect(amplify.publish).toBeCalledWith(WebAppEvents.CONTENT.SWITCH, ContentViewModel.STATE.COLLECTION);
+    expect(amplify.publish).toHaveBeenCalledWith(WebAppEvents.CONTENT.SWITCH, ContentViewModel.STATE.COLLECTION);
   });
 
   it('opens conversation details on conversation name click', async () => {
@@ -127,7 +127,7 @@ describe('TitleBar', () => {
     expect(conversationName).toBeDefined();
 
     fireEvent.click(conversationName);
-    expect(panelViewModel.togglePanel).toBeCalledWith(PanelViewModel.STATE.CONVERSATION_DETAILS, {
+    expect(panelViewModel.togglePanel).toHaveBeenCalledWith(PanelViewModel.STATE.CONVERSATION_DETAILS, {
       entity: conversation,
     });
   });
@@ -149,7 +149,7 @@ describe('TitleBar', () => {
     const infoButton = getByLabelText('tooltipConversationInfo');
     expect(infoButton).toBeDefined();
     fireEvent.click(infoButton);
-    expect(panelViewModel.togglePanel).toBeCalledWith(PanelViewModel.STATE.CONVERSATION_DETAILS, {
+    expect(panelViewModel.togglePanel).toHaveBeenCalledWith(PanelViewModel.STATE.CONVERSATION_DETAILS, {
       entity: conversation,
     });
   });
@@ -224,7 +224,7 @@ describe('TitleBar', () => {
     const audioCallButton = getByLabelText('tooltipConversationCall');
     expect(audioCallButton).toBeDefined();
     fireEvent.click(audioCallButton);
-    expect(callActions.startAudio).toBeCalledWith(conversation);
+    expect(callActions.startAudio).toHaveBeenCalledWith(conversation);
   });
 
   it("doesn't show video call button when video calling is not enabled", async () => {
@@ -268,7 +268,7 @@ describe('TitleBar', () => {
     expect(videoCallButton).toBeDefined();
 
     fireEvent.click(videoCallButton);
-    expect(callActions.startVideo).toBeCalledWith(conversation);
+    expect(callActions.startVideo).toHaveBeenCalledWith(conversation);
   });
 
   it('displays warning badge', async () => {

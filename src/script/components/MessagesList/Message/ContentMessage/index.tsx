@@ -42,6 +42,7 @@ import {Message} from 'src/script/entity/message/Message';
 import ContentAsset from './asset';
 import {KEY} from 'Util/KeyboardUtil';
 import {setContextMenuPosition} from 'Util/util';
+import {CompositeMessage} from 'src/script/entity/message/CompositeMessage';
 
 export interface ContentMessageProps extends Omit<MessageActions, 'onClickResetSession'> {
   contextMenu: {entries: ko.Subscribable<ContextMenuEntry[]>};
@@ -51,7 +52,7 @@ export interface ContentMessageProps extends Omit<MessageActions, 'onClickResetS
   hasMarker?: boolean;
   isLastDeliveredMessage: boolean;
   message: ContentMessage;
-  onClickButton?: (message: ContentMessage, assetId: string) => void;
+  onClickButton: (message: CompositeMessage, buttonId: string) => void;
   previousMessage: Message;
   quotedMessage?: ContentMessage;
   selfId: QualifiedId;

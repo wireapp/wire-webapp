@@ -21,10 +21,9 @@ import React, {useState, useRef, useEffect, FC} from 'react';
 import {container} from 'tsyringe';
 
 import {t} from 'Util/LocalizerUtil';
-import useEffectRef from 'Util/useEffectRef';
 import {registerReactComponent, useKoSubscribableChildren} from 'Util/ComponentUtil';
 
-import {useFadingScrollbar} from '../../ui/fadingScrollbar';
+import {initFadingScrollbar} from '../../ui/fadingScrollbar';
 import {NOTIFICATION_STATE, getNotificationText} from '../../conversation/NotificationSetting';
 import {ViewModelRepositories} from '../MainViewModel';
 import PanelHeader from './PanelHeader';
@@ -52,8 +51,6 @@ const NotificationsPanel: FC<NotificationsPanelProps> = ({
   const saveOptionNotificationPreference = (value: number) => {
     repositories.conversation.setNotificationState(activeConversation!, value);
   };
-  const [scrollbarRef, setScrollbarRef] = useEffectRef<HTMLDivElement>();
-  useFadingScrollbar(scrollbarRef);
 
   const [settings] = useState(
     Object.values(NOTIFICATION_STATE).map(status => ({
@@ -93,7 +90,7 @@ const NotificationsPanel: FC<NotificationsPanelProps> = ({
         ref={btnRef}
         handleBlur={() => setBtnFocus(false)}
       />
-      <div className="panel__content" ref={setScrollbarRef}>
+      <div className="panel__content" ref={initFadingScrollbar}>
         <fieldset className="notification-section">
           <PreferencesRadio
             name="preferences-options-notifications"

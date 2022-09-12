@@ -46,25 +46,25 @@ describe('ConversationMapper', () => {
       //@ts-expect-error
       const functionCallUndefinedParam = () => ConversationMapper.mapConversations();
 
-      expect(functionCallUndefinedParam).toThrowError(BaseError.MESSAGE.MISSING_PARAMETER);
+      expect(functionCallUndefinedParam).toThrow(BaseError.MESSAGE.MISSING_PARAMETER);
 
       const functionCallEmtpyArray = () => ConversationMapper.mapConversations([]);
 
-      expect(functionCallEmtpyArray).toThrowError(BaseError.MESSAGE.INVALID_PARAMETER);
+      expect(functionCallEmtpyArray).toThrow(BaseError.MESSAGE.INVALID_PARAMETER);
 
       //@ts-expect-error
       const functionCallWrongType = () => ConversationMapper.mapConversations('Conversation');
 
-      expect(functionCallWrongType).toThrowError(BaseError.MESSAGE.INVALID_PARAMETER);
+      expect(functionCallWrongType).toThrow(BaseError.MESSAGE.INVALID_PARAMETER);
 
       const functionCallUndefinedInArray = () => ConversationMapper.mapConversations([undefined]);
 
-      expect(functionCallUndefinedInArray).toThrowError(BaseError.MESSAGE.MISSING_PARAMETER);
+      expect(functionCallUndefinedInArray).toThrow(BaseError.MESSAGE.MISSING_PARAMETER);
 
       //@ts-expect-error
       const functionCallStringInArray = () => ConversationMapper.mapConversations(['Conversation']);
 
-      expect(functionCallStringInArray).toThrowError(BaseError.MESSAGE.INVALID_PARAMETER);
+      expect(functionCallStringInArray).toThrow(BaseError.MESSAGE.INVALID_PARAMETER);
     });
 
     it('maps a single conversation', () => {
