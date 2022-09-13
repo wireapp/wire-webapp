@@ -18,12 +18,11 @@
  */
 
 import React, {useEffect, useState} from 'react';
-import {useFadingScrollbar} from '../../ui/fadingScrollbar';
+import {initFadingScrollbar} from '../../ui/fadingScrollbar';
 import {container} from 'tsyringe';
 import {registerReactComponent, useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 import {formatDuration} from 'Util/TimeUtil';
-import useEffectRef from 'Util/useEffectRef';
 
 import {ConversationState} from '../../conversation/ConversationState';
 import {EphemeralTimings} from '../../ephemeral/EphemeralTimings';
@@ -46,8 +45,6 @@ const TimedMessagesPanel: React.FC<TimedMessagesPanelProps> = ({onClose, onGoBac
   const conversationState = container.resolve(ConversationState);
   const [currentMessageTimer, setCurrentMessageTimer] = useState(0);
   const [messageTimes, setMessageTimes] = useState<MessageTime[]>([]);
-  const [scrollbarRef, setScrollbarRef] = useEffectRef<HTMLDivElement>();
-  useFadingScrollbar(scrollbarRef);
 
   const {activeConversation} = useKoSubscribableChildren(conversationState, ['activeConversation']);
   const {globalMessageTimer} = useKoSubscribableChildren(activeConversation, ['globalMessageTimer']);
@@ -92,7 +89,7 @@ const TimedMessagesPanel: React.FC<TimedMessagesPanelProps> = ({onClose, onGoBac
         title={t('timedMessagesTitle')}
         goBackUie="go-back-timed-messages-options"
       />
-      <div ref={setScrollbarRef} className="panel__content">
+      <div ref={initFadingScrollbar} className="panel__content">
         {messageTimes.map(({text, isCustom, value}) => (
           <label
             key={value}

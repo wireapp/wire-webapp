@@ -32,30 +32,30 @@ interface DeviceProps {
 const DetailedDevice: React.FC<DeviceProps> = ({device, fingerprint}) => {
   return (
     <>
-      <div className="preferences-devices-model" data-uie-name="device-model">
+      <h3 className="preferences-devices-model" data-uie-name="device-model">
         {device.model}
-      </div>
-      <div className="preferences-devices-id">
+      </h3>
+      <p className="preferences-devices-id">
         <span>{t('preferencesDevicesId')}</span>
         <span data-uie-name="preferences-device-current-id">
           <FormattedId idSlices={splitFingerprint(device.id)} />
         </span>
-      </div>
+      </p>
       {device.time !== undefined && (
         <div className="preferences-devices-activated">
-          <div
+          <p
             dangerouslySetInnerHTML={{
               __html: t('preferencesDevicesActivatedOn', {date: formatTimestamp(device.time)}),
             }}
           />
         </div>
       )}
-      <div className="label preferences-label preferences-devices-fingerprint-label">
+      <h3 className="label preferences-label preferences-devices-fingerprint-label">
         {t('preferencesDevicesFingerprint')}
-      </div>
-      <div className="preferences-devices-fingerprint">
+      </h3>
+      <p className="preferences-devices-fingerprint">
         <FormattedId idSlices={splitFingerprint(fingerprint)} />
-      </div>
+      </p>
     </>
   );
 };

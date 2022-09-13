@@ -32,6 +32,7 @@ import Message from './Message';
 import {Text} from 'src/script/entity/message/Text';
 import {useResizeObserver} from '../../ui/resizeObserver';
 import {isMemberMessage} from '../../guards/Message';
+import {ServiceEntity} from 'src/script/integration/ServiceEntity';
 
 type FocusedElement = {center?: boolean; element: Element};
 interface MessagesListParams {
@@ -49,14 +50,14 @@ interface MessagesListParams {
     deleteMessageEveryone: (conversation: Conversation, message: MessageEntity) => void;
   };
   messageRepository: MessageRepository;
-  onClickMessage: (message: ContentMessage | Text, event: React.MouseEvent) => void;
+  onClickMessage: (message: ContentMessage | Text, event: React.UIEvent) => void;
   onLoading: (isLoading: boolean) => void;
   resetSession: (messageError: DecryptErrorMessage) => void;
   selfUser: User;
-  showImageDetails: (message: MessageEntity, event: React.MouseEvent | React.KeyboardEvent) => void;
+  showImageDetails: (message: MessageEntity, event: React.UIEvent) => void;
   showMessageDetails: (message: MessageEntity, showLikes?: boolean) => void;
   showParticipants: (users: User[]) => void;
-  showUserDetails: (user: User) => void;
+  showUserDetails: (user: User | ServiceEntity) => void;
 }
 
 const filterDuplicatedMemberMessages = (messages: MessageEntity[]) => {

@@ -53,7 +53,7 @@ const GroupedConversationHeader: React.FC<GroupedConversationHeaderProps> = ({on
       <span className="disclose-icon">
         <Icon.Disclose />
       </span>
-      <span className="conversation-folder__head__name">{conversationLabel.name}</span>
+      <h3 className="conversation-folder__head__name">{conversationLabel.name}</h3>
       {badge > 0 && (
         <span className="cell-badge-dark conversation-folder__head__badge" data-uie-name="conversation-folder-badge">
           {badge}

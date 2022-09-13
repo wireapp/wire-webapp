@@ -32,45 +32,45 @@ describe('MentionEntity', () => {
       const mentionEntity = new MentionEntity();
       const functionCall = () => mentionEntity.validate(textMessage);
 
-      expect(functionCall).toThrowError(MentionEntity.ERROR.MISSING_START_INDEX);
+      expect(functionCall).toThrow(MentionEntity.ERROR.MISSING_START_INDEX);
       mentionEntity.startIndex = 'fourteen';
 
-      expect(functionCall).toThrowError(MentionEntity.ERROR.MISSING_START_INDEX);
+      expect(functionCall).toThrow(MentionEntity.ERROR.MISSING_START_INDEX);
       mentionEntity.startIndex = 14;
 
-      expect(functionCall).toThrowError(MentionEntity.ERROR.MISSING_LENGTH);
+      expect(functionCall).toThrow(MentionEntity.ERROR.MISSING_LENGTH);
       mentionEntity.length = 'ten';
 
-      expect(functionCall).toThrowError(MentionEntity.ERROR.MISSING_LENGTH);
+      expect(functionCall).toThrow(MentionEntity.ERROR.MISSING_LENGTH);
       mentionEntity.length = 10;
 
-      expect(functionCall).toThrowError(MentionEntity.ERROR.MISSING_USER_ID);
+      expect(functionCall).toThrow(MentionEntity.ERROR.MISSING_USER_ID);
       mentionEntity.userId = 1337;
 
-      expect(functionCall).toThrowError(MentionEntity.ERROR.MISSING_USER_ID);
+      expect(functionCall).toThrow(MentionEntity.ERROR.MISSING_USER_ID);
     });
 
     it('should throw with inconsistent properties', () => {
       const mentionEntity = new MentionEntity(-1, 10, userId);
       const functionCall = () => mentionEntity.validate(textMessage);
 
-      expect(functionCall).toThrowError(MentionEntity.ERROR.INVALID_START_INDEX);
+      expect(functionCall).toThrow(MentionEntity.ERROR.INVALID_START_INDEX);
       mentionEntity.startIndex = 14;
       mentionEntity.length = -1;
 
-      expect(functionCall).toThrowError(MentionEntity.ERROR.INVALID_LENGTH);
+      expect(functionCall).toThrow(MentionEntity.ERROR.INVALID_LENGTH);
       mentionEntity.length = 40;
 
-      expect(() => mentionEntity.validate('')).toThrowError(MentionEntity.ERROR.OUT_OF_BOUNDS);
-      expect(functionCall).toThrowError(MentionEntity.ERROR.OUT_OF_BOUNDS);
+      expect(() => mentionEntity.validate('')).toThrow(MentionEntity.ERROR.OUT_OF_BOUNDS);
+      expect(functionCall).toThrow(MentionEntity.ERROR.OUT_OF_BOUNDS);
       mentionEntity.length = 10;
       mentionEntity.userId = '1337';
 
-      expect(functionCall).toThrowError(MentionEntity.ERROR.INVALID_USER_ID);
+      expect(functionCall).toThrow(MentionEntity.ERROR.INVALID_USER_ID);
       mentionEntity.userId = userId;
       const functionToThrow = () => mentionEntity.validate('Hello, World! Please read!');
 
-      expect(functionToThrow).toThrowError(MentionEntity.ERROR.INVALID_START_CHAR);
+      expect(functionToThrow).toThrow(MentionEntity.ERROR.INVALID_START_CHAR);
     });
 
     it('should return true on validation', () => {
