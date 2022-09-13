@@ -56,7 +56,7 @@ import {ShortcutType} from '../../../ui/ShortcutType';
 import {UserState} from '../../../user/UserState';
 import {ActionsViewModel} from '../../../view_model/ActionsViewModel';
 import {PanelViewModel} from '../../../view_model/PanelViewModel';
-import {useFadingScrollbar} from '../../../ui/fadingScrollbar';
+import {initFadingScrollbar} from '../../../ui/fadingScrollbar';
 
 const CONFIG = {
   MAX_USERS_VISIBLE: 7,
@@ -268,7 +268,7 @@ const ConversationDetails: FC<ConversationDetailsProps> = ({
     setUserParticipants(users);
   }, [activeConversation, participatingUserEts.length, removedFromConversation, selfUser]);
 
-  useFadingScrollbar(panelContentRef.current);
+  initFadingScrollbar(panelContentRef.current);
 
   return (
     <div
