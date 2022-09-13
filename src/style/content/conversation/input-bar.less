@@ -134,6 +134,12 @@
 .controls-right-button {
   .button-icon-primary;
 
+  body.theme-dark &:focus-visible,
+  &:focus-visible {
+    border: 1px solid var(--accent-color-focus);
+    outline: none;
+  }
+
   &.no-radius {
     border-radius: 0;
   }
