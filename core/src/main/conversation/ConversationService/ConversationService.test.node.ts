@@ -340,7 +340,7 @@ describe('ConversationService', () => {
     });
   });
 
-  describe('getAllParticipantsClients', () => {
+  describe('fetchAllParticipantsClients', () => {
     it('gives the members and clients of a federated conversation', async () => {
       const members = {
         'test-domain': {
@@ -354,7 +354,44 @@ describe('ConversationService', () => {
         {domain: 'test-domain', id: 'test-id-2'},
       ]);
 
+      const fetchedMembers = await conversationService.fetchAllParticipantsClients('convid');
+      expect(fetchedMembers).toEqual(members);
+    });
+  });
+
+  describe('getAllParticipantsClients', () => {
+    it('gives the members and clients of a federated conversation', async () => {
+      const members = {
+        user1: ['client1', 'client2'],
+        user2: ['client1', 'client2'],
+        user3: ['client1', 'client2'],
+      };
+      const conversationService = buildConversationService(true);
+      spyOn(conversationService['messageService'], 'sendMessage').and.callFake(
+        (_client, _recipients, _text, options) => {
+          options?.onClientMismatch?.({missing: members, deleted: {}, redundant: {}, time: ''});
+          return {} as any;
+        },
+      );
       const fetchedMembers = await conversationService.getAllParticipantsClients('convid');
+
+      expect(fetchedMembers).toEqual(members);
+    });
+
+    it('gives the members and clients of a federated conversation', async () => {
+      const members = {
+        domain1: {user1: ['client1', 'client2']},
+        domain2: {user2: ['client1', 'client2'], user3: ['client1', 'client2']},
+      };
+      const conversationService = buildConversationService(true);
+      spyOn(conversationService['messageService'], 'sendFederatedMessage').and.callFake(
+        (_client, _recipients, _text, options) => {
+          options?.onClientMismatch?.({missing: members, deleted: {}, redundant: {}, failed_to_send: {}, time: ''});
+          return {} as any;
+        },
+      );
+      const fetchedMembers = await conversationService.getAllParticipantsClients('convid', 'domain1');
+
       expect(fetchedMembers).toEqual(members);
     });
   });
