@@ -32,6 +32,7 @@ import {
   QualifiedUserClients,
   MessageSendingStatus,
   UserClients,
+  ConversationProtocol,
 } from '@wireapp/api-client/src/conversation';
 import {QualifiedId, RequestCancellationError, User as APIClientUser} from '@wireapp/api-client/src/user';
 import {WebAppEvents} from '@wireapp/webapp-events';
@@ -715,7 +716,7 @@ export class MessageRepository {
       syncTimestamp: true,
     },
   ) {
-    const userIds = await this.generateRecipients(conversation, recipients, skipSelf);
+    const {groupId} = conversation;
 
     const injectOptimisticEvent: MessageSendingCallbacks['onStart'] = async genericMessage => {
       if (playPingAudio) {
@@ -742,27 +743,40 @@ export class MessageRepository {
       this.updateMessageAsSent(conversation, genericMessage.messageId, syncTimestamp ? sentTime : undefined);
     };
 
+    const handleSuccess = async (genericMessage: GenericMessage, sentTime?: string) => {
+      const preMessageTimestamp = new Date(new Date(sentTime).getTime() - 10).toISOString();
+      // Trigger an empty mismatch to check for users that have no devices and that could have been removed from the team
+      await this.onClientMismatch?.({time: preMessageTimestamp}, conversation, silentDegradationWarning);
+      updateOptimisticEvent(genericMessage, sentTime);
+    };
+
     const conversationService = this.conversationService;
     // Configure ephemeral messages
     conversationService.messageTimer.setConversationLevelTimer(conversation.id, conversation.messageTimer());
 
+    if (groupId) {
+      return this.messageSender.queueMessage(() =>
+        this.conversationService.send({
+          groupId,
+          onStart: injectOptimisticEvent,
+          onSuccess: handleSuccess,
+          payload,
+          protocol: ConversationProtocol.MLS,
+        }),
+      );
+    }
+
     return this.messageSender.queueMessage(() =>
       this.conversationService.send({
-        callbacks: {
-          onClientMismatch: mismatch => this.onClientMismatch?.(mismatch, conversation, silentDegradationWarning),
-          onStart: injectOptimisticEvent,
-          onSuccess: async (genericMessage, sentTime) => {
-            const preMessageTimestamp = new Date(new Date(sentTime).getTime() - 10).toISOString();
-            // Trigger an empty mismatch to check for users that have no devices and that could have been removed from the team
-            await this.onClientMismatch?.({time: preMessageTimestamp}, conversation, silentDegradationWarning);
-            updateOptimisticEvent(genericMessage, sentTime);
-          },
-        },
         conversationDomain: conversation.domain || undefined,
         nativePush,
-        payloadBundle: payload,
+        onClientMismatch: mismatch => this.onClientMismatch?.(mismatch, conversation, silentDegradationWarning),
+        onStart: injectOptimisticEvent,
+        onSuccess: handleSuccess,
+        payload,
+        protocol: ConversationProtocol.PROTEUS,
         targetMode,
-        userIds,
+        userIds: this.generateRecipients(conversation, recipients, skipSelf),
       }),
     );
   }
@@ -820,7 +834,8 @@ export class MessageRepository {
     await this.messageSender.queueMessage(() =>
       this.conversationService.send({
         conversationDomain: this.core.backendFeatures.federationEndpoints ? conversation.domain : undefined,
-        payloadBundle: sessionReset,
+        payload: sessionReset,
+        protocol: ConversationProtocol.PROTEUS,
         targetMode: MessageTargetMode.USERS_CLIENTS,
         userIds: this.core.backendFeatures.federationEndpoints ? {[userId.domain]: userClient} : userClient, // we target this message to the specific client of the user (no need for mismatch handling here)
       }),
@@ -1268,7 +1283,7 @@ export class MessageRepository {
    * @param conversationId id of the conversation to send call message to
    * @returns Resolves when the confirmation was sent
    */
-  public sendCallingMessage(conversation: Conversation, payload: string, options: MessageSendingOptions) {
+  public sendCallingMessage(conversation: Conversation, payload: string, options: MessageSendingOptions = {}) {
     const message = MessageBuilder.createCall({
       ...this.createCommonMessagePayload(conversation),
       content: payload,

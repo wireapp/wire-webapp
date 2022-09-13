@@ -49,7 +49,7 @@ const BaseToggle: React.FC<BaseToggleProps> = ({
 }) => {
   const uuid = useId();
   const labelUuid = useId();
-  const inputRef = React.useRef<HTMLInputElement>();
+  const inputRef = React.useRef<HTMLInputElement>(null);
   return (
     <div className={cx(defaultToggleName, className)}>
       <div className="info-toggle__row">
@@ -75,7 +75,7 @@ const BaseToggle: React.FC<BaseToggleProps> = ({
             className="button-label"
             aria-pressed={isChecked}
             type="button"
-            onClick={() => setIsChecked(inputRef.current.checked)}
+            onClick={() => inputRef.current && setIsChecked(inputRef.current.checked)}
             data-uie-name={`do-allow-${toggleId}`}
             data-uie-value={isChecked ? 'checked' : 'unchecked'}
           >

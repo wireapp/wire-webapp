@@ -69,6 +69,7 @@ export const INITIALS_SIZE = {
 
 export interface AvatarProps extends React.HTMLProps<HTMLDivElement> {
   avatarSize?: AVATAR_SIZE;
+  avatarAlt?: string;
   noBadge?: boolean;
   noFilter?: boolean;
   onAvatarClick?: (participant: User | ServiceEntity, target: Node) => void;
@@ -95,7 +96,9 @@ const Avatar: React.FunctionComponent<AvatarProps> = ({
   const isMe = (participant as User).isMe;
 
   const clickHandler = (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
-    onAvatarClick?.(participant, event.currentTarget.parentNode);
+    if (event.currentTarget.parentNode) {
+      onAvatarClick?.(participant, event.currentTarget.parentNode);
+    }
   };
 
   if (participant instanceof ServiceEntity || participant.isService) {

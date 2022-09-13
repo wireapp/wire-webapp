@@ -47,7 +47,6 @@ body.theme-dark {
   min-width: 560px;
   height: 100%;
   padding: 32px 32px 32px 72px;
-  color: var(--background);
   overflow-x: hidden;
 
   input {
@@ -61,12 +60,11 @@ body.theme-dark {
 
 .preferences-detail {
   margin-top: 10px;
-  color: var(--gray-90);
   font-size: @font-size-small;
   line-height: 14px;
 
   &-intended {
-    margin-left: 28.5px;
+    margin-left: 2rem;
   }
 }
 
@@ -91,8 +89,6 @@ body.theme-dark {
   margin-bottom: 16px;
   color: var(--background);
   line-height: @line-height-sm;
-
-  text-transform: uppercase;
 }
 
 .preferences-hint {
@@ -100,13 +96,7 @@ body.theme-dark {
 }
 
 .preferences-label {
-  color: var(--gray-80);
-}
-
-body.theme-dark {
-  .preferences-label {
-    color: var(--white);
-  }
+  color: var(--text-input-label);
 }
 
 .preferences-info {
@@ -156,6 +146,10 @@ body.theme-dark {
   & ~ & {
     margin-top: 24px;
   }
+}
+
+.checkbox-margin {
+  margin-top: 1.5rem;
 }
 
 .preferences-option-pointer {

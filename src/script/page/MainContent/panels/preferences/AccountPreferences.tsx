@@ -137,7 +137,6 @@ const AccountPreferences: React.FC<AccountPreferencesProps> = ({
           title={name}
           css={{
             marginBottom: 16,
-            textTransform: 'uppercase',
             width: '100%',
           }}
         >
@@ -181,12 +180,12 @@ const AccountPreferences: React.FC<AccountPreferencesProps> = ({
                 readOnly
               />
             ))}
-            <AccountLink
-              label={t('preferencesAccountLink')}
-              value={`${Config.getConfig().URL.ACCOUNT_BASE}/user-profile/?id=${selfUser.id}`}
-              data-uie-name="element-profile-link"
-            />
           </div>
+          <AccountLink
+            label={t('preferencesAccountLink')}
+            value={`${Config.getConfig().URL.ACCOUNT_BASE}/user-profile/?id=${selfUser.id}`}
+            data-uie-name="element-profile-link"
+          />
         </PreferencesSection>
       ) : (
         <PreferencesSection hasSeparator>

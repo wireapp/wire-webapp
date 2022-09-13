@@ -17,7 +17,7 @@
  *
  */
 
-import React from 'react';
+import {forwardRef, ForwardRefRenderFunction, ForwardedRef} from 'react';
 
 import DragableClickWrapper from 'Components/DragableClickWrapper';
 import {t} from 'Util/LocalizerUtil';
@@ -29,21 +29,53 @@ export interface PanelHeaderProps {
   onClose: () => void;
   onGoBack: () => void;
   title?: string;
+  tabIndex?: number;
+  handleBlur?: () => void;
+  goBackTitle?: string;
+  closeBtnTitle?: string;
 }
 
-const PanelHeader: React.FC<PanelHeaderProps> = ({onGoBack, onClose, title, goBackUie, closeUie = 'do-close'}) => {
+const PanelHeader: ForwardRefRenderFunction<HTMLButtonElement, PanelHeaderProps> = (
+  {
+    onGoBack,
+    onClose,
+    title,
+    goBackUie,
+    closeUie = 'do-close',
+    tabIndex = 0,
+    handleBlur,
+    goBackTitle = t('index.goBack'),
+    closeBtnTitle = t('accessibility.rightPanel.close'),
+  }: PanelHeaderProps,
+  ref: ForwardedRef<HTMLButtonElement>,
+) => {
   return (
     <div className="panel__header">
       <DragableClickWrapper onClick={onGoBack}>
-        <button className="icon-button" data-uie-name={goBackUie} title={t('index.goBack')}>
+        <button
+          id="arrowleftiid"
+          ref={ref}
+          className="icon-button"
+          data-uie-name={goBackUie}
+          title={goBackTitle}
+          tabIndex={tabIndex}
+          onBlur={handleBlur}
+        >
           <Icon.ArrowLeft />
         </button>
       </DragableClickWrapper>
-
-      <div className="panel__header__title">{title}</div>
-
+      {/*eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex*/}
+      <div className="panel__header__title" tabIndex={0}>
+        {title}
+      </div>
       <DragableClickWrapper onClick={onClose}>
-        <button className="icon-button" data-uie-name={closeUie} title={t('accessibility.rightPanel.close')}>
+        <button
+          className="icon-button"
+          data-uie-name={closeUie}
+          title={closeBtnTitle}
+          tabIndex={tabIndex}
+          onBlur={handleBlur}
+        >
           <Icon.Close className="right-panel-close" />
         </button>
       </DragableClickWrapper>
@@ -51,4 +83,4 @@ const PanelHeader: React.FC<PanelHeaderProps> = ({onGoBack, onClose, title, goBa
   );
 };
 
-export default PanelHeader;
+export default forwardRef(PanelHeader);

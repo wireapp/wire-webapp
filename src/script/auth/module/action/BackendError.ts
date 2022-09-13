@@ -67,6 +67,7 @@ export class BackendError extends Error {
     INVALID_PAYLOAD: 'invalid-payload',
     NOT_FOUND: 'not-found',
     OPERATION_DENIED: 'operation-denied',
+    TOO_MANY_REQUESTS: 'too-many-requests', // Synthetic error label
     UNAUTHORIZED: 'unauthorized',
   };
 

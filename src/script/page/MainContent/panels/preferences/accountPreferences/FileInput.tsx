@@ -25,25 +25,27 @@ interface FileInputProps extends React.HTMLProps<HTMLInputElement> {
   onFileChange?: (files: FileList) => void;
 }
 
-const FileInput: React.FC<FileInputProps> = React.forwardRef(({fileTypes = ['*'], onFileChange, ...rest}, ref) => {
-  return (
-    <input
-      ref={ref}
-      type="file"
-      accept={fileTypes.join(',')}
-      onChange={({target}) => {
-        if (target.files.length > 0) {
-          onFileChange?.(target.files);
-          window.setTimeout(() => {
-            target.value = null;
-          }, TIME_IN_MILLIS.SECOND);
-        }
-      }}
-      onFocus={({target}) => target.blur()}
-      {...rest}
-    />
-  );
-});
+const FileInput = React.forwardRef<HTMLInputElement, FileInputProps>(
+  ({fileTypes = ['*'], onFileChange, ...rest}, ref) => {
+    return (
+      <input
+        ref={ref}
+        type="file"
+        accept={fileTypes.join(',')}
+        onChange={({target}) => {
+          if (target.files && target.files.length > 0) {
+            onFileChange?.(target.files);
+            window.setTimeout(() => {
+              target.value = '';
+            }, TIME_IN_MILLIS.SECOND);
+          }
+        }}
+        onFocus={({target}) => target.blur()}
+        {...rest}
+      />
+    );
+  },
+);
 
 FileInput.displayName = 'FileInput';
 

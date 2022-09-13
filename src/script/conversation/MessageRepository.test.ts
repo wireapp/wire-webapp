@@ -17,6 +17,7 @@
  *
  */
 
+import {ConversationProtocol} from '@wireapp/api-client/src/conversation/NewConversation';
 import {ConnectionStatus} from '@wireapp/api-client/src/connection/';
 import {CONVERSATION_TYPE} from '@wireapp/api-client/src/conversation/';
 import {LegalHoldStatus} from '@wireapp/protocol-messaging';
@@ -48,6 +49,13 @@ import {PayloadBundleState} from '@wireapp/core/src/main/conversation';
 
 const selfUser = new User('selfid', '');
 selfUser.isMe = true;
+
+const commonSendResponse = {
+  onClientMismatch: expect.any(Function),
+  onStart: expect.any(Function),
+  onSuccess: expect.any(Function),
+  protocol: ConversationProtocol.PROTEUS,
+};
 
 type MessageRepositoryDependencies = {
   assetRepository: AssetRepository;
@@ -119,10 +127,10 @@ describe('MessageRepository', () => {
 
       await messageRepository.sendPing(conversation);
       expect(core.service!.conversation.send).toHaveBeenCalledWith({
-        callbacks: expect.any(Object),
+        ...commonSendResponse,
         conversationDomain: undefined,
         nativePush: true,
-        payloadBundle: expect.objectContaining({
+        payload: expect.objectContaining({
           content: expect.objectContaining({hotKnock: false}),
           conversation: conversation.id,
         }),
@@ -146,10 +154,10 @@ describe('MessageRepository', () => {
 
       await messageRepository.sendMessageEdit(conversation, 'new text', originalMessage, []);
       expect(core.service!.conversation.send).toHaveBeenCalledWith({
-        callbacks: expect.any(Object),
+        ...commonSendResponse,
         conversationDomain: undefined,
         nativePush: true,
-        payloadBundle: expect.objectContaining({
+        payload: expect.objectContaining({
           content: expect.objectContaining({text: 'new text', originalMessageId: originalMessage.id}),
           conversation: conversation.id,
         }),
@@ -170,10 +178,10 @@ describe('MessageRepository', () => {
       const conversation = generateConversation();
       await messageRepository.sendTextWithLinkPreview(conversation, 'hello there', []);
       expect(core.service!.conversation.send).toHaveBeenCalledWith({
-        callbacks: expect.any(Object),
+        ...commonSendResponse,
         conversationDomain: undefined,
         nativePush: true,
-        payloadBundle: expect.objectContaining({
+        payload: expect.objectContaining({
           content: expect.objectContaining({text: 'hello there'}),
           conversation: conversation.id,
         }),

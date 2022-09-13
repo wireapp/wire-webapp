@@ -26,7 +26,7 @@ interface PreferencesCheckboxProps {
   disabled?: boolean;
   label: string;
   onChange: (checked: boolean) => void;
-  uieName?: string;
+  uieName: string;
 }
 
 const PreferencesCheckbox: React.FC<PreferencesCheckboxProps> = ({

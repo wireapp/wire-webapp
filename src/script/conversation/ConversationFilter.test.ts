@@ -22,6 +22,7 @@ import {ConversationFilter} from './ConversationFilter';
 import {ConversationDatabaseData, ConversationMapper} from './ConversationMapper';
 import {ConversationStatus} from './ConversationStatus';
 import {CONVERSATION_ACCESS, CONVERSATION_ACCESS_ROLE, CONVERSATION_TYPE} from '@wireapp/api-client/src/conversation';
+import {ConversationProtocol} from '@wireapp/api-client/src/conversation/NewConversation';
 
 describe('ConversationFilter', () => {
   describe('showCallControls', () => {
@@ -43,6 +44,7 @@ describe('ConversationFilter', () => {
         domain: '',
         ephemeral_timer: null,
         global_message_timer: null,
+        group_id: 'test-group-id',
         id: '796161e1-a319-41e3-9b33-2b3ab0b3b87a',
         is_guest: false,
         is_managed: false,
@@ -54,6 +56,7 @@ describe('ConversationFilter', () => {
         muted_timestamp: 0,
         name: 'Florian@Staging11',
         others: ['71e25be1-5433-4647-964d-03a5d9e7c970'],
+        protocol: ConversationProtocol.PROTEUS,
         qualified_others: undefined,
         receipt_mode: null,
         roles: {},
@@ -88,6 +91,7 @@ describe('ConversationFilter', () => {
         domain: '',
         ephemeral_timer: null,
         global_message_timer: null,
+        group_id: 'test-group-id',
         id: '796161e1-a319-41e3-9b33-2b3ab0b3b87a',
         is_guest: false,
         is_managed: false,
@@ -100,6 +104,7 @@ describe('ConversationFilter', () => {
         muted_timestamp: 0,
         name: 'Florian@Staging11',
         others: ['71e25be1-5433-4647-964d-03a5d9e7c970'],
+        protocol: ConversationProtocol.PROTEUS,
         qualified_others: undefined,
         receipt_mode: null,
         roles: {

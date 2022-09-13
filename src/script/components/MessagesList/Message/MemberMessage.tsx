@@ -77,7 +77,7 @@ const MemberMessage: React.FC<MemberMessageProps> = ({
   const isMemberLeave = message.isMemberLeave();
   const isMemberChange = message.isMemberChange();
 
-  const [messageHeaderLabelRef, setMessageHeaderLabelRef] = useEffectRef(null);
+  const [messageHeaderLabelRef, setMessageHeaderLabelRef] = useEffectRef<HTMLDivElement>();
   useEffect(() => {
     if (messageHeaderLabelRef) {
       const link = messageHeaderLabelRef.querySelector('.message-header-show-more');

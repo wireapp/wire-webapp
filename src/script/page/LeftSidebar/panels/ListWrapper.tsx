@@ -17,15 +17,14 @@
  *
  */
 
-import React, {ReactElement, useEffect} from 'react';
+import React, {ReactElement} from 'react';
 
 import {css} from '@emotion/react';
 import {throttle} from 'underscore';
 import {isScrollable, isScrolledBottom, isScrolledTop} from 'Util/scroll-helpers';
 import Icon from 'Components/Icon';
 import {t} from 'Util/LocalizerUtil';
-import useEffectRef from 'Util/useEffectRef';
-import {useFadingScrollbar} from '../../../ui/fadingScrollbar';
+import {initFadingScrollbar} from '../../../ui/fadingScrollbar';
 
 type LeftListWrapperProps = {
   /** A react element that will be inserted after the header but before the list */
@@ -64,9 +63,6 @@ const ListWrapper: React.FC<LeftListWrapperProps> = ({
   before,
   headerUieName,
 }) => {
-  const [scrollbarRef, setScrollbarRef] = useEffectRef<HTMLDivElement>();
-  useFadingScrollbar(scrollbarRef);
-
   const calculateBorders = throttle((element: HTMLElement) => {
     window.requestAnimationFrame(() => {
       if (element.offsetHeight <= 0 || !isScrollable(element)) {
@@ -79,16 +75,13 @@ const ListWrapper: React.FC<LeftListWrapperProps> = ({
     });
   }, 100);
 
-  useEffect(() => {
-    if (!scrollbarRef) {
-      return undefined;
+  function initBorderedScroll(element: HTMLElement | null) {
+    if (!element) {
+      return;
     }
-    const onScroll = (event: MouseEvent) => calculateBorders(event.target as HTMLElement);
-    calculateBorders(scrollbarRef);
-    scrollbarRef.addEventListener('scroll', onScroll);
-
-    return () => scrollbarRef.removeEventListener('scroll', onScroll);
-  }, [scrollbarRef]);
+    calculateBorders(element);
+    element.addEventListener('scroll', () => calculateBorders(element));
+  }
 
   return (
     <div id={id} className={`left-list-${id} ${id}`} css={style}>
@@ -113,7 +106,13 @@ const ListWrapper: React.FC<LeftListWrapperProps> = ({
         )}
       </section>
       {before ?? null}
-      <section css={scrollStyle} ref={setScrollbarRef}>
+      <section
+        css={scrollStyle}
+        ref={element => {
+          initBorderedScroll(element);
+          initFadingScrollbar(element);
+        }}
+      >
         {children}
       </section>
       {footer ?? null}

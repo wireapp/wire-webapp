@@ -473,7 +473,7 @@ export class EventService {
    * @param conversationId Delete events for this conversation
    * @param isoDate Date in ISO string format as upper bound which events should be removed
    */
-  async deleteEvents(conversationId: string, isoDate: string): Promise<number> {
+  async deleteEvents(conversationId: string, isoDate?: string): Promise<number> {
     return this.storageService.deleteEventsByDate(StorageSchemata.OBJECT_STORE.EVENTS, conversationId, isoDate);
   }
 }

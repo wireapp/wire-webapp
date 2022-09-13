@@ -18,7 +18,7 @@
  */
 
 import {RecursivePartial} from '@wireapp/commons/src/main/util/TypeUtil';
-import {StyledApp} from '@wireapp/react-ui-kit';
+import {StyledApp, THEME_ID} from '@wireapp/react-ui-kit';
 import {mount} from 'enzyme';
 import {History, createMemoryHistory} from 'history';
 import React from 'react';
@@ -37,7 +37,7 @@ export const withStore = (
 
 export const withIntl = (component: React.ReactNode) => <IntlProvider locale="en">{component}</IntlProvider>;
 
-export const withTheme = (component: React.ReactNode) => <StyledApp>{component}</StyledApp>;
+export const withTheme = (component: React.ReactNode) => <StyledApp themeId={THEME_ID.DEFAULT}>{component}</StyledApp>;
 
 export const withRouter = (component: React.ReactNode, history: History) => (
   <Router history={history}>{component}</Router>

@@ -29,8 +29,7 @@ import {t} from 'Util/LocalizerUtil';
 import VerifiedIcon from 'Components/VerifiedIcon';
 import Icon from 'Components/Icon';
 import {CryptographyRepository} from 'src/script/cryptography/CryptographyRepository';
-import {useFadingScrollbar} from '../../../../../ui/fadingScrollbar';
-import useEffectRef from 'Util/useEffectRef';
+import {initFadingScrollbar} from '../../../../../ui/fadingScrollbar';
 import DetailedDevice from './components/DetailedDevice';
 import DeviceDetailsPreferences from './DeviceDetailsPreferences';
 import {Conversation} from '../../../../../entity/Conversation';
@@ -52,23 +51,36 @@ const Device: React.FC<{
   isSSO: boolean;
   onRemove: (device: ClientEntity) => void;
   onSelect: (device: ClientEntity) => void;
-}> = ({device, isSSO, onSelect, onRemove}) => {
+  deviceNumber: number;
+}> = ({device, isSSO, onSelect, onRemove, deviceNumber}) => {
   const {isVerified} = useKoSubscribableChildren(device.meta, ['isVerified']);
-
+  const verifiedLabel = isVerified ? t('preferencesDevicesVerification') : t('preferencesDeviceNotVerified');
+  const deviceAriaLabel = `${t('preferencesDevice')} ${deviceNumber}, ${device.getName()}, ${verifiedLabel}`;
+  const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.stopPropagation();
+    onRemove(device);
+  };
+  const handleKeyPress = (e: React.KeyboardEvent<HTMLButtonElement>) => {
+    e.stopPropagation();
+  };
   return (
     <div
-      role="button"
-      tabIndex={0}
       className="preferences-devices-card"
       onClick={() => onSelect(device)}
       onKeyDown={e => handleKeyDown(e, onSelect.bind(null, device))}
+      tabIndex={0}
+      role="button"
     >
       <div className="preferences-devices-card-data">
         <div className="preferences-devices-card-icon" data-uie-value={device.id} data-uie-name="device-id">
           <VerifiedIcon data-uie-name={`user-device-${isVerified ? '' : 'not-'}verified`} isVerified={isVerified} />
         </div>
         <div className="preferences-devices-card-info">
-          <div className="preferences-devices-model" data-uie-name="preferences-device-active-model">
+          <div
+            className="preferences-devices-model"
+            data-uie-name="preferences-device-active-model"
+            aria-label={deviceAriaLabel}
+          >
             {device.getName()}
           </div>
           <div className="preferences-devices-id">
@@ -85,16 +97,19 @@ const Device: React.FC<{
             aria-label={t('preferencesDevicesRemove')}
             type="button"
             className={`preferences-devices-card-action__delete ${isSSO && 'svg-red'}`}
-            onClick={event => {
-              event.stopPropagation();
-              onRemove(device);
-            }}
+            onClick={handleClick}
+            onKeyDown={handleKeyPress}
             data-uie-name="do-device-remove"
           >
             <Icon.Delete />
           </button>
         )}
-        <div className="icon-forward preferences-devices-card-action__forward" data-uie-name="go-device-details" />
+        <button
+          className="icon-forward preferences-devices-card-action__forward"
+          data-uie-name="go-device-details"
+          aria-label={t('accessibility.headings.preferencesDeviceDetails')}
+          aria-hidden
+        ></button>
       </div>
     </div>
   );
@@ -113,10 +128,8 @@ const DevicesPreferences: React.FC<DevicesPreferencesProps> = ({
   const {clients, currentClient} = useKoSubscribableChildren(clientState, ['clients', 'currentClient']);
   const {self} = useKoSubscribableChildren(userState, ['self']);
   const isSSO = self?.isNoPasswordSSO;
-  const [scrollbarRef, setScrollbarRef] = useEffectRef<HTMLDivElement>();
   const getFingerprint = (device: ClientEntity) =>
     cryptographyRepository.getRemoteFingerprint(self.qualifiedId, device.id);
-  useFadingScrollbar(scrollbarRef);
 
   if (selectedDevice) {
     return (
@@ -137,7 +150,7 @@ const DevicesPreferences: React.FC<DevicesPreferencesProps> = ({
   return (
     <div id="preferences-devices" className="preferences-page preferences-devices">
       <h2 className="preferences-titlebar">{t('preferencesDevices')}</h2>
-      <div className="preferences-content" ref={setScrollbarRef}>
+      <div className="preferences-content" ref={initFadingScrollbar}>
         <fieldset className="preferences-section" data-uie-name="preferences-device-current">
           <legend className="preferences-header">{t('preferencesDevicesCurrent')}</legend>
           <DetailedDevice device={currentClient} fingerprint={cryptographyRepository.getLocalFingerprint()} />
@@ -148,16 +161,17 @@ const DevicesPreferences: React.FC<DevicesPreferencesProps> = ({
         {clients.length > 0 && (
           <fieldset className="preferences-section">
             <legend className="preferences-header">{t('preferencesDevicesActive')}</legend>
-            {clients.map(device => (
+            {clients.map((device, index) => (
               <Device
                 device={device}
                 key={device.id}
                 isSSO={isSSO}
                 onSelect={setSelectedDevice}
                 onRemove={removeDevice}
+                deviceNumber={++index}
               />
             ))}
-            <div className="preferences-detail">{t('preferencesDevicesActiveDetail')}</div>
+            <p className="preferences-detail">{t('preferencesDevicesActiveDetail')}</p>
           </fieldset>
         )}
       </div>

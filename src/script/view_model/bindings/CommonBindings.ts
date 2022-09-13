@@ -316,32 +316,6 @@ ko.bindingHandlers.loadImage = {
 };
 
 /**
- * Load image when hovering over element.
- */
-ko.bindingHandlers.load_image_on_hover = {
-  init(element) {
-    const hoverable_item = $(element);
-    const static_image = hoverable_item.data('src');
-    const animated_gif = hoverable_item.data('hover');
-
-    if (animated_gif) {
-      let image: HTMLImageElement = undefined;
-      hoverable_item
-        .on('mouseover', function () {
-          const item = $(this);
-          image = new Image();
-          image.onload = () => item.css({backgroundImage: `url(${animated_gif})`});
-          image.src = animated_gif;
-        })
-        .on('mouseout', function () {
-          image.onload = undefined;
-          $(this).css({backgroundImage: `url(${static_image})`});
-        });
-    }
-  },
-};
-
-/**
  * Will only fire once when the value has changed.
  */
 (ko.subscribable.fn as any).subscribe_once = function (
@@ -607,8 +581,8 @@ ko.bindingHandlers.in_viewport = {
         inViewport = isInViewport;
         triggerCallbackIfVisible();
       },
-      true,
       container,
+      true,
     );
     overlayedObserver.trackElement(element, isVisible => {
       visible = isVisible;

@@ -22,14 +22,21 @@ import {overlayedObserver} from '../../ui/overlayedObserver';
 import {viewportObserver} from '../../ui/viewportObserver';
 
 interface InViewportParams {
-  children?: React.ReactNode;
-  fullyInView?: boolean;
   onVisible: () => void;
+  children?: React.ReactNode;
+  requireFullyInView?: boolean;
+  allowBiggerThanViewport?: boolean;
   style?: React.CSSProperties;
 }
 
-const InViewport: React.FC<InViewportParams> = ({children, style, onVisible, fullyInView = true}) => {
-  const domNode = useRef<HTMLDivElement>();
+const InViewport: React.FC<InViewportParams> = ({
+  children,
+  style,
+  onVisible,
+  requireFullyInView = true,
+  allowBiggerThanViewport = false,
+}) => {
+  const domNode = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const element = domNode.current;
@@ -57,15 +64,16 @@ const InViewport: React.FC<InViewportParams> = ({children, style, onVisible, ful
         inViewport = isInViewport;
         triggerCallbackIfVisible();
       },
-      fullyInView,
-      element.parentElement,
+      element.parentElement || undefined,
+      requireFullyInView,
+      allowBiggerThanViewport,
     );
     overlayedObserver.trackElement(element, isVisible => {
       visible = isVisible;
       triggerCallbackIfVisible();
     });
     return () => releaseTrackers();
-  }, [onVisible]);
+  }, [allowBiggerThanViewport, requireFullyInView, onVisible]);
 
   return (
     <div ref={domNode} style={style}>

@@ -28,11 +28,17 @@
 //
 .checkbox {
   display: inline-block;
+  padding-left: 2px;
 
   input[type='checkbox'] {
     position: absolute;
     left: @offscreen-left;
     opacity: 0;
+
+    &:focus-visible + label {
+      outline: 1px solid var(--accent-color);
+      outline-offset: 0.4rem;
+    }
 
     &:checked + label {
       &::after {
@@ -86,12 +92,12 @@
     }
 
     &::before {
-      border: 1.5px solid var(--gray-80);
-      background-color: var(--gray-20);
+      border: 1.5px solid var(--checkbox-border);
+      background-color: var(--checkbox-background);
     }
 
     > div {
-      color: var(--background) !important;
+      color: var(--main-color) !important;
       line-height: 16px;
     }
   }

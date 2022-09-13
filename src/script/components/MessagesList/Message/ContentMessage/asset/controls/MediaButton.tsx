@@ -90,7 +90,9 @@ const MediaButton: React.FC<MediaButtonProps> = ({
           data-uie-name="do-pause-media"
         />
       )}
-      {isDownloading && <AssetLoader large={large} loadProgress={unwrappedAsset.downloadProgress} onCancel={cancel} />}
+      {isDownloading && (
+        <AssetLoader large={large} loadProgress={unwrappedAsset.downloadProgress || 0} onCancel={cancel} />
+      )}
       {isUploading && <AssetLoader large={large} loadProgress={uploadProgress} onCancel={cancel} />}
     </div>
   );

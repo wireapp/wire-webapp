@@ -17,27 +17,27 @@
  *
  */
 
-import React, {Fragment, useRef} from 'react';
+import {Fragment, useRef} from 'react';
 
-interface PreferencesRadioProps {
+interface PreferencesRadioProps<T> {
   name: string;
-  onChange: (newValue: string) => void;
+  onChange: (newValue: T) => void;
   options: {
     detailLabel?: string;
     label: string;
-    value: string;
+    value: T;
   }[];
-  selectedValue: string;
+  selectedValue: T;
   uieName?: string;
 }
 
-const PreferencesRadio: React.FC<PreferencesRadioProps> = ({
+const PreferencesRadio = <T extends string | number>({
   name,
   selectedValue,
   options,
   onChange,
   uieName = name,
-}) => {
+}: PreferencesRadioProps<T>) => {
   const {current: id} = useRef(Math.random().toString(36).slice(2));
 
   return (

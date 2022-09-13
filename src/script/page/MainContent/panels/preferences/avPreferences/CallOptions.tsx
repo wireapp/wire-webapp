@@ -21,6 +21,7 @@ import React, {useEffect, useRef, useState} from 'react';
 import {amplify} from 'amplify';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import type {WebappProperties} from '@wireapp/api-client/src/user/data/';
+import {Checkbox, CheckboxLabel} from '@wireapp/react-ui-kit';
 
 import {t} from 'Util/LocalizerUtil';
 
@@ -28,7 +29,6 @@ import {Config} from '../../../../../Config';
 import type {MediaConstraintsHandler} from '../../../../../media/MediaConstraintsHandler';
 import type {PropertiesRepository} from '../../../../../properties/PropertiesRepository';
 import {PROPERTIES_TYPE} from '../../../../../properties/PropertiesType';
-import PreferencesCheckbox from '../components/PreferencesCheckbox';
 import PreferencesSection from '../components/PreferencesSection';
 
 interface CallOptionsProps {
@@ -58,39 +58,58 @@ const CallOptions: React.FC<CallOptionsProps> = ({constraintsHandler, properties
 
   return (
     <PreferencesSection title={t('preferencesOptionsCall')}>
-      <PreferencesCheckbox
-        uieName="status-preference-vbr-encoding"
-        label={t('preferencesOptionsEnableVbrCheckbox')}
-        checked={vbrEncoding}
-        disabled={isCbrEncodingEnforced}
-        details={t('preferencesOptionsEnableVbrDetails')}
-        onChange={checked => {
-          if (!isCbrEncodingEnforced) {
-            propertiesRepository.savePreference(PROPERTIES_TYPE.CALL.ENABLE_VBR_ENCODING, checked);
-            setVbrEncoding(checked);
-          }
-        }}
-      />
-      <PreferencesCheckbox
-        uieName="status-preference-agc"
-        label={t('preferencesOptionsEnableAgcCheckbox')}
-        checked={agcEnabled}
-        details={t('preferencesOptionsEnableAgcDetails')}
-        onChange={checked => {
-          constraintsHandler.setAgcPreference(checked);
-          setAgcEnabled(checked);
-        }}
-      />
-      <PreferencesCheckbox
-        uieName="status-preference-soundless-incoming-calls"
-        label={t('preferencesOptionsEnableSoundlessIncomingCalls')}
-        checked={soundlessCallsEnabled}
-        details={t('preferencesOptionsEnableSoundlessIncomingCallsDetails')}
-        onChange={checked => {
-          propertiesRepository.savePreference(PROPERTIES_TYPE.CALL.ENABLE_SOUNDLESS_INCOMING_CALLS, checked);
-          setSoundlessCallsEnabled(checked);
-        }}
-      />
+      <div>
+        <Checkbox
+          onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+            if (!isCbrEncodingEnforced) {
+              const isChecked = event.target.checked;
+              propertiesRepository.savePreference(PROPERTIES_TYPE.CALL.ENABLE_VBR_ENCODING, isChecked);
+              setVbrEncoding(isChecked);
+            }
+          }}
+          checked={vbrEncoding}
+          data-uie-name="status-preference-vbr-encoding"
+          disabled={isCbrEncodingEnforced}
+        >
+          <CheckboxLabel htmlFor="status-preference-vbr-encoding">
+            {t('preferencesOptionsEnableVbrCheckbox')}
+          </CheckboxLabel>
+        </Checkbox>
+        <p className="preferences-detail preferences-detail-intended">{t('preferencesOptionsEnableVbrDetails')}</p>
+      </div>
+      <div className="checkbox-margin">
+        <Checkbox
+          onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+            const isChecked = event.target.checked;
+            constraintsHandler.setAgcPreference(isChecked);
+            setAgcEnabled(isChecked);
+          }}
+          checked={agcEnabled}
+          data-uie-name="status-preference-agc"
+        >
+          <CheckboxLabel htmlFor="status-preference-agc">{t('preferencesOptionsEnableAgcCheckbox')}</CheckboxLabel>
+        </Checkbox>
+        <p className="preferences-detail preferences-detail-intended">{t('preferencesOptionsEnableAgcDetails')}</p>
+      </div>
+      <div className="checkbox-margin">
+        <Checkbox
+          onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+            const isChecked = event.target.checked;
+            propertiesRepository.savePreference(PROPERTIES_TYPE.CALL.ENABLE_SOUNDLESS_INCOMING_CALLS, isChecked);
+            setSoundlessCallsEnabled(isChecked);
+          }}
+          checked={soundlessCallsEnabled}
+          data-uie-name="status-preference-soundless-incoming-calls"
+          disabled={isCbrEncodingEnforced}
+        >
+          <CheckboxLabel htmlFor="status-preference-soundless-incoming-calls">
+            {t('preferencesOptionsEnableSoundlessIncomingCalls')}
+          </CheckboxLabel>
+        </Checkbox>
+        <p className="preferences-detail preferences-detail-intended">
+          {t('preferencesOptionsEnableSoundlessIncomingCallsDetails')}
+        </p>
+      </div>
     </PreferencesSection>
   );
 };

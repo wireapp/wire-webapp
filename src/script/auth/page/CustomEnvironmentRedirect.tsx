@@ -37,7 +37,7 @@ const REDIRECT_DELAY = 5000;
 const CustomEnvironmentRedirect = ({doNavigate, doSendNavigationEvent}: DispatchProps) => {
   const {formatMessage: _} = useIntl();
 
-  const [destinationUrl, setDestinationUrl] = useState(null);
+  const [destinationUrl, setDestinationUrl] = useState<string | null>(null);
   const [isAnimating, setIsAnimating] = useState(false);
 
   useEffect(() => {

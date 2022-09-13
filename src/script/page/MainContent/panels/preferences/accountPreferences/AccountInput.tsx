@@ -17,13 +17,15 @@
  *
  */
 
-import React, {useEffect, useState, useRef} from 'react';
+import {useEffect, useState, useRef, FC, InputHTMLAttributes} from 'react';
 import Icon from 'Components/Icon';
 import useIsMounted from 'Util/useIsMounted';
 import {MotionDuration} from '../../../../../motion/MotionDuration';
 import TextInput from 'Components/TextInput';
+import {IconButton, IconButtonVariant} from '@wireapp/react-ui-kit';
+import {isTabKey, isEnterKey} from '../../../../../util/KeyboardUtil';
 
-interface AccountInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
+interface AccountInputProps extends InputHTMLAttributes<HTMLInputElement> {
   allowedChars?: string;
   'data-uie-name'?: string;
   forceLowerCase?: boolean;
@@ -60,7 +62,7 @@ export const useInputDone = () => {
   return {done, isDone};
 };
 
-const AccountInput: React.FC<AccountInputProps> = ({
+const AccountInput: FC<AccountInputProps> = ({
   label,
   fieldName,
   value,
@@ -77,8 +79,9 @@ const AccountInput: React.FC<AccountInputProps> = ({
   valueUie,
   ...rest
 }) => {
-  const textInputRef = useRef<HTMLDivElement>(null);
-  const [input, setInput] = useState<string>();
+  const inputWrapperRef = useRef<HTMLDivElement>(null);
+
+  const [input, setInput] = useState<string>('');
   const [isEditing, setIsEditing] = useState(false);
   useEffect(() => {
     setInput(value);
@@ -86,7 +89,7 @@ const AccountInput: React.FC<AccountInputProps> = ({
 
   useEffect(() => {
     const handleClickOutside = (event: any) => {
-      if (textInputRef.current && !textInputRef.current.contains(event.target)) {
+      if (inputWrapperRef.current && !inputWrapperRef.current.contains(event.target)) {
         setInput(value);
         setIsEditingExternal?.(false);
         setIsEditing(false);
@@ -98,7 +101,7 @@ const AccountInput: React.FC<AccountInputProps> = ({
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
     };
-  }, [textInputRef]);
+  }, []);
 
   const updateInput = (value: string) => {
     if (allowedChars) {
@@ -120,8 +123,7 @@ const AccountInput: React.FC<AccountInputProps> = ({
       css={{
         display: 'flex',
         flexDirection: 'column',
-        height: 56,
-        marginBottom: 40,
+        height: 100,
         padding: 8,
         width: 280,
       }}
@@ -131,8 +133,10 @@ const AccountInput: React.FC<AccountInputProps> = ({
           <label
             className="label preferences-label"
             css={{
+              alignItems: 'center',
+              display: 'flex',
+              height: 32,
               lineHeight: '14px',
-              marginBottom: 16,
               position: 'relative',
             }}
             data-uie-name={labelUie}
@@ -141,22 +145,16 @@ const AccountInput: React.FC<AccountInputProps> = ({
             {label}
 
             {!readOnly && (
-              <button
-                type="button"
+              <IconButton
+                variant={IconButtonVariant.SECONDARY}
                 css={{
-                  background: 'transparent',
-                  border: 'none',
-                  margin: 0,
-                  padding: 0,
-                  position: 'absolute',
-                  svg: {marginLeft: 8},
-                  top: '-1px',
+                  margin: '0 0.5rem',
                 }}
+                data-uie-name={`go-edit-${fieldName}`}
                 onClick={() => {
                   setIsEditingExternal?.(true);
                   setIsEditing(true);
                 }}
-                data-uie-name={`go-edit-${fieldName}`}
               >
                 {isDone ? (
                   <Icon.AnimatedCheck
@@ -164,13 +162,9 @@ const AccountInput: React.FC<AccountInputProps> = ({
                     data-uie-name={`${iconUiePrefix}-icon-check`}
                   />
                 ) : (
-                  <Icon.Edit
-                    css={{fill: 'var(--foreground)'}}
-                    className="edit-icon"
-                    data-uie-name={`${iconUiePrefix}-icon`}
-                  />
+                  <Icon.Edit className="edit-icon" data-uie-name={`${iconUiePrefix}-icon`} />
                 )}
-              </button>
+              </IconButton>
             )}
           </label>
 
@@ -182,27 +176,39 @@ const AccountInput: React.FC<AccountInputProps> = ({
         </>
       )}
 
+      {/* eslint jsx-a11y/no-autofocus : "off" */}
       {isEditing && (
         <TextInput
+          autoFocus
           uieName={`enter-${fieldName}-input`}
           label={label}
-          name={valueUie}
+          name={valueUie ? valueUie : fieldName}
           value={input}
+          inputWrapperRef={inputWrapperRef}
           onChange={({target}) => updateInput(target.value)}
-          onCancel={() => updateInput('')}
+          onCancel={() => {
+            updateInput('');
+            setIsEditing(true);
+          }}
           onKeyDown={event => {
-            if (event.key === 'Enter' && !event.shiftKey && !event.altKey) {
+            if (isEnterKey(event) && !event.shiftKey && !event.altKey) {
               event.preventDefault();
               onValueChange?.(input);
               (event.target as HTMLInputElement).blur();
+              // on enter save changes and close the editable field
+              setIsEditing(false);
+            } else if (isTabKey(event) && !!!input) {
+              // after clearing the input i.e field value is empty when user press tab,
+              // revert to the last saved value, close the editable field and focus on the next field
+              setInput(value);
+              setIsEditing(false);
             }
           }}
           onBlur={() => {
             setInput(value);
             setIsEditingExternal?.(false);
-            setIsEditing(false);
           }}
-          ref={textInputRef}
+          setIsEditing={setIsEditing}
         />
       )}
     </div>

@@ -31,7 +31,8 @@ import {registerReactComponent, useKoSubscribableChildren} from 'Util/ComponentU
 import Message from './Message';
 import {Text} from 'src/script/entity/message/Text';
 import {useResizeObserver} from '../../ui/resizeObserver';
-import useEffectRef from 'Util/useEffectRef';
+import {isMemberMessage} from '../../guards/Message';
+import {ServiceEntity} from 'src/script/integration/ServiceEntity';
 
 type FocusedElement = {center?: boolean; element: Element};
 interface MessagesListParams {
@@ -49,15 +50,44 @@ interface MessagesListParams {
     deleteMessageEveryone: (conversation: Conversation, message: MessageEntity) => void;
   };
   messageRepository: MessageRepository;
-  onClickMessage: (message: ContentMessage | Text, event: React.MouseEvent) => void;
+  onClickMessage: (message: ContentMessage | Text, event: React.UIEvent) => void;
   onLoading: (isLoading: boolean) => void;
   resetSession: (messageError: DecryptErrorMessage) => void;
   selfUser: User;
-  showImageDetails: (message: MessageEntity, event: React.MouseEvent | React.KeyboardEvent) => void;
+  showImageDetails: (message: MessageEntity, event: React.UIEvent) => void;
   showMessageDetails: (message: MessageEntity, showLikes?: boolean) => void;
   showParticipants: (users: User[]) => void;
-  showUserDetails: (user: User) => void;
+  showUserDetails: (user: User | ServiceEntity) => void;
 }
+
+const filterDuplicatedMemberMessages = (messages: MessageEntity[]) => {
+  const typesToFilter = ['conversation.member-join', 'conversation.group-creation', 'conversation.member-leave'];
+  return messages.reduce<MessageEntity[]>((uniqMessages, currentMessage) => {
+    if (isMemberMessage(currentMessage)) {
+      const uniqMemberMessages = uniqMessages.filter(isMemberMessage);
+
+      if (!!uniqMemberMessages.length && typesToFilter.includes(currentMessage.type)) {
+        switch (currentMessage.type) {
+          case 'conversation.group-creation':
+            // Dont show duplicated group creation messages
+            if (uniqMemberMessages.some(m => m.type === currentMessage.type)) {
+              return uniqMessages;
+            }
+          case 'conversation.member-join':
+          case 'conversation.member-leave':
+            // Dont show duplicated member join/leave messages that follow each other
+            if (uniqMemberMessages?.[uniqMemberMessages.length - 1]?.htmlCaption() === currentMessage.htmlCaption()) {
+              return uniqMessages;
+            }
+        }
+      }
+    }
+
+    return [...uniqMessages, currentMessage];
+  }, []);
+};
+
+const filterHiddenMessages = (messages: MessageEntity[]) => messages.filter(message => message.visible());
 
 const MessagesList: React.FC<MessagesListParams> = ({
   conversation,
@@ -88,9 +118,10 @@ const MessagesList: React.FC<MessagesListParams> = ({
     'isGuestRoom',
     'isGuestAndServicesRoom',
   ]);
-  const messages = allMessages.filter(message => message.visible());
   const [loaded, setLoaded] = useState(false);
   const [focusedMessage, setFocusedMessage] = useState<string | undefined>(initialMessage?.id);
+
+  const filteredMessages = filterDuplicatedMemberMessages(filterHiddenMessages(allMessages));
 
   const shouldShowInvitePeople =
     conversation.isActiveParticipant() && conversation.inTeam() && (isGuestRoom || isGuestAndServicesRoom);
@@ -104,14 +135,14 @@ const MessagesList: React.FC<MessagesListParams> = ({
   };
 
   const verticallyCenterMessage = (): boolean => {
-    if (messages.length === 1) {
-      const [firstMessage] = messages;
+    if (filteredMessages.length === 1) {
+      const [firstMessage] = filteredMessages;
       return firstMessage.isMember() && firstMessage.isConnection();
     }
     return false;
   };
 
-  const [messagesContainer, setContainer] = useEffectRef<HTMLDivElement | null>(null);
+  const [messagesContainer, setContainer] = useState<HTMLDivElement | null>(null);
   const scrollHeight = useRef(0);
   const nbMessages = useRef(0);
   const focusedElement = useRef<FocusedElement | null>(null);
@@ -122,7 +153,7 @@ const MessagesList: React.FC<MessagesListParams> = ({
     if (!scrollingContainer || !loaded) {
       return;
     }
-    const lastMessage = messages[messages.length - 1];
+    const lastMessage = filteredMessages[filteredMessages.length - 1];
     const previousScrollHeight = scrollHeight.current;
     const scrollBottomPosition = scrollingContainer.scrollTop + scrollingContainer.clientHeight;
     const shouldStickToBottom = previousScrollHeight - scrollBottomPosition < 100;
@@ -139,7 +170,7 @@ const MessagesList: React.FC<MessagesListParams> = ({
       scrollingContainer.scrollTop = scrollingContainer.scrollHeight - previousScrollHeight;
     } else if (shouldStickToBottom) {
       // We only want to animate the scroll if there are new messages in the list
-      const behavior = nbMessages.current !== messages.length ? 'smooth' : 'auto';
+      const behavior = nbMessages.current !== filteredMessages.length ? 'smooth' : 'auto';
       // Simple content update, we just scroll to bottom if we are in the stick to bottom threshold
       scrollingContainer.scrollTo?.({behavior, top: scrollingContainer.scrollHeight});
     } else if (lastMessage && lastMessage.status() === StatusType.SENDING && lastMessage.user().id === selfUser.id) {
@@ -147,7 +178,7 @@ const MessagesList: React.FC<MessagesListParams> = ({
       scrollingContainer.scrollTo?.({behavior: 'smooth', top: scrollingContainer.scrollHeight});
     }
     scrollHeight.current = scrollingContainer.scrollHeight;
-    nbMessages.current = messages.length;
+    nbMessages.current = filteredMessages.length;
   };
 
   // Listen to resizes of the the container element (if it's resized it means something has changed in the message list)
@@ -158,7 +189,7 @@ const MessagesList: React.FC<MessagesListParams> = ({
     if (messagesContainer) {
       updateScroll(messagesContainer);
     }
-  }, [messages.length, messagesContainer]);
+  }, [filteredMessages.length, messagesContainer]);
 
   useEffect(() => {
     onLoading(true);
@@ -174,12 +205,12 @@ const MessagesList: React.FC<MessagesListParams> = ({
     return null;
   }
 
-  const messageViews = messages.map((message, index) => {
-    const previousMessage = messages[index - 1];
+  const messageViews = filteredMessages.map((message, index) => {
+    const previousMessage = filteredMessages[index - 1];
     const isLastDeliveredMessage = lastDeliveredMessage?.id === message.id;
 
     const visibleCallback = getVisibleCallback(conversation, message);
-    const key = (message.id || 'message-') + message.timestamp();
+    const key = `${message.id || 'message'}-${message.timestamp()}`;
     return (
       <Message
         key={key}

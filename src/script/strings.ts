@@ -297,16 +297,16 @@ export const setEntropyStrings = defineMessages({
     id: 'setEntropy.continue',
   },
   headline: {
-    defaultMessage: 'Create Entropy',
+    defaultMessage: 'Increase your account’s security',
     id: 'setEntropy.headline',
   },
   subheadline: {
     defaultMessage:
-      'Move your mouse as randomly as possible within the window below until the progress bar is 100% filled. This increases the quality of the random numbers which are used to create your cryptographic long term secrets and therefore increases the overall security of your Wire client.',
+      'Move your mouse as randomly as possible in the white window until the progress bar is 100% full. In this way, you will help improve the quality of the random numbers used to create the long-term cryptographic secrets of this device and thus increase the security of your account.',
     id: 'setEntropy.subheadline',
   },
   success: {
-    defaultMessage: 'Entropy successfully created',
+    defaultMessage: 'Thanks for your support!',
     id: 'setEntropy.success',
   },
 });
@@ -549,6 +549,10 @@ export const errorHandlerStrings = defineMessages({
   [BackendError.LABEL.TOO_MANY_LOGINS]: {
     defaultMessage: 'Please try again later',
     id: 'BackendError.LABEL.TOO_MANY_LOGINS',
+  },
+  [BackendError.LABEL.TOO_MANY_REQUESTS]: {
+    defaultMessage: 'Too many requests, please try again later.',
+    id: 'BackendError.LABEL.TOO_MANY_REQUESTS',
   },
   [BackendError.LABEL.BAD_REQUEST]: {
     defaultMessage: 'Invalid input',

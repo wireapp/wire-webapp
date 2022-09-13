@@ -18,7 +18,7 @@
  */
 
 import {pathWithParams} from '@wireapp/commons/src/main/util/UrlUtil';
-import {StyledApp, Loading, ContainerXS} from '@wireapp/react-ui-kit';
+import {StyledApp, Loading, ContainerXS, THEME_ID} from '@wireapp/react-ui-kit';
 import React, {useEffect} from 'react';
 import {IntlProvider} from 'react-intl';
 import {connect} from 'react-redux';
@@ -104,7 +104,7 @@ const Root: React.FC<RootProps & ConnectedProps & DispatchProps> = ({
 
   return (
     <IntlProvider locale={normalizeLanguage(language)} messages={loadLanguage(language)}>
-      <StyledApp style={{display: 'flex', height: '100%', minHeight: '100vh'}}>
+      <StyledApp themeId={THEME_ID.DEFAULT} style={{display: 'flex', height: '100%', minHeight: '100vh'}}>
         {isFetchingSSOSettings ? (
           <ContainerXS centerText verticalCenter style={{justifyContent: 'center'}}>
             <Loading />

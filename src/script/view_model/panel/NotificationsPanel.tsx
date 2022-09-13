@@ -17,18 +17,21 @@
  *
  */
 
-import React, {useState} from 'react';
+import React, {useState, useRef, useEffect, FC} from 'react';
 import {container} from 'tsyringe';
 
 import {t} from 'Util/LocalizerUtil';
-import useEffectRef from 'Util/useEffectRef';
 import {registerReactComponent, useKoSubscribableChildren} from 'Util/ComponentUtil';
 
-import {useFadingScrollbar} from '../../ui/fadingScrollbar';
+import {initFadingScrollbar} from '../../ui/fadingScrollbar';
 import {NOTIFICATION_STATE, getNotificationText} from '../../conversation/NotificationSetting';
 import {ViewModelRepositories} from '../MainViewModel';
 import PanelHeader from './PanelHeader';
 import {ConversationState} from '../../conversation/ConversationState';
+import PreferencesRadio from '../../page/MainContent/panels/preferences/components/PreferencesRadio';
+import {KEY} from 'Util/KeyboardUtil';
+
+const PANEL_HEADER_BTN_TABINDEX = 2;
 
 export interface NotificationsPanelProps {
   conversationState?: ConversationState;
@@ -37,24 +40,42 @@ export interface NotificationsPanelProps {
   repositories: ViewModelRepositories;
 }
 
-const NotificationsPanel: React.FC<NotificationsPanelProps> = ({
+const NotificationsPanel: FC<NotificationsPanelProps> = ({
   onGoBack,
   onClose,
   repositories,
   conversationState = container.resolve(ConversationState),
 }) => {
   const {activeConversation} = useKoSubscribableChildren(conversationState, ['activeConversation']);
-  const {notificationState} = useKoSubscribableChildren(activeConversation, ['notificationState']);
-
-  const [scrollbarRef, setScrollbarRef] = useEffectRef<HTMLDivElement>();
-  useFadingScrollbar(scrollbarRef);
+  const {notificationState} = useKoSubscribableChildren(activeConversation!, ['notificationState']);
+  const saveOptionNotificationPreference = (value: number) => {
+    repositories.conversation.setNotificationState(activeConversation!, value);
+  };
 
   const [settings] = useState(
     Object.values(NOTIFICATION_STATE).map(status => ({
-      text: getNotificationText(status),
+      label: getNotificationText(status),
       value: status,
     })),
   );
+
+  const [tabIndex, setTabIndex] = useState(-1);
+  const [btnFocus, setBtnFocus] = useState(false);
+  const btnRef = useRef<HTMLButtonElement>(null);
+
+  useEffect(() => {
+    if (btnFocus) {
+      btnRef.current?.focus();
+    }
+  }, [btnFocus]);
+
+  const handleKeyDown = (event: React.KeyboardEvent) => {
+    if (event.key === KEY.TAB && !event.shiftKey && !event.altKey) {
+      event.preventDefault();
+      setTabIndex(PANEL_HEADER_BTN_TABINDEX);
+      setBtnFocus(true);
+    }
+  };
 
   return (
     <>
@@ -62,26 +83,31 @@ const NotificationsPanel: React.FC<NotificationsPanelProps> = ({
         onGoBack={onGoBack}
         onClose={onClose}
         goBackUie="go-back-notification-options"
+        goBackTitle={t('accessibility.conversation.goBack')}
         title={t('notificationSettingsTitle')}
+        closeBtnTitle={t('accessibility.closeNotificationsLabel')}
+        tabIndex={tabIndex}
+        ref={btnRef}
+        handleBlur={() => setBtnFocus(false)}
       />
-      <div className="panel__content" ref={setScrollbarRef}>
-        {settings.map(({text, value}) => (
-          <label
-            key={value}
-            className="panel__action-item panel__action-item__option"
-            data-uie-name="item-notification-option"
-          >
-            <input
-              type="radio"
-              name="notification-settings"
-              value={value}
-              checked={notificationState === value}
-              onChange={() => repositories.conversation.setNotificationState(activeConversation, value)}
-            />
-            <span>{text}</span>
-          </label>
-        ))}
-        <div className="panel__info-text notification-settings__disclaimer">{t('notificationSettingsDisclaimer')}</div>
+      <div className="panel__content" ref={initFadingScrollbar}>
+        <fieldset className="notification-section">
+          <PreferencesRadio
+            name="preferences-options-notifications"
+            selectedValue={notificationState}
+            onChange={saveOptionNotificationPreference}
+            options={settings}
+          />
+        </fieldset>
+        {/* eslint-disable-next-line jsx-a11y/no-static-element-interactions*/}
+        <div
+          className="panel__info-text notification-settings__disclaimer"
+          // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex
+          tabIndex={0}
+          onKeyDown={handleKeyDown}
+        >
+          {t('notificationSettingsDisclaimer')}
+        </div>
       </div>
     </>
   );

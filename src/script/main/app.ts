@@ -101,7 +101,6 @@ import {AudioRepository} from '../audio/AudioRepository';
 import {MessageSender} from '../message/MessageSender';
 import {StorageService} from '../storage';
 import {BackupService} from '../backup/BackupService';
-import {AuthRepository} from '../auth/AuthRepository';
 import {MediaRepository} from '../media/MediaRepository';
 import {GiphyRepository} from '../extension/GiphyRepository';
 import {GiphyService} from '../extension/GiphyService';
@@ -229,7 +228,6 @@ class App {
 
     repositories.asset = container.resolve(AssetRepository);
 
-    repositories.auth = new AuthRepository();
     repositories.giphy = new GiphyRepository(new GiphyService());
     repositories.properties = new PropertiesRepository(new PropertiesService(), selfService);
     repositories.serverTime = serverTimeHandler;
@@ -255,7 +253,7 @@ class App {
 
     repositories.message = new MessageRepository(
       /*
-       * FIXME there is a cyclic dependency between message and conversation repos.
+       * ToDo: there is a cyclic dependency between message and conversation repos.
        * MessageRepository should NOT depend upon ConversationRepository.
        * We need to remove all usages of conversationRepository inside the messageRepository
        */
@@ -696,14 +694,16 @@ class App {
     }
 
     const router = new Router({
-      '/conversation/:conversationId(/:domain)': (conversationId: string, domain?: string) =>
-        mainView.content.showConversation(conversationId, {}, domain),
+      '/conversation/:conversationId(/:domain)': (
+        conversationId: string,
+        domain: string = this.apiClient.context?.domain ?? '',
+      ) => mainView.content.showConversation(conversationId, {}, domain),
       '/preferences/about': () => mainView.list.openPreferencesAbout(),
       '/preferences/account': () => mainView.list.openPreferencesAccount(),
       '/preferences/av': () => mainView.list.openPreferencesAudioVideo(),
       '/preferences/devices': () => mainView.list.openPreferencesDevices(),
       '/preferences/options': () => mainView.list.openPreferencesOptions(),
-      '/user/:userId(/:domain)': (userId: string, domain?: string) => {
+      '/user/:userId(/:domain)': (userId: string, domain: string = this.apiClient.context?.domain ?? '') => {
         showUserModal({
           actionsViewModel: mainView.actions,
           onClose: () => router.navigate('/'),
@@ -816,12 +816,14 @@ class App {
       return _redirectToLogin();
     };
 
-    const _logoutOnBackend = () => {
+    const _logoutOnBackend = async () => {
       this.logger.info(`Logout triggered by '${signOutReason}': Disconnecting user from the backend.`);
-      return this.repository.auth
-        .logout()
-        .then(() => _logout())
-        .catch(() => _redirectToLogin());
+      try {
+        await this.core.logout(clearData);
+        _logout();
+      } catch (e) {
+        _redirectToLogin();
+      }
     };
 
     if (App.CONFIG.SIGN_OUT_REASONS.IMMEDIATE.includes(signOutReason)) {

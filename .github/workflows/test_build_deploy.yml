@@ -2,12 +2,12 @@ name: CI
 
 on:
   push:
-    branches: [master, dev, edge, avs, mobile]
+    branches: [master, dev, edge, avs, mobile, acc]
     tags:
       - '*staging*'
       - '*production*'
   pull_request:
-    branches: [master, dev, edge, avs, mobile]
+    branches: [master, dev, edge, avs, mobile, acc]
 
 concurrency:
   group: ci-${{ github.ref }}
@@ -130,7 +130,7 @@ jobs:
 
       # Stage 1: https://wire-webapp-edge.zinfra.io/
       - name: Deploy edge build to Elastic Beanstalk
-        if: env.BRANCH_NAME == 'edge'
+        if: env.BRANCH_NAME == 'dev'
         uses: einaregilsson/beanstalk-deploy@v20
         with:
           application_name: ${{env.AWS_APPLICATION_NAME}}
@@ -223,6 +223,23 @@ jobs:
           aws_secret_key: ${{secrets.WEBTEAM_AWS_SECRET_ACCESS_KEY}}
           deployment_package: ${{env.AWS_BUILD_ZIP_PATH}}
           environment_name: wire-webapp-mobile
+          region: eu-central-1
+          use_existing_version_if_available: true
+          version_description: ${{github.sha}}
+          version_label: ${{github.run_id}}
+          wait_for_deployment: false
+          wait_for_environment_recovery: ${{env.DEPLOYMENT_RECOVERY_TIMEOUT_SECONDS}}
+
+      # Stage 7: https://wire-webapp-qa.zinfra.io/
+      - name: Deploy acc build to Elastic Beanstalk
+        if: env.BRANCH_NAME == 'acc'
+        uses: einaregilsson/beanstalk-deploy@v20
+        with:
+          application_name: ${{env.AWS_APPLICATION_NAME}}
+          aws_access_key: ${{secrets.WEBTEAM_AWS_ACCESS_KEY_ID}}
+          aws_secret_key: ${{secrets.WEBTEAM_AWS_SECRET_ACCESS_KEY}}
+          deployment_package: ${{env.AWS_BUILD_ZIP_PATH}}
+          environment_name: wire-webapp-acc
           region: eu-central-1
           use_existing_version_if_available: true
           version_description: ${{github.sha}}

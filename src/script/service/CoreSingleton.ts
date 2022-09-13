@@ -25,8 +25,17 @@ import {createStorageEngine, DatabaseTypes} from './StoreEngineProvider';
 import {isTemporaryClientAndNonPersistent} from 'Util/util';
 import {Config} from '../Config';
 
+declare global {
+  interface Window {
+    secretsCrypto?: {
+      decrypt: (value: Uint8Array) => Promise<Uint8Array>;
+      encrypt: (encrypted: Uint8Array) => Promise<Uint8Array>;
+    };
+  }
+}
+
 @singleton()
-export class Core extends Account {
+export class Core extends Account<Uint8Array> {
   constructor(apiClient = container.resolve(APIClient)) {
     super(apiClient, {
       createStore: (storeName, context) => {
@@ -36,7 +45,18 @@ export class Core extends Account {
 
         return createStorageEngine(storeName, dbType);
       },
-      enableMLS: Config.getConfig().FEATURE.ENABLE_MLS,
+      mlsConfig: Config.getConfig().FEATURE.ENABLE_MLS
+        ? {
+            coreCrypoWasmFilePath: '/min/core-crypto.wasm',
+            /*
+             * When in an electron context, the window.secretsCrypto will be populated by the renderer process.
+             * We then give those crypto primitives to the core that will use them when encrypting MLS secrets.
+             * When in an browser context, then this secretsCrypto will be undefined and the core will then use it's internal encryption system
+             */
+            keyingMaterialUpdateThreshold: Config.getConfig().FEATURE.MLS_CONFIG_KEYING_MATERIAL_UPDATE_THRESHOLD,
+            secretsCrypto: window.secretsCrypto,
+          }
+        : undefined,
       nbPrekeys: 100,
     });
   }

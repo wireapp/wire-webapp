@@ -72,7 +72,7 @@ export enum CallViewTab {
 }
 
 export const CallViewTabs: ButtonGroupTab[] = [
-  {getText: () => t('videoSpeakersTabSpeakers'), value: CallViewTab.SPEAKERS},
+  {getText: () => t('videoSpeakersTabSpeakers').toUpperCase(), value: CallViewTab.SPEAKERS},
   {getText: substitute => t('videoSpeakersTabAll', substitute), value: CallViewTab.ALL},
 ];
 

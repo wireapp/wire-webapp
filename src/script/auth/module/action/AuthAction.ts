@@ -361,6 +361,7 @@ export class AuthAction {
           throw new Error(`Could not find value for '${LocalStorageKey.AUTH.PERSIST}'`);
         }
         const clientType = persist ? ClientType.PERMANENT : ClientType.TEMPORARY;
+
         await core.init(clientType, undefined, false);
         await this.persistAuthData(clientType, core, dispatch, localStorageAction);
 

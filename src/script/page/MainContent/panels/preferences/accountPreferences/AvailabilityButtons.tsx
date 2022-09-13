@@ -45,7 +45,6 @@ const headerStyles: CSSObject = {
   lineHeight: '14px',
   margin: '37px 0 6px',
   padding: 0,
-  textTransform: 'uppercase',
 };
 
 const AvailabilityButtons: React.FC<AvailabilityInputProps> = ({availability}) => {
@@ -121,9 +120,9 @@ const AvailabilityButtons: React.FC<AvailabilityInputProps> = ({availability}) =
               })}
               key={item.availability}
               type="button"
-              onClick={() => item.click()}
+              onClick={() => item.click?.()}
             >
-              {icons[item.availability]}
+              {item.availability !== undefined && icons[item.availability]}
               {item.label}
             </button>
           );

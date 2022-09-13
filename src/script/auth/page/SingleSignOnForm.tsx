@@ -311,6 +311,7 @@ const SingleSignOnForm = ({
           }
           checked={clientType === ClientType.TEMPORARY}
           data-uie-name="enter-public-computer-sso-sign-in"
+          aligncenter
           style={{justifyContent: 'center', marginTop: '36px'}}
         >
           <CheckboxLabel htmlFor="">{_(loginStrings.publicComputer)}</CheckboxLabel>

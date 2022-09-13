@@ -27,7 +27,7 @@ import {PropertiesRepository} from '../../../../../properties/PropertiesReposito
 import {AppLockRepository} from '../../../../../user/AppLockRepository';
 import {formatDurationCaption} from 'Util/TimeUtil';
 import PreferencesSection from '../components/PreferencesSection';
-import PreferencesCheckbox from '../components/PreferencesCheckbox';
+import {Checkbox, CheckboxLabel} from '@wireapp/react-ui-kit';
 
 interface PrivacySectionProps {
   appLockRepository?: AppLockRepository;
@@ -52,28 +52,40 @@ const PrivacySection: React.FC<PrivacySectionProps> = ({
 
   return (
     <PreferencesSection hasSeparator className="preferences-section-privacy" title={t('preferencesAccountPrivacy')}>
-      <PreferencesCheckbox
-        checked={receiptMode === RECEIPT_MODE.ON}
-        onChange={checked =>
-          propertiesRepository.updateProperty(
-            PropertiesRepository.CONFIG.WIRE_RECEIPT_MODE.key,
-            checked ? RECEIPT_MODE.ON : RECEIPT_MODE.OFF,
-          )
-        }
-        label={t('preferencesAccountReadReceiptsCheckbox')}
-        details={t('preferencesAccountReadReceiptsDetail')}
-        uieName="status-preference-read-receipts"
-      />
-
+      <>
+        <Checkbox
+          onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+            const isChecked = event.target.checked;
+            propertiesRepository.updateProperty(
+              PropertiesRepository.CONFIG.WIRE_RECEIPT_MODE.key,
+              isChecked ? RECEIPT_MODE.ON : RECEIPT_MODE.OFF,
+            );
+          }}
+          checked={receiptMode === RECEIPT_MODE.ON}
+          data-uie-name="status-preference-read-receipts"
+        >
+          <CheckboxLabel htmlFor="status-preference-read-receipts">
+            {t('preferencesAccountReadReceiptsCheckbox')}
+          </CheckboxLabel>
+        </Checkbox>
+        <p className="preferences-detail preferences-detail-intended">{t('preferencesAccountReadReceiptsDetail')}</p>
+      </>
       {isAppLockAvailable && (
-        <PreferencesCheckbox
-          checked={isAppLockEnabled}
-          disabled={isAppLockEnforced}
-          onChange={checked => appLockRepository.setEnabled(checked)}
-          label={t('preferencesAccountAppLockCheckbox')}
-          details={t('preferencesAccountAppLockDetail', formatDurationCaption(appLockInactivityTimeoutSecs * 1000))}
-          uieName="status-preference-applock"
-        />
+        <div className="checkbox-margin">
+          <Checkbox
+            onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+              appLockRepository.setEnabled(event.target.checked);
+            }}
+            checked={isAppLockEnabled}
+            disabled={isAppLockEnforced}
+            data-uie-name="status-preference-applock"
+          >
+            <CheckboxLabel htmlFor="status-preference-applock">{t('preferencesAccountAppLockCheckbox')}</CheckboxLabel>
+          </Checkbox>
+          <p className="preferences-detail preferences-detail-intended">
+            {t('preferencesAccountAppLockDetail', formatDurationCaption(appLockInactivityTimeoutSecs * 1000))}
+          </p>
+        </div>
       )}
     </PreferencesSection>
   );

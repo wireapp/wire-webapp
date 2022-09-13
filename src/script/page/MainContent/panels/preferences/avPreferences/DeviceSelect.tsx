@@ -28,7 +28,7 @@ interface DeviceSelectProps {
   isRequesting?: boolean;
   onChange: (deviceId: string) => void;
   title: string;
-  uieName?: string;
+  uieName: string;
   value: string;
 }
 
@@ -59,15 +59,22 @@ const DeviceSelect: React.FC<DeviceSelectProps> = ({
       <div className="preferences-option-icon preferences-av-select-icon">
         <DeviceIcon />
       </div>
+
       <div css={{width: '550px'}}>
         <Select
           id={uieName}
-          onChange={onChange}
+          onChange={option => {
+            const currentOption = option?.value.toString();
+
+            if (currentOption) {
+              onChange(currentOption);
+            }
+          }}
           dataUieName={uieName}
           options={devicesList}
-          value={currentValue}
+          defaultValue={currentValue}
           label={title}
-          disabled={disabled}
+          isDisabled={disabled}
         />
       </div>
     </div>

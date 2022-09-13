@@ -30,10 +30,10 @@ import {t} from 'Util/LocalizerUtil';
 
 import {PropertiesRepository} from '../../../../properties/PropertiesRepository';
 import {UserState} from '../../../../user/UserState';
-import PreferencesCheckbox from './components/PreferencesCheckbox';
 import PreferencesSection from './components/PreferencesSection';
 import PreferencesRadio from './components/PreferencesRadio';
 import PreferencesPage from './components/PreferencesPage';
+import {Checkbox, CheckboxLabel} from '@wireapp/react-ui-kit';
 
 interface OptionPreferencesProps {
   propertiesRepository: PropertiesRepository;
@@ -129,6 +129,7 @@ const OptionPreferences: React.FC<OptionPreferencesProps> = ({
       {isActivatedAccount && (
         <>
           <hr className="preferences-separator" />
+
           <PreferencesSection title={t('preferencesOptionsNotifications')}>
             <PreferencesRadio
               name="preferences-options-notification"
@@ -154,39 +155,65 @@ const OptionPreferences: React.FC<OptionPreferencesProps> = ({
               ]}
             />
           </PreferencesSection>
+
           <hr className="preferences-separator" />
+
           <PreferencesSection title={t('preferencesOptionsPopular')}>
-            <PreferencesCheckbox
-              uieName="status-preference-use-dark-mode"
-              label={t('preferencesOptionsUseDarkMode')}
+            <Checkbox
+              onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                saveOptionNewTheme(event.target.checked);
+              }}
               checked={optionDarkMode}
-              onChange={newOptionDarkMode => saveOptionNewTheme(newOptionDarkMode)}
-            />
-            <PreferencesCheckbox
-              uieName="status-preference-emoji-replace"
-              label={t('preferencesOptionsEmojiReplaceCheckbox')}
-              checked={optionReplaceInlineEmoji}
-              onChange={newOptionReplaceInlineEmoji => saveOptionEmojiPreference(newOptionReplaceInlineEmoji)}
-              details={
-                <div
-                  aria-hidden="true"
-                  dangerouslySetInnerHTML={{
-                    __html: t(
-                      'preferencesOptionsEmojiReplaceDetail',
-                      {},
-                      {icon: "<span class='font-size-xs icon-emoji'></span>"},
-                    ),
-                  }}
-                />
-              }
-            />
-            <PreferencesCheckbox
-              uieName="status-preference-previews-send"
-              label={t('preferencesOptionsPreviewsSendCheckbox')}
-              checked={optionSendPreviews}
-              onChange={newOptionSendPreviews => saveOptionSendPreviewsPreference(newOptionSendPreviews)}
-              details={t('preferencesOptionsPreviewsSendDetail')}
-            />
+              data-uie-name="status-preference-use-dark-mode"
+            >
+              <CheckboxLabel htmlFor="status-preference-use-dark-mode">
+                {t('preferencesOptionsUseDarkMode')}
+              </CheckboxLabel>
+            </Checkbox>
+
+            <div className="checkbox-margin">
+              <Checkbox
+                onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                  saveOptionEmojiPreference(event.target.checked);
+                }}
+                checked={optionReplaceInlineEmoji}
+                data-uie-name="status-preference-emoji-replace"
+              >
+                <CheckboxLabel htmlFor="status-preference-emoji-replace">
+                  {t('preferencesOptionsEmojiReplaceCheckbox')}
+                </CheckboxLabel>
+              </Checkbox>
+
+              <div
+                className="preferences-detail preferences-detail-intended"
+                aria-hidden="true"
+                dangerouslySetInnerHTML={{
+                  __html: t(
+                    'preferencesOptionsEmojiReplaceDetail',
+                    {},
+                    {icon: "<span class='font-size-xs icon-emoji'></span>"},
+                  ),
+                }}
+              />
+            </div>
+
+            <div className="checkbox-margin">
+              <Checkbox
+                onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                  saveOptionSendPreviewsPreference(event.target.checked);
+                }}
+                checked={optionSendPreviews}
+                data-uie-name="status-preference-previews-send"
+              >
+                <CheckboxLabel htmlFor="status-preference-previews-send">
+                  {t('preferencesOptionsPreviewsSendCheckbox')}
+                </CheckboxLabel>
+              </Checkbox>
+
+              <div className="preferences-detail preferences-detail-intended">
+                {t('preferencesOptionsPreviewsSendDetail')}
+              </div>
+            </div>
           </PreferencesSection>
         </>
       )}

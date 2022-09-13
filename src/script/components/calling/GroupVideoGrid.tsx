@@ -27,7 +27,6 @@ import type {Grid} from '../../calling/videoGridHandler';
 import Video from './Video';
 import type {Participant} from '../../calling/Participant';
 import GroupVideoGridTile from './GroupVideoGridTile';
-import ParticipantMicOnIcon from './ParticipantMicOnIcon';
 import Avatar, {AVATAR_SIZE} from 'Components/Avatar';
 import {QualifiedId} from '@wireapp/api-client/src/user';
 
@@ -59,12 +58,12 @@ const GroupVideoThumbnailWrapper: React.FC<{children?: React.ReactNode; minimize
     css={
       minimized
         ? css`
-            top: unset;
+            top: 8px;
             right: 8px;
-            bottom: 8px;
-            width: 80px;
-            height: 60px;
-            box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.16);
+            bottom: unset;
+            width: 70px;
+            height: 40px;
+            box-shadow: 0 0 0 1px var(--gray-90);
           `
         : undefined
     }
@@ -107,17 +106,13 @@ const GroupVideoGrid: React.FunctionComponent<GroupVideoGripProps> = ({
     setRowsAndColumns(calculateRowsAndColumns(participants.length));
   }, [participants.length]);
 
-  const {isMuted: selfIsMuted, isActivelySpeaking: selfIsActivelySpeaking} = useKoSubscribableChildren(
-    selfParticipant,
-    ['isMuted', 'isActivelySpeaking'],
-  );
-  const {name: selfName} = useKoSubscribableChildren(selfParticipant?.user, ['name']);
+  const {isMuted: selfIsMuted} = useKoSubscribableChildren(selfParticipant, ['isMuted']);
 
   return (
     <div className="group-video">
       <div
         className="group-video-grid"
-        css={{backgroundColor: '#000'}}
+        css={{backgroundColor: 'var(--group-video-bg)'}}
         style={rowsAndColumns}
         data-uie-name="grids-wrapper"
       >
@@ -169,32 +164,11 @@ const GroupVideoGrid: React.FunctionComponent<GroupVideoGripProps> = ({
             }}
             srcObject={thumbnail.videoStream}
           />
-          <div className="group-video-grid__element__label" css={{padding: 4}}>
-            {selfIsMuted ? (
-              <span
-                className="group-video-grid__element__label__icon"
-                css={{'> svg': {width: 12}, height: 12}}
-                data-uie-name="status-call-audio-muted"
-              >
-                <Icon.MicOff data-uie-name="mic-icon-off" />
-              </span>
-            ) : (
-              <ParticipantMicOnIcon
-                isActive={selfIsActivelySpeaking}
-                className="group-video-grid__element__label__icon"
-                css={{'> svg': {width: 12}}}
-              />
-            )}
-            <span
-              data-uie-name={
-                selfIsActivelySpeaking ? 'status-active-speaking' : selfIsMuted ? 'status-audio-off' : 'status-audio-on'
-              }
-              className="group-video-grid__element__label__name"
-              css={{fontSize: 10}}
-            >
-              {selfName}
+          {selfIsMuted && !minimized && (
+            <span className="group-video-grid__element__label__icon" data-uie-name="status-call-audio-muted">
+              <Icon.MicOff data-uie-name="mic-icon-off" />
             </span>
-          </div>
+          )}
         </GroupVideoThumbnailWrapper>
       )}
       {!!grid.thumbnail && !thumbnail.hasActiveVideo && !!selfParticipant && (
@@ -208,6 +182,11 @@ const GroupVideoGrid: React.FunctionComponent<GroupVideoGripProps> = ({
               width: '100%',
             }}
           >
+            {selfIsMuted && !minimized && (
+              <span className="group-video-grid__element__label__icon" data-uie-name="status-call-audio-muted">
+                <Icon.MicOff data-uie-name="mic-icon-off" />
+              </span>
+            )}
             <Avatar
               avatarSize={minimized ? AVATAR_SIZE.SMALL : AVATAR_SIZE.MEDIUM}
               participant={selfParticipant.user}

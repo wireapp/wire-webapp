@@ -94,11 +94,11 @@ const GroupedConversations: React.FC<GroupedConversationsProps> = ({
     .filter(({conversations}) => !!conversations().length);
 
   const folders = [
-    favorites.length && createLabelFavorites(favorites),
-    groups.length && createLabelGroups(groups),
-    contacts.length && createLabelPeople(contacts),
+    ...(favorites.length > 0 ? [createLabelFavorites(favorites)] : []),
+    ...(groups.length > 0 ? [createLabelGroups(groups)] : []),
+    ...(contacts.length > 0 ? [createLabelPeople(contacts)] : []),
     ...custom,
-  ].filter(Boolean);
+  ];
 
   return (
     <ul className="conversation-folder-list">

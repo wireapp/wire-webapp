@@ -46,6 +46,7 @@ export interface ServerConfig {
       ENABLE_PHONE_LOGIN: boolean;
       ENABLE_SSO: boolean;
       ENFORCE_CONSTANT_BITRATE: boolean;
+      MLS_CONFIG_KEYING_MATERIAL_UPDATE_THRESHOLD: number;
       PERSIST_TEMPORARY_CLIENTS: boolean;
       SHOW_LOADING_INFORMATION: boolean;
     };
@@ -69,6 +70,7 @@ export interface ServerConfig {
         INDEX: string;
         LEGAL_HOLD_BLOCK: string;
         MICROPHONE_ACCESS_DENIED: string;
+        PRIVACY_VERIFY_FINGERPRINT: string;
         SCREEN_ACCESS_DENIED: string;
       };
       TEAMS_BASE: string;

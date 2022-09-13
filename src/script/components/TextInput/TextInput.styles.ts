@@ -54,13 +54,13 @@ export const getInputCSS = (disabled?: boolean, borderColor?: string): CSSObject
     color: 'var(--text-input-placeholder)',
   },
   '&:hover': {
-    borderColor: !disabled && 'var(--text-input-border-hover)',
+    borderColor: !disabled ? 'var(--text-input-border-hover)' : undefined,
   },
   '&:focus, &:focus-visible, &:active': {
     '& + label': {
-      color: !disabled && 'var(--accent-color-500)',
+      color: !disabled ? 'var(--accent-color-500)' : undefined,
     },
-    borderColor: !disabled && 'var(--accent-color-500)',
+    borderColor: !disabled ? 'var(--accent-color-500)' : undefined,
   },
   ':-ms-input-placeholder': {
     // Internet Explorer 10-11

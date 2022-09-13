@@ -146,24 +146,45 @@ body.theme-dark {
     text-align: left;
     transition: background-color 0.15s ease-in-out;
 
-    &:hover {
+    &::after {
+      position: absolute;
+      right: 0;
+      bottom: 0;
+      left: @left-list-item-left-width;
+      height: 1px;
+      background-color: var(--border-color);
+      content: '';
+    }
+
+    &--active:after {
+      opacity: 0;
+    }
+
+    &:hover,
+    &:focus-visible,
+    &--active:focus-visible {
       background: @white;
+      color: @black;
+    }
+
+    &:focus-visible,
+    &--active:focus-visible {
+      outline: 1px solid var(--accent-color);
+      outline-offset: -2px;
+
+      .left-column-icon > svg {
+        fill: @black;
+      }
     }
 
     &--active,
     &--active:hover {
-      border-bottom-width: 0 !important;
       background-color: var(--accent-color);
       color: @white;
 
       .left-column-icon > svg {
         fill: @white;
       }
-    }
-
-    &--active > .center-column,
-    &:hover .center-column {
-      border-bottom-width: 0 !important;
     }
   }
 
@@ -188,7 +209,6 @@ body.theme-dark {
     height: 100%;
     flex: 1 1;
     align-items: center;
-    border-bottom: 1px solid var(--gray-40);
     margin-right: -8px;
     cursor: pointer;
     font-weight: @font-weight-medium;
@@ -246,13 +266,24 @@ body.theme-dark {
   }
 
   .left-list-item-button {
-    &:hover {
-      background: @gray-95;
+    &:hover,
+    &:focus-visible,
+    &--active:focus-visible {
+      background: @black;
+      color: @white;
     }
+    &:focus-visible,
+    &--active:focus-visible {
+      outline: 1px solid var(--accent-color);
+      outline-offset: -2px;
 
+      .left-column-icon > svg {
+        fill: @white;
+      }
+    }
     &--active,
     &--active:hover {
-      background-color: var(--accent-color-600) !important;
+      background-color: var(--accent-color-600);
       color: var(--black);
 
       .left-column-icon > svg {

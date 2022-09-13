@@ -23,6 +23,7 @@ import type {User} from '../entity/User';
 import {MAX_HANDLE_LENGTH} from '../user/UserHandleGenerator';
 import {isEnterKey, isRemovalAction} from 'Util/KeyboardUtil';
 import Icon from 'Components/Icon';
+import {t} from 'Util/LocalizerUtil';
 
 export interface SearchInputProps {
   enter?: () => void | Promise<void>;
@@ -44,15 +45,17 @@ const SearchInput: React.FC<SearchInputProps> = ({
   setInput,
   forceDark,
 }: SearchInputProps) => {
-  const innerElement = useRef<HTMLDivElement>();
-  const inputElement = useRef<HTMLInputElement>();
+  const innerElement = useRef<HTMLDivElement>(null);
+  const inputElement = useRef<HTMLInputElement>(null);
 
   const emptyInput = input.length === 0;
   const noSelectedUsers = selectedUsers.length === 0;
 
   useLayoutEffect(() => {
-    inputElement.current.focus();
-    innerElement.current.scrollTop = inputElement.current.scrollHeight;
+    if (inputElement.current && innerElement.current) {
+      inputElement.current.focus();
+      innerElement.current.scrollTop = inputElement.current.scrollHeight;
+    }
   }, [selectedUsers.length]);
 
   useEffect(() => {
@@ -89,7 +92,11 @@ const SearchInput: React.FC<SearchInputProps> = ({
             aria-label={placeholder}
           />
           {input && (
-            <button className="search-input-cancel" onClick={() => setInput('')}>
+            <button
+              className="search-input-cancel"
+              onClick={() => setInput('')}
+              aria-label={t('accessibility.searchInput.cancel')}
+            >
               <Icon.Close css={{fill: 'var(--text-input-background)', height: 8, width: 8}} />
             </button>
           )}
