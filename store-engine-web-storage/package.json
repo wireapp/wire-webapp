@@ -18,7 +18,7 @@
     "!src/**/!(*.d).ts"
   ],
   "license": "GPL-3.0",
-  "main": "src/LocalStorageEngine",
+  "main": "src/WebStorageEngine",
   "name": "@wireapp/store-engine-web-storage",
   "peerDependencies": {
     "@wireapp/store-engine": "4.x.x"
