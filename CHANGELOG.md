@@ -3,6 +3,22 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [30.6.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/compare/@wireapp/core@30.5.2...@wireapp/core@30.6.0) (2022-09-13)
+
+
+### Bug Fixes
+
+* restore initial getAllParticipantsClients ([#4388](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/issues/4388)) ([614b908](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/commit/614b908e2a2410c4d6cb1510bd66d03d0d609c84))
+
+
+### Features
+
+* add fetchAllParticipantsClients method for MLS conversations ([#4389](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/issues/4389)) ([e3e0a3d](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/commit/e3e0a3d00ce52d3ff9f2637f8e0ca655551a23fd))
+
+
+
+
+
 ## [30.5.2](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/compare/@wireapp/core@30.5.1...@wireapp/core@30.5.2) (2022-09-12)
 
 **Note:** Version bump only for package @wireapp/core
