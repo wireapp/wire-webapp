@@ -110,6 +110,6 @@ export const mlsConversationState = createVanilla<StoreState>((set, get) => {
 /**
  * react hook to manipulate the MLS conversation state
  */
-export const useMLSConversationState = create<StoreState>(mlsConversationState);
+export const useMLSConversationState = create(mlsConversationState);
 
 mlsConversationState.subscribe(saveState);
