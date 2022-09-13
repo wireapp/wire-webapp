@@ -53,7 +53,7 @@ const logger = logdown('Demo', {
 });
 logger.state.isEnabled = true;
 
-logger.log(`Using "process.env.WIRE_EMAIL": ${WIRE_EMAIL}`);
+logger.log(`Using account "process.env.WIRE_EMAIL": ${WIRE_EMAIL}`);
 
 async function createContext(storeEngine: CRUDEngine, apiClient: APIClient, loginData: LoginData): Promise<Context> {
   try {
