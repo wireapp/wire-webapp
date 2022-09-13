@@ -752,6 +752,32 @@ export class ConversationService {
     });
   }
 
+  /**
+   * Get a fresh list from backend of clients for all the participants of the conversation.
+   * @fixme there are some case where this method is not enough to detect removed devices
+   * @param {string} conversationId
+   * @param {string} conversationDomain? - If given will send the message to the new qualified endpoint
+   */
+  public async fetchAllParticipantsClients(
+    conversationId: string,
+    conversationDomain?: string,
+  ): Promise<UserClients | QualifiedUserClients> {
+    const qualifiedMembers = await this.getConversationQualifiedMembers(
+      conversationDomain ? {id: conversationId, domain: conversationDomain} : conversationId,
+    );
+    const allClients = await this.apiClient.api.user.postListClients({qualified_users: qualifiedMembers});
+    const qualifiedUserClients: QualifiedUserClients = {};
+
+    Object.entries(allClients.qualified_user_map).map(([domain, userClientMap]) =>
+      Object.entries(userClientMap).map(async ([userId, clients]) => {
+        qualifiedUserClients[domain] ||= {};
+        qualifiedUserClients[domain][userId] = clients.map(client => client.id);
+      }),
+    );
+
+    return qualifiedUserClients;
+  }
+
   public async deleteMessageLocal(
     conversationId: string,
     messageIdToHide: string,
