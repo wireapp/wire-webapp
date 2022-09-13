@@ -128,6 +128,7 @@ import {ClientState} from '../client/ClientState';
 import {MLSReturnType} from '@wireapp/core/src/main/conversation';
 import {isMemberMessage} from '../guards/Message';
 import {LEAVE_CALL_REASON} from '../calling/enum/LeaveCallReason';
+import {mlsConversationState} from '../mls/mlsConversationState';
 
 type ConversationDBChange = {obj: EventRecord; oldObj: EventRecord};
 type FetchPromise = {rejectFn: (error: ConversationError) => void; resolveFn: (conversation: Conversation) => void};
@@ -424,7 +425,8 @@ export class ConversationRepository {
        * Needs to be done to receive the latest epoch and avoid epoch mismatch errors
        */
       let response: MLSReturnType;
-      if (payload.protocol === ConversationProtocol.MLS) {
+      const isMLSConversation = payload.protocol === ConversationProtocol.MLS;
+      if (isMLSConversation) {
         response = await this.core.service!.conversation.createMLSConversation(payload);
       } else {
         response = {conversation: await this.core.service!.conversation.createProteusConversation(payload), events: []};
@@ -443,6 +445,10 @@ export class ConversationRepository {
         time: new Date().toISOString(),
         type: CONVERSATION_EVENT.CREATE,
       });
+      if (isMLSConversation) {
+        // since we are the creator of the conversation, we can safely mark it as established
+        mlsConversationState.getState().markAsEstablished(conversationEntity.id);
+      }
       return conversationEntity;
     } catch (error) {
       this.handleConversationCreateError(
@@ -2441,6 +2447,14 @@ export class ConversationRepository {
 
     const qualifiedUserIds =
       eventData.users?.map(user => user.qualified_id) || eventData.user_ids.map(userId => ({domain: '', id: userId}));
+
+    if (
+      !mlsConversationState.getState().isEstablished(conversationEntity.id) &&
+      (await this.core.service!.conversation.isMLSConversationEstablished(conversationEntity.groupId))
+    ) {
+      // If the conversation was not previously marked as established and the core if aware of this conversation, we can mark is as established
+      mlsConversationState.getState().markAsEstablished(conversationEntity.id);
+    }
 
     return updateSequence
       .then(() => this.updateParticipatingUserEntities(conversationEntity, false, true))

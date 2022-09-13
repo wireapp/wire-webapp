@@ -71,6 +71,7 @@ import {ConversationState} from 'src/script/conversation/ConversationState';
 import {AssetService} from 'src/script/assets/AssetService';
 import {entities} from '../api/payloads';
 import {createStorageEngine, DatabaseTypes} from 'src/script/service/StoreEngineProvider';
+import {Core} from 'src/script/service/CoreSingleton';
 
 export class TestFactory {
   constructor() {
@@ -302,6 +303,8 @@ export class TestFactory {
       this.team_repository['teamState'],
       clientState,
     );
+    const core = container.resolve(Core);
+    core.initServices({clientType: ClientType.NONE, userId: 'userID'});
     this.conversation_repository = new ConversationRepository(
       this.conversation_service,
       this.message_repository,
@@ -314,6 +317,7 @@ export class TestFactory {
       this.user_repository['userState'],
       this.team_repository['teamState'],
       conversationState,
+      core,
     );
 
     return this.conversation_repository;
