@@ -225,14 +225,17 @@ export class Account<T = any> extends EventEmitter {
     // Assumption: client gets only initialized once
     if (initClient) {
       await this.initClient({clientType});
-      // initialize schedulers for pending mls proposals once client is initialized
-      await this.service?.notification.checkExistingPendingProposals();
 
-      // initialize schedulers for renewing key materials
-      await this.service?.notification.checkForKeyMaterialsUpdate();
+      if (this.mlsConfig) {
+        // initialize schedulers for pending mls proposals once client is initialized
+        await this.service?.notification.checkExistingPendingProposals();
 
-      // initialize scheduler for syncing key packages with backend
-      await this.service?.notification.checkForKeyPackagesBackendSync();
+        // initialize schedulers for renewing key materials
+        await this.service?.notification.checkForKeyMaterialsUpdate();
+
+        // initialize scheduler for syncing key packages with backend
+        await this.service?.notification.checkForKeyPackagesBackendSync();
+      }
     }
     return context;
   }
