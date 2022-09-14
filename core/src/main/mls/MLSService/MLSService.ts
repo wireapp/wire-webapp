@@ -31,7 +31,7 @@ import {
   ProposalArgs,
   ProposalType,
   RemoveProposalArgs,
-} from '@wireapp/core-crypto/platforms/web/corecrypto';
+} from '@wireapp/core-crypto';
 import {APIClient} from '@wireapp/api-client';
 import {QualifiedUsers} from '../../conversation';
 import {Converter, Decoder, Encoder} from 'bazinga64';
@@ -59,7 +59,7 @@ export class MLSService {
     return client;
   }
 
-  private async uploadCommitBundle(groupIdDecodedFromBase64: Uint8Array, commitBundle: CommitBundle) {
+  private async uploadCommitBundle(groupId: Uint8Array, commitBundle: CommitBundle) {
     const coreCryptoClient = this.getCoreCryptoClient();
 
     if (commitBundle.welcome) {
@@ -67,33 +67,26 @@ export class MLSService {
       await this.apiClient.api.conversation.postMlsWelcomeMessage(optionalToUint8Array(commitBundle.welcome));
     }
     if (commitBundle.commit) {
-      const messageResponse = await this.apiClient.api.conversation.postMlsMessage(
-        //@todo: it's temporary - we wait for core-crypto fix to return the actual Uint8Array instead of regular array
-        optionalToUint8Array(commitBundle.commit),
-      );
-      await coreCryptoClient.commitAccepted(groupIdDecodedFromBase64);
-      return messageResponse;
+      try {
+        const messageResponse = await this.apiClient.api.conversation.postMlsMessage(
+          //@todo: it's temporary - we wait for core-crypto fix to return the actual Uint8Array instead of regular array
+          optionalToUint8Array(commitBundle.commit),
+        );
+        await coreCryptoClient.commitAccepted(groupId);
+        return messageResponse;
+      } catch (error) {
+        await coreCryptoClient.clear_pending_commit(groupId);
+        return null;
+      }
     }
     return null;
   }
 
-  public async addUsersToExistingConversation(groupIdDecodedFromBase64: Uint8Array, invitee: Invitee[]) {
+  public async addUsersToExistingConversation(groupId: Uint8Array, invitee: Invitee[]) {
     const coreCryptoClient = this.getCoreCryptoClient();
-    const memberAddedMessages = await coreCryptoClient.addClientsToConversation(groupIdDecodedFromBase64, invitee);
+    const memberAddedMessages = await coreCryptoClient.addClientsToConversation(groupId, invitee);
 
-    if (memberAddedMessages?.welcome) {
-      //@todo: it's temporary - we wait for core-crypto fix to return the actual Uint8Array instead of regular array
-      await this.apiClient.api.conversation.postMlsWelcomeMessage(optionalToUint8Array(memberAddedMessages.welcome));
-    }
-    if (memberAddedMessages?.commit) {
-      const messageResponse = await this.apiClient.api.conversation.postMlsMessage(
-        //@todo: it's temporary - we wait for core-crypto fix to return the actual Uint8Array instead of regular array
-        optionalToUint8Array(memberAddedMessages.commit),
-      );
-      await coreCryptoClient.commitAccepted(groupIdDecodedFromBase64);
-      return messageResponse;
-    }
-    return null;
+    return this.uploadCommitBundle(groupId, memberAddedMessages);
   }
 
   public async getKeyPackagesPayload(qualifiedUsers: QualifiedUsers[]) {
