@@ -119,6 +119,11 @@ const CallingContainer: React.FC<CallingContainerProps> = ({
     callingRepository.refreshVideoInput();
   };
 
+  const switchMicrophoneInput = (call: Call, deviceId: string) => {
+    mediaDevicesHandler.currentDeviceId.audioInput(deviceId);
+    callingRepository.refreshAudioInput();
+  };
+
   const toggleCamera = (call: Call) => {
     callingRepository.toggleCamera(call);
   };
@@ -181,6 +186,7 @@ const CallingContainer: React.FC<CallingContainerProps> = ({
           muteState={muteState}
           isChoosingScreen={isChoosingScreen}
           switchCameraInput={switchCameraInput}
+          switchMicrophoneInput={switchMicrophoneInput}
           setMaximizedParticipant={setMaximizedParticipant}
           setActiveCallViewTab={setActiveCallViewTab}
           toggleMute={toggleMute}

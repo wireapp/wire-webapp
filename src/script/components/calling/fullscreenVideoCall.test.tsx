@@ -47,6 +47,7 @@ describe('fullscreenVideoCall', () => {
       isMuted: false,
       mediaDevicesHandler: {
         availableDevices: {
+          audioInput: ko.observableArray(),
           videoInput: ko.observableArray(),
         },
         currentDeviceId: {

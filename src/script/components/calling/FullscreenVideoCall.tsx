@@ -66,6 +66,7 @@ export interface FullscreenVideoCallProps {
   setActiveCallViewTab: (tab: string) => void;
   setMaximizedParticipant: (call: Call, participant: Participant) => void;
   switchCameraInput: (call: Call, deviceId: string) => void;
+  switchMicrophoneInput: (call: Call, deviceId: string) => void;
   teamState?: TeamState;
   toggleCamera: (call: Call) => void;
   toggleMute: (call: Call, muteState: boolean) => void;
@@ -86,6 +87,7 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
   maximizedParticipant,
   activeCallViewTab,
   switchCameraInput,
+  switchMicrophoneInput,
   setMaximizedParticipant,
   setActiveCallViewTab,
   toggleMute,
@@ -132,6 +134,17 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
     [videoInput],
   );
   const showSwitchCamera = availableCameras.length > 1;
+
+  const {audioInput: currentMicrophoneDevice} = useKoSubscribableChildren(mediaDevicesHandler.currentDeviceId, [
+    DeviceTypes.AUDIO_INPUT,
+  ]);
+  const {audioInput} = useKoSubscribableChildren(mediaDevicesHandler.availableDevices, [DeviceTypes.AUDIO_INPUT]);
+  const availableMicrophones = useMemo(
+    () =>
+      audioInput.map(device => (device as MediaDeviceInfo).deviceId || (device as ElectronDesktopCapturerSource).id),
+    [audioInput],
+  );
+  const showSwitchMicrophone = availableMicrophones.length > 1;
 
   const [hasUnreadMessages, setHasUnreadMessages] = useState(false);
   const updateUnreadCount = (unreadCount: number) => setHasUnreadMessages(unreadCount > 0);
@@ -303,6 +316,20 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
                   </span>
 
                   {isMuted ? <Icon.MicOff width={16} height={16} /> : <Icon.MicOn width={16} height={16} />}
+
+                  {showSwitchMicrophone && (
+                    <DeviceToggleButton
+                      styles={css`
+                        position: absolute;
+                        bottom: -38px;
+                        left: 50%;
+                        transform: translateX(-50%);
+                      `}
+                      currentDevice={currentMicrophoneDevice}
+                      devices={availableMicrophones}
+                      onChooseDevice={deviceId => switchMicrophoneInput(call, deviceId)}
+                    />
+                  )}
                 </button>
               </li>
 
