@@ -26,13 +26,11 @@ import React, {useEffect, useMemo, useState} from 'react';
 import {TeamState} from '../../team/TeamState';
 import {container} from 'tsyringe';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
-import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 import type {Call} from '../../calling/Call';
 import type {Participant} from '../../calling/Participant';
 import type {Grid} from '../../calling/videoGridHandler';
 import type {Conversation} from '../../entity/Conversation';
 import {MuteState} from '../../calling/CallState';
-import useHideElement from '../../hooks/useHideElement';
 import {DeviceTypes, ElectronDesktopCapturerSource, MediaDevicesHandler} from '../../media/MediaDevicesHandler';
 import type {Multitasking} from '../../notification/NotificationRepository';
 import {t} from '../../util/LocalizerUtil';
@@ -74,10 +72,6 @@ export interface FullscreenVideoCallProps {
   toggleScreenshare: (call: Call) => void;
   videoGrid: Grid;
 }
-
-const FullscreenVideoCallConfig = {
-  HIDE_CONTROLS_TIMEOUT: TIME_IN_MILLIS.SECOND * 4,
-};
 
 const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
   call,
@@ -138,7 +132,6 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
     [videoInput],
   );
   const showSwitchCamera = selfSharesCamera && availableCameras.length > 1;
-  const setWrapper = useHideElement(FullscreenVideoCallConfig.HIDE_CONTROLS_TIMEOUT, 'video-controls__button');
 
   const [hasUnreadMessages, setHasUnreadMessages] = useState(false);
   const updateUnreadCount = (unreadCount: number) => setHasUnreadMessages(unreadCount > 0);
@@ -171,7 +164,7 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
   }, []);
 
   return (
-    <div id="video-calling" className="video-calling" ref={setWrapper}>
+    <div id="video-calling" className="video-calling">
       <div id="video-title" className="video-title">
         {classifiedDomains && (
           <ClassifiedBar

@@ -23,6 +23,14 @@ import {createRandomUuid} from 'Util/util';
 import {ServiceEntity} from '../integration/ServiceEntity';
 import ServiceList, {ServiceListProps} from './ServiceList';
 
+jest.mock(
+  'Components/utils/InViewport',
+  () =>
+    function MockInViewport() {
+      return <div></div>;
+    },
+);
+
 class ServiceListPage extends TestPage<ServiceListProps> {
   constructor(props?: ServiceListProps) {
     super(ServiceList, props);

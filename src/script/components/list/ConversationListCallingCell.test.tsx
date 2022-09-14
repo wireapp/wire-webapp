@@ -35,6 +35,14 @@ import {CallingRepository} from 'src/script/calling/CallingRepository';
 import {TeamState} from 'src/script/team/TeamState';
 import {waitFor} from '@testing-library/react';
 
+jest.mock(
+  'Components/utils/InViewport',
+  () =>
+    function MockInViewport() {
+      return <div></div>;
+    },
+);
+
 class ConversationListCallingCellPage extends TestPage<CallingCellProps> {
   constructor(props?: CallingCellProps) {
     super(ConversationListCallingCell, props);
@@ -47,11 +55,7 @@ class ConversationListCallingCellPage extends TestPage<CallingCellProps> {
   getCallDuration = () => this.get('[data-uie-name="call-duration"]');
 }
 
-const createCall = (
-  state: CALL_STATE,
-  selfUser = new User(createRandomUuid(), null),
-  selfClientId = createRandomUuid(),
-) => {
+const createCall = (state: CALL_STATE, selfUser = new User(createRandomUuid()), selfClientId = createRandomUuid()) => {
   const selfParticipant = new Participant(selfUser, selfClientId);
   const call = new Call({domain: '', id: ''}, {domain: '', id: ''}, 0, selfParticipant, CALL_TYPE.NORMAL, {
     currentAvailableDeviceId: {
@@ -72,7 +76,7 @@ const createProps = async () => {
   jest.spyOn(mockTeamState, 'isExternal').mockReturnValue(false);
 
   const conversation = new Conversation();
-  conversation.participating_user_ets([new User('id', null)]);
+  conversation.participating_user_ets([new User('id')]);
   return {
     call: createCall(CALL_STATE.MEDIA_ESTAB),
     callActions: {} as CallActions,
@@ -125,12 +129,12 @@ describe('ConversationListCallingCell', () => {
     });
     await waitFor(() => callingCellPage.renderResults.getByText('00:00'));
 
-    expect(callingCellPage.getCallDuration().textContent).toBe('00:00');
+    expect(callingCellPage.getCallDuration()?.textContent).toBe('00:00');
     act(() => {
       jest.advanceTimersByTime(10000);
     });
 
-    expect(callingCellPage.getCallDuration().textContent).toBe('00:10');
+    expect(callingCellPage.getCallDuration()?.textContent).toBe('00:10');
     jest.useRealTimers();
   });
 });
