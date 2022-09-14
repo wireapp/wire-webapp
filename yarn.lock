@@ -2069,11 +2069,6 @@
   resolved "https://registry.yarnpkg.com/@open-wc/webpack-import-meta-loader/-/webpack-import-meta-loader-0.4.7.tgz#d8212640a386a66bf06a2a4c101936467839b5a1"
   integrity sha512-F3d1EHRckk2+ZpgEEAgVITp8BU9DYLBhKOhNMREeQ1BwILRIhrt+V1bebpnd0Mz595jzd7Yh1wSibLsXibkCpg==
 
-"@otak/core-crypto@0.3.0-es2017":
-  version "0.3.0-es2017"
-  resolved "https://registry.yarnpkg.com/@otak/core-crypto/-/core-crypto-0.3.0-es2017.tgz#a221ab983cde8903af191844be94a98cdec152b1"
-  integrity sha512-tz4HNaghngCR1aBY+pFOxsmMP3ZLiWZLV3UIreuBRGUKV7JX4w9AcCUkMxmbTEitHuWstSnZCboJ67lNgkREFQ==
-
 "@protobufjs/aspromise@^1.1.1", "@protobufjs/aspromise@^1.1.2":
   version "1.1.2"
   resolved "https://registry.yarnpkg.com/@protobufjs/aspromise/-/aspromise-1.1.2.tgz#9b8b0cc663d669a7d8f6f5d0893a14d348f30fbf"
@@ -3234,17 +3229,22 @@
     logdown "3.3.1"
     rimraf "3.0.2"
 
-"@wireapp/core@30.7.0":
-  version "30.7.0"
-  resolved "https://registry.yarnpkg.com/@wireapp/core/-/core-30.7.0.tgz#2c66c6a16180786f31faab3bc0a68c105b823698"
-  integrity sha512-4bCeiisaXB8bxppP9vPXSc5ifCaNcSUKyVDl34Z5k/hnQ5u3s2EFukw9S/HKV1AHAA1zrTtAAwnZE/TPIITuXA==
+"@wireapp/core-crypto@0.4.0":
+  version "0.4.0"
+  resolved "https://registry.yarnpkg.com/@wireapp/core-crypto/-/core-crypto-0.4.0.tgz#62ae0b4976753a454d478b141cd4f08e5a8be95a"
+  integrity sha512-GIrzcbTdZ66dVXh+T56mhsoepTov6H5aQst40WFTGT20EnjubI5bV+w/PE8kegTRQcmDnZL2WQUQExDEwGK5aw==
+
+"@wireapp/core@30.7.1":
+  version "30.7.1"
+  resolved "https://registry.yarnpkg.com/@wireapp/core/-/core-30.7.1.tgz#ee27653b199ae7f843307dffdbe7904f60486580"
+  integrity sha512-Cva2227fmfjrue9BdbRERBpayHPyUOdE1cXtyStOdK1Srkgqp5vNng2oqyxFGRaX+6zA1kKJMFwC3zEo0E3n2g==
   dependencies:
     "@open-wc/webpack-import-meta-loader" "0.4.7"
-    "@otak/core-crypto" "0.3.0-es2017"
     "@types/long" "4.0.1"
     "@types/node" "~14"
     "@wireapp/api-client" "20.3.1"
     "@wireapp/commons" "4.3.0"
+    "@wireapp/core-crypto" "0.4.0"
     "@wireapp/cryptobox" "12.8.0"
     "@wireapp/store-engine-dexie" "1.6.10"
     bazinga64 "5.10.0"
