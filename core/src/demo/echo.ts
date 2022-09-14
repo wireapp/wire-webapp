@@ -339,6 +339,9 @@ const {WIRE_EMAIL, WIRE_PASSWORD, WIRE_BACKEND = 'staging'} = process.env;
       id: messageId,
     } = data;
 
+    if (!uploaded) {
+      throw new Error('asset not yet uploaded');
+    }
     const imageBuffer = await account.service.conversation.getAsset(uploaded);
 
     const image = {
