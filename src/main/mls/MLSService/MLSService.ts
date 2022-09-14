@@ -34,7 +34,7 @@ import {
 } from '@otak/core-crypto/platforms/web/corecrypto';
 import {APIClient} from '@wireapp/api-client';
 import {QualifiedUsers} from '../../conversation';
-import {Decoder, Encoder} from 'bazinga64';
+import {Converter, Decoder, Encoder} from 'bazinga64';
 import type {MLSConfig} from '../types';
 import {PostMlsMessageResponse} from '@wireapp/api-client/src/conversation';
 
@@ -176,5 +176,32 @@ export class MLSService {
 
   public async conversationExists(conversationId: ConversationId): Promise<boolean> {
     return this.getCoreCryptoClient().conversationExists(conversationId);
+  }
+
+  public async clientValidKeypackagesCount(): Promise<number> {
+    return this.getCoreCryptoClient().clientValidKeypackagesCount();
+  }
+
+  public async clientKeypackages(amountRequested: number): Promise<Uint8Array[]> {
+    return this.getCoreCryptoClient().clientKeypackages(amountRequested);
+  }
+
+  /**
+   * Will make the given client mls capable (generate and upload key packages)
+   *
+   * @param mlsClient Intance of the coreCrypto that represents the mls client
+   * @param clientId The id of the client
+   */
+  public async uploadMLSPublicKeys(publicKey: Uint8Array, clientId: string) {
+    return this.apiClient.api.client.putClient(clientId, {
+      mls_public_keys: {ed25519: btoa(Converter.arrayBufferViewToBaselineString(publicKey))},
+    });
+  }
+
+  public async uploadMLSKeyPackages(keypackages: Uint8Array[], clientId: string) {
+    return this.apiClient.api.client.uploadMLSKeyPackages(
+      clientId,
+      keypackages.map(keypackage => btoa(Converter.arrayBufferViewToBaselineString(keypackage))),
+    );
   }
 }

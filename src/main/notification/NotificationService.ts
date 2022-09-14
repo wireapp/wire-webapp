@@ -41,6 +41,7 @@ import {CommitPendingProposalsParams, HandlePendingProposalsParams, LastKeyMater
 import {TaskScheduler} from '../util/TaskScheduler/TaskScheduler';
 import type {MLSService} from '../mls';
 import {LowPrecisionTaskScheduler} from '../util/LowPrecisionTaskScheduler/LowPrecisionTaskScheduler';
+import {keyPackagesStatusStore} from '../mls/keyPackagesStatusStore/keyPackagesStatusStore';
 
 export type HandledEventPayload = {
   event: Events.BackendEvent;
@@ -54,6 +55,8 @@ enum TOPIC {
 }
 
 const DEFAULT_KEYING_MATERIAL_UPDATE_THRESHOLD = 1000 * 60 * 60 * 24 * 30; //30 days
+
+const INITIAL_NUMBER_OF_KEY_PACKAGES = 100;
 
 export type NotificationHandler = (
   notification: Notification,
@@ -507,7 +510,7 @@ export class NotificationService extends EventEmitter {
 
   /**
    * ## MLS only ##
-   * Get all pending proposals from the database and schedule them
+   * Get all keying material last update dates and schedule tasks for renewal
    * Function must only be called once, after application start
    *
    */
@@ -518,5 +521,55 @@ export class NotificationService extends EventEmitter {
     } catch (error) {
       this.logger.error('Could not get last key material update dates', error);
     }
+  }
+
+  private scheduleKeyPackagesSync(firingDate: number) {
+    TaskScheduler.addTask({
+      firingDate,
+      key: 'try-key-packages-backend-sync',
+      task: () => this.syncKeyPackages(),
+    });
+  }
+
+  private async syncKeyPackages() {
+    const validKeyPackagesCount = await this.mlsService.clientValidKeypackagesCount();
+
+    const lastQueryDate = new Date().getTime();
+
+    await keyPackagesStatusStore.saveState({lastQueryDate});
+
+    const minAllowedNumberOfKeyPackages = INITIAL_NUMBER_OF_KEY_PACKAGES / 2;
+
+    if (validKeyPackagesCount <= minAllowedNumberOfKeyPackages) {
+      const clientId = this.apiClient.validatedClientId;
+
+      //check numbers of keys on backend
+      const backendKeyPackagesCount = await this.apiClient.api.client.getMLSKeyPackageCount(clientId);
+
+      if (backendKeyPackagesCount <= minAllowedNumberOfKeyPackages) {
+        //upload new keys
+        const newKeyPackages = await this.mlsService.clientKeypackages(INITIAL_NUMBER_OF_KEY_PACKAGES);
+
+        await this.mlsService.uploadMLSKeyPackages(newKeyPackages, clientId);
+      }
+    }
+
+    //schedule new task after next 24h
+    const nextKeyPackagesQueryDate = lastQueryDate + TimeUtil.TimeInMillis.DAY;
+    this.scheduleKeyPackagesSync(nextKeyPackagesQueryDate);
+  }
+
+  /**
+   * ## MLS only ##
+   * Get date of last key packages count query and schedule a task to sync it with backend
+   * Function must only be called once, after application start
+   *
+   */
+  public async checkForKeyPackagesBackendSync() {
+    const {lastQueryDate} = keyPackagesStatusStore.getState();
+
+    //schedule a task lastKeyPackagesQueryDate + 24H
+    const nextKeyPackagesQueryDate = lastQueryDate + TimeUtil.TimeInMillis.DAY;
+    this.scheduleKeyPackagesSync(nextKeyPackagesQueryDate);
   }
 }
