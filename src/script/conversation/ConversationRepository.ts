@@ -36,8 +36,6 @@ import {
 
 import {
   DefaultConversationRoleName as DefaultRole,
-  CONVERSATION_ACCESS,
-  ACCESS_ROLE_V2,
   CONVERSATION_TYPE,
   NewConversation,
   Conversation as BackendConversation,
@@ -125,8 +123,12 @@ import {matchQualifiedIds} from 'Util/QualifiedId';
 import {ConversationVerificationState} from './ConversationVerificationState';
 import {extractClientDiff} from './ClientMismatchUtil';
 import {Core} from '../service/CoreSingleton';
+import {updateAccessRights} from './ConversationAccessPermission';
 import {ClientState} from '../client/ClientState';
 import {MLSReturnType} from '@wireapp/core/src/main/conversation';
+import {isMemberMessage} from '../guards/Message';
+import {LEAVE_CALL_REASON} from '../calling/enum/LeaveCallReason';
+import {mlsConversationState} from '../mls/mlsConversationState';
 
 type ConversationDBChange = {obj: EventRecord; oldObj: EventRecord};
 type FetchPromise = {rejectFn: (error: ConversationError) => void; resolveFn: (conversation: Conversation) => void};
@@ -141,7 +143,7 @@ export class ConversationRepository {
   public readonly conversationRoleRepository: ConversationRoleRepository;
   private readonly event_mapper: EventMapper;
   private readonly eventService: EventService;
-  public leaveCall: (conversationId: QualifiedId) => void;
+  public leaveCall: (conversationId: QualifiedId, reason: LEAVE_CALL_REASON) => void;
   private readonly receiving_queue: PromiseQueue;
   private readonly logger: Logger;
   public readonly stateHandler: ConversationStateHandler;
@@ -374,7 +376,7 @@ export class ConversationRepository {
   public async createGroupConversation(
     userEntities: User[],
     groupName?: string,
-    accessState?: string,
+    accessState?: ACCESS_STATE,
     options: Partial<NewConversation> = {},
   ): Promise<Conversation | undefined> {
     const userIds = userEntities.map(user => user.qualifiedId);
@@ -411,42 +413,9 @@ export class ConversationRepository {
       };
 
       if (accessState) {
-        let accessPayload;
+        const {accessModes: access, accessRole: access_role_v2} = updateAccessRights(accessState);
 
-        switch (accessState) {
-          case ACCESS_STATE.TEAM.GUEST_ROOM:
-            accessPayload = {
-              access: [CONVERSATION_ACCESS.INVITE, CONVERSATION_ACCESS.CODE],
-              access_role_v2: [ACCESS_ROLE_V2.GUEST, ACCESS_ROLE_V2.NON_TEAM_MEMBER, ACCESS_ROLE_V2.TEAM_MEMBER],
-            };
-            break;
-          case ACCESS_STATE.TEAM.TEAM_ONLY:
-            accessPayload = {
-              access: [CONVERSATION_ACCESS.INVITE],
-              access_role_v2: [ACCESS_ROLE_V2.TEAM_MEMBER],
-            };
-            break;
-          case ACCESS_STATE.TEAM.GUESTS_SERVICES:
-            accessPayload = {
-              access: [CONVERSATION_ACCESS.INVITE, CONVERSATION_ACCESS.CODE],
-              access_role_v2: [
-                ACCESS_ROLE_V2.GUEST,
-                ACCESS_ROLE_V2.NON_TEAM_MEMBER,
-                ACCESS_ROLE_V2.TEAM_MEMBER,
-                ACCESS_ROLE_V2.SERVICE,
-              ],
-            };
-            break;
-          case ACCESS_STATE.TEAM.SERVICES:
-            accessPayload = {
-              access: [CONVERSATION_ACCESS.INVITE],
-              access_role_v2: [ACCESS_ROLE_V2.TEAM_MEMBER, ACCESS_ROLE_V2.SERVICE],
-            };
-            break;
-        }
-        if (accessPayload) {
-          payload = {...payload, ...accessPayload};
-        }
+        payload = {...payload, access, access_role_v2};
       }
     }
 
@@ -456,7 +425,8 @@ export class ConversationRepository {
        * Needs to be done to receive the latest epoch and avoid epoch mismatch errors
        */
       let response: MLSReturnType;
-      if (payload.protocol === ConversationProtocol.MLS) {
+      const isMLSConversation = payload.protocol === ConversationProtocol.MLS;
+      if (isMLSConversation) {
         response = await this.core.service!.conversation.createMLSConversation(payload);
       } else {
         response = {conversation: await this.core.service!.conversation.createProteusConversation(payload), events: []};
@@ -475,6 +445,10 @@ export class ConversationRepository {
         time: new Date().toISOString(),
         type: CONVERSATION_EVENT.CREATE,
       });
+      if (isMLSConversation) {
+        // since we are the creator of the conversation, we can safely mark it as established
+        mlsConversationState.getState().markAsEstablished(conversationEntity.id);
+      }
       return conversationEntity;
     } catch (error) {
       this.handleConversationCreateError(
@@ -619,12 +593,13 @@ export class ConversationRepository {
 
     const mappedMessageEntities = await this.addEventsToConversation(events, conversationEntity);
     conversationEntity.hasAdditionalMessages(hasAdditionalMessages);
+
     if (!hasAdditionalMessages) {
-      const firstMessage = conversationEntity.getFirstMessage() as MemberMessage;
-      const checkCreationMessage = firstMessage?.isMember() && firstMessage.isCreation();
+      const firstMessage = conversationEntity.getFirstMessage();
+      const checkCreationMessage = isMemberMessage(firstMessage) && firstMessage?.isCreation();
       if (checkCreationMessage) {
-        const groupCreationMessageIn1to1 = conversationEntity.is1to1() && firstMessage.isGroupCreation();
-        const one2oneConnectionMessageInGroup = conversationEntity.isGroup() && firstMessage.isConnection();
+        const groupCreationMessageIn1to1 = conversationEntity.is1to1() && firstMessage?.isGroupCreation();
+        const one2oneConnectionMessageInGroup = conversationEntity.isGroup() && firstMessage?.isConnection();
         const wrongMessageTypeForConversation = groupCreationMessageIn1to1 || one2oneConnectionMessageInGroup;
 
         if (wrongMessageTypeForConversation) {
@@ -634,12 +609,12 @@ export class ConversationRepository {
           conversationEntity.hasCreationMessage = true;
         }
       }
-
       const addCreationMessage = !conversationEntity.hasCreationMessage;
       if (addCreationMessage) {
         this.addCreationMessage(conversationEntity, this.userState.self().isTemporaryGuest());
       }
     }
+
     return mappedMessageEntities;
   }
 
@@ -1483,7 +1458,7 @@ export class ConversationRepository {
 
     if (leaveConversation) {
       conversationEntity.status(ConversationStatus.PAST_MEMBER);
-      this.leaveCall(conversationEntity.qualifiedId);
+      this.leaveCall(conversationEntity.qualifiedId, LEAVE_CALL_REASON.USER_MANUALY_LEFT_CONVERSATION);
     }
 
     this.messageRepository.updateClearedTimestamp(conversationEntity);
@@ -1506,14 +1481,37 @@ export class ConversationRepository {
   }
 
   /**
-   * Remove member from conversation.
+   * Remove a member from a MLS conversation
    *
    * @param conversationEntity Conversation to remove member from
    * @param userId ID of member to be removed from the conversation
    * @returns Resolves when member was removed from the conversation
    */
-  public async removeMember(conversationEntity: Conversation, userId: QualifiedId) {
-    const response = await this.conversationService.deleteMembers(conversationEntity.qualifiedId, userId);
+  private async removeMemberFromMLSConversation(conversationEntity: Conversation, userId: QualifiedId) {
+    const {groupId, qualifiedId} = conversationEntity;
+    const {events} = await this.core.service!.conversation.removeUsersFromMLSConversation({
+      conversationId: qualifiedId,
+      groupId,
+      qualifiedUserIds: [userId],
+    });
+
+    if (!!events.length) {
+      events.forEach(event => this.eventRepository.injectEvent(event));
+    }
+  }
+
+  /**
+   * Remove a member from a Proteus conversation
+   *
+   * @param conversationEntity Conversation to remove member from
+   * @param userId ID of member to be removed from the conversation
+   * @returns Resolves when member was removed from the conversation
+   */
+  private async removeMemberFromProteusConversation(conversationEntity: Conversation, userId: QualifiedId) {
+    const response = await this.core.service!.conversation.removeUserFromProteusConversation(
+      conversationEntity.qualifiedId,
+      userId,
+    );
     const roles = conversationEntity.roles();
     delete roles[userId.id];
     conversationEntity.roles(roles);
@@ -1521,6 +1519,41 @@ export class ConversationRepository {
     const event = response || EventBuilder.buildMemberLeave(conversationEntity, userId, true, currentTimestamp);
     this.eventRepository.injectEvent(event, EventRepository.SOURCE.BACKEND_RESPONSE);
     return event;
+  }
+
+  /**
+   * Remove the current user from a Proteus conversation.
+   *
+   * @param conversationEntity Conversation to remove user from
+   * @param clearContent Should we clear the conversation content from the database?
+   * @returns Resolves when user was removed from the conversation
+   */
+  private async leaveProteusConversation(conversationEntity: Conversation, clearContent: boolean) {
+    return clearContent
+      ? this.clearConversation(conversationEntity, true)
+      : this.removeMemberFromProteusConversation(conversationEntity, this.userState.self().qualifiedId);
+  }
+
+  /**
+   * Umbrella function to remove a member from a conversation, no matter the protocol or type.
+   *
+   * @param conversationEntity Conversation to remove member from
+   * @param userId ID of member to be removed from the conversation
+   * @param clearContent Should we clear the conversation content from the database?
+   * @returns Resolves when member was removed from the conversation
+   */
+  public async removeMember(conversationEntity: Conversation, userId: QualifiedId, clearContent: boolean = false) {
+    const isUserLeaving = this.userState.self().qualifiedId.id === userId.id;
+    const isMLSConversation = conversationEntity.isUsingMLSProtocol;
+
+    if (isUserLeaving) {
+      //@todo leaveMLSConversation
+      return this.leaveProteusConversation(conversationEntity, clearContent);
+    }
+
+    return isMLSConversation
+      ? this.removeMemberFromMLSConversation(conversationEntity, userId)
+      : this.removeMemberFromProteusConversation(conversationEntity, userId);
   }
 
   /**
@@ -2415,6 +2448,15 @@ export class ConversationRepository {
     const qualifiedUserIds =
       eventData.users?.map(user => user.qualified_id) || eventData.user_ids.map(userId => ({domain: '', id: userId}));
 
+    if (
+      conversationEntity.groupId &&
+      !mlsConversationState.getState().isEstablished(conversationEntity.id) &&
+      (await this.core.service!.conversation.isMLSConversationEstablished(conversationEntity.groupId))
+    ) {
+      // If the conversation was not previously marked as established and the core if aware of this conversation, we can mark is as established
+      mlsConversationState.getState().markAsEstablished(conversationEntity.id);
+    }
+
     return updateSequence
       .then(() => this.updateParticipatingUserEntities(conversationEntity, false, true))
       .then(() => this.addEventToConversation(conversationEntity, eventJson))
@@ -2442,7 +2484,10 @@ export class ConversationRepository {
 
     if (removesSelfUser) {
       conversationEntity.status(ConversationStatus.PAST_MEMBER);
-      this.leaveCall(conversationEntity.qualifiedId);
+      this.leaveCall(
+        conversationEntity.qualifiedId,
+        LEAVE_CALL_REASON.USER_IS_REMOVED_BY_AN_ADMIN_OR_LEFT_ON_ANOTHER_CLIENT,
+      );
       if (this.userState.self().isTemporaryGuest()) {
         eventJson.from = this.userState.self().id;
       }
@@ -2906,8 +2951,7 @@ export class ConversationRepository {
       id: messageEntity.from,
     });
     messageEntity.user(userEntity);
-    const isMemberMessage = messageEntity.isMember();
-    if (isMemberMessage || messageEntity.hasOwnProperty('userEntities')) {
+    if (isMemberMessage(messageEntity) || messageEntity.hasOwnProperty('userEntities')) {
       return this.userRepository.getUsersById((messageEntity as MemberMessage).userIds()).then(userEntities => {
         userEntities.sort(sortUsersByPriority);
         (messageEntity as MemberMessage).userEntities(userEntities);

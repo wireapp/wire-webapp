@@ -254,10 +254,7 @@ export class ConversationService {
    * @param userId ID of member to be removed from the the conversation
    * @returns Resolves with the server response
    */
-  deleteMembers(
-    conversationId: string | QualifiedId,
-    userId: string | QualifiedId,
-  ): Promise<ConversationMemberLeaveEvent> {
+  deleteMembers(conversationId: QualifiedId, userId: QualifiedId): Promise<ConversationMemberLeaveEvent> {
     return this.apiClient.api.conversation.deleteMember(conversationId, userId);
   }
 

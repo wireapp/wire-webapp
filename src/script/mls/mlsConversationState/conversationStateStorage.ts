@@ -17,26 +17,28 @@
  *
  */
 
-import {useEffect, DependencyList} from 'react';
+import {MLSConversationState} from './mlsConversationState';
 
-const useScrollSync = (element: HTMLElement | null, targetElement: HTMLElement | null, deps?: DependencyList) => {
-  const syncScroll = () => {
-    if (element && targetElement) {
-      if (element?.scrollTop !== targetElement?.scrollTop) {
-        targetElement.scrollTop = element.scrollTop;
-      }
-    }
-  };
+const storageKey = 'mlsConversationsState';
 
-  useEffect(() => {
-    window.addEventListener('resize', syncScroll);
-    element?.addEventListener('scroll', syncScroll);
-
-    return () => {
-      window.removeEventListener('resize', syncScroll);
-      element?.removeEventListener('scroll', syncScroll);
+export const loadState = (): MLSConversationState => {
+  const storedState = localStorage.getItem(storageKey);
+  if (!storedState) {
+    return {
+      established: new Set(),
+      pendingWelcome: new Set(),
     };
-  }, deps);
+  }
+  const parsedState = JSON.parse(storedState);
+  return {
+    established: new Set(parsedState.established),
+    pendingWelcome: new Set(parsedState.pendingWelcome),
+  };
 };
 
-export default useScrollSync;
+export const saveState = ({established, pendingWelcome}: MLSConversationState) => {
+  localStorage.setItem(
+    storageKey,
+    JSON.stringify({established: [...established], pendingWelcome: [...pendingWelcome]}),
+  );
+};

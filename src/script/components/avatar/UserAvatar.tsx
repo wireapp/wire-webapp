@@ -60,49 +60,34 @@ const UserAvatar: React.FunctionComponent<UserAvatarProps> = ({
 }) => {
   const isImageGrey = !noFilter && [STATE.BLOCKED, STATE.IGNORED, STATE.PENDING, STATE.UNKNOWN].includes(state);
   const backgroundColor = state === STATE.UNKNOWN ? COLOR.GRAY : undefined;
-  const {
-    mediumPictureResource,
-    previewPictureResource,
-    accent_color: accentColor,
-    name,
-    initials,
-  } = useKoSubscribableChildren(participant, [
+  const {mediumPictureResource, previewPictureResource} = useKoSubscribableChildren(participant, [
     'mediumPictureResource',
     'previewPictureResource',
-    'accent_color',
-    'name',
-    'initials',
   ]);
-  const avatarImgAlt = avatarAlt ? avatarAlt : `${t('userProfileImageAlt')} ${name}`;
+  const avatarImgAlt = avatarAlt ? avatarAlt : `${t('userProfileImageAlt')} ${participant.name()}`;
 
   return (
     <AvatarWrapper
       avatarSize={avatarSize}
-      color={accentColor}
+      color={participant.accent_color()}
       data-uie-name="element-avatar-user"
       data-uie-value={participant.id}
       data-uie-status={state}
       onClick={onClick}
-      title={name}
+      title={participant.name()}
       {...props}
     >
       <AvatarBackground backgroundColor={backgroundColor} />
-
-      {initials && <AvatarInitials avatarSize={avatarSize} initials={initials} />}
-
-      <div tabIndex={0} role="button">
-        <AvatarImage
-          avatarSize={avatarSize}
-          avatarAlt={avatarImgAlt}
-          backgroundColor={backgroundColor}
-          isGrey={isImageGrey}
-          mediumPicture={mediumPictureResource}
-          previewPicture={previewPictureResource}
-        />
-      </div>
-
+      <AvatarInitials avatarSize={avatarSize} initials={participant.initials()} />
+      <AvatarImage
+        avatarSize={avatarSize}
+        avatarAlt={avatarImgAlt}
+        backgroundColor={backgroundColor}
+        isGrey={isImageGrey}
+        mediumPicture={mediumPictureResource}
+        previewPicture={previewPictureResource}
+      />
       {!noBadge && shouldShowBadge(avatarSize, state) && <AvatarBadge state={state} />}
-
       {!isImageGrey && <AvatarBorder />}
     </AvatarWrapper>
   );

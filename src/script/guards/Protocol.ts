@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2018 Wire Swiss GmbH
+ * Copyright (C) 2022 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,10 +17,14 @@
  *
  */
 
-// Helper class for hide_controls binding
-.hide-controls {
-  .hide-controls-hidden {
-    opacity: 0;
-    transition: opacity 0.25s ease-in-out;
-  }
+import {ConversationProtocol} from '@wireapp/api-client/src/conversation/NewConversation';
+
+export interface ProtocolOption {
+  label: string;
+  value: ConversationProtocol;
 }
+
+export const isProtocolOption = (option: any): option is ProtocolOption => {
+  const protocols = Object.values(ConversationProtocol) as string[];
+  return typeof option?.value === 'string' && protocols.includes(option.value);
+};

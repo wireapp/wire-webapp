@@ -136,6 +136,7 @@ const AppLock: React.FC<AppLockProps> = ({
       appLockRepository.removeCode();
       amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.ACKNOWLEDGE, {
         text: {
+          closeBtnLabel: t('teamSettingsModalCloseBtn'),
           htmlMessage: t('featureConfigChangeModalApplock'),
           title: t('featureConfigChangeModalApplockHeadline'),
         },
@@ -271,7 +272,13 @@ const AppLock: React.FC<AppLockProps> = ({
     <ModalComponent isShown={isVisible} showLoading={isLoading} onClosed={onClosed} data-uie-name="applock-modal">
       <div className="modal__header">
         {!isAppLockEnforced && !isAppLockActivated && (
-          <button type="button" className="modal__header__button" onClick={onCancelAppLock} data-uie-name="do-close">
+          <button
+            type="button"
+            className="modal__header__button"
+            onClick={onCancelAppLock}
+            data-uie-name="do-close"
+            aria-label={t('modalAppLockSetupCloseBtn')}
+          >
             <span className="modal__header__icon" aria-hidden="true">
               <Icon.Close />
             </span>

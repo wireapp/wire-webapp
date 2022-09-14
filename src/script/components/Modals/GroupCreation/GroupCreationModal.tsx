@@ -17,11 +17,12 @@
  *
  */
 
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useState, useMemo} from 'react';
 import {container} from 'tsyringe';
 import cx from 'classnames';
 import {amplify} from 'amplify';
 import {WebAppEvents} from '@wireapp/webapp-events';
+import {Button, ButtonVariant, Select, StyledApp, THEME_ID} from '@wireapp/react-ui-kit';
 import {RECEIPT_MODE} from '@wireapp/api-client/src/conversation/data/ConversationReceiptModeUpdateData';
 import {ConversationProtocol} from '@wireapp/api-client/src/conversation/NewConversation';
 
@@ -50,9 +51,9 @@ import {
   teamPermissionsForAccessState,
   toggleFeature,
 } from '../../../conversation/ConversationAccessPermission';
-import useEffectRef from 'Util/useEffectRef';
-import {useFadingScrollbar} from '../../../ui/fadingScrollbar';
+import {initFadingScrollbar} from '../../../ui/fadingScrollbar';
 import {Config} from '../../../Config';
+import {isProtocolOption, ProtocolOption} from '../../../guards/Protocol';
 
 interface GroupCreationModalProps {
   conversationRepository: ConversationRepository;
@@ -77,10 +78,17 @@ const GroupCreationModal: React.FC<GroupCreationModalProps> = ({
   userState = container.resolve(UserState),
   teamState = container.resolve(TeamState),
 }) => {
+  const protocolOptions: ProtocolOption[] = [ConversationProtocol.PROTEUS, ConversationProtocol.MLS].map(protocol => ({
+    label: t(`modalCreateGroupProtocolSelect.${protocol}`),
+    value: protocol,
+  }));
+
+  const initialProtocol = protocolOptions.find(protocol => protocol.value === ConversationProtocol.PROTEUS)!;
+
   const [isShown, setIsShown] = useState<boolean>(false);
   const [selectedContacts, setSelectedContacts] = useState<User[]>([]);
   const [enableReadReceipts, setEnableReadReceipts] = useState<boolean>(false);
-  const [enableMls, setEnableMls] = useState<boolean>(false);
+  const [selectedProtocol, setSelectedProtocol] = useState<ProtocolOption>(initialProtocol);
   const [showContacts, setShowContacts] = useState<boolean>(false);
   const [isCreatingConversation, setIsCreatingConversation] = useState<boolean>(false);
   const [accessState, setAccessState] = useState<ACCESS_STATE>(ACCESS_STATE.TEAM.GUESTS_SERVICES);
@@ -90,8 +98,6 @@ const GroupCreationModal: React.FC<GroupCreationModalProps> = ({
   const [groupCreationState, setGroupCreationState] = useState<GroupCreationModalState>(
     GroupCreationModalState.DEFAULT,
   );
-  const [scrollbarRef, setScrollbarRef] = useEffectRef<HTMLDivElement>();
-  useFadingScrollbar(scrollbarRef);
 
   const maxNameLength = ConversationRepository.CONFIG.GROUP.MAX_NAME_LENGTH;
   const maxSize = ConversationRepository.CONFIG.GROUP.MAX_SIZE;
@@ -162,7 +168,7 @@ const GroupCreationModal: React.FC<GroupCreationModalProps> = ({
           groupName,
           isTeam ? accessState : undefined,
           {
-            protocol: enableMls ? ConversationProtocol.MLS : ConversationProtocol.PROTEUS,
+            protocol: selectedProtocol.value,
             receipt_mode: enableReadReceipts ? RECEIPT_MODE.ON : RECEIPT_MODE.OFF,
           },
         );
@@ -193,6 +199,8 @@ const GroupCreationModal: React.FC<GroupCreationModalProps> = ({
 
   const groupNameLength = groupName.length;
 
+  const hasNameError = nameError.length > 0;
+
   const clickOnNext = (): void => {
     const nameTooLong = groupNameLength > maxNameLength;
 
@@ -201,7 +209,7 @@ const GroupCreationModal: React.FC<GroupCreationModalProps> = ({
     }
   };
 
-  const getContacts = () => {
+  const contacts = useMemo(() => {
     if (showContacts) {
       if (!isTeam) {
         return userState.connectedUsers();
@@ -214,7 +222,7 @@ const GroupCreationModal: React.FC<GroupCreationModalProps> = ({
       return teamState.teamMembers().sort(sortUsersByPriority);
     }
     return [];
-  };
+  }, [isGuestEnabled, isTeam, showContacts, teamState, userState]);
 
   const clickOnToggle = (feature: number): void => {
     const newAccessState = toggleFeature(feature, accessState);
@@ -225,187 +233,209 @@ const GroupCreationModal: React.FC<GroupCreationModalProps> = ({
   const clickOnBack = (): void => {
     setGroupCreationState(GroupCreationModalState.PREFERENCES);
   };
+
   const participantsActionText = selectedContacts.length
     ? t('groupCreationParticipantsActionCreate')
     : t('groupCreationParticipantsActionSkip');
   const isInputValid = groupNameLength && !nameError.length;
 
   return (
-    <div id="group-creation-modal" className="group-creation__modal">
-      <ModalComponent isShown={isShown} onClosed={onClose} data-uie-name="group-creation-label">
-        <div className="modal__header modal__header--list">
-          {stateIsParticipants && (
-            <>
-              <button
-                className="button-reset-default"
-                type="button"
-                onClick={clickOnBack}
-                aria-label={t('accessibility.groupCreationParticipantsActionBack')}
-                data-uie-name="go-back"
-              >
-                <Icon.ArrowLeft aria-hidden="true" className="modal__header__button" />
-              </button>
-
-              <h2 id="group-creation-label" className="modal__header__title" data-uie-name="status-people-selected">
-                {selectedContacts.length
-                  ? t('groupCreationParticipantsHeaderWithCounter', selectedContacts.length)
-                  : t('groupCreationParticipantsHeader')}
-              </h2>
-
-              <button
-                className="group-creation__action enabled accent-text"
-                type="button"
-                onClick={clickOnCreate}
-                aria-label={participantsActionText}
-                data-uie-name="do-create-group"
-              >
-                {participantsActionText}
-              </button>
-            </>
-          )}
-          {stateIsPreferences && (
-            <>
-              <button
-                className="button-reset-default"
-                type="button"
-                onClick={() => setIsShown(false)}
-                aria-label={t('accessibility.groupCreationActionCloseModal')}
-                data-uie-name="do-close"
-              >
-                <Icon.Close aria-hidden="true" className="modal__header__button" />
-              </button>
-
-              <h2 id="group-creation-label" className="modal__header__title">
-                {t('groupCreationPreferencesHeader')}
-              </h2>
-
-              <button
-                id="group-go-next"
-                className={cx('group-creation__action', {
-                  'accent-text': groupNameLength,
-                  enabled: isInputValid,
-                })}
-                disabled={!isInputValid}
-                type="button"
-                onClick={clickOnNext}
-                aria-label={t('groupCreationPreferencesAction')}
-                data-uie-name="go-next"
-              >
-                {t('groupCreationPreferencesAction')}
-              </button>
-            </>
-          )}
-        </div>
-        {stateIsParticipants && (
-          <SearchInput
-            input={participantsInput}
-            setInput={setParticipantsInput}
-            selectedUsers={selectedContacts}
-            setSelectedUsers={setSelectedContacts}
-            placeholder={t('groupCreationParticipantsPlaceholder')}
-            enter={clickOnCreate}
-          />
-        )}
-
-        {stateIsParticipants && (
-          <div className="group-creation__list" ref={setScrollbarRef}>
-            {getContacts().length > 0 && (
-              <UserSearchableList
-                users={getContacts()}
-                filter={participantsInput}
-                selected={selectedContacts}
-                onUpdateSelectedUsers={setSelectedContacts}
-                searchRepository={searchRepository}
-                teamRepository={teamRepository}
-                conversationRepository={conversationRepository}
-                noUnderline
-              />
-            )}
-          </div>
-        )}
-        {/* eslint jsx-a11y/no-autofocus : "off" */}
-        {stateIsPreferences && (
-          <>
-            <div className="modal-input-wrapper">
-              <TextInputForwarded
-                autoFocus
-                label={t('groupCreationPreferencesPlaceholder')}
-                placeholder={t('groupCreationPreferencesPlaceholder')}
-                uieName="enter-group-name"
-                name="enter-group-name"
-                errorUieName="error-group-name"
-                onCancel={() => setGroupName('')}
-                onChange={onGroupNameChange}
-                onBlur={event => {
-                  const {value} = event.target as HTMLInputElement;
-                  const trimmedName = value.trim();
-                  setGroupName(trimmedName);
-                }}
-                onKeyDown={(event: React.KeyboardEvent<HTMLInputElement>) => {
-                  handleEnterDown(event, clickOnNext);
-                }}
-                value={groupName}
-                isError={nameError.length > 0}
-                errorMessage={nameError}
-              />
-            </div>
-            {isTeam && (
+    <StyledApp themeId={THEME_ID.DEFAULT}>
+      <div id="group-creation-modal" className="group-creation__modal">
+        <ModalComponent
+          wrapperCSS={{overflow: 'unset', overflowY: 'unset'}}
+          isShown={isShown}
+          onClosed={onClose}
+          data-uie-name="group-creation-label"
+        >
+          <div className="modal__header modal__header--list">
+            {stateIsParticipants && (
               <>
-                <div
-                  className="modal__info"
-                  style={{visibility: nameError.length > 0 ? 'hidden' : 'visible'}}
-                  data-uie-name="status-group-size-info"
+                <button
+                  className="button-reset-default"
+                  type="button"
+                  onClick={clickOnBack}
+                  aria-label={t('accessibility.groupCreationParticipantsActionBack')}
+                  data-uie-name="go-back"
                 >
-                  {t('groupSizeInfo', maxSize)}
-                </div>
-                <hr className="group-creation__modal__separator" />
-                <BaseToggle
-                  className="modal-style"
-                  isChecked={isGuestEnabled}
-                  setIsChecked={clickOnToggleGuestMode}
-                  extendedInfo
-                  extendedInfoText={t('guestRoomToggleInfoExtended')}
-                  infoText={t('guestRoomToggleInfo')}
-                  toggleName={t('guestOptionsTitle')}
-                  toggleId="guests"
-                />
-                <BaseToggle
-                  className="modal-style"
-                  isChecked={isServicesEnabled}
-                  setIsChecked={clickOnToggleServicesMode}
-                  extendedInfo
-                  extendedInfoText={t('servicesRoomToggleInfoExtended')}
-                  infoText={t('servicesRoomToggleInfo')}
-                  toggleName={t('servicesOptionsTitle')}
-                  toggleId="services"
-                />
-                <InfoToggle
-                  className="modal-style"
-                  dataUieName="read-receipts"
-                  info={t('readReceiptsToggleInfo')}
-                  isChecked={enableReadReceipts}
-                  setIsChecked={setEnableReadReceipts}
-                  isDisabled={false}
-                  name={t('readReceiptsToggleName')}
-                />
-                {enableMlsCheckbox && (
-                  <InfoToggle
-                    className="modal-style"
-                    dataUieName="mls"
-                    info={t('mlsToggleInfo')}
-                    isChecked={enableMls}
-                    setIsChecked={setEnableMls}
-                    isDisabled={false}
-                    name={t('mlsToggleName')}
-                  />
-                )}
-                <br />
+                  <Icon.ArrowLeft aria-hidden="true" className="modal__header__button" />
+                </button>
+
+                <h2 id="group-creation-label" className="modal__header__title" data-uie-name="status-people-selected">
+                  {selectedContacts.length
+                    ? t('groupCreationParticipantsHeaderWithCounter', selectedContacts.length)
+                    : t('groupCreationParticipantsHeader')}
+                </h2>
+
+                <Button
+                  className="group-creation__action enabled accent-text"
+                  css={{marginBottom: 0}}
+                  type="button"
+                  onClick={clickOnCreate}
+                  aria-label={participantsActionText}
+                  data-uie-name="do-create-group"
+                  variant={ButtonVariant.TERTIARY}
+                >
+                  {participantsActionText}
+                </Button>
               </>
             )}
-          </>
-        )}
-      </ModalComponent>
-    </div>
+            {stateIsPreferences && (
+              <>
+                <button
+                  className="button-reset-default"
+                  type="button"
+                  onClick={() => setIsShown(false)}
+                  aria-label={t('accessibility.groupCreationActionCloseModal')}
+                  data-uie-name="do-close"
+                >
+                  <Icon.Close aria-hidden="true" className="modal__header__button" />
+                </button>
+
+                <h2 id="group-creation-label" className="modal__header__title">
+                  {t('groupCreationPreferencesHeader')}
+                </h2>
+
+                <Button
+                  id="group-go-next"
+                  className={cx('group-creation__action', {
+                    'accent-text': groupNameLength,
+                    enabled: isInputValid,
+                  })}
+                  css={{marginBottom: 0}}
+                  disabled={!isInputValid}
+                  type="button"
+                  onClick={clickOnNext}
+                  aria-label={t('groupCreationPreferencesAction')}
+                  data-uie-name="go-next"
+                  variant={ButtonVariant.TERTIARY}
+                >
+                  {t('groupCreationPreferencesAction')}
+                </Button>
+              </>
+            )}
+          </div>
+          {stateIsParticipants && (
+            <SearchInput
+              input={participantsInput}
+              setInput={setParticipantsInput}
+              selectedUsers={selectedContacts}
+              setSelectedUsers={setSelectedContacts}
+              placeholder={t('groupCreationParticipantsPlaceholder')}
+              enter={clickOnCreate}
+            />
+          )}
+
+          {stateIsParticipants && (
+            <div className="group-creation__list" ref={initFadingScrollbar}>
+              {contacts.length > 0 && (
+                <UserSearchableList
+                  users={contacts}
+                  filter={participantsInput}
+                  selected={selectedContacts}
+                  onUpdateSelectedUsers={setSelectedContacts}
+                  searchRepository={searchRepository}
+                  teamRepository={teamRepository}
+                  conversationRepository={conversationRepository}
+                  noUnderline
+                />
+              )}
+            </div>
+          )}
+          {/* eslint jsx-a11y/no-autofocus : "off" */}
+          {stateIsPreferences && (
+            <>
+              <div className="modal-input-wrapper">
+                <TextInputForwarded
+                  autoFocus
+                  label={t('groupCreationPreferencesPlaceholder')}
+                  placeholder={t('groupCreationPreferencesPlaceholder')}
+                  uieName="enter-group-name"
+                  name="enter-group-name"
+                  errorUieName="error-group-name"
+                  onCancel={() => setGroupName('')}
+                  onChange={onGroupNameChange}
+                  onBlur={event => {
+                    const {value} = event.target as HTMLInputElement;
+                    const trimmedName = value.trim();
+                    setGroupName(trimmedName);
+                  }}
+                  onKeyDown={(event: React.KeyboardEvent<HTMLInputElement>) => {
+                    handleEnterDown(event, clickOnNext);
+                  }}
+                  value={groupName}
+                  isError={hasNameError}
+                  errorMessage={nameError}
+                />
+              </div>
+              {isTeam && (
+                <>
+                  <p
+                    className="modal__info"
+                    style={{visibility: hasNameError ? 'hidden' : 'visible'}}
+                    data-uie-name="status-group-size-info"
+                  >
+                    {t('groupSizeInfo', maxSize)}
+                  </p>
+                  <hr className="group-creation__modal__separator" />
+                  <BaseToggle
+                    className="modal-style"
+                    isChecked={isGuestEnabled}
+                    setIsChecked={clickOnToggleGuestMode}
+                    extendedInfo
+                    extendedInfoText={t('guestRoomToggleInfoExtended')}
+                    infoText={t('guestRoomToggleInfo')}
+                    toggleName={t('guestOptionsTitle')}
+                    toggleId="guests"
+                  />
+                  <BaseToggle
+                    className="modal-style"
+                    isChecked={isServicesEnabled}
+                    setIsChecked={clickOnToggleServicesMode}
+                    extendedInfo
+                    extendedInfoText={t('servicesRoomToggleInfoExtended')}
+                    infoText={t('servicesRoomToggleInfo')}
+                    toggleName={t('servicesOptionsTitle')}
+                    toggleId="services"
+                  />
+                  <InfoToggle
+                    className="modal-style"
+                    dataUieName="read-receipts"
+                    info={t('readReceiptsToggleInfo')}
+                    isChecked={enableReadReceipts}
+                    setIsChecked={setEnableReadReceipts}
+                    isDisabled={false}
+                    name={t('readReceiptsToggleName')}
+                  />
+                  {enableMlsCheckbox && (
+                    <>
+                      <Select
+                        id="select-protocol"
+                        onChange={option => {
+                          if (isProtocolOption(option)) {
+                            setSelectedProtocol(option);
+                          }
+                        }}
+                        dataUieName="select-protocol"
+                        options={protocolOptions}
+                        value={selectedProtocol}
+                        label={t('modalCreateGroupProtocolHeading')}
+                        menuPosition="absolute"
+                        wrapperCSS={{marginBottom: 0}}
+                      />
+                      <p className="modal__info" data-uie-name="status-group-protocol-info">
+                        {t('modalCreateGroupProtocolInfo')}
+                      </p>
+                    </>
+                  )}
+                  <br />
+                </>
+              )}
+            </>
+          )}
+        </ModalComponent>
+      </div>
+    </StyledApp>
   );
 };
 

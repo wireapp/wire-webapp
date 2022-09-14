@@ -104,7 +104,7 @@ const Root: React.FC<RootProps & ConnectedProps & DispatchProps> = ({
 
   return (
     <IntlProvider locale={normalizeLanguage(language)} messages={loadLanguage(language)}>
-      <StyledApp themeId={THEME_ID.LIGHT} style={{display: 'flex', height: '100%', minHeight: '100vh'}}>
+      <StyledApp themeId={THEME_ID.DEFAULT} style={{display: 'flex', height: '100%', minHeight: '100vh'}}>
         {isFetchingSSOSettings ? (
           <ContainerXS centerText verticalCenter style={{justifyContent: 'center'}}>
             <Loading />

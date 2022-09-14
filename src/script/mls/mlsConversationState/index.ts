@@ -17,6 +17,4 @@
  *
  */
 
-import {ServiceEntity} from '../integration/ServiceEntity';
-
-export const isServiceEntity = (entity: any): entity is ServiceEntity => 'isService' in entity && entity.isService;
+export * from './mlsConversationState';

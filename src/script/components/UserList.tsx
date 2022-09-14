@@ -200,6 +200,7 @@ const UserList: React.FC<UserListProps> = ({
                     selfInTeam={selfInTeam}
                     isSelfVerified={isSelfVerified}
                     onClick={onClickOrKeyPressed}
+                    onKeyDown={onUserKeyPressed}
                   />
                 </li>
               ))}
@@ -239,7 +240,6 @@ const UserList: React.FC<UserListProps> = ({
       {content}
       {hasMoreUsers && (
         <InViewport
-          requireFullyInView={false}
           onVisible={() => setMaxShownUsers(maxShownUsers + USER_CHUNK_SIZE)}
           key={`in-viewport-${Math.random()}`}
           style={{height: 10, transform: 'translateY(-60px)', width: 10}}

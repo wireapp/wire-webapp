@@ -2,7 +2,7 @@
   <!-- ko if: isVisible() -->
     <div class="panel__header">
       <button type="button" class="icon-button" 
-        data-bind="clickOrDrag: onGoBack, attr: { title: t('accessibility.rightPanel.GoBack'), 'aria-label': t('accessibility.rightPanel.GoBack') }"
+        data-bind="clickOrDrag: onGoBack, attr: { title: t('accessibility.rightPanel.GoBack'), 'aria-label': t('accessibility.conversation.goBack') }"
         data-uie-name="go-back-group-participant">
         <arrow-left-icon aria-hidden="true"></arrow-left-icon>
       </button>
@@ -15,16 +15,22 @@
         <panel-user-details params="participant: selectedParticipant, badge: teamRepository.getRoleBadge(selectedParticipant().id), isGroupAdmin: isAdmin, isSelfVerified: isSelfVerified, classifiedDomains: teamState.classifiedDomains"></panel-user-details>
       <!-- /ko -->
       <!-- ko if: showActionDevices(selectedParticipant()) -->
-        <div class="panel__action-item conversation-details__devices" data-bind="click: clickOnDevices" data-uie-name="go-devices">
-          <devices-icon aria-hidden="true" class="panel__action-item__icon"></devices-icon>
-          <div class="panel__action-item__text" data-bind="text: t('conversationDetailsActionDevices')"></div>
-          <disclose-icon aria-hidden="true" class="disclose-icon"></disclose-icon>
+        <div class="conversation-details__devices">
+          <button class="panel__action-item" data-bind="click: clickOnDevices, attr: {'aria-label': t('accessibility.conversationDetailsActionDevicesLabel')}" data-uie-name="go-devices" type="button">
+            <devices-icon aria-hidden="true" class="panel__action-item__icon"></devices-icon>
+            <span class="panel__action-item__text" data-bind="text: t('conversationDetailsActionDevices')"></span>
+            <chevron-right aria-hidden="true" class="chevron-right-icon"></chevron-right>
+          </button>
         </div>
       <!-- /ko -->
       <!-- ko if: canChangeRole() -->
-        <div class="panel__action-item conversation-details__admin" data-uie-name="toggle-admin">
-          <group-admin-icon aria-hidden="true" class="panel__action-item__icon"></group-admin-icon>
-          <base-toggle
+        <div class="conversation-details__admin">
+          <button class="panel__action-item" 
+          data-bind="click: onToggleAdmin, attr: {'aria-label': t('accessibility.conversationDetailsActionGroupAdminLabel')}" 
+          data-uie-name="toggle-admin" type="button"
+          aria-pressed={isAdmin()}>
+            <group-admin-icon aria-hidden="true" class="panel__action-item__icon"></group-admin-icon>
+            <base-toggle
             class="modal-style"
             params="
               isChecked: isAdmin(),
@@ -33,8 +39,9 @@
               toggleId: 'admin',
               isDisabled: selectedParticipant().isFederated"
           ></base-toggle>
+          </button>
         </div>
-        <div class="panel__action-item panel__info-text" data-bind="text: t('conversationDetailsGroupAdminInfo')"></div>
+        <div class="panel__action-item panel__info-text panel__item-offset" data-bind="text: t('conversationDetailsGroupAdminInfo')" tabindex="0"></div>
       <!-- /ko -->
       <enriched-fields params="user: selectedParticipant, showDomain: $root.isFederated"></enriched-fields>
       <user-actions params="user: selectedParticipant, conversation: activeConversation, actionsViewModel: actionsViewModel, onAction: onUserAction, isSelfActivated: isActivatedAccount(), conversationRoleRepository: conversationRoleRepository, selfUser: userState.self"></user-actions>

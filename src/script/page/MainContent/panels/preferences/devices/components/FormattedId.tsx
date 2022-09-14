@@ -24,7 +24,7 @@ export const FormattedId: React.FC<{idSlices: string[]}> = ({idSlices}) => {
     <>
       {idSlices.map((slice, index) => (
         <span className="device-id-part" key={slice + index}>
-          {slice}
+          {index % 2 === 0 ? <strong>{slice}</strong> : slice}
         </span>
       ))}
     </>

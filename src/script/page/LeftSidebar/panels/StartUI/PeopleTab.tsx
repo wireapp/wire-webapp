@@ -241,9 +241,9 @@ export const PeopleTab: React.FC<{
               <span className="start-ui-no-search-results__icon">
                 <Icon.Message />
               </span>
-              <div className="start-ui-no-search-results__text" data-uie-name="label-no-search-result">
+              <p className="start-ui-no-search-results__text" data-uie-name="label-no-search-result">
                 {t('searchNoMatchesPartner')}
-              </div>
+              </p>
             </div>
           ) : isFederated ? (
             <div className="start-ui-fed-wrapper">
@@ -260,7 +260,7 @@ export const PeopleTab: React.FC<{
               </div>
             </div>
           ) : (
-            <div className="start-ui-no-search-results">{t('searchTrySearch')}</div>
+            <p className="start-ui-no-search-results">{t('searchTrySearch')}</p>
           )}
         </>
       )}

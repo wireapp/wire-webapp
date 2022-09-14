@@ -53,7 +53,7 @@ const MentionSuggestionsItem: React.ForwardRefRenderFunction<HTMLDivElement, Men
       role="button"
       tabIndex={0}
       onClick={onClick}
-      onKeyDown={e => handleKeyDown(e, () => onClick(e))}
+      onKeyDown={e => handleKeyDown(e, onClick.bind(null, e))}
       onMouseEnter={onMouseEnter}
       className={cx('mention-suggestion-list__item', {'mention-suggestion-list__item--highlighted': isSelected})}
       data-uie-name="item-mention-suggestion"

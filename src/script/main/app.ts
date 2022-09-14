@@ -101,7 +101,6 @@ import {AudioRepository} from '../audio/AudioRepository';
 import {MessageSender} from '../message/MessageSender';
 import {StorageService} from '../storage';
 import {BackupService} from '../backup/BackupService';
-import {AuthRepository} from '../auth/AuthRepository';
 import {MediaRepository} from '../media/MediaRepository';
 import {GiphyRepository} from '../extension/GiphyRepository';
 import {GiphyService} from '../extension/GiphyService';
@@ -124,6 +123,7 @@ import Warnings from '../view_model/WarningsContainer';
 import {Core} from '../service/CoreSingleton';
 import {migrateToQualifiedSessionIds} from './sessionIdMigrator';
 import showUserModal from 'Components/Modals/UserModal';
+import {mlsConversationState} from '../mls/mlsConversationState';
 
 function doRedirect(signOutReason: SIGN_OUT_REASON) {
   let url = `/auth/${location.search}`;
@@ -229,7 +229,6 @@ class App {
 
     repositories.asset = container.resolve(AssetRepository);
 
-    repositories.auth = new AuthRepository();
     repositories.giphy = new GiphyRepository(new GiphyService());
     repositories.properties = new PropertiesRepository(new PropertiesService(), selfService);
     repositories.serverTime = serverTimeHandler;
@@ -426,6 +425,14 @@ class App {
       await teamRepository.initTeam();
 
       const conversationEntities = await conversationRepository.getConversations();
+      // We send external proposal to all the MLS conversations that are in an unknown state (not established nor pendingWelcome)
+      await mlsConversationState.getState().sendExternalToPendingJoin(
+        conversationEntities,
+        conversation => this.core.service!.conversation.isMLSConversationEstablished(conversation.groupId),
+        conversation =>
+          this.core.service!.conversation.sendExternalJoinProposal(conversation.groupId, conversation.epoch),
+      );
+
       const connectionEntities = await connectionRepository.getConnections();
       loadingView.updateProgress(25, t('initReceivedUserData'));
       telemetry.timeStep(AppInitTimingsStep.RECEIVED_USER_DATA);
@@ -818,12 +825,14 @@ class App {
       return _redirectToLogin();
     };
 
-    const _logoutOnBackend = () => {
+    const _logoutOnBackend = async () => {
       this.logger.info(`Logout triggered by '${signOutReason}': Disconnecting user from the backend.`);
-      return this.repository.auth
-        .logout()
-        .then(() => _logout())
-        .catch(() => _redirectToLogin());
+      try {
+        await this.core.logout(clearData);
+        _logout();
+      } catch (e) {
+        _redirectToLogin();
+      }
     };
 
     if (App.CONFIG.SIGN_OUT_REASONS.IMMEDIATE.includes(signOutReason)) {

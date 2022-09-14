@@ -38,6 +38,8 @@ import {TestFactory} from 'test/helper/TestFactory';
 import {MediaDevicesHandler} from '../media/MediaDevicesHandler';
 import {CALL_MESSAGE_TYPE} from './enum/CallMessageType';
 import {CALL} from '../event/Client';
+import {UserRepository} from '../user/UserRepository';
+import {LEAVE_CALL_REASON} from './enum/LeaveCallReason';
 
 const createSelfParticipant = () => {
   const selfUser = new User();
@@ -127,19 +129,40 @@ describe('CallingRepository', () => {
     it('only exposes the current active call', () => {
       const selfParticipant = createSelfParticipant();
       const userId = {domain: '', id: ''};
-      const incomingCall = new Call(userId, createConversationId(), undefined, selfParticipant, CALL_TYPE.NORMAL, {
-        currentAvailableDeviceId: mediaDevices,
-      } as MediaDevicesHandler);
+      const incomingCall = new Call(
+        userId,
+        createConversationId(),
+        CONV_TYPE.CONFERENCE,
+        selfParticipant,
+        CALL_TYPE.NORMAL,
+        {
+          currentAvailableDeviceId: mediaDevices,
+        } as MediaDevicesHandler,
+      );
       incomingCall.state(CALL_STATE.INCOMING);
 
-      const activeCall = new Call(userId, createConversationId(), undefined, selfParticipant, CALL_TYPE.NORMAL, {
-        currentAvailableDeviceId: mediaDevices,
-      } as MediaDevicesHandler);
+      const activeCall = new Call(
+        userId,
+        createConversationId(),
+        CONV_TYPE.CONFERENCE,
+        selfParticipant,
+        CALL_TYPE.NORMAL,
+        {
+          currentAvailableDeviceId: mediaDevices,
+        } as MediaDevicesHandler,
+      );
       activeCall.state(CALL_STATE.MEDIA_ESTAB);
 
-      const declinedCall = new Call(userId, createConversationId(), undefined, selfParticipant, CALL_TYPE.NORMAL, {
-        currentAvailableDeviceId: mediaDevices,
-      } as MediaDevicesHandler);
+      const declinedCall = new Call(
+        userId,
+        createConversationId(),
+        CONV_TYPE.CONFERENCE,
+        selfParticipant,
+        CALL_TYPE.NORMAL,
+        {
+          currentAvailableDeviceId: mediaDevices,
+        } as MediaDevicesHandler,
+      );
       declinedCall.state(CALL_STATE.INCOMING);
       declinedCall.reason(REASON.STILL_ONGOING);
 
@@ -153,7 +176,7 @@ describe('CallingRepository', () => {
     it('returns cached mediastream for self user if set', () => {
       const selfParticipant = createSelfParticipant();
       const userId = {domain: '', id: ''};
-      const call = new Call(userId, createConversationId(), undefined, selfParticipant, CALL_TYPE.NORMAL, {
+      const call = new Call(userId, createConversationId(), CONV_TYPE.CONFERENCE, selfParticipant, CALL_TYPE.NORMAL, {
         currentAvailableDeviceId: mediaDevices,
       } as MediaDevicesHandler);
       const source = new RTCAudioSource();
@@ -178,7 +201,7 @@ describe('CallingRepository', () => {
       const call = new Call(
         {domain: '', id: ''},
         createConversationId(),
-        undefined,
+        CONV_TYPE.CONFERENCE,
         selfParticipant,
         CALL_TYPE.NORMAL,
         {
@@ -242,7 +265,7 @@ describe('CallingRepository ISO', () => {
       return avsCall && avsCall.destroy(avsUser);
     });
 
-    it('creates and stores a new call when an incoming call arrives', async done => {
+    it('creates and stores a new call when an incoming call arrives', async () => {
       const selfUser = new User(createRandomUuid());
       selfUser.isMe = true;
 
@@ -365,7 +388,7 @@ describe('CallingRepository ISO', () => {
       callingRepo.onIncomingCall(call => {
         expect(callingRepo['callState'].calls().length).toBe(1);
 
-        done();
+        return Promise.resolve();
       });
       await callingRepo.onCallEvent(event, '');
     });
@@ -381,7 +404,7 @@ describe.skip('E2E audio call', () => {
   const client = new CallingRepository(
     messageRepository,
     eventRepository,
-    undefined,
+    {} as UserRepository,
     serverTimeHandler as any,
     {} as any,
     {} as any,
@@ -429,7 +452,7 @@ describe.skip('E2E audio call', () => {
            */
           client
             .getStats(call.conversationId)
-            .then(extractAudioStats)
+            ?.then(extractAudioStats)
             .then(audioStats => {
               if (audioStats.length > 0) {
                 onCallConnected();
@@ -459,7 +482,7 @@ describe.skip('E2E audio call', () => {
       expect(client.onCallEvent).toHaveBeenCalledTimes(1);
       client
         .getStats(conversationId)
-        .then(extractAudioStats)
+        ?.then(extractAudioStats)
         .then(audioStats => {
           expect(audioStats.length).toBeGreaterThan(0);
           audioStats.forEach(stats => {
@@ -467,7 +490,7 @@ describe.skip('E2E audio call', () => {
           });
 
           expect(client['callState'].joinedCall()).toBeDefined();
-          client.leaveCall(conversationId);
+          client.leaveCall(conversationId, LEAVE_CALL_REASON.MANUAL_LEAVE_BY_UI_CLICK);
         })
         .catch(done.fail);
     };
@@ -482,13 +505,13 @@ describe.skip('E2E audio call', () => {
       expect(client['incomingCallCallback']).toHaveBeenCalled();
       client
         .getStats(conversationId)
-        .then(extractAudioStats)
+        ?.then(extractAudioStats)
         .then(audioStats => {
           expect(audioStats.length).toBeGreaterThan(0);
           audioStats.forEach(stats => {
             expect(stats.bytesFlowing).toBeGreaterThan(0);
           });
-          client.leaveCall(conversationId);
+          client.leaveCall(conversationId, LEAVE_CALL_REASON.MANUAL_LEAVE_BY_UI_CLICK);
         })
         .catch(done.fail);
     };
@@ -515,12 +538,12 @@ function createAutoAnsweringWuser(wCall: Wcall, remoteCallingRepository: Calling
   const selfUserId = createRandomUuid();
   const selfClientId = createRandomUuid();
   const sendMsg = (
-    context: any,
+    _context: number,
     conversationId: string,
     userId: string,
     clientId: string,
-    destinationUserId: string,
-    destinationClientId: string,
+    targets: string | null,
+    _unused: string | null,
     payload: string,
   ) => {
     const event = {

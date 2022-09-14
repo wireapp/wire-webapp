@@ -54,6 +54,8 @@ const buttonGroupWrapperStyles: CSSObject = {
     paddingRight: '14px !important',
   },
   display: 'flex',
+  justifyContent: 'center',
+  minWidth: '145px',
 };
 
 const buttonGroupItemStyles: CSSObject = {
