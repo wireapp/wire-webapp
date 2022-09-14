@@ -137,7 +137,7 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
       videoInput.map(device => (device as MediaDeviceInfo).deviceId || (device as ElectronDesktopCapturerSource).id),
     [videoInput],
   );
-  const showSwitchCamera = selfSharesCamera && availableCameras.length > 1;
+  const showSwitchCamera = availableCameras.length > 1;
   const setWrapper = useHideElement(FullscreenVideoCallConfig.HIDE_CONTROLS_TIMEOUT, 'video-controls__button');
 
   const [hasUnreadMessages, setHasUnreadMessages] = useState(false);
