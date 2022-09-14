@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [30.8.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/compare/@wireapp/core@30.7.2...@wireapp/core@30.8.0) (2022-09-14)
+
+
+### Features
+
+* Call clearPendingCommits when commit sending failed on backend ([#4395](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/issues/4395)) ([b863bf0](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/commit/b863bf0b3292bb71db94eb6411e5232e5918646e))
+
+
+
+
+
 ## [30.7.2](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/compare/@wireapp/core@30.7.1...@wireapp/core@30.7.2) (2022-09-14)
 
 **Note:** Version bump only for package @wireapp/core
