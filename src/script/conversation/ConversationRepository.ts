@@ -2449,6 +2449,7 @@ export class ConversationRepository {
       eventData.users?.map(user => user.qualified_id) || eventData.user_ids.map(userId => ({domain: '', id: userId}));
 
     if (
+      conversationEntity.groupId &&
       !mlsConversationState.getState().isEstablished(conversationEntity.id) &&
       (await this.core.service!.conversation.isMLSConversationEstablished(conversationEntity.groupId))
     ) {
