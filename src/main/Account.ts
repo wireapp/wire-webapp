@@ -47,7 +47,7 @@ import {TeamService} from './team/';
 import {UserService} from './user/';
 import {AccountService} from './account/';
 import {LinkPreviewService} from './linkPreview';
-import type {CoreCrypto} from '@otak/core-crypto';
+import type {CoreCrypto} from '@wireapp/core-crypto';
 import {WEBSOCKET_STATE} from '@wireapp/api-client/src/tcp/ReconnectingWebsocket';
 import {createCustomEncryptedStore, createEncryptedStore, deleteEncryptedStore} from './util/encryptedStore';
 import {Encoder} from 'bazinga64';
@@ -412,7 +412,7 @@ export class Account<T = any> extends EventEmitter {
       throw new Error('Services are not set.');
     }
     const coreCryptoKeyId = 'corecrypto-key';
-    const {CoreCrypto} = await import('@otak/core-crypto');
+    const {CoreCrypto} = await import('@wireapp/core-crypto');
     const dbName = this.generateSecretsDbName(context);
 
     const secretStore = mlsConfig.secretsCrypto

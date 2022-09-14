@@ -4,11 +4,11 @@
   },
   "dependencies": {
     "@open-wc/webpack-import-meta-loader": "0.4.7",
-    "@otak/core-crypto": "0.3.0-es2017",
     "@types/long": "4.0.1",
     "@types/node": "~14",
     "@wireapp/api-client": "20.3.1",
     "@wireapp/commons": "4.3.0",
+    "@wireapp/core-crypto": "0.4.0",
     "@wireapp/cryptobox": "12.8.0",
     "@wireapp/store-engine-dexie": "1.6.10",
     "bazinga64": "5.10.0",

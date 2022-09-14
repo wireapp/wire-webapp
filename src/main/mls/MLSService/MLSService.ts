@@ -31,7 +31,7 @@ import {
   ProposalArgs,
   ProposalType,
   RemoveProposalArgs,
-} from '@otak/core-crypto/platforms/web/corecrypto';
+} from '@wireapp/core-crypto/platforms/web/corecrypto';
 import {APIClient} from '@wireapp/api-client';
 import {QualifiedUsers} from '../../conversation';
 import {Converter, Decoder, Encoder} from 'bazinga64';
@@ -125,16 +125,14 @@ export class MLSService {
     return coreCryptoKeyPackagesPayload;
   }
 
-  public async newProposal(
-    proposalType: ProposalType,
-    args: ProposalArgs | AddProposalArgs | RemoveProposalArgs,
-  ): Promise<Uint8Array> {
+  public async newProposal(proposalType: ProposalType, args: ProposalArgs | AddProposalArgs | RemoveProposalArgs) {
     return this.getCoreCryptoClient().newProposal(proposalType, args);
   }
+
   public async newExternalProposal(
     externalProposalType: ExternalProposalType,
     args: ExternalProposalArgs | ExternalRemoveProposalArgs,
-  ): Promise<Uint8Array> {
+  ) {
     return this.getCoreCryptoClient().newExternalProposal(externalProposalType, args);
   }
 
