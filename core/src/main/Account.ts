@@ -138,6 +138,7 @@ export class Account<T = any> extends EventEmitter {
 
   public static readonly TOPIC = TOPIC;
   public service?: {
+    mls: MLSService;
     account: AccountService;
     asset: AssetService;
     broadcast: BroadcastService;
@@ -229,6 +230,9 @@ export class Account<T = any> extends EventEmitter {
 
       // initialize schedulers for renewing key materials
       await this.service?.notification.checkForKeyMaterialsUpdate();
+
+      // initialize scheduler for syncing key packages with backend
+      await this.service?.notification.checkForKeyPackagesBackendSync();
     }
     return context;
   }
@@ -363,6 +367,7 @@ export class Account<T = any> extends EventEmitter {
     const userService = new UserService(this.apiClient, broadcastService, conversationService, connectionService);
 
     this.service = {
+      mls: mlsService,
       account: accountService,
       asset: assetService,
       broadcast: broadcastService,
@@ -434,8 +439,8 @@ export class Account<T = any> extends EventEmitter {
 
     if (isNewMLSDevice) {
       // If the device is new, we need to upload keypackages and public key to the backend
-      await this.service.client.uploadMLSPublicKeys(await mlsClient.clientPublicKey(), client.id);
-      await this.service.client.uploadMLSKeyPackages(await mlsClient.clientKeypackages(this.nbPrekeys), client.id);
+      await this.service.mls.uploadMLSPublicKeys(await mlsClient.clientPublicKey(), client.id);
+      await this.service.mls.uploadMLSKeyPackages(await mlsClient.clientKeypackages(this.nbPrekeys), client.id);
     }
 
     return mlsClient;
