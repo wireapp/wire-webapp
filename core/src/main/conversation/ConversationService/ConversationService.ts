@@ -17,7 +17,7 @@
  *
  */
 
-import {ExternalProposalType} from '@otak/core-crypto';
+import {ExternalProposalType} from '@wireapp/core-crypto';
 import type {APIClient} from '@wireapp/api-client';
 import {
   MessageSendingStatus,
