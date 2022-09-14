@@ -131,7 +131,7 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
       videoInput.map(device => (device as MediaDeviceInfo).deviceId || (device as ElectronDesktopCapturerSource).id),
     [videoInput],
   );
-  const showSwitchCamera = selfSharesCamera && availableCameras.length > 1;
+  const showSwitchCamera = availableCameras.length > 1;
 
   const [hasUnreadMessages, setHasUnreadMessages] = useState(false);
   const updateUnreadCount = (unreadCount: number) => setHasUnreadMessages(unreadCount > 0);
