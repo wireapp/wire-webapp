@@ -53,6 +53,7 @@ import {createCustomEncryptedStore, createEncryptedStore, deleteEncryptedStore} 
 import {Encoder} from 'bazinga64';
 import {MLSService} from './mls';
 import type {MLSConfig} from './mls/types';
+import {resumeMessageSending} from './conversation/message/messageSender';
 
 export type ProcessedEventPayload = HandledEventPayload;
 
@@ -599,6 +600,9 @@ export class Account<T = any> extends EventEmitter {
       );
       // We can now unlock the websocket and let the new messages being handled and decrypted
       this.apiClient.transport.ws.unlock();
+      // We need to wait for the notification stream to be fully handled before releasing the message sending queue.
+      // This is due to the nature of how message are encrypted, any change in mls epoch needs to happen before we start encrypting any kind of messages
+      resumeMessageSending();
       onConnected();
     };
     await this.apiClient.connect(onBeforeConnect);

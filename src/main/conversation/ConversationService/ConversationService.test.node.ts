@@ -32,6 +32,7 @@ import {MessageBuilder} from '../message/MessageBuilder';
 import {OtrMessage} from '../message/OtrMessage';
 import {NotificationService} from '../../notification/NotificationService';
 import type {MLSService} from '../../mls';
+import * as messageSender from '../message/messageSender';
 
 const mockedMLSService = {
   encryptMessage: () => {},
@@ -39,6 +40,7 @@ const mockedMLSService = {
 
 describe('ConversationService', () => {
   beforeAll(() => {
+    spyOn(messageSender, 'sendMessage').and.callFake(fn => fn());
     jasmine.clock().install();
     jasmine.clock().mockDate(new Date(0));
   });
