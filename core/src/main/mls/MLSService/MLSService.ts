@@ -37,6 +37,7 @@ import {QualifiedUsers} from '../../conversation';
 import {Converter, Decoder, Encoder} from 'bazinga64';
 import type {MLSConfig} from '../types';
 import {PostMlsMessageResponse} from '@wireapp/api-client/src/conversation';
+import {sendMessage} from '../../conversation/message/messageSender';
 
 //@todo: this function is temporary, we wait for the update from core-crypto side
 //they are returning regular array instead of Uint8Array for commit and welcome messages
@@ -82,11 +83,13 @@ export class MLSService {
     return null;
   }
 
-  public async addUsersToExistingConversation(groupId: Uint8Array, invitee: Invitee[]) {
-    const coreCryptoClient = this.getCoreCryptoClient();
-    const memberAddedMessages = await coreCryptoClient.addClientsToConversation(groupId, invitee);
+  public addUsersToExistingConversation(groupId: Uint8Array, invitee: Invitee[]) {
+    return sendMessage(async () => {
+      const coreCryptoClient = this.getCoreCryptoClient();
+      const memberAddedMessages = await coreCryptoClient.addClientsToConversation(groupId, invitee);
 
-    return this.uploadCommitBundle(groupId, memberAddedMessages);
+      return this.uploadCommitBundle(groupId, memberAddedMessages);
+    });
   }
 
   public async getKeyPackagesPayload(qualifiedUsers: QualifiedUsers[]) {
@@ -141,9 +144,11 @@ export class MLSService {
     return this.getCoreCryptoClient().encryptMessage(conversationId, message);
   }
 
-  public async updateKeyingMaterial(conversationId: ConversationId): Promise<PostMlsMessageResponse | null> {
-    const commitBundle = await this.getCoreCryptoClient().updateKeyingMaterial(conversationId);
-    return this.uploadCommitBundle(conversationId, commitBundle);
+  public updateKeyingMaterial(conversationId: ConversationId): Promise<PostMlsMessageResponse | null> {
+    return sendMessage(async () => {
+      const commitBundle = await this.getCoreCryptoClient().updateKeyingMaterial(conversationId);
+      return this.uploadCommitBundle(conversationId, commitBundle);
+    });
   }
 
   public async createConversation(
@@ -153,12 +158,14 @@ export class MLSService {
     return this.getCoreCryptoClient().createConversation(conversationId, configuration);
   }
 
-  public async removeClientsFromConversation(
+  public removeClientsFromConversation(
     conversationId: ConversationId,
     clientIds: Uint8Array[],
   ): Promise<PostMlsMessageResponse | null> {
-    const commitBundle = await this.getCoreCryptoClient().removeClientsFromConversation(conversationId, clientIds);
-    return this.uploadCommitBundle(conversationId, commitBundle);
+    return sendMessage(async () => {
+      const commitBundle = await this.getCoreCryptoClient().removeClientsFromConversation(conversationId, clientIds);
+      return this.uploadCommitBundle(conversationId, commitBundle);
+    });
   }
 
   public async commitPendingProposals(conversationId: ConversationId): Promise<CommitBundle> {

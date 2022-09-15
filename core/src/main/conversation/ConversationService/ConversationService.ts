@@ -107,6 +107,7 @@ import {
 import {Decoder} from 'bazinga64';
 import {mapQualifiedUserClientIdsToFullyQualifiedClientIds} from '../../util/mapQualifiedUserClientIdsToFullyQualifiedClientIds';
 import {optionalToUint8Array} from '../../mls';
+import {sendMessage} from '../message/messageSender';
 
 export class ConversationService {
   public readonly messageTimer: MessageTimer;
@@ -1019,9 +1020,11 @@ export class ConversationService {
       return {...payload, state: PayloadBundleState.CANCELLED};
     }
 
-    return isMLS(params)
-      ? this.sendMLSMessage(params, genericMessage, content)
-      : this.sendProteusMessage(params, genericMessage, content);
+    return sendMessage(() =>
+      isMLS(params)
+        ? this.sendMLSMessage(params, genericMessage, content)
+        : this.sendProteusMessage(params, genericMessage, content),
+    );
   }
 
   public sendTypingStart(conversationId: string): Promise<void> {
@@ -1309,18 +1312,20 @@ export class ConversationService {
    * @param epoch The current epoch of the local conversation
    */
   public async sendExternalJoinProposal(conversationGroupId: string, epoch: number) {
-    const groupIdDecodedFromBase64 = Decoder.fromBase64(conversationGroupId!).asBytes;
-    const externalProposal = await this.mlsService.newExternalProposal(ExternalProposalType.Add, {
-      epoch,
-      conversationId: groupIdDecodedFromBase64,
-    });
-    await this.apiClient.api.conversation.postMlsMessage(
-      //@todo: it's temporary - we wait for core-crypto fix to return the actual Uint8Array instead of regular array
-      optionalToUint8Array(externalProposal),
-    );
+    return sendMessage(async () => {
+      const groupIdDecodedFromBase64 = Decoder.fromBase64(conversationGroupId!).asBytes;
+      const externalProposal = await this.mlsService.newExternalProposal(ExternalProposalType.Add, {
+        epoch,
+        conversationId: groupIdDecodedFromBase64,
+      });
+      await this.apiClient.api.conversation.postMlsMessage(
+        //@todo: it's temporary - we wait for core-crypto fix to return the actual Uint8Array instead of regular array
+        optionalToUint8Array(externalProposal),
+      );
 
-    //We store the info when user was added (and key material was created), so we will know when to renew it
-    await this.storeLastKeyMaterialUpdateDateWithCurrentTime(conversationGroupId);
+      //We store the info when user was added (and key material was created), so we will know when to renew it
+      await this.storeLastKeyMaterialUpdateDateWithCurrentTime(conversationGroupId);
+    });
   }
 
   public async isMLSConversationEstablished(conversationGroupId: string) {

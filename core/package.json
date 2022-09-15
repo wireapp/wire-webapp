@@ -10,6 +10,7 @@
     "@wireapp/commons": "4.3.0",
     "@wireapp/core-crypto": "0.4.0",
     "@wireapp/cryptobox": "12.8.0",
+    "@wireapp/promise-queue": "1.1.1",
     "@wireapp/store-engine-dexie": "1.6.10",
     "bazinga64": "5.10.0",
     "hash.js": "1.1.7",
