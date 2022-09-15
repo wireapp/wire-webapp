@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [30.9.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/compare/@wireapp/core@30.8.0...@wireapp/core@30.9.0) (2022-09-15)
+
+
+### Features
+
+* use localstorage for keys update date ([#4396](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/issues/4396)) ([cce74a3](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/commit/cce74a3a8f403be8d658618a8684c397ab060df3))
+
+
+
+
+
 # [30.8.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/compare/@wireapp/core@30.7.2...@wireapp/core@30.8.0) (2022-09-14)
 
 
