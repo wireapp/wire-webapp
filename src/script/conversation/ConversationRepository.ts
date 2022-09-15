@@ -1522,6 +1522,27 @@ export class ConversationRepository {
   }
 
   /**
+   * Remove the current user from a MLS conversation.
+   *
+   * @param conversationEntity Conversation to remove user from
+   * @param clearContent Should we clear the conversation content from the database?
+   * @returns Resolves when user was removed from the conversation
+   */
+  private async leaveMLSConversation(conversationEntity: Conversation, clearContent: boolean) {
+    // const {qualifiedId} = conversationEntity;
+    // const response = await this.core.service!.conversation.leaveMLSConversation(qualifiedId);
+    // console.log(response);
+    // if (response) {
+    //   const roles = conversationEntity.roles();
+    //   delete roles[userId.id];
+    //   conversationEntity.roles(roles);
+    //   const currentTimestamp = this.serverTimeHandler.toServerTimestamp();
+    //   const event = response || EventBuilder.buildMemberLeave(conversationEntity, userId, true, currentTimestamp);
+    //   this.eventRepository.injectEvent(event, EventRepository.SOURCE.BACKEND_RESPONSE);
+    // }
+  }
+
+  /**
    * Remove the current user from a Proteus conversation.
    *
    * @param conversationEntity Conversation to remove user from
@@ -1547,8 +1568,9 @@ export class ConversationRepository {
     const isMLSConversation = conversationEntity.isUsingMLSProtocol;
 
     if (isUserLeaving) {
-      //@todo leaveMLSConversation
-      return this.leaveProteusConversation(conversationEntity, clearContent);
+      return isMLSConversation
+        ? this.leaveMLSConversation(conversationEntity, clearContent)
+        : this.leaveProteusConversation(conversationEntity, clearContent);
     }
 
     return isMLSConversation
