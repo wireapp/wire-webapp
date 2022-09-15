@@ -42,6 +42,7 @@ import {TaskScheduler} from '../util/TaskScheduler/TaskScheduler';
 import type {MLSService} from '../mls';
 import {LowPrecisionTaskScheduler} from '../util/LowPrecisionTaskScheduler/LowPrecisionTaskScheduler';
 import {keyPackagesStatusStore} from '../mls/keyPackagesStatusStore/keyPackagesStatusStore';
+import {keyMaterialUpdatesStore} from '../mls/keyMaterialUpdatesStore';
 
 export type HandledEventPayload = {
   event: Events.BackendEvent;
@@ -457,7 +458,7 @@ export class NotificationService extends EventEmitter {
    * @param {previousUpdateDate} params.previousUpdateDate - date of the previous key material update
    */
   public async storeLastKeyMaterialUpdateDate(params: LastKeyMaterialUpdateParams) {
-    await this.database.storeLastKeyMaterialUpdateDate(params);
+    keyMaterialUpdatesStore.storeLastKeyMaterialUpdateDate(params);
     await this.scheduleTaskToRenewKeyMaterial(params);
   }
 
@@ -472,7 +473,7 @@ export class NotificationService extends EventEmitter {
       const groupConversationExists = await this.mlsService.conversationExists(Decoder.fromBase64(groupId).asBytes);
 
       if (!groupConversationExists) {
-        await this.database.deleteLastKeyMaterialUpdateDate({groupId});
+        keyMaterialUpdatesStore.deleteLastKeyMaterialUpdateDate({groupId});
         return;
       }
 
@@ -516,7 +517,7 @@ export class NotificationService extends EventEmitter {
    */
   public async checkForKeyMaterialsUpdate() {
     try {
-      const keyMaterialUpdateDates = await this.database.getStoredLastKeyMaterialUpdateDates();
+      const keyMaterialUpdateDates = keyMaterialUpdatesStore.getAllUpdateDates();
       keyMaterialUpdateDates.forEach(date => this.scheduleTaskToRenewKeyMaterial(date));
     } catch (error) {
       this.logger.error('Could not get last key material update dates', error);
