@@ -11,7 +11,7 @@
     "amplify": "git+https://git@github.com/wireapp/amplify",
     "classnames": "2.3.1",
     "copy-webpack-plugin": "11.0.0",
-    "core-js": "2.6.10",
+    "core-js": "3.25.1",
     "countly-sdk-web": "21.11.4",
     "date-fns": "2.29.2",
     "dexie-batch": "0.4.3",

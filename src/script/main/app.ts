@@ -18,7 +18,7 @@
  */
 
 // Polyfill for "tsyringe" dependency injection
-import 'core-js/es7/reflect';
+import 'core-js/full/reflect';
 
 import ko from 'knockout';
 import platform from 'platform';
