@@ -445,9 +445,9 @@ export class ConversationRepository {
         time: new Date().toISOString(),
         type: CONVERSATION_EVENT.CREATE,
       });
-      if (isMLSConversation) {
+      if (isMLSConversation && conversationEntity.groupId) {
         // since we are the creator of the conversation, we can safely mark it as established
-        mlsConversationState.getState().markAsEstablished(conversationEntity.id);
+        mlsConversationState.getState().markAsEstablished(conversationEntity.groupId);
       }
       return conversationEntity;
     } catch (error) {
@@ -1361,7 +1361,7 @@ export class ConversationRepository {
     const {qualifiedId: conversationId, groupId} = conversation;
 
     try {
-      if (conversation.isUsingMLSProtocol) {
+      if (conversation.isUsingMLSProtocol && groupId) {
         const {events} = await this.core.service!.conversation.addUsersToMLSConversation({
           conversationId,
           groupId,
@@ -1969,6 +1969,10 @@ export class ConversationRepository {
         CONVERSATION_EVENT.MLS_WELCOME_MESSAGE,
       ];
 
+      if (type === CONVERSATION_EVENT.MLS_WELCOME_MESSAGE) {
+        mlsConversationState.getState().markAsEstablished(eventData);
+      }
+
       const isExpectedType = typesInSelfConversation.includes(type);
       if (!isExpectedType) {
         return Promise.reject(
@@ -2464,11 +2468,11 @@ export class ConversationRepository {
 
     if (
       conversationEntity.groupId &&
-      !mlsConversationState.getState().isEstablished(conversationEntity.id) &&
+      !mlsConversationState.getState().isEstablished(conversationEntity.groupId) &&
       (await this.core.service!.conversation.isMLSConversationEstablished(conversationEntity.groupId))
     ) {
       // If the conversation was not previously marked as established and the core if aware of this conversation, we can mark is as established
-      mlsConversationState.getState().markAsEstablished(conversationEntity.id);
+      mlsConversationState.getState().markAsEstablished(conversationEntity.groupId);
     }
 
     return updateSequence
