@@ -3234,10 +3234,10 @@
   resolved "https://registry.yarnpkg.com/@wireapp/core-crypto/-/core-crypto-0.4.0.tgz#62ae0b4976753a454d478b141cd4f08e5a8be95a"
   integrity sha512-GIrzcbTdZ66dVXh+T56mhsoepTov6H5aQst40WFTGT20EnjubI5bV+w/PE8kegTRQcmDnZL2WQUQExDEwGK5aw==
 
-"@wireapp/core@30.8.0":
-  version "30.8.0"
-  resolved "https://registry.yarnpkg.com/@wireapp/core/-/core-30.8.0.tgz#731fa1912347f00e54e222a097abe2b6148f8454"
-  integrity sha512-965tmos7VaXR8mIq3myU9EavkLLgaVtFC8ZcwvM21MRGbVKktysGzQttYKiDja/nEzbE4y5ZvscXO8aB2Sb11A==
+"@wireapp/core@30.10.0":
+  version "30.10.0"
+  resolved "https://registry.yarnpkg.com/@wireapp/core/-/core-30.10.0.tgz#ce46735125badd40fea056132255e06f18c34a5c"
+  integrity sha512-+N54Bf9MuJs7QgtpZsnMLEuMNgjcW1fIewsTs7KTq9FP1s6L12X6qyrlz2l9s01ZRJPG+oGFr1fnoPXVMdGeRg==
   dependencies:
     "@open-wc/webpack-import-meta-loader" "0.4.7"
     "@types/long" "4.0.1"
@@ -3246,6 +3246,7 @@
     "@wireapp/commons" "4.3.0"
     "@wireapp/core-crypto" "0.4.0"
     "@wireapp/cryptobox" "12.8.0"
+    "@wireapp/promise-queue" "1.1.1"
     "@wireapp/store-engine-dexie" "1.6.10"
     bazinga64 "5.10.0"
     hash.js "1.1.7"
@@ -3296,6 +3297,11 @@
   integrity sha512-KE3dilt231KSyVT1wo40XXGFyQZTbxh9eoCmuwdBUdXT11R9i/ES91hk/v/7oh/t18G3EEn2nTcDwCWCY2FGJA==
   dependencies:
     "@types/node" "~14"
+
+"@wireapp/promise-queue@1.1.1":
+  version "1.1.1"
+  resolved "https://registry.yarnpkg.com/@wireapp/promise-queue/-/promise-queue-1.1.1.tgz#9a30d092b50187d7f24397cea4570e1c7f82982a"
+  integrity sha512-87lpealLCyDFHkyks+hI3S/KHlW2tftBPx4UGa4fPBlkaPLNt9IzPeHXhJbAYQbYVZVT4gn/lzJC4nsYyGHRuA==
 
 "@wireapp/proteus@9.13.0":
   version "9.13.0"
