@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [30.10.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/compare/@wireapp/core@30.9.0...@wireapp/core@30.10.0) (2022-09-15)
+
+
+### Features
+
+* Queue message sending [FS-882] ([#4392](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/issues/4392)) ([3b29dd0](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/commit/3b29dd012ebd41debcea3460c6e0fffa2da3646e))
+
+
+
+
+
 # [30.9.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/compare/@wireapp/core@30.8.0...@wireapp/core@30.9.0) (2022-09-15)
 
 

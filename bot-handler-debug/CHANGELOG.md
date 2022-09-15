@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.4.303](https://github.com/wireapp/wire-web-packages/tree/main/packages/bot-handler-debug/compare/@wireapp/bot-handler-debug@0.4.302...@wireapp/bot-handler-debug@0.4.303) (2022-09-15)
+
+**Note:** Version bump only for package @wireapp/bot-handler-debug
+
+
+
+
+
 ## [0.4.302](https://github.com/wireapp/wire-web-packages/tree/main/packages/bot-handler-debug/compare/@wireapp/bot-handler-debug@0.4.301...@wireapp/bot-handler-debug@0.4.302) (2022-09-15)
 
 **Note:** Version bump only for package @wireapp/bot-handler-debug
