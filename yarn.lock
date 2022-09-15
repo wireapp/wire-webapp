@@ -3172,10 +3172,8 @@
   resolved "https://registry.yarnpkg.com/@wireapp/antiscroll-2/-/antiscroll-2-1.3.1.tgz#bcb66f72c6dadc306e43235256b768ed3f89039c"
   integrity sha512-vWmWYAzSdyxs+xlgSPGtiNSTCM1z0nxM+jSPa/xz1/kuFKy80BrJP5xaGwNNLljBAz8ymlSPUUZlylUd0tFr1Q==
 
-"@wireapp/api-client@20.3.1":
+"@wireapp/api-client@file:.yalc/@wireapp/api-client", "@wireapp/api-client@file:.yalc/@wireapp/core/.yalc/@wireapp/api-client":
   version "20.3.1"
-  resolved "https://registry.yarnpkg.com/@wireapp/api-client/-/api-client-20.3.1.tgz#d06ac6f261c17f90fdb40764249400901b752083"
-  integrity sha512-9VmA8BLCIpRGS0kovjD37seaktf5kMto6Hj+2aSaXr71J/lGFqzKsIXgMbk7rtfJxDer+kZgAgV8EOwye0x4CA==
   dependencies:
     "@types/node" "~14"
     "@types/spark-md5" "3.0.2"
@@ -3234,15 +3232,20 @@
   resolved "https://registry.yarnpkg.com/@wireapp/core-crypto/-/core-crypto-0.4.0.tgz#62ae0b4976753a454d478b141cd4f08e5a8be95a"
   integrity sha512-GIrzcbTdZ66dVXh+T56mhsoepTov6H5aQst40WFTGT20EnjubI5bV+w/PE8kegTRQcmDnZL2WQUQExDEwGK5aw==
 
+<<<<<<< Updated upstream
 "@wireapp/core@30.10.0":
   version "30.10.0"
   resolved "https://registry.yarnpkg.com/@wireapp/core/-/core-30.10.0.tgz#ce46735125badd40fea056132255e06f18c34a5c"
   integrity sha512-+N54Bf9MuJs7QgtpZsnMLEuMNgjcW1fIewsTs7KTq9FP1s6L12X6qyrlz2l9s01ZRJPG+oGFr1fnoPXVMdGeRg==
+=======
+"@wireapp/core@file:.yalc/@wireapp/core":
+  version "30.7.1"
+>>>>>>> Stashed changes
   dependencies:
     "@open-wc/webpack-import-meta-loader" "0.4.7"
     "@types/long" "4.0.1"
     "@types/node" "~14"
-    "@wireapp/api-client" "20.3.1"
+    "@wireapp/api-client" "file:../../Library/Caches/Yarn/v6/npm-@wireapp-core-30.7.1-2be10107-c36a-430d-b839-25b5f70f7198-1663159982463/node_modules/@wireapp/core/.yalc/@wireapp/api-client"
     "@wireapp/commons" "4.3.0"
     "@wireapp/core-crypto" "0.4.0"
     "@wireapp/cryptobox" "12.8.0"
