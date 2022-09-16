@@ -78,12 +78,15 @@ const GroupCreationModal: React.FC<GroupCreationModalProps> = ({
   userState = container.resolve(UserState),
   teamState = container.resolve(TeamState),
 }) => {
+  const defaultProtocol = teamState.teamFeatures().mls.config.defaultProtocol;
   const protocolOptions: ProtocolOption[] = [ConversationProtocol.PROTEUS, ConversationProtocol.MLS].map(protocol => ({
-    label: t(`modalCreateGroupProtocolSelect.${protocol}`),
+    label: `${t(`modalCreateGroupProtocolSelect.${protocol}`)}${
+      protocol === defaultProtocol ? t(`modalCreateGroupProtocolSelect.default`) : ''
+    }`,
     value: protocol,
   }));
 
-  const initialProtocol = protocolOptions.find(protocol => protocol.value === ConversationProtocol.PROTEUS)!;
+  const initialProtocol = protocolOptions.find(protocol => protocol.value === defaultProtocol)!;
 
   const [isShown, setIsShown] = useState<boolean>(false);
   const [selectedContacts, setSelectedContacts] = useState<User[]>([]);
@@ -119,6 +122,10 @@ const GroupCreationModal: React.FC<GroupCreationModalProps> = ({
 
     amplify.subscribe(WebAppEvents.CONVERSATION.CREATE_GROUP, showCreateGroup);
   }, []);
+
+  useEffect(() => {
+    setSelectedProtocol(protocolOptions.find(protocol => protocol.value === selectedProtocol.value)!);
+  }, [defaultProtocol]);
 
   const onClose = () => {
     setIsCreatingConversation(false);
