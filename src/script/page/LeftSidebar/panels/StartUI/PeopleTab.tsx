@@ -234,37 +234,6 @@ export const PeopleTab: React.FC<{
         </div>
       )}
 
-      {!hasFederationError && !hasResults && (
-        <>
-          {!canSearchUnconnectedUsers ? (
-            <div className="start-ui-no-search-results__content">
-              <span className="start-ui-no-search-results__icon">
-                <Icon.Message />
-              </span>
-              <p className="start-ui-no-search-results__text" data-uie-name="label-no-search-result">
-                {t('searchNoMatchesPartner')}
-              </p>
-            </div>
-          ) : isFederated ? (
-            <div className="start-ui-fed-wrapper">
-              <span className="start-ui-fed-wrapper__icon">
-                <Icon.Profile />
-              </span>
-              <div className="start-ui-fed-wrapper__text">{t('searchTrySearchFederation')}</div>
-              <div className="start-ui-fed-wrapper__button">
-                {/*@todo: re-enable when federation article is available
-                <button type="button" data-bind="click: () => {}" data-uie-name="do-search-learn-more">
-                  {t('searchTrySearchLearnMore')}
-                </button>
-          */}
-              </div>
-            </div>
-          ) : (
-            <p className="start-ui-no-search-results">{t('searchTrySearch')}</p>
-          )}
-        </>
-      )}
-
       {searchQuery.length === 0 && (
         <>
           <ul className="start-ui-list left-list-items">
@@ -325,6 +294,36 @@ export const PeopleTab: React.FC<{
                 </div>
               </div>
             </div>
+          )}
+        </>
+      )}
+      {!hasFederationError && !hasResults && (
+        <>
+          {!canSearchUnconnectedUsers ? (
+            <div className="start-ui-no-search-results__content">
+              <span className="start-ui-no-search-results__icon">
+                <Icon.Message />
+              </span>
+              <p className="start-ui-no-search-results__text" data-uie-name="label-no-search-result">
+                {t('searchNoMatchesPartner')}
+              </p>
+            </div>
+          ) : isFederated ? (
+            <div className="start-ui-fed-wrapper">
+              <span className="start-ui-fed-wrapper__icon">
+                <Icon.Profile />
+              </span>
+              <div className="start-ui-fed-wrapper__text">{t('searchTrySearchFederation')}</div>
+              <div className="start-ui-fed-wrapper__button">
+                {/*@todo: re-enable when federation article is available
+                <button type="button" data-bind="click: () => {}" data-uie-name="do-search-learn-more">
+                  {t('searchTrySearchLearnMore')}
+                </button>
+          */}
+              </div>
+            </div>
+          ) : (
+            <p className="start-ui-no-search-results">{t('searchTrySearch')}</p>
           )}
         </>
       )}
