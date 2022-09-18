@@ -106,7 +106,7 @@
     "babel-loader": "8.2.5",
     "concurrently": "7.4.0",
     "cross-env": "7.0.3",
-    "cspell": "6.8.1",
+    "cspell": "6.9.1",
     "cssnano": "4.1.11",
     "dotenv": "16.0.2",
     "enzyme": "3.11.0",
