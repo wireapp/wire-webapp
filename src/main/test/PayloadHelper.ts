@@ -17,7 +17,7 @@
  *
  */
 
-import faker = require('faker');
+import faker from 'faker';
 import UUID from 'uuidjs';
 
 export function getUUID(): string {

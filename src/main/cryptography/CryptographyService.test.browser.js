@@ -61,8 +61,8 @@ describe('CryptographyService', () => {
       const userId = 'afbb5d60-1187-4385-9c29-7361dea79647';
       cryptography = new CryptographyService(undefined, await createEngine('wire'), {useQualifiedIds: false, nbPrekeys: 1});
       const actual = cryptography.constructSessionId(userId, clientId);
-      expect(actual).toContain(clientId);
-      expect(actual).toContain(userId);
+      expect(actual).toContainEqual(clientId);
+      expect(actual).toContainEqual(userId);
     });
   });
 

@@ -17,7 +17,7 @@
  *
  */
 
-import type {AudioMetaData, VideoMetaData, ImageMetaData} from './AssetContent';
+import {AudioMetaData, VideoMetaData, ImageMetaData} from './AssetContent';
 
 export interface FileContent {
   data: Buffer;

@@ -20,8 +20,8 @@
 import {DBSchema, IDBPDatabase, openDB, deleteDB} from 'idb';
 
 interface DefaultEncryptedPayload {
-  iv: Uint8Array;
-  value: Uint8Array;
+  iv: Uint8Array | ArrayBuffer;
+  value: Uint8Array | ArrayBuffer;
 }
 interface EncryptedDB<EncryptedPayload> extends DBSchema {
   key: {

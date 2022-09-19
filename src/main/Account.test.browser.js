@@ -60,7 +60,7 @@ describe('Account', () => {
 
       const account = new Account(apiClient);
       await account.initServices(context);
-      spyOn(account.service.client, 'register').and.callThrough();
+      jest.spyOn(account.service.client, 'register').and.callThrough();
       account.service.client.synchronizeClients = () => Promise.resolve();
       account.service.notification.backend.getLastNotification = () => Promise.resolve({id: 'notification-id'});
       account.apiClient.context = {};
@@ -83,9 +83,9 @@ describe('Account', () => {
       const clientId = UUID.genV4().toString().toString();
       const account = new Account(apiClient);
       await account.initServices(context);
-      spyOn(account.service.cryptography, 'initCryptobox').and.returnValue(Promise.resolve());
-      spyOn(account.service.client, 'getLocalClient').and.returnValue(Promise.resolve({id: clientId}));
-      spyOn(account.apiClient.api.client, 'getClient').and.returnValue(Promise.resolve({id: clientId}));
+      jest.spyOn(account.service.cryptography, 'initCryptobox').mockReturnValue(Promise.resolve());
+      jest.spyOn(account.service.client, 'getLocalClient').mockReturnValue(Promise.resolve({id: clientId}));
+      jest.spyOn(account.apiClient.api.client, 'getClient').mockReturnValue(Promise.resolve({id: clientId}));
       await account.apiClient.createContext('userId', 'clientType', 'clientId');
 
       await account.loadAndValidateLocalClient();
@@ -102,10 +102,10 @@ describe('Account', () => {
       const clientId = UUID.genV4().toString().toString();
       const account = new Account(apiClient);
       await account.initServices(context);
-      spyOn(account.service.client, 'register').and.returnValue(Promise.resolve({id: clientId}));
-      spyOn(account.service.client, 'synchronizeClients').and.returnValue(Promise.resolve());
-      spyOn(account.service.notification, 'initializeNotificationStream').and.returnValue(Promise.resolve());
-      spyOn(account.service.cryptography, 'initCryptobox').and.returnValue(Promise.resolve());
+      jest.spyOn(account.service.client, 'register').mockReturnValue(Promise.resolve({id: clientId}));
+      jest.spyOn(account.service.client, 'synchronizeClients').mockReturnValue(Promise.resolve());
+      jest.spyOn(account.service.notification, 'initializeNotificationStream').mockReturnValue(Promise.resolve());
+      jest.spyOn(account.service.cryptography, 'initCryptobox').mockReturnValue(Promise.resolve());
       await account.apiClient.createContext('userId', 'clientType', 'clientId');
 
       await account.registerClient(context);

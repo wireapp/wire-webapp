@@ -33,7 +33,7 @@ describe('AssetService', () => {
         expires: '',
       };
 
-      spyOn(apiClient.api.asset, 'postAsset').and.returnValue({
+      jest.spyOn(apiClient.api.asset, 'postAsset').mockReturnValue({
         cancel: () => {},
         response: Promise.resolve(assetServerData),
       });
@@ -55,11 +55,11 @@ describe('AssetService', () => {
       const assetService = new AssetService(apiClient);
 
       const apiUpload = {
-        cancel: jasmine.createSpy(),
+        cancel: jest.fn(),
         response: Promise.resolve({} as any),
       };
 
-      spyOn(apiClient.api.asset, 'postAsset').and.returnValue(apiUpload);
+      jest.spyOn(apiClient.api.asset, 'postAsset').mockReturnValue(apiUpload);
 
       const asset = await assetService.uploadAsset(Buffer.from([1, 2, 3]));
       asset.cancel();
@@ -71,16 +71,16 @@ describe('AssetService', () => {
       const assetService = new AssetService(apiClient);
 
       const apiUpload = {
-        cancel: jasmine.createSpy(),
+        cancel: jest.fn(),
         response: Promise.resolve({} as any),
       };
 
-      spyOn(apiClient.api.asset, 'postAsset').and.callFake((_asset, _options, progressCallback) => {
+      jest.spyOn(apiClient.api.asset, 'postAsset').mockImplementation((_asset, _options, progressCallback) => {
         progressCallback?.(1);
         return apiUpload;
       });
 
-      const onProgress = jasmine.createSpy();
+      const onProgress = jest.fn();
       await assetService.uploadAsset(Buffer.from([1, 2, 3]), {}, onProgress);
       expect(onProgress).toHaveBeenCalledWith(1);
     });

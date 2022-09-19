@@ -17,7 +17,7 @@
  *
  */
 
-import type {LegalHoldStatus} from '.';
+import {LegalHoldStatus} from '.';
 
 export interface LocationContent {
   expectsReadConfirmation?: boolean;

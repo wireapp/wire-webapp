@@ -17,10 +17,10 @@
  *
  */
 
-import type {Connection} from '@wireapp/api-client/src/connection/';
+import {Connection} from '@wireapp/api-client/src/connection/';
 
-import type {ClientActionType} from '..';
-import type {
+import {ClientActionType} from '..';
+import {
   AssetContent,
   ClearedContent,
   ClientActionContent,
