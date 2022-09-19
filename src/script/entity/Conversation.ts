@@ -103,6 +103,7 @@ export class Conversation {
   public creator: string;
   public groupId?: string;
   public epoch: number = -1;
+  public cipherSuite: number = 1;
   public readonly isUsingMLSProtocol: boolean;
   public readonly display_name: ko.PureComputed<string>;
   public readonly firstUserEntity: ko.PureComputed<User>;
@@ -995,6 +996,7 @@ export class Conversation {
       access_role: this.accessRole,
       archived_state: this.archivedState(),
       archived_timestamp: this.archivedTimestamp(),
+      cipher_suite: this.cipherSuite,
       cleared_timestamp: this.cleared_timestamp(),
       creator: this.creator,
       domain: this.domain,

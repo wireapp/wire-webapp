@@ -212,7 +212,9 @@ export class ConversationMapper {
       throw new ConversationError(BASE_ERROR_TYPE.INVALID_PARAMETER, BaseError.MESSAGE.INVALID_PARAMETER);
     }
 
-    const {creator, id, members, name, others, qualified_others, type, group_id, epoch, protocol} = conversationData;
+    const {creator, id, members, name, others, qualified_others, type, group_id, epoch, protocol, cipher_suite} =
+      conversationData;
+
     let conversationEntity = new Conversation(
       id,
       conversationData.domain || conversationData.qualified_id?.domain,
@@ -223,6 +225,7 @@ export class ConversationMapper {
     conversationEntity.creator = creator;
     conversationEntity.groupId = group_id;
     conversationEntity.epoch = epoch ?? -1;
+    conversationEntity.cipherSuite = cipher_suite;
     conversationEntity.type(type);
     conversationEntity.name(name || '');
 
@@ -312,6 +315,7 @@ export class ConversationMapper {
           type,
           group_id,
           epoch,
+          cipher_suite,
           protocol,
         } = remoteConversationData;
         const {others: othersStates, self: selfState} = members;
@@ -320,6 +324,7 @@ export class ConversationMapper {
           accessModes: access,
           accessRole: access_role,
           accessRoleV2: access_role_v2,
+          cipher_suite,
           creator,
           domain: qualified_id?.domain,
           group_id,
