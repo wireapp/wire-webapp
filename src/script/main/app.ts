@@ -433,6 +433,15 @@ class App {
           groupId => this.core.service!.conversation.isMLSConversationEstablished(groupId),
           ({groupId, epoch}) => this.core.service!.conversation.sendExternalJoinProposal(groupId, epoch),
         );
+
+        this.core.configureMLSCallbacks({
+          authorize: (conversationId, clientId) => true,
+          clientIdBelongsToOneOf: (clientId, otherClients) => true,
+          groupIdFromConversationId: async conversationId => {
+            const conversation = await conversationRepository.getConversationById(conversationId);
+            return conversation?.groupId;
+          },
+        });
       }
 
       const connectionEntities = await connectionRepository.getConnections();
