@@ -1948,18 +1948,6 @@ export class ConversationRepository {
     return this.pushToReceivingQueue(eventJson, eventSource);
   };
 
-  private async handleWipeMLSConversation(conversationId: string) {
-    try {
-      const conversation = await this.conversationService.loadConversation<ConversationRecord>(conversationId);
-      if (conversation) {
-        const groupIdDecodedFromBase64 = base64ToArray(conversation.group_id);
-        this.core.service!.conversation.wipeMLSConversation(groupIdDecodedFromBase64);
-      }
-    } catch (error) {
-      this.logger.error("Couldn't wipe conversation's data: ", error);
-    }
-  }
-
   private handleConversationEvent(
     eventJson: IncomingEvent,
     eventSource: EventSource = EventSource.NOTIFICATION_STREAM,
@@ -2529,7 +2517,8 @@ export class ConversationRepository {
       if (conversationEntity.protocol === ConversationProtocol.MLS) {
         const {groupId} = conversationEntity;
         if (groupId) {
-          await this.handleWipeMLSConversation(groupId);
+          const groupIdDecodedFromBase64 = base64ToArray(groupId);
+          await this.core.service!.conversation.wipeMLSConversation(groupIdDecodedFromBase64);
         }
       }
     }
