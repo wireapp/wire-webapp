@@ -879,10 +879,18 @@ export class ConversationRepository {
         ConversationError.MESSAGE.NO_CONVERSATION_ID,
       );
     }
-    const conversationEntity = this.conversationState.findConversation(conversation_id);
-    if (conversationEntity) {
-      return conversationEntity;
+    const localStateConversation = this.conversationState.findConversation(conversation_id);
+    if (localStateConversation) {
+      return localStateConversation;
     }
+
+    const localDBConversation = await this.conversationService.loadConversation<BackendConversation>(
+      conversation_id.id,
+    );
+    if (localDBConversation) {
+      return this.mapConversations([localDBConversation])[0];
+    }
+
     try {
       return await this.fetchConversationById(conversation_id);
     } catch (error) {
@@ -1993,10 +2001,6 @@ export class ConversationRepository {
       }
     }
 
-    if (type === CONVERSATION_EVENT.MEMBER_LEAVE) {
-      this.handleWipeMLSConversation(conversationId.id);
-    }
-
     const isConversationCreate = type === CONVERSATION_EVENT.CREATE;
     const onEventPromise = isConversationCreate ? Promise.resolve(null) : this.getConversationById(conversationId);
     let previouslyArchived = false;
@@ -2520,6 +2524,13 @@ export class ConversationRepository {
 
       if (this.userState.self().isTemporaryGuest()) {
         eventJson.from = this.userState.self().id;
+      }
+
+      if (conversationEntity.protocol === ConversationProtocol.MLS) {
+        const {groupId} = conversationEntity;
+        if (groupId) {
+          await this.handleWipeMLSConversation(groupId);
+        }
       }
     }
 
