@@ -92,12 +92,12 @@ describe('MessageService', () => {
   const messageService = new MessageService(apiClient, cryptographyService);
 
   beforeEach(() => {
-    spyOn(cryptographyService, 'encryptQualified').and.callFake(fakeEncrypt);
+    jest.spyOn(cryptographyService, 'encryptQualified').mockImplementation(fakeEncrypt as any);
   });
 
   describe('sendFederatedMessage', () => {
     it('sends a message', async () => {
-      spyOn(apiClient.api.conversation, 'postOTRMessageV2').and.returnValue(Promise.resolve(baseMessageSendingStatus));
+      jest.spyOn(apiClient.api.conversation, 'postOTRMessageV2').mockResolvedValue(baseMessageSendingStatus);
       const recipients = generateQualifiedRecipients([user1, user2]);
 
       await messageService.sendFederatedMessage('senderclientid', recipients, new Uint8Array(), {
@@ -114,7 +114,7 @@ describe('MessageService', () => {
           deleted: {[user1.domain]: {[user1.id]: [user1.clients[0]]}},
           missing: {'2.wire.test': {[user2.id]: ['client22']}},
         };
-        spyOn(apiClient.api.conversation, 'postOTRMessageV2').and.callFake(() => {
+        jest.spyOn(apiClient.api.conversation, 'postOTRMessageV2').mockImplementation(() => {
           spyCounter++;
           if (spyCounter === 1) {
             const error = new Error();
@@ -126,7 +126,7 @@ describe('MessageService', () => {
           }
           return Promise.resolve(baseMessageSendingStatus);
         });
-        spyOn(apiClient.api.user, 'postQualifiedMultiPreKeyBundles').and.returnValue(Promise.resolve({}));
+        jest.spyOn(apiClient.api.user, 'postQualifiedMultiPreKeyBundles').mockReturnValue(Promise.resolve({}));
 
         const recipients = generateQualifiedRecipients([user1, user2]);
 
@@ -138,10 +138,10 @@ describe('MessageService', () => {
       });
 
       it('continues message sending if onClientMismatch returns true', async () => {
-        const onClientMismatch = jasmine.createSpy('onClientMismatch').and.returnValue(true);
+        const onClientMismatch = jest.fn().mockReturnValue(true);
         const clientMismatch = {...baseMessageSendingStatus, missing: {'2.wire.test': {[user2.id]: ['client22']}}};
         let spyCounter = 0;
-        spyOn(apiClient.api.conversation, 'postOTRMessageV2').and.callFake(() => {
+        jest.spyOn(apiClient.api.conversation, 'postOTRMessageV2').mockImplementation(() => {
           spyCounter++;
           if (spyCounter === 1) {
             const error = new Error();
@@ -153,7 +153,7 @@ describe('MessageService', () => {
           }
           return Promise.resolve(baseMessageSendingStatus);
         });
-        spyOn(apiClient.api.user, 'postQualifiedMultiPreKeyBundles').and.returnValue(Promise.resolve({}));
+        jest.spyOn(apiClient.api.user, 'postQualifiedMultiPreKeyBundles').mockReturnValue(Promise.resolve({}));
 
         const recipients = generateQualifiedRecipients([user1, user2]);
 
@@ -167,9 +167,9 @@ describe('MessageService', () => {
       });
 
       it('stops message sending if onClientMismatch returns false', async () => {
-        const onClientMismatch = jasmine.createSpy('onClientMismatch').and.returnValue(false);
+        const onClientMismatch = jest.fn().mockReturnValue(false);
         const clientMismatch = {...baseMessageSendingStatus, missing: {'2.wire.test': {[user2.id]: ['client22']}}};
-        spyOn(apiClient.api.conversation, 'postOTRMessageV2').and.callFake(() => {
+        jest.spyOn(apiClient.api.conversation, 'postOTRMessageV2').mockImplementation(() => {
           const error = new Error();
           (error as any).response = {
             status: StatusCodes.PRECONDITION_FAILED,
@@ -177,7 +177,7 @@ describe('MessageService', () => {
           };
           return Promise.reject(error);
         });
-        spyOn(apiClient.api.user, 'postQualifiedMultiPreKeyBundles').and.returnValue(Promise.resolve({}));
+        jest.spyOn(apiClient.api.user, 'postQualifiedMultiPreKeyBundles').mockReturnValue(Promise.resolve({}));
 
         const recipients = generateQualifiedRecipients([user1, user2]);
 
@@ -214,7 +214,7 @@ describe('MessageService', () => {
 
     it('should send regular to conversation', async () => {
       const message = 'Lorem ipsum dolor sit amet';
-      spyOn(apiClient.api.conversation, 'postOTRMessage').and.returnValue(Promise.resolve({} as ClientMismatch));
+      jest.spyOn(apiClient.api.conversation, 'postOTRMessage').mockReturnValue(Promise.resolve({} as ClientMismatch));
 
       await messageService.sendMessage(clientId, generateRecipients(generateUsers(3, 3)), createMessage(message), {
         conversationId,
@@ -222,16 +222,16 @@ describe('MessageService', () => {
       expect(apiClient.api.conversation.postOTRMessage).toHaveBeenCalledWith(
         clientId,
         conversationId,
-        jasmine.any(Object),
+        expect.any(Object),
         false,
       );
     });
 
     it('should send protobuf message to conversation', async () => {
       const message = 'Lorem ipsum dolor sit amet';
-      spyOn(apiClient.api.conversation, 'postOTRProtobufMessage').and.returnValue(
-        Promise.resolve({} as ClientMismatch),
-      );
+      jest
+        .spyOn(apiClient.api.conversation, 'postOTRProtobufMessage')
+        .mockReturnValue(Promise.resolve({} as ClientMismatch));
 
       await messageService.sendMessage(clientId, generateRecipients(generateUsers(3, 3)), createMessage(message), {
         conversationId,
@@ -240,24 +240,26 @@ describe('MessageService', () => {
       expect(apiClient.api.conversation.postOTRProtobufMessage).toHaveBeenCalledWith(
         clientId,
         conversationId,
-        jasmine.any(Object),
+        expect.any(Object),
         false,
       );
     });
 
     it('should broadcast regular message if no conversationId is given', async () => {
       const message = 'Lorem ipsum dolor sit amet';
-      spyOn(apiClient.api.broadcast, 'postBroadcastMessage').and.returnValue(Promise.resolve({} as ClientMismatch));
+      jest
+        .spyOn(apiClient.api.broadcast, 'postBroadcastMessage')
+        .mockReturnValue(Promise.resolve({} as ClientMismatch));
 
       await messageService.sendMessage(clientId, generateRecipients(generateUsers(3, 3)), createMessage(message));
-      expect(apiClient.api.broadcast.postBroadcastMessage).toHaveBeenCalledWith(clientId, jasmine.any(Object), false);
+      expect(apiClient.api.broadcast.postBroadcastMessage).toHaveBeenCalledWith(clientId, expect.any(Object), false);
     });
 
     it('should broadcast protobuf message if no conversationId is given', async () => {
       const message = 'Lorem ipsum dolor sit amet';
-      spyOn(apiClient.api.broadcast, 'postBroadcastProtobufMessage').and.returnValue(
-        Promise.resolve({} as ClientMismatch),
-      );
+      jest
+        .spyOn(apiClient.api.broadcast, 'postBroadcastProtobufMessage')
+        .mockReturnValue(Promise.resolve({} as ClientMismatch));
 
       await messageService.sendMessage(clientId, generateRecipients(generateUsers(3, 3)), createMessage(message), {
         sendAsProtobuf: true,
@@ -265,14 +267,14 @@ describe('MessageService', () => {
 
       expect(apiClient.api.broadcast.postBroadcastProtobufMessage).toHaveBeenCalledWith(
         clientId,
-        jasmine.any(Object),
+        expect.any(Object),
         false,
       );
     });
 
     it('should not send as external if payload small', async () => {
       const message = 'Lorem ipsum dolor sit amet';
-      spyOn(apiClient.api.conversation, 'postOTRMessage').and.returnValue(Promise.resolve({} as ClientMismatch));
+      jest.spyOn(apiClient.api.conversation, 'postOTRMessage').mockReturnValue(Promise.resolve({} as ClientMismatch));
 
       await messageService.sendMessage(clientId, generateRecipients(generateUsers(3, 3)), createMessage(message), {
         conversationId,
@@ -280,7 +282,7 @@ describe('MessageService', () => {
       expect(apiClient.api.conversation.postOTRMessage).toHaveBeenCalledWith(
         clientId,
         conversationId,
-        jasmine.objectContaining({data: undefined}),
+        expect.objectContaining({data: undefined}),
         false,
       );
     });
@@ -288,7 +290,7 @@ describe('MessageService', () => {
     it('should send as external if payload is big', async () => {
       const longMessage =
         'Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Duis autem Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Duis autem';
-      spyOn(apiClient.api.conversation, 'postOTRMessage').and.returnValue(Promise.resolve({} as ClientMismatch));
+      jest.spyOn(apiClient.api.conversation, 'postOTRMessage').mockReturnValue(Promise.resolve({} as ClientMismatch));
 
       await messageService.sendMessage(
         clientId,
@@ -301,7 +303,7 @@ describe('MessageService', () => {
       expect(apiClient.api.conversation.postOTRMessage).toHaveBeenCalledWith(
         clientId,
         conversationId,
-        jasmine.objectContaining({data: jasmine.any(String)}),
+        expect.objectContaining({data: expect.any(String)}),
         false,
       );
     });
@@ -321,7 +323,7 @@ describe('MessageService', () => {
           deleted: {[user1.id]: [user1.clients[0]]},
           missing: {[user2.id]: ['client22']},
         };
-        spyOn(apiClient.api.conversation, 'postOTRMessage').and.callFake(() => {
+        jest.spyOn(apiClient.api.conversation, 'postOTRMessage').mockImplementation(() => {
           spyCounter++;
           if (spyCounter === 1) {
             const error = new Error();
@@ -333,7 +335,7 @@ describe('MessageService', () => {
           }
           return Promise.resolve(baseClientMismatch);
         });
-        spyOn(apiClient.api.user, 'postMultiPreKeyBundles').and.returnValue(Promise.resolve({}));
+        jest.spyOn(apiClient.api.user, 'postMultiPreKeyBundles').mockReturnValue(Promise.resolve({}));
 
         const recipients = generateRecipients([user1, user2]);
 
@@ -345,10 +347,10 @@ describe('MessageService', () => {
       });
 
       it('continues message sending if onClientMismatch returns true', async () => {
-        const onClientMismatch = jasmine.createSpy().and.returnValue(Promise.resolve(true));
+        const onClientMismatch = jest.fn().mockReturnValue(Promise.resolve(true));
         const clientMismatch = {...baseClientMismatch, missing: {[user2.id]: ['client22']}};
         let spyCounter = 0;
-        spyOn(apiClient.api.conversation, 'postOTRMessage').and.callFake(() => {
+        jest.spyOn(apiClient.api.conversation, 'postOTRMessage').mockImplementation(() => {
           spyCounter++;
           if (spyCounter === 1) {
             const error = new Error();
@@ -360,7 +362,7 @@ describe('MessageService', () => {
           }
           return Promise.resolve(baseClientMismatch);
         });
-        spyOn(apiClient.api.user, 'postMultiPreKeyBundles').and.returnValue(Promise.resolve({}));
+        jest.spyOn(apiClient.api.user, 'postMultiPreKeyBundles').mockReturnValue(Promise.resolve({}));
 
         const recipients = generateRecipients([user1, user2]);
 
@@ -374,9 +376,9 @@ describe('MessageService', () => {
       });
 
       it('stops message sending if onClientMismatch returns false', async () => {
-        const onClientMismatch = jasmine.createSpy().and.returnValue(Promise.resolve(false));
+        const onClientMismatch = jest.fn().mockReturnValue(Promise.resolve(false));
         const clientMismatch = {...baseMessageSendingStatus, missing: {[user2.id]: ['client22']}};
-        spyOn(apiClient.api.conversation, 'postOTRMessage').and.callFake(() => {
+        jest.spyOn(apiClient.api.conversation, 'postOTRMessage').mockImplementation(() => {
           const error = new Error();
           (error as any).response = {
             status: StatusCodes.PRECONDITION_FAILED,
@@ -384,7 +386,7 @@ describe('MessageService', () => {
           };
           return Promise.reject(error);
         });
-        spyOn(apiClient.api.user, 'postMultiPreKeyBundles').and.returnValue(Promise.resolve({}));
+        jest.spyOn(apiClient.api.user, 'postMultiPreKeyBundles').mockReturnValue(Promise.resolve({}));
 
         const recipients = generateRecipients([user1, user2]);
 

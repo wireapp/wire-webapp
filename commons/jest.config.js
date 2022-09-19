@@ -18,10 +18,9 @@
  */
 
 module.exports = {
-  preset: 'ts-jest',
   setupFilesAfterEnv: [],
   testEnvironment: 'jsdom',
   testPathIgnorePatterns: ['node_modules'],
-  testRegex: '.*.test(.browser|.node).[jt]s$',
+  testRegex: '.*.test(.browser|.node).[t]s$',
   verbose: true,
 };

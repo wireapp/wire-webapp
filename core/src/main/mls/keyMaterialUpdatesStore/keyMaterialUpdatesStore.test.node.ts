@@ -53,21 +53,21 @@ function storageMock() {
 describe('keyMaterialUpdatesStore', () => {
   it('adds and retrieves items to/from dates store', () => {
     keyMaterialUpdatesStore.storeLastKeyMaterialUpdateDate(mockUpdateEntries[0]);
-    expect(keyMaterialUpdatesStore.getAllUpdateDates()).toContain(mockUpdateEntries[0]);
+    expect(keyMaterialUpdatesStore.getAllUpdateDates()).toContainEqual(mockUpdateEntries[0]);
 
     keyMaterialUpdatesStore.storeLastKeyMaterialUpdateDate(mockUpdateEntries[1]);
     const stored = keyMaterialUpdatesStore.getAllUpdateDates();
-    expect(stored).toContain(mockUpdateEntries[1]);
-    expect(stored).toContain(mockUpdateEntries[0]);
-    expect(stored).toHaveSize(2);
+    expect(stored).toContainEqual(mockUpdateEntries[1]);
+    expect(stored).toContainEqual(mockUpdateEntries[0]);
+    expect(stored).toHaveLength(2);
   });
 
   it('removes items from dates store', () => {
     keyMaterialUpdatesStore.storeLastKeyMaterialUpdateDate(mockUpdateEntries[0]);
-    expect(keyMaterialUpdatesStore.getAllUpdateDates()).toContain(mockUpdateEntries[0]);
+    expect(keyMaterialUpdatesStore.getAllUpdateDates()).toContainEqual(mockUpdateEntries[0]);
 
     keyMaterialUpdatesStore.deleteLastKeyMaterialUpdateDate({groupId: mockUpdateEntries[0].groupId});
 
-    expect(keyMaterialUpdatesStore.getAllUpdateDates()).not.toContain(mockUpdateEntries[0]);
+    expect(keyMaterialUpdatesStore.getAllUpdateDates()).not.toContainEqual(mockUpdateEntries[0]);
   });
 });

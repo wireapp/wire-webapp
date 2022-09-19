@@ -28,8 +28,8 @@ describe('MessageHashService', () => {
 
       const messageHashService = new MessageHashService(content);
 
-      spyOn<any>(messageHashService, 'getTextBytes').and.callThrough();
-      spyOn<any>(messageHashService, 'getLocationBytes').and.callThrough();
+      jest.spyOn(messageHashService as any, 'getTextBytes');
+      jest.spyOn(messageHashService as any, 'getLocationBytes');
 
       messageHashService.getHash();
 

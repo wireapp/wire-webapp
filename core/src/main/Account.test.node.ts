@@ -27,8 +27,7 @@ import {BackendError, BackendErrorLabel} from '@wireapp/api-client/src/http';
 import {NotificationAPI} from '@wireapp/api-client/src/notification';
 import {AccentColor, ValidationUtil} from '@wireapp/commons';
 import {GenericMessage, Text} from '@wireapp/protocol-messaging';
-import * as Proteus from '@wireapp/proteus';
-import nock = require('nock');
+import nock from 'nock';
 import {Account} from './Account';
 import {PayloadBundleType} from './conversation';
 import {MessageBuilder} from './conversation/message/MessageBuilder';
@@ -41,14 +40,14 @@ const MOCK_BACKEND = {
   ws: `wss://${BASE_URL}`,
 };
 
-async function createAccount(storageName = `test-${Date.now()}`): Promise<Account> {
+async function createAccount(storageName = `test-${Date.now()}`): Promise<{account: Account; apiClient: APIClient}> {
   const apiClient = new APIClient({urls: MOCK_BACKEND});
   const account = new Account(apiClient);
   await account.initServices({
     clientType: ClientType.TEMPORARY,
     userId: '',
   });
-  return account;
+  return {account, apiClient};
 }
 
 describe('Account', () => {
@@ -61,14 +60,6 @@ describe('Account', () => {
     token_type: 'Bearer',
     user: 'aaf9a833-ef30-4c22-86a0-9adc8a15b3b4',
   };
-
-  beforeAll(async () => {
-    jasmine.clock().install();
-    await Proteus.init();
-  });
-  afterAll(() => {
-    jasmine.clock().uninstall();
-  });
 
   beforeEach(() => {
     nock(MOCK_BACKEND.rest)
@@ -139,10 +130,7 @@ describe('Account', () => {
 
   describe('"createText"', () => {
     it('creates a text payload', async () => {
-      const date = new Date(Date.UTC(2017, 0, 1, 0, 0, 0));
-      jasmine.clock().mockDate(date);
-
-      const account = await createAccount();
+      const {account} = await createAccount();
 
       await account.login({
         clientType: ClientType.TEMPORARY,
@@ -153,6 +141,8 @@ describe('Account', () => {
       expect(account['apiClient'].context!.userId).toBeDefined();
 
       const text = 'FIFA World Cup';
+      const date = new Date(0);
+      jest.spyOn(Date, 'now').mockImplementation(() => date.getTime());
       const payload = MessageBuilder.createText({conversationId: '', from: '', text}).build();
 
       expect(payload.timestamp).toEqual(date.getTime());
@@ -216,25 +206,30 @@ describe('Account', () => {
     });
   });
 
-  it('emits text messages', async done => {
-    const account = await createAccount();
+  it('emits text messages', () => {
+    return new Promise<void>(async resolve => {
+      const {account, apiClient} = await createAccount();
 
-    await account.login({
-      clientType: ClientType.TEMPORARY,
-      email: 'hello@example.com',
-      password: 'my-secret',
+      await account.login({
+        clientType: ClientType.TEMPORARY,
+        email: 'hello@example.com',
+        password: 'my-secret',
+      });
+
+      jest.spyOn(apiClient, 'connect').mockImplementation();
+      jest.spyOn(account.service!.notification as any, 'handleEvent').mockReturnValue({
+        mappedEvent: {type: PayloadBundleType.TEXT},
+      });
+
+      const kill = await account.listen({
+        onEvent: ({mappedEvent}) => {
+          expect(mappedEvent?.type).toBe(PayloadBundleType.TEXT);
+          resolve();
+        },
+      });
+
+      apiClient.transport.ws.emit(WebSocketClient.TOPIC.ON_MESSAGE, {payload: [{}]});
+      kill();
     });
-
-    await account.listen();
-
-    spyOn<any>(account.service!.notification, 'handleEvent').and.returnValue({
-      mappedEvent: {type: PayloadBundleType.TEXT},
-    });
-    account.on(PayloadBundleType.TEXT, message => {
-      expect(message.type).toBe(PayloadBundleType.TEXT);
-      done();
-    });
-
-    account.service!.notification['apiClient'].transport.ws.emit(WebSocketClient.TOPIC.ON_MESSAGE, {payload: [{}]});
   });
 });

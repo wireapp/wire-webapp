@@ -21,15 +21,15 @@ import {LowPrecisionTaskScheduler} from './LowPrecisionTaskScheduler';
 
 describe('LowPrecisionTaskScheduler', () => {
   beforeEach(() => {
-    jasmine.clock().install();
-    jasmine.clock().mockDate(new Date(0));
+    jest.useFakeTimers();
+    jest.setSystemTime(new Date(0));
   });
   afterEach(() => {
-    jasmine.clock().uninstall();
+    jest.useRealTimers();
   });
 
   it("task won't run again after it was executed previously", async () => {
-    const mockedTask = jasmine.createSpy('mockedTask', () => Promise.resolve('hello task'));
+    const mockedTask = jest.fn(() => Promise.resolve('hello task'));
 
     LowPrecisionTaskScheduler.addTask({
       key: 'test-key',
@@ -38,17 +38,17 @@ describe('LowPrecisionTaskScheduler', () => {
       task: mockedTask,
     });
 
-    jasmine.clock().tick(2001);
+    jest.advanceTimersByTime(2001);
     await Promise.resolve();
 
-    jasmine.clock().tick(2001);
+    jest.advanceTimersByTime(2001);
     await Promise.resolve();
 
     expect(mockedTask).toHaveBeenCalledTimes(1);
   });
 
   it('adds single task to schedule and runs it after given delay', async () => {
-    const mockedTask = jasmine.createSpy('mockedTask', () => Promise.resolve('hello task'));
+    const mockedTask = jest.fn(() => Promise.resolve('hello task'));
 
     LowPrecisionTaskScheduler.addTask({
       key: 'test-key',
@@ -57,15 +57,15 @@ describe('LowPrecisionTaskScheduler', () => {
       task: mockedTask,
     });
 
-    jasmine.clock().tick(1001);
+    jest.advanceTimersByTime(1001);
     await Promise.resolve();
 
     expect(mockedTask).toHaveBeenCalled();
   });
 
   it('adds multiple tasks to schedule and runs it after given delay', async () => {
-    const mockedTask1 = jasmine.createSpy('mockedTask1').and.returnValue(Promise.resolve('hello task 1'));
-    const mockedTask2 = jasmine.createSpy('mockedTask2').and.returnValue(Promise.resolve('hello task 2'));
+    const mockedTask1 = jest.fn().mockReturnValue(Promise.resolve('hello task 1'));
+    const mockedTask2 = jest.fn().mockReturnValue(Promise.resolve('hello task 2'));
 
     LowPrecisionTaskScheduler.addTask({
       key: 'test1-key',
@@ -74,7 +74,7 @@ describe('LowPrecisionTaskScheduler', () => {
       task: mockedTask1,
     });
 
-    jasmine.clock().tick(1000);
+    jest.advanceTimersByTime(1000);
 
     LowPrecisionTaskScheduler.addTask({
       key: 'test2-key',
@@ -83,7 +83,7 @@ describe('LowPrecisionTaskScheduler', () => {
       task: mockedTask2,
     });
 
-    jasmine.clock().tick(5001);
+    jest.advanceTimersByTime(5001);
 
     await Promise.resolve();
     await Promise.resolve();
@@ -93,8 +93,8 @@ describe('LowPrecisionTaskScheduler', () => {
   });
 
   it('cancels tasks', async () => {
-    const mockedTask3 = jasmine.createSpy('mockedTask3').and.returnValue(Promise.resolve('hello task 3'));
-    const mockedTask4 = jasmine.createSpy('mockedTask4').and.returnValue(Promise.resolve('hello task 4'));
+    const mockedTask3 = jest.fn().mockReturnValue(Promise.resolve('hello task 3'));
+    const mockedTask4 = jest.fn().mockReturnValue(Promise.resolve('hello task 4'));
 
     LowPrecisionTaskScheduler.addTask({
       key: 'test3-key',
@@ -103,7 +103,7 @@ describe('LowPrecisionTaskScheduler', () => {
       task: mockedTask3,
     });
 
-    jasmine.clock().tick(1000);
+    jest.advanceTimersByTime(1000);
 
     LowPrecisionTaskScheduler.addTask({
       key: 'test4-key',
@@ -117,7 +117,7 @@ describe('LowPrecisionTaskScheduler', () => {
       key: 'test3-key',
     });
 
-    jasmine.clock().tick(4001);
+    jest.advanceTimersByTime(4001);
 
     await Promise.resolve();
     await Promise.resolve();

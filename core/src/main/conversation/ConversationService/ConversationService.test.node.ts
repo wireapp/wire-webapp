@@ -40,23 +40,20 @@ const mockedMLSService = {
 
 describe('ConversationService', () => {
   beforeAll(() => {
-    spyOn(messageSender, 'sendMessage').and.callFake(fn => fn());
-    jasmine.clock().install();
-    jasmine.clock().mockDate(new Date(0));
-  });
-  afterAll(() => {
-    jasmine.clock().uninstall();
+    jest.spyOn(messageSender, 'sendMessage').mockImplementation(fn => fn());
+    jest.useFakeTimers();
+    jest.setSystemTime(new Date(0));
   });
 
   function buildConversationService(federated?: boolean) {
     const client = new APIClient({urls: APIClient.BACKEND.STAGING});
-    spyOn(client.api.conversation, 'postMlsMessage').and.returnValue(
+    jest.spyOn(client.api.conversation, 'postMlsMessage').mockReturnValue(
       Promise.resolve({
         events: [],
         time: new Date().toISOString(),
       }),
     );
-    spyOn(client.api.user, 'postListClients').and.returnValue(
+    jest.spyOn(client.api.user, 'postListClients').mockReturnValue(
       Promise.resolve({
         qualified_user_map: {
           'test-domain': {
@@ -110,11 +107,11 @@ describe('ConversationService', () => {
       it(`calls callbacks when sending '${payloadBundle.type}' message is starting and successful`, async () => {
         const conversationService = buildConversationService();
         const sentTime = new Date().toISOString();
-        const onStart = jasmine.createSpy().and.returnValue(Promise.resolve(true));
-        const onSuccess = jasmine.createSpy();
+        const onStart = jest.fn().mockReturnValue(Promise.resolve(true));
+        const onSuccess = jest.fn();
 
-        spyOn<any>(conversationService, 'sendGenericMessage').and.returnValue(Promise.resolve({time: sentTime}));
-        // const onReconnect = jasmine.createSpy().and.returnValue(getServerAddress());
+        jest.spyOn(conversationService as any, 'sendGenericMessage').mockReturnValue(Promise.resolve({time: sentTime}));
+        // const onReconnect = jest.fn().mockReturnValue(getServerAddress());
 
         const promise = conversationService.send({
           protocol: ConversationProtocol.PROTEUS,
@@ -149,8 +146,10 @@ describe('ConversationService', () => {
       [{user1: ['client1'], user2: ['client11', 'client12']}, ['user1', 'user2']].forEach(recipients => {
         it(`forwards the list of users to report (${JSON.stringify(recipients)})`, async () => {
           const conversationService = buildConversationService();
-          spyOn<any>(conversationService, 'getRecipientsForConversation').and.returnValue(Promise.resolve({} as any));
-          spyOn(conversationService['messageService'], 'sendMessage').and.returnValue(Promise.resolve({} as any));
+          jest
+            .spyOn(conversationService as any, 'getRecipientsForConversation')
+            .mockReturnValue(Promise.resolve({} as any));
+          jest.spyOn(conversationService['messageService'], 'sendMessage').mockReturnValue(Promise.resolve({} as any));
           await conversationService.send({
             protocol: ConversationProtocol.PROTEUS,
             payload: message,
@@ -177,12 +176,12 @@ describe('ConversationService', () => {
       ].forEach(recipients => {
         it(`forwards the list of users to report for federated message (${JSON.stringify(recipients)})`, async () => {
           const conversationService = buildConversationService(true);
-          spyOn<any>(conversationService, 'getQualifiedRecipientsForConversation').and.returnValue(
-            Promise.resolve({} as any),
-          );
-          spyOn(conversationService['messageService'], 'sendFederatedMessage').and.returnValue(
-            Promise.resolve({} as any),
-          );
+          jest
+            .spyOn(conversationService as any, 'getQualifiedRecipientsForConversation')
+            .mockReturnValue(Promise.resolve({} as any));
+          jest
+            .spyOn(conversationService['messageService'], 'sendFederatedMessage')
+            .mockReturnValue(Promise.resolve({} as any));
           await conversationService.send({
             protocol: ConversationProtocol.PROTEUS,
             conversationDomain: 'domain1',
@@ -209,8 +208,10 @@ describe('ConversationService', () => {
       [{user1: ['client1'], user2: ['client11', 'client12']}, ['user1', 'user2']].forEach(recipients => {
         it(`ignores all missing user/client pair if targetMode is USER_CLIENTS`, async () => {
           const conversationService = buildConversationService(true);
-          spyOn<any>(conversationService, 'getRecipientsForConversation').and.returnValue(Promise.resolve({} as any));
-          spyOn(conversationService['messageService'], 'sendMessage').and.returnValue(Promise.resolve({} as any));
+          jest
+            .spyOn(conversationService as any, 'getRecipientsForConversation')
+            .mockReturnValue(Promise.resolve({} as any));
+          jest.spyOn(conversationService['messageService'], 'sendMessage').mockReturnValue(Promise.resolve({} as any));
           await conversationService.send({
             protocol: ConversationProtocol.PROTEUS,
             payload: message,
@@ -237,12 +238,12 @@ describe('ConversationService', () => {
       ].forEach(recipients => {
         it(`ignores all missing user/client pair if targetMode is USER_CLIENTS on federated env`, async () => {
           const conversationService = buildConversationService(true);
-          spyOn<any>(conversationService, 'getQualifiedRecipientsForConversation').and.returnValue(
-            Promise.resolve({} as any),
-          );
-          spyOn(conversationService['messageService'], 'sendFederatedMessage').and.returnValue(
-            Promise.resolve({} as any),
-          );
+          jest
+            .spyOn(conversationService as any, 'getQualifiedRecipientsForConversation')
+            .mockReturnValue(Promise.resolve({} as any));
+          jest
+            .spyOn(conversationService['messageService'], 'sendFederatedMessage')
+            .mockReturnValue(Promise.resolve({} as any));
           await conversationService.send({
             protocol: ConversationProtocol.PROTEUS,
             conversationDomain: 'domain1',
@@ -265,10 +266,10 @@ describe('ConversationService', () => {
 
     it(`cancels message sending if onStart returns false`, async () => {
       const conversationService = buildConversationService();
-      spyOn<any>(conversationService, 'sendGenericMessage');
+      jest.spyOn(conversationService as any, 'sendGenericMessage');
       const message: OtrMessage = {...baseMessage, type: PayloadBundleType.TEXT, content: {text: 'test'}};
-      const onStart = jasmine.createSpy().and.returnValue(Promise.resolve(false));
-      const onSuccess = jasmine.createSpy();
+      const onStart = jest.fn().mockReturnValue(Promise.resolve(false));
+      const onSuccess = jest.fn();
       const payloadBundle = await conversationService.send({
         onStart,
         onSuccess,
@@ -283,9 +284,11 @@ describe('ConversationService', () => {
 
     it(`does not call onSuccess when message was canceled`, async () => {
       const conversationService = buildConversationService();
-      spyOn<any>(conversationService, 'sendGenericMessage').and.returnValue(Promise.resolve({time: '', errored: true}));
+      jest
+        .spyOn(conversationService as any, 'sendGenericMessage')
+        .mockReturnValue(Promise.resolve({time: '', errored: true}));
       const message: OtrMessage = {...baseMessage, type: PayloadBundleType.TEXT, content: {text: 'test'}};
-      const onSuccess = jasmine.createSpy();
+      const onSuccess = jest.fn();
       const payloadBundle = await conversationService.send({
         onSuccess,
         payload: message,
@@ -324,8 +327,8 @@ describe('ConversationService', () => {
     messages.forEach(payload => {
       it(`calls callbacks when sending '${payload.type}' message is starting and successful`, async () => {
         const conversationService = buildConversationService();
-        const onStart = jasmine.createSpy().and.returnValue(Promise.resolve(true));
-        const onSuccess = jasmine.createSpy();
+        const onStart = jest.fn().mockReturnValue(Promise.resolve(true));
+        const onSuccess = jest.fn();
         const promise = conversationService.send({
           protocol: ConversationProtocol.MLS,
           groupId,
@@ -351,7 +354,7 @@ describe('ConversationService', () => {
         },
       };
       const conversationService = buildConversationService(true);
-      spyOn<any>(conversationService, 'getConversationQualifiedMembers').and.returnValue([
+      jest.spyOn(conversationService as any, 'getConversationQualifiedMembers').mockReturnValue([
         {domain: 'test-domain', id: 'test-id-1'},
         {domain: 'test-domain', id: 'test-id-2'},
       ]);
@@ -369,12 +372,12 @@ describe('ConversationService', () => {
         user3: ['client1', 'client2'],
       };
       const conversationService = buildConversationService(true);
-      spyOn(conversationService['messageService'], 'sendMessage').and.callFake(
-        (_client, _recipients, _text, options) => {
+      jest
+        .spyOn(conversationService['messageService'], 'sendMessage')
+        .mockImplementation((_client, _recipients, _text, options) => {
           options?.onClientMismatch?.({missing: members, deleted: {}, redundant: {}, time: ''});
           return {} as any;
-        },
-      );
+        });
       const fetchedMembers = await conversationService.getAllParticipantsClients('convid');
 
       expect(fetchedMembers).toEqual(members);
@@ -386,12 +389,12 @@ describe('ConversationService', () => {
         domain2: {user2: ['client1', 'client2'], user3: ['client1', 'client2']},
       };
       const conversationService = buildConversationService(true);
-      spyOn(conversationService['messageService'], 'sendFederatedMessage').and.callFake(
-        (_client, _recipients, _text, options) => {
+      jest
+        .spyOn(conversationService['messageService'], 'sendFederatedMessage')
+        .mockImplementation((_client, _recipients, _text, options) => {
           options?.onClientMismatch?.({missing: members, deleted: {}, redundant: {}, failed_to_send: {}, time: ''});
           return {} as any;
-        },
-      );
+        });
       const fetchedMembers = await conversationService.getAllParticipantsClients('convid', 'domain1');
 
       expect(fetchedMembers).toEqual(members);

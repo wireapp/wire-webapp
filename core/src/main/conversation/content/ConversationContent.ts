@@ -17,8 +17,8 @@
  *
  */
 
-import type {ClientActionType} from '..';
-import type {
+import {ClientActionType} from '..';
+import {
   AssetContent,
   ButtonActionContent,
   ButtonActionConfirmationContent,

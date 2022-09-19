@@ -29,5 +29,5 @@ export interface Crypto {
     keyBytes: Uint8Array,
     initializationVector: Uint8Array,
     algorithm: string,
-  ): Promise<{key: Uint8Array; cipher: Uint8Array}>;
+  ): Promise<{key: Uint8Array; cipher: Uint8Array | ArrayBuffer}>;
 }

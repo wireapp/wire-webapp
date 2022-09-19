@@ -87,7 +87,7 @@ exports[`"Checkbox" renders (dark theme) 1`] = `
       className="wireinput"
       id="1"
       style={
-        Object {
+        {
           "cursor": "pointer",
           "height": "22px",
           "marginBottom": "0",
@@ -204,7 +204,7 @@ exports[`"Checkbox" renders 1`] = `
       className="wireinput"
       id="1"
       style={
-        Object {
+        {
           "cursor": "pointer",
           "height": "22px",
           "marginBottom": "0",
@@ -321,7 +321,7 @@ exports[`"Checkbox" renders as invalid 1`] = `
       className="wireinput"
       id="1"
       style={
-        Object {
+        {
           "cursor": "pointer",
           "height": "22px",
           "marginBottom": "0",
@@ -435,7 +435,7 @@ exports[`"Checkbox" renders disabled 1`] = `
       disabled={true}
       id="1"
       style={
-        Object {
+        {
           "cursor": "not-allowed",
           "height": "22px",
           "marginBottom": "0",

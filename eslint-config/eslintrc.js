@@ -6,6 +6,7 @@ module.exports = {
     es6: true,
     node: true,
   },
+
   extends: ['prettier', 'plugin:react/recommended', 'plugin:no-unsanitized/DOM'],
   overrides: [
     {
@@ -24,6 +25,7 @@ module.exports = {
   ],
   parser: '@babel/eslint-parser',
   parserOptions: {
+    requireConfigFile: false,
     ecmaFeatures: {
       jsx: true,
     },

@@ -45,7 +45,7 @@ export const crypto: Crypto = {
     plainText: Uint8Array,
     keyBytes: Uint8Array,
     initializationVector: Uint8Array,
-  ): Promise<{key: Uint8Array; cipher: Uint8Array}> {
+  ): Promise<{key: Uint8Array; cipher: Uint8Array | ArrayBuffer}> {
     const key = await cryptoLib.subtle.importKey('raw', keyBytes, 'AES-CBC', true, ['encrypt']);
     return {
       key: new Uint8Array(await cryptoLib.subtle.exportKey('raw', key)),

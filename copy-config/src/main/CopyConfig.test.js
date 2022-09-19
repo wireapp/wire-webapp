@@ -24,7 +24,7 @@ const fs = require('fs-extra');
 
 const {CopyConfig} = require('./');
 const utils = require('./utils');
-const TEMP_DIR = path.resolve(__dirname, '..', '..', '.temp/');
+const TEMP_DIR = path.resolve(__dirname, '..', '..', '.temp');
 
 describe('CopyConfig', () => {
   afterEach(() => fs.remove(TEMP_DIR));
@@ -57,7 +57,7 @@ describe('CopyConfig', () => {
       const copyConfig = new CopyConfig({
         externalDir: '.',
         files: {
-          './spec/helpers/test1.txt': TEMP_DIR,
+          './spec/helpers/test1.txt': `${TEMP_DIR}/test1.txt`,
         },
         repositoryUrl: '',
       });
@@ -127,7 +127,7 @@ describe('CopyConfig', () => {
       const copyConfig = new CopyConfig({
         externalDir: '.',
         files: {
-          './spec/helpers/test1.txt': TEMP_DIR,
+          './spec/helpers/test1.txt': `${TEMP_DIR}/test1.txt`,
         },
         repositoryUrl: '',
       });

@@ -22,7 +22,7 @@ import {OS, Runtime} from './Runtime';
 
 describe('isAndroid', () => {
   it('knows if running on Android', () => {
-    spyOn(Runtime, 'getOS').and.returnValue({family: 'Android'} as OS);
+    jest.spyOn(Runtime, 'getOS').mockReturnValue({family: 'Android'} as OS);
     expect(Runtime.isAndroid()).toBe(true);
     expect(Runtime.isIOS()).toBe(false);
     expect(Runtime.isMobileOS()).toBe(true);
@@ -31,7 +31,7 @@ describe('isAndroid', () => {
 
 describe('getBrowserName', () => {
   it('works if platform fails to load properly', () => {
-    spyOn(Runtime, 'getPlatform').and.returnValue({} as typeof platform);
+    jest.spyOn(Runtime, 'getPlatform').mockReturnValue({} as typeof platform);
     expect(Runtime.getBrowserName()).toBe('unknown');
   });
 });
@@ -40,7 +40,7 @@ describe('isChrome', () => {
   it('knows if running in Chrome', () => {
     const userAgent =
       'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/67.0.3396.99 Safari/537.36';
-    spyOn(Runtime, 'getPlatform').and.returnValue(platform.parse(userAgent));
+    jest.spyOn(Runtime, 'getPlatform').mockReturnValue(platform.parse(userAgent));
     expect(Runtime.isChrome()).toBe(true);
     expect(Runtime.isEdge()).toBe(false);
     expect(Runtime.isFirefox()).toBe(false);
@@ -54,14 +54,14 @@ describe('isElectron', () => {
   it('knows if running in Electron', () => {
     const userAgent =
       'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/49.0.2623.75 Electron/0.37.5 Safari/537.36';
-    spyOn(Runtime, 'getPlatform').and.returnValue(platform.parse(userAgent));
+    jest.spyOn(Runtime, 'getPlatform').mockReturnValue(platform.parse(userAgent));
     expect(Runtime.isElectron()).toBe(true);
   });
 });
 
 describe('isIOS', () => {
   it('knows if running on iOS', () => {
-    spyOn(Runtime, 'getOS').and.returnValue({family: 'iOS'} as OS);
+    jest.spyOn(Runtime, 'getOS').mockReturnValue({family: 'iOS'} as OS);
     expect(Runtime.isAndroid()).toBe(false);
     expect(Runtime.isIOS()).toBe(true);
     expect(Runtime.isMobileOS()).toBe(true);
@@ -70,52 +70,52 @@ describe('isIOS', () => {
 
 describe('isLinux', () => {
   it('detects pure Linux', () => {
-    spyOn(Runtime, 'getOS').and.returnValue({family: 'Linux'} as OS);
+    jest.spyOn(Runtime, 'getOS').mockReturnValue({family: 'Linux'} as OS);
     expect(Runtime.isLinux()).toBe(true);
     expect(Runtime.isMacOS()).toBe(false);
     expect(Runtime.isWindows()).toBe(false);
   });
 
   it('detects Debian', () => {
-    spyOn(Runtime, 'getOS').and.returnValue({family: 'Debian'} as OS);
+    jest.spyOn(Runtime, 'getOS').mockReturnValue({family: 'Debian'} as OS);
     expect(Runtime.isLinux()).toBe(true);
   });
 
   it('detects Fedora', () => {
-    spyOn(Runtime, 'getOS').and.returnValue({family: 'Fedora'} as OS);
+    jest.spyOn(Runtime, 'getOS').mockReturnValue({family: 'Fedora'} as OS);
     expect(Runtime.isLinux()).toBe(true);
   });
 
   it('detects Ubuntu', () => {
-    spyOn(Runtime, 'getOS').and.returnValue({family: 'Ubuntu'} as OS);
+    jest.spyOn(Runtime, 'getOS').mockReturnValue({family: 'Ubuntu'} as OS);
     expect(Runtime.isLinux()).toBe(true);
   });
 });
 
 describe('isMacOS', () => {
   it('detects OS X', () => {
-    spyOn(Runtime, 'getOS').and.returnValue({family: 'OS X'} as OS);
+    jest.spyOn(Runtime, 'getOS').mockReturnValue({family: 'OS X'} as OS);
     expect(Runtime.isLinux()).toBe(false);
     expect(Runtime.isMacOS()).toBe(true);
     expect(Runtime.isWindows()).toBe(false);
   });
 
   it('detects Mac OS', () => {
-    spyOn(Runtime, 'getOS').and.returnValue({family: 'Mac OS'} as OS);
+    jest.spyOn(Runtime, 'getOS').mockReturnValue({family: 'Mac OS'} as OS);
     expect(Runtime.isMacOS()).toBe(true);
   });
 });
 
 describe('isWindows', () => {
   it('detects Windows', () => {
-    spyOn(Runtime, 'getOS').and.returnValue({family: 'Windows'} as OS);
+    jest.spyOn(Runtime, 'getOS').mockReturnValue({family: 'Windows'} as OS);
     expect(Runtime.isLinux()).toBe(false);
     expect(Runtime.isMacOS()).toBe(false);
     expect(Runtime.isWindows()).toBe(true);
   });
 
   it('detects Windows 7', () => {
-    spyOn(Runtime, 'getOS').and.returnValue({family: 'windows server 2008 r2 / 7'} as OS);
+    jest.spyOn(Runtime, 'getOS').mockReturnValue({family: 'windows server 2008 r2 / 7'} as OS);
     expect(Runtime.isWindows()).toBe(true);
   });
 });

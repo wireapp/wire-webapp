@@ -50,7 +50,9 @@ describe('NotificationService', () => {
         storeEngine,
       );
 
-      spyOn<any>(notificationService, 'handleEvent').and.throwError('Test error');
+      jest.spyOn(notificationService as any, 'handleEvent').mockImplementation(() => {
+        throw new Error('Test error');
+      });
 
       const promise = new Promise<void>(resolve => {
         notificationService.on(NotificationService.TOPIC.NOTIFICATION_ERROR, notificationError => {
@@ -86,8 +88,10 @@ describe('NotificationService', () => {
         storeEngine,
       );
 
-      spyOn<any>(notificationService, 'handleEvent').and.returnValue({});
-      const spySetLastNotificationId = spyOn<any>(notificationService, 'setLastNotificationId').and.returnValue({});
+      jest.spyOn(notificationService as any, 'handleEvent').mockReturnValue({});
+      const spySetLastNotificationId = jest
+        .spyOn(notificationService as any, 'setLastNotificationId')
+        .mockReturnValue({});
 
       const notification = {
         payload: [{}],
@@ -102,7 +106,7 @@ describe('NotificationService', () => {
       await handledNotifications.next();
       await handledNotifications.next();
 
-      expect(spySetLastNotificationId.calls.count()).toBe(1);
+      expect(spySetLastNotificationId).toHaveBeenCalledTimes(1);
     });
 
     it('does NOT update last notification ID when notification is transient', async () => {
@@ -117,8 +121,10 @@ describe('NotificationService', () => {
         storeEngine,
       );
 
-      spyOn<any>(notificationService, 'handleEvent').and.returnValue({});
-      const spySetLastNotificationId = spyOn<any>(notificationService, 'setLastNotificationId').and.returnValue({});
+      jest.spyOn(notificationService as any, 'handleEvent').mockReturnValue({});
+      const spySetLastNotificationId = jest
+        .spyOn(notificationService as any, 'setLastNotificationId')
+        .mockReturnValue({});
 
       const notification = {
         payload: [{}],
@@ -131,39 +137,43 @@ describe('NotificationService', () => {
       );
       await handledNotifications.next();
 
-      expect(spySetLastNotificationId.calls.count()).toBe(0);
+      expect(spySetLastNotificationId).toHaveBeenCalledTimes(0);
     });
 
-    it('does NOT update last notification ID when event processing fails', async done => {
-      const storeEngine = new MemoryEngine();
-      await storeEngine.init('NotificationService.test');
+    it('does NOT update last notification ID when event processing fails', async () => {
+      return new Promise<void>(async resolve => {
+        const storeEngine = new MemoryEngine();
+        await storeEngine.init('NotificationService.test');
 
-      const apiClient = new APIClient({urls: MOCK_BACKEND});
-      const notificationService = new NotificationService(
-        apiClient,
-        mockedCryptographyService,
-        mockedMLSService,
-        storeEngine,
-      );
-      notificationService.on(NotificationService.TOPIC.NOTIFICATION_ERROR, notificationError => {
-        expect(notificationError.error.message).toBe('Test error');
-        expect(spySetLastNotificationId.calls.count()).toBe(0);
-        done();
+        const apiClient = new APIClient({urls: MOCK_BACKEND});
+        const notificationService = new NotificationService(
+          apiClient,
+          mockedCryptographyService,
+          mockedMLSService,
+          storeEngine,
+        );
+        notificationService.on(NotificationService.TOPIC.NOTIFICATION_ERROR, notificationError => {
+          expect(notificationError.error.message).toBe('Test error');
+          expect(spySetLastNotificationId).toHaveBeenCalledTimes(0);
+          resolve();
+        });
+
+        jest.spyOn(notificationService as any, 'handleEvent').mockImplementation(() => {
+          throw new Error('Test error');
+        });
+        const spySetLastNotificationId = jest.spyOn(notificationService, 'setLastNotificationId').mockResolvedValue('');
+
+        const notification = {
+          payload: [{}],
+          transient: true,
+        } as unknown as Notification;
+
+        const handledNotifications = notificationService.handleNotification(
+          notification,
+          PayloadBundleSource.NOTIFICATION_STREAM,
+        );
+        await handledNotifications.next();
       });
-
-      spyOn<any>(notificationService, 'handleEvent').and.throwError('Test error');
-      const spySetLastNotificationId = spyOn<any>(notificationService, 'setLastNotificationId').and.returnValue({});
-
-      const notification = {
-        payload: [{}],
-        transient: true,
-      } as unknown as Notification;
-
-      const handledNotifications = notificationService.handleNotification(
-        notification,
-        PayloadBundleSource.NOTIFICATION_STREAM,
-      );
-      await handledNotifications.next();
     });
   });
 });
