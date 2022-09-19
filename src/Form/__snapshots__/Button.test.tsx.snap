@@ -325,7 +325,7 @@ exports[`"Button" renders in loading state 1`] = `
       height={30}
       strokeWidth="3"
       style={
-        Object {
+        {
           "display": "flex",
           "margin": "auto",
         }
