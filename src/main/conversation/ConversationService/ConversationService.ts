@@ -867,10 +867,6 @@ export class ConversationService {
     });
   }
 
-  public leaveMLSConversation(conversationId: QualifiedId): Promise<ConversationMemberLeaveEvent> {
-    return this.leaveConversation(conversationId);
-  }
-
   /**
    * @depricated seems not to be used and is outdated. use leaveConversation instead
    */
@@ -888,6 +884,7 @@ export class ConversationService {
       ),
     );
   }
+
   /**
    * Create a group conversation.
    * @param  {string} name
@@ -1331,5 +1328,9 @@ export class ConversationService {
   public async isMLSConversationEstablished(conversationGroupId: string) {
     const groupIdDecodedFromBase64 = Decoder.fromBase64(conversationGroupId!).asBytes;
     return this.mlsService.conversationExists(groupIdDecodedFromBase64);
+  }
+
+  public async wipeMLSConversation(conversationId: Uint8Array): Promise<void> {
+    return this.mlsService.wipeConversation(conversationId);
   }
 }
