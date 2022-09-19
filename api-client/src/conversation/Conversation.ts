@@ -92,6 +92,7 @@ export interface Conversation {
   /** MLS conversations only */
   group_id?: string;
   epoch?: number;
+  cipher_suite?: number;
 
   protocol: ConversationProtocol;
 }
