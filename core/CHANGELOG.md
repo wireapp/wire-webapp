@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [30.11.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/compare/@wireapp/core@30.10.0...@wireapp/core@30.11.0) (2022-09-19)
+
+
+### Features
+
+* leave mls conversation (FS-683) ([#4399](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/issues/4399)) ([4e5087a](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/commit/4e5087a8c224d95e1685376fedee202b2b4cb039))
+
+
+
+
+
 # [30.10.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/compare/@wireapp/core@30.9.0...@wireapp/core@30.10.0) (2022-09-15)
 
 
