@@ -1940,6 +1940,14 @@ export class ConversationRepository {
     return this.pushToReceivingQueue(eventJson, eventSource);
   };
 
+  private async handleWipeMLSConversation(conversationId: QualifiedId) {
+    try {
+      this.core.service!.conversation.wipeMLSConversation(conversationId);
+    } catch (error) {
+      this.logger.error("Couldn't wipe conversation's data: ", error);
+    }
+  }
+
   private handleConversationEvent(
     eventJson: IncomingEvent,
     eventSource: EventSource = EventSource.NOTIFICATION_STREAM,
@@ -1979,6 +1987,11 @@ export class ConversationRepository {
           ),
         );
       }
+    }
+
+    const conversationQualifiedId = eventJson.qualified_conversation;
+    if (type === CONVERSATION_EVENT.MEMBER_LEAVE && conversationQualifiedId) {
+      this.handleWipeMLSConversation(conversationQualifiedId);
     }
 
     const isConversationCreate = type === CONVERSATION_EVENT.CREATE;
@@ -2504,13 +2517,6 @@ export class ConversationRepository {
 
       if (this.userState.self().isTemporaryGuest()) {
         eventJson.from = this.userState.self().id;
-      }
-
-      if (conversationEntity.protocol === ConversationProtocol.MLS) {
-        const {groupId} = conversationEntity;
-        if (groupId) {
-          this.core.service!.conversation.wipeMLSConversation(groupId);
-        }
       }
     }
 
