@@ -1522,7 +1522,7 @@ export class ConversationRepository {
   }
 
   /**
-   * Remove the current user from a MLS conversation.
+   * Remove the current user from a conversation.
    *
    * @param conversationEntity Conversation to remove user from
    * @param clearContent Should we clear the conversation content from the database?
