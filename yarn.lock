@@ -3234,10 +3234,10 @@
   resolved "https://registry.yarnpkg.com/@wireapp/core-crypto/-/core-crypto-0.4.0.tgz#62ae0b4976753a454d478b141cd4f08e5a8be95a"
   integrity sha512-GIrzcbTdZ66dVXh+T56mhsoepTov6H5aQst40WFTGT20EnjubI5bV+w/PE8kegTRQcmDnZL2WQUQExDEwGK5aw==
 
-"@wireapp/core@30.10.0":
-  version "30.10.0"
-  resolved "https://registry.yarnpkg.com/@wireapp/core/-/core-30.10.0.tgz#ce46735125badd40fea056132255e06f18c34a5c"
-  integrity sha512-+N54Bf9MuJs7QgtpZsnMLEuMNgjcW1fIewsTs7KTq9FP1s6L12X6qyrlz2l9s01ZRJPG+oGFr1fnoPXVMdGeRg==
+"@wireapp/core@30.11.0":
+  version "30.11.0"
+  resolved "https://registry.yarnpkg.com/@wireapp/core/-/core-30.11.0.tgz#6108a254c85e3d51bb45ccdfc510002acff7ca98"
+  integrity sha512-3ravNAdA3VF5yjJuDS89JGCcnPlYlt+oDPq6joCF6TxWYdTPpkQUmTT78igKNxGYKgESm4KUTvTDng87ObHerw==
   dependencies:
     "@open-wc/webpack-import-meta-loader" "0.4.7"
     "@types/long" "4.0.1"
