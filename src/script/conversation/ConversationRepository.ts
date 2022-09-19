@@ -1530,7 +1530,7 @@ export class ConversationRepository {
    */
   private async leaveConversation(conversationEntity: Conversation, clearContent: boolean) {
     if (clearContent) {
-      return this.clearConversation(conversationEntity, true);
+      this.clearConversation(conversationEntity, false);
     }
 
     const userQualifiedId = this.userState.self().qualifiedId;
