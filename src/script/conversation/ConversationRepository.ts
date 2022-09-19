@@ -50,7 +50,7 @@ import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 import {PromiseQueue} from 'Util/PromiseQueue';
 import {replaceLink, t} from 'Util/LocalizerUtil';
 import {getNextItem} from 'Util/ArrayUtil';
-import {createRandomUuid, noop} from 'Util/util';
+import {base64ToArray, createRandomUuid, noop} from 'Util/util';
 import {allowsAllFiles, getFileExtensionOrName, isAllowedFile} from 'Util/FileTypeUtil';
 import {
   compareTransliteration,
@@ -1940,9 +1940,13 @@ export class ConversationRepository {
     return this.pushToReceivingQueue(eventJson, eventSource);
   };
 
-  private async handleWipeMLSConversation(conversationId: QualifiedId) {
+  private async handleWipeMLSConversation(conversationId: string) {
     try {
-      this.core.service!.conversation.wipeMLSConversation(conversationId);
+      const conversation = await this.conversationService.loadConversation<ConversationRecord>(conversationId);
+      if (conversation) {
+        const groupIdDecodedFromBase64 = base64ToArray(conversation.group_id);
+        this.core.service!.conversation.wipeMLSConversation(groupIdDecodedFromBase64);
+      }
     } catch (error) {
       this.logger.error("Couldn't wipe conversation's data: ", error);
     }
@@ -1989,9 +1993,8 @@ export class ConversationRepository {
       }
     }
 
-    const conversationQualifiedId = eventJson.qualified_conversation;
-    if (type === CONVERSATION_EVENT.MEMBER_LEAVE && conversationQualifiedId) {
-      this.handleWipeMLSConversation(conversationQualifiedId);
+    if (type === CONVERSATION_EVENT.MEMBER_LEAVE) {
+      this.handleWipeMLSConversation(conversationId.id);
     }
 
     const isConversationCreate = type === CONVERSATION_EVENT.CREATE;
