@@ -202,4 +202,8 @@ export class MLSService {
       keypackages.map(keypackage => btoa(Converter.arrayBufferViewToBaselineString(keypackage))),
     );
   }
+
+  public async wipeConversation(conversationId: ConversationId): Promise<void> {
+    return this.getCoreCryptoClient().wipeConversation(conversationId);
+  }
 }
