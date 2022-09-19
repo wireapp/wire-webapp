@@ -70,6 +70,7 @@ const subTitleStyles: CSSObject = {
   fontSize: 12,
   fontWeight: 400,
   marginBottom: 16,
+  wordBreak: 'break-all',
 };
 
 const wrapperStyles: CSSObject = {
