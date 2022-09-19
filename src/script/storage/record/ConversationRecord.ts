@@ -36,6 +36,7 @@ export interface ConversationRecord {
   access: CONVERSATION_ACCESS[];
   archived_state: boolean;
   archived_timestamp: number;
+  cipher_suite: number;
   cleared_timestamp: number;
   creator: string;
   domain: string | null;
@@ -43,7 +44,6 @@ export interface ConversationRecord {
   global_message_timer: number;
   group_id: string;
   epoch: number;
-  protocol: ConversationProtocol;
   id: string;
   is_guest: boolean;
   is_managed: boolean;
@@ -55,6 +55,7 @@ export interface ConversationRecord {
   muted_timestamp: number;
   name: string;
   others: string[];
+  protocol: ConversationProtocol;
   qualified_others: QualifiedId[];
   receipt_mode: RECEIPT_MODE | null;
   roles: {[userId: string]: DefaultConversationRoleName | string};

@@ -1032,7 +1032,7 @@
   "preferencesOptionsBackupExportHeadline": "Back up",
   "preferencesOptionsBackupExportSecondary": "Ein Backup erstellen, um den Gesprächsverlauf zu sichern. Damit können Unterhaltungen wiederhergestellt werden, falls das Gerät verloren geht oder ein neues genutzt wird.\nDie Backup-Datei wird nicht mit {{brandName}} Ende-zu-Ende-Verschlüsselung geschützt. Bitte darauf achten, sie an einem sicheren Ort zu speichern.",
   "preferencesOptionsBackupHeader": "Gesprächsverlauf",
-  "preferencesOptionsBackupImportHeadline": "Restore",
+  "preferencesOptionsBackupImportHeadline": "Wiederherstellen",
   "preferencesOptionsBackupImportSecondary": "Es können nur Backup-Dateien derselben Plattform wiederhergestellt werden. Der Inhalt der Backup-Datei ersetzt den Gesprächsverlauf auf diesem Gerät.",
   "preferencesOptionsCall": "Anrufe",
   "preferencesOptionsCallLogs": "Fehlerbehebung",
