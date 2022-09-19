@@ -319,6 +319,7 @@
   "conversationDetailsOff": "Off",
   "conversationDetailsOn": "On",
   "conversationDetailsOptions": "Options",
+  "conversationDetailsProtocolDetails": "Protocol details (Beta)",
   "conversationDetailsParticipantsServicesMany": "Services",
   "conversationDetailsParticipantsServicesOne": "Service",
   "conversationDetailsParticipantsUsersMany": "People",

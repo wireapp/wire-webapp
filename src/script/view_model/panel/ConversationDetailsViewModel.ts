@@ -69,6 +69,8 @@ export class ConversationDetailsViewModel extends BasePanelViewModel {
   selectedService: ko.Observable<ServiceEntity>;
   isSelfVerified: ko.PureComputed<boolean>;
   firstParticipant: ko.PureComputed<User>;
+  conversationProtocol: ko.PureComputed<string>;
+  conversationCipherSuite: ko.PureComputed<number>;
   isActiveGroupParticipant: ko.PureComputed<boolean>;
   isVerified: ko.PureComputed<boolean>;
   isEditingName: ko.Observable<boolean>;
@@ -168,6 +170,8 @@ export class ConversationDetailsViewModel extends BasePanelViewModel {
     });
 
     this.firstParticipant = ko.pureComputed(() => this.activeConversation()?.firstUserEntity());
+    this.conversationProtocol = ko.pureComputed(() => this.activeConversation()?.protocol.toUpperCase());
+    this.conversationCipherSuite = ko.pureComputed(() => this.activeConversation()?.cipherSuite);
 
     this.isActiveGroupParticipant = ko.pureComputed(() => {
       return !!(this.activeConversation()?.isGroup() && !this.activeConversation().removed_from_conversation());
