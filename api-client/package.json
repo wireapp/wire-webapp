@@ -7,7 +7,7 @@
     "@types/node": "~14",
     "@types/spark-md5": "3.0.2",
     "@types/tough-cookie": "4.0.1",
-    "@wireapp/commons": "4.3.0",
+    "@wireapp/commons": "4.3.1",
     "@wireapp/priority-queue": "1.7.0",
     "@wireapp/protocol-messaging": "1.37.0",
     "axios": "0.21.4",
@@ -29,7 +29,7 @@
     "@types/jasmine": "3.8.2",
     "@types/karma": "6.3.1",
     "@types/ws": "7.4.7",
-    "@wireapp/react-ui-kit": "8.13.8",
+    "@wireapp/react-ui-kit": "8.13.9",
     "@wireapp/store-engine": "4.9.9",
     "@wireapp/store-engine-fs": "2.4.9",
     "babel-loader": "8.2.2",
@@ -90,6 +90,6 @@
     "test:types": "tsc --noEmit",
     "watch": "webpack serve --config webpack.browser.js"
   },
-  "version": "20.4.0",
+  "version": "20.4.1",
   "gitHead": "5339f01fe01ef0871da8c8bc8662fbe9e604754a"
 }
