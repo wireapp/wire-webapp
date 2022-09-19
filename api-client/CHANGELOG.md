@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [20.4.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/compare/@wireapp/api-client@20.3.1...@wireapp/api-client@20.4.0) (2022-09-19)
+
+
+### Features
+
+* Add cipher_suite to conversation data (FS-881) ([#4400](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/issues/4400)) ([d216468](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/commit/d2164680ec484d432cdf62da69b5afa86c956067))
+
+
+
+
+
 ## [20.3.1](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/compare/@wireapp/api-client@20.3.0...@wireapp/api-client@20.3.1) (2022-09-13)
 
 
