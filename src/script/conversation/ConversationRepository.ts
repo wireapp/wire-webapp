@@ -3044,6 +3044,10 @@ export class ConversationRepository {
     return false;
   }
 
+  findConversationByGroupId(groupId: string): Conversation | undefined {
+    return this.conversationState.findConversationByGroupId(groupId);
+  }
+
   public async cleanupEphemeralMessages(): Promise<void> {
     this.conversationState.conversations().forEach(async conversationEntity => {
       const messages = (await this.eventService.loadEphemeralEvents(conversationEntity.id)) as EventRecord[];

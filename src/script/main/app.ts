@@ -31,7 +31,7 @@ import {Runtime} from '@wireapp/commons';
 
 import {getLogger, Logger} from 'Util/Logger';
 import {t} from 'Util/LocalizerUtil';
-import {checkIndexedDb, createRandomUuid} from 'Util/util';
+import {arrayToBase64, checkIndexedDb, createRandomUuid} from 'Util/util';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 import {enableLogging} from 'Util/LoggerUtil';
 import {Environment} from 'Util/Environment';
@@ -435,8 +435,17 @@ class App {
         );
 
         this.core.configureMLSCallbacks({
-          authorize: (conversationId, clientId) => true,
-          clientIdBelongsToOneOf: (clientId, otherClients) => true,
+          authorize: (groupIdBytes, clientId) => {
+            const groupId = arrayToBase64(groupIdBytes);
+            const conversation = conversationRepository.findConversationByGroupId(groupId);
+            if (!conversation) {
+              return false;
+            }
+            return conversationRepository.conversationRoleRepository.isUserGroupAdmin(conversation, selfUser);
+          },
+          clientIdBelongsToOneOf: (clientId, otherClients) => {
+            return true;
+          },
           groupIdFromConversationId: async conversationId => {
             const conversation = await conversationRepository.getConversationById(conversationId);
             return conversation?.groupId;
