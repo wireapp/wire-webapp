@@ -439,7 +439,8 @@ class App {
             const groupId = arrayToBase64(groupIdBytes);
             const conversation = conversationRepository.findConversationByGroupId(groupId);
             if (!conversation) {
-              return false;
+              // If the conversation is not found, it means it's being created by the self user, thus they have admin rights
+              return true;
             }
             return conversationRepository.conversationRoleRepository.isUserGroupAdmin(conversation, selfUser);
           },
