@@ -872,7 +872,7 @@ export class ConversationRepository {
    * Check for conversation locally and fetch it from the server otherwise.
    * TODO(Federation): Remove "optional" from "domain"
    */
-  async getConversationById(conversation_id: QualifiedId): Promise<Conversation> {
+  async getConversationById(conversation_id: QualifiedId, searchInLocalDB = false): Promise<Conversation> {
     if (typeof conversation_id.id !== 'string') {
       throw new ConversationError(
         ConversationError.TYPE.NO_CONVERSATION_ID,
@@ -884,11 +884,13 @@ export class ConversationRepository {
       return localStateConversation;
     }
 
-    const localDBConversation = await this.conversationService.loadConversation<BackendConversation>(
-      conversation_id.id,
-    );
-    if (localDBConversation) {
-      return this.mapConversations([localDBConversation])[0];
+    if (searchInLocalDB) {
+      const localDBConversation = await this.conversationService.loadConversation<BackendConversation>(
+        conversation_id.id,
+      );
+      if (localDBConversation) {
+        return this.mapConversations([localDBConversation])[0];
+      }
     }
 
     try {
@@ -1990,7 +1992,9 @@ export class ConversationRepository {
     }
 
     const isConversationCreate = type === CONVERSATION_EVENT.CREATE;
-    const onEventPromise = isConversationCreate ? Promise.resolve(null) : this.getConversationById(conversationId);
+    const onEventPromise = isConversationCreate
+      ? Promise.resolve(null)
+      : this.getConversationById(conversationId, true);
     let previouslyArchived = false;
 
     return onEventPromise
