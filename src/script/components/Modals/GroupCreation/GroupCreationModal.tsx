@@ -78,7 +78,7 @@ const GroupCreationModal: React.FC<GroupCreationModalProps> = ({
   userState = container.resolve(UserState),
   teamState = container.resolve(TeamState),
 }) => {
-  const defaultProtocol = teamState.teamFeatures().mls.config.defaultProtocol;
+  const defaultProtocol = teamState.teamFeatures().mls?.config.defaultProtocol;
   const protocolOptions: ProtocolOption[] = [ConversationProtocol.PROTEUS, ConversationProtocol.MLS].map(protocol => ({
     label: `${t(`modalCreateGroupProtocolSelect.${protocol}`)}${
       protocol === defaultProtocol ? t(`modalCreateGroupProtocolSelect.default`) : ''
@@ -107,7 +107,7 @@ const GroupCreationModal: React.FC<GroupCreationModalProps> = ({
 
   const onEscape = () => setIsShown(false);
   const {isTeam, isMLSEnabled: isMLSEnabledForTeam} = useKoSubscribableChildren(teamState, ['isTeam', 'isMLSEnabled']);
-  const enableMlsCheckbox = isMLSEnabledForTeam || Config.getConfig().FEATURE.ENABLE_MLS;
+  const enableMlsCheckbox = isMLSEnabledForTeam && Config.getConfig().FEATURE.ENABLE_MLS;
 
   useEffect(() => {
     const showCreateGroup = (_: string, userEntity: User) => {
