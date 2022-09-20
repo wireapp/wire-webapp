@@ -754,13 +754,12 @@ export class MessageRepository {
     // Configure ephemeral messages
     conversationService.messageTimer.setConversationLevelTimer(conversation.id, conversation.messageTimer());
 
+    const commonProperties = {onStart: injectOptimisticEvent, onSuccess: handleSuccess, payload};
     if (groupId) {
       return this.messageSender.queueMessage(() =>
         this.conversationService.send({
+          ...commonProperties,
           groupId,
-          onStart: injectOptimisticEvent,
-          onSuccess: handleSuccess,
-          payload,
           protocol: ConversationProtocol.MLS,
         }),
       );
@@ -768,12 +767,10 @@ export class MessageRepository {
 
     return this.messageSender.queueMessage(() =>
       this.conversationService.send({
+        ...commonProperties,
         conversationDomain: conversation.domain || undefined,
         nativePush,
         onClientMismatch: mismatch => this.onClientMismatch?.(mismatch, conversation, silentDegradationWarning),
-        onStart: injectOptimisticEvent,
-        onSuccess: handleSuccess,
-        payload,
         protocol: ConversationProtocol.PROTEUS,
         targetMode,
         userIds: this.generateRecipients(conversation, recipients, skipSelf),
