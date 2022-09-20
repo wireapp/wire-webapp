@@ -23,7 +23,7 @@ import {MemoryEngine} from '@wireapp/store-engine';
 import {PayloadBundleSource} from '../conversation';
 import {CryptographyService} from '../cryptography';
 import {NotificationService} from './NotificationService';
-import type {MLSService} from '../mls';
+import {MLSService} from '../mls';
 
 const BASE_URL = 'mock-backend.wire.com';
 const MOCK_BACKEND = {

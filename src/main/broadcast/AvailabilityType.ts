@@ -17,6 +17,6 @@
  *
  */
 
-import type {Availability} from '@wireapp/protocol-messaging';
+import {Availability} from '@wireapp/protocol-messaging';
 
 export type AvailabilityType = Availability.Type;

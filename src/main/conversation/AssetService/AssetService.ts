@@ -17,11 +17,11 @@
  *
  */
 
-import type {APIClient} from '@wireapp/api-client';
-import type {AssetOptions} from '@wireapp/api-client/src/asset';
-import type {ProgressCallback, RequestCancelable} from '@wireapp/api-client/src/http';
+import {APIClient} from '@wireapp/api-client';
+import {AssetOptions} from '@wireapp/api-client/src/asset';
+import {ProgressCallback, RequestCancelable} from '@wireapp/api-client/src/http';
 
-import type {EncryptedAssetUploaded} from '../../cryptography';
+import {EncryptedAssetUploaded} from '../../cryptography';
 import {encryptAsset} from '../../cryptography/AssetCryptography';
 
 export interface AssetDataV4 {

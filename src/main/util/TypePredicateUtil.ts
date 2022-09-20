@@ -17,8 +17,8 @@
  *
  */
 
-import type {QualifiedUserClients, UserClients} from '@wireapp/api-client/src/conversation/';
-import type {QualifiedId} from '@wireapp/api-client/src/user/';
+import {QualifiedUserClients, UserClients} from '@wireapp/api-client/src/conversation/';
+import {QualifiedId} from '@wireapp/api-client/src/user/';
 
 export function isStringArray(obj: any): obj is string[] {
   return Array.isArray(obj) && (obj.length === 0 || typeof obj[0] === 'string');

@@ -17,19 +17,19 @@
  *
  */
 
-import type {APIClient} from '@wireapp/api-client';
+import {APIClient} from '@wireapp/api-client';
 import {
   ClientMismatch,
   MessageSendingStatus,
   QualifiedUserClients,
   UserClients,
 } from '@wireapp/api-client/src/conversation';
-import type {UserPreKeyBundleMap} from '@wireapp/api-client/src/user/';
+import {UserPreKeyBundleMap} from '@wireapp/api-client/src/user/';
 import {GenericMessage} from '@wireapp/protocol-messaging';
 
 import {MessageService} from '../conversation/message/MessageService';
 import {flattenQualifiedUserClients} from '../conversation/message/UserClientsUtil';
-import type {CryptographyService} from '../cryptography/';
+import {CryptographyService} from '../cryptography/';
 import {isQualifiedUserClients} from '../util';
 
 export class BroadcastService {

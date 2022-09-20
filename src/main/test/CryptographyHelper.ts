@@ -21,7 +21,7 @@ import {Cryptobox} from '@wireapp/cryptobox';
 import {init, keys} from '@wireapp/proteus';
 import * as bazinga64 from 'bazinga64';
 
-import type {CryptographyService} from '../cryptography';
+import {CryptographyService} from '../cryptography';
 
 const StoreHelper = require('./StoreHelper');
 

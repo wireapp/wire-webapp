@@ -17,7 +17,7 @@
  *
  */
 
-import type {ConversationOtrMessageAddEvent} from '@wireapp/api-client/src/event/';
+import {ConversationOtrMessageAddEvent} from '@wireapp/api-client/src/event/';
 import logdown from 'logdown';
 import {
   GenericMessageType,
@@ -26,7 +26,7 @@ import {
   PayloadBundleState,
   PayloadBundleType,
 } from '../conversation';
-import type {
+import {
   AssetContent,
   ClearedContent,
   ConfirmationContent,

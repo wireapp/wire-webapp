@@ -17,7 +17,7 @@
  *
  */
 
-import type {APIClient} from '@wireapp/api-client';
+import {APIClient} from '@wireapp/api-client';
 import {Connection, ConnectionStatus} from '@wireapp/api-client/src/connection/';
 import {QualifiedId} from '@wireapp/api-client/src/user';
 

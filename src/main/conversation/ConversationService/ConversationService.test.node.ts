@@ -31,7 +31,7 @@ import {MessageTargetMode} from './ConversationService.types';
 import {MessageBuilder} from '../message/MessageBuilder';
 import {OtrMessage} from '../message/OtrMessage';
 import {NotificationService} from '../../notification/NotificationService';
-import type {MLSService} from '../../mls';
+import {MLSService} from '../../mls';
 import * as messageSender from '../message/messageSender';
 
 const mockedMLSService = {

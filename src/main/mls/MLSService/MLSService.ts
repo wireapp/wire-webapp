@@ -35,7 +35,7 @@ import {
 import {APIClient} from '@wireapp/api-client';
 import {QualifiedUsers} from '../../conversation';
 import {Converter, Decoder, Encoder} from 'bazinga64';
-import type {MLSCallbacks, MLSConfig} from '../types';
+import {MLSCallbacks, MLSConfig} from '../types';
 import {PostMlsMessageResponse} from '@wireapp/api-client/src/conversation';
 import {sendMessage} from '../../conversation/message/messageSender';
 import {parseFullQualifiedClientId} from '../../util/fullyQualifiedClientIdUtils';
