@@ -17,17 +17,17 @@
  *
  */
 
-import type {AxiosRequestConfig, AxiosResponse} from 'axios';
+import {AxiosRequestConfig, AxiosResponse} from 'axios';
 
 import {BackendError, BackendErrorLabel, HttpClient} from '../http/';
 import {ClientType} from '../client/';
 import {ForbiddenPhoneNumberError, InvalidPhoneNumberError, PasswordExistsError} from './AuthenticationError';
 import {retrieveCookie, sendRequestWithCookie} from '../shims/node/cookie';
-import type {AccessTokenData, LoginData, SendLoginCode} from '../auth/';
-import type {CookieList} from './CookieList';
-import type {LoginCodeResponse} from './LoginCodeResponse';
-import type {RegisterData} from './RegisterData';
-import type {User} from '../user/';
+import {AccessTokenData, LoginData, SendLoginCode} from '../auth/';
+import {CookieList} from './CookieList';
+import {LoginCodeResponse} from './LoginCodeResponse';
+import {RegisterData} from './RegisterData';
+import {User} from '../user/';
 
 export class AuthAPI {
   constructor(private readonly client: HttpClient) {}

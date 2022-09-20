@@ -17,7 +17,7 @@
  *
  */
 
-import type {
+import {
   ConversationAccessUpdateData,
   ConversationCodeUpdateData,
   ConversationConnectRequestData,

@@ -19,12 +19,12 @@
 
 import {EventEmitter} from 'events';
 import logdown from 'logdown';
-import type {CloseEvent, ErrorEvent, Event} from 'reconnecting-websocket';
+import {CloseEvent, ErrorEvent, Event} from 'reconnecting-websocket';
 
 import {HttpClient, NetworkError} from '../http/';
 import {InvalidTokenError, MissingCookieError} from '../auth/';
 import {ReconnectingWebsocket, WEBSOCKET_STATE} from './ReconnectingWebsocket';
-import type {Notification} from '../notification/';
+import {Notification} from '../notification/';
 
 enum TOPIC {
   ON_ERROR = 'WebSocketClient.TOPIC.ON_ERROR',

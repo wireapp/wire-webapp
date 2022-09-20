@@ -17,7 +17,7 @@
  *
  */
 
-import type {IdentityProvider} from './IdentityProvider';
+import {IdentityProvider} from './IdentityProvider';
 
 export interface IdentityProviders {
   providers: IdentityProvider[];

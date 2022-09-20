@@ -18,7 +18,7 @@
  */
 
 import {FEATURE_KEY} from '../team';
-import type {
+import {
   TeamFeatureConfigurationUpdateEventData,
   TeamConversationCreateData,
   TeamConversationDeleteData,

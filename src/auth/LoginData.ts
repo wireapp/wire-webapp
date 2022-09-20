@@ -17,7 +17,7 @@
  *
  */
 
-import type {ClientType} from '../client/';
+import {ClientType} from '../client/';
 
 export interface LoginData {
   clientType: ClientType;

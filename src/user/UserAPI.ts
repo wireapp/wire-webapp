@@ -21,7 +21,7 @@ import Axios, {AxiosRequestConfig} from 'axios';
 import {ArrayUtil} from '@wireapp/commons';
 
 import {BackendError, HttpClient, RequestCancelable, SyntheticErrorLabel} from '../http/';
-import type {
+import {
   Activate,
   ActivationResponse,
   CheckHandles,
@@ -38,11 +38,11 @@ import type {
   VerifyDelete,
 } from '../user/';
 import {RequestCancellationError} from './UserError';
-import type {ClientPreKey, PreKeyBundle} from '../auth/';
-import type {PublicClient, QualifiedPublicClients} from '../client/';
-import type {RichInfo} from './RichInfo';
-import type {UserClients, QualifiedUserClients} from '../conversation/';
-import type {QualifiedUserPreKeyBundleMap} from './UserPreKeyBundleMap';
+import {ClientPreKey, PreKeyBundle} from '../auth/';
+import {PublicClient, QualifiedPublicClients} from '../client/';
+import {RichInfo} from './RichInfo';
+import {UserClients, QualifiedUserClients} from '../conversation/';
+import {QualifiedUserPreKeyBundleMap} from './UserPreKeyBundleMap';
 import {VerificationActionType} from '../auth/VerificationActionType';
 import {BackendFeatures} from '../APIClient';
 

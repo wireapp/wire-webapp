@@ -17,7 +17,7 @@
  *
  */
 
-import type {Consent} from './Consent';
+import {Consent} from './Consent';
 
 export interface ConsentResults {
   results: Consent[];

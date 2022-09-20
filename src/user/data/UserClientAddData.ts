@@ -17,7 +17,7 @@
  *
  */
 
-import type {AddedClient} from '../../client';
+import {AddedClient} from '../../client';
 
 export interface UserClientAddData {
   client: AddedClient;

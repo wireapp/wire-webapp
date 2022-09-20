@@ -17,9 +17,9 @@
  *
  */
 
-import type {AxiosRequestConfig} from 'axios';
+import {AxiosRequestConfig} from 'axios';
 
-import type {HttpClient} from '../../http';
+import {HttpClient} from '../../http';
 import {NewScimToken} from './NewScimToken';
 import {ScimTokenInfoList} from './ScimTokenInfoList';
 

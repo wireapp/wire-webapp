@@ -17,8 +17,8 @@
  *
  */
 
-import type {AxiosRequestConfig} from 'axios';
-import type {HttpClient} from '../../http';
+import {AxiosRequestConfig} from 'axios';
+import {HttpClient} from '../../http';
 import {BillingData} from './BillingInfo';
 import {BillingTeamData} from './BillingTeamData';
 import {CardData} from './CardData';

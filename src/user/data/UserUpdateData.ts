@@ -17,7 +17,7 @@
  *
  */
 
-import type {User} from '../User';
+import {User} from '../User';
 
 export interface UserUpdateData {
   user: Partial<User> & {

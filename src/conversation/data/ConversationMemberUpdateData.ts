@@ -17,8 +17,8 @@
  *
  */
 
-import type {MutedStatus} from '../MutedStatus';
-import type {DefaultConversationRoleName} from '../ConversationRole';
+import {MutedStatus} from '../MutedStatus';
+import {DefaultConversationRoleName} from '../ConversationRole';
 import {QualifiedId} from '../../user';
 
 export interface ConversationMemberUpdateData extends Partial<ConversationOtherMemberUpdateData> {

@@ -17,11 +17,11 @@
  *
  */
 
-import type {AxiosRequestConfig} from 'axios';
+import {AxiosRequestConfig} from 'axios';
 
-import type {GiphySearchOptions, GiphyRandomOptions, GiphyTrendingOptions, GiphyIdOptions} from './GiphyOptions';
-import type {GiphyResult, GiphyMultipleResult} from './GiphyResult';
-import type {HttpClient} from '../http/';
+import {GiphySearchOptions, GiphyRandomOptions, GiphyTrendingOptions, GiphyIdOptions} from './GiphyOptions';
+import {GiphyResult, GiphyMultipleResult} from './GiphyResult';
+import {HttpClient} from '../http/';
 
 export class GiphyAPI {
   constructor(private readonly client: HttpClient) {}

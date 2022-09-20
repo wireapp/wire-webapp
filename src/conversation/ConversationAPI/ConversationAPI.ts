@@ -18,7 +18,7 @@
  */
 
 import {proteus as ProtobufOTR} from '@wireapp/protocol-messaging/web/otr';
-import type {AxiosError, AxiosRequestConfig} from 'axios';
+import {AxiosError, AxiosRequestConfig} from 'axios';
 
 import {ValidationError} from '../../validation';
 import {
@@ -37,7 +37,7 @@ import {
   QualifiedConversationIds,
   RemoteConversations,
 } from '..';
-import type {
+import {
   ConversationAccessUpdateEvent,
   ConversationCodeDeleteEvent,
   ConversationCodeUpdateEvent,
@@ -49,7 +49,7 @@ import type {
   ConversationRenameEvent,
 } from '../../event';
 import {BackendError, BackendErrorLabel, HttpClient} from '../../http';
-import type {
+import {
   ConversationAccessUpdateData,
   ConversationAccessV2UpdateData,
   ConversationJoinData,

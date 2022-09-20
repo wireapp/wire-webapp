@@ -17,11 +17,11 @@
  *
  */
 
-import type {AxiosError, AxiosRequestConfig} from 'axios';
+import {AxiosError, AxiosRequestConfig} from 'axios';
 
 import {TeamAPI} from '../team/';
 import {HttpClient, BackendErrorLabel, BackendError} from '../../http/';
-import type {NewTeamInvitation, TeamInvitation, TeamInvitationChunk} from '../invitation/';
+import {NewTeamInvitation, TeamInvitation, TeamInvitationChunk} from '../invitation/';
 import {StatusCodes as StatusCode} from 'http-status-codes';
 import {
   InvitationInvalidPhoneError,

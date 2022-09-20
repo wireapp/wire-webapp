@@ -32,7 +32,7 @@ import {
 import {isValidToken, isValidUUID} from './AssetUtil';
 import {RequestCancellationError} from '../user';
 import {unsafeAlphanumeric} from '../shims/node/random';
-import type {AssetUploadData} from './AssetUploadData';
+import {AssetUploadData} from './AssetUploadData';
 import {BackendFeatures} from '../APIClient';
 
 export interface CipherOptions {

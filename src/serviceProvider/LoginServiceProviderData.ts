@@ -17,6 +17,6 @@
  *
  */
 
-import type {NewServiceProvider} from './NewServiceProvider';
+import {NewServiceProvider} from './NewServiceProvider';
 
 export type LoginServiceProviderData = Required<Pick<NewServiceProvider, 'email' | 'password'>>;

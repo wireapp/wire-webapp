@@ -17,10 +17,10 @@
  *
  */
 
-import type {AxiosRequestConfig, AxiosResponse} from 'axios';
+import {AxiosRequestConfig, AxiosResponse} from 'axios';
 
-import type {AccessTokenData} from '../../auth/';
-import type {HttpClient} from '../../http/';
+import {AccessTokenData} from '../../auth/';
+import {HttpClient} from '../../http/';
 
 export const retrieveCookie = (response: AxiosResponse<AccessTokenData>): Promise<AccessTokenData> =>
   Promise.resolve(response.data);

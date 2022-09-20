@@ -17,10 +17,10 @@
  *
  */
 
-import type {AxiosRequestConfig} from 'axios';
+import {AxiosRequestConfig} from 'axios';
 
 import {HttpClient} from '../http/';
-import type {Notification, NotificationList} from './';
+import {Notification, NotificationList} from './';
 
 export const NOTIFICATION_SIZE_MAXIMUM = 10000;
 

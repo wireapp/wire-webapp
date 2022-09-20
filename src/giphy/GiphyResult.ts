@@ -17,7 +17,7 @@
  *
  */
 
-import type {GiphyImage} from './GiphyImage';
+import {GiphyImage} from './GiphyImage';
 
 export interface GiphyResult {
   data: GiphyImage;

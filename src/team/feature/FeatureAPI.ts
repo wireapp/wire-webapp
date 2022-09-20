@@ -17,11 +17,11 @@
  *
  */
 
-import type {AxiosRequestConfig} from 'axios';
+import {AxiosRequestConfig} from 'axios';
 
 import {BackendError, BackendErrorLabel, HttpClient} from '../../http';
 import {InvalidAppLockTimeoutError} from './FeatureError';
-import type {
+import {
   FeatureAppLock,
   FeatureVideoCalling,
   FeatureConferenceCalling,
@@ -33,7 +33,7 @@ import type {
   FeatureSndFactorPassword,
   FeatureMLS,
 } from './Feature';
-import type {FeatureList} from './FeatureList';
+import {FeatureList} from './FeatureList';
 import {FeatureConversationGuestLink, FeatureLockedError} from '.';
 
 export class FeatureAPI {

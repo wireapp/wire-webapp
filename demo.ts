@@ -20,7 +20,7 @@
 import {FileEngine} from '@wireapp/store-engine-fs';
 import logdown from 'logdown';
 import path from 'path';
-import type {CRUDEngine} from '@wireapp/store-engine';
+import {CRUDEngine} from '@wireapp/store-engine';
 
 import {APIClient} from './src/APIClient';
 import {
@@ -34,7 +34,7 @@ import {
 } from './src/auth';
 import {ClientType} from './src/client';
 import {WebSocketClient} from './src/tcp';
-import type {Config} from './src/Config';
+import {Config} from './src/Config';
 
 require('dotenv').config();
 

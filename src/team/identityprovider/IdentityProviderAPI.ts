@@ -17,11 +17,11 @@
  *
  */
 
-import type {AxiosRequestConfig} from 'axios';
+import {AxiosRequestConfig} from 'axios';
 
-import type {HttpClient} from '../../http';
-import type {IdentityProvider} from './IdentityProvider';
-import type {IdentityProviders} from './IdentityProviders';
+import {HttpClient} from '../../http';
+import {IdentityProvider} from './IdentityProvider';
+import {IdentityProviders} from './IdentityProviders';
 
 export class IdentityProviderAPI {
   constructor(private readonly client: HttpClient) {}

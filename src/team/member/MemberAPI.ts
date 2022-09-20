@@ -29,7 +29,7 @@ import {
   RequestCancelable,
   SyntheticErrorLabel,
 } from '../../http/';
-import type {MemberData, Members} from '../member/';
+import {MemberData, Members} from '../member/';
 import {RequestCancellationError} from '../../user';
 import {MemberCSVResponse} from './MemberCSVResponse';
 import {UpdatedMemberData} from './UpdatedMemberData';

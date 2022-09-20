@@ -17,7 +17,7 @@
  *
  */
 
-import type {BackendData} from './env/';
+import {BackendData} from './env/';
 
 export interface Config {
   urls: BackendData;
