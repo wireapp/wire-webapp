@@ -50,10 +50,10 @@ describe('NotificationService', () => {
       });
 
       const notificationService = new NotificationService(apiClient, {}, {}, engine);
-      jest.spyOn(notificationService.database, 'getLastEventDate').
-      jest.spyOn(engine, 'read').
-      jest.spyOn(engine, 'update').
-      jest.spyOn(engine, 'create').
+      jest.spyOn(notificationService.database, 'getLastEventDate');
+      jest.spyOn(engine, 'read');
+      jest.spyOn(engine, 'update');
+      jest.spyOn(engine, 'create');
 
       const returnValue = await notificationService.setLastEventDate(new Date(0));
       expect(returnValue).toEqual(new Date(0));
@@ -80,10 +80,10 @@ describe('NotificationService', () => {
       const notificationService = new NotificationService(apiClient, {}, {}, engine);
       await notificationService.setLastEventDate(new Date(0));
 
-      jest.spyOn(notificationService.database, 'getLastEventDate').
-      jest.spyOn(engine, 'read').
-      jest.spyOn(engine, 'update').
-      jest.spyOn(engine, 'create').
+      jest.spyOn(notificationService.database, 'getLastEventDate');
+      jest.spyOn(engine, 'read');
+      jest.spyOn(engine, 'update');
+      jest.spyOn(engine, 'create');
 
       const newDate = await notificationService.setLastEventDate(new Date(1));
       expect(newDate).toEqual(new Date(1));
@@ -114,10 +114,10 @@ describe('NotificationService', () => {
 
     await notificationService.setLastEventDate(greaterDate);
 
-    jest.spyOn(notificationService.database, 'getLastEventDate').
-    jest.spyOn(engine, 'read').
-    jest.spyOn(engine, 'update').
-    jest.spyOn(engine, 'create').
+    jest.spyOn(notificationService.database, 'getLastEventDate');
+    jest.spyOn(engine, 'read');
+    jest.spyOn(engine, 'update');
+    jest.spyOn(engine, 'create');
 
     const returnValue = await notificationService.setLastEventDate(lesserDate);
     expect(returnValue).toEqual(greaterDate);
@@ -143,10 +143,10 @@ describe('NotificationService', () => {
     });
 
     const notificationService = new NotificationService(apiClient, {}, {}, engine);
-    jest.spyOn(notificationService.database, 'getLastNotificationId').
-    jest.spyOn(engine, 'read').
-    jest.spyOn(engine, 'update').
-    jest.spyOn(engine, 'create').
+    jest.spyOn(notificationService.database, 'getLastNotificationId');
+    jest.spyOn(engine, 'read');
+    jest.spyOn(engine, 'update');
+    jest.spyOn(engine, 'create');
 
     const lastNotificationId = await notificationService.setLastNotificationId({id: '12'});
     expect(lastNotificationId).toEqual('12');
@@ -168,10 +168,10 @@ describe('NotificationService', () => {
     const notificationService = new NotificationService(apiClient, {}, {}, engine);
     await notificationService.setLastNotificationId({id: '12'});
 
-    jest.spyOn(notificationService.database, 'getLastNotificationId').
-    jest.spyOn(engine, 'read').
-    jest.spyOn(engine, 'update').
-    jest.spyOn(engine, 'create').
+    jest.spyOn(notificationService.database, 'getLastNotificationId');
+    jest.spyOn(engine, 'read');
+    jest.spyOn(engine, 'update');
+    jest.spyOn(engine, 'create');
 
     const returnValue = await notificationService.setLastNotificationId({id: '13'});
     expect(returnValue).toEqual('13');
