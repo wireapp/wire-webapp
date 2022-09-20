@@ -1517,8 +1517,8 @@ export class ConversationRepository {
    * @param userId ID of member to be removed from the conversation
    * @returns Resolves when member was removed from the conversation
    */
-  private async removeMemberFromProteusConversation(conversationEntity: Conversation, userId: QualifiedId) {
-    const response = await this.core.service!.conversation.removeUserFromProteusConversation(
+  private async removeMemberFromConversation(conversationEntity: Conversation, userId: QualifiedId) {
+    const response = await this.core.service!.conversation.removeUserFromConversation(
       conversationEntity.qualifiedId,
       userId,
     );
@@ -1527,7 +1527,7 @@ export class ConversationRepository {
     conversationEntity.roles(roles);
     const currentTimestamp = this.serverTimeHandler.toServerTimestamp();
     const event = response || EventBuilder.buildMemberLeave(conversationEntity, userId, true, currentTimestamp);
-    this.eventRepository.injectEvent(event, EventRepository.SOURCE.BACKEND_RESPONSE);
+    await this.eventRepository.injectEvent(event, EventRepository.SOURCE.BACKEND_RESPONSE);
     return event;
   }
 
@@ -1544,18 +1544,7 @@ export class ConversationRepository {
     }
 
     const userQualifiedId = this.userState.self().qualifiedId;
-
-    const roles = conversationEntity.roles();
-    delete roles[userQualifiedId.id];
-    conversationEntity.roles(roles);
-
-    const currentTimestamp = this.serverTimeHandler.toServerTimestamp();
-    const userLeaveEvent = await this.core.service!.conversation.leaveConversation(conversationEntity.qualifiedId);
-    const event =
-      userLeaveEvent || EventBuilder.buildMemberLeave(conversationEntity, userQualifiedId, true, currentTimestamp);
-
-    await this.eventRepository.injectEvent(event, EventRepository.SOURCE.BACKEND_RESPONSE);
-    return event;
+    return this.removeMemberFromConversation(conversationEntity, userQualifiedId);
   }
 
   /**
@@ -1576,7 +1565,7 @@ export class ConversationRepository {
 
     return isMLSConversation
       ? this.removeMemberFromMLSConversation(conversationEntity, userId)
-      : this.removeMemberFromProteusConversation(conversationEntity, userId);
+      : this.removeMemberFromConversation(conversationEntity, userId);
   }
 
   /**
