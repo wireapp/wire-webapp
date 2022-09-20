@@ -17,10 +17,23 @@
  *
  */
 
+import {QualifiedId} from '@wireapp/api-client/src/user';
+import {CoreCryptoCallbacks} from '@wireapp/core-crypto';
+
 type SecretCrypto<T> = {
   encrypt: (value: Uint8Array) => Promise<T>;
   decrypt: (payload: T) => Promise<Uint8Array>;
 };
+
+export interface MLSCallbacks extends Pick<CoreCryptoCallbacks, 'authorize'> {
+  /**
+   * Should return a groupId corresponding to the conversation ID given
+   * Used for the core to know what core-crypto conversation we are dealing with when receiving events
+   * @param conversationId
+   * @returns the bytes of the groupId corresponding to the conversation ID
+   */
+  groupIdFromConversationId: (conversationId: QualifiedId) => Promise<string | undefined>;
+}
 
 export interface MLSConfig<T = any> {
   /**

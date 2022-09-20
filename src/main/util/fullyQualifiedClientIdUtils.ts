@@ -30,6 +30,15 @@ export const constructFullyQualifiedClientId = (
   domain: Domain,
 ): ClientIdStringType => `${userId}:${clientId}@${domain}`;
 
+export const parseFullQualifiedClientId = (qualifiedId: string): {user: UserId; client: ClientId; domain: Domain} => {
+  const regexp = /([a-zA-Z0-9\-]+):([a-zA-Z0-9\-]+)@([a-zA-Z0-9\-.]+)/;
+  const [, user, client, domain] = qualifiedId.match(regexp) ?? [];
+  if (!user || !client || !domain) {
+    throw new Error(`given client fully qualified ID is corrupted (${qualifiedId})`);
+  }
+  return {user, client, domain};
+};
+
 export const mapQualifiedUserClientIdsToFullyQualifiedClientIds = (qualifiedUserMap: QualifiedUserClientMap) => {
   const encoder = new TextEncoder();
   return Object.entries(qualifiedUserMap).flatMap(([domain, users]) => {

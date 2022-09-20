@@ -21,11 +21,6 @@ export type CommonMLS = {
   groupId: string;
 };
 
-export type CompoundGroupIdParams = {
-  conversationId: string;
-  conversationDomain: string;
-} & CommonMLS;
-
 export type HandlePendingProposalsParams = {
   delayInMs: number;
   eventTime: string;

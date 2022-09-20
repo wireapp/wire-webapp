@@ -17,11 +17,12 @@
  *
  */
 
+import {ClientClassification, QualifiedUserClientMap} from '@wireapp/api-client/src/client';
 import {
   mapQualifiedUserClientIdsToFullyQualifiedClientIds,
   constructFullyQualifiedClientId,
-} from './mapQualifiedUserClientIdsToFullyQualifiedClientIds';
-import {ClientClassification, QualifiedUserClientMap} from '@wireapp/api-client/src/client';
+  parseFullQualifiedClientId,
+} from './fullyQualifiedClientIdUtils';
 
 enum MOCKED_DOMAINS {
   DOMAIN1 = 'domain1.example.com',
@@ -46,6 +47,26 @@ describe('constructFullyQualifiedClientId', () => {
     expect(
       constructFullyQualifiedClientId(MOCKED_USER_IDS.USER1, MOCKED_CLIENT_IDS.CLIENT1, MOCKED_DOMAINS.DOMAIN1),
     ).toEqual(`${MOCKED_USER_IDS.USER1}:${MOCKED_CLIENT_IDS.CLIENT1}@${MOCKED_DOMAINS.DOMAIN1}`);
+  });
+});
+
+describe('parseFullQualifiedClientId', () => {
+  it('parses a client id correctly', () => {
+    const qualifiedClientId = constructFullyQualifiedClientId(
+      MOCKED_USER_IDS.USER1,
+      MOCKED_CLIENT_IDS.CLIENT1,
+      MOCKED_DOMAINS.DOMAIN1,
+    );
+
+    const {user, client, domain} = parseFullQualifiedClientId(qualifiedClientId);
+    expect(user).toEqual(MOCKED_USER_IDS.USER1);
+    expect(client).toEqual(MOCKED_CLIENT_IDS.CLIENT1);
+    expect(domain).toEqual(MOCKED_DOMAINS.DOMAIN1);
+  });
+
+  it('throws an error when a wrong id is given', () => {
+    expect(() => parseFullQualifiedClientId('')).toThrow('corrupted');
+    expect(() => parseFullQualifiedClientId('userid:clientid:domain')).toThrow('corrupted');
   });
 });
 
