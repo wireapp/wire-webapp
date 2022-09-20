@@ -40,6 +40,7 @@ import {
   ButtonActionMessage,
   CallMessage,
   ConfirmationMessage,
+  DeleteMessage,
   FileAssetAbortMessage,
   FileAssetMessage,
   FileAssetMetaDataMessage,
@@ -55,6 +56,10 @@ interface BaseOptions {
   conversationId: string;
   from: string;
   messageId?: string;
+}
+
+interface CreateDeleteOption extends BaseOptions {
+  messageIdToDelete: string;
 }
 
 interface CreateImageOptions extends BaseOptions {
@@ -171,6 +176,14 @@ export class MessageBuilder {
       },
       id: originalMessageId,
       type: PayloadBundleType.ASSET,
+    };
+  }
+
+  public static createDelete(payload: CreateDeleteOption): DeleteMessage {
+    return {
+      ...createCommonProperties(payload),
+      content: {messageId: payload.messageIdToDelete},
+      type: PayloadBundleType.MESSAGE_DELETE,
     };
   }
 

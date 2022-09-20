@@ -126,6 +126,7 @@ export type SendProteusMessageParams<T> = SendCommonParams<T> &
       status: ClientMismatch | MessageSendingStatus,
       wasSent: boolean,
     ) => void | boolean | Promise<boolean>;
+    protocol: ConversationProtocol.PROTEUS;
   };
 
 export type SendMlsMessageParams<T> = SendCommonParams<T> & {
@@ -133,6 +134,7 @@ export type SendMlsMessageParams<T> = SendCommonParams<T> & {
    * The groupId of the conversation to send the message to (Needed only for MLS)
    */
   groupId: string;
+  protocol: ConversationProtocol.MLS;
 };
 
 export type QualifiedUsers = QualifiedId & {skipOwn?: string};
