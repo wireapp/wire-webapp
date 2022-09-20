@@ -22,7 +22,7 @@ import type {Notification} from '@wireapp/api-client/src/notification/';
 import type {CRUDEngine} from '@wireapp/store-engine';
 
 import {CryptographyDatabaseRepository} from '../cryptography/CryptographyDatabaseRepository';
-import {CommonMLS, CompoundGroupIdParams, StorePendingProposalsParams} from './types';
+import {CommonMLS, StorePendingProposalsParams} from './types';
 
 export enum DatabaseStores {
   EVENTS = 'events',
@@ -77,26 +77,6 @@ export class NotificationDatabaseRepository {
       value: lastNotification.id,
     });
     return lastNotification.id;
-  }
-
-  private generateCompoundGroupIdPrimaryKey({
-    conversationId,
-    conversationDomain,
-  }: Omit<CompoundGroupIdParams, 'groupId'>) {
-    return `${conversationId}@${conversationDomain}`;
-  }
-
-  public async addCompoundGroupId(params: CompoundGroupIdParams) {
-    await this.storeEngine.updateOrCreate(
-      STORES.GROUP_IDS,
-      this.generateCompoundGroupIdPrimaryKey(params),
-      params.groupId,
-    );
-    return params;
-  }
-
-  public async getCompoundGroupId(params: Omit<CompoundGroupIdParams, 'groupId'>) {
-    return this.storeEngine.read<string>(STORES.GROUP_IDS, this.generateCompoundGroupIdPrimaryKey(params));
   }
 
   /**

@@ -104,7 +104,7 @@ import {
   SendProteusMessageParams,
 } from './ConversationService.types';
 import {Decoder} from 'bazinga64';
-import {mapQualifiedUserClientIdsToFullyQualifiedClientIds} from '../../util/mapQualifiedUserClientIdsToFullyQualifiedClientIds';
+import {mapQualifiedUserClientIdsToFullyQualifiedClientIds} from '../../util/fullyQualifiedClientIdUtils';
 import {optionalToUint8Array} from '../../mls';
 import {sendMessage} from '../message/messageSender';
 
@@ -1166,8 +1166,6 @@ export class ConversationService {
       groupIdDecodedFromBase64,
       coreCryptoKeyPackagesPayload,
     );
-
-    await this.notificationService.saveConversationGroupId(newConversation);
 
     //We store the info when conversation (along with key material) was created, so we will know when to renew it
     const groupCreationTimeStamp = new Date().getTime();

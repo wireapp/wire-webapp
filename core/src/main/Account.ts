@@ -52,7 +52,7 @@ import {WEBSOCKET_STATE} from '@wireapp/api-client/src/tcp/ReconnectingWebsocket
 import {createCustomEncryptedStore, createEncryptedStore, deleteEncryptedStore} from './util/encryptedStore';
 import {Encoder} from 'bazinga64';
 import {MLSService} from './mls';
-import type {MLSConfig} from './mls/types';
+import type {MLSCallbacks, MLSConfig} from './mls/types';
 import {resumeMessageSending} from './conversation/message/messageSender';
 
 export type ProcessedEventPayload = HandledEventPayload;
@@ -330,6 +330,17 @@ export class Account<T = any> extends EventEmitter {
 
       throw error;
     }
+  }
+
+  /**
+   * In order to be able to send MLS messages, the core needs a few information from the consumer.
+   * Namely:
+   * - is the current user allowed to administrate a specific conversation
+   * - what is the groupId of a conversation
+   * @param mlsCallbacks
+   */
+  configureMLSCallbacks(mlsCallbacks: MLSCallbacks) {
+    this.service?.mls.configureMLSCallbacks(mlsCallbacks);
   }
 
   public async initServices(context: Context): Promise<void> {

@@ -35,10 +35,10 @@ import {
 import {APIClient} from '@wireapp/api-client';
 import {QualifiedUsers} from '../../conversation';
 import {Converter, Decoder, Encoder} from 'bazinga64';
-import type {MLSConfig} from '../types';
+import type {MLSCallbacks, MLSConfig} from '../types';
 import {PostMlsMessageResponse} from '@wireapp/api-client/src/conversation';
 import {sendMessage} from '../../conversation/message/messageSender';
-
+import {parseFullQualifiedClientId} from '../../util/fullyQualifiedClientIdUtils';
 //@todo: this function is temporary, we wait for the update from core-crypto side
 //they are returning regular array instead of Uint8Array for commit and welcome messages
 export const optionalToUint8Array = (array: Uint8Array | []): Uint8Array => {
@@ -46,6 +46,8 @@ export const optionalToUint8Array = (array: Uint8Array | []): Uint8Array => {
 };
 
 export class MLSService {
+  groupIdFromConversationId?: MLSCallbacks['groupIdFromConversationId'];
+
   constructor(
     public readonly config: MLSConfig | undefined,
     private readonly apiClient: APIClient,
@@ -60,24 +62,24 @@ export class MLSService {
     return client;
   }
 
-  private async uploadCommitBundle(groupId: Uint8Array, commitBundle: CommitBundle) {
+  private async uploadCommitBundle(groupId: Uint8Array, {commit, welcome}: CommitBundle) {
     const coreCryptoClient = this.getCoreCryptoClient();
 
-    if (commitBundle.welcome) {
-      //@todo: it's temporary - we wait for core-crypto fix to return the actual Uint8Array instead of regular array
-      await this.apiClient.api.conversation.postMlsWelcomeMessage(optionalToUint8Array(commitBundle.welcome));
-    }
-    if (commitBundle.commit) {
+    if (commit) {
       try {
         const messageResponse = await this.apiClient.api.conversation.postMlsMessage(
           //@todo: it's temporary - we wait for core-crypto fix to return the actual Uint8Array instead of regular array
-          optionalToUint8Array(commitBundle.commit),
+          optionalToUint8Array(commit),
         );
         await coreCryptoClient.commitAccepted(groupId);
+        if (welcome) {
+          // If the commit went well, we can send the Welcome
+          //@todo: it's temporary - we wait for core-crypto fix to return the actual Uint8Array instead of regular array
+          await this.apiClient.api.conversation.postMlsWelcomeMessage(optionalToUint8Array(welcome));
+        }
         return messageResponse;
       } catch (error) {
         await coreCryptoClient.clearPendingCommit(groupId);
-        return null;
       }
     }
     return null;
@@ -90,6 +92,21 @@ export class MLSService {
 
       return this.uploadCommitBundle(groupId, memberAddedMessages);
     });
+  }
+
+  public configureMLSCallbacks({groupIdFromConversationId, ...coreCryptoCallbacks}: MLSCallbacks): void {
+    this.getCoreCryptoClient().registerCallbacks({
+      ...coreCryptoCallbacks,
+      clientIdBelongsToOneOf: (client, otherClients) => {
+        const decoder = new TextDecoder();
+        const {user} = parseFullQualifiedClientId(decoder.decode(client));
+        return otherClients.some(client => {
+          const {user: otherUser} = parseFullQualifiedClientId(decoder.decode(client));
+          return otherUser === user;
+        });
+      },
+    });
+    this.groupIdFromConversationId = groupIdFromConversationId;
   }
 
   public async getKeyPackagesPayload(qualifiedUsers: QualifiedUsers[]) {
@@ -168,8 +185,9 @@ export class MLSService {
     });
   }
 
-  public async commitPendingProposals(conversationId: ConversationId): Promise<CommitBundle | undefined> {
-    return this.getCoreCryptoClient().commitPendingProposals(conversationId);
+  public async commitPendingProposals(groupId: ConversationId): Promise<void> {
+    const commitBundle = await this.getCoreCryptoClient().commitPendingProposals(groupId);
+    return commitBundle ? void this.uploadCommitBundle(groupId, commitBundle) : undefined;
   }
 
   public async conversationExists(conversationId: ConversationId): Promise<boolean> {
