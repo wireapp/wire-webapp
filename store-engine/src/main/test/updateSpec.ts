@@ -17,7 +17,7 @@
  *
  */
 
-import type {CRUDEngine} from '../engine';
+import {CRUDEngine} from '../engine';
 import {RecordNotFoundError} from '../engine/error';
 
 const TABLE_NAME = 'the-simpsons';

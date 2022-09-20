@@ -20,7 +20,7 @@
 import {Cookie as ToughCookie} from 'tough-cookie';
 
 import {ObfuscationUtil} from './ObfuscationUtil';
-import type {AccessTokenData} from '../auth';
+import {AccessTokenData} from '../auth';
 
 describe('ObfuscationUtil', () => {
   const accessTokenData: AccessTokenData = {

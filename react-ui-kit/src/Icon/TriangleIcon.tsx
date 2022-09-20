@@ -20,7 +20,7 @@
 /** @jsx jsx */
 import {jsx} from '@emotion/react';
 
-import type {Rotation} from './ArrowIcon';
+import {Rotation} from './ArrowIcon';
 import {SVGIcon, SVGIconProps} from './SVGIcon';
 
 export interface Props extends SVGIconProps {

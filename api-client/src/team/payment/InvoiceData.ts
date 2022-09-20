@@ -17,7 +17,7 @@
  *
  */
 
-import type {SupportedCurrency} from '../payment/';
+import {SupportedCurrency} from '../payment/';
 
 interface PaymentCoupon {
   amountOff: number;

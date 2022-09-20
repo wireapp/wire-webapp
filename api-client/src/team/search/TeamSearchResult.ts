@@ -17,7 +17,7 @@
  *
  */
 
-import type {TeamContact} from './TeamContact';
+import {TeamContact} from './TeamContact';
 
 export interface TeamSearchResult {
   documents: TeamContact[];

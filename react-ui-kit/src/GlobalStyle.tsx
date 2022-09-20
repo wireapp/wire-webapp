@@ -22,7 +22,7 @@ import {Global, CSSObject, css, jsx, withTheme} from '@emotion/react';
 import emotionNormalize from 'emotion-normalize';
 import {GlobalCssVariables} from './GlobalCssVariables';
 
-import type {Theme} from './Layout';
+import {Theme} from './Layout';
 
 const globalStyles: (theme: Theme) => CSSObject = (theme: Theme) => ({
   '*': {

@@ -17,7 +17,7 @@
  *
  */
 
-import type {MemberData} from '../member/MemberData';
+import {MemberData} from '../member/MemberData';
 
 export interface NewTeamData {
   /** User binding team

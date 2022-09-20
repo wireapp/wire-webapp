@@ -17,11 +17,11 @@
  *
  */
 
-import type {TeamInfo} from '../team/';
-import type {QualifiedId} from '../user/';
-import type {Conversation} from './Conversation';
-import type {DefaultConversationRoleName} from './ConversationRole';
-import type {RECEIPT_MODE} from './data/ConversationReceiptModeUpdateData';
+import {TeamInfo} from '../team/';
+import {QualifiedId} from '../user/';
+import {Conversation} from './Conversation';
+import {DefaultConversationRoleName} from './ConversationRole';
+import {RECEIPT_MODE} from './data/ConversationReceiptModeUpdateData';
 
 export enum ConversationProtocol {
   MLS = 'mls',

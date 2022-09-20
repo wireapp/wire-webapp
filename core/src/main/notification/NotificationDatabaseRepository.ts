@@ -17,9 +17,9 @@
  *
  */
 
-import type {BackendEvent} from '@wireapp/api-client/src/event';
-import type {Notification} from '@wireapp/api-client/src/notification/';
-import type {CRUDEngine} from '@wireapp/store-engine';
+import {BackendEvent} from '@wireapp/api-client/src/event';
+import {Notification} from '@wireapp/api-client/src/notification/';
+import {CRUDEngine} from '@wireapp/store-engine';
 
 import {CryptographyDatabaseRepository} from '../cryptography/CryptographyDatabaseRepository';
 import {CommonMLS, StorePendingProposalsParams} from './types';

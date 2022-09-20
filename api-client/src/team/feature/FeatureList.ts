@@ -18,7 +18,7 @@
  */
 
 import {FeatureConversationGuestLink} from '.';
-import type {
+import {
   FeatureAppLock,
   FeatureClassifiedDomains,
   FeatureConferenceCalling,

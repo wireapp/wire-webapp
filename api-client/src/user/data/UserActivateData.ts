@@ -17,7 +17,7 @@
  *
  */
 
-import type {Self} from '../../self';
+import {Self} from '../../self';
 
 export interface UserActivateData {
   user: Self;

@@ -21,9 +21,9 @@ import * as moment from 'moment';
 import momentDurationFormatSetup from 'moment-duration-format';
 
 import {PayloadBundle, PayloadBundleSource, PayloadBundleType} from '@wireapp/core/src/main/conversation/';
-import type {QuotableMessage} from '@wireapp/core/src/main/conversation/message/OtrMessage';
+import {QuotableMessage} from '@wireapp/core/src/main/conversation/message/OtrMessage';
 import {MessageHandler} from '@wireapp/bot-api';
-import type {TextContent} from '@wireapp/core/src/main/conversation/content';
+import {TextContent} from '@wireapp/core/src/main/conversation/content';
 
 momentDurationFormatSetup(moment as any);
 

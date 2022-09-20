@@ -17,7 +17,7 @@
  *
  */
 
-import type {Config} from 'karma';
+import {Config} from 'karma';
 import * as path from 'path';
 
 const distDir = 'dist/';

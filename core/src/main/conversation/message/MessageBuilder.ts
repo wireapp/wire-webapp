@@ -22,7 +22,7 @@ import UUID from 'uuidjs';
 
 import {AbortReason, PayloadBundleSource, PayloadBundleState, PayloadBundleType} from '..';
 import {EncryptedAssetUploaded} from '../../cryptography';
-import type {
+import {
   ButtonActionConfirmationContent,
   ButtonActionContent,
   CallingContent,
@@ -35,7 +35,7 @@ import type {
   ReactionContent,
 } from '../content';
 import {CompositeContentBuilder} from './CompositeContentBuilder';
-import type {
+import {
   ButtonActionConfirmationMessage,
   ButtonActionMessage,
   CallMessage,

@@ -17,8 +17,6 @@
  *
  */
 
-import 'url-search-params-polyfill';
-
 export function pathWithParams(
   path: string,
   additionalParams?: Record<string, any>,

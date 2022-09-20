@@ -17,12 +17,12 @@
  *
  */
 
-import type {AccentColor} from '@wireapp/commons';
+import {AccentColor} from '@wireapp/commons';
 
-import type {ServiceRef} from '../conversation/';
-import type {Picture} from '../self/';
-import type {UserAsset} from '../user/';
-import type {QualifiedId} from './QualifiedId';
+import {ServiceRef} from '../conversation/';
+import {Picture} from '../self/';
+import {UserAsset} from '../user/';
+import {QualifiedId} from './QualifiedId';
 
 export interface User {
   accent_id?: AccentColor.AccentColorID;

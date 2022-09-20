@@ -17,7 +17,7 @@
  *
  */
 
-import type {Conversation} from './';
+import {Conversation} from './';
 
 export interface Conversations {
   conversations: Conversation[];

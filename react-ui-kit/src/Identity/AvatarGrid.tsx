@@ -21,7 +21,7 @@
 import {CSSObject, jsx} from '@emotion/react';
 import React from 'react';
 
-import type {AvatarProps} from '../Identity/';
+import {AvatarProps} from '../Identity/';
 import {IsInViewport} from '../Misc/';
 import {filterProps} from '../util';
 import {Avatar, DEFAULT_AVATAR_SIZE} from './Avatar';

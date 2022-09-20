@@ -17,14 +17,14 @@
  *
  */
 
-import type {AxiosRequestConfig} from 'axios';
+import {AxiosRequestConfig} from 'axios';
 
 import {CustomBackendNotFoundError} from './AccountError';
 import {HttpClient, BackendErrorLabel, BackendError} from '../http';
-import type {BackendConfigData} from './BackendConfigData';
-import type {CallConfigData} from './CallConfigData';
-import type {DomainData} from './DomainData';
-import type {SSOSettings} from './SSOSettings';
+import {BackendConfigData} from './BackendConfigData';
+import {CallConfigData} from './CallConfigData';
+import {DomainData} from './DomainData';
+import {SSOSettings} from './SSOSettings';
 
 export class AccountAPI {
   constructor(private readonly client: HttpClient) {}

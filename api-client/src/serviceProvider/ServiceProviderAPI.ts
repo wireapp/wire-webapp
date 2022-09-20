@@ -17,14 +17,14 @@
  *
  */
 
-import type {AxiosRequestConfig} from 'axios';
+import {AxiosRequestConfig} from 'axios';
 
-import type {HttpClient} from '../http';
-import type {CompletePasswordReset} from '../user';
-import type {LoginServiceProviderData} from './LoginServiceProviderData';
-import type {RegisteredServiceProvider} from './RegisteredServiceProvider';
-import type {NewServiceProvider} from './NewServiceProvider';
-import type {UpdateServiceProviderData} from './UpdateServiceProviderData';
+import {HttpClient} from '../http';
+import {CompletePasswordReset} from '../user';
+import {LoginServiceProviderData} from './LoginServiceProviderData';
+import {RegisteredServiceProvider} from './RegisteredServiceProvider';
+import {NewServiceProvider} from './NewServiceProvider';
+import {UpdateServiceProviderData} from './UpdateServiceProviderData';
 
 export class ServiceProviderAPI {
   constructor(private readonly client: HttpClient) {}

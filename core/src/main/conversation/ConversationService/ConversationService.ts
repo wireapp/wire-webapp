@@ -18,7 +18,7 @@
  */
 
 import {ExternalProposalType} from '@wireapp/core-crypto';
-import type {APIClient} from '@wireapp/api-client';
+import {APIClient} from '@wireapp/api-client';
 import {
   MessageSendingStatus,
   Conversation,
@@ -31,8 +31,8 @@ import {
   ConversationProtocol,
 } from '@wireapp/api-client/src/conversation';
 import {CONVERSATION_TYPING, ConversationMemberUpdateData} from '@wireapp/api-client/src/conversation/data';
-import type {ConversationMemberLeaveEvent} from '@wireapp/api-client/src/event';
-import type {QualifiedId, QualifiedUserPreKeyBundleMap, UserPreKeyBundleMap} from '@wireapp/api-client/src/user';
+import {ConversationMemberLeaveEvent} from '@wireapp/api-client/src/event';
+import {QualifiedId, QualifiedUserPreKeyBundleMap, UserPreKeyBundleMap} from '@wireapp/api-client/src/user';
 import {
   Asset,
   ButtonAction,
@@ -63,16 +63,16 @@ import {
   PayloadBundleType,
   RemoveUsersParams,
 } from '../../conversation/';
-import type {ClearedContent, DeletedContent, HiddenContent, RemoteData} from '../content';
-import type {CryptographyService} from '../../cryptography/';
-import type {MLSService} from '../../mls';
-import type {NotificationService} from '../../notification';
+import {ClearedContent, DeletedContent, HiddenContent, RemoteData} from '../content';
+import {CryptographyService} from '../../cryptography/';
+import {MLSService} from '../../mls';
+import {NotificationService} from '../../notification';
 import {decryptAsset} from '../../cryptography/AssetCryptography';
 import {isStringArray, isQualifiedIdArray, isQualifiedUserClients, isUserClients} from '../../util/TypePredicateUtil';
 import {MessageBuilder} from '../message/MessageBuilder';
 import {MessageService} from '../message/MessageService';
 import {MessageToProtoMapper} from '../message/MessageToProtoMapper';
-import type {
+import {
   ButtonActionConfirmationMessage,
   ButtonActionMessage,
   CallMessage,

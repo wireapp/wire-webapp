@@ -17,13 +17,13 @@
  *
  */
 
-import type {AxiosRequestConfig} from 'axios';
+import {AxiosRequestConfig} from 'axios';
 
 import {TeamAPI} from '../team/TeamAPI';
-import type {HttpClient} from '../../http';
-import type {LegalHoldData} from './LegalHoldData';
-import type {LegalHoldMemberData} from './LegalHoldMemberStatus';
-import type {NewLegalHoldData} from './NewLegalHoldData';
+import {HttpClient} from '../../http';
+import {LegalHoldData} from './LegalHoldData';
+import {LegalHoldMemberData} from './LegalHoldMemberStatus';
+import {NewLegalHoldData} from './NewLegalHoldData';
 
 export class LegalHoldAPI {
   constructor(private readonly client: HttpClient) {}

@@ -17,18 +17,18 @@
  *
  */
 
-import type {APIClient} from '@wireapp/api-client';
+import {APIClient} from '@wireapp/api-client';
 import {TimeUtil} from '@wireapp/commons';
 import * as Events from '@wireapp/api-client/src/event';
-import type {Notification} from '@wireapp/api-client/src/notification/';
+import {Notification} from '@wireapp/api-client/src/notification/';
 import {CRUDEngine, error as StoreEngineError} from '@wireapp/store-engine';
 import {EventEmitter} from 'events';
 import logdown from 'logdown';
 import {PayloadBundle, PayloadBundleSource, PayloadBundleType} from '../conversation';
-import type {AssetContent} from '../conversation/content';
+import {AssetContent} from '../conversation/content';
 import {ConversationMapper} from '../conversation/ConversationMapper';
 import {CoreError, NotificationError} from '../CoreError';
-import type {CryptographyService, DecryptionError} from '../cryptography';
+import {CryptographyService, DecryptionError} from '../cryptography';
 import {UserMapper} from '../user/UserMapper';
 import {NotificationBackendRepository} from './NotificationBackendRepository';
 import {NotificationDatabaseRepository} from './NotificationDatabaseRepository';
@@ -38,7 +38,7 @@ import {Decoder, Encoder} from 'bazinga64';
 import {QualifiedId} from '@wireapp/api-client/src/user';
 import {CommitPendingProposalsParams, HandlePendingProposalsParams, LastKeyMaterialUpdateParams} from './types';
 import {TaskScheduler} from '../util/TaskScheduler/TaskScheduler';
-import type {MLSService} from '../mls';
+import {MLSService} from '../mls';
 import {LowPrecisionTaskScheduler} from '../util/LowPrecisionTaskScheduler/LowPrecisionTaskScheduler';
 import {keyPackagesStatusStore} from '../mls/keyPackagesStatusStore/keyPackagesStatusStore';
 import {keyMaterialUpdatesStore} from '../mls/keyMaterialUpdatesStore';

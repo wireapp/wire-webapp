@@ -17,10 +17,10 @@
  *
  */
 
-import type {AxiosRequestConfig} from 'axios';
+import {AxiosRequestConfig} from 'axios';
 import {BackendFeatures} from '../APIClient';
 
-import type {Connection, ConnectionRequest, ConnectionUpdate, UserConnectionList} from '../connection/';
+import {Connection, ConnectionRequest, ConnectionUpdate, UserConnectionList} from '../connection/';
 import {BackendError, BackendErrorLabel, HttpClient} from '../http/';
 import {QualifiedId} from '../user';
 import {ConnectionLegalholdMissingConsentError} from './ConnectionError';

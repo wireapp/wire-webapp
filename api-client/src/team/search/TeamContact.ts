@@ -17,8 +17,8 @@
  *
  */
 
-import type {Role} from '..';
-import type {User, ManagedSource} from '../../user/';
+import {Role} from '..';
+import {User, ManagedSource} from '../../user/';
 
 export type TeamContact = Pick<User, 'id' | 'email' | 'accent_id' | 'handle' | 'name' | 'team'> & {
   /** Timestamp of invitation creation. */

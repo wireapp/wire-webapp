@@ -19,11 +19,11 @@
 
 /** @jsx jsx */
 import {CSSObject, jsx, useTheme} from '@emotion/react';
-import type {Property} from 'csstype';
+import {Property} from 'csstype';
 import React, {ReactElement, useState} from 'react';
 
-import type {Theme} from '../Layout';
-import type {TextProps} from '../Text';
+import {Theme} from '../Layout';
+import {TextProps} from '../Text';
 import {filterProps} from '../util';
 import {ErrorIcon, HideIcon, ShowIcon} from '../Icon';
 import InputLabel from './InputLabel';

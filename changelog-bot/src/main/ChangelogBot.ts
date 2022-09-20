@@ -25,7 +25,7 @@ import {MemoryEngine} from '@wireapp/store-engine';
 import * as Changelog from 'generate-changelog';
 import logdown from 'logdown';
 
-import type {ChangelogData, LoginDataBackend} from './Interfaces';
+import {ChangelogData, LoginDataBackend} from './Interfaces';
 import {MessageBuilder} from '@wireapp/core/src/main/conversation/message/MessageBuilder';
 import {ConversationProtocol} from '@wireapp/api-client/src/conversation';
 

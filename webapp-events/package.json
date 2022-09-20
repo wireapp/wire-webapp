@@ -2,7 +2,7 @@
   "description": "Events shared between Wire's web app and desktop app.",
   "devDependencies": {
     "rimraf": "3.0.2",
-    "typescript": "4.4.2"
+    "typescript": "4.8.3"
   },
   "files": [
     "src/**/*.js*",
@@ -15,7 +15,7 @@
   "scripts": {
     "build": "tsc",
     "build:node": "tsc",
-    "clean": "rimraf .nyc_output coverage src/**/*{.js,.js.map,.d.ts}",
+    "clean": "rimraf \"src/*{.js,.js.map,.d.ts}\"",
     "dist": "yarn clean && yarn build",
     "test": "exit 0"
   },

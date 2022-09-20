@@ -23,7 +23,7 @@ import {CSSObject, jsx} from '@emotion/react';
 import {defaultTransition} from '../../Identity/motions';
 import {QueryKeys, media} from '../../mediaQueries';
 import {TextProps, textStyle} from '../../Text';
-import type {Theme} from '../Theme';
+import {Theme} from '../Theme';
 
 type MenuSubLinkProps<T = HTMLDivElement> = TextProps<T>;
 

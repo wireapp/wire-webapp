@@ -17,10 +17,10 @@
  *
  */
 
-import type {AxiosRequestConfig} from 'axios';
+import {AxiosRequestConfig} from 'axios';
 
-import type {HttpClient, ProgressCallback} from '../http';
-import type {
+import {HttpClient, ProgressCallback} from '../http';
+import {
   Client,
   Self,
   UserPreKeyList,
@@ -29,7 +29,7 @@ import type {
   ClientSeenByService,
   ServiceMessage,
 } from './Service';
-import type {PreKey} from '../auth';
+import {PreKey} from '../auth';
 import {AssetOptions, AssetAPI} from '../asset';
 
 export class ServicesAPI {

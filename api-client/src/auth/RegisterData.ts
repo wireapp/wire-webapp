@@ -17,8 +17,8 @@
  *
  */
 
-import type {TeamData} from '../team/team/TeamData';
-import type {User} from '../user/';
+import {TeamData} from '../team/team/TeamData';
+import {User} from '../user/';
 
 export type RegisterData = Pick<User, 'accent_id' | 'assets' | 'email' | 'name'> & {
   /** Email activation code */

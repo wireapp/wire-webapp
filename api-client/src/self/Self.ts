@@ -17,8 +17,8 @@
  *
  */
 
-import type {SSOSignature} from '../self/';
-import type {QualifiedId, ManagedSource, User} from '../user/';
+import {SSOSignature} from '../self/';
+import {QualifiedId, ManagedSource, User} from '../user/';
 
 export interface Self extends User {
   locale: string;

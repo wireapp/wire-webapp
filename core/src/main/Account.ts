@@ -17,11 +17,11 @@
  *
  */
 
-import type {AxiosError} from 'axios';
+import {AxiosError} from 'axios';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 import {APIClient, BackendFeatures} from '@wireapp/api-client';
-import type {RegisterData} from '@wireapp/api-client/src/auth';
-import type {Notification} from '@wireapp/api-client/src/notification/';
+import {RegisterData} from '@wireapp/api-client/src/auth';
+import {Notification} from '@wireapp/api-client/src/notification/';
 import {AUTH_COOKIE_KEY, AUTH_TABLE_NAME, Context, Cookie, CookieStore, LoginData} from '@wireapp/api-client/src/auth/';
 import {ClientClassification, ClientType, RegisteredClient} from '@wireapp/api-client/src/client/';
 import * as Events from '@wireapp/api-client/src/event';
@@ -38,7 +38,7 @@ import {ConnectionService} from './connection/';
 import {AssetService, ConversationService, PayloadBundleSource, PayloadBundleType} from './conversation/';
 import * as OtrMessage from './conversation/message/OtrMessage';
 import * as UserMessage from './conversation/message/UserMessage';
-import type {CoreError} from './CoreError';
+import {CoreError} from './CoreError';
 import {CryptographyService} from './cryptography/';
 import {GiphyService} from './giphy/';
 import {HandledEventPayload, NotificationService} from './notification/';
@@ -47,12 +47,12 @@ import {TeamService} from './team/';
 import {UserService} from './user/';
 import {AccountService} from './account/';
 import {LinkPreviewService} from './linkPreview';
-import type {CoreCrypto} from '@wireapp/core-crypto';
+import {CoreCrypto} from '@wireapp/core-crypto';
 import {WEBSOCKET_STATE} from '@wireapp/api-client/src/tcp/ReconnectingWebsocket';
 import {createCustomEncryptedStore, createEncryptedStore, deleteEncryptedStore} from './util/encryptedStore';
 import {Encoder} from 'bazinga64';
 import {MLSService} from './mls';
-import type {MLSCallbacks, MLSConfig} from './mls/types';
+import {MLSCallbacks, MLSConfig} from './mls/types';
 import {resumeMessageSending} from './conversation/message/messageSender';
 
 export type ProcessedEventPayload = HandledEventPayload;

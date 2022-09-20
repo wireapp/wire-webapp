@@ -17,7 +17,7 @@
  *
  */
 
-import type {BackendEvent} from '../event';
+import {BackendEvent} from '../event';
 
 export interface Notification {
   id: string;

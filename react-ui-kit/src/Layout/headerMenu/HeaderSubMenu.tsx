@@ -24,7 +24,7 @@ import React from 'react';
 import {COLOR, Opacity, Slide, YAxisMovement} from '../../Identity';
 import {DURATION} from '../../Identity/motions';
 import {QUERY} from '../../mediaQueries';
-import type {Theme} from '../Theme';
+import {Theme} from '../Theme';
 import {MenuSubLink} from './MenuSubLink';
 import {MENU_LINK_CLASSNAME} from './MenuLink';
 

@@ -34,7 +34,7 @@ import {
   SelectContainer,
   ValueContainer,
 } from './SelectComponents';
-import type {Theme} from '../Layout';
+import {Theme} from '../Layout';
 import InputLabel from './InputLabel';
 
 export type Option = {

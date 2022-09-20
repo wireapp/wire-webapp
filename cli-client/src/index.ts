@@ -28,7 +28,7 @@ import dotenv from 'dotenv';
 import fs from 'fs-extra';
 import os from 'os';
 import path from 'path';
-import type {AxiosError} from 'axios';
+import {AxiosError} from 'axios';
 import {MessageBuilder} from '@wireapp/core/src/main/conversation/message/MessageBuilder';
 import {ConversationProtocol} from '@wireapp/api-client/src/conversation';
 
@@ -86,7 +86,7 @@ account.on(PayloadBundleType.TEXT, textMessage => {
     await account.login(loginData);
     await account.listen();
   } catch (error) {
-    const data = (error as AxiosError).response?.data;
+    const data: any = (error as AxiosError).response?.data;
     const errorLabel = data?.label;
     // TODO: The following is just a quick hack to continue if too many clients are registered!
     // We should expose this fail-safe method as an emergency function

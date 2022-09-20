@@ -23,7 +23,7 @@ import {CSSObject, jsx} from '@emotion/react';
 
 import {QueryKeys, media} from '../../mediaQueries';
 import {filterProps} from '../../util';
-import type {Theme} from '../Theme';
+import {Theme} from '../Theme';
 
 export interface MenuItemsProps<T = HTMLDivElement> extends React.HTMLProps<T> {
   open?: boolean;

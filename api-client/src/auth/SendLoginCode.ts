@@ -17,7 +17,7 @@
  *
  */
 
-import type {SendActivationCode} from '../user';
+import {SendActivationCode} from '../user';
 
 export type SendLoginCode = Partial<Pick<SendActivationCode, 'phone' | 'voice_call'>> & {
   /** Forces validation via SMS/voice call code */

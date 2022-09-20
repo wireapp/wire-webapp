@@ -17,10 +17,10 @@
  *
  */
 
-import type {AxiosRequestConfig} from 'axios';
+import {AxiosRequestConfig} from 'axios';
 
-import type {PreKeyBundle} from '../auth/';
-import type {CreateClientPayload, RegisteredClient, UpdateClientPayload} from '../client/';
+import {PreKeyBundle} from '../auth/';
+import {CreateClientPayload, RegisteredClient, UpdateClientPayload} from '../client/';
 import {ClientCapabilityRemovedError} from './ClientError';
 import {BackendError, BackendErrorLabel, HttpClient} from '../http/';
 import {ClientCapabilityData} from './ClientCapabilityData';

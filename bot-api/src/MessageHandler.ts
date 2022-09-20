@@ -19,11 +19,11 @@
 
 import {Conversation, ConversationProtocol, UserClients} from '@wireapp/api-client/src/conversation';
 import {CONVERSATION_TYPING} from '@wireapp/api-client/src/conversation/data';
-import type {ConversationEvent, TeamEvent, UserEvent} from '@wireapp/api-client/src/event';
-import type {QualifiedId, User} from '@wireapp/api-client/src/user/';
-import type {Account} from '@wireapp/core';
-import type {PayloadBundle, ReactionType} from '@wireapp/core/src/main/conversation/';
-import type {
+import {ConversationEvent, TeamEvent, UserEvent} from '@wireapp/api-client/src/event';
+import {QualifiedId, User} from '@wireapp/api-client/src/user/';
+import {Account} from '@wireapp/core';
+import {PayloadBundle, ReactionType} from '@wireapp/core/src/main/conversation/';
+import {
   ButtonActionConfirmationContent,
   CallingContent,
   FileContent,
@@ -33,7 +33,7 @@ import type {
   LocationContent,
   MentionContent,
 } from '@wireapp/core/src/main/conversation/content/';
-import type {QuotableMessage} from '@wireapp/core/src/main/conversation/message/OtrMessage';
+import {QuotableMessage} from '@wireapp/core/src/main/conversation/message/OtrMessage';
 import {Asset, Confirmation, Text} from '@wireapp/protocol-messaging';
 import {promisify} from 'util';
 import fs from 'fs';

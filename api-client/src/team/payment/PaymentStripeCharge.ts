@@ -19,7 +19,7 @@
 
 // https://stripe.com/docs/api#charge_object
 
-import type {SupportedCurrency} from '../payment/';
+import {SupportedCurrency} from '../payment/';
 
 enum PaymentStripeChargeStatus {
   FAILED = 'failed',

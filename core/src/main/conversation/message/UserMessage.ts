@@ -17,7 +17,7 @@
  *
  */
 
-import type {
+import {
   UserActivateData,
   UserClientAddData,
   UserClientRemoveData,
@@ -30,7 +30,7 @@ import type {
   UserUpdateData,
 } from '@wireapp/api-client/src/user/data';
 
-import type {BasePayloadBundle, PayloadBundleType} from './PayloadBundle';
+import {BasePayloadBundle, PayloadBundleType} from './PayloadBundle';
 
 export interface UserActivateMessage extends BasePayloadBundle {
   content: UserActivateData;

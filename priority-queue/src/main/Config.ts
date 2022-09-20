@@ -17,7 +17,7 @@
  *
  */
 
-import type {Item} from './Item';
+import {Item} from './Item';
 
 export interface Config {
   comparator: (a: Item, b: Item) => number;

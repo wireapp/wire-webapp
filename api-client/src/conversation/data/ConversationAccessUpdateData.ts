@@ -17,7 +17,7 @@
  *
  */
 
-import type {ACCESS_ROLE_V2, CONVERSATION_ACCESS, CONVERSATION_ACCESS_ROLE} from '../Conversation';
+import {ACCESS_ROLE_V2, CONVERSATION_ACCESS, CONVERSATION_ACCESS_ROLE} from '../Conversation';
 
 /**@deprecated */
 export interface ConversationAccessUpdateData {

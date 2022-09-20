@@ -3,17 +3,19 @@
     "wire-changelog-bot": "src/main/cli.js"
   },
   "dependencies": {
-    "@types/generate-changelog": "1.8.1",
-    "@types/node": "~14",
-    "@wireapp/core": "30.13.0",
-    "commander": "8.0.0",
-    "generate-changelog": "1.8.0"
+    "@wireapp/api-client": "workspace:^",
+    "@wireapp/core": "workspace:^",
+    "@wireapp/store-engine": "workspace:^",
+    "commander": "8.0.0"
   },
   "description": "A changelog notification bot.",
   "devDependencies": {
+    "@types/generate-changelog": "1.8.1",
+    "@types/node": "^14.18.29",
+    "generate-changelog": "1.8.0",
     "logdown": "3.3.1",
     "rimraf": "3.0.2",
-    "typescript": "4.4.2"
+    "typescript": "4.8.3"
   },
   "files": [
     "src",

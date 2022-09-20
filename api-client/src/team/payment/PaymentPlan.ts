@@ -17,7 +17,7 @@
  *
  */
 
-import type {PaymentInterval} from '../payment/';
+import {PaymentInterval} from '../payment/';
 
 export enum PaymentPlanID {
   ANNUAL = 'wire_annual_plan',

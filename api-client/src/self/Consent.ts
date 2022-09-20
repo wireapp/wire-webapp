@@ -17,7 +17,7 @@
  *
  */
 
-import type {ConsentType} from './ConsentType';
+import {ConsentType} from './ConsentType';
 
 export interface Consent {
   source: string;

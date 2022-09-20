@@ -20,7 +20,7 @@
 import {EventEmitter} from 'events';
 import logdown from 'logdown';
 
-import type {AccessTokenData} from '../auth/';
+import {AccessTokenData} from '../auth/';
 
 enum TOPIC {
   ACCESS_TOKEN_REFRESH = 'AccessTokenStore.TOPIC.ACCESS_TOKEN_REFRESH',

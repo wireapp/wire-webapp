@@ -23,9 +23,9 @@ import React, {CSSProperties} from 'react';
 import Color from 'color';
 
 import {CloseIcon} from '../Icon';
-import type {SVGIconProps} from '../Icon/SVGIcon';
+import {SVGIconProps} from '../Icon/SVGIcon';
 import {COLOR} from '../Identity';
-import type {Theme} from '../Layout';
+import {Theme} from '../Layout';
 import {QueryKeys, media} from '../mediaQueries';
 import {filterProps, noop} from '../util';
 import {OverlayBackgroundProps, OverlayWrapper, overlayBackgroundStyle} from './Overlay';

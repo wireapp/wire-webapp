@@ -21,7 +21,7 @@ import {ClientType} from '@wireapp/api-client/src/client/';
 import logdown from 'logdown';
 
 import {ChangelogBot} from './ChangelogBot';
-import type {ChangelogData, LoginDataBackend, Parameters} from './Interfaces';
+import {ChangelogData, LoginDataBackend, Parameters} from './Interfaces';
 
 const logger = logdown('@wireapp/changelog-bot/Start', {
   logger: console,

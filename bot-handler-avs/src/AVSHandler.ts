@@ -18,7 +18,7 @@
  */
 
 import {MessageHandler} from '@wireapp/bot-api';
-import type {PayloadBundle} from '@wireapp/core/src/main/conversation/';
+import {PayloadBundle} from '@wireapp/core/src/main/conversation/';
 import {
   CALL_TYPE,
   CONV_TYPE,
@@ -31,9 +31,9 @@ import {
   WcallParticipantChangedHandler,
 } from '@wireapp/avs';
 import axios from 'axios';
-import type {CallMessage} from '@wireapp/core/src/main/conversation/message/OtrMessage';
+import {CallMessage} from '@wireapp/core/src/main/conversation/message/OtrMessage';
 
-import type {Call} from './Call';
+import {Call} from './Call';
 
 const wrtc = require('@koush/wrtc');
 

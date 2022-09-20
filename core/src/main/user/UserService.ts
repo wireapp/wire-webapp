@@ -17,12 +17,12 @@
  *
  */
 
-import type {APIClient} from '@wireapp/api-client';
-import type {QualifiedId, User} from '@wireapp/api-client/src/user/';
+import {APIClient} from '@wireapp/api-client';
+import {QualifiedId, User} from '@wireapp/api-client/src/user/';
 import {Availability, GenericMessage} from '@wireapp/protocol-messaging';
 import UUID from 'uuidjs';
 
-import type {AvailabilityType, BroadcastService} from '../broadcast/';
+import {AvailabilityType, BroadcastService} from '../broadcast/';
 import {isQualifiedIdArray} from '../util/TypePredicateUtil';
 import {ConnectionService} from '../connection';
 import {ConnectionStatus} from '@wireapp/api-client/src/connection';

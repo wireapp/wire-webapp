@@ -19,7 +19,7 @@
 
 import {Item} from './Item';
 import {Priority} from './Priority';
-import type {Config} from './Config';
+import {Config} from './Config';
 
 export class PriorityQueue {
   private readonly config: Config = {

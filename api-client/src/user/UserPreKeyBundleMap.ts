@@ -17,7 +17,7 @@
  *
  */
 
-import type {PreKey} from '../auth';
+import {PreKey} from '../auth';
 
 export interface UserPreKeyBundleMap {
   [userId: string]: {

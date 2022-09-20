@@ -17,7 +17,7 @@
  *
  */
 
-import type {ClientType} from '@wireapp/api-client/src/client/';
+import {ClientType} from '@wireapp/api-client/src/client/';
 
 export interface BotConfig {
   /** Set the backend (staging or production) */

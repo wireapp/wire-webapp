@@ -17,14 +17,13 @@
  *
  */
 
-import type {Config, ConfigOptions} from 'karma';
 import 'karma-webpack';
-
+import {Config} from 'karma';
 import * as jasmineConfig from './jasmine.json';
 import webpackConfig from './webpack.config';
 
-module.exports = (config: Config): void => {
-  const options: ConfigOptions = {
+module.exports = (config: Config) => {
+  const options = {
     autoWatch: false,
     basePath: jasmineConfig.spec_dir,
     browserNoActivityTimeout: 90000,

@@ -17,6 +17,6 @@
  *
  */
 
-import type {Asset} from '@wireapp/protocol-messaging';
+import {Asset} from '@wireapp/protocol-messaging';
 
 export type AbortReason = Asset.NotUploaded;

@@ -17,8 +17,8 @@
  *
  */
 
-import type {PreKey} from '../auth/';
-import type {ClientClassification, ClientType, Location} from './';
+import {PreKey} from '../auth/';
+import {ClientClassification, ClientType, Location} from './';
 import {ClientCapabilityData} from './ClientCapabilityData';
 
 type BaseUpdatePayload = ClientCapabilityData & {label?: string};

@@ -18,13 +18,13 @@
  */
 
 import {APIClient} from '@wireapp/api-client';
-import type {LoginData} from '@wireapp/api-client/src/auth';
+import {LoginData} from '@wireapp/api-client/src/auth';
 import {ClientType} from '@wireapp/api-client/src/client';
 import {Text} from '@wireapp/protocol-messaging';
 
 import {Account} from '../main/Account';
 import {PayloadBundleType} from '../main/conversation';
-import type {ButtonActionContent, ButtonActionConfirmationContent} from '../main/conversation/content';
+import {ButtonActionContent, ButtonActionConfirmationContent} from '../main/conversation/content';
 
 import 'dotenv-defaults/config';
 import {MessageBuilder} from '../main/conversation/message/MessageBuilder';

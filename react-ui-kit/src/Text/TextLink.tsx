@@ -21,7 +21,7 @@
 import {CSSObject, jsx} from '@emotion/react';
 
 import {COLOR_V2} from '../Identity/colors-v2';
-import type {Theme} from '../Layout';
+import {Theme} from '../Layout';
 import {LinkProps, filterLinkProps, linkStyle} from './Link';
 
 export type TextLinkProps<T = HTMLAnchorElement> = LinkProps<T>;

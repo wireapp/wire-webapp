@@ -18,7 +18,7 @@
  */
 
 import {CRUDEngine, error as StoreEngineError} from '@wireapp/store-engine';
-import Dexie, {DexieError} from 'dexie';
+import Dexie, {DexieError, IndexableType} from 'dexie';
 import logdown = require('logdown');
 
 type DexieObservable = {_dbSchema?: Object};
@@ -165,7 +165,7 @@ export class IndexedDBEngine implements CRUDEngine {
     tableName: string,
     primaryKey: PrimaryKey,
   ): Promise<EntityType> {
-    const record = await this.db.table<EntityType>(tableName).get(primaryKey);
+    const record = await this.db.table<EntityType>(tableName).get(primaryKey as IndexableType);
     if (record) {
       return record;
     }
@@ -206,7 +206,7 @@ export class IndexedDBEngine implements CRUDEngine {
   public async update<PrimaryKey = string>(
     tableName: string,
     primaryKey: PrimaryKey,
-    changes: Object,
+    changes: any,
   ): Promise<PrimaryKey> {
     const updatedRecords = await this.db.table(tableName).update(primaryKey, changes);
     if (updatedRecords === 0) {

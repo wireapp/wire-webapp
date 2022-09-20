@@ -17,6 +17,6 @@
  *
  */
 
-import type {User} from '../user/';
+import {User} from '../user/';
 
 export type UserUpdate = Partial<Pick<User, 'name'> & Pick<User, 'assets' | 'accent_id'>>;
