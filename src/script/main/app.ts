@@ -832,6 +832,7 @@ class App {
       if (clearData) {
         // Info: This async call cannot be awaited in an "beforeunload" scenario, so we call it without waiting for it in order to delete the CacheStorage in the background.
         CacheRepository.clearCacheStorage();
+        localStorage.clear();
 
         try {
           await this.repository.storage.deleteDatabase();
