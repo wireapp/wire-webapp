@@ -329,7 +329,7 @@ export class ConversationService {
     return primaryKey;
   }
 
-  loadConversation<T>(conversationId: string): Promise<T> {
+  loadConversation<T>(conversationId: string): Promise<T | undefined> {
     return this.storageService.load(StorageSchemata.OBJECT_STORE.CONVERSATIONS, conversationId);
   }
 

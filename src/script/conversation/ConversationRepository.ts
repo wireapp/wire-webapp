@@ -50,7 +50,7 @@ import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 import {PromiseQueue} from 'Util/PromiseQueue';
 import {replaceLink, t} from 'Util/LocalizerUtil';
 import {getNextItem} from 'Util/ArrayUtil';
-import {createRandomUuid, noop} from 'Util/util';
+import {base64ToArray, createRandomUuid, noop} from 'Util/util';
 import {allowsAllFiles, getFileExtensionOrName, isAllowedFile} from 'Util/FileTypeUtil';
 import {
   compareTransliteration,
@@ -872,17 +872,27 @@ export class ConversationRepository {
    * Check for conversation locally and fetch it from the server otherwise.
    * TODO(Federation): Remove "optional" from "domain"
    */
-  async getConversationById(conversation_id: QualifiedId): Promise<Conversation> {
+  async getConversationById(conversation_id: QualifiedId, searchInLocalDB = false): Promise<Conversation> {
     if (typeof conversation_id.id !== 'string') {
       throw new ConversationError(
         ConversationError.TYPE.NO_CONVERSATION_ID,
         ConversationError.MESSAGE.NO_CONVERSATION_ID,
       );
     }
-    const conversationEntity = this.conversationState.findConversation(conversation_id);
-    if (conversationEntity) {
-      return conversationEntity;
+    const localStateConversation = this.conversationState.findConversation(conversation_id);
+    if (localStateConversation) {
+      return localStateConversation;
     }
+
+    if (searchInLocalDB) {
+      const localDBConversation = await this.conversationService.loadConversation<BackendConversation>(
+        conversation_id.id,
+      );
+      if (localDBConversation) {
+        return this.mapConversations([localDBConversation])[0];
+      }
+    }
+
     try {
       return await this.fetchConversationById(conversation_id);
     } catch (error) {
@@ -1507,8 +1517,8 @@ export class ConversationRepository {
    * @param userId ID of member to be removed from the conversation
    * @returns Resolves when member was removed from the conversation
    */
-  private async removeMemberFromProteusConversation(conversationEntity: Conversation, userId: QualifiedId) {
-    const response = await this.core.service!.conversation.removeUserFromProteusConversation(
+  private async removeMemberFromConversation(conversationEntity: Conversation, userId: QualifiedId) {
+    const response = await this.core.service!.conversation.removeUserFromConversation(
       conversationEntity.qualifiedId,
       userId,
     );
@@ -1517,21 +1527,24 @@ export class ConversationRepository {
     conversationEntity.roles(roles);
     const currentTimestamp = this.serverTimeHandler.toServerTimestamp();
     const event = response || EventBuilder.buildMemberLeave(conversationEntity, userId, true, currentTimestamp);
-    this.eventRepository.injectEvent(event, EventRepository.SOURCE.BACKEND_RESPONSE);
+    await this.eventRepository.injectEvent(event, EventRepository.SOURCE.BACKEND_RESPONSE);
     return event;
   }
 
   /**
-   * Remove the current user from a Proteus conversation.
+   * Remove the current user from a conversation.
    *
    * @param conversationEntity Conversation to remove user from
    * @param clearContent Should we clear the conversation content from the database?
    * @returns Resolves when user was removed from the conversation
    */
-  private async leaveProteusConversation(conversationEntity: Conversation, clearContent: boolean) {
-    return clearContent
-      ? this.clearConversation(conversationEntity, true)
-      : this.removeMemberFromProteusConversation(conversationEntity, this.userState.self().qualifiedId);
+  private async leaveConversation(conversationEntity: Conversation, clearContent: boolean) {
+    if (clearContent) {
+      this.clearConversation(conversationEntity, false);
+    }
+
+    const userQualifiedId = this.userState.self().qualifiedId;
+    return this.removeMemberFromConversation(conversationEntity, userQualifiedId);
   }
 
   /**
@@ -1547,13 +1560,12 @@ export class ConversationRepository {
     const isMLSConversation = conversationEntity.isUsingMLSProtocol;
 
     if (isUserLeaving) {
-      //@todo leaveMLSConversation
-      return this.leaveProteusConversation(conversationEntity, clearContent);
+      return this.leaveConversation(conversationEntity, clearContent);
     }
 
     return isMLSConversation
       ? this.removeMemberFromMLSConversation(conversationEntity, userId)
-      : this.removeMemberFromProteusConversation(conversationEntity, userId);
+      : this.removeMemberFromConversation(conversationEntity, userId);
   }
 
   /**
@@ -1969,7 +1981,9 @@ export class ConversationRepository {
     }
 
     const isConversationCreate = type === CONVERSATION_EVENT.CREATE;
-    const onEventPromise = isConversationCreate ? Promise.resolve(null) : this.getConversationById(conversationId);
+    const onEventPromise = isConversationCreate
+      ? Promise.resolve(null)
+      : this.getConversationById(conversationId, true);
     let previouslyArchived = false;
 
     return onEventPromise
@@ -2488,8 +2502,17 @@ export class ConversationRepository {
         conversationEntity.qualifiedId,
         LEAVE_CALL_REASON.USER_IS_REMOVED_BY_AN_ADMIN_OR_LEFT_ON_ANOTHER_CLIENT,
       );
+
       if (this.userState.self().isTemporaryGuest()) {
         eventJson.from = this.userState.self().id;
+      }
+
+      if (conversationEntity.protocol === ConversationProtocol.MLS) {
+        const {groupId} = conversationEntity;
+        if (groupId) {
+          const groupIdDecodedFromBase64 = base64ToArray(groupId);
+          await this.core.service!.conversation.wipeMLSConversation(groupIdDecodedFromBase64);
+        }
       }
     }
 
