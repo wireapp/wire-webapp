@@ -20,7 +20,7 @@
 /** @jsx jsx */
 import {jsx} from '@emotion/react';
 import {COLOR_V2} from '../Identity';
-import type {Theme} from '../Layout';
+import {Theme} from '../Layout';
 import React, {FC, ReactNode} from 'react';
 
 export interface InputLabelProps {

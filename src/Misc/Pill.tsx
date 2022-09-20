@@ -23,7 +23,7 @@ import React from 'react';
 
 import {COLOR} from '../Identity';
 import {DURATION, EASE} from '../Identity/motions';
-import type {Theme} from '../Layout';
+import {Theme} from '../Layout';
 import {filterProps} from '../util';
 
 export interface PillProps<T = HTMLSpanElement> extends React.HTMLProps<T> {

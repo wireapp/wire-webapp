@@ -21,7 +21,7 @@
 import {CSSObject, jsx} from '@emotion/react';
 import React from 'react';
 
-import type {Theme} from '../Layout';
+import {Theme} from '../Layout';
 
 export interface InternalSVGIconProps<T = SVGSVGElement> extends SVGIconProps<T> {
   realHeight: number;

@@ -22,8 +22,8 @@ import {CSSObject, jsx} from '@emotion/react';
 import React, {useState, FC, forwardRef, DragEvent} from 'react';
 
 import {COLOR} from '../Identity';
-import type {Theme} from '../Layout';
-import type {TextProps} from '../Text';
+import {Theme} from '../Layout';
+import {TextProps} from '../Text';
 import {UploadIcon} from '../Icon';
 import {FlexBox} from '../Layout';
 

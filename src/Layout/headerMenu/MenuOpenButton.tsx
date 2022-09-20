@@ -23,7 +23,7 @@ import React from 'react';
 
 import {QueryKeys, media} from '../../mediaQueries';
 import {filterProps} from '../../util';
-import type {Theme} from '../Theme';
+import {Theme} from '../Theme';
 
 export interface MenuOpenButtonProps<T = HTMLDivElement> extends React.HTMLProps<T> {
   open?: boolean;

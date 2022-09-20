@@ -22,7 +22,7 @@ import {CSSObject, jsx} from '@emotion/react';
 import {ReactElement} from 'react';
 
 import {COLOR_V2} from '../Identity';
-import type {Theme} from '../Layout';
+import {Theme} from '../Layout';
 import {IconButtonProps} from './IconButton';
 
 const buttonGroupStyle: <T>(theme: Theme) => CSSObject = () => ({

@@ -32,7 +32,7 @@ module.exports = {
       },
     ],
   },
-  plugins: [new webpack.HotModuleReplacementPlugin(), new webpack.NamedModulesPlugin()],
+  plugins: [new webpack.HotModuleReplacementPlugin()],
   resolve: {
     alias: {
       '@wireapp/react-ui-kit': path.resolve(__dirname, 'src'),

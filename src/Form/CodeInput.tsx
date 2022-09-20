@@ -21,7 +21,7 @@
 import {CSSObject, jsx} from '@emotion/react';
 import React, {useEffect, useState} from 'react';
 
-import type {Theme} from '../Layout';
+import {Theme} from '../Layout';
 import {noop} from '../util';
 import {InputProps, inputStyle} from './Input';
 import {COLOR_V2} from '../Identity';

@@ -22,7 +22,7 @@ import {CSSObject, jsx} from '@emotion/react';
 import React from 'react';
 
 import {COLOR} from '../Identity';
-import type {Theme} from '../Layout';
+import {Theme} from '../Layout';
 import {TextProps, textStyle} from '../Text';
 import {filterProps} from '../util';
 

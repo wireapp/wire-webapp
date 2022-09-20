@@ -23,7 +23,7 @@ import React from 'react';
 
 import {COLOR} from '../Identity';
 import {Loading} from '../Misc';
-import type {InputProps} from './Input';
+import {InputProps} from './Input';
 
 export interface SwitchProps<T = HTMLInputElement> extends InputProps<T> {
   activatedColor?: string;

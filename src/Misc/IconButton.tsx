@@ -21,7 +21,7 @@
 import {CSSObject, jsx} from '@emotion/react';
 
 import {defaultTransition} from '../Identity/motions';
-import type {Theme} from '../Layout';
+import {Theme} from '../Layout';
 import {TextProps, filterTextProps} from '../Text';
 import {filterProps} from '../util';
 
