@@ -80,7 +80,7 @@ export abstract class MessageHandler {
 
   async removeUser(conversationId: QualifiedId, userId: QualifiedId): Promise<void> {
     if (this.account?.service) {
-      await this.account.service.conversation.removeUserFromProteusConversation(conversationId, userId);
+      await this.account.service.conversation.removeUserFromConversation(conversationId, userId);
     }
   }
 

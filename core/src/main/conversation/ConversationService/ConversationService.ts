@@ -22,7 +22,6 @@ import type {APIClient} from '@wireapp/api-client';
 import {
   MessageSendingStatus,
   Conversation,
-  CONVERSATION_TYPE,
   DefaultConversationRoleName,
   MutedStatus,
   NewConversation,
@@ -857,34 +856,6 @@ export class ConversationService {
     };
   }
 
-  public leaveConversation(conversationId: QualifiedId): Promise<ConversationMemberLeaveEvent> {
-    if (!this.apiClient.context || !this.apiClient.context.userId || !this.apiClient.context.domain) {
-      throw new Error('Cannot leave conversation without a userId and domain');
-    }
-    return this.apiClient.api.conversation.deleteMember(conversationId, {
-      domain: this.apiClient.context.domain,
-      id: this.apiClient.context.userId,
-    });
-  }
-
-  /**
-   * @depricated seems not to be used and is outdated. use leaveConversation instead
-   */
-  public async leaveConversations(conversationIds?: string[]): Promise<ConversationMemberLeaveEvent[]> {
-    if (!conversationIds) {
-      const conversation = await this.getConversations();
-      conversationIds = conversation
-        .filter(conversation => conversation.type === CONVERSATION_TYPE.REGULAR)
-        .map(conversation => conversation.id);
-    }
-
-    return Promise.all(
-      conversationIds.map(conversationId =>
-        this.leaveConversation({id: conversationId, domain: this.apiClient.context?.domain ?? ''}),
-      ),
-    );
-  }
-
   /**
    * Create a group conversation.
    * @param  {string} name
@@ -955,7 +926,7 @@ export class ConversationService {
     return this.apiClient.api.conversation.postMembers(conversationId, qualifiedUserIds);
   }
 
-  public async removeUserFromProteusConversation(
+  public async removeUserFromConversation(
     conversationId: QualifiedId,
     userId: QualifiedId,
   ): Promise<ConversationMemberLeaveEvent> {
