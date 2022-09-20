@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [30.12.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/compare/@wireapp/core@30.11.2...@wireapp/core@30.12.0) (2022-09-20)
+
+
+### Features
+
+* leave mls convo - refactor (FS-683) ([#4401](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/issues/4401)) ([909e142](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/commit/909e142753035fb54c8b4f19076a1dec646f6b97))
+
+
+
+
+
 ## [30.11.2](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/compare/@wireapp/core@30.11.1...@wireapp/core@30.11.2) (2022-09-19)
 
 **Note:** Version bump only for package @wireapp/core
