@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [30.13.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/compare/@wireapp/core@30.12.0...@wireapp/core@30.13.0) (2022-09-20)
+
+
+### Features
+
+* Handle external proposals ([#4397](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/issues/4397)) ([54c5f97](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/commit/54c5f979eb5e5bd4e864dad1b9acb3c330ddac75))
+
+
+
+
+
 # [30.12.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/compare/@wireapp/core@30.11.2...@wireapp/core@30.12.0) (2022-09-20)
 
 
