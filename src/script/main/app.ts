@@ -415,7 +415,7 @@ class App {
       callingRepository.initAvs(selfUser, clientEntity().id);
       loadingView.updateProgress(7.5, t('initValidatedClient'));
       telemetry.timeStep(AppInitTimingsStep.VALIDATED_CLIENT);
-      telemetry.addStatistic(AppInitStatisticsValue.CLIENT_TYPE, clientEntity().type);
+      telemetry.addStatistic(AppInitStatisticsValue.CLIENT_TYPE, clientEntity().type ?? 'unknown');
 
       await cryptographyRepository.init(this.core.service!.cryptography.cryptobox, clientEntity);
 
@@ -435,16 +435,13 @@ class App {
         );
 
         this.core.configureMLSCallbacks({
-          authorize: (groupIdBytes, clientId) => {
+          authorize: groupIdBytes => {
             const groupId = arrayToBase64(groupIdBytes);
             const conversation = conversationRepository.findConversationByGroupId(groupId);
             if (!conversation) {
               return false;
             }
             return conversationRepository.conversationRoleRepository.isUserGroupAdmin(conversation, selfUser);
-          },
-          clientIdBelongsToOneOf: (clientId, otherClients) => {
-            return true;
           },
           groupIdFromConversationId: async conversationId => {
             const conversation = await conversationRepository.getConversationById(conversationId);
