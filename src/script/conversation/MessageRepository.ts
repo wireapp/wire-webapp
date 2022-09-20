@@ -954,13 +954,11 @@ export class MessageRepository {
         throw new ConversationError(ConversationError.TYPE.WRONG_USER, ConversationError.MESSAGE.WRONG_USER);
       }
       const userIds = targetedUsers || conversation.allUserEntities.map(user => user.qualifiedId);
-      await this.conversationService.deleteMessageEveryone(
-        conversation.id,
-        message.id,
-        this.core.backendFeatures.federationEndpoints ? userIds : userIds.map(({id}) => id),
-        true,
-        this.core.backendFeatures.federationEndpoints ? conversation.domain : undefined,
-      );
+      const payload = MessageBuilder.createDelete({
+        ...this.createCommonMessagePayload(conversation),
+        messageIdToDelete: message.id,
+      });
+      await this.sendAndInjectGenericCoreMessage(payload, conversation, {recipients: userIds, skipInjection: true});
 
       await this.deleteMessageById(conversation, messageId);
     } catch (error) {
