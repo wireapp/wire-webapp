@@ -70,7 +70,8 @@
     "test:coverage": "yarn test --coverage",
     "test:watch": "yarn test --watch",
     "test:update": "yarn test --updateSnapshot",
-    "test:project": "yarn dist && yarn test"
+    "test:project": "yarn dist && yarn test",
+    "prepare": "yarn dist"
   },
   "version": "8.14.3"
 }
