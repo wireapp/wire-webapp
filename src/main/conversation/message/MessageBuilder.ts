@@ -44,6 +44,7 @@ import {
   FileAssetAbortMessage,
   FileAssetMessage,
   FileAssetMetaDataMessage,
+  HideMessage,
   ImageAssetMessageOutgoing,
   LocationMessage,
   PingMessage,
@@ -58,8 +59,13 @@ interface BaseOptions {
   messageId?: string;
 }
 
-interface CreateDeleteOption extends BaseOptions {
+interface CreateMessageDeleteOption extends BaseOptions {
   messageIdToDelete: string;
+}
+
+interface CreateMessageHideOption extends BaseOptions {
+  messageIdToDelete: string;
+  targetConversation: string;
 }
 
 interface CreateImageOptions extends BaseOptions {
@@ -179,11 +185,19 @@ export class MessageBuilder {
     };
   }
 
-  public static createDelete(payload: CreateDeleteOption): DeleteMessage {
+  public static createMessageDelete(payload: CreateMessageDeleteOption): DeleteMessage {
     return {
       ...createCommonProperties(payload),
       content: {messageId: payload.messageIdToDelete},
       type: PayloadBundleType.MESSAGE_DELETE,
+    };
+  }
+
+  public static createMessageHide(payload: CreateMessageHideOption): HideMessage {
+    return {
+      ...createCommonProperties(payload),
+      content: {messageId: payload.messageIdToDelete, conversationId: payload.targetConversation},
+      type: PayloadBundleType.MESSAGE_HIDE,
     };
   }
 
