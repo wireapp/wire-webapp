@@ -40,6 +40,7 @@ import {isContentMessage} from '../../../guards/Message';
 import {Message} from '../../../entity/message/Message';
 import {SearchRepository} from '../../../search/SearchRepository';
 import {UserReactionMap} from '../../../storage';
+import {ContentMessage} from '../../../entity/message/ContentMessage';
 
 const MESSAGE_STATES = {
   LIKES: 'likes',
@@ -60,7 +61,7 @@ interface MessageDetailsProps {
   activeConversation: Conversation;
   onClose: () => void;
   conversationRepository: ConversationRepository;
-  messageEntity: Message;
+  messageEntity: ContentMessage;
   teamRepository: TeamRepository;
   searchRepository: SearchRepository;
   userRepository: UserRepository;
@@ -85,10 +86,16 @@ const MessageDetails: FC<MessageDetailsProps> = ({
 
   const [isReceiptsOpen, setIsReceiptsOpen] = useState<boolean>(showLikes);
 
-  const {timestamp, user: selfUser} = useKoSubscribableChildren(messageEntity, ['timestamp', 'user']);
+  const {
+    timestamp,
+    user: messageSender,
+    reactions,
+    readReceipts,
+    edited_timestamp: editedTimestamp,
+  } = useKoSubscribableChildren(messageEntity, ['timestamp', 'user', 'reactions', 'readReceipts', 'edited_timestamp']);
 
   const teamId = activeConversation.team_id;
-  const supportsReceipts = selfUser.isMe && teamId;
+  const supportsReceipts = messageSender.isMe && teamId;
 
   const supportsLikes = useMemo(() => {
     const isPing = messageEntity.super_type === SuperType.PING;
@@ -117,15 +124,13 @@ const MessageDetails: FC<MessageDetailsProps> = ({
     setLikeUsers(sortedUsersLikes);
   }, []);
 
-  const receipts = messageEntity?.readReceipts() || [];
-
   const receiptTimes = useMemo(() => {
-    const userIds: QualifiedId[] = receipts.map(({userId, domain}) => ({domain: domain || '', id: userId}));
+    const userIds: QualifiedId[] = readReceipts.map(({userId, domain}) => ({domain: domain || '', id: userId}));
     userRepository.getUsersById(userIds).then((users: User[]) => {
       setReceiptUsers(users.sort(sortUsers));
     });
 
-    return receipts.reduce<Record<string, string>>((times, {userId, time}) => {
+    return readReceipts.reduce<Record<string, string>>((times, {userId, time}) => {
       times[userId] = formatTime(time);
       return times;
     }, {});
@@ -153,19 +158,17 @@ const MessageDetails: FC<MessageDetailsProps> = ({
 
   const showTabs = supportsReceipts && supportsLikes;
 
-  const messageTimestamp = isContentMessage(messageEntity) && messageEntity.edited_timestamp();
-  const editedFooter = messageTimestamp ? formatTime(messageTimestamp) : '';
+  const editedFooter = editedTimestamp ? formatTime(editedTimestamp) : '';
 
   const onReceipts = () => setIsReceiptsOpen(true);
 
   const onLikes = () => setIsReceiptsOpen(false);
 
   useEffect(() => {
-    if (supportsLikes && isContentMessage(messageEntity)) {
-      const messageReactions = messageEntity.reactions();
-      getLikes(messageReactions);
+    if (supportsLikes && reactions) {
+      getLikes(reactions);
     }
-  }, [getLikes, supportsLikes, messageEntity]);
+  }, [getLikes, supportsLikes, reactions]);
 
   useEffect(() => {
     amplify.subscribe(WebAppEvents.CONVERSATION.MESSAGE.UPDATED, (oldId: string, updatedMessageEntity: Message) => {
@@ -190,7 +193,6 @@ const MessageDetails: FC<MessageDetailsProps> = ({
         title={panelTitle}
         showBackArrow={false}
         titleDataUieName="message-details-title"
-        closeBtnTitle={t('accessibility.rightPanel.close')}
       />
 
       {showTabs && (

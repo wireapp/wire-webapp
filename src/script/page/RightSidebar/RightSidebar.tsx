@@ -41,7 +41,7 @@ import {isServiceEntity} from '../../guards/Service';
 import {ServiceEntity} from '../../integration/ServiceEntity';
 import AddParticipants from './AddParticipants';
 import MessageDetails from './MessageDetails';
-import {isMessage} from '../../guards/Message';
+import {isContentMessage} from '../../guards/Message';
 
 const migratedPanels = [
   PanelViewModel.STATE.CONVERSATION_DETAILS,
@@ -277,19 +277,21 @@ const RightSidebar: FC<RightSidebarProps> = ({contentViewModel, teamState, userS
         />
       )}
 
-      {currentState === PanelViewModel.STATE.MESSAGE_DETAILS && activeConversation && isMessage(currentEntity) && (
-        <MessageDetails
-          activeConversation={activeConversation}
-          conversationRepository={conversationRepository}
-          messageEntity={currentEntity}
-          updateEntity={setCurrentEntity}
-          teamRepository={teamRepository}
-          searchRepository={searchRepository}
-          showLikes={showLikes}
-          userRepository={userRepository}
-          onClose={onClose}
-        />
-      )}
+      {currentState === PanelViewModel.STATE.MESSAGE_DETAILS &&
+        activeConversation &&
+        isContentMessage(currentEntity) && (
+          <MessageDetails
+            activeConversation={activeConversation}
+            conversationRepository={conversationRepository}
+            messageEntity={currentEntity}
+            updateEntity={setCurrentEntity}
+            teamRepository={teamRepository}
+            searchRepository={searchRepository}
+            showLikes={showLikes}
+            userRepository={userRepository}
+            onClose={onClose}
+          />
+        )}
     </>
   );
 };
