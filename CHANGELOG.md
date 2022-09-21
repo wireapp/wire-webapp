@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [8.14.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/react-ui-kit@8.13.9...@wireapp/react-ui-kit@8.14.0) (2022-09-21)
+
+
+### Features
+
+* update yarn to v2, update typescript ([#4402](https://github.com/wireapp/wire-web-packages/issues/4402)) ([9b1cf1f](https://github.com/wireapp/wire-web-packages/commit/9b1cf1f56a6f1a410a6175b080ec78d73a60586c))
+
+
+
+
+
 ## [8.13.9](https://github.com/wireapp/wire-web-packages/tree/main/packages/react-ui-kit/compare/@wireapp/react-ui-kit@8.13.8...@wireapp/react-ui-kit@8.13.9) (2022-09-19)
 
 **Note:** Version bump only for package @wireapp/react-ui-kit
