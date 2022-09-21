@@ -30,5 +30,5 @@
     "test:node": "nyc jasmine --config=jasmine.json",
     "prepare": "yarn dist"
   },
-  "version": "0.5.3"
+  "version": "0.5.4"
 }

@@ -43,5 +43,5 @@
     "test": "nyc --nycrc-path=../../nyc.config.js jasmine --config=jasmine.json",
     "prepare": "yarn dist"
   },
-  "version": "5.11.3"
+  "version": "5.11.4"
 }

@@ -33,5 +33,5 @@
     "test": "exit 0",
     "prepare": "yarn dist"
   },
-  "version": "0.10.3"
+  "version": "0.10.4"
 }

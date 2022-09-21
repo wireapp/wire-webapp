@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.2.4](https://github.com/wireapp/wire-web-packages/compare/@wireapp/promise-queue@1.2.3...@wireapp/promise-queue@1.2.4) (2022-09-21)
+
+**Note:** Version bump only for package @wireapp/promise-queue
+
 ## [1.2.3](https://github.com/wireapp/wire-web-packages/compare/@wireapp/promise-queue@1.2.2...@wireapp/promise-queue@1.2.3) (2022-09-21)
 
 **Note:** Version bump only for package @wireapp/promise-queue
