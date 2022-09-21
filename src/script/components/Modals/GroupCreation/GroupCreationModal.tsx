@@ -107,7 +107,7 @@ const GroupCreationModal: React.FC<GroupCreationModalProps> = ({
 
   const onEscape = () => setIsShown(false);
   const {isTeam, isMLSEnabled} = useKoSubscribableChildren(teamState, ['isTeam', 'isMLSEnabled']);
-  const enableMlsCheckbox = isMLSEnabled && Config.getConfig().FEATURE.ENABLE_MLS;
+  const enableMlsToggle = isMLSEnabled && Config.getConfig().FEATURE.ENABLE_MLS;
 
   useEffect(() => {
     const showCreateGroup = (_: string, userEntity: User) => {
@@ -175,7 +175,7 @@ const GroupCreationModal: React.FC<GroupCreationModalProps> = ({
           groupName,
           isTeam ? accessState : undefined,
           {
-            protocol: selectedProtocol.value,
+            protocol: enableMlsToggle ? selectedProtocol.value : defaultProtocol,
             receipt_mode: enableReadReceipts ? RECEIPT_MODE.ON : RECEIPT_MODE.OFF,
           },
         );
@@ -414,7 +414,7 @@ const GroupCreationModal: React.FC<GroupCreationModalProps> = ({
                     isDisabled={false}
                     name={t('readReceiptsToggleName')}
                   />
-                  {enableMlsCheckbox && (
+                  {enableMlsToggle && (
                     <>
                       <Select
                         id="select-protocol"
