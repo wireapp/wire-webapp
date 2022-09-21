@@ -90,6 +90,7 @@ const TimedMessages: FC<TimedMessagesPanelProps> = ({activeConversation, onClose
         title={t('timedMessagesTitle')}
         goBackUie="go-back-timed-messages-options"
       />
+
       <div ref={initFadingScrollbar} className="panel__content">
         {messageTimes.map(({text, isCustom, value}) => (
           <label

@@ -65,7 +65,9 @@ const UserSearchableList: React.FC<UserListProps> = ({onUpdateSelectedUsers, ...
   const [filteredUsers, setFilteredUsers] = useState<User[]>([]);
   const [remoteTeamMembers, setRemoteTeamMembers] = useState<User[]>([]);
 
-  const selfInTeam = userState.self().inTeam();
+  const {self: selfUser} = useKoSubscribableChildren(userState, ['self']);
+  const {inTeam: selfInTeam} = useKoSubscribableChildren(selfUser, ['inTeam']);
+
   const {
     users: unwrappedUsers,
     selected: unwrappedSelected,
@@ -86,7 +88,7 @@ const UserSearchableList: React.FC<UserListProps> = ({onUpdateSelectedUsers, ...
   const fetchMembersFromBackend = useCallback(
     debounce(async (query: string, isHandle: boolean, ignoreMembers: User[]) => {
       const resultUsers = await searchRepository!.searchByName(query, isHandle);
-      const selfTeamId = userState.self().teamId;
+      const selfTeamId = selfUser.teamId;
       const foundMembers = resultUsers.filter(user => user.teamId === selfTeamId);
       const ignoreIds = ignoreMembers.map(member => member.id);
       const uniqueMembers = foundMembers.filter(member => !ignoreIds.includes(member.id));

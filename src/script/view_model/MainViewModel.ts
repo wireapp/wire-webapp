@@ -60,6 +60,7 @@ import type {EventTrackingRepository} from '../tracking/EventTrackingRepository'
 import type {MessageRepository} from '../conversation/MessageRepository';
 import {UserState} from '../user/UserState';
 import {Core} from '../service/CoreSingleton';
+import {Message} from '../entity/message/Message';
 
 export interface ViewModelRepositories {
   asset: AssetRepository;
@@ -104,6 +105,8 @@ export class MainViewModel {
   title: WindowTitleViewModel;
   userRepository: UserRepository;
   isFederated: boolean;
+  messageEntity: Message | undefined;
+  showLikes: boolean;
   private readonly userState: UserState;
 
   static get CONFIG() {
@@ -154,6 +157,9 @@ export class MainViewModel {
 
     this.selfUser = this.userState.self;
 
+    this.messageEntity = undefined;
+    this.showLikes = false;
+
     this.isPanelOpen = ko.observable(false);
 
     this.actions = new ActionsViewModel(
@@ -196,11 +202,21 @@ export class MainViewModel {
     document.addEventListener('scroll', () => window.scrollTo(0, 0));
   }
 
+  updateMessageEntity(message: Message): void {
+    this.messageEntity = message;
+  }
+
+  updateShowLikes(showLikes: boolean): void {
+    this.showLikes = showLikes;
+  }
+
   openPanel(): Promise<void> {
     return this.togglePanel(MainViewModel.PANEL_STATE.OPEN);
   }
 
   closePanel(): Promise<void> {
+    this.messageEntity = undefined;
+    this.showLikes = false;
     return this.togglePanel(MainViewModel.PANEL_STATE.CLOSED);
   }
 

@@ -26,10 +26,10 @@ import {t} from 'Util/LocalizerUtil';
 import PanelHeader from '../PanelHeader';
 
 import PreferencesRadio from '../../MainContent/panels/preferences/components/PreferencesRadio';
+import {initFadingScrollbar} from '../../../ui/fadingScrollbar';
 
 import {NOTIFICATION_STATE, getNotificationText} from '../../../conversation/NotificationSetting';
 import {Conversation} from '../../../entity/Conversation';
-import {initFadingScrollbar} from '../../../ui/fadingScrollbar';
 import {ViewModelRepositories} from '../../../view_model/MainViewModel';
 
 const PANEL_HEADER_BTN_TABINDEX = 2;
