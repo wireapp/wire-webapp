@@ -45,7 +45,6 @@ const headerStyles: CSSObject = {
   lineHeight: '14px',
   margin: '37px 0 6px',
   padding: 0,
-  textTransform: 'uppercase',
 };
 
 const AvailabilityButtons: React.FC<AvailabilityInputProps> = ({availability}) => {

@@ -104,8 +104,8 @@ const AboutPreferences: React.FC<AboutPreferencesProps> = ({userState = containe
         </PreferencesSection>
       )}
       <PreferencesSection hasSeparator>
-        <div className="preferences-detail">{t('preferencesAboutVersion', config.VERSION)}</div>
-        <div className="preferences-detail">{t('preferencesAboutCopyright')}</div>
+        <p className="preferences-detail">{t('preferencesAboutVersion', config.VERSION)}</p>
+        <p className="preferences-detail">{t('preferencesAboutCopyright')}</p>
       </PreferencesSection>
     </PreferencesPage>
   );

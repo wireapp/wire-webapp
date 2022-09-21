@@ -99,9 +99,9 @@ export class AssetRepository {
       }
       return new Blob([new Uint8Array(plaintext)], {type: mimeType});
     } catch (error) {
-      const errorMessage = error?.message || '';
-      const isAssetNotFound = errorMessage.endsWith(HTTP_STATUS.NOT_FOUND);
-      const isServerError = errorMessage.endsWith(HTTP_STATUS.INTERNAL_SERVER_ERROR);
+      const errorMessage = (error as Error)?.message || '';
+      const isAssetNotFound = errorMessage.endsWith(HTTP_STATUS.NOT_FOUND.toString());
+      const isServerError = errorMessage.endsWith(HTTP_STATUS.INTERNAL_SERVER_ERROR.toString());
 
       const isExpectedError = isAssetNotFound || isServerError;
       if (!isExpectedError) {

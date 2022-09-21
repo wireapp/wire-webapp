@@ -23,7 +23,7 @@ import cx from 'classnames';
 import {safeWindowOpen} from 'Util/SanitizationUtil';
 import {cleanURL} from 'Util/UrlUtil';
 import {isTweetUrl} from 'Util/ValidationUtil';
-import {registerReactComponent, useKoSubscribableChildren} from 'Util/ComponentUtil';
+import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 
 import Image from 'Components/Image';
@@ -127,5 +127,3 @@ const LinkPreviewAssetComponent: React.FC<LinkPreviewAssetProps> = ({header = fa
 };
 
 export default LinkPreviewAssetComponent;
-
-registerReactComponent('link-preview-asset', LinkPreviewAssetComponent);

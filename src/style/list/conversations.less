@@ -164,16 +164,12 @@
 .conversation-folder {
   &__head {
     .button-reset-default;
-
     display: flex;
     width: 100%;
     align-items: center;
     margin: 20px 0;
     cursor: pointer;
-    font-size: 11px;
-    font-weight: @font-weight-regular;
     text-align: left;
-    text-transform: uppercase;
 
     .disclose-icon {
       display: flex;
@@ -188,9 +184,9 @@
 
     &__name {
       .ellipsis;
-
-      display: inline-block;
       flex: 1;
+      font-size: @font-size-medium;
+      font-weight: @font-weight-medium;
     }
 
     &__badge {

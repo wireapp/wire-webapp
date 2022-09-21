@@ -193,6 +193,7 @@ each(.colors(), .(@color-key, @color-name) {
   @accent-color-highlight-inversed: '@{name}-800';
   @accent-color-border: '@{name}-500';
   @accent-color-focus: '@{name}-400';
+  @accent-color-selection: '@{name}-300';
   @icon-primary-active-fill: '@{name}-500';
   @icon-secondary-active-border: 'accent_colors-0';
   @button-primary-hover: '@{name}-600';
@@ -216,6 +217,7 @@ each(.colors(), .(@color-key, @color-name) {
     --accent-color-highlight-inversed: @@accent-color-highlight-inversed;
     --accent-color-border: @@accent-color-border;
     --accent-color-focus: @@accent-color-focus;
+    --accent-color-selection: @@accent-color-selection;
     --accent-color-fade-16: fade(@@accent-color, 16%);
     --accent-color-fade-24: fade(@@accent-color, 24%);
     --accent-color-darken-16: darken(@@accent-color, 16%);
@@ -235,6 +237,7 @@ each(.colors(), .(@color-key, @color-name) {
     @accent-color-highlight-inversed-dark: '@{name}-50';
     @accent-color-border-dark: '@{name}-dark-600';
     @accent-color-focus-dark: '@{name}-dark-600';
+    @accent-color-selection-dark: '@{name}-dark-700';
     @icon-primary-active-fill-dark: 'w-white';
     @icon-secondary-active-border-dark: '@{name}-dark-800' ;
     @button-primary-hover-dark: '@{name}-dark-400';
@@ -257,6 +260,7 @@ each(.colors(), .(@color-key, @color-name) {
       --accent-color-highlight-inversed: @@accent-color-highlight-inversed-dark;
       --accent-color-border: @@accent-color-border-dark;
       --accent-color-focus: @@accent-color-focus-dark;
+      --accent-color-selection: @@accent-color-selection-dark;
       each(@color-index, {
         @accent-color: '@{name}-dark-@{value}';
         --accent-color-@{value}: @@accent-color;
@@ -270,10 +274,10 @@ each(.colors(), .(@color-key, @color-name) {
 })
   .accent-selection() {
   &::-moz-selection {
-    background-color: var(--accent-color-fade-24);
+    background-color: var(--accent-color-selection);
   }
   &::selection {
-    background-color: var(--accent-color-fade-24);
+    background-color: var(--accent-color-selection);
   }
 }
 
