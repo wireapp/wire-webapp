@@ -40,7 +40,8 @@
     "build:node": "tsc",
     "clean": "rimraf \"src/**/*.{js?(.map),d.ts}\"",
     "dist": "yarn clean && yarn build",
-    "test": "nyc --nycrc-path=../../nyc.config.js jasmine --config=jasmine.json"
+    "test": "nyc --nycrc-path=../../nyc.config.js jasmine --config=jasmine.json",
+    "prepare": "yarn dist"
   },
   "version": "5.11.3"
 }

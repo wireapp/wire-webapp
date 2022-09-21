@@ -41,7 +41,8 @@
     "dist": "yarn clean && yarn build",
     "test": "jest",
     "test:coverage": "yarn test --coverage",
-    "test:watch": "yarn test --watch"
+    "test:watch": "yarn test --watch",
+    "prepare": "yarn dist"
   },
   "version": "4.4.3"
 }

@@ -47,7 +47,8 @@
     "clean": "rimraf \"src/**/{!(websql-worker).js,*.js.map,*.d.ts}\"",
     "dist": "yarn clean && yarn build",
     "test": "yarn build && karma start",
-    "test:project": "yarn build && yarn test"
+    "test:project": "yarn build && yarn test",
+    "prepare": "yarn dist"
   },
   "version": "1.8.3"
 }

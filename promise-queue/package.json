@@ -19,7 +19,8 @@
     "build": "tsc",
     "clean": "rimraf lib",
     "dist": "yarn clean && yarn build",
-    "test": "jest"
+    "test": "jest",
+    "prepare": "yarn dist"
   },
   "version": "1.2.3"
 }
