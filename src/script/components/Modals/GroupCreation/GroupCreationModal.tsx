@@ -106,8 +106,8 @@ const GroupCreationModal: React.FC<GroupCreationModalProps> = ({
   const maxSize = ConversationRepository.CONFIG.GROUP.MAX_SIZE;
 
   const onEscape = () => setIsShown(false);
-  const {isTeam, isMLSEnabled: isMLSEnabledForTeam} = useKoSubscribableChildren(teamState, ['isTeam', 'isMLSEnabled']);
-  const enableMlsCheckbox = isMLSEnabledForTeam && Config.getConfig().FEATURE.ENABLE_MLS;
+  const {isTeam, isMLSEnabled} = useKoSubscribableChildren(teamState, ['isTeam', 'isMLSEnabled']);
+  const enableMlsCheckbox = isMLSEnabled && Config.getConfig().FEATURE.ENABLE_MLS;
 
   useEffect(() => {
     const showCreateGroup = (_: string, userEntity: User) => {
