@@ -39,5 +39,5 @@
     "test": "yarn build && karma start",
     "test:project": "yarn build && yarn test"
   },
-  "version": "1.7.2"
+  "version": "1.7.3"
 }

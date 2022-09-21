@@ -43,5 +43,5 @@
     "test:coverage": "yarn test --coverage",
     "test:watch": "yarn test --watch"
   },
-  "version": "4.4.2"
+  "version": "4.4.3"
 }
