@@ -18,7 +18,6 @@
  */
 
 import {WebAppEvents} from '@wireapp/webapp-events';
-import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
 import {amplify} from 'amplify';
 import React, {ChangeEvent} from 'react';
 
@@ -27,6 +26,7 @@ import {importHistoryFile} from 'Components/HistoryImport';
 
 import {t} from 'Util/LocalizerUtil';
 import {handleKeyDown} from 'Util/KeyboardUtil';
+import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
 
 import PreferencesSection from '../components/PreferencesSection';
 
@@ -63,11 +63,9 @@ const HistoryBackupSection: React.FC<HistoryBackupSectionProps> = ({backupReposi
       >
         {t('preferencesOptionsBackupExportHeadline')}
       </Button>
-
       <p id="preferences-history-describe-1" className="preferences-detail">
         {t('preferencesOptionsBackupExportSecondary', brandName)}
       </p>
-
       <Button
         variant={ButtonVariant.TERTIARY}
         className="preferences-history-restore-button"

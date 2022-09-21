@@ -18,7 +18,6 @@
  */
 
 import React, {ForwardRefRenderFunction, useEffect, useRef} from 'react';
-import {registerReactComponent} from 'Util/ComponentUtil';
 import Icon from 'Components/Icon';
 import {CheckIcon, COLOR} from '@wireapp/react-ui-kit';
 import {cancelButtonCSS, containerCSS, errorMessageCSS, getIconCSS, getInputCSS, getLabelCSS} from './TextInput.styles';
@@ -145,5 +144,3 @@ const TextInput: ForwardRefRenderFunction<HTMLInputElement, UserInputProps> = ({
 const TextInputForwarded = React.forwardRef(TextInput);
 
 export default TextInputForwarded;
-
-registerReactComponent('text-input', TextInputForwarded);

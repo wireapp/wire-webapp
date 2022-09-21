@@ -22,7 +22,6 @@ import React, {useState, useRef, useEffect, FC} from 'react';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {KEY} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
-import useEffectRef from 'Util/useEffectRef';
 
 import PanelHeader from '../PanelHeader';
 
@@ -30,7 +29,7 @@ import PreferencesRadio from '../../MainContent/panels/preferences/components/Pr
 
 import {NOTIFICATION_STATE, getNotificationText} from '../../../conversation/NotificationSetting';
 import {Conversation} from '../../../entity/Conversation';
-import {useFadingScrollbar} from '../../../ui/fadingScrollbar';
+import {initFadingScrollbar} from '../../../ui/fadingScrollbar';
 import {ViewModelRepositories} from '../../../view_model/MainViewModel';
 
 const PANEL_HEADER_BTN_TABINDEX = 2;
@@ -47,8 +46,6 @@ const Notifications: FC<NotificationsProps> = ({activeConversation, onGoBack, on
   const saveOptionNotificationPreference = (value: number) => {
     repositories.conversation.setNotificationState(activeConversation, value);
   };
-  const [scrollbarRef, setScrollbarRef] = useEffectRef<HTMLDivElement>();
-  useFadingScrollbar(scrollbarRef);
 
   const [settings] = useState(
     Object.values(NOTIFICATION_STATE).map(status => ({
@@ -89,7 +86,7 @@ const Notifications: FC<NotificationsProps> = ({activeConversation, onGoBack, on
         handleBlur={() => setBtnFocus(false)}
       />
 
-      <div className="panel__content" ref={setScrollbarRef}>
+      <div className="panel__content" ref={initFadingScrollbar}>
         <fieldset className="notification-section">
           <PreferencesRadio
             name="preferences-options-notifications"

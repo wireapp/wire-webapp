@@ -22,7 +22,7 @@ import {container} from 'tsyringe';
 import cx from 'classnames';
 import {amplify} from 'amplify';
 import {WebAppEvents} from '@wireapp/webapp-events';
-import {Select, StyledApp, THEME_ID} from '@wireapp/react-ui-kit';
+import {Button, ButtonVariant, Select, StyledApp, THEME_ID} from '@wireapp/react-ui-kit';
 import {RECEIPT_MODE} from '@wireapp/api-client/src/conversation/data/ConversationReceiptModeUpdateData';
 import {ConversationProtocol} from '@wireapp/api-client/src/conversation/NewConversation';
 
@@ -51,8 +51,7 @@ import {
   teamPermissionsForAccessState,
   toggleFeature,
 } from '../../../conversation/ConversationAccessPermission';
-import useEffectRef from 'Util/useEffectRef';
-import {useFadingScrollbar} from '../../../ui/fadingScrollbar';
+import {initFadingScrollbar} from '../../../ui/fadingScrollbar';
 import {Config} from '../../../Config';
 import {isProtocolOption, ProtocolOption} from '../../../guards/Protocol';
 
@@ -99,8 +98,6 @@ const GroupCreationModal: React.FC<GroupCreationModalProps> = ({
   const [groupCreationState, setGroupCreationState] = useState<GroupCreationModalState>(
     GroupCreationModalState.DEFAULT,
   );
-  const [scrollbarRef, setScrollbarRef] = useEffectRef<HTMLDivElement>();
-  useFadingScrollbar(scrollbarRef);
 
   const maxNameLength = ConversationRepository.CONFIG.GROUP.MAX_NAME_LENGTH;
   const maxSize = ConversationRepository.CONFIG.GROUP.MAX_SIZE;
@@ -270,15 +267,17 @@ const GroupCreationModal: React.FC<GroupCreationModalProps> = ({
                     : t('groupCreationParticipantsHeader')}
                 </h2>
 
-                <button
+                <Button
                   className="group-creation__action enabled accent-text"
+                  css={{marginBottom: 0}}
                   type="button"
                   onClick={clickOnCreate}
                   aria-label={participantsActionText}
                   data-uie-name="do-create-group"
+                  variant={ButtonVariant.TERTIARY}
                 >
                   {participantsActionText}
-                </button>
+                </Button>
               </>
             )}
             {stateIsPreferences && (
@@ -297,20 +296,22 @@ const GroupCreationModal: React.FC<GroupCreationModalProps> = ({
                   {t('groupCreationPreferencesHeader')}
                 </h2>
 
-                <button
+                <Button
                   id="group-go-next"
                   className={cx('group-creation__action', {
                     'accent-text': groupNameLength,
                     enabled: isInputValid,
                   })}
+                  css={{marginBottom: 0}}
                   disabled={!isInputValid}
                   type="button"
                   onClick={clickOnNext}
                   aria-label={t('groupCreationPreferencesAction')}
                   data-uie-name="go-next"
+                  variant={ButtonVariant.TERTIARY}
                 >
                   {t('groupCreationPreferencesAction')}
-                </button>
+                </Button>
               </>
             )}
           </div>
@@ -326,7 +327,7 @@ const GroupCreationModal: React.FC<GroupCreationModalProps> = ({
           )}
 
           {stateIsParticipants && (
-            <div className="group-creation__list" ref={setScrollbarRef}>
+            <div className="group-creation__list" ref={initFadingScrollbar}>
               {contacts.length > 0 && (
                 <UserSearchableList
                   users={contacts}
@@ -369,13 +370,13 @@ const GroupCreationModal: React.FC<GroupCreationModalProps> = ({
               </div>
               {isTeam && (
                 <>
-                  <div
+                  <p
                     className="modal__info"
                     style={{visibility: hasNameError ? 'hidden' : 'visible'}}
                     data-uie-name="status-group-size-info"
                   >
                     {t('groupSizeInfo', maxSize)}
-                  </div>
+                  </p>
                   <hr className="group-creation__modal__separator" />
                   <BaseToggle
                     className="modal-style"
@@ -422,9 +423,9 @@ const GroupCreationModal: React.FC<GroupCreationModalProps> = ({
                         menuPosition="absolute"
                         wrapperCSS={{marginBottom: 0}}
                       />
-                      <div className="modal__info" data-uie-name="status-group-protocol-info">
+                      <p className="modal__info" data-uie-name="status-group-protocol-info">
                         {t('modalCreateGroupProtocolInfo')}
-                      </div>
+                      </p>
                     </>
                   )}
                   <br />

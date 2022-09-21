@@ -82,6 +82,7 @@ import useScrollSync from '../../hooks/useScrollSync';
 import useResizeTarget from '../../hooks/useResizeTarget';
 import useDropFiles from '../../hooks/useDropFiles';
 import useTextAreaFocus from '../../hooks/useTextAreaFocus';
+import {StyledApp, THEME_ID} from '@wireapp/react-ui-kit';
 
 const CONFIG = {
   ...Config.getConfig(),
@@ -805,82 +806,86 @@ const InputBar = ({
   }, [pastedFile]);
 
   return (
-    <div id="conversation-input-bar" className="conversation-input-bar">
-      {classifiedDomains && !isConnectionRequest && (
-        <ClassifiedBar users={participatingUserEts} classifiedDomains={classifiedDomains} />
-      )}
-
-      {isReplying && !isEditing && <ReplyBar replyMessageEntity={replyMessageEntity} onCancel={handleCancelReply} />}
-
-      <div className={cx('conversation-input-bar__input', {'conversation-input-bar__input--editing': isEditing})}>
-        {!isOutgoingRequest && (
-          <>
-            <div className="controls-left">
-              {!!inputValue.length && (
-                <Avatar className="cursor-default" participant={selfUser} avatarSize={AVATAR_SIZE.X_SMALL} />
-              )}
-            </div>
-
-            {!removedFromConversation && !pastedFile && (
-              <>
-                {renderEmojiComponent()}
-
-                <div className="controls-center">
-                  <textarea
-                    ref={textareaRef}
-                    id="conversation-input-bar-text"
-                    className={cx('conversation-input-bar-text', {
-                      'conversation-input-bar-text--accent': hasLocalEphemeralTimer,
-                    })}
-                    onKeyDown={onTextAreaKeyDown}
-                    onKeyUp={onTextareaKeyUp}
-                    onClick={handleMentionFlow}
-                    onInput={updateMentions}
-                    onChange={onChange}
-                    onPaste={onPasteFiles}
-                    value={inputValue}
-                    placeholder={inputPlaceholder}
-                    aria-label={inputPlaceholder}
-                    data-uie-name="input-message"
-                    dir="auto"
-                  />
-
-                  <div
-                    ref={shadowInputRef}
-                    className="shadow-input"
-                    dangerouslySetInnerHTML={{__html: richTextInput}}
-                    data-uie-name="input-message-rich-text"
-                    dir="auto"
-                  />
-                </div>
-
-                <MentionSuggestionList
-                  targetInput={textareaRef.current}
-                  suggestions={mentionSuggestions}
-                  onSelectionValidated={addMention}
-                />
-
-                <InputBarControls
-                  conversation={conversationEntity}
-                  input={inputValue}
-                  isEditing={isEditing}
-                  disablePing={pingDisabled}
-                  disableFilesharing={!isFileSharingSendingEnabled}
-                  onSend={() => onSend(inputValue)}
-                  onSelectFiles={uploadFiles}
-                  onSelectImages={uploadImages}
-                  onCancelEditing={cancelMessageEditing}
-                  onClickGif={onGifClick}
-                  onClickPing={onPingClick}
-                />
-              </>
-            )}
-          </>
+    <StyledApp themeId={THEME_ID.DEFAULT}>
+      <div id="conversation-input-bar" className="conversation-input-bar">
+        {classifiedDomains && !isConnectionRequest && (
+          <ClassifiedBar users={participatingUserEts} classifiedDomains={classifiedDomains} />
         )}
 
-        {pastedFile && <PastedFileControls pastedFile={pastedFile} onClear={clearPastedFile} onSend={sendPastedFile} />}
+        {isReplying && !isEditing && <ReplyBar replyMessageEntity={replyMessageEntity} onCancel={handleCancelReply} />}
+
+        <div className={cx('conversation-input-bar__input', {'conversation-input-bar__input--editing': isEditing})}>
+          {!isOutgoingRequest && (
+            <>
+              <div className="controls-left">
+                {!!inputValue.length && (
+                  <Avatar className="cursor-default" participant={selfUser} avatarSize={AVATAR_SIZE.X_SMALL} />
+                )}
+              </div>
+
+              {!removedFromConversation && !pastedFile && (
+                <>
+                  {renderEmojiComponent()}
+
+                  <div className="controls-center">
+                    <textarea
+                      ref={textareaRef}
+                      id="conversation-input-bar-text"
+                      className={cx('conversation-input-bar-text', {
+                        'conversation-input-bar-text--accent': hasLocalEphemeralTimer,
+                      })}
+                      onKeyDown={onTextAreaKeyDown}
+                      onKeyUp={onTextareaKeyUp}
+                      onClick={handleMentionFlow}
+                      onInput={updateMentions}
+                      onChange={onChange}
+                      onPaste={onPasteFiles}
+                      value={inputValue}
+                      placeholder={inputPlaceholder}
+                      aria-label={inputPlaceholder}
+                      data-uie-name="input-message"
+                      dir="auto"
+                    />
+
+                    <div
+                      ref={shadowInputRef}
+                      className="shadow-input"
+                      dangerouslySetInnerHTML={{__html: richTextInput}}
+                      data-uie-name="input-message-rich-text"
+                      dir="auto"
+                    />
+                  </div>
+
+                  <MentionSuggestionList
+                    targetInput={textareaRef.current}
+                    suggestions={mentionSuggestions}
+                    onSelectionValidated={addMention}
+                  />
+
+                  <InputBarControls
+                    conversation={conversationEntity}
+                    input={inputValue}
+                    isEditing={isEditing}
+                    disablePing={pingDisabled}
+                    disableFilesharing={!isFileSharingSendingEnabled}
+                    onSend={() => onSend(inputValue)}
+                    onSelectFiles={uploadFiles}
+                    onSelectImages={uploadImages}
+                    onCancelEditing={cancelMessageEditing}
+                    onClickGif={onGifClick}
+                    onClickPing={onPingClick}
+                  />
+                </>
+              )}
+            </>
+          )}
+
+          {pastedFile && (
+            <PastedFileControls pastedFile={pastedFile} onClear={clearPastedFile} onSend={sendPastedFile} />
+          )}
+        </div>
       </div>
-    </div>
+    </StyledApp>
   );
 };
 
