@@ -951,7 +951,7 @@ export class MessageRepository {
         throw new ConversationError(ConversationError.TYPE.WRONG_USER, ConversationError.MESSAGE.WRONG_USER);
       }
       const userIds = targetedUsers || conversation.allUserEntities.map(user => user.qualifiedId);
-      const payload = MessageBuilder.createDelete({
+      const payload = MessageBuilder.createMessageDelete({
         ...this.createCommonMessagePayload(conversation),
         messageIdToDelete: message.id,
       });
@@ -980,12 +980,19 @@ export class MessageRepository {
    */
   public async deleteMessage(conversation: Conversation, message: Message): Promise<void> {
     try {
-      await this.conversationService.deleteMessageLocal(
-        conversation.id,
-        message.id,
-        true,
-        this.core.backendFeatures.federationEndpoints ? conversation.domain : undefined,
-      );
+      const selfConversation = this.conversationState.self_conversation();
+      if (!selfConversation) {
+        throw new Error('cannot delete message as selfConversation is not defined');
+      }
+      const payload = MessageBuilder.createMessageHide({
+        ...this.createCommonMessagePayload(selfConversation),
+        messageIdToDelete: message.id,
+        targetConversation: conversation.id,
+      });
+      await this.sendAndInjectGenericCoreMessage(payload, selfConversation, {
+        skipInjection: true,
+      });
+
       await this.deleteMessageById(conversation, message.id);
     } catch (error) {
       this.logger.info(
