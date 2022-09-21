@@ -37,6 +37,6 @@
     "test:node": "yarn build:node --noEmit",
     "test:project": "yarn dist && yarn test"
   },
-  "version": "0.3.1",
+  "version": "0.3.2",
   "gitHead": "5339f01fe01ef0871da8c8bc8662fbe9e604754a"
 }

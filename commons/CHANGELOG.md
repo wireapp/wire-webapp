@@ -3,626 +3,332 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
-# [4.4.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/commons@4.3.1...@wireapp/commons@4.4.0) (2022-09-21)
+## [4.4.1](https://github.com/wireapp/wire-web-packages/compare/@wireapp/commons@4.4.0...@wireapp/commons@4.4.1) (2022-09-21)
 
+**Note:** Version bump only for package @wireapp/commons
+
+# [4.4.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/commons@4.3.1...@wireapp/commons@4.4.0) (2022-09-21)
 
 ### Features
 
 * update yarn to v2, update typescript ([#4402](https://github.com/wireapp/wire-web-packages/issues/4402)) ([9b1cf1f](https://github.com/wireapp/wire-web-packages/commit/9b1cf1f56a6f1a410a6175b080ec78d73a60586c))
 
-
-
-
-
 ## [4.3.1](https://github.com/wireapp/wire-web-packages/tree/main/packages/commons/compare/@wireapp/commons@4.3.0...@wireapp/commons@4.3.1) (2022-09-19)
 
 **Note:** Version bump only for package @wireapp/commons
 
-
-
-
-
 # [4.3.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/commons/compare/@wireapp/commons@4.2.13...@wireapp/commons@4.3.0) (2022-07-06)
-
 
 ### Features
 
 * **commons:** Add XOR type utility ([#4317](https://github.com/wireapp/wire-web-packages/tree/main/packages/commons/issues/4317)) ([26c73b5](https://github.com/wireapp/wire-web-packages/tree/main/packages/commons/commit/26c73b5cf48b0c74ff81f9264374e53fc5e8984c))
 
-
-
-
-
 ## [4.2.13](https://github.com/wireapp/wire-web-packages/tree/main/packages/commons/compare/@wireapp/commons@4.2.12...@wireapp/commons@4.2.13) (2021-09-29)
-
 
 ### Bug Fixes
 
 * **commons:** Fix ReDoS in ansi-regex ([0ebfc2c](https://github.com/wireapp/wire-web-packages/tree/main/packages/commons/commit/0ebfc2c4a74c11d594dad0faf6b4808a6cda565d))
 
-
-
-
-
 ## [4.2.12](https://github.com/wireapp/wire-web-packages/tree/main/packages/commons/compare/@wireapp/commons@4.2.11...@wireapp/commons@4.2.12) (2021-09-23)
-
 
 ### Bug Fixes
 
 * **commons:** Include LogFactory tests ([#4139](https://github.com/wireapp/wire-web-packages/tree/main/packages/commons/issues/4139)) ([b4902de](https://github.com/wireapp/wire-web-packages/tree/main/packages/commons/commit/b4902de63bf0cdfa92b533ee38278c3847e50667))
 
-
-
-
-
 ## [4.2.11](https://github.com/wireapp/wire-web-packages/tree/main/packages/commons/compare/@wireapp/commons@4.2.10...@wireapp/commons@4.2.11) (2021-08-30)
 
 **Note:** Version bump only for package @wireapp/commons
-
-
-
-
 
 ## [4.2.10](https://github.com/wireapp/wire-web-packages/tree/main/packages/commons/compare/@wireapp/commons@4.2.9...@wireapp/commons@4.2.10) (2021-07-12)
 
 **Note:** Version bump only for package @wireapp/commons
 
-
-
-
-
 ## [4.2.9](https://github.com/wireapp/wire-web-packages/tree/main/packages/commons/compare/@wireapp/commons@4.2.8...@wireapp/commons@4.2.9) (2021-07-12)
 
 **Note:** Version bump only for package @wireapp/commons
-
-
-
-
 
 ## [4.2.8](https://github.com/wireapp/wire-web-packages/tree/main/packages/commons/compare/@wireapp/commons@4.2.7...@wireapp/commons@4.2.8) (2021-07-06)
 
 **Note:** Version bump only for package @wireapp/commons
 
-
-
-
-
 ## [4.2.7](https://github.com/wireapp/wire-web-packages/tree/main/packages/commons/compare/@wireapp/commons@4.2.6...@wireapp/commons@4.2.7) (2021-05-18)
 
 **Note:** Version bump only for package @wireapp/commons
 
-
-
-
-
 ## [4.2.6](https://github.com/wireapp/wire-web-packages/tree/main/packages/commons/compare/@wireapp/commons@4.2.5...@wireapp/commons@4.2.6) (2021-05-17)
-
 
 ### Bug Fixes
 
 * **commons,react-ui-kit:** Filter falsy values of user name ([#3857](https://github.com/wireapp/wire-web-packages/tree/main/packages/commons/issues/3857)) ([a785efe](https://github.com/wireapp/wire-web-packages/tree/main/packages/commons/commit/a785efed38d2ae7a16981eb5ad78add17fca1687))
 
-
-
-
-
 ## [4.2.5](https://github.com/wireapp/wire-web-packages/tree/main/packages/commons/compare/@wireapp/commons@4.2.3...@wireapp/commons@4.2.5) (2021-05-12)
 
 **Note:** Version bump only for package @wireapp/commons
-
-
-
-
 
 ## [4.2.3](https://github.com/wireapp/wire-web-packages/tree/main/packages/commons/compare/@wireapp/commons@4.2.2...@wireapp/commons@4.2.3) (2021-05-11)
 
 **Note:** Version bump only for package @wireapp/commons
 
-
-
-
-
 ## [4.2.2](https://github.com/wireapp/wire-web-packages/tree/main/packages/commons/compare/@wireapp/commons@4.2.1...@wireapp/commons@4.2.2) (2021-05-04)
 
 **Note:** Version bump only for package @wireapp/commons
-
-
-
-
 
 ## [4.2.1](https://github.com/wireapp/wire-web-packages/tree/main/packages/commons/compare/@wireapp/commons@4.2.0...@wireapp/commons@4.2.1) (2021-05-04)
 
 **Note:** Version bump only for package @wireapp/commons
 
-
-
-
-
 # [4.2.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/commons/compare/@wireapp/commons@4.1.8...@wireapp/commons@4.2.0) (2021-04-26)
-
 
 ### Features
 
 * **cryptobox:** Bump ts-jest from 26.5.4 to 26.5.5 ([#3755](https://github.com/wireapp/wire-web-packages/tree/main/packages/commons/issues/3755)) ([cb37324](https://github.com/wireapp/wire-web-packages/tree/main/packages/commons/commit/cb37324d9c7cb58c0667b8072dc379f882abb083))
 
-
-
-
-
 ## [4.1.8](https://github.com/wireapp/wire-web-packages/tree/main/packages/commons/compare/@wireapp/commons@4.1.7...@wireapp/commons@4.1.8) (2021-04-14)
 
 **Note:** Version bump only for package @wireapp/commons
-
-
-
-
 
 ## [4.1.7](https://github.com/wireapp/wire-web-packages/tree/main/packages/commons/compare/@wireapp/commons@4.1.6...@wireapp/commons@4.1.7) (2021-04-09)
 
 **Note:** Version bump only for package @wireapp/commons
 
-
-
-
-
 ## [4.1.6](https://github.com/wireapp/wire-web-packages/tree/main/packages/commons/compare/@wireapp/commons@4.1.5...@wireapp/commons@4.1.6) (2021-04-09)
 
 **Note:** Version bump only for package @wireapp/commons
-
-
-
-
 
 ## [4.1.5](https://github.com/wireapp/wire-web-packages/tree/main/packages/commons/compare/@wireapp/commons@4.1.4...@wireapp/commons@4.1.5) (2021-04-01)
 
 **Note:** Version bump only for package @wireapp/commons
 
-
-
-
-
 ## [4.1.4](https://github.com/wireapp/wire-web-packages/tree/main/packages/commons/compare/@wireapp/commons@4.1.3...@wireapp/commons@4.1.4) (2021-03-24)
 
 **Note:** Version bump only for package @wireapp/commons
-
-
-
-
 
 ## [4.1.3](https://github.com/wireapp/wire-web-packages/tree/main/packages/commons/compare/@wireapp/commons@4.1.2...@wireapp/commons@4.1.3) (2021-03-23)
 
 **Note:** Version bump only for package @wireapp/commons
 
-
-
-
-
 ## [4.1.2](https://github.com/wireapp/wire-web-packages/tree/main/packages/commons/compare/@wireapp/commons@4.1.1...@wireapp/commons@4.1.2) (2021-03-01)
 
 **Note:** Version bump only for package @wireapp/commons
 
-
-
-
-
 ## [4.1.1](https://github.com/wireapp/wire-web-packages/tree/main/packages/commons/compare/@wireapp/commons@4.1.0...@wireapp/commons@4.1.1) (2021-02-19)
-
 
 ### Bug Fixes
 
 * **core:** Use onClientMismatch and properly use additional data ([#3551](https://github.com/wireapp/wire-web-packages/tree/main/packages/commons/issues/3551)) ([872d8b6](https://github.com/wireapp/wire-web-packages/tree/main/packages/commons/commit/872d8b68d23dc49176088240ae9eaea358425a1a))
 
-
-
-
-
 # [4.1.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/commons/compare/@wireapp/commons@4.0.3...@wireapp/commons@4.1.0) (2021-02-16)
-
 
 ### Features
 
 * **commons:** Add OptionalKeys and RequiredKeys and add tests ([#3540](https://github.com/wireapp/wire-web-packages/tree/main/packages/commons/issues/3540)) ([4977cda](https://github.com/wireapp/wire-web-packages/tree/main/packages/commons/commit/4977cda1917baa90c04114b84d529df74285b3df))
 
-
-
-
-
 ## [4.0.3](https://github.com/wireapp/wire-web-packages/tree/main/packages/commons/compare/@wireapp/commons@4.0.2...@wireapp/commons@4.0.3) (2021-02-09)
 
 **Note:** Version bump only for package @wireapp/commons
-
-
-
-
 
 ## [4.0.2](https://github.com/wireapp/wire-web-packages/tree/main/packages/commons/compare/@wireapp/commons@4.0.1...@wireapp/commons@4.0.2) (2021-02-02)
 
 **Note:** Version bump only for package @wireapp/commons
 
-
-
-
-
 ## [4.0.1](https://github.com/wireapp/wire-web-packages/tree/main/packages/commons/compare/@wireapp/commons@4.0.0...@wireapp/commons@4.0.1) (2021-02-01)
 
 **Note:** Version bump only for package @wireapp/commons
 
-
-
-
-
 # [4.0.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/commons/compare/@wireapp/commons@3.8.17...@wireapp/commons@4.0.0) (2021-01-07)
-
 
 ### Features
 
 * **api-client,core:** Send messages as protobuf (SQCORE-252) (BREAKING) ([#3356](https://github.com/wireapp/wire-web-packages/tree/main/packages/commons/issues/3356)) ([8ebdd33](https://github.com/wireapp/wire-web-packages/tree/main/packages/commons/commit/8ebdd33be1c9fb03c2d5d7bb031cc874e7454aec))
-
 
 ### BREAKING CHANGES
 
 * **api-client,core:** - cryptographyService.encrypt() now returns a Uint8Array
 - new MessageService class for crucial parts of sending messages
 
-
-
-
-
 ## [3.8.17](https://github.com/wireapp/wire-web-packages/tree/main/packages/commons/compare/@wireapp/commons@3.8.16...@wireapp/commons@3.8.17) (2021-01-04)
 
 **Note:** Version bump only for package @wireapp/commons
-
-
-
-
 
 ## [3.8.16](https://github.com/wireapp/wire-web-packages/tree/main/packages/commons/compare/@wireapp/commons@3.8.15...@wireapp/commons@3.8.16) (2020-12-18)
 
 **Note:** Version bump only for package @wireapp/commons
 
-
-
-
-
 ## [3.8.15](https://github.com/wireapp/wire-web-packages/tree/main/packages/commons/compare/@wireapp/commons@3.8.14...@wireapp/commons@3.8.15) (2020-12-16)
 
 **Note:** Version bump only for package @wireapp/commons
-
-
-
-
 
 ## [3.8.14](https://github.com/wireapp/wire-web-packages/tree/main/packages/commons/compare/@wireapp/commons@3.8.13...@wireapp/commons@3.8.14) (2020-11-25)
 
 **Note:** Version bump only for package @wireapp/commons
 
-
-
-
-
 ## [3.8.13](https://github.com/wireapp/wire-web-packages/tree/main/packages/commons/compare/@wireapp/commons@3.8.12...@wireapp/commons@3.8.13) (2020-11-25)
-
 
 ### Bug Fixes
 
 * **bot-api:** Publish source files on npm ([#3343](https://github.com/wireapp/wire-web-packages/tree/main/packages/commons/issues/3343)) ([4aba0ee](https://github.com/wireapp/wire-web-packages/tree/main/packages/commons/commit/4aba0eec2d70e7ecafe6937f88d40f0e94a02c93))
 
-
-
-
-
 ## [3.8.12](https://github.com/wireapp/wire-web-packages/tree/main/packages/commons/compare/@wireapp/commons@3.8.11...@wireapp/commons@3.8.12) (2020-11-10)
-
 
 ### Bug Fixes
 
 * Don't publish test files ([#3320](https://github.com/wireapp/wire-web-packages/tree/main/packages/commons/issues/3320)) ([8248b19](https://github.com/wireapp/wire-web-packages/tree/main/packages/commons/commit/8248b194033242123f023355d67230afcfe6ede8))
 
-
-
-
-
 ## [3.8.11](https://github.com/wireapp/wire-web-packages/tree/main/packages/commons/compare/@wireapp/commons@3.8.10...@wireapp/commons@3.8.11) (2020-10-29)
 
 **Note:** Version bump only for package @wireapp/commons
-
-
-
-
 
 ## [3.8.10](https://github.com/wireapp/wire-web-packages/tree/main/packages/commons/compare/@wireapp/commons@3.8.9...@wireapp/commons@3.8.10) (2020-10-26)
 
 **Note:** Version bump only for package @wireapp/commons
 
-
-
-
-
 ## [3.8.9](https://github.com/wireapp/wire-web-packages/tree/main/packages/commons/compare/@wireapp/commons@3.8.8...@wireapp/commons@3.8.9) (2020-10-22)
-
 
 ### Bug Fixes
 
 * **commons,copy-config:** Publish .d.ts files to npm ([#3291](https://github.com/wireapp/wire-web-packages/tree/main/packages/commons/issues/3291)) ([ad3ed3c](https://github.com/wireapp/wire-web-packages/tree/main/packages/commons/commit/ad3ed3c5400e9be02f2671aaa43deb0e8d884ca9))
 
-
-
-
-
 ## [3.8.8](https://github.com/wireapp/wire-web-packages/tree/main/packages/commons/compare/@wireapp/commons@3.8.7...@wireapp/commons@3.8.8) (2020-10-19)
 
 **Note:** Version bump only for package @wireapp/commons
 
-
-
-
-
 ## [3.8.7](https://github.com/wireapp/wire-web-packages/tree/main/packages/commons/compare/@wireapp/commons@3.8.6...@wireapp/commons@3.8.7) (2020-10-13)
-
 
 ### Bug Fixes
 
 * **commons:** Legacy support for encoded streams in Chrome 83 & 84 ([#3262](https://github.com/wireapp/wire-web-packages/tree/main/packages/commons/issues/3262)) ([11257c1](https://github.com/wireapp/wire-web-packages/tree/main/packages/commons/commit/11257c10218ffdea9d1d684e5a23b3294ec3de1a))
 
-
-
-
-
 ## [3.8.6](https://github.com/wireapp/wire-web-packages/tree/main/packages/commons/compare/@wireapp/commons@3.8.5...@wireapp/commons@3.8.6) (2020-10-08)
 
 **Note:** Version bump only for package @wireapp/commons
 
-
-
-
-
 ## [3.8.5](https://github.com/wireapp/wire-web-packages/tree/main/packages/commons/compare/@wireapp/commons@3.8.4...@wireapp/commons@3.8.5) (2020-10-08)
-
 
 ### Bug Fixes
 
 * **commons:** Remove check for deprecated 'createEncodedVideoStreams' ([#3225](https://github.com/wireapp/wire-web-packages/tree/main/packages/commons/issues/3225)) ([ac52616](https://github.com/wireapp/wire-web-packages/tree/main/packages/commons/commit/ac526166b3862d56fc01213a65bddfa9285e0083))
 
-
-
-
-
 ## [3.8.4](https://github.com/wireapp/wire-web-packages/tree/main/packages/commons/compare/@wireapp/commons@3.8.3...@wireapp/commons@3.8.4) (2020-10-05)
-
 
 ### Bug Fixes
 
 * **commons:** Ensure value in getOSFamily ([#3248](https://github.com/wireapp/wire-web-packages/tree/main/packages/commons/issues/3248)) ([78de3ae](https://github.com/wireapp/wire-web-packages/tree/main/packages/commons/commit/78de3aed22bbf4a1761e6b59882bce367cdac28b))
 
-
-
-
-
 ## [3.8.3](https://github.com/wireapp/wire-web-packages/tree/main/packages/commons/compare/@wireapp/commons@3.8.2...@wireapp/commons@3.8.3) (2020-09-28)
 
 **Note:** Version bump only for package @wireapp/commons
-
-
-
-
 
 ## [3.8.2](https://github.com/wireapp/wire-web-packages/tree/main/packages/commons/compare/@wireapp/commons@3.8.1...@wireapp/commons@3.8.2) (2020-09-21)
 
 **Note:** Version bump only for package @wireapp/commons
 
-
-
-
-
 ## [3.8.1](https://github.com/wireapp/wire-web-packages/tree/main/packages/commons/compare/@wireapp/commons@3.8.0...@wireapp/commons@3.8.1) (2020-09-14)
 
 **Note:** Version bump only for package @wireapp/commons
 
-
-
-
-
 # [3.8.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/commons/compare/@wireapp/commons@3.7.2...@wireapp/commons@3.8.0) (2020-09-01)
-
 
 ### Features
 
 * **commons:** Add feature detections to Runtime ([#3209](https://github.com/wireapp/wire-web-packages/tree/main/packages/commons/issues/3209)) ([34e2eaf](https://github.com/wireapp/wire-web-packages/tree/main/packages/commons/commit/34e2eaf81f144d68951bc2abb3de213c11b0027c))
 
-
-
-
-
 ## [3.7.2](https://github.com/wireapp/wire-web-packages/tree/main/packages/commons/compare/@wireapp/commons@3.7.1...@wireapp/commons@3.7.2) (2020-08-27)
 
 **Note:** Version bump only for package @wireapp/commons
-
-
-
-
 
 ## [3.7.1](https://github.com/wireapp/wire-web-packages/tree/main/packages/commons/compare/@wireapp/commons@3.7.0...@wireapp/commons@3.7.1) (2020-08-09)
 
 **Note:** Version bump only for package @wireapp/commons
 
-
-
-
-
 # [3.7.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/commons/compare/@wireapp/commons@3.6.3...@wireapp/commons@3.7.0) (2020-08-06)
-
 
 ### Features
 
 * **commons:** Add handle validation ([#3160](https://github.com/wireapp/wire-web-packages/tree/main/packages/commons/issues/3160)) ([49eb79e](https://github.com/wireapp/wire-web-packages/tree/main/packages/commons/commit/49eb79e0ae9e8d16f1bf6f40afd179c94537c069))
 
-
-
-
-
 ## [3.6.3](https://github.com/wireapp/wire-web-packages/tree/main/packages/commons/compare/@wireapp/commons@3.6.2...@wireapp/commons@3.6.3) (2020-07-30)
 
 **Note:** Version bump only for package @wireapp/commons
-
-
-
-
 
 ## [3.6.2](https://github.com/wireapp/wire-web-packages/tree/main/packages/commons/compare/@wireapp/commons@3.6.1...@wireapp/commons@3.6.2) (2020-07-21)
 
 **Note:** Version bump only for package @wireapp/commons
 
-
-
-
-
 ## [3.6.1](https://github.com/wireapp/wire-web-packages/tree/main/packages/commons/compare/@wireapp/commons@3.6.0...@wireapp/commons@3.6.1) (2020-07-16)
 
 **Note:** Version bump only for package @wireapp/commons
 
-
-
-
-
 # 3.6.0 (2020-07-08)
-
 
 ### Features
 
 * **api-client:** Expose VBR call setting ([#3060](https://github.com/wireapp/wire-web-packages/tree/main/packages/commons/issues/3060)) ([42ec268](https://github.com/wireapp/wire-web-packages/tree/main/packages/commons/commit/42ec26826f05c6fe6c27e84967ab74c3e5d4d72d))
 
-
-
-
-
 ## [3.5.4](https://github.com/wireapp/wire-web-packages/tree/main/packages/commons/compare/@wireapp/commons@3.5.3...@wireapp/commons@3.5.4) (2020-05-23)
 
 **Note:** Version bump only for package @wireapp/commons
-
-
-
-
 
 ## [3.5.3](https://github.com/wireapp/wire-web-packages/tree/main/packages/commons/compare/@wireapp/commons@3.5.2...@wireapp/commons@3.5.3) (2020-05-18)
 
 **Note:** Version bump only for package @wireapp/commons
 
-
-
-
-
 ## [3.5.2](https://github.com/wireapp/wire-web-packages/tree/main/packages/commons/compare/@wireapp/commons@3.5.1...@wireapp/commons@3.5.2) (2020-05-06)
 
 **Note:** Version bump only for package @wireapp/commons
 
-
-
-
-
 ## [3.5.1](https://github.com/wireapp/wire-web-packages/tree/main/packages/commons/compare/@wireapp/commons@3.5.0...@wireapp/commons@3.5.1) (2020-05-04)
-
 
 ### Bug Fixes
 
 * **commons:** Export directly ([b6f68b4](https://github.com/wireapp/wire-web-packages/tree/main/packages/commons/commit/b6f68b4214397d92cefa8c6337fea4e52d2c302d))
 
-
-
-
-
 # [3.5.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/commons/compare/@wireapp/commons@3.4.0...@wireapp/commons@3.5.0) (2020-05-04)
-
 
 ### Features
 
 * **commons:** Add DateUtil and pluralize ([#3000](https://github.com/wireapp/wire-web-packages/tree/main/packages/commons/issues/3000)) ([ed1633b](https://github.com/wireapp/wire-web-packages/tree/main/packages/commons/commit/ed1633b084421811abc5548789e64071b68f6f3e))
 
-
-
-
-
 # [3.4.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/commons/compare/@wireapp/commons@3.3.10...@wireapp/commons@3.4.0) (2020-04-17)
-
 
 ### Features
 
 * **api-client:** Add backend config endpoint ([#2774](https://github.com/wireapp/wire-web-packages/tree/main/packages/commons/issues/2774)) ([5ee4128](https://github.com/wireapp/wire-web-packages/tree/main/packages/commons/commit/5ee41283dd9094a58baa84287e731ef067ac8418))
 
-
-
-
-
 ## [3.3.10](https://github.com/wireapp/wire-web-packages/tree/main/packages/commons/compare/@wireapp/commons@3.3.9...@wireapp/commons@3.3.10) (2020-04-08)
 
 **Note:** Version bump only for package @wireapp/commons
-
-
-
-
 
 ## [3.3.9](https://github.com/wireapp/wire-web-packages/tree/main/packages/commons/compare/@wireapp/commons@3.3.8...@wireapp/commons@3.3.9) (2020-03-31)
 
 **Note:** Version bump only for package @wireapp/commons
 
-
-
-
-
 ## [3.3.8](https://github.com/wireapp/wire-web-packages/tree/main/packages/commons/compare/@wireapp/commons@3.3.7...@wireapp/commons@3.3.8) (2020-03-17)
 
 **Note:** Version bump only for package @wireapp/commons
-
-
-
-
 
 ## [3.3.7](https://github.com/wireapp/wire-web-packages/tree/main/packages/commons/compare/@wireapp/commons@3.3.6...@wireapp/commons@3.3.7) (2020-03-10)
 
 **Note:** Version bump only for package @wireapp/commons
 
-
-
-
-
 ## [3.3.6](https://github.com/wireapp/wire-web-packages/tree/main/packages/commons/compare/@wireapp/commons@3.3.5...@wireapp/commons@3.3.6) (2020-03-09)
 
 **Note:** Version bump only for package @wireapp/commons
-
-
-
-
 
 ## [3.3.5](https://github.com/wireapp/wire-web-packages/tree/main/packages/commons/compare/@wireapp/commons@3.3.4...@wireapp/commons@3.3.5) (2020-02-28)
 
 **Note:** Version bump only for package @wireapp/commons
 
-
-
-
-
 ## [3.3.4](https://github.com/wireapp/wire-web-packages/tree/main/packages/commons/compare/@wireapp/commons@3.3.3...@wireapp/commons@3.3.4) (2020-02-18)
 
 **Note:** Version bump only for package @wireapp/commons
-
-
-
-
 
 ## [3.3.3](https://github.com/wireapp/wire-web-packages/tree/main/packages/commons/compare/@wireapp/commons@3.3.2...@wireapp/commons@3.3.3) (2020-02-06)
 
 **Note:** Version bump only for package @wireapp/commons
 
-
-
-
-
 ## [3.3.2](https://github.com/wireapp/wire-web-packages/tree/main/packages/commons/compare/@wireapp/commons@3.3.1...@wireapp/commons@3.3.2) (2020-02-03)
 
 **Note:** Version bump only for package @wireapp/commons
-
-
-
-
 
 ## [3.3.1](https://github.com/wireapp/wire-web-packages/tree/main/packages/commons/compare/@wireapp/commons@3.3.0...@wireapp/commons@3.3.1) (2020-01-24)
 
