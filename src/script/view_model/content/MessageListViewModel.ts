@@ -368,6 +368,8 @@ export class MessageListViewModel {
   };
 
   readonly showParticipants = (participants: User[]): void => {
+    this.mainViewModel.updateHighlightedUsers(participants);
+
     this.mainViewModel.panel.togglePanel(PanelViewModel.STATE.CONVERSATION_PARTICIPANTS, {
       entity: this.conversation(),
       highlighted: participants,

@@ -58,7 +58,7 @@ import {ActionsViewModel} from '../../../view_model/ActionsViewModel';
 import {PanelParams, PanelViewModel} from '../../../view_model/PanelViewModel';
 
 const CONFIG = {
-  MAX_USERS_VISIBLE: 7,
+  MAX_USERS_VISIBLE: 1,
   REDUCED_USERS_COUNT: 5,
 };
 

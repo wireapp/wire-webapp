@@ -104,6 +104,7 @@ export class MainViewModel {
   title: WindowTitleViewModel;
   userRepository: UserRepository;
   isFederated: boolean;
+  highlightedUsers: User[];
   private readonly userState: UserState;
 
   static get CONFIG() {
@@ -154,6 +155,8 @@ export class MainViewModel {
 
     this.selfUser = this.userState.self;
 
+    this.highlightedUsers = [];
+
     this.isPanelOpen = ko.observable(false);
 
     this.actions = new ActionsViewModel(
@@ -194,6 +197,10 @@ export class MainViewModel {
     // Prevent Chrome (and Electron) from pushing the content out of the
     // viewport when using form elements (e.g. in the preferences)
     document.addEventListener('scroll', () => window.scrollTo(0, 0));
+  }
+
+  updateHighlightedUsers(participants: User[]): void {
+    this.highlightedUsers = participants;
   }
 
   openPanel(): Promise<void> {

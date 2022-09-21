@@ -42,6 +42,7 @@ import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {TeamState} from '../../../team/TeamState';
 import {MemberLeaveEvent} from '../../../conversation/EventBuilder';
 import {ClientEvent} from '../../../event/Client';
+import {initFadingScrollbar} from '../../../ui/fadingScrollbar';
 
 interface GroupParticipantUserProps {
   onBack: () => void;
@@ -137,7 +138,7 @@ const GroupParticipantUser: FC<GroupParticipantUserProps> = ({
     <div id="group-participant-user" className="panel__page group-participant panel__page--visible">
       <PanelHeader showBackArrow goBackUie="go-back-group-participant" onGoBack={onBack} onClose={onClose} />
 
-      <div className="panel__content" data-bind="fadingscrollbar">
+      <div className="panel__content" ref={initFadingScrollbar}>
         <UserDetails
           participant={currentUser}
           badge={teamRepository.getRoleBadge(currentUser.id)}

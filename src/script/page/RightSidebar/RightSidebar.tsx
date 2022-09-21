@@ -71,13 +71,12 @@ const RightSidebar: FC<RightSidebarProps> = ({contentViewModel, teamState, userS
 
   const {conversationRoleRepository} = conversationRepository;
 
-  const {actions: actionsViewModel, panel: panelViewModel} = contentViewModel.mainViewModel;
+  const {actions: actionsViewModel, panel: panelViewModel, highlightedUsers} = contentViewModel.mainViewModel;
   const conversationState = container.resolve(ConversationState);
 
   const {isVisible, state} = useKoSubscribableChildren(panelViewModel, ['isVisible', 'state']);
   const {activeConversation} = useKoSubscribableChildren(conversationState, ['activeConversation']);
 
-  const [isMounted, setIsMounted] = useState<boolean>(false);
   const [previousState, setPreviousState] = useState<string | null>(null);
   const [currentState, setCurrentState] = useState<string | null>(state);
   const [currentEntity, setCurrentEntity] = useState<PanelParams['entity'] | null>(null);
@@ -127,13 +126,17 @@ const RightSidebar: FC<RightSidebarProps> = ({contentViewModel, teamState, userS
     panelViewModel.closePanel();
     setCurrentState(null);
     setPreviousState(null);
-    setIsMounted(false);
   };
 
   const backToConversationDetails = () => {
     if (activeConversation) {
-      togglePanel(PanelViewModel.STATE.PARTICIPANT_DEVICES, {entity: activeConversation});
-      setCurrentState(PanelViewModel.STATE.CONVERSATION_DETAILS);
+      if (previousState === PanelViewModel.STATE.CONVERSATION_PARTICIPANTS) {
+        togglePanel(PanelViewModel.STATE.CONVERSATION_PARTICIPANTS, {entity: activeConversation});
+
+        return;
+      }
+
+      togglePanel(PanelViewModel.STATE.CONVERSATION_DETAILS, {entity: activeConversation});
       setCurrentEntity(activeConversation);
     }
   };
@@ -154,18 +157,8 @@ const RightSidebar: FC<RightSidebarProps> = ({contentViewModel, teamState, userS
   };
 
   useEffect(() => {
-    if (isVisible && !isMounted) {
-      setCurrentState(PanelViewModel.STATE.CONVERSATION_DETAILS);
-      setIsMounted(true);
-    }
-  }, [isMounted, isVisible]);
-
-  useEffect(
-    () => () => {
-      onClose();
-    },
-    [isVisible],
-  );
+    setCurrentState(state);
+  }, [state]);
 
   if (!isVisible) {
     return null;
@@ -287,7 +280,10 @@ const RightSidebar: FC<RightSidebarProps> = ({contentViewModel, teamState, userS
           searchRepository={searchRepository}
           teamRepository={teamRepository}
           isVisible={isVisible}
-          togglePanel={panelViewModel.togglePanel}
+          togglePanel={togglePanel}
+          highlightedUsers={highlightedUsers}
+          onBack={backToConversationDetails}
+          onClose={onClose}
         />
       )}
     </>

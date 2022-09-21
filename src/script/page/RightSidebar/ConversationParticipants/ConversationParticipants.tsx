@@ -17,7 +17,7 @@
  *
  */
 
-import {FC, useEffect, useState} from 'react';
+import {FC, useMemo, useState} from 'react';
 import cx from 'classnames';
 
 import SearchInput from 'Components/SearchInput';
@@ -36,6 +36,7 @@ import {SearchRepository} from '../../../search/SearchRepository';
 import {TeamRepository} from '../../../team/TeamRepository';
 import {isServiceEntity} from '../../../guards/Service';
 import {PanelParams, PanelViewModel} from '../../../view_model/PanelViewModel';
+import {initFadingScrollbar} from '../../../ui/fadingScrollbar';
 
 interface ConversationParticipantsProps {
   activeConversation: Conversation;
@@ -43,6 +44,9 @@ interface ConversationParticipantsProps {
   searchRepository: SearchRepository;
   teamRepository: TeamRepository;
   togglePanel: (state: string, params: PanelParams) => void;
+  highlightedUsers: User[];
+  onClose: () => void;
+  onBack: () => void;
   isVisible?: boolean;
 }
 
@@ -52,10 +56,12 @@ const ConversationParticipants: FC<ConversationParticipantsProps> = ({
   searchRepository,
   teamRepository,
   togglePanel,
+  onClose,
+  onBack,
+  highlightedUsers,
   isVisible = false,
 }) => {
   const [searchInput, setSearchInput] = useState<string>('');
-  const [participants, setParticipants] = useState<User[]>([]);
 
   const {
     participating_user_ets: participatingUserEts,
@@ -67,35 +73,20 @@ const ConversationParticipants: FC<ConversationParticipantsProps> = ({
     'selfUser',
   ]);
 
-  // TODO: Pass highlighted users
-  // initView({highlighted = []}: PanelParams = {entity: null, highlighted: []}): void {
-  //   this.searchInput('');
-  //   this.highlightedUsers(highlighted);
-  // }
-
-  const highlightedUsers: User[] = [];
-
   const showUser = (userEntity: User) => togglePanel(PanelViewModel.STATE.GROUP_PARTICIPANT_USER, {entity: userEntity});
 
-  const onBackClick = () => {};
-
-  const onClose = () => {};
-
-  useEffect(() => {
+  const participants = useMemo(() => {
     const users: User[] = participatingUserEts.flatMap(user => {
       const isUser = !isServiceEntity(user);
       return isUser ? [user] : [];
     });
 
     if (removedFromConversation && selfUser) {
-      const updatedUsers = [...users, selfUser].sort(sortUsersByPriority);
-      setParticipants(updatedUsers);
-
-      return;
+      return [...users, selfUser].sort(sortUsersByPriority);
     }
 
-    setParticipants(users);
-  }, [participatingUserEts, selfUser, removedFromConversation]);
+    return users;
+  }, [participatingUserEts, removedFromConversation, selfUser]);
 
   return (
     <div
@@ -103,7 +94,7 @@ const ConversationParticipants: FC<ConversationParticipantsProps> = ({
       className={cx('panel__page conversation-participants', {'panel__page--visible': isVisible})}
     >
       <PanelHeader
-        onGoBack={onBackClick}
+        onGoBack={onBack}
         onClose={onClose}
         goBackUie="go-back-conversation-participants"
         title={t('conversationParticipantsTitle')}
@@ -114,9 +105,10 @@ const ConversationParticipants: FC<ConversationParticipantsProps> = ({
           input={searchInput}
           setInput={setSearchInput}
           placeholder={t('conversationParticipantsSearchPlaceholder')}
+          forceDark
         />
 
-        <div className="conversation-participants__list panel__content" data-bind="fadingscrollbar">
+        <div className="conversation-participants__list panel__content" ref={initFadingScrollbar}>
           {/* TODO: Need to update dataUieName for UserSearchableList */}
           {/*data-uie-name="list-conversation-participants"*/}
 
@@ -126,7 +118,6 @@ const ConversationParticipants: FC<ConversationParticipantsProps> = ({
             highlightedUsers={highlightedUsers}
             onClick={showUser}
             noUnderline
-            showArrow
             searchRepository={searchRepository}
             teamRepository={teamRepository}
             conversationRepository={conversationRepository}
