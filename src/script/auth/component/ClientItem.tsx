@@ -41,11 +41,11 @@ import {parseError, parseValidationErrors} from '../util/errorUtil';
 
 export interface Props extends React.HTMLProps<HTMLDivElement> {
   client: RegisteredClient;
-  clientError?: Error;
   onClick: (event: React.MouseEvent<HTMLDivElement>) => void;
   onClientRemoval: (password?: string) => void;
   requirePassword: boolean;
   selected: boolean;
+  clientError?: Error;
 }
 
 const ClientItem = ({selected, onClientRemoval, onClick, client, clientError, requirePassword}: Props) => {
