@@ -19,7 +19,6 @@
 
 import {FC} from 'react';
 
-import useEffectRef from 'Util/useEffectRef';
 import UserDevices, {UserDevicesState, useUserDevicesHistory} from 'Components/UserDevices';
 
 import {t} from 'Util/LocalizerUtil';
@@ -28,7 +27,7 @@ import PanelHeader from '../PanelHeader';
 
 import type {User} from '../../../entity/User';
 import {ViewModelRepositories} from '../../../view_model/MainViewModel';
-import {useFadingScrollbar} from '../../../ui/fadingScrollbar';
+import {initFadingScrollbar} from '../../../ui/fadingScrollbar';
 
 interface ParticipantDevicesProps {
   onClose: () => void;
@@ -38,8 +37,6 @@ interface ParticipantDevicesProps {
 }
 
 const ParticipantDevices: FC<ParticipantDevicesProps> = ({repositories, onClose, onGoBack, user}) => {
-  const [scrollbarRef, setScrollbarRef] = useEffectRef<HTMLDivElement>();
-  useFadingScrollbar(scrollbarRef);
   const history = useUserDevicesHistory();
 
   return (
@@ -58,7 +55,7 @@ const ParticipantDevices: FC<ParticipantDevicesProps> = ({repositories, onClose,
         goBackUie="go-back-participant-devices"
       />
 
-      <div className="panel__content" ref={setScrollbarRef}>
+      <div className="panel__content" ref={initFadingScrollbar}>
         <UserDevices
           clientRepository={repositories.client}
           cryptographyRepository={repositories.cryptography}

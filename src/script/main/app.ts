@@ -815,6 +815,7 @@ class App {
         }
       }
 
+      await this.core.logout(clearData);
       return _redirectToLogin();
     };
 

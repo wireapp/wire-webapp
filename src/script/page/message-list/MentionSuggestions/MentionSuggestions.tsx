@@ -24,7 +24,7 @@ import {KEY} from 'Util/KeyboardUtil';
 import {clamp} from 'Util/NumberUtil';
 import useEffectRef from 'Util/useEffectRef';
 
-import {useFadingScrollbar} from '../../../ui/fadingScrollbar';
+import {initFadingScrollbar} from '../../../ui/fadingScrollbar';
 import MentionSuggestionsItem from './MentionSuggestionsItem';
 import {User} from '../../../entity/User';
 
@@ -38,8 +38,6 @@ const MentionSuggestionList: React.FunctionComponent<MentionSuggestionListProps>
   onSelectionValidated,
   targetInput,
 }) => {
-  const [scrollbarRef, setScrollbarRef] = useEffectRef<HTMLDivElement>();
-  useFadingScrollbar(scrollbarRef);
   const [selectedSuggestionIndex, setSelectedSuggestionIndex] = useState(0);
   const [selectedItem, setSelectedItem] = useEffectRef();
 
@@ -106,7 +104,7 @@ const MentionSuggestionList: React.FunctionComponent<MentionSuggestionListProps>
       className="conversation-input-bar-mention-suggestion"
       style={{bottom, overflowY: 'auto'}}
       data-uie-name="list-mention-suggestions"
-      ref={setScrollbarRef}
+      ref={initFadingScrollbar}
     >
       <div className="mention-suggestion-list">
         {suggestions

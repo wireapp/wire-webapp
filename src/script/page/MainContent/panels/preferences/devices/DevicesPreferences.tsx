@@ -29,8 +29,7 @@ import {t} from 'Util/LocalizerUtil';
 import VerifiedIcon from 'Components/VerifiedIcon';
 import Icon from 'Components/Icon';
 import {CryptographyRepository} from 'src/script/cryptography/CryptographyRepository';
-import {useFadingScrollbar} from '../../../../../ui/fadingScrollbar';
-import useEffectRef from 'Util/useEffectRef';
+import {initFadingScrollbar} from '../../../../../ui/fadingScrollbar';
 import DetailedDevice from './components/DetailedDevice';
 import DeviceDetailsPreferences from './DeviceDetailsPreferences';
 import {Conversation} from '../../../../../entity/Conversation';
@@ -57,7 +56,6 @@ const Device: React.FC<{
   const {isVerified} = useKoSubscribableChildren(device.meta, ['isVerified']);
   const verifiedLabel = isVerified ? t('preferencesDevicesVerification') : t('preferencesDeviceNotVerified');
   const deviceAriaLabel = `${t('preferencesDevice')} ${deviceNumber}, ${device.getName()}, ${verifiedLabel}`;
-
   const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.stopPropagation();
     onRemove(device);
@@ -137,10 +135,8 @@ const DevicesPreferences: React.FC<DevicesPreferencesProps> = ({
   const {clients, currentClient} = useKoSubscribableChildren(clientState, ['clients', 'currentClient']);
   const {self} = useKoSubscribableChildren(userState, ['self']);
   const isSSO = self?.isNoPasswordSSO;
-  const [scrollbarRef, setScrollbarRef] = useEffectRef<HTMLDivElement>();
   const getFingerprint = (device: ClientEntity) =>
     cryptographyRepository.getRemoteFingerprint(self.qualifiedId, device.id);
-  useFadingScrollbar(scrollbarRef);
 
   if (selectedDevice) {
     return (
@@ -161,7 +157,7 @@ const DevicesPreferences: React.FC<DevicesPreferencesProps> = ({
   return (
     <div id="preferences-devices" className="preferences-page preferences-devices">
       <h2 className="preferences-titlebar">{t('preferencesDevices')}</h2>
-      <div className="preferences-content" ref={setScrollbarRef}>
+      <div className="preferences-content" ref={initFadingScrollbar}>
         <fieldset className="preferences-section" data-uie-name="preferences-device-current">
           <legend className="preferences-header">{t('preferencesDevicesCurrent')}</legend>
           <DetailedDevice device={currentClient} fingerprint={cryptographyRepository.getLocalFingerprint()} />
@@ -182,7 +178,7 @@ const DevicesPreferences: React.FC<DevicesPreferencesProps> = ({
                 deviceNumber={++index}
               />
             ))}
-            <div className="preferences-detail">{t('preferencesDevicesActiveDetail')}</div>
+            <p className="preferences-detail">{t('preferencesDevicesActiveDetail')}</p>
           </fieldset>
         )}
       </div>

@@ -22,11 +22,10 @@ import {FC, useEffect, useState} from 'react';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 import {formatDuration} from 'Util/TimeUtil';
-import useEffectRef from 'Util/useEffectRef';
 
 import {Conversation} from '../../../entity/Conversation';
 import {EphemeralTimings} from '../../../ephemeral/EphemeralTimings';
-import {useFadingScrollbar} from '../../../ui/fadingScrollbar';
+import {initFadingScrollbar} from '../../../ui/fadingScrollbar';
 import {ViewModelRepositories} from '../../../view_model/MainViewModel';
 import PanelHeader from '../PanelHeader';
 
@@ -46,8 +45,6 @@ interface MessageTime {
 const TimedMessages: FC<TimedMessagesPanelProps> = ({activeConversation, onClose, onGoBack, repositories}) => {
   const [currentMessageTimer, setCurrentMessageTimer] = useState(0);
   const [messageTimes, setMessageTimes] = useState<MessageTime[]>([]);
-  const [scrollbarRef, setScrollbarRef] = useEffectRef<HTMLDivElement>();
-  useFadingScrollbar(scrollbarRef);
 
   const {globalMessageTimer} = useKoSubscribableChildren(activeConversation, ['globalMessageTimer']);
 
@@ -93,7 +90,8 @@ const TimedMessages: FC<TimedMessagesPanelProps> = ({activeConversation, onClose
         title={t('timedMessagesTitle')}
         goBackUie="go-back-timed-messages-options"
       />
-      <div ref={setScrollbarRef} className="panel__content">
+
+      <div ref={initFadingScrollbar} className="panel__content">
         {messageTimes.map(({text, isCustom, value}) => (
           <label
             key={value}

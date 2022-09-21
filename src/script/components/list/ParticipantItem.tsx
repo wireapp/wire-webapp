@@ -20,7 +20,7 @@
 import React from 'react';
 import cx from 'classnames';
 
-import {registerReactComponent, useKoSubscribableChildren} from 'Util/ComponentUtil';
+import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import Avatar, {AVATAR_SIZE} from 'Components/Avatar';
 import {UserlistMode} from 'Components/UserList';
 import {t} from 'Util/LocalizerUtil';
@@ -283,5 +283,3 @@ const ParticipantItem = <UserType extends User | ServiceEntity>(
 };
 
 export default ParticipantItem;
-
-registerReactComponent('participant-item', ParticipantItem);

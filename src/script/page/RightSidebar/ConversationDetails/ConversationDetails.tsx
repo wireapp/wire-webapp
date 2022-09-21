@@ -50,12 +50,12 @@ import {IntegrationRepository} from '../../../integration/IntegrationRepository'
 import {SearchRepository} from '../../../search/SearchRepository';
 import {TeamRepository} from '../../../team/TeamRepository';
 import {TeamState} from '../../../team/TeamState';
-import {useFadingScrollbar} from '../../../ui/fadingScrollbar';
 import {Shortcut} from '../../../ui/Shortcut';
 import {ShortcutType} from '../../../ui/ShortcutType';
 import {UserState} from '../../../user/UserState';
 import {ActionsViewModel} from '../../../view_model/ActionsViewModel';
 import {PanelParams, PanelViewModel} from '../../../view_model/PanelViewModel';
+import {initFadingScrollbar} from '../../../ui/fadingScrollbar';
 
 const CONFIG = {
   MAX_USERS_VISIBLE: 7,
@@ -264,7 +264,7 @@ const ConversationDetails: FC<ConversationDetailsProps> = ({
     setUserParticipants(users);
   }, [activeConversation, participatingUserEts.length, removedFromConversation, selfUser]);
 
-  useFadingScrollbar(panelContentRef.current);
+  initFadingScrollbar(panelContentRef.current);
 
   return (
     <div id="conversation-details" className="panel__page conversation-details panel__page--visible">
