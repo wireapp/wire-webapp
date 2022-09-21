@@ -60,8 +60,6 @@ const GroupParticipantService: FC<GroupParticipantServiceProps> = ({
   userState,
   isAddMode = false,
 }) => {
-  // TODO: Should be added (?)
-  // getLogger('GroupParticipantServiceViewModel');
   const {
     inTeam,
     isActiveParticipant,

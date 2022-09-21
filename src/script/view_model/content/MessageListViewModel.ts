@@ -374,8 +374,19 @@ export class MessageListViewModel {
     });
   };
 
-  readonly showMessageDetails = (message: Message, showLikes: boolean): void => {
+  readonly showMessageDetails = (message: Message, showLikes: boolean = false): void => {
+    // console.log('przemvs this.mainViewModel.panel', this.mainViewModel.panel.state());
+
+    // if (this.mainViewModel.panel.state() === PanelViewModel.STATE.MESSAGE_DETAILS) {
+    //   this.mainViewModel.panel.closePanel();
+    //
+    //   return;
+    // }
+
     if (!this.conversation().is1to1()) {
+      this.mainViewModel.updateMessageEntity(message);
+      this.mainViewModel.updateShowLikes(showLikes);
+
       this.mainViewModel.panel.togglePanel(PanelViewModel.STATE.MESSAGE_DETAILS, {
         entity: message,
         showLikes,

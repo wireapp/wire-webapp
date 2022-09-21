@@ -40,6 +40,8 @@ import GroupParticipantService from './GroupParticipantService';
 import {isServiceEntity} from '../../guards/Service';
 import {ServiceEntity} from '../../integration/ServiceEntity';
 import AddParticipants from './AddParticipants';
+import MessageDetails from './MessageDetails';
+import {isMessage} from '../../guards/Message';
 
 const migratedPanels = [
   PanelViewModel.STATE.CONVERSATION_DETAILS,
@@ -51,6 +53,7 @@ const migratedPanels = [
   PanelViewModel.STATE.SERVICES_OPTIONS,
   PanelViewModel.STATE.GROUP_PARTICIPANT_SERVICE,
   PanelViewModel.STATE.ADD_PARTICIPANTS,
+  PanelViewModel.STATE.MESSAGE_DETAILS,
 ];
 
 interface RightSidebarProps {
@@ -65,17 +68,17 @@ const RightSidebar: FC<RightSidebarProps> = ({contentViewModel, teamState, userS
     integration: integrationRepository,
     search: searchRepository,
     team: teamRepository,
+    user: userRepository,
   } = contentViewModel.repositories;
 
   const {conversationRoleRepository} = conversationRepository;
 
-  const {actions: actionsViewModel, panel: panelViewModel} = contentViewModel.mainViewModel;
+  const {actions: actionsViewModel, panel: panelViewModel, showLikes, messageEntity} = contentViewModel.mainViewModel;
   const conversationState = container.resolve(ConversationState);
 
   const {isVisible, state} = useKoSubscribableChildren(panelViewModel, ['isVisible', 'state']);
   const {activeConversation} = useKoSubscribableChildren(conversationState, ['activeConversation']);
 
-  const [isMounted, setIsMounted] = useState<boolean>(false);
   const [previousState, setPreviousState] = useState<string | null>(null);
   const [currentState, setCurrentState] = useState<string | null>(state);
   const [currentEntity, setCurrentEntity] = useState<PanelParams['entity'] | null>(null);
@@ -124,13 +127,13 @@ const RightSidebar: FC<RightSidebarProps> = ({contentViewModel, teamState, userS
   const onClose = () => {
     panelViewModel.closePanel();
     setCurrentState(null);
+    setCurrentEntity(null);
+    setCurrentServiceEntity(null);
     setPreviousState(null);
-    setIsMounted(false);
   };
 
   const backToConversationDetails = () => {
     if (activeConversation) {
-      togglePanel(PanelViewModel.STATE.PARTICIPANT_DEVICES, {entity: activeConversation});
       setCurrentState(PanelViewModel.STATE.CONVERSATION_DETAILS);
       setCurrentEntity(activeConversation);
     }
@@ -152,18 +155,14 @@ const RightSidebar: FC<RightSidebarProps> = ({contentViewModel, teamState, userS
   };
 
   useEffect(() => {
-    if (isVisible && !isMounted) {
-      setCurrentState(PanelViewModel.STATE.CONVERSATION_DETAILS);
-      setIsMounted(true);
-    }
-  }, [isMounted, isVisible]);
+    setCurrentState(state);
+  }, [state]);
 
-  useEffect(
-    () => () => {
-      onClose();
-    },
-    [isVisible],
-  );
+  useEffect(() => {
+    if (messageEntity) {
+      setCurrentEntity(messageEntity);
+    }
+  }, [messageEntity]);
 
   if (!isVisible) {
     return null;
@@ -275,6 +274,20 @@ const RightSidebar: FC<RightSidebarProps> = ({contentViewModel, teamState, userS
           teamRepository={teamRepository}
           teamState={teamState}
           userState={userState}
+        />
+      )}
+
+      {currentState === PanelViewModel.STATE.MESSAGE_DETAILS && activeConversation && isMessage(currentEntity) && (
+        <MessageDetails
+          activeConversation={activeConversation}
+          conversationRepository={conversationRepository}
+          messageEntity={currentEntity}
+          updateEntity={setCurrentEntity}
+          teamRepository={teamRepository}
+          searchRepository={searchRepository}
+          showLikes={showLikes}
+          userRepository={userRepository}
+          onClose={onClose}
         />
       )}
     </>

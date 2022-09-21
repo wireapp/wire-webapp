@@ -29,3 +29,6 @@ export const isContentMessage = (
 
 export const isMemberMessage = (message: any | undefined | null): message is MemberMessage =>
   message && 'super_type' in message && message.super_type === SuperType.MEMBER;
+
+export const isMessage = (message: any | undefined | null): message is Message =>
+  message && 'super_type' in message && message.super_type === SuperType.CONTENT;

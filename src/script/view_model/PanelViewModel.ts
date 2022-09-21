@@ -23,7 +23,6 @@ import {amplify} from 'amplify';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {ConversationParticipantsViewModel} from './panel/ConversationParticipantsViewModel';
-import {MessageDetailsViewModel} from './panel/MessageDetailsViewModel';
 import {MotionDuration} from '../motion/MotionDuration';
 import {ContentViewModel} from './ContentViewModel';
 import type {MainViewModel, ViewModelRepositories} from './MainViewModel';
@@ -79,13 +78,11 @@ export class PanelViewModel {
 
   elementIds = {
     [PanelViewModel.STATE.CONVERSATION_PARTICIPANTS]: 'conversation-participants',
-    [PanelViewModel.STATE.MESSAGE_DETAILS]: 'message-details',
   };
 
   buildSubViews() {
     const viewModels = {
       [PanelViewModel.STATE.CONVERSATION_PARTICIPANTS]: ConversationParticipantsViewModel,
-      [PanelViewModel.STATE.MESSAGE_DETAILS]: MessageDetailsViewModel,
     };
 
     return Object.entries(viewModels).reduce<Record<string, any>>((subViews, [state, viewModel]) => {
