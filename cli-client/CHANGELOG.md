@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [11.2.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/cli-client@11.1.64...@wireapp/cli-client@11.2.0) (2022-09-21)
+
+
+### Features
+
+* update yarn to v2, update typescript ([#4402](https://github.com/wireapp/wire-web-packages/issues/4402)) ([9b1cf1f](https://github.com/wireapp/wire-web-packages/commit/9b1cf1f56a6f1a410a6175b080ec78d73a60586c))
+
+
+
+
+
 ## [11.1.64](https://github.com/wireapp/wire-web-packages/tree/main/packages/cli-client/compare/@wireapp/cli-client@11.1.63...@wireapp/cli-client@11.1.64) (2022-09-20)
 
 **Note:** Version bump only for package @wireapp/cli-client

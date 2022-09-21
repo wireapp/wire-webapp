@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.14.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/webapp-events@0.13.2...@wireapp/webapp-events@0.14.0) (2022-09-21)
+
+
+### Features
+
+* update yarn to v2, update typescript ([#4402](https://github.com/wireapp/wire-web-packages/issues/4402)) ([9b1cf1f](https://github.com/wireapp/wire-web-packages/commit/9b1cf1f56a6f1a410a6175b080ec78d73a60586c))
+
+
+
+
+
 ## [0.13.2](https://github.com/wireapp/wire-web-packages/tree/main/packages/webapp-events/compare/@wireapp/webapp-events@0.13.1...@wireapp/webapp-events@0.13.2) (2022-05-24)
 
 

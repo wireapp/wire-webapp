@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.5.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/store-engine-fs@2.4.9...@wireapp/store-engine-fs@2.5.0) (2022-09-21)
+
+
+### Features
+
+* update yarn to v2, update typescript ([#4402](https://github.com/wireapp/wire-web-packages/issues/4402)) ([9b1cf1f](https://github.com/wireapp/wire-web-packages/commit/9b1cf1f56a6f1a410a6175b080ec78d73a60586c))
+
+
+
+
+
 ## [2.4.9](https://github.com/wireapp/wire-web-packages/tree/main/packages/store-engine-fs/compare/@wireapp/store-engine-fs@2.4.8...@wireapp/store-engine-fs@2.4.9) (2022-03-07)
 
 **Note:** Version bump only for package @wireapp/store-engine-fs

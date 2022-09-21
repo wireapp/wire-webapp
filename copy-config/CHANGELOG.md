@@ -3,6 +3,22 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.3.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/copy-config@1.2.10...@wireapp/copy-config@1.3.0) (2022-09-21)
+
+
+### Bug Fixes
+
+* address CI issue ([4a00962](https://github.com/wireapp/wire-web-packages/commit/4a009622c476c43bf16ebf6b6432d548efd7982c))
+
+
+### Features
+
+* update yarn to v2, update typescript ([#4402](https://github.com/wireapp/wire-web-packages/issues/4402)) ([9b1cf1f](https://github.com/wireapp/wire-web-packages/commit/9b1cf1f56a6f1a410a6175b080ec78d73a60586c))
+
+
+
+
+
 ## [1.2.10](https://github.com/wireapp/wire-web-packages/tree/main/packages/copy-config/compare/@wireapp/copy-config@1.2.9...@wireapp/copy-config@1.2.10) (2022-09-19)
 
 **Note:** Version bump only for package @wireapp/copy-config
