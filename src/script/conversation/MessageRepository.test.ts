@@ -200,12 +200,14 @@ describe('MessageRepository', () => {
       msgToDelete.user(sender);
       conversation.addMessage(msgToDelete);
       const [messageRepository, {core}] = await buildMessageRepository();
-      spyOn(core.service!.conversation, 'deleteMessageEveryone');
+      spyOn(core.service!.conversation, 'send').and.returnValue(
+        Promise.resolve({state: PayloadBundleState.OUTGOING_SENT}),
+      );
 
       await expect(messageRepository.deleteMessageForEveryone(conversation, msgToDelete)).rejects.toMatchObject({
         type: ConversationError.TYPE.WRONG_USER,
       });
-      expect(core.service!.conversation.deleteMessageEveryone).not.toHaveBeenCalled();
+      expect(core.service!.conversation.send).not.toHaveBeenCalled();
     });
 
     it('should send delete and deletes message for own messages', async () => {
@@ -217,16 +219,23 @@ describe('MessageRepository', () => {
       conversation.addMessage(messageToDelete);
 
       const [messageRepository, {core, eventRepository}] = await buildMessageRepository();
-      spyOn(core.service!.conversation, 'deleteMessageEveryone');
+      spyOn(core.service!.conversation, 'send').and.returnValue(
+        Promise.resolve({state: PayloadBundleState.OUTGOING_SENT}),
+      );
       spyOn(eventRepository.eventService, 'deleteEvent').and.returnValue(Promise.resolve());
 
       await messageRepository.deleteMessageForEveryone(conversation, messageToDelete);
-      expect(core.service!.conversation.deleteMessageEveryone).toHaveBeenCalledWith(
-        conversation.id,
-        messageToDelete.id,
-        ['selfid', 'user1'],
-        true,
-        undefined,
+      expect(core.service!.conversation.send).toHaveBeenCalledWith(
+        expect.objectContaining({
+          payload: expect.objectContaining({
+            conversation: conversation.id,
+            content: expect.objectContaining({
+              messageId: messageToDelete.id,
+            }),
+            type: 'PayloadBundleType.MESSAGE_DELETE',
+          }),
+          userIds: {selfid: [], user1: []},
+        }),
       );
       expect(eventRepository.eventService.deleteEvent).toHaveBeenCalledTimes(1);
     });
