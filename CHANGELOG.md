@@ -3,6 +3,23 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [31.0.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@30.13.0...@wireapp/core@31.0.0) (2022-09-21)
+
+
+### Features
+
+* Enable deleting message for MLS conversation ([#4403](https://github.com/wireapp/wire-web-packages/issues/4403)) ([93a9b6d](https://github.com/wireapp/wire-web-packages/commit/93a9b6d80d0a1594a37a811d237eb602e6e3d554))
+* update yarn to v2, update typescript ([#4402](https://github.com/wireapp/wire-web-packages/issues/4402)) ([9b1cf1f](https://github.com/wireapp/wire-web-packages/commit/9b1cf1f56a6f1a410a6175b080ec78d73a60586c))
+
+
+### BREAKING CHANGES
+
+* the `deleteMessageEveryone` method doesn't exist anymore. Instead the `send` method should be used along with the `MessageBuilder.createDelete` method
+
+
+
+
+
 # [30.13.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/compare/@wireapp/core@30.12.0...@wireapp/core@30.13.0) (2022-09-20)
 
 
