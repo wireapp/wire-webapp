@@ -85,7 +85,7 @@
     "start:node": "cross-env NODE_DEBUG='@wireapp*' node --inspect -r ts-node/register demo.ts",
     "test": "yarn test:node && yarn test:browser",
     "test:browser": "karma start",
-    "test:node": "cross-env NODE_DEBUG='@wireapp/api-client*' nyc jasmine --config=jasmine.json",
+    "test:node": "nyc jasmine --config=jasmine.json",
     "test:project": "yarn dist && yarn test",
     "test:types": "tsc --noEmit",
     "watch": "webpack serve --config webpack.browser.js",
