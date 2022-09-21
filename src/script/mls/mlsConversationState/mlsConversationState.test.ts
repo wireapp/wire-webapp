@@ -23,6 +23,13 @@ import {Conversation} from '../../entity/Conversation';
 import {mlsConversationState} from './mlsConversationState';
 
 describe('mlsPendingStateUtil', () => {
+  const createConversation = (protocol: ConversationProtocol) => {
+    const conversation = new Conversation(createRandomUuid(), '', protocol);
+    if (protocol === ConversationProtocol.MLS) {
+      conversation.groupId = createRandomUuid();
+    }
+    return conversation;
+  };
   const createConversations = (
     nb: number,
   ): {
@@ -34,14 +41,13 @@ describe('mlsPendingStateUtil', () => {
 
     for (let i = 0; i < nb; i++) {
       const isMsl = Math.random() >= 0.5;
-      result.conversations.push(
-        new Conversation(createRandomUuid(), '', isMsl ? ConversationProtocol.MLS : ConversationProtocol.PROTEUS),
-      );
+      const conversation = createConversation(isMsl ? ConversationProtocol.MLS : ConversationProtocol.PROTEUS);
       if (isMsl) {
         result.nbMlsConversations++;
       } else {
         result.nbProteusConversations++;
       }
+      result.conversations.push(conversation);
     }
     return result;
   };
@@ -77,9 +83,9 @@ describe('mlsPendingStateUtil', () => {
 
   it('marks conversation as established if they are already known', async () => {
     const conversations = [
-      new Conversation(createRandomUuid(), '', ConversationProtocol.MLS),
-      new Conversation(createRandomUuid(), '', ConversationProtocol.MLS),
-      new Conversation(createRandomUuid(), '', ConversationProtocol.MLS),
+      createConversation(ConversationProtocol.MLS),
+      createConversation(ConversationProtocol.MLS),
+      createConversation(ConversationProtocol.MLS),
     ];
     const sendExternalProposal = jest.fn();
     const currentSize = mlsConversationState.getState().established.size;
@@ -93,14 +99,14 @@ describe('mlsPendingStateUtil', () => {
 
   it('sends external proposal only to conversations that are not pending and not established', async () => {
     const conversations = [
-      new Conversation(createRandomUuid(), '', ConversationProtocol.MLS),
-      new Conversation(createRandomUuid(), '', ConversationProtocol.MLS),
-      new Conversation(createRandomUuid(), '', ConversationProtocol.MLS),
-      new Conversation(createRandomUuid(), '', ConversationProtocol.PROTEUS),
+      createConversation(ConversationProtocol.MLS),
+      createConversation(ConversationProtocol.MLS),
+      createConversation(ConversationProtocol.MLS),
+      createConversation(ConversationProtocol.PROTEUS),
     ];
 
-    mlsConversationState.getState().markAsEstablished(conversations[1].id);
-    mlsConversationState.getState().markAsPendingWelcome(conversations[2].id);
+    mlsConversationState.getState().markAsEstablished(conversations[1].groupId!);
+    mlsConversationState.getState().markAsPendingWelcome(conversations[2].groupId!);
 
     const sendExternalProposal = jest.fn();
     await mlsConversationState

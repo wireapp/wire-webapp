@@ -32,11 +32,11 @@ export interface MLSConversationState {
 const initialState = loadState();
 
 type StoreState = MLSConversationState & {
-  isEstablished: (conversationId: string) => boolean;
-  isPendingWelcome: (conversationId: string) => boolean;
+  isEstablished: (groupId: string) => boolean;
+  isPendingWelcome: (groupId: string) => boolean;
   filterEstablishedConversations: (conversations: Conversation[]) => Conversation[];
-  markAsEstablished: (conversationId: string) => void;
-  markAsPendingWelcome: (conversationId: string) => void;
+  markAsEstablished: (groupId: string) => void;
+  markAsPendingWelcome: (groupId: string) => void;
   /**
    * Will send external proposal for all the conversations that are not pendingWelcome or established
    * @param conversations The conversations that we want to process (only the mls conversations will be considered)
@@ -44,8 +44,8 @@ type StoreState = MLSConversationState & {
    */
   sendExternalToPendingJoin(
     conversations: Conversation[],
-    isEstablishedConversation: (conversation: Conversation) => Promise<boolean>,
-    sendExternalProposal: (conversation: Conversation) => Promise<void>,
+    isEstablishedConversation: (groupId: string) => Promise<boolean>,
+    sendExternalProposal: (conversationDetails: {groupId: string; epoch: number}) => Promise<void>,
   ): Promise<void>;
 };
 
@@ -53,39 +53,42 @@ export const mlsConversationState = createVanilla<StoreState>((set, get) => {
   return {
     established: initialState.established,
     filterEstablishedConversations: conversations =>
-      conversations.filter(conversation => !conversation.isUsingMLSProtocol || get().isEstablished(conversation.id)),
+      conversations.filter(conversation => !conversation.groupId || get().isEstablished(conversation.groupId)),
 
-    isEstablished: conversationId => get().established.has(conversationId),
+    isEstablished: groupId => get().established.has(groupId),
 
-    isPendingWelcome: conversationId => get().pendingWelcome.has(conversationId),
+    isPendingWelcome: groupId => get().pendingWelcome.has(groupId),
 
-    markAsEstablished: conversationId =>
+    markAsEstablished: groupId =>
       set(state => ({
         ...state,
-        established: state.established.add(conversationId),
+        established: state.established.add(groupId),
       })),
 
-    markAsPendingWelcome: conversationId =>
+    markAsPendingWelcome: groupId =>
       set(state => ({
         ...state,
-        pendingWelcome: state.pendingWelcome.add(conversationId),
+        pendingWelcome: state.pendingWelcome.add(groupId),
       })),
 
     pendingWelcome: initialState.pendingWelcome,
 
     async sendExternalToPendingJoin(conversations, isAlreadyEstablished, sendExternalProposal): Promise<void> {
       const currentState = get();
-      const mlsConversations = conversations.filter(conversation => conversation.isUsingMLSProtocol);
-      const pendingConversations: Conversation[] = [];
-      const alreadyEstablishedConversations: Conversation[] = [];
+      const pendingConversations: {groupId: string; epoch: number}[] = [];
+      const alreadyEstablishedConversations: string[] = [];
 
-      for (const conversation of mlsConversations) {
-        if (!currentState.isEstablished(conversation.id) && !currentState.isPendingWelcome(conversation.id)) {
-          if (await isAlreadyEstablished(conversation)) {
+      for (const conversation of conversations) {
+        const groupId = conversation.groupId;
+        if (!conversation.isUsingMLSProtocol || !groupId) {
+          continue;
+        }
+        if (!currentState.isEstablished(groupId) && !currentState.isPendingWelcome(groupId)) {
+          if (await isAlreadyEstablished(groupId)) {
             // check is the conversation is not actually already established
-            alreadyEstablishedConversations.push(conversation);
+            alreadyEstablishedConversations.push(groupId);
           } else {
-            pendingConversations.push(conversation);
+            pendingConversations.push({epoch: conversation.epoch, groupId});
           }
         }
       }
@@ -94,14 +97,8 @@ export const mlsConversationState = createVanilla<StoreState>((set, get) => {
 
       set({
         ...currentState,
-        established: new Set([
-          ...currentState.established,
-          ...alreadyEstablishedConversations.map(conversation => conversation.id),
-        ]),
-        pendingWelcome: new Set([
-          ...currentState.pendingWelcome,
-          ...pendingConversations.map(conversation => conversation.id),
-        ]),
+        established: new Set([...currentState.established, ...alreadyEstablishedConversations]),
+        pendingWelcome: new Set([...currentState.pendingWelcome, ...pendingConversations.map(({groupId}) => groupId)]),
       });
     },
   };

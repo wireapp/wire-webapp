@@ -31,7 +31,7 @@ import {Runtime} from '@wireapp/commons';
 
 import {getLogger, Logger} from 'Util/Logger';
 import {t} from 'Util/LocalizerUtil';
-import {checkIndexedDb, createRandomUuid} from 'Util/util';
+import {arrayToBase64, checkIndexedDb, createRandomUuid} from 'Util/util';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 import {enableLogging} from 'Util/LoggerUtil';
 import {Environment} from 'Util/Environment';
@@ -415,7 +415,7 @@ class App {
       callingRepository.initAvs(selfUser, clientEntity().id);
       loadingView.updateProgress(7.5, t('initValidatedClient'));
       telemetry.timeStep(AppInitTimingsStep.VALIDATED_CLIENT);
-      telemetry.addStatistic(AppInitStatisticsValue.CLIENT_TYPE, clientEntity().type);
+      telemetry.addStatistic(AppInitStatisticsValue.CLIENT_TYPE, clientEntity().type ?? 'unknown');
 
       await cryptographyRepository.init(this.core.service!.cryptography.cryptobox, clientEntity);
 
@@ -430,10 +430,25 @@ class App {
         // We send external proposal to all the MLS conversations that are in an unknown state (not established nor pendingWelcome)
         await mlsConversationState.getState().sendExternalToPendingJoin(
           conversationEntities,
-          conversation => this.core.service!.conversation.isMLSConversationEstablished(conversation.groupId),
-          conversation =>
-            this.core.service!.conversation.sendExternalJoinProposal(conversation.groupId, conversation.epoch),
+          groupId => this.core.service!.conversation.isMLSConversationEstablished(groupId),
+          ({groupId, epoch}) => this.core.service!.conversation.sendExternalJoinProposal(groupId, epoch),
         );
+
+        this.core.configureMLSCallbacks({
+          authorize: groupIdBytes => {
+            const groupId = arrayToBase64(groupIdBytes);
+            const conversation = conversationRepository.findConversationByGroupId(groupId);
+            if (!conversation) {
+              // If the conversation is not found, it means it's being created by the self user, thus they have admin rights
+              return true;
+            }
+            return conversationRepository.conversationRoleRepository.isUserGroupAdmin(conversation, selfUser);
+          },
+          groupIdFromConversationId: async conversationId => {
+            const conversation = await conversationRepository.getConversationById(conversationId);
+            return conversation?.groupId;
+          },
+        });
       }
 
       const connectionEntities = await connectionRepository.getConnections();
@@ -817,6 +832,7 @@ class App {
       if (clearData) {
         // Info: This async call cannot be awaited in an "beforeunload" scenario, so we call it without waiting for it in order to delete the CacheStorage in the background.
         CacheRepository.clearCacheStorage();
+        localStorage.clear();
 
         try {
           await this.repository.storage.deleteDatabase();
