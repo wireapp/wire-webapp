@@ -3207,19 +3207,19 @@
     logdown "3.3.1"
     rimraf "3.0.2"
 
-"@wireapp/core-crypto@0.5.0":
-  version "0.5.0"
-  resolved "https://registry.yarnpkg.com/@wireapp/core-crypto/-/core-crypto-0.5.0.tgz#f3b2afc406179ece79c97084619b546fd9b03f8b"
-  integrity sha512-aK6JvrryMxRzpW7QyGTZEc79QVzST1QNeXOYR7Mp/rU8goaBErTThDEQ1kYzg+8VQjokglWrcvqy3OClUia8sw==
+"@wireapp/core-crypto@0.5.1":
+  version "0.5.1"
+  resolved "https://registry.yarnpkg.com/@wireapp/core-crypto/-/core-crypto-0.5.1.tgz#78d640e14c5519d8b2e035f5a97654482e652037"
+  integrity sha512-9xKUTTxbDYzbAlcdnV1L1f89wYsR58pJU9Or4gYqgd2KV8AZKPlFsxAvNbsXSWbaXGrqK6Wzu7dNAV9AqMmDEA==
 
-"@wireapp/core@31.1.4":
-  version "31.1.4"
-  resolved "https://registry.yarnpkg.com/@wireapp/core/-/core-31.1.4.tgz#bf10afe80f028c2ef7b29e6eeaf020dccb776b78"
-  integrity sha512-5xwSjYFbxABvmKVwbu/i6R+NhME0Nt4crYm9WDGdDKRnC/wjJFJU6IaKWSBeL8+gObp62+nqzF3ZOpH8hZLrWA==
+"@wireapp/core@31.2.0":
+  version "31.2.0"
+  resolved "https://registry.yarnpkg.com/@wireapp/core/-/core-31.2.0.tgz#ff5b201a5a45982f285749e0d6eb435d570a5c93"
+  integrity sha512-V3t71vjab543Wm9XhPZ1ipzFwANBriOkmV5YFAcVzvP/qjJZfsxCcB4I1WaZI2s+kOD+wQmT4W4bCOp1ZETE+A==
   dependencies:
     "@wireapp/api-client" "^20.5.4"
     "@wireapp/commons" "^4.4.4"
-    "@wireapp/core-crypto" "0.5.0"
+    "@wireapp/core-crypto" "0.5.1"
     "@wireapp/cryptobox" "12.8.0"
     "@wireapp/promise-queue" "^1.2.4"
     "@wireapp/store-engine-dexie" "^1.7.4"
