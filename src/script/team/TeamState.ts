@@ -114,7 +114,12 @@ export class TeamState {
       // TODO connect to video calling feature config
       () => true || this.teamFeatures()?.videoCalling?.status === FeatureStatus.ENABLED,
     );
-    this.isMLSEnabled = ko.pureComputed(() => this.teamFeatures()?.mls?.status === FeatureStatus.ENABLED);
+    this.isMLSEnabled = ko.pureComputed(
+      () =>
+        (this.teamFeatures()?.mls?.config.protocolToggleUsers.includes(this.userState.self().id) &&
+          this.teamFeatures()?.mls?.status === FeatureStatus.ENABLED) ??
+        false,
+    );
     this.isConferenceCallingEnabled = ko.pureComputed(
       () => this.teamFeatures()?.conferenceCalling?.status === FeatureStatus.ENABLED,
     );
