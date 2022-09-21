@@ -28,6 +28,7 @@ import {
   FileAssetAbortMessage,
   FileAssetMessage,
   FileAssetMetaDataMessage,
+  HideMessage,
   ImageAssetMessageOutgoing,
   LocationMessage,
   OtrMessage,
@@ -50,6 +51,7 @@ import {
   Location,
   MessageDelete,
   MessageEdit,
+  MessageHide,
   Reaction,
 } from '@wireapp/protocol-messaging';
 import {PayloadBundleType} from '../message/PayloadBundle';
@@ -99,9 +101,10 @@ export function generateGenericMessage<T extends OtrMessage>(
       return {genericMessage: generateReactionGenericMessage(payload), content};
     case PayloadBundleType.TEXT:
       return {genericMessage: generateTextGenericMessage(payload, messageTimer), content};
-
     case PayloadBundleType.MESSAGE_DELETE:
       return {genericMessage: generateDeleteMessage(payload), content};
+    case PayloadBundleType.MESSAGE_HIDE:
+      return {genericMessage: generateHideMessage(payload), content};
 
     /**
      * ToDo: Create Generic implementation for everything else
@@ -342,6 +345,18 @@ function generateDeleteMessage(payload: DeleteMessage): GenericMessage {
 
   return GenericMessage.create({
     [GenericMessageType.DELETED]: content,
+    messageId: payload.id,
+  });
+}
+
+function generateHideMessage(payload: HideMessage): GenericMessage {
+  const content = MessageHide.create({
+    messageId: payload.content.messageId,
+    conversationId: payload.content.conversationId,
+  });
+
+  return GenericMessage.create({
+    [GenericMessageType.HIDDEN]: content,
     messageId: payload.id,
   });
 }

@@ -33,7 +33,7 @@ import {
 import {CONVERSATION_TYPING, ConversationMemberUpdateData} from '@wireapp/api-client/src/conversation/data';
 import {ConversationMemberLeaveEvent} from '@wireapp/api-client/src/event';
 import {QualifiedId, QualifiedUserPreKeyBundleMap, UserPreKeyBundleMap} from '@wireapp/api-client/src/user';
-import {Cleared, DataTransfer, GenericMessage, LastRead, MessageHide} from '@wireapp/protocol-messaging';
+import {Cleared, DataTransfer, GenericMessage, LastRead} from '@wireapp/protocol-messaging';
 
 import {
   GenericMessageType,
@@ -43,7 +43,7 @@ import {
   PayloadBundleType,
   RemoveUsersParams,
 } from '../../conversation/';
-import {ClearedContent, HiddenContent, RemoteData} from '../content';
+import {ClearedContent, RemoteData} from '../content';
 import {CryptographyService} from '../../cryptography/';
 import {MLSService} from '../../mls';
 import {NotificationService} from '../../notification';
@@ -51,7 +51,7 @@ import {decryptAsset} from '../../cryptography/AssetCryptography';
 import {isStringArray, isQualifiedIdArray, isQualifiedUserClients, isUserClients} from '../../util/TypePredicateUtil';
 import {MessageBuilder} from '../message/MessageBuilder';
 import {MessageService} from '../message/MessageService';
-import {ClearConversationMessage, HideMessage, OtrMessage} from '../message/OtrMessage';
+import {ClearConversationMessage, OtrMessage} from '../message/OtrMessage';
 import {XOR} from '@wireapp/commons/src/main/util/TypeUtil';
 import {
   AddUsersParams,
@@ -455,44 +455,6 @@ export class ConversationService {
     );
 
     return qualifiedUserClients;
-  }
-
-  public async deleteMessageLocal(
-    conversationId: string,
-    messageIdToHide: string,
-    sendAsProtobuf?: boolean,
-    conversationDomain?: string,
-  ): Promise<HideMessage> {
-    const messageId = MessageBuilder.createId();
-
-    const content: HiddenContent = MessageHide.create({
-      conversationId,
-      messageId: messageIdToHide,
-    });
-
-    const genericMessage = GenericMessage.create({
-      [GenericMessageType.HIDDEN]: content,
-      messageId,
-    });
-
-    const {id: selfConversationId} = await this.getSelfConversationId();
-
-    await this.sendGenericMessage(this.apiClient.validatedClientId, selfConversationId, genericMessage, {
-      sendAsProtobuf,
-      conversationDomain,
-    });
-
-    return {
-      content,
-      conversation: conversationId,
-      from: this.apiClient.context!.userId,
-      id: messageId,
-      messageTimer: this.messageTimer.getMessageTimer(conversationId),
-      source: PayloadBundleSource.LOCAL,
-      state: PayloadBundleState.OUTGOING_SENT,
-      timestamp: Date.now(),
-      type: PayloadBundleType.MESSAGE_HIDE,
-    };
   }
 
   /**
