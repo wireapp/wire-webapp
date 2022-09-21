@@ -41,6 +41,8 @@ import GroupParticipantService from './GroupParticipantService';
 import {isServiceEntity} from '../../guards/Service';
 import {ServiceEntity} from '../../integration/ServiceEntity';
 import AddParticipants from './AddParticipants';
+import MessageDetails from './MessageDetails';
+import {isContentMessage} from '../../guards/Message';
 
 const migratedPanels = [
   PanelViewModel.STATE.CONVERSATION_DETAILS,
@@ -53,6 +55,7 @@ const migratedPanels = [
   PanelViewModel.STATE.SERVICES_OPTIONS,
   PanelViewModel.STATE.GROUP_PARTICIPANT_SERVICE,
   PanelViewModel.STATE.ADD_PARTICIPANTS,
+  PanelViewModel.STATE.MESSAGE_DETAILS,
 ];
 
 interface RightSidebarProps {
@@ -67,11 +70,18 @@ const RightSidebar: FC<RightSidebarProps> = ({contentViewModel, teamState, userS
     integration: integrationRepository,
     search: searchRepository,
     team: teamRepository,
+    user: userRepository,
   } = contentViewModel.repositories;
 
   const {conversationRoleRepository} = conversationRepository;
 
-  const {actions: actionsViewModel, panel: panelViewModel, highlightedUsers} = contentViewModel.mainViewModel;
+  const {
+    actions: actionsViewModel,
+    panel: panelViewModel,
+    showLikes,
+    messageEntity,
+    highlightedUsers,
+  } = contentViewModel.mainViewModel;
   const conversationState = container.resolve(ConversationState);
 
   const {isVisible, state} = useKoSubscribableChildren(panelViewModel, ['isVisible', 'state']);
@@ -125,18 +135,19 @@ const RightSidebar: FC<RightSidebarProps> = ({contentViewModel, teamState, userS
   const onClose = () => {
     panelViewModel.closePanel();
     setCurrentState(null);
+    setCurrentEntity(null);
+    setCurrentServiceEntity(null);
     setPreviousState(null);
   };
 
   const backToConversationDetails = () => {
     if (activeConversation) {
       if (previousState === PanelViewModel.STATE.CONVERSATION_PARTICIPANTS) {
-        togglePanel(PanelViewModel.STATE.CONVERSATION_PARTICIPANTS, {entity: activeConversation});
-
+        setCurrentState(PanelViewModel.STATE.CONVERSATION_PARTICIPANTS);
         return;
       }
 
-      togglePanel(PanelViewModel.STATE.CONVERSATION_DETAILS, {entity: activeConversation});
+      setCurrentState(PanelViewModel.STATE.CONVERSATION_DETAILS);
       setCurrentEntity(activeConversation);
     }
   };
@@ -159,6 +170,12 @@ const RightSidebar: FC<RightSidebarProps> = ({contentViewModel, teamState, userS
   useEffect(() => {
     setCurrentState(state);
   }, [state]);
+
+  useEffect(() => {
+    if (messageEntity) {
+      setCurrentEntity(messageEntity);
+    }
+  }, [messageEntity]);
 
   if (!isVisible) {
     return null;
@@ -272,6 +289,22 @@ const RightSidebar: FC<RightSidebarProps> = ({contentViewModel, teamState, userS
           userState={userState}
         />
       )}
+
+      {currentState === PanelViewModel.STATE.MESSAGE_DETAILS &&
+        activeConversation &&
+        isContentMessage(currentEntity) && (
+          <MessageDetails
+            activeConversation={activeConversation}
+            conversationRepository={conversationRepository}
+            messageEntity={currentEntity}
+            updateEntity={setCurrentEntity}
+            teamRepository={teamRepository}
+            searchRepository={searchRepository}
+            showLikes={showLikes}
+            userRepository={userRepository}
+            onClose={onClose}
+          />
+        )}
 
       {state === PanelViewModel.STATE.CONVERSATION_PARTICIPANTS && activeConversation && (
         <ConversationParticipants

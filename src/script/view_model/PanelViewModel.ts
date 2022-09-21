@@ -22,7 +22,6 @@ import {amplify} from 'amplify';
 
 import {WebAppEvents} from '@wireapp/webapp-events';
 
-import {MessageDetailsViewModel} from './panel/MessageDetailsViewModel';
 import {MotionDuration} from '../motion/MotionDuration';
 import {ContentViewModel} from './ContentViewModel';
 import type {MainViewModel, ViewModelRepositories} from './MainViewModel';
@@ -76,14 +75,10 @@ export class PanelViewModel {
     };
   }
 
-  elementIds = {
-    [PanelViewModel.STATE.MESSAGE_DETAILS]: 'message-details',
-  };
+  elementIds = {};
 
   buildSubViews() {
-    const viewModels = {
-      [PanelViewModel.STATE.MESSAGE_DETAILS]: MessageDetailsViewModel,
-    };
+    const viewModels = {};
 
     return Object.entries(viewModels).reduce<Record<string, any>>((subViews, [state, viewModel]) => {
       subViews[state] = new viewModel({
