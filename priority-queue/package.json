@@ -38,5 +38,5 @@
     "test:node": "cross-env JASMINE_CONFIG_PATH=src/test/node/support/jasmine.json jasmine",
     "prepare": "yarn dist"
   },
-  "version": "1.8.4"
+  "version": "1.8.5"
 }

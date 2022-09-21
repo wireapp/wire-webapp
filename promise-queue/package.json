@@ -22,5 +22,5 @@
     "test": "jest",
     "prepare": "yarn dist"
   },
-  "version": "1.2.4"
+  "version": "1.2.5"
 }

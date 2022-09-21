@@ -39,5 +39,5 @@
     "test:project": "yarn build && yarn test",
     "prepare": "yarn dist"
   },
-  "version": "1.7.4"
+  "version": "1.7.5"
 }

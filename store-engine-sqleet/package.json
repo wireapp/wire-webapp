@@ -1,7 +1,7 @@
 {
   "dependencies": {
     "@wireapp/websql": "0.0.17",
-    "bazinga64": "5.11.4",
+    "bazinga64": "5.11.5",
     "uint32": "0.2.1"
   },
   "devDependencies": {
@@ -50,5 +50,5 @@
     "test:project": "yarn build && yarn test",
     "prepare": "yarn dist"
   },
-  "version": "1.8.4"
+  "version": "1.8.5"
 }
