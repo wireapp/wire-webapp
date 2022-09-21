@@ -107,6 +107,7 @@ export class MainViewModel {
   isFederated: boolean;
   messageEntity: Message | undefined;
   showLikes: boolean;
+  highlightedUsers: User[];
   private readonly userState: UserState;
 
   static get CONFIG() {
@@ -160,6 +161,8 @@ export class MainViewModel {
     this.messageEntity = undefined;
     this.showLikes = false;
 
+    this.highlightedUsers = [];
+
     this.isPanelOpen = ko.observable(false);
 
     this.actions = new ActionsViewModel(
@@ -210,6 +213,10 @@ export class MainViewModel {
     this.showLikes = showLikes;
   }
 
+  updateHighlightedUsers(participants: User[]): void {
+    this.highlightedUsers = participants;
+  }
+
   openPanel(): Promise<void> {
     return this.togglePanel(MainViewModel.PANEL_STATE.OPEN);
   }
@@ -217,6 +224,8 @@ export class MainViewModel {
   closePanel(): Promise<void> {
     this.messageEntity = undefined;
     this.showLikes = false;
+    this.highlightedUsers = [];
+
     return this.togglePanel(MainViewModel.PANEL_STATE.CLOSED);
   }
 

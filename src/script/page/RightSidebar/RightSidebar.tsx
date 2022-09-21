@@ -23,6 +23,7 @@ import {container} from 'tsyringe';
 import {registerReactComponent, useKoSubscribableChildren} from 'Util/ComponentUtil';
 
 import ConversationDetails from './ConversationDetails';
+import ConversationParticipants from './ConversationParticipants';
 
 import {ConversationState} from '../../conversation/ConversationState';
 import {UserState} from '../../user/UserState';
@@ -45,6 +46,7 @@ import {isContentMessage} from '../../guards/Message';
 
 const migratedPanels = [
   PanelViewModel.STATE.CONVERSATION_DETAILS,
+  PanelViewModel.STATE.CONVERSATION_PARTICIPANTS,
   PanelViewModel.STATE.GROUP_PARTICIPANT_USER,
   PanelViewModel.STATE.NOTIFICATIONS,
   PanelViewModel.STATE.PARTICIPANT_DEVICES,
@@ -73,7 +75,13 @@ const RightSidebar: FC<RightSidebarProps> = ({contentViewModel, teamState, userS
 
   const {conversationRoleRepository} = conversationRepository;
 
-  const {actions: actionsViewModel, panel: panelViewModel, showLikes, messageEntity} = contentViewModel.mainViewModel;
+  const {
+    actions: actionsViewModel,
+    panel: panelViewModel,
+    showLikes,
+    messageEntity,
+    highlightedUsers,
+  } = contentViewModel.mainViewModel;
   const conversationState = container.resolve(ConversationState);
 
   const {isVisible, state} = useKoSubscribableChildren(panelViewModel, ['isVisible', 'state']);
@@ -134,6 +142,11 @@ const RightSidebar: FC<RightSidebarProps> = ({contentViewModel, teamState, userS
 
   const backToConversationDetails = () => {
     if (activeConversation) {
+      if (previousState === PanelViewModel.STATE.CONVERSATION_PARTICIPANTS) {
+        setCurrentState(PanelViewModel.STATE.CONVERSATION_PARTICIPANTS);
+        return;
+      }
+
       setCurrentState(PanelViewModel.STATE.CONVERSATION_DETAILS);
       setCurrentEntity(activeConversation);
     }
@@ -292,6 +305,20 @@ const RightSidebar: FC<RightSidebarProps> = ({contentViewModel, teamState, userS
             onClose={onClose}
           />
         )}
+
+      {state === PanelViewModel.STATE.CONVERSATION_PARTICIPANTS && activeConversation && (
+        <ConversationParticipants
+          activeConversation={activeConversation}
+          conversationRepository={conversationRepository}
+          searchRepository={searchRepository}
+          teamRepository={teamRepository}
+          isVisible={isVisible}
+          togglePanel={togglePanel}
+          highlightedUsers={highlightedUsers}
+          onBack={backToConversationDetails}
+          onClose={onClose}
+        />
+      )}
     </>
   );
 };
