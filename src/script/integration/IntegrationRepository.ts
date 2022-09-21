@@ -97,7 +97,13 @@ export class IntegrationRepository {
     if (entity instanceof ServiceEntity) {
       return entity;
     }
+
     const {providerId, serviceId} = entity;
+
+    if (!providerId || !serviceId) {
+      return;
+    }
+
     return this.getServiceById(providerId, serviceId, entity.qualifiedId.domain);
   }
 
