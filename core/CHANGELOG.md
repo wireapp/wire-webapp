@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [31.2.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@31.1.4...@wireapp/core@31.2.0) (2022-09-21)
+
+### Features
+
+* Upgrade @wireapp/core-crypto ([#4409](https://github.com/wireapp/wire-web-packages/issues/4409)) ([fc846ad](https://github.com/wireapp/wire-web-packages/commit/fc846ad100ed7466bf1b9a4253cc412cf57ea07e))
+
 ## [31.1.4](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@31.1.3...@wireapp/core@31.1.4) (2022-09-21)
 
 **Note:** Version bump only for package @wireapp/core

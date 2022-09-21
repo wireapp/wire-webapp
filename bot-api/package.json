@@ -40,6 +40,6 @@
     "test:project": "yarn dist && yarn test",
     "prepare": "yarn dist"
   },
-  "version": "14.2.5",
+  "version": "14.2.6",
   "gitHead": "5339f01fe01ef0871da8c8bc8662fbe9e604754a"
 }
