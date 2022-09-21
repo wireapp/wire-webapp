@@ -58,7 +58,7 @@ import {PanelParams, PanelViewModel} from '../../../view_model/PanelViewModel';
 import {initFadingScrollbar} from '../../../ui/fadingScrollbar';
 
 const CONFIG = {
-  MAX_USERS_VISIBLE: 1,
+  MAX_USERS_VISIBLE: 7,
   REDUCED_USERS_COUNT: 5,
 };
 
