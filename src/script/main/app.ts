@@ -190,7 +190,7 @@ class App {
     private readonly core: Core,
     private readonly apiClient: APIClient,
   ) {
-    this.apiClient.on(APIClient.TOPIC.ON_LOGOUT, () => this.logout(SIGN_OUT_REASON.NOT_SIGNED_IN, false));
+    this.apiClient.on(APIClient.TOPIC.ON_LOGOUT, () => this.logout(SIGN_OUT_REASON.SESSION_EXPIRED, false));
     this.logger = getLogger('App');
     this.appContainer = appContainer;
 
