@@ -17,12 +17,14 @@
  *
  */
 
+import {getStorage} from 'Util/localStorage';
 import {MLSConversationState} from './mlsConversationState';
 
 const storageKey = 'mlsConversationsState';
+const storage = getStorage();
 
 export const loadState = (): MLSConversationState => {
-  const storedState = localStorage.getItem(storageKey);
+  const storedState = storage?.getItem(storageKey);
   if (!storedState) {
     return {
       established: new Set(),
@@ -37,8 +39,5 @@ export const loadState = (): MLSConversationState => {
 };
 
 export const saveState = ({established, pendingWelcome}: MLSConversationState) => {
-  localStorage.setItem(
-    storageKey,
-    JSON.stringify({established: [...established], pendingWelcome: [...pendingWelcome]}),
-  );
+  storage?.setItem(storageKey, JSON.stringify({established: [...established], pendingWelcome: [...pendingWelcome]}));
 };
