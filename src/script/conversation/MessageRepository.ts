@@ -941,7 +941,11 @@ export class MessageRepository {
   public async deleteMessageForEveryone(
     conversation: Conversation,
     message: Message,
-    targetedUsers?: QualifiedId[],
+    options: {
+      targetedUsers?: QualifiedId[];
+      /** will not wait for backend confirmation before actually deleting the message locally */
+      optimiticRemoval?: boolean;
+    },
   ): Promise<void> {
     const conversationId = conversation.id;
     const messageId = message.id;
@@ -950,14 +954,18 @@ export class MessageRepository {
       if (!message.user().isMe && !message.ephemeral_expires()) {
         throw new ConversationError(ConversationError.TYPE.WRONG_USER, ConversationError.MESSAGE.WRONG_USER);
       }
-      const userIds = targetedUsers || conversation.allUserEntities.map(user => user.qualifiedId);
+      const userIds = options.targetedUsers || conversation.allUserEntities.map(user => user.qualifiedId);
       const payload = MessageBuilder.createMessageDelete({
         ...this.createCommonMessagePayload(conversation),
         messageIdToDelete: message.id,
       });
-      await this.sendAndInjectGenericCoreMessage(payload, conversation, {recipients: userIds, skipInjection: true});
-
-      await this.deleteMessageById(conversation, messageId);
+      await this.sendAndInjectGenericCoreMessage(payload, conversation, {
+        recipients: userIds,
+        skipInjection: !options.optimiticRemoval,
+      });
+      if (!options.optimiticRemoval) {
+        this.deleteMessage(conversation, message);
+      }
     } catch (error) {
       const isConversationNotFound = error.code === HTTP_STATUS.NOT_FOUND;
       if (isConversationNotFound) {
