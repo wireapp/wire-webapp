@@ -115,12 +115,12 @@ function toLinkPreviewData(openGraphData: OpenGraphResult, url: string, offset: 
   const {site_name, title, description} = openGraphData;
 
   const truncatedTitle = truncate(deArrayify(title), Config.getConfig().MAXIMUM_LINK_PREVIEW_CHARS);
-  const truncatedDescription = truncate(deArrayify(description), Config.getConfig().MAXIMUM_LINK_PREVIEW_CHARS);
+  const truncatedDescription = truncate(deArrayify(description ?? ''), Config.getConfig().MAXIMUM_LINK_PREVIEW_CHARS);
 
   let tweet;
   if (deArrayify(site_name) === 'Twitter' && isTweetUrl(deArrayify(url))) {
     const author = deArrayify(title).replace('on Twitter', '').trim();
-    const username = deArrayify(url).match(/com\/([^/]*)\//)[1];
+    const username = deArrayify(url).match(/com\/([^/]*)\//)?.[1];
     tweet = {
       author,
       username,
@@ -129,7 +129,7 @@ function toLinkPreviewData(openGraphData: OpenGraphResult, url: string, offset: 
 
   return {
     image,
-    permanantUrl: deArrayify(openGraphData.url),
+    permanantUrl: deArrayify(openGraphData.url) ?? '',
     title: tweet ? truncatedDescription : truncatedTitle,
     tweet,
     url,
@@ -154,7 +154,9 @@ async function fetchOpenGraphData(link: string): Promise<OpenGraphResult | undef
     }
     return undefined;
   } catch (error) {
-    logger.warn(`Error while fetching OpenGraph data: ${error.message}`);
+    if (error instanceof Error) {
+      logger.warn(`Error while fetching OpenGraph data: ${error.message}`);
+    }
     throw new LinkPreviewError(LinkPreviewError.TYPE.UNSUPPORTED_TYPE, LinkPreviewError.MESSAGE.UNSUPPORTED_TYPE);
   }
 }
