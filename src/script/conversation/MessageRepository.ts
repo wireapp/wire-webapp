@@ -945,7 +945,7 @@ export class MessageRepository {
       targetedUsers?: QualifiedId[];
       /** will not wait for backend confirmation before actually deleting the message locally */
       optimiticRemoval?: boolean;
-    },
+    } = {},
   ): Promise<void> {
     const conversationId = conversation.id;
     const messageId = message.id;
