@@ -4,5 +4,5 @@
   "main": "index.json",
   "name": "@wireapp/prettier-config",
   "repository": "https://github.com/wireapp/wire-web-packages/tree/main/packages/prettier-config",
-  "version": "0.4.5"
+  "version": "0.4.6"
 }
