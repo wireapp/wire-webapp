@@ -79,8 +79,7 @@
     "start:echo": "cross-env NODE_DEBUG='@wireapp/core*' node src/demo/echo.js",
     "start:sender": "cross-env NODE_DEBUG='@wireapp/core*' node src/demo/sender.js",
     "test": "jest",
-    "watch": "tsc ---watch",
-    "prepare": "yarn dist"
+    "watch": "tsc ---watch"
   },
   "version": "31.2.1",
   "gitHead": "5339f01fe01ef0871da8c8bc8662fbe9e604754a"
