@@ -961,6 +961,7 @@ export class MessageRepository {
       });
       await this.sendAndInjectGenericCoreMessage(payload, conversation, {
         recipients: userIds,
+        // if we want optimistic removal, we can rely on the injection system that will handle the event and remove the message even before the message is sent
         skipInjection: !options.optimiticRemoval,
       });
       if (!options.optimiticRemoval) {

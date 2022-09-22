@@ -2841,9 +2841,12 @@ export class ConversationRepository {
         }
 
         const userIds = conversationEntity.isGroup()
-          ? [this.userState.self().qualifiedId, {domain: messageEntity.fromDomain, id: messageEntity.from}]
+          ? [this.userState.self().qualifiedId, {domain: messageEntity.fromDomain ?? '', id: messageEntity.from}]
           : undefined;
-        return this.messageRepository.deleteMessageForEveryone(conversationEntity, messageEntity, userIds);
+        return this.messageRepository.deleteMessageForEveryone(conversationEntity, messageEntity, {
+          optimiticRemoval: true,
+          targetedUsers: userIds,
+        });
       });
     }
   };
