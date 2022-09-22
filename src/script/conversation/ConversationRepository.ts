@@ -2844,7 +2844,7 @@ export class ConversationRepository {
           ? [this.userState.self().qualifiedId, {domain: messageEntity.fromDomain ?? '', id: messageEntity.from}]
           : undefined;
         return this.messageRepository.deleteMessageForEveryone(conversationEntity, messageEntity, {
-          optimiticRemoval: true,
+          optimisticRemoval: true,
           targetedUsers: userIds,
         });
       });
