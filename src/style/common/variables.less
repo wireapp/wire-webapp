@@ -172,9 +172,17 @@
 @teams-width: 78px;
 
 @conversation-list-color: #fff;
-@conversation-list-width: 320px;
+@conversation-list-width: 300px;
 
 @right-width: 304px;
+
+body {
+  --preferences-width: 560px;
+
+  @media (max-width: @screen-md-min) {
+    --preferences-width: 100%;
+  }
+}
 
 // ----------------------------------------------------------------------------
 // Left list

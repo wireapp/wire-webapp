@@ -133,7 +133,7 @@ const AccountPreferences: React.FC<AccountPreferencesProps> = ({
           alignItems: 'center',
           display: 'flex',
           flexDirection: 'column',
-          width: 560,
+          width: 'var(--preferences-width)',
         }}
       >
         <h3

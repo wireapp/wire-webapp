@@ -26,6 +26,10 @@
   background-color: var(--app-bg);
   transition: filter 0.3s;
 
+  @media (max-width: @screen-md-min) {
+    min-width: 320px;
+  }
+
   .left-column {
     position: relative;
     width: @conversation-list-width;
