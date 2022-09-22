@@ -30,8 +30,7 @@
     "clean": "rimraf \"src/**/*.{js?(.map),d.ts}\"",
     "dist": "yarn clean && yarn build",
     "start": "ts-node -r tsconfig-paths/register ./src/cli.ts",
-    "test": "exit 0",
-    "prepare": "yarn dist"
+    "test": "exit 0"
   },
   "version": "0.10.5"
 }

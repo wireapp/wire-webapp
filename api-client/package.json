@@ -88,8 +88,7 @@
     "test:node": "nyc jasmine --config=jasmine.json",
     "test:project": "yarn dist && yarn test",
     "test:types": "tsc --noEmit",
-    "watch": "webpack serve --config webpack.browser.js",
-    "prepare": "yarn dist"
+    "watch": "webpack serve --config webpack.browser.js"
   },
   "version": "20.5.5",
   "gitHead": "5339f01fe01ef0871da8c8bc8662fbe9e604754a"

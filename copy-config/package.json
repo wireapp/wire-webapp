@@ -31,8 +31,7 @@
     "clean": "rimraf \"src/**/{!(*.test).js,*.js.map,*.d.ts}\"",
     "dist": "yarn clean && yarn build",
     "test": "yarn test:node",
-    "test:node": "yarn build && jasmine --config=jasmine.json",
-    "prepare": "yarn dist"
+    "test:node": "yarn build && jasmine --config=jasmine.json"
   },
   "version": "1.3.5"
 }

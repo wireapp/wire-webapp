@@ -27,8 +27,7 @@
     "dist": "yarn clean && yarn build",
     "test": "yarn build && yarn test:node",
     "test:project": "yarn dist && yarn test",
-    "test:node": "nyc jasmine --config=jasmine.json",
-    "prepare": "yarn dist"
+    "test:node": "nyc jasmine --config=jasmine.json"
   },
   "version": "0.5.5"
 }

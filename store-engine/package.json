@@ -43,8 +43,7 @@
     "test": "yarn test:node && yarn test:browser",
     "test:browser": "karma start",
     "test:project": "yarn dist && yarn test",
-    "test:node": "yarn build && nyc jasmine --config=jasmine.json",
-    "prepare": "yarn dist"
+    "test:node": "yarn build && nyc jasmine --config=jasmine.json"
   },
   "version": "4.10.5"
 }

@@ -32,8 +32,7 @@
     "clean": "rimraf \"src/**/{!(test*).js,*.js.map,*.d.ts}\"",
     "dist": "yarn clean && yarn build",
     "test": "yarn build && nyc jasmine --config=jasmine.json",
-    "test:project": "yarn build && yarn test",
-    "prepare": "yarn dist"
+    "test:project": "yarn build && yarn test"
   },
   "version": "2.5.5"
 }

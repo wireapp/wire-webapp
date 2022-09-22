@@ -35,8 +35,7 @@
     "test": "yarn build && yarn test:node && yarn test:browser",
     "test:browser": "webpack && karma start",
     "test:project": "yarn dist && yarn test",
-    "test:node": "cross-env JASMINE_CONFIG_PATH=src/test/node/support/jasmine.json jasmine",
-    "prepare": "yarn dist"
+    "test:node": "cross-env JASMINE_CONFIG_PATH=src/test/node/support/jasmine.json jasmine"
   },
   "version": "1.8.5"
 }

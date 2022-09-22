@@ -37,8 +37,7 @@
     "dist": "yarn clean && yarn build",
     "test": "yarn build && yarn test:node",
     "test:node": "exit 0",
-    "test:project": "yarn dist && yarn test",
-    "prepare": "yarn dist"
+    "test:project": "yarn dist && yarn test"
   },
   "version": "14.2.7",
   "gitHead": "5339f01fe01ef0871da8c8bc8662fbe9e604754a"
