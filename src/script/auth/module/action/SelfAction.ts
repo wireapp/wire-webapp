@@ -35,9 +35,6 @@ export class SelfAction {
       try {
         const selfUser = await apiClient.api.self.getSelf();
         await dispatch(selfAction.doCheckPasswordState());
-        const {teams} = await apiClient.api.teams.team.getTeams();
-        const [boundTeam] = teams.filter(team => team.binding);
-        selfUser.team = boundTeam?.id;
         dispatch(SelfActionCreator.successfulFetchSelf(selfUser));
         return selfUser;
       } catch (error) {
