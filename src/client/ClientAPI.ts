@@ -35,6 +35,12 @@ type ClaimedKeyPackages = {
   }[];
 };
 
+type PublicKeys = {
+  removal: {
+    [algorithm: string]: string;
+  };
+};
+
 export class ClientAPI {
   constructor(private readonly client: HttpClient) {}
 
@@ -44,6 +50,7 @@ export class ClientAPI {
     MLS_KEY_PACKAGES: 'key-packages',
     CAPABILITIES: 'capabilities',
     PREKEYS: 'prekeys',
+    PUBLIC_KEYS: 'public-keys',
   };
 
   public async postClient(newClient: CreateClientPayload): Promise<RegisteredClient> {
@@ -180,5 +187,20 @@ export class ClientAPI {
 
     const response = await this.client.sendJSON<{count: number}>(config, true);
     return response.data.count;
+  }
+
+  /**
+   * Get the public keys from the backend, used for removing users from groups.
+   * In the future this may be used for other purposes as well.
+   * @see https://staging-nginz-https.zinfra.io/api/swagger-ui/#/default/get_mls_public_keys
+   */
+  public async getPublicKeys(): Promise<PublicKeys> {
+    const config: AxiosRequestConfig = {
+      method: 'GET',
+      url: `/${ClientAPI.URL.MLS_CLIENTS}/${ClientAPI.URL.PUBLIC_KEYS}`,
+    };
+
+    const response = await this.client.sendJSON<PublicKeys>(config, true);
+    return response.data;
   }
 }
