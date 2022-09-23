@@ -264,6 +264,8 @@
   "connectionRequestConnect": "Connect",
   "connectionRequestIgnore": "Ignore",
   "conversationAssetDownloading": "Downloading…",
+  "conversationAssetFailedDecryptDownloading": "DOWNLOAD FAILED (CANNOT DECRYPT)",
+  "conversationAssetFailedHashDownloading": "DOWNLOAD FAILED (HASH DOES NOT MATCH)",
   "conversationAssetRestrictedAudioMessageHeadline": "Audio message",
   "conversationAssetUploadFailed": "Upload Failed",
   "conversationAssetUploading": "Uploading…",
