@@ -82,7 +82,8 @@ import useScrollSync from '../../hooks/useScrollSync';
 import useResizeTarget from '../../hooks/useResizeTarget';
 import useDropFiles from '../../hooks/useDropFiles';
 import useTextAreaFocus from '../../hooks/useTextAreaFocus';
-import {StyledApp, THEME_ID} from '@wireapp/react-ui-kit';
+import {StyledApp, THEME_ID, useMatchMedia} from '@wireapp/react-ui-kit';
+import ControlButtons from '../../page/message-list/InputBarControls/ControlButtons';
 
 const CONFIG = {
   ...Config.getConfig(),
@@ -192,6 +193,8 @@ const InputBar = ({
   const hasLocalEphemeralTimer = isSelfDeletingMessagesEnabled && localMessageTimer && !hasGlobalMessageTimer;
 
   const richTextInput = getRichTextInput(currentMentions, inputValue);
+
+  const isScaledDown = useMatchMedia('max-width: 720px');
 
   const updateSelectionState = (updateOnInit = true) => {
     if (!updateOnInit) {
@@ -808,6 +811,22 @@ const InputBar = ({
   return (
     <StyledApp themeId={THEME_ID.DEFAULT}>
       <div id="conversation-input-bar" className="conversation-input-bar">
+        {isScaledDown && (
+          <div className="controls-right buttons-group">
+            <ControlButtons
+              conversation={conversationEntity}
+              input={inputValue}
+              isEditing={isEditing}
+              disablePing={pingDisabled}
+              disableFilesharing={!isFileSharingSendingEnabled}
+              onSelectFiles={uploadFiles}
+              onSelectImages={uploadImages}
+              onCancelEditing={cancelMessageEditing}
+              onClickGif={onGifClick}
+              onClickPing={onPingClick}
+            />
+          </div>
+        )}
         {classifiedDomains && !isConnectionRequest && (
           <ClassifiedBar users={participatingUserEts} classifiedDomains={classifiedDomains} />
         )}
