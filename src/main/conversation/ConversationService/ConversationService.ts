@@ -17,7 +17,7 @@
  *
  */
 
-import {ExternalProposalType} from '@wireapp/core-crypto';
+import {ConversationConfiguration, ExternalProposalType} from '@wireapp/core-crypto';
 import {APIClient} from '@wireapp/api-client';
 import {
   MessageSendingStatus,
@@ -684,7 +684,15 @@ export class ConversationService {
       throw new Error('You need to pass self user qualified id in order to create an MLS conversation');
     }
 
-    await this.mlsService.createConversation(groupIdDecodedFromBase64);
+    const mlsKeys = (await this.apiClient.api.client.getPublicKeys()).removal;
+    const mlsKeyBytes = Object.values(mlsKeys).map((key: string) => Decoder.fromBase64(key).asBytes);
+    const config: ConversationConfiguration = {
+      externalSenders: mlsKeyBytes,
+      ciphersuite: 1, // TODO: Use the correct ciphersuite enum.
+    };
+
+    await this.mlsService.createConversation(groupIdDecodedFromBase64, config);
+
     const coreCryptoKeyPackagesPayload = await this.mlsService.getKeyPackagesPayload([
       {
         id: selfUserId.id,
@@ -698,10 +706,13 @@ export class ConversationService {
       ...qualifiedUsers,
     ]);
 
-    const response = await this.mlsService.addUsersToExistingConversation(
-      groupIdDecodedFromBase64,
-      coreCryptoKeyPackagesPayload,
-    );
+    let response;
+    if (coreCryptoKeyPackagesPayload.length !== 0) {
+      response = await this.mlsService.addUsersToExistingConversation(
+        groupIdDecodedFromBase64,
+        coreCryptoKeyPackagesPayload,
+      );
+    }
 
     //We store the info when conversation (along with key material) was created, so we will know when to renew it
     const groupCreationTimeStamp = new Date().getTime();
