@@ -23,7 +23,7 @@ import UnsupportedBrowser from './UnsupportedBrowser';
 import {TypeUtil} from '@wireapp/commons';
 import {Config, Configuration} from '../../Config';
 import {Runtime} from '@wireapp/commons';
-import {mountComponentReact16} from '../util/test/TestUtil';
+import {mountComponentReact18} from '../util/test/TestUtil';
 
 jest.mock('../util/SVGProvider');
 
@@ -50,7 +50,7 @@ describe('UnsupportedBrowser', () => {
         isSupportedBrowser: false,
       },
     });
-    const {getByTestId} = mountComponentReact16(<UnsupportedBrowser />, store);
+    const {getByTestId} = mountComponentReact18(<UnsupportedBrowser />, store);
 
     expect(getByTestId(desktopMessageId)).not.toBe(null);
   });
@@ -76,7 +76,7 @@ describe('UnsupportedBrowser', () => {
       },
     });
     const props = {children: 'content'};
-    const {queryByTestId, getByText} = mountComponentReact16(<UnsupportedBrowser {...props} />, store);
+    const {queryByTestId, getByText} = mountComponentReact18(<UnsupportedBrowser {...props} />, store);
 
     expect(queryByTestId(desktopMessageId)).toBe(null);
     expect(getByText(expectedContent)).not.toBe(null);
@@ -99,7 +99,7 @@ describe('UnsupportedBrowser', () => {
         isSupportedBrowser: false,
       },
     });
-    const {getByTestId} = mountComponentReact16(<UnsupportedBrowser />, store);
+    const {getByTestId} = mountComponentReact18(<UnsupportedBrowser />, store);
 
     expect(getByTestId(generalMessageId)).not.toBe(null);
   });

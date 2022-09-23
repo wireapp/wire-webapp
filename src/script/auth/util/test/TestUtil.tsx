@@ -44,17 +44,23 @@ export const withRouter = (component: React.ReactNode, history: History) => (
   <Router history={history}>{component}</Router>
 );
 
+const wrapComponent = (
+  component: React.ReactNode,
+  store: MockStoreEnhanced<RecursivePartial<RootState>, ThunkDispatch<RootState, Api, AnyAction>>,
+  history: History = createMemoryHistory(),
+) => withRouter(withTheme(withStore(withIntl(component), store)), history);
+
 /**
- * @deprecated use mountComponentReact16 instead
+ * @deprecated use mountComponentReact16 instead to avoid "Warning: ReactDOM.render is no longer supported in React 18."
  */
 export const mountComponent = (
   component: React.ReactNode,
   store: MockStoreEnhanced<RecursivePartial<RootState>, ThunkDispatch<RootState, Api, AnyAction>>,
   history: History = createMemoryHistory(),
-) => mount(withRouter(withTheme(withStore(withIntl(component), store)), history));
+) => mount(wrapComponent(component, store, history));
 
-export const mountComponentReact16 = (
+export const mountComponentReact18 = (
   component: React.ReactNode,
   store: MockStoreEnhanced<RecursivePartial<RootState>, ThunkDispatch<RootState, Api, AnyAction>>,
   history: History = createMemoryHistory(),
-) => render(withRouter(withTheme(withStore(withIntl(component), store)), history));
+) => render(wrapComponent(component, store, history));
