@@ -5,6 +5,7 @@
     "@babel/preset-typescript": "7.18.6",
     "@types/babel__preset-env": "^7",
     "@types/jest": "29.0.3",
+    "@wireapp/commons": "workspace:^",
     "jest": "29.0.3",
     "jest-environment-jsdom": "29.0.3",
     "rimraf": "3.0.2",
