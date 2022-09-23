@@ -51,7 +51,7 @@ const wrapComponent = (
 ) => withRouter(withTheme(withStore(withIntl(component), store)), history);
 
 /**
- * @deprecated use mountComponentReact16 instead to avoid "Warning: ReactDOM.render is no longer supported in React 18."
+ * @deprecated use mountComponentReact18 instead to avoid "Warning: ReactDOM.render is no longer supported in React 18."
  */
 export const mountComponent = (
   component: React.ReactNode,
