@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.3.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/promise-queue@1.2.6...@wireapp/promise-queue@1.3.0) (2022-09-23)
+
+### Features
+
+* preshared key (FS-564) ([#4385](https://github.com/wireapp/wire-web-packages/issues/4385)) ([235affb](https://github.com/wireapp/wire-web-packages/commit/235affb57b7ddba6a74e56911ff145ff36c23957))
+
 ## [1.2.6](https://github.com/wireapp/wire-web-packages/compare/@wireapp/promise-queue@1.2.5...@wireapp/promise-queue@1.2.6) (2022-09-22)
 
 **Note:** Version bump only for package @wireapp/promise-queue
