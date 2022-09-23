@@ -115,8 +115,7 @@ import {AccessTokenError, ACCESS_TOKEN_ERROR_TYPE} from '../error/AccessTokenErr
 import {ClientError, CLIENT_ERROR_TYPE} from '../error/ClientError';
 import {AuthError} from '../error/AuthError';
 import {AssetRepository} from '../assets/AssetRepository';
-import type {BaseError} from '../error/BaseError';
-import type {User} from '../entity/User';
+import {BaseError} from '../error/BaseError';
 import {MessageRepository} from '../conversation/MessageRepository';
 import {TeamError} from '../error/TeamError';
 import Warnings from '../view_model/WarningsContainer';
@@ -346,7 +345,9 @@ class App {
         amplify.publish(WebAppEvents.CONNECTION.ACCESS_TOKEN.RENEWED);
         this.logger.info(`Refreshed access token.`);
       } catch (error) {
-        this.logger.warn(`Logging out user because access token cannot be refreshed: ${error.message}`, error);
+        if (error instanceof BaseError) {
+          this.logger.warn(`Logging out user because access token cannot be refreshed: ${error.message}`, error);
+        }
         this.logout(SIGN_OUT_REASON.NOT_SIGNED_IN, false);
       }
     });
@@ -404,10 +405,11 @@ class App {
       const selfUser = await this.initiateSelfUser();
       if (this.apiClient.backendFeatures.isFederated) {
         // Migrate all existing session to fully qualified ids (if need be)
-        await migrateToQualifiedSessionIds(
-          this.repository.storage.storageService.db.sessions,
-          this.apiClient.context!.domain,
-        );
+        const sessions = this.repository.storage.storageService.db?.sessions;
+        const domain = this.apiClient.context?.domain;
+        if (sessions && domain) {
+          await migrateToQualifiedSessionIds(sessions, domain);
+        }
       }
       loadingView.updateProgress(5, t('initReceivedSelfUser', selfUser.name()));
       telemetry.timeStep(AppInitTimingsStep.RECEIVED_SELF_USER);
@@ -508,7 +510,9 @@ class App {
       callingRepository.setReady();
       this.logger.info('App fully loaded');
     } catch (error) {
-      this._appInitFailure(error, isReload);
+      if (error instanceof BaseError) {
+        this._appInitFailure(error, isReload);
+      }
     }
   }
 
@@ -526,7 +530,7 @@ class App {
   private _appInitFailure(error: BaseError, isReload: boolean) {
     let logMessage = `Could not initialize app version '${Environment.version(false)}'`;
     if (Runtime.isDesktopApp()) {
-      logMessage += ` - Electron '${platform.os.family}' '${Environment.version()}'`;
+      logMessage += ` - Electron '${platform.os?.family}' '${Environment.version()}'`;
     }
     this.logger.warn(`${logMessage}: ${error.message}`, {error});
 
@@ -597,21 +601,6 @@ class App {
   }
 
   /**
-   * Check whether we need to set different user information (picture, username).
-   * @param userEntity Self user entity
-   * @returns Checked user entity
-   */
-  private _checkUserInformation(userEntity: User) {
-    if (userEntity.hasActivatedIdentity()) {
-      if (!userEntity.mediumPictureResource()) {
-        this.repository.user.setDefaultPicture();
-      }
-    }
-
-    return userEntity;
-  }
-
-  /**
    * Initiate the self user by getting it from the backend.
    * @returns Resolves with the self user entity
    */
@@ -631,7 +620,6 @@ class App {
     await container.resolve(StorageService).init(this.core.storage);
     this.repository.client.init(userEntity);
     await this.repository.properties.init(userEntity);
-    this._checkUserInformation(userEntity);
 
     return userEntity;
   }
@@ -801,7 +789,7 @@ class App {
       try {
         keepPermanentDatabase = this.repository.client.isCurrentClientPermanent() && !clearData;
       } catch (error) {
-        if (error.type === ClientError.TYPE.CLIENT_NOT_SET) {
+        if (error instanceof BaseError && error.type === ClientError.TYPE.CLIENT_NOT_SET) {
           keepPermanentDatabase = false;
         }
       }
@@ -858,8 +846,10 @@ class App {
       try {
         return _logout();
       } catch (error) {
-        this.logger.error(`Logout triggered by '${signOutReason}' and errored: ${error.message}.`);
-        _redirectToLogin();
+        if (error instanceof BaseError) {
+          this.logger.error(`Logout triggered by '${signOutReason}' and errored: ${error.message}.`);
+          _redirectToLogin();
+        }
       }
     }
 
@@ -902,7 +892,10 @@ class App {
     const isTemporaryGuestReason = App.CONFIG.SIGN_OUT_REASONS.TEMPORARY_GUEST.includes(signOutReason);
     const isLeavingGuestRoom = isTemporaryGuestReason && this.repository.user['userState'].isTemporaryGuest();
     if (isLeavingGuestRoom) {
-      return window.location.replace(getWebsiteUrl());
+      const websiteUrl = getWebsiteUrl();
+      if (websiteUrl) {
+        return window.location.replace(websiteUrl);
+      }
     }
 
     doRedirect(signOutReason);

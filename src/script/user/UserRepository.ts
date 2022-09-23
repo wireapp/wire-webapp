@@ -44,7 +44,6 @@ import type {User as APIClientUser, QualifiedHandle} from '@wireapp/api-client/s
 import {chunk, partition} from 'Util/ArrayUtil';
 import {t} from 'Util/LocalizerUtil';
 import {Logger, getLogger} from 'Util/Logger';
-import {loadUrlBlob} from 'Util/util';
 import {isAxiosError, isBackendError, isQualifiedId} from 'Util/TypePredicateUtil';
 
 import {AssetRepository} from '../assets/AssetRepository';
@@ -59,7 +58,6 @@ import {mapProfileAssetsV1} from '../assets/AssetMapper';
 import {valueFromType} from './AvailabilityMapper';
 import {showAvailabilityModal} from './AvailabilityModal';
 import {SIGN_OUT_REASON} from '../auth/SignOutReason';
-import {UNSPLASH_URL} from '../externalRoute';
 import {User} from '../entity/User';
 import {UserError} from '../error/UserError';
 import {UserMapper} from './UserMapper';
@@ -784,14 +782,6 @@ export class UserRepository {
     } catch (error) {
       throw new Error(`Error during profile image upload: ${error.message || error.code || error}`);
     }
-  }
-
-  /**
-   * Set the user's default profile image.
-   */
-  async setDefaultPicture(): Promise<User> {
-    const blob = await loadUrlBlob(UNSPLASH_URL);
-    return this.changePicture(blob);
   }
 
   mapGuestStatus(userEntities = this.userState.users()): void {

@@ -54,7 +54,6 @@ const defaultCSP = {
     'https://wire.com',
     'https://www.google.com',
     'https://*.giphy.com',
-    'https://*.unsplash.com',
     'https://apis.google.com',
   ],
   defaultSrc: ["'self'"],
