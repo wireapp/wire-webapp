@@ -67,6 +67,8 @@ const FileAssetComponent: React.FC<FileAssetProps> = ({
   const isFailedUpload = assetStatus === AssetTransferState.UPLOAD_FAILED;
   const isUploaded = assetStatus === AssetTransferState.UPLOADED;
   const isDownloading = assetStatus === AssetTransferState.DOWNLOADING;
+  const isFailedDownloadingDecrypt = assetStatus === AssetTransferState.DOWNLOAD_FAILED_DECRPYT;
+  const isFailedDownloadingHash = assetStatus === AssetTransferState.DOWNLOAD_FAILED_HASH;
   const isUploading = assetStatus === AssetTransferState.UPLOADING;
 
   if (isObfuscated) {
@@ -113,7 +115,9 @@ const FileAssetComponent: React.FC<FileAssetProps> = ({
 
               {isUploading && <AssetLoader loadProgress={uploadProgress || 0} onCancel={() => cancelUpload()} />}
 
-              {isFailedUpload && <div className="media-button media-button-error" />}
+              {(isFailedUpload || isFailedDownloadingDecrypt || isFailedDownloadingHash) && (
+                <div className="media-button media-button-error" />
+              )}
 
               <div className="file__desc">
                 <div className="label-bold-xs ellipsis" data-uie-name="file-name">
@@ -127,6 +131,12 @@ const FileAssetComponent: React.FC<FileAssetProps> = ({
                   {isUploading && <li data-uie-name="file-status">{t('conversationAssetUploading')}</li>}
                   {isFailedUpload && <li data-uie-name="file-status">{t('conversationAssetUploadFailed')}</li>}
                   {isDownloading && <li data-uie-name="file-status">{t('conversationAssetDownloading')}</li>}
+                  {isFailedDownloadingDecrypt && (
+                    <li data-uie-name="file-status">{t('conversationAssetFailedDecryptDownloading')}</li>
+                  )}
+                  {isFailedDownloadingHash && (
+                    <li data-uie-name="file-status">{t('conversationAssetFailedHashDownloading')}</li>
+                  )}
                 </ul>
               </div>
             </>

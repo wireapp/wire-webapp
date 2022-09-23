@@ -104,6 +104,7 @@ export class AssetRepository {
       const isServerError = errorMessage.endsWith(HTTP_STATUS.INTERNAL_SERVER_ERROR.toString());
 
       const isExpectedError = isAssetNotFound || isServerError;
+
       if (!isExpectedError) {
         throw error;
       }
@@ -166,7 +167,12 @@ export class AssetRepository {
       asset.status(AssetTransferState.UPLOADED);
       return downloadBlob(blob, asset.file_name);
     } catch (error) {
-      asset.status(AssetTransferState.UPLOADED);
+      const errorMessage = (error as Error)?.message || '';
+      if (errorMessage.endsWith('Encrypted asset does not match its SHA-256 hash')) {
+        asset.status(AssetTransferState.DOWNLOAD_FAILED_HASH);
+      } else {
+        asset.status(AssetTransferState.DOWNLOAD_FAILED_DECRPYT);
+      }
       return this.logger.error('Failed to download FileAsset blob', error);
     }
   }
