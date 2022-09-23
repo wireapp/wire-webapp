@@ -17,7 +17,7 @@
  *
  */
 
-import React, {ForwardRefRenderFunction, useEffect, useRef} from 'react';
+import React, {useEffect, useRef} from 'react';
 import Icon from 'Components/Icon';
 import {CheckIcon, COLOR} from '@wireapp/react-ui-kit';
 import {cancelButtonCSS, containerCSS, errorMessageCSS, getIconCSS, getInputCSS, getLabelCSS} from './TextInput.styles';
@@ -47,7 +47,7 @@ export interface UserInputProps {
 
 const SUCCESS_DISMISS_TIMEOUT = 2500;
 
-const TextInput: ForwardRefRenderFunction<HTMLInputElement, UserInputProps> = ({
+const TextInput: React.FC<UserInputProps> = ({
   autoFocus,
   disabled,
   errorMessage,
@@ -141,6 +141,4 @@ const TextInput: ForwardRefRenderFunction<HTMLInputElement, UserInputProps> = ({
   );
 };
 
-const TextInputForwarded = React.forwardRef(TextInput);
-
-export default TextInputForwarded;
+export default TextInput;

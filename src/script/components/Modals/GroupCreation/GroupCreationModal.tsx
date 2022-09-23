@@ -38,7 +38,7 @@ import {registerReactComponent, useKoSubscribableChildren} from 'Util/ComponentU
 import ModalComponent from 'Components/ModalComponent';
 import SearchInput from 'Components/SearchInput';
 import UserSearchableList from 'Components/UserSearchableList';
-import TextInputForwarded from 'Components/TextInput/TextInput';
+import TextInput from 'Components/TextInput/TextInput';
 import BaseToggle from 'Components/toggle/BaseToggle';
 import InfoToggle from 'Components/toggle/InfoToggle';
 import {User} from '../../../entity/User';
@@ -353,7 +353,7 @@ const GroupCreationModal: React.FC<GroupCreationModalProps> = ({
           {stateIsPreferences && (
             <>
               <div className="modal-input-wrapper">
-                <TextInputForwarded
+                <TextInput
                   autoFocus
                   label={t('groupCreationPreferencesPlaceholder')}
                   placeholder={t('groupCreationPreferencesPlaceholder')}
