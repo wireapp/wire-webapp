@@ -3186,10 +3186,10 @@
     bazinga64 "5.10.0"
     buffer "6.0.3"
 
-"@wireapp/eslint-config@1.12.4":
-  version "1.12.4"
-  resolved "https://registry.yarnpkg.com/@wireapp/eslint-config/-/eslint-config-1.12.4.tgz#7554c59da799d86f5dc3bd9e824987ec1b439214"
-  integrity sha512-hZfkER9rsNnjYGrkkDgrLC61k7ufjEtJBh5/CuhFLuzp59W3whEJ3l0v5nzt145F1EuW9ApWJmqIKbL4ANyCeQ==
+"@wireapp/eslint-config@1.12.11":
+  version "1.12.11"
+  resolved "https://registry.yarnpkg.com/@wireapp/eslint-config/-/eslint-config-1.12.11.tgz#3680bd69def007c43d8ef619c48cda1dcf45b2db"
+  integrity sha512-seGCNwwOBJZqIeiEgrXQu4o3hVedMfyzbF3dFF+zCQleBq7Uffv2dU5lA7/KBPqt9LkKcqpIAn4ubcFWTKCFQQ==
 
 "@wireapp/lru-cache@3.8.1":
   version "3.8.1"
