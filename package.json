@@ -97,7 +97,7 @@
     "@types/webpack-env": "1.18.0",
     "@typescript-eslint/eslint-plugin": "5.37.0",
     "@typescript-eslint/parser": "5.38.0",
-    "@wireapp/copy-config": "1.2.9",
+    "@wireapp/copy-config": "1.3.6",
     "@wireapp/eslint-config": "1.12.4",
     "@wireapp/prettier-config": "0.4.0",
     "@wojtekmaj/enzyme-adapter-react-17": "0.6.7",
