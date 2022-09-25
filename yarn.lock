@@ -3248,14 +3248,7 @@
     react-select "5.4.0"
     react-transition-group "4.4.2"
 
-"@wireapp/store-engine-dexie@1.6.10":
-  version "1.6.10"
-  resolved "https://registry.yarnpkg.com/@wireapp/store-engine-dexie/-/store-engine-dexie-1.6.10.tgz#43c4afbcfcee8514ca5eea098bde9c691a235fd5"
-  integrity sha512-e1t9wJ82xW4JcwyOOQfOy+DaCiObwH8Xj/QFrioUZKTxrYf412852zyxYBmU/RdvEZGCzg5CsAKdf4Up+XkG4A==
-  dependencies:
-    dexie "3.2.2"
-
-"@wireapp/store-engine-dexie@^1.7.6":
+"@wireapp/store-engine-dexie@1.7.6", "@wireapp/store-engine-dexie@^1.7.6":
   version "1.7.6"
   resolved "https://registry.yarnpkg.com/@wireapp/store-engine-dexie/-/store-engine-dexie-1.7.6.tgz#cfd4ecb694ed057a9f2e4959a14b2e75028d7bf7"
   integrity sha512-D1Se/nJeIKECqdz7m7QWJ+orSpKjzTV3Y3J5DagBfw2Ju+AxOBkWOotSYtct6uyoJTdTFPicAT5qh0ebJ7Jfow==
