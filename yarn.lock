@@ -3313,10 +3313,10 @@
   dependencies:
     "@types/node" "~14"
 
-"@wireapp/webapp-events@0.13.2":
-  version "0.13.2"
-  resolved "https://registry.yarnpkg.com/@wireapp/webapp-events/-/webapp-events-0.13.2.tgz#4274c1b30fd933e4b1ed981b8e1797e245c0b87c"
-  integrity sha512-TLOu6ZKid63dSLUFzO8/CKdC2xajmyR6q3ZJ5oQ9eVuV/4TZ/JtK6s+Kmor3vVmKafIGiIXR00uK5bR80npghQ==
+"@wireapp/webapp-events@0.14.6":
+  version "0.14.6"
+  resolved "https://registry.yarnpkg.com/@wireapp/webapp-events/-/webapp-events-0.14.6.tgz#54dd76ce41118b825501666e2adab3d25ed2fbb6"
+  integrity sha512-Xi+33aM7srwux8zCmJmbdkIruiOnvAZe/Wv7JxkuER0JOaUmS4bNVq38x4xMWOFxRHjzJPLNH8lhBFpfy8QOCQ==
 
 "@wireapp/websql@0.0.17":
   version "0.0.17"
@@ -4023,11 +4023,6 @@ bazinga64@5.10.0:
   version "5.10.0"
   resolved "https://registry.yarnpkg.com/bazinga64/-/bazinga64-5.10.0.tgz#ceba5dd21bf8723e23916e39daa0721a711766af"
   integrity sha512-ymVNSWxRmZJ05PAy5+PBA2VcTPVMwoBFjyWkxjZ+rK4ZlV+ziPeF+NR08dDXj0C8XI2tMBG1Dnd5BlU4g8tFGQ==
-
-bazinga64@5.11.6:
-  version "5.11.6"
-  resolved "https://registry.yarnpkg.com/bazinga64/-/bazinga64-5.11.6.tgz#94cc2057132f656f81ee962ef472f8602d7b276b"
-  integrity sha512-zirkITs82R3JKbtU6/dFVsiCxzSIGy5wukr2t+0O8Q/LqcCC6vu8R5IlNIvrfFJ4bN0bLP2GonrEZ1JJ6mKEoA==
 
 bazinga64@5.11.6:
   version "5.11.6"
