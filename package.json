@@ -5,7 +5,7 @@
     "@wireapp/avs": "8.2.8",
     "@wireapp/core": "31.3.0",
     "@wireapp/react-ui-kit": "8.13.8",
-    "@wireapp/store-engine-dexie": "1.6.10",
+    "@wireapp/store-engine-dexie": "1.7.6",
     "@wireapp/store-engine-sqleet": "1.8.6",
     "@wireapp/webapp-events": "0.14.6",
     "amplify": "git+https://git@github.com/wireapp/amplify",
