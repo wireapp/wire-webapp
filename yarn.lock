@@ -3170,15 +3170,15 @@
     logdown "3.3.1"
     platform "1.3.6"
 
-"@wireapp/copy-config@1.2.9":
-  version "1.2.9"
-  resolved "https://registry.yarnpkg.com/@wireapp/copy-config/-/copy-config-1.2.9.tgz#253dac301cd16f744a5684bbd91a8f091a336b0e"
-  integrity sha512-F8gYIT9pUJlx/Pi2/iaDyE52XiPbTU2vqxqne7k9ITAZwrngYEvtwTu4Z/Q2Og7Jy1xBOFK/u4IUzYtNtNb9YA==
+"@wireapp/copy-config@1.3.6":
+  version "1.3.6"
+  resolved "https://registry.yarnpkg.com/@wireapp/copy-config/-/copy-config-1.3.6.tgz#8a69e17adb3850e12bd179ac9b116865c13db6e8"
+  integrity sha512-ZKO/R4vWI8CsimCWS4PA0PRgkMs1r7MQ+PKMPWX6OgfWnggEewV+yYUGizKqTLzsTavgcOMfsvJMuHYNLxDBvg==
   dependencies:
     axios "0.21.4"
     copy "0.3.2"
     cosmiconfig "7.0.0"
-    fs-extra "10.0.0"
+    fs-extra "10.1.0"
     jszip "3.7.0"
     logdown "3.3.1"
     rimraf "3.0.2"
@@ -4023,11 +4023,6 @@ bazinga64@5.10.0:
   version "5.10.0"
   resolved "https://registry.yarnpkg.com/bazinga64/-/bazinga64-5.10.0.tgz#ceba5dd21bf8723e23916e39daa0721a711766af"
   integrity sha512-ymVNSWxRmZJ05PAy5+PBA2VcTPVMwoBFjyWkxjZ+rK4ZlV+ziPeF+NR08dDXj0C8XI2tMBG1Dnd5BlU4g8tFGQ==
-
-bazinga64@5.11.6:
-  version "5.11.6"
-  resolved "https://registry.yarnpkg.com/bazinga64/-/bazinga64-5.11.6.tgz#94cc2057132f656f81ee962ef472f8602d7b276b"
-  integrity sha512-zirkITs82R3JKbtU6/dFVsiCxzSIGy5wukr2t+0O8Q/LqcCC6vu8R5IlNIvrfFJ4bN0bLP2GonrEZ1JJ6mKEoA==
 
 bazinga64@5.11.6:
   version "5.11.6"
@@ -6497,7 +6492,7 @@ fs-exists-sync@^0.1.0:
   resolved "https://registry.yarnpkg.com/fs-exists-sync/-/fs-exists-sync-0.1.0.tgz#982d6893af918e72d08dec9e8673ff2b5a8d6add"
   integrity sha1-mC1ok6+RjnLQjeyehnP/K1qNat0=
 
-fs-extra@10, fs-extra@^10.1.0:
+fs-extra@10, fs-extra@10.1.0, fs-extra@^10.1.0:
   version "10.1.0"
   resolved "https://registry.yarnpkg.com/fs-extra/-/fs-extra-10.1.0.tgz#02873cfbc4084dde127eaa5f9905eef2325d1abf"
   integrity sha512-oRXApq54ETRj4eMiFzGnHWGy+zo5raudjuxN0b8H7s/RU2oW0Wvsx9O0ACRN/kRq9E8Vu/ReskGB5o3ji+FzHQ==
