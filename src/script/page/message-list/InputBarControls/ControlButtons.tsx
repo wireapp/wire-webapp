@@ -23,7 +23,7 @@ import MessageTimerButton from '../MessageTimerButton';
 import {t} from 'Util/LocalizerUtil';
 import {Conversation} from 'src/script/entity/Conversation';
 import {Config} from '../../../Config';
-import {IconButton} from '@wireapp/react-ui-kit';
+import GiphyButton from './GiphyButton';
 
 export type ControlButtonsProps = {
   input: string;
@@ -154,24 +154,7 @@ const ControlButtons: React.FC<ControlButtonsProps> = ({
 
   const showGiphyButton = input.length <= config.GIPHY_TEXT_LENGTH;
 
-  return (
-    <>
-      {showGiphyButton && !disableFilesharing && (
-        <li>
-          <IconButton
-            type="button"
-            css={{marginBottom: '0'}}
-            title={t('extensionsBubbleButtonGif')}
-            aria-label={t('extensionsBubbleButtonGif')}
-            onClick={onClickGif}
-            data-uie-name="do-giphy-popover"
-          >
-            <Icon.Gif />
-          </IconButton>
-        </li>
-      )}
-    </>
-  );
+  return <>{showGiphyButton && !disableFilesharing && <GiphyButton onClickGif={onClickGif} />}</>;
 };
 
 export default ControlButtons;
