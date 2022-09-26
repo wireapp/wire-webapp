@@ -263,7 +263,7 @@ export class TeamRepository {
   async sendAccountInfo(isDesktop = Runtime.isDesktopApp()): Promise<AccountInfo | void> {
     if (isDesktop) {
       const imageResource = this.teamState.isTeam()
-        ? this.teamState.team().getIconResource()
+        ? this.teamState.team().getIconResource(this.teamState.teamDomain())
         : this.userState.self().previewPictureResource();
       let imageDataUrl;
 
