@@ -79,13 +79,15 @@ const ControlButtons: React.FC<ControlButtonsProps> = ({
   }
 
   if (input.length === 0 || isScaledDown) {
+    const scaledDownClass = isScaledDown && 'controls-right-button_responsive';
+
     return (
       <>
         {!disableFilesharing && (
           <>
             <li>
               <button
-                className="controls-right-button buttons-group-button-left"
+                className={`controls-right-button buttons-group-button-left ${scaledDownClass}`}
                 type="button"
                 onClick={onClickPing}
                 disabled={disablePing}
@@ -102,7 +104,7 @@ const ControlButtons: React.FC<ControlButtonsProps> = ({
                 type="button"
                 aria-label={t('tooltipConversationAddImage')}
                 title={t('tooltipConversationAddImage')}
-                className="conversation-button controls-right-button no-radius file-button"
+                className={`conversation-button controls-right-button no-radius file-button`}
                 onClick={() => imageRef.current?.click()}
                 data-uie-name="do-share-image"
               >
@@ -124,7 +126,7 @@ const ControlButtons: React.FC<ControlButtonsProps> = ({
                 type="button"
                 aria-label={t('tooltipConversationFile')}
                 title={t('tooltipConversationFile')}
-                className="conversation-button controls-right-button no-radius file-button"
+                className={`conversation-button controls-right-button no-radius file-button`}
                 onClick={() => fileRef.current?.click()}
                 data-uie-name="do-share-file"
               >

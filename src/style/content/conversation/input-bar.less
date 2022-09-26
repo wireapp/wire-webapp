@@ -135,6 +135,11 @@
 .controls-right-button {
   .button-icon-primary;
 
+  @media (max-width: @screen-md-min) {
+    width: 75px;
+    margin-bottom: 5px;
+  }
+
   body.theme-dark &:focus-visible,
   &:focus-visible {
     border: 1px solid var(--accent-color-focus);

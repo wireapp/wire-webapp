@@ -195,7 +195,7 @@ const InputBar = ({
 
   const richTextInput = getRichTextInput(currentMentions, inputValue);
 
-  const isScaledDown = useMatchMedia('max-width: 720px');
+  const isScaledDown = useMatchMedia('max-width: 768px');
 
   const config = {
     GIPHY_TEXT_LENGTH: 256,
@@ -873,7 +873,7 @@ const InputBar = ({
                   />
                   {isScaledDown ? (
                     <>
-                      <ul className="controls-right buttons-group" css={{minWidth: 0}}>
+                      <ul className="controls-right buttons-group" css={{minWidth: '95px'}}>
                         {showGiphyButton && <GiphyButton onClickGif={onGifClick} />}
                         <li>
                           <button
