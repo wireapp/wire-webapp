@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [8.14.7](https://github.com/wireapp/wire-web-packages/compare/@wireapp/react-ui-kit@8.14.6...@wireapp/react-ui-kit@8.14.7) (2022-09-26)
+
+### Bug Fixes
+
+* **ui-kit:** Proper use of forwardRef ([#4412](https://github.com/wireapp/wire-web-packages/issues/4412)) ([8487e62](https://github.com/wireapp/wire-web-packages/commit/8487e62959f9b98b1c0afec87c2f96e075386841))
+
 ## [8.14.6](https://github.com/wireapp/wire-web-packages/compare/@wireapp/react-ui-kit@8.14.5...@wireapp/react-ui-kit@8.14.6) (2022-09-22)
 
 **Note:** Version bump only for package @wireapp/react-ui-kit
