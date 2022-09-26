@@ -50,7 +50,7 @@ export class TeamEntity {
     } catch (error) {}
 
     if (hasIcon) {
-      return teamDomain ? AssetRemoteData.v4(this.icon, teamDomain) : AssetRemoteData.v3(this.icon);
+      return AssetRemoteData.v3(this.icon, teamDomain);
     }
   }
 }

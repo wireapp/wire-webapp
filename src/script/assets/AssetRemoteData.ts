@@ -23,7 +23,7 @@ export type AssetUrlData = AssetUrlDataVersion1 | AssetUrlDataVersion2 | AssetUr
 
 export interface AssetUrlDataVersion3 {
   assetKey: string;
-  assetToken: string;
+  assetToken?: string;
   forceCaching: boolean;
   version: 3;
 }
@@ -60,46 +60,28 @@ export class AssetRemoteData {
     this.cancelDownload = () => {};
   }
 
-  static v4(
-    assetKey: string,
-    assetDomain: string,
-    otrKey?: Uint8Array,
-    sha256?: Uint8Array,
-    assetToken?: string,
-    forceCaching: boolean = false,
-  ) {
-    return new AssetRemoteData(
-      assetKey,
-      {
-        assetDomain,
-        assetKey,
-        assetToken,
-        forceCaching,
-        version: 4,
-      },
-      otrKey,
-      sha256,
-    );
-  }
-
   static v3(
     assetKey: string,
+    assetDomain?: string,
     otrKey?: Uint8Array,
     sha256?: Uint8Array,
     assetToken?: string,
     forceCaching: boolean = false,
   ) {
-    return new AssetRemoteData(
+    const baseProperties: AssetUrlDataVersion3 = {
       assetKey,
-      {
-        assetKey,
-        assetToken,
-        forceCaching,
-        version: 3,
-      },
-      otrKey,
-      sha256,
-    );
+      assetToken,
+      forceCaching,
+      version: 3,
+    };
+    const urlData = assetDomain
+      ? ({
+          ...baseProperties,
+          assetDomain,
+          version: 4,
+        } as AssetUrlDataVersion4)
+      : baseProperties;
+    return new AssetRemoteData(assetKey, urlData, otrKey, sha256);
   }
 
   static v2(
