@@ -84,6 +84,7 @@ import useTextAreaFocus from '../../hooks/useTextAreaFocus';
 import {StyledApp, THEME_ID, useMatchMedia} from '@wireapp/react-ui-kit';
 import ControlButtons from '../../page/message-list/InputBarControls/ControlButtons';
 import Icon from 'Components/Icon';
+import GiphyButton from '../../page/message-list/InputBarControls/GiphyButton';
 
 const CONFIG = {
   ...Config.getConfig(),
@@ -195,6 +196,12 @@ const InputBar = ({
   const richTextInput = getRichTextInput(currentMentions, inputValue);
 
   const isScaledDown = useMatchMedia('max-width: 720px');
+
+  const config = {
+    GIPHY_TEXT_LENGTH: 256,
+  };
+
+  const showGiphyButton = inputValue.length > 0 && inputValue.length <= config.GIPHY_TEXT_LENGTH;
 
   const updateSelectionState = (updateOnInit = true) => {
     if (!updateOnInit) {
@@ -866,17 +873,22 @@ const InputBar = ({
                   />
                   {isScaledDown ? (
                     <>
-                      <button
-                        type="button"
-                        className={cx('controls-right-button controls-right-button--send')}
-                        disabled={inputValue.length === 0}
-                        title={t('tooltipConversationSendMessage')}
-                        aria-label={t('tooltipConversationSendMessage')}
-                        onClick={() => onSend(inputValue)}
-                        data-uie-name="do-send-message"
-                      >
-                        <Icon.Send />
-                      </button>
+                      <ul className="controls-right buttons-group" css={{minWidth: 0}}>
+                        {showGiphyButton && <GiphyButton onClickGif={onGifClick} />}
+                        <li>
+                          <button
+                            type="button"
+                            className={cx('controls-right-button controls-right-button--send')}
+                            disabled={inputValue.length === 0}
+                            title={t('tooltipConversationSendMessage')}
+                            aria-label={t('tooltipConversationSendMessage')}
+                            onClick={() => onSend(inputValue)}
+                            data-uie-name="do-send-message"
+                          >
+                            <Icon.Send />
+                          </button>
+                        </li>
+                      </ul>
                       <ul className="controls-right buttons-group" css={{justifyContent: 'center', width: '100%'}}>
                         <ControlButtons
                           conversation={conversationEntity}
@@ -901,6 +913,7 @@ const InputBar = ({
                         isEditing={isEditing}
                         disablePing={pingDisabled}
                         disableFilesharing={!isFileSharingSendingEnabled}
+                        showGiphyButton={showGiphyButton}
                         onSelectFiles={uploadFiles}
                         onSelectImages={uploadImages}
                         onCancelEditing={cancelMessageEditing}

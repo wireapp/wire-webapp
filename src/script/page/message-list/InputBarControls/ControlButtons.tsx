@@ -32,15 +32,12 @@ export type ControlButtonsProps = {
   disableFilesharing?: boolean;
   isEditing?: boolean;
   isScaledDown?: boolean;
+  showGiphyButton?: boolean;
   onClickPing: () => void;
   onSelectFiles: (files: File[]) => void;
   onSelectImages: (files: File[]) => void;
   onCancelEditing: () => void;
   onClickGif: () => void;
-};
-
-const config = {
-  GIPHY_TEXT_LENGTH: 256,
 };
 
 const ControlButtons: React.FC<ControlButtonsProps> = ({
@@ -50,6 +47,7 @@ const ControlButtons: React.FC<ControlButtonsProps> = ({
   input,
   isEditing,
   isScaledDown,
+  showGiphyButton,
   onClickPing,
   onSelectFiles,
   onSelectImages,
@@ -151,8 +149,6 @@ const ControlButtons: React.FC<ControlButtonsProps> = ({
       </>
     );
   }
-
-  const showGiphyButton = input.length <= config.GIPHY_TEXT_LENGTH;
 
   return <>{showGiphyButton && !disableFilesharing && <GiphyButton onClickGif={onClickGif} />}</>;
 };
