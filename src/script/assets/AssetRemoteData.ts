@@ -60,6 +60,10 @@ export class AssetRemoteData {
     this.cancelDownload = () => {};
   }
 
+  /**
+   * Will generate a v3 or v4 (depending on the given domain) asset payload.
+   * Assets v3 and v4 only differ by the domain, so it doesn't make sense to split those into 2 different methods
+   */
   static v3(
     assetKey: string,
     assetDomain?: string,
