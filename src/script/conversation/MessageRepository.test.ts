@@ -46,6 +46,7 @@ import {ClientEntity} from '../client/ClientEntity';
 import {TeamState} from '../team/TeamState';
 import {ContentMessage} from '../entity/message/ContentMessage';
 import {PayloadBundleState} from '@wireapp/core/src/main/conversation';
+import {ConversationState} from './ConversationState';
 
 const selfUser = new User('selfid', '');
 selfUser.isMe = true;
@@ -69,6 +70,7 @@ type MessageRepositoryDependencies = {
   serverTimeHandler: ServerTimeHandler;
   userRepository: UserRepository;
   userState: UserState;
+  conversationState: ConversationState;
 };
 
 async function buildMessageRepository(): Promise<[MessageRepository, MessageRepositoryDependencies]> {
@@ -81,6 +83,10 @@ async function buildMessageRepository(): Promise<[MessageRepository, MessageRepo
   messageSender.pauseQueue(false);
   await core.initServices({} as any);
   /* eslint-disable sort-keys-fix/sort-keys-fix */
+  const conversationState = new ConversationState(userState);
+  const selfConversation = new Conversation(selfUser.id);
+  selfConversation.selfUser(selfUser);
+  conversationState.conversations([selfConversation]);
   const dependencies = {
     conversationRepository: () => ({} as ConversationRepository),
     cryptographyRepository: new CryptographyRepository({} as any),
@@ -93,6 +99,7 @@ async function buildMessageRepository(): Promise<[MessageRepository, MessageRepo
     userState,
     teamState: new TeamState(),
     clientState,
+    conversationState,
     core,
   };
   /* eslint-disable sort-keys-fix/sort-keys-fix */
@@ -237,7 +244,6 @@ describe('MessageRepository', () => {
           userIds: {selfid: [], user1: []},
         }),
       );
-      expect(eventRepository.eventService.deleteEvent).toHaveBeenCalledTimes(1);
     });
   });
 
