@@ -38,19 +38,21 @@ export interface RangeInputProps<T = HTMLInputElement> extends TextProps<T> {
 }
 
 export const RangeInput: FC<RangeInputProps> = forwardRef<HTMLInputElement, RangeInputProps<HTMLInputElement>>(
-  ({
+  (
+    {
+      id = Math.random().toString(),
+      label,
+      minValueLabel,
+      maxValueLabel,
+      min = '0',
+      max = '100',
+      value = '0',
+      onChange,
+      wrapperCSS,
+      ...inputProps
+    },
     ref,
-    id = Math.random().toString(),
-    label,
-    minValueLabel,
-    maxValueLabel,
-    min = '0',
-    max = '100',
-    value = '0',
-    onChange,
-    wrapperCSS,
-    ...inputProps
-  }) => {
+  ) => {
     const minNum = Number(min);
     const maxNum = Number(max);
     const valueNum = Number(value);
