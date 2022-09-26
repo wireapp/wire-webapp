@@ -31,6 +31,7 @@ export type ControlButtonsProps = {
   disablePing?: boolean;
   disableFilesharing?: boolean;
   isEditing?: boolean;
+  isScaledDown?: boolean;
   onClickPing: () => void;
   onSelectFiles: (files: File[]) => void;
   onSelectImages: (files: File[]) => void;
@@ -43,11 +44,12 @@ const config = {
 };
 
 const ControlButtons: React.FC<ControlButtonsProps> = ({
-  input,
   conversation,
   disablePing,
   disableFilesharing,
+  input,
   isEditing,
+  isScaledDown,
   onClickPing,
   onSelectFiles,
   onSelectImages,
@@ -78,7 +80,7 @@ const ControlButtons: React.FC<ControlButtonsProps> = ({
     );
   }
 
-  if (input.length === 0) {
+  if (input.length === 0 || isScaledDown) {
     return (
       <>
         {!disableFilesharing && (

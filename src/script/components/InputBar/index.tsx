@@ -58,7 +58,6 @@ import {TeamState} from '../../team/TeamState';
 import {UserState} from '../../user/UserState';
 import {SearchRepository} from '../../search/SearchRepository';
 import {ContentMessage} from '../../entity/message/ContentMessage';
-import InputBarControls from '../../page/message-list/InputBarControls';
 import {Conversation} from '../../entity/Conversation';
 import {AssetRepository} from '../../assets/AssetRepository';
 import {ConversationRepository} from '../../conversation/ConversationRepository';
@@ -84,6 +83,7 @@ import useDropFiles from '../../hooks/useDropFiles';
 import useTextAreaFocus from '../../hooks/useTextAreaFocus';
 import {StyledApp, THEME_ID, useMatchMedia} from '@wireapp/react-ui-kit';
 import ControlButtons from '../../page/message-list/InputBarControls/ControlButtons';
+import Icon from 'Components/Icon';
 
 const CONFIG = {
   ...Config.getConfig(),
@@ -811,22 +811,6 @@ const InputBar = ({
   return (
     <StyledApp themeId={THEME_ID.DEFAULT}>
       <div id="conversation-input-bar" className="conversation-input-bar">
-        {isScaledDown && (
-          <div className="controls-right buttons-group">
-            <ControlButtons
-              conversation={conversationEntity}
-              input={inputValue}
-              isEditing={isEditing}
-              disablePing={pingDisabled}
-              disableFilesharing={!isFileSharingSendingEnabled}
-              onSelectFiles={uploadFiles}
-              onSelectImages={uploadImages}
-              onCancelEditing={cancelMessageEditing}
-              onClickGif={onGifClick}
-              onClickPing={onPingClick}
-            />
-          </div>
-        )}
         {classifiedDomains && !isConnectionRequest && (
           <ClassifiedBar users={participatingUserEts} classifiedDomains={classifiedDomains} />
         )}
@@ -880,20 +864,64 @@ const InputBar = ({
                     suggestions={mentionSuggestions}
                     onSelectionValidated={addMention}
                   />
-
-                  <InputBarControls
-                    conversation={conversationEntity}
-                    input={inputValue}
-                    isEditing={isEditing}
-                    disablePing={pingDisabled}
-                    disableFilesharing={!isFileSharingSendingEnabled}
-                    onSend={() => onSend(inputValue)}
-                    onSelectFiles={uploadFiles}
-                    onSelectImages={uploadImages}
-                    onCancelEditing={cancelMessageEditing}
-                    onClickGif={onGifClick}
-                    onClickPing={onPingClick}
-                  />
+                  {isScaledDown ? (
+                    <>
+                      <button
+                        type="button"
+                        className={cx('controls-right-button controls-right-button--send')}
+                        disabled={inputValue.length === 0}
+                        title={t('tooltipConversationSendMessage')}
+                        aria-label={t('tooltipConversationSendMessage')}
+                        onClick={() => onSend(inputValue)}
+                        data-uie-name="do-send-message"
+                      >
+                        <Icon.Send />
+                      </button>
+                      <ul className="controls-right buttons-group" css={{justifyContent: 'center', width: '100%'}}>
+                        <ControlButtons
+                          conversation={conversationEntity}
+                          input={inputValue}
+                          isEditing={isEditing}
+                          isScaledDown={isScaledDown}
+                          disablePing={pingDisabled}
+                          disableFilesharing={!isFileSharingSendingEnabled}
+                          onSelectFiles={uploadFiles}
+                          onSelectImages={uploadImages}
+                          onCancelEditing={cancelMessageEditing}
+                          onClickGif={onGifClick}
+                          onClickPing={onPingClick}
+                        />
+                      </ul>
+                    </>
+                  ) : (
+                    <ul className="controls-right buttons-group">
+                      <ControlButtons
+                        conversation={conversationEntity}
+                        input={inputValue}
+                        isEditing={isEditing}
+                        disablePing={pingDisabled}
+                        disableFilesharing={!isFileSharingSendingEnabled}
+                        onSelectFiles={uploadFiles}
+                        onSelectImages={uploadImages}
+                        onCancelEditing={cancelMessageEditing}
+                        onClickGif={onGifClick}
+                        onClickPing={onPingClick}
+                      />
+                      <li>
+                        <button
+                          type="button"
+                          className={cx('controls-right-button controls-right-button--send')}
+                          disabled={inputValue.length === 0}
+                          title={t('tooltipConversationSendMessage')}
+                          aria-label={t('tooltipConversationSendMessage')}
+                          onClick={() => onSend(inputValue)}
+                          data-uie-name="do-send-message"
+                        >
+                          <Icon.Send />
+                        </button>
+                      </li>
+                    </ul>
+                  )}
                 </>
               )}
             </>

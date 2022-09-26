@@ -26,10 +26,28 @@ import ControlButtons, {ControlButtonsProps} from './ControlButtons';
 
 type InputBarControlsProps = ControlButtonsProps & {
   onSend: () => void;
+  responsive: Boolean;
 };
 
-const InputBarControls: React.FC<InputBarControlsProps> = ({onSend, ...props}) => {
-  return (
+const InputBarControls: React.FC<InputBarControlsProps> = ({onSend, responsive, ...props}) => {
+  return responsive ? (
+    <ul className="controls-right buttons-group">
+      <li>
+        <button
+          type="button"
+          className={cx('controls-right-button controls-right-button--send')}
+          disabled={props.input.length === 0}
+          title={t('tooltipConversationSendMessage')}
+          aria-label={t('tooltipConversationSendMessage')}
+          onClick={onSend}
+          data-uie-name="do-send-message"
+        >
+          <Icon.Send />
+        </button>
+      </li>
+      <ControlButtons {...props} />
+    </ul>
+  ) : (
     <ul className="controls-right buttons-group">
       <ControlButtons {...props} />
 
