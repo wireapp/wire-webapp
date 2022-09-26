@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [8.14.8](https://github.com/wireapp/wire-web-packages/compare/@wireapp/react-ui-kit@8.14.7...@wireapp/react-ui-kit@8.14.8) (2022-09-26)
+
+### Bug Fixes
+
+* **ui-kit:** move @types/color to dependencies ([#4413](https://github.com/wireapp/wire-web-packages/issues/4413)) ([8ba51ac](https://github.com/wireapp/wire-web-packages/commit/8ba51ac7989ea9cc9565456015d79e41caee5a85))
+
 ## [8.14.7](https://github.com/wireapp/wire-web-packages/compare/@wireapp/react-ui-kit@8.14.6...@wireapp/react-ui-kit@8.14.7) (2022-09-26)
 
 ### Bug Fixes
