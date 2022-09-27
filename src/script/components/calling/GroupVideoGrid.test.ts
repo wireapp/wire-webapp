@@ -38,7 +38,7 @@ class GroupVideoGridPage extends TestPage<GroupVideoGripProps> {
 
 describe('GroupVideoGrid', () => {
   it('renders video grids', async () => {
-    const user = new User('id', null);
+    const user = new User('id', undefined);
     user.name('Anton Bertha');
     const participant = new Participant(user, 'example');
     const groupVideoGrid = new GroupVideoGridPage({
@@ -49,7 +49,7 @@ describe('GroupVideoGrid', () => {
       maximizedParticipant: null,
       minimized: false,
       selfParticipant: participant,
-      setMaximizedParticipant: () => undefined,
+      setMaximizedParticipant: () => null,
     });
 
     expect(groupVideoGrid.getGridsWrapper()).not.toBeNull();
@@ -57,13 +57,13 @@ describe('GroupVideoGrid', () => {
   });
 
   it('maximizes a grid on double click', async () => {
-    const userOne = new User('idOne', null);
-    const userTwo = new User('idTwo', null);
+    const userOne = new User('idOne', undefined);
+    const userTwo = new User('idTwo', undefined);
     userOne.name('Testing User One');
     userOne.name('Testing User Two');
     const participantOne = new Participant(userOne, 'exampleOne');
     const participantTwo = new Participant(userTwo, 'exampleTwo');
-    let maximizedParticipant: Participant = null;
+    let maximizedParticipant: Participant | null = null;
     const props: GroupVideoGripProps = {
       grid: {
         grid: [participantOne, participantTwo],
@@ -84,7 +84,7 @@ describe('GroupVideoGrid', () => {
   });
 
   it('renders a grid with paused video', async () => {
-    const user = new User('id', null);
+    const user = new User('id', undefined);
     user.name('Anton Bertha');
     const participant = new Participant(user, 'example');
     participant.videoState(VIDEO_STATE.PAUSED);
@@ -103,7 +103,7 @@ describe('GroupVideoGrid', () => {
   });
 
   it('renders thumbnail', async () => {
-    const user = new User('id', null);
+    const user = new User('id', undefined);
     user.name('Anton Bertha');
     const participant = new Participant(user, 'example');
     participant.setVideoStream(new MediaStream(), false);
@@ -124,7 +124,7 @@ describe('GroupVideoGrid', () => {
   });
 
   it('renders muted thumbnail', async () => {
-    const user = new User('id', null);
+    const user = new User('id', undefined);
     user.name('Anton Bertha');
     const participant = new Participant(user, 'example');
     participant.setVideoStream(new MediaStream(), false);

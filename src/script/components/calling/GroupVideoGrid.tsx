@@ -32,7 +32,7 @@ import {QualifiedId} from '@wireapp/api-client/src/user';
 
 export interface GroupVideoGripProps {
   grid: Grid;
-  maximizedParticipant: Participant;
+  maximizedParticipant: Participant | null;
   minimized?: boolean;
   selfParticipant: Participant;
   setMaximizedParticipant?: (participant: Participant | null) => void;
