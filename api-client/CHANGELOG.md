@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [20.6.3](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@20.6.2...@wireapp/api-client@20.6.3) (2022-09-27)
+
+### Bug Fixes
+
+* **api-client:** Add flag to use dev version of the api ([#4414](https://github.com/wireapp/wire-web-packages/issues/4414)) ([e24bab8](https://github.com/wireapp/wire-web-packages/commit/e24bab8276628de271ca8fff620d92f051438b79))
+
 ## [20.6.2](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@20.6.1...@wireapp/api-client@20.6.2) (2022-09-26)
 
 **Note:** Version bump only for package @wireapp/api-client
