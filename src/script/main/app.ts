@@ -919,8 +919,9 @@ class App {
 //##############################################################################
 
 $(async () => {
+  const config = Config.getConfig();
   const apiClient = container.resolve(APIClient);
-  await apiClient.useVersion(Config.getConfig().SUPPORTED_API_VERSIONS);
+  await apiClient.useVersion(config.SUPPORTED_API_VERSIONS, config.FEATURE.ENABLE_MLS);
   const core = container.resolve(Core);
 
   enableLogging(Config.getConfig().FEATURE.ENABLE_DEBUG);
