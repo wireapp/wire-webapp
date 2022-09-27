@@ -64,7 +64,7 @@ export interface FullscreenVideoCallProps {
   multitasking: Multitasking;
   muteState: MuteState;
   setActiveCallViewTab: (tab: string) => void;
-  setMaximizedParticipant: (call: Call, participant: Participant) => void;
+  setMaximizedParticipant: (call: Call, participant: Participant | null) => void;
   switchCameraInput: (call: Call, deviceId: string) => void;
   switchMicrophoneInput: (call: Call, deviceId: string) => void;
   teamState?: TeamState;
