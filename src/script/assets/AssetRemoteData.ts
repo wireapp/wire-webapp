@@ -60,46 +60,32 @@ export class AssetRemoteData {
     this.cancelDownload = () => {};
   }
 
-  static v4(
-    assetKey: string,
-    assetDomain: string,
-    otrKey?: Uint8Array,
-    sha256?: Uint8Array,
-    assetToken?: string,
-    forceCaching: boolean = false,
-  ) {
-    return new AssetRemoteData(
-      assetKey,
-      {
-        assetDomain,
-        assetKey,
-        assetToken,
-        forceCaching,
-        version: 4,
-      },
-      otrKey,
-      sha256,
-    );
-  }
-
+  /**
+   * Will generate a v3 or v4 (depending on the given domain) asset payload.
+   * Assets v3 and v4 only differ by the domain, so it doesn't make sense to split those into 2 different methods
+   */
   static v3(
     assetKey: string,
+    assetDomain?: string,
     otrKey?: Uint8Array,
     sha256?: Uint8Array,
     assetToken?: string,
     forceCaching: boolean = false,
   ) {
-    return new AssetRemoteData(
+    const baseProperties: AssetUrlDataVersion3 = {
       assetKey,
-      {
-        assetKey,
-        assetToken,
-        forceCaching,
-        version: 3,
-      },
-      otrKey,
-      sha256,
-    );
+      assetToken,
+      forceCaching,
+      version: 3,
+    };
+    const urlData = assetDomain
+      ? ({
+          ...baseProperties,
+          assetDomain,
+          version: 4,
+        } as AssetUrlDataVersion4)
+      : baseProperties;
+    return new AssetRemoteData(assetKey, urlData, otrKey, sha256);
   }
 
   static v2(
