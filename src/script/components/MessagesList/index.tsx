@@ -33,7 +33,7 @@ import {Text} from 'src/script/entity/message/Text';
 import {useResizeObserver} from '../../ui/resizeObserver';
 import useHitTopOrBottom from '../../hooks/useHitTopOrBottom';
 import {isContentMessage} from '../../guards/Message';
-import {useFadingScrollbar} from '../../ui/fadingScrollbar';
+import {initFadingScrollbar} from '../../ui/fadingScrollbar';
 import {isMemberMessage} from '../../guards/Message';
 import {ServiceEntity} from 'src/script/integration/ServiceEntity';
 
@@ -230,7 +230,7 @@ const MessagesList: React.FC<MessagesListParams> = ({
   };
 
   useHitTopOrBottom(loadPrecedingMessages, loadFollowingMessages, messageListRef.current);
-  useFadingScrollbar(messageListRef.current);
+  initFadingScrollbar(messageListRef.current);
 
   useEffect(() => {
     if (loaded && messageContainerRef.current) {
