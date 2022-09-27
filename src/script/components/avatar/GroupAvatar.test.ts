@@ -31,10 +31,10 @@ class GroupAvatarPage extends TestPage<GroupAvatarProps> {
 
 describe('GroupAvatar', () => {
   it('renders avatar', async () => {
-    const user0 = new User('user0', undefined);
-    const user1 = new User('user1', undefined);
-    const user2 = new User('user2', undefined);
-    const user3 = new User('user3', undefined);
+    const user0 = new User('user0');
+    const user1 = new User('user1');
+    const user2 = new User('user2');
+    const user3 = new User('user3');
     user0.name('Anton Bertha');
     user1.name('Spencer Senger');
     user2.name('Tasia Price');

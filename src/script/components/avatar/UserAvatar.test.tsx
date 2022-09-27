@@ -37,7 +37,7 @@ class UserAvatarPage extends TestPage<UserAvatarProps> {
 
 describe('UserAvatar', () => {
   it('shows participant initials if no avatar is defined', async () => {
-    const participant = new User('id', undefined);
+    const participant = new User('id');
     participant.name('Anton Bertha');
 
     const userAvatar = new UserAvatarPage({
@@ -51,7 +51,7 @@ describe('UserAvatar', () => {
   });
 
   it('shows single initial character when avatar size is extra small', async () => {
-    const participant = new User('id', undefined);
+    const participant = new User('id');
     participant.name('Anton Bertha');
 
     const userAvatar = new UserAvatarPage({
@@ -65,7 +65,7 @@ describe('UserAvatar', () => {
   });
 
   it('does not show avatar badge in default state', async () => {
-    const participant = new User('id', undefined);
+    const participant = new User('id');
     participant.name('Anton Bertha');
 
     const userAvatar = new UserAvatarPage({
@@ -78,7 +78,7 @@ describe('UserAvatar', () => {
   });
 
   it('shows avatar badge for blocked user', async () => {
-    const participant = new User('id', undefined);
+    const participant = new User('id');
     participant.name('Anton Bertha');
 
     const userAvatar = new UserAvatarPage({
@@ -91,7 +91,7 @@ describe('UserAvatar', () => {
   });
 
   it('shows avatar badge for connection request', async () => {
-    const participant = new User('id', undefined);
+    const participant = new User('id');
     participant.name('Anton Bertha');
 
     const userAvatar = new UserAvatarPage({

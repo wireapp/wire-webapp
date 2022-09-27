@@ -25,7 +25,7 @@ import {Participant} from '../../calling/Participant';
 
 describe('GroupVideoGrid', () => {
   it('renders video grids', async () => {
-    const user = new User('id', undefined);
+    const user = new User('id');
     user.name('Anton Bertha');
     const participant = new Participant(user, 'example');
 
@@ -49,10 +49,10 @@ describe('GroupVideoGrid', () => {
   });
 
   it('maximizes a grid on double click', async () => {
-    const userOne = new User('idOne', undefined);
+    const userOne = new User('idOne');
     userOne.name('Testing User One');
 
-    const userTwo = new User('idTwo', undefined);
+    const userTwo = new User('idTwo');
     userOne.name('Testing User Two');
 
     const participantOne = new Participant(userOne, 'exampleOne');
@@ -83,7 +83,7 @@ describe('GroupVideoGrid', () => {
   });
 
   it('renders a grid with paused video', async () => {
-    const user = new User('id', undefined);
+    const user = new User('id');
     user.name('Anton Bertha');
 
     const participant = new Participant(user, 'example');
@@ -107,7 +107,7 @@ describe('GroupVideoGrid', () => {
   });
 
   it('renders thumbnail', async () => {
-    const user = new User('id', undefined);
+    const user = new User('id');
     user.name('Anton Bertha');
 
     const participant = new Participant(user, 'example');
@@ -134,7 +134,7 @@ describe('GroupVideoGrid', () => {
   });
 
   it('does not render muted thumbnail when un-muted', async () => {
-    const user = new User('id', undefined);
+    const user = new User('id');
     const participant = new Participant(user, 'example');
     participant.isMuted(false);
 

@@ -32,7 +32,7 @@ describe('fullscreenVideoCall', () => {
   const createProps = (): FullscreenVideoCallProps => {
     const conversation = new Conversation();
     spyOn(conversation, 'supportsVideoCall').and.returnValue(true);
-    const selfUser = new User('', undefined);
+    const selfUser = new User('');
     selfUser.isMe = true;
     const call = new Call({domain: '', id: ''}, {domain: '', id: ''}, 0, new Participant(selfUser, ''), 0, {
       currentAvailableDeviceId: {
@@ -109,10 +109,10 @@ describe('fullscreenVideoCall', () => {
     const props = createProps();
     props.setMaximizedParticipant = setMaximizedSpy;
     props.setActiveCallViewTab = () => {};
-    props.call.addParticipant(new Participant(new User('a', undefined), 'a'));
-    props.call.addParticipant(new Participant(new User('b', undefined), 'b'));
-    props.call.addParticipant(new Participant(new User('c', undefined), 'd'));
-    props.call.addParticipant(new Participant(new User('e', undefined), 'f'));
+    props.call.addParticipant(new Participant(new User('a'), 'a'));
+    props.call.addParticipant(new Participant(new User('b'), 'b'));
+    props.call.addParticipant(new Participant(new User('c'), 'd'));
+    props.call.addParticipant(new Participant(new User('e'), 'f'));
 
     const {getByText} = render(<FullscreenVideoCall {...props} />);
     const speakersButtonLabel = 'videoSpeakersTabSpeakers'.toUpperCase();
