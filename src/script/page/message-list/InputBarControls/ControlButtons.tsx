@@ -37,7 +37,7 @@ export type ControlButtonsProps = {
   onSelectFiles: (files: File[]) => void;
   onSelectImages: (files: File[]) => void;
   onCancelEditing: () => void;
-  onClickGif: () => void;
+  onGifClick: () => void;
 };
 
 const ControlButtons: React.FC<ControlButtonsProps> = ({
@@ -52,7 +52,7 @@ const ControlButtons: React.FC<ControlButtonsProps> = ({
   onSelectFiles,
   onSelectImages,
   onCancelEditing,
-  onClickGif,
+  onGifClick,
 }) => {
   const acceptedImageTypes = Config.getConfig().ALLOWED_IMAGE_TYPES.join(',');
   const acceptedFileTypes = Config.getConfig().FEATURE.ALLOWED_FILE_UPLOAD_EXTENSIONS.join(',');
@@ -152,7 +152,7 @@ const ControlButtons: React.FC<ControlButtonsProps> = ({
     );
   }
 
-  return <>{showGiphyButton && !disableFilesharing && <GiphyButton onClickGif={onClickGif} />}</>;
+  return <>{showGiphyButton && !disableFilesharing && <GiphyButton onGifClick={onGifClick} />}</>;
 };
 
 export default ControlButtons;

@@ -874,7 +874,7 @@ const InputBar = ({
                   {isScaledDown ? (
                     <>
                       <ul className="controls-right buttons-group" css={{minWidth: '95px'}}>
-                        {showGiphyButton && <GiphyButton onClickGif={onGifClick} />}
+                        {showGiphyButton && <GiphyButton onGifClick={onGifClick} />}
                         <li>
                           <button
                             type="button"
@@ -900,7 +900,7 @@ const InputBar = ({
                           onSelectFiles={uploadFiles}
                           onSelectImages={uploadImages}
                           onCancelEditing={cancelMessageEditing}
-                          onClickGif={onGifClick}
+                          onGifClick={onGifClick}
                           onClickPing={onPingClick}
                         />
                       </ul>
@@ -917,7 +917,7 @@ const InputBar = ({
                         onSelectFiles={uploadFiles}
                         onSelectImages={uploadImages}
                         onCancelEditing={cancelMessageEditing}
-                        onClickGif={onGifClick}
+                        onGifClick={onGifClick}
                         onClickPing={onPingClick}
                       />
                       <li>

@@ -23,10 +23,10 @@ import {t} from 'Util/LocalizerUtil';
 import {IconButton} from '@wireapp/react-ui-kit';
 
 export type GiphyButtonProps = {
-  onClickGif: () => void;
+  onGifClick: () => void;
 };
 
-const GiphyButton: React.FC<GiphyButtonProps> = ({onClickGif}) => {
+const GiphyButton: React.FC<GiphyButtonProps> = ({onGifClick}) => {
   return (
     <>
       <li>
@@ -35,7 +35,7 @@ const GiphyButton: React.FC<GiphyButtonProps> = ({onClickGif}) => {
           css={{marginBottom: '0'}}
           title={t('extensionsBubbleButtonGif')}
           aria-label={t('extensionsBubbleButtonGif')}
-          onClick={onClickGif}
+          onClick={onGifClick}
           data-uie-name="do-giphy-popover"
         >
           <Icon.Gif />
