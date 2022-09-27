@@ -109,7 +109,7 @@ const ConversationListCallingCell: React.FC<CallingCellProps> = ({
   const isMuted = muteState !== MuteState.NOT_MUTED;
 
   const isStillOngoing = reason === CALL_REASON.STILL_ONGOING;
-  const isDeclined = [CALL_REASON.STILL_ONGOING, CALL_REASON.ANSWERED_ELSEWHERE].includes(reason);
+  const isDeclined = !!reason && [CALL_REASON.STILL_ONGOING, CALL_REASON.ANSWERED_ELSEWHERE].includes(reason);
 
   const isOutgoing = state === CALL_STATE.OUTGOING;
   const isIncoming = state === CALL_STATE.INCOMING;
@@ -122,7 +122,7 @@ const ConversationListCallingCell: React.FC<CallingCellProps> = ({
 
   const videoGrid = useVideoGrid(call);
 
-  const conversationParticipants = conversation && userEts.concat([selfUser]);
+  const conversationParticipants = conversation && (selfUser ? userEts.concat(selfUser) : userEts);
   const conversationUrl = generateConversationUrl(conversation.id, conversation.domain);
   const selfParticipant = call?.getSelfParticipant();
 
@@ -142,7 +142,7 @@ const ConversationListCallingCell: React.FC<CallingCellProps> = ({
 
   const showJoinButton = conversation && isStillOngoing && temporaryUserStyle;
   const [showParticipants, setShowParticipants] = useState(false);
-  const isModerator = roles[selfUser?.id] === DefaultConversationRoleName.WIRE_ADMIN;
+  const isModerator = selfUser && roles[selfUser.id] === DefaultConversationRoleName.WIRE_ADMIN;
 
   const getParticipantContext = (event: React.MouseEvent<HTMLDivElement>, participant: Participant) => {
     event.preventDefault();
@@ -167,7 +167,7 @@ const ConversationListCallingCell: React.FC<CallingCellProps> = ({
       label: t('moderatorMenuEntryMuteAllOthers'),
     };
 
-    const entries: ContextMenuEntry[] = [!participant.user.isMe && muteParticipant, muteOthers].filter(Boolean);
+    const entries: ContextMenuEntry[] = [muteOthers].concat(!participant.user.isMe ? muteParticipant : []);
     showContextMenu(event, entries, 'participant-moderator-menu');
   };
 

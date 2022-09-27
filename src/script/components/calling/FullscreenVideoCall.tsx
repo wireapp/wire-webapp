@@ -59,12 +59,12 @@ export interface FullscreenVideoCallProps {
   isChoosingScreen: boolean;
   isMuted: boolean;
   leave: (call: Call) => void;
-  maximizedParticipant: Participant;
+  maximizedParticipant: Participant | null;
   mediaDevicesHandler: MediaDevicesHandler;
   multitasking: Multitasking;
   muteState: MuteState;
   setActiveCallViewTab: (tab: string) => void;
-  setMaximizedParticipant: (call: Call, participant: Participant) => void;
+  setMaximizedParticipant: (call: Call, participant: Participant | null) => void;
   switchCameraInput: (call: Call, deviceId: string) => void;
   switchMicrophoneInput: (call: Call, deviceId: string) => void;
   teamState?: TeamState;

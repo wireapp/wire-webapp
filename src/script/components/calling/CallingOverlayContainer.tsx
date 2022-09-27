@@ -103,7 +103,7 @@ const CallingContainer: React.FC<CallingContainerProps> = ({
     call.maximizedParticipant(null);
   };
 
-  const setMaximizedParticipant = (call: Call, participant: Participant) => {
+  const setMaximizedParticipant = (call: Call, participant: Participant | null) => {
     call.maximizedParticipant(participant);
   };
 

@@ -32,10 +32,10 @@ import {QualifiedId} from '@wireapp/api-client/src/user';
 
 export interface GroupVideoGripProps {
   grid: Grid;
-  maximizedParticipant: Participant;
+  maximizedParticipant: Participant | null;
   minimized?: boolean;
   selfParticipant: Participant;
-  setMaximizedParticipant?: (participant: Participant) => void;
+  setMaximizedParticipant?: (participant: Participant | null) => void;
 }
 
 interface RowsAndColumns extends CSSProperties {
@@ -96,7 +96,7 @@ const GroupVideoGrid: React.FunctionComponent<GroupVideoGripProps> = ({
       return;
     }
 
-    const participant = grid.grid.find(participant => participant?.doesMatchIds(userId, clientId));
+    const participant = grid.grid.find(participant => participant?.doesMatchIds(userId, clientId)) || null;
     setMaximizedParticipant(participant);
   };
 
