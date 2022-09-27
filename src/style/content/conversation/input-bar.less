@@ -45,7 +45,9 @@
   .reset-textarea;
 
   width: 100%;
-  max-width: @conversation-max-width - @conversation-message-sender-width - @conversation-message-timestamp-width;
+  max-width: calc(
+    @conversation-max-width - @conversation-message-sender-width - var(--conversation-message-timestamp-width)
+  );
   height: @conversation-input-line-height;
   min-height: @conversation-input-line-height;
   max-height: @conversation-input-max-height;
@@ -122,7 +124,7 @@
   .list-unstyled;
 
   display: flex;
-  min-width: @conversation-message-timestamp-width;
+  min-width: var(--conversation-message-timestamp-width);
   align-items: center;
   justify-content: flex-end;
   margin: 0;

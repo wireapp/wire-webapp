@@ -249,7 +249,7 @@
 }
 
 .message-header-line {
-  min-width: @conversation-message-timestamp-width;
+  min-width: var(--conversation-message-timestamp-width);
   height: 1px;
   flex: 1;
   border: none;
@@ -287,7 +287,7 @@
 
   &:not(.message-timestamp-day) {
     border: 0;
-    margin-right: @conversation-message-timestamp-width;
+    margin-right: var(--conversation-message-timestamp-width);
 
     .message-header-label {
       border-bottom: 1px dotted @separator-color;
@@ -314,7 +314,7 @@
 // MESSAGE - BODY
 .message-body {
   position: relative;
-  padding-right: @conversation-message-timestamp-width;
+  padding-right: var(--conversation-message-timestamp-width);
   padding-left: @conversation-message-sender-width;
   margin-top: -5px;
 
@@ -467,7 +467,7 @@
   width: 100%;
   flex-wrap: wrap;
   margin-top: 4px;
-  margin-right: @conversation-message-timestamp-width;
+  margin-right: var(--conversation-message-timestamp-width);
   margin-left: @conversation-message-sender-width;
 
   > *:not(:last-child) {
@@ -504,7 +504,7 @@
   top: 0;
   right: 0;
   display: flex;
-  width: @conversation-message-timestamp-width;
+  width: var(--conversation-message-timestamp-width);
   height: @line-height-lg;
   align-items: center;
 
