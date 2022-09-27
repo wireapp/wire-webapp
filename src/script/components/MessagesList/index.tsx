@@ -35,6 +35,7 @@ import useHitTopOrBottom from '../../hooks/useHitTopOrBottom';
 import {isContentMessage} from '../../guards/Message';
 import {useFadingScrollbar} from '../../ui/fadingScrollbar';
 import {isMemberMessage} from '../../guards/Message';
+import {ServiceEntity} from 'src/script/integration/ServiceEntity';
 
 type FocusedElement = {center?: boolean; element: Element};
 
@@ -56,15 +57,15 @@ interface MessagesListParams {
     deleteMessage: (conversation: Conversation, message: MessageEntity) => void;
     deleteMessageEveryone: (conversation: Conversation, message: MessageEntity) => void;
   };
-  messageRepository: Pick<MessageRepository, 'getMessageInConversationById' | 'sendButtonAction' | 'toggleLike'>;
-  onClickMessage: (message: ContentMessage | Text, event: React.MouseEvent) => void;
+  messageRepository: MessageRepository;
+  onClickMessage: (message: ContentMessage | Text, event: React.UIEvent) => void;
   onLoading: (isLoading: boolean) => void;
   resetSession: (messageError: DecryptErrorMessage) => void;
   selfUser: User;
-  showImageDetails: (message: ContentMessage, event: React.MouseEvent | React.KeyboardEvent) => void;
+  showImageDetails: (message: ContentMessage, event: React.UIEvent) => void;
   showMessageDetails: (message: MessageEntity, showLikes?: boolean) => void;
   showParticipants: (users: User[]) => void;
-  showUserDetails: (user: User) => void;
+  showUserDetails: (user: User | ServiceEntity) => void;
   isLastReceivedMessage: (messageEntity: MessageEntity, conversationEntity: ConversationEntity) => boolean;
 }
 

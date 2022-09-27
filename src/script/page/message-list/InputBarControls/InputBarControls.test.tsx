@@ -18,6 +18,7 @@
  */
 
 import {render} from '@testing-library/react';
+import {withTheme} from 'src/script/auth/util/test/TestUtil';
 import InputBarControls from './InputBarControls';
 
 const mockConfig = {
@@ -72,7 +73,7 @@ describe('InputBarControls', () => {
     ['hello', ['tooltipConversationSendMessage', 'extensionsBubbleButtonGif']],
   ])('Shows the right buttons depending on the input (input: %s)', (input, buttonTitles) => {
     const params = {...defaultParams, ...{input}};
-    const {getByTitle, queryByTitle} = render(<InputBarControls {...params} />);
+    const {getByTitle, queryByTitle} = render(withTheme(<InputBarControls {...params} />));
 
     // check that the relevant buttons are present
     buttonTitles.forEach(button => expect(getByTitle(button)).not.toBe(null));

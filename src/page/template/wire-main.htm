@@ -19,7 +19,7 @@
         </div>
 
         <div id="right-column" class="right-column">
-          #include('panel/conversation-details.htm')
+          <right-sidebar params="contentViewModel: $root, teamState: $root.repositories.team.teamState, userState: $root.repositories.user.userState"></right-sidebar>
           #include('panel/conversation-participants.htm')
           #include('panel/add-participants.htm')
           #include('panel/group-participant-user.htm')

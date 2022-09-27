@@ -75,7 +75,7 @@ const CallOptions: React.FC<CallOptionsProps> = ({constraintsHandler, properties
             {t('preferencesOptionsEnableVbrCheckbox')}
           </CheckboxLabel>
         </Checkbox>
-        <div className="preferences-detail preferences-detail-intended">{t('preferencesOptionsEnableVbrDetails')}</div>
+        <p className="preferences-detail preferences-detail-intended">{t('preferencesOptionsEnableVbrDetails')}</p>
       </div>
       <div className="checkbox-margin">
         <Checkbox
@@ -89,7 +89,7 @@ const CallOptions: React.FC<CallOptionsProps> = ({constraintsHandler, properties
         >
           <CheckboxLabel htmlFor="status-preference-agc">{t('preferencesOptionsEnableAgcCheckbox')}</CheckboxLabel>
         </Checkbox>
-        <div className="preferences-detail preferences-detail-intended">{t('preferencesOptionsEnableAgcDetails')}</div>
+        <p className="preferences-detail preferences-detail-intended">{t('preferencesOptionsEnableAgcDetails')}</p>
       </div>
       <div className="checkbox-margin">
         <Checkbox
@@ -106,9 +106,9 @@ const CallOptions: React.FC<CallOptionsProps> = ({constraintsHandler, properties
             {t('preferencesOptionsEnableSoundlessIncomingCalls')}
           </CheckboxLabel>
         </Checkbox>
-        <div className="preferences-detail preferences-detail-intended">
+        <p className="preferences-detail preferences-detail-intended">
           {t('preferencesOptionsEnableSoundlessIncomingCallsDetails')}
-        </div>
+        </p>
       </div>
     </PreferencesSection>
   );

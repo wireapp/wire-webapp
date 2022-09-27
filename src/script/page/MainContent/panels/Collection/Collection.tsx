@@ -190,6 +190,7 @@ const Collection: React.FC<CollectionDetailsProps> = ({
             className="content-titlebar-icon"
             data-uie-name="do-close-collection"
             onClick={() => amplify.publish(WebAppEvents.CONVERSATION.SHOW, conversation, {})}
+            aria-label={t('fullsearchCancelLabel')}
           >
             <Icon.Close />
           </button>

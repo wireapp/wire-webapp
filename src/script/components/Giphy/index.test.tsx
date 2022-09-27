@@ -36,7 +36,7 @@ describe('Giphy', () => {
 
     await render(<Giphy {...getDefaultProps()} />);
     await waitFor(() => {
-      expect(amplify.subscribe).toBeCalledWith(WebAppEvents.EXTENSIONS.GIPHY.SHOW, expect.anything());
+      expect(amplify.subscribe).toHaveBeenCalledWith(WebAppEvents.EXTENSIONS.GIPHY.SHOW, expect.anything());
     });
   });
 

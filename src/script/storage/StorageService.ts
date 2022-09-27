@@ -381,7 +381,7 @@ export class StorageService {
    * @param changes Object containing the key paths to each property you want to change
    * @returns Promise with the number of updated records (0 if no records were changed).
    */
-  async update<T = Object>(storeName: string, primaryKey: string, changes: T): Promise<number> {
+  async update<T extends Record<string, any>>(storeName: string, primaryKey: string, changes: T): Promise<number> {
     try {
       if (this.hasHookSupport) {
         const numberOfUpdates = await this.db.table(storeName).update(primaryKey, changes);

@@ -36,8 +36,6 @@ import {
 
 import {
   DefaultConversationRoleName as DefaultRole,
-  CONVERSATION_ACCESS,
-  ACCESS_ROLE_V2,
   CONVERSATION_TYPE,
   NewConversation,
   Conversation as BackendConversation,
@@ -125,6 +123,7 @@ import {matchQualifiedIds} from 'Util/QualifiedId';
 import {ConversationVerificationState} from './ConversationVerificationState';
 import {extractClientDiff} from './ClientMismatchUtil';
 import {Core} from '../service/CoreSingleton';
+import {updateAccessRights} from './ConversationAccessPermission';
 import {ClientState} from '../client/ClientState';
 import {MLSReturnType} from '@wireapp/core/src/main/conversation';
 import {isMemberMessage} from '../guards/Message';
@@ -380,7 +379,7 @@ export class ConversationRepository {
   public async createGroupConversation(
     userEntities: User[],
     groupName?: string,
-    accessState?: string,
+    accessState?: ACCESS_STATE,
     options: Partial<NewConversation> = {},
   ): Promise<Conversation | undefined> {
     const userIds = userEntities.map(user => user.qualifiedId);
@@ -417,42 +416,9 @@ export class ConversationRepository {
       };
 
       if (accessState) {
-        let accessPayload;
+        const {accessModes: access, accessRole: access_role_v2} = updateAccessRights(accessState);
 
-        switch (accessState) {
-          case ACCESS_STATE.TEAM.GUEST_ROOM:
-            accessPayload = {
-              access: [CONVERSATION_ACCESS.INVITE, CONVERSATION_ACCESS.CODE],
-              access_role_v2: [ACCESS_ROLE_V2.GUEST, ACCESS_ROLE_V2.NON_TEAM_MEMBER, ACCESS_ROLE_V2.TEAM_MEMBER],
-            };
-            break;
-          case ACCESS_STATE.TEAM.TEAM_ONLY:
-            accessPayload = {
-              access: [CONVERSATION_ACCESS.INVITE],
-              access_role_v2: [ACCESS_ROLE_V2.TEAM_MEMBER],
-            };
-            break;
-          case ACCESS_STATE.TEAM.GUESTS_SERVICES:
-            accessPayload = {
-              access: [CONVERSATION_ACCESS.INVITE, CONVERSATION_ACCESS.CODE],
-              access_role_v2: [
-                ACCESS_ROLE_V2.GUEST,
-                ACCESS_ROLE_V2.NON_TEAM_MEMBER,
-                ACCESS_ROLE_V2.TEAM_MEMBER,
-                ACCESS_ROLE_V2.SERVICE,
-              ],
-            };
-            break;
-          case ACCESS_STATE.TEAM.SERVICES:
-            accessPayload = {
-              access: [CONVERSATION_ACCESS.INVITE],
-              access_role_v2: [ACCESS_ROLE_V2.TEAM_MEMBER, ACCESS_ROLE_V2.SERVICE],
-            };
-            break;
-        }
-        if (accessPayload) {
-          payload = {...payload, ...accessPayload};
-        }
+        payload = {...payload, access, access_role_v2};
       }
     }
 

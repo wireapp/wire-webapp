@@ -1283,7 +1283,7 @@ export class MessageRepository {
    * @param conversationId id of the conversation to send call message to
    * @returns Resolves when the confirmation was sent
    */
-  public sendCallingMessage(conversation: Conversation, payload: string, options: MessageSendingOptions) {
+  public sendCallingMessage(conversation: Conversation, payload: string, options: MessageSendingOptions = {}) {
     const message = MessageBuilder.createCall({
       ...this.createCommonMessagePayload(conversation),
       content: payload,

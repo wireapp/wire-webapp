@@ -44,6 +44,7 @@ interface Content {
   primaryAction: Action;
   secondaryAction: Action[] | Action;
   titleText: string;
+  closeBtnTitle?: string;
 }
 
 interface Action {
@@ -57,6 +58,7 @@ interface Text {
   message?: string;
   option?: string;
   title?: string;
+  closeBtnLabel?: string;
 }
 
 export interface ModalOptions {
@@ -77,6 +79,7 @@ export interface ModalOptions {
 
 const defaultContent: Content = {
   checkboxLabel: '',
+  closeBtnTitle: '',
   closeFn: noop,
   currentType: null,
   inputPlaceholder: '',
@@ -199,6 +202,7 @@ export class ModalsViewModel {
     } = options;
     const content = {
       checkboxLabel: text.option,
+      closeBtnTitle: text.closeBtnLabel,
       closeFn: close,
       closeOnConfirm,
       currentType: type,

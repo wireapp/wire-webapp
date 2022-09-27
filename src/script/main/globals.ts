@@ -47,6 +47,9 @@ import 'Components/ServiceList';
 import 'Components/SearchInput';
 import 'Components/calling/CallingOverlayContainer';
 
+import '../page/AppLock';
+import '../page/RightSidebar';
+
 import 'Util/LocalizerUtil';
 
 import '../page/AppLock';

@@ -98,6 +98,11 @@ export class IntegrationRepository {
       return entity;
     }
     const {providerId, serviceId} = entity;
+
+    if (!providerId || !serviceId) {
+      return undefined;
+    }
+
     return this.getServiceById(providerId, serviceId, entity.qualifiedId.domain);
   }
 

@@ -35,8 +35,8 @@ test('copies correct text', async () => {
   const button = await screen.findByRole('button');
   fireEvent.click(button);
 
-  expect(mockCopy).toBeCalledTimes(1);
-  expect(mockCopy).toReturnWith('test-value');
+  expect(mockCopy).toHaveBeenCalledTimes(1);
+  expect(mockCopy).toHaveReturnedWith('test-value');
 });
 
 test('renders elements correctly', () => {

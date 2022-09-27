@@ -31,10 +31,22 @@ export interface PanelHeaderProps {
   title?: string;
   tabIndex?: number;
   handleBlur?: () => void;
+  goBackTitle?: string;
+  closeBtnTitle?: string;
 }
 
 const PanelHeader: ForwardRefRenderFunction<HTMLButtonElement, PanelHeaderProps> = (
-  {onGoBack, onClose, title, goBackUie, closeUie = 'do-close', tabIndex = 0, handleBlur}: PanelHeaderProps,
+  {
+    onGoBack,
+    onClose,
+    title,
+    goBackUie,
+    closeUie = 'do-close',
+    tabIndex = 0,
+    handleBlur,
+    goBackTitle = t('index.goBack'),
+    closeBtnTitle = t('accessibility.rightPanel.close'),
+  }: PanelHeaderProps,
   ref: ForwardedRef<HTMLButtonElement>,
 ) => {
   return (
@@ -45,7 +57,7 @@ const PanelHeader: ForwardRefRenderFunction<HTMLButtonElement, PanelHeaderProps>
           ref={ref}
           className="icon-button"
           data-uie-name={goBackUie}
-          title={t('index.goBack')}
+          title={goBackTitle}
           tabIndex={tabIndex}
           onBlur={handleBlur}
         >
@@ -60,7 +72,7 @@ const PanelHeader: ForwardRefRenderFunction<HTMLButtonElement, PanelHeaderProps>
         <button
           className="icon-button"
           data-uie-name={closeUie}
-          title={t('accessibility.rightPanel.close')}
+          title={closeBtnTitle}
           tabIndex={tabIndex}
           onBlur={handleBlur}
         >

@@ -75,7 +75,10 @@ const subscribeProperties = <C extends keyof Subscribables<P>, P extends Partial
  * @param name Name of the component to register. can be used a `<component-name>` directly in ko
  * @param component The React component to register
  */
-export function registerReactComponent<Props>(name: string, component: React.ComponentType<Props>) {
+export function registerReactComponent<Props extends Record<string, any>>(
+  name: string,
+  component: React.FC<Props> | React.ComponentClass<Props>,
+) {
   if (ko.components.isRegistered(name)) {
     return;
   }
@@ -83,7 +86,7 @@ export function registerReactComponent<Props>(name: string, component: React.Com
   ko.components.register(name, {
     template: '<!-- -->', // We do not need any particular template as this is going to be replaced by react content
     viewModel: {
-      createViewModel: (params: Props, {element}: {element: HTMLElement}) => {
+      createViewModel: (params: Subscribables<Props>, {element}: {element: HTMLElement}) => {
         let state: Props = resolveObservables(params);
         const root = createRoot(element);
         const subscription = subscribeProperties(params, updates => {
