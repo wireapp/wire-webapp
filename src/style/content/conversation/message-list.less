@@ -508,6 +508,11 @@
   height: @line-height-lg;
   align-items: center;
 
+  @media (max-width: @screen-md-min) {
+    height: 45px;
+    flex-direction: column;
+  }
+
   // actions pill
   .action-pill-style() {
     z-index: 1;
@@ -524,8 +529,11 @@
     .action-pill-style;
     .button-icon-secondary;
     .square(16px);
-    position: absolute;
-    left: 8px;
+
+    @media (min-width: @screen-md-min) {
+      position: absolute;
+      left: 8px;
+    }
 
     min-width: 0;
     min-height: 0;
@@ -553,11 +561,14 @@
   .message-status,
   .message-status-read {
     .action-pill-style;
-    position: absolute;
-    bottom: 3px;
     color: var(--gray-70);
     pointer-events: none;
     user-select: none;
+
+    @media (min-width: @screen-md-min) {
+      position: absolute;
+      bottom: 3px;
+    }
 
     .subline;
 
@@ -576,13 +587,16 @@
   }
 }
 
-.time {
-  left: 32px;
+@media (min-width: @screen-md-min) {
+  .time {
+    left: 32px;
+  }
 }
 .message-status,
 .message-status-read {
   left: 83px;
   &::before {
+    position: absolute;
     display: flex;
     width: 16px;
     align-items: center;
