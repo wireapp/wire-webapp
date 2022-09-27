@@ -3098,10 +3098,10 @@
   resolved "https://registry.yarnpkg.com/@wireapp/antiscroll-2/-/antiscroll-2-1.3.1.tgz#bcb66f72c6dadc306e43235256b768ed3f89039c"
   integrity sha512-vWmWYAzSdyxs+xlgSPGtiNSTCM1z0nxM+jSPa/xz1/kuFKy80BrJP5xaGwNNLljBAz8ymlSPUUZlylUd0tFr1Q==
 
-"@wireapp/api-client@^20.6.0":
-  version "20.6.0"
-  resolved "https://registry.yarnpkg.com/@wireapp/api-client/-/api-client-20.6.0.tgz#a5d37dcaac3f88cc0eefb444ed2aa5b9c3450f13"
-  integrity sha512-OoPzT5uc8lRFG2oRLp9U0clGdBr+5GY5emLsZpwM+BEW+kz7mRjUcE9RMctePtfoMI9m++1T52khTBMrLqTkOQ==
+"@wireapp/api-client@^20.6.3":
+  version "20.6.3"
+  resolved "https://registry.yarnpkg.com/@wireapp/api-client/-/api-client-20.6.3.tgz#e59e473343eec1f28750512bc1e45499544a6f42"
+  integrity sha512-LLWuuKTmeoGdiflTpW7bcGMgBNYo0a/LQ1rnyiyQhI0lmWXLMLJcv0Ee5jcRE/DYr9Pq1dsYg5lPA/yX1nZm5A==
   dependencies:
     "@wireapp/commons" "^4.4.6"
     "@wireapp/priority-queue" "^1.8.6"
@@ -3153,12 +3153,12 @@
   resolved "https://registry.yarnpkg.com/@wireapp/core-crypto/-/core-crypto-0.5.1.tgz#78d640e14c5519d8b2e035f5a97654482e652037"
   integrity sha512-9xKUTTxbDYzbAlcdnV1L1f89wYsR58pJU9Or4gYqgd2KV8AZKPlFsxAvNbsXSWbaXGrqK6Wzu7dNAV9AqMmDEA==
 
-"@wireapp/core@31.3.0":
-  version "31.3.0"
-  resolved "https://registry.yarnpkg.com/@wireapp/core/-/core-31.3.0.tgz#c82834ed93ec91d913fe4679cbbb67a0b21084a6"
-  integrity sha512-Ix4nK0CFacbfJGREZRmN9ptejHuyUU+UvMNNEIhb2QeKkZdS2+En1o8N/Pb7oYauHCN2JwRWdcy5HfdfZJU1rA==
+"@wireapp/core@31.3.3":
+  version "31.3.3"
+  resolved "https://registry.yarnpkg.com/@wireapp/core/-/core-31.3.3.tgz#535b7785cd9551785ff0f2bd08fb1e827ebcc4f1"
+  integrity sha512-SzL5k+kzY6KrHwPLJ+lYN1A4IaOOuleix/GaP3nVKSAicmqKm72GU7G4jfnYKR1PjDl9li4lEpCIVh3EMyx3Gg==
   dependencies:
-    "@wireapp/api-client" "^20.6.0"
+    "@wireapp/api-client" "^20.6.3"
     "@wireapp/commons" "^4.4.6"
     "@wireapp/core-crypto" "0.5.1"
     "@wireapp/cryptobox" "12.8.0"
