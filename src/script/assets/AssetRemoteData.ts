@@ -23,7 +23,7 @@ export type AssetUrlData = AssetUrlDataVersion1 | AssetUrlDataVersion2 | AssetUr
 
 export interface AssetUrlDataVersion3 {
   assetKey: string;
-  assetToken?: string;
+  assetToken: string;
   forceCaching: boolean;
   version: 3;
 }
