@@ -31,10 +31,10 @@ class GroupAvatarPage extends TestPage<GroupAvatarProps> {
 
 describe('GroupAvatar', () => {
   it('renders avatar', async () => {
-    const user0 = new User('user0', null);
-    const user1 = new User('user1', null);
-    const user2 = new User('user2', null);
-    const user3 = new User('user3', null);
+    const user0 = new User('user0', undefined);
+    const user1 = new User('user1', undefined);
+    const user2 = new User('user2', undefined);
+    const user3 = new User('user3', undefined);
     user0.name('Anton Bertha');
     user1.name('Spencer Senger');
     user2.name('Tasia Price');
@@ -44,6 +44,6 @@ describe('GroupAvatar', () => {
     });
 
     expect(GroupAvatar.getAvatarWrapper()).not.toBeNull();
-    expect(GroupAvatar.getAvatarWrapper().children.length).toBe(4);
+    expect(GroupAvatar.getAvatarWrapper()?.children.length).toBe(4);
   });
 });

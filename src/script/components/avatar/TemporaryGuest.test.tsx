@@ -40,7 +40,7 @@ class TemporaryGuestAvatarPage extends TestPage<UserAvatarProps> {
 
 describe('TemporaryGuestAvatar', () => {
   it('shows expiration circle', async () => {
-    const participant = new User('id', null);
+    const participant = new User('id', undefined);
     participant.name('Anton Bertha');
     participant.isTemporaryGuest(true);
 
@@ -54,7 +54,7 @@ describe('TemporaryGuestAvatar', () => {
   });
 
   it('shows participant initials', async () => {
-    const participant = new User('id', null);
+    const participant = new User('id', undefined);
     participant.name('Anton Bertha');
     participant.isTemporaryGuest(true);
 
@@ -65,11 +65,11 @@ describe('TemporaryGuestAvatar', () => {
     });
 
     expect(temporaryGuestAvatar.getInitials()).not.toBeNull();
-    expect(temporaryGuestAvatar.getInitials().textContent).toBe('AB');
+    expect(temporaryGuestAvatar.getInitials()?.textContent).toBe('AB');
   });
 
   it('does not show avatar badge in default state', async () => {
-    const participant = new User('id', null);
+    const participant = new User('id', undefined);
     participant.name('Anton Bertha');
     participant.isTemporaryGuest(true);
 
@@ -83,7 +83,7 @@ describe('TemporaryGuestAvatar', () => {
   });
 
   it('shows avatar badge for blocked user', async () => {
-    const participant = new User('id', null);
+    const participant = new User('id', undefined);
     participant.name('Anton Bertha');
     participant.isTemporaryGuest(true);
 
