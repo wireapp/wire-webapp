@@ -47,6 +47,10 @@ export const ConversationsList: React.FC<{
   conversationState: ConversationState;
   listViewModel: ListViewModel;
   viewStyle: ConverationViewStyle;
+  currentFocus: number;
+  showFocus: boolean;
+  handleFocus: (index: number) => void;
+  handleArrowKeyDown: (e: KeyboardEvent) => void;
 }> = ({
   conversations,
   listViewModel,
@@ -55,6 +59,10 @@ export const ConversationsList: React.FC<{
   conversationState,
   conversationRepository,
   callState,
+  currentFocus,
+  showFocus,
+  handleFocus,
+  handleArrowKeyDown,
 }) => {
   const {joinableCalls} = useKoSubscribableChildren(callState, ['joinableCalls']);
 
@@ -83,21 +91,29 @@ export const ConversationsList: React.FC<{
   const conversationView =
     viewStyle === ConverationViewStyle.RECENT ? (
       <>
-        {conversations.map(conversation => (
-          <ConversationListCell
-            key={conversation.id}
-            dataUieName="item-conversation"
-            conversation={conversation}
-            onClick={createNavigate(generateConversationUrl(conversation.id, conversation.domain))}
-            isSelected={isActiveConversation}
-            onJoinCall={answerCall}
-            rightClick={openContextMenu}
-            showJoinButton={hasJoinableCall(conversation)}
-          />
-        ))}
+        {conversations.map((conversation, index) => {
+          return (
+            <ConversationListCell
+              key={conversation.id}
+              focus={currentFocus === index}
+              currentFocus={currentFocus}
+              showFocus={showFocus}
+              handleFocus={handleFocus}
+              handleArrowKeyDown={handleArrowKeyDown}
+              index={index}
+              dataUieName="item-conversation"
+              conversation={conversation}
+              onClick={createNavigate(generateConversationUrl(conversation.id, conversation.domain))}
+              isSelected={isActiveConversation}
+              onJoinCall={answerCall}
+              rightClick={openContextMenu}
+              showJoinButton={hasJoinableCall(conversation)}
+            />
+          );
+        })}
       </>
     ) : (
-      <li>
+      <li tabIndex={-1}>
         <GroupedConversations
           callState={callState}
           conversationRepository={conversationRepository}
@@ -119,7 +135,7 @@ export const ConversationsList: React.FC<{
 
   const connectionRequests =
     connectRequests.length === 0 ? null : (
-      <li>
+      <li tabIndex={-1}>
         <div
           role="button"
           tabIndex={0}

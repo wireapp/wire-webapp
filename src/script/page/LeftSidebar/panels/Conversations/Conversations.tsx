@@ -45,6 +45,8 @@ import {PreferenceNotificationRepository} from 'src/script/notification/Preferen
 import {useFolderState} from './state';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import {amplify} from 'amplify';
+import useRoveFocus from '../../../../hooks/useRoveFocus';
+import {isTabKey} from 'Util/KeyboardUtil';
 
 type ConversationsProps = {
   callState?: CallState;
@@ -102,6 +104,7 @@ const Conversations: React.FC<ConversationsProps> = ({
   const isFolderOpen = useFolderState(state => state.isOpen);
 
   const {conversationLabelRepository} = conversationRepository;
+  const [showFocus, focusFirstConversation] = useState(false);
 
   useEffect(() => {
     if (!activeConversation) {
@@ -146,12 +149,17 @@ const Conversations: React.FC<ConversationsProps> = ({
         <Icon.Settings />
       </button>
 
-      {teamState.isTeam() ? (
+      {!teamState.isTeam() ? (
         <>
           <button
             type="button"
             className="left-list-header-availability"
             onClick={event => AvailabilityContextMenu.show(event.nativeEvent, 'left-list-availability-menu')}
+            onKeyDown={event => {
+              if (isTabKey(event)) {
+                focusFirstConversation(true);
+              }
+            }}
           >
             <AvailabilityState
               className="availability-state"
@@ -272,6 +280,10 @@ const Conversations: React.FC<ConversationsProps> = ({
       })}
     </>
   );
+  const {currentFocus, handleKeyDown, setCurrentFocus} = useRoveFocus(conversations.length);
+  const handleFocus = (focus: number) => {
+    setCurrentFocus(focus);
+  };
 
   return (
     <ListWrapper id={'conversations'} headerElement={header} footer={footer} before={callingView}>
@@ -295,6 +307,10 @@ const Conversations: React.FC<ConversationsProps> = ({
           listViewModel={listViewModel}
           conversationState={conversationState}
           conversationRepository={conversationRepository}
+          handleFocus={handleFocus}
+          currentFocus={currentFocus}
+          showFocus={showFocus}
+          handleArrowKeyDown={handleKeyDown}
         />
       )}
     </ListWrapper>

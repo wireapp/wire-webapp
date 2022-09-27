@@ -87,16 +87,19 @@ const ContextMenu: React.FC<ContextMenuProps> = ({entries, defaultIdentifier = '
   useEffect(() => {
     const onWheel = (event: MouseEvent) => event.preventDefault();
 
+    //after opening the menu first time, select the first option
+    if (!selected) {
+      setSelected(entries[0]);
+    }
+
     const onKeyDown = (event: KeyboardEvent): void => {
       event.preventDefault();
       if (isEscapeKey(event)) {
         cleanUp();
         previouslyFocused.focus();
       }
-      //after opening the menu on first tab press select the first option
-      if (!selected && isKey(event, KEY.TAB)) {
-        setSelected(entries[0]);
-      } else if (isKey(event, KEY.TAB)) {
+
+      if (isKey(event, KEY.TAB)) {
         //tab key press while the menu is open will close the menu
         cleanUp();
       }
@@ -114,6 +117,7 @@ const ContextMenu: React.FC<ContextMenuProps> = ({entries, defaultIdentifier = '
         if (selected) {
           cleanUp();
           selected.click?.();
+          previouslyFocused.focus();
         }
       }
     };
@@ -139,7 +143,7 @@ const ContextMenu: React.FC<ContextMenuProps> = ({entries, defaultIdentifier = '
   }, [mainElement, selected]);
 
   return (
-    <ul className="ctx-menu" ref={setMainElement} style={{maxHeight: window.innerHeight, ...style}}>
+    <ul className="ctx-menu" ref={setMainElement} style={{maxHeight: window.innerHeight, ...style}} role="menu">
       {entries.map((entry, index) =>
         entry.isSeparator ? (
           <li key={`${index}`} className="ctx-menu__separator" />
@@ -151,6 +155,8 @@ const ContextMenu: React.FC<ContextMenuProps> = ({entries, defaultIdentifier = '
               'ctx-menu__item--disabled': entry.isDisabled,
               selected: entry === selected,
             })}
+            role="menuitem"
+            aria-haspopup="true"
           >
             <button
               id={getButtonId(entry.label!)}

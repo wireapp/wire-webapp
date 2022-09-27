@@ -70,15 +70,11 @@
   .button-states();
 
   &:focus-visible {
-    background-color: var(--white);
-    outline: 1px solid var(--gray-40);
+    .focus-border-radius;
+    outline-offset: -2px;
   }
 
   body.theme-dark & {
-    &:focus-visible {
-      background-color: var(--gray-95);
-      outline: 1px solid var(--gray-90);
-    }
     &.active {
       .button-active();
       color: var(--black);
@@ -102,7 +98,9 @@
 .conversations-settings-button {
   .button-reset-default;
   .button-icon-large;
+  .focus-border-radius;
   position: relative;
+  outline-offset: 0.2rem;
 }
 
 .conversations-settings {
