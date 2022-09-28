@@ -163,6 +163,16 @@ describe('TitleBar', () => {
       entity: conversation,
     });
   });
+  it('hide info button and search button on scaled down view', async () => {
+    mockedUiKit.useMatchMedia.mockReturnValue(true);
+
+    const {queryByLabelText} = render(<TitleBar {...getDefaultProps(callingRepository)} />);
+
+    const infoButton = queryByLabelText('tooltipConversationInfo');
+    const videoCallButton = queryByLabelText('tooltipConversationVideoCall');
+    expect(infoButton).toBe(null);
+    expect(videoCallButton).toBe(null);
+  });
 
   it("doesn't show legal-hold icon for non legal-hold user", async () => {
     const userState = createUserState({isActivatedAccount: ko.pureComputed(() => true)});
