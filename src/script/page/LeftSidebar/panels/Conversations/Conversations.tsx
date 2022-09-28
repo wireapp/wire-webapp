@@ -149,7 +149,7 @@ const Conversations: React.FC<ConversationsProps> = ({
         <Icon.Settings />
       </button>
 
-      {!teamState.isTeam() ? (
+      {teamState.isTeam() ? (
         <>
           <button
             type="button"
@@ -157,6 +157,7 @@ const Conversations: React.FC<ConversationsProps> = ({
             onClick={event => AvailabilityContextMenu.show(event.nativeEvent, 'left-list-availability-menu')}
             onKeyDown={event => {
               if (isTabKey(event)) {
+                // without this flag the first conversation is getting focus on page load
                 focusFirstConversation(true);
               }
             }}
@@ -196,6 +197,12 @@ const Conversations: React.FC<ConversationsProps> = ({
               type="button"
               className="conversations-footer-btn"
               onClick={() => switchList(ListState.START_UI)}
+              onKeyDown={event => {
+                //shift+tab from contacts tab should focus on the first conversation
+                if (event.shiftKey && isTabKey(event)) {
+                  focusFirstConversation(true);
+                }
+              }}
               title={t('tooltipConversationsStart', Shortcut.getShortcutTooltip(ShortcutType.START))}
               data-uie-name="go-people"
             >
@@ -210,7 +217,9 @@ const Conversations: React.FC<ConversationsProps> = ({
               type="button"
               role="tab"
               className={`conversations-footer-btn ${viewStyle === ConverationViewStyle.RECENT ? 'active' : ''}`}
-              onClick={() => setViewStyle(ConverationViewStyle.RECENT)}
+              onClick={() => {
+                setViewStyle(ConverationViewStyle.RECENT);
+              }}
               title={t('conversationViewTooltip')}
               data-uie-name="go-recent-view"
               data-uie-status={viewStyle === ConverationViewStyle.RECENT ? 'active' : 'inactive'}

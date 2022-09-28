@@ -49,10 +49,10 @@ export interface ConversationListCellProps {
   showJoinButton: boolean;
   index: number;
   focus: boolean;
-  currentFocus: number;
   showFocus: boolean;
   handleFocus: (index: number) => void;
   handleArrowKeyDown: (e: React.KeyboardEvent) => void;
+  isFolder: boolean;
 }
 
 const ConversationListCell: React.FC<ConversationListCellProps> = ({
@@ -65,10 +65,10 @@ const ConversationListCell: React.FC<ConversationListCellProps> = ({
   dataUieName,
   index,
   focus,
-  currentFocus,
   showFocus,
   handleFocus,
   handleArrowKeyDown,
+  isFolder = false,
 }) => {
   const {
     isGroup,
@@ -138,7 +138,7 @@ const ConversationListCell: React.FC<ConversationListCellProps> = ({
     if (focus && conversationRef.current && showFocus) {
       conversationRef.current.focus();
     }
-  }, [focus, currentFocus]);
+  }, [focus]);
 
   useEffect(() => {
     // Move element into view when it is focused
@@ -163,6 +163,13 @@ const ConversationListCell: React.FC<ConversationListCellProps> = ({
       handleArrowKeyDown(event);
     }
   };
+
+  // always focus on the selected conversation when the folder tab loaded
+  useEffect(() => {
+    if (isActive && showFocus && isFolder) {
+      handleFocus(index);
+    }
+  }, [isActive, showFocus]);
 
   return (
     <li ref={setViewportElementRef}>
