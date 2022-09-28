@@ -30,12 +30,12 @@ import {useWarningModalState, showNextModalInQueue, defaultContent, removeCurren
 export interface WarningModalProps {}
 
 const WarningModalComponent: React.FC = () => {
-  console.info('bardia re-render');
   const [inputValue, updateInputValue] = useState<string>('');
   const [passwordValue, updatePasswordValue] = useState<string>('');
-  const [errorMessage, updateErrorMessage] = useState<string>('');
   const [optionChecked, updateOptionChecked] = useState<boolean>(false);
   const content = useWarningModalState(state => state.currentModalContent);
+  const errorMessage = useWarningModalState(state => state.errorMessage);
+  const updateErrorMessage = useWarningModalState(state => state.updateErrorMessage);
   const updateCurrentModalContent = useWarningModalState(state => state.updateCurrentModalContent);
   const currentId = useWarningModalState(state => state.currentModalId);
   const isModalVisible = currentId !== null;
