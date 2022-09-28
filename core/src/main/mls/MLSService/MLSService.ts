@@ -36,7 +36,6 @@ import {APIClient} from '@wireapp/api-client';
 import {QualifiedUsers} from '../../conversation';
 import {Converter, Decoder, Encoder} from 'bazinga64';
 import {MLSCallbacks, MLSConfig} from '../types';
-import {PostMlsMessageResponse} from '@wireapp/api-client/src/conversation';
 import {sendMessage} from '../../conversation/message/messageSender';
 import {parseFullQualifiedClientId} from '../../util/fullyQualifiedClientIdUtils';
 //@todo: this function is temporary, we wait for the update from core-crypto side
@@ -86,12 +85,9 @@ export class MLSService {
   }
 
   public addUsersToExistingConversation(groupId: Uint8Array, invitee: Invitee[]) {
-    return sendMessage(async () => {
-      const coreCryptoClient = this.getCoreCryptoClient();
-      const memberAddedMessages = await coreCryptoClient.addClientsToConversation(groupId, invitee);
-
-      return this.uploadCommitBundle(groupId, memberAddedMessages);
-    });
+    return this.processCommitAction(groupId, () =>
+      this.getCoreCryptoClient().addClientsToConversation(groupId, invitee),
+    );
   }
 
   public configureMLSCallbacks({groupIdFromConversationId, ...coreCryptoCallbacks}: MLSCallbacks): void {
@@ -161,11 +157,28 @@ export class MLSService {
     return this.getCoreCryptoClient().encryptMessage(conversationId, message);
   }
 
-  public updateKeyingMaterial(conversationId: ConversationId): Promise<PostMlsMessageResponse | null> {
+  /**
+   * Will wrap a coreCrypto call that generates a CommitBundle and do all the necessary work so that commitbundle is handled the right way.
+   * It does:
+   *   - commit the pending proposal
+   *   - then generates the commitBundle with the given function
+   *   - uploads the commitBundle to backend
+   *   - warns coreCrypto that the commit was successfully processed
+   * @param groupId
+   * @param generateCommit The function that will generate a coreCrypto CommitBundle
+   */
+  private async processCommitAction(groupId: ConversationId, generateCommit: () => Promise<CommitBundle>) {
     return sendMessage(async () => {
-      const commitBundle = await this.getCoreCryptoClient().updateKeyingMaterial(conversationId);
-      return this.uploadCommitBundle(conversationId, commitBundle);
+      await this.commitPendingProposals(groupId);
+      const commitBundle = await generateCommit();
+      return this.uploadCommitBundle(groupId, commitBundle);
     });
+  }
+
+  public updateKeyingMaterial(conversationId: ConversationId) {
+    return this.processCommitAction(conversationId, () =>
+      this.getCoreCryptoClient().updateKeyingMaterial(conversationId),
+    );
   }
 
   public async createConversation(
@@ -175,19 +188,15 @@ export class MLSService {
     return this.getCoreCryptoClient().createConversation(conversationId, configuration);
   }
 
-  public removeClientsFromConversation(
-    conversationId: ConversationId,
-    clientIds: Uint8Array[],
-  ): Promise<PostMlsMessageResponse | null> {
-    return sendMessage(async () => {
-      const commitBundle = await this.getCoreCryptoClient().removeClientsFromConversation(conversationId, clientIds);
-      return this.uploadCommitBundle(conversationId, commitBundle);
-    });
+  public removeClientsFromConversation(conversationId: ConversationId, clientIds: Uint8Array[]) {
+    return this.processCommitAction(conversationId, () =>
+      this.getCoreCryptoClient().removeClientsFromConversation(conversationId, clientIds),
+    );
   }
 
   public async commitPendingProposals(groupId: ConversationId): Promise<void> {
     const commitBundle = await this.getCoreCryptoClient().commitPendingProposals(groupId);
-    return commitBundle ? void this.uploadCommitBundle(groupId, commitBundle) : undefined;
+    return commitBundle ? void (await this.uploadCommitBundle(groupId, commitBundle)) : undefined;
   }
 
   public async conversationExists(conversationId: ConversationId): Promise<boolean> {
