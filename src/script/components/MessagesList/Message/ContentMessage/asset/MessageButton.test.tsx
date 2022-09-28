@@ -19,56 +19,57 @@
 
 import ko from 'knockout';
 import {CompositeMessage} from 'src/script/entity/message/CompositeMessage';
-import TestPage from 'Util/test/TestPage';
-import MessageButton, {MessageButtonProps} from './MessageButton';
-
-class MessageButtonPage extends TestPage<MessageButtonProps> {
-  constructor(props?: MessageButtonProps) {
-    super(MessageButton, props);
-  }
-
-  getButtonWithId = (id: string) => this.get(`button[data-uie-uid="${id}"]`);
-  getError = () => this.get('div[data-uie-name="message-button-error"]');
-  getLoadingIcon = () => this.get('svg[data-uie-name="message-button-loading-icon"]');
-
-  clickButtonWithId = (id: string) => this.click(this.getButtonWithId(id));
-}
+import MessageButton from './MessageButton';
+import {render} from '@testing-library/react';
 
 describe('MessageButton', () => {
   it('shows error message', async () => {
     const messageId = 'id';
     const messageError = 'error';
     const message: Partial<CompositeMessage> = {
-      errorButtonId: ko.observable(messageId),
+      errorButtonId: ko.observable<string | undefined>(messageId),
       errorMessage: ko.observable(messageError),
-      selectedButtonId: ko.observable(''),
-      waitingButtonId: ko.observable(''),
+      selectedButtonId: ko.observable<string | undefined>(''),
+      waitingButtonId: ko.observable<string | undefined>(''),
     };
-    const messageButton = new MessageButtonPage({
+
+    const props = {
       id: messageId,
       label: 'buttonLabel',
       message: message as CompositeMessage,
-    });
+    };
 
-    expect(messageButton.getError()).not.toBeNull();
-    expect(messageButton.getError().textContent).toBe(messageError);
+    const {container} = render(<MessageButton {...props} />);
+
+    const errorMessageElement = container.querySelector('div[data-uie-name="message-button-error"]');
+    expect(errorMessageElement).not.toBeNull();
+
+    expect(errorMessageElement!.textContent).toBe(messageError);
   });
 
   it('renders selected button', async () => {
     const messageId = 'id';
     const message: Partial<CompositeMessage> = {
-      errorButtonId: ko.observable(''),
+      errorButtonId: ko.observable<string | undefined>(''),
       errorMessage: ko.observable(''),
-      selectedButtonId: ko.observable(messageId),
-      waitingButtonId: ko.observable(''),
+      selectedButtonId: ko.observable<string | undefined>(messageId),
+      waitingButtonId: ko.observable<string | undefined>(''),
     };
-    const messageButton = new MessageButtonPage({
+
+    const props = {
       id: messageId,
       label: 'buttonLabel',
       message: message as CompositeMessage,
-    });
+    };
 
-    expect(messageButton.getError()).toBeNull();
-    expect(messageButton.getButtonWithId(messageId).getAttribute('data-uie-selected')).toBe('true');
+    const {container} = render(<MessageButton {...props} />);
+
+    const errorMessageElement = container.querySelector('div[data-uie-name="message-button-error"]');
+    expect(errorMessageElement).toBeNull();
+
+    const selectedButton = container.querySelector(`button[data-uie-uid="${messageId}"]`);
+    expect(selectedButton).not.toBeNull();
+
+    expect(selectedButton!.getAttribute('data-uie-selected')).toBe('true');
   });
 });
