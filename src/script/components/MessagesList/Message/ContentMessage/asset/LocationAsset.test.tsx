@@ -17,36 +17,32 @@
  *
  */
 
-import TestPage from 'Util/test/TestPage';
+import {render} from '@testing-library/react';
 
-import LocationAsset, {LocationAssetProps} from './LocationAsset';
+import LocationAsset from './LocationAsset';
 
 import type {Location} from 'src/script/entity/message/Location';
-
-class LocationAssetPage extends TestPage<LocationAssetProps> {
-  constructor(props?: LocationAssetProps) {
-    super(LocationAsset, props);
-  }
-
-  getMapsElement = () => this.get('[data-uie-name="location-asset-link"]');
-  getMapsLink = () => this.getMapsElement().getAttribute('href');
-  getLocationElement = () => this.get('[data-uie-name="location-name"]');
-}
 
 describe('LocationAsset', () => {
   const location: Partial<Location> = {latitude: '52.31', longitude: '13.24', name: 'Berlin', zoom: '0'};
 
   it('sets the correct Google Maps link', () => {
-    const locationAsset = new LocationAssetPage({asset: location as Location});
-    const mapsLink = locationAsset.getMapsLink();
+    const {container} = render(<LocationAsset asset={location as Location} />);
+
+    const mapsElement = container.querySelector('[data-uie-name="location-asset-link"]');
+    expect(mapsElement).not.toBeNull();
+
+    const mapsLink = mapsElement!.getAttribute('href');
 
     expect(mapsLink).toContain(`${location.latitude},${location.longitude}`);
   });
 
   it('sets the correct location name', () => {
-    const locationAsset = new LocationAssetPage({asset: location as Location});
-    const locationName = locationAsset.getLocationElement();
+    const {container} = render(<LocationAsset asset={location as Location} />);
 
-    expect(locationName.textContent).toBe(location.name);
+    const locationElement = container.querySelector('[data-uie-name="location-name"]');
+    expect(locationElement).not.toBeNull();
+
+    expect(locationElement!.textContent).toBe(location.name);
   });
 });
