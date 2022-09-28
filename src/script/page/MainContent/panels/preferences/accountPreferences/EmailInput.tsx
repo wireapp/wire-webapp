@@ -22,11 +22,11 @@ import {amplify} from 'amplify';
 import React from 'react';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 
-import {ModalsViewModel} from '../../../../../view_model/ModalsViewModel';
 import AccountInput, {useInputDone} from './AccountInput';
 import {getLogger} from 'Util/Logger';
 import {t} from 'Util/LocalizerUtil';
 import {UserRepository} from '../../../../../user/UserRepository';
+import {WarningModalType} from 'Components/Modals/WarningModal/WarningModalTypes';
 
 interface EmailInputProps {
   canEditProfile: boolean;
@@ -41,7 +41,7 @@ const EmailInput: React.FC<EmailInputProps> = ({email, canEditProfile, userRepos
 
   const changeEmail = async (enteredEmail: string): Promise<void> => {
     const showWarning = (title: string, message: string) => {
-      amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.ACKNOWLEDGE, {
+      amplify.publish(WebAppEvents.WARNING.MODAL, WarningModalType.ACKNOWLEDGE, {
         text: {
           message,
           title,

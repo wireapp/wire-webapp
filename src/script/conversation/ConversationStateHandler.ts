@@ -26,8 +26,6 @@ import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 
 import {t} from 'Util/LocalizerUtil';
 
-import {ModalsViewModel} from '../view_model/ModalsViewModel';
-
 import type {Conversation} from '../entity/Conversation';
 import {AbstractConversationEventHandler, EventHandlingConfig} from './AbstractConversationEventHandler';
 import {ACCESS_STATE} from './AccessState';
@@ -40,6 +38,7 @@ import {
   isGettingAccessToFeature,
   updateAccessRights,
 } from './ConversationAccessPermission';
+import {WarningModalType} from '../components/Modals/WarningModal/WarningModalTypes';
 
 export class ConversationStateHandler extends AbstractConversationEventHandler {
   private readonly conversationService: ConversationService;
@@ -145,6 +144,6 @@ export class ConversationStateHandler extends AbstractConversationEventHandler {
 
   private _showModal(message: string): void {
     const modalOptions = {text: {message}};
-    amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.ACKNOWLEDGE, modalOptions);
+    amplify.publish(WebAppEvents.WARNING.MODAL, WarningModalType.ACKNOWLEDGE, modalOptions);
   }
 }

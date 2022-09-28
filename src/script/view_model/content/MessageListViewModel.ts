@@ -38,7 +38,6 @@ import {IntegrationRepository} from '../../integration/IntegrationRepository';
 import {MainViewModel} from '../MainViewModel';
 import {MemberMessage} from '../../entity/message/MemberMessage';
 import {Message} from '../../entity/message/Message';
-import {ModalsViewModel} from '../ModalsViewModel';
 import {MotionDuration} from '../../motion/MotionDuration';
 import {PanelViewModel} from '../PanelViewModel';
 import {ServerTimeHandler} from '../../time/serverTimeHandler';
@@ -51,6 +50,7 @@ import type {MessageRepository} from '../../conversation/MessageRepository';
 import {showDetailViewModal} from 'Components/Modals/DetailViewModal';
 import {AssetRepository} from '../../assets/AssetRepository';
 import React from 'react';
+import {WarningModalType} from '../../components/Modals/WarningModal/WarningModalTypes';
 
 /*
  * Message list rendering view model.
@@ -183,7 +183,7 @@ export class MessageListViewModel {
     const resetProgress = () =>
       window.setTimeout(() => {
         messageEntity.is_resetting_session(false);
-        amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.SESSION_RESET);
+        amplify.publish(WebAppEvents.WARNING.MODAL, WarningModalType.SESSION_RESET);
       }, MotionDuration.LONG);
 
     messageEntity.is_resetting_session(true);
@@ -327,7 +327,7 @@ export class MessageListViewModel {
     const linkTarget = (event.target as HTMLElement).closest<HTMLAnchorElement>('[data-md-link]');
     if (linkTarget) {
       const href = linkTarget.href;
-      amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.CONFIRM, {
+      amplify.publish(WebAppEvents.WARNING.MODAL, WarningModalType.CONFIRM, {
         primaryAction: {
           action: () => {
             safeWindowOpen(href);

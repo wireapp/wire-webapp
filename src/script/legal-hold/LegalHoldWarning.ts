@@ -24,10 +24,10 @@ import {t} from 'Util/LocalizerUtil';
 
 import {ConversationVerificationState} from '../conversation/ConversationVerificationState';
 import type {Conversation} from '../entity/Conversation';
-import {ModalsViewModel} from '../view_model/ModalsViewModel';
 import {OPEN_CONVERSATION_DETAILS} from '../view_model/PanelViewModel';
 import {ConversationError} from '../error/ConversationError';
 import {LegalHoldModalViewModel} from '../view_model/content/LegalHoldModalViewModel';
+import {WarningModalType} from '../components/Modals/WarningModal/WarningModalTypes';
 
 export const showLegalHoldWarningModal = (
   conversationEntity: Conversation,
@@ -48,7 +48,7 @@ export const showLegalHoldWarningModal = (
       });
     }
 
-    amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.MULTI_ACTIONS, {
+    amplify.publish(WebAppEvents.WARNING.MODAL, WarningModalType.MULTI_ACTIONS, {
       close: () => {
         reject(
           new ConversationError(

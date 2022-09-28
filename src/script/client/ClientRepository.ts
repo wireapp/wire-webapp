@@ -32,7 +32,6 @@ import {Logger, getLogger} from 'Util/Logger';
 import {loadValue} from 'Util/StorageUtil';
 import {SIGN_OUT_REASON} from '../auth/SignOutReason';
 import {StorageKey} from '../storage/StorageKey';
-import {ModalsViewModel} from '../view_model/ModalsViewModel';
 import {ClientEntity} from './ClientEntity';
 import {ClientMapper} from './ClientMapper';
 import type {ClientService} from './ClientService';
@@ -43,6 +42,7 @@ import {ClientRecord, StorageRepository} from '../storage';
 import {ClientState} from './ClientState';
 import {matchQualifiedIds} from 'Util/QualifiedId';
 import {Core} from '../service/CoreSingleton';
+import {WarningModalType} from '../components/Modals/WarningModal/WarningModalTypes';
 
 export type UserClientEntityMap = {[userId: string]: ClientEntity[]};
 export type QualifiedUserClientEntityMap = {[domain: string]: UserClientEntityMap};
@@ -308,7 +308,7 @@ export class ClientRepository {
         await this.deleteLocalTemporaryClient();
         amplify.publish(WebAppEvents.LIFECYCLE.SIGN_OUT, SIGN_OUT_REASON.USER_REQUESTED, true);
       } else {
-        amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.OPTION, {
+        amplify.publish(WebAppEvents.WARNING.MODAL, WarningModalType.OPTION, {
           preventClose: true,
           primaryAction: {
             action: (clearData: boolean) => {
@@ -570,7 +570,7 @@ export class ClientRepository {
     if (removedClient?.isLegalHold()) {
       amplify.publish(
         WebAppEvents.WARNING.MODAL,
-        ModalsViewModel.TYPE.ACKNOWLEDGE,
+        WarningModalType.ACKNOWLEDGE,
         {
           text: {
             message: t('modalLegalHoldDeactivatedMessage'),

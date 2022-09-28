@@ -33,7 +33,6 @@ import {showLabelContextMenu} from '../ui/LabelContextMenu';
 import {Shortcut} from '../ui/Shortcut';
 import {ShortcutType} from '../ui/ShortcutType';
 import {ContentState, ContentViewModel} from './ContentViewModel';
-import {ModalsViewModel} from './ModalsViewModel';
 import {PanelViewModel} from './PanelViewModel';
 import type {MainViewModel, ViewModelRepositories} from './MainViewModel';
 import type {CallingRepository} from '../calling/CallingRepository';
@@ -48,6 +47,7 @@ import {ConversationState} from '../conversation/ConversationState';
 import {CallingViewModel} from './CallingViewModel';
 import {PropertiesRepository} from '../properties/PropertiesRepository';
 import {SearchRepository} from '../search/SearchRepository';
+import {WarningModalType} from '../components/Modals/WarningModal/WarningModalTypes';
 
 export enum ListState {
   ARCHIVE = 'ListViewModel.STATE.ARCHIVE',
@@ -169,7 +169,7 @@ export class ListViewModel {
       return;
     }
     if (call.conversationType === CONV_TYPE.CONFERENCE && !this.callingRepository.supportsConferenceCalling) {
-      amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.ACKNOWLEDGE, {
+      amplify.publish(WebAppEvents.WARNING.MODAL, WarningModalType.ACKNOWLEDGE, {
         text: {
           message: `${t('modalConferenceCallNotSupportedMessage')} ${t('modalConferenceCallNotSupportedJoinMessage')}`,
           title: t('modalConferenceCallNotSupportedHeadline'),

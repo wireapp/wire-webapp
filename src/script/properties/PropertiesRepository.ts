@@ -32,9 +32,9 @@ import {Config} from '../Config';
 import type {User} from '../entity/User';
 import type {SelfService} from '../self/SelfService';
 import {ConsentValue} from '../user/ConsentValue';
-import {ModalsViewModel} from '../view_model/ModalsViewModel';
 import type {PropertiesService} from './PropertiesService';
 import {PROPERTIES_TYPE} from './PropertiesType';
+import {WarningModalType} from '../components/Modals/WarningModal/WarningModalTypes';
 
 export class PropertiesRepository {
   // Value names are specified by the protocol but key names can be changed.
@@ -125,7 +125,7 @@ export class PropertiesRepository {
     }
 
     return new Promise(resolve => {
-      amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.CONFIRM, {
+      amplify.publish(WebAppEvents.WARNING.MODAL, WarningModalType.CONFIRM, {
         preventClose: true,
         primaryAction: {
           action: () => {

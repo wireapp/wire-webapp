@@ -27,13 +27,13 @@ import {safeWindowOpen} from 'Util/SanitizationUtil';
 import {afterRender} from 'Util/util';
 
 import {Config} from '../Config';
-import {ModalsViewModel} from './ModalsViewModel';
 import {PermissionState} from '../notification/PermissionState';
 import {Runtime} from '@wireapp/commons';
 
 import React, {useEffect, useState} from 'react';
 import Icon from 'Components/Icon';
 import {registerReactComponent} from 'Util/ComponentUtil';
+import {WarningModalType} from 'Components/Modals/WarningModal/WarningModalTypes';
 
 const WarningsContainer: React.FC = () => {
   const logger = getLogger('WarningsViewModel');
@@ -79,7 +79,7 @@ const WarningsContainer: React.FC = () => {
 
     switch (warningToClose) {
       case TYPE.REQUEST_MICROPHONE: {
-        amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.ACKNOWLEDGE, {
+        amplify.publish(WebAppEvents.WARNING.MODAL, WarningModalType.ACKNOWLEDGE, {
           primaryAction: {
             action: () => {
               safeWindowOpen(URL.SUPPORT.MICROPHONE_ACCESS_DENIED);

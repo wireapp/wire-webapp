@@ -28,9 +28,9 @@ import {downloadBlob} from 'Util/util';
 import {Config} from '../../../../../Config';
 import PreferencesSection from '../components/PreferencesSection';
 import type {CallingRepository} from '../../../../../calling/CallingRepository';
-import {ModalsViewModel} from '../../../../../view_model/ModalsViewModel';
 import {UserState} from '../../../../../user/UserState';
 import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
+import {WarningModalType} from 'Components/Modals/WarningModal/WarningModalTypes';
 
 interface SaveCallLogsProps {
   callingRepository: CallingRepository;
@@ -52,7 +52,7 @@ const SaveCallLogs: React.FC<SaveCallLogsProps> = ({callingRepository, userState
 
       downloadBlob(blob, filename);
     } else {
-      amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.ACKNOWLEDGE, {
+      amplify.publish(WebAppEvents.WARNING.MODAL, WarningModalType.ACKNOWLEDGE, {
         text: {
           closeBtnLabel: t('modalCallEmptyLogCloseBtn'),
           message: t('modalCallEmptyLogMessage'),

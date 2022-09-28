@@ -58,7 +58,6 @@ import {flatten} from 'Util/ArrayUtil';
 import {roundLogarithmic} from 'Util/NumberUtil';
 
 import {Config} from '../Config';
-import {ModalsViewModel} from '../view_model/ModalsViewModel';
 import {CALL_MESSAGE_TYPE} from './enum/CallMessageType';
 import {CallingEvent, EventBuilder} from '../conversation/EventBuilder';
 import {EventRepository} from '../event/EventRepository';
@@ -85,6 +84,7 @@ import Warnings from '../view_model/WarningsContainer';
 import {PayloadBundleState} from '@wireapp/core/src/main/conversation';
 import {Core} from '../service/CoreSingleton';
 import {LEAVE_CALL_REASON} from './enum/LeaveCallReason';
+import {WarningModalType} from '../components/Modals/WarningModal/WarningModalTypes';
 
 interface MediaStreamQuery {
   audio?: boolean;
@@ -500,7 +500,7 @@ export class CallingRepository {
         this.leaveCall(activeCall.conversationId, LEAVE_CALL_REASON.USER_TURNED_UNVERIFIED);
         amplify.publish(
           WebAppEvents.WARNING.MODAL,
-          ModalsViewModel.TYPE.ACKNOWLEDGE,
+          WarningModalType.ACKNOWLEDGE,
           {
             action: {
               title: t('callDegradationAction'),
@@ -533,7 +533,7 @@ export class CallingRepository {
     const brandName = Config.getConfig().BRAND_NAME;
     amplify.publish(
       WebAppEvents.WARNING.MODAL,
-      ModalsViewModel.TYPE.ACKNOWLEDGE,
+      WarningModalType.ACKNOWLEDGE,
       {
         close: () => this.acceptVersionWarning(conversationId),
         text: {
@@ -1745,7 +1745,7 @@ export class CallingRepository {
     }
 
     return new Promise((resolve, reject) => {
-      amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.CONFIRM, {
+      amplify.publish(WebAppEvents.WARNING.MODAL, WarningModalType.CONFIRM, {
         primaryAction: {
           action: () => {
             if (activeCall.state() === CALL_STATE.INCOMING) {
@@ -1784,7 +1784,7 @@ export class CallingRepository {
         title: t('modalNoAudioInputTitle'),
       },
     };
-    amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.CONFIRM, modalOptions);
+    amplify.publish(WebAppEvents.WARNING.MODAL, WarningModalType.CONFIRM, modalOptions);
   }
 
   private showNoCameraModal(): void {
@@ -1800,7 +1800,7 @@ export class CallingRepository {
         title: t('modalNoCameraTitle'),
       },
     };
-    amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.ACKNOWLEDGE, modalOptions);
+    amplify.publish(WebAppEvents.WARNING.MODAL, WarningModalType.ACKNOWLEDGE, modalOptions);
   }
 
   //##############################################################################

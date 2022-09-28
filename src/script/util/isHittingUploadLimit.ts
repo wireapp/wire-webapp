@@ -23,7 +23,7 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 import {t} from 'Util/LocalizerUtil';
 
 import {AssetRepository} from '../assets/AssetRepository';
-import {ModalsViewModel} from '../view_model/ModalsViewModel';
+import {WarningModalType} from '../components/Modals/WarningModal/WarningModalTypes';
 
 const CONCURRENT_UPLOAD_LIMIT = 10;
 
@@ -39,7 +39,7 @@ const isHittingUploadLimit = (files: File[], assetRepository: AssetRepository): 
       },
     };
 
-    amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.ACKNOWLEDGE, modalOptions);
+    amplify.publish(WebAppEvents.WARNING.MODAL, WarningModalType.ACKNOWLEDGE, modalOptions);
   }
 
   return isHittingUploadLimit;

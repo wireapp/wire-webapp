@@ -32,7 +32,6 @@ import type {ConversationRepository} from '../conversation/ConversationRepositor
 import type {Conversation} from '../entity/Conversation';
 import type {User} from '../entity/User';
 import type {TeamRepository} from '../team/TeamRepository';
-import {ModalsViewModel} from '../view_model/ModalsViewModel';
 import {IntegrationMapper} from './IntegrationMapper';
 import type {IntegrationService} from './IntegrationService';
 import {ServiceEntity} from './ServiceEntity';
@@ -41,6 +40,7 @@ import {ProviderEntity} from './ProviderEntity';
 import {MemberLeaveEvent} from '../conversation/EventBuilder';
 import {TeamState} from '../team/TeamState';
 import {ConversationState} from '../conversation/ConversationState';
+import {WarningModalType} from '../components/Modals/WarningModal/WarningModalTypes';
 
 export class IntegrationRepository {
   private readonly logger: Logger;
@@ -146,7 +146,7 @@ export class IntegrationRepository {
         ConversationError.MESSAGE.CONVERSATION_NOT_FOUND,
       );
     } catch (error) {
-      amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.ACKNOWLEDGE, {
+      amplify.publish(WebAppEvents.WARNING.MODAL, WarningModalType.ACKNOWLEDGE, {
         text: {
           message: t('modalIntegrationUnavailableMessage'),
           title: t('modalIntegrationUnavailableHeadline'),

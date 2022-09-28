@@ -28,7 +28,6 @@ import {t} from 'Util/LocalizerUtil';
 
 import {Config} from '../../Config';
 import {BasePanelViewModel, PanelViewModelProps} from './BasePanelViewModel';
-import {ModalsViewModel} from '../ModalsViewModel';
 import {ACCESS_STATE} from '../../conversation/AccessState';
 import type {ConversationStateHandler} from '../../conversation/ConversationStateHandler';
 import type {Conversation} from '../../entity/Conversation';
@@ -38,6 +37,7 @@ import {
   teamPermissionsForAccessState,
   toggleFeature,
 } from '../../conversation/ConversationAccessPermission';
+import {WarningModalType} from '../../components/Modals/WarningModal/WarningModalTypes';
 
 export class GuestsAndServicesViewModel extends BasePanelViewModel {
   private readonly teamState: TeamState;
@@ -143,7 +143,7 @@ export class GuestsAndServicesViewModel extends BasePanelViewModel {
   };
 
   readonly revokeAccessCode = (): void => {
-    amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.CONFIRM, {
+    amplify.publish(WebAppEvents.WARNING.MODAL, WarningModalType.CONFIRM, {
       preventClose: true,
       primaryAction: {
         action: async (): Promise<void> => {
@@ -181,7 +181,7 @@ export class GuestsAndServicesViewModel extends BasePanelViewModel {
         return changeAccessState();
       }
 
-      amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.CONFIRM, {
+      amplify.publish(WebAppEvents.WARNING.MODAL, WarningModalType.CONFIRM, {
         preventClose: true,
         primaryAction: {
           action: changeAccessState,

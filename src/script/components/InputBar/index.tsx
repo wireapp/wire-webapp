@@ -67,7 +67,6 @@ import {MessageRepository, OutgoingQuote} from '../../conversation/MessageReposi
 import {StorageRepository} from '../../storage';
 import {MentionEntity} from '../../message/MentionEntity';
 import {Config} from '../../Config';
-import {ModalsViewModel} from '../../view_model/ModalsViewModel';
 import {ConversationError} from '../../error/ConversationError';
 import {MessageHasher} from '../../message/MessageHasher';
 import {QuoteEntity} from '../../message/QuoteEntity';
@@ -83,6 +82,7 @@ import useResizeTarget from '../../hooks/useResizeTarget';
 import useDropFiles from '../../hooks/useDropFiles';
 import useTextAreaFocus from '../../hooks/useTextAreaFocus';
 import {StyledApp, THEME_ID} from '@wireapp/react-ui-kit';
+import {WarningModalType} from '../../components/Modals/WarningModal/WarningModalTypes';
 
 const CONFIG = {
   ...Config.getConfig(),
@@ -92,7 +92,7 @@ const CONFIG = {
 const showWarningModal = (title: string, message: string): void => {
   // Timeout needed for display warning modal - we need to update modal
   setTimeout(() => {
-    amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.ACKNOWLEDGE, {
+    amplify.publish(WebAppEvents.WARNING.MODAL, WarningModalType.ACKNOWLEDGE, {
       text: {message, title},
     });
   }, 0);

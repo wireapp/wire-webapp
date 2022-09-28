@@ -25,7 +25,6 @@ import {getLogger, Logger} from 'Util/Logger';
 import {afterRender} from 'Util/util';
 
 import {WindowTitleViewModel} from './WindowTitleViewModel';
-import {modals, ModalsViewModel} from './ModalsViewModel';
 import {ContentViewModel} from './ContentViewModel';
 import {CallingViewModel} from './CallingViewModel';
 import {ActionsViewModel} from './ActionsViewModel';
@@ -97,7 +96,6 @@ export class MainViewModel {
   list: ListViewModel;
   logger: Logger;
   mainClasses: ko.PureComputed<string | undefined>;
-  modals: ModalsViewModel;
   multitasking: Multitasking;
   panel: PanelViewModel;
   selfUser: ko.Observable<User>;
@@ -145,8 +143,6 @@ export class MainViewModel {
 
     this.userState = container.resolve(UserState);
     this.isFederated = container.resolve(Core).backendFeatures.isFederated;
-
-    this.modals = modals;
 
     this.multitasking = {
       isMinimized: ko.observable(true),

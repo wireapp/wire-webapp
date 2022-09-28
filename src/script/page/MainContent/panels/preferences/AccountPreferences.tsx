@@ -21,6 +21,7 @@ import {Runtime} from '@wireapp/commons';
 import React, {useRef} from 'react';
 import {container} from 'tsyringe';
 import {useEnrichedFields} from 'Components/panel/EnrichedFields';
+import {amplify} from 'amplify';
 
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
@@ -39,7 +40,6 @@ import {TeamState} from '../../../../team/TeamState';
 import {RichProfileRepository} from '../../../../user/RichProfileRepository';
 import type {UserRepository} from '../../../../user/UserRepository';
 import {UserState} from '../../../../user/UserState';
-import {modals, ModalsViewModel} from '../../../../view_model/ModalsViewModel';
 import AccentColorPicker from '../../../AccentColorPicker';
 import AccountInput from './accountPreferences/AccountInput';
 import AccountSecuritySection from './accountPreferences/AccountSecuritySection';
@@ -55,6 +55,8 @@ import PrivacySection from './accountPreferences/PrivacySection';
 import UsernameInput from './accountPreferences/UsernameInput';
 import PreferencesPage from './components/PreferencesPage';
 import AccountLink from './accountPreferences/AccountLink';
+import {WarningModalType} from 'Components/Modals/WarningModal/WarningModalTypes';
+import {WebAppEvents} from '@wireapp/webapp-events';
 
 interface AccountPreferencesProps {
   backupRepository: BackupRepository;
@@ -102,8 +104,9 @@ const AccountPreferences: React.FC<AccountPreferencesProps> = ({
   const domain = selfUser.domain;
 
   const clickOnLeaveGuestRoom = (): void => {
-    modals.showModal(
-      ModalsViewModel.TYPE.CONFIRM,
+    amplify.publish(
+      WebAppEvents.WARNING.MODAL,
+      WarningModalType.CONFIRM,
       {
         preventClose: true,
         primaryAction: {
