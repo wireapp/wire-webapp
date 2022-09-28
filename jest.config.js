@@ -21,12 +21,7 @@ process.env.TZ = 'UTC';
 
 module.exports = {
   collectCoverageFrom: ['src/script/**/*.{ts,tsx}', '!src/script/util/test/**/*.*'],
-  coverageThreshold: {
-    global: {
-      statements: 40,
-    },
-  },
-  moduleDirectories: ['node_modules', './'],
+  moduleDirectories: ['node_modules', __dirname],
   // Must be in sync with tsconfig.json >> paths
   moduleNameMapper: {
     'Components/(.*)': '<rootDir>/src/script/components/$1',
@@ -36,8 +31,9 @@ module.exports = {
     '^react(.*)$': '<rootDir>/node_modules/react$1',
   },
   setupFilesAfterEnv: ['<rootDir>/setupTests.js'],
-  testEnvironment: './src/script/util/test/env/JSDomEnvironment.js',
+  testEnvironment: 'jsdom',
   testEnvironmentOptions: {
+    customExportConditions: ['node', 'node-addons'],
     resources: 'usable', // For <img>.src the package `canvas` is needed as well
   },
   testPathIgnorePatterns: ['<rootDir>/server'],
