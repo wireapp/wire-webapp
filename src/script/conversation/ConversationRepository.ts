@@ -1947,6 +1947,11 @@ export class ConversationRepository {
       return Promise.reject(new Error('Conversation Repository Event Handling: Event missing'));
     }
 
+    const ignoredEvents = [CONVERSATION_EVENT.MLS_MESSAGE_ADD];
+    if (ignoredEvents.includes(eventJson?.type)) {
+      return Promise.resolve();
+    }
+
     const {conversation, qualified_conversation, data: eventData, type} = eventJson;
     // data.conversationId is always the conversationId that should be read first. If not found we can fallback to qualified_conversation or conversation
     const conversationId: QualifiedId = eventData?.conversationId
