@@ -20,7 +20,7 @@
 import {ContentMessage} from 'src/script/entity/message/ContentMessage';
 import {MediumImage} from 'src/script/entity/message/MediumImage';
 import ImageAsset, {ImageAssetProps} from './ImageAsset';
-import {container as tsyringeContainer} from 'tsyringe';
+import {container} from 'tsyringe';
 import {AssetRepository} from 'src/script/assets/AssetRepository';
 import {AssetRemoteData} from 'src/script/assets/AssetRemoteData';
 import {render, waitFor} from '@testing-library/react';
@@ -60,7 +60,7 @@ describe('image-asset', () => {
   });
 
   it('displays the image url when resource is loaded', async () => {
-    const assetRepository = tsyringeContainer.resolve(AssetRepository);
+    const assetRepository = container.resolve(AssetRepository);
     jest
       .spyOn(assetRepository, 'load')
       .mockReturnValue(Promise.resolve(new Blob([new Uint8Array()], {type: 'application/octet-stream'})));
