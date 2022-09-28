@@ -17,74 +17,68 @@
  *
  */
 
-import TestPage from 'Util/test/TestPage';
-
-import AssetLoader, {AssetLoaderProps} from './AssetLoader';
-
-class AssetLoaderPage extends TestPage<AssetLoaderProps> {
-  constructor(props?: AssetLoaderProps) {
-    super(AssetLoader, props);
-  }
-
-  getStatus = () => this.get('div[data-uie-name="status-loading-media"]');
-  clickStatus = () => this.click(this.getStatus());
-  getViewBox = () => this.get('svg[data-uie-name="asset-loader-svg"]').getAttribute('viewBox');
-  getCircle = () => this.get('circle[data-uie-name="asset-loader-circle"]');
-}
+import AssetLoader from './AssetLoader';
+import {render, fireEvent} from '@testing-library/react';
 
 describe('AssetLoader', () => {
   it('runs onClick when clicking it', async () => {
-    const onClickMock = jest.fn();
+    const props = {large: false, loadProgress: 10, onCancel: jest.fn()};
 
-    const assetLoader = new AssetLoaderPage({large: false, loadProgress: 10, onCancel: onClickMock});
-    assetLoader.clickStatus();
+    const {container} = render(<AssetLoader {...props} />);
 
-    expect(onClickMock.mock.calls.length).toBe(1);
+    const assetLoader = container.querySelector('div[data-uie-name="status-loading-media"]');
+    expect(assetLoader).not.toBeNull();
+
+    fireEvent.click(assetLoader!);
+    expect(props.onCancel).toHaveBeenCalledTimes(1);
   });
 
   it('sets the correct viewBox size', async () => {
-    const assetLoaderSmall = new AssetLoaderPage({large: false, loadProgress: 10, onCancel: () => {}});
-    const viewBoxSmall = assetLoaderSmall.getViewBox();
+    const props = {large: false, loadProgress: 10, onCancel: () => {}};
+
+    const {container, rerender} = render(<AssetLoader {...props} />);
+
+    const assetLoaderSvg = container.querySelector('svg[data-uie-name="asset-loader-svg"]');
+    expect(assetLoaderSvg).not.toBeNull();
+
+    const viewBoxSmall = assetLoaderSvg!.getAttribute('viewBox');
     expect(viewBoxSmall).toBe(`0 0 32 32`);
 
-    const assetLoaderLarge = new AssetLoaderPage({large: true, loadProgress: 10, onCancel: () => {}});
-    const viewBoxLarge = assetLoaderLarge.getViewBox();
-    expect(viewBoxLarge).toBe(`0 0 64 64`);
-  });
+    props.large = true;
+    rerender(<AssetLoader {...props} />);
 
-  it('sets the correct viewBox size', async () => {
-    const assetLoaderSmall = new AssetLoaderPage({large: false, loadProgress: 10, onCancel: () => {}});
-    const viewBoxSmall = assetLoaderSmall.getViewBox();
-    expect(viewBoxSmall).toBe(`0 0 32 32`);
-
-    const assetLoaderLarge = new AssetLoaderPage({large: true, loadProgress: 10, onCancel: () => {}});
-    const viewBoxLarge = assetLoaderLarge.getViewBox();
+    const viewBoxLarge = assetLoaderSvg!.getAttribute('viewBox');
     expect(viewBoxLarge).toBe(`0 0 64 64`);
   });
 
   it('sets the correct circle style', async () => {
-    const assetLoaderSmallTen = new AssetLoaderPage({large: false, loadProgress: 10, onCancel: () => {}});
-    const strokeDasharraySmallTen = window
-      .getComputedStyle(assetLoaderSmallTen.getCircle())
-      .getPropertyValue('stroke-dasharray');
+    const props = {large: false, loadProgress: 10, onCancel: () => {}};
+
+    const {container, rerender} = render(<AssetLoader {...props} />);
+
+    const circleElement = container.querySelector('circle[data-uie-name="asset-loader-circle"]');
+    expect(circleElement).not.toBeNull();
+
+    const strokeDasharraySmallTen = window.getComputedStyle(circleElement!).getPropertyValue('stroke-dasharray');
     expect(strokeDasharraySmallTen).toBe('10 100');
 
-    const assetLoaderSmallFifty = new AssetLoaderPage({large: false, loadProgress: 50, onCancel: () => {}});
-    const strokeDasharraySmallFifty = window
-      .getComputedStyle(assetLoaderSmallFifty.getCircle())
-      .getPropertyValue('stroke-dasharray');
+    props.loadProgress = 50;
+    rerender(<AssetLoader {...props} />);
+
+    const strokeDasharraySmallFifty = window.getComputedStyle(circleElement!).getPropertyValue('stroke-dasharray');
     expect(strokeDasharraySmallFifty).toBe('50 100');
 
-    const assetLoaderLargeTen = new AssetLoaderPage({large: true, loadProgress: 10, onCancel: () => {}});
-    const strokeDasharrayLargeTen = window
-      .getComputedStyle(assetLoaderLargeTen.getCircle())
-      .getPropertyValue('stroke-dasharray');
+    props.large = true;
+    props.loadProgress = 10;
+    rerender(<AssetLoader {...props} />);
+
+    const strokeDasharrayLargeTen = window.getComputedStyle(circleElement!).getPropertyValue('stroke-dasharray');
     expect(strokeDasharrayLargeTen).toBe('20 200');
 
-    const assetLoaderLargeFifty = new AssetLoaderPage({large: true, loadProgress: 50, onCancel: () => {}});
-    const strokeDasharrayLargeFifty = window
-      .getComputedStyle(assetLoaderLargeFifty.getCircle())
-      .getPropertyValue('stroke-dasharray');
+    props.loadProgress = 50;
+    rerender(<AssetLoader {...props} />);
+
+    const strokeDasharrayLargeFifty = window.getComputedStyle(circleElement!).getPropertyValue('stroke-dasharray');
     expect(strokeDasharrayLargeFifty).toBe('100 200');
   });
 });
