@@ -48,12 +48,11 @@ describe('image-asset', () => {
 
     const props = {...defaultProps, asset: image};
 
-    const {container} = render(<ImageAsset {...props} />);
+    const {getByTestId} = render(<ImageAsset {...props} />);
 
-    const imageElement = container.querySelector('[data-uie-name="image-asset-img"]');
-    expect(imageElement).not.toBeNull();
+    const imageElement = getByTestId('image-asset-img');
 
-    const imgSrc = imageElement!.getAttribute('src');
+    const imgSrc = imageElement.getAttribute('src');
 
     expect(imgSrc).toContain('svg');
     expect(imgSrc).toContain('10');
@@ -80,14 +79,13 @@ describe('image-asset', () => {
 
     const props = {...defaultProps, asset: image};
 
-    const {container} = render(<ImageAsset {...props} />);
+    const {getByTestId} = render(<ImageAsset {...props} />);
 
-    const imageElement = container.querySelector('[data-uie-name="image-asset-img"]');
-    expect(imageElement).not.toBeNull();
+    const imageElement = getByTestId('image-asset-img');
 
     await waitFor(() => {
       expect(createObjectURLSpy).toHaveBeenCalled();
-      const imgSrc = imageElement!.getAttribute('src');
+      const imgSrc = imageElement.getAttribute('src');
       expect(imgSrc).toContain('/image-url');
     });
   });

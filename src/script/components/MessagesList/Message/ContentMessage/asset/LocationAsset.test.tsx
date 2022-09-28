@@ -27,22 +27,16 @@ describe('LocationAsset', () => {
   const location: Partial<Location> = {latitude: '52.31', longitude: '13.24', name: 'Berlin', zoom: '0'};
 
   it('sets the correct Google Maps link', () => {
-    const {container} = render(<LocationAsset asset={location as Location} />);
+    const {getByTestId} = render(<LocationAsset asset={location as Location} />);
 
-    const mapsElement = container.querySelector('[data-uie-name="location-asset-link"]');
-    expect(mapsElement).not.toBeNull();
+    const mapsElement = getByTestId('location-asset-link');
 
-    const mapsLink = mapsElement!.getAttribute('href');
-
+    const mapsLink = mapsElement.getAttribute('href');
     expect(mapsLink).toContain(`${location.latitude},${location.longitude}`);
   });
 
   it('sets the correct location name', () => {
-    const {container} = render(<LocationAsset asset={location as Location} />);
-
-    const locationElement = container.querySelector('[data-uie-name="location-name"]');
-    expect(locationElement).not.toBeNull();
-
-    expect(locationElement!.textContent).toBe(location.name);
+    const {queryByText} = render(<LocationAsset asset={location as Location} />);
+    expect(queryByText(location.name!)).not.toBeNull();
   });
 });

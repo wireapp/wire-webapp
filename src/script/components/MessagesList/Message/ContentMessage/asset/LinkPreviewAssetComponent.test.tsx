@@ -58,9 +58,9 @@ describe('LinkPreviewAssetComponent', () => {
 
   it('renders link previews', () => {
     const message = mockLinkPreview();
-    const {container} = render(<LinkPreviewAssetComponent message={message} />);
+    const {queryByTestId} = render(<LinkPreviewAssetComponent message={message} />);
 
-    const linkPreviewTitle = container.querySelector('[data-uie-name="link-preview-title"]');
+    const linkPreviewTitle = queryByTestId('link-preview-title');
     expect(linkPreviewTitle).not.toBeNull();
   });
 
@@ -69,34 +69,30 @@ describe('LinkPreviewAssetComponent', () => {
     message.ephemeral_expires(true);
     message.status(StatusType.SENT);
 
-    const {container} = render(<LinkPreviewAssetComponent message={message} />);
+    const {queryByTestId} = render(<LinkPreviewAssetComponent message={message} />);
 
-    const linkPreviewTitle = container.querySelector('[data-uie-name="link-preview-title"]');
+    const linkPreviewTitle = queryByTestId('link-preview-title');
     expect(linkPreviewTitle).toBeNull();
   });
 
   it('displays the author if the link is a tweet', () => {
     const message = mockTweet();
 
-    const {container} = render(<LinkPreviewAssetComponent message={message} />);
+    const {queryByTestId} = render(<LinkPreviewAssetComponent message={message} />);
 
-    const linkPreviewUploadMessage = container.querySelector('[data-uie-name="link-preview-title"]');
+    const linkPreviewUploadMessage = queryByTestId('link-preview-title');
     expect(linkPreviewUploadMessage).not.toBeNull();
 
-    const linkPreviewTweetAuthor = container.querySelector('[data-uie-name="link-preview-tweet-author"]');
+    const linkPreviewTweetAuthor = queryByTestId('link-preview-tweet-author');
     expect(linkPreviewTweetAuthor).not.toBeNull();
   });
 
   it('cleans the preview URL', () => {
     const message = mockLinkPreview('http://example.com');
 
-    const {container} = render(<LinkPreviewAssetComponent message={message} />);
+    const {queryByTestId, queryByText} = render(<LinkPreviewAssetComponent message={message} />);
 
-    const linkPreviewUploadMessage = container.querySelector('[data-uie-name="link-preview-title"]');
-    expect(linkPreviewUploadMessage).not.toBeNull();
-
-    const linkPreviewUrlElement = container.querySelector('[data-uie-name="link-preview-url"]');
-    expect(linkPreviewUrlElement).not.toBeNull();
-    expect(linkPreviewUrlElement!.textContent).toBe('example.com');
+    expect(queryByTestId('link-preview-title')).not.toBeNull();
+    expect(queryByText('example.com')).not.toBeNull();
   });
 });

@@ -43,12 +43,10 @@ describe('MessageFooterLike', () => {
       onLike: jest.fn(),
     };
 
-    const {container} = render(<MessageFooterLike {...props} />);
+    const {getByTestId} = render(<MessageFooterLike {...props} />);
+    const likeMessageElement = getByTestId('do-like-message');
 
-    const likeMessageElement = container.querySelector('[data-uie-name="do-like-message"]');
-    expect(likeMessageElement).not.toBeNull();
-
-    fireEvent.click(likeMessageElement!);
+    fireEvent.click(likeMessageElement);
     expect(props.onLike).toHaveBeenCalledWith(message);
   });
 
@@ -62,12 +60,10 @@ describe('MessageFooterLike', () => {
       onLike: jest.fn(),
     };
 
-    const {container} = render(<MessageFooterLike {...props} />);
+    const {getByTestId} = render(<MessageFooterLike {...props} />);
+    const likeNameList = getByTestId('message-liked-names');
 
-    const likeNameList = container.querySelector('[data-uie-name="message-liked-names"]');
-    expect(likeNameList).not.toBeNull();
-
-    fireEvent.click(likeNameList!);
+    fireEvent.click(likeNameList);
     expect(props.onClickLikes).toHaveBeenCalled();
   });
 
@@ -81,12 +77,12 @@ describe('MessageFooterLike', () => {
       onLike: jest.fn(),
     };
 
-    const {container} = render(<MessageFooterLike {...props} />);
+    const {getByTestId} = render(<MessageFooterLike {...props} />);
 
-    const likeNameList = container.querySelector('[data-uie-name="message-liked-names"]');
+    const likeNameList = getByTestId('message-liked-names');
     expect(likeNameList).not.toBeNull();
 
-    fireEvent.click(likeNameList!);
+    fireEvent.click(likeNameList);
     expect(props.onClickLikes).not.toHaveBeenCalled();
   });
 });

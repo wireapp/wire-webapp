@@ -40,12 +40,11 @@ describe('GroupVideoGrid', () => {
       setMaximizedParticipant: jest.fn(),
     };
 
-    const {container} = render(<GroupVideoGrid {...props} />);
+    const {getByTestId} = render(<GroupVideoGrid {...props} />);
 
-    const groupVideoGrid = container.querySelector('div[data-uie-name="grids-wrapper"]');
+    const groupVideoGrid = getByTestId('grids-wrapper');
 
-    expect(groupVideoGrid).not.toBeNull();
-    expect(groupVideoGrid!.children.length).toBe(2);
+    expect(groupVideoGrid.children.length).toBe(2);
   });
 
   it('maximizes a grid on double click', async () => {
@@ -69,14 +68,13 @@ describe('GroupVideoGrid', () => {
       setMaximizedParticipant: jest.fn(),
     };
 
-    const {container} = render(<GroupVideoGrid {...props} />);
+    const {getByTestId} = render(<GroupVideoGrid {...props} />);
 
-    const groupVideoGrid = container.querySelector('div[data-uie-name="grids-wrapper"]');
-    expect(groupVideoGrid).not.toBeNull();
+    const groupVideoGrid = getByTestId('grids-wrapper');
 
-    expect(groupVideoGrid!.children.length).toBe(2);
+    expect(groupVideoGrid.children.length).toBe(2);
 
-    const gridFirstChild = groupVideoGrid!.children[0];
+    const gridFirstChild = groupVideoGrid.children[0];
 
     fireEvent.doubleClick(gridFirstChild);
     expect(props.setMaximizedParticipant).toHaveBeenCalledWith(participantOne);
@@ -100,10 +98,9 @@ describe('GroupVideoGrid', () => {
       setMaximizedParticipant: jest.fn(),
     };
 
-    const {container} = render(<GroupVideoGrid {...props} />);
-    const pausedGrid = container.querySelector('div[data-uie-name="status-video-paused"]');
+    const {queryByTestId} = render(<GroupVideoGrid {...props} />);
 
-    expect(pausedGrid).not.toBeNull();
+    expect(queryByTestId('status-video-paused')).not.toBeNull();
   });
 
   it('renders thumbnail', async () => {
@@ -125,12 +122,12 @@ describe('GroupVideoGrid', () => {
       setMaximizedParticipant: jest.fn(),
     };
 
-    const {container} = render(<GroupVideoGrid {...props} />);
-    const thumbnailElement = container.querySelector('div[data-uie-name="self-video-thumbnail-wrapper"]');
-    const thumbnailMutedIcon = container.querySelector('[data-uie-name="status-call-audio-muted"]');
+    const {getAllByTestId} = render(<GroupVideoGrid {...props} />);
+    const thumbnailElements = getAllByTestId('self-video-thumbnail-wrapper');
+    const thumbnailMutedIcons = getAllByTestId('status-call-audio-muted');
 
-    expect(thumbnailElement).not.toBeNull();
-    expect(thumbnailMutedIcon).not.toBeNull();
+    expect(thumbnailElements).not.toHaveLength(0);
+    expect(thumbnailMutedIcons).not.toHaveLength(0);
   });
 
   it('does not render muted thumbnail when un-muted', async () => {
@@ -149,9 +146,8 @@ describe('GroupVideoGrid', () => {
       setMaximizedParticipant: jest.fn(),
     };
 
-    const {container} = render(<GroupVideoGrid {...props} />);
-    const thumbnailMutedIcon = container.querySelector('[data-uie-name="status-call-audio-muted"]');
-
+    const {queryByTestId} = render(<GroupVideoGrid {...props} />);
+    const thumbnailMutedIcon = queryByTestId('status-call-audio-muted');
     expect(thumbnailMutedIcon).toBeNull();
   });
 });

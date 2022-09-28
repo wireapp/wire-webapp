@@ -39,12 +39,8 @@ describe('MessageButton', () => {
       message: message as CompositeMessage,
     };
 
-    const {container} = render(<MessageButton {...props} />);
-
-    const errorMessageElement = container.querySelector('div[data-uie-name="message-button-error"]');
-    expect(errorMessageElement).not.toBeNull();
-
-    expect(errorMessageElement!.textContent).toBe(messageError);
+    const {queryByText} = render(<MessageButton {...props} />);
+    expect(queryByText(messageError)).not.toBeNull();
   });
 
   it('renders selected button', async () => {
@@ -62,9 +58,9 @@ describe('MessageButton', () => {
       message: message as CompositeMessage,
     };
 
-    const {container} = render(<MessageButton {...props} />);
+    const {queryByTestId, container} = render(<MessageButton {...props} />);
 
-    const errorMessageElement = container.querySelector('div[data-uie-name="message-button-error"]');
+    const errorMessageElement = queryByTestId('message-button-error');
     expect(errorMessageElement).toBeNull();
 
     const selectedButton = container.querySelector(`button[data-uie-uid="${messageId}"]`);

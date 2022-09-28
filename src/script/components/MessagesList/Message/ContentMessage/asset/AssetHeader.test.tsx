@@ -26,7 +26,7 @@ import {Message} from '../../../../../entity/message/Message';
 import {User} from '../../../../../entity/User';
 
 describe('AssetHeader', () => {
-  it('displays the expected username and time', async () => {
+  it('displays the expected username and time', () => {
     const timestamp = new Date('2021-01-21T15:08:14.225Z').getTime();
     const userName = 'John Doe';
     jest.spyOn(TimeUtil, 'formatTimeShort').mockReturnValue('3:08 PM');
@@ -39,16 +39,9 @@ describe('AssetHeader', () => {
     message.timestamp(timestamp);
     message.user(user);
 
-    const {container} = render(<AssetHeader message={message} />);
+    const {queryByText} = render(<AssetHeader message={message} />);
 
-    const userNameElement = container.querySelector('span[data-uie-name="asset-header-user-name"]');
-    expect(userNameElement).not.toBeNull();
-
-    expect(userNameElement!.textContent).toBe(userName);
-
-    const timeElement = container.querySelector('span[data-uie-name="asset-header-time"]');
-    expect(timeElement).not.toBeNull();
-
-    expect(timeElement!.textContent).toBe('01/21 3:08 PM');
+    expect(queryByText(userName)).not.toBeNull();
+    expect(queryByText('01/21 3:08 PM')).not.toBeNull();
   });
 });

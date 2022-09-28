@@ -47,11 +47,9 @@ describe('FileAssetComponent', () => {
       teamState,
     };
 
-    const {container} = render(<FileAssetComponent {...props} />);
+    const {queryByTestId} = render(<FileAssetComponent {...props} />);
 
-    const fileElement = container.querySelector('[data-uie-name="file"]');
-
-    expect(fileElement).not.toBeNull();
+    expect(queryByTestId('file')).not.toBeNull();
   });
 
   it('does not render file uploads from timed-out / obfuscated messages', () => {
@@ -64,9 +62,9 @@ describe('FileAssetComponent', () => {
       teamState,
     };
 
-    const {container} = render(<FileAssetComponent {...props} />);
+    const {queryByTestId} = render(<FileAssetComponent {...props} />);
 
-    const fileElement = container.querySelector('[data-uie-name="file"]');
+    const fileElement = queryByTestId('file');
     expect(fileElement).toBeNull();
   });
 
@@ -76,11 +74,8 @@ describe('FileAssetComponent', () => {
       teamState,
     };
 
-    const {container} = render(<FileAssetComponent {...props} />);
+    const {queryByText} = render(<FileAssetComponent {...props} />);
 
-    const fileSizeElement = container.querySelector('[data-uie-name="file-size"]');
-    expect(fileSizeElement).not.toBeNull();
-
-    expect(fileSizeElement!.textContent).toBe('10 MB');
+    expect(queryByText('10 MB')).not.toBeNull();
   });
 });
