@@ -226,8 +226,8 @@ export class AssetRepository {
       .participating_user_ets()
       .some(conversationParticipant => conversationParticipant.inTeam());
 
-    const isEternal = isTeamMember || isTeamConversation || isTeamUserInConversation;
-    return isEternal ? AssetRetentionPolicy.ETERNAL : AssetRetentionPolicy.PERSISTENT;
+    const isEternalInfrequentAccess = isTeamMember || isTeamConversation || isTeamUserInConversation;
+    return isEternalInfrequentAccess ? AssetRetentionPolicy.ETERNAL_INFREQUENT_ACCESS : AssetRetentionPolicy.EXPIRING;
   }
 
   /**
