@@ -3153,10 +3153,10 @@
   resolved "https://registry.yarnpkg.com/@wireapp/core-crypto/-/core-crypto-0.5.2.tgz#73f7787529d80fee68a42881003a5bded40486d9"
   integrity sha512-D/lnVk/omd2xltMOpWjWkWfv/AHYzD0EepKLOqTq456coi5lwHNWja0niuFc6cBccXXrlkv3mh/ClDf2lGPvvg==
 
-"@wireapp/core@31.3.4":
-  version "31.3.4"
-  resolved "https://registry.yarnpkg.com/@wireapp/core/-/core-31.3.4.tgz#4bd4e4fe4c610550176094c2010c553ee7e3d42b"
-  integrity sha512-APaob8IIBGTneYCNFNjjlQ+HekU7P4AViIMD0JE0v8r6b1D70pe/feZ633qeIRKBOhEy+ZgPIMHZXZloX4SYiw==
+"@wireapp/core@31.3.5":
+  version "31.3.5"
+  resolved "https://registry.yarnpkg.com/@wireapp/core/-/core-31.3.5.tgz#81fc74b142af572fcb11d92e86e982e47b92e43c"
+  integrity sha512-JeFL4UOMDavwi495myZa8cOirvNIfuR/CXAZ5h73C5obLl+ur9g1vBr6yTLaGI12Px3Uy8u3sZ8VeDffsYXPbw==
   dependencies:
     "@wireapp/api-client" "^20.6.3"
     "@wireapp/commons" "^4.4.6"
