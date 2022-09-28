@@ -127,7 +127,7 @@ describe('ConversationListCallingCell', () => {
 
     const {getByText, rerender, container} = render(<ConversationListCallingCell {...props} />);
 
-    jest.useFakeTimers('modern');
+    jest.useFakeTimers();
     const now = Date.now();
     jest.setSystemTime(now);
     act(() => {
