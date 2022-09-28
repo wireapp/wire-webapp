@@ -36,6 +36,14 @@ import {User} from '../../entity/User';
 import {QualifiedId} from '@wireapp/api-client/src/user';
 import {amplify} from 'amplify';
 import {ContentViewModel} from '../../view_model/ContentViewModel';
+import * as uiKit from '@wireapp/react-ui-kit';
+
+jest.mock('@wireapp/react-ui-kit', () => ({
+  ...jest.requireActual('@wireapp/react-ui-kit'),
+  useMatchMedia: jest.fn(),
+}));
+
+const mockedUiKit = uiKit as jest.Mocked<typeof uiKit>;
 
 jest.spyOn(Runtime, 'isSupportingConferenceCalling').mockReturnValue(true);
 
@@ -136,6 +144,8 @@ describe('TitleBar', () => {
     const userState = createUserState({isActivatedAccount: ko.pureComputed(() => true)});
     const panelViewModel = createPanelViewModel();
     const conversation = createConversationEntity();
+
+    mockedUiKit.useMatchMedia.mockReturnValue(false);
 
     const {getByLabelText} = render(
       <TitleBar
