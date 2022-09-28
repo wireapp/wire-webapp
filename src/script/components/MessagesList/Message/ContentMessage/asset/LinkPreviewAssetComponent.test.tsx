@@ -18,21 +18,11 @@
  */
 
 import {ContentMessage} from 'src/script/entity/message/ContentMessage';
-import TestPage from 'Util/test/TestPage';
 import {LinkPreview} from 'src/script/entity/message/LinkPreview';
 import {Text} from 'src/script/entity/message/Text';
 import {StatusType} from 'src/script/message/StatusType';
-import LinkPreviewAssetComponent, {LinkPreviewAssetProps} from './LinkPreviewAssetComponent';
-
-class LinkPreviewAssetComponentTestPage extends TestPage<LinkPreviewAssetProps> {
-  constructor(props?: LinkPreviewAssetProps) {
-    super(LinkPreviewAssetComponent, props);
-  }
-
-  getLinkPreviewTitle = () => this.get('[data-uie-name="link-preview-title"]');
-  getTweetAuthor = () => this.get('[data-uie-name="link-preview-tweet-author"]');
-  getLinkPreviewUrl = () => this.get('[data-uie-name="link-preview-url"]');
-}
+import LinkPreviewAssetComponent from './LinkPreviewAssetComponent';
+import {render} from '@testing-library/react';
 
 describe('LinkPreviewAssetComponent', () => {
   function mockLinkPreview(url = 'https://example.com'): ContentMessage {
@@ -67,12 +57,11 @@ describe('LinkPreviewAssetComponent', () => {
   }
 
   it('renders link previews', () => {
-    const testPage = new LinkPreviewAssetComponentTestPage({
-      message: mockLinkPreview(),
-    });
+    const message = mockLinkPreview();
+    const {container} = render(<LinkPreviewAssetComponent message={message} />);
 
-    const linkPreviewUploadMessage = testPage.getLinkPreviewTitle();
-    expect(linkPreviewUploadMessage).not.toBeNull();
+    const linkPreviewTitle = container.querySelector('[data-uie-name="link-preview-title"]');
+    expect(linkPreviewTitle).not.toBeNull();
   });
 
   it('does not render link previews from timed-out / obfuscated messages', () => {
@@ -80,40 +69,34 @@ describe('LinkPreviewAssetComponent', () => {
     message.ephemeral_expires(true);
     message.status(StatusType.SENT);
 
-    const testPage = new LinkPreviewAssetComponentTestPage({
-      message,
-    });
+    const {container} = render(<LinkPreviewAssetComponent message={message} />);
 
-    const linkPreviewUploadMessage = testPage.getLinkPreviewTitle();
-    expect(linkPreviewUploadMessage).toBeNull();
+    const linkPreviewTitle = container.querySelector('[data-uie-name="link-preview-title"]');
+    expect(linkPreviewTitle).toBeNull();
   });
 
   it('displays the author if the link is a tweet', () => {
     const message = mockTweet();
 
-    const testPage = new LinkPreviewAssetComponentTestPage({
-      message,
-    });
+    const {container} = render(<LinkPreviewAssetComponent message={message} />);
 
-    const linkPreviewUploadMessage = testPage.getLinkPreviewTitle();
+    const linkPreviewUploadMessage = container.querySelector('[data-uie-name="link-preview-title"]');
     expect(linkPreviewUploadMessage).not.toBeNull();
 
-    const linkPreviewTweetAuthor = testPage.getTweetAuthor();
+    const linkPreviewTweetAuthor = container.querySelector('[data-uie-name="link-preview-tweet-author"]');
     expect(linkPreviewTweetAuthor).not.toBeNull();
   });
 
   it('cleans the preview URL', () => {
     const message = mockLinkPreview('http://example.com');
 
-    const testPage = new LinkPreviewAssetComponentTestPage({
-      message,
-    });
+    const {container} = render(<LinkPreviewAssetComponent message={message} />);
 
-    const linkPreviewUploadMessage = testPage.getLinkPreviewTitle();
+    const linkPreviewUploadMessage = container.querySelector('[data-uie-name="link-preview-title"]');
     expect(linkPreviewUploadMessage).not.toBeNull();
 
-    const linkPreviewUrlElement = testPage.getLinkPreviewUrl();
+    const linkPreviewUrlElement = container.querySelector('[data-uie-name="link-preview-url"]');
     expect(linkPreviewUrlElement).not.toBeNull();
-    expect(linkPreviewUrlElement.textContent).toBe('example.com');
+    expect(linkPreviewUrlElement!.textContent).toBe('example.com');
   });
 });
