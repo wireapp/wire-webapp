@@ -34,7 +34,6 @@ module.exports = {
   testEnvironment: 'jsdom',
   testEnvironmentOptions: {
     customExportConditions: ['node', 'node-addons'],
-    resources: 'usable', // For <img>.src the package `canvas` is needed as well
   },
   testPathIgnorePatterns: ['<rootDir>/server'],
   testRegex: '(test|Spec)\\.[tj]sx?$',
