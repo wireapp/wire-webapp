@@ -59,7 +59,7 @@ import {
   sortUsersByPriority,
   fixWebsocketString,
 } from 'Util/StringUtil';
-import {ClientEvent} from '../event/Client';
+import {ClientEvent, CONVERSATION as CLIENT_CONVERSATION_EVENT} from '../event/Client';
 import {NOTIFICATION_HANDLING_STATE} from '../event/NotificationHandlingState';
 import {EventRepository} from '../event/EventRepository';
 import {
@@ -1945,6 +1945,11 @@ export class ConversationRepository {
   ) {
     if (!eventJson) {
       return Promise.reject(new Error('Conversation Repository Event Handling: Event missing'));
+    }
+
+    const ignoredEvents: (CONVERSATION_EVENT | CLIENT_CONVERSATION_EVENT)[] = [CONVERSATION_EVENT.MLS_MESSAGE_ADD];
+    if (ignoredEvents.includes(eventJson?.type)) {
+      return Promise.resolve();
     }
 
     const {conversation, qualified_conversation, data: eventData, type} = eventJson;
