@@ -18,22 +18,9 @@
  */
 
 import ko from 'knockout';
-import TestPage from 'Util/test/TestPage';
 import {ContentMessage} from 'src/script/entity/message/ContentMessage';
-import MessageFooterLike, {MessageFooterLikeProps} from './MessageFooterLike';
-
-class MessageFooterLikePage extends TestPage<MessageFooterLikeProps> {
-  constructor(props?: MessageFooterLikeProps) {
-    super(MessageFooterLike, props);
-  }
-
-  getMessageFooterLike = () => this.get('[data-uie-name="element-message-call"]');
-  getLikeNameList = () => this.get('[data-uie-name="message-liked-names"]');
-  getLike = () => this.get('[data-uie-name="do-like-message"]');
-
-  clickLikeNameList = () => this.click(this.getLikeNameList());
-  clickLike = () => this.click(this.getLike());
-}
+import MessageFooterLike from './MessageFooterLike';
+import {render, fireEvent} from '@testing-library/react';
 
 const createLikeMessage = (partialLikeMessage: Partial<ContentMessage>) => {
   const likeMessage: Partial<ContentMessage> = {
@@ -47,52 +34,59 @@ const createLikeMessage = (partialLikeMessage: Partial<ContentMessage>) => {
 
 describe('MessageFooterLike', () => {
   it('triggers message likes', async () => {
-    const spyOnLike = jest.fn();
     const message = createLikeMessage({});
-    const messageFooterLikePage = new MessageFooterLikePage({
+
+    const props = {
       is1to1Conversation: false,
       message,
-      onClickLikes: () => {},
-      onLike: spyOnLike,
-    });
+      onClickLikes: jest.fn(),
+      onLike: jest.fn(),
+    };
 
-    expect(messageFooterLikePage.getLike()).not.toBeNull();
-    messageFooterLikePage.clickLike();
+    const {container} = render(<MessageFooterLike {...props} />);
 
-    expect(spyOnLike).toHaveBeenCalledWith(message);
+    const likeMessageElement = container.querySelector('[data-uie-name="do-like-message"]');
+    expect(likeMessageElement).not.toBeNull();
+
+    fireEvent.click(likeMessageElement!);
+    expect(props.onLike).toHaveBeenCalledWith(message);
   });
 
   it('does open conversation details in group conversation when clicking on like names', async () => {
-    const spyOnOpenConversationDetails = jest.fn();
-    const messageFooterLikePage = new MessageFooterLikePage({
+    const props = {
       is1to1Conversation: false,
       message: createLikeMessage({
         is_liked: ko.pureComputed(() => true),
       }),
-      onClickLikes: spyOnOpenConversationDetails,
-      onLike: () => {},
-    });
+      onClickLikes: jest.fn(),
+      onLike: jest.fn(),
+    };
 
-    expect(messageFooterLikePage.getLikeNameList()).not.toBeNull();
-    messageFooterLikePage.clickLikeNameList();
+    const {container} = render(<MessageFooterLike {...props} />);
 
-    expect(spyOnOpenConversationDetails).toHaveBeenCalled();
+    const likeNameList = container.querySelector('[data-uie-name="message-liked-names"]');
+    expect(likeNameList).not.toBeNull();
+
+    fireEvent.click(likeNameList!);
+    expect(props.onClickLikes).toHaveBeenCalled();
   });
 
   it('does not open conversation details in 1:1 conversation when clicking on like names', async () => {
-    const spyOnOpenConversationDetails = jest.fn();
-    const messageFooterLikePage = new MessageFooterLikePage({
+    const props = {
       is1to1Conversation: true,
       message: createLikeMessage({
         is_liked: ko.pureComputed(() => true),
       }),
-      onClickLikes: spyOnOpenConversationDetails,
-      onLike: () => {},
-    });
+      onClickLikes: jest.fn(),
+      onLike: jest.fn(),
+    };
 
-    expect(messageFooterLikePage.getLikeNameList()).not.toBeNull();
-    messageFooterLikePage.clickLikeNameList();
+    const {container} = render(<MessageFooterLike {...props} />);
 
-    expect(spyOnOpenConversationDetails).not.toHaveBeenCalled();
+    const likeNameList = container.querySelector('[data-uie-name="message-liked-names"]');
+    expect(likeNameList).not.toBeNull();
+
+    fireEvent.click(likeNameList!);
+    expect(props.onClickLikes).not.toHaveBeenCalled();
   });
 });
