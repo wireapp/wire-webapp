@@ -17,22 +17,13 @@
  *
  */
 
-import TestPage from 'Util/test/TestPage';
+import AssetHeader from './AssetHeader';
+import {render} from '@testing-library/react';
 import {createRandomUuid} from 'Util/util';
 import * as TimeUtil from 'Util/TimeUtil';
 
 import {Message} from '../../../../../entity/message/Message';
 import {User} from '../../../../../entity/User';
-import AssetHeader, {AssetHeaderProps} from './AssetHeader';
-
-class AssetHeaderPage extends TestPage<AssetHeaderProps> {
-  constructor(props?: AssetHeaderProps) {
-    super(AssetHeader, props);
-  }
-
-  getUserName = () => this.get('span[data-uie-name="asset-header-user-name"]').textContent;
-  getTime = () => this.get('span[data-uie-name="asset-header-time"]').textContent;
-}
 
 describe('AssetHeader', () => {
   it('displays the expected username and time', async () => {
@@ -41,17 +32,23 @@ describe('AssetHeader', () => {
     jest.spyOn(TimeUtil, 'formatTimeShort').mockReturnValue('3:08 PM');
     jest.spyOn(TimeUtil, 'formatDateShort').mockReturnValue('01/21');
 
-    const user = new User(createRandomUuid(), null);
+    const user = new User(createRandomUuid());
     user.name(userName);
 
     const message = new Message(createRandomUuid());
     message.timestamp(timestamp);
     message.user(user);
 
-    const assetHeader = new AssetHeaderPage({message});
+    const {container} = render(<AssetHeader message={message} />);
 
-    expect(assetHeader.getUserName()).toBe(userName);
+    const userNameElement = container.querySelector('span[data-uie-name="asset-header-user-name"]');
+    expect(userNameElement).not.toBeNull();
 
-    expect(assetHeader.getTime()).toBe('01/21 3:08 PM');
+    expect(userNameElement!.textContent).toBe(userName);
+
+    const timeElement = container.querySelector('span[data-uie-name="asset-header-time"]');
+    expect(timeElement).not.toBeNull();
+
+    expect(timeElement!.textContent).toBe('01/21 3:08 PM');
   });
 });
