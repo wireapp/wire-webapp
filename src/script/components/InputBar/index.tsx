@@ -815,6 +815,37 @@ const InputBar = ({
     };
   }, [pastedFile]);
 
+  const sendButton = (
+    <li>
+      <button
+        type="button"
+        className={cx('controls-right-button controls-right-button--send')}
+        disabled={inputValue.length === 0}
+        title={t('tooltipConversationSendMessage')}
+        aria-label={t('tooltipConversationSendMessage')}
+        onClick={() => onSend(inputValue)}
+        data-uie-name="do-send-message"
+      >
+        <Icon.Send />
+      </button>
+    </li>
+  );
+
+  const controlButtonsProps = {
+    conversation: conversationEntity,
+    disableFilesharing: !isFileSharingSendingEnabled,
+    disablePing: pingDisabled,
+    input: inputValue,
+    isEditing: isEditing,
+    isScaledDown: isScaledDown,
+    onCancelEditing: cancelMessageEditing,
+    onClickPing: onPingClick,
+    onGifClick: onGifClick,
+    onSelectFiles: uploadFiles,
+    onSelectImages: uploadImages,
+    showGiphyButton: showGiphyButton,
+  };
+
   return (
     <StyledApp themeId={THEME_ID.DEFAULT}>
       <div id="conversation-input-bar" className="conversation-input-bar">
@@ -875,64 +906,16 @@ const InputBar = ({
                     <>
                       <ul className="controls-right buttons-group" css={{minWidth: '95px'}}>
                         {showGiphyButton && <GiphyButton onGifClick={onGifClick} />}
-                        <li>
-                          <button
-                            type="button"
-                            className={cx('controls-right-button controls-right-button--send')}
-                            disabled={inputValue.length === 0}
-                            title={t('tooltipConversationSendMessage')}
-                            aria-label={t('tooltipConversationSendMessage')}
-                            onClick={() => onSend(inputValue)}
-                            data-uie-name="do-send-message"
-                          >
-                            <Icon.Send />
-                          </button>
-                        </li>
+                        {sendButton}
                       </ul>
                       <ul className="controls-right buttons-group" css={{justifyContent: 'center', width: '100%'}}>
-                        <ControlButtons
-                          conversation={conversationEntity}
-                          input={inputValue}
-                          isEditing={isEditing}
-                          isScaledDown={isScaledDown}
-                          disablePing={pingDisabled}
-                          disableFilesharing={!isFileSharingSendingEnabled}
-                          onSelectFiles={uploadFiles}
-                          onSelectImages={uploadImages}
-                          onCancelEditing={cancelMessageEditing}
-                          onGifClick={onGifClick}
-                          onClickPing={onPingClick}
-                        />
+                        <ControlButtons {...controlButtonsProps} isScaledDown={isScaledDown} />
                       </ul>
                     </>
                   ) : (
                     <ul className="controls-right buttons-group">
-                      <ControlButtons
-                        conversation={conversationEntity}
-                        input={inputValue}
-                        isEditing={isEditing}
-                        disablePing={pingDisabled}
-                        disableFilesharing={!isFileSharingSendingEnabled}
-                        showGiphyButton={showGiphyButton}
-                        onSelectFiles={uploadFiles}
-                        onSelectImages={uploadImages}
-                        onCancelEditing={cancelMessageEditing}
-                        onGifClick={onGifClick}
-                        onClickPing={onPingClick}
-                      />
-                      <li>
-                        <button
-                          type="button"
-                          className={cx('controls-right-button controls-right-button--send')}
-                          disabled={inputValue.length === 0}
-                          title={t('tooltipConversationSendMessage')}
-                          aria-label={t('tooltipConversationSendMessage')}
-                          onClick={() => onSend(inputValue)}
-                          data-uie-name="do-send-message"
-                        >
-                          <Icon.Send />
-                        </button>
-                      </li>
+                      <ControlButtons {...controlButtonsProps} showGiphyButton={showGiphyButton} />
+                      {sendButton}
                     </ul>
                   )}
                 </>
