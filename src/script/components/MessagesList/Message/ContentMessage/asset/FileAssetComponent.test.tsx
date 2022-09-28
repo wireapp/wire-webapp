@@ -19,21 +19,11 @@
 
 import ko from 'knockout';
 import {ContentMessage} from 'src/script/entity/message/ContentMessage';
-import TestPage from 'Util/test/TestPage';
-import FileAssetComponent, {FileAssetProps} from './FileAssetComponent';
+import FileAssetComponent from './FileAssetComponent';
 import {FileAsset} from 'src/script/entity/message/FileAsset';
 import {StatusType} from '../../../../../message/StatusType';
 import {TeamState} from 'src/script/team/TeamState';
-
-class FileAssetComponentTestPage extends TestPage<FileAssetProps> {
-  constructor(props?: FileAssetProps) {
-    super(FileAssetComponent, props);
-  }
-
-  getFile = () => this.get('[data-uie-name="file"]');
-
-  getFileSize = () => this.get('[data-uie-name="file-size"]').textContent;
-}
+import {render} from '@testing-library/react';
 
 describe('FileAssetComponent', () => {
   function mockContentMessage(): ContentMessage {
@@ -47,49 +37,50 @@ describe('FileAssetComponent', () => {
     return message;
   }
 
-  it('renders file uploads', () => {
-    const teamState = {
-      isFileSharingReceivingEnabled: ko.pureComputed(() => true),
-    } as TeamState;
+  const teamState = {
+    isFileSharingReceivingEnabled: ko.pureComputed(() => true),
+  } as TeamState;
 
-    const testPage = new FileAssetComponentTestPage({
+  it('renders file uploads', () => {
+    const props = {
       message: mockContentMessage(),
       teamState,
-    });
+    };
 
-    const fileUploadMessage = testPage.getFile();
-    expect(fileUploadMessage).not.toBeNull();
+    const {container} = render(<FileAssetComponent {...props} />);
+
+    const fileElement = container.querySelector('[data-uie-name="file"]');
+
+    expect(fileElement).not.toBeNull();
   });
 
   it('does not render file uploads from timed-out / obfuscated messages', () => {
-    const teamState = {
-      isFileSharingReceivingEnabled: ko.pureComputed(() => true),
-    } as TeamState;
-
     const message = mockContentMessage();
     message.ephemeral_expires(true);
     message.status(StatusType.SENT);
 
-    const testPage = new FileAssetComponentTestPage({
+    const props = {
       message,
       teamState,
-    });
+    };
 
-    const fileUploadMessage = testPage.getFile();
-    expect(fileUploadMessage).toBeNull();
+    const {container} = render(<FileAssetComponent {...props} />);
+
+    const fileElement = container.querySelector('[data-uie-name="file"]');
+    expect(fileElement).toBeNull();
   });
 
   it('shows the file size in MB', () => {
-    const teamState = {
-      isFileSharingReceivingEnabled: ko.pureComputed(() => true),
-    } as TeamState;
-
-    const testPage = new FileAssetComponentTestPage({
+    const props = {
       message: mockContentMessage(),
       teamState,
-    });
+    };
 
-    const fileSize = testPage.getFileSize();
-    expect(fileSize).toBe('10 MB');
+    const {container} = render(<FileAssetComponent {...props} />);
+
+    const fileSizeElement = container.querySelector('[data-uie-name="file-size"]');
+    expect(fileSizeElement).not.toBeNull();
+
+    expect(fileSizeElement!.textContent).toBe('10 MB');
   });
 });
