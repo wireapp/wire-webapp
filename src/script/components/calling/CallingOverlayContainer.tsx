@@ -38,7 +38,7 @@ import {CallViewTab} from '../../view_model/CallingViewModel';
 import ChooseScreen, {Screen} from './ChooseScreen';
 import FullscreenVideoCall from './FullscreenVideoCall';
 import {LEAVE_CALL_REASON} from '../../calling/enum/LeaveCallReason';
-import {useKeyPress} from '../../hooks/useKeypress';
+import {PushToTalkHandler} from './PushToTalkHandler';
 
 export interface CallingContainerProps {
   readonly callingRepository: CallingRepository;
@@ -72,24 +72,7 @@ const CallingContainer: React.FC<CallingContainerProps> = ({
     muteState,
   } = useKoSubscribableChildren(joinedCall, ['maximizedParticipant', 'state', 'muteState']);
 
-  const [isSpacebarPressUnmuted, setIsSpacebarPressUnmuted] = React.useState(false);
   const isMuted = muteState !== MuteState.NOT_MUTED;
-
-  const spacebarPress: boolean = useKeyPress(' ');
-
-  useEffect(() => {
-    if (joinedCall) {
-      const isUnmuteAllowed =
-        joinedCall.muteState() === MuteState.SELF_MUTED || joinedCall.muteState() === MuteState.REMOTE_MUTED;
-      if (!spacebarPress && isSpacebarPressUnmuted) {
-        callingRepository.muteCall(joinedCall, true);
-        setIsSpacebarPressUnmuted(false);
-      } else if (spacebarPress && isUnmuteAllowed) {
-        callingRepository.muteCall(joinedCall, false);
-        setIsSpacebarPressUnmuted(true);
-      }
-    }
-  }, [spacebarPress, joinedCall, callingRepository, isSpacebarPressUnmuted]);
 
   useEffect(() => {
     if (currentCallState === CALL_STATE.MEDIA_ESTAB && joinedCall.initialType === CALL_TYPE.VIDEO) {
@@ -222,6 +205,10 @@ const CallingContainer: React.FC<CallingContainerProps> = ({
           screens={selectableScreens as unknown as Screen[]}
           windows={selectableWindows as unknown as Screen[]}
         />
+      )}
+
+      {joinedCall && Number.isInteger(joinedCall.muteState()) && (
+        <PushToTalkHandler call={joinedCall} callingRepository={callingRepository} />
       )}
     </Fragment>
   );
