@@ -36,8 +36,8 @@ const defaultParams: PropsType = {
   input: '',
 
   onCancelEditing: jest.fn(),
-  onClickGif: jest.fn(),
   onClickPing: jest.fn(),
+  onGifClick: jest.fn(),
   onSelectFiles: jest.fn(),
   onSelectImages: jest.fn(),
   showGiphyButton: true,
