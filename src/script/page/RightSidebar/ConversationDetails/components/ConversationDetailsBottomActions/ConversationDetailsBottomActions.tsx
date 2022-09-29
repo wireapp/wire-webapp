@@ -48,7 +48,9 @@ const ConversationDetailsBottomActions: FC<ConversationDetailsBottomActionsProps
             data-uie-name="go-notifications"
             type="button"
           >
-            <Icon.Notification className="panel__action-item__icon" />
+            <span className="panel__action-item__icon">
+              <Icon.Notification />
+            </span>
 
             <span className="panel__action-item__summary">
               <span className="panel__action-item__text">{t('conversationDetailsActionNotifications')}</span>

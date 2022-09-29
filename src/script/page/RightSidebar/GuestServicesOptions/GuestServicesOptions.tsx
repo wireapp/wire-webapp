@@ -100,7 +100,7 @@ const GuestServicesOptions: FC<GuestServicesOptionsProps> = ({
   };
 
   return (
-    <div id={isGuest ? 'guest-options' : 'services-options'} className="panel__page guest-options panel__page--visible">
+    <div id={isGuest ? 'guest-options' : 'services-options'} className="panel__page guest-options">
       <PanelHeader
         onGoBack={onBack}
         goBackUie={isGuest ? 'go-back-guest-options' : 'go-back-services-options'}

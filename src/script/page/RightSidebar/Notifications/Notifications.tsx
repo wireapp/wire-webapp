@@ -73,7 +73,7 @@ const Notifications: FC<NotificationsProps> = ({activeConversation, onGoBack, on
   };
 
   return (
-    <div id="notification-settings" className="panel__page notification-settings panel__page--visible">
+    <div id="notification-settings" className="panel__page notification-settings">
       <PanelHeader
         onGoBack={onGoBack}
         onClose={onClose}

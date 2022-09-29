@@ -28,6 +28,7 @@ import UserDetails from 'Components/panel/UserDetails';
 import {t} from 'Util/LocalizerUtil';
 
 import PanelHeader from '../PanelHeader';
+import {PanelEntity} from '../RightSidebar';
 
 import {User} from '../../../entity/User';
 import BaseToggle from 'Components/toggle/BaseToggle';
@@ -43,9 +44,10 @@ import {TeamState} from '../../../team/TeamState';
 import {MemberLeaveEvent} from '../../../conversation/EventBuilder';
 import {ClientEvent} from '../../../event/Client';
 import {initFadingScrollbar} from '../../../ui/fadingScrollbar';
+import {handleKeyDown} from 'Util/KeyboardUtil';
 
 interface GroupParticipantUserProps {
-  onBack: () => void;
+  onBack: (entity: PanelEntity) => void;
   onClose: () => void;
   showDevices: (entity: User) => void;
   goToRoot: () => void;
@@ -102,7 +104,7 @@ const GroupParticipantUser: FC<GroupParticipantUserProps> = ({
 
   const onUserAction = (action: Actions) => {
     if (action === Actions.REMOVE) {
-      onBack();
+      onBack(activeConversation);
     }
   };
 
@@ -135,8 +137,13 @@ const GroupParticipantUser: FC<GroupParticipantUserProps> = ({
   }, [isTemporaryGuest, currentUser]);
 
   return (
-    <div id="group-participant-user" className="panel__page group-participant panel__page--visible">
-      <PanelHeader showBackArrow goBackUie="go-back-group-participant" onGoBack={onBack} onClose={onClose} />
+    <div id="group-participant-user" className="panel__page group-participant">
+      <PanelHeader
+        showBackArrow
+        goBackUie="go-back-group-participant"
+        onGoBack={() => onBack(activeConversation)}
+        onClose={onClose}
+      />
 
       <div className="panel__content" ref={initFadingScrollbar}>
         <UserDetails
@@ -156,7 +163,9 @@ const GroupParticipantUser: FC<GroupParticipantUserProps> = ({
               data-uie-name="go-devices"
               type="button"
             >
-              <Icon.Devices className="panel__action-item__icon" />
+              <span className="panel__action-item__icon">
+                <Icon.Devices />
+              </span>
 
               <span className="panel__action-item__text">{t('conversationDetailsActionDevices')}</span>
 
@@ -168,24 +177,28 @@ const GroupParticipantUser: FC<GroupParticipantUserProps> = ({
         {canChangeRole && (
           <>
             <div className="conversation-details__admin">
-              <button
-                className="panel__action-item"
-                data-bind="click: onToggleAdmin, attr: {'aria-label': t('accessibility.conversationDetailsActionGroupAdminLabel')}"
+              <div
+                tabIndex={0}
+                role="button"
+                className="panel__action-item modal-style panel__action-button"
                 data-uie-name="toggle-admin"
-                type="button"
+                aria-label={t('accessibility.conversationDetailsActionGroupAdminLabel')}
                 aria-pressed={isAdmin}
+                onClick={toggleAdmin}
+                onKeyDown={(event: React.KeyboardEvent<HTMLElement>) => handleKeyDown(event, toggleAdmin)}
               >
-                <Icon.GroupAdmin className="panel__action-item__icon" />
+                <span className="panel__action-item__icon">
+                  <Icon.GroupAdmin />
+                </span>
 
                 <BaseToggle
-                  className="modal-style"
                   isChecked={isAdmin}
                   setIsChecked={toggleAdmin}
                   toggleName={t('conversationDetailsGroupAdmin')}
                   toggleId="admin"
                   isDisabled={currentUser.isFederated}
                 />
-              </button>
+              </div>
             </div>
 
             {/* @ts-ignore Ignore tabIndex for accessibility */}

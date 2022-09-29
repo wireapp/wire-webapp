@@ -195,12 +195,18 @@ const GuestOptions: FC<GuestOptionsProps> = ({
                     data-uie-name="do-copy-link"
                   >
                     <span className="panel__action-item__default">
-                      <Icon.Copy className="panel__action-item__icon" />
+                      <span className="panel__action-item__icon">
+                        <Icon.Copy />
+                      </span>
+
                       <span className="panel__action-item__text">{t('guestOptionsCopyLink')}</span>
                     </span>
 
                     <span className="panel__action-item__alternative">
-                      <Icon.Check className="panel__action-item__icon" />
+                      <span className="panel__action-item__icon">
+                        <Icon.Check />
+                      </span>
+
                       <span className="panel__action-item__text" data-uie-name="status-copy-link-done">
                         {t('guestOptionsCopyLinkDone')}
                       </span>
@@ -213,7 +219,9 @@ const GuestOptions: FC<GuestOptionsProps> = ({
                     disabled={isRequestOngoing}
                     onClick={revokeAccessCode}
                   >
-                    <Icon.Close className="panel__action-item__icon" />
+                    <span className="panel__action-item__icon">
+                      <Icon.Close />
+                    </span>
 
                     <span className="panel__action-item__text" data-uie-name="do-revoke-link">
                       {t('guestOptionsRevokeLink')}
@@ -229,7 +237,9 @@ const GuestOptions: FC<GuestOptionsProps> = ({
                   disabled={isRequestOngoing}
                   onClick={requestAccessCode}
                 >
-                  <Icon.Link className="panel__action-item__icon" />
+                  <span className="panel__action-item__icon">
+                    <Icon.Link />
+                  </span>
 
                   <span className="panel__action-item__text" data-uie-name="do-create-link">
                     {t('guestOptionsCreateLink')}
@@ -241,7 +251,9 @@ const GuestOptions: FC<GuestOptionsProps> = ({
 
           {!isGuestLinkEnabled && (
             <div className="panel__action-item--info">
-              <Icon.Info className="panel__action-item__icon--info" />
+              <span className="panel__action-item__icon--info">
+                <Icon.Info />
+              </span>
 
               <p className="panel__action-item__text--info" data-uie-name="guest-link-disabled-info">
                 {guestLinkDisabledInfo}

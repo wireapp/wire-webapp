@@ -34,7 +34,6 @@ import {Shortcut} from '../ui/Shortcut';
 import {ShortcutType} from '../ui/ShortcutType';
 import {ContentState, ContentViewModel} from './ContentViewModel';
 import {ModalsViewModel} from './ModalsViewModel';
-import {PanelViewModel} from './PanelViewModel';
 import type {MainViewModel, ViewModelRepositories} from './MainViewModel';
 import type {CallingRepository} from '../calling/CallingRepository';
 import type {ConversationRepository} from '../conversation/ConversationRepository';
@@ -48,6 +47,7 @@ import {ConversationState} from '../conversation/ConversationState';
 import {CallingViewModel} from './CallingViewModel';
 import {PropertiesRepository} from '../properties/PropertiesRepository';
 import {SearchRepository} from '../search/SearchRepository';
+import {openRightSidebar, PanelState} from '../page/RightSidebar/RightSidebar';
 
 export enum ListState {
   ARCHIVE = 'ListViewModel.STATE.ARCHIVE',
@@ -78,10 +78,10 @@ export class ListViewModel {
   private readonly actionsViewModel: ActionsViewModel;
   public readonly contentViewModel: ContentViewModel;
   public readonly callingViewModel: CallingViewModel;
-  private readonly panelViewModel: PanelViewModel;
   private readonly isProAccount: ko.PureComputed<boolean>;
   public readonly selfUser: ko.Observable<User>;
   private readonly visibleListItems: ko.PureComputed<(string | Conversation)[]>;
+  private readonly repositories: ViewModelRepositories;
 
   static get STATE() {
     return {
@@ -101,6 +101,7 @@ export class ListViewModel {
     this.mainViewModel = mainViewModel;
     this.elementId = 'left-column';
     this.isFederated = mainViewModel.isFederated;
+    this.repositories = repositories;
     this.conversationRepository = repositories.conversation;
     this.callingRepository = repositories.calling;
     this.teamRepository = repositories.team;
@@ -109,7 +110,6 @@ export class ListViewModel {
 
     this.actionsViewModel = mainViewModel.actions;
     this.contentViewModel = mainViewModel.content;
-    this.panelViewModel = mainViewModel.panel;
     this.callingViewModel = mainViewModel.calling;
 
     this.isActivatedAccount = this.userState.isActivatedAccount;
@@ -182,8 +182,14 @@ export class ListViewModel {
 
   readonly changeNotificationSetting = () => {
     if (this.isProAccount()) {
-      this.panelViewModel.togglePanel(PanelViewModel.STATE.NOTIFICATIONS, {
-        entity: this.conversationState.activeConversation(),
+      openRightSidebar({
+        initialEntity: this.conversationState.activeConversation(),
+        initialState: PanelState.NOTIFICATIONS,
+        isFederated: this.mainViewModel.isFederated,
+        mainViewModel: this.mainViewModel,
+        repositories: this.repositories,
+        teamState: this.teamState,
+        userState: this.userState,
       });
     } else {
       this.clickToToggleMute();

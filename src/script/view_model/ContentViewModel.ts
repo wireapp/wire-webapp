@@ -32,7 +32,6 @@ import {MessageListViewModel} from './content/MessageListViewModel';
 import {LegalHoldModalViewModel} from './content/LegalHoldModalViewModel';
 import {ModalsViewModel} from './ModalsViewModel';
 import {ConversationError} from '../error/ConversationError';
-import {PanelViewModel} from './PanelViewModel';
 import type {MainViewModel, ViewModelRepositories} from './MainViewModel';
 import type {ConversationRepository} from '../conversation/ConversationRepository';
 import type {UserRepository} from '../user/UserRepository';
@@ -46,12 +45,13 @@ import {matchQualifiedIds} from 'Util/QualifiedId';
 import '../page/LeftSidebar';
 import '../page/MainContent';
 import {
-  PreferenceNotificationRepository,
-  Notification,
   ClientNotificationData,
+  Notification,
+  PreferenceNotificationRepository,
 } from '../notification/PreferenceNotificationRepository';
 import {modals} from '../view_model/ModalsViewModel';
 import {MessageRepository} from '../conversation/MessageRepository';
+import {openRightSidebar, PanelState} from '../page/RightSidebar/RightSidebar';
 
 interface ShowConversationOptions {
   exposeMessage?: Message;
@@ -152,6 +152,10 @@ export class ContentViewModel {
       repositories.user,
       repositories.message,
       repositories.asset,
+      this.userState,
+      this.conversationState,
+      this.teamState,
+      repositories,
     );
 
     this.state.subscribe(state => {
@@ -249,7 +253,15 @@ export class ContentViewModel {
 
       if (isOpenedConversation) {
         if (openNotificationSettings) {
-          this.mainViewModel.panel.togglePanel(PanelViewModel.STATE.NOTIFICATIONS, {entity: conversationEntity});
+          openRightSidebar({
+            initialEntity: conversationEntity,
+            initialState: PanelState.NOTIFICATIONS,
+            isFederated: this.mainViewModel.isFederated,
+            mainViewModel: this.mainViewModel,
+            repositories: this.repositories,
+            teamState: this.teamState,
+            userState: this.userState,
+          });
         }
         return;
       }
@@ -278,8 +290,14 @@ export class ContentViewModel {
       this.showContent(ContentViewModel.STATE.CONVERSATION);
       this.previousConversation = this.conversationState.activeConversation();
       if (openNotificationSettings) {
-        this.mainViewModel.panel.togglePanel(PanelViewModel.STATE.NOTIFICATIONS, {
-          entity: this.conversationState.activeConversation(),
+        openRightSidebar({
+          initialEntity: this.conversationState.activeConversation(),
+          initialState: PanelState.NOTIFICATIONS,
+          isFederated: this.mainViewModel.isFederated,
+          mainViewModel: this.mainViewModel,
+          repositories: this.repositories,
+          teamState: this.teamState,
+          userState: this.userState,
         });
       }
     } catch (error) {

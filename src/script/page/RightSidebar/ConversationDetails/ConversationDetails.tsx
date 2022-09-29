@@ -54,18 +54,17 @@ import {Shortcut} from '../../../ui/Shortcut';
 import {ShortcutType} from '../../../ui/ShortcutType';
 import {UserState} from '../../../user/UserState';
 import {ActionsViewModel} from '../../../view_model/ActionsViewModel';
-import {PanelParams, PanelViewModel} from '../../../view_model/PanelViewModel';
 import {initFadingScrollbar} from '../../../ui/fadingScrollbar';
+import {PanelEntity, PanelState} from '../RightSidebar';
 
 const CONFIG = {
-  MAX_USERS_VISIBLE: 7,
+  MAX_USERS_VISIBLE: 1,
   REDUCED_USERS_COUNT: 5,
 };
 
 interface ConversationDetailsProps {
   onClose: () => void;
-  showDevices: (entity: User) => void;
-  togglePanel: (panel: string, params: PanelParams) => void;
+  togglePanel: (panel: PanelState, entity: PanelEntity, addMode?: boolean, direction?: 'left' | 'right') => void;
   actionsViewModel: ActionsViewModel;
   activeConversation: Conversation;
   conversationRepository: ConversationRepository;
@@ -79,7 +78,6 @@ interface ConversationDetailsProps {
 
 const ConversationDetails: FC<ConversationDetailsProps> = ({
   onClose,
-  showDevices,
   togglePanel,
   actionsViewModel,
   activeConversation,
@@ -185,25 +183,21 @@ const ConversationDetails: FC<ConversationDetailsProps> = ({
 
   const toggleMute = () => actionsViewModel.toggleMuteConversation(activeConversation);
 
-  const openParticipantDevices = () => {
-    showDevices(firstParticipant);
-  };
+  const openParticipantDevices = () => togglePanel(PanelState.PARTICIPANT_DEVICES, firstParticipant, false, 'left');
 
-  const updateConversationName = (conversationName: string) => {
+  const updateConversationName = (conversationName: string) =>
     conversationRepository.renameConversation(activeConversation, conversationName);
-  };
 
-  const openAddParticipants = () => {
-    togglePanel(PanelViewModel.STATE.ADD_PARTICIPANTS, {entity: activeConversation});
-  };
+  const openAddParticipants = () => togglePanel(PanelState.ADD_PARTICIPANTS, activeConversation);
+
+  const showUser = (userEntity: User) => togglePanel(PanelState.GROUP_PARTICIPANT_USER, userEntity);
 
   const showService = (serviceEntity: ServiceEntity) =>
-    togglePanel(PanelViewModel.STATE.GROUP_PARTICIPANT_SERVICE, {entity: serviceEntity});
+    togglePanel(PanelState.GROUP_PARTICIPANT_SERVICE, serviceEntity);
 
-  const showAllParticipants = () =>
-    togglePanel(PanelViewModel.STATE.CONVERSATION_PARTICIPANTS, {entity: activeConversation});
+  const showAllParticipants = () => togglePanel(PanelState.CONVERSATION_PARTICIPANTS, activeConversation);
 
-  const showNotifications = () => togglePanel(PanelViewModel.STATE.NOTIFICATIONS, {entity: activeConversation});
+  const showNotifications = () => togglePanel(PanelState.NOTIFICATIONS, activeConversation);
 
   const updateConversationReceiptMode = (receiptMode: RECEIPT_MODE) =>
     conversationRepository.updateConversationReceiptMode(activeConversation, {receipt_mode: receiptMode});
@@ -267,7 +261,7 @@ const ConversationDetails: FC<ConversationDetailsProps> = ({
   initFadingScrollbar(panelContentRef.current);
 
   return (
-    <div id="conversation-details" className="panel__page conversation-details panel__page--visible">
+    <div id="conversation-details" className="panel__page conversation-details">
       <PanelHeader
         isReverse
         showBackArrow={false}
@@ -315,48 +309,52 @@ const ConversationDetails: FC<ConversationDetailsProps> = ({
                   onClick={openAddParticipants}
                   data-uie-name="go-add-people"
                 >
-                  <Icon.Plus className="panel__action-item__icon" />
+                  <span className="panel__action-item__icon">
+                    <Icon.Plus />
+                  </span>
+
                   <span className="panel__action-item__text">{t('conversationDetailsActionAddParticipants')}</span>
+
                   <Icon.ChevronRight className="chevron-right-icon" />
                 </button>
               </div>
             )}
 
             <div className="conversation-details__participants">
-              {isGroup && (
+              {isGroup && !!userParticipants.length && (
                 <>
-                  {!!userParticipants.length && (
-                    <>
-                      <UserSearchableList
-                        data-uie-name="list-users"
-                        users={userParticipants}
-                        onClick={showDevices}
-                        noUnderline
-                        searchRepository={searchRepository}
-                        teamRepository={teamRepository}
-                        conversationRepository={conversationRepository}
-                        conversation={activeConversation}
-                        truncate
-                        showEmptyAdmin
-                        selfFirst={false}
-                        noSelfInteraction
-                      />
+                  <UserSearchableList
+                    data-uie-name="list-users"
+                    users={userParticipants}
+                    onClick={showUser}
+                    noUnderline
+                    searchRepository={searchRepository}
+                    teamRepository={teamRepository}
+                    conversationRepository={conversationRepository}
+                    conversation={activeConversation}
+                    truncate
+                    showEmptyAdmin
+                    selfFirst={false}
+                    noSelfInteraction
+                  />
 
-                      {allUsersCount > 0 && (
-                        <button
-                          type="button"
-                          className="panel__action-item panel__action-item--no-border"
-                          onClick={showAllParticipants}
-                          data-uie-name="go-conversation-participants"
-                        >
-                          <Icon.People className="panel__action-item__icon" />
-                          <span className="panel__action-item__text">
-                            {t('conversationDetailsActionConversationParticipants', allUsersCount)}
-                          </span>
-                          <Icon.ChevronRight className="chevron-right-icon" />
-                        </button>
-                      )}
-                    </>
+                  {allUsersCount > 0 && (
+                    <button
+                      type="button"
+                      className="panel__action-item panel__action-item--no-border"
+                      onClick={showAllParticipants}
+                      data-uie-name="go-conversation-participants"
+                    >
+                      <span className="panel__action-item__icon">
+                        <Icon.People />
+                      </span>
+
+                      <span className="panel__action-item__text">
+                        {t('conversationDetailsActionConversationParticipants', allUsersCount)}
+                      </span>
+
+                      <Icon.ChevronRight className="chevron-right-icon" />
+                    </button>
                   )}
                 </>
               )}

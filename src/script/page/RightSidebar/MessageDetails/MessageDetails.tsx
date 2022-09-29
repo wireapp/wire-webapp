@@ -187,7 +187,7 @@ const MessageDetails: FC<MessageDetailsProps> = ({
   }, [messageId, supportsLikes]);
 
   return (
-    <div id="message-details" className="panel__page message-details panel__page--visible">
+    <div id="message-details" className="panel__page message-details">
       <PanelHeader
         onClose={onClose}
         title={panelTitle}

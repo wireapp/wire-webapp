@@ -93,7 +93,7 @@ const GroupParticipantService: FC<GroupParticipantServiceProps> = ({
   }, [serviceEntity]);
 
   return (
-    <div id="group-participant-service" className="panel__page group-participant panel__page--visible">
+    <div id="group-participant-service" className="panel__page group-participant">
       <PanelHeader onGoBack={onBack} goBackUie="go-back-group-participant" onClose={onClose} />
 
       <div className="panel__content panel__content--fill" data-bind="fadingscrollbar">
@@ -108,7 +108,9 @@ const GroupParticipantService: FC<GroupParticipantServiceProps> = ({
             onClick={onOpen}
             onKeyDown={event => handleKeyDown(event, onOpen)}
           >
-            <Icon.Message className="panel__action-item__icon" />
+            <span className="panel__action-item__icon">
+              <Icon.Message />
+            </span>
 
             <div className="panel__action-item__text">{t('groupParticipantActionOpenConversation')}</div>
           </div>
@@ -123,7 +125,9 @@ const GroupParticipantService: FC<GroupParticipantServiceProps> = ({
             onClick={onRemove}
             onKeyDown={event => handleKeyDown(event, onRemove)}
           >
-            <Icon.Minus className="panel__action-item__icon" />
+            <span className="panel__action-item__icon">
+              <Icon.Minus />
+            </span>
 
             <div className="panel__action-item__text">{t('groupParticipantActionRemove')}</div>
           </div>

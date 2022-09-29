@@ -17,18 +17,22 @@
  *
  */
 
-import {User} from '../entity/User';
-import {ServiceEntity} from '../integration/ServiceEntity';
-import {PanelEntity} from '../page/RightSidebar/RightSidebar';
+import {useMemo, useState} from 'react';
 
-export const isServiceEntity = (entity: PanelEntity): entity is ServiceEntity => {
-  return 'isService' in entity && entity.isService;
+import {PanelState} from '../RightSidebar';
+
+const usePanelHistory = (initialState: PanelState) => {
+  const [history, setHistory] = useState<PanelState[]>([initialState]);
+  const currentState = useMemo<PanelState>(() => history[history.length - 1], [history]);
+
+  return {
+    clearHistory: () => setHistory([initialState]),
+    currentState,
+    goBack: () => setHistory(history.slice(0, -1)),
+    goTo: (state: PanelState) => setHistory([...history, state]),
+    panelDepth: history.length,
+    previousHistory: history.length === 1 ? history : history.slice(0, -1),
+  };
 };
 
-export const isUserEntity = (entity: PanelEntity): entity is User => {
-  return !isServiceEntity(entity);
-};
-
-export const isUserServiceEntity = (entity: PanelEntity): entity is User => {
-  return isServiceEntity(entity);
-};
+export default usePanelHistory;

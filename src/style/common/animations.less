@@ -72,3 +72,139 @@
     }
   }
 }
+
+.slide-left,
+.slide-right {
+  &-enter,
+  &-exit {
+    position: absolute;
+    top: 0;
+    transition: all @animation-timing-fast @ease-out-expo;
+
+    .panel__header {
+      //opacity: 1;
+      transition: opacity @animation-timing-fast @ease-out-quart;
+    }
+
+    .panel__content,
+    .panel__footer {
+      //transition: transform @animation-timing-fast @ease-out-expo;
+      transition: right @animation-timing-fast @ease-out-expo;
+    }
+
+    &&-active {
+      pointer-events: none;
+    }
+  }
+
+  &-enter-active,
+  &-exit-active {
+    .panel__header {
+      //opacity: 1;
+      transition: opacity @animation-timing-fast @ease-out-quart;
+    }
+  }
+
+  &-enter-done,
+  &-enter {
+    .panel__header {
+      opacity: 1;
+    }
+  }
+
+  &-exit {
+    .panel__header {
+      opacity: 0;
+    }
+  }
+}
+
+.slide-left {
+  &-enter {
+    .panel__content,
+    .panel__footer {
+      right: -@panel-width;
+    }
+
+    &-active {
+      .panel__content,
+      .panel__footer {
+        right: 0;
+      }
+    }
+  }
+
+  &-exit {
+    .panel__content,
+    .panel__footer {
+      right: 0;
+    }
+
+    &-active {
+      .panel__content,
+      .panel__footer {
+        right: -@panel-width;
+      }
+    }
+  }
+}
+
+.slide-right {
+  &-enter {
+    .panel__content,
+    .panel__footer {
+      right: @panel-width;
+    }
+
+    &&-active {
+      .panel__content,
+      .panel__footer {
+        right: 0;
+      }
+    }
+  }
+
+  &-exit {
+    .panel__content,
+    .panel__footer {
+      right: 0;
+    }
+
+    &&-active {
+      .panel__content,
+      .panel__footer {
+        right: @panel-width;
+      }
+    }
+  }
+}
+
+.right-panel--closed,
+.right-panel--open {
+  position: absolute;
+  right: 0;
+  width: @panel-width;
+}
+
+.right-panel--closed {
+  transform: translateX(@panel-width);
+}
+
+.right-panel--open {
+  transform: translateX(0);
+}
+
+.right-column {
+  animation: slide-left 0.35s ease;
+}
+
+@keyframes slide-left {
+  0% {
+    //opacity: 0;
+    transform: translateX(304px);
+  }
+  100% {
+    //opacity: 1;
+    transform: translateX(0);
+  }
+}

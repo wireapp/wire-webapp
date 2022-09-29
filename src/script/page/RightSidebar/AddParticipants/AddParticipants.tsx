@@ -44,8 +44,8 @@ import {TeamRepository} from '../../../team/TeamRepository';
 import {TeamState} from '../../../team/TeamState';
 import {UserState} from '../../../user/UserState';
 import {generatePermissionHelpers} from '../../../user/UserPermission';
-import {PanelParams, PanelViewModel} from '../../../view_model/PanelViewModel';
 import {handleKeyDown} from 'Util/KeyboardUtil';
+import {PanelEntity, PanelState} from '../RightSidebar';
 
 interface AddParticipantsProps {
   activeConversation: Conversation;
@@ -54,7 +54,7 @@ interface AddParticipantsProps {
   conversationRepository: ConversationRepository;
   integrationRepository: IntegrationRepository;
   searchRepository: SearchRepository;
-  togglePanel: (panel: string, params: PanelParams) => void;
+  togglePanel: (panel: PanelState, entity: PanelEntity, addMode?: boolean) => void;
   teamRepository: TeamRepository;
   teamState: TeamState;
   userState: UserState;
@@ -119,8 +119,8 @@ const AddParticipants: FC<AddParticipantsProps> = ({
       users = connectedUsers;
     }
 
-    return users.filter(userEntity => participatingUserIds.find(userId => matchQualifiedIds(userEntity, userId)));
-  }, [isTeam, isTeamOnly, isServicesRoom, teamUsers, connectedUsers, participatingUserIds]);
+    return users.filter(userEntity => !participatingUserIds.find(userId => matchQualifiedIds(userEntity, userId)));
+  }, []);
 
   const enabledAddAction = selectedContacts.length > 0;
 
@@ -134,7 +134,7 @@ const AddParticipants: FC<AddParticipantsProps> = ({
     const allowIntegrations = isGroup || isService;
 
     return isTeam && allowIntegrations && inTeam && !isTeamOnly && isServicesEnabled;
-  }, [isServicesRoom, isGuestAndServicesRoom, firstUserEntity, isGroup, isTeam, inTeam, isTeamOnly]);
+  }, []);
 
   const manageServicesUrl = getManageServicesUrl('client_landing');
   const isSearching = searchInput.length > 0;
@@ -158,11 +158,16 @@ const AddParticipants: FC<AddParticipantsProps> = ({
     }
   };
 
-  const onServiceSelect = (serviceEntity: ServiceEntity) => {
-    togglePanel(PanelViewModel.STATE.GROUP_PARTICIPANT_SERVICE, {
-      addMode: true,
-      entity: serviceEntity,
-    });
+  const onServiceSelect = async (entity: ServiceEntity) => {
+    const serviceEntity = await integrationRepository.getServiceFromUser(entity);
+
+    if (!serviceEntity) {
+      return;
+    }
+
+    integrationRepository.addProviderNameToParticipant(serviceEntity);
+
+    togglePanel(PanelState.GROUP_PARTICIPANT_SERVICE, serviceEntity, true);
   };
 
   const addUsers = async () => {
@@ -182,7 +187,7 @@ const AddParticipants: FC<AddParticipantsProps> = ({
   };
 
   return (
-    <div id="add-participants" className="add-participants panel__page panel__page--visible">
+    <div id="add-participants" className="add-participants panel__page">
       <PanelHeader
         showBackArrow
         goBackUie="go-back-add-participants"
@@ -254,7 +259,9 @@ const AddParticipants: FC<AddParticipantsProps> = ({
                         onKeyDown={event => handleKeyDown(event, openManageServices)}
                         data-uie-name="go-manage-services"
                       >
-                        <Icon.Service className="left-column-icon left-column-icon-dark" />
+                        <span className="left-column-icon left-column-icon-dark">
+                          <Icon.Service />
+                        </span>
 
                         <div className="center-column">{t('addParticipantsManageServices')}</div>
                       </li>

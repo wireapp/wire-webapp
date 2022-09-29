@@ -83,7 +83,7 @@ const TimedMessages: FC<TimedMessagesPanelProps> = ({activeConversation, onClose
   };
 
   return (
-    <div id="timed-messages" className="panel__page timed-messages panel__page--visible">
+    <div id="timed-messages" className="panel__page timed-messages">
       <PanelHeader
         onGoBack={onGoBack}
         onClose={onClose}

@@ -40,7 +40,7 @@ const ParticipantDevices: FC<ParticipantDevicesProps> = ({repositories, onClose,
   const history = useUserDevicesHistory();
 
   return (
-    <div id="participant-devices" className="panel__page participant-devices panel__page--visible">
+    <div id="participant-devices" className="panel__page participant-devices">
       <PanelHeader
         onGoBack={() => {
           if (history.current.state === UserDevicesState.DEVICE_LIST) {

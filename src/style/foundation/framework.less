@@ -66,14 +66,22 @@
   }
 
   .right-column {
+
+    position: absolute;
     z-index: @z-index-panel;
+    right: 0;
     overflow: hidden;
-    width: 0;
+    width: @right-width;
+    //width: 0;
     height: 100vh;
     max-height: 100%;
     border-left: 1px solid var(--sidebar-border-color);
     background-color: var(--sidebar-bg);
     transform: scale(1, 1);
+
+    @media (min-width: 1000px) {
+      position: relative;
+    }
   }
 
   &.app--panel-open {

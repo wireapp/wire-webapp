@@ -61,7 +61,9 @@ const UserConversationDetails: FC<UserConversationDetailsProps> = ({
       {(firstParticipant.isConnected || firstParticipant.inTeam) && (
         <div className="conversation-details__devices">
           <button className="panel__action-item" onClick={onDevicesClick} data-uie-name="go-devices" type="button">
-            <Icon.Devices className="panel__action-item__icon" />
+            <span className="panel__action-item__icon">
+              <Icon.Devices />
+            </span>
 
             <span className="panel__action-item__text">{t('conversationDetailsActionDevices')}</span>
 

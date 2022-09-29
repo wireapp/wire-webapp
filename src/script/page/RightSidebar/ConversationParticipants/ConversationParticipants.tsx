@@ -18,7 +18,6 @@
  */
 
 import {FC, useMemo, useState} from 'react';
-import cx from 'classnames';
 
 import SearchInput from 'Components/SearchInput';
 import UserSearchableList from 'Components/UserSearchableList';
@@ -28,6 +27,7 @@ import {t} from 'Util/LocalizerUtil';
 import {sortUsersByPriority} from 'Util/StringUtil';
 
 import PanelHeader from '../PanelHeader';
+import {PanelEntity, PanelState} from '../RightSidebar';
 
 import {ConversationRepository} from '../../../conversation/ConversationRepository';
 import {Conversation} from '../../../entity/Conversation';
@@ -35,7 +35,6 @@ import {User} from '../../../entity/User';
 import {SearchRepository} from '../../../search/SearchRepository';
 import {TeamRepository} from '../../../team/TeamRepository';
 import {isServiceEntity} from '../../../guards/Service';
-import {PanelParams, PanelViewModel} from '../../../view_model/PanelViewModel';
 import {initFadingScrollbar} from '../../../ui/fadingScrollbar';
 
 interface ConversationParticipantsProps {
@@ -43,11 +42,10 @@ interface ConversationParticipantsProps {
   conversationRepository: ConversationRepository;
   searchRepository: SearchRepository;
   teamRepository: TeamRepository;
-  togglePanel: (state: string, params: PanelParams) => void;
+  togglePanel: (state: PanelState, entity: PanelEntity, addMode?: boolean) => void;
   highlightedUsers: User[];
   onClose: () => void;
   onBack: () => void;
-  isVisible?: boolean;
 }
 
 const ConversationParticipants: FC<ConversationParticipantsProps> = ({
@@ -59,7 +57,6 @@ const ConversationParticipants: FC<ConversationParticipantsProps> = ({
   onClose,
   onBack,
   highlightedUsers,
-  isVisible = false,
 }) => {
   const [searchInput, setSearchInput] = useState<string>('');
 
@@ -73,7 +70,7 @@ const ConversationParticipants: FC<ConversationParticipantsProps> = ({
     'selfUser',
   ]);
 
-  const showUser = (userEntity: User) => togglePanel(PanelViewModel.STATE.GROUP_PARTICIPANT_USER, {entity: userEntity});
+  const showUser = (userEntity: User) => togglePanel(PanelState.GROUP_PARTICIPANT_USER, userEntity);
 
   const participants = useMemo(() => {
     const users: User[] = participatingUserEts.flatMap(user => {
@@ -89,10 +86,7 @@ const ConversationParticipants: FC<ConversationParticipantsProps> = ({
   }, [participatingUserEts, removedFromConversation, selfUser]);
 
   return (
-    <div
-      id="conversation-participants"
-      className={cx('panel__page conversation-participants', {'panel__page--visible': isVisible})}
-    >
+    <div id="conversation-participants" className="panel__page conversation-participants">
       <PanelHeader
         onGoBack={onBack}
         onClose={onClose}

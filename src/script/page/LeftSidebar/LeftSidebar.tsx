@@ -33,6 +33,7 @@ import TemporaryGuestConversations from './panels/TemporatyGuestConversations';
 import {amplify} from 'amplify';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import StartUI from './panels/StartUI';
+import {forceCloseRightPanel} from '../RightSidebar/utils/toggleRightPanel';
 
 type LeftSidebarProps = {
   assetRepository?: AssetRepository;
@@ -57,7 +58,12 @@ const LeftSidebar: React.FC<LeftSidebarProps> = ({
 
   const {state} = useKoSubscribableChildren(listViewModel, ['state']);
   let content = <span></span>;
-  const switchList = (list: ListState) => listViewModel.switchList(list);
+
+  const switchList = (list: ListState) => {
+    forceCloseRightPanel();
+    listViewModel.switchList(list);
+  };
+
   const goHome = () => {
     return selfUser.isTemporaryGuest()
       ? listViewModel.switchList(ListViewModel.STATE.TEMPORARY_GUEST)

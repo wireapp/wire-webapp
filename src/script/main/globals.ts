@@ -58,7 +58,6 @@ import '../view_model/bindings/MessageListBindings';
 import '../view_model/bindings/VideoCallingBindings';
 
 import '../view_model/MainViewModel';
-import '../view_model/PanelViewModel';
 
 window.amplify = amplify;
 // we need to publish jQuery on the window so that knockout can use it

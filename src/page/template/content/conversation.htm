@@ -6,12 +6,13 @@
   <!-- ko if: $root.conversationRepository.conversationState.activeConversation() -->
   <title-bar
     params="
+      contentViewModel: $root,
+      mainViewModel: $root.mainViewModel,
+      repositories: $root.repositories,
       conversation: $root.conversationState.activeConversation(),
       legalHoldModal: $root.legalHoldModal,
-      panelViewModel: $root.mainViewModel.panel,
-      callingRepository: $root.repositories.calling,
       callActions: $root.mainViewModel.calling.callActions,
-      panelViewModel: $root.mainViewModel.panel,
+      isFederated: $root.mainViewModel.isFederated,
     "
   >
   </title-bar>

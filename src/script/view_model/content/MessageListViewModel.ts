@@ -35,12 +35,11 @@ import {ConversationRepository} from '../../conversation/ConversationRepository'
 import {ConversationState} from '../../conversation/ConversationState';
 import {DecryptErrorMessage} from '../../entity/message/DecryptErrorMessage';
 import {IntegrationRepository} from '../../integration/IntegrationRepository';
-import {MainViewModel} from '../MainViewModel';
+import {MainViewModel, ViewModelRepositories} from '../MainViewModel';
 import {MemberMessage} from '../../entity/message/MemberMessage';
 import {Message} from '../../entity/message/Message';
 import {ModalsViewModel} from '../ModalsViewModel';
 import {MotionDuration} from '../../motion/MotionDuration';
-import {PanelViewModel} from '../PanelViewModel';
 import {ServerTimeHandler} from '../../time/serverTimeHandler';
 import {Text} from '../../entity/message/Text';
 import {User} from '../../entity/User';
@@ -51,6 +50,8 @@ import type {MessageRepository} from '../../conversation/MessageRepository';
 import {showDetailViewModal} from 'Components/Modals/DetailViewModal';
 import {AssetRepository} from '../../assets/AssetRepository';
 import React from 'react';
+import {openRightSidebar, PanelState} from '../../page/RightSidebar/RightSidebar';
+import {TeamState} from '../../team/TeamState';
 
 /*
  * Message list rendering view model.
@@ -78,11 +79,15 @@ export class MessageListViewModel {
     private readonly assetRepository: AssetRepository,
     private readonly userState = container.resolve(UserState),
     private readonly conversationState = container.resolve(ConversationState),
+    private readonly teamState = container.resolve(TeamState),
+    readonly repositories: ViewModelRepositories,
   ) {
     this.logger = getLogger('MessageListViewModel');
 
     this.actionsViewModel = this.mainViewModel.actions;
     this.selfUser = this.userState.self;
+
+    this.repositories = repositories;
 
     this.conversation = ko.observable(new Conversation());
 
@@ -163,20 +168,36 @@ export class MessageListViewModel {
   readonly showUserDetails = (userEntity: User): void => {
     userEntity = ko.unwrap(userEntity);
     const conversationEntity = this.conversationState.activeConversation();
-    const isSingleModeConversation = conversationEntity.is1to1() || conversationEntity.isRequest();
 
-    if (userEntity.isDeleted || (isSingleModeConversation && !userEntity.isMe)) {
-      return this.mainViewModel.panel.togglePanel(PanelViewModel.STATE.CONVERSATION_DETAILS, {
-        entity: conversationEntity,
-      });
+    if (conversationEntity) {
+      const isSingleModeConversation = conversationEntity.is1to1() || conversationEntity.isRequest();
+
+      if (userEntity.isDeleted || (isSingleModeConversation && !userEntity.isMe)) {
+        openRightSidebar({
+          initialEntity: conversationEntity,
+          initialState: PanelState.CONVERSATION_DETAILS,
+          isFederated: this.mainViewModel.isFederated,
+          mainViewModel: this.mainViewModel,
+          repositories: this.repositories,
+          teamState: this.teamState,
+          userState: this.userState,
+        });
+
+        return;
+      }
     }
 
-    const params = {entity: userEntity};
-    const panelId = userEntity.isService
-      ? PanelViewModel.STATE.GROUP_PARTICIPANT_SERVICE
-      : PanelViewModel.STATE.GROUP_PARTICIPANT_USER;
+    const panelId = userEntity.isService ? PanelState.GROUP_PARTICIPANT_SERVICE : PanelState.GROUP_PARTICIPANT_USER;
 
-    this.mainViewModel.panel.togglePanel(panelId, params);
+    openRightSidebar({
+      initialEntity: userEntity,
+      initialState: panelId,
+      isFederated: this.mainViewModel.isFederated,
+      mainViewModel: this.mainViewModel,
+      repositories: this.repositories,
+      teamState: this.teamState,
+      userState: this.userState,
+    });
   };
 
   onSessionResetClick = async (messageEntity: DecryptErrorMessage): Promise<void> => {
@@ -228,7 +249,15 @@ export class MessageListViewModel {
   };
 
   readonly clickOnInvitePeople = (conversation: Conversation): void => {
-    this.mainViewModel.panel.togglePanel(PanelViewModel.STATE.GUEST_OPTIONS, {entity: conversation});
+    openRightSidebar({
+      initialEntity: conversation,
+      initialState: PanelState.GUEST_OPTIONS,
+      isFederated: this.mainViewModel.isFederated,
+      mainViewModel: this.mainViewModel,
+      repositories: this.repositories,
+      teamState: this.teamState,
+      userState: this.userState,
+    });
   };
 
   readonly getInViewportCallback = (
@@ -368,22 +397,29 @@ export class MessageListViewModel {
   };
 
   readonly showParticipants = (participants: User[]): void => {
-    this.mainViewModel.updateHighlightedUsers(participants);
-
-    this.mainViewModel.panel.togglePanel(PanelViewModel.STATE.CONVERSATION_PARTICIPANTS, {
-      entity: this.conversation(),
+    openRightSidebar({
       highlighted: participants,
+      initialEntity: this.conversation(),
+      initialState: PanelState.CONVERSATION_PARTICIPANTS,
+      isFederated: this.mainViewModel.isFederated,
+      mainViewModel: this.mainViewModel,
+      repositories: this.repositories,
+      teamState: this.teamState,
+      userState: this.userState,
     });
   };
 
   readonly showMessageDetails = (message: Message, showLikes: boolean = false): void => {
     if (!this.conversation().is1to1()) {
-      this.mainViewModel.updateMessageEntity(message);
-      this.mainViewModel.updateShowLikes(showLikes);
-
-      this.mainViewModel.panel.togglePanel(PanelViewModel.STATE.MESSAGE_DETAILS, {
-        entity: message,
+      openRightSidebar({
+        initialEntity: message,
+        initialState: PanelState.MESSAGE_DETAILS,
+        isFederated: this.mainViewModel.isFederated,
+        mainViewModel: this.mainViewModel,
+        repositories: this.repositories,
         showLikes,
+        teamState: this.teamState,
+        userState: this.userState,
       });
     }
   };

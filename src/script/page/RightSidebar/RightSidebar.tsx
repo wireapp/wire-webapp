@@ -17,312 +17,336 @@
  *
  */
 
-import {FC, useCallback, useEffect, useState} from 'react';
+import {WebAppEvents} from '@wireapp/webapp-events';
+
+import {amplify} from 'amplify';
+import {FC, ReactNode, useEffect, useState} from 'react';
+import {CSSTransition, TransitionGroup} from 'react-transition-group';
 import {container} from 'tsyringe';
 
-import {registerReactComponent, useKoSubscribableChildren} from 'Util/ComponentUtil';
+import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 
+import AddParticipants from './AddParticipants';
 import ConversationDetails from './ConversationDetails';
 import ConversationParticipants from './ConversationParticipants';
+import GuestServicesOptions from './GuestServicesOptions';
+import GroupParticipantUser from './GroupParticipantUser';
+import GroupParticipantService from './GroupParticipantService';
+import MessageDetails from './MessageDetails';
+import Notifications from './Notifications';
+import ParticipantDevices from './ParticipantDevices';
+import TimedMessages from './TimedMessages';
+
+import toggleRightSidebar from './utils/toggleRightPanel';
+import usePanelHistory from './utils/usePanelHistory';
 
 import {ConversationState} from '../../conversation/ConversationState';
+import {Conversation} from '../../entity/Conversation';
+import {Message} from '../../entity/message/Message';
+import {User} from '../../entity/User';
+import {isContentMessage} from '../../guards/Message';
+import {isUserEntity, isUserServiceEntity} from '../../guards/Panel';
+import {isServiceEntity} from '../../guards/Service';
+import {ServiceEntity} from '../../integration/ServiceEntity';
 import {UserState} from '../../user/UserState';
 import {TeamState} from '../../team/TeamState';
 import {ContentViewModel} from '../../view_model/ContentViewModel';
-import {PanelParams, PanelViewModel} from '../../view_model/PanelViewModel';
-import GroupParticipantUser from './GroupParticipantUser';
-import {User} from '../../entity/User';
-import {isUserEntity, isUserServiceEntity} from '../../guards/Panel';
-import ParticipantDevices from './ParticipantDevices/ParticipantDevices';
-import Notifications from './Notifications/Notifications';
-import TimedMessages from './TimedMessages';
-import GuestServicesOptions from './GuestServicesOptions/GuestServicesOptions';
-import GroupParticipantService from './GroupParticipantService';
-import {isServiceEntity} from '../../guards/Service';
-import {ServiceEntity} from '../../integration/ServiceEntity';
-import AddParticipants from './AddParticipants';
-import MessageDetails from './MessageDetails';
-import {isContentMessage} from '../../guards/Message';
+import {MainViewModel, ViewModelRepositories} from '../../view_model/MainViewModel';
 
-const migratedPanels = [
-  PanelViewModel.STATE.CONVERSATION_DETAILS,
-  PanelViewModel.STATE.CONVERSATION_PARTICIPANTS,
-  PanelViewModel.STATE.GROUP_PARTICIPANT_USER,
-  PanelViewModel.STATE.NOTIFICATIONS,
-  PanelViewModel.STATE.PARTICIPANT_DEVICES,
-  PanelViewModel.STATE.TIMED_MESSAGES,
-  PanelViewModel.STATE.GUEST_OPTIONS,
-  PanelViewModel.STATE.SERVICES_OPTIONS,
-  PanelViewModel.STATE.GROUP_PARTICIPANT_SERVICE,
-  PanelViewModel.STATE.ADD_PARTICIPANTS,
-  PanelViewModel.STATE.MESSAGE_DETAILS,
-];
+export const OPEN_CONVERSATION_DETAILS = 'OPEN_CONVERSATION_DETAILS';
 
-interface RightSidebarProps {
-  contentViewModel: ContentViewModel;
-  teamState: TeamState;
-  userState: UserState;
+const Animated: FC<{children: ReactNode; direction?: string}> = ({children, direction = 'left', ...rest}) => {
+  const classDirection = `slide-${direction}`;
+
+  return (
+    <CSSTransition classNames={classDirection} timeout={350} {...rest}>
+      {children}
+    </CSSTransition>
+  );
+};
+
+export enum PanelState {
+  ADD_PARTICIPANTS = 'ADD_PARTICIPANTS',
+  CONVERSATION_DETAILS = 'CONVERSATION_DETAILS',
+  CONVERSATION_PARTICIPANTS = 'CONVERSATION_PARTICIPANTS',
+  GROUP_PARTICIPANT_SERVICE = 'GROUP_PARTICIPANT_SERVICE',
+  GROUP_PARTICIPANT_USER = 'GROUP_PARTICIPANT_USER',
+  GUEST_OPTIONS = 'GUEST_OPTIONS',
+  MESSAGE_DETAILS = 'MESSAGE_DETAILS',
+  NOTIFICATIONS = 'NOTIFICATIONS',
+  PARTICIPANT_DEVICES = 'DEVICES',
+  SERVICES_OPTIONS = 'SERVICES_OPTIONS',
+  TIMED_MESSAGES = 'TIMED_MESSAGES',
 }
 
-const RightSidebar: FC<RightSidebarProps> = ({contentViewModel, teamState, userState}) => {
+export type PanelEntity = Conversation | User | Message | ServiceEntity;
+
+interface RightSidebarProps {
+  initialState: PanelState;
+  initialEntity: PanelEntity | null;
+  mainViewModel: MainViewModel;
+  repositories: ViewModelRepositories;
+  teamState: TeamState;
+  userState: UserState;
+  highlighted?: User[];
+  showLikes?: boolean;
+  isFederated?: boolean;
+  onClose?: () => void;
+}
+
+const RightSidebar: FC<RightSidebarProps> = ({
+  initialState,
+  initialEntity,
+  mainViewModel,
+  repositories,
+  teamState,
+  userState,
+  highlighted = [],
+  showLikes = false,
+  isFederated = false,
+  onClose: onPanelClose,
+}) => {
   const {
     conversation: conversationRepository,
     integration: integrationRepository,
     search: searchRepository,
     team: teamRepository,
     user: userRepository,
-  } = contentViewModel.repositories;
-
+  } = repositories;
   const {conversationRoleRepository} = conversationRepository;
-
-  const {
-    actions: actionsViewModel,
-    panel: panelViewModel,
-    showLikes,
-    messageEntity,
-    highlightedUsers,
-  } = contentViewModel.mainViewModel;
+  const {actions: actionsViewModel} = mainViewModel;
   const conversationState = container.resolve(ConversationState);
 
-  const {isVisible, state} = useKoSubscribableChildren(panelViewModel, ['isVisible', 'state']);
   const {activeConversation} = useKoSubscribableChildren(conversationState, ['activeConversation']);
 
-  const [previousState, setPreviousState] = useState<string | null>(null);
-  const [currentState, setCurrentState] = useState<string | null>(state);
-  const [currentEntity, setCurrentEntity] = useState<PanelParams['entity'] | null>(null);
-  const [currentServiceEntity, setCurrentServiceEntity] = useState<ServiceEntity | null>(null);
-  const [isAddMode, setIsAddMode] = useState<PanelParams['addMode']>(false);
+  const [isAddMode, setIsAddMode] = useState<boolean>(false);
+  const [currentEntity, setCurrentEntity] = useState<PanelEntity | null>(initialEntity);
+
+  const {panelDepth, currentState, goBack, goTo, clearHistory} = usePanelHistory(initialState);
+
+  const isDeeper = panelDepth > 2;
 
   const userEntity = currentEntity && isUserEntity(currentEntity) ? currentEntity : null;
   const userServiceEntity = currentEntity && isUserServiceEntity(currentEntity) ? currentEntity : null;
-
-  const getServiceEntity = useCallback(
-    async (entity: PanelParams['entity']) => {
-      if (entity && isServiceEntity(entity)) {
-        const serviceEntity = await integrationRepository.getServiceFromUser(entity);
-
-        if (!serviceEntity) {
-          return;
-        }
-
-        integrationRepository.addProviderNameToParticipant(serviceEntity);
-        setCurrentServiceEntity(serviceEntity);
-      }
-    },
-    [userEntity],
-  );
+  const messageEntity = currentEntity && isContentMessage(currentEntity) ? currentEntity : null;
+  const serviceEntity = currentEntity && isServiceEntity(currentEntity) ? currentEntity : null;
 
   const goToRoot = () => {
-    if (activeConversation) {
-      panelViewModel.goToRoot(PanelViewModel.STATE.CONVERSATION_DETAILS, {entity: activeConversation}, true);
-    }
+    setCurrentEntity(activeConversation);
+    clearHistory();
   };
 
-  const togglePanel = (panel: string, params: PanelParams) => {
-    const isMigratedPanel = migratedPanels.includes(panel);
-    setPreviousState(currentState);
-    setCurrentState(isMigratedPanel ? panel : null);
-    setCurrentEntity(params.entity);
-    setIsAddMode(!!params.addMode);
-
-    if (panel === PanelViewModel.STATE.GROUP_PARTICIPANT_SERVICE) {
-      getServiceEntity(params.entity);
-    }
-
-    panelViewModel.togglePanel(panel, params);
-  };
-
-  const onClose = () => {
-    panelViewModel.closePanel();
-    setCurrentState(null);
+  const closePanel = () => {
+    onPanelClose?.();
     setCurrentEntity(null);
-    setCurrentServiceEntity(null);
-    setPreviousState(null);
   };
 
-  const backToConversationDetails = () => {
-    if (activeConversation) {
-      if (previousState === PanelViewModel.STATE.CONVERSATION_PARTICIPANTS) {
-        setCurrentState(PanelViewModel.STATE.CONVERSATION_PARTICIPANTS);
-        return;
-      }
+  const togglePanel = (newState: PanelState, entity: PanelEntity | null, addMode: boolean = false) => {
+    goTo(newState);
+    setCurrentEntity(entity);
+    setIsAddMode(addMode);
+  };
 
-      setCurrentState(PanelViewModel.STATE.CONVERSATION_DETAILS);
-      setCurrentEntity(activeConversation);
-    }
+  const onBackClick = (entity: PanelEntity | null = activeConversation) => {
+    setCurrentEntity(entity);
+    goBack();
   };
 
   const showDevices = (entity: User) => {
-    togglePanel(PanelViewModel.STATE.PARTICIPANT_DEVICES, {entity});
-  };
-
-  const goBackToGroupOrConversationDetails = (entity: User) => {
-    const isGroupUserPreviousState = previousState === PanelViewModel.STATE.GROUP_PARTICIPANT_USER;
-    const newState = isGroupUserPreviousState
-      ? PanelViewModel.STATE.GROUP_PARTICIPANT_USER
-      : PanelViewModel.STATE.CONVERSATION_DETAILS;
-
-    togglePanel(newState, {entity});
-    setCurrentState(newState);
     setCurrentEntity(entity);
+    goTo(PanelState.PARTICIPANT_DEVICES);
+  };
+
+  const switchContent = (newContentState: string) => {
+    const isCollectionState = newContentState === ContentViewModel.STATE.COLLECTION;
+
+    if (isCollectionState && currentState) {
+      closePanel();
+    }
   };
 
   useEffect(() => {
-    setCurrentState(state);
-  }, [state]);
+    amplify.subscribe(WebAppEvents.CONTENT.SWITCH, switchContent);
+    amplify.subscribe(OPEN_CONVERSATION_DETAILS, goToRoot);
 
-  useEffect(() => {
-    if (messageEntity) {
-      setCurrentEntity(messageEntity);
-    }
-  }, [messageEntity]);
+    amplify.subscribe(WebAppEvents.CONVERSATION.MESSAGE.UPDATED, (oldId: string, updatedMessageEntity: Message) => {
+      if (currentState === PanelState.MESSAGE_DETAILS && oldId === currentEntity?.id) {
+        setCurrentEntity(updatedMessageEntity);
+      }
+    });
+  }, []);
 
-  if (!isVisible) {
+  if (!activeConversation) {
     return null;
   }
 
   return (
-    <>
-      {currentState === PanelViewModel.STATE.CONVERSATION_DETAILS && activeConversation && (
-        <ConversationDetails
-          onClose={onClose}
-          showDevices={showDevices}
-          togglePanel={togglePanel}
-          activeConversation={activeConversation}
-          actionsViewModel={actionsViewModel}
-          conversationRepository={conversationRepository}
-          integrationRepository={integrationRepository}
-          searchRepository={searchRepository}
-          teamRepository={teamRepository}
-          teamState={teamState}
-          userState={userState}
-          isFederated={!!contentViewModel.isFederated}
-        />
+    <TransitionGroup style={{height: '100%'}}>
+      {currentState === PanelState.CONVERSATION_DETAILS && (
+        <Animated key={PanelState.CONVERSATION_DETAILS} direction={isDeeper ? 'left' : 'right'}>
+          <ConversationDetails
+            onClose={closePanel}
+            togglePanel={togglePanel}
+            activeConversation={activeConversation}
+            actionsViewModel={actionsViewModel}
+            conversationRepository={conversationRepository}
+            integrationRepository={integrationRepository}
+            searchRepository={searchRepository}
+            teamRepository={teamRepository}
+            teamState={teamState}
+            userState={userState}
+            isFederated={isFederated}
+          />
+        </Animated>
       )}
 
-      {currentState === PanelViewModel.STATE.GROUP_PARTICIPANT_USER && activeConversation && userEntity && (
-        <GroupParticipantUser
-          onBack={backToConversationDetails}
-          onClose={onClose}
-          goToRoot={goToRoot}
-          showDevices={showDevices}
-          currentUser={userEntity}
-          activeConversation={activeConversation}
-          actionsViewModel={actionsViewModel}
-          conversationRoleRepository={conversationRoleRepository}
-          teamRepository={teamRepository}
-          teamState={teamState}
-          userState={userState}
-          isFederated={!!contentViewModel.isFederated}
-        />
+      {currentState === PanelState.GROUP_PARTICIPANT_USER && userEntity && (
+        <Animated key={PanelState.GROUP_PARTICIPANT_USER} direction={isDeeper ? 'left' : 'right'}>
+          <GroupParticipantUser
+            onBack={onBackClick}
+            onClose={closePanel}
+            goToRoot={goToRoot}
+            showDevices={showDevices}
+            currentUser={userEntity}
+            activeConversation={activeConversation}
+            actionsViewModel={actionsViewModel}
+            conversationRoleRepository={conversationRoleRepository}
+            teamRepository={teamRepository}
+            teamState={teamState}
+            userState={userState}
+            isFederated={isFederated}
+          />
+        </Animated>
       )}
 
-      {currentState === PanelViewModel.STATE.NOTIFICATIONS && activeConversation && (
-        <Notifications
-          activeConversation={activeConversation}
-          repositories={contentViewModel.repositories}
-          onClose={onClose}
-          onGoBack={backToConversationDetails}
-        />
+      {currentState === PanelState.NOTIFICATIONS && (
+        <Animated key={PanelState.NOTIFICATIONS} direction={isDeeper ? 'left' : 'right'}>
+          <Notifications
+            activeConversation={activeConversation}
+            repositories={repositories}
+            onClose={closePanel}
+            onGoBack={onBackClick}
+          />
+        </Animated>
       )}
 
-      {currentState === PanelViewModel.STATE.PARTICIPANT_DEVICES && userEntity && (
-        <ParticipantDevices
-          repositories={contentViewModel.repositories}
-          onClose={onClose}
-          onGoBack={goBackToGroupOrConversationDetails}
-          user={userEntity}
-        />
+      {currentState === PanelState.PARTICIPANT_DEVICES && userEntity && (
+        <Animated key={PanelState.PARTICIPANT_DEVICES} direction={isDeeper ? 'left' : 'right'}>
+          <ParticipantDevices
+            repositories={repositories}
+            onClose={closePanel}
+            onGoBack={onBackClick}
+            user={userEntity}
+          />
+        </Animated>
       )}
 
-      {currentState === PanelViewModel.STATE.TIMED_MESSAGES && activeConversation && (
-        <TimedMessages
-          activeConversation={activeConversation}
-          repositories={contentViewModel.repositories}
-          onClose={onClose}
-          onGoBack={backToConversationDetails}
-        />
+      {currentState === PanelState.TIMED_MESSAGES && (
+        <Animated key={PanelState.TIMED_MESSAGES} direction={isDeeper ? 'left' : 'right'}>
+          <TimedMessages
+            activeConversation={activeConversation}
+            repositories={repositories}
+            onClose={closePanel}
+            onGoBack={onBackClick}
+          />
+        </Animated>
       )}
 
-      {(currentState === PanelViewModel.STATE.GUEST_OPTIONS ||
-        currentState === PanelViewModel.STATE.SERVICES_OPTIONS) &&
-        activeConversation && (
+      {currentState === PanelState.GUEST_OPTIONS && (
+        <Animated key={PanelState.GUEST_OPTIONS} direction={isDeeper ? 'left' : 'right'}>
           <GuestServicesOptions
-            isGuest={currentState === PanelViewModel.STATE.GUEST_OPTIONS}
+            isGuest
             activeConversation={activeConversation}
             conversationRepository={conversationRepository}
             teamRepository={teamRepository}
-            onClose={onClose}
-            onBack={backToConversationDetails}
+            onClose={closePanel}
+            onBack={onBackClick}
             teamState={teamState}
           />
-        )}
+        </Animated>
+      )}
 
-      {currentState === PanelViewModel.STATE.GROUP_PARTICIPANT_SERVICE &&
-        activeConversation &&
-        currentServiceEntity &&
-        userServiceEntity && (
+      {currentState === PanelState.SERVICES_OPTIONS && (
+        <Animated key={PanelState.SERVICES_OPTIONS} direction={isDeeper ? 'left' : 'right'}>
+          <GuestServicesOptions
+            isGuest={false}
+            activeConversation={activeConversation}
+            conversationRepository={conversationRepository}
+            teamRepository={teamRepository}
+            onClose={closePanel}
+            onBack={onBackClick}
+            teamState={teamState}
+          />
+        </Animated>
+      )}
+
+      {currentState === PanelState.GROUP_PARTICIPANT_SERVICE && serviceEntity && userServiceEntity && (
+        <Animated key={PanelState.GROUP_PARTICIPANT_SERVICE} direction={isDeeper ? 'left' : 'right'}>
           <GroupParticipantService
             activeConversation={activeConversation}
             actionsViewModel={actionsViewModel}
             integrationRepository={integrationRepository}
-            onBack={backToConversationDetails}
-            onClose={onClose}
-            serviceEntity={currentServiceEntity}
+            onBack={onBackClick}
+            onClose={closePanel}
+            serviceEntity={serviceEntity}
             userEntity={userServiceEntity}
             userState={userState}
             isAddMode={isAddMode}
           />
-        )}
-
-      {currentState === PanelViewModel.STATE.ADD_PARTICIPANTS && activeConversation && (
-        <AddParticipants
-          activeConversation={activeConversation}
-          onBack={backToConversationDetails}
-          onClose={onClose}
-          conversationRepository={conversationRepository}
-          integrationRepository={integrationRepository}
-          searchRepository={searchRepository}
-          togglePanel={togglePanel}
-          teamRepository={teamRepository}
-          teamState={teamState}
-          userState={userState}
-        />
+        </Animated>
       )}
 
-      {currentState === PanelViewModel.STATE.MESSAGE_DETAILS &&
-        activeConversation &&
-        isContentMessage(currentEntity) && (
+      {currentState === PanelState.ADD_PARTICIPANTS && (
+        <Animated key={PanelState.ADD_PARTICIPANTS} direction={isDeeper ? 'left' : 'right'}>
+          <AddParticipants
+            activeConversation={activeConversation}
+            onBack={onBackClick}
+            onClose={closePanel}
+            conversationRepository={conversationRepository}
+            integrationRepository={integrationRepository}
+            searchRepository={searchRepository}
+            togglePanel={togglePanel}
+            teamRepository={teamRepository}
+            teamState={teamState}
+            userState={userState}
+          />
+        </Animated>
+      )}
+
+      {currentState === PanelState.MESSAGE_DETAILS && messageEntity && (
+        <Animated key={PanelState.MESSAGE_DETAILS} direction={isDeeper ? 'left' : 'right'}>
           <MessageDetails
             activeConversation={activeConversation}
             conversationRepository={conversationRepository}
-            messageEntity={currentEntity}
+            messageEntity={messageEntity}
             updateEntity={setCurrentEntity}
             teamRepository={teamRepository}
             searchRepository={searchRepository}
             showLikes={showLikes}
             userRepository={userRepository}
-            onClose={onClose}
+            onClose={closePanel}
           />
-        )}
-
-      {state === PanelViewModel.STATE.CONVERSATION_PARTICIPANTS && activeConversation && (
-        <ConversationParticipants
-          activeConversation={activeConversation}
-          conversationRepository={conversationRepository}
-          searchRepository={searchRepository}
-          teamRepository={teamRepository}
-          isVisible={isVisible}
-          togglePanel={togglePanel}
-          highlightedUsers={highlightedUsers}
-          onBack={backToConversationDetails}
-          onClose={onClose}
-        />
+        </Animated>
       )}
-    </>
+
+      {currentState === PanelState.CONVERSATION_PARTICIPANTS && (
+        <Animated key={PanelState.CONVERSATION_PARTICIPANTS} direction={isDeeper ? 'left' : 'right'}>
+          <ConversationParticipants
+            activeConversation={activeConversation}
+            conversationRepository={conversationRepository}
+            searchRepository={searchRepository}
+            teamRepository={teamRepository}
+            togglePanel={togglePanel}
+            highlightedUsers={highlighted}
+            onBack={onBackClick}
+            onClose={closePanel}
+          />
+        </Animated>
+      )}
+    </TransitionGroup>
   );
 };
 
 export default RightSidebar;
 
-registerReactComponent('right-sidebar', RightSidebar);
+export const openRightSidebar = toggleRightSidebar<RightSidebarProps>(RightSidebar);
