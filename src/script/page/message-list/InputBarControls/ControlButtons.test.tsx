@@ -19,7 +19,7 @@
 
 import {render} from '@testing-library/react';
 import {withTheme} from 'src/script/auth/util/test/TestUtil';
-import InputBarControls from './InputBarControls';
+import ControlButtons from './ControlButtons';
 
 const mockConfig = {
   ALLOWED_IMAGE_TYPES: ['image/gif', 'image/avif'],
@@ -30,17 +30,17 @@ jest.mock('../../../Config', () => ({
   Config: {getConfig: () => mockConfig},
 }));
 
-type PropsType = React.ComponentProps<typeof InputBarControls>;
+type PropsType = React.ComponentProps<typeof ControlButtons>;
 const defaultParams: PropsType = {
   conversation: undefined,
   input: '',
 
   onCancelEditing: jest.fn(),
-  onClickGif: jest.fn(),
   onClickPing: jest.fn(),
+  onGifClick: jest.fn(),
   onSelectFiles: jest.fn(),
   onSelectImages: jest.fn(),
-  onSend: jest.fn(),
+  showGiphyButton: true,
 };
 
 const allButtonTitles = [
@@ -48,17 +48,15 @@ const allButtonTitles = [
   'tooltipConversationAddImage',
   'tooltipConversationFile',
   'extensionsBubbleButtonGif',
-  'tooltipConversationSendMessage',
-  'tooltipConversationPing',
 ];
 
-describe('InputBarControls', () => {
+describe('ControlButtons', () => {
   it.each<[Partial<PropsType>, string[]]>([
-    [{disableFilesharing: true}, ['tooltipConversationSendMessage']],
-    [{isEditing: true}, ['tooltipConversationSendMessage']],
+    [{disableFilesharing: true}, []],
+    [{isEditing: true}, []],
   ])('renders the right buttons depending on props (%s)', (overrides, buttonTitles) => {
     const params = {...defaultParams, ...overrides};
-    const {getByTitle, queryByTitle} = render(<InputBarControls {...params} />);
+    const {getByTitle, queryByTitle} = render(<ControlButtons {...params} />);
     // check that the relevant buttons are present
     buttonTitles.forEach(button => expect(getByTitle(button)).not.toBe(null));
 
@@ -67,13 +65,12 @@ describe('InputBarControls', () => {
       .filter(button => !buttonTitles.includes(button))
       .forEach(button => expect(queryByTitle(button)).toBe(null));
   });
-
   it.each<[string, string[]]>([
     ['', allButtonTitles.filter(button => button != 'extensionsBubbleButtonGif')],
-    ['hello', ['tooltipConversationSendMessage', 'extensionsBubbleButtonGif']],
+    ['hello', ['extensionsBubbleButtonGif']],
   ])('Shows the right buttons depending on the input (input: %s)', (input, buttonTitles) => {
     const params = {...defaultParams, ...{input}};
-    const {getByTitle, queryByTitle} = render(withTheme(<InputBarControls {...params} />));
+    const {getByTitle, queryByTitle} = render(withTheme(<ControlButtons {...params} />));
 
     // check that the relevant buttons are present
     buttonTitles.forEach(button => expect(getByTitle(button)).not.toBe(null));

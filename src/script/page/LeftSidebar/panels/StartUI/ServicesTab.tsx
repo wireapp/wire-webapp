@@ -66,7 +66,7 @@ export const ServicesTab: React.FC<{
                   <span className="left-column-icon">
                     <Icon.Service />
                   </span>
-                  <span className="center-column">{t('searchManageServices')}</span>
+                  <span className="column-center">{t('searchManageServices')}</span>
                 </button>
               </li>
             </ul>

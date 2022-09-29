@@ -39,9 +39,6 @@ import {ConversationState} from '../../conversation/ConversationState';
 import {UserState} from '../../user/UserState';
 import {ContentViewModel, ContentState} from '../../view_model/ContentViewModel';
 
-// Ko imported components
-import '../message-list/InputBarControls';
-
 type LeftSidebarProps = {
   contentViewModel: ContentViewModel;
   conversationState?: ConversationState;
