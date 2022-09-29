@@ -17,22 +17,19 @@
  *
  */
 
-import React, {useState, useRef, useEffect, FC} from 'react';
+import {useState, FC} from 'react';
 
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
-import {KEY} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
 
 import PanelHeader from '../PanelHeader';
 
 import PreferencesRadio from '../../MainContent/panels/preferences/components/PreferencesRadio';
-import {initFadingScrollbar} from '../../../ui/fadingScrollbar';
 
 import {NOTIFICATION_STATE, getNotificationText} from '../../../conversation/NotificationSetting';
 import {Conversation} from '../../../entity/Conversation';
+import {initFadingScrollbar} from '../../../ui/fadingScrollbar';
 import {ViewModelRepositories} from '../../../view_model/MainViewModel';
-
-const PANEL_HEADER_BTN_TABINDEX = 2;
 
 export interface NotificationsProps {
   activeConversation: Conversation;
@@ -54,24 +51,6 @@ const Notifications: FC<NotificationsProps> = ({activeConversation, onGoBack, on
     })),
   );
 
-  const [tabIndex, setTabIndex] = useState(-1);
-  const [btnFocus, setBtnFocus] = useState(false);
-  const btnRef = useRef<HTMLButtonElement>(null);
-
-  useEffect(() => {
-    if (btnFocus) {
-      btnRef.current?.focus();
-    }
-  }, [btnFocus]);
-
-  const handleKeyDown = (event: React.KeyboardEvent) => {
-    if (event.key === KEY.TAB && !event.shiftKey && !event.altKey) {
-      event.preventDefault();
-      setTabIndex(PANEL_HEADER_BTN_TABINDEX);
-      setBtnFocus(true);
-    }
-  };
-
   return (
     <div id="notification-settings" className="panel__page notification-settings">
       <PanelHeader
@@ -81,9 +60,6 @@ const Notifications: FC<NotificationsProps> = ({activeConversation, onGoBack, on
         goBackTitle={t('accessibility.conversation.goBack')}
         title={t('notificationSettingsTitle')}
         closeBtnTitle={t('accessibility.closeNotificationsLabel')}
-        tabIndex={tabIndex}
-        ref={btnRef}
-        handleBlur={() => setBtnFocus(false)}
       />
 
       <div className="panel__content" ref={initFadingScrollbar}>
@@ -96,13 +72,7 @@ const Notifications: FC<NotificationsProps> = ({activeConversation, onGoBack, on
           />
         </fieldset>
 
-        {/* eslint-disable-next-line jsx-a11y/no-static-element-interactions*/}
-        <div
-          className="panel__info-text notification-settings__disclaimer"
-          // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex
-          tabIndex={0}
-          onKeyDown={handleKeyDown}
-        >
+        <div className="panel__info-text notification-settings__disclaimer" tabIndex={0}>
           {t('notificationSettingsDisclaimer')}
         </div>
       </div>

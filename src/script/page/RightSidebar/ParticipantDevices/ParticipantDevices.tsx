@@ -26,8 +26,8 @@ import {t} from 'Util/LocalizerUtil';
 import PanelHeader from '../PanelHeader';
 
 import type {User} from '../../../entity/User';
-import {ViewModelRepositories} from '../../../view_model/MainViewModel';
 import {initFadingScrollbar} from '../../../ui/fadingScrollbar';
+import {ViewModelRepositories} from '../../../view_model/MainViewModel';
 
 interface ParticipantDevicesProps {
   onClose: () => void;

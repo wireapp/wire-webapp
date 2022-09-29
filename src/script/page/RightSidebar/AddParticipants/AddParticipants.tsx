@@ -26,12 +26,14 @@ import SearchInput from 'Components/SearchInput';
 import ServiceList from 'Components/ServiceList';
 import UserSearchableList from 'Components/UserSearchableList';
 
+import {handleKeyDown} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
 import {safeWindowOpen} from 'Util/SanitizationUtil';
 import {sortUsersByPriority} from 'Util/StringUtil';
 import {matchQualifiedIds} from 'Util/QualifiedId';
 
 import PanelHeader from '../PanelHeader';
+import {PanelEntity, PanelState} from '../RightSidebar';
 
 import {ConversationRepository} from '../../../conversation/ConversationRepository';
 import {Conversation} from '../../../entity/Conversation';
@@ -42,10 +44,9 @@ import {IntegrationRepository} from '../../../integration/IntegrationRepository'
 import {SearchRepository} from '../../../search/SearchRepository';
 import {TeamRepository} from '../../../team/TeamRepository';
 import {TeamState} from '../../../team/TeamState';
+import {initFadingScrollbar} from '../../../ui/fadingScrollbar';
 import {UserState} from '../../../user/UserState';
 import {generatePermissionHelpers} from '../../../user/UserPermission';
-import {handleKeyDown} from 'Util/KeyboardUtil';
-import {PanelEntity, PanelState} from '../RightSidebar';
 
 interface AddParticipantsProps {
   activeConversation: Conversation;
@@ -232,7 +233,7 @@ const AddParticipants: FC<AddParticipantsProps> = ({
           </div>
         )}
 
-        <div className="add-participants__list panel__content" data-bind="fadingscrollbar">
+        <div className="add-participants__list panel__content" ref={initFadingScrollbar}>
           {isAddPeopleState && (
             <UserSearchableList
               users={contacts}
@@ -259,11 +260,11 @@ const AddParticipants: FC<AddParticipantsProps> = ({
                         onKeyDown={event => handleKeyDown(event, openManageServices)}
                         data-uie-name="go-manage-services"
                       >
-                        <span className="left-column-icon left-column-icon-dark">
+                        <div className="left-column-icon left-column-icon-dark">
                           <Icon.Service />
-                        </span>
+                        </div>
 
-                        <div className="center-column">{t('addParticipantsManageServices')}</div>
+                        <div className="column-center">{t('addParticipantsManageServices')}</div>
                       </li>
                     </ul>
                   )}

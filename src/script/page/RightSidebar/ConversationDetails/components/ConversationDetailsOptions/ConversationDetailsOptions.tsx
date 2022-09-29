@@ -27,8 +27,9 @@ import {t} from 'Util/LocalizerUtil';
 
 import ConversationDetailsOption from './ConversationDetailsOption';
 
-import {Conversation} from '../../../../../entity/Conversation';
 import {PanelState, PanelEntity} from '../../../RightSidebar';
+
+import {Conversation} from '../../../../../entity/Conversation';
 
 interface ConversationDetailsOptionsProps {
   activeConversation: Conversation;

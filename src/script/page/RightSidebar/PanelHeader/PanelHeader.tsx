@@ -18,7 +18,7 @@
  */
 
 import cx from 'classnames';
-import {forwardRef, ForwardRefRenderFunction, ForwardedRef} from 'react';
+import {FC} from 'react';
 
 import DragableClickWrapper from 'Components/DragableClickWrapper';
 import Icon from 'Components/Icon';
@@ -40,44 +40,32 @@ export interface PanelHeaderProps {
   goBackUie?: string;
   titleDataUieName?: string;
   title?: string;
-  tabIndex?: number;
   handleBlur?: () => void;
   onToggleMute?: () => void;
 }
 
-const PanelHeader: ForwardRefRenderFunction<HTMLButtonElement, PanelHeaderProps> = (
-  {
-    onClose,
-    isReverse,
-    className = '',
-    showBackArrow = true,
-    showActionMute = false,
-    showNotificationsNothing = false,
-    goBackUie,
-    goBackTitle = t('accessibility.rightPanel.GoBack'),
-    title = '',
-    titleDataUieName = '',
-    closeUie = 'do-close',
-    closeBtnTitle = t('accessibility.rightPanel.close'),
-    tabIndex = 0,
-    handleBlur = noop,
-    onGoBack = noop,
-    onToggleMute = noop,
-  }: PanelHeaderProps,
-  ref: ForwardedRef<HTMLButtonElement>,
-) => {
+const PanelHeader: FC<PanelHeaderProps> = ({
+  onClose,
+  isReverse,
+  className = '',
+  showBackArrow = true,
+  showActionMute = false,
+  showNotificationsNothing = false,
+  goBackUie = 'back-button',
+  goBackTitle = t('accessibility.rightPanel.GoBack'),
+  title = '',
+  titleDataUieName = '',
+  closeUie = 'do-close',
+  closeBtnTitle = t('accessibility.rightPanel.close'),
+  handleBlur = noop,
+  onGoBack = noop,
+  onToggleMute = noop,
+}: PanelHeaderProps) => {
   return (
     <div className={cx('panel__header', {'panel__header--reverse': isReverse}, className)}>
       {showBackArrow && (
         <DragableClickWrapper onClick={onGoBack}>
-          <button
-            ref={ref}
-            className="icon-button"
-            data-uie-name={goBackUie}
-            title={goBackTitle}
-            tabIndex={tabIndex}
-            onBlur={handleBlur}
-          >
+          <button className="icon-button" data-uie-name={goBackUie} title={goBackTitle} onBlur={handleBlur}>
             <Icon.ArrowLeft />
           </button>
         </DragableClickWrapper>
@@ -90,13 +78,7 @@ const PanelHeader: ForwardRefRenderFunction<HTMLButtonElement, PanelHeaderProps>
       )}
 
       <DragableClickWrapper onClick={onClose}>
-        <button
-          className="icon-button"
-          data-uie-name={closeUie}
-          title={closeBtnTitle}
-          tabIndex={tabIndex}
-          onBlur={handleBlur}
-        >
+        <button className="icon-button" data-uie-name={closeUie} title={closeBtnTitle} onBlur={handleBlur}>
           <Icon.Close className="right-panel-close" />
         </button>
       </DragableClickWrapper>
@@ -119,4 +101,4 @@ const PanelHeader: ForwardRefRenderFunction<HTMLButtonElement, PanelHeaderProps>
   );
 };
 
-export default forwardRef(PanelHeader);
+export default PanelHeader;

@@ -34,6 +34,7 @@ import {ConversationRepository} from '../../../conversation/ConversationReposito
 import {Conversation} from '../../../entity/Conversation';
 import {TeamRepository} from '../../../team/TeamRepository';
 import {TeamState} from '../../../team/TeamState';
+import {initFadingScrollbar} from '../../../ui/fadingScrollbar';
 import {ModalsViewModel} from '../../../view_model/ModalsViewModel';
 
 interface GuestServicesOptionsProps {
@@ -108,7 +109,7 @@ const GuestServicesOptions: FC<GuestServicesOptionsProps> = ({
         title={isGuest ? t('guestOptionsTitle') : t('servicesOptionsTitle')}
       />
 
-      <div className="panel__content" data-bind="fadingscrollbar">
+      <div className="panel__content" ref={initFadingScrollbar}>
         {isGuest ? (
           <GuestOptions
             activeConversation={activeConversation}

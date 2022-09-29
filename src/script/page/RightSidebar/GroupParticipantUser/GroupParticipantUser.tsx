@@ -22,29 +22,30 @@ import {DefaultConversationRoleName as DefaultRole} from '@wireapp/api-client/sr
 import {amplify} from 'amplify';
 import {FC, useEffect} from 'react';
 
+import BaseToggle from 'Components/toggle/BaseToggle';
+import EnrichedFields from 'Components/panel/EnrichedFields';
+import UserActions, {Actions} from 'Components/panel/UserActions';
 import Icon from 'Components/Icon';
 import UserDetails from 'Components/panel/UserDetails';
 
+import {useKoSubscribableChildren} from 'Util/ComponentUtil';
+import {handleKeyDown} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
 
 import PanelHeader from '../PanelHeader';
 import {PanelEntity} from '../RightSidebar';
 
 import {User} from '../../../entity/User';
-import BaseToggle from 'Components/toggle/BaseToggle';
-import EnrichedFields from 'Components/panel/EnrichedFields';
-import UserActions, {Actions} from 'Components/panel/UserActions';
-import {ActionsViewModel} from '../../../view_model/ActionsViewModel';
-import {Conversation} from '../../../entity/Conversation';
+
 import {ConversationRoleRepository} from '../../../conversation/ConversationRoleRepository';
-import {TeamRepository} from '../../../team/TeamRepository';
-import {UserState} from '../../../user/UserState';
-import {useKoSubscribableChildren} from 'Util/ComponentUtil';
-import {TeamState} from '../../../team/TeamState';
 import {MemberLeaveEvent} from '../../../conversation/EventBuilder';
 import {ClientEvent} from '../../../event/Client';
+import {Conversation} from '../../../entity/Conversation';
+import {TeamRepository} from '../../../team/TeamRepository';
+import {TeamState} from '../../../team/TeamState';
 import {initFadingScrollbar} from '../../../ui/fadingScrollbar';
-import {handleKeyDown} from 'Util/KeyboardUtil';
+import {UserState} from '../../../user/UserState';
+import {ActionsViewModel} from '../../../view_model/ActionsViewModel';
 
 interface GroupParticipantUserProps {
   onBack: (entity: PanelEntity) => void;

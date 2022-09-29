@@ -293,6 +293,7 @@ const RightSidebar: FC<RightSidebarProps> = ({
             activeConversation={activeConversation}
             actionsViewModel={actionsViewModel}
             integrationRepository={integrationRepository}
+            goToRoot={goToRoot}
             onBack={onBackClick}
             onClose={closePanel}
             serviceEntity={serviceEntity}

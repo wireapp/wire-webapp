@@ -19,8 +19,10 @@
 
 import React from 'react';
 import {createRoot, Root} from 'react-dom/client';
-import {MainViewModel} from '../../../view_model/MainViewModel';
+
 import {rightPanelAnimationTimeout} from '../RightSidebar';
+
+import {MainViewModel} from '../../../view_model/MainViewModel';
 
 let elementContainer: HTMLDivElement | undefined;
 let reactRoot: Root;
@@ -62,6 +64,7 @@ interface RenderElement {
   onClose?: () => void;
 }
 
+// TODO: Move toggle sidebar after migration to react
 const toggleRightSidebar =
   <T extends RenderElement>(Component: React.FC<T>) =>
   (props: T) => {
@@ -77,7 +80,7 @@ const toggleRightSidebar =
     const onClose = () => {
       if (app) {
         const isNarrowScreen = app.offsetWidth < MainViewModel.CONFIG.PANEL.BREAKPOINT;
-        const centerWidthClose = app.offsetWidth - MainViewModel.CONFIG.PANEL.WIDTH - 16;
+        const centerWidthClose = app.offsetWidth - MainViewModel.CONFIG.PANEL.WIDTH;
 
         if (!isNarrowScreen) {
           if (titleBar) {
@@ -130,7 +133,7 @@ const toggleRightSidebar =
 
     if (app) {
       const centerWidthClose = app.offsetWidth - MainViewModel.CONFIG.PANEL.WIDTH;
-      const centerWidthOpen = centerWidthClose - MainViewModel.CONFIG.PANEL.WIDTH - 16;
+      const centerWidthOpen = centerWidthClose - MainViewModel.CONFIG.PANEL.WIDTH;
       const isNarrowScreen = app.offsetWidth < MainViewModel.CONFIG.PANEL.BREAKPOINT;
 
       elementContainer = document.createElement('div');
@@ -181,10 +184,9 @@ const toggleRightSidebar =
       });
 
       reactRoot = createRoot(elementContainer);
+      const element = React.createElement(Component, {...props, onClose});
+      reactRoot.render(element);
     }
-
-    const element = React.createElement(Component, {...props, onClose});
-    reactRoot.render(element);
   };
 
 export default toggleRightSidebar;

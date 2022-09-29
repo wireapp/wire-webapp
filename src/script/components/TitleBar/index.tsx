@@ -192,19 +192,7 @@ const TitleBar: React.FC<TitleBarProps> = ({
     amplify.publish(WebAppEvents.CONTENT.SWITCH, ContentViewModel.STATE.COLLECTION);
   };
 
-  const onClickDetails = () => {
-    openRightSidebar({
-      initialEntity: conversation,
-      initialState: PanelState.CONVERSATION_DETAILS,
-      isFederated,
-      mainViewModel,
-      repositories,
-      teamState,
-      userState,
-    });
-
-    // showDetails(false);
-  };
+  const onClickDetails = () => showDetails(false);
 
   const onRightPanelToggle = (mutationList: MutationRecord[]) => {
     mutationList.forEach(mutation => {

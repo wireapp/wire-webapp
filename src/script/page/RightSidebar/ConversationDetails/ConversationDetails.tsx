@@ -18,7 +18,7 @@
  */
 
 import {RECEIPT_MODE} from '@wireapp/api-client/src/conversation/data/';
-import {FC, useEffect, useRef, useState} from 'react';
+import {FC, useEffect, useState} from 'react';
 
 import Icon from 'Components/Icon';
 import ServiceDetails from 'Components/panel/ServiceDetails';
@@ -38,6 +38,7 @@ import ConversationDetailsHeader from './components/ConversationDetailsHeader/Co
 import getConversationActions from './utils/getConversationActions';
 
 import PanelHeader from '../PanelHeader';
+import {PanelEntity, PanelState} from '../RightSidebar';
 
 import {ConversationRepository} from '../../../conversation/ConversationRepository';
 import {ConversationVerificationState} from '../../../conversation/ConversationVerificationState';
@@ -52,10 +53,9 @@ import {TeamRepository} from '../../../team/TeamRepository';
 import {TeamState} from '../../../team/TeamState';
 import {Shortcut} from '../../../ui/Shortcut';
 import {ShortcutType} from '../../../ui/ShortcutType';
+import {initFadingScrollbar} from '../../../ui/fadingScrollbar';
 import {UserState} from '../../../user/UserState';
 import {ActionsViewModel} from '../../../view_model/ActionsViewModel';
-import {initFadingScrollbar} from '../../../ui/fadingScrollbar';
-import {PanelEntity, PanelState} from '../RightSidebar';
 
 const CONFIG = {
   MAX_USERS_VISIBLE: 7,
@@ -89,8 +89,6 @@ const ConversationDetails: FC<ConversationDetailsProps> = ({
   userState,
   isFederated = false,
 }) => {
-  const panelContentRef = useRef<HTMLDivElement>(null);
-
   const [selectedService, setSelectedService] = useState<ServiceEntity>();
   const [allUsersCount, setAllUsersCount] = useState<number>(0);
   const [userParticipants, setUserParticipants] = useState<User[]>([]);
@@ -258,8 +256,6 @@ const ConversationDetails: FC<ConversationDetailsProps> = ({
     setUserParticipants(users);
   }, [activeConversation, participatingUserEts.length, removedFromConversation, selfUser]);
 
-  initFadingScrollbar(panelContentRef.current);
-
   return (
     <div id="conversation-details" className="panel__page conversation-details">
       <PanelHeader
@@ -271,7 +267,7 @@ const ConversationDetails: FC<ConversationDetailsProps> = ({
         onToggleMute={toggleMute}
       />
 
-      <div className="panel__content" ref={panelContentRef}>
+      <div className="panel__content" ref={initFadingScrollbar}>
         {isSingleUserMode && isServiceMode && selectedService && <ServiceDetails service={selectedService} />}
 
         {isSingleUserMode && !isServiceMode && firstParticipant && (

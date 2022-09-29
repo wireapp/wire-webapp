@@ -103,7 +103,7 @@ const ConversationParticipants: FC<ConversationParticipantsProps> = ({
         />
 
         <div className="conversation-participants__list panel__content" ref={initFadingScrollbar}>
-          {/* TODO: Need to update dataUieName for UserSearchableList */}
+          {/* TODO: Need to update dataUieName for UserSearchableList - make it in another PR, and change other UserSearchableList */}
           {/*data-uie-name="list-conversation-participants"*/}
 
           <UserSearchableList

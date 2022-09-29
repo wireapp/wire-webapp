@@ -22,25 +22,27 @@ import {FC, useEffect} from 'react';
 import Icon from 'Components/Icon';
 import ServiceDetails from 'Components/panel/ServiceDetails';
 
+import {useKoSubscribableChildren} from 'Util/ComponentUtil';
+import {handleKeyDown} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
 import {matchQualifiedIds} from 'Util/QualifiedId';
 
 import PanelHeader from '../PanelHeader';
 
-import {UserState} from '../../../user/UserState';
-import {useKoSubscribableChildren} from 'Util/ComponentUtil';
-import {generatePermissionHelpers} from '../../../user/UserPermission';
 import {Conversation} from '../../../entity/Conversation';
-import {ActionsViewModel} from '../../../view_model/ActionsViewModel';
-import {IntegrationRepository} from '../../../integration/IntegrationRepository';
 import {User} from '../../../entity/User';
+import {IntegrationRepository} from '../../../integration/IntegrationRepository';
 import {ServiceEntity} from '../../../integration/ServiceEntity';
-import {handleKeyDown} from 'Util/KeyboardUtil';
+import {initFadingScrollbar} from '../../../ui/fadingScrollbar';
+import {generatePermissionHelpers} from '../../../user/UserPermission';
+import {UserState} from '../../../user/UserState';
+import {ActionsViewModel} from '../../../view_model/ActionsViewModel';
 
 interface GroupParticipantServiceProps {
   activeConversation: Conversation;
   actionsViewModel: ActionsViewModel;
   integrationRepository: IntegrationRepository;
+  goToRoot: () => void;
   onBack: () => void;
   onClose: () => void;
   serviceEntity: ServiceEntity;
@@ -53,6 +55,7 @@ const GroupParticipantService: FC<GroupParticipantServiceProps> = ({
   activeConversation,
   actionsViewModel,
   integrationRepository,
+  goToRoot,
   onBack,
   onClose,
   serviceEntity,
@@ -80,12 +83,12 @@ const GroupParticipantService: FC<GroupParticipantServiceProps> = ({
 
   const onRemove = () => {
     actionsViewModel.removeFromConversation(activeConversation, userEntity);
-    // this.onGoBack();
+    onBack();
   };
 
   const onAdd = () => {
     integrationRepository.addService(activeConversation, serviceEntity);
-    // this.onGoToRoot();
+    goToRoot();
   };
 
   useEffect(() => {
@@ -96,7 +99,7 @@ const GroupParticipantService: FC<GroupParticipantServiceProps> = ({
     <div id="group-participant-service" className="panel__page group-participant">
       <PanelHeader onGoBack={onBack} goBackUie="go-back-group-participant" onClose={onClose} />
 
-      <div className="panel__content panel__content--fill" data-bind="fadingscrollbar">
+      <div className="panel__content panel__content--fill" ref={initFadingScrollbar}>
         <ServiceDetails service={serviceEntity} />
 
         {showActions && canChatWithServices() && (

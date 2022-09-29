@@ -23,24 +23,27 @@ import {amplify} from 'amplify';
 import cx from 'classnames';
 import {FC, useCallback, useEffect, useMemo, useState} from 'react';
 
-import {t} from 'Util/LocalizerUtil';
-
-import PanelHeader from '../PanelHeader';
 import Icon from 'Components/Icon';
 import UserSearchableList from 'Components/UserSearchableList';
-import {User} from '../../../entity/User';
-import {ConversationRepository} from '../../../conversation/ConversationRepository';
-import {TeamRepository} from '../../../team/TeamRepository';
-import {Conversation} from '../../../entity/Conversation';
-import {useKoSubscribableChildren} from 'Util/ComponentUtil';
-import {SuperType} from '../../../message/SuperType';
-import {UserRepository} from '../../../user/UserRepository';
+
+import {t} from 'Util/LocalizerUtil';
 import {formatLocale} from 'Util/TimeUtil';
-import {isContentMessage} from '../../../guards/Message';
+import {useKoSubscribableChildren} from 'Util/ComponentUtil';
+
+import PanelHeader from '../PanelHeader';
+
+import {ConversationRepository} from '../../../conversation/ConversationRepository';
+import {ContentMessage} from '../../../entity/message/ContentMessage';
 import {Message} from '../../../entity/message/Message';
+import {Conversation} from '../../../entity/Conversation';
+import {User} from '../../../entity/User';
+import {isContentMessage} from '../../../guards/Message';
+import {SuperType} from '../../../message/SuperType';
 import {SearchRepository} from '../../../search/SearchRepository';
 import {UserReactionMap} from '../../../storage';
-import {ContentMessage} from '../../../entity/message/ContentMessage';
+import {TeamRepository} from '../../../team/TeamRepository';
+import {UserRepository} from '../../../user/UserRepository';
+import {initFadingScrollbar} from '../../../ui/fadingScrollbar';
 
 const MESSAGE_STATES = {
   LIKES: 'likes',
@@ -214,7 +217,7 @@ const MessageDetails: FC<MessageDetailsProps> = ({
         </div>
       )}
 
-      <div className="panel__content" data-bind="fadingscrollbar" style={{flexGrow: 1}}>
+      <div className="panel__content" ref={initFadingScrollbar} style={{flexGrow: 1}}>
         {messageState === MESSAGE_STATES.RECEIPTS && (
           <UserSearchableList
             data-uie-name="read-list"
