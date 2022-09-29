@@ -189,168 +189,138 @@ const RightSidebar: FC<RightSidebarProps> = ({
         })
       }
     >
-      {currentState === PanelState.CONVERSATION_DETAILS && (
-        <Animated key={PanelState.CONVERSATION_DETAILS}>
-          <ConversationDetails
-            onClose={closePanel}
-            togglePanel={togglePanel}
-            activeConversation={activeConversation}
-            actionsViewModel={actionsViewModel}
-            conversationRepository={conversationRepository}
-            integrationRepository={integrationRepository}
-            searchRepository={searchRepository}
-            teamRepository={teamRepository}
-            teamState={teamState}
-            userState={userState}
-            isFederated={isFederated}
-          />
-        </Animated>
-      )}
+      <Animated key={currentState}>
+        <>
+          {currentState === PanelState.CONVERSATION_DETAILS && (
+            <ConversationDetails
+              onClose={closePanel}
+              togglePanel={togglePanel}
+              activeConversation={activeConversation}
+              actionsViewModel={actionsViewModel}
+              conversationRepository={conversationRepository}
+              integrationRepository={integrationRepository}
+              searchRepository={searchRepository}
+              teamRepository={teamRepository}
+              teamState={teamState}
+              userState={userState}
+              isFederated={isFederated}
+            />
+          )}
 
-      {currentState === PanelState.GROUP_PARTICIPANT_USER && userEntity && (
-        <Animated key={PanelState.GROUP_PARTICIPANT_USER}>
-          <GroupParticipantUser
-            onBack={onBackClick}
-            onClose={closePanel}
-            goToRoot={goToRoot}
-            showDevices={showDevices}
-            currentUser={userEntity}
-            activeConversation={activeConversation}
-            actionsViewModel={actionsViewModel}
-            conversationRoleRepository={conversationRoleRepository}
-            teamRepository={teamRepository}
-            teamState={teamState}
-            userState={userState}
-            isFederated={isFederated}
-          />
-        </Animated>
-      )}
+          {currentState === PanelState.GROUP_PARTICIPANT_USER && userEntity && (
+            <GroupParticipantUser
+              onBack={onBackClick}
+              onClose={closePanel}
+              goToRoot={goToRoot}
+              showDevices={showDevices}
+              currentUser={userEntity}
+              activeConversation={activeConversation}
+              actionsViewModel={actionsViewModel}
+              conversationRoleRepository={conversationRoleRepository}
+              teamRepository={teamRepository}
+              teamState={teamState}
+              userState={userState}
+              isFederated={isFederated}
+            />
+          )}
 
-      {currentState === PanelState.NOTIFICATIONS && (
-        <Animated key={PanelState.NOTIFICATIONS}>
-          <Notifications
-            activeConversation={activeConversation}
-            repositories={repositories}
-            onClose={closePanel}
-            onGoBack={onBackClick}
-          />
-        </Animated>
-      )}
+          {currentState === PanelState.NOTIFICATIONS && (
+            <Notifications
+              activeConversation={activeConversation}
+              repositories={repositories}
+              onClose={closePanel}
+              onGoBack={onBackClick}
+            />
+          )}
 
-      {currentState === PanelState.PARTICIPANT_DEVICES && userEntity && (
-        <Animated key={PanelState.PARTICIPANT_DEVICES}>
-          <ParticipantDevices
-            repositories={repositories}
-            onClose={closePanel}
-            onGoBack={onBackClick}
-            user={userEntity}
-          />
-        </Animated>
-      )}
+          {currentState === PanelState.PARTICIPANT_DEVICES && userEntity && (
+            <ParticipantDevices
+              repositories={repositories}
+              onClose={closePanel}
+              onGoBack={onBackClick}
+              user={userEntity}
+            />
+          )}
 
-      {currentState === PanelState.TIMED_MESSAGES && (
-        <Animated key={PanelState.TIMED_MESSAGES}>
-          <TimedMessages
-            activeConversation={activeConversation}
-            repositories={repositories}
-            onClose={closePanel}
-            onGoBack={onBackClick}
-          />
-        </Animated>
-      )}
+          {currentState === PanelState.TIMED_MESSAGES && (
+            <TimedMessages
+              activeConversation={activeConversation}
+              repositories={repositories}
+              onClose={closePanel}
+              onGoBack={onBackClick}
+            />
+          )}
 
-      {currentState === PanelState.GUEST_OPTIONS && (
-        <Animated key={PanelState.GUEST_OPTIONS}>
-          <GuestServicesOptions
-            isGuest
-            activeConversation={activeConversation}
-            conversationRepository={conversationRepository}
-            teamRepository={teamRepository}
-            onClose={closePanel}
-            onBack={onBackClick}
-            teamState={teamState}
-          />
-        </Animated>
-      )}
+          {(currentState === PanelState.GUEST_OPTIONS || currentState === PanelState.SERVICES_OPTIONS) && (
+            <GuestServicesOptions
+              isGuest={currentState === PanelState.GUEST_OPTIONS}
+              activeConversation={activeConversation}
+              conversationRepository={conversationRepository}
+              teamRepository={teamRepository}
+              onClose={closePanel}
+              onBack={onBackClick}
+              teamState={teamState}
+            />
+          )}
 
-      {currentState === PanelState.SERVICES_OPTIONS && (
-        <Animated key={PanelState.SERVICES_OPTIONS}>
-          <GuestServicesOptions
-            isGuest={false}
-            activeConversation={activeConversation}
-            conversationRepository={conversationRepository}
-            teamRepository={teamRepository}
-            onClose={closePanel}
-            onBack={onBackClick}
-            teamState={teamState}
-          />
-        </Animated>
-      )}
+          {currentState === PanelState.GROUP_PARTICIPANT_SERVICE && serviceEntity && userServiceEntity && (
+            <GroupParticipantService
+              activeConversation={activeConversation}
+              actionsViewModel={actionsViewModel}
+              integrationRepository={integrationRepository}
+              goToRoot={goToRoot}
+              onBack={onBackClick}
+              onClose={closePanel}
+              serviceEntity={serviceEntity}
+              userEntity={userServiceEntity}
+              userState={userState}
+              isAddMode={isAddMode}
+            />
+          )}
 
-      {currentState === PanelState.GROUP_PARTICIPANT_SERVICE && serviceEntity && userServiceEntity && (
-        <Animated key={PanelState.GROUP_PARTICIPANT_SERVICE}>
-          <GroupParticipantService
-            activeConversation={activeConversation}
-            actionsViewModel={actionsViewModel}
-            integrationRepository={integrationRepository}
-            goToRoot={goToRoot}
-            onBack={onBackClick}
-            onClose={closePanel}
-            serviceEntity={serviceEntity}
-            userEntity={userServiceEntity}
-            userState={userState}
-            isAddMode={isAddMode}
-          />
-        </Animated>
-      )}
+          {currentState === PanelState.ADD_PARTICIPANTS && (
+            <AddParticipants
+              activeConversation={activeConversation}
+              onBack={onBackClick}
+              onClose={closePanel}
+              conversationRepository={conversationRepository}
+              integrationRepository={integrationRepository}
+              searchRepository={searchRepository}
+              togglePanel={togglePanel}
+              teamRepository={teamRepository}
+              teamState={teamState}
+              userState={userState}
+            />
+          )}
 
-      {currentState === PanelState.ADD_PARTICIPANTS && (
-        <Animated key={PanelState.ADD_PARTICIPANTS}>
-          <AddParticipants
-            activeConversation={activeConversation}
-            onBack={onBackClick}
-            onClose={closePanel}
-            conversationRepository={conversationRepository}
-            integrationRepository={integrationRepository}
-            searchRepository={searchRepository}
-            togglePanel={togglePanel}
-            teamRepository={teamRepository}
-            teamState={teamState}
-            userState={userState}
-          />
-        </Animated>
-      )}
+          {currentState === PanelState.MESSAGE_DETAILS && messageEntity && (
+            <MessageDetails
+              activeConversation={activeConversation}
+              conversationRepository={conversationRepository}
+              messageEntity={messageEntity}
+              updateEntity={setCurrentEntity}
+              teamRepository={teamRepository}
+              searchRepository={searchRepository}
+              showLikes={showLikes}
+              userRepository={userRepository}
+              onClose={closePanel}
+            />
+          )}
 
-      {currentState === PanelState.MESSAGE_DETAILS && messageEntity && (
-        <Animated key={PanelState.MESSAGE_DETAILS}>
-          <MessageDetails
-            activeConversation={activeConversation}
-            conversationRepository={conversationRepository}
-            messageEntity={messageEntity}
-            updateEntity={setCurrentEntity}
-            teamRepository={teamRepository}
-            searchRepository={searchRepository}
-            showLikes={showLikes}
-            userRepository={userRepository}
-            onClose={closePanel}
-          />
-        </Animated>
-      )}
-
-      {currentState === PanelState.CONVERSATION_PARTICIPANTS && (
-        <Animated key={PanelState.CONVERSATION_PARTICIPANTS}>
-          <ConversationParticipants
-            activeConversation={activeConversation}
-            conversationRepository={conversationRepository}
-            searchRepository={searchRepository}
-            teamRepository={teamRepository}
-            togglePanel={togglePanel}
-            highlightedUsers={highlighted}
-            onBack={onBackClick}
-            onClose={closePanel}
-          />
-        </Animated>
-      )}
+          {currentState === PanelState.CONVERSATION_PARTICIPANTS && (
+            <ConversationParticipants
+              activeConversation={activeConversation}
+              conversationRepository={conversationRepository}
+              searchRepository={searchRepository}
+              teamRepository={teamRepository}
+              togglePanel={togglePanel}
+              highlightedUsers={highlighted}
+              onBack={onBackClick}
+              onClose={closePanel}
+            />
+          )}
+        </>
+      </Animated>
     </TransitionGroup>
   );
 };

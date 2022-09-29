@@ -20,16 +20,18 @@
 import {render, waitFor} from '@testing-library/react';
 import {QualifiedId} from '@wireapp/api-client/src/user';
 
+import {createRandomUuid} from 'Util/util';
+
 import {Conversation} from 'src/script/entity/Conversation';
 
+import MessageDetails from './MessageDetails';
+
 import {ConversationRepository} from '../../../conversation/ConversationRepository';
+import {ContentMessage} from '../../../entity/message/ContentMessage';
+import {User} from '../../../entity/User';
+import {SearchRepository} from '../../../search/SearchRepository';
 import {TeamRepository} from '../../../team/TeamRepository';
 import {TestFactory} from '../../../../../test/helper/TestFactory';
-import MessageDetails from './MessageDetails';
-import {User} from '../../../entity/User';
-import {createRandomUuid} from 'Util/util';
-import {Message} from '../../../entity/message/Message';
-import {SearchRepository} from '../../../search/SearchRepository';
 import {UserRepository} from '../../../user/UserRepository';
 
 const testFactory = new TestFactory();
@@ -72,7 +74,7 @@ describe('MessageDetails', () => {
     const user = new User(createRandomUuid());
     user.name(userName);
 
-    const message = new Message(createRandomUuid());
+    const message = new ContentMessage(createRandomUuid());
     message.timestamp(timestamp);
     message.user(user);
 
