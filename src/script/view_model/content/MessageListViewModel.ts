@@ -50,7 +50,7 @@ import type {MessageRepository} from '../../conversation/MessageRepository';
 import {showDetailViewModal} from 'Components/Modals/DetailViewModal';
 import {AssetRepository} from '../../assets/AssetRepository';
 import React from 'react';
-import {WarningModalType} from '../../components/Modals/WarningModal/WarningModalTypes';
+import {PrimaryModalType} from '../../components/Modals/PrimaryModal/PrimaryModalTypes';
 
 /*
  * Message list rendering view model.
@@ -183,7 +183,7 @@ export class MessageListViewModel {
     const resetProgress = () =>
       window.setTimeout(() => {
         messageEntity.is_resetting_session(false);
-        amplify.publish(WebAppEvents.WARNING.MODAL, WarningModalType.SESSION_RESET);
+        amplify.publish(WebAppEvents.WARNING.MODAL, PrimaryModalType.SESSION_RESET);
       }, MotionDuration.LONG);
 
     messageEntity.is_resetting_session(true);
@@ -327,7 +327,7 @@ export class MessageListViewModel {
     const linkTarget = (event.target as HTMLElement).closest<HTMLAnchorElement>('[data-md-link]');
     if (linkTarget) {
       const href = linkTarget.href;
-      amplify.publish(WebAppEvents.WARNING.MODAL, WarningModalType.CONFIRM, {
+      amplify.publish(WebAppEvents.WARNING.MODAL, PrimaryModalType.CONFIRM, {
         primaryAction: {
           action: () => {
             safeWindowOpen(href);

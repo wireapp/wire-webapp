@@ -30,7 +30,7 @@ import {ListViewModel} from '../../../view_model/ListViewModel';
 import {Config} from '../../../Config';
 import {CallingViewModel} from '../../../view_model/CallingViewModel';
 import {QualifiedId} from '@wireapp/api-client/src/user';
-import {WarningModalType} from 'Components/Modals/WarningModal/WarningModalTypes';
+import {PrimaryModalType} from 'Components/Modals/PrimaryModal/PrimaryModalTypes';
 
 type TemporaryGuestConversations = {
   callingViewModel: CallingViewModel;
@@ -56,7 +56,7 @@ const TemporaryGuestConversations: React.FC<TemporaryGuestConversations> = ({
   };
 
   const createAccount = (): void => {
-    amplify.publish(WebAppEvents.WARNING.MODAL, WarningModalType.CONFIRM, {
+    amplify.publish(WebAppEvents.WARNING.MODAL, PrimaryModalType.CONFIRM, {
       preventClose: true,
       primaryAction: {
         action: () => window.location.replace(`/auth/${location.search}`),

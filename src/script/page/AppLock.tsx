@@ -35,7 +35,7 @@ import {AppLockState} from '../user/AppLockState';
 import {AppLockRepository} from '../user/AppLockRepository';
 import {registerReactComponent, useKoSubscribableChildren} from 'Util/ComponentUtil';
 import Icon from 'Components/Icon';
-import {WarningModalType} from 'Components/Modals/WarningModal/WarningModalTypes';
+import {PrimaryModalType} from 'Components/Modals/PrimaryModal/PrimaryModalTypes';
 
 export enum APPLOCK_STATE {
   FORGOT = 'applock.forgot',
@@ -134,7 +134,7 @@ const AppLock: React.FC<AppLockProps> = ({
       showAppLock();
     } else if (appLockState.hasPassphrase()) {
       appLockRepository.removeCode();
-      amplify.publish(WebAppEvents.WARNING.MODAL, WarningModalType.ACKNOWLEDGE, {
+      amplify.publish(WebAppEvents.WARNING.MODAL, PrimaryModalType.ACKNOWLEDGE, {
         text: {
           closeBtnLabel: t('teamSettingsModalCloseBtn'),
           htmlMessage: t('featureConfigChangeModalApplock'),

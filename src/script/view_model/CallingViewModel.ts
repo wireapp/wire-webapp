@@ -50,7 +50,7 @@ import {QualifiedId} from '@wireapp/api-client/src/user';
 import {PropertiesRepository} from '../properties/PropertiesRepository';
 import {PROPERTIES_TYPE} from '../properties/PropertiesType';
 import {LEAVE_CALL_REASON} from '../calling/enum/LeaveCallReason';
-import {WarningModalType} from '../components/Modals/WarningModal/WarningModalTypes';
+import {PrimaryModalType} from '../components/Modals/PrimaryModal/PrimaryModalTypes';
 
 export interface CallActions {
   answer: (call: Call) => void;
@@ -165,7 +165,7 @@ export class CallingViewModel {
     this.callActions = {
       answer: (call: Call) => {
         if (call.conversationType === CONV_TYPE.CONFERENCE && !this.callingRepository.supportsConferenceCalling) {
-          amplify.publish(WebAppEvents.WARNING.MODAL, WarningModalType.ACKNOWLEDGE, {
+          amplify.publish(WebAppEvents.WARNING.MODAL, PrimaryModalType.ACKNOWLEDGE, {
             primaryAction: {
               action: () => {
                 this.callingRepository.rejectCall(call.conversationId);
@@ -261,7 +261,7 @@ export class CallingViewModel {
           'modal__text__read-more',
           'read-more-pricing',
         );
-        amplify.publish(WebAppEvents.WARNING.MODAL, WarningModalType.CONFIRM, {
+        amplify.publish(WebAppEvents.WARNING.MODAL, PrimaryModalType.CONFIRM, {
           primaryAction: {
             action: () => {
               safeWindowOpen(Config.getConfig().URL.TEAMS_BILLING);
@@ -278,7 +278,7 @@ export class CallingViewModel {
           },
         });
       } else {
-        amplify.publish(WebAppEvents.WARNING.MODAL, WarningModalType.ACKNOWLEDGE, {
+        amplify.publish(WebAppEvents.WARNING.MODAL, PrimaryModalType.ACKNOWLEDGE, {
           text: {
             htmlMessage: t('callingRestrictedConferenceCallTeamMemberModalDescription'),
             title: t('callingRestrictedConferenceCallTeamMemberModalTitle'),
@@ -286,7 +286,7 @@ export class CallingViewModel {
         });
       }
     } else {
-      amplify.publish(WebAppEvents.WARNING.MODAL, WarningModalType.ACKNOWLEDGE, {
+      amplify.publish(WebAppEvents.WARNING.MODAL, PrimaryModalType.ACKNOWLEDGE, {
         text: {
           htmlMessage: t('callingRestrictedConferenceCallPersonalModalDescription', {
             brandName: Config.getConfig().BRAND_NAME,

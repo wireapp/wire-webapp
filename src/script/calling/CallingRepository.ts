@@ -84,7 +84,7 @@ import Warnings from '../view_model/WarningsContainer';
 import {PayloadBundleState} from '@wireapp/core/src/main/conversation';
 import {Core} from '../service/CoreSingleton';
 import {LEAVE_CALL_REASON} from './enum/LeaveCallReason';
-import {WarningModalType} from '../components/Modals/WarningModal/WarningModalTypes';
+import {PrimaryModalType} from '../components/Modals/PrimaryModal/PrimaryModalTypes';
 
 interface MediaStreamQuery {
   audio?: boolean;
@@ -500,7 +500,7 @@ export class CallingRepository {
         this.leaveCall(activeCall.conversationId, LEAVE_CALL_REASON.USER_TURNED_UNVERIFIED);
         amplify.publish(
           WebAppEvents.WARNING.MODAL,
-          WarningModalType.ACKNOWLEDGE,
+          PrimaryModalType.ACKNOWLEDGE,
           {
             action: {
               title: t('callDegradationAction'),
@@ -533,7 +533,7 @@ export class CallingRepository {
     const brandName = Config.getConfig().BRAND_NAME;
     amplify.publish(
       WebAppEvents.WARNING.MODAL,
-      WarningModalType.ACKNOWLEDGE,
+      PrimaryModalType.ACKNOWLEDGE,
       {
         close: () => this.acceptVersionWarning(conversationId),
         text: {
@@ -1745,7 +1745,7 @@ export class CallingRepository {
     }
 
     return new Promise((resolve, reject) => {
-      amplify.publish(WebAppEvents.WARNING.MODAL, WarningModalType.CONFIRM, {
+      amplify.publish(WebAppEvents.WARNING.MODAL, PrimaryModalType.CONFIRM, {
         primaryAction: {
           action: () => {
             if (activeCall.state() === CALL_STATE.INCOMING) {
@@ -1784,7 +1784,7 @@ export class CallingRepository {
         title: t('modalNoAudioInputTitle'),
       },
     };
-    amplify.publish(WebAppEvents.WARNING.MODAL, WarningModalType.CONFIRM, modalOptions);
+    amplify.publish(WebAppEvents.WARNING.MODAL, PrimaryModalType.CONFIRM, modalOptions);
   }
 
   private showNoCameraModal(): void {
@@ -1800,7 +1800,7 @@ export class CallingRepository {
         title: t('modalNoCameraTitle'),
       },
     };
-    amplify.publish(WebAppEvents.WARNING.MODAL, WarningModalType.ACKNOWLEDGE, modalOptions);
+    amplify.publish(WebAppEvents.WARNING.MODAL, PrimaryModalType.ACKNOWLEDGE, modalOptions);
   }
 
   //##############################################################################

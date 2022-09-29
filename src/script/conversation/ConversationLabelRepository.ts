@@ -29,7 +29,7 @@ import {createRandomUuid} from 'Util/util';
 import type {Conversation} from '../entity/Conversation';
 import type {PropertiesService} from '../properties/PropertiesService';
 import {TypedEventTarget} from 'Util/TypedEventTarget';
-import {WarningModalType} from '../components/Modals/WarningModal/WarningModalTypes';
+import {PrimaryModalType} from '../components/Modals/PrimaryModal/PrimaryModalTypes';
 
 export enum LabelType {
   Custom = 0,
@@ -259,7 +259,7 @@ export class ConversationLabelRepository extends TypedEventTarget<{type: 'conver
   };
 
   readonly addConversationToNewLabel = (conversation: Conversation) => {
-    amplify.publish(WebAppEvents.WARNING.MODAL, WarningModalType.INPUT, {
+    amplify.publish(WebAppEvents.WARNING.MODAL, PrimaryModalType.INPUT, {
       primaryAction: {
         action: (name: string) => {
           this.removeConversationFromAllLabels(conversation);

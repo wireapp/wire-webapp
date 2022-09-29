@@ -24,20 +24,20 @@ import Icon from 'Components/Icon';
 import ModalComponent from 'Components/ModalComponent';
 import {initFadingScrollbar} from '../../../ui/fadingScrollbar';
 import renderElement from 'Util/renderElement';
-import {Action, WarningModalType} from './WarningModalTypes';
-import {useWarningModalState, showNextModalInQueue, defaultContent, removeCurrentModal} from './WarningModalState';
+import {Action, PrimaryModalType} from './PrimaryModalTypes';
+import {usePrimaryModalState, showNextModalInQueue, defaultContent, removeCurrentModal} from './PrimaryModalState';
 
-export interface WarningModalProps {}
+export interface PrimaryModalProps {}
 
-const WarningModalComponent: React.FC = () => {
+const PrimaryModalComponent: React.FC = () => {
   const [inputValue, updateInputValue] = useState<string>('');
   const [passwordValue, updatePasswordValue] = useState<string>('');
   const [optionChecked, updateOptionChecked] = useState<boolean>(false);
-  const content = useWarningModalState(state => state.currentModalContent);
-  const errorMessage = useWarningModalState(state => state.errorMessage);
-  const updateErrorMessage = useWarningModalState(state => state.updateErrorMessage);
-  const updateCurrentModalContent = useWarningModalState(state => state.updateCurrentModalContent);
-  const currentId = useWarningModalState(state => state.currentModalId);
+  const content = usePrimaryModalState(state => state.currentModalContent);
+  const errorMessage = usePrimaryModalState(state => state.errorMessage);
+  const updateErrorMessage = usePrimaryModalState(state => state.updateErrorMessage);
+  const updateCurrentModalContent = usePrimaryModalState(state => state.updateCurrentModalContent);
+  const currentId = usePrimaryModalState(state => state.currentModalId);
   const isModalVisible = currentId !== null;
   const {
     checkboxLabel,
@@ -53,10 +53,10 @@ const WarningModalComponent: React.FC = () => {
     titleText,
     closeBtnTitle,
   } = content || defaultContent;
-  const hasPassword = currentType === WarningModalType.PASSWORD;
-  const hasInput = currentType === WarningModalType.INPUT;
-  const hasOption = currentType === WarningModalType.OPTION;
-  const hasMultipleSecondary = currentType === WarningModalType.MULTI_ACTIONS;
+  const hasPassword = currentType === PrimaryModalType.PASSWORD;
+  const hasInput = currentType === PrimaryModalType.INPUT;
+  const hasOption = currentType === PrimaryModalType.OPTION;
+  const hasMultipleSecondary = currentType === PrimaryModalType.MULTI_ACTIONS;
   const onModalHidden = () => {
     updateCurrentModalContent(defaultContent);
     updateInputValue('');
@@ -83,9 +83,9 @@ const WarningModalComponent: React.FC = () => {
     const action = content?.primaryAction?.action;
     if (typeof action === 'function') {
       const actions = {
-        [WarningModalType.OPTION]: action(optionChecked),
-        [WarningModalType.INPUT]: action(inputValue),
-        [WarningModalType.PASSWORD]: action(passwordValue),
+        [PrimaryModalType.OPTION]: action(optionChecked),
+        [PrimaryModalType.INPUT]: action(inputValue),
+        [PrimaryModalType.PASSWORD]: action(passwordValue),
       };
       if (content?.currentType) {
         actions[content.currentType as keyof typeof actions]();
@@ -204,9 +204,9 @@ const WarningModalComponent: React.FC = () => {
   );
 };
 
-export default WarningModalComponent;
+export default PrimaryModalComponent;
 
-export const initWarningModal = () => {
-  renderElement<WarningModalProps>(WarningModalComponent)({});
+export const initPrimaryModal = () => {
+  renderElement<PrimaryModalProps>(PrimaryModalComponent)({});
   showNextModalInQueue();
 };

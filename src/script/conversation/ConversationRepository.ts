@@ -127,7 +127,7 @@ import {ClientState} from '../client/ClientState';
 import {MLSReturnType} from '@wireapp/core/src/main/conversation';
 import {isMemberMessage} from '../guards/Message';
 import {LEAVE_CALL_REASON} from '../calling/enum/LeaveCallReason';
-import {WarningModalType} from '../components/Modals/WarningModal/WarningModalTypes';
+import {PrimaryModalType} from '../components/Modals/PrimaryModal/PrimaryModalTypes';
 
 type ConversationDBChange = {obj: EventRecord; oldObj: EventRecord};
 type FetchPromise = {rejectFn: (error: ConversationError) => void; resolveFn: (conversation: Conversation) => void};
@@ -826,7 +826,7 @@ export class ConversationRepository {
         this.deleteConversationLocally(conversationEntity, true);
       })
       .catch(() => {
-        amplify.publish(WebAppEvents.WARNING.MODAL, WarningModalType.ACKNOWLEDGE, {
+        amplify.publish(WebAppEvents.WARNING.MODAL, PrimaryModalType.ACKNOWLEDGE, {
           text: {
             message: t('modalConversationDeleteErrorMessage', conversationEntity.name()),
             title: t('modalConversationDeleteErrorHeadline'),
@@ -1087,7 +1087,7 @@ export class ConversationRepository {
         amplify.publish(WebAppEvents.CONVERSATION.SHOW, knownConversation, {});
         return;
       }
-      amplify.publish(WebAppEvents.WARNING.MODAL, WarningModalType.CONFIRM, {
+      amplify.publish(WebAppEvents.WARNING.MODAL, PrimaryModalType.CONFIRM, {
         primaryAction: {
           action: async () => {
             try {
@@ -1829,7 +1829,7 @@ export class ConversationRepository {
   }
 
   private showModal(messageText: string, titleText: string) {
-    amplify.publish(WebAppEvents.WARNING.MODAL, WarningModalType.ACKNOWLEDGE, {
+    amplify.publish(WebAppEvents.WARNING.MODAL, PrimaryModalType.ACKNOWLEDGE, {
       text: {
         message: messageText,
         title: titleText,
@@ -1847,7 +1847,7 @@ export class ConversationRepository {
     const messageText = t('modalLegalHoldConversationMissingConsentMessage', {}, replaceLinkLegalHold);
     const titleText = t('modalUserCannotBeAddedHeadline');
 
-    amplify.publish(WebAppEvents.WARNING.MODAL, WarningModalType.ACKNOWLEDGE, {
+    amplify.publish(WebAppEvents.WARNING.MODAL, PrimaryModalType.ACKNOWLEDGE, {
       text: {
         htmlMessage: messageText,
         title: titleText,

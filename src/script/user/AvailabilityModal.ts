@@ -20,7 +20,7 @@
 import {Availability} from '@wireapp/protocol-messaging';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import {amplify} from 'amplify';
-import {WarningModalType} from '../components/Modals/WarningModal/WarningModalTypes';
+import {PrimaryModalType} from '../components/Modals/PrimaryModal/PrimaryModalTypes';
 
 import {t} from 'Util/LocalizerUtil';
 import {loadValue, storeValue} from 'Util/StorageUtil';
@@ -32,7 +32,7 @@ function showModal(storageKey: string, title: string, message: string): void {
   if (!hideModal) {
     amplify.publish(
       WebAppEvents.WARNING.MODAL,
-      WarningModalType.OPTION,
+      PrimaryModalType.OPTION,
       {
         hideSecondary: true,
         preventClose: true,

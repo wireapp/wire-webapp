@@ -50,7 +50,7 @@ export interface ModalOptions {
   text?: Text;
 }
 
-export enum WarningModalType {
+export enum PrimaryModalType {
   ACCOUNT_NEW_DEVICES = 'modal-account-new-devices',
   ACCOUNT_READ_RECEIPTS_CHANGED = 'modal-account-read-receipts-changed',
   ACKNOWLEDGE = 'modal-template-acknowledge',
@@ -78,6 +78,6 @@ export interface ModalContent {
   closeBtnTitle?: string;
 }
 
-export type ModalItem = {id: string; options: ModalOptions; type: WarningModalType};
+export type ModalItem = {id: string; options: ModalOptions; type: PrimaryModalType};
 
 export type ModalQueue = ModalItem[];

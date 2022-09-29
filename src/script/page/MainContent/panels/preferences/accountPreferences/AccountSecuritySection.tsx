@@ -33,7 +33,7 @@ import {t} from 'Util/LocalizerUtil';
 import {safeWindowOpen} from 'Util/SanitizationUtil';
 import PreferencesSection from '../components/PreferencesSection';
 import {Link, LinkVariant} from '@wireapp/react-ui-kit';
-import {WarningModalType} from 'Components/Modals/WarningModal/WarningModalTypes';
+import {PrimaryModalType} from 'Components/Modals/PrimaryModal/PrimaryModalTypes';
 
 interface AccountSecuritySectionProps {
   appLockState?: AppLockState;
@@ -58,7 +58,7 @@ const AccountSecuritySection: React.FC<AccountSecuritySectionProps> = ({
   const onClickDeleteAccount = () =>
     amplify.publish(
       WebAppEvents.WARNING.MODAL,
-      WarningModalType.CONFIRM,
+      PrimaryModalType.CONFIRM,
       {
         primaryAction: {
           action: () => userRepository.deleteMe(),

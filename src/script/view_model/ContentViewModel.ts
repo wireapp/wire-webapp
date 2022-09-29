@@ -50,7 +50,7 @@ import {
   ClientNotificationData,
 } from '../notification/PreferenceNotificationRepository';
 import {MessageRepository} from '../conversation/MessageRepository';
-import {WarningModalType} from '../components/Modals/WarningModal/WarningModalTypes';
+import {PrimaryModalType} from '../components/Modals/PrimaryModal/PrimaryModalTypes';
 
 interface ShowConversationOptions {
   exposeMessage?: Message;
@@ -286,7 +286,7 @@ export class ContentViewModel {
       if (isConversationNotFound) {
         amplify.publish(
           WebAppEvents.WARNING.MODAL,
-          WarningModalType.ACKNOWLEDGE,
+          PrimaryModalType.ACKNOWLEDGE,
           {
             text: {
               message: t('conversationNotFoundMessage'),
@@ -395,7 +395,7 @@ export class ContentViewModel {
         case PreferenceNotificationRepository.CONFIG.NOTIFICATION_TYPES.NEW_CLIENT: {
           amplify.publish(
             WebAppEvents.WARNING.MODAL,
-            WarningModalType.ACCOUNT_NEW_DEVICES,
+            PrimaryModalType.ACCOUNT_NEW_DEVICES,
             {
               data: aggregatedNotifications.map(notification => notification.data) as ClientNotificationData[],
               preventClose: true,
@@ -413,7 +413,7 @@ export class ContentViewModel {
         case PreferenceNotificationRepository.CONFIG.NOTIFICATION_TYPES.READ_RECEIPTS_CHANGED: {
           amplify.publish(
             WebAppEvents.WARNING.MODAL,
-            WarningModalType.ACCOUNT_READ_RECEIPTS_CHANGED,
+            PrimaryModalType.ACCOUNT_READ_RECEIPTS_CHANGED,
             {
               data: aggregatedNotifications.pop().data as boolean,
               preventClose: true,

@@ -36,8 +36,8 @@ import type {Message} from '../entity/message/Message';
 import type {ServiceEntity} from '../integration/ServiceEntity';
 import type {MessageRepository} from '../conversation/MessageRepository';
 import {UserState} from '../user/UserState';
-import {WarningModalType} from '../components/Modals/WarningModal/WarningModalTypes';
-import {removeCurrentModal, useWarningModalState} from 'Components/Modals/WarningModal/WarningModalState';
+import {PrimaryModalType} from '../components/Modals/PrimaryModal/PrimaryModalTypes';
+import {removeCurrentModal, usePrimaryModalState} from 'Components/Modals/PrimaryModal/PrimaryModalState';
 import {BackendError} from '../auth/module/action/BackendError';
 
 export class ActionsViewModel {
@@ -76,7 +76,7 @@ export class ActionsViewModel {
   ): Promise<void> => {
     // TODO: Does the promise resolve when there is no primary action (i.e. cancel button gets clicked)?
     return new Promise(resolve => {
-      amplify.publish(WebAppEvents.WARNING.MODAL, WarningModalType.CONFIRM, {
+      amplify.publish(WebAppEvents.WARNING.MODAL, PrimaryModalType.CONFIRM, {
         primaryAction: {
           action: async () => {
             await this.connectionRepository.blockUser(userEntity, hideConversation, nextConversationEntity);
@@ -110,7 +110,7 @@ export class ActionsViewModel {
     }
 
     return new Promise(resolve => {
-      amplify.publish(WebAppEvents.WARNING.MODAL, WarningModalType.CONFIRM, {
+      amplify.publish(WebAppEvents.WARNING.MODAL, PrimaryModalType.CONFIRM, {
         primaryAction: {
           action: () => {
             this.connectionRepository.cancelRequest(userEntity, hideConversation, nextConversationEntity);
@@ -131,7 +131,7 @@ export class ActionsViewModel {
 
   readonly clearConversation = (conversationEntity: Conversation): void => {
     if (conversationEntity) {
-      const modalType = conversationEntity.isLeavable() ? WarningModalType.OPTION : WarningModalType.CONFIRM;
+      const modalType = conversationEntity.isLeavable() ? PrimaryModalType.OPTION : PrimaryModalType.CONFIRM;
 
       amplify.publish(WebAppEvents.WARNING.MODAL, modalType, {
         primaryAction: {
@@ -165,7 +165,7 @@ export class ActionsViewModel {
       let isSending = false;
       amplify.publish(
         WebAppEvents.WARNING.MODAL,
-        WarningModalType.PASSWORD,
+        PrimaryModalType.PASSWORD,
         {
           closeOnConfirm: false,
           preventClose: true,
@@ -179,7 +179,7 @@ export class ActionsViewModel {
                   resolve();
                 } catch (error) {
                   if (error instanceof BackendError) {
-                    const updateErrorMessage = useWarningModalState(state => state.updateErrorMessage);
+                    const updateErrorMessage = usePrimaryModalState(state => state.updateErrorMessage);
                     updateErrorMessage(expectedErrors[error.label] || error.message);
                   }
                 } finally {
@@ -204,7 +204,7 @@ export class ActionsViewModel {
   readonly deleteMessage = (conversationEntity: Conversation, messageEntity: Message): Promise<void> => {
     if (conversationEntity && messageEntity) {
       return new Promise(resolve => {
-        amplify.publish(WebAppEvents.WARNING.MODAL, WarningModalType.CONFIRM, {
+        amplify.publish(WebAppEvents.WARNING.MODAL, PrimaryModalType.CONFIRM, {
           primaryAction: {
             action: () => {
               this.messageRepository.deleteMessage(conversationEntity, messageEntity);
@@ -227,7 +227,7 @@ export class ActionsViewModel {
   readonly deleteMessageEveryone = (conversationEntity: Conversation, messageEntity: Message): Promise<void> => {
     if (conversationEntity && messageEntity) {
       return new Promise(resolve => {
-        amplify.publish(WebAppEvents.WARNING.MODAL, WarningModalType.CONFIRM, {
+        amplify.publish(WebAppEvents.WARNING.MODAL, PrimaryModalType.CONFIRM, {
           primaryAction: {
             action: () => {
               this.messageRepository.deleteMessageForEveryone(conversationEntity, messageEntity);
@@ -260,7 +260,7 @@ export class ActionsViewModel {
     }
 
     return new Promise(resolve => {
-      amplify.publish(WebAppEvents.WARNING.MODAL, WarningModalType.OPTION, {
+      amplify.publish(WebAppEvents.WARNING.MODAL, PrimaryModalType.OPTION, {
         primaryAction: {
           action: (clearContent = false) => {
             this.conversationRepository.removeMember(
@@ -286,7 +286,7 @@ export class ActionsViewModel {
   readonly deleteConversation = (conversationEntity: Conversation): Promise<void> => {
     if (conversationEntity && conversationEntity.isCreatedBySelf()) {
       return new Promise(() => {
-        amplify.publish(WebAppEvents.WARNING.MODAL, WarningModalType.CONFIRM, {
+        amplify.publish(WebAppEvents.WARNING.MODAL, PrimaryModalType.CONFIRM, {
           primaryAction: {
             action: () => {
               return this.conversationRepository.deleteConversation(conversationEntity);
@@ -355,7 +355,7 @@ export class ActionsViewModel {
       }
 
       return new Promise((resolve, reject) => {
-        amplify.publish(WebAppEvents.WARNING.MODAL, WarningModalType.CONFIRM, {
+        amplify.publish(WebAppEvents.WARNING.MODAL, PrimaryModalType.CONFIRM, {
           primaryAction: {
             action: async () => {
               try {
@@ -402,7 +402,7 @@ export class ActionsViewModel {
    */
   readonly unblockUser = (userEntity: User): Promise<void> => {
     return new Promise(resolve => {
-      amplify.publish(WebAppEvents.WARNING.MODAL, WarningModalType.CONFIRM, {
+      amplify.publish(WebAppEvents.WARNING.MODAL, PrimaryModalType.CONFIRM, {
         primaryAction: {
           action: async () => {
             await this.connectionRepository.unblockUser(userEntity);

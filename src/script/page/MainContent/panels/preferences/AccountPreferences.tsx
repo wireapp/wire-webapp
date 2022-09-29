@@ -55,7 +55,7 @@ import PrivacySection from './accountPreferences/PrivacySection';
 import UsernameInput from './accountPreferences/UsernameInput';
 import PreferencesPage from './components/PreferencesPage';
 import AccountLink from './accountPreferences/AccountLink';
-import {WarningModalType} from 'Components/Modals/WarningModal/WarningModalTypes';
+import {PrimaryModalType} from 'Components/Modals/PrimaryModal/PrimaryModalTypes';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 interface AccountPreferencesProps {
@@ -106,7 +106,7 @@ const AccountPreferences: React.FC<AccountPreferencesProps> = ({
   const clickOnLeaveGuestRoom = (): void => {
     amplify.publish(
       WebAppEvents.WARNING.MODAL,
-      WarningModalType.CONFIRM,
+      PrimaryModalType.CONFIRM,
       {
         preventClose: true,
         primaryAction: {

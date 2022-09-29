@@ -27,7 +27,7 @@ import type {Conversation} from '../entity/Conversation';
 import {OPEN_CONVERSATION_DETAILS} from '../view_model/PanelViewModel';
 import {ConversationError} from '../error/ConversationError';
 import {LegalHoldModalViewModel} from '../view_model/content/LegalHoldModalViewModel';
-import {WarningModalType} from '../components/Modals/WarningModal/WarningModalTypes';
+import {PrimaryModalType} from '../components/Modals/PrimaryModal/PrimaryModalTypes';
 
 export const showLegalHoldWarningModal = (
   conversationEntity: Conversation,
@@ -48,7 +48,7 @@ export const showLegalHoldWarningModal = (
       });
     }
 
-    amplify.publish(WebAppEvents.WARNING.MODAL, WarningModalType.MULTI_ACTIONS, {
+    amplify.publish(WebAppEvents.WARNING.MODAL, PrimaryModalType.MULTI_ACTIONS, {
       close: () => {
         reject(
           new ConversationError(

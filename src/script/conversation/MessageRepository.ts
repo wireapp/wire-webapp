@@ -104,7 +104,7 @@ import {findDeletedClients} from './ClientMismatchUtil';
 import {protoFromType} from '../user/AvailabilityMapper';
 import {partition} from 'underscore';
 import {ConversationState} from './ConversationState';
-import {ModalOptions, WarningModalType} from '../components/Modals/WarningModal/WarningModalTypes';
+import {ModalOptions, PrimaryModalType} from '../components/Modals/PrimaryModal/PrimaryModalTypes';
 
 export interface MessageSendingOptions {
   /** Send native push notification for message. Default is `true`. */
@@ -675,7 +675,7 @@ export class MessageRepository {
         },
       };
 
-      amplify.publish(WebAppEvents.WARNING.MODAL, WarningModalType.CONFIRM, options, `degraded-${conversation.id}`);
+      amplify.publish(WebAppEvents.WARNING.MODAL, PrimaryModalType.CONFIRM, options, `degraded-${conversation.id}`);
     });
   }
 

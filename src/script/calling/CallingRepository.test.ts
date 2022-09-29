@@ -39,7 +39,7 @@ import {CALL_MESSAGE_TYPE} from './enum/CallMessageType';
 import {CALL} from '../event/Client';
 import {UserRepository} from '../user/UserRepository';
 import {LEAVE_CALL_REASON} from './enum/LeaveCallReason';
-import {WarningModalType} from 'Components/Modals/WarningModal/WarningModalTypes';
+import {PrimaryModalType} from 'Components/Modals/PrimaryModal/PrimaryModalTypes';
 
 const createSelfParticipant = () => {
   const selfUser = new User();
@@ -105,7 +105,7 @@ describe('CallingRepository', () => {
       setTimeout(() => {
         expect(amplify.publish).toHaveBeenCalledWith(
           WebAppEvents.WARNING.MODAL,
-          WarningModalType.CONFIRM,
+          PrimaryModalType.CONFIRM,
           jasmine.any(Object),
         );
 

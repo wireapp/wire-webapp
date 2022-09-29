@@ -40,7 +40,7 @@ import {ProviderEntity} from './ProviderEntity';
 import {MemberLeaveEvent} from '../conversation/EventBuilder';
 import {TeamState} from '../team/TeamState';
 import {ConversationState} from '../conversation/ConversationState';
-import {WarningModalType} from '../components/Modals/WarningModal/WarningModalTypes';
+import {PrimaryModalType} from '../components/Modals/PrimaryModal/PrimaryModalTypes';
 
 export class IntegrationRepository {
   private readonly logger: Logger;
@@ -146,7 +146,7 @@ export class IntegrationRepository {
         ConversationError.MESSAGE.CONVERSATION_NOT_FOUND,
       );
     } catch (error) {
-      amplify.publish(WebAppEvents.WARNING.MODAL, WarningModalType.ACKNOWLEDGE, {
+      amplify.publish(WebAppEvents.WARNING.MODAL, PrimaryModalType.ACKNOWLEDGE, {
         text: {
           message: t('modalIntegrationUnavailableMessage'),
           title: t('modalIntegrationUnavailableHeadline'),

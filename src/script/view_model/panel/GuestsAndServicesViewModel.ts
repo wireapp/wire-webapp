@@ -37,7 +37,7 @@ import {
   teamPermissionsForAccessState,
   toggleFeature,
 } from '../../conversation/ConversationAccessPermission';
-import {WarningModalType} from '../../components/Modals/WarningModal/WarningModalTypes';
+import {PrimaryModalType} from '../../components/Modals/PrimaryModal/PrimaryModalTypes';
 
 export class GuestsAndServicesViewModel extends BasePanelViewModel {
   private readonly teamState: TeamState;
@@ -143,7 +143,7 @@ export class GuestsAndServicesViewModel extends BasePanelViewModel {
   };
 
   readonly revokeAccessCode = (): void => {
-    amplify.publish(WebAppEvents.WARNING.MODAL, WarningModalType.CONFIRM, {
+    amplify.publish(WebAppEvents.WARNING.MODAL, PrimaryModalType.CONFIRM, {
       preventClose: true,
       primaryAction: {
         action: async (): Promise<void> => {
@@ -181,7 +181,7 @@ export class GuestsAndServicesViewModel extends BasePanelViewModel {
         return changeAccessState();
       }
 
-      amplify.publish(WebAppEvents.WARNING.MODAL, WarningModalType.CONFIRM, {
+      amplify.publish(WebAppEvents.WARNING.MODAL, PrimaryModalType.CONFIRM, {
         preventClose: true,
         primaryAction: {
           action: changeAccessState,

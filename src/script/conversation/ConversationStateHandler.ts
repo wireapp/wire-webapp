@@ -38,7 +38,7 @@ import {
   isGettingAccessToFeature,
   updateAccessRights,
 } from './ConversationAccessPermission';
-import {WarningModalType} from '../components/Modals/WarningModal/WarningModalTypes';
+import {PrimaryModalType} from '../components/Modals/PrimaryModal/PrimaryModalTypes';
 
 export class ConversationStateHandler extends AbstractConversationEventHandler {
   private readonly conversationService: ConversationService;
@@ -144,6 +144,6 @@ export class ConversationStateHandler extends AbstractConversationEventHandler {
 
   private _showModal(message: string): void {
     const modalOptions = {text: {message}};
-    amplify.publish(WebAppEvents.WARNING.MODAL, WarningModalType.ACKNOWLEDGE, modalOptions);
+    amplify.publish(WebAppEvents.WARNING.MODAL, PrimaryModalType.ACKNOWLEDGE, modalOptions);
   }
 }

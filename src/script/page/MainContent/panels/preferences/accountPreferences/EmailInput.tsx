@@ -26,7 +26,7 @@ import AccountInput, {useInputDone} from './AccountInput';
 import {getLogger} from 'Util/Logger';
 import {t} from 'Util/LocalizerUtil';
 import {UserRepository} from '../../../../../user/UserRepository';
-import {WarningModalType} from 'Components/Modals/WarningModal/WarningModalTypes';
+import {PrimaryModalType} from 'Components/Modals/PrimaryModal/PrimaryModalTypes';
 
 interface EmailInputProps {
   canEditProfile: boolean;
@@ -41,7 +41,7 @@ const EmailInput: React.FC<EmailInputProps> = ({email, canEditProfile, userRepos
 
   const changeEmail = async (enteredEmail: string): Promise<void> => {
     const showWarning = (title: string, message: string) => {
-      amplify.publish(WebAppEvents.WARNING.MODAL, WarningModalType.ACKNOWLEDGE, {
+      amplify.publish(WebAppEvents.WARNING.MODAL, PrimaryModalType.ACKNOWLEDGE, {
         text: {
           message,
           title,

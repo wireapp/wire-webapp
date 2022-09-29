@@ -20,7 +20,7 @@
 import create from 'zustand';
 import {amplify} from 'amplify';
 import {WebAppEvents} from '@wireapp/webapp-events';
-import {Action, ModalContent, ModalItem, ModalOptions, ModalQueue, WarningModalType, Text} from './WarningModalTypes';
+import {Action, ModalContent, ModalItem, ModalOptions, ModalQueue, PrimaryModalType, Text} from './PrimaryModalTypes';
 import {getLogger} from 'Util/Logger';
 import {replaceLink, t} from 'Util/LocalizerUtil';
 import {noop} from 'Util/util';
@@ -29,7 +29,7 @@ import {ClientNotificationData} from '../../../notification/PreferenceNotificati
 import {Config} from '../../../Config';
 import {createRandomUuid} from 'Util/util';
 
-type WarningModalState = {
+type PrimaryModalState = {
   errorMessage: string | null;
   queue: ModalQueue;
   currentModalContent: ModalContent | null;
@@ -58,9 +58,9 @@ const defaultContent: ModalContent = {
   titleText: '',
 };
 
-const logger = getLogger('WarningModalState');
+const logger = getLogger('PrimaryModalState');
 
-const useWarningModalState = create<WarningModalState>((set, get) => ({
+const usePrimaryModalState = create<PrimaryModalState>((set, get) => ({
   addToQueue: (modalItem: ModalItem) => set(state => ({...state, queue: [...state.queue, modalItem]})),
   currentModalContent: defaultContent,
   currentModalId: null,
@@ -81,8 +81,8 @@ const useWarningModalState = create<WarningModalState>((set, get) => ({
   updateErrorMessage: nextErrorMessage => set(state => ({...state, errorMessage: nextErrorMessage})),
 }));
 
-const onIncmoingModalEvent = (type: WarningModalType, options: ModalOptions, modalId = createRandomUuid()) => {
-  const {currentModalId, existsInQueue, addToQueue, replaceInQueue} = useWarningModalState.getState();
+const onIncmoingModalEvent = (type: PrimaryModalType, options: ModalOptions, modalId = createRandomUuid()) => {
+  const {currentModalId, existsInQueue, addToQueue, replaceInQueue} = usePrimaryModalState.getState();
 
   const alreadyOpen = modalId === currentModalId;
   if (alreadyOpen) {
@@ -100,7 +100,7 @@ const onIncmoingModalEvent = (type: WarningModalType, options: ModalOptions, mod
 };
 
 const showNextModalInQueue = () => {
-  const {queue, removeFirstItemInQueue} = useWarningModalState.getState();
+  const {queue, removeFirstItemInQueue} = usePrimaryModalState.getState();
   if (queue.length > 0) {
     const nextModalToShow = queue[0];
     const {type, options, id} = nextModalToShow;
@@ -109,8 +109,8 @@ const showNextModalInQueue = () => {
   }
 };
 
-const updateCurrentModalContent = (type: WarningModalType, options: ModalOptions = {}, id?: string): void => {
-  if (!Object.values(WarningModalType).includes(type)) {
+const updateCurrentModalContent = (type: PrimaryModalType, options: ModalOptions = {}, id?: string): void => {
+  if (!Object.values(PrimaryModalType).includes(type)) {
     return logger.warn(`Modal of type '${type}' is not supported`);
   }
 
@@ -143,7 +143,7 @@ const updateCurrentModalContent = (type: WarningModalType, options: ModalOptions
   };
 
   switch (type) {
-    case WarningModalType.ACCOUNT_NEW_DEVICES: {
+    case PrimaryModalType.ACCOUNT_NEW_DEVICES: {
       content.titleText = t('modalAccountNewDevicesHeadline');
       content.primaryAction = {...primaryAction, text: t('modalAcknowledgeAction')};
       content.secondaryAction = {...secondaryAction, text: t('modalAccountNewDevicesSecondary')};
@@ -158,7 +158,7 @@ const updateCurrentModalContent = (type: WarningModalType, options: ModalOptions
       content.messageHtml = `<div class="modal__content__device-list">${deviceList}</div>`;
       break;
     }
-    case WarningModalType.ACCOUNT_READ_RECEIPTS_CHANGED: {
+    case PrimaryModalType.ACCOUNT_READ_RECEIPTS_CHANGED: {
       content.primaryAction = {...primaryAction, text: t('modalAcknowledgeAction')};
       content.titleText = data
         ? t('modalAccountReadReceiptsChangedOnHeadline')
@@ -166,25 +166,25 @@ const updateCurrentModalContent = (type: WarningModalType, options: ModalOptions
       content.messageText = t('modalAccountReadReceiptsChangedMessage');
       break;
     }
-    case WarningModalType.ACKNOWLEDGE: {
+    case PrimaryModalType.ACKNOWLEDGE: {
       content.primaryAction = {text: t('modalAcknowledgeAction'), ...primaryAction};
       content.titleText = text.title || t('modalAcknowledgeHeadline');
       content.messageText = (!text.htmlMessage && text.message) || null;
       break;
     }
-    case WarningModalType.CONFIRM: {
+    case PrimaryModalType.CONFIRM: {
       content.secondaryAction = {text: t('modalConfirmSecondary'), ...content.secondaryAction};
       break;
     }
-    case WarningModalType.INPUT:
-    case WarningModalType.PASSWORD:
-    case WarningModalType.OPTION: {
+    case PrimaryModalType.INPUT:
+    case PrimaryModalType.PASSWORD:
+    case PrimaryModalType.OPTION: {
       if (!hideSecondary) {
         content.secondaryAction = {text: t('modalOptionSecondary'), ...content.secondaryAction};
       }
       break;
     }
-    case WarningModalType.SESSION_RESET: {
+    case PrimaryModalType.SESSION_RESET: {
       content.titleText = t('modalSessionResetHeadline');
       content.primaryAction = {...primaryAction, text: t('modalAcknowledgeAction')};
       content.messageHtml = t('modalSessionResetMessage', {}, replaceLink(Config.getConfig().URL.SUPPORT.BUG_REPORT));
@@ -201,13 +201,13 @@ const updateCurrentModalContent = (type: WarningModalType, options: ModalOptions
     });
   }
 
-  const {updateCurrentModalContent, updateCurrentModalId} = useWarningModalState.getState();
+  const {updateCurrentModalContent, updateCurrentModalId} = usePrimaryModalState.getState();
   updateCurrentModalContent(content);
   updateCurrentModalId(id ?? null);
 };
 
 const removeCurrentModal = () => {
-  const {currentModalContent, updateCurrentModalId} = useWarningModalState.getState();
+  const {currentModalContent, updateCurrentModalId} = usePrimaryModalState.getState();
 
   currentModalContent?.closeFn();
   updateCurrentModalId(null);
@@ -215,4 +215,4 @@ const removeCurrentModal = () => {
 
 amplify.subscribe(WebAppEvents.WARNING.MODAL, onIncmoingModalEvent);
 
-export {useWarningModalState, defaultContent, showNextModalInQueue, removeCurrentModal};
+export {usePrimaryModalState, defaultContent, showNextModalInQueue, removeCurrentModal};
