@@ -24,7 +24,7 @@ import Icon from 'Components/Icon';
 import ModalComponent from 'Components/ModalComponent';
 import {initFadingScrollbar} from '../../../ui/fadingScrollbar';
 import renderElement from 'Util/renderElement';
-import {WarningModalType} from './WarningModalTypes';
+import {Action, WarningModalType} from './WarningModalTypes';
 import {useWarningModalState, showNextModalInQueue, defaultContent, removeCurrentModal} from './WarningModalState';
 
 export interface WarningModalProps {}
@@ -167,19 +167,21 @@ const WarningModalComponent: React.FC = () => {
                 </div>
               )}
               <div className={cx('modal__buttons', {'modal__buttons--column': hasMultipleSecondary})}>
-                {secondaryActions.map(action => (
-                  <button
-                    key={`${action?.text}-${action?.uieName}`}
-                    type="button"
-                    onClick={() => action?.action && doAction(action?.action, true, true)}
-                    data-uie-name={action?.uieName}
-                    className={cx('modal__button modal__button--secondary', {
-                      'modal__button--full': hasMultipleSecondary,
-                    })}
-                  >
-                    {action?.text}
-                  </button>
-                ))}
+                {secondaryActions
+                  .filter((action): action is Action => action !== null)
+                  .map(action => (
+                    <button
+                      key={`${action?.text}-${action?.uieName}`}
+                      type="button"
+                      onClick={() => action?.action && doAction(action?.action, true, true)}
+                      data-uie-name={action?.uieName}
+                      className={cx('modal__button modal__button--secondary', {
+                        'modal__button--full': hasMultipleSecondary,
+                      })}
+                    >
+                      {action?.text}
+                    </button>
+                  ))}
                 {primaryAction?.text && (
                   <button
                     type="button"
