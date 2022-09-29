@@ -17,7 +17,6 @@
  *
  */
 
-import {ConversationProtocol} from '@wireapp/api-client/src/conversation/NewConversation';
 import React, {useEffect, useMemo, useState} from 'react';
 import {container} from 'tsyringe';
 import cx from 'classnames';
@@ -98,7 +97,7 @@ const DeviceDetails: React.FC<DeviceDetailsProps> = ({
     }
   };
 
-  const isMLSConversation = conversationState.activeConversation()?.protocol === ConversationProtocol.MLS;
+  const isMLSConversation = !!conversationState.activeConversation()?.isUsingMLSProtocol;
 
   return (
     <div className={cx('participant-devices__header', {'participant-devices__header--padding': !noPadding})}>
