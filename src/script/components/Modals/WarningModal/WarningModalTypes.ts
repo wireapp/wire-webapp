@@ -64,14 +64,14 @@ export enum WarningModalType {
 
 export interface ModalContent {
   checkboxLabel: string | null;
-  closeFn: Function;
+  closeFn: () => void;
   closeOnConfirm?: boolean;
   currentType: string | null;
   inputPlaceholder: string | null;
   messageHtml: string | null;
   messageText: string | null;
   modalUie: string;
-  onBgClick: Function;
+  onBgClick: () => void;
   primaryAction: Action | null;
   secondaryAction: Action[] | Action | null;
   titleText: string | null;

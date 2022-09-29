@@ -101,7 +101,7 @@ const WarningModalComponent: React.FC = () => {
         isShown={isModalVisible}
         onClosed={onModalHidden}
         aria-describedby="modal-description"
-        onBgClick={() => onBgClick()}
+        onBgClick={onBgClick}
         data-uie-name={modalUie}
       >
         {isModalVisible && (
