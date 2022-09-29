@@ -18,7 +18,6 @@
  */
 
 import {amplify} from 'amplify';
-import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {t} from 'Util/LocalizerUtil';
 
@@ -27,7 +26,7 @@ import type {Conversation} from '../entity/Conversation';
 import {OPEN_CONVERSATION_DETAILS} from '../view_model/PanelViewModel';
 import {ConversationError} from '../error/ConversationError';
 import {LegalHoldModalViewModel} from '../view_model/content/LegalHoldModalViewModel';
-import {PrimaryModalType} from '../components/Modals/PrimaryModal/PrimaryModalTypes';
+import PrimaryModal from '../components/Modals/PrimaryModal/PrimaryModal';
 
 export const showLegalHoldWarningModal = (
   conversationEntity: Conversation,
@@ -48,7 +47,7 @@ export const showLegalHoldWarningModal = (
       });
     }
 
-    amplify.publish(WebAppEvents.WARNING.MODAL, PrimaryModalType.MULTI_ACTIONS, {
+    PrimaryModal.add(PrimaryModal.type.MULTI_ACTIONS, {
       close: () => {
         reject(
           new ConversationError(

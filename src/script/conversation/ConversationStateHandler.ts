@@ -20,8 +20,6 @@
 import {ConversationCode} from '@wireapp/api-client/src/conversation/';
 import {ConversationAccessUpdateData, ConversationAccessV2UpdateData} from '@wireapp/api-client/src/conversation/data/';
 import {CONVERSATION_EVENT} from '@wireapp/api-client/src/event/';
-import {amplify} from 'amplify';
-import {WebAppEvents} from '@wireapp/webapp-events';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 
 import {t} from 'Util/LocalizerUtil';
@@ -38,7 +36,7 @@ import {
   isGettingAccessToFeature,
   updateAccessRights,
 } from './ConversationAccessPermission';
-import {PrimaryModalType} from '../components/Modals/PrimaryModal/PrimaryModalTypes';
+import PrimaryModal from '../components/Modals/PrimaryModal/PrimaryModal';
 
 export class ConversationStateHandler extends AbstractConversationEventHandler {
   private readonly conversationService: ConversationService;
@@ -144,6 +142,6 @@ export class ConversationStateHandler extends AbstractConversationEventHandler {
 
   private _showModal(message: string): void {
     const modalOptions = {text: {message}};
-    amplify.publish(WebAppEvents.WARNING.MODAL, PrimaryModalType.ACKNOWLEDGE, modalOptions);
+    PrimaryModal.add(PrimaryModal.type.ACKNOWLEDGE, modalOptions);
   }
 }

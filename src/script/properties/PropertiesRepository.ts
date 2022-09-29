@@ -34,7 +34,7 @@ import type {SelfService} from '../self/SelfService';
 import {ConsentValue} from '../user/ConsentValue';
 import type {PropertiesService} from './PropertiesService';
 import {PROPERTIES_TYPE} from './PropertiesType';
-import {PrimaryModalType} from '../components/Modals/PrimaryModal/PrimaryModalTypes';
+import PrimaryModal from '../components/Modals/PrimaryModal/PrimaryModal';
 
 export class PropertiesRepository {
   // Value names are specified by the protocol but key names can be changed.
@@ -125,7 +125,7 @@ export class PropertiesRepository {
     }
 
     return new Promise(resolve => {
-      amplify.publish(WebAppEvents.WARNING.MODAL, PrimaryModalType.CONFIRM, {
+      PrimaryModal.add(PrimaryModal.type.CONFIRM, {
         preventClose: true,
         primaryAction: {
           action: () => {

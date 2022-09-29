@@ -41,7 +41,7 @@ import {ConnectionState} from './ConnectionState';
 import {Config} from '../Config';
 import {matchQualifiedIds} from 'Util/QualifiedId';
 import {QualifiedId} from '@wireapp/api-client/src/user';
-import {PrimaryModalType} from '../components/Modals/PrimaryModal/PrimaryModalTypes';
+import PrimaryModal from '../components/Modals/PrimaryModal/PrimaryModal';
 
 export class ConnectionRepository {
   private readonly connectionService: ConnectionService;
@@ -192,7 +192,7 @@ export class ConnectionRepository {
           '',
           'read-more-legal-hold',
         );
-        amplify.publish(WebAppEvents.WARNING.MODAL, PrimaryModalType.ACKNOWLEDGE, {
+        PrimaryModal.add(PrimaryModal.type.ACKNOWLEDGE, {
           text: {
             htmlMessage: t('modalUserCannotConnectLegalHoldMessage', {}, replaceLinkLegalHold),
             title: t('modalUserCannotConnectLegalHoldHeadline'),

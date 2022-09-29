@@ -18,8 +18,6 @@
  */
 
 import ko from 'knockout';
-import {amplify} from 'amplify';
-import {WebAppEvents} from '@wireapp/webapp-events';
 import type {ConversationMemberJoinEvent} from '@wireapp/api-client/src/event/';
 import {container} from 'tsyringe';
 
@@ -40,7 +38,7 @@ import {ProviderEntity} from './ProviderEntity';
 import {MemberLeaveEvent} from '../conversation/EventBuilder';
 import {TeamState} from '../team/TeamState';
 import {ConversationState} from '../conversation/ConversationState';
-import {PrimaryModalType} from '../components/Modals/PrimaryModal/PrimaryModalTypes';
+import PrimaryModal from '../components/Modals/PrimaryModal/PrimaryModal';
 
 export class IntegrationRepository {
   private readonly logger: Logger;
@@ -146,7 +144,7 @@ export class IntegrationRepository {
         ConversationError.MESSAGE.CONVERSATION_NOT_FOUND,
       );
     } catch (error) {
-      amplify.publish(WebAppEvents.WARNING.MODAL, PrimaryModalType.ACKNOWLEDGE, {
+      PrimaryModal.add(PrimaryModal.type.ACKNOWLEDGE, {
         text: {
           message: t('modalIntegrationUnavailableMessage'),
           title: t('modalIntegrationUnavailableHeadline'),

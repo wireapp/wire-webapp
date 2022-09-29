@@ -17,8 +17,6 @@
  *
  */
 
-import {WebAppEvents} from '@wireapp/webapp-events';
-import {amplify} from 'amplify';
 import React from 'react';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 
@@ -26,7 +24,7 @@ import AccountInput, {useInputDone} from './AccountInput';
 import {getLogger} from 'Util/Logger';
 import {t} from 'Util/LocalizerUtil';
 import {UserRepository} from '../../../../../user/UserRepository';
-import {PrimaryModalType} from 'Components/Modals/PrimaryModal/PrimaryModalTypes';
+import PrimaryModal from 'Components/Modals/PrimaryModal/PrimaryModal';
 
 interface EmailInputProps {
   canEditProfile: boolean;
@@ -41,7 +39,7 @@ const EmailInput: React.FC<EmailInputProps> = ({email, canEditProfile, userRepos
 
   const changeEmail = async (enteredEmail: string): Promise<void> => {
     const showWarning = (title: string, message: string) => {
-      amplify.publish(WebAppEvents.WARNING.MODAL, PrimaryModalType.ACKNOWLEDGE, {
+      PrimaryModal.add(PrimaryModal.type.ACKNOWLEDGE, {
         text: {
           message,
           title,

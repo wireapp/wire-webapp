@@ -50,7 +50,7 @@ import {
   ClientNotificationData,
 } from '../notification/PreferenceNotificationRepository';
 import {MessageRepository} from '../conversation/MessageRepository';
-import {PrimaryModalType} from '../components/Modals/PrimaryModal/PrimaryModalTypes';
+import PrimaryModal from '../components/Modals/PrimaryModal/PrimaryModal';
 
 interface ShowConversationOptions {
   exposeMessage?: Message;
@@ -284,9 +284,8 @@ export class ContentViewModel {
     } catch (error) {
       const isConversationNotFound = error.type === ConversationError.TYPE.CONVERSATION_NOT_FOUND;
       if (isConversationNotFound) {
-        amplify.publish(
-          WebAppEvents.WARNING.MODAL,
-          PrimaryModalType.ACKNOWLEDGE,
+        PrimaryModal.add(
+          PrimaryModal.type.ACKNOWLEDGE,
           {
             text: {
               message: t('conversationNotFoundMessage'),
@@ -393,9 +392,8 @@ export class ContentViewModel {
     const showNotification = (type: string, aggregatedNotifications: Notification[]) => {
       switch (type) {
         case PreferenceNotificationRepository.CONFIG.NOTIFICATION_TYPES.NEW_CLIENT: {
-          amplify.publish(
-            WebAppEvents.WARNING.MODAL,
-            PrimaryModalType.ACCOUNT_NEW_DEVICES,
+          PrimaryModal.add(
+            PrimaryModal.type.ACCOUNT_NEW_DEVICES,
             {
               data: aggregatedNotifications.map(notification => notification.data) as ClientNotificationData[],
               preventClose: true,
@@ -411,9 +409,8 @@ export class ContentViewModel {
         }
 
         case PreferenceNotificationRepository.CONFIG.NOTIFICATION_TYPES.READ_RECEIPTS_CHANGED: {
-          amplify.publish(
-            WebAppEvents.WARNING.MODAL,
-            PrimaryModalType.ACCOUNT_READ_RECEIPTS_CHANGED,
+          PrimaryModal.add(
+            PrimaryModal.type.ACCOUNT_READ_RECEIPTS_CHANGED,
             {
               data: aggregatedNotifications.pop().data as boolean,
               preventClose: true,

@@ -21,7 +21,6 @@ import {Runtime} from '@wireapp/commons';
 import React, {useRef} from 'react';
 import {container} from 'tsyringe';
 import {useEnrichedFields} from 'Components/panel/EnrichedFields';
-import {amplify} from 'amplify';
 
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
@@ -55,8 +54,7 @@ import PrivacySection from './accountPreferences/PrivacySection';
 import UsernameInput from './accountPreferences/UsernameInput';
 import PreferencesPage from './components/PreferencesPage';
 import AccountLink from './accountPreferences/AccountLink';
-import {PrimaryModalType} from 'Components/Modals/PrimaryModal/PrimaryModalTypes';
-import {WebAppEvents} from '@wireapp/webapp-events';
+import PrimaryModal from 'Components/Modals/PrimaryModal/PrimaryModal';
 
 interface AccountPreferencesProps {
   backupRepository: BackupRepository;
@@ -104,9 +102,8 @@ const AccountPreferences: React.FC<AccountPreferencesProps> = ({
   const domain = selfUser.domain;
 
   const clickOnLeaveGuestRoom = (): void => {
-    amplify.publish(
-      WebAppEvents.WARNING.MODAL,
-      PrimaryModalType.CONFIRM,
+    PrimaryModal.add(
+      PrimaryModal.type.CONFIRM,
       {
         preventClose: true,
         primaryAction: {

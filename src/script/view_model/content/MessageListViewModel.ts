@@ -17,10 +17,8 @@
  *
  */
 
-import {amplify} from 'amplify';
 import {container} from 'tsyringe';
 import {groupBy} from 'underscore';
-import {WebAppEvents} from '@wireapp/webapp-events';
 import $ from 'jquery';
 import ko from 'knockout';
 
@@ -50,7 +48,7 @@ import type {MessageRepository} from '../../conversation/MessageRepository';
 import {showDetailViewModal} from 'Components/Modals/DetailViewModal';
 import {AssetRepository} from '../../assets/AssetRepository';
 import React from 'react';
-import {PrimaryModalType} from '../../components/Modals/PrimaryModal/PrimaryModalTypes';
+import PrimaryModal from '../../components/Modals/PrimaryModal/PrimaryModal';
 
 /*
  * Message list rendering view model.
@@ -183,7 +181,7 @@ export class MessageListViewModel {
     const resetProgress = () =>
       window.setTimeout(() => {
         messageEntity.is_resetting_session(false);
-        amplify.publish(WebAppEvents.WARNING.MODAL, PrimaryModalType.SESSION_RESET);
+        PrimaryModal.add(PrimaryModal.type.SESSION_RESET, {});
       }, MotionDuration.LONG);
 
     messageEntity.is_resetting_session(true);
@@ -327,7 +325,7 @@ export class MessageListViewModel {
     const linkTarget = (event.target as HTMLElement).closest<HTMLAnchorElement>('[data-md-link]');
     if (linkTarget) {
       const href = linkTarget.href;
-      amplify.publish(WebAppEvents.WARNING.MODAL, PrimaryModalType.CONFIRM, {
+      PrimaryModal.add(PrimaryModal.type.CONFIRM, {
         primaryAction: {
           action: () => {
             safeWindowOpen(href);

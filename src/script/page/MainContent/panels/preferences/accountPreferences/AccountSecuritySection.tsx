@@ -33,7 +33,7 @@ import {t} from 'Util/LocalizerUtil';
 import {safeWindowOpen} from 'Util/SanitizationUtil';
 import PreferencesSection from '../components/PreferencesSection';
 import {Link, LinkVariant} from '@wireapp/react-ui-kit';
-import {PrimaryModalType} from 'Components/Modals/PrimaryModal/PrimaryModalTypes';
+import PrimaryModal from 'Components/Modals/PrimaryModal/PrimaryModal';
 
 interface AccountSecuritySectionProps {
   appLockState?: AppLockState;
@@ -56,9 +56,8 @@ const AccountSecuritySection: React.FC<AccountSecuritySectionProps> = ({
   const isMacOsWrapper = Runtime.isDesktopApp() && Runtime.isMacOS();
 
   const onClickDeleteAccount = () =>
-    amplify.publish(
-      WebAppEvents.WARNING.MODAL,
-      PrimaryModalType.CONFIRM,
+    PrimaryModal.add(
+      PrimaryModal.type.CONFIRM,
       {
         primaryAction: {
           action: () => userRepository.deleteMe(),

@@ -28,9 +28,7 @@ import {UserRepository} from '../../../../../user/UserRepository';
 import {validateProfileImageResolution} from 'Util/util';
 import {getLogger} from 'Util/Logger';
 import {handleKeyDown} from 'Util/KeyboardUtil';
-import {amplify} from 'amplify';
-import {PrimaryModalType} from 'Components/Modals/PrimaryModal/PrimaryModalTypes';
-import {WebAppEvents} from '@wireapp/webapp-events';
+import PrimaryModal from 'Components/Modals/PrimaryModal/PrimaryModal';
 
 interface AvatarInputProps {
   isActivatedAccount: boolean;
@@ -50,7 +48,7 @@ const AvatarInput: React.FC<AvatarInputProps> = ({selfUser, isActivatedAccount, 
 
   const showUploadWarning = (title: string, message: string): Promise<never> => {
     const modalOptions = {text: {message, title}};
-    amplify.publish(WebAppEvents.WARNING.MODAL, PrimaryModalType.ACKNOWLEDGE, modalOptions, undefined);
+    PrimaryModal.add(PrimaryModal.type.ACKNOWLEDGE, modalOptions, undefined);
     return Promise.reject(new UserError(UserError.TYPE.INVALID_UPDATE, UserError.MESSAGE.INVALID_UPDATE));
   };
 

@@ -42,7 +42,7 @@ import {ClientRecord, StorageRepository} from '../storage';
 import {ClientState} from './ClientState';
 import {matchQualifiedIds} from 'Util/QualifiedId';
 import {Core} from '../service/CoreSingleton';
-import {PrimaryModalType} from '../components/Modals/PrimaryModal/PrimaryModalTypes';
+import PrimaryModal from '../components/Modals/PrimaryModal/PrimaryModal';
 
 export type UserClientEntityMap = {[userId: string]: ClientEntity[]};
 export type QualifiedUserClientEntityMap = {[domain: string]: UserClientEntityMap};
@@ -308,7 +308,7 @@ export class ClientRepository {
         await this.deleteLocalTemporaryClient();
         amplify.publish(WebAppEvents.LIFECYCLE.SIGN_OUT, SIGN_OUT_REASON.USER_REQUESTED, true);
       } else {
-        amplify.publish(WebAppEvents.WARNING.MODAL, PrimaryModalType.OPTION, {
+        PrimaryModal.add(PrimaryModal.type.OPTION, {
           preventClose: true,
           primaryAction: {
             action: (clearData: boolean) => {
@@ -568,9 +568,8 @@ export class ClientRepository {
     const localClients = await this.getClientsForSelf();
     const removedClient = localClients.find(client => client.id === clientId);
     if (removedClient?.isLegalHold()) {
-      amplify.publish(
-        WebAppEvents.WARNING.MODAL,
-        PrimaryModalType.ACKNOWLEDGE,
+      PrimaryModal.add(
+        PrimaryModal.type.ACKNOWLEDGE,
         {
           text: {
             message: t('modalLegalHoldDeactivatedMessage'),

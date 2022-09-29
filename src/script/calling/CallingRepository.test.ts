@@ -21,7 +21,6 @@ import 'jsdom-worker';
 
 import ko, {Subscription} from 'knockout';
 import {amplify} from 'amplify';
-import {WebAppEvents} from '@wireapp/webapp-events';
 import {CONV_TYPE, CALL_TYPE, STATE as CALL_STATE, REASON, Wcall} from '@wireapp/avs';
 import {CallingRepository} from 'src/script/calling/CallingRepository';
 import {EventRepository} from 'src/script/event/EventRepository';
@@ -39,7 +38,7 @@ import {CALL_MESSAGE_TYPE} from './enum/CallMessageType';
 import {CALL} from '../event/Client';
 import {UserRepository} from '../user/UserRepository';
 import {LEAVE_CALL_REASON} from './enum/LeaveCallReason';
-import {PrimaryModalType} from 'Components/Modals/PrimaryModal/PrimaryModalTypes';
+import {usePrimaryModalState} from 'Components/Modals/PrimaryModal/PrimaryModalState';
 
 const createSelfParticipant = () => {
   const selfUser = new User();
@@ -103,12 +102,7 @@ describe('CallingRepository', () => {
       spyOn(wCall, 'start');
       callingRepository.startCall(conversationId, conversationType, callType).catch(done);
       setTimeout(() => {
-        expect(amplify.publish).toHaveBeenCalledWith(
-          WebAppEvents.WARNING.MODAL,
-          PrimaryModalType.CONFIRM,
-          jasmine.any(Object),
-        );
-
+        expect(usePrimaryModalState.getState().currentModalId).not.toBeNull();
         expect(wCall.start).not.toHaveBeenCalled();
         done();
       }, 10);
