@@ -51,7 +51,7 @@ const PreferenceItem: React.FC<{
         <span className="left-column-icon">
           <IconComponent />
         </span>
-        <span className="center-column">{label}</span>
+        <span className="column-center">{label}</span>
       </button>
     </li>
   );

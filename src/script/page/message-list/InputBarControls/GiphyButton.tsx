@@ -18,38 +18,31 @@
  */
 
 import Icon from 'Components/Icon';
-import cx from 'classnames';
 import React from 'react';
-import {registerReactComponent} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
-import ControlButtons, {ControlButtonsProps} from './ControlButtons';
+import {IconButton} from '@wireapp/react-ui-kit';
 
-type InputBarControlsProps = ControlButtonsProps & {
-  onSend: () => void;
+export type GiphyButtonProps = {
+  onGifClick: () => void;
 };
 
-const InputBarControls: React.FC<InputBarControlsProps> = ({onSend, ...props}) => {
+const GiphyButton: React.FC<GiphyButtonProps> = ({onGifClick}) => {
   return (
-    <ul className="controls-right buttons-group">
-      <ControlButtons {...props} />
-
+    <>
       <li>
-        <button
+        <IconButton
           type="button"
-          className={cx('controls-right-button controls-right-button--send')}
-          disabled={props.input.length === 0}
-          title={t('tooltipConversationSendMessage')}
-          aria-label={t('tooltipConversationSendMessage')}
-          onClick={onSend}
-          data-uie-name="do-send-message"
+          css={{marginBottom: '0'}}
+          title={t('extensionsBubbleButtonGif')}
+          aria-label={t('extensionsBubbleButtonGif')}
+          onClick={onGifClick}
+          data-uie-name="do-giphy-popover"
         >
-          <Icon.Send />
-        </button>
+          <Icon.Gif />
+        </IconButton>
       </li>
-    </ul>
+    </>
   );
 };
 
-export default InputBarControls;
-
-registerReactComponent('input-bar-controls', InputBarControls);
+export default GiphyButton;
