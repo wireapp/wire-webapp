@@ -83,12 +83,12 @@ const PrimaryModalComponent: React.FC = () => {
     const action = content?.primaryAction?.action;
     if (typeof action === 'function') {
       const actions = {
-        [PrimaryModalType.OPTION]: action(optionChecked),
-        [PrimaryModalType.INPUT]: action(inputValue),
-        [PrimaryModalType.PASSWORD]: action(passwordValue),
+        [PrimaryModalType.OPTION]: () => action(optionChecked),
+        [PrimaryModalType.INPUT]: () => action(inputValue),
+        [PrimaryModalType.PASSWORD]: () => action(passwordValue),
       };
-      if (content?.currentType) {
-        actions[content.currentType as keyof typeof actions]();
+      if (Object.keys(actions).includes(content?.currentType ?? '')) {
+        actions[content?.currentType as keyof typeof actions]();
         return;
       }
       action();
@@ -209,4 +209,8 @@ export default PrimaryModalComponent;
 export const initPrimaryModal = () => {
   renderElement<PrimaryModalProps>(PrimaryModalComponent)({});
   showNextModalInQueue();
+};
+
+export const PrimaryModal = {
+  // addModal:
 };
