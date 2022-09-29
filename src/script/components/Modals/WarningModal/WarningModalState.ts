@@ -61,20 +61,14 @@ const defaultContent: ModalContent = {
 const logger = getLogger('WarningModalState');
 
 const useWarningModalState = create<WarningModalState>((set, get) => ({
-  addToQueue: (modalItem: ModalItem) =>
-    set(state => {
-      return {...state, queue: [...state.queue, modalItem]};
-    }),
+  addToQueue: (modalItem: ModalItem) => set(state => ({...state, queue: [...state.queue, modalItem]})),
   currentModalContent: defaultContent,
   currentModalId: null,
   errorMessage: null,
   existsInQueue: (modalItem: ModalItem): boolean =>
     get().queue.findIndex(queueItem => queueItem.id === modalItem.id) !== -1,
   queue: [],
-  removeFirstItemInQueue: () =>
-    set(state => {
-      return {...state, queue: [...state.queue.slice(1)]};
-    }),
+  removeFirstItemInQueue: () => set(state => ({...state, queue: state.queue.slice(1)})),
   replaceInQueue: (modalItem: ModalItem) =>
     set(state => {
       const updatedQueue = [...state.queue];
