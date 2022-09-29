@@ -20,6 +20,7 @@
 import {render, waitFor, fireEvent} from '@testing-library/react';
 import {QualifiedId} from '@wireapp/api-client/src/user';
 import {Runtime} from '@wireapp/commons';
+import * as uiKit from '@wireapp/react-ui-kit';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import {amplify} from 'amplify';
 import ko from 'knockout';
@@ -39,6 +40,13 @@ import {ConversationVerificationState} from '../../conversation/ConversationVeri
 import {User} from '../../entity/User';
 import {ContentViewModel} from '../../view_model/ContentViewModel';
 import {MainViewModel, ViewModelRepositories} from '../../view_model/MainViewModel';
+
+jest.mock('@wireapp/react-ui-kit', () => ({
+  ...(jest.requireActual('@wireapp/react-ui-kit') as any),
+  useMatchMedia: jest.fn(),
+}));
+
+const mockedUiKit = uiKit as jest.Mocked<typeof uiKit>;
 
 jest.spyOn(Runtime, 'isSupportingConferenceCalling').mockReturnValue(true);
 
@@ -130,27 +138,45 @@ describe('TitleBar', () => {
   //   expect(conversationName).toBeDefined();
   //
   //   fireEvent.click(conversationName);
-  //   // expect(panelViewModel.togglePanel).toHaveBeenCalledWith(PanelViewModel.STATE.CONVERSATION_DETAILS, {
-  //   //   entity: conversation,
-  //   // });
+  //   expect(panelViewModel.togglePanel).toHaveBeenCalledWith(PanelViewModel.STATE.CONVERSATION_DETAILS, {
+  //     entity: conversation,
+  //   });
   // });
-
-  // TODO: Fix this test
+  //
   // it('opens conversation details on info button click', async () => {
   //   const userState = createUserState({isActivatedAccount: ko.pureComputed(() => true)});
+  //   const panelViewModel = createPanelViewModel();
   //   const conversation = createConversationEntity();
   //
+  //   mockedUiKit.useMatchMedia.mockReturnValue(false);
+  //
   //   const {getByLabelText} = render(
-  //     <TitleBar {...getDefaultProps(callingRepository)} userState={userState} conversation={conversation} />,
+  //     <TitleBar
+  //       {...getDefaultProps(callingRepository)}
+  //       userState={userState}
+  //       conversation={conversation}
+  //       panelViewModel={panelViewModel}
+  //     />,
   //   );
   //
   //   const infoButton = getByLabelText('tooltipConversationInfo');
   //   expect(infoButton).toBeDefined();
   //   fireEvent.click(infoButton);
-  //   // expect(panelViewModel.togglePanel).toHaveBeenCalledWith(PanelViewModel.STATE.CONVERSATION_DETAILS, {
-  //   //   entity: conversation,
-  //   // });
+  //   expect(panelViewModel.togglePanel).toHaveBeenCalledWith(PanelViewModel.STATE.CONVERSATION_DETAILS, {
+  //     entity: conversation,
+  //   });
   // });
+
+  it('hide info button and search button on scaled down view', async () => {
+    mockedUiKit.useMatchMedia.mockReturnValue(true);
+
+    const {queryByLabelText} = render(<TitleBar {...getDefaultProps(callingRepository)} />);
+
+    const infoButton = queryByLabelText('tooltipConversationInfo');
+    const videoCallButton = queryByLabelText('tooltipConversationVideoCall');
+    expect(infoButton).toBe(null);
+    expect(videoCallButton).toBe(null);
+  });
 
   it("doesn't show legal-hold icon for non legal-hold user", async () => {
     const userState = createUserState({isActivatedAccount: ko.pureComputed(() => true)});
@@ -247,6 +273,8 @@ describe('TitleBar', () => {
   });
 
   it('starts video call on video call button click', async () => {
+    mockedUiKit.useMatchMedia.mockReturnValue(false);
+
     const firstUser = new User();
     const teamState = createTeamState({isVideoCallingEnabled: ko.pureComputed(() => true)});
     const conversation = createConversationEntity({

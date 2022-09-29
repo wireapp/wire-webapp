@@ -18,30 +18,34 @@
  */
 
 import {WebAppEvents} from '@wireapp/webapp-events';
+import {IconButton, StyledApp, THEME_ID, useMatchMedia} from '@wireapp/react-ui-kit';
 import {amplify} from 'amplify';
+import cx from 'classnames';
 import React, {useMemo, useEffect, useCallback, useState} from 'react';
-import {registerReactComponent, useKoSubscribableChildren} from 'Util/ComponentUtil';
-import {StringIdentifer, t} from 'Util/LocalizerUtil';
-import {ConversationVerificationState} from '../../conversation/ConversationVerificationState';
+import {container} from 'tsyringe';
+
 import LegalHoldDot from 'Components/LegalHoldDot';
 import Icon from 'Components/Icon';
-import {ContentViewModel} from '../../view_model/ContentViewModel';
+
+import {registerReactComponent, useKoSubscribableChildren} from 'Util/ComponentUtil';
+import {handleKeyDown} from 'Util/KeyboardUtil';
+import {StringIdentifer, t} from 'Util/LocalizerUtil';
+import {TIME_IN_MILLIS} from 'Util/TimeUtil';
+import {matchQualifiedIds} from 'Util/QualifiedId';
+
+import {CallState} from '../../calling/CallState';
+import {ConversationFilter} from '../../conversation/ConversationFilter';
+import {ConversationVerificationState} from '../../conversation/ConversationVerificationState';
+import {Conversation} from '../../entity/Conversation';
+import {openRightSidebar, PanelState} from '../../page/RightSidebar/RightSidebar';
+import {UserState} from '../../user/UserState';
+import {TeamState} from '../../team/TeamState';
 import {Shortcut} from '../../ui/Shortcut';
 import {ShortcutType} from '../../ui/ShortcutType';
-import cx from 'classnames';
-import {Conversation} from '../../entity/Conversation';
-import {UserState} from '../../user/UserState';
-import {CallState} from '../../calling/CallState';
-import {TeamState} from '../../team/TeamState';
-import {container} from 'tsyringe';
-import {LegalHoldModalViewModel} from '../../view_model/content/LegalHoldModalViewModel';
-import {ConversationFilter} from '../../conversation/ConversationFilter';
-import {matchQualifiedIds} from 'Util/QualifiedId';
 import {CallActions} from '../../view_model/CallingViewModel';
-import {handleKeyDown} from 'Util/KeyboardUtil';
-import {TIME_IN_MILLIS} from 'Util/TimeUtil';
-import {openRightSidebar, PanelState} from '../../page/RightSidebar/RightSidebar';
+import {ContentViewModel} from '../../view_model/ContentViewModel';
 import {MainViewModel, ViewModelRepositories} from '../../view_model/MainViewModel';
+import {LegalHoldModalViewModel} from '../../view_model/content/LegalHoldModalViewModel';
 
 export interface TitleBarProps {
   mainViewModel: MainViewModel;
@@ -134,6 +138,8 @@ const TitleBar: React.FC<TitleBarProps> = ({
   const shortcut = Shortcut.getShortcutTooltip(ShortcutType.PEOPLE);
   const peopleTooltip = t('tooltipConversationPeople', shortcut);
 
+  const isScaledDown = useMatchMedia('max-width: 768px');
+
   const showDetails = useCallback(
     (addParticipants: boolean): void => {
       const panelId = addParticipants ? PanelState.ADD_PARTICIPANTS : PanelState.CONVERSATION_DETAILS;
@@ -196,6 +202,8 @@ const TitleBar: React.FC<TitleBarProps> = ({
       teamState,
       userState,
     });
+
+    // showDetails(false);
   };
 
   const onRightPanelToggle = (mutationList: MutationRecord[]) => {
@@ -238,109 +246,138 @@ const TitleBar: React.FC<TitleBarProps> = ({
   }, []);
 
   return (
-    <ul id="conversation-title-bar" className="conversation-title-bar">
-      <li className="conversation-title-bar-library">
-        {isActivatedAccount && (
-          <button
-            className="conversation-title-bar-icon icon-search"
-            type="button"
-            title={t('tooltipConversationSearch')}
-            aria-label={t('tooltipConversationSearch')}
-            onClick={onClickCollectionButton}
-            data-uie-name="do-collections"
+    <StyledApp themeId={THEME_ID.DEFAULT}>
+      <ul id="conversation-title-bar" className="conversation-title-bar">
+        <li className="conversation-title-bar-library">
+          {isActivatedAccount && !isScaledDown && (
+            <button
+              className="conversation-title-bar-icon icon-search"
+              type="button"
+              title={t('tooltipConversationSearch')}
+              aria-label={t('tooltipConversationSearch')}
+              onClick={onClickCollectionButton}
+              data-uie-name="do-collections"
+            >
+              <span className="visually-hidden">{t('tooltipConversationSearch')}</span>
+            </button>
+          )}
+        </li>
+
+        <li className="conversation-title-bar-name">
+          <div
+            id="show-participants"
+            onClick={onClickDetails}
+            title={peopleTooltip}
+            aria-label={peopleTooltip}
+            onKeyDown={e => handleKeyDown(e, onClickDetails)}
+            data-placement="bottom"
+            role="button"
+            tabIndex={0}
+            data-uie-name="do-participants"
           >
-            <span className="visually-hidden">{t('tooltipConversationSearch')}</span>
-          </button>
-        )}
-      </li>
+            <div className="conversation-title-bar-name-label--wrapper">
+              {hasLegalHold && (
+                <LegalHoldDot
+                  dataUieName="status-legal-hold-conversation"
+                  className="conversation-title-bar-legal-hold"
+                  legalHoldModal={legalHoldModal}
+                  conversation={conversation}
+                />
+              )}
 
-      <li className="conversation-title-bar-name">
-        <div
-          id="show-participants"
-          onClick={onClickDetails}
-          title={peopleTooltip}
-          aria-label={peopleTooltip}
-          onKeyDown={e => handleKeyDown(e, onClickDetails)}
-          data-placement="bottom"
-          role="button"
-          tabIndex={0}
-          data-uie-name="do-participants"
-        >
-          <div className="conversation-title-bar-name-label--wrapper">
-            {hasLegalHold && (
-              <LegalHoldDot
-                dataUieName="status-legal-hold-conversation"
-                className="conversation-title-bar-legal-hold"
-                legalHoldModal={legalHoldModal}
-                conversation={conversation}
-              />
+              {verificationState === ConversationVerificationState.VERIFIED && (
+                <Icon.Verified
+                  data-uie-name="conversation-title-bar-verified-icon"
+                  className="conversation-title-bar-name--verified"
+                />
+              )}
+
+              <h2 className="conversation-title-bar-name-label" data-uie-name="status-conversation-title-bar-label">
+                {displayName}
+              </h2>
+            </div>
+
+            {conversationSubtitle && (
+              <div className="conversation-title-bar-name--subtitle">{conversationSubtitle}</div>
             )}
-
-            {verificationState === ConversationVerificationState.VERIFIED && (
-              <Icon.Verified
-                data-uie-name="conversation-title-bar-verified-icon"
-                className="conversation-title-bar-name--verified"
-              />
-            )}
-
-            <h2 className="conversation-title-bar-name-label" data-uie-name="status-conversation-title-bar-label">
-              {displayName}
-            </h2>
           </div>
+        </li>
 
-          {conversationSubtitle && <div className="conversation-title-bar-name--subtitle">{conversationSubtitle}</div>}
-        </div>
-      </li>
+        <li className="conversation-title-bar-icons">
+          {showCallControls && !isScaledDown && (
+            <div className="buttons-group">
+              {supportsVideoCall && isVideoCallingEnabled && (
+                <button
+                  type="button"
+                  className="conversation-title-bar-icon"
+                  title={t('tooltipConversationVideoCall')}
+                  aria-label={t('tooltipConversationVideoCall')}
+                  onClick={() => callActions.startVideo(conversation)}
+                  data-uie-name="do-video-call"
+                >
+                  <Icon.Camera />
+                </button>
+              )}
 
-      <li className="conversation-title-bar-icons">
-        {showCallControls && (
-          <div className="buttons-group">
-            {supportsVideoCall && isVideoCallingEnabled && (
               <button
                 type="button"
                 className="conversation-title-bar-icon"
-                title={t('tooltipConversationVideoCall')}
-                aria-label={t('tooltipConversationVideoCall')}
-                onClick={() => callActions.startVideo(conversation)}
-                data-uie-name="do-video-call"
+                title={t('tooltipConversationCall')}
+                aria-label={t('tooltipConversationCall')}
+                onClick={() => callActions.startAudio(conversation)}
+                data-uie-name="do-call"
               >
-                <Icon.Camera />
+                <Icon.Pickup />
               </button>
-            )}
+            </div>
+          )}
 
+          {isScaledDown ? (
+            <>
+              <IconButton
+                className="icon-search"
+                css={{marginBottom: 0}}
+                title={t('tooltipConversationSearch')}
+                aria-label={t('tooltipConversationSearch')}
+                onClick={onClickCollectionButton}
+                data-uie-name="do-collections"
+              >
+                <span className="visually-hidden">{t('tooltipConversationSearch')}</span>
+              </IconButton>
+
+              <IconButton
+                title={t('tooltipConversationCall')}
+                aria-label={t('tooltipConversationCall')}
+                css={{marginBottom: 0}}
+                onClick={() => callActions.startAudio(conversation)}
+                data-uie-name="do-call"
+              >
+                <Icon.Pickup />
+              </IconButton>
+            </>
+          ) : (
             <button
               type="button"
-              className="conversation-title-bar-icon"
-              title={t('tooltipConversationCall')}
-              aria-label={t('tooltipConversationCall')}
-              onClick={() => callActions.startAudio(conversation)}
-              data-uie-name="do-call"
+              title={t('tooltipConversationInfo')}
+              aria-label={t('tooltipConversationInfo')}
+              onClick={onClickDetails}
+              className={cx('conversation-title-bar-icon', {active: isRightPanelOpen})}
+              data-uie-name="do-open-info"
             >
-              <Icon.Pickup />
+              <Icon.Info />
             </button>
-          </div>
+          )}
+        </li>
+
+        {badgeLabelCopy && (
+          <li
+            className="conversation-title-bar-indication-badge"
+            data-uie-name="status-indication-badge"
+            dangerouslySetInnerHTML={{__html: badgeLabelCopy}}
+          />
         )}
-
-        <button
-          type="button"
-          title={t('tooltipConversationInfo')}
-          aria-label={t('tooltipConversationInfo')}
-          onClick={onClickDetails}
-          className={cx('conversation-title-bar-icon', {active: isRightPanelOpen})}
-          data-uie-name="do-open-info"
-        >
-          <Icon.Info />
-        </button>
-      </li>
-
-      {badgeLabelCopy && (
-        <li
-          className="conversation-title-bar-indication-badge"
-          data-uie-name="status-indication-badge"
-          dangerouslySetInnerHTML={{__html: badgeLabelCopy}}
-        />
-      )}
-    </ul>
+      </ul>
+    </StyledApp>
   );
 };
 
