@@ -17,15 +17,13 @@
  *
  */
 
-import TestPage from 'Util/test/TestPage';
-
 import {ContentMessage} from 'src/script/entity/message/ContentMessage';
 import {MediumImage} from 'src/script/entity/message/MediumImage';
 import ImageAsset, {ImageAssetProps} from './ImageAsset';
 import {container} from 'tsyringe';
 import {AssetRepository} from 'src/script/assets/AssetRepository';
 import {AssetRemoteData} from 'src/script/assets/AssetRemoteData';
-import waitForExpect from 'wait-for-expect';
+import {render, waitFor} from '@testing-library/react';
 
 jest.mock(
   'Components/utils/InViewport',
@@ -36,13 +34,6 @@ jest.mock(
     },
 );
 
-class ImageAssetTestPage extends TestPage<ImageAssetProps> {
-  constructor(props?: ImageAssetProps) {
-    super(ImageAsset, props);
-  }
-
-  getImg = () => this.get('[data-uie-name="image-asset-img"]');
-}
 describe('image-asset', () => {
   const defaultProps: ImageAssetProps = {
     asset: new MediumImage('image'),
@@ -54,8 +45,14 @@ describe('image-asset', () => {
     const image = new MediumImage('image');
     image.height = '10';
     image.width = '100';
-    const testPage = new ImageAssetTestPage({...defaultProps, asset: image});
-    const imgSrc = testPage.getImg().getAttribute('src');
+
+    const props = {...defaultProps, asset: image};
+
+    const {getByTestId} = render(<ImageAsset {...props} />);
+
+    const imageElement = getByTestId('image-asset-img');
+
+    const imgSrc = imageElement.getAttribute('src');
 
     expect(imgSrc).toContain('svg');
     expect(imgSrc).toContain('10');
@@ -67,6 +64,7 @@ describe('image-asset', () => {
     jest
       .spyOn(assetRepository, 'load')
       .mockReturnValue(Promise.resolve(new Blob([new Uint8Array()], {type: 'application/octet-stream'})));
+
     const createObjectURLSpy = jest.spyOn(window.URL, 'createObjectURL').mockReturnValue('/image-url');
 
     const image = new MediumImage('image');
@@ -78,10 +76,16 @@ describe('image-asset', () => {
         version: 3,
       }),
     );
-    const testPage = new ImageAssetTestPage({...defaultProps, asset: image});
-    await waitForExpect(() => {
+
+    const props = {...defaultProps, asset: image};
+
+    const {getByTestId} = render(<ImageAsset {...props} />);
+
+    const imageElement = getByTestId('image-asset-img');
+
+    await waitFor(() => {
       expect(createObjectURLSpy).toHaveBeenCalled();
-      const imgSrc = testPage.getImg().getAttribute('src');
+      const imgSrc = imageElement.getAttribute('src');
       expect(imgSrc).toContain('/image-url');
     });
   });

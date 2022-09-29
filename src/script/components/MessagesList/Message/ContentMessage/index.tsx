@@ -53,7 +53,7 @@ export interface ContentMessageProps extends Omit<MessageActions, 'onClickResetS
   isLastDeliveredMessage: boolean;
   message: ContentMessage;
   onClickButton: (message: CompositeMessage, buttonId: string) => void;
-  previousMessage: Message;
+  previousMessage?: Message;
   quotedMessage?: ContentMessage;
   selfId: QualifiedId;
 }
