@@ -269,6 +269,8 @@ describe('TitleBar', () => {
   });
 
   it('starts video call on video call button click', async () => {
+    mockedUiKit.useMatchMedia.mockReturnValue(false);
+
     const firstUser = new User();
     const teamState = createTeamState({isVideoCallingEnabled: ko.pureComputed(() => true)});
     const conversation = createConversationEntity({
