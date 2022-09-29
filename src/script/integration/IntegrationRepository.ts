@@ -101,7 +101,7 @@ export class IntegrationRepository {
     const {providerId, serviceId} = entity;
 
     if (!providerId || !serviceId) {
-      return;
+      return undefined;
     }
 
     return this.getServiceById(providerId, serviceId, entity.qualifiedId.domain);

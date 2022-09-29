@@ -53,7 +53,7 @@ const DetailedDevice: React.FC<DeviceProps> = ({device, fingerprint}) => {
       <h3 className="label preferences-label preferences-devices-fingerprint-label">
         {t('preferencesDevicesFingerprint')}
       </h3>
-      <p className="preferences-devices-fingerprint">
+      <p className="preferences-devices-fingerprint" css={{width: '300px'}}>
         <FormattedId idSlices={splitFingerprint(fingerprint)} />
       </p>
     </>
