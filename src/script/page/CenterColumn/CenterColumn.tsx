@@ -22,7 +22,6 @@ import {amplify} from 'amplify';
 import {FC, useEffect, useState} from 'react';
 
 import HistoryExport from 'Components/HistoryExport';
-// import HistoryImport from 'Components/HistoryImport';
 import ConnectRequests from 'Components/ConnectRequests';
 import ConversationList from 'Components/Conversation';
 import GroupCreationModal from 'Components/Modals/GroupCreation/GroupCreationModal';
@@ -33,9 +32,9 @@ import {t} from 'Util/LocalizerUtil';
 import MainContent from '../MainContent';
 import RootProvider from '../RootProvider';
 
-import {ContentViewModel} from '../../view_model/ContentViewModel';
 import {Conversation} from '../../entity/Conversation';
 import {Message} from '../../entity/message/Message';
+import {ContentViewModel} from '../../view_model/ContentViewModel';
 
 interface ShowConversationOptions {
   exposeMessage?: Message;
@@ -78,6 +77,10 @@ const CenterColumn: FC<CenterColumnProps> = ({contentViewModel}) => {
 
   useEffect(() => {
     amplify.subscribe(WebAppEvents.CONVERSATION.SHOW, onConversationShow);
+
+    return () => {
+      amplify.unsubscribe(WebAppEvents.CONVERSATION.SHOW, onConversationShow);
+    };
   }, []);
 
   return (
@@ -95,11 +98,6 @@ const CenterColumn: FC<CenterColumnProps> = ({contentViewModel}) => {
       )}
 
       {state === ContentViewModel.STATE.HISTORY_EXPORT && <HistoryExport userState={userState} />}
-
-      {/* TODO: Move this functionality after migrate '<div id="app" class="app">' to react */}
-      {/*{state === ContentViewModel.STATE.HISTORY_IMPORT && (*/}
-      {/*  <HistoryImport backupRepository={contentViewModel.repositories.backup} />*/}
-      {/*)}*/}
 
       <GroupCreationModal userState={userState} teamState={teamState} />
 

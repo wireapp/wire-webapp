@@ -1,4 +1,3 @@
-/* eslint-disable */
 /*
  * Wire
  * Copyright (C) 2022 Wire Swiss GmbH
@@ -18,14 +17,7 @@
  *
  */
 
-import {
-  FC,
-  MouseEvent as ReactMouseEvent,
-  KeyboardEvent as ReactKeyboardEvent,
-  useContext,
-  useEffect,
-  useState,
-} from 'react';
+import {FC, MouseEvent as ReactMouseEvent, UIEvent, useContext, useEffect, useState} from 'react';
 import {amplify} from 'amplify';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import {groupBy} from 'underscore';
@@ -57,11 +49,13 @@ import {MotionDuration} from '../../motion/MotionDuration';
 import {getLogger} from 'Util/Logger';
 import {RootContext} from '../../page/RootProvider';
 import {showDetailViewModal} from 'Components/Modals/DetailViewModal';
+import {ServiceEntity} from '../../integration/ServiceEntity';
+import {isServiceEntity} from '../../guards/Service';
 
 type ReadMessageBuffer = {conversation: ConversationEntity; message: Message};
 
 interface ConversationListProps {
-  initialMessage?: Message;
+  readonly initialMessage?: Message;
   readonly teamState: TeamState;
   readonly userState: UserState;
 }
@@ -96,12 +90,15 @@ const ConversationList: FC<ConversationListProps> = ({initialMessage, teamState,
     }
   };
 
-  const showUserDetails = (userEntity: User) => {
-    // what do do with unwrap (?)
-    // userEntity = ko.unwrap(userEntity);
+  const showUserDetails = (userEntity: User | ServiceEntity) => {
     const isSingleModeConversation = is1to1 || isRequest;
 
-    if (activeConversation && (userEntity.isDeleted || (isSingleModeConversation && !userEntity.isMe))) {
+    const isUserEntity = !isServiceEntity(userEntity);
+    if (
+      activeConversation &&
+      isUserEntity &&
+      (userEntity.isDeleted || (isSingleModeConversation && !userEntity.isMe))
+    ) {
       return mainViewModel.panel.togglePanel(PanelViewModel.STATE.CONVERSATION_DETAILS, {
         entity: activeConversation,
       });
@@ -177,9 +174,8 @@ const ConversationList: FC<ConversationListProps> = ({initialMessage, teamState,
         try {
           const userEntity = await repositories.user.getUserById({domain, id: userId});
           showUserDetails(userEntity);
-          //  TODO: Fix type
-        } catch (error: any) {
-          if (error.type !== UserError.TYPE.USER_NOT_FOUND) {
+        } catch (error) {
+          if (error instanceof UserError && error.type !== UserError.TYPE.USER_NOT_FOUND) {
             throw error;
           }
         }
@@ -190,10 +186,7 @@ const ConversationList: FC<ConversationListProps> = ({initialMessage, teamState,
     return true;
   };
 
-  const showDetail = async (
-    messageEntity: ContentMessage,
-    event: ReactMouseEvent | ReactKeyboardEvent,
-  ): Promise<void> => {
+  const showDetail = async (messageEntity: ContentMessage, event: UIEvent): Promise<void> => {
     if (messageEntity.isExpired() || event.currentTarget.classList.contains('image-asset--no-image')) {
       return;
     }

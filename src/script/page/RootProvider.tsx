@@ -17,13 +17,14 @@
  *
  */
 
-import {FC, createContext} from 'react';
+import {FC, ReactNode, createContext} from 'react';
+
 import {ContentViewModel} from '../view_model/ContentViewModel';
 
 export const RootContext = createContext<ContentViewModel | null>(null);
 
 interface RootProviderProps {
-  children: any;
+  children?: ReactNode;
   value: ContentViewModel;
 }
 

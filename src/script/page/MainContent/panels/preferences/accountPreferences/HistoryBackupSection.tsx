@@ -90,8 +90,6 @@ const HistoryBackupSection: React.FC<HistoryBackupSectionProps> = ({backupReposi
             onChange={(event: ChangeEvent<HTMLInputElement>) => {
               const file = event.target.files?.[0];
               if (file) {
-                amplify.publish(WebAppEvents.CONTENT.SWITCH, ContentViewModel.STATE.HISTORY_IMPORT);
-
                 importHistoryFile({
                   backupRepository,
                   file,

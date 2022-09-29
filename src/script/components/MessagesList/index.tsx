@@ -17,7 +17,8 @@
  *
  */
 
-import React, {useEffect, useRef, useState} from 'react';
+import cx from 'classnames';
+import React, {FC, MouseEvent as ReactMouseEvent, useEffect, useRef, useState} from 'react';
 import {ConversationRepository} from 'src/script/conversation/ConversationRepository';
 import {MessageRepository} from 'src/script/conversation/MessageRepository';
 import {Conversation as ConversationEntity, Conversation} from '../../entity/Conversation';
@@ -31,11 +32,11 @@ import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import Message from './Message';
 import {Text} from 'src/script/entity/message/Text';
 import {useResizeObserver} from '../../ui/resizeObserver';
-import useHitTopOrBottom from '../../hooks/useHitTopOrBottom';
 import {isContentMessage} from '../../guards/Message';
-import {useFadingScrollbar} from '../../ui/fadingScrollbar';
+import {initFadingScrollbar} from '../../ui/fadingScrollbar';
 import {isMemberMessage} from '../../guards/Message';
 import {ServiceEntity} from 'src/script/integration/ServiceEntity';
+import onHitTopOrBottom from '../../ui/onHitTopOrBottom';
 
 type FocusedElement = {center?: boolean; element: Element};
 
@@ -58,7 +59,7 @@ interface MessagesListParams {
     deleteMessageEveryone: (conversation: Conversation, message: MessageEntity) => void;
   };
   messageRepository: MessageRepository;
-  onClickMessage: (message: ContentMessage | Text, event: React.UIEvent) => void;
+  onClickMessage: (message: ContentMessage | Text, event: ReactMouseEvent) => void;
   onLoading: (isLoading: boolean) => void;
   resetSession: (messageError: DecryptErrorMessage) => void;
   selfUser: User;
@@ -98,7 +99,7 @@ const filterDuplicatedMemberMessages = (messages: MessageEntity[]) => {
 
 const filterHiddenMessages = (messages: MessageEntity[]) => messages.filter(message => message.visible());
 
-const MessagesList: React.FC<MessagesListParams> = ({
+const MessagesList: FC<MessagesListParams> = ({
   conversation,
   initialMessage,
   selfUser,
@@ -142,7 +143,6 @@ const MessagesList: React.FC<MessagesListParams> = ({
 
   const filteredMessages = filterDuplicatedMemberMessages(filterHiddenMessages(allMessages));
 
-  const messageListRef = useRef<HTMLDivElement>(null);
   const messageContainerRef = useRef<HTMLDivElement>(null);
 
   const shouldShowInvitePeople = isActiveParticipant && inTeam && (isGuestRoom || isGuestAndServicesRoom);
@@ -229,14 +229,11 @@ const MessagesList: React.FC<MessagesListParams> = ({
     }
   };
 
-  useHitTopOrBottom(loadPrecedingMessages, loadFollowingMessages, messageListRef.current);
-  useFadingScrollbar(messageListRef.current);
-
   useEffect(() => {
     if (loaded && messageContainerRef.current) {
       updateScroll(messageContainerRef.current);
     }
-  }, [filteredMessages.length, messageContainerRef.current, loaded]);
+  }, [filteredMessages.length, loaded]);
 
   useEffect(() => {
     onLoading(true);
@@ -253,8 +250,15 @@ const MessagesList: React.FC<MessagesListParams> = ({
   }
 
   return (
-    <div ref={messageListRef} id="message-list" className="message-list">
-      <div ref={messageContainerRef} className={`messages ${verticallyCenterMessage() ? 'flex-center' : ''}`}>
+    <div
+      ref={element => {
+        initFadingScrollbar(element);
+        onHitTopOrBottom(element, loadPrecedingMessages, loadFollowingMessages);
+      }}
+      id="message-list"
+      className="message-list"
+    >
+      <div ref={messageContainerRef} className={cx('messages', {'flex-center': verticallyCenterMessage()})}>
         {filteredMessages.map((message, index) => {
           const previousMessage = filteredMessages[index - 1];
           const isLastDeliveredMessage = lastDeliveredMessage?.id === message.id;

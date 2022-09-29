@@ -18,6 +18,7 @@
  */
 
 import {QualifiedId} from '@wireapp/api-client/src/user';
+import {MouseEvent as ReactMouseEvent} from 'react';
 
 import {Message as BaseMessage} from '../../../entity/message/Message';
 import type {ContentMessage} from '../../../entity/message/ContentMessage';
@@ -45,7 +46,7 @@ export interface MessageActions {
   onClickImage: (message: ContentMessage, event: React.UIEvent) => void;
   onClickInvitePeople: () => void;
   onClickLikes: (message: BaseMessage) => void;
-  onClickMessage: (message: ContentMessage | Text, event: React.UIEvent) => void;
+  onClickMessage: (message: ContentMessage | Text, event: ReactMouseEvent) => void;
   onClickParticipants: (participants: User[]) => void;
   onClickReceipts: (message: BaseMessage) => void;
   onClickResetSession: (messageError: DecryptErrorMessage) => void;
@@ -66,7 +67,7 @@ export interface MessageParams extends MessageActions {
     deleteMessage: (conversation: Conversation, message: BaseMessage) => void;
     deleteMessageEveryone: (conversation: Conversation, message: BaseMessage) => void;
   };
-  messageRepository: Pick<MessageRepository, 'getMessageInConversationById' | 'sendButtonAction' | 'toggleLike'>;
+  messageRepository: MessageRepository;
   onVisible?: () => void;
   previousMessage?: BaseMessage;
   selfId: QualifiedId;

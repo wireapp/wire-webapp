@@ -17,21 +17,21 @@
  *
  */
 
-import {useEffect} from 'react';
+const onHitTopOrBottom = (element: HTMLElement | null, onHitTop: () => void, onHitBottom: () => void) => {
+  if (!element) {
+    return;
+  }
 
-const useHitTopOrBottom = (onHitTop: () => void, onHitBottom: () => void, scrollingElement?: HTMLDivElement | null) => {
   const onScroll = () => {
-    if (scrollingElement) {
-      const scrollPosition = Math.ceil(scrollingElement.scrollTop);
-      const scrollEnd = scrollingElement.offsetHeight + scrollPosition;
-      const hitTop = scrollPosition <= 0;
-      const hitBottom = scrollEnd >= scrollingElement.scrollHeight;
+    const scrollPosition = Math.ceil(element.scrollTop);
+    const scrollEnd = element.offsetHeight + scrollPosition;
+    const hitTop = scrollPosition <= 0;
+    const hitBottom = scrollEnd >= element.scrollHeight;
 
-      if (hitTop) {
-        onHitTop();
-      } else if (hitBottom) {
-        onHitBottom();
-      }
+    if (hitTop) {
+      onHitTop();
+    } else if (hitBottom) {
+      onHitBottom();
     }
   };
 
@@ -53,15 +53,8 @@ const useHitTopOrBottom = (onHitTop: () => void, onHitBottom: () => void, scroll
     return onHitBottom();
   };
 
-  useEffect(() => {
-    scrollingElement?.addEventListener('scroll', onScroll);
-    scrollingElement?.addEventListener('wheel', onMouseWheel);
-
-    return () => {
-      scrollingElement?.removeEventListener('scroll', onScroll);
-      scrollingElement?.removeEventListener('wheel', onMouseWheel);
-    };
-  }, [scrollingElement]);
+  element.addEventListener('scroll', onScroll);
+  element.addEventListener('wheel', onMouseWheel);
 };
 
-export default useHitTopOrBottom;
+export default onHitTopOrBottom;
