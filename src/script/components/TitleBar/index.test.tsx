@@ -39,7 +39,7 @@ import {ContentViewModel} from '../../view_model/ContentViewModel';
 import * as uiKit from '@wireapp/react-ui-kit';
 
 jest.mock('@wireapp/react-ui-kit', () => ({
-  ...jest.requireActual('@wireapp/react-ui-kit'),
+  ...(jest.requireActual('@wireapp/react-ui-kit') as any),
   useMatchMedia: jest.fn(),
 }));
 
