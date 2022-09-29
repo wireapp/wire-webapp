@@ -20,6 +20,7 @@
 import React from 'react';
 import {createRoot, Root} from 'react-dom/client';
 import {MainViewModel} from '../../../view_model/MainViewModel';
+import {rightPanelAnimationTimeout} from '../RightSidebar';
 
 let elementContainer: HTMLDivElement | undefined;
 let reactRoot: Root;
@@ -66,7 +67,7 @@ const toggleRightSidebar =
   (props: T) => {
     const rightPanelId = 'right-column';
     const rightPanelClassName = 'right-column';
-    const widthTransition = 'width .35s cubic-bezier(0.19, 1, 0.22, 1)';
+    const widthTransition = `width ${rightPanelAnimationTimeout}ms cubic-bezier(0.19, 1, 0.22, 1)`;
 
     const app = document.querySelector<HTMLElement>('#app');
     const titleBar = document.querySelector<HTMLElement>('#conversation-title-bar');
@@ -80,20 +81,26 @@ const toggleRightSidebar =
 
         if (!isNarrowScreen) {
           if (titleBar) {
-            titleBar.style.width = `${centerWidthClose}px`;
-            titleBar.style.transition = widthTransition;
+            requestAnimationFrame(() => {
+              titleBar.style.width = `${centerWidthClose}px`;
+              titleBar.style.transition = widthTransition;
+            });
           }
 
           if (input) {
-            input.style.width = `${centerWidthClose}px`;
-            input.style.transition = widthTransition;
+            requestAnimationFrame(() => {
+              input.style.width = `${centerWidthClose}px`;
+              input.style.transition = widthTransition;
+            });
           }
         }
 
-        if (elementContainer) {
-          elementContainer.style.transform = 'translateX(304px)';
-          elementContainer.style.transition = 'transform .35s cubic-bezier(0.19, 1, 0.22, 1)';
-        }
+        requestAnimationFrame(() => {
+          if (elementContainer) {
+            elementContainer.style.transform = 'translateX(304px)';
+            elementContainer.style.transition = `transform ${rightPanelAnimationTimeout}ms cubic-bezier(0.19, 1, 0.22, 1)`;
+          }
+        });
 
         requestAnimationFrame(() => {
           setTimeout(() => {
@@ -109,14 +116,14 @@ const toggleRightSidebar =
 
             forceCloseRightPanel();
             props.onClose?.();
-          }, 350);
+          }, rightPanelAnimationTimeout);
         });
       }
     };
 
     if (rightPanel) {
-      applyStyle(rightPanel, panelStyle.open);
       onClose();
+      applyStyle(rightPanel, panelStyle.open);
 
       return;
     }
@@ -170,7 +177,7 @@ const toggleRightSidebar =
             input.style.transition = '';
             input.style.width = '';
           }
-        }, 350);
+        }, rightPanelAnimationTimeout);
       });
 
       reactRoot = createRoot(elementContainer);

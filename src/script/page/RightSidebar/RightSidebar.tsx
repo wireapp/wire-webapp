@@ -20,7 +20,7 @@
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {amplify} from 'amplify';
-import {FC, ReactNode, useEffect, useState} from 'react';
+import {FC, ReactNode, cloneElement, useEffect, useState} from 'react';
 import {CSSTransition, TransitionGroup} from 'react-transition-group';
 import {container} from 'tsyringe';
 
@@ -54,16 +54,13 @@ import {ContentViewModel} from '../../view_model/ContentViewModel';
 import {MainViewModel, ViewModelRepositories} from '../../view_model/MainViewModel';
 
 export const OPEN_CONVERSATION_DETAILS = 'OPEN_CONVERSATION_DETAILS';
+export const rightPanelAnimationTimeout = 350; // ms
 
-const Animated: FC<{children: ReactNode; direction?: string}> = ({children, direction = 'left', ...rest}) => {
-  const classDirection = `slide-${direction}`;
-
-  return (
-    <CSSTransition classNames={classDirection} timeout={350} {...rest}>
-      {children}
-    </CSSTransition>
-  );
-};
+const Animated: FC<{children: ReactNode}> = ({children, ...rest}) => (
+  <CSSTransition classNames="right-to-left" timeout={rightPanelAnimationTimeout} {...rest}>
+    {children}
+  </CSSTransition>
+);
 
 export enum PanelState {
   ADD_PARTICIPANTS = 'ADD_PARTICIPANTS',
@@ -121,10 +118,9 @@ const RightSidebar: FC<RightSidebarProps> = ({
 
   const [isAddMode, setIsAddMode] = useState<boolean>(false);
   const [currentEntity, setCurrentEntity] = useState<PanelEntity | null>(initialEntity);
+  const [animatePanelToLeft, setAnimatePanelToLeft] = useState<boolean>(true);
 
-  const {panelDepth, currentState, goBack, goTo, clearHistory} = usePanelHistory(initialState);
-
-  const isDeeper = panelDepth > 2;
+  const {currentState, goBack, goTo, clearHistory} = usePanelHistory(initialState);
 
   const userEntity = currentEntity && isUserEntity(currentEntity) ? currentEntity : null;
   const userServiceEntity = currentEntity && isUserServiceEntity(currentEntity) ? currentEntity : null;
@@ -142,6 +138,7 @@ const RightSidebar: FC<RightSidebarProps> = ({
   };
 
   const togglePanel = (newState: PanelState, entity: PanelEntity | null, addMode: boolean = false) => {
+    setAnimatePanelToLeft(true);
     goTo(newState);
     setCurrentEntity(entity);
     setIsAddMode(addMode);
@@ -150,11 +147,13 @@ const RightSidebar: FC<RightSidebarProps> = ({
   const onBackClick = (entity: PanelEntity | null = activeConversation) => {
     setCurrentEntity(entity);
     goBack();
+    setAnimatePanelToLeft(false);
   };
 
   const showDevices = (entity: User) => {
     setCurrentEntity(entity);
     goTo(PanelState.PARTICIPANT_DEVICES);
+    setAnimatePanelToLeft(true);
   };
 
   const switchContent = (newContentState: string) => {
@@ -181,9 +180,17 @@ const RightSidebar: FC<RightSidebarProps> = ({
   }
 
   return (
-    <TransitionGroup style={{height: '100%'}}>
+    <TransitionGroup
+      style={{height: '100%'}}
+      childFactory={child =>
+        cloneElement(child, {
+          classNames: animatePanelToLeft ? 'right-to-left' : 'left-to-right',
+          timeout: rightPanelAnimationTimeout,
+        })
+      }
+    >
       {currentState === PanelState.CONVERSATION_DETAILS && (
-        <Animated key={PanelState.CONVERSATION_DETAILS} direction={isDeeper ? 'left' : 'right'}>
+        <Animated key={PanelState.CONVERSATION_DETAILS}>
           <ConversationDetails
             onClose={closePanel}
             togglePanel={togglePanel}
@@ -201,7 +208,7 @@ const RightSidebar: FC<RightSidebarProps> = ({
       )}
 
       {currentState === PanelState.GROUP_PARTICIPANT_USER && userEntity && (
-        <Animated key={PanelState.GROUP_PARTICIPANT_USER} direction={isDeeper ? 'left' : 'right'}>
+        <Animated key={PanelState.GROUP_PARTICIPANT_USER}>
           <GroupParticipantUser
             onBack={onBackClick}
             onClose={closePanel}
@@ -220,7 +227,7 @@ const RightSidebar: FC<RightSidebarProps> = ({
       )}
 
       {currentState === PanelState.NOTIFICATIONS && (
-        <Animated key={PanelState.NOTIFICATIONS} direction={isDeeper ? 'left' : 'right'}>
+        <Animated key={PanelState.NOTIFICATIONS}>
           <Notifications
             activeConversation={activeConversation}
             repositories={repositories}
@@ -231,7 +238,7 @@ const RightSidebar: FC<RightSidebarProps> = ({
       )}
 
       {currentState === PanelState.PARTICIPANT_DEVICES && userEntity && (
-        <Animated key={PanelState.PARTICIPANT_DEVICES} direction={isDeeper ? 'left' : 'right'}>
+        <Animated key={PanelState.PARTICIPANT_DEVICES}>
           <ParticipantDevices
             repositories={repositories}
             onClose={closePanel}
@@ -242,7 +249,7 @@ const RightSidebar: FC<RightSidebarProps> = ({
       )}
 
       {currentState === PanelState.TIMED_MESSAGES && (
-        <Animated key={PanelState.TIMED_MESSAGES} direction={isDeeper ? 'left' : 'right'}>
+        <Animated key={PanelState.TIMED_MESSAGES}>
           <TimedMessages
             activeConversation={activeConversation}
             repositories={repositories}
@@ -253,7 +260,7 @@ const RightSidebar: FC<RightSidebarProps> = ({
       )}
 
       {currentState === PanelState.GUEST_OPTIONS && (
-        <Animated key={PanelState.GUEST_OPTIONS} direction={isDeeper ? 'left' : 'right'}>
+        <Animated key={PanelState.GUEST_OPTIONS}>
           <GuestServicesOptions
             isGuest
             activeConversation={activeConversation}
@@ -267,7 +274,7 @@ const RightSidebar: FC<RightSidebarProps> = ({
       )}
 
       {currentState === PanelState.SERVICES_OPTIONS && (
-        <Animated key={PanelState.SERVICES_OPTIONS} direction={isDeeper ? 'left' : 'right'}>
+        <Animated key={PanelState.SERVICES_OPTIONS}>
           <GuestServicesOptions
             isGuest={false}
             activeConversation={activeConversation}
@@ -281,7 +288,7 @@ const RightSidebar: FC<RightSidebarProps> = ({
       )}
 
       {currentState === PanelState.GROUP_PARTICIPANT_SERVICE && serviceEntity && userServiceEntity && (
-        <Animated key={PanelState.GROUP_PARTICIPANT_SERVICE} direction={isDeeper ? 'left' : 'right'}>
+        <Animated key={PanelState.GROUP_PARTICIPANT_SERVICE}>
           <GroupParticipantService
             activeConversation={activeConversation}
             actionsViewModel={actionsViewModel}
@@ -297,7 +304,7 @@ const RightSidebar: FC<RightSidebarProps> = ({
       )}
 
       {currentState === PanelState.ADD_PARTICIPANTS && (
-        <Animated key={PanelState.ADD_PARTICIPANTS} direction={isDeeper ? 'left' : 'right'}>
+        <Animated key={PanelState.ADD_PARTICIPANTS}>
           <AddParticipants
             activeConversation={activeConversation}
             onBack={onBackClick}
@@ -314,7 +321,7 @@ const RightSidebar: FC<RightSidebarProps> = ({
       )}
 
       {currentState === PanelState.MESSAGE_DETAILS && messageEntity && (
-        <Animated key={PanelState.MESSAGE_DETAILS} direction={isDeeper ? 'left' : 'right'}>
+        <Animated key={PanelState.MESSAGE_DETAILS}>
           <MessageDetails
             activeConversation={activeConversation}
             conversationRepository={conversationRepository}
@@ -330,7 +337,7 @@ const RightSidebar: FC<RightSidebarProps> = ({
       )}
 
       {currentState === PanelState.CONVERSATION_PARTICIPANTS && (
-        <Animated key={PanelState.CONVERSATION_PARTICIPANTS} direction={isDeeper ? 'left' : 'right'}>
+        <Animated key={PanelState.CONVERSATION_PARTICIPANTS}>
           <ConversationParticipants
             activeConversation={activeConversation}
             conversationRepository={conversationRepository}

@@ -58,7 +58,7 @@ import {initFadingScrollbar} from '../../../ui/fadingScrollbar';
 import {PanelEntity, PanelState} from '../RightSidebar';
 
 const CONFIG = {
-  MAX_USERS_VISIBLE: 1,
+  MAX_USERS_VISIBLE: 7,
   REDUCED_USERS_COUNT: 5,
 };
 
