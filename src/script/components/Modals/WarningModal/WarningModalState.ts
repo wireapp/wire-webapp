@@ -84,7 +84,7 @@ const useWarningModalState = create<WarningModalState>((set, get) => ({
 const onIncmoingModalEvent = (type: WarningModalType, options: ModalOptions, modalId = createRandomUuid()) => {
   const {currentModalId, existsInQueue, addToQueue, replaceInQueue} = useWarningModalState.getState();
 
-  const alreadyOpen = modalId && modalId === currentModalId;
+  const alreadyOpen = modalId === currentModalId;
   if (alreadyOpen) {
     return showNextModalInQueue();
   }
