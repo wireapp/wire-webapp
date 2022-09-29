@@ -83,10 +83,10 @@ const GroupCreationModal: React.FC<GroupCreationModalProps> = ({
     'isMLSEnabled',
   ]);
 
-  const enableMlsToggle = isMLSEnabledForTeamUser && Config.getConfig().FEATURE.ENABLE_MLS;
+  const enableMLSToggle = isMLSEnabledForTeamUser && Config.getConfig().FEATURE.ENABLE_MLS;
 
   //if user is not able to choose mls (team does not allow or feature flag is off), use proteus as default
-  const defaultProtocol = enableMlsToggle
+  const defaultProtocol = enableMLSToggle
     ? teamState.teamFeatures().mls?.config.defaultProtocol
     : ConversationProtocol.PROTEUS;
 
@@ -184,7 +184,7 @@ const GroupCreationModal: React.FC<GroupCreationModalProps> = ({
           groupName,
           isTeam ? accessState : undefined,
           {
-            protocol: enableMlsToggle ? selectedProtocol.value : defaultProtocol,
+            protocol: enableMLSToggle ? selectedProtocol.value : defaultProtocol,
             receipt_mode: enableReadReceipts ? RECEIPT_MODE.ON : RECEIPT_MODE.OFF,
           },
         );
@@ -423,7 +423,7 @@ const GroupCreationModal: React.FC<GroupCreationModalProps> = ({
                     isDisabled={false}
                     name={t('readReceiptsToggleName')}
                   />
-                  {enableMlsToggle && (
+                  {enableMLSToggle && (
                     <>
                       <Select
                         id="select-protocol"
