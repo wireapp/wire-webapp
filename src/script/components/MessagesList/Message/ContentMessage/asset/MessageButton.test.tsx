@@ -60,8 +60,7 @@ describe('MessageButton', () => {
 
     const {queryByTestId, container} = render(<MessageButton {...props} />);
 
-    const errorMessageElement = queryByTestId('message-button-error');
-    expect(errorMessageElement).toBeNull();
+    expect(queryByTestId('message-button-error')).toBeNull();
 
     const selectedButton = container.querySelector(`button[data-uie-uid="${messageId}"]`);
     expect(selectedButton).not.toBeNull();

@@ -63,9 +63,7 @@ describe('FileAssetComponent', () => {
     };
 
     const {queryByTestId} = render(<FileAssetComponent {...props} />);
-
-    const fileElement = queryByTestId('file');
-    expect(fileElement).toBeNull();
+    expect(queryByTestId('file')).toBeNull();
   });
 
   it('shows the file size in MB', () => {
@@ -75,7 +73,6 @@ describe('FileAssetComponent', () => {
     };
 
     const {queryByText} = render(<FileAssetComponent {...props} />);
-
     expect(queryByText('10 MB')).not.toBeNull();
   });
 });
