@@ -78,7 +78,18 @@ const GroupCreationModal: React.FC<GroupCreationModalProps> = ({
   userState = container.resolve(UserState),
   teamState = container.resolve(TeamState),
 }) => {
-  const defaultProtocol = teamState.teamFeatures().mls?.config.defaultProtocol;
+  const {isTeam, isMLSEnabled: isMLSEnabledForTeamUser} = useKoSubscribableChildren(teamState, [
+    'isTeam',
+    'isMLSEnabled',
+  ]);
+
+  const enableMLSToggle = isMLSEnabledForTeamUser && Config.getConfig().FEATURE.ENABLE_MLS;
+
+  //if user is not able to choose mls (team does not allow or feature flag is off), use proteus as default
+  const defaultProtocol = enableMLSToggle
+    ? teamState.teamFeatures().mls?.config.defaultProtocol
+    : ConversationProtocol.PROTEUS;
+
   const protocolOptions: ProtocolOption[] = [ConversationProtocol.PROTEUS, ConversationProtocol.MLS].map(protocol => ({
     label: `${t(`modalCreateGroupProtocolSelect.${protocol}`)}${
       protocol === defaultProtocol ? t(`modalCreateGroupProtocolSelect.default`) : ''
@@ -106,8 +117,6 @@ const GroupCreationModal: React.FC<GroupCreationModalProps> = ({
   const maxSize = ConversationRepository.CONFIG.GROUP.MAX_SIZE;
 
   const onEscape = () => setIsShown(false);
-  const {isTeam, isMLSEnabled} = useKoSubscribableChildren(teamState, ['isTeam', 'isMLSEnabled']);
-  const enableMlsToggle = isMLSEnabled && Config.getConfig().FEATURE.ENABLE_MLS;
 
   useEffect(() => {
     const showCreateGroup = (_: string, userEntity: User) => {
@@ -175,7 +184,7 @@ const GroupCreationModal: React.FC<GroupCreationModalProps> = ({
           groupName,
           isTeam ? accessState : undefined,
           {
-            protocol: enableMlsToggle ? selectedProtocol.value : defaultProtocol,
+            protocol: enableMLSToggle ? selectedProtocol.value : defaultProtocol,
             receipt_mode: enableReadReceipts ? RECEIPT_MODE.ON : RECEIPT_MODE.OFF,
           },
         );
@@ -414,7 +423,7 @@ const GroupCreationModal: React.FC<GroupCreationModalProps> = ({
                     isDisabled={false}
                     name={t('readReceiptsToggleName')}
                   />
-                  {enableMlsToggle && (
+                  {enableMLSToggle && (
                     <>
                       <Select
                         id="select-protocol"
