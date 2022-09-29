@@ -23,7 +23,6 @@ import cx from 'classnames';
 import {noop, setContextMenuPosition} from 'Util/util';
 import {t} from 'Util/LocalizerUtil';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
-import useEffectRef from 'Util/useEffectRef';
 
 import {AVATAR_SIZE} from 'Components/Avatar';
 
@@ -96,24 +95,16 @@ const ConversationListCell: React.FC<ConversationListCellProps> = ({
 
   const isActive = isSelected(conversation);
 
-  const [viewportElementRef, setViewportElementRef] = useEffectRef<HTMLElement>();
-
   const conversationRef = useRef<HTMLDivElement>(null);
   const contextMenuRef = useRef<HTMLButtonElement>(null);
   const [focusContextMenu, setContextMenuFocus] = useState(false);
   const [isContextMenuOpen, setContextMenuOpen] = useState(false);
 
-  useEffect(() => {
-    const handleRightClick = (event: MouseEvent) => {
-      event.stopPropagation();
-      event.preventDefault();
-      rightClick(conversation, event);
-    };
-    viewportElementRef?.addEventListener('contextmenu', handleRightClick);
-    return () => {
-      viewportElementRef?.removeEventListener('contextmenu', handleRightClick);
-    };
-  }, [viewportElementRef]);
+  const openContextMenu = (event: React.MouseEvent) => {
+    event.stopPropagation();
+    event.preventDefault();
+    rightClick(conversation, event.nativeEvent);
+  };
 
   const cellState = useMemo(() => generateCellState(conversation), [unreadState, mutedState, isRequest]);
 
@@ -138,7 +129,7 @@ const ConversationListCell: React.FC<ConversationListCellProps> = ({
     if (focus && conversationRef.current && showFocus) {
       conversationRef.current.focus();
     }
-  }, [focus]);
+  }, [focus, showFocus]);
 
   useEffect(() => {
     // Move element into view when it is focused
@@ -169,10 +160,10 @@ const ConversationListCell: React.FC<ConversationListCellProps> = ({
     if (isActive && showFocus && isFolder) {
       handleFocus(index);
     }
-  }, [isActive, showFocus]);
+  }, [handleFocus, index, isActive, isFolder, showFocus]);
 
   return (
-    <li ref={setViewportElementRef}>
+    <li onContextMenu={openContextMenu}>
       <div
         data-uie-name={dataUieName}
         data-uie-uid={conversation.id}
@@ -204,7 +195,7 @@ const ConversationListCell: React.FC<ConversationListCellProps> = ({
             )}
           </div>
           <div className="conversation-list-cell-center">
-            {is1to1 && selfUser.inTeam() ? (
+            {is1to1 && selfUser?.inTeam() ? (
               <AvailabilityState
                 className="conversation-list-cell-availability"
                 availability={availabilityOfUser}

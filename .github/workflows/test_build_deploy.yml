@@ -81,7 +81,7 @@ jobs:
         run: yarn test --coverage --coverage-reporters=lcov --detectOpenHandles=false
 
       - name: Monitor coverage
-        uses: codecov/codecov-action@v3.1.0
+        uses: codecov/codecov-action@v3.1.1
         with:
           fail_ci_if_error: false
           files: ./coverage/lcov.info
@@ -130,7 +130,7 @@ jobs:
 
       # Stage 1: https://wire-webapp-edge.zinfra.io/
       - name: Deploy edge build to Elastic Beanstalk
-        if: env.BRANCH_NAME == 'edge'
+        if: env.BRANCH_NAME == 'dev'
         uses: einaregilsson/beanstalk-deploy@v20
         with:
           application_name: ${{env.AWS_APPLICATION_NAME}}

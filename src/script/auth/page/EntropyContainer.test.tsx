@@ -31,7 +31,7 @@ describe('EntropyContainer', () => {
 
   it('renders elements', () => {
     const {getByText, queryByText} = render(withTheme(withIntl(<EntropyContainer onSetEntropy={mockonSetEntropy} />)));
-    expect(getByText(/create entropy/gi)).toBeTruthy();
+    expect(getByText(/Increase your account’s security/gi)).toBeTruthy();
     expect(getByText(/move your mouse/gi)).toBeTruthy();
     expect(queryByText(/success/gi)).toBeNull();
   });

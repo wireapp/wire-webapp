@@ -33,7 +33,15 @@ import {MediaDevicesHandler} from 'src/script/media/MediaDevicesHandler';
 import {CallActions} from 'src/script/view_model/CallingViewModel';
 import {CallingRepository} from 'src/script/calling/CallingRepository';
 import {TeamState} from 'src/script/team/TeamState';
-import {waitFor} from '@testing-library/react';
+import {waitFor, render} from '@testing-library/react';
+
+jest.mock(
+  'Components/utils/InViewport',
+  () =>
+    function MockInViewport() {
+      return <div></div>;
+    },
+);
 
 class ConversationListCallingCellPage extends TestPage<CallingCellProps> {
   constructor(props?: CallingCellProps) {
@@ -47,11 +55,7 @@ class ConversationListCallingCellPage extends TestPage<CallingCellProps> {
   getCallDuration = () => this.get('[data-uie-name="call-duration"]');
 }
 
-const createCall = (
-  state: CALL_STATE,
-  selfUser = new User(createRandomUuid(), null),
-  selfClientId = createRandomUuid(),
-) => {
+const createCall = (state: CALL_STATE, selfUser = new User(createRandomUuid()), selfClientId = createRandomUuid()) => {
   const selfParticipant = new Participant(selfUser, selfClientId);
   const call = new Call({domain: '', id: ''}, {domain: '', id: ''}, 0, selfParticipant, CALL_TYPE.NORMAL, {
     currentAvailableDeviceId: {
@@ -72,7 +76,7 @@ const createProps = async () => {
   jest.spyOn(mockTeamState, 'isExternal').mockReturnValue(false);
 
   const conversation = new Conversation();
-  conversation.participating_user_ets([new User('id', null)]);
+  conversation.participating_user_ets([new User('id')]);
   return {
     call: createCall(CALL_STATE.MEDIA_ESTAB),
     callActions: {} as CallActions,
@@ -90,10 +94,13 @@ describe('ConversationListCallingCell', () => {
   it('displays an incoming ringing call', async () => {
     const props = await createProps();
     props.call.state(CALL_STATE.INCOMING);
-    const callingCellPage = new ConversationListCallingCellPage(props);
+    const {container} = render(<ConversationListCallingCell {...props} />);
 
-    expect(callingCellPage.getAcceptButton()).not.toBeNull();
-    expect(callingCellPage.getDeclineButton()).not.toBeNull();
+    const acceptButton = container.querySelector('[data-uie-name="do-call-controls-call-accept"]');
+    const declineButton = container.querySelector('[data-uie-name="do-call-controls-call-decline"]');
+
+    expect(acceptButton).not.toBeNull();
+    expect(declineButton).not.toBeNull();
   });
 
   it('displays an outgoing ringing call', async () => {
@@ -107,30 +114,38 @@ describe('ConversationListCallingCell', () => {
   it('displays a call that is connecting', async () => {
     const props = await createProps();
     props.call.state(CALL_STATE.ANSWERED);
-    const callingCellPage = new ConversationListCallingCellPage(props);
 
-    expect(callingCellPage.getConnectingLabel()).not.toBeNull();
+    const {container} = render(<ConversationListCallingCell {...props} />);
+
+    const connectingLabel = container.querySelector('[data-uie-name="call-label-connecting"]');
+    expect(connectingLabel).not.toBeNull();
   });
 
   it('displays the running time of an ongoing call', async () => {
     const props = await createProps();
     props.call.state(CALL_STATE.MEDIA_ESTAB);
-    const callingCellPage = new ConversationListCallingCellPage(props);
-    jest.useFakeTimers('modern');
+
+    const {getByText, rerender, container} = render(<ConversationListCallingCell {...props} />);
+
+    jest.useFakeTimers();
     const now = Date.now();
     jest.setSystemTime(now);
     act(() => {
       props.call.startedAt(now);
-      callingCellPage.setProps(props);
+      rerender(<ConversationListCallingCell {...props} />);
     });
-    await waitFor(() => callingCellPage.renderResults.getByText('00:00'));
 
-    expect(callingCellPage.getCallDuration().textContent).toBe('00:00');
+    await waitFor(() => getByText('00:00'));
+
+    const callDuration = container.querySelector('[data-uie-name="call-duration"]');
+
+    expect(callDuration).not.toBeNull();
+    expect(callDuration!.textContent).toBe('00:00');
     act(() => {
       jest.advanceTimersByTime(10000);
     });
 
-    expect(callingCellPage.getCallDuration().textContent).toBe('00:10');
+    expect(callDuration!.textContent).toBe('00:10');
     jest.useRealTimers();
   });
 });

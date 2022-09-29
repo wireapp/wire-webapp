@@ -18,30 +18,18 @@
  */
 
 import {VIDEO_STATE} from '@wireapp/avs';
+import {render, fireEvent} from '@testing-library/react';
 import GroupVideoGrid, {GroupVideoGripProps} from './GroupVideoGrid';
-import TestPage from 'Util/test/TestPage';
 import {User} from '../../entity/User';
 import {Participant} from '../../calling/Participant';
 
-class GroupVideoGridPage extends TestPage<GroupVideoGripProps> {
-  constructor(props?: GroupVideoGripProps) {
-    super(GroupVideoGrid, props);
-  }
-
-  getGridsWrapper = () => this.get('div[data-uie-name="grids-wrapper"]');
-  getPausedGrid = () => this.get('div[data-uie-name="status-video-paused"]');
-  getThumbnail = () => this.get('div[data-uie-name="self-video-thumbnail-wrapper"]');
-  getThumbnailMutedIcon = () => this.get('[data-uie-name="status-call-audio-muted"]');
-
-  doubleClickOnGridFirstChild = () => this.doubleClick(this.getGridsWrapper().children[0]);
-}
-
 describe('GroupVideoGrid', () => {
   it('renders video grids', async () => {
-    const user = new User('id', null);
+    const user = new User('id');
     user.name('Anton Bertha');
     const participant = new Participant(user, 'example');
-    const groupVideoGrid = new GroupVideoGridPage({
+
+    const props: GroupVideoGripProps = {
       grid: {
         grid: [participant, participant],
         thumbnail: null,
@@ -49,46 +37,59 @@ describe('GroupVideoGrid', () => {
       maximizedParticipant: null,
       minimized: false,
       selfParticipant: participant,
-      setMaximizedParticipant: () => undefined,
-    });
+      setMaximizedParticipant: jest.fn(),
+    };
 
-    expect(groupVideoGrid.getGridsWrapper()).not.toBeNull();
-    expect(groupVideoGrid.getGridsWrapper().children.length).toBe(2);
+    const {container} = render(<GroupVideoGrid {...props} />);
+
+    const groupVideoGrid = container.querySelector('div[data-uie-name="grids-wrapper"]');
+
+    expect(groupVideoGrid).not.toBeNull();
+    expect(groupVideoGrid!.children.length).toBe(2);
   });
 
   it('maximizes a grid on double click', async () => {
-    const userOne = new User('idOne', null);
-    const userTwo = new User('idTwo', null);
+    const userOne = new User('idOne');
     userOne.name('Testing User One');
+
+    const userTwo = new User('idTwo');
     userOne.name('Testing User Two');
+
     const participantOne = new Participant(userOne, 'exampleOne');
     const participantTwo = new Participant(userTwo, 'exampleTwo');
-    let maximizedParticipant: Participant = null;
+
     const props: GroupVideoGripProps = {
       grid: {
         grid: [participantOne, participantTwo],
         thumbnail: null,
       },
-      maximizedParticipant,
+      maximizedParticipant: null,
       minimized: false,
       selfParticipant: participantOne,
-      setMaximizedParticipant: () => {
-        maximizedParticipant = participantTwo;
-      },
+      setMaximizedParticipant: jest.fn(),
     };
-    const groupVideoGrid = new GroupVideoGridPage(props);
 
-    expect(groupVideoGrid.getGridsWrapper().children.length).toBe(2);
-    groupVideoGrid.doubleClickOnGridFirstChild();
-    expect(maximizedParticipant.user.id).toBe(participantTwo.user.id);
+    const {container} = render(<GroupVideoGrid {...props} />);
+
+    const groupVideoGrid = container.querySelector('div[data-uie-name="grids-wrapper"]');
+    expect(groupVideoGrid).not.toBeNull();
+
+    expect(groupVideoGrid!.children.length).toBe(2);
+
+    const gridFirstChild = groupVideoGrid!.children[0];
+
+    fireEvent.doubleClick(gridFirstChild);
+    expect(props.setMaximizedParticipant).toHaveBeenCalledWith(participantOne);
   });
 
   it('renders a grid with paused video', async () => {
-    const user = new User('id', null);
+    const user = new User('id');
     user.name('Anton Bertha');
+
     const participant = new Participant(user, 'example');
     participant.videoState(VIDEO_STATE.PAUSED);
-    const groupVideoGrid = new GroupVideoGridPage({
+
+    const props: GroupVideoGripProps = {
       grid: {
         grid: [participant],
         thumbnail: null,
@@ -96,19 +97,24 @@ describe('GroupVideoGrid', () => {
       maximizedParticipant: null,
       minimized: false,
       selfParticipant: participant,
-      setMaximizedParticipant: () => undefined,
-    });
+      setMaximizedParticipant: jest.fn(),
+    };
 
-    expect(groupVideoGrid.getPausedGrid()).not.toBeNull();
+    const {container} = render(<GroupVideoGrid {...props} />);
+    const pausedGrid = container.querySelector('div[data-uie-name="status-video-paused"]');
+
+    expect(pausedGrid).not.toBeNull();
   });
 
   it('renders thumbnail', async () => {
-    const user = new User('id', null);
+    const user = new User('id');
     user.name('Anton Bertha');
+
     const participant = new Participant(user, 'example');
     participant.setVideoStream(new MediaStream(), false);
     participant.isMuted(true);
-    const groupVideoGrid = new GroupVideoGridPage({
+
+    const props: GroupVideoGripProps = {
       grid: {
         grid: [],
         thumbnail: participant,
@@ -116,20 +122,23 @@ describe('GroupVideoGrid', () => {
       maximizedParticipant: null,
       minimized: false,
       selfParticipant: participant,
-      setMaximizedParticipant: () => undefined,
-    });
+      setMaximizedParticipant: jest.fn(),
+    };
 
-    expect(groupVideoGrid.getThumbnail()).not.toBeNull();
-    expect(groupVideoGrid.getThumbnailMutedIcon()).not.toBeNull();
+    const {container} = render(<GroupVideoGrid {...props} />);
+    const thumbnailElement = container.querySelector('div[data-uie-name="self-video-thumbnail-wrapper"]');
+    const thumbnailMutedIcon = container.querySelector('[data-uie-name="status-call-audio-muted"]');
+
+    expect(thumbnailElement).not.toBeNull();
+    expect(thumbnailMutedIcon).not.toBeNull();
   });
 
-  it('renders muted thumbnail', async () => {
-    const user = new User('id', null);
-    user.name('Anton Bertha');
+  it('does not render muted thumbnail when un-muted', async () => {
+    const user = new User('id');
     const participant = new Participant(user, 'example');
-    participant.setVideoStream(new MediaStream(), false);
-    participant.isMuted(true);
-    const groupVideoGrid = new GroupVideoGridPage({
+    participant.isMuted(false);
+
+    const props: GroupVideoGripProps = {
       grid: {
         grid: [],
         thumbnail: participant,
@@ -137,9 +146,12 @@ describe('GroupVideoGrid', () => {
       maximizedParticipant: null,
       minimized: false,
       selfParticipant: participant,
-      setMaximizedParticipant: () => undefined,
-    });
+      setMaximizedParticipant: jest.fn(),
+    };
 
-    expect(groupVideoGrid.getThumbnailMutedIcon()).not.toBeNull();
+    const {container} = render(<GroupVideoGrid {...props} />);
+    const thumbnailMutedIcon = container.querySelector('[data-uie-name="status-call-audio-muted"]');
+
+    expect(thumbnailMutedIcon).toBeNull();
   });
 });

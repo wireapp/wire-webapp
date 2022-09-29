@@ -21,8 +21,8 @@ import {render, fireEvent} from '@testing-library/react';
 
 import GifImage from 'Components/Giphy/GifImage';
 
-const staticImage = 'https://unsplash.it/500/300';
-const hoveredImage = 'https://unsplash.it/500/400';
+const staticImage = 'https://mock.image/500/300';
+const hoveredImage = 'https://mock.image/500/400';
 
 describe('GifImage', () => {
   it('single image rendered', async () => {

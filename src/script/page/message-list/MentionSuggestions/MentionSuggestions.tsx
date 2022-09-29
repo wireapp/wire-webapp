@@ -17,13 +17,11 @@
  *
  */
 
-import React, {useEffect, useMemo, useState} from 'react';
+import React, {useEffect, useMemo, useRef, useState} from 'react';
 
 import {registerReactComponent} from 'Util/ComponentUtil';
 import {KEY} from 'Util/KeyboardUtil';
 import {clamp} from 'Util/NumberUtil';
-import useEffectRef from 'Util/useEffectRef';
-
 import {initFadingScrollbar} from '../../../ui/fadingScrollbar';
 import MentionSuggestionsItem from './MentionSuggestionsItem';
 import {User} from '../../../entity/User';
@@ -39,10 +37,11 @@ const MentionSuggestionList: React.FunctionComponent<MentionSuggestionListProps>
   targetInputSelector,
 }) => {
   const [selectedSuggestionIndex, setSelectedSuggestionIndex] = useState(0);
-  const [selectedItem, setSelectedItem] = useEffectRef();
+  const selectedItem = useRef<HTMLElement | null>();
+
   useEffect(
-    () => selectedItem?.scrollIntoView({behavior: 'auto', block: 'nearest'}),
-    [selectedItem, suggestions.length],
+    () => selectedItem.current?.scrollIntoView({behavior: 'auto', block: 'nearest'}),
+    [selectedSuggestionIndex, suggestions.length],
   );
 
   const targetInput = useMemo(
@@ -111,7 +110,7 @@ const MentionSuggestionList: React.FunctionComponent<MentionSuggestionListProps>
                 onSelectionValidated(suggestion, targetInput);
               }}
               onMouseEnter={() => setSelectedSuggestionIndex(index)}
-              ref={index === selectedSuggestionIndex ? setSelectedItem : undefined}
+              ref={index === selectedSuggestionIndex ? element => (selectedItem.current = element) : undefined}
             />
           ))
           .reverse()}

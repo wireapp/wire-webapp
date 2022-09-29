@@ -23,4 +23,6 @@ export enum AssetTransferState {
   UPLOAD_PENDING = 'upload-pending',
   UPLOADED = 'uploaded',
   UPLOADING = 'uploading',
+  DOWNLOAD_FAILED_DECRPYT = 'download-failed-decrypt',
+  DOWNLOAD_FAILED_HASH = 'download-failed-hash',
 }
