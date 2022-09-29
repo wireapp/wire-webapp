@@ -70,12 +70,10 @@ const useWarningModalState = create<WarningModalState>((set, get) => ({
   queue: [],
   removeFirstItemInQueue: () => set(state => ({...state, queue: state.queue.slice(1)})),
   replaceInQueue: (modalItem: ModalItem) =>
-    set(state => {
-      const updatedQueue = [...state.queue];
-      const index = updatedQueue.findIndex(queueItem => queueItem.id === modalItem.id);
-      updatedQueue[index] = modalItem;
-      return {...state, queue: updatedQueue};
-    }),
+    set(state => ({
+      ...state,
+      queue: state.queue.map(queueItem => (queueItem.id === modalItem.id ? modalItem : queueItem)),
+    })),
   updateCurrentModalContent: nextCurrentModaContent =>
     set(state => ({...state, currentModalContent: nextCurrentModaContent})),
   updateCurrentModalId: (nextCurrentModalId: string | null) =>

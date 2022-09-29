@@ -35,7 +35,7 @@ export interface Text {
 }
 
 export interface ModalOptions {
-  close?: Function;
+  close?: () => void;
   closeOnConfirm?: boolean;
   /** Content needed for visualization on modal */
   data?: ClientNotificationData[] | boolean;
