@@ -123,7 +123,7 @@ import Warnings from '../view_model/WarningsContainer';
 import {Core} from '../service/CoreSingleton';
 import {migrateToQualifiedSessionIds} from './sessionIdMigrator';
 import showUserModal from 'Components/Modals/UserModal';
-import {initPrimaryModal} from 'Components/Modals/PrimaryModal/PrimaryModal';
+import PrimaryModal from 'Components/Modals/PrimaryModal/PrimaryModal';
 
 function doRedirect(signOutReason: SIGN_OUT_REASON) {
   let url = `/auth/${location.search}`;
@@ -471,7 +471,7 @@ class App {
       loadingView.removeFromView();
       telemetry.report();
       amplify.publish(WebAppEvents.LIFECYCLE.LOADED);
-      initPrimaryModal();
+      PrimaryModal.init();
       showInitialModal(userRepository['userState'].self().availability());
       telemetry.timeStep(AppInitTimingsStep.UPDATED_CONVERSATIONS);
       if (userRepository['userState'].isActivatedAccount()) {

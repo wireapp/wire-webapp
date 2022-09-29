@@ -18,8 +18,6 @@
  */
 
 import create from 'zustand';
-import {amplify} from 'amplify';
-import {WebAppEvents} from '@wireapp/webapp-events';
 import {Action, ModalContent, ModalItem, ModalOptions, ModalQueue, PrimaryModalType, Text} from './PrimaryModalTypes';
 import {getLogger} from 'Util/Logger';
 import {replaceLink, t} from 'Util/LocalizerUtil';
@@ -81,7 +79,7 @@ const usePrimaryModalState = create<PrimaryModalState>((set, get) => ({
   updateErrorMessage: nextErrorMessage => set(state => ({...state, errorMessage: nextErrorMessage})),
 }));
 
-const onIncmoingModalEvent = (type: PrimaryModalType, options: ModalOptions, modalId = createRandomUuid()) => {
+const addNewModalToQueue = (type: PrimaryModalType, options: ModalOptions, modalId = createRandomUuid()) => {
   const {currentModalId, existsInQueue, addToQueue, replaceInQueue} = usePrimaryModalState.getState();
 
   const alreadyOpen = modalId === currentModalId;
@@ -213,6 +211,4 @@ const removeCurrentModal = () => {
   updateCurrentModalId(null);
 };
 
-amplify.subscribe(WebAppEvents.WARNING.MODAL, onIncmoingModalEvent);
-
-export {usePrimaryModalState, defaultContent, showNextModalInQueue, removeCurrentModal};
+export {usePrimaryModalState, defaultContent, addNewModalToQueue, showNextModalInQueue, removeCurrentModal};

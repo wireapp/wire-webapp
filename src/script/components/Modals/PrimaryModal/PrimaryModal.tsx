@@ -25,11 +25,17 @@ import ModalComponent from 'Components/ModalComponent';
 import {initFadingScrollbar} from '../../../ui/fadingScrollbar';
 import renderElement from 'Util/renderElement';
 import {Action, PrimaryModalType} from './PrimaryModalTypes';
-import {usePrimaryModalState, showNextModalInQueue, defaultContent, removeCurrentModal} from './PrimaryModalState';
+import {
+  usePrimaryModalState,
+  showNextModalInQueue,
+  defaultContent,
+  removeCurrentModal,
+  addNewModalToQueue,
+} from './PrimaryModalState';
 
 export interface PrimaryModalProps {}
 
-const PrimaryModalComponent: React.FC = () => {
+export const PrimaryModalComponent: React.FC = () => {
   const [inputValue, updateInputValue] = useState<string>('');
   const [passwordValue, updatePasswordValue] = useState<string>('');
   const [optionChecked, updateOptionChecked] = useState<boolean>(false);
@@ -204,13 +210,13 @@ const PrimaryModalComponent: React.FC = () => {
   );
 };
 
-export default PrimaryModalComponent;
-
-export const initPrimaryModal = () => {
-  renderElement<PrimaryModalProps>(PrimaryModalComponent)({});
-  showNextModalInQueue();
+const PrimaryModal = {
+  add: addNewModalToQueue,
+  init: () => {
+    renderElement<PrimaryModalProps>(PrimaryModalComponent)({});
+    showNextModalInQueue();
+  },
+  type: PrimaryModalType,
 };
 
-export const PrimaryModal = {
-  // addModal:
-};
+export default PrimaryModal;

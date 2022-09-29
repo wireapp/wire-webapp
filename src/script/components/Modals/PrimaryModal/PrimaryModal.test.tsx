@@ -18,16 +18,13 @@
  */
 
 import {act} from '@testing-library/react';
-import {WebAppEvents} from '@wireapp/webapp-events';
-import {amplify} from 'amplify';
 
 import TestPage from 'Util/test/TestPage';
-import PrimaryModal, {PrimaryModalProps} from './PrimaryModal';
-import {PrimaryModalType} from './PrimaryModalTypes';
+import PrimaryModal, {PrimaryModalComponent, PrimaryModalProps} from './PrimaryModal';
 
 class PrimaryModalPage extends TestPage<PrimaryModalProps> {
   constructor(props?: PrimaryModalProps) {
-    super(PrimaryModal, props);
+    super(PrimaryModalComponent, props);
   }
 
   getWrapperElement = () => this.get('div#modals');
@@ -37,15 +34,15 @@ class PrimaryModalPage extends TestPage<PrimaryModalProps> {
 
 describe('PrimaryModal', () => {
   it('does not render when no item is in the queue', async () => {
-    const PrimaryModal = new PrimaryModalPage({});
-    expect(PrimaryModal.getWrapperElement()?.children[0].getAttribute('style')).toBe('display: none;');
+    const PrimaryModalWrapper = new PrimaryModalPage({});
+    expect(PrimaryModalWrapper.getWrapperElement()?.children[0].getAttribute('style')).toBe('display: none;');
   });
 
   it('correctly calls action callback', async () => {
-    const PrimaryModal = new PrimaryModalPage({});
+    const PrimaryModalWrapper = new PrimaryModalPage({});
     const actionCallback = jest.fn();
     act(() => {
-      amplify.publish(WebAppEvents.WARNING.MODAL, PrimaryModalType.CONFIRM, {
+      PrimaryModal.add(PrimaryModal.type.CONFIRM, {
         primaryAction: {
           action: actionCallback,
           text: 'test-text',
@@ -60,19 +57,19 @@ describe('PrimaryModal', () => {
         },
       });
     });
-    const actionButton = PrimaryModal.getPrimaryActionButton();
+    const actionButton = PrimaryModalWrapper.getPrimaryActionButton();
     if (!actionButton) {
       throw new Error('Failed to find action button');
     }
-    PrimaryModal.click(actionButton);
+    PrimaryModalWrapper.click(actionButton);
 
     expect(actionCallback).toHaveBeenCalledTimes(1);
   });
   it('correctly calls secondary action callback', async () => {
-    const PrimaryModal = new PrimaryModalPage({});
+    const PrimaryModalWrapper = new PrimaryModalPage({});
     const secondaryActionCallback = jest.fn();
     act(() => {
-      amplify.publish(WebAppEvents.WARNING.MODAL, PrimaryModalType.CONFIRM, {
+      PrimaryModal.add(PrimaryModal.type.CONFIRM, {
         primaryAction: {
           action: () => {},
           text: 'test-text',
@@ -87,11 +84,11 @@ describe('PrimaryModal', () => {
         },
       });
     });
-    const secondaryActionButton = PrimaryModal.getSecondaryActionButton();
+    const secondaryActionButton = PrimaryModalWrapper.getSecondaryActionButton();
     if (!secondaryActionButton) {
       throw new Error('Failed to find action button');
     }
-    PrimaryModal.click(secondaryActionButton);
+    PrimaryModalWrapper.click(secondaryActionButton);
 
     expect(secondaryActionCallback).toHaveBeenCalledTimes(1);
   });
