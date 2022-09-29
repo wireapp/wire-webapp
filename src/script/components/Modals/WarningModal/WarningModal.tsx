@@ -123,8 +123,8 @@ const WarningModalComponent: React.FC = () => {
             <div className="modal__body" ref={initFadingScrollbar}>
               {(messageHtml || messageText) && (
                 <div className="modal__text" data-uie-name="status-modal-text">
-                  {messageHtml && <div id="modal-description" dangerouslySetInnerHTML={{__html: messageHtml}} />}
-                  {messageText && <div id="modal-description">{messageText}</div>}
+                  {messageHtml && <div id="modal-description-html" dangerouslySetInnerHTML={{__html: messageHtml}} />}
+                  {messageText && <div id="modal-description-text">{messageText}</div>}
                 </div>
               )}
               {hasPassword && (
