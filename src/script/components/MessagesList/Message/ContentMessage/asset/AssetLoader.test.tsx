@@ -21,20 +21,18 @@ import AssetLoader from './AssetLoader';
 import {render, fireEvent} from '@testing-library/react';
 
 describe('AssetLoader', () => {
+  const defaultProps = {large: false, loadProgress: 10, onCancel: jest.fn()};
   it('runs onClick when clicking it', async () => {
-    const props = {large: false, loadProgress: 10, onCancel: jest.fn()};
-
-    const {getByTestId} = render(<AssetLoader {...props} />);
+    const {getByTestId} = render(<AssetLoader {...defaultProps} />);
 
     const assetLoader = getByTestId('status-loading-media');
 
     fireEvent.click(assetLoader);
-    expect(props.onCancel).toHaveBeenCalledTimes(1);
+    expect(defaultProps.onCancel).toHaveBeenCalledTimes(1);
   });
 
   it('sets the correct viewBox size', async () => {
-    const props = {large: false, loadProgress: 10, onCancel: () => {}};
-
+    const props = {...defaultProps};
     const {getByTestId, rerender} = render(<AssetLoader {...props} />);
 
     const assetLoaderSvg = getByTestId('asset-loader-svg');
@@ -50,7 +48,7 @@ describe('AssetLoader', () => {
   });
 
   it('sets the correct circle style', async () => {
-    const props = {large: false, loadProgress: 10, onCancel: () => {}};
+    const props = {...defaultProps};
 
     const {getByTestId, rerender} = render(<AssetLoader {...props} />);
 
