@@ -95,6 +95,8 @@ const WarningModalComponent: React.FC = () => {
     }
   };
 
+  const secondaryActions = Array.isArray(secondaryAction) ? secondaryAction : [secondaryAction];
+
   return (
     <div id="modals">
       <ModalComponent
@@ -165,7 +167,7 @@ const WarningModalComponent: React.FC = () => {
                 </div>
               )}
               <div className={cx('modal__buttons', {'modal__buttons--column': hasMultipleSecondary})}>
-                {(Array.isArray(secondaryAction) ? secondaryAction : [secondaryAction]).map(action => (
+                {secondaryActions.map(action => (
                   <button
                     key={`${action?.text}-${action?.uieName}`}
                     type="button"
