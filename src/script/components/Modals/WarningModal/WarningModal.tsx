@@ -82,14 +82,14 @@ const WarningModalComponent: React.FC = () => {
   const confirm = () => {
     const action = content?.primaryAction?.action;
     if (typeof action === 'function') {
-      if (content?.currentType === WarningModalType.OPTION) {
-        return action(optionChecked);
-      }
-      if (content?.currentType === WarningModalType.INPUT) {
-        return action(inputValue);
-      }
-      if (content?.currentType === WarningModalType.PASSWORD) {
-        return action(passwordValue);
+      const actions = {
+        [WarningModalType.OPTION]: action(optionChecked),
+        [WarningModalType.INPUT]: action(inputValue),
+        [WarningModalType.PASSWORD]: action(passwordValue),
+      };
+      if (content?.currentType) {
+        actions[content.currentType as keyof typeof actions]();
+        return;
       }
       action();
     }
