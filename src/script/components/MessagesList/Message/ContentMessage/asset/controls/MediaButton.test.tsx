@@ -19,21 +19,9 @@
 
 import ko from 'knockout';
 import {AssetTransferState} from 'src/script/assets/AssetTransferState';
-import TestPage from 'Util/test/TestPage';
 import MediaButton, {MediaButtonProps} from './MediaButton';
 import {FileAsset} from 'src/script/entity/message/FileAsset';
-
-class MediaButtonTestPage extends TestPage<MediaButtonProps> {
-  constructor(props?: MediaButtonProps) {
-    super(MediaButton, props);
-  }
-
-  getPlayButton = () => this.get('[data-uie-name="do-play-media"]');
-  getPauseButton = () => this.get('[data-uie-name="do-pause-media"]');
-  getAssetLoader = () => this.get('[data-uie-name="status-loading-media"]');
-  clickOnPlayButton = () => this.click(this.getPlayButton());
-  clickOnPauseButton = () => this.click(this.getPauseButton());
-}
+import {render, fireEvent} from '@testing-library/react';
 
 describe('MediaButton', () => {
   const getDefaultProps = (): MediaButtonProps => {
@@ -61,34 +49,30 @@ describe('MediaButton', () => {
     jest.spyOn(props, 'play');
     jest.spyOn(props, 'pause');
 
-    const testPage = new MediaButtonTestPage(props);
+    const {getByTestId} = render(<MediaButton {...props} />);
 
-    testPage.clickOnPlayButton();
-
+    const playButton = getByTestId('do-play-media');
+    fireEvent.click(playButton);
     expect(props.play).toHaveBeenCalledTimes(1);
 
-    testPage.clickOnPauseButton();
-
+    const pauseButton = getByTestId('do-pause-media');
+    fireEvent.click(pauseButton);
     expect(props.pause).toHaveBeenCalledTimes(1);
   });
 
   it('displays a loader if the media is being downloaded', () => {
     const props: MediaButtonProps = {...getDefaultProps(), transferState: AssetTransferState.DOWNLOADING};
 
-    const testPage = new MediaButtonTestPage(props);
+    const {queryByTestId} = render(<MediaButton {...props} />);
 
-    const loader = testPage.getAssetLoader();
-
-    expect(loader).not.toBe(null);
+    expect(queryByTestId('status-loading-media')).not.toBe(null);
   });
 
   it('displays a loader if the media is being uploaded', () => {
     const props: MediaButtonProps = {...getDefaultProps(), transferState: AssetTransferState.UPLOADING};
 
-    const testPage = new MediaButtonTestPage(props);
+    const {queryByTestId} = render(<MediaButton {...props} />);
 
-    const loader = testPage.getAssetLoader();
-
-    expect(loader).not.toBe(null);
+    expect(queryByTestId('status-loading-media')).not.toBe(null);
   });
 });
