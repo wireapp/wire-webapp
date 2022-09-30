@@ -78,17 +78,21 @@ const GroupCreationModal: React.FC<GroupCreationModalProps> = ({
   userState = container.resolve(UserState),
   teamState = container.resolve(TeamState),
 }) => {
-  const {isTeam, isMLSEnabled: isMLSEnabledForTeamUser} = useKoSubscribableChildren(teamState, [
-    'isTeam',
-    'isMLSEnabled',
-  ]);
+  const {
+    isTeam,
+    isMLSEnabled: isMLSEnabledForTeam,
+    isProtocolToggleEnabledForUser,
+  } = useKoSubscribableChildren(teamState, ['isTeam', 'isMLSEnabled', 'isProtocolToggleEnabledForUser']);
 
-  const enableMLSToggle = isMLSEnabledForTeamUser && Config.getConfig().FEATURE.ENABLE_MLS;
+  const isMLSFeatureEnabled = Config.getConfig().FEATURE.ENABLE_MLS;
+
+  const enableMLSToggle = isMLSFeatureEnabled && isMLSEnabledForTeam && isProtocolToggleEnabledForUser;
 
   //if user is not able to choose mls (team does not allow or feature flag is off), use proteus as default
-  const defaultProtocol = enableMLSToggle
-    ? teamState.teamFeatures().mls?.config.defaultProtocol
-    : ConversationProtocol.PROTEUS;
+  const defaultProtocol =
+    isMLSFeatureEnabled && isMLSEnabledForTeam
+      ? teamState.teamFeatures().mls?.config.defaultProtocol
+      : ConversationProtocol.PROTEUS;
 
   const protocolOptions: ProtocolOption[] = [ConversationProtocol.PROTEUS, ConversationProtocol.MLS].map(protocol => ({
     label: `${t(`modalCreateGroupProtocolSelect.${protocol}`)}${

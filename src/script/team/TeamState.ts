@@ -42,6 +42,7 @@ export class TeamState {
   public readonly isFileSharingReceivingEnabled: ko.PureComputed<boolean>;
   public readonly isVideoCallingEnabled: ko.PureComputed<boolean>;
   public readonly isMLSEnabled: ko.PureComputed<boolean>;
+  public readonly isProtocolToggleEnabledForUser: ko.PureComputed<boolean>;
   public readonly isGuestLinkEnabled: ko.PureComputed<boolean>;
   public readonly isSelfDeletingMessagesEnabled: ko.PureComputed<boolean>;
   public readonly isSelfDeletingMessagesEnforced: ko.PureComputed<boolean>;
@@ -114,12 +115,13 @@ export class TeamState {
       // TODO connect to video calling feature config
       () => true || this.teamFeatures()?.videoCalling?.status === FeatureStatus.ENABLED,
     );
-    this.isMLSEnabled = ko.pureComputed(
-      () =>
-        (this.teamFeatures()?.mls?.config.protocolToggleUsers.includes(this.userState.self().id) &&
-          this.teamFeatures()?.mls?.status === FeatureStatus.ENABLED) ??
-        false,
+
+    this.isMLSEnabled = ko.pureComputed(() => this.teamFeatures()?.mls?.status === FeatureStatus.ENABLED ?? false);
+
+    this.isProtocolToggleEnabledForUser = ko.pureComputed(
+      () => this.teamFeatures()?.mls?.config.protocolToggleUsers.includes(this.userState.self().id) ?? false,
     );
+
     this.isConferenceCallingEnabled = ko.pureComputed(
       () => this.teamFeatures()?.conferenceCalling?.status === FeatureStatus.ENABLED,
     );
