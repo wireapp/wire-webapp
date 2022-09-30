@@ -38,7 +38,7 @@ import {CallViewTab} from '../../view_model/CallingViewModel';
 import ChooseScreen, {Screen} from './ChooseScreen';
 import FullscreenVideoCall from './FullscreenVideoCall';
 import {LEAVE_CALL_REASON} from '../../calling/enum/LeaveCallReason';
-import {PushToTalkHandler} from './PushToTalkHandler';
+import PushToTalkHandler from './PushToTalkHandler';
 
 export interface CallingContainerProps {
   readonly callingRepository: CallingRepository;

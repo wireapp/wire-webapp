@@ -17,34 +17,34 @@
  *
  */
 
-import {useEffect, useState} from 'react';
+import {useEffect, useRef} from 'react';
 import {CallingRepository} from '../../calling/CallingRepository';
 import {Call} from '../../calling/Call';
 import {MuteState} from '../../calling/CallState';
 import {useKeyPress} from '../../hooks/useKeypress';
 
-interface PushToTalkContainerProps {
+interface PushToTalkHandlerProps {
   callingRepository: CallingRepository;
   call: Call;
 }
 
-const PushToTalkHandler = ({callingRepository, call}: PushToTalkContainerProps) => {
-  const spacePress: boolean = useKeyPress(' ');
-  const [unmuted, setUnmuted] = useState(false);
+const PushToTalkHandler: React.FC<PushToTalkHandlerProps> = ({callingRepository, call}) => {
+  const spacePress = useKeyPress(' ');
+  const isUnmuted = useRef(false);
 
   useEffect(() => {
     const isUnmuteAllowed = call.muteState() === MuteState.SELF_MUTED || call.muteState() === MuteState.REMOTE_MUTED;
-    if (!spacePress && unmuted) {
+    if (!spacePress && isUnmuted.current) {
       callingRepository.muteCall(call, true);
-      setUnmuted(false);
+      isUnmuted.current = false;
     } else if (spacePress && isUnmuteAllowed) {
       callingRepository.muteCall(call, false);
-      setUnmuted(true);
+      isUnmuted.current = true;
     }
     return () => undefined;
-  }, [spacePress, callingRepository, unmuted, call]);
+  }, [spacePress, callingRepository, call]);
 
   return null;
 };
 
-export {PushToTalkHandler};
+export default PushToTalkHandler;
