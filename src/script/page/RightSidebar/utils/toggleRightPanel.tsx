@@ -65,7 +65,7 @@ interface RenderElement {
 }
 
 // TODO: Move toggle sidebar after migration to react
-const toggleRightSidebar =
+const toggleRightPanel =
   <T extends RenderElement>(Component: React.FC<T>) =>
   (props: T) => {
     const rightPanelId = 'right-column';
@@ -77,8 +77,8 @@ const toggleRightSidebar =
     const input = document.querySelector<HTMLElement>('#conversation-input-bar');
     const rightPanel = document.querySelector<HTMLElement>('#right-column');
 
-    const onClose = () => {
-      if (app) {
+    if (app) {
+      const onClose = () => {
         const isNarrowScreen = app.offsetWidth < MainViewModel.CONFIG.PANEL.BREAKPOINT;
         const centerWidthClose = app.offsetWidth - MainViewModel.CONFIG.PANEL.WIDTH;
 
@@ -121,17 +121,15 @@ const toggleRightSidebar =
             props.onClose?.();
           }, rightPanelAnimationTimeout);
         });
+      };
+
+      if (rightPanel) {
+        onClose();
+        applyStyle(rightPanel, panelStyle.open);
+
+        return;
       }
-    };
 
-    if (rightPanel) {
-      onClose();
-      applyStyle(rightPanel, panelStyle.open);
-
-      return;
-    }
-
-    if (app) {
       const centerWidthClose = app.offsetWidth - MainViewModel.CONFIG.PANEL.WIDTH;
       const centerWidthOpen = centerWidthClose - MainViewModel.CONFIG.PANEL.WIDTH;
       const isNarrowScreen = app.offsetWidth < MainViewModel.CONFIG.PANEL.BREAKPOINT;
@@ -189,4 +187,4 @@ const toggleRightSidebar =
     }
   };
 
-export default toggleRightSidebar;
+export default toggleRightPanel;

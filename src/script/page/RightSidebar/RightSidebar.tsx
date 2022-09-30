@@ -37,7 +37,7 @@ import Notifications from './Notifications';
 import ParticipantDevices from './ParticipantDevices';
 import TimedMessages from './TimedMessages';
 
-import toggleRightSidebar from './utils/toggleRightPanel';
+import toggleRightPanel from './utils/toggleRightPanel';
 import usePanelHistory from './utils/usePanelHistory';
 
 import {ConversationState} from '../../conversation/ConversationState';
@@ -327,4 +327,4 @@ const RightSidebar: FC<RightSidebarProps> = ({
 
 export default RightSidebar;
 
-export const openRightSidebar = toggleRightSidebar<RightSidebarProps>(RightSidebar);
+export const openRightSidebar = toggleRightPanel<RightSidebarProps>(RightSidebar);
