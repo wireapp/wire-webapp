@@ -17,9 +17,7 @@
  *
  */
 
-import {WebAppEvents} from '@wireapp/webapp-events';
-import {amplify} from 'amplify';
-import {FC, useEffect, useState} from 'react';
+import {FC} from 'react';
 
 import HistoryExport from 'Components/HistoryExport';
 import ConnectRequests from 'Components/ConnectRequests';
@@ -32,7 +30,6 @@ import {t} from 'Util/LocalizerUtil';
 import MainContent from '../MainContent';
 import RootProvider from '../RootProvider';
 
-import {Conversation} from '../../entity/Conversation';
 import {Message} from '../../entity/message/Message';
 import {ContentViewModel} from '../../view_model/ContentViewModel';
 
@@ -55,33 +52,12 @@ interface CenterColumnProps {
 
 const CenterColumn: FC<CenterColumnProps> = ({contentViewModel}) => {
   const {state} = useKoSubscribableChildren(contentViewModel, ['state']);
-  const {conversationRepository} = contentViewModel;
-  const conversationState = conversationRepository.getConversationState();
-
-  const [initialMessage, setInitialMessage] = useState<Message>();
+  const {initialMessage} = contentViewModel;
 
   const teamState = contentViewModel.getTeamState();
   const userState = contentViewModel.getUserState();
 
   const title = statesTitle[state];
-
-  const onConversationShow = (conversation: Conversation, options: ShowConversationOptions) => {
-    const {exposeMessage: exposeMessageEntity, openFirstSelfMention = false} = options;
-    const messageEntity = openFirstSelfMention ? conversation.getFirstUnreadSelfMention() : exposeMessageEntity;
-
-    const activeConversation = conversationState.activeConversation();
-    activeConversation?.release();
-
-    setInitialMessage(messageEntity);
-  };
-
-  useEffect(() => {
-    amplify.subscribe(WebAppEvents.CONVERSATION.SHOW, onConversationShow);
-
-    return () => {
-      amplify.unsubscribe(WebAppEvents.CONVERSATION.SHOW, onConversationShow);
-    };
-  }, []);
 
   return (
     <RootProvider value={contentViewModel}>
