@@ -17,53 +17,40 @@
  *
  */
 
-import DeviceToggleButton, {DeviceToggleButtonProps} from './DeviceToggleButton';
-import TestPage from 'Util/test/TestPage';
-
-class DeviceToggleButtonPage extends TestPage<DeviceToggleButtonProps> {
-  constructor(props?: DeviceToggleButtonProps) {
-    super(DeviceToggleButton, props);
-  }
-
-  getDots = () => this.getAll('button[data-uie-name="device-toggle-button-indicator-dot"]');
-  getActiveDot = () => this.get('button[data-uie-value="active"]');
-  getButton = () => this.get('button[data-uie-name="device-toggle-button-indicator-dot"]');
-
-  clickOnButton = () => this.click(this.getButton());
-}
+import DeviceToggleButton from './DeviceToggleButton';
+import {render, fireEvent} from '@testing-library/react';
 
 describe('deviceToggleButton', () => {
+  const devices = ['first', 'second'];
   it('shows the available devices and highlight the current active device', async () => {
-    const devices = ['first', 'second'];
-    const deviceToggleButton = new DeviceToggleButtonPage({
+    const props = {
       currentDevice: devices[0],
-      devices: devices,
-      onChooseDevice: () => {},
-    });
+      devices,
+      onChooseDevice: jest.fn(),
+    };
 
-    const dots = deviceToggleButton.getDots();
+    const {container} = render(<DeviceToggleButton {...props} />);
 
+    const dots = container.querySelectorAll('button[data-uie-name="device-toggle-button-indicator-dot"]');
     expect(dots.length).toBe(devices.length);
 
-    const activeDot = deviceToggleButton.getActiveDot();
-
+    const activeDot = container.querySelector('button[data-uie-value="active"]');
     expect(activeDot).not.toBeNull();
-    expect(activeDot).not.toBe(null);
   });
 
   it('switches to next device when clicked', () => {
-    const devices = ['first', 'second'];
     const props = {
       currentDevice: devices[0],
-      devices: devices,
+      devices,
       onChooseDevice: jest.fn(),
     };
-    const deviceToggleButton = new DeviceToggleButtonPage(props);
 
-    expect(deviceToggleButton.getButton()).not.toBeNull();
+    const {container} = render(<DeviceToggleButton {...props} />);
 
-    deviceToggleButton.clickOnButton();
+    const deviceToggleButton = container.querySelector('button[data-uie-name="device-toggle-button-indicator-dot"]');
+    expect(deviceToggleButton).not.toBeNull();
 
+    fireEvent.click(deviceToggleButton!);
     expect(props.onChooseDevice).toHaveBeenCalled();
   });
 });

@@ -29,7 +29,7 @@ describe('ClassifiedBar', () => {
   const otherDomainUser = new User(createRandomUuid(), 'other.domain');
 
   it.each([[[sameDomainUser]], [[sameDomainUser, otherDomainUser]]])('is empty if no domains are given', users => {
-    const {container} = render(ClassifiedBar({users}));
+    const {container} = render(<ClassifiedBar users={users} />);
 
     expect(container.querySelector('[data-uie-name=classified-label]')).toBe(null);
   });
@@ -37,7 +37,7 @@ describe('ClassifiedBar', () => {
   it.each([[[sameDomainUser]], [[classifiedDomainUser]], [[sameDomainUser, classifiedDomainUser]]])(
     'returns classified if all users in the classified domains',
     users => {
-      const {getByText, queryByText} = render(ClassifiedBar({classifiedDomains, users}));
+      const {getByText, queryByText} = render(<ClassifiedBar users={users} classifiedDomains={classifiedDomains} />);
 
       expect(getByText('conversationClassified')).not.toBe(null);
       expect(queryByText('conversationNotClassified')).toBe(null);
@@ -49,7 +49,7 @@ describe('ClassifiedBar', () => {
     [[classifiedDomainUser, otherDomainUser]],
     [[sameDomainUser, classifiedDomainUser, otherDomainUser]],
   ])('returns non-classified if a single user is from another domain', users => {
-    const {queryByText, getByText} = render(ClassifiedBar({classifiedDomains, users}));
+    const {queryByText, getByText} = render(<ClassifiedBar users={users} classifiedDomains={classifiedDomains} />);
 
     expect(queryByText('conversationClassified')).toBe(null);
     expect(getByText('conversationNotClassified')).not.toBe(null);

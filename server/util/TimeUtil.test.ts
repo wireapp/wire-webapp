@@ -21,7 +21,7 @@ import * as TimeUtil from './TimeUtil';
 
 describe('TimeUtil', () => {
   beforeAll(() => {
-    jest.useFakeTimers('modern');
+    jest.useFakeTimers();
   });
 
   afterAll(() => {

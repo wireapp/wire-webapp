@@ -17,7 +17,7 @@
  *
  */
 
-import React, {useEffect} from 'react';
+import React from 'react';
 import Icon from 'Components/Icon';
 import {MemberMessage as MemberMessageEntity} from '../../../entity/message/MemberMessage';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
@@ -25,7 +25,7 @@ import MessageTime from './MessageTime';
 import {t} from 'Util/LocalizerUtil';
 import ConnectedMessage from './memberMessage/ConnectedMessage';
 import {User} from 'src/script/entity/User';
-import useEffectRef from 'Util/useEffectRef';
+import {useDisposableRef} from 'Util/useDisposableRef';
 
 export interface MemberMessageProps {
   classifiedDomains?: string[];
@@ -77,20 +77,17 @@ const MemberMessage: React.FC<MemberMessageProps> = ({
   const isMemberLeave = message.isMemberLeave();
   const isMemberChange = message.isMemberChange();
 
-  const [messageHeaderLabelRef, setMessageHeaderLabelRef] = useEffectRef<HTMLDivElement>();
-  useEffect(() => {
-    if (messageHeaderLabelRef) {
-      const link = messageHeaderLabelRef.querySelector('.message-header-show-more');
-      if (link) {
-        const listener = () => onClickParticipants(highlightedUsers);
-        link.addEventListener('click', listener);
-        return () => {
-          link.removeEventListener('click', listener);
-        };
-      }
+  const initShowMore = useDisposableRef(element => {
+    const link = element.querySelector('.message-header-show-more');
+    if (link) {
+      const listener = () => onClickParticipants(highlightedUsers);
+      link.addEventListener('click', listener);
+      return () => {
+        link.removeEventListener('click', listener);
+      };
     }
-    return undefined;
-  }, [messageHeaderLabelRef]);
+    return () => {};
+  });
 
   return (
     <>
@@ -119,7 +116,7 @@ const MemberMessage: React.FC<MemberMessageProps> = ({
                 {isMemberRemoval && <span className="icon-minus" />}
                 {isMemberJoin && <span className="icon-plus" />}
               </div>
-              <div ref={setMessageHeaderLabelRef} className="message-header-label">
+              <div ref={initShowMore} className="message-header-label">
                 <span className="message-header-caption" dangerouslySetInnerHTML={{__html: htmlCaption}} />
                 <hr className="message-header-line" />
               </div>

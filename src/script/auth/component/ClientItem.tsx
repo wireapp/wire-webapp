@@ -41,16 +41,16 @@ import {parseError, parseValidationErrors} from '../util/errorUtil';
 
 export interface Props extends React.HTMLProps<HTMLDivElement> {
   client: RegisteredClient;
-  clientError: Error;
   onClick: (event: React.MouseEvent<HTMLDivElement>) => void;
   onClientRemoval: (password?: string) => void;
   requirePassword: boolean;
   selected: boolean;
+  clientError?: Error;
 }
 
 const ClientItem = ({selected, onClientRemoval, onClick, client, clientError, requirePassword}: Props) => {
   const {formatMessage: _} = useIntl();
-  const passwordInput = React.useRef<HTMLInputElement>();
+  const passwordInput = React.useRef<HTMLInputElement>(null);
 
   const CONFIG = {
     animationSteps: 8,
@@ -147,13 +147,17 @@ const ClientItem = ({selected, onClientRemoval, onClick, client, clientError, re
   const handleSubmit = (event: React.FormEvent): Promise<void> => {
     event.preventDefault();
     let localValidationError = null;
-    if (!passwordInput.current.checkValidity()) {
-      localValidationError = ValidationError.handleValidationState(
-        passwordInput.current.name,
-        passwordInput.current.validity,
-      );
+
+    if (passwordInput.current) {
+      if (!passwordInput.current.checkValidity()) {
+        localValidationError = ValidationError.handleValidationState(
+          passwordInput.current.name,
+          passwordInput.current.validity,
+        );
+      }
+      setIsValidPassword(passwordInput.current.validity.valid);
     }
-    setIsValidPassword(passwordInput.current.validity.valid);
+
     setValidationError(localValidationError);
     return Promise.resolve(localValidationError)
       .then(error => {
@@ -233,9 +237,11 @@ const ClientItem = ({selected, onClientRemoval, onClick, client, clientError, re
               <DeviceIcon color="#323639" />
             </div>
             <div style={{flexGrow: 1, marginTop: isOpen ? smoothMarginTop : 0}}>
-              <Text bold block color="#323639" data-uie-name="device-header-model">
-                {formatName(client.model, client.class)}
-              </Text>
+              {client.model && (
+                <Text bold block color="#323639" data-uie-name="device-header-model">
+                  {formatName(client.model, client.class)}
+                </Text>
+              )}
               <Small block data-uie-name="device-id">{`ID: ${formatId(client.id)}`}</Small>
               <Small block>{formatDate(client.time)}</Small>
             </div>
