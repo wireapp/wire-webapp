@@ -43,14 +43,7 @@ type FocusedElement = {center?: boolean; element: Element};
 interface MessagesListParams {
   cancelConnectionRequest: (message: MemberMessage) => void;
   conversation: Conversation;
-  conversationRepository: Pick<
-    ConversationRepository,
-    | 'getPrecedingMessages'
-    | 'getMessagesWithOffset'
-    | 'updateParticipatingUserEntities'
-    | 'expectReadReceipt'
-    | 'getSubsequentMessages'
-  >;
+  conversationRepository: ConversationRepository;
   getVisibleCallback: (conversationEntity: Conversation, messageEntity: MessageEntity) => (() => void) | undefined;
   initialMessage?: MessageEntity;
   invitePeople: (convesation: Conversation) => void;
