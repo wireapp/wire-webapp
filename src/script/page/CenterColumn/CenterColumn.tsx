@@ -30,14 +30,7 @@ import {t} from 'Util/LocalizerUtil';
 import MainContent from '../MainContent';
 import RootProvider from '../RootProvider';
 
-import {Message} from '../../entity/message/Message';
 import {ContentViewModel} from '../../view_model/ContentViewModel';
-
-interface ShowConversationOptions {
-  exposeMessage?: Message;
-  openFirstSelfMention?: boolean;
-  openNotificationSettings?: boolean;
-}
 
 const statesTitle = {
   [ContentViewModel.STATE.CONNECTION_REQUESTS]: t('accessibility.headings.connectionRequests'),
