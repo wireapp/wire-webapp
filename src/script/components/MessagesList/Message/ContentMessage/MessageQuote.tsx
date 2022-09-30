@@ -17,7 +17,7 @@
  *
  */
 
-import React from 'react';
+import {FC, Fragment, MouseEvent as ReactMouseEvent, KeyboardEvent as ReactKeyboardEvent} from 'react';
 import cx from 'classnames';
 import {amplify} from 'amplify';
 import {WebAppEvents} from '@wireapp/webapp-events';
@@ -48,14 +48,14 @@ export interface QuoteProps {
   conversation: Conversation;
   findMessage: (conversation: Conversation, messageId: string) => Promise<ContentMessage | undefined>;
   focusMessage: (id: string) => void;
-  handleClickOnMessage: (message: Text, event: React.UIEvent) => void;
+  handleClickOnMessage: (message: Text, event: ReactMouseEvent | ReactKeyboardEvent<HTMLElement>) => void;
   quote: QuoteEntity;
   selfId: QualifiedId;
-  showDetail: (message: ContentMessage, event: React.MouseEvent) => void;
+  showDetail: (message: ContentMessage, event: ReactMouseEvent) => void;
   showUserDetails: (user: User) => void;
 }
 
-const Quote: React.FC<QuoteProps> = ({
+const Quote: FC<QuoteProps> = ({
   conversation,
   findMessage,
   focusMessage,
@@ -132,14 +132,14 @@ const Quote: React.FC<QuoteProps> = ({
 
 interface QuotedMessageProps {
   focusMessage: (id: string) => void;
-  handleClickOnMessage: (message: Text, event: React.UIEvent) => void;
+  handleClickOnMessage: (message: Text, event: ReactMouseEvent | ReactKeyboardEvent<HTMLElement>) => void;
   quotedMessage: ContentMessage;
   selfId: QualifiedId;
-  showDetail: (message: ContentMessage, event: React.MouseEvent) => void;
+  showDetail: (message: ContentMessage, event: ReactMouseEvent) => void;
   showUserDetails: (user: User) => void;
 }
 
-const QuotedMessage: React.FC<QuotedMessageProps> = ({
+const QuotedMessage: FC<QuotedMessageProps> = ({
   quotedMessage,
   focusMessage,
   selfId,
@@ -199,7 +199,7 @@ const QuotedMessage: React.FC<QuotedMessageProps> = ({
         )}
       </div>
       {quotedAssets.map((asset, index) => (
-        <React.Fragment key={index}>
+        <Fragment key={index}>
           {asset.isImage() && (
             <div data-uie-name="media-picture-quote">
               <Image
@@ -267,7 +267,7 @@ const QuotedMessage: React.FC<QuotedMessageProps> = ({
           )}
 
           {asset.isLocation() && <LocationAsset asset={asset} data-uie-name="media-location-quote" />}
-        </React.Fragment>
+        </Fragment>
       ))}
       <button
         type="button"

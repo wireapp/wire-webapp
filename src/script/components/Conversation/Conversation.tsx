@@ -17,7 +17,15 @@
  *
  */
 
-import {FC, MouseEvent as ReactMouseEvent, UIEvent, useContext, useEffect, useState} from 'react';
+import {
+  FC,
+  MouseEvent as ReactMouseEvent,
+  KeyboardEvent as ReactKeyboardEvent,
+  UIEvent,
+  useContext,
+  useEffect,
+  useState,
+} from 'react';
 import {amplify} from 'amplify';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import {groupBy} from 'underscore';
@@ -25,32 +33,33 @@ import cx from 'classnames';
 
 import TitleBar from 'Components/TitleBar';
 import MessagesList from 'Components/MessagesList';
+import {showDetailViewModal} from 'Components/Modals/DetailViewModal';
 import InputBar from 'Components/InputBar';
 import Giphy from 'Components/Giphy';
 
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
+import {t} from 'Util/LocalizerUtil';
+import {getLogger} from 'Util/Logger';
+import {safeMailOpen, safeWindowOpen} from 'Util/SanitizationUtil';
 
 import {Conversation as ConversationEntity} from '../../entity/Conversation';
 
-import {TeamState} from '../../team/TeamState';
-import {UserState} from '../../user/UserState';
-import {PanelViewModel} from '../../view_model/PanelViewModel';
-import {MemberMessage} from '../../entity/message/MemberMessage';
-import {User} from '../../entity/User';
-import {Message} from '../../entity/message/Message';
 import {ContentMessage} from '../../entity/message/ContentMessage';
-import {Text} from '../../entity/message/Text';
-import {safeMailOpen, safeWindowOpen} from 'Util/SanitizationUtil';
-import {ModalsViewModel} from '../../view_model/ModalsViewModel';
-import {t} from 'Util/LocalizerUtil';
-import {UserError} from '../../error/UserError';
 import {DecryptErrorMessage} from '../../entity/message/DecryptErrorMessage';
-import {MotionDuration} from '../../motion/MotionDuration';
-import {getLogger} from 'Util/Logger';
-import {RootContext} from '../../page/RootProvider';
-import {showDetailViewModal} from 'Components/Modals/DetailViewModal';
-import {ServiceEntity} from '../../integration/ServiceEntity';
+import {MemberMessage} from '../../entity/message/MemberMessage';
+import {Message} from '../../entity/message/Message';
+import {Text} from '../../entity/message/Text';
+import {User} from '../../entity/User';
+import {UserError} from '../../error/UserError';
+import {isMouseEvent} from '../../guards/Mouse';
 import {isServiceEntity} from '../../guards/Service';
+import {ServiceEntity} from '../../integration/ServiceEntity';
+import {MotionDuration} from '../../motion/MotionDuration';
+import {RootContext} from '../../page/RootProvider';
+import {UserState} from '../../user/UserState';
+import {TeamState} from '../../team/TeamState';
+import {PanelViewModel} from '../../view_model/PanelViewModel';
+import {ModalsViewModel} from '../../view_model/ModalsViewModel';
 
 type ReadMessageBuffer = {conversation: ConversationEntity; message: Message};
 
@@ -130,8 +139,11 @@ const ConversationList: FC<ConversationListProps> = ({initialMessage, teamState,
     }
   };
 
-  const handleClickOnMessage = (messageEntity: ContentMessage | Text, event: ReactMouseEvent) => {
-    if (event.button === 2) {
+  const handleClickOnMessage = (
+    messageEntity: ContentMessage | Text,
+    event: ReactMouseEvent | ReactKeyboardEvent<HTMLElement>,
+  ) => {
+    if (isMouseEvent(event) && event.button === 2) {
       // Default browser behavior on right click
       return true;
     }

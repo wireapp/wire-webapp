@@ -18,7 +18,7 @@
  */
 
 import {QualifiedId} from '@wireapp/api-client/src/user';
-import {MouseEvent as ReactMouseEvent} from 'react';
+import {MouseEvent as ReactMouseEvent, KeyboardEvent as ReactKeyboardEvent} from 'react';
 
 import {Message as BaseMessage} from '../../../entity/message/Message';
 import type {ContentMessage} from '../../../entity/message/ContentMessage';
@@ -46,7 +46,7 @@ export interface MessageActions {
   onClickImage: (message: ContentMessage, event: React.UIEvent) => void;
   onClickInvitePeople: () => void;
   onClickLikes: (message: BaseMessage) => void;
-  onClickMessage: (message: ContentMessage | Text, event: ReactMouseEvent) => void;
+  onClickMessage: (message: ContentMessage | Text, event: ReactMouseEvent | ReactKeyboardEvent<HTMLElement>) => void;
   onClickParticipants: (participants: User[]) => void;
   onClickReceipts: (message: BaseMessage) => void;
   onClickResetSession: (messageError: DecryptErrorMessage) => void;

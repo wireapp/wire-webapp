@@ -29,13 +29,15 @@ const resizeObserver = new ResizeObserver(entries => {
 
 // In order to avoid firing the callback at init time (and only firing it when the content size actually updated)
 // we need this little tool to avoid it (see. https://github.com/WICG/resize-observer/issues/38)
-const skipFirstCall = (fn: (...args: any[]) => void) => {
+const skipFirstCall = (fn: (...args: unknown[]) => void) => {
   let isFirst = true;
+
   return () => {
     if (isFirst) {
       isFirst = false;
       return;
     }
+
     return fn();
   };
 };

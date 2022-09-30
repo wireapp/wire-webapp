@@ -18,7 +18,14 @@
  */
 
 import cx from 'classnames';
-import React, {FC, MouseEvent as ReactMouseEvent, useEffect, useRef, useState} from 'react';
+import React, {
+  FC,
+  MouseEvent as ReactMouseEvent,
+  KeyboardEvent as ReactKeyboardEvent,
+  useEffect,
+  useRef,
+  useState,
+} from 'react';
 import {ConversationRepository} from 'src/script/conversation/ConversationRepository';
 import {MessageRepository} from 'src/script/conversation/MessageRepository';
 import {Conversation as ConversationEntity, Conversation} from '../../entity/Conversation';
@@ -52,7 +59,7 @@ interface MessagesListParams {
     deleteMessageEveryone: (conversation: Conversation, message: MessageEntity) => void;
   };
   messageRepository: MessageRepository;
-  onClickMessage: (message: ContentMessage | Text, event: ReactMouseEvent) => void;
+  onClickMessage: (message: ContentMessage | Text, event: ReactMouseEvent | ReactKeyboardEvent<HTMLElement>) => void;
   onLoading: (isLoading: boolean) => void;
   resetSession: (messageError: DecryptErrorMessage) => void;
   selfUser: User;
