@@ -88,7 +88,7 @@ const GroupCreationModal: React.FC<GroupCreationModalProps> = ({
 
   const enableMLSToggle = isMLSFeatureEnabled && isMLSEnabledForTeam && isProtocolToggleEnabledForUser;
 
-  //if user is not able to choose mls (team does not allow or feature flag is off), use proteus as default
+  //if feature flag is set to false or mls is disabled for current team use proteus as default
   const defaultProtocol =
     isMLSFeatureEnabled && isMLSEnabledForTeam
       ? teamState.teamFeatures().mls?.config.defaultProtocol
