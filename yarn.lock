@@ -1575,10 +1575,10 @@
   resolved "https://registry.yarnpkg.com/@faker-js/faker/-/faker-7.5.0.tgz#8e8265f65f5b68d2a57886d59b03788eeb676264"
   integrity sha512-8wNUCCUHvfvI0gQpDUho/3gPzABffnCn5um65F8dzQ86zz6dlt4+nmAA7PQUc8L+eH+9RgR/qzy5N/8kN0Ozdw==
 
-"@formatjs/cli@5.1.0":
-  version "5.1.0"
-  resolved "https://registry.yarnpkg.com/@formatjs/cli/-/cli-5.1.0.tgz#086b01745185ce35247c323988d7787c5815e263"
-  integrity sha512-9yoRFHgXOgi2oeR4B0Ixz30OBqOsalX1TUkFQBx0r7DyMKPRU5rFCERyeiJsf9MV5DijZ4Nvb/FZBbaJPIo/7Q==
+"@formatjs/cli@5.1.1":
+  version "5.1.1"
+  resolved "https://registry.yarnpkg.com/@formatjs/cli/-/cli-5.1.1.tgz#04af557ea99471b7b8c04f45cb5c989b002ba919"
+  integrity sha512-9cRYyvPO2IP+pISQcBRzzi437jl5Q336cNV5ZPnkACTsHVI+hEJUGtYciiwWsj2HR4Xg3/benRMru7ToQHWYiQ==
 
 "@formatjs/ecma402-abstract@1.12.0":
   version "1.12.0"
@@ -9322,6 +9322,11 @@ nanoid@^3.1.25:
   resolved "https://registry.yarnpkg.com/nanoid/-/nanoid-3.2.0.tgz#62667522da6673971cca916a6d3eff3f415ff80c"
   integrity sha512-fmsZYa9lpn69Ad5eDn7FMcnnSR+8R34W9qJEijxYhTbfOWzr22n1QxCMzXLK+ODyW2973V3Fux959iQoUxzUIA==
 
+nanoid@^3.3.4:
+  version "3.3.4"
+  resolved "https://registry.yarnpkg.com/nanoid/-/nanoid-3.3.4.tgz#730b67e3cd09e2deacf03c027c81c9d9dbc5e8ab"
+  integrity sha512-MqBkQh/OHTS2egovRtLk45wEyNXwF+cokD+1YPf9u5VfJiRdAiRwB2froX5Co9Rh20xs4siNPm8naNotSD6RBw==
+
 native-request@^1.0.5:
   version "1.0.8"
   resolved "https://registry.yarnpkg.com/native-request/-/native-request-1.0.8.tgz#8f66bf606e0f7ea27c0e5995eb2f5d03e33ae6fb"
@@ -11869,6 +11874,11 @@ source-map-js@^0.6.2:
   version "0.6.2"
   resolved "https://registry.yarnpkg.com/source-map-js/-/source-map-js-0.6.2.tgz#0bb5de631b41cfbda6cfba8bd05a80efdfd2385e"
   integrity sha512-/3GptzWzu0+0MBQFrDKzw/DvvMTUORvgY6k6jd/VS6iCR4RDTKWH6v6WPwQoUO8667uQEf9Oe38DxAYWY5F/Ug==
+
+source-map-js@^1.0.2:
+  version "1.0.2"
+  resolved "https://registry.yarnpkg.com/source-map-js/-/source-map-js-1.0.2.tgz#adbc361d9c62df380125e7f161f71c826f1e490c"
+  integrity sha512-R0XvVJ9WusLiqTCEiGCmICCMplcCkIwwR11mOSD9CR5u+IXYdiseeEuXCVAjS54zqwkLcPNnmU4OeJ6tUrWhDw==
 
 source-map-support@0.5.13:
   version "0.5.13"
