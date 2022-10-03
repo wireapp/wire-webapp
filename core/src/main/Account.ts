@@ -61,6 +61,17 @@ enum TOPIC {
   ERROR = 'Account.TOPIC.ERROR',
 }
 
+export enum ConnectionState {
+  /** The websocket is closed and notifications stream is not being processed */
+  CLOSED = 'closed',
+  /** The websocket is being opened */
+  CONNECTING = 'connecting',
+  /** The websocket is open but locked and notifications stream is being processed */
+  PROCESSING_NOTIFICATIONS = 'processing_notifications',
+  /** The websocket is open and message will go through and notifications stream is fully processed */
+  LIVE = 'live',
+}
+
 export interface Account {
   on(
     event: PayloadBundleType.ASSET,
@@ -516,7 +527,6 @@ export class Account<T = any> extends EventEmitter {
    */
   public async listen({
     onEvent = () => {},
-    onConnected = () => {},
     onConnectionStateChanged = () => {},
     onNotificationStreamProgress = () => {},
     onMissedNotifications = () => {},
@@ -535,14 +545,9 @@ export class Account<T = any> extends EventEmitter {
     onNotificationStreamProgress?: ({done, total}: {done: number; total: number}) => void;
 
     /**
-     * called when the connection to the websocket is established and the notification stream has been processed
-     */
-    onConnected?: () => void;
-
-    /**
      * called when the connection stateh with the backend has changed
      */
-    onConnectionStateChanged?: (state: WEBSOCKET_STATE) => void;
+    onConnectionStateChanged?: (state: ConnectionState) => void;
 
     /**
      * called when we detect lost notification from backend.
@@ -596,10 +601,20 @@ export class Account<T = any> extends EventEmitter {
     this.apiClient.transport.ws.on(WebSocketClient.TOPIC.ON_MESSAGE, notification =>
       handleNotification(notification, PayloadBundleSource.WEBSOCKET),
     );
-    this.apiClient.transport.ws.on(WebSocketClient.TOPIC.ON_STATE_CHANGE, onConnectionStateChanged);
+    this.apiClient.transport.ws.on(WebSocketClient.TOPIC.ON_STATE_CHANGE, wsState => {
+      const mapping: Partial<Record<WEBSOCKET_STATE, ConnectionState>> = {
+        [WEBSOCKET_STATE.CLOSED]: ConnectionState.CLOSED,
+        [WEBSOCKET_STATE.CONNECTING]: ConnectionState.CONNECTING,
+      };
+      const connectionState = mapping[wsState];
+      if (connectionState) {
+        onConnectionStateChanged(connectionState);
+      }
+    });
 
-    const onBeforeConnect = async (abortHandler: AbortHandler) => {
+    const processNotificationStream = async (abortHandler: AbortHandler) => {
       // Lock websocket in order to buffer any message that arrives while we handle the notification stream
+      onConnectionStateChanged(ConnectionState.PROCESSING_NOTIFICATIONS);
       this.apiClient.transport.ws.lock();
       await this.service!.notification.handleNotificationStream(
         async (notification, source, progress) => {
@@ -614,13 +629,14 @@ export class Account<T = any> extends EventEmitter {
       // We need to wait for the notification stream to be fully handled before releasing the message sending queue.
       // This is due to the nature of how message are encrypted, any change in mls epoch needs to happen before we start encrypting any kind of messages
       resumeMessageSending();
-      onConnected();
+      onConnectionStateChanged(ConnectionState.LIVE);
     };
-    await this.apiClient.connect(onBeforeConnect);
+    this.apiClient.connect(processNotificationStream);
 
     return () => {
-      this.apiClient.transport.ws.removeAllListeners();
       this.apiClient.disconnect();
+      onConnectionStateChanged(ConnectionState.CLOSED);
+      this.apiClient.transport.ws.removeAllListeners();
     };
   }
 
