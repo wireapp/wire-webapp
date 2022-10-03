@@ -20,11 +20,12 @@
 import {act} from '@testing-library/react';
 
 import TestPage from 'Util/test/TestPage';
-import PrimaryModal, {PrimaryModalComponent, PrimaryModalProps} from './PrimaryModal';
+import PrimaryModal from '.';
+import {PrimaryModalComponent} from './PrimaryModal';
 
-class PrimaryModalPage extends TestPage<PrimaryModalProps> {
-  constructor(props?: PrimaryModalProps) {
-    super(PrimaryModalComponent, props);
+class PrimaryModalPage extends TestPage<{}> {
+  constructor() {
+    super(PrimaryModalComponent);
   }
 
   getWrapperElement = () => this.get('div#modals');
@@ -34,15 +35,15 @@ class PrimaryModalPage extends TestPage<PrimaryModalProps> {
 
 describe('PrimaryModal', () => {
   it('does not render when no item is in the queue', async () => {
-    const PrimaryModalWrapper = new PrimaryModalPage({});
+    const PrimaryModalWrapper = new PrimaryModalPage();
     expect(PrimaryModalWrapper.getWrapperElement()?.children[0].getAttribute('style')).toBe('display: none;');
   });
 
   it('correctly calls action callback', async () => {
-    const PrimaryModalWrapper = new PrimaryModalPage({});
+    const PrimaryModalWrapper = new PrimaryModalPage();
     const actionCallback = jest.fn();
     act(() => {
-      PrimaryModal.add(PrimaryModal.type.CONFIRM, {
+      PrimaryModal.show(PrimaryModal.type.CONFIRM, {
         primaryAction: {
           action: actionCallback,
           text: 'test-text',
@@ -66,10 +67,10 @@ describe('PrimaryModal', () => {
     expect(actionCallback).toHaveBeenCalledTimes(1);
   });
   it('correctly calls secondary action callback', async () => {
-    const PrimaryModalWrapper = new PrimaryModalPage({});
+    const PrimaryModalWrapper = new PrimaryModalPage();
     const secondaryActionCallback = jest.fn();
     act(() => {
-      PrimaryModal.add(PrimaryModal.type.CONFIRM, {
+      PrimaryModal.show(PrimaryModal.type.CONFIRM, {
         primaryAction: {
           action: () => {},
           text: 'test-text',

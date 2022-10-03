@@ -20,7 +20,7 @@
 import {t} from 'Util/LocalizerUtil';
 
 import {AssetRepository} from '../assets/AssetRepository';
-import PrimaryModal from '../components/Modals/PrimaryModal/PrimaryModal';
+import PrimaryModal from '../components/Modals/PrimaryModal';
 
 const CONCURRENT_UPLOAD_LIMIT = 10;
 
@@ -36,7 +36,7 @@ const isHittingUploadLimit = (files: File[], assetRepository: AssetRepository): 
       },
     };
 
-    PrimaryModal.add(PrimaryModal.type.ACKNOWLEDGE, modalOptions);
+    PrimaryModal.show(PrimaryModal.type.ACKNOWLEDGE, modalOptions);
   }
 
   return isHittingUploadLimit;

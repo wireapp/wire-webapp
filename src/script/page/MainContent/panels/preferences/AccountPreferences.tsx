@@ -54,7 +54,7 @@ import PrivacySection from './accountPreferences/PrivacySection';
 import UsernameInput from './accountPreferences/UsernameInput';
 import PreferencesPage from './components/PreferencesPage';
 import AccountLink from './accountPreferences/AccountLink';
-import PrimaryModal from 'Components/Modals/PrimaryModal/PrimaryModal';
+import PrimaryModal from 'Components/Modals/PrimaryModal';
 
 interface AccountPreferencesProps {
   backupRepository: BackupRepository;
@@ -102,7 +102,7 @@ const AccountPreferences: React.FC<AccountPreferencesProps> = ({
   const domain = selfUser.domain;
 
   const clickOnLeaveGuestRoom = (): void => {
-    PrimaryModal.add(
+    PrimaryModal.show(
       PrimaryModal.type.CONFIRM,
       {
         preventClose: true,

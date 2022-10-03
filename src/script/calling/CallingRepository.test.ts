@@ -38,7 +38,7 @@ import {CALL_MESSAGE_TYPE} from './enum/CallMessageType';
 import {CALL} from '../event/Client';
 import {UserRepository} from '../user/UserRepository';
 import {LEAVE_CALL_REASON} from './enum/LeaveCallReason';
-import {usePrimaryModalState} from 'Components/Modals/PrimaryModal/PrimaryModalState';
+import {usePrimaryModalState} from '../components/Modals/PrimaryModal';
 
 const createSelfParticipant = () => {
   const selfUser = new User();

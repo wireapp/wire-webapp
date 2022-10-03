@@ -47,7 +47,7 @@ import {ConversationState} from '../conversation/ConversationState';
 import {CallingViewModel} from './CallingViewModel';
 import {PropertiesRepository} from '../properties/PropertiesRepository';
 import {SearchRepository} from '../search/SearchRepository';
-import PrimaryModal from '../components/Modals/PrimaryModal/PrimaryModal';
+import PrimaryModal from '../components/Modals/PrimaryModal';
 
 export enum ListState {
   ARCHIVE = 'ListViewModel.STATE.ARCHIVE',
@@ -169,7 +169,7 @@ export class ListViewModel {
       return;
     }
     if (call.conversationType === CONV_TYPE.CONFERENCE && !this.callingRepository.supportsConferenceCalling) {
-      PrimaryModal.add(PrimaryModal.type.ACKNOWLEDGE, {
+      PrimaryModal.show(PrimaryModal.type.ACKNOWLEDGE, {
         text: {
           message: `${t('modalConferenceCallNotSupportedMessage')} ${t('modalConferenceCallNotSupportedJoinMessage')}`,
           title: t('modalConferenceCallNotSupportedHeadline'),

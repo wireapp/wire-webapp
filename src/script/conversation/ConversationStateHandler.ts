@@ -36,7 +36,7 @@ import {
   isGettingAccessToFeature,
   updateAccessRights,
 } from './ConversationAccessPermission';
-import PrimaryModal from '../components/Modals/PrimaryModal/PrimaryModal';
+import PrimaryModal from '../components/Modals/PrimaryModal';
 
 export class ConversationStateHandler extends AbstractConversationEventHandler {
   private readonly conversationService: ConversationService;
@@ -142,6 +142,6 @@ export class ConversationStateHandler extends AbstractConversationEventHandler {
 
   private _showModal(message: string): void {
     const modalOptions = {text: {message}};
-    PrimaryModal.add(PrimaryModal.type.ACKNOWLEDGE, modalOptions);
+    PrimaryModal.show(PrimaryModal.type.ACKNOWLEDGE, modalOptions);
   }
 }

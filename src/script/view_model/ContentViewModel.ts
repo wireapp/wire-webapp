@@ -50,7 +50,7 @@ import {
   ClientNotificationData,
 } from '../notification/PreferenceNotificationRepository';
 import {MessageRepository} from '../conversation/MessageRepository';
-import PrimaryModal from '../components/Modals/PrimaryModal/PrimaryModal';
+import PrimaryModal from '../components/Modals/PrimaryModal';
 
 interface ShowConversationOptions {
   exposeMessage?: Message;
@@ -284,7 +284,7 @@ export class ContentViewModel {
     } catch (error) {
       const isConversationNotFound = error.type === ConversationError.TYPE.CONVERSATION_NOT_FOUND;
       if (isConversationNotFound) {
-        PrimaryModal.add(
+        PrimaryModal.show(
           PrimaryModal.type.ACKNOWLEDGE,
           {
             text: {
@@ -392,7 +392,7 @@ export class ContentViewModel {
     const showNotification = (type: string, aggregatedNotifications: Notification[]) => {
       switch (type) {
         case PreferenceNotificationRepository.CONFIG.NOTIFICATION_TYPES.NEW_CLIENT: {
-          PrimaryModal.add(
+          PrimaryModal.show(
             PrimaryModal.type.ACCOUNT_NEW_DEVICES,
             {
               data: aggregatedNotifications.map(notification => notification.data) as ClientNotificationData[],
@@ -409,7 +409,7 @@ export class ContentViewModel {
         }
 
         case PreferenceNotificationRepository.CONFIG.NOTIFICATION_TYPES.READ_RECEIPTS_CHANGED: {
-          PrimaryModal.add(
+          PrimaryModal.show(
             PrimaryModal.type.ACCOUNT_READ_RECEIPTS_CHANGED,
             {
               data: aggregatedNotifications.pop().data as boolean,

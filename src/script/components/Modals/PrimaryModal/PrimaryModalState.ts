@@ -30,7 +30,7 @@ import {createRandomUuid} from 'Util/util';
 type PrimaryModalState = {
   errorMessage: string | null;
   queue: ModalQueue;
-  currentModalContent: ModalContent | null;
+  currentModalContent: ModalContent;
   currentModalId: string | null;
   existsInQueue: (modalItem: ModalItem) => boolean;
   addToQueue: (modalItem: ModalItem) => void;
@@ -38,7 +38,7 @@ type PrimaryModalState = {
   replaceInQueue: (modalItem: ModalItem) => void;
   updateCurrentModalId: (nextCurrentModalId: string | null) => void;
   updateErrorMessage: (nextErrorMessage: string | null) => void;
-  updateCurrentModalContent: (nextCurrentModaContent: ModalContent | null) => void;
+  updateCurrentModalContent: (nextCurrentModaContent: ModalContent) => void;
 };
 
 const defaultContent: ModalContent = {

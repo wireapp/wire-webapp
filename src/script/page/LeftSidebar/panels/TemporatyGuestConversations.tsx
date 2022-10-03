@@ -28,7 +28,7 @@ import {ListViewModel} from '../../../view_model/ListViewModel';
 import {Config} from '../../../Config';
 import {CallingViewModel} from '../../../view_model/CallingViewModel';
 import {QualifiedId} from '@wireapp/api-client/src/user';
-import PrimaryModal from 'Components/Modals/PrimaryModal/PrimaryModal';
+import PrimaryModal from 'Components/Modals/PrimaryModal';
 
 type TemporaryGuestConversations = {
   callingViewModel: CallingViewModel;
@@ -54,7 +54,7 @@ const TemporaryGuestConversations: React.FC<TemporaryGuestConversations> = ({
   };
 
   const createAccount = (): void => {
-    PrimaryModal.add(PrimaryModal.type.CONFIRM, {
+    PrimaryModal.show(PrimaryModal.type.CONFIRM, {
       preventClose: true,
       primaryAction: {
         action: () => window.location.replace(`/auth/${location.search}`),

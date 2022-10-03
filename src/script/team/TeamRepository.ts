@@ -62,7 +62,7 @@ import {TeamState} from './TeamState';
 import {NOTIFICATION_HANDLING_STATE} from '../event/NotificationHandlingState';
 import {EventSource} from '../event/EventSource';
 import {Config} from '../Config';
-import PrimaryModal from '../components/Modals/PrimaryModal/PrimaryModal';
+import PrimaryModal from '../components/Modals/PrimaryModal';
 
 export interface AccountInfo {
   accentID: number;
@@ -434,7 +434,7 @@ export class TeamRepository {
     const hasChangedToEnabled = newConfig?.fileSharing?.status === FeatureStatus.ENABLED;
 
     if (hasFileSharingChanged) {
-      PrimaryModal.add(PrimaryModal.type.ACKNOWLEDGE, {
+      PrimaryModal.show(PrimaryModal.type.ACKNOWLEDGE, {
         text: {
           htmlMessage: hasChangedToEnabled
             ? t('featureConfigChangeModalFileSharingDescriptionItemFileSharingEnabled')
@@ -451,7 +451,7 @@ export class TeamRepository {
     const hasGuestLinkChangedToEnabled = newConfig?.conversationGuestLinks?.status === FeatureStatus.ENABLED;
 
     if (hasGuestLinkChanged) {
-      PrimaryModal.add(PrimaryModal.type.ACKNOWLEDGE, {
+      PrimaryModal.show(PrimaryModal.type.ACKNOWLEDGE, {
         text: {
           htmlMessage: hasGuestLinkChangedToEnabled
             ? t('featureConfigChangeModalConversationGuestLinksDescriptionItemConversationGuestLinksEnabled')
@@ -478,7 +478,7 @@ export class TeamRepository {
     const isFeatureEnabled = newStatus === FeatureStatus.ENABLED;
 
     if (hasFeatureChanged) {
-      PrimaryModal.add(PrimaryModal.type.ACKNOWLEDGE, {
+      PrimaryModal.show(PrimaryModal.type.ACKNOWLEDGE, {
         text: {
           htmlMessage: isFeatureEnabled
             ? isEnforced
@@ -498,7 +498,7 @@ export class TeamRepository {
     const hasChangedToEnabled = newConfig?.videoCalling?.status === FeatureStatus.ENABLED;
 
     if (hasVideoCallingChanged) {
-      PrimaryModal.add(PrimaryModal.type.ACKNOWLEDGE, {
+      PrimaryModal.show(PrimaryModal.type.ACKNOWLEDGE, {
         text: {
           htmlMessage: hasChangedToEnabled
             ? t('featureConfigChangeModalAudioVideoDescriptionItemCameraEnabled')
@@ -518,7 +518,7 @@ export class TeamRepository {
           'modal__text__read-more',
           'read-more-pricing',
         );
-        PrimaryModal.add(PrimaryModal.type.ACKNOWLEDGE, {
+        PrimaryModal.show(PrimaryModal.type.ACKNOWLEDGE, {
           text: {
             htmlMessage: t(
               'featureConfigChangeModalConferenceCallingEnabled',

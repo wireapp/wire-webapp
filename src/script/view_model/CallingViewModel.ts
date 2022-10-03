@@ -48,7 +48,7 @@ import {QualifiedId} from '@wireapp/api-client/src/user';
 import {PropertiesRepository} from '../properties/PropertiesRepository';
 import {PROPERTIES_TYPE} from '../properties/PropertiesType';
 import {LEAVE_CALL_REASON} from '../calling/enum/LeaveCallReason';
-import PrimaryModal from '../components/Modals/PrimaryModal/PrimaryModal';
+import PrimaryModal from '../components/Modals/PrimaryModal';
 
 export interface CallActions {
   answer: (call: Call) => void;
@@ -163,7 +163,7 @@ export class CallingViewModel {
     this.callActions = {
       answer: (call: Call) => {
         if (call.conversationType === CONV_TYPE.CONFERENCE && !this.callingRepository.supportsConferenceCalling) {
-          PrimaryModal.add(PrimaryModal.type.ACKNOWLEDGE, {
+          PrimaryModal.show(PrimaryModal.type.ACKNOWLEDGE, {
             primaryAction: {
               action: () => {
                 this.callingRepository.rejectCall(call.conversationId);
@@ -259,7 +259,7 @@ export class CallingViewModel {
           'modal__text__read-more',
           'read-more-pricing',
         );
-        PrimaryModal.add(PrimaryModal.type.CONFIRM, {
+        PrimaryModal.show(PrimaryModal.type.CONFIRM, {
           primaryAction: {
             action: () => {
               safeWindowOpen(Config.getConfig().URL.TEAMS_BILLING);
@@ -276,7 +276,7 @@ export class CallingViewModel {
           },
         });
       } else {
-        PrimaryModal.add(PrimaryModal.type.ACKNOWLEDGE, {
+        PrimaryModal.show(PrimaryModal.type.ACKNOWLEDGE, {
           text: {
             htmlMessage: t('callingRestrictedConferenceCallTeamMemberModalDescription'),
             title: t('callingRestrictedConferenceCallTeamMemberModalTitle'),
@@ -284,7 +284,7 @@ export class CallingViewModel {
         });
       }
     } else {
-      PrimaryModal.add(PrimaryModal.type.ACKNOWLEDGE, {
+      PrimaryModal.show(PrimaryModal.type.ACKNOWLEDGE, {
         text: {
           htmlMessage: t('callingRestrictedConferenceCallPersonalModalDescription', {
             brandName: Config.getConfig().BRAND_NAME,

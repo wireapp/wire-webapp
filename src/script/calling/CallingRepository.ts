@@ -84,7 +84,7 @@ import Warnings from '../view_model/WarningsContainer';
 import {PayloadBundleState} from '@wireapp/core/src/main/conversation';
 import {Core} from '../service/CoreSingleton';
 import {LEAVE_CALL_REASON} from './enum/LeaveCallReason';
-import PrimaryModal from '../components/Modals/PrimaryModal/PrimaryModal';
+import PrimaryModal from '../components/Modals/PrimaryModal';
 
 interface MediaStreamQuery {
   audio?: boolean;
@@ -498,7 +498,7 @@ export class CallingRepository {
 
       if (participant) {
         this.leaveCall(activeCall.conversationId, LEAVE_CALL_REASON.USER_TURNED_UNVERIFIED);
-        PrimaryModal.add(
+        PrimaryModal.show(
           PrimaryModal.type.ACKNOWLEDGE,
           {
             primaryAction: {
@@ -530,7 +530,7 @@ export class CallingRepository {
 
   private warnOutdatedClient(conversationId: QualifiedId) {
     const brandName = Config.getConfig().BRAND_NAME;
-    PrimaryModal.add(
+    PrimaryModal.show(
       PrimaryModal.type.ACKNOWLEDGE,
       {
         close: () => this.acceptVersionWarning(conversationId),
@@ -1743,7 +1743,7 @@ export class CallingRepository {
     }
 
     return new Promise((resolve, reject) => {
-      PrimaryModal.add(PrimaryModal.type.CONFIRM, {
+      PrimaryModal.show(PrimaryModal.type.CONFIRM, {
         primaryAction: {
           action: () => {
             if (activeCall.state() === CALL_STATE.INCOMING) {
@@ -1782,7 +1782,7 @@ export class CallingRepository {
         title: t('modalNoAudioInputTitle'),
       },
     };
-    PrimaryModal.add(PrimaryModal.type.CONFIRM, modalOptions);
+    PrimaryModal.show(PrimaryModal.type.CONFIRM, modalOptions);
   }
 
   private showNoCameraModal(): void {
@@ -1798,7 +1798,7 @@ export class CallingRepository {
         title: t('modalNoCameraTitle'),
       },
     };
-    PrimaryModal.add(PrimaryModal.type.ACKNOWLEDGE, modalOptions);
+    PrimaryModal.show(PrimaryModal.type.ACKNOWLEDGE, modalOptions);
   }
 
   //##############################################################################

@@ -29,7 +29,7 @@ import {createRandomUuid} from 'Util/util';
 import type {Conversation} from '../entity/Conversation';
 import type {PropertiesService} from '../properties/PropertiesService';
 import {TypedEventTarget} from 'Util/TypedEventTarget';
-import PrimaryModal from '../components/Modals/PrimaryModal/PrimaryModal';
+import PrimaryModal from '../components/Modals/PrimaryModal';
 
 export enum LabelType {
   Custom = 0,
@@ -259,7 +259,7 @@ export class ConversationLabelRepository extends TypedEventTarget<{type: 'conver
   };
 
   readonly addConversationToNewLabel = (conversation: Conversation) => {
-    PrimaryModal.add(PrimaryModal.type.INPUT, {
+    PrimaryModal.show(PrimaryModal.type.INPUT, {
       primaryAction: {
         action: (name: string) => {
           this.removeConversationFromAllLabels(conversation);

@@ -35,7 +35,7 @@ import {
   teamPermissionsForAccessState,
   toggleFeature,
 } from '../../conversation/ConversationAccessPermission';
-import PrimaryModal from '../../components/Modals/PrimaryModal/PrimaryModal';
+import PrimaryModal from '../../components/Modals/PrimaryModal';
 
 export class GuestsAndServicesViewModel extends BasePanelViewModel {
   private readonly teamState: TeamState;
@@ -141,7 +141,7 @@ export class GuestsAndServicesViewModel extends BasePanelViewModel {
   };
 
   readonly revokeAccessCode = (): void => {
-    PrimaryModal.add(PrimaryModal.type.CONFIRM, {
+    PrimaryModal.show(PrimaryModal.type.CONFIRM, {
       preventClose: true,
       primaryAction: {
         action: async (): Promise<void> => {
@@ -178,7 +178,7 @@ export class GuestsAndServicesViewModel extends BasePanelViewModel {
         return changeAccessState();
       }
 
-      PrimaryModal.add(PrimaryModal.type.CONFIRM, {
+      PrimaryModal.show(PrimaryModal.type.CONFIRM, {
         preventClose: true,
         primaryAction: {
           action: changeAccessState,

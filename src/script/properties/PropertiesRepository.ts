@@ -34,7 +34,7 @@ import type {SelfService} from '../self/SelfService';
 import {ConsentValue} from '../user/ConsentValue';
 import type {PropertiesService} from './PropertiesService';
 import {PROPERTIES_TYPE} from './PropertiesType';
-import PrimaryModal from '../components/Modals/PrimaryModal/PrimaryModal';
+import PrimaryModal from '../components/Modals/PrimaryModal';
 
 export class PropertiesRepository {
   // Value names are specified by the protocol but key names can be changed.
@@ -125,7 +125,7 @@ export class PropertiesRepository {
     }
 
     return new Promise(resolve => {
-      PrimaryModal.add(PrimaryModal.type.CONFIRM, {
+      PrimaryModal.show(PrimaryModal.type.CONFIRM, {
         preventClose: true,
         primaryAction: {
           action: () => {

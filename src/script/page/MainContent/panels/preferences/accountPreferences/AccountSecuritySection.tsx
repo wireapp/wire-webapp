@@ -33,7 +33,7 @@ import {t} from 'Util/LocalizerUtil';
 import {safeWindowOpen} from 'Util/SanitizationUtil';
 import PreferencesSection from '../components/PreferencesSection';
 import {Link, LinkVariant} from '@wireapp/react-ui-kit';
-import PrimaryModal from 'Components/Modals/PrimaryModal/PrimaryModal';
+import PrimaryModal from 'Components/Modals/PrimaryModal';
 
 interface AccountSecuritySectionProps {
   appLockState?: AppLockState;
@@ -56,7 +56,7 @@ const AccountSecuritySection: React.FC<AccountSecuritySectionProps> = ({
   const isMacOsWrapper = Runtime.isDesktopApp() && Runtime.isMacOS();
 
   const onClickDeleteAccount = () =>
-    PrimaryModal.add(
+    PrimaryModal.show(
       PrimaryModal.type.CONFIRM,
       {
         primaryAction: {

@@ -82,7 +82,7 @@ import useResizeTarget from '../../hooks/useResizeTarget';
 import useDropFiles from '../../hooks/useDropFiles';
 import useTextAreaFocus from '../../hooks/useTextAreaFocus';
 import {StyledApp, THEME_ID} from '@wireapp/react-ui-kit';
-import PrimaryModal from '../Modals/PrimaryModal/PrimaryModal';
+import PrimaryModal from '../Modals/PrimaryModal';
 
 const CONFIG = {
   ...Config.getConfig(),
@@ -92,7 +92,7 @@ const CONFIG = {
 const showWarningModal = (title: string, message: string): void => {
   // Timeout needed for display warning modal - we need to update modal
   setTimeout(() => {
-    PrimaryModal.add(PrimaryModal.type.ACKNOWLEDGE, {
+    PrimaryModal.show(PrimaryModal.type.ACKNOWLEDGE, {
       text: {message, title},
     });
   }, 0);

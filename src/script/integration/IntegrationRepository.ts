@@ -38,7 +38,7 @@ import {ProviderEntity} from './ProviderEntity';
 import {MemberLeaveEvent} from '../conversation/EventBuilder';
 import {TeamState} from '../team/TeamState';
 import {ConversationState} from '../conversation/ConversationState';
-import PrimaryModal from '../components/Modals/PrimaryModal/PrimaryModal';
+import PrimaryModal from '../components/Modals/PrimaryModal';
 
 export class IntegrationRepository {
   private readonly logger: Logger;
@@ -144,7 +144,7 @@ export class IntegrationRepository {
         ConversationError.MESSAGE.CONVERSATION_NOT_FOUND,
       );
     } catch (error) {
-      PrimaryModal.add(PrimaryModal.type.ACKNOWLEDGE, {
+      PrimaryModal.show(PrimaryModal.type.ACKNOWLEDGE, {
         text: {
           message: t('modalIntegrationUnavailableMessage'),
           title: t('modalIntegrationUnavailableHeadline'),

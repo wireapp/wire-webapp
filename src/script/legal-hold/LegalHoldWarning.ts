@@ -26,7 +26,7 @@ import type {Conversation} from '../entity/Conversation';
 import {OPEN_CONVERSATION_DETAILS} from '../view_model/PanelViewModel';
 import {ConversationError} from '../error/ConversationError';
 import {LegalHoldModalViewModel} from '../view_model/content/LegalHoldModalViewModel';
-import PrimaryModal from '../components/Modals/PrimaryModal/PrimaryModal';
+import PrimaryModal from '../components/Modals/PrimaryModal';
 
 export const showLegalHoldWarningModal = (
   conversationEntity: Conversation,
@@ -47,7 +47,7 @@ export const showLegalHoldWarningModal = (
       });
     }
 
-    PrimaryModal.add(PrimaryModal.type.MULTI_ACTIONS, {
+    PrimaryModal.show(PrimaryModal.type.MULTI_ACTIONS, {
       close: () => {
         reject(
           new ConversationError(
