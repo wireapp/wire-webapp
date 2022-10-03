@@ -108,7 +108,7 @@ describe('WebSocketClient', () => {
       expect(onMessageSpy.calls.count()).toBe(1);
     });
 
-    it('calls "onConnect" when "onReconnect" is called', async () => {
+    it('calls "onConnect" when websocket is connected or re-connected', async () => {
       const onConnectResult = jasmine.createSpy().and.returnValue(Promise.resolve());
       const onConnect = () => {
         return onConnectResult();
@@ -118,30 +118,9 @@ describe('WebSocketClient', () => {
       spyOn<any>(socket, 'getReconnectingWebsocket').and.returnValue(fakeSocket);
 
       await websocketClient.connect(undefined, onConnect);
+      fakeSocket.onopen();
       await websocketClient['onReconnect']();
       expect(onConnectResult.calls.count()).toBe(1);
-    });
-
-    it('emits error when "onConnect" fails during "onReconnect"', async () => {
-      const testError = new Error('oh no!');
-      let errorHandlerCalled = false;
-      const onConnectResult = jasmine.createSpy().and.returnValue(Promise.reject(testError));
-      const onBeforeConnect = () => {
-        return onConnectResult();
-      };
-      const websocketClient = new WebSocketClient('url', fakeHttpClient);
-      const socket = websocketClient['socket'];
-      spyOn<any>(socket, 'getReconnectingWebsocket').and.returnValue(fakeSocket);
-
-      websocketClient.on(WebSocketClient.TOPIC.ON_ERROR, error => {
-        expect(onConnectResult.calls.count()).toBe(1);
-        expect(error).toBe(testError);
-        errorHandlerCalled = true;
-      });
-
-      await websocketClient.connect(undefined, onBeforeConnect);
-      await websocketClient['onReconnect']();
-      expect(errorHandlerCalled).toBe(true);
     });
   });
 
