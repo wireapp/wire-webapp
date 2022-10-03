@@ -23,7 +23,7 @@ import React, {useRef, useState} from 'react';
 import {useIntl} from 'react-intl';
 import {connect} from 'react-redux';
 import {AnyAction, Dispatch} from 'redux';
-import {useNavigate} from 'react-router-dom';
+import {Navigate, useNavigate} from 'react-router-dom';
 import {Config} from '../../Config';
 import {accountFormStrings, setPasswordStrings} from '../../strings';
 import Exception from '../component/Exception';
@@ -72,8 +72,7 @@ const SetPassword = ({
   };
 
   if (hasSelfPassword || isSelfSSOUser) {
-    navigate(ROUTE.SET_HANDLE);
-    return null;
+    return <Navigate to={ROUTE.SET_HANDLE} />;
   }
 
   return (

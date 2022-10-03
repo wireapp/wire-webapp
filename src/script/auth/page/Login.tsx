@@ -43,7 +43,7 @@ import {
 import React, {useEffect, useRef, useState} from 'react';
 import {useIntl} from 'react-intl';
 import {connect} from 'react-redux';
-import {Redirect} from 'react-router';
+import {Navigate} from 'react-router';
 import {AnyAction, Dispatch} from 'redux';
 import {useNavigate} from 'react-router-dom';
 import {getLogger} from 'Util/Logger';
@@ -269,7 +269,7 @@ const Login = ({
         <EntropyContainer onSetEntropy={storeEntropy} />
       ) : (
         <Container centerText verticalCenter style={{width: '100%'}}>
-          {!isValidLink && <Redirect to={ROUTE.CONVERSATION_JOIN_INVALID} />}
+          {!isValidLink && <Navigate to={ROUTE.CONVERSATION_JOIN_INVALID} replace />}
           <AppAlreadyOpen />
           <Columns>
             <IsMobile not>

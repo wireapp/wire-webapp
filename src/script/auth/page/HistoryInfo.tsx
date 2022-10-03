@@ -22,7 +22,7 @@ import {Button, ContainerXS, H1, Link, Paragraph} from '@wireapp/react-ui-kit';
 import React from 'react';
 import {FormattedMessage, useIntl} from 'react-intl';
 import {connect} from 'react-redux';
-import {useNavigate} from 'react-router-dom';
+import {Navigate, useNavigate} from 'react-router-dom';
 import {Config} from '../../Config';
 import {historyInfoStrings} from '../../strings';
 import {RootState} from '../module/reducer';
@@ -54,8 +54,7 @@ const HistoryInfo = ({hasHistory, clients, currentSelfClient, isNewCurrentSelfCl
     (hasHistory || clients.length > 1 || (currentSelfClient && currentSelfClient.type === ClientType.TEMPORARY));
 
   if (!shouldShowHistoryInfo) {
-    navigate(ROUTE.SET_EMAIL);
-    return null;
+    return <Navigate to={ROUTE.SET_EMAIL} />;
   }
 
   return (

@@ -22,7 +22,7 @@ import React, {useRef, useState} from 'react';
 import {useIntl} from 'react-intl';
 import {connect} from 'react-redux';
 import {AnyAction, Dispatch} from 'redux';
-import {useNavigate} from 'react-router-dom';
+import {Navigate, useNavigate} from 'react-router-dom';
 import {setEmailStrings} from '../../strings';
 import Exception from '../component/Exception';
 import {actionRoot} from '../module/action';
@@ -66,8 +66,7 @@ const SetEmail = ({hasSelfEmail, isSelfSSOUser, doSetEmail, isFetching}: Props &
   };
 
   if (hasSelfEmail || isSelfSSOUser) {
-    navigate(ROUTE.SET_PASSWORD);
-    return null;
+    return <Navigate to={ROUTE.SET_PASSWORD} />;
   }
   return (
     <Page>
