@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [20.6.4](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@20.6.3...@wireapp/api-client@20.6.4) (2022-10-03)
+
+### Bug Fixes
+
+* **api-client:** Avoid message gap during websocket connection ([#4418](https://github.com/wireapp/wire-web-packages/issues/4418)) ([8537793](https://github.com/wireapp/wire-web-packages/commit/85377939d6b37144327acd5659113dbe7878b166))
+
 ## [20.6.3](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@20.6.2...@wireapp/api-client@20.6.3) (2022-09-27)
 
 ### Bug Fixes
