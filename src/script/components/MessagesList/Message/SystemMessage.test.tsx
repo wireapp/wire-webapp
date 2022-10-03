@@ -23,18 +23,18 @@ import {MessageTimerUpdateMessage} from 'src/script/entity/message/MessageTimerU
 import {ReceiptModeUpdateMessage} from 'src/script/entity/message/ReceiptModeUpdateMessage';
 import {RenameMessage} from 'src/script/entity/message/RenameMessage';
 import {SystemMessageType} from 'src/script/message/SystemMessageType';
-import TestPage from 'Util/test/TestPage';
-import SystemMessage, {SystemMessageProps} from './SystemMessage';
+import SystemMessage from './SystemMessage';
+import {render} from '@testing-library/react';
 
 jest.mock('Components/Icon', () => ({
   Edit: function EditIcon() {
-    return <span className="editicon"></span>;
+    return <span data-uie-name="editicon" className="editicon"></span>;
   },
   Read: function ReadIcon() {
-    return <span className="readicon"></span>;
+    return <span data-uie-name="readicon" className="readicon"></span>;
   },
   Timer: function TimerIcon() {
-    return <span className="timericon"></span>;
+    return <span data-uie-name="timericon" className="timericon"></span>;
   },
 }));
 
@@ -43,17 +43,6 @@ type SystemMessageUnion =
   | MessageTimerUpdateMessage
   | ReceiptModeUpdateMessage
   | RenameMessage;
-
-class SystemMessagePage extends TestPage<SystemMessageProps> {
-  constructor(props?: SystemMessageProps) {
-    super(SystemMessage, props);
-  }
-
-  getSystemMessage = () => this.get('[data-uie-name="element-message-system"]');
-  getEditIcon = () => this.get('.editicon');
-  getTimerIcon = () => this.get('.timericon');
-  getReadIcon = () => this.get('.readicon');
-}
 
 const createSystemMessage = (partialSystemMessage: Partial<SystemMessageUnion>) => {
   const systemMessage: Partial<SystemMessageUnion> = {
@@ -67,35 +56,35 @@ const createSystemMessage = (partialSystemMessage: Partial<SystemMessageUnion>) 
 
 describe('SystemMessage', () => {
   it('shows edit icon for RenameMessage', async () => {
-    const systemMessagePage = new SystemMessagePage({
-      message: createSystemMessage({
-        system_message_type: SystemMessageType.CONVERSATION_RENAME,
-      }),
+    const message = createSystemMessage({
+      system_message_type: SystemMessageType.CONVERSATION_RENAME,
     });
 
-    expect(systemMessagePage.getSystemMessage()).not.toBeNull();
-    expect(systemMessagePage.getEditIcon()).not.toBeNull();
+    const {queryByTestId} = render(<SystemMessage message={message} />);
+
+    expect(queryByTestId('element-message-system')).not.toBeNull();
+    expect(queryByTestId('editicon')).not.toBeNull();
   });
 
   it('shows timer icon for MessageTimerUpdateMessage', async () => {
-    const systemMessagePage = new SystemMessagePage({
-      message: createSystemMessage({
-        system_message_type: SystemMessageType.CONVERSATION_MESSAGE_TIMER_UPDATE,
-      }),
+    const message = createSystemMessage({
+      system_message_type: SystemMessageType.CONVERSATION_MESSAGE_TIMER_UPDATE,
     });
 
-    expect(systemMessagePage.getSystemMessage()).not.toBeNull();
-    expect(systemMessagePage.getTimerIcon()).not.toBeNull();
+    const {queryByTestId} = render(<SystemMessage message={message} />);
+
+    expect(queryByTestId('element-message-system')).not.toBeNull();
+    expect(queryByTestId('timericon')).not.toBeNull();
   });
 
   it('shows read icon for ReceiptModeUpdateMessage', async () => {
-    const systemMessagePage = new SystemMessagePage({
-      message: createSystemMessage({
-        system_message_type: SystemMessageType.CONVERSATION_RECEIPT_MODE_UPDATE,
-      }),
+    const message = createSystemMessage({
+      system_message_type: SystemMessageType.CONVERSATION_RECEIPT_MODE_UPDATE,
     });
 
-    expect(systemMessagePage.getSystemMessage()).not.toBeNull();
-    expect(systemMessagePage.getReadIcon()).not.toBeNull();
+    const {queryByTestId} = render(<SystemMessage message={message} />);
+
+    expect(queryByTestId('element-message-system')).not.toBeNull();
+    expect(queryByTestId('readicon')).not.toBeNull();
   });
 });
