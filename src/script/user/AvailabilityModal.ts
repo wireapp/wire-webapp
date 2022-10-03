@@ -21,16 +21,15 @@ import {Availability} from '@wireapp/protocol-messaging';
 
 import {t} from 'Util/LocalizerUtil';
 import {loadValue, storeValue} from 'Util/StorageUtil';
-
-import {ModalsViewModel, modals} from '../view_model/ModalsViewModel';
+import PrimaryModal from '../components/Modals/PrimaryModal';
 
 const initialKey = 'hide_initial_modal';
 
 function showModal(storageKey: string, title: string, message: string): void {
   const hideModal = loadValue(storageKey);
   if (!hideModal) {
-    modals.showModal(
-      ModalsViewModel.TYPE.OPTION,
+    PrimaryModal.show(
+      PrimaryModal.type.OPTION,
       {
         hideSecondary: true,
         preventClose: true,

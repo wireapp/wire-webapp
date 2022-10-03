@@ -824,7 +824,6 @@
   "modalConversationRemoveMessage": "{{user}} won’t be able to send or receive messages in this conversation.",
   "modalConversationRemoveServicesMessage": "Current services will be removed from the conversation. New services will not be allowed.",
   "modalConversationRevokeLinkAction": "Revoke link",
-  "modalConversationRevokeLinkCloseBtn": "Close window, Revoke the link?",
   "modalConversationRevokeLinkHeadline": "Revoke the link?",
   "modalConversationRevokeLinkMessage": "New guests will not be able to join with this link. Current guests will still have access.",
   "modalConversationTooManyMembersHeadline": "The group is full",

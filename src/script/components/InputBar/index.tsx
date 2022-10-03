@@ -66,7 +66,6 @@ import {MessageRepository, OutgoingQuote} from '../../conversation/MessageReposi
 import {StorageRepository} from '../../storage';
 import {MentionEntity} from '../../message/MentionEntity';
 import {Config} from '../../Config';
-import {ModalsViewModel} from '../../view_model/ModalsViewModel';
 import {ConversationError} from '../../error/ConversationError';
 import {MessageHasher} from '../../message/MessageHasher';
 import {QuoteEntity} from '../../message/QuoteEntity';
@@ -81,10 +80,12 @@ import useScrollSync from '../../hooks/useScrollSync';
 import useResizeTarget from '../../hooks/useResizeTarget';
 import useDropFiles from '../../hooks/useDropFiles';
 import useTextAreaFocus from '../../hooks/useTextAreaFocus';
+
 import {StyledApp, THEME_ID, useMatchMedia} from '@wireapp/react-ui-kit';
 import ControlButtons from '../../page/message-list/InputBarControls/ControlButtons';
 import Icon from 'Components/Icon';
 import GiphyButton from '../../page/message-list/InputBarControls/GiphyButton';
+import PrimaryModal from '../Modals/PrimaryModal';
 
 const CONFIG = {
   ...Config.getConfig(),
@@ -94,7 +95,7 @@ const CONFIG = {
 const showWarningModal = (title: string, message: string): void => {
   // Timeout needed for display warning modal - we need to update modal
   setTimeout(() => {
-    amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.ACKNOWLEDGE, {
+    PrimaryModal.show(PrimaryModal.type.ACKNOWLEDGE, {
       text: {message, title},
     });
   }, 0);

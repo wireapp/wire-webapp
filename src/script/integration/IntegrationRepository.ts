@@ -18,8 +18,6 @@
  */
 
 import ko from 'knockout';
-import {amplify} from 'amplify';
-import {WebAppEvents} from '@wireapp/webapp-events';
 import type {ConversationMemberJoinEvent} from '@wireapp/api-client/src/event/';
 import {container} from 'tsyringe';
 
@@ -32,7 +30,6 @@ import type {ConversationRepository} from '../conversation/ConversationRepositor
 import type {Conversation} from '../entity/Conversation';
 import type {User} from '../entity/User';
 import type {TeamRepository} from '../team/TeamRepository';
-import {ModalsViewModel} from '../view_model/ModalsViewModel';
 import {IntegrationMapper} from './IntegrationMapper';
 import type {IntegrationService} from './IntegrationService';
 import {ServiceEntity} from './ServiceEntity';
@@ -41,6 +38,7 @@ import {ProviderEntity} from './ProviderEntity';
 import {MemberLeaveEvent} from '../conversation/EventBuilder';
 import {TeamState} from '../team/TeamState';
 import {ConversationState} from '../conversation/ConversationState';
+import PrimaryModal from '../components/Modals/PrimaryModal';
 
 export class IntegrationRepository {
   private readonly logger: Logger;
@@ -146,7 +144,7 @@ export class IntegrationRepository {
         ConversationError.MESSAGE.CONVERSATION_NOT_FOUND,
       );
     } catch (error) {
-      amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.ACKNOWLEDGE, {
+      PrimaryModal.show(PrimaryModal.type.ACKNOWLEDGE, {
         text: {
           message: t('modalIntegrationUnavailableMessage'),
           title: t('modalIntegrationUnavailableHeadline'),
