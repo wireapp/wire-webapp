@@ -2971,10 +2971,10 @@
     tough-cookie "4.0.0"
     ws "7.5.3"
 
-"@wireapp/avs@8.2.8":
-  version "8.2.8"
-  resolved "https://registry.yarnpkg.com/@wireapp/avs/-/avs-8.2.8.tgz#58b9a129eca375305e66aadd6f2970fd77e77c38"
-  integrity sha512-G3Fe+Jn8hT89nMxQzYnoxcv/eBj9ahh18+zY7HPzVrYarzwsrfk1SiWh2S5mtC5pzBYPOsU1vZEKd2grXGQCuA==
+"@wireapp/avs@8.2.16":
+  version "8.2.16"
+  resolved "https://registry.yarnpkg.com/@wireapp/avs/-/avs-8.2.16.tgz#be282255aeeff7da4b7b41b1f591049e37c7c517"
+  integrity sha512-yXYC2u+8jZPoNFHdjD/81tapsm7IegMXic1ZREangtxrlJ+yPRxEVzvxrN+qivrbnI5TPKk+uXx3EJncJP0xOg==
 
 "@wireapp/cbor@4.7.3":
   version "4.7.3"
