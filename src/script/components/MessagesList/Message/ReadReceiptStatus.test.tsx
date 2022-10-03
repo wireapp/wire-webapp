@@ -18,29 +18,16 @@
  */
 
 import ko from 'knockout';
-import TestPage from 'Util/test/TestPage';
 import {Message as MessageEntity} from 'src/script/entity/message/Message';
-import ReadReceiptStatus, {ReadReceiptStatusProps} from './ReadReceiptStatus';
+import ReadReceiptStatus from './ReadReceiptStatus';
 import {ReadReceipt} from 'src/script/storage';
 import {formatTimeShort} from 'Util/TimeUtil';
-
-class ReadReceiptStatusPage extends TestPage<ReadReceiptStatusProps> {
-  constructor(props?: ReadReceiptStatusProps) {
-    super(ReadReceiptStatus, props);
-  }
-
-  getReadReceiptStatus = () => this.get('button[data-uie-name="status-message-read-receipts"]');
-  getReadReceiptStatusCount = () => this.get('span[data-uie-name="status-message-read-receipt-count"]');
-  getReadReceiptStatusDelivered = () => this.get('span[data-uie-name="status-message-read-receipt-delivered"]');
-  getReadIcon = () => this.get('[data-uie-name=status-message-read-receipts]');
-
-  clickReadReceiptStatus = () => this.click(this.getReadReceiptStatus());
-}
+import {render, fireEvent} from '@testing-library/react';
 
 const createReadReceiptMessage = (partialReadReceiptStatus: Partial<MessageEntity>) => {
   const readReceiptMessage: Partial<MessageEntity> = {
     expectsReadConfirmation: true,
-    readReceipts: ko.observableArray([]),
+    readReceipts: ko.observableArray([] as ReadReceipt[]),
     ...partialReadReceiptStatus,
   };
   return readReceiptMessage as MessageEntity;
@@ -48,78 +35,86 @@ const createReadReceiptMessage = (partialReadReceiptStatus: Partial<MessageEntit
 
 describe('ReadReceiptStatus', () => {
   it('is not shown when message is not last delivered message', () => {
-    const readReceiptStatusPage = new ReadReceiptStatusPage({
+    const props = {
       is1to1Conversation: false,
       isLastDeliveredMessage: false,
       message: createReadReceiptMessage({
-        readReceipts: ko.observableArray([]),
+        readReceipts: ko.observableArray([] as ReadReceipt[]),
       }),
       onClickReceipts: jest.fn(),
-    });
+    };
 
-    expect(readReceiptStatusPage.getReadReceiptStatusDelivered()).toBeNull();
+    const {queryByTestId} = render(<ReadReceiptStatus {...props} />);
+
+    expect(queryByTestId('status-message-read-receipt-delivered')).toBeNull();
   });
 
   it('shows "delivered" when noone read the message', () => {
-    const readReceiptStatusPage = new ReadReceiptStatusPage({
+    const props = {
       is1to1Conversation: false,
       isLastDeliveredMessage: true,
       message: createReadReceiptMessage({
-        readReceipts: ko.observableArray([]),
+        readReceipts: ko.observableArray([] as ReadReceipt[]),
       }),
       onClickReceipts: jest.fn(),
-    });
+    };
 
-    expect(readReceiptStatusPage.getReadReceiptStatusDelivered()).not.toBeNull();
-    expect(readReceiptStatusPage.getReadIcon()).toBeNull();
+    const {queryByTestId} = render(<ReadReceiptStatus {...props} />);
+
+    expect(queryByTestId('status-message-read-receipt-delivered')).not.toBeNull();
+    expect(queryByTestId('status-message-read-receipts')).toBeNull();
   });
 
   it('shows the read icon', () => {
-    const readReceiptStatusPage = new ReadReceiptStatusPage({
+    const props = {
       is1to1Conversation: false,
       isLastDeliveredMessage: true,
       message: createReadReceiptMessage({
         readReceipts: ko.observableArray([{} as ReadReceipt]),
       }),
       onClickReceipts: jest.fn(),
-    });
+    };
 
-    expect(readReceiptStatusPage.getReadReceiptStatus()).not.toBeNull();
-    expect(readReceiptStatusPage.getReadIcon()).not.toBeNull();
+    const {queryByTestId} = render(<ReadReceiptStatus {...props} />);
+
+    expect(queryByTestId('status-message-read-receipts')).not.toBeNull();
+    expect(queryByTestId('status-message-read-receipts')).not.toBeNull();
   });
 
   describe('1to1 conversation', () => {
     it('has no click handler', () => {
       const onClickReceiptsSpy = jest.fn();
       const readReceiptTime = new Date().toISOString();
-      const readReceiptStatusPage = new ReadReceiptStatusPage({
+      const props = {
         is1to1Conversation: true,
         isLastDeliveredMessage: true,
         message: createReadReceiptMessage({
           readReceipts: ko.observableArray([{time: readReceiptTime} as ReadReceipt]),
         }),
         onClickReceipts: onClickReceiptsSpy,
-      });
+      };
 
-      expect(readReceiptStatusPage.getReadReceiptStatus()).not.toBeNull();
+      const {getByTestId} = render(<ReadReceiptStatus {...props} />);
 
-      readReceiptStatusPage.clickReadReceiptStatus();
+      const readReceiptStatus = getByTestId('status-message-read-receipts');
+      fireEvent.click(readReceiptStatus);
       expect(onClickReceiptsSpy).toHaveBeenCalledTimes(0);
     });
 
     it('shows timestamp instead of read count', () => {
       const readReceiptTime = new Date().toISOString();
-      const readReceiptStatusPage = new ReadReceiptStatusPage({
+      const props = {
         is1to1Conversation: true,
         isLastDeliveredMessage: true,
         message: createReadReceiptMessage({
           readReceipts: ko.observableArray([{time: readReceiptTime} as ReadReceipt]),
         }),
-      });
+      };
 
-      expect(readReceiptStatusPage.getReadReceiptStatus()).not.toBeNull();
-      expect(readReceiptStatusPage.getReadReceiptStatusCount()).not.toBeNull();
-      expect(readReceiptStatusPage.getReadReceiptStatusCount().textContent).toBe(formatTimeShort(readReceiptTime));
+      const {queryByTestId, queryByText} = render(<ReadReceiptStatus {...props} />);
+
+      expect(queryByTestId('status-message-read-receipts')).not.toBeNull();
+      expect(queryByText(formatTimeShort(readReceiptTime))).not.toBeNull();
     });
   });
 
@@ -127,34 +122,37 @@ describe('ReadReceiptStatus', () => {
     it('has a click handler', () => {
       const onClickReceiptsSpy = jest.fn();
       const readReceiptTime = new Date().toISOString();
-      const readReceiptStatusPage = new ReadReceiptStatusPage({
+      const props = {
         is1to1Conversation: false,
         isLastDeliveredMessage: true,
         message: createReadReceiptMessage({
           readReceipts: ko.observableArray([{time: readReceiptTime} as ReadReceipt]),
         }),
         onClickReceipts: onClickReceiptsSpy,
-      });
+      };
 
-      expect(readReceiptStatusPage.getReadReceiptStatus()).not.toBeNull();
+      const {getByTestId} = render(<ReadReceiptStatus {...props} />);
 
-      readReceiptStatusPage.clickReadReceiptStatus();
+      const readReceiptStatus = getByTestId('status-message-read-receipts');
+
+      fireEvent.click(readReceiptStatus);
       expect(onClickReceiptsSpy).toHaveBeenCalledTimes(1);
     });
 
     it('shows read count', async () => {
-      const readReceiptStatusPage = new ReadReceiptStatusPage({
+      const props = {
         is1to1Conversation: false,
         isLastDeliveredMessage: true,
         message: createReadReceiptMessage({
           readReceipts: ko.observableArray([{} as ReadReceipt, {} as ReadReceipt]),
         }),
-        onClickReceipts: null,
-      });
+        onClickReceipts: jest.fn(),
+      };
 
-      expect(readReceiptStatusPage.getReadReceiptStatus()).not.toBeNull();
-      expect(readReceiptStatusPage.getReadReceiptStatusCount()).not.toBeNull();
-      expect(readReceiptStatusPage.getReadReceiptStatusCount().textContent).toEqual('2');
+      const {getByText, queryByTestId} = render(<ReadReceiptStatus {...props} />);
+
+      expect(queryByTestId('status-message-read-receipts')).not.toBeNull();
+      expect(getByText('2')).not.toBeNull();
     });
   });
 });
