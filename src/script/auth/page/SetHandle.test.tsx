@@ -17,40 +17,14 @@
  *
  */
 
-import {ReactWrapper} from 'enzyme';
 import {actionRoot} from '../module/action';
-import {initialRootState, RootState, Api} from '../module/reducer';
+import {initialRootState} from '../module/reducer';
 import {mockStoreFactory} from '../util/test/mockStoreFactory';
-import {mountComponent, mountComponentReact18} from '../util/test/TestUtil';
+import {mountComponentReact18} from '../util/test/TestUtil';
 import SetHandle from './SetHandle';
-import {MockStoreEnhanced} from 'redux-mock-store';
-import {ThunkDispatch} from 'redux-thunk';
-import {AnyAction} from 'redux';
-import {TypeUtil} from '@wireapp/commons';
-import {History} from 'history';
 import {fireEvent} from '@testing-library/react';
 
 jest.mock('../util/SVGProvider');
-
-class SetHandlePage {
-  private readonly driver: ReactWrapper;
-
-  constructor(
-    store: MockStoreEnhanced<TypeUtil.RecursivePartial<RootState>, ThunkDispatch<RootState, Api, AnyAction>>,
-    history?: History,
-  ) {
-    this.driver = mountComponent(<SetHandle />, store, history);
-  }
-
-  getHandleInput = () => this.driver.find('input[data-uie-name="enter-handle"]');
-  getSetHandleButton = () => this.driver.find('button[data-uie-name="do-send-handle"]');
-  getErrorMessage = (errorLabel?: string) =>
-    this.driver.find(`[data-uie-name="error-message"]${errorLabel ? `[data-uie-value="${errorLabel}"]` : ''}`);
-
-  clickSetHandleButton = () => this.getSetHandleButton().simulate('submit');
-
-  enterHandle = (value: string) => this.getHandleInput().simulate('change', {target: {value}});
-}
 
 const handleInputId = 'enter-handle';
 const setHandleButtonId = 'do-send-handle';
