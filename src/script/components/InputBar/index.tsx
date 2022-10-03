@@ -58,7 +58,6 @@ import {TeamState} from '../../team/TeamState';
 import {UserState} from '../../user/UserState';
 import {SearchRepository} from '../../search/SearchRepository';
 import {ContentMessage} from '../../entity/message/ContentMessage';
-import InputBarControls from '../../page/message-list/InputBarControls';
 import {Conversation} from '../../entity/Conversation';
 import {AssetRepository} from '../../assets/AssetRepository';
 import {ConversationRepository} from '../../conversation/ConversationRepository';
@@ -81,7 +80,11 @@ import useScrollSync from '../../hooks/useScrollSync';
 import useResizeTarget from '../../hooks/useResizeTarget';
 import useDropFiles from '../../hooks/useDropFiles';
 import useTextAreaFocus from '../../hooks/useTextAreaFocus';
-import {StyledApp, THEME_ID} from '@wireapp/react-ui-kit';
+
+import {StyledApp, THEME_ID, useMatchMedia} from '@wireapp/react-ui-kit';
+import ControlButtons from '../../page/message-list/InputBarControls/ControlButtons';
+import Icon from 'Components/Icon';
+import GiphyButton from '../../page/message-list/InputBarControls/GiphyButton';
 import PrimaryModal from '../Modals/PrimaryModal';
 
 const CONFIG = {
@@ -192,6 +195,14 @@ const InputBar = ({
   const hasLocalEphemeralTimer = isSelfDeletingMessagesEnabled && localMessageTimer && !hasGlobalMessageTimer;
 
   const richTextInput = getRichTextInput(currentMentions, inputValue);
+
+  const isScaledDown = useMatchMedia('max-width: 768px');
+
+  const config = {
+    GIPHY_TEXT_LENGTH: 256,
+  };
+
+  const showGiphyButton = inputValue.length > 0 && inputValue.length <= config.GIPHY_TEXT_LENGTH;
 
   const updateSelectionState = (updateOnInit = true) => {
     if (!updateOnInit) {
@@ -805,6 +816,37 @@ const InputBar = ({
     };
   }, [pastedFile]);
 
+  const sendButton = (
+    <li>
+      <button
+        type="button"
+        className={cx('controls-right-button controls-right-button--send')}
+        disabled={inputValue.length === 0}
+        title={t('tooltipConversationSendMessage')}
+        aria-label={t('tooltipConversationSendMessage')}
+        onClick={() => onSend(inputValue)}
+        data-uie-name="do-send-message"
+      >
+        <Icon.Send />
+      </button>
+    </li>
+  );
+
+  const controlButtonsProps = {
+    conversation: conversationEntity,
+    disableFilesharing: !isFileSharingSendingEnabled,
+    disablePing: pingDisabled,
+    input: inputValue,
+    isEditing: isEditing,
+    isScaledDown: isScaledDown,
+    onCancelEditing: cancelMessageEditing,
+    onClickPing: onPingClick,
+    onGifClick: onGifClick,
+    onSelectFiles: uploadFiles,
+    onSelectImages: uploadImages,
+    showGiphyButton: showGiphyButton,
+  };
+
   return (
     <StyledApp themeId={THEME_ID.DEFAULT}>
       <div id="conversation-input-bar" className="conversation-input-bar">
@@ -861,20 +903,22 @@ const InputBar = ({
                     suggestions={mentionSuggestions}
                     onSelectionValidated={addMention}
                   />
-
-                  <InputBarControls
-                    conversation={conversationEntity}
-                    input={inputValue}
-                    isEditing={isEditing}
-                    disablePing={pingDisabled}
-                    disableFilesharing={!isFileSharingSendingEnabled}
-                    onSend={() => onSend(inputValue)}
-                    onSelectFiles={uploadFiles}
-                    onSelectImages={uploadImages}
-                    onCancelEditing={cancelMessageEditing}
-                    onClickGif={onGifClick}
-                    onClickPing={onPingClick}
-                  />
+                  {isScaledDown ? (
+                    <>
+                      <ul className="controls-right buttons-group" css={{minWidth: '95px'}}>
+                        {showGiphyButton && <GiphyButton onGifClick={onGifClick} />}
+                        {sendButton}
+                      </ul>
+                      <ul className="controls-right buttons-group" css={{justifyContent: 'center', width: '100%'}}>
+                        <ControlButtons {...controlButtonsProps} isScaledDown={isScaledDown} />
+                      </ul>
+                    </>
+                  ) : (
+                    <ul className="controls-right buttons-group">
+                      <ControlButtons {...controlButtonsProps} showGiphyButton={showGiphyButton} />
+                      {sendButton}
+                    </ul>
+                  )}
                 </>
               )}
             </>

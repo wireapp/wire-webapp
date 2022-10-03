@@ -201,7 +201,13 @@ body {
 
 @conversation-message-max-width: 640px;
 @conversation-message-sender-width: 56px;
-@conversation-message-timestamp-width: 170px;
+
+body {
+  --conversation-message-timestamp-width: 170px;
+  @media (max-width: @screen-md-min) {
+    --conversation-message-timestamp-width: 55px;
+  }
+}
 
 // ----------------------------------------------------------------------------
 // Conversation Input

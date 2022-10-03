@@ -36,6 +36,14 @@ import {User} from '../../entity/User';
 import {QualifiedId} from '@wireapp/api-client/src/user';
 import {amplify} from 'amplify';
 import {ContentViewModel} from '../../view_model/ContentViewModel';
+import * as uiKit from '@wireapp/react-ui-kit';
+
+jest.mock('@wireapp/react-ui-kit', () => ({
+  ...(jest.requireActual('@wireapp/react-ui-kit') as any),
+  useMatchMedia: jest.fn(),
+}));
+
+const mockedUiKit = uiKit as jest.Mocked<typeof uiKit>;
 
 jest.spyOn(Runtime, 'isSupportingConferenceCalling').mockReturnValue(true);
 
@@ -137,6 +145,8 @@ describe('TitleBar', () => {
     const panelViewModel = createPanelViewModel();
     const conversation = createConversationEntity();
 
+    mockedUiKit.useMatchMedia.mockReturnValue(false);
+
     const {getByLabelText} = render(
       <TitleBar
         {...getDefaultProps(callingRepository)}
@@ -152,6 +162,16 @@ describe('TitleBar', () => {
     expect(panelViewModel.togglePanel).toHaveBeenCalledWith(PanelViewModel.STATE.CONVERSATION_DETAILS, {
       entity: conversation,
     });
+  });
+  it('hide info button and search button on scaled down view', async () => {
+    mockedUiKit.useMatchMedia.mockReturnValue(true);
+
+    const {queryByLabelText} = render(<TitleBar {...getDefaultProps(callingRepository)} />);
+
+    const infoButton = queryByLabelText('tooltipConversationInfo');
+    const videoCallButton = queryByLabelText('tooltipConversationVideoCall');
+    expect(infoButton).toBe(null);
+    expect(videoCallButton).toBe(null);
   });
 
   it("doesn't show legal-hold icon for non legal-hold user", async () => {
@@ -249,6 +269,8 @@ describe('TitleBar', () => {
   });
 
   it('starts video call on video call button click', async () => {
+    mockedUiKit.useMatchMedia.mockReturnValue(false);
+
     const firstUser = new User();
     const teamState = createTeamState({isVideoCallingEnabled: ko.pureComputed(() => true)});
     const conversation = createConversationEntity({

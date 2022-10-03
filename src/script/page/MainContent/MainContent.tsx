@@ -36,9 +36,6 @@ import {ClientState} from '../../client/ClientState';
 import {UserState} from '../../user/UserState';
 import {StyledApp, THEME_ID} from '@wireapp/react-ui-kit';
 
-// Ko imported components
-import '../message-list/InputBarControls';
-
 type LeftSidebarProps = {
   contentViewModel: ContentViewModel;
   conversationState?: ConversationState;
