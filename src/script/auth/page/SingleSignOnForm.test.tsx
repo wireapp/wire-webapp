@@ -17,46 +17,21 @@
  *
  */
 
-import {ReactWrapper} from 'enzyme';
-import {createMemoryHistory} from 'history';
-import waitForExpect from 'wait-for-expect';
 import {actionRoot} from '../module/action';
-import {initialRootState, RootState, Api} from '../module/reducer';
+import {initialRootState} from '../module/reducer';
 import {ROUTE, QUERY_KEY} from '../route';
 import {mockStoreFactory} from '../util/test/mockStoreFactory';
-import {mountComponent} from '../util/test/TestUtil';
-import SingleSignOnForm, {SingleSignOnFormProps} from './SingleSignOnForm';
+import {mountComponentReact18} from '../util/test/TestUtil';
+import SingleSignOnForm from './SingleSignOnForm';
 import {ValidationError} from '../module/action/ValidationError';
 import {TypeUtil} from '@wireapp/commons';
 import {Config, Configuration} from '../../Config';
-import {MockStoreEnhanced} from 'redux-mock-store';
-import {ThunkDispatch} from 'redux-thunk';
-import {AnyAction} from 'redux';
-import {History} from 'history';
+import {fireEvent, waitFor} from '@testing-library/react';
 
-class SingleSignOnFormPage {
-  private readonly driver: ReactWrapper;
-
-  constructor(
-    store: MockStoreEnhanced<TypeUtil.RecursivePartial<RootState>, ThunkDispatch<RootState, Api, AnyAction>>,
-    componentProps: SingleSignOnFormProps,
-    history?: History,
-  ) {
-    this.driver = mountComponent(<SingleSignOnForm {...componentProps} />, store, history);
-  }
-
-  getCodeOrEmailInput = () => this.driver.find('input[data-uie-name="enter-code"]');
-  getSubmitButton = () => this.driver.find('button[data-uie-name="do-sso-sign-in"]');
-  getTemporaryCheckbox = () => this.driver.find('input[data-uie-name="enter-public-computer-sso-sign-in"]');
-  getErrorMessage = (errorLabel?: string) =>
-    this.driver.find(`[data-uie-name="error-message"]${errorLabel ? `[data-uie-value="${errorLabel}"]` : ''}`);
-
-  clickSubmitButton = () => this.getSubmitButton().simulate('submit');
-
-  enterCodeOrEmail = (value: string) => this.getCodeOrEmailInput().simulate('change', {target: {value}});
-
-  update = () => this.driver.update();
-}
+const codeOrEmailInputId = 'enter-code';
+const submitButtonId = 'do-sso-sign-in';
+const temporaryCheckboxId = 'enter-public-computer-sso-sign-in';
+const errorId = 'error-message';
 
 describe('SingleSignOnForm', () => {
   it('prefills code and disables input with initial SSO code', async () => {
@@ -72,7 +47,8 @@ describe('SingleSignOnForm', () => {
     spyOn(actionRoot.authAction, 'validateSSOCode').and.returnValue(() => Promise.resolve());
     spyOn(actionRoot.authAction, 'doFinalizeSSOLogin').and.returnValue(() => Promise.resolve());
 
-    const singleSignOnFormPage = new SingleSignOnFormPage(
+    const {getByTestId} = mountComponentReact18(
+      <SingleSignOnForm {...{doLogin, initialCode}} />,
       mockStoreFactory()({
         ...initialRootState,
         runtimeState: {
@@ -81,16 +57,16 @@ describe('SingleSignOnForm', () => {
           isSupportedBrowser: true,
         },
       }),
-      {doLogin, initialCode},
     );
 
-    expect(singleSignOnFormPage.getCodeOrEmailInput()).not.toBeNull();
+    const codeOrEmailInput = getByTestId(codeOrEmailInputId) as HTMLInputElement;
+    const submitButton = getByTestId(submitButtonId) as HTMLInputElement;
 
-    expect(singleSignOnFormPage.getCodeOrEmailInput().props().value).toEqual(initialCode);
+    expect(codeOrEmailInput.value).toEqual(initialCode);
 
-    expect(singleSignOnFormPage.getCodeOrEmailInput().props().disabled).toBe(true);
+    expect(codeOrEmailInput.disabled).toBe(true);
 
-    expect(singleSignOnFormPage.getSubmitButton().props().disabled).toEqual(false);
+    expect(submitButton.disabled).toEqual(false);
   });
 
   it('successfully logs into account with SSO code', async () => {
@@ -100,15 +76,15 @@ describe('SingleSignOnForm', () => {
       },
     });
 
-    const history = createMemoryHistory();
-    const historyPushSpy = spyOn(history, 'push');
+    const historyPushSpy = spyOn(history, 'pushState');
     const doLogin = jasmine.createSpy().and.returnValue((code: string) => Promise.resolve());
     const code = 'wire-cb6e4dfc-a4b0-4c59-a31d-303a7f5eb5ab';
 
     spyOn(actionRoot.authAction, 'validateSSOCode').and.returnValue(() => Promise.resolve());
     spyOn(actionRoot.authAction, 'doFinalizeSSOLogin').and.returnValue(() => Promise.resolve());
 
-    const singleSignOnFormPage = new SingleSignOnFormPage(
+    const {getByTestId} = mountComponentReact18(
+      <SingleSignOnForm {...{doLogin}} />,
       mockStoreFactory()({
         ...initialRootState,
         runtimeState: {
@@ -117,24 +93,23 @@ describe('SingleSignOnForm', () => {
           isSupportedBrowser: true,
         },
       }),
-      {doLogin},
-      history,
     );
 
-    expect(singleSignOnFormPage.getCodeOrEmailInput()).not.toBeNull();
+    const codeOrEmailInput = getByTestId(codeOrEmailInputId) as HTMLInputElement;
+    const submitButton = getByTestId(submitButtonId) as HTMLInputElement;
 
-    singleSignOnFormPage.enterCodeOrEmail(code);
-    singleSignOnFormPage.clickSubmitButton();
+    fireEvent.change(codeOrEmailInput, {target: {value: code}});
+    fireEvent.click(submitButton);
 
     expect(actionRoot.authAction.validateSSOCode).toHaveBeenCalledTimes(1);
 
-    await waitForExpect(() => {
+    await waitFor(() => {
       expect(doLogin).toHaveBeenCalledTimes(1);
     });
 
     expect(actionRoot.authAction.doFinalizeSSOLogin).toHaveBeenCalledTimes(1);
 
-    expect(historyPushSpy).toHaveBeenCalledWith(ROUTE.HISTORY_INFO as any);
+    expect(historyPushSpy).toHaveBeenCalledWith(expect.any(Object), expect.any(String), `#${ROUTE.HISTORY_INFO}`);
   });
 
   it('shows invalid code or email error', async () => {
@@ -145,7 +120,8 @@ describe('SingleSignOnForm', () => {
     });
     const code = 'invalid-code';
 
-    const singleSignOnFormPage = new SingleSignOnFormPage(
+    const {getByTestId, container} = mountComponentReact18(
+      <SingleSignOnForm {...{doLogin: () => Promise.reject()}} />,
       mockStoreFactory()({
         ...initialRootState,
         runtimeState: {
@@ -154,22 +130,21 @@ describe('SingleSignOnForm', () => {
           isSupportedBrowser: true,
         },
       }),
-      {doLogin: () => Promise.reject()},
     );
 
-    expect(singleSignOnFormPage.getCodeOrEmailInput()).not.toBeNull();
+    const codeOrEmailInput = getByTestId(codeOrEmailInputId) as HTMLInputElement;
+    const submitButton = getByTestId(submitButtonId) as HTMLInputElement;
 
-    expect(singleSignOnFormPage.getSubmitButton().props().disabled).toBe(true);
+    expect(submitButton.disabled).toBe(true);
 
-    singleSignOnFormPage.enterCodeOrEmail(code);
+    fireEvent.change(codeOrEmailInput, {target: {value: code}});
 
-    expect(singleSignOnFormPage.getSubmitButton().props().disabled).toBe(false);
+    expect(submitButton.disabled).toBe(false);
 
-    singleSignOnFormPage.clickSubmitButton();
+    fireEvent.submit(container.querySelector('form')!);
 
-    expect(singleSignOnFormPage.getErrorMessage(ValidationError.FIELD.SSO_EMAIL_CODE.PATTERN_MISMATCH).exists()).toBe(
-      true,
-    );
+    const errorMessage = getByTestId(errorId);
+    expect(errorMessage.dataset.uieValue).toBe(ValidationError.FIELD.SSO_EMAIL_CODE.PATTERN_MISMATCH);
   });
 
   it('disallows email when domain discovery is disabled', async () => {
@@ -180,7 +155,8 @@ describe('SingleSignOnForm', () => {
     });
     const email = 'email@mail.com';
 
-    const singleSignOnFormPage = new SingleSignOnFormPage(
+    const {getByTestId, container} = mountComponentReact18(
+      <SingleSignOnForm {...{doLogin: () => Promise.reject()}} />,
       mockStoreFactory()({
         ...initialRootState,
         runtimeState: {
@@ -189,20 +165,21 @@ describe('SingleSignOnForm', () => {
           isSupportedBrowser: true,
         },
       }),
-      {doLogin: () => Promise.reject()},
     );
 
-    expect(singleSignOnFormPage.getCodeOrEmailInput()).not.toBeNull();
+    const codeOrEmailInput = getByTestId(codeOrEmailInputId) as HTMLInputElement;
+    const submitButton = getByTestId(submitButtonId) as HTMLInputElement;
 
-    expect(singleSignOnFormPage.getSubmitButton().props().disabled).toBe(true);
+    expect(submitButton.disabled).toBe(true);
 
-    singleSignOnFormPage.enterCodeOrEmail(email);
+    fireEvent.change(codeOrEmailInput, {target: {value: email}});
 
-    expect(singleSignOnFormPage.getSubmitButton().props().disabled).toBe(false);
+    expect(submitButton.disabled).toBe(false);
 
-    singleSignOnFormPage.clickSubmitButton();
+    fireEvent.submit(container.querySelector('form')!);
 
-    expect(singleSignOnFormPage.getErrorMessage(ValidationError.FIELD.SSO_CODE.PATTERN_MISMATCH)).not.toBeNull();
+    const errorMessage = getByTestId(errorId);
+    expect(errorMessage.dataset.uieValue).toBe(ValidationError.FIELD.SSO_CODE.PATTERN_MISMATCH);
   });
 
   it('successfully redirects with registered domain and permanent client', async () => {
@@ -222,7 +199,8 @@ describe('SingleSignOnForm', () => {
     );
     spyOn(actionRoot.navigationAction, 'doNavigate').and.returnValue(() => {});
 
-    const singleSignOnFormPage = new SingleSignOnFormPage(
+    const {getByTestId, container} = mountComponentReact18(
+      <SingleSignOnForm {...{doLogin: () => Promise.reject()}} />,
       mockStoreFactory()({
         ...initialRootState,
         runtimeState: {
@@ -231,22 +209,22 @@ describe('SingleSignOnForm', () => {
           isSupportedBrowser: true,
         },
       }),
-      {doLogin: () => Promise.reject()},
     );
 
-    expect(singleSignOnFormPage.getCodeOrEmailInput()).not.toBeNull();
+    const codeOrEmailInput = getByTestId(codeOrEmailInputId) as HTMLInputElement;
+    const submitButton = getByTestId(submitButtonId) as HTMLInputElement;
 
-    expect(singleSignOnFormPage.getSubmitButton().props().disabled).toBe(true);
+    expect(submitButton.disabled).toBe(true);
 
-    singleSignOnFormPage.enterCodeOrEmail(email);
+    fireEvent.change(codeOrEmailInput, {target: {value: email}});
 
-    expect(singleSignOnFormPage.getSubmitButton().props().disabled).toBe(false);
+    expect(submitButton.disabled).toBe(false);
 
-    singleSignOnFormPage.clickSubmitButton();
+    fireEvent.submit(container.querySelector('form')!);
 
     expect(actionRoot.authAction.doGetDomainInfo).toHaveBeenCalledTimes(1);
 
-    await waitForExpect(() => {
+    await waitFor(() => {
       expect(actionRoot.navigationAction.doNavigate).toHaveBeenCalledWith(expectedHost);
     });
   });
@@ -268,7 +246,8 @@ describe('SingleSignOnForm', () => {
     );
     spyOn(actionRoot.navigationAction, 'doNavigate').and.returnValue(() => {});
 
-    const singleSignOnFormPage = new SingleSignOnFormPage(
+    const {getByTestId, container} = mountComponentReact18(
+      <SingleSignOnForm {...{doLogin: () => Promise.reject()}} />,
       mockStoreFactory()({
         ...initialRootState,
         runtimeState: {
@@ -277,23 +256,24 @@ describe('SingleSignOnForm', () => {
           isSupportedBrowser: true,
         },
       }),
-      {doLogin: () => Promise.reject()},
     );
 
-    expect(singleSignOnFormPage.getCodeOrEmailInput()).not.toBeNull();
+    const codeOrEmailInput = getByTestId(codeOrEmailInputId) as HTMLInputElement;
+    const submitButton = getByTestId(submitButtonId) as HTMLInputElement;
+    const temporaryCheckbox = getByTestId(temporaryCheckboxId) as HTMLInputElement;
 
-    expect(singleSignOnFormPage.getSubmitButton().props().disabled).toBe(true);
+    expect(submitButton.disabled).toBe(true);
 
-    singleSignOnFormPage.enterCodeOrEmail(email);
-    singleSignOnFormPage.getTemporaryCheckbox().simulate('change', {target: {checked: true}});
+    fireEvent.change(codeOrEmailInput, {target: {value: email}});
+    fireEvent.click(temporaryCheckbox);
 
-    expect(singleSignOnFormPage.getSubmitButton().props().disabled).toBe(false);
+    expect(submitButton.disabled).toBe(false);
 
-    singleSignOnFormPage.clickSubmitButton();
+    fireEvent.submit(container.querySelector('form')!);
 
     expect(actionRoot.authAction.doGetDomainInfo).toHaveBeenCalledTimes(1);
 
-    await waitForExpect(() => {
+    await waitFor(() => {
       expect(actionRoot.navigationAction.doNavigate).toHaveBeenCalledWith(expectedHost);
     });
   });

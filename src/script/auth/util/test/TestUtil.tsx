@@ -21,11 +21,10 @@ import {render} from '@testing-library/react';
 import {RecursivePartial} from '@wireapp/commons/src/main/util/TypeUtil';
 import {StyledApp, THEME_ID} from '@wireapp/react-ui-kit';
 import {mount} from 'enzyme';
-import {History, createMemoryHistory} from 'history';
 import React from 'react';
 import {IntlProvider} from 'react-intl';
 import {Provider} from 'react-redux';
-import {Router} from 'react-router';
+import {HashRouter as Router} from 'react-router-dom';
 import {AnyAction} from 'redux';
 import {MockStoreEnhanced} from 'redux-mock-store';
 import {ThunkDispatch} from 'redux-thunk';
@@ -40,15 +39,12 @@ export const withIntl = (component: React.ReactNode) => <IntlProvider locale="en
 
 export const withTheme = (component: React.ReactNode) => <StyledApp themeId={THEME_ID.DEFAULT}>{component}</StyledApp>;
 
-export const withRouter = (component: React.ReactNode, history: History) => (
-  <Router history={history}>{component}</Router>
-);
+export const withRouter = (component: React.ReactNode) => <Router>{component}</Router>;
 
 const wrapComponent = (
   component: React.ReactNode,
   store: MockStoreEnhanced<RecursivePartial<RootState>, ThunkDispatch<RootState, Api, AnyAction>>,
-  history: History = createMemoryHistory(),
-) => withRouter(withTheme(withStore(withIntl(component), store)), history);
+) => withRouter(withTheme(withStore(withIntl(component), store)));
 
 /**
  * @deprecated use mountComponentReact18 instead to avoid "Warning: ReactDOM.render is no longer supported in React 18."
@@ -56,11 +52,9 @@ const wrapComponent = (
 export const mountComponent = (
   component: React.ReactNode,
   store: MockStoreEnhanced<RecursivePartial<RootState>, ThunkDispatch<RootState, Api, AnyAction>>,
-  history: History = createMemoryHistory(),
-) => mount(wrapComponent(component, store, history));
+) => mount(wrapComponent(component, store));
 
 export const mountComponentReact18 = (
   component: React.ReactNode,
   store: MockStoreEnhanced<RecursivePartial<RootState>, ThunkDispatch<RootState, Api, AnyAction>>,
-  history: History = createMemoryHistory(),
-) => render(wrapComponent(component, store, history));
+) => render(wrapComponent(component, store));

@@ -57,7 +57,7 @@ const CheckPassword = ({loginData, doLogin, resetAuthError, isFetching}: Props &
   const passwordInput = useRef<HTMLInputElement>();
 
   const [error, setError] = useState(null);
-  const [password, setPassword] = useState<string | null>(null);
+  const [password, setPassword] = useState<string>('');
   const [validPasswordInput, setValidPasswordInput] = useState(true);
 
   useEffect(() => {
@@ -66,8 +66,9 @@ const CheckPassword = ({loginData, doLogin, resetAuthError, isFetching}: Props &
     }
   }, []);
 
-  const handleLogin = async () => {
+  const handleLogin = async (event: React.UIEvent) => {
     let validationError: Error;
+    event.preventDefault();
 
     if (!passwordInput.current.checkValidity()) {
       validationError = ValidationError.handleValidationState(
@@ -117,7 +118,7 @@ const CheckPassword = ({loginData, doLogin, resetAuthError, isFetching}: Props &
         style={{display: 'flex', flexDirection: 'column', height: 428, justifyContent: 'space-between'}}
       >
         <H1 center>{_(phoneLoginStrings.verifyPasswordHeadline)}</H1>
-        <Form style={{marginTop: 30}} data-uie-name="login">
+        <Form style={{marginTop: 30}} data-uie-name="login" onSubmit={handleLogin}>
           <InputBlock>
             <InputSubmitCombo>
               <Input

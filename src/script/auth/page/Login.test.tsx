@@ -17,60 +17,32 @@
  *
  */
 
-import {ReactWrapper} from 'enzyme';
-import {initialRootState, RootState, Api} from '../module/reducer';
+import {initialRootState} from '../module/reducer';
 import {mockStoreFactory} from '../util/test/mockStoreFactory';
-import {mountComponent} from '../util/test/TestUtil';
+import {mountComponentReact18} from '../util/test/TestUtil';
 import Login from './Login';
 import {Config, Configuration} from '../../Config';
 import {TypeUtil} from '@wireapp/commons';
-import {MockStoreEnhanced} from 'redux-mock-store';
-import {ThunkDispatch} from 'redux-thunk';
-import {AnyAction} from 'redux';
-import {History} from 'history';
 import {actionRoot} from '../module/action';
-import waitForExpect from 'wait-for-expect';
-import {createMemoryHistory} from 'history';
+
 import {ROUTE} from '../route';
 import {ClientType} from '@wireapp/api-client/src/client';
 import {BackendError} from '../module/action/BackendError';
+import {fireEvent, waitFor} from '@testing-library/react';
 
 jest.mock('../util/SVGProvider');
 
-class LoginPage {
-  private readonly driver: ReactWrapper;
-
-  constructor(
-    store: MockStoreEnhanced<TypeUtil.RecursivePartial<RootState>, ThunkDispatch<RootState, Api, AnyAction>>,
-    history?: History,
-  ) {
-    this.driver = mountComponent(<Login />, store, history);
-  }
-
-  getBackButton = () => this.driver.find('[data-uie-name="go-index"]');
-  getEmailInput = () => this.driver.find('input[data-uie-name="enter-email"]');
-  getPasswordInput = () => this.driver.find('input[data-uie-name="enter-password"]');
-  getLoginButton = () => this.driver.find('button[data-uie-name="do-sign-in"]');
-
-  enterEmail = (email: string) => this.getEmailInput().simulate('change', {target: {value: email}});
-  enterPassword = (password: string) => this.getPasswordInput().simulate('change', {target: {value: password}});
-
-  clickLoginButton = () => this.getLoginButton().simulate('click');
-
-  update = () => this.driver.update();
-}
-
 describe('Login', () => {
   it('successfully logs in with email', async () => {
-    const history = createMemoryHistory();
-    const historyPushSpy = spyOn(history, 'push');
+    const historyPushSpy = spyOn(history, 'pushState');
 
     const email = 'email@mail.com';
     const password = 'password';
 
     spyOn(actionRoot.authAction, 'doLogin').and.returnValue(() => Promise.resolve());
 
-    const loginPage = new LoginPage(
+    const {getByTestId} = mountComponentReact18(
+      <Login />,
       mockStoreFactory()({
         ...initialRootState,
         runtimeState: {
@@ -79,26 +51,28 @@ describe('Login', () => {
           isSupportedBrowser: true,
         },
       }),
-      history,
     );
 
-    loginPage.enterEmail(email);
-    loginPage.enterPassword(password);
-    loginPage.clickLoginButton();
+    const emailInput = getByTestId('enter-email');
+    const passwordInput = getByTestId('enter-password');
+    const submitButton = getByTestId('do-sign-in');
 
-    await waitForExpect(() => {
+    fireEvent.change(emailInput, {target: {value: email}});
+    fireEvent.change(passwordInput, {target: {value: password}});
+    fireEvent.click(submitButton);
+
+    await waitFor(() => {
       expect(actionRoot.authAction.doLogin).toHaveBeenCalledWith(
         {clientType: ClientType.PERMANENT, email, password},
         undefined,
       );
     });
 
-    expect(historyPushSpy).toHaveBeenCalledWith(ROUTE.HISTORY_INFO as any);
+    expect(historyPushSpy).toHaveBeenCalledWith(expect.any(Object), expect.any(String), `#${ROUTE.HISTORY_INFO}`);
   });
 
   it('redirects to client deletion page if max devices is reached', async () => {
-    const history = createMemoryHistory();
-    const historyPushSpy = spyOn(history, 'push');
+    const historyPushSpy = spyOn(history, 'pushState');
 
     const email = 'email@mail.com';
     const password = 'password';
@@ -107,7 +81,8 @@ describe('Login', () => {
       Promise.reject({label: BackendError.LABEL.TOO_MANY_CLIENTS}),
     );
 
-    const loginPage = new LoginPage(
+    const {getByTestId} = mountComponentReact18(
+      <Login />,
       mockStoreFactory()({
         ...initialRootState,
         runtimeState: {
@@ -116,33 +91,36 @@ describe('Login', () => {
           isSupportedBrowser: true,
         },
       }),
-      history,
     );
 
-    loginPage.enterEmail(email);
-    loginPage.enterPassword(password);
-    loginPage.clickLoginButton();
+    const emailInput = getByTestId('enter-email');
+    const passwordInput = getByTestId('enter-password');
+    const submitButton = getByTestId('do-sign-in');
 
-    await waitForExpect(() => {
+    fireEvent.change(emailInput, {target: {value: email}});
+    fireEvent.change(passwordInput, {target: {value: password}});
+    fireEvent.click(submitButton);
+
+    await waitFor(() => {
       expect(actionRoot.authAction.doLogin).toHaveBeenCalledWith(
         {clientType: ClientType.PERMANENT, email, password},
         undefined,
       );
     });
 
-    expect(historyPushSpy).toHaveBeenCalledWith(ROUTE.CLIENTS as any);
+    expect(historyPushSpy).toHaveBeenCalledWith(expect.any(Object), expect.any(String), `#${ROUTE.CLIENTS}`);
   });
 
   it('successfully logs in with handle', async () => {
-    const history = createMemoryHistory();
-    const historyPushSpy = spyOn(history, 'push');
+    const historyPushSpy = spyOn(history, 'pushState');
 
     const handle = 'extra-long-handle-with-special-characters...';
     const password = 'password';
 
     spyOn(actionRoot.authAction, 'doLogin').and.returnValue(() => Promise.resolve());
 
-    const loginPage = new LoginPage(
+    const {getByTestId} = mountComponentReact18(
+      <Login />,
       mockStoreFactory()({
         ...initialRootState,
         runtimeState: {
@@ -151,26 +129,29 @@ describe('Login', () => {
           isSupportedBrowser: true,
         },
       }),
-      history,
     );
 
-    loginPage.enterEmail(handle);
-    loginPage.enterPassword(password);
+    const emailInput = getByTestId('enter-email');
+    const passwordInput = getByTestId('enter-password');
+    const submitButton = getByTestId('do-sign-in');
 
-    loginPage.clickLoginButton();
+    fireEvent.change(emailInput, {target: {value: handle}});
+    fireEvent.change(passwordInput, {target: {value: password}});
+    fireEvent.click(submitButton);
 
-    await waitForExpect(() => {
+    await waitFor(() => {
       expect(actionRoot.authAction.doLogin).toHaveBeenCalledWith(
         {clientType: ClientType.PERMANENT, handle, password},
         undefined,
       );
     });
 
-    expect(historyPushSpy).toHaveBeenCalledWith(ROUTE.HISTORY_INFO as any);
+    expect(historyPushSpy).toHaveBeenCalledWith(expect.any(Object), expect.any(String), `#${ROUTE.HISTORY_INFO}`);
   });
 
   it('has disabled submit button as long as one input is empty', () => {
-    const loginPage = new LoginPage(
+    const {getByTestId} = mountComponentReact18(
+      <Login />,
       mockStoreFactory()({
         ...initialRootState,
         runtimeState: {
@@ -181,17 +162,17 @@ describe('Login', () => {
       }),
     );
 
-    expect(loginPage.getEmailInput().exists()).toBe(true);
-    expect(loginPage.getPasswordInput().exists()).toBe(true);
-    expect(loginPage.getLoginButton().exists()).toBe(true);
+    const emailInput = getByTestId('enter-email');
+    const passwordInput = getByTestId('enter-password');
+    const submitButton = getByTestId('do-sign-in') as HTMLButtonElement;
 
-    expect(loginPage.getLoginButton().props().disabled).toBe(true);
-    loginPage.enterEmail('e');
+    expect(submitButton.disabled).toBe(true);
+    fireEvent.change(emailInput, {target: {value: 'e'}});
 
-    expect(loginPage.getLoginButton().props().disabled).toBe(true);
-    loginPage.enterPassword('p');
+    expect(submitButton.disabled).toBe(true);
+    fireEvent.change(passwordInput, {target: {value: 'e'}});
 
-    expect(loginPage.getLoginButton().props().disabled).toBe(false);
+    expect(submitButton.disabled).toBe(false);
   });
 
   describe('with account registration and SSO disabled', () => {
@@ -203,7 +184,8 @@ describe('Login', () => {
           ENABLE_SSO: false,
         },
       });
-      const loginPage = new LoginPage(
+      const {queryByTestId} = mountComponentReact18(
+        <Login />,
         mockStoreFactory()({
           ...initialRootState,
           runtimeState: {
@@ -214,7 +196,8 @@ describe('Login', () => {
         }),
       );
 
-      expect(loginPage.getBackButton().exists()).toBe(false);
+      const backButton = queryByTestId('go-index');
+      expect(backButton).toBeNull();
     });
   });
 
@@ -225,7 +208,8 @@ describe('Login', () => {
           ENABLE_ACCOUNT_REGISTRATION: true,
         },
       });
-      const loginPage = new LoginPage(
+      const {getByTestId} = mountComponentReact18(
+        <Login />,
         mockStoreFactory()({
           ...initialRootState,
           runtimeState: {
@@ -236,7 +220,8 @@ describe('Login', () => {
         }),
       );
 
-      expect(loginPage.getBackButton().exists()).toBe(true);
+      const backButton = getByTestId('go-index');
+      expect(backButton).not.toBeNull();
     });
   });
 });

@@ -18,37 +18,23 @@
  */
 
 import {TypeUtil} from '@wireapp/commons';
-import {ReactWrapper} from 'enzyme';
-import {initialRootState, RootState, Api} from '../module/reducer';
+import {initialRootState} from '../module/reducer';
 import {mockStoreFactory} from '../util/test/mockStoreFactory';
-import {mountComponent} from '../util/test/TestUtil';
+import {mountComponentReact18} from '../util/test/TestUtil';
 import SetAccountType from './SetAccountType';
 import {Config, Configuration} from '../../Config';
-import {MockStoreEnhanced} from 'redux-mock-store';
-import {ThunkDispatch} from 'redux-thunk';
-import {AnyAction} from 'redux';
-import {History} from 'history';
 
 jest.mock('../util/SVGProvider');
+jest.mock('react-router-dom', () => ({
+  ...jest.requireActual('react-router-dom'),
+  Navigate: function Navigate({to}: any) {
+    return <span>Navigate to {to}</span>;
+  },
+}));
 
-class SetAccountTypePage {
-  private readonly driver: ReactWrapper;
-
-  constructor(
-    store: MockStoreEnhanced<TypeUtil.RecursivePartial<RootState>, ThunkDispatch<RootState, Api, AnyAction>>,
-    history?: History,
-  ) {
-    this.driver = mountComponent(<SetAccountType />, store, history);
-  }
-
-  getPersonalAccountButton = () => this.driver.find('a[data-uie-name="go-register-personal"]');
-  getTeamAccountButton = () => this.driver.find('a[data-uie-name="go-register-team"]');
-  getLogo = () => this.driver.find('[data-uie-name="ui-wire-logo"]');
-  getIndexRedirect = () => this.driver.find('[data-uie-name="redirect-login"][to="/"]');
-
-  clickPersonalAccountButton = () => this.getPersonalAccountButton().simulate('click');
-  clickTeamAccountButton = () => this.getTeamAccountButton().simulate('click');
-}
+const personalAccountButtonId = 'go-register-personal';
+const teamAccountButtonId = 'go-register-team';
+const logoId = 'ui-wire-logo';
 
 describe('when visiting the set account type page', () => {
   describe('and the account registration is disabled', () => {
@@ -64,7 +50,8 @@ describe('when visiting the set account type page', () => {
     });
 
     it('redirects to the index page', () => {
-      const accountTypePage = new SetAccountTypePage(
+      const {getByText} = mountComponentReact18(
+        <SetAccountType />,
         mockStoreFactory()({
           ...initialRootState,
           runtimeState: {
@@ -74,8 +61,9 @@ describe('when visiting the set account type page', () => {
           },
         }),
       );
+      const redirect = getByText('Navigate to /');
 
-      expect(accountTypePage.getIndexRedirect()).not.toBeNull();
+      expect(redirect).not.toBeNull();
     });
   });
 
@@ -92,7 +80,8 @@ describe('when visiting the set account type page', () => {
     });
 
     it('shows the Wire logo', () => {
-      const accountTypePage = new SetAccountTypePage(
+      const {getByTestId} = mountComponentReact18(
+        <SetAccountType />,
         mockStoreFactory()({
           ...initialRootState,
           runtimeState: {
@@ -102,12 +91,14 @@ describe('when visiting the set account type page', () => {
           },
         }),
       );
+      const logo = getByTestId(logoId);
 
-      expect(accountTypePage.getLogo()).not.toBeNull();
+      expect(logo).not.toBeNull();
     });
 
     it('shows an option to create a private account', () => {
-      const accountTypePage = new SetAccountTypePage(
+      const {getByTestId} = mountComponentReact18(
+        <SetAccountType />,
         mockStoreFactory()({
           ...initialRootState,
           runtimeState: {
@@ -117,12 +108,14 @@ describe('when visiting the set account type page', () => {
           },
         }),
       );
+      const personalAccountButton = getByTestId(personalAccountButtonId);
 
-      expect(accountTypePage.getPersonalAccountButton()).not.toBeNull();
+      expect(personalAccountButton).not.toBeNull();
     });
 
     it('shows an option to create a team', () => {
-      const accountTypePage = new SetAccountTypePage(
+      const {getByTestId} = mountComponentReact18(
+        <SetAccountType />,
         mockStoreFactory()({
           ...initialRootState,
           runtimeState: {
@@ -133,7 +126,8 @@ describe('when visiting the set account type page', () => {
         }),
       );
 
-      expect(accountTypePage.clickTeamAccountButton()).not.toBeNull();
+      const teamAccountButton = getByTestId(teamAccountButtonId);
+      expect(teamAccountButton).not.toBeNull();
     });
   });
 });

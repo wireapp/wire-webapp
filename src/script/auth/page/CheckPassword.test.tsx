@@ -17,50 +17,23 @@
  *
  */
 
-import {ReactWrapper} from 'enzyme';
-import {createMemoryHistory} from 'history';
-import waitForExpect from 'wait-for-expect';
 import {actionRoot} from '../module/action';
 import {BackendError} from '../module/action/BackendError';
-import {initialRootState, RootState, Api} from '../module/reducer';
+import {initialRootState} from '../module/reducer';
 import {ROUTE} from '../route';
 import {mockStoreFactory} from '../util/test/mockStoreFactory';
-import {mountComponent} from '../util/test/TestUtil';
+import {mountComponentReact18} from '../util/test/TestUtil';
 import CheckPassword from './CheckPassword';
-import {MockStoreEnhanced} from 'redux-mock-store';
-import {TypeUtil} from '@wireapp/commons';
-import {ThunkDispatch} from 'redux-thunk';
-import {AnyAction} from 'redux';
-import {History} from 'history';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
+import {fireEvent, waitFor} from '@testing-library/dom';
+import {act} from 'react-dom/test-utils';
 
 jest.mock('../util/SVGProvider');
 
-class CheckPasswordPage {
-  private readonly driver: ReactWrapper;
-
-  constructor(
-    store: MockStoreEnhanced<TypeUtil.RecursivePartial<RootState>, ThunkDispatch<RootState, Api, AnyAction>>,
-    history?: History,
-  ) {
-    this.driver = mountComponent(<CheckPassword />, store, history);
-  }
-
-  getPasswordInput = () => this.driver.find('input[data-uie-name="enter-password"]');
-  getLoginButton = () => this.driver.find('button[data-uie-name="do-sign-in"]');
-  getErrorMessage = (errorLabel?: string) =>
-    this.driver.find(`[data-uie-name="error-message"]${errorLabel ? `[data-uie-value="${errorLabel}"]` : ''}`);
-
-  clickLoginButton = () => this.getLoginButton().simulate('click');
-
-  enterPassword = (value: string) => this.getPasswordInput().simulate('change', {target: {value}});
-
-  update = () => this.driver.update();
-}
-
 describe('CheckPassword', () => {
   it('has disabled submit button as long as there is no input', () => {
-    const checkPasswordPage = new CheckPasswordPage(
+    const {getByTestId} = mountComponentReact18(
+      <CheckPassword />,
       mockStoreFactory()({
         ...initialRootState,
         runtimeState: {
@@ -71,20 +44,23 @@ describe('CheckPassword', () => {
       }),
     );
 
-    expect(checkPasswordPage.getPasswordInput()).not.toBeNull();
-    expect(checkPasswordPage.getLoginButton()).not.toBeNull();
-    expect(checkPasswordPage.getLoginButton().props().disabled).toBe(true);
-    checkPasswordPage.enterPassword('e');
-    expect(checkPasswordPage.getLoginButton().props().disabled).toBe(false);
+    const loginButton = getByTestId('do-sign-in') as HTMLButtonElement;
+    const passwordInput = getByTestId('enter-password');
+    expect(passwordInput).not.toBeNull();
+    expect(loginButton).not.toBeNull();
+    expect(loginButton.disabled).toBe(true);
+    fireEvent.change(passwordInput, {target: {value: 'e'}});
+    expect(loginButton.disabled).toBe(false);
   });
 
   it('navigates to the history page on valid password', async () => {
-    const history = createMemoryHistory();
-    const historyPushSpy = spyOn(history, 'push');
+    const history = window.history;
+    const historyPushSpy = spyOn(history, 'pushState');
 
     spyOn(actionRoot.authAction, 'doLogin').and.returnValue(() => Promise.resolve());
 
-    const checkPasswordPage = new CheckPasswordPage(
+    const {getByTestId} = mountComponentReact18(
+      <CheckPassword />,
       mockStoreFactory()({
         ...initialRootState,
         runtimeState: {
@@ -93,18 +69,20 @@ describe('CheckPassword', () => {
           isSupportedBrowser: true,
         },
       }),
-      history,
     );
+    const loginButton = getByTestId('do-sign-in') as HTMLButtonElement;
+    const passwordInput = getByTestId('enter-password');
+    fireEvent.change(passwordInput, {target: {value: 'e'}});
 
-    checkPasswordPage.enterPassword('e');
+    expect(loginButton.disabled).toBe(false);
 
-    expect(checkPasswordPage.getLoginButton().props().disabled).toBe(false);
+    act(() => {
+      loginButton.click();
+    });
 
-    checkPasswordPage.clickLoginButton();
-
-    await waitForExpect(() => {
+    await waitFor(() => {
       expect(actionRoot.authAction.doLogin).toHaveBeenCalled();
-      expect(historyPushSpy).toHaveBeenCalledWith(ROUTE.HISTORY_INFO as any);
+      expect(historyPushSpy).toHaveBeenCalledWith(expect.any(Object), expect.any(String), `#${ROUTE.HISTORY_INFO}`);
     });
   });
 
@@ -112,7 +90,8 @@ describe('CheckPassword', () => {
     const error = new BackendError({code: HTTP_STATUS.NOT_FOUND, label: BackendError.LABEL.INVALID_CREDENTIALS});
     spyOn(actionRoot.authAction, 'doLogin').and.returnValue(() => Promise.reject(error));
 
-    const checkPasswordPage = new CheckPasswordPage(
+    const {getByTestId} = mountComponentReact18(
+      <CheckPassword />,
       mockStoreFactory()({
         ...initialRootState,
         runtimeState: {
@@ -123,30 +102,35 @@ describe('CheckPassword', () => {
       }),
     );
 
-    checkPasswordPage.enterPassword('e');
+    const passwordInput = getByTestId('enter-password');
+    const loginButton = getByTestId('do-sign-in') as HTMLButtonElement;
 
-    expect(checkPasswordPage.getLoginButton().props().disabled).toBe(false);
+    fireEvent.change(passwordInput, {target: {value: 'e'}});
 
-    checkPasswordPage.clickLoginButton();
+    expect(loginButton.disabled).toBe(false);
 
-    await waitForExpect(() => {
+    act(() => {
+      loginButton.click();
+    });
+
+    await waitFor(() => {
       expect(actionRoot.authAction.doLogin).toHaveBeenCalledTimes(1);
     });
-    await waitForExpect(() => {
-      checkPasswordPage.update();
-
-      expect(checkPasswordPage.getErrorMessage(BackendError.LABEL.INVALID_CREDENTIALS)).not.toBeNull();
+    await waitFor(() => {
+      const errorMessage = getByTestId('error-message');
+      expect(errorMessage.dataset.uieValue).toEqual(BackendError.LABEL.INVALID_CREDENTIALS);
     });
   });
 
   it('handles too many devices', async () => {
-    const history = createMemoryHistory();
-    const historyPushSpy = spyOn(history, 'push');
+    const history = window.history;
+    const historyPushSpy = spyOn(history, 'pushState');
 
     const error = new BackendError({code: HTTP_STATUS.NOT_FOUND, label: BackendError.LABEL.TOO_MANY_CLIENTS});
     spyOn(actionRoot.authAction, 'doLogin').and.returnValue(() => Promise.reject(error));
 
-    const checkPasswordPage = new CheckPasswordPage(
+    const {getByTestId} = mountComponentReact18(
+      <CheckPassword />,
       mockStoreFactory()({
         ...initialRootState,
         runtimeState: {
@@ -155,19 +139,22 @@ describe('CheckPassword', () => {
           isSupportedBrowser: true,
         },
       }),
-      history,
     );
 
-    checkPasswordPage.enterPassword('e');
+    const passwordInput = getByTestId('enter-password');
+    const loginButton = getByTestId('do-sign-in') as HTMLButtonElement;
+    fireEvent.change(passwordInput, {target: {value: 'e'}});
 
-    expect(checkPasswordPage.getLoginButton().props().disabled).toBe(false);
+    expect(loginButton.disabled).toBe(false);
 
-    checkPasswordPage.clickLoginButton();
+    act(() => {
+      loginButton.click();
+    });
 
-    await waitForExpect(() => {
+    await waitFor(() => {
       expect(actionRoot.authAction.doLogin).toHaveBeenCalled();
 
-      expect(historyPushSpy).toHaveBeenCalledWith(ROUTE.CLIENTS as any);
+      expect(historyPushSpy).toHaveBeenCalledWith(expect.any(Object), expect.any(String), `#${ROUTE.CLIENTS}`);
     });
   });
 });
