@@ -341,7 +341,7 @@ export class APIClient extends EventEmitter {
     delete this.context;
   }
 
-  public connect(onConnect?: OnConnect): Promise<WebSocketClient> {
+  public connect(onConnect?: OnConnect): WebSocketClient {
     return this.transport.ws.connect(this.context?.clientId, onConnect);
   }
 

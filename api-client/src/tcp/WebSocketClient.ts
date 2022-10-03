@@ -19,7 +19,7 @@
 
 import {EventEmitter} from 'events';
 import logdown from 'logdown';
-import {CloseEvent, ErrorEvent, Event} from 'reconnecting-websocket';
+import {CloseEvent, ErrorEvent} from 'reconnecting-websocket';
 
 import {HttpClient, NetworkError} from '../http/';
 import {InvalidTokenError, MissingCookieError} from '../auth/';
@@ -62,7 +62,6 @@ export class WebSocketClient extends EventEmitter {
   public client: HttpClient;
   private isSocketLocked: boolean;
   private bufferedMessages: string[];
-  private onConnect: () => Promise<void> = () => Promise.resolve();
   private abortHandler?: AbortHandler;
 
   public static readonly TOPIC = TOPIC;
@@ -111,12 +110,10 @@ export class WebSocketClient extends EventEmitter {
       // before we try any connection, we first refresh the access token to make sure we will avoid concurrent accessToken refreshes
       await this.refreshAccessToken();
     }
-    // Note: Do NOT await `onConnect` otherwise the websocket will not connect during notification stream processing
-    void this.onConnect();
     return this.buildWebSocketUrl();
   };
 
-  private readonly onOpen = (event: Event) => {
+  private readonly onOpen = () => {
     this.onStateChange(this.socket.getState());
   };
 
@@ -138,25 +135,19 @@ export class WebSocketClient extends EventEmitter {
    * Essentially the websocket will lock before execution of this function and
    * unlocks after the execution of the handler and pushes all buffered messages.
    */
-  public async connect(clientId?: string, onConnect?: OnConnect): Promise<WebSocketClient> {
-    if (onConnect) {
-      this.onConnect = async () => {
-        this.abortHandler = new AbortHandler();
-        try {
-          this.logger.info('Calling "onConnect"');
-          await onConnect(this.abortHandler);
-        } catch (error) {
-          this.logger.warn(`Error during execution of "onConnect"`, error);
-          this.emit(WebSocketClient.TOPIC.ON_ERROR, error);
-        }
-        this.onStateChange(this.socket.getState());
-      };
-    }
+  public connect(clientId?: string, onConnect?: OnConnect): WebSocketClient {
     this.clientId = clientId;
 
+    this.onStateChange(WEBSOCKET_STATE.CONNECTING);
     this.socket.setOnMessage(this.onMessage);
     this.socket.setOnError(this.onError);
-    this.socket.setOnOpen(this.onOpen);
+    this.socket.setOnOpen(() => {
+      this.onOpen();
+      if (onConnect) {
+        this.abortHandler = new AbortHandler();
+        void onConnect(this.abortHandler);
+      }
+    });
     this.socket.setOnClose(this.onClose);
 
     this.socket.connect();
