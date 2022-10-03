@@ -17,30 +17,19 @@
  *
  */
 
-import {act} from '@testing-library/react';
-
-import TestPage from 'Util/test/TestPage';
+import {render, fireEvent, act} from '@testing-library/react';
 import PrimaryModal from '.';
 import {PrimaryModalComponent} from './PrimaryModal';
 
-class PrimaryModalPage extends TestPage<{}> {
-  constructor() {
-    super(PrimaryModalComponent);
-  }
-
-  getWrapperElement = () => this.get('div#modals');
-  getPrimaryActionButton = () => this.get('[data-uie-name="do-action"]');
-  getSecondaryActionButton = () => this.get('[data-uie-name="do-secondary"]');
-}
-
 describe('PrimaryModal', () => {
   it('does not render when no item is in the queue', async () => {
-    const PrimaryModalWrapper = new PrimaryModalPage();
-    expect(PrimaryModalWrapper.getWrapperElement()?.children[0].getAttribute('style')).toBe('display: none;');
+    const {getByTestId} = render(<PrimaryModalComponent />);
+    const PrimaryModalWrapper = getByTestId('primary-modals-container');
+    expect(PrimaryModalWrapper.children[0].getAttribute('style')).toBe('display: none;');
   });
 
   it('correctly calls action callback', async () => {
-    const PrimaryModalWrapper = new PrimaryModalPage();
+    const {getByTestId} = render(<PrimaryModalComponent />);
     const actionCallback = jest.fn();
     act(() => {
       PrimaryModal.show(PrimaryModal.type.CONFIRM, {
@@ -58,16 +47,14 @@ describe('PrimaryModal', () => {
         },
       });
     });
-    const actionButton = PrimaryModalWrapper.getPrimaryActionButton();
-    if (!actionButton) {
-      throw new Error('Failed to find action button');
-    }
-    PrimaryModalWrapper.click(actionButton);
+
+    const actionButton = getByTestId('do-action');
+    fireEvent.click(actionButton);
 
     expect(actionCallback).toHaveBeenCalledTimes(1);
   });
   it('correctly calls secondary action callback', async () => {
-    const PrimaryModalWrapper = new PrimaryModalPage();
+    const {getByTestId} = render(<PrimaryModalComponent />);
     const secondaryActionCallback = jest.fn();
     act(() => {
       PrimaryModal.show(PrimaryModal.type.CONFIRM, {
@@ -85,11 +72,9 @@ describe('PrimaryModal', () => {
         },
       });
     });
-    const secondaryActionButton = PrimaryModalWrapper.getSecondaryActionButton();
-    if (!secondaryActionButton) {
-      throw new Error('Failed to find action button');
-    }
-    PrimaryModalWrapper.click(secondaryActionButton);
+
+    const secondaryActionButton = getByTestId('do-secondary');
+    fireEvent.click(secondaryActionButton);
 
     expect(secondaryActionCallback).toHaveBeenCalledTimes(1);
   });
