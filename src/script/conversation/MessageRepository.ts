@@ -104,8 +104,7 @@ import {findDeletedClients} from './ClientMismatchUtil';
 import {protoFromType} from '../user/AvailabilityMapper';
 import {partition} from 'underscore';
 import {ConversationState} from './ConversationState';
-import {ModalOptions} from '../components/Modals/PrimaryModalTypes';
-import PrimaryModal from '../components/Modals/PrimaryModal';
+import PrimaryModal, {ModalOptions} from '../components/Modals/PrimaryModal';
 
 export interface MessageSendingOptions {
   /** Send native push notification for message. Default is `true`. */

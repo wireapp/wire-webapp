@@ -36,7 +36,7 @@ import type {Message} from '../entity/message/Message';
 import type {ServiceEntity} from '../integration/ServiceEntity';
 import type {MessageRepository} from '../conversation/MessageRepository';
 import {UserState} from '../user/UserState';
-import {removeCurrentModal, usePrimaryModalState} from 'Components/Modals/PrimaryModalState';
+import {removeCurrentModal, usePrimaryModalState} from 'Components/Modals/PrimaryModal';
 import {BackendError} from '../auth/module/action/BackendError';
 import PrimaryModal from '../components/Modals/PrimaryModal';
 

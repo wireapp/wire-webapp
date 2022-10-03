@@ -22,7 +22,8 @@ import {PrimaryModalComponent} from './PrimaryModal';
 import {addNewModalToQueue, showNextModalInQueue} from './PrimaryModalState';
 import {PrimaryModalType} from './PrimaryModalTypes';
 
-export {usePrimaryModalState} from './PrimaryModalState';
+export {usePrimaryModalState, removeCurrentModal} from './PrimaryModalState';
+export {ModalOptions} from './PrimaryModalTypes';
 
 const PrimaryModal = {
   init: () => {
