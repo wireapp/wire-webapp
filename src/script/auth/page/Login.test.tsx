@@ -19,7 +19,7 @@
 
 import {initialRootState} from '../module/reducer';
 import {mockStoreFactory} from '../util/test/mockStoreFactory';
-import {mountComponentReact18} from '../util/test/TestUtil';
+import {mountComponent} from '../util/test/TestUtil';
 import Login from './Login';
 import {Config, Configuration} from '../../Config';
 import {TypeUtil} from '@wireapp/commons';
@@ -41,7 +41,7 @@ describe('Login', () => {
 
     spyOn(actionRoot.authAction, 'doLogin').and.returnValue(() => Promise.resolve());
 
-    const {getByTestId} = mountComponentReact18(
+    const {getByTestId} = mountComponent(
       <Login />,
       mockStoreFactory()({
         ...initialRootState,
@@ -81,7 +81,7 @@ describe('Login', () => {
       Promise.reject({label: BackendError.LABEL.TOO_MANY_CLIENTS}),
     );
 
-    const {getByTestId} = mountComponentReact18(
+    const {getByTestId} = mountComponent(
       <Login />,
       mockStoreFactory()({
         ...initialRootState,
@@ -119,7 +119,7 @@ describe('Login', () => {
 
     spyOn(actionRoot.authAction, 'doLogin').and.returnValue(() => Promise.resolve());
 
-    const {getByTestId} = mountComponentReact18(
+    const {getByTestId} = mountComponent(
       <Login />,
       mockStoreFactory()({
         ...initialRootState,
@@ -150,7 +150,7 @@ describe('Login', () => {
   });
 
   it('has disabled submit button as long as one input is empty', () => {
-    const {getByTestId} = mountComponentReact18(
+    const {getByTestId} = mountComponent(
       <Login />,
       mockStoreFactory()({
         ...initialRootState,
@@ -184,7 +184,7 @@ describe('Login', () => {
           ENABLE_SSO: false,
         },
       });
-      const {queryByTestId} = mountComponentReact18(
+      const {queryByTestId} = mountComponent(
         <Login />,
         mockStoreFactory()({
           ...initialRootState,
@@ -208,7 +208,7 @@ describe('Login', () => {
           ENABLE_ACCOUNT_REGISTRATION: true,
         },
       });
-      const {getByTestId} = mountComponentReact18(
+      const {getByTestId} = mountComponent(
         <Login />,
         mockStoreFactory()({
           ...initialRootState,

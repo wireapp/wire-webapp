@@ -20,7 +20,7 @@
 import {ValidationError} from '../module/action/ValidationError';
 import {initialRootState} from '../module/reducer';
 import {mockStoreFactory} from '../util/test/mockStoreFactory';
-import {mountComponentReact18} from '../util/test/TestUtil';
+import {mountComponent} from '../util/test/TestUtil';
 import SetPassword from './SetPassword';
 import {fireEvent, waitFor} from '@testing-library/react';
 
@@ -32,7 +32,7 @@ const errorMessageId = 'error-message';
 
 describe('SetPassword', () => {
   it('has disabled submit button as long as there is no input', () => {
-    const {getByTestId} = mountComponentReact18(
+    const {getByTestId} = mountComponent(
       <SetPassword />,
       mockStoreFactory()({
         ...initialRootState,
@@ -54,7 +54,7 @@ describe('SetPassword', () => {
   });
 
   it('handles invalid password', async () => {
-    const {getByTestId, container} = mountComponentReact18(
+    const {getByTestId, container} = mountComponent(
       <SetPassword />,
       mockStoreFactory()({
         ...initialRootState,

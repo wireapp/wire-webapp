@@ -23,7 +23,7 @@ import {actionRoot} from '../module/action';
 import {initialRootState} from '../module/reducer';
 import {ROUTE} from '../route';
 import {mockStoreFactory} from '../util/test/mockStoreFactory';
-import {mountComponentReact18} from '../util/test/TestUtil';
+import {mountComponent} from '../util/test/TestUtil';
 import PhoneLogin from './PhoneLogin';
 import {fireEvent, waitFor} from '@testing-library/react';
 
@@ -36,7 +36,7 @@ const loginButtonId = 'do-sign-in-phone';
 
 describe('PhoneLogin', () => {
   it('has disabled submit button as long as one input is empty', () => {
-    const {getByTestId} = mountComponentReact18(
+    const {getByTestId} = mountComponent(
       <PhoneLogin />,
       mockStoreFactory()({
         ...initialRootState,
@@ -58,7 +58,7 @@ describe('PhoneLogin', () => {
   });
 
   it('has an option to navigate back', async () => {
-    const {getByTestId} = mountComponentReact18(
+    const {getByTestId} = mountComponent(
       <PhoneLogin />,
       mockStoreFactory()({
         ...initialRootState,
@@ -79,7 +79,7 @@ describe('PhoneLogin', () => {
 
     spyOn(actionRoot.authAction, 'doSendPhoneLoginCode').and.returnValue(() => Promise.resolve());
 
-    const {getByTestId} = mountComponentReact18(
+    const {getByTestId} = mountComponent(
       <PhoneLogin />,
       mockStoreFactory()({
         ...initialRootState,
@@ -118,7 +118,7 @@ describe('PhoneLogin', () => {
     const error: any = new PasswordExistsError('test error') as any;
     spyOn(actionRoot.authAction, 'doSendPhoneLoginCode').and.returnValue(() => Promise.reject(error));
 
-    const {getByTestId} = mountComponentReact18(
+    const {getByTestId} = mountComponent(
       <PhoneLogin />,
       mockStoreFactory()({
         ...initialRootState,

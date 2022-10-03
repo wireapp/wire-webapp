@@ -17,21 +17,21 @@
  *
  */
 
-import {ReactWrapper} from 'enzyme';
+import {fireEvent, RenderResult} from '@testing-library/react';
 import {initialRootState} from '../module/reducer';
 import {mockStoreFactory} from '../util/test/mockStoreFactory';
 import {mountComponent} from '../util/test/TestUtil';
 import AccountForm from './AccountForm';
 
 describe('when entering account data', () => {
-  let wrapper: ReactWrapper;
+  let wrapper: RenderResult;
 
-  const nameInput = () => wrapper.find('[data-uie-name="enter-name"] input').first();
-  const emailInput = () => wrapper.find('[data-uie-name="enter-email"]').first();
-  const passwordInput = () => wrapper.find('[data-uie-name="enter-password"]').first();
-  const doNextButton = () => wrapper.find('[data-uie-name="do-next"]').first();
-  const doTermsCheckbox = () => wrapper.find('[data-uie-name="do-terms"]').first();
-  const validationErrorMessage = () => wrapper.find('[data-uie-name="error-message"]').last();
+  const nameInput = () => wrapper.getByTestId('enter-name') as HTMLInputElement;
+  const emailInput = () => wrapper.getByTestId('enter-email') as HTMLInputElement;
+  const passwordInput = () => wrapper.getByTestId('enter-password') as HTMLInputElement;
+  const doNextButton = () => wrapper.getByTestId('do-next') as HTMLButtonElement;
+  const doTermsCheckbox = () => wrapper.getByTestId('do-terms') as HTMLInputElement;
+  const validationErrorMessage = () => wrapper.getByTestId('error-message');
 
   describe('the submit button', () => {
     it('is disabled if input is insufficient', () => {
@@ -47,12 +47,12 @@ describe('when entering account data', () => {
         }),
       );
 
-      expect(nameInput().props().required).toBe(true);
-      expect(emailInput().props().required).toBe(true);
-      expect(passwordInput().props().required).toBe(true);
-      expect(doTermsCheckbox().props().required).toBe(true);
+      expect(nameInput().required).toBe(true);
+      expect(emailInput().required).toBe(true);
+      expect(passwordInput().required).toBe(true);
+      expect(doTermsCheckbox().required).toBe(true);
 
-      expect(doNextButton().props().disabled).toBe(true);
+      expect(doNextButton().disabled).toBe(true);
     });
 
     it('is enabled when data is prefilled', () => {
@@ -76,7 +76,7 @@ describe('when entering account data', () => {
         }),
       );
 
-      expect(doNextButton().props().disabled).toBe(undefined);
+      expect(doNextButton().disabled).toBe(false);
     });
   });
 
@@ -105,14 +105,14 @@ describe('when entering account data', () => {
         }),
       );
 
-      expect(doNextButton().props().disabled).toBe(true);
-      nameInput().simulate('change', {target: {value: expectedName}});
+      expect(doNextButton().disabled).toBe(true);
+      fireEvent.change(nameInput(), {target: {value: expectedName}});
 
-      expect(nameInput().props().value).toBe(expectedName);
-      expect(doNextButton().props().disabled).toBe(undefined);
-      doNextButton().simulate('submit');
+      expect(nameInput().value).toBe(expectedName);
+      expect(doNextButton().disabled).toBe(false);
+      fireEvent.submit(doNextButton());
 
-      expect(validationErrorMessage().text()).toBe(expectedErrorMessage);
+      expect(validationErrorMessage().innerHTML).toContain(expectedErrorMessage);
     });
 
     it('appears when input gets trimmed', () => {
@@ -140,14 +140,14 @@ describe('when entering account data', () => {
         }),
       );
 
-      expect(doNextButton().props().disabled).toBe(true);
-      nameInput().simulate('change', {target: {value: actualName}});
+      expect(doNextButton().disabled).toBe(true);
+      fireEvent.change(nameInput(), {target: {value: actualName}});
 
-      expect(nameInput().props().value).toBe(expectedName);
-      expect(doNextButton().props().disabled).toBe(undefined);
-      doNextButton().simulate('submit');
+      expect(nameInput().value).toBe(expectedName);
+      expect(doNextButton().disabled).toBe(false);
+      fireEvent.submit(doNextButton());
 
-      expect(validationErrorMessage().text()).toBe(expectedErrorMessage);
+      expect(validationErrorMessage().innerHTML).toContain(expectedErrorMessage);
     });
   });
 });

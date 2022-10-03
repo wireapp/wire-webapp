@@ -22,7 +22,7 @@ import {BackendError} from '../module/action/BackendError';
 import {initialRootState} from '../module/reducer';
 import {ROUTE} from '../route';
 import {mockStoreFactory} from '../util/test/mockStoreFactory';
-import {mountComponentReact18} from '../util/test/TestUtil';
+import {mountComponent} from '../util/test/TestUtil';
 import CheckPassword from './CheckPassword';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 import {fireEvent, waitFor} from '@testing-library/dom';
@@ -32,7 +32,7 @@ jest.mock('../util/SVGProvider');
 
 describe('CheckPassword', () => {
   it('has disabled submit button as long as there is no input', () => {
-    const {getByTestId} = mountComponentReact18(
+    const {getByTestId} = mountComponent(
       <CheckPassword />,
       mockStoreFactory()({
         ...initialRootState,
@@ -59,7 +59,7 @@ describe('CheckPassword', () => {
 
     spyOn(actionRoot.authAction, 'doLogin').and.returnValue(() => Promise.resolve());
 
-    const {getByTestId} = mountComponentReact18(
+    const {getByTestId} = mountComponent(
       <CheckPassword />,
       mockStoreFactory()({
         ...initialRootState,
@@ -90,7 +90,7 @@ describe('CheckPassword', () => {
     const error = new BackendError({code: HTTP_STATUS.NOT_FOUND, label: BackendError.LABEL.INVALID_CREDENTIALS});
     spyOn(actionRoot.authAction, 'doLogin').and.returnValue(() => Promise.reject(error));
 
-    const {getByTestId} = mountComponentReact18(
+    const {getByTestId} = mountComponent(
       <CheckPassword />,
       mockStoreFactory()({
         ...initialRootState,
@@ -129,7 +129,7 @@ describe('CheckPassword', () => {
     const error = new BackendError({code: HTTP_STATUS.NOT_FOUND, label: BackendError.LABEL.TOO_MANY_CLIENTS});
     spyOn(actionRoot.authAction, 'doLogin').and.returnValue(() => Promise.reject(error));
 
-    const {getByTestId} = mountComponentReact18(
+    const {getByTestId} = mountComponent(
       <CheckPassword />,
       mockStoreFactory()({
         ...initialRootState,

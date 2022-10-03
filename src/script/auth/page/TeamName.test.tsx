@@ -19,7 +19,7 @@
 
 import {initialRootState} from '../module/reducer';
 import {mockStoreFactory} from '../util/test/mockStoreFactory';
-import {mountComponentReact18} from '../util/test/TestUtil';
+import {mountComponent} from '../util/test/TestUtil';
 import TeamName from './TeamName';
 import {initialAuthState} from '../module/reducer/authReducer';
 import {ValidationError} from '../module/action/ValidationError';
@@ -30,7 +30,7 @@ jest.mock('../util/SVGProvider');
 describe('when entering a team name', () => {
   describe('the submit button', () => {
     it('is disabled if too few characters are entered', () => {
-      const {getByTestId} = mountComponentReact18(
+      const {getByTestId} = mountComponent(
         <TeamName />,
         mockStoreFactory()({
           ...initialRootState,
@@ -49,7 +49,7 @@ describe('when entering a team name', () => {
     });
 
     it('is enabled when the minimum amount of characters is entered', () => {
-      const {getByTestId} = mountComponentReact18(
+      const {getByTestId} = mountComponent(
         <TeamName />,
         mockStoreFactory()({
           ...initialRootState,
@@ -71,7 +71,7 @@ describe('when entering a team name', () => {
     });
 
     it('is disabled if previous submit with same value failed', () => {
-      const {getByTestId} = mountComponentReact18(
+      const {getByTestId} = mountComponent(
         <TeamName />,
         mockStoreFactory()({
           ...initialRootState,
@@ -101,7 +101,7 @@ describe('when entering a team name', () => {
     });
 
     it('is disabled when prefilled with too few characters', () => {
-      const {getByTestId} = mountComponentReact18(
+      const {getByTestId} = mountComponent(
         <TeamName />,
         mockStoreFactory()({
           ...initialRootState,
@@ -128,7 +128,7 @@ describe('when entering a team name', () => {
 
   describe('an error message', () => {
     it('appears if too few characters are entered', () => {
-      const {getByTestId} = mountComponentReact18(
+      const {getByTestId} = mountComponent(
         <TeamName />,
         mockStoreFactory()({
           ...initialRootState,
@@ -153,7 +153,7 @@ describe('when entering a team name', () => {
     });
 
     it('appears when input gets trimmed', () => {
-      const {getByTestId} = mountComponentReact18(
+      const {getByTestId} = mountComponent(
         <TeamName />,
         mockStoreFactory()({
           ...initialRootState,

@@ -20,7 +20,7 @@
 import {TypeUtil} from '@wireapp/commons';
 import {initialRootState} from '../module/reducer';
 import {mockStoreFactory} from '../util/test/mockStoreFactory';
-import {mountComponentReact18} from '../util/test/TestUtil';
+import {mountComponent} from '../util/test/TestUtil';
 import SetAccountType from './SetAccountType';
 import {Config, Configuration} from '../../Config';
 
@@ -50,7 +50,7 @@ describe('when visiting the set account type page', () => {
     });
 
     it('redirects to the index page', () => {
-      const {getByText} = mountComponentReact18(
+      const {getByText} = mountComponent(
         <SetAccountType />,
         mockStoreFactory()({
           ...initialRootState,
@@ -80,7 +80,7 @@ describe('when visiting the set account type page', () => {
     });
 
     it('shows the Wire logo', () => {
-      const {getByTestId} = mountComponentReact18(
+      const {getByTestId} = mountComponent(
         <SetAccountType />,
         mockStoreFactory()({
           ...initialRootState,
@@ -97,7 +97,7 @@ describe('when visiting the set account type page', () => {
     });
 
     it('shows an option to create a private account', () => {
-      const {getByTestId} = mountComponentReact18(
+      const {getByTestId} = mountComponent(
         <SetAccountType />,
         mockStoreFactory()({
           ...initialRootState,
@@ -114,7 +114,7 @@ describe('when visiting the set account type page', () => {
     });
 
     it('shows an option to create a team', () => {
-      const {getByTestId} = mountComponentReact18(
+      const {getByTestId} = mountComponent(
         <SetAccountType />,
         mockStoreFactory()({
           ...initialRootState,

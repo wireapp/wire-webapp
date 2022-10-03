@@ -21,7 +21,7 @@ import {actionRoot} from '../module/action';
 import {initialRootState} from '../module/reducer';
 import {ROUTE, QUERY_KEY} from '../route';
 import {mockStoreFactory} from '../util/test/mockStoreFactory';
-import {mountComponentReact18} from '../util/test/TestUtil';
+import {mountComponent} from '../util/test/TestUtil';
 import SingleSignOnForm from './SingleSignOnForm';
 import {ValidationError} from '../module/action/ValidationError';
 import {TypeUtil} from '@wireapp/commons';
@@ -47,7 +47,7 @@ describe('SingleSignOnForm', () => {
     spyOn(actionRoot.authAction, 'validateSSOCode').and.returnValue(() => Promise.resolve());
     spyOn(actionRoot.authAction, 'doFinalizeSSOLogin').and.returnValue(() => Promise.resolve());
 
-    const {getByTestId} = mountComponentReact18(
+    const {getByTestId} = mountComponent(
       <SingleSignOnForm {...{doLogin, initialCode}} />,
       mockStoreFactory()({
         ...initialRootState,
@@ -83,7 +83,7 @@ describe('SingleSignOnForm', () => {
     spyOn(actionRoot.authAction, 'validateSSOCode').and.returnValue(() => Promise.resolve());
     spyOn(actionRoot.authAction, 'doFinalizeSSOLogin').and.returnValue(() => Promise.resolve());
 
-    const {getByTestId} = mountComponentReact18(
+    const {getByTestId} = mountComponent(
       <SingleSignOnForm {...{doLogin}} />,
       mockStoreFactory()({
         ...initialRootState,
@@ -120,7 +120,7 @@ describe('SingleSignOnForm', () => {
     });
     const code = 'invalid-code';
 
-    const {getByTestId, container} = mountComponentReact18(
+    const {getByTestId, container} = mountComponent(
       <SingleSignOnForm {...{doLogin: () => Promise.reject()}} />,
       mockStoreFactory()({
         ...initialRootState,
@@ -155,7 +155,7 @@ describe('SingleSignOnForm', () => {
     });
     const email = 'email@mail.com';
 
-    const {getByTestId, container} = mountComponentReact18(
+    const {getByTestId, container} = mountComponent(
       <SingleSignOnForm {...{doLogin: () => Promise.reject()}} />,
       mockStoreFactory()({
         ...initialRootState,
@@ -199,7 +199,7 @@ describe('SingleSignOnForm', () => {
     );
     spyOn(actionRoot.navigationAction, 'doNavigate').and.returnValue(() => {});
 
-    const {getByTestId, container} = mountComponentReact18(
+    const {getByTestId, container} = mountComponent(
       <SingleSignOnForm {...{doLogin: () => Promise.reject()}} />,
       mockStoreFactory()({
         ...initialRootState,
@@ -246,7 +246,7 @@ describe('SingleSignOnForm', () => {
     );
     spyOn(actionRoot.navigationAction, 'doNavigate').and.returnValue(() => {});
 
-    const {getByTestId, container} = mountComponentReact18(
+    const {getByTestId, container} = mountComponent(
       <SingleSignOnForm {...{doLogin: () => Promise.reject()}} />,
       mockStoreFactory()({
         ...initialRootState,

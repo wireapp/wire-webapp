@@ -21,7 +21,7 @@ import {actionRoot} from '../module/action';
 import {ValidationError} from '../module/action/ValidationError';
 import {initialRootState} from '../module/reducer';
 import {mockStoreFactory} from '../util/test/mockStoreFactory';
-import {mountComponentReact18} from '../util/test/TestUtil';
+import {mountComponent} from '../util/test/TestUtil';
 import SetEmail from './SetEmail';
 import {fireEvent, waitFor} from '@testing-library/react';
 
@@ -33,7 +33,7 @@ const errorMessageId = 'error-message';
 
 describe('SetEmail', () => {
   it('has disabled submit button as long as there is no input', () => {
-    const {getByTestId} = mountComponentReact18(
+    const {getByTestId} = mountComponent(
       <SetEmail />,
       mockStoreFactory()({
         ...initialRootState,
@@ -55,7 +55,7 @@ describe('SetEmail', () => {
   });
 
   it('handles invalid email', async () => {
-    const {getByTestId, container} = mountComponentReact18(
+    const {getByTestId, container} = mountComponent(
       <SetEmail />,
       mockStoreFactory()({
         ...initialRootState,
@@ -84,7 +84,7 @@ describe('SetEmail', () => {
 
     const email = 'e@e.com';
 
-    const {getByTestId} = mountComponentReact18(
+    const {getByTestId} = mountComponent(
       <SetEmail />,
       mockStoreFactory()({
         ...initialRootState,

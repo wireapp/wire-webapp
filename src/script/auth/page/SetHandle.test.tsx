@@ -20,7 +20,7 @@
 import {actionRoot} from '../module/action';
 import {initialRootState} from '../module/reducer';
 import {mockStoreFactory} from '../util/test/mockStoreFactory';
-import {mountComponentReact18} from '../util/test/TestUtil';
+import {mountComponent} from '../util/test/TestUtil';
 import SetHandle from './SetHandle';
 import {fireEvent} from '@testing-library/react';
 
@@ -33,7 +33,7 @@ describe('SetHandle', () => {
   it('has disabled submit button as long as there is no input', () => {
     spyOn(actionRoot.selfAction, 'doGetConsents').and.returnValue(() => Promise.resolve());
     spyOn(actionRoot.userAction, 'checkHandles').and.returnValue(() => Promise.resolve());
-    const {getByTestId} = mountComponentReact18(
+    const {getByTestId} = mountComponent(
       <SetHandle />,
       mockStoreFactory()({
         ...initialRootState,
@@ -61,7 +61,7 @@ describe('SetHandle', () => {
 
     const handle = 'handle';
 
-    const {getByTestId} = mountComponentReact18(
+    const {getByTestId} = mountComponent(
       <SetHandle />,
       mockStoreFactory()({
         ...initialRootState,

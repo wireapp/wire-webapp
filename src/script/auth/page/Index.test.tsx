@@ -21,7 +21,7 @@ import {TypeUtil} from '@wireapp/commons';
 import {Config, Configuration} from '../../Config';
 import {initialRootState} from '../module/reducer';
 import {mockStoreFactory} from '../util/test/mockStoreFactory';
-import {mountComponentReact18} from '../util/test/TestUtil';
+import {mountComponent} from '../util/test/TestUtil';
 import Index from './Index';
 import {ROUTE} from '../route';
 import {initialAuthState} from '../module/reducer/authReducer';
@@ -31,7 +31,7 @@ jest.mock('../util/SVGProvider');
 
 describe('when visiting the index page', () => {
   it('shows the logo', () => {
-    const {getByTestId} = mountComponentReact18(
+    const {getByTestId} = mountComponent(
       <Index />,
       mockStoreFactory()({
         ...initialRootState,
@@ -52,7 +52,7 @@ describe('when visiting the index page', () => {
 
     const defaultSSOCode = 'default-a4b0-4c59-a31d-303a7f5eb5ab';
 
-    mountComponentReact18(
+    mountComponent(
       <Index />,
       mockStoreFactory()({
         ...initialRootState,
@@ -80,7 +80,7 @@ describe('when visiting the index page', () => {
   });
 
   it('shows the welcome text with default backend name', () => {
-    const {getByTestId} = mountComponentReact18(
+    const {getByTestId} = mountComponent(
       <Index />,
       mockStoreFactory()({
         ...initialRootState,
@@ -104,7 +104,7 @@ describe('when visiting the index page', () => {
         ENABLE_ACCOUNT_REGISTRATION: true,
       },
     });
-    const {getByTestId} = mountComponentReact18(
+    const {getByTestId} = mountComponent(
       <Index />,
       mockStoreFactory()({
         ...initialRootState,
@@ -124,7 +124,7 @@ describe('when visiting the index page', () => {
   it('navigates to login page when clicking login button', async () => {
     const historyPushSpy = spyOn(history, 'pushState');
 
-    const {getByTestId} = mountComponentReact18(
+    const {getByTestId} = mountComponent(
       <Index />,
       mockStoreFactory()({
         ...initialRootState,
@@ -156,7 +156,7 @@ describe('when visiting the index page', () => {
 
     const historyPushSpy = spyOn(history, 'pushState');
 
-    const {getByTestId} = mountComponentReact18(
+    const {getByTestId} = mountComponent(
       <Index />,
       mockStoreFactory()({
         ...initialRootState,
@@ -189,7 +189,7 @@ describe('when visiting the index page', () => {
     });
 
     it('does not show create account button', () => {
-      const {queryByTestId} = mountComponentReact18(
+      const {queryByTestId} = mountComponent(
         <Index />,
         mockStoreFactory()({
           ...initialRootState,
@@ -218,7 +218,7 @@ describe('when visiting the index page', () => {
     it('show create account button and navigates to account type selection on click', async () => {
       const historyPushSpy = spyOn(history, 'pushState');
 
-      const {getByTestId} = mountComponentReact18(
+      const {getByTestId} = mountComponent(
         <Index />,
         mockStoreFactory()({
           ...initialRootState,
@@ -257,7 +257,7 @@ describe('when visiting the index page', () => {
     });
 
     it('does not show SSO login button', () => {
-      const {queryByTestId} = mountComponentReact18(
+      const {queryByTestId} = mountComponent(
         <Index />,
         mockStoreFactory()({
           ...initialRootState,
@@ -286,7 +286,7 @@ describe('when visiting the index page', () => {
 
     it('navigates directly to email login', async () => {
       const historyPushSpy = spyOn(history, 'pushState');
-      mountComponentReact18(
+      mountComponent(
         <Index />,
         mockStoreFactory()({
           ...initialRootState,
