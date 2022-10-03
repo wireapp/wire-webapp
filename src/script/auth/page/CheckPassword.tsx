@@ -66,7 +66,7 @@ const CheckPassword = ({loginData, doLogin, resetAuthError, isFetching}: Props &
     }
   }, []);
 
-  const handleLogin = async (event: React.UIEvent) => {
+  const handleLogin = async (event: React.SyntheticEvent) => {
     let validationError: Error;
     event.preventDefault();
 

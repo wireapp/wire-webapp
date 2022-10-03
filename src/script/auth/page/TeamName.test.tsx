@@ -164,7 +164,6 @@ describe('when entering a team name', () => {
           },
         }),
       );
-      const actualTeamName = '  ';
       const expectedTeamName = '  ';
       const nextButton = getByTestId('do-next') as HTMLButtonElement;
       const teamNameInput = getByTestId('enter-team-name') as HTMLInputElement;
