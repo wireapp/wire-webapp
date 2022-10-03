@@ -37,6 +37,7 @@ import React, {useRef, useState} from 'react';
 import {useIntl} from 'react-intl';
 import {connect} from 'react-redux';
 import {AnyAction, Dispatch} from 'redux';
+import {useParams} from 'react-router-dom';
 import {getLogger} from 'Util/Logger';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 
@@ -59,7 +60,7 @@ const logger = getLogger('SingleSignOn');
 const SingleSignOn = ({hasDefaultSSOCode}: Props & ConnectedProps & DispatchProps) => {
   const {formatMessage: _} = useIntl();
   const ssoWindowRef = useRef<Window>();
-  const {match} = useReactRouter<{code?: string}>();
+  const params = useParams<{code?: string}>();
   const [isOverlayOpen, setIsOverlayOpen] = useState(false);
 
   const handleSSOWindow = (code: string): Promise<void> => {
@@ -268,7 +269,7 @@ const SingleSignOn = ({hasDefaultSSOCode}: Props & ConnectedProps & DispatchProp
                 ) : (
                   <Muted data-uie-name="status-sso-code">{_(ssoLoginStrings.subheadCode)}</Muted>
                 )}
-                <SingleSignOnForm doLogin={handleSSOWindow} initialCode={match.params.code} />
+                <SingleSignOnForm doLogin={handleSSOWindow} initialCode={params.code} />
               </div>
             </ContainerXS>
           </Column>

@@ -160,14 +160,24 @@ const Root: React.FC<RootProps & ConnectedProps & DispatchProps> = ({
                   </Title>
                 }
               />
-              <Route
-                path={`${ROUTE.SSO}/:code?`}
-                element={
-                  <Title title={`${t('authSSOLoginTitle')} . ${brandName}`}>
-                    <SingleSignOn />
-                  </Title>
-                }
-              />
+              <Route path={`${ROUTE.SSO}`}>
+                <Route
+                  path=""
+                  element={
+                    <Title title={`${t('authSSOLoginTitle')} . ${brandName}`}>
+                      <SingleSignOn />
+                    </Title>
+                  }
+                />
+                <Route
+                  path=":code"
+                  element={
+                    <Title title={`${t('authSSOLoginTitle')} . ${brandName}`}>
+                      <SingleSignOn />
+                    </Title>
+                  }
+                />
+              </Route>
               <Route path={ROUTE.VERIFY_EMAIL_LINK} element={<VerifyEmailLink />} />
               <Route path={ROUTE.VERIFY_PHONE_CODE} element={<VerifyPhoneCode />} />
               <Route path={ROUTE.CUSTOM_ENV_REDIRECT} element={<CustomEnvironmentRedirect />} />
