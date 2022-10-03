@@ -22,7 +22,7 @@ import React from 'react';
 import {FormattedMessage, useIntl} from 'react-intl';
 import {connect} from 'react-redux';
 import {AnyAction, Dispatch} from 'redux';
-import useReactRouter from 'use-react-router';
+import {useNavigate} from 'react-router-dom';
 import {getLogger} from 'Util/Logger';
 import {verifyStrings} from '../../strings';
 import RouterLink from '../component/RouterLink';
@@ -51,7 +51,7 @@ const VerifyEmailCode = ({
   doRegisterTeam,
   doSendActivationCode,
 }: Props & ConnectedProps & DispatchProps) => {
-  const {history} = useReactRouter();
+  const navigate = useNavigate();
   const {formatMessage: _} = useIntl();
 
   const logger = getLogger('VerifyEmailCode');
@@ -60,7 +60,7 @@ const VerifyEmailCode = ({
       case AuthSelector.REGISTER_FLOW.TEAM: {
         try {
           await doRegisterTeam({...account, email_code});
-          history.push(ROUTE.SET_HANDLE);
+          navigate(ROUTE.SET_HANDLE);
         } catch (error) {
           logger.error('Failed to create team account', error);
         }
@@ -71,7 +71,7 @@ const VerifyEmailCode = ({
       case AuthSelector.REGISTER_FLOW.GENERIC_INVITATION: {
         try {
           await doRegisterPersonal({...account, email_code}, entropyData);
-          history.push(ROUTE.SET_HANDLE);
+          navigate(ROUTE.SET_HANDLE);
         } catch (error) {
           logger.error('Failed to create personal account', error);
         }

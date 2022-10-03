@@ -22,7 +22,7 @@ import React, {useRef, useState} from 'react';
 import {useIntl} from 'react-intl';
 import {connect} from 'react-redux';
 import {AnyAction, Dispatch} from 'redux';
-import useReactRouter from 'use-react-router';
+import {useNavigate} from 'react-router-dom';
 import {setEmailStrings} from '../../strings';
 import Exception from '../component/Exception';
 import {actionRoot} from '../module/action';
@@ -41,7 +41,7 @@ const SetEmail = ({hasSelfEmail, isSelfSSOUser, doSetEmail, isFetching}: Props &
   const [error, setError] = useState();
   const [isValidEmail, setIsValidEmail] = useState(true);
   const [email, setEmail] = useState('');
-  const {history} = useReactRouter();
+  const navigate = useNavigate();
 
   const onSetEmail = async (event: React.FormEvent): Promise<void> => {
     event.preventDefault();
@@ -59,14 +59,14 @@ const SetEmail = ({hasSelfEmail, isSelfSSOUser, doSetEmail, isFetching}: Props &
         throw validationError;
       }
       await doSetEmail(currentInputNode.value);
-      history.push(ROUTE.VERIFY_EMAIL_LINK);
+      navigate(ROUTE.VERIFY_EMAIL_LINK);
     } catch (error) {
       setError(error);
     }
   };
 
   if (hasSelfEmail || isSelfSSOUser) {
-    history.push(ROUTE.SET_PASSWORD);
+    navigate(ROUTE.SET_PASSWORD);
     return null;
   }
   return (

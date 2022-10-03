@@ -45,7 +45,7 @@ import {useIntl} from 'react-intl';
 import {connect} from 'react-redux';
 import {Redirect} from 'react-router';
 import {AnyAction, Dispatch} from 'redux';
-import useReactRouter from 'use-react-router';
+import {useNavigate} from 'react-router-dom';
 import {getLogger} from 'Util/Logger';
 import {Config} from '../../Config';
 import {loginStrings, verifyStrings} from '../../strings';
@@ -88,7 +88,7 @@ const Login = ({
 }: Props & ConnectedProps & DispatchProps) => {
   const logger = getLogger('Login');
   const {formatMessage: _} = useIntl();
-  const {history} = useReactRouter();
+  const navigate = useNavigate();
   const [conversationCode, setConversationCode] = useState<string | null>(null);
   const [conversationKey, setConversationKey] = useState<string | null>(null);
 
@@ -128,7 +128,7 @@ const Login = ({
   useEffect(() => {
     // Redirect to prefilled SSO login if default SSO code is set on backend
     if (defaultSSOCode) {
-      history.push(`${ROUTE.SSO}/${defaultSSOCode}`);
+      navigate(`${ROUTE.SSO}/${defaultSSOCode}`);
     }
   }, [defaultSSOCode]);
 
@@ -164,7 +164,7 @@ const Login = ({
       await doInit({isImmediateLogin: true, shouldValidateLocalClient: false});
       const entropyData = await getEntropy?.();
       await doInitializeClient(ClientType.PERMANENT, undefined, undefined, entropyData);
-      return history.push(ROUTE.HISTORY_INFO);
+      return navigate(ROUTE.HISTORY_INFO);
     } catch (error) {
       logger.error('Unable to login immediately', error);
     }
@@ -185,7 +185,7 @@ const Login = ({
         await doLogin(login, getEntropy);
       }
 
-      return history.push(ROUTE.HISTORY_INFO);
+      return navigate(ROUTE.HISTORY_INFO);
     } catch (error) {
       if ((error as BackendError).label) {
         const backendError = error as BackendError;
@@ -198,7 +198,7 @@ const Login = ({
             if (entropy.current) {
               pushEntropyData(entropy.current);
             }
-            history.push(ROUTE.CLIENTS);
+            navigate(ROUTE.CLIENTS);
             break;
           }
           case BackendError.LABEL.CODE_AUTHENTICATION_REQUIRED: {

@@ -171,7 +171,7 @@ export const makeUserDevicesHistory = () => {
   const current = ko.pureComputed(() => history()[history().length - 1]);
   const reset = () => {
     history.removeAll();
-    history.push({headline: '', state: UserDevicesState.DEVICE_LIST});
+    navigate({headline: '', state: UserDevicesState.DEVICE_LIST});
   };
   reset();
   return {
@@ -180,7 +180,7 @@ export const makeUserDevicesHistory = () => {
       history.pop();
     },
     goTo: (state: UserDevicesState, headline: string) => {
-      history.push({headline, state});
+      navigate({headline, state});
     },
     reset,
   };

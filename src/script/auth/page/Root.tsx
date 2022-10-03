@@ -54,7 +54,6 @@ import VerifyEmailLink from './VerifyEmailLink';
 import VerifyPhoneCode from './VerifyPhoneCode';
 import CustomEnvironmentRedirect from './CustomEnvironmentRedirect';
 import SetEntropyPage from './SetEntropyPage';
-import {t} from 'Util/LocalizerUtil';
 
 interface RootProps {}
 
@@ -112,83 +111,39 @@ const Root: React.FC<RootProps & ConnectedProps & DispatchProps> = ({
         ) : (
           <Router>
             <Routes>
-              <Route path={ROUTE.INDEX}>
-                <Index />
-              </Route>
-              <Route path={ROUTE.CHECK_PASSWORD}>
-                <CheckPassword />
-              </Route>
-              <Route path={ROUTE.CLIENTS}>
-                <ProtectedClientManager />
-              </Route>
-              <Route path={ROUTE.CONVERSATION_JOIN_INVALID}>
-                <ConversationJoinInvalid />
-              </Route>
-              <Route path={ROUTE.CONVERSATION_JOIN}>
-                <ConversationJoin />
-              </Route>
+              <Route path={ROUTE.INDEX} element={<Index />} />
+              <Route path={ROUTE.CHECK_PASSWORD} element={<CheckPassword />} />
+              <Route path={ROUTE.CLIENTS} element={<ProtectedClientManager />} />
+              <Route path={ROUTE.CONVERSATION_JOIN_INVALID} element={<ConversationJoinInvalid />} />
+              <Route path={ROUTE.CONVERSATION_JOIN} element={<ConversationJoin />} />
               {Config.getConfig().FEATURE.ENABLE_ACCOUNT_REGISTRATION && (
-                <Route path={ROUTE.CREATE_TEAM}>
-                  <TeamName />
-                </Route>
+                <Route path={ROUTE.CREATE_TEAM} element={<TeamName />} />
               )}
-              <Route path={ROUTE.HISTORY_INFO}>
-                <ProtectedHistoryInfo />
-              </Route>
-              <Route path={ROUTE.INITIAL_INVITE}>
-                <ProtectedInitialInvite />
-              </Route>
-              <Route path={ROUTE.LOGIN}>
-                <Login />
-              </Route>
-              <Route path={ROUTE.LOGIN_PHONE}>
-                <PhoneLogin />
-              </Route>
-              <Route path={ROUTE.SET_ACCOUNT_TYPE}>
-                <SetAccountType />
-              </Route>
-              <Route path={ROUTE.SET_EMAIL}>
-                <ProtectedSetEmail />
-              </Route>
-              <Route path={ROUTE.SET_HANDLE}>
-                <ProtectedSetHandle />
-              </Route>
-              <Route path={ROUTE.SET_PASSWORD}>
-                <ProtectedSetPassword />
-              </Route>
-              <Route path={`${ROUTE.SSO}/:code?`}>
-                <SingleSignOn />
-              </Route>
-              <Route path={ROUTE.VERIFY_EMAIL_LINK}>
-                <VerifyEmailLink />
-              </Route>
-              <Route path={ROUTE.VERIFY_PHONE_CODE}>
-                <VerifyPhoneCode />
-              </Route>
-              <Route path={ROUTE.CUSTOM_ENV_REDIRECT}>
-                <CustomEnvironmentRedirect />
-              </Route>
+              <Route path={ROUTE.HISTORY_INFO} element={<ProtectedHistoryInfo />} />
+              <Route path={ROUTE.INITIAL_INVITE} element={<ProtectedInitialInvite />} />
+              <Route path={ROUTE.LOGIN} element={<Login />} />
+              <Route path={ROUTE.LOGIN_PHONE} element={<PhoneLogin />} />
+              <Route path={ROUTE.SET_ACCOUNT_TYPE} element={<SetAccountType />} />
+              <Route path={ROUTE.SET_EMAIL} element={<ProtectedSetEmail />} />
+              <Route path={ROUTE.SET_HANDLE} element={<ProtectedSetHandle />} />
+              <Route path={ROUTE.SET_PASSWORD} element={<ProtectedSetPassword />} />
+              <Route path={`${ROUTE.SSO}/:code?`} element={<SingleSignOn />} />
+              <Route path={ROUTE.VERIFY_EMAIL_LINK} element={<VerifyEmailLink />} />
+              <Route path={ROUTE.VERIFY_PHONE_CODE} element={<VerifyPhoneCode />} />
+              <Route path={ROUTE.CUSTOM_ENV_REDIRECT} element={<CustomEnvironmentRedirect />} />
               {Config.getConfig().FEATURE.ENABLE_EXTRA_CLIENT_ENTROPY && (
-                <Route path={ROUTE.SET_ENTROPY}>
-                  <SetEntropyPage />
-                </Route>
+                <Route path={ROUTE.SET_ENTROPY} element={<SetEntropyPage />} />
               )}
               {Config.getConfig().FEATURE.ENABLE_ACCOUNT_REGISTRATION && (
-                <Route path={ROUTE.VERIFY_EMAIL_CODE}>
-                  <VerifyEmailCode />
-                </Route>
+                <Route path={ROUTE.VERIFY_EMAIL_CODE} element={<VerifyEmailCode />} />
               )}
               {Config.getConfig().FEATURE.ENABLE_ACCOUNT_REGISTRATION && (
-                <Route path={ROUTE.CREATE_ACCOUNT}>
-                  <CreatePersonalAccount />
-                </Route>
+                <Route path={ROUTE.CREATE_ACCOUNT} element={<CreatePersonalAccount />} />
               )}
               {Config.getConfig().FEATURE.ENABLE_ACCOUNT_REGISTRATION && (
-                <Route path={ROUTE.CREATE_TEAM_ACCOUNT}>
-                  <CreateAccount />
-                </Route>
+                <Route path={ROUTE.CREATE_TEAM_ACCOUNT} element={<CreateAccount />} />
               )}
-              <Navigate to={ROUTE.INDEX} replace />
+              <Route path="*" element={<Navigate to={ROUTE.INDEX} replace />} />
             </Routes>
           </Router>
         )}
