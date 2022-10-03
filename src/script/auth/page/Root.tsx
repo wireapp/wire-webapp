@@ -54,8 +54,16 @@ import VerifyEmailLink from './VerifyEmailLink';
 import VerifyPhoneCode from './VerifyPhoneCode';
 import CustomEnvironmentRedirect from './CustomEnvironmentRedirect';
 import SetEntropyPage from './SetEntropyPage';
+import {t} from 'Util/LocalizerUtil';
 
 interface RootProps {}
+
+const Title: React.FC<{title: string; children: React.ReactNode}> = ({title, children}) => {
+  useEffect(() => {
+    document.title = title;
+  }, [title]);
+  return <>{children}</>;
+};
 
 const Root: React.FC<RootProps & ConnectedProps & DispatchProps> = ({
   isAuthenticated,
@@ -87,10 +95,6 @@ const Root: React.FC<RootProps & ConnectedProps & DispatchProps> = ({
     return null;
   };
 
-  const setTitle = (title = 'Wire') => {
-    document.title = title;
-  };
-
   const isAuthenticatedCheck = (page: any): any => (page ? (isAuthenticated ? page : navigate('/auth')) : null);
 
   const ProtectedHistoryInfo = () => isAuthenticatedCheck(<HistoryInfo />);
@@ -101,6 +105,7 @@ const Root: React.FC<RootProps & ConnectedProps & DispatchProps> = ({
   const ProtectedSetEmail = () => isAuthenticatedCheck(<SetEmail />);
   const ProtectedSetPassword = () => isAuthenticatedCheck(<SetPassword />);
 
+  const brandName = Config.getConfig().BRAND_NAME;
   return (
     <IntlProvider locale={normalizeLanguage(language)} messages={loadLanguage(language)}>
       <StyledApp themeId={THEME_ID.DEFAULT} style={{display: 'flex', height: '100%', minHeight: '100vh'}}>
@@ -111,7 +116,14 @@ const Root: React.FC<RootProps & ConnectedProps & DispatchProps> = ({
         ) : (
           <Router>
             <Routes>
-              <Route path={ROUTE.INDEX} element={<Index />} />
+              <Route
+                path={ROUTE.INDEX}
+                element={
+                  <Title title={`${t('authLandingPageTitleP1')} ${brandName} . ${t('authLandingPageTitleP2')}`}>
+                    <Index />
+                  </Title>
+                }
+              />
               <Route path={ROUTE.CHECK_PASSWORD} element={<CheckPassword />} />
               <Route path={ROUTE.CLIENTS} element={<ProtectedClientManager />} />
               <Route path={ROUTE.CONVERSATION_JOIN_INVALID} element={<ConversationJoinInvalid />} />
@@ -121,13 +133,41 @@ const Root: React.FC<RootProps & ConnectedProps & DispatchProps> = ({
               )}
               <Route path={ROUTE.HISTORY_INFO} element={<ProtectedHistoryInfo />} />
               <Route path={ROUTE.INITIAL_INVITE} element={<ProtectedInitialInvite />} />
-              <Route path={ROUTE.LOGIN} element={<Login />} />
+              <Route
+                path={ROUTE.LOGIN}
+                element={
+                  <Title title={`${t('authLoginTitle')} . ${brandName}`}>
+                    <Login />
+                  </Title>
+                }
+              />
               <Route path={ROUTE.LOGIN_PHONE} element={<PhoneLogin />} />
-              <Route path={ROUTE.SET_ACCOUNT_TYPE} element={<SetAccountType />} />
+              <Route
+                path={ROUTE.SET_ACCOUNT_TYPE}
+                element={
+                  <Title title={`${t('authAccCreationTitle')} . ${brandName}`}>
+                    <SetAccountType />
+                  </Title>
+                }
+              />
               <Route path={ROUTE.SET_EMAIL} element={<ProtectedSetEmail />} />
               <Route path={ROUTE.SET_HANDLE} element={<ProtectedSetHandle />} />
-              <Route path={ROUTE.SET_PASSWORD} element={<ProtectedSetPassword />} />
-              <Route path={`${ROUTE.SSO}/:code?`} element={<SingleSignOn />} />
+              <Route
+                path={ROUTE.SET_PASSWORD}
+                element={
+                  <Title title={`${t('authForgotPasswordTitle')} . ${brandName}`}>
+                    <ProtectedSetPassword />
+                  </Title>
+                }
+              />
+              <Route
+                path={`${ROUTE.SSO}/:code?`}
+                element={
+                  <Title title={`${t('authSSOLoginTitle')} . ${brandName}`}>
+                    <SingleSignOn />
+                  </Title>
+                }
+              />
               <Route path={ROUTE.VERIFY_EMAIL_LINK} element={<VerifyEmailLink />} />
               <Route path={ROUTE.VERIFY_PHONE_CODE} element={<VerifyPhoneCode />} />
               <Route path={ROUTE.CUSTOM_ENV_REDIRECT} element={<CustomEnvironmentRedirect />} />
