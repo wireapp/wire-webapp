@@ -41,11 +41,11 @@ const CallMessage: React.FC<CallMessageProps> = ({message}) => {
     <div className="message-header">
       <div className="message-header-icon message-header-icon--svg">
         {isCompleted ? (
-          <div data-uie-name="pickup-icon" className="svg-green">
+          <div className="svg-green">
             <Icon.Pickup />
           </div>
         ) : (
-          <div data-uie-name="hangup-icon" className="svg-red">
+          <div className="svg-red">
             <Icon.Hangup />
           </div>
         )}

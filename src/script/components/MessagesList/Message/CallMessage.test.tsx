@@ -22,6 +22,15 @@ import {CallMessage as CallMessageEntity} from 'src/script/entity/message/CallMe
 import CallMessage from './CallMessage';
 import {render} from '@testing-library/react';
 
+jest.mock('Components/Icon', () => ({
+  Hangup: function HangupIcon() {
+    return <span>hangupIcon</span>;
+  },
+  Pickup: function PickupIcon() {
+    return <span>pickupIcon</span>;
+  },
+}));
+
 const createCallMessage = (partialCallMessage: Partial<CallMessageEntity>) => {
   const callMessage: Partial<CallMessageEntity> = {
     caption: ko.pureComputed(() => ''),
@@ -42,13 +51,13 @@ describe('CallMessage', () => {
       }),
     };
 
-    const {getByTestId, queryByTestId} = render(<CallMessage {...props} />);
+    const {getByTestId, queryByText} = render(<CallMessage {...props} />);
 
     const elementMessageCall = getByTestId('element-message-call');
     expect(elementMessageCall.getAttribute('data-uie-value')).toEqual('completed');
 
-    expect(queryByTestId('hangup-icon')).toBeNull();
-    expect(queryByTestId('pickup-icon')).not.toBeNull();
+    expect(queryByText('hangupIcon')).toBeNull();
+    expect(queryByText('pickupIcon')).not.toBeNull();
   });
 
   it('shows red hangup icon for incompleted calls', async () => {
@@ -58,12 +67,12 @@ describe('CallMessage', () => {
       }),
     };
 
-    const {getByTestId, queryByTestId} = render(<CallMessage {...props} />);
+    const {getByTestId, queryByText} = render(<CallMessage {...props} />);
 
     const elementMessageCall = getByTestId('element-message-call');
     expect(elementMessageCall.getAttribute('data-uie-value')).toEqual('not_completed');
 
-    expect(queryByTestId('pickup-icon')).toBeNull();
-    expect(queryByTestId('hangup-icon')).not.toBeNull();
+    expect(queryByText('pickupIcon')).toBeNull();
+    expect(queryByText('hangupIcon')).not.toBeNull();
   });
 });
