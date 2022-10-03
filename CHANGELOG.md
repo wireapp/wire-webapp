@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [32.0.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@31.3.6...@wireapp/core@32.0.0) (2022-10-03)
+
+### Bug Fixes
+
+* Improve websocket lifecycle hooks reliability ([#4417](https://github.com/wireapp/wire-web-packages/issues/4417)) ([675544a](https://github.com/wireapp/wire-web-packages/commit/675544a2fbb0ed1407c9e5e37282b715f4be42f2))
+
+### BREAKING CHANGES
+
+* the `onConnected` callback has been removed in favor of a clean lifecycle event `ConnectionState.LIVE`
+
 ## [31.3.6](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@31.3.5...@wireapp/core@31.3.6) (2022-10-03)
 
 **Note:** Version bump only for package @wireapp/core
