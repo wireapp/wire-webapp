@@ -132,18 +132,13 @@ export const PrimaryModalComponent: React.FC = () => {
                     className="modal__input"
                     type="password"
                     value={passwordValue}
-                    placeholder={inputPlaceholder ?? ''}
+                    placeholder={inputPlaceholder}
                   />
                 </form>
               )}
               {hasInput && (
                 <form onSubmit={() => doAction(confirm, !!closeOnConfirm)}>
-                  <input
-                    maxLength={64}
-                    className="modal__input"
-                    value={inputValue}
-                    placeholder={inputPlaceholder ?? ''}
-                  />
+                  <input maxLength={64} className="modal__input" value={inputValue} placeholder={inputPlaceholder} />
                 </form>
               )}
               {errorMessage && <div className="modal__input__error">{errorMessage}</div>}
@@ -165,18 +160,18 @@ export const PrimaryModalComponent: React.FC = () => {
               )}
               <div className={cx('modal__buttons', {'modal__buttons--column': hasMultipleSecondary})}>
                 {secondaryActions
-                  .filter((action): action is Action => action !== null)
+                  .filter((action): action is Action => action !== null && !!action.text)
                   .map(action => (
                     <button
-                      key={`${action?.text}-${action?.uieName}`}
+                      key={`${action.text}-${action.uieName}`}
                       type="button"
-                      onClick={() => action?.action && doAction(action?.action, true, true)}
+                      onClick={() => action?.action && doAction(action.action, true, true)}
                       data-uie-name={action?.uieName}
                       className={cx('modal__button modal__button--secondary', {
                         'modal__button--full': hasMultipleSecondary,
                       })}
                     >
-                      {action?.text}
+                      {action.text}
                     </button>
                   ))}
                 {primaryAction?.text && (

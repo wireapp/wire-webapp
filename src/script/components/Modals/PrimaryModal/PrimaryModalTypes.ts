@@ -63,18 +63,18 @@ export enum PrimaryModalType {
 }
 
 export interface ModalContent {
-  checkboxLabel: string | null;
+  checkboxLabel: string;
   closeFn: () => void;
   closeOnConfirm?: boolean;
-  currentType: string | null;
-  inputPlaceholder: string | null;
-  messageHtml: string | null;
-  messageText: string | null;
+  currentType: string;
+  inputPlaceholder: string;
+  messageHtml: string;
+  messageText: string;
   modalUie: string;
   onBgClick: () => void;
   primaryAction: Action | null;
   secondaryAction: Action[] | Action | null;
-  titleText: string | null;
+  titleText: string;
   closeBtnTitle?: string;
 }
 

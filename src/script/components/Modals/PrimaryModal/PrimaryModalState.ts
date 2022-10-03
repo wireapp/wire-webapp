@@ -45,7 +45,7 @@ const defaultContent: ModalContent = {
   checkboxLabel: '',
   closeBtnTitle: '',
   closeFn: noop,
-  currentType: null,
+  currentType: '',
   inputPlaceholder: '',
   messageHtml: '',
   messageText: '',
@@ -123,21 +123,22 @@ const updateCurrentModalContent = (type: PrimaryModalType, options: ModalOptions
     showClose = false,
     text = {} as Text,
   } = options;
+
   const content = {
-    checkboxLabel: text.option ?? null,
+    checkboxLabel: text.option ?? '',
     closeBtnTitle: text.closeBtnLabel,
     closeFn: close,
     closeOnConfirm,
     currentType: type,
-    inputPlaceholder: text.input ?? null,
-    messageHtml: text.htmlMessage ?? null,
-    messageText: text.message ?? null,
+    inputPlaceholder: text.input ?? '',
+    messageHtml: text.htmlMessage ?? '',
+    messageText: text.message ?? '',
     modalUie: type,
     onBgClick: preventClose ? noop : removeCurrentModal,
     primaryAction: primaryAction ?? null,
     secondaryAction: secondaryAction ?? null,
     showClose,
-    titleText: text.title ?? null,
+    titleText: text.title ?? '',
   };
 
   switch (type) {
@@ -167,7 +168,7 @@ const updateCurrentModalContent = (type: PrimaryModalType, options: ModalOptions
     case PrimaryModalType.ACKNOWLEDGE: {
       content.primaryAction = {text: t('modalAcknowledgeAction'), ...primaryAction};
       content.titleText = text.title || t('modalAcknowledgeHeadline');
-      content.messageText = (!text.htmlMessage && text.message) || null;
+      content.messageText = (!text.htmlMessage && text.message) || '';
       break;
     }
     case PrimaryModalType.CONFIRM: {
