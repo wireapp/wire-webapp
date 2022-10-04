@@ -760,12 +760,12 @@ export class NotificationRepository {
 
   // Request browser permission for notifications.
   private async requestPermission(): Promise<void> {
-    amplify.publish(WebAppEvents.WARNING.SHOW, Warnings.TYPE.REQUEST_NOTIFICATION);
+    Warnings.showWarning(Warnings.TYPE.REQUEST_NOTIFICATION);
     // Note: The callback will be only triggered in Chrome.
     // If you ignore a permission request on Firefox, then the callback will not be triggered.
     if (window.Notification.requestPermission) {
       const permissionState = await window.Notification.requestPermission();
-      amplify.publish(WebAppEvents.WARNING.DISMISS, Warnings.TYPE.REQUEST_NOTIFICATION);
+      Warnings.hideWarning(Warnings.TYPE.REQUEST_NOTIFICATION);
       this.updatePermissionState(permissionState);
     }
   }

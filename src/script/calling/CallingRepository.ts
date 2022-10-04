@@ -351,9 +351,9 @@ export class CallingRepository {
       users = [...users, userId];
     }
     if (users.length === call.participants.length - 1) {
-      amplify.publish(WebAppEvents.WARNING.SHOW, Warnings.TYPE.CALL_QUALITY_POOR);
+      Warnings.showWarning(Warnings.TYPE.CALL_QUALITY_POOR);
     } else {
-      amplify.publish(WebAppEvents.WARNING.DISMISS, Warnings.TYPE.CALL_QUALITY_POOR);
+      Warnings.hideWarning(Warnings.TYPE.CALL_QUALITY_POOR);
     }
 
     switch (quality) {
@@ -1212,7 +1212,7 @@ export class CallingRepository {
   };
 
   private readonly callClosed = (reason: REASON, convId: SerializedConversationId) => {
-    amplify.publish(WebAppEvents.WARNING.DISMISS, Warnings.TYPE.CALL_QUALITY_POOR);
+    Warnings.hideWarning(Warnings.TYPE.CALL_QUALITY_POOR);
     const conversationId = this.parseQualifiedId(convId);
     const call = this.findCall(conversationId);
     if (!call) {

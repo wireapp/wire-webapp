@@ -69,7 +69,7 @@ import {EventMapper} from './EventMapper';
 import {ConversationVerificationState} from './ConversationVerificationState';
 import {buildMetadata, isVideo, isImage, isAudio, ImageMetadata} from '../assets/AssetMetaDataBuilder';
 import {AssetTransferState} from '../assets/AssetTransferState';
-import {ModalOptions, ModalsViewModel} from '../view_model/ModalsViewModel';
+import {ModalsViewModel} from '../view_model/ModalsViewModel';
 import {AudioType} from '../audio/AudioType';
 import {EventName} from '../tracking/EventName';
 import {StatusType} from '../message/StatusType';
@@ -660,7 +660,7 @@ export class MessageRepository {
     const titleString = users[0].isMe ? t('modalConversationNewDeviceHeadlineYou', titleSubstitutions) : baseTitle;
 
     return new Promise(resolve => {
-      const options: ModalOptions = {
+      const options = {
         close: () => resolve(false),
         primaryAction: {
           action: () => {
