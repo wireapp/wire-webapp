@@ -281,10 +281,10 @@ describe('APIClient', () => {
       const client = new APIClient();
       const testError = new Error('Test rejection');
 
-      spyOn(client.api.auth, 'postLogout').and.returnValue(Promise.reject(testError));
-      spyOn(client, 'disconnect').and.returnValue();
-      spyOn(client['accessTokenStore'], 'delete').and.returnValue(Promise.resolve(undefined));
-      spyOn(client['logger'], 'warn').and.returnValue();
+      jest.spyOn(client.api.auth, 'postLogout').mockReturnValue(Promise.reject(testError));
+      jest.spyOn(client, 'disconnect').mockReturnValue();
+      jest.spyOn(client['accessTokenStore'], 'delete').mockReturnValue(Promise.resolve(undefined));
+      jest.spyOn(client['logger'], 'warn').mockReturnValue();
 
       await client.logout();
       expect(client['logger'].warn).toHaveBeenCalledWith(testError);
@@ -293,10 +293,10 @@ describe('APIClient', () => {
     it('skips request when told to', async () => {
       const client = new APIClient();
 
-      spyOn(client.api.auth, 'postLogout');
-      spyOn(client, 'disconnect').and.returnValue();
-      spyOn(client['accessTokenStore'], 'delete').and.returnValue(Promise.resolve(undefined));
-      spyOn(client['logger'], 'warn').and.returnValue();
+      jest.spyOn(client.api.auth, 'postLogout');
+      jest.spyOn(client, 'disconnect').mockReturnValue();
+      jest.spyOn(client['accessTokenStore'], 'delete').mockReturnValue(Promise.resolve(undefined));
+      jest.spyOn(client['logger'], 'warn').mockReturnValue();
 
       await client.logout({skipLogoutRequest: true});
       expect(client['logger'].warn).not.toHaveBeenCalled();

@@ -90,29 +90,14 @@ describe('ReconnectingWebsocket', () => {
   });
 
   it('calls "onReconnect", "onOpen" and "onClose"', done => {
-    const onReconnect = jasmine.createSpy().and.returnValue(getServerAddress());
+    const onReconnect = jest.fn().mockReturnValue(getServerAddress());
     const RWS = new ReconnectingWebsocket(onReconnect);
     RWS.setOnOpen(() => {
-      expect(onReconnect.calls.count()).toBe(1);
+      expect(onReconnect).toHaveBeenCalledTimes(1);
       RWS.disconnect();
     });
     RWS.setOnClose(event => {
       expect(event.wasClean).toBe(true);
-      done();
-    });
-    RWS.connect();
-  });
-
-  it('closes the connection without reconnecting when server terminates the connection', done => {
-    const onReconnect = jasmine.createSpy().and.returnValue(getServerAddress());
-    const RWS = new ReconnectingWebsocket(onReconnect);
-    RWS.setOnOpen(() => {
-      expect(onReconnect.calls.count()).toBe(1);
-      RWS.send('terminate');
-    });
-    RWS.setOnClose(event => {
-      expect(event.wasClean).toBe(true);
-      expect(onReconnect.calls.count()).toBe(1);
       done();
     });
     RWS.connect();
@@ -124,14 +109,14 @@ describe('ReconnectingWebsocket', () => {
    */
   it('reconnects', done => {
     let reconnectCalls = 0;
-    const onReconnect = jasmine.createSpy().and.returnValue(getServerAddress());
+    const onReconnect = jest.fn().mockReturnValue(getServerAddress());
     const RWS = new ReconnectingWebsocket(onReconnect);
 
     RWS.connect();
 
     RWS.setOnOpen(() => {
       reconnectCalls++;
-      expect(onReconnect.calls.count()).toBe(reconnectCalls);
+      expect(onReconnect).toHaveBeenCalledTimes(reconnectCalls);
       if (reconnectCalls === 1) {
         RWS['socket']!.reconnect();
       } else {
