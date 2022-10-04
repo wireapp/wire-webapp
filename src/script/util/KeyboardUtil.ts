@@ -36,7 +36,7 @@ export const KEY = {
   TAB: 'Tab',
 };
 
-export const isOneOfKeys = (keyboardEvent: KeyboardEvent, expectedKeys: string[] = []) => {
+export const isOneOfKeys = (keyboardEvent: KeyboardEvent | ReactKeyboardEvent, expectedKeys: string[] = []) => {
   expectedKeys = expectedKeys.map(key => key.toLowerCase());
   const eventKey = keyboardEvent.key?.toLowerCase() || '';
   return !!expectedKeys.find(key => key === eventKey);
