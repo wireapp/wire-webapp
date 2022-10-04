@@ -42,7 +42,8 @@ import {CallActions} from '../../view_model/CallingViewModel';
 import {handleKeyDown} from 'Util/KeyboardUtil';
 import {PanelViewModel} from '../../view_model/PanelViewModel';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
-import {IconButton, StyledApp, THEME_ID, useMatchMedia} from '@wireapp/react-ui-kit';
+import {IconButton, IconButtonVariant, StyledApp, THEME_ID, useMatchMedia} from '@wireapp/react-ui-kit';
+import {useResponsiveViewState} from '../../page/ResponsiveViewState';
 
 export interface TitleBarProps {
   conversation: Conversation;
@@ -134,6 +135,10 @@ const TitleBar: React.FC<TitleBarProps> = ({
 
   const isScaledDown = useMatchMedia('max-width: 768px');
 
+  const responsiveView = useResponsiveViewState(state => state.currentView);
+
+  const setResponsiveView = useResponsiveViewState(state => state.setCurrentView);
+
   const showDetails = useCallback(
     (addParticipants: boolean): void => {
       const panelId = addParticipants
@@ -175,6 +180,10 @@ const TitleBar: React.FC<TitleBarProps> = ({
     };
   }, [isActivatedAccount, showAddParticipant, showDetails]);
 
+  useEffect(() => {
+    document.querySelector('#wire-main')?.classList.add(`view-${responsiveView}`);
+  }, [responsiveView]);
+
   const onClickCollectionButton = () => {
     amplify.publish(WebAppEvents.CONTENT.SWITCH, ContentViewModel.STATE.COLLECTION);
   };
@@ -189,6 +198,14 @@ const TitleBar: React.FC<TitleBarProps> = ({
     <StyledApp themeId={THEME_ID.DEFAULT}>
       <ul id="conversation-title-bar" className="conversation-title-bar">
         <li className="conversation-title-bar-library">
+          {isScaledDown && (
+            <IconButton
+              variant={IconButtonVariant.SECONDARY}
+              className="conversation-title-bar-icon icon-back"
+              css={{marginBottom: 0}}
+              onClick={() => setResponsiveView(1)}
+            />
+          )}
           {isActivatedAccount && !isScaledDown && (
             <button
               className="conversation-title-bar-icon icon-search"
