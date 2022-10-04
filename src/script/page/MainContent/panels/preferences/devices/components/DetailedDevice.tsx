@@ -35,12 +35,15 @@ const DetailedDevice: React.FC<DeviceProps> = ({device, fingerprint}) => {
       <h3 className="preferences-devices-model" data-uie-name="device-model">
         {device.model}
       </h3>
+
       <p className="preferences-devices-id">
         <span>{t('preferencesDevicesId')}</span>
+
         <span data-uie-name="preferences-device-current-id">
           <FormattedId idSlices={splitFingerprint(device.id)} />
         </span>
       </p>
+
       {device.time !== undefined && (
         <div className="preferences-devices-activated">
           <p
@@ -50,9 +53,11 @@ const DetailedDevice: React.FC<DeviceProps> = ({device, fingerprint}) => {
           />
         </div>
       )}
+
       <h3 className="label preferences-label preferences-devices-fingerprint-label">
         {t('preferencesDevicesFingerprint')}
       </h3>
+
       <p className="preferences-devices-fingerprint" css={{width: '300px'}}>
         <FormattedId idSlices={splitFingerprint(fingerprint)} />
       </p>

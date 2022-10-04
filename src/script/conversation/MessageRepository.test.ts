@@ -46,6 +46,7 @@ import {ClientEntity} from '../client/ClientEntity';
 import {TeamState} from '../team/TeamState';
 import {ContentMessage} from '../entity/message/ContentMessage';
 import {PayloadBundleState} from '@wireapp/core/src/main/conversation';
+import {ConversationState} from './ConversationState';
 
 const selfUser = new User('selfid', '');
 selfUser.isMe = true;
@@ -69,6 +70,7 @@ type MessageRepositoryDependencies = {
   serverTimeHandler: ServerTimeHandler;
   userRepository: UserRepository;
   userState: UserState;
+  conversationState: ConversationState;
 };
 
 async function buildMessageRepository(): Promise<[MessageRepository, MessageRepositoryDependencies]> {
@@ -81,6 +83,10 @@ async function buildMessageRepository(): Promise<[MessageRepository, MessageRepo
   messageSender.pauseQueue(false);
   await core.initServices({} as any);
   /* eslint-disable sort-keys-fix/sort-keys-fix */
+  const conversationState = new ConversationState(userState);
+  const selfConversation = new Conversation(selfUser.id);
+  selfConversation.selfUser(selfUser);
+  conversationState.conversations([selfConversation]);
   const dependencies = {
     conversationRepository: () => ({} as ConversationRepository),
     cryptographyRepository: new CryptographyRepository({} as any),
@@ -93,6 +99,7 @@ async function buildMessageRepository(): Promise<[MessageRepository, MessageRepo
     userState,
     teamState: new TeamState(),
     clientState,
+    conversationState,
     core,
   };
   /* eslint-disable sort-keys-fix/sort-keys-fix */
@@ -200,12 +207,14 @@ describe('MessageRepository', () => {
       msgToDelete.user(sender);
       conversation.addMessage(msgToDelete);
       const [messageRepository, {core}] = await buildMessageRepository();
-      spyOn(core.service!.conversation, 'deleteMessageEveryone');
+      spyOn(core.service!.conversation, 'send').and.returnValue(
+        Promise.resolve({state: PayloadBundleState.OUTGOING_SENT}),
+      );
 
       await expect(messageRepository.deleteMessageForEveryone(conversation, msgToDelete)).rejects.toMatchObject({
         type: ConversationError.TYPE.WRONG_USER,
       });
-      expect(core.service!.conversation.deleteMessageEveryone).not.toHaveBeenCalled();
+      expect(core.service!.conversation.send).not.toHaveBeenCalled();
     });
 
     it('should send delete and deletes message for own messages', async () => {
@@ -217,18 +226,24 @@ describe('MessageRepository', () => {
       conversation.addMessage(messageToDelete);
 
       const [messageRepository, {core, eventRepository}] = await buildMessageRepository();
-      spyOn(core.service!.conversation, 'deleteMessageEveryone');
+      spyOn(core.service!.conversation, 'send').and.returnValue(
+        Promise.resolve({state: PayloadBundleState.OUTGOING_SENT}),
+      );
       spyOn(eventRepository.eventService, 'deleteEvent').and.returnValue(Promise.resolve());
 
       await messageRepository.deleteMessageForEveryone(conversation, messageToDelete);
-      expect(core.service!.conversation.deleteMessageEveryone).toHaveBeenCalledWith(
-        conversation.id,
-        messageToDelete.id,
-        ['selfid', 'user1'],
-        true,
-        undefined,
+      expect(core.service!.conversation.send).toHaveBeenCalledWith(
+        expect.objectContaining({
+          payload: expect.objectContaining({
+            conversation: conversation.id,
+            content: expect.objectContaining({
+              messageId: messageToDelete.id,
+            }),
+            type: 'PayloadBundleType.MESSAGE_DELETE',
+          }),
+          userIds: {selfid: [], user1: []},
+        }),
       );
-      expect(eventRepository.eventService.deleteEvent).toHaveBeenCalledTimes(1);
     });
   });
 

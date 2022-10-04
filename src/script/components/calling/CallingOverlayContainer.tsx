@@ -103,7 +103,7 @@ const CallingContainer: React.FC<CallingContainerProps> = ({
     call.maximizedParticipant(null);
   };
 
-  const setMaximizedParticipant = (call: Call, participant: Participant) => {
+  const setMaximizedParticipant = (call: Call, participant: Participant | null) => {
     call.maximizedParticipant(participant);
   };
 
@@ -117,6 +117,11 @@ const CallingContainer: React.FC<CallingContainerProps> = ({
   const switchCameraInput = (call: Call, deviceId: string) => {
     mediaDevicesHandler.currentDeviceId.videoInput(deviceId);
     callingRepository.refreshVideoInput();
+  };
+
+  const switchMicrophoneInput = (call: Call, deviceId: string) => {
+    mediaDevicesHandler.currentDeviceId.audioInput(deviceId);
+    callingRepository.refreshAudioInput();
   };
 
   const toggleCamera = (call: Call) => {
@@ -181,6 +186,7 @@ const CallingContainer: React.FC<CallingContainerProps> = ({
           muteState={muteState}
           isChoosingScreen={isChoosingScreen}
           switchCameraInput={switchCameraInput}
+          switchMicrophoneInput={switchMicrophoneInput}
           setMaximizedParticipant={setMaximizedParticipant}
           setActiveCallViewTab={setActiveCallViewTab}
           toggleMute={toggleMute}

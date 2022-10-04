@@ -184,7 +184,7 @@ const InputBar = ({
     }
 
     return messageTimer ? t('tooltipConversationEphemeral') : t('tooltipConversationInputPlaceholder');
-  }, [availability, messageTimer, showAvailabilityTooltip]);
+  }, [availability, messageTimer, showAvailabilityTooltip]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const candidates = participatingUserEts.filter(userEntity => !userEntity.isService);
   const mentionSuggestions = editedMention ? searchRepository.searchUserInSet(editedMention.term, candidates) : [];
@@ -378,7 +378,7 @@ const InputBar = ({
       const firstAsset = editMessageEntity.getFirstAsset() as TextAsset;
       moveCursorToEnd(firstAsset.text.length);
     }
-  }, [editMessageEntity]);
+  }, [editMessageEntity]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const replyMessage = (messageEntity: ContentMessage): void => {
     if (messageEntity?.isReplyable() && messageEntity !== replyMessageEntity) {
@@ -730,6 +730,7 @@ const InputBar = ({
     return () => {
       amplify.unsubscribeAll(WebAppEvents.SHORTCUT.PING);
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
@@ -740,6 +741,7 @@ const InputBar = ({
         ...(replyMessageEntity && {reply: replyMessageEntity}),
       });
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isEditing, currentMentions, replyMessageEntity, inputValue]);
 
   useTextAreaFocus(() => textareaRef.current?.focus());
@@ -776,6 +778,7 @@ const InputBar = ({
       amplify.unsubscribe(WebAppEvents.CONVERSATION.MESSAGE.REMOVED, handleRepliedMessageDeleted);
       amplify.unsubscribe(WebAppEvents.CONVERSATION.MESSAGE.UPDATED, handleRepliedMessageUpdated);
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [replyMessageEntity]);
 
   useEffect(() => {
@@ -788,6 +791,7 @@ const InputBar = ({
     }
 
     return () => undefined;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isEditing]);
 
   // Temporarily functionality for dropping files on conversation container, should be moved to Conversation Component
@@ -796,6 +800,7 @@ const InputBar = ({
   useEffect(() => {
     document.addEventListener('paste', onPasteFiles);
     return () => document.removeEventListener('paste', onPasteFiles);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const sendImageOnEnterClick = (event: KeyboardEvent) => {
@@ -814,6 +819,7 @@ const InputBar = ({
     return () => {
       window.removeEventListener('keydown', sendImageOnEnterClick);
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pastedFile]);
 
   const sendButton = (

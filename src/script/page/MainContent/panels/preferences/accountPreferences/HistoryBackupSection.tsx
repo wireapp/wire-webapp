@@ -17,6 +17,7 @@
  *
  */
 
+import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import {amplify} from 'amplify';
 import React, {ChangeEvent} from 'react';
@@ -26,7 +27,6 @@ import {importHistoryFile} from 'Components/HistoryImport';
 
 import {t} from 'Util/LocalizerUtil';
 import {handleKeyDown} from 'Util/KeyboardUtil';
-import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
 
 import PreferencesSection from '../components/PreferencesSection';
 

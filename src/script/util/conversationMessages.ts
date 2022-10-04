@@ -37,7 +37,7 @@ export enum MessageMarkerType {
  *
  * @param message The message we want to render
  * @param lastReadTimestamp If given will check new messages from this timestamp instead of live value of conversation.last_read_timestamp()
- * @param previousMessage The rigth before in the conversation
+ * @param previousMessage The right before in the conversation
  */
 export function getMessageMarkerType(
   message: Message,

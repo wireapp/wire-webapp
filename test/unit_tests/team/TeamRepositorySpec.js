@@ -33,13 +33,6 @@ describe('TeamRepository', () => {
         id: 'e6d3adc5-9140-477a-abc1-8279d210ceab',
         name: 'Wire GmbH',
       },
-      {
-        creator: 'e82019bc-5ee1-4835-8057-cfbe2229582b',
-        icon_key: null,
-        icon: '',
-        id: 'f9310b63-0c04-4f13-a051-c19d24b78ed5',
-        name: 'My Awesome Company',
-      },
     ],
     has_more: false,
   };
@@ -53,11 +46,11 @@ describe('TeamRepository', () => {
   /* eslint sort-keys-fix/sort-keys-fix: "off" */
 
   describe('getTeam()', () => {
-    it('returns the binding team entity', async () => {
+    it('returns the team entity', async () => {
       const userState = new UserState();
-      userState.self({id: 'self-id'});
+      userState.self({id: 'self-id', teamId: 'e6d3adc5-9140-477a-abc1-8279d210ceab'});
       const teamService = {
-        getTeams: jest.fn(() => Promise.resolve(teams_data)),
+        getTeamById: jest.fn(team => Promise.resolve(team_metadata)),
       };
       const teamRepo = new TeamRepository(
         teamService,
@@ -68,6 +61,8 @@ describe('TeamRepository', () => {
         userState,
         new TeamState(userState),
       );
+      jest.spyOn(teamRepo, 'getSelfMember').mockImplementation(team => Promise.resolve(team_members.members[0]));
+
       const team_et = await teamRepo.getTeam();
       const [team_data] = teams_data.teams;
 

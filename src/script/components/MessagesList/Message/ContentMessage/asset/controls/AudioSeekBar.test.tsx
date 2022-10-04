@@ -17,19 +17,10 @@
  *
  */
 
-import {act, fireEvent} from '@testing-library/react';
+import {act, fireEvent, render} from '@testing-library/react';
 import {FileAsset} from 'src/script/entity/message/FileAsset';
-import TestPage from 'Util/test/TestPage';
 
-import AudioSeekBar, {AudioSeekBarProps} from './AudioSeekBar';
-
-class AudioSeekBarPage extends TestPage<AudioSeekBarProps> {
-  constructor(props?: AudioSeekBarProps) {
-    super(AudioSeekBar, props);
-  }
-
-  getClipRect = () => this.get('svg clipPath rect');
-}
+import AudioSeekBar from './AudioSeekBar';
 
 describe('AudioSeekBar', () => {
   const getAudioAsset = () =>
@@ -53,15 +44,15 @@ describe('AudioSeekBar', () => {
   });
 
   it('renders level indicators for the audio asset', () => {
-    const audioSeekBar = new AudioSeekBarPage(getDefaultProps());
-    expect(audioSeekBar.getAll('path').length).toEqual(2);
+    const {container} = render(<AudioSeekBar {...getDefaultProps()} />);
+    expect(container.querySelectorAll('path')).toHaveLength(2);
   });
 
   it('updates on audio events', () => {
     const audioElement = createAudioElement(500);
-    const audioSeekBar = new AudioSeekBarPage({...getDefaultProps(), audioElement});
+    const {container} = render(<AudioSeekBar {...getDefaultProps()} audioElement={audioElement} />);
 
-    const clipPathWidth = () => audioSeekBar.getClipRect().getAttribute('width');
+    const clipPathWidth = () => container.querySelector('svg rect')?.getAttribute('width');
 
     act(() => {
       audioElement.dispatchEvent(new Event('timeupdate'));
@@ -78,8 +69,8 @@ describe('AudioSeekBar', () => {
 
   it('updates the currentTime on click', () => {
     const props = getDefaultProps();
-    const audioSeekBar = new AudioSeekBarPage(props);
-    const svg = audioSeekBar.get('svg');
+    const {container} = render(<AudioSeekBar {...props} />);
+    const svg = container.querySelector('svg') as SVGElement;
     Object.defineProperty(svg, 'clientWidth', {get: () => 100});
 
     const expected = 500;

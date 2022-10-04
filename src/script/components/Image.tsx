@@ -24,10 +24,9 @@ import {container} from 'tsyringe';
 import {registerReactComponent, useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {AssetRemoteData} from '../assets/AssetRemoteData';
 import {AssetRepository} from '../assets/AssetRepository';
-import {useViewPortObserver} from '../ui/viewportObserver';
 import {TeamState} from '../team/TeamState';
 import RestrictedImage from './asset/RestrictedImage';
-import useEffectRef from 'Util/useEffectRef';
+import InViewport from './utils/InViewport';
 
 export interface ImageProps extends React.HTMLProps<HTMLDivElement> {
   aspectRatio?: number;
@@ -48,8 +47,7 @@ const Image: React.FC<ImageProps> = ({
   aspectRatio,
   ...props
 }) => {
-  const [viewportElementRef, setViewportElementRef] = useEffectRef<HTMLDivElement>();
-  const isInViewport = useViewPortObserver(viewportElementRef);
+  const [isInViewport, setIsInViewport] = useState(false);
 
   const [assetIsLoading, setAssetIsLoading] = useState<boolean>(false);
   const [assetSrc, setAssetSrc] = useState<string>();
@@ -83,13 +81,13 @@ const Image: React.FC<ImageProps> = ({
   return !isFileSharingReceivingEnabled ? (
     <RestrictedImage className={className} showMessage={!isQuote} isSmall={isQuote} />
   ) : (
-    <div ref={setViewportElementRef} className={cx('image-wrapper', className)} {...props}>
+    <InViewport onVisible={() => setIsInViewport(true)} className={cx('image-wrapper', className)} {...props}>
       {assetSrc ? (
         <img style={style} onClick={onClick} src={assetSrc} role="presentation" alt="" />
       ) : (
         <div style={style} className={cx({'loading-dots': assetIsLoading})}></div>
       )}
-    </div>
+    </InViewport>
   );
 };
 

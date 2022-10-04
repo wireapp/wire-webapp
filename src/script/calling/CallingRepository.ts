@@ -305,7 +305,9 @@ export class CallingRepository {
       return false;
     }
     const {id, domain} = call.conversationId;
-    const allClients = await this.core.service!.conversation.getAllParticipantsClients(id, domain);
+    const allClients = conversation.isUsingMLSProtocol
+      ? await this.core.service!.conversation.fetchAllParticipantsClients(id, domain)
+      : await this.core.service!.conversation.getAllParticipantsClients(id, domain);
     const qualifiedClients = isQualifiedUserClients(allClients)
       ? flattenQualifiedUserClients(allClients)
       : flattenUserClients(allClients);
@@ -587,7 +589,9 @@ export class CallingRepository {
       case CALL_MESSAGE_TYPE.CONFKEY: {
         if (source !== EventRepository.SOURCE.STREAM) {
           const {id, domain} = conversationId;
-          const allClients = await this.core.service!.conversation.getAllParticipantsClients(id, domain);
+          const allClients = conversationEntity.isUsingMLSProtocol
+            ? await this.core.service!.conversation.fetchAllParticipantsClients(id, domain)
+            : await this.core.service!.conversation.getAllParticipantsClients(id, domain);
           // We warn the message repository that a mismatch has happened outside of its lifecycle (eventually triggering a conversation degradation)
           // We warn the message repository that a mismatch has happened outside of its lifecycle (eventually triggering a conversation degradation)
           const shouldContinue = await this.messageRepository.updateMissingClients(
