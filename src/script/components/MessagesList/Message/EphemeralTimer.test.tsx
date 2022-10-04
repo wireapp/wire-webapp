@@ -17,17 +17,9 @@
  *
  */
 
-import TestPage from 'Util/test/TestPage';
 import {Message} from '../../../entity/message/Message';
-import EphemeralTimer, {EphemeralTimerProps} from './EphemeralTimer';
-
-class EphemeralTimerPage extends TestPage<EphemeralTimerProps> {
-  constructor(props?: EphemeralTimerProps) {
-    super(EphemeralTimer, props);
-  }
-
-  getCircle = () => this.get('[data-uie-name="ephemeral-timer-circle"]');
-}
+import EphemeralTimer from './EphemeralTimer';
+import {render} from '@testing-library/react';
 
 describe('EphemeralTimer', () => {
   it('shows the icon', () => {
@@ -38,16 +30,19 @@ describe('EphemeralTimer', () => {
     message.ephemeral_expires(now + remaining);
     message.ephemeral_remaining(remaining);
 
-    const ephemeralTimer = new EphemeralTimerPage({message});
-    const circle = ephemeralTimer.getCircle();
+    const {getByTestId} = render(<EphemeralTimer message={message} />);
+
+    const circle = getByTestId('ephemeral-timer-circle');
 
     expect(window.getComputedStyle(circle).getPropertyValue('--offset')).toBe('1');
   });
+
   it('hides the icon when no ephemeral timer was started', () => {
     const message = new Message();
 
-    const ephemeralTimer = new EphemeralTimerPage({message});
-    const circle = ephemeralTimer.getCircle();
+    const {getByTestId} = render(<EphemeralTimer message={message} />);
+
+    const circle = getByTestId('ephemeral-timer-circle');
 
     expect(window.getComputedStyle(circle).getPropertyValue('--offset')).toBe('0');
   });

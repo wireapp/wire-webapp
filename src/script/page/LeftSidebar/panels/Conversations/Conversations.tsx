@@ -41,10 +41,11 @@ import {TeamState} from '../../../../team/TeamState';
 import {AvailabilityContextMenu} from '../../../../ui/AvailabilityContextMenu';
 import {UserState} from '../../../../user/UserState';
 import {ConversationsList} from './ConversationsList';
-import {PreferenceNotificationRepository} from 'src/script/notification/PreferenceNotificationRepository';
+import {PreferenceNotificationRepository} from '../../../../notification/PreferenceNotificationRepository';
 import {useFolderState} from './state';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import {amplify} from 'amplify';
+import {useMLSConversationState} from '../../../../mls/mlsConversationState';
 
 type ConversationsProps = {
   callState?: CallState;
@@ -89,6 +90,8 @@ const Conversations: React.FC<ConversationsProps> = ({
     useKoSubscribableChildren(conversationState, ['conversations_archived', 'conversations_unarchived']);
   const {notifications} = useKoSubscribableChildren(preferenceNotificationRepository, ['notifications']);
 
+  const {filterEstablishedConversations} = useMLSConversationState();
+
   const {activeCalls} = useKoSubscribableChildren(callState, ['activeCalls']);
   const initialViewStyle = propertiesRepository.getPreference(PROPERTIES_TYPE.INTERFACE.VIEW_FOLDERS)
     ? ConverationViewStyle.FOLDER
@@ -117,6 +120,7 @@ const Conversations: React.FC<ConversationsProps> = ({
     return () => {
       amplify.unsubscribe(WebAppEvents.CONTENT.EXPAND_FOLDER, openFolder);
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeConversation]);
 
   useEffect(() => {
@@ -125,6 +129,7 @@ const Conversations: React.FC<ConversationsProps> = ({
     return () => {
       conversationLabelRepository.removeEventListener('conversation-favorited', openFavorites);
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
@@ -132,6 +137,7 @@ const Conversations: React.FC<ConversationsProps> = ({
       PROPERTIES_TYPE.INTERFACE.VIEW_FOLDERS,
       viewStyle === ConverationViewStyle.FOLDER,
     );
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [viewStyle]);
 
   const header = (
@@ -290,7 +296,7 @@ const Conversations: React.FC<ConversationsProps> = ({
         <ConversationsList
           connectRequests={connectRequests}
           callState={callState}
-          conversations={conversations}
+          conversations={filterEstablishedConversations(conversations)}
           viewStyle={viewStyle}
           listViewModel={listViewModel}
           conversationState={conversationState}

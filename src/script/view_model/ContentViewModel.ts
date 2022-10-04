@@ -29,7 +29,6 @@ import {container} from 'tsyringe';
 
 import {Config} from '../Config';
 import {LegalHoldModalViewModel} from './content/LegalHoldModalViewModel';
-import {ModalsViewModel} from './ModalsViewModel';
 import {ConversationError} from '../error/ConversationError';
 import {PanelViewModel} from './PanelViewModel';
 import type {MainViewModel, ViewModelRepositories} from './MainViewModel';
@@ -49,8 +48,8 @@ import {
   Notification,
   ClientNotificationData,
 } from '../notification/PreferenceNotificationRepository';
-import {modals} from '../view_model/ModalsViewModel';
 import {MessageRepository} from '../conversation/MessageRepository';
+import PrimaryModal from '../components/Modals/PrimaryModal';
 
 interface ShowConversationOptions {
   exposeMessage?: Message;
@@ -289,8 +288,8 @@ export class ContentViewModel {
     } catch (error) {
       const isConversationNotFound = error.type === ConversationError.TYPE.CONVERSATION_NOT_FOUND;
       if (isConversationNotFound) {
-        this.mainViewModel.modals.showModal(
-          ModalsViewModel.TYPE.ACKNOWLEDGE,
+        PrimaryModal.show(
+          PrimaryModal.type.ACKNOWLEDGE,
           {
             text: {
               message: t('conversationNotFoundMessage'),
@@ -398,8 +397,8 @@ export class ContentViewModel {
     const showNotification = (type: string, aggregatedNotifications: Notification[]) => {
       switch (type) {
         case PreferenceNotificationRepository.CONFIG.NOTIFICATION_TYPES.NEW_CLIENT: {
-          modals.showModal(
-            ModalsViewModel.TYPE.ACCOUNT_NEW_DEVICES,
+          PrimaryModal.show(
+            PrimaryModal.type.ACCOUNT_NEW_DEVICES,
             {
               data: aggregatedNotifications.map(notification => notification.data) as ClientNotificationData[],
               preventClose: true,
@@ -415,8 +414,8 @@ export class ContentViewModel {
         }
 
         case PreferenceNotificationRepository.CONFIG.NOTIFICATION_TYPES.READ_RECEIPTS_CHANGED: {
-          modals.showModal(
-            ModalsViewModel.TYPE.ACCOUNT_READ_RECEIPTS_CHANGED,
+          PrimaryModal.show(
+            PrimaryModal.type.ACCOUNT_READ_RECEIPTS_CHANGED,
             {
               data: aggregatedNotifications.pop().data as boolean,
               preventClose: true,

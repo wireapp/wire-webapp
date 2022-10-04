@@ -37,7 +37,7 @@ const AudioSeekBar: React.FC<AudioSeekBarProps> = ({asset, audioElement, disable
   const [path, setPath] = useState('');
   const [loudness, setLoudness] = useState<number[]>([]);
   const [position, setPosition] = useState(0);
-  const svgNode = useRef<SVGSVGElement>();
+  const svgNode = useRef<SVGSVGElement>(null);
   const [clipId] = useState(`clip-${createRandomUuid()}`);
 
   useEffect(() => {
@@ -46,8 +46,10 @@ const AudioSeekBar: React.FC<AudioSeekBarProps> = ({asset, audioElement, disable
   }, []);
 
   useEffect(() => {
-    if (asset.meta?.loudness !== null) {
-      setLoudness(Array.from(asset.meta.loudness).map(level => level / 256));
+    const loudness = asset.meta?.loudness;
+
+    if (loudness) {
+      setLoudness(Array.from(loudness).map(level => level / 256));
     }
   }, [asset]);
 
@@ -58,8 +60,10 @@ const AudioSeekBar: React.FC<AudioSeekBarProps> = ({asset, audioElement, disable
       audioElement?.removeEventListener('ended', onAudioEnded);
       audioElement?.removeEventListener('timeupdate', onTimeUpdate);
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [audioElement]);
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => updateSvgWidth(), [svgNode.current]);
 
   useEffect(() => {
@@ -79,11 +83,16 @@ const AudioSeekBar: React.FC<AudioSeekBarProps> = ({asset, audioElement, disable
       })
       .join('');
     setPath(newPath);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [svgWidth]);
 
   const updateSvgWidth = () => setSvgWidth(svgNode.current?.clientWidth ?? 0);
 
   const onLevelClick = (event: React.MouseEvent<SVGSVGElement, MouseEvent>) => {
+    if (!svgNode.current) {
+      return;
+    }
+
     const mouse_x = (event.pageX ?? event.clientX) - svgNode.current.getBoundingClientRect().left;
     const calculatedTime = (audioElement.duration * mouse_x) / svgNode.current.clientWidth;
     const currentTime = isNaN(calculatedTime) ? 0 : calculatedTime;

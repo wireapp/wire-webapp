@@ -17,12 +17,11 @@
  *
  */
 
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 
 import Icon from 'Components/Icon';
 import {t} from 'Util/LocalizerUtil';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
-import useEffectRef from 'Util/useEffectRef';
 import {getLogger} from 'Util/Logger';
 
 import {Config} from '../../../../../Config';
@@ -48,8 +47,8 @@ const CameraPreferences: React.FC<CameraPreferencesProps> = ({
   hasActiveCameraStream,
 }) => {
   const [isRequesting, setIsRequesting] = useState(false);
-  const [stream, setStream] = useState<MediaStream>();
-  const [videoElement, setVideoElement] = useEffectRef<HTMLVideoElement>();
+  const [stream, setStream] = useState<MediaStream | null>(null);
+  const videoElement = useRef<HTMLVideoElement>(null);
   const {[DeviceTypes.VIDEO_INPUT]: availableDevices} = useKoSubscribableChildren(devicesHandler?.availableDevices, [
     DeviceTypes.VIDEO_INPUT,
   ]);
@@ -87,13 +86,14 @@ const CameraPreferences: React.FC<CameraPreferencesProps> = ({
 
   useEffect(() => {
     requestStream();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentDeviceId]);
 
   useEffect(() => {
-    if (videoElement) {
-      videoElement.srcObject = stream;
+    if (videoElement.current && stream) {
+      videoElement.current.srcObject = stream;
     }
-  }, [videoElement, stream]);
+  }, [stream]);
 
   useEffect(
     () => () => {
@@ -131,7 +131,7 @@ const CameraPreferences: React.FC<CameraPreferencesProps> = ({
       ) : (
         <>
           {stream ? (
-            <video className="preferences-av-video mirror" autoPlay playsInline muted ref={setVideoElement} />
+            <video className="preferences-av-video mirror" autoPlay playsInline muted ref={videoElement} />
           ) : (
             <div className="preferences-av-video-disabled">
               <div

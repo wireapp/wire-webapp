@@ -66,7 +66,6 @@ import {MessageRepository, OutgoingQuote} from '../../conversation/MessageReposi
 import {StorageRepository} from '../../storage';
 import {MentionEntity} from '../../message/MentionEntity';
 import {Config} from '../../Config';
-import {ModalsViewModel} from '../../view_model/ModalsViewModel';
 import {ConversationError} from '../../error/ConversationError';
 import {MessageHasher} from '../../message/MessageHasher';
 import {QuoteEntity} from '../../message/QuoteEntity';
@@ -81,10 +80,12 @@ import useScrollSync from '../../hooks/useScrollSync';
 import useResizeTarget from '../../hooks/useResizeTarget';
 import useDropFiles from '../../hooks/useDropFiles';
 import useTextAreaFocus from '../../hooks/useTextAreaFocus';
+
 import {StyledApp, THEME_ID, useMatchMedia} from '@wireapp/react-ui-kit';
 import ControlButtons from '../../page/message-list/InputBarControls/ControlButtons';
 import Icon from 'Components/Icon';
 import GiphyButton from '../../page/message-list/InputBarControls/GiphyButton';
+import PrimaryModal from '../Modals/PrimaryModal';
 
 const CONFIG = {
   ...Config.getConfig(),
@@ -94,7 +95,7 @@ const CONFIG = {
 const showWarningModal = (title: string, message: string): void => {
   // Timeout needed for display warning modal - we need to update modal
   setTimeout(() => {
-    amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.ACKNOWLEDGE, {
+    PrimaryModal.show(PrimaryModal.type.ACKNOWLEDGE, {
       text: {message, title},
     });
   }, 0);
@@ -183,7 +184,7 @@ const InputBar = ({
     }
 
     return messageTimer ? t('tooltipConversationEphemeral') : t('tooltipConversationInputPlaceholder');
-  }, [availability, messageTimer, showAvailabilityTooltip]);
+  }, [availability, messageTimer, showAvailabilityTooltip]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const candidates = participatingUserEts.filter(userEntity => !userEntity.isService);
   const mentionSuggestions = editedMention ? searchRepository.searchUserInSet(editedMention.term, candidates) : [];
@@ -377,7 +378,7 @@ const InputBar = ({
       const firstAsset = editMessageEntity.getFirstAsset() as TextAsset;
       moveCursorToEnd(firstAsset.text.length);
     }
-  }, [editMessageEntity]);
+  }, [editMessageEntity]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const replyMessage = (messageEntity: ContentMessage): void => {
     if (messageEntity?.isReplyable() && messageEntity !== replyMessageEntity) {
@@ -729,6 +730,7 @@ const InputBar = ({
     return () => {
       amplify.unsubscribeAll(WebAppEvents.SHORTCUT.PING);
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
@@ -739,6 +741,7 @@ const InputBar = ({
         ...(replyMessageEntity && {reply: replyMessageEntity}),
       });
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isEditing, currentMentions, replyMessageEntity, inputValue]);
 
   useTextAreaFocus(() => textareaRef.current?.focus());
@@ -775,6 +778,7 @@ const InputBar = ({
       amplify.unsubscribe(WebAppEvents.CONVERSATION.MESSAGE.REMOVED, handleRepliedMessageDeleted);
       amplify.unsubscribe(WebAppEvents.CONVERSATION.MESSAGE.UPDATED, handleRepliedMessageUpdated);
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [replyMessageEntity]);
 
   useEffect(() => {
@@ -787,6 +791,7 @@ const InputBar = ({
     }
 
     return () => undefined;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isEditing]);
 
   // Temporarily functionality for dropping files on conversation container, should be moved to Conversation Component
@@ -795,6 +800,7 @@ const InputBar = ({
   useEffect(() => {
     document.addEventListener('paste', onPasteFiles);
     return () => document.removeEventListener('paste', onPasteFiles);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const sendImageOnEnterClick = (event: KeyboardEvent) => {
@@ -813,6 +819,7 @@ const InputBar = ({
     return () => {
       window.removeEventListener('keydown', sendImageOnEnterClick);
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pastedFile]);
 
   const sendButton = (

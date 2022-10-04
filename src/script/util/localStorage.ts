@@ -17,30 +17,21 @@
  *
  */
 
-// Overcomes error from jest internals.
-// https://github.com/facebook/jest/issues/6248
-const JSDomEnvironment = require('jest-environment-jsdom');
-
-class FixedJSDomEnvironment extends JSDomEnvironment {
-  constructor(config) {
-    super({
-      ...config,
-      ...{
-        globals: {
-          ...config.globals,
-          ...{
-            ArrayBuffer: ArrayBuffer,
-            Uint32Array: Uint32Array,
-            Uint8Array: Uint8Array,
-          },
-        },
-      },
-    });
+/**
+ * Gives back the browser's instance of localstorage if present.
+ * Will prevent failing if localStorage is not accessible because cookies are disabled
+ * @returns {any}
+ */
+export function getStorage() {
+  try {
+    /**
+     * If users disable cookies in their browsers, they won't have access to the localStorage API.
+     * The following check will fix this error:
+     * > Failed to read the 'localStorage' property from 'Window': Access is denied for this document
+     * (note: Some version of Firefox do not throw an error but, instead, return a null object, we also need to account for that scenario)
+     */
+    return window.localStorage;
+  } catch (error) {
+    return undefined;
   }
-
-  async setup() {}
-
-  async teardown() {}
 }
-
-module.exports = FixedJSDomEnvironment;

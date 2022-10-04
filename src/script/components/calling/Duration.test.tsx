@@ -22,7 +22,7 @@ import Duration from './Duration';
 
 describe('Duration', () => {
   beforeEach(() => {
-    jest.useFakeTimers('modern');
+    jest.useFakeTimers();
   });
 
   afterEach(() => jest.useRealTimers());

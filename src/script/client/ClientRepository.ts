@@ -32,7 +32,6 @@ import {Logger, getLogger} from 'Util/Logger';
 import {loadValue} from 'Util/StorageUtil';
 import {SIGN_OUT_REASON} from '../auth/SignOutReason';
 import {StorageKey} from '../storage/StorageKey';
-import {ModalsViewModel} from '../view_model/ModalsViewModel';
 import {ClientEntity} from './ClientEntity';
 import {ClientMapper} from './ClientMapper';
 import type {ClientService} from './ClientService';
@@ -43,6 +42,7 @@ import {ClientRecord, StorageRepository} from '../storage';
 import {ClientState} from './ClientState';
 import {matchQualifiedIds} from 'Util/QualifiedId';
 import {Core} from '../service/CoreSingleton';
+import PrimaryModal from '../components/Modals/PrimaryModal';
 
 export type UserClientEntityMap = {[userId: string]: ClientEntity[]};
 export type QualifiedUserClientEntityMap = {[domain: string]: UserClientEntityMap};
@@ -308,7 +308,7 @@ export class ClientRepository {
         await this.deleteLocalTemporaryClient();
         amplify.publish(WebAppEvents.LIFECYCLE.SIGN_OUT, SIGN_OUT_REASON.USER_REQUESTED, true);
       } else {
-        amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.OPTION, {
+        PrimaryModal.show(PrimaryModal.type.OPTION, {
           preventClose: true,
           primaryAction: {
             action: (clearData: boolean) => {
@@ -568,9 +568,8 @@ export class ClientRepository {
     const localClients = await this.getClientsForSelf();
     const removedClient = localClients.find(client => client.id === clientId);
     if (removedClient?.isLegalHold()) {
-      amplify.publish(
-        WebAppEvents.WARNING.MODAL,
-        ModalsViewModel.TYPE.ACKNOWLEDGE,
+      PrimaryModal.show(
+        PrimaryModal.type.ACKNOWLEDGE,
         {
           text: {
             message: t('modalLegalHoldDeactivatedMessage'),

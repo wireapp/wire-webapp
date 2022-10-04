@@ -17,13 +17,12 @@
  *
  */
 
-import React, {useEffect, useMemo} from 'react';
+import React, {useMemo} from 'react';
 import cx from 'classnames';
 
 import {noop} from 'Util/util';
 import {t} from 'Util/LocalizerUtil';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
-import useEffectRef from 'Util/useEffectRef';
 
 import {AVATAR_SIZE} from 'Components/Avatar';
 
@@ -84,20 +83,13 @@ const ConversationListCell: React.FC<ConversationListCellProps> = ({
 
   const isActive = isSelected(conversation);
 
-  const [viewportElementRef, setViewportElementRef] = useEffectRef<HTMLElement>();
+  const openContextMenu = (event: React.MouseEvent) => {
+    event.stopPropagation();
+    event.preventDefault();
+    rightClick(conversation, event.nativeEvent);
+  };
 
-  useEffect(() => {
-    const handleRightClick = (event: MouseEvent) => {
-      event.stopPropagation();
-      event.preventDefault();
-      rightClick(conversation, event);
-    };
-    viewportElementRef?.addEventListener('contextmenu', handleRightClick);
-    return () => {
-      viewportElementRef?.removeEventListener('contextmenu', handleRightClick);
-    };
-  }, [viewportElementRef]);
-
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const cellState = useMemo(() => generateCellState(conversation), [unreadState, mutedState, isRequest]);
 
   const onClickJoinCall = (event: React.MouseEvent) => {
@@ -119,7 +111,7 @@ const ConversationListCell: React.FC<ConversationListCellProps> = ({
   };
 
   return (
-    <li ref={setViewportElementRef}>
+    <li onContextMenu={openContextMenu}>
       <div
         data-uie-name={dataUieName}
         data-uie-uid={conversation.id}
@@ -149,7 +141,7 @@ const ConversationListCell: React.FC<ConversationListCellProps> = ({
             )}
           </div>
           <div className="conversation-list-cell-center">
-            {is1to1 && selfUser.inTeam() ? (
+            {is1to1 && selfUser?.inTeam() ? (
               <AvailabilityState
                 className="conversation-list-cell-availability"
                 availability={availabilityOfUser}

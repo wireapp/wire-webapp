@@ -102,6 +102,10 @@ export class ConversationState {
         });
   }
 
+  findConversationByGroupId(groupId: string): Conversation | undefined {
+    return this.conversations().find(conversation => conversation.groupId === groupId);
+  }
+
   /**
    * Check whether conversation is currently displayed.
    */

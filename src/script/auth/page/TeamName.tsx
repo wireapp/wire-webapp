@@ -66,12 +66,13 @@ const TeamName = ({
   const {formatMessage: _} = useIntl();
   const {history} = useReactRouter();
   const [enteredTeamName, setEnteredTeamName] = useState(teamName || '');
-  const [error, setError] = useState(null);
+  const [error, setError] = useState<ValidationError | null>(null);
   const [isValidTeamName, setIsValidTeamName] = useState(!!teamName);
-  const teamNameInput = useRef<HTMLInputElement>();
+  const teamNameInput = useRef<HTMLInputElement | null>(null);
 
   useEffect(() => {
     enterTeamCreationFlow();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const resetErrors = () => {
@@ -81,27 +82,29 @@ const TeamName = ({
   };
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
-    teamNameInput.current.value = teamNameInput.current.value.trim();
-    if (!teamNameInput.current.checkValidity()) {
-      setError(ValidationError.handleValidationState('name', teamNameInput.current.validity));
-      setIsValidTeamName(false);
-    } else {
-      try {
-        await pushAccountRegistrationData({
-          team: {
-            binding: undefined,
-            creator: undefined,
-            icon: undefined,
-            id: undefined,
-            name: teamNameInput.current.value,
-          },
-        });
-        return history.push(ROUTE.CREATE_TEAM_ACCOUNT);
-      } catch (error) {
-        logger.error('Unable to push account data', error);
+
+    if (teamNameInput.current) {
+      teamNameInput.current.value = teamNameInput.current.value.trim();
+      if (!teamNameInput.current.checkValidity()) {
+        setError(ValidationError.handleValidationState('name', teamNameInput.current.validity));
+        setIsValidTeamName(false);
+      } else {
+        try {
+          await pushAccountRegistrationData({
+            team: {
+              creator: '',
+              icon: '',
+              id: '',
+              name: teamNameInput.current.value,
+            },
+          });
+          return history.push(ROUTE.CREATE_TEAM_ACCOUNT);
+        } catch (error) {
+          logger.error('Unable to push account data', error);
+        }
       }
+      teamNameInput.current.focus();
     }
-    teamNameInput.current.focus();
   };
 
   const onTeamNameChange = (event: React.ChangeEvent<HTMLInputElement>) => {

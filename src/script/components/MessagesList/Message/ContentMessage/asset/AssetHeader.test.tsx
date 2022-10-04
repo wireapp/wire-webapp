@@ -17,41 +17,31 @@
  *
  */
 
-import TestPage from 'Util/test/TestPage';
+import AssetHeader from './AssetHeader';
+import {render} from '@testing-library/react';
 import {createRandomUuid} from 'Util/util';
 import * as TimeUtil from 'Util/TimeUtil';
 
 import {Message} from '../../../../../entity/message/Message';
 import {User} from '../../../../../entity/User';
-import AssetHeader, {AssetHeaderProps} from './AssetHeader';
-
-class AssetHeaderPage extends TestPage<AssetHeaderProps> {
-  constructor(props?: AssetHeaderProps) {
-    super(AssetHeader, props);
-  }
-
-  getUserName = () => this.get('span[data-uie-name="asset-header-user-name"]').textContent;
-  getTime = () => this.get('span[data-uie-name="asset-header-time"]').textContent;
-}
 
 describe('AssetHeader', () => {
-  it('displays the expected username and time', async () => {
+  it('displays the expected username and time', () => {
     const timestamp = new Date('2021-01-21T15:08:14.225Z').getTime();
     const userName = 'John Doe';
     jest.spyOn(TimeUtil, 'formatTimeShort').mockReturnValue('3:08 PM');
     jest.spyOn(TimeUtil, 'formatDateShort').mockReturnValue('01/21');
 
-    const user = new User(createRandomUuid(), null);
+    const user = new User(createRandomUuid());
     user.name(userName);
 
     const message = new Message(createRandomUuid());
     message.timestamp(timestamp);
     message.user(user);
 
-    const assetHeader = new AssetHeaderPage({message});
+    const {queryByText} = render(<AssetHeader message={message} />);
 
-    expect(assetHeader.getUserName()).toBe(userName);
-
-    expect(assetHeader.getTime()).toBe('01/21 3:08 PM');
+    expect(queryByText(userName)).not.toBeNull();
+    expect(queryByText('01/21 3:08 PM')).not.toBeNull();
   });
 });

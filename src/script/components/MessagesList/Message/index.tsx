@@ -98,6 +98,7 @@ const Message: React.FC<
     } else if (markerType === MessageMarkerType.UNREAD) {
       scrollTo?.({element: messageElementRef.current}, true);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isMarked, messageElementRef]);
 
   const getTimestampClass = (): string => {
@@ -112,7 +113,7 @@ const Message: React.FC<
 
   const content = <MessageWrapper {...props} hasMarker={markerType !== MessageMarkerType.NONE} />;
   const wrappedContent = onVisible ? (
-    <InViewport allowBiggerThanViewport onVisible={onVisible}>
+    <InViewport requireFullyInView allowBiggerThanViewport onVisible={onVisible}>
       {content}
     </InViewport>
   ) : (

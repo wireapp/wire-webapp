@@ -17,8 +17,6 @@
  *
  */
 
-import {WebAppEvents} from '@wireapp/webapp-events';
-import {amplify} from 'amplify';
 import cx from 'classnames';
 import {
   FC,
@@ -44,7 +42,9 @@ import {getLogger} from 'Util/Logger';
 import {safeMailOpen, safeWindowOpen} from 'Util/SanitizationUtil';
 
 import {Conversation as ConversationEntity} from '../../entity/Conversation';
+import PrimaryModal from '../../components/Modals/PrimaryModal';
 
+import {ConversationState} from '../../conversation/ConversationState';
 import {ContentMessage} from '../../entity/message/ContentMessage';
 import {DecryptErrorMessage} from '../../entity/message/DecryptErrorMessage';
 import {MemberMessage} from '../../entity/message/MemberMessage';
@@ -60,8 +60,6 @@ import {RootContext} from '../../page/RootProvider';
 import {UserState} from '../../user/UserState';
 import {TeamState} from '../../team/TeamState';
 import {PanelViewModel} from '../../view_model/PanelViewModel';
-import {ModalsViewModel} from '../../view_model/ModalsViewModel';
-import {ConversationState} from '../../conversation/ConversationState';
 
 type ReadMessageBuffer = {conversation: ConversationEntity; message: Message};
 
@@ -75,20 +73,41 @@ const ConversationList: FC<ConversationListProps> = ({initialMessage, teamState,
   const messageListLogger = getLogger('ConversationList');
 
   const contentViewModel = useContext(RootContext);
+  const [isConversationLoaded, setIsConversationLoaded] = useState<boolean>(false);
+  const [readMessagesBuffer, setReadMessagesBuffer] = useState<ReadMessageBuffer[]>([]);
+
+  const conversationState = container.resolve(ConversationState);
+  const {activeConversation} = useKoSubscribableChildren(conversationState, ['activeConversation']);
+  const {is1to1, isRequest} = useKoSubscribableChildren(activeConversation!, ['is1to1', 'isRequest']);
+  const {self: selfUser} = useKoSubscribableChildren(userState, ['self']);
+
+  useEffect(() => {
+    if (readMessagesBuffer.length) {
+      const groupedMessagesTest = groupBy(
+        readMessagesBuffer,
+        ({conversation, message}) => conversation.id + message.from,
+      );
+
+      Object.values(groupedMessagesTest).forEach(readMessagesBatch => {
+        const poppedMessage = readMessagesBatch.pop();
+
+        if (poppedMessage) {
+          const {conversation, message: firstMessage} = poppedMessage;
+          const otherMessages = readMessagesBatch.map(({message}) => message);
+          repositories.message.sendReadReceipt(conversation, firstMessage, otherMessages);
+        }
+      });
+
+      setReadMessagesBuffer([]);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [readMessagesBuffer.length]);
 
   if (!contentViewModel) {
     return null;
   }
 
-  const [isConversationLoaded, setIsConversationLoaded] = useState<boolean>(false);
-  const [readMessagesBuffer, setReadMessagesBuffer] = useState<ReadMessageBuffer[]>([]);
-
   const {conversationRepository, repositories, mainViewModel, legalHoldModal} = contentViewModel;
-  const conversationState = container.resolve(ConversationState);
-
-  const {activeConversation} = useKoSubscribableChildren(conversationState, ['activeConversation']);
-  const {is1to1, isRequest} = useKoSubscribableChildren(activeConversation!, ['is1to1', 'isRequest']);
-  const {self: selfUser} = useKoSubscribableChildren(userState, ['self']);
 
   const clickOnInvitePeople = (conversation: ConversationEntity): void => {
     mainViewModel.panel.togglePanel(PanelViewModel.STATE.GUEST_OPTIONS, {entity: conversation});
@@ -160,7 +179,7 @@ const ConversationList: FC<ConversationListProps> = ({initialMessage, teamState,
     const linkTarget = (event.target as HTMLElement).closest<HTMLAnchorElement>('[data-md-link]');
     if (linkTarget) {
       const href = linkTarget.href;
-      amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.CONFIRM, {
+      PrimaryModal.show(PrimaryModal.type.CONFIRM, {
         primaryAction: {
           action: () => {
             safeWindowOpen(href);
@@ -217,7 +236,7 @@ const ConversationList: FC<ConversationListProps> = ({initialMessage, teamState,
     const resetProgress = () => {
       setTimeout(() => {
         messageEntity.is_resetting_session(false);
-        amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.SESSION_RESET);
+        PrimaryModal.show(PrimaryModal.type.SESSION_RESET, {});
       }, MotionDuration.LONG);
     };
 
@@ -323,27 +342,6 @@ const ConversationList: FC<ConversationListProps> = ({initialMessage, teamState,
       return document.hasFocus() ? trigger() : window.addEventListener('focus', () => trigger(), {once: true});
     };
   };
-
-  useEffect(() => {
-    if (readMessagesBuffer.length) {
-      const groupedMessagesTest = groupBy(
-        readMessagesBuffer,
-        ({conversation, message}) => conversation.id + message.from,
-      );
-
-      Object.values(groupedMessagesTest).forEach(readMessagesBatch => {
-        const poppedMessage = readMessagesBatch.pop();
-
-        if (poppedMessage) {
-          const {conversation, message: firstMessage} = poppedMessage;
-          const otherMessages = readMessagesBatch.map(({message}) => message);
-          repositories.message.sendReadReceipt(conversation, firstMessage, otherMessages);
-        }
-      });
-
-      setReadMessagesBuffer([]);
-    }
-  }, [readMessagesBuffer.length]);
 
   return (
     <div id="conversation" className={cx('conversation', {loading: !isConversationLoaded})}>

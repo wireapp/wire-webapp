@@ -46,9 +46,13 @@ interface RenderElement {
 }
 
 const renderElement =
-  <T extends RenderElement>(Component: React.FC<T>, elementId?: string, style?: Partial<CSSStyleDeclaration>) =>
+  <T extends RenderElement>(
+    Component: React.FC<T>,
+    parentElementId = 'wire-main',
+    style?: Partial<CSSStyleDeclaration>,
+  ) =>
   (props: T) => {
-    const currentElementId = elementId || 'wire-main';
+    const currentElementId = parentElementId;
 
     cleanUpElement(currentElementId);
     elementContainer = document.createElement('div');
@@ -56,7 +60,6 @@ const renderElement =
       elementContainer.setAttribute('style', generateStyleString(style));
     }
     document.getElementById(currentElementId)?.appendChild(elementContainer);
-
     reactRoot = createRoot(elementContainer);
     const onClose = () => {
       cleanUpElement(currentElementId);

@@ -18,8 +18,6 @@
  */
 
 import ko from 'knockout';
-import {amplify} from 'amplify';
-import {WebAppEvents} from '@wireapp/webapp-events';
 import {container} from 'tsyringe';
 
 import {Logger, getLogger} from 'Util/Logger';
@@ -28,7 +26,6 @@ import {t} from 'Util/LocalizerUtil';
 
 import {Config} from '../../Config';
 import {BasePanelViewModel, PanelViewModelProps} from './BasePanelViewModel';
-import {ModalsViewModel} from '../ModalsViewModel';
 import {ACCESS_STATE} from '../../conversation/AccessState';
 import type {ConversationStateHandler} from '../../conversation/ConversationStateHandler';
 import type {Conversation} from '../../entity/Conversation';
@@ -38,6 +35,7 @@ import {
   teamPermissionsForAccessState,
   toggleFeature,
 } from '../../conversation/ConversationAccessPermission';
+import PrimaryModal from '../../components/Modals/PrimaryModal';
 
 export class GuestsAndServicesViewModel extends BasePanelViewModel {
   private readonly teamState: TeamState;
@@ -143,7 +141,7 @@ export class GuestsAndServicesViewModel extends BasePanelViewModel {
   };
 
   readonly revokeAccessCode = (): void => {
-    amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.CONFIRM, {
+    PrimaryModal.show(PrimaryModal.type.CONFIRM, {
       preventClose: true,
       primaryAction: {
         action: async (): Promise<void> => {
@@ -153,7 +151,6 @@ export class GuestsAndServicesViewModel extends BasePanelViewModel {
             this.requestOngoing(false);
           }
         },
-        closeBtnLabel: t('modalConversationRevokeLinkCloseBtn'),
         text: t('modalConversationRevokeLinkAction'),
       },
       text: {
@@ -181,7 +178,7 @@ export class GuestsAndServicesViewModel extends BasePanelViewModel {
         return changeAccessState();
       }
 
-      amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.CONFIRM, {
+      PrimaryModal.show(PrimaryModal.type.CONFIRM, {
         preventClose: true,
         primaryAction: {
           action: changeAccessState,

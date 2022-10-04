@@ -147,6 +147,7 @@ export const PeopleTab: React.FC<{
     if (!isTeam) {
       getTopPeople().then(setTopPeople);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useDebounce(
@@ -220,6 +221,7 @@ export const PeopleTab: React.FC<{
       currentSearchQuery.current = '';
       onSearchResults(undefined);
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchQuery]);
 
   return (
@@ -232,37 +234,6 @@ export const PeopleTab: React.FC<{
                 <a className="start-ui-fed-domain-unavailable__link" rel="nofollow noopener noreferrer" target="_blank" data-bind="attr: {href: ''}, text: t('searchFederatedDomainNotAvailableLearnMore')"></a>
             */}
         </div>
-      )}
-
-      {!hasFederationError && !hasResults && (
-        <>
-          {!canSearchUnconnectedUsers ? (
-            <div className="start-ui-no-search-results__content">
-              <span className="start-ui-no-search-results__icon">
-                <Icon.Message />
-              </span>
-              <p className="start-ui-no-search-results__text" data-uie-name="label-no-search-result">
-                {t('searchNoMatchesPartner')}
-              </p>
-            </div>
-          ) : isFederated ? (
-            <div className="start-ui-fed-wrapper">
-              <span className="start-ui-fed-wrapper__icon">
-                <Icon.Profile />
-              </span>
-              <div className="start-ui-fed-wrapper__text">{t('searchTrySearchFederation')}</div>
-              <div className="start-ui-fed-wrapper__button">
-                {/*@todo: re-enable when federation article is available
-                <button type="button" data-bind="click: () => {}" data-uie-name="do-search-learn-more">
-                  {t('searchTrySearchLearnMore')}
-                </button>
-          */}
-              </div>
-            </div>
-          ) : (
-            <p className="start-ui-no-search-results">{t('searchTrySearch')}</p>
-          )}
-        </>
       )}
 
       {searchQuery.length === 0 && (
@@ -325,6 +296,36 @@ export const PeopleTab: React.FC<{
                 </div>
               </div>
             </div>
+          )}
+        </>
+      )}
+      {!hasFederationError && !hasResults && (
+        <>
+          {!canSearchUnconnectedUsers ? (
+            <div className="start-ui-no-search-results__content">
+              <span className="start-ui-no-search-results__icon">
+                <Icon.Message />
+              </span>
+              <p className="start-ui-no-search-results__text" data-uie-name="label-no-search-result">
+                {t('searchNoMatchesPartner')}
+              </p>
+            </div>
+          ) : isFederated ? (
+            <div className="start-ui-fed-wrapper">
+              <span className="start-ui-fed-wrapper__icon">
+                <Icon.Profile />
+              </span>
+              <div className="start-ui-fed-wrapper__text">{t('searchTrySearchFederation')}</div>
+              <div className="start-ui-fed-wrapper__button">
+                {/*@todo: re-enable when federation article is available
+                <button type="button" data-bind="click: () => {}" data-uie-name="do-search-learn-more">
+                  {t('searchTrySearchLearnMore')}
+                </button>
+          */}
+              </div>
+            </div>
+          ) : (
+            <p className="start-ui-no-search-results">{t('searchTrySearch')}</p>
           )}
         </>
       )}

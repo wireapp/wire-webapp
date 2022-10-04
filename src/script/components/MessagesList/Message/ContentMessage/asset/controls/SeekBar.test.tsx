@@ -17,53 +17,43 @@
  *
  */
 
-import {act} from '@testing-library/react';
-import TestPage from 'Util/test/TestPage';
-import SeekBar, {SeekBarProps} from './SeekBar';
+import SeekBar from './SeekBar';
+import {render, act} from '@testing-library/react';
 
-class SeekBarPage extends TestPage<SeekBarProps> {
-  constructor(props?: SeekBarProps) {
-    super(SeekBar, props);
-  }
+const createAudioElement = (currentTime: number, maxTime: number) => {
+  const audioElement = document.createElement('audio');
+  Object.defineProperty(audioElement, 'duration', {get: () => maxTime});
+  audioElement.currentTime = currentTime;
+  return audioElement;
+};
 
-  getSeekBar = () => this.get('input[data-uie-name="asset-control-media-seek-bar"]');
-  getProgress = (): string =>
-    this.getSeekBar()
-      .getAttribute('style')
-      .replace(/--seek-bar-progress: (.*);/, '$1');
-}
+const getProgress = (element: HTMLElement) =>
+  element.getAttribute('style')?.replace(/--seek-bar-progress: (.*);/, '$1');
 
 describe('SeekBar', () => {
   it('shows how much of an audio asset has been already played', async () => {
-    const createAudioElement = (currentTime: number, maxTime: number) => {
-      const audioElement = document.createElement('audio');
-      Object.defineProperty(audioElement, 'duration', {get: () => maxTime});
-      audioElement.currentTime = currentTime;
-      return audioElement;
-    };
-
-    const checkProgress = (currentTime: number, expectation: string) => {
-      audioElement.currentTime = currentTime;
-
-      act(() => {
-        audioElement.dispatchEvent(new Event('timeupdate'));
-      });
-
-      testPage.update();
-
-      expect(testPage.getProgress()).toEqual(expectation);
-    };
-
     const audioElement = createAudioElement(25, 100);
 
-    const testPage = new SeekBarPage({
+    const props = {
       dark: false,
       disabled: false,
       mediaElement: audioElement,
-    });
+    };
 
-    expect(testPage.getProgress()).toEqual('0%');
+    const {getByTestId, rerender} = render(<SeekBar {...props} />);
 
+    const mediaSeekBar = getByTestId('asset-control-media-seek-bar');
+
+    const checkProgress = (currentTime: number, expectation: string) => {
+      props.mediaElement.currentTime = currentTime;
+      act(() => {
+        audioElement.dispatchEvent(new Event('timeupdate'));
+      });
+      rerender(<SeekBar {...props} />);
+      expect(getProgress(mediaSeekBar)).toEqual(expectation);
+    };
+
+    expect(getProgress(mediaSeekBar)).toEqual('0%');
     checkProgress(50, '50%');
     checkProgress(75, '75%');
     checkProgress(100, '100%');

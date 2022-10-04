@@ -76,6 +76,7 @@ const DeviceDetails: React.FC<DeviceDetailsProps> = ({
         .getRemoteFingerprint(user.qualifiedId, selectedClient.id)
         .then(remoteFingerprint => setFingerprintRemote(remoteFingerprint));
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedClient]);
 
   const clickToToggleDeviceVerification = () => {
@@ -96,6 +97,8 @@ const DeviceDetails: React.FC<DeviceDetailsProps> = ({
         .catch(_resetProgress);
     }
   };
+
+  const isMLSConversation = !!conversationState.activeConversation()?.isUsingMLSProtocol;
 
   return (
     <div className={cx('participant-devices__header', {'participant-devices__header--padding': !noPadding})}>
@@ -152,15 +155,17 @@ const DeviceDetails: React.FC<DeviceDetailsProps> = ({
             style={{display: isResettingSession ? 'initial' : 'none'}}
             data-uie-name="status-loading"
           />
-          <button
-            type="button"
-            className="button-reset-default button-label participant-devices__reset-session accent-text ellipsis"
-            onClick={clickToResetSession}
-            style={{display: isResettingSession ? 'none' : 'initial'}}
-            data-uie-name="do-reset-session"
-          >
-            {t('participantDevicesDetailResetSession')}
-          </button>
+          {!isMLSConversation && (
+            <button
+              type="button"
+              className="button-reset-default button-label participant-devices__reset-session accent-text ellipsis"
+              onClick={clickToResetSession}
+              style={{display: isResettingSession ? 'none' : 'initial'}}
+              data-uie-name="do-reset-session"
+            >
+              {t('participantDevicesDetailResetSession')}
+            </button>
+          )}
         </div>
       </div>
     </div>

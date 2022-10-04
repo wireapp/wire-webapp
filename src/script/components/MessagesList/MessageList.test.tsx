@@ -17,7 +17,7 @@
  *
  */
 
-import 'util/test/mock/resizeObserver.mock';
+import 'src/script/util/test/mock/resizeObserver.mock';
 import React from 'react';
 import {act, render, waitFor} from '@testing-library/react';
 import {ContentMessage} from 'src/script/entity/message/ContentMessage';
