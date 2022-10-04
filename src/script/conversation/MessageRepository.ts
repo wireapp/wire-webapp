@@ -963,9 +963,10 @@ export class MessageRepository {
         recipients: userIds,
         // if we want optimistic removal, we can rely on the injection system that will handle the event and remove the message even before the message is sent
         skipInjection: !options.optimisticRemoval,
+        targetMode: MessageTargetMode.USERS,
       });
       if (!options.optimisticRemoval) {
-        this.deleteMessage(conversation, message);
+        this.deleteMessageById(conversation, message.id);
       }
     } catch (error) {
       const isConversationNotFound = error.code === HTTP_STATUS.NOT_FOUND;
