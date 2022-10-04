@@ -963,7 +963,8 @@ export class MessageRepository {
         recipients: userIds,
         // if we want optimistic removal, we can rely on the injection system that will handle the event and remove the message even before the message is sent
         skipInjection: !options.optimisticRemoval,
-        targetMode: MessageTargetMode.USERS,
+        // If there are recipients to the message, we only want to target those users (case of ephemeral messages that should be deleted in the sender's client and the user's own clients)
+        targetMode: userIds ? MessageTargetMode.USERS : undefined,
       });
       if (!options.optimisticRemoval) {
         this.deleteMessageById(conversation, message.id);
