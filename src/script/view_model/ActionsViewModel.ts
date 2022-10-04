@@ -178,8 +178,7 @@ export class ActionsViewModel {
                   resolve();
                 } catch (error) {
                   if (error instanceof BackendError) {
-                    // eslint-disable-next-line react-hooks/rules-of-hooks
-                    const updateErrorMessage = usePrimaryModalState(state => state.updateErrorMessage);
+                    const {updateErrorMessage} = usePrimaryModalState.getState();
                     updateErrorMessage(expectedErrors[error.label] || error.message);
                   }
                 } finally {

@@ -17,7 +17,6 @@
  *
  */
 
-import 'src/script/util/test/mock/resizeObserver.mock';
 import React from 'react';
 import {act, render, waitFor} from '@testing-library/react';
 import {ContentMessage} from 'src/script/entity/message/ContentMessage';
@@ -29,6 +28,7 @@ import {User} from 'src/script/entity/User';
 
 const getDefaultParams = (): React.ComponentProps<typeof MessagesList> => {
   const conversation = new Conversation(createRandomUuid());
+
   return {
     cancelConnectionRequest: jest.fn(),
     conversation,
@@ -36,16 +36,22 @@ const getDefaultParams = (): React.ComponentProps<typeof MessagesList> => {
       expectReadReceipt: jest.fn(() => false),
       getMessagesWithOffset: jest.fn(),
       getPrecedingMessages: jest.fn(),
+      getSubsequentMessages: jest.fn(),
       updateParticipatingUserEntities: jest.fn(),
-    },
+    } as any,
     getVisibleCallback: jest.fn(),
     initialMessage: undefined,
     invitePeople: jest.fn(),
+    isLastReceivedMessage: jest.fn(),
     messageActions: {
       deleteMessage: jest.fn(),
       deleteMessageEveryone: jest.fn(),
     },
-    messageRepository: undefined,
+    messageRepository: {
+      getMessageInConversationById: jest.fn(),
+      sendButtonAction: jest.fn(),
+      toggleLike: jest.fn(),
+    } as any,
     onClickMessage: jest.fn(),
     onLoading: jest.fn(),
     resetSession: jest.fn(),

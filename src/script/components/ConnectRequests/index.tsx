@@ -17,52 +17,35 @@
  *
  */
 
-import {FC, useEffect, useRef} from 'react';
+import {FC, useContext, useEffect, useRef} from 'react';
 import {container} from 'tsyringe';
 
 import Avatar, {AVATAR_SIZE} from 'Components/Avatar';
 import ClassifiedBar from 'Components/input/ClassifiedBar';
 
-import {registerReactComponent, useKoSubscribableChildren} from 'Util/ComponentUtil';
+import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 
 import {TeamState} from '../../team/TeamState';
 import {UserState} from '../../user/UserState';
 import {User} from '../../entity/User';
-import {ActionsViewModel} from '../../view_model/ActionsViewModel';
+import {RootContext} from '../../page/RootProvider';
 
 interface ConnectRequestsProps {
-  readonly actionsViewModel: ActionsViewModel;
   readonly userState: UserState;
   readonly teamState: TeamState;
 }
 
 const ConnectRequests: FC<ConnectRequestsProps> = ({
-  actionsViewModel,
   userState = container.resolve(UserState),
   teamState = container.resolve(TeamState),
 }) => {
   const connectRequestsRefEnd = useRef<HTMLDivElement | null>(null);
   const temporaryConnectRequestsCount = useRef<number>(0);
 
+  const contentViewModel = useContext(RootContext);
   const {classifiedDomains} = useKoSubscribableChildren(teamState, ['classifiedDomains']);
   const {connectRequests} = useKoSubscribableChildren(userState, ['connectRequests']);
-
-  const onIgnoreClick = (userEntity: User): void => {
-    actionsViewModel.ignoreConnectionRequest(userEntity);
-  };
-
-  const onAcceptClick = async (userEntity: User) => {
-    await actionsViewModel.acceptConnectionRequest(userEntity);
-    const conversationEntity = await actionsViewModel.getOrCreate1to1Conversation(userEntity);
-
-    if (connectRequests.length === 1) {
-      /**
-       * In the connect request view modal, we show an overview of all incoming connection requests. When there are multiple open connection requests, we want that the user sees them all and can accept them one-by-one. When the last open connection request gets accepted, we want the user to switch to this conversation.
-       */
-      actionsViewModel.open1to1Conversation(conversationEntity);
-    }
-  };
 
   const scrollToBottom = (behavior: ScrollBehavior = 'auto') => {
     if (connectRequestsRefEnd.current) {
@@ -81,6 +64,28 @@ const ConnectRequests: FC<ConnectRequestsProps> = ({
   useEffect(() => {
     scrollToBottom();
   }, []);
+
+  if (!contentViewModel) {
+    return null;
+  }
+
+  const actionsViewModel = contentViewModel.mainViewModel.actions;
+
+  const onIgnoreClick = (userEntity: User): void => {
+    actionsViewModel.ignoreConnectionRequest(userEntity);
+  };
+
+  const onAcceptClick = async (userEntity: User) => {
+    await actionsViewModel.acceptConnectionRequest(userEntity);
+    const conversationEntity = await actionsViewModel.getOrCreate1to1Conversation(userEntity);
+
+    if (connectRequests.length === 1) {
+      /**
+       * In the connect request view modal, we show an overview of all incoming connection requests. When there are multiple open connection requests, we want that the user sees them all and can accept them one-by-one. When the last open connection request gets accepted, we want the user to switch to this conversation.
+       */
+      actionsViewModel.open1to1Conversation(conversationEntity);
+    }
+  };
 
   return (
     <div className="connect-request-wrapper">
@@ -137,5 +142,3 @@ const ConnectRequests: FC<ConnectRequestsProps> = ({
 };
 
 export default ConnectRequests;
-
-registerReactComponent('connect-requests', ConnectRequests);

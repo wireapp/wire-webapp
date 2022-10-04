@@ -28,13 +28,12 @@ import {amplify} from 'amplify';
 import {container} from 'tsyringe';
 
 import {Config} from '../Config';
-import {MessageListViewModel} from './content/MessageListViewModel';
 import {LegalHoldModalViewModel} from './content/LegalHoldModalViewModel';
 import {ConversationError} from '../error/ConversationError';
 import type {MainViewModel, ViewModelRepositories} from './MainViewModel';
 import type {ConversationRepository} from '../conversation/ConversationRepository';
 import type {UserRepository} from '../user/UserRepository';
-import type {Conversation} from '../entity/Conversation';
+import {Conversation} from '../entity/Conversation';
 import type {Message} from '../entity/message/Message';
 import {UserState} from '../user/UserState';
 import {TeamState} from '../team/TeamState';
@@ -92,12 +91,12 @@ export class ContentViewModel {
   logger: Logger;
   readonly isFederated?: boolean;
   mainViewModel: MainViewModel;
-  messageList: MessageListViewModel;
   previousConversation: Conversation | null = null;
   previousState: string | null = null;
   state: ko.Observable<ContentState>;
   State: typeof ContentViewModel.STATE;
   userRepository: UserRepository;
+  initialMessage?: Message;
 
   static get STATE() {
     return {
@@ -142,19 +141,6 @@ export class ContentViewModel {
       repositories.client,
       repositories.cryptography,
       repositories.message,
-    );
-    this.messageList = new MessageListViewModel(
-      mainViewModel,
-      repositories.conversation,
-      repositories.integration,
-      repositories.serverTime,
-      repositories.user,
-      repositories.message,
-      repositories.asset,
-      this.userState,
-      this.conversationState,
-      this.teamState,
-      repositories,
     );
 
     this.state.subscribe(state => {
@@ -213,6 +199,19 @@ export class ContentViewModel {
     }
   }
 
+  changeConversation = (conversationEntity: Conversation, messageEntity?: Message) => {
+    // Clean up old conversation
+    const conversation = this.conversationState.activeConversation();
+
+    if (conversation) {
+      conversation.release();
+    }
+
+    // Update new conversation
+    this.initialMessage = messageEntity;
+    this.conversationState.activeConversation(conversationEntity);
+  };
+
   /**
    * Opens the specified conversation.
    *
@@ -220,6 +219,7 @@ export class ContentViewModel {
    *
    * @param conversation Conversation entity or conversation ID
    * @param options State to open conversation in
+   * @param domain Domain name
    */
   readonly showConversation: ShowConversationOverload = async (
     conversation: Conversation | string,
@@ -239,7 +239,7 @@ export class ContentViewModel {
     try {
       const conversationEntity = isConversationEntity(conversation)
         ? conversation
-        : await this.conversationRepository.getConversationById({domain, id: conversation});
+        : await this.conversationRepository.getConversationById({domain: domain || '', id: conversation});
       if (!conversationEntity) {
         throw new ConversationError(
           ConversationError.TYPE.CONVERSATION_NOT_FOUND,
@@ -284,7 +284,7 @@ export class ContentViewModel {
         await this.conversationRepository.unarchiveConversation(conversationEntity);
       }
 
-      await this.messageList.changeConversation(conversationEntity, messageEntity);
+      this.changeConversation(conversationEntity, messageEntity);
 
       this.showContent(ContentViewModel.STATE.CONVERSATION);
       this.previousConversation = this.conversationState.activeConversation();
@@ -393,12 +393,13 @@ export class ContentViewModel {
         this.conversationState.activeConversation(null);
       }
 
-      return this.messageList.releaseConversation(undefined);
+      return this.conversationState.activeConversation()?.release();
     }
   };
 
   private readonly showContent = (newContentState: ContentState) => {
     this.state(newContentState);
+
     return this._shiftContent(
       this.getElementOfContent(newContentState),
       newContentState === ContentViewModel.STATE.HISTORY_EXPORT ||

@@ -17,7 +17,7 @@
  *
  */
 
-import React, {useEffect, useState, useMemo} from 'react';
+import React, {useContext, useEffect, useState, useMemo} from 'react';
 import {container} from 'tsyringe';
 import cx from 'classnames';
 import {amplify} from 'amplify';
@@ -30,11 +30,9 @@ import {getLogger} from 'Util/Logger';
 import {sortUsersByPriority} from 'Util/StringUtil';
 import {ConversationRepository} from '../../../conversation/ConversationRepository';
 
-import {SearchRepository} from '../../../search/SearchRepository';
-import {TeamRepository} from '../../../team/TeamRepository';
 import {TeamState} from '../../../team/TeamState';
 import {UserState} from '../../../user/UserState';
-import {registerReactComponent, useKoSubscribableChildren} from 'Util/ComponentUtil';
+import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import ModalComponent from 'Components/ModalComponent';
 import SearchInput from 'Components/SearchInput';
 import UserSearchableList from 'Components/UserSearchableList';
@@ -54,11 +52,9 @@ import {
 import {initFadingScrollbar} from '../../../ui/fadingScrollbar';
 import {Config} from '../../../Config';
 import {isProtocolOption, ProtocolOption} from '../../../guards/Protocol';
+import {RootContext} from '../../../page/RootProvider';
 
 interface GroupCreationModalProps {
-  conversationRepository: ConversationRepository;
-  searchRepository: SearchRepository;
-  teamRepository: TeamRepository;
   userState?: UserState;
   teamState?: TeamState;
 }
@@ -72,9 +68,6 @@ enum GroupCreationModalState {
 const logger = getLogger('GroupCreationModal');
 
 const GroupCreationModal: React.FC<GroupCreationModalProps> = ({
-  conversationRepository,
-  searchRepository,
-  teamRepository,
   userState = container.resolve(UserState),
   teamState = container.resolve(TeamState),
 }) => {
@@ -117,10 +110,7 @@ const GroupCreationModal: React.FC<GroupCreationModalProps> = ({
     GroupCreationModalState.DEFAULT,
   );
 
-  const maxNameLength = ConversationRepository.CONFIG.GROUP.MAX_NAME_LENGTH;
-  const maxSize = ConversationRepository.CONFIG.GROUP.MAX_SIZE;
-
-  const onEscape = () => setIsShown(false);
+  const contentViewModel = useContext(RootContext);
 
   useEffect(() => {
     const showCreateGroup = (_: string, userEntity: User) => {
@@ -140,15 +130,7 @@ const GroupCreationModal: React.FC<GroupCreationModalProps> = ({
     setSelectedProtocol(protocolOptions.find(protocol => protocol.value === selectedProtocol.value)!);
   }, [defaultProtocol]);
 
-  const onClose = () => {
-    setIsCreatingConversation(false);
-    setNameError('');
-    setGroupName('');
-    setParticipantsInput('');
-    setSelectedContacts([]);
-    setGroupCreationState(GroupCreationModalState.DEFAULT);
-    setAccessState(ACCESS_STATE.TEAM.GUESTS_SERVICES);
-  };
+  const onEscape = () => setIsShown(false);
 
   const stateIsPreferences = groupCreationState === GroupCreationModalState.PREFERENCES;
   const stateIsParticipants = groupCreationState === GroupCreationModalState.PARTICIPANTS;
@@ -157,6 +139,21 @@ const GroupCreationModal: React.FC<GroupCreationModalProps> = ({
   const isGuestRoom = accessState === ACCESS_STATE.TEAM.GUEST_ROOM;
   const isGuestEnabled = isGuestRoom || isGuestAndServicesRoom;
   const isServicesEnabled = isServicesRoom || isGuestAndServicesRoom;
+
+  const contacts = useMemo(() => {
+    if (showContacts) {
+      if (!isTeam) {
+        return userState.connectedUsers();
+      }
+
+      if (isGuestEnabled) {
+        return teamState.teamUsers();
+      }
+
+      return teamState.teamMembers().sort(sortUsersByPriority);
+    }
+    return [];
+  }, [isGuestEnabled, isTeam, showContacts, teamState, userState]);
 
   useEffect(() => {
     if (stateIsPreferences) {
@@ -177,6 +174,29 @@ const GroupCreationModal: React.FC<GroupCreationModalProps> = ({
       window.clearTimeout(timerId);
     };
   }, [stateIsParticipants]);
+
+  if (!contentViewModel) {
+    return null;
+  }
+
+  const {
+    conversation: conversationRepository,
+    search: searchRepository,
+    team: teamRepository,
+  } = contentViewModel.repositories;
+
+  const maxNameLength = ConversationRepository.CONFIG.GROUP.MAX_NAME_LENGTH;
+  const maxSize = ConversationRepository.CONFIG.GROUP.MAX_SIZE;
+
+  const onClose = () => {
+    setIsCreatingConversation(false);
+    setNameError('');
+    setGroupName('');
+    setParticipantsInput('');
+    setSelectedContacts([]);
+    setGroupCreationState(GroupCreationModalState.DEFAULT);
+    setAccessState(ACCESS_STATE.TEAM.GUESTS_SERVICES);
+  };
 
   const clickOnCreate = async (): Promise<void> => {
     if (!isCreatingConversation) {
@@ -228,21 +248,6 @@ const GroupCreationModal: React.FC<GroupCreationModalProps> = ({
       setGroupCreationState(GroupCreationModalState.PARTICIPANTS);
     }
   };
-
-  const contacts = useMemo(() => {
-    if (showContacts) {
-      if (!isTeam) {
-        return userState.connectedUsers();
-      }
-
-      if (isGuestEnabled) {
-        return teamState.teamUsers();
-      }
-
-      return teamState.teamMembers().sort(sortUsersByPriority);
-    }
-    return [];
-  }, [isGuestEnabled, isTeam, showContacts, teamState, userState]);
 
   const clickOnToggle = (feature: number): void => {
     const newAccessState = toggleFeature(feature, accessState);
@@ -459,4 +464,4 @@ const GroupCreationModal: React.FC<GroupCreationModalProps> = ({
   );
 };
 
-registerReactComponent('group-creation-modal', GroupCreationModal);
+export default GroupCreationModal;

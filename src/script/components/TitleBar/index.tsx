@@ -54,7 +54,7 @@ export interface TitleBarProps {
   legalHoldModal: LegalHoldModalViewModel;
   callActions: CallActions;
   userState: UserState;
-  callState: CallState;
+  callState?: CallState;
   teamState: TeamState;
   isFederated?: boolean;
   // Function will be used after migration, to changing React State. Current implementation works with React and Knockout.
