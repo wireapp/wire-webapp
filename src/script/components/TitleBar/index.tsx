@@ -57,6 +57,8 @@ export interface TitleBarProps {
   callState: CallState;
   teamState: TeamState;
   isFederated?: boolean;
+  // Function will be used after migration, to changing React State. Current implementation works with React and Knockout.
+  toggleRightSidebar?: (state: PanelState) => void;
 }
 
 const TitleBar: React.FC<TitleBarProps> = ({
@@ -66,6 +68,7 @@ const TitleBar: React.FC<TitleBarProps> = ({
   legalHoldModal,
   callActions,
   isFederated = false,
+  toggleRightSidebar = state => null,
   userState = container.resolve(UserState),
   callState = container.resolve(CallState),
   teamState = container.resolve(TeamState),
@@ -144,6 +147,8 @@ const TitleBar: React.FC<TitleBarProps> = ({
     (addParticipants: boolean): void => {
       const panelId = addParticipants ? PanelState.ADD_PARTICIPANTS : PanelState.CONVERSATION_DETAILS;
 
+      toggleRightSidebar(panelId);
+
       openRightSidebar({
         initialEntity: conversation,
         initialState: panelId,
@@ -218,6 +223,9 @@ const TitleBar: React.FC<TitleBarProps> = ({
     });
   };
 
+  // This observer getting if right panel is open.
+  // It will be refactored for react statement if we migrate all wire-main to React.
+  // Now in the wire-main we have defined this TitleBar, so if we move it to the React we will work on state.
   const config = {childList: true};
   const observer = new MutationObserver(onRightPanelToggle);
 

@@ -167,12 +167,17 @@ const RightSidebar: FC<RightSidebarProps> = ({
   useEffect(() => {
     amplify.subscribe(WebAppEvents.CONTENT.SWITCH, switchContent);
     amplify.subscribe(OPEN_CONVERSATION_DETAILS, goToRoot);
-
     amplify.subscribe(WebAppEvents.CONVERSATION.MESSAGE.UPDATED, (oldId: string, updatedMessageEntity: Message) => {
       if (currentState === PanelState.MESSAGE_DETAILS && oldId === currentEntity?.id) {
         setCurrentEntity(updatedMessageEntity);
       }
     });
+
+    return () => {
+      amplify.unsubscribeAll(WebAppEvents.CONTENT.SWITCH);
+      amplify.unsubscribeAll(OPEN_CONVERSATION_DETAILS);
+      amplify.unsubscribeAll(WebAppEvents.CONVERSATION.MESSAGE.UPDATED);
+    };
   }, []);
 
   if (!activeConversation) {

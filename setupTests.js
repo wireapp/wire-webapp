@@ -46,9 +46,6 @@ jest.mock('axios', () => {
   };
 });
 
-// TODO: Remove after all migrations
-jest.mock('src/script/page/RightSidebar/utils/toggleRightPanel', () => () => jest.fn());
-
 require('test/api/payloads');
 
 const Adapter = require('@wojtekmaj/enzyme-adapter-react-17');

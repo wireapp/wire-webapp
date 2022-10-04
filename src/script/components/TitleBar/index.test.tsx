@@ -40,6 +40,7 @@ import {ConversationVerificationState} from '../../conversation/ConversationVeri
 import {User} from '../../entity/User';
 import {ContentViewModel} from '../../view_model/ContentViewModel';
 import {MainViewModel, ViewModelRepositories} from '../../view_model/MainViewModel';
+import {PanelState} from '../../page/RightSidebar/RightSidebar';
 
 jest.mock('@wireapp/react-ui-kit', () => ({
   ...(jest.requireActual('@wireapp/react-ui-kit') as any),
@@ -128,45 +129,45 @@ describe('TitleBar', () => {
     const conversation = createConversationEntity({
       display_name: ko.pureComputed(() => displayName),
     });
+    const mockedToggleRightSidebar = jest.fn();
 
     const {getByText} = render(
-      <TitleBar {...getDefaultProps(callingRepository)} userState={userState} conversation={conversation} />,
+      <TitleBar
+        {...getDefaultProps(callingRepository)}
+        userState={userState}
+        conversation={conversation}
+        toggleRightSidebar={mockedToggleRightSidebar}
+      />,
     );
 
     const conversationName = getByText(displayName);
     expect(conversationName).toBeDefined();
 
-    // TODO: Update this test after all migrations to react
-    const onClick = fireEvent.click(conversationName);
-    expect(onClick).not.toBe(false);
-
-    // Test to reproduce after migration
-    // expect(panelViewModel.togglePanel).toHaveBeenCalledWith(PanelViewModel.STATE.CONVERSATION_DETAILS, {
-    //   entity: conversation,
-    // });
+    fireEvent.click(conversationName);
+    expect(mockedToggleRightSidebar).toHaveBeenCalledWith(PanelState.CONVERSATION_DETAILS);
   });
 
   it('opens conversation details on info button click', async () => {
     const userState = createUserState({isActivatedAccount: ko.pureComputed(() => true)});
     const conversation = createConversationEntity();
+    const mockedToggleRightSidebar = jest.fn();
 
     mockedUiKit.useMatchMedia.mockReturnValue(false);
 
     const {getByLabelText} = render(
-      <TitleBar {...getDefaultProps(callingRepository)} userState={userState} conversation={conversation} />,
+      <TitleBar
+        {...getDefaultProps(callingRepository)}
+        userState={userState}
+        conversation={conversation}
+        toggleRightSidebar={mockedToggleRightSidebar}
+      />,
     );
 
     const infoButton = getByLabelText('tooltipConversationInfo');
     expect(infoButton).toBeDefined();
 
-    // TODO: Update this test after all migrations to react
-    const onClick = fireEvent.click(infoButton);
-    expect(onClick).not.toBe(false);
-
-    // Test to reproduce after migration
-    // expect(panelViewModel.togglePanel).toHaveBeenCalledWith(PanelViewModel.STATE.CONVERSATION_DETAILS, {
-    //   entity: conversation,
-    // });
+    fireEvent.click(infoButton);
+    expect(mockedToggleRightSidebar).toHaveBeenCalledWith(PanelState.CONVERSATION_DETAILS);
   });
 
   it('hide info button and search button on scaled down view', async () => {

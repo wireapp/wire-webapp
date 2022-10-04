@@ -117,6 +117,10 @@ const GroupParticipantUser: FC<GroupParticipantUserProps> = ({
 
   useEffect(() => {
     amplify.subscribe(WebAppEvents.CONVERSATION.EVENT_FROM_BACKEND, checkMemberLeave);
+
+    return () => {
+      amplify.unsubscribeAll(WebAppEvents.CONVERSATION.EVENT_FROM_BACKEND);
+    };
   }, []);
 
   useEffect(() => {
