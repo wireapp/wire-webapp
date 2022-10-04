@@ -21,29 +21,23 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 import {amplify} from 'amplify';
 import cx from 'classnames';
 
-import {getLogger} from 'Util/Logger';
 import {t} from 'Util/LocalizerUtil';
-import {safeWindowOpen} from 'Util/SanitizationUtil';
 import {afterRender} from 'Util/util';
 
-import {Config} from '../Config';
-import {PermissionState} from '../notification/PermissionState';
+import {Config} from '../../Config';
 import {Runtime} from '@wireapp/commons';
 
-import React, {useEffect, useState} from 'react';
+import React, {useEffect} from 'react';
 import Icon from 'Components/Icon';
 import {registerReactComponent} from 'Util/ComponentUtil';
-import PrimaryModal from 'Components/Modals/PrimaryModal';
+import {CONFIG, TYPE} from './WarningsTypes';
+import {closeWarning, useWarningsState} from './WarningsState';
 
 const WarningsContainer: React.FC = () => {
-  const logger = getLogger('WarningsViewModel');
-
+  const name = useWarningsState(state => state.name);
+  const warnings = useWarningsState(state => state.warnings);
   const type = TYPE;
-
-  const [name, setName] = useState<string>();
-  const [warnings, setWarnings] = useState<string[]>([]);
   const visibleWarning = warnings[warnings.length - 1];
-
   const warningDimmed = warnings.some(warning => CONFIG.DIMMED_MODES.includes(warning));
 
   useEffect(() => {
@@ -65,79 +59,6 @@ const WarningsContainer: React.FC = () => {
   const brandName = Config.getConfig().BRAND_NAME;
   const URL = Config.getConfig().URL;
 
-  /**
-   * Close warning.
-   * @note Used to close a warning banner by clicking the close button
-   */
-  const closeWarning = (): void => {
-    const warningToClose = visibleWarning;
-
-    if (warnings.includes(warningToClose)) {
-      setWarnings(warnings.filter(warning => warning !== warningToClose));
-      logger.info(`Dismissed warning of type '${type}'`);
-    }
-
-    switch (warningToClose) {
-      case TYPE.REQUEST_MICROPHONE: {
-        PrimaryModal.show(PrimaryModal.type.ACKNOWLEDGE, {
-          primaryAction: {
-            action: () => {
-              safeWindowOpen(URL.SUPPORT.MICROPHONE_ACCESS_DENIED);
-            },
-            text: t('modalCallNoMicrophoneAction'),
-          },
-          text: {
-            message: t('modalCallNoMicrophoneMessage'),
-            title: t('modalCallNoMicrophoneHeadline'),
-          },
-        });
-        break;
-      }
-
-      case TYPE.REQUEST_NOTIFICATION: {
-        // We block subsequent permission requests for notifications when the user ignores the request.
-        amplify.publish(WebAppEvents.NOTIFICATION.PERMISSION_STATE, PermissionState.IGNORED);
-        break;
-      }
-
-      default:
-        break;
-    }
-  };
-
-  useEffect(() => {
-    const hideWarning = (type = visibleWarning) => {
-      if (warnings.includes(type)) {
-        setWarnings(warnings.filter(warning => warning !== type));
-        logger.info(`Dismissed warning of type '${type}'`);
-      }
-    };
-
-    const showWarning = (type: string, info: {name: string}) => {
-      const connectivityTypes = [TYPE.CONNECTIVITY_RECONNECT, TYPE.NO_INTERNET];
-      const isConnectivityWarning = connectivityTypes.includes(type);
-      const visibleWarningIsLifecycleUpdate = visibleWarning === TYPE.LIFECYCLE_UPDATE;
-      if (isConnectivityWarning && !visibleWarningIsLifecycleUpdate) {
-        hideWarning(visibleWarning);
-      }
-
-      logger.warn(`Showing warning of type '${type}'`);
-      if (info) {
-        setName(info.name);
-      }
-
-      setWarnings(warnings => [...warnings, type]);
-    };
-
-    amplify.subscribe(WebAppEvents.WARNING.SHOW, showWarning);
-    amplify.subscribe(WebAppEvents.WARNING.DISMISS, hideWarning);
-
-    return () => {
-      amplify.unsubscribe(WebAppEvents.WARNING.SHOW, showWarning);
-      amplify.unsubscribe(WebAppEvents.WARNING.DISMISS, hideWarning);
-    };
-  });
-
   const closeButton = (
     <button
       type="button"
@@ -154,7 +75,7 @@ const WarningsContainer: React.FC = () => {
   return (
     <div className={cx('warning', {'warning-dimmed': warningDimmed})}>
       {visibleWarning === type.REQUEST_CAMERA && (
-        <div className="warning-bar warning-bar-feature">
+        <div data-uie-name="request-camera" className="warning-bar warning-bar-feature">
           <div
             className="warning-bar-message"
             dangerouslySetInnerHTML={{
@@ -169,7 +90,7 @@ const WarningsContainer: React.FC = () => {
         </div>
       )}
       {visibleWarning === type.DENIED_CAMERA && (
-        <div className="warning-bar warning-bar-feature">
+        <div data-uie-name="denied-camera" className="warning-bar warning-bar-feature">
           <div className="warning-bar-message">
             <span>{t('warningPermissionDeniedCamera')}</span>&nbsp;
             <a
@@ -185,7 +106,7 @@ const WarningsContainer: React.FC = () => {
         </div>
       )}
       {visibleWarning === type.REQUEST_MICROPHONE && (
-        <div className="warning-bar warning-bar-feature">
+        <div data-uie-name="request-microphone" className="warning-bar warning-bar-feature">
           <div className="warning-bar-message">
             <Icon.MicOn className="warning-bar-icon" />
             <span dangerouslySetInnerHTML={{__html: t('warningPermissionRequestMicrophone', {}, {icon: ''})}} />
@@ -194,7 +115,7 @@ const WarningsContainer: React.FC = () => {
         </div>
       )}
       {visibleWarning === type.DENIED_MICROPHONE && (
-        <div className="warning-bar warning-bar-feature">
+        <div data-uie-name="denied-microphone" className="warning-bar warning-bar-feature">
           <div className="warning-bar-message">
             <span>{t('warningPermissionDeniedMicrophone')}</span>&nbsp;
             <a
@@ -210,7 +131,7 @@ const WarningsContainer: React.FC = () => {
         </div>
       )}
       {visibleWarning === type.REQUEST_SCREEN && (
-        <div className="warning-bar warning-bar-feature">
+        <div data-uie-name="request-screen" className="warning-bar warning-bar-feature">
           <div
             className="warning-bar-message"
             dangerouslySetInnerHTML={{
@@ -225,7 +146,7 @@ const WarningsContainer: React.FC = () => {
         </div>
       )}
       {visibleWarning === type.DENIED_SCREEN && (
-        <div className="warning-bar warning-bar-feature">
+        <div data-uie-name="denied-screen" className="warning-bar warning-bar-feature">
           <div className="warning-bar-message">
             <span>{t('warningPermissionDeniedScreen')}</span>&nbsp;
             <a
@@ -241,7 +162,7 @@ const WarningsContainer: React.FC = () => {
         </div>
       )}
       {visibleWarning === type.NOT_FOUND_CAMERA && (
-        <div className="warning-bar warning-bar-feature">
+        <div data-uie-name="not-found-camera" className="warning-bar warning-bar-feature">
           <div className="warning-bar-message">
             <span>{t('warningNotFoundCamera')}</span>&nbsp;
             <a
@@ -257,7 +178,7 @@ const WarningsContainer: React.FC = () => {
         </div>
       )}
       {visibleWarning === type.NOT_FOUND_MICROPHONE && (
-        <div className="warning-bar warning-bar-feature">
+        <div data-uie-name="not-found-microphone" className="warning-bar warning-bar-feature">
           <div className="warning-bar-message">
             <span>{t('warningNotFoundMicrophone')}</span>&nbsp;
             <a
@@ -273,7 +194,7 @@ const WarningsContainer: React.FC = () => {
         </div>
       )}
       {visibleWarning === type.REQUEST_NOTIFICATION && (
-        <div className="warning-bar warning-bar-feature">
+        <div data-uie-name="request-notification" className="warning-bar warning-bar-feature">
           <div
             className="warning-bar-message"
             dangerouslySetInnerHTML={{
@@ -288,7 +209,7 @@ const WarningsContainer: React.FC = () => {
         </div>
       )}
       {visibleWarning === type.UNSUPPORTED_INCOMING_CALL && (
-        <div className="warning-bar warning-bar-feature">
+        <div data-uie-name="unsupported-incoming-call" className="warning-bar warning-bar-feature">
           {!Runtime.isChrome() && (
             <div className="warning-bar-message">
               <span>{t('warningCallUnsupportedIncoming', name)}</span>&nbsp;
@@ -323,7 +244,7 @@ const WarningsContainer: React.FC = () => {
         </div>
       )}
       {visibleWarning === type.UNSUPPORTED_OUTGOING_CALL && (
-        <div className="warning-bar warning-bar-feature">
+        <div data-uie-name="unsupported-outgoing-call" className="warning-bar warning-bar-feature">
           {!Runtime.isChrome() && (
             <div className="warning-bar-message">
               <span>{t('warningCallUnsupportedOutgoing')}</span>&nbsp;
@@ -358,7 +279,7 @@ const WarningsContainer: React.FC = () => {
         </div>
       )}
       {visibleWarning === type.CONNECTIVITY_RECONNECT && (
-        <div className="warning-bar warning-bar-connection">
+        <div data-uie-name="connectivity-reconnect" className="warning-bar warning-bar-connection">
           <div className="warning-bar-message">
             <span>{t('warningConnectivityConnectionLost', brandName)}</span>
             <Icon.Loading className="warning-bar-spinner" data-uie-name="status-loading" />
@@ -366,20 +287,25 @@ const WarningsContainer: React.FC = () => {
         </div>
       )}
       {visibleWarning === type.CALL_QUALITY_POOR && (
-        <div className="warning-bar warning-bar-connection warning-bar-poor-call-quality">
+        <div
+          data-uie-name="call-quality-poor"
+          className="warning-bar warning-bar-connection warning-bar-poor-call-quality"
+        >
           <div className="warning-bar-message">
             <span>{t('warningCallQualityPoor')}</span>
           </div>
         </div>
       )}
-      {visibleWarning === type.CONNECTIVITY_RECOVERY && <div className="warning-bar warning-bar-progress" />}
+      {visibleWarning === type.CONNECTIVITY_RECOVERY && (
+        <div data-uie-name="connectivity-recovery" className="warning-bar warning-bar-progress" />
+      )}
       {visibleWarning === type.NO_INTERNET && (
-        <div className="warning-bar warning-bar-connection">
+        <div data-uie-name="no-internet" className="warning-bar warning-bar-connection">
           <div className="warning-bar-message">{t('warningConnectivityNoInternet')}</div>
         </div>
       )}
       {visibleWarning === type.LIFECYCLE_UPDATE && (
-        <div className="warning-bar warning-bar-connection">
+        <div data-uie-name="lifecycle-update" className="warning-bar warning-bar-connection">
           <div className="warning-bar-message">
             <span>{t('warningLifecycleUpdate', brandName)}</span>&nbsp;
             <a
@@ -407,35 +333,6 @@ const WarningsContainer: React.FC = () => {
   );
 };
 
-const TYPE = {
-  CALL_QUALITY_POOR: 'call_quality_poor',
-  CONNECTIVITY_RECONNECT: 'connectivity_reconnect',
-  CONNECTIVITY_RECOVERY: 'connectivity_recovery',
-  DENIED_CAMERA: 'camera_access_denied',
-  DENIED_MICROPHONE: 'mic_access_denied',
-  DENIED_SCREEN: 'screen_access_denied',
-  LIFECYCLE_UPDATE: 'lifecycle_update',
-  NOT_FOUND_CAMERA: 'not_found_camera',
-  NOT_FOUND_MICROPHONE: 'not_found_microphone',
-  NO_INTERNET: 'no_internet',
-  REQUEST_CAMERA: 'request_camera',
-  REQUEST_MICROPHONE: 'request_microphone',
-  REQUEST_NOTIFICATION: 'request_notification',
-  REQUEST_SCREEN: 'request_screen',
-  UNSUPPORTED_INCOMING_CALL: 'unsupported_incoming_call',
-  UNSUPPORTED_OUTGOING_CALL: 'unsupported_outgoing_call',
-};
-
-const CONFIG = {
-  DIMMED_MODES: [TYPE.REQUEST_CAMERA, TYPE.REQUEST_MICROPHONE, TYPE.REQUEST_NOTIFICATION, TYPE.REQUEST_SCREEN],
-  MINI_MODES: [TYPE.CONNECTIVITY_RECONNECT, TYPE.LIFECYCLE_UPDATE, TYPE.NO_INTERNET, TYPE.CALL_QUALITY_POOR],
-};
-
-const Warnings = {
-  CONFIG,
-  TYPE,
-};
-
-export default Warnings;
-
 registerReactComponent('warnings-container', WarningsContainer);
+
+export default WarningsContainer;

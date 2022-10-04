@@ -133,27 +133,27 @@ export class EventRepository {
   private readonly updateConnectivitityStatus = (state: ConnectionState) => {
     switch (state) {
       case ConnectionState.CONNECTING: {
-        amplify.publish(WebAppEvents.WARNING.DISMISS, Warnings.TYPE.NO_INTERNET);
-        amplify.publish(WebAppEvents.WARNING.SHOW, Warnings.TYPE.CONNECTIVITY_RECONNECT);
+        Warnings.hideWarning(Warnings.TYPE.NO_INTERNET);
+        Warnings.showWarning(Warnings.TYPE.CONNECTIVITY_RECONNECT);
         return;
       }
       case ConnectionState.PROCESSING_NOTIFICATIONS: {
         this.notificationHandlingState(NOTIFICATION_HANDLING_STATE.STREAM);
-        amplify.publish(WebAppEvents.WARNING.DISMISS, Warnings.TYPE.NO_INTERNET);
-        amplify.publish(WebAppEvents.WARNING.DISMISS, Warnings.TYPE.CONNECTIVITY_RECONNECT);
-        amplify.publish(WebAppEvents.WARNING.SHOW, Warnings.TYPE.CONNECTIVITY_RECOVERY);
+        Warnings.hideWarning(Warnings.TYPE.NO_INTERNET);
+        Warnings.hideWarning(Warnings.TYPE.CONNECTIVITY_RECONNECT);
+        Warnings.showWarning(Warnings.TYPE.CONNECTIVITY_RECOVERY);
         return;
       }
       case ConnectionState.CLOSED: {
-        amplify.publish(WebAppEvents.WARNING.SHOW, Warnings.TYPE.NO_INTERNET);
+        Warnings.showWarning(Warnings.TYPE.NO_INTERNET);
         return;
       }
       case ConnectionState.LIVE: {
         this.notificationHandlingState(NOTIFICATION_HANDLING_STATE.WEB_SOCKET);
         amplify.publish(WebAppEvents.CONNECTION.ONLINE);
-        amplify.publish(WebAppEvents.WARNING.DISMISS, Warnings.TYPE.NO_INTERNET);
-        amplify.publish(WebAppEvents.WARNING.DISMISS, Warnings.TYPE.CONNECTIVITY_RECONNECT);
-        amplify.publish(WebAppEvents.WARNING.DISMISS, Warnings.TYPE.CONNECTIVITY_RECOVERY);
+        Warnings.hideWarning(Warnings.TYPE.NO_INTERNET);
+        Warnings.hideWarning(Warnings.TYPE.CONNECTIVITY_RECONNECT);
+        Warnings.hideWarning(Warnings.TYPE.CONNECTIVITY_RECOVERY);
       }
     }
   };
@@ -208,7 +208,7 @@ export class EventRepository {
     window.addEventListener('offline', () => {
       this.logger.warn('Internet connection lost');
       this.disconnectWebSocket();
-      amplify.publish(WebAppEvents.WARNING.SHOW, Warnings.TYPE.NO_INTERNET);
+      Warnings.showWarning(Warnings.TYPE.NO_INTERNET);
     });
     return connect();
   }
