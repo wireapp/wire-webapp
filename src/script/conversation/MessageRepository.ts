@@ -104,7 +104,7 @@ import {findDeletedClients} from './ClientMismatchUtil';
 import {protoFromType} from '../user/AvailabilityMapper';
 import {partition} from 'underscore';
 import {ConversationState} from './ConversationState';
-import PrimaryModal, {ModalOptions} from '../components/Modals/PrimaryModal';
+import PrimaryModal from '../components/Modals/PrimaryModal';
 
 export interface MessageSendingOptions {
   /** Send native push notification for message. Default is `true`. */
@@ -660,7 +660,7 @@ export class MessageRepository {
     const titleString = users[0].isMe ? t('modalConversationNewDeviceHeadlineYou', titleSubstitutions) : baseTitle;
 
     return new Promise(resolve => {
-      const options: ModalOptions = {
+      const options = {
         close: () => resolve(false),
         primaryAction: {
           action: () => {

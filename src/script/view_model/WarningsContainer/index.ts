@@ -17,20 +17,15 @@
  *
  */
 
-import renderElement from 'Util/renderElement';
-import {PrimaryModalComponent} from './PrimaryModal';
-import {addNewModalToQueue, showNextModalInQueue} from './PrimaryModalState';
-import {PrimaryModalType} from './PrimaryModalTypes';
+import {CONFIG, TYPE} from './WarningsTypes';
+import {showWarning, hideWarning} from './WarningsState';
+import './WarningsContainer';
 
-export {usePrimaryModalState, removeCurrentModal} from './PrimaryModalState';
-
-const PrimaryModal = {
-  init: () => {
-    renderElement(PrimaryModalComponent)({});
-    showNextModalInQueue();
-  },
-  show: addNewModalToQueue,
-  type: PrimaryModalType,
+export const Warnings = {
+  CONFIG,
+  TYPE,
+  hideWarning,
+  showWarning,
 };
 
-export default PrimaryModal;
+export default Warnings;

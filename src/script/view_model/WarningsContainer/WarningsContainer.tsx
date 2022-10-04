@@ -21,29 +21,23 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 import {amplify} from 'amplify';
 import cx from 'classnames';
 
-import {getLogger} from 'Util/Logger';
 import {t} from 'Util/LocalizerUtil';
-import {safeWindowOpen} from 'Util/SanitizationUtil';
 import {afterRender} from 'Util/util';
 
-import {Config} from '../Config';
-import {PermissionState} from '../notification/PermissionState';
+import {Config} from '../../Config';
 import {Runtime} from '@wireapp/commons';
 
-import React, {useEffect, useState} from 'react';
+import React, {useEffect} from 'react';
 import Icon from 'Components/Icon';
 import {registerReactComponent} from 'Util/ComponentUtil';
-import PrimaryModal from 'Components/Modals/PrimaryModal';
+import {CONFIG, TYPE} from './WarningsTypes';
+import {closeWarning, useWarningsState} from './WarningsState';
 
 const WarningsContainer: React.FC = () => {
-  const logger = getLogger('WarningsViewModel');
-
+  const name = useWarningsState(state => state.name);
+  const warnings = useWarningsState(state => state.warnings);
   const type = TYPE;
-
-  const [name, setName] = useState<string>();
-  const [warnings, setWarnings] = useState<string[]>([]);
   const visibleWarning = warnings[warnings.length - 1];
-
   const warningDimmed = warnings.some(warning => CONFIG.DIMMED_MODES.includes(warning));
 
   useEffect(() => {
@@ -64,79 +58,6 @@ const WarningsContainer: React.FC = () => {
   const lifeCycleRefresh = WebAppEvents.LIFECYCLE.REFRESH;
   const brandName = Config.getConfig().BRAND_NAME;
   const URL = Config.getConfig().URL;
-
-  /**
-   * Close warning.
-   * @note Used to close a warning banner by clicking the close button
-   */
-  const closeWarning = (): void => {
-    const warningToClose = visibleWarning;
-
-    if (warnings.includes(warningToClose)) {
-      setWarnings(warnings.filter(warning => warning !== warningToClose));
-      logger.info(`Dismissed warning of type '${type}'`);
-    }
-
-    switch (warningToClose) {
-      case TYPE.REQUEST_MICROPHONE: {
-        PrimaryModal.show(PrimaryModal.type.ACKNOWLEDGE, {
-          primaryAction: {
-            action: () => {
-              safeWindowOpen(URL.SUPPORT.MICROPHONE_ACCESS_DENIED);
-            },
-            text: t('modalCallNoMicrophoneAction'),
-          },
-          text: {
-            message: t('modalCallNoMicrophoneMessage'),
-            title: t('modalCallNoMicrophoneHeadline'),
-          },
-        });
-        break;
-      }
-
-      case TYPE.REQUEST_NOTIFICATION: {
-        // We block subsequent permission requests for notifications when the user ignores the request.
-        amplify.publish(WebAppEvents.NOTIFICATION.PERMISSION_STATE, PermissionState.IGNORED);
-        break;
-      }
-
-      default:
-        break;
-    }
-  };
-
-  useEffect(() => {
-    const hideWarning = (type = visibleWarning) => {
-      if (warnings.includes(type)) {
-        setWarnings(warnings.filter(warning => warning !== type));
-        logger.info(`Dismissed warning of type '${type}'`);
-      }
-    };
-
-    const showWarning = (type: string, info: {name: string}) => {
-      const connectivityTypes = [TYPE.CONNECTIVITY_RECONNECT, TYPE.NO_INTERNET];
-      const isConnectivityWarning = connectivityTypes.includes(type);
-      const visibleWarningIsLifecycleUpdate = visibleWarning === TYPE.LIFECYCLE_UPDATE;
-      if (isConnectivityWarning && !visibleWarningIsLifecycleUpdate) {
-        hideWarning(visibleWarning);
-      }
-
-      logger.warn(`Showing warning of type '${type}'`);
-      if (info) {
-        setName(info.name);
-      }
-
-      setWarnings(warnings => [...warnings, type]);
-    };
-
-    amplify.subscribe(WebAppEvents.WARNING.SHOW, showWarning);
-    amplify.subscribe(WebAppEvents.WARNING.DISMISS, hideWarning);
-
-    return () => {
-      amplify.unsubscribe(WebAppEvents.WARNING.SHOW, showWarning);
-      amplify.unsubscribe(WebAppEvents.WARNING.DISMISS, hideWarning);
-    };
-  });
 
   const closeButton = (
     <button
@@ -406,36 +327,5 @@ const WarningsContainer: React.FC = () => {
     </div>
   );
 };
-
-const TYPE = {
-  CALL_QUALITY_POOR: 'call_quality_poor',
-  CONNECTIVITY_RECONNECT: 'connectivity_reconnect',
-  CONNECTIVITY_RECOVERY: 'connectivity_recovery',
-  DENIED_CAMERA: 'camera_access_denied',
-  DENIED_MICROPHONE: 'mic_access_denied',
-  DENIED_SCREEN: 'screen_access_denied',
-  LIFECYCLE_UPDATE: 'lifecycle_update',
-  NOT_FOUND_CAMERA: 'not_found_camera',
-  NOT_FOUND_MICROPHONE: 'not_found_microphone',
-  NO_INTERNET: 'no_internet',
-  REQUEST_CAMERA: 'request_camera',
-  REQUEST_MICROPHONE: 'request_microphone',
-  REQUEST_NOTIFICATION: 'request_notification',
-  REQUEST_SCREEN: 'request_screen',
-  UNSUPPORTED_INCOMING_CALL: 'unsupported_incoming_call',
-  UNSUPPORTED_OUTGOING_CALL: 'unsupported_outgoing_call',
-};
-
-const CONFIG = {
-  DIMMED_MODES: [TYPE.REQUEST_CAMERA, TYPE.REQUEST_MICROPHONE, TYPE.REQUEST_NOTIFICATION, TYPE.REQUEST_SCREEN],
-  MINI_MODES: [TYPE.CONNECTIVITY_RECONNECT, TYPE.LIFECYCLE_UPDATE, TYPE.NO_INTERNET, TYPE.CALL_QUALITY_POOR],
-};
-
-const Warnings = {
-  CONFIG,
-  TYPE,
-};
-
-export default Warnings;
 
 registerReactComponent('warnings-container', WarningsContainer);

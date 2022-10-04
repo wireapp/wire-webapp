@@ -881,7 +881,7 @@ class App {
    * Notify about found update
    */
   readonly update = (): void => {
-    amplify.publish(WebAppEvents.WARNING.SHOW, Warnings.TYPE.LIFECYCLE_UPDATE);
+    Warnings.showWarning(Warnings.TYPE.LIFECYCLE_UPDATE);
   };
 
   /**
