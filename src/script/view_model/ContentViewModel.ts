@@ -219,7 +219,7 @@ export class ContentViewModel {
    *
    * @param conversation Conversation entity or conversation ID
    * @param options State to open conversation in
-   * @param domain TODO: Add description for domain param
+   * @param domain Domain name
    */
   readonly showConversation: ShowConversationOverload = async (
     conversation: Conversation | string,

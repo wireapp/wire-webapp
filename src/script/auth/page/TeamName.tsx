@@ -82,28 +82,32 @@ const TeamName = ({
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
 
-    if (teamNameInput.current) {
-      teamNameInput.current.value = teamNameInput.current.value.trim();
-      if (!teamNameInput.current.checkValidity()) {
-        setError(ValidationError.handleValidationState('name', teamNameInput.current.validity));
-        setIsValidTeamName(false);
-      } else {
-        try {
-          await pushAccountRegistrationData({
-            team: {
-              creator: '',
-              icon: '',
-              id: '',
-              name: teamNameInput.current.value,
-            },
-          });
-          return history.push(ROUTE.CREATE_TEAM_ACCOUNT);
-        } catch (error) {
-          logger.error('Unable to push account data', error);
-        }
-      }
-      teamNameInput.current.focus();
+    if (!teamNameInput.current) {
+      return;
     }
+
+    teamNameInput.current.value = teamNameInput.current.value.trim();
+
+    if (!teamNameInput.current.checkValidity()) {
+      setError(ValidationError.handleValidationState('name', teamNameInput.current.validity));
+      setIsValidTeamName(false);
+    } else {
+      try {
+        await pushAccountRegistrationData({
+          team: {
+            creator: '',
+            icon: '',
+            id: '',
+            name: teamNameInput.current.value,
+          },
+        });
+        return history.push(ROUTE.CREATE_TEAM_ACCOUNT);
+      } catch (error) {
+        logger.error('Unable to push account data', error);
+      }
+    }
+
+    teamNameInput.current.focus();
   };
 
   const onTeamNameChange = (event: React.ChangeEvent<HTMLInputElement>) => {
