@@ -178,7 +178,7 @@ export class ActionsViewModel {
                   resolve();
                 } catch (error) {
                   if (error instanceof BackendError) {
-                    const updateErrorMessage = usePrimaryModalState(state => state.updateErrorMessage);
+                    const {updateErrorMessage} = usePrimaryModalState.getState();
                     updateErrorMessage(expectedErrors[error.label] || error.message);
                   }
                 } finally {
