@@ -18,23 +18,10 @@
  */
 
 import ko from 'knockout';
-import TestPage from 'Util/test/TestPage';
 import {CallingTimeoutMessage as CallTimeoutMessageEntity} from 'src/script/entity/message/CallingTimeoutMessage';
-import CallTimeoutMessage, {CallTimeoutMessageProps} from './CallTimeoutMessage';
+import CallTimeoutMessage from './CallTimeoutMessage';
 import {REASON} from '@wireapp/avs';
-
-class CallTimeoutMessagePage extends TestPage<CallTimeoutMessageProps> {
-  constructor(props?: CallTimeoutMessageProps) {
-    super(CallTimeoutMessage, props);
-  }
-
-  getCallTimeoutMessage = (reason: REASON.NOONE_JOINED | REASON.EVERYONE_LEFT) =>
-    this.get(
-      `[data-uie-name="element-message-call"][data-uie-value="${
-        reason === REASON.NOONE_JOINED ? 'no-one-joined' : 'everyone-left'
-      }"]`,
-    );
-}
+import {render} from '@testing-library/react';
 
 const createCallTimeoutMessage = (partialCallTimeoutMessage: Partial<CallTimeoutMessageEntity>) => {
   const callMessage: Partial<CallTimeoutMessageEntity> = {
@@ -49,22 +36,24 @@ const createCallTimeoutMessage = (partialCallTimeoutMessage: Partial<CallTimeout
 
 describe('CallTimeoutMessage', () => {
   it('shows that nobody joined', async () => {
-    const callMessagePage = new CallTimeoutMessagePage({
-      message: createCallTimeoutMessage({
-        reason: REASON.NOONE_JOINED,
-      }),
+    const message = createCallTimeoutMessage({
+      reason: REASON.NOONE_JOINED,
     });
 
-    expect(callMessagePage.getCallTimeoutMessage(REASON.NOONE_JOINED)).not.toBeNull();
+    const {getByTestId} = render(<CallTimeoutMessage message={message} />);
+
+    const elementMessageCall = getByTestId('element-message-call');
+    expect(elementMessageCall.getAttribute('data-uie-value')).toEqual('no-one-joined');
   });
 
   it('shows that all participants left', async () => {
-    const callMessagePage = new CallTimeoutMessagePage({
-      message: createCallTimeoutMessage({
-        reason: REASON.EVERYONE_LEFT,
-      }),
+    const message = createCallTimeoutMessage({
+      reason: REASON.EVERYONE_LEFT,
     });
 
-    expect(callMessagePage.getCallTimeoutMessage(REASON.EVERYONE_LEFT)).not.toBeNull();
+    const {getByTestId} = render(<CallTimeoutMessage message={message} />);
+
+    const elementMessageCall = getByTestId('element-message-call');
+    expect(elementMessageCall.getAttribute('data-uie-value')).toEqual('everyone-left');
   });
 });

@@ -26,18 +26,21 @@ import {User} from 'src/script/entity/User';
 import MessageTime from './MessageTime';
 import {formatTimeShort, fromUnixTime, TIME_IN_MILLIS} from 'Util/TimeUtil';
 import {t} from 'Util/LocalizerUtil';
+import {ServiceEntity} from '../../../integration/ServiceEntity';
 
 export interface DeleteMessageProps {
   message: DeleteMessageEntity;
-  onClickAvatar: (user: User) => void;
+  onClickAvatar: (user: User | ServiceEntity) => void;
 }
 
 const DeleteMessage: React.FC<DeleteMessageProps> = ({message, onClickAvatar}) => {
   const {unsafeSenderName, user} = useKoSubscribableChildren(message, ['unsafeSenderName', 'user']);
 
+  const deletedTimeStamp = message.deleted_timestamp || 0;
+
   const formattedDeletionTime = t(
     'conversationDeleteTimestamp',
-    formatTimeShort(fromUnixTime(message.deleted_timestamp / TIME_IN_MILLIS.SECOND)),
+    formatTimeShort(fromUnixTime(deletedTimeStamp / TIME_IN_MILLIS.SECOND)),
   );
 
   return (
@@ -58,7 +61,7 @@ const DeleteMessage: React.FC<DeleteMessageProps> = ({message, onClickAvatar}) =
       </div>
       <div className="message-body-actions message-body-actions-large">
         <MessageTime
-          timestamp={message.deleted_timestamp}
+          timestamp={deletedTimeStamp}
           data-uie-uid={message.id}
           data-uie-name="item-message-delete-timestamp"
         >

@@ -18,19 +18,10 @@
  */
 
 import ko from 'knockout';
-import TestPage from 'Util/test/TestPage';
 import {DeleteMessage as DeleteMessageEntity} from 'src/script/entity/message/DeleteMessage';
-import DeleteMessage, {DeleteMessageProps} from './DeleteMessage';
+import DeleteMessage from './DeleteMessage';
 import {User} from 'src/script/entity/User';
-
-class DeleteMessagePage extends TestPage<DeleteMessageProps> {
-  constructor(props?: DeleteMessageProps) {
-    super(DeleteMessage, props);
-  }
-
-  getDeleteMessage = () => this.get('[data-uie-name="element-message-delete"]');
-  getDeleteMessageSenderName = () => this.get('[data-uie-name="element-message-delete-sender-name"]');
-}
+import {render} from '@testing-library/react';
 
 const createDeleteMessage = (partialDeleteMessage: Partial<DeleteMessageEntity>) => {
   const DeleteMessage: Partial<DeleteMessageEntity> = {
@@ -39,7 +30,7 @@ const createDeleteMessage = (partialDeleteMessage: Partial<DeleteMessageEntity>)
     displayTimestampShort: () => '',
     timestamp: ko.observable(Date.now()),
     unsafeSenderName: ko.pureComputed(() => ''),
-    user: ko.observable(new User('userId', null)),
+    user: ko.observable(new User('userId')),
     ...partialDeleteMessage,
   };
   return DeleteMessage as DeleteMessageEntity;
@@ -48,14 +39,17 @@ const createDeleteMessage = (partialDeleteMessage: Partial<DeleteMessageEntity>)
 describe('DeleteMessage', () => {
   it('shows sender name', async () => {
     const senderName = 'name';
-    const deleteMessagePage = new DeleteMessagePage({
+
+    const props = {
       message: createDeleteMessage({
         unsafeSenderName: ko.pureComputed(() => senderName),
       }),
       onClickAvatar: jest.fn(),
-    });
+    };
 
-    expect(deleteMessagePage.getDeleteMessage()).not.toBeNull();
-    expect(deleteMessagePage.getDeleteMessageSenderName().textContent).toBe(senderName);
+    const {queryByTestId, queryByText} = render(<DeleteMessage {...props} />);
+
+    expect(queryByTestId('element-message-delete')).not.toBeNull();
+    expect(queryByText(senderName)).not.toBeNull();
   });
 });
