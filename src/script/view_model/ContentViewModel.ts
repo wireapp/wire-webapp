@@ -181,14 +181,6 @@ export class ContentViewModel {
     amplify.subscribe(WebAppEvents.CONVERSATION.SHOW, this.showConversation);
   }
 
-  public getTeamState(): TeamState {
-    return this.teamState;
-  }
-
-  public getUserState(): UserState {
-    return this.userState;
-  }
-
   private _shiftContent(contentSelector: string, hideSidebar: boolean = false): void {
     const incomingCssClass = 'content-animation-incoming-horizontal-left';
 

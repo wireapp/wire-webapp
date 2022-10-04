@@ -17,6 +17,9 @@
  *
  */
 
+import {WebAppEvents} from '@wireapp/webapp-events';
+import {amplify} from 'amplify';
+import cx from 'classnames';
 import {
   FC,
   MouseEvent as ReactMouseEvent,
@@ -26,10 +29,8 @@ import {
   useEffect,
   useState,
 } from 'react';
-import {amplify} from 'amplify';
-import {WebAppEvents} from '@wireapp/webapp-events';
+import {container} from 'tsyringe';
 import {groupBy} from 'underscore';
-import cx from 'classnames';
 
 import TitleBar from 'Components/TitleBar';
 import MessagesList from 'Components/MessagesList';
@@ -60,6 +61,7 @@ import {UserState} from '../../user/UserState';
 import {TeamState} from '../../team/TeamState';
 import {PanelViewModel} from '../../view_model/PanelViewModel';
 import {ModalsViewModel} from '../../view_model/ModalsViewModel';
+import {ConversationState} from '../../conversation/ConversationState';
 
 type ReadMessageBuffer = {conversation: ConversationEntity; message: Message};
 
@@ -82,7 +84,7 @@ const ConversationList: FC<ConversationListProps> = ({initialMessage, teamState,
   const [readMessagesBuffer, setReadMessagesBuffer] = useState<ReadMessageBuffer[]>([]);
 
   const {conversationRepository, repositories, mainViewModel, legalHoldModal} = contentViewModel;
-  const conversationState = conversationRepository.getConversationState();
+  const conversationState = container.resolve(ConversationState);
 
   const {activeConversation} = useKoSubscribableChildren(conversationState, ['activeConversation']);
   const {is1to1, isRequest} = useKoSubscribableChildren(activeConversation!, ['is1to1', 'isRequest']);

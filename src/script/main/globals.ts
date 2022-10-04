@@ -34,7 +34,6 @@ import 'Components/Image';
 import 'Components/toggle/InfoToggle';
 import 'Components/calling/FullscreenVideoCall';
 import 'Components/avatar/GroupAvatar';
-import 'Components/Conversation';
 import 'Components/TitleBar';
 import 'Components/MessagesList';
 import 'Components/InputBar';
@@ -48,12 +47,12 @@ import 'Components/SearchInput';
 import 'Components/calling/CallingOverlayContainer';
 
 import '../page/AppLock';
+import '../page/MainContent';
 import '../page/RightSidebar';
 
 import 'Util/LocalizerUtil';
 
 import '../page/AppLock';
-import '../page/CenterColumn';
 
 import '../localization/Localizer';
 import '../view_model/bindings/CommonBindings';

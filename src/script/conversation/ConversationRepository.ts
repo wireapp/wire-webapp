@@ -272,10 +272,6 @@ export class ConversationRepository {
     this.leaveCall = noop;
   }
 
-  public getConversationState(): ConversationState {
-    return this.conversationState;
-  }
-
   checkMessageTimer(messageEntity: ContentMessage): void {
     this.ephemeralHandler.checkMessageTimer(messageEntity, this.serverTimeHandler.getTimeOffset());
   }

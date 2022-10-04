@@ -18,61 +18,64 @@
  */
 
 import {StyledApp, THEME_ID} from '@wireapp/react-ui-kit';
-import React from 'react';
+import {FC, ReactNode} from 'react';
 import {CSSTransition, SwitchTransition} from 'react-transition-group';
 import {container} from 'tsyringe';
 
-import Icon from 'Components/Icon';
+import HistoryExport from 'Components/HistoryExport';
+import ConnectRequests from 'Components/ConnectRequests';
+import ConversationList from 'Components/Conversation';
+import GroupCreationModal from 'Components/Modals/GroupCreation/GroupCreationModal';
 
-import {useKoSubscribableChildren} from 'Util/ComponentUtil';
+import {registerReactComponent, useKoSubscribableChildren} from 'Util/ComponentUtil';
+import Icon from 'Components/Icon';
 import {t} from 'Util/LocalizerUtil';
 
-import AboutPreferences from './panels/preferences/AboutPreferences';
+import RootProvider from '../RootProvider';
+
 import Collection from './panels/Collection';
 import AccountPreferences from './panels/preferences/AccountPreferences';
+import AboutPreferences from './panels/preferences/AboutPreferences';
+import AVPreferences from './panels/preferences/AVPreferences';
 import DevicesPreferences from './panels/preferences/devices/DevicesPreferences';
 import OptionPreferences from './panels/preferences/OptionPreferences';
-import AVPreferences from './panels/preferences/AVPreferences';
 
 import {ClientState} from '../../client/ClientState';
 import {ConversationState} from '../../conversation/ConversationState';
 import {UserState} from '../../user/UserState';
-import {ContentViewModel, ContentState} from '../../view_model/ContentViewModel';
+import {TeamState} from '../../team/TeamState';
+import {ContentState, ContentViewModel} from '../../view_model/ContentViewModel';
 
-type LeftSidebarProps = {
-  contentViewModel: ContentViewModel;
-  conversationState?: ConversationState;
-};
-
-const Animated: React.FC<{children: React.ReactNode}> = ({children, ...rest}) => {
+const Animated: FC<{children: ReactNode}> = ({children, ...rest}) => {
   return (
-    <CSSTransition classNames="slide-in-left" timeout={{enter: 500}} {...rest}>
+    <CSSTransition classNames="slide-in-left" timeout={{enter: 5000}} {...rest}>
       {children}
     </CSSTransition>
   );
 };
 
-const MainContent: React.FC<LeftSidebarProps> = ({
+interface MainContentProps {
+  contentViewModel: ContentViewModel;
+  conversationState?: ConversationState;
+}
+
+const MainContent: FC<MainContentProps> = ({
   contentViewModel,
   conversationState = container.resolve(ConversationState),
 }) => {
   const {state} = useKoSubscribableChildren(contentViewModel, ['state']);
   const {activeConversation} = useKoSubscribableChildren(conversationState, ['activeConversation']);
 
-  const repositories = contentViewModel.repositories;
-  const {isFederated} = contentViewModel;
+  const {initialMessage, repositories, isFederated} = contentViewModel;
 
-  const statesToRender = [
-    ContentState.COLLECTION,
-    ContentState.PREFERENCES_ABOUT,
-    ContentState.PREFERENCES_ACCOUNT,
-    ContentState.PREFERENCES_AV,
-    ContentState.PREFERENCES_DEVICES,
-    ContentState.PREFERENCES_OPTIONS,
-    ContentState.WATERMARK,
-  ];
+  const teamState = container.resolve(TeamState);
+  const userState = container.resolve(UserState);
 
-  const stateTitles: Partial<Record<ContentState, string>> = {
+  const statesTitle = {
+    [ContentViewModel.STATE.CONNECTION_REQUESTS]: t('accessibility.headings.connectionRequests'),
+    [ContentViewModel.STATE.CONVERSATION]: t('accessibility.headings.conversation'),
+    [ContentViewModel.STATE.HISTORY_EXPORT]: t('accessibility.headings.historyExport'),
+    [ContentViewModel.STATE.HISTORY_IMPORT]: t('accessibility.headings.historyImport'),
     [ContentState.COLLECTION]: t('accessibility.headings.collection'),
     [ContentState.PREFERENCES_ABOUT]: t('accessibility.headings.preferencesAbout'),
     [ContentState.PREFERENCES_ACCOUNT]: t('accessibility.headings.preferencesAccount'),
@@ -82,17 +85,13 @@ const MainContent: React.FC<LeftSidebarProps> = ({
     [ContentState.WATERMARK]: t('accessibility.headings.noConversation'),
   };
 
-  const title = stateTitles?.[state];
-
-  if (!statesToRender.includes(state)) {
-    return null;
-  }
+  const title = statesTitle[state];
 
   return (
-    <>
-      {title && <h1 className="visually-hidden">{title}</h1>}
-
+    <RootProvider value={contentViewModel}>
       <StyledApp themeId={THEME_ID.DEFAULT} css={{backgroundColor: 'unset', height: '100%'}}>
+        <h1 className="visually-hidden">{title}</h1>
+
         <SwitchTransition>
           <Animated key={state}>
             <>
@@ -163,12 +162,28 @@ const MainContent: React.FC<LeftSidebarProps> = ({
                   </span>
                 </div>
               )}
+
+              {state === ContentViewModel.STATE.CONNECTION_REQUESTS && (
+                <ConnectRequests teamState={teamState} userState={userState} />
+              )}
+
+              {state === ContentViewModel.STATE.CONVERSATION && (
+                <ConversationList initialMessage={initialMessage} teamState={teamState} userState={userState} />
+              )}
+
+              {state === ContentViewModel.STATE.HISTORY_EXPORT && <HistoryExport userState={userState} />}
             </>
           </Animated>
         </SwitchTransition>
+
+        <GroupCreationModal userState={userState} teamState={teamState} />
+
+        <div className="center-column__overlay" />
       </StyledApp>
-    </>
+    </RootProvider>
   );
 };
 
 export default MainContent;
+
+registerReactComponent('main-content', MainContent);
