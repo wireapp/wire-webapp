@@ -84,7 +84,6 @@ import {ReceiptsMiddleware} from '../event/preprocessor/ReceiptsMiddleware';
 
 import {getWebsiteUrl} from '../externalRoute';
 
-import {modals} from '../view_model/ModalsViewModel';
 import {showInitialModal} from '../user/AvailabilityModal';
 
 import {URLParameter} from '../auth/URLParameter';
@@ -122,6 +121,7 @@ import Warnings from '../view_model/WarningsContainer';
 import {Core} from '../service/CoreSingleton';
 import {migrateToQualifiedSessionIds} from './sessionIdMigrator';
 import showUserModal from 'Components/Modals/UserModal';
+import PrimaryModal from 'Components/Modals/PrimaryModal';
 import {mlsConversationState} from '../mls/mlsConversationState';
 
 function doRedirect(signOutReason: SIGN_OUT_REASON) {
@@ -498,7 +498,7 @@ class App {
       loadingView.removeFromView();
       telemetry.report();
       amplify.publish(WebAppEvents.LIFECYCLE.LOADED);
-      modals.ready();
+      PrimaryModal.init();
       showInitialModal(userRepository['userState'].self().availability());
       telemetry.timeStep(AppInitTimingsStep.UPDATED_CONVERSATIONS);
       if (userRepository['userState'].isActivatedAccount()) {

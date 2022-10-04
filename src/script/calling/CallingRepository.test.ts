@@ -1,5 +1,24 @@
 /*
  * Wire
+ * Copyright (C) 2022 Wire Swiss GmbH
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ *
+ */
+
+/*
+ * Wire
  * Copyright (C) 2018 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
@@ -21,7 +40,6 @@ import 'jsdom-worker';
 
 import ko, {Subscription} from 'knockout';
 import {amplify} from 'amplify';
-import {WebAppEvents} from '@wireapp/webapp-events';
 import {CONV_TYPE, CALL_TYPE, STATE as CALL_STATE, REASON, Wcall} from '@wireapp/avs';
 import {CallingRepository} from 'src/script/calling/CallingRepository';
 import {EventRepository} from 'src/script/event/EventRepository';
@@ -31,7 +49,6 @@ import {CallState} from 'src/script/calling/CallState';
 import {User} from 'src/script/entity/User';
 import {MediaType} from 'src/script/media/MediaType';
 import {Conversation} from 'src/script/entity/Conversation';
-import {ModalsViewModel} from 'src/script/view_model/ModalsViewModel';
 import {serverTimeHandler} from 'src/script/time/serverTimeHandler';
 import {createRandomUuid} from 'Util/util';
 import {TestFactory} from 'test/helper/TestFactory';
@@ -40,6 +57,7 @@ import {CALL_MESSAGE_TYPE} from './enum/CallMessageType';
 import {CALL} from '../event/Client';
 import {UserRepository} from '../user/UserRepository';
 import {LEAVE_CALL_REASON} from './enum/LeaveCallReason';
+import {usePrimaryModalState} from '../components/Modals/PrimaryModal';
 
 const createSelfParticipant = () => {
   const selfUser = new User();
@@ -103,12 +121,7 @@ describe('CallingRepository', () => {
       spyOn(wCall, 'start');
       callingRepository.startCall(conversationId, conversationType, callType).catch(done);
       setTimeout(() => {
-        expect(amplify.publish).toHaveBeenCalledWith(
-          WebAppEvents.WARNING.MODAL,
-          ModalsViewModel.TYPE.CONFIRM,
-          jasmine.any(Object),
-        );
-
+        expect(usePrimaryModalState.getState().currentModalId).not.toBeNull();
         expect(wCall.start).not.toHaveBeenCalled();
         done();
       }, 10);
@@ -395,6 +408,7 @@ describe('CallingRepository ISO', () => {
   });
 });
 
+// eslint-disable-next-line jest/no-disabled-tests
 describe.skip('E2E audio call', () => {
   const messageRepository = {
     grantMessage: () => Promise.resolve(true),
