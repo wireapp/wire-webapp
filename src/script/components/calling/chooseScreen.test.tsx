@@ -17,17 +17,8 @@
  *
  */
 
-import TestPage from 'Util/test/TestPage';
-
-import ChooseScreen, {ChooseScreenProps} from './ChooseScreen';
-
-class ChooseScreenPage extends TestPage<ChooseScreenProps> {
-  constructor(props?: ChooseScreenProps) {
-    super(ChooseScreen, props);
-  }
-  getListItems = () => this.getAll('.choose-screen-list-item');
-  getCancelButton = () => this.get('[data-uie-name="do-choose-screen-cancel"]');
-}
+import ChooseScreen from './ChooseScreen';
+import {render, fireEvent} from '@testing-library/react';
 
 describe('ChooseScreen', () => {
   const screens = [
@@ -38,8 +29,9 @@ describe('ChooseScreen', () => {
     {id: 'window:first', thumbnail: {toDataURL: () => 'first window'} as HTMLCanvasElement},
     {id: 'window:second', thumbnail: {toDataURL: () => 'second window'} as HTMLCanvasElement},
   ];
-  const cancel = jasmine.createSpy();
-  const choose = jasmine.createSpy();
+
+  const cancel = jest.fn();
+  const choose = jest.fn();
 
   const props = {
     cancel,
@@ -49,28 +41,43 @@ describe('ChooseScreen', () => {
   };
 
   it('shows the available screens', () => {
-    const chooseScreen = new ChooseScreenPage(props);
-    expect(chooseScreen.getListItems().length).toBe(screens.length + windows.length);
+    const {container} = render(<ChooseScreen {...props} />);
+    const screenItems = container.querySelectorAll('[data-uie-name="item-screen"]');
+    const windowItems = container.querySelectorAll('[data-uie-name="item-window"]');
+
+    expect(screenItems).toHaveLength(screens.length);
+    expect(windowItems).toHaveLength(windows.length);
   });
 
   it('calls cancel on escape', () => {
-    new ChooseScreenPage(props);
-    const event = new KeyboardEvent('keydown', {key: 'Escape'});
-    document.dispatchEvent(event);
+    render(<ChooseScreen {...props} />);
+
+    fireEvent.keyDown(document, {code: 'Enter', key: 'Escape'});
     expect(props.cancel).toHaveBeenCalled();
   });
 
   it('calls cancel on cancel button click', () => {
-    const chooseScreen = new ChooseScreenPage(props);
-    chooseScreen.click(chooseScreen.getCancelButton());
+    const {container} = render(<ChooseScreen {...props} />);
+
+    const cancelButton = container.querySelector('[data-uie-name="do-choose-screen-cancel"]');
+    expect(cancelButton).not.toBeNull();
+
+    fireEvent.click(cancelButton!);
     expect(props.cancel).toHaveBeenCalled();
   });
 
   it('chooses the correct screens on click', () => {
-    const chooseScreen = new ChooseScreenPage(props);
+    const {container} = render(<ChooseScreen {...props} />);
+
     const ids = [...screens, ...windows].map(({id}) => id);
-    chooseScreen.getListItems().forEach((listItem, index) => {
-      chooseScreen.click(listItem);
+
+    const screenItems = container.querySelectorAll('[data-uie-name="item-screen"]');
+    const windowItems = container.querySelectorAll('[data-uie-name="item-window"]');
+
+    const allItems = [...screenItems, ...windowItems];
+
+    allItems.forEach((listItem, index) => {
+      fireEvent.click(listItem);
       expect(props.choose).toHaveBeenCalledWith(ids[index]);
     });
   });

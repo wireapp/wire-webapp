@@ -44,7 +44,7 @@ export class UserGenerator {
       ],
       handle: faker.internet.userName(),
       id: createRandomUuid(),
-      name: faker.name.findName(),
+      name: faker.name.fullName(),
     };
 
     return new UserMapper(serverTimeHandler).mapUserFromJson(template);

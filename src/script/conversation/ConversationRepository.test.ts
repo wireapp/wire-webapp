@@ -52,6 +52,8 @@ import {UserGenerator} from '../../../test/helper/UserGenerator';
 import {TestFactory} from '../../../test/helper/TestFactory';
 import {entities, payload} from '../../../test/api/payloads';
 import Sinon from 'sinon';
+import {Core} from '../service/CoreSingleton';
+import {container} from 'tsyringe';
 
 jest.deepUnmock('axios');
 
@@ -707,6 +709,9 @@ describe('ConversationRepository', () => {
         spyOn(testFactory.conversation_repository as any, 'onMemberJoin').and.callThrough();
         spyOn(testFactory.conversation_repository, 'updateParticipatingUserEntities').and.callThrough();
         spyOn(testFactory.user_repository, 'getUsersById').and.returnValue(Promise.resolve([]));
+        spyOn(container.resolve(Core).service!.conversation, 'isMLSConversationEstablished').and.returnValue(
+          Promise.resolve(true),
+        );
 
         memberJoinEvent = {
           conversation: conversation_et.id,

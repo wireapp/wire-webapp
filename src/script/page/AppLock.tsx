@@ -119,6 +119,7 @@ const AppLock: React.FC<AppLockProps> = ({
     window.clearTimeout(inactivityTimeoutId);
     const id = window.setTimeout(showAppLock, getInactivityAppLockTimeoutInSeconds() * 1000);
     setInactivityTimeoutId(id);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [inactivityTimeoutId]);
 
   const clearAppLockTimeout = useCallback(() => {
@@ -142,6 +143,7 @@ const AppLock: React.FC<AppLockProps> = ({
         },
       });
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isAppLockEnabled]);
 
   useEffect(() => {
@@ -172,6 +174,7 @@ const AppLock: React.FC<AppLockProps> = ({
       modalObserver.disconnect();
       appObserver.disconnect();
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [state, isVisible]);
 
   const showAppLock = () => {

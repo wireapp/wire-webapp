@@ -17,29 +17,18 @@
  *
  */
 
-export function enableLogging(force = false, search = window.location.search): void {
-  let localStorage;
+import {getStorage} from './localStorage';
 
-  try {
-    /**
-     * If users disable cookies in their browsers, they won't have access to the localStorage API.
-     * The following check will fix this error:
-     * > Failed to read the 'localStorage' property from 'Window': Access is denied for this document
-     * (note: Some version of Firefox do not throw an error but, instead, return a null object, we also need to account for that scenario)
-     */
-    localStorage = window.localStorage;
-  } catch (error) {}
-  if (!localStorage) {
-    return;
-  }
+export function enableLogging(force = false, search = window.location.search): void {
+  const storage = getStorage();
 
   const namespace = new URLSearchParams(search).get('enableLogging');
 
   if (namespace) {
-    localStorage.setItem('debug', namespace);
+    storage?.setItem('debug', namespace);
   } else if (force) {
-    localStorage.setItem('debug', '@wireapp/webapp*');
+    storage?.setItem('debug', '*');
   } else {
-    localStorage.removeItem('debug');
+    storage?.removeItem('debug');
   }
 }
