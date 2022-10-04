@@ -31,7 +31,7 @@ type ResponsiveViewState = {
 };
 
 const useResponsiveViewState = create<ResponsiveViewState>(set => ({
-  currentView: 0,
+  currentView: 1,
   setCurrentView: (view: viewType) => set({currentView: view}),
 }));
 

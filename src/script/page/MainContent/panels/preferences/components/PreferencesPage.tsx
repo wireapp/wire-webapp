@@ -17,8 +17,10 @@
  *
  */
 
-import React from 'react';
+import React, {useEffect} from 'react';
+import {useResponsiveViewState} from '../../../../ResponsiveViewState';
 import {initFadingScrollbar} from '../../../../../ui/fadingScrollbar';
+import {IconButton, IconButtonVariant, useMatchMedia} from '@wireapp/react-ui-kit';
 
 interface PreferencesPageProps {
   children: React.ReactNode;
@@ -26,9 +28,30 @@ interface PreferencesPageProps {
 }
 
 const PreferencesPage: React.FC<PreferencesPageProps> = ({title, children}) => {
+  const isScaledDown = useMatchMedia('max-width: 768px');
+  const responsiveView = useResponsiveViewState(state => state.currentView);
+  const setResponsiveView = useResponsiveViewState(state => state.setCurrentView);
+
+  useEffect(() => {
+    document.querySelector('#app')?.classList.add(`view-${responsiveView}`);
+    return () => {
+      document.querySelector('#app')?.classList.remove(`view-${responsiveView}`);
+    };
+  }, [responsiveView]);
+
   return (
     <div style={{display: 'flex', flexDirection: 'column', height: '100vh'}}>
-      <h2 className="preferences-titlebar">{title}</h2>
+      <div className="preferences-titlebar">
+        {isScaledDown && responsiveView !== 1 && (
+          <IconButton
+            variant={IconButtonVariant.SECONDARY}
+            className="conversation-title-bar-icon icon-back"
+            css={{marginBottom: 0}}
+            onClick={() => setResponsiveView(1)}
+          />
+        )}
+        <h2 className="preferences-titlebar">{title}</h2>
+      </div>
       <div className="preferences-content" ref={initFadingScrollbar}>
         {children}
       </div>

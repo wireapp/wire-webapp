@@ -52,6 +52,7 @@ import {
 } from '../notification/PreferenceNotificationRepository';
 import {modals} from '../view_model/ModalsViewModel';
 import {MessageRepository} from '../conversation/MessageRepository';
+import {useResponsiveViewState} from '../page/ResponsiveViewState';
 
 interface ShowConversationOptions {
   exposeMessage?: Message;
@@ -304,6 +305,7 @@ export class ContentViewModel {
   readonly switchContent = (newContentState: ContentState): void => {
     const isStateChange = newContentState !== this.state();
     if (isStateChange) {
+      useResponsiveViewState.setState({currentView: 0});
       this.releaseContent(newContentState);
       this.showContent(this.checkContentAvailability(newContentState));
     }
