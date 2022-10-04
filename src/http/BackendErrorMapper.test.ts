@@ -34,7 +34,7 @@ describe('BackendErrorMapper', () => {
       };
 
       const userError = BackendErrorMapper.map(userIdError);
-      expect(userError).toEqual(jasmine.any(UserIsUnknownError));
+      expect(userError).toEqual(expect.any(UserIsUnknownError));
 
       const conversationIdError = {
         code: StatusCode.BAD_REQUEST,
@@ -44,7 +44,7 @@ describe('BackendErrorMapper', () => {
       };
 
       const conversationError = BackendErrorMapper.map(conversationIdError);
-      expect(conversationError).toEqual(jasmine.any(ConversationIsUnknownError));
+      expect(conversationError).toEqual(expect.any(ConversationIsUnknownError));
     });
   });
 });

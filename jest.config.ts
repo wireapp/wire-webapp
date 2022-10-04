@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2018 Wire Swiss GmbH
+ * Copyright (C) 2022 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,21 +17,8 @@
  *
  */
 
-module.exports = {
-  externals: {
-    'fs-extra': '{}',
-  },
-  mode: 'development',
-  module: {
-    rules: [
-      {
-        exclude: /node_modules/,
-        loader: 'babel-loader',
-        test: /\.[tj]s$/,
-      },
-    ],
-  },
-  resolve: {
-    extensions: ['.js', '.ts'],
-  },
+export default {
+  clearMocks: true,
+  testMatch: ['**/?(*.)test.[t]s?(x)'],
+  coverageDirectory: 'coverage',
 };

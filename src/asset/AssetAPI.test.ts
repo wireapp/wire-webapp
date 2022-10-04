@@ -18,20 +18,13 @@
  */
 
 import {APIClient} from '../APIClient';
-import {ClientType} from '../client/ClientType';
 import {StatusCode} from '../http';
 
-describe('AuthAPI', () => {
+describe('"AssetAPI"', () => {
   const apiClient = new APIClient();
 
-  it('sets the client to permanent', async () => {
-    const data = {
-      clientType: ClientType.PERMANENT,
-      email: 'email@example.com',
-      password: 'email@example.com',
-    };
-
-    spyOn(apiClient.transport.http, 'sendJSON').and.returnValue(
+  it('adds token parameters', async () => {
+    jest.spyOn(apiClient.transport.http, 'sendRequest').mockReturnValue(
       Promise.resolve({
         config: {},
         data: '',
@@ -40,31 +33,24 @@ describe('AuthAPI', () => {
         statusText: 'OK',
       }),
     );
+    const assetId = 'my-asset-id';
+    const assetToken = 'my-asset-token';
 
-    await apiClient.api.auth.postLogin(data);
+    await apiClient.api.asset.getAssetV3(assetId, assetToken);
 
-    expect(apiClient.transport.http.sendJSON).toHaveBeenCalledWith(
-      jasmine.objectContaining({
-        data: {
-          clientType: undefined,
-          email: data.email,
-          password: data.password,
-        },
+    expect(apiClient.transport.http.sendRequest).toHaveBeenCalledWith(
+      expect.objectContaining({
         params: {
-          persist: true,
+          asset_token: assetToken,
         },
+        url: expect.stringMatching(new RegExp(assetId)),
       }),
+      true,
     );
   });
 
-  it('sets the client to temporary', async () => {
-    const data = {
-      clientType: ClientType.TEMPORARY,
-      email: 'email@example.com',
-      password: 'email@example.com',
-    };
-
-    spyOn(apiClient.transport.http, 'sendJSON').and.returnValue(
+  it('removes token parameters', async () => {
+    jest.spyOn(apiClient.transport.http, 'sendRequest').mockReturnValue(
       Promise.resolve({
         config: {},
         data: '',
@@ -73,20 +59,16 @@ describe('AuthAPI', () => {
         statusText: 'OK',
       }),
     );
+    const assetId = 'my-asset-id';
 
-    await apiClient.api.auth.postLogin(data);
+    await apiClient.api.asset.getAssetV3(assetId);
 
-    expect(apiClient.transport.http.sendJSON).toHaveBeenCalledWith(
-      jasmine.objectContaining({
-        data: {
-          clientType: undefined,
-          email: data.email,
-          password: data.password,
-        },
-        params: {
-          persist: false,
-        },
+    expect(apiClient.transport.http.sendRequest).toHaveBeenCalledWith(
+      expect.objectContaining({
+        params: {},
+        url: expect.stringMatching(new RegExp(assetId)),
       }),
+      true,
     );
   });
 });
