@@ -17,33 +17,39 @@
  *
  */
 
-import {FC, useEffect, useRef} from 'react';
+import {FC, useContext, useEffect, useRef} from 'react';
 import {container} from 'tsyringe';
 
 import Avatar, {AVATAR_SIZE} from 'Components/Avatar';
 import ClassifiedBar from 'Components/input/ClassifiedBar';
 
-import {registerReactComponent, useKoSubscribableChildren} from 'Util/ComponentUtil';
+import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 
 import {TeamState} from '../../team/TeamState';
 import {UserState} from '../../user/UserState';
 import {User} from '../../entity/User';
-import {ActionsViewModel} from '../../view_model/ActionsViewModel';
+import {RootContext} from '../../page/RootProvider';
 
 interface ConnectRequestsProps {
-  readonly actionsViewModel: ActionsViewModel;
   readonly userState: UserState;
   readonly teamState: TeamState;
 }
 
 const ConnectRequests: FC<ConnectRequestsProps> = ({
-  actionsViewModel,
   userState = container.resolve(UserState),
   teamState = container.resolve(TeamState),
 }) => {
   const connectRequestsRefEnd = useRef<HTMLDivElement | null>(null);
   const temporaryConnectRequestsCount = useRef<number>(0);
+
+  const contentViewModel = useContext(RootContext);
+
+  if (!contentViewModel) {
+    return null;
+  }
+
+  const actionsViewModel = contentViewModel.mainViewModel.actions;
 
   const {classifiedDomains} = useKoSubscribableChildren(teamState, ['classifiedDomains']);
   const {connectRequests} = useKoSubscribableChildren(userState, ['connectRequests']);
@@ -137,5 +143,3 @@ const ConnectRequests: FC<ConnectRequestsProps> = ({
 };
 
 export default ConnectRequests;
-
-registerReactComponent('connect-requests', ConnectRequests);

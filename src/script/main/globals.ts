@@ -48,9 +48,12 @@ import 'Components/SearchInput';
 import 'Components/calling/CallingOverlayContainer';
 
 import '../page/AppLock';
+import '../page/MainContent';
 import '../page/RightSidebar';
 
 import 'Util/LocalizerUtil';
+
+import '../page/AppLock';
 
 import '../localization/Localizer';
 import '../view_model/bindings/CommonBindings';

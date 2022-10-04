@@ -17,15 +17,17 @@
  *
  */
 
-import {ContentMessage} from '../entity/message/ContentMessage';
-import {Message} from '../entity/message/Message';
-import {MemberMessage} from '../entity/message/MemberMessage';
-import {SystemMessage} from '../entity/message/SystemMessage';
-import {SuperType} from '../message/SuperType';
+import {Draft} from 'Util/DraftStateUtil';
 
-export const isContentMessage = (
-  message: Message | ContentMessage | MemberMessage | SystemMessage,
-): message is ContentMessage => message.super_type === SuperType.CONTENT;
+import {ContentMessage} from '../entity/message/ContentMessage';
+import {MemberMessage} from '../entity/message/MemberMessage';
+import {SuperType} from '../message/SuperType';
 
 export const isMemberMessage = (message: any | undefined | null): message is MemberMessage =>
   message && 'super_type' in message && message.super_type === SuperType.MEMBER;
+
+export const isDraftMessageWithReplyId = (message: any | undefined | null): message is Draft =>
+  message && 'reply' in message && 'messageId' in message.reply;
+
+export const isContentMessage = (message: any | undefined | null): message is ContentMessage =>
+  message && 'super_type' in message && message.super_type === SuperType.CONTENT;

@@ -51,7 +51,7 @@ export interface TitleBarProps {
   callActions: CallActions;
   panelViewModel: PanelViewModel;
   userState: UserState;
-  callState: CallState;
+  callState?: CallState;
   teamState: TeamState;
 }
 
@@ -179,11 +179,7 @@ const TitleBar: React.FC<TitleBarProps> = ({
     amplify.publish(WebAppEvents.CONTENT.SWITCH, ContentViewModel.STATE.COLLECTION);
   };
 
-  const onClickDetails = () => {
-    const panelId = PanelViewModel.STATE.CONVERSATION_DETAILS;
-    panelViewModel.togglePanel(panelId, {entity: conversation});
-    showDetails(false);
-  };
+  const onClickDetails = () => showDetails(false);
 
   return (
     <StyledApp themeId={THEME_ID.DEFAULT}>

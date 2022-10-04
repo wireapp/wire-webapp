@@ -20,21 +20,20 @@
 import {amplify} from 'amplify';
 import {container} from 'tsyringe';
 import {WebAppEvents} from '@wireapp/webapp-events';
-import {FC, useEffect, useState} from 'react';
+import {FC, useContext, useEffect, useState} from 'react';
 
+import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import LoadingBar from 'Components/LoadingBar';
-import {getLogger} from 'Util/Logger';
-import {registerReactComponent, useKoSubscribableChildren} from 'Util/ComponentUtil';
-
 import {t} from 'Util/LocalizerUtil';
-
-import {UserState} from '../../user/UserState';
-import {BackupRepository} from '../../backup/BackupRepository';
-import {CancelError} from '../../backup/Error';
-import {ContentViewModel} from '../../view_model/ContentViewModel';
-import {Config} from '../../Config';
+import {getLogger} from 'Util/Logger';
 import {getCurrentDate} from 'Util/TimeUtil';
 import {downloadBlob} from 'Util/util';
+
+import {CancelError} from '../../backup/Error';
+import {UserState} from '../../user/UserState';
+import {RootContext} from '../../page/RootProvider';
+import {ContentViewModel} from '../../view_model/ContentViewModel';
+import {Config} from '../../Config';
 
 enum ExportState {
   COMPRESSING = 'ExportState.STATE.COMPRESSING',
@@ -48,12 +47,19 @@ export const CONFIG = {
 };
 
 interface HistoryExportProps {
-  readonly backupRepository: BackupRepository;
   readonly userState: UserState;
 }
 
-const HistoryExport: FC<HistoryExportProps> = ({backupRepository, userState = container.resolve(UserState)}) => {
+const HistoryExport: FC<HistoryExportProps> = ({userState = container.resolve(UserState)}) => {
   const logger = getLogger('HistoryExport');
+
+  const contentViewModel = useContext(RootContext);
+
+  if (!contentViewModel) {
+    return null;
+  }
+
+  const backupRepository = contentViewModel.repositories.backup;
 
   const [historyState, setHistoryState] = useState<ExportState>(ExportState.PREPARING);
   const [hasError, setHasError] = useState<boolean>(false);
@@ -229,5 +235,3 @@ const HistoryExport: FC<HistoryExportProps> = ({backupRepository, userState = co
 };
 
 export default HistoryExport;
-
-registerReactComponent('history-export', HistoryExport);

@@ -17,151 +17,170 @@
  *
  */
 
-import React from 'react';
+import {StyledApp, THEME_ID} from '@wireapp/react-ui-kit';
+import {FC, ReactNode} from 'react';
 import {CSSTransition, SwitchTransition} from 'react-transition-group';
-import {registerReactComponent, useKoSubscribableChildren} from 'Util/ComponentUtil';
+import {container} from 'tsyringe';
 
-import {ContentViewModel, ContentState} from '../../view_model/ContentViewModel';
-import {t} from 'Util/LocalizerUtil';
+import HistoryExport from 'Components/HistoryExport';
+import ConnectRequests from 'Components/ConnectRequests';
+import ConversationList from 'Components/Conversation';
+import GroupCreationModal from 'Components/Modals/GroupCreation/GroupCreationModal';
+
+import {registerReactComponent, useKoSubscribableChildren} from 'Util/ComponentUtil';
 import Icon from 'Components/Icon';
-import AboutPreferences from './panels/preferences/AboutPreferences';
+import {t} from 'Util/LocalizerUtil';
+
+import RootProvider from '../RootProvider';
+
 import Collection from './panels/Collection';
 import AccountPreferences from './panels/preferences/AccountPreferences';
+import AboutPreferences from './panels/preferences/AboutPreferences';
+import AVPreferences from './panels/preferences/AVPreferences';
 import DevicesPreferences from './panels/preferences/devices/DevicesPreferences';
 import OptionPreferences from './panels/preferences/OptionPreferences';
-import {ConversationState} from '../../conversation/ConversationState';
-import AVPreferences from './panels/preferences/AVPreferences';
-import {container} from 'tsyringe';
-import {ClientState} from '../../client/ClientState';
-import {UserState} from '../../user/UserState';
-import {StyledApp, THEME_ID} from '@wireapp/react-ui-kit';
 
-type LeftSidebarProps = {
-  contentViewModel: ContentViewModel;
-  conversationState?: ConversationState;
-};
-const Animated: React.FC<{children: React.ReactNode}> = ({children, ...rest}) => {
+import {ClientState} from '../../client/ClientState';
+import {ConversationState} from '../../conversation/ConversationState';
+import {UserState} from '../../user/UserState';
+import {TeamState} from '../../team/TeamState';
+import {ContentState, ContentViewModel} from '../../view_model/ContentViewModel';
+
+const Animated: FC<{children: ReactNode}> = ({children, ...rest}) => {
   return (
-    <CSSTransition classNames="slide-in-left" timeout={{enter: 500}} {...rest}>
+    <CSSTransition classNames="slide-in-left" timeout={{enter: 5000}} {...rest}>
       {children}
     </CSSTransition>
   );
 };
 
-const MainContent: React.FC<LeftSidebarProps> = ({
+interface MainContentProps {
+  contentViewModel: ContentViewModel;
+  conversationState?: ConversationState;
+}
+
+const MainContent: FC<MainContentProps> = ({
   contentViewModel,
   conversationState = container.resolve(ConversationState),
 }) => {
   const {state} = useKoSubscribableChildren(contentViewModel, ['state']);
   const {activeConversation} = useKoSubscribableChildren(conversationState, ['activeConversation']);
-  const repositories = contentViewModel.repositories;
 
-  const {isFederated} = contentViewModel;
+  const {initialMessage, repositories, isFederated} = contentViewModel;
 
-  let title = '';
-  let content = null;
-  switch (state) {
-    case ContentState.COLLECTION:
-      title = t('accessibility.headings.collection');
-      content = (
-        <Collection
-          conversation={activeConversation}
-          conversationRepository={repositories.conversation}
-          assetRepository={repositories.asset}
-          messageRepository={repositories.message}
-        />
-      );
-      break;
+  const teamState = container.resolve(TeamState);
+  const userState = container.resolve(UserState);
 
-    case ContentState.PREFERENCES_ABOUT:
-      title = t('accessibility.headings.preferencesAbout');
-      content = (
-        <div id="preferences-about" className="preferences-page preferences-about">
-          <AboutPreferences />
-        </div>
-      );
-      break;
+  const statesTitle = {
+    [ContentViewModel.STATE.CONNECTION_REQUESTS]: t('accessibility.headings.connectionRequests'),
+    [ContentViewModel.STATE.CONVERSATION]: t('accessibility.headings.conversation'),
+    [ContentViewModel.STATE.HISTORY_EXPORT]: t('accessibility.headings.historyExport'),
+    [ContentViewModel.STATE.HISTORY_IMPORT]: t('accessibility.headings.historyImport'),
+    [ContentState.COLLECTION]: t('accessibility.headings.collection'),
+    [ContentState.PREFERENCES_ABOUT]: t('accessibility.headings.preferencesAbout'),
+    [ContentState.PREFERENCES_ACCOUNT]: t('accessibility.headings.preferencesAccount'),
+    [ContentState.PREFERENCES_AV]: t('accessibility.headings.preferencesAV'),
+    [ContentState.PREFERENCES_DEVICES]: t('accessibility.headings.preferencesDevices'),
+    [ContentState.PREFERENCES_OPTIONS]: t('accessibility.headings.preferencesOptions'),
+    [ContentState.WATERMARK]: t('accessibility.headings.noConversation'),
+  };
 
-    case ContentState.PREFERENCES_ACCOUNT:
-      title = t('accessibility.headings.preferencesAccount');
-      content = (
-        <div id="preferences-account" className="preferences-page preferences-account">
-          <AccountPreferences
-            showDomain={isFederated}
-            backupRepository={repositories.backup}
-            clientRepository={repositories.client}
-            conversationRepository={repositories.conversation}
-            propertiesRepository={repositories.properties}
-            userRepository={repositories.user}
-          />
-        </div>
-      );
-      break;
-
-    case ContentState.PREFERENCES_AV:
-      title = t('accessibility.headings.preferencesAV');
-      content = (
-        <div id="preferences-av" className="preferences-page preferences-av">
-          <AVPreferences
-            callingRepository={repositories.calling}
-            mediaRepository={repositories.media}
-            propertiesRepository={repositories.properties}
-          />
-        </div>
-      );
-      break;
-
-    case ContentState.PREFERENCES_DEVICES:
-      title = t('accessibility.headings.preferencesDevices');
-      content = (
-        <DevicesPreferences
-          clientState={container.resolve(ClientState)}
-          conversationState={conversationState}
-          cryptographyRepository={repositories.cryptography}
-          removeDevice={contentViewModel.mainViewModel.actions.deleteClient}
-          resetSession={(userId, device, conversation) =>
-            repositories.message.resetSession(userId, device.id, conversation)
-          }
-          userState={container.resolve(UserState)}
-          verifyDevice={(userId, device, verified) => repositories.client.verifyClient(userId, device, verified)}
-        />
-      );
-      break;
-
-    case ContentState.PREFERENCES_OPTIONS:
-      title = t('accessibility.headings.preferencesOptions');
-      content = (
-        <div id="preferences-options" className="preferences-page preferences-options">
-          <OptionPreferences propertiesRepository={repositories.properties} />
-        </div>
-      );
-      break;
-
-    case ContentState.WATERMARK:
-      title = t('accessibility.headings.noConversation');
-      content = (
-        <div className="watermark">
-          <span className="absolute-center" aria-hidden="true" data-uie-name="no-conversation">
-            <Icon.Watermark />
-          </span>
-        </div>
-      );
-      break;
-  }
-
-  if (!content) {
-    return null;
-  }
+  const title = statesTitle[state];
 
   return (
-    <>
-      <h1 className="visually-hidden">{title}</h1>
+    <RootProvider value={contentViewModel}>
       <StyledApp themeId={THEME_ID.DEFAULT} css={{backgroundColor: 'unset', height: '100%'}}>
+        <h1 className="visually-hidden">{title}</h1>
+
         <SwitchTransition>
-          <Animated key={state}>{content}</Animated>
+          <Animated key={state}>
+            <>
+              {state === ContentState.COLLECTION && activeConversation && (
+                <Collection
+                  conversation={activeConversation}
+                  conversationRepository={repositories.conversation}
+                  assetRepository={repositories.asset}
+                  messageRepository={repositories.message}
+                />
+              )}
+
+              {state === ContentState.PREFERENCES_ABOUT && (
+                <div id="preferences-about" className="preferences-page preferences-about">
+                  <AboutPreferences />
+                </div>
+              )}
+
+              {state === ContentState.PREFERENCES_ACCOUNT && (
+                <div id="preferences-account" className="preferences-page preferences-account">
+                  <AccountPreferences
+                    showDomain={isFederated}
+                    backupRepository={repositories.backup}
+                    clientRepository={repositories.client}
+                    conversationRepository={repositories.conversation}
+                    propertiesRepository={repositories.properties}
+                    userRepository={repositories.user}
+                  />
+                </div>
+              )}
+
+              {state === ContentState.PREFERENCES_AV && (
+                <div id="preferences-av" className="preferences-page preferences-av">
+                  <AVPreferences
+                    callingRepository={repositories.calling}
+                    mediaRepository={repositories.media}
+                    propertiesRepository={repositories.properties}
+                  />
+                </div>
+              )}
+
+              {state === ContentState.PREFERENCES_DEVICES && (
+                <DevicesPreferences
+                  clientState={container.resolve(ClientState)}
+                  conversationState={conversationState}
+                  cryptographyRepository={repositories.cryptography}
+                  removeDevice={contentViewModel.mainViewModel.actions.deleteClient}
+                  resetSession={(userId, device, conversation) =>
+                    repositories.message.resetSession(userId, device.id, conversation)
+                  }
+                  userState={container.resolve(UserState)}
+                  verifyDevice={(userId, device, verified) =>
+                    repositories.client.verifyClient(userId, device, verified)
+                  }
+                />
+              )}
+
+              {state === ContentState.PREFERENCES_OPTIONS && (
+                <div id="preferences-options" className="preferences-page preferences-options">
+                  <OptionPreferences propertiesRepository={repositories.properties} />
+                </div>
+              )}
+
+              {state === ContentState.WATERMARK && (
+                <div className="watermark">
+                  <span className="absolute-center" aria-hidden="true" data-uie-name="no-conversation">
+                    <Icon.Watermark />
+                  </span>
+                </div>
+              )}
+
+              {state === ContentViewModel.STATE.CONNECTION_REQUESTS && (
+                <ConnectRequests teamState={teamState} userState={userState} />
+              )}
+
+              {state === ContentViewModel.STATE.CONVERSATION && (
+                <ConversationList initialMessage={initialMessage} teamState={teamState} userState={userState} />
+              )}
+
+              {state === ContentViewModel.STATE.HISTORY_EXPORT && <HistoryExport userState={userState} />}
+            </>
+          </Animated>
         </SwitchTransition>
+
+        <GroupCreationModal userState={userState} teamState={teamState} />
+
+        <div className="center-column__overlay" />
       </StyledApp>
-    </>
+    </RootProvider>
   );
 };
 
