@@ -38,7 +38,7 @@ import React, {useEffect, useRef, useState} from 'react';
 import {useIntl} from 'react-intl';
 import {connect} from 'react-redux';
 import {AnyAction, Dispatch} from 'redux';
-import useReactRouter from 'use-react-router';
+import {useNavigate} from 'react-router-dom';
 import {getLogger} from 'Util/Logger';
 import {addLocaleToUrl} from '../../externalRoute';
 import {teamNameStrings} from '../../strings';
@@ -64,7 +64,7 @@ const TeamName = ({
   const logger = getLogger('TeamName');
 
   const {formatMessage: _} = useIntl();
-  const {history} = useReactRouter();
+  const navigate = useNavigate();
   const [enteredTeamName, setEnteredTeamName] = useState(teamName || '');
   const [error, setError] = useState(null);
   const [isValidTeamName, setIsValidTeamName] = useState(!!teamName);
@@ -95,7 +95,7 @@ const TeamName = ({
             name: teamNameInput.current.value,
           },
         });
-        return history.push(ROUTE.CREATE_TEAM_ACCOUNT);
+        return navigate(ROUTE.CREATE_TEAM_ACCOUNT);
       } catch (error) {
         logger.error('Unable to push account data', error);
       }

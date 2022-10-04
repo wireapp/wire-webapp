@@ -34,7 +34,7 @@ import React, {useEffect, useState} from 'react';
 import {useIntl} from 'react-intl';
 import {connect} from 'react-redux';
 import {AnyAction, Dispatch} from 'redux';
-import useReactRouter from 'use-react-router';
+import {useNavigate} from 'react-router-dom';
 import {chooseHandleStrings} from '../../strings';
 import AcceptNewsModal from '../component/AcceptNewsModal';
 import {actionRoot as ROOT_ACTIONS} from '../module/action';
@@ -59,13 +59,13 @@ const SetHandle = ({
   name,
 }: Props & ConnectedProps & DispatchProps) => {
   const {formatMessage: _} = useIntl();
-  const {history} = useReactRouter();
+  const navigate = useNavigate();
   const [error, setError] = useState(null);
   const [handle, setHandle] = useState('');
 
   useEffect(() => {
     if (hasSelfHandle) {
-      history.push(ROUTE.INITIAL_INVITE);
+      navigate(ROUTE.INITIAL_INVITE);
     }
   }, [hasSelfHandle]);
 

@@ -33,7 +33,7 @@ import {
 } from '@wireapp/react-ui-kit';
 import React from 'react';
 import {useIntl} from 'react-intl';
-import {Redirect} from 'react-router';
+import {Navigate} from 'react-router-dom';
 import {Config} from '../../Config';
 import {setAccountTypeStrings} from '../../strings';
 import RouterLink from '../component/RouterLink';
@@ -67,10 +67,10 @@ const SetAccountType = ({}: Props) => {
   return (
     <Page>
       {!Config.getConfig().FEATURE.ENABLE_ACCOUNT_REGISTRATION && (
-        <Redirect to={pathWithParams(ROUTE.INDEX)} data-uie-name="redirect-login" />
+        <Navigate to={pathWithParams(ROUTE.INDEX)} replace data-uie-name="redirect-login" />
       )}
       {isMacOsWrapper && (
-        <Redirect to={pathWithParams(ROUTE.CREATE_ACCOUNT)} data-uie-name="redirect-register-personal" />
+        <Navigate to={pathWithParams(ROUTE.CREATE_ACCOUNT)} replace data-uie-name="redirect-register-personal" />
       )}
       <Container centerText verticalCenter style={{width: '100%'}}>
         <Columns>

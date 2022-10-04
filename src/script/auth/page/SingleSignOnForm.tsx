@@ -38,7 +38,7 @@ import React, {useEffect, useRef, useState} from 'react';
 import {FormattedMessage, useIntl} from 'react-intl';
 import {connect} from 'react-redux';
 import {AnyAction, Dispatch} from 'redux';
-import useReactRouter from 'use-react-router';
+import {useNavigate, Navigate} from 'react-router-dom';
 import {Config} from '../../Config';
 import {loginStrings, logoutReasonStrings, ssoLoginStrings} from '../../strings';
 import {actionRoot as ROOT_ACTIONS} from '../module/action/';
@@ -50,7 +50,6 @@ import * as ClientSelector from '../module/selector/ClientSelector';
 import {QUERY_KEY, ROUTE} from '../route';
 import {Runtime} from '@wireapp/commons';
 import {parseError, parseValidationErrors} from '../util/errorUtil';
-import {Redirect} from 'react-router';
 import {getSearchParams} from '../util/urlUtil';
 
 export interface SingleSignOnFormProps extends React.HTMLAttributes<HTMLDivElement> {
@@ -77,7 +76,7 @@ const SingleSignOnForm = ({
   const [codeOrMail, setCodeOrMail] = useState('');
   const [disableInput, setDisableInput] = useState(false);
   const {formatMessage: _} = useIntl();
-  const {history} = useReactRouter();
+  const navigate = useNavigate();
   const [clientType, setClientType] = useState<ClientType>(null);
   const [ssoError, setSsoError] = useState(null);
   const [isCodeOrMailInputValid, setIsCodeOrMailInputValid] = useState(true);
@@ -207,14 +206,14 @@ const SingleSignOnForm = ({
           await doJoinConversationByCode(conversationKey, conversationCode);
         }
 
-        history.push(ROUTE.HISTORY_INFO);
+        navigate(ROUTE.HISTORY_INFO);
       }
     } catch (error) {
       setIsLoading(false);
       switch (error.label) {
         case BackendError.LABEL.TOO_MANY_CLIENTS: {
           resetAuthError();
-          history.push(ROUTE.CLIENTS);
+          navigate(ROUTE.CLIENTS);
           break;
         }
         case BackendErrorLabel.CUSTOM_BACKEND_NOT_FOUND: {
@@ -260,7 +259,7 @@ const SingleSignOnForm = ({
     <Loading style={{marginTop: '24px'}} />
   ) : (
     <Form style={{marginTop: 30}} data-uie-name="sso" onSubmit={handleSubmit}>
-      {!isValidLink && <Redirect to={ROUTE.CONVERSATION_JOIN_INVALID} />}
+      {!isValidLink && <Navigate to={ROUTE.CONVERSATION_JOIN_INVALID} replace />}
       <InputBlock>
         <InputSubmitCombo>
           <Input
