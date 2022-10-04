@@ -107,7 +107,7 @@ const Conversations: React.FC<ConversationsProps> = ({
   const isFolderOpen = useFolderState(state => state.isOpen);
 
   const {conversationLabelRepository} = conversationRepository;
-  const [showFocus, focusConversationList] = useState(false);
+  const [isConversationListFocus, focusConversationList] = useState(false);
 
   useEffect(() => {
     if (!activeConversation) {
@@ -188,7 +188,7 @@ const Conversations: React.FC<ConversationsProps> = ({
           // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex
           tabIndex={0}
           onBlur={event => {
-            // persoanl user won't see availability status menu, on blur of the user name
+            // personal user won't see availability status menu, on blur of the user name
             // conversation list should get the focus
             focusConversationList(true);
           }}
@@ -327,7 +327,7 @@ const Conversations: React.FC<ConversationsProps> = ({
           conversationRepository={conversationRepository}
           handleFocus={setCurrentFocus}
           currentFocus={currentFocus}
-          showFocus={showFocus}
+          isConversationListFocus={isConversationListFocus}
           handleArrowKeyDown={handleKeyDown}
         />
       )}

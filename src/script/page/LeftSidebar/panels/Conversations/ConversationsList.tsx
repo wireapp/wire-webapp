@@ -48,7 +48,7 @@ export const ConversationsList: React.FC<{
   listViewModel: ListViewModel;
   viewStyle: ConverationViewStyle;
   currentFocus: number;
-  showFocus: boolean;
+  isConversationListFocus: boolean;
   handleFocus: (index: number) => void;
   handleArrowKeyDown: (e: React.KeyboardEvent) => void;
 }> = ({
@@ -60,7 +60,7 @@ export const ConversationsList: React.FC<{
   conversationRepository,
   callState,
   currentFocus,
-  showFocus,
+  isConversationListFocus,
   handleFocus,
   handleArrowKeyDown,
 }) => {
@@ -95,8 +95,8 @@ export const ConversationsList: React.FC<{
           return (
             <ConversationListCell
               key={conversation.id}
-              focus={currentFocus === index}
-              showFocus={showFocus}
+              focusConversation={currentFocus === index}
+              isConversationListFocus={isConversationListFocus}
               handleFocus={handleFocus}
               handleArrowKeyDown={handleArrowKeyDown}
               index={index}

@@ -64,8 +64,8 @@ const GroupedConversationsFolder: React.FC<GroupedConversationsFolderProps> = ({
               dataUieName="item-conversation"
               key={conversation.id}
               index={index}
-              focus={currentFocus === index}
-              showFocus
+              focusConversation={currentFocus === index}
+              isConversationListFocus
               handleFocus={setCurrentFocus}
               handleArrowKeyDown={handleKeyDown}
               onClick={makeOnClick(conversation.id, conversation.domain)}

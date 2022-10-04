@@ -71,8 +71,8 @@ const Archive: React.FC<ArchiveProps> = ({
           <ConversationListCell
             key={conversation.id}
             index={index}
-            focus={currentFocus === index}
-            showFocus
+            focusConversation={currentFocus === index}
+            isConversationListFocus
             handleFocus={setCurrentFocus}
             handleArrowKeyDown={handleKeyDown}
             dataUieName="item-conversation-archived"
