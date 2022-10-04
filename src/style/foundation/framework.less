@@ -105,4 +105,20 @@
   &--large-offset {
     top: 64px;
   }
+
+  @media (max-width: @screen-md-min) {
+    &.view-0 {
+      .left-column {
+        display: none;
+      }
+    }
+  }
+
+  @media (max-width: calc(@screen-sm-min*2)) {
+    &.view-1 {
+      .center-column {
+        display: none;
+      }
+    }
+  }
 }

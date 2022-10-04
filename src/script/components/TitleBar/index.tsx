@@ -181,7 +181,10 @@ const TitleBar: React.FC<TitleBarProps> = ({
   }, [isActivatedAccount, showAddParticipant, showDetails]);
 
   useEffect(() => {
-    document.querySelector('#wire-main')?.classList.add(`view-${responsiveView}`);
+    document.querySelector('#app')?.classList.add(`view-${responsiveView}`);
+    return () => {
+      document.querySelector('#app')?.classList.remove(`view-${responsiveView}`);
+    };
   }, [responsiveView]);
 
   const onClickCollectionButton = () => {
@@ -198,7 +201,7 @@ const TitleBar: React.FC<TitleBarProps> = ({
     <StyledApp themeId={THEME_ID.DEFAULT}>
       <ul id="conversation-title-bar" className="conversation-title-bar">
         <li className="conversation-title-bar-library">
-          {isScaledDown && (
+          {isScaledDown && responsiveView !== 1 && (
             <IconButton
               variant={IconButtonVariant.SECONDARY}
               className="conversation-title-bar-icon icon-back"

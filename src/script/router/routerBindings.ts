@@ -22,6 +22,7 @@ import React from 'react';
 
 import type {Router} from './Router';
 import {KEY} from 'Util/KeyboardUtil';
+import {useResponsiveViewState} from '../page/ResponsiveViewState';
 
 let router: Router;
 
@@ -43,6 +44,7 @@ export function initRouterBindings(routerInstance: Router): void {
 export const createNavigate =
   (link: string): React.MouseEventHandler =>
   (event: React.MouseEvent<Element, MouseEvent>) => {
+    useResponsiveViewState.setState({currentView: 0});
     router?.navigate(link);
     event.preventDefault();
   };
