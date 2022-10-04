@@ -17,10 +17,10 @@
  *
  */
 
-import {WebAppEvents} from '@wireapp/webapp-events';
-import {amplify} from 'amplify';
 import cx from 'classnames';
 import {FC, useCallback, useEffect, useMemo, useState} from 'react';
+
+import PrimaryModal from 'Components/Modals/PrimaryModal';
 
 import BaseToggle from 'Components/toggle/BaseToggle';
 import CopyToClipboard from 'Components/CopyToClipboard';
@@ -36,7 +36,6 @@ import {teamPermissionsForAccessState} from '../../../../../conversation/Convers
 import {ConversationRepository} from '../../../../../conversation/ConversationRepository';
 import {Conversation} from '../../../../../entity/Conversation';
 import {TeamRepository} from '../../../../../team/TeamRepository';
-import {ModalsViewModel} from '../../../../../view_model/ModalsViewModel';
 
 const COPY_LINK_CONFIRM_DURATION = 1500;
 
@@ -106,7 +105,7 @@ const GuestOptions: FC<GuestOptionsProps> = ({
   };
 
   const revokeAccessCode = () => {
-    amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.CONFIRM, {
+    PrimaryModal.show(PrimaryModal.type.CONFIRM, {
       preventClose: true,
       primaryAction: {
         action: async (): Promise<void> => {

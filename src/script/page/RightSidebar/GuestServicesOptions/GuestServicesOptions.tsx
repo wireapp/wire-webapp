@@ -17,9 +17,9 @@
  *
  */
 
-import {WebAppEvents} from '@wireapp/webapp-events';
-import {amplify} from 'amplify';
 import {FC, useState} from 'react';
+
+import PrimaryModal from 'Components/Modals/PrimaryModal';
 
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
@@ -35,7 +35,6 @@ import {Conversation} from '../../../entity/Conversation';
 import {TeamRepository} from '../../../team/TeamRepository';
 import {TeamState} from '../../../team/TeamState';
 import {initFadingScrollbar} from '../../../ui/fadingScrollbar';
-import {ModalsViewModel} from '../../../view_model/ModalsViewModel';
 
 interface GuestServicesOptionsProps {
   activeConversation: Conversation;
@@ -86,7 +85,7 @@ const GuestServicesOptions: FC<GuestServicesOptionsProps> = ({
         return changeAccessState();
       }
 
-      amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.CONFIRM, {
+      PrimaryModal.show(PrimaryModal.type.CONFIRM, {
         preventClose: true,
         primaryAction: {
           action: changeAccessState,
