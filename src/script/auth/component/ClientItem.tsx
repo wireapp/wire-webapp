@@ -75,7 +75,6 @@ const ClientItem = ({selected, onClientRemoval, onClick, client, clientError, re
     } else {
       setAnimationStep(0);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selected]);
 
   const formatId = (id = '?') => splitFingerprint(id).join(' ');

@@ -86,7 +86,6 @@ const CameraPreferences: React.FC<CameraPreferencesProps> = ({
 
   useEffect(() => {
     requestStream();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentDeviceId]);
 
   useEffect(() => {

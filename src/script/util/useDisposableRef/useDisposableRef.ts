@@ -30,7 +30,6 @@ export function useDisposableRef(init: (element: HTMLElement) => () => void, dep
 
   useLayoutEffect(() => {
     return elementRef.current ? init(elementRef.current) : () => {};
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, dependencies);
 
   return (element: HTMLElement | null) => {

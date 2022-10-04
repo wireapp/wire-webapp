@@ -60,10 +60,8 @@ const AudioSeekBar: React.FC<AudioSeekBarProps> = ({asset, audioElement, disable
       audioElement?.removeEventListener('ended', onAudioEnded);
       audioElement?.removeEventListener('timeupdate', onTimeUpdate);
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [audioElement]);
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => updateSvgWidth(), [svgNode.current]);
 
   useEffect(() => {
@@ -83,7 +81,6 @@ const AudioSeekBar: React.FC<AudioSeekBarProps> = ({asset, audioElement, disable
       })
       .join('');
     setPath(newPath);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [svgWidth]);
 
   const updateSvgWidth = () => setSvgWidth(svgNode.current?.clientWidth ?? 0);

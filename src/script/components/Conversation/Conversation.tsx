@@ -100,7 +100,6 @@ const ConversationList: FC<ConversationListProps> = ({initialMessage, teamState,
 
       setReadMessagesBuffer([]);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [readMessagesBuffer.length]);
 
   if (!contentViewModel) {

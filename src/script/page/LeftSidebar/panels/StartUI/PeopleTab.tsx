@@ -147,7 +147,6 @@ export const PeopleTab: React.FC<{
     if (!isTeam) {
       getTopPeople().then(setTopPeople);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useDebounce(
@@ -221,7 +220,6 @@ export const PeopleTab: React.FC<{
       currentSearchQuery.current = '';
       onSearchResults(undefined);
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchQuery]);
 
   return (

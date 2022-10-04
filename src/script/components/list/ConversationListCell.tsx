@@ -89,7 +89,6 @@ const ConversationListCell: React.FC<ConversationListCellProps> = ({
     rightClick(conversation, event.nativeEvent);
   };
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   const cellState = useMemo(() => generateCellState(conversation), [unreadState, mutedState, isRequest]);
 
   const onClickJoinCall = (event: React.MouseEvent) => {

@@ -72,7 +72,6 @@ const TeamName = ({
 
   useEffect(() => {
     enterTeamCreationFlow();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const resetErrors = () => {

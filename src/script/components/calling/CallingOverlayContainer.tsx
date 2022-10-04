@@ -78,7 +78,6 @@ const CallingContainer: React.FC<CallingContainerProps> = ({
     if (currentCallState === undefined) {
       multitasking.isMinimized(true);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentCallState]);
 
   const videoGrid = useVideoGrid(joinedCall!);

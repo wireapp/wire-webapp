@@ -124,12 +124,10 @@ const GroupCreationModal: React.FC<GroupCreationModalProps> = ({
     };
 
     amplify.subscribe(WebAppEvents.CONVERSATION.CREATE_GROUP, showCreateGroup);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
     setSelectedProtocol(protocolOptions.find(protocol => protocol.value === selectedProtocol.value)!);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [defaultProtocol]);
 
   const onEscape = () => setIsShown(false);

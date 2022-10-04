@@ -76,7 +76,6 @@ const DeviceDetails: React.FC<DeviceDetailsProps> = ({
         .getRemoteFingerprint(user.qualifiedId, selectedClient.id)
         .then(remoteFingerprint => setFingerprintRemote(remoteFingerprint));
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedClient]);
 
   const clickToToggleDeviceVerification = () => {

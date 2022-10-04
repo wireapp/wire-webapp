@@ -120,7 +120,6 @@ const Conversations: React.FC<ConversationsProps> = ({
     return () => {
       amplify.unsubscribe(WebAppEvents.CONTENT.EXPAND_FOLDER, openFolder);
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeConversation]);
 
   useEffect(() => {
@@ -129,7 +128,6 @@ const Conversations: React.FC<ConversationsProps> = ({
     return () => {
       conversationLabelRepository.removeEventListener('conversation-favorited', openFavorites);
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
@@ -137,7 +135,6 @@ const Conversations: React.FC<ConversationsProps> = ({
       PROPERTIES_TYPE.INTERFACE.VIEW_FOLDERS,
       viewStyle === ConverationViewStyle.FOLDER,
     );
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [viewStyle]);
 
   const header = (

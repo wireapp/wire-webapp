@@ -75,7 +75,6 @@ const Image: React.FC<ImageProps> = ({
         window.URL.revokeObjectURL(assetSrc);
       }
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isInViewport]);
 
   const style = aspectRatio ? {aspectRatio: aspectRatio.toString(), width: '100%'} : undefined;

@@ -98,7 +98,6 @@ const Message: React.FC<
     } else if (markerType === MessageMarkerType.UNREAD) {
       scrollTo?.({element: messageElementRef.current}, true);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isMarked, messageElementRef]);
 
   const getTimestampClass = (): string => {

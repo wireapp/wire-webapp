@@ -97,7 +97,6 @@ const MentionSuggestionList: React.FunctionComponent<MentionSuggestionListProps>
     return () => {
       targetInput?.removeEventListener('keydown', onInput);
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isVisible, suggestions, selectedSuggestionIndex]);
 
   return isVisible ? (

@@ -104,7 +104,6 @@ const Quote: FC<QuoteProps> = ({
           throw error;
         });
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [quote, error]);
 
   return !quotedMessage && !error ? (
