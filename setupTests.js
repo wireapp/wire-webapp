@@ -18,7 +18,7 @@
  */
 
 // Polyfill for "tsyringe" dependency injection
-require('core-js/es7/reflect');
+require('core-js/full/reflect');
 require('intersection-observer');
 require('fake-indexeddb/auto');
 

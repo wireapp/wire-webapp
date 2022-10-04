@@ -130,7 +130,7 @@ export class EventMapper {
    * @returns the updated message entity
    */
   async updateMessageEvent(originalEntity: ContentMessage, event: EventRecord): Promise<ContentMessage> {
-    const {id, data: eventData, edited_time: editedTime} = event;
+    const {id, data: eventData, edited_time: editedTime, conversation, qualified_conversation} = event;
 
     if (eventData.quote) {
       const {message_id: messageId, user_id: userId, error} = eventData.quote;
@@ -154,14 +154,18 @@ export class EventMapper {
         }
       }
 
-      const {preview_id, preview_key, preview_domain, preview_otr_key, preview_sha256, preview_token} =
-        eventData as AssetData;
+      const {
+        preview_id,
+        preview_key,
+        preview_domain = qualified_conversation?.domain,
+        preview_otr_key,
+        preview_sha256,
+        preview_token,
+      } = eventData as AssetData;
       if (preview_otr_key) {
-        const remoteDataPreview = preview_domain
-          ? AssetRemoteData.v4(preview_key, preview_domain, preview_otr_key, preview_sha256, preview_token, true)
-          : preview_key
-          ? AssetRemoteData.v3(preview_key, preview_otr_key, preview_sha256, preview_token, true)
-          : AssetRemoteData.v2(event.conversation, preview_id, preview_otr_key, preview_sha256, true);
+        const remoteDataPreview = preview_key
+          ? AssetRemoteData.v3(preview_key, preview_domain, preview_otr_key, preview_sha256, preview_token, true)
+          : AssetRemoteData.v2(conversation, preview_id, preview_otr_key, preview_sha256, true);
         (asset as FileAsset).preview_resource(remoteDataPreview);
       }
     }
@@ -708,7 +712,7 @@ export class EventMapper {
    * @returns FileAsset entity
    */
   private _mapAssetFile(event: EventRecord) {
-    const {conversation: conversationId, data: eventData} = event;
+    const {conversation: conversationId, qualified_conversation, data: eventData} = event;
     const {content_length, content_type, id, info, meta, status} = eventData;
 
     const assetEntity = new FileAsset(id);
@@ -728,23 +732,26 @@ export class EventMapper {
     }
 
     // Remote data - full
-    const {key, otr_key, sha256, token, domain} = eventData as AssetData;
-    const remoteData = domain
-      ? AssetRemoteData.v4(key, domain, otr_key, sha256, token)
-      : key
-      ? AssetRemoteData.v3(key, otr_key, sha256, token)
+    const {key, otr_key, sha256, token, domain = qualified_conversation?.domain} = eventData as AssetData;
+    const remoteData = key
+      ? AssetRemoteData.v3(key, domain, otr_key, sha256, token)
       : AssetRemoteData.v2(conversationId, id, otr_key, sha256);
     assetEntity.original_resource(remoteData);
 
     // Remote data - preview
-    const {preview_id, preview_key, preview_domain, preview_otr_key, preview_sha256, preview_token} =
-      eventData as AssetData;
+    const {
+      preview_id,
+      preview_key,
+      preview_domain = qualified_conversation?.domain,
+      preview_otr_key,
+      preview_sha256,
+      preview_token,
+    } = eventData as AssetData;
     if (preview_otr_key) {
-      const remoteDataPreview = preview_domain
-        ? AssetRemoteData.v4(preview_key, preview_domain, preview_otr_key, preview_sha256, preview_token, true)
-        : key
-        ? AssetRemoteData.v3(preview_key, preview_otr_key, preview_sha256, preview_token, true)
-        : AssetRemoteData.v2(conversationId, preview_id, preview_otr_key, preview_sha256, true);
+      const remoteDataPreview =
+        key && preview_key
+          ? AssetRemoteData.v3(preview_key, preview_domain, preview_otr_key, preview_sha256, preview_token, true)
+          : AssetRemoteData.v2(conversationId, preview_id, preview_otr_key, preview_sha256, true);
       assetEntity.preview_resource(remoteDataPreview);
     }
 
@@ -760,7 +767,7 @@ export class EventMapper {
    * @returns Medium image asset entity
    */
   private _mapAssetImage(event: EventRecord<AssetData>) {
-    const {data: eventData, conversation: conversationId} = event;
+    const {data: eventData, conversation: conversationId, qualified_conversation} = event;
     const {content_length, content_type, id: assetId, info} = eventData;
     const assetEntity = new MediumImage(assetId);
 
@@ -772,16 +779,14 @@ export class EventMapper {
       assetEntity.height = `${info.height}px`;
     }
 
-    const {key, otr_key, sha256, token, domain} = eventData;
+    const {key, otr_key, sha256, token, domain = qualified_conversation?.domain} = eventData;
 
     if (!otr_key || !sha256) {
       return assetEntity;
     }
 
-    const remoteData = domain
-      ? AssetRemoteData.v4(key, domain, otr_key, sha256, token, true)
-      : key
-      ? AssetRemoteData.v3(key, otr_key, sha256, token, true)
+    const remoteData = key
+      ? AssetRemoteData.v3(key, domain, otr_key, sha256, token, true)
       : AssetRemoteData.v2(conversationId, assetId, otr_key, sha256, true);
 
     assetEntity.resource(remoteData);
@@ -814,9 +819,7 @@ export class EventMapper {
           otrKey = new Uint8Array(otrKey);
           sha256 = new Uint8Array(sha256);
 
-          const remoteData = assetDomain
-            ? AssetRemoteData.v4(assetKey, assetDomain, otrKey, sha256, assetToken, true)
-            : AssetRemoteData.v3(assetKey, otrKey, sha256, assetToken, true);
+          const remoteData = AssetRemoteData.v3(assetKey, assetDomain, otrKey, sha256, assetToken, true);
           linkPreviewData.image = remoteData;
         }
       }

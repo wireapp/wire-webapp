@@ -17,6 +17,7 @@
  *
  */
 
+import {render} from '@testing-library/react';
 import {RecursivePartial} from '@wireapp/commons/src/main/util/TypeUtil';
 import {StyledApp, THEME_ID} from '@wireapp/react-ui-kit';
 import {mount} from 'enzyme';
@@ -43,8 +44,23 @@ export const withRouter = (component: React.ReactNode, history: History) => (
   <Router history={history}>{component}</Router>
 );
 
+const wrapComponent = (
+  component: React.ReactNode,
+  store: MockStoreEnhanced<RecursivePartial<RootState>, ThunkDispatch<RootState, Api, AnyAction>>,
+  history: History = createMemoryHistory(),
+) => withRouter(withTheme(withStore(withIntl(component), store)), history);
+
+/**
+ * @deprecated use mountComponentReact18 instead to avoid "Warning: ReactDOM.render is no longer supported in React 18."
+ */
 export const mountComponent = (
   component: React.ReactNode,
   store: MockStoreEnhanced<RecursivePartial<RootState>, ThunkDispatch<RootState, Api, AnyAction>>,
   history: History = createMemoryHistory(),
-) => mount(withRouter(withTheme(withStore(withIntl(component), store)), history));
+) => mount(wrapComponent(component, store, history));
+
+export const mountComponentReact18 = (
+  component: React.ReactNode,
+  store: MockStoreEnhanced<RecursivePartial<RootState>, ThunkDispatch<RootState, Api, AnyAction>>,
+  history: History = createMemoryHistory(),
+) => render(wrapComponent(component, store, history));

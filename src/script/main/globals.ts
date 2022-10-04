@@ -41,6 +41,7 @@ import 'Components/Giphy';
 import 'Components/Modals/GroupCreation/GroupCreationModal';
 import 'Components/modal';
 import 'Components/panel/ServiceDetails';
+import 'Components/panel/ConversationProtocolDetails/ConversationProtocolDetails';
 import 'Components/panel/UserDetails';
 import 'Components/ServiceList';
 import 'Components/SearchInput';

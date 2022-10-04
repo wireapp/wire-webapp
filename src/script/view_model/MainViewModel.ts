@@ -24,7 +24,6 @@ import {container} from 'tsyringe';
 import {getLogger, Logger} from 'Util/Logger';
 
 import {WindowTitleViewModel} from './WindowTitleViewModel';
-import {modals, ModalsViewModel} from './ModalsViewModel';
 import {ContentViewModel} from './ContentViewModel';
 import {CallingViewModel} from './CallingViewModel';
 import {ActionsViewModel} from './ActionsViewModel';
@@ -53,7 +52,6 @@ import type {StorageRepository} from '../storage';
 import type {TeamRepository} from '../team/TeamRepository';
 import type {User} from '../entity/User';
 import type {UserRepository} from '../user/UserRepository';
-import type {AuthRepository} from '../auth/AuthRepository';
 import type {EventTrackingRepository} from '../tracking/EventTrackingRepository';
 import type {MessageRepository} from '../conversation/MessageRepository';
 import {UserState} from '../user/UserState';
@@ -63,7 +61,6 @@ import {Message} from '../entity/message/Message';
 export interface ViewModelRepositories {
   asset: AssetRepository;
   audio: AudioRepository;
-  auth: AuthRepository;
   backup: BackupRepository;
   calling: CallingRepository;
   client: ClientRepository;
@@ -96,7 +93,6 @@ export class MainViewModel {
   list: ListViewModel;
   logger: Logger;
   mainClasses: ko.PureComputed<string | undefined>;
-  modals: ModalsViewModel;
   multitasking: Multitasking;
   selfUser: ko.Observable<User>;
   title: WindowTitleViewModel;
@@ -122,8 +118,6 @@ export class MainViewModel {
 
     this.userState = container.resolve(UserState);
     this.isFederated = container.resolve(Core).backendFeatures.isFederated;
-
-    this.modals = modals;
 
     this.multitasking = {
       isMinimized: ko.observable(true),

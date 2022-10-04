@@ -38,7 +38,7 @@ import {registerReactComponent, useKoSubscribableChildren} from 'Util/ComponentU
 import ModalComponent from 'Components/ModalComponent';
 import SearchInput from 'Components/SearchInput';
 import UserSearchableList from 'Components/UserSearchableList';
-import TextInputForwarded from 'Components/TextInput/TextInput';
+import TextInput from 'Components/TextInput/TextInput';
 import BaseToggle from 'Components/toggle/BaseToggle';
 import InfoToggle from 'Components/toggle/InfoToggle';
 import {User} from '../../../entity/User';
@@ -78,12 +78,30 @@ const GroupCreationModal: React.FC<GroupCreationModalProps> = ({
   userState = container.resolve(UserState),
   teamState = container.resolve(TeamState),
 }) => {
+  const {
+    isTeam,
+    isMLSEnabled: isMLSEnabledForTeam,
+    isProtocolToggleEnabledForUser,
+  } = useKoSubscribableChildren(teamState, ['isTeam', 'isMLSEnabled', 'isProtocolToggleEnabledForUser']);
+
+  const isMLSFeatureEnabled = Config.getConfig().FEATURE.ENABLE_MLS;
+
+  const enableMLSToggle = isMLSFeatureEnabled && isMLSEnabledForTeam && isProtocolToggleEnabledForUser;
+
+  //if feature flag is set to false or mls is disabled for current team use proteus as default
+  const defaultProtocol =
+    isMLSFeatureEnabled && isMLSEnabledForTeam
+      ? teamState.teamFeatures().mls?.config.defaultProtocol
+      : ConversationProtocol.PROTEUS;
+
   const protocolOptions: ProtocolOption[] = [ConversationProtocol.PROTEUS, ConversationProtocol.MLS].map(protocol => ({
-    label: t(`modalCreateGroupProtocolSelect.${protocol}`),
+    label: `${t(`modalCreateGroupProtocolSelect.${protocol}`)}${
+      protocol === defaultProtocol ? t(`modalCreateGroupProtocolSelect.default`) : ''
+    }`,
     value: protocol,
   }));
 
-  const initialProtocol = protocolOptions.find(protocol => protocol.value === ConversationProtocol.PROTEUS)!;
+  const initialProtocol = protocolOptions.find(protocol => protocol.value === defaultProtocol)!;
 
   const [isShown, setIsShown] = useState<boolean>(false);
   const [selectedContacts, setSelectedContacts] = useState<User[]>([]);
@@ -103,8 +121,6 @@ const GroupCreationModal: React.FC<GroupCreationModalProps> = ({
   const maxSize = ConversationRepository.CONFIG.GROUP.MAX_SIZE;
 
   const onEscape = () => setIsShown(false);
-  const {isTeam, isMLSEnabled: isMLSEnabledForTeam} = useKoSubscribableChildren(teamState, ['isTeam', 'isMLSEnabled']);
-  const enableMlsCheckbox = isMLSEnabledForTeam || Config.getConfig().FEATURE.ENABLE_MLS;
 
   useEffect(() => {
     const showCreateGroup = (_: string, userEntity: User) => {
@@ -119,6 +135,10 @@ const GroupCreationModal: React.FC<GroupCreationModalProps> = ({
 
     amplify.subscribe(WebAppEvents.CONVERSATION.CREATE_GROUP, showCreateGroup);
   }, []);
+
+  useEffect(() => {
+    setSelectedProtocol(protocolOptions.find(protocol => protocol.value === selectedProtocol.value)!);
+  }, [defaultProtocol]);
 
   const onClose = () => {
     setIsCreatingConversation(false);
@@ -168,7 +188,7 @@ const GroupCreationModal: React.FC<GroupCreationModalProps> = ({
           groupName,
           isTeam ? accessState : undefined,
           {
-            protocol: selectedProtocol.value,
+            protocol: enableMLSToggle ? selectedProtocol.value : defaultProtocol,
             receipt_mode: enableReadReceipts ? RECEIPT_MODE.ON : RECEIPT_MODE.OFF,
           },
         );
@@ -346,7 +366,7 @@ const GroupCreationModal: React.FC<GroupCreationModalProps> = ({
           {stateIsPreferences && (
             <>
               <div className="modal-input-wrapper">
-                <TextInputForwarded
+                <TextInput
                   autoFocus
                   label={t('groupCreationPreferencesPlaceholder')}
                   placeholder={t('groupCreationPreferencesPlaceholder')}
@@ -407,7 +427,7 @@ const GroupCreationModal: React.FC<GroupCreationModalProps> = ({
                     isDisabled={false}
                     name={t('readReceiptsToggleName')}
                   />
-                  {enableMlsCheckbox && (
+                  {enableMLSToggle && (
                     <>
                       <Select
                         id="select-protocol"

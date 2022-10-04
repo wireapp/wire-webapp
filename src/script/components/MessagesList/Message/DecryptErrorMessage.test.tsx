@@ -18,24 +18,10 @@
  */
 
 import ko from 'knockout';
-import TestPage from 'Util/test/TestPage';
 import {DecryptErrorMessage as DecryptErrorMessageEntity} from 'src/script/entity/message/DecryptErrorMessage';
-import DecryptErrorMessage, {DecryptErrorMessageProps} from './DecryptErrorMessage';
+import DecryptErrorMessage from './DecryptErrorMessage';
 import {act} from 'react-dom/test-utils';
-
-class DecryptErrorMessagePage extends TestPage<DecryptErrorMessageProps> {
-  constructor(props?: DecryptErrorMessageProps) {
-    super(DecryptErrorMessage, props);
-  }
-
-  getDecryptErrorMessage = () => this.get('[data-uie-name="element-message-decrypt-error"]');
-  getDecryptErrorLink = () => this.get('[data-uie-name="go-decrypt-error-link"]');
-  getDecryptErrorLabel = () => this.get('[data-uie-name="status-decrypt-error"]');
-  getResetEncryptionSessionLink = () => this.get('[data-uie-name="do-reset-encryption-session"]');
-  getResetEncryptionSessionLoadingSpinner = () => this.get('[data-uie-name="status-loading"]');
-
-  clickResetEncryptionSessionLink = () => this.click(this.getResetEncryptionSessionLink());
-}
+import {render, fireEvent} from '@testing-library/react';
 
 const createDecryptErrorMessage = (partialDecryptErrorMessage: Partial<DecryptErrorMessageEntity>) => {
   const decryptErrorMessage: Partial<DecryptErrorMessageEntity> = {
@@ -51,50 +37,66 @@ const createDecryptErrorMessage = (partialDecryptErrorMessage: Partial<DecryptEr
 describe('DecryptErrorMessage', () => {
   it('shows "reset session" action when error is recoverable', async () => {
     const isRecoverable = ko.observable(false);
-    const decryptErrorMessagePage = new DecryptErrorMessagePage({
+    const props = {
       message: createDecryptErrorMessage({
         is_recoverable: ko.pureComputed(() => isRecoverable()),
       }),
       onClickResetSession: jest.fn(),
-    });
+    };
 
-    expect(decryptErrorMessagePage.getDecryptErrorMessage()).not.toBeNull();
-    expect(decryptErrorMessagePage.getResetEncryptionSessionLink()).toBeNull();
+    const {queryByTestId, rerender} = render(<DecryptErrorMessage {...props} />);
+
+    expect(queryByTestId('do-reset-encryption-session')).toBeNull();
+
+    const decryptErrorMessage = queryByTestId('element-message-decrypt-error');
+    expect(decryptErrorMessage).not.toBeNull();
+
     act(() => {
       isRecoverable(true);
     });
-    decryptErrorMessagePage.update();
+    rerender(<DecryptErrorMessage {...props} />);
 
-    expect(decryptErrorMessagePage.getResetEncryptionSessionLink()).not.toBeNull();
+    expect(decryptErrorMessage).not.toBeNull();
   });
 
   it('shows loading spinner during session reset', async () => {
     const isResetting = ko.observable(false);
-    const decryptErrorMessagePage = new DecryptErrorMessagePage({
+
+    const props = {
       message: createDecryptErrorMessage({
         is_recoverable: ko.pureComputed(() => true),
         is_resetting_session: isResetting,
       }),
-      onClickResetSession: () => {
+      onClickResetSession: jest.fn(() => {
         isResetting(true);
-      },
+      }),
+    };
+
+    const {getByTestId, queryByTestId, rerender} = render(<DecryptErrorMessage {...props} />);
+
+    const decryptErrorMessage = queryByTestId('element-message-decrypt-error');
+    expect(decryptErrorMessage).not.toBeNull();
+
+    const resetEncryptionSessionLoadingSpinner = queryByTestId('status-loading');
+    expect(resetEncryptionSessionLoadingSpinner).toBeNull();
+
+    const resetEncryptionSessionLink = getByTestId('do-reset-encryption-session');
+
+    act(() => {
+      fireEvent.click(resetEncryptionSessionLink);
     });
 
-    expect(decryptErrorMessagePage.getDecryptErrorMessage()).not.toBeNull();
-    expect(decryptErrorMessagePage.getResetEncryptionSessionLoadingSpinner()).toBeNull();
-    expect(decryptErrorMessagePage.getResetEncryptionSessionLink()).not.toBeNull();
+    expect(props.onClickResetSession).toHaveBeenCalled();
 
-    decryptErrorMessagePage.clickResetEncryptionSessionLink();
-
-    expect(decryptErrorMessagePage.getResetEncryptionSessionLink()).toBeNull();
-    expect(decryptErrorMessagePage.getResetEncryptionSessionLoadingSpinner()).not.toBeNull();
+    expect(queryByTestId('do-reset-encryption-session')).toBeNull();
+    expect(queryByTestId('status-loading')).not.toBeNull();
 
     act(() => {
       isResetting(false);
     });
-    decryptErrorMessagePage.update();
+    rerender(<DecryptErrorMessage {...props} />);
 
-    expect(decryptErrorMessagePage.getResetEncryptionSessionLink()).not.toBeNull();
-    expect(decryptErrorMessagePage.getResetEncryptionSessionLoadingSpinner()).toBeNull();
+    expect(resetEncryptionSessionLink).not.toBeNull();
+    expect(resetEncryptionSessionLoadingSpinner).toBeNull();
   });
 });

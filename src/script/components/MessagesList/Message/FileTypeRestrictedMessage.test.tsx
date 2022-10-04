@@ -17,22 +17,9 @@
  *
  */
 
-import TestPage from 'Util/test/TestPage';
 import {FileTypeRestrictedMessage as FileTypeRestrictedMessageEntity} from 'src/script/entity/message/FileTypeRestrictedMessage';
-import FileTypeRestrictedMessage, {FileTypeRestrictedMessageProps} from './FileTypeRestrictedMessage';
-
-class FileTypeRestrictedMessagePage extends TestPage<FileTypeRestrictedMessageProps> {
-  constructor(props?: FileTypeRestrictedMessageProps) {
-    super(FileTypeRestrictedMessage, props);
-  }
-
-  getFileTypeRestrictedMessageText = (isIncoming?: boolean) =>
-    this.get(
-      `[data-uie-name="filetype-restricted-message-text"]${
-        isIncoming ? '[data-uie-value="incoming"]' : '[data-uie-value="outgoing"]'
-      }`,
-    );
-}
+import FileTypeRestrictedMessage from './FileTypeRestrictedMessage';
+import {render} from '@testing-library/react';
 
 const createFileTypeRestrictedMessage = (
   partialFileTypeRestrictedMessage: Partial<FileTypeRestrictedMessageEntity>,
@@ -48,22 +35,26 @@ const createFileTypeRestrictedMessage = (
 
 describe('FileTypeRestrictedMessage', () => {
   it('shows incoming message', async () => {
-    const fileTypeRestrictedMessagePage = new FileTypeRestrictedMessagePage({
-      message: createFileTypeRestrictedMessage({
-        isIncoming: true,
-      }),
+    const message = createFileTypeRestrictedMessage({
+      isIncoming: true,
     });
 
-    expect(fileTypeRestrictedMessagePage.getFileTypeRestrictedMessageText(true)).not.toBeNull();
+    const {getByTestId} = render(<FileTypeRestrictedMessage message={message} />);
+
+    const filetypeRestrictedMessageText = getByTestId('filetype-restricted-message-text');
+
+    expect(filetypeRestrictedMessageText.getAttribute('data-uie-value')).toEqual('incoming');
   });
 
   it('shows outgoing message', async () => {
-    const fileTypeRestrictedMessagePage = new FileTypeRestrictedMessagePage({
-      message: createFileTypeRestrictedMessage({
-        isIncoming: false,
-      }),
+    const message = createFileTypeRestrictedMessage({
+      isIncoming: false,
     });
 
-    expect(fileTypeRestrictedMessagePage.getFileTypeRestrictedMessageText(false)).not.toBeNull();
+    const {getByTestId} = render(<FileTypeRestrictedMessage message={message} />);
+
+    const filetypeRestrictedMessageText = getByTestId('filetype-restricted-message-text');
+
+    expect(filetypeRestrictedMessageText.getAttribute('data-uie-value')).toEqual('outgoing');
   });
 });

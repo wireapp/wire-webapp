@@ -22,8 +22,6 @@ import {Config} from './Config';
 
 const env = window.wire.env;
 
-export const UNSPLASH_URL = 'https://source.unsplash.com/1200x1200/?landscape';
-
 export const URL = {
   ACCOUNT: env.URL?.ACCOUNT_BASE,
   PRIVACY_POLICY: env.URL?.PRIVACY_POLICY,

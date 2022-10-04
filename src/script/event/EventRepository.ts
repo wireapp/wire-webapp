@@ -47,8 +47,7 @@ import type {NotificationService} from './NotificationService';
 import {UserState} from '../user/UserState';
 import {AssetData, CryptographyMapper} from '../cryptography/CryptographyMapper';
 import Warnings from '../view_model/WarningsContainer';
-import {Account, ProcessedEventPayload} from '@wireapp/core';
-import {WEBSOCKET_STATE} from '@wireapp/api-client/src/tcp/ReconnectingWebsocket';
+import {Account, ConnectionState, ProcessedEventPayload} from '@wireapp/core';
 import {HandledEventPayload} from '@wireapp/core/src/main/notification';
 import {EventBuilder} from '../conversation/EventBuilder';
 import {EventName} from '../tracking/EventName';
@@ -131,21 +130,26 @@ export class EventRepository {
   // WebSocket handling
   //##############################################################################
 
-  private readonly updateConnectivitityStatus = (state: WEBSOCKET_STATE) => {
+  private readonly updateConnectivitityStatus = (state: ConnectionState) => {
     switch (state) {
-      case WEBSOCKET_STATE.CONNECTING: {
+      case ConnectionState.CONNECTING: {
         amplify.publish(WebAppEvents.WARNING.DISMISS, Warnings.TYPE.NO_INTERNET);
         amplify.publish(WebAppEvents.WARNING.SHOW, Warnings.TYPE.CONNECTIVITY_RECONNECT);
         return;
       }
-      case WEBSOCKET_STATE.CLOSING: {
+      case ConnectionState.PROCESSING_NOTIFICATIONS: {
+        this.notificationHandlingState(NOTIFICATION_HANDLING_STATE.STREAM);
+        amplify.publish(WebAppEvents.WARNING.DISMISS, Warnings.TYPE.NO_INTERNET);
+        amplify.publish(WebAppEvents.WARNING.DISMISS, Warnings.TYPE.CONNECTIVITY_RECONNECT);
+        amplify.publish(WebAppEvents.WARNING.SHOW, Warnings.TYPE.CONNECTIVITY_RECOVERY);
         return;
       }
-      case WEBSOCKET_STATE.CLOSED: {
+      case ConnectionState.CLOSED: {
         amplify.publish(WebAppEvents.WARNING.SHOW, Warnings.TYPE.NO_INTERNET);
         return;
       }
-      case WEBSOCKET_STATE.OPEN: {
+      case ConnectionState.LIVE: {
+        this.notificationHandlingState(NOTIFICATION_HANDLING_STATE.WEB_SOCKET);
         amplify.publish(WebAppEvents.CONNECTION.ONLINE);
         amplify.publish(WebAppEvents.WARNING.DISMISS, Warnings.TYPE.NO_INTERNET);
         amplify.publish(WebAppEvents.WARNING.DISMISS, Warnings.TYPE.CONNECTIVITY_RECONNECT);
@@ -179,23 +183,19 @@ export class EventRepository {
   ): Promise<void> {
     await this.handleTimeDrift();
     const connect = () => {
-      this.notificationHandlingState(NOTIFICATION_HANDLING_STATE.STREAM);
       // We make sure there is only be a single active connection to the WebSocket.
       this.disconnectWebSocket?.();
       return new Promise<void>(async resolve => {
         this.disconnectWebSocket = await account.listen({
-          onConnected: () => {
-            this.notificationHandlingState(NOTIFICATION_HANDLING_STATE.WEB_SOCKET);
-            this.updateConnectivitityStatus(WEBSOCKET_STATE.OPEN);
-            resolve();
+          onConnectionStateChanged: connectionState => {
+            this.updateConnectivitityStatus(connectionState);
+            if (connectionState === ConnectionState.LIVE) {
+              resolve();
+            }
           },
-          onConnectionStateChanged: this.updateConnectivitityStatus,
           onEvent: this.handleIncomingEvent,
           onMissedNotifications: this.triggerMissedSystemEventMessageRendering,
-          onNotificationStreamProgress: ({done, total}) => {
-            amplify.publish(WebAppEvents.WARNING.SHOW, Warnings.TYPE.CONNECTIVITY_RECOVERY);
-            onNotificationStreamProgress({done, total});
-          },
+          onNotificationStreamProgress: onNotificationStreamProgress,
         });
       });
     };
