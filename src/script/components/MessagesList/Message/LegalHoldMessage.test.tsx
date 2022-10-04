@@ -17,18 +17,9 @@
  *
  */
 
-import TestPage from 'Util/test/TestPage';
 import {LegalHoldMessage as LegalHoldMessageEntity} from 'src/script/entity/message/LegalHoldMessage';
-import LegalHoldMessage, {LegalHoldMessageProps} from './LegalHoldMessage';
-
-class LegalHoldMessagePage extends TestPage<LegalHoldMessageProps> {
-  constructor(props?: LegalHoldMessageProps) {
-    super(LegalHoldMessage, props);
-  }
-
-  getLegalHoldActivatedMessage = () => this.get('[data-uie-name="status-legalhold-activated"]');
-  getLegalHoldDeactivatedMessage = () => this.get('[data-uie-name="status-legalhold-deactivated"]');
-}
+import LegalHoldMessage from './LegalHoldMessage';
+import {render} from '@testing-library/react';
 
 const createLegalHoldMessage = (partialLegalHoldMessage: Partial<LegalHoldMessageEntity>) => {
   const legalHoldMessage: Partial<LegalHoldMessageEntity> = {
@@ -40,23 +31,21 @@ const createLegalHoldMessage = (partialLegalHoldMessage: Partial<LegalHoldMessag
 
 describe('LegalHoldMessage', () => {
   it('shows legal hold deactivated message', async () => {
-    const legalHoldMessagePage = new LegalHoldMessagePage({
-      message: createLegalHoldMessage({
-        isActivationMessage: false,
-      }),
+    const message = createLegalHoldMessage({
+      isActivationMessage: false,
     });
+    const {queryByTestId} = render(<LegalHoldMessage message={message} />);
 
-    expect(legalHoldMessagePage.getLegalHoldDeactivatedMessage()).not.toBeNull();
-    expect(legalHoldMessagePage.getLegalHoldActivatedMessage()).toBeNull();
+    expect(queryByTestId('status-legalhold-deactivated')).not.toBeNull();
+    expect(queryByTestId('status-legalhold-activated')).toBeNull();
   });
   it('shows legal hold activated message', async () => {
-    const legalHoldMessagePage = new LegalHoldMessagePage({
-      message: createLegalHoldMessage({
-        isActivationMessage: true,
-      }),
+    const message = createLegalHoldMessage({
+      isActivationMessage: true,
     });
+    const {queryByTestId} = render(<LegalHoldMessage message={message} />);
 
-    expect(legalHoldMessagePage.getLegalHoldActivatedMessage()).not.toBeNull();
-    expect(legalHoldMessagePage.getLegalHoldDeactivatedMessage()).toBeNull();
+    expect(queryByTestId('status-legalhold-deactivated')).toBeNull();
+    expect(queryByTestId('status-legalhold-activated')).not.toBeNull();
   });
 });

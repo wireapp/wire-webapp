@@ -18,33 +18,19 @@
  */
 
 import ko from 'knockout';
-import TestPage from 'Util/test/TestPage';
-import VerificationMessage, {VerificationMessageProps} from './VerificationMessage';
+import VerificationMessage from './VerificationMessage';
 import {VerificationMessage as VerificationMessageEntity} from 'src/script/entity/message/VerificationMessage';
 import {VerificationMessageType} from 'src/script/message/VerificationMessageType';
-
-class VerificationMessagePage extends TestPage<VerificationMessageProps> {
-  constructor(props?: VerificationMessageProps) {
-    super(VerificationMessage, props);
-  }
-
-  getVerificationMessage = (verificationMessageType?: VerificationMessageType) =>
-    this.get(
-      `[data-uie-name="element-message-verification"]${
-        verificationMessageType ? `[data-uie-value="${verificationMessageType}"]` : ''
-      }`,
-    );
-  getVerifiedIcon = () => this.get('svg[data-uie-name="user-device-verified"]');
-  getNotVerifiedIcon = () => this.get('svg[data-uie-name="user-device-not-verified"]');
-}
+import {render} from '@testing-library/react';
+import {User} from '../../../entity/User';
+import {QualifiedUserId} from '@wireapp/protocol-messaging';
 
 const createVerificationMessage = (partialVerificationMessage: Partial<VerificationMessageEntity>) => {
   const verificationMessage: Partial<VerificationMessageEntity> = {
     isSelfClient: ko.pureComputed(() => false),
     unsafeSenderName: ko.pureComputed(() => 'senderName'),
-    userEntities: ko.observableArray([]),
-    userIds: ko.observableArray([]),
-    verificationMessageType: ko.observable(undefined),
+    userEntities: ko.observableArray([] as User[]),
+    userIds: ko.observableArray([] as (string | QualifiedUserId)[]),
     ...partialVerificationMessage,
   };
   return verificationMessage as VerificationMessageEntity;
@@ -53,65 +39,72 @@ const createVerificationMessage = (partialVerificationMessage: Partial<Verificat
 describe('VerificationMessage', () => {
   describe('with verified message', () => {
     it('shows verified icon when message is verified', async () => {
-      const verificationMessagePage = new VerificationMessagePage({
-        message: createVerificationMessage({
-          verificationMessageType: ko.observable(VerificationMessageType.VERIFIED),
-        }),
+      const message = createVerificationMessage({
+        verificationMessageType: ko.observable<VerificationMessageType>(VerificationMessageType.VERIFIED),
       });
 
-      expect(verificationMessagePage.getVerificationMessage(VerificationMessageType.VERIFIED)).not.toBeNull();
-      expect(verificationMessagePage.getVerifiedIcon()).not.toBeNull();
+      const {queryByTestId, getByTestId} = render(<VerificationMessage message={message} />);
+
+      const elementMessageVerification = getByTestId('element-message-verification');
+      expect(elementMessageVerification.getAttribute('data-uie-value')).toEqual(VerificationMessageType.VERIFIED);
+      expect(queryByTestId('user-device-verified')).not.toBeNull();
     });
 
     it('shows unverified icon when message is not verified', async () => {
-      const verificationMessagePage = new VerificationMessagePage({
-        message: createVerificationMessage({}),
-      });
+      const message = createVerificationMessage({});
 
-      expect(verificationMessagePage.getVerificationMessage()).not.toBeNull();
-      expect(verificationMessagePage.getNotVerifiedIcon()).not.toBeNull();
+      const {queryByTestId} = render(<VerificationMessage message={message} />);
+
+      expect(queryByTestId('element-message-verification')).not.toBeNull();
+      expect(queryByTestId('user-device-not-verified')).not.toBeNull();
     });
   });
 
   describe('with unverified message', () => {
     it('shows unverified message', async () => {
-      const verificationMessagePage = new VerificationMessagePage({
-        message: createVerificationMessage({
-          verificationMessageType: ko.observable(VerificationMessageType.UNVERIFIED),
-        }),
+      const message = createVerificationMessage({
+        verificationMessageType: ko.observable<VerificationMessageType>(VerificationMessageType.UNVERIFIED),
       });
 
-      expect(verificationMessagePage.getVerificationMessage(VerificationMessageType.UNVERIFIED)).not.toBeNull();
-      expect(verificationMessagePage.getVerifiedIcon()).toBeNull();
-      expect(verificationMessagePage.getNotVerifiedIcon()).not.toBeNull();
+      const {queryByTestId, getByTestId} = render(<VerificationMessage message={message} />);
+
+      const elementMessageVerification = getByTestId('element-message-verification');
+      expect(elementMessageVerification.getAttribute('data-uie-value')).toEqual(VerificationMessageType.UNVERIFIED);
+
+      expect(queryByTestId('user-device-verified')).toBeNull();
+      expect(queryByTestId('user-device-not-verified')).not.toBeNull();
     });
   });
 
   describe('with new device message', () => {
     it('shows new device message', async () => {
-      const verificationMessagePage = new VerificationMessagePage({
-        message: createVerificationMessage({
-          verificationMessageType: ko.observable(VerificationMessageType.NEW_DEVICE),
-        }),
+      const message = createVerificationMessage({
+        verificationMessageType: ko.observable<VerificationMessageType>(VerificationMessageType.NEW_DEVICE),
       });
 
-      expect(verificationMessagePage.getVerificationMessage(VerificationMessageType.NEW_DEVICE)).not.toBeNull();
-      expect(verificationMessagePage.getVerifiedIcon()).toBeNull();
-      expect(verificationMessagePage.getNotVerifiedIcon()).not.toBeNull();
+      const {queryByTestId, getByTestId} = render(<VerificationMessage message={message} />);
+
+      const elementMessageVerification = getByTestId('element-message-verification');
+      expect(elementMessageVerification.getAttribute('data-uie-value')).toEqual(VerificationMessageType.NEW_DEVICE);
+
+      expect(queryByTestId('user-device-verified')).toBeNull();
+      expect(queryByTestId('user-device-not-verified')).not.toBeNull();
     });
   });
 
   describe('with new member message', () => {
     it('shows new member message', async () => {
-      const verificationMessagePage = new VerificationMessagePage({
-        message: createVerificationMessage({
-          verificationMessageType: ko.observable(VerificationMessageType.NEW_MEMBER),
-        }),
+      const message = createVerificationMessage({
+        verificationMessageType: ko.observable<VerificationMessageType>(VerificationMessageType.NEW_MEMBER),
       });
 
-      expect(verificationMessagePage.getVerificationMessage(VerificationMessageType.NEW_MEMBER)).not.toBeNull();
-      expect(verificationMessagePage.getVerifiedIcon()).toBeNull();
-      expect(verificationMessagePage.getNotVerifiedIcon()).not.toBeNull();
+      const {queryByTestId, getByTestId} = render(<VerificationMessage message={message} />);
+
+      const elementMessageVerification = getByTestId('element-message-verification');
+      expect(elementMessageVerification.getAttribute('data-uie-value')).toEqual(VerificationMessageType.NEW_MEMBER);
+
+      expect(queryByTestId('user-device-verified')).toBeNull();
+      expect(queryByTestId('user-device-not-verified')).not.toBeNull();
     });
   });
 });

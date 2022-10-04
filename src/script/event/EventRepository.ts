@@ -138,6 +138,7 @@ export class EventRepository {
         return;
       }
       case ConnectionState.PROCESSING_NOTIFICATIONS: {
+        this.notificationHandlingState(NOTIFICATION_HANDLING_STATE.STREAM);
         amplify.publish(WebAppEvents.WARNING.DISMISS, Warnings.TYPE.NO_INTERNET);
         amplify.publish(WebAppEvents.WARNING.DISMISS, Warnings.TYPE.CONNECTIVITY_RECONNECT);
         amplify.publish(WebAppEvents.WARNING.SHOW, Warnings.TYPE.CONNECTIVITY_RECOVERY);
@@ -148,6 +149,7 @@ export class EventRepository {
         return;
       }
       case ConnectionState.LIVE: {
+        this.notificationHandlingState(NOTIFICATION_HANDLING_STATE.WEB_SOCKET);
         amplify.publish(WebAppEvents.CONNECTION.ONLINE);
         amplify.publish(WebAppEvents.WARNING.DISMISS, Warnings.TYPE.NO_INTERNET);
         amplify.publish(WebAppEvents.WARNING.DISMISS, Warnings.TYPE.CONNECTIVITY_RECONNECT);
@@ -181,7 +183,6 @@ export class EventRepository {
   ): Promise<void> {
     await this.handleTimeDrift();
     const connect = () => {
-      this.notificationHandlingState(NOTIFICATION_HANDLING_STATE.STREAM);
       // We make sure there is only be a single active connection to the WebSocket.
       this.disconnectWebSocket?.();
       return new Promise<void>(async resolve => {

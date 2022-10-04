@@ -269,8 +269,11 @@ export class TeamRepository {
 
       if (imageResource) {
         try {
-          const imageBlob = imageResource ? await this.assetRepository.load(imageResource) : undefined;
-          imageDataUrl = imageBlob ? await loadDataUrl(imageBlob) : undefined;
+          const imageBlob = imageResource && (await this.assetRepository.load(imageResource));
+
+          if (imageBlob) {
+            imageDataUrl = await loadDataUrl(imageBlob);
+          }
         } catch (error) {
           this.logger.warn(`Account image could not be loaded`, error);
         }

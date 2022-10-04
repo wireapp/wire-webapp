@@ -22,7 +22,7 @@ import Page from './Page';
 import EntropyContainer from './EntropyContainer';
 import {actionRoot as ROOT_ACTIONS} from '../module/action';
 import {ROUTE} from '../route';
-import useReactRouter from 'use-react-router';
+import {useNavigate} from 'react-router-dom';
 import {connect} from 'react-redux';
 import {AnyAction, Dispatch} from 'redux';
 import {RootState, bindActionCreators} from '../module/reducer';
@@ -30,12 +30,12 @@ import {RootState, bindActionCreators} from '../module/reducer';
 interface Props extends React.HTMLProps<HTMLDivElement> {}
 
 const SetEntropyPage = ({pushEntropyData}: Props & ConnectedProps & DispatchProps) => {
-  const {history} = useReactRouter();
+  const navigate = useNavigate();
 
   const onSetEntropy = async (entropyData: Uint8Array): Promise<void> => {
     try {
       await pushEntropyData(entropyData);
-      history.push(ROUTE.VERIFY_EMAIL_CODE);
+      navigate(ROUTE.VERIFY_EMAIL_CODE);
     } catch (error) {
       console.warn(error);
     }

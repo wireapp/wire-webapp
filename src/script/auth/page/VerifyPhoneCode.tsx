@@ -23,7 +23,7 @@ import React, {useEffect, useState} from 'react';
 import {useIntl} from 'react-intl';
 import {connect} from 'react-redux';
 import {AnyAction, Dispatch} from 'redux';
-import useReactRouter from 'use-react-router';
+import {useNavigate} from 'react-router-dom';
 import {phoneLoginStrings} from '../../strings';
 import {actionRoot} from '../module/action';
 import {BackendError} from '../module/action/BackendError';
@@ -47,11 +47,11 @@ const VerifyPhoneCode = ({
 }: Props & ConnectedProps & DispatchProps) => {
   const {formatMessage: _} = useIntl();
   const [error, setError] = useState<ValidationError | null>(null);
-  const {history} = useReactRouter();
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (!loginData.phone) {
-      history.push(ROUTE.LOGIN_PHONE);
+      navigate(ROUTE.LOGIN_PHONE);
     }
   }, []);
 
@@ -64,7 +64,7 @@ const VerifyPhoneCode = ({
       } else if (error.hasOwnProperty('label')) {
         switch (error.label) {
           case BackendError.LABEL.PASSWORD_EXISTS: {
-            return history.push(ROUTE.CHECK_PASSWORD);
+            return navigate(ROUTE.CHECK_PASSWORD);
           }
           default: {
             setError(error);
@@ -81,7 +81,7 @@ const VerifyPhoneCode = ({
     try {
       const login: LoginData = {clientType: loginData.clientType, code, phone: loginData.phone};
       await doLogin(login);
-      return history.push(ROUTE.HISTORY_INFO);
+      return navigate(ROUTE.HISTORY_INFO);
     } catch (error) {
       if (error instanceof ValidationError) {
         setError(error);
@@ -91,7 +91,7 @@ const VerifyPhoneCode = ({
       switch (error.label) {
         case BackendError.LABEL.TOO_MANY_CLIENTS: {
           resetAuthError();
-          return history.push(ROUTE.CLIENTS);
+          return navigate(ROUTE.CLIENTS);
         }
         case BackendError.LABEL.INVALID_CREDENTIALS:
         case LabeledError.GENERAL_ERRORS.LOW_DISK_SPACE:
