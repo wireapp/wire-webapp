@@ -53,9 +53,6 @@ const GroupedConversationsFolder: React.FC<GroupedConversationsFolderProps> = ({
   const makeOnClick = (conversationId: string, domain: string | null) =>
     createNavigate(generateConversationUrl(conversationId, domain));
   const {currentFocus, handleKeyDown, setCurrentFocus} = useRoveFocus(conversations.length);
-  const handleFocus = (focus: number) => {
-    setCurrentFocus(focus);
-  };
 
   return (
     <li className="conversation-folder" data-uie-name="conversation-folder" data-uie-value={folder.name}>
@@ -69,7 +66,7 @@ const GroupedConversationsFolder: React.FC<GroupedConversationsFolderProps> = ({
               index={index}
               focus={currentFocus === index}
               showFocus
-              handleFocus={handleFocus}
+              handleFocus={setCurrentFocus}
               handleArrowKeyDown={handleKeyDown}
               onClick={makeOnClick(conversation.id, conversation.domain)}
               rightClick={(_, event) => listViewModel.onContextMenu(conversation, event)}

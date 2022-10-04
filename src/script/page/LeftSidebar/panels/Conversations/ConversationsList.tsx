@@ -68,7 +68,7 @@ export const ConversationsList: React.FC<{
 
   const isActiveConversation = (conversation: Conversation) => conversationState.isActiveConversation(conversation);
 
-  const openContextMenu = (conversation: Conversation, event: MouseEvent) =>
+  const openContextMenu = (conversation: Conversation, event: MouseEvent | React.MouseEvent<Element, MouseEvent>) =>
     listViewModel.onContextMenu(conversation, event);
   const answerCall = (conversation: Conversation) => listViewModel.answerCall(conversation);
   const {state: contentState} = useKoSubscribableChildren(listViewModel.contentViewModel, ['state']);

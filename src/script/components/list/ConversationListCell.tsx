@@ -35,8 +35,7 @@ import Avatar from 'Components/Avatar';
 import GroupAvatar from 'Components/avatar/GroupAvatar';
 import AvailabilityState from 'Components/AvailabilityState';
 import Icon from 'Components/Icon';
-import {isOneOfKeys, KEY} from 'Util/KeyboardUtil';
-import {MouseEvent} from 'react';
+import {isKey, isOneOfKeys, KEY} from 'Util/KeyboardUtil';
 
 export interface ConversationListCellProps {
   conversation: Conversation;
@@ -44,14 +43,14 @@ export interface ConversationListCellProps {
   isSelected?: (conversation: Conversation) => boolean;
   onClick: React.MouseEventHandler<Element>;
   onJoinCall: (conversation: Conversation, mediaType: MediaType) => void;
-  rightClick: (conversation: Conversation, event: MouseEvent) => void;
+  rightClick: (conversation: Conversation, event: MouseEvent | React.MouseEvent<Element, MouseEvent>) => void;
   showJoinButton: boolean;
   index: number;
   focus: boolean;
   showFocus: boolean;
   handleFocus: (index: number) => void;
   handleArrowKeyDown: (e: React.KeyboardEvent) => void;
-  isFolder: boolean;
+  isFolder?: boolean;
 }
 
 const ConversationListCell: React.FC<ConversationListCellProps> = ({
@@ -100,10 +99,10 @@ const ConversationListCell: React.FC<ConversationListCellProps> = ({
   const [focusContextMenu, setContextMenuFocus] = useState(false);
   const [isContextMenuOpen, setContextMenuOpen] = useState(false);
 
-  const openContextMenu = (event: React.MouseEvent) => {
+  const openContextMenu = (event: MouseEvent | React.MouseEvent<Element, MouseEvent>) => {
     event.stopPropagation();
     event.preventDefault();
-    rightClick(conversation, event.nativeEvent);
+    rightClick(conversation, event);
   };
 
   const cellState = useMemo(() => generateCellState(conversation), [unreadState, mutedState, isRequest]);
@@ -116,7 +115,7 @@ const ConversationListCell: React.FC<ConversationListCellProps> = ({
   const handleDivKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
     if (event.key === KEY.SPACE || event.key === KEY.ENTER) {
       onClick(event as unknown as React.MouseEvent<Element, MouseEvent>);
-    } else if (event.key === 'ArrowRight') {
+    } else if (isKey(event, KEY.ARROW_RIGHT)) {
       setContextMenuFocus(true);
     } else {
       setContextMenuFocus(false);
@@ -127,6 +126,7 @@ const ConversationListCell: React.FC<ConversationListCellProps> = ({
   useEffect(() => {
     // Move element into view when it is focused
     if (focus && conversationRef.current && showFocus) {
+      // showFocus is required to focus on first conversation only
       conversationRef.current.focus();
     }
   }, [focus, showFocus]);
@@ -148,7 +148,7 @@ const ConversationListCell: React.FC<ConversationListCellProps> = ({
     setContextMenuFocus(false);
     setContextMenuOpen(false);
 
-    //when focused on the context menu and the menu is closed pressing up/down arrow keys will
+    // when focused on the context menu and the menu is closed pressing up/down arrow keys will
     // get the focus back to the conversation list items
     if (isOneOfKeys(event, [KEY.ARROW_UP, KEY.ARROW_DOWN]) && !isContextMenuOpen) {
       handleArrowKeyDown(event);
@@ -160,7 +160,7 @@ const ConversationListCell: React.FC<ConversationListCellProps> = ({
     if (isActive && showFocus && isFolder) {
       handleFocus(index);
     }
-  }, [handleFocus, index, isActive, isFolder, showFocus]);
+  }, [index, isActive, isFolder, showFocus, handleFocus]);
 
   return (
     <li onContextMenu={openContextMenu}>

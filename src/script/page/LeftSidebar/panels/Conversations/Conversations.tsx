@@ -107,7 +107,7 @@ const Conversations: React.FC<ConversationsProps> = ({
   const isFolderOpen = useFolderState(state => state.isOpen);
 
   const {conversationLabelRepository} = conversationRepository;
-  const [showFocus, focusFirstConversation] = useState(false);
+  const [showFocus, focusConversationList] = useState(false);
 
   useEffect(() => {
     if (!activeConversation) {
@@ -158,11 +158,9 @@ const Conversations: React.FC<ConversationsProps> = ({
             type="button"
             className="left-list-header-availability"
             onClick={event => AvailabilityContextMenu.show(event.nativeEvent, 'left-list-availability-menu')}
-            onKeyDown={event => {
-              if (isTabKey(event)) {
-                // without this flag the first conversation is getting focus on page load
-                focusFirstConversation(true);
-              }
+            onBlur={event => {
+              // on blur conversation list should get the focus
+              focusConversationList(true);
             }}
           >
             <AvailabilityState
@@ -183,7 +181,18 @@ const Conversations: React.FC<ConversationsProps> = ({
           )}
         </>
       ) : (
-        <span className="left-list-header-text" data-uie-name="status-name">
+        <span
+          className="left-list-header-text"
+          data-uie-name="status-name"
+          role="presentation"
+          // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex
+          tabIndex={0}
+          onBlur={event => {
+            // persoanl user won't see availability status menu, on blur of the user name
+            // conversation list should get the focus
+            focusConversationList(true);
+          }}
+        >
           {userName}
         </span>
       )}
@@ -203,7 +212,7 @@ const Conversations: React.FC<ConversationsProps> = ({
               onKeyDown={event => {
                 //shift+tab from contacts tab should focus on the first conversation
                 if (event.shiftKey && isTabKey(event)) {
-                  focusFirstConversation(true);
+                  focusConversationList(true);
                 }
               }}
               title={t('tooltipConversationsStart', Shortcut.getShortcutTooltip(ShortcutType.START))}
@@ -293,9 +302,6 @@ const Conversations: React.FC<ConversationsProps> = ({
     </>
   );
   const {currentFocus, handleKeyDown, setCurrentFocus} = useRoveFocus(conversations.length);
-  const handleFocus = (focus: number) => {
-    setCurrentFocus(focus);
-  };
 
   return (
     <ListWrapper id={'conversations'} headerElement={header} footer={footer} before={callingView}>
@@ -319,7 +325,7 @@ const Conversations: React.FC<ConversationsProps> = ({
           listViewModel={listViewModel}
           conversationState={conversationState}
           conversationRepository={conversationRepository}
-          handleFocus={handleFocus}
+          handleFocus={setCurrentFocus}
           currentFocus={currentFocus}
           showFocus={showFocus}
           handleArrowKeyDown={handleKeyDown}

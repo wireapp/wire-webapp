@@ -21,8 +21,8 @@ import {useCallback, useState} from 'react';
 import {isKey, isTabKey, KEY} from 'Util/KeyboardUtil';
 import type {KeyboardEvent as ReactKeyboardEvent} from 'react';
 
-function useRoveFocus(size: number) {
-  const [currentFocus, setCurrentFocus] = useState(0);
+function useRoveFocus(size: number, defaultFocus = 0) {
+  const [currentFocus, setCurrentFocus] = useState(defaultFocus);
 
   const handleKeyDown = useCallback(
     (e: ReactKeyboardEvent | KeyboardEvent) => {
