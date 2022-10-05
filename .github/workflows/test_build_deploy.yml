@@ -67,7 +67,7 @@ jobs:
         uses: andymckay/cancel-action@0.2
 
       - name: Yarn cache
-        uses: c-hive/gha-yarn-cache@v2.1.0
+        uses: c-hive/gha-yarn-cache@v2
 
       - name: Authenticate git clone
         env:
@@ -75,7 +75,7 @@ jobs:
         run: echo "machine github.com login ${GH_TOKEN}" > ~/.netrc
 
       - name: Install JS dependencies
-        run: yarn --frozen-lockfile
+        run: yarn --immutable
 
       - name: Test
         run: yarn test --coverage --coverage-reporters=lcov --detectOpenHandles=false
