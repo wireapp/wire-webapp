@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [7.2.19](https://github.com/wireapp/wire-web-packages/compare/@wireapp/changelog-bot@7.2.18...@wireapp/changelog-bot@7.2.19) (2022-10-05)
+
+**Note:** Version bump only for package @wireapp/changelog-bot
+
 ## [7.2.18](https://github.com/wireapp/wire-web-packages/compare/@wireapp/changelog-bot@7.2.17...@wireapp/changelog-bot@7.2.18) (2022-10-05)
 
 **Note:** Version bump only for package @wireapp/changelog-bot
