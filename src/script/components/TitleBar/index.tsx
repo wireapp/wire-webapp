@@ -18,7 +18,7 @@
  */
 
 import {WebAppEvents} from '@wireapp/webapp-events';
-import {IconButton, StyledApp, THEME_ID, useMatchMedia} from '@wireapp/react-ui-kit';
+import {IconButton, IconButtonVariant, StyledApp, THEME_ID, useMatchMedia} from '@wireapp/react-ui-kit';
 import {amplify} from 'amplify';
 import cx from 'classnames';
 import React, {useMemo, useEffect, useCallback, useState} from 'react';
@@ -43,8 +43,6 @@ import {TeamState} from '../../team/TeamState';
 import {Shortcut} from '../../ui/Shortcut';
 import {ShortcutType} from '../../ui/ShortcutType';
 import {CallActions} from '../../view_model/CallingViewModel';
-import {handleKeyDown} from 'Util/KeyboardUtil';
-import {IconButton, IconButtonVariant, StyledApp, THEME_ID, useMatchMedia} from '@wireapp/react-ui-kit';
 import {useResponsiveViewState} from '../../page/ResponsiveViewState';
 import {ContentState} from '../../view_model/ContentViewModel';
 import {MainViewModel, ViewModelRepositories} from '../../view_model/MainViewModel';
