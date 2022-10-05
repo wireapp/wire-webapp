@@ -18,12 +18,11 @@
  */
 
 /** @jsx jsx */
-import {jsx, ThemeProvider as EmotionThemeProvider} from '@emotion/react';
+import {jsx, ThemeProvider as EmotionThemeProvider, Theme as ETheme} from '@emotion/react';
 import React from 'react';
 
 import {COLOR} from '../Identity/colors';
 import {COLOR_V2, BASE_DARK_COLOR, BASE_LIGHT_COLOR} from '../Identity/colors-v2';
-import {filterProps} from '../util';
 
 export enum THEME_ID {
   DARK = 'THEME_DARK',
@@ -31,7 +30,7 @@ export enum THEME_ID {
   DEFAULT = 'THEME_DEFAULT',
 }
 
-export interface Theme {
+export interface Theme extends ETheme {
   Button?: {
     primaryBg: String;
     primaryHoverBg: String;
@@ -285,10 +284,7 @@ export const themes: {[themeId in THEME_ID]: Theme} = {
 
 export interface ThemeProps<T = HTMLDivElement> extends React.HTMLProps<T> {
   theme?: Theme;
+  children: React.ReactNode;
 }
 
-const filterThemeProps = (props: ThemeProps) => filterProps(props, ['theme']);
-
-export const ThemeProvider = (props: ThemeProps) => (
-  <EmotionThemeProvider theme={props.theme} {...filterThemeProps(props)} />
-);
+export const ThemeProvider = (props: ThemeProps) => <EmotionThemeProvider {...props} theme={props.theme} />;
