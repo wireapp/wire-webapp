@@ -17,49 +17,45 @@
  *
  */
 
-import {amplify} from 'amplify';
 import {CONVERSATION_TYPE} from '@wireapp/api-client/src/conversation/';
-import {Availability} from '@wireapp/protocol-messaging';
-import {NotificationPreference} from '@wireapp/api-client/src/user/data/';
 import {CONVERSATION_EVENT} from '@wireapp/api-client/src/event/';
-import {WebAppEvents} from '@wireapp/webapp-events';
+import {NotificationPreference} from '@wireapp/api-client/src/user/data/';
 import {Runtime} from '@wireapp/commons';
-
-import {t} from 'Util/LocalizerUtil';
-import {createRandomUuid} from 'Util/util';
-import {truncate} from 'Util/StringUtil';
-
-import 'src/script/localization/Localizer';
-
-import {Conversation} from 'src/script/entity/Conversation';
-import {MediumImage} from 'src/script/entity/message/MediumImage';
-import {User} from 'src/script/entity/User';
-import {MessageTimerUpdateMessage} from 'src/script/entity/message/MessageTimerUpdateMessage';
-import {RenameMessage} from 'src/script/entity/message/RenameMessage';
-import {Location} from 'src/script/entity/message/Location';
-import {MemberMessage} from 'src/script/entity/message/MemberMessage';
-import {ContentMessage} from 'src/script/entity/message/ContentMessage';
-import {CompositeMessage} from 'src/script/entity/message/CompositeMessage';
-import {Text} from 'src/script/entity/message/Text';
-import {PingMessage} from 'src/script/entity/message/PingMessage';
+import {Availability} from '@wireapp/protocol-messaging';
+import {WebAppEvents} from '@wireapp/webapp-events';
+import {amplify} from 'amplify';
 
 import {TERMINATION_REASON} from 'src/script/calling/enum/TerminationReason';
+import {ConnectionMapper} from 'src/script/connection/ConnectionMapper';
+import {ConversationMapper} from 'src/script/conversation/ConversationMapper';
+import {NOTIFICATION_STATE} from 'src/script/conversation/NotificationSetting';
+import {Conversation} from 'src/script/entity/Conversation';
+import {CallMessage} from 'src/script/entity/message/CallMessage';
+import {CompositeMessage} from 'src/script/entity/message/CompositeMessage';
+import {ContentMessage} from 'src/script/entity/message/ContentMessage';
+import {Location} from 'src/script/entity/message/Location';
+import {MediumImage} from 'src/script/entity/message/MediumImage';
+import {MemberMessage} from 'src/script/entity/message/MemberMessage';
+import {MessageTimerUpdateMessage} from 'src/script/entity/message/MessageTimerUpdateMessage';
+import {PingMessage} from 'src/script/entity/message/PingMessage';
+import {RenameMessage} from 'src/script/entity/message/RenameMessage';
+import {Text} from 'src/script/entity/message/Text';
+import {User} from 'src/script/entity/User';
+import {NOTIFICATION_HANDLING_STATE} from 'src/script/event/NotificationHandlingState';
+import 'src/script/localization/Localizer';
+import {CALL_MESSAGE_TYPE} from 'src/script/message/CallMessageType';
+import {MentionEntity} from 'src/script/message/MentionEntity';
+import {QuoteEntity} from 'src/script/message/QuoteEntity';
+import {SystemMessageType} from 'src/script/message/SystemMessageType';
 import {NotificationRepository} from 'src/script/notification/NotificationRepository';
 import {PermissionStatusState} from 'src/script/permission/PermissionStatusState';
-import {NOTIFICATION_STATE} from 'src/script/conversation/NotificationSetting';
-import {NOTIFICATION_HANDLING_STATE} from 'src/script/event/NotificationHandlingState';
-
-import {CallMessage} from 'src/script/entity/message/CallMessage';
-import {SystemMessageType} from 'src/script/message/SystemMessageType';
-import {CALL_MESSAGE_TYPE} from 'src/script/message/CallMessageType';
-import {QuoteEntity} from 'src/script/message/QuoteEntity';
-import {MentionEntity} from 'src/script/message/MentionEntity';
-
-import {ConversationMapper} from 'src/script/conversation/ConversationMapper';
-import {ConnectionMapper} from 'src/script/connection/ConnectionMapper';
 import {ContentState} from 'src/script/view_model/ContentViewModel';
-import {TestFactory} from '../../helper/TestFactory';
+import {t} from 'Util/LocalizerUtil';
+import {truncate} from 'Util/StringUtil';
+import {createRandomUuid} from 'Util/util';
+
 import {entities, payload} from '../../api/payloads';
+import {TestFactory} from '../../helper/TestFactory';
 
 window.wire = window.wire || {};
 window.wire.app = window.wire.app || {};

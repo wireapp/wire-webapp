@@ -17,8 +17,8 @@
  *
  */
 
-import {MentionEntity} from '../message/MentionEntity';
 import {User} from '../entity/User';
+import {MentionEntity} from '../message/MentionEntity';
 
 export const findMentionAtPosition = (position: number, mentions: MentionEntity[]) =>
   mentions.find(({startIndex, endIndex}) => position > startIndex && position < endIndex);

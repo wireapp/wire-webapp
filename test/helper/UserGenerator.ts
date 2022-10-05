@@ -21,10 +21,11 @@ import {faker} from '@faker-js/faker';
 import type {User as APIClientUser} from '@wireapp/api-client/src/user/';
 import {UserAssetType} from '@wireapp/api-client/src/user/';
 
+import {createRandomUuid} from 'Util/util';
+
 import type {User} from '../../src/script/entity/User';
 import {serverTimeHandler} from '../../src/script/time/serverTimeHandler';
 import {UserMapper} from '../../src/script/user/UserMapper';
-import {createRandomUuid} from 'Util/util';
 
 export class UserGenerator {
   static getRandomUser(): User {

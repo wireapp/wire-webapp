@@ -17,41 +17,42 @@
  *
  */
 
+import {USER_EVENT, CONVERSATION_EVENT} from '@wireapp/api-client/src/event/';
+import {Account, ConnectionState, ProcessedEventPayload} from '@wireapp/core';
+import {PayloadBundleSource} from '@wireapp/core/src/main/conversation';
+import {HandledEventPayload} from '@wireapp/core/src/main/notification';
 import {Asset as ProtobufAsset, GenericMessage} from '@wireapp/protocol-messaging';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import {amplify} from 'amplify';
 import ko from 'knockout';
-import {USER_EVENT, CONVERSATION_EVENT} from '@wireapp/api-client/src/event/';
 import {container} from 'tsyringe';
+
 import {getLogger, Logger} from 'Util/Logger';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 
-import {CALL_MESSAGE_TYPE} from '../calling/enum/CallMessageType';
-import {AssetTransferState} from '../assets/AssetTransferState';
-
-import {EVENT_TYPE} from './EventType';
 import {ClientEvent} from './Client';
-import {EventTypeHandling} from './EventTypeHandling';
-import {NOTIFICATION_HANDLING_STATE} from './NotificationHandlingState';
-import {categoryFromEvent} from '../message/MessageCategorization';
+import type {EventService} from './EventService';
 import {EventSource} from './EventSource';
+import {EVENT_TYPE} from './EventType';
+import {EventTypeHandling} from './EventTypeHandling';
 import {EventValidation} from './EventValidation';
 import {validateEvent} from './EventValidator';
+import {NOTIFICATION_HANDLING_STATE} from './NotificationHandlingState';
+import type {NotificationService} from './NotificationService';
+
+import {AssetTransferState} from '../assets/AssetTransferState';
+import {CALL_MESSAGE_TYPE} from '../calling/enum/CallMessageType';
+import type {ClientEntity} from '../client/ClientEntity';
+import {EventBuilder} from '../conversation/EventBuilder';
+import {AssetData, CryptographyMapper} from '../cryptography/CryptographyMapper';
 import {CryptographyError} from '../error/CryptographyError';
 import {EventError} from '../error/EventError';
-import type {EventService} from './EventService';
-import type {ServerTimeHandler} from '../time/serverTimeHandler';
-import type {ClientEntity} from '../client/ClientEntity';
+import {categoryFromEvent} from '../message/MessageCategorization';
 import type {EventRecord} from '../storage';
-import type {NotificationService} from './NotificationService';
-import {UserState} from '../user/UserState';
-import {AssetData, CryptographyMapper} from '../cryptography/CryptographyMapper';
-import Warnings from '../view_model/WarningsContainer';
-import {Account, ConnectionState, ProcessedEventPayload} from '@wireapp/core';
-import {HandledEventPayload} from '@wireapp/core/src/main/notification';
-import {EventBuilder} from '../conversation/EventBuilder';
+import type {ServerTimeHandler} from '../time/serverTimeHandler';
 import {EventName} from '../tracking/EventName';
-import {PayloadBundleSource} from '@wireapp/core/src/main/conversation';
+import {UserState} from '../user/UserState';
+import Warnings from '../view_model/WarningsContainer';
 
 export class EventRepository {
   logger: Logger;

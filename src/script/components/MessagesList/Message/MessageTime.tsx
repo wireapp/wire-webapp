@@ -18,6 +18,7 @@
  */
 
 import React from 'react';
+
 import {formatDateNumeral, formatTimeShort, fromUnixTime, TIME_IN_MILLIS} from 'Util/TimeUtil';
 
 export interface MessageTimeProps extends React.HTMLProps<HTMLTimeElement> {

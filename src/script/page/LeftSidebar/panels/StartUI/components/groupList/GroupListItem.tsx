@@ -17,15 +17,17 @@
  *
  */
 
-import Avatar, {AVATAR_SIZE} from 'Components/Avatar';
 import React from 'react';
+
+import Avatar, {AVATAR_SIZE} from 'Components/Avatar';
+import GroupAvatar from 'Components/avatar/GroupAvatar';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
+import {handleKeyDown} from 'Util/KeyboardUtil';
+
 import {AssetRepository} from '../../../../../../assets/AssetRepository';
 import type {Conversation} from '../../../../../../entity/Conversation';
 import {generateConversationUrl} from '../../../../../../router/routeGenerator';
 import {Router} from '../../../../../../router/Router';
-import GroupAvatar from 'Components/avatar/GroupAvatar';
-import {handleKeyDown} from 'Util/KeyboardUtil';
 
 export interface GroupListItemProps {
   assetRepository: AssetRepository;

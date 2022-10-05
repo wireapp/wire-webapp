@@ -17,9 +17,10 @@
  *
  */
 
-import {mapProfileAssets, updateUserEntityAssets} from '../assets/AssetMapper';
 import {ProviderData, ProviderEntity} from './ProviderEntity';
 import {ServiceData, ServiceEntity} from './ServiceEntity';
+
+import {mapProfileAssets, updateUserEntityAssets} from '../assets/AssetMapper';
 
 export const IntegrationMapper = {
   mapProviderFromObject: (providerData: ProviderData, providerEntity = new ProviderEntity()) => {

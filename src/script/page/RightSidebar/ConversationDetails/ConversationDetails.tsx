@@ -17,28 +17,25 @@
  *
  */
 
-import {RECEIPT_MODE} from '@wireapp/api-client/src/conversation/data/';
 import {FC, useEffect, useState} from 'react';
 
+import {RECEIPT_MODE} from '@wireapp/api-client/src/conversation/data/';
+
 import Icon from 'Components/Icon';
+import PanelActions from 'Components/panel/PanelActions';
 import ServiceDetails from 'Components/panel/ServiceDetails';
 import ServiceList from 'Components/ServiceList';
-import PanelActions from 'Components/panel/PanelActions';
 import UserSearchableList from 'Components/UserSearchableList';
-
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 import {sortUsersByPriority} from 'Util/StringUtil';
 import {formatDuration} from 'Util/TimeUtil';
 
-import UserConversationDetails from './components/UserConversationDetails/UserConversationDetails';
 import ConversationDetailsBottomActions from './components/ConversationDetailsBottomActions/ConversationDetailsBottomActions';
-import ConversationDetailsOptions from './components/ConversationDetailsOptions/ConversationDetailsOptions';
 import ConversationDetailsHeader from './components/ConversationDetailsHeader/ConversationDetailsHeader';
+import ConversationDetailsOptions from './components/ConversationDetailsOptions/ConversationDetailsOptions';
+import UserConversationDetails from './components/UserConversationDetails/UserConversationDetails';
 import getConversationActions from './utils/getConversationActions';
-
-import PanelHeader from '../PanelHeader';
-import {PanelEntity, PanelState} from '../RightSidebar';
 
 import {ConversationRepository} from '../../../conversation/ConversationRepository';
 import {ConversationVerificationState} from '../../../conversation/ConversationVerificationState';
@@ -46,16 +43,18 @@ import {getNotificationText} from '../../../conversation/NotificationSetting';
 import {Conversation} from '../../../entity/Conversation';
 import {User} from '../../../entity/User';
 import {isServiceEntity} from '../../../guards/Service';
-import {ServiceEntity} from '../../../integration/ServiceEntity';
 import {IntegrationRepository} from '../../../integration/IntegrationRepository';
+import {ServiceEntity} from '../../../integration/ServiceEntity';
 import {SearchRepository} from '../../../search/SearchRepository';
 import {TeamRepository} from '../../../team/TeamRepository';
 import {TeamState} from '../../../team/TeamState';
+import {initFadingScrollbar} from '../../../ui/fadingScrollbar';
 import {Shortcut} from '../../../ui/Shortcut';
 import {ShortcutType} from '../../../ui/ShortcutType';
-import {initFadingScrollbar} from '../../../ui/fadingScrollbar';
 import {UserState} from '../../../user/UserState';
 import {ActionsViewModel} from '../../../view_model/ActionsViewModel';
+import PanelHeader from '../PanelHeader';
+import {PanelEntity, PanelState} from '../RightSidebar';
 
 const CONFIG = {
   MAX_USERS_VISIBLE: 7,

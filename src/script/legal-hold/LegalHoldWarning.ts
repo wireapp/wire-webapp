@@ -21,12 +21,12 @@ import {amplify} from 'amplify';
 
 import {t} from 'Util/LocalizerUtil';
 
+import PrimaryModal from '../components/Modals/PrimaryModal';
 import {ConversationVerificationState} from '../conversation/ConversationVerificationState';
 import type {Conversation} from '../entity/Conversation';
 import {ConversationError} from '../error/ConversationError';
-import {LegalHoldModalViewModel} from '../view_model/content/LegalHoldModalViewModel';
 import {OPEN_CONVERSATION_DETAILS} from '../page/RightSidebar/RightSidebar';
-import PrimaryModal from '../components/Modals/PrimaryModal';
+import {LegalHoldModalViewModel} from '../view_model/content/LegalHoldModalViewModel';
 
 export const showLegalHoldWarningModal = (
   conversationEntity: Conversation,

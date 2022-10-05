@@ -18,6 +18,7 @@
  */
 
 import type {RegisteredClient} from '@wireapp/api-client/src/client/';
+
 import type {AppAction} from './';
 
 export enum CLIENT_ACTION {

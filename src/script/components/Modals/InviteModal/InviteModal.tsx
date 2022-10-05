@@ -18,16 +18,17 @@
  */
 
 import React, {useState} from 'react';
+
 import {Runtime} from '@wireapp/commons';
 
-import {t} from 'Util/LocalizerUtil';
-
+import Icon from 'Components/Icon';
 import ModalComponent from 'Components/ModalComponent';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
-import Icon from 'Components/Icon';
+import {t} from 'Util/LocalizerUtil';
+import renderElement from 'Util/renderElement';
+
 import {Config} from '../../../Config';
 import {UserState} from '../../../user/UserState';
-import renderElement from 'Util/renderElement';
 
 export interface InviteModalProps {
   readonly userState: UserState;

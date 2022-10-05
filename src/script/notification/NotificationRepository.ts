@@ -17,32 +17,33 @@
  *
  */
 
-import {NotificationPreference, WebappProperties} from '@wireapp/api-client/src/user/data/';
 import type {QualifiedId} from '@wireapp/api-client/src/user/';
+import {NotificationPreference, WebappProperties} from '@wireapp/api-client/src/user/data/';
+import {Runtime} from '@wireapp/commons';
 import {Availability} from '@wireapp/protocol-messaging';
+import {WebAppEvents} from '@wireapp/webapp-events';
 import {amplify} from 'amplify';
 import ko from 'knockout';
-import {WebAppEvents} from '@wireapp/webapp-events';
 import {container} from 'tsyringe';
-import {Runtime} from '@wireapp/commons';
 
 import {Declension, t} from 'Util/LocalizerUtil';
 import {Logger, getLogger} from 'Util/Logger';
+import {getRenderedTextContent} from 'Util/messageRenderer';
 import {getUserName} from 'Util/SanitizationUtil';
 import {truncate} from 'Util/StringUtil';
 import {TIME_IN_MILLIS, formatDuration} from 'Util/TimeUtil';
 import {ValidationUtilError} from 'Util/ValidationUtil';
-import {getRenderedTextContent} from 'Util/messageRenderer';
 
-import {AudioType} from '../audio/AudioType';
-import {TERMINATION_REASON} from '../calling/enum/TerminationReason';
-import {PermissionStatusState} from '../permission/PermissionStatusState';
-import {PermissionType} from '../permission/PermissionType';
 import {PermissionState} from './PermissionState';
 
+import {AssetRepository} from '../assets/AssetRepository';
+import {AudioType} from '../audio/AudioType';
+import {CallState} from '../calling/CallState';
+import {TERMINATION_REASON} from '../calling/enum/TerminationReason';
 import type {ConnectionEntity} from '../connection/ConnectionEntity';
 import {ConversationEphemeralHandler} from '../conversation/ConversationEphemeralHandler';
 import type {ConversationRepository} from '../conversation/ConversationRepository';
+import {ConversationState} from '../conversation/ConversationState';
 import type {Conversation} from '../entity/Conversation';
 import type {CallMessage} from '../entity/message/CallMessage';
 import type {ContentMessage} from '../entity/message/ContentMessage';
@@ -56,11 +57,10 @@ import type {User} from '../entity/User';
 import {SuperType} from '../message/SuperType';
 import {SystemMessageType} from '../message/SystemMessageType';
 import type {PermissionRepository} from '../permission/PermissionRepository';
-import {ContentState} from '../view_model/ContentViewModel';
-import {AssetRepository} from '../assets/AssetRepository';
+import {PermissionStatusState} from '../permission/PermissionStatusState';
+import {PermissionType} from '../permission/PermissionType';
 import {UserState} from '../user/UserState';
-import {ConversationState} from '../conversation/ConversationState';
-import {CallState} from '../calling/CallState';
+import {ContentState} from '../view_model/ContentViewModel';
 import Warnings from '../view_model/WarningsContainer';
 
 export interface Multitasking {

@@ -17,12 +17,12 @@
  *
  */
 
-import cx from 'classnames';
 import {FC} from 'react';
+
+import cx from 'classnames';
 
 import DragableClickWrapper from 'Components/DragableClickWrapper';
 import Icon from 'Components/Icon';
-
 import {t} from 'Util/LocalizerUtil';
 import {noop} from 'Util/util';
 
@@ -72,6 +72,7 @@ const PanelHeader: FC<PanelHeaderProps> = ({
       )}
 
       {title && (
+        // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex
         <h3 className="panel__header__title" tabIndex={0} data-uie-name={titleDataUieName}>
           {title}
         </h3>

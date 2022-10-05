@@ -23,8 +23,6 @@ import type {CookiesStatic} from 'js-cookie';
 import {ActionCreatorsMapObject, AnyAction, Dispatch, bindActionCreators as bindActionCreatorsRedux} from 'redux';
 import type {ThunkAction as ReduxThunkAction, ThunkDispatch as ReduxThunkDispatch} from 'redux-thunk';
 
-import type {Configuration} from '../../../Config';
-import type {ActionRoot} from '../action';
 import {AuthState, authReducer, initialAuthState} from './authReducer';
 import {ClientState, clientReducer, initialClientState} from './clientReducer';
 import {ConversationState, conversationReducer, initialConversationState} from './conversationReducer';
@@ -33,6 +31,9 @@ import {InvitationState, initialInvitationState, invitationReducer} from './invi
 import {LanguageState, initialLanguageState, languageReducer} from './languageReducer';
 import {RuntimeState, initialRuntimeState, runtimeReducer} from './runtimeReducer';
 import {SelfState, initialSelfState, selfReducer} from './selfReducer';
+
+import type {Configuration} from '../../../Config';
+import type {ActionRoot} from '../action';
 
 export type Api = {
   actions: ActionRoot;

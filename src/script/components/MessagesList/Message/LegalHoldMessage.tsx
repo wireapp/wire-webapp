@@ -18,14 +18,16 @@
  */
 
 import React from 'react';
-import {LegalHoldMessage as LegalHoldMessageEntity} from '../../../entity/message/LegalHoldMessage';
-import LegalHoldDot from 'Components/LegalHoldDot';
 
-import {t} from 'Util/LocalizerUtil';
 import {amplify} from 'amplify';
-import {LegalHoldModalViewModel} from '../../../view_model/content/LegalHoldModalViewModel';
 import {container} from 'tsyringe';
+
+import LegalHoldDot from 'Components/LegalHoldDot';
+import {t} from 'Util/LocalizerUtil';
+
 import {ConversationState} from '../../../conversation/ConversationState';
+import {LegalHoldMessage as LegalHoldMessageEntity} from '../../../entity/message/LegalHoldMessage';
+import {LegalHoldModalViewModel} from '../../../view_model/content/LegalHoldModalViewModel';
 
 export interface LegalHoldMessageProps {
   conversationState?: ConversationState;

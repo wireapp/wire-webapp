@@ -17,8 +17,9 @@
  *
  */
 
-import InfoToggle from './InfoToggle';
 import {render, fireEvent} from '@testing-library/react';
+
+import InfoToggle from './InfoToggle';
 
 describe('InfoToggle', () => {
   it('toggles check property', () => {

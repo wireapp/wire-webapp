@@ -18,7 +18,9 @@
  */
 
 import React, {useId} from 'react';
+
 import cx from 'classnames';
+
 import {registerReactComponent} from 'Util/ComponentUtil';
 
 export interface InfoToggleProps {

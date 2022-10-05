@@ -18,14 +18,16 @@
  */
 
 import create from 'zustand';
-import {Action, ModalContent, ModalItem, ModalOptions, ModalQueue, PrimaryModalType, Text} from './PrimaryModalTypes';
-import {getLogger} from 'Util/Logger';
+
 import {replaceLink, t} from 'Util/LocalizerUtil';
-import {noop} from 'Util/util';
+import {getLogger} from 'Util/Logger';
 import {formatLocale} from 'Util/TimeUtil';
-import {ClientNotificationData} from '../../../notification/PreferenceNotificationRepository';
+import {noop, createRandomUuid} from 'Util/util';
+
+import {Action, ModalContent, ModalItem, ModalOptions, ModalQueue, PrimaryModalType, Text} from './PrimaryModalTypes';
+
 import {Config} from '../../../Config';
-import {createRandomUuid} from 'Util/util';
+import {ClientNotificationData} from '../../../notification/PreferenceNotificationRepository';
 
 type PrimaryModalState = {
   errorMessage: string | null;

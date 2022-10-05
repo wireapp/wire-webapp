@@ -17,9 +17,11 @@
  *
  */
 
-import {render, fireEvent, screen} from '@testing-library/react';
-import AccountLink from './AccountLink';
+import {fireEvent, render, screen} from '@testing-library/react';
 import {StyledApp, THEME_ID} from '@wireapp/react-ui-kit';
+
+import AccountLink from './AccountLink';
+
 import * as utils from '../../../../../util/ClipboardUtil';
 
 test('copies correct text', async () => {

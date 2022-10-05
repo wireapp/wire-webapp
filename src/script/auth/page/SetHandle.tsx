@@ -17,6 +17,8 @@
  *
  */
 
+import React, {useEffect, useState} from 'react';
+
 import {ConsentType} from '@wireapp/api-client/src/self/index';
 import {
   ArrowIcon,
@@ -30,11 +32,13 @@ import {
   RoundIconButton,
   Text,
 } from '@wireapp/react-ui-kit';
-import React, {useEffect, useState} from 'react';
 import {useIntl} from 'react-intl';
 import {connect} from 'react-redux';
-import {AnyAction, Dispatch} from 'redux';
 import {useNavigate} from 'react-router-dom';
+import {AnyAction, Dispatch} from 'redux';
+
+import Page from './Page';
+
 import {chooseHandleStrings} from '../../strings';
 import AcceptNewsModal from '../component/AcceptNewsModal';
 import {actionRoot as ROOT_ACTIONS} from '../module/action';
@@ -44,7 +48,6 @@ import * as SelfSelector from '../module/selector/SelfSelector';
 import {ROUTE} from '../route';
 import {parseError} from '../util/errorUtil';
 import {createSuggestions} from '../util/handleUtil';
-import Page from './Page';
 
 interface Props extends React.HTMLProps<HTMLDivElement> {}
 

@@ -17,21 +17,20 @@
  *
  */
 
+import React, {ChangeEvent} from 'react';
+
 import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import {amplify} from 'amplify';
-import React, {ChangeEvent} from 'react';
 
 import {CONFIG as HistoryExportConfig} from 'Components/HistoryExport';
 import {importHistoryFile} from 'Components/HistoryImport';
-
-import {t} from 'Util/LocalizerUtil';
 import {handleKeyDown} from 'Util/KeyboardUtil';
-
-import PreferencesSection from '../components/PreferencesSection';
+import {t} from 'Util/LocalizerUtil';
 
 import {BackupRepository} from '../../../../../backup/BackupRepository';
 import {ContentState} from '../../../../../view_model/ContentViewModel';
+import PreferencesSection from '../components/PreferencesSection';
 
 interface HistoryBackupSectionProps {
   backupRepository: BackupRepository;

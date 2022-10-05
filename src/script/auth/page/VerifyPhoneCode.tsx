@@ -17,14 +17,20 @@
  *
  */
 
+import React, {useEffect, useState} from 'react';
+
 import {LoginData} from '@wireapp/api-client/src/auth';
 import {CodeInput, Column, Columns, ContainerXS, H1} from '@wireapp/react-ui-kit';
-import React, {useEffect, useState} from 'react';
 import {useIntl} from 'react-intl';
 import {connect} from 'react-redux';
-import {AnyAction, Dispatch} from 'redux';
 import {useNavigate} from 'react-router-dom';
+import {AnyAction, Dispatch} from 'redux';
+
+import Page from './Page';
+
 import {phoneLoginStrings} from '../../strings';
+import LinkButton from '../component/LinkButton';
+import RouterLink from '../component/RouterLink';
 import {actionRoot} from '../module/action';
 import {BackendError} from '../module/action/BackendError';
 import {LabeledError} from '../module/action/LabeledError';
@@ -33,9 +39,6 @@ import {RootState, bindActionCreators} from '../module/reducer';
 import * as AuthSelector from '../module/selector/AuthSelector';
 import {ROUTE} from '../route';
 import {parseError} from '../util/errorUtil';
-import Page from './Page';
-import LinkButton from '../component/LinkButton';
-import RouterLink from '../component/RouterLink';
 
 interface Props extends React.HTMLProps<HTMLDivElement> {}
 

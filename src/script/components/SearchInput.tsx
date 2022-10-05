@@ -18,12 +18,14 @@
  */
 
 import React, {useEffect, useLayoutEffect, useRef} from 'react';
+
+import Icon from 'Components/Icon';
 import {registerReactComponent} from 'Util/ComponentUtil';
+import {isEnterKey, isRemovalAction} from 'Util/KeyboardUtil';
+import {t} from 'Util/LocalizerUtil';
+
 import type {User} from '../entity/User';
 import {MAX_HANDLE_LENGTH} from '../user/UserHandleGenerator';
-import {isEnterKey, isRemovalAction} from 'Util/KeyboardUtil';
-import Icon from 'Components/Icon';
-import {t} from 'Util/LocalizerUtil';
 
 export interface SearchInputProps {
   enter?: () => void | Promise<void>;

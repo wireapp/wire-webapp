@@ -18,6 +18,7 @@
  */
 
 import renderElement from 'Util/renderElement';
+
 import {PrimaryModalComponent} from './PrimaryModal';
 import {addNewModalToQueue, showNextModalInQueue} from './PrimaryModalState';
 import {PrimaryModalType} from './PrimaryModalTypes';

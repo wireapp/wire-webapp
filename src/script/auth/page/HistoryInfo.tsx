@@ -17,19 +17,23 @@
  *
  */
 
+import React from 'react';
+
 import {ClientType} from '@wireapp/api-client/src/client';
 import {Button, ContainerXS, H1, Link, Paragraph} from '@wireapp/react-ui-kit';
-import React from 'react';
 import {FormattedMessage, useIntl} from 'react-intl';
 import {connect} from 'react-redux';
 import {Navigate, useNavigate} from 'react-router-dom';
+
+import {KEY} from 'Util/KeyboardUtil';
+
+import Page from './Page';
+
 import {Config} from '../../Config';
 import {historyInfoStrings} from '../../strings';
 import {RootState} from '../module/reducer';
 import * as ClientSelector from '../module/selector/ClientSelector';
 import {ROUTE} from '../route';
-import Page from './Page';
-import {KEY} from 'Util/KeyboardUtil';
 
 interface Props extends React.HTMLProps<HTMLDivElement> {}
 

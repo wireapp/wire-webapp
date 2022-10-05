@@ -17,29 +17,34 @@
  *
  */
 
-import {amplify} from 'amplify';
+import React from 'react';
+
 import {WebAppEvents} from '@wireapp/webapp-events';
+import {amplify} from 'amplify';
 import ko from 'knockout';
 import {container} from 'tsyringe';
+
 import {t} from 'Util/LocalizerUtil';
-import {ContextMenuEntry} from '../../../ui/ContextMenu';
-import {CompositeMessage} from '../../../entity/message/CompositeMessage';
-import {Conversation} from '../../../entity/Conversation';
-import {AssetRepository} from '../../../assets/AssetRepository';
-import {TeamState} from '../../../team/TeamState';
-import VerificationMessage from './VerificationMessage';
+
 import CallMessage from './CallMessage';
 import CallTimeoutMessage from './CallTimeoutMessage';
-import MissedMessage from './MissedMessage';
-import FileTypeRestrictedMessage from './FileTypeRestrictedMessage';
-import DeleteMessage from './DeleteMessage';
-import DecryptionErrorMessage from './DecryptErrorMessage';
-import LegalHoldMessage from './LegalHoldMessage';
-import SystemMessage from './SystemMessage';
-import MemberMessage from './MemberMessage';
-import PingMessage from './PingMessage';
 import ContentMessageComponent from './ContentMessage';
-import React from 'react';
+import DecryptionErrorMessage from './DecryptErrorMessage';
+import DeleteMessage from './DeleteMessage';
+import FileTypeRestrictedMessage from './FileTypeRestrictedMessage';
+import LegalHoldMessage from './LegalHoldMessage';
+import MemberMessage from './MemberMessage';
+import MissedMessage from './MissedMessage';
+import PingMessage from './PingMessage';
+import SystemMessage from './SystemMessage';
+import VerificationMessage from './VerificationMessage';
+
+import {AssetRepository} from '../../../assets/AssetRepository';
+import {Conversation} from '../../../entity/Conversation';
+import {CompositeMessage} from '../../../entity/message/CompositeMessage';
+import {TeamState} from '../../../team/TeamState';
+import {ContextMenuEntry} from '../../../ui/ContextMenu';
+
 import {MessageParams} from './index';
 
 export const MessageWrapper: React.FC<MessageParams & {hasMarker: boolean}> = ({

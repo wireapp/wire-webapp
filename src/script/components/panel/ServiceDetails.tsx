@@ -19,10 +19,10 @@
 
 import React from 'react';
 
-import type {ServiceEntity} from '../../integration/ServiceEntity';
-
-import {registerReactComponent, useKoSubscribableChildren} from 'Util/ComponentUtil';
 import Avatar, {AVATAR_SIZE} from 'Components/Avatar';
+import {registerReactComponent, useKoSubscribableChildren} from 'Util/ComponentUtil';
+
+import type {ServiceEntity} from '../../integration/ServiceEntity';
 
 export interface ServiceDetailsProps {
   service: ServiceEntity;

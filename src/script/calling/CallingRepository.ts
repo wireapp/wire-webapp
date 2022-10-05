@@ -17,13 +17,10 @@
  *
  */
 
-import axios from 'axios';
-import {Runtime} from '@wireapp/commons';
-import type {WebappProperties} from '@wireapp/api-client/src/user/data';
-import type {QualifiedId} from '@wireapp/api-client/src/user';
 import type {CallConfigData} from '@wireapp/api-client/src/account/CallConfigData';
-import type {UserClients, QualifiedUserClients} from '@wireapp/api-client/src/conversation';
-import {matchQualifiedIds} from 'Util/QualifiedId';
+import type {QualifiedUserClients, UserClients} from '@wireapp/api-client/src/conversation';
+import type {QualifiedId} from '@wireapp/api-client/src/user';
+import type {WebappProperties} from '@wireapp/api-client/src/user/data';
 import {
   CALL_TYPE,
   CONV_TYPE,
@@ -40,51 +37,55 @@ import {
   WcallClient,
   WcallMember,
 } from '@wireapp/avs';
-import {WebAppEvents} from '@wireapp/webapp-events';
-import {amplify} from 'amplify';
-import ko from 'knockout';
-import 'webrtc-adapter';
-import {container} from 'tsyringe';
-import {isQualifiedUserClients} from '@wireapp/core/src/main/util';
+import {Runtime} from '@wireapp/commons';
+import {PayloadBundleState} from '@wireapp/core/src/main/conversation';
 import {
   flattenQualifiedUserClients,
   flattenUserClients,
 } from '@wireapp/core/src/main/conversation/message/UserClientsUtil';
+import {isQualifiedUserClients} from '@wireapp/core/src/main/util';
+import {WebAppEvents} from '@wireapp/webapp-events';
+import {amplify} from 'amplify';
+import axios from 'axios';
+import ko from 'knockout';
+import {container} from 'tsyringe';
+import 'webrtc-adapter';
 
-import {t} from 'Util/LocalizerUtil';
-import {Logger, getLogger} from 'Util/Logger';
-import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 import {flatten} from 'Util/ArrayUtil';
+import {t} from 'Util/LocalizerUtil';
+import {getLogger, Logger} from 'Util/Logger';
 import {roundLogarithmic} from 'Util/NumberUtil';
+import {matchQualifiedIds} from 'Util/QualifiedId';
+import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 
-import {Config} from '../Config';
-import {CALL_MESSAGE_TYPE} from './enum/CallMessageType';
-import {CallingEvent, EventBuilder} from '../conversation/EventBuilder';
-import {EventRepository} from '../event/EventRepository';
-import {MediaType} from '../media/MediaType';
 import {Call, SerializedConversationId} from './Call';
 import {CallState, MuteState} from './CallState';
-import {ClientId, Participant, UserId} from './Participant';
-import {EventName} from '../tracking/EventName';
-import {Segmentation} from '../tracking/Segmentation';
-import * as trackingHelpers from '../tracking/Helpers';
-import type {MediaStreamHandler} from '../media/MediaStreamHandler';
-import type {User} from '../entity/User';
-import type {ServerTimeHandler} from '../time/serverTimeHandler';
-import type {UserRepository} from '../user/UserRepository';
-import type {EventRecord} from '../storage';
-import type {EventSource} from '../event/EventSource';
-import {CONSENT_TYPE, MessageRepository, MessageSendingOptions} from '../conversation/MessageRepository';
-import type {MediaDevicesHandler} from '../media/MediaDevicesHandler';
-import {NoAudioInputError} from '../error/NoAudioInputError';
-import {APIClient} from '../service/APIClientSingleton';
-import {ConversationState} from '../conversation/ConversationState';
-import {TeamState} from '../team/TeamState';
-import Warnings from '../view_model/WarningsContainer';
-import {PayloadBundleState} from '@wireapp/core/src/main/conversation';
-import {Core} from '../service/CoreSingleton';
+import {CALL_MESSAGE_TYPE} from './enum/CallMessageType';
 import {LEAVE_CALL_REASON} from './enum/LeaveCallReason';
+import {ClientId, Participant, UserId} from './Participant';
+
 import PrimaryModal from '../components/Modals/PrimaryModal';
+import {Config} from '../Config';
+import {ConversationState} from '../conversation/ConversationState';
+import {CallingEvent, EventBuilder} from '../conversation/EventBuilder';
+import {CONSENT_TYPE, MessageRepository, MessageSendingOptions} from '../conversation/MessageRepository';
+import type {User} from '../entity/User';
+import {NoAudioInputError} from '../error/NoAudioInputError';
+import {EventRepository} from '../event/EventRepository';
+import type {EventSource} from '../event/EventSource';
+import type {MediaDevicesHandler} from '../media/MediaDevicesHandler';
+import type {MediaStreamHandler} from '../media/MediaStreamHandler';
+import {MediaType} from '../media/MediaType';
+import {APIClient} from '../service/APIClientSingleton';
+import {Core} from '../service/CoreSingleton';
+import type {EventRecord} from '../storage';
+import {TeamState} from '../team/TeamState';
+import type {ServerTimeHandler} from '../time/serverTimeHandler';
+import {EventName} from '../tracking/EventName';
+import * as trackingHelpers from '../tracking/Helpers';
+import {Segmentation} from '../tracking/Segmentation';
+import type {UserRepository} from '../user/UserRepository';
+import Warnings from '../view_model/WarningsContainer';
 
 interface MediaStreamQuery {
   audio?: boolean;

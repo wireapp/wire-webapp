@@ -20,16 +20,14 @@
 import {FC, ChangeEvent, KeyboardEvent, useEffect, useRef, useState} from 'react';
 
 import Icon from 'Components/Icon';
-
-import {t} from 'Util/LocalizerUtil';
 import {isEnterKey} from 'Util/KeyboardUtil';
+import {t} from 'Util/LocalizerUtil';
 import {removeLineBreaks} from 'Util/StringUtil';
-
-import GroupDetails from '../GroupDetails/GroupDetails';
 
 import {ConversationRepository} from '../../../../../conversation/ConversationRepository';
 import {User} from '../../../../../entity/User';
 import {ServiceEntity} from '../../../../../integration/ServiceEntity';
+import GroupDetails from '../GroupDetails/GroupDetails';
 
 interface ConversationDetailsHeaderProps {
   isActiveGroupParticipant: boolean;

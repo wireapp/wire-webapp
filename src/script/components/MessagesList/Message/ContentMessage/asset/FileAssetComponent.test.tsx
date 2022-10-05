@@ -17,13 +17,16 @@
  *
  */
 
-import ko from 'knockout';
-import {ContentMessage} from 'src/script/entity/message/ContentMessage';
-import FileAssetComponent from './FileAssetComponent';
-import {FileAsset} from 'src/script/entity/message/FileAsset';
-import {StatusType} from '../../../../../message/StatusType';
-import {TeamState} from 'src/script/team/TeamState';
 import {render} from '@testing-library/react';
+import ko from 'knockout';
+
+import {ContentMessage} from 'src/script/entity/message/ContentMessage';
+import {FileAsset} from 'src/script/entity/message/FileAsset';
+import {TeamState} from 'src/script/team/TeamState';
+
+import FileAssetComponent from './FileAssetComponent';
+
+import {StatusType} from '../../../../../message/StatusType';
 
 describe('FileAssetComponent', () => {
   function mockContentMessage(): ContentMessage {

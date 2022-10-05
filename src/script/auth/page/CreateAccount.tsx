@@ -17,16 +17,19 @@
  *
  */
 
-import {ArrowIcon, COLOR, Column, Columns, Container, ContainerXS, H1, IsMobile} from '@wireapp/react-ui-kit';
 import React from 'react';
+
+import {ArrowIcon, COLOR, Column, Columns, Container, ContainerXS, H1, IsMobile} from '@wireapp/react-ui-kit';
 import {useIntl} from 'react-intl';
-import {Config} from '../../../script/Config';
 import {useNavigate} from 'react-router-dom';
+
+import Page from './Page';
+
+import {Config} from '../../../script/Config';
 import {createAccountStrings} from '../../strings';
 import AccountForm from '../component/AccountForm';
 import RouterLink from '../component/RouterLink';
 import {ROUTE} from '../route';
-import Page from './Page';
 
 interface Props extends React.HTMLProps<HTMLDivElement> {}
 

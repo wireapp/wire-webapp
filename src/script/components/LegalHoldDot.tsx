@@ -18,12 +18,15 @@
  */
 
 import React from 'react';
+
 import cx from 'classnames';
-import type {Conversation} from '../entity/Conversation';
-import type {LegalHoldModalViewModel} from '../view_model/content/LegalHoldModalViewModel';
+
 import Icon from 'Components/Icon';
 import {registerReactComponent} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
+
+import type {Conversation} from '../entity/Conversation';
+import type {LegalHoldModalViewModel} from '../view_model/content/LegalHoldModalViewModel';
 
 export interface LegalHoldDotProps {
   className?: string;

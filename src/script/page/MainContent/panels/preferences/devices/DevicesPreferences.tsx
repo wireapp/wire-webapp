@@ -18,23 +18,27 @@
  */
 
 import React, {useState} from 'react';
-import {ClientEntity} from 'src/script/client/ClientEntity';
-import {ClientState} from '../../../../../client/ClientState';
-import {UserState} from '../../../../../user/UserState';
-import {ConversationState} from '../../../../../conversation/ConversationState';
-import {container} from 'tsyringe';
-import {useKoSubscribableChildren} from '../../../../../util/ComponentUtil';
+
 import {QualifiedId} from '@wireapp/api-client/src/user';
-import {t} from 'Util/LocalizerUtil';
-import VerifiedIcon from 'Components/VerifiedIcon';
+import {container} from 'tsyringe';
+
 import Icon from 'Components/Icon';
+import VerifiedIcon from 'Components/VerifiedIcon';
+import {ClientEntity} from 'src/script/client/ClientEntity';
 import {CryptographyRepository} from 'src/script/cryptography/CryptographyRepository';
-import {initFadingScrollbar} from '../../../../../ui/fadingScrollbar';
-import DetailedDevice from './components/DetailedDevice';
-import DeviceDetailsPreferences from './DeviceDetailsPreferences';
-import {Conversation} from '../../../../../entity/Conversation';
-import {FormattedId} from './components/FormattedId';
 import {handleKeyDown} from 'Util/KeyboardUtil';
+import {t} from 'Util/LocalizerUtil';
+
+import DetailedDevice from './components/DetailedDevice';
+import {FormattedId} from './components/FormattedId';
+import DeviceDetailsPreferences from './DeviceDetailsPreferences';
+
+import {ClientState} from '../../../../../client/ClientState';
+import {ConversationState} from '../../../../../conversation/ConversationState';
+import {Conversation} from '../../../../../entity/Conversation';
+import {initFadingScrollbar} from '../../../../../ui/fadingScrollbar';
+import {UserState} from '../../../../../user/UserState';
+import {useKoSubscribableChildren} from '../../../../../util/ComponentUtil';
 
 interface DevicesPreferencesProps {
   clientState: ClientState;

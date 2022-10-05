@@ -17,10 +17,12 @@
  *
  */
 
-import {TeamData} from '@wireapp/api-client/src/team';
 import React from 'react';
+
+import {TeamData} from '@wireapp/api-client/src/team';
 import {connect} from 'react-redux';
 import {Navigate} from 'react-router-dom';
+
 import UnsupportedBrowser from '../component/UnsupportedBrowser';
 import {RootState} from '../module/reducer';
 import {RegistrationDataState} from '../module/reducer/authReducer';

@@ -17,10 +17,13 @@
  *
  */
 
-import ko from 'knockout';
 import {ClientClassification} from '@wireapp/api-client/src/client/';
+import ko from 'knockout';
+
 import TestPage from 'Util/test/TestPage';
+
 import DeviceCard, {DeviceCardProps} from './DeviceCard';
+
 import type {ClientEntity} from '../../client/ClientEntity';
 
 function createClientEntity(clientEntity: Partial<ClientEntity>): ClientEntity {

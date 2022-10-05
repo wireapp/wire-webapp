@@ -17,35 +17,33 @@
  *
  */
 
-import {WebAppEvents} from '@wireapp/webapp-events';
-import {DefaultConversationRoleName as DefaultRole} from '@wireapp/api-client/src/conversation/';
-import {amplify} from 'amplify';
 import {FC, useEffect} from 'react';
 
-import BaseToggle from 'Components/toggle/BaseToggle';
+import {DefaultConversationRoleName as DefaultRole} from '@wireapp/api-client/src/conversation/';
+import {WebAppEvents} from '@wireapp/webapp-events';
+import {amplify} from 'amplify';
+
+import Icon from 'Components/Icon';
 import EnrichedFields from 'Components/panel/EnrichedFields';
 import UserActions, {Actions} from 'Components/panel/UserActions';
-import Icon from 'Components/Icon';
 import UserDetails from 'Components/panel/UserDetails';
-
+import BaseToggle from 'Components/toggle/BaseToggle';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {handleKeyDown} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
 
-import PanelHeader from '../PanelHeader';
-import {PanelEntity} from '../RightSidebar';
-
-import {User} from '../../../entity/User';
-
 import {ConversationRoleRepository} from '../../../conversation/ConversationRoleRepository';
 import {MemberLeaveEvent} from '../../../conversation/EventBuilder';
-import {ClientEvent} from '../../../event/Client';
 import {Conversation} from '../../../entity/Conversation';
+import {User} from '../../../entity/User';
+import {ClientEvent} from '../../../event/Client';
 import {TeamRepository} from '../../../team/TeamRepository';
 import {TeamState} from '../../../team/TeamState';
 import {initFadingScrollbar} from '../../../ui/fadingScrollbar';
 import {UserState} from '../../../user/UserState';
 import {ActionsViewModel} from '../../../view_model/ActionsViewModel';
+import PanelHeader from '../PanelHeader';
+import {PanelEntity} from '../RightSidebar';
 
 interface GroupParticipantUserProps {
   onBack: (entity: PanelEntity) => void;
@@ -206,10 +204,12 @@ const GroupParticipantUser: FC<GroupParticipantUserProps> = ({
               </div>
             </div>
 
-            {/* @ts-ignore Ignore tabIndex for accessibility */}
-            <div className="panel__action-item panel__info-text panel__item-offset" tabIndex="0">
-              {t('conversationDetailsGroupAdminInfo')}
-            </div>
+            {true && (
+              // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex
+              <div className="panel__action-item panel__info-text panel__item-offset" tabIndex="0">
+                {t('conversationDetailsGroupAdminInfo')}
+              </div>
+            )}
           </>
         )}
 

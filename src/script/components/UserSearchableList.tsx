@@ -23,20 +23,19 @@ import {container} from 'tsyringe';
 import {debounce} from 'underscore';
 
 import {partition} from 'Util/ArrayUtil';
+import {registerReactComponent, useKoSubscribableChildren} from 'Util/ComponentUtil';
+import {t} from 'Util/LocalizerUtil';
 import {sortByPriority} from 'Util/StringUtil';
 
+import UserList from './UserList';
+
+import {ConversationState} from '../conversation/ConversationState';
 import type {User} from '../entity/User';
 import {SearchRepository} from '../search/SearchRepository';
 import type {TeamRepository} from '../team/TeamRepository';
-import {validateHandle} from '../user/UserHandleGenerator';
-
-import {UserState} from '../user/UserState';
-import {ConversationState} from '../conversation/ConversationState';
-import {registerReactComponent, useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {TeamState} from '../team/TeamState';
-
-import UserList from './UserList';
-import {t} from 'Util/LocalizerUtil';
+import {validateHandle} from '../user/UserHandleGenerator';
+import {UserState} from '../user/UserState';
 
 export type UserListProps = React.ComponentProps<typeof UserList> & {
   conversationState?: ConversationState;

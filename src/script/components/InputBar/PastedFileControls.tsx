@@ -18,9 +18,11 @@
  */
 
 import {FC} from 'react';
+
 import Icon from 'Components/Icon';
-import {Config} from '../../Config';
 import {t} from 'Util/LocalizerUtil';
+
+import {Config} from '../../Config';
 
 interface PastedFileControlsProps {
   pastedFile: File;

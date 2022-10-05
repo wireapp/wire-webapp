@@ -17,6 +17,8 @@
  *
  */
 
+import React, {useState} from 'react';
+
 import {
   Button,
   COLOR,
@@ -33,11 +35,14 @@ import {
   Text,
   InputBlock,
 } from '@wireapp/react-ui-kit';
-import React, {useState} from 'react';
 import {useIntl} from 'react-intl';
 import {connect} from 'react-redux';
 import {AnyAction, Dispatch} from 'redux';
+
+import Page from './Page';
+
 import {inviteStrings} from '../../strings';
+import Exception from '../component/Exception';
 import {EXTERNAL_ROUTE} from '../externalRoute';
 import {actionRoot as ROOT_ACTIONS} from '../module/action/';
 import {BackendError} from '../module/action/BackendError';
@@ -46,10 +51,8 @@ import {RootState, bindActionCreators} from '../module/reducer';
 import * as AuthSelector from '../module/selector/AuthSelector';
 import * as InviteSelector from '../module/selector/InviteSelector';
 import * as LanguageSelector from '../module/selector/LanguageSelector';
-import {pathWithParams} from '../util/urlUtil';
-import Page from './Page';
-import Exception from '../component/Exception';
 import {QUERY_KEY} from '../route';
+import {pathWithParams} from '../util/urlUtil';
 
 interface Props extends React.HTMLProps<HTMLDivElement> {}
 

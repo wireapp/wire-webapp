@@ -17,31 +17,31 @@
  *
  */
 
-import {useKoSubscribableChildren} from 'Util/ComponentUtil';
-
 import {QualifiedId} from '@wireapp/api-client/src/user';
+
 import {Asset} from 'src/script/entity/message/Asset';
 import type {FileAsset} from 'src/script/entity/message/FileAsset';
+import type {Location} from 'src/script/entity/message/Location';
 import type {MediumImage} from 'src/script/entity/message/MediumImage';
 import type {Text} from 'src/script/entity/message/Text';
-import type {Location} from 'src/script/entity/message/Location';
+import {useKoSubscribableChildren} from 'Util/ComponentUtil';
+import {includesOnlyEmojis} from 'Util/EmojiUtil';
+import {handleKeyDown} from 'Util/KeyboardUtil';
 
-import FileAssetComponent from './FileAssetComponent';
 import AudioAssetComponent from './AudioAsset';
+import FileAssetComponent from './FileAssetComponent';
 import ImageAssetComponent from './ImageAsset';
 import LinkPreviewAssetComponent from './LinkPreviewAssetComponent';
 import LocationAssetComponent from './LocationAsset';
-import VideoAssetComponent from './VideoAsset';
 import ButtonAssetComponent from './MessageButton';
+import VideoAssetComponent from './VideoAsset';
 
+import {MessageActions} from '../..';
 import {AssetType} from '../../../../../assets/AssetType';
 import {Button} from '../../../../../entity/message/Button';
 import {CompositeMessage} from '../../../../../entity/message/CompositeMessage';
-import {StatusType} from '../../../../../message/StatusType';
-import {includesOnlyEmojis} from 'Util/EmojiUtil';
 import {ContentMessage} from '../../../../../entity/message/ContentMessage';
-import {MessageActions} from '../..';
-import {handleKeyDown} from 'Util/KeyboardUtil';
+import {StatusType} from '../../../../../message/StatusType';
 
 const ContentAsset = ({
   asset,

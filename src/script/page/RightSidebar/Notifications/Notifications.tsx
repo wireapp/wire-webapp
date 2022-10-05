@@ -22,14 +22,12 @@ import {useState, FC} from 'react';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 
-import PanelHeader from '../PanelHeader';
-
-import PreferencesRadio from '../../MainContent/panels/preferences/components/PreferencesRadio';
-
 import {NOTIFICATION_STATE, getNotificationText} from '../../../conversation/NotificationSetting';
 import {Conversation} from '../../../entity/Conversation';
 import {initFadingScrollbar} from '../../../ui/fadingScrollbar';
 import {ViewModelRepositories} from '../../../view_model/MainViewModel';
+import PreferencesRadio from '../../MainContent/panels/preferences/components/PreferencesRadio';
+import PanelHeader from '../PanelHeader';
 
 export interface NotificationsProps {
   activeConversation: Conversation;
@@ -72,9 +70,12 @@ const Notifications: FC<NotificationsProps> = ({activeConversation, onGoBack, on
           />
         </fieldset>
 
-        <div className="panel__info-text notification-settings__disclaimer" tabIndex={0}>
-          {t('notificationSettingsDisclaimer')}
-        </div>
+        {true && (
+          // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex
+          <div className="panel__info-text notification-settings__disclaimer" tabIndex={0}>
+            {t('notificationSettingsDisclaimer')}
+          </div>
+        )}
       </div>
     </div>
   );

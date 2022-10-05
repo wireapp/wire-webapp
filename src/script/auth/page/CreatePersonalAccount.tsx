@@ -17,13 +17,18 @@
  *
  */
 
-import {ArrowIcon, COLOR, Column, Columns, Container, ContainerXS, H1, IsMobile} from '@wireapp/react-ui-kit';
 import React from 'react';
+
+import {Runtime} from '@wireapp/commons';
+import {ArrowIcon, COLOR, Column, Columns, Container, ContainerXS, H1, IsMobile} from '@wireapp/react-ui-kit';
 import {useIntl} from 'react-intl';
 import {connect} from 'react-redux';
 import {useNavigate} from 'react-router-dom';
-
 import {AnyAction, Dispatch} from 'redux';
+
+import Page from './Page';
+
+import {Config} from '../../Config';
 import {createPersonalAccountStrings} from '../../strings';
 import AccountForm from '../component/AccountForm';
 import RouterLink from '../component/RouterLink';
@@ -31,9 +36,6 @@ import {actionRoot as ROOT_ACTIONS} from '../module/action/';
 import {RootState, bindActionCreators} from '../module/reducer';
 import * as AuthSelector from '../module/selector/AuthSelector';
 import {ROUTE} from '../route';
-import {Runtime} from '@wireapp/commons';
-import Page from './Page';
-import {Config} from '../../Config';
 
 interface Props extends React.HTMLAttributes<HTMLDivElement> {}
 

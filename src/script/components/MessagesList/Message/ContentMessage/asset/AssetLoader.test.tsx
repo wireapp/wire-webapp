@@ -17,8 +17,9 @@
  *
  */
 
-import AssetLoader from './AssetLoader';
 import {render, fireEvent} from '@testing-library/react';
+
+import AssetLoader from './AssetLoader';
 
 describe('AssetLoader', () => {
   const defaultProps = {large: false, loadProgress: 10, onCancel: jest.fn()};

@@ -20,18 +20,20 @@
 import {fireEvent, render, waitFor, act} from '@testing-library/react';
 import {container} from 'tsyringe';
 
-import Collection from './Collection';
 import {Conversation} from 'src/script/entity/Conversation';
-import {createRandomUuid} from 'Util/util';
 import {ContentMessage} from 'src/script/entity/message/ContentMessage';
-import {Text} from '../../../../entity/message/Text';
-import {MediumImage} from 'src/script/entity/message/MediumImage';
-import {MessageCategory} from 'src/script/message/MessageCategory';
 import {FileAsset} from 'src/script/entity/message/FileAsset';
 import {LinkPreview} from 'src/script/entity/message/LinkPreview';
-import {ConversationRepository} from '../../../../conversation/ConversationRepository';
+import {MediumImage} from 'src/script/entity/message/MediumImage';
+import {MessageCategory} from 'src/script/message/MessageCategory';
+import {createRandomUuid} from 'Util/util';
+
+import Collection from './Collection';
+
 import {AssetRepository} from '../../../../assets/AssetRepository';
+import {ConversationRepository} from '../../../../conversation/ConversationRepository';
 import {MessageRepository} from '../../../../conversation/MessageRepository';
+import {Text} from '../../../../entity/message/Text';
 
 jest.mock(
   './CollectionDetails',

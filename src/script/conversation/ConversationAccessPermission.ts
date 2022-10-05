@@ -19,8 +19,10 @@
 
 /* eslint-disable sort-keys-fix/sort-keys-fix */
 import {CONVERSATION_ACCESS, ACCESS_ROLE_V2} from '@wireapp/api-client/src/conversation/';
-import {combinePermissions, hasPermissions} from '../user/UserPermission';
+
 import {ACCESS_STATE, TEAM} from './AccessState';
+
+import {combinePermissions, hasPermissions} from '../user/UserPermission';
 
 export const ACCESS_TYPES = {
   GUEST: 1 << 0,

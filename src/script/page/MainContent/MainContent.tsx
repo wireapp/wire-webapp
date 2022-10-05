@@ -17,34 +17,33 @@
  *
  */
 
-import {StyledApp, THEME_ID} from '@wireapp/react-ui-kit';
 import {FC, ReactNode} from 'react';
+
+import {StyledApp, THEME_ID} from '@wireapp/react-ui-kit';
 import {CSSTransition, SwitchTransition} from 'react-transition-group';
 import {container} from 'tsyringe';
 
-import HistoryExport from 'Components/HistoryExport';
 import ConnectRequests from 'Components/ConnectRequests';
 import ConversationList from 'Components/Conversation';
-import GroupCreationModal from 'Components/Modals/GroupCreation/GroupCreationModal';
-
-import {registerReactComponent, useKoSubscribableChildren} from 'Util/ComponentUtil';
+import HistoryExport from 'Components/HistoryExport';
 import Icon from 'Components/Icon';
+import GroupCreationModal from 'Components/Modals/GroupCreation/GroupCreationModal';
+import {registerReactComponent, useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 
-import RootProvider from '../RootProvider';
-
 import Collection from './panels/Collection';
-import AccountPreferences from './panels/preferences/AccountPreferences';
 import AboutPreferences from './panels/preferences/AboutPreferences';
+import AccountPreferences from './panels/preferences/AccountPreferences';
 import AVPreferences from './panels/preferences/AVPreferences';
 import DevicesPreferences from './panels/preferences/devices/DevicesPreferences';
 import OptionPreferences from './panels/preferences/OptionPreferences';
 
 import {ClientState} from '../../client/ClientState';
 import {ConversationState} from '../../conversation/ConversationState';
-import {UserState} from '../../user/UserState';
 import {TeamState} from '../../team/TeamState';
+import {UserState} from '../../user/UserState';
 import {ContentState, ContentViewModel} from '../../view_model/ContentViewModel';
+import RootProvider from '../RootProvider';
 
 const Animated: FC<{children: ReactNode}> = ({children, ...rest}) => {
   return (

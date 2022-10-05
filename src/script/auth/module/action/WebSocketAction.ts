@@ -22,7 +22,9 @@ import {ConnectionState, HttpClient} from '@wireapp/api-client/src/http/';
 import {PayloadBundle, PayloadBundleType} from '@wireapp/core/src/main/conversation/';
 import type {UserUpdateMessage} from '@wireapp/core/src/main/conversation/message/UserMessage';
 import {UserMapper} from '@wireapp/core/src/main/user/UserMapper';
+
 import {getLogger} from 'Util/Logger';
+
 import type {ThunkAction} from '../../module/reducer';
 import * as SelfSelector from '../../module/selector/SelfSelector';
 

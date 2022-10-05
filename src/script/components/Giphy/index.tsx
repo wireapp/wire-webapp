@@ -17,18 +17,19 @@
  *
  */
 
-import {WebAppEvents} from '@wireapp/webapp-events';
 import {FC, useEffect, useState} from 'react';
+
+import {WebAppEvents} from '@wireapp/webapp-events';
 import {amplify} from 'amplify';
 import cx from 'classnames';
 
+import GifImage from 'Components/Giphy/GifImage';
 import Icon from 'Components/Icon';
-
 import {registerReactComponent} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
-import {Modal} from '../../ui/Modal';
+
 import {Gif, GiphyRepository} from '../../extension/GiphyRepository';
-import GifImage from 'Components/Giphy/GifImage';
+import {Modal} from '../../ui/Modal';
 
 export enum GiphyState {
   DEFAULT = '',

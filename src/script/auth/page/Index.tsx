@@ -17,22 +17,25 @@
  *
  */
 
-import {UrlUtil} from '@wireapp/commons';
-import * as AuthSelector from '../module/selector/AuthSelector';
-import {Button, ButtonVariant, COLOR, ContainerXS, ErrorMessage, Text} from '@wireapp/react-ui-kit';
 import React, {useEffect, useState} from 'react';
+
+import {UrlUtil} from '@wireapp/commons';
+import {Button, ButtonVariant, COLOR, ContainerXS, ErrorMessage, Text} from '@wireapp/react-ui-kit';
+import {SVGIcon} from '@wireapp/react-ui-kit/src/Icon/SVGIcon';
 import {FormattedMessage, useIntl} from 'react-intl';
+import {connect} from 'react-redux';
 import {useNavigate} from 'react-router-dom';
+import {AnyAction, Dispatch} from 'redux';
+
+import Page from './Page';
+
 import {Config} from '../../Config';
 import '../../localization/Localizer';
 import {indexStrings, logoutReasonStrings} from '../../strings';
+import {bindActionCreators, RootState} from '../module/reducer';
+import * as AuthSelector from '../module/selector/AuthSelector';
 import {QUERY_KEY, ROUTE} from '../route';
-import Page from './Page';
-import {RootState, bindActionCreators} from '../module/reducer';
-import {AnyAction, Dispatch} from 'redux';
-import {connect} from 'react-redux';
 import SVGProvider from '../util/SVGProvider';
-import {SVGIcon} from '@wireapp/react-ui-kit/src/Icon/SVGIcon';
 
 interface Props extends React.HTMLProps<HTMLDivElement> {}
 

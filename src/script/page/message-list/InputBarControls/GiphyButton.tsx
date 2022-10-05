@@ -17,10 +17,12 @@
  *
  */
 
-import Icon from 'Components/Icon';
 import React from 'react';
-import {t} from 'Util/LocalizerUtil';
+
 import {IconButton} from '@wireapp/react-ui-kit';
+
+import Icon from 'Components/Icon';
+import {t} from 'Util/LocalizerUtil';
 
 export type GiphyButtonProps = {
   onGifClick: () => void;

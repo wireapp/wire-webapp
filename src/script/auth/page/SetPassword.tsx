@@ -17,13 +17,17 @@
  *
  */
 
+import React, {useRef, useState} from 'react';
+
 import {ValidationUtil} from '@wireapp/commons';
 import {Button, ContainerXS, Form, H1, Input, Small} from '@wireapp/react-ui-kit';
-import React, {useRef, useState} from 'react';
 import {useIntl} from 'react-intl';
 import {connect} from 'react-redux';
-import {AnyAction, Dispatch} from 'redux';
 import {Navigate, useNavigate} from 'react-router-dom';
+import {AnyAction, Dispatch} from 'redux';
+
+import Page from './Page';
+
 import {Config} from '../../Config';
 import {accountFormStrings, setPasswordStrings} from '../../strings';
 import Exception from '../component/Exception';
@@ -32,7 +36,6 @@ import {ValidationError} from '../module/action/ValidationError';
 import {RootState, bindActionCreators} from '../module/reducer';
 import * as SelfSelector from '../module/selector/SelfSelector';
 import {ROUTE} from '../route';
-import Page from './Page';
 
 interface Props extends React.HTMLProps<HTMLDivElement> {}
 

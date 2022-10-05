@@ -17,11 +17,11 @@
  *
  */
 
-import {Runtime} from '@wireapp/commons';
 import React, {useEffect} from 'react';
 
-import Icon from 'Components/Icon';
+import {Runtime} from '@wireapp/commons';
 
+import Icon from 'Components/Icon';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 

@@ -20,22 +20,24 @@
 // Polyfill "Object.entries" & "Object.values"
 import 'core-js/full/object';
 import 'core-js/full/reflect';
-import cookieStore from 'js-cookie';
 import React from 'react';
+
+import cookieStore from 'js-cookie';
 import {createRoot} from 'react-dom/client';
 import {Provider, ConnectedComponent} from 'react-redux';
+import {container} from 'tsyringe';
 
 import {enableLogging} from 'Util/LoggerUtil';
 import {exposeWrapperGlobals} from 'Util/wrapper';
 
-import {Config} from '../Config';
-import {Core} from '../service/CoreSingleton';
-import {APIClient} from '../service/APIClientSingleton';
 import './configureEnvironment';
 import {configureStore} from './configureStore';
 import {actionRoot} from './module/action';
 import Root from './page/Root';
-import {container} from 'tsyringe';
+
+import {Config} from '../Config';
+import {APIClient} from '../service/APIClientSingleton';
+import {Core} from '../service/CoreSingleton';
 
 exposeWrapperGlobals();
 

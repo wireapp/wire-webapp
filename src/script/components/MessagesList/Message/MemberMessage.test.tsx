@@ -17,11 +17,13 @@
  *
  */
 
-import ko from 'knockout';
-import {MemberMessage as MemberMessageEntity} from 'src/script/entity/message/MemberMessage';
-import MemberMessage from './MemberMessage';
-import {User} from 'src/script/entity/User';
 import {render} from '@testing-library/react';
+import ko from 'knockout';
+
+import {MemberMessage as MemberMessageEntity} from 'src/script/entity/message/MemberMessage';
+import {User} from 'src/script/entity/User';
+
+import MemberMessage from './MemberMessage';
 
 const createMemberMessage = (partialMemberMessage: Partial<MemberMessageEntity>) => {
   const memberMessage: Partial<MemberMessageEntity> = {

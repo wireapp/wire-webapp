@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2018 Wire Swiss GmbH
+ * Copyright (C) 2022 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,22 +17,21 @@
  *
  */
 
-import ko from 'knockout';
-import {WebAppEvents} from '@wireapp/webapp-events';
-import {CONVERSATION_TYPE} from '@wireapp/api-client/src/conversation/';
-
-import {t, setStrings} from 'Util/LocalizerUtil';
-import {createRandomUuid} from 'Util/util';
-
 import 'src/script/localization/Localizer';
 
+import {CONVERSATION_TYPE} from '@wireapp/api-client/src/conversation/';
+import {WebAppEvents} from '@wireapp/webapp-events';
+import ko from 'knockout';
+
+import {NOTIFICATION_STATE} from 'src/script/conversation/NotificationSetting';
 import {Conversation} from 'src/script/entity/Conversation';
 import {ContentMessage} from 'src/script/entity/message/ContentMessage';
 import {User} from 'src/script/entity/User';
-
-import {NOTIFICATION_STATE} from 'src/script/conversation/NotificationSetting';
-import {WindowTitleViewModel} from 'src/script/view_model/WindowTitleViewModel';
 import {ContentState} from 'src/script/view_model/ContentViewModel';
+import {WindowTitleViewModel} from 'src/script/view_model/WindowTitleViewModel';
+import {t, setStrings} from 'Util/LocalizerUtil';
+import {createRandomUuid} from 'Util/util';
+
 import {TestFactory} from '../../helper/TestFactory';
 
 describe('WindowTitleViewModel', () => {

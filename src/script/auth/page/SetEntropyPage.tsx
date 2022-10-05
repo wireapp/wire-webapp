@@ -18,14 +18,17 @@
  */
 
 import React from 'react';
-import Page from './Page';
-import EntropyContainer from './EntropyContainer';
-import {actionRoot as ROOT_ACTIONS} from '../module/action';
-import {ROUTE} from '../route';
-import {useNavigate} from 'react-router-dom';
+
 import {connect} from 'react-redux';
+import {useNavigate} from 'react-router-dom';
 import {AnyAction, Dispatch} from 'redux';
+
+import EntropyContainer from './EntropyContainer';
+import Page from './Page';
+
+import {actionRoot as ROOT_ACTIONS} from '../module/action';
 import {RootState, bindActionCreators} from '../module/reducer';
+import {ROUTE} from '../route';
 
 interface Props extends React.HTMLProps<HTMLDivElement> {}
 

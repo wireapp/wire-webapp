@@ -18,11 +18,14 @@
  */
 
 import React from 'react';
+
+import classNames from 'classnames';
+
+import Icon from 'Components/Icon';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {noop} from 'Util/util';
-import classNames from 'classnames';
+
 import type {CompositeMessage} from '../../../../../entity/message/CompositeMessage';
-import Icon from 'Components/Icon';
 
 export interface MessageButtonProps {
   id: string;

@@ -17,6 +17,8 @@
  *
  */
 
+import React, {useEffect, useRef, useState} from 'react';
+
 import {
   ArrowIcon,
   COLOR,
@@ -34,12 +36,15 @@ import {
   Muted,
   RoundIconButton,
 } from '@wireapp/react-ui-kit';
-import React, {useEffect, useRef, useState} from 'react';
 import {useIntl} from 'react-intl';
 import {connect} from 'react-redux';
-import {AnyAction, Dispatch} from 'redux';
 import {useNavigate} from 'react-router-dom';
+import {AnyAction, Dispatch} from 'redux';
+
 import {getLogger} from 'Util/Logger';
+
+import Page from './Page';
+
 import {addLocaleToUrl} from '../../externalRoute';
 import {teamNameStrings} from '../../strings';
 import RouterLink from '../component/RouterLink';
@@ -50,7 +55,6 @@ import {RootState, bindActionCreators} from '../module/reducer';
 import * as AuthSelector from '../module/selector/AuthSelector';
 import {ROUTE} from '../route';
 import {parseError, parseValidationErrors} from '../util/errorUtil';
-import Page from './Page';
 
 interface Props extends React.HTMLProps<HTMLDivElement> {}
 

@@ -17,15 +17,14 @@
  *
  */
 
-import cx from 'classnames';
 import {FC, useCallback, useEffect, useMemo, useState} from 'react';
 
-import PrimaryModal from 'Components/Modals/PrimaryModal';
+import cx from 'classnames';
 
-import BaseToggle from 'Components/toggle/BaseToggle';
 import CopyToClipboard from 'Components/CopyToClipboard';
 import Icon from 'Components/Icon';
-
+import PrimaryModal from 'Components/Modals/PrimaryModal';
+import BaseToggle from 'Components/toggle/BaseToggle';
 import {copyText} from 'Util/ClipboardUtil';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';

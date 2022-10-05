@@ -17,22 +17,26 @@
  *
  */
 
-import {CodeInput, ContainerXS, H1, Muted} from '@wireapp/react-ui-kit';
 import React from 'react';
+
+import {CodeInput, ContainerXS, H1, Muted} from '@wireapp/react-ui-kit';
 import {FormattedMessage, useIntl} from 'react-intl';
 import {connect} from 'react-redux';
-import {AnyAction, Dispatch} from 'redux';
 import {useNavigate} from 'react-router-dom';
+import {AnyAction, Dispatch} from 'redux';
+
 import {getLogger} from 'Util/Logger';
+
+import Page from './Page';
+
 import {verifyStrings} from '../../strings';
+import LinkButton from '../component/LinkButton';
 import RouterLink from '../component/RouterLink';
 import {actionRoot as ROOT_ACTIONS} from '../module/action';
 import {RootState, bindActionCreators} from '../module/reducer';
 import * as AuthSelector from '../module/selector/AuthSelector';
 import {ROUTE} from '../route';
 import {parseError} from '../util/errorUtil';
-import Page from './Page';
-import LinkButton from '../component/LinkButton';
 
 interface Props extends React.HTMLProps<HTMLDivElement> {}
 

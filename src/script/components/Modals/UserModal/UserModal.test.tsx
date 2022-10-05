@@ -17,19 +17,19 @@
  *
  */
 
+import {render, waitFor} from '@testing-library/react';
 import {QualifiedId} from '@wireapp/api-client/src/user';
 
-import {UserState} from 'src/script/user/UserState';
-import {TeamState} from 'src/script/team/TeamState';
-import {Core} from 'src/script/service/CoreSingleton';
-import UserModal from './UserModal';
-import {UserRepository} from 'src/script/user/UserRepository';
-import {ActionsViewModel} from 'src/script/view_model/ActionsViewModel';
 import {User} from 'src/script/entity/User';
-import {render, waitFor} from '@testing-library/react';
+import {Core} from 'src/script/service/CoreSingleton';
+import {TeamState} from 'src/script/team/TeamState';
+import {UserRepository} from 'src/script/user/UserRepository';
+import {UserState} from 'src/script/user/UserState';
+import {ActionsViewModel} from 'src/script/view_model/ActionsViewModel';
+
+import UserModal from './UserModal';
 
 describe('UserModal', () => {
-
   it('correctly fetches user from user repository', async () => {
     jest.useFakeTimers();
     const getUserById = jest.fn(async (id: QualifiedId) => {

@@ -18,7 +18,6 @@
  */
 
 import {RichProfileRepository} from 'src/script/user/RichProfileRepository';
-
 import {createRandomUuid} from 'Util/util';
 
 describe('RichProfileRepository', () => {

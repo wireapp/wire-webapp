@@ -23,19 +23,19 @@ import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 import ko from 'knockout';
 import {container} from 'tsyringe';
 
-import {UserDevicesState, makeUserDevicesHistory} from 'Components/UserDevices';
-import {t} from 'Util/LocalizerUtil';
-
-import {UserState} from '../../user/UserState';
-import type {ClientRepository} from '../../client/ClientRepository';
-import type {Conversation} from '../../entity/Conversation';
-import type {ConversationRepository} from '../../conversation/ConversationRepository';
-import type {CryptographyRepository} from '../../cryptography/CryptographyRepository';
-import type {MessageRepository} from '../../conversation/MessageRepository';
-import type {TeamRepository} from '../../team/TeamRepository';
-import type {User} from '../../entity/User';
-import {splitFingerprint} from 'Util/StringUtil';
+import {makeUserDevicesHistory, UserDevicesState} from 'Components/UserDevices';
 import {KEY} from 'Util/KeyboardUtil';
+import {t} from 'Util/LocalizerUtil';
+import {splitFingerprint} from 'Util/StringUtil';
+
+import type {ClientRepository} from '../../client/ClientRepository';
+import type {ConversationRepository} from '../../conversation/ConversationRepository';
+import type {MessageRepository} from '../../conversation/MessageRepository';
+import type {CryptographyRepository} from '../../cryptography/CryptographyRepository';
+import type {Conversation} from '../../entity/Conversation';
+import type {User} from '../../entity/User';
+import type {TeamRepository} from '../../team/TeamRepository';
+import {UserState} from '../../user/UserState';
 
 export class LegalHoldModalViewModel {
   static SHOW_REQUEST = 'LegalHold.showRequestModal';

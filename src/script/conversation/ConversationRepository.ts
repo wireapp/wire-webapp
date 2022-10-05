@@ -17,12 +17,14 @@
  *
  */
 
-import ko from 'knockout';
-import {amplify} from 'amplify';
-import {Confirmation, LegalHoldStatus, Asset as ProtobufAsset} from '@wireapp/protocol-messaging';
-import {flatten} from 'underscore';
-import {WebAppEvents} from '@wireapp/webapp-events';
-import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
+import {
+  DefaultConversationRoleName as DefaultRole,
+  CONVERSATION_TYPE,
+  NewConversation,
+  Conversation as BackendConversation,
+  ConversationProtocol,
+} from '@wireapp/api-client/src/conversation/';
+import {ConversationReceiptModeUpdateData} from '@wireapp/api-client/src/conversation/data/';
 import {
   CONVERSATION_EVENT,
   ConversationMessageTimerUpdateEvent,
@@ -32,26 +34,25 @@ import {
   ConversationEvent,
   ConversationReceiptModeUpdateEvent,
   ConversationMemberLeaveEvent,
+  ConversationMemberUpdateEvent,
 } from '@wireapp/api-client/src/event';
-
-import {
-  DefaultConversationRoleName as DefaultRole,
-  CONVERSATION_TYPE,
-  NewConversation,
-  Conversation as BackendConversation,
-  ConversationProtocol,
-} from '@wireapp/api-client/src/conversation/';
-import {container} from 'tsyringe';
-import {ConversationReceiptModeUpdateData} from '@wireapp/api-client/src/conversation/data/';
 import {BackendErrorLabel} from '@wireapp/api-client/src/http/';
 import type {QualifiedId} from '@wireapp/api-client/src/user/';
-import {Logger, getLogger} from 'Util/Logger';
-import {TIME_IN_MILLIS} from 'Util/TimeUtil';
-import {PromiseQueue} from 'Util/PromiseQueue';
-import {replaceLink, t} from 'Util/LocalizerUtil';
+import {MLSReturnType} from '@wireapp/core/src/main/conversation';
+import {Confirmation, LegalHoldStatus, Asset as ProtobufAsset} from '@wireapp/protocol-messaging';
+import {WebAppEvents} from '@wireapp/webapp-events';
+import {amplify} from 'amplify';
+import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
+import ko from 'knockout';
+import {container} from 'tsyringe';
+import {flatten} from 'underscore';
+
 import {getNextItem} from 'Util/ArrayUtil';
-import {base64ToArray, createRandomUuid, noop} from 'Util/util';
 import {allowsAllFiles, getFileExtensionOrName, isAllowedFile} from 'Util/FileTypeUtil';
+import {replaceLink, t} from 'Util/LocalizerUtil';
+import {Logger, getLogger} from 'Util/Logger';
+import {PromiseQueue} from 'Util/PromiseQueue';
+import {matchQualifiedIds} from 'Util/QualifiedId';
 import {
   compareTransliteration,
   sortByPriority,
@@ -59,9 +60,34 @@ import {
   sortUsersByPriority,
   fixWebsocketString,
 } from 'Util/StringUtil';
-import {ClientEvent, CONVERSATION as CLIENT_CONVERSATION_EVENT} from '../event/Client';
-import {NOTIFICATION_HANDLING_STATE} from '../event/NotificationHandlingState';
-import {EventRepository} from '../event/EventRepository';
+import {TIME_IN_MILLIS} from 'Util/TimeUtil';
+import {base64ToArray, createRandomUuid, noop} from 'Util/util';
+
+import {ACCESS_STATE} from './AccessState';
+import {extractClientDiff} from './ClientMismatchUtil';
+import {updateAccessRights} from './ConversationAccessPermission';
+import {ConversationEphemeralHandler} from './ConversationEphemeralHandler';
+import {ConversationFilter} from './ConversationFilter';
+import {ConversationLabelRepository} from './ConversationLabelRepository';
+import {ConversationMapper, ConversationDatabaseData} from './ConversationMapper';
+import {ConversationRoleRepository} from './ConversationRoleRepository';
+import {ConversationService} from './ConversationService';
+import {ConversationState} from './ConversationState';
+import {ConversationStateHandler} from './ConversationStateHandler';
+import {ConversationStatus} from './ConversationStatus';
+import {ConversationVerificationState} from './ConversationVerificationState';
+import {ConversationVerificationStateHandler} from './ConversationVerificationStateHandler';
+import {EventMapper} from './EventMapper';
+import {MessageRepository} from './MessageRepository';
+import {NOTIFICATION_STATE} from './NotificationSetting';
+
+import {AssetTransferState} from '../assets/AssetTransferState';
+import {LEAVE_CALL_REASON} from '../calling/enum/LeaveCallReason';
+import {ClientState} from '../client/ClientState';
+import PrimaryModal from '../components/Modals/PrimaryModal';
+import {Config} from '../Config';
+import {ConnectionEntity} from '../connection/ConnectionEntity';
+import {ConnectionRepository} from '../connection/ConnectionRepository';
 import {
   AssetAddEvent,
   ButtonActionConfirmationEvent,
@@ -75,60 +101,36 @@ import {
   TeamMemberLeaveEvent,
 } from '../conversation/EventBuilder';
 import {Conversation} from '../entity/Conversation';
-import {Message} from '../entity/message/Message';
-import {ConversationMapper, ConversationDatabaseData} from './ConversationMapper';
-import {ConversationStateHandler} from './ConversationStateHandler';
-import {EventMapper} from './EventMapper';
-import {ACCESS_STATE} from './AccessState';
-import {ConversationStatus} from './ConversationStatus';
-import {ConversationVerificationStateHandler} from './ConversationVerificationStateHandler';
-import {NOTIFICATION_STATE} from './NotificationSetting';
-import {ConversationEphemeralHandler} from './ConversationEphemeralHandler';
-import {ConversationLabelRepository} from './ConversationLabelRepository';
-import {AssetTransferState} from '../assets/AssetTransferState';
-import {SystemMessageType} from '../message/SystemMessageType';
-import {SuperType} from '../message/SuperType';
-import {MessageCategory} from '../message/MessageCategory';
-import {Config} from '../Config';
-import {BaseError, BASE_ERROR_TYPE} from '../error/BaseError';
-import {BackendClientError} from '../error/BackendClientError';
-import * as LegalHoldEvaluator from '../legal-hold/LegalHoldEvaluator';
-import {DeleteConversationMessage} from '../entity/message/DeleteConversationMessage';
-import {ConversationRoleRepository} from './ConversationRoleRepository';
-import {ConversationError} from '../error/ConversationError';
-import {ConversationService} from './ConversationService';
-import {ConnectionRepository} from '../connection/ConnectionRepository';
-import {UserRepository} from '../user/UserRepository';
-import {PropertiesRepository} from '../properties/PropertiesRepository';
-import {ServerTimeHandler} from '../time/serverTimeHandler';
 import {ContentMessage} from '../entity/message/ContentMessage';
-import {User} from '../entity/User';
-import {EventService} from '../event/EventService';
-import {ConnectionEntity} from '../connection/ConnectionEntity';
-import {EventSource} from '../event/EventSource';
-import {MemberMessage} from '../entity/message/MemberMessage';
+import {DeleteConversationMessage} from '../entity/message/DeleteConversationMessage';
 import {FileAsset} from '../entity/message/FileAsset';
-import type {EventRecord} from '../storage';
-import {MessageRepository} from './MessageRepository';
-import {UserState} from '../user/UserState';
-import {TeamState} from '../team/TeamState';
-import {TeamRepository} from '../team/TeamRepository';
-import {ConversationState} from './ConversationState';
-import {ConversationRecord} from '../storage/record/ConversationRecord';
-import {UserFilter} from '../user/UserFilter';
-import {ConversationFilter} from './ConversationFilter';
-import {ConversationMemberUpdateEvent} from '@wireapp/api-client/src/event';
-import {matchQualifiedIds} from 'Util/QualifiedId';
-import {ConversationVerificationState} from './ConversationVerificationState';
-import {extractClientDiff} from './ClientMismatchUtil';
-import {Core} from '../service/CoreSingleton';
-import {updateAccessRights} from './ConversationAccessPermission';
-import {ClientState} from '../client/ClientState';
-import {MLSReturnType} from '@wireapp/core/src/main/conversation';
+import {MemberMessage} from '../entity/message/MemberMessage';
+import {Message} from '../entity/message/Message';
+import {User} from '../entity/User';
+import {BackendClientError} from '../error/BackendClientError';
+import {BaseError, BASE_ERROR_TYPE} from '../error/BaseError';
+import {ConversationError} from '../error/ConversationError';
+import {ClientEvent, CONVERSATION as CLIENT_CONVERSATION_EVENT} from '../event/Client';
+import {EventRepository} from '../event/EventRepository';
+import {EventService} from '../event/EventService';
+import {EventSource} from '../event/EventSource';
+import {NOTIFICATION_HANDLING_STATE} from '../event/NotificationHandlingState';
 import {isMemberMessage} from '../guards/Message';
-import {LEAVE_CALL_REASON} from '../calling/enum/LeaveCallReason';
+import * as LegalHoldEvaluator from '../legal-hold/LegalHoldEvaluator';
+import {MessageCategory} from '../message/MessageCategory';
+import {SuperType} from '../message/SuperType';
+import {SystemMessageType} from '../message/SystemMessageType';
 import {mlsConversationState} from '../mls/mlsConversationState';
-import PrimaryModal from '../components/Modals/PrimaryModal';
+import {PropertiesRepository} from '../properties/PropertiesRepository';
+import {Core} from '../service/CoreSingleton';
+import type {EventRecord} from '../storage';
+import {ConversationRecord} from '../storage/record/ConversationRecord';
+import {TeamRepository} from '../team/TeamRepository';
+import {TeamState} from '../team/TeamState';
+import {ServerTimeHandler} from '../time/serverTimeHandler';
+import {UserFilter} from '../user/UserFilter';
+import {UserRepository} from '../user/UserRepository';
+import {UserState} from '../user/UserState';
 
 type ConversationDBChange = {obj: EventRecord; oldObj: EventRecord};
 type FetchPromise = {rejectFn: (error: ConversationError) => void; resolveFn: (conversation: Conversation) => void};

@@ -18,7 +18,9 @@
  */
 
 import {render} from '@testing-library/react';
+
 import {withTheme} from 'src/script/auth/util/test/TestUtil';
+
 import ControlButtons from './ControlButtons';
 
 const mockConfig = {

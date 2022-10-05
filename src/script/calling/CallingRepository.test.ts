@@ -18,27 +18,29 @@
  */
 
 import 'jsdom-worker';
-
-import ko, {Subscription} from 'knockout';
-import {amplify} from 'amplify';
 import {CONV_TYPE, CALL_TYPE, STATE as CALL_STATE, REASON, Wcall} from '@wireapp/avs';
-import {CallingRepository} from 'src/script/calling/CallingRepository';
-import {EventRepository} from 'src/script/event/EventRepository';
-import {Participant} from 'src/script/calling/Participant';
+import {amplify} from 'amplify';
+import ko, {Subscription} from 'knockout';
+
 import {Call} from 'src/script/calling/Call';
+import {CallingRepository} from 'src/script/calling/CallingRepository';
 import {CallState} from 'src/script/calling/CallState';
-import {User} from 'src/script/entity/User';
-import {MediaType} from 'src/script/media/MediaType';
+import {Participant} from 'src/script/calling/Participant';
 import {Conversation} from 'src/script/entity/Conversation';
+import {User} from 'src/script/entity/User';
+import {EventRepository} from 'src/script/event/EventRepository';
+import {MediaType} from 'src/script/media/MediaType';
 import {serverTimeHandler} from 'src/script/time/serverTimeHandler';
-import {createRandomUuid} from 'Util/util';
 import {TestFactory} from 'test/helper/TestFactory';
-import {MediaDevicesHandler} from '../media/MediaDevicesHandler';
+import {createRandomUuid} from 'Util/util';
+
 import {CALL_MESSAGE_TYPE} from './enum/CallMessageType';
-import {CALL} from '../event/Client';
-import {UserRepository} from '../user/UserRepository';
 import {LEAVE_CALL_REASON} from './enum/LeaveCallReason';
+
 import {usePrimaryModalState} from '../components/Modals/PrimaryModal';
+import {CALL} from '../event/Client';
+import {MediaDevicesHandler} from '../media/MediaDevicesHandler';
+import {UserRepository} from '../user/UserRepository';
 
 const createSelfParticipant = () => {
   const selfUser = new User();

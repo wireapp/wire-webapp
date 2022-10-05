@@ -26,21 +26,20 @@ import {amplify} from 'amplify';
 import ko from 'knockout';
 
 import TitleBar from 'Components/TitleBar';
-
 import {createRandomUuid} from 'Util/util';
 
-import {UserState} from '../../user/UserState';
-import {CallState} from '../../calling/CallState';
-import {TeamState} from '../../team/TeamState';
 import {TestFactory} from '../../../../test/helper/TestFactory';
 import {CallingRepository} from '../../calling/CallingRepository';
-import {Conversation} from '../../entity/Conversation';
-import {LegalHoldModalViewModel} from '../../view_model/content/LegalHoldModalViewModel';
+import {CallState} from '../../calling/CallState';
 import {ConversationVerificationState} from '../../conversation/ConversationVerificationState';
+import {Conversation} from '../../entity/Conversation';
 import {User} from '../../entity/User';
+import {PanelState} from '../../page/RightSidebar/RightSidebar';
+import {TeamState} from '../../team/TeamState';
+import {UserState} from '../../user/UserState';
+import {LegalHoldModalViewModel} from '../../view_model/content/LegalHoldModalViewModel';
 import {ContentState} from '../../view_model/ContentViewModel';
 import {MainViewModel, ViewModelRepositories} from '../../view_model/MainViewModel';
-import {PanelState} from '../../page/RightSidebar/RightSidebar';
 
 jest.mock('@wireapp/react-ui-kit', () => ({
   ...(jest.requireActual('@wireapp/react-ui-kit') as any),

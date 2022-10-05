@@ -21,10 +21,10 @@ import {fireEvent, render, waitFor} from '@testing-library/react';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import {amplify} from 'amplify';
 
-import Giphy, {GiphyState} from './index';
-
 import {GiphyRepository} from '../../extension/GiphyRepository';
 import {GiphyService} from '../../extension/GiphyService';
+
+import Giphy, {GiphyState} from './index';
 
 const getDefaultProps = () => ({
   giphyRepository: new GiphyRepository(new GiphyService()),

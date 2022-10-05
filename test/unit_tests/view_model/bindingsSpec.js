@@ -17,8 +17,8 @@
  *
  */
 
-import ko from 'knockout';
 import $ from 'jquery';
+import ko from 'knockout';
 
 import '../../../src/script/view_model/bindings/CommonBindings';
 
