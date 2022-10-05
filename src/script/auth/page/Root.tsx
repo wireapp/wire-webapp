@@ -151,7 +151,7 @@ const Root: React.FC<RootProps & ConnectedProps & DispatchProps> = ({
               <Route path={ROUTE.HISTORY_INFO} element={<ProtectedHistoryInfo />} />
               <Route path={ROUTE.INITIAL_INVITE} element={<ProtectedInitialInvite />} />
               <Route
-                path={ROUTE.LOGIN}
+                path={`${ROUTE.LOGIN}/*`}
                 element={
                   <Title title={`${t('authLoginTitle')} . ${brandName}`}>
                     <Login />
