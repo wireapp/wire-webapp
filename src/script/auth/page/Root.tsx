@@ -75,6 +75,23 @@ const Root: React.FC<RootProps & ConnectedProps & DispatchProps> = ({
   doGetSSOSettings,
 }) => {
   useEffect(() => {
+    // Force the hash url to have a initial `/` (see https://stackoverflow.com/a/71864506)
+    const forceSlashAfterHash = () => {
+      const hash = window.location.hash;
+      if (!hash.startsWith('#/')) {
+        window.location.hash = `#/${hash.slice(1)}`;
+      }
+    };
+
+    forceSlashAfterHash();
+
+    window.addEventListener('hashchange', forceSlashAfterHash);
+    return () => {
+      window.removeEventListener('hashchange', forceSlashAfterHash);
+    };
+  }, []);
+
+  useEffect(() => {
     startPolling();
     window.onbeforeunload = () => {
       safelyRemoveCookie(CookieSelector.COOKIE_NAME_APP_OPENED, Config.getConfig().APP_INSTANCE_ID);
