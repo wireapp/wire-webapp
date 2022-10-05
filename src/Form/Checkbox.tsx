@@ -19,11 +19,10 @@
 
 /** @jsx jsx */
 import {jsx} from '@emotion/react';
-import React from 'react';
+import React, {useId} from 'react';
 
 import {Theme} from '../Layout';
 import {Text, TextProps, textStyle} from '../Text';
-import {filterProps} from '../util';
 import {INPUT_CLASSNAME, InputProps} from './Input';
 
 export interface StyledLabelProps<T = HTMLLabelElement> extends React.HTMLProps<T> {
@@ -32,10 +31,7 @@ export interface StyledLabelProps<T = HTMLLabelElement> extends React.HTMLProps<
   aligncenter?: boolean;
 }
 
-const filterStyledLabelProps = (props: StyledLabelProps) => filterProps(props, ['markInvalid']);
-
-const StyledLabel = (props: StyledLabelProps) => {
-  const {disabled, markInvalid, aligncenter = false} = props;
+const StyledLabel = ({disabled, markInvalid, aligncenter = false, children, ...props}: StyledLabelProps) => {
   return (
     <label
       css={(theme: Theme) => ({
@@ -87,9 +83,9 @@ const StyledLabel = (props: StyledLabelProps) => {
         cursor: disabled ? 'not-allowed' : 'pointer',
         borderRadius: '4px',
       })}
-      {...filterStyledLabelProps(props)}
+      {...props}
     >
-      {props.children}
+      {children}
       <svg width="15" height="13" viewBox="0 0 16 13" xmlns="http://www.w3.org/2000/svg">
         <path d="M5.65685 12.0711L15.9842 1.62738L14.57 0.213167L5.65685 9.24264L1.41421 5L0 6.41421L5.65685 12.0711Z" />
       </svg>
@@ -102,13 +98,10 @@ interface CheckboxProps<T = HTMLInputElement> extends InputProps<T> {
   aligncenter?: boolean;
 }
 
-const filterCheckboxProps = (props: CheckboxProps) => filterProps(props, ['markInvalid']);
-
-// We use Math.random..., because some of apps doesn't migrated to newest version of React.
 export const Checkbox: React.FC<CheckboxProps<HTMLInputElement>> = React.forwardRef<
   HTMLInputElement,
   CheckboxProps<HTMLInputElement>
->(({id = Math.random().toString(), children, style, disabled, wrapperCSS = {}, ...props}, ref) => (
+>(({id = useId(), children, style, disabled, wrapperCSS = {}, markInvalid, aligncenter, ...props}, ref) => (
   <div
     css={(theme: Theme) => ({
       alignItems: 'center',
@@ -137,10 +130,10 @@ export const Checkbox: React.FC<CheckboxProps<HTMLInputElement>> = React.forward
       disabled={disabled}
       ref={ref}
       className={INPUT_CLASSNAME}
-      {...filterCheckboxProps(props)}
+      {...props}
     />
 
-    <StyledLabel htmlFor={id} disabled={disabled} markInvalid={props.markInvalid} aligncenter={props.aligncenter}>
+    <StyledLabel htmlFor={id} disabled={disabled} markInvalid={markInvalid} aligncenter={aligncenter}>
       {children}
     </StyledLabel>
   </div>
