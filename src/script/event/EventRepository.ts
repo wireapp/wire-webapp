@@ -662,6 +662,7 @@ export class EventRepository {
    * @returns `true` if event is handled within it's lifetime, otherwise throws error
    */
   private validateCallEventLifetime(event: EventRecord): boolean {
+    return true;
     const {content = {}, conversation: conversationId, time, type} = event;
     const forcedEventTypes = [CALL_MESSAGE_TYPE.CANCEL, CALL_MESSAGE_TYPE.GROUP_LEAVE];
 
