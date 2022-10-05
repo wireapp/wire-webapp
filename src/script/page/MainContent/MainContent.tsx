@@ -63,10 +63,10 @@ const MainContent: FC<MainContentProps> = ({
   contentViewModel,
   conversationState = container.resolve(ConversationState),
 }) => {
-  const {state} = useKoSubscribableChildren(contentViewModel, ['state']);
+  const {state, isFederated, initialMessage} = useKoSubscribableChildren(contentViewModel, ['state']);
   const {activeConversation} = useKoSubscribableChildren(conversationState, ['activeConversation']);
 
-  const {initialMessage, repositories, isFederated} = contentViewModel;
+  const {repositories} = contentViewModel;
 
   const teamState = container.resolve(TeamState);
   const userState = container.resolve(UserState);
@@ -76,13 +76,13 @@ const MainContent: FC<MainContentProps> = ({
     [ContentViewModel.STATE.CONVERSATION]: t('accessibility.headings.conversation'),
     [ContentViewModel.STATE.HISTORY_EXPORT]: t('accessibility.headings.historyExport'),
     [ContentViewModel.STATE.HISTORY_IMPORT]: t('accessibility.headings.historyImport'),
-    [ContentState.COLLECTION]: t('accessibility.headings.collection'),
-    [ContentState.PREFERENCES_ABOUT]: t('accessibility.headings.preferencesAbout'),
-    [ContentState.PREFERENCES_ACCOUNT]: t('accessibility.headings.preferencesAccount'),
-    [ContentState.PREFERENCES_AV]: t('accessibility.headings.preferencesAV'),
-    [ContentState.PREFERENCES_DEVICES]: t('accessibility.headings.preferencesDevices'),
-    [ContentState.PREFERENCES_OPTIONS]: t('accessibility.headings.preferencesOptions'),
-    [ContentState.WATERMARK]: t('accessibility.headings.noConversation'),
+    [ContentViewModel.STATE.COLLECTION]: t('accessibility.headings.collection'),
+    [ContentViewModel.STATE.PREFERENCES_ABOUT]: t('accessibility.headings.preferencesAbout'),
+    [ContentViewModel.STATE.PREFERENCES_ACCOUNT]: t('accessibility.headings.preferencesAccount'),
+    [ContentViewModel.STATE.PREFERENCES_AV]: t('accessibility.headings.preferencesAV'),
+    [ContentViewModel.STATE.PREFERENCES_DEVICES]: t('accessibility.headings.preferencesDevices'),
+    [ContentViewModel.STATE.PREFERENCES_OPTIONS]: t('accessibility.headings.preferencesOptions'),
+    [ContentViewModel.STATE.WATERMARK]: t('accessibility.headings.noConversation'),
   };
 
   const title = statesTitle[state];
@@ -163,15 +163,15 @@ const MainContent: FC<MainContentProps> = ({
                 </div>
               )}
 
-              {state === ContentViewModel.STATE.CONNECTION_REQUESTS && (
+              {state === ContentState.CONNECTION_REQUESTS && (
                 <ConnectRequests teamState={teamState} userState={userState} />
               )}
 
-              {state === ContentViewModel.STATE.CONVERSATION && (
+              {state === ContentState.CONVERSATION && (
                 <ConversationList initialMessage={initialMessage} teamState={teamState} userState={userState} />
               )}
 
-              {state === ContentViewModel.STATE.HISTORY_EXPORT && <HistoryExport userState={userState} />}
+              {state === ContentState.HISTORY_EXPORT && <HistoryExport userState={userState} />}
             </>
           </Animated>
         </SwitchTransition>

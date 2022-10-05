@@ -172,12 +172,6 @@ const RightSidebar: FC<RightSidebarProps> = ({
         setCurrentEntity(updatedMessageEntity);
       }
     });
-
-    return () => {
-      amplify.unsubscribeAll(WebAppEvents.CONTENT.SWITCH);
-      amplify.unsubscribeAll(OPEN_CONVERSATION_DETAILS);
-      amplify.unsubscribeAll(WebAppEvents.CONVERSATION.MESSAGE.UPDATED);
-    };
   }, []);
 
   if (!activeConversation) {

@@ -54,8 +54,8 @@ export interface TitleBarProps {
   legalHoldModal: LegalHoldModalViewModel;
   callActions: CallActions;
   userState: UserState;
-  callState?: CallState;
   teamState: TeamState;
+  callState?: CallState;
   isFederated?: boolean;
   // Function will be used after migration, to changing React State. Current implementation works with React and Knockout.
   toggleRightSidebar?: (state: PanelState) => void;
