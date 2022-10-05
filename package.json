@@ -72,5 +72,5 @@
     "test:update": "yarn test --updateSnapshot",
     "test:project": "yarn dist && yarn test"
   },
-  "version": "8.14.8"
+  "version": "8.14.9"
 }

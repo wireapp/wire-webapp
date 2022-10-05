@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [8.14.9](https://github.com/wireapp/wire-web-packages/compare/@wireapp/react-ui-kit@8.14.8...@wireapp/react-ui-kit@8.14.9) (2022-10-05)
+
+### Bug Fixes
+
+* **react-ui-kit:** Address issue with non-standard props passed to DOM elements ([#4421](https://github.com/wireapp/wire-web-packages/issues/4421)) ([93d9c12](https://github.com/wireapp/wire-web-packages/commit/93d9c121b842fa039706d7cc29733b66aa117fc8))
+
 ## [8.14.8](https://github.com/wireapp/wire-web-packages/compare/@wireapp/react-ui-kit@8.14.7...@wireapp/react-ui-kit@8.14.8) (2022-09-26)
 
 ### Bug Fixes
