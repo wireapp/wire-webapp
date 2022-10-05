@@ -30,7 +30,6 @@
     "@types/spark-md5": "3.0.2",
     "@types/tough-cookie": "4.0.1",
     "@types/ws": "7.4.7",
-    "@wireapp/react-ui-kit": "workspace:^",
     "@wireapp/store-engine": "workspace:^",
     "@wireapp/store-engine-fs": "workspace:^",
     "babel-loader": "8.2.2",
