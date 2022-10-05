@@ -22,19 +22,9 @@ import type {RichInfo} from '@wireapp/api-client/src/user/';
 import {act} from 'react-dom/test-utils';
 import {User} from 'src/script/entity/User';
 import {RichProfileRepository} from 'src/script/user/RichProfileRepository';
-import TestPage from 'Util/test/TestPage';
 import {createRandomUuid} from 'Util/util';
-import EnrichedFields, {EnrichedFieldsProps} from './EnrichedFields';
-
-class EnrichedFieldsPage extends TestPage<EnrichedFieldsProps> {
-  constructor(props?: EnrichedFieldsProps) {
-    super(EnrichedFields, props);
-  }
-
-  getEntries = () => this.getAll('[data-uie-name="item-enriched-key"]');
-  findByValue = (expectedValue: string) =>
-    this.getAll(`[data-uie-name="item-enriched-value"][data-uie-value="${expectedValue}"]`);
-}
+import EnrichedFields from './EnrichedFields';
+import {render} from '@testing-library/react';
 
 const richInfo: Partial<RichInfo> = {
   fields: [
@@ -55,72 +45,97 @@ describe('EnrichedFields', () => {
   it('displays all the given fields', async () => {
     const richProfileRepository = createRichProfileRepository();
     const user = new User(createRandomUuid(), '');
-    const enrichedFields = new EnrichedFieldsPage({richProfileRepository, user});
+
+    const props = {richProfileRepository, user};
+
+    const {getAllByTestId} = render(<EnrichedFields {...props} />);
 
     await act(() =>
       waitFor(() => {
         expect(richProfileRepository.getUserRichProfile).toHaveBeenCalled();
       }),
     );
-    enrichedFields.update();
-    expect(enrichedFields.getEntries().length).toEqual(2);
+
+    expect(getAllByTestId('item-enriched-key')).toHaveLength(2);
   });
 
   it('displays the email if set on user', async () => {
     const richProfileRepository = createRichProfileRepository();
     const user = new User(createRandomUuid(), '');
     user.email('user@inter.net');
-    const enrichedFields = new EnrichedFieldsPage({richProfileRepository, user});
+
+    const props = {richProfileRepository, user};
+
+    const {getAllByTestId} = render(<EnrichedFields {...props} />);
 
     await act(() =>
       waitFor(() => {
         expect(richProfileRepository.getUserRichProfile).toHaveBeenCalled();
       }),
     );
-    enrichedFields.update();
-    expect(enrichedFields.getEntries().length).toEqual(3);
+
+    expect(getAllByTestId('item-enriched-key')).toHaveLength(3);
   });
 
   it('displays the domain of a user when the federation feature flag is turned on', async () => {
     const richProfileRepository = createRichProfileRepository();
     const domain = 'wire.com';
     const user = new User(createRandomUuid(), domain);
-    const enrichedFields = new EnrichedFieldsPage({richProfileRepository, showDomain: true, user});
+
+    const props = {richProfileRepository, showDomain: true, user};
+
+    const {container} = render(<EnrichedFields {...props} />);
+
     await act(() =>
       waitFor(() => {
         expect(richProfileRepository.getUserRichProfile).toHaveBeenCalled();
       }),
     );
-    enrichedFields.update();
-    expect(enrichedFields.findByValue(domain).length).toBe(1);
+
+    const itemEnrichedValues = container.querySelectorAll(
+      `[data-uie-name="item-enriched-value"][data-uie-value="${domain}"]`,
+    );
+
+    expect(itemEnrichedValues).toHaveLength(1);
   });
 
   it('does NOT display the domain of a user when the federation feature flag is turned off', async () => {
     const richProfileRepository = createRichProfileRepository();
     const domain = 'wire.com';
     const user = new User(createRandomUuid(), domain);
-    const enrichedFields = new EnrichedFieldsPage({richProfileRepository, user});
+
+    const props = {richProfileRepository, user};
+
+    const {container} = render(<EnrichedFields {...props} />);
+
     await act(() =>
       waitFor(() => {
         expect(richProfileRepository.getUserRichProfile).toHaveBeenCalled();
       }),
     );
-    enrichedFields.update();
-    expect(enrichedFields.findByValue(domain).length).toBe(0);
+
+    const itemEnrichedValues = container.querySelectorAll(
+      `[data-uie-name="item-enriched-value"][data-uie-value="${domain}"]`,
+    );
+
+    expect(itemEnrichedValues).toHaveLength(0);
   });
 
   it('calls the `onFieldsLoaded` function when fields are loaded', async () => {
     const richProfileRepository = createRichProfileRepository();
     const user = new User(createRandomUuid(), '');
     const onFieldsLoaded = jest.fn();
-    const enrichedFields = new EnrichedFieldsPage({onFieldsLoaded, richProfileRepository, user});
+
+    const props = {onFieldsLoaded, richProfileRepository, user};
+
+    render(<EnrichedFields {...props} />);
 
     await act(() =>
       waitFor(() => {
         expect(richProfileRepository.getUserRichProfile).toHaveBeenCalled();
       }),
     );
-    enrichedFields.update();
+
     expect(onFieldsLoaded).toHaveBeenCalledWith(richInfo.fields);
   });
 });

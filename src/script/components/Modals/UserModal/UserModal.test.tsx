@@ -19,43 +19,24 @@
 
 import {QualifiedId} from '@wireapp/api-client/src/user';
 
-import TestPage from 'Util/test/TestPage';
 import {UserState} from 'src/script/user/UserState';
 import {TeamState} from 'src/script/team/TeamState';
 import {Core} from 'src/script/service/CoreSingleton';
-import UserModal, {UserModalProps} from './UserModal';
+import UserModal from './UserModal';
 import {UserRepository} from 'src/script/user/UserRepository';
 import {ActionsViewModel} from 'src/script/view_model/ActionsViewModel';
 import {User} from 'src/script/entity/User';
-
-class UserModalPage extends TestPage<UserModalProps> {
-  constructor(props?: UserModalProps) {
-    super(UserModal, props);
-  }
-
-  getWrapperElement = () => this.get('div.user-modal');
-  getStatusModalText = () => this.findByTestId('status-modal-text');
-}
+import {render, waitFor} from '@testing-library/react';
 
 describe('UserModal', () => {
-  it('does not render when user id is not passed', async () => {
-    const UserModal = new UserModalPage({
-      actionsViewModel: {} as ActionsViewModel,
-      core: {} as Core,
-      teamState: {} as TeamState,
-      userId: null,
-      userRepository: {} as UserRepository,
-      userState: {} as UserState,
-    });
-    expect(UserModal.getWrapperElement()?.children[0].getAttribute('style')).toBe('display: none;');
-  });
 
   it('correctly fetches user from user repository', async () => {
     jest.useFakeTimers();
     const getUserById = jest.fn(async (id: QualifiedId) => {
       return new User('mock-id', 'test-domain.mock');
     });
-    new UserModalPage({
+
+    const props = {
       actionsViewModel: {} as ActionsViewModel,
       core: {} as Core,
       teamState: {} as TeamState,
@@ -64,7 +45,10 @@ describe('UserModal', () => {
         getUserById,
       } as unknown as UserRepository,
       userState: {} as UserState,
-    });
+    };
+
+    render(<UserModal {...props} />);
+
     expect(getUserById).toHaveBeenCalledTimes(1);
   });
 
@@ -75,7 +59,8 @@ describe('UserModal', () => {
       user.isDeleted = true;
       return user;
     });
-    const UserModal = new UserModalPage({
+
+    const props = {
       actionsViewModel: {} as ActionsViewModel,
       core: {} as Core,
       teamState: {} as TeamState,
@@ -84,9 +69,14 @@ describe('UserModal', () => {
         getUserById,
       } as unknown as UserRepository,
       userState: {} as UserState,
-    });
+    };
+
+    const {getByTestId} = render(<UserModal {...props} />);
+
     expect(getUserById).toHaveBeenCalledTimes(1);
-    const statusModalText = await UserModal.getStatusModalText();
-    expect(statusModalText).toBeInstanceOf(HTMLDivElement);
+
+    await waitFor(() => {
+      expect(getByTestId('status-modal-text')).toBeInstanceOf(HTMLDivElement);
+    });
   });
 });
