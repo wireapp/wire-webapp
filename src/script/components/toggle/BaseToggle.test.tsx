@@ -17,17 +17,8 @@
  *
  */
 
-import TestPage from 'Util/test/TestPage';
-
-import BaseToggle, {BaseToggleProps} from './BaseToggle';
-
-class BasePage extends TestPage<BaseToggleProps> {
-  constructor(props?: BaseToggleProps) {
-    super(BaseToggle, props);
-  }
-
-  getInput = () => this.get('input[data-uie-name="allow-base-toggle-input"]');
-}
+import BaseToggle from './BaseToggle';
+import {render, fireEvent} from '@testing-library/react';
 
 describe('BaseToggle', () => {
   it('toggles check property', async () => {
@@ -40,8 +31,11 @@ describe('BaseToggle', () => {
       },
     };
 
-    const baseTogglePage = new BasePage(props);
-    baseTogglePage.click(baseTogglePage.getInput());
+    const {getByTestId} = render(<BaseToggle {...props} />);
+
+    const input = getByTestId('allow-base-toggle-input');
+    fireEvent.click(input);
+
     expect(isChecked).toBe(true);
   });
 });
