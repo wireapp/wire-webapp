@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [8.15.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/react-ui-kit@8.14.9...@wireapp/react-ui-kit@8.15.0) (2022-10-05)
+
+### Features
+
+* update emotion ([#4419](https://github.com/wireapp/wire-web-packages/issues/4419)) ([7b76bd6](https://github.com/wireapp/wire-web-packages/commit/7b76bd6e34a0807a96d62bbcad70644d5b175e60))
+
 ## [8.14.9](https://github.com/wireapp/wire-web-packages/compare/@wireapp/react-ui-kit@8.14.8...@wireapp/react-ui-kit@8.14.9) (2022-10-05)
 
 ### Bug Fixes
