@@ -47,7 +47,7 @@ describe('UserModal', () => {
       userRepository: {} as UserRepository,
       userState: {} as UserState,
     });
-    expect(UserModal.getWrapperElement().children[0].getAttribute('style')).toBe('display: none;');
+    expect(UserModal.getWrapperElement()?.children[0].getAttribute('style')).toBe('display: none;');
   });
 
   it('correctly fetches user from user repository', async () => {

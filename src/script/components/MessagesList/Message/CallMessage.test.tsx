@@ -18,29 +18,18 @@
  */
 
 import ko from 'knockout';
-import TestPage from 'Util/test/TestPage';
 import {CallMessage as CallMessageEntity} from 'src/script/entity/message/CallMessage';
-import CallMessage, {CallMessageProps} from './CallMessage';
+import CallMessage from './CallMessage';
+import {render} from '@testing-library/react';
 
 jest.mock('Components/Icon', () => ({
   Hangup: function HangupIcon() {
-    return <span className="hangupicon"></span>;
+    return <span>hangupIcon</span>;
   },
   Pickup: function PickupIcon() {
-    return <span className="pickupicon"></span>;
+    return <span>pickupIcon</span>;
   },
 }));
-
-class CallMessagePage extends TestPage<CallMessageProps> {
-  constructor(props?: CallMessageProps) {
-    super(CallMessage, props);
-  }
-
-  getCallMessage = (completed: 'completed' | 'not_completed') =>
-    this.get(`[data-uie-name="element-message-call"]${completed ? `[data-uie-value="${completed}"]` : ''}`);
-  getPickupIcon = () => this.get('.pickupicon');
-  getHangupIcon = () => this.get('.hangupicon');
-}
 
 const createCallMessage = (partialCallMessage: Partial<CallMessageEntity>) => {
   const callMessage: Partial<CallMessageEntity> = {
@@ -56,24 +45,34 @@ const createCallMessage = (partialCallMessage: Partial<CallMessageEntity>) => {
 
 describe('CallMessage', () => {
   it('shows green pickup icon for completed calls', async () => {
-    const callMessagePage = new CallMessagePage({
+    const props = {
       message: createCallMessage({
         wasCompleted: () => true,
       }),
-    });
+    };
 
-    expect(callMessagePage.getCallMessage('completed')).not.toBeNull();
-    expect(callMessagePage.getPickupIcon()).not.toBeNull();
+    const {getByTestId, queryByText} = render(<CallMessage {...props} />);
+
+    const elementMessageCall = getByTestId('element-message-call');
+    expect(elementMessageCall.getAttribute('data-uie-value')).toEqual('completed');
+
+    expect(queryByText('hangupIcon')).toBeNull();
+    expect(queryByText('pickupIcon')).not.toBeNull();
   });
 
   it('shows red hangup icon for incompleted calls', async () => {
-    const callMessagePage = new CallMessagePage({
+    const props = {
       message: createCallMessage({
         wasCompleted: () => false,
       }),
-    });
+    };
 
-    expect(callMessagePage.getCallMessage('not_completed')).not.toBeNull();
-    expect(callMessagePage.getHangupIcon()).not.toBeNull();
+    const {getByTestId, queryByText} = render(<CallMessage {...props} />);
+
+    const elementMessageCall = getByTestId('element-message-call');
+    expect(elementMessageCall.getAttribute('data-uie-value')).toEqual('not_completed');
+
+    expect(queryByText('pickupIcon')).toBeNull();
+    expect(queryByText('hangupIcon')).not.toBeNull();
   });
 });

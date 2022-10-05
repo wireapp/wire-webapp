@@ -23,7 +23,6 @@ export enum ShortcutType {
   NEXT = 'next',
   NOTIFICATIONS = 'notifications',
   PEOPLE = 'people',
-  PING = 'ping',
   PREV = 'prev',
   START = 'start',
 }

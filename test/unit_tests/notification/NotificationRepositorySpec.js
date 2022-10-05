@@ -57,7 +57,7 @@ import {MentionEntity} from 'src/script/message/MentionEntity';
 
 import {ConversationMapper} from 'src/script/conversation/ConversationMapper';
 import {ConnectionMapper} from 'src/script/connection/ConnectionMapper';
-import {ContentViewModel} from 'src/script/view_model/ContentViewModel';
+import {ContentState} from 'src/script/view_model/ContentViewModel';
 import {TestFactory} from '../../helper/TestFactory';
 import {entities, payload} from '../../api/payloads';
 
@@ -115,7 +115,7 @@ describe('NotificationRepository', () => {
       spyOn(testFactory.notification_repository.assetRepository, 'generateAssetUrl').and.returnValue(
         Promise.resolve('/image/logo/notification.png'),
       );
-      contentViewModelState.state = ko.observable(ContentViewModel.STATE.CONVERSATION);
+      contentViewModelState.state = ko.observable(ContentState.CONVERSATION);
       contentViewModelState.multitasking = {
         isMinimized: () => true,
       };

@@ -27,6 +27,7 @@ import {generateConversationUrl} from '../../../../router/routeGenerator';
 import {createNavigate} from '../../../../router/routerBindings';
 import {ListViewModel} from 'src/script/view_model/ListViewModel';
 import {Conversation} from 'src/script/entity/Conversation';
+import useRoveFocus from '../../../../hooks/useRoveFocus';
 
 export interface GroupedConversationsFolderProps {
   expandedFolders: string[];
@@ -51,22 +52,29 @@ const GroupedConversationsFolder: React.FC<GroupedConversationsFolderProps> = ({
   const {conversations} = useKoSubscribableChildren(folder, ['conversations']);
   const makeOnClick = (conversationId: string, domain: string | null) =>
     createNavigate(generateConversationUrl(conversationId, domain));
+  const {currentFocus, handleKeyDown, setCurrentFocus} = useRoveFocus(conversations.length);
 
   return (
     <li className="conversation-folder" data-uie-name="conversation-folder" data-uie-value={folder.name}>
       <GroupedConversationHeader onClick={() => toggle(folder.id)} conversationLabel={folder} isOpen={isExpanded} />
-      <ul css={css({listStyle: 'none', padding: 0})} id={folder.id}>
+      <ul css={css({listStyle: 'none', padding: 0})} id={folder.id} aria-labelledby={folder.id}>
         {isExpanded &&
-          conversations.map(conversation => (
+          conversations.map((conversation, index) => (
             <ConversationListCell
               dataUieName="item-conversation"
               key={conversation.id}
+              index={index}
+              focusConversation={currentFocus === index}
+              isConversationListFocus
+              handleFocus={setCurrentFocus}
+              handleArrowKeyDown={handleKeyDown}
               onClick={makeOnClick(conversation.id, conversation.domain)}
               rightClick={(_, event) => listViewModel.onContextMenu(conversation, event)}
               conversation={conversation}
               showJoinButton={hasJoinableCall(conversation)}
               isSelected={isSelectedConversation}
               onJoinCall={onJoinCall}
+              isFolder={true}
             />
           ))}
       </ul>

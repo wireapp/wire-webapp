@@ -23,6 +23,7 @@ import React from 'react';
 import type {Router} from './Router';
 import {KEY} from 'Util/KeyboardUtil';
 import {useResponsiveViewState} from '../page/ResponsiveViewState';
+import {forceCloseRightPanel} from '../page/RightSidebar/utils/toggleRightPanel';
 
 let router: Router;
 
@@ -47,6 +48,7 @@ export const createNavigate =
     useResponsiveViewState.setState({currentView: 0});
     router?.navigate(link);
     event.preventDefault();
+    forceCloseRightPanel();
   };
 
 export const createNavigateKeyboard =

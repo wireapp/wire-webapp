@@ -56,7 +56,7 @@ const GroupDetails: FC<GroupDetailsProps> = ({
             <span className="conversation-details__participant_count__number" data-uie-name="status-user-count">
               {allUsersCount || userParticipants.length}
             </span>
-
+            &nbsp;
             <span className="conversation-details__participant_count__text">{participantsUserText}</span>
           </span>
         )}
@@ -66,7 +66,7 @@ const GroupDetails: FC<GroupDetailsProps> = ({
             <span className="conversation-details__participant_count__number" data-uie-name="status-service-count">
               {serviceParticipants.length}
             </span>
-
+            &nbsp;
             <span className="conversation-details__participant_count__text">{participantsServiceText}</span>
           </span>
         )}

@@ -18,7 +18,7 @@
  */
 
 // Polyfill for "tsyringe" dependency injection
-require('core-js/es7/reflect');
+require('core-js/full/reflect');
 require('intersection-observer');
 require('fake-indexeddb/auto');
 
@@ -31,6 +31,7 @@ require('src/script/util/test/mock/navigatorPermissionsMock');
 require('src/script/util/test/mock/ResponseMock');
 require('src/script/util/test/mock/SVGProviderMock');
 require('src/script/util/test/mock/WebRTCMock');
+require('src/script/util/test/mock/resizeObserver.mock');
 
 jest.mock('axios', () => {
   return {

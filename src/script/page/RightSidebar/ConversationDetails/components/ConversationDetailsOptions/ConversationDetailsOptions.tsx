@@ -27,12 +27,13 @@ import {t} from 'Util/LocalizerUtil';
 
 import ConversationDetailsOption from './ConversationDetailsOption';
 
+import {PanelState, PanelEntity} from '../../../RightSidebar';
+
 import {Conversation} from '../../../../../entity/Conversation';
-import {PanelParams, PanelViewModel} from '../../../../../view_model/PanelViewModel';
 
 interface ConversationDetailsOptionsProps {
   activeConversation: Conversation;
-  togglePanel: (state: string, params: PanelParams) => void;
+  togglePanel: (state: PanelState, entity: PanelEntity, addMode?: boolean) => void;
   receiptMode: RECEIPT_MODE;
   guestOptionsText: string;
   notificationStatusText: string;
@@ -61,13 +62,13 @@ const ConversationDetailsOptions: FC<ConversationDetailsOptionsProps> = ({
   timedMessagesText,
   updateConversationReceiptMode,
 }) => {
-  const openNotificationsPanel = () => togglePanel(PanelViewModel.STATE.NOTIFICATIONS, {entity: activeConversation});
+  const openNotificationsPanel = () => togglePanel(PanelState.NOTIFICATIONS, activeConversation);
 
-  const openTimedMessagePanel = () => togglePanel(PanelViewModel.STATE.TIMED_MESSAGES, {entity: activeConversation});
+  const openTimedMessagePanel = () => togglePanel(PanelState.TIMED_MESSAGES, activeConversation);
 
-  const openGuestPanel = () => togglePanel(PanelViewModel.STATE.GUEST_OPTIONS, {entity: activeConversation});
+  const openGuestPanel = () => togglePanel(PanelState.GUEST_OPTIONS, activeConversation);
 
-  const openServicePanel = () => togglePanel(PanelViewModel.STATE.SERVICES_OPTIONS, {entity: activeConversation});
+  const openServicePanel = () => togglePanel(PanelState.SERVICES_OPTIONS, activeConversation);
 
   return (
     <>
@@ -79,7 +80,7 @@ const ConversationDetailsOptions: FC<ConversationDetailsOptionsProps> = ({
             className="conversation-details__notifications"
             onClick={openNotificationsPanel}
             dataUieName="go-notifications"
-            icon={<Icon.Notification className="panel__action-item__icon" />}
+            icon={<Icon.Notification />}
             title={t('conversationDetailsActionNotifications')}
             statusUieName="status-notifications"
             statusText={notificationStatusText}
@@ -91,7 +92,7 @@ const ConversationDetailsOptions: FC<ConversationDetailsOptionsProps> = ({
             className="conversation-details__timed-messages"
             onClick={openTimedMessagePanel}
             dataUieName="go-timed-messages"
-            icon={<Icon.Timer className="panel__action-item__icon" />}
+            icon={<Icon.Timer />}
             title={t('conversationDetailsActionTimedMessages')}
             statusUieName="status-timed-messages"
             statusText={timedMessagesText}
@@ -103,7 +104,7 @@ const ConversationDetailsOptions: FC<ConversationDetailsOptionsProps> = ({
             className="conversation-details__guest-options"
             onClick={openGuestPanel}
             dataUieName="go-guest-options"
-            icon={<Icon.Guest className="panel__action-item__icon" />}
+            icon={<Icon.Guest />}
             title={t('conversationDetailsActionGuestOptions')}
             statusUieName="status-allow-guests"
             statusText={guestOptionsText}
@@ -115,7 +116,7 @@ const ConversationDetailsOptions: FC<ConversationDetailsOptionsProps> = ({
             className="conversation-details__services-options"
             onClick={openServicePanel}
             dataUieName="go-services-options"
-            icon={<Icon.Service className="panel__action-item__icon service-icon" />}
+            icon={<Icon.Service className="service-icon" />}
             title={t('conversationDetailsActionServicesOptions')}
             statusUieName="status-allow-services"
             statusText={servicesOptionsText}

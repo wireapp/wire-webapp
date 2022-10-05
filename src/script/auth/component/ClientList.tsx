@@ -22,7 +22,7 @@ import {ContainerXS, Loading} from '@wireapp/react-ui-kit';
 import React from 'react';
 import {connect} from 'react-redux';
 import {AnyAction, Dispatch} from 'redux';
-import useReactRouter from 'use-react-router';
+import {useNavigate} from 'react-router-dom';
 import {getLogger} from 'Util/Logger';
 import {actionRoot as ROOT_ACTIONS} from '../module/action/';
 import * as LocalStorageAction from '../module/action/LocalStorageAction';
@@ -48,14 +48,15 @@ const ClientList = ({
   resetAuthError,
   removeLocalStorage,
 }: Props & ConnectedProps & DispatchProps) => {
-  const {history} = useReactRouter();
+  const navigate = useNavigate();
   const [showLoading, setShowLoading] = React.useState(false);
   const [currentlySelectedClient, setCurrentlySelectedClient] = React.useState<string | null>(null);
 
   const setSelectedClient = (clientId: string) => {
     const isSelectedClient = currentlySelectedClient === clientId;
-    clientId = isSelectedClient ? null : clientId;
-    setCurrentlySelectedClient(clientId);
+
+    const selectedClientId = isSelectedClient ? null : clientId;
+    setCurrentlySelectedClient(selectedClientId);
     resetAuthError();
   };
 
@@ -64,9 +65,9 @@ const ClientList = ({
       const SFAcode = (await getLocalStorage(QUERY_KEY.CONVERSATION_CODE)) ?? undefined;
       setShowLoading(true);
       await doRemoveClient(clientId, password);
-      const persist = getLocalStorage(LocalStorageAction.LocalStorageKey.AUTH.PERSIST);
+      const persist = await getLocalStorage(LocalStorageAction.LocalStorageKey.AUTH.PERSIST);
       await doInitializeClient(persist ? ClientType.PERMANENT : ClientType.TEMPORARY, password, SFAcode, entropy);
-      return history.push(ROUTE.HISTORY_INFO);
+      return navigate(ROUTE.HISTORY_INFO);
     } catch (error) {
       logger.error(error);
     } finally {
@@ -91,7 +92,7 @@ const ClientList = ({
       {permanentClients.map(client => (
         <ClientItem
           client={client}
-          clientError={isSelectedClient(client.id) && clientError}
+          clientError={isSelectedClient(client.id) ? clientError : undefined}
           key={client.id}
           onClick={() => setSelectedClient(client.id)}
           onClientRemoval={(password?: string) => removeClient(client.id, password)}

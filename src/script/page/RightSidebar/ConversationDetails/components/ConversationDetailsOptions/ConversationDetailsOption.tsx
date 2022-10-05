@@ -43,7 +43,7 @@ const ConversationDetailsOption: FC<ConversationDetailsOptionProps> = ({
 }) => (
   <li className={className}>
     <button className="panel__action-item" onClick={onClick} data-uie-name={dataUieName} type="button">
-      {icon}
+      <span className="panel__action-item__icon">{icon}</span>
 
       <span className="panel__action-item__summary">
         <span className="panel__action-item__text">{title}</span>

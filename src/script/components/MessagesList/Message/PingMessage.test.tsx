@@ -18,23 +18,15 @@
  */
 
 import ko from 'knockout';
-import TestPage from 'Util/test/TestPage';
 import {PingMessage as PingMessageEntity} from 'src/script/entity/message/PingMessage';
-import PingMessage, {PingMessageProps} from './PingMessage';
-
-class PingMessagePage extends TestPage<PingMessageProps> {
-  constructor(props?: PingMessageProps) {
-    super(PingMessage, props);
-  }
-
-  getPingMessage = () => this.get('[data-uie-name="element-message-ping"]');
-  getPingMessageText = () => this.get('[data-uie-name="element-message-ping-text"]');
-}
+import PingMessage from './PingMessage';
+import {render} from '@testing-library/react';
+import {ReadReceipt} from '../../../storage';
 
 const createPingMessage = (partialPingMessage: Partial<PingMessageEntity>) => {
   const callMessage: Partial<PingMessageEntity> = {
     caption: ko.pureComputed(() => ''),
-    readReceipts: ko.observableArray([]),
+    readReceipts: ko.observableArray([] as ReadReceipt[]),
     timestamp: ko.observable(Date.now()),
     unsafeSenderName: ko.pureComputed(() => ''),
     ...partialPingMessage,
@@ -46,16 +38,19 @@ describe('PingMessage', () => {
   it('shows sender name and caption', async () => {
     const caption = 'caption';
     const sender = 'sender';
-    const pingMessagePage = new PingMessagePage({
+
+    const props = {
       is1to1Conversation: false,
       isLastDeliveredMessage: false,
       message: createPingMessage({
         caption: ko.pureComputed(() => 'caption'),
         unsafeSenderName: ko.pureComputed(() => 'sender'),
       }),
-    });
+    };
 
-    expect(pingMessagePage.getPingMessage()).not.toBeNull();
-    expect(pingMessagePage.getPingMessageText().textContent).toBe(`${sender}${caption}`);
+    const {queryByTestId, getByTestId} = render(<PingMessage {...props} />);
+
+    expect(queryByTestId('element-message-ping')).not.toBeNull();
+    expect(getByTestId('element-message-ping-text').textContent).toBe(`${sender}${caption}`);
   });
 });

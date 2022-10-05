@@ -41,15 +41,19 @@ import 'Components/Giphy';
 import 'Components/Modals/GroupCreation/GroupCreationModal';
 import 'Components/modal';
 import 'Components/panel/ServiceDetails';
+import 'Components/panel/ConversationProtocolDetails/ConversationProtocolDetails';
 import 'Components/panel/UserDetails';
 import 'Components/ServiceList';
 import 'Components/SearchInput';
 import 'Components/calling/CallingOverlayContainer';
 
 import '../page/AppLock';
+import '../page/MainContent';
 import '../page/RightSidebar';
 
 import 'Util/LocalizerUtil';
+
+import '../page/AppLock';
 
 import '../localization/Localizer';
 import '../view_model/bindings/CommonBindings';
@@ -58,7 +62,6 @@ import '../view_model/bindings/MessageListBindings';
 import '../view_model/bindings/VideoCallingBindings';
 
 import '../view_model/MainViewModel';
-import '../view_model/PanelViewModel';
 
 window.amplify = amplify;
 // we need to publish jQuery on the window so that knockout can use it

@@ -17,7 +17,7 @@
  *
  */
 
-import React, {useEffect, useState, useMemo} from 'react';
+import React, {useContext, useEffect, useState, useMemo} from 'react';
 import {container} from 'tsyringe';
 import cx from 'classnames';
 import {amplify} from 'amplify';
@@ -30,15 +30,13 @@ import {getLogger} from 'Util/Logger';
 import {sortUsersByPriority} from 'Util/StringUtil';
 import {ConversationRepository} from '../../../conversation/ConversationRepository';
 
-import {SearchRepository} from '../../../search/SearchRepository';
-import {TeamRepository} from '../../../team/TeamRepository';
 import {TeamState} from '../../../team/TeamState';
 import {UserState} from '../../../user/UserState';
-import {registerReactComponent, useKoSubscribableChildren} from 'Util/ComponentUtil';
+import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import ModalComponent from 'Components/ModalComponent';
 import SearchInput from 'Components/SearchInput';
 import UserSearchableList from 'Components/UserSearchableList';
-import TextInputForwarded from 'Components/TextInput/TextInput';
+import TextInput from 'Components/TextInput/TextInput';
 import BaseToggle from 'Components/toggle/BaseToggle';
 import InfoToggle from 'Components/toggle/InfoToggle';
 import {User} from '../../../entity/User';
@@ -54,11 +52,9 @@ import {
 import {initFadingScrollbar} from '../../../ui/fadingScrollbar';
 import {Config} from '../../../Config';
 import {isProtocolOption, ProtocolOption} from '../../../guards/Protocol';
+import {RootContext} from '../../../page/RootProvider';
 
 interface GroupCreationModalProps {
-  conversationRepository: ConversationRepository;
-  searchRepository: SearchRepository;
-  teamRepository: TeamRepository;
   userState?: UserState;
   teamState?: TeamState;
 }
@@ -72,18 +68,33 @@ enum GroupCreationModalState {
 const logger = getLogger('GroupCreationModal');
 
 const GroupCreationModal: React.FC<GroupCreationModalProps> = ({
-  conversationRepository,
-  searchRepository,
-  teamRepository,
   userState = container.resolve(UserState),
   teamState = container.resolve(TeamState),
 }) => {
+  const {
+    isTeam,
+    isMLSEnabled: isMLSEnabledForTeam,
+    isProtocolToggleEnabledForUser,
+  } = useKoSubscribableChildren(teamState, ['isTeam', 'isMLSEnabled', 'isProtocolToggleEnabledForUser']);
+
+  const isMLSFeatureEnabled = Config.getConfig().FEATURE.ENABLE_MLS;
+
+  const enableMLSToggle = isMLSFeatureEnabled && isMLSEnabledForTeam && isProtocolToggleEnabledForUser;
+
+  //if feature flag is set to false or mls is disabled for current team use proteus as default
+  const defaultProtocol =
+    isMLSFeatureEnabled && isMLSEnabledForTeam
+      ? teamState.teamFeatures().mls?.config.defaultProtocol
+      : ConversationProtocol.PROTEUS;
+
   const protocolOptions: ProtocolOption[] = [ConversationProtocol.PROTEUS, ConversationProtocol.MLS].map(protocol => ({
-    label: t(`modalCreateGroupProtocolSelect.${protocol}`),
+    label: `${t(`modalCreateGroupProtocolSelect.${protocol}`)}${
+      protocol === defaultProtocol ? t(`modalCreateGroupProtocolSelect.default`) : ''
+    }`,
     value: protocol,
   }));
 
-  const initialProtocol = protocolOptions.find(protocol => protocol.value === ConversationProtocol.PROTEUS)!;
+  const initialProtocol = protocolOptions.find(protocol => protocol.value === defaultProtocol)!;
 
   const [isShown, setIsShown] = useState<boolean>(false);
   const [selectedContacts, setSelectedContacts] = useState<User[]>([]);
@@ -99,12 +110,7 @@ const GroupCreationModal: React.FC<GroupCreationModalProps> = ({
     GroupCreationModalState.DEFAULT,
   );
 
-  const maxNameLength = ConversationRepository.CONFIG.GROUP.MAX_NAME_LENGTH;
-  const maxSize = ConversationRepository.CONFIG.GROUP.MAX_SIZE;
-
-  const onEscape = () => setIsShown(false);
-  const {isTeam, isMLSEnabled: isMLSEnabledForTeam} = useKoSubscribableChildren(teamState, ['isTeam', 'isMLSEnabled']);
-  const enableMlsCheckbox = isMLSEnabledForTeam || Config.getConfig().FEATURE.ENABLE_MLS;
+  const contentViewModel = useContext(RootContext);
 
   useEffect(() => {
     const showCreateGroup = (_: string, userEntity: User) => {
@@ -120,15 +126,11 @@ const GroupCreationModal: React.FC<GroupCreationModalProps> = ({
     amplify.subscribe(WebAppEvents.CONVERSATION.CREATE_GROUP, showCreateGroup);
   }, []);
 
-  const onClose = () => {
-    setIsCreatingConversation(false);
-    setNameError('');
-    setGroupName('');
-    setParticipantsInput('');
-    setSelectedContacts([]);
-    setGroupCreationState(GroupCreationModalState.DEFAULT);
-    setAccessState(ACCESS_STATE.TEAM.GUESTS_SERVICES);
-  };
+  useEffect(() => {
+    setSelectedProtocol(protocolOptions.find(protocol => protocol.value === selectedProtocol.value)!);
+  }, [defaultProtocol]);
+
+  const onEscape = () => setIsShown(false);
 
   const stateIsPreferences = groupCreationState === GroupCreationModalState.PREFERENCES;
   const stateIsParticipants = groupCreationState === GroupCreationModalState.PARTICIPANTS;
@@ -137,6 +139,21 @@ const GroupCreationModal: React.FC<GroupCreationModalProps> = ({
   const isGuestRoom = accessState === ACCESS_STATE.TEAM.GUEST_ROOM;
   const isGuestEnabled = isGuestRoom || isGuestAndServicesRoom;
   const isServicesEnabled = isServicesRoom || isGuestAndServicesRoom;
+
+  const contacts = useMemo(() => {
+    if (showContacts) {
+      if (!isTeam) {
+        return userState.connectedUsers();
+      }
+
+      if (isGuestEnabled) {
+        return teamState.teamUsers();
+      }
+
+      return teamState.teamMembers().sort(sortUsersByPriority);
+    }
+    return [];
+  }, [isGuestEnabled, isTeam, showContacts, teamState, userState]);
 
   useEffect(() => {
     if (stateIsPreferences) {
@@ -158,6 +175,29 @@ const GroupCreationModal: React.FC<GroupCreationModalProps> = ({
     };
   }, [stateIsParticipants]);
 
+  if (!contentViewModel) {
+    return null;
+  }
+
+  const {
+    conversation: conversationRepository,
+    search: searchRepository,
+    team: teamRepository,
+  } = contentViewModel.repositories;
+
+  const maxNameLength = ConversationRepository.CONFIG.GROUP.MAX_NAME_LENGTH;
+  const maxSize = ConversationRepository.CONFIG.GROUP.MAX_SIZE;
+
+  const onClose = () => {
+    setIsCreatingConversation(false);
+    setNameError('');
+    setGroupName('');
+    setParticipantsInput('');
+    setSelectedContacts([]);
+    setGroupCreationState(GroupCreationModalState.DEFAULT);
+    setAccessState(ACCESS_STATE.TEAM.GUESTS_SERVICES);
+  };
+
   const clickOnCreate = async (): Promise<void> => {
     if (!isCreatingConversation) {
       setIsCreatingConversation(true);
@@ -168,7 +208,7 @@ const GroupCreationModal: React.FC<GroupCreationModalProps> = ({
           groupName,
           isTeam ? accessState : undefined,
           {
-            protocol: selectedProtocol.value,
+            protocol: enableMLSToggle ? selectedProtocol.value : defaultProtocol,
             receipt_mode: enableReadReceipts ? RECEIPT_MODE.ON : RECEIPT_MODE.OFF,
           },
         );
@@ -208,21 +248,6 @@ const GroupCreationModal: React.FC<GroupCreationModalProps> = ({
       setGroupCreationState(GroupCreationModalState.PARTICIPANTS);
     }
   };
-
-  const contacts = useMemo(() => {
-    if (showContacts) {
-      if (!isTeam) {
-        return userState.connectedUsers();
-      }
-
-      if (isGuestEnabled) {
-        return teamState.teamUsers();
-      }
-
-      return teamState.teamMembers().sort(sortUsersByPriority);
-    }
-    return [];
-  }, [isGuestEnabled, isTeam, showContacts, teamState, userState]);
 
   const clickOnToggle = (feature: number): void => {
     const newAccessState = toggleFeature(feature, accessState);
@@ -346,7 +371,7 @@ const GroupCreationModal: React.FC<GroupCreationModalProps> = ({
           {stateIsPreferences && (
             <>
               <div className="modal-input-wrapper">
-                <TextInputForwarded
+                <TextInput
                   autoFocus
                   label={t('groupCreationPreferencesPlaceholder')}
                   placeholder={t('groupCreationPreferencesPlaceholder')}
@@ -407,7 +432,7 @@ const GroupCreationModal: React.FC<GroupCreationModalProps> = ({
                     isDisabled={false}
                     name={t('readReceiptsToggleName')}
                   />
-                  {enableMlsCheckbox && (
+                  {enableMLSToggle && (
                     <>
                       <Select
                         id="select-protocol"
@@ -439,4 +464,4 @@ const GroupCreationModal: React.FC<GroupCreationModalProps> = ({
   );
 };
 
-registerReactComponent('group-creation-modal', GroupCreationModal);
+export default GroupCreationModal;

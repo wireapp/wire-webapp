@@ -23,18 +23,16 @@ import {viewportObserver} from '../../ui/viewportObserver';
 
 interface InViewportParams {
   onVisible: () => void;
-  children?: React.ReactNode;
   requireFullyInView?: boolean;
   allowBiggerThanViewport?: boolean;
-  style?: React.CSSProperties;
 }
 
-const InViewport: React.FC<InViewportParams> = ({
+const InViewport: React.FC<InViewportParams & React.HTMLProps<HTMLDivElement>> = ({
   children,
-  style,
   onVisible,
-  requireFullyInView = true,
+  requireFullyInView = false,
   allowBiggerThanViewport = false,
+  ...props
 }) => {
   const domNode = useRef<HTMLDivElement>(null);
 
@@ -76,7 +74,7 @@ const InViewport: React.FC<InViewportParams> = ({
   }, [allowBiggerThanViewport, requireFullyInView, onVisible]);
 
   return (
-    <div ref={domNode} style={style}>
+    <div ref={domNode} {...props} css={{minHeight: '1px'}}>
       {children}
     </div>
   );

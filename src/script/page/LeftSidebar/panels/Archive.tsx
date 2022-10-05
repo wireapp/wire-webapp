@@ -30,6 +30,7 @@ import {ListViewModel} from '../../../view_model/ListViewModel';
 import {ConversationState} from '../../../conversation/ConversationState';
 import {container} from 'tsyringe';
 import {ConversationRepository} from '../../../conversation/ConversationRepository';
+import useRoveFocus from '../../../hooks/useRoveFocus';
 
 type ArchiveProps = {
   answerCall: (conversation: Conversation) => void;
@@ -61,12 +62,19 @@ const Archive: React.FC<ArchiveProps> = ({
     conversationRepository.updateArchivedConversations();
   }, []);
 
+  const {currentFocus, handleKeyDown, setCurrentFocus} = useRoveFocus(conversations.length);
+
   return (
     <ListWrapper id="archive" header={t('archiveHeader')} onClose={onClose}>
       <ul className="left-list-items no-scroll">
-        {conversations.map(conversation => (
+        {conversations.map((conversation, index) => (
           <ConversationListCell
             key={conversation.id}
+            index={index}
+            focusConversation={currentFocus === index}
+            isConversationListFocus
+            handleFocus={setCurrentFocus}
+            handleArrowKeyDown={handleKeyDown}
             dataUieName="item-conversation-archived"
             onClick={() => onClickConversation(conversation)}
             rightClick={listViewModel.onContextMenu}

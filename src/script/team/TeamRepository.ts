@@ -61,8 +61,8 @@ import {UserState} from '../user/UserState';
 import {TeamState} from './TeamState';
 import {NOTIFICATION_HANDLING_STATE} from '../event/NotificationHandlingState';
 import {EventSource} from '../event/EventSource';
-import {ModalsViewModel} from '../view_model/ModalsViewModel';
 import {Config} from '../Config';
+import PrimaryModal from '../components/Modals/PrimaryModal';
 
 export interface AccountInfo {
   accentID: number;
@@ -147,9 +147,9 @@ export class TeamRepository {
     }, TIME_IN_MILLIS.DAY);
   };
 
-  getTeam = async (): Promise<TeamEntity> => {
+  async getTeam(): Promise<TeamEntity> {
     const selfTeamId = this.userState.self().teamId;
-    const teamData = selfTeamId ? await this.getTeamById(selfTeamId) : await this.getBindingTeam();
+    const teamData = !!selfTeamId && (await this.getTeamById(selfTeamId));
 
     const teamEntity = teamData ? this.teamMapper.mapTeamFromObject(teamData, this.teamState.team()) : new TeamEntity();
     this.teamState.team(teamEntity);
@@ -159,7 +159,7 @@ export class TeamRepository {
     // doesn't need to be awaited because it publishes the account info over amplify.
     this.sendAccountInfo();
     return teamEntity;
-  };
+  }
 
   async getTeamMember(teamId: string, userId: string): Promise<TeamMemberEntity> {
     const memberResponse = await this.teamService.getTeamMember(teamId, userId);
@@ -263,13 +263,20 @@ export class TeamRepository {
   async sendAccountInfo(isDesktop = Runtime.isDesktopApp()): Promise<AccountInfo | void> {
     if (isDesktop) {
       const imageResource = this.teamState.isTeam()
-        ? this.teamState.team().getIconResource()
+        ? this.teamState.team().getIconResource(this.teamState.teamDomain())
         : this.userState.self().previewPictureResource();
       let imageDataUrl;
 
       if (imageResource) {
-        const imageBlob = imageResource ? await this.assetRepository.load(imageResource) : undefined;
-        imageDataUrl = imageBlob ? await loadDataUrl(imageBlob) : undefined;
+        try {
+          const imageBlob = imageResource && (await this.assetRepository.load(imageResource));
+
+          if (imageBlob) {
+            imageDataUrl = await loadDataUrl(imageBlob);
+          }
+        } catch (error) {
+          this.logger.warn(`Account image could not be loaded`, error);
+        }
       }
 
       const accountInfo: AccountInfo = {
@@ -350,16 +357,6 @@ export class TeamRepository {
     return this.teamService.getTeamById(teamId);
   }
 
-  private getBindingTeam(): Promise<TeamData | undefined> {
-    return this.teamService.getTeams().then(({teams}) => {
-      const [team] = teams;
-      if (team && team.binding) {
-        return team;
-      }
-      return undefined;
-    });
-  }
-
   private onDelete(eventJson: TeamDeleteEvent | TeamMemberLeaveEvent): void {
     const {team: teamId} = eventJson;
     if (this.teamState.isTeam() && this.teamState.team().id === teamId) {
@@ -434,7 +431,7 @@ export class TeamRepository {
     const hasChangedToEnabled = newConfig?.fileSharing?.status === FeatureStatus.ENABLED;
 
     if (hasFileSharingChanged) {
-      amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.ACKNOWLEDGE, {
+      PrimaryModal.show(PrimaryModal.type.ACKNOWLEDGE, {
         text: {
           htmlMessage: hasChangedToEnabled
             ? t('featureConfigChangeModalFileSharingDescriptionItemFileSharingEnabled')
@@ -451,7 +448,7 @@ export class TeamRepository {
     const hasGuestLinkChangedToEnabled = newConfig?.conversationGuestLinks?.status === FeatureStatus.ENABLED;
 
     if (hasGuestLinkChanged) {
-      amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.ACKNOWLEDGE, {
+      PrimaryModal.show(PrimaryModal.type.ACKNOWLEDGE, {
         text: {
           htmlMessage: hasGuestLinkChangedToEnabled
             ? t('featureConfigChangeModalConversationGuestLinksDescriptionItemConversationGuestLinksEnabled')
@@ -478,7 +475,7 @@ export class TeamRepository {
     const isFeatureEnabled = newStatus === FeatureStatus.ENABLED;
 
     if (hasFeatureChanged) {
-      amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.ACKNOWLEDGE, {
+      PrimaryModal.show(PrimaryModal.type.ACKNOWLEDGE, {
         text: {
           htmlMessage: isFeatureEnabled
             ? isEnforced
@@ -498,7 +495,7 @@ export class TeamRepository {
     const hasChangedToEnabled = newConfig?.videoCalling?.status === FeatureStatus.ENABLED;
 
     if (hasVideoCallingChanged) {
-      amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.ACKNOWLEDGE, {
+      PrimaryModal.show(PrimaryModal.type.ACKNOWLEDGE, {
         text: {
           htmlMessage: hasChangedToEnabled
             ? t('featureConfigChangeModalAudioVideoDescriptionItemCameraEnabled')
@@ -518,7 +515,7 @@ export class TeamRepository {
           'modal__text__read-more',
           'read-more-pricing',
         );
-        amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.ACKNOWLEDGE, {
+        PrimaryModal.show(PrimaryModal.type.ACKNOWLEDGE, {
           text: {
             htmlMessage: t(
               'featureConfigChangeModalConferenceCallingEnabled',

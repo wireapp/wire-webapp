@@ -19,9 +19,7 @@
 
 import {CALL_TYPE, CONV_TYPE, REASON as CALL_REASON, STATE as CALL_STATE} from '@wireapp/avs';
 import {Availability} from '@wireapp/protocol-messaging';
-import {amplify} from 'amplify';
 import ko from 'knockout';
-import {WebAppEvents} from '@wireapp/webapp-events';
 import {container} from 'tsyringe';
 
 import 'Components/calling/ChooseScreen';
@@ -39,7 +37,6 @@ import type {PermissionRepository} from '../permission/PermissionRepository';
 import {PermissionStatusState} from '../permission/PermissionStatusState';
 import type {Multitasking} from '../notification/NotificationRepository';
 import type {TeamRepository} from '../team/TeamRepository';
-import {ModalsViewModel} from './ModalsViewModel';
 import {ConversationState} from '../conversation/ConversationState';
 import {CallState} from '../calling/CallState';
 import {ButtonGroupTab} from 'Components/calling/ButtonGroup';
@@ -51,6 +48,7 @@ import {QualifiedId} from '@wireapp/api-client/src/user';
 import {PropertiesRepository} from '../properties/PropertiesRepository';
 import {PROPERTIES_TYPE} from '../properties/PropertiesType';
 import {LEAVE_CALL_REASON} from '../calling/enum/LeaveCallReason';
+import PrimaryModal from '../components/Modals/PrimaryModal';
 
 export interface CallActions {
   answer: (call: Call) => void;
@@ -165,7 +163,7 @@ export class CallingViewModel {
     this.callActions = {
       answer: (call: Call) => {
         if (call.conversationType === CONV_TYPE.CONFERENCE && !this.callingRepository.supportsConferenceCalling) {
-          amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.ACKNOWLEDGE, {
+          PrimaryModal.show(PrimaryModal.type.ACKNOWLEDGE, {
             primaryAction: {
               action: () => {
                 this.callingRepository.rejectCall(call.conversationId);
@@ -261,7 +259,7 @@ export class CallingViewModel {
           'modal__text__read-more',
           'read-more-pricing',
         );
-        amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.CONFIRM, {
+        PrimaryModal.show(PrimaryModal.type.CONFIRM, {
           primaryAction: {
             action: () => {
               safeWindowOpen(Config.getConfig().URL.TEAMS_BILLING);
@@ -278,7 +276,7 @@ export class CallingViewModel {
           },
         });
       } else {
-        amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.ACKNOWLEDGE, {
+        PrimaryModal.show(PrimaryModal.type.ACKNOWLEDGE, {
           text: {
             htmlMessage: t('callingRestrictedConferenceCallTeamMemberModalDescription'),
             title: t('callingRestrictedConferenceCallTeamMemberModalTitle'),
@@ -286,7 +284,7 @@ export class CallingViewModel {
         });
       }
     } else {
-      amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.ACKNOWLEDGE, {
+      PrimaryModal.show(PrimaryModal.type.ACKNOWLEDGE, {
         text: {
           htmlMessage: t('callingRestrictedConferenceCallPersonalModalDescription', {
             brandName: Config.getConfig().BRAND_NAME,

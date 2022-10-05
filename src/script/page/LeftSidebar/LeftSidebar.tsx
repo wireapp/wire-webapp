@@ -33,6 +33,7 @@ import TemporaryGuestConversations from './panels/TemporatyGuestConversations';
 import {amplify} from 'amplify';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import StartUI from './panels/StartUI';
+import {forceCloseRightPanel} from '../RightSidebar/utils/toggleRightPanel';
 
 type LeftSidebarProps = {
   assetRepository?: AssetRepository;
@@ -56,13 +57,16 @@ const LeftSidebar: React.FC<LeftSidebarProps> = ({
   const repositories = listViewModel.contentViewModel.repositories;
 
   const {state} = useKoSubscribableChildren(listViewModel, ['state']);
-  let content = <span></span>;
-  const switchList = (list: ListState) => listViewModel.switchList(list);
-  const goHome = () => {
-    return selfUser.isTemporaryGuest()
+
+  const switchList = (list: ListState) => {
+    forceCloseRightPanel();
+    listViewModel.switchList(list);
+  };
+
+  const goHome = () =>
+    selfUser.isTemporaryGuest()
       ? listViewModel.switchList(ListViewModel.STATE.TEMPORARY_GUEST)
       : listViewModel.switchList(ListViewModel.STATE.CONVERSATIONS);
-  };
 
   useEffect(() => {
     amplify.subscribe(WebAppEvents.SHORTCUT.START, () => {
@@ -70,68 +74,61 @@ const LeftSidebar: React.FC<LeftSidebarProps> = ({
     });
   }, []);
 
-  switch (state) {
-    case ListState.CONVERSATIONS:
-      content = (
-        <Conversations
-          listViewModel={listViewModel}
-          preferenceNotificationRepository={repositories.preferenceNotification}
-          conversationRepository={conversationRepository}
-          propertiesRepository={propertiesRepository}
-          switchList={switchList}
-          selfUser={selfUser}
-        />
-      );
-      break;
-    case ListState.PREFERENCES:
-      content = (
-        <Preferences
-          contentViewModel={listViewModel.contentViewModel}
-          teamRepository={repositories.team}
-          onClose={goHome}
-        ></Preferences>
-      );
-      break;
-
-    case ListState.ARCHIVE:
-      content = (
-        <Archive
-          answerCall={listViewModel.answerCall}
-          conversationRepository={conversationRepository}
-          listViewModel={listViewModel}
-          onClose={goHome}
-        ></Archive>
-      );
-      break;
-
-    case ListState.TEMPORARY_GUEST:
-      content = (
-        <TemporaryGuestConversations
-          callingViewModel={listViewModel.callingViewModel}
-          listViewModel={listViewModel}
-          selfUser={selfUser}
-        />
-      );
-      break;
-
-    case ListState.START_UI:
-      content = (
-        <StartUI
-          onClose={goHome}
-          conversationRepository={conversationRepository}
-          searchRepository={repositories.search}
-          teamRepository={repositories.team}
-          integrationRepository={repositories.integration}
-          mainViewModel={listViewModel.mainViewModel}
-          userRepository={repositories.user}
-          isFederated={listViewModel.isFederated}
-        />
-      );
-  }
   return (
     <>
       <SwitchTransition>
-        <Animated key={state}>{content}</Animated>
+        <Animated key={state}>
+          <>
+            {state === ListState.CONVERSATIONS && (
+              <Conversations
+                listViewModel={listViewModel}
+                preferenceNotificationRepository={repositories.preferenceNotification}
+                conversationRepository={conversationRepository}
+                propertiesRepository={propertiesRepository}
+                switchList={switchList}
+                selfUser={selfUser}
+              />
+            )}
+
+            {state === ListState.PREFERENCES && (
+              <Preferences
+                contentViewModel={listViewModel.contentViewModel}
+                teamRepository={repositories.team}
+                onClose={goHome}
+              />
+            )}
+
+            {state === ListState.ARCHIVE && (
+              <Archive
+                answerCall={listViewModel.answerCall}
+                conversationRepository={conversationRepository}
+                listViewModel={listViewModel}
+                onClose={goHome}
+              />
+            )}
+
+            {state === ListState.TEMPORARY_GUEST && (
+              <TemporaryGuestConversations
+                callingViewModel={listViewModel.callingViewModel}
+                listViewModel={listViewModel}
+                selfUser={selfUser}
+              />
+            )}
+
+            {state === ListState.START_UI && (
+              <StartUI
+                onClose={goHome}
+                conversationRepository={conversationRepository}
+                searchRepository={repositories.search}
+                teamRepository={repositories.team}
+                integrationRepository={repositories.integration}
+                mainViewModel={listViewModel.mainViewModel}
+                userRepository={repositories.user}
+                isFederated={listViewModel.isFederated}
+              />
+            )}
+          </>
+        </Animated>
       </SwitchTransition>
     </>
   );

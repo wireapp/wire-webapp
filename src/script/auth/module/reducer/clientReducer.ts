@@ -78,7 +78,7 @@ export function clientReducer(state: ClientState = initialClientState, action: A
     case CLIENT_ACTION.CLIENT_REMOVE_SUCCESS: {
       return {
         ...state,
-        clients: [...state.clients.filter(client => client.id === action.payload)],
+        clients: [...state.clients.filter(client => client.id !== action.payload)],
         error: null,
         fetching: false,
       };
