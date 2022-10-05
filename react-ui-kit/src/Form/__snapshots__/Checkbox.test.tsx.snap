@@ -447,7 +447,6 @@ exports[`"Checkbox" renders disabled 1`] = `
     />
     <label
       className="emotion-2"
-      disabled={true}
       htmlFor="1"
     >
       Check
