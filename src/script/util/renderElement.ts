@@ -20,21 +20,21 @@
 import React from 'react';
 import {createRoot, Root} from 'react-dom/client';
 
-const roots: Record<
+const roots = new Map<
   string,
   {
     elementContainer: HTMLDivElement | undefined;
     reactRoot: Root;
   }
-> = {};
+>();
 
 export const cleanUpElement = (elementId: string) => {
-  const root = roots[elementId];
+  const root = roots.get(elementId);
   if (root && root.elementContainer) {
     root.reactRoot.unmount();
     document.getElementById(elementId)?.removeChild(root.elementContainer);
     root.elementContainer = undefined;
-    delete roots[elementId];
+    roots.delete(elementId);
   }
 };
 
@@ -71,10 +71,10 @@ const renderElement =
     document.getElementById(currentElementId)?.appendChild(elementContainer);
     const reactRoot = createRoot(elementContainer);
 
-    roots[currentElementId] = {
+    roots.set(currentElementId, {
       elementContainer,
       reactRoot,
-    };
+    });
 
     const onClose = () => {
       cleanUpElement(currentElementId);
