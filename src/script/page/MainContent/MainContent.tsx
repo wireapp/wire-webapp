@@ -63,10 +63,10 @@ const MainContent: FC<MainContentProps> = ({
   contentViewModel,
   conversationState = container.resolve(ConversationState),
 }) => {
-  const {state, isFederated, initialMessage} = useKoSubscribableChildren(contentViewModel, ['state']);
+  const {state} = useKoSubscribableChildren(contentViewModel, ['state']);
   const {activeConversation} = useKoSubscribableChildren(conversationState, ['activeConversation']);
 
-  const {repositories} = contentViewModel;
+  const {initialMessage, isFederated, repositories} = contentViewModel;
 
   const teamState = container.resolve(TeamState);
   const userState = container.resolve(UserState);
