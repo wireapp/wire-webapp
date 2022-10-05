@@ -26,7 +26,7 @@ export {usePrimaryModalState, removeCurrentModal} from './PrimaryModalState';
 
 const PrimaryModal = {
   init: () => {
-    renderElement(PrimaryModalComponent)({});
+    renderElement(PrimaryModalComponent, 'primary-modal-container')({});
     showNextModalInQueue();
   },
   show: addNewModalToQueue,
