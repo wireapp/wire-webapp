@@ -65,6 +65,10 @@
   width: 100%;
   text-overflow: ellipsis;
   white-space: nowrap;
+
+  &:focus-visible {
+    outline-offset: -0.2rem;
+  }
 }
 
 .conversation-list-cell-button {
@@ -201,9 +205,17 @@ body.theme-dark {
     opacity: 0;
     transition: opacity @animation-timing-slow @ease-out-quart @animation-timing-faster + 0.05;
 
-    .conversation-list-cell:hover & {
+    .conversation-list-cell:hover &,
+    :focus-visible & {
       opacity: 1;
     }
+  }
+
+  &:focus-visible {
+    &::before {
+      opacity: 1;
+    }
+    .focus-default;
   }
 
   &--active {

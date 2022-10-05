@@ -17,10 +17,10 @@
  *
  */
 
-import React, {useMemo} from 'react';
+import React, {useEffect, useMemo, useRef, useState} from 'react';
 import cx from 'classnames';
 
-import {noop} from 'Util/util';
+import {noop, setContextMenuPosition} from 'Util/util';
 import {t} from 'Util/LocalizerUtil';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 
@@ -35,8 +35,7 @@ import Avatar from 'Components/Avatar';
 import GroupAvatar from 'Components/avatar/GroupAvatar';
 import AvailabilityState from 'Components/AvailabilityState';
 import Icon from 'Components/Icon';
-import {KEY} from 'Util/KeyboardUtil';
-import {setContextMenuPosition} from 'Util/util';
+import {isKey, isOneOfKeys, KEY} from 'Util/KeyboardUtil';
 
 export interface ConversationListCellProps {
   conversation: Conversation;
@@ -44,8 +43,17 @@ export interface ConversationListCellProps {
   isSelected?: (conversation: Conversation) => boolean;
   onClick: React.MouseEventHandler<Element>;
   onJoinCall: (conversation: Conversation, mediaType: MediaType) => void;
-  rightClick: (conversation: Conversation, event: MouseEvent) => void;
+  rightClick: (conversation: Conversation, event: MouseEvent | React.MouseEvent<Element, MouseEvent>) => void;
   showJoinButton: boolean;
+  index: number;
+  /** it determines whether the conversation item is currently focused  */
+  focusConversation: boolean;
+  /** conversation list can only be focused using tab key from user name so enable
+   * it when this condition satisfies  */
+  isConversationListFocus: boolean;
+  handleFocus: (index: number) => void;
+  handleArrowKeyDown: (e: React.KeyboardEvent) => void;
+  isFolder?: boolean;
 }
 
 const ConversationListCell: React.FC<ConversationListCellProps> = ({
@@ -56,6 +64,12 @@ const ConversationListCell: React.FC<ConversationListCellProps> = ({
   isSelected = () => false,
   rightClick = noop,
   dataUieName,
+  index,
+  focusConversation,
+  isConversationListFocus,
+  handleFocus,
+  handleArrowKeyDown,
+  isFolder = false,
 }) => {
   const {
     isGroup,
@@ -83,10 +97,15 @@ const ConversationListCell: React.FC<ConversationListCellProps> = ({
 
   const isActive = isSelected(conversation);
 
-  const openContextMenu = (event: React.MouseEvent) => {
+  const conversationRef = useRef<HTMLDivElement>(null);
+  const contextMenuRef = useRef<HTMLButtonElement>(null);
+  const [focusContextMenu, setContextMenuFocus] = useState(false);
+  const [isContextMenuOpen, setContextMenuOpen] = useState(false);
+
+  const openContextMenu = (event: MouseEvent | React.MouseEvent<Element, MouseEvent>) => {
     event.stopPropagation();
     event.preventDefault();
-    rightClick(conversation, event.nativeEvent);
+    rightClick(conversation, event);
   };
 
   const cellState = useMemo(() => generateCellState(conversation), [unreadState, mutedState, isRequest]);
@@ -96,18 +115,55 @@ const ConversationListCell: React.FC<ConversationListCellProps> = ({
     onJoinCall(conversation, MediaType.AUDIO);
   };
 
-  const handleDivKeyDown = (event: React.KeyboardEvent) => {
+  const handleDivKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
     if (event.key === KEY.SPACE || event.key === KEY.ENTER) {
       onClick(event as unknown as React.MouseEvent<Element, MouseEvent>);
+    } else if (isKey(event, KEY.ARROW_RIGHT)) {
+      setContextMenuFocus(true);
+    } else {
+      setContextMenuFocus(false);
     }
+    handleArrowKeyDown(event);
   };
+
+  useEffect(() => {
+    // Move element into view when it is focused
+    if (focusConversation && conversationRef.current && isConversationListFocus) {
+      // isConversationListFocus is required to focus on first conversation only
+      conversationRef.current.focus();
+    }
+  }, [focusConversation, isConversationListFocus]);
+
+  useEffect(() => {
+    // Move element into view when it is focused
+    if (focusConversation && contextMenuRef.current && focusContextMenu) {
+      contextMenuRef.current.focus();
+    }
+  }, [focusConversation, focusContextMenu]);
 
   const handleContextKeyDown = (event: React.KeyboardEvent) => {
     if (event.key === KEY.SPACE || event.key === KEY.ENTER) {
       const newEvent = setContextMenuPosition(event);
       rightClick(conversation, newEvent);
+      setContextMenuOpen(true);
+      return;
+    }
+    setContextMenuFocus(false);
+    setContextMenuOpen(false);
+
+    // when focused on the context menu and the menu is closed pressing up/down arrow keys will
+    // get the focus back to the conversation list items
+    if (isOneOfKeys(event, [KEY.ARROW_UP, KEY.ARROW_DOWN]) && !isContextMenuOpen) {
+      handleArrowKeyDown(event);
     }
   };
+
+  // always focus on the selected conversation when the folder tab loaded
+  useEffect(() => {
+    if (isActive && isConversationListFocus && isFolder) {
+      handleFocus(index);
+    }
+  }, [index, isActive, isFolder, isConversationListFocus, handleFocus]);
 
   return (
     <li onContextMenu={openContextMenu}>
@@ -120,12 +176,14 @@ const ConversationListCell: React.FC<ConversationListCellProps> = ({
       >
         <div
           role="button"
+          ref={conversationRef}
           className="conversation-list-cell-main-button"
           onClick={onClick}
           onKeyDown={handleDivKeyDown}
           data-uie-name="go-open-conversation"
-          tabIndex={0}
+          tabIndex={focusConversation ? 0 : -1}
           aria-label={t('accessibility.openConversation', displayName)}
+          title={t('accessibility.conversationOptionsMenuAccessKey')}
         >
           <div
             className={cx('conversation-list-cell-left', {
@@ -165,12 +223,15 @@ const ConversationListCell: React.FC<ConversationListCellProps> = ({
         </div>
         <div className="conversation-list-cell-right">
           <button
+            ref={contextMenuRef}
             className={cx('conversation-list-cell-context-menu', {
               'conversation-list-cell-context-menu--active': isActive,
             })}
             data-uie-name="go-options"
             aria-label={t('accessibility.conversationOptionsMenu')}
             type="button"
+            tabIndex={focusContextMenu && focusConversation ? 0 : -1}
+            aria-haspopup="true"
             onClick={event => {
               event.stopPropagation();
               rightClick(conversation, event.nativeEvent);

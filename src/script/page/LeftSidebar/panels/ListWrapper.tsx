@@ -106,7 +106,9 @@ const ListWrapper: React.FC<LeftListWrapperProps> = ({
         )}
       </section>
       {before ?? null}
-      <section
+      <div
+        role="list"
+        aria-label={t('accessibility.conversation.sectionLabel')}
         css={scrollStyle}
         ref={element => {
           initBorderedScroll(element);
@@ -114,7 +116,7 @@ const ListWrapper: React.FC<LeftListWrapperProps> = ({
         }}
       >
         {children}
-      </section>
+      </div>
       {footer ?? null}
     </div>
   );
