@@ -21,7 +21,6 @@ import ko from 'knockout';
 import $ from 'jquery';
 import SimpleBar from 'simplebar';
 import {debounce, throttle} from 'underscore';
-import '@wireapp/antiscroll-2/dist/antiscroll-2';
 
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 import {stripUrlWrapper} from 'Util/util';
@@ -32,109 +31,6 @@ import {viewportObserver} from '../../ui/viewportObserver';
 import {Runtime} from '@wireapp/commons';
 
 type KOEvent<T = Event> = JQuery.Event & {currentTarget: Element; originalEvent: T};
-
-/**
- * Use it on the drop area.
- */
-ko.bindingHandlers.drop_file = {
-  init(element, valueAccessor, _allBindings, _data, context) {
-    const onDragLeave = (_: unknown, event: KOEvent) => event.currentTarget.classList.remove('drag-hover');
-
-    const onDragOver = (_: unknown, event: KOEvent<DragEvent>) => {
-      event.preventDefault();
-      event.originalEvent.dataTransfer.dropEffect = 'copy';
-      event.currentTarget.classList.add('drag-hover');
-    };
-
-    const onDrop = (_: unknown, event: KOEvent<DragEvent> | DragEvent) => {
-      event.preventDefault();
-      (event.currentTarget as Element).classList.remove('drag-hover');
-
-      const {originalEvent} = event as KOEvent<DragEvent>;
-      const {dataTransfer} = event as DragEvent;
-      const eventDataTransfer = dataTransfer || originalEvent?.dataTransfer || {};
-      const files = (eventDataTransfer as DataTransfer).files || new FileList();
-
-      if (files.length > 0) {
-        valueAccessor()(files);
-      }
-    };
-
-    ko.applyBindingsToNode(
-      element,
-      {
-        event: {
-          dragleave: onDragLeave,
-          dragover: onDragOver,
-          drop: onDrop,
-        },
-      },
-      context,
-    );
-  },
-};
-
-/**
- * Capture pasted files.
- */
-ko.bindingHandlers.paste_file = {
-  init(_element, valueAccessor, _allBindings, _data, context) {
-    const onPaste = (_: unknown, event: KOEvent<ClipboardEvent>) => {
-      const clipboardData = event.originalEvent.clipboardData;
-      const items: (DataTransferItem | File)[] = [].slice.call(clipboardData.items || clipboardData.files);
-
-      // MS Word for Mac not only puts the copied text into the clipboard
-      // but also a rendered PNG representation of that text.
-      // This breaks our naïve file paste detection. So we identify a paste
-      // from Word and ignore that there is a file in there.
-      const msWordTypes = ['text/plain', 'text/html', 'text/rtf', 'image/png'];
-      const isMsWordPaste = msWordTypes.every((type, index) => items[index] && items[index].type === type);
-      if (isMsWordPaste) {
-        return true;
-      }
-
-      const files = items
-        .filter(item => (item as DataTransferItem).kind === 'file')
-        .map(item => new Blob([(item as DataTransferItem).getAsFile()], {type: item.type}))
-        .filter(item => item && item.size !== 4); // Pasted files result in 4 byte blob (OSX)
-
-      if (files.length > 0) {
-        valueAccessor()(files);
-        return false;
-      }
-      return true;
-    };
-
-    ko.applyBindingsToNode(
-      window.document,
-      {
-        event: {
-          paste: onPaste,
-        },
-      },
-      context,
-    );
-  },
-};
-
-/**
- * Blocks the default behavior when dropping a file on the element.
- * @note If a child element is listening to drag events, than this will be triggered after
- */
-ko.bindingHandlers.ignore_drop_file = {
-  init(element, _valueAccessor, _allBindings, _data, context) {
-    ko.applyBindingsToNode(
-      element,
-      {
-        event: {
-          dragover: (_: unknown, event: KOEvent<DragEvent>) => event.preventDefault(),
-          drop: (_: unknown, event: KOEvent<DragEvent>) => event.preventDefault(),
-        },
-      },
-      context,
-    );
-  },
-};
 
 /**
  * Indicate that the current binding loop should not try to bind this element's children.
@@ -186,58 +82,6 @@ ko.bindingHandlers.resize = {
       },
       context,
     );
-  },
-};
-
-ko.bindingHandlers.heightSync = {
-  init(element, valueAccessor) {
-    const params = ko.unwrap(valueAccessor()) || {};
-
-    const targetElement = document.querySelector(params.target);
-    const triggerValue = params.trigger;
-
-    const resizeTarget = () => {
-      const sourceHeight = element.offsetHeight;
-      const targetHeight = targetElement.offsetHeight;
-      if (sourceHeight !== targetHeight) {
-        targetElement.style.height = `${element.scrollHeight}px`;
-      }
-
-      const isScrolling = targetElement.scrollHeight > targetElement.offsetHeight;
-      element.style.overflowY = isScrolling ? 'scroll' : 'auto';
-      element.style.maxHeight = isScrolling ? `${targetElement.offsetHeight}px` : '';
-    };
-
-    // initial resize
-    resizeTarget();
-    const heightSync = () => window.requestAnimationFrame(resizeTarget);
-    const valueSubscription = triggerValue.subscribe(heightSync);
-    window.addEventListener('resize', heightSync);
-
-    ko.utils.domNodeDisposal.addDisposeCallback(element, () => {
-      window.removeEventListener('resize', heightSync);
-      valueSubscription.dispose();
-    });
-  },
-};
-
-/**
- * Syncs scrolling to another element.
- */
-ko.bindingHandlers.scrollSync = {
-  init(element, valueAccessor) {
-    const selector = valueAccessor();
-    const anchorElement = document.querySelector(selector);
-    const syncScroll = () => (element.scrollTop = anchorElement.scrollTop);
-    if (anchorElement) {
-      anchorElement.addEventListener('scroll', syncScroll);
-      window.addEventListener('resize', syncScroll);
-
-      ko.utils.domNodeDisposal.addDisposeCallback(element, () => {
-        anchorElement.removeEventListener('scroll', syncScroll);
-        window.removeEventListener('resize', syncScroll);
-      });
-    }
   },
 };
 
@@ -416,43 +260,6 @@ ko.bindingHandlers.fadingscrollbar = {
       element.removeEventListener('scroll', fadeIn);
       element.removeEventListener('scroll', debouncedFadeOut);
     });
-  },
-};
-
-/**
- * Render antiscroll scrollbar.
- */
-ko.bindingHandlers.antiscroll = {
-  init(element, valueAccessor) {
-    ($(element) as any).antiscroll({
-      autoHide: true,
-      autoWrap: true,
-      debug: false,
-      notHorizontal: true,
-    });
-
-    const parentElement = $(element).parent();
-    const antiscroll = parentElement.data('antiscroll');
-
-    if (antiscroll) {
-      const observer = new ResizeObserver(throttle(() => antiscroll.rebuild(), 100));
-      observer.observe(parentElement[0], {box: 'border-box'});
-      observer.observe(element, {box: 'border-box'});
-
-      let triggerSubscription: ko.Subscription;
-      const triggerValue = valueAccessor();
-      if (ko.isObservable(triggerValue)) {
-        triggerSubscription = triggerValue.subscribe(() => {
-          antiscroll.rebuild();
-        });
-      }
-
-      ko.utils.domNodeDisposal.addDisposeCallback(element, () => {
-        antiscroll.destroy();
-        observer.disconnect();
-        triggerSubscription?.dispose();
-      });
-    }
   },
 };
 

@@ -246,7 +246,7 @@ export const PeopleTab: React.FC<{
                   data-uie-name="do-invite-member"
                 >
                   <span className="left-column-icon icon-envelope"></span>
-                  <span className="center-column">{t('searchMemberInvite')}</span>
+                  <span className="column-center">{t('searchMemberInvite')}</span>
                 </button>
               </li>
             )}
@@ -261,7 +261,7 @@ export const PeopleTab: React.FC<{
                   <span className="left-column-icon">
                     <Icon.Group />
                   </span>
-                  <span className="center-column">{t('searchCreateGroup')}</span>
+                  <span className="column-center">{t('searchCreateGroup')}</span>
                 </button>
               </li>
             )}
@@ -280,7 +280,7 @@ export const PeopleTab: React.FC<{
                   <span className="left-column-icon">
                     <Icon.Guest />
                   </span>
-                  <span className="center-column">{t('searchCreateGuestRoom')}</span>
+                  <span className="column-center">{t('searchCreateGuestRoom')}</span>
                 </button>
               </li>
             )}

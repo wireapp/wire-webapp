@@ -18,15 +18,18 @@
  */
 
 import React from 'react';
+import cx from 'classnames';
+
 import {registerReactComponent} from 'Util/ComponentUtil';
 
 export interface LoadingBarProps {
   message: string;
   progress: number;
+  className?: string;
 }
 
-const LoadingBar: React.FC<LoadingBarProps> = ({progress, message}) => (
-  <div className="text-center">
+const LoadingBar: React.FC<LoadingBarProps> = ({progress, message, className = ''}) => (
+  <div className={cx('loading-bar text-center', className)}>
     <div className="progress-console">{message}</div>
     <div className="progress-bar">
       <div data-uie-name="loading-bar-progress" style={{width: `${progress}%`}}></div>

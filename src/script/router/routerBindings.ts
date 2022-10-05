@@ -22,6 +22,7 @@ import React from 'react';
 
 import type {Router} from './Router';
 import {KEY} from 'Util/KeyboardUtil';
+import {forceCloseRightPanel} from '../page/RightSidebar/utils/toggleRightPanel';
 
 let router: Router;
 
@@ -45,6 +46,7 @@ export const createNavigate =
   (event: React.MouseEvent<Element, MouseEvent>) => {
     router?.navigate(link);
     event.preventDefault();
+    forceCloseRightPanel();
   };
 
 export const createNavigateKeyboard =

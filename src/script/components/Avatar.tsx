@@ -17,15 +17,17 @@
  *
  */
 
-import React from 'react';
+import {FC, HTMLProps, MouseEvent as ReactMouseEvent} from 'react';
 
-import {User} from '../entity/User';
-import {ServiceEntity} from '../integration/ServiceEntity';
 import {registerReactComponent, useKoSubscribableChildren} from 'Util/ComponentUtil';
 
-import UserAvatar from './avatar/UserAvatar';
+import {User} from '../entity/User';
+import {isServiceEntity} from '../guards/Service';
+import {ServiceEntity} from '../integration/ServiceEntity';
+
 import ServiceAvatar from './avatar/ServiceAvatar';
 import TemporaryGuestAvatar from './avatar/TemporaryGuestAvatar';
+import UserAvatar from './avatar/UserAvatar';
 
 export enum AVATAR_SIZE {
   LARGE = 'avatar-l',
@@ -67,7 +69,7 @@ export const INITIALS_SIZE = {
   [AVATAR_SIZE.XXX_SMALL]: '8px',
 };
 
-export interface AvatarProps extends React.HTMLProps<HTMLDivElement> {
+export interface AvatarProps extends HTMLProps<HTMLDivElement> {
   avatarSize?: AVATAR_SIZE;
   avatarAlt?: string;
   noBadge?: boolean;
@@ -76,7 +78,7 @@ export interface AvatarProps extends React.HTMLProps<HTMLDivElement> {
   participant: User | ServiceEntity;
 }
 
-const Avatar: React.FunctionComponent<AvatarProps> = ({
+const Avatar: FC<AvatarProps> = ({
   avatarSize = AVATAR_SIZE.LARGE,
   noBadge = false,
   noFilter = false,
@@ -84,7 +86,17 @@ const Avatar: React.FunctionComponent<AvatarProps> = ({
   participant,
   ...props
 }) => {
-  const user = useKoSubscribableChildren(participant as User, [
+  const clickHandler = (event: ReactMouseEvent<HTMLDivElement, MouseEvent>) => {
+    if (event.currentTarget.parentNode) {
+      onAvatarClick?.(participant, event.currentTarget.parentNode);
+    }
+  };
+
+  if (isServiceEntity(participant)) {
+    return <ServiceAvatar avatarSize={avatarSize} participant={participant} onClick={clickHandler} {...props} />;
+  }
+
+  const user = useKoSubscribableChildren(participant, [
     'isTemporaryGuest',
     'isTeamMember',
     'isBlocked',
@@ -93,24 +105,8 @@ const Avatar: React.FunctionComponent<AvatarProps> = ({
     'isCanceled',
     'isUnknown',
   ]);
-  const isMe = (participant as User).isMe;
 
-  const clickHandler = (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
-    if (event.currentTarget.parentNode) {
-      onAvatarClick?.(participant, event.currentTarget.parentNode);
-    }
-  };
-
-  if (participant instanceof ServiceEntity || participant.isService) {
-    return (
-      <ServiceAvatar
-        avatarSize={avatarSize}
-        participant={participant as ServiceEntity}
-        onClick={clickHandler}
-        {...props}
-      />
-    );
-  }
+  const isMe = participant?.isMe;
 
   let avatarState = STATE.NONE;
 

@@ -184,7 +184,7 @@ const AccountInput: FC<AccountInputProps> = ({
           label={label}
           name={valueUie ? valueUie : fieldName}
           value={input}
-          ref={inputWrapperRef}
+          inputWrapperRef={inputWrapperRef}
           onChange={({target}) => updateInput(target.value)}
           onCancel={() => {
             updateInput('');

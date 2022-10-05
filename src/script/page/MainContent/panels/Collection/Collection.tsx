@@ -33,10 +33,15 @@ import {MessageCategory} from '../../../../message/MessageCategory';
 import FullSearch from './FullSearch';
 import CollectionDetails from './CollectionDetails';
 import CollectionSection from './CollectionSection';
+import {AssetRepository} from '../../../../assets/AssetRepository';
+import {MessageRepository} from '../../../../conversation/MessageRepository';
+import {showDetailViewModal} from 'Components/Modals/DetailViewModal';
 
 interface CollectionDetailsProps {
   conversation: Conversation;
   conversationRepository: ConversationRepository;
+  assetRepository: AssetRepository;
+  messageRepository: MessageRepository;
 }
 
 type Categories = Record<Category, ContentMessage[]>;
@@ -68,7 +73,12 @@ function splitIntoCategories(messages: ContentMessage[]): Categories {
   );
 }
 
-const Collection: React.FC<CollectionDetailsProps> = ({conversation, conversationRepository}) => {
+const Collection: React.FC<CollectionDetailsProps> = ({
+  conversation,
+  conversationRepository,
+  assetRepository,
+  messageRepository,
+}) => {
   const [searchTerm, setSearchTerm] = useState('');
   const {display_name} = useKoSubscribableChildren(conversation, ['display_name']);
   const [messages, setMessages] = useState<ContentMessage[]>([]);
@@ -110,12 +120,22 @@ const Collection: React.FC<CollectionDetailsProps> = ({conversation, conversatio
   const categories = splitIntoCategories(messages);
   const {images, audio, links, files} = categories;
 
+  const onImageClick = (message: ContentMessage) => {
+    showDetailViewModal({
+      assetRepository,
+      conversationRepository,
+      currentMessageEntity: message,
+      messageRepository,
+    });
+  };
+
   if (detailCategory && categories[detailCategory].length > 0) {
     return (
       <CollectionDetails
         conversation={conversation}
         messages={categories[detailCategory]}
         onClose={() => setDetailCategory(undefined)}
+        onImageClick={onImageClick}
       />
     );
   }
@@ -127,6 +147,7 @@ const Collection: React.FC<CollectionDetailsProps> = ({conversation, conversatio
         limit={12}
         uieName={'collection-section-image'}
         onSelect={() => setDetailCategory('images')}
+        onImageClick={onImageClick}
         label={t('collectionSectionImages')}
       >
         <span className={`collection-header-icon icon-library`}></span>

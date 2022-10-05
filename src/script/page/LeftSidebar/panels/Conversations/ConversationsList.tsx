@@ -34,7 +34,7 @@ import {matchQualifiedIds} from 'Util/QualifiedId';
 import {ConversationRepository} from '../../../../conversation/ConversationRepository';
 import Avatar, {AVATAR_SIZE} from 'Components/Avatar';
 import GroupAvatar from 'Components/avatar/GroupAvatar';
-import {ContentViewModel} from '../../../../view_model/ContentViewModel';
+import {ContentState} from '../../../../view_model/ContentViewModel';
 import {ConverationViewStyle} from './Conversations';
 import {User} from 'src/script/entity/User';
 import {handleKeyDown} from 'Util/KeyboardUtil';
@@ -72,7 +72,7 @@ export const ConversationsList: React.FC<{
     listViewModel.onContextMenu(conversation, event);
   const answerCall = (conversation: Conversation) => listViewModel.answerCall(conversation);
   const {state: contentState} = useKoSubscribableChildren(listViewModel.contentViewModel, ['state']);
-  const isShowingConnectionRequests = contentState === ContentViewModel.STATE.CONNECTION_REQUESTS;
+  const isShowingConnectionRequests = contentState === ContentState.CONNECTION_REQUESTS;
 
   const hasJoinableCall = (conversation: Conversation) => {
     const call = joinableCalls.find((callInstance: Call) =>
@@ -85,7 +85,7 @@ export const ConversationsList: React.FC<{
   };
 
   const onConnectionRequestClick = () => {
-    listViewModel.contentViewModel.switchContent(ContentViewModel.STATE.CONNECTION_REQUESTS);
+    listViewModel.contentViewModel.switchContent(ContentState.CONNECTION_REQUESTS);
   };
 
   const conversationView =

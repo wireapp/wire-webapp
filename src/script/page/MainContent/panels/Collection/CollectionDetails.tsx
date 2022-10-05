@@ -32,6 +32,7 @@ interface CollectionDetailsProps {
   conversation: Conversation;
   messages: ContentMessage[];
   onClose?: () => void;
+  onImageClick?: (message: ContentMessage) => void;
 }
 
 type GroupedCollection = [string, ContentMessage[]][];
@@ -54,7 +55,12 @@ const groupByDate = (messages: ContentMessage[]): GroupedCollection => {
   );
 };
 
-const CollectionDetails: React.FC<CollectionDetailsProps> = ({conversation, messages, onClose = noop}) => {
+const CollectionDetails: React.FC<CollectionDetailsProps> = ({
+  conversation,
+  messages,
+  onClose = noop,
+  onImageClick,
+}) => {
   const {display_name} = useKoSubscribableChildren(conversation, ['display_name']);
 
   return (
@@ -80,7 +86,12 @@ const CollectionDetails: React.FC<CollectionDetailsProps> = ({conversation, mess
                 <Fragment key={groupName}>
                   <header className="collection-date-separator">{groupName}</header>
                   {groupMessages.map(message => (
-                    <CollectionItem message={message} key={message.id} allMessages={messages} />
+                    <CollectionItem
+                      message={message}
+                      key={message.id}
+                      allMessages={messages}
+                      onImageClick={onImageClick}
+                    />
                   ))}
                 </Fragment>
               );

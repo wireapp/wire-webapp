@@ -38,7 +38,7 @@ import {Config} from '../../../Config';
 import {User} from '../../../entity/User';
 import {noop} from 'Util/util';
 import {Core} from '../../../service/CoreSingleton';
-import renderModal from 'Util/renderModal';
+import renderElement from 'Util/renderElement';
 
 export interface UserModalProps {
   userId: QualifiedId;
@@ -167,4 +167,4 @@ const UserModalComponent: React.FC<UserModalProps> = ({
 
 export default UserModalComponent;
 
-export const showUserModal = renderModal<UserModalProps>(UserModalComponent);
+export const showUserModal = renderElement<UserModalProps>(UserModalComponent);

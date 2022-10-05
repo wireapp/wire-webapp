@@ -58,7 +58,6 @@ import {flatten} from 'Util/ArrayUtil';
 import {roundLogarithmic} from 'Util/NumberUtil';
 
 import {Config} from '../Config';
-import {ModalsViewModel} from '../view_model/ModalsViewModel';
 import {CALL_MESSAGE_TYPE} from './enum/CallMessageType';
 import {CallingEvent, EventBuilder} from '../conversation/EventBuilder';
 import {EventRepository} from '../event/EventRepository';
@@ -85,6 +84,7 @@ import Warnings from '../view_model/WarningsContainer';
 import {PayloadBundleState} from '@wireapp/core/src/main/conversation';
 import {Core} from '../service/CoreSingleton';
 import {LEAVE_CALL_REASON} from './enum/LeaveCallReason';
+import PrimaryModal from '../components/Modals/PrimaryModal';
 
 interface MediaStreamQuery {
   audio?: boolean;
@@ -351,9 +351,9 @@ export class CallingRepository {
       users = [...users, userId];
     }
     if (users.length === call.participants.length - 1) {
-      amplify.publish(WebAppEvents.WARNING.SHOW, Warnings.TYPE.CALL_QUALITY_POOR);
+      Warnings.showWarning(Warnings.TYPE.CALL_QUALITY_POOR);
     } else {
-      amplify.publish(WebAppEvents.WARNING.DISMISS, Warnings.TYPE.CALL_QUALITY_POOR);
+      Warnings.hideWarning(Warnings.TYPE.CALL_QUALITY_POOR);
     }
 
     switch (quality) {
@@ -500,12 +500,11 @@ export class CallingRepository {
 
       if (participant) {
         this.leaveCall(activeCall.conversationId, LEAVE_CALL_REASON.USER_TURNED_UNVERIFIED);
-        amplify.publish(
-          WebAppEvents.WARNING.MODAL,
-          ModalsViewModel.TYPE.ACKNOWLEDGE,
+        PrimaryModal.show(
+          PrimaryModal.type.ACKNOWLEDGE,
           {
-            action: {
-              title: t('callDegradationAction'),
+            primaryAction: {
+              text: t('callDegradationAction'),
             },
             text: {
               message: t('callDegradationDescription', participant.user.name()),
@@ -533,9 +532,8 @@ export class CallingRepository {
 
   private warnOutdatedClient(conversationId: QualifiedId) {
     const brandName = Config.getConfig().BRAND_NAME;
-    amplify.publish(
-      WebAppEvents.WARNING.MODAL,
-      ModalsViewModel.TYPE.ACKNOWLEDGE,
+    PrimaryModal.show(
+      PrimaryModal.type.ACKNOWLEDGE,
       {
         close: () => this.acceptVersionWarning(conversationId),
         text: {
@@ -594,6 +592,7 @@ export class CallingRepository {
           const allClients = conversationEntity.isUsingMLSProtocol
             ? await this.core.service!.conversation.fetchAllParticipantsClients(id, domain)
             : await this.core.service!.conversation.getAllParticipantsClients(id, domain);
+          // We warn the message repository that a mismatch has happened outside of its lifecycle (eventually triggering a conversation degradation)
           // We warn the message repository that a mismatch has happened outside of its lifecycle (eventually triggering a conversation degradation)
           const shouldContinue = await this.messageRepository.updateMissingClients(
             conversationEntity,
@@ -1212,7 +1211,7 @@ export class CallingRepository {
   };
 
   private readonly callClosed = (reason: REASON, convId: SerializedConversationId) => {
-    amplify.publish(WebAppEvents.WARNING.DISMISS, Warnings.TYPE.CALL_QUALITY_POOR);
+    Warnings.hideWarning(Warnings.TYPE.CALL_QUALITY_POOR);
     const conversationId = this.parseQualifiedId(convId);
     const call = this.findCall(conversationId);
     if (!call) {
@@ -1748,7 +1747,7 @@ export class CallingRepository {
     }
 
     return new Promise((resolve, reject) => {
-      amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.CONFIRM, {
+      PrimaryModal.show(PrimaryModal.type.CONFIRM, {
         primaryAction: {
           action: () => {
             if (activeCall.state() === CALL_STATE.INCOMING) {
@@ -1787,7 +1786,7 @@ export class CallingRepository {
         title: t('modalNoAudioInputTitle'),
       },
     };
-    amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.CONFIRM, modalOptions);
+    PrimaryModal.show(PrimaryModal.type.CONFIRM, modalOptions);
   }
 
   private showNoCameraModal(): void {
@@ -1803,7 +1802,7 @@ export class CallingRepository {
         title: t('modalNoCameraTitle'),
       },
     };
-    amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.ACKNOWLEDGE, modalOptions);
+    PrimaryModal.show(PrimaryModal.type.ACKNOWLEDGE, modalOptions);
   }
 
   //##############################################################################

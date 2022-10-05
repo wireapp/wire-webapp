@@ -35,6 +35,9 @@ import {CallingRepository} from 'src/script/calling/CallingRepository';
 import {TeamState} from 'src/script/team/TeamState';
 import {waitFor, render} from '@testing-library/react';
 
+// TODO: Remove after all migrations
+jest.mock('src/script/page/RightSidebar/utils/toggleRightPanel', () => () => jest.fn());
+
 jest.mock(
   'Components/utils/InViewport',
   () =>

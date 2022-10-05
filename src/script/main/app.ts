@@ -84,13 +84,12 @@ import {ReceiptsMiddleware} from '../event/preprocessor/ReceiptsMiddleware';
 
 import {getWebsiteUrl} from '../externalRoute';
 
-import {modals} from '../view_model/ModalsViewModel';
 import {showInitialModal} from '../user/AvailabilityModal';
 
 import {URLParameter} from '../auth/URLParameter';
 import {SIGN_OUT_REASON} from '../auth/SignOutReason';
 import {ClientRepository} from '../client/ClientRepository';
-import {ContentViewModel} from '../view_model/ContentViewModel';
+import {ContentState} from '../view_model/ContentViewModel';
 import {CacheRepository} from '../cache/CacheRepository';
 import {SelfService} from '../self/SelfService';
 import {PropertiesRepository} from '../properties/PropertiesRepository';
@@ -122,6 +121,7 @@ import Warnings from '../view_model/WarningsContainer';
 import {Core} from '../service/CoreSingleton';
 import {migrateToQualifiedSessionIds} from './sessionIdMigrator';
 import showUserModal from 'Components/Modals/UserModal';
+import PrimaryModal from 'Components/Modals/PrimaryModal';
 import {mlsConversationState} from '../mls/mlsConversationState';
 
 function doRedirect(signOutReason: SIGN_OUT_REASON) {
@@ -498,7 +498,7 @@ class App {
       loadingView.removeFromView();
       telemetry.report();
       amplify.publish(WebAppEvents.LIFECYCLE.LOADED);
-      modals.ready();
+      PrimaryModal.init();
       showInitialModal(userRepository['userState'].self().availability());
       telemetry.timeStep(AppInitTimingsStep.UPDATED_CONVERSATIONS);
       if (userRepository['userState'].isActivatedAccount()) {
@@ -692,7 +692,7 @@ class App {
     } else if (conversationEntity) {
       mainView.content.showConversation(conversationEntity, {});
     } else if (this.repository.user['userState'].connectRequests().length) {
-      amplify.publish(WebAppEvents.CONTENT.SWITCH, ContentViewModel.STATE.CONNECTION_REQUESTS);
+      amplify.publish(WebAppEvents.CONTENT.SWITCH, ContentState.CONNECTION_REQUESTS);
     }
 
     const redirect = localStorage.getItem(App.LOCAL_STORAGE_LOGIN_REDIRECT_KEY);
@@ -829,6 +829,7 @@ class App {
         }
       }
 
+      await this.core.logout(clearData);
       return _redirectToLogin();
     };
 
@@ -880,7 +881,7 @@ class App {
    * Notify about found update
    */
   readonly update = (): void => {
-    amplify.publish(WebAppEvents.WARNING.SHOW, Warnings.TYPE.LIFECYCLE_UPDATE);
+    Warnings.showWarning(Warnings.TYPE.LIFECYCLE_UPDATE);
   };
 
   /**

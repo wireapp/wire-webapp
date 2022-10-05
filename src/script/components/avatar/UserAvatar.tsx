@@ -60,25 +60,35 @@ const UserAvatar: React.FunctionComponent<UserAvatarProps> = ({
 }) => {
   const isImageGrey = !noFilter && [STATE.BLOCKED, STATE.IGNORED, STATE.PENDING, STATE.UNKNOWN].includes(state);
   const backgroundColor = state === STATE.UNKNOWN ? COLOR.GRAY : undefined;
-  const {mediumPictureResource, previewPictureResource} = useKoSubscribableChildren(participant, [
+  const {
+    mediumPictureResource,
+    previewPictureResource,
+    accent_color: accentColor,
+    name,
+    initials,
+  } = useKoSubscribableChildren(participant, [
     'mediumPictureResource',
     'previewPictureResource',
+    'accent_color',
+    'name',
+    'initials',
   ]);
-  const avatarImgAlt = avatarAlt ? avatarAlt : `${t('userProfileImageAlt')} ${participant.name()}`;
+  const avatarImgAlt = avatarAlt ? avatarAlt : `${t('userProfileImageAlt')} ${name}`;
 
   return (
     <AvatarWrapper
       avatarSize={avatarSize}
-      color={participant.accent_color()}
+      color={accentColor}
       data-uie-name="element-avatar-user"
       data-uie-value={participant.id}
       data-uie-status={state}
       onClick={onClick}
-      title={participant.name()}
+      title={name}
       {...props}
     >
       <AvatarBackground backgroundColor={backgroundColor} />
-      <AvatarInitials avatarSize={avatarSize} initials={participant.initials()} />
+
+      {initials && <AvatarInitials avatarSize={avatarSize} initials={initials} />}
       <AvatarImage
         avatarSize={avatarSize}
         avatarAlt={avatarImgAlt}
@@ -88,6 +98,7 @@ const UserAvatar: React.FunctionComponent<UserAvatarProps> = ({
         previewPicture={previewPictureResource}
       />
       {!noBadge && shouldShowBadge(avatarSize, state) && <AvatarBadge state={state} />}
+
       {!isImageGrey && <AvatarBorder />}
     </AvatarWrapper>
   );

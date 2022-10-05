@@ -17,7 +17,7 @@
  *
  */
 
-import React from 'react';
+import {FC} from 'react';
 
 import {getFirstChar} from 'Util/StringUtil';
 import {CSS_FILL_PARENT} from 'Util/CSSMixin';
@@ -26,11 +26,11 @@ import {AVATAR_SIZE, INITIALS_SIZE, DIAMETER} from '../Avatar';
 
 export interface AvatarInitialsProps {
   avatarSize: AVATAR_SIZE;
-  color?: string;
   initials: string;
+  color?: string;
 }
 
-const AvatarInitials: React.FunctionComponent<AvatarInitialsProps> = ({avatarSize, initials, color = '#fff'}) => (
+const AvatarInitials: FC<AvatarInitialsProps> = ({avatarSize, initials, color = '#fff'}) => (
   <div
     css={{
       ...CSS_FILL_PARENT,

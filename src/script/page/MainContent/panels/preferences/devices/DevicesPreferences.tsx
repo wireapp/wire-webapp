@@ -60,9 +60,11 @@ const Device: React.FC<{
     e.stopPropagation();
     onRemove(device);
   };
+
   const handleKeyPress = (e: React.KeyboardEvent<HTMLButtonElement>) => {
     e.stopPropagation();
   };
+
   return (
     <div
       className="preferences-devices-card"
@@ -75,6 +77,7 @@ const Device: React.FC<{
         <div className="preferences-devices-card-icon" data-uie-value={device.id} data-uie-name="device-id">
           <VerifiedIcon data-uie-name={`user-device-${isVerified ? '' : 'not-'}verified`} isVerified={isVerified} />
         </div>
+
         <div className="preferences-devices-card-info">
           <div
             className="preferences-devices-model"
@@ -83,14 +86,17 @@ const Device: React.FC<{
           >
             {device.getName()}
           </div>
+
           <div className="preferences-devices-id">
             <span>{t('preferencesDevicesId')}</span>
+
             <span data-uie-name="preferences-device-active-id">
               <FormattedId idSlices={device.formatId()} />
             </span>
           </div>
         </div>
       </div>
+
       <div className="preferences-devices-card-action">
         {!device.isLegalHold() && (
           <button
@@ -104,12 +110,13 @@ const Device: React.FC<{
             <Icon.Delete />
           </button>
         )}
+
         <button
           className="icon-forward preferences-devices-card-action__forward"
           data-uie-name="go-device-details"
           aria-label={t('accessibility.headings.preferencesDeviceDetails')}
           aria-hidden
-        ></button>
+        />
       </div>
     </div>
   );

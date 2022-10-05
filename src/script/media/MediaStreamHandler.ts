@@ -17,8 +17,6 @@
  *
  */
 
-import {amplify} from 'amplify';
-import {WebAppEvents} from '@wireapp/webapp-events';
 import {Runtime} from '@wireapp/commons';
 
 import {getLogger, Logger} from 'Util/Logger';
@@ -239,17 +237,17 @@ export class MediaStreamHandler {
 
   private hidePermissionFailedHint(audio: boolean, video: boolean, screen: boolean): void {
     const warningType = this.selectPermissionDeniedWarningType(audio, video, screen);
-    amplify.publish(WebAppEvents.WARNING.DISMISS, warningType);
+    Warnings.hideWarning(warningType);
   }
 
   private hidePermissionRequestHint(audio: boolean, video: boolean, screen: boolean): void {
     if (!Runtime.isDesktopApp()) {
       const warningType = this.selectPermissionRequestWarningType(audio, video, screen);
-      amplify.publish(WebAppEvents.WARNING.DISMISS, warningType);
+      Warnings.hideWarning(warningType);
     }
   }
 
-  private selectPermissionDeniedWarningType(audio: boolean, video: boolean, screen: boolean): string {
+  private selectPermissionDeniedWarningType(audio: boolean, video: boolean, screen: boolean) {
     if (video) {
       return Warnings.TYPE.DENIED_CAMERA;
     }
@@ -259,7 +257,7 @@ export class MediaStreamHandler {
     return Warnings.TYPE.DENIED_MICROPHONE;
   }
 
-  private selectPermissionRequestWarningType(audio: boolean, video: boolean, screen: boolean): string {
+  private selectPermissionRequestWarningType(audio: boolean, video: boolean, screen: boolean) {
     if (video) {
       return Warnings.TYPE.REQUEST_CAMERA;
     }
@@ -272,7 +270,7 @@ export class MediaStreamHandler {
   private showPermissionRequestHint(audio: boolean, video: boolean, screen: boolean): void {
     if (!Runtime.isDesktopApp()) {
       const warningType = this.selectPermissionRequestWarningType(audio, video, screen);
-      amplify.publish(WebAppEvents.WARNING.SHOW, warningType);
+      Warnings.showWarning(warningType);
     }
   }
 }

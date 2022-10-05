@@ -21,7 +21,6 @@ import 'jsdom-worker';
 
 import ko, {Subscription} from 'knockout';
 import {amplify} from 'amplify';
-import {WebAppEvents} from '@wireapp/webapp-events';
 import {CONV_TYPE, CALL_TYPE, STATE as CALL_STATE, REASON, Wcall} from '@wireapp/avs';
 import {CallingRepository} from 'src/script/calling/CallingRepository';
 import {EventRepository} from 'src/script/event/EventRepository';
@@ -31,7 +30,6 @@ import {CallState} from 'src/script/calling/CallState';
 import {User} from 'src/script/entity/User';
 import {MediaType} from 'src/script/media/MediaType';
 import {Conversation} from 'src/script/entity/Conversation';
-import {ModalsViewModel} from 'src/script/view_model/ModalsViewModel';
 import {serverTimeHandler} from 'src/script/time/serverTimeHandler';
 import {createRandomUuid} from 'Util/util';
 import {TestFactory} from 'test/helper/TestFactory';
@@ -40,6 +38,7 @@ import {CALL_MESSAGE_TYPE} from './enum/CallMessageType';
 import {CALL} from '../event/Client';
 import {UserRepository} from '../user/UserRepository';
 import {LEAVE_CALL_REASON} from './enum/LeaveCallReason';
+import {usePrimaryModalState} from '../components/Modals/PrimaryModal';
 
 const createSelfParticipant = () => {
   const selfUser = new User();
@@ -103,12 +102,7 @@ describe('CallingRepository', () => {
       spyOn(wCall, 'start');
       callingRepository.startCall(conversationId, conversationType, callType).catch(done);
       setTimeout(() => {
-        expect(amplify.publish).toHaveBeenCalledWith(
-          WebAppEvents.WARNING.MODAL,
-          ModalsViewModel.TYPE.CONFIRM,
-          jasmine.any(Object),
-        );
-
+        expect(usePrimaryModalState.getState().currentModalId).not.toBeNull();
         expect(wCall.start).not.toHaveBeenCalled();
         done();
       }, 10);
@@ -395,6 +389,7 @@ describe('CallingRepository ISO', () => {
   });
 });
 
+// eslint-disable-next-line jest/no-disabled-tests
 describe.skip('E2E audio call', () => {
   const messageRepository = {
     grantMessage: () => Promise.resolve(true),
