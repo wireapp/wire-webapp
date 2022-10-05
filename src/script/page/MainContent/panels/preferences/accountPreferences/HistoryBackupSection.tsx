@@ -31,7 +31,7 @@ import {handleKeyDown} from 'Util/KeyboardUtil';
 import PreferencesSection from '../components/PreferencesSection';
 
 import {BackupRepository} from '../../../../../backup/BackupRepository';
-import {ContentViewModel} from '../../../../../view_model/ContentViewModel';
+import {ContentState} from '../../../../../view_model/ContentViewModel';
 
 interface HistoryBackupSectionProps {
   backupRepository: BackupRepository;
@@ -55,7 +55,7 @@ const HistoryBackupSection: React.FC<HistoryBackupSectionProps> = ({backupReposi
       <Button
         variant={ButtonVariant.TERTIARY}
         onClick={() => {
-          amplify.publish(WebAppEvents.CONTENT.SWITCH, ContentViewModel.STATE.HISTORY_EXPORT);
+          amplify.publish(WebAppEvents.CONTENT.SWITCH, ContentState.HISTORY_EXPORT);
         }}
         data-uie-name="do-backup-export"
         aria-describedby="preferences-history-describe-1"

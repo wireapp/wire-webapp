@@ -44,31 +44,8 @@ const ConnectRequests: FC<ConnectRequestsProps> = ({
   const temporaryConnectRequestsCount = useRef<number>(0);
 
   const contentViewModel = useContext(RootContext);
-
-  if (!contentViewModel) {
-    return null;
-  }
-
-  const actionsViewModel = contentViewModel.mainViewModel.actions;
-
   const {classifiedDomains} = useKoSubscribableChildren(teamState, ['classifiedDomains']);
   const {connectRequests} = useKoSubscribableChildren(userState, ['connectRequests']);
-
-  const onIgnoreClick = (userEntity: User): void => {
-    actionsViewModel.ignoreConnectionRequest(userEntity);
-  };
-
-  const onAcceptClick = async (userEntity: User) => {
-    await actionsViewModel.acceptConnectionRequest(userEntity);
-    const conversationEntity = await actionsViewModel.getOrCreate1to1Conversation(userEntity);
-
-    if (connectRequests.length === 1) {
-      /**
-       * In the connect request view modal, we show an overview of all incoming connection requests. When there are multiple open connection requests, we want that the user sees them all and can accept them one-by-one. When the last open connection request gets accepted, we want the user to switch to this conversation.
-       */
-      actionsViewModel.open1to1Conversation(conversationEntity);
-    }
-  };
 
   const scrollToBottom = (behavior: ScrollBehavior = 'auto') => {
     if (connectRequestsRefEnd.current) {
@@ -87,6 +64,28 @@ const ConnectRequests: FC<ConnectRequestsProps> = ({
   useEffect(() => {
     scrollToBottom();
   }, []);
+
+  if (!contentViewModel) {
+    return null;
+  }
+
+  const actionsViewModel = contentViewModel.mainViewModel.actions;
+
+  const onIgnoreClick = (userEntity: User): void => {
+    actionsViewModel.ignoreConnectionRequest(userEntity);
+  };
+
+  const onAcceptClick = async (userEntity: User) => {
+    await actionsViewModel.acceptConnectionRequest(userEntity);
+    const conversationEntity = await actionsViewModel.getOrCreate1to1Conversation(userEntity);
+
+    if (connectRequests.length === 1) {
+      /**
+       * In the connect request view modal, we show an overview of all incoming connection requests. When there are multiple open connection requests, we want that the user sees them all and can accept them one-by-one. When the last open connection request gets accepted, we want the user to switch to this conversation.
+       */
+      actionsViewModel.open1to1Conversation(conversationEntity);
+    }
+  };
 
   return (
     <div className="connect-request-wrapper">

@@ -32,7 +32,7 @@ import {downloadBlob} from 'Util/util';
 import {CancelError} from '../../backup/Error';
 import {UserState} from '../../user/UserState';
 import {RootContext} from '../../page/RootProvider';
-import {ContentViewModel} from '../../view_model/ContentViewModel';
+import {ContentState} from '../../view_model/ContentViewModel';
 import {Config} from '../../Config';
 
 enum ExportState {
@@ -53,14 +53,6 @@ interface HistoryExportProps {
 const HistoryExport: FC<HistoryExportProps> = ({userState = container.resolve(UserState)}) => {
   const logger = getLogger('HistoryExport');
 
-  const contentViewModel = useContext(RootContext);
-
-  if (!contentViewModel) {
-    return null;
-  }
-
-  const backupRepository = contentViewModel.repositories.backup;
-
   const [historyState, setHistoryState] = useState<ExportState>(ExportState.PREPARING);
   const [hasError, setHasError] = useState<boolean>(false);
 
@@ -70,6 +62,18 @@ const HistoryExport: FC<HistoryExportProps> = ({userState = container.resolve(Us
   const [archiveBlob, setArchiveBlob] = useState<Blob | null>(null);
 
   const {self: selfUser} = useKoSubscribableChildren(userState, ['self']);
+
+  const contentViewModel = useContext(RootContext);
+
+  useEffect(() => {
+    exportHistory();
+  }, []);
+
+  if (!contentViewModel) {
+    return null;
+  }
+
+  const backupRepository = contentViewModel.repositories.backup;
 
   const loadingProgress = Math.floor((numberOfProcessedRecords / numberOfRecords) * 100);
 
@@ -92,7 +96,7 @@ const HistoryExport: FC<HistoryExportProps> = ({userState = container.resolve(Us
   const loadingMessage = historyMessages?.[historyState] || '';
 
   const dismissExport = () => {
-    amplify.publish(WebAppEvents.CONTENT.SWITCH, ContentViewModel.STATE.PREFERENCES_ACCOUNT);
+    amplify.publish(WebAppEvents.CONTENT.SWITCH, ContentState.PREFERENCES_ACCOUNT);
   };
 
   const onProgress = (processedNumber: number) => {
@@ -152,10 +156,6 @@ const HistoryExport: FC<HistoryExportProps> = ({userState = container.resolve(Us
       onError(error as Error);
     }
   };
-
-  useEffect(() => {
-    exportHistory();
-  }, []);
 
   return (
     <div id="history-export">

@@ -59,7 +59,7 @@ import {MotionDuration} from '../../motion/MotionDuration';
 import {RootContext} from '../../page/RootProvider';
 import {UserState} from '../../user/UserState';
 import {TeamState} from '../../team/TeamState';
-import {PanelViewModel} from '../../view_model/PanelViewModel';
+import {openRightSidebar, PanelState} from '../../page/RightSidebar/RightSidebar';
 
 type ReadMessageBuffer = {conversation: ConversationEntity; message: Message};
 
@@ -106,10 +106,18 @@ const ConversationList: FC<ConversationListProps> = ({initialMessage, teamState,
     return null;
   }
 
-  const {conversationRepository, repositories, mainViewModel, legalHoldModal} = contentViewModel;
+  const {conversationRepository, repositories, mainViewModel, legalHoldModal, isFederated} = contentViewModel;
 
   const clickOnInvitePeople = (conversation: ConversationEntity): void => {
-    mainViewModel.panel.togglePanel(PanelViewModel.STATE.GUEST_OPTIONS, {entity: conversation});
+    openRightSidebar({
+      initialEntity: conversation,
+      initialState: PanelState.GUEST_OPTIONS,
+      isFederated,
+      mainViewModel,
+      repositories,
+      teamState,
+      userState,
+    });
   };
 
   const clickOnCancelRequest = (messageEntity: MemberMessage): void => {
@@ -128,33 +136,58 @@ const ConversationList: FC<ConversationListProps> = ({initialMessage, teamState,
       isUserEntity &&
       (userEntity.isDeleted || (isSingleModeConversation && !userEntity.isMe))
     ) {
-      return mainViewModel.panel.togglePanel(PanelViewModel.STATE.CONVERSATION_DETAILS, {
-        entity: activeConversation,
+      openRightSidebar({
+        initialEntity: activeConversation,
+        initialState: PanelState.CONVERSATION_DETAILS,
+        isFederated,
+        mainViewModel,
+        repositories,
+        teamState,
+        userState,
       });
+
+      return;
     }
 
-    const params = {entity: userEntity};
-    const panelId = userEntity.isService
-      ? PanelViewModel.STATE.GROUP_PARTICIPANT_SERVICE
-      : PanelViewModel.STATE.GROUP_PARTICIPANT_USER;
+    const panelId = userEntity.isService ? PanelState.GROUP_PARTICIPANT_SERVICE : PanelState.GROUP_PARTICIPANT_USER;
 
-    mainViewModel.panel.togglePanel(panelId, params);
+    openRightSidebar({
+      initialEntity: userEntity,
+      initialState: panelId,
+      isFederated,
+      mainViewModel,
+      repositories,
+      teamState,
+      userState,
+    });
   };
 
   const showParticipants = (participants: User[]) => {
     if (activeConversation) {
-      mainViewModel.panel.togglePanel(PanelViewModel.STATE.CONVERSATION_PARTICIPANTS, {
-        entity: activeConversation,
+      openRightSidebar({
         highlighted: participants,
+        initialEntity: activeConversation,
+        initialState: PanelState.CONVERSATION_PARTICIPANTS,
+        isFederated,
+        mainViewModel,
+        repositories,
+        teamState,
+        userState,
       });
     }
   };
 
   const showMessageDetails = (message: Message, showLikes = false) => {
     if (!is1to1) {
-      mainViewModel.panel.togglePanel(PanelViewModel.STATE.MESSAGE_DETAILS, {
-        entity: message,
+      openRightSidebar({
+        initialEntity: message,
+        initialState: PanelState.MESSAGE_DETAILS,
+        isFederated,
+        mainViewModel,
+        repositories,
         showLikes,
+        teamState,
+        userState,
       });
     }
   };
@@ -347,13 +380,13 @@ const ConversationList: FC<ConversationListProps> = ({initialMessage, teamState,
       {activeConversation && (
         <>
           <TitleBar
+            mainViewModel={mainViewModel}
+            repositories={repositories}
             conversation={activeConversation}
+            legalHoldModal={legalHoldModal}
             userState={userState}
             teamState={teamState}
             callActions={mainViewModel.calling.callActions}
-            panelViewModel={mainViewModel.panel}
-            callingRepository={repositories.calling}
-            legalHoldModal={legalHoldModal}
           />
 
           <MessagesList

@@ -95,6 +95,7 @@ export class IntegrationRepository {
     if (entity instanceof ServiceEntity) {
       return entity;
     }
+
     const {providerId, serviceId} = entity;
 
     if (!providerId || !serviceId) {

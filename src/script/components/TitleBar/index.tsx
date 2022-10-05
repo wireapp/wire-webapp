@@ -18,53 +18,62 @@
  */
 
 import {WebAppEvents} from '@wireapp/webapp-events';
+import {IconButton, StyledApp, THEME_ID, useMatchMedia} from '@wireapp/react-ui-kit';
 import {amplify} from 'amplify';
-import React, {useMemo, useEffect, useCallback} from 'react';
-import {registerReactComponent, useKoSubscribableChildren} from 'Util/ComponentUtil';
-import {StringIdentifer, t} from 'Util/LocalizerUtil';
-import {ConversationVerificationState} from '../../conversation/ConversationVerificationState';
+import cx from 'classnames';
+import React, {useMemo, useEffect, useCallback, useState} from 'react';
+import {container} from 'tsyringe';
+
 import LegalHoldDot from 'Components/LegalHoldDot';
 import Icon from 'Components/Icon';
-import {ContentViewModel} from '../../view_model/ContentViewModel';
+
+import {registerReactComponent, useKoSubscribableChildren} from 'Util/ComponentUtil';
+import {handleKeyDown} from 'Util/KeyboardUtil';
+import {StringIdentifer, t} from 'Util/LocalizerUtil';
+import {TIME_IN_MILLIS} from 'Util/TimeUtil';
+import {matchQualifiedIds} from 'Util/QualifiedId';
+
+import {CallState} from '../../calling/CallState';
+import {ConversationFilter} from '../../conversation/ConversationFilter';
+import {ConversationVerificationState} from '../../conversation/ConversationVerificationState';
+import {Conversation} from '../../entity/Conversation';
+import {openRightSidebar, PanelState} from '../../page/RightSidebar/RightSidebar';
+import {UserState} from '../../user/UserState';
+import {TeamState} from '../../team/TeamState';
 import {Shortcut} from '../../ui/Shortcut';
 import {ShortcutType} from '../../ui/ShortcutType';
-import cx from 'classnames';
-import {Conversation} from '../../entity/Conversation';
-import {CallingRepository} from '../../calling/CallingRepository';
-import {UserState} from '../../user/UserState';
-import {CallState} from '../../calling/CallState';
-import {TeamState} from '../../team/TeamState';
-import {container} from 'tsyringe';
-import {LegalHoldModalViewModel} from '../../view_model/content/LegalHoldModalViewModel';
-import {ConversationFilter} from '../../conversation/ConversationFilter';
-import {matchQualifiedIds} from 'Util/QualifiedId';
 import {CallActions} from '../../view_model/CallingViewModel';
-import {handleKeyDown} from 'Util/KeyboardUtil';
-import {PanelViewModel} from '../../view_model/PanelViewModel';
-import {TIME_IN_MILLIS} from 'Util/TimeUtil';
-import {IconButton, StyledApp, THEME_ID, useMatchMedia} from '@wireapp/react-ui-kit';
+import {ContentState} from '../../view_model/ContentViewModel';
+import {MainViewModel, ViewModelRepositories} from '../../view_model/MainViewModel';
+import {LegalHoldModalViewModel} from '../../view_model/content/LegalHoldModalViewModel';
 
 export interface TitleBarProps {
+  mainViewModel: MainViewModel;
+  repositories: ViewModelRepositories;
   conversation: Conversation;
   legalHoldModal: LegalHoldModalViewModel;
-  callingRepository: CallingRepository;
   callActions: CallActions;
-  panelViewModel: PanelViewModel;
   userState: UserState;
-  callState?: CallState;
   teamState: TeamState;
+  callState?: CallState;
+  isFederated?: boolean;
+  // Function will be used after migration, to changing React State. Current implementation works with React and Knockout.
+  toggleRightSidebar?: (state: PanelState) => void;
 }
 
 const TitleBar: React.FC<TitleBarProps> = ({
+  mainViewModel,
+  repositories,
   conversation,
   legalHoldModal,
-  callingRepository,
   callActions,
-  panelViewModel,
+  isFederated = false,
+  toggleRightSidebar = state => null,
   userState = container.resolve(UserState),
   callState = container.resolve(CallState),
   teamState = container.resolve(TeamState),
 }) => {
+  const {calling: callingRepository} = repositories;
   const {
     is1to1,
     isRequest,
@@ -93,7 +102,7 @@ const TitleBar: React.FC<TitleBarProps> = ({
     'verification_state',
   ]);
 
-  const {isVisible: isPanelVisible} = useKoSubscribableChildren(panelViewModel, ['isVisible']);
+  const [isRightPanelOpen, setIsRightPanelOpen] = useState<boolean>(false);
 
   const {isActivatedAccount} = useKoSubscribableChildren(userState, ['isActivatedAccount']);
   const {joinedCall} = useKoSubscribableChildren(callState, ['joinedCall']);
@@ -136,12 +145,21 @@ const TitleBar: React.FC<TitleBarProps> = ({
 
   const showDetails = useCallback(
     (addParticipants: boolean): void => {
-      const panelId = addParticipants
-        ? PanelViewModel.STATE.ADD_PARTICIPANTS
-        : PanelViewModel.STATE.CONVERSATION_DETAILS;
-      panelViewModel.togglePanel(panelId, {entity: conversation});
+      const panelId = addParticipants ? PanelState.ADD_PARTICIPANTS : PanelState.CONVERSATION_DETAILS;
+
+      toggleRightSidebar(panelId);
+
+      openRightSidebar({
+        initialEntity: conversation,
+        initialState: panelId,
+        isFederated,
+        mainViewModel,
+        repositories,
+        teamState,
+        userState,
+      });
     },
-    [conversation, panelViewModel],
+    [conversation],
   );
 
   const showAddParticipant = useCallback(() => {
@@ -176,10 +194,52 @@ const TitleBar: React.FC<TitleBarProps> = ({
   }, [isActivatedAccount, showAddParticipant, showDetails]);
 
   const onClickCollectionButton = () => {
-    amplify.publish(WebAppEvents.CONTENT.SWITCH, ContentViewModel.STATE.COLLECTION);
+    amplify.publish(WebAppEvents.CONTENT.SWITCH, ContentState.COLLECTION);
   };
 
   const onClickDetails = () => showDetails(false);
+
+  const onRightPanelToggle = (mutationList: MutationRecord[]) => {
+    mutationList.forEach(mutation => {
+      const {addedNodes, removedNodes} = mutation;
+
+      addedNodes.forEach(node => {
+        if (node instanceof Element) {
+          const isElementExist = node.id === 'right-column';
+          if (isElementExist) {
+            setIsRightPanelOpen(true);
+          }
+        }
+      });
+
+      removedNodes.forEach(node => {
+        if (node instanceof Element) {
+          const isElementExist = node.id === 'right-column';
+          if (isElementExist) {
+            setIsRightPanelOpen(false);
+          }
+        }
+      });
+    });
+  };
+
+  // This observer getting if right panel is open.
+  // It will be refactored for react statement if we migrate all wire-main to React.
+  // Now in the wire-main we have defined this TitleBar, so if we move it to the React we will work on state.
+  const config = {childList: true};
+  const observer = new MutationObserver(onRightPanelToggle);
+
+  useEffect(() => {
+    const rightPanel = document.querySelector('#app');
+
+    if (rightPanel) {
+      observer.observe(rightPanel, config);
+
+      return () => observer.disconnect();
+    }
+
+    return () => undefined;
+  }, []);
 
   return (
     <StyledApp themeId={THEME_ID.DEFAULT}>
@@ -280,6 +340,7 @@ const TitleBar: React.FC<TitleBarProps> = ({
               >
                 <span className="visually-hidden">{t('tooltipConversationSearch')}</span>
               </IconButton>
+
               <IconButton
                 title={t('tooltipConversationCall')}
                 aria-label={t('tooltipConversationCall')}
@@ -296,7 +357,7 @@ const TitleBar: React.FC<TitleBarProps> = ({
               title={t('tooltipConversationInfo')}
               aria-label={t('tooltipConversationInfo')}
               onClick={onClickDetails}
-              className={cx('conversation-title-bar-icon', {active: isPanelVisible})}
+              className={cx('conversation-title-bar-icon', {active: isRightPanelOpen})}
               data-uie-name="do-open-info"
             >
               <Icon.Info />

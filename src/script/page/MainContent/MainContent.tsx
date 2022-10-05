@@ -48,7 +48,7 @@ import {ContentState, ContentViewModel} from '../../view_model/ContentViewModel'
 
 const Animated: FC<{children: ReactNode}> = ({children, ...rest}) => {
   return (
-    <CSSTransition classNames="slide-in-left" timeout={{enter: 5000}} {...rest}>
+    <CSSTransition classNames="slide-in-left" timeout={{enter: 500}} {...rest}>
       {children}
     </CSSTransition>
   );
@@ -66,16 +66,16 @@ const MainContent: FC<MainContentProps> = ({
   const {state} = useKoSubscribableChildren(contentViewModel, ['state']);
   const {activeConversation} = useKoSubscribableChildren(conversationState, ['activeConversation']);
 
-  const {initialMessage, repositories, isFederated} = contentViewModel;
+  const {initialMessage, isFederated, repositories} = contentViewModel;
 
   const teamState = container.resolve(TeamState);
   const userState = container.resolve(UserState);
 
-  const statesTitle = {
-    [ContentViewModel.STATE.CONNECTION_REQUESTS]: t('accessibility.headings.connectionRequests'),
-    [ContentViewModel.STATE.CONVERSATION]: t('accessibility.headings.conversation'),
-    [ContentViewModel.STATE.HISTORY_EXPORT]: t('accessibility.headings.historyExport'),
-    [ContentViewModel.STATE.HISTORY_IMPORT]: t('accessibility.headings.historyImport'),
+  const statesTitle: Partial<Record<ContentState, string>> = {
+    [ContentState.CONNECTION_REQUESTS]: t('accessibility.headings.connectionRequests'),
+    [ContentState.CONVERSATION]: t('accessibility.headings.conversation'),
+    [ContentState.HISTORY_EXPORT]: t('accessibility.headings.historyExport'),
+    [ContentState.HISTORY_IMPORT]: t('accessibility.headings.historyImport'),
     [ContentState.COLLECTION]: t('accessibility.headings.collection'),
     [ContentState.PREFERENCES_ABOUT]: t('accessibility.headings.preferencesAbout'),
     [ContentState.PREFERENCES_ACCOUNT]: t('accessibility.headings.preferencesAccount'),
@@ -163,15 +163,15 @@ const MainContent: FC<MainContentProps> = ({
                 </div>
               )}
 
-              {state === ContentViewModel.STATE.CONNECTION_REQUESTS && (
+              {state === ContentState.CONNECTION_REQUESTS && (
                 <ConnectRequests teamState={teamState} userState={userState} />
               )}
 
-              {state === ContentViewModel.STATE.CONVERSATION && (
+              {state === ContentState.CONVERSATION && (
                 <ConversationList initialMessage={initialMessage} teamState={teamState} userState={userState} />
               )}
 
-              {state === ContentViewModel.STATE.HISTORY_EXPORT && <HistoryExport userState={userState} />}
+              {state === ContentState.HISTORY_EXPORT && <HistoryExport userState={userState} />}
             </>
           </Animated>
         </SwitchTransition>

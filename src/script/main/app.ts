@@ -89,7 +89,7 @@ import {showInitialModal} from '../user/AvailabilityModal';
 import {URLParameter} from '../auth/URLParameter';
 import {SIGN_OUT_REASON} from '../auth/SignOutReason';
 import {ClientRepository} from '../client/ClientRepository';
-import {ContentViewModel} from '../view_model/ContentViewModel';
+import {ContentState} from '../view_model/ContentViewModel';
 import {CacheRepository} from '../cache/CacheRepository';
 import {SelfService} from '../self/SelfService';
 import {PropertiesRepository} from '../properties/PropertiesRepository';
@@ -692,7 +692,7 @@ class App {
     } else if (conversationEntity) {
       mainView.content.showConversation(conversationEntity, {});
     } else if (this.repository.user['userState'].connectRequests().length) {
-      amplify.publish(WebAppEvents.CONTENT.SWITCH, ContentViewModel.STATE.CONNECTION_REQUESTS);
+      amplify.publish(WebAppEvents.CONTENT.SWITCH, ContentState.CONNECTION_REQUESTS);
     }
 
     const redirect = localStorage.getItem(App.LOCAL_STORAGE_LOGIN_REDIRECT_KEY);

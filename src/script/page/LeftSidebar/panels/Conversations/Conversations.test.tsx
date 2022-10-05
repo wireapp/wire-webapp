@@ -27,6 +27,9 @@ import {User} from 'src/script/entity/User';
 import {PROPERTIES_TYPE} from 'src/script/properties/PropertiesType';
 import ko from 'knockout';
 
+// TODO: Remove after all migrations
+jest.mock('src/script/page/RightSidebar/utils/toggleRightPanel', () => () => jest.fn());
+
 describe('Conversations', () => {
   const defaultParams: React.ComponentProps<typeof Conversations> = {
     conversationRepository: {

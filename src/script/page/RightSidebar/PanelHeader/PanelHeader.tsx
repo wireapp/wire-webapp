@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2022 Wire Swiss GmbH
+ * Copyright (C) 2021 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,55 +17,85 @@
  *
  */
 
-import {FC} from 'react';
 import cx from 'classnames';
+import {FC} from 'react';
 
+import DragableClickWrapper from 'Components/DragableClickWrapper';
 import Icon from 'Components/Icon';
 
 import {t} from 'Util/LocalizerUtil';
 import {noop} from 'Util/util';
 
-interface PanelHeaderProps {
+export interface PanelHeaderProps {
   onClose: () => void;
-  onToggleMute?: () => void;
+  onGoBack?: () => void;
   className?: string;
+  showBackArrow?: boolean;
   showActionMute?: boolean;
   showNotificationsNothing?: boolean;
+  isReverse?: boolean;
+  closeUie?: string;
+  closeBtnTitle?: string;
+  goBackTitle?: string;
+  goBackUie?: string;
+  titleDataUieName?: string;
+  title?: string;
+  handleBlur?: () => void;
+  onToggleMute?: () => void;
 }
 
 const PanelHeader: FC<PanelHeaderProps> = ({
   onClose,
+  isReverse,
   className = '',
+  showBackArrow = true,
   showActionMute = false,
   showNotificationsNothing = false,
+  goBackUie = 'back-button',
+  goBackTitle = t('accessibility.rightPanel.GoBack'),
+  title = '',
+  titleDataUieName = '',
+  closeUie = 'do-close',
+  closeBtnTitle = t('accessibility.rightPanel.close'),
+  handleBlur = noop,
+  onGoBack = noop,
   onToggleMute = noop,
-}) => {
+}: PanelHeaderProps) => {
   return (
-    <div className={cx('panel__header panel__header--reverse', className)}>
-      {/* TODO: ADD clickOrDrag functionality */}
-      <button
-        className="right-panel-close icon-button"
-        type="button"
-        title={t('accessibility.rightPanel.close')}
-        aria-label={t('accessibility.rightPanel.close')}
-        onClick={onClose}
-        data-uie-name="do-close"
-      >
-        <Icon.Close />
-      </button>
+    <div className={cx('panel__header', {'panel__header--reverse': isReverse}, className)}>
+      {showBackArrow && (
+        <DragableClickWrapper onClick={onGoBack}>
+          <button className="icon-button" data-uie-name={goBackUie} title={goBackTitle} onBlur={handleBlur}>
+            <Icon.ArrowLeft />
+          </button>
+        </DragableClickWrapper>
+      )}
 
-      {/* TODO: ADD clickOrDrag functionality */}
-      {showActionMute && (
-        <button
-          className={cx('right-panel-close icon-button', {
-            'right-panel-mute--active': showNotificationsNothing,
-          })}
-          type="button"
-          onClick={onToggleMute}
-          data-uie-name="do-mute"
-        >
-          <Icon.Mute />
+      {title && (
+        <h3 className="panel__header__title" tabIndex={0} data-uie-name={titleDataUieName}>
+          {title}
+        </h3>
+      )}
+
+      <DragableClickWrapper onClick={onClose}>
+        <button className="icon-button" data-uie-name={closeUie} title={closeBtnTitle} onBlur={handleBlur}>
+          <Icon.Close className="right-panel-close" />
         </button>
+      </DragableClickWrapper>
+
+      {showActionMute && (
+        <DragableClickWrapper onClick={onToggleMute}>
+          <button
+            className={cx('right-panel-close icon-button', {
+              'right-panel-mute--active': showNotificationsNothing,
+            })}
+            type="button"
+            onClick={onToggleMute}
+            data-uie-name="do-mute"
+          >
+            <Icon.Mute />
+          </button>
+        </DragableClickWrapper>
       )}
     </div>
   );

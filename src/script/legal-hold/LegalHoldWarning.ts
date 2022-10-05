@@ -23,9 +23,9 @@ import {t} from 'Util/LocalizerUtil';
 
 import {ConversationVerificationState} from '../conversation/ConversationVerificationState';
 import type {Conversation} from '../entity/Conversation';
-import {OPEN_CONVERSATION_DETAILS} from '../view_model/PanelViewModel';
 import {ConversationError} from '../error/ConversationError';
 import {LegalHoldModalViewModel} from '../view_model/content/LegalHoldModalViewModel';
+import {OPEN_CONVERSATION_DETAILS} from '../page/RightSidebar/RightSidebar';
 import PrimaryModal from '../components/Modals/PrimaryModal';
 
 export const showLegalHoldWarningModal = (
