@@ -18,7 +18,7 @@
  */
 
 // Polyfill for "tsyringe" dependency injection
-import 'core-js/es7/reflect';
+import 'core-js/full/reflect';
 
 import ko from 'knockout';
 import platform from 'platform';
@@ -31,7 +31,7 @@ import {Runtime} from '@wireapp/commons';
 
 import {getLogger, Logger} from 'Util/Logger';
 import {t} from 'Util/LocalizerUtil';
-import {checkIndexedDb, createRandomUuid} from 'Util/util';
+import {arrayToBase64, checkIndexedDb, createRandomUuid} from 'Util/util';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 import {enableLogging} from 'Util/LoggerUtil';
 import {Environment} from 'Util/Environment';
@@ -115,14 +115,14 @@ import {AccessTokenError, ACCESS_TOKEN_ERROR_TYPE} from '../error/AccessTokenErr
 import {ClientError, CLIENT_ERROR_TYPE} from '../error/ClientError';
 import {AuthError} from '../error/AuthError';
 import {AssetRepository} from '../assets/AssetRepository';
-import type {BaseError} from '../error/BaseError';
-import type {User} from '../entity/User';
+import {BaseError} from '../error/BaseError';
 import {MessageRepository} from '../conversation/MessageRepository';
 import {TeamError} from '../error/TeamError';
 import Warnings from '../view_model/WarningsContainer';
 import {Core} from '../service/CoreSingleton';
 import {migrateToQualifiedSessionIds} from './sessionIdMigrator';
 import showUserModal from 'Components/Modals/UserModal';
+import {mlsConversationState} from '../mls/mlsConversationState';
 
 function doRedirect(signOutReason: SIGN_OUT_REASON) {
   let url = `/auth/${location.search}`;
@@ -189,7 +189,7 @@ class App {
     private readonly core: Core,
     private readonly apiClient: APIClient,
   ) {
-    this.apiClient.on(APIClient.TOPIC.ON_LOGOUT, () => this.logout(SIGN_OUT_REASON.NOT_SIGNED_IN, false));
+    this.apiClient.on(APIClient.TOPIC.ON_LOGOUT, () => this.logout(SIGN_OUT_REASON.SESSION_EXPIRED, false));
     this.logger = getLogger('App');
     this.appContainer = appContainer;
 
@@ -345,7 +345,9 @@ class App {
         amplify.publish(WebAppEvents.CONNECTION.ACCESS_TOKEN.RENEWED);
         this.logger.info(`Refreshed access token.`);
       } catch (error) {
-        this.logger.warn(`Logging out user because access token cannot be refreshed: ${error.message}`, error);
+        if (error instanceof BaseError) {
+          this.logger.warn(`Logging out user because access token cannot be refreshed: ${error.message}`, error);
+        }
         this.logout(SIGN_OUT_REASON.NOT_SIGNED_IN, false);
       }
     });
@@ -403,10 +405,11 @@ class App {
       const selfUser = await this.initiateSelfUser();
       if (this.apiClient.backendFeatures.isFederated) {
         // Migrate all existing session to fully qualified ids (if need be)
-        await migrateToQualifiedSessionIds(
-          this.repository.storage.storageService.db.sessions,
-          this.apiClient.context!.domain,
-        );
+        const sessions = this.repository.storage.storageService.db?.sessions;
+        const domain = this.apiClient.context?.domain;
+        if (sessions && domain) {
+          await migrateToQualifiedSessionIds(sessions, domain);
+        }
       }
       loadingView.updateProgress(5, t('initReceivedSelfUser', selfUser.name()));
       telemetry.timeStep(AppInitTimingsStep.RECEIVED_SELF_USER);
@@ -414,7 +417,7 @@ class App {
       callingRepository.initAvs(selfUser, clientEntity().id);
       loadingView.updateProgress(7.5, t('initValidatedClient'));
       telemetry.timeStep(AppInitTimingsStep.VALIDATED_CLIENT);
-      telemetry.addStatistic(AppInitStatisticsValue.CLIENT_TYPE, clientEntity().type);
+      telemetry.addStatistic(AppInitStatisticsValue.CLIENT_TYPE, clientEntity().type ?? 'unknown');
 
       await cryptographyRepository.init(this.core.service!.cryptography.cryptobox, clientEntity);
 
@@ -424,6 +427,32 @@ class App {
       await teamRepository.initTeam();
 
       const conversationEntities = await conversationRepository.getConversations();
+
+      if (Config.getConfig().FEATURE.ENABLE_MLS) {
+        // We send external proposal to all the MLS conversations that are in an unknown state (not established nor pendingWelcome)
+        await mlsConversationState.getState().sendExternalToPendingJoin(
+          conversationEntities,
+          groupId => this.core.service!.conversation.isMLSConversationEstablished(groupId),
+          ({groupId, epoch}) => this.core.service!.conversation.sendExternalJoinProposal(groupId, epoch),
+        );
+
+        this.core.configureMLSCallbacks({
+          authorize: groupIdBytes => {
+            const groupId = arrayToBase64(groupIdBytes);
+            const conversation = conversationRepository.findConversationByGroupId(groupId);
+            if (!conversation) {
+              // If the conversation is not found, it means it's being created by the self user, thus they have admin rights
+              return true;
+            }
+            return conversationRepository.conversationRoleRepository.isUserGroupAdmin(conversation, selfUser);
+          },
+          groupIdFromConversationId: async conversationId => {
+            const conversation = await conversationRepository.getConversationById(conversationId);
+            return conversation?.groupId;
+          },
+        });
+      }
+
       const connectionEntities = await connectionRepository.getConnections();
       loadingView.updateProgress(25, t('initReceivedUserData'));
       telemetry.timeStep(AppInitTimingsStep.RECEIVED_USER_DATA);
@@ -481,7 +510,9 @@ class App {
       callingRepository.setReady();
       this.logger.info('App fully loaded');
     } catch (error) {
-      this._appInitFailure(error, isReload);
+      if (error instanceof BaseError) {
+        this._appInitFailure(error, isReload);
+      }
     }
   }
 
@@ -499,7 +530,7 @@ class App {
   private _appInitFailure(error: BaseError, isReload: boolean) {
     let logMessage = `Could not initialize app version '${Environment.version(false)}'`;
     if (Runtime.isDesktopApp()) {
-      logMessage += ` - Electron '${platform.os.family}' '${Environment.version()}'`;
+      logMessage += ` - Electron '${platform.os?.family}' '${Environment.version()}'`;
     }
     this.logger.warn(`${logMessage}: ${error.message}`, {error});
 
@@ -570,21 +601,6 @@ class App {
   }
 
   /**
-   * Check whether we need to set different user information (picture, username).
-   * @param userEntity Self user entity
-   * @returns Checked user entity
-   */
-  private _checkUserInformation(userEntity: User) {
-    if (userEntity.hasActivatedIdentity()) {
-      if (!userEntity.mediumPictureResource()) {
-        this.repository.user.setDefaultPicture();
-      }
-    }
-
-    return userEntity;
-  }
-
-  /**
    * Initiate the self user by getting it from the backend.
    * @returns Resolves with the self user entity
    */
@@ -604,7 +620,6 @@ class App {
     await container.resolve(StorageService).init(this.core.storage);
     this.repository.client.init(userEntity);
     await this.repository.properties.init(userEntity);
-    this._checkUserInformation(userEntity);
 
     return userEntity;
   }
@@ -774,7 +789,7 @@ class App {
       try {
         keepPermanentDatabase = this.repository.client.isCurrentClientPermanent() && !clearData;
       } catch (error) {
-        if (error.type === ClientError.TYPE.CLIENT_NOT_SET) {
+        if (error instanceof BaseError && error.type === ClientError.TYPE.CLIENT_NOT_SET) {
           keepPermanentDatabase = false;
         }
       }
@@ -805,6 +820,7 @@ class App {
       if (clearData) {
         // Info: This async call cannot be awaited in an "beforeunload" scenario, so we call it without waiting for it in order to delete the CacheStorage in the background.
         CacheRepository.clearCacheStorage();
+        localStorage.clear();
 
         try {
           await this.repository.storage.deleteDatabase();
@@ -830,8 +846,10 @@ class App {
       try {
         return _logout();
       } catch (error) {
-        this.logger.error(`Logout triggered by '${signOutReason}' and errored: ${error.message}.`);
-        _redirectToLogin();
+        if (error instanceof BaseError) {
+          this.logger.error(`Logout triggered by '${signOutReason}' and errored: ${error.message}.`);
+          _redirectToLogin();
+        }
       }
     }
 
@@ -874,7 +892,10 @@ class App {
     const isTemporaryGuestReason = App.CONFIG.SIGN_OUT_REASONS.TEMPORARY_GUEST.includes(signOutReason);
     const isLeavingGuestRoom = isTemporaryGuestReason && this.repository.user['userState'].isTemporaryGuest();
     if (isLeavingGuestRoom) {
-      return window.location.replace(getWebsiteUrl());
+      const websiteUrl = getWebsiteUrl();
+      if (websiteUrl) {
+        return window.location.replace(websiteUrl);
+      }
     }
 
     doRedirect(signOutReason);
@@ -898,8 +919,9 @@ class App {
 //##############################################################################
 
 $(async () => {
+  const config = Config.getConfig();
   const apiClient = container.resolve(APIClient);
-  await apiClient.useVersion(Config.getConfig().SUPPORTED_API_VERSIONS);
+  await apiClient.useVersion(config.SUPPORTED_API_VERSIONS, config.FEATURE.ENABLE_MLS);
   const core = container.resolve(Core);
 
   enableLogging(Config.getConfig().FEATURE.ENABLE_DEBUG);

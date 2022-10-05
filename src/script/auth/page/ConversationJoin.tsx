@@ -34,7 +34,7 @@ import {
 import React, {useEffect, useState} from 'react';
 import {FormattedMessage, useIntl} from 'react-intl';
 import {connect} from 'react-redux';
-import {Redirect} from 'react-router';
+import {Navigate} from 'react-router-dom';
 import {AnyAction, Dispatch} from 'redux';
 import {noop} from 'Util/util';
 import type {RegisterData} from '@wireapp/api-client/src/auth';
@@ -212,7 +212,7 @@ const ConversationJoin = ({
   const renderTemporaryGuestAccountCreation = !isAuthenticated || isTemporaryGuest || forceNewTemporaryGuestAccount;
 
   if (!isValidLink) {
-    return <Redirect to={ROUTE.CONVERSATION_JOIN_INVALID} />;
+    return <Navigate to={ROUTE.CONVERSATION_JOIN_INVALID} replace />;
   }
   return (
     <UnsupportedBrowser isTemporaryGuest>

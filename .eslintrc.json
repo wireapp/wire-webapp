@@ -14,7 +14,7 @@
     "z": true,
     "RTCAudioSource": true
   },
-  "plugins": ["sort-keys-fix"],
+  "plugins": ["sort-keys-fix", "react-hooks"],
   "ignorePatterns": [".git/", "docs/", "bin/", "node_modules/", "resource/", "server/bin/", "server/dist/", "server/node_modules/", "src/ext/", "src/script/localization/**/webapp*.js", "src/worker/"],
   "overrides": [
     {
@@ -46,7 +46,9 @@
     "sort-keys-fix/sort-keys-fix": "warn",
     "jsx-a11y/media-has-caption": "warn",
     "react/react-in-jsx-scope": "off",
-    "react/no-unknown-property": ["error", {"ignore": ["css", "transform-origin"]}]
+    "react/no-unknown-property": ["error", {"ignore": ["css", "transform-origin"]}],
+    "react-hooks/rules-of-hooks": "error",
+    "react-hooks/exhaustive-deps": "warn"
   },
   "settings": {
     "react": {

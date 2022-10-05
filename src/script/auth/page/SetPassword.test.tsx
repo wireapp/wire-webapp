@@ -17,46 +17,23 @@
  *
  */
 
-import {ReactWrapper} from 'enzyme';
-import waitForExpect from 'wait-for-expect';
 import {ValidationError} from '../module/action/ValidationError';
-import {initialRootState, RootState, Api} from '../module/reducer';
+import {initialRootState} from '../module/reducer';
 import {mockStoreFactory} from '../util/test/mockStoreFactory';
 import {mountComponent} from '../util/test/TestUtil';
 import SetPassword from './SetPassword';
-import {MockStoreEnhanced} from 'redux-mock-store';
-import {TypeUtil} from '@wireapp/commons';
-import {ThunkDispatch} from 'redux-thunk';
-import {AnyAction} from 'redux';
-import {History} from 'history';
+import {fireEvent, waitFor} from '@testing-library/react';
 
 jest.mock('../util/SVGProvider');
 
-class SetPasswordPage {
-  private readonly driver: ReactWrapper;
-
-  constructor(
-    store: MockStoreEnhanced<TypeUtil.RecursivePartial<RootState>, ThunkDispatch<RootState, Api, AnyAction>>,
-    history?: History<any>,
-  ) {
-    this.driver = mountComponent(<SetPassword />, store, history);
-  }
-
-  getPasswordInput = () => this.driver.find('input[data-uie-name="enter-password"]');
-  getSetPasswordButton = () => this.driver.find('button[data-uie-name="do-set-password"]');
-  getErrorMessage = (errorLabel?: string) =>
-    this.driver.find(`[data-uie-name="error-message"]${errorLabel ? `[data-uie-value="${errorLabel}"]` : ''}`);
-
-  clickSetPasswordButton = () => this.getSetPasswordButton().simulate('submit');
-
-  enterPassword = (value: string) => this.getPasswordInput().simulate('change', {target: {value}});
-
-  update = () => this.driver.update();
-}
+const passwordInputId = 'enter-password';
+const setPasswordButtonId = 'do-set-password';
+const errorMessageId = 'error-message';
 
 describe('SetPassword', () => {
   it('has disabled submit button as long as there is no input', () => {
-    const setPasswordPage = new SetPasswordPage(
+    const {getByTestId} = mountComponent(
+      <SetPassword />,
       mockStoreFactory()({
         ...initialRootState,
         runtimeState: {
@@ -67,18 +44,18 @@ describe('SetPassword', () => {
       }),
     );
 
-    expect(setPasswordPage.getPasswordInput().exists()).toBe(true);
+    const passwordInput = getByTestId(passwordInputId);
+    const setPasswordButton = getByTestId(setPasswordButtonId) as HTMLButtonElement;
 
-    expect(setPasswordPage.getSetPasswordButton().exists()).toBe(true);
+    expect(setPasswordButton.disabled).toBe(true);
+    fireEvent.change(passwordInput, {target: {value: 'e'}});
 
-    expect(setPasswordPage.getSetPasswordButton().props().disabled).toBe(true);
-    setPasswordPage.enterPassword('e');
-
-    expect(setPasswordPage.getSetPasswordButton().props().disabled).toBe(false);
+    expect(setPasswordButton.disabled).toBe(false);
   });
 
   it('handles invalid password', async () => {
-    const setPasswordPage = new SetPasswordPage(
+    const {getByTestId, container} = mountComponent(
+      <SetPassword />,
       mockStoreFactory()({
         ...initialRootState,
         runtimeState: {
@@ -89,15 +66,14 @@ describe('SetPassword', () => {
       }),
     );
 
-    expect(setPasswordPage.getErrorMessage().exists()).toBe(false);
+    const passwordInput = getByTestId(passwordInputId);
 
-    setPasswordPage.enterPassword('e');
-    setPasswordPage.clickSetPasswordButton();
+    fireEvent.change(passwordInput, {target: {value: 'e'}});
+    fireEvent.submit(container.querySelector('form')!);
 
-    await waitForExpect(() => {
-      setPasswordPage.update();
-
-      expect(setPasswordPage.getErrorMessage(ValidationError.FIELD.PASSWORD.PATTERN_MISMATCH).exists()).toBe(true);
+    await waitFor(() => {
+      const errorMessage = getByTestId(errorMessageId);
+      expect(errorMessage.dataset.uieValue).toBe(ValidationError.FIELD.PASSWORD.PATTERN_MISMATCH);
     });
   });
 });

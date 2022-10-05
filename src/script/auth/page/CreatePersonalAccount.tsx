@@ -21,7 +21,7 @@ import {ArrowIcon, COLOR, Column, Columns, Container, ContainerXS, H1, IsMobile}
 import React from 'react';
 import {useIntl} from 'react-intl';
 import {connect} from 'react-redux';
-import useReactRouter from 'use-react-router';
+import {useNavigate} from 'react-router-dom';
 
 import {AnyAction, Dispatch} from 'redux';
 import {createPersonalAccountStrings} from '../../strings';
@@ -38,7 +38,7 @@ import {Config} from '../../Config';
 interface Props extends React.HTMLAttributes<HTMLDivElement> {}
 
 const CreatePersonalAccount = ({isPersonalFlow, enterPersonalCreationFlow}: Props & ConnectedProps & DispatchProps) => {
-  const {history} = useReactRouter();
+  const navigate = useNavigate();
   const {formatMessage: _} = useIntl();
   const isMacOsWrapper = Runtime.isDesktopApp() && Runtime.isMacOS();
   React.useEffect(() => {
@@ -55,9 +55,9 @@ const CreatePersonalAccount = ({isPersonalFlow, enterPersonalCreationFlow}: Prop
       <AccountForm
         onSubmit={() => {
           if (Config.getConfig().FEATURE.ENABLE_EXTRA_CLIENT_ENTROPY) {
-            history.push(ROUTE.SET_ENTROPY);
+            navigate(ROUTE.SET_ENTROPY);
           } else {
-            history.push(ROUTE.VERIFY_EMAIL_CODE);
+            navigate(ROUTE.VERIFY_EMAIL_CODE);
           }
         }}
         submitText={_(createPersonalAccountStrings.submitButton)}

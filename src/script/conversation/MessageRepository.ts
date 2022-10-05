@@ -754,13 +754,12 @@ export class MessageRepository {
     // Configure ephemeral messages
     conversationService.messageTimer.setConversationLevelTimer(conversation.id, conversation.messageTimer());
 
+    const commonProperties = {onStart: injectOptimisticEvent, onSuccess: handleSuccess, payload};
     if (groupId) {
       return this.messageSender.queueMessage(() =>
         this.conversationService.send({
+          ...commonProperties,
           groupId,
-          onStart: injectOptimisticEvent,
-          onSuccess: handleSuccess,
-          payload,
           protocol: ConversationProtocol.MLS,
         }),
       );
@@ -768,12 +767,10 @@ export class MessageRepository {
 
     return this.messageSender.queueMessage(() =>
       this.conversationService.send({
+        ...commonProperties,
         conversationDomain: conversation.domain || undefined,
         nativePush,
         onClientMismatch: mismatch => this.onClientMismatch?.(mismatch, conversation, silentDegradationWarning),
-        onStart: injectOptimisticEvent,
-        onSuccess: handleSuccess,
-        payload,
         protocol: ConversationProtocol.PROTEUS,
         targetMode,
         userIds: this.generateRecipients(conversation, recipients, skipSelf),
@@ -944,7 +941,11 @@ export class MessageRepository {
   public async deleteMessageForEveryone(
     conversation: Conversation,
     message: Message,
-    targetedUsers?: QualifiedId[],
+    options: {
+      targetedUsers?: QualifiedId[];
+      /** will not wait for backend confirmation before actually deleting the message locally */
+      optimisticRemoval?: boolean;
+    } = {},
   ): Promise<void> {
     const conversationId = conversation.id;
     const messageId = message.id;
@@ -953,16 +954,21 @@ export class MessageRepository {
       if (!message.user().isMe && !message.ephemeral_expires()) {
         throw new ConversationError(ConversationError.TYPE.WRONG_USER, ConversationError.MESSAGE.WRONG_USER);
       }
-      const userIds = targetedUsers || conversation.allUserEntities.map(user => user.qualifiedId);
-      await this.conversationService.deleteMessageEveryone(
-        conversation.id,
-        message.id,
-        this.core.backendFeatures.federationEndpoints ? userIds : userIds.map(({id}) => id),
-        true,
-        this.core.backendFeatures.federationEndpoints ? conversation.domain : undefined,
-      );
-
-      await this.deleteMessageById(conversation, messageId);
+      const userIds = options.targetedUsers || conversation.allUserEntities.map(user => user.qualifiedId);
+      const payload = MessageBuilder.createMessageDelete({
+        ...this.createCommonMessagePayload(conversation),
+        messageIdToDelete: message.id,
+      });
+      await this.sendAndInjectGenericCoreMessage(payload, conversation, {
+        recipients: userIds,
+        // if we want optimistic removal, we can rely on the injection system that will handle the event and remove the message even before the message is sent
+        skipInjection: !options.optimisticRemoval,
+        // If there are recipients to the message, we only want to target those users (case of ephemeral messages that should be deleted in the sender's client and the user's own clients)
+        targetMode: userIds ? MessageTargetMode.USERS : undefined,
+      });
+      if (!options.optimisticRemoval) {
+        this.deleteMessageById(conversation, message.id);
+      }
     } catch (error) {
       const isConversationNotFound = error.code === HTTP_STATUS.NOT_FOUND;
       if (isConversationNotFound) {
@@ -985,12 +991,19 @@ export class MessageRepository {
    */
   public async deleteMessage(conversation: Conversation, message: Message): Promise<void> {
     try {
-      await this.conversationService.deleteMessageLocal(
-        conversation.id,
-        message.id,
-        true,
-        this.core.backendFeatures.federationEndpoints ? conversation.domain : undefined,
-      );
+      const selfConversation = this.conversationState.self_conversation();
+      if (!selfConversation) {
+        throw new Error('cannot delete message as selfConversation is not defined');
+      }
+      const payload = MessageBuilder.createMessageHide({
+        ...this.createCommonMessagePayload(selfConversation),
+        messageIdToDelete: message.id,
+        targetConversation: conversation.id,
+      });
+      await this.sendAndInjectGenericCoreMessage(payload, selfConversation, {
+        skipInjection: true,
+      });
+
       await this.deleteMessageById(conversation, message.id);
     } catch (error) {
       this.logger.info(

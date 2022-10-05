@@ -17,7 +17,7 @@
  *
  */
 
-import React, {ForwardRefRenderFunction, useEffect, useRef} from 'react';
+import React, {forwardRef, useEffect, useRef} from 'react';
 import Icon from 'Components/Icon';
 import {CheckIcon, COLOR} from '@wireapp/react-ui-kit';
 import {cancelButtonCSS, containerCSS, errorMessageCSS, getIconCSS, getInputCSS, getLabelCSS} from './TextInput.styles';
@@ -41,32 +41,33 @@ export interface UserInputProps {
   value?: string;
   uieName?: string;
   errorUieName?: string;
-  inputWrapperRef?: React.RefObject<HTMLDivElement>;
   setIsEditing?: (x: boolean) => void;
 }
 
 const SUCCESS_DISMISS_TIMEOUT = 2500;
 
-const TextInput: ForwardRefRenderFunction<HTMLInputElement, UserInputProps> = ({
-  autoFocus,
-  disabled,
-  errorMessage,
-  isError,
-  isSuccess,
-  label,
-  name,
-  onCancel,
-  onChange,
-  onBlur,
-  onKeyDown,
-  onSuccessDismissed,
-  placeholder,
-  value,
-  uieName,
-  errorUieName,
-  inputWrapperRef,
-  setIsEditing,
-}: UserInputProps) => {
+const TextInput: React.ForwardRefRenderFunction<HTMLDivElement, UserInputProps> = (
+  {
+    autoFocus,
+    disabled,
+    errorMessage,
+    isError,
+    isSuccess,
+    label,
+    name,
+    onCancel,
+    onChange,
+    onBlur,
+    onKeyDown,
+    onSuccessDismissed,
+    placeholder,
+    value,
+    uieName,
+    errorUieName,
+    setIsEditing,
+  }: UserInputProps,
+  ref,
+) => {
   const isFilled = Boolean(value);
   const textInputRef = useRef<HTMLInputElement>(null);
 
@@ -87,7 +88,7 @@ const TextInput: ForwardRefRenderFunction<HTMLInputElement, UserInputProps> = ({
   }
 
   return (
-    <div css={containerCSS} ref={inputWrapperRef}>
+    <div css={containerCSS} ref={ref}>
       {isError && errorMessage && (
         <span className="label" css={errorMessageCSS} data-uie-name={errorUieName}>
           {errorMessage}
@@ -140,7 +141,4 @@ const TextInput: ForwardRefRenderFunction<HTMLInputElement, UserInputProps> = ({
     </div>
   );
 };
-
-const TextInputForwarded = React.forwardRef(TextInput);
-
-export default TextInputForwarded;
+export default forwardRef(TextInput);

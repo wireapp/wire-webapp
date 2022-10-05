@@ -97,6 +97,8 @@ const DeviceDetails: React.FC<DeviceDetailsProps> = ({
     }
   };
 
+  const isMLSConversation = !!conversationState.activeConversation()?.isUsingMLSProtocol;
+
   return (
     <div className={cx('participant-devices__header', {'participant-devices__header--padding': !noPadding})}>
       <button
@@ -152,15 +154,17 @@ const DeviceDetails: React.FC<DeviceDetailsProps> = ({
             style={{display: isResettingSession ? 'initial' : 'none'}}
             data-uie-name="status-loading"
           />
-          <button
-            type="button"
-            className="button-reset-default button-label participant-devices__reset-session accent-text ellipsis"
-            onClick={clickToResetSession}
-            style={{display: isResettingSession ? 'none' : 'initial'}}
-            data-uie-name="do-reset-session"
-          >
-            {t('participantDevicesDetailResetSession')}
-          </button>
+          {!isMLSConversation && (
+            <button
+              type="button"
+              className="button-reset-default button-label participant-devices__reset-session accent-text ellipsis"
+              onClick={clickToResetSession}
+              style={{display: isResettingSession ? 'none' : 'initial'}}
+              data-uie-name="do-reset-session"
+            >
+              {t('participantDevicesDetailResetSession')}
+            </button>
+          )}
         </div>
       </div>
     </div>

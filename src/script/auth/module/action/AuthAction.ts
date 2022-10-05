@@ -269,7 +269,6 @@ export class AuthAction {
       registration.name = registration.name.trim();
       registration.email = registration.email.trim();
       registration.team.icon = 'default';
-      registration.team.binding = true;
       registration.team.currency = currentCurrency();
       registration.team.name = registration.team.name.trim();
 

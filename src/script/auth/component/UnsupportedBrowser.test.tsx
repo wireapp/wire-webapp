@@ -17,38 +17,18 @@
  *
  */
 
-import {ReactWrapper} from 'enzyme';
-import {initialRootState, RootState, Api} from '../module/reducer';
+import {initialRootState} from '../module/reducer';
 import {mockStoreFactory} from '../util/test/mockStoreFactory';
-import {mountComponent} from '../util/test/TestUtil';
-import UnsupportedBrowser, {UnsupportedBrowserProps} from './UnsupportedBrowser';
+import UnsupportedBrowser from './UnsupportedBrowser';
 import {TypeUtil} from '@wireapp/commons';
-import {MockStoreEnhanced} from 'redux-mock-store';
-import {ThunkDispatch} from 'redux-thunk';
-import {AnyAction} from 'redux';
-import {History} from 'history';
 import {Config, Configuration} from '../../Config';
 import {Runtime} from '@wireapp/commons';
+import {mountComponent} from '../util/test/TestUtil';
 
 jest.mock('../util/SVGProvider');
 
-class UnsupportedBrowserPage {
-  private readonly driver: ReactWrapper;
-
-  constructor(
-    store: MockStoreEnhanced<TypeUtil.RecursivePartial<RootState>, ThunkDispatch<RootState, Api, AnyAction>>,
-    props?: UnsupportedBrowserProps,
-    history?: History<any>,
-  ) {
-    this.driver = mountComponent(<UnsupportedBrowser {...props} />, store, history);
-  }
-
-  getOnlyDesktopMessage = () => this.driver.find('[data-uie-name="element-unsupported-desktop-only"]');
-  getGeneralUnsupprtedMessage = () => this.driver.find('[data-uie-name="element-unsupported-general"]');
-  getText = () => this.driver.text();
-
-  update = () => this.driver.update();
-}
+const desktopMessageId = 'element-unsupported-desktop-only';
+const generalMessageId = 'element-unsupported-general';
 
 describe('UnsupportedBrowser', () => {
   // @SF.Channel @TSFI.UserInterface @S1
@@ -62,18 +42,17 @@ describe('UnsupportedBrowser', () => {
         },
       });
 
-    const unsupportedPage = new UnsupportedBrowserPage(
-      mockStoreFactory()({
-        ...initialRootState,
-        runtimeState: {
-          hasCookieSupport: true,
-          hasIndexedDbSupport: true,
-          isSupportedBrowser: false,
-        },
-      }),
-    );
+    const store = mockStoreFactory()({
+      ...initialRootState,
+      runtimeState: {
+        hasCookieSupport: true,
+        hasIndexedDbSupport: true,
+        isSupportedBrowser: false,
+      },
+    });
+    const {getByTestId} = mountComponent(<UnsupportedBrowser />, store);
 
-    expect(unsupportedPage.getOnlyDesktopMessage().exists()).toBe(true);
+    expect(getByTestId(desktopMessageId)).not.toBe(null);
   });
 
   it('renders content in desktop application when ENABLE_ENFORCE_DESKTOP_APPLICATION_ONLY is true', async () => {
@@ -88,20 +67,19 @@ describe('UnsupportedBrowser', () => {
 
     const expectedContent = 'content';
 
-    const unsupportedPage = new UnsupportedBrowserPage(
-      mockStoreFactory()({
-        ...initialRootState,
-        runtimeState: {
-          hasCookieSupport: true,
-          hasIndexedDbSupport: true,
-          isSupportedBrowser: true,
-        },
-      }),
-      {children: 'content'},
-    );
+    const store = mockStoreFactory()({
+      ...initialRootState,
+      runtimeState: {
+        hasCookieSupport: true,
+        hasIndexedDbSupport: true,
+        isSupportedBrowser: true,
+      },
+    });
+    const props = {children: 'content'};
+    const {queryByTestId, getByText} = mountComponent(<UnsupportedBrowser {...props} />, store);
 
-    expect(unsupportedPage.getOnlyDesktopMessage().exists()).toBe(false);
-    expect(unsupportedPage.getText()).toContain(expectedContent);
+    expect(queryByTestId(desktopMessageId)).toBe(null);
+    expect(getByText(expectedContent)).not.toBe(null);
   });
 
   it('shows general unsupported browser message', async () => {
@@ -113,17 +91,16 @@ describe('UnsupportedBrowser', () => {
         },
       });
 
-    const unsupportedPage = new UnsupportedBrowserPage(
-      mockStoreFactory()({
-        ...initialRootState,
-        runtimeState: {
-          hasCookieSupport: true,
-          hasIndexedDbSupport: true,
-          isSupportedBrowser: false,
-        },
-      }),
-    );
+    const store = mockStoreFactory()({
+      ...initialRootState,
+      runtimeState: {
+        hasCookieSupport: true,
+        hasIndexedDbSupport: true,
+        isSupportedBrowser: false,
+      },
+    });
+    const {getByTestId} = mountComponent(<UnsupportedBrowser />, store);
 
-    expect(unsupportedPage.getGeneralUnsupprtedMessage().exists()).toBe(true);
+    expect(getByTestId(generalMessageId)).not.toBe(null);
   });
 });

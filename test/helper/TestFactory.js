@@ -22,7 +22,7 @@
 /* eslint no-undef: "off" */
 
 // Polyfill for "tsyringe" dependency injection
-import 'core-js/es7/reflect';
+import 'core-js/full/reflect';
 import {container} from 'tsyringe';
 import ko from 'knockout';
 import {ClientClassification, ClientType} from '@wireapp/api-client/src/client/';
@@ -71,6 +71,7 @@ import {ConversationState} from 'src/script/conversation/ConversationState';
 import {AssetService} from 'src/script/assets/AssetService';
 import {entities} from '../api/payloads';
 import {createStorageEngine, DatabaseTypes} from 'src/script/service/StoreEngineProvider';
+import {Core} from 'src/script/service/CoreSingleton';
 
 export class TestFactory {
   constructor() {
@@ -302,6 +303,8 @@ export class TestFactory {
       this.team_repository['teamState'],
       clientState,
     );
+    const core = container.resolve(Core);
+    core.initServices({clientType: ClientType.NONE, userId: 'userID'});
     this.conversation_repository = new ConversationRepository(
       this.conversation_service,
       this.message_repository,
@@ -314,6 +317,7 @@ export class TestFactory {
       this.user_repository['userState'],
       this.team_repository['teamState'],
       conversationState,
+      core,
     );
 
     return this.conversation_repository;

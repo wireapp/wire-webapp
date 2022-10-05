@@ -23,7 +23,7 @@ import React, {useRef, useState} from 'react';
 import {useIntl} from 'react-intl';
 import {connect} from 'react-redux';
 import {AnyAction, Dispatch} from 'redux';
-import useReactRouter from 'use-react-router';
+import {Navigate, useNavigate} from 'react-router-dom';
 import {Config} from '../../Config';
 import {accountFormStrings, setPasswordStrings} from '../../strings';
 import Exception from '../component/Exception';
@@ -48,7 +48,7 @@ const SetPassword = ({
   const [error, setError] = useState();
   const [isValidPassword, setIsValidPassword] = useState(true);
   const [password, setPassword] = useState('');
-  const {history} = useReactRouter();
+  const navigate = useNavigate();
 
   const onSetPassword = async (event: React.FormEvent): Promise<void> => {
     event.preventDefault();
@@ -65,15 +65,14 @@ const SetPassword = ({
         throw validationError;
       }
       await doSetPassword({new_password: password});
-      history.push(ROUTE.SET_HANDLE);
+      navigate(ROUTE.SET_HANDLE);
     } catch (error) {
       setError(error);
     }
   };
 
   if (hasSelfPassword || isSelfSSOUser) {
-    history.push(ROUTE.SET_HANDLE);
-    return null;
+    return <Navigate to={ROUTE.SET_HANDLE} />;
   }
 
   return (

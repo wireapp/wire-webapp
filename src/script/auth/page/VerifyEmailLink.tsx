@@ -21,7 +21,7 @@ import {ContainerXS, H1, H3, Muted} from '@wireapp/react-ui-kit';
 import React, {useEffect} from 'react';
 import {useIntl} from 'react-intl';
 import {connect} from 'react-redux';
-import useReactRouter from 'use-react-router';
+import {useNavigate} from 'react-router-dom';
 import {setEmailStrings} from '../../strings';
 import {RootState} from '../module/reducer';
 import * as SelfSelector from '../module/selector/SelfSelector';
@@ -33,11 +33,11 @@ interface Props extends React.HTMLProps<HTMLDivElement> {}
 
 const VerifyEmailLink = ({hasSelfEmail}: Props & ConnectedProps) => {
   const {formatMessage: _} = useIntl();
-  const {history} = useReactRouter();
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (hasSelfEmail) {
-      history.push(ROUTE.SET_PASSWORD);
+      navigate(ROUTE.SET_PASSWORD);
     }
   }, [hasSelfEmail]);
 

@@ -17,47 +17,24 @@
  *
  */
 
-import {ReactWrapper} from 'enzyme';
-import waitForExpect from 'wait-for-expect';
 import {actionRoot} from '../module/action';
 import {ValidationError} from '../module/action/ValidationError';
-import {initialRootState, RootState, Api} from '../module/reducer';
+import {initialRootState} from '../module/reducer';
 import {mockStoreFactory} from '../util/test/mockStoreFactory';
 import {mountComponent} from '../util/test/TestUtil';
 import SetEmail from './SetEmail';
-import {MockStoreEnhanced} from 'redux-mock-store';
-import {TypeUtil} from '@wireapp/commons';
-import {ThunkDispatch} from 'redux-thunk';
-import {AnyAction} from 'redux';
-import {History} from 'history';
+import {fireEvent, waitFor} from '@testing-library/react';
 
 jest.mock('../util/SVGProvider');
 
-class SetEmailPage {
-  private readonly driver: ReactWrapper;
-
-  constructor(
-    store: MockStoreEnhanced<TypeUtil.RecursivePartial<RootState>, ThunkDispatch<RootState, Api, AnyAction>>,
-    history?: History<any>,
-  ) {
-    this.driver = mountComponent(<SetEmail />, store, history);
-  }
-
-  getEmailInput = () => this.driver.find('input[data-uie-name="enter-email"]');
-  getVerifyEmailButton = () => this.driver.find('button[data-uie-name="do-verify-email"]');
-  getErrorMessage = (errorLabel?: string) =>
-    this.driver.find(`[data-uie-name="error-message"]${errorLabel ? `[data-uie-value="${errorLabel}"]` : ''}`);
-
-  clickVerifyEmailButton = () => this.getVerifyEmailButton().simulate('submit');
-
-  enterEmail = (value: string) => this.getEmailInput().simulate('change', {target: {value}});
-
-  update = () => this.driver.update();
-}
+const emailInputId = 'enter-email';
+const verifyButtonId = 'do-verify-email';
+const errorMessageId = 'error-message';
 
 describe('SetEmail', () => {
   it('has disabled submit button as long as there is no input', () => {
-    const setEmailPage = new SetEmailPage(
+    const {getByTestId} = mountComponent(
+      <SetEmail />,
       mockStoreFactory()({
         ...initialRootState,
         runtimeState: {
@@ -68,18 +45,18 @@ describe('SetEmail', () => {
       }),
     );
 
-    expect(setEmailPage.getEmailInput()).not.toBeNull();
+    const emailInput = getByTestId(emailInputId);
+    const verifyButton = getByTestId(verifyButtonId) as HTMLButtonElement;
 
-    expect(setEmailPage.getVerifyEmailButton()).not.toBeNull();
+    expect(verifyButton.disabled).toBe(true);
+    fireEvent.change(emailInput, {target: {value: 'e'}});
 
-    expect(setEmailPage.getVerifyEmailButton().props().disabled).toBe(true);
-    setEmailPage.enterEmail('e');
-
-    expect(setEmailPage.getVerifyEmailButton().props().disabled).toBe(false);
+    expect(verifyButton.disabled).toBe(false);
   });
 
   it('handles invalid email', async () => {
-    const setEmailPage = new SetEmailPage(
+    const {getByTestId, container} = mountComponent(
+      <SetEmail />,
       mockStoreFactory()({
         ...initialRootState,
         runtimeState: {
@@ -90,15 +67,15 @@ describe('SetEmail', () => {
       }),
     );
 
-    expect(setEmailPage.getErrorMessage().exists()).toBe(false);
+    const emailInput = getByTestId(emailInputId);
 
-    setEmailPage.enterEmail('e');
-    setEmailPage.clickVerifyEmailButton();
+    fireEvent.change(emailInput, {target: {value: 'e'}});
+    fireEvent.submit(container.querySelector('form')!);
 
-    await waitForExpect(() => {
-      setEmailPage.update();
+    await waitFor(() => {
+      const errorMessage = getByTestId(errorMessageId);
 
-      expect(setEmailPage.getErrorMessage(ValidationError.FIELD.EMAIL.TYPE_MISMATCH).exists()).toBe(true);
+      expect(errorMessage.dataset.uieValue).toBe(ValidationError.FIELD.EMAIL.TYPE_MISMATCH);
     });
   });
 
@@ -107,7 +84,8 @@ describe('SetEmail', () => {
 
     const email = 'e@e.com';
 
-    const setEmailPage = new SetEmailPage(
+    const {getByTestId} = mountComponent(
+      <SetEmail />,
       mockStoreFactory()({
         ...initialRootState,
         runtimeState: {
@@ -118,8 +96,11 @@ describe('SetEmail', () => {
       }),
     );
 
-    setEmailPage.enterEmail(` ${email} `);
-    setEmailPage.clickVerifyEmailButton();
+    const emailInput = getByTestId(emailInputId);
+    const verifyButton = getByTestId(verifyButtonId) as HTMLButtonElement;
+
+    fireEvent.change(emailInput, {target: {value: ` ${email} `}});
+    fireEvent.click(verifyButton);
 
     expect(actionRoot.selfAction.doSetEmail).toHaveBeenCalledWith(email);
   });

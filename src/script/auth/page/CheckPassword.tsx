@@ -35,7 +35,7 @@ import React, {useEffect, useRef, useState} from 'react';
 import {useIntl} from 'react-intl';
 import {connect} from 'react-redux';
 import {AnyAction, Dispatch} from 'redux';
-import useReactRouter from 'use-react-router';
+import {useNavigate} from 'react-router-dom';
 import {loginStrings, phoneLoginStrings} from '../../strings';
 import Exception from '../component/Exception';
 import {EXTERNAL_ROUTE} from '../externalRoute';
@@ -52,22 +52,23 @@ interface Props extends React.HTMLProps<HTMLDivElement> {}
 
 const CheckPassword = ({loginData, doLogin, resetAuthError, isFetching}: Props & ConnectedProps & DispatchProps) => {
   const {formatMessage: _} = useIntl();
-  const {history} = useReactRouter();
+  const navigate = useNavigate();
 
   const passwordInput = useRef<HTMLInputElement>();
 
   const [error, setError] = useState(null);
-  const [password, setPassword] = useState<string | null>(null);
+  const [password, setPassword] = useState<string>('');
   const [validPasswordInput, setValidPasswordInput] = useState(true);
 
   useEffect(() => {
     if (!loginData.phone) {
-      history.push(ROUTE.LOGIN_PHONE);
+      navigate(ROUTE.LOGIN_PHONE);
     }
   }, []);
 
-  const handleLogin = async () => {
+  const handleLogin = async (event: React.SyntheticEvent) => {
     let validationError: Error;
+    event.preventDefault();
 
     if (!passwordInput.current.checkValidity()) {
       validationError = ValidationError.handleValidationState(
@@ -82,7 +83,7 @@ const CheckPassword = ({loginData, doLogin, resetAuthError, isFetching}: Props &
       }
       const login: LoginData = {clientType: loginData.clientType, password, phone: loginData.phone};
       await doLogin(login);
-      return history.push(ROUTE.HISTORY_INFO);
+      return navigate(ROUTE.HISTORY_INFO);
     } catch (error) {
       if (error instanceof ValidationError) {
         setError(error);
@@ -91,7 +92,7 @@ const CheckPassword = ({loginData, doLogin, resetAuthError, isFetching}: Props &
       switch (error.label) {
         case BackendErrorLabel.TOO_MANY_CLIENTS: {
           resetAuthError();
-          history.push(ROUTE.CLIENTS);
+          navigate(ROUTE.CLIENTS);
           break;
         }
         case BackendErrorLabel.INVALID_CREDENTIALS:
@@ -117,7 +118,7 @@ const CheckPassword = ({loginData, doLogin, resetAuthError, isFetching}: Props &
         style={{display: 'flex', flexDirection: 'column', height: 428, justifyContent: 'space-between'}}
       >
         <H1 center>{_(phoneLoginStrings.verifyPasswordHeadline)}</H1>
-        <Form style={{marginTop: 30}} data-uie-name="login">
+        <Form style={{marginTop: 30}} data-uie-name="login" onSubmit={handleLogin}>
           <InputBlock>
             <InputSubmitCombo>
               <Input

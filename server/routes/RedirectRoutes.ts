@@ -35,7 +35,7 @@ export const RedirectRoutes = (config: ServerConfig) => [
   router.get('/join/?', (req, res) => {
     const key = req.query.key;
     const code = req.query.code;
-    res.redirect(HTTP_STATUS.MOVED_TEMPORARILY, `/auth/?join_key=${key}&join_code=${code}#join-conversation`);
+    res.redirect(HTTP_STATUS.MOVED_TEMPORARILY, `/auth/?join_key=${key}&join_code=${code}#/join-conversation`);
   }),
   router.get('/browser/?', (req, res, next) => {
     if (config.SERVER.DEVELOPMENT) {

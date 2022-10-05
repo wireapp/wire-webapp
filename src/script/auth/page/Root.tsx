@@ -22,7 +22,7 @@ import {StyledApp, Loading, ContainerXS, THEME_ID} from '@wireapp/react-ui-kit';
 import React, {useEffect} from 'react';
 import {IntlProvider} from 'react-intl';
 import {connect} from 'react-redux';
-import {HashRouter as Router, Redirect, Route, Switch} from 'react-router-dom';
+import {HashRouter as Router, Navigate, Route, Routes} from 'react-router-dom';
 import {AnyAction, Dispatch} from 'redux';
 import {Config} from '../../Config';
 import {mapLanguage, normalizeLanguage} from '../localeConfig';
@@ -58,6 +58,13 @@ import {t} from 'Util/LocalizerUtil';
 
 interface RootProps {}
 
+const Title: React.FC<{title: string; children: React.ReactNode}> = ({title, children}) => {
+  useEffect(() => {
+    document.title = title;
+  }, [title]);
+  return <>{children}</>;
+};
+
 const Root: React.FC<RootProps & ConnectedProps & DispatchProps> = ({
   isAuthenticated,
   language,
@@ -67,6 +74,23 @@ const Root: React.FC<RootProps & ConnectedProps & DispatchProps> = ({
   stopPolling,
   doGetSSOSettings,
 }) => {
+  useEffect(() => {
+    // Force the hash url to have a initial `/` (see https://stackoverflow.com/a/71864506)
+    const forceSlashAfterHash = () => {
+      const hash = window.location.hash;
+      if (!hash.startsWith('#/')) {
+        window.location.hash = `#/${hash.slice(1)}`;
+      }
+    };
+
+    forceSlashAfterHash();
+
+    window.addEventListener('hashchange', forceSlashAfterHash);
+    return () => {
+      window.removeEventListener('hashchange', forceSlashAfterHash);
+    };
+  }, []);
+
   useEffect(() => {
     startPolling();
     window.onbeforeunload = () => {
@@ -88,10 +112,6 @@ const Root: React.FC<RootProps & ConnectedProps & DispatchProps> = ({
     return null;
   };
 
-  const setTitle = (title = 'Wire') => {
-    document.title = title;
-  };
-
   const isAuthenticatedCheck = (page: any): any => (page ? (isAuthenticated ? page : navigate('/auth')) : null);
 
   const ProtectedHistoryInfo = () => isAuthenticatedCheck(<HistoryInfo />);
@@ -102,6 +122,7 @@ const Root: React.FC<RootProps & ConnectedProps & DispatchProps> = ({
   const ProtectedSetEmail = () => isAuthenticatedCheck(<SetEmail />);
   const ProtectedSetPassword = () => isAuthenticatedCheck(<SetPassword />);
 
+  const brandName = Config.getConfig().BRAND_NAME;
   return (
     <IntlProvider locale={normalizeLanguage(language)} messages={loadLanguage(language)}>
       <StyledApp themeId={THEME_ID.DEFAULT} style={{display: 'flex', height: '100%', minHeight: '100vh'}}>
@@ -110,79 +131,87 @@ const Root: React.FC<RootProps & ConnectedProps & DispatchProps> = ({
             <Loading />
           </ContainerXS>
         ) : (
-          <Router hashType="noslash">
-            <Switch>
+          <Router>
+            <Routes>
               <Route
-                exact
                 path={ROUTE.INDEX}
-                render={() => {
-                  setTitle(
-                    `${t('authLandingPageTitleP1')} ${Config.getConfig().BRAND_NAME} . ${t('authLandingPageTitleP2')}`,
-                  );
-                  return <Index />;
-                }}
+                element={
+                  <Title title={`${t('authLandingPageTitleP1')} ${brandName} . ${t('authLandingPageTitleP2')}`}>
+                    <Index />
+                  </Title>
+                }
               />
-              <Route path={ROUTE.CHECK_PASSWORD} component={CheckPassword} />
-              <Route path={ROUTE.CLIENTS} component={ProtectedClientManager} />
-              <Route path={ROUTE.CONVERSATION_JOIN_INVALID} component={ConversationJoinInvalid} />
-              <Route path={ROUTE.CONVERSATION_JOIN} component={ConversationJoin} />
+              <Route path={ROUTE.CHECK_PASSWORD} element={<CheckPassword />} />
+              <Route path={ROUTE.CLIENTS} element={<ProtectedClientManager />} />
+              <Route path={ROUTE.CONVERSATION_JOIN_INVALID} element={<ConversationJoinInvalid />} />
+              <Route path={ROUTE.CONVERSATION_JOIN} element={<ConversationJoin />} />
+              {Config.getConfig().FEATURE.ENABLE_ACCOUNT_REGISTRATION && (
+                <Route path={ROUTE.CREATE_TEAM} element={<TeamName />} />
+              )}
+              <Route path={ROUTE.HISTORY_INFO} element={<ProtectedHistoryInfo />} />
+              <Route path={ROUTE.INITIAL_INVITE} element={<ProtectedInitialInvite />} />
               <Route
-                path={ROUTE.CREATE_TEAM}
-                component={Config.getConfig().FEATURE.ENABLE_ACCOUNT_REGISTRATION && TeamName}
+                path={`${ROUTE.LOGIN}/*`}
+                element={
+                  <Title title={`${t('authLoginTitle')} . ${brandName}`}>
+                    <Login />
+                  </Title>
+                }
               />
-              <Route path={ROUTE.HISTORY_INFO} component={ProtectedHistoryInfo} />
-              <Route path={ROUTE.INITIAL_INVITE} component={ProtectedInitialInvite} />
-              <Route
-                path={ROUTE.LOGIN}
-                render={() => {
-                  setTitle(`${t('authLoginTitle')} . ${Config.getConfig().BRAND_NAME}`);
-                  return <Login />;
-                }}
-              />
-              <Route path={ROUTE.LOGIN_PHONE} component={PhoneLogin} />
+              <Route path={ROUTE.LOGIN_PHONE} element={<PhoneLogin />} />
               <Route
                 path={ROUTE.SET_ACCOUNT_TYPE}
-                render={() => {
-                  setTitle(`${t('authAccCreationTitle')} . ${Config.getConfig().BRAND_NAME}`);
-                  return <SetAccountType />;
-                }}
+                element={
+                  <Title title={`${t('authAccCreationTitle')} . ${brandName}`}>
+                    <SetAccountType />
+                  </Title>
+                }
               />
-              <Route path={ROUTE.SET_EMAIL} component={ProtectedSetEmail} />
-              <Route path={ROUTE.SET_HANDLE} component={ProtectedSetHandle} />
+              <Route path={ROUTE.SET_EMAIL} element={<ProtectedSetEmail />} />
+              <Route path={ROUTE.SET_HANDLE} element={<ProtectedSetHandle />} />
               <Route
                 path={ROUTE.SET_PASSWORD}
-                render={() => {
-                  setTitle(`${t('authForgotPasswordTitle')} . ${Config.getConfig().BRAND_NAME}`);
-                  return <ProtectedSetPassword />;
-                }}
+                element={
+                  <Title title={`${t('authForgotPasswordTitle')} . ${brandName}`}>
+                    <ProtectedSetPassword />
+                  </Title>
+                }
               />
-              <Route
-                path={`${ROUTE.SSO}/:code?`}
-                render={() => {
-                  setTitle(`${t('authSSOLoginTitle')} . ${Config.getConfig().BRAND_NAME}`);
-                  return <SingleSignOn />;
-                }}
-              />
-              <Route path={ROUTE.VERIFY_EMAIL_LINK} component={VerifyEmailLink} />
-              <Route path={ROUTE.VERIFY_PHONE_CODE} component={VerifyPhoneCode} />
-              <Route path={ROUTE.CUSTOM_ENV_REDIRECT} component={CustomEnvironmentRedirect} />
+              <Route path={`${ROUTE.SSO}`}>
+                <Route
+                  path=""
+                  element={
+                    <Title title={`${t('authSSOLoginTitle')} . ${brandName}`}>
+                      <SingleSignOn />
+                    </Title>
+                  }
+                />
+                <Route
+                  path=":code"
+                  element={
+                    <Title title={`${t('authSSOLoginTitle')} . ${brandName}`}>
+                      <SingleSignOn />
+                    </Title>
+                  }
+                />
+              </Route>
+              <Route path={ROUTE.VERIFY_EMAIL_LINK} element={<VerifyEmailLink />} />
+              <Route path={ROUTE.VERIFY_PHONE_CODE} element={<VerifyPhoneCode />} />
+              <Route path={ROUTE.CUSTOM_ENV_REDIRECT} element={<CustomEnvironmentRedirect />} />
               {Config.getConfig().FEATURE.ENABLE_EXTRA_CLIENT_ENTROPY && (
-                <Route path={ROUTE.SET_ENTROPY} component={SetEntropyPage} />
+                <Route path={ROUTE.SET_ENTROPY} element={<SetEntropyPage />} />
               )}
-              <Route
-                path={ROUTE.VERIFY_EMAIL_CODE}
-                component={Config.getConfig().FEATURE.ENABLE_ACCOUNT_REGISTRATION && VerifyEmailCode}
-              />
-              <Route
-                path={ROUTE.CREATE_ACCOUNT}
-                component={Config.getConfig().FEATURE.ENABLE_ACCOUNT_REGISTRATION && CreatePersonalAccount}
-              />
-              <Route
-                path={ROUTE.CREATE_TEAM_ACCOUNT}
-                component={Config.getConfig().FEATURE.ENABLE_ACCOUNT_REGISTRATION && CreateAccount}
-              />
-              <Redirect to={ROUTE.INDEX} />
-            </Switch>
+              {Config.getConfig().FEATURE.ENABLE_ACCOUNT_REGISTRATION && (
+                <Route path={ROUTE.VERIFY_EMAIL_CODE} element={<VerifyEmailCode />} />
+              )}
+              {Config.getConfig().FEATURE.ENABLE_ACCOUNT_REGISTRATION && (
+                <Route path={ROUTE.CREATE_ACCOUNT} element={<CreatePersonalAccount />} />
+              )}
+              {Config.getConfig().FEATURE.ENABLE_ACCOUNT_REGISTRATION && (
+                <Route path={ROUTE.CREATE_TEAM_ACCOUNT} element={<CreateAccount />} />
+              )}
+              <Route path="*" element={<Navigate to={ROUTE.INDEX} replace />} />
+            </Routes>
           </Router>
         )}
       </StyledApp>

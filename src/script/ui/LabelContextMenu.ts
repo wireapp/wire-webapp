@@ -24,7 +24,7 @@ import type {Conversation} from '../entity/Conversation';
 import {showContextMenu, ContextMenuEntry} from './ContextMenu';
 
 export const showLabelContextMenu = (
-  event: MouseEvent,
+  event: MouseEvent | React.MouseEvent<Element, MouseEvent>,
   conversation: Conversation,
   labelRepository: ConversationLabelRepository,
 ): void => {

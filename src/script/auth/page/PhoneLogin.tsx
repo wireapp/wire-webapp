@@ -41,7 +41,7 @@ import React, {useState} from 'react';
 import {useIntl} from 'react-intl';
 import {connect} from 'react-redux';
 import {AnyAction, Dispatch} from 'redux';
-import useReactRouter from 'use-react-router';
+import {useNavigate} from 'react-router-dom';
 import {loginStrings, phoneLoginStrings} from '../../strings';
 import AppAlreadyOpen from '../component/AppAlreadyOpen';
 import PhoneLoginForm from '../component/PhoneLoginForm';
@@ -64,7 +64,7 @@ const PhoneLogin = ({
   loginData,
 }: Props & ConnectedProps & DispatchProps) => {
   const {formatMessage: _} = useIntl();
-  const {history} = useReactRouter();
+  const navigate = useNavigate();
 
   const [error, setError] = useState();
 
@@ -75,11 +75,11 @@ const PhoneLogin = ({
       }
       await pushLoginData({phone: formLoginData.phone});
       await doSendPhoneLoginCode({phone: formLoginData.phone});
-      return history.push(ROUTE.VERIFY_PHONE_CODE);
+      return navigate(ROUTE.VERIFY_PHONE_CODE);
     } catch (error) {
       switch (true) {
         case error instanceof PasswordExistsError: {
-          return history.push(ROUTE.CHECK_PASSWORD);
+          return navigate(ROUTE.CHECK_PASSWORD);
         }
         case error instanceof ValidationError:
         case error instanceof InvalidPhoneNumberError:

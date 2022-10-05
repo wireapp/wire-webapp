@@ -17,32 +17,14 @@
  *
  */
 
-import {ReactWrapper} from 'enzyme';
+import {act} from '@testing-library/react';
 import {actionRoot} from '../module/action';
-import {initialRootState, RootState, Api} from '../module/reducer';
+import {initialRootState} from '../module/reducer';
 import {mockStoreFactory} from '../util/test/mockStoreFactory';
 import {mountComponent} from '../util/test/TestUtil';
-import {TypeUtil} from '@wireapp/commons';
-import {MockStoreEnhanced} from 'redux-mock-store';
-import {ThunkDispatch} from 'redux-thunk';
-import {AnyAction} from 'redux';
-import {History} from 'history';
 import CustomEnvironmentRedirect from './CustomEnvironmentRedirect';
 
 jest.mock('../util/SVGProvider');
-
-class CustomEnvironmentRedirectPage {
-  private readonly driver: ReactWrapper;
-
-  constructor(
-    store: MockStoreEnhanced<TypeUtil.RecursivePartial<RootState>, ThunkDispatch<RootState, Api, AnyAction>>,
-    history?: History<any>,
-  ) {
-    this.driver = mountComponent(<CustomEnvironmentRedirect />, store, history);
-  }
-
-  update = () => this.driver.update();
-}
 
 function createMockedURLSearchParams(value: string) {
   return class MockedURLSearchParams extends window.URLSearchParams {
@@ -63,7 +45,8 @@ describe('CustomEnvironmentRedirect', () => {
     const originalURLSearchParams = window.URLSearchParams;
     window.URLSearchParams = createMockedURLSearchParams(expectedHost);
     spyOn(actionRoot.navigationAction, 'doNavigate').and.returnValue(() => {});
-    new CustomEnvironmentRedirectPage(
+    mountComponent(
+      <CustomEnvironmentRedirect />,
       mockStoreFactory()({
         ...initialRootState,
         runtimeState: {
@@ -74,9 +57,13 @@ describe('CustomEnvironmentRedirect', () => {
       }),
     );
 
-    jest.advanceTimersByTime(1000);
+    act(() => {
+      jest.advanceTimersByTime(1000);
+    });
     expect(actionRoot.navigationAction.doNavigate).toHaveBeenCalledTimes(0);
-    jest.advanceTimersByTime(5000);
+    act(() => {
+      jest.advanceTimersByTime(5000);
+    });
 
     expect(actionRoot.navigationAction.doNavigate).toHaveBeenCalledWith(expectedHost);
 

@@ -111,7 +111,7 @@ const Message: React.FC<
 
   const content = <MessageWrapper {...props} hasMarker={markerType !== MessageMarkerType.NONE} />;
   const wrappedContent = onVisible ? (
-    <InViewport allowBiggerThanViewport onVisible={onVisible}>
+    <InViewport requireFullyInView allowBiggerThanViewport onVisible={onVisible}>
       {content}
     </InViewport>
   ) : (
