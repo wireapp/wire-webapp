@@ -48,7 +48,7 @@ import {ContentState, ContentViewModel} from '../../view_model/ContentViewModel'
 
 const Animated: FC<{children: ReactNode}> = ({children, ...rest}) => {
   return (
-    <CSSTransition classNames="slide-in-left" timeout={{enter: 5000}} {...rest}>
+    <CSSTransition classNames="slide-in-left" timeout={{enter: 500}} {...rest}>
       {children}
     </CSSTransition>
   );
