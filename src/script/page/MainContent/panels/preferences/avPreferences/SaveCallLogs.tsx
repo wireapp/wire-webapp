@@ -17,9 +17,7 @@
  *
  */
 
-import {amplify} from 'amplify';
 import React from 'react';
-import {WebAppEvents} from '@wireapp/webapp-events';
 import {container} from 'tsyringe';
 
 import {t} from 'Util/LocalizerUtil';
@@ -28,8 +26,9 @@ import {downloadBlob} from 'Util/util';
 import {Config} from '../../../../../Config';
 import PreferencesSection from '../components/PreferencesSection';
 import type {CallingRepository} from '../../../../../calling/CallingRepository';
-import {ModalsViewModel} from '../../../../../view_model/ModalsViewModel';
 import {UserState} from '../../../../../user/UserState';
+import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
+import PrimaryModal from 'Components/Modals/PrimaryModal';
 
 interface SaveCallLogsProps {
   callingRepository: CallingRepository;
@@ -51,8 +50,9 @@ const SaveCallLogs: React.FC<SaveCallLogsProps> = ({callingRepository, userState
 
       downloadBlob(blob, filename);
     } else {
-      amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.ACKNOWLEDGE, {
+      PrimaryModal.show(PrimaryModal.type.ACKNOWLEDGE, {
         text: {
+          closeBtnLabel: t('modalCallEmptyLogCloseBtn'),
           message: t('modalCallEmptyLogMessage'),
           title: t('modalCallEmptyLogHeadline'),
         },
@@ -62,15 +62,15 @@ const SaveCallLogs: React.FC<SaveCallLogsProps> = ({callingRepository, userState
   return (
     <PreferencesSection title={t('preferencesOptionsCallLogs')}>
       <div className="preferences-option">
-        <button
-          className="button-text-primary"
+        <Button
+          variant={ButtonVariant.TERTIARY}
           onClick={saveCallLogs}
           data-uie-name="get-call-logs"
           aria-describedby="call-logs-description"
           type="button"
         >
           {t('preferencesOptionsCallLogsGet')}
-        </button>
+        </Button>
       </div>
       <p id="call-logs-description" className="preferences-detail">
         {t('preferencesOptionsCallLogsDetail', brandName)}

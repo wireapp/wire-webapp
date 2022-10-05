@@ -17,26 +17,26 @@
  *
  */
 
-import React from 'react';
+import React, {useState} from 'react';
 import cx from 'classnames';
 
-import {registerReactComponent, useKoSubscribableChildren} from 'Util/ComponentUtil';
+import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import Avatar, {AVATAR_SIZE} from 'Components/Avatar';
 import {UserlistMode} from 'Components/UserList';
 import {t} from 'Util/LocalizerUtil';
 import {capitalizeFirstChar} from 'Util/StringUtil';
-import {noop} from 'Util/util';
+import {noop, setContextMenuPosition} from 'Util/util';
 
 import {User} from '../../entity/User';
 import {ServiceEntity} from '../../integration/ServiceEntity';
-import {useViewPortObserver} from '../../ui/viewportObserver';
 
 import 'Components/AvailabilityState';
 import {Participant} from '../../calling/Participant';
 import AvailabilityState from 'Components/AvailabilityState';
 import ParticipantMicOnIcon from 'Components/calling/ParticipantMicOnIcon';
 import Icon from 'Components/Icon';
-import useEffectRef from 'Util/useEffectRef';
+import {KEY} from 'Util/KeyboardUtil';
+import InViewport from 'Components/utils/InViewport';
 
 export interface ParticipantItemProps<UserType> extends Omit<React.HTMLProps<HTMLDivElement>, 'onClick' | 'onKeyDown'> {
   badge?: boolean;
@@ -83,8 +83,7 @@ const ParticipantItem = <UserType extends User | ServiceEntity>(
     onClick = noop,
     onKeyDown = noop,
   } = props;
-  const [viewportElementRef, setViewportElementRef] = useEffectRef<HTMLDivElement>();
-  const isInViewport = useViewPortObserver(viewportElementRef);
+  const [isInViewport, setIsInViewport] = useState(false);
   const isUser = participant instanceof User && !participant.isService;
   const isService = participant instanceof ServiceEntity || participant.isService;
   const isSelf = !!(participant as User).isMe;
@@ -132,6 +131,13 @@ const ParticipantItem = <UserType extends User | ServiceEntity>(
     return (participant as User).handle;
   })();
 
+  const handleContextKeyDown = (event: React.KeyboardEvent) => {
+    if ([KEY.SPACE, KEY.ENTER].includes(event.key)) {
+      const newEvent = setContextMenuPosition(event);
+      onContextMenu(newEvent as unknown as React.MouseEvent<HTMLDivElement>);
+    }
+  };
+
   return (
     <div
       className={cx('participant-item-wrapper', {
@@ -142,15 +148,15 @@ const ParticipantItem = <UserType extends User | ServiceEntity>(
       role="button"
       tabIndex={0}
       onContextMenu={onContextMenu}
-      onClick={noInteraction ? noop : event => onClick(participant, event.nativeEvent)}
-      onKeyDown={noInteraction ? noop : event => onKeyDown(participant, event.nativeEvent)}
+      onClick={noInteraction ? onContextMenu : event => onClick(participant, event.nativeEvent)}
+      onKeyDown={noInteraction ? handleContextKeyDown : event => onKeyDown(participant, event.nativeEvent)}
       aria-label={t('accessibility.openConversation', participantName)}
     >
-      <div
+      <InViewport
         className="participant-item"
         data-uie-name={isUser ? 'item-user' : 'item-service'}
         data-uie-value={participantName}
-        ref={setViewportElementRef}
+        onVisible={() => setIsInViewport(true)}
       >
         {isInViewport && (
           <>
@@ -197,6 +203,7 @@ const ParticipantItem = <UserType extends User | ServiceEntity>(
               </div>
               {showDropdown && (
                 <button
+                  tabIndex={-1}
                   className="participant-item__content__chevron"
                   onClick={event => onContextMenu(event as unknown as React.MouseEvent<HTMLDivElement>)}
                   type="button"
@@ -268,11 +275,9 @@ const ParticipantItem = <UserType extends User | ServiceEntity>(
             {showArrow && <Icon.ChevronRight className="disclose-icon" />}
           </>
         )}
-      </div>
+      </InViewport>
     </div>
   );
 };
 
 export default ParticipantItem;
-
-registerReactComponent('participant-item', ParticipantItem);

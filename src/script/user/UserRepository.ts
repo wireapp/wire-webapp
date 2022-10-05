@@ -44,7 +44,6 @@ import type {User as APIClientUser, QualifiedHandle} from '@wireapp/api-client/s
 import {chunk, partition} from 'Util/ArrayUtil';
 import {t} from 'Util/LocalizerUtil';
 import {Logger, getLogger} from 'Util/Logger';
-import {loadUrlBlob} from 'Util/util';
 import {isAxiosError, isBackendError, isQualifiedId} from 'Util/TypePredicateUtil';
 
 import {AssetRepository} from '../assets/AssetRepository';
@@ -58,7 +57,6 @@ import {mapProfileAssetsV1} from '../assets/AssetMapper';
 import {valueFromType} from './AvailabilityMapper';
 import {showAvailabilityModal} from './AvailabilityModal';
 import {SIGN_OUT_REASON} from '../auth/SignOutReason';
-import {UNSPLASH_URL} from '../externalRoute';
 import {User} from '../entity/User';
 import {UserError} from '../error/UserError';
 import {UserMapper} from './UserMapper';
@@ -441,8 +439,12 @@ export class UserRepository {
     }
 
     const getUsers = async (chunkOfUserIds: QualifiedId[]): Promise<User[]> => {
+      const selfDomain = this.userState.self().domain;
+
+      const chunkOfQualifiedUserIds = chunkOfUserIds.map(({id, domain}) => ({domain: domain || selfDomain, id}));
+
       try {
-        const response = await this.userService.getUsers(chunkOfUserIds);
+        const response = await this.userService.getUsers(chunkOfQualifiedUserIds);
         return response ? this.userMapper.mapUsersFromJson(response) : [];
       } catch (error: any) {
         if (
@@ -453,8 +455,8 @@ export class UserRepository {
         ) {
           this.logger.warn('loading federated users failed: trying loading same backend users only');
           const [sameBackendUsers, federatedUsers] = partition(
-            chunkOfUserIds,
-            userId => userId.domain === this.userState.self().domain,
+            chunkOfQualifiedUserIds,
+            userId => userId.domain === selfDomain,
           );
           const users = await getUsers(sameBackendUsers);
 
@@ -482,7 +484,10 @@ export class UserRepository {
       }
     };
 
-    const chunksOfUserIds = chunk<QualifiedId>(userIds, Config.getConfig().MAXIMUM_USERS_PER_REQUEST);
+    const chunksOfUserIds = chunk<QualifiedId>(
+      userIds.filter(({id}) => !!id),
+      Config.getConfig().MAXIMUM_USERS_PER_REQUEST,
+    );
     const resolveArray = await Promise.all(chunksOfUserIds.map(getUsers));
     const newUserEntities = flatten(resolveArray);
     if (this.userState.isTeam()) {
@@ -495,6 +500,7 @@ export class UserRepository {
       fetchedUserEntities = this.addSuspendedUsers(userIds, fetchedUserEntities);
     }
     await this.getTeamMembersFromUsers(fetchedUserEntities);
+
     return fetchedUserEntities;
   }
 
@@ -614,7 +620,8 @@ export class UserRepository {
   }
 
   getUserListFromBackend(userIds: QualifiedId[]): Promise<APIClientUser[]> {
-    return this.userService.getUsers(userIds);
+    const qualifiedUserIds = userIds.map(({id, domain}) => ({domain: domain || this.userState.self().domain, id}));
+    return this.userService.getUsers(qualifiedUserIds);
   }
 
   /**
@@ -775,14 +782,6 @@ export class UserRepository {
     } catch (error) {
       throw new Error(`Error during profile image upload: ${error.message || error.code || error}`);
     }
-  }
-
-  /**
-   * Set the user's default profile image.
-   */
-  async setDefaultPicture(): Promise<User> {
-    const blob = await loadUrlBlob(UNSPLASH_URL);
-    return this.changePicture(blob);
   }
 
   mapGuestStatus(userEntities = this.userState.users()): void {

@@ -99,13 +99,15 @@ export class AssetRepository {
       }
       return new Blob([new Uint8Array(plaintext)], {type: mimeType});
     } catch (error) {
-      const errorMessage = error?.message || '';
-      const isAssetNotFound = errorMessage.endsWith(HTTP_STATUS.NOT_FOUND);
-      const isServerError = errorMessage.endsWith(HTTP_STATUS.INTERNAL_SERVER_ERROR);
+      if (error instanceof Error) {
+        const isAssetNotFound = error.message.endsWith(HTTP_STATUS.NOT_FOUND.toString());
+        const isServerError = error.message.endsWith(HTTP_STATUS.INTERNAL_SERVER_ERROR.toString());
 
-      const isExpectedError = isAssetNotFound || isServerError;
-      if (!isExpectedError) {
-        throw error;
+        const isExpectedError = isAssetNotFound || isServerError;
+
+        if (!isExpectedError) {
+          throw error;
+        }
       }
       return undefined;
     }
@@ -166,7 +168,13 @@ export class AssetRepository {
       asset.status(AssetTransferState.UPLOADED);
       return downloadBlob(blob, asset.file_name);
     } catch (error) {
-      asset.status(AssetTransferState.UPLOADED);
+      if (error instanceof Error) {
+        if (error.message.endsWith('Encrypted asset does not match its SHA-256 hash')) {
+          asset.status(AssetTransferState.DOWNLOAD_FAILED_HASH);
+        } else {
+          asset.status(AssetTransferState.DOWNLOAD_FAILED_DECRPYT);
+        }
+      }
       return this.logger.error('Failed to download FileAsset blob', error);
     }
   }
@@ -218,8 +226,8 @@ export class AssetRepository {
       .participating_user_ets()
       .some(conversationParticipant => conversationParticipant.inTeam());
 
-    const isEternal = isTeamMember || isTeamConversation || isTeamUserInConversation;
-    return isEternal ? AssetRetentionPolicy.ETERNAL : AssetRetentionPolicy.PERSISTENT;
+    const isEternalInfrequentAccess = isTeamMember || isTeamConversation || isTeamUserInConversation;
+    return isEternalInfrequentAccess ? AssetRetentionPolicy.ETERNAL_INFREQUENT_ACCESS : AssetRetentionPolicy.EXPIRING;
   }
 
   /**

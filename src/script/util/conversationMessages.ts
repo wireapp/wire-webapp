@@ -36,13 +36,13 @@ export enum MessageMarkerType {
  * A marker would indicated a new day, hour or unread section
  *
  * @param message The message we want to render
- * @param previousMessage The rigth before in the conversation
  * @param lastReadTimestamp If given will check new messages from this timestamp instead of live value of conversation.last_read_timestamp()
+ * @param previousMessage The right before in the conversation
  */
 export function getMessageMarkerType(
   message: Message,
-  previousMessage: Message,
   lastReadTimestamp: number,
+  previousMessage?: Message,
 ): MessageMarkerType {
   if (!previousMessage || message.isCall()) {
     return MessageMarkerType.NONE;

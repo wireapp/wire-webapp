@@ -17,18 +17,12 @@
  *
  */
 
-import React, {useEffect} from 'react';
-import {registerReactComponent} from 'Util/ComponentUtil';
+import React, {ForwardRefRenderFunction, useEffect, useRef} from 'react';
 import Icon from 'Components/Icon';
 import {CheckIcon, COLOR} from '@wireapp/react-ui-kit';
-import {
-  cancelButtonCSS,
-  containerCSS,
-  errorMessageCSS,
-  getIconCSS,
-  getInputCSS,
-  getLabelCSS,
-} from 'Components/TextInput/TextInput.styles';
+import {cancelButtonCSS, containerCSS, errorMessageCSS, getIconCSS, getInputCSS, getLabelCSS} from './TextInput.styles';
+import {t} from 'Util/LocalizerUtil';
+import {isTabKey} from 'Util/KeyboardUtil';
 
 export interface UserInputProps {
   autoFocus?: boolean;
@@ -37,42 +31,44 @@ export interface UserInputProps {
   isError?: boolean;
   isSuccess?: boolean;
   label: string;
-  name: string;
+  name?: string;
   onBlur?: React.FocusEventHandler<HTMLInputElement>;
   onCancel: () => void;
   onChange: React.ChangeEventHandler<HTMLInputElement>;
   onKeyDown?: React.KeyboardEventHandler<HTMLInputElement>;
   onSuccessDismissed?: () => void;
   placeholder?: string;
-  value: string;
+  value?: string;
   uieName?: string;
   errorUieName?: string;
+  inputWrapperRef?: React.RefObject<HTMLDivElement>;
+  setIsEditing?: (x: boolean) => void;
 }
 
 const SUCCESS_DISMISS_TIMEOUT = 2500;
 
-const TextInput: React.ForwardRefRenderFunction<HTMLDivElement, UserInputProps> = (
-  {
-    autoFocus,
-    disabled,
-    errorMessage,
-    isError,
-    isSuccess,
-    label,
-    name,
-    onCancel,
-    onChange,
-    onBlur,
-    onKeyDown,
-    onSuccessDismissed,
-    placeholder,
-    value,
-    uieName,
-    errorUieName,
-  }: UserInputProps,
-  ref: React.ForwardedRef<HTMLDivElement>,
-) => {
+const TextInput: ForwardRefRenderFunction<HTMLInputElement, UserInputProps> = ({
+  autoFocus,
+  disabled,
+  errorMessage,
+  isError,
+  isSuccess,
+  label,
+  name,
+  onCancel,
+  onChange,
+  onBlur,
+  onKeyDown,
+  onSuccessDismissed,
+  placeholder,
+  value,
+  uieName,
+  errorUieName,
+  inputWrapperRef,
+  setIsEditing,
+}: UserInputProps) => {
   const isFilled = Boolean(value);
+  const textInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (isSuccess && onSuccessDismissed) {
@@ -91,7 +87,7 @@ const TextInput: React.ForwardRefRenderFunction<HTMLDivElement, UserInputProps> 
   }
 
   return (
-    <div css={containerCSS} ref={ref}>
+    <div css={containerCSS} ref={inputWrapperRef}>
       {isError && errorMessage && (
         <span className="label" css={errorMessageCSS} data-uie-name={errorUieName}>
           {errorMessage}
@@ -111,13 +107,31 @@ const TextInput: React.ForwardRefRenderFunction<HTMLDivElement, UserInputProps> 
         onBlur={onBlur}
         onKeyDown={onKeyDown}
         placeholder={placeholder}
+        ref={textInputRef}
         data-uie-name={uieName}
       />
       <label className="label-medium" css={getLabelCSS(changedColor)} htmlFor={name}>
         {label}
       </label>
       {isFilled && !isSuccess && !isError && (
-        <button type="button" css={cancelButtonCSS} onClick={onCancel}>
+        <button
+          type="button"
+          css={cancelButtonCSS}
+          onClick={() => {
+            onCancel();
+            textInputRef.current?.focus();
+          }}
+          aria-label={t('accessibility.userProfileDeleteEntry')}
+          onKeyDown={(event: React.KeyboardEvent<HTMLButtonElement>): void => {
+            if (event.shiftKey && isTabKey(event)) {
+              // shift+tab from clear button should focus on the input field
+              setIsEditing?.(true);
+            } else if (isTabKey(event)) {
+              // tab from clear button should close the editable field
+              setIsEditing?.(false);
+            }
+          }}
+        >
           <Icon.Close css={{fill: 'var(--text-input-background)', height: 8, width: 8}} />
         </button>
       )}
@@ -130,5 +144,3 @@ const TextInput: React.ForwardRefRenderFunction<HTMLDivElement, UserInputProps> 
 const TextInputForwarded = React.forwardRef(TextInput);
 
 export default TextInputForwarded;
-
-registerReactComponent('text-input', TextInputForwarded);

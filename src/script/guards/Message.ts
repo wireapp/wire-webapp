@@ -17,9 +17,14 @@
  *
  */
 
+import {Draft} from 'Util/DraftStateUtil';
+
+import {ContentMessage} from '../entity/message/ContentMessage';
 import {MemberMessage} from '../entity/message/MemberMessage';
 import {SuperType} from '../message/SuperType';
-import {Draft} from 'Util/DraftStateUtil';
+
+export const isContentMessage = (message: any): message is ContentMessage =>
+  message && 'super_type' in message && message.super_type === SuperType.CONTENT;
 
 export const isMemberMessage = (message: any | undefined | null): message is MemberMessage =>
   message && 'super_type' in message && message.super_type === SuperType.MEMBER;

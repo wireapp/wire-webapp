@@ -20,6 +20,7 @@
 import {Availability} from '@wireapp/protocol-messaging';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import {
+  ChangeEvent,
   ClipboardEvent as ReactClipboardEvent,
   KeyboardEvent as ReactKeyboardEvent,
   FormEvent,
@@ -57,7 +58,6 @@ import {TeamState} from '../../team/TeamState';
 import {UserState} from '../../user/UserState';
 import {SearchRepository} from '../../search/SearchRepository';
 import {ContentMessage} from '../../entity/message/ContentMessage';
-import InputBarControls from '../../page/message-list/InputBarControls';
 import {Conversation} from '../../entity/Conversation';
 import {AssetRepository} from '../../assets/AssetRepository';
 import {ConversationRepository} from '../../conversation/ConversationRepository';
@@ -66,7 +66,6 @@ import {MessageRepository, OutgoingQuote} from '../../conversation/MessageReposi
 import {StorageRepository} from '../../storage';
 import {MentionEntity} from '../../message/MentionEntity';
 import {Config} from '../../Config';
-import {ModalsViewModel} from '../../view_model/ModalsViewModel';
 import {ConversationError} from '../../error/ConversationError';
 import {MessageHasher} from '../../message/MessageHasher';
 import {QuoteEntity} from '../../message/QuoteEntity';
@@ -82,6 +81,12 @@ import useResizeTarget from '../../hooks/useResizeTarget';
 import useDropFiles from '../../hooks/useDropFiles';
 import useTextAreaFocus from '../../hooks/useTextAreaFocus';
 
+import {StyledApp, THEME_ID, useMatchMedia} from '@wireapp/react-ui-kit';
+import ControlButtons from '../../page/message-list/InputBarControls/ControlButtons';
+import Icon from 'Components/Icon';
+import GiphyButton from '../../page/message-list/InputBarControls/GiphyButton';
+import PrimaryModal from '../Modals/PrimaryModal';
+
 const CONFIG = {
   ...Config.getConfig(),
   PING_TIMEOUT: TIME_IN_MILLIS.SECOND * 2,
@@ -90,7 +95,7 @@ const CONFIG = {
 const showWarningModal = (title: string, message: string): void => {
   // Timeout needed for display warning modal - we need to update modal
   setTimeout(() => {
-    amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.ACKNOWLEDGE, {
+    PrimaryModal.show(PrimaryModal.type.ACKNOWLEDGE, {
       text: {message, title},
     });
   }, 0);
@@ -179,7 +184,7 @@ const InputBar = ({
     }
 
     return messageTimer ? t('tooltipConversationEphemeral') : t('tooltipConversationInputPlaceholder');
-  }, [availability, messageTimer, showAvailabilityTooltip]);
+  }, [availability, messageTimer, showAvailabilityTooltip]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const candidates = participatingUserEts.filter(userEntity => !userEntity.isService);
   const mentionSuggestions = editedMention ? searchRepository.searchUserInSet(editedMention.term, candidates) : [];
@@ -190,6 +195,14 @@ const InputBar = ({
   const hasLocalEphemeralTimer = isSelfDeletingMessagesEnabled && localMessageTimer && !hasGlobalMessageTimer;
 
   const richTextInput = getRichTextInput(currentMentions, inputValue);
+
+  const isScaledDown = useMatchMedia('max-width: 768px');
+
+  const config = {
+    GIPHY_TEXT_LENGTH: 256,
+  };
+
+  const showGiphyButton = inputValue.length > 0 && inputValue.length <= config.GIPHY_TEXT_LENGTH;
 
   const updateSelectionState = (updateOnInit = true) => {
     if (!updateOnInit) {
@@ -220,9 +233,12 @@ const InputBar = ({
     }, 0);
   };
 
-  const resetDraftState = () => {
+  const resetDraftState = (resetInputValue = false) => {
     setCurrentMentions([]);
-    setInputValue('');
+
+    if (resetInputValue) {
+      setInputValue('');
+    }
   };
 
   const clearPastedFile = () => setPastedFile(null);
@@ -241,14 +257,14 @@ const InputBar = ({
     }
 
     if (!isHittingUploadLimit(droppedFiles, assetRepository)) {
-      Array.from(droppedFiles).forEach((file): void | number => {
+      Array.from(droppedFiles).forEach(file => {
         const isSupportedImage = CONFIG.ALLOWED_IMAGE_TYPES.includes(file.type);
 
         if (isSupportedImage) {
-          return images.push(file);
+          images.push(file);
+        } else {
+          files.push(file);
         }
-
-        files.push(file);
       });
 
       uploadImages(images);
@@ -288,7 +304,8 @@ const InputBar = ({
 
       const updatedMentions = updateMentionRanges(currentMentions, selectionStart, selectionEnd, difference);
       const newMentions = [...updatedMentions, mentionEntity];
-      setCurrentMentions(newMentions.sort((mentionA, mentionB) => mentionA.startIndex - mentionB.startIndex));
+      const sortedMentions = newMentions.sort((mentionA, mentionB) => mentionA.startIndex - mentionB.startIndex);
+      setCurrentMentions(sortedMentions);
 
       const caretPosition = mentionEntity.endIndex + 1;
 
@@ -320,18 +337,18 @@ const InputBar = ({
     }
   };
 
-  const cancelMessageEditing = (resetDraft = true) => {
+  const cancelMessageEditing = (resetDraft = true, resetInputValue = false) => {
     setEditMessageEntity(null);
     setReplyMessageEntity(null);
 
     if (resetDraft) {
-      resetDraftState();
+      resetDraftState(resetInputValue);
     }
   };
 
   const handleCancelReply = () => {
     if (!mentionSuggestions.length) {
-      cancelMessageReply();
+      cancelMessageReply(false);
     }
 
     textareaRef.current?.focus();
@@ -343,7 +360,7 @@ const InputBar = ({
       const newMentions = firstAsset.mentions().slice();
 
       cancelMessageReply();
-      cancelMessageEditing();
+      cancelMessageEditing(true, true);
       setEditMessageEntity(messageEntity);
       setInputValue(firstAsset.text);
       setCurrentMentions(newMentions);
@@ -353,10 +370,15 @@ const InputBar = ({
           .getMessageInConversationById(conversationEntity, messageEntity.quote().messageId)
           .then(quotedMessage => setReplyMessageEntity(quotedMessage));
       }
-
-      moveCursorToEnd(firstAsset.text.length);
     }
   };
+
+  useEffect(() => {
+    if (editMessageEntity?.isEditable()) {
+      const firstAsset = editMessageEntity.getFirstAsset() as TextAsset;
+      moveCursorToEnd(firstAsset.text.length);
+    }
+  }, [editMessageEntity]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const replyMessage = (messageEntity: ContentMessage): void => {
     if (messageEntity?.isReplyable() && messageEntity !== replyMessageEntity) {
@@ -406,7 +428,7 @@ const InputBar = ({
           } else if (pastedFile) {
             setPastedFile(null);
           } else if (isEditing) {
-            cancelMessageEditing();
+            cancelMessageEditing(true, true);
           } else if (isReplying) {
             cancelMessageReply(false);
           }
@@ -446,12 +468,11 @@ const InputBar = ({
     }
   };
 
-  const onChange = (event: ReactKeyboardEvent<HTMLTextAreaElement>) => {
+  const onChange = (event: ChangeEvent<HTMLTextAreaElement>) => {
     event.preventDefault();
 
     const {value: currentValue} = event.currentTarget;
     setInputValue(currentValue);
-
     const currentValueLength = currentValue.length;
     const previousValueLength = inputValue.length;
     const difference = currentValueLength - previousValueLength;
@@ -475,9 +496,9 @@ const InputBar = ({
           });
   };
 
-  const sendMessage = (messageText: string) => {
+  const sendMessage = (messageText: string, mentions: MentionEntity[]) => {
     if (messageText.length) {
-      const mentionEntities = currentMentions.slice(0);
+      const mentionEntities = mentions.slice(0);
 
       generateQuote().then(quoteEntity => {
         messageRepository.sendTextWithLinkPreview(conversationEntity, messageText, mentionEntities, quoteEntity);
@@ -486,9 +507,9 @@ const InputBar = ({
     }
   };
 
-  const sendMessageEdit = (messageText: string): void | Promise<any> => {
-    const mentionEntities = currentMentions.slice(0);
-    cancelMessageEditing();
+  const sendMessageEdit = (messageText: string, mentions: MentionEntity[]): void | Promise<any> => {
+    const mentionEntities = mentions.slice(0);
+    cancelMessageEditing(true, true);
 
     if (!messageText.length && editMessageEntity) {
       return messageRepository.deleteMessageForEveryone(conversationEntity, editMessageEntity);
@@ -513,9 +534,10 @@ const InputBar = ({
     }
 
     const beforeLength = text.length;
-    const messageText = text.trim();
-    const afterLength = messageText.length;
-    const isMessageTextTooLong = afterLength > CONFIG.MAXIMUM_MESSAGE_LENGTH;
+    const messageTrimmedStart = text.trimLeft();
+    const trimmedStartLength = messageTrimmedStart.length;
+    const messageText = messageTrimmedStart.trimRight();
+    const isMessageTextTooLong = messageText.length > CONFIG.MAXIMUM_MESSAGE_LENGTH;
 
     if (isMessageTextTooLong) {
       showWarningModal(
@@ -525,17 +547,15 @@ const InputBar = ({
 
       return;
     }
-
-    const updatedMentions = updateMentionRanges(currentMentions, 0, 0, afterLength - beforeLength);
-    setCurrentMentions(updatedMentions);
+    const updatedMentions = updateMentionRanges(currentMentions, 0, 0, trimmedStartLength - beforeLength);
 
     if (isEditing) {
-      sendMessageEdit(messageText);
+      sendMessageEdit(messageText, updatedMentions);
     } else {
-      sendMessage(messageText);
+      sendMessage(messageText, updatedMentions);
     }
 
-    resetDraftState();
+    resetDraftState(true);
     textareaRef.current?.focus();
   };
 
@@ -543,7 +563,7 @@ const InputBar = ({
     onInputKeyDown: emojiKeyDown,
     onInputKeyUp: emojiKeyUp,
     renderEmojiComponent,
-  } = useEmoji(propertiesRepository, setInputValue, onSend, textareaRef.current);
+  } = useEmoji(propertiesRepository, setInputValue, onSend, currentMentions, setCurrentMentions, textareaRef.current);
 
   const uploadFiles = (files: File[]) => {
     const fileArray = Array.from(files);
@@ -647,7 +667,7 @@ const InputBar = ({
 
   const loadInitialStateForConversation = async (): Promise<void> => {
     setPastedFile(null);
-    cancelMessageEditing();
+    cancelMessageEditing(true, true);
     cancelMessageReply();
     endMentionFlow();
 
@@ -681,7 +701,7 @@ const InputBar = ({
     generateQuote().then(quoteEntity => {
       if (quoteEntity) {
         messageRepository.sendGif(conversationEntity, gifUrl, tag, quoteEntity);
-        cancelMessageEditing(true);
+        cancelMessageEditing(true, true);
       }
     });
   };
@@ -692,7 +712,7 @@ const InputBar = ({
     );
 
     if (!ignoredParent) {
-      cancelMessageEditing();
+      cancelMessageEditing(true, true);
       cancelMessageReply();
     }
   };
@@ -722,9 +742,7 @@ const InputBar = ({
     }
   }, [isEditing, currentMentions, replyMessageEntity, inputValue]);
 
-  useTextAreaFocus(() => {
-    textareaRef.current?.focus();
-  });
+  useTextAreaFocus(() => textareaRef.current?.focus());
 
   useScrollSync(textareaRef.current, shadowInputRef.current, [
     textareaRef.current,
@@ -773,90 +791,145 @@ const InputBar = ({
   }, [isEditing]);
 
   // Temporarily functionality for dropping files on conversation container, should be moved to Conversation Component
-  useDropFiles('#conversation', onDropOrPastedFile);
+  useDropFiles('#conversation', onDropOrPastedFile, [isFileSharingSendingEnabled]);
 
   useEffect(() => {
     document.addEventListener('paste', onPasteFiles);
     return () => document.removeEventListener('paste', onPasteFiles);
   }, []);
 
+  const sendImageOnEnterClick = (event: KeyboardEvent) => {
+    if (event.key === KEY.ENTER && !event.shiftKey && !event.altKey && !event.metaKey) {
+      sendPastedFile();
+    }
+  };
+
+  useEffect(() => {
+    if (!pastedFile) {
+      return () => undefined;
+    }
+
+    window.addEventListener('keydown', sendImageOnEnterClick);
+
+    return () => {
+      window.removeEventListener('keydown', sendImageOnEnterClick);
+    };
+  }, [pastedFile]);
+
+  const sendButton = (
+    <li>
+      <button
+        type="button"
+        className={cx('controls-right-button controls-right-button--send')}
+        disabled={inputValue.length === 0}
+        title={t('tooltipConversationSendMessage')}
+        aria-label={t('tooltipConversationSendMessage')}
+        onClick={() => onSend(inputValue)}
+        data-uie-name="do-send-message"
+      >
+        <Icon.Send />
+      </button>
+    </li>
+  );
+
+  const controlButtonsProps = {
+    conversation: conversationEntity,
+    disableFilesharing: !isFileSharingSendingEnabled,
+    disablePing: pingDisabled,
+    input: inputValue,
+    isEditing: isEditing,
+    isScaledDown: isScaledDown,
+    onCancelEditing: cancelMessageEditing,
+    onClickPing: onPingClick,
+    onGifClick: onGifClick,
+    onSelectFiles: uploadFiles,
+    onSelectImages: uploadImages,
+    showGiphyButton: showGiphyButton,
+  };
+
   return (
-    <div id="conversation-input-bar" className="conversation-input-bar">
-      {classifiedDomains && !isConnectionRequest && (
-        <ClassifiedBar users={participatingUserEts} classifiedDomains={classifiedDomains} />
-      )}
-
-      {isReplying && !isEditing && <ReplyBar replyMessageEntity={replyMessageEntity} onCancel={handleCancelReply} />}
-
-      <div className={cx('conversation-input-bar__input', {'conversation-input-bar__input--editing': isEditing})}>
-        {!isOutgoingRequest && (
-          <>
-            <div className="controls-left">
-              {!!inputValue.length && (
-                <Avatar className="cursor-default" participant={selfUser} avatarSize={AVATAR_SIZE.X_SMALL} />
-              )}
-            </div>
-
-            {!removedFromConversation && !pastedFile && (
-              <>
-                {renderEmojiComponent()}
-
-                <div className="controls-center">
-                  <textarea
-                    ref={textareaRef}
-                    id="conversation-input-bar-text"
-                    className={cx('conversation-input-bar-text', {
-                      'conversation-input-bar-text--accent': hasLocalEphemeralTimer,
-                    })}
-                    onKeyDown={onTextAreaKeyDown}
-                    onKeyUp={onTextareaKeyUp}
-                    onClick={handleMentionFlow}
-                    onInput={updateMentions}
-                    onChange={onChange}
-                    onPaste={onPasteFiles}
-                    value={inputValue}
-                    placeholder={inputPlaceholder}
-                    aria-label={inputPlaceholder}
-                    data-uie-name="input-message"
-                    dir="auto"
-                  />
-
-                  <div
-                    ref={shadowInputRef}
-                    className="shadow-input"
-                    dangerouslySetInnerHTML={{__html: richTextInput}}
-                    data-uie-name="input-message-rich-text"
-                    dir="auto"
-                  />
-                </div>
-
-                <MentionSuggestionList
-                  targetInput={textareaRef.current}
-                  suggestions={mentionSuggestions}
-                  onSelectionValidated={addMention}
-                />
-
-                <InputBarControls
-                  conversation={conversationEntity}
-                  input={inputValue}
-                  isEditing={isEditing}
-                  disablePing={pingDisabled}
-                  disableFilesharing={!isFileSharingSendingEnabled}
-                  onSend={() => onSend(inputValue)}
-                  onSelectFiles={uploadFiles}
-                  onSelectImages={uploadImages}
-                  onCancelEditing={cancelMessageEditing}
-                  onClickGif={onGifClick}
-                  onClickPing={onPingClick}
-                />
-              </>
-            )}
-          </>
+    <StyledApp themeId={THEME_ID.DEFAULT}>
+      <div id="conversation-input-bar" className="conversation-input-bar">
+        {classifiedDomains && !isConnectionRequest && (
+          <ClassifiedBar users={participatingUserEts} classifiedDomains={classifiedDomains} />
         )}
 
-        {pastedFile && <PastedFileControls pastedFile={pastedFile} onClear={clearPastedFile} onSend={sendPastedFile} />}
+        {isReplying && !isEditing && <ReplyBar replyMessageEntity={replyMessageEntity} onCancel={handleCancelReply} />}
+
+        <div className={cx('conversation-input-bar__input', {'conversation-input-bar__input--editing': isEditing})}>
+          {!isOutgoingRequest && (
+            <>
+              <div className="controls-left">
+                {!!inputValue.length && (
+                  <Avatar className="cursor-default" participant={selfUser} avatarSize={AVATAR_SIZE.X_SMALL} />
+                )}
+              </div>
+
+              {!removedFromConversation && !pastedFile && (
+                <>
+                  {renderEmojiComponent()}
+
+                  <div className="controls-center">
+                    <textarea
+                      ref={textareaRef}
+                      id="conversation-input-bar-text"
+                      className={cx('conversation-input-bar-text', {
+                        'conversation-input-bar-text--accent': hasLocalEphemeralTimer,
+                      })}
+                      onKeyDown={onTextAreaKeyDown}
+                      onKeyUp={onTextareaKeyUp}
+                      onClick={handleMentionFlow}
+                      onInput={updateMentions}
+                      onChange={onChange}
+                      onPaste={onPasteFiles}
+                      value={inputValue}
+                      placeholder={inputPlaceholder}
+                      aria-label={inputPlaceholder}
+                      data-uie-name="input-message"
+                      dir="auto"
+                    />
+
+                    <div
+                      ref={shadowInputRef}
+                      className="shadow-input"
+                      dangerouslySetInnerHTML={{__html: richTextInput}}
+                      data-uie-name="input-message-rich-text"
+                      dir="auto"
+                    />
+                  </div>
+
+                  <MentionSuggestionList
+                    targetInput={textareaRef.current}
+                    suggestions={mentionSuggestions}
+                    onSelectionValidated={addMention}
+                  />
+                  {isScaledDown ? (
+                    <>
+                      <ul className="controls-right buttons-group" css={{minWidth: '95px'}}>
+                        {showGiphyButton && <GiphyButton onGifClick={onGifClick} />}
+                        {sendButton}
+                      </ul>
+                      <ul className="controls-right buttons-group" css={{justifyContent: 'center', width: '100%'}}>
+                        <ControlButtons {...controlButtonsProps} isScaledDown={isScaledDown} />
+                      </ul>
+                    </>
+                  ) : (
+                    <ul className="controls-right buttons-group">
+                      <ControlButtons {...controlButtonsProps} showGiphyButton={showGiphyButton} />
+                      {sendButton}
+                    </ul>
+                  )}
+                </>
+              )}
+            </>
+          )}
+
+          {pastedFile && (
+            <PastedFileControls pastedFile={pastedFile} onClear={clearPastedFile} onSend={sendPastedFile} />
+          )}
+        </div>
       </div>
-    </div>
+    </StyledApp>
   );
 };
 

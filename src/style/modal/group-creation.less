@@ -34,6 +34,10 @@
       margin: 8px 4px 22px;
     }
 
+    .modal__select-description {
+      margin-top: 10px;
+    }
+
     .modal__header {
       margin-bottom: 35px;
       line-height: @line-height-lg;
@@ -44,25 +48,6 @@
       border: none;
       border-bottom: 1px solid var(--gray-50);
       margin: 0 0 20px;
-    }
-  }
-
-  &__action {
-    .button-reset-default;
-    color: var(--black);
-    font-size: @font-size-base;
-    font-weight: @font-weight-bold;
-    line-height: @line-height-lg;
-    opacity: 0.32;
-    transition: all 0.25s ease-in-out;
-
-    &:hover {
-      text-decoration: underline;
-    }
-
-    &.enabled {
-      cursor: pointer;
-      opacity: 1;
     }
   }
 
@@ -78,13 +63,5 @@
     margin: 12px -16px -16px;
     overflow-x: hidden;
     overflow-y: auto;
-  }
-}
-
-body.theme-dark {
-  .group-creation {
-    &__action {
-      color: var(--white);
-    }
   }
 }

@@ -26,7 +26,7 @@ import {ServiceEntity} from '../../../integration/ServiceEntity';
 import {ActionsViewModel} from '../../../view_model/ActionsViewModel';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
-import renderModal from 'Util/renderModal';
+import renderElement from 'Util/renderElement';
 
 interface ServiceModalProps {
   readonly service: ServiceEntity;
@@ -98,4 +98,4 @@ const ServiceModal: React.FC<ServiceModalProps> = ({
 
 export default ServiceModal;
 
-export const showServiceModal = renderModal<ServiceModalProps>(ServiceModal);
+export const showServiceModal = renderElement<ServiceModalProps>(ServiceModal);

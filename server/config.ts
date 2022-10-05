@@ -47,16 +47,7 @@ if (federation) {
 }
 
 const defaultCSP = {
-  connectSrc: [
-    "'self'",
-    'blob:',
-    'data:',
-    'https://wire.com',
-    'https://www.google.com',
-    'https://*.giphy.com',
-    'https://*.unsplash.com',
-    'https://apis.google.com',
-  ],
+  connectSrc: ["'self'", 'blob:', 'data:', 'https://*.giphy.com'],
   defaultSrc: ["'self'"],
   fontSrc: ["'self'", 'data:'],
   frameSrc: [
@@ -64,23 +55,14 @@ const defaultCSP = {
     'https://*.spotify.com',
     'https://*.vimeo.com',
     'https://*.youtube-nocookie.com',
-    'https://accounts.google.com',
   ],
-  imgSrc: [
-    "'self'",
-    'blob:',
-    'data:',
-    'https://*.cloudfront.net',
-    'https://*.giphy.com',
-    'https://1-ps.googleusercontent.com',
-    'https://csi.gstatic.com',
-  ],
+  imgSrc: ["'self'", 'blob:', 'data:', 'https://*.giphy.com'],
   manifestSrc: ["'self'"],
-  mediaSrc: ["'self'", 'blob:', 'data:', '*'],
-  objectSrc: ["'self'", 'https://*.youtube-nocookie.com', 'https://1-ps.googleusercontent.com'],
+  mediaSrc: ["'self'", 'blob:', 'data:'],
+  objectSrc: ["'none'"],
   prefetchSrc: ["'self'"],
-  scriptSrc: ["'self'", "'unsafe-eval'", "'unsafe-inline'", 'https://apis.google.com'],
-  styleSrc: ["'self'", "'unsafe-inline'", 'https://*.googleusercontent.com'],
+  scriptSrc: ["'self'", "'unsafe-eval'"],
+  styleSrc: ["'self'", "'unsafe-inline'"],
   workerSrc: ["'self'", 'blob:'],
 };
 const logger = logdown('config', {
@@ -164,6 +146,9 @@ const config: ServerConfig = {
       ENABLE_SSO: process.env.FEATURE_ENABLE_SSO == 'true',
       ENFORCE_CONSTANT_BITRATE: process.env.FEATURE_ENFORCE_CONSTANT_BITRATE == 'true',
       FORCE_EXTRA_CLIENT_ENTROPY: process.env.FEATURE_FORCE_EXTRA_CLIENT_ENTROPY == 'true',
+      MLS_CONFIG_KEYING_MATERIAL_UPDATE_THRESHOLD:
+        process.env.FEATURE_MLS_CONFIG_KEYING_MATERIAL_UPDATE_THRESHOLD &&
+        Number(process.env.FEATURE_MLS_CONFIG_KEYING_MATERIAL_UPDATE_THRESHOLD),
       PERSIST_TEMPORARY_CLIENTS: process.env.FEATURE_PERSIST_TEMPORARY_CLIENTS != 'false',
       SHOW_LOADING_INFORMATION: process.env.FEATURE_SHOW_LOADING_INFORMATION == 'true',
     },

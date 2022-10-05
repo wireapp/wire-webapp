@@ -136,3 +136,11 @@
 .focus-border-radius {
   border-radius: 4px;
 }
+
+.focus-default {
+  &:focus-visible {
+    .focus-outline;
+    .focus-offset;
+    .focus-border-radius;
+  }
+}

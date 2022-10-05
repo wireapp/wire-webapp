@@ -44,11 +44,14 @@ body.theme-dark {
 
 .preferences-content {
   width: 100%;
-  min-width: 560px;
+  min-width: var(--preferences-width);
   height: 100%;
   padding: 32px 32px 32px 72px;
-  color: var(--background);
   overflow-x: hidden;
+
+  @media (max-width: @screen-md-min) {
+    padding: 10px;
+  }
 
   input {
     color: var(--background);
@@ -61,7 +64,6 @@ body.theme-dark {
 
 .preferences-detail {
   margin-top: 10px;
-  color: var(--gray-90);
   font-size: @font-size-small;
   line-height: 14px;
 
@@ -102,7 +104,6 @@ body.theme-dark {
 }
 
 .preferences-info {
-  width: 400px;
   line-height: @line-height-lg;
 }
 
@@ -186,7 +187,7 @@ body.theme-dark {
 
 .preferences-section {
   display: flex;
-  width: 560px;
+  width: var(--preferences-width);
   flex-direction: column;
   align-items: flex-start;
   padding: 0;
@@ -196,7 +197,7 @@ body.theme-dark {
 }
 
 .preferences-separator {
-  width: 560px;
+  width: var(--preferences-width);
   height: 1px;
   border: 0;
   margin: 22px 0 22px;

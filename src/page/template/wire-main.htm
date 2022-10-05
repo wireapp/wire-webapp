@@ -11,29 +11,9 @@
           <left-sidebar params="listViewModel: $root, selfUser: selfUser"></left-sidebar>
         <!-- /ko -->
       </div>
+
       <div id="center-column" class="center-column">
         <main-content params="contentViewModel: $root"></main-content>
-        <!-- ko if: state() === State.CONNECTION_REQUESTS -->
-          <h1 class="visually-hidden" data-bind="text: t('accessibility.headings.connectionRequests')"></h1>
-          #include('content/connect-requests.htm')
-        <!-- /ko -->
-        <!-- ko if: state() === State.CONVERSATION -->
-          <h1 class="visually-hidden" data-bind="text: t('accessibility.headings.conversation')"></h1>
-          #include('content/conversation.htm')
-        <!-- /ko -->
-        <!-- ko if: state() === State.HISTORY_EXPORT -->
-          <h1 class="visually-hidden" data-bind="text: t('accessibility.headings.historyExport')"></h1>
-          #include('content/history-export.htm')
-        <!-- /ko -->
-        <!-- ko if: state() === State.HISTORY_IMPORT -->
-          <h1 class="visually-hidden" data-bind="text: t('accessibility.headings.historyImport')"></h1>
-          #include('content/history-import.htm')
-        <!-- /ko -->
-        <group-creation-modal params="
-          conversationRepository: $root.repositories.conversation,
-          searchRepository: $root.repositories.search,
-          teamRepository: $root.repositories.team,
-        "></group-creation-modal>
 
         <legal-hold-modal params="
           userState: $root.userState,
@@ -44,27 +24,13 @@
           cryptographyRepository: $root.repositories.cryptography,
           messageRepository: $root.repositories.message,
         "></legal-hold-modal>
-
-        <div class="center-column__overlay"></div>
-      </div>
-
-      <div id="right-column" class="right-column">
-        #include('panel/conversation-details.htm')
-        #include('panel/conversation-participants.htm')
-        #include('panel/add-participants.htm')
-        #include('panel/group-participant-user.htm')
-        #include('panel/group-participant-service.htm')
-        #include('panel/guest-options.htm')
-        #include('panel/services-options.htm')
-        #include('panel/notifications.htm')
-        #include('panel/participant-devices.htm')
-        #include('panel/timed-messages.htm')
-        #include('panel/message-details.htm')
       </div>
     </div>
-    #include('detail-view.htm')
+
     #include('modals.htm')
+
     <!-- /ko -->
+
     <app-lock-container params="clientRepository: $root.content.repositories.client"></app-lock-container>
     <warnings-container></warnings-container>
     <calling-overlay-container params="

@@ -71,6 +71,7 @@ export const INITIALS_SIZE = {
 
 export interface AvatarProps extends HTMLProps<HTMLDivElement> {
   avatarSize?: AVATAR_SIZE;
+  avatarAlt?: string;
   noBadge?: boolean;
   noFilter?: boolean;
   onAvatarClick?: (participant: User | ServiceEntity, target: Node) => void;
@@ -91,19 +92,20 @@ const Avatar: FC<AvatarProps> = ({
     }
   };
 
+  const {isTemporaryGuest, isTeamMember, isBlocked, isRequest, isIgnored, isCanceled, isUnknown} =
+    useKoSubscribableChildren(participant, [
+      'isTemporaryGuest',
+      'isTeamMember',
+      'isBlocked',
+      'isRequest',
+      'isIgnored',
+      'isCanceled',
+      'isUnknown',
+    ]);
+
   if (isServiceEntity(participant)) {
     return <ServiceAvatar avatarSize={avatarSize} participant={participant} onClick={clickHandler} {...props} />;
   }
-
-  const user = useKoSubscribableChildren(participant, [
-    'isTemporaryGuest',
-    'isTeamMember',
-    'isBlocked',
-    'isRequest',
-    'isIgnored',
-    'isCanceled',
-    'isUnknown',
-  ]);
 
   const isMe = participant?.isMe;
 
@@ -111,19 +113,19 @@ const Avatar: FC<AvatarProps> = ({
 
   if (isMe) {
     avatarState = STATE.SELF;
-  } else if (user.isTeamMember) {
+  } else if (isTeamMember) {
     avatarState = STATE.NONE;
-  } else if (user.isBlocked) {
+  } else if (isBlocked) {
     avatarState = STATE.BLOCKED;
-  } else if (user.isRequest) {
+  } else if (isRequest) {
     avatarState = STATE.PENDING;
-  } else if (user.isIgnored) {
+  } else if (isIgnored) {
     avatarState = STATE.IGNORED;
-  } else if (user.isCanceled || user.isUnknown) {
+  } else if (isCanceled || isUnknown) {
     avatarState = STATE.UNKNOWN;
   }
 
-  if (user.isTemporaryGuest) {
+  if (isTemporaryGuest) {
     return (
       <TemporaryGuestAvatar
         avatarSize={avatarSize}

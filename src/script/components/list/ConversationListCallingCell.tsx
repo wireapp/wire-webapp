@@ -33,7 +33,6 @@ import Duration from 'Components/calling/Duration';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 import {sortUsersByPriority} from 'Util/StringUtil';
-import useEffectRef from 'Util/useEffectRef';
 
 import type {Call} from '../../calling/Call';
 import type {CallingRepository} from '../../calling/CallingRepository';
@@ -44,7 +43,7 @@ import {generateConversationUrl} from '../../router/routeGenerator';
 import {createNavigate, createNavigateKeyboard} from '../../router/routerBindings';
 import {TeamState} from '../../team/TeamState';
 import {CallState, MuteState} from '../../calling/CallState';
-import {useFadingScrollbar} from '../../ui/fadingScrollbar';
+import {initFadingScrollbar} from '../../ui/fadingScrollbar';
 import {CallActions, CallViewTab} from '../../view_model/CallingViewModel';
 import {showContextMenu, ContextMenuEntry} from '../../ui/ContextMenu';
 import type {Participant} from '../../calling/Participant';
@@ -77,9 +76,6 @@ const ConversationListCallingCell: React.FC<CallingCellProps> = ({
   teamState = container.resolve(TeamState),
   callState = container.resolve(CallState),
 }) => {
-  const [scrollbarRef, setScrollbarRef] = useEffectRef<HTMLDivElement>();
-  useFadingScrollbar(scrollbarRef);
-
   const {reason, state, isCbrEnabled, startedAt, participants, maximizedParticipant, muteState} =
     useKoSubscribableChildren(call, [
       'reason',
@@ -113,7 +109,7 @@ const ConversationListCallingCell: React.FC<CallingCellProps> = ({
   const isMuted = muteState !== MuteState.NOT_MUTED;
 
   const isStillOngoing = reason === CALL_REASON.STILL_ONGOING;
-  const isDeclined = [CALL_REASON.STILL_ONGOING, CALL_REASON.ANSWERED_ELSEWHERE].includes(reason);
+  const isDeclined = !!reason && [CALL_REASON.STILL_ONGOING, CALL_REASON.ANSWERED_ELSEWHERE].includes(reason);
 
   const isOutgoing = state === CALL_STATE.OUTGOING;
   const isIncoming = state === CALL_STATE.INCOMING;
@@ -126,7 +122,7 @@ const ConversationListCallingCell: React.FC<CallingCellProps> = ({
 
   const videoGrid = useVideoGrid(call);
 
-  const conversationParticipants = conversation && userEts.concat([selfUser]);
+  const conversationParticipants = conversation && (selfUser ? userEts.concat(selfUser) : userEts);
   const conversationUrl = generateConversationUrl(conversation.id, conversation.domain);
   const selfParticipant = call?.getSelfParticipant();
 
@@ -146,7 +142,7 @@ const ConversationListCallingCell: React.FC<CallingCellProps> = ({
 
   const showJoinButton = conversation && isStillOngoing && temporaryUserStyle;
   const [showParticipants, setShowParticipants] = useState(false);
-  const isModerator = roles[selfUser?.id] === DefaultConversationRoleName.WIRE_ADMIN;
+  const isModerator = selfUser && roles[selfUser.id] === DefaultConversationRoleName.WIRE_ADMIN;
 
   const getParticipantContext = (event: React.MouseEvent<HTMLDivElement>, participant: Participant) => {
     event.preventDefault();
@@ -171,8 +167,8 @@ const ConversationListCallingCell: React.FC<CallingCellProps> = ({
       label: t('moderatorMenuEntryMuteAllOthers'),
     };
 
-    const entries: ContextMenuEntry[] = [!participant.user.isMe && muteParticipant, muteOthers].filter(Boolean);
-    showContextMenu(event.nativeEvent, entries, 'participant-moderator-menu');
+    const entries: ContextMenuEntry[] = [muteOthers].concat(!participant.user.isMe ? muteParticipant : []);
+    showContextMenu(event, entries, 'participant-moderator-menu');
   };
 
   const handleMinimizedKeydown = useCallback(
@@ -218,7 +214,7 @@ const ConversationListCallingCell: React.FC<CallingCellProps> = ({
           {muteState === MuteState.REMOTE_MUTED && (
             <div className="conversation-list-calling-cell__info-bar">{t('muteStateRemoteMute')}</div>
           )}
-          <div className="conversation-list-calling-cell">
+          <div className="conversation-list-cell-right__calling">
             <div
               className="conversation-list-cell conversation-list-cell-button"
               onClick={createNavigate(conversationUrl)}
@@ -448,13 +444,13 @@ const ConversationListCallingCell: React.FC<CallingCellProps> = ({
                   'call-ui__participant-list__wrapper--active': showParticipants,
                 })}
               >
-                <div ref={setScrollbarRef} className="call-ui__participant-list__container">
+                <div ref={initFadingScrollbar} className="call-ui__participant-list__container">
                   <ul className="call-ui__participant-list" data-uie-name="list-call-ui-participants">
                     {participants
                       .slice()
                       .sort((participantA, participantB) => sortUsersByPriority(participantA.user, participantB.user))
                       .map(participant => (
-                        <li key={participant.clientId}>
+                        <li key={participant.clientId} className="call-ui__participant-list__participant">
                           <ParticipantItem
                             key={participant.clientId}
                             participant={participant.user}
@@ -466,6 +462,7 @@ const ConversationListCallingCell: React.FC<CallingCellProps> = ({
                             external={teamState.isExternal(participant.user.id)}
                             onContextMenu={isModerator ? event => getParticipantContext(event, participant) : undefined}
                             showDropdown={isModerator}
+                            noInteraction
                           />
                         </li>
                       ))}

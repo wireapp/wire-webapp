@@ -54,6 +54,7 @@ export interface UserListProps {
   mode?: UserlistMode;
   noSelfInteraction?: boolean;
   noUnderline?: boolean;
+  showArrow?: boolean;
   onClick?: (userEntity: User, event: MouseEvent | KeyboardEvent) => void;
   onSelectUser?: (user: User) => void;
   reducedUserCount?: number;
@@ -80,6 +81,7 @@ const UserList: React.FC<UserListProps> = ({
   reducedUserCount = 5,
   showEmptyAdmin = false,
   noSelfInteraction = false,
+  showArrow = false,
   userState = container.resolve(UserState),
   teamState = container.resolve(TeamState),
   onSelectUser,
@@ -167,6 +169,7 @@ const UserList: React.FC<UserListProps> = ({
                       isSelfVerified={isSelfVerified}
                       onClick={onClickOrKeyPressed}
                       onKeyDown={onUserKeyPressed}
+                      showArrow={showArrow}
                     />
                   </li>
                 ))}
@@ -201,6 +204,7 @@ const UserList: React.FC<UserListProps> = ({
                     isSelfVerified={isSelfVerified}
                     onClick={onClickOrKeyPressed}
                     onKeyDown={onUserKeyPressed}
+                    showArrow={showArrow}
                   />
                 </li>
               ))}
@@ -229,6 +233,7 @@ const UserList: React.FC<UserListProps> = ({
             selfInTeam={selfInTeam}
             isSelfVerified={isSelfVerified}
             onClick={onClickOrKeyPressed}
+            showArrow={showArrow}
           />
         ))}
       </div>
@@ -240,7 +245,6 @@ const UserList: React.FC<UserListProps> = ({
       {content}
       {hasMoreUsers && (
         <InViewport
-          requireFullyInView={false}
           onVisible={() => setMaxShownUsers(maxShownUsers + USER_CHUNK_SIZE)}
           key={`in-viewport-${Math.random()}`}
           style={{height: 10, transform: 'translateY(-60px)', width: 10}}

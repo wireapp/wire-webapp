@@ -18,6 +18,7 @@
  */
 
 import {QualifiedId} from '@wireapp/api-client/src/user';
+import {MouseEvent as ReactMouseEvent, KeyboardEvent as ReactKeyboardEvent} from 'react';
 
 import {Message as BaseMessage} from '../../../entity/message/Message';
 import type {ContentMessage} from '../../../entity/message/ContentMessage';
@@ -37,14 +38,15 @@ import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import MessageTime from './MessageTime';
 import {MessageWrapper} from './MessageWrapper';
 import {useRelativeTimestamp} from '../../../hooks/useRelativeTimestamp';
+import {ServiceEntity} from 'src/script/integration/ServiceEntity';
 
 export interface MessageActions {
-  onClickAvatar: (user: User) => void;
+  onClickAvatar: (user: User | ServiceEntity) => void;
   onClickCancelRequest: (message: MemberMessageEntity) => void;
-  onClickImage: (message: ContentMessage, event: React.MouseEvent | React.KeyboardEvent) => void;
+  onClickImage: (message: ContentMessage, event: React.UIEvent) => void;
   onClickInvitePeople: () => void;
   onClickLikes: (message: BaseMessage) => void;
-  onClickMessage: (message: ContentMessage | Text, event: React.MouseEvent) => void;
+  onClickMessage: (message: ContentMessage | Text, event: ReactMouseEvent | ReactKeyboardEvent<HTMLElement>) => void;
   onClickParticipants: (participants: User[]) => void;
   onClickReceipts: (message: BaseMessage) => void;
   onClickResetSession: (messageError: DecryptErrorMessage) => void;
@@ -76,8 +78,8 @@ export interface MessageParams extends MessageActions {
 const Message: React.FC<
   MessageParams & {scrollTo?: (elm: {center?: boolean; element: HTMLElement}, isUnread?: boolean) => void}
 > = props => {
-  const {message, previousMessage, isMarked, lastReadTimestamp, onVisible} = props;
-  const messageElementRef = useRef<HTMLDivElement>();
+  const {message, previousMessage, isMarked, lastReadTimestamp, onVisible, scrollTo} = props;
+  const messageElementRef = useRef<HTMLDivElement>(null);
   const {status, ephemeral_expires, timestamp} = useKoSubscribableChildren(message, [
     'status',
     'ephemeral_expires',
@@ -85,13 +87,16 @@ const Message: React.FC<
   ]);
   const timeago = useRelativeTimestamp(message.timestamp());
   const timeagoDay = useRelativeTimestamp(message.timestamp(), true);
-  const markerType = getMessageMarkerType(message, previousMessage, lastReadTimestamp);
+  const markerType = getMessageMarkerType(message, lastReadTimestamp, previousMessage);
 
   useLayoutEffect(() => {
+    if (!messageElementRef.current) {
+      return;
+    }
     if (isMarked) {
-      props.scrollTo({center: true, element: messageElementRef.current});
+      scrollTo?.({center: true, element: messageElementRef.current});
     } else if (markerType === MessageMarkerType.UNREAD) {
-      props.scrollTo({element: messageElementRef.current}, true);
+      scrollTo?.({element: messageElementRef.current}, true);
     }
   }, [isMarked, messageElementRef]);
 
@@ -107,7 +112,7 @@ const Message: React.FC<
 
   const content = <MessageWrapper {...props} hasMarker={markerType !== MessageMarkerType.NONE} />;
   const wrappedContent = onVisible ? (
-    <InViewport allowBiggerThanViewport onVisible={onVisible}>
+    <InViewport requireFullyInView allowBiggerThanViewport onVisible={onVisible}>
       {content}
     </InViewport>
   ) : (

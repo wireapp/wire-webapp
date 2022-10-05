@@ -34,8 +34,8 @@ import {ClientState} from '../client/ClientState';
 import {AppLockState} from '../user/AppLockState';
 import {AppLockRepository} from '../user/AppLockRepository';
 import {registerReactComponent, useKoSubscribableChildren} from 'Util/ComponentUtil';
-import {ModalsViewModel} from '../view_model/ModalsViewModel';
 import Icon from 'Components/Icon';
+import PrimaryModal from 'Components/Modals/PrimaryModal';
 
 export enum APPLOCK_STATE {
   FORGOT = 'applock.forgot',
@@ -134,8 +134,9 @@ const AppLock: React.FC<AppLockProps> = ({
       showAppLock();
     } else if (appLockState.hasPassphrase()) {
       appLockRepository.removeCode();
-      amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.ACKNOWLEDGE, {
+      PrimaryModal.show(PrimaryModal.type.ACKNOWLEDGE, {
         text: {
+          closeBtnLabel: t('teamSettingsModalCloseBtn'),
           htmlMessage: t('featureConfigChangeModalApplock'),
           title: t('featureConfigChangeModalApplockHeadline'),
         },
@@ -271,7 +272,13 @@ const AppLock: React.FC<AppLockProps> = ({
     <ModalComponent isShown={isVisible} showLoading={isLoading} onClosed={onClosed} data-uie-name="applock-modal">
       <div className="modal__header">
         {!isAppLockEnforced && !isAppLockActivated && (
-          <button type="button" className="modal__header__button" onClick={onCancelAppLock} data-uie-name="do-close">
+          <button
+            type="button"
+            className="modal__header__button"
+            onClick={onCancelAppLock}
+            data-uie-name="do-close"
+            aria-label={t('modalAppLockSetupCloseBtn')}
+          >
             <span className="modal__header__icon" aria-hidden="true">
               <Icon.Close />
             </span>

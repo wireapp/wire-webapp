@@ -20,8 +20,7 @@
 import React, {Fragment} from 'react';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {Conversation} from '../../../../entity/Conversation';
-import {useFadingScrollbar} from '../../../../ui/fadingScrollbar';
-import useEffectRef from 'Util/useEffectRef';
+import {initFadingScrollbar} from '../../../../ui/fadingScrollbar';
 
 import {ContentMessage} from 'src/script/entity/message/ContentMessage';
 import {isToday, isThisYear, formatLocale} from 'Util/TimeUtil';
@@ -33,6 +32,7 @@ interface CollectionDetailsProps {
   conversation: Conversation;
   messages: ContentMessage[];
   onClose?: () => void;
+  onImageClick?: (message: ContentMessage) => void;
 }
 
 type GroupedCollection = [string, ContentMessage[]][];
@@ -55,10 +55,13 @@ const groupByDate = (messages: ContentMessage[]): GroupedCollection => {
   );
 };
 
-const CollectionDetails: React.FC<CollectionDetailsProps> = ({conversation, messages, onClose = noop}) => {
+const CollectionDetails: React.FC<CollectionDetailsProps> = ({
+  conversation,
+  messages,
+  onClose = noop,
+  onImageClick,
+}) => {
   const {display_name} = useKoSubscribableChildren(conversation, ['display_name']);
-  const [scrollbarRef, setScrollbarRef] = useEffectRef<HTMLDivElement>();
-  useFadingScrollbar(scrollbarRef);
 
   return (
     <div id="collection-details" className="collection-details content">
@@ -76,14 +79,19 @@ const CollectionDetails: React.FC<CollectionDetailsProps> = ({conversation, mess
       </div>
 
       <div className="content-list-wrapper">
-        <div className="content-list collection-list" ref={setScrollbarRef}>
+        <div className="content-list collection-list" ref={initFadingScrollbar}>
           <div className="collection-images">
             {groupByDate(messages).map(([groupName, groupMessages]) => {
               return (
                 <Fragment key={groupName}>
                   <header className="collection-date-separator">{groupName}</header>
                   {groupMessages.map(message => (
-                    <CollectionItem message={message} key={message.id} allMessages={messages} />
+                    <CollectionItem
+                      message={message}
+                      key={message.id}
+                      allMessages={messages}
+                      onImageClick={onImageClick}
+                    />
                   ))}
                 </Fragment>
               );

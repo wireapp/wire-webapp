@@ -24,8 +24,8 @@
   display: inline-block;
   padding: 0 16px;
   border: @button-border-size solid transparent;
-  background-color: var(--accent-color);
   border-radius: @button-border-radius;
+  background-color: var(--accent-color);
   color: #fff;
   cursor: pointer;
   text-align: center;
@@ -254,8 +254,8 @@
 .button-reset-default {
   padding: 0;
   border: 0;
-  background-color: transparent;
   border-radius: 0;
+  background-color: transparent;
   cursor: pointer;
   font-family: inherit;
   font-size: inherit;
@@ -274,10 +274,27 @@
     align-items: center;
     justify-content: center;
     padding: 8px 12px;
-    border: 1px solid var(--gray-40);
-    background: var(--white);
+    border: 1px solid var(--button-tertiary-border);
+    background: var(--button-tertiary-bg);
+    color: var(--main-color);
 
-    color: var(--black);
+    &:focus-visible {
+      border: 1px solid var(--accent-color-focus);
+      border-radius: 0;
+      background-color: var(--button-tertiary-hover-bg);
+      outline: none;
+    }
+
+    &:hover {
+      border: 1px solid var(--button-tertiary-hover-border);
+      background-color: var(--button-tertiary-hover-bg);
+    }
+
+    &:active {
+      border: 1px solid var(--accent-color-focus);
+      background: var(--accent-color-highlight);
+      color: var(--icon-primary-active-fill);
+    }
   }
 
   &-button-left {
@@ -289,26 +306,9 @@
   }
 
   &-button-active {
-    border: 1px solid var(--accent-color-300);
-    background: var(--accent-color-50);
-    color: var(--accent-color-500);
-  }
-}
-
-body.theme-dark {
-  .buttons-group {
-    &-button {
-      border: 1px solid var(--gray-100);
-      background: var(--gray-90);
-
-      color: var(--white);
-    }
-
-    &-button-active {
-      border: 1px solid var(--accent-color-600);
-      background: var(--accent-color-700);
-      color: var(--white);
-    }
+    border: 1px solid var(--accent-color-focus);
+    background: var(--accent-color-highlight);
+    color: var(--icon-primary-active-fill);
   }
 }
 
@@ -465,7 +465,6 @@ body.theme-dark {
 
   &:focus-visible {
     background-color: var(--gray-20);
-    outline: 1px solid var(--gray-60);
   }
 
   body.theme-dark & {
@@ -480,7 +479,6 @@ body.theme-dark {
 
     &:focus-visible {
       background-color: var(--gray-80);
-      outline: 1px solid var(--gray-50);
     }
   }
 

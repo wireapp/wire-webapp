@@ -106,27 +106,26 @@ const AccountForm = ({account, ...props}: Props & ConnectedProps & DispatchProps
       await props.doSendActivationCode(registrationData.email);
       return props.onSubmit(event);
     } catch (error) {
-      if (error && error.label) {
-        switch (error.label) {
+      const label = (error as BackendError)?.label;
+      if (label) {
+        switch (label) {
           case BackendError.AUTH_ERRORS.BLACKLISTED_EMAIL:
           case BackendError.AUTH_ERRORS.DOMAIN_BLOCKED_FOR_REGISTRATION:
           case BackendError.AUTH_ERRORS.INVALID_EMAIL:
           case BackendError.AUTH_ERRORS.KEY_EXISTS: {
-            inputs.email.current.setCustomValidity(error.label);
+            inputs.email.current.setCustomValidity(label);
             setValidInputs({...validInputs, email: false});
             break;
           }
           case BackendError.AUTH_ERRORS.INVALID_CREDENTIALS:
           case BackendError.GENERAL_ERRORS.UNAUTHORIZED: {
-            inputs.email.current.setCustomValidity(error.label);
-            inputs.password.current.setCustomValidity(error.label);
+            inputs.email.current.setCustomValidity(label);
+            inputs.password.current.setCustomValidity(label);
             setValidInputs({...validInputs, email: false, password: false});
             break;
           }
           default: {
-            const isValidationError = Object.values(ValidationError.ERROR).some(errorType =>
-              error.label.endsWith(errorType),
-            );
+            const isValidationError = Object.values(ValidationError.ERROR).some(errorType => label.endsWith(errorType));
             if (!isValidationError) {
               throw error;
             }

@@ -195,7 +195,7 @@ describe('ClientRepository', () => {
       spyOn(Runtime, 'isDesktopApp').and.returnValue(true);
       const functionCall = () => testFactory.client_repository.isCurrentClientPermanent();
 
-      expect(functionCall).toThrowError(ClientError);
+      expect(functionCall).toThrow(ClientError);
     });
 
     it('returns true if current client is permanent', () => {
@@ -229,7 +229,7 @@ describe('ClientRepository', () => {
     it('throws an error if no current client', () => {
       const functionCall = () => testFactory.client_repository.isCurrentClientPermanent();
 
-      expect(functionCall).toThrowError(ClientError);
+      expect(functionCall).toThrow(ClientError);
     });
   });
 
@@ -267,21 +267,21 @@ describe('ClientRepository', () => {
     it('throws an error if current client is not set', () => {
       const functionCall = () => testFactory.client_repository['isCurrentClient']({domain: '', id: userId}, clientId);
 
-      expect(functionCall).toThrowError(ClientError);
+      expect(functionCall).toThrow(ClientError);
     });
 
     it('throws an error if client ID is not specified', () => {
       testFactory.client_repository['clientState'].currentClient(new ClientEntity(false, null));
       const functionCall = () => testFactory.client_repository['isCurrentClient']({domain: '', id: userId}, undefined);
 
-      expect(functionCall).toThrowError(ClientError);
+      expect(functionCall).toThrow(ClientError);
     });
 
     it('throws an error if user ID is not specified', () => {
       testFactory.client_repository['clientState'].currentClient(new ClientEntity(false, null));
       const functionCall = () => testFactory.client_repository['isCurrentClient'](undefined, clientId);
 
-      expect(functionCall).toThrowError(ClientError);
+      expect(functionCall).toThrow(ClientError);
     });
   });
 });

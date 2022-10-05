@@ -45,7 +45,7 @@ const providePermanentEngine = async (storeName: string, requestPersistentStorag
   } catch (error) {
     await engine.initWithDb(db, false);
   }
-  return engine;
+  return engine as CRUDEngine; // FIXME: the type of IndexedDBEngine needs fixing on the web packages side
 };
 
 const provideTemporaryAndNonPersistentEngine = async (storeName: string): Promise<CRUDEngine> => {

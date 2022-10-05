@@ -18,19 +18,10 @@
  */
 
 import ko from 'knockout';
-import TestPage from 'Util/test/TestPage';
 import {MemberMessage as MemberMessageEntity} from 'src/script/entity/message/MemberMessage';
-import MemberMessage, {MemberMessageProps} from './MemberMessage';
+import MemberMessage from './MemberMessage';
 import {User} from 'src/script/entity/User';
-
-class MemberMessagePage extends TestPage<MemberMessageProps> {
-  constructor(props?: MemberMessageProps) {
-    super(MemberMessage, props);
-  }
-
-  getMemberMessage = () => this.get('[data-uie-name="element-message-member"]');
-  getConnectedMessage = () => this.get('[data-uie-name="element-connected-message"]');
-}
+import {render} from '@testing-library/react';
 
 const createMemberMessage = (partialMemberMessage: Partial<MemberMessageEntity>) => {
   const memberMessage: Partial<MemberMessageEntity> = {
@@ -50,19 +41,21 @@ const createMemberMessage = (partialMemberMessage: Partial<MemberMessageEntity>)
 
 describe('MemberMessage', () => {
   it('shows connected message', async () => {
-    const memberMessagePage = new MemberMessagePage({
+    const props = {
       hasReadReceiptsTurnedOn: false,
       isSelfTemporaryGuest: false,
       message: createMemberMessage({
-        otherUser: ko.pureComputed(() => new User('id', null)),
+        otherUser: ko.pureComputed(() => new User('id')),
         showLargeAvatar: () => true,
       }),
       onClickCancelRequest: () => {},
       onClickInvitePeople: () => {},
       onClickParticipants: () => {},
       shouldShowInvitePeople: false,
-    });
+    };
 
-    expect(memberMessagePage.getConnectedMessage()).not.toBeNull();
+    const {queryByTestId} = render(<MemberMessage {...props} />);
+
+    expect(queryByTestId('element-connected-message')).not.toBeNull();
   });
 });

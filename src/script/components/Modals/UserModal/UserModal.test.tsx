@@ -47,7 +47,7 @@ describe('UserModal', () => {
       userRepository: {} as UserRepository,
       userState: {} as UserState,
     });
-    expect(UserModal.getWrapperElement().children[0].getAttribute('style')).toBe('display: none;');
+    expect(UserModal.getWrapperElement()?.children[0].getAttribute('style')).toBe('display: none;');
   });
 
   it('correctly fetches user from user repository', async () => {
@@ -65,7 +65,7 @@ describe('UserModal', () => {
       } as unknown as UserRepository,
       userState: {} as UserState,
     });
-    expect(getUserById).toBeCalledTimes(1);
+    expect(getUserById).toHaveBeenCalledTimes(1);
   });
 
   it('shows user not found when user is deleted', async () => {
@@ -85,7 +85,7 @@ describe('UserModal', () => {
       } as unknown as UserRepository,
       userState: {} as UserState,
     });
-    expect(getUserById).toBeCalledTimes(1);
+    expect(getUserById).toHaveBeenCalledTimes(1);
     const statusModalText = await UserModal.getStatusModalText();
     expect(statusModalText).toBeInstanceOf(HTMLDivElement);
   });

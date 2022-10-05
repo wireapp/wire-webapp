@@ -115,16 +115,14 @@
 
     .start-ui-list-tab-button {
       .button-reset-default;
+      .heading-h3;
 
       width: 100%;
       height: 100%;
 
       color: var(--main-color);
       cursor: pointer;
-      font-size: @font-size-small;
-      font-weight: @font-weight-medium;
-      line-height: 14px;
-      text-transform: uppercase;
+      line-height: @line-height-md;
     }
   }
 }
@@ -167,6 +165,7 @@ body.theme-dark {
     width: 60px;
   }
 
+  .column-center,
   .center-column {
     margin-right: 16px;
   }
@@ -189,6 +188,8 @@ body.theme-dark {
 
 .start-ui-no-contacts,
 .start-ui-no-search-results {
+  .text-light;
+  margin-top: 72px;
   margin-bottom: 16px;
   line-height: 24px;
   text-align: center;
@@ -218,31 +219,19 @@ body.theme-dark {
 }
 
 .start-ui-list-header {
-  .label-bold-xs;
-
-  display: block;
-  margin-top: 24px;
-  margin-left: 16px;
-  line-height: 24px;
-}
-
-.start-ui-list-header-connections,
-.start-ui-list-header-contacts,
-.start-ui-list-header-top-people {
+  .heading-h4;
   padding-bottom: 4px;
+  padding-left: 16px;
   border-bottom: 1px solid var(--gray-60);
   margin-top: 16px;
   margin-bottom: 0;
   color: var(--gray-70);
+  line-height: @line-height-lg;
 }
 
-body.theme-dark {
-  .start-ui-list-header-connections,
-  .start-ui-list-header-contacts,
-  .start-ui-list-header-top-people {
-    border-bottom-color: var(--gray-70);
-    color: var(--gray-50);
-  }
+body.theme-dark .start-ui-list-header {
+  border-bottom-color: var(--gray-70);
+  color: var(--gray-50);
 }
 
 .start-ui-list-header-top-people {
@@ -289,9 +278,9 @@ body.theme-dark {
   height: 24px;
   padding: 3px;
   border: 1px solid rgba(141, 152, 159, 0.16);
+  border-radius: 4px;
   margin-right: 16px;
   background-color: #fff;
-  border-radius: 4px;
   color: var(--background);
 }
 
@@ -329,9 +318,9 @@ body.theme-dark {
     .button-reset-default;
 
     padding: 4px 16px;
+    border-radius: 4px;
     margin-top: 16px;
     background-color: rgba(255, 255, 255, 0.24);
-    border-radius: 4px;
     cursor: pointer;
     font-size: 14px;
     font-weight: 600;
@@ -344,10 +333,10 @@ body.theme-dark {
 
 .start-ui-fed-wrapper {
   display: flex;
-  height: 100%;
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  margin-top: 72px;
 
   &__icon {
     opacity: 0.24;
@@ -376,8 +365,8 @@ body.theme-dark {
       display: inline-block;
       padding: 4px 16px;
       border: none;
-      background-color: rgba(186, 200, 209, 0.24);
       border-radius: 4px;
+      background-color: rgba(186, 200, 209, 0.24);
       font-size: 14px;
       font-weight: @font-weight-bold;
 

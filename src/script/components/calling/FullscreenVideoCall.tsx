@@ -26,13 +26,11 @@ import React, {useEffect, useMemo, useState} from 'react';
 import {TeamState} from '../../team/TeamState';
 import {container} from 'tsyringe';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
-import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 import type {Call} from '../../calling/Call';
 import type {Participant} from '../../calling/Participant';
 import type {Grid} from '../../calling/videoGridHandler';
 import type {Conversation} from '../../entity/Conversation';
 import {MuteState} from '../../calling/CallState';
-import useHideElement from '../../hooks/useHideElement';
 import {DeviceTypes, ElectronDesktopCapturerSource, MediaDevicesHandler} from '../../media/MediaDevicesHandler';
 import type {Multitasking} from '../../notification/NotificationRepository';
 import {t} from '../../util/LocalizerUtil';
@@ -61,23 +59,20 @@ export interface FullscreenVideoCallProps {
   isChoosingScreen: boolean;
   isMuted: boolean;
   leave: (call: Call) => void;
-  maximizedParticipant: Participant;
+  maximizedParticipant: Participant | null;
   mediaDevicesHandler: MediaDevicesHandler;
   multitasking: Multitasking;
   muteState: MuteState;
   setActiveCallViewTab: (tab: string) => void;
-  setMaximizedParticipant: (call: Call, participant: Participant) => void;
+  setMaximizedParticipant: (call: Call, participant: Participant | null) => void;
   switchCameraInput: (call: Call, deviceId: string) => void;
+  switchMicrophoneInput: (call: Call, deviceId: string) => void;
   teamState?: TeamState;
   toggleCamera: (call: Call) => void;
   toggleMute: (call: Call, muteState: boolean) => void;
   toggleScreenshare: (call: Call) => void;
   videoGrid: Grid;
 }
-
-const FullscreenVideoCallConfig = {
-  HIDE_CONTROLS_TIMEOUT: TIME_IN_MILLIS.SECOND * 4,
-};
 
 const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
   call,
@@ -92,6 +87,7 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
   maximizedParticipant,
   activeCallViewTab,
   switchCameraInput,
+  switchMicrophoneInput,
   setMaximizedParticipant,
   setActiveCallViewTab,
   toggleMute,
@@ -137,8 +133,18 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
       videoInput.map(device => (device as MediaDeviceInfo).deviceId || (device as ElectronDesktopCapturerSource).id),
     [videoInput],
   );
-  const showSwitchCamera = selfSharesCamera && availableCameras.length > 1;
-  const setWrapper = useHideElement(FullscreenVideoCallConfig.HIDE_CONTROLS_TIMEOUT, 'video-controls__button');
+  const showSwitchCamera = availableCameras.length > 1;
+
+  const {audioInput: currentMicrophoneDevice} = useKoSubscribableChildren(mediaDevicesHandler.currentDeviceId, [
+    DeviceTypes.AUDIO_INPUT,
+  ]);
+  const {audioInput} = useKoSubscribableChildren(mediaDevicesHandler.availableDevices, [DeviceTypes.AUDIO_INPUT]);
+  const availableMicrophones = useMemo(
+    () =>
+      audioInput.map(device => (device as MediaDeviceInfo).deviceId || (device as ElectronDesktopCapturerSource).id),
+    [audioInput],
+  );
+  const showSwitchMicrophone = availableMicrophones.length > 1;
 
   const [hasUnreadMessages, setHasUnreadMessages] = useState(false);
   const updateUnreadCount = (unreadCount: number) => setHasUnreadMessages(unreadCount > 0);
@@ -171,7 +177,7 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
   }, []);
 
   return (
-    <div id="video-calling" className="video-calling" ref={setWrapper}>
+    <div id="video-calling" className="video-calling">
       <div id="video-title" className="video-title">
         {classifiedDomains && (
           <ClassifiedBar
@@ -256,7 +262,7 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
               <Icon.ArrowNext css={{position: 'relative', right: 4, transform: 'rotate(180deg)'}} />
             </button>
           )}
-          <div css={{bottom: 110, display: 'flex', justifyContent: 'center', position: 'absolute', width: '100%'}}>
+          <div css={{bottom: 108, display: 'flex', justifyContent: 'center', position: 'absolute', width: '100%'}}>
             <Pagination
               totalPages={totalPages}
               currentPage={currentPage}
@@ -268,7 +274,7 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
       {!isChoosingScreen && (
         <div id="video-controls" className="video-controls">
           <ul className="video-controls__wrapper">
-            <li className="video-controls__item">
+            <li className="video-controls__item__minimize">
               <button
                 className="video-controls__button"
                 css={videoControlInActiveStyles}
@@ -310,6 +316,20 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
                   </span>
 
                   {isMuted ? <Icon.MicOff width={16} height={16} /> : <Icon.MicOn width={16} height={16} />}
+
+                  {showSwitchMicrophone && (
+                    <DeviceToggleButton
+                      styles={css`
+                        position: absolute;
+                        bottom: -38px;
+                        left: 50%;
+                        transform: translateX(-50%);
+                      `}
+                      currentDevice={currentMicrophoneDevice}
+                      devices={availableMicrophones}
+                      onChooseDevice={deviceId => switchMicrophoneInput(call, deviceId)}
+                    />
+                  )}
                 </button>
               </li>
 
@@ -333,11 +353,15 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
                       <Icon.CameraOff width={16} height={16} />
                     )}
 
-                    {showSwitchCamera ? (
+                    <span id="video-label" className="video-controls__button__label">
+                      {t('videoCallOverlayCamera')}
+                    </span>
+
+                    {showSwitchCamera && (
                       <DeviceToggleButton
                         styles={css`
                           position: absolute;
-                          bottom: -16px;
+                          bottom: -38px;
                           left: 50%;
                           transform: translateX(-50%);
                         `}
@@ -345,10 +369,6 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
                         devices={availableCameras}
                         onChooseDevice={deviceId => switchCameraInput(call, deviceId)}
                       />
-                    ) : (
-                      <span id="video-label" className="video-controls__button__label">
-                        {t('videoCallOverlayCamera')}
-                      </span>
                     )}
                   </div>
                 </li>
@@ -398,7 +418,7 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
                 </button>
               </li>
             </div>
-            <div css={{display: 'flex', minWidth: '76px'}}>
+            <div css={{display: 'flex', justifyContent: 'flex-end', minWidth: '157px'}}>
               {participants.length > 2 && (
                 <ButtonGroup
                   items={Object.values(CallViewTabs)}

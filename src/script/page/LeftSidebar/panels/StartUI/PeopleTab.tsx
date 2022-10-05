@@ -234,37 +234,6 @@ export const PeopleTab: React.FC<{
         </div>
       )}
 
-      {!hasFederationError && !hasResults && (
-        <>
-          {!canSearchUnconnectedUsers ? (
-            <div className="start-ui-no-search-results__content">
-              <span className="start-ui-no-search-results__icon">
-                <Icon.Message />
-              </span>
-              <div className="start-ui-no-search-results__text" data-uie-name="label-no-search-result">
-                {t('searchNoMatchesPartner')}
-              </div>
-            </div>
-          ) : isFederated ? (
-            <div className="start-ui-fed-wrapper">
-              <span className="start-ui-fed-wrapper__icon">
-                <Icon.Profile />
-              </span>
-              <div className="start-ui-fed-wrapper__text">{t('searchTrySearchFederation')}</div>
-              <div className="start-ui-fed-wrapper__button">
-                {/*@todo: re-enable when federation article is available
-                <button type="button" data-bind="click: () => {}" data-uie-name="do-search-learn-more">
-                  {t('searchTrySearchLearnMore')}
-                </button>
-          */}
-              </div>
-            </div>
-          ) : (
-            <div className="start-ui-no-search-results">{t('searchTrySearch')}</div>
-          )}
-        </>
-      )}
-
       {searchQuery.length === 0 && (
         <>
           <ul className="start-ui-list left-list-items">
@@ -277,7 +246,7 @@ export const PeopleTab: React.FC<{
                   data-uie-name="do-invite-member"
                 >
                   <span className="left-column-icon icon-envelope"></span>
-                  <span className="center-column">{t('searchMemberInvite')}</span>
+                  <span className="column-center">{t('searchMemberInvite')}</span>
                 </button>
               </li>
             )}
@@ -292,7 +261,7 @@ export const PeopleTab: React.FC<{
                   <span className="left-column-icon">
                     <Icon.Group />
                   </span>
-                  <span className="center-column">{t('searchCreateGroup')}</span>
+                  <span className="column-center">{t('searchCreateGroup')}</span>
                 </button>
               </li>
             )}
@@ -311,7 +280,7 @@ export const PeopleTab: React.FC<{
                   <span className="left-column-icon">
                     <Icon.Guest />
                   </span>
-                  <span className="center-column">{t('searchCreateGuestRoom')}</span>
+                  <span className="column-center">{t('searchCreateGuestRoom')}</span>
                 </button>
               </li>
             )}
@@ -325,6 +294,36 @@ export const PeopleTab: React.FC<{
                 </div>
               </div>
             </div>
+          )}
+        </>
+      )}
+      {!hasFederationError && !hasResults && (
+        <>
+          {!canSearchUnconnectedUsers ? (
+            <div className="start-ui-no-search-results__content">
+              <span className="start-ui-no-search-results__icon">
+                <Icon.Message />
+              </span>
+              <p className="start-ui-no-search-results__text" data-uie-name="label-no-search-result">
+                {t('searchNoMatchesPartner')}
+              </p>
+            </div>
+          ) : isFederated ? (
+            <div className="start-ui-fed-wrapper">
+              <span className="start-ui-fed-wrapper__icon">
+                <Icon.Profile />
+              </span>
+              <div className="start-ui-fed-wrapper__text">{t('searchTrySearchFederation')}</div>
+              <div className="start-ui-fed-wrapper__button">
+                {/*@todo: re-enable when federation article is available
+                <button type="button" data-bind="click: () => {}" data-uie-name="do-search-learn-more">
+                  {t('searchTrySearchLearnMore')}
+                </button>
+          */}
+              </div>
+            </div>
+          ) : (
+            <p className="start-ui-no-search-results">{t('searchTrySearch')}</p>
           )}
         </>
       )}

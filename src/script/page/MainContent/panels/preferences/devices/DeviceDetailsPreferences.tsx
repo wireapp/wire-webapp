@@ -24,6 +24,7 @@ import {t} from 'Util/LocalizerUtil';
 import DetailedDevice from './components/DetailedDevice';
 import {MotionDuration} from '../../../../../motion/MotionDuration';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
+import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
 
 interface DevicesPreferencesProps {
   device: ClientEntity;
@@ -79,8 +80,8 @@ const DeviceDetailsPreferences: React.FC<DevicesPreferencesProps> = ({
               className="preferences-devices-icon icon-back"
               onClick={onClose}
               data-uie-name="go-back"
+              aria-label={t('accessibility.preferencesDeviceDetails.goBack')}
             />
-            <span>{t('preferencesDevices')}</span>
           </legend>
           <DetailedDevice device={device} fingerprint={fingerprint} />
 
@@ -100,7 +101,7 @@ const DeviceDetailsPreferences: React.FC<DevicesPreferencesProps> = ({
             </label>
           </div>
 
-          <div className="preferences-detail">{t('preferencesDevicesFingerprintDetail', brandName)}</div>
+          <p className="preferences-detail">{t('preferencesDevicesFingerprintDetail', brandName)}</p>
         </fieldset>
 
         <section className="preferences-section">
@@ -110,40 +111,42 @@ const DeviceDetailsPreferences: React.FC<DevicesPreferencesProps> = ({
         </section>
 
         <section className="preferences-section">
-          <div className="preferences-info">{t('preferencesDevicesSessionDetail')}</div>
+          <p className="preferences-info">{t('preferencesDevicesSessionDetail')}</p>
           <div className="preferences-devices-session" data-uie-name="preferences-device-details-session">
             {resetState === SessionResetState.RESET && (
-              <button
+              <Button
+                variant={ButtonVariant.TERTIARY}
                 type="button"
-                className="preferences-button button button-small button-fluid"
+                className="preferences-button"
                 onClick={resetSession}
                 data-uie-name="do-session-reset"
               >
                 {t('preferencesDevicesSessionReset')}
-              </button>
+              </Button>
             )}
             {resetState === SessionResetState.ONGOING && (
-              <div className="preferences-devices-session-reset">{t('preferencesDevicesSessionOngoing')}</div>
+              <p className="preferences-devices-session-reset">{t('preferencesDevicesSessionOngoing')}</p>
             )}
             {resetState === SessionResetState.CONFIRMATION && (
-              <div className="preferences-devices-session-confirmation accent-text">
+              <p className="preferences-devices-session-confirmation accent-text">
                 {t('preferencesDevicesSessionConfirmation')}
-              </div>
+              </p>
             )}
           </div>
         </section>
 
         {!device.isLegalHold() && (
           <section className="preferences-section">
-            <div className="preferences-info">{t('preferencesDevicesRemoveDetail')}</div>
-            <button
+            <p className="preferences-info">{t('preferencesDevicesRemoveDetail')}</p>
+            <Button
+              variant={ButtonVariant.TERTIARY}
               type="button"
-              className="preferences-button button button-small button-fluid"
+              className="preferences-button"
               onClick={() => onRemove(device)}
               data-uie-name="go-remove-device"
             >
               {t('preferencesDevicesRemove')}
-            </button>
+            </Button>
           </section>
         )}
       </div>

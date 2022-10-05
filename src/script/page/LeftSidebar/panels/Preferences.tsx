@@ -17,15 +17,18 @@
  *
  */
 
+import {Runtime} from '@wireapp/commons';
 import React, {useEffect} from 'react';
+
+import Icon from 'Components/Icon';
+
+import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 
-import {Runtime} from '@wireapp/commons';
-import Icon from 'Components/Icon';
-import {useKoSubscribableChildren} from 'Util/ComponentUtil';
-import {ContentViewModel} from '../../../view_model/ContentViewModel';
 import ListWrapper from './ListWrapper';
+
 import {TeamRepository} from '../../../team/TeamRepository';
+import {ContentState, ContentViewModel} from '../../../view_model/ContentViewModel';
 
 type PreferencesProps = {
   contentViewModel: ContentViewModel;
@@ -51,7 +54,7 @@ const PreferenceItem: React.FC<{
         <span className="left-column-icon">
           <IconComponent />
         </span>
-        <span className="center-column">{label}</span>
+        <span className="column-center">{label}</span>
       </button>
     </li>
   );
@@ -71,33 +74,33 @@ const Preferences: React.FC<PreferencesProps> = ({contentViewModel, teamReposito
   const items = [
     {
       IconComponent: Icon.Profile,
-      id: ContentViewModel.STATE.PREFERENCES_ACCOUNT,
+      id: ContentState.PREFERENCES_ACCOUNT,
       label: t('preferencesAccount'),
       uieName: 'go-account',
     },
     {
       IconComponent: Icon.Devices,
-      id: ContentViewModel.STATE.PREFERENCES_DEVICES,
+      id: ContentState.PREFERENCES_DEVICES,
       label: t('preferencesDevices'),
       uieName: 'go-devices',
     },
     {
       IconComponent: Icon.Options,
-      id: ContentViewModel.STATE.PREFERENCES_OPTIONS,
+      id: ContentState.PREFERENCES_OPTIONS,
       label: t('preferencesOptions'),
       uieName: 'go-options',
     },
     {
       IconComponent: Icon.Av,
       hidden: !supportsCalling,
-      id: ContentViewModel.STATE.PREFERENCES_AV,
+      id: ContentState.PREFERENCES_AV,
       label: t('preferencesAV'),
       uieName: 'go-audio-video',
     },
     {
       IconComponent: Icon.About,
       hidden: isDesktop,
-      id: ContentViewModel.STATE.PREFERENCES_ABOUT,
+      id: ContentState.PREFERENCES_ABOUT,
       label: t('preferencesAbout'),
       uieName: 'go-about',
     },

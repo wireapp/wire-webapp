@@ -53,6 +53,7 @@ export class Core extends Account<Uint8Array> {
              * We then give those crypto primitives to the core that will use them when encrypting MLS secrets.
              * When in an browser context, then this secretsCrypto will be undefined and the core will then use it's internal encryption system
              */
+            keyingMaterialUpdateThreshold: Config.getConfig().FEATURE.MLS_CONFIG_KEYING_MATERIAL_UPDATE_THRESHOLD,
             secretsCrypto: window.secretsCrypto,
           }
         : undefined,

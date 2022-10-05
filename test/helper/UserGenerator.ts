@@ -17,7 +17,7 @@
  *
  */
 
-import faker from '@faker-js/faker';
+import {faker} from '@faker-js/faker';
 import type {User as APIClientUser} from '@wireapp/api-client/src/user/';
 import {UserAssetType} from '@wireapp/api-client/src/user/';
 
@@ -44,7 +44,7 @@ export class UserGenerator {
       ],
       handle: faker.internet.userName(),
       id: createRandomUuid(),
-      name: faker.name.findName(),
+      name: faker.name.fullName(),
     };
 
     return new UserMapper(serverTimeHandler).mapUserFromJson(template);

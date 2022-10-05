@@ -34,6 +34,8 @@ import {StorageKey} from '../../storage';
 import emojiBindings from './emoji.json';
 import inlineReplacements from './inlineReplacements';
 import EmojiItem from './EmojiItem';
+import {MentionEntity} from '../../message/MentionEntity';
+import {updateMentionRanges} from 'Util/MentionUtil';
 
 const escapeRegexp = (string: string): string => string.replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&');
 
@@ -83,6 +85,8 @@ const useEmoji = (
   propertiesRepository: PropertiesRepository,
   updateText: (text: string) => void,
   onSend: (text: string) => void,
+  currentMentions: MentionEntity[],
+  setCurrentMentions: (mentions: MentionEntity[]) => void,
   textareaElement?: HTMLTextAreaElement | null,
 ) => {
   const emojiWrapperRef = useRef<HTMLDivElement>(null);
@@ -118,15 +122,20 @@ const useEmoji = (
     emojiIcon: string,
     inlineEmojiStartPosition = emojiStartPosition,
   ) => {
-    const {selectionStart: selection, value: text} = input;
+    const {selectionStart: selection, selectionEnd: end, value: text} = input;
 
-    if (selection) {
+    if (selection && end) {
       const textBeforeEmoji = text.substring(0, inlineEmojiStartPosition - 1);
       const textAfterEmoji = text.slice(selection);
-      const updatedText = `${textBeforeEmoji}${emojiIcon}${textAfterEmoji}`;
-      const newCursorPosition = updatedText.length;
+      const textWithEmoji = `${textBeforeEmoji}${emojiIcon}`;
+      const updatedText = `${textWithEmoji}${textAfterEmoji}`;
+      const newCursorPosition = textWithEmoji.length;
 
       updateText(updatedText);
+
+      const difference = updatedText.length - text.length;
+      const updatedMentions = updateMentionRanges(currentMentions, selection, end, difference);
+      setCurrentMentions(updatedMentions);
 
       removeEmojiPopup();
 
@@ -188,10 +197,6 @@ const useEmoji = (
   };
 
   const replaceAllInlineEmoji = (input: HTMLInputElement | HTMLTextAreaElement, shiftKeyPressed = false) => {
-    if (!shouldReplaceEmoji) {
-      return;
-    }
-
     const {selectionStart: selection, value: text} = input;
 
     if (selection) {
@@ -286,7 +291,7 @@ const useEmoji = (
       return;
     }
 
-    const input = keyboardEvent.target;
+    const input = keyboardEvent.currentTarget;
     const {selectionStart: selection, value: text} = input;
 
     if (text) {
@@ -367,6 +372,10 @@ const useEmoji = (
         default:
           break;
       }
+    }
+
+    if (!shouldReplaceEmoji) {
+      return false;
     }
 
     if (isEnterKey(keyboardEvent)) {

@@ -23,6 +23,7 @@ import MessageTimerButton from '../MessageTimerButton';
 import {t} from 'Util/LocalizerUtil';
 import {Conversation} from 'src/script/entity/Conversation';
 import {Config} from '../../../Config';
+import GiphyButton from './GiphyButton';
 
 export type ControlButtonsProps = {
   input: string;
@@ -30,28 +31,28 @@ export type ControlButtonsProps = {
   disablePing?: boolean;
   disableFilesharing?: boolean;
   isEditing?: boolean;
+  isScaledDown?: boolean;
+  showGiphyButton?: boolean;
   onClickPing: () => void;
   onSelectFiles: (files: File[]) => void;
   onSelectImages: (files: File[]) => void;
   onCancelEditing: () => void;
-  onClickGif: () => void;
-};
-
-const config = {
-  GIPHY_TEXT_LENGTH: 256,
+  onGifClick: () => void;
 };
 
 const ControlButtons: React.FC<ControlButtonsProps> = ({
-  input,
   conversation,
   disablePing,
   disableFilesharing,
+  input,
   isEditing,
+  isScaledDown,
+  showGiphyButton,
   onClickPing,
   onSelectFiles,
   onSelectImages,
   onCancelEditing,
-  onClickGif,
+  onGifClick,
 }) => {
   const acceptedImageTypes = Config.getConfig().ALLOWED_IMAGE_TYPES.join(',');
   const acceptedFileTypes = Config.getConfig().FEATURE.ALLOWED_FILE_UPLOAD_EXTENSIONS.join(',');
@@ -69,6 +70,7 @@ const ControlButtons: React.FC<ControlButtonsProps> = ({
           className="controls-right-button button-icon-large"
           onClick={onCancelEditing}
           data-uie-name="do-cancel-edit"
+          aria-label={t('accessibility.cancelMsgEdit')}
         >
           <Icon.Close />
         </button>
@@ -76,14 +78,16 @@ const ControlButtons: React.FC<ControlButtonsProps> = ({
     );
   }
 
-  if (input.length === 0) {
+  if (input.length === 0 || isScaledDown) {
+    const scaledDownClass = isScaledDown && 'controls-right-button_responsive';
+
     return (
       <>
         {!disableFilesharing && (
           <>
             <li>
               <button
-                className="controls-right-button buttons-group-button-left"
+                className={`controls-right-button buttons-group-button-left ${scaledDownClass}`}
                 type="button"
                 onClick={onClickPing}
                 disabled={disablePing}
@@ -100,7 +104,7 @@ const ControlButtons: React.FC<ControlButtonsProps> = ({
                 type="button"
                 aria-label={t('tooltipConversationAddImage')}
                 title={t('tooltipConversationAddImage')}
-                className="conversation-button controls-right-button no-radius file-button"
+                className={`conversation-button controls-right-button no-radius file-button`}
                 onClick={() => imageRef.current?.click()}
                 data-uie-name="do-share-image"
               >
@@ -122,7 +126,7 @@ const ControlButtons: React.FC<ControlButtonsProps> = ({
                 type="button"
                 aria-label={t('tooltipConversationFile')}
                 title={t('tooltipConversationFile')}
-                className="conversation-button controls-right-button no-radius file-button"
+                className={`conversation-button controls-right-button no-radius file-button`}
                 onClick={() => fileRef.current?.click()}
                 data-uie-name="do-share-file"
               >
@@ -148,26 +152,7 @@ const ControlButtons: React.FC<ControlButtonsProps> = ({
     );
   }
 
-  const showGiphyButton = input.length <= config.GIPHY_TEXT_LENGTH;
-
-  return (
-    <>
-      {showGiphyButton && !disableFilesharing && (
-        <li>
-          <button
-            type="button"
-            className="controls-right-button button-icon-large"
-            title={t('extensionsBubbleButtonGif')}
-            aria-label={t('extensionsBubbleButtonGif')}
-            onClick={onClickGif}
-            data-uie-name="do-giphy-popover"
-          >
-            <Icon.Gif />
-          </button>
-        </li>
-      )}
-    </>
-  );
+  return <>{showGiphyButton && !disableFilesharing && <GiphyButton onGifClick={onGifClick} />}</>;
 };
 
 export default ControlButtons;

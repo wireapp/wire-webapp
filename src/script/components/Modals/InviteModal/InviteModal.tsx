@@ -27,7 +27,7 @@ import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import Icon from 'Components/Icon';
 import {Config} from '../../../Config';
 import {UserState} from '../../../user/UserState';
-import renderModal from 'Util/renderModal';
+import renderElement from 'Util/renderElement';
 
 export interface InviteModalProps {
   readonly userState: UserState;
@@ -93,4 +93,4 @@ const InviteModalComponent: React.FC<InviteModalProps> = ({userState, onClose}) 
 
 export default InviteModalComponent;
 
-export const showInviteModal = renderModal<InviteModalProps>(InviteModalComponent);
+export const showInviteModal = renderElement<InviteModalProps>(InviteModalComponent);
