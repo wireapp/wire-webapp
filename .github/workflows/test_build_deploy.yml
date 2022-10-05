@@ -67,7 +67,7 @@ jobs:
         uses: andymckay/cancel-action@0.2
 
       - name: Yarn cache
-        uses: c-hive/gha-yarn-cache@v2
+        uses: c-hive/gha-yarn-cache@v2.1.0
 
       - name: Authenticate git clone
         env:
