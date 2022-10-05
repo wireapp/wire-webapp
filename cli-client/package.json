@@ -35,6 +35,6 @@
     "test:project": "yarn dist && yarn test",
     "test:node": "exit 0"
   },
-  "version": "11.2.17",
+  "version": "11.2.18",
   "gitHead": "5339f01fe01ef0871da8c8bc8662fbe9e604754a"
 }
