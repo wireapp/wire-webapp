@@ -43,7 +43,7 @@ import {TeamState} from '../../team/TeamState';
 import {Shortcut} from '../../ui/Shortcut';
 import {ShortcutType} from '../../ui/ShortcutType';
 import {CallActions} from '../../view_model/CallingViewModel';
-import {ContentViewModel} from '../../view_model/ContentViewModel';
+import {ContentState} from '../../view_model/ContentViewModel';
 import {MainViewModel, ViewModelRepositories} from '../../view_model/MainViewModel';
 import {LegalHoldModalViewModel} from '../../view_model/content/LegalHoldModalViewModel';
 
@@ -194,7 +194,7 @@ const TitleBar: React.FC<TitleBarProps> = ({
   }, [isActivatedAccount, showAddParticipant, showDetails]);
 
   const onClickCollectionButton = () => {
-    amplify.publish(WebAppEvents.CONTENT.SWITCH, ContentViewModel.STATE.COLLECTION);
+    amplify.publish(WebAppEvents.CONTENT.SWITCH, ContentState.COLLECTION);
   };
 
   const onClickDetails = () => showDetails(false);

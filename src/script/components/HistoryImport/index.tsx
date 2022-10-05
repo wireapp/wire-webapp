@@ -34,7 +34,7 @@ import {Config} from '../../Config';
 import {BackupRepository} from '../../backup/BackupRepository';
 import {CancelError, DifferentAccountError, ImportError, IncompatibleBackupError} from '../../backup/Error';
 import {MotionDuration} from '../../motion/MotionDuration';
-import {ContentViewModel} from '../../view_model/ContentViewModel';
+import {ContentState} from '../../view_model/ContentViewModel';
 import renderElement from 'Util/renderElement';
 
 export enum HistoryImportState {
@@ -81,7 +81,7 @@ const HistoryImport: FC<HistoryImportProps> = ({backupRepository, file, onClose}
   const onCancel = () => backupRepository.cancelAction();
   const dismissImport = () => {
     onClose?.();
-    amplify.publish(WebAppEvents.CONTENT.SWITCH, ContentViewModel.STATE.PREFERENCES_ACCOUNT);
+    amplify.publish(WebAppEvents.CONTENT.SWITCH, ContentState.PREFERENCES_ACCOUNT);
   };
 
   const onInit = (numberOfRecords: number) => {

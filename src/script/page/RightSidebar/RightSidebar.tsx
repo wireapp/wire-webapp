@@ -50,7 +50,7 @@ import {isServiceEntity} from '../../guards/Service';
 import {ServiceEntity} from '../../integration/ServiceEntity';
 import {UserState} from '../../user/UserState';
 import {TeamState} from '../../team/TeamState';
-import {ContentViewModel} from '../../view_model/ContentViewModel';
+import {ContentState} from '../../view_model/ContentViewModel';
 import {MainViewModel, ViewModelRepositories} from '../../view_model/MainViewModel';
 
 export const OPEN_CONVERSATION_DETAILS = 'OPEN_CONVERSATION_DETAILS';
@@ -157,7 +157,7 @@ const RightSidebar: FC<RightSidebarProps> = ({
   };
 
   const switchContent = (newContentState: string) => {
-    const isCollectionState = newContentState === ContentViewModel.STATE.COLLECTION;
+    const isCollectionState = newContentState === ContentState.COLLECTION;
 
     if (isCollectionState && currentState) {
       closePanel();

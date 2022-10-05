@@ -125,21 +125,21 @@ export class ListViewModel {
       const isStatePreferences = this.state() === ListViewModel.STATE.PREFERENCES;
       if (isStatePreferences) {
         const preferenceItems = [
-          ContentViewModel.STATE.PREFERENCES_ACCOUNT,
-          ContentViewModel.STATE.PREFERENCES_DEVICES,
-          ContentViewModel.STATE.PREFERENCES_OPTIONS,
-          ContentViewModel.STATE.PREFERENCES_AV,
+          ContentState.PREFERENCES_ACCOUNT,
+          ContentState.PREFERENCES_DEVICES,
+          ContentState.PREFERENCES_OPTIONS,
+          ContentState.PREFERENCES_AV,
         ];
 
         if (!Runtime.isDesktopApp()) {
-          preferenceItems.push(ContentViewModel.STATE.PREFERENCES_ABOUT);
+          preferenceItems.push(ContentState.PREFERENCES_ABOUT);
         }
 
         return preferenceItems;
       }
 
       const hasConnectRequests = !!this.userState.connectRequests().length;
-      const states: (string | Conversation)[] = hasConnectRequests ? [ContentViewModel.STATE.CONNECTION_REQUESTS] : [];
+      const states: (string | Conversation)[] = hasConnectRequests ? [ContentState.CONNECTION_REQUESTS] : [];
       return states.concat(this.conversationState.conversations_unarchived());
     });
 
@@ -219,16 +219,16 @@ export class ListViewModel {
   };
 
   private readonly iterateActiveConversation = (reverse: boolean) => {
-    const isStateRequests = this.contentViewModel.state() === ContentViewModel.STATE.CONNECTION_REQUESTS;
+    const isStateRequests = this.contentViewModel.state() === ContentState.CONNECTION_REQUESTS;
     const activeConversationItem = isStateRequests
-      ? ContentViewModel.STATE.CONNECTION_REQUESTS
+      ? ContentState.CONNECTION_REQUESTS
       : this.conversationState.activeConversation();
 
     const nextItem = iterateItem(this.visibleListItems(), activeConversationItem, reverse);
 
-    const isConnectionRequestItem = nextItem === ContentViewModel.STATE.CONNECTION_REQUESTS;
+    const isConnectionRequestItem = nextItem === ContentState.CONNECTION_REQUESTS;
     if (isConnectionRequestItem) {
-      return this.contentViewModel.switchContent(ContentViewModel.STATE.CONNECTION_REQUESTS);
+      return this.contentViewModel.switchContent(ContentState.CONNECTION_REQUESTS);
     }
 
     if (nextItem) {
@@ -239,9 +239,9 @@ export class ListViewModel {
   private readonly iterateActivePreference = (reverse: boolean) => {
     let activePreference = this.contentViewModel.state();
 
-    const isDeviceDetails = activePreference === ContentViewModel.STATE.PREFERENCES_DEVICE_DETAILS;
+    const isDeviceDetails = activePreference === ContentState.PREFERENCES_DEVICE_DETAILS;
     if (isDeviceDetails) {
-      activePreference = ContentViewModel.STATE.PREFERENCES_DEVICES;
+      activePreference = ContentState.PREFERENCES_DEVICES;
     }
 
     const nextPreference = iterateItem(this.visibleListItems(), activePreference, reverse) as ContentState;
@@ -254,27 +254,27 @@ export class ListViewModel {
     await this.teamRepository.getTeam();
 
     this.switchList(ListViewModel.STATE.PREFERENCES);
-    this.contentViewModel.switchContent(ContentViewModel.STATE.PREFERENCES_ACCOUNT);
+    this.contentViewModel.switchContent(ContentState.PREFERENCES_ACCOUNT);
   };
 
   readonly openPreferencesDevices = (): void => {
     this.switchList(ListViewModel.STATE.PREFERENCES);
-    return this.contentViewModel.switchContent(ContentViewModel.STATE.PREFERENCES_DEVICES);
+    return this.contentViewModel.switchContent(ContentState.PREFERENCES_DEVICES);
   };
 
   readonly openPreferencesAbout = (): void => {
     this.switchList(ListViewModel.STATE.PREFERENCES);
-    return this.contentViewModel.switchContent(ContentViewModel.STATE.PREFERENCES_ABOUT);
+    return this.contentViewModel.switchContent(ContentState.PREFERENCES_ABOUT);
   };
 
   readonly openPreferencesAudioVideo = (): void => {
     this.switchList(ListViewModel.STATE.PREFERENCES);
-    return this.contentViewModel.switchContent(ContentViewModel.STATE.PREFERENCES_AV);
+    return this.contentViewModel.switchContent(ContentState.PREFERENCES_AV);
   };
 
   readonly openPreferencesOptions = (): void => {
     this.switchList(ListViewModel.STATE.PREFERENCES);
-    return this.contentViewModel.switchContent(ContentViewModel.STATE.PREFERENCES_OPTIONS);
+    return this.contentViewModel.switchContent(ContentState.PREFERENCES_OPTIONS);
   };
 
   readonly openStartUI = (): void => {
@@ -311,7 +311,7 @@ export class ListViewModel {
   private readonly updateList = (newListState: string, respectLastState: boolean): void => {
     switch (newListState) {
       case ListViewModel.STATE.PREFERENCES:
-        amplify.publish(WebAppEvents.CONTENT.SWITCH, ContentViewModel.STATE.PREFERENCES_ACCOUNT);
+        amplify.publish(WebAppEvents.CONTENT.SWITCH, ContentState.PREFERENCES_ACCOUNT);
         break;
       default:
         if (respectLastState) {

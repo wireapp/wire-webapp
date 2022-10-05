@@ -38,7 +38,7 @@ import {Conversation} from '../../entity/Conversation';
 import {LegalHoldModalViewModel} from '../../view_model/content/LegalHoldModalViewModel';
 import {ConversationVerificationState} from '../../conversation/ConversationVerificationState';
 import {User} from '../../entity/User';
-import {ContentViewModel} from '../../view_model/ContentViewModel';
+import {ContentState} from '../../view_model/ContentViewModel';
 import {MainViewModel, ViewModelRepositories} from '../../view_model/MainViewModel';
 import {PanelState} from '../../page/RightSidebar/RightSidebar';
 
@@ -120,7 +120,7 @@ describe('TitleBar', () => {
 
     spyOn(amplify, 'publish').and.returnValue(undefined);
     fireEvent.click(searchButton);
-    expect(amplify.publish).toHaveBeenCalledWith(WebAppEvents.CONTENT.SWITCH, ContentViewModel.STATE.COLLECTION);
+    expect(amplify.publish).toHaveBeenCalledWith(WebAppEvents.CONTENT.SWITCH, ContentState.COLLECTION);
   });
 
   it('opens conversation details on conversation name click', async () => {

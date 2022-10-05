@@ -71,18 +71,18 @@ const MainContent: FC<MainContentProps> = ({
   const teamState = container.resolve(TeamState);
   const userState = container.resolve(UserState);
 
-  const statesTitle = {
-    [ContentViewModel.STATE.CONNECTION_REQUESTS]: t('accessibility.headings.connectionRequests'),
-    [ContentViewModel.STATE.CONVERSATION]: t('accessibility.headings.conversation'),
-    [ContentViewModel.STATE.HISTORY_EXPORT]: t('accessibility.headings.historyExport'),
-    [ContentViewModel.STATE.HISTORY_IMPORT]: t('accessibility.headings.historyImport'),
-    [ContentViewModel.STATE.COLLECTION]: t('accessibility.headings.collection'),
-    [ContentViewModel.STATE.PREFERENCES_ABOUT]: t('accessibility.headings.preferencesAbout'),
-    [ContentViewModel.STATE.PREFERENCES_ACCOUNT]: t('accessibility.headings.preferencesAccount'),
-    [ContentViewModel.STATE.PREFERENCES_AV]: t('accessibility.headings.preferencesAV'),
-    [ContentViewModel.STATE.PREFERENCES_DEVICES]: t('accessibility.headings.preferencesDevices'),
-    [ContentViewModel.STATE.PREFERENCES_OPTIONS]: t('accessibility.headings.preferencesOptions'),
-    [ContentViewModel.STATE.WATERMARK]: t('accessibility.headings.noConversation'),
+  const statesTitle: Partial<Record<ContentState, string>> = {
+    [ContentState.CONNECTION_REQUESTS]: t('accessibility.headings.connectionRequests'),
+    [ContentState.CONVERSATION]: t('accessibility.headings.conversation'),
+    [ContentState.HISTORY_EXPORT]: t('accessibility.headings.historyExport'),
+    [ContentState.HISTORY_IMPORT]: t('accessibility.headings.historyImport'),
+    [ContentState.COLLECTION]: t('accessibility.headings.collection'),
+    [ContentState.PREFERENCES_ABOUT]: t('accessibility.headings.preferencesAbout'),
+    [ContentState.PREFERENCES_ACCOUNT]: t('accessibility.headings.preferencesAccount'),
+    [ContentState.PREFERENCES_AV]: t('accessibility.headings.preferencesAV'),
+    [ContentState.PREFERENCES_DEVICES]: t('accessibility.headings.preferencesDevices'),
+    [ContentState.PREFERENCES_OPTIONS]: t('accessibility.headings.preferencesOptions'),
+    [ContentState.WATERMARK]: t('accessibility.headings.noConversation'),
   };
 
   const title = statesTitle[state];

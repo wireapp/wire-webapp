@@ -32,7 +32,7 @@ import {downloadBlob} from 'Util/util';
 import {CancelError} from '../../backup/Error';
 import {UserState} from '../../user/UserState';
 import {RootContext} from '../../page/RootProvider';
-import {ContentViewModel} from '../../view_model/ContentViewModel';
+import {ContentState} from '../../view_model/ContentViewModel';
 import {Config} from '../../Config';
 
 enum ExportState {
@@ -96,7 +96,7 @@ const HistoryExport: FC<HistoryExportProps> = ({userState = container.resolve(Us
   const loadingMessage = historyMessages?.[historyState] || '';
 
   const dismissExport = () => {
-    amplify.publish(WebAppEvents.CONTENT.SWITCH, ContentViewModel.STATE.PREFERENCES_ACCOUNT);
+    amplify.publish(WebAppEvents.CONTENT.SWITCH, ContentState.PREFERENCES_ACCOUNT);
   };
 
   const onProgress = (processedNumber: number) => {
