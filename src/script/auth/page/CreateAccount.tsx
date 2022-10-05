@@ -21,7 +21,7 @@ import {ArrowIcon, COLOR, Column, Columns, Container, ContainerXS, H1, IsMobile}
 import React from 'react';
 import {useIntl} from 'react-intl';
 import {Config} from '../../../script/Config';
-import useReactRouter from 'use-react-router';
+import {useNavigate} from 'react-router-dom';
 import {createAccountStrings} from '../../strings';
 import AccountForm from '../component/AccountForm';
 import RouterLink from '../component/RouterLink';
@@ -32,7 +32,7 @@ interface Props extends React.HTMLProps<HTMLDivElement> {}
 
 const CreateAccount = ({}: Props) => {
   const {formatMessage: _} = useIntl();
-  const {history} = useReactRouter();
+  const navigate = useNavigate();
   const backArrow = (
     <RouterLink to={ROUTE.CREATE_TEAM} data-uie-name="go-register-team">
       <ArrowIcon direction="left" color={COLOR.TEXT} style={{opacity: 0.56}} />
@@ -60,9 +60,9 @@ const CreateAccount = ({}: Props) => {
               <AccountForm
                 onSubmit={() => {
                   if (Config.getConfig().FEATURE.ENABLE_EXTRA_CLIENT_ENTROPY) {
-                    history.push(ROUTE.SET_ENTROPY);
+                    navigate(ROUTE.SET_ENTROPY);
                   } else {
-                    history.push(ROUTE.VERIFY_EMAIL_CODE);
+                    navigate(ROUTE.VERIFY_EMAIL_CODE);
                   }
                 }}
                 submitText={_(createAccountStrings.submitButton)}

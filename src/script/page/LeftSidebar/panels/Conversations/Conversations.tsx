@@ -45,6 +45,8 @@ import {PreferenceNotificationRepository} from '../../../../notification/Prefere
 import {useFolderState} from './state';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import {amplify} from 'amplify';
+import useRoveFocus from '../../../../hooks/useRoveFocus';
+import {isTabKey} from 'Util/KeyboardUtil';
 import {useMLSConversationState} from '../../../../mls/mlsConversationState';
 
 type ConversationsProps = {
@@ -105,6 +107,7 @@ const Conversations: React.FC<ConversationsProps> = ({
   const isFolderOpen = useFolderState(state => state.isOpen);
 
   const {conversationLabelRepository} = conversationRepository;
+  const [isConversationListFocus, focusConversationList] = useState(false);
 
   useEffect(() => {
     if (!activeConversation) {
@@ -155,6 +158,10 @@ const Conversations: React.FC<ConversationsProps> = ({
             type="button"
             className="left-list-header-availability"
             onClick={event => AvailabilityContextMenu.show(event.nativeEvent, 'left-list-availability-menu')}
+            onBlur={event => {
+              // on blur conversation list should get the focus
+              focusConversationList(true);
+            }}
           >
             <AvailabilityState
               className="availability-state"
@@ -174,7 +181,18 @@ const Conversations: React.FC<ConversationsProps> = ({
           )}
         </>
       ) : (
-        <span className="left-list-header-text" data-uie-name="status-name">
+        <span
+          className="left-list-header-text"
+          data-uie-name="status-name"
+          role="presentation"
+          // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex
+          tabIndex={0}
+          onBlur={event => {
+            // personal user won't see availability status menu, on blur of the user name
+            // conversation list should get the focus
+            focusConversationList(true);
+          }}
+        >
           {userName}
         </span>
       )}
@@ -191,6 +209,12 @@ const Conversations: React.FC<ConversationsProps> = ({
               type="button"
               className="conversations-footer-btn"
               onClick={() => switchList(ListState.START_UI)}
+              onKeyDown={event => {
+                //shift+tab from contacts tab should focus on the first conversation
+                if (event.shiftKey && isTabKey(event)) {
+                  focusConversationList(true);
+                }
+              }}
               title={t('tooltipConversationsStart', Shortcut.getShortcutTooltip(ShortcutType.START))}
               data-uie-name="go-people"
             >
@@ -205,7 +229,9 @@ const Conversations: React.FC<ConversationsProps> = ({
               type="button"
               role="tab"
               className={`conversations-footer-btn ${viewStyle === ConverationViewStyle.RECENT ? 'active' : ''}`}
-              onClick={() => setViewStyle(ConverationViewStyle.RECENT)}
+              onClick={() => {
+                setViewStyle(ConverationViewStyle.RECENT);
+              }}
               title={t('conversationViewTooltip')}
               data-uie-name="go-recent-view"
               data-uie-status={viewStyle === ConverationViewStyle.RECENT ? 'active' : 'inactive'}
@@ -275,6 +301,7 @@ const Conversations: React.FC<ConversationsProps> = ({
       })}
     </>
   );
+  const {currentFocus, handleKeyDown, setCurrentFocus} = useRoveFocus(conversations.length);
 
   return (
     <ListWrapper id={'conversations'} headerElement={header} footer={footer} before={callingView}>
@@ -298,6 +325,10 @@ const Conversations: React.FC<ConversationsProps> = ({
           listViewModel={listViewModel}
           conversationState={conversationState}
           conversationRepository={conversationRepository}
+          handleFocus={setCurrentFocus}
+          currentFocus={currentFocus}
+          isConversationListFocus={isConversationListFocus}
+          handleArrowKeyDown={handleKeyDown}
         />
       )}
     </ListWrapper>

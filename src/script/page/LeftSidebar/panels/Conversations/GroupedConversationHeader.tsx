@@ -49,6 +49,7 @@ const GroupedConversationHeader: React.FC<GroupedConversationHeaderProps> = ({on
       data-uie-name="conversation-folder-head"
       aria-expanded={isOpen}
       aria-controls={conversationLabel.id}
+      id={conversationLabel.id}
     >
       <span className="disclose-icon">
         <Icon.Disclose />

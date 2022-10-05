@@ -18,44 +18,26 @@
  */
 
 import {PasswordExistsError} from '@wireapp/api-client/src/auth';
-import {ReactWrapper} from 'enzyme';
-import {createMemoryHistory} from 'history';
-import waitForExpect from 'wait-for-expect';
+
 import {actionRoot} from '../module/action';
-import {initialRootState, RootState, Api} from '../module/reducer';
+import {initialRootState} from '../module/reducer';
 import {ROUTE} from '../route';
 import {mockStoreFactory} from '../util/test/mockStoreFactory';
 import {mountComponent} from '../util/test/TestUtil';
 import PhoneLogin from './PhoneLogin';
-import {MockStoreEnhanced} from 'redux-mock-store';
-import {TypeUtil} from '@wireapp/commons';
-import {ThunkDispatch} from 'redux-thunk';
-import {AnyAction} from 'redux';
-import {History} from 'history';
+import {fireEvent, waitFor} from '@testing-library/react';
 
 jest.mock('../util/SVGProvider');
 
-class PhoneLoginPage {
-  private readonly driver: ReactWrapper;
-
-  constructor(
-    store: MockStoreEnhanced<TypeUtil.RecursivePartial<RootState>, ThunkDispatch<RootState, Api, AnyAction>>,
-    history?: History<any>,
-  ) {
-    this.driver = mountComponent(<PhoneLogin />, store, history);
-  }
-
-  getBackButton = () => this.driver.find('a[data-uie-name="go-login"]');
-  getPhoneInput = () => this.driver.find('input[data-uie-name="enter-phone"]');
-  getCountryCodeInput = () => this.driver.find('input[data-uie-name="enter-country-code"]');
-  getLoginButton = () => this.driver.find('button[data-uie-name="do-sign-in-phone"]');
-
-  clickLoginButton = () => this.getLoginButton().simulate('click');
-}
+const backButtonId = 'go-login';
+const phoneInputId = 'enter-phone';
+const countryCodeInputId = 'enter-country-code';
+const loginButtonId = 'do-sign-in-phone';
 
 describe('PhoneLogin', () => {
   it('has disabled submit button as long as one input is empty', () => {
-    const phoneLoginPage = new PhoneLoginPage(
+    const {getByTestId} = mountComponent(
+      <PhoneLogin />,
       mockStoreFactory()({
         ...initialRootState,
         runtimeState: {
@@ -66,21 +48,18 @@ describe('PhoneLogin', () => {
       }),
     );
 
-    expect(phoneLoginPage.getPhoneInput()).not.toBeNull();
+    const phoneInput = getByTestId(phoneInputId);
+    const loginButton = getByTestId(loginButtonId) as HTMLButtonElement;
 
-    expect(phoneLoginPage.getCountryCodeInput()).not.toBeNull();
+    expect(loginButton.disabled).toBe(true);
+    fireEvent.change(phoneInput, {target: {value: '1'}});
 
-    expect(phoneLoginPage.getLoginButton()).not.toBeNull();
-
-    expect(phoneLoginPage.getLoginButton().props().disabled).toBe(true);
-    phoneLoginPage.getPhoneInput().simulate('change', {target: {value: '1'}});
-
-    expect(phoneLoginPage.getLoginButton().props().disabled).toBe(false);
+    expect(loginButton.disabled).toBe(false);
   });
 
   it('has an option to navigate back', async () => {
-    const history = createMemoryHistory();
-    const phoneLoginPage = new PhoneLoginPage(
+    const {getByTestId} = mountComponent(
+      <PhoneLogin />,
       mockStoreFactory()({
         ...initialRootState,
         runtimeState: {
@@ -89,20 +68,19 @@ describe('PhoneLogin', () => {
           isSupportedBrowser: true,
         },
       }),
-      history,
     );
 
-    expect(phoneLoginPage.getBackButton()).not.toBeNull();
-    expect(phoneLoginPage.getBackButton().props().href).toEqual(ROUTE.LOGIN);
+    const backButton = getByTestId(backButtonId) as HTMLAnchorElement;
+    expect(backButton.href).toContain(ROUTE.LOGIN);
   });
 
   it('navigates to verify phone code page if no password is set', async () => {
-    const history = createMemoryHistory();
-    const historyPushSpy = spyOn(history, 'push');
+    const historyPushSpy = spyOn(history, 'pushState');
 
     spyOn(actionRoot.authAction, 'doSendPhoneLoginCode').and.returnValue(() => Promise.resolve());
 
-    const phoneLoginPage = new PhoneLoginPage(
+    const {getByTestId} = mountComponent(
+      <PhoneLogin />,
       mockStoreFactory()({
         ...initialRootState,
         runtimeState: {
@@ -111,30 +89,37 @@ describe('PhoneLogin', () => {
           isSupportedBrowser: true,
         },
       }),
-      history,
     );
 
-    phoneLoginPage.getCountryCodeInput().simulate('change', {target: {value: '+0'}});
-    phoneLoginPage.getPhoneInput().simulate('change', {target: {value: '1111111'}});
+    const phoneInput = getByTestId(phoneInputId);
+    const countryCodeInput = getByTestId(countryCodeInputId);
+    const loginButton = getByTestId(loginButtonId) as HTMLButtonElement;
 
-    expect(phoneLoginPage.getLoginButton().props().disabled).toBe(false);
-    phoneLoginPage.getLoginButton().simulate('click');
+    fireEvent.change(phoneInput, {target: {value: '1111111'}});
+    fireEvent.change(countryCodeInput, {target: {value: '+0'}});
 
-    await waitForExpect(() => {
+    expect(loginButton.disabled).toBe(false);
+    fireEvent.click(loginButton);
+
+    await waitFor(() => {
       expect(actionRoot.authAction.doSendPhoneLoginCode).toHaveBeenCalled();
 
-      expect(historyPushSpy).toHaveBeenCalledWith(ROUTE.VERIFY_PHONE_CODE as any);
+      expect(historyPushSpy).toHaveBeenCalledWith(
+        expect.any(Object),
+        expect.any(String),
+        `#${ROUTE.VERIFY_PHONE_CODE}`,
+      );
     });
   });
 
   it('navigates to check password page if password is set', async () => {
-    const history = createMemoryHistory();
-    const historyPushSpy = spyOn(history, 'push');
+    const historyPushSpy = spyOn(history, 'pushState');
 
     const error: any = new PasswordExistsError('test error') as any;
     spyOn(actionRoot.authAction, 'doSendPhoneLoginCode').and.returnValue(() => Promise.reject(error));
 
-    const phoneLoginPage = new PhoneLoginPage(
+    const {getByTestId} = mountComponent(
+      <PhoneLogin />,
       mockStoreFactory()({
         ...initialRootState,
         runtimeState: {
@@ -143,19 +128,22 @@ describe('PhoneLogin', () => {
           isSupportedBrowser: true,
         },
       }),
-      history,
     );
 
-    phoneLoginPage.getCountryCodeInput().simulate('change', {target: {value: '+0'}});
-    phoneLoginPage.getPhoneInput().simulate('change', {target: {value: '1111111'}});
+    const phoneInput = getByTestId(phoneInputId);
+    const countryCodeInput = getByTestId(countryCodeInputId);
+    const loginButton = getByTestId(loginButtonId) as HTMLButtonElement;
 
-    expect(phoneLoginPage.getLoginButton().props().disabled).toBe(false);
-    phoneLoginPage.getLoginButton().simulate('click');
+    fireEvent.change(phoneInput, {target: {value: '1111111'}});
+    fireEvent.change(countryCodeInput, {target: {value: '+0'}});
 
-    await waitForExpect(() => {
+    expect(loginButton.disabled).toBe(false);
+    fireEvent.click(loginButton);
+
+    await waitFor(() => {
       expect(actionRoot.authAction.doSendPhoneLoginCode).toHaveBeenCalled();
 
-      expect(historyPushSpy).toHaveBeenCalledWith(ROUTE.CHECK_PASSWORD as any);
+      expect(historyPushSpy).toHaveBeenCalledWith(expect.any(Object), expect.any(String), `#${ROUTE.CHECK_PASSWORD}`);
     });
   });
 });

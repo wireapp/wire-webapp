@@ -326,7 +326,10 @@ export class ListViewModel {
     amplify.publish(WebAppEvents.CONVERSATION.SHOW, conversationEntity, {});
   };
 
-  readonly onContextMenu = (conversationEntity: Conversation, event: MouseEvent): void => {
+  readonly onContextMenu = (
+    conversationEntity: Conversation,
+    event: MouseEvent | React.MouseEvent<Element, MouseEvent>,
+  ): void => {
     const entries = [];
 
     if (conversationEntity.isMutable()) {
