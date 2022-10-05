@@ -71,6 +71,11 @@ body.theme-dark {
   justify-content: center;
   cursor: pointer;
 
+  &:focus-visible {
+    .focus-border-radius;
+    outline-offset: -0.2rem;
+  }
+
   .availability-state-label {
     .ellipsis-nowrap;
     .heading-h3;

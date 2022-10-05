@@ -55,7 +55,7 @@ const cleanUp = () => {
   }
 };
 
-const getButtonId = (label: string): string => `btn-${label.split(' ').join('-').toLowerCase()}`;
+const getButtonId = (label: string): string => `btn-${label?.split(' ').join('-').toLowerCase()}`;
 
 const ContextMenu: React.FC<ContextMenuProps> = ({entries, defaultIdentifier = 'ctx-menu-item', posX, posY}) => {
   const [mainElement, setMainElement] = useState<HTMLUListElement>();
@@ -77,9 +77,12 @@ const ContextMenu: React.FC<ContextMenuProps> = ({entries, defaultIdentifier = '
 
   useEffect(() => {
     if (selected) {
-      //context menu options such as 10 seconds etc begings with digit which is an invalid querySelector
-      //param append btn- to avoid such errors
-      const selectedButton = document.querySelector(`#${getButtonId(selected.label!)}`) as HTMLButtonElement;
+      // remove quotes from label
+      const labelWithoutQuotes = selected?.label?.replaceAll('"', '');
+
+      // context menu options such as 10 seconds etc begings with digit which is an invalid querySelector
+      // param append btn- to avoid such errors
+      const selectedButton = document.querySelector(`#${getButtonId(labelWithoutQuotes!)}`) as HTMLButtonElement;
       selectedButton?.focus();
     }
   }, [selected]);
@@ -87,19 +90,19 @@ const ContextMenu: React.FC<ContextMenuProps> = ({entries, defaultIdentifier = '
   useEffect(() => {
     const onWheel = (event: MouseEvent) => event.preventDefault();
 
+    //after opening the menu first time, select the first option
+    if (!selected) {
+      setSelected(entries[0]);
+    }
+
     const onKeyDown = (event: KeyboardEvent): void => {
       event.preventDefault();
-      if (isEscapeKey(event)) {
+      if (isEscapeKey(event) || isKey(event, KEY.TAB)) {
+        // escape/tab key press while the menu is open will close the menu and focus the trigerer
         cleanUp();
         previouslyFocused.focus();
       }
-      //after opening the menu on first tab press select the first option
-      if (!selected && isKey(event, KEY.TAB)) {
-        setSelected(entries[0]);
-      } else if (isKey(event, KEY.TAB)) {
-        //tab key press while the menu is open will close the menu
-        cleanUp();
-      }
+
       if (isOneOfKeys(event, [KEY.ARROW_UP, KEY.ARROW_DOWN])) {
         if (!entries.includes(selected!)) {
           const index = isKey(event, KEY.ARROW_DOWN) ? 0 : entries.length - 1;
@@ -114,6 +117,7 @@ const ContextMenu: React.FC<ContextMenuProps> = ({entries, defaultIdentifier = '
         if (selected) {
           cleanUp();
           selected.click?.();
+          previouslyFocused.focus();
         }
       }
     };
@@ -139,7 +143,7 @@ const ContextMenu: React.FC<ContextMenuProps> = ({entries, defaultIdentifier = '
   }, [mainElement, selected]);
 
   return (
-    <ul className="ctx-menu" ref={setMainElement} style={{maxHeight: window.innerHeight, ...style}}>
+    <ul className="ctx-menu" ref={setMainElement} style={{maxHeight: window.innerHeight, ...style}} role="menu">
       {entries.map((entry, index) =>
         entry.isSeparator ? (
           <li key={`${index}`} className="ctx-menu__separator" />
@@ -151,6 +155,8 @@ const ContextMenu: React.FC<ContextMenuProps> = ({entries, defaultIdentifier = '
               'ctx-menu__item--disabled': entry.isDisabled,
               selected: entry === selected,
             })}
+            role="menuitem"
+            aria-haspopup="true"
           >
             <button
               id={getButtonId(entry.label!)}

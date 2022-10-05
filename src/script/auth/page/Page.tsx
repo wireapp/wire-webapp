@@ -20,7 +20,7 @@
 import {TeamData} from '@wireapp/api-client/src/team';
 import React from 'react';
 import {connect} from 'react-redux';
-import {Redirect} from 'react-router';
+import {Navigate} from 'react-router-dom';
 import UnsupportedBrowser from '../component/UnsupportedBrowser';
 import {RootState} from '../module/reducer';
 import {RegistrationDataState} from '../module/reducer/authReducer';
@@ -57,7 +57,7 @@ const Page = ({
     (hasTeamData && hasInvalidTeamData(account) && !isStateAuthenticated) ||
     (isAuthenticated && !isStateAuthenticated)
   ) {
-    return <Redirect to={redirects[currentFlow] || ROUTE.INDEX} />;
+    return <Navigate to={redirects[currentFlow] || ROUTE.INDEX} replace />;
   }
   return <UnsupportedBrowser>{children}</UnsupportedBrowser>;
 };

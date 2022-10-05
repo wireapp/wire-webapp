@@ -17,45 +17,24 @@
  *
  */
 
-import {ReactWrapper} from 'enzyme';
 import {actionRoot} from '../module/action';
-import {initialRootState, RootState, Api} from '../module/reducer';
+import {initialRootState} from '../module/reducer';
 import {mockStoreFactory} from '../util/test/mockStoreFactory';
 import {mountComponent} from '../util/test/TestUtil';
 import SetHandle from './SetHandle';
-import {MockStoreEnhanced} from 'redux-mock-store';
-import {ThunkDispatch} from 'redux-thunk';
-import {AnyAction} from 'redux';
-import {TypeUtil} from '@wireapp/commons';
-import {History} from 'history';
+import {fireEvent} from '@testing-library/react';
 
 jest.mock('../util/SVGProvider');
 
-class SetHandlePage {
-  private readonly driver: ReactWrapper;
-
-  constructor(
-    store: MockStoreEnhanced<TypeUtil.RecursivePartial<RootState>, ThunkDispatch<RootState, Api, AnyAction>>,
-    history?: History<any>,
-  ) {
-    this.driver = mountComponent(<SetHandle />, store, history);
-  }
-
-  getHandleInput = () => this.driver.find('input[data-uie-name="enter-handle"]');
-  getSetHandleButton = () => this.driver.find('button[data-uie-name="do-send-handle"]');
-  getErrorMessage = (errorLabel?: string) =>
-    this.driver.find(`[data-uie-name="error-message"]${errorLabel ? `[data-uie-value="${errorLabel}"]` : ''}`);
-
-  clickSetHandleButton = () => this.getSetHandleButton().simulate('submit');
-
-  enterHandle = (value: string) => this.getHandleInput().simulate('change', {target: {value}});
-}
+const handleInputId = 'enter-handle';
+const setHandleButtonId = 'do-send-handle';
 
 describe('SetHandle', () => {
   it('has disabled submit button as long as there is no input', () => {
     spyOn(actionRoot.selfAction, 'doGetConsents').and.returnValue(() => Promise.resolve());
     spyOn(actionRoot.userAction, 'checkHandles').and.returnValue(() => Promise.resolve());
-    const setHandlePage = new SetHandlePage(
+    const {getByTestId} = mountComponent(
+      <SetHandle />,
       mockStoreFactory()({
         ...initialRootState,
         runtimeState: {
@@ -66,14 +45,13 @@ describe('SetHandle', () => {
       }),
     );
 
-    expect(setHandlePage.getHandleInput()).not.toBeNull();
+    const handleInput = getByTestId(handleInputId);
+    const setHandleButton = getByTestId(setHandleButtonId) as HTMLButtonElement;
 
-    expect(setHandlePage.getSetHandleButton()).not.toBeNull();
+    expect(setHandleButton.disabled).toBe(true);
+    fireEvent.change(handleInput, {target: {value: 'e'}});
 
-    expect(setHandlePage.getSetHandleButton().props().disabled).toBe(true);
-    setHandlePage.enterHandle('e');
-
-    expect(setHandlePage.getSetHandleButton().props().disabled).toBe(false);
+    expect(setHandleButton.disabled).toBe(false);
   });
 
   it('trims the handle', () => {
@@ -83,7 +61,8 @@ describe('SetHandle', () => {
 
     const handle = 'handle';
 
-    const setHandlePage = new SetHandlePage(
+    const {getByTestId} = mountComponent(
+      <SetHandle />,
       mockStoreFactory()({
         ...initialRootState,
         runtimeState: {
@@ -94,8 +73,11 @@ describe('SetHandle', () => {
       }),
     );
 
-    setHandlePage.getHandleInput().simulate('change', {target: {value: ` ${handle} `}});
-    setHandlePage.clickSetHandleButton();
+    const handleInput = getByTestId(handleInputId);
+    const setHandleButton = getByTestId(setHandleButtonId) as HTMLButtonElement;
+    fireEvent.change(handleInput, {target: {value: ` ${handle} `}});
+
+    fireEvent.click(setHandleButton);
 
     expect(actionRoot.selfAction.setHandle).toHaveBeenCalledWith(handle);
   });
