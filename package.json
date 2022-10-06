@@ -190,16 +190,12 @@
   },
   "license": "GPL-3.0",
   "lint-staged": {
+    "*": "prettier --ignore-unknown --write",
     "*.less": [
-      "prettier --write",
       "stylelint --fix"
     ],
-    "*.{js,ts,tsx}": [
-      "eslint --fix",
-      "yarn check:circular-dependencies"
-    ],
-    "*.{json,md,yml}": [
-      "prettier --write"
+    "*.{js,jsx,ts,tsx}": [
+      "eslint --fix"
     ]
   },
   "name": "wire-webapp",
