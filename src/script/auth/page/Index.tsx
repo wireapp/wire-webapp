@@ -53,11 +53,8 @@ const Index = ({defaultSSOCode}: Props & ConnectedProps & DispatchProps) => {
     return <Navigate to={`${ROUTE.SSO}/wire-${defaultSSOCode}`} />;
   }
 
-  if (
-    !Config.getConfig().FEATURE.ENABLE_DOMAIN_DISCOVERY &&
-    !Config.getConfig().FEATURE.ENABLE_SSO &&
-    !Config.getConfig().FEATURE.ENABLE_ACCOUNT_REGISTRATION
-  ) {
+  const features = Config.getConfig().FEATURE;
+  if (!features.ENABLE_DOMAIN_DISCOVERY && !features.ENABLE_SSO && !features.ENABLE_ACCOUNT_REGISTRATION) {
     // Navigate directly to email login because it's the only available option on the index page
     return <Navigate to={ROUTE.LOGIN} />;
   }
