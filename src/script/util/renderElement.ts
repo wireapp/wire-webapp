@@ -20,14 +20,21 @@
 import React from 'react';
 import {createRoot, Root} from 'react-dom/client';
 
-let elementContainer: HTMLDivElement | undefined;
-let reactRoot: Root;
+const roots = new Map<
+  string,
+  {
+    elementContainer: HTMLDivElement | undefined;
+    reactRoot: Root;
+  }
+>();
 
 export const cleanUpElement = (elementId: string) => {
-  if (elementContainer) {
-    reactRoot.unmount();
-    document.getElementById(elementId)?.removeChild(elementContainer);
-    elementContainer = undefined;
+  const root = roots.get(elementId);
+  if (root && root.elementContainer) {
+    root.reactRoot.unmount();
+    document.getElementById(elementId)?.removeChild(root.elementContainer);
+    root.elementContainer = undefined;
+    roots.delete(elementId);
   }
 };
 
@@ -55,12 +62,20 @@ const renderElement =
     const currentElementId = parentElementId;
 
     cleanUpElement(currentElementId);
-    elementContainer = document.createElement('div');
+    const elementContainer = document.createElement('div');
+
     if (style) {
       elementContainer.setAttribute('style', generateStyleString(style));
     }
+
     document.getElementById(currentElementId)?.appendChild(elementContainer);
-    reactRoot = createRoot(elementContainer);
+    const reactRoot = createRoot(elementContainer);
+
+    roots.set(currentElementId, {
+      elementContainer,
+      reactRoot,
+    });
+
     const onClose = () => {
       cleanUpElement(currentElementId);
       props.onClose?.();

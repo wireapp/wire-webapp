@@ -26,9 +26,6 @@
         "></legal-hold-modal>
       </div>
     </div>
-
-    #include('modals.htm')
-
     <!-- /ko -->
 
     <app-lock-container params="clientRepository: $root.content.repositories.client"></app-lock-container>
@@ -39,4 +36,7 @@
       mediaRepository: $root.content.repositories.media,
       ">
     </calling-overlay-container>
+    <!-- The order of these elements matter to show proper modals stack upon each other -->
+    <div id="user-modal-container"></div>
+    <div id="primary-modal-container"></div>
 </main>

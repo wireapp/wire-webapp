@@ -17,35 +17,22 @@
  *
  */
 
-import TestPage from 'Util/test/TestPage';
-
-import PanelActions, {MenuItem, PanelActionsProps} from './PanelActions';
-
-class PanelActionsPage extends TestPage<PanelActionsProps> {
-  constructor(props?: PanelActionsProps) {
-    super(PanelActions, props);
-  }
-
-  getMainAction = (identifier: string) => this.get(`[data-uie-name="${identifier}"]`);
-  getMainActionLabel = (identifier: string) => this.get(`[data-uie-name="${identifier}-item-text"]`);
-  clickMainAction = (identifier: string) => this.click(this.getMainAction(identifier));
-}
+import PanelActions, {MenuItem} from './PanelActions';
+import {render, fireEvent} from '@testing-library/react';
 
 describe('PanelActions', () => {
   it('displays a single action', () => {
     const items: MenuItem[] = [{click: () => {}, icon: 'edit-icon', identifier: 'testIdentifier', label: 'testLabel'}];
     const itemSpy = jest.spyOn(items[0], 'click');
 
-    const panelAction = new PanelActionsPage({items});
+    const {getByTestId, queryByText} = render(<PanelActions items={items} />);
 
-    const mainActionLabel = panelAction.getMainActionLabel(items[0].identifier);
-    const mainAction = panelAction.getMainAction(items[0].identifier);
+    const mainAction = getByTestId(items[0].identifier);
 
-    expect(mainActionLabel.textContent).toBe(items[0].label);
+    expect(queryByText(items[0].label)).not.toBeNull();
     expect(mainAction).not.toBeNull();
 
-    panelAction.clickMainAction(items[0].identifier);
-
+    fireEvent.click(mainAction);
     expect(itemSpy).toHaveBeenCalled();
   });
 
@@ -55,14 +42,12 @@ describe('PanelActions', () => {
       {click: () => {}, icon: 'pickup-icon', identifier: 'secondaryIdentifier', label: 'secondaryLabel'},
     ];
 
-    const panelAction = new PanelActionsPage({items});
+    const {queryByText, getByTestId} = render(<PanelActions items={items} />);
 
-    const mainActionLabel = panelAction.getMainActionLabel(items[0].identifier);
-    const mainAction = panelAction.getMainAction(items[0].identifier);
-    const secondaryAction = panelAction.getMainAction(items[1].identifier);
+    expect(queryByText(items[0].label)).not.toBeNull();
 
-    expect(mainActionLabel.textContent).toBe(items[0].label);
-    expect(mainAction).not.toBeNull();
-    expect(secondaryAction).not.toBeNull();
+    expect(getByTestId(items[0].identifier)).not.toBeNull();
+
+    expect(getByTestId(items[1].identifier)).not.toBeNull();
   });
 });

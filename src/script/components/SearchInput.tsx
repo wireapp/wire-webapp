@@ -18,7 +18,6 @@
  */
 
 import React, {useEffect, useLayoutEffect, useRef} from 'react';
-import {registerReactComponent} from 'Util/ComponentUtil';
 import type {User} from '../entity/User';
 import {MAX_HANDLE_LENGTH} from '../user/UserHandleGenerator';
 import {isEnterKey, isRemovalAction} from 'Util/KeyboardUtil';
@@ -114,5 +113,3 @@ const SearchInput: React.FC<SearchInputProps> = ({
 };
 
 export default SearchInput;
-
-registerReactComponent('user-input', SearchInput);
