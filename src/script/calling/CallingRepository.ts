@@ -608,6 +608,18 @@ export class CallingRepository {
             this.abortCall(conversationId, LEAVE_CALL_REASON.ABORTED_BECAUSE_FAILED_TO_UPDATE_MISSING_CLIENTS);
           }
         }
+        break;
+      }
+      case CALL_MESSAGE_TYPE.REMOTE_MUTE: {
+        const call = this.findCall(conversationId);
+        if (call) {
+          this.muteCall(call, true, MuteState.REMOTE_MUTED);
+        }
+        break;
+      }
+      case CALL_MESSAGE_TYPE.REMOTE_KICK: {
+        this.leaveCall(conversationId, LEAVE_CALL_REASON.REMOTE_KICK);
+        break;
       }
     }
 
