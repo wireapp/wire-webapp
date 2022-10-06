@@ -627,7 +627,6 @@ const InputBar = ({
 
   const onGifClick = () => {
     onGiphyClick(inputValue);
-    amplify.publish(WebAppEvents.EXTENSIONS.GIPHY.SHOW, inputValue);
   };
 
   const onPingClick = () => {
