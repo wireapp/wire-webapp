@@ -28,7 +28,6 @@ import {getLogger} from 'Util/Logger';
 import {loadValue} from 'Util/StorageUtil';
 import {isTemporaryClientAndNonPersistent} from 'Util/util';
 
-import {BackupRepository} from '../../../../backup/BackupRepository';
 import {ClientRepository} from '../../../../client/ClientRepository';
 import {Config} from '../../../../Config';
 import {ConversationRepository} from '../../../../conversation/ConversationRepository';
@@ -55,12 +54,14 @@ import UsernameInput from './accountPreferences/UsernameInput';
 import PreferencesPage from './components/PreferencesPage';
 import AccountLink from './accountPreferences/AccountLink';
 import PrimaryModal from 'Components/Modals/PrimaryModal';
+import {ContentState} from '../../../../view_model/ContentViewModel';
 
 interface AccountPreferencesProps {
-  backupRepository: BackupRepository;
+  importFile: (file: File) => void;
   clientRepository: ClientRepository;
   conversationRepository: ConversationRepository;
   propertiesRepository: PropertiesRepository;
+  switchContent: (contentState: ContentState) => void;
   richProfileRepository?: RichProfileRepository;
   /** Should the domain be displayed */
   showDomain?: boolean;
@@ -72,10 +73,11 @@ interface AccountPreferencesProps {
 const logger = getLogger('AccountPreferences');
 
 const AccountPreferences: React.FC<AccountPreferencesProps> = ({
-  backupRepository,
+  importFile,
   clientRepository,
   userRepository,
   propertiesRepository,
+  switchContent,
   conversationRepository,
   showDomain = false,
   userState = container.resolve(UserState),
@@ -216,7 +218,7 @@ const AccountPreferences: React.FC<AccountPreferencesProps> = ({
       {isActivatedAccount && (
         <>
           {!isTemporaryAndNonPersistent.current && (
-            <HistoryBackupSection backupRepository={backupRepository} brandName={brandName} />
+            <HistoryBackupSection brandName={brandName} importFile={importFile} switchContent={switchContent} />
           )}
           <AccountSecuritySection {...{selfUser, userRepository}} />
           {!isDesktop && <LogoutSection {...{clientRepository}} />}

@@ -37,7 +37,7 @@ import ClassifiedBar from 'Components/input/ClassifiedBar';
 import Avatar, {AVATAR_SIZE} from 'Components/Avatar';
 import useEmoji from 'Components/Emoji/useEmoji';
 
-import {registerReactComponent, useKoSubscribableChildren} from 'Util/ComponentUtil';
+import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {loadDraftState, saveDraftState} from 'Util/DraftStateUtil';
 import isHittingUploadLimit from 'Util/isHittingUploadLimit';
 import {insertAtCaret, isFunctionKey, KEY} from 'Util/KeyboardUtil';
@@ -107,6 +107,7 @@ interface InputBarProps {
   readonly conversationRepository: ConversationRepository;
   readonly eventRepository: EventRepository;
   readonly messageRepository: MessageRepository;
+  readonly openGiphy: (inputValue: string) => void;
   readonly propertiesRepository: PropertiesRepository;
   readonly searchRepository: SearchRepository;
   readonly storageRepository: StorageRepository;
@@ -120,6 +121,7 @@ const InputBar = ({
   conversationRepository,
   eventRepository,
   messageRepository,
+  openGiphy,
   propertiesRepository,
   searchRepository,
   storageRepository,
@@ -623,7 +625,7 @@ const InputBar = ({
     }
   };
 
-  const onGifClick = () => amplify.publish(WebAppEvents.EXTENSIONS.GIPHY.SHOW, inputValue);
+  const onGifClick = () => openGiphy(inputValue);
 
   const onPingClick = () => {
     if (conversationEntity && !pingDisabled) {
@@ -934,5 +936,3 @@ const InputBar = ({
 };
 
 export default InputBar;
-
-registerReactComponent('input-bar', InputBar);

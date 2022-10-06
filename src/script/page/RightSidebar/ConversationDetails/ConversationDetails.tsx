@@ -320,7 +320,7 @@ const ConversationDetails: FC<ConversationDetailsProps> = ({
               {isGroup && !!userParticipants.length && (
                 <>
                   <UserSearchableList
-                    data-uie-name="list-users"
+                    dataUieName="list-users"
                     users={userParticipants}
                     onClick={showUser}
                     noUnderline
@@ -383,7 +383,7 @@ const ConversationDetails: FC<ConversationDetailsProps> = ({
                   click={showService}
                   noUnderline
                   arrow
-                  data-uie-name="list-services"
+                  dataUieName="list-services"
                 />
               </div>
             )}

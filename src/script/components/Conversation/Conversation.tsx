@@ -73,7 +73,11 @@ const ConversationList: FC<ConversationListProps> = ({initialMessage, teamState,
   const messageListLogger = getLogger('ConversationList');
 
   const contentViewModel = useContext(RootContext);
+
   const [isConversationLoaded, setIsConversationLoaded] = useState<boolean>(false);
+  const [inputValue, setInputValue] = useState<string>('');
+  const [isGiphyModalOpen, setIsGiphyModalOpen] = useState<boolean>(false);
+
   const [readMessagesBuffer, setReadMessagesBuffer] = useState<ReadMessageBuffer[]>([]);
 
   const conversationState = container.resolve(ConversationState);
@@ -107,6 +111,13 @@ const ConversationList: FC<ConversationListProps> = ({initialMessage, teamState,
   }
 
   const {conversationRepository, repositories, mainViewModel, legalHoldModal, isFederated} = contentViewModel;
+
+  const openGiphy = (text: string) => {
+    setInputValue(text);
+    setIsGiphyModalOpen(true);
+  };
+
+  const closeGiphy = () => setIsGiphyModalOpen(false);
 
   const clickOnInvitePeople = (conversation: ConversationEntity): void => {
     openRightSidebar({
@@ -415,6 +426,7 @@ const ConversationList: FC<ConversationListProps> = ({initialMessage, teamState,
             conversationRepository={repositories.conversation}
             eventRepository={repositories.event}
             messageRepository={repositories.message}
+            openGiphy={openGiphy}
             propertiesRepository={repositories.properties}
             searchRepository={repositories.search}
             storageRepository={repositories.storage}
@@ -428,7 +440,9 @@ const ConversationList: FC<ConversationListProps> = ({initialMessage, teamState,
         </>
       )}
 
-      <Giphy giphyRepository={repositories.giphy} />
+      {isGiphyModalOpen && inputValue && (
+        <Giphy giphyRepository={repositories.giphy} inputValue={inputValue} onClose={closeGiphy} />
+      )}
     </div>
   );
 };
