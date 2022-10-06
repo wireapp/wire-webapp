@@ -244,6 +244,6 @@
     "translate:upload": "yarn translate:merge && ts-node ./bin/translations_upload.ts",
     "translate:download": "ts-node ./bin/translations_download.ts"
   },
-  "version": "0.20.0",
+  "version": "0.21.0",
   "packageManager": "yarn@3.2.3"
 }
