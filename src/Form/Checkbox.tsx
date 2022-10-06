@@ -117,6 +117,7 @@ interface CheckboxProps<T = HTMLInputElement> extends InputProps<T> {
   id?: string;
   aligncenter?: boolean;
   labelBeforeCheckbox?: boolean;
+  outlineOffset?: string;
 }
 
 export const Checkbox: React.FC<CheckboxProps<HTMLInputElement>> = React.forwardRef<
@@ -124,7 +125,18 @@ export const Checkbox: React.FC<CheckboxProps<HTMLInputElement>> = React.forward
   CheckboxProps<HTMLInputElement>
 >(
   (
-    {id = useId(), children, style, disabled, wrapperCSS = {}, markInvalid, aligncenter, labelBeforeCheckbox, ...props},
+    {
+      id = useId(),
+      children,
+      style,
+      disabled,
+      wrapperCSS = {},
+      markInvalid,
+      aligncenter,
+      labelBeforeCheckbox,
+      outlineOffset = '0.4rem',
+      ...props
+    },
     ref,
   ) => (
     <div
@@ -136,7 +148,7 @@ export const Checkbox: React.FC<CheckboxProps<HTMLInputElement>> = React.forward
         left: '-0.3rem',
         [`.${INPUT_CLASSNAME}:focus-visible + label`]: {
           outline: `1px solid ${theme.general.primaryColor}`,
-          outlineOffset: '0.4rem',
+          outlineOffset: outlineOffset,
         },
         ...wrapperCSS,
       })}
