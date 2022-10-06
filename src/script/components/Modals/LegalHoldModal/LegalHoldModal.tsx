@@ -35,7 +35,7 @@ import {ClientRepository} from '../../../client/ClientRepository';
 import {CryptographyRepository} from '../../../cryptography/CryptographyRepository';
 import {MessageRepository} from '../../../conversation/MessageRepository';
 import {UserState} from '../../../user/UserState';
-import {registerReactComponent, useKoSubscribableChildren} from 'Util/ComponentUtil';
+import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {splitFingerprint} from 'Util/StringUtil';
 import {Conversation} from '../../../entity/Conversation';
 import {User} from '../../../entity/User';
@@ -280,150 +280,146 @@ const LegalHoldModal: FC<LegalHoldModalProps> = ({
   }, []);
 
   return (
-    <div id="legal-hold-modal" className="legal-hold-modal">
-      <ModalComponent
-        isShown={isShown}
-        onBgClick={onBgClick}
-        onClosed={onClose}
-        data-uie-name="legal-hold-modal"
-        showLoading={isLoading}
-      >
-        <div className="modal__header">
-          {userDevices && (
-            <button
-              className="button-reset-default"
-              type="button"
-              onClick={onBackClick}
-              data-uie-name="go-back-participant-devices"
-            >
-              <Icon.ArrowLeft className="modal__header__button modal__header__button__left" />
-            </button>
-          )}
+    <ModalComponent
+      isShown={isShown}
+      onBgClick={onBgClick}
+      onClosed={onClose}
+      data-uie-name="legal-hold-modal"
+      showLoading={isLoading}
+      id="legal-hold-modal"
+      className="legal-hold-modal"
+    >
+      <div className="modal__header">
+        {userDevices && (
+          <button
+            className="button-reset-default"
+            type="button"
+            onClick={onBackClick}
+            data-uie-name="go-back-participant-devices"
+          >
+            <Icon.ArrowLeft className="modal__header__button modal__header__button__left" />
+          </button>
+        )}
 
-          {showRequest ? (
-            <h2 className="modal__header__title" data-uie-name="status-modal-title">
-              {t('legalHoldModalTitle')}
-            </h2>
-          ) : (
-            <button className="button-reset-default modal__header__button" data-uie-name="do-close" onClick={onBgClick}>
-              <Icon.Close />
-            </button>
-          )}
-        </div>
+        {showRequest ? (
+          <h2 className="modal__header__title" data-uie-name="status-modal-title">
+            {t('legalHoldModalTitle')}
+          </h2>
+        ) : (
+          <button className="button-reset-default modal__header__button" data-uie-name="do-close" onClick={onBgClick}>
+            <Icon.Close />
+          </button>
+        )}
+      </div>
 
-        <div
-          className={cx('modal__body legal-hold-modal__wrapper', {'legal-hold-modal__wrapper--request': showRequest})}
-        >
-          {showRequest && (
-            <>
-              <div className="modal__text" data-uie-name="status-modal-text">
-                <p
-                  dangerouslySetInnerHTML={{
-                    __html: t(
-                      'legalHoldModalText',
-                      {},
-                      {
-                        br: '<br>',
-                        fingerprint: `<span class="legal-hold-modal__fingerprint" data-uie-name="status-modal-fingerprint">${requestFingerprint}</span>`,
-                      },
-                    ),
-                  }}
-                />
-
-                {requiresPassword && <div>{t('legalHoldModalTextPassword')}</div>}
-              </div>
-
-              {requiresPassword && (
-                <input
-                  className="modal__input"
-                  type="password"
-                  value={passwordValue}
-                  placeholder={t('login.passwordPlaceholder')}
-                  onChange={ev => setPasswordValue(ev.target.value)}
-                />
-              )}
-
-              {requestError && (
-                <div className="modal__input__error" data-uie-name="status-error">
-                  {requestError}
-                </div>
-              )}
-
-              <div className="modal__buttons">
-                <button
-                  type="button"
-                  className="modal__button modal__button--secondary"
-                  data-uie-name="do-secondary"
-                  onClick={closeRequest}
-                >
-                  {t('legalHoldModalSecondaryAction')}
-                </button>
-
-                {!isSendingApprove ? (
-                  <button
-                    type="button"
-                    className={cx('modal__button modal__button--primary', {'modal__button--disabled': disableSubmit})}
-                    data-uie-name="do-action"
-                    onClick={acceptRequest}
-                  >
-                    {t('legalHoldModalPrimaryAction')}
-                  </button>
-                ) : (
-                  <div className="modal__button modal__button--primary legal-hold-modal__loading-button">
-                    <Icon.Loading />
-                  </div>
-                )}
-              </div>
-            </>
-          )}
-
-          {!showRequest && !userDevices ? (
-            <>
-              <div className="legal-hold-modal__logo">
-                <LegalHoldDot large dataUieName="status-modal-legal-hold-icon" />
-              </div>
-
-              <div className="legal-hold-modal__headline" data-uie-name="status-modal-title">
-                {t('legalHoldHeadline')}
-              </div>
-
+      <div className={cx('modal__body legal-hold-modal__wrapper', {'legal-hold-modal__wrapper--request': showRequest})}>
+        {showRequest && (
+          <>
+            <div className="modal__text" data-uie-name="status-modal-text">
               <p
-                className="legal-hold-modal__info"
-                data-uie-name="status-modal-text"
                 dangerouslySetInnerHTML={{
-                  __html: isSelfInfo ? t('legalHoldDescriptionSelf') : t('legalHoldDescriptionOthers'),
+                  __html: t(
+                    'legalHoldModalText',
+                    {},
+                    {
+                      br: '<br>',
+                      fingerprint: `<span class="legal-hold-modal__fingerprint" data-uie-name="status-modal-fingerprint">${requestFingerprint}</span>`,
+                    },
+                  ),
                 }}
               />
 
-              <div className="legal-hold-modal__subjects">{t('legalHoldSubjects')}</div>
+              {requiresPassword && <div>{t('legalHoldModalTextPassword')}</div>}
+            </div>
 
-              <UserSearchableList
-                users={users}
-                userState={userState}
-                conversationRepository={conversationRepository}
-                searchRepository={searchRepository}
-                teamRepository={teamRepository}
-                onClick={setUserDevices}
-                noUnderline
+            {requiresPassword && (
+              <input
+                className="modal__input"
+                type="password"
+                value={passwordValue}
+                placeholder={t('login.passwordPlaceholder')}
+                onChange={ev => setPasswordValue(ev.target.value)}
               />
-            </>
-          ) : (
-            <UserDevices
-              clientRepository={clientRepository}
-              cryptographyRepository={cryptographyRepository}
-              messageRepository={messageRepository}
-              user={userDevices as User}
-              current={userDevicesHistory.current}
-              goTo={userDevicesHistory.goTo}
-              noPadding
+            )}
+
+            {requestError && (
+              <div className="modal__input__error" data-uie-name="status-error">
+                {requestError}
+              </div>
+            )}
+
+            <div className="modal__buttons">
+              <button
+                type="button"
+                className="modal__button modal__button--secondary"
+                data-uie-name="do-secondary"
+                onClick={closeRequest}
+              >
+                {t('legalHoldModalSecondaryAction')}
+              </button>
+
+              {!isSendingApprove ? (
+                <button
+                  type="button"
+                  className={cx('modal__button modal__button--primary', {'modal__button--disabled': disableSubmit})}
+                  data-uie-name="do-action"
+                  onClick={acceptRequest}
+                >
+                  {t('legalHoldModalPrimaryAction')}
+                </button>
+              ) : (
+                <div className="modal__button modal__button--primary legal-hold-modal__loading-button">
+                  <Icon.Loading />
+                </div>
+              )}
+            </div>
+          </>
+        )}
+
+        {!showRequest && !userDevices ? (
+          <>
+            <div className="legal-hold-modal__logo">
+              <LegalHoldDot large dataUieName="status-modal-legal-hold-icon" />
+            </div>
+
+            <div className="legal-hold-modal__headline" data-uie-name="status-modal-title">
+              {t('legalHoldHeadline')}
+            </div>
+
+            <p
+              className="legal-hold-modal__info"
+              data-uie-name="status-modal-text"
+              dangerouslySetInnerHTML={{
+                __html: isSelfInfo ? t('legalHoldDescriptionSelf') : t('legalHoldDescriptionOthers'),
+              }}
             />
-          )}
-        </div>
-      </ModalComponent>
-    </div>
+
+            <div className="legal-hold-modal__subjects">{t('legalHoldSubjects')}</div>
+
+            <UserSearchableList
+              users={users}
+              userState={userState}
+              conversationRepository={conversationRepository}
+              searchRepository={searchRepository}
+              teamRepository={teamRepository}
+              onClick={setUserDevices}
+              noUnderline
+            />
+          </>
+        ) : (
+          <UserDevices
+            clientRepository={clientRepository}
+            cryptographyRepository={cryptographyRepository}
+            messageRepository={messageRepository}
+            user={userDevices as User}
+            current={userDevicesHistory.current}
+            goTo={userDevicesHistory.goTo}
+            noPadding
+          />
+        )}
+      </div>
+    </ModalComponent>
   );
 };
 
 export default LegalHoldModal;
-
-registerReactComponent('legal-hold-modal', LegalHoldModal);

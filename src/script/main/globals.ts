@@ -24,7 +24,6 @@ import ko from 'knockout';
 import '../Config';
 
 import 'Components/icons';
-import 'Components/modal';
 import 'Components/calling/CallingOverlayContainer';
 
 import '../page/AppLock';

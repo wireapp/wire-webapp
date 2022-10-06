@@ -39,15 +39,18 @@ const LegalHoldMessage: React.FC<LegalHoldMessageProps> = ({
   const showLegalHold = () => {
     amplify.publish(LegalHoldModalState.SHOW_DETAILS, conversationState.activeConversation());
   };
+
   return (
     <div className="message-header">
       <div className="message-header-icon">
         <LegalHoldDot isMessage />
       </div>
+
       <div className="message-header-label">
         {message.isActivationMessage ? (
           <>
             <span data-uie-name="status-legalhold-activated">{t('legalHoldActivated')}</span>
+
             <button
               type="button"
               className="button-reset-default message-header-label__learn-more"

@@ -110,7 +110,7 @@ const ConversationList: FC<ConversationListProps> = ({initialMessage, teamState,
     return null;
   }
 
-  const {conversationRepository, repositories, mainViewModel, legalHoldModal, isFederated} = contentViewModel;
+  const {conversationRepository, repositories, mainViewModel, isFederated} = contentViewModel;
 
   const openGiphy = (text: string) => {
     setInputValue(text);
@@ -394,7 +394,6 @@ const ConversationList: FC<ConversationListProps> = ({initialMessage, teamState,
             mainViewModel={mainViewModel}
             repositories={repositories}
             conversation={activeConversation}
-            legalHoldModal={legalHoldModal}
             userState={userState}
             teamState={teamState}
             callActions={mainViewModel.calling.callActions}

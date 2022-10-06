@@ -46,6 +46,7 @@ import {UserState} from '../../user/UserState';
 import {TeamState} from '../../team/TeamState';
 import {ContentState, ContentViewModel} from '../../view_model/ContentViewModel';
 import HistoryImport from 'Components/HistoryImport';
+import LegalHoldModal from 'Components/Modals/LegalHoldModal/LegalHoldModal';
 
 const Animated: FC<{children: ReactNode}> = ({children, ...rest}) => {
   return (
@@ -198,6 +199,16 @@ const MainContent: FC<MainContentProps> = ({
         <GroupCreationModal userState={userState} teamState={teamState} />
 
         <div className="center-column__overlay" />
+
+        <LegalHoldModal
+          userState={userState}
+          conversationRepository={repositories.conversation}
+          searchRepository={repositories.search}
+          teamRepository={repositories.team}
+          clientRepository={repositories.client}
+          messageRepository={repositories.message}
+          cryptographyRepository={repositories.cryptography}
+        />
       </StyledApp>
     </RootProvider>
   );
