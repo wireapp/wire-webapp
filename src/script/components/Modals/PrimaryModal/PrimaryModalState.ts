@@ -193,7 +193,9 @@ const updateCurrentModalContent = (type: PrimaryModalType, options: ModalOptions
     }
   }
   if (content.secondaryAction) {
-    const updatedSecondaryAction = Array.isArray(secondaryAction) ? secondaryAction : [secondaryAction];
+    const updatedSecondaryAction = Array.isArray(content.secondaryAction)
+      ? content.secondaryAction
+      : [content.secondaryAction];
     // force it into array format
     const uieNames = ['do-secondary', 'do-tertiary', 'do-quaternary'];
     content.secondaryAction = updatedSecondaryAction.map((action, index) => {

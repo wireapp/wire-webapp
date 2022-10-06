@@ -2587,15 +2587,20 @@ export class ConversationRepository {
     const selfConversation = this.conversationState.self_conversation();
     const inSelfConversation = selfConversation && matchQualifiedIds(selfConversation, conversationId);
     if (!inSelfConversation && conversation && !isBackendEvent) {
-      throw new ConversationError(
-        ConversationError.TYPE.WRONG_CONVERSATION,
-        ConversationError.MESSAGE.WRONG_CONVERSATION,
+      this.logger.warn(
+        `A conversation update message was not sent in the selfConversation. Skipping conversation update`,
+        eventData,
       );
+      return;
     }
 
     const isFromSelf = !this.userState.self() || from === this.userState.self().id;
     if (!isFromSelf) {
-      throw new ConversationError(ConversationError.TYPE.WRONG_USER, ConversationError.MESSAGE.WRONG_USER);
+      this.logger.warn(
+        `A conversation update message was not sent by the self user. Skipping conversation update`,
+        eventData,
+      );
+      return;
     }
 
     const isActiveConversation = this.conversationState.isActiveConversation(conversationEntity);

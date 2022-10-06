@@ -3397,9 +3397,9 @@ __metadata:
   linkType: hard
 
 "@types/sizzle@npm:*":
-  version: 2.3.3
-  resolution: "@types/sizzle@npm:2.3.3"
-  checksum: 586a9fb1f6ff3e325e0f2cc1596a460615f0bc8a28f6e276ac9b509401039dd242fa8b34496d3a30c52f5b495873922d09a9e76c50c2ab2bcc70ba3fb9c4e160
+  version: 2.3.2
+  resolution: "@types/sizzle@npm:2.3.2"
+  checksum: 783b6382934d8f12f2e21220a01c4557150f07abd18336f392664fb74ceaa9a9d59b7c859c0b82fd3f15b6484774cd0d493261fe64c78ee399bf198a8fe8d89d
   languageName: node
   linkType: hard
 
