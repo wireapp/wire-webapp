@@ -106,6 +106,7 @@
     "cspell": "6.12.0",
     "cssnano": "4.1.11",
     "dotenv": "16.0.3",
+    "dpdm": "3.10.0",
     "enzyme": "3.11.0",
     "enzyme-to-json": "3.6.2",
     "eslint": "8.24.0",
@@ -190,7 +191,8 @@
       "stylelint --fix"
     ],
     "*.{js,ts,tsx}": [
-      "eslint --fix"
+      "eslint --fix",
+      "check:circular-dependencies"
     ],
     "*.{json,md,yml}": [
       "prettier --write"
@@ -224,6 +226,9 @@
     "lint:other": "yarn prettier --list-different && yarn stylelint",
     "lint:code": "eslint -c .eslintrc.json --ext .js,.ts,.tsx .",
     "lint:spelling": "cspell -c .cspell.json 'src/script/**/*.{js,ts,tsx,md}' src/i18n/en-US.json",
+    "check:circular-dependencies": "yarn check:circular-dependencies:app && yarn check:circular-dependencies:auth",
+    "check:circular-dependencies:app": "dpdm -T --no-warning --no-tree ./src/script/main/app.ts",
+    "check:circular-dependencies:auth": "dpdm -T --no-warning --no-tree ./src/script/auth/main.tsx",
     "postinstall": "yarn configure && cd server && yarn  && cd .. && husky install",
     "prettier": "prettier --ignore-path .prettierignore \"**/*.{json,md,yml}\"",
     "release:staging": "git checkout dev && git pull && ts-node ./bin/release_tag.ts staging",
