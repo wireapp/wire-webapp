@@ -62,6 +62,7 @@ export const ROUTE = {
   CUSTOM_ENV_REDIRECT: '/custom-env-redirect',
   HISTORY_INFO: '/historyinfo',
   INDEX: '/',
+  OAUTH: '/oauth',
   INITIAL_INVITE: '/teaminvite',
   LOGIN: '/login',
   LOGIN_PHONE: '/phonelogin',

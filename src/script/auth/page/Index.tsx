@@ -33,6 +33,7 @@ import {AnyAction, Dispatch} from 'redux';
 import {connect} from 'react-redux';
 import SVGProvider from '../util/SVGProvider';
 import {SVGIcon} from '@wireapp/react-ui-kit/src/Icon/SVGIcon';
+import {createRandomUuid} from 'Util/util';
 
 interface Props extends React.HTMLProps<HTMLDivElement> {}
 
@@ -59,6 +60,18 @@ const Index = ({defaultSSOCode}: Props & ConnectedProps & DispatchProps) => {
     return <Navigate to={ROUTE.LOGIN} />;
   }
 
+  const startOauthFlow = () => {
+    const state = createRandomUuid();
+    localStorage.setItem('oauth_state', state);
+    const url = new URL('https://oauth.mocklab.io/oauth/authorize');
+    url.searchParams.append('response_type', 'code');
+    url.searchParams.append('scope', 'openid profile email');
+    url.searchParams.append('client_id', 'TODO');
+    url.searchParams.append('state', state);
+    url.searchParams.append('redirect_uri', `${Config.getConfig().APP_BASE}/auth#${ROUTE.OAUTH}`);
+    location.href = url.toString();
+  };
+
   return (
     <Page>
       <ContainerXS centerText verticalCenter style={{width: '380px'}}>
@@ -80,7 +93,7 @@ const Index = ({defaultSSOCode}: Props & ConnectedProps & DispatchProps) => {
         >
           {_(indexStrings.welcome, {brandName: Config.getConfig().BACKEND_NAME})}
         </Text>
-        {Config.getConfig().FEATURE.ENABLE_ACCOUNT_REGISTRATION ? (
+        {features.ENABLE_ACCOUNT_REGISTRATION ? (
           <>
             <Button
               type="button"
@@ -89,6 +102,9 @@ const Index = ({defaultSSOCode}: Props & ConnectedProps & DispatchProps) => {
               data-uie-name="go-set-account-type"
             >
               {_(indexStrings.createAccount)}
+            </Button>
+            <Button type="button" onClick={startOauthFlow} block>
+              Login to OAuth provider
             </Button>
             <Button type="button" onClick={() => navigate(ROUTE.LOGIN)} block data-uie-name="go-login">
               {_(indexStrings.logIn)}
@@ -103,7 +119,7 @@ const Index = ({defaultSSOCode}: Props & ConnectedProps & DispatchProps) => {
                 />
               </ErrorMessage>
             )}
-            {(Config.getConfig().FEATURE.ENABLE_SSO || Config.getConfig().FEATURE.ENABLE_DOMAIN_DISCOVERY) && (
+            {(features.ENABLE_SSO || features.ENABLE_DOMAIN_DISCOVERY) && (
               <Button
                 type="button"
                 variant={ButtonVariant.SECONDARY}
@@ -112,9 +128,7 @@ const Index = ({defaultSSOCode}: Props & ConnectedProps & DispatchProps) => {
                 style={{marginTop: '120px'}}
                 data-uie-name="go-sso-login"
               >
-                {_(
-                  Config.getConfig().FEATURE.ENABLE_DOMAIN_DISCOVERY ? indexStrings.enterprise : indexStrings.ssoLogin,
-                )}
+                {_(features.ENABLE_DOMAIN_DISCOVERY ? indexStrings.enterprise : indexStrings.ssoLogin)}
               </Button>
             )}
           </>
@@ -129,7 +143,7 @@ const Index = ({defaultSSOCode}: Props & ConnectedProps & DispatchProps) => {
             >
               {_(indexStrings.logIn)}
             </Button>
-            {(Config.getConfig().FEATURE.ENABLE_SSO || Config.getConfig().FEATURE.ENABLE_DOMAIN_DISCOVERY) && (
+            {(features.ENABLE_SSO || features.ENABLE_DOMAIN_DISCOVERY) && (
               <Button
                 type="button"
                 onClick={() => navigate(ROUTE.SSO)}
@@ -139,9 +153,7 @@ const Index = ({defaultSSOCode}: Props & ConnectedProps & DispatchProps) => {
                 style={{border: `1px solid ${COLOR.BLUE}`, fontSize: '13px'}}
                 data-uie-name="go-sso-login"
               >
-                {_(
-                  Config.getConfig().FEATURE.ENABLE_DOMAIN_DISCOVERY ? indexStrings.enterprise : indexStrings.ssoLogin,
-                )}
+                {_(features.ENABLE_DOMAIN_DISCOVERY ? indexStrings.enterprise : indexStrings.ssoLogin)}
               </Button>
             )}
             {logoutReason && (

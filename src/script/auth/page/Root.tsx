@@ -55,6 +55,7 @@ import VerifyPhoneCode from './VerifyPhoneCode';
 import CustomEnvironmentRedirect from './CustomEnvironmentRedirect';
 import SetEntropyPage from './SetEntropyPage';
 import {t} from 'Util/LocalizerUtil';
+import {OAuth} from './OAuth';
 
 interface RootProps {}
 
@@ -141,6 +142,7 @@ const Root: React.FC<RootProps & ConnectedProps & DispatchProps> = ({
                   </Title>
                 }
               />
+              <Route path={ROUTE.OAUTH} element={<OAuth />} />
               <Route path={ROUTE.CHECK_PASSWORD} element={<CheckPassword />} />
               <Route path={ROUTE.CLIENTS} element={<ProtectedClientManager />} />
               <Route path={ROUTE.CONVERSATION_JOIN_INVALID} element={<ConversationJoinInvalid />} />
