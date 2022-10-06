@@ -45,7 +45,6 @@ import UsernameInput from './accountPreferences/UsernameInput';
 import PreferencesPage from './components/PreferencesPage';
 import PreferencesSection from './components/PreferencesSection';
 
-import {BackupRepository} from '../../../../backup/BackupRepository';
 import {ClientRepository} from '../../../../client/ClientRepository';
 import {Config} from '../../../../Config';
 import {ConversationRepository} from '../../../../conversation/ConversationRepository';
@@ -56,13 +55,15 @@ import {TeamState} from '../../../../team/TeamState';
 import {RichProfileRepository} from '../../../../user/RichProfileRepository';
 import type {UserRepository} from '../../../../user/UserRepository';
 import {UserState} from '../../../../user/UserState';
+import {ContentState} from '../../../../view_model/ContentViewModel';
 import AccentColorPicker from '../../../AccentColorPicker';
 
 interface AccountPreferencesProps {
-  backupRepository: BackupRepository;
+  importFile: (file: File) => void;
   clientRepository: ClientRepository;
   conversationRepository: ConversationRepository;
   propertiesRepository: PropertiesRepository;
+  switchContent: (contentState: ContentState) => void;
   richProfileRepository?: RichProfileRepository;
   /** Should the domain be displayed */
   showDomain?: boolean;
@@ -74,10 +75,11 @@ interface AccountPreferencesProps {
 const logger = getLogger('AccountPreferences');
 
 const AccountPreferences: React.FC<AccountPreferencesProps> = ({
-  backupRepository,
+  importFile,
   clientRepository,
   userRepository,
   propertiesRepository,
+  switchContent,
   conversationRepository,
   showDomain = false,
   userState = container.resolve(UserState),
@@ -218,7 +220,7 @@ const AccountPreferences: React.FC<AccountPreferencesProps> = ({
       {isActivatedAccount && (
         <>
           {!isTemporaryAndNonPersistent.current && (
-            <HistoryBackupSection backupRepository={backupRepository} brandName={brandName} />
+            <HistoryBackupSection brandName={brandName} importFile={importFile} switchContent={switchContent} />
           )}
           <AccountSecuritySection {...{selfUser, userRepository}} />
           {!isDesktop && <LogoutSection {...{clientRepository}} />}

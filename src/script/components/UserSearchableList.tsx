@@ -23,7 +23,7 @@ import {container} from 'tsyringe';
 import {debounce} from 'underscore';
 
 import {partition} from 'Util/ArrayUtil';
-import {registerReactComponent, useKoSubscribableChildren} from 'Util/ComponentUtil';
+import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 import {sortByPriority} from 'Util/StringUtil';
 
@@ -55,9 +55,10 @@ export type UserListProps = React.ComponentProps<typeof UserList> & {
   teamState?: TeamState;
   truncate?: boolean;
   userState?: UserState;
+  dataUieName?: string;
 };
 
-const UserSearchableList: React.FC<UserListProps> = ({onUpdateSelectedUsers, ...props}) => {
+const UserSearchableList: React.FC<UserListProps> = ({onUpdateSelectedUsers, dataUieName = '', ...props}) => {
   const {searchRepository, teamRepository, observables, selfFirst, ...userListProps} = props;
   const {userState = container.resolve(UserState), conversationState = container.resolve(ConversationState)} = props;
 
@@ -166,7 +167,7 @@ const UserSearchableList: React.FC<UserListProps> = ({onUpdateSelectedUsers, ...
   const noResultsTranslationText = hasUsers ? 'searchListEveryoneParticipates' : 'searchListNoMatches';
 
   return (
-    <div className="user-list-wrapper">
+    <div className="user-list-wrapper" data-uie-name={dataUieName}>
       {isEmptyUserList ? (
         <div className="user-list__no-results" data-uie-name={noResultsDataUieName}>
           {t(noResultsTranslationText)}
@@ -187,5 +188,3 @@ const UserSearchableList: React.FC<UserListProps> = ({onUpdateSelectedUsers, ...
 };
 
 export default UserSearchableList;
-
-registerReactComponent('user-list', UserSearchableList);

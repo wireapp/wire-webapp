@@ -168,4 +168,4 @@ const UserModalComponent: React.FC<UserModalProps> = ({
 
 export default UserModalComponent;
 
-export const showUserModal = renderElement<UserModalProps>(UserModalComponent);
+export const showUserModal = renderElement<UserModalProps>(UserModalComponent, 'user-modal-container');

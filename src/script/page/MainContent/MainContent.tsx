@@ -17,7 +17,7 @@
  *
  */
 
-import {FC, ReactNode} from 'react';
+import {FC, ReactNode, useState} from 'react';
 
 import {StyledApp, THEME_ID} from '@wireapp/react-ui-kit';
 import {CSSTransition, SwitchTransition} from 'react-transition-group';
@@ -26,6 +26,7 @@ import {container} from 'tsyringe';
 import ConnectRequests from 'Components/ConnectRequests';
 import ConversationList from 'Components/Conversation';
 import HistoryExport from 'Components/HistoryExport';
+import HistoryImport from 'Components/HistoryImport';
 import Icon from 'Components/Icon';
 import GroupCreationModal from 'Components/Modals/GroupCreation/GroupCreationModal';
 import {registerReactComponent, useKoSubscribableChildren} from 'Util/ComponentUtil';
@@ -62,10 +63,12 @@ const MainContent: FC<MainContentProps> = ({
   contentViewModel,
   conversationState = container.resolve(ConversationState),
 }) => {
+  const [uploadedFile, setUploadedFile] = useState<File | null>(null);
+
   const {state} = useKoSubscribableChildren(contentViewModel, ['state']);
   const {activeConversation} = useKoSubscribableChildren(conversationState, ['activeConversation']);
 
-  const {initialMessage, isFederated, repositories} = contentViewModel;
+  const {initialMessage, isFederated, repositories, switchContent} = contentViewModel;
 
   const teamState = container.resolve(TeamState);
   const userState = container.resolve(UserState);
@@ -85,6 +88,11 @@ const MainContent: FC<MainContentProps> = ({
   };
 
   const title = statesTitle[state];
+
+  const onFileUpload = (file: File) => {
+    switchContent(ContentState.HISTORY_IMPORT);
+    setUploadedFile(file);
+  };
 
   return (
     <RootProvider value={contentViewModel}>
@@ -112,8 +120,9 @@ const MainContent: FC<MainContentProps> = ({
               {state === ContentState.PREFERENCES_ACCOUNT && (
                 <div id="preferences-account" className="preferences-page preferences-account">
                   <AccountPreferences
+                    importFile={onFileUpload}
                     showDomain={isFederated}
-                    backupRepository={repositories.backup}
+                    switchContent={switchContent}
                     clientRepository={repositories.client}
                     conversationRepository={repositories.conversation}
                     propertiesRepository={repositories.properties}
@@ -170,7 +179,17 @@ const MainContent: FC<MainContentProps> = ({
                 <ConversationList initialMessage={initialMessage} teamState={teamState} userState={userState} />
               )}
 
-              {state === ContentState.HISTORY_EXPORT && <HistoryExport userState={userState} />}
+              {state === ContentState.HISTORY_EXPORT && (
+                <HistoryExport userState={userState} switchContent={switchContent} />
+              )}
+
+              {state === ContentState.HISTORY_IMPORT && uploadedFile && (
+                <HistoryImport
+                  file={uploadedFile}
+                  backupRepository={repositories.backup}
+                  switchContent={switchContent}
+                />
+              )}
             </>
           </Animated>
         </SwitchTransition>

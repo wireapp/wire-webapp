@@ -77,6 +77,7 @@ const getDefaultProps = () => ({
   conversationRepository,
   eventRepository,
   messageRepository: {} as MessageRepository,
+  openGiphy: jest.fn(),
   propertiesRepository: new PropertiesRepository({} as any, {} as any),
   searchRepository,
   storageRepository,

@@ -22,7 +22,7 @@ import React, {useEffect, useState} from 'react';
 import cx from 'classnames';
 import {container} from 'tsyringe';
 
-import {registerReactComponent, useKoSubscribableChildren} from 'Util/ComponentUtil';
+import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 
 import RestrictedImage from './asset/RestrictedImage';
 import InViewport from './utils/InViewport';
@@ -95,5 +95,3 @@ const Image: React.FC<ImageProps> = ({
 };
 
 export default Image;
-
-registerReactComponent('image-component', Image);

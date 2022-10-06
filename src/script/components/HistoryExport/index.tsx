@@ -19,8 +19,6 @@
 
 import {FC, useContext, useEffect, useState} from 'react';
 
-import {WebAppEvents} from '@wireapp/webapp-events';
-import {amplify} from 'amplify';
 import {container} from 'tsyringe';
 
 import LoadingBar from 'Components/LoadingBar';
@@ -48,10 +46,11 @@ export const CONFIG = {
 };
 
 interface HistoryExportProps {
+  switchContent: (contentState: ContentState) => void;
   readonly userState: UserState;
 }
 
-const HistoryExport: FC<HistoryExportProps> = ({userState = container.resolve(UserState)}) => {
+const HistoryExport: FC<HistoryExportProps> = ({switchContent, userState = container.resolve(UserState)}) => {
   const logger = getLogger('HistoryExport');
 
   const [historyState, setHistoryState] = useState<ExportState>(ExportState.PREPARING);
@@ -97,7 +96,7 @@ const HistoryExport: FC<HistoryExportProps> = ({userState = container.resolve(Us
   const loadingMessage = historyMessages?.[historyState] || '';
 
   const dismissExport = () => {
-    amplify.publish(WebAppEvents.CONTENT.SWITCH, ContentState.PREFERENCES_ACCOUNT);
+    switchContent(ContentState.PREFERENCES_ACCOUNT);
   };
 
   const onProgress = (processedNumber: number) => {

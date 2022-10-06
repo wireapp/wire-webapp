@@ -22,7 +22,6 @@ import React, {Fragment} from 'react';
 import cx from 'classnames';
 
 import ParticipantItem from 'Components/list/ParticipantItem';
-import {registerReactComponent} from 'Util/ComponentUtil';
 import {KEY} from 'Util/KeyboardUtil';
 
 import type {ServiceEntity} from '../integration/ServiceEntity';
@@ -35,6 +34,7 @@ export interface ServiceListProps {
   noUnderline: boolean;
   isSearching?: boolean;
   mode?: MODE;
+  dataUieName?: string;
 }
 
 export enum MODE {
@@ -49,6 +49,7 @@ const ServiceList: React.FC<ServiceListProps> = ({
   mode = MODE.DEFAULT,
   noUnderline,
   services,
+  dataUieName = '',
 }) => {
   const handleKeyDown = (event: KeyboardEvent, service: ServiceEntity) => {
     if (event.key === KEY.ENTER || event.key === KEY.SPACE) {
@@ -58,7 +59,10 @@ const ServiceList: React.FC<ServiceListProps> = ({
 
   return (
     <Fragment>
-      <ul className={cx('search-list', mode === MODE.COMPACT ? 'search-list-sm' : 'search-list-lg')}>
+      <ul
+        className={cx('search-list', mode === MODE.COMPACT ? 'search-list-sm' : 'search-list-lg')}
+        data-uie-name={dataUieName}
+      >
         {services.map(service => (
           <li key={service.id}>
             <div className="search-list-button" data-uie-name={`service-list-service-${service.id}`}>
@@ -73,6 +77,7 @@ const ServiceList: React.FC<ServiceListProps> = ({
           </li>
         ))}
       </ul>
+
       {isSearching && !services.length && (
         <div className="no-results" data-uie-name="service-list-no-results">
           {t('searchListNoMatches')}
@@ -83,5 +88,3 @@ const ServiceList: React.FC<ServiceListProps> = ({
 };
 
 export default ServiceList;
-
-registerReactComponent('service-list', ServiceList);

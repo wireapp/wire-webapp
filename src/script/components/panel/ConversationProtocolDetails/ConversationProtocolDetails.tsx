@@ -22,7 +22,6 @@ import React from 'react';
 import {CSSObject} from '@emotion/react';
 import {ConversationProtocol} from '@wireapp/api-client/src/conversation/NewConversation';
 
-import {registerReactComponent} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 
 export enum Ciphersuite {
@@ -103,5 +102,3 @@ const ConversationProtocolDetails: React.FC<ConversationProtocolDetailsProps> = 
 };
 
 export default ConversationProtocolDetails;
-
-registerReactComponent('conversation-protocol-details', ConversationProtocolDetails);

@@ -21,8 +21,6 @@ import React, {useId} from 'react';
 
 import cx from 'classnames';
 
-import {registerReactComponent} from 'Util/ComponentUtil';
-
 export interface BaseToggleProps {
   extendedInfo?: boolean;
   extendedInfoText?: string;
@@ -93,5 +91,3 @@ const BaseToggle: React.FC<BaseToggleProps> = ({
 };
 
 export default BaseToggle;
-
-registerReactComponent('base-toggle', BaseToggle);

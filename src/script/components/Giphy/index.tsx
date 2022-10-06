@@ -25,11 +25,9 @@ import cx from 'classnames';
 
 import GifImage from 'Components/Giphy/GifImage';
 import Icon from 'Components/Icon';
-import {registerReactComponent} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 
 import {Gif, GiphyRepository} from '../../extension/GiphyRepository';
-import {Modal} from '../../ui/Modal';
 
 export enum GiphyState {
   DEFAULT = '',
@@ -42,16 +40,20 @@ export enum GiphyState {
 
 interface GiphyProps {
   readonly giphyRepository: GiphyRepository;
+  inputValue: string;
+  onClose: () => void;
   defaultGiphyState?: GiphyState;
 }
 
-const Giphy: FC<GiphyProps> = ({giphyRepository, defaultGiphyState = GiphyState.DEFAULT}) => {
-  const [currentQuery, setCurrentQuery] = useState<string>('');
+const Giphy: FC<GiphyProps> = ({giphyRepository, defaultGiphyState = GiphyState.DEFAULT, inputValue, onClose}) => {
+  const [playAnimation, setPlayAnimation] = useState<boolean>(false);
+  const [currentQuery, setCurrentQuery] = useState<string>(inputValue);
   const [gifs, setGifs] = useState<Gif[]>([]);
   const [selectedGif, setSelectedGif] = useState<Gif | null>(null);
   const [currentGif, setCurrentGif] = useState<Gif | null>(null);
 
   const [giphyState, setGiphyState] = useState<GiphyState>(defaultGiphyState);
+
   const isErrorState = giphyState === GiphyState.ERROR;
   const isLoading = giphyState === GiphyState.LOADING;
   const isSingleGif = giphyState === GiphyState.RESULT;
@@ -61,10 +63,6 @@ const Giphy: FC<GiphyProps> = ({giphyRepository, defaultGiphyState = GiphyState.
   const hasGifs = gifs.length > 0;
 
   const loadingTxt = isLoading ? t('accessibility.giphyModal.loading') : '';
-
-  const giphyModal = new Modal('#giphy-modal', () => {
-    giphyRepository.resetOffset();
-  });
 
   const clearGifs = (): void => {
     setGifs([]);
@@ -116,17 +114,17 @@ const Giphy: FC<GiphyProps> = ({giphyRepository, defaultGiphyState = GiphyState.
   };
 
   const onCloseClick = () => {
-    giphyModal.hide();
-    giphyRepository.resetOffset();
+    requestAnimationFrame(() => setPlayAnimation(false));
+
+    setTimeout(() => {
+      onClose();
+      giphyRepository.resetOffset();
+    }, 350);
   };
 
   const showGiphy = async (query: string) => {
     setCurrentQuery(query);
-    setGiphyState(GiphyState.DEFAULT);
     await getGifs(query, true);
-
-    giphyModal.show();
-    giphyModal.focus();
   };
 
   const getRandomGif = async () => {
@@ -152,8 +150,7 @@ const Giphy: FC<GiphyProps> = ({giphyRepository, defaultGiphyState = GiphyState.
       amplify.publish(WebAppEvents.EXTENSIONS.GIPHY.SEND, selectedGif.animated, currentQuery);
       setSelectedGif(null);
 
-      giphyModal.hide();
-      giphyRepository.resetOffset();
+      onCloseClick();
     }
   };
 
@@ -170,11 +167,14 @@ const Giphy: FC<GiphyProps> = ({giphyRepository, defaultGiphyState = GiphyState.
   };
 
   useEffect(() => {
-    amplify.subscribe(WebAppEvents.EXTENSIONS.GIPHY.SHOW, showGiphy);
-  }, []);
+    if (inputValue) {
+      requestAnimationFrame(() => setPlayAnimation(true));
+      showGiphy(inputValue);
+    }
+  }, [inputValue]);
 
   return (
-    <div id="giphy-modal" className="giphy-modal modal modal-large">
+    <div id="giphy-modal" className={cx('giphy-modal modal modal-large modal-show', {'modal-fadein': playAnimation})}>
       <div role="dialog" aria-labelledby="giphy-name">
         <div className="modal-content">
           <div className="giphy-modal-header modal-header">
@@ -284,5 +284,3 @@ const Giphy: FC<GiphyProps> = ({giphyRepository, defaultGiphyState = GiphyState.
 };
 
 export default Giphy;
-
-registerReactComponent('giphy', Giphy);

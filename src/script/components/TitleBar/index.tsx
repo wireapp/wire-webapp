@@ -17,7 +17,7 @@
  *
  */
 
-import React, {useMemo, useEffect, useCallback, useState} from 'react';
+import React, {useCallback, useEffect, useMemo, useState} from 'react';
 
 import {IconButton, StyledApp, THEME_ID, useMatchMedia} from '@wireapp/react-ui-kit';
 import {WebAppEvents} from '@wireapp/webapp-events';
@@ -27,7 +27,7 @@ import {container} from 'tsyringe';
 
 import Icon from 'Components/Icon';
 import LegalHoldDot from 'Components/LegalHoldDot';
-import {registerReactComponent, useKoSubscribableChildren} from 'Util/ComponentUtil';
+import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {handleKeyDown} from 'Util/KeyboardUtil';
 import {StringIdentifer, t} from 'Util/LocalizerUtil';
 import {matchQualifiedIds} from 'Util/QualifiedId';
@@ -412,5 +412,3 @@ export function generateWarningBadgeKey({
 }
 
 export default TitleBar;
-
-registerReactComponent('title-bar', TitleBar);
