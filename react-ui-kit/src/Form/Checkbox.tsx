@@ -29,9 +29,17 @@ export interface StyledLabelProps<T = HTMLLabelElement> extends React.HTMLProps<
   disabled?: boolean;
   markInvalid?: boolean;
   aligncenter?: boolean;
+  labelBeforeCheckbox?: boolean;
 }
 
-const StyledLabel = ({disabled, markInvalid, aligncenter = false, children, ...props}: StyledLabelProps) => {
+const StyledLabel = ({
+  disabled,
+  markInvalid,
+  aligncenter = false,
+  labelBeforeCheckbox = false,
+  children,
+  ...props
+}: StyledLabelProps) => {
   return (
     <label
       css={(theme: Theme) => ({
@@ -45,8 +53,15 @@ const StyledLabel = ({disabled, markInvalid, aligncenter = false, children, ...p
         [`.${INPUT_CLASSNAME} + & > svg`]: {
           fill: 'none',
           position: 'absolute',
-          left: '0.25rem',
-          top: '0.25rem',
+          top: '50%',
+          transform: 'translateY(-50%)',
+          ...(labelBeforeCheckbox
+            ? {
+                right: '0.75rem',
+              }
+            : {
+                left: '0.25rem',
+              }),
         },
         ...(!disabled && {
           [`.${INPUT_CLASSNAME}:hover + &::before`]: {
@@ -74,6 +89,11 @@ const StyledLabel = ({disabled, markInvalid, aligncenter = false, children, ...p
           margin: '0 8px 0 0px',
           color: theme.general.color,
         },
+        ...(labelBeforeCheckbox && {
+          flexDirection: 'row-reverse',
+          justifyContent: 'space-between',
+        }),
+        alignItems: 'center',
         position: 'relative',
         margin: '0 0 0 -16px',
         width: aligncenter ? 'auto' : '100%',
@@ -96,48 +116,60 @@ const StyledLabel = ({disabled, markInvalid, aligncenter = false, children, ...p
 interface CheckboxProps<T = HTMLInputElement> extends InputProps<T> {
   id?: string;
   aligncenter?: boolean;
+  labelBeforeCheckbox?: boolean;
 }
 
 export const Checkbox: React.FC<CheckboxProps<HTMLInputElement>> = React.forwardRef<
   HTMLInputElement,
   CheckboxProps<HTMLInputElement>
->(({id = useId(), children, style, disabled, wrapperCSS = {}, markInvalid, aligncenter, ...props}, ref) => (
-  <div
-    css={(theme: Theme) => ({
-      alignItems: 'center',
-      display: 'flex',
-      justifyContent: 'flex-start',
-      position: 'relative',
-      left: '-0.3rem',
-      [`.${INPUT_CLASSNAME}:focus-visible + label`]: {
-        outline: `1px solid ${theme.general.primaryColor}`,
-        outlineOffset: '0.4rem',
-      },
-      ...wrapperCSS,
-    })}
-    style={style}
-  >
-    <input
-      type="checkbox"
-      id={id}
-      style={{
-        height: '22px',
-        marginBottom: '0',
-        opacity: 0,
-        width: '22px',
-        cursor: disabled ? 'not-allowed' : 'pointer',
-      }}
-      disabled={disabled}
-      ref={ref}
-      className={INPUT_CLASSNAME}
-      {...props}
-    />
+>(
+  (
+    {id = useId(), children, style, disabled, wrapperCSS = {}, markInvalid, aligncenter, labelBeforeCheckbox, ...props},
+    ref,
+  ) => (
+    <div
+      css={(theme: Theme) => ({
+        alignItems: 'center',
+        display: 'flex',
+        justifyContent: 'flex-start',
+        position: 'relative',
+        left: '-0.3rem',
+        [`.${INPUT_CLASSNAME}:focus-visible + label`]: {
+          outline: `1px solid ${theme.general.primaryColor}`,
+          outlineOffset: '0.4rem',
+        },
+        ...wrapperCSS,
+      })}
+      style={style}
+    >
+      <input
+        type="checkbox"
+        id={id}
+        style={{
+          height: '22px',
+          marginBottom: '0',
+          opacity: 0,
+          width: '22px',
+          cursor: disabled ? 'not-allowed' : 'pointer',
+        }}
+        disabled={disabled}
+        ref={ref}
+        className={INPUT_CLASSNAME}
+        {...props}
+      />
 
-    <StyledLabel htmlFor={id} disabled={disabled} markInvalid={markInvalid} aligncenter={aligncenter}>
-      {children}
-    </StyledLabel>
-  </div>
-));
+      <StyledLabel
+        htmlFor={id}
+        disabled={disabled}
+        markInvalid={markInvalid}
+        aligncenter={aligncenter}
+        labelBeforeCheckbox={labelBeforeCheckbox}
+      >
+        {children}
+      </StyledLabel>
+    </div>
+  ),
+);
 
 export type CheckboxLabelProps<T = HTMLSpanElement> = TextProps<T>;
 
