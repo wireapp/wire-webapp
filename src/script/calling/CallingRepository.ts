@@ -631,32 +631,8 @@ export class CallingRepository {
       ) {
         this.warnOutdatedClient(conversationId);
       }
-      return;
     }
-    return this.handleCallEventSaving(content.type, conversationId, userId, time, source);
   };
-
-  private handleCallEventSaving(
-    type: string,
-    conversationId: QualifiedId,
-    userId: QualifiedId,
-    time: string,
-    source: string,
-  ): void {
-    // save event if needed
-    switch (type) {
-      case CALL_MESSAGE_TYPE.SETUP:
-      case CALL_MESSAGE_TYPE.CONF_START:
-      case CALL_MESSAGE_TYPE.GROUP_START:
-        const activeCall = this.findCall(conversationId);
-        const ignoreNotificationStates = [CALL_STATE.MEDIA_ESTAB, CALL_STATE.ANSWERED, CALL_STATE.OUTGOING];
-        if (!activeCall || !ignoreNotificationStates.includes(activeCall.state())) {
-          // we want to ignore call start events that already have an active call (whether it's ringing or connected).
-          this.injectActivateEvent(conversationId, userId, time, source);
-        }
-        break;
-    }
-  }
 
   //##############################################################################
   // Call actions
@@ -1043,9 +1019,9 @@ export class CallingRepository {
     return recipients;
   }
 
-  private injectActivateEvent(conversationId: QualifiedId, userId: QualifiedId, time: string, source: string): void {
+  private injectActivateEvent(conversationId: QualifiedId, userId: QualifiedId, time: string): void {
     const event = EventBuilder.buildVoiceChannelActivate(conversationId, userId, time, this.avsVersion);
-    this.eventRepository.injectEvent(event as unknown as EventRecord, source as EventSource);
+    this.eventRepository.injectEvent(event as unknown as EventRecord, EventSource.INJECTED);
   }
 
   private injectDeactivateEvent(
@@ -1319,12 +1295,13 @@ export class CallingRepository {
   private readonly incomingCall = (
     convId: SerializedConversationId,
     timestamp: number,
-    userId: UserId,
+    userIdStr: UserId,
     clientId: string,
     hasVideo: number,
     shouldRing: number,
     conversationType: CONV_TYPE,
   ) => {
+    const userId = this.parseQualifiedId(userIdStr);
     const conversationId = this.parseQualifiedId(convId);
     const conversation = this.conversationState.findConversation(conversationId);
     if (!conversation || !this.selfUser || !this.selfClientId) {
@@ -1345,7 +1322,7 @@ export class CallingRepository {
     const isVideoCall = hasVideo ? CALL_TYPE.VIDEO : CALL_TYPE.NORMAL;
     const isMuted = Config.getConfig().FEATURE.CONFERENCE_AUTO_MUTE && conversationType === CONV_TYPE.CONFERENCE;
     const call = new Call(
-      this.parseQualifiedId(userId),
+      userId,
       conversation.qualifiedId,
       conversationType,
       selfParticipant,
@@ -1361,6 +1338,7 @@ export class CallingRepository {
     if (canRing && isVideoCall) {
       this.warmupMediaStreams(call, true, true);
     }
+    this.injectActivateEvent(conversationId, userId, new Date(timestamp * 1000).toISOString());
 
     this.storeCall(call);
     this.incomingCallCallback(call);
