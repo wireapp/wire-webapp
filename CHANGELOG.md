@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [8.16.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/react-ui-kit@8.15.0...@wireapp/react-ui-kit@8.16.0) (2022-10-06)
+
+### Features
+
+* add prop to checkbox component to change label position ([#4423](https://github.com/wireapp/wire-web-packages/issues/4423)) ([760f4e4](https://github.com/wireapp/wire-web-packages/commit/760f4e4866968be57f654e093543fd4f54e8a7bf))
+
 # [8.15.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/react-ui-kit@8.14.9...@wireapp/react-ui-kit@8.15.0) (2022-10-05)
 
 ### Features
