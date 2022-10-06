@@ -107,7 +107,7 @@ interface InputBarProps {
   readonly conversationRepository: ConversationRepository;
   readonly eventRepository: EventRepository;
   readonly messageRepository: MessageRepository;
-  readonly onGiphyClick: (inputValue: string) => void;
+  readonly openGiphy: (inputValue: string) => void;
   readonly propertiesRepository: PropertiesRepository;
   readonly searchRepository: SearchRepository;
   readonly storageRepository: StorageRepository;
@@ -121,7 +121,7 @@ const InputBar = ({
   conversationRepository,
   eventRepository,
   messageRepository,
-  onGiphyClick,
+  openGiphy,
   propertiesRepository,
   searchRepository,
   storageRepository,
@@ -625,9 +625,7 @@ const InputBar = ({
     }
   };
 
-  const onGifClick = () => {
-    onGiphyClick(inputValue);
-  };
+  const onGifClick = () => openGiphy(inputValue);
 
   const onPingClick = () => {
     if (conversationEntity && !pingDisabled) {

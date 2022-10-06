@@ -112,14 +112,12 @@ const ConversationList: FC<ConversationListProps> = ({initialMessage, teamState,
 
   const {conversationRepository, repositories, mainViewModel, legalHoldModal, isFederated} = contentViewModel;
 
-  const onGiphyClick = (text: string) => {
+  const openGiphy = (text: string) => {
     setInputValue(text);
     setIsGiphyModalOpen(true);
   };
 
-  const onGiphyClose = () => {
-    setIsGiphyModalOpen(false);
-  };
+  const closeGiphy = () => setIsGiphyModalOpen(false);
 
   const clickOnInvitePeople = (conversation: ConversationEntity): void => {
     openRightSidebar({
@@ -428,7 +426,7 @@ const ConversationList: FC<ConversationListProps> = ({initialMessage, teamState,
             conversationRepository={repositories.conversation}
             eventRepository={repositories.event}
             messageRepository={repositories.message}
-            onGiphyClick={onGiphyClick}
+            openGiphy={openGiphy}
             propertiesRepository={repositories.properties}
             searchRepository={repositories.search}
             storageRepository={repositories.storage}
@@ -443,7 +441,7 @@ const ConversationList: FC<ConversationListProps> = ({initialMessage, teamState,
       )}
 
       {isGiphyModalOpen && inputValue && (
-        <Giphy giphyRepository={repositories.giphy} inputValue={inputValue} onClose={onGiphyClose} />
+        <Giphy giphyRepository={repositories.giphy} inputValue={inputValue} onClose={closeGiphy} />
       )}
     </div>
   );
