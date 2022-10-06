@@ -17,7 +17,7 @@
  *
  */
 
-import {USER_EVENT, CONVERSATION_EVENT} from '@wireapp/api-client/src/event/';
+import {CONVERSATION_EVENT, USER_EVENT} from '@wireapp/api-client/src/event/';
 import {Account, ConnectionState, ProcessedEventPayload} from '@wireapp/core';
 import {PayloadBundleSource} from '@wireapp/core/src/main/conversation';
 import {HandledEventPayload} from '@wireapp/core/src/main/notification';
@@ -41,7 +41,6 @@ import {NOTIFICATION_HANDLING_STATE} from './NotificationHandlingState';
 import type {NotificationService} from './NotificationService';
 
 import {AssetTransferState} from '../assets/AssetTransferState';
-import {CALL_MESSAGE_TYPE} from '../calling/enum/CallMessageType';
 import type {ClientEntity} from '../client/ClientEntity';
 import {EventBuilder} from '../conversation/EventBuilder';
 import {AssetData, CryptographyMapper} from '../cryptography/CryptographyMapper';
@@ -446,12 +445,6 @@ export class EventRepository {
         this.updateLastEventDate(eventDate as string);
       }
     }
-
-    const isCallEvent = event.type === ClientEvent.CALL.E_CALL;
-    if (isCallEvent) {
-      this.validateCallEventLifetime(event);
-    }
-
     return this.distributeEvent(event, source);
   }
 
@@ -654,39 +647,5 @@ export class EventRepository {
     const baseErrorMessage = 'Event validation failed:';
     this.logger.warn(`${baseLogMessage} ${logMessage || errorMessage}`, event);
     throw new EventError(EventError.TYPE.VALIDATION_FAILED, `${baseErrorMessage} ${errorMessage}`);
-  }
-
-  /**
-   * Check if call event is handled within its valid lifespan.
-   *
-   * @param event Event to validate
-   * @returns `true` if event is handled within it's lifetime, otherwise throws error
-   */
-  private validateCallEventLifetime(event: EventRecord): boolean {
-    const {content = {}, conversation: conversationId, time, type} = event;
-    const forcedEventTypes = [CALL_MESSAGE_TYPE.CANCEL, CALL_MESSAGE_TYPE.GROUP_LEAVE];
-
-    const correctedTimestamp = this.serverTimeHandler.toServerTimestamp();
-    const thresholdTimestamp = new Date(time).getTime() + EventRepository.CONFIG.E_CALL_EVENT_LIFETIME;
-
-    const isForcedEventType = forcedEventTypes.includes((content as {type: CALL_MESSAGE_TYPE}).type);
-    const eventWithinThreshold = correctedTimestamp < thresholdTimestamp;
-    const stateIsWebSocket = this.notificationHandlingState() === NOTIFICATION_HANDLING_STATE.WEB_SOCKET;
-
-    const isValidEvent = isForcedEventType || eventWithinThreshold || stateIsWebSocket;
-    if (isValidEvent) {
-      return true;
-    }
-
-    const eventIsoDate = new Date(time).toISOString();
-    const logMessage = `Ignored outdated calling event '${type}' (${eventIsoDate}) in conversation '${conversationId}'`;
-    const logObject = {
-      eventJson: JSON.stringify(event),
-      eventObject: event,
-      eventTime: eventIsoDate,
-      localTime: new Date(correctedTimestamp).toISOString(),
-    };
-    this.logger.info(logMessage, logObject);
-    throw new EventError(EventError.TYPE.OUTDATED_E_CALL_EVENT, EventError.MESSAGE.OUTDATED_E_CALL_EVENT);
   }
 }
