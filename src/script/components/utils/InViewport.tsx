@@ -25,7 +25,7 @@ interface InViewportParams {
   onVisible: () => void;
   requireFullyInView?: boolean;
   allowBiggerThanViewport?: boolean;
-  /** Will check if the element is overlayed by something else. Can be used to be absolutely sure the user could actually see the element */
+  /** Will check if the element is overlayed by something else. Can be used to be sure the user could actually see the element. Should not be used to do lazy loading as the overlayObserver has quite a long debounce time */
   checkOverlay?: boolean;
 }
 
