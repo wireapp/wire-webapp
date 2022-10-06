@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [8.17.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/react-ui-kit@8.16.0...@wireapp/react-ui-kit@8.17.0) (2022-10-06)
+
+### Features
+
+* add prop to checkbox component to remove focus outline offset ([#4424](https://github.com/wireapp/wire-web-packages/issues/4424)) ([66e8f8c](https://github.com/wireapp/wire-web-packages/commit/66e8f8c9e5fa5268fa929ac37ce482b75432bc7c))
+
 # [8.16.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/react-ui-kit@8.15.0...@wireapp/react-ui-kit@8.16.0) (2022-10-06)
 
 ### Features
