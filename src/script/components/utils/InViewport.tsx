@@ -25,12 +25,15 @@ interface InViewportParams {
   onVisible: () => void;
   requireFullyInView?: boolean;
   allowBiggerThanViewport?: boolean;
+  /** Will check if the element is overlayed by something else. Can be used to be absolutely sure the user could actually see the element */
+  checkOverlay?: boolean;
 }
 
 const InViewport: React.FC<InViewportParams & React.HTMLProps<HTMLDivElement>> = ({
   children,
   onVisible,
   requireFullyInView = false,
+  checkOverlay = false,
   allowBiggerThanViewport = false,
   ...props
 }) => {
@@ -43,9 +46,11 @@ const InViewport: React.FC<InViewportParams & React.HTMLProps<HTMLDivElement>> =
     }
 
     let inViewport = false;
-    let visible = false;
+    let visible = !checkOverlay;
     const releaseTrackers = () => {
-      overlayedObserver.removeElement(element);
+      if (checkOverlay) {
+        overlayedObserver.removeElement(element);
+      }
       viewportObserver.removeElement(element);
     };
 
@@ -66,12 +71,14 @@ const InViewport: React.FC<InViewportParams & React.HTMLProps<HTMLDivElement>> =
       requireFullyInView,
       allowBiggerThanViewport,
     );
-    overlayedObserver.trackElement(element, isVisible => {
-      visible = isVisible;
-      triggerCallbackIfVisible();
-    });
+    if (checkOverlay) {
+      overlayedObserver.trackElement(element, isVisible => {
+        visible = isVisible;
+        triggerCallbackIfVisible();
+      });
+    }
     return () => releaseTrackers();
-  }, [allowBiggerThanViewport, requireFullyInView, onVisible]);
+  }, [allowBiggerThanViewport, requireFullyInView, checkOverlay, onVisible]);
 
   return (
     <div ref={domNode} {...props} css={{minHeight: '1px'}}>
