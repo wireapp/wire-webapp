@@ -206,7 +206,7 @@ const GroupParticipantUser: FC<GroupParticipantUserProps> = ({
 
             {true && (
               // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex
-              <div className="panel__action-item panel__info-text panel__item-offset" tabIndex="0">
+              <div className="panel__action-item panel__info-text panel__item-offset" tabIndex={0}>
                 {t('conversationDetailsGroupAdminInfo')}
               </div>
             )}

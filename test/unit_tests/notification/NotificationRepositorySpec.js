@@ -60,6 +60,9 @@ import {TestFactory} from '../../helper/TestFactory';
 window.wire = window.wire || {};
 window.wire.app = window.wire.app || {};
 
+// TODO: Remove after all migrations
+jest.mock('src/script/page/RightSidebar/utils/toggleRightPanel', () => () => jest.fn());
+
 describe('NotificationRepository', () => {
   const testFactory = new TestFactory();
   let conversation_et = null;

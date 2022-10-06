@@ -25,6 +25,9 @@ import {ContentState, ContentViewModel} from 'src/script/view_model/ContentViewM
 
 import Preferences from './Preferences';
 
+// TODO: Remove after all migrations
+jest.mock('src/script/page/RightSidebar/utils/toggleRightPanel', () => () => jest.fn());
+
 describe('Preferences', () => {
   const defaultParams = {
     contentViewModel: {
