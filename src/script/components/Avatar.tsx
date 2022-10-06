@@ -93,6 +93,7 @@ const Avatar: FC<AvatarProps> = ({
   };
 
   const {isTemporaryGuest, isTeamMember, isBlocked, isRequest, isIgnored, isCanceled, isUnknown} =
+    // @ts-ignore
     useKoSubscribableChildren(participant, [
       'isTemporaryGuest',
       'isTeamMember',

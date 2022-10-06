@@ -49,14 +49,8 @@ const LegalHoldDot: React.FC<LegalHoldDotProps> = ({
   const onClick = (event: React.MouseEvent) => {
     event.stopPropagation();
 
-    if (!isInteractive) {
-      return;
-    }
-
     if (isPending) {
       amplify.publish(LegalHoldModalState.SHOW_REQUEST);
-
-      return;
     }
 
     amplify.publish(LegalHoldModalState.SHOW_DETAILS, conversation);
@@ -64,10 +58,12 @@ const LegalHoldDot: React.FC<LegalHoldDotProps> = ({
 
   return (
     <button
+      id="legal-hold-button-interactive"
       type="button"
-      className={cx('legal-hold-dot-button', {'legal-hold-dot-button--interactive': isInteractive})}
+      className="legal-hold-dot-button legal-hold-dot-button--interactive"
       onClick={onClick}
       data-uie-name={dataUieName}
+      disabled={!isInteractive}
     >
       <span
         className={cx(
