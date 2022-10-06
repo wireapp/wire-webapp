@@ -27,7 +27,7 @@ import {container} from 'tsyringe';
 import LegalHoldDot from 'Components/LegalHoldDot';
 import Icon from 'Components/Icon';
 
-import {registerReactComponent, useKoSubscribableChildren} from 'Util/ComponentUtil';
+import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {handleKeyDown} from 'Util/KeyboardUtil';
 import {StringIdentifer, t} from 'Util/LocalizerUtil';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
@@ -412,5 +412,3 @@ export function generateWarningBadgeKey({
 }
 
 export default TitleBar;
-
-registerReactComponent('title-bar', TitleBar);

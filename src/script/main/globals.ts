@@ -23,28 +23,8 @@ import ko from 'knockout';
 
 import '../Config';
 
-import 'Components/CopyToClipboard';
-import 'Components/ConnectRequests';
-import 'Components/HistoryExport';
-import 'Components/HistoryImport';
-import 'Components/UserSearchableList';
-import 'Components/toggle/BaseToggle';
 import 'Components/icons';
-import 'Components/Image';
-import 'Components/toggle/InfoToggle';
-import 'Components/calling/FullscreenVideoCall';
-import 'Components/avatar/GroupAvatar';
-import 'Components/TitleBar';
-import 'Components/MessagesList';
-import 'Components/InputBar';
-import 'Components/Giphy';
-import 'Components/Modals/GroupCreation/GroupCreationModal';
 import 'Components/modal';
-import 'Components/panel/ServiceDetails';
-import 'Components/panel/ConversationProtocolDetails/ConversationProtocolDetails';
-import 'Components/panel/UserDetails';
-import 'Components/ServiceList';
-import 'Components/SearchInput';
 import 'Components/calling/CallingOverlayContainer';
 
 import '../page/AppLock';
