@@ -64,7 +64,7 @@ export const PrimaryModalComponent: React.FC = () => {
   };
 
   const actionEnabled = !hasInput || !!inputValue.trim().length;
-  const doAction = (action: Function, closeAfter: boolean, skipValidation = false) => {
+  const doAction = (action?: Function, closeAfter = true, skipValidation = false) => {
     if (!skipValidation && !actionEnabled) {
       return;
     }
@@ -165,7 +165,7 @@ export const PrimaryModalComponent: React.FC = () => {
                     <button
                       key={`${action.text}-${action.uieName}`}
                       type="button"
-                      onClick={() => action?.action && doAction(action.action, true, true)}
+                      onClick={() => doAction(action.action, true, true)}
                       data-uie-name={action?.uieName}
                       className={cx('modal__button modal__button--secondary', {
                         'modal__button--full': hasMultipleSecondary,
