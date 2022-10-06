@@ -292,18 +292,12 @@ export class CallingRepository {
     return wUser;
   }
 
-  private readonly handleMissedCall = (
-    convid: string,
-    timestamp: number,
-    userid: string,
-    clientid: string,
-    video_call: number,
-    arg: number,
-  ) => {
+  private readonly handleMissedCall = (conversationId: string, timestamp: number, userId: string) => {
+    const callDuration = 0;
     this.injectDeactivateEvent(
-      this.parseQualifiedId(convid),
-      this.parseQualifiedId(userid),
-      0,
+      this.parseQualifiedId(conversationId),
+      this.parseQualifiedId(userId),
+      callDuration,
       REASON.CANCELED,
       new Date(timestamp * 1000).toISOString(),
       EventSource.INJECTED,
@@ -1307,13 +1301,13 @@ export class CallingRepository {
   private readonly incomingCall = (
     convId: SerializedConversationId,
     timestamp: number,
-    userIdStr: UserId,
+    userId: UserId,
     clientId: string,
     hasVideo: number,
     shouldRing: number,
     conversationType: CONV_TYPE,
   ) => {
-    const userId = this.parseQualifiedId(userIdStr);
+    const qualifiedUserId = this.parseQualifiedId(userId);
     const conversationId = this.parseQualifiedId(convId);
     const conversation = this.conversationState.findConversation(conversationId);
     if (!conversation || !this.selfUser || !this.selfClientId) {
@@ -1334,7 +1328,7 @@ export class CallingRepository {
     const isVideoCall = hasVideo ? CALL_TYPE.VIDEO : CALL_TYPE.NORMAL;
     const isMuted = Config.getConfig().FEATURE.CONFERENCE_AUTO_MUTE && conversationType === CONV_TYPE.CONFERENCE;
     const call = new Call(
-      userId,
+      qualifiedUserId,
       conversation.qualifiedId,
       conversationType,
       selfParticipant,
@@ -1350,7 +1344,7 @@ export class CallingRepository {
     if (canRing && isVideoCall) {
       this.warmupMediaStreams(call, true, true);
     }
-    this.injectActivateEvent(conversationId, userId, new Date(timestamp * 1000).toISOString());
+    this.injectActivateEvent(conversationId, qualifiedUserId, new Date(timestamp * 1000).toISOString());
 
     this.storeCall(call);
     this.incomingCallCallback(call);
