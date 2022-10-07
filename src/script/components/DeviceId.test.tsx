@@ -17,31 +17,23 @@
  *
  */
 
-import TestPage from 'Util/test/TestPage';
-import DeviceId, {DeviceIdProps} from './DeviceId';
-
-class DeviceIdPage extends TestPage<DeviceIdProps> {
-  constructor(props?: DeviceIdProps) {
-    super(DeviceId, props);
-  }
-
-  getDeviceIdParts = () => this.getAll('[data-uie-name="element-device-id-part"]');
-}
+import DeviceId from './DeviceId';
+import {render} from '@testing-library/react';
 
 describe('DeviceId', () => {
   it('can print device id', () => {
-    const deviceIdPage = new DeviceIdPage({
-      deviceId: '66e66c79e8d1dea4',
-    });
-    const deviceIdParts = Array.from(deviceIdPage.getDeviceIdParts()).map(node => node.textContent);
+    const {getAllByTestId} = render(<DeviceId deviceId={'66e66c79e8d1dea4'} />);
+
+    const deviceIdParts = getAllByTestId('element-device-id-part').map(node => node.textContent);
+
     expect(deviceIdParts).toEqual(['66', 'e6', '6c', '79', 'e8', 'd1', 'de', 'a4']);
   });
 
   it('can print device id and apply padding', () => {
-    const deviceIdPage = new DeviceIdPage({
-      deviceId: '6e66c79e8d1dea4',
-    });
-    const deviceIdParts = Array.from(deviceIdPage.getDeviceIdParts()).map(node => node.textContent);
+    const {getAllByTestId} = render(<DeviceId deviceId={'6e66c79e8d1dea4'} />);
+
+    const deviceIdParts = getAllByTestId('element-device-id-part').map(node => node.textContent);
+
     expect(deviceIdParts).toEqual(['06', 'e6', '6c', '79', 'e8', 'd1', 'de', 'a4']);
   });
 });
