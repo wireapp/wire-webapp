@@ -142,7 +142,8 @@ const TitleBar: React.FC<TitleBarProps> = ({
   const shortcut = Shortcut.getShortcutTooltip(ShortcutType.PEOPLE);
   const peopleTooltip = t('tooltipConversationPeople', shortcut);
 
-  const isScaledDown = useMatchMedia('max-width: 768px');
+  const mdBreakpoint = useMatchMedia('max-width: 768px');
+  const smBreakpoint = useMatchMedia('max-width: 620px');
 
   const responsiveView = useResponsiveViewState(state => state.currentView);
 
@@ -257,7 +258,7 @@ const TitleBar: React.FC<TitleBarProps> = ({
     <StyledApp themeId={THEME_ID.DEFAULT}>
       <ul id="conversation-title-bar" className="conversation-title-bar">
         <li className="conversation-title-bar-library">
-          {isScaledDown && responsiveView !== 1 && (
+          {smBreakpoint && (
             <IconButton
               variant={IconButtonVariant.SECONDARY}
               className="conversation-title-bar-icon icon-back"
@@ -265,7 +266,7 @@ const TitleBar: React.FC<TitleBarProps> = ({
               onClick={() => setResponsiveView(1)}
             />
           )}
-          {isActivatedAccount && !isScaledDown && (
+          {isActivatedAccount && !mdBreakpoint && (
             <button
               className="conversation-title-bar-icon icon-search"
               type="button"
@@ -320,7 +321,7 @@ const TitleBar: React.FC<TitleBarProps> = ({
         </li>
 
         <li className="conversation-title-bar-icons">
-          {showCallControls && !isScaledDown && (
+          {showCallControls && !mdBreakpoint && (
             <div className="buttons-group">
               {supportsVideoCall && isVideoCallingEnabled && (
                 <button
@@ -348,7 +349,7 @@ const TitleBar: React.FC<TitleBarProps> = ({
             </div>
           )}
 
-          {isScaledDown ? (
+          {mdBreakpoint ? (
             <>
               <IconButton
                 className="icon-search"
