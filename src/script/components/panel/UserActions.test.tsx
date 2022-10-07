@@ -20,36 +20,30 @@
 import ko from 'knockout';
 import {ConnectionStatus} from '@wireapp/api-client/src/connection/';
 
-import TestPage from 'Util/test/TestPage';
 import {noop} from 'Util/util';
 
-import UserActions, {UserActionsProps, ActionIdentifier, Actions} from './UserActions';
+import UserActions, {ActionIdentifier, Actions} from './UserActions';
 import {User} from 'src/script/entity/User';
 import {Conversation} from 'src/script/entity/Conversation';
 import {ConversationRoleRepository} from 'src/script/conversation/ConversationRoleRepository';
 import {ActionsViewModel} from 'src/script/view_model/ActionsViewModel';
+import {render} from '@testing-library/react';
 
 const actionsViewModel = {} as ActionsViewModel;
 
-class UserActionsPage extends TestPage<UserActionsProps> {
-  constructor(props?: UserActionsProps) {
-    super(UserActions, props);
-  }
+const getAllActions = (queryFunction: (id: string) => HTMLElement | null) =>
+  Object.values(ActionIdentifier)
+    .map(action => queryFunction(action))
+    .filter(action => action !== null);
 
-  getAction = (identifier: string) => this.get(`[data-uie-name="${identifier}"]`);
-  getAllActions = () =>
-    Object.values(ActionIdentifier)
-      .map(this.getAction)
-      .filter(action => action !== null);
-}
 describe('UserActions', () => {
   it('generates actions for self user profile', () => {
-    const user = new User('', null);
+    const user = new User('');
     user.isMe = true;
     const conversation = new Conversation();
     jest.spyOn(conversation, 'isGroup').mockImplementation(ko.pureComputed(() => true));
     const conversationRoleRepository: Partial<ConversationRoleRepository> = {canLeaveGroup: () => true};
-    const userActions = new UserActionsPage({
+    const props = {
       actionsViewModel,
       conversation,
       conversationRoleRepository: conversationRoleRepository as ConversationRoleRepository,
@@ -57,20 +51,26 @@ describe('UserActions', () => {
       onAction: noop,
       selfUser: user,
       user,
-    });
+    };
 
-    expect(userActions.getAllActions().length).toEqual(2);
+    const {queryByTestId} = render(<UserActions {...props} />);
+
+    const allActions = getAllActions(queryByTestId);
+
+    expect(allActions).toHaveLength(2);
+
     [Actions.OPEN_PROFILE, Actions.LEAVE].forEach(action => {
       const identifier = ActionIdentifier[action];
-      expect(userActions.getAction(identifier)).not.toBeNull();
+      expect(queryByTestId(identifier)).not.toBeNull();
     });
   });
+
   it('generates actions for self user profile when user is not activated', () => {
-    const user = new User('', null);
+    const user = new User('');
     user.isMe = true;
     const conversation = new Conversation();
 
-    const userActions = new UserActionsPage({
+    const props = {
       actionsViewModel,
       conversation,
       conversationRoleRepository: {} as ConversationRoleRepository,
@@ -78,32 +78,41 @@ describe('UserActions', () => {
       onAction: noop,
       selfUser: user,
       user,
-    });
+    };
 
-    expect(userActions.getAllActions().length).toEqual(1);
+    const {queryByTestId} = render(<UserActions {...props} />);
+
+    const allActions = getAllActions(queryByTestId);
+    expect(allActions).toHaveLength(1);
 
     const identifier = ActionIdentifier[Actions.OPEN_PROFILE];
-    expect(userActions.getAction(identifier)).not.toBeNull();
+    expect(queryByTestId(identifier)).not.toBeNull();
   });
+
   it('generates actions for another user profile to which I am connected', () => {
-    const user = new User('', null);
+    const user = new User('');
     const conversation = new Conversation();
     jest.spyOn(conversation, 'isGroup').mockImplementation(ko.pureComputed(() => true));
     user.connection().status(ConnectionStatus.ACCEPTED);
-    const userActions = new UserActionsPage({
+
+    const props = {
       actionsViewModel,
       conversation,
       conversationRoleRepository: {} as ConversationRoleRepository,
       isSelfActivated: true,
       onAction: noop,
-      selfUser: new User('', null),
+      selfUser: new User(''),
       user,
-    });
+    };
 
-    expect(userActions.getAllActions().length).toEqual(2);
+    const {queryByTestId} = render(<UserActions {...props} />);
+
+    const allActions = getAllActions(queryByTestId);
+    expect(allActions).toHaveLength(2);
+
     [Actions.OPEN_CONVERSATION, Actions.BLOCK].forEach(action => {
       const identifier = ActionIdentifier[action];
-      expect(userActions.getAction(identifier)).not.toBeNull();
+      expect(queryByTestId(identifier)).not.toBeNull();
     });
   });
 });

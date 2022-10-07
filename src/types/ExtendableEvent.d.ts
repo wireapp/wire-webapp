@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2021 Wire Swiss GmbH
+ * Copyright (C) 2022 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,25 +17,6 @@
  *
  */
 
-import BaseToggle from './BaseToggle';
-import {render, fireEvent} from '@testing-library/react';
-
-describe('BaseToggle', () => {
-  it('toggles check property', async () => {
-    let isChecked = false;
-    const props = {
-      isChecked,
-      isDisabled: false,
-      setIsChecked: (updatedIsChecked: boolean) => {
-        isChecked = updatedIsChecked;
-      },
-    };
-
-    const {getByTestId} = render(<BaseToggle {...props} />);
-
-    const input = getByTestId('allow-base-toggle-input');
-    fireEvent.click(input);
-
-    expect(isChecked).toBe(true);
-  });
-});
+interface ExtendableEvent extends Event {
+  waitUntil(f: any): void;
+}
