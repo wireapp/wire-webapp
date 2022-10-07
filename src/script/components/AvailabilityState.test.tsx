@@ -18,67 +18,80 @@
  */
 
 import {Availability} from '@wireapp/protocol-messaging';
-import TestPage from 'Util/test/TestPage';
-import AvailabilityState, {AvailabilityStateProps} from './AvailabilityState';
+import AvailabilityState from './AvailabilityState';
+import {render} from '@testing-library/react';
 
-class AvailabilityStatePage extends TestPage<AvailabilityStateProps> {
-  constructor(props?: AvailabilityStateProps) {
-    super(AvailabilityState, props);
-  }
-
-  getAvailableIcon = () => this.get('svg[data-uie-value="available"]');
-  getAwayIcon = () => this.get('svg[data-uie-value="away"]');
-  getBusyIcon = () => this.get('svg[data-uie-value="busy"]');
-  getArrow = () => this.get('span[data-uie-name="availability-arrow"]');
-}
+const defaultProps = {
+  availability: Availability.Type.AVAILABLE,
+  dataUieName: 'example-data-uie',
+  label: 'example',
+  showArrow: false,
+  theme: false,
+};
 
 describe('AvailabilityState', () => {
   it('renders available icon', async () => {
-    const availabilityState = new AvailabilityStatePage({
+    const props = {
+      ...defaultProps,
       availability: Availability.Type.AVAILABLE,
-      dataUieName: 'example-data-uie',
-      label: 'example',
-      showArrow: false,
-      theme: false,
-    });
+    };
 
-    expect(availabilityState.getAvailableIcon()).not.toBeNull();
+    const {getByTestId} = render(<AvailabilityState {...props} />);
+
+    const statusAvailabilityIcon = getByTestId('status-availability-icon');
+    expect(statusAvailabilityIcon.getAttribute('data-uie-value')).toEqual('available');
   });
 
   it('renders away icon', async () => {
-    const availabilityState = new AvailabilityStatePage({
+    const props = {
+      ...defaultProps,
       availability: Availability.Type.AWAY,
-      dataUieName: 'example-data-uie',
-      label: 'example',
-      showArrow: false,
-      theme: false,
-    });
+    };
 
-    expect(availabilityState.getAwayIcon()).not.toBeNull();
+    const {getByTestId} = render(<AvailabilityState {...props} />);
+
+    const statusAvailabilityIcon = getByTestId('status-availability-icon');
+    expect(statusAvailabilityIcon.getAttribute('data-uie-value')).toEqual('away');
   });
 
   it('renders busy icon', async () => {
-    const availabilityState = new AvailabilityStatePage({
+    const props = {
+      ...defaultProps,
       availability: Availability.Type.BUSY,
-      dataUieName: 'example-data-uie',
-      label: 'example',
-      showArrow: false,
-      theme: false,
-    });
+    };
 
-    expect(availabilityState.getBusyIcon()).not.toBeNull();
+    const {getByTestId} = render(<AvailabilityState {...props} />);
+
+    const statusAvailabilityIcon = getByTestId('status-availability-icon');
+    expect(statusAvailabilityIcon.getAttribute('data-uie-value')).toEqual('busy');
   });
 
   it('renders availability icon with arrow', async () => {
-    const availabilityState = new AvailabilityStatePage({
+    const props = {
+      ...defaultProps,
       availability: Availability.Type.BUSY,
-      dataUieName: 'example-data-uie',
-      label: 'example',
       showArrow: true,
-      theme: false,
-    });
+    };
 
-    expect(availabilityState.getBusyIcon()).not.toBeNull();
-    expect(availabilityState.getArrow()).not.toBeNull();
+    const {getByTestId} = render(<AvailabilityState {...props} />);
+
+    const statusAvailabilityIcon = getByTestId('status-availability-icon');
+    expect(statusAvailabilityIcon.getAttribute('data-uie-value')).toEqual('busy');
+
+    expect(getByTestId('availability-arrow')).not.toBeNull();
+  });
+
+  it('shows label text', async () => {
+    const label = 'cool label';
+    const props = {
+      ...defaultProps,
+      availability: Availability.Type.BUSY,
+      label,
+      showArrow: true,
+    };
+
+    const {getByText} = render(<AvailabilityState {...props} />);
+
+    expect(getByText(label)).not.toBeNull();
   });
 });
