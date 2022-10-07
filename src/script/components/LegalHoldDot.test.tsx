@@ -17,17 +17,15 @@
  *
  */
 
-import TestPage from 'Util/test/TestPage';
-import LegalHoldDot, {LegalHoldDotProps} from 'Components/LegalHoldDot';
+import LegalHoldDot from 'Components/LegalHoldDot';
 import {LegalHoldModalViewModel} from '../view_model/content/LegalHoldModalViewModel';
+import {render} from '@testing-library/react';
 
-class LegalHoldDotPage extends TestPage<LegalHoldDotProps> {
-  constructor(props?: LegalHoldDotProps) {
-    super(LegalHoldDot, props);
-  }
-
-  getPendingIcon = () => this.get('svg.pending-icon');
-}
+jest.mock('Components/Icon', () => ({
+  Pending: function PeningIcon() {
+    return <span>pendingIcon</span>;
+  },
+}));
 
 describe('LegalHoldDot', () => {
   it('shows a pending icon', () => {
@@ -36,12 +34,13 @@ describe('LegalHoldDot', () => {
       showUsers: () => Promise.resolve(),
     } as LegalHoldModalViewModel;
 
-    const legalHoldDotPage = new LegalHoldDotPage({
+    const props = {
       isPending: true,
       legalHoldModal,
-    });
+    };
 
-    const isPending = legalHoldDotPage.getPendingIcon() !== null;
-    expect(isPending).toBe(true);
+    const {getByText} = render(<LegalHoldDot {...props} />);
+
+    expect(getByText('pendingIcon')).not.toBeNull();
   });
 });
