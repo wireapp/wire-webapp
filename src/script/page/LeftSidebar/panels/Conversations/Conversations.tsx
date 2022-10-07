@@ -188,7 +188,6 @@ const Conversations: React.FC<ConversationsProps> = ({
           className="left-list-header-text"
           data-uie-name="status-name"
           role="presentation"
-          // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex
           tabIndex={0}
           onBlur={event => {
             // personal user won't see availability status menu, on blur of the user name

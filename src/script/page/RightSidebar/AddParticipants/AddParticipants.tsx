@@ -253,7 +253,6 @@ const AddParticipants: FC<AddParticipantsProps> = ({
                     <ul className="panel-manage-services left-list-items">
                       <li
                         role="presentation"
-                        // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex
                         tabIndex={0}
                         className="left-list-item left-list-item-clickable"
                         onClick={openManageServices}

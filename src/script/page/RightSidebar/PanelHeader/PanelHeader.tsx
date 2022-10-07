@@ -72,7 +72,6 @@ const PanelHeader: FC<PanelHeaderProps> = ({
       )}
 
       {title && (
-        // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex
         <h3 className="panel__header__title" tabIndex={0} data-uie-name={titleDataUieName}>
           {title}
         </h3>

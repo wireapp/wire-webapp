@@ -70,12 +70,9 @@ const Notifications: FC<NotificationsProps> = ({activeConversation, onGoBack, on
           />
         </fieldset>
 
-        {true && (
-          // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex
-          <div className="panel__info-text notification-settings__disclaimer" tabIndex={0}>
-            {t('notificationSettingsDisclaimer')}
-          </div>
-        )}
+        <div className="panel__info-text notification-settings__disclaimer" tabIndex={0}>
+          {t('notificationSettingsDisclaimer')}
+        </div>
       </div>
     </div>
   );
