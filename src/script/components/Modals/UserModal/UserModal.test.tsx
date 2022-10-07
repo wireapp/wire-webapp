@@ -29,7 +29,6 @@ import {User} from 'src/script/entity/User';
 import {render, waitFor} from '@testing-library/react';
 
 describe('UserModal', () => {
-
   it('correctly fetches user from user repository', async () => {
     jest.useFakeTimers();
     const getUserById = jest.fn(async (id: QualifiedId) => {
