@@ -5524,10 +5524,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"caniuse-lite@npm:^1.0.30001416":
-  version: 1.0.30001416
-  resolution: "caniuse-lite@npm:1.0.30001416"
-  checksum: 4d93f449aeb3527877892647beb53a01b71eef6d63907b65ed2f6d07b2fb2a9b739ebbb60adc02baa16df26fba81be9f207312159a1cf864251ad79b884db0a3
+"caniuse-lite@npm:^1.0.30001418":
+  version: 1.0.30001418
+  resolution: "caniuse-lite@npm:1.0.30001418"
+  checksum: 03380a9ba50b1abd0081e76bfdf331bfb2c28f2277ce5eead5b83960c4db9f1fbbd84a536efa6f8f1fe2c038bc01129d6c42d17f8323fe99a016a5da3829c4bc
   languageName: node
   linkType: hard
 
@@ -17828,7 +17828,7 @@ __metadata:
     amplify: "https://github.com/wireapp/amplify#head=master"
     autoprefixer: 9.8.8
     babel-loader: 8.2.5
-    caniuse-lite: ^1.0.30001416
+    caniuse-lite: ^1.0.30001418
     classnames: 2.3.2
     concurrently: 7.4.0
     copy-webpack-plugin: 11.0.0
