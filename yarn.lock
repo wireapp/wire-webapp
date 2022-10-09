@@ -17268,12 +17268,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"uuidjs@npm:4.2.11":
-  version: 4.2.11
-  resolution: "uuidjs@npm:4.2.11"
+"uuidjs@npm:4.2.12":
+  version: 4.2.12
+  resolution: "uuidjs@npm:4.2.12"
   bin:
     uuidjs: bin/cli.js
-  checksum: 0e4669295e0f5cec6268e6b976561cd458680190b238a7a84d1634e8b8fcfef065442e9a068e5ead48955b14f4e9fba11d40ff337f8352cdebce8b75f7c7839f
+  checksum: 2c837144b097ead20b27573334a00150453522e08149665844ef3e14a54290a2b46883923c5f1a380c2bd1646151c8f2ffc2363b1b603b6034155bbbee6457aa
   languageName: node
   linkType: hard
 
@@ -17937,7 +17937,7 @@ __metadata:
     typescript: 4.8.4
     uint32: 0.2.1
     underscore: 1.13.6
-    uuidjs: 4.2.11
+    uuidjs: 4.2.12
     webpack: 5.74.0
     webpack-cli: 4.10.0
     webpack-dev-middleware: 5.3.3
