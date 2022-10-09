@@ -3327,10 +3327,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/node@npm:^18.8.2":
-  version: 18.8.2
-  resolution: "@types/node@npm:18.8.2"
-  checksum: b7c74dea0e835fb7faf69b4a2e87d43c1d228d88adacdff464d9e92d18a0b43bec6147b9eb3287650ac75fe5af730c53391869d02175e6b032dcb99ae2f54c92
+"@types/node@npm:^18.8.3":
+  version: 18.8.3
+  resolution: "@types/node@npm:18.8.3"
+  checksum: 9201adc6dc389644c9f478f950ef8926a93e5827865dcd80d7d12fefacab665c96879c87cd6ec74d5eccdd998c4603d02e1e07a35d71a63fe4c20670a381f6ef
   languageName: node
   linkType: hard
 
@@ -17796,7 +17796,7 @@ __metadata:
     "@types/libsodium-wrappers-sumo": 0.7.5
     "@types/linkify-it": 3.0.2
     "@types/markdown-it": 12.2.3
-    "@types/node": ^18.8.2
+    "@types/node": ^18.8.3
     "@types/open-graph": 0.2.2
     "@types/platform": 1.3.4
     "@types/react": 18.0.21
