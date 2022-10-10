@@ -20,19 +20,11 @@
 import ko from 'knockout';
 
 import {createRandomUuid} from 'Util/util';
-import TestPage from 'Util/test/TestPage';
-
-import GroupedConversationHeader, {GroupedConversationHeaderProps} from './GroupedConversationHeader';
+import GroupedConversationHeader from './GroupedConversationHeader';
 import {ConversationLabel, LabelType} from '../../../../conversation/ConversationLabelRepository';
 import {Conversation} from '../../../../entity/Conversation';
-
-class GroupedConversationHeaderPage extends TestPage<GroupedConversationHeaderProps> {
-  constructor(props?: GroupedConversationHeaderProps) {
-    super(GroupedConversationHeader, props);
-  }
-
-  getUnreadBadge = () => this.get('span[data-uie-name="conversation-folder-badge"]');
-}
+import {act} from 'react-dom/test-utils';
+import {render} from '@testing-library/react';
 
 describe('GroupedConversationHeader', () => {
   it('displays the unread badge', () => {
@@ -45,21 +37,24 @@ describe('GroupedConversationHeader', () => {
       type: LabelType.Custom,
     };
 
-    const groupedConversationHeader = new GroupedConversationHeaderPage({
+    const props = {
       conversationLabel,
       isOpen: false,
-    });
+    };
 
-    let unreadBadge = groupedConversationHeader.getUnreadBadge();
-    expect(unreadBadge).toBeNull();
+    const {queryByTestId, rerender, getByText} = render(<GroupedConversationHeader {...props} />);
+
+    expect(queryByTestId('conversation-folder-badge')).toBeNull();
 
     const conversation: Partial<Conversation> = {hasUnread: ko.pureComputed(() => true)};
-    conversationLabel.conversations.push(conversation as Conversation, conversation as Conversation);
 
-    groupedConversationHeader.setProps({conversationLabel, isOpen: false});
+    act(() => {
+      conversationLabel.conversations.push(conversation as Conversation, conversation as Conversation);
+    });
 
-    unreadBadge = groupedConversationHeader.getUnreadBadge();
-    expect(unreadBadge).not.toBeNull();
-    expect(unreadBadge.textContent).toBe('2');
+    props.conversationLabel = conversationLabel;
+    rerender(<GroupedConversationHeader {...props} />);
+
+    expect(getByText('2')).not.toBeNull();
   });
 });

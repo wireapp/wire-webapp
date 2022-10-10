@@ -17,26 +17,10 @@
  *
  */
 
-import TestPage from 'Util/test/TestPage';
-
 import TemporaryGuestAvatar from './TemporaryGuestAvatar';
 import {User} from '../../entity/User';
-import {UserAvatarProps} from './UserAvatar';
 import {AVATAR_SIZE, STATE} from '../Avatar';
-
-jest.mock('../../auth/util/SVGProvider');
-
-class TemporaryGuestAvatarPage extends TestPage<UserAvatarProps> {
-  constructor(props?: UserAvatarProps) {
-    super(TemporaryGuestAvatar, props);
-  }
-
-  getInitials = () => this.get('div[data-uie-name="element-avatar-initials"]');
-  getServiceIcon = () => this.get('div[data-uie-name="element-avatar-service-icon"]');
-  getUserBadgeIcon = (state?: STATE) =>
-    this.get(`div[data-uie-name="element-avatar-user-badge-icon"]${state ? `[data-uie-value="${state}"]` : ''}`);
-  getGuestExpirationCircle = () => this.get('svg[data-uie-name="element-avatar-guest-expiration-circle"]');
-}
+import {render} from '@testing-library/react';
 
 describe('TemporaryGuestAvatar', () => {
   it('shows expiration circle', async () => {
@@ -44,13 +28,15 @@ describe('TemporaryGuestAvatar', () => {
     participant.name('Anton Bertha');
     participant.isTemporaryGuest(true);
 
-    const temporaryGuestAvatar = new TemporaryGuestAvatarPage({
+    const props = {
       avatarSize: AVATAR_SIZE.LARGE,
       participant: participant,
       state: STATE.NONE,
-    });
+    };
 
-    expect(temporaryGuestAvatar.getGuestExpirationCircle()).not.toBeNull();
+    const {getByTestId} = render(<TemporaryGuestAvatar {...props} />);
+
+    expect(getByTestId('element-avatar-guest-expiration-circle')).not.toBeNull();
   });
 
   it('shows participant initials', async () => {
@@ -58,14 +44,15 @@ describe('TemporaryGuestAvatar', () => {
     participant.name('Anton Bertha');
     participant.isTemporaryGuest(true);
 
-    const temporaryGuestAvatar = new TemporaryGuestAvatarPage({
+    const props = {
       avatarSize: AVATAR_SIZE.LARGE,
       participant: participant,
       state: STATE.NONE,
-    });
+    };
 
-    expect(temporaryGuestAvatar.getInitials()).not.toBeNull();
-    expect(temporaryGuestAvatar.getInitials()?.textContent).toBe('AB');
+    const {getByText} = render(<TemporaryGuestAvatar {...props} />);
+
+    expect(getByText('AB')).not.toBeNull();
   });
 
   it('does not show avatar badge in default state', async () => {
@@ -73,13 +60,15 @@ describe('TemporaryGuestAvatar', () => {
     participant.name('Anton Bertha');
     participant.isTemporaryGuest(true);
 
-    const temporaryGuestAvatar = new TemporaryGuestAvatarPage({
+    const props = {
       avatarSize: AVATAR_SIZE.LARGE,
       participant: participant,
       state: STATE.NONE,
-    });
+    };
 
-    expect(temporaryGuestAvatar.getUserBadgeIcon()).toBeNull();
+    const {queryByTestId} = render(<TemporaryGuestAvatar {...props} />);
+
+    expect(queryByTestId('element-avatar-user-badge-icon')).toBeNull();
   });
 
   it('shows avatar badge for blocked user', async () => {
@@ -87,12 +76,14 @@ describe('TemporaryGuestAvatar', () => {
     participant.name('Anton Bertha');
     participant.isTemporaryGuest(true);
 
-    const temporaryGuestAvatar = new TemporaryGuestAvatarPage({
+    const props = {
       avatarSize: AVATAR_SIZE.LARGE,
       participant: participant,
       state: STATE.BLOCKED,
-    });
+    };
 
-    expect(temporaryGuestAvatar.getUserBadgeIcon(STATE.BLOCKED)).not.toBeNull();
+    const {getByTestId} = render(<TemporaryGuestAvatar {...props} />);
+
+    expect(getByTestId('element-avatar-user-badge-icon').getAttribute('data-uie-value')).toEqual(STATE.BLOCKED);
   });
 });

@@ -22,7 +22,6 @@ import ko from 'knockout';
 import {STATE as CALL_STATE, CALL_TYPE} from '@wireapp/avs';
 
 import {createRandomUuid} from 'Util/util';
-import TestPage from 'Util/test/TestPage';
 
 import {Call} from 'src/script/calling/Call';
 import {Participant} from 'src/script/calling/Participant';
@@ -42,18 +41,6 @@ jest.mock(
       return <div></div>;
     },
 );
-
-class ConversationListCallingCellPage extends TestPage<CallingCellProps> {
-  constructor(props?: CallingCellProps) {
-    super(ConversationListCallingCell, props);
-  }
-
-  getAcceptButton = () => this.get('[data-uie-name="do-call-controls-call-accept"]');
-  getDeclineButton = () => this.get('[data-uie-name="do-call-controls-call-decline"]');
-  getOutgoingLabel = () => this.get('[data-uie-name="call-label-outgoing"]');
-  getConnectingLabel = () => this.get('[data-uie-name="call-label-connecting"]');
-  getCallDuration = () => this.get('[data-uie-name="call-duration"]');
-}
 
 const createCall = (state: CALL_STATE, selfUser = new User(createRandomUuid()), selfClientId = createRandomUuid()) => {
   const selfParticipant = new Participant(selfUser, selfClientId);
@@ -106,9 +93,10 @@ describe('ConversationListCallingCell', () => {
   it('displays an outgoing ringing call', async () => {
     const props = await createProps();
     props.call.state(CALL_STATE.OUTGOING);
-    const callingCellPage = new ConversationListCallingCellPage(props);
 
-    expect(callingCellPage.getOutgoingLabel()).not.toBeNull();
+    const {getByTestId} = render(<ConversationListCallingCell {...props} />);
+
+    expect(getByTestId('call-label-outgoing')).not.toBeNull();
   });
 
   it('displays a call that is connecting', async () => {
