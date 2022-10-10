@@ -140,7 +140,9 @@ const UserDevices: React.FC<UserDevicesProps> = ({
       {showDeviceList && deviceMode === FIND_MODE.FOUND && (
         <DeviceList {...{clickOnDevice, clients, noPadding, user}} />
       )}
+
       {showDeviceList && deviceMode === FIND_MODE.NOT_FOUND && <NoDevicesFound {...{noPadding, user}} />}
+
       {current.state === UserDevicesState.DEVICE_DETAILS && (
         <DeviceDetails
           {...{
@@ -155,6 +157,7 @@ const UserDevices: React.FC<UserDevicesProps> = ({
           }}
         />
       )}
+
       {current.state === UserDevicesState.SELF_FINGERPRINT && (
         <SelfFingerprint {...{cryptographyRepository, noPadding}} />
       )}
@@ -173,7 +176,9 @@ export const makeUserDevicesHistory = () => {
     history.removeAll();
     history.push({headline: '', state: UserDevicesState.DEVICE_LIST});
   };
+
   reset();
+
   return {
     current,
     goBack: () => {

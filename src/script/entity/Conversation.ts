@@ -51,12 +51,12 @@ import {Config} from '../Config';
 import type {Call} from '../calling/Call';
 import {RECEIPT_MODE} from '@wireapp/api-client/src/conversation/data';
 import {ConversationRecord} from '../storage/record/ConversationRecord';
-import {LegalHoldModalViewModel} from '../view_model/content/LegalHoldModalViewModel';
 import {CallMessage} from './message/CallMessage';
 import {PingMessage} from './message/PingMessage';
 import {container} from 'tsyringe';
 import {TeamState} from '../team/TeamState';
 import {matchQualifiedIds} from 'Util/QualifiedId';
+import {LegalHoldModalState} from '../legal-hold/LegalHoldModalState';
 
 interface UnreadState {
   allEvents: Message[];
@@ -328,7 +328,7 @@ export class Conversation {
         this.legalHoldStatus(hasLegalHold ? LegalHoldStatus.ENABLED : LegalHoldStatus.DISABLED);
       }
       if (!hasLegalHold) {
-        amplify.publish(LegalHoldModalViewModel.HIDE_DETAILS, this.id);
+        amplify.publish(LegalHoldModalState.HIDE_DETAILS, this.id);
       }
       return hasLegalHold;
     });
