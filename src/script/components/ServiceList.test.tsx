@@ -48,7 +48,7 @@ describe('ServiceList', () => {
       click: () => {},
       isSearching: true,
       noUnderline: true,
-      services: [],
+      services: [] as ServiceEntity[],
     };
 
     const {getByTestId} = render(<ServiceList {...props} />);

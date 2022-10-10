@@ -67,7 +67,7 @@ describe('DeviceCard', () => {
 
   it('shows disclose icon when component is clickable', async () => {
     const props = {
-      click: () => undefined,
+      click: jest.fn(),
       device: createClientEntity({
         class: ClientClassification.PHONE,
         meta: {
