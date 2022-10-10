@@ -46,6 +46,7 @@ const ClientList = ({
   doRemoveClient,
   getLocalStorage,
   resetAuthError,
+  resetClientError,
   removeLocalStorage,
 }: Props & ConnectedProps & DispatchProps) => {
   const navigate = useNavigate();
@@ -58,6 +59,7 @@ const ClientList = ({
     const selectedClientId = isSelectedClient ? null : clientId;
     setCurrentlySelectedClient(selectedClientId);
     resetAuthError();
+    resetClientError();
   };
 
   const removeClient = async (clientId: string, password?: string) => {
@@ -67,12 +69,12 @@ const ClientList = ({
       await doRemoveClient(clientId, password);
       const persist = await getLocalStorage(LocalStorageAction.LocalStorageKey.AUTH.PERSIST);
       await doInitializeClient(persist ? ClientType.PERMANENT : ClientType.TEMPORARY, password, SFAcode, entropy);
+      removeLocalStorage(QUERY_KEY.CONVERSATION_CODE);
+      removeLocalStorage(QUERY_KEY.JOIN_EXPIRES);
       return navigate(ROUTE.HISTORY_INFO);
     } catch (error) {
       logger.error(error);
     } finally {
-      removeLocalStorage(QUERY_KEY.CONVERSATION_CODE);
-      removeLocalStorage(QUERY_KEY.JOIN_EXPIRES);
       setShowLoading(false);
     }
   };
@@ -122,6 +124,7 @@ const mapDispatchToProps = (dispatch: Dispatch<AnyAction>) =>
       getLocalStorage: ROOT_ACTIONS.localStorageAction.getLocalStorage,
       removeLocalStorage: ROOT_ACTIONS.localStorageAction.deleteLocalStorage,
       resetAuthError: ROOT_ACTIONS.authAction.resetAuthError,
+      resetClientError: ROOT_ACTIONS.clientAction.resetClientError,
     },
     dispatch,
   );
