@@ -31,12 +31,7 @@ const defaultProps = {
 
 describe('AvailabilityState', () => {
   it('renders available icon', async () => {
-    const props = {
-      ...defaultProps,
-      availability: Availability.Type.AVAILABLE,
-    };
-
-    const {getByTestId} = render(<AvailabilityState {...props} />);
+    const {getByTestId} = render(<AvailabilityState {...defaultProps} />);
 
     const statusAvailabilityIcon = getByTestId('status-availability-icon');
     expect(statusAvailabilityIcon.getAttribute('data-uie-value')).toEqual('available');
