@@ -19,12 +19,7 @@
 
 import {amplify} from 'amplify';
 import {Asset, Confirmation, GenericMessage, Availability} from '@wireapp/protocol-messaging';
-import {
-  ReactionType,
-  MessageSendingCallbacks,
-  MessageTargetMode,
-  PayloadBundleState,
-} from '@wireapp/core/src/main/conversation';
+import {ReactionType, MessageTargetMode, PayloadBundleState} from '@wireapp/core/src/main/conversation';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 import {
   ClientMismatch,
@@ -729,45 +724,40 @@ export class MessageRepository {
       return silentDegradationWarning ? true : this.requestUserSendingPermission(conversation, false, consentType);
     };
 
-    const updateOptimisticEvent: MessageSendingCallbacks['onSuccess'] = (genericMessage, sentTime) => {
-      this.updateMessageAsSent(conversation, genericMessage.messageId, syncTimestamp ? sentTime : undefined);
-    };
-
-    const handleSuccess = async (genericMessage: GenericMessage, sentTime?: string) => {
-      const preMessageTimestamp = new Date(new Date(sentTime).getTime() - 10).toISOString();
+    const handleSuccess = async (sentAt: string) => {
+      const preMessageTimestamp = new Date(new Date(sentAt).getTime() - 10).toISOString();
       // Trigger an empty mismatch to check for users that have no devices and that could have been removed from the team
       await this.onClientMismatch?.({time: preMessageTimestamp}, conversation, silentDegradationWarning);
-      updateOptimisticEvent(genericMessage, sentTime);
+      this.updateMessageAsSent(conversation, payload.messageId, syncTimestamp ? sentAt : undefined);
     };
 
     const conversationService = this.conversationService;
     // Configure ephemeral messages
     conversationService.messageTimer.setConversationLevelTimer(conversation.id, conversation.messageTimer());
 
-    const commonProperties = {onSuccess: handleSuccess, payload};
-    if ((await injectOptimisticEvent()) === false) {
-      return {id: payload.messageId, state: PayloadBundleState.CANCELLED};
-    }
-    if (groupId) {
-      return this.messageSender.queueMessage(() => {
-        return this.conversationService.send({
-          ...commonProperties,
+    const sendOptions: Parameters<typeof conversationService.send>[0] = groupId
+      ? {
           groupId,
+          payload,
           protocol: ConversationProtocol.MLS,
-        });
-      });
-    }
+        }
+      : {
+          conversationId: conversation.qualifiedId,
+          nativePush,
+          onClientMismatch: mismatch => this.onClientMismatch?.(mismatch, conversation, silentDegradationWarning),
+          payload,
+          protocol: ConversationProtocol.PROTEUS,
+          targetMode,
+          userIds: this.generateRecipients(conversation, recipients, skipSelf),
+        };
 
-    return this.messageSender.queueMessage(() => {
-      return this.conversationService.send({
-        ...commonProperties,
-        conversationId: conversation.qualifiedId,
-        nativePush,
-        onClientMismatch: mismatch => this.onClientMismatch?.(mismatch, conversation, silentDegradationWarning),
-        protocol: ConversationProtocol.PROTEUS,
-        targetMode,
-        userIds: this.generateRecipients(conversation, recipients, skipSelf),
-      });
+    return this.messageSender.queueMessage(async () => {
+      if ((await injectOptimisticEvent()) === false) {
+        return {id: payload.messageId, state: PayloadBundleState.CANCELLED};
+      }
+      const result = await this.conversationService.send(sendOptions);
+      handleSuccess(result.sentAt);
+      return result;
     });
   }
 
