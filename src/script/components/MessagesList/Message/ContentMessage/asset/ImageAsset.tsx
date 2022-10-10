@@ -88,7 +88,10 @@ const ImageAsset: React.FC<ImageAssetProps> = ({asset, message, onClick, teamSta
   });
 
   return (
-    <div data-uie-name="image-asset">
+    <div
+      data-uie-name="image-asset"
+      style={{aspectRatio: asset.ratio.toString(), maxWidth: '100%', width: asset.width}}
+    >
       {isFileSharingReceivingEnabled ? (
         <InViewport
           className={cx('image-asset', {
@@ -120,7 +123,6 @@ const ImageAsset: React.FC<ImageAssetProps> = ({asset, message, onClick, teamSta
           <img
             data-uie-name="image-asset-img"
             className={cx('image-element', {'image-ephemeral': isObfuscated})}
-            style={!imageUrl ? {aspectRatio: asset.ratio.toString(), width: '100%'} : undefined}
             src={imageUrl || dummyImageUrl}
             alt={imageAltText}
           />
