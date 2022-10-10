@@ -17,38 +17,33 @@
  *
  */
 
-import PanelHeader, {PanelHeaderProps} from './PanelHeader';
-
-import TestPage from 'Util/test/TestPage';
+import PanelHeader from './PanelHeader';
+import {render, fireEvent} from '@testing-library/react';
 
 const goBackUie = 'back-button';
 const closeUie = 'close-button';
-
-class PanelHeaderPage extends TestPage<PanelHeaderProps> {
-  constructor(props?: PanelHeaderProps) {
-    super(PanelHeader, props);
-  }
-
-  getGoBackButton = () => this.get(`button[data-uie-name="${goBackUie}"]`);
-  getCloseButton = () => this.get(`button[data-uie-name="${closeUie}"]`);
-  clickGoBackButton = () => this.click(this.getGoBackButton());
-  clickCloseButton = () => this.click(this.getCloseButton());
-}
 
 describe('PanelHeader', () => {
   it('calls the correct callbacks for back and close', () => {
     const onGoBack = jest.fn();
     const onClose = jest.fn();
-    const panelHeader = new PanelHeaderPage({
+
+    const props = {
       closeUie,
       goBackUie,
       onClose,
       onGoBack,
-    });
-    panelHeader.clickCloseButton();
+    };
+    const {getByTestId} = render(<PanelHeader {...props} />);
+
+    const closeButton = getByTestId(closeUie);
+
+    fireEvent.click(closeButton);
     expect(onClose).toHaveBeenCalled();
 
-    panelHeader.clickGoBackButton();
+    const goBackButton = getByTestId(goBackUie);
+
+    fireEvent.click(goBackButton);
     expect(onGoBack).toHaveBeenCalled();
   });
 });
