@@ -98,7 +98,6 @@ import {PropertiesService} from '../properties/PropertiesService';
 import {AssetService} from '../assets/AssetService';
 import {UserService} from '../user/UserService';
 import {AudioRepository} from '../audio/AudioRepository';
-import {MessageSender} from '../message/MessageSender';
 import {StorageService} from '../storage';
 import {BackupService} from '../backup/BackupService';
 import {MediaRepository} from '../media/MediaRepository';
@@ -224,7 +223,6 @@ class App {
   private _setupRepositories() {
     const repositories: ViewModelRepositories = {} as ViewModelRepositories;
     const selfService = new SelfService();
-    const sendingMessageQueue = new MessageSender();
 
     repositories.asset = container.resolve(AssetRepository);
 
@@ -260,7 +258,6 @@ class App {
       () => repositories.conversation,
       repositories.cryptography,
       repositories.event,
-      sendingMessageQueue,
       repositories.properties,
       serverTimeHandler,
       repositories.user,

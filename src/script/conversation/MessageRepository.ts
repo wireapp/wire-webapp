@@ -78,7 +78,6 @@ import {ConversationRepository} from './ConversationRepository';
 import {getLinkPreviewFromString} from './linkPreviews';
 import {UserRepository} from '../user/UserRepository';
 import {PropertiesRepository} from '../properties/PropertiesRepository';
-import {MessageSender} from '../message/MessageSender';
 import {ServerTimeHandler} from '../time/serverTimeHandler';
 import {ContentMessage} from '../entity/message/ContentMessage';
 import {EventService} from '../event/EventService';
@@ -151,7 +150,6 @@ export class MessageRepository {
     private readonly conversationRepositoryProvider: () => ConversationRepository,
     private readonly cryptography_repository: CryptographyRepository,
     private readonly eventRepository: EventRepository,
-    private readonly messageSender: MessageSender,
     private readonly propertyRepository: PropertiesRepository,
     private readonly serverTimeHandler: ServerTimeHandler,
     private readonly userRepository: UserRepository,
@@ -216,10 +214,6 @@ export class MessageRepository {
 
     if (this.isBlockingNotificationHandling !== updatedHandlingState) {
       this.isBlockingNotificationHandling = updatedHandlingState;
-      this.logger.info(
-        `Block message sending: ${this.isBlockingNotificationHandling} (${this.messageSender.queuedMessages} items in queue)`,
-      );
-      this.messageSender.pauseQueue(this.isBlockingNotificationHandling);
     }
   };
 
@@ -751,14 +745,12 @@ export class MessageRepository {
           userIds: this.generateRecipients(conversation, recipients, skipSelf),
         };
 
-    return this.messageSender.queueMessage(async () => {
-      if ((await injectOptimisticEvent()) === false) {
-        return {id: payload.messageId, state: PayloadBundleState.CANCELLED};
-      }
-      const result = await this.conversationService.send(sendOptions);
-      handleSuccess(result.sentAt);
-      return result;
-    });
+    if ((await injectOptimisticEvent()) === false) {
+      return {id: payload.messageId, state: PayloadBundleState.CANCELLED};
+    }
+    const result = await this.conversationService.send(sendOptions);
+    handleSuccess(result.sentAt);
+    return result;
   }
 
   /**
@@ -812,15 +804,13 @@ export class MessageRepository {
     const sessionReset = MessageBuilder.buildSessionResetMessage();
 
     const userClient = {[userId.id]: [clientId]};
-    await this.messageSender.queueMessage(() =>
-      this.conversationService.send({
-        conversationId: conversation.qualifiedId,
-        payload: sessionReset,
-        protocol: ConversationProtocol.PROTEUS,
-        targetMode: MessageTargetMode.USERS_CLIENTS,
-        userIds: this.core.backendFeatures.federationEndpoints ? {[userId.domain]: userClient} : userClient, // we target this message to the specific client of the user (no need for mismatch handling here)
-      }),
-    );
+    await this.conversationService.send({
+      conversationId: conversation.qualifiedId,
+      payload: sessionReset,
+      protocol: ConversationProtocol.PROTEUS,
+      targetMode: MessageTargetMode.USERS_CLIENTS,
+      userIds: this.core.backendFeatures.federationEndpoints ? {[userId.domain]: userClient} : userClient, // we target this message to the specific client of the user (no need for mismatch handling here)
+    });
   }
 
   /**
