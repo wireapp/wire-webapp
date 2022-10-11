@@ -69,6 +69,7 @@ export class ListViewModel {
   readonly state: ko.Observable<string>;
   readonly lastUpdate: ko.Observable<number>;
   readonly isFederated: boolean;
+  readonly repositories: ViewModelRepositories;
 
   public readonly mainViewModel: MainViewModel;
   public readonly conversationRepository: ConversationRepository;
@@ -82,7 +83,6 @@ export class ListViewModel {
   private readonly isProAccount: ko.PureComputed<boolean>;
   public readonly selfUser: ko.Observable<User>;
   private readonly visibleListItems: ko.PureComputed<(string | Conversation)[]>;
-  private readonly repositories: ViewModelRepositories;
 
   static get STATE() {
     return {
