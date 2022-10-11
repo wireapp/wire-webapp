@@ -55,7 +55,7 @@
     "jsx-a11y/media-has-caption": "warn",
     "jsx-a11y/no-noninteractive-tabindex": "warn",
     "react/no-unknown-property": ["error", {"ignore": ["css"]}],
-    "react/react-in-jsx-scope": "warn",
+    "react/react-in-jsx-scope": "off",
     "react-hooks/rules-of-hooks": "error",
     "react-hooks/exhaustive-deps": "warn",
     "import/no-unresolved": "error",
