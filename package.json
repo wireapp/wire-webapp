@@ -65,7 +65,7 @@
     "!src/main/**/*test*.ts"
   ],
   "license": "GPL-3.0",
-  "main": "src/main/Account",
+  "main": "src/main/index",
   "name": "@wireapp/core",
   "repository": "https://github.com/wireapp/wire-web-packages/tree/main/packages/core",
   "scripts": {

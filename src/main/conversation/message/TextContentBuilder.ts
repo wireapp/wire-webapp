@@ -18,24 +18,28 @@
  */
 
 import {MessageHashService} from '../../cryptography';
-import {LegalHoldStatus, LinkPreviewUploadedContent, MentionContent, QuoteContent, TextContent} from '../content';
-import {EditedTextMessage, TextMessage, QuotableMessage} from './OtrMessage';
+import {
+  EditedTextContent,
+  LegalHoldStatus,
+  LinkPreviewUploadedContent,
+  MentionContent,
+  QuoteContent,
+  TextContent,
+} from '../content';
+import {QuotableMessage} from './OtrMessage';
 
-export class TextContentBuilder {
-  private readonly content: TextContent;
-  private readonly payloadBundle: TextMessage | EditedTextMessage;
+export class TextContentBuilder<T extends TextContent | EditedTextContent> {
+  private readonly content: T;
 
-  constructor(payloadBundle: TextMessage | EditedTextMessage) {
-    this.payloadBundle = payloadBundle;
-    this.content = this.payloadBundle.content as TextContent;
+  constructor(textContent: T) {
+    this.content = textContent;
   }
 
-  build(): TextMessage | EditedTextMessage {
-    this.payloadBundle.content = this.content;
-    return this.payloadBundle;
+  build(): T {
+    return this.content;
   }
 
-  withLinkPreviews(linkPreviews?: LinkPreviewUploadedContent[]): TextContentBuilder {
+  withLinkPreviews(linkPreviews?: LinkPreviewUploadedContent[]) {
     if (linkPreviews?.length) {
       this.content.linkPreviews = linkPreviews;
     }
@@ -43,7 +47,7 @@ export class TextContentBuilder {
     return this;
   }
 
-  withMentions(mentions?: MentionContent[]): TextContentBuilder {
+  withMentions(mentions?: MentionContent[]) {
     if (mentions?.length) {
       this.content.mentions = mentions;
     }
@@ -51,7 +55,7 @@ export class TextContentBuilder {
     return this;
   }
 
-  withQuote(quote?: QuotableMessage | QuoteContent): TextContentBuilder {
+  withQuote(quote?: QuotableMessage | QuoteContent) {
     if (quote) {
       if ((quote as QuoteContent).quotedMessageId) {
         this.content.quote = quote as QuoteContent;
@@ -72,14 +76,14 @@ export class TextContentBuilder {
     return this;
   }
 
-  withReadConfirmation(expectsReadConfirmation = false): TextContentBuilder {
+  withReadConfirmation(expectsReadConfirmation = false) {
     if (typeof expectsReadConfirmation !== 'undefined') {
       this.content.expectsReadConfirmation = expectsReadConfirmation;
     }
     return this;
   }
 
-  withLegalHoldStatus(legalHoldStatus = LegalHoldStatus.UNKNOWN): TextContentBuilder {
+  withLegalHoldStatus(legalHoldStatus = LegalHoldStatus.UNKNOWN) {
     if (typeof legalHoldStatus !== 'undefined') {
       this.content.legalHoldStatus = legalHoldStatus;
     }

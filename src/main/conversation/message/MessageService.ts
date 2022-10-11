@@ -37,7 +37,7 @@ import {Encoder} from 'bazinga64';
 import {encryptAsset} from '../../cryptography/AssetCryptography';
 import {CryptographyService} from '../../cryptography';
 import {QualifiedId, QualifiedUserPreKeyBundleMap, UserPreKeyBundleMap} from '@wireapp/api-client/src/user';
-import {MessageBuilder} from './MessageBuilder';
+import {createId} from './MessageBuilder';
 import {GenericMessage} from '@wireapp/protocol-messaging';
 import {GenericMessageType} from '..';
 import {flattenUserClients, flattenQualifiedUserClients} from './UserClientsUtil';
@@ -65,7 +65,7 @@ export class MessageService {
     recipients: UserClients | UserPreKeyBundleMap,
     plainText: Uint8Array,
     options: {
-      conversationId?: string;
+      conversationId?: QualifiedId;
       reportMissing?: boolean | string[];
       sendAsProtobuf?: boolean;
       nativePush?: boolean;
@@ -223,7 +223,7 @@ export class MessageService {
     sendingClientId: string,
     recipients: OTRRecipients<Uint8Array>,
     options: {
-      conversationId?: string;
+      conversationId?: QualifiedId;
       assetData?: Uint8Array;
       reportMissing?: boolean | string[];
       nativePush?: boolean;
@@ -246,13 +246,18 @@ export class MessageService {
 
     return !options.conversationId
       ? this.apiClient.api.broadcast.postBroadcastMessage(sendingClientId, message, ignoreMissing)
-      : this.apiClient.api.conversation.postOTRMessage(sendingClientId, options.conversationId, message, ignoreMissing);
+      : this.apiClient.api.conversation.postOTRMessage(
+          sendingClientId,
+          options.conversationId.id,
+          message,
+          ignoreMissing,
+        );
   }
 
   private async generateExternalPayload(plainText: Uint8Array): Promise<{text: Uint8Array; cipherText: Uint8Array}> {
     const asset = await encryptAsset({plainText});
     const {cipherText, keyBytes, sha256} = asset;
-    const messageId = MessageBuilder.createId();
+    const messageId = createId();
 
     const externalMessage = {
       otrKey: new Uint8Array(keyBytes),
@@ -338,7 +343,7 @@ export class MessageService {
   private async sendOTRProtobufMessage(
     sendingClientId: string,
     recipients: OTRRecipients<Uint8Array>,
-    options: {conversationId?: string; assetData?: Uint8Array; reportMissing?: boolean | string[]},
+    options: {conversationId?: QualifiedId; assetData?: Uint8Array; reportMissing?: boolean | string[]},
   ): Promise<ClientMismatch> {
     const userEntries: ProtobufOTR.IUserEntry[] = Object.entries(recipients).map(([userId, otrClientMap]) => {
       const clients: ProtobufOTR.IClientEntry[] = Object.entries(otrClientMap).map(([clientId, payload]) => {
@@ -382,7 +387,7 @@ export class MessageService {
       ? this.apiClient.api.broadcast.postBroadcastProtobufMessage(sendingClientId, protoMessage, ignoreMissing)
       : this.apiClient.api.conversation.postOTRProtobufMessage(
           sendingClientId,
-          options.conversationId,
+          options.conversationId.id,
           protoMessage,
           ignoreMissing,
         );

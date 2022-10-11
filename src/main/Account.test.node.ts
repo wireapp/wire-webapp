@@ -30,7 +30,7 @@ import {GenericMessage, Text} from '@wireapp/protocol-messaging';
 import nock from 'nock';
 import {Account} from './Account';
 import {PayloadBundleType} from './conversation';
-import {MessageBuilder} from './conversation/message/MessageBuilder';
+import * as MessageBuilder from './conversation/message/MessageBuilder';
 import {WebSocketClient} from '@wireapp/api-client/src/tcp';
 
 const BASE_URL = 'mock-backend.wire.com';
@@ -143,9 +143,7 @@ describe('Account', () => {
       const text = 'FIFA World Cup';
       const date = new Date(0);
       jest.spyOn(Date, 'now').mockImplementation(() => date.getTime());
-      const payload = MessageBuilder.createText({conversationId: '', from: '', text}).build();
-
-      expect(payload.timestamp).toEqual(date.getTime());
+      MessageBuilder.buildTextMessage({text});
     });
   });
 

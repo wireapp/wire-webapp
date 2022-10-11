@@ -87,8 +87,8 @@ export class MessageToProtoMapper {
     return builtLinkPreviews;
   }
 
-  static mapText(payloadBundle: TextMessage | EditedTextMessage): Text {
-    const {expectsReadConfirmation, legalHoldStatus, linkPreviews, mentions, quote, text} = payloadBundle.content;
+  static mapText(payloadBundle: TextMessage['content'] | EditedTextMessage['content']): Text {
+    const {expectsReadConfirmation, legalHoldStatus, linkPreviews, mentions, quote, text} = payloadBundle;
 
     const textMessage = Text.create({
       content: text,

@@ -17,20 +17,10 @@
  *
  */
 
-import {Account} from './Account';
-import * as auth from './auth/';
-import * as conversation from './conversation/';
-import {CoreError} from './CoreError';
-import * as cryptography from './cryptography/';
-import * as util from './util';
-import {MessageBuilder} from './conversation/message/MessageBuilder';
-
-export = {
-  Account,
-  MessageBuilder,
-  CoreError,
-  auth,
-  conversation,
-  cryptography,
-  util,
-};
+export {Account, ConnectionState, ProcessedEventPayload} from './Account';
+export * as auth from './auth/';
+export * as conversation from './conversation/';
+export {CoreError} from './CoreError';
+export * as cryptography from './cryptography/';
+export * as util from './util';
+export * as MessageBuilder from './conversation/message/MessageBuilder';

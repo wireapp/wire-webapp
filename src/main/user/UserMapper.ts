@@ -27,7 +27,7 @@ import {
 } from '@wireapp/api-client/src/event';
 
 import {PayloadBundle, PayloadBundleSource, PayloadBundleState, PayloadBundleType} from '../conversation';
-import {MessageBuilder} from '../conversation/message/MessageBuilder';
+import {createId} from '../conversation/message/MessageBuilder';
 
 export class UserMapper {
   public static mapUserEvent(
@@ -42,7 +42,7 @@ export class UserMapper {
           content: {connection, user},
           conversation: connection.conversation,
           from: connection.from,
-          id: MessageBuilder.createId(),
+          id: createId(),
           messageTimer: 0,
           source,
           state: PayloadBundleState.INCOMING,
@@ -56,7 +56,7 @@ export class UserMapper {
           content: {client},
           conversation: selfUserId,
           from: selfUserId,
-          id: MessageBuilder.createId(),
+          id: createId(),
           messageTimer: 0,
           source,
           state: PayloadBundleState.INCOMING,
@@ -70,7 +70,7 @@ export class UserMapper {
           content: {user},
           conversation: selfUserId,
           from: selfUserId,
-          id: MessageBuilder.createId(),
+          id: createId(),
           source,
           state: PayloadBundleState.INCOMING,
           timestamp: new Date().getTime(),
@@ -83,7 +83,7 @@ export class UserMapper {
           content: {client},
           conversation: selfUserId,
           from: selfUserId,
-          id: MessageBuilder.createId(),
+          id: createId(),
           messageTimer: 0,
           source,
           state: PayloadBundleState.INCOMING,

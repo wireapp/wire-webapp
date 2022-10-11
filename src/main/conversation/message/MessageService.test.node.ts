@@ -202,7 +202,7 @@ describe('MessageService', () => {
     };
 
     const clientId = 'sendingClient';
-    const conversationId = 'conv1';
+    const conversationId = {id: 'conv1', domain: ''};
     const createMessage = (content: string) => {
       const customTextMessage = GenericMessage.create({
         messageId: getUUID(),
@@ -221,7 +221,7 @@ describe('MessageService', () => {
       });
       expect(apiClient.api.conversation.postOTRMessage).toHaveBeenCalledWith(
         clientId,
-        conversationId,
+        conversationId.id,
         expect.any(Object),
         false,
       );
@@ -239,7 +239,7 @@ describe('MessageService', () => {
       });
       expect(apiClient.api.conversation.postOTRProtobufMessage).toHaveBeenCalledWith(
         clientId,
-        conversationId,
+        conversationId.id,
         expect.any(Object),
         false,
       );
@@ -281,7 +281,7 @@ describe('MessageService', () => {
       });
       expect(apiClient.api.conversation.postOTRMessage).toHaveBeenCalledWith(
         clientId,
-        conversationId,
+        conversationId.id,
         expect.objectContaining({data: undefined}),
         false,
       );
@@ -302,7 +302,7 @@ describe('MessageService', () => {
       );
       expect(apiClient.api.conversation.postOTRMessage).toHaveBeenCalledWith(
         clientId,
-        conversationId,
+        conversationId.id,
         expect.objectContaining({data: expect.any(String)}),
         false,
       );
@@ -341,7 +341,7 @@ describe('MessageService', () => {
 
         await messageService.sendMessage('senderclientid', recipients, new Uint8Array(), {
           reportMissing: true,
-          conversationId: 'convid',
+          conversationId: {id: 'convid', domain: ''},
         });
         expect(apiClient.api.conversation.postOTRMessage).toHaveBeenCalledTimes(2);
       });
@@ -369,7 +369,7 @@ describe('MessageService', () => {
         await messageService.sendMessage('senderclientid', recipients, new Uint8Array(), {
           reportMissing: true,
           onClientMismatch,
-          conversationId: 'convid',
+          conversationId: {id: 'convid', domain: ''},
         });
         expect(apiClient.api.conversation.postOTRMessage).toHaveBeenCalledTimes(2);
         expect(onClientMismatch).toHaveBeenCalledWith(clientMismatch);
@@ -393,7 +393,7 @@ describe('MessageService', () => {
         await messageService.sendMessage('senderclientid', recipients, new Uint8Array(), {
           reportMissing: true,
           onClientMismatch,
-          conversationId: 'convid',
+          conversationId: {id: 'convid', domain: ''},
         });
         expect(apiClient.api.conversation.postOTRMessage).toHaveBeenCalledTimes(1);
         expect(onClientMismatch).toHaveBeenCalledWith(clientMismatch);

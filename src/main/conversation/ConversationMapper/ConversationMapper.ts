@@ -19,7 +19,7 @@
 
 import {CONVERSATION_EVENT, ConversationEvent} from '@wireapp/api-client/src/event';
 
-import {MessageBuilder} from '../message/MessageBuilder';
+import {createId} from '../message/MessageBuilder';
 import {PayloadBundle, PayloadBundleSource, PayloadBundleState, PayloadBundleType} from '../message/PayloadBundle';
 
 export class ConversationMapper {
@@ -30,7 +30,7 @@ export class ConversationMapper {
       qualifiedConversation: event.qualified_conversation,
       qualifiedFrom: event.qualified_from,
       from: event.from,
-      id: MessageBuilder.createId(),
+      id: createId(),
       messageTimer: 0,
       source,
       state: PayloadBundleState.INCOMING,

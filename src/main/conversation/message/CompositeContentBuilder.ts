@@ -21,7 +21,7 @@ import {Button, Composite, Text} from '@wireapp/protocol-messaging';
 
 import {CompositeContent, LegalHoldStatus} from '../content';
 import {CompositeMessage} from './OtrMessage';
-import {MessageBuilder} from './MessageBuilder';
+import {createId} from './MessageBuilder';
 
 export class CompositeContentBuilder {
   private readonly content: CompositeContent = {};
@@ -53,7 +53,7 @@ export class CompositeContentBuilder {
     return this;
   }
 
-  addButton(buttonText: string, id: string = MessageBuilder.createId()): CompositeContentBuilder {
+  addButton(buttonText: string, id: string = createId()): CompositeContentBuilder {
     this.items.push(Composite.Item.create({button: Button.create({id, text: buttonText})}));
     return this;
   }

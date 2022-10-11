@@ -37,11 +37,6 @@ export enum MessageTargetMode {
 
 export interface MessageSendingOptions {
   /**
-   * The federated domain the server runs on. Should only be set for federation enabled envs
-   */
-  conversationDomain?: string;
-
-  /**
    * can be either a QualifiedId[] or QualfiedUserClients or undefined. The type has some effect on the behavior of the method.
    *    When given undefined the method will fetch both the members of the conversations and their devices. No ClientMismatch can happen in that case
    *    When given a QualifiedId[] the method will fetch the freshest list of devices for those users (since they are not given by the consumer). As a consequence no ClientMismatch error will trigger and we will ignore missing clients when sending
@@ -71,14 +66,6 @@ export interface MessageSendingOptions {
 
 export interface MessageSendingCallbacks {
   /**
-   * Will be called before a message is actually sent. Returning 'false' will prevent the message from being sent
-   * @param message The message being sent
-   * @return true or undefined if the message should be sent, false if the message sending should be cancelled
-   */
-  onStart?: (message: GenericMessage) => void | boolean | Promise<boolean>;
-
-  onSuccess?: (message: GenericMessage, sentTime?: string) => void;
-  /**
    * Called whenever there is a clientmismatch returned from the server. Will also indicate the sending status of the message (if it was already sent or not)
    *
    * @param status The mismatch info
@@ -107,13 +94,13 @@ export type ProtocolParam = {
 /**
  * The message to send to the conversation
  */
-export type SendCommonParams<T> = ProtocolParam & {
-  payload: T;
-  onStart?: (message: GenericMessage) => void | boolean | Promise<boolean>;
-  onSuccess?: (message: GenericMessage, sentTime?: string) => void;
+export type SendCommonParams = ProtocolParam & {
+  payload: GenericMessage;
 };
-export type SendProteusMessageParams<T> = SendCommonParams<T> &
+export type SendProteusMessageParams = SendCommonParams &
   MessageSendingOptions & {
+    conversationId: QualifiedId;
+
     /**
      * Can be either a QualifiedId[], string[], UserClients or QualfiedUserClients. The type has some effect on the behavior of the method. (Needed only for Proteus)
      *    When given a QualifiedId[] or string[] the method will fetch the freshest list of devices for those users (since they are not given by the consumer). As a consequence no ClientMismatch error will trigger and we will ignore missing clients when sending
@@ -129,7 +116,7 @@ export type SendProteusMessageParams<T> = SendCommonParams<T> &
     protocol: ConversationProtocol.PROTEUS;
   };
 
-export type SendMlsMessageParams<T> = SendCommonParams<T> & {
+export type SendMlsMessageParams = SendCommonParams & {
   /**
    * The groupId of the conversation to send the message to (Needed only for MLS)
    */

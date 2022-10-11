@@ -19,9 +19,11 @@
 
 import {APIClient} from '@wireapp/api-client';
 import {ClientType} from '@wireapp/api-client/src/client/';
+import {ConversationProtocol} from '@wireapp/api-client/src/conversation';
 import {Account, MessageBuilder} from '@wireapp/core';
 import {MemoryEngine} from '@wireapp/store-engine';
 import * as logdown from 'logdown';
+import {buildTextMessage} from '../main/conversation/message/MessageBuilder';
 
 const {name, version} = require('../../package.json');
 const logger = logdown('@wireapp/core/demo/StatusBot', {
@@ -68,7 +70,11 @@ if (!message) {
 
   const text = message || `I am posting from ${name} v${version}. 🌞`;
   for (const conversationId of conversationIds) {
-    const payload = MessageBuilder.createText({conversationId, from: apiClient.userId, text}).build();
-    await account.service.conversation.send({payloadBundle: payload});
+    const payload = buildTextMessage({text});
+    await account.service!.conversation.send({
+      conversationId: {id: conversationId, domain: ''},
+      protocol: ConversationProtocol.PROTEUS,
+      payload,
+    });
   }
 })().catch(error => logger.error(error));
