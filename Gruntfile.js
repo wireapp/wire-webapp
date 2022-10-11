@@ -87,24 +87,7 @@ module.exports = grunt => {
   grunt.registerTask('build_prod', ['build', 'shell:dist_bundle', 'compress']);
 
   grunt.registerTask('set_version', () => {
-    grunt.task.run('gitinfo');
-    const target = grunt.config('gitinfo.local.branch.current.name');
-    grunt.log.ok(`Version target set to ${target}`);
-
-    let user = grunt.config('gitinfo.local.branch.current.currentUser');
-    if (user) {
-      user = user.substring(0, user.indexOf(' ')).toLowerCase();
-    }
-
-    let version = format(new Date(), 'yyyy.MM.dd.HH.mm');
-
-    if (user) {
-      version = `${version}-${user}`;
-    }
-    if (target) {
-      version = `${version}-${target}`;
-    }
-
+    const version = format(new Date(), 'yyyy.MM.dd.HH.mm');
     grunt.log.ok(`Version set to ${version}`);
     grunt.file.write(path.join('server/dist/version'), version);
   });
