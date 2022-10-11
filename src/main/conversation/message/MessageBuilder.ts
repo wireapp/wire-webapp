@@ -46,6 +46,7 @@ import {
   ClientAction,
   Composite,
   Confirmation,
+  DataTransfer,
   Ephemeral,
   GenericMessage,
   Knock,
@@ -54,10 +55,13 @@ import {
   MessageEdit,
   MessageHide,
   Reaction,
+  LastRead,
+  Cleared,
 } from '@wireapp/protocol-messaging';
 import {MessageToProtoMapper} from '../message/MessageToProtoMapper';
 import {GenericMessageType} from '../GenericMessageType';
 import {AssetTransferState} from '../AssetTransferState';
+import {QualifiedId} from '@wireapp/api-client/src/user';
 
 export function createId() {
   return UUID.genV4().toString();
@@ -186,6 +190,43 @@ export function buildFileAbortMessage(
   });
 
   return genericMessage;
+}
+
+export function buildLastReadMessage(conversationId: QualifiedId, lastReadTimestamp: number) {
+  const lastRead = new LastRead({
+    conversationId: conversationId.id,
+    lastReadTimestamp,
+  });
+
+  return GenericMessage.create({
+    [GenericMessageType.LAST_READ]: lastRead,
+    messageId: createId(),
+  });
+}
+
+export function buildDataTransferMessage(identifier: string) {
+  const dataTransfer = new DataTransfer({
+    trackingIdentifier: {
+      identifier,
+    },
+  });
+
+  return new GenericMessage({
+    [GenericMessageType.DATA_TRANSFER]: dataTransfer,
+    messageId: createId(),
+  });
+}
+
+export function buildClearedMessage(conversationId: QualifiedId, timestamp: number = Date.now()) {
+  const clearedMessage = Cleared.create({
+    clearedTimestamp: timestamp,
+    conversationId: conversationId.id,
+  });
+
+  return GenericMessage.create({
+    [GenericMessageType.CLEARED]: clearedMessage,
+    messageId: createId(),
+  });
 }
 
 export function buildImageMessage(
