@@ -8691,10 +8691,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"getobject@npm:~1.0.0":
-  version: 1.0.0
-  resolution: "getobject@npm:1.0.0"
-  checksum: b2c4a860b83b5fa9cf3a010414fdc623ef54b74ec073a4c5a7e7f8dd4747f119f2e97bc684b4477fc91e969f4fa96984ebe78973ca850e6f159e6260f590a66b
+"getobject@npm:^1.1.0":
+  version: 1.1.1
+  resolution: "getobject@npm:1.1.1"
+  checksum: affd5715c597154ce2e1e2908943ae282f2ac57d32f41097ab141743390b536dcafae03d8fdb560d94e851dc0f948391cf37bf127797037cdd82e344b769ac99
   languageName: node
   linkType: hard
 

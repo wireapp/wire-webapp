@@ -205,6 +205,9 @@
     "type": "git",
     "url": "https://github.com/wireapp/wire-webapp.git"
   },
+  "resolutions": {
+    "grunt-legacy-util/getobject": "^1.1.0"
+  },
   "scripts": {
     "build:prod": "yarn build:server && grunt build_prod",
     "build:server": "cd server && yarn build",
