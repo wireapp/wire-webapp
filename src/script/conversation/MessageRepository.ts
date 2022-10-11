@@ -722,7 +722,9 @@ export class MessageRepository {
       const preMessageTimestamp = new Date(new Date(sentAt).getTime() - 10).toISOString();
       // Trigger an empty mismatch to check for users that have no devices and that could have been removed from the team
       await this.onClientMismatch?.({time: preMessageTimestamp}, conversation, silentDegradationWarning);
-      this.updateMessageAsSent(conversation, payload.messageId, syncTimestamp ? sentAt : undefined);
+      if (!skipInjection) {
+        this.updateMessageAsSent(conversation, payload.messageId, syncTimestamp ? sentAt : undefined);
+      }
     };
 
     const conversationService = this.conversationService;
@@ -749,7 +751,9 @@ export class MessageRepository {
       return {id: payload.messageId, state: PayloadBundleState.CANCELLED};
     }
     const result = await this.conversationService.send(sendOptions);
-    handleSuccess(result.sentAt);
+    if (result.state === PayloadBundleState.OUTGOING_SENT) {
+      handleSuccess(result.sentAt);
+    }
     return result;
   }
 

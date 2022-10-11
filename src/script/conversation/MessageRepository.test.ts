@@ -52,8 +52,6 @@ selfUser.isMe = true;
 
 const commonSendResponse = {
   onClientMismatch: expect.any(Function),
-  onStart: expect.any(Function),
-  onSuccess: expect.any(Function),
   protocol: ConversationProtocol.PROTEUS,
 };
 
@@ -99,7 +97,9 @@ async function buildMessageRepository(): Promise<[MessageRepository, MessageRepo
   };
   /* eslint-disable sort-keys-fix/sort-keys-fix */
   const deps = Object.values(dependencies) as ConstructorParameters<typeof MessageRepository>;
-  return [new MessageRepository(...deps), dependencies];
+  const messageRepository = new MessageRepository(...deps);
+  jest.spyOn(messageRepository as any, 'updateMessageAsSent').mockReturnValue(undefined);
+  return [messageRepository, dependencies];
 }
 
 describe('MessageRepository', () => {
@@ -121,21 +121,25 @@ describe('MessageRepository', () => {
     return conversation;
   };
 
+  const successPayload = {
+    sentAt: new Date().toISOString(),
+    id: createRandomUuid(),
+    state: PayloadBundleState.OUTGOING_SENT,
+  };
+
   describe('sendPing', () => {
     it('sends a ping', async () => {
-      const [messageRepository, {core}] = await buildMessageRepository();
-      spyOn(core.service!.conversation, 'send').and.returnValue(Promise.resolve());
+      const [messageRepository, {core, eventRepository}] = await buildMessageRepository();
+      jest.spyOn(core.service!.conversation, 'send').mockResolvedValue(successPayload);
+      jest.spyOn(eventRepository, 'injectEvent').mockResolvedValue(undefined);
       const conversation = generateConversation();
 
       await messageRepository.sendPing(conversation);
       expect(core.service!.conversation.send).toHaveBeenCalledWith({
         ...commonSendResponse,
-        conversationDomain: undefined,
+        conversationId: conversation.qualifiedId,
         nativePush: true,
-        payload: expect.objectContaining({
-          content: expect.objectContaining({hotKnock: false}),
-          conversation: conversation.id,
-        }),
+        payload: expect.objectContaining({knock: expect.objectContaining({hotKnock: false})}),
         targetMode: undefined,
         userIds: expect.any(Object),
       });
@@ -144,10 +148,9 @@ describe('MessageRepository', () => {
 
   describe('sendMessageEdit', () => {
     it('sends an edit message if original message exists', async () => {
-      const [messageRepository, {core}] = await buildMessageRepository();
-      spyOn(core.service!.conversation, 'send').and.returnValue(
-        Promise.resolve({state: PayloadBundleState.OUTGOING_SENT}),
-      );
+      const [messageRepository, {core, eventRepository}] = await buildMessageRepository();
+      jest.spyOn(core.service!.conversation, 'send').mockResolvedValue(successPayload);
+      jest.spyOn(eventRepository, 'injectEvent').mockResolvedValue(undefined);
 
       const originalMessage = new ContentMessage(createRandomUuid());
       originalMessage.assets.push(new Text(createRandomUuid(), 'old text'));
@@ -157,11 +160,13 @@ describe('MessageRepository', () => {
       await messageRepository.sendMessageEdit(conversation, 'new text', originalMessage, []);
       expect(core.service!.conversation.send).toHaveBeenCalledWith({
         ...commonSendResponse,
-        conversationDomain: undefined,
+        conversationId: conversation.qualifiedId,
         nativePush: true,
         payload: expect.objectContaining({
-          content: expect.objectContaining({text: 'new text', originalMessageId: originalMessage.id}),
-          conversation: conversation.id,
+          edited: expect.objectContaining({
+            replacingMessageId: originalMessage.id,
+            text: expect.objectContaining({content: 'new text'}),
+          }),
         }),
         targetMode: undefined,
         userIds: expect.any(Object),
@@ -173,20 +178,15 @@ describe('MessageRepository', () => {
     it('sends a text message', async () => {
       const [messageRepository, {eventRepository, core, propertiesRepository}] = await buildMessageRepository();
       spyOn(propertiesRepository, 'getPreference').and.returnValue(false);
-      spyOn(core.service!.conversation, 'send').and.returnValue(
-        Promise.resolve({state: PayloadBundleState.OUTGOING_SENT}),
-      );
+      jest.spyOn(core.service!.conversation, 'send').mockResolvedValue(successPayload);
       spyOn(eventRepository, 'injectEvent').and.returnValue(Promise.resolve());
       const conversation = generateConversation();
       await messageRepository.sendTextWithLinkPreview(conversation, 'hello there', []);
       expect(core.service!.conversation.send).toHaveBeenCalledWith({
         ...commonSendResponse,
-        conversationDomain: undefined,
+        conversationId: conversation.qualifiedId,
         nativePush: true,
-        payload: expect.objectContaining({
-          content: expect.objectContaining({text: 'hello there'}),
-          conversation: conversation.id,
-        }),
+        payload: expect.objectContaining({text: expect.objectContaining({content: 'hello there'})}),
         targetMode: undefined,
         userIds: expect.any(Object),
       });
@@ -203,7 +203,7 @@ describe('MessageRepository', () => {
       conversation.addMessage(msgToDelete);
       const [messageRepository, {core}] = await buildMessageRepository();
       spyOn(core.service!.conversation, 'send').and.returnValue(
-        Promise.resolve({state: PayloadBundleState.OUTGOING_SENT}),
+        Promise.resolve({state: PayloadBundleState.OUTGOING_SENT, sentAt: new Date().toISOString()}),
       );
 
       await expect(messageRepository.deleteMessageForEveryone(conversation, msgToDelete)).rejects.toMatchObject({
@@ -221,21 +221,13 @@ describe('MessageRepository', () => {
       conversation.addMessage(messageToDelete);
 
       const [messageRepository, {core, eventRepository}] = await buildMessageRepository();
-      spyOn(core.service!.conversation, 'send').and.returnValue(
-        Promise.resolve({state: PayloadBundleState.OUTGOING_SENT}),
-      );
+      jest.spyOn(core.service!.conversation, 'send').mockResolvedValue(successPayload);
       spyOn(eventRepository.eventService, 'deleteEvent').and.returnValue(Promise.resolve());
 
       await messageRepository.deleteMessageForEveryone(conversation, messageToDelete);
       expect(core.service!.conversation.send).toHaveBeenCalledWith(
         expect.objectContaining({
-          payload: expect.objectContaining({
-            conversation: conversation.id,
-            content: expect.objectContaining({
-              messageId: messageToDelete.id,
-            }),
-            type: 'PayloadBundleType.MESSAGE_DELETE',
-          }),
+          payload: expect.objectContaining({deleted: {messageId: messageToDelete.id}}),
           userIds: {selfid: [], user1: []},
         }),
       );
@@ -245,7 +237,7 @@ describe('MessageRepository', () => {
   describe('resetSession', () => {
     it('resets the session with another device', async () => {
       const [messageRepository, {cryptographyRepository, core}] = await buildMessageRepository();
-      jest.spyOn(core.service!.conversation, 'send').mockResolvedValue({} as any);
+      jest.spyOn(core.service!.conversation, 'send').mockResolvedValue(successPayload);
       spyOn(cryptographyRepository, 'deleteSession');
       const conversation = generateConversation();
 
