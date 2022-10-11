@@ -18,17 +18,20 @@
  */
 
 import React, {useState, useEffect, CSSProperties} from 'react';
-import {css} from '@emotion/react';
 
+import {css} from '@emotion/react';
+import {QualifiedId} from '@wireapp/api-client/src/user';
+
+import Avatar, {AVATAR_SIZE} from 'Components/Avatar';
+import Icon from 'Components/Icon';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
-import Icon from 'Components/Icon';
-import type {Grid} from '../../calling/videoGridHandler';
-import Video from './Video';
-import type {Participant} from '../../calling/Participant';
+
 import GroupVideoGridTile from './GroupVideoGridTile';
-import Avatar, {AVATAR_SIZE} from 'Components/Avatar';
-import {QualifiedId} from '@wireapp/api-client/src/user';
+import Video from './Video';
+
+import type {Participant} from '../../calling/Participant';
+import type {Grid} from '../../calling/videoGridHandler';
 
 export interface GroupVideoGripProps {
   grid: Grid;

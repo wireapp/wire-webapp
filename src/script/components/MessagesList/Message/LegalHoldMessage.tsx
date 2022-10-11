@@ -18,14 +18,16 @@
  */
 
 import React from 'react';
-import {LegalHoldMessage as LegalHoldMessageEntity} from '../../../entity/message/LegalHoldMessage';
-import LegalHoldDot from 'Components/LegalHoldDot';
 
-import {t} from 'Util/LocalizerUtil';
 import {amplify} from 'amplify';
-import {LegalHoldModalViewModel} from '../../../view_model/content/LegalHoldModalViewModel';
 import {container} from 'tsyringe';
+
+import LegalHoldDot from 'Components/LegalHoldDot';
+import {t} from 'Util/LocalizerUtil';
+
 import {ConversationState} from '../../../conversation/ConversationState';
+import {LegalHoldMessage as LegalHoldMessageEntity} from '../../../entity/message/LegalHoldMessage';
+import {LegalHoldModalState} from '../../../legal-hold/LegalHoldModalState';
 
 export interface LegalHoldMessageProps {
   conversationState?: ConversationState;
@@ -37,17 +39,20 @@ const LegalHoldMessage: React.FC<LegalHoldMessageProps> = ({
   conversationState = container.resolve(ConversationState),
 }) => {
   const showLegalHold = () => {
-    amplify.publish(LegalHoldModalViewModel.SHOW_DETAILS, conversationState.activeConversation());
+    amplify.publish(LegalHoldModalState.SHOW_DETAILS, conversationState.activeConversation());
   };
+
   return (
     <div className="message-header">
       <div className="message-header-icon">
         <LegalHoldDot isMessage />
       </div>
+
       <div className="message-header-label">
         {message.isActivationMessage ? (
           <>
             <span data-uie-name="status-legalhold-activated">{t('legalHoldActivated')}</span>
+
             <button
               type="button"
               className="button-reset-default message-header-label__learn-more"

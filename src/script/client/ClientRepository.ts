@@ -17,32 +17,35 @@
  *
  */
 
-import ko from 'knockout';
 import {ClientType, PublicClient, RegisteredClient, ClientCapability} from '@wireapp/api-client/src/client/';
 import {USER_EVENT, UserClientAddEvent, UserClientRemoveEvent} from '@wireapp/api-client/src/event';
 import {QualifiedId} from '@wireapp/api-client/src/user/';
 import {Runtime} from '@wireapp/commons';
-import {amplify} from 'amplify';
 import {WebAppEvents} from '@wireapp/webapp-events';
+import {amplify} from 'amplify';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
-import {container} from 'tsyringe';
+import ko from 'knockout';
 import murmurhash from 'murmurhash';
+import {container} from 'tsyringe';
+
 import {t} from 'Util/LocalizerUtil';
 import {Logger, getLogger} from 'Util/Logger';
+import {matchQualifiedIds} from 'Util/QualifiedId';
 import {loadValue} from 'Util/StorageUtil';
-import {SIGN_OUT_REASON} from '../auth/SignOutReason';
-import {StorageKey} from '../storage/StorageKey';
+
 import {ClientEntity} from './ClientEntity';
 import {ClientMapper} from './ClientMapper';
 import type {ClientService} from './ClientService';
+import {ClientState} from './ClientState';
+
+import {SIGN_OUT_REASON} from '../auth/SignOutReason';
+import PrimaryModal from '../components/Modals/PrimaryModal';
 import type {CryptographyRepository} from '../cryptography/CryptographyRepository';
 import type {User} from '../entity/User';
 import {ClientError} from '../error/ClientError';
-import {ClientRecord, StorageRepository} from '../storage';
-import {ClientState} from './ClientState';
-import {matchQualifiedIds} from 'Util/QualifiedId';
 import {Core} from '../service/CoreSingleton';
-import PrimaryModal from '../components/Modals/PrimaryModal';
+import {ClientRecord, StorageRepository} from '../storage';
+import {StorageKey} from '../storage/StorageKey';
 
 export type UserClientEntityMap = {[userId: string]: ClientEntity[]};
 export type QualifiedUserClientEntityMap = {[domain: string]: UserClientEntityMap};

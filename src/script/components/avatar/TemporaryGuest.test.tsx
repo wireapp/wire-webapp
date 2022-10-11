@@ -20,8 +20,9 @@
 import TestPage from 'Util/test/TestPage';
 
 import TemporaryGuestAvatar from './TemporaryGuestAvatar';
-import {User} from '../../entity/User';
 import {UserAvatarProps} from './UserAvatar';
+
+import {User} from '../../entity/User';
 import {AVATAR_SIZE, STATE} from '../Avatar';
 
 jest.mock('../../auth/util/SVGProvider');

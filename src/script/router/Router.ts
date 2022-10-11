@@ -18,6 +18,7 @@
  */
 
 import React from 'react';
+
 import switchPath from 'switch-path';
 import {singleton} from 'tsyringe';
 

@@ -17,18 +17,9 @@
  *
  */
 
-import TestPage from 'Util/test/TestPage';
+import {render, fireEvent} from '@testing-library/react';
 
-import InfoToggle, {InfoToggleProps} from './InfoToggle';
-
-class InfoTogglePage extends TestPage<InfoToggleProps> {
-  constructor(props?: InfoToggleProps) {
-    super(InfoToggle, props);
-  }
-
-  getInput = () => this.get('input[data-uie-name="info-toggle-input"]');
-  getInfo = (dataUieName: string) => this.get(`[data-uie-name="status-info-toggle-${dataUieName}"]`);
-}
+import InfoToggle from './InfoToggle';
 
 describe('InfoToggle', () => {
   it('toggles check property', () => {
@@ -36,7 +27,7 @@ describe('InfoToggle', () => {
     let isChecked = false;
     const props = {
       dataUieName,
-      info: 'example',
+      info: 'info',
       isChecked,
       isDisabled: false,
       name: 'example',
@@ -45,9 +36,12 @@ describe('InfoToggle', () => {
       },
     };
 
-    const infoToggle = new InfoTogglePage(props);
-    expect(infoToggle.getInfo(dataUieName).textContent).toBe('example');
-    infoToggle.click(infoToggle.getInput());
+    const {getByText, getByTestId} = render(<InfoToggle {...props} />);
+
+    expect(getByText('info')).not.toBeNull();
+
+    const input = getByTestId('info-toggle-input');
+    fireEvent.click(input);
 
     expect(isChecked).toBe(true);
   });

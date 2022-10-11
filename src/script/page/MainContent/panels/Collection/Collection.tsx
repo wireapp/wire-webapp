@@ -18,24 +18,26 @@
  */
 
 import React, {useEffect, useState} from 'react';
-import {amplify} from 'amplify';
+
 import {WebAppEvents} from '@wireapp/webapp-events';
-import {useKoSubscribableChildren} from 'Util/ComponentUtil';
-import {Conversation} from '../../../../entity/Conversation';
+import {amplify} from 'amplify';
 
-import {ContentMessage} from 'src/script/entity/message/ContentMessage';
-import {t} from 'Util/LocalizerUtil';
-import {isOfCategory, Category} from './utils';
 import Icon from 'Components/Icon';
+import {showDetailViewModal} from 'Components/Modals/DetailViewModal';
 import {ConversationRepository} from 'src/script/conversation/ConversationRepository';
-import {MessageCategory} from '../../../../message/MessageCategory';
+import {ContentMessage} from 'src/script/entity/message/ContentMessage';
+import {useKoSubscribableChildren} from 'Util/ComponentUtil';
+import {t} from 'Util/LocalizerUtil';
 
-import FullSearch from './FullSearch';
 import CollectionDetails from './CollectionDetails';
 import CollectionSection from './CollectionSection';
+import FullSearch from './FullSearch';
+import {Category, isOfCategory} from './utils';
+
 import {AssetRepository} from '../../../../assets/AssetRepository';
 import {MessageRepository} from '../../../../conversation/MessageRepository';
-import {showDetailViewModal} from 'Components/Modals/DetailViewModal';
+import {Conversation} from '../../../../entity/Conversation';
+import {MessageCategory} from '../../../../message/MessageCategory';
 
 interface CollectionDetailsProps {
   conversation: Conversation;

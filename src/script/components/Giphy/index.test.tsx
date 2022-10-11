@@ -17,42 +17,37 @@
  *
  */
 
-import {fireEvent, render, waitFor} from '@testing-library/react';
-import {WebAppEvents} from '@wireapp/webapp-events';
-import {amplify} from 'amplify';
-
-import Giphy, {GiphyState} from './index';
+import {fireEvent, render} from '@testing-library/react';
 
 import {GiphyRepository} from '../../extension/GiphyRepository';
 import {GiphyService} from '../../extension/GiphyService';
 
+import Giphy, {GiphyState} from '.';
+
+const inputValue = 'Yammy yammy';
 const getDefaultProps = () => ({
   giphyRepository: new GiphyRepository(new GiphyService()),
+  inputValue,
+  onClose: jest.fn(),
 });
 
 describe('Giphy', () => {
-  it('subscribes to GIPHY.SHOW on mount', async () => {
-    spyOn(amplify, 'subscribe').and.returnValue(undefined);
-
-    await render(<Giphy {...getDefaultProps()} />);
-    await waitFor(() => {
-      expect(amplify.subscribe).toHaveBeenCalledWith(WebAppEvents.EXTENSIONS.GIPHY.SHOW, expect.anything());
-    });
+  it('rendered modal', () => {
+    const {getByText} = render(<Giphy {...getDefaultProps()} defaultGiphyState={GiphyState.RESULT} />);
+    expect(getByText(inputValue)).not.toBeNull();
   });
 
   it('closes giphy modal', async () => {
-    const {container} = render(<Giphy {...getDefaultProps()} />);
-    const closeButton = container.querySelector('button[data-uie-name="do-close-giphy-modal"]');
+    const {getByTestId} = render(<Giphy {...getDefaultProps()} />);
+    const closeButton = getByTestId('do-close-giphy-modal');
 
     expect(closeButton).not.toBeNull();
-    fireEvent.click(closeButton!);
+    fireEvent.click(closeButton);
   });
 
   it('no giphys found', async () => {
-    const {container} = render(<Giphy {...getDefaultProps()} defaultGiphyState={GiphyState.ERROR} />);
-    const errorContainer = container.querySelector('[data-uie-name="giphy-error-message"]');
+    const {getByText} = render(<Giphy {...getDefaultProps()} defaultGiphyState={GiphyState.ERROR} />);
 
-    expect(errorContainer).not.toBeNull();
-    expect(errorContainer!.innerHTML).toEqual('extensionsGiphyNoGifs');
+    expect(getByText('extensionsGiphyNoGifs')).not.toBeNull();
   });
 });

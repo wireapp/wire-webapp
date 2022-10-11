@@ -17,6 +17,8 @@
  *
  */
 
+import React, {useEffect, useRef, useState} from 'react';
+
 import {LoginData} from '@wireapp/api-client/src/auth';
 import {BackendErrorLabel} from '@wireapp/api-client/src/http';
 import {
@@ -31,11 +33,13 @@ import {
   Loading,
   RoundIconButton,
 } from '@wireapp/react-ui-kit';
-import React, {useEffect, useRef, useState} from 'react';
 import {useIntl} from 'react-intl';
 import {connect} from 'react-redux';
-import {AnyAction, Dispatch} from 'redux';
 import {useNavigate} from 'react-router-dom';
+import {AnyAction, Dispatch} from 'redux';
+
+import Page from './Page';
+
 import {loginStrings, phoneLoginStrings} from '../../strings';
 import Exception from '../component/Exception';
 import {EXTERNAL_ROUTE} from '../externalRoute';
@@ -46,9 +50,8 @@ import {RootState, bindActionCreators} from '../module/reducer';
 import * as AuthSelector from '../module/selector/AuthSelector';
 import {ROUTE} from '../route';
 import * as UrlUtil from '../util/urlUtil';
-import Page from './Page';
 
-interface Props extends React.HTMLProps<HTMLDivElement> {}
+type Props = React.HTMLProps<HTMLDivElement>;
 
 const CheckPassword = ({loginData, doLogin, resetAuthError, isFetching}: Props & ConnectedProps & DispatchProps) => {
   const {formatMessage: _} = useIntl();

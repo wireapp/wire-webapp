@@ -17,10 +17,9 @@
  *
  */
 
+import {Text} from 'src/script/entity/message/Text';
 import {areMentionsDifferent, isTextDifferent} from 'Util/messageComparator';
 import {createRandomUuid} from 'Util/util';
-
-import {Text} from 'src/script/entity/message/Text';
 
 describe('MessageComparator', () => {
   it('areMentionsDifferent', () => {

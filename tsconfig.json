@@ -18,7 +18,7 @@
     "jsx": "react-jsx",
     "jsxImportSource": "@emotion/react",
     "module": "esnext",
-    "lib": ["dom", "esnext", "dom.iterable"],
+    "lib": ["esnext", "dom", "dom.iterable"],
     "moduleResolution": "node",
     "noEmitOnError": true,
     "noImplicitAny": true,
@@ -35,8 +35,8 @@
     "rootDirs": ["src/script"],
     "sourceMap": true,
     "target": "es2017",
-    "typeRoots": ["src/types", "node_modules/@types"],
+    "typeRoots": ["src/types", "node_modules/@types", "node_modules/amplify/typings"],
     "strict": true
   },
-  "exclude": ["node_modules", "server", "src/sw.js"]
+  "exclude": ["node_modules", "server/", "src/sw.js", "src/worker/"]
 }

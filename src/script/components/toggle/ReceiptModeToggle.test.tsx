@@ -17,40 +17,33 @@
  *
  */
 
+import {render} from '@testing-library/react';
 import {RECEIPT_MODE} from '@wireapp/api-client/src/conversation/data';
 
-import TestPage from 'Util/test/TestPage';
-
-import ReceiptModeToggle, {ReceiptModeToggleProps} from './ReceiptModeToggle';
-
-class ReceiptModeTogglePage extends TestPage<ReceiptModeToggleProps> {
-  constructor(props?: ReceiptModeToggleProps) {
-    super(ReceiptModeToggle, props);
-  }
-
-  getCheckbox = () => this.get('input[data-uie-name="toggle-receipt-mode-checkbox"]');
-}
+import ReceiptModeToggle from './ReceiptModeToggle';
 
 describe('ReceiptModeToggle', () => {
   it('checks the checkbox when receipts are turned on', () => {
-    const receiptModeToggle = new ReceiptModeTogglePage({
+    const props = {
       onReceiptModeChanged: () => {},
       receiptMode: RECEIPT_MODE.OFF,
-    });
+    };
 
-    const checkBox = receiptModeToggle.getCheckbox();
+    const {getByTestId} = render(<ReceiptModeToggle {...props} />);
 
-    expect(checkBox.getAttribute('checked')).toBe(null);
+    const checkbox = getByTestId('toggle-receipt-mode-checkbox');
+    expect(checkbox.getAttribute('checked')).toBe(null);
   });
 
   it('unchecks the checkbox when receipts are turned off', () => {
-    const receiptModeToggle = new ReceiptModeTogglePage({
+    const props = {
       onReceiptModeChanged: () => {},
       receiptMode: RECEIPT_MODE.ON,
-    });
+    };
 
-    const checkBox = receiptModeToggle.getCheckbox();
+    const {getByTestId} = render(<ReceiptModeToggle {...props} />);
 
-    expect(checkBox.getAttribute('checked')).toBe('');
+    const checkbox = getByTestId('toggle-receipt-mode-checkbox');
+    expect(checkbox.getAttribute('checked')).toBe('');
   });
 });

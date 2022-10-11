@@ -17,38 +17,31 @@
  *
  */
 
-import TestPage from 'Util/test/TestPage';
+import {render} from '@testing-library/react';
 import {ConversationProtocol} from '@wireapp/api-client/src/conversation/NewConversation';
 
-import ConversationProtocolDetails, {
-  ConversationProtocolDetailsProps,
-  Ciphersuite,
-} from './ConversationProtocolDetails';
-
-class ConversationProtocolDetailsPage extends TestPage<ConversationProtocolDetailsProps> {
-  constructor(props: ConversationProtocolDetailsProps) {
-    super(ConversationProtocolDetails, props);
-  }
-
-  getProtocolName = () => this.get('[data-uie-name="protocol-name"]');
-  getCipherSuite = () => this.get('[data-uie-name="cipher-suite"]');
-}
+import ConversationProtocolDetails, {Ciphersuite} from './ConversationProtocolDetails';
 
 describe('ConversationProtocolDetails', () => {
   it('renders the correct infos for the conversation with mls protocol', () => {
-    const ConversationProtocolDetails = new ConversationProtocolDetailsPage({
+    const props = {
       cipherSuite: Ciphersuite.MLS_128_DHKEMP256_AES128GCM_SHA256_P256,
       protocol: ConversationProtocol.MLS,
-    });
+    };
 
-    expect(ConversationProtocolDetails.getProtocolName()?.textContent).toBe('mls');
-    expect(ConversationProtocolDetails.getCipherSuite()?.textContent).toBe('MLS_128_DHKEMP256_AES128GCM_SHA256_P256');
+    const {queryByText} = render(<ConversationProtocolDetails {...props} />);
+
+    expect(queryByText('mls')).not.toBeNull();
+    expect(queryByText('MLS_128_DHKEMP256_AES128GCM_SHA256_P256')).not.toBeNull();
   });
-  it('renders the correct infos for the conversation with proteus protocol', () => {
-    const ConversationProtocolDetails = new ConversationProtocolDetailsPage({
-      protocol: ConversationProtocol.PROTEUS,
-    });
 
-    expect(ConversationProtocolDetails.getProtocolName()?.textContent).toBe('proteus');
+  it('renders the correct infos for the conversation with proteus protocol', () => {
+    const props = {
+      protocol: ConversationProtocol.PROTEUS,
+    };
+
+    const {queryByText} = render(<ConversationProtocolDetails {...props} />);
+
+    expect(queryByText('proteus')).not.toBeNull();
   });
 });

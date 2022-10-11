@@ -17,11 +17,13 @@
  *
  */
 
-import ko from 'knockout';
-import {DeleteMessage as DeleteMessageEntity} from 'src/script/entity/message/DeleteMessage';
-import DeleteMessage from './DeleteMessage';
-import {User} from 'src/script/entity/User';
 import {render} from '@testing-library/react';
+import ko from 'knockout';
+
+import {DeleteMessage as DeleteMessageEntity} from 'src/script/entity/message/DeleteMessage';
+import {User} from 'src/script/entity/User';
+
+import DeleteMessage from './DeleteMessage';
 
 const createDeleteMessage = (partialDeleteMessage: Partial<DeleteMessageEntity>) => {
   const DeleteMessage: Partial<DeleteMessageEntity> = {

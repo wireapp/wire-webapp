@@ -17,28 +17,33 @@
  *
  */
 
+import React, {
+  MouseEvent as ReactMouseEvent,
+  KeyboardEvent as ReactKeyboardEvent,
+  useLayoutEffect,
+  useRef,
+} from 'react';
+
 import {QualifiedId} from '@wireapp/api-client/src/user';
-import {MouseEvent as ReactMouseEvent, KeyboardEvent as ReactKeyboardEvent} from 'react';
 
-import {Message as BaseMessage} from '../../../entity/message/Message';
-import type {ContentMessage} from '../../../entity/message/ContentMessage';
-import type {MemberMessage as MemberMessageEntity} from '../../../entity/message/MemberMessage';
-import type {Text} from '../../../entity/message/Text';
-import type {Conversation} from '../../../entity/Conversation';
-import type {User} from '../../../entity/User';
-import type {DecryptErrorMessage} from '../../../entity/message/DecryptErrorMessage';
-import type {MessageRepository} from '../../../conversation/MessageRepository';
-import {TeamState} from '../../../team/TeamState';
-
+import InViewport from 'Components/utils/InViewport';
+import {ServiceEntity} from 'src/script/integration/ServiceEntity';
+import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {getMessageMarkerType, MessageMarkerType} from 'Util/conversationMessages';
 
-import React, {useLayoutEffect, useRef} from 'react';
-import InViewport from 'Components/utils/InViewport';
-import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import MessageTime from './MessageTime';
 import {MessageWrapper} from './MessageWrapper';
+
+import type {MessageRepository} from '../../../conversation/MessageRepository';
+import type {Conversation} from '../../../entity/Conversation';
+import type {ContentMessage} from '../../../entity/message/ContentMessage';
+import type {DecryptErrorMessage} from '../../../entity/message/DecryptErrorMessage';
+import type {MemberMessage as MemberMessageEntity} from '../../../entity/message/MemberMessage';
+import {Message as BaseMessage} from '../../../entity/message/Message';
+import type {Text} from '../../../entity/message/Text';
+import type {User} from '../../../entity/User';
 import {useRelativeTimestamp} from '../../../hooks/useRelativeTimestamp';
-import {ServiceEntity} from 'src/script/integration/ServiceEntity';
+import {TeamState} from '../../../team/TeamState';
 
 export interface MessageActions {
   onClickAvatar: (user: User | ServiceEntity) => void;

@@ -17,16 +17,17 @@
  *
  */
 
+/* eslint-disable jsx-a11y/no-noninteractive-tabindex */
+
 import {FC} from 'react';
 
-import Icon from 'Components/Icon';
-import Image from 'Components/Image';
 import RestrictedVideo from 'Components/asset/RestrictedVideo';
 import ParticipantMicOnIcon from 'Components/calling/ParticipantMicOnIcon';
-
+import Icon from 'Components/Icon';
+import Image from 'Components/Image';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
-import {renderMessage} from 'Util/messageRenderer';
 import {t} from 'Util/LocalizerUtil';
+import {renderMessage} from 'Util/messageRenderer';
 
 import {ContentMessage} from '../../entity/message/ContentMessage';
 

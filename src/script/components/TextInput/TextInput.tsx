@@ -18,11 +18,14 @@
  */
 
 import React, {ForwardRefRenderFunction, useEffect, useRef} from 'react';
-import Icon from 'Components/Icon';
+
 import {CheckIcon, COLOR} from '@wireapp/react-ui-kit';
-import {cancelButtonCSS, containerCSS, errorMessageCSS, getIconCSS, getInputCSS, getLabelCSS} from './TextInput.styles';
-import {t} from 'Util/LocalizerUtil';
+
+import Icon from 'Components/Icon';
 import {isTabKey} from 'Util/KeyboardUtil';
+import {t} from 'Util/LocalizerUtil';
+
+import {cancelButtonCSS, containerCSS, errorMessageCSS, getIconCSS, getInputCSS, getLabelCSS} from './TextInput.styles';
 
 export interface UserInputProps {
   autoFocus?: boolean;

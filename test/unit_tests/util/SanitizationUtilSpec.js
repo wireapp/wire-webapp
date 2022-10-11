@@ -17,12 +17,10 @@
  *
  */
 
-import {LocalizerUtil, Declension, setStrings} from 'Util/LocalizerUtil';
-
-import 'src/script/localization/Localizer';
-
-import {escapeRegex, getSelfName, getUserName, safeWindowOpen} from 'src/script/util/SanitizationUtil';
 import {User} from 'src/script/entity/User';
+import 'src/script/localization/Localizer';
+import {escapeRegex, getSelfName, getUserName, safeWindowOpen} from 'src/script/util/SanitizationUtil';
+import {Declension, LocalizerUtil, setStrings} from 'Util/LocalizerUtil';
 
 describe('SanitizationUtil', () => {
   beforeEach(() => {

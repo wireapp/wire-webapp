@@ -17,10 +17,12 @@
  *
  */
 
-import ko from 'knockout';
-import {CompositeMessage} from 'src/script/entity/message/CompositeMessage';
-import MessageButton from './MessageButton';
 import {render} from '@testing-library/react';
+import ko from 'knockout';
+
+import {CompositeMessage} from 'src/script/entity/message/CompositeMessage';
+
+import MessageButton from './MessageButton';
 
 describe('MessageButton', () => {
   it('shows error message', async () => {

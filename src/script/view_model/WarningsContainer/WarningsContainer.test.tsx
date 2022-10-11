@@ -17,8 +17,10 @@
  *
  */
 
-import {render, act} from '@testing-library/react';
+import {act, render} from '@testing-library/react';
+
 import WarningsContainer from './WarningsContainer';
+
 import Warnings from '.';
 
 describe('WarningsContainer', () => {

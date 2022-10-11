@@ -17,11 +17,13 @@
  *
  */
 
-import ko from 'knockout';
-import {AssetTransferState} from 'src/script/assets/AssetTransferState';
-import MediaButton, {MediaButtonProps} from './MediaButton';
-import {FileAsset} from 'src/script/entity/message/FileAsset';
 import {render, fireEvent} from '@testing-library/react';
+import ko from 'knockout';
+
+import {AssetTransferState} from 'src/script/assets/AssetTransferState';
+import {FileAsset} from 'src/script/entity/message/FileAsset';
+
+import MediaButton, {MediaButtonProps} from './MediaButton';
 
 describe('MediaButton', () => {
   const getDefaultProps = (): MediaButtonProps => {

@@ -17,12 +17,13 @@
  *
  */
 
+import {TypeUtil, Runtime} from '@wireapp/commons';
+
+import UnsupportedBrowser from './UnsupportedBrowser';
+
+import {Config, Configuration} from '../../Config';
 import {initialRootState} from '../module/reducer';
 import {mockStoreFactory} from '../util/test/mockStoreFactory';
-import UnsupportedBrowser from './UnsupportedBrowser';
-import {TypeUtil} from '@wireapp/commons';
-import {Config, Configuration} from '../../Config';
-import {Runtime} from '@wireapp/commons';
 import {mountComponent} from '../util/test/TestUtil';
 
 jest.mock('../util/SVGProvider');

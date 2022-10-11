@@ -17,31 +17,29 @@
  *
  */
 
-import TestPage from 'Util/test/TestPage';
-import LegalHoldDot, {LegalHoldDotProps} from 'Components/LegalHoldDot';
-import {LegalHoldModalViewModel} from '../view_model/content/LegalHoldModalViewModel';
+import {render} from '@testing-library/react';
 
-class LegalHoldDotPage extends TestPage<LegalHoldDotProps> {
-  constructor(props?: LegalHoldDotProps) {
-    super(LegalHoldDot, props);
-  }
-
-  getPendingIcon = () => this.get('svg.pending-icon');
-}
+import LegalHoldDot from 'Components/LegalHoldDot';
 
 describe('LegalHoldDot', () => {
   it('shows a pending icon', () => {
-    const legalHoldModal = {
-      showRequestModal: () => Promise.resolve(),
-      showUsers: () => Promise.resolve(),
-    } as LegalHoldModalViewModel;
+    const {getByTestId} = render(<LegalHoldDot isPending />);
+    expect(getByTestId('legal-hold-dot-pending-icon')).not.toBeNull();
+  });
 
-    const legalHoldDotPage = new LegalHoldDotPage({
-      isPending: true,
-      legalHoldModal,
-    });
+  it('is not interactive dot', async () => {
+    const interactiveUieData = 'legal-hold-dot';
+    const {getByTestId} = await render(<LegalHoldDot dataUieName={interactiveUieData} />);
 
-    const isPending = legalHoldDotPage.getPendingIcon() !== null;
-    expect(isPending).toBe(true);
+    const button = getByTestId(interactiveUieData);
+    expect(button.getAttribute('disabled')).toBeDefined();
+  });
+
+  it('is interactive dot', async () => {
+    const interactiveUieData = 'legal-hold-dot';
+    const {getByTestId} = await render(<LegalHoldDot isInteractive dataUieName={interactiveUieData} />);
+
+    const button = getByTestId(interactiveUieData);
+    expect(button.getAttribute('disabled')).toBeNull();
   });
 });

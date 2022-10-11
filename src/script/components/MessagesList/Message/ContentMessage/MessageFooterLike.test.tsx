@@ -17,10 +17,12 @@
  *
  */
 
-import ko from 'knockout';
-import {ContentMessage} from 'src/script/entity/message/ContentMessage';
-import MessageFooterLike from './MessageFooterLike';
 import {render, fireEvent} from '@testing-library/react';
+import ko from 'knockout';
+
+import {ContentMessage} from 'src/script/entity/message/ContentMessage';
+
+import MessageFooterLike from './MessageFooterLike';
 
 const createLikeMessage = (partialLikeMessage: Partial<ContentMessage>) => {
   const likeMessage: Partial<ContentMessage> = {

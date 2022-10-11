@@ -17,12 +17,14 @@
  *
  */
 
+import {render} from '@testing-library/react';
+
 import {ContentMessage} from 'src/script/entity/message/ContentMessage';
 import {LinkPreview} from 'src/script/entity/message/LinkPreview';
 import {Text} from 'src/script/entity/message/Text';
 import {StatusType} from 'src/script/message/StatusType';
+
 import LinkPreviewAssetComponent from './LinkPreviewAssetComponent';
-import {render} from '@testing-library/react';
 
 describe('LinkPreviewAssetComponent', () => {
   function mockLinkPreview(url = 'https://example.com'): ContentMessage {

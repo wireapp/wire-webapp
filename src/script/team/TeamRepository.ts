@@ -17,15 +17,7 @@
  *
  */
 
-import {amplify} from 'amplify';
-import {WebAppEvents} from '@wireapp/webapp-events';
 import type {ConversationRolesList} from '@wireapp/api-client/src/conversation/ConversationRole';
-import type {TeamData} from '@wireapp/api-client/src/team/team/TeamData';
-import {Availability} from '@wireapp/protocol-messaging';
-import {TEAM_EVENT} from '@wireapp/api-client/src/event/TeamEvent';
-import type {FeatureList} from '@wireapp/api-client/src/team/feature/';
-import {FeatureStatus, FEATURE_KEY, SelfDeletingTimeout} from '@wireapp/api-client/src/team/feature/';
-import {formatDuration} from 'Util/TimeUtil';
 import type {
   TeamConversationDeleteEvent,
   TeamDeleteEvent,
@@ -35,34 +27,40 @@ import type {
   TeamMemberUpdateEvent,
   TeamUpdateEvent,
 } from '@wireapp/api-client/src/event';
+import {TEAM_EVENT} from '@wireapp/api-client/src/event/TeamEvent';
+import {FeatureStatus, FEATURE_KEY, SelfDeletingTimeout} from '@wireapp/api-client/src/team/feature/';
+import type {FeatureList} from '@wireapp/api-client/src/team/feature/';
+import type {TeamData} from '@wireapp/api-client/src/team/team/TeamData';
 import {Runtime} from '@wireapp/commons';
+import {Availability} from '@wireapp/protocol-messaging';
+import {WebAppEvents} from '@wireapp/webapp-events';
+import {amplify} from 'amplify';
 import {container} from 'tsyringe';
 
-import {Logger, getLogger} from 'Util/Logger';
-import {replaceLink, t} from 'Util/LocalizerUtil';
-import {loadDataUrl} from 'Util/util';
-import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 import {Environment} from 'Util/Environment';
+import {replaceLink, t} from 'Util/LocalizerUtil';
+import {Logger, getLogger} from 'Util/Logger';
+import {formatDuration, TIME_IN_MILLIS} from 'Util/TimeUtil';
+import {loadDataUrl} from 'Util/util';
 
-import {TeamMapper} from './TeamMapper';
 import {TeamEntity} from './TeamEntity';
-import {roleFromTeamPermissions, ROLE} from '../user/UserPermission';
-
-import {IntegrationMapper} from '../integration/IntegrationMapper';
-import {SIGN_OUT_REASON} from '../auth/SignOutReason';
-import {User} from '../entity/User';
-import {TeamService} from './TeamService';
-import {ROLE as TEAM_ROLE} from '../user/UserPermission';
-import {UserRepository} from '../user/UserRepository';
+import {TeamMapper} from './TeamMapper';
 import {TeamMemberEntity} from './TeamMemberEntity';
-import {ServiceEntity} from '../integration/ServiceEntity';
-import {AssetRepository} from '../assets/AssetRepository';
-import {UserState} from '../user/UserState';
+import {TeamService} from './TeamService';
 import {TeamState} from './TeamState';
-import {NOTIFICATION_HANDLING_STATE} from '../event/NotificationHandlingState';
-import {EventSource} from '../event/EventSource';
-import {Config} from '../Config';
+
+import {AssetRepository} from '../assets/AssetRepository';
+import {SIGN_OUT_REASON} from '../auth/SignOutReason';
 import PrimaryModal from '../components/Modals/PrimaryModal';
+import {Config} from '../Config';
+import {User} from '../entity/User';
+import {EventSource} from '../event/EventSource';
+import {NOTIFICATION_HANDLING_STATE} from '../event/NotificationHandlingState';
+import {IntegrationMapper} from '../integration/IntegrationMapper';
+import {ServiceEntity} from '../integration/ServiceEntity';
+import {roleFromTeamPermissions, ROLE, ROLE as TEAM_ROLE} from '../user/UserPermission';
+import {UserRepository} from '../user/UserRepository';
+import {UserState} from '../user/UserState';
 
 export interface AccountInfo {
   accentID: number;

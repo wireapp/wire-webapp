@@ -17,16 +17,17 @@
  *
  */
 
+import {fireEvent} from '@testing-library/react';
 import ko from 'knockout';
+
+import {ConversationRepository} from 'src/script/conversation/ConversationRepository';
+import {NOTIFICATION_STATE} from 'src/script/conversation/NotificationSetting';
+import {Conversation} from 'src/script/entity/Conversation';
+import TestPage from 'Util/test/TestPage';
 
 import Notifications, {NotificationsProps} from './Notifications';
 
-import TestPage from 'Util/test/TestPage';
 import {ViewModelRepositories} from '../../../view_model/MainViewModel';
-import {Conversation} from 'src/script/entity/Conversation';
-import {NOTIFICATION_STATE} from 'src/script/conversation/NotificationSetting';
-import {ConversationRepository} from 'src/script/conversation/ConversationRepository';
-import {fireEvent} from '@testing-library/react';
 
 class NotificationsPanelPage extends TestPage<NotificationsProps> {
   constructor(props?: NotificationsProps) {

@@ -17,20 +17,11 @@
  *
  */
 
-import TestPage from 'Util/test/TestPage';
+import {render} from '@testing-library/react';
+
+import ServiceDetails from './ServiceDetails';
 
 import {ServiceEntity} from '../../integration/ServiceEntity';
-import ServiceDetails, {ServiceDetailsProps} from './ServiceDetails';
-
-class ServiceDetailsPage extends TestPage<ServiceDetailsProps> {
-  constructor(props: ServiceDetailsProps) {
-    super(ServiceDetails, props);
-  }
-
-  getName = () => this.get('[data-uie-name="status-service-name"]');
-  getProvider = () => this.get('[data-uie-name="status-service-provider"]');
-  getDescription = () => this.get('[data-uie-name="status-service-description"]');
-}
 
 describe('ServiceDetails', () => {
   it('renders the correct infos for the service', () => {
@@ -39,10 +30,11 @@ describe('ServiceDetails', () => {
     const serviceDescription = 'serviceDescription';
     const service = new ServiceEntity({description: serviceDescription, name: serviceName});
     service.providerName(serviceProvider);
-    const serviceDetails = new ServiceDetailsPage({service});
 
-    expect(serviceDetails.getName().textContent).toBe(serviceName);
-    expect(serviceDetails.getProvider().textContent).toBe(serviceProvider);
-    expect(serviceDetails.getDescription().textContent).toBe(serviceDescription);
+    const {getByText} = render(<ServiceDetails service={service} />);
+
+    getByText(serviceName);
+    getByText(serviceProvider);
+    getByText(serviceDescription);
   });
 });

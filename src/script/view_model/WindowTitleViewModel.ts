@@ -17,20 +17,21 @@
  *
  */
 
-import ko from 'knockout';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import {amplify} from 'amplify';
+import ko from 'knockout';
 import {container} from 'tsyringe';
 
-import {getLogger, Logger} from 'Util/Logger';
 import {t} from 'Util/LocalizerUtil';
+import {getLogger, Logger} from 'Util/Logger';
 
-import {Config} from '../Config';
-import {NOTIFICATION_HANDLING_STATE} from '../event/NotificationHandlingState';
 import {ContentState} from './ContentViewModel';
 import type {MainViewModel} from './MainViewModel';
-import {UserState} from '../user/UserState';
+
+import {Config} from '../Config';
 import {ConversationState} from '../conversation/ConversationState';
+import {NOTIFICATION_HANDLING_STATE} from '../event/NotificationHandlingState';
+import {UserState} from '../user/UserState';
 
 export class WindowTitleViewModel {
   contentState: ko.Observable<string>;

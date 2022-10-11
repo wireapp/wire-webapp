@@ -17,25 +17,21 @@
  *
  */
 
-import {WebAppEvents} from '@wireapp/webapp-events';
-import {amplify} from 'amplify';
 import {FC, useEffect, useState} from 'react';
 
 import Icon from 'Components/Icon';
 import LoadingBar from 'Components/LoadingBar';
-
-import {getLogger} from 'Util/Logger';
 import {t} from 'Util/LocalizerUtil';
+import {getLogger} from 'Util/Logger';
 import {formatDuration} from 'Util/TimeUtil';
 import {loadFileBuffer} from 'Util/util';
 import {WebWorker} from 'Util/worker';
 
-import {Config} from '../../Config';
 import {BackupRepository} from '../../backup/BackupRepository';
 import {CancelError, DifferentAccountError, ImportError, IncompatibleBackupError} from '../../backup/Error';
+import {Config} from '../../Config';
 import {MotionDuration} from '../../motion/MotionDuration';
 import {ContentState} from '../../view_model/ContentViewModel';
-import renderElement from 'Util/renderElement';
 
 export enum HistoryImportState {
   DONE = 'HistoryImportState.STATE.DONE',
@@ -46,10 +42,10 @@ export enum HistoryImportState {
 interface HistoryImportProps {
   readonly backupRepository: BackupRepository;
   file: File;
-  onClose?: () => void;
+  switchContent: (contentState: ContentState) => void;
 }
 
-const HistoryImport: FC<HistoryImportProps> = ({backupRepository, file, onClose}) => {
+const HistoryImport: FC<HistoryImportProps> = ({backupRepository, file, switchContent}) => {
   const logger = getLogger('HistoryImportViewModel');
 
   const [historyImportState, setHistoryImportState] = useState(HistoryImportState.PREPARING);
@@ -79,9 +75,9 @@ const HistoryImport: FC<HistoryImportProps> = ({backupRepository, file, onClose}
   const loadingMessage = historyImportMessages?.[historyImportState] || '';
 
   const onCancel = () => backupRepository.cancelAction();
+
   const dismissImport = () => {
-    onClose?.();
-    amplify.publish(WebAppEvents.CONTENT.SWITCH, ContentState.PREFERENCES_ACCOUNT);
+    switchContent(ContentState.PREFERENCES_ACCOUNT);
   };
 
   const onInit = (numberOfRecords: number) => {
@@ -157,7 +153,7 @@ const HistoryImport: FC<HistoryImportProps> = ({backupRepository, file, onClose}
   }, []);
 
   return (
-    <>
+    <div style={{height: '100%'}}>
       <h1 className="visually-hidden">{t('accessibility.headings.historyImport')}</h1>
 
       <div id="history-import">
@@ -205,10 +201,8 @@ const HistoryImport: FC<HistoryImportProps> = ({backupRepository, file, onClose}
           </div>
         )}
       </div>
-    </>
+    </div>
   );
 };
 
 export default HistoryImport;
-
-export const importHistoryFile = renderElement<HistoryImportProps>(HistoryImport, 'center-column', {height: '100%'});

@@ -23,12 +23,11 @@ import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 import {formatDuration} from 'Util/TimeUtil';
 
-import PanelHeader from '../PanelHeader';
-
 import {Conversation} from '../../../entity/Conversation';
 import {EphemeralTimings} from '../../../ephemeral/EphemeralTimings';
 import {initFadingScrollbar} from '../../../ui/fadingScrollbar';
 import {ViewModelRepositories} from '../../../view_model/MainViewModel';
+import PanelHeader from '../PanelHeader';
 
 interface TimedMessagesPanelProps {
   activeConversation: Conversation;

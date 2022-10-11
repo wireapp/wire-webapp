@@ -18,15 +18,17 @@
  */
 
 import React, {Fragment} from 'react';
-import {useKoSubscribableChildren} from 'Util/ComponentUtil';
-import {Conversation} from '../../../../entity/Conversation';
-import {initFadingScrollbar} from '../../../../ui/fadingScrollbar';
 
 import {ContentMessage} from 'src/script/entity/message/ContentMessage';
-import {isToday, isThisYear, formatLocale} from 'Util/TimeUtil';
+import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
-import CollectionItem from './CollectionItem';
+import {formatLocale, isThisYear, isToday} from 'Util/TimeUtil';
 import {noop} from 'Util/util';
+
+import CollectionItem from './CollectionItem';
+
+import {Conversation} from '../../../../entity/Conversation';
+import {initFadingScrollbar} from '../../../../ui/fadingScrollbar';
 
 interface CollectionDetailsProps {
   conversation: Conversation;

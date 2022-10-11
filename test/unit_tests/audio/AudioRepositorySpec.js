@@ -21,9 +21,9 @@ import {AudioPreference} from '@wireapp/api-client/src/user/data/';
 import {difference} from 'underscore';
 
 import {AudioPlayingType} from 'src/script/audio/AudioPlayingType';
+import {AudioRepository} from 'src/script/audio/AudioRepository';
 import {AudioType} from 'src/script/audio/AudioType';
 import {NOTIFICATION_HANDLING_STATE} from 'src/script/event/NotificationHandlingState';
-import {AudioRepository} from 'src/script/audio/AudioRepository';
 
 describe('AudioRepository', () => {
   const audioRepository = new AudioRepository();

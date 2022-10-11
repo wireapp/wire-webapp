@@ -17,7 +17,7 @@
  *
  */
 
-import {render, waitFor, fireEvent} from '@testing-library/react';
+import {fireEvent, render, waitFor} from '@testing-library/react';
 import {QualifiedId} from '@wireapp/api-client/src/user';
 import {Runtime} from '@wireapp/commons';
 import * as uiKit from '@wireapp/react-ui-kit';
@@ -27,20 +27,17 @@ import ko from 'knockout';
 
 import TitleBar from 'Components/TitleBar';
 
-import {createRandomUuid} from 'Util/util';
-
-import {UserState} from '../../user/UserState';
-import {CallState} from '../../calling/CallState';
-import {TeamState} from '../../team/TeamState';
 import {TestFactory} from '../../../../test/helper/TestFactory';
 import {CallingRepository} from '../../calling/CallingRepository';
-import {Conversation} from '../../entity/Conversation';
-import {LegalHoldModalViewModel} from '../../view_model/content/LegalHoldModalViewModel';
+import {CallState} from '../../calling/CallState';
 import {ConversationVerificationState} from '../../conversation/ConversationVerificationState';
+import {Conversation} from '../../entity/Conversation';
 import {User} from '../../entity/User';
+import {PanelState} from '../../page/RightSidebar/RightSidebar';
+import {TeamState} from '../../team/TeamState';
+import {UserState} from '../../user/UserState';
 import {ContentState} from '../../view_model/ContentViewModel';
 import {MainViewModel, ViewModelRepositories} from '../../view_model/MainViewModel';
-import {PanelState} from '../../page/RightSidebar/RightSidebar';
 
 jest.mock('@wireapp/react-ui-kit', () => ({
   ...(jest.requireActual('@wireapp/react-ui-kit') as any),
@@ -79,11 +76,6 @@ const getDefaultProps = (callingRepository: CallingRepository) => ({
   callActions,
   callState: new CallState(),
   callingRepository,
-  conversation: new Conversation(createRandomUuid()),
-  legalHoldModal: {
-    showRequestModal: () => Promise.resolve(),
-    showUsers: () => Promise.resolve(),
-  } as LegalHoldModalViewModel,
   mainViewModel: {} as MainViewModel,
   repositories: {
     calling: {
@@ -97,7 +89,9 @@ const getDefaultProps = (callingRepository: CallingRepository) => ({
 describe('TitleBar', () => {
   it('subscribes to shortcut PEOPLE and add ADD_PEOPLE events on mount', async () => {
     spyOn(amplify, 'subscribe').and.returnValue(undefined);
-    await render(<TitleBar {...getDefaultProps(callingRepository)} />);
+    const conversation = new Conversation();
+
+    await render(<TitleBar {...getDefaultProps(callingRepository)} conversation={conversation} />);
     await waitFor(() => {
       expect(amplify.subscribe).toHaveBeenCalledWith(WebAppEvents.SHORTCUT.PEOPLE, expect.anything());
       expect(amplify.subscribe).toHaveBeenCalledWith(WebAppEvents.SHORTCUT.ADD_PEOPLE, expect.anything());
@@ -106,14 +100,22 @@ describe('TitleBar', () => {
 
   it("doesn't show conversation search button for user with activated account", async () => {
     const userState = createUserState({isActivatedAccount: ko.pureComputed(() => false)});
-    const {queryByText} = render(<TitleBar {...getDefaultProps(callingRepository)} userState={userState} />);
+    const conversation = new Conversation();
+
+    const {queryByText} = render(
+      <TitleBar {...getDefaultProps(callingRepository)} userState={userState} conversation={conversation} />,
+    );
 
     expect(queryByText('tooltipConversationSearch')).toBeNull();
   });
 
   it('opens search area after search button click', async () => {
     const userState = createUserState({isActivatedAccount: ko.pureComputed(() => true)});
-    const {getByText} = render(<TitleBar {...getDefaultProps(callingRepository)} userState={userState} />);
+    const conversation = new Conversation();
+
+    const {getByText} = render(
+      <TitleBar {...getDefaultProps(callingRepository)} userState={userState} conversation={conversation} />,
+    );
 
     const searchButton = getByText('tooltipConversationSearch');
     expect(searchButton).toBeDefined();
@@ -172,8 +174,9 @@ describe('TitleBar', () => {
 
   it('hide info button and search button on scaled down view', async () => {
     mockedUiKit.useMatchMedia.mockReturnValue(true);
+    const conversation = new Conversation();
 
-    const {queryByLabelText} = render(<TitleBar {...getDefaultProps(callingRepository)} />);
+    const {queryByLabelText} = render(<TitleBar {...getDefaultProps(callingRepository)} conversation={conversation} />);
 
     const infoButton = queryByLabelText('tooltipConversationInfo');
     const videoCallButton = queryByLabelText('tooltipConversationVideoCall');

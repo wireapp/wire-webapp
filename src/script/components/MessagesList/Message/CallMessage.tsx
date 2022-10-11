@@ -18,11 +18,13 @@
  */
 
 import React from 'react';
-import Icon from 'Components/Icon';
-import {CallMessage as CallMessageEntity} from '../../../entity/message/CallMessage';
 
+import Icon from 'Components/Icon';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
+
 import MessageTime from './MessageTime';
+
+import {CallMessage as CallMessageEntity} from '../../../entity/message/CallMessage';
 
 export interface CallMessageProps {
   message: CallMessageEntity;

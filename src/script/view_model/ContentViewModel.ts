@@ -17,40 +17,41 @@
  *
  */
 
-import {WebAppEvents} from '@wireapp/webapp-events';
 import {ConnectionStatus} from '@wireapp/api-client/src/connection/';
-
-import {getLogger, Logger} from 'Util/Logger';
-import {t} from 'Util/LocalizerUtil';
-import {alias} from 'Util/util';
-import ko from 'knockout';
+import {WebAppEvents} from '@wireapp/webapp-events';
 import {amplify} from 'amplify';
+import ko from 'knockout';
 import {container} from 'tsyringe';
 
-import {Config} from '../Config';
-import {LegalHoldModalViewModel} from './content/LegalHoldModalViewModel';
-import {ConversationError} from '../error/ConversationError';
+import {t} from 'Util/LocalizerUtil';
+import {getLogger, Logger} from 'Util/Logger';
+import {matchQualifiedIds} from 'Util/QualifiedId';
+import {isConversationEntity} from 'Util/TypePredicateUtil';
+import {alias} from 'Util/util';
+
 import type {MainViewModel, ViewModelRepositories} from './MainViewModel';
+
+import PrimaryModal from '../components/Modals/PrimaryModal';
+import {Config} from '../Config';
 import type {ConversationRepository} from '../conversation/ConversationRepository';
-import type {UserRepository} from '../user/UserRepository';
+import {ConversationState} from '../conversation/ConversationState';
+import {MessageRepository} from '../conversation/MessageRepository';
 import {Conversation} from '../entity/Conversation';
 import type {Message} from '../entity/message/Message';
-import {UserState} from '../user/UserState';
-import {TeamState} from '../team/TeamState';
-import {ConversationState} from '../conversation/ConversationState';
-import {isConversationEntity} from 'Util/TypePredicateUtil';
-import {matchQualifiedIds} from 'Util/QualifiedId';
-import '../page/LeftSidebar';
-import '../page/MainContent';
+import {ConversationError} from '../error/ConversationError';
+import {LegalHoldModalState} from '../legal-hold/LegalHoldModalState';
 import {
   ClientNotificationData,
   Notification,
   PreferenceNotificationRepository,
 } from '../notification/PreferenceNotificationRepository';
-import {MessageRepository} from '../conversation/MessageRepository';
 import {useResponsiveViewState} from '../page/ResponsiveViewState';
-import PrimaryModal from '../components/Modals/PrimaryModal';
+import '../page/LeftSidebar';
+import '../page/MainContent';
 import {openRightSidebar, PanelState} from '../page/RightSidebar/RightSidebar';
+import {TeamState} from '../team/TeamState';
+import type {UserRepository} from '../user/UserRepository';
+import {UserState} from '../user/UserState';
 
 interface ShowConversationOptions {
   exposeMessage?: Message;
@@ -88,7 +89,6 @@ export class ContentViewModel {
   messageRepository: MessageRepository;
   elementId: string;
   sidebarId: string;
-  legalHoldModal: LegalHoldModalViewModel;
   logger: Logger;
   readonly isFederated?: boolean;
   mainViewModel: MainViewModel;
@@ -117,15 +117,6 @@ export class ContentViewModel {
     // State
     this.state = ko.observable(ContentState.WATERMARK);
 
-    // Nested view models
-    this.legalHoldModal = new LegalHoldModalViewModel(
-      repositories.conversation,
-      repositories.team,
-      repositories.client,
-      repositories.cryptography,
-      repositories.message,
-    );
-
     this.state.subscribe(state => {
       switch (state) {
         case ContentState.PREFERENCES_ACCOUNT:
@@ -153,7 +144,8 @@ export class ContentViewModel {
 
     this._initSubscriptions();
     if (this.teamState.supportsLegalHold()) {
-      this.legalHoldModal.showRequestModal();
+      // this.legalHoldModal.showRequestModal();
+      amplify.publish(LegalHoldModalState.SHOW_REQUEST);
     }
     ko.applyBindings(this, document.getElementById(this.elementId));
   }

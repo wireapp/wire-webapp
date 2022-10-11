@@ -19,24 +19,24 @@
 
 import {act, fireEvent, render, waitFor} from '@testing-library/react';
 
+import InputBar from 'Components/InputBar/index';
+import {Config} from 'src/script/Config';
+import {createMentionEntity, getMentionCandidate} from 'Util/MentionUtil';
 import {createRandomUuid} from 'Util/util';
 
-import {Config} from 'src/script/Config';
 import {TestFactory} from '../../../../test/helper/TestFactory';
-import {UserState} from '../../user/UserState';
-import {TeamState} from '../../team/TeamState';
 import {AssetRepository} from '../../assets/AssetRepository';
 import {AssetService} from '../../assets/AssetService';
-import {Conversation} from '../../entity/Conversation';
 import {ConversationRepository} from '../../conversation/ConversationRepository';
+import {MessageRepository} from '../../conversation/MessageRepository';
+import {Conversation} from '../../entity/Conversation';
+import {User} from '../../entity/User';
 import {EventRepository} from '../../event/EventRepository';
+import {PropertiesRepository} from '../../properties/PropertiesRepository';
 import {SearchRepository} from '../../search/SearchRepository';
 import {StorageRepository} from '../../storage';
-import InputBar from 'Components/InputBar/index';
-import {MessageRepository} from '../../conversation/MessageRepository';
-import {User} from '../../entity/User';
-import {createMentionEntity, getMentionCandidate} from 'Util/MentionUtil';
-import {PropertiesRepository} from '../../properties/PropertiesRepository';
+import {TeamState} from '../../team/TeamState';
+import {UserState} from '../../user/UserState';
 
 const testFactory = new TestFactory();
 let conversationRepository: ConversationRepository;
@@ -77,6 +77,7 @@ const getDefaultProps = () => ({
   conversationRepository,
   eventRepository,
   messageRepository: {} as MessageRepository,
+  openGiphy: jest.fn(),
   propertiesRepository: new PropertiesRepository({} as any, {} as any),
   searchRepository,
   storageRepository,

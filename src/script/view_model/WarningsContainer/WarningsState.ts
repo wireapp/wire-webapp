@@ -17,17 +17,19 @@
  *
  */
 
+import {WebAppEvents} from '@wireapp/webapp-events';
 import {amplify} from 'amplify';
 import create from 'zustand';
-import {WebAppEvents} from '@wireapp/webapp-events';
 
-import {TYPE} from './WarningsTypes';
-import {getLogger} from 'Util/Logger';
-import {safeWindowOpen} from 'Util/SanitizationUtil';
-import {PermissionState} from '../../notification/PermissionState';
 import PrimaryModal from 'Components/Modals/PrimaryModal';
 import {t} from 'Util/LocalizerUtil';
+import {getLogger} from 'Util/Logger';
+import {safeWindowOpen} from 'Util/SanitizationUtil';
+
+import {TYPE} from './WarningsTypes';
+
 import {Config} from '../../Config';
+import {PermissionState} from '../../notification/PermissionState';
 
 const logger = getLogger('WarningsViewModel');
 

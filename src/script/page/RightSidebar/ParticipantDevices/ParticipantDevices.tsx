@@ -20,14 +20,12 @@
 import {FC} from 'react';
 
 import UserDevices, {UserDevicesState, useUserDevicesHistory} from 'Components/UserDevices';
-
 import {t} from 'Util/LocalizerUtil';
-
-import PanelHeader from '../PanelHeader';
 
 import type {User} from '../../../entity/User';
 import {initFadingScrollbar} from '../../../ui/fadingScrollbar';
 import {ViewModelRepositories} from '../../../view_model/MainViewModel';
+import PanelHeader from '../PanelHeader';
 
 interface ParticipantDevicesProps {
   onClose: () => void;

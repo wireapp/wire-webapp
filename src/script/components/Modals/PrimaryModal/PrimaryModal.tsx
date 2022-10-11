@@ -18,13 +18,16 @@
  */
 
 import React, {useState} from 'react';
+
 import cx from 'classnames';
 
 import Icon from 'Components/Icon';
 import ModalComponent from 'Components/ModalComponent';
-import {initFadingScrollbar} from '../../../ui/fadingScrollbar';
-import {Action, PrimaryModalType} from './PrimaryModalTypes';
+
 import {usePrimaryModalState, showNextModalInQueue, defaultContent, removeCurrentModal} from './PrimaryModalState';
+import {Action, PrimaryModalType} from './PrimaryModalTypes';
+
+import {initFadingScrollbar} from '../../../ui/fadingScrollbar';
 
 export const PrimaryModalComponent: React.FC = () => {
   const [inputValue, updateInputValue] = useState<string>('');
@@ -64,7 +67,7 @@ export const PrimaryModalComponent: React.FC = () => {
   };
 
   const actionEnabled = !hasInput || !!inputValue.trim().length;
-  const doAction = (action: Function, closeAfter: boolean, skipValidation = false) => {
+  const doAction = (action?: Function, closeAfter = true, skipValidation = false) => {
     if (!skipValidation && !actionEnabled) {
       return;
     }
@@ -165,7 +168,7 @@ export const PrimaryModalComponent: React.FC = () => {
                     <button
                       key={`${action.text}-${action.uieName}`}
                       type="button"
-                      onClick={() => action?.action && doAction(action.action, true, true)}
+                      onClick={() => doAction(action.action, true, true)}
                       data-uie-name={action?.uieName}
                       className={cx('modal__button modal__button--secondary', {
                         'modal__button--full': hasMultipleSecondary,

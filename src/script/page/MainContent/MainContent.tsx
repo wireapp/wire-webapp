@@ -17,34 +17,35 @@
  *
  */
 
+import {FC, ReactNode, useState} from 'react';
+
 import {StyledApp, THEME_ID} from '@wireapp/react-ui-kit';
-import {FC, ReactNode} from 'react';
 import {CSSTransition, SwitchTransition} from 'react-transition-group';
 import {container} from 'tsyringe';
 
-import HistoryExport from 'Components/HistoryExport';
 import ConnectRequests from 'Components/ConnectRequests';
 import ConversationList from 'Components/Conversation';
-import GroupCreationModal from 'Components/Modals/GroupCreation/GroupCreationModal';
-
-import {registerReactComponent, useKoSubscribableChildren} from 'Util/ComponentUtil';
+import HistoryExport from 'Components/HistoryExport';
+import HistoryImport from 'Components/HistoryImport';
 import Icon from 'Components/Icon';
+import GroupCreationModal from 'Components/Modals/GroupCreation/GroupCreationModal';
+import LegalHoldModal from 'Components/Modals/LegalHoldModal/LegalHoldModal';
+import {registerReactComponent, useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 
-import RootProvider from '../RootProvider';
-
 import Collection from './panels/Collection';
-import AccountPreferences from './panels/preferences/AccountPreferences';
 import AboutPreferences from './panels/preferences/AboutPreferences';
+import AccountPreferences from './panels/preferences/AccountPreferences';
 import AVPreferences from './panels/preferences/AVPreferences';
 import DevicesPreferences from './panels/preferences/devices/DevicesPreferences';
 import OptionPreferences from './panels/preferences/OptionPreferences';
 
 import {ClientState} from '../../client/ClientState';
 import {ConversationState} from '../../conversation/ConversationState';
-import {UserState} from '../../user/UserState';
 import {TeamState} from '../../team/TeamState';
+import {UserState} from '../../user/UserState';
 import {ContentState, ContentViewModel} from '../../view_model/ContentViewModel';
+import RootProvider from '../RootProvider';
 
 const Animated: FC<{children: ReactNode}> = ({children, ...rest}) => {
   return (
@@ -63,10 +64,12 @@ const MainContent: FC<MainContentProps> = ({
   contentViewModel,
   conversationState = container.resolve(ConversationState),
 }) => {
+  const [uploadedFile, setUploadedFile] = useState<File | null>(null);
+
   const {state} = useKoSubscribableChildren(contentViewModel, ['state']);
   const {activeConversation} = useKoSubscribableChildren(conversationState, ['activeConversation']);
 
-  const {initialMessage, isFederated, repositories} = contentViewModel;
+  const {initialMessage, isFederated, repositories, switchContent} = contentViewModel;
 
   const teamState = container.resolve(TeamState);
   const userState = container.resolve(UserState);
@@ -86,6 +89,11 @@ const MainContent: FC<MainContentProps> = ({
   };
 
   const title = statesTitle[state];
+
+  const onFileUpload = (file: File) => {
+    switchContent(ContentState.HISTORY_IMPORT);
+    setUploadedFile(file);
+  };
 
   return (
     <RootProvider value={contentViewModel}>
@@ -113,8 +121,9 @@ const MainContent: FC<MainContentProps> = ({
               {state === ContentState.PREFERENCES_ACCOUNT && (
                 <div id="preferences-account" className="preferences-page preferences-account">
                   <AccountPreferences
+                    importFile={onFileUpload}
                     showDomain={isFederated}
-                    backupRepository={repositories.backup}
+                    switchContent={switchContent}
                     clientRepository={repositories.client}
                     conversationRepository={repositories.conversation}
                     propertiesRepository={repositories.properties}
@@ -171,7 +180,17 @@ const MainContent: FC<MainContentProps> = ({
                 <ConversationList initialMessage={initialMessage} teamState={teamState} userState={userState} />
               )}
 
-              {state === ContentState.HISTORY_EXPORT && <HistoryExport userState={userState} />}
+              {state === ContentState.HISTORY_EXPORT && (
+                <HistoryExport userState={userState} switchContent={switchContent} />
+              )}
+
+              {state === ContentState.HISTORY_IMPORT && uploadedFile && (
+                <HistoryImport
+                  file={uploadedFile}
+                  backupRepository={repositories.backup}
+                  switchContent={switchContent}
+                />
+              )}
             </>
           </Animated>
         </SwitchTransition>
@@ -179,6 +198,16 @@ const MainContent: FC<MainContentProps> = ({
         <GroupCreationModal userState={userState} teamState={teamState} />
 
         <div className="center-column__overlay" />
+
+        <LegalHoldModal
+          userState={userState}
+          conversationRepository={repositories.conversation}
+          searchRepository={repositories.search}
+          teamRepository={repositories.team}
+          clientRepository={repositories.client}
+          messageRepository={repositories.message}
+          cryptographyRepository={repositories.cryptography}
+        />
       </StyledApp>
     </RootProvider>
   );

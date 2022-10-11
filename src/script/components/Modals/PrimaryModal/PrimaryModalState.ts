@@ -18,14 +18,16 @@
  */
 
 import create from 'zustand';
-import {Action, ModalContent, ModalItem, ModalOptions, ModalQueue, PrimaryModalType, Text} from './PrimaryModalTypes';
-import {getLogger} from 'Util/Logger';
+
 import {replaceLink, t} from 'Util/LocalizerUtil';
-import {noop} from 'Util/util';
+import {getLogger} from 'Util/Logger';
 import {formatLocale} from 'Util/TimeUtil';
-import {ClientNotificationData} from '../../../notification/PreferenceNotificationRepository';
+import {noop, createRandomUuid} from 'Util/util';
+
+import {Action, ModalContent, ModalItem, ModalOptions, ModalQueue, PrimaryModalType, Text} from './PrimaryModalTypes';
+
 import {Config} from '../../../Config';
-import {createRandomUuid} from 'Util/util';
+import {ClientNotificationData} from '../../../notification/PreferenceNotificationRepository';
 
 type PrimaryModalState = {
   errorMessage: string | null;
@@ -191,7 +193,9 @@ const updateCurrentModalContent = (type: PrimaryModalType, options: ModalOptions
     }
   }
   if (content.secondaryAction) {
-    const updatedSecondaryAction = Array.isArray(secondaryAction) ? secondaryAction : [secondaryAction];
+    const updatedSecondaryAction = Array.isArray(content.secondaryAction)
+      ? content.secondaryAction
+      : [content.secondaryAction];
     // force it into array format
     const uieNames = ['do-secondary', 'do-tertiary', 'do-quaternary'];
     content.secondaryAction = updatedSecondaryAction.map((action, index) => {

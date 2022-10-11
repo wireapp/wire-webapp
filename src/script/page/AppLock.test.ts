@@ -17,20 +17,22 @@
  *
  */
 
-import ko from 'knockout';
 import {act} from '@testing-library/react';
+import {FeatureStatus} from '@wireapp/api-client/src/team/feature/';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import {amplify} from 'amplify';
-import {FeatureStatus} from '@wireapp/api-client/src/team/feature/';
+import ko from 'knockout';
 
 import TestPage from 'Util/test/TestPage';
-import type {ClientRepository} from '../client/ClientRepository';
-import AppLock, {AppLockProps, APPLOCK_STATE} from './AppLock';
-import {AppLockState} from '../user/AppLockState';
-import {AppLockRepository} from '../user/AppLockRepository';
-import {UserState} from '../user/UserState';
 import {createRandomUuid} from 'Util/util';
+
+import AppLock, {AppLockProps, APPLOCK_STATE} from './AppLock';
+
+import type {ClientRepository} from '../client/ClientRepository';
 import {TeamState} from '../team/TeamState';
+import {AppLockRepository} from '../user/AppLockRepository';
+import {AppLockState} from '../user/AppLockState';
+import {UserState} from '../user/UserState';
 
 // https://github.com/jedisct1/libsodium.js/issues/235
 jest.mock('libsodium-wrappers-sumo', () => ({

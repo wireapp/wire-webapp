@@ -28,7 +28,7 @@ jobs:
         run: echo -e "machine github.com\n  login ${GH_TOKEN}" > ~/.netrc
 
       - name: Install JS dependencies
-        run: yarn --frozen-lockfile
+        run: yarn --immutable
 
       - name: Merge translations
         run: yarn translate:merge

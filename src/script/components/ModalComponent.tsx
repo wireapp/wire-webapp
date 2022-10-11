@@ -17,14 +17,19 @@
  *
  */
 
-import {CSSObject} from '@emotion/react';
 import React, {useEffect, useId, useRef, useState, useCallback} from 'react';
+
+import {CSSObject} from '@emotion/react';
+
 import {noop, preventFocusOutside} from 'Util/util';
+
 import Icon from './Icon';
 
 interface ModalComponentProps {
   children: React.ReactNode;
   isShown: boolean;
+  id?: string;
+  className?: string;
   onBgClick?: () => void;
   onClosed?: () => void;
   showLoading?: boolean;
@@ -79,6 +84,8 @@ const ModalContentVisibleStyles: CSSObject = {
 };
 
 const ModalComponent: React.FC<ModalComponentProps> = ({
+  id,
+  className = '',
   isShown,
   onBgClick = noop,
   onClosed = noop,
@@ -141,6 +148,8 @@ const ModalComponent: React.FC<ModalComponentProps> = ({
       tabIndex={0}
       role="button"
       onKeyDown={noop}
+      id={id}
+      className={className}
       {...rest}
     >
       {showLoading ? (

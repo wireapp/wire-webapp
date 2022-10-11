@@ -17,10 +17,10 @@
  *
  */
 
-import cx from 'classnames';
 import React from 'react';
 
-import {registerReactComponent} from 'Util/ComponentUtil';
+import cx from 'classnames';
+
 import {handleKeyDown} from 'Util/KeyboardUtil';
 
 export interface CopyToClipboardProps {
@@ -58,4 +58,3 @@ const CopyToClipboard: React.FC<CopyToClipboardProps> = ({text, className = '', 
 };
 
 export default CopyToClipboard;
-registerReactComponent('copy-to-clipboard', CopyToClipboard);

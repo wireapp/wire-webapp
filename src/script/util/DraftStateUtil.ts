@@ -19,11 +19,11 @@
 
 import {generateConversationInputStorageKey} from 'Util/util';
 
-import {StorageRepository} from '../storage';
 import {MessageRepository} from '../conversation/MessageRepository';
 import {Conversation} from '../entity/Conversation';
 import {ContentMessage} from '../entity/message/ContentMessage';
 import {MentionEntity} from '../message/MentionEntity';
+import {StorageRepository} from '../storage';
 
 interface DraftMessage {
   mentions: MentionEntity[];

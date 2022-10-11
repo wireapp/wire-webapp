@@ -19,10 +19,19 @@
 
 .legal-hold-dot-button {
   .button-reset-default;
-
   display: flex;
   align-items: center;
   padding: 8px;
+
+  cursor: default;
+
+  &--interactive {
+    cursor: pointer;
+  }
+
+  &.legal-hold-dot-element {
+    display: block;
+  }
 }
 
 .legal-hold-dot {
@@ -64,7 +73,6 @@
     line-height: 13px;
   }
 
-  pending-icon,
   .pending-icon {
     position: relative;
 

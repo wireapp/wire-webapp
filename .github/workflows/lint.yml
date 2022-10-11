@@ -22,7 +22,7 @@ jobs:
         uses: c-hive/gha-yarn-cache@v2.1.0
 
       - name: Install JS dependencies
-        run: yarn --frozen-lockfile
+        run: yarn --immutable
 
       - name: Lint
         run: yarn lint

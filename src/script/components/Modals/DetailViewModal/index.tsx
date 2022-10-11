@@ -17,10 +17,11 @@
  *
  */
 
+import {FC, KeyboardEvent as ReactKeyboardEvent, useEffect, useRef, useState} from 'react';
+
 import {WebAppEvents} from '@wireapp/webapp-events';
 import {amplify} from 'amplify';
 import cx from 'classnames';
-import {FC, KeyboardEvent as ReactKeyboardEvent, useEffect, useRef, useState} from 'react';
 
 import {handleKeyDown, KEY} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
@@ -35,9 +36,9 @@ import {MessageRepository} from '../../../conversation/MessageRepository';
 import {Conversation} from '../../../entity/Conversation';
 import {ContentMessage} from '../../../entity/message/ContentMessage';
 import {MediumImage} from '../../../entity/message/MediumImage';
+import {isContentMessage} from '../../../guards/Message';
 import {MessageCategory} from '../../../message/MessageCategory';
 import {isOfCategory} from '../../../page/MainContent/panels/Collection/utils';
-import {isContentMessage} from '../../../guards/Message';
 
 interface DetailViewModalProps {
   readonly assetRepository: AssetRepository;

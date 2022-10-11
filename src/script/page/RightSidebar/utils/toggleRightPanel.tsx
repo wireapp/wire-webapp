@@ -18,11 +18,11 @@
  */
 
 import React from 'react';
+
 import {createRoot, Root} from 'react-dom/client';
 
-import {rightPanelAnimationTimeout} from '../RightSidebar';
-
 import {MainViewModel} from '../../../view_model/MainViewModel';
+import {rightPanelAnimationTimeout} from '../RightSidebar';
 
 let elementContainer: HTMLDivElement | undefined;
 let reactRoot: Root;

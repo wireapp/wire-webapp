@@ -17,7 +17,6 @@
  *
  */
 
-import cx from 'classnames';
 import {
   FC,
   MouseEvent as ReactMouseEvent,
@@ -27,24 +26,24 @@ import {
   useEffect,
   useState,
 } from 'react';
+
+import cx from 'classnames';
 import {container} from 'tsyringe';
 import {groupBy} from 'underscore';
 
-import TitleBar from 'Components/TitleBar';
+import Giphy from 'Components/Giphy';
+import InputBar from 'Components/InputBar';
 import MessagesList from 'Components/MessagesList';
 import {showDetailViewModal} from 'Components/Modals/DetailViewModal';
-import InputBar from 'Components/InputBar';
-import Giphy from 'Components/Giphy';
-
+import TitleBar from 'Components/TitleBar';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 import {getLogger} from 'Util/Logger';
 import {safeMailOpen, safeWindowOpen} from 'Util/SanitizationUtil';
 
-import {Conversation as ConversationEntity} from '../../entity/Conversation';
 import PrimaryModal from '../../components/Modals/PrimaryModal';
-
 import {ConversationState} from '../../conversation/ConversationState';
+import {Conversation as ConversationEntity} from '../../entity/Conversation';
 import {ContentMessage} from '../../entity/message/ContentMessage';
 import {DecryptErrorMessage} from '../../entity/message/DecryptErrorMessage';
 import {MemberMessage} from '../../entity/message/MemberMessage';
@@ -56,10 +55,10 @@ import {isMouseEvent} from '../../guards/Mouse';
 import {isServiceEntity} from '../../guards/Service';
 import {ServiceEntity} from '../../integration/ServiceEntity';
 import {MotionDuration} from '../../motion/MotionDuration';
-import {RootContext} from '../../page/RootProvider';
-import {UserState} from '../../user/UserState';
-import {TeamState} from '../../team/TeamState';
 import {openRightSidebar, PanelState} from '../../page/RightSidebar/RightSidebar';
+import {RootContext} from '../../page/RootProvider';
+import {TeamState} from '../../team/TeamState';
+import {UserState} from '../../user/UserState';
 
 type ReadMessageBuffer = {conversation: ConversationEntity; message: Message};
 
@@ -73,7 +72,11 @@ const ConversationList: FC<ConversationListProps> = ({initialMessage, teamState,
   const messageListLogger = getLogger('ConversationList');
 
   const contentViewModel = useContext(RootContext);
+
   const [isConversationLoaded, setIsConversationLoaded] = useState<boolean>(false);
+  const [inputValue, setInputValue] = useState<string>('');
+  const [isGiphyModalOpen, setIsGiphyModalOpen] = useState<boolean>(false);
+
   const [readMessagesBuffer, setReadMessagesBuffer] = useState<ReadMessageBuffer[]>([]);
 
   const conversationState = container.resolve(ConversationState);
@@ -106,7 +109,14 @@ const ConversationList: FC<ConversationListProps> = ({initialMessage, teamState,
     return null;
   }
 
-  const {conversationRepository, repositories, mainViewModel, legalHoldModal, isFederated} = contentViewModel;
+  const {conversationRepository, repositories, mainViewModel, isFederated} = contentViewModel;
+
+  const openGiphy = (text: string) => {
+    setInputValue(text);
+    setIsGiphyModalOpen(true);
+  };
+
+  const closeGiphy = () => setIsGiphyModalOpen(false);
 
   const clickOnInvitePeople = (conversation: ConversationEntity): void => {
     openRightSidebar({
@@ -383,7 +393,6 @@ const ConversationList: FC<ConversationListProps> = ({initialMessage, teamState,
             mainViewModel={mainViewModel}
             repositories={repositories}
             conversation={activeConversation}
-            legalHoldModal={legalHoldModal}
             userState={userState}
             teamState={teamState}
             callActions={mainViewModel.calling.callActions}
@@ -415,6 +424,7 @@ const ConversationList: FC<ConversationListProps> = ({initialMessage, teamState,
             conversationRepository={repositories.conversation}
             eventRepository={repositories.event}
             messageRepository={repositories.message}
+            openGiphy={openGiphy}
             propertiesRepository={repositories.properties}
             searchRepository={repositories.search}
             storageRepository={repositories.storage}
@@ -428,7 +438,9 @@ const ConversationList: FC<ConversationListProps> = ({initialMessage, teamState,
         </>
       )}
 
-      <Giphy giphyRepository={repositories.giphy} />
+      {isGiphyModalOpen && inputValue && (
+        <Giphy giphyRepository={repositories.giphy} inputValue={inputValue} onClose={closeGiphy} />
+      )}
     </div>
   );
 };

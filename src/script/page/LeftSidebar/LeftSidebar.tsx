@@ -18,21 +18,23 @@
  */
 
 import React, {useEffect} from 'react';
+
+import {WebAppEvents} from '@wireapp/webapp-events';
+import {amplify} from 'amplify';
 import {CSSTransition, SwitchTransition} from 'react-transition-group';
-import {registerReactComponent, useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {container} from 'tsyringe';
 
-import {ListViewModel, ListState} from '../../view_model/ListViewModel';
-import {User} from '../../entity/User';
-import {AssetRepository} from '../../assets/AssetRepository';
+import {registerReactComponent, useKoSubscribableChildren} from 'Util/ComponentUtil';
 
-import Preferences from './panels/Preferences';
 import Archive from './panels/Archive';
 import Conversations from './panels/Conversations';
-import TemporaryGuestConversations from './panels/TemporatyGuestConversations';
-import {amplify} from 'amplify';
-import {WebAppEvents} from '@wireapp/webapp-events';
+import Preferences from './panels/Preferences';
 import StartUI from './panels/StartUI';
+import TemporaryGuestConversations from './panels/TemporatyGuestConversations';
+
+import {AssetRepository} from '../../assets/AssetRepository';
+import {User} from '../../entity/User';
+import {ListViewModel, ListState} from '../../view_model/ListViewModel';
 import {forceCloseRightPanel} from '../RightSidebar/utils/toggleRightPanel';
 
 type LeftSidebarProps = {

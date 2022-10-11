@@ -18,6 +18,7 @@
  */
 
 import React from 'react';
+
 import {act, fireEvent, render, RenderResult} from '@testing-library/react';
 
 type ComponentTypes<T> = React.FC<T> | React.ComponentClass<T>;

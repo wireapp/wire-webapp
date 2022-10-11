@@ -17,33 +17,32 @@
  *
  */
 
+import {FC, useCallback, useEffect, useMemo, useState} from 'react';
+
 import type {QualifiedId} from '@wireapp/api-client/src/user/';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import {amplify} from 'amplify';
 import cx from 'classnames';
-import {FC, useCallback, useEffect, useMemo, useState} from 'react';
 
 import Icon from 'Components/Icon';
 import UserSearchableList from 'Components/UserSearchableList';
-
+import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 import {formatLocale} from 'Util/TimeUtil';
-import {useKoSubscribableChildren} from 'Util/ComponentUtil';
-
-import PanelHeader from '../PanelHeader';
 
 import {ConversationRepository} from '../../../conversation/ConversationRepository';
+import {Conversation} from '../../../entity/Conversation';
 import {ContentMessage} from '../../../entity/message/ContentMessage';
 import {Message} from '../../../entity/message/Message';
-import {Conversation} from '../../../entity/Conversation';
 import {User} from '../../../entity/User';
 import {isContentMessage} from '../../../guards/Message';
 import {SuperType} from '../../../message/SuperType';
 import {SearchRepository} from '../../../search/SearchRepository';
 import {UserReactionMap} from '../../../storage';
 import {TeamRepository} from '../../../team/TeamRepository';
-import {UserRepository} from '../../../user/UserRepository';
 import {initFadingScrollbar} from '../../../ui/fadingScrollbar';
+import {UserRepository} from '../../../user/UserRepository';
+import PanelHeader from '../PanelHeader';
 
 const MESSAGE_STATES = {
   LIKES: 'likes',
