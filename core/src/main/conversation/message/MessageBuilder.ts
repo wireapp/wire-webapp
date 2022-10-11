@@ -17,30 +17,15 @@
  *
  */
 
-import {ClientAction, Confirmation} from '@wireapp/protocol-messaging';
 import UUID from 'uuidjs';
 
-import {AbortReason, PayloadBundleSource, PayloadBundleState, PayloadBundleType} from '..';
-import {EncryptedAssetUploaded} from '../../cryptography';
-import {
-  ButtonActionConfirmationContent,
-  ButtonActionContent,
-  CallingContent,
-  FileContent,
-  FileMetaDataContent,
-  ImageContent,
-  KnockContent,
-  LegalHoldStatus,
-  LocationContent,
-  ReactionContent,
-} from '../content';
-import {CompositeContentBuilder} from './CompositeContentBuilder';
 import {
   ButtonActionConfirmationMessage,
   ButtonActionMessage,
   CallMessage,
   ConfirmationMessage,
   DeleteMessage,
+  EditedTextMessage,
   FileAssetAbortMessage,
   FileAssetMessage,
   FileAssetMetaDataMessage,
@@ -49,287 +34,312 @@ import {
   LocationMessage,
   PingMessage,
   ReactionMessage,
-  ResetSessionMessage,
+  TextMessage,
 } from './OtrMessage';
-import {TextContentBuilder} from './TextContentBuilder';
 
-interface BaseOptions {
-  conversationId: string;
-  from: string;
-  messageId?: string;
+import {
+  IComposite,
+  Asset,
+  ButtonAction,
+  ButtonActionConfirmation,
+  Calling,
+  ClientAction,
+  Composite,
+  Confirmation,
+  Ephemeral,
+  GenericMessage,
+  Knock,
+  Location,
+  MessageDelete,
+  MessageEdit,
+  MessageHide,
+  Reaction,
+} from '@wireapp/protocol-messaging';
+import {MessageToProtoMapper} from '../message/MessageToProtoMapper';
+import {GenericMessageType} from '../GenericMessageType';
+import {AssetTransferState} from '../AssetTransferState';
+
+export function createId() {
+  return UUID.genV4().toString();
 }
 
-interface CreateMessageDeleteOption extends BaseOptions {
-  messageIdToDelete: string;
+export function buildButtonActionMessage(payloadBundle: ButtonActionMessage['content']): GenericMessage {
+  return GenericMessage.create({
+    [GenericMessageType.BUTTON_ACTION]: ButtonAction.create(payloadBundle),
+    messageId: createId(),
+  });
 }
 
-interface CreateMessageHideOption extends BaseOptions {
-  messageIdToDelete: string;
-  targetConversation: string;
+export function buildButtonActionConfirmationMessage(
+  payloadBundle: ButtonActionConfirmationMessage['content'],
+): GenericMessage {
+  return GenericMessage.create({
+    [GenericMessageType.BUTTON_ACTION_CONFIRMATION]: ButtonActionConfirmation.create(payloadBundle),
+    messageId: createId(),
+  });
 }
 
-interface CreateImageOptions extends BaseOptions {
-  expectsReadConfirmation?: boolean;
-  asset: EncryptedAssetUploaded;
-  image: ImageContent;
-  legalHoldStatus?: LegalHoldStatus;
+export function buildCompositeMessage(payload: IComposite): GenericMessage {
+  return GenericMessage.create({
+    [GenericMessageType.COMPOSITE]: Composite.create(payload),
+    messageId: createId(),
+  });
 }
 
-interface CreateFileOptions extends BaseOptions {
-  expectsReadConfirmation?: boolean;
-  asset: EncryptedAssetUploaded;
-  file: FileContent;
-  legalHoldStatus?: LegalHoldStatus;
-  originalMessageId: string;
+export function buildConfirmationMessage(payloadBundle: ConfirmationMessage['content']): GenericMessage {
+  const content = Confirmation.create(payloadBundle);
+
+  return GenericMessage.create({
+    [GenericMessageType.CONFIRMATION]: content,
+    messageId: createId(),
+  });
 }
 
-interface CreateEditedTextOptions extends BaseOptions {
-  newMessageText: string;
-  originalMessageId: string;
+export function buildEditedTextMessage(
+  payloadBundle: EditedTextMessage['content'],
+  messageId: string = createId(),
+): GenericMessage {
+  const editedMessage = MessageEdit.create({
+    replacingMessageId: payloadBundle.originalMessageId,
+    text: MessageToProtoMapper.mapText(payloadBundle),
+  });
+
+  return GenericMessage.create({
+    [GenericMessageType.EDITED]: editedMessage,
+    messageId,
+  });
 }
 
-interface CreateFileMetadataOptions extends BaseOptions {
-  expectsReadConfirmation?: boolean;
-  legalHoldStatus?: LegalHoldStatus;
-  metaData: FileMetaDataContent;
+export function buildFileDataMessage(
+  payloadBundle: FileAssetMessage['content'],
+  messageId: string = createId(),
+): GenericMessage {
+  const {asset, expectsReadConfirmation, legalHoldStatus} = payloadBundle;
+
+  const remoteData = Asset.RemoteData.create({
+    assetId: asset.key,
+    assetToken: asset.token,
+    otrKey: asset.keyBytes,
+    sha256: asset.sha256,
+    assetDomain: asset.domain,
+  });
+
+  const assetMessage = Asset.create({
+    expectsReadConfirmation,
+    legalHoldStatus,
+    uploaded: remoteData,
+  });
+
+  assetMessage.status = AssetTransferState.UPLOADED;
+
+  const genericMessage = GenericMessage.create({
+    [GenericMessageType.ASSET]: assetMessage,
+    messageId,
+  });
+
+  return genericMessage;
 }
 
-interface CreateFileAbortOptions {
-  conversationId: string;
-  expectsReadConfirmation?: boolean;
-  from: string;
-  legalHoldStatus?: LegalHoldStatus;
-  originalMessageId: string;
-  reason: AbortReason;
+export function buildFileMetaDataMessage(payloadBundle: FileAssetMetaDataMessage['content']): GenericMessage {
+  const {expectsReadConfirmation, legalHoldStatus, metaData} = payloadBundle;
+
+  const original = Asset.Original.create({
+    audio: metaData.audio,
+    mimeType: metaData.type,
+    name: metaData.name,
+    size: metaData.length,
+    video: metaData.video,
+    image: metaData.image,
+  });
+
+  const assetMessage = Asset.create({
+    expectsReadConfirmation,
+    legalHoldStatus,
+    original,
+  });
+
+  const genericMessage = GenericMessage.create({
+    [GenericMessageType.ASSET]: assetMessage,
+    messageId: createId(),
+  });
+
+  return genericMessage;
 }
 
-interface CreateLocationOptions extends BaseOptions {
-  location: LocationContent;
+export function buildFileAbortMessage(
+  payloadBundle: FileAssetAbortMessage['content'],
+  messageId: string = createId(),
+): GenericMessage {
+  const {expectsReadConfirmation, legalHoldStatus, reason} = payloadBundle;
+
+  const assetMessage = Asset.create({
+    expectsReadConfirmation,
+    legalHoldStatus,
+    notUploaded: reason,
+  });
+
+  assetMessage.status = AssetTransferState.NOT_UPLOADED;
+
+  const genericMessage = GenericMessage.create({
+    [GenericMessageType.ASSET]: assetMessage,
+    messageId,
+  });
+
+  return genericMessage;
 }
 
-interface CreateCallOptions extends BaseOptions {
-  content: CallingContent;
+export function buildImageMessage(
+  payloadBundle: ImageAssetMessageOutgoing['content'],
+  messageId: string = createId(),
+): GenericMessage {
+  const imageAsset = buildAsset(payloadBundle);
+
+  const genericMessage = GenericMessage.create({
+    [GenericMessageType.ASSET]: imageAsset,
+    messageId,
+  });
+
+  return genericMessage;
+}
+export function buildLocationMessage(payloadBundle: LocationMessage['content']): GenericMessage {
+  const {expectsReadConfirmation, latitude, legalHoldStatus, longitude, name, zoom} = payloadBundle;
+
+  const locationMessage = Location.create({
+    expectsReadConfirmation,
+    latitude,
+    legalHoldStatus,
+    longitude,
+    name,
+    zoom,
+  });
+
+  const genericMessage = GenericMessage.create({
+    [GenericMessageType.LOCATION]: locationMessage,
+    messageId: createId(),
+  });
+
+  return genericMessage;
+}
+export function buildPingMessage(payloadBundle: PingMessage['content']): GenericMessage {
+  const content = Knock.create(payloadBundle);
+
+  const genericMessage = GenericMessage.create({
+    [GenericMessageType.KNOCK]: content,
+    messageId: createId(),
+  });
+
+  return genericMessage;
 }
 
-interface CreateReactionOptions extends BaseOptions {
-  reaction: ReactionContent;
+export function buildReactionMessage(payloadBundle: ReactionMessage['content']): GenericMessage {
+  const {legalHoldStatus, originalMessageId, type} = payloadBundle;
+
+  const reaction = Reaction.create({
+    emoji: type,
+    legalHoldStatus,
+    messageId: originalMessageId,
+  });
+
+  const genericMessage = GenericMessage.create({
+    [GenericMessageType.REACTION]: reaction,
+    messageId: createId(),
+  });
+  return genericMessage;
 }
 
-interface CreateTextOptions extends BaseOptions {
-  text: string;
+export function buildSessionResetMessage(): GenericMessage {
+  return GenericMessage.create({
+    [GenericMessageType.CLIENT_ACTION]: ClientAction.RESET_SESSION,
+    messageId: createId(),
+  });
 }
 
-interface CreateConfirmationOptions extends BaseOptions {
-  firstMessageId: string;
-  moreMessageIds?: string[];
-  type: Confirmation.Type;
+export function buildCallMessage(payloadBundle: CallMessage['content']): GenericMessage {
+  const callMessage = Calling.create({
+    content: payloadBundle,
+  });
+
+  return GenericMessage.create({
+    [GenericMessageType.CALLING]: callMessage,
+    messageId: createId(),
+  });
 }
 
-interface CreatePingOptions extends BaseOptions {
-  ping?: KnockContent;
+export function buildDeleteMessage(payload: DeleteMessage['content']): GenericMessage {
+  const content = MessageDelete.create(payload);
+
+  return GenericMessage.create({
+    [GenericMessageType.DELETED]: content,
+    messageId: createId(),
+  });
 }
 
-interface CreateButtonActionConfirmationOptions extends BaseOptions {
-  content: ButtonActionConfirmationContent;
+export function buildHideMessage(payload: HideMessage['content']): GenericMessage {
+  const content = MessageHide.create(payload);
+
+  return GenericMessage.create({
+    [GenericMessageType.HIDDEN]: content,
+    messageId: createId(),
+  });
 }
 
-interface CreateActionMessageOptions extends BaseOptions {
-  content: ButtonActionContent;
+export function buildTextMessage(
+  payloadBundle: TextMessage['content'],
+  messageId: string = createId(),
+): GenericMessage {
+  const genericMessage = GenericMessage.create({
+    messageId,
+    [GenericMessageType.TEXT]: MessageToProtoMapper.mapText(payloadBundle),
+  });
+
+  return genericMessage;
 }
 
-function createCommonProperties<T extends BaseOptions>(
-  options: T,
-): {
-  id: string;
-  conversation: string;
-  from: string;
-  source: PayloadBundleSource;
-  state: PayloadBundleState;
-  timestamp: number;
-} {
-  return {
-    id: options.messageId || MessageBuilder.createId(),
-    conversation: options.conversationId,
-    from: options.from,
-    source: PayloadBundleSource.LOCAL,
-    state: PayloadBundleState.OUTGOING_UNSENT,
-    timestamp: Date.now(),
-  };
+function buildAsset(payloadBundle: ImageAssetMessageOutgoing['content']): Asset {
+  const {asset, expectsReadConfirmation, image, legalHoldStatus} = payloadBundle;
+
+  const imageMetadata = Asset.ImageMetaData.create({
+    height: image.height,
+    width: image.width,
+  });
+
+  const original = Asset.Original.create({
+    [GenericMessageType.IMAGE]: imageMetadata,
+    mimeType: image.type,
+    name: null,
+    size: image.data.length,
+  });
+
+  const remoteData = Asset.RemoteData.create({
+    assetId: asset.key,
+    assetToken: asset.token,
+    assetDomain: asset.domain,
+    otrKey: asset.keyBytes,
+    sha256: asset.sha256,
+  });
+
+  const assetMessage = Asset.create({
+    expectsReadConfirmation,
+    legalHoldStatus,
+    original,
+    uploaded: remoteData,
+  });
+
+  assetMessage.status = AssetTransferState.UPLOADED;
+
+  return assetMessage;
 }
 
-export class MessageBuilder {
-  public static createEditedText(payload: CreateEditedTextOptions): TextContentBuilder {
-    return new TextContentBuilder({
-      ...createCommonProperties(payload),
-      content: {
-        originalMessageId: payload.originalMessageId,
-        text: payload.newMessageText,
-      },
-      type: PayloadBundleType.MESSAGE_EDIT,
-    });
-  }
+export function wrapInEphemeral(originalGenericMessage: GenericMessage, expireAfterMillis: number): GenericMessage {
+  const ephemeralMessage = Ephemeral.create({
+    expireAfterMillis,
+    [originalGenericMessage.content!]: originalGenericMessage[originalGenericMessage.content!],
+  });
 
-  public static createFileData(payload: CreateFileOptions): FileAssetMessage {
-    const {asset, expectsReadConfirmation, file, legalHoldStatus, originalMessageId} = payload;
+  const genericMessage = GenericMessage.create({
+    [GenericMessageType.EPHEMERAL]: ephemeralMessage,
+    messageId: originalGenericMessage.messageId,
+  });
 
-    return {
-      ...createCommonProperties(payload),
-      content: {
-        asset,
-        expectsReadConfirmation,
-        file,
-        legalHoldStatus,
-      },
-      id: originalMessageId,
-      type: PayloadBundleType.ASSET,
-    };
-  }
-
-  public static createMessageDelete(payload: CreateMessageDeleteOption): DeleteMessage {
-    return {
-      ...createCommonProperties(payload),
-      content: {messageId: payload.messageIdToDelete},
-      type: PayloadBundleType.MESSAGE_DELETE,
-    };
-  }
-
-  public static createMessageHide(payload: CreateMessageHideOption): HideMessage {
-    return {
-      ...createCommonProperties(payload),
-      content: {messageId: payload.messageIdToDelete, conversationId: payload.targetConversation},
-      type: PayloadBundleType.MESSAGE_HIDE,
-    };
-  }
-
-  public static createFileMetadata(payload: CreateFileMetadataOptions): FileAssetMetaDataMessage {
-    const {expectsReadConfirmation, legalHoldStatus, metaData} = payload;
-
-    return {
-      ...createCommonProperties(payload),
-      content: {
-        expectsReadConfirmation,
-        legalHoldStatus,
-        metaData,
-      },
-      type: PayloadBundleType.ASSET_META,
-    };
-  }
-
-  public static createFileAbort(payload: CreateFileAbortOptions): FileAssetAbortMessage {
-    const {expectsReadConfirmation, legalHoldStatus, reason} = payload;
-
-    return {
-      ...createCommonProperties(payload),
-      content: {
-        expectsReadConfirmation,
-        legalHoldStatus,
-        reason,
-      },
-      id: payload.originalMessageId,
-      type: PayloadBundleType.ASSET_ABORT,
-    };
-  }
-
-  public static createImage(payload: CreateImageOptions): ImageAssetMessageOutgoing {
-    const {expectsReadConfirmation, image, asset, legalHoldStatus} = payload;
-    return {
-      ...createCommonProperties(payload),
-      content: {
-        expectsReadConfirmation,
-        image,
-        asset,
-        legalHoldStatus,
-      },
-      type: PayloadBundleType.ASSET_IMAGE,
-    };
-  }
-
-  public static createLocation(payload: CreateLocationOptions): LocationMessage {
-    return {
-      ...createCommonProperties(payload),
-      content: payload.location,
-      type: PayloadBundleType.LOCATION,
-    };
-  }
-
-  public static createCall(payload: CreateCallOptions): CallMessage {
-    return {
-      ...createCommonProperties(payload),
-      content: payload.content,
-      type: PayloadBundleType.CALL,
-    };
-  }
-
-  public static createReaction(payload: CreateReactionOptions): ReactionMessage {
-    return {
-      ...createCommonProperties(payload),
-      content: payload.reaction,
-      type: PayloadBundleType.REACTION,
-    };
-  }
-
-  public static createText(payload: CreateTextOptions): TextContentBuilder {
-    return new TextContentBuilder({
-      ...createCommonProperties(payload),
-      content: {text: payload.text},
-      type: PayloadBundleType.TEXT,
-    });
-  }
-
-  public static createConfirmation(payload: CreateConfirmationOptions): ConfirmationMessage {
-    const {firstMessageId, moreMessageIds, type} = payload;
-    return {
-      ...createCommonProperties(payload),
-      content: {firstMessageId, moreMessageIds, type},
-      type: PayloadBundleType.CONFIRMATION,
-    };
-  }
-
-  public static createButtonActionMessage(payload: CreateActionMessageOptions): ButtonActionMessage {
-    return {
-      ...createCommonProperties(payload),
-      content: payload.content,
-      type: PayloadBundleType.BUTTON_ACTION,
-    };
-  }
-
-  public static createButtonActionConfirmationMessage(
-    payload: CreateButtonActionConfirmationOptions,
-  ): ButtonActionConfirmationMessage {
-    return {
-      ...createCommonProperties(payload),
-      content: payload.content,
-      type: PayloadBundleType.BUTTON_ACTION_CONFIRMATION,
-    };
-  }
-
-  public static createComposite(payload: BaseOptions): CompositeContentBuilder {
-    return new CompositeContentBuilder({
-      ...createCommonProperties(payload),
-      content: {},
-      type: PayloadBundleType.COMPOSITE,
-    });
-  }
-
-  public static createPing(payload: CreatePingOptions): PingMessage {
-    return {
-      ...createCommonProperties(payload),
-      content: payload.ping || {hotKnock: false},
-      type: PayloadBundleType.PING,
-    };
-  }
-
-  public static createSessionReset(payload: BaseOptions): ResetSessionMessage {
-    return {
-      ...createCommonProperties(payload),
-      content: {
-        clientAction: ClientAction.RESET_SESSION,
-      },
-      type: PayloadBundleType.CLIENT_ACTION,
-    };
-  }
-
-  public static createId(): string {
-    return UUID.genV4().toString();
-  }
+  return genericMessage;
 }

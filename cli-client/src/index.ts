@@ -29,7 +29,7 @@ import fs from 'fs-extra';
 import os from 'os';
 import path from 'path';
 import {AxiosError} from 'axios';
-import {MessageBuilder} from '@wireapp/core/src/main/conversation/message/MessageBuilder';
+import {buildTextMessage} from '@wireapp/core/src/main/conversation/message/MessageBuilder';
 import {ConversationProtocol} from '@wireapp/api-client/src/conversation';
 
 dotenv.config();
@@ -113,8 +113,12 @@ account.on(PayloadBundleType.TEXT, textMessage => {
   stdin.addListener('data', async data => {
     const message = data.toString().trim();
     if (account.service) {
-      const payload = MessageBuilder.createText({conversationId, from: userId, text: message}).build();
-      await account.service.conversation.send({protocol: ConversationProtocol.PROTEUS, payload});
+      const payload = buildTextMessage({text: message});
+      await account.service.conversation.send({
+        conversationId: {id: conversationId, domain: ''},
+        protocol: ConversationProtocol.PROTEUS,
+        payload,
+      });
     }
   });
 })().catch((error: Error) => {

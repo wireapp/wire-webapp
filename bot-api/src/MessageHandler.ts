@@ -34,13 +34,13 @@ import {
   MentionContent,
 } from '@wireapp/core/src/main/conversation/content/';
 import {QuotableMessage} from '@wireapp/core/src/main/conversation/message/OtrMessage';
-import {Asset, Confirmation, Text} from '@wireapp/protocol-messaging';
+import {Asset, Confirmation} from '@wireapp/protocol-messaging';
 import {promisify} from 'util';
 import fs from 'fs';
 import path from 'path';
 import FileType = require('file-type');
 import {DefaultConversationRoleName} from '@wireapp/api-client/src/conversation';
-import {MessageBuilder} from '@wireapp/core/src/main/conversation/message/MessageBuilder';
+import {MessageBuilder} from '@wireapp/core';
 
 export abstract class MessageHandler {
   account: Account | undefined = undefined;
@@ -112,14 +112,13 @@ export abstract class MessageHandler {
         referenceMessageId,
       };
 
-      const buttonActionConfirmationMessage = MessageBuilder.createButtonActionConfirmationMessage({
-        conversationId,
-        from: this.account.userId,
-        content: buttonActionConfirmationContent,
-      });
+      const buttonActionConfirmationMessage = MessageBuilder.buildButtonActionConfirmationMessage(
+        buttonActionConfirmationContent,
+      );
 
       await this.account.service.conversation.send({
         protocol: ConversationProtocol.PROTEUS,
+        conversationId: {id: conversationId, domain: ''},
         payload: buttonActionConfirmationMessage,
         userIds: [userId],
       });
@@ -131,8 +130,9 @@ export abstract class MessageHandler {
    */
   async sendCall(conversationId: string, content: CallingContent, userIds?: string[] | UserClients): Promise<void> {
     if (this.account?.service) {
-      const callPayload = MessageBuilder.createCall({conversationId, from: this.account.userId, content});
+      const callPayload = MessageBuilder.buildCallMessage(content);
       await this.account.service.conversation.send({
+        conversationId: {id: conversationId, domain: ''},
         protocol: ConversationProtocol.PROTEUS,
         payload: callPayload,
         userIds,
@@ -150,13 +150,11 @@ export abstract class MessageHandler {
     userIds?: string[] | UserClients,
   ): Promise<void> {
     if (this.account?.service) {
-      const message = MessageBuilder.createComposite({conversationId, from: this.account.userId}).addText(
-        Text.create({content: text}),
-      );
-      buttons.forEach(button => message.addButton(button));
+      const message = MessageBuilder.buildCompositeMessage({items: [{text: {content: text}}]});
       await this.account.service.conversation.send({
         protocol: ConversationProtocol.PROTEUS,
-        payload: message.build(),
+        conversationId: {id: conversationId, domain: ''},
+        payload: message,
         userIds,
       });
     }
@@ -171,13 +169,12 @@ export abstract class MessageHandler {
     userIds?: string[] | UserClients,
   ): Promise<void> {
     if (this.account?.service) {
-      const confirmationPayload = MessageBuilder.createConfirmation({
-        conversationId,
-        from: this.account.userId,
+      const confirmationPayload = MessageBuilder.buildConfirmationMessage({
         firstMessageId,
         type: Confirmation.Type.DELIVERED,
       });
       await this.account.service.conversation.send({
+        conversationId: {id: conversationId, domain: ''},
         protocol: ConversationProtocol.PROTEUS,
         payload: confirmationPayload,
         userIds,
@@ -213,34 +210,31 @@ export abstract class MessageHandler {
     userIds?: string[] | UserClients,
   ): Promise<void> {
     if (this.account?.service) {
-      const editedPayload = MessageBuilder.createEditedText({
-        conversationId,
-        from: this.account.userId,
-        newMessageText,
+      const payload = {
+        text: newMessageText,
         originalMessageId,
-      })
-        .withMentions(newMentions)
-        .build();
+        mentions: newMentions,
+      };
+      const editedPayload = MessageBuilder.buildEditedTextMessage(payload);
 
       const editedMessage = await this.account.service.conversation.send({
+        conversationId: {id: conversationId, domain: ''},
         protocol: ConversationProtocol.PROTEUS,
         payload: editedPayload,
         userIds,
       });
 
       if (newLinkPreview) {
-        const editedWithPreviewPayload = MessageBuilder.createEditedText({
-          from: this.account.userId,
-          conversationId,
-          newMessageText,
-          originalMessageId,
-          messageId: editedMessage.id,
-        })
-          .withLinkPreviews([await this.account.service.linkPreview.uploadLinkPreviewImage(newLinkPreview)])
-          .withMentions(newMentions)
-          .build();
+        const editedWithPreviewPayload = MessageBuilder.buildEditedTextMessage(
+          {
+            ...payload,
+            linkPreviews: [await this.account.service.linkPreview.uploadLinkPreviewImage(newLinkPreview)],
+          },
+          editedMessage.id,
+        );
 
         await this.account.service.conversation.send({
+          conversationId: {id: conversationId, domain: ''},
           protocol: ConversationProtocol.PROTEUS,
           payload: editedWithPreviewPayload,
           userIds,
@@ -277,38 +271,39 @@ export abstract class MessageHandler {
     userIds?: string[] | UserClients,
   ): Promise<void> {
     if (this.account?.service) {
-      const metadataPayload = MessageBuilder.createFileMetadata({
-        conversationId,
+      const metadataPayload = MessageBuilder.buildFileMetaDataMessage({
         metaData: metadata,
-        from: this.account.userId,
       });
       await this.account.service.conversation.send({
+        conversationId: {id: conversationId, domain: ''},
         protocol: ConversationProtocol.PROTEUS,
         payload: metadataPayload,
         userIds,
       });
 
       try {
-        const filePayload = MessageBuilder.createFileData({
-          conversationId,
-          from: this.account.userId,
-          file,
-          asset: await (await this.account.service!.asset.uploadAsset(file.data)).response,
-          originalMessageId: metadataPayload.id,
-        });
+        const filePayload = MessageBuilder.buildFileDataMessage(
+          {
+            file,
+            asset: await (await this.account.service!.asset.uploadAsset(file.data)).response,
+          },
+          metadataPayload.messageId,
+        );
         await this.account.service.conversation.send({
+          conversationId: {id: conversationId, domain: ''},
           protocol: ConversationProtocol.PROTEUS,
           payload: filePayload,
           userIds,
         });
       } catch (error) {
-        const abortPayload = await MessageBuilder.createFileAbort({
-          conversationId,
-          from: this.account.userId,
-          reason: Asset.NotUploaded.FAILED,
-          originalMessageId: metadataPayload.id,
-        });
+        const abortPayload = await MessageBuilder.buildFileAbortMessage(
+          {
+            reason: Asset.NotUploaded.FAILED,
+          },
+          metadataPayload.messageId,
+        );
         await this.account.service.conversation.send({
+          conversationId: {id: conversationId, domain: ''},
           protocol: ConversationProtocol.PROTEUS,
           payload: abortPayload,
           userIds,
@@ -322,13 +317,12 @@ export abstract class MessageHandler {
    */
   async sendImage(conversationId: string, image: ImageContent, userIds?: string[] | UserClients): Promise<void> {
     if (this.account?.service) {
-      const imagePayload = MessageBuilder.createImage({
-        conversationId,
-        from: this.account.userId,
+      const imagePayload = MessageBuilder.buildImageMessage({
         image,
         asset: await (await this.account.service!.asset.uploadAsset(image.data)).response,
       });
       await this.account.service.conversation.send({
+        conversationId: {id: conversationId, domain: ''},
         protocol: ConversationProtocol.PROTEUS,
         payload: imagePayload,
         userIds,
@@ -345,12 +339,9 @@ export abstract class MessageHandler {
     userIds?: string[] | UserClients,
   ): Promise<void> {
     if (this.account?.service) {
-      const locationPayload = MessageBuilder.createLocation({
-        conversationId,
-        from: this.account.userId,
-        location,
-      });
+      const locationPayload = MessageBuilder.buildLocationMessage(location);
       await this.account.service.conversation.send({
+        conversationId: {id: conversationId, domain: ''},
         protocol: ConversationProtocol.PROTEUS,
         payload: locationPayload,
         userIds,
@@ -363,8 +354,9 @@ export abstract class MessageHandler {
    */
   async sendPing(conversationId: string, userIds?: string[] | UserClients): Promise<void> {
     if (this.account?.service) {
-      const pingPayload = MessageBuilder.createPing({conversationId, from: this.account.userId});
+      const pingPayload = MessageBuilder.buildPingMessage({hotKnock: false});
       await this.account.service.conversation.send({
+        conversationId: {id: conversationId, domain: ''},
         protocol: ConversationProtocol.PROTEUS,
         payload: pingPayload,
         userIds,
@@ -382,15 +374,9 @@ export abstract class MessageHandler {
     userIds?: string[] | UserClients,
   ): Promise<void> {
     if (this.account?.service) {
-      const reactionPayload = MessageBuilder.createReaction({
-        conversationId,
-        from: this.account.userId,
-        reaction: {
-          originalMessageId,
-          type,
-        },
-      });
+      const reactionPayload = MessageBuilder.buildReactionMessage({originalMessageId, type});
       await this.account.service.conversation.send({
+        conversationId: {id: conversationId, domain: ''},
         protocol: ConversationProtocol.PROTEUS,
         payload: reactionPayload,
         userIds,
@@ -405,10 +391,9 @@ export abstract class MessageHandler {
     userIds?: string[] | UserClients,
   ): Promise<void> {
     if (this.account?.service) {
-      const replyPayload = MessageBuilder.createText({conversationId, text, from: this.account.userId})
-        .withQuote(quotedMessage)
-        .build();
+      const replyPayload = MessageBuilder.buildTextMessage({text});
       await this.account.service.conversation.send({
+        conversationId: {id: conversationId, domain: ''},
         protocol: ConversationProtocol.PROTEUS,
         payload: replyPayload,
         userIds,
@@ -439,27 +424,26 @@ export abstract class MessageHandler {
     userIds?: string[] | UserClients,
   ): Promise<void> {
     if (this.account?.service) {
-      const payload = MessageBuilder.createText({conversationId, text, from: this.account.userId})
-        .withMentions(mentions)
-        .build();
+      const payload = MessageBuilder.buildTextMessage({text, mentions});
       const sentMessage = await this.account.service.conversation.send({
+        conversationId: {id: conversationId, domain: ''},
         protocol: ConversationProtocol.PROTEUS,
         payload: payload,
         userIds,
       });
 
       if (linkPreview) {
-        const editedWithPreviewPayload = MessageBuilder.createText({
-          conversationId,
-          text,
-          from: this.account.userId,
-          messageId: sentMessage.id,
-        })
-          .withLinkPreviews([await this.account.service!.linkPreview.uploadLinkPreviewImage(linkPreview)])
-          .withMentions(mentions)
-          .build();
+        const editedWithPreviewPayload = MessageBuilder.buildTextMessage(
+          {
+            text,
+            linkPreviews: [await this.account.service!.linkPreview.uploadLinkPreviewImage(linkPreview)],
+            mentions,
+          },
+          sentMessage.id,
+        );
 
         await this.account.service.conversation.send({
+          conversationId: {id: conversationId, domain: ''},
           protocol: ConversationProtocol.PROTEUS,
           payload: editedWithPreviewPayload,
           userIds,

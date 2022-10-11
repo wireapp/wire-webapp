@@ -25,6 +25,10 @@ export function sendMessage<T>(sendingFunction: Task<T>): Promise<T> {
   return sendingQueue.push(sendingFunction);
 }
 
+export function getQueueLength(): number {
+  return sendingQueue.getLength();
+}
+
 export function resumeMessageSending(): void {
   sendingQueue.pause(false);
 }

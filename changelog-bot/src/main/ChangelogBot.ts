@@ -26,7 +26,7 @@ import * as Changelog from 'generate-changelog';
 import logdown from 'logdown';
 
 import {ChangelogData, LoginDataBackend} from './Interfaces';
-import {MessageBuilder} from '@wireapp/core/src/main/conversation/message/MessageBuilder';
+import {buildTextMessage} from '@wireapp/core/src/main/conversation/message/MessageBuilder';
 import {ConversationProtocol} from '@wireapp/api-client/src/conversation';
 
 const logger = logdown('@wireapp/changelog-bot/ChangelogBot', {
@@ -78,12 +78,14 @@ export class ChangelogBot {
     for (const conversationId of conversationIds) {
       if (conversationId) {
         logger.log(`Sending message to conversation "${conversationId}" ...`);
-        const textPayload = MessageBuilder.createText({
-          conversationId,
-          from: account.userId,
+        const textPayload = buildTextMessage({
           text: this.message,
-        }).build();
-        await account.service.conversation.send({protocol: ConversationProtocol.PROTEUS, payload: textPayload});
+        });
+        await account.service.conversation.send({
+          conversationId: {id: conversationId, domain: ''},
+          protocol: ConversationProtocol.PROTEUS,
+          payload: textPayload,
+        });
       }
     }
   }
