@@ -48,6 +48,7 @@ import {amplify} from 'amplify';
 import useRoveFocus from '../../../../hooks/useRoveFocus';
 import {isTabKey} from 'Util/KeyboardUtil';
 import {useMLSConversationState} from '../../../../mls/mlsConversationState';
+import {useAppMainState} from '../../../state';
 
 type ConversationsProps = {
   callState?: CallState;
@@ -146,7 +147,11 @@ const Conversations: React.FC<ConversationsProps> = ({
         type="button"
         className={`conversations-settings-button accent-text ${showBadge ? 'conversations-settings--badge' : ''}`}
         title={t('tooltipConversationsPreferences')}
-        onClick={() => switchList(ListState.PREFERENCES)}
+        onClick={() => {
+          switchList(ListState.PREFERENCES);
+          const {rightSidebar} = useAppMainState.getState();
+          rightSidebar.clearHistory();
+        }}
         data-uie-name="go-preferences"
       >
         <Icon.Settings />

@@ -20,7 +20,6 @@
 import React from 'react';
 import cx from 'classnames';
 
-import {registerReactComponent} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 import Icon from 'Components/Icon';
 
@@ -43,5 +42,3 @@ const RestrictedImage: React.FC<RestrictedImageProps> = ({showMessage = true, is
 };
 
 export default RestrictedImage;
-
-registerReactComponent('image-restricted', RestrictedImage);

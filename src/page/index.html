@@ -12,7 +12,9 @@
   </head>
 
   <body>
-    #include('wire-main.htm')
+    <app-main id="wire-main" class="off" data-bind="css: mainClasses()" params="root: $root" data-uie-name="status-webapp"
+                  data-uie-value="is-loading"></app-main>
+
     #include('loading.htm')
 
     <script src="./config.js?{{@config.VERSION}}"></script>

@@ -37,9 +37,6 @@ import Notifications from './Notifications';
 import ParticipantDevices from './ParticipantDevices';
 import TimedMessages from './TimedMessages';
 
-import toggleRightPanel from './utils/toggleRightPanel';
-import usePanelHistory from './utils/usePanelHistory';
-
 import {ConversationState} from '../../conversation/ConversationState';
 import {Conversation} from '../../entity/Conversation';
 import {Message} from '../../entity/message/Message';
@@ -51,7 +48,10 @@ import {ServiceEntity} from '../../integration/ServiceEntity';
 import {UserState} from '../../user/UserState';
 import {TeamState} from '../../team/TeamState';
 import {ContentState} from '../../view_model/ContentViewModel';
-import {MainViewModel, ViewModelRepositories} from '../../view_model/MainViewModel';
+import {ViewModelRepositories} from '../../view_model/MainViewModel';
+import {ActionsViewModel} from '../../view_model/ActionsViewModel';
+import {RightSidebarParams} from '../AppMain';
+import {useAppMainState} from '../state';
 
 export const OPEN_CONVERSATION_DETAILS = 'OPEN_CONVERSATION_DETAILS';
 export const rightPanelAnimationTimeout = 350; // ms
@@ -79,29 +79,21 @@ export enum PanelState {
 export type PanelEntity = Conversation | User | Message | ServiceEntity;
 
 interface RightSidebarProps {
-  initialState: PanelState;
-  initialEntity: PanelEntity | null;
-  mainViewModel: MainViewModel;
+  currentEntity?: RightSidebarParams['entity'];
+  actionsViewModel: ActionsViewModel;
   repositories: ViewModelRepositories;
   teamState: TeamState;
   userState: UserState;
-  highlighted?: User[];
-  showLikes?: boolean;
-  isFederated?: boolean;
-  onClose?: () => void;
+  isFederated: boolean;
 }
 
 const RightSidebar: FC<RightSidebarProps> = ({
-  initialState,
-  initialEntity,
-  mainViewModel,
+  currentEntity,
+  actionsViewModel,
   repositories,
   teamState,
   userState,
-  highlighted = [],
-  showLikes = false,
-  isFederated = false,
-  onClose: onPanelClose,
+  isFederated,
 }) => {
   const {
     conversation: conversationRepository,
@@ -111,16 +103,15 @@ const RightSidebar: FC<RightSidebarProps> = ({
     user: userRepository,
   } = repositories;
   const {conversationRoleRepository} = conversationRepository;
-  const {actions: actionsViewModel} = mainViewModel;
   const conversationState = container.resolve(ConversationState);
 
   const {activeConversation} = useKoSubscribableChildren(conversationState, ['activeConversation']);
 
   const [isAddMode, setIsAddMode] = useState<boolean>(false);
-  const [currentEntity, setCurrentEntity] = useState<PanelEntity | null>(initialEntity);
   const [animatePanelToLeft, setAnimatePanelToLeft] = useState<boolean>(true);
 
-  const {currentState, goBack, goTo, clearHistory} = usePanelHistory(initialState);
+  const {rightSidebar} = useAppMainState.getState();
+  const currentState = rightSidebar.history.at(-1);
 
   const userEntity = currentEntity && isUserEntity(currentEntity) ? currentEntity : null;
   const userServiceEntity = currentEntity && isUserServiceEntity(currentEntity) ? currentEntity : null;
@@ -128,31 +119,31 @@ const RightSidebar: FC<RightSidebarProps> = ({
   const serviceEntity = currentEntity && isServiceEntity(currentEntity) ? currentEntity : null;
 
   const goToRoot = () => {
-    setCurrentEntity(activeConversation);
-    clearHistory();
+    rightSidebar.goToRoot(activeConversation);
   };
 
   const closePanel = () => {
-    onPanelClose?.();
-    setCurrentEntity(null);
+    rightSidebar.clearHistory();
   };
 
   const togglePanel = (newState: PanelState, entity: PanelEntity | null, addMode: boolean = false) => {
     setAnimatePanelToLeft(true);
-    goTo(newState);
-    setCurrentEntity(entity);
+    rightSidebar.goTo(newState, {entity});
     setIsAddMode(addMode);
   };
 
   const onBackClick = (entity: PanelEntity | null = activeConversation) => {
-    setCurrentEntity(entity);
-    goBack();
+    rightSidebar.goBack(entity);
+    setAnimatePanelToLeft(false);
+  };
+
+  const onBackToDetails = (entity: PanelEntity | null = activeConversation) => {
+    rightSidebar.goTo(PanelState.CONVERSATION_DETAILS, {entity});
     setAnimatePanelToLeft(false);
   };
 
   const showDevices = (entity: User) => {
-    setCurrentEntity(entity);
-    goTo(PanelState.PARTICIPANT_DEVICES);
+    rightSidebar.goTo(PanelState.PARTICIPANT_DEVICES, {entity});
     setAnimatePanelToLeft(true);
   };
 
@@ -169,7 +160,7 @@ const RightSidebar: FC<RightSidebarProps> = ({
     amplify.subscribe(OPEN_CONVERSATION_DETAILS, goToRoot);
     amplify.subscribe(WebAppEvents.CONVERSATION.MESSAGE.UPDATED, (oldId: string, updatedMessageEntity: Message) => {
       if (currentState === PanelState.MESSAGE_DETAILS && oldId === currentEntity?.id) {
-        setCurrentEntity(updatedMessageEntity);
+        rightSidebar.updateEntity(updatedMessageEntity);
       }
     });
   }, []);
@@ -180,7 +171,8 @@ const RightSidebar: FC<RightSidebarProps> = ({
 
   return (
     <TransitionGroup
-      style={{height: '100%'}}
+      id="right-column"
+      className="right-column"
       childFactory={child =>
         cloneElement(child, {
           classNames: animatePanelToLeft ? 'right-to-left' : 'left-to-right',
@@ -208,7 +200,7 @@ const RightSidebar: FC<RightSidebarProps> = ({
 
           {currentState === PanelState.GROUP_PARTICIPANT_USER && userEntity && (
             <GroupParticipantUser
-              onBack={onBackClick}
+              onBack={onBackToDetails}
               onClose={closePanel}
               goToRoot={goToRoot}
               showDevices={showDevices}
@@ -228,7 +220,7 @@ const RightSidebar: FC<RightSidebarProps> = ({
               activeConversation={activeConversation}
               repositories={repositories}
               onClose={closePanel}
-              onGoBack={onBackClick}
+              onGoBack={onBackToDetails}
             />
           )}
 
@@ -268,7 +260,7 @@ const RightSidebar: FC<RightSidebarProps> = ({
               actionsViewModel={actionsViewModel}
               integrationRepository={integrationRepository}
               goToRoot={goToRoot}
-              onBack={onBackClick}
+              onBack={onBackToDetails}
               onClose={closePanel}
               serviceEntity={serviceEntity}
               userEntity={userServiceEntity}
@@ -297,10 +289,10 @@ const RightSidebar: FC<RightSidebarProps> = ({
               activeConversation={activeConversation}
               conversationRepository={conversationRepository}
               messageEntity={messageEntity}
-              updateEntity={setCurrentEntity}
+              updateEntity={rightSidebar.updateEntity}
               teamRepository={teamRepository}
               searchRepository={searchRepository}
-              showLikes={showLikes}
+              showLikes={rightSidebar.showLikes}
               userRepository={userRepository}
               onClose={closePanel}
             />
@@ -313,7 +305,7 @@ const RightSidebar: FC<RightSidebarProps> = ({
               searchRepository={searchRepository}
               teamRepository={teamRepository}
               togglePanel={togglePanel}
-              highlightedUsers={highlighted}
+              highlightedUsers={rightSidebar.highlightedUsers || []}
               onBack={onBackClick}
               onClose={closePanel}
             />
@@ -325,5 +317,3 @@ const RightSidebar: FC<RightSidebarProps> = ({
 };
 
 export default RightSidebar;
-
-export const openRightSidebar = toggleRightPanel<RightSidebarProps>(RightSidebar);

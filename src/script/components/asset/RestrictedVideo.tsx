@@ -20,7 +20,6 @@
 import React from 'react';
 import cx from 'classnames';
 
-import {registerReactComponent} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 
 export interface RestrictedVideoProps extends React.HTMLProps<HTMLDivElement> {
@@ -46,5 +45,3 @@ const RestrictedVideo: React.FC<RestrictedVideoProps> = ({showMessage = true, is
 };
 
 export default RestrictedVideo;
-
-registerReactComponent('video-restricted', RestrictedVideo);

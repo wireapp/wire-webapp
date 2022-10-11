@@ -19,7 +19,6 @@
 
 import React from 'react';
 import {CSSObject} from '@emotion/react';
-import {registerReactComponent} from 'Util/ComponentUtil';
 import {User} from 'src/script/entity/User';
 import {t} from 'Util/LocalizerUtil';
 
@@ -67,5 +66,3 @@ const ClassifiedBar: React.FC<ClassifiedBarProps> = ({users, classifiedDomains, 
 };
 
 export default ClassifiedBar;
-
-registerReactComponent('classified-bar', ClassifiedBar);

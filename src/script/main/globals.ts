@@ -26,6 +26,7 @@ import '../Config';
 import 'Components/icons';
 import 'Components/calling/CallingOverlayContainer';
 
+import '../page/AppMain';
 import '../page/AppLock';
 import '../page/MainContent';
 import '../page/RightSidebar';

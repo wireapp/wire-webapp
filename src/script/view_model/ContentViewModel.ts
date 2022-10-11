@@ -39,8 +39,6 @@ import {TeamState} from '../team/TeamState';
 import {ConversationState} from '../conversation/ConversationState';
 import {isConversationEntity} from 'Util/TypePredicateUtil';
 import {matchQualifiedIds} from 'Util/QualifiedId';
-import '../page/LeftSidebar';
-import '../page/MainContent';
 import {
   ClientNotificationData,
   Notification,
@@ -48,8 +46,9 @@ import {
 } from '../notification/PreferenceNotificationRepository';
 import {MessageRepository} from '../conversation/MessageRepository';
 import PrimaryModal from '../components/Modals/PrimaryModal';
-import {openRightSidebar, PanelState} from '../page/RightSidebar/RightSidebar';
+import {PanelState} from '../page/RightSidebar/RightSidebar';
 import {LegalHoldModalState} from '../legal-hold/LegalHoldModalState';
+import {useAppMainState} from '../page/state';
 
 interface ShowConversationOptions {
   exposeMessage?: Message;
@@ -85,7 +84,6 @@ export class ContentViewModel {
 
   conversationRepository: ConversationRepository;
   messageRepository: MessageRepository;
-  elementId: string;
   sidebarId: string;
   logger: Logger;
   readonly isFederated?: boolean;
@@ -102,7 +100,6 @@ export class ContentViewModel {
     this.teamState = container.resolve(TeamState);
     this.conversationState = container.resolve(ConversationState);
 
-    this.elementId = 'center-column';
     this.sidebarId = 'left-column';
     this.mainViewModel = mainViewModel;
     this.conversationRepository = repositories.conversation;
@@ -142,10 +139,8 @@ export class ContentViewModel {
 
     this._initSubscriptions();
     if (this.teamState.supportsLegalHold()) {
-      // this.legalHoldModal.showRequestModal();
       amplify.publish(LegalHoldModalState.SHOW_REQUEST);
     }
-    ko.applyBindings(this, document.getElementById(this.elementId));
   }
 
   private _initSubscriptions() {
@@ -225,15 +220,8 @@ export class ContentViewModel {
 
       if (isOpenedConversation) {
         if (openNotificationSettings) {
-          openRightSidebar({
-            initialEntity: conversationEntity,
-            initialState: PanelState.NOTIFICATIONS,
-            isFederated: this.mainViewModel.isFederated,
-            mainViewModel: this.mainViewModel,
-            repositories: this.repositories,
-            teamState: this.teamState,
-            userState: this.userState,
-          });
+          const {rightSidebar} = useAppMainState.getState();
+          rightSidebar.goTo(PanelState.NOTIFICATIONS, {entity: conversationEntity});
         }
         return;
       }
@@ -262,15 +250,8 @@ export class ContentViewModel {
       this.showContent(ContentState.CONVERSATION);
       this.previousConversation = this.conversationState.activeConversation();
       if (openNotificationSettings) {
-        openRightSidebar({
-          initialEntity: this.conversationState.activeConversation(),
-          initialState: PanelState.NOTIFICATIONS,
-          isFederated: this.mainViewModel.isFederated,
-          mainViewModel: this.mainViewModel,
-          repositories: this.repositories,
-          teamState: this.teamState,
-          userState: this.userState,
-        });
+        const {rightSidebar} = useAppMainState.getState();
+        rightSidebar.goTo(PanelState.NOTIFICATIONS, {entity: this.conversationState.activeConversation()});
       }
     } catch (error) {
       const isConversationNotFound = error.type === ConversationError.TYPE.CONVERSATION_NOT_FOUND;

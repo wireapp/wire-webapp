@@ -17,28 +17,27 @@
  *
  */
 
+import {WebAppEvents} from '@wireapp/webapp-events';
+import {amplify} from 'amplify';
+import cx from 'classnames';
 import React, {useEffect} from 'react';
 import {CSSTransition, SwitchTransition} from 'react-transition-group';
-import {registerReactComponent, useKoSubscribableChildren} from 'Util/ComponentUtil';
-import {container} from 'tsyringe';
+
+import {useKoSubscribableChildren} from 'Util/ComponentUtil';
+import {t} from 'Util/LocalizerUtil';
 
 import {ListViewModel, ListState} from '../../view_model/ListViewModel';
 import {User} from '../../entity/User';
-import {AssetRepository} from '../../assets/AssetRepository';
-
 import Preferences from './panels/Preferences';
 import Archive from './panels/Archive';
 import Conversations from './panels/Conversations';
 import TemporaryGuestConversations from './panels/TemporatyGuestConversations';
-import {amplify} from 'amplify';
-import {WebAppEvents} from '@wireapp/webapp-events';
 import StartUI from './panels/StartUI';
-import {forceCloseRightPanel} from '../RightSidebar/utils/toggleRightPanel';
 
 type LeftSidebarProps = {
-  assetRepository?: AssetRepository;
   listViewModel: ListViewModel;
   selfUser: User;
+  isActivatedAccount: boolean;
 };
 const Animated: React.FC<{children: React.ReactNode}> = ({children, ...rest}) => {
   return (
@@ -48,18 +47,14 @@ const Animated: React.FC<{children: React.ReactNode}> = ({children, ...rest}) =>
   );
 };
 
-const LeftSidebar: React.FC<LeftSidebarProps> = ({
-  listViewModel,
-  assetRepository = container.resolve(AssetRepository),
-  selfUser,
-}) => {
+const LeftSidebar: React.FC<LeftSidebarProps> = ({listViewModel, selfUser, isActivatedAccount}) => {
   const {conversationRepository, propertiesRepository} = listViewModel;
   const repositories = listViewModel.contentViewModel.repositories;
 
   const {state} = useKoSubscribableChildren(listViewModel, ['state']);
 
   const switchList = (list: ListState) => {
-    forceCloseRightPanel();
+    // forceCloseRightPanel();
     listViewModel.switchList(list);
   };
 
@@ -75,7 +70,11 @@ const LeftSidebar: React.FC<LeftSidebarProps> = ({
   }, []);
 
   return (
-    <>
+    <div id="left-column" className={cx('left-column', {'left-column--light-theme': !isActivatedAccount})}>
+      <header>
+        <h1 className="visually-hidden">{t('accessibility.headings.sidebar')}</h1>
+      </header>
+
       <SwitchTransition>
         <Animated key={state}>
           <>
@@ -130,10 +129,8 @@ const LeftSidebar: React.FC<LeftSidebarProps> = ({
           </>
         </Animated>
       </SwitchTransition>
-    </>
+    </div>
   );
 };
 
 export default LeftSidebar;
-
-registerReactComponent('left-sidebar', LeftSidebar);

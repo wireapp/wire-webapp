@@ -21,7 +21,7 @@ import {CALL_TYPE, STATE as CALL_STATE} from '@wireapp/avs';
 import React, {Fragment, useEffect} from 'react';
 import {container} from 'tsyringe';
 
-import {registerReactComponent, useKoSubscribableChildren} from 'Util/ComponentUtil';
+import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 
 import {Call} from '../../calling/Call';
 import {CallingRepository} from '../../calling/CallingRepository';
@@ -204,4 +204,4 @@ const CallingContainer: React.FC<CallingContainerProps> = ({
   );
 };
 
-registerReactComponent('calling-overlay-container', CallingContainer);
+export default CallingContainer;

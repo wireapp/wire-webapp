@@ -59,7 +59,8 @@ import {MotionDuration} from '../../motion/MotionDuration';
 import {RootContext} from '../../page/RootProvider';
 import {UserState} from '../../user/UserState';
 import {TeamState} from '../../team/TeamState';
-import {openRightSidebar, PanelState} from '../../page/RightSidebar/RightSidebar';
+import {PanelState} from '../../page/RightSidebar/RightSidebar';
+import {RightSidebarParams} from '../../page/AppMain';
 
 type ReadMessageBuffer = {conversation: ConversationEntity; message: Message};
 
@@ -67,9 +68,17 @@ interface ConversationListProps {
   readonly initialMessage?: Message;
   readonly teamState: TeamState;
   readonly userState: UserState;
+  openRightSidebar: (panelState: PanelState, params: RightSidebarParams) => void;
+  isRightSidebarOpen?: boolean;
 }
 
-const ConversationList: FC<ConversationListProps> = ({initialMessage, teamState, userState}) => {
+const ConversationList: FC<ConversationListProps> = ({
+  initialMessage,
+  teamState,
+  userState,
+  openRightSidebar,
+  isRightSidebarOpen = false,
+}) => {
   const messageListLogger = getLogger('ConversationList');
 
   const contentViewModel = useContext(RootContext);
@@ -110,7 +119,7 @@ const ConversationList: FC<ConversationListProps> = ({initialMessage, teamState,
     return null;
   }
 
-  const {conversationRepository, repositories, mainViewModel, isFederated} = contentViewModel;
+  const {conversationRepository, repositories, mainViewModel} = contentViewModel;
 
   const openGiphy = (text: string) => {
     setInputValue(text);
@@ -120,15 +129,7 @@ const ConversationList: FC<ConversationListProps> = ({initialMessage, teamState,
   const closeGiphy = () => setIsGiphyModalOpen(false);
 
   const clickOnInvitePeople = (conversation: ConversationEntity): void => {
-    openRightSidebar({
-      initialEntity: conversation,
-      initialState: PanelState.GUEST_OPTIONS,
-      isFederated,
-      mainViewModel,
-      repositories,
-      teamState,
-      userState,
-    });
+    openRightSidebar(PanelState.GUEST_OPTIONS, {entity: conversation});
   };
 
   const clickOnCancelRequest = (messageEntity: MemberMessage): void => {
@@ -147,59 +148,25 @@ const ConversationList: FC<ConversationListProps> = ({initialMessage, teamState,
       isUserEntity &&
       (userEntity.isDeleted || (isSingleModeConversation && !userEntity.isMe))
     ) {
-      openRightSidebar({
-        initialEntity: activeConversation,
-        initialState: PanelState.CONVERSATION_DETAILS,
-        isFederated,
-        mainViewModel,
-        repositories,
-        teamState,
-        userState,
-      });
+      openRightSidebar(PanelState.CONVERSATION_DETAILS, {entity: activeConversation});
 
       return;
     }
 
     const panelId = userEntity.isService ? PanelState.GROUP_PARTICIPANT_SERVICE : PanelState.GROUP_PARTICIPANT_USER;
 
-    openRightSidebar({
-      initialEntity: userEntity,
-      initialState: panelId,
-      isFederated,
-      mainViewModel,
-      repositories,
-      teamState,
-      userState,
-    });
+    openRightSidebar(panelId, {entity: userEntity});
   };
 
   const showParticipants = (participants: User[]) => {
     if (activeConversation) {
-      openRightSidebar({
-        highlighted: participants,
-        initialEntity: activeConversation,
-        initialState: PanelState.CONVERSATION_PARTICIPANTS,
-        isFederated,
-        mainViewModel,
-        repositories,
-        teamState,
-        userState,
-      });
+      openRightSidebar(PanelState.CONVERSATION_PARTICIPANTS, {entity: activeConversation, highlighted: participants});
     }
   };
 
   const showMessageDetails = (message: Message, showLikes = false) => {
     if (!is1to1) {
-      openRightSidebar({
-        initialEntity: message,
-        initialState: PanelState.MESSAGE_DETAILS,
-        isFederated,
-        mainViewModel,
-        repositories,
-        showLikes,
-        teamState,
-        userState,
-      });
+      openRightSidebar(PanelState.MESSAGE_DETAILS, {entity: message, showLikes});
     }
   };
 
@@ -243,7 +210,7 @@ const ConversationList: FC<ConversationListProps> = ({initialMessage, teamState,
       ? (event.target as HTMLElement).closest<HTMLSpanElement>('.message-mention')
       : undefined;
     const userId = mentionElement?.dataset.userId;
-    const domain = mentionElement?.dataset.domain;
+    const domain = mentionElement?.dataset.userDomain;
 
     if (userId && domain) {
       (async () => {
@@ -391,12 +358,13 @@ const ConversationList: FC<ConversationListProps> = ({initialMessage, teamState,
       {activeConversation && (
         <>
           <TitleBar
-            mainViewModel={mainViewModel}
             repositories={repositories}
             conversation={activeConversation}
             userState={userState}
             teamState={teamState}
             callActions={mainViewModel.calling.callActions}
+            openRightSidebar={openRightSidebar}
+            isRightSidebarOpen={isRightSidebarOpen}
           />
 
           <MessagesList

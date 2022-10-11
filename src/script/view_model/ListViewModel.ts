@@ -46,8 +46,10 @@ import {ConversationState} from '../conversation/ConversationState';
 import {CallingViewModel} from './CallingViewModel';
 import {PropertiesRepository} from '../properties/PropertiesRepository';
 import {SearchRepository} from '../search/SearchRepository';
-import {openRightSidebar, PanelState} from '../page/RightSidebar/RightSidebar';
 import PrimaryModal from '../components/Modals/PrimaryModal';
+import {useAppMainState} from '../page/state';
+import {PanelState} from '../page/RightSidebar/RightSidebar';
+import React from 'react';
 
 export enum ListState {
   ARCHIVE = 'ListViewModel.STATE.ARCHIVE',
@@ -67,7 +69,6 @@ export class ListViewModel {
   readonly state: ko.Observable<string>;
   readonly lastUpdate: ko.Observable<number>;
   readonly isFederated: boolean;
-  private readonly elementId: 'left-column';
 
   public readonly mainViewModel: MainViewModel;
   public readonly conversationRepository: ConversationRepository;
@@ -99,7 +100,6 @@ export class ListViewModel {
     this.conversationState = container.resolve(ConversationState);
 
     this.mainViewModel = mainViewModel;
-    this.elementId = 'left-column';
     this.isFederated = mainViewModel.isFederated;
     this.repositories = repositories;
     this.conversationRepository = repositories.conversation;
@@ -144,8 +144,6 @@ export class ListViewModel {
     });
 
     this._initSubscriptions();
-
-    ko.applyBindings(this, document.getElementById(this.elementId));
   }
 
   private readonly _initSubscriptions = () => {
@@ -182,15 +180,8 @@ export class ListViewModel {
 
   readonly changeNotificationSetting = () => {
     if (this.isProAccount()) {
-      openRightSidebar({
-        initialEntity: this.conversationState.activeConversation(),
-        initialState: PanelState.NOTIFICATIONS,
-        isFederated: this.mainViewModel.isFederated,
-        mainViewModel: this.mainViewModel,
-        repositories: this.repositories,
-        teamState: this.teamState,
-        userState: this.userState,
-      });
+      const {rightSidebar} = useAppMainState.getState();
+      rightSidebar.goTo(PanelState.NOTIFICATIONS, {entity: this.conversationState.activeConversation()});
     } else {
       this.clickToToggleMute();
     }

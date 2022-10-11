@@ -29,7 +29,6 @@ import {Runtime} from '@wireapp/commons';
 
 import React, {useEffect} from 'react';
 import Icon from 'Components/Icon';
-import {registerReactComponent} from 'Util/ComponentUtil';
 import {CONFIG, TYPE} from './WarningsTypes';
 import {closeWarning, useWarningsState} from './WarningsState';
 
@@ -332,7 +331,5 @@ const WarningsContainer: React.FC = () => {
     </div>
   );
 };
-
-registerReactComponent('warnings-container', WarningsContainer);
 
 export default WarningsContainer;

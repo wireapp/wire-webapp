@@ -33,7 +33,7 @@ import {SIGN_OUT_REASON} from '../auth/SignOutReason';
 import {ClientState} from '../client/ClientState';
 import {AppLockState} from '../user/AppLockState';
 import {AppLockRepository} from '../user/AppLockRepository';
-import {registerReactComponent, useKoSubscribableChildren} from 'Util/ComponentUtil';
+import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import Icon from 'Components/Icon';
 import PrimaryModal from 'Components/Modals/PrimaryModal';
 
@@ -552,7 +552,5 @@ const AppLock: React.FC<AppLockProps> = ({
     </ModalComponent>
   );
 };
-
-registerReactComponent('app-lock-container', AppLock);
 
 export default AppLock;

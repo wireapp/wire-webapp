@@ -19,7 +19,6 @@
 
 import React from 'react';
 
-import {registerReactComponent} from 'Util/ComponentUtil';
 import Icon from '../../Icon';
 import {listCSS} from './PanelActions.styles';
 
@@ -54,5 +53,3 @@ const PanelActions: React.FC<PanelActionsProps> = ({items}) => {
 };
 
 export default PanelActions;
-
-registerReactComponent('panel-actions', PanelActions);

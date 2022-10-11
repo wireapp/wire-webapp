@@ -89,7 +89,6 @@ export class MainViewModel {
   calling: CallingViewModel;
   content: ContentViewModel;
   favicon: FaviconViewModel;
-  isPanelOpen: ko.Observable<boolean>;
   list: ListViewModel;
   logger: Logger;
   mainClasses: ko.PureComputed<string | undefined>;
@@ -129,8 +128,6 @@ export class MainViewModel {
     this.showLikes = false;
 
     this.highlightedUsers = [];
-
-    this.isPanelOpen = ko.observable(false);
 
     this.actions = new ActionsViewModel(
       this,

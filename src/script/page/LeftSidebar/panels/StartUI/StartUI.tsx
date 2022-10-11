@@ -44,6 +44,7 @@ import {ServiceEntity} from 'src/script/integration/ServiceEntity';
 import showUserModal from 'Components/Modals/UserModal';
 import showServiceModal from 'Components/Modals/ServiceModal';
 import showInviteModal from 'Components/Modals/InviteModal';
+import {useAppMainState} from '../../../state';
 
 type StartUIProps = {
   conversationRepository: ConversationRepository;
@@ -112,6 +113,12 @@ const StartUI: React.FC<StartUIProps> = ({
 
   const openContact = async (user: User) => {
     const conversationEntity = await actions.getOrCreate1to1Conversation(user);
+
+    if (!conversationState.isActiveConversation(conversationEntity)) {
+      const {rightSidebar} = useAppMainState.getState();
+      rightSidebar.clearHistory();
+    }
+
     actions.open1to1Conversation(conversationEntity);
   };
 

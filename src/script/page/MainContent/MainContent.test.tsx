@@ -38,6 +38,7 @@ describe('Preferences', () => {
       repositories: {} as any,
       state: ko.observable(ContentState.PREFERENCES_ACCOUNT),
     } as ContentViewModel,
+    openRightSidebar: jest.fn(),
   };
 
   it('renders the right component according to view state', () => {

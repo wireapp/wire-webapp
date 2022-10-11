@@ -30,7 +30,7 @@ import type {User} from '../../entity/User';
 import type {MenuItem} from './PanelActions';
 
 import PanelActions from './PanelActions';
-import {registerReactComponent, useKoSubscribableChildren} from 'Util/ComponentUtil';
+import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {matchQualifiedIds} from 'Util/QualifiedId';
 import {ACCESS_STATE} from '../../conversation/AccessState';
 import {CONVERSATION_TYPE} from '@wireapp/api-client/src/conversation';
@@ -297,5 +297,3 @@ const UserActions: React.FC<UserActionsProps> = ({
 };
 
 export default UserActions;
-
-registerReactComponent('user-actions', UserActions);
