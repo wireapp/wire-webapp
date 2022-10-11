@@ -86,6 +86,8 @@ import {PayloadBundleState} from '@wireapp/core/src/main/conversation';
 import {Core} from '../service/CoreSingleton';
 import {LEAVE_CALL_REASON} from './enum/LeaveCallReason';
 
+const avsLogger = getLogger('avs');
+
 interface MediaStreamQuery {
   audio?: boolean;
   camera?: boolean;
@@ -233,7 +235,6 @@ export class CallingRepository {
   }
 
   private configureCallingApi(wCall: Wcall): Wcall {
-    const avsLogger = getLogger('avs');
     const logLevels: Record<LOG_LEVEL, string> = {
       [LOG_LEVEL.DEBUG]: 'DEBUG',
       [LOG_LEVEL.INFO]: 'INFO ',
@@ -1159,11 +1160,15 @@ export class CallingRepository {
     _: number,
   ): number => {
     (async () => {
-      const response = await axios.post(url, data);
+      try {
+        const response = await axios.post(url, data);
 
-      const {status, data: axiosData} = response;
-      const jsonData = JSON.stringify(axiosData);
-      this.wCall?.sftResp(this.wUser!, status, jsonData, jsonData.length, context);
+        const {status, data: axiosData} = response;
+        const jsonData = JSON.stringify(axiosData);
+        this.wCall?.sftResp(this.wUser!, status, jsonData, jsonData.length, context);
+      } catch (error) {
+        avsLogger.warn(`Request to sft server failed with error`, error);
+      }
     })();
 
     return 0;
