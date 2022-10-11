@@ -246,7 +246,7 @@ export class CallingRepository {
     return wCall;
   }
 
-  private readonly avsLogHandler = (level: LOG_LEVEL, message: string, error: Error) => {
+  private readonly avsLogHandler = (level: LOG_LEVEL, message: string, error: Error | unknown) => {
     const logLevels: Record<LOG_LEVEL, string> = {
       [LOG_LEVEL.DEBUG]: 'DEBUG',
       [LOG_LEVEL.INFO]: 'INFO ',
