@@ -17,7 +17,7 @@
  *
  */
 
-import React, {Fragment, useState, ChangeEvent} from 'react';
+import React, {ChangeEvent, Fragment, useState} from 'react';
 
 import cx from 'classnames';
 import {container} from 'tsyringe';

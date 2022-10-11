@@ -17,7 +17,7 @@
  *
  */
 
-import React, {useState, ChangeEvent} from 'react';
+import React, {ChangeEvent, useState} from 'react';
 
 import {Checkbox, CheckboxLabel, StyledApp, THEME_ID} from '@wireapp/react-ui-kit';
 import cx from 'classnames';
