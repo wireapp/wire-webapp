@@ -246,7 +246,7 @@ export class CallingRepository {
     return wCall;
   }
 
-  private avsLogHandler(level: LOG_LEVEL, message: string, error: Error) {
+  private readonly avsLogHandler = (level: LOG_LEVEL, message: string, error: Error) => {
     const logLevels: Record<LOG_LEVEL, string> = {
       [LOG_LEVEL.DEBUG]: 'DEBUG',
       [LOG_LEVEL.INFO]: 'INFO ',
@@ -262,7 +262,7 @@ export class CallingRepository {
     const trimmedMessage = message.trim();
     logFunctions[level].call(avsLogger, trimmedMessage, error);
     this.callLog.push(`${new Date().toISOString()} [${logLevels[level]}] ${trimmedMessage}`);
-  }
+  };
 
   private createWUser(wCall: Wcall, selfUserId: string, selfClientId: string): number {
     /* cspell:disable */
