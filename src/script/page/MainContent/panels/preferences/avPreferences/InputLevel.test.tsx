@@ -18,6 +18,7 @@
  */
 
 import TestPage from 'Util/test/TestPage';
+
 import InputLevel, {InputLevelProps, MAX_AUDIO_BULLETS} from './InputLevel';
 
 class InputLevelTestPage extends TestPage<InputLevelProps> {

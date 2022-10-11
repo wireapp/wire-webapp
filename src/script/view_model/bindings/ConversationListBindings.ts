@@ -17,10 +17,10 @@
  *
  */
 
-import {amplify} from 'amplify';
-import {throttle} from 'underscore';
 import {WebAppEvents} from '@wireapp/webapp-events';
+import {amplify} from 'amplify';
 import ko from 'knockout';
+import {throttle} from 'underscore';
 
 import {isScrollable, isScrolledBottom, isScrolledTop} from 'Util/scroll-helpers';
 

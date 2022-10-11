@@ -17,9 +17,12 @@
  *
  */
 
-import {CSSObject} from '@emotion/react';
 import React, {useEffect, useId, useRef, useState, useCallback} from 'react';
+
+import {CSSObject} from '@emotion/react';
+
 import {noop, preventFocusOutside} from 'Util/util';
+
 import Icon from './Icon';
 
 interface ModalComponentProps {

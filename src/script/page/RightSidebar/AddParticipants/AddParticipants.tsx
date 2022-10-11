@@ -17,36 +17,35 @@
  *
  */
 
-import cx from 'classnames';
 import {FC, useMemo, useState} from 'react';
 
-import {useKoSubscribableChildren} from 'Util/ComponentUtil';
+import cx from 'classnames';
+
 import Icon from 'Components/Icon';
 import SearchInput from 'Components/SearchInput';
 import ServiceList from 'Components/ServiceList';
 import UserSearchableList from 'Components/UserSearchableList';
-
+import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {handleKeyDown} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
+import {matchQualifiedIds} from 'Util/QualifiedId';
 import {safeWindowOpen} from 'Util/SanitizationUtil';
 import {sortUsersByPriority} from 'Util/StringUtil';
-import {matchQualifiedIds} from 'Util/QualifiedId';
-
-import PanelHeader from '../PanelHeader';
-import {PanelEntity, PanelState} from '../RightSidebar';
 
 import {ConversationRepository} from '../../../conversation/ConversationRepository';
 import {Conversation} from '../../../entity/Conversation';
 import {User} from '../../../entity/User';
 import {getManageServicesUrl} from '../../../externalRoute';
-import {ServiceEntity} from '../../../integration/ServiceEntity';
 import {IntegrationRepository} from '../../../integration/IntegrationRepository';
+import {ServiceEntity} from '../../../integration/ServiceEntity';
 import {SearchRepository} from '../../../search/SearchRepository';
 import {TeamRepository} from '../../../team/TeamRepository';
 import {TeamState} from '../../../team/TeamState';
 import {initFadingScrollbar} from '../../../ui/fadingScrollbar';
-import {UserState} from '../../../user/UserState';
 import {generatePermissionHelpers} from '../../../user/UserPermission';
+import {UserState} from '../../../user/UserState';
+import PanelHeader from '../PanelHeader';
+import {PanelEntity, PanelState} from '../RightSidebar';
 
 interface AddParticipantsProps {
   activeConversation: Conversation;

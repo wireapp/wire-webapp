@@ -17,11 +17,13 @@
  *
  */
 
-import TestPage from 'Util/test/TestPage';
-import SearchInput, {SearchInputProps} from 'Components/SearchInput';
 import ko from 'knockout';
-import {User} from '../entity/User';
+
+import SearchInput, {SearchInputProps} from 'Components/SearchInput';
 import {KEY} from 'Util/KeyboardUtil';
+import TestPage from 'Util/test/TestPage';
+
+import {User} from '../entity/User';
 
 class SearchInputPage extends TestPage<SearchInputProps> {
   constructor(props?: SearchInputProps) {

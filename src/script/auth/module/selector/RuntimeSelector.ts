@@ -17,9 +17,10 @@
  *
  */
 
+import {Runtime} from '@wireapp/commons';
+
 import {Config} from '../../../Config';
 import type {RootState} from '../reducer';
-import {Runtime} from '@wireapp/commons';
 
 export const isChecking = (state: RootState) =>
   state.runtimeState.isCheckingIndexedDb || state.runtimeState.isCheckingCookie;

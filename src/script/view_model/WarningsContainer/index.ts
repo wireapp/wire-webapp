@@ -17,9 +17,9 @@
  *
  */
 
-import {CONFIG, TYPE} from './WarningsTypes';
-import {showWarning, hideWarning} from './WarningsState';
 import './WarningsContainer';
+import {hideWarning, showWarning} from './WarningsState';
+import {CONFIG, TYPE} from './WarningsTypes';
 
 export const Warnings = {
   CONFIG,

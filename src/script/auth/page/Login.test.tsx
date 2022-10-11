@@ -17,18 +17,19 @@
  *
  */
 
+import {fireEvent, waitFor} from '@testing-library/react';
+import {ClientType} from '@wireapp/api-client/src/client';
+import {TypeUtil} from '@wireapp/commons';
+
+import Login from './Login';
+
+import {Config, Configuration} from '../../Config';
+import {actionRoot} from '../module/action';
+import {BackendError} from '../module/action/BackendError';
 import {initialRootState} from '../module/reducer';
+import {ROUTE} from '../route';
 import {mockStoreFactory} from '../util/test/mockStoreFactory';
 import {mountComponent} from '../util/test/TestUtil';
-import Login from './Login';
-import {Config, Configuration} from '../../Config';
-import {TypeUtil} from '@wireapp/commons';
-import {actionRoot} from '../module/action';
-
-import {ROUTE} from '../route';
-import {ClientType} from '@wireapp/api-client/src/client';
-import {BackendError} from '../module/action/BackendError';
-import {fireEvent, waitFor} from '@testing-library/react';
 
 jest.mock('../util/SVGProvider');
 

@@ -17,27 +17,31 @@
  *
  */
 
-import {css} from '@emotion/react';
 import React from 'react';
-import {t} from 'Util/LocalizerUtil';
-import {ListViewModel} from '../../../../view_model/ListViewModel';
-import {useKoSubscribableChildren} from 'Util/ComponentUtil';
-import {ConversationState} from '../../../../conversation/ConversationState';
-import {Conversation} from '../../../../entity/Conversation';
-import ConversationListCell from 'Components/list/ConversationListCell';
-import GroupedConversations from './GroupedConversations';
-import {createNavigate} from '../../../../router/routerBindings';
-import {generateConversationUrl} from '../../../../router/routeGenerator';
-import {CallState} from '../../../../calling/CallState';
-import {Call} from 'src/script/calling/Call';
-import {matchQualifiedIds} from 'Util/QualifiedId';
-import {ConversationRepository} from '../../../../conversation/ConversationRepository';
+
+import {css} from '@emotion/react';
+
 import Avatar, {AVATAR_SIZE} from 'Components/Avatar';
 import GroupAvatar from 'Components/avatar/GroupAvatar';
-import {ContentState} from '../../../../view_model/ContentViewModel';
-import {ConverationViewStyle} from './Conversations';
+import ConversationListCell from 'Components/list/ConversationListCell';
+import {Call} from 'src/script/calling/Call';
 import {User} from 'src/script/entity/User';
+import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {handleKeyDown} from 'Util/KeyboardUtil';
+import {t} from 'Util/LocalizerUtil';
+import {matchQualifiedIds} from 'Util/QualifiedId';
+
+import {ConverationViewStyle} from './Conversations';
+import GroupedConversations from './GroupedConversations';
+
+import {CallState} from '../../../../calling/CallState';
+import {ConversationRepository} from '../../../../conversation/ConversationRepository';
+import {ConversationState} from '../../../../conversation/ConversationState';
+import {Conversation} from '../../../../entity/Conversation';
+import {generateConversationUrl} from '../../../../router/routeGenerator';
+import {createNavigate} from '../../../../router/routerBindings';
+import {ContentState} from '../../../../view_model/ContentViewModel';
+import {ListViewModel} from '../../../../view_model/ListViewModel';
 import {useAppMainState} from '../../../state';
 
 export const ConversationsList: React.FC<{

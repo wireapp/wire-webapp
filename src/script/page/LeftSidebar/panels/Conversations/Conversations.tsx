@@ -17,38 +17,41 @@
  *
  */
 
-import Icon from 'Components/Icon';
 import React, {useEffect, useState} from 'react';
-import {container} from 'tsyringe';
-import {t} from 'Util/LocalizerUtil';
 
-import {ListState, ListViewModel} from '../../../../view_model/ListViewModel';
-import ListWrapper from '../ListWrapper';
-import {useKoSubscribableChildren} from 'Util/ComponentUtil';
-import {User} from '../../../../entity/User';
-import {ConversationState} from '../../../../conversation/ConversationState';
-import {Shortcut} from '../../../../ui/Shortcut';
-import {ShortcutType} from '../../../../ui/ShortcutType';
-import {PropertiesRepository} from '../../../../properties/PropertiesRepository';
-import {PROPERTIES_TYPE} from '../../../../properties/PropertiesType';
-import {CallState} from '../../../../calling/CallState';
-import {ConversationRepository} from '../../../../conversation/ConversationRepository';
-import {DefaultLabelIds} from '../../../../conversation/ConversationLabelRepository';
-import ConversationListCallingCell from 'Components/list/ConversationListCallingCell';
-import AvailabilityState from 'Components/AvailabilityState';
-import LegalHoldDot from 'Components/LegalHoldDot';
-import {TeamState} from '../../../../team/TeamState';
-import {AvailabilityContextMenu} from '../../../../ui/AvailabilityContextMenu';
-import {UserState} from '../../../../user/UserState';
-import {ConversationsList} from './ConversationsList';
-import {PreferenceNotificationRepository} from '../../../../notification/PreferenceNotificationRepository';
-import {useFolderState} from './state';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import {amplify} from 'amplify';
-import useRoveFocus from '../../../../hooks/useRoveFocus';
+import {container} from 'tsyringe';
+
+import AvailabilityState from 'Components/AvailabilityState';
+import Icon from 'Components/Icon';
+import LegalHoldDot from 'Components/LegalHoldDot';
+import ConversationListCallingCell from 'Components/list/ConversationListCallingCell';
+import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {isTabKey} from 'Util/KeyboardUtil';
+import {t} from 'Util/LocalizerUtil';
+
+import {ConversationsList} from './ConversationsList';
+import {useFolderState} from './state';
+
+import {CallState} from '../../../../calling/CallState';
+import {DefaultLabelIds} from '../../../../conversation/ConversationLabelRepository';
+import {ConversationRepository} from '../../../../conversation/ConversationRepository';
+import {ConversationState} from '../../../../conversation/ConversationState';
+import {User} from '../../../../entity/User';
+import useRoveFocus from '../../../../hooks/useRoveFocus';
 import {useMLSConversationState} from '../../../../mls/mlsConversationState';
+import {PreferenceNotificationRepository} from '../../../../notification/PreferenceNotificationRepository';
+import {PropertiesRepository} from '../../../../properties/PropertiesRepository';
+import {PROPERTIES_TYPE} from '../../../../properties/PropertiesType';
+import {TeamState} from '../../../../team/TeamState';
+import {AvailabilityContextMenu} from '../../../../ui/AvailabilityContextMenu';
+import {Shortcut} from '../../../../ui/Shortcut';
+import {ShortcutType} from '../../../../ui/ShortcutType';
+import {UserState} from '../../../../user/UserState';
+import {ListState, ListViewModel} from '../../../../view_model/ListViewModel';
 import {useAppMainState} from '../../../state';
+import ListWrapper from '../ListWrapper';
 
 type ConversationsProps = {
   callState?: CallState;
@@ -190,7 +193,6 @@ const Conversations: React.FC<ConversationsProps> = ({
           className="left-list-header-text"
           data-uie-name="status-name"
           role="presentation"
-          // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex
           tabIndex={0}
           onBlur={event => {
             // personal user won't see availability status menu, on blur of the user name

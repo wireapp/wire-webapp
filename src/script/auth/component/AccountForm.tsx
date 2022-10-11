@@ -17,13 +17,18 @@
  *
  */
 
+import React from 'react';
+
 import {ValidationUtil} from '@wireapp/commons';
 import {Button, Checkbox, CheckboxLabel, Form, Input, InputBlock, Small} from '@wireapp/react-ui-kit';
-import React from 'react';
 import {FormattedMessage, useIntl} from 'react-intl';
 import {connect} from 'react-redux';
 import {AnyAction, Dispatch} from 'redux';
+
 import {KEY} from 'Util/KeyboardUtil';
+
+import Exception from './Exception';
+
 import {Config} from '../../Config';
 import {accountFormStrings} from '../../strings';
 import {actionRoot as ROOT_ACTIONS} from '../module/action/';
@@ -32,7 +37,6 @@ import {ValidationError} from '../module/action/ValidationError';
 import {RootState, bindActionCreators} from '../module/reducer';
 import * as AuthSelector from '../module/selector/AuthSelector';
 import * as AccentColor from '../util/AccentColor';
-import Exception from './Exception';
 
 interface Props extends React.HTMLProps<HTMLFormElement> {
   beforeSubmit?: () => Promise<void>;

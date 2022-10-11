@@ -20,13 +20,14 @@
 import {waitFor} from '@testing-library/react';
 import {act} from 'react-dom/test-utils';
 
+import {AVATAR_SIZE} from 'Components/Avatar';
+import {AssetRemoteData} from 'src/script/assets/AssetRemoteData';
 import TestPage from 'Util/test/TestPage';
 
 import AvatarImage, {AvatarImageProps} from './AvatarImage';
-import {User} from '../../entity/User';
+
 import {AssetRepository} from '../../assets/AssetRepository';
-import {AVATAR_SIZE} from 'Components/Avatar';
-import {AssetRemoteData} from 'src/script/assets/AssetRemoteData';
+import {User} from '../../entity/User';
 
 jest.mock('../../auth/util/SVGProvider');
 

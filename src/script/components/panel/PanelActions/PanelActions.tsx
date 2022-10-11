@@ -19,8 +19,9 @@
 
 import React from 'react';
 
-import Icon from '../../Icon';
 import {listCSS} from './PanelActions.styles';
+
+import Icon from '../../Icon';
 
 export interface MenuItem {
   click: () => void;

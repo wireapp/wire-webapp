@@ -19,9 +19,10 @@
 
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 
-import {actionRoot} from '.';
 import {mockStoreFactory} from '../../util/test/mockStoreFactory';
 import {ClientActionCreator} from '../action/creator/';
+
+import {actionRoot} from '.';
 
 describe('ClientAction', () => {
   it('fetches all self clients', async () => {

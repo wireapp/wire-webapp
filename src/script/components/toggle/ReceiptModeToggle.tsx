@@ -18,6 +18,7 @@
  */
 
 import React, {Fragment} from 'react';
+
 import {RECEIPT_MODE} from '@wireapp/api-client/src/conversation/data';
 
 import {t} from 'Util/LocalizerUtil';

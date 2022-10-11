@@ -18,16 +18,18 @@
  */
 
 import React from 'react';
+
+import {QualifiedId} from '@wireapp/api-client/src/user';
 import {VIDEO_STATE} from '@wireapp/avs';
 
-import {t} from 'Util/LocalizerUtil';
+import Avatar, {AVATAR_SIZE} from 'Components/Avatar';
 import Icon from 'Components/Icon';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
+import {t} from 'Util/LocalizerUtil';
 
 import Video from './Video';
+
 import type {Participant} from '../../calling/Participant';
-import Avatar, {AVATAR_SIZE} from 'Components/Avatar';
-import {QualifiedId} from '@wireapp/api-client/src/user';
 
 export interface GroupVideoGridTileProps {
   isMaximized: boolean;

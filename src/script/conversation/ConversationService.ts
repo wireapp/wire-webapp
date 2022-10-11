@@ -41,6 +41,7 @@ import type {
   ConversationReceiptModeUpdateEvent,
   ConversationRenameEvent,
 } from '@wireapp/api-client/src/event';
+import {QualifiedId} from '@wireapp/api-client/src/user';
 import {container} from 'tsyringe';
 
 import {Logger, getLogger} from 'Util/Logger';
@@ -49,11 +50,10 @@ import type {Conversation as ConversationEntity} from '../entity/Conversation';
 import type {EventService} from '../event/EventService';
 import {MessageCategory} from '../message/MessageCategory';
 import {search as fullTextSearch} from '../search/FullTextSearch';
-import {StorageService} from '../storage';
-import {StorageSchemata} from '../storage/StorageSchemata';
 import {APIClient} from '../service/APIClientSingleton';
+import {StorageService} from '../storage';
 import {ConversationRecord} from '../storage/record/ConversationRecord';
-import {QualifiedId} from '@wireapp/api-client/src/user';
+import {StorageSchemata} from '../storage/StorageSchemata';
 
 export class ConversationService {
   private readonly eventService: EventService;

@@ -17,25 +17,26 @@
  *
  */
 
-import {amplify} from 'amplify';
-import {WebAppEvents} from '@wireapp/webapp-events';
-import type {WebappProperties} from '@wireapp/api-client/src/user/data/';
 import {KeyboardEvent, useEffect, useRef, useState} from 'react';
 
+import type {WebappProperties} from '@wireapp/api-client/src/user/data/';
+import {WebAppEvents} from '@wireapp/webapp-events';
+import {amplify} from 'amplify';
+
 import {isEnterKey, isKey, KEY} from 'Util/KeyboardUtil';
+import {updateMentionRanges} from 'Util/MentionUtil';
 import {getCursorPixelPosition} from 'Util/PopupUtil';
 import {loadValue, storeValue} from 'Util/StorageUtil';
 import {sortByPriority} from 'Util/StringUtil';
 
+import emojiBindings from './emoji.json';
+import EmojiItem from './EmojiItem';
+import inlineReplacements from './inlineReplacements';
+
+import {MentionEntity} from '../../message/MentionEntity';
 import {PropertiesRepository} from '../../properties/PropertiesRepository';
 import {PROPERTIES_TYPE} from '../../properties/PropertiesType';
 import {StorageKey} from '../../storage';
-
-import emojiBindings from './emoji.json';
-import inlineReplacements from './inlineReplacements';
-import EmojiItem from './EmojiItem';
-import {MentionEntity} from '../../message/MentionEntity';
-import {updateMentionRanges} from 'Util/MentionUtil';
 
 const escapeRegexp = (string: string): string => string.replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&');
 

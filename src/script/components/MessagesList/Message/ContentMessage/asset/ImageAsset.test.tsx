@@ -17,13 +17,15 @@
  *
  */
 
+import {render, waitFor} from '@testing-library/react';
+import {container} from 'tsyringe';
+
+import {AssetRemoteData} from 'src/script/assets/AssetRemoteData';
+import {AssetRepository} from 'src/script/assets/AssetRepository';
 import {ContentMessage} from 'src/script/entity/message/ContentMessage';
 import {MediumImage} from 'src/script/entity/message/MediumImage';
+
 import ImageAsset, {ImageAssetProps} from './ImageAsset';
-import {container} from 'tsyringe';
-import {AssetRepository} from 'src/script/assets/AssetRepository';
-import {AssetRemoteData} from 'src/script/assets/AssetRemoteData';
-import {render, waitFor} from '@testing-library/react';
 
 jest.mock(
   'Components/utils/InViewport',

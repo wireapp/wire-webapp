@@ -17,20 +17,21 @@
  *
  */
 
+import React, {useEffect} from 'react';
+
+import {Runtime} from '@wireapp/commons';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import {amplify} from 'amplify';
 import cx from 'classnames';
 
+import Icon from 'Components/Icon';
 import {t} from 'Util/LocalizerUtil';
 import {afterRender} from 'Util/util';
 
-import {Config} from '../../Config';
-import {Runtime} from '@wireapp/commons';
-
-import React, {useEffect} from 'react';
-import Icon from 'Components/Icon';
-import {CONFIG, TYPE} from './WarningsTypes';
 import {closeWarning, useWarningsState} from './WarningsState';
+import {CONFIG, TYPE} from './WarningsTypes';
+
+import {Config} from '../../Config';
 
 const WarningsContainer: React.FC = () => {
   const name = useWarningsState(state => state.name);

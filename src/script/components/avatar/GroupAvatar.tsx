@@ -18,6 +18,7 @@
  */
 
 import React from 'react';
+
 import {CSS_SQUARE, CSS_FLEX_CENTER} from 'Util/CSSMixin';
 
 import type {User} from '../../entity/User';

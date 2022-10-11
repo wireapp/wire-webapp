@@ -18,13 +18,16 @@
  */
 
 import React, {useState} from 'react';
+
 import cx from 'classnames';
 
 import Icon from 'Components/Icon';
 import ModalComponent from 'Components/ModalComponent';
-import {initFadingScrollbar} from '../../../ui/fadingScrollbar';
-import {Action, PrimaryModalType} from './PrimaryModalTypes';
+
 import {usePrimaryModalState, showNextModalInQueue, defaultContent, removeCurrentModal} from './PrimaryModalState';
+import {Action, PrimaryModalType} from './PrimaryModalTypes';
+
+import {initFadingScrollbar} from '../../../ui/fadingScrollbar';
 
 export const PrimaryModalComponent: React.FC = () => {
   const [inputValue, updateInputValue] = useState<string>('');
@@ -133,12 +136,19 @@ export const PrimaryModalComponent: React.FC = () => {
                     type="password"
                     value={passwordValue}
                     placeholder={inputPlaceholder}
+                    onChange={event => updatePasswordValue(event.target.value)}
                   />
                 </form>
               )}
               {hasInput && (
                 <form onSubmit={() => doAction(confirm, !!closeOnConfirm)}>
-                  <input maxLength={64} className="modal__input" value={inputValue} placeholder={inputPlaceholder} />
+                  <input
+                    maxLength={64}
+                    className="modal__input"
+                    value={inputValue}
+                    placeholder={inputPlaceholder}
+                    onChange={event => updateInputValue(event.target.value)}
+                  />
                 </form>
               )}
               {errorMessage && <div className="modal__input__error">{errorMessage}</div>}
@@ -151,6 +161,7 @@ export const PrimaryModalComponent: React.FC = () => {
                       id="clear-data-checkbox"
                       checked={optionChecked}
                       data-uie-name="modal-option-checkbox"
+                      onChange={event => updateOptionChecked(event.target.checked)}
                     />
                     <label className="label-xs" htmlFor="clear-data-checkbox">
                       <span className="modal-option-text text-background">{checkboxLabel}</span>

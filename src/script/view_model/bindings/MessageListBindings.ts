@@ -17,8 +17,8 @@
  *
  */
 
-import ko from 'knockout';
 import 'jquery-mousewheel';
+import ko from 'knockout';
 
 ko.bindingHandlers.infinite_scroll = {
   init(scrollingElement: HTMLElement, params: () => {onHitBottom: () => void; onHitTop: () => void}) {

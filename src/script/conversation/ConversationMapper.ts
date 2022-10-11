@@ -17,9 +17,6 @@
  *
  */
 
-import {isObject} from 'underscore';
-import ko from 'knockout';
-import {LegalHoldStatus} from '@wireapp/protocol-messaging';
 import {
   Conversation as ConversationBackendData,
   ConversationCode,
@@ -31,13 +28,19 @@ import {
   RemoteConversations,
 } from '@wireapp/api-client/src/conversation';
 import {QualifiedId} from '@wireapp/api-client/src/user';
+import {LegalHoldStatus} from '@wireapp/protocol-messaging';
+import ko from 'knockout';
+import {isObject} from 'underscore';
+
+import {matchQualifiedIds, QualifiedEntity} from 'Util/QualifiedId';
+
 import {ACCESS_STATE} from './AccessState';
 import {ConversationStatus} from './ConversationStatus';
+
 import {Conversation} from '../entity/Conversation';
 import {BASE_ERROR_TYPE, BaseError} from '../error/BaseError';
 import {ConversationError} from '../error/ConversationError';
 import {ConversationRecord} from '../storage/record/ConversationRecord';
-import {matchQualifiedIds, QualifiedEntity} from 'Util/QualifiedId';
 
 /** Conversation self data from the database. */
 export interface SelfStatusUpdateDatabaseData {

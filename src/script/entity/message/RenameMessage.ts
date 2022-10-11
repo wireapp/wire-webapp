@@ -17,13 +17,14 @@
  *
  */
 
-import ko from 'knockout';
 import {CONVERSATION_EVENT} from '@wireapp/api-client/src/event/';
+import ko from 'knockout';
 
 import {t} from 'Util/LocalizerUtil';
 
-import {SystemMessageType} from '../../message/SystemMessageType';
 import {SystemMessage} from './SystemMessage';
+
+import {SystemMessageType} from '../../message/SystemMessageType';
 
 export class RenameMessage extends SystemMessage {
   public readonly system_message_type: SystemMessageType;

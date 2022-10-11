@@ -20,8 +20,9 @@
 /** Reference: https://www.freecodecamp.org/news/html-roving-tabindex-attribute-explained-with-examples/ */
 
 import {useCallback, useState} from 'react';
-import {isKey, isTabKey, KEY} from 'Util/KeyboardUtil';
 import type {KeyboardEvent as ReactKeyboardEvent} from 'react';
+
+import {isKey, isTabKey, KEY} from 'Util/KeyboardUtil';
 
 function useRoveFocus(size: number, defaultFocus = 0) {
   const [currentFocus, setCurrentFocus] = useState(defaultFocus);

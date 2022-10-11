@@ -21,13 +21,10 @@ import {FC, useEffect} from 'react';
 
 import Icon from 'Components/Icon';
 import ServiceDetails from 'Components/panel/ServiceDetails';
-
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {handleKeyDown} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
 import {matchQualifiedIds} from 'Util/QualifiedId';
-
-import PanelHeader from '../PanelHeader';
 
 import {Conversation} from '../../../entity/Conversation';
 import {User} from '../../../entity/User';
@@ -37,6 +34,7 @@ import {initFadingScrollbar} from '../../../ui/fadingScrollbar';
 import {generatePermissionHelpers} from '../../../user/UserPermission';
 import {UserState} from '../../../user/UserState';
 import {ActionsViewModel} from '../../../view_model/ActionsViewModel';
+import PanelHeader from '../PanelHeader';
 
 interface GroupParticipantServiceProps {
   activeConversation: Conversation;

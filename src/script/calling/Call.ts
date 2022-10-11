@@ -17,18 +17,20 @@
  *
  */
 
+import {QualifiedId} from '@wireapp/api-client/src/user';
 import {CALL_TYPE, CONV_TYPE, STATE as CALL_STATE} from '@wireapp/avs';
 import ko from 'knockout';
 
 import {chunk, getDifference, partition} from 'Util/ArrayUtil';
+import {matchQualifiedIds} from 'Util/QualifiedId';
 import {sortUsersByPriority} from 'Util/StringUtil';
+
+import {MuteState} from './CallState';
 import {CALL_MESSAGE_TYPE} from './enum/CallMessageType';
 import type {Participant, ClientId} from './Participant';
-import type {MediaDevicesHandler} from '../media/MediaDevicesHandler';
+
 import {Config} from '../Config';
-import {QualifiedId} from '@wireapp/api-client/src/user';
-import {matchQualifiedIds} from 'Util/QualifiedId';
-import {MuteState} from './CallState';
+import type {MediaDevicesHandler} from '../media/MediaDevicesHandler';
 
 export type SerializedConversationId = string;
 

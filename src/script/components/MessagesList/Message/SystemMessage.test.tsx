@@ -17,14 +17,16 @@
  *
  */
 
+import {render} from '@testing-library/react';
 import ko from 'knockout';
+
 import {DeleteConversationMessage} from 'src/script/entity/message/DeleteConversationMessage';
 import {MessageTimerUpdateMessage} from 'src/script/entity/message/MessageTimerUpdateMessage';
 import {ReceiptModeUpdateMessage} from 'src/script/entity/message/ReceiptModeUpdateMessage';
 import {RenameMessage} from 'src/script/entity/message/RenameMessage';
 import {SystemMessageType} from 'src/script/message/SystemMessageType';
+
 import SystemMessage from './SystemMessage';
-import {render} from '@testing-library/react';
 
 jest.mock('Components/Icon', () => ({
   Edit: function EditIcon() {

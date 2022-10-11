@@ -17,26 +17,27 @@
  *
  */
 
+import React, {useEffect, useMemo, useState} from 'react';
+
+import {ClientClassification} from '@wireapp/api-client/src/client/';
 import ko from 'knockout';
 
-import React, {useEffect, useMemo, useState} from 'react';
-import {ClientClassification} from '@wireapp/api-client/src/client/';
-
 import {partition} from 'Util/ArrayUtil';
+import {t} from 'Util/LocalizerUtil';
 import {getLogger} from 'Util/Logger';
 import {capitalizeFirstChar} from 'Util/StringUtil';
-import {t} from 'Util/LocalizerUtil';
 
+import DeviceDetails from './userDevices/DeviceDetails';
+import DeviceList from './userDevices/DeviceList';
+import NoDevicesFound from './userDevices/NoDevicesFound';
+import SelfFingerprint from './userDevices/SelfFingerprint';
+
+import {ClientEntity} from '../client/ClientEntity';
 import {ClientRepository} from '../client/ClientRepository';
 import {ConversationState} from '../conversation/ConversationState';
 import {MessageRepository} from '../conversation/MessageRepository';
 import {CryptographyRepository} from '../cryptography/CryptographyRepository';
 import {User} from '../entity/User';
-import {ClientEntity} from '../client/ClientEntity';
-import SelfFingerprint from './userDevices/SelfFingerprint';
-import DeviceDetails from './userDevices/DeviceDetails';
-import NoDevicesFound from './userDevices/NoDevicesFound';
-import DeviceList from './userDevices/DeviceList';
 
 enum FIND_MODE {
   FOUND = 'UserDevices.MODE.FOUND',

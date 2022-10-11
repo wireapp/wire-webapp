@@ -18,13 +18,14 @@
  */
 
 import React, {useState, useEffect, useRef} from 'react';
+
 import cx from 'classnames';
 
 import {interpolate} from 'Util/ArrayUtil';
 import {clamp} from 'Util/NumberUtil';
+import {createRandomUuid} from 'Util/util';
 
 import {FileAsset} from '../../../../../../entity/message/FileAsset';
-import {createRandomUuid} from 'Util/util';
 
 export interface AudioSeekBarProps {
   asset: FileAsset;

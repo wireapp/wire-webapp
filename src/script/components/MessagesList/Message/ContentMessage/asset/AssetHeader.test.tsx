@@ -17,10 +17,12 @@
  *
  */
 
-import AssetHeader from './AssetHeader';
 import {render} from '@testing-library/react';
-import {createRandomUuid} from 'Util/util';
+
 import * as TimeUtil from 'Util/TimeUtil';
+import {createRandomUuid} from 'Util/util';
+
+import AssetHeader from './AssetHeader';
 
 import {Message} from '../../../../../entity/message/Message';
 import {User} from '../../../../../entity/User';

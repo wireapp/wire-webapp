@@ -19,10 +19,10 @@
 
 import {fireEvent, render} from '@testing-library/react';
 
-import Giphy, {GiphyState} from './index';
-
 import {GiphyRepository} from '../../extension/GiphyRepository';
 import {GiphyService} from '../../extension/GiphyService';
+
+import Giphy, {GiphyState} from '.';
 
 const inputValue = 'Yammy yammy';
 const getDefaultProps = () => ({

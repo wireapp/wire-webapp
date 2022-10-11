@@ -18,38 +18,38 @@
  */
 
 import {CONV_TYPE} from '@wireapp/avs';
-import {WebAppEvents} from '@wireapp/webapp-events';
-import ko from 'knockout';
-import {amplify} from 'amplify';
 import {Runtime} from '@wireapp/commons';
+import {WebAppEvents} from '@wireapp/webapp-events';
+import {amplify} from 'amplify';
+import ko from 'knockout';
 import {container} from 'tsyringe';
 
-import {t} from 'Util/LocalizerUtil';
 import {iterateItem} from 'Util/ArrayUtil';
 import {isEscapeKey} from 'Util/KeyboardUtil';
+import {t} from 'Util/LocalizerUtil';
 
+import type {ActionsViewModel} from './ActionsViewModel';
+import {CallingViewModel} from './CallingViewModel';
+import {ContentState, ContentViewModel} from './ContentViewModel';
+import type {MainViewModel, ViewModelRepositories} from './MainViewModel';
+
+import type {CallingRepository} from '../calling/CallingRepository';
+import PrimaryModal from '../components/Modals/PrimaryModal';
+import type {ConversationRepository} from '../conversation/ConversationRepository';
+import {ConversationState} from '../conversation/ConversationState';
+import type {Conversation} from '../entity/Conversation';
+import type {User} from '../entity/User';
+import {PanelState} from '../page/RightSidebar/RightSidebar';
+import {useAppMainState} from '../page/state';
+import {PropertiesRepository} from '../properties/PropertiesRepository';
+import {SearchRepository} from '../search/SearchRepository';
+import type {TeamRepository} from '../team/TeamRepository';
+import {TeamState} from '../team/TeamState';
 import {showContextMenu} from '../ui/ContextMenu';
 import {showLabelContextMenu} from '../ui/LabelContextMenu';
 import {Shortcut} from '../ui/Shortcut';
 import {ShortcutType} from '../ui/ShortcutType';
-import {ContentState, ContentViewModel} from './ContentViewModel';
-import type {MainViewModel, ViewModelRepositories} from './MainViewModel';
-import type {CallingRepository} from '../calling/CallingRepository';
-import type {ConversationRepository} from '../conversation/ConversationRepository';
-import type {TeamRepository} from '../team/TeamRepository';
-import type {ActionsViewModel} from './ActionsViewModel';
-import type {Conversation} from '../entity/Conversation';
-import type {User} from '../entity/User';
 import {UserState} from '../user/UserState';
-import {TeamState} from '../team/TeamState';
-import {ConversationState} from '../conversation/ConversationState';
-import {CallingViewModel} from './CallingViewModel';
-import {PropertiesRepository} from '../properties/PropertiesRepository';
-import {SearchRepository} from '../search/SearchRepository';
-import PrimaryModal from '../components/Modals/PrimaryModal';
-import {useAppMainState} from '../page/state';
-import {PanelState} from '../page/RightSidebar/RightSidebar';
-import React from 'react';
 
 export enum ListState {
   ARCHIVE = 'ListViewModel.STATE.ARCHIVE',

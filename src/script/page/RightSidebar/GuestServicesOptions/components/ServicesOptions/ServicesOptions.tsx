@@ -20,7 +20,6 @@
 import {FC} from 'react';
 
 import BaseToggle from 'Components/toggle/BaseToggle';
-
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 

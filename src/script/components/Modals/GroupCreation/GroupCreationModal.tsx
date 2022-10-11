@@ -18,41 +18,42 @@
  */
 
 import React, {useContext, useEffect, useState, useMemo} from 'react';
-import {container} from 'tsyringe';
-import cx from 'classnames';
-import {amplify} from 'amplify';
-import {WebAppEvents} from '@wireapp/webapp-events';
-import {Button, ButtonVariant, Select, StyledApp, THEME_ID} from '@wireapp/react-ui-kit';
+
 import {RECEIPT_MODE} from '@wireapp/api-client/src/conversation/data/ConversationReceiptModeUpdateData';
 import {ConversationProtocol} from '@wireapp/api-client/src/conversation/NewConversation';
+import {Button, ButtonVariant, Select, StyledApp, THEME_ID} from '@wireapp/react-ui-kit';
+import {WebAppEvents} from '@wireapp/webapp-events';
+import {amplify} from 'amplify';
+import cx from 'classnames';
+import {container} from 'tsyringe';
 
-import {getLogger} from 'Util/Logger';
-import {sortUsersByPriority} from 'Util/StringUtil';
-import {ConversationRepository} from '../../../conversation/ConversationRepository';
-
-import {TeamState} from '../../../team/TeamState';
-import {UserState} from '../../../user/UserState';
-import {useKoSubscribableChildren} from 'Util/ComponentUtil';
+import Icon from 'Components/Icon';
 import ModalComponent from 'Components/ModalComponent';
 import SearchInput from 'Components/SearchInput';
-import UserSearchableList from 'Components/UserSearchableList';
 import TextInput from 'Components/TextInput/TextInput';
 import BaseToggle from 'Components/toggle/BaseToggle';
 import InfoToggle from 'Components/toggle/InfoToggle';
-import {User} from '../../../entity/User';
-import {ACCESS_STATE} from '../../../conversation/AccessState';
-import Icon from 'Components/Icon';
-import {t} from 'Util/LocalizerUtil';
+import UserSearchableList from 'Components/UserSearchableList';
+import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {onEscKey, offEscKey, handleEnterDown} from 'Util/KeyboardUtil';
+import {t} from 'Util/LocalizerUtil';
+import {getLogger} from 'Util/Logger';
+import {sortUsersByPriority} from 'Util/StringUtil';
+
+import {Config} from '../../../Config';
+import {ACCESS_STATE} from '../../../conversation/AccessState';
 import {
   ACCESS_TYPES,
   teamPermissionsForAccessState,
   toggleFeature,
 } from '../../../conversation/ConversationAccessPermission';
-import {initFadingScrollbar} from '../../../ui/fadingScrollbar';
-import {Config} from '../../../Config';
+import {ConversationRepository} from '../../../conversation/ConversationRepository';
+import {User} from '../../../entity/User';
 import {isProtocolOption, ProtocolOption} from '../../../guards/Protocol';
 import {RootContext} from '../../../page/RootProvider';
+import {TeamState} from '../../../team/TeamState';
+import {initFadingScrollbar} from '../../../ui/fadingScrollbar';
+import {UserState} from '../../../user/UserState';
 
 interface GroupCreationModalProps {
   userState?: UserState;

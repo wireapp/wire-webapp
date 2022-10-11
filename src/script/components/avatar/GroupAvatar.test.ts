@@ -17,8 +17,10 @@
  *
  */
 
-import GroupAvatar, {GroupAvatarProps} from './GroupAvatar';
 import TestPage from 'Util/test/TestPage';
+
+import GroupAvatar, {GroupAvatarProps} from './GroupAvatar';
+
 import {User} from '../../entity/User';
 
 class GroupAvatarPage extends TestPage<GroupAvatarProps> {

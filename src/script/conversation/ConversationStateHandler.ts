@@ -24,19 +24,20 @@ import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 
 import {t} from 'Util/LocalizerUtil';
 
-import type {Conversation} from '../entity/Conversation';
 import {AbstractConversationEventHandler, EventHandlingConfig} from './AbstractConversationEventHandler';
 import {ACCESS_STATE} from './AccessState';
-import {ConversationMapper} from './ConversationMapper';
-import type {ConversationService} from './ConversationService';
-import {ConversationEvent} from './EventBuilder';
 import {
   ACCESS_MODES,
   featureFromStateChange,
   isGettingAccessToFeature,
   updateAccessRights,
 } from './ConversationAccessPermission';
+import {ConversationMapper} from './ConversationMapper';
+import type {ConversationService} from './ConversationService';
+import {ConversationEvent} from './EventBuilder';
+
 import PrimaryModal from '../components/Modals/PrimaryModal';
+import type {Conversation} from '../entity/Conversation';
 
 export class ConversationStateHandler extends AbstractConversationEventHandler {
   private readonly conversationService: ConversationService;

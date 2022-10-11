@@ -18,10 +18,11 @@
  */
 
 import React from 'react';
+
 import cx from 'classnames';
 
-import {t} from 'Util/LocalizerUtil';
 import Icon from 'Components/Icon';
+import {t} from 'Util/LocalizerUtil';
 
 export interface RestrictedImageProps extends React.HTMLProps<HTMLDivElement> {
   isSmall?: boolean;

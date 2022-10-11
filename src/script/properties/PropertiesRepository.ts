@@ -17,24 +17,25 @@
  *
  */
 
-import ko from 'knockout';
-import {amplify} from 'amplify';
-import {WebAppEvents} from '@wireapp/webapp-events';
-import {AudioPreference, NotificationPreference, WebappProperties} from '@wireapp/api-client/src/user/data/';
 import {RECEIPT_MODE} from '@wireapp/api-client/src/conversation/data';
 import {ConsentType} from '@wireapp/api-client/src/self/';
+import {AudioPreference, NotificationPreference, WebappProperties} from '@wireapp/api-client/src/user/data/';
+import {WebAppEvents} from '@wireapp/webapp-events';
+import {amplify} from 'amplify';
+import ko from 'knockout';
 
 import {Environment} from 'Util/Environment';
 import {t} from 'Util/LocalizerUtil';
 import {Logger, getLogger} from 'Util/Logger';
 
+import type {PropertiesService} from './PropertiesService';
+import {PROPERTIES_TYPE} from './PropertiesType';
+
+import PrimaryModal from '../components/Modals/PrimaryModal';
 import {Config} from '../Config';
 import type {User} from '../entity/User';
 import type {SelfService} from '../self/SelfService';
 import {ConsentValue} from '../user/ConsentValue';
-import type {PropertiesService} from './PropertiesService';
-import {PROPERTIES_TYPE} from './PropertiesType';
-import PrimaryModal from '../components/Modals/PrimaryModal';
 
 export class PropertiesRepository {
   // Value names are specified by the protocol but key names can be changed.

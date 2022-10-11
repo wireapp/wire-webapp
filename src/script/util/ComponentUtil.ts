@@ -17,8 +17,9 @@
  *
  */
 
-import ko, {Unwrapped} from 'knockout';
 import React, {useEffect, useState} from 'react';
+
+import ko, {Unwrapped} from 'knockout';
 import {createRoot} from 'react-dom/client';
 
 type Subscribables<T> = {

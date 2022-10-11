@@ -17,23 +17,23 @@
  *
  */
 
-import {act} from 'react-dom/test-utils';
-import ko from 'knockout';
+import {waitFor, render} from '@testing-library/react';
 import {STATE as CALL_STATE, CALL_TYPE} from '@wireapp/avs';
-
-import {createRandomUuid} from 'Util/util';
-import TestPage from 'Util/test/TestPage';
+import ko from 'knockout';
+import {act} from 'react-dom/test-utils';
 
 import {Call} from 'src/script/calling/Call';
+import {CallingRepository} from 'src/script/calling/CallingRepository';
 import {Participant} from 'src/script/calling/Participant';
 import {Conversation} from 'src/script/entity/Conversation';
-import ConversationListCallingCell, {CallingCellProps} from './ConversationListCallingCell';
 import {User} from 'src/script/entity/User';
 import {MediaDevicesHandler} from 'src/script/media/MediaDevicesHandler';
-import {CallActions} from 'src/script/view_model/CallingViewModel';
-import {CallingRepository} from 'src/script/calling/CallingRepository';
 import {TeamState} from 'src/script/team/TeamState';
-import {waitFor, render} from '@testing-library/react';
+import {CallActions} from 'src/script/view_model/CallingViewModel';
+import TestPage from 'Util/test/TestPage';
+import {createRandomUuid} from 'Util/util';
+
+import ConversationListCallingCell, {CallingCellProps} from './ConversationListCallingCell';
 
 jest.mock(
   'Components/utils/InViewport',

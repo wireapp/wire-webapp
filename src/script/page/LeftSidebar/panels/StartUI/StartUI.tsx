@@ -19,32 +19,35 @@
 
 import React, {useRef, useState} from 'react';
 
-import ListWrapper from '../ListWrapper';
-import {container} from 'tsyringe';
-import {TeamState} from '../../../../team/TeamState';
-import {UserState} from '../../../../user/UserState';
-import SearchInput from 'Components/SearchInput';
-import {t} from 'Util/LocalizerUtil';
 import cx from 'classnames';
-import {SearchRepository} from '../../../../search/SearchRepository';
-import {generatePermissionHelpers} from '../../../../user/UserPermission';
-import {useKoSubscribableChildren} from 'Util/ComponentUtil';
-import {ConversationState} from '../../../../conversation/ConversationState';
-import {TeamRepository} from '../../../../team/TeamRepository';
-import {ConversationRepository} from '../../../../conversation/ConversationRepository';
-import {Config} from '../../../../Config';
-import {IntegrationRepository} from 'src/script/integration/IntegrationRepository';
-import {ServicesTab} from './ServicesTab';
-import {PeopleTab, SearchResultsData} from './PeopleTab';
-import {MainViewModel} from 'src/script/view_model/MainViewModel';
-import {UserRepository} from 'src/script/user/UserRepository';
-import {User} from 'src/script/entity/User';
-import {Conversation} from 'src/script/entity/Conversation';
-import {ServiceEntity} from 'src/script/integration/ServiceEntity';
-import showUserModal from 'Components/Modals/UserModal';
-import showServiceModal from 'Components/Modals/ServiceModal';
+import {container} from 'tsyringe';
+
 import showInviteModal from 'Components/Modals/InviteModal';
+import showServiceModal from 'Components/Modals/ServiceModal';
+import showUserModal from 'Components/Modals/UserModal';
+import SearchInput from 'Components/SearchInput';
+import {Conversation} from 'src/script/entity/Conversation';
+import {User} from 'src/script/entity/User';
+import {IntegrationRepository} from 'src/script/integration/IntegrationRepository';
+import {ServiceEntity} from 'src/script/integration/ServiceEntity';
+import {UserRepository} from 'src/script/user/UserRepository';
+import {MainViewModel} from 'src/script/view_model/MainViewModel';
+import {useKoSubscribableChildren} from 'Util/ComponentUtil';
+import {t} from 'Util/LocalizerUtil';
+
+import {PeopleTab, SearchResultsData} from './PeopleTab';
+import {ServicesTab} from './ServicesTab';
+
+import {Config} from '../../../../Config';
+import {ConversationRepository} from '../../../../conversation/ConversationRepository';
+import {ConversationState} from '../../../../conversation/ConversationState';
+import {SearchRepository} from '../../../../search/SearchRepository';
+import {TeamRepository} from '../../../../team/TeamRepository';
+import {TeamState} from '../../../../team/TeamState';
+import {generatePermissionHelpers} from '../../../../user/UserPermission';
+import {UserState} from '../../../../user/UserState';
 import {useAppMainState} from '../../../state';
+import ListWrapper from '../ListWrapper';
 
 type StartUIProps = {
   conversationRepository: ConversationRepository;

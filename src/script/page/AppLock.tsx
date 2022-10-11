@@ -18,24 +18,25 @@
  */
 
 import React, {useState, useEffect, useRef, useCallback} from 'react';
+
 import {ValidationUtil} from '@wireapp/commons';
 import {WebAppEvents} from '@wireapp/webapp-events';
-import {container} from 'tsyringe';
 import {amplify} from 'amplify';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
+import {container} from 'tsyringe';
 
+import Icon from 'Components/Icon';
+import ModalComponent from 'Components/ModalComponent';
+import PrimaryModal from 'Components/Modals/PrimaryModal';
+import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 
-import {ClientRepository} from '../client/ClientRepository';
-import {Config} from '../Config';
-import ModalComponent from 'Components/ModalComponent';
 import {SIGN_OUT_REASON} from '../auth/SignOutReason';
+import {ClientRepository} from '../client/ClientRepository';
 import {ClientState} from '../client/ClientState';
-import {AppLockState} from '../user/AppLockState';
+import {Config} from '../Config';
 import {AppLockRepository} from '../user/AppLockRepository';
-import {useKoSubscribableChildren} from 'Util/ComponentUtil';
-import Icon from 'Components/Icon';
-import PrimaryModal from 'Components/Modals/PrimaryModal';
+import {AppLockState} from '../user/AppLockState';
 
 export enum APPLOCK_STATE {
   FORGOT = 'applock.forgot',

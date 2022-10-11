@@ -17,24 +17,23 @@
  *
  */
 
-import type {LegalHoldStatus} from '@wireapp/protocol-messaging';
 import {MemberLeaveReason} from '@wireapp/api-client/src/conversation/data/';
-import {CONVERSATION_EVENT} from '@wireapp/api-client/src/event/';
+import {CONVERSATION_EVENT, ConversationOtrMessageAddEvent} from '@wireapp/api-client/src/event/';
 import type {QualifiedId} from '@wireapp/api-client/src/user/';
 import type {REASON as AVS_REASON} from '@wireapp/avs';
+import {ReactionType} from '@wireapp/core/src/main/conversation';
+import type {LegalHoldStatus} from '@wireapp/protocol-messaging';
 
 import {createRandomUuid} from 'Util/util';
 
-import {CALL, CONVERSATION, ClientEvent} from '../event/Client';
-import {StatusType} from '../message/StatusType';
-import {VerificationMessageType} from '../message/VerificationMessageType';
+import {CALL_MESSAGE_TYPE} from '../calling/enum/CallMessageType';
 import type {Conversation} from '../entity/Conversation';
 import type {Message} from '../entity/message/Message';
 import type {User} from '../entity/User';
+import {CALL, CONVERSATION, ClientEvent} from '../event/Client';
+import {StatusType} from '../message/StatusType';
+import {VerificationMessageType} from '../message/VerificationMessageType';
 import {AssetRecord, EventRecord} from '../storage';
-import {ReactionType} from '@wireapp/core/src/main/conversation';
-import {ConversationOtrMessageAddEvent} from '@wireapp/api-client/src/event';
-import {CALL_MESSAGE_TYPE} from '../calling/enum/CallMessageType';
 
 export interface BaseEvent {
   conversation: string;
@@ -82,12 +81,6 @@ export interface BackendEventMessage<T> extends Omit<BaseEvent, 'id'> {
   data: T;
   id?: string;
   type: string;
-}
-
-export interface ErrorEvent extends BaseEvent {
-  error: string;
-  error_code: number | string;
-  type: CONVERSATION;
 }
 
 export interface VoiceChannelActivateEvent extends BaseEvent {

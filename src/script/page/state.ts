@@ -18,8 +18,10 @@
  */
 
 import create from 'zustand';
-import {User} from '../entity/User';
+
 import {PanelEntity, PanelState} from './RightSidebar/RightSidebar';
+
+import {User} from '../entity/User';
 
 type RightSidebarParams = {
   entity: PanelEntity | null;

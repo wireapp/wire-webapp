@@ -17,8 +17,9 @@
  *
  */
 
-import cx from 'classnames';
 import {FC} from 'react';
+
+import cx from 'classnames';
 
 import {EmojiListItem} from './useEmoji';
 

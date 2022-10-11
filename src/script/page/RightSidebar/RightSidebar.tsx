@@ -17,10 +17,10 @@
  *
  */
 
-import {WebAppEvents} from '@wireapp/webapp-events';
-
-import {amplify} from 'amplify';
 import {FC, ReactNode, cloneElement, useEffect, useState} from 'react';
+
+import {WebAppEvents} from '@wireapp/webapp-events';
+import {amplify} from 'amplify';
 import {CSSTransition, TransitionGroup} from 'react-transition-group';
 import {container} from 'tsyringe';
 
@@ -29,9 +29,9 @@ import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import AddParticipants from './AddParticipants';
 import ConversationDetails from './ConversationDetails';
 import ConversationParticipants from './ConversationParticipants';
-import GuestServicesOptions from './GuestServicesOptions';
-import GroupParticipantUser from './GroupParticipantUser';
 import GroupParticipantService from './GroupParticipantService';
+import GroupParticipantUser from './GroupParticipantUser';
+import GuestServicesOptions from './GuestServicesOptions';
 import MessageDetails from './MessageDetails';
 import Notifications from './Notifications';
 import ParticipantDevices from './ParticipantDevices';
@@ -45,11 +45,11 @@ import {isContentMessage} from '../../guards/Message';
 import {isUserEntity, isUserServiceEntity} from '../../guards/Panel';
 import {isServiceEntity} from '../../guards/Service';
 import {ServiceEntity} from '../../integration/ServiceEntity';
-import {UserState} from '../../user/UserState';
 import {TeamState} from '../../team/TeamState';
+import {UserState} from '../../user/UserState';
+import {ActionsViewModel} from '../../view_model/ActionsViewModel';
 import {ContentState} from '../../view_model/ContentViewModel';
 import {ViewModelRepositories} from '../../view_model/MainViewModel';
-import {ActionsViewModel} from '../../view_model/ActionsViewModel';
 import {RightSidebarParams} from '../AppMain';
 import {useAppMainState} from '../state';
 

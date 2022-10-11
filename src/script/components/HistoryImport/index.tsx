@@ -21,16 +21,15 @@ import {FC, useEffect, useState} from 'react';
 
 import Icon from 'Components/Icon';
 import LoadingBar from 'Components/LoadingBar';
-
-import {getLogger} from 'Util/Logger';
 import {t} from 'Util/LocalizerUtil';
+import {getLogger} from 'Util/Logger';
 import {formatDuration} from 'Util/TimeUtil';
 import {loadFileBuffer} from 'Util/util';
 import {WebWorker} from 'Util/worker';
 
-import {Config} from '../../Config';
 import {BackupRepository} from '../../backup/BackupRepository';
 import {CancelError, DifferentAccountError, ImportError, IncompatibleBackupError} from '../../backup/Error';
+import {Config} from '../../Config';
 import {MotionDuration} from '../../motion/MotionDuration';
 import {ContentState} from '../../view_model/ContentViewModel';
 

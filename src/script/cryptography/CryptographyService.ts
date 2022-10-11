@@ -19,8 +19,9 @@
 
 import type {ClientPreKey, PreKey} from '@wireapp/api-client/src/auth/';
 import type {QualifiedId} from '@wireapp/api-client/src/user/';
-import {APIClient} from '../service/APIClientSingleton';
 import {container} from 'tsyringe';
+
+import {APIClient} from '../service/APIClientSingleton';
 
 export class CryptographyService {
   constructor(private readonly apiClient = container.resolve(APIClient)) {}

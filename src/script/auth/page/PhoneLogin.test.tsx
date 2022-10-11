@@ -17,15 +17,16 @@
  *
  */
 
+import {fireEvent, waitFor} from '@testing-library/react';
 import {PasswordExistsError} from '@wireapp/api-client/src/auth';
+
+import PhoneLogin from './PhoneLogin';
 
 import {actionRoot} from '../module/action';
 import {initialRootState} from '../module/reducer';
 import {ROUTE} from '../route';
 import {mockStoreFactory} from '../util/test/mockStoreFactory';
 import {mountComponent} from '../util/test/TestUtil';
-import PhoneLogin from './PhoneLogin';
-import {fireEvent, waitFor} from '@testing-library/react';
 
 jest.mock('../util/SVGProvider');
 

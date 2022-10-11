@@ -21,13 +21,13 @@ import {FC, HTMLProps, MouseEvent as ReactMouseEvent} from 'react';
 
 import {registerReactComponent, useKoSubscribableChildren} from 'Util/ComponentUtil';
 
-import {User} from '../entity/User';
-import {isServiceEntity} from '../guards/Service';
-import {ServiceEntity} from '../integration/ServiceEntity';
-
 import ServiceAvatar from './avatar/ServiceAvatar';
 import TemporaryGuestAvatar from './avatar/TemporaryGuestAvatar';
 import UserAvatar from './avatar/UserAvatar';
+
+import {User} from '../entity/User';
+import {isServiceEntity} from '../guards/Service';
+import {ServiceEntity} from '../integration/ServiceEntity';
 
 export enum AVATAR_SIZE {
   LARGE = 'avatar-l',

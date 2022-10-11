@@ -17,25 +17,26 @@
  *
  */
 
-import {StyledApp, THEME_ID} from '@wireapp/react-ui-kit';
 import {FC} from 'react';
+
+import {StyledApp, THEME_ID} from '@wireapp/react-ui-kit';
 import {container} from 'tsyringe';
 
 import CallingContainer from 'Components/calling/CallingOverlayContainer';
-
 import {registerReactComponent, useKoSubscribableChildren} from 'Util/ComponentUtil';
 
+import AppLock from './AppLock';
+import LeftSidebar from './LeftSidebar';
 import MainContent from './MainContent';
+import RightSidebar from './RightSidebar';
+import {PanelEntity, PanelState} from './RightSidebar/RightSidebar';
+import {useAppMainState} from './state';
+
+import {User} from '../entity/User';
+import {TeamState} from '../team/TeamState';
 import {UserState} from '../user/UserState';
 import {MainViewModel} from '../view_model/MainViewModel';
-import LeftSidebar from './LeftSidebar';
-import AppLock from './AppLock';
 import WarningsContainer from '../view_model/WarningsContainer/WarningsContainer';
-import RightSidebar from './RightSidebar';
-import {TeamState} from '../team/TeamState';
-import {PanelEntity, PanelState} from './RightSidebar/RightSidebar';
-import {User} from '../entity/User';
-import {useAppMainState} from './state';
 
 export type RightSidebarParams = {
   entity: PanelEntity | null;

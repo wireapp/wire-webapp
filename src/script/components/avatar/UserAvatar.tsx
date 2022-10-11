@@ -18,19 +18,21 @@
  */
 
 import React from 'react';
+
 import {COLOR} from '@wireapp/react-ui-kit';
 
-import {User} from '../../entity/User';
-
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
-import {AVATAR_SIZE, STATE} from '../Avatar';
+import {t} from 'Util/LocalizerUtil';
+
 import AvatarBackground from './AvatarBackground';
-import AvatarImage from './AvatarImage';
-import AvatarInitials from './AvatarInitials';
 import AvatarBadge from './AvatarBadge';
 import AvatarBorder from './AvatarBorder';
+import AvatarImage from './AvatarImage';
+import AvatarInitials from './AvatarInitials';
 import AvatarWrapper from './AvatarWrapper';
-import {t} from 'Util/LocalizerUtil';
+
+import {User} from '../../entity/User';
+import {AVATAR_SIZE, STATE} from '../Avatar';
 
 export interface UserAvatarProps extends React.HTMLProps<HTMLDivElement> {
   avatarSize: AVATAR_SIZE;

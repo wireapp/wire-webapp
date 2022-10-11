@@ -17,17 +17,16 @@
  *
  */
 
-import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
 import {FC, useRef} from 'react';
 
+import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
+
 import {CONFIG as HistoryExportConfig} from 'Components/HistoryExport';
-
-import {t} from 'Util/LocalizerUtil';
 import {handleKeyDown} from 'Util/KeyboardUtil';
-
-import PreferencesSection from '../components/PreferencesSection';
+import {t} from 'Util/LocalizerUtil';
 
 import {ContentState} from '../../../../../view_model/ContentViewModel';
+import PreferencesSection from '../components/PreferencesSection';
 
 interface HistoryBackupSectionProps {
   brandName: string;

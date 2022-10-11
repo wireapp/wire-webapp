@@ -18,10 +18,12 @@
  */
 
 import React from 'react';
+
 import {ClientEntity} from 'src/script/client/ClientEntity';
 import {t} from 'Util/LocalizerUtil';
-import {formatTimestamp} from 'Util/TimeUtil';
 import {splitFingerprint} from 'Util/StringUtil';
+import {formatTimestamp} from 'Util/TimeUtil';
+
 import {FormattedId} from './FormattedId';
 
 interface DeviceProps {
