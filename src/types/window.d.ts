@@ -21,7 +21,7 @@ import {amplify} from 'amplify';
 import jQuery from 'jquery';
 import ko from 'knockout';
 
-import {WireConfiguration} from './Wire.types';
+import {WireModule} from './Wire.types';
 
 import {t} from '../script/util/LocalizerUtil';
 
@@ -32,7 +32,7 @@ declare global {
     jQuery: typeof jQuery;
     ko: typeof ko;
     t: typeof t;
-    wire: WireConfiguration;
+    wire: WireModule;
     wSSOCapable: boolean;
     z: any;
   }

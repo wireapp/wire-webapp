@@ -91,7 +91,7 @@ export type WireEnvironmentVariables = {
   WEBSITE_LABEL: string;
 };
 
-export interface WireConfiguration {
+export interface WireModule {
   app: App;
   env: WireEnvironmentVariables;
 }
