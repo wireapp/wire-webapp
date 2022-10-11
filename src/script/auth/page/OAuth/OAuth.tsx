@@ -25,7 +25,10 @@ export const OAuth: React.FC = () => {
   const params = new URLSearchParams(location.search);
   const code = params.get('code');
   const state = params.get('state');
-  if (false && state !== 'TODO') {
+
+  const storedState = localStorage.getItem('oauth_state');
+
+  if (!state || !storedState || state !== storedState) {
     return <div>states do not match</div>;
   }
   return <div>Hello OAuth {code}</div>;
