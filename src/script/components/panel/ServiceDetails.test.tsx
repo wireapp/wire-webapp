@@ -17,9 +17,11 @@
  *
  */
 
-import {ServiceEntity} from '../../integration/ServiceEntity';
-import ServiceDetails from './ServiceDetails';
 import {render} from '@testing-library/react';
+
+import ServiceDetails from './ServiceDetails';
+
+import {ServiceEntity} from '../../integration/ServiceEntity';
 
 describe('ServiceDetails', () => {
   it('renders the correct infos for the service', () => {

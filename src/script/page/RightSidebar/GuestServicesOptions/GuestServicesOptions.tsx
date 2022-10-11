@@ -20,11 +20,8 @@
 import {FC, useState} from 'react';
 
 import PrimaryModal from 'Components/Modals/PrimaryModal';
-
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
-
-import PanelHeader from '../PanelHeader';
 
 import GuestOptions from './components/GuestOptions';
 import ServicesOptions from './components/ServicesOptions';
@@ -35,6 +32,7 @@ import {Conversation} from '../../../entity/Conversation';
 import {TeamRepository} from '../../../team/TeamRepository';
 import {TeamState} from '../../../team/TeamState';
 import {initFadingScrollbar} from '../../../ui/fadingScrollbar';
+import PanelHeader from '../PanelHeader';
 
 interface GuestServicesOptionsProps {
   activeConversation: Conversation;

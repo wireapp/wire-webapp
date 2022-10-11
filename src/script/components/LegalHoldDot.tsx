@@ -18,12 +18,15 @@
  */
 
 import React from 'react';
+
 import {amplify} from 'amplify';
 import cx from 'classnames';
-import type {Conversation} from '../entity/Conversation';
-import {LegalHoldModalState} from '../legal-hold/LegalHoldModalState';
+
 import Icon from 'Components/Icon';
 import {t} from 'Util/LocalizerUtil';
+
+import type {Conversation} from '../entity/Conversation';
+import {LegalHoldModalState} from '../legal-hold/LegalHoldModalState';
 
 export interface LegalHoldDotProps {
   isInteractive?: boolean;

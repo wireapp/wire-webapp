@@ -17,8 +17,9 @@
  *
  */
 
-import {CSSObject} from '@emotion/react';
 import React from 'react';
+
+import {CSSObject} from '@emotion/react';
 import {ConversationProtocol} from '@wireapp/api-client/src/conversation/NewConversation';
 
 import {t} from 'Util/LocalizerUtil';

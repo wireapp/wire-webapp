@@ -17,23 +17,25 @@
  *
  */
 
-import Icon from 'Components/Icon';
 import React, {useEffect, useState} from 'react';
-import {container} from 'tsyringe';
+
 import cx from 'classnames';
+import {container} from 'tsyringe';
+
+import RestrictedImage from 'Components/asset/RestrictedImage';
+import Icon from 'Components/Icon';
+import InViewport from 'Components/utils/InViewport';
+import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {handleKeyDown} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
 
-import {useKoSubscribableChildren} from 'Util/ComponentUtil';
+import {useAssetTransfer} from './AbstractAssetTransferStateTracker';
+import AssetLoader from './AssetLoader';
 
 import {Config} from '../../../../../Config';
 import {ContentMessage} from '../../../../../entity/message/ContentMessage';
 import {MediumImage} from '../../../../../entity/message/MediumImage';
 import {TeamState} from '../../../../../team/TeamState';
-import AssetLoader from './AssetLoader';
-import RestrictedImage from 'Components/asset/RestrictedImage';
-import {useAssetTransfer} from './AbstractAssetTransferStateTracker';
-import InViewport from 'Components/utils/InViewport';
 
 export interface ImageAssetProps {
   asset: MediumImage;

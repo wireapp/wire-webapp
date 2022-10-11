@@ -17,13 +17,40 @@
  *
  */
 
+import React, {useEffect} from 'react';
+
 import {pathWithParams} from '@wireapp/commons/src/main/util/UrlUtil';
 import {StyledApp, Loading, ContainerXS, THEME_ID} from '@wireapp/react-ui-kit';
-import React, {useEffect} from 'react';
 import {IntlProvider} from 'react-intl';
 import {connect} from 'react-redux';
 import {HashRouter as Router, Navigate, Route, Routes} from 'react-router-dom';
 import {AnyAction, Dispatch} from 'redux';
+
+import {t} from 'Util/LocalizerUtil';
+
+import CheckPassword from './CheckPassword';
+import ClientManager from './ClientManager';
+import ConversationJoin from './ConversationJoin';
+import ConversationJoinInvalid from './ConversationJoinInvalid';
+import CreateAccount from './CreateAccount';
+import CreatePersonalAccount from './CreatePersonalAccount';
+import CustomEnvironmentRedirect from './CustomEnvironmentRedirect';
+import HistoryInfo from './HistoryInfo';
+import Index from './Index';
+import InitialInvite from './InitialInvite';
+import Login from './Login';
+import PhoneLogin from './PhoneLogin';
+import SetAccountType from './SetAccountType';
+import SetEmail from './SetEmail';
+import SetEntropyPage from './SetEntropyPage';
+import SetHandle from './SetHandle';
+import SetPassword from './SetPassword';
+import SingleSignOn from './SingleSignOn';
+import TeamName from './TeamName';
+import VerifyEmailCode from './VerifyEmailCode';
+import VerifyEmailLink from './VerifyEmailLink';
+import VerifyPhoneCode from './VerifyPhoneCode';
+
 import {Config} from '../../Config';
 import {mapLanguage, normalizeLanguage} from '../localeConfig';
 import {actionRoot as ROOT_ACTIONS} from '../module/action/';
@@ -32,29 +59,6 @@ import * as AuthSelector from '../module/selector/AuthSelector';
 import * as CookieSelector from '../module/selector/CookieSelector';
 import * as LanguageSelector from '../module/selector/LanguageSelector';
 import {ROUTE} from '../route';
-import CheckPassword from './CheckPassword';
-import ClientManager from './ClientManager';
-import ConversationJoin from './ConversationJoin';
-import ConversationJoinInvalid from './ConversationJoinInvalid';
-import CreateAccount from './CreateAccount';
-import CreatePersonalAccount from './CreatePersonalAccount';
-import HistoryInfo from './HistoryInfo';
-import Index from './Index';
-import InitialInvite from './InitialInvite';
-import Login from './Login';
-import PhoneLogin from './PhoneLogin';
-import SetAccountType from './SetAccountType';
-import SetEmail from './SetEmail';
-import SetHandle from './SetHandle';
-import SetPassword from './SetPassword';
-import SingleSignOn from './SingleSignOn';
-import TeamName from './TeamName';
-import VerifyEmailCode from './VerifyEmailCode';
-import VerifyEmailLink from './VerifyEmailLink';
-import VerifyPhoneCode from './VerifyPhoneCode';
-import CustomEnvironmentRedirect from './CustomEnvironmentRedirect';
-import SetEntropyPage from './SetEntropyPage';
-import {t} from 'Util/LocalizerUtil';
 
 interface RootProps {}
 

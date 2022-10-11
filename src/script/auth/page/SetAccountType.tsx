@@ -17,6 +17,9 @@
  *
  */
 
+import React from 'react';
+
+import {Runtime} from '@wireapp/commons';
 import {
   ArrowIcon,
   Bold,
@@ -31,18 +34,18 @@ import {
   TeamIcon,
   Text,
 } from '@wireapp/react-ui-kit';
-import React from 'react';
 import {useIntl} from 'react-intl';
 import {Navigate} from 'react-router-dom';
+
+import Page from './Page';
+
 import {Config} from '../../Config';
 import {setAccountTypeStrings} from '../../strings';
 import RouterLink from '../component/RouterLink';
 import {ROUTE} from '../route';
-import {Runtime} from '@wireapp/commons';
 import {pathWithParams} from '../util/urlUtil';
-import Page from './Page';
 
-interface Props extends React.HTMLProps<HTMLDivElement> {}
+type Props = React.HTMLProps<HTMLDivElement>;
 
 const SetAccountType = ({}: Props) => {
   const {formatMessage: _} = useIntl();

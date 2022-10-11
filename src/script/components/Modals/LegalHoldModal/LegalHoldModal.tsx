@@ -17,30 +17,33 @@
  *
  */
 
-import {LegalHoldMemberStatus} from '@wireapp/api-client/src/team/legalhold/';
-import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 import {FC, useEffect, useState} from 'react';
-import ko from 'knockout';
+
+import {LegalHoldMemberStatus} from '@wireapp/api-client/src/team/legalhold/';
 import {amplify} from 'amplify';
 import cx from 'classnames';
-import ModalComponent from 'Components/ModalComponent';
+import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
+import ko from 'knockout';
+
 import Icon from 'Components/Icon';
-import {t} from 'Util/LocalizerUtil';
 import LegalHoldDot from 'Components/LegalHoldDot';
-import UserSearchableList from 'Components/UserSearchableList';
+import ModalComponent from 'Components/ModalComponent';
 import UserDevices, {UserDevicesState, useUserDevicesHistory} from 'Components/UserDevices';
-import {ConversationRepository} from '../../../conversation/ConversationRepository';
-import {TeamRepository} from '../../../team/TeamRepository';
-import {ClientRepository} from '../../../client/ClientRepository';
-import {CryptographyRepository} from '../../../cryptography/CryptographyRepository';
-import {MessageRepository} from '../../../conversation/MessageRepository';
-import {UserState} from '../../../user/UserState';
+import UserSearchableList from 'Components/UserSearchableList';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
+import {t} from 'Util/LocalizerUtil';
 import {splitFingerprint} from 'Util/StringUtil';
+
+import {ClientRepository} from '../../../client/ClientRepository';
+import {ConversationRepository} from '../../../conversation/ConversationRepository';
+import {MessageRepository} from '../../../conversation/MessageRepository';
+import {CryptographyRepository} from '../../../cryptography/CryptographyRepository';
 import {Conversation} from '../../../entity/Conversation';
 import {User} from '../../../entity/User';
-import {SearchRepository} from '../../../search/SearchRepository';
 import {LegalHoldModalState} from '../../../legal-hold/LegalHoldModalState';
+import {SearchRepository} from '../../../search/SearchRepository';
+import {TeamRepository} from '../../../team/TeamRepository';
+import {UserState} from '../../../user/UserState';
 
 export interface LegalHoldModalProps {
   userState: UserState;

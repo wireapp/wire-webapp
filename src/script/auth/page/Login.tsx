@@ -17,8 +17,11 @@
  *
  */
 
+import React, {useEffect, useRef, useState} from 'react';
+
 import {LoginData} from '@wireapp/api-client/src/auth';
 import {ClientType} from '@wireapp/api-client/src/client/index';
+import {Runtime, UrlUtil} from '@wireapp/commons';
 import {
   ArrowIcon,
   COLOR,
@@ -40,13 +43,18 @@ import {
   Muted,
   Text,
 } from '@wireapp/react-ui-kit';
-import React, {useEffect, useRef, useState} from 'react';
+import {StatusCodes} from 'http-status-codes';
 import {useIntl} from 'react-intl';
 import {connect} from 'react-redux';
 import {Navigate} from 'react-router';
-import {AnyAction, Dispatch} from 'redux';
 import {useNavigate} from 'react-router-dom';
+import {AnyAction, Dispatch} from 'redux';
+
 import {getLogger} from 'Util/Logger';
+
+import EntropyContainer from './EntropyContainer';
+import Page from './Page';
+
 import {Config} from '../../Config';
 import {loginStrings, verifyStrings} from '../../strings';
 import AppAlreadyOpen from '../component/AppAlreadyOpen';
@@ -60,14 +68,9 @@ import {ValidationError} from '../module/action/ValidationError';
 import {RootState, bindActionCreators} from '../module/reducer';
 import * as AuthSelector from '../module/selector/AuthSelector';
 import {QUERY_KEY, ROUTE} from '../route';
-import {Runtime} from '@wireapp/commons';
 import {parseError, parseValidationErrors} from '../util/errorUtil';
-import {UrlUtil} from '@wireapp/commons';
-import Page from './Page';
-import EntropyContainer from './EntropyContainer';
-import {StatusCodes} from 'http-status-codes';
 
-interface Props extends React.HTMLProps<HTMLDivElement> {}
+type Props = React.HTMLProps<HTMLDivElement>;
 
 const Login = ({
   loginError,

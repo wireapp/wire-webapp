@@ -17,7 +17,8 @@
  *
  */
 
-import {mount} from 'enzyme';
 import React from 'react';
+
+import {mount} from 'enzyme';
 
 export const mountComponent = (component: React.ReactElement) => mount(component);

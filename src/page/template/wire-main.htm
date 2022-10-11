@@ -1,32 +1,36 @@
-<main id="wire-main"
-     class="off"
-     data-bind="css: mainClasses()"
-     data-uie-name="status-webapp"
-     data-uie-value="is-loading">
+<main
+  id="wire-main"
+  class="off"
+  data-bind="css: mainClasses()"
+  data-uie-name="status-webapp"
+  data-uie-value="is-loading"
+>
   <!-- ko stopBinding: true -->
-    <div id="app" class="app">
-      <div id="left-column" class="left-column" data-bind="css: {'left-column--light-theme': !isActivatedAccount()}">
-        <header><h1 class="visually-hidden" data-bind="text: t('accessibility.headings.sidebar')"></h1></header>
-        <!-- ko if: webappLoaded -->
-          <left-sidebar params="listViewModel: $root, selfUser: selfUser"></left-sidebar>
-        <!-- /ko -->
-      </div>
-
-      <div id="center-column" class="center-column">
-        <main-content params="contentViewModel: $root"></main-content>
-      </div>
+  <div id="app" class="app">
+    <div id="left-column" class="left-column" data-bind="css: {'left-column--light-theme': !isActivatedAccount()}">
+      <header><h1 class="visually-hidden" data-bind="text: t('accessibility.headings.sidebar')"></h1></header>
+      <!-- ko if: webappLoaded -->
+      <left-sidebar params="listViewModel: $root, selfUser: selfUser"></left-sidebar>
+      <!-- /ko -->
     </div>
-    <!-- /ko -->
 
-    <app-lock-container params="clientRepository: $root.content.repositories.client"></app-lock-container>
-    <warnings-container></warnings-container>
-    <calling-overlay-container params="
+    <div id="center-column" class="center-column">
+      <main-content params="contentViewModel: $root"></main-content>
+    </div>
+  </div>
+  <!-- /ko -->
+
+  <app-lock-container params="clientRepository: $root.content.repositories.client"></app-lock-container>
+  <warnings-container></warnings-container>
+  <calling-overlay-container
+    params="
       multitasking: $root.multitasking,
       callingRepository: $root.content.repositories.calling,
       mediaRepository: $root.content.repositories.media,
-      ">
-    </calling-overlay-container>
-    <!-- The order of these elements matter to show proper modals stack upon each other -->
-    <div id="user-modal-container"></div>
-    <div id="primary-modal-container"></div>
+      "
+  >
+  </calling-overlay-container>
+  <!-- The order of these elements matter to show proper modals stack upon each other -->
+  <div id="user-modal-container"></div>
+  <div id="primary-modal-container"></div>
 </main>

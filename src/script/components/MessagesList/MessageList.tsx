@@ -17,7 +17,6 @@
  *
  */
 
-import cx from 'classnames';
 import React, {
   FC,
   MouseEvent as ReactMouseEvent,
@@ -26,24 +25,28 @@ import React, {
   useRef,
   useState,
 } from 'react';
+
+import cx from 'classnames';
+
 import {ConversationRepository} from 'src/script/conversation/ConversationRepository';
 import {MessageRepository} from 'src/script/conversation/MessageRepository';
-import {Conversation as ConversationEntity, Conversation} from '../../entity/Conversation';
 import {ContentMessage} from 'src/script/entity/message/ContentMessage';
 import {DecryptErrorMessage} from 'src/script/entity/message/DecryptErrorMessage';
 import {MemberMessage} from 'src/script/entity/message/MemberMessage';
 import {Message as MessageEntity} from 'src/script/entity/message/Message';
-import {User} from 'src/script/entity/User';
-import {StatusType} from '../../message/StatusType';
-import {useKoSubscribableChildren} from 'Util/ComponentUtil';
-import Message from './Message';
 import {Text} from 'src/script/entity/message/Text';
-import {useResizeObserver} from '../../ui/resizeObserver';
-import {isContentMessage} from '../../guards/Message';
-import {initFadingScrollbar} from '../../ui/fadingScrollbar';
-import {isMemberMessage} from '../../guards/Message';
+import {User} from 'src/script/entity/User';
 import {ServiceEntity} from 'src/script/integration/ServiceEntity';
+import {useKoSubscribableChildren} from 'Util/ComponentUtil';
+
+import Message from './Message';
+
+import {Conversation as ConversationEntity, Conversation} from '../../entity/Conversation';
+import {isMemberMessage, isContentMessage} from '../../guards/Message';
+import {StatusType} from '../../message/StatusType';
+import {initFadingScrollbar} from '../../ui/fadingScrollbar';
 import onHitTopOrBottom from '../../ui/onHitTopOrBottom';
+import {useResizeObserver} from '../../ui/resizeObserver';
 
 type FocusedElement = {center?: boolean; element: Element};
 

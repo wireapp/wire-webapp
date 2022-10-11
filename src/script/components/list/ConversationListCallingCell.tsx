@@ -18,36 +18,37 @@
  */
 
 import React, {useState, useCallback} from 'react';
-import {container} from 'tsyringe';
+
+import {DefaultConversationRoleName} from '@wireapp/api-client/src/conversation/';
 import {CALL_TYPE, CONV_TYPE, REASON as CALL_REASON, STATE as CALL_STATE} from '@wireapp/avs';
 import cx from 'classnames';
-import {DefaultConversationRoleName} from '@wireapp/api-client/src/conversation/';
-import {KEY} from 'Util/KeyboardUtil';
+import {container} from 'tsyringe';
 
 import Avatar, {AVATAR_SIZE} from 'Components/Avatar';
 import GroupAvatar from 'Components/avatar/GroupAvatar';
+import Duration from 'Components/calling/Duration';
 import GroupVideoGrid from 'Components/calling/GroupVideoGrid';
 import Icon from 'Components/Icon';
+import ClassifiedBar from 'Components/input/ClassifiedBar';
 import ParticipantItem from 'Components/list/ParticipantItem';
-import Duration from 'Components/calling/Duration';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
+import {KEY} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
 import {sortUsersByPriority} from 'Util/StringUtil';
 
 import type {Call} from '../../calling/Call';
 import type {CallingRepository} from '../../calling/CallingRepository';
+import {CallState, MuteState} from '../../calling/CallState';
+import type {Participant} from '../../calling/Participant';
 import {useVideoGrid} from '../../calling/videoGridHandler';
 import type {Conversation} from '../../entity/Conversation';
 import type {Multitasking} from '../../notification/NotificationRepository';
 import {generateConversationUrl} from '../../router/routeGenerator';
 import {createNavigate, createNavigateKeyboard} from '../../router/routerBindings';
 import {TeamState} from '../../team/TeamState';
-import {CallState, MuteState} from '../../calling/CallState';
+import {showContextMenu, ContextMenuEntry} from '../../ui/ContextMenu';
 import {initFadingScrollbar} from '../../ui/fadingScrollbar';
 import {CallActions, CallViewTab} from '../../view_model/CallingViewModel';
-import {showContextMenu, ContextMenuEntry} from '../../ui/ContextMenu';
-import type {Participant} from '../../calling/Participant';
-import ClassifiedBar from 'Components/input/ClassifiedBar';
 
 export interface CallingCellProps {
   call: Call;

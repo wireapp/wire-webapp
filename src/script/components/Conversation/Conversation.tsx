@@ -17,7 +17,6 @@
  *
  */
 
-import cx from 'classnames';
 import {
   FC,
   MouseEvent as ReactMouseEvent,
@@ -27,24 +26,24 @@ import {
   useEffect,
   useState,
 } from 'react';
+
+import cx from 'classnames';
 import {container} from 'tsyringe';
 import {groupBy} from 'underscore';
 
-import TitleBar from 'Components/TitleBar';
+import Giphy from 'Components/Giphy';
+import InputBar from 'Components/InputBar';
 import MessagesList from 'Components/MessagesList';
 import {showDetailViewModal} from 'Components/Modals/DetailViewModal';
-import InputBar from 'Components/InputBar';
-import Giphy from 'Components/Giphy';
-
+import TitleBar from 'Components/TitleBar';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 import {getLogger} from 'Util/Logger';
 import {safeMailOpen, safeWindowOpen} from 'Util/SanitizationUtil';
 
-import {Conversation as ConversationEntity} from '../../entity/Conversation';
 import PrimaryModal from '../../components/Modals/PrimaryModal';
-
 import {ConversationState} from '../../conversation/ConversationState';
+import {Conversation as ConversationEntity} from '../../entity/Conversation';
 import {ContentMessage} from '../../entity/message/ContentMessage';
 import {DecryptErrorMessage} from '../../entity/message/DecryptErrorMessage';
 import {MemberMessage} from '../../entity/message/MemberMessage';
@@ -56,10 +55,10 @@ import {isMouseEvent} from '../../guards/Mouse';
 import {isServiceEntity} from '../../guards/Service';
 import {ServiceEntity} from '../../integration/ServiceEntity';
 import {MotionDuration} from '../../motion/MotionDuration';
-import {RootContext} from '../../page/RootProvider';
-import {UserState} from '../../user/UserState';
-import {TeamState} from '../../team/TeamState';
 import {openRightSidebar, PanelState} from '../../page/RightSidebar/RightSidebar';
+import {RootContext} from '../../page/RootProvider';
+import {TeamState} from '../../team/TeamState';
+import {UserState} from '../../user/UserState';
 
 type ReadMessageBuffer = {conversation: ConversationEntity; message: Message};
 

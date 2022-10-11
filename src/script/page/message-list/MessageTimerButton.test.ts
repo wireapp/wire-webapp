@@ -18,12 +18,15 @@
  */
 
 import ko from 'knockout';
+
+import {TeamState} from 'src/script/team/TeamState';
 import TestPage from 'Util/test/TestPage';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
+
 import MessageTimerButton, {MessageTimerButtonProps} from './MessageTimerButton';
+
 import type {Conversation} from '../../entity/Conversation';
 import * as Context from '../../ui/ContextMenu';
-import {TeamState} from 'src/script/team/TeamState';
 
 class MessageTimerButtonPage extends TestPage<MessageTimerButtonProps> {
   constructor(props?: MessageTimerButtonProps) {

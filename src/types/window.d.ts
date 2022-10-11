@@ -23,7 +23,6 @@ import ko from 'knockout';
 
 import type {AssetService} from '../script/assets/AssetService';
 import type {NotificationService} from '../script/event/NotificationService';
-
 import {t} from '../script/util/LocalizerUtil';
 
 declare global {

@@ -20,8 +20,9 @@
 import TestPage from 'Util/test/TestPage';
 import {createRandomUuid} from 'Util/util';
 
-import {ServiceEntity} from '../integration/ServiceEntity';
 import ServiceList, {ServiceListProps} from './ServiceList';
+
+import {ServiceEntity} from '../integration/ServiceEntity';
 
 jest.mock(
   'Components/utils/InViewport',

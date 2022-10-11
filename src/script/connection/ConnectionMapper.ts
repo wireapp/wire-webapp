@@ -18,6 +18,7 @@
  */
 
 import type {Connection as ConnectionData} from '@wireapp/api-client/src/connection/';
+
 import {ConnectionEntity} from './ConnectionEntity';
 
 /**

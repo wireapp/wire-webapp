@@ -17,16 +17,33 @@
  *
  */
 
-import {Runtime} from '@wireapp/commons';
 import React, {useRef} from 'react';
-import {container} from 'tsyringe';
-import {useEnrichedFields} from 'Components/panel/EnrichedFields';
 
+import {Runtime} from '@wireapp/commons';
+import {container} from 'tsyringe';
+
+import PrimaryModal from 'Components/Modals/PrimaryModal';
+import {useEnrichedFields} from 'Components/panel/EnrichedFields';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 import {getLogger} from 'Util/Logger';
 import {loadValue} from 'Util/StorageUtil';
 import {isTemporaryClientAndNonPersistent} from 'Util/util';
+
+import AccountInput from './accountPreferences/AccountInput';
+import AccountLink from './accountPreferences/AccountLink';
+import AccountSecuritySection from './accountPreferences/AccountSecuritySection';
+import AvailabilityButtons from './accountPreferences/AvailabilityButtons';
+import AvatarInput from './accountPreferences/AvatarInput';
+import DataUsageSection from './accountPreferences/DataUsageSection';
+import EmailInput from './accountPreferences/EmailInput';
+import HistoryBackupSection from './accountPreferences/HistoryBackupSection';
+import LogoutSection from './accountPreferences/LogoutSection';
+import NameInput from './accountPreferences/NameInput';
+import PrivacySection from './accountPreferences/PrivacySection';
+import UsernameInput from './accountPreferences/UsernameInput';
+import PreferencesPage from './components/PreferencesPage';
+import PreferencesSection from './components/PreferencesSection';
 
 import {ClientRepository} from '../../../../client/ClientRepository';
 import {Config} from '../../../../Config';
@@ -38,23 +55,8 @@ import {TeamState} from '../../../../team/TeamState';
 import {RichProfileRepository} from '../../../../user/RichProfileRepository';
 import type {UserRepository} from '../../../../user/UserRepository';
 import {UserState} from '../../../../user/UserState';
-import AccentColorPicker from '../../../AccentColorPicker';
-import AccountInput from './accountPreferences/AccountInput';
-import AccountSecuritySection from './accountPreferences/AccountSecuritySection';
-import AvailabilityButtons from './accountPreferences/AvailabilityButtons';
-import AvatarInput from './accountPreferences/AvatarInput';
-import DataUsageSection from './accountPreferences/DataUsageSection';
-import EmailInput from './accountPreferences/EmailInput';
-import HistoryBackupSection from './accountPreferences/HistoryBackupSection';
-import LogoutSection from './accountPreferences/LogoutSection';
-import NameInput from './accountPreferences/NameInput';
-import PreferencesSection from './components/PreferencesSection';
-import PrivacySection from './accountPreferences/PrivacySection';
-import UsernameInput from './accountPreferences/UsernameInput';
-import PreferencesPage from './components/PreferencesPage';
-import AccountLink from './accountPreferences/AccountLink';
-import PrimaryModal from 'Components/Modals/PrimaryModal';
 import {ContentState} from '../../../../view_model/ContentViewModel';
+import AccentColorPicker from '../../../AccentColorPicker';
 
 interface AccountPreferencesProps {
   importFile: (file: File) => void;

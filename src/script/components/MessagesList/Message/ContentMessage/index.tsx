@@ -20,29 +20,29 @@
 import React from 'react';
 
 import {QualifiedId} from '@wireapp/api-client/src/user';
-import {useKoSubscribableChildren} from 'Util/ComponentUtil';
-
-import {Conversation} from 'src/script/entity/Conversation';
-import {ContentMessage} from 'src/script/entity/message/ContentMessage';
-import {EphemeralStatusType} from '../../../../message/EphemeralStatusType';
 
 import Avatar, {AVATAR_SIZE} from 'Components/Avatar';
-import MessageQuote from './MessageQuote';
-import MessageLike from './MessageLike';
-import MessageFooterLike from './MessageFooterLike';
-import ReadReceiptStatus from '../ReadReceiptStatus';
-import EphemeralTimer from '../EphemeralTimer';
-
-import MessageTime from '../MessageTime';
-import {ContextMenuEntry, showContextMenu} from '../../../../ui/ContextMenu';
 import Icon from 'Components/Icon';
-import {t} from 'Util/LocalizerUtil';
-import {MessageActions} from '..';
-import {Message} from 'src/script/entity/message/Message';
-import ContentAsset from './asset';
-import {KEY} from 'Util/KeyboardUtil';
-import {setContextMenuPosition} from 'Util/util';
+import {Conversation} from 'src/script/entity/Conversation';
 import {CompositeMessage} from 'src/script/entity/message/CompositeMessage';
+import {ContentMessage} from 'src/script/entity/message/ContentMessage';
+import {Message} from 'src/script/entity/message/Message';
+import {useKoSubscribableChildren} from 'Util/ComponentUtil';
+import {KEY} from 'Util/KeyboardUtil';
+import {t} from 'Util/LocalizerUtil';
+import {setContextMenuPosition} from 'Util/util';
+
+import ContentAsset from './asset';
+import MessageFooterLike from './MessageFooterLike';
+import MessageLike from './MessageLike';
+import MessageQuote from './MessageQuote';
+
+import {MessageActions} from '..';
+import {EphemeralStatusType} from '../../../../message/EphemeralStatusType';
+import {ContextMenuEntry, showContextMenu} from '../../../../ui/ContextMenu';
+import EphemeralTimer from '../EphemeralTimer';
+import MessageTime from '../MessageTime';
+import ReadReceiptStatus from '../ReadReceiptStatus';
 
 export interface ContentMessageProps extends Omit<MessageActions, 'onClickResetSession'> {
   contextMenu: {entries: ko.Subscribable<ContextMenuEntry[]>};

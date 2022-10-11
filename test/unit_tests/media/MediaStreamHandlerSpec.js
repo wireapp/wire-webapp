@@ -17,9 +17,9 @@
  *
  */
 
+import {MediaConstraintsHandler} from 'src/script/media/MediaConstraintsHandler';
 import {MediaStreamHandler} from 'src/script/media/MediaStreamHandler';
 import {PermissionRepository} from 'src/script/permission/PermissionRepository';
-import {MediaConstraintsHandler} from 'src/script/media/MediaConstraintsHandler';
 
 describe('MediaStreamHandler', () => {
   let streamHandler;

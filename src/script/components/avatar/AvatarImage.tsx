@@ -18,16 +18,16 @@
  */
 
 import React, {useEffect, useState} from 'react';
-import {Transition} from 'react-transition-group';
+
 import {CSSObject} from '@emotion/serialize';
+import {Transition} from 'react-transition-group';
+import {container} from 'tsyringe';
 
 import {CSS_FILL_PARENT} from 'Util/CSSMixin';
 
 import {AssetRemoteData} from '../../assets/AssetRemoteData';
 import {AssetRepository} from '../../assets/AssetRepository';
-
 import {AVATAR_SIZE} from '../Avatar';
-import {container} from 'tsyringe';
 
 export interface AvatarImageProps {
   assetRepository?: AssetRepository;

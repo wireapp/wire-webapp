@@ -17,15 +17,17 @@
  *
  */
 
+import {act, waitFor} from '@testing-library/react';
 import {TypeUtil} from '@wireapp/commons';
+
+import Index from './Index';
+
 import {Config, Configuration} from '../../Config';
 import {initialRootState} from '../module/reducer';
+import {initialAuthState} from '../module/reducer/authReducer';
+import {ROUTE} from '../route';
 import {mockStoreFactory} from '../util/test/mockStoreFactory';
 import {mountComponent} from '../util/test/TestUtil';
-import Index from './Index';
-import {ROUTE} from '../route';
-import {initialAuthState} from '../module/reducer/authReducer';
-import {act, waitFor} from '@testing-library/react';
 
 jest.mock('../util/SVGProvider');
 

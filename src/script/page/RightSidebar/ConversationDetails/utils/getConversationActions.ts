@@ -21,7 +21,6 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 import {amplify} from 'amplify';
 
 import {MenuItem} from 'Components/panel/PanelActions';
-
 import {t} from 'Util/LocalizerUtil';
 
 import {ConversationRepository} from '../../../../conversation/ConversationRepository';

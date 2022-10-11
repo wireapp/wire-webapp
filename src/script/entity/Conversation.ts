@@ -17,46 +17,49 @@
  *
  */
 
-import {amplify} from 'amplify';
-import ko from 'knockout';
-import {Availability, LegalHoldStatus} from '@wireapp/protocol-messaging';
-import {QualifiedId} from '@wireapp/api-client/src/user';
-import {ConversationProtocol} from '@wireapp/api-client/src/conversation/NewConversation';
-import {Cancelable, debounce} from 'underscore';
-import {WebAppEvents} from '@wireapp/webapp-events';
 import {
   ACCESS_ROLE_V2,
   CONVERSATION_ACCESS,
   CONVERSATION_ACCESS_ROLE,
   CONVERSATION_TYPE,
 } from '@wireapp/api-client/src/conversation/';
-import {getLogger, Logger} from 'Util/Logger';
+import {RECEIPT_MODE} from '@wireapp/api-client/src/conversation/data';
+import {ConversationProtocol} from '@wireapp/api-client/src/conversation/NewConversation';
+import {QualifiedId} from '@wireapp/api-client/src/user';
+import {Availability, LegalHoldStatus} from '@wireapp/protocol-messaging';
+import {WebAppEvents} from '@wireapp/webapp-events';
+import {amplify} from 'amplify';
+import ko from 'knockout';
+import {container} from 'tsyringe';
+import {Cancelable, debounce} from 'underscore';
+
 import {t} from 'Util/LocalizerUtil';
+import {getLogger, Logger} from 'Util/Logger';
+import {matchQualifiedIds} from 'Util/QualifiedId';
 import {truncate} from 'Util/StringUtil';
-import {ACCESS_STATE} from '../conversation/AccessState';
-import {NOTIFICATION_STATE} from '../conversation/NotificationSetting';
-import {ConversationStatus} from '../conversation/ConversationStatus';
-import {ConversationRepository} from '../conversation/ConversationRepository';
-import {ConversationVerificationState} from '../conversation/ConversationVerificationState';
-import {ClientRepository} from '../client/ClientRepository';
-import {StatusType} from '../message/StatusType';
-import {ConnectionEntity} from '../connection/ConnectionEntity';
-import {ConversationError} from '../error/ConversationError';
-import type {User} from './User';
+
+import {CallMessage} from './message/CallMessage';
 import type {ContentMessage} from './message/ContentMessage';
 import type {MemberMessage} from './message/MemberMessage';
 import type {Message} from './message/Message';
-import type {SystemMessage} from './message/SystemMessage';
-import {Config} from '../Config';
-import type {Call} from '../calling/Call';
-import {RECEIPT_MODE} from '@wireapp/api-client/src/conversation/data';
-import {ConversationRecord} from '../storage/record/ConversationRecord';
-import {CallMessage} from './message/CallMessage';
 import {PingMessage} from './message/PingMessage';
-import {container} from 'tsyringe';
-import {TeamState} from '../team/TeamState';
-import {matchQualifiedIds} from 'Util/QualifiedId';
+import type {SystemMessage} from './message/SystemMessage';
+import type {User} from './User';
+
+import type {Call} from '../calling/Call';
+import {ClientRepository} from '../client/ClientRepository';
+import {Config} from '../Config';
+import {ConnectionEntity} from '../connection/ConnectionEntity';
+import {ACCESS_STATE} from '../conversation/AccessState';
+import {ConversationRepository} from '../conversation/ConversationRepository';
+import {ConversationStatus} from '../conversation/ConversationStatus';
+import {ConversationVerificationState} from '../conversation/ConversationVerificationState';
+import {NOTIFICATION_STATE} from '../conversation/NotificationSetting';
+import {ConversationError} from '../error/ConversationError';
 import {LegalHoldModalState} from '../legal-hold/LegalHoldModalState';
+import {StatusType} from '../message/StatusType';
+import {ConversationRecord} from '../storage/record/ConversationRecord';
+import {TeamState} from '../team/TeamState';
 
 interface UnreadState {
   allEvents: Message[];

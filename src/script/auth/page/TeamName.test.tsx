@@ -17,13 +17,15 @@
  *
  */
 
+import {fireEvent} from '@testing-library/react';
+
+import TeamName from './TeamName';
+
+import {ValidationError} from '../module/action/ValidationError';
 import {initialRootState} from '../module/reducer';
+import {initialAuthState} from '../module/reducer/authReducer';
 import {mockStoreFactory} from '../util/test/mockStoreFactory';
 import {mountComponent} from '../util/test/TestUtil';
-import TeamName from './TeamName';
-import {initialAuthState} from '../module/reducer/authReducer';
-import {ValidationError} from '../module/action/ValidationError';
-import {fireEvent} from '@testing-library/react';
 
 jest.mock('../util/SVGProvider');
 

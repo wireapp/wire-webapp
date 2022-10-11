@@ -17,6 +17,8 @@
  *
  */
 
+import React, {useRef, useState} from 'react';
+
 import {
   ArrowIcon,
   COLOR,
@@ -33,13 +35,17 @@ import {
   Text,
 } from '@wireapp/react-ui-kit';
 import {WebAppEvents} from '@wireapp/webapp-events';
-import React, {useRef, useState} from 'react';
+import {amplify} from 'amplify';
+import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 import {useIntl} from 'react-intl';
 import {connect} from 'react-redux';
-import {AnyAction, Dispatch} from 'redux';
 import {useParams} from 'react-router-dom';
+import {AnyAction, Dispatch} from 'redux';
+
 import {getLogger} from 'Util/Logger';
-import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
+
+import Page from './Page';
+import SingleSignOnForm from './SingleSignOnForm';
 
 import {Config} from '../../Config';
 import {ssoLoginStrings} from '../../strings';
@@ -47,13 +53,10 @@ import AppAlreadyOpen from '../component/AppAlreadyOpen';
 import RouterLink from '../component/RouterLink';
 import {BackendError} from '../module/action/BackendError';
 import {RootState, bindActionCreators} from '../module/reducer';
-import {ROUTE} from '../route';
-import Page from './Page';
-import SingleSignOnForm from './SingleSignOnForm';
 import * as AuthSelector from '../module/selector/AuthSelector';
-import {amplify} from 'amplify';
+import {ROUTE} from '../route';
 
-interface Props extends React.HTMLAttributes<HTMLDivElement> {}
+type Props = React.HTMLAttributes<HTMLDivElement>;
 
 const logger = getLogger('SingleSignOn');
 

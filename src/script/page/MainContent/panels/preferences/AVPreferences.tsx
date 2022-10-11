@@ -18,18 +18,21 @@
  */
 
 import React from 'react';
+
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
-import type {CallingRepository} from '../../../../calling/CallingRepository';
-import type {MediaRepository} from '../../../../media/MediaRepository';
-import type {PropertiesRepository} from '../../../../properties/PropertiesRepository';
 import {t} from 'Util/LocalizerUtil';
-import {DeviceTypes} from '../../../../media/MediaDevicesHandler';
-import SaveCallLogs from './avPreferences/SaveCallLogs';
+
+import AudioOutPreferences from './avPreferences/AudioOutPreferences';
 import CallOptions from './avPreferences/CallOptions';
 import CameraPreferences from './avPreferences/CameraPreferences';
 import MicrophonePreferences from './avPreferences/MicrophonePreferences';
-import AudioOutPreferences from './avPreferences/AudioOutPreferences';
+import SaveCallLogs from './avPreferences/SaveCallLogs';
 import PreferencesPage from './components/PreferencesPage';
+
+import type {CallingRepository} from '../../../../calling/CallingRepository';
+import {DeviceTypes} from '../../../../media/MediaDevicesHandler';
+import type {MediaRepository} from '../../../../media/MediaRepository';
+import type {PropertiesRepository} from '../../../../properties/PropertiesRepository';
 
 interface AVPreferencesProps {
   callingRepository: CallingRepository;

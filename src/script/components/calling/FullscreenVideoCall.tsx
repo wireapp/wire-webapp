@@ -17,38 +17,42 @@
  *
  */
 
+import React, {useEffect, useMemo, useState} from 'react';
+
 import {css} from '@emotion/react';
 import {CALL_TYPE, CONV_TYPE} from '@wireapp/avs';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import {amplify} from 'amplify';
-import Icon from 'Components/Icon';
-import React, {useEffect, useMemo, useState} from 'react';
-import {TeamState} from '../../team/TeamState';
 import {container} from 'tsyringe';
+
+import Icon from 'Components/Icon';
+import ClassifiedBar from 'Components/input/ClassifiedBar';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
-import type {Call} from '../../calling/Call';
-import type {Participant} from '../../calling/Participant';
-import type {Grid} from '../../calling/videoGridHandler';
-import type {Conversation} from '../../entity/Conversation';
-import {MuteState} from '../../calling/CallState';
-import {DeviceTypes, ElectronDesktopCapturerSource, MediaDevicesHandler} from '../../media/MediaDevicesHandler';
-import type {Multitasking} from '../../notification/NotificationRepository';
-import {t} from '../../util/LocalizerUtil';
-import {CallViewTab, CallViewTabs} from '../../view_model/CallingViewModel';
+import {KEY} from 'Util/KeyboardUtil';
+import {preventFocusOutside} from 'Util/util';
+
 import ButtonGroup from './ButtonGroup';
 import DeviceToggleButton from './DeviceToggleButton';
 import Duration from './Duration';
-import GroupVideoGrid from './GroupVideoGrid';
-import Pagination from './Pagination';
-import ClassifiedBar from 'Components/input/ClassifiedBar';
-import {KEY} from 'Util/KeyboardUtil';
-import {preventFocusOutside} from 'Util/util';
 import {
   videoControlActiveStyles,
   videoControlInActiveStyles,
   videoControlDisabledStyles,
   paginationButtonStyles,
 } from './FullscreenVideoCallStyles';
+import GroupVideoGrid from './GroupVideoGrid';
+import Pagination from './Pagination';
+
+import type {Call} from '../../calling/Call';
+import {MuteState} from '../../calling/CallState';
+import type {Participant} from '../../calling/Participant';
+import type {Grid} from '../../calling/videoGridHandler';
+import type {Conversation} from '../../entity/Conversation';
+import {DeviceTypes, ElectronDesktopCapturerSource, MediaDevicesHandler} from '../../media/MediaDevicesHandler';
+import type {Multitasking} from '../../notification/NotificationRepository';
+import {TeamState} from '../../team/TeamState';
+import {t} from '../../util/LocalizerUtil';
+import {CallViewTab, CallViewTabs} from '../../view_model/CallingViewModel';
 
 export interface FullscreenVideoCallProps {
   activeCallViewTab: string;

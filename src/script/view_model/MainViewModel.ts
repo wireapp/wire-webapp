@@ -23,12 +23,12 @@ import {container} from 'tsyringe';
 
 import {getLogger, Logger} from 'Util/Logger';
 
-import {WindowTitleViewModel} from './WindowTitleViewModel';
-import {ContentViewModel} from './ContentViewModel';
-import {CallingViewModel} from './CallingViewModel';
 import {ActionsViewModel} from './ActionsViewModel';
-import {ListViewModel} from './ListViewModel';
+import {CallingViewModel} from './CallingViewModel';
+import {ContentViewModel} from './ContentViewModel';
 import {FaviconViewModel} from './FaviconViewModel';
+import {ListViewModel} from './ListViewModel';
+import {WindowTitleViewModel} from './WindowTitleViewModel';
 
 import type {AssetRepository} from '../assets/AssetRepository';
 import type {AudioRepository} from '../audio/AudioRepository';
@@ -37,26 +37,26 @@ import type {CallingRepository} from '../calling/CallingRepository';
 import type {ClientRepository} from '../client/ClientRepository';
 import type {ConnectionRepository} from '../connection/ConnectionRepository';
 import type {ConversationRepository} from '../conversation/ConversationRepository';
+import type {MessageRepository} from '../conversation/MessageRepository';
 import type {CryptographyRepository} from '../cryptography/CryptographyRepository';
+import {Message} from '../entity/message/Message';
+import type {User} from '../entity/User';
 import type {EventRepository} from '../event/EventRepository';
 import type {GiphyRepository} from '../extension/GiphyRepository';
 import type {IntegrationRepository} from '../integration/IntegrationRepository';
 import type {MediaRepository} from '../media/MediaRepository';
 import type {Multitasking, NotificationRepository} from '../notification/NotificationRepository';
-import type {PermissionRepository} from '../permission/PermissionRepository';
 import type {PreferenceNotificationRepository} from '../notification/PreferenceNotificationRepository';
+import type {PermissionRepository} from '../permission/PermissionRepository';
 import type {PropertiesRepository} from '../properties/PropertiesRepository';
 import type {SearchRepository} from '../search/SearchRepository';
-import type {ServerTimeHandler} from '../time/serverTimeHandler';
+import {Core} from '../service/CoreSingleton';
 import type {StorageRepository} from '../storage';
 import type {TeamRepository} from '../team/TeamRepository';
-import type {User} from '../entity/User';
-import type {UserRepository} from '../user/UserRepository';
+import type {ServerTimeHandler} from '../time/serverTimeHandler';
 import type {EventTrackingRepository} from '../tracking/EventTrackingRepository';
-import type {MessageRepository} from '../conversation/MessageRepository';
+import type {UserRepository} from '../user/UserRepository';
 import {UserState} from '../user/UserState';
-import {Core} from '../service/CoreSingleton';
-import {Message} from '../entity/message/Message';
 
 export interface ViewModelRepositories {
   asset: AssetRepository;

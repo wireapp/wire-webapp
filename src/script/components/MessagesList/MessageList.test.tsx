@@ -18,13 +18,17 @@
  */
 
 import React from 'react';
+
 import {act, render, waitFor} from '@testing-library/react';
-import {ContentMessage} from 'src/script/entity/message/ContentMessage';
+
 import {Conversation} from 'src/script/entity/Conversation';
-import MessagesList from './';
-import {Text} from '../../entity/message/Text';
-import {createRandomUuid} from 'Util/util';
+import {ContentMessage} from 'src/script/entity/message/ContentMessage';
 import {User} from 'src/script/entity/User';
+import {createRandomUuid} from 'Util/util';
+
+import {Text} from '../../entity/message/Text';
+
+import MessagesList from './';
 
 const getDefaultParams = (): React.ComponentProps<typeof MessagesList> => {
   const conversation = new Conversation(createRandomUuid());

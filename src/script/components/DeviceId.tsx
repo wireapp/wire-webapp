@@ -18,6 +18,7 @@
  */
 
 import React from 'react';
+
 import {splitFingerprint} from 'Util/StringUtil';
 
 export interface DeviceIdProps {

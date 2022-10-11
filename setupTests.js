@@ -17,6 +17,8 @@
  *
  */
 
+/* eslint-disable import/order */
+
 // Polyfill for "tsyringe" dependency injection
 require('core-js/full/reflect');
 require('intersection-observer');

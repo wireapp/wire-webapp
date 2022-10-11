@@ -18,13 +18,16 @@
  */
 
 import React, {useState} from 'react';
+
 import cx from 'classnames';
 
 import Icon from 'Components/Icon';
 import ModalComponent from 'Components/ModalComponent';
-import {initFadingScrollbar} from '../../../ui/fadingScrollbar';
-import {Action, PrimaryModalType} from './PrimaryModalTypes';
+
 import {usePrimaryModalState, showNextModalInQueue, defaultContent, removeCurrentModal} from './PrimaryModalState';
+import {Action, PrimaryModalType} from './PrimaryModalTypes';
+
+import {initFadingScrollbar} from '../../../ui/fadingScrollbar';
 
 export const PrimaryModalComponent: React.FC = () => {
   const [inputValue, updateInputValue] = useState<string>('');

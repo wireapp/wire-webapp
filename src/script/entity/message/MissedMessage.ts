@@ -17,8 +17,9 @@
  *
  */
 
-import {SuperType} from '../../message/SuperType';
 import {Message} from './Message';
+
+import {SuperType} from '../../message/SuperType';
 
 export class MissedMessage extends Message {
   constructor() {

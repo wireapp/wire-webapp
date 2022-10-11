@@ -17,9 +17,11 @@
  *
  */
 
-import {Button, COLOR, Column, Columns, Container, H3, Link, Modal, Text} from '@wireapp/react-ui-kit';
 import React from 'react';
+
+import {Button, COLOR, Column, Columns, Container, H3, Link, Modal, Text} from '@wireapp/react-ui-kit';
 import {FormattedMessage, useIntl} from 'react-intl';
+
 import {Config} from '../../Config';
 import {acceptNewsModalStrings} from '../../strings';
 

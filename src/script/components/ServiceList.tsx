@@ -18,13 +18,14 @@
  */
 
 import React, {Fragment} from 'react';
+
 import cx from 'classnames';
 
 import ParticipantItem from 'Components/list/ParticipantItem';
+import {KEY} from 'Util/KeyboardUtil';
 
 import type {ServiceEntity} from '../integration/ServiceEntity';
 import {t} from '../util/LocalizerUtil';
-import {KEY} from 'Util/KeyboardUtil';
 
 export interface ServiceListProps {
   services: ServiceEntity[];

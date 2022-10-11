@@ -17,12 +17,16 @@
  *
  */
 
-import ko from 'knockout';
 import {render} from '@testing-library/react';
-import Preferences from './Preferences';
-import {ContentViewModel, ContentState} from 'src/script/view_model/ContentViewModel';
-
 import {Runtime} from '@wireapp/commons';
+import ko from 'knockout';
+
+import {ContentState, ContentViewModel} from 'src/script/view_model/ContentViewModel';
+
+import Preferences from './Preferences';
+
+// TODO: Remove after all migrations
+jest.mock('src/script/page/RightSidebar/utils/toggleRightPanel', () => () => jest.fn());
 
 describe('Preferences', () => {
   const defaultParams = {

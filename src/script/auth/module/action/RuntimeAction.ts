@@ -17,14 +17,15 @@
  *
  */
 
+import {Runtime} from '@wireapp/commons';
 import type {CookiesStatic} from 'js-cookie';
 
+import {RuntimeActionCreator} from './creator/';
+
+import * as RuntimeSelector from '../../module/selector/RuntimeSelector';
 import {QUERY_KEY} from '../../route';
-import {Runtime} from '@wireapp/commons';
 import {hasURLParameter} from '../../util/urlUtil';
 import type {ThunkAction} from '../reducer';
-import {RuntimeActionCreator} from './creator/';
-import * as RuntimeSelector from '../../module/selector/RuntimeSelector';
 
 export class RuntimeAction {
   checkSupportedBrowser = (): ThunkAction<void> => {

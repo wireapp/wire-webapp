@@ -19,16 +19,18 @@
 
 import React from 'react';
 
-import Icon from 'Components/Icon';
-import {useKoSubscribableChildren} from 'Util/ComponentUtil';
-import ConversationListCallingCell from 'Components/list/ConversationListCallingCell';
-import {t} from 'Util/LocalizerUtil';
-import {User} from '../../../entity/User';
-import {ListViewModel} from '../../../view_model/ListViewModel';
-import {Config} from '../../../Config';
-import {CallingViewModel} from '../../../view_model/CallingViewModel';
 import {QualifiedId} from '@wireapp/api-client/src/user';
+
+import Icon from 'Components/Icon';
+import ConversationListCallingCell from 'Components/list/ConversationListCallingCell';
 import PrimaryModal from 'Components/Modals/PrimaryModal';
+import {useKoSubscribableChildren} from 'Util/ComponentUtil';
+import {t} from 'Util/LocalizerUtil';
+
+import {Config} from '../../../Config';
+import {User} from '../../../entity/User';
+import {CallingViewModel} from '../../../view_model/CallingViewModel';
+import {ListViewModel} from '../../../view_model/ListViewModel';
 
 type TemporaryGuestConversations = {
   callingViewModel: CallingViewModel;

@@ -22,6 +22,7 @@ import {amplify} from 'amplify';
 
 import LegalHoldModal from './LegalHoldModal';
 
+import {TestFactory} from '../../../../../test/helper/TestFactory';
 import {CallingRepository} from '../../../calling/CallingRepository';
 import {ClientRepository} from '../../../client/ClientRepository';
 import {ConversationRepository} from '../../../conversation/ConversationRepository';
@@ -33,8 +34,6 @@ import {SearchService} from '../../../search/SearchService';
 import {TeamRepository} from '../../../team/TeamRepository';
 import {UserRepository} from '../../../user/UserRepository';
 import {UserState} from '../../../user/UserState';
-
-import {TestFactory} from '../../../../../test/helper/TestFactory';
 
 const userRepository = {} as UserRepository;
 const testFactory = new TestFactory();

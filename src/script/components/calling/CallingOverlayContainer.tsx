@@ -17,25 +17,27 @@
  *
  */
 
-import {CALL_TYPE, STATE as CALL_STATE} from '@wireapp/avs';
 import React, {Fragment, useEffect} from 'react';
+
+import {CALL_TYPE, STATE as CALL_STATE} from '@wireapp/avs';
 import {container} from 'tsyringe';
 
 import {registerReactComponent, useKoSubscribableChildren} from 'Util/ComponentUtil';
 
+import ChooseScreen, {Screen} from './ChooseScreen';
+import FullscreenVideoCall from './FullscreenVideoCall';
+
 import {Call} from '../../calling/Call';
 import {CallingRepository} from '../../calling/CallingRepository';
-import {MediaRepository} from '../../media/MediaRepository';
 import {CallState, MuteState} from '../../calling/CallState';
+import {LEAVE_CALL_REASON} from '../../calling/enum/LeaveCallReason';
 import {Participant} from '../../calling/Participant';
 import {useVideoGrid} from '../../calling/videoGridHandler';
 import {ConversationState} from '../../conversation/ConversationState';
 import {ElectronDesktopCapturerSource} from '../../media/MediaDevicesHandler';
+import {MediaRepository} from '../../media/MediaRepository';
 import {Multitasking} from '../../notification/NotificationRepository';
 import {CallViewTab} from '../../view_model/CallingViewModel';
-import ChooseScreen, {Screen} from './ChooseScreen';
-import FullscreenVideoCall from './FullscreenVideoCall';
-import {LEAVE_CALL_REASON} from '../../calling/enum/LeaveCallReason';
 
 export interface CallingContainerProps {
   readonly callingRepository: CallingRepository;

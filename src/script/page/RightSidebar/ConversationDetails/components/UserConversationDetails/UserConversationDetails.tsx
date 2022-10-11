@@ -19,10 +19,9 @@
 
 import {FC} from 'react';
 
-import UserDetails from 'Components/panel/UserDetails';
-import EnrichedFields from 'Components/panel/EnrichedFields';
 import Icon from 'Components/Icon';
-
+import EnrichedFields from 'Components/panel/EnrichedFields';
+import UserDetails from 'Components/panel/UserDetails';
 import {t} from 'Util/LocalizerUtil';
 
 import {User} from '../../../../../entity/User';

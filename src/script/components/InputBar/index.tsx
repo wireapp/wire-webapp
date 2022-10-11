@@ -17,8 +17,6 @@
  *
  */
 
-import {Availability} from '@wireapp/protocol-messaging';
-import {WebAppEvents} from '@wireapp/webapp-events';
 import {
   ChangeEvent,
   ClipboardEvent as ReactClipboardEvent,
@@ -29,62 +27,62 @@ import {
   useRef,
   useState,
 } from 'react';
+
+import {Availability} from '@wireapp/protocol-messaging';
+import {StyledApp, THEME_ID, useMatchMedia} from '@wireapp/react-ui-kit';
+import {WebAppEvents} from '@wireapp/webapp-events';
 import {amplify} from 'amplify';
 import cx from 'classnames';
 import {container} from 'tsyringe';
 
-import ClassifiedBar from 'Components/input/ClassifiedBar';
 import Avatar, {AVATAR_SIZE} from 'Components/Avatar';
 import useEmoji from 'Components/Emoji/useEmoji';
-
+import Icon from 'Components/Icon';
+import ClassifiedBar from 'Components/input/ClassifiedBar';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {loadDraftState, saveDraftState} from 'Util/DraftStateUtil';
+import {allowsAllFiles, getFileExtensionOrName, hasAllowedExtension} from 'Util/FileTypeUtil';
 import isHittingUploadLimit from 'Util/isHittingUploadLimit';
 import {insertAtCaret, isFunctionKey, KEY} from 'Util/KeyboardUtil';
+import {t} from 'Util/LocalizerUtil';
 import {
   createMentionEntity,
   detectMentionEdgeDeletion,
   getMentionCandidate,
   updateMentionRanges,
 } from 'Util/MentionUtil';
-import {t} from 'Util/LocalizerUtil';
-import {formatBytes, getSelectionPosition} from 'Util/util';
 import {formatLocale, TIME_IN_MILLIS} from 'Util/TimeUtil';
-import {allowsAllFiles, getFileExtensionOrName, hasAllowedExtension} from 'Util/FileTypeUtil';
+import {formatBytes, getSelectionPosition} from 'Util/util';
 
 import getRichTextInput from './getRichTextInput';
-import MentionSuggestionList from '../../page/message-list/MentionSuggestions';
-import {TeamState} from '../../team/TeamState';
-import {UserState} from '../../user/UserState';
-import {SearchRepository} from '../../search/SearchRepository';
-import {ContentMessage} from '../../entity/message/ContentMessage';
-import {Conversation} from '../../entity/Conversation';
-import {AssetRepository} from '../../assets/AssetRepository';
-import {ConversationRepository} from '../../conversation/ConversationRepository';
-import {EventRepository} from '../../event/EventRepository';
-import {MessageRepository, OutgoingQuote} from '../../conversation/MessageRepository';
-import {StorageRepository} from '../../storage';
-import {MentionEntity} from '../../message/MentionEntity';
-import {Config} from '../../Config';
-import {ConversationError} from '../../error/ConversationError';
-import {MessageHasher} from '../../message/MessageHasher';
-import {QuoteEntity} from '../../message/QuoteEntity';
-import {Text as TextAsset} from '../../entity/message/Text';
-import {User} from '../../entity/User';
-import {PropertiesRepository} from '../../properties/PropertiesRepository';
-
 import PastedFileControls from './PastedFileControls';
 import ReplyBar from './ReplyBar';
 
-import useScrollSync from '../../hooks/useScrollSync';
-import useResizeTarget from '../../hooks/useResizeTarget';
+import {AssetRepository} from '../../assets/AssetRepository';
+import {Config} from '../../Config';
+import {ConversationRepository} from '../../conversation/ConversationRepository';
+import {MessageRepository, OutgoingQuote} from '../../conversation/MessageRepository';
+import {Conversation} from '../../entity/Conversation';
+import {ContentMessage} from '../../entity/message/ContentMessage';
+import {Text as TextAsset} from '../../entity/message/Text';
+import {User} from '../../entity/User';
+import {ConversationError} from '../../error/ConversationError';
+import {EventRepository} from '../../event/EventRepository';
 import useDropFiles from '../../hooks/useDropFiles';
+import useResizeTarget from '../../hooks/useResizeTarget';
+import useScrollSync from '../../hooks/useScrollSync';
 import useTextAreaFocus from '../../hooks/useTextAreaFocus';
-
-import {StyledApp, THEME_ID, useMatchMedia} from '@wireapp/react-ui-kit';
+import {MentionEntity} from '../../message/MentionEntity';
+import {MessageHasher} from '../../message/MessageHasher';
+import {QuoteEntity} from '../../message/QuoteEntity';
 import ControlButtons from '../../page/message-list/InputBarControls/ControlButtons';
-import Icon from 'Components/Icon';
 import GiphyButton from '../../page/message-list/InputBarControls/GiphyButton';
+import MentionSuggestionList from '../../page/message-list/MentionSuggestions';
+import {PropertiesRepository} from '../../properties/PropertiesRepository';
+import {SearchRepository} from '../../search/SearchRepository';
+import {StorageRepository} from '../../storage';
+import {TeamState} from '../../team/TeamState';
+import {UserState} from '../../user/UserState';
 import PrimaryModal from '../Modals/PrimaryModal';
 
 const CONFIG = {

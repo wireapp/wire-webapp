@@ -24,11 +24,11 @@ import {Conversation} from 'src/script/entity/Conversation';
 
 import GuestServicesOptions from './GuestServicesOptions';
 
+import {TestFactory} from '../../../../../test/helper/TestFactory';
 import {ACCESS_STATE} from '../../../conversation/AccessState';
 import {ConversationRepository} from '../../../conversation/ConversationRepository';
 import {TeamRepository} from '../../../team/TeamRepository';
 import {TeamState} from '../../../team/TeamState';
-import {TestFactory} from '../../../../../test/helper/TestFactory';
 
 const testFactory = new TestFactory();
 let conversationRepository: ConversationRepository;

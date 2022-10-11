@@ -18,17 +18,18 @@
  */
 
 import React, {useEffect} from 'react';
+
 import {WebAppEvents} from '@wireapp/webapp-events';
 import {amplify} from 'amplify';
 
-import {t} from 'Util/LocalizerUtil';
-import {useKoSubscribableChildren} from 'Util/ComponentUtil';
-
-import type {User} from '../../entity/User';
+import AvailabilityState from 'Components/AvailabilityState';
 import Avatar, {AVATAR_SIZE} from 'Components/Avatar';
 import Icon from 'Components/Icon';
-import AvailabilityState from 'Components/AvailabilityState';
 import ClassifiedBar from 'Components/input/ClassifiedBar';
+import {useKoSubscribableChildren} from 'Util/ComponentUtil';
+import {t} from 'Util/LocalizerUtil';
+
+import type {User} from '../../entity/User';
 
 export interface UserDetailsProps {
   badge?: string;

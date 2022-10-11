@@ -18,7 +18,9 @@
  */
 
 import React from 'react';
+
 import {keyframes} from '@emotion/react';
+
 import SVGProvider from '../../auth/util/SVGProvider';
 
 const fadeAnimation = keyframes`

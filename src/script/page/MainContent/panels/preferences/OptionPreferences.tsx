@@ -18,22 +18,24 @@
  */
 
 import React, {useEffect, useState} from 'react';
+
+import {AudioPreference, WebappProperties, NotificationPreference} from '@wireapp/api-client/src/user/data/';
+import {Checkbox, CheckboxLabel} from '@wireapp/react-ui-kit';
+import {WebAppEvents} from '@wireapp/webapp-events';
 import {amplify} from 'amplify';
 import {container} from 'tsyringe';
-import {AudioPreference, WebappProperties, NotificationPreference} from '@wireapp/api-client/src/user/data/';
-import {THEMES as ThemeViewModelThemes} from '../../../../view_model/ThemeViewModel';
-import {WebAppEvents} from '@wireapp/webapp-events';
-import {PROPERTIES_TYPE} from '../../../../properties/PropertiesType';
 
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 
-import {PropertiesRepository} from '../../../../properties/PropertiesRepository';
-import {UserState} from '../../../../user/UserState';
-import PreferencesSection from './components/PreferencesSection';
-import PreferencesRadio from './components/PreferencesRadio';
 import PreferencesPage from './components/PreferencesPage';
-import {Checkbox, CheckboxLabel} from '@wireapp/react-ui-kit';
+import PreferencesRadio from './components/PreferencesRadio';
+import PreferencesSection from './components/PreferencesSection';
+
+import {PropertiesRepository} from '../../../../properties/PropertiesRepository';
+import {PROPERTIES_TYPE} from '../../../../properties/PropertiesType';
+import {UserState} from '../../../../user/UserState';
+import {THEMES as ThemeViewModelThemes} from '../../../../view_model/ThemeViewModel';
 
 interface OptionPreferencesProps {
   propertiesRepository: PropertiesRepository;

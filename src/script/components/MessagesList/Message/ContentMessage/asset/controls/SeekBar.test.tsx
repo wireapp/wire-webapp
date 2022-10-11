@@ -17,8 +17,9 @@
  *
  */
 
-import SeekBar from './SeekBar';
 import {render, act} from '@testing-library/react';
+
+import SeekBar from './SeekBar';
 
 const createAudioElement = (currentTime: number, maxTime: number) => {
   const audioElement = document.createElement('audio');

@@ -17,19 +17,18 @@
  *
  */
 
-import {RECEIPT_MODE} from '@wireapp/api-client/src/conversation/data/';
 import {FC} from 'react';
+
+import {RECEIPT_MODE} from '@wireapp/api-client/src/conversation/data/';
 
 import Icon from 'Components/Icon';
 import ReceiptModeToggle from 'Components/toggle/ReceiptModeToggle';
-
 import {t} from 'Util/LocalizerUtil';
 
 import ConversationDetailsOption from './ConversationDetailsOption';
 
-import {PanelState, PanelEntity} from '../../../RightSidebar';
-
 import {Conversation} from '../../../../../entity/Conversation';
+import {PanelState, PanelEntity} from '../../../RightSidebar';
 
 interface ConversationDetailsOptionsProps {
   activeConversation: Conversation;

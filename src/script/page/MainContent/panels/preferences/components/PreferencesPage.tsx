@@ -18,6 +18,7 @@
  */
 
 import React from 'react';
+
 import {initFadingScrollbar} from '../../../../../ui/fadingScrollbar';
 
 interface PreferencesPageProps {
