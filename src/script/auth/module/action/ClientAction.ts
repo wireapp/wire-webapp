@@ -103,6 +103,12 @@ export class ClientAction {
       model: deviceModel,
     };
   };
+
+  resetClientError = (): ThunkAction => {
+    return async dispatch => {
+      dispatch(ClientActionCreator.resetError());
+    };
+  };
 }
 
 export const clientAction = new ClientAction();

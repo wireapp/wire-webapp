@@ -19,25 +19,13 @@
 
 import ko from 'knockout';
 
-import NotificationsPanel, {NotificationsPanelProps} from './NotificationsPanel';
-
-import TestPage from 'Util/test/TestPage';
+import NotificationsPanel from './NotificationsPanel';
 import {ViewModelRepositories} from '../MainViewModel';
 import {Conversation} from 'src/script/entity/Conversation';
 import {NOTIFICATION_STATE} from 'src/script/conversation/NotificationSetting';
 import {ConversationState} from 'src/script/conversation/ConversationState';
 import {ConversationRepository} from 'src/script/conversation/ConversationRepository';
-import {fireEvent} from '@testing-library/react';
-
-class NotificationsPanelPage extends TestPage<NotificationsPanelProps> {
-  constructor(props?: NotificationsPanelProps) {
-    super(NotificationsPanel, props);
-  }
-
-  getCheckedInput = () => this.get('input[checked]') as HTMLInputElement;
-  getInputWithValue = (value: number) => this.get(`input[value="${value}"]`);
-  clickInputWithValue = (value: number) => this.click(this.getInputWithValue(value));
-}
+import {render, fireEvent} from '@testing-library/react';
 
 describe('NotificationsPanel', () => {
   const onGoBack = jest.fn();
@@ -51,13 +39,18 @@ describe('NotificationsPanel', () => {
     const conversationState = {
       activeConversation: ko.observable(conversation),
     } as ConversationState;
-    const notificationsPanel = new NotificationsPanelPage({
+    const props = {
       conversationState,
       onClose,
       onGoBack,
       repositories: {} as ViewModelRepositories,
-    });
-    expect(notificationsPanel.getCheckedInput().value).toEqual(NOTIFICATION_STATE.MENTIONS_AND_REPLIES.toString());
+    };
+
+    const {getByRole} = render(<NotificationsPanel {...props} />);
+
+    const checkbox = getByRole('radio', {checked: true}) as HTMLInputElement;
+
+    expect(checkbox.value).toEqual(NOTIFICATION_STATE.MENTIONS_AND_REPLIES.toString());
   });
 
   it('sets the correct new value on the ative conversation', () => {
@@ -68,13 +61,20 @@ describe('NotificationsPanel', () => {
     const conversationRepo = {
       setNotificationState: jest.fn(),
     } as Partial<ConversationRepository>;
-    const notificationsPanel = new NotificationsPanelPage({
+
+    const props = {
       conversationState,
       onClose,
       onGoBack,
       repositories: {conversation: conversationRepo} as ViewModelRepositories,
-    });
-    fireEvent.click(notificationsPanel.getInputWithValue(NOTIFICATION_STATE.MENTIONS_AND_REPLIES));
+    };
+
+    const {getByLabelText} = render(<NotificationsPanel {...props} />);
+
+    const mentionsRadioInput = getByLabelText('notificationSettingsMentionsAndReplies');
+
+    fireEvent.click(mentionsRadioInput);
+
     expect(conversationRepo.setNotificationState).toHaveBeenCalledWith(
       conversation,
       NOTIFICATION_STATE.MENTIONS_AND_REPLIES,

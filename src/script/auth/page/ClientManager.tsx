@@ -35,7 +35,7 @@ interface Props extends React.HTMLProps<HTMLDivElement> {}
 const ClientManager = ({doGetAllClients, doLogout}: Props & ConnectedProps & DispatchProps) => {
   const {formatMessage: _} = useIntl();
   const SFAcode = localStorage.getItem(QUERY_KEY.CONVERSATION_CODE);
-  const timeRemaining = JSON.parse(localStorage.getItem(QUERY_KEY.JOIN_EXPIRES))?.data ?? Date.now();
+  const timeRemaining = JSON.parse(localStorage.getItem(QUERY_KEY.JOIN_EXPIRES) ?? '')?.data ?? Date.now();
 
   // Automatically log the user out if ten minutes passes and they are a 2fa user.
   const {startTimeout} = useTimeout(

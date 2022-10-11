@@ -17,17 +17,9 @@
  *
  */
 
-import GroupAvatar, {GroupAvatarProps} from './GroupAvatar';
-import TestPage from 'Util/test/TestPage';
+import GroupAvatar from './GroupAvatar';
 import {User} from '../../entity/User';
-
-class GroupAvatarPage extends TestPage<GroupAvatarProps> {
-  constructor(props?: GroupAvatarProps) {
-    super(GroupAvatar, props);
-  }
-
-  getAvatarWrapper = () => this.get('div[data-uie-name="group-avatar-box-wrapper"]');
-}
+import {render} from '@testing-library/react';
 
 describe('GroupAvatar', () => {
   it('renders avatar', async () => {
@@ -39,11 +31,11 @@ describe('GroupAvatar', () => {
     user1.name('Spencer Senger');
     user2.name('Tasia Price');
     user3.name('Dorsey Rath');
-    const GroupAvatar = new GroupAvatarPage({
-      users: [user0, user1, user2, user3],
-    });
 
-    expect(GroupAvatar.getAvatarWrapper()).not.toBeNull();
-    expect(GroupAvatar.getAvatarWrapper()?.children.length).toBe(4);
+    const {getByTestId} = render(<GroupAvatar users={[user0, user1, user2, user3]} />);
+
+    const avatarWrapper = getByTestId('group-avatar-box-wrapper');
+
+    expect(avatarWrapper.children).toHaveLength(4);
   });
 });
