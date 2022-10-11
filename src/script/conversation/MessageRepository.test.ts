@@ -32,7 +32,6 @@ import {MessageRepository} from 'src/script/conversation/MessageRepository';
 import {ConversationRepository} from './ConversationRepository';
 import {CryptographyRepository} from '../cryptography/CryptographyRepository';
 import {EventRepository} from '../event/EventRepository';
-import {MessageSender} from '../message/MessageSender';
 import {PropertiesRepository} from '../properties/PropertiesRepository';
 import {ServerTimeHandler, serverTimeHandler} from '../time/serverTimeHandler';
 import {UserRepository} from '../user/UserRepository';
@@ -65,7 +64,6 @@ type MessageRepositoryDependencies = {
   core: Core;
   cryptographyRepository: CryptographyRepository;
   eventRepository: EventRepository;
-  messageSender: MessageSender;
   propertiesRepository: PropertiesRepository;
   serverTimeHandler: ServerTimeHandler;
   userRepository: UserRepository;
@@ -79,8 +77,6 @@ async function buildMessageRepository(): Promise<[MessageRepository, MessageRepo
   const clientState = new ClientState();
   clientState.currentClient(new ClientEntity(true, ''));
   const core = container.resolve(Core);
-  const messageSender = new MessageSender();
-  messageSender.pauseQueue(false);
   await core.initServices({} as any);
   /* eslint-disable sort-keys-fix/sort-keys-fix */
   const conversationState = new ConversationState(userState);
@@ -91,7 +87,6 @@ async function buildMessageRepository(): Promise<[MessageRepository, MessageRepo
     conversationRepository: () => ({} as ConversationRepository),
     cryptographyRepository: new CryptographyRepository({} as any),
     eventRepository: new EventRepository(new EventService({} as any), {} as any, {} as any, {} as any),
-    messageSender,
     propertiesRepository: new PropertiesRepository({} as any, {} as any),
     serverTimeHandler: serverTimeHandler,
     userRepository: {} as UserRepository,

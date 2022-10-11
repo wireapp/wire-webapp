@@ -319,7 +319,7 @@ export class CallingRepository {
     const {id, domain} = call.conversationId;
     const allClients = conversation.isUsingMLSProtocol
       ? await this.core.service!.conversation.fetchAllParticipantsClients(id, domain)
-      : await this.core.service!.conversation.getAllParticipantsClients(id, domain);
+      : await this.core.service!.conversation.getAllParticipantsClients(call.conversationId);
     const qualifiedClients = isQualifiedUserClients(allClients)
       ? flattenQualifiedUserClients(allClients)
       : flattenUserClients(allClients);
@@ -590,7 +590,7 @@ export class CallingRepository {
           const {id, domain} = conversationId;
           const allClients = conversationEntity.isUsingMLSProtocol
             ? await this.core.service!.conversation.fetchAllParticipantsClients(id, domain)
-            : await this.core.service!.conversation.getAllParticipantsClients(id, domain);
+            : await this.core.service!.conversation.getAllParticipantsClients(conversationId);
           // We warn the message repository that a mismatch has happened outside of its lifecycle (eventually triggering a conversation degradation)
           const shouldContinue = await this.messageRepository.updateMissingClients(
             conversationEntity,

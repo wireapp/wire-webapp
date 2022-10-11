@@ -54,7 +54,6 @@ import {MessageRepository} from 'src/script/conversation/MessageRepository';
 import {SelfService} from 'src/script/self/SelfService';
 import {PropertiesRepository} from 'src/script/properties/PropertiesRepository';
 import {PropertiesService} from 'src/script/properties/PropertiesService';
-import {MessageSender} from 'src/script/message/MessageSender';
 import {UserService} from 'src/script/user/UserService';
 import {BackupService} from 'src/script/backup/BackupService';
 import {StorageService} from 'src/script/storage';
@@ -294,7 +293,6 @@ export class TestFactory {
       () => this.conversation_repository,
       this.cryptography_repository,
       this.event_repository,
-      new MessageSender(),
       this.propertyRepository,
       serverTimeHandler,
       this.user_repository,
