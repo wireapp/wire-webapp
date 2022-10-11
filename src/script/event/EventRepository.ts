@@ -130,6 +130,7 @@ export class EventRepository {
   //##############################################################################
 
   private readonly updateConnectivitityStatus = (state: ConnectionState) => {
+    this.logger.log('Websocket connection state changed to', state);
     switch (state) {
       case ConnectionState.CONNECTING: {
         amplify.publish(WebAppEvents.WARNING.DISMISS, Warnings.TYPE.NO_INTERNET);
