@@ -33,25 +33,16 @@ import {
 import {CONVERSATION_TYPING, ConversationMemberUpdateData} from '@wireapp/api-client/src/conversation/data';
 import {ConversationMemberLeaveEvent} from '@wireapp/api-client/src/event';
 import {QualifiedId, QualifiedUserPreKeyBundleMap, UserPreKeyBundleMap} from '@wireapp/api-client/src/user';
-import {Cleared, DataTransfer, GenericMessage, LastRead} from '@wireapp/protocol-messaging';
+import {GenericMessage} from '@wireapp/protocol-messaging';
 
-import {
-  GenericMessageType,
-  MessageTimer,
-  PayloadBundleSource,
-  PayloadBundleState,
-  PayloadBundleType,
-  RemoveUsersParams,
-} from '../../conversation/';
-import {ClearedContent, RemoteData} from '../content';
+import {MessageTimer, PayloadBundleState, RemoveUsersParams} from '../../conversation/';
+import {RemoteData} from '../content';
 import {CryptographyService} from '../../cryptography/';
 import {MLSService} from '../../mls';
 import {NotificationService} from '../../notification';
 import {decryptAsset} from '../../cryptography/AssetCryptography';
 import {isStringArray, isQualifiedIdArray, isQualifiedUserClients, isUserClients} from '../../util/TypePredicateUtil';
-import {createId} from '../message/MessageBuilder';
 import {MessageService} from '../message/MessageService';
-import {ClearConversationMessage} from '../message/OtrMessage';
 import {XOR} from '@wireapp/commons/src/main/util/TypeUtil';
 import {
   AddUsersParams,
@@ -77,7 +68,6 @@ type SendResult = {
 export class ConversationService {
   public readonly messageTimer: MessageTimer;
   private readonly messageService: MessageService;
-  private selfConversationId?: QualifiedId;
 
   constructor(
     private readonly apiClient: APIClient,
@@ -187,16 +177,6 @@ export class ConversationService {
     }, {});
   }
 
-  private async getSelfConversationId(): Promise<QualifiedId> {
-    if (!this.selfConversationId) {
-      const {userId} = this.apiClient.context!;
-      const {qualified_id, id} = await this.apiClient.api.conversation.getConversation(userId);
-      const domain = this.config.useQualifiedIds ? qualified_id.domain : '';
-      this.selfConversationId = {id, domain};
-    }
-    return this.selfConversationId;
-  }
-
   private async getQualifiedRecipientsForConversation(
     conversationId: QualifiedId,
     userIds?: QualifiedId[] | QualifiedUserClients,
@@ -301,102 +281,6 @@ export class ConversationService {
       }, []);
     }
     return userIds;
-  }
-
-  public async clearConversation(
-    conversationId: string,
-    timestamp: number | Date = new Date(),
-    messageId: string = createId(),
-    sendAsProtobuf?: boolean,
-  ): Promise<ClearConversationMessage> {
-    if (timestamp instanceof Date) {
-      timestamp = timestamp.getTime();
-    }
-
-    const content: ClearedContent = {
-      clearedTimestamp: timestamp,
-      conversationId,
-    };
-
-    const clearedMessage = Cleared.create(content);
-
-    const genericMessage = GenericMessage.create({
-      [GenericMessageType.CLEARED]: clearedMessage,
-      messageId,
-    });
-
-    const selfConversationId = await this.getSelfConversationId();
-
-    await this.sendGenericMessage(selfConversationId, this.apiClient.validatedClientId, genericMessage, {
-      sendAsProtobuf,
-    });
-
-    return {
-      content,
-      conversation: conversationId,
-      from: this.apiClient.context!.userId,
-      id: messageId,
-      messageTimer: 0,
-      source: PayloadBundleSource.LOCAL,
-      state: PayloadBundleState.OUTGOING_SENT,
-      timestamp: Date.now(),
-      type: PayloadBundleType.CONVERSATION_CLEAR,
-    };
-  }
-
-  /**
-   * Sends a LastRead message to the current user's self conversation.
-   * This will allow all the user's devices to compute which messages are unread
-   *
-   * @param conversationId The conversation which has been read
-   * @param lastReadTimestamp The timestamp at which the conversation was read
-   * @param sendingOptions?
-   * @return Resolves when the message has been sent
-   */
-  public async sendLastRead(
-    conversationId: QualifiedId,
-    lastReadTimestamp: number,
-    sendingOptions?: MessageSendingOptions,
-  ) {
-    const lastRead = new LastRead({
-      conversationId: conversationId.id,
-      lastReadTimestamp,
-    });
-
-    const genericMessage = GenericMessage.create({
-      [GenericMessageType.LAST_READ]: lastRead,
-      messageId: createId(),
-    });
-
-    const selfConversationId = await this.getSelfConversationId();
-
-    return this.sendGenericMessage(selfConversationId, this.apiClient.validatedClientId, genericMessage, {
-      ...sendingOptions,
-    });
-  }
-
-  /**
-   * Syncs all self user's devices with the countly id
-   *
-   * @param countlyId The countly id of the current device
-   * @param sendingOptions?
-   * @return Resolves when the message has been sent
-   */
-  public async sendCountlySync(countlyId: string, sendingOptions: MessageSendingOptions) {
-    const dataTransfer = new DataTransfer({
-      trackingIdentifier: {
-        identifier: countlyId,
-      },
-    });
-    const genericMessage = new GenericMessage({
-      [GenericMessageType.DATA_TRANSFER]: dataTransfer,
-      messageId: createId(),
-    });
-
-    const selfConversationId = await this.getSelfConversationId();
-    return this.sendGenericMessage(selfConversationId, this.apiClient.validatedClientId, genericMessage, {
-      ...sendingOptions,
-    });
   }
 
   /**
