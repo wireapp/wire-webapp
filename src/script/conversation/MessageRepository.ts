@@ -983,11 +983,15 @@ export class MessageRepository {
   /**
    * Update cleared of conversation using timestamp.
    */
-  public updateClearedTimestamp(conversation: Conversation): void {
+  public async updateClearedTimestamp(conversation: Conversation): Promise<void> {
     const timestamp = conversation.getLastKnownTimestamp(this.serverTimeHandler.toServerTimestamp());
-
+    const selfConversation = this.conversationState.self_conversation();
+    if (!selfConversation) {
+      throw new Error('cannot clear conversation as selfConversation is not defined');
+    }
     if (timestamp && conversation.setTimestamp(timestamp, Conversation.TIMESTAMP_TYPE.CLEARED)) {
-      this.conversationService.clearConversation(conversation.id, timestamp);
+      const payload = MessageBuilder.buildClearedMessage(conversation.qualifiedId);
+      await this.sendAndInjectMessage(payload, selfConversation, {skipInjection: true});
     }
   }
 
@@ -1210,10 +1214,7 @@ export class MessageRepository {
     if (blockSystemMessage) {
       conversation.blockLegalHoldMessage = true;
     }
-    const missing = await this.conversationService.getAllParticipantsClients(
-      conversation.id,
-      this.core.backendFeatures.federationEndpoints ? conversation.domain : undefined,
-    );
+    const missing = await this.conversationService.getAllParticipantsClients(conversation.qualifiedId);
     const deleted = findDeletedClients(missing, await this.generateRecipients(conversation));
     await this.onClientMismatch?.({deleted, missing} as ClientMismatch, conversation, true);
     if (blockSystemMessage) {
@@ -1228,10 +1229,13 @@ export class MessageRepository {
    * @param conversation Conversation to be marked as read
    */
   public async markAsRead(conversation: Conversation) {
+    const selfConversation = this.conversationState.self_conversation();
+    if (!selfConversation) {
+      throw new Error('cannot mark as read as selfConversation is not defined');
+    }
     const timestamp = conversation.last_read_timestamp();
-    this.conversationService.sendLastRead(conversation.id, timestamp, {
-      userIds: this.generateRecipients(this.conversationState.self_conversation()),
-    });
+    const payload = MessageBuilder.buildLastReadMessage(conversation.qualifiedId, timestamp);
+    await this.sendAndInjectMessage(payload, selfConversation, {skipInjection: true});
     /*
      * FIXME notification removal can be improved.
      * We can add the conversation ID in the payload of the event and only check unread messages for this particular conversation
@@ -1246,9 +1250,12 @@ export class MessageRepository {
    * @param countlyId Countly new ID
    */
   public async sendCountlySync(countlyId: string) {
-    await this.conversationService.sendCountlySync(countlyId, {
-      userIds: this.generateRecipients(this.conversationState.self_conversation()),
-    });
+    const selfConversation = this.conversationState.self_conversation();
+    if (!selfConversation) {
+      throw new Error('cannot mark as read as selfConversation is not defined');
+    }
+    const payload = MessageBuilder.buildDataTransferMessage(countlyId);
+    await this.sendAndInjectMessage(payload, selfConversation, {skipInjection: true});
     this.logger.info(`Sent countly sync message with ID ${countlyId}`);
   }
 
