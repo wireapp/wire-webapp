@@ -30,7 +30,7 @@ import {actionRoot as ROOT_ACTIONS} from '../module/action';
 import {RootState, bindActionCreators} from '../module/reducer';
 import {ROUTE} from '../route';
 
-interface Props extends React.HTMLProps<HTMLDivElement> {}
+type Props = React.HTMLProps<HTMLDivElement>;
 
 const SetEntropyPage = ({pushEntropyData}: Props & ConnectedProps & DispatchProps) => {
   const navigate = useNavigate();

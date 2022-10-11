@@ -17,8 +17,9 @@
  *
  */
 
-import React, {useState} from 'react';
+import React, {useState, ChangeEvent} from 'react';
 
+import {Checkbox, CheckboxLabel, StyledApp, THEME_ID} from '@wireapp/react-ui-kit';
 import cx from 'classnames';
 
 import AvailabilityState from 'Components/AvailabilityState';
@@ -50,7 +51,7 @@ export interface ParticipantItemProps<UserType> extends Omit<React.HTMLProps<HTM
   mode?: UserlistMode;
   noInteraction?: boolean;
   noUnderline?: boolean;
-  onClick?: (user: UserType, event: MouseEvent) => void;
+  onClick?: (user: UserType, event: MouseEvent | ChangeEvent) => void;
   onKeyDown?: (user: UserType, event: KeyboardEvent) => void;
   participant: UserType;
   selfInTeam?: boolean;
@@ -76,7 +77,6 @@ const ParticipantItem = <UserType extends User | ServiceEntity>(
     noUnderline = false,
     participant,
     selfInTeam,
-    showArrow = false,
     showDropdown = false,
     onContextMenu = noop,
     onClick = noop,
@@ -137,20 +137,8 @@ const ParticipantItem = <UserType extends User | ServiceEntity>(
     }
   };
 
-  return (
-    <div
-      className={cx('participant-item-wrapper', {
-        highlighted,
-        'no-interaction': noInteraction,
-        'no-underline': noUnderline,
-      })}
-      role="button"
-      tabIndex={0}
-      onContextMenu={onContextMenu}
-      onClick={noInteraction ? onContextMenu : event => onClick(participant, event.nativeEvent)}
-      onKeyDown={noInteraction ? handleContextKeyDown : event => onKeyDown(participant, event.nativeEvent)}
-      aria-label={t('accessibility.openConversation', participantName)}
-    >
+  const RenderParticipant = () => {
+    return (
       <InViewport
         className="participant-item"
         data-uie-name={isUser ? 'item-user' : 'item-service'}
@@ -264,18 +252,57 @@ const ParticipantItem = <UserType extends User | ServiceEntity>(
                 )}
               </>
             )}
-
-            {canSelect && (
-              <div
-                className={cx('search-list-item-select icon-check', {selected: isSelected})}
-                data-uie-name="status-selected"
-              />
-            )}
-            {showArrow && <Icon.ChevronRight className="disclose-icon" />}
           </>
         )}
       </InViewport>
-    </div>
+    );
+  };
+
+  return (
+    <StyledApp themeId={THEME_ID.DEFAULT}>
+      {canSelect ? (
+        <div
+          className={cx('participant-item-wrapper', {
+            highlighted,
+            'no-interaction': noInteraction,
+            'no-underline': noUnderline,
+          })}
+          onContextMenu={onContextMenu}
+          aria-label={t('accessibility.openConversation', participantName)}
+        >
+          <Checkbox
+            checked={isSelected}
+            onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+              onClick(participant, event);
+            }}
+            data-uie-name="status-selected"
+            labelBeforeCheckbox={true}
+            aligncenter={false}
+            outlineOffset="0"
+          >
+            <CheckboxLabel htmlFor="status-selected">
+              <RenderParticipant />
+            </CheckboxLabel>
+          </Checkbox>
+        </div>
+      ) : (
+        <div
+          className={cx('participant-item-wrapper', {
+            highlighted,
+            'no-interaction': noInteraction,
+            'no-underline': noUnderline,
+          })}
+          tabIndex={0}
+          role="button"
+          onContextMenu={onContextMenu}
+          onClick={noInteraction ? onContextMenu : event => onClick(participant, event.nativeEvent)}
+          onKeyDown={noInteraction ? handleContextKeyDown : event => onKeyDown(participant, event.nativeEvent)}
+          aria-label={t('accessibility.openConversation', participantName)}
+        >
+          <RenderParticipant />
+        </div>
+      )}
+    </StyledApp>
   );
 };
 

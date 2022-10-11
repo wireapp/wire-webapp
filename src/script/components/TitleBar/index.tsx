@@ -43,7 +43,6 @@ import {Shortcut} from '../../ui/Shortcut';
 import {ShortcutType} from '../../ui/ShortcutType';
 import {UserState} from '../../user/UserState';
 import {CallActions} from '../../view_model/CallingViewModel';
-import {LegalHoldModalViewModel} from '../../view_model/content/LegalHoldModalViewModel';
 import {ContentState} from '../../view_model/ContentViewModel';
 import {MainViewModel, ViewModelRepositories} from '../../view_model/MainViewModel';
 
@@ -51,7 +50,6 @@ export interface TitleBarProps {
   mainViewModel: MainViewModel;
   repositories: ViewModelRepositories;
   conversation: Conversation;
-  legalHoldModal: LegalHoldModalViewModel;
   callActions: CallActions;
   userState: UserState;
   teamState: TeamState;
@@ -65,7 +63,6 @@ const TitleBar: React.FC<TitleBarProps> = ({
   mainViewModel,
   repositories,
   conversation,
-  legalHoldModal,
   callActions,
   isFederated = false,
   toggleRightSidebar = state => null,
@@ -276,8 +273,8 @@ const TitleBar: React.FC<TitleBarProps> = ({
                 <LegalHoldDot
                   dataUieName="status-legal-hold-conversation"
                   className="conversation-title-bar-legal-hold"
-                  legalHoldModal={legalHoldModal}
                   conversation={conversation}
+                  isInteractive
                 />
               )}
 

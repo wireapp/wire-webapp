@@ -29,7 +29,6 @@ import {matchQualifiedIds} from 'Util/QualifiedId';
 import {isConversationEntity} from 'Util/TypePredicateUtil';
 import {alias} from 'Util/util';
 
-import {LegalHoldModalViewModel} from './content/LegalHoldModalViewModel';
 import type {MainViewModel, ViewModelRepositories} from './MainViewModel';
 
 import PrimaryModal from '../components/Modals/PrimaryModal';
@@ -40,6 +39,7 @@ import {MessageRepository} from '../conversation/MessageRepository';
 import {Conversation} from '../entity/Conversation';
 import type {Message} from '../entity/message/Message';
 import {ConversationError} from '../error/ConversationError';
+import {LegalHoldModalState} from '../legal-hold/LegalHoldModalState';
 import {
   ClientNotificationData,
   Notification,
@@ -88,7 +88,6 @@ export class ContentViewModel {
   messageRepository: MessageRepository;
   elementId: string;
   sidebarId: string;
-  legalHoldModal: LegalHoldModalViewModel;
   logger: Logger;
   readonly isFederated?: boolean;
   mainViewModel: MainViewModel;
@@ -117,15 +116,6 @@ export class ContentViewModel {
     // State
     this.state = ko.observable(ContentState.WATERMARK);
 
-    // Nested view models
-    this.legalHoldModal = new LegalHoldModalViewModel(
-      repositories.conversation,
-      repositories.team,
-      repositories.client,
-      repositories.cryptography,
-      repositories.message,
-    );
-
     this.state.subscribe(state => {
       switch (state) {
         case ContentState.PREFERENCES_ACCOUNT:
@@ -153,7 +143,8 @@ export class ContentViewModel {
 
     this._initSubscriptions();
     if (this.teamState.supportsLegalHold()) {
-      this.legalHoldModal.showRequestModal();
+      // this.legalHoldModal.showRequestModal();
+      amplify.publish(LegalHoldModalState.SHOW_REQUEST);
     }
     ko.applyBindings(this, document.getElementById(this.elementId));
   }

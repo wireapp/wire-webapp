@@ -33,7 +33,7 @@ import {actionRoot as ROOT_ACTIONS} from '../module/action/';
 import {RootState, bindActionCreators} from '../module/reducer';
 import {QUERY_KEY} from '../route';
 
-interface Props extends React.HTMLProps<HTMLDivElement> {}
+type Props = React.HTMLProps<HTMLDivElement>;
 
 const ClientManager = ({doGetAllClients, doLogout}: Props & ConnectedProps & DispatchProps) => {
   const {formatMessage: _} = useIntl();

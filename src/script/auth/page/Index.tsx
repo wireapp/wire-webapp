@@ -37,7 +37,7 @@ import * as AuthSelector from '../module/selector/AuthSelector';
 import {QUERY_KEY, ROUTE} from '../route';
 import SVGProvider from '../util/SVGProvider';
 
-interface Props extends React.HTMLProps<HTMLDivElement> {}
+type Props = React.HTMLProps<HTMLDivElement>;
 
 const Index = ({defaultSSOCode}: Props & ConnectedProps & DispatchProps) => {
   const {formatMessage: _} = useIntl();

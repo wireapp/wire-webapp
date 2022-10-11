@@ -56,10 +56,10 @@ import {ConversationStatus} from '../conversation/ConversationStatus';
 import {ConversationVerificationState} from '../conversation/ConversationVerificationState';
 import {NOTIFICATION_STATE} from '../conversation/NotificationSetting';
 import {ConversationError} from '../error/ConversationError';
+import {LegalHoldModalState} from '../legal-hold/LegalHoldModalState';
 import {StatusType} from '../message/StatusType';
 import {ConversationRecord} from '../storage/record/ConversationRecord';
 import {TeamState} from '../team/TeamState';
-import {LegalHoldModalViewModel} from '../view_model/content/LegalHoldModalViewModel';
 
 interface UnreadState {
   allEvents: Message[];
@@ -331,7 +331,7 @@ export class Conversation {
         this.legalHoldStatus(hasLegalHold ? LegalHoldStatus.ENABLED : LegalHoldStatus.DISABLED);
       }
       if (!hasLegalHold) {
-        amplify.publish(LegalHoldModalViewModel.HIDE_DETAILS, this.id);
+        amplify.publish(LegalHoldModalState.HIDE_DETAILS, this.id);
       }
       return hasLegalHold;
     });

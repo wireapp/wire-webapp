@@ -58,7 +58,7 @@ import * as AuthSelector from '../module/selector/AuthSelector';
 import {ROUTE} from '../route';
 import {isValidationError, parseError, parseValidationErrors} from '../util/errorUtil';
 
-interface Props extends React.HTMLProps<HTMLDivElement> {}
+type Props = React.HTMLProps<HTMLDivElement>;
 
 const PhoneLogin = ({
   pushLoginData,

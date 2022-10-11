@@ -45,7 +45,7 @@ import RouterLink from '../component/RouterLink';
 import {ROUTE} from '../route';
 import {pathWithParams} from '../util/urlUtil';
 
-interface Props extends React.HTMLProps<HTMLDivElement> {}
+type Props = React.HTMLProps<HTMLDivElement>;
 
 const SetAccountType = ({}: Props) => {
   const {formatMessage: _} = useIntl();

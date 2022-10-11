@@ -183,7 +183,7 @@ export const MessageWrapper: React.FC<MessageParams & {hasMarker: boolean}> = ({
     return <DecryptionErrorMessage message={message} onClickResetSession={onClickResetSession} />;
   }
   if (message.isLegalHold()) {
-    return <LegalHoldMessage message={message}></LegalHoldMessage>;
+    return <LegalHoldMessage message={message} />;
   }
   if (message.isVerification()) {
     return <VerificationMessage message={message} />;

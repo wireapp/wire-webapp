@@ -17,22 +17,22 @@
  *
  */
 
-import type {PublicClient, AddedClient} from '@wireapp/api-client/src/client';
+import type {AddedClient, PublicClient} from '@wireapp/api-client/src/client';
 import {
   UserEvent,
-  UserLegalHoldRequestEvent,
   UserLegalHoldDisableEvent,
+  UserLegalHoldRequestEvent,
   USER_EVENT,
 } from '@wireapp/api-client/src/event';
 import type {BackendError, TraceState} from '@wireapp/api-client/src/http';
 import {BackendErrorLabel} from '@wireapp/api-client/src/http';
 import {ConsentType, Self as APIClientSelf} from '@wireapp/api-client/src/self/';
+import type {QualifiedHandle, User as APIClientUser} from '@wireapp/api-client/src/user';
 import {
+  QualifiedId,
   UserAsset as APIClientUserAsset,
   UserAssetType as APIClientUserAssetType,
-  QualifiedId,
 } from '@wireapp/api-client/src/user';
-import type {User as APIClientUser, QualifiedHandle} from '@wireapp/api-client/src/user';
 import type {AccentColor} from '@wireapp/commons';
 import {Availability} from '@wireapp/protocol-messaging';
 import {WebAppEvents} from '@wireapp/webapp-events';
@@ -43,7 +43,7 @@ import {flatten} from 'underscore';
 
 import {chunk, partition} from 'Util/ArrayUtil';
 import {t} from 'Util/LocalizerUtil';
-import {Logger, getLogger} from 'Util/Logger';
+import {getLogger, Logger} from 'Util/Logger';
 import {matchQualifiedIds} from 'Util/QualifiedId';
 import {fixWebsocketString} from 'Util/StringUtil';
 import {isAxiosError, isBackendError, isQualifiedId} from 'Util/TypePredicateUtil';
@@ -69,10 +69,10 @@ import {UserError} from '../error/UserError';
 import {USER} from '../event/Client';
 import {EventRepository} from '../event/EventRepository';
 import type {EventSource} from '../event/EventSource';
+import {LegalHoldModalState} from '../legal-hold/LegalHoldModalState';
 import type {PropertiesRepository} from '../properties/PropertiesRepository';
 import type {SelfService} from '../self/SelfService';
 import type {ServerTimeHandler} from '../time/serverTimeHandler';
-import {LegalHoldModalViewModel} from '../view_model/content/LegalHoldModalViewModel';
 
 interface UserAvailabilityEvent {
   data: {availability: Availability.Type};
@@ -308,7 +308,7 @@ export class UserRepository {
       if (clientEntity.isLegalHold()) {
         const isSelfUser = userId.id === this.userState.self().id;
         if (isSelfUser) {
-          amplify.publish(LegalHoldModalViewModel.SHOW_DETAILS);
+          amplify.publish(LegalHoldModalState.SHOW_DETAILS);
         }
       }
       if (publishClient) {
@@ -379,7 +379,7 @@ export class UserRepository {
   private onLegalHoldRequestCanceled(eventJson: UserLegalHoldDisableEvent): void {
     if (this.userState.self().id === eventJson.id) {
       this.userState.self().hasPendingLegalHold(false);
-      amplify.publish(LegalHoldModalViewModel.HIDE_REQUEST);
+      amplify.publish(LegalHoldModalState.HIDE_REQUEST);
     } else {
       /*
        * TODO:
@@ -407,7 +407,7 @@ export class UserRepository {
       clientId,
       last_prekey,
     );
-    amplify.publish(LegalHoldModalViewModel.SHOW_REQUEST, fingerprint);
+    amplify.publish(LegalHoldModalState.SHOW_REQUEST, fingerprint);
   }
 
   /**

@@ -51,7 +51,7 @@ import * as AuthSelector from '../module/selector/AuthSelector';
 import {ROUTE} from '../route';
 import * as UrlUtil from '../util/urlUtil';
 
-interface Props extends React.HTMLProps<HTMLDivElement> {}
+type Props = React.HTMLProps<HTMLDivElement>;
 
 const CheckPassword = ({loginData, doLogin, resetAuthError, isFetching}: Props & ConnectedProps & DispatchProps) => {
   const {formatMessage: _} = useIntl();

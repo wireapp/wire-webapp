@@ -27,7 +27,7 @@ import {conversationJoinStrings} from '../../strings';
 import UnsupportedBrowser from '../component/UnsupportedBrowser';
 import WirelessContainer from '../component/WirelessContainer';
 
-interface Props extends React.HTMLProps<HTMLDivElement> {}
+type Props = React.HTMLProps<HTMLDivElement>;
 
 const ConversationJoinInvalid = ({}: Props) => {
   const {formatMessage: _} = useIntl();

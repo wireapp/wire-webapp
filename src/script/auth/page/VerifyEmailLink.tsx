@@ -32,7 +32,7 @@ import {RootState} from '../module/reducer';
 import * as SelfSelector from '../module/selector/SelfSelector';
 import {ROUTE} from '../route';
 
-interface Props extends React.HTMLProps<HTMLDivElement> {}
+type Props = React.HTMLProps<HTMLDivElement>;
 
 const VerifyEmailLink = ({hasSelfEmail}: Props & ConnectedProps) => {
   const {formatMessage: _} = useIntl();

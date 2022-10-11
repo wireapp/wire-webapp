@@ -39,7 +39,7 @@ import {QUERY_KEY, ROUTE} from '../route';
 
 const logger = getLogger('ClientList');
 
-interface Props extends React.HTMLProps<HTMLDivElement> {}
+type Props = React.HTMLProps<HTMLDivElement>;
 const ClientList = ({
   clientError,
   isFetching,

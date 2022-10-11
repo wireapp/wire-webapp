@@ -17,7 +17,7 @@
  *
  */
 
-import React, {Fragment, useState} from 'react';
+import React, {Fragment, useState, ChangeEvent} from 'react';
 
 import cx from 'classnames';
 import {container} from 'tsyringe';
@@ -55,7 +55,7 @@ export interface UserListProps {
   noSelfInteraction?: boolean;
   noUnderline?: boolean;
   showArrow?: boolean;
-  onClick?: (userEntity: User, event: MouseEvent | KeyboardEvent) => void;
+  onClick?: (userEntity: User, event: MouseEvent | KeyboardEvent | ChangeEvent) => void;
   onSelectUser?: (user: User) => void;
   reducedUserCount?: number;
   selectedUsers?: User[];
@@ -109,7 +109,7 @@ const UserList: React.FC<UserListProps> = ({
     return true;
   };
 
-  const onClickOrKeyPressed = (userEntity: User, event: MouseEvent | KeyboardEvent) => {
+  const onClickOrKeyPressed = (userEntity: User, event: MouseEvent | KeyboardEvent | ChangeEvent) => {
     onSelectUser?.(userEntity);
     onClick?.(userEntity, event);
   };

@@ -33,7 +33,6 @@ import 'Components/icons';
 import 'Components/Image';
 import 'Components/InputBar';
 import 'Components/MessagesList';
-import 'Components/modal';
 import 'Components/Modals/GroupCreation/GroupCreationModal';
 import 'Components/panel/ConversationProtocolDetails/ConversationProtocolDetails';
 import 'Components/panel/ServiceDetails';

@@ -54,7 +54,7 @@ import * as LanguageSelector from '../module/selector/LanguageSelector';
 import {QUERY_KEY} from '../route';
 import {pathWithParams} from '../util/urlUtil';
 
-interface Props extends React.HTMLProps<HTMLDivElement> {}
+type Props = React.HTMLProps<HTMLDivElement>;
 
 const InitialInvite = ({
   invites,

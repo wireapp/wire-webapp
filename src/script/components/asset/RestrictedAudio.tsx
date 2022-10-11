@@ -22,7 +22,7 @@ import React from 'react';
 import Icon from 'Components/Icon';
 import {t} from 'Util/LocalizerUtil';
 
-export interface RestrictedAudioProps extends React.HTMLProps<HTMLDivElement> {}
+export type RestrictedAudioProps = React.HTMLProps<HTMLDivElement>;
 
 const RestrictedAudio: React.FC<RestrictedAudioProps> = ({}) => {
   return (

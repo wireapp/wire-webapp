@@ -28,6 +28,8 @@ import Icon from './Icon';
 interface ModalComponentProps {
   children: React.ReactNode;
   isShown: boolean;
+  id?: string;
+  className?: string;
   onBgClick?: () => void;
   onClosed?: () => void;
   showLoading?: boolean;
@@ -82,6 +84,8 @@ const ModalContentVisibleStyles: CSSObject = {
 };
 
 const ModalComponent: React.FC<ModalComponentProps> = ({
+  id,
+  className = '',
   isShown,
   onBgClick = noop,
   onClosed = noop,
@@ -144,6 +148,8 @@ const ModalComponent: React.FC<ModalComponentProps> = ({
       tabIndex={0}
       role="button"
       onKeyDown={noop}
+      id={id}
+      className={className}
       {...rest}
     >
       {showLoading ? (

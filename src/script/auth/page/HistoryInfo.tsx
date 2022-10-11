@@ -35,7 +35,7 @@ import {RootState} from '../module/reducer';
 import * as ClientSelector from '../module/selector/ClientSelector';
 import {ROUTE} from '../route';
 
-interface Props extends React.HTMLProps<HTMLDivElement> {}
+type Props = React.HTMLProps<HTMLDivElement>;
 
 const HistoryInfo = ({hasHistory, clients, currentSelfClient, isNewCurrentSelfClient}: Props & ConnectedProps) => {
   const {formatMessage: _} = useIntl();

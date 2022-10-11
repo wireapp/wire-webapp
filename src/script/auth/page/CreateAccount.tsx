@@ -31,7 +31,7 @@ import AccountForm from '../component/AccountForm';
 import RouterLink from '../component/RouterLink';
 import {ROUTE} from '../route';
 
-interface Props extends React.HTMLProps<HTMLDivElement> {}
+type Props = React.HTMLProps<HTMLDivElement>;
 
 const CreateAccount = ({}: Props) => {
   const {formatMessage: _} = useIntl();

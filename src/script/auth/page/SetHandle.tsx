@@ -49,7 +49,7 @@ import {ROUTE} from '../route';
 import {parseError} from '../util/errorUtil';
 import {createSuggestions} from '../util/handleUtil';
 
-interface Props extends React.HTMLProps<HTMLDivElement> {}
+type Props = React.HTMLProps<HTMLDivElement>;
 
 const SetHandle = ({
   doGetConsents,
