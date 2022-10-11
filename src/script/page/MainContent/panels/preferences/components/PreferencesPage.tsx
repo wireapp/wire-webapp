@@ -18,8 +18,12 @@
  */
 
 import React, {useEffect} from 'react';
-import {useResponsiveViewState} from '../../../../ResponsiveViewState';ui/fadingScrollbar';
+
 import {IconButton, IconButtonVariant, useMatchMedia} from '@wireapp/react-ui-kit';
+
+import {initFadingScrollbar} from 'src/script/ui/fadingScrollbar';
+
+import {useResponsiveViewState} from '../../../../ResponsiveViewState';
 
 interface PreferencesPageProps {
   children: React.ReactNode;

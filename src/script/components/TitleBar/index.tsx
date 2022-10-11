@@ -17,6 +17,8 @@
  *
  */
 
+import React, {useCallback, useEffect, useMemo, useState} from 'react';
+
 import {IconButton, IconButtonVariant, StyledApp, THEME_ID, useMatchMedia} from '@wireapp/react-ui-kit';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import {amplify} from 'amplify';
@@ -35,13 +37,13 @@ import {CallState} from '../../calling/CallState';
 import {ConversationFilter} from '../../conversation/ConversationFilter';
 import {ConversationVerificationState} from '../../conversation/ConversationVerificationState';
 import {Conversation} from '../../entity/Conversation';
+import {useResponsiveViewState} from '../../page/ResponsiveViewState';
 import {openRightSidebar, PanelState} from '../../page/RightSidebar/RightSidebar';
 import {TeamState} from '../../team/TeamState';
 import {Shortcut} from '../../ui/Shortcut';
 import {ShortcutType} from '../../ui/ShortcutType';
 import {UserState} from '../../user/UserState';
 import {CallActions} from '../../view_model/CallingViewModel';
-import {useResponsiveViewState} from '../../page/ResponsiveViewState';
 import {ContentState} from '../../view_model/ContentViewModel';
 import {MainViewModel, ViewModelRepositories} from '../../view_model/MainViewModel';
 

@@ -22,10 +22,10 @@ import React from 'react';
 import ko from 'knockout';
 
 import {KEY} from 'Util/KeyboardUtil';
-import {useResponsiveViewState} from '../page/ResponsiveViewState';
 
 import type {Router} from './Router';
 
+import {useResponsiveViewState} from '../page/ResponsiveViewState';
 import {forceCloseRightPanel} from '../page/RightSidebar/utils/toggleRightPanel';
 
 let router: Router;
