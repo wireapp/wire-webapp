@@ -19,13 +19,13 @@
 
 import {FC, ReactNode, createContext} from 'react';
 
-import {ContentViewModel} from '../view_model/ContentViewModel';
+import {MainViewModel} from '../view_model/MainViewModel';
 
-export const RootContext = createContext<ContentViewModel | null>(null);
+export const RootContext = createContext<MainViewModel | null>(null);
 
 interface RootProviderProps {
   children?: ReactNode;
-  value: ContentViewModel;
+  value: MainViewModel;
 }
 
 const RootProvider: FC<RootProviderProps> = ({children, value}) => {

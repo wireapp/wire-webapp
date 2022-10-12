@@ -80,7 +80,7 @@ const ConversationList: FC<ConversationListProps> = ({
 }) => {
   const messageListLogger = getLogger('ConversationList');
 
-  const contentViewModel = useContext(RootContext);
+  const mainViewModel = useContext(RootContext);
 
   const [isConversationLoaded, setIsConversationLoaded] = useState<boolean>(false);
   const [inputValue, setInputValue] = useState<string>('');
@@ -114,11 +114,12 @@ const ConversationList: FC<ConversationListProps> = ({
     }
   }, [readMessagesBuffer.length]);
 
-  if (!contentViewModel) {
+  if (!mainViewModel) {
     return null;
   }
 
-  const {conversationRepository, repositories, mainViewModel} = contentViewModel;
+  const {content: contentViewModel} = mainViewModel;
+  const {conversationRepository, repositories} = contentViewModel;
 
   const openGiphy = (text: string) => {
     setInputValue(text);

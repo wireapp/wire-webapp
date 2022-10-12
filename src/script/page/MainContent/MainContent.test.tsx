@@ -21,9 +21,12 @@ import {act, render, waitFor} from '@testing-library/react';
 import {StyledApp, THEME_ID} from '@wireapp/react-ui-kit';
 import ko from 'knockout';
 
-import {ContentViewModel, ContentState} from 'src/script/view_model/ContentViewModel';
+import {ContentState, ContentViewModel} from 'src/script/view_model/ContentViewModel';
 
 import MainContent from './MainContent';
+
+import {MainViewModel} from '../../view_model/MainViewModel';
+import RootProvider from '../RootProvider';
 
 jest.mock(
   './panels/preferences/AccountPreferences',
@@ -34,11 +37,14 @@ jest.mock(
 );
 
 describe('Preferences', () => {
-  const defaultParams = {
-    contentViewModel: {
+  const mainViewModel = {
+    content: {
       repositories: {} as any,
       state: ko.observable(ContentState.PREFERENCES_ACCOUNT),
     } as ContentViewModel,
+  } as MainViewModel;
+
+  const defaultParams = {
     openRightSidebar: jest.fn(),
   };
 
@@ -46,14 +52,16 @@ describe('Preferences', () => {
     jest.useFakeTimers();
     const {queryByText, getByText} = render(
       <StyledApp themeId={THEME_ID.DEFAULT}>
-        <MainContent {...defaultParams} />
+        <RootProvider value={mainViewModel}>
+          <MainContent {...defaultParams} />
+        </RootProvider>
       </StyledApp>,
     );
     expect(queryByText('accessibility.headings.preferencesAbout')).toBeNull();
     expect(queryByText('AccountPreferences')).not.toBeNull();
 
     act(() => {
-      defaultParams.contentViewModel.state(ContentState.PREFERENCES_ABOUT);
+      mainViewModel.content.state(ContentState.PREFERENCES_ABOUT);
     });
     waitFor(() => getByText('accessibility.headings.preferencesAbout'));
     act(() => {

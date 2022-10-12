@@ -30,6 +30,7 @@ import LeftSidebar from './LeftSidebar';
 import MainContent from './MainContent';
 import RightSidebar from './RightSidebar';
 import {PanelEntity, PanelState} from './RightSidebar/RightSidebar';
+import RootProvider from './RootProvider';
 import {useAppMainState} from './state';
 
 import {User} from '../entity/User';
@@ -73,41 +74,39 @@ const AppContainer: FC<AppContainerProps> = ({root}) => {
 
   return (
     <StyledApp themeId={THEME_ID.DEFAULT} css={{backgroundColor: 'unset', height: '100%'}}>
-      <main>
-        <div id="app" className="app">
-          <LeftSidebar listViewModel={root.list} selfUser={selfUser} isActivatedAccount={isActivatedAccount} />
+      <RootProvider value={root}>
+        <main>
+          <div id="app" className="app">
+            <LeftSidebar listViewModel={root.list} selfUser={selfUser} isActivatedAccount={isActivatedAccount} />
 
-          <MainContent
-            contentViewModel={root.content}
-            isRightSidebarOpen={!!currentState}
-            openRightSidebar={toggleRightSidebar}
+            <MainContent isRightSidebarOpen={!!currentState} openRightSidebar={toggleRightSidebar} />
+
+            {currentState && (
+              <RightSidebar
+                currentEntity={rightSidebar.entity}
+                repositories={root.content.repositories}
+                actionsViewModel={root.actions}
+                isFederated={root.isFederated}
+                teamState={teamState}
+                userState={userState}
+              />
+            )}
+          </div>
+
+          <AppLock clientRepository={root.content.repositories.client} />
+          <WarningsContainer />
+
+          <CallingContainer
+            multitasking={root.multitasking}
+            callingRepository={root.content.repositories.calling}
+            mediaRepository={root.content.repositories.media}
           />
 
-          {currentState && (
-            <RightSidebar
-              currentEntity={rightSidebar.entity}
-              repositories={root.content.repositories}
-              actionsViewModel={root.actions}
-              isFederated={root.isFederated}
-              teamState={teamState}
-              userState={userState}
-            />
-          )}
-        </div>
-
-        <AppLock clientRepository={root.content.repositories.client} />
-        <WarningsContainer />
-
-        <CallingContainer
-          multitasking={root.multitasking}
-          callingRepository={root.content.repositories.calling}
-          mediaRepository={root.content.repositories.media}
-        />
-
-        {/*The order of these elements matter to show proper modals stack upon each other*/}
-        <div id="user-modal-container"></div>
-        <div id="primary-modal-container"></div>
-      </main>
+          {/*The order of these elements matter to show proper modals stack upon each other*/}
+          <div id="user-modal-container"></div>
+          <div id="primary-modal-container"></div>
+        </main>
+      </RootProvider>
     </StyledApp>
   );
 };
