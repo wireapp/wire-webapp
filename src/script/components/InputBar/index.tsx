@@ -29,7 +29,7 @@ import {
 } from 'react';
 
 import {Availability} from '@wireapp/protocol-messaging';
-import {StyledApp, THEME_ID, useMatchMedia} from '@wireapp/react-ui-kit';
+import {useMatchMedia} from '@wireapp/react-ui-kit';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import {amplify} from 'amplify';
 import cx from 'classnames';
@@ -848,88 +848,84 @@ const InputBar = ({
   };
 
   return (
-    <StyledApp themeId={THEME_ID.DEFAULT}>
-      <div id="conversation-input-bar" className="conversation-input-bar">
-        {classifiedDomains && !isConnectionRequest && (
-          <ClassifiedBar users={participatingUserEts} classifiedDomains={classifiedDomains} />
-        )}
+    <div id="conversation-input-bar" className="conversation-input-bar">
+      {classifiedDomains && !isConnectionRequest && (
+        <ClassifiedBar users={participatingUserEts} classifiedDomains={classifiedDomains} />
+      )}
 
-        {isReplying && !isEditing && <ReplyBar replyMessageEntity={replyMessageEntity} onCancel={handleCancelReply} />}
+      {isReplying && !isEditing && <ReplyBar replyMessageEntity={replyMessageEntity} onCancel={handleCancelReply} />}
 
-        <div className={cx('conversation-input-bar__input', {'conversation-input-bar__input--editing': isEditing})}>
-          {!isOutgoingRequest && (
-            <>
-              <div className="controls-left">
-                {!!inputValue.length && (
-                  <Avatar className="cursor-default" participant={selfUser} avatarSize={AVATAR_SIZE.X_SMALL} />
-                )}
-              </div>
+      <div className={cx('conversation-input-bar__input', {'conversation-input-bar__input--editing': isEditing})}>
+        {!isOutgoingRequest && (
+          <>
+            <div className="controls-left">
+              {!!inputValue.length && (
+                <Avatar className="cursor-default" participant={selfUser} avatarSize={AVATAR_SIZE.X_SMALL} />
+              )}
+            </div>
 
-              {!removedFromConversation && !pastedFile && (
-                <>
-                  {renderEmojiComponent()}
+            {!removedFromConversation && !pastedFile && (
+              <>
+                {renderEmojiComponent()}
 
-                  <div className="controls-center">
-                    <textarea
-                      ref={textareaRef}
-                      id="conversation-input-bar-text"
-                      className={cx('conversation-input-bar-text', {
-                        'conversation-input-bar-text--accent': hasLocalEphemeralTimer,
-                      })}
-                      onKeyDown={onTextAreaKeyDown}
-                      onKeyUp={onTextareaKeyUp}
-                      onClick={handleMentionFlow}
-                      onInput={updateMentions}
-                      onChange={onChange}
-                      onPaste={onPasteFiles}
-                      value={inputValue}
-                      placeholder={inputPlaceholder}
-                      aria-label={inputPlaceholder}
-                      data-uie-name="input-message"
-                      dir="auto"
-                    />
-
-                    <div
-                      ref={shadowInputRef}
-                      className="shadow-input"
-                      dangerouslySetInnerHTML={{__html: richTextInput}}
-                      data-uie-name="input-message-rich-text"
-                      dir="auto"
-                    />
-                  </div>
-
-                  <MentionSuggestionList
-                    targetInput={textareaRef.current}
-                    suggestions={mentionSuggestions}
-                    onSelectionValidated={addMention}
+                <div className="controls-center">
+                  <textarea
+                    ref={textareaRef}
+                    id="conversation-input-bar-text"
+                    className={cx('conversation-input-bar-text', {
+                      'conversation-input-bar-text--accent': hasLocalEphemeralTimer,
+                    })}
+                    onKeyDown={onTextAreaKeyDown}
+                    onKeyUp={onTextareaKeyUp}
+                    onClick={handleMentionFlow}
+                    onInput={updateMentions}
+                    onChange={onChange}
+                    onPaste={onPasteFiles}
+                    value={inputValue}
+                    placeholder={inputPlaceholder}
+                    aria-label={inputPlaceholder}
+                    data-uie-name="input-message"
+                    dir="auto"
                   />
-                  {isScaledDown ? (
-                    <>
-                      <ul className="controls-right buttons-group" css={{minWidth: '95px'}}>
-                        {showGiphyButton && <GiphyButton onGifClick={onGifClick} />}
-                        {sendButton}
-                      </ul>
-                      <ul className="controls-right buttons-group" css={{justifyContent: 'center', width: '100%'}}>
-                        <ControlButtons {...controlButtonsProps} isScaledDown={isScaledDown} />
-                      </ul>
-                    </>
-                  ) : (
-                    <ul className="controls-right buttons-group">
-                      <ControlButtons {...controlButtonsProps} showGiphyButton={showGiphyButton} />
+
+                  <div
+                    ref={shadowInputRef}
+                    className="shadow-input"
+                    dangerouslySetInnerHTML={{__html: richTextInput}}
+                    data-uie-name="input-message-rich-text"
+                    dir="auto"
+                  />
+                </div>
+
+                <MentionSuggestionList
+                  targetInput={textareaRef.current}
+                  suggestions={mentionSuggestions}
+                  onSelectionValidated={addMention}
+                />
+                {isScaledDown ? (
+                  <>
+                    <ul className="controls-right buttons-group" css={{minWidth: '95px'}}>
+                      {showGiphyButton && <GiphyButton onGifClick={onGifClick} />}
                       {sendButton}
                     </ul>
-                  )}
-                </>
-              )}
-            </>
-          )}
+                    <ul className="controls-right buttons-group" css={{justifyContent: 'center', width: '100%'}}>
+                      <ControlButtons {...controlButtonsProps} isScaledDown={isScaledDown} />
+                    </ul>
+                  </>
+                ) : (
+                  <ul className="controls-right buttons-group">
+                    <ControlButtons {...controlButtonsProps} showGiphyButton={showGiphyButton} />
+                    {sendButton}
+                  </ul>
+                )}
+              </>
+            )}
+          </>
+        )}
 
-          {pastedFile && (
-            <PastedFileControls pastedFile={pastedFile} onClear={clearPastedFile} onSend={sendPastedFile} />
-          )}
-        </div>
+        {pastedFile && <PastedFileControls pastedFile={pastedFile} onClear={clearPastedFile} onSend={sendPastedFile} />}
       </div>
-    </StyledApp>
+    </div>
   );
 };
 

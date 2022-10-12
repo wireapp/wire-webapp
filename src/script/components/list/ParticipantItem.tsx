@@ -19,7 +19,7 @@
 
 import React, {ChangeEvent, useState} from 'react';
 
-import {Checkbox, CheckboxLabel, StyledApp, THEME_ID} from '@wireapp/react-ui-kit';
+import {Checkbox, CheckboxLabel} from '@wireapp/react-ui-kit';
 import cx from 'classnames';
 
 import AvailabilityState from 'Components/AvailabilityState';
@@ -259,7 +259,7 @@ const ParticipantItem = <UserType extends User | ServiceEntity>(
   };
 
   return (
-    <StyledApp themeId={THEME_ID.DEFAULT}>
+    <>
       {canSelect ? (
         <div
           className={cx('participant-item-wrapper', {
@@ -302,7 +302,7 @@ const ParticipantItem = <UserType extends User | ServiceEntity>(
           <RenderParticipant />
         </div>
       )}
-    </StyledApp>
+    </>
   );
 };
 
