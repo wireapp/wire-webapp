@@ -46,6 +46,7 @@ import {TeamRepository} from '../../../../team/TeamRepository';
 import {TeamState} from '../../../../team/TeamState';
 import {generatePermissionHelpers} from '../../../../user/UserPermission';
 import {UserState} from '../../../../user/UserState';
+import {useAppMainState} from '../../../state';
 import ListWrapper from '../ListWrapper';
 
 type StartUIProps = {
@@ -115,6 +116,12 @@ const StartUI: React.FC<StartUIProps> = ({
 
   const openContact = async (user: User) => {
     const conversationEntity = await actions.getOrCreate1to1Conversation(user);
+
+    if (!conversationState.isActiveConversation(conversationEntity)) {
+      const {rightSidebar} = useAppMainState.getState();
+      rightSidebar.clearHistory();
+    }
+
     actions.open1to1Conversation(conversationEntity);
   };
 

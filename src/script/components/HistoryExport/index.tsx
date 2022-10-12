@@ -63,16 +63,17 @@ const HistoryExport: FC<HistoryExportProps> = ({switchContent, userState = conta
 
   const {self: selfUser} = useKoSubscribableChildren(userState, ['self']);
 
-  const contentViewModel = useContext(RootContext);
+  const mainViewModel = useContext(RootContext);
 
   useEffect(() => {
     exportHistory();
   }, []);
 
-  if (!contentViewModel) {
+  if (!mainViewModel) {
     return null;
   }
 
+  const {content: contentViewModel} = mainViewModel;
   const backupRepository = contentViewModel.repositories.backup;
 
   const loadingProgress = Math.floor((numberOfProcessedRecords / numberOfRecords) * 100);

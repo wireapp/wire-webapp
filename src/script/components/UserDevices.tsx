@@ -23,7 +23,6 @@ import {ClientClassification} from '@wireapp/api-client/src/client/';
 import ko from 'knockout';
 
 import {partition} from 'Util/ArrayUtil';
-import {registerReactComponent} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 import {getLogger} from 'Util/Logger';
 import {capitalizeFirstChar} from 'Util/StringUtil';
@@ -167,8 +166,6 @@ const UserDevices: React.FC<UserDevicesProps> = ({
 };
 
 export default UserDevices;
-
-registerReactComponent('user-devices', UserDevices);
 
 export const makeUserDevicesHistory = () => {
   const history = ko.observableArray<UserDevicesHistoryEntry>();

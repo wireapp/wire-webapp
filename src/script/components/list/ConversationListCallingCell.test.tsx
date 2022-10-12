@@ -35,9 +35,6 @@ import {createRandomUuid} from 'Util/util';
 
 import ConversationListCallingCell, {CallingCellProps} from './ConversationListCallingCell';
 
-// TODO: Remove after all migrations
-jest.mock('src/script/page/RightSidebar/utils/toggleRightPanel', () => () => jest.fn());
-
 jest.mock(
   'Components/utils/InViewport',
   () =>

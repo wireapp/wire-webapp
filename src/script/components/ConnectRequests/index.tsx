@@ -43,7 +43,7 @@ const ConnectRequests: FC<ConnectRequestsProps> = ({
   const connectRequestsRefEnd = useRef<HTMLDivElement | null>(null);
   const temporaryConnectRequestsCount = useRef<number>(0);
 
-  const contentViewModel = useContext(RootContext);
+  const mainViewModel = useContext(RootContext);
   const {classifiedDomains} = useKoSubscribableChildren(teamState, ['classifiedDomains']);
   const {connectRequests} = useKoSubscribableChildren(userState, ['connectRequests']);
 
@@ -65,11 +65,11 @@ const ConnectRequests: FC<ConnectRequestsProps> = ({
     scrollToBottom();
   }, []);
 
-  if (!contentViewModel) {
+  if (!mainViewModel) {
     return null;
   }
 
-  const actionsViewModel = contentViewModel.mainViewModel.actions;
+  const actionsViewModel = mainViewModel.actions;
 
   const onIgnoreClick = (userEntity: User): void => {
     actionsViewModel.ignoreConnectionRequest(userEntity);

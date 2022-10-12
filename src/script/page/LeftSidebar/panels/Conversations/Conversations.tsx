@@ -50,6 +50,7 @@ import {Shortcut} from '../../../../ui/Shortcut';
 import {ShortcutType} from '../../../../ui/ShortcutType';
 import {UserState} from '../../../../user/UserState';
 import {ListState, ListViewModel} from '../../../../view_model/ListViewModel';
+import {useAppMainState} from '../../../state';
 import ListWrapper from '../ListWrapper';
 
 type ConversationsProps = {
@@ -149,7 +150,11 @@ const Conversations: React.FC<ConversationsProps> = ({
         type="button"
         className={`conversations-settings-button accent-text ${showBadge ? 'conversations-settings--badge' : ''}`}
         title={t('tooltipConversationsPreferences')}
-        onClick={() => switchList(ListState.PREFERENCES)}
+        onClick={() => {
+          switchList(ListState.PREFERENCES);
+          const {rightSidebar} = useAppMainState.getState();
+          rightSidebar.clearHistory();
+        }}
         data-uie-name="go-preferences"
       >
         <Icon.Settings />

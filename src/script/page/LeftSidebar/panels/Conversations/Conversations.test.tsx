@@ -28,9 +28,6 @@ import {ListState} from 'src/script/view_model/ListViewModel';
 
 import Conversations from './';
 
-// TODO: Remove after all migrations
-jest.mock('src/script/page/RightSidebar/utils/toggleRightPanel', () => () => jest.fn());
-
 describe('Conversations', () => {
   const defaultParams: React.ComponentProps<typeof Conversations> = {
     conversationRepository: {

@@ -20,9 +20,13 @@
 import {act, render, waitFor} from '@testing-library/react';
 import ko from 'knockout';
 
-import {ContentViewModel, ContentState} from 'src/script/view_model/ContentViewModel';
+import {ContentState, ContentViewModel} from 'src/script/view_model/ContentViewModel';
 
 import MainContent from './MainContent';
+
+import {withTheme} from '../../auth/util/test/TestUtil';
+import {MainViewModel} from '../../view_model/MainViewModel';
+import RootProvider from '../RootProvider';
 
 jest.mock(
   './panels/preferences/AccountPreferences',
@@ -32,25 +36,32 @@ jest.mock(
     },
 );
 
-// TODO: Remove after all migrations
-jest.mock('src/script/page/RightSidebar/utils/toggleRightPanel', () => () => jest.fn());
-
 describe('Preferences', () => {
-  const defaultParams = {
-    contentViewModel: {
+  const mainViewModel = {
+    content: {
       repositories: {} as any,
       state: ko.observable(ContentState.PREFERENCES_ACCOUNT),
     } as ContentViewModel,
+  } as MainViewModel;
+
+  const defaultParams = {
+    openRightSidebar: jest.fn(),
   };
 
   it('renders the right component according to view state', () => {
     jest.useFakeTimers();
-    const {queryByText, getByText} = render(<MainContent {...defaultParams} />);
+    const {queryByText, getByText} = render(
+      withTheme(
+        <RootProvider value={mainViewModel}>
+          <MainContent {...defaultParams} />
+        </RootProvider>,
+      ),
+    );
     expect(queryByText('accessibility.headings.preferencesAbout')).toBeNull();
     expect(queryByText('AccountPreferences')).not.toBeNull();
 
     act(() => {
-      defaultParams.contentViewModel.state(ContentState.PREFERENCES_ABOUT);
+      mainViewModel.content.state(ContentState.PREFERENCES_ABOUT);
     });
     waitFor(() => getByText('accessibility.headings.preferencesAbout'));
     act(() => {

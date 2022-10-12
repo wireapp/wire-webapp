@@ -51,7 +51,6 @@ export const createNavigate =
     useResponsiveViewState.setState({currentView: 0});
     router?.navigate(link);
     event.preventDefault();
-    forceCloseRightPanel();
   };
 
 export const createNavigateKeyboard =

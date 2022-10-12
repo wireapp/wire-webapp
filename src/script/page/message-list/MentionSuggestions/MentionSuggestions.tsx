@@ -19,7 +19,6 @@
 
 import React, {useEffect, useMemo, useRef, useState} from 'react';
 
-import {registerReactComponent} from 'Util/ComponentUtil';
 import {KEY} from 'Util/KeyboardUtil';
 import {clamp} from 'Util/NumberUtil';
 
@@ -125,5 +124,3 @@ const MentionSuggestionList: React.FunctionComponent<MentionSuggestionListProps>
 };
 
 export default MentionSuggestionList;
-
-registerReactComponent('mention-suggestions', MentionSuggestionList);

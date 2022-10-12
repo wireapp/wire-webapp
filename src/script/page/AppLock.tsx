@@ -28,7 +28,7 @@ import {container} from 'tsyringe';
 import Icon from 'Components/Icon';
 import ModalComponent from 'Components/ModalComponent';
 import PrimaryModal from 'Components/Modals/PrimaryModal';
-import {registerReactComponent, useKoSubscribableChildren} from 'Util/ComponentUtil';
+import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 
 import {SIGN_OUT_REASON} from '../auth/SignOutReason';
@@ -553,7 +553,5 @@ const AppLock: React.FC<AppLockProps> = ({
     </ModalComponent>
   );
 };
-
-registerReactComponent('app-lock-container', AppLock);
 
 export default AppLock;

@@ -111,7 +111,7 @@ const GroupCreationModal: React.FC<GroupCreationModalProps> = ({
     GroupCreationModalState.DEFAULT,
   );
 
-  const contentViewModel = useContext(RootContext);
+  const mainViewModel = useContext(RootContext);
 
   useEffect(() => {
     const showCreateGroup = (_: string, userEntity: User) => {
@@ -176,10 +176,11 @@ const GroupCreationModal: React.FC<GroupCreationModalProps> = ({
     };
   }, [stateIsParticipants]);
 
-  if (!contentViewModel) {
+  if (!mainViewModel) {
     return null;
   }
 
+  const {content: contentViewModel} = mainViewModel;
   const {
     conversation: conversationRepository,
     search: searchRepository,

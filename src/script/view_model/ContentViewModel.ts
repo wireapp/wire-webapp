@@ -48,7 +48,8 @@ import {
 import {useResponsiveViewState} from '../page/ResponsiveViewState';
 import '../page/LeftSidebar';
 import '../page/MainContent';
-import {openRightSidebar, PanelState} from '../page/RightSidebar/RightSidebar';
+import {PanelState} from '../page/RightSidebar/RightSidebar';
+import {useAppMainState} from '../page/state';
 import {TeamState} from '../team/TeamState';
 import type {UserRepository} from '../user/UserRepository';
 import {UserState} from '../user/UserState';
@@ -87,7 +88,6 @@ export class ContentViewModel {
 
   conversationRepository: ConversationRepository;
   messageRepository: MessageRepository;
-  elementId: string;
   sidebarId: string;
   logger: Logger;
   readonly isFederated?: boolean;
@@ -104,7 +104,6 @@ export class ContentViewModel {
     this.teamState = container.resolve(TeamState);
     this.conversationState = container.resolve(ConversationState);
 
-    this.elementId = 'center-column';
     this.sidebarId = 'left-column';
     this.mainViewModel = mainViewModel;
     this.conversationRepository = repositories.conversation;
@@ -144,10 +143,8 @@ export class ContentViewModel {
 
     this._initSubscriptions();
     if (this.teamState.supportsLegalHold()) {
-      // this.legalHoldModal.showRequestModal();
       amplify.publish(LegalHoldModalState.SHOW_REQUEST);
     }
-    ko.applyBindings(this, document.getElementById(this.elementId));
   }
 
   private _initSubscriptions() {
@@ -227,15 +224,8 @@ export class ContentViewModel {
 
       if (isOpenedConversation) {
         if (openNotificationSettings) {
-          openRightSidebar({
-            initialEntity: conversationEntity,
-            initialState: PanelState.NOTIFICATIONS,
-            isFederated: this.mainViewModel.isFederated,
-            mainViewModel: this.mainViewModel,
-            repositories: this.repositories,
-            teamState: this.teamState,
-            userState: this.userState,
-          });
+          const {rightSidebar} = useAppMainState.getState();
+          rightSidebar.goTo(PanelState.NOTIFICATIONS, {entity: conversationEntity});
         }
         return;
       }
@@ -264,15 +254,8 @@ export class ContentViewModel {
       this.showContent(ContentState.CONVERSATION);
       this.previousConversation = this.conversationState.activeConversation();
       if (openNotificationSettings) {
-        openRightSidebar({
-          initialEntity: this.conversationState.activeConversation(),
-          initialState: PanelState.NOTIFICATIONS,
-          isFederated: this.mainViewModel.isFederated,
-          mainViewModel: this.mainViewModel,
-          repositories: this.repositories,
-          teamState: this.teamState,
-          userState: this.userState,
-        });
+        const {rightSidebar} = useAppMainState.getState();
+        rightSidebar.goTo(PanelState.NOTIFICATIONS, {entity: this.conversationState.activeConversation()});
       }
     } catch (error) {
       const isConversationNotFound = error.type === ConversationError.TYPE.CONVERSATION_NOT_FOUND;
