@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [32.0.7](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@32.0.6...@wireapp/core@32.0.7) (2022-10-12)
+
+### Bug Fixes
+
+* Avoid unlocking websocket when connection is aborted ([#4428](https://github.com/wireapp/wire-web-packages/issues/4428)) ([506dc25](https://github.com/wireapp/wire-web-packages/commit/506dc25a5a998967e1a81057bde6ec2c97077715))
+
 ## [32.0.6](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@32.0.5...@wireapp/core@32.0.6) (2022-10-11)
 
 **Note:** Version bump only for package @wireapp/core

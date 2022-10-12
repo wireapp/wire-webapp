@@ -81,6 +81,6 @@
     "test": "jest",
     "watch": "tsc ---watch"
   },
-  "version": "32.0.6",
+  "version": "32.0.7",
   "gitHead": "5339f01fe01ef0871da8c8bc8662fbe9e604754a"
 }
