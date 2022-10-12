@@ -73,7 +73,7 @@ export class NotificationService extends EventEmitter {
   private readonly backend: NotificationBackendRepository;
   private readonly cryptographyService: CryptographyService;
   private readonly database: NotificationDatabaseRepository;
-  private readonly logger = logdown('@wireapp/core/notification/NotificationService', {
+  private readonly logger = logdown('@wireapp/core/NotificationService', {
     logger: console,
     markdown: false,
   });
@@ -92,10 +92,9 @@ export class NotificationService extends EventEmitter {
     this.database = new NotificationDatabaseRepository(storeEngine);
   }
 
-  private async getAllNotifications() {
+  private async getAllNotifications(since: string) {
     const clientId = this.apiClient.clientId;
-    const lastNotificationId = await this.database.getLastNotificationId();
-    return this.backend.getAllNotifications(clientId, lastNotificationId);
+    return this.backend.getAllNotifications(clientId, since);
   }
 
   /** Should only be called with a completely new client. */
@@ -141,28 +140,44 @@ export class NotificationService extends EventEmitter {
     return this.database.updateLastNotificationId(lastNotification);
   }
 
-  public async handleNotificationStream(
+  public async processNotificationStream(
     notificationHandler: NotificationHandler,
     onMissedNotifications: (notificationId: string) => void,
     abortHandler: AbortHandler,
-  ): Promise<void> {
-    const {notifications, missedNotification} = await this.getAllNotifications();
+  ): Promise<{total: number; error: number; success: number}> {
+    const lastNotificationId = await this.database.getLastNotificationId();
+    const {notifications, missedNotification} = await this.getAllNotifications(lastNotificationId);
     if (missedNotification) {
       onMissedNotifications(missedNotification);
     }
 
+    const results = {total: notifications.length, error: 0, success: 0};
+    const logMessage =
+      notifications.length > 0
+        ? `Start processing ${notifications.length} notifications since notification id ${lastNotificationId}`
+        : `No notification to process from the stream`;
+    this.logger.log(logMessage);
     for (const [index, notification] of notifications.entries()) {
       if (abortHandler.isAborted()) {
         /* Stop handling notifications if the websocket has been disconnected.
          * Upon reconnecting we are going to restart handling the notification stream for where we left of
          */
-        return;
+        this.logger.warn(`Stop processing notifications as connection to websocket was closed`);
+        return results;
       }
-      await notificationHandler(notification, PayloadBundleSource.NOTIFICATION_STREAM, {
-        done: index + 1,
-        total: notifications.length,
-      }).catch(error => this.logger.error(error));
+      try {
+        await notificationHandler(notification, PayloadBundleSource.NOTIFICATION_STREAM, {
+          done: index + 1,
+          total: notifications.length,
+        });
+        results.success++;
+      } catch (error) {
+        const message = error instanceof Error ? error.message : error;
+        this.logger.error(`Error while processing notification ${notification.id}: ${message}`, error);
+        results.error++;
+      }
     }
+    return results;
   }
 
   /**

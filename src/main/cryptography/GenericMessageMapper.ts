@@ -40,7 +40,7 @@ import {
 } from '../conversation/content';
 
 export class GenericMessageMapper {
-  private static readonly logger = logdown('@wireapp/core/cryptography/GenericMessageMapper', {
+  private static readonly logger = logdown('@wireapp/core/GenericMessageMapper', {
     logger: console,
     markdown: false,
   });

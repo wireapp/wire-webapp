@@ -616,7 +616,7 @@ export class Account<T = any> extends EventEmitter {
       // Lock websocket in order to buffer any message that arrives while we handle the notification stream
       onConnectionStateChanged(ConnectionState.PROCESSING_NOTIFICATIONS);
       this.apiClient.transport.ws.lock();
-      await this.service!.notification.handleNotificationStream(
+      const results = await this.service!.notification.processNotificationStream(
         async (notification, source, progress) => {
           await handleNotification(notification, source);
           onNotificationStreamProgress(progress);
@@ -624,11 +624,16 @@ export class Account<T = any> extends EventEmitter {
         onMissedNotifications,
         abortHandler,
       );
+      this.logger.log(`Finished processing notifications ${JSON.stringify(results)}`, results);
+      if (abortHandler.isAborted()) {
+        this.logger.warn('Ending connection process as websocket was closed');
+        return;
+      }
       // We can now unlock the websocket and let the new messages being handled and decrypted
       this.apiClient.transport.ws.unlock();
       // We need to wait for the notification stream to be fully handled before releasing the message sending queue.
       // This is due to the nature of how message are encrypted, any change in mls epoch needs to happen before we start encrypting any kind of messages
-      this.logger.log(`resume message sending. ${getQueueLength()} messages to be sent`);
+      this.logger.info(`Resuming message sending. ${getQueueLength()} messages to be sent`);
       resumeMessageSending();
       onConnectionStateChanged(ConnectionState.LIVE);
     };

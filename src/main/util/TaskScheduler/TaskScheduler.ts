@@ -19,7 +19,7 @@
 
 import logdown from 'logdown';
 
-const logger = logdown('@wireapp/core/util/TaskScheduler/TaskScheduler', {
+const logger = logdown('@wireapp/core/TaskScheduler', {
   logger: console,
   markdown: false,
 });
