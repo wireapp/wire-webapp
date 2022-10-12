@@ -19,7 +19,7 @@
 
 import React, {useMemo, useEffect, useCallback} from 'react';
 
-import {IconButton, StyledApp, THEME_ID, useMatchMedia} from '@wireapp/react-ui-kit';
+import {IconButton, IconButtonVariant, StyledApp, THEME_ID, useMatchMedia} from '@wireapp/react-ui-kit';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import {amplify} from 'amplify';
 import cx from 'classnames';
@@ -27,6 +27,7 @@ import {container} from 'tsyringe';
 
 import Icon from 'Components/Icon';
 import LegalHoldDot from 'Components/LegalHoldDot';
+import {useResponsiveViewState} from 'src/script/page/ResponsiveViewState';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {handleKeyDown} from 'Util/KeyboardUtil';
 import {StringIdentifer, t} from 'Util/LocalizerUtil';
@@ -134,7 +135,12 @@ export const TitleBar: React.FC<TitleBarProps> = ({
   const shortcut = Shortcut.getShortcutTooltip(ShortcutType.PEOPLE);
   const peopleTooltip = t('tooltipConversationPeople', shortcut);
 
-  const isScaledDown = useMatchMedia('max-width: 768px');
+  const mdBreakpoint = useMatchMedia('max-width: 768px');
+  const smBreakpoint = useMatchMedia('max-width: 620px');
+
+  const responsiveView = useResponsiveViewState(state => state.currentView);
+
+  const setResponsiveView = useResponsiveViewState(state => state.setCurrentView);
 
   const showDetails = useCallback(
     (addParticipants: boolean): void => {
@@ -176,6 +182,13 @@ export const TitleBar: React.FC<TitleBarProps> = ({
     };
   }, [isActivatedAccount, showAddParticipant, showDetails]);
 
+  useEffect(() => {
+    document.querySelector('#app')?.classList.add(`view-${responsiveView}`);
+    return () => {
+      document.querySelector('#app')?.classList.remove(`view-${responsiveView}`);
+    };
+  }, [responsiveView]);
+
   const onClickCollectionButton = () => {
     amplify.publish(WebAppEvents.CONTENT.SWITCH, ContentState.COLLECTION);
   };
@@ -186,7 +199,15 @@ export const TitleBar: React.FC<TitleBarProps> = ({
     <StyledApp themeId={THEME_ID.DEFAULT}>
       <ul id="conversation-title-bar" className="conversation-title-bar">
         <li className="conversation-title-bar-library">
-          {isActivatedAccount && !isScaledDown && (
+          {smBreakpoint && (
+            <IconButton
+              variant={IconButtonVariant.SECONDARY}
+              className="conversation-title-bar-icon icon-back"
+              css={{marginBottom: 0}}
+              onClick={() => setResponsiveView(1)}
+            />
+          )}
+          {isActivatedAccount && !mdBreakpoint && (
             <button
               className="conversation-title-bar-icon icon-search"
               type="button"
@@ -241,7 +262,7 @@ export const TitleBar: React.FC<TitleBarProps> = ({
         </li>
 
         <li className="conversation-title-bar-icons">
-          {showCallControls && !isScaledDown && (
+          {showCallControls && !mdBreakpoint && (
             <div className="buttons-group">
               {supportsVideoCall && isVideoCallingEnabled && (
                 <button
@@ -269,7 +290,7 @@ export const TitleBar: React.FC<TitleBarProps> = ({
             </div>
           )}
 
-          {isScaledDown ? (
+          {mdBreakpoint ? (
             <>
               <IconButton
                 className="icon-search"
