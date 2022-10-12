@@ -33,6 +33,7 @@ import {PanelEntity, PanelState} from './RightSidebar/RightSidebar';
 import RootProvider from './RootProvider';
 import {useAppMainState} from './state';
 
+import {PrimaryModalComponent} from '../components/Modals/PrimaryModal/PrimaryModal';
 import {User} from '../entity/User';
 import {TeamState} from '../team/TeamState';
 import {UserState} from '../user/UserState';
@@ -104,7 +105,7 @@ const AppContainer: FC<AppContainerProps> = ({root}) => {
 
           {/*The order of these elements matter to show proper modals stack upon each other*/}
           <div id="user-modal-container"></div>
-          <div id="primary-modal-container"></div>
+          <PrimaryModalComponent />
         </main>
       </RootProvider>
     </StyledApp>

@@ -97,6 +97,8 @@ export const PrimaryModalComponent: React.FC = () => {
 
   const secondaryActions = Array.isArray(secondaryAction) ? secondaryAction : [secondaryAction];
 
+  console.info('bardia', {content, currentId});
+
   return (
     <div id="modals" data-uie-name="primary-modals-container">
       <ModalComponent
