@@ -19,7 +19,6 @@
 
 import {FC, ReactNode, useState} from 'react';
 
-import {StyledApp, THEME_ID} from '@wireapp/react-ui-kit';
 import {CSSTransition, SwitchTransition} from 'react-transition-group';
 import {container} from 'tsyringe';
 
@@ -104,124 +103,122 @@ const MainContent: FC<MainContentProps> = ({
   return (
     <div id="center-column" className="center-column">
       <RootProvider value={contentViewModel}>
-        <StyledApp themeId={THEME_ID.DEFAULT} css={{backgroundColor: 'unset', height: '100%'}}>
-          <h1 className="visually-hidden">{title}</h1>
+        <h1 className="visually-hidden">{title}</h1>
 
-          <SwitchTransition>
-            <Animated key={state}>
-              <>
-                {state === ContentState.COLLECTION && activeConversation && (
-                  <Collection
-                    conversation={activeConversation}
-                    conversationRepository={repositories.conversation}
-                    assetRepository={repositories.asset}
-                    messageRepository={repositories.message}
-                  />
-                )}
+        <SwitchTransition>
+          <Animated key={state}>
+            <>
+              {state === ContentState.COLLECTION && activeConversation && (
+                <Collection
+                  conversation={activeConversation}
+                  conversationRepository={repositories.conversation}
+                  assetRepository={repositories.asset}
+                  messageRepository={repositories.message}
+                />
+              )}
 
-                {state === ContentState.PREFERENCES_ABOUT && (
-                  <div id="preferences-about" className="preferences-page preferences-about">
-                    <AboutPreferences />
-                  </div>
-                )}
+              {state === ContentState.PREFERENCES_ABOUT && (
+                <div id="preferences-about" className="preferences-page preferences-about">
+                  <AboutPreferences />
+                </div>
+              )}
 
-                {state === ContentState.PREFERENCES_ACCOUNT && (
-                  <div id="preferences-account" className="preferences-page preferences-account">
-                    <AccountPreferences
-                      importFile={onFileUpload}
-                      showDomain={isFederated}
-                      switchContent={switchContent}
-                      clientRepository={repositories.client}
-                      conversationRepository={repositories.conversation}
-                      propertiesRepository={repositories.properties}
-                      userRepository={repositories.user}
-                    />
-                  </div>
-                )}
-
-                {state === ContentState.PREFERENCES_AV && (
-                  <div id="preferences-av" className="preferences-page preferences-av">
-                    <AVPreferences
-                      callingRepository={repositories.calling}
-                      mediaRepository={repositories.media}
-                      propertiesRepository={repositories.properties}
-                    />
-                  </div>
-                )}
-
-                {state === ContentState.PREFERENCES_DEVICES && (
-                  <DevicesPreferences
-                    clientState={container.resolve(ClientState)}
-                    conversationState={conversationState}
-                    cryptographyRepository={repositories.cryptography}
-                    removeDevice={contentViewModel.mainViewModel.actions.deleteClient}
-                    resetSession={(userId, device, conversation) =>
-                      repositories.message.resetSession(userId, device.id, conversation)
-                    }
-                    userState={container.resolve(UserState)}
-                    verifyDevice={(userId, device, verified) =>
-                      repositories.client.verifyClient(userId, device, verified)
-                    }
-                  />
-                )}
-
-                {state === ContentState.PREFERENCES_OPTIONS && (
-                  <div id="preferences-options" className="preferences-page preferences-options">
-                    <OptionPreferences propertiesRepository={repositories.properties} />
-                  </div>
-                )}
-
-                {state === ContentState.WATERMARK && (
-                  <div className="watermark">
-                    <span className="absolute-center" aria-hidden="true" data-uie-name="no-conversation">
-                      <Icon.Watermark />
-                    </span>
-                  </div>
-                )}
-
-                {state === ContentState.CONNECTION_REQUESTS && (
-                  <ConnectRequests teamState={teamState} userState={userState} />
-                )}
-
-                {state === ContentState.CONVERSATION && (
-                  <ConversationList
-                    initialMessage={initialMessage}
-                    teamState={teamState}
-                    userState={userState}
-                    isRightSidebarOpen={isRightSidebarOpen}
-                    openRightSidebar={openRightSidebar}
-                  />
-                )}
-
-                {state === ContentState.HISTORY_EXPORT && (
-                  <HistoryExport userState={userState} switchContent={switchContent} />
-                )}
-
-                {state === ContentState.HISTORY_IMPORT && uploadedFile && (
-                  <HistoryImport
-                    file={uploadedFile}
-                    backupRepository={repositories.backup}
+              {state === ContentState.PREFERENCES_ACCOUNT && (
+                <div id="preferences-account" className="preferences-page preferences-account">
+                  <AccountPreferences
+                    importFile={onFileUpload}
+                    showDomain={isFederated}
                     switchContent={switchContent}
+                    clientRepository={repositories.client}
+                    conversationRepository={repositories.conversation}
+                    propertiesRepository={repositories.properties}
+                    userRepository={repositories.user}
                   />
-                )}
-              </>
-            </Animated>
-          </SwitchTransition>
+                </div>
+              )}
 
-          <GroupCreationModal userState={userState} teamState={teamState} />
+              {state === ContentState.PREFERENCES_AV && (
+                <div id="preferences-av" className="preferences-page preferences-av">
+                  <AVPreferences
+                    callingRepository={repositories.calling}
+                    mediaRepository={repositories.media}
+                    propertiesRepository={repositories.properties}
+                  />
+                </div>
+              )}
 
-          <div className="center-column__overlay" />
+              {state === ContentState.PREFERENCES_DEVICES && (
+                <DevicesPreferences
+                  clientState={container.resolve(ClientState)}
+                  conversationState={conversationState}
+                  cryptographyRepository={repositories.cryptography}
+                  removeDevice={contentViewModel.mainViewModel.actions.deleteClient}
+                  resetSession={(userId, device, conversation) =>
+                    repositories.message.resetSession(userId, device.id, conversation)
+                  }
+                  userState={container.resolve(UserState)}
+                  verifyDevice={(userId, device, verified) =>
+                    repositories.client.verifyClient(userId, device, verified)
+                  }
+                />
+              )}
 
-          <LegalHoldModal
-            userState={userState}
-            conversationRepository={repositories.conversation}
-            searchRepository={repositories.search}
-            teamRepository={repositories.team}
-            clientRepository={repositories.client}
-            messageRepository={repositories.message}
-            cryptographyRepository={repositories.cryptography}
-          />
-        </StyledApp>
+              {state === ContentState.PREFERENCES_OPTIONS && (
+                <div id="preferences-options" className="preferences-page preferences-options">
+                  <OptionPreferences propertiesRepository={repositories.properties} />
+                </div>
+              )}
+
+              {state === ContentState.WATERMARK && (
+                <div className="watermark">
+                  <span className="absolute-center" aria-hidden="true" data-uie-name="no-conversation">
+                    <Icon.Watermark />
+                  </span>
+                </div>
+              )}
+
+              {state === ContentState.CONNECTION_REQUESTS && (
+                <ConnectRequests teamState={teamState} userState={userState} />
+              )}
+
+              {state === ContentState.CONVERSATION && (
+                <ConversationList
+                  initialMessage={initialMessage}
+                  teamState={teamState}
+                  userState={userState}
+                  isRightSidebarOpen={isRightSidebarOpen}
+                  openRightSidebar={openRightSidebar}
+                />
+              )}
+
+              {state === ContentState.HISTORY_EXPORT && (
+                <HistoryExport userState={userState} switchContent={switchContent} />
+              )}
+
+              {state === ContentState.HISTORY_IMPORT && uploadedFile && (
+                <HistoryImport
+                  file={uploadedFile}
+                  backupRepository={repositories.backup}
+                  switchContent={switchContent}
+                />
+              )}
+            </>
+          </Animated>
+        </SwitchTransition>
+
+        <GroupCreationModal userState={userState} teamState={teamState} />
+
+        <div className="center-column__overlay" />
+
+        <LegalHoldModal
+          userState={userState}
+          conversationRepository={repositories.conversation}
+          searchRepository={repositories.search}
+          teamRepository={repositories.team}
+          clientRepository={repositories.client}
+          messageRepository={repositories.message}
+          cryptographyRepository={repositories.cryptography}
+        />
       </RootProvider>
     </div>
   );
