@@ -32,9 +32,6 @@ jest.mock(
     },
 );
 
-// TODO: Remove after all migrations
-jest.mock('src/script/page/RightSidebar/utils/toggleRightPanel', () => () => jest.fn());
-
 describe('Preferences', () => {
   const defaultParams = {
     contentViewModel: {

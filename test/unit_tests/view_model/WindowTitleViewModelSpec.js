@@ -34,9 +34,6 @@ import {createRandomUuid} from 'Util/util';
 
 import {TestFactory} from '../../helper/TestFactory';
 
-// TODO: Remove after all migrations
-jest.mock('src/script/page/RightSidebar/utils/toggleRightPanel', () => () => jest.fn());
-
 describe('WindowTitleViewModel', () => {
   const suffix = 'Wire';
   let testFactory = undefined;
