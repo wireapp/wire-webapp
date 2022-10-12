@@ -65,6 +65,8 @@ const Index = ({defaultSSOCode}: Props & ConnectedProps & DispatchProps) => {
       navigate(ROUTE.LOGIN);
     }
   }, []);
+  const features = Config.getConfig().FEATURE;
+
   return (
     <Page>
       <ContainerXS centerText verticalCenter style={{width: '380px'}}>
