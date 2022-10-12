@@ -26,7 +26,6 @@ import {KEY} from 'Util/KeyboardUtil';
 import type {Router} from './Router';
 
 import {useResponsiveViewState} from '../page/ResponsiveViewState';
-import {forceCloseRightPanel} from '../page/RightSidebar/utils/toggleRightPanel';
 
 let router: Router;
 
