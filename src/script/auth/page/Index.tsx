@@ -34,6 +34,7 @@ import {connect} from 'react-redux';
 import SVGProvider from '../util/SVGProvider';
 import {SVGIcon} from '@wireapp/react-ui-kit/src/Icon/SVGIcon';
 import {createRandomUuid} from 'Util/util';
+import {getOAuthAuthorizeUrl, OAuthStateStorage} from 'Util/oauthUtils';
 
 interface Props extends React.HTMLProps<HTMLDivElement> {}
 
@@ -62,14 +63,10 @@ const Index = ({defaultSSOCode}: Props & ConnectedProps & DispatchProps) => {
 
   const startOauthFlow = () => {
     const state = createRandomUuid();
-    localStorage.setItem('oauth_state', state);
-    const url = new URL('https://oauth.mocklab.io/oauth/authorize');
-    url.searchParams.append('response_type', 'code');
-    url.searchParams.append('scope', 'openid profile email');
-    url.searchParams.append('client_id', 'TODO');
-    url.searchParams.append('state', state);
-    url.searchParams.append('redirect_uri', `${Config.getConfig().APP_BASE}/auth#${ROUTE.OAUTH}`);
-    location.href = url.toString();
+
+    OAuthStateStorage.setState(state);
+
+    location.href = getOAuthAuthorizeUrl(state);
   };
 
   return (

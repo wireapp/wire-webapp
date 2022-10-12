@@ -17,19 +17,40 @@
  *
  */
 
-import React from 'react';
+import React, {useEffect} from 'react';
 import {useLocation} from 'react-router';
+import {useNavigate} from 'react-router-dom';
+import {Config} from '../../../Config';
+import {getOAuthTokenID, OAuthStateStorage} from 'Util/oauthUtils';
 
 export const OAuth: React.FC = () => {
+  const navigate = useNavigate();
   const location = useLocation();
   const params = new URLSearchParams(location.search);
   const code = params.get('code');
   const state = params.get('state');
 
-  const storedState = localStorage.getItem('oauth_state');
+  const storedState = OAuthStateStorage.getState();
 
-  if (!state || !storedState || state !== storedState) {
-    return <div>states do not match</div>;
+  const storedStateMatches = state && storedState && state === storedState;
+
+  useEffect(() => {
+    if (!code || !storedStateMatches) {
+      navigate(Config.getConfig().APP_BASE);
+      return;
+    }
+
+    getOAuthTokenID(code).then(data => {
+      console.info(data);
+
+      //todo: store access token (and refresh token ??)
+
+      //todo: let user in
+    });
+  }, [code, navigate, storedStateMatches]);
+
+  if (!storedStateMatches) {
+    return null;
   }
   return <div>Hello OAuth {code}</div>;
 };
