@@ -44,11 +44,11 @@ export type RightSidebarParams = {
   highlighted?: User[];
 };
 
-interface AppProps {
+interface AppContainerProps {
   root: MainViewModel;
 }
 
-const AppMain: FC<AppProps> = ({root}) => {
+const AppContainer: FC<AppContainerProps> = ({root}) => {
   const teamState = container.resolve(TeamState);
   const userState = container.resolve(UserState);
 
@@ -112,6 +112,6 @@ const AppMain: FC<AppProps> = ({root}) => {
   );
 };
 
-registerReactComponent('app-main', AppMain);
+registerReactComponent('app-container', AppContainer);
 
-export default AppMain;
+export default AppContainer;

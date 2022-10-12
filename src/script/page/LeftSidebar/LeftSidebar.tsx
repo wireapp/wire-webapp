@@ -55,10 +55,7 @@ const LeftSidebar: React.FC<LeftSidebarProps> = ({listViewModel, selfUser, isAct
 
   const {state} = useKoSubscribableChildren(listViewModel, ['state']);
 
-  const switchList = (list: ListState) => {
-    // forceCloseRightPanel();
-    listViewModel.switchList(list);
-  };
+  const switchList = (list: ListState) => listViewModel.switchList(list);
 
   const goHome = () =>
     selfUser.isTemporaryGuest()

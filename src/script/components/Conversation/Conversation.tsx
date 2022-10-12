@@ -35,7 +35,7 @@ import Giphy from 'Components/Giphy';
 import InputBar from 'Components/InputBar';
 import MessagesList from 'Components/MessagesList';
 import {showDetailViewModal} from 'Components/Modals/DetailViewModal';
-import TitleBar from 'Components/TitleBar';
+import {TitleBar} from 'Components/TitleBar';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 import {getLogger} from 'Util/Logger';

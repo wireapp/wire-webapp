@@ -25,7 +25,7 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 import {amplify} from 'amplify';
 import ko from 'knockout';
 
-import TitleBar from 'Components/TitleBar';
+import {TitleBar} from 'Components/TitleBar';
 
 import {TestFactory} from '../../../../test/helper/TestFactory';
 import {CallingRepository} from '../../calling/CallingRepository';
@@ -114,11 +114,7 @@ describe('TitleBar', () => {
     const conversation = new Conversation();
 
     const {getByText} = render(
-      <TitleBar
-        {...getDefaultProps(callingRepository, conversation)}
-        userState={userState}
-        conversation={conversation}
-      />,
+      <TitleBar {...getDefaultProps(callingRepository, conversation)} userState={userState} />,
     );
 
     const searchButton = getByText('tooltipConversationSearch');

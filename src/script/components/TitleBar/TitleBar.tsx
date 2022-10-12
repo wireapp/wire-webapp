@@ -58,7 +58,7 @@ export interface TitleBarProps {
   callState?: CallState;
 }
 
-const TitleBar: React.FC<TitleBarProps> = ({
+export const TitleBar: React.FC<TitleBarProps> = ({
   repositories,
   conversation,
   callActions,
@@ -351,5 +351,3 @@ export function generateWarningBadgeKey({
   }
   return `${baseKey}${extras.join('And')}` as StringIdentifer;
 }
-
-export default TitleBar;
