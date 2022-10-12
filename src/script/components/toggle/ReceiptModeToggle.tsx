@@ -21,7 +21,6 @@ import React, {Fragment} from 'react';
 
 import {RECEIPT_MODE} from '@wireapp/api-client/src/conversation/data';
 
-import {registerReactComponent} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 
 import Icon from '../Icon';
@@ -83,5 +82,3 @@ const ReceiptModeToggle: React.FC<ReceiptModeToggleProps> = ({receiptMode, onRec
 };
 
 export default ReceiptModeToggle;
-
-registerReactComponent('read-receipt-toggle', ReceiptModeToggle);

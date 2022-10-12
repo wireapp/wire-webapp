@@ -21,33 +21,10 @@ import {amplify} from 'amplify';
 import jQuery from 'jquery';
 import ko from 'knockout';
 
-import 'Components/avatar/GroupAvatar';
-import 'Components/calling/CallingOverlayContainer';
-import 'Components/calling/FullscreenVideoCall';
-import 'Components/ConnectRequests';
-import 'Components/CopyToClipboard';
-import 'Components/Giphy';
-import 'Components/HistoryExport';
-import 'Components/HistoryImport';
 import 'Components/icons';
-import 'Components/Image';
-import 'Components/InputBar';
-import 'Components/MessagesList';
-import 'Components/Modals/GroupCreation/GroupCreationModal';
-import 'Components/panel/ConversationProtocolDetails/ConversationProtocolDetails';
-import 'Components/panel/ServiceDetails';
-import 'Components/panel/UserDetails';
-import 'Components/SearchInput';
-import 'Components/ServiceList';
-import 'Components/TitleBar';
-import 'Components/toggle/BaseToggle';
-import 'Components/toggle/InfoToggle';
-import 'Components/UserSearchableList';
 import '../Config';
 
-import '../page/AppLock';
-import '../page/MainContent';
-import '../page/RightSidebar';
+import '../page/AppMain';
 
 import 'Util/LocalizerUtil';
 

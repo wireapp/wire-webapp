@@ -22,7 +22,7 @@ import React, {Fragment, useEffect} from 'react';
 import {CALL_TYPE, STATE as CALL_STATE} from '@wireapp/avs';
 import {container} from 'tsyringe';
 
-import {registerReactComponent, useKoSubscribableChildren} from 'Util/ComponentUtil';
+import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 
 import ChooseScreen, {Screen} from './ChooseScreen';
 import FullscreenVideoCall from './FullscreenVideoCall';
@@ -206,4 +206,4 @@ const CallingContainer: React.FC<CallingContainerProps> = ({
   );
 };
 
-registerReactComponent('calling-overlay-container', CallingContainer);
+export default CallingContainer;

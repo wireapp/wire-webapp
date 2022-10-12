@@ -21,10 +21,11 @@ import React, {useEffect} from 'react';
 
 import {WebAppEvents} from '@wireapp/webapp-events';
 import {amplify} from 'amplify';
+import cx from 'classnames';
 import {CSSTransition, SwitchTransition} from 'react-transition-group';
-import {container} from 'tsyringe';
 
-import {registerReactComponent, useKoSubscribableChildren} from 'Util/ComponentUtil';
+import {useKoSubscribableChildren} from 'Util/ComponentUtil';
+import {t} from 'Util/LocalizerUtil';
 
 import Archive from './panels/Archive';
 import Conversations from './panels/Conversations';
@@ -32,15 +33,13 @@ import Preferences from './panels/Preferences';
 import StartUI from './panels/StartUI';
 import TemporaryGuestConversations from './panels/TemporatyGuestConversations';
 
-import {AssetRepository} from '../../assets/AssetRepository';
 import {User} from '../../entity/User';
 import {ListViewModel, ListState} from '../../view_model/ListViewModel';
-import {forceCloseRightPanel} from '../RightSidebar/utils/toggleRightPanel';
 
 type LeftSidebarProps = {
-  assetRepository?: AssetRepository;
   listViewModel: ListViewModel;
   selfUser: User;
+  isActivatedAccount: boolean;
 };
 const Animated: React.FC<{children: React.ReactNode}> = ({children, ...rest}) => {
   return (
@@ -50,20 +49,13 @@ const Animated: React.FC<{children: React.ReactNode}> = ({children, ...rest}) =>
   );
 };
 
-const LeftSidebar: React.FC<LeftSidebarProps> = ({
-  listViewModel,
-  assetRepository = container.resolve(AssetRepository),
-  selfUser,
-}) => {
+const LeftSidebar: React.FC<LeftSidebarProps> = ({listViewModel, selfUser, isActivatedAccount}) => {
   const {conversationRepository, propertiesRepository} = listViewModel;
   const repositories = listViewModel.contentViewModel.repositories;
 
   const {state} = useKoSubscribableChildren(listViewModel, ['state']);
 
-  const switchList = (list: ListState) => {
-    forceCloseRightPanel();
-    listViewModel.switchList(list);
-  };
+  const switchList = (list: ListState) => listViewModel.switchList(list);
 
   const goHome = () =>
     selfUser.isTemporaryGuest()
@@ -77,7 +69,11 @@ const LeftSidebar: React.FC<LeftSidebarProps> = ({
   }, []);
 
   return (
-    <>
+    <div id="left-column" className={cx('left-column', {'left-column--light-theme': !isActivatedAccount})}>
+      <header>
+        <h1 className="visually-hidden">{t('accessibility.headings.sidebar')}</h1>
+      </header>
+
       <SwitchTransition>
         <Animated key={state}>
           <>
@@ -132,10 +128,8 @@ const LeftSidebar: React.FC<LeftSidebarProps> = ({
           </>
         </Animated>
       </SwitchTransition>
-    </>
+    </div>
   );
 };
 
 export default LeftSidebar;
-
-registerReactComponent('left-sidebar', LeftSidebar);

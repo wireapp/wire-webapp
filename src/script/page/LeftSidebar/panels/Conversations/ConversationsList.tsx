@@ -42,6 +42,7 @@ import {generateConversationUrl} from '../../../../router/routeGenerator';
 import {createNavigate} from '../../../../router/routerBindings';
 import {ContentState} from '../../../../view_model/ContentViewModel';
 import {ListViewModel} from '../../../../view_model/ListViewModel';
+import {useAppMainState} from '../../../state';
 
 export const ConversationsList: React.FC<{
   callState: CallState;
@@ -106,7 +107,14 @@ export const ConversationsList: React.FC<{
               index={index}
               dataUieName="item-conversation"
               conversation={conversation}
-              onClick={createNavigate(generateConversationUrl(conversation.id, conversation.domain))}
+              onClick={event => {
+                if (!isActiveConversation(conversation)) {
+                  const {rightSidebar} = useAppMainState.getState();
+                  rightSidebar.clearHistory();
+                }
+
+                createNavigate(generateConversationUrl(conversation.id, conversation.domain))(event);
+              }}
               isSelected={isActiveConversation}
               onJoinCall={answerCall}
               rightClick={openContextMenu}

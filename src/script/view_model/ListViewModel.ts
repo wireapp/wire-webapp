@@ -39,7 +39,8 @@ import type {ConversationRepository} from '../conversation/ConversationRepositor
 import {ConversationState} from '../conversation/ConversationState';
 import type {Conversation} from '../entity/Conversation';
 import type {User} from '../entity/User';
-import {openRightSidebar, PanelState} from '../page/RightSidebar/RightSidebar';
+import {PanelState} from '../page/RightSidebar/RightSidebar';
+import {useAppMainState} from '../page/state';
 import {PropertiesRepository} from '../properties/PropertiesRepository';
 import {SearchRepository} from '../search/SearchRepository';
 import type {TeamRepository} from '../team/TeamRepository';
@@ -68,7 +69,7 @@ export class ListViewModel {
   readonly state: ko.Observable<string>;
   readonly lastUpdate: ko.Observable<number>;
   readonly isFederated: boolean;
-  private readonly elementId: 'left-column';
+  readonly repositories: ViewModelRepositories;
 
   public readonly mainViewModel: MainViewModel;
   public readonly conversationRepository: ConversationRepository;
@@ -82,7 +83,6 @@ export class ListViewModel {
   private readonly isProAccount: ko.PureComputed<boolean>;
   public readonly selfUser: ko.Observable<User>;
   private readonly visibleListItems: ko.PureComputed<(string | Conversation)[]>;
-  private readonly repositories: ViewModelRepositories;
 
   static get STATE() {
     return {
@@ -100,7 +100,6 @@ export class ListViewModel {
     this.conversationState = container.resolve(ConversationState);
 
     this.mainViewModel = mainViewModel;
-    this.elementId = 'left-column';
     this.isFederated = mainViewModel.isFederated;
     this.repositories = repositories;
     this.conversationRepository = repositories.conversation;
@@ -145,8 +144,6 @@ export class ListViewModel {
     });
 
     this._initSubscriptions();
-
-    ko.applyBindings(this, document.getElementById(this.elementId));
   }
 
   private readonly _initSubscriptions = () => {
@@ -183,15 +180,8 @@ export class ListViewModel {
 
   readonly changeNotificationSetting = () => {
     if (this.isProAccount()) {
-      openRightSidebar({
-        initialEntity: this.conversationState.activeConversation(),
-        initialState: PanelState.NOTIFICATIONS,
-        isFederated: this.mainViewModel.isFederated,
-        mainViewModel: this.mainViewModel,
-        repositories: this.repositories,
-        teamState: this.teamState,
-        userState: this.userState,
-      });
+      const {rightSidebar} = useAppMainState.getState();
+      rightSidebar.goTo(PanelState.NOTIFICATIONS, {entity: this.conversationState.activeConversation()});
     } else {
       this.clickToToggleMute();
     }

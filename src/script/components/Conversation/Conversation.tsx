@@ -35,7 +35,7 @@ import Giphy from 'Components/Giphy';
 import InputBar from 'Components/InputBar';
 import MessagesList from 'Components/MessagesList';
 import {showDetailViewModal} from 'Components/Modals/DetailViewModal';
-import TitleBar from 'Components/TitleBar';
+import {TitleBar} from 'Components/TitleBar';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 import {getLogger} from 'Util/Logger';
@@ -55,7 +55,8 @@ import {isMouseEvent} from '../../guards/Mouse';
 import {isServiceEntity} from '../../guards/Service';
 import {ServiceEntity} from '../../integration/ServiceEntity';
 import {MotionDuration} from '../../motion/MotionDuration';
-import {openRightSidebar, PanelState} from '../../page/RightSidebar/RightSidebar';
+import {RightSidebarParams} from '../../page/AppMain';
+import {PanelState} from '../../page/RightSidebar/RightSidebar';
 import {RootContext} from '../../page/RootProvider';
 import {TeamState} from '../../team/TeamState';
 import {UserState} from '../../user/UserState';
@@ -66,12 +67,20 @@ interface ConversationListProps {
   readonly initialMessage?: Message;
   readonly teamState: TeamState;
   readonly userState: UserState;
+  openRightSidebar: (panelState: PanelState, params: RightSidebarParams) => void;
+  isRightSidebarOpen?: boolean;
 }
 
-const ConversationList: FC<ConversationListProps> = ({initialMessage, teamState, userState}) => {
+const ConversationList: FC<ConversationListProps> = ({
+  initialMessage,
+  teamState,
+  userState,
+  openRightSidebar,
+  isRightSidebarOpen = false,
+}) => {
   const messageListLogger = getLogger('ConversationList');
 
-  const contentViewModel = useContext(RootContext);
+  const mainViewModel = useContext(RootContext);
 
   const [isConversationLoaded, setIsConversationLoaded] = useState<boolean>(false);
   const [inputValue, setInputValue] = useState<string>('');
@@ -105,11 +114,12 @@ const ConversationList: FC<ConversationListProps> = ({initialMessage, teamState,
     }
   }, [readMessagesBuffer.length]);
 
-  if (!contentViewModel) {
+  if (!mainViewModel) {
     return null;
   }
 
-  const {conversationRepository, repositories, mainViewModel, isFederated} = contentViewModel;
+  const {content: contentViewModel} = mainViewModel;
+  const {conversationRepository, repositories} = contentViewModel;
 
   const openGiphy = (text: string) => {
     setInputValue(text);
@@ -119,15 +129,7 @@ const ConversationList: FC<ConversationListProps> = ({initialMessage, teamState,
   const closeGiphy = () => setIsGiphyModalOpen(false);
 
   const clickOnInvitePeople = (conversation: ConversationEntity): void => {
-    openRightSidebar({
-      initialEntity: conversation,
-      initialState: PanelState.GUEST_OPTIONS,
-      isFederated,
-      mainViewModel,
-      repositories,
-      teamState,
-      userState,
-    });
+    openRightSidebar(PanelState.GUEST_OPTIONS, {entity: conversation});
   };
 
   const clickOnCancelRequest = (messageEntity: MemberMessage): void => {
@@ -146,59 +148,25 @@ const ConversationList: FC<ConversationListProps> = ({initialMessage, teamState,
       isUserEntity &&
       (userEntity.isDeleted || (isSingleModeConversation && !userEntity.isMe))
     ) {
-      openRightSidebar({
-        initialEntity: activeConversation,
-        initialState: PanelState.CONVERSATION_DETAILS,
-        isFederated,
-        mainViewModel,
-        repositories,
-        teamState,
-        userState,
-      });
+      openRightSidebar(PanelState.CONVERSATION_DETAILS, {entity: activeConversation});
 
       return;
     }
 
     const panelId = userEntity.isService ? PanelState.GROUP_PARTICIPANT_SERVICE : PanelState.GROUP_PARTICIPANT_USER;
 
-    openRightSidebar({
-      initialEntity: userEntity,
-      initialState: panelId,
-      isFederated,
-      mainViewModel,
-      repositories,
-      teamState,
-      userState,
-    });
+    openRightSidebar(panelId, {entity: userEntity});
   };
 
   const showParticipants = (participants: User[]) => {
     if (activeConversation) {
-      openRightSidebar({
-        highlighted: participants,
-        initialEntity: activeConversation,
-        initialState: PanelState.CONVERSATION_PARTICIPANTS,
-        isFederated,
-        mainViewModel,
-        repositories,
-        teamState,
-        userState,
-      });
+      openRightSidebar(PanelState.CONVERSATION_PARTICIPANTS, {entity: activeConversation, highlighted: participants});
     }
   };
 
   const showMessageDetails = (message: Message, showLikes = false) => {
     if (!is1to1) {
-      openRightSidebar({
-        initialEntity: message,
-        initialState: PanelState.MESSAGE_DETAILS,
-        isFederated,
-        mainViewModel,
-        repositories,
-        showLikes,
-        teamState,
-        userState,
-      });
+      openRightSidebar(PanelState.MESSAGE_DETAILS, {entity: message, showLikes});
     }
   };
 
@@ -242,7 +210,7 @@ const ConversationList: FC<ConversationListProps> = ({initialMessage, teamState,
       ? (event.target as HTMLElement).closest<HTMLSpanElement>('.message-mention')
       : undefined;
     const userId = mentionElement?.dataset.userId;
-    const domain = mentionElement?.dataset.domain;
+    const domain = mentionElement?.dataset.userDomain;
 
     if (userId && domain) {
       (async () => {
@@ -390,12 +358,13 @@ const ConversationList: FC<ConversationListProps> = ({initialMessage, teamState,
       {activeConversation && (
         <>
           <TitleBar
-            mainViewModel={mainViewModel}
             repositories={repositories}
             conversation={activeConversation}
             userState={userState}
             teamState={teamState}
             callActions={mainViewModel.calling.callActions}
+            openRightSidebar={openRightSidebar}
+            isRightSidebarOpen={isRightSidebarOpen}
           />
 
           <MessagesList

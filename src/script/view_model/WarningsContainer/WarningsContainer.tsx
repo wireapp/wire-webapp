@@ -25,7 +25,6 @@ import {amplify} from 'amplify';
 import cx from 'classnames';
 
 import Icon from 'Components/Icon';
-import {registerReactComponent} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 import {afterRender} from 'Util/util';
 
@@ -333,7 +332,5 @@ const WarningsContainer: React.FC = () => {
     </div>
   );
 };
-
-registerReactComponent('warnings-container', WarningsContainer);
 
 export default WarningsContainer;

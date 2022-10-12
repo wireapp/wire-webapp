@@ -23,7 +23,7 @@ import {CONVERSATION_TYPE} from '@wireapp/api-client/src/conversation';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import {amplify} from 'amplify';
 
-import {registerReactComponent, useKoSubscribableChildren} from 'Util/ComponentUtil';
+import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 import {matchQualifiedIds} from 'Util/QualifiedId';
 
@@ -298,5 +298,3 @@ const UserActions: React.FC<UserActionsProps> = ({
 };
 
 export default UserActions;
-
-registerReactComponent('user-actions', UserActions);

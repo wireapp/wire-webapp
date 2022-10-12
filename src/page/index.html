@@ -3,8 +3,7 @@
 <!-- {{@config.VERSION}} -->
 <html id="wire-main-app">
   <head>
-#include('meta.htm')
-#include('graph.htm')
+    #include('meta.htm') #include('graph.htm')
     <title>{{@config.BRAND_NAME}}</title>
     <style type="text/css">
       #include('../../../server/dist/static/style/default.css');
@@ -12,7 +11,15 @@
   </head>
 
   <body>
-    #include('wire-main.htm')
+    <app-container
+      id="wire-main"
+      class="off"
+      data-bind="css: mainClasses()"
+      params="root: $root"
+      data-uie-name="status-webapp"
+      data-uie-value="is-loading"
+    ></app-container>
+
     #include('loading.htm')
 
     <script src="./config.js?{{@config.VERSION}}"></script>

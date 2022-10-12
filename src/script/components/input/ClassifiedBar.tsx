@@ -22,7 +22,6 @@ import React from 'react';
 import {CSSObject} from '@emotion/react';
 
 import {User} from 'src/script/entity/User';
-import {registerReactComponent} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 
 function isClassified(users: User[], classifiedDomains: string[]): boolean {
@@ -69,5 +68,3 @@ const ClassifiedBar: React.FC<ClassifiedBarProps> = ({users, classifiedDomains, 
 };
 
 export default ClassifiedBar;
-
-registerReactComponent('classified-bar', ClassifiedBar);

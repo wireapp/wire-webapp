@@ -21,9 +21,6 @@ import {initRouterBindings} from 'src/script/router/routerBindings';
 
 import {bindHtml} from '../../helper/knockoutHelpers';
 
-// TODO: Remove after all migrations
-jest.mock('src/script/page/RightSidebar/utils/toggleRightPanel', () => () => jest.fn());
-
 describe('routerBindings', () => {
   let mockRouter;
   beforeEach(() => {
