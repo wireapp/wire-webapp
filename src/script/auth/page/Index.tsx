@@ -19,7 +19,7 @@
 
 import {UrlUtil} from '@wireapp/commons';
 import * as AuthSelector from '../module/selector/AuthSelector';
-import {Button, ButtonVariant, COLOR, ContainerXS, ErrorMessage, Text} from '@wireapp/react-ui-kit';
+import {Button, ButtonVariant, ContainerXS, ErrorMessage, Text} from '@wireapp/react-ui-kit';
 import React, {useEffect, useState} from 'react';
 import {FormattedMessage, useIntl} from 'react-intl';
 import {Navigate, useNavigate} from 'react-router-dom';
@@ -90,7 +90,7 @@ const Index = ({defaultSSOCode}: Props & ConnectedProps & DispatchProps) => {
         >
           {_(indexStrings.welcome, {brandName: Config.getConfig().BACKEND_NAME})}
         </Text>
-        {features.ENABLE_ACCOUNT_REGISTRATION ? (
+        {features.ENABLE_ACCOUNT_REGISTRATION && (
           <>
             <Button
               type="button"
@@ -103,67 +103,32 @@ const Index = ({defaultSSOCode}: Props & ConnectedProps & DispatchProps) => {
             <Button type="button" onClick={startOauthFlow} block>
               Login to OAuth provider
             </Button>
-            <Button type="button" onClick={() => navigate(ROUTE.LOGIN)} block data-uie-name="go-login">
-              {_(indexStrings.logIn)}
-            </Button>
-            {logoutReason && (
-              <ErrorMessage data-uie-name="status-logout-reason">
-                <FormattedMessage
-                  {...logoutReasonStrings[logoutReason]}
-                  values={{
-                    newline: <br />,
-                  }}
-                />
-              </ErrorMessage>
-            )}
-            {(features.ENABLE_SSO || features.ENABLE_DOMAIN_DISCOVERY) && (
-              <Button
-                type="button"
-                variant={ButtonVariant.SECONDARY}
-                onClick={() => navigate(ROUTE.SSO)}
-                block
-                style={{marginTop: '120px'}}
-                data-uie-name="go-sso-login"
-              >
-                {_(features.ENABLE_DOMAIN_DISCOVERY ? indexStrings.enterprise : indexStrings.ssoLogin)}
-              </Button>
-            )}
           </>
-        ) : (
-          <>
-            <Button
-              type="button"
-              onClick={() => navigate(ROUTE.LOGIN)}
-              block
-              style={{fontSize: '13px'}}
-              data-uie-name="go-login"
-            >
-              {_(indexStrings.logIn)}
-            </Button>
-            {(features.ENABLE_SSO || features.ENABLE_DOMAIN_DISCOVERY) && (
-              <Button
-                type="button"
-                onClick={() => navigate(ROUTE.SSO)}
-                block
-                backgroundColor={'transparent'}
-                color={COLOR.BLUE}
-                style={{border: `1px solid ${COLOR.BLUE}`, fontSize: '13px'}}
-                data-uie-name="go-sso-login"
-              >
-                {_(features.ENABLE_DOMAIN_DISCOVERY ? indexStrings.enterprise : indexStrings.ssoLogin)}
-              </Button>
-            )}
-            {logoutReason && (
-              <ErrorMessage data-uie-name="status-logout-reason">
-                <FormattedMessage
-                  {...logoutReasonStrings[logoutReason]}
-                  values={{
-                    newline: <br />,
-                  }}
-                />
-              </ErrorMessage>
-            )}
-          </>
+        )}
+        <Button type="button" onClick={() => navigate(ROUTE.LOGIN)} block data-uie-name="go-login">
+          {_(indexStrings.logIn)}
+        </Button>
+        {logoutReason && (
+          <ErrorMessage data-uie-name="status-logout-reason">
+            <FormattedMessage
+              {...logoutReasonStrings[logoutReason]}
+              values={{
+                newline: <br />,
+              }}
+            />
+          </ErrorMessage>
+        )}
+        {(features.ENABLE_SSO || features.ENABLE_DOMAIN_DISCOVERY) && (
+          <Button
+            type="button"
+            variant={ButtonVariant.SECONDARY}
+            onClick={() => navigate(ROUTE.SSO)}
+            block
+            style={{marginTop: '120px'}}
+            data-uie-name="go-sso-login"
+          >
+            {_(features.ENABLE_DOMAIN_DISCOVERY ? indexStrings.enterprise : indexStrings.ssoLogin)}
+          </Button>
         )}
       </ContainerXS>
     </Page>

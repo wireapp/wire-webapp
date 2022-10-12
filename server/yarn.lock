@@ -1744,9 +1744,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"body-parser@npm:1.20.0":
-  version: 1.20.0
-  resolution: "body-parser@npm:1.20.0"
+"body-parser@npm:1.20.1":
+  version: 1.20.1
+  resolution: "body-parser@npm:1.20.1"
   dependencies:
     bytes: 3.1.2
     content-type: ~1.0.4
@@ -1756,11 +1756,11 @@ __metadata:
     http-errors: 2.0.0
     iconv-lite: 0.4.24
     on-finished: 2.4.1
-    qs: 6.10.3
+    qs: 6.11.0
     raw-body: 2.5.1
     type-is: ~1.6.18
     unpipe: 1.0.0
-  checksum: 12fffdeac82fe20dddcab7074215d5156e7d02a69ae90cbe9fee1ca3efa2f28ef52097cbea76685ee0a1509c71d85abd0056a08e612c09077cad6277a644cf88
+  checksum: f1050dbac3bede6a78f0b87947a8d548ce43f91ccc718a50dd774f3c81f2d8b04693e52acf62659fad23101827dd318da1fb1363444ff9a8482b886a3e4a5266
   languageName: node
   linkType: hard
 
@@ -2748,13 +2748,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"express@npm:4.18.1":
-  version: 4.18.1
-  resolution: "express@npm:4.18.1"
+"express@npm:4.18.2":
+  version: 4.18.2
+  resolution: "express@npm:4.18.2"
   dependencies:
     accepts: ~1.3.8
     array-flatten: 1.1.1
-    body-parser: 1.20.0
+    body-parser: 1.20.1
     content-disposition: 0.5.4
     content-type: ~1.0.4
     cookie: 0.5.0
@@ -2773,7 +2773,7 @@ __metadata:
     parseurl: ~1.3.3
     path-to-regexp: 0.1.7
     proxy-addr: ~2.0.7
-    qs: 6.10.3
+    qs: 6.11.0
     range-parser: ~1.2.1
     safe-buffer: 5.2.1
     send: 0.18.0
@@ -2783,7 +2783,7 @@ __metadata:
     type-is: ~1.6.18
     utils-merge: 1.0.1
     vary: ~1.1.2
-  checksum: c3d44c92e48226ef32ec978becfedb0ecf0ca21316bfd33674b3c5d20459840584f2325726a4f17f33d9c99f769636f728982d1c5433a5b6fe6eb95b8cf0c854
+  checksum: 3c4b9b076879442f6b968fe53d85d9f1eeacbb4f4c41e5f16cc36d77ce39a2b0d81b3f250514982110d815b2f7173f5561367f9110fcc541f9371948e8c8b037
   languageName: node
   linkType: hard
 
@@ -4511,13 +4511,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"maxmind@npm:4.3.6":
-  version: 4.3.6
-  resolution: "maxmind@npm:4.3.6"
+"maxmind@npm:4.3.8":
+  version: 4.3.8
+  resolution: "maxmind@npm:4.3.8"
   dependencies:
     mmdb-lib: 2.0.2
-    tiny-lru: 8.0.2
-  checksum: 5ffa7d685d7cf0d31cb1be9fa2e38b31f9bfc735c7f3911b8d9e511348d6912277e333d943361973b3dc2707a618d81b6d3fd0d31507bd6294e1e4378ac720bd
+    tiny-lru: 9.0.3
+  checksum: 39fba2071c93de9d4852478b07c78cb2aadc7ddb485ffacbc5bfa9763931ef4ec6c0b269a397339ee1550196a8e24058df3f237d863c1b0e6d867de8df365f8d
   languageName: node
   linkType: hard
 
@@ -5457,12 +5457,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"qs@npm:6.10.3":
-  version: 6.10.3
-  resolution: "qs@npm:6.10.3"
+"qs@npm:6.11.0":
+  version: 6.11.0
+  resolution: "qs@npm:6.11.0"
   dependencies:
     side-channel: ^1.0.4
-  checksum: 0fac5e6c7191d0295a96d0e83c851aeb015df7e990e4d3b093897d3ac6c94e555dbd0a599739c84d7fa46d7fee282d94ba76943983935cf33bba6769539b8019
+  checksum: 6e1f29dd5385f7488ec74ac7b6c92f4d09a90408882d0c208414a34dd33badc1a621019d4c799a3df15ab9b1d0292f97c1dd71dc7c045e69f81a8064e5af7297
   languageName: node
   linkType: hard
 
@@ -6211,10 +6211,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"tiny-lru@npm:8.0.2":
-  version: 8.0.2
-  resolution: "tiny-lru@npm:8.0.2"
-  checksum: ec4d884914626760eef05cd57850f21a153adeeb7c4242eb8d44a031f1bd8489f18c1bf5d6f10f0a11c5dcfe03b302f26b00f2b879b38853599486bf0dca8c97
+"tiny-lru@npm:9.0.3":
+  version: 9.0.3
+  resolution: "tiny-lru@npm:9.0.3"
+  checksum: 8ded11a875d622a2d4c3ee2d33331ddfaa80f86b5b280bad17810ecbfd94d774c1726948f91031527bb03e2fd38c4385bd4db27fd5614b3c59fe3fa7d3359451
   languageName: node
   linkType: hard
 
@@ -6712,7 +6712,7 @@ __metadata:
     "@wireapp/commons": 4.4.6
     dotenv: 16.0.3
     dotenv-extended: 2.9.0
-    express: 4.18.1
+    express: 4.18.2
     express-sitemap-xml: 3.0.1
     express-useragent: 1.0.15
     fs-extra: 10.1.0
@@ -6722,7 +6722,7 @@ __metadata:
     http-status-codes: 2.2.0
     jest: 27.5.1
     logdown: 3.3.1
-    maxmind: 4.3.6
+    maxmind: 4.3.8
     nocache: 3.0.4
     nyc: 15.1.0
     opn: 6.0.0

@@ -17,60 +17,42 @@
  *
  */
 
-import TestPage from 'Util/test/TestPage';
 import {createRandomUuid} from 'Util/util';
 
 import {ServiceEntity} from '../integration/ServiceEntity';
-import ServiceList, {ServiceListProps} from './ServiceList';
-
-jest.mock(
-  'Components/utils/InViewport',
-  () =>
-    function MockInViewport() {
-      return <div></div>;
-    },
-);
-
-class ServiceListPage extends TestPage<ServiceListProps> {
-  constructor(props?: ServiceListProps) {
-    super(ServiceList, props);
-  }
-
-  getNoResultsElement = () => this.get('[data-uie-name="service-list-no-results"]');
-  getServiceElement = (serviceId: string) => this.get(`[data-uie-name="service-list-service-${serviceId}"]`);
-}
+import ServiceList from './ServiceList';
+import {render} from '@testing-library/react';
 
 describe('ServiceList', () => {
   it('lists the services', () => {
     const serviceEntity1 = new ServiceEntity({id: createRandomUuid()});
     const serviceEntity2 = new ServiceEntity({id: createRandomUuid()});
 
-    const serviceList = new ServiceListPage({
+    const props = {
       arrow: false,
       click: () => {},
       isSearching: false,
       noUnderline: true,
       services: [serviceEntity1, serviceEntity2],
-    });
+    };
 
-    const serviceElement1 = serviceList.getServiceElement(serviceEntity1.id);
-    const serviceElement2 = serviceList.getServiceElement(serviceEntity2.id);
+    const {getByTestId} = render(<ServiceList {...props} />);
 
-    expect(serviceElement1).not.toBeNull();
-    expect(serviceElement2).not.toBeNull();
+    expect(expect(getByTestId(`service-list-service-${serviceEntity1.id}`))).not.toBeNull();
+    expect(expect(getByTestId(`service-list-service-${serviceEntity2.id}`))).not.toBeNull();
   });
 
   it('shows the "no results found" element when there are no services', () => {
-    const serviceList = new ServiceListPage({
+    const props = {
       arrow: false,
       click: () => {},
       isSearching: true,
       noUnderline: true,
-      services: [],
-    });
+      services: [] as ServiceEntity[],
+    };
 
-    const noResultsElement = serviceList.getNoResultsElement();
+    const {getByTestId} = render(<ServiceList {...props} />);
 
-    expect(noResultsElement).not.toBeNull();
+    expect(getByTestId('service-list-no-results')).not.toBeNull();
   });
 });
