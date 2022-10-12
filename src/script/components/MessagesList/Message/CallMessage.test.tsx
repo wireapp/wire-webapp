@@ -22,7 +22,7 @@ import ko from 'knockout';
 
 import {CallMessage as CallMessageEntity} from 'src/script/entity/message/CallMessage';
 
-import CallMessage from './CallMessage';
+import {CallMessage} from './CallMessage';
 
 jest.mock('Components/Icon', () => ({
   Hangup: function HangupIcon() {

@@ -48,4 +48,4 @@ const RestrictedFile: React.FC<RestrictedFileProps> = ({asset}) => {
   );
 };
 
-export default RestrictedFile;
+export {RestrictedFile};

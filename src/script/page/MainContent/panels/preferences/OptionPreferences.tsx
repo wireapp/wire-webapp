@@ -223,4 +223,4 @@ const OptionPreferences: React.FC<OptionPreferencesProps> = ({
   );
 };
 
-export default OptionPreferences;
+export {OptionPreferences};

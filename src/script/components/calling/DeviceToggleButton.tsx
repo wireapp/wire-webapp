@@ -100,4 +100,4 @@ const DeviceToggleButton: React.FC<DeviceToggleButtonProps> = ({currentDevice, d
   );
 };
 
-export default DeviceToggleButton;
+export {DeviceToggleButton};

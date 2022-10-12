@@ -28,13 +28,8 @@ import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {includesOnlyEmojis} from 'Util/EmojiUtil';
 import {handleKeyDown} from 'Util/KeyboardUtil';
 
-import AudioAssetComponent from './AudioAsset';
-import FileAssetComponent from './FileAssetComponent';
-import ImageAssetComponent from './ImageAsset';
-import LinkPreviewAssetComponent from './LinkPreviewAssetComponent';
-import LocationAssetComponent from './LocationAsset';
-import ButtonAssetComponent from './MessageButton';
-import VideoAssetComponent from './VideoAsset';
+import {FileAssetComponent} from './FileAssetComponent';
+import {LinkPreviewAssetComponent} from './LinkPreviewAssetComponent';
 
 import {MessageActions} from '../..';
 import {AssetType} from '../../../../../assets/AssetType';
@@ -130,4 +125,4 @@ const ContentAsset = ({
   return null;
 };
 
-export default ContentAsset;
+export {ContentAsset};

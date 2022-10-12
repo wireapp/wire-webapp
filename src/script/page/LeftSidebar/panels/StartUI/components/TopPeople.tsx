@@ -42,4 +42,4 @@ const TopPeople: React.FC<TopPeopleProps> = ({clickOnUser, max, users}) => {
   return <div className="search-list search-list-sm">{searchListItems}</div>;
 };
 
-export default TopPeople;
+export {TopPeople};

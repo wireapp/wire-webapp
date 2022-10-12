@@ -62,4 +62,4 @@ const DragableClickWrapper: React.FC<DragableClickWrapperProps> = ({onClick, chi
   });
 };
 
-export default DragableClickWrapper;
+export {DragableClickWrapper};

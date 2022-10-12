@@ -130,4 +130,4 @@ const EntropyCanvas = (props: CanvasProps) => {
   );
 };
 
-export default EntropyCanvas;
+export {EntropyCanvas};

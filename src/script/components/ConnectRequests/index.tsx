@@ -21,8 +21,8 @@ import {FC, useContext, useEffect, useRef} from 'react';
 
 import {container} from 'tsyringe';
 
-import Avatar, {AVATAR_SIZE} from 'Components/Avatar';
-import ClassifiedBar from 'Components/input/ClassifiedBar';
+import {Avatar, AVATAR_SIZE} from 'Components/Avatar';
+import {ClassifiedBar} from 'Components/input/ClassifiedBar';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 
@@ -141,4 +141,4 @@ const ConnectRequests: FC<ConnectRequestsProps> = ({
   );
 };
 
-export default ConnectRequests;
+export {ConnectRequests};

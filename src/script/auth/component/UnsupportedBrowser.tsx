@@ -24,7 +24,7 @@ import {Container, ContainerXS, H1, H2, H3, Loading, Logo, Text} from '@wireapp/
 import {MessageDescriptor, useIntl} from 'react-intl';
 import {connect} from 'react-redux';
 
-import WirelessContainer from './WirelessContainer';
+import {WirelessContainer} from './WirelessContainer';
 
 import {Config} from '../../Config';
 import {unsupportedJoinStrings, unsupportedStrings} from '../../strings';

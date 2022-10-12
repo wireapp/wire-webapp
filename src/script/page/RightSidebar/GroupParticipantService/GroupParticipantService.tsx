@@ -20,7 +20,7 @@
 import {FC, useEffect} from 'react';
 
 import Icon from 'Components/Icon';
-import ServiceDetails from 'Components/panel/ServiceDetails';
+import {ServiceDetails} from 'Components/panel/ServiceDetails';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {handleKeyDown} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
@@ -34,7 +34,7 @@ import {initFadingScrollbar} from '../../../ui/fadingScrollbar';
 import {generatePermissionHelpers} from '../../../user/UserPermission';
 import {UserState} from '../../../user/UserState';
 import {ActionsViewModel} from '../../../view_model/ActionsViewModel';
-import PanelHeader from '../PanelHeader';
+import {PanelHeader} from '../PanelHeader';
 
 interface GroupParticipantServiceProps {
   activeConversation: Conversation;
@@ -146,4 +146,4 @@ const GroupParticipantService: FC<GroupParticipantServiceProps> = ({
   );
 };
 
-export default GroupParticipantService;
+export {GroupParticipantService};

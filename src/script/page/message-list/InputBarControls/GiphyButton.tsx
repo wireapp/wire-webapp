@@ -47,4 +47,4 @@ const GiphyButton: React.FC<GiphyButtonProps> = ({onGifClick}) => {
   );
 };
 
-export default GiphyButton;
+export {GiphyButton};

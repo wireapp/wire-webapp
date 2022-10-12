@@ -82,4 +82,4 @@ const AccountLink: React.FC<AccountLinkProps> = ({label, value, ...rest}) => {
   );
 };
 
-export default AccountLink;
+export {AccountLink};

@@ -21,8 +21,8 @@ import React, {useState} from 'react';
 
 import cx from 'classnames';
 
-import Icon from 'Components/Icon';
-import ModalComponent from 'Components/ModalComponent';
+import {Icon} from 'Components/Icon';
+import {ModalComponent} from 'Components/ModalComponent';
 
 import {usePrimaryModalState, showNextModalInQueue, defaultContent, removeCurrentModal} from './PrimaryModalState';
 import {Action, PrimaryModalType} from './PrimaryModalTypes';

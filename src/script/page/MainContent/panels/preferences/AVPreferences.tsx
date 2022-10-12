@@ -73,4 +73,4 @@ const AVPreferences: React.FC<AVPreferencesProps> = ({
   );
 };
 
-export default AVPreferences;
+export {AVPreferences};

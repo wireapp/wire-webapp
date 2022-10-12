@@ -37,11 +37,11 @@ import {
 import {useIntl} from 'react-intl';
 import {Navigate} from 'react-router-dom';
 
-import Page from './Page';
+import {Page} from './Page';
 
 import {Config} from '../../Config';
 import {setAccountTypeStrings} from '../../strings';
-import RouterLink from '../component/RouterLink';
+import {RouterLink} from '../component/RouterLink';
 import {ROUTE} from '../route';
 import {pathWithParams} from '../util/urlUtil';
 
@@ -154,4 +154,4 @@ const SetAccountType = ({}: Props) => {
   );
 };
 
-export default SetAccountType;
+export {SetAccountType};

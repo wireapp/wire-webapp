@@ -24,8 +24,8 @@ import {container} from 'tsyringe';
 
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 
-import RestrictedImage from './asset/RestrictedImage';
-import InViewport from './utils/InViewport';
+import {RestrictedImage} from './asset/RestrictedImage';
+import {InViewport} from './utils/InViewport';
 
 import {AssetRemoteData} from '../assets/AssetRemoteData';
 import {AssetRepository} from '../assets/AssetRepository';
@@ -94,4 +94,4 @@ const Image: React.FC<ImageProps> = ({
   );
 };
 
-export default Image;
+export {Image};

@@ -333,4 +333,4 @@ const WarningsContainer: React.FC = () => {
   );
 };
 
-export default WarningsContainer;
+export {WarningsContainer};

@@ -25,15 +25,14 @@ import {Button, ButtonVariant, Select, StyledApp, THEME_ID} from '@wireapp/react
 import {WebAppEvents} from '@wireapp/webapp-events';
 import {amplify} from 'amplify';
 import cx from 'classnames';
-import {container} from 'tsyringe';
+import {container} from 'webpack';
 
-import Icon from 'Components/Icon';
-import ModalComponent from 'Components/ModalComponent';
-import SearchInput from 'Components/SearchInput';
-import TextInput from 'Components/TextInput/TextInput';
-import BaseToggle from 'Components/toggle/BaseToggle';
-import InfoToggle from 'Components/toggle/InfoToggle';
-import UserSearchableList from 'Components/UserSearchableList';
+import {Icon} from 'Components/Icon';
+import {ModalComponent} from 'Components/ModalComponent';
+import {SearchInput} from 'Components/SearchInput';
+import {BaseToggle} from 'Components/toggle/BaseToggle';
+import {InfoToggle} from 'Components/toggle/InfoToggle';
+import {UserSearchableList} from 'Components/UserSearchableList';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {onEscKey, offEscKey, handleEnterDown} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
@@ -466,4 +465,4 @@ const GroupCreationModal: React.FC<GroupCreationModalProps> = ({
   );
 };
 
-export default GroupCreationModal;
+export {GroupCreationModal};

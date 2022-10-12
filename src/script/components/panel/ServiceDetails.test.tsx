@@ -19,7 +19,7 @@
 
 import {render} from '@testing-library/react';
 
-import ServiceDetails from './ServiceDetails';
+import {ServiceDetails} from './ServiceDetails';
 
 import {ServiceEntity} from '../../integration/ServiceEntity';
 

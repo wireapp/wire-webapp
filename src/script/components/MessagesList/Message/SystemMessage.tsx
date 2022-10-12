@@ -19,11 +19,11 @@
 
 import React from 'react';
 
-import Icon from 'Components/Icon';
+import {Icon} from 'Components/Icon';
 import {SystemMessage as SystemMessageEntity} from 'src/script/entity/message/SystemMessage';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 
-import MessageTime from './MessageTime';
+import {MessageTime} from './MessageTime';
 
 import {RenameMessage} from '../../../entity/message/RenameMessage';
 import {SystemMessageType} from '../../../message/SystemMessageType';
@@ -65,4 +65,4 @@ const SystemMessage: React.FC<SystemMessageProps> = ({message}) => {
   );
 };
 
-export default SystemMessage;
+export {SystemMessage};

@@ -81,4 +81,4 @@ const SaveCallLogs: React.FC<SaveCallLogsProps> = ({callingRepository, userState
   );
 };
 
-export default SaveCallLogs;
+export {SaveCallLogs};

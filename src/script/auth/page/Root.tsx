@@ -28,28 +28,28 @@ import {AnyAction, Dispatch} from 'redux';
 
 import {t} from 'Util/LocalizerUtil';
 
-import CheckPassword from './CheckPassword';
-import ClientManager from './ClientManager';
-import ConversationJoin from './ConversationJoin';
-import ConversationJoinInvalid from './ConversationJoinInvalid';
-import CreateAccount from './CreateAccount';
-import CreatePersonalAccount from './CreatePersonalAccount';
-import CustomEnvironmentRedirect from './CustomEnvironmentRedirect';
-import HistoryInfo from './HistoryInfo';
-import Index from './Index';
-import InitialInvite from './InitialInvite';
-import Login from './Login';
-import PhoneLogin from './PhoneLogin';
-import SetAccountType from './SetAccountType';
-import SetEmail from './SetEmail';
-import SetEntropyPage from './SetEntropyPage';
-import SetHandle from './SetHandle';
-import SetPassword from './SetPassword';
-import SingleSignOn from './SingleSignOn';
-import TeamName from './TeamName';
-import VerifyEmailCode from './VerifyEmailCode';
-import VerifyEmailLink from './VerifyEmailLink';
-import VerifyPhoneCode from './VerifyPhoneCode';
+import {CheckPassword} from './CheckPassword';
+import {ClientManager} from './ClientManager';
+import {ConversationJoin} from './ConversationJoin';
+import {ConversationJoinInvalid} from './ConversationJoinInvalid';
+import {CreateAccount} from './CreateAccount';
+import {CreatePersonalAccount} from './CreatePersonalAccount';
+import {CustomEnvironmentRedirect} from './CustomEnvironmentRedirect';
+import {HistoryInfo} from './HistoryInfo';
+import {Index} from './Index';
+import {InitialInvite} from './InitialInvite';
+import {Login} from './Login';
+import {PhoneLogin} from './PhoneLogin';
+import {SetAccountType} from './SetAccountType';
+import {SetEmail} from './SetEmail';
+import {SetEntropyPage} from './SetEntropyPage';
+import {SetHandle} from './SetHandle';
+import {SetPassword} from './SetPassword';
+import {SingleSignOn} from './SingleSignOn';
+import {TeamName} from './TeamName';
+import {VerifyEmailCode} from './VerifyEmailCode';
+import {VerifyEmailLink} from './VerifyEmailLink';
+import {VerifyPhoneCode} from './VerifyPhoneCode';
 
 import {Config} from '../../Config';
 import {mapLanguage, normalizeLanguage} from '../localeConfig';
@@ -69,7 +69,7 @@ const Title: React.FC<{title: string; children: React.ReactNode}> = ({title, chi
   return <>{children}</>;
 };
 
-const Root: React.FC<RootProps & ConnectedProps & DispatchProps> = ({
+const RootComponent: React.FC<RootProps & ConnectedProps & DispatchProps> = ({
   isAuthenticated,
   language,
   isFetchingSSOSettings,
@@ -242,4 +242,6 @@ const mapDispatchToProps = (dispatch: Dispatch<AnyAction>) =>
     dispatch,
   );
 
-export default connect(mapStateToProps, mapDispatchToProps)(Root);
+const Root = connect(mapStateToProps, mapDispatchToProps)(RootComponent);
+
+export {Root};

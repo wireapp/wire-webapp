@@ -45,4 +45,4 @@ const EmojiItem: FC<EmojiItemProps> = ({emoji, onClick, onMouseEnter, selectedEm
   </button>
 );
 
-export default EmojiItem;
+export {EmojiItem};

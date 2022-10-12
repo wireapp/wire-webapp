@@ -25,11 +25,11 @@ import cx from 'classnames';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 import ko from 'knockout';
 
-import Icon from 'Components/Icon';
-import LegalHoldDot from 'Components/LegalHoldDot';
-import ModalComponent from 'Components/ModalComponent';
-import UserDevices, {UserDevicesState, useUserDevicesHistory} from 'Components/UserDevices';
-import UserSearchableList from 'Components/UserSearchableList';
+import {Icon} from 'Components/Icon';
+import {LegalHoldDot} from 'Components/LegalHoldDot';
+import {ModalComponent} from 'Components/ModalComponent';
+import {useUserDevicesHistory, UserDevicesState, UserDevices} from 'Components/UserDevices';
+import {UserSearchableList} from 'Components/UserSearchableList';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 import {splitFingerprint} from 'Util/StringUtil';
@@ -425,4 +425,4 @@ const LegalHoldModal: FC<LegalHoldModalProps> = ({
   );
 };
 
-export default LegalHoldModal;
+export {LegalHoldModal};

@@ -120,4 +120,4 @@ const GroupedConversations: React.FC<GroupedConversationsProps> = ({
   );
 };
 
-export default GroupedConversations;
+export {GroupedConversations};

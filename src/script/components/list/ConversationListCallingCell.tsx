@@ -21,20 +21,22 @@ import React, {useState, useCallback} from 'react';
 
 import {DefaultConversationRoleName} from '@wireapp/api-client/src/conversation/';
 import {CALL_TYPE, CONV_TYPE, REASON as CALL_REASON, STATE as CALL_STATE} from '@wireapp/avs';
+import {Avatar} from '@wireapp/react-ui-kit';
 import cx from 'classnames';
 import {container} from 'tsyringe';
 
-import Avatar, {AVATAR_SIZE} from 'Components/Avatar';
-import GroupAvatar from 'Components/avatar/GroupAvatar';
-import Duration from 'Components/calling/Duration';
-import GroupVideoGrid from 'Components/calling/GroupVideoGrid';
-import Icon from 'Components/Icon';
-import ClassifiedBar from 'Components/input/ClassifiedBar';
-import ParticipantItem from 'Components/list/ParticipantItem';
+import {AVATAR_SIZE} from 'Components/Avatar';
+import {GroupAvatar} from 'Components/avatar/GroupAvatar';
+import {Duration} from 'Components/calling/Duration';
+import {GroupVideoGrid} from 'Components/calling/GroupVideoGrid';
+import {Icon} from 'Components/Icon';
+import {ClassifiedBar} from 'Components/input/ClassifiedBar';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {KEY} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
 import {sortUsersByPriority} from 'Util/StringUtil';
+
+import {ParticipantItem} from './ParticipantItem';
 
 import type {Call} from '../../calling/Call';
 import type {CallingRepository} from '../../calling/CallingRepository';
@@ -478,4 +480,4 @@ const ConversationListCallingCell: React.FC<CallingCellProps> = ({
   );
 };
 
-export default ConversationListCallingCell;
+export {ConversationListCallingCell};

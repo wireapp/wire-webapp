@@ -88,4 +88,4 @@ const DetailViewModalFooter: FC<DetailViewModalFooterProps> = ({
   );
 };
 
-export default DetailViewModalFooter;
+export {DetailViewModalFooter};

@@ -44,13 +44,13 @@ import {AnyAction, Dispatch} from 'redux';
 
 import {getLogger} from 'Util/Logger';
 
-import Page from './Page';
-import SingleSignOnForm from './SingleSignOnForm';
+import {Page} from './Page';
+import {SingleSignOnForm} from './SingleSignOnForm';
 
 import {Config} from '../../Config';
 import {ssoLoginStrings} from '../../strings';
-import AppAlreadyOpen from '../component/AppAlreadyOpen';
-import RouterLink from '../component/RouterLink';
+import {AppAlreadyOpen} from '../component/AppAlreadyOpen';
+import {RouterLink} from '../component/RouterLink';
 import {BackendError} from '../module/action/BackendError';
 import {RootState, bindActionCreators} from '../module/reducer';
 import * as AuthSelector from '../module/selector/AuthSelector';
@@ -60,7 +60,7 @@ type Props = React.HTMLAttributes<HTMLDivElement>;
 
 const logger = getLogger('SingleSignOn');
 
-const SingleSignOn = ({hasDefaultSSOCode}: Props & ConnectedProps & DispatchProps) => {
+const SingleSignOnComponent = ({hasDefaultSSOCode}: Props & ConnectedProps & DispatchProps) => {
   const {formatMessage: _} = useIntl();
   const ssoWindowRef = useRef<Window>();
   const params = useParams<{code?: string}>();
@@ -291,4 +291,6 @@ const mapStateToProps = (state: RootState) => ({
 type DispatchProps = ReturnType<typeof mapDispatchToProps>;
 const mapDispatchToProps = (dispatch: Dispatch<AnyAction>) => bindActionCreators({}, dispatch);
 
-export default connect(mapStateToProps, mapDispatchToProps)(SingleSignOn);
+const SingleSignOn = connect(mapStateToProps, mapDispatchToProps)(SingleSignOnComponent);
+
+export {SingleSignOn};

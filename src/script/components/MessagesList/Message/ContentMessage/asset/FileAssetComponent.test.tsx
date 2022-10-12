@@ -24,7 +24,7 @@ import {ContentMessage} from 'src/script/entity/message/ContentMessage';
 import {FileAsset} from 'src/script/entity/message/FileAsset';
 import {TeamState} from 'src/script/team/TeamState';
 
-import FileAssetComponent from './FileAssetComponent';
+import {FileAssetComponent} from './FileAssetComponent';
 
 import {StatusType} from '../../../../../message/StatusType';
 

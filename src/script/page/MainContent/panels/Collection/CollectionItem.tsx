@@ -65,4 +65,4 @@ const CollectionItem: FC<CollectionItemProps> = ({message, onImageClick}) => {
   return null;
 };
 
-export default CollectionItem;
+export {CollectionItem};

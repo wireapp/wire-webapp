@@ -21,7 +21,7 @@ import {fireEvent, waitFor} from '@testing-library/dom';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 import {act} from 'react-dom/test-utils';
 
-import CheckPassword from './CheckPassword';
+import {CheckPassword} from './CheckPassword';
 
 import {actionRoot} from '../module/action';
 import {BackendError} from '../module/action/BackendError';

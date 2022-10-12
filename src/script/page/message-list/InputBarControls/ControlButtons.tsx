@@ -158,4 +158,4 @@ const ControlButtons: React.FC<ControlButtonsProps> = ({
   return <>{showGiphyButton && !disableFilesharing && <GiphyButton onGifClick={onGifClick} />}</>;
 };
 
-export default ControlButtons;
+export {ControlButtons};

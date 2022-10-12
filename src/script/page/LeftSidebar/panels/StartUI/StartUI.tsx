@@ -245,4 +245,4 @@ const StartUI: React.FC<StartUIProps> = ({
   );
 };
 
-export default StartUI;
+export {StartUI};

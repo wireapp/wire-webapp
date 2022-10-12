@@ -52,4 +52,4 @@ const EphemeralTimer: React.FC<EphemeralTimerProps> = ({message}) => {
   );
 };
 
-export default EphemeralTimer;
+export {EphemeralTimer};

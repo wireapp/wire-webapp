@@ -26,7 +26,7 @@ import {ReceiptModeUpdateMessage} from 'src/script/entity/message/ReceiptModeUpd
 import {RenameMessage} from 'src/script/entity/message/RenameMessage';
 import {SystemMessageType} from 'src/script/message/SystemMessageType';
 
-import SystemMessage from './SystemMessage';
+import {SystemMessage} from './SystemMessage';
 
 jest.mock('Components/Icon', () => ({
   Edit: function EditIcon() {

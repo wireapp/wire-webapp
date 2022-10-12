@@ -31,7 +31,7 @@ import {alias} from 'Util/util';
 
 import type {MainViewModel, ViewModelRepositories} from './MainViewModel';
 
-import PrimaryModal from '../components/Modals/PrimaryModal';
+import {PrimaryModal} from '../components/Modals/PrimaryModal';
 import {Config} from '../Config';
 import type {ConversationRepository} from '../conversation/ConversationRepository';
 import {ConversationState} from '../conversation/ConversationState';

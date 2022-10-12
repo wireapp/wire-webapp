@@ -26,7 +26,7 @@ import {FormattedMessage, useIntl} from 'react-intl';
 import {Config} from '../../Config';
 import {cookiePolicyStrings, footerStrings} from '../../strings';
 import {EXTERNAL_ROUTE} from '../externalRoute';
-import SVGProvider from '../util/SVGProvider';
+import {SVGProvider} from '../util/SVGProvider';
 
 export interface Props extends React.HTMLAttributes<HTMLDivElement> {
   children: React.ReactNode;
@@ -34,7 +34,7 @@ export interface Props extends React.HTMLAttributes<HTMLDivElement> {
   showCookiePolicyBanner?: boolean;
 }
 
-export const WirelessContainer: React.FC<Props> = ({showCookiePolicyBanner, onCookiePolicyBannerClose, children}) => {
+const WirelessContainer: React.FC<Props> = ({showCookiePolicyBanner, onCookiePolicyBannerClose, children}) => {
   const {formatMessage: _} = useIntl();
   return (
     <div
@@ -108,4 +108,4 @@ export const WirelessContainer: React.FC<Props> = ({showCookiePolicyBanner, onCo
   );
 };
 
-export default WirelessContainer;
+export {WirelessContainer};

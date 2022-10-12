@@ -342,4 +342,4 @@ const Conversations: React.FC<ConversationsProps> = ({
   );
 };
 
-export default Conversations;
+export {Conversations};

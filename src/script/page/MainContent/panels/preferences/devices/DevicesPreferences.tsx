@@ -190,4 +190,4 @@ const DevicesPreferences: React.FC<DevicesPreferencesProps> = ({
   );
 };
 
-export default DevicesPreferences;
+export {DevicesPreferences};

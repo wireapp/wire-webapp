@@ -123,4 +123,4 @@ const MentionSuggestionList: React.FunctionComponent<MentionSuggestionListProps>
   ) : null;
 };
 
-export default MentionSuggestionList;
+export {MentionSuggestionList};

@@ -94,4 +94,4 @@ const GroupedConversationsFolder: React.FC<GroupedConversationsFolderProps> = ({
   );
 };
 
-export default GroupedConversationsFolder;
+export {GroupedConversationsFolder};

@@ -113,4 +113,4 @@ const AppContainer: FC<AppContainerProps> = ({root}) => {
 
 registerReactComponent('app-container', AppContainer);
 
-export default AppContainer;
+export {AppContainer};

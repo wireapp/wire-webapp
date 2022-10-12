@@ -19,9 +19,9 @@
 
 import {act, render} from '@testing-library/react';
 
-import WarningsContainer from './WarningsContainer';
+import {WarningsContainer} from './WarningsContainer';
 
-import Warnings from '.';
+import {Warnings} from '.';
 
 describe('WarningsContainer', () => {
   it('does not render when no warning is in the queue', async () => {

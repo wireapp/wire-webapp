@@ -24,17 +24,17 @@ import {useIntl} from 'react-intl';
 import {connect} from 'react-redux';
 import {useNavigate} from 'react-router-dom';
 
-import Page from './Page';
+import {Page} from './Page';
 
 import {setEmailStrings} from '../../strings';
-import RouterLink from '../component/RouterLink';
+import {RouterLink} from '../component/RouterLink';
 import {RootState} from '../module/reducer';
 import * as SelfSelector from '../module/selector/SelfSelector';
 import {ROUTE} from '../route';
 
 type Props = React.HTMLProps<HTMLDivElement>;
 
-const VerifyEmailLink = ({hasSelfEmail}: Props & ConnectedProps) => {
+const VerifyEmailLinkComponent = ({hasSelfEmail}: Props & ConnectedProps) => {
   const {formatMessage: _} = useIntl();
   const navigate = useNavigate();
 
@@ -78,4 +78,6 @@ const mapStateToProps = (state: RootState) => ({
   hasSelfEmail: SelfSelector.hasSelfEmail(state),
 });
 
-export default connect(mapStateToProps)(VerifyEmailLink);
+const VerifyEmailLink = connect(mapStateToProps)(VerifyEmailLinkComponent);
+
+export {VerifyEmailLink};

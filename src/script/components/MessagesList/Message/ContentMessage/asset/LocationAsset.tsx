@@ -51,4 +51,4 @@ const LocationAsset: React.FC<LocationAssetProps> = ({asset}) => {
   );
 };
 
-export default LocationAsset;
+export {LocationAsset};

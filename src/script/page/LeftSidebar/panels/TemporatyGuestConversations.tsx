@@ -131,4 +131,4 @@ const TemporaryGuestConversations: React.FC<TemporaryGuestConversations> = ({
   );
 };
 
-export default TemporaryGuestConversations;
+export {TemporaryGuestConversations};

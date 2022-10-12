@@ -131,4 +131,4 @@ const LoginForm = ({isFetching, onSubmit}: LoginFormProps) => {
   );
 };
 
-export default LoginForm;
+export {LoginForm};

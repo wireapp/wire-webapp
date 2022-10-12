@@ -132,4 +132,4 @@ const AccountSecuritySection: React.FC<AccountSecuritySectionProps> = ({
   );
 };
 
-export default AccountSecuritySection;
+export {AccountSecuritySection};

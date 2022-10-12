@@ -114,4 +114,4 @@ const MicrophonePreferences: React.FC<MicrophonePreferencesProps> = ({
   );
 };
 
-export default MicrophonePreferences;
+export {MicrophonePreferences};

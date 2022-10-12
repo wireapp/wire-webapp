@@ -148,4 +148,4 @@ const UsernameInput: React.FC<UsernameInputProps> = ({username, domain, userRepo
   );
 };
 
-export default UsernameInput;
+export {UsernameInput};

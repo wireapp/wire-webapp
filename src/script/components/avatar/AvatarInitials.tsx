@@ -46,4 +46,4 @@ const AvatarInitials: FC<AvatarInitialsProps> = ({avatarSize, initials, color = 
   </div>
 );
 
-export default AvatarInitials;
+export {AvatarInitials};

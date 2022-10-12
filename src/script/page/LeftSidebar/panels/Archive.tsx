@@ -91,4 +91,4 @@ const Archive: React.FC<ArchiveProps> = ({
   );
 };
 
-export default Archive;
+export {Archive};

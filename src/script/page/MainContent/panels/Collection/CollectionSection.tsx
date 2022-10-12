@@ -60,4 +60,4 @@ const CollectionSection: React.FC<{
   );
 };
 
-export default CollectionSection;
+export {CollectionSection};

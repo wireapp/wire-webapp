@@ -554,4 +554,4 @@ const AppLock: React.FC<AppLockProps> = ({
   );
 };
 
-export default AppLock;
+export {AppLock};

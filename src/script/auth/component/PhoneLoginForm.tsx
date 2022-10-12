@@ -131,4 +131,4 @@ const PhoneLoginForm = ({isFetching, onSubmit}: LoginFormProps) => {
     </div>
   );
 };
-export default PhoneLoginForm;
+export {PhoneLoginForm};

@@ -24,7 +24,7 @@ import {LinkPreview} from 'src/script/entity/message/LinkPreview';
 import {Text} from 'src/script/entity/message/Text';
 import {StatusType} from 'src/script/message/StatusType';
 
-import LinkPreviewAssetComponent from './LinkPreviewAssetComponent';
+import {LinkPreviewAssetComponent} from './LinkPreviewAssetComponent';
 
 describe('LinkPreviewAssetComponent', () => {
   function mockLinkPreview(url = 'https://example.com'): ContentMessage {

@@ -35,4 +35,4 @@ const AvatarBorder: React.FunctionComponent<AvatarBorderProps> = ({borderRadius 
   />
 );
 
-export default AvatarBorder;
+export {AvatarBorder};

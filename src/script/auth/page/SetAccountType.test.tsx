@@ -19,7 +19,7 @@
 
 import {TypeUtil} from '@wireapp/commons';
 
-import SetAccountType from './SetAccountType';
+import {SetAccountType} from './SetAccountType';
 
 import {Config, Configuration} from '../../Config';
 import {initialRootState} from '../module/reducer';

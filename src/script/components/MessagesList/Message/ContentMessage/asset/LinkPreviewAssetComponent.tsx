@@ -21,7 +21,7 @@ import React from 'react';
 
 import cx from 'classnames';
 
-import Image from 'Components/Image';
+import {Image} from 'Components/Image';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {handleKeyDown} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
@@ -29,7 +29,7 @@ import {safeWindowOpen} from 'Util/SanitizationUtil';
 import {cleanURL} from 'Util/UrlUtil';
 import {isTweetUrl} from 'Util/ValidationUtil';
 
-import AssetHeader from './AssetHeader';
+import {AssetHeader} from './AssetHeader';
 
 import type {ContentMessage} from '../../../../../entity/message/ContentMessage';
 import type {Text} from '../../../../../entity/message/Text';
@@ -128,4 +128,4 @@ const LinkPreviewAssetComponent: React.FC<LinkPreviewAssetProps> = ({header = fa
   );
 };
 
-export default LinkPreviewAssetComponent;
+export {LinkPreviewAssetComponent};

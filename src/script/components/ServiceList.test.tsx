@@ -17,10 +17,10 @@
  *
  */
 
-import TestPage from 'Util/test/TestPage';
+import {TestPage} from 'Util/test/TestPage';
 import {createRandomUuid} from 'Util/util';
 
-import ServiceList, {ServiceListProps} from './ServiceList';
+import {ServiceList, ServiceListProps} from './ServiceList';
 
 import {ServiceEntity} from '../integration/ServiceEntity';
 

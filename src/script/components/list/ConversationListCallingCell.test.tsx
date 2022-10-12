@@ -30,10 +30,10 @@ import {User} from 'src/script/entity/User';
 import {MediaDevicesHandler} from 'src/script/media/MediaDevicesHandler';
 import {TeamState} from 'src/script/team/TeamState';
 import {CallActions} from 'src/script/view_model/CallingViewModel';
-import TestPage from 'Util/test/TestPage';
+import {TestPage} from 'Util/test/TestPage';
 import {createRandomUuid} from 'Util/util';
 
-import ConversationListCallingCell, {CallingCellProps} from './ConversationListCallingCell';
+import {ConversationListCallingCell, CallingCellProps} from './ConversationListCallingCell';
 
 jest.mock(
   'Components/utils/InViewport',

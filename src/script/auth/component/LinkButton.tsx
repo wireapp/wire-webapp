@@ -37,4 +37,4 @@ const LinkButton = (props: React.ButtonHTMLAttributes<HTMLButtonElement>) => (
   />
 );
 
-export default LinkButton;
+export {LinkButton};

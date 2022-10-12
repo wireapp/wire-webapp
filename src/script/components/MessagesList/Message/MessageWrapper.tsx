@@ -26,18 +26,17 @@ import {container} from 'tsyringe';
 
 import {t} from 'Util/LocalizerUtil';
 
-import CallMessage from './CallMessage';
-import CallTimeoutMessage from './CallTimeoutMessage';
-import ContentMessageComponent from './ContentMessage';
-import DecryptionErrorMessage from './DecryptErrorMessage';
-import DeleteMessage from './DeleteMessage';
-import FileTypeRestrictedMessage from './FileTypeRestrictedMessage';
-import LegalHoldMessage from './LegalHoldMessage';
-import MemberMessage from './MemberMessage';
-import MissedMessage from './MissedMessage';
-import PingMessage from './PingMessage';
-import SystemMessage from './SystemMessage';
-import VerificationMessage from './VerificationMessage';
+import {CallMessage} from './CallMessage';
+import {CallTimeoutMessage} from './CallTimeoutMessage';
+import {ContentMessageComponent} from './ContentMessage';
+import {DeleteMessage} from './DeleteMessage';
+import {FileTypeRestrictedMessage} from './FileTypeRestrictedMessage';
+import {LegalHoldMessage} from './LegalHoldMessage';
+import {MemberMessage} from './MemberMessage';
+import {MissedMessage} from './MissedMessage';
+import {PingMessage} from './PingMessage';
+import {SystemMessage} from './SystemMessage';
+import {VerificationMessage} from './VerificationMessage';
 
 import {AssetRepository} from '../../../assets/AssetRepository';
 import {Conversation} from '../../../entity/Conversation';

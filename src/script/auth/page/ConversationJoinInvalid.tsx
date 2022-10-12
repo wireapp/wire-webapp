@@ -24,15 +24,22 @@ import {FormattedMessage, useIntl} from 'react-intl';
 
 import {Config} from '../../Config';
 import {conversationJoinStrings} from '../../strings';
-import UnsupportedBrowser from '../component/UnsupportedBrowser';
-import WirelessContainer from '../component/WirelessContainer';
+import {UnsupportedBrowser} from '../component/UnsupportedBrowser';
+import {WirelessContainer} from '../component/WirelessContainer';
 
 type Props = React.HTMLProps<HTMLDivElement>;
 
 const ConversationJoinInvalid = ({}: Props) => {
   const {formatMessage: _} = useIntl();
   return (
-    <UnsupportedBrowser isTemporaryGuest>
+    <UnsupportedBrowser
+      isTemporaryGuest
+      hasCookieSupport={false}
+      hasIndexedDbSupport={false}
+      hasToUseDesktopApplication={false}
+      isCheckingSupport={false}
+      isSupportedBrowser={false}
+    >
       <WirelessContainer>
         <ContainerXS style={{margin: 'auto 0'}}>
           <H2 style={{fontWeight: 500, marginBottom: '10px', marginTop: '0'}} data-uie-name="status-invalid-headline">
@@ -52,4 +59,4 @@ const ConversationJoinInvalid = ({}: Props) => {
   );
 };
 
-export default ConversationJoinInvalid;
+export {ConversationJoinInvalid};

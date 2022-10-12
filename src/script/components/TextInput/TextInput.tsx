@@ -146,4 +146,4 @@ const TextInput: ForwardRefRenderFunction<HTMLInputElement, UserInputProps> = ({
 
 const TextInputForwarded = React.forwardRef(TextInput);
 
-export default TextInputForwarded;
+export {TextInputForwarded};

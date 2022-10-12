@@ -136,4 +136,4 @@ const AvatarInput: React.FC<AvatarInputProps> = ({selfUser, isActivatedAccount, 
   );
 };
 
-export default AvatarInput;
+export {AvatarInput};

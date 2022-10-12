@@ -20,8 +20,8 @@
 import {
   ChangeEvent,
   ClipboardEvent as ReactClipboardEvent,
-  KeyboardEvent as ReactKeyboardEvent,
   FormEvent,
+  KeyboardEvent as ReactKeyboardEvent,
   useEffect,
   useMemo,
   useRef,
@@ -29,20 +29,29 @@ import {
 } from 'react';
 
 import {Availability} from '@wireapp/protocol-messaging';
-import {StyledApp, THEME_ID, useMatchMedia} from '@wireapp/react-ui-kit';
+import {Avatar, StyledApp, THEME_ID, useMatchMedia} from '@wireapp/react-ui-kit';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import {amplify} from 'amplify';
 import cx from 'classnames';
 import {container} from 'tsyringe';
 
-import Avatar, {AVATAR_SIZE} from 'Components/Avatar';
-import useEmoji from 'Components/Emoji/useEmoji';
-import Icon from 'Components/Icon';
-import ClassifiedBar from 'Components/input/ClassifiedBar';
+import {AVATAR_SIZE} from 'Components/Avatar';
+import {useEmoji} from 'Components/Emoji/useEmoji';
+import {Icon} from 'Components/Icon';
+import {ClassifiedBar} from 'Components/input/ClassifiedBar';
+import {PrimaryModal} from 'Components/Modals/PrimaryModal';
+import {useDropFiles} from 'src/script/hooks/useDropFiles';
+import {useResizeTarget} from 'src/script/hooks/useResizeTarget';
+import {useScrollSync} from 'src/script/hooks/useScrollSync';
+import {useTextAreaFocus} from 'src/script/hooks/useTextAreaFocus';
+import {ControlButtons} from 'src/script/page/message-list/InputBarControls/ControlButtons';
+import {GiphyButton} from 'src/script/page/message-list/InputBarControls/GiphyButton';
+import {MentionSuggestionList} from 'src/script/page/message-list/MentionSuggestions';
+import {PropertiesRepository} from 'src/script/properties/PropertiesRepository';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {loadDraftState, saveDraftState} from 'Util/DraftStateUtil';
 import {allowsAllFiles, getFileExtensionOrName, hasAllowedExtension} from 'Util/FileTypeUtil';
-import isHittingUploadLimit from 'Util/isHittingUploadLimit';
+import {isHittingUploadLimit} from 'Util/isHittingUploadLimit';
 import {insertAtCaret, isFunctionKey, KEY} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
 import {
@@ -54,9 +63,9 @@ import {
 import {formatLocale, TIME_IN_MILLIS} from 'Util/TimeUtil';
 import {formatBytes, getSelectionPosition} from 'Util/util';
 
-import getRichTextInput from './getRichTextInput';
-import PastedFileControls from './PastedFileControls';
-import ReplyBar from './ReplyBar';
+import {getRichTextInput} from './getRichTextInput';
+import {PastedFileControls} from './PastedFileControls';
+import {ReplyBar} from './ReplyBar';
 
 import {AssetRepository} from '../../assets/AssetRepository';
 import {Config} from '../../Config';
@@ -68,22 +77,13 @@ import {Text as TextAsset} from '../../entity/message/Text';
 import {User} from '../../entity/User';
 import {ConversationError} from '../../error/ConversationError';
 import {EventRepository} from '../../event/EventRepository';
-import useDropFiles from '../../hooks/useDropFiles';
-import useResizeTarget from '../../hooks/useResizeTarget';
-import useScrollSync from '../../hooks/useScrollSync';
-import useTextAreaFocus from '../../hooks/useTextAreaFocus';
 import {MentionEntity} from '../../message/MentionEntity';
 import {MessageHasher} from '../../message/MessageHasher';
 import {QuoteEntity} from '../../message/QuoteEntity';
-import ControlButtons from '../../page/message-list/InputBarControls/ControlButtons';
-import GiphyButton from '../../page/message-list/InputBarControls/GiphyButton';
-import MentionSuggestionList from '../../page/message-list/MentionSuggestions';
-import {PropertiesRepository} from '../../properties/PropertiesRepository';
 import {SearchRepository} from '../../search/SearchRepository';
 import {StorageRepository} from '../../storage';
 import {TeamState} from '../../team/TeamState';
 import {UserState} from '../../user/UserState';
-import PrimaryModal from '../Modals/PrimaryModal';
 
 const CONFIG = {
   ...Config.getConfig(),
@@ -933,4 +933,4 @@ const InputBar = ({
   );
 };
 
-export default InputBar;
+export {InputBar};

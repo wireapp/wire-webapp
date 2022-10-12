@@ -17,7 +17,7 @@
  *
  */
 
-import {FC, ChangeEvent, KeyboardEvent, useEffect, useRef, useState} from 'react';
+import {ChangeEvent, FC, KeyboardEvent, useEffect, useRef, useState} from 'react';
 
 import Icon from 'Components/Icon';
 import {isEnterKey} from 'Util/KeyboardUtil';
@@ -27,7 +27,7 @@ import {removeLineBreaks} from 'Util/StringUtil';
 import {ConversationRepository} from '../../../../../conversation/ConversationRepository';
 import {User} from '../../../../../entity/User';
 import {ServiceEntity} from '../../../../../integration/ServiceEntity';
-import GroupDetails from '../GroupDetails/GroupDetails';
+import {GroupDetails} from '../GroupDetails/GroupDetails';
 
 interface ConversationDetailsHeaderProps {
   isActiveGroupParticipant: boolean;
@@ -156,4 +156,4 @@ const ConversationDetailsHeader: FC<ConversationDetailsHeaderProps> = ({
   );
 };
 
-export default ConversationDetailsHeader;
+export {ConversationDetailsHeader};

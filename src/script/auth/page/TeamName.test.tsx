@@ -19,7 +19,7 @@
 
 import {fireEvent} from '@testing-library/react';
 
-import TeamName from './TeamName';
+import {TeamName} from './TeamName';
 
 import {ValidationError} from '../module/action/ValidationError';
 import {initialRootState} from '../module/reducer';

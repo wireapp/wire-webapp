@@ -25,7 +25,7 @@ import {amplify} from 'amplify';
 import cx from 'classnames';
 
 import Icon from 'Components/Icon';
-import UserSearchableList from 'Components/UserSearchableList';
+import {UserSearchableList} from 'Components/UserSearchableList';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 import {formatLocale} from 'Util/TimeUtil';
@@ -42,7 +42,7 @@ import {UserReactionMap} from '../../../storage';
 import {TeamRepository} from '../../../team/TeamRepository';
 import {initFadingScrollbar} from '../../../ui/fadingScrollbar';
 import {UserRepository} from '../../../user/UserRepository';
-import PanelHeader from '../PanelHeader';
+import {PanelHeader} from '../PanelHeader';
 
 const MESSAGE_STATES = {
   LIKES: 'likes',
@@ -277,4 +277,4 @@ const MessageDetails: FC<MessageDetailsProps> = ({
   );
 };
 
-export default MessageDetails;
+export {MessageDetails};

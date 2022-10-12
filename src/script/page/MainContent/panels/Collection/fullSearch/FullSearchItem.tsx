@@ -78,4 +78,4 @@ const FullSearchItem: React.FC<FullSearchItemProps> = ({message, onClick, format
   );
 };
 
-export default FullSearchItem;
+export {FullSearchItem};

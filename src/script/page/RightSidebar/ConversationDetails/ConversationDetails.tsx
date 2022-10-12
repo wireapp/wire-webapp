@@ -22,20 +22,20 @@ import {FC, useEffect, useState} from 'react';
 import {RECEIPT_MODE} from '@wireapp/api-client/src/conversation/data/';
 
 import Icon from 'Components/Icon';
-import PanelActions from 'Components/panel/PanelActions';
-import ServiceDetails from 'Components/panel/ServiceDetails';
-import ServiceList from 'Components/ServiceList';
-import UserSearchableList from 'Components/UserSearchableList';
+import {PanelActions} from 'Components/panel/PanelActions';
+import {ServiceDetails} from 'Components/panel/ServiceDetails';
+import {ServiceList} from 'Components/ServiceList';
+import {UserSearchableList} from 'Components/UserSearchableList';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 import {sortUsersByPriority} from 'Util/StringUtil';
 import {formatDuration} from 'Util/TimeUtil';
 
-import ConversationDetailsBottomActions from './components/ConversationDetailsBottomActions/ConversationDetailsBottomActions';
-import ConversationDetailsHeader from './components/ConversationDetailsHeader/ConversationDetailsHeader';
-import ConversationDetailsOptions from './components/ConversationDetailsOptions/ConversationDetailsOptions';
-import UserConversationDetails from './components/UserConversationDetails/UserConversationDetails';
-import getConversationActions from './utils/getConversationActions';
+import {ConversationDetailsBottomActions} from './components/ConversationDetailsBottomActions/ConversationDetailsBottomActions';
+import {ConversationDetailsHeader} from './components/ConversationDetailsHeader/ConversationDetailsHeader';
+import {ConversationDetailsOptions} from './components/ConversationDetailsOptions/ConversationDetailsOptions';
+import {UserConversationDetails} from './components/UserConversationDetails/UserConversationDetails';
+import {getConversationActions} from './utils/getConversationActions';
 
 import {ConversationRepository} from '../../../conversation/ConversationRepository';
 import {ConversationVerificationState} from '../../../conversation/ConversationVerificationState';
@@ -53,7 +53,7 @@ import {Shortcut} from '../../../ui/Shortcut';
 import {ShortcutType} from '../../../ui/ShortcutType';
 import {UserState} from '../../../user/UserState';
 import {ActionsViewModel} from '../../../view_model/ActionsViewModel';
-import PanelHeader from '../PanelHeader';
+import {PanelHeader} from '../PanelHeader';
 import {PanelEntity, PanelState} from '../RightSidebar';
 
 const CONFIG = {
@@ -407,4 +407,4 @@ const ConversationDetails: FC<ConversationDetailsProps> = ({
   );
 };
 
-export default ConversationDetails;
+export {ConversationDetails};

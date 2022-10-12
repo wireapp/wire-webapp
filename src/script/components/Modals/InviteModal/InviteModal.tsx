@@ -21,11 +21,11 @@ import React, {useState} from 'react';
 
 import {Runtime} from '@wireapp/commons';
 
-import Icon from 'Components/Icon';
-import ModalComponent from 'Components/ModalComponent';
+import {Icon} from 'Components/Icon';
+import {ModalComponent} from 'Components/ModalComponent';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
-import renderElement from 'Util/renderElement';
+import {renderElement} from 'Util/renderElement';
 
 import {Config} from '../../../Config';
 import {UserState} from '../../../user/UserState';
@@ -92,6 +92,6 @@ const InviteModalComponent: React.FC<InviteModalProps> = ({userState, onClose}) 
   );
 };
 
-export default InviteModalComponent;
+export {InviteModalComponent};
 
 export const showInviteModal = renderElement<InviteModalProps>(InviteModalComponent);

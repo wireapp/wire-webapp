@@ -98,4 +98,4 @@ const HistoryBackupSection: FC<HistoryBackupSectionProps> = ({brandName, importF
   );
 };
 
-export default HistoryBackupSection;
+export {HistoryBackupSection};

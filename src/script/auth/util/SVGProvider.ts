@@ -28,4 +28,4 @@ fileList.keys().forEach(iconFileName => {
   svgs[iconName] = parser.parseFromString(svgString, 'image/svg+xml');
 });
 
-export default svgs;
+export {svgs as SVGProvider};

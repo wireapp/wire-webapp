@@ -19,7 +19,7 @@
 
 import {fireEvent, render} from '@testing-library/react';
 
-import PanelHeader from './PanelHeader';
+import {PanelHeader} from './PanelHeader';
 
 const goBackUie = 'back-button';
 const closeUie = 'do-close';

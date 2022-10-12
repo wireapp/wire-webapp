@@ -20,7 +20,7 @@
 import {fireEvent, waitFor} from '@testing-library/react';
 import {PasswordExistsError} from '@wireapp/api-client/src/auth';
 
-import PhoneLogin from './PhoneLogin';
+import {PhoneLogin} from './PhoneLogin';
 
 import {actionRoot} from '../module/action';
 import {initialRootState} from '../module/reducer';

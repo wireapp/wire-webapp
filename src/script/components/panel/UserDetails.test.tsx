@@ -21,7 +21,7 @@ import {render} from '@testing-library/react';
 
 import {createRandomUuid} from 'Util/util';
 
-import UserDetails from './UserDetails';
+import {UserDetails} from './UserDetails';
 
 import {ClientEntity} from '../../client/ClientEntity';
 import {User} from '../../entity/User';

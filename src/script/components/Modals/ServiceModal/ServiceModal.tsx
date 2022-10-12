@@ -19,12 +19,14 @@
 
 import React from 'react';
 
-import Avatar, {AVATAR_SIZE} from 'Components/Avatar';
-import Icon from 'Components/Icon';
-import ModalComponent from 'Components/ModalComponent';
+import {Avatar} from '@wireapp/react-ui-kit';
+
+import {AVATAR_SIZE} from 'Components/Avatar';
+import {Icon} from 'Components/Icon';
+import {ModalComponent} from 'Components/ModalComponent';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
-import renderElement from 'Util/renderElement';
+import {renderElement} from 'Util/renderElement';
 
 import {IntegrationRepository} from '../../../integration/IntegrationRepository';
 import {ServiceEntity} from '../../../integration/ServiceEntity';
@@ -98,6 +100,6 @@ const ServiceModal: React.FC<ServiceModalProps> = ({
   );
 };
 
-export default ServiceModal;
+export {ServiceModal};
 
 export const showServiceModal = renderElement<ServiceModalProps>(ServiceModal);

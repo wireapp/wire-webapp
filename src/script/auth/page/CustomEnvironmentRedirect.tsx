@@ -17,10 +17,10 @@
  *
  */
 
-import {useState, useEffect} from 'react';
+import {useEffect, useState} from 'react';
 
-import {UrlUtil, Runtime} from '@wireapp/commons';
-import {ContainerXS, FlexBox, COLOR, Text} from '@wireapp/react-ui-kit';
+import {Runtime, UrlUtil} from '@wireapp/commons';
+import {COLOR, ContainerXS, FlexBox, Text} from '@wireapp/react-ui-kit';
 import {SVGIcon} from '@wireapp/react-ui-kit/src/Icon/SVGIcon';
 import {useIntl} from 'react-intl';
 import {connect} from 'react-redux';
@@ -28,16 +28,16 @@ import {AnyAction, Dispatch} from 'redux';
 
 import {afterRender} from 'Util/util';
 
-import Page from './Page';
+import {Page} from './Page';
 
 import {customEnvRedirectStrings} from '../../strings';
 import {actionRoot} from '../module/action';
 import {bindActionCreators} from '../module/reducer';
 import {QUERY_KEY} from '../route';
-import SVGProvider from '../util/SVGProvider';
+import {SVGProvider} from '../util/SVGProvider';
 
 const REDIRECT_DELAY = 5000;
-const CustomEnvironmentRedirect = ({doNavigate, doSendNavigationEvent}: DispatchProps) => {
+const CustomEnvironmentRedirectComponent = ({doNavigate, doSendNavigationEvent}: DispatchProps) => {
   const {formatMessage: _} = useIntl();
 
   const [destinationUrl, setDestinationUrl] = useState<string | null>(null);
@@ -143,4 +143,6 @@ const mapDispatchToProps = (dispatch: Dispatch<AnyAction>) =>
     dispatch,
   );
 
-export default connect(null, mapDispatchToProps)(CustomEnvironmentRedirect);
+const CustomEnvironmentRedirect = connect(null, mapDispatchToProps)(CustomEnvironmentRedirectComponent);
+
+export {CustomEnvironmentRedirect};

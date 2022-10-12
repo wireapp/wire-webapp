@@ -161,4 +161,4 @@ const CameraPreferences: React.FC<CameraPreferencesProps> = ({
   );
 };
 
-export default CameraPreferences;
+export {CameraPreferences};

@@ -17,4 +17,4 @@
  *
  */
 
-export {default} from './GroupParticipantService';
+export * from './GroupParticipantService';

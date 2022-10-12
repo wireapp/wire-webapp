@@ -19,9 +19,9 @@
 
 import ko from 'knockout';
 
-import SearchInput, {SearchInputProps} from 'Components/SearchInput';
+import {SearchInput, SearchInputProps} from 'Components/SearchInput';
 import {KEY} from 'Util/KeyboardUtil';
-import TestPage from 'Util/test/TestPage';
+import {TestPage} from 'Util/test/TestPage';
 
 import {User} from '../entity/User';
 

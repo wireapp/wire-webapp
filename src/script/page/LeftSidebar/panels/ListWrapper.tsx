@@ -124,4 +124,4 @@ const ListWrapper: React.FC<LeftListWrapperProps> = ({
   );
 };
 
-export default ListWrapper;
+export {ListWrapper};

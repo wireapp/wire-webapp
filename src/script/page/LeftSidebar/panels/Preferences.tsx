@@ -126,4 +126,4 @@ const Preferences: React.FC<PreferencesProps> = ({contentViewModel, teamReposito
   );
 };
 
-export default Preferences;
+export {Preferences};

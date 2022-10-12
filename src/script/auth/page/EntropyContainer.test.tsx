@@ -19,7 +19,7 @@
 
 import {render} from '@testing-library/react';
 
-import EntropyContainer from './EntropyContainer';
+import {EntropyContainer} from './EntropyContainer';
 
 import {EntropyData} from '../../util/Entropy';
 import {withIntl, withTheme} from '../util/test/TestUtil';

@@ -65,4 +65,4 @@ const GroupedConversationHeader: React.FC<GroupedConversationHeaderProps> = ({on
   );
 };
 
-export default GroupedConversationHeader;
+export {GroupedConversationHeader};

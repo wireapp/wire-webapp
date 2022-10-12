@@ -67,4 +67,4 @@ const DetailedDevice: React.FC<DeviceProps> = ({device, fingerprint}) => {
   );
 };
 
-export default DetailedDevice;
+export {DetailedDevice};

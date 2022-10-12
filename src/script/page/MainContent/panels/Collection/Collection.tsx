@@ -214,4 +214,4 @@ const Collection: React.FC<CollectionDetailsProps> = ({
   );
 };
 
-export default Collection;
+export {Collection};

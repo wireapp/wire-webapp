@@ -21,7 +21,7 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 import {amplify} from 'amplify';
 import {container} from 'tsyringe';
 
-import PrimaryModal, {removeCurrentModal, usePrimaryModalState} from 'Components/Modals/PrimaryModal';
+import {PrimaryModal, removeCurrentModal, usePrimaryModalState} from 'Components/Modals/PrimaryModal';
 import {t} from 'Util/LocalizerUtil';
 
 import type {MainViewModel} from './MainViewModel';

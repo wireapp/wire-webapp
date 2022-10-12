@@ -19,4 +19,4 @@
 
 const svgs: {[index: string]: Document} = {};
 
-export default svgs;
+export {svgs};

@@ -53,4 +53,4 @@ const PanelActions: React.FC<PanelActionsProps> = ({items}) => {
   );
 };
 
-export default PanelActions;
+export {PanelActions};

@@ -17,4 +17,4 @@
  *
  */
 
-export {default} from './GroupParticipantUser';
+export * from './GroupParticipantUser';

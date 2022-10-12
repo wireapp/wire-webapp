@@ -20,7 +20,7 @@
 import {act, waitFor} from '@testing-library/react';
 import {TypeUtil} from '@wireapp/commons';
 
-import Index from './Index';
+import {Index} from './Index';
 
 import {Config, Configuration} from '../../Config';
 import {initialRootState} from '../module/reducer';

@@ -115,4 +115,4 @@ const CallOptions: React.FC<CallOptionsProps> = ({constraintsHandler, properties
   );
 };
 
-export default CallOptions;
+export {CallOptions};

@@ -56,4 +56,4 @@ const AudioOutPreferences: React.FC<AudioOutPreferencesProps> = ({devicesHandler
   );
 };
 
-export default AudioOutPreferences;
+export {AudioOutPreferences};

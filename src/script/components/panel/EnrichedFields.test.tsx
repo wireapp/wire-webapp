@@ -25,7 +25,7 @@ import {User} from 'src/script/entity/User';
 import {RichProfileRepository} from 'src/script/user/RichProfileRepository';
 import {createRandomUuid} from 'Util/util';
 
-import EnrichedFields from './EnrichedFields';
+import {EnrichedFields} from './EnrichedFields';
 
 const richInfo: Partial<RichInfo> = {
   fields: [

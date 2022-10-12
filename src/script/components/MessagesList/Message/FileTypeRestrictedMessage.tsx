@@ -52,4 +52,4 @@ const FileTypeRestrictedMessage: React.FC<FileTypeRestrictedMessageProps> = ({me
   );
 };
 
-export default FileTypeRestrictedMessage;
+export {FileTypeRestrictedMessage};

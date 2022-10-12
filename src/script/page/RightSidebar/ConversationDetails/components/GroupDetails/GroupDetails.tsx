@@ -84,4 +84,4 @@ const GroupDetails: FC<GroupDetailsProps> = ({
   );
 };
 
-export default GroupDetails;
+export {GroupDetails};

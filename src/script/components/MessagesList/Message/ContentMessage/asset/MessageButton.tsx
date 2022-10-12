@@ -21,7 +21,7 @@ import React from 'react';
 
 import classNames from 'classnames';
 
-import Icon from 'Components/Icon';
+import {Icon} from 'Components/Icon';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {noop} from 'Util/util';
 
@@ -77,4 +77,4 @@ const MessageButton: React.FC<MessageButtonProps> = ({id, label, message, onClic
   );
 };
 
-export default MessageButton;
+export {MessageButton};

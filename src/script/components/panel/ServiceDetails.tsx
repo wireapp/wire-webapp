@@ -54,4 +54,4 @@ const ServiceDetails: React.FC<ServiceDetailsProps> = ({service}) => {
   );
 };
 
-export default ServiceDetails;
+export {ServiceDetails};

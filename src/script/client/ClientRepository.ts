@@ -39,7 +39,7 @@ import type {ClientService} from './ClientService';
 import {ClientState} from './ClientState';
 
 import {SIGN_OUT_REASON} from '../auth/SignOutReason';
-import PrimaryModal from '../components/Modals/PrimaryModal';
+import {PrimaryModal} from '../components/Modals/PrimaryModal';
 import type {CryptographyRepository} from '../cryptography/CryptographyRepository';
 import type {User} from '../entity/User';
 import {ClientError} from '../error/ClientError';

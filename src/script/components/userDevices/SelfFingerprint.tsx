@@ -66,4 +66,4 @@ const SelfFingerprint: React.FC<SelfFingerprintProps> = ({
   );
 };
 
-export default SelfFingerprint;
+export {SelfFingerprint};

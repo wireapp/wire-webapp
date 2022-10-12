@@ -17,9 +17,9 @@
  *
  */
 
-import TestPage from 'Util/test/TestPage';
+import {TestPage} from 'Util/test/TestPage';
 
-import GroupAvatar, {GroupAvatarProps} from './GroupAvatar';
+import {GroupAvatar, GroupAvatarProps} from './GroupAvatar';
 
 import {User} from '../../entity/User';
 

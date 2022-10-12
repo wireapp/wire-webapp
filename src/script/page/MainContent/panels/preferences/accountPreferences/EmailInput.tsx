@@ -76,4 +76,4 @@ const EmailInput: React.FC<EmailInputProps> = ({email, canEditProfile, userRepos
   );
 };
 
-export default EmailInput;
+export {EmailInput};

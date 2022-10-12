@@ -19,7 +19,7 @@
 
 import {render, fireEvent} from '@testing-library/react';
 
-import ButtonGroup from './ButtonGroup';
+import {ButtonGroup} from './ButtonGroup';
 
 describe('ButtonGroup', () => {
   const items = [

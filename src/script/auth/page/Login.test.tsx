@@ -21,7 +21,7 @@ import {fireEvent, waitFor} from '@testing-library/react';
 import {ClientType} from '@wireapp/api-client/src/client';
 import {TypeUtil} from '@wireapp/commons';
 
-import Login from './Login';
+import {Login} from './Login';
 
 import {Config, Configuration} from '../../Config';
 import {actionRoot} from '../module/action';

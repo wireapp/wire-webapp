@@ -105,4 +105,4 @@ const CollectionDetails: React.FC<CollectionDetailsProps> = ({
   );
 };
 
-export default CollectionDetails;
+export {CollectionDetails};

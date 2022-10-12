@@ -45,7 +45,7 @@
   ],
   "rules": {
     "id-length": "warn",
-    "no-magic-numbers": "warn",
+    "no-magic-numbers": ["off", { "ignoreArrayIndexes": true }],
     "jest/no-jasmine-globals": "off",
     "jest/no-identical-title": "warn",
     "jest/no-done-callback": "warn",

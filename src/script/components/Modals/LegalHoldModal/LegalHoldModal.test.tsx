@@ -20,7 +20,7 @@
 import {render, waitFor} from '@testing-library/react';
 import {amplify} from 'amplify';
 
-import LegalHoldModal from './LegalHoldModal';
+import {LegalHoldModal} from './LegalHoldModal';
 
 import {TestFactory} from '../../../../../test/helper/TestFactory';
 import {CallingRepository} from '../../../calling/CallingRepository';

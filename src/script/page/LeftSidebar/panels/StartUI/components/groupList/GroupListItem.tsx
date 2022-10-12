@@ -69,4 +69,4 @@ const GroupListItem: React.FC<GroupListItemProps> = ({assetRepository, click, gr
   );
 };
 
-export default GroupListItem;
+export {GroupListItem};

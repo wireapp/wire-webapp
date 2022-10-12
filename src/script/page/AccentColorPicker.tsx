@@ -146,4 +146,4 @@ const AccentColorPicker: React.FunctionComponent<AccentColorPickerProps> = ({use
   );
 };
 
-export default AccentColorPicker;
+export {AccentColorPicker};

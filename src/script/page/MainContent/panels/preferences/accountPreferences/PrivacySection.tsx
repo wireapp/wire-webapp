@@ -94,4 +94,4 @@ const PrivacySection: React.FC<PrivacySectionProps> = ({
   );
 };
 
-export default PrivacySection;
+export {PrivacySection};

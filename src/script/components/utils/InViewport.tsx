@@ -81,4 +81,4 @@ const InViewport: React.FC<InViewportParams & React.HTMLProps<HTMLDivElement>> =
   );
 };
 
-export default InViewport;
+export {InViewport};

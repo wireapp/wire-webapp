@@ -31,9 +31,9 @@ import cx from 'classnames';
 import {container} from 'tsyringe';
 import {groupBy} from 'underscore';
 
-import Giphy from 'Components/Giphy';
-import InputBar from 'Components/InputBar';
-import MessagesList from 'Components/MessagesList';
+import {Giphy} from 'Components/Giphy';
+import {InputBar} from 'Components/InputBar';
+import {MessagesList} from 'Components/MessagesList';
 import {showDetailViewModal} from 'Components/Modals/DetailViewModal';
 import {TitleBar} from 'Components/TitleBar';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
@@ -41,7 +41,7 @@ import {t} from 'Util/LocalizerUtil';
 import {getLogger} from 'Util/Logger';
 import {safeMailOpen, safeWindowOpen} from 'Util/SanitizationUtil';
 
-import PrimaryModal from '../../components/Modals/PrimaryModal';
+import {PrimaryModal} from '../../components/Modals/PrimaryModal';
 import {ConversationState} from '../../conversation/ConversationState';
 import {Conversation as ConversationEntity} from '../../entity/Conversation';
 import {ContentMessage} from '../../entity/message/ContentMessage';
@@ -414,4 +414,4 @@ const ConversationList: FC<ConversationListProps> = ({
   );
 };
 
-export default ConversationList;
+export {ConversationList};

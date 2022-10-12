@@ -51,7 +51,7 @@ import {TeamState} from './TeamState';
 
 import {AssetRepository} from '../assets/AssetRepository';
 import {SIGN_OUT_REASON} from '../auth/SignOutReason';
-import PrimaryModal from '../components/Modals/PrimaryModal';
+import {PrimaryModal} from '../components/Modals/PrimaryModal';
 import {Config} from '../Config';
 import {User} from '../entity/User';
 import {EventSource} from '../event/EventSource';

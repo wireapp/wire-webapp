@@ -218,4 +218,4 @@ const AccountInput: FC<AccountInputProps> = ({
   );
 };
 
-export default AccountInput;
+export {AccountInput};

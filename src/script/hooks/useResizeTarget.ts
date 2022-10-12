@@ -46,4 +46,4 @@ const useResizeTarget = (element: HTMLElement | null, targetElement: HTMLElement
   }, deps);
 };
 
-export default useResizeTarget;
+export {useResizeTarget};

@@ -82,4 +82,4 @@ const ConversationDetailsBottomActions: FC<ConversationDetailsBottomActionsProps
   );
 };
 
-export default ConversationDetailsBottomActions;
+export {ConversationDetailsBottomActions};

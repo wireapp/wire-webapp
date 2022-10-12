@@ -134,4 +134,4 @@ const AvailabilityButtons: React.FC<AvailabilityInputProps> = ({availability}) =
   );
 };
 
-export default AvailabilityButtons;
+export {AvailabilityButtons};

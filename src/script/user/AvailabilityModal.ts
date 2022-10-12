@@ -22,7 +22,7 @@ import {Availability} from '@wireapp/protocol-messaging';
 import {t} from 'Util/LocalizerUtil';
 import {loadValue, storeValue} from 'Util/StorageUtil';
 
-import PrimaryModal from '../components/Modals/PrimaryModal';
+import {PrimaryModal} from '../components/Modals/PrimaryModal';
 
 const initialKey = 'hide_initial_modal';
 

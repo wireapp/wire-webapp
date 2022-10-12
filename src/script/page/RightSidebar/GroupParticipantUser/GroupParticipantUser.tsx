@@ -24,10 +24,10 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 import {amplify} from 'amplify';
 
 import Icon from 'Components/Icon';
-import EnrichedFields from 'Components/panel/EnrichedFields';
-import UserActions, {Actions} from 'Components/panel/UserActions';
-import UserDetails from 'Components/panel/UserDetails';
-import BaseToggle from 'Components/toggle/BaseToggle';
+import {EnrichedFields} from 'Components/panel/EnrichedFields';
+import {UserActions, Actions} from 'Components/panel/UserActions';
+import {UserDetails} from 'Components/panel/UserDetails';
+import {BaseToggle} from 'Components/toggle/BaseToggle';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {handleKeyDown} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
@@ -42,7 +42,7 @@ import {TeamState} from '../../../team/TeamState';
 import {initFadingScrollbar} from '../../../ui/fadingScrollbar';
 import {UserState} from '../../../user/UserState';
 import {ActionsViewModel} from '../../../view_model/ActionsViewModel';
-import PanelHeader from '../PanelHeader';
+import {PanelHeader} from '../PanelHeader';
 import {PanelEntity} from '../RightSidebar';
 
 interface GroupParticipantUserProps {
@@ -226,4 +226,4 @@ const GroupParticipantUser: FC<GroupParticipantUserProps> = ({
   );
 };
 
-export default GroupParticipantUser;
+export {GroupParticipantUser};

@@ -159,4 +159,4 @@ const FullSearch: React.FC<FullSearchProps> = ({searchProvider, click = noop, ch
   );
 };
 
-export default FullSearch;
+export {FullSearch};

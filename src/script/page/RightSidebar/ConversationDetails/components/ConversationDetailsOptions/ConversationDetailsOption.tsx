@@ -58,4 +58,4 @@ const ConversationDetailsOption: FC<ConversationDetailsOptionProps> = ({
   </li>
 );
 
-export default ConversationDetailsOption;
+export {ConversationDetailsOption};

@@ -129,4 +129,4 @@ const DataUsageSection: React.FC<DataUsageSectionProps> = ({
   );
 };
 
-export default DataUsageSection;
+export {DataUsageSection};

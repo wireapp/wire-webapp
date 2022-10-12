@@ -65,4 +65,4 @@ const TopContact: React.FC<TopContactProps> = ({assetRepository, user, clickOnUs
   );
 };
 
-export default TopContact;
+export {TopContact};

@@ -50,4 +50,4 @@ const AvatarBadge: React.FunctionComponent<AvatarBadgeProps> = ({state}) => {
   );
 };
 
-export default AvatarBadge;
+export {AvatarBadge};

@@ -27,7 +27,7 @@ import {AnyAction, Dispatch} from 'redux';
 
 import {getLogger} from 'Util/Logger';
 
-import ClientItem from './ClientItem';
+import {ClientItem} from './ClientItem';
 
 import {actionRoot as ROOT_ACTIONS} from '../module/action/';
 import * as LocalStorageAction from '../module/action/LocalStorageAction';
@@ -40,7 +40,7 @@ import {QUERY_KEY, ROUTE} from '../route';
 const logger = getLogger('ClientList');
 
 type Props = React.HTMLProps<HTMLDivElement>;
-const ClientList = ({
+const ClientListComponent = ({
   clientError,
   isFetching,
   isNoPasswordSSO,
@@ -130,4 +130,6 @@ const mapDispatchToProps = (dispatch: Dispatch<AnyAction>) =>
     dispatch,
   );
 
-export default connect(mapStateToProps, mapDispatchToProps)(ClientList);
+const ClientList = connect(mapStateToProps, mapDispatchToProps)(ClientListComponent);
+
+export {ClientList};

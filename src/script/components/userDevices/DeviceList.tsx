@@ -74,4 +74,4 @@ const DeviceList: React.FC<DeviceListProps> = ({user, noPadding, clients, clickO
   );
 };
 
-export default DeviceList;
+export {DeviceList};

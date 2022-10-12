@@ -19,7 +19,7 @@
 
 import {render, fireEvent} from '@testing-library/react';
 
-import ChooseScreen from './ChooseScreen';
+import {ChooseScreen} from './ChooseScreen';
 
 describe('ChooseScreen', () => {
   const screens = [

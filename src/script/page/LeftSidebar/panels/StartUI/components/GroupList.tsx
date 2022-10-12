@@ -49,4 +49,4 @@ const GroupList: React.FC<GroupListProps> = ({
   );
 };
 
-export default GroupList;
+export {GroupList};

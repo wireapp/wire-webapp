@@ -69,4 +69,4 @@ const DetailViewModalHeader: FC<DetailViewModalHeaderProps> = ({messageEntity, o
   );
 };
 
-export default DetailViewModalHeader;
+export {DetailViewModalHeader};

@@ -19,7 +19,7 @@
 
 import {fireEvent} from '@testing-library/react';
 
-import SetHandle from './SetHandle';
+import {SetHandle} from './SetHandle';
 
 import {actionRoot} from '../module/action';
 import {initialRootState} from '../module/reducer';

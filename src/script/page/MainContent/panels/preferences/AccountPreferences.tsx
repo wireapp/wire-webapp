@@ -230,4 +230,4 @@ const AccountPreferences: React.FC<AccountPreferencesProps> = ({
   );
 };
 
-export default AccountPreferences;
+export {AccountPreferences};

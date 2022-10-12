@@ -64,4 +64,4 @@ const NameInput: React.FC<NameInputProps> = ({name, userRepository, canEditProfi
   );
 };
 
-export default NameInput;
+export {NameInput};

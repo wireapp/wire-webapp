@@ -17,7 +17,7 @@
  *
  */
 
-import renderElement from 'Util/renderElement';
+import {renderElement} from 'Util/renderElement';
 
 import {PrimaryModalComponent} from './PrimaryModal';
 import {addNewModalToQueue, showNextModalInQueue} from './PrimaryModalState';
@@ -34,4 +34,4 @@ const PrimaryModal = {
   type: PrimaryModalType,
 };
 
-export default PrimaryModal;
+export {PrimaryModal};

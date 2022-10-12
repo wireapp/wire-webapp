@@ -115,4 +115,4 @@ const AboutPreferences: React.FC<AboutPreferencesProps> = ({userState = containe
   );
 };
 
-export default AboutPreferences;
+export {AboutPreferences};

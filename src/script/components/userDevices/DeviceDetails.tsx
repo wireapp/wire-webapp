@@ -173,4 +173,4 @@ const DeviceDetails: React.FC<DeviceDetailsProps> = ({
   );
 };
 
-export default DeviceDetails;
+export {DeviceDetails};

@@ -57,4 +57,4 @@ const PreferencesCheckbox: React.FC<PreferencesCheckboxProps> = ({
   );
 };
 
-export default PreferencesCheckbox;
+export {PreferencesCheckbox};

@@ -19,7 +19,7 @@
 
 import React from 'react';
 
-import SVGProvider from '../auth/util/SVGProvider';
+import {SVGProvider} from '../auth/util/SVGProvider';
 
 type IconProps = React.SVGProps<SVGSVGElement>;
 
@@ -62,7 +62,7 @@ const icons = Object.entries(SVGProvider).reduce<IconList>((list, [key, svg]) =>
   return Object.assign(list, {[name]: createSvgComponent(svg.documentElement, `Icon.${name}`)});
 }, {});
 
-const Icon: React.FC<NamedIconProps> = ({name, ...props}) => {
+const IconComponent: React.FC<NamedIconProps> = ({name, ...props}) => {
   const componentName = normalizeIconName(name);
   const Component = icons[componentName];
   if (!Component) {
@@ -71,4 +71,6 @@ const Icon: React.FC<NamedIconProps> = ({name, ...props}) => {
   return <Component {...props} />;
 };
 
-export default Object.assign(Icon, icons);
+const Icon = Object.assign(IconComponent, icons);
+
+export {Icon};
