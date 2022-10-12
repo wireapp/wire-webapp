@@ -17,21 +17,21 @@
  *
  */
 
-import React, {useEffect} from 'react';
+import React, {useContext, useEffect} from 'react';
 
 import {IconButton, IconButtonVariant, useMatchMedia} from '@wireapp/react-ui-kit';
 
+import {RootContext} from 'src/script/page/RootProvider';
 import {initFadingScrollbar} from 'src/script/ui/fadingScrollbar';
 
 import {useResponsiveViewState} from '../../../../ResponsiveViewState';
-
 interface PreferencesPageProps {
   children: React.ReactNode;
   title: string;
 }
 
 const PreferencesPage: React.FC<PreferencesPageProps> = ({title, children}) => {
-  const isScaledDown = useMatchMedia('max-width: 768px');
+  const smBreakpoint = useMatchMedia('max-width: 620px');
   const responsiveView = useResponsiveViewState(state => state.currentView);
   const setResponsiveView = useResponsiveViewState(state => state.setCurrentView);
 
@@ -42,10 +42,14 @@ const PreferencesPage: React.FC<PreferencesPageProps> = ({title, children}) => {
     };
   }, [responsiveView]);
 
+  const root = useContext(RootContext);
+  const goHome = () => root?.content.switchPreviousContent();
+
+  console.info('virgile', root);
   return (
     <div style={{display: 'flex', flexDirection: 'column', height: '100vh'}}>
       <div className="preferences-titlebar">
-        {isScaledDown && responsiveView !== 1 && (
+        {smBreakpoint && responsiveView !== 1 && (
           <IconButton
             variant={IconButtonVariant.SECONDARY}
             className="conversation-title-bar-icon icon-back"
@@ -54,6 +58,14 @@ const PreferencesPage: React.FC<PreferencesPageProps> = ({title, children}) => {
           />
         )}
         <h2 className="preferences-titlebar">{title}</h2>
+        {smBreakpoint && responsiveView !== 1 && (
+          <IconButton
+            variant={IconButtonVariant.SECONDARY}
+            className="conversation-title-bar-icon icon-close"
+            css={{marginBottom: 0}}
+            onClick={goHome}
+          />
+        )}
       </div>
       <div className="preferences-content" ref={initFadingScrollbar}>
         {children}
