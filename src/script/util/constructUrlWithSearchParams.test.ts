@@ -36,10 +36,7 @@ describe('constructUrlWithSearchParams', () => {
 
   it('adds many params to base url', () => {
     const urlWithParams = constructUrlWithSearchParams(BASE_URL, {limit: '5', query: 'dog', size: 'big'});
-    expect(urlWithParams).toEqual(`${BASE_URL}?query=dog&size=big&limit=5`);
-
-    const urlWithParams2 = constructUrlWithSearchParams(BASE_URL, {limit: '5', query: 'dog', size: 'big'});
-    expect(urlWithParams2).toEqual(`${BASE_URL}?limit=5&query=dog&size=big`);
+    expect(urlWithParams).toEqual(`${BASE_URL}?limit=5&query=dog&size=big`);
   });
 
   it('replaces param when it was in base url before', () => {
