@@ -719,7 +719,9 @@ export class MessageRepository {
     };
 
     const handleSuccess = async (sentAt: string) => {
-      const preMessageTimestamp = new Date(new Date(sentAt).getTime() - 10).toISOString();
+      const injectDelta = 10; // we want to make sure the message is injected slightly before it was received by the backend
+      const sentTimestamp = new Date(sentAt).getTime() - injectDelta;
+      const preMessageTimestamp = new Date(sentTimestamp).toISOString();
       // Trigger an empty mismatch to check for users that have no devices and that could have been removed from the team
       await this.onClientMismatch?.({time: preMessageTimestamp}, conversation, silentDegradationWarning);
       if (!skipInjection) {
@@ -747,10 +749,13 @@ export class MessageRepository {
           userIds: this.generateRecipients(conversation, recipients, skipSelf),
         };
 
-    if ((await injectOptimisticEvent()) === false) {
+    const shouldProceedSending = await injectOptimisticEvent();
+    if (shouldProceedSending === false) {
       return {id: payload.messageId, state: PayloadBundleState.CANCELLED};
     }
+
     const result = await this.conversationService.send(sendOptions);
+
     if (result.state === PayloadBundleState.OUTGOING_SENT) {
       handleSuccess(result.sentAt);
     }
