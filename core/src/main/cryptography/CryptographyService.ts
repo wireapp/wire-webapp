@@ -64,7 +64,7 @@ export class CryptographyService {
   ) {
     this.cryptobox = new Cryptobox(this.storeEngine, config.nbPrekeys);
     this.database = new CryptographyDatabaseRepository(this.storeEngine);
-    this.logger = logdown('@wireapp/core/cryptography/CryptographyService', {
+    this.logger = logdown('@wireapp/core/CryptographyService', {
       logger: console,
       markdown: false,
     });
