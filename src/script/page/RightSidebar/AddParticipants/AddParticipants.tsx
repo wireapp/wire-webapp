@@ -158,8 +158,7 @@ const AddParticipants: FC<AddParticipantsProps> = ({
     }
   };
 
-  const onServiceSelect = async (entity: ServiceEntity) =>
-    togglePanel(PanelState.GROUP_PARTICIPANT_SERVICE, entity, true);
+  const onServiceSelect = (entity: ServiceEntity) => togglePanel(PanelState.GROUP_PARTICIPANT_SERVICE, entity, true);
 
   const addUsers = async () => {
     const userEntities = selectedContacts.slice();

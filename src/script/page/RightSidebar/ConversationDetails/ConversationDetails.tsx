@@ -208,9 +208,8 @@ const ConversationDetails: FC<ConversationDetailsProps> = ({
 
   const showUser = (userEntity: User) => togglePanel(PanelState.GROUP_PARTICIPANT_USER, userEntity);
 
-  const showService = async (serviceEntity: ServiceEntity) => {
+  const showService = (serviceEntity: ServiceEntity) =>
     togglePanel(PanelState.GROUP_PARTICIPANT_SERVICE, serviceEntity);
-  };
 
   const showAllParticipants = () => togglePanel(PanelState.CONVERSATION_PARTICIPANTS, activeConversation);
 

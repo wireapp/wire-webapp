@@ -139,7 +139,7 @@ const ConversationList: FC<ConversationListProps> = ({
     }
   };
 
-  const showUserDetails = async (userEntity: User | ServiceEntity) => {
+  const showUserDetails = (userEntity: User | ServiceEntity) => {
     const isSingleModeConversation = is1to1 || isRequest;
 
     const isUserEntity = !isServiceEntity(userEntity);
