@@ -186,7 +186,7 @@ export class EventRepository {
       // We make sure there is only be a single active connection to the WebSocket.
       this.disconnectWebSocket?.();
       return new Promise<void>(async resolve => {
-        this.disconnectWebSocket = await account.listen({
+        this.disconnectWebSocket = account.listen({
           onConnectionStateChanged: connectionState => {
             this.updateConnectivitityStatus(connectionState);
             if (connectionState === ConnectionState.LIVE) {
