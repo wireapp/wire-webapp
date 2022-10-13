@@ -48,13 +48,11 @@ import {RightSidebarParams} from '../AppMain';
 import {PanelState} from '../RightSidebar/RightSidebar';
 import {RootContext} from '../RootProvider';
 
-const Animated: FC<{children: ReactNode}> = ({children, ...rest}) => {
-  return (
-    <CSSTransition classNames="slide-in-left" timeout={{enter: 500}} {...rest}>
-      {children}
-    </CSSTransition>
-  );
-};
+const Animated: FC<{children: ReactNode}> = ({children, ...rest}) => (
+  <CSSTransition classNames="slide-in-left" timeout={{enter: 500}} {...rest}>
+    {children}
+  </CSSTransition>
+);
 
 interface MainContentProps {
   openRightSidebar: (panelState: PanelState, params: RightSidebarParams) => void;

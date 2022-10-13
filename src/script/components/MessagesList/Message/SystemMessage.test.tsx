@@ -17,7 +17,7 @@
  *
  */
 
-import {render} from '@testing-library/react';
+import {render, screen} from '@testing-library/react';
 import ko from 'knockout';
 
 import {DeleteConversationMessage} from 'src/script/entity/message/DeleteConversationMessage';
@@ -29,14 +29,16 @@ import {SystemMessageType} from 'src/script/message/SystemMessageType';
 import {SystemMessage} from './SystemMessage';
 
 jest.mock('Components/Icon', () => ({
-  Edit: () => {
-    return <span data-uie-name="editicon" className="editicon"></span>;
-  },
-  Read: () => {
-    return <span data-uie-name="readicon" className="readicon"></span>;
-  },
-  Timer: () => {
-    return <span data-uie-name="timericon" className="timericon"></span>;
+  Icon: {
+    Edit: () => {
+      return <span data-uie-name="editicon" className="editicon"></span>;
+    },
+    Read: () => {
+      return <span data-uie-name="readicon" className="readicon"></span>;
+    },
+    Timer: () => {
+      return <span data-uie-name="timericon" className="timericon"></span>;
+    },
   },
   __esModule: true,
 }));
@@ -63,10 +65,10 @@ describe('SystemMessage', () => {
       system_message_type: SystemMessageType.CONVERSATION_RENAME,
     });
 
-    const {queryByTestId} = render(<SystemMessage message={message} />);
+    render(<SystemMessage message={message} />);
 
-    expect(queryByTestId('element-message-system')).not.toBeNull();
-    expect(queryByTestId('editicon')).not.toBeNull();
+    expect(screen.queryByTestId('element-message-system')).not.toBeNull();
+    expect(screen.queryByTestId('editicon')).not.toBeNull();
   });
 
   it('shows timer icon for MessageTimerUpdateMessage', async () => {
@@ -74,10 +76,10 @@ describe('SystemMessage', () => {
       system_message_type: SystemMessageType.CONVERSATION_MESSAGE_TIMER_UPDATE,
     });
 
-    const {queryByTestId} = render(<SystemMessage message={message} />);
+    render(<SystemMessage message={message} />);
 
-    expect(queryByTestId('element-message-system')).not.toBeNull();
-    expect(queryByTestId('timericon')).not.toBeNull();
+    expect(screen.queryByTestId('element-message-system')).not.toBeNull();
+    expect(screen.queryByTestId('timericon')).not.toBeNull();
   });
 
   it('shows read icon for ReceiptModeUpdateMessage', async () => {
@@ -85,9 +87,9 @@ describe('SystemMessage', () => {
       system_message_type: SystemMessageType.CONVERSATION_RECEIPT_MODE_UPDATE,
     });
 
-    const {queryByTestId} = render(<SystemMessage message={message} />);
+    render(<SystemMessage message={message} />);
 
-    expect(queryByTestId('element-message-system')).not.toBeNull();
-    expect(queryByTestId('readicon')).not.toBeNull();
+    expect(screen.queryByTestId('element-message-system')).not.toBeNull();
+    expect(screen.queryByTestId('readicon')).not.toBeNull();
   });
 });

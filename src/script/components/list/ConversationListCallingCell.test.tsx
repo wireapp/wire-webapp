@@ -35,13 +35,13 @@ import {createRandomUuid} from 'Util/util';
 
 import {ConversationListCallingCell, CallingCellProps} from './ConversationListCallingCell';
 
-jest.mock(
-  'Components/utils/InViewport',
-  () =>
-    function MockInViewport() {
-      return <div></div>;
-    },
-);
+jest.mock('Components/utils/InViewport', () => ({
+  InViewport: ({onVisible, children}: {onVisible: () => void; children: any}) => {
+    onVisible();
+    return <div>{children}</div>;
+  },
+  __esModule: true,
+}));
 
 class ConversationListCallingCellPage extends TestPage<CallingCellProps> {
   constructor(props?: CallingCellProps) {

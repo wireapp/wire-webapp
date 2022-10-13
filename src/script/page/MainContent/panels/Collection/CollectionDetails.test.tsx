@@ -31,34 +31,22 @@ import {CollectionDetails} from './CollectionDetails';
 
 import {Text} from '../../../../entity/message/Text';
 
-jest.mock(
-  'Components/Image',
-  () =>
-    function Image() {
-      return <div>Image</div>;
-    },
-);
-jest.mock(
-  'Components/MessagesList/Message/ContentMessage/asset/AudioAsset',
-  () =>
-    function Audio() {
-      return <div>Audio</div>;
-    },
-);
-jest.mock(
-  'Components/MessagesList/Message/ContentMessage/asset/FileAssetComponent',
-  () =>
-    function File() {
-      return <div>File</div>;
-    },
-);
-jest.mock(
-  'Components/MessagesList/Message/ContentMessage/asset/LinkPreviewAssetComponent',
-  () =>
-    function LinkPreview() {
-      return <div>Link Preview</div>;
-    },
-);
+jest.mock('Components/Image', () => ({
+  Image: () => <div>Image</div>,
+  __esModule: true,
+}));
+jest.mock('Components/MessagesList/Message/ContentMessage/asset/AudioAsset', () => ({
+  AudioAsset: () => <div>Audio</div>,
+  __esModule: true,
+}));
+jest.mock('Components/MessagesList/Message/ContentMessage/asset/FileAssetComponent', () => ({
+  FileAsset: () => <div>File</div>,
+  __esModule: true,
+}));
+jest.mock('Components/MessagesList/Message/ContentMessage/asset/LinkPreviewAssetComponent', () => ({
+  LinkPreviewAsset: () => <div>Link Preview</div>,
+  __esModule: true,
+}));
 
 const createImageMessage = (timestamp: number = Date.now()) => {
   const message = new ContentMessage(createRandomUuid());

@@ -17,7 +17,7 @@
  *
  */
 
-import {render, waitFor} from '@testing-library/react';
+import {render, screen, waitFor} from '@testing-library/react';
 import {container} from 'tsyringe';
 
 import {AssetRemoteData} from 'src/script/assets/AssetRemoteData';
@@ -27,14 +27,13 @@ import {MediumImage} from 'src/script/entity/message/MediumImage';
 
 import {ImageAsset, ImageAssetProps} from './ImageAsset';
 
-jest.mock(
-  'Components/utils/InViewport',
-  () =>
-    function MockInViewport({onVisible, children}: {onVisible: () => void; children: any}) {
-      onVisible();
-      return <div>{children}</div>;
-    },
-);
+jest.mock('Components/utils/InViewport', () => ({
+  InViewport: ({onVisible, children}: {onVisible: () => void; children: any}) => {
+    onVisible();
+    return <div>{children}</div>;
+  },
+  __esModule: true,
+}));
 
 describe('image-asset', () => {
   const defaultProps: ImageAssetProps = {
@@ -50,9 +49,9 @@ describe('image-asset', () => {
 
     const props = {...defaultProps, asset: image};
 
-    const {getByTestId} = render(<ImageAsset {...props} />);
+    render(<ImageAsset {...props} />);
 
-    const imageElement = getByTestId('image-asset-img');
+    const imageElement = screen.getByTestId('image-asset-img');
 
     const imgSrc = imageElement.getAttribute('src');
 
@@ -81,9 +80,9 @@ describe('image-asset', () => {
 
     const props = {...defaultProps, asset: image};
 
-    const {getByTestId} = render(<ImageAsset {...props} />);
+    render(<ImageAsset {...props} />);
 
-    const imageElement = getByTestId('image-asset-img');
+    const imageElement = screen.getByTestId('image-asset-img');
 
     await waitFor(() => {
       expect(createObjectURLSpy).toHaveBeenCalled();
