@@ -29,15 +29,16 @@ import {SystemMessageType} from 'src/script/message/SystemMessageType';
 import {SystemMessage} from './SystemMessage';
 
 jest.mock('Components/Icon', () => ({
-  Edit: function EditIcon() {
+  Edit: () => {
     return <span data-uie-name="editicon" className="editicon"></span>;
   },
-  Read: function ReadIcon() {
+  Read: () => {
     return <span data-uie-name="readicon" className="readicon"></span>;
   },
-  Timer: function TimerIcon() {
+  Timer: () => {
     return <span data-uie-name="timericon" className="timericon"></span>;
   },
+  __esModule: true,
 }));
 
 type SystemMessageUnion =

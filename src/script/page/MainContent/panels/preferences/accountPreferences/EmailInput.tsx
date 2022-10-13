@@ -21,11 +21,11 @@ import React from 'react';
 
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 
-import PrimaryModal from 'Components/Modals/PrimaryModal';
+import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {t} from 'Util/LocalizerUtil';
 import {getLogger} from 'Util/Logger';
 
-import AccountInput, {useInputDone} from './AccountInput';
+import {AccountInput, useInputDone} from './AccountInput';
 
 import {UserRepository} from '../../../../../user/UserRepository';
 

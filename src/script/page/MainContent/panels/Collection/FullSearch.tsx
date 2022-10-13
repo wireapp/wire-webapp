@@ -21,14 +21,14 @@ import React, {useEffect, useMemo, useRef, useState} from 'react';
 
 import {t} from 'Util/LocalizerUtil';
 import {isScrolledBottom} from 'Util/scroll-helpers';
-import useEffectRef from 'Util/useEffectRef';
+import {useEffectRef} from 'Util/useEffectRef';
 import {noop} from 'Util/util';
 
-import FullSearchItem from './fullSearch/FullSearchItem';
+import {FullSearchItem} from './fullSearch/FullSearchItem';
 
 import {ContentMessage} from '../../../../entity/message/ContentMessage';
 import type {Message} from '../../../../entity/message/Message';
-import useDebounce from '../../../../hooks/useDebounce';
+import {useDebounce} from '../../../../hooks/useDebounce';
 import {getSearchRegex} from '../../../../search/FullTextSearch';
 
 export interface FullSearchProps {

@@ -34,7 +34,7 @@ import {AssetLoader} from './AssetLoader';
 
 import {AssetTransferState} from '../../../../../assets/AssetTransferState';
 import type {ContentMessage} from '../../../../../entity/message/ContentMessage';
-import type {FileAsset} from '../../../../../entity/message/FileAsset';
+import type {FileAsset as FileAssetType} from '../../../../../entity/message/FileAsset';
 import {TeamState} from '../../../../../team/TeamState';
 
 export interface FileAssetProps {
@@ -43,12 +43,12 @@ export interface FileAssetProps {
   teamState?: TeamState;
 }
 
-const FileAssetComponent: React.FC<FileAssetProps> = ({
+const FileAsset: React.FC<FileAssetProps> = ({
   message,
   hasHeader = false,
   teamState = container.resolve(TeamState),
 }) => {
-  const asset = message.getFirstAsset() as FileAsset;
+  const asset = message.getFirstAsset() as FileAssetType;
 
   const {transferState, downloadAsset, uploadProgress, cancelUpload} = useAssetTransfer(message);
   const {isObfuscated} = useKoSubscribableChildren(message, ['isObfuscated']);
@@ -151,4 +151,4 @@ const FileAssetComponent: React.FC<FileAssetProps> = ({
   );
 };
 
-export {FileAssetComponent};
+export {FileAsset};

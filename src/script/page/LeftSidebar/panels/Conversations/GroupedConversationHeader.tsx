@@ -21,7 +21,7 @@ import React, {useEffect, useState} from 'react';
 
 import cx from 'classnames';
 
-import Icon from 'Components/Icon';
+import {Icon} from 'Components/Icon';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 
 import type {ConversationLabel} from '../../../../conversation/ConversationLabelRepository';

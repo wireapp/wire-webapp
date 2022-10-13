@@ -23,7 +23,6 @@ import {UserAvatar, UserAvatarProps} from './UserAvatar';
 
 import {User} from '../../entity/User';
 import {AVATAR_SIZE, STATE} from '../Avatar';
-
 jest.mock('../../auth/util/SVGProvider');
 
 class UserAvatarPage extends TestPage<UserAvatarProps> {

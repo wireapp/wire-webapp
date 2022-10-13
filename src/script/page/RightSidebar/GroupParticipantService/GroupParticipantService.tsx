@@ -19,7 +19,7 @@
 
 import {FC, useEffect} from 'react';
 
-import Icon from 'Components/Icon';
+import {Icon} from 'Components/Icon';
 import {ServiceDetails} from 'Components/panel/ServiceDetails';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {handleKeyDown} from 'Util/KeyboardUtil';

@@ -34,7 +34,7 @@ import {customEnvRedirectStrings} from '../../strings';
 import {actionRoot} from '../module/action';
 import {bindActionCreators} from '../module/reducer';
 import {QUERY_KEY} from '../route';
-import {SVGProvider} from '../util/SVGProvider';
+import {getSVG} from '../util/SVGProvider';
 
 const REDIRECT_DELAY = 5000;
 const CustomEnvironmentRedirectComponent = ({doNavigate, doSendNavigationEvent}: DispatchProps) => {
@@ -87,7 +87,7 @@ const CustomEnvironmentRedirectComponent = ({doNavigate, doSendNavigationEvent}:
             }}
           >
             <SVGIcon aria-hidden="true" color={COLOR.WHITE} realWidth={47} realHeight={38}>
-              <g dangerouslySetInnerHTML={{__html: SVGProvider['logo-icon']?.documentElement?.innerHTML}} />
+              <g dangerouslySetInnerHTML={{__html: getSVG('logo-icon')?.documentElement?.innerHTML}} />
             </SVGIcon>
             <svg
               aria-hidden="true"

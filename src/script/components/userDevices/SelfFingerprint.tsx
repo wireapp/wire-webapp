@@ -27,11 +27,11 @@ import {container} from 'tsyringe';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 
-import DeviceCard from './DeviceCard';
+import {DeviceCard} from './DeviceCard';
 
 import {ClientState} from '../../client/ClientState';
 import type {CryptographyRepository} from '../../cryptography/CryptographyRepository';
-import DeviceId from '../DeviceId';
+import {DeviceId} from '../DeviceId';
 
 interface SelfFingerprintProps {
   clientState?: ClientState;

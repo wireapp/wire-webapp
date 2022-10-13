@@ -40,7 +40,7 @@ export interface LinkPreviewAssetProps {
   message: ContentMessage;
 }
 
-const LinkPreviewAssetComponent: React.FC<LinkPreviewAssetProps> = ({header = false, message}) => {
+const LinkPreviewAsset: React.FC<LinkPreviewAssetProps> = ({header = false, message}) => {
   const {
     previews: [preview],
   } = useKoSubscribableChildren(message.getFirstAsset() as Text, ['previews']);
@@ -128,4 +128,4 @@ const LinkPreviewAssetComponent: React.FC<LinkPreviewAssetProps> = ({header = fa
   );
 };
 
-export {LinkPreviewAssetComponent};
+export {LinkPreviewAsset};

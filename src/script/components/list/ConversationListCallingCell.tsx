@@ -21,11 +21,10 @@ import React, {useState, useCallback} from 'react';
 
 import {DefaultConversationRoleName} from '@wireapp/api-client/src/conversation/';
 import {CALL_TYPE, CONV_TYPE, REASON as CALL_REASON, STATE as CALL_STATE} from '@wireapp/avs';
-import {Avatar} from '@wireapp/react-ui-kit';
 import cx from 'classnames';
 import {container} from 'tsyringe';
 
-import {AVATAR_SIZE} from 'Components/Avatar';
+import {Avatar, AVATAR_SIZE} from 'Components/Avatar';
 import {GroupAvatar} from 'Components/avatar/GroupAvatar';
 import {Duration} from 'Components/calling/Duration';
 import {GroupVideoGrid} from 'Components/calling/GroupVideoGrid';

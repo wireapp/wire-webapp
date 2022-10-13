@@ -23,7 +23,7 @@ import {t} from 'Util/LocalizerUtil';
 
 import {LegalHoldModalState} from './LegalHoldModalState';
 
-import PrimaryModal from '../components/Modals/PrimaryModal';
+import {PrimaryModal} from '../components/Modals/PrimaryModal';
 import {ConversationVerificationState} from '../conversation/ConversationVerificationState';
 import type {Conversation} from '../entity/Conversation';
 import {ConversationError} from '../error/ConversationError';

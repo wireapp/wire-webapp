@@ -19,7 +19,7 @@
 
 import React from 'react';
 
-import Avatar, {AVATAR_SIZE} from 'Components/Avatar';
+import {Avatar, AVATAR_SIZE} from 'Components/Avatar';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 
 import type {ServiceEntity} from '../../integration/ServiceEntity';

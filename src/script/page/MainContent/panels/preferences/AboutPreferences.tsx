@@ -24,8 +24,8 @@ import {container} from 'tsyringe';
 
 import {t} from 'Util/LocalizerUtil';
 
-import PreferencesPage from './components/PreferencesPage';
-import PreferencesSection from './components/PreferencesSection';
+import {PreferencesPage} from './components/PreferencesPage';
+import {PreferencesSection} from './components/PreferencesSection';
 
 import {Config} from '../../../../Config';
 import {getPrivacyPolicyUrl, getTermsOfUsePersonalUrl, getTermsOfUseTeamUrl, URL} from '../../../../externalRoute';

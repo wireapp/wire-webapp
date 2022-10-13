@@ -30,7 +30,7 @@ import {AddParticipants} from './AddParticipants';
 import {ConversationDetails} from './ConversationDetails';
 import {ConversationParticipants} from './ConversationParticipants';
 import {GroupParticipantService} from './GroupParticipantService';
-import GroupParticipantUser from './GroupParticipantUser';
+import {GroupParticipantUser} from './GroupParticipantUser';
 import {GuestServicesOptions} from './GuestServicesOptions';
 import {MessageDetails} from './MessageDetails';
 import {Notifications} from './Notifications';

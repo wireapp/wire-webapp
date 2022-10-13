@@ -35,7 +35,7 @@ import {setContextMenuPosition} from 'Util/util';
 import {ContentAsset} from './asset';
 import {MessageFooterLike} from './MessageFooterLike';
 import {MessageLike} from './MessageLike';
-import {MessageQuote} from './MessageQuote';
+import {Quote} from './MessageQuote';
 
 import {MessageActions} from '..';
 import {EphemeralStatusType} from '../../../../message/EphemeralStatusType';
@@ -163,7 +163,7 @@ const ContentMessageComponent: React.FC<ContentMessageProps> = ({
     <>
       {avatarSection}
       {message.quote() && (
-        <MessageQuote
+        <Quote
           conversation={conversation}
           quote={message.quote()}
           selfId={selfId}

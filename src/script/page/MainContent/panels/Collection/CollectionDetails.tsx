@@ -25,7 +25,7 @@ import {t} from 'Util/LocalizerUtil';
 import {formatLocale, isThisYear, isToday} from 'Util/TimeUtil';
 import {noop} from 'Util/util';
 
-import CollectionItem from './CollectionItem';
+import {CollectionItem} from './CollectionItem';
 
 import {Conversation} from '../../../../entity/Conversation';
 import {initFadingScrollbar} from '../../../../ui/fadingScrollbar';

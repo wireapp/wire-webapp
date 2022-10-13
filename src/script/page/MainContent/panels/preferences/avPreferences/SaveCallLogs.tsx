@@ -22,7 +22,7 @@ import React from 'react';
 import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
 import {container} from 'tsyringe';
 
-import PrimaryModal from 'Components/Modals/PrimaryModal';
+import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {t} from 'Util/LocalizerUtil';
 import {getCurrentDate} from 'Util/TimeUtil';
 import {downloadBlob} from 'Util/util';
@@ -30,7 +30,7 @@ import {downloadBlob} from 'Util/util';
 import type {CallingRepository} from '../../../../../calling/CallingRepository';
 import {Config} from '../../../../../Config';
 import {UserState} from '../../../../../user/UserState';
-import PreferencesSection from '../components/PreferencesSection';
+import {PreferencesSection} from '../components/PreferencesSection';
 
 interface SaveCallLogsProps {
   callingRepository: CallingRepository;

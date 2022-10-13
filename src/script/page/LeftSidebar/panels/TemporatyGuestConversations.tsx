@@ -21,9 +21,9 @@ import React from 'react';
 
 import {QualifiedId} from '@wireapp/api-client/src/user';
 
-import Icon from 'Components/Icon';
-import ConversationListCallingCell from 'Components/list/ConversationListCallingCell';
-import PrimaryModal from 'Components/Modals/PrimaryModal';
+import {Icon} from 'Components/Icon';
+import {ConversationListCallingCell} from 'Components/list/ConversationListCallingCell';
+import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 

@@ -23,10 +23,10 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 import {amplify} from 'amplify';
 import {container} from 'tsyringe';
 
-import AvailabilityState from 'Components/AvailabilityState';
-import Icon from 'Components/Icon';
-import LegalHoldDot from 'Components/LegalHoldDot';
-import ConversationListCallingCell from 'Components/list/ConversationListCallingCell';
+import {AvailabilityState} from 'Components/AvailabilityState';
+import {Icon} from 'Components/Icon';
+import {LegalHoldDot} from 'Components/LegalHoldDot';
+import {ConversationListCallingCell} from 'Components/list/ConversationListCallingCell';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {isTabKey} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
@@ -39,7 +39,7 @@ import {DefaultLabelIds} from '../../../../conversation/ConversationLabelReposit
 import {ConversationRepository} from '../../../../conversation/ConversationRepository';
 import {ConversationState} from '../../../../conversation/ConversationState';
 import {User} from '../../../../entity/User';
-import useRoveFocus from '../../../../hooks/useRoveFocus';
+import {useRoveFocus} from '../../../../hooks/useRoveFocus';
 import {useMLSConversationState} from '../../../../mls/mlsConversationState';
 import {PreferenceNotificationRepository} from '../../../../notification/PreferenceNotificationRepository';
 import {PropertiesRepository} from '../../../../properties/PropertiesRepository';
@@ -51,7 +51,7 @@ import {ShortcutType} from '../../../../ui/ShortcutType';
 import {UserState} from '../../../../user/UserState';
 import {ListState, ListViewModel} from '../../../../view_model/ListViewModel';
 import {useAppMainState} from '../../../state';
-import ListWrapper from '../ListWrapper';
+import {ListWrapper} from '../ListWrapper';
 
 type ConversationsProps = {
   callState?: CallState;

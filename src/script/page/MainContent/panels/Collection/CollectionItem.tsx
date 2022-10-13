@@ -19,10 +19,10 @@
 
 import {FC} from 'react';
 
-import Image from 'Components/Image';
-import AudioAsset from 'Components/MessagesList/Message/ContentMessage/asset/AudioAsset';
-import FileAssetComponent from 'Components/MessagesList/Message/ContentMessage/asset/FileAssetComponent';
-import LinkPreviewAssetComponent from 'Components/MessagesList/Message/ContentMessage/asset/LinkPreviewAssetComponent';
+import {Image} from 'Components/Image';
+import {AudioAsset} from 'Components/MessagesList/Message/ContentMessage/asset/AudioAsset';
+import {FileAsset} from 'Components/MessagesList/Message/ContentMessage/asset/FileAssetComponent';
+import {LinkPreviewAsset} from 'Components/MessagesList/Message/ContentMessage/asset/LinkPreviewAssetComponent';
 import {ContentMessage} from 'src/script/entity/message/ContentMessage';
 import {MediumImage} from 'src/script/entity/message/MediumImage';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
@@ -51,11 +51,11 @@ const CollectionItem: FC<CollectionItemProps> = ({message, onImageClick}) => {
     );
   }
   if (isOfCategory('links', message)) {
-    return <LinkPreviewAssetComponent message={message} header={true} />;
+    return <LinkPreviewAsset message={message} header={true} />;
   }
 
   if (isOfCategory('files', message)) {
-    return <FileAssetComponent message={message} hasHeader={true} />;
+    return <FileAsset message={message} hasHeader={true} />;
   }
 
   if (isOfCategory('audio', message)) {

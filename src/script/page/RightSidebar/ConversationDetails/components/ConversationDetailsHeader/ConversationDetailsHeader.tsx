@@ -19,7 +19,7 @@
 
 import {ChangeEvent, FC, KeyboardEvent, useEffect, useRef, useState} from 'react';
 
-import Icon from 'Components/Icon';
+import {Icon} from 'Components/Icon';
 import {isEnterKey} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
 import {removeLineBreaks} from 'Util/StringUtil';

@@ -21,9 +21,9 @@ import {FC, InputHTMLAttributes, useEffect, useRef, useState} from 'react';
 
 import {IconButton, IconButtonVariant} from '@wireapp/react-ui-kit';
 
-import Icon from 'Components/Icon';
-import TextInput from 'Components/TextInput';
-import useIsMounted from 'Util/useIsMounted';
+import {Icon} from 'Components/Icon';
+import {TextInput} from 'Components/TextInput';
+import {useIsMounted} from 'Util/useIsMounted';
 
 import {MotionDuration} from '../../../../../motion/MotionDuration';
 import {isEnterKey, isTabKey} from '../../../../../util/KeyboardUtil';

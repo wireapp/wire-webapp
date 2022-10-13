@@ -21,8 +21,8 @@ import React, {forwardRef} from 'react';
 
 import cx from 'classnames';
 
-import Avatar, {AVATAR_SIZE} from 'Components/Avatar';
-import Icon from 'Components/Icon';
+import {Avatar, AVATAR_SIZE} from 'Components/Avatar';
+import {Icon} from 'Components/Icon';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {handleKeyDown} from 'Util/KeyboardUtil';
 

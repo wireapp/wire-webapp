@@ -21,7 +21,7 @@ import React from 'react';
 
 import {keyframes} from '@emotion/react';
 
-import {SVGProvider} from '../../auth/util/SVGProvider';
+import {getSVG} from '../../auth/util/SVGProvider';
 
 const fadeAnimation = keyframes`
   0%   { opacity: 0.2; }
@@ -60,7 +60,7 @@ const ParticipantMicOnIcon: React.FC<ParticipantMicOnIconProps> = ({
           },
         }}
         viewBox="0 0 16 16"
-        dangerouslySetInnerHTML={{__html: SVGProvider['mic-on-icon']?.documentElement?.innerHTML}}
+        dangerouslySetInnerHTML={{__html: getSVG('mic-on-icon')?.documentElement?.innerHTML}}
       ></svg>
     </span>
   );

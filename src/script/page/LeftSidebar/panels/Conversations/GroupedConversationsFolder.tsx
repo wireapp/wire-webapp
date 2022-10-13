@@ -21,15 +21,15 @@ import React from 'react';
 
 import {css} from '@emotion/react';
 
-import ConversationListCell from 'Components/list/ConversationListCell';
+import {ConversationListCell} from 'Components/list/ConversationListCell';
 import type {ConversationLabel} from 'src/script/conversation/ConversationLabelRepository';
 import {Conversation} from 'src/script/entity/Conversation';
 import {ListViewModel} from 'src/script/view_model/ListViewModel';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 
-import GroupedConversationHeader from './GroupedConversationHeader';
+import {GroupedConversationHeader} from './GroupedConversationHeader';
 
-import useRoveFocus from '../../../../hooks/useRoveFocus';
+import {useRoveFocus} from '../../../../hooks/useRoveFocus';
 import {generateConversationUrl} from '../../../../router/routeGenerator';
 import {createNavigate} from '../../../../router/routerBindings';
 import {useAppMainState} from '../../../state';

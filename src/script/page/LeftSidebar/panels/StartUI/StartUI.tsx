@@ -22,10 +22,10 @@ import React, {useRef, useState} from 'react';
 import cx from 'classnames';
 import {container} from 'tsyringe';
 
-import showInviteModal from 'Components/Modals/InviteModal';
-import showServiceModal from 'Components/Modals/ServiceModal';
-import showUserModal from 'Components/Modals/UserModal';
-import SearchInput from 'Components/SearchInput';
+import {showInviteModal} from 'Components/Modals/InviteModal';
+import {showServiceModal} from 'Components/Modals/ServiceModal';
+import {showUserModal} from 'Components/Modals/UserModal';
+import {SearchInput} from 'Components/SearchInput';
 import {Conversation} from 'src/script/entity/Conversation';
 import {User} from 'src/script/entity/User';
 import {IntegrationRepository} from 'src/script/integration/IntegrationRepository';
@@ -47,7 +47,7 @@ import {TeamState} from '../../../../team/TeamState';
 import {generatePermissionHelpers} from '../../../../user/UserPermission';
 import {UserState} from '../../../../user/UserState';
 import {useAppMainState} from '../../../state';
-import ListWrapper from '../ListWrapper';
+import {ListWrapper} from '../ListWrapper';
 
 type StartUIProps = {
   conversationRepository: ConversationRepository;

@@ -22,11 +22,11 @@ import ko from 'knockout';
 
 import {ContentState, ContentViewModel} from 'src/script/view_model/ContentViewModel';
 
-import MainContent from './MainContent';
+import {MainContent} from './MainContent';
 
 import {withTheme} from '../../auth/util/test/TestUtil';
 import {MainViewModel} from '../../view_model/MainViewModel';
-import RootProvider from '../RootProvider';
+import {RootProvider} from '../RootProvider';
 
 jest.mock(
   './panels/preferences/AccountPreferences',

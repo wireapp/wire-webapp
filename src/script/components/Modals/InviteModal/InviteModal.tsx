@@ -37,7 +37,7 @@ export interface InviteModalProps {
 
 const {BRAND_NAME: brandName} = Config.getConfig();
 
-const InviteModalComponent: React.FC<InviteModalProps> = ({userState, onClose}) => {
+const InviteModal: React.FC<InviteModalProps> = ({userState, onClose}) => {
   const [isInviteMessageSelected, setIsInviteMessageSelected] = useState<boolean>(false);
   const {self: selfUser} = useKoSubscribableChildren(userState, ['self']);
   const userName = selfUser.username();
@@ -92,6 +92,6 @@ const InviteModalComponent: React.FC<InviteModalProps> = ({userState, onClose}) 
   );
 };
 
-export {InviteModalComponent};
+const showInviteModal = renderElement<InviteModalProps>(InviteModal);
 
-export const showInviteModal = renderElement<InviteModalProps>(InviteModalComponent);
+export {InviteModal, showInviteModal};

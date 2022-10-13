@@ -24,7 +24,7 @@ import {LinkPreview} from 'src/script/entity/message/LinkPreview';
 import {Text} from 'src/script/entity/message/Text';
 import {StatusType} from 'src/script/message/StatusType';
 
-import {LinkPreviewAssetComponent} from './LinkPreviewAssetComponent';
+import {LinkPreviewAsset} from './LinkPreviewAssetComponent';
 
 describe('LinkPreviewAssetComponent', () => {
   function mockLinkPreview(url = 'https://example.com'): ContentMessage {
@@ -60,7 +60,7 @@ describe('LinkPreviewAssetComponent', () => {
 
   it('renders link previews', () => {
     const message = mockLinkPreview();
-    const {queryByTestId} = render(<LinkPreviewAssetComponent message={message} />);
+    const {queryByTestId} = render(<LinkPreviewAsset message={message} />);
 
     expect(queryByTestId('link-preview-title')).not.toBeNull();
   });
@@ -70,7 +70,7 @@ describe('LinkPreviewAssetComponent', () => {
     message.ephemeral_expires(true);
     message.status(StatusType.SENT);
 
-    const {queryByTestId} = render(<LinkPreviewAssetComponent message={message} />);
+    const {queryByTestId} = render(<LinkPreviewAsset message={message} />);
 
     expect(queryByTestId('link-preview-title')).toBeNull();
   });
@@ -78,7 +78,7 @@ describe('LinkPreviewAssetComponent', () => {
   it('displays the author if the link is a tweet', () => {
     const message = mockTweet();
 
-    const {queryByTestId} = render(<LinkPreviewAssetComponent message={message} />);
+    const {queryByTestId} = render(<LinkPreviewAsset message={message} />);
 
     expect(queryByTestId('link-preview-title')).not.toBeNull();
     expect(queryByTestId('link-preview-tweet-author')).not.toBeNull();
@@ -87,7 +87,7 @@ describe('LinkPreviewAssetComponent', () => {
   it('cleans the preview URL', () => {
     const message = mockLinkPreview('http://example.com');
 
-    const {queryByTestId, queryByText} = render(<LinkPreviewAssetComponent message={message} />);
+    const {queryByTestId, queryByText} = render(<LinkPreviewAsset message={message} />);
 
     expect(queryByTestId('link-preview-title')).not.toBeNull();
     expect(queryByText('example.com')).not.toBeNull();

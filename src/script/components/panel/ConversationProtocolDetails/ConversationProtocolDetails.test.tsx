@@ -20,7 +20,7 @@
 import {render} from '@testing-library/react';
 import {ConversationProtocol} from '@wireapp/api-client/src/conversation/NewConversation';
 
-import ConversationProtocolDetails, {Ciphersuite} from './ConversationProtocolDetails';
+import {ConversationProtocolDetails, Ciphersuite} from './ConversationProtocolDetails';
 
 describe('ConversationProtocolDetails', () => {
   it('renders the correct infos for the conversation with mls protocol', () => {

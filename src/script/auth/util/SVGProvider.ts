@@ -18,8 +18,10 @@
  */
 
 const fileList = require.context('Resource/image/icon', true, /.+\.svg$/);
+export type SVGProvider = {[index: string]: Document};
 
-const svgs: {[index: string]: Document} = {};
+const svgs: SVGProvider = {};
+
 const parser = new DOMParser();
 fileList.keys().forEach(iconFileName => {
   const iconPath = iconFileName.replace(/^\.\//, '');
@@ -28,4 +30,7 @@ fileList.keys().forEach(iconFileName => {
   svgs[iconName] = parser.parseFromString(svgString, 'image/svg+xml');
 });
 
-export {svgs as SVGProvider};
+const getAllSVGs = () => svgs;
+const getSVG = (iconName: string) => svgs[iconName];
+
+export {getAllSVGs, getSVG};

@@ -21,7 +21,7 @@ import {FC, useEffect, useState} from 'react';
 
 import {RECEIPT_MODE} from '@wireapp/api-client/src/conversation/data/';
 
-import Icon from 'Components/Icon';
+import {Icon} from 'Components/Icon';
 import {PanelActions} from 'Components/panel/PanelActions';
 import {ServiceDetails} from 'Components/panel/ServiceDetails';
 import {ServiceList} from 'Components/ServiceList';

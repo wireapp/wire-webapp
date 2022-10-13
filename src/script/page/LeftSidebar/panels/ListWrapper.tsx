@@ -22,7 +22,7 @@ import React, {ReactElement} from 'react';
 import {css} from '@emotion/react';
 import {throttle} from 'underscore';
 
-import Icon from 'Components/Icon';
+import {Icon} from 'Components/Icon';
 import {t} from 'Util/LocalizerUtil';
 import {isScrollable, isScrolledBottom, isScrolledTop} from 'Util/scroll-helpers';
 

@@ -23,7 +23,7 @@ import {DefaultConversationRoleName as DefaultRole} from '@wireapp/api-client/sr
 import {WebAppEvents} from '@wireapp/webapp-events';
 import {amplify} from 'amplify';
 
-import Icon from 'Components/Icon';
+import {Icon} from 'Components/Icon';
 import {EnrichedFields} from 'Components/panel/EnrichedFields';
 import {UserActions, Actions} from 'Components/panel/UserActions';
 import {UserDetails} from 'Components/panel/UserDetails';

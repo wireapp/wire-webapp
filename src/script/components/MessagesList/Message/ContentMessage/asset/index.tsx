@@ -20,7 +20,7 @@
 import {QualifiedId} from '@wireapp/api-client/src/user';
 
 import {Asset} from 'src/script/entity/message/Asset';
-import type {FileAsset} from 'src/script/entity/message/FileAsset';
+import type {FileAsset as FileAssetType} from 'src/script/entity/message/FileAsset';
 import type {Location} from 'src/script/entity/message/Location';
 import type {MediumImage} from 'src/script/entity/message/MediumImage';
 import type {Text} from 'src/script/entity/message/Text';
@@ -28,8 +28,13 @@ import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {includesOnlyEmojis} from 'Util/EmojiUtil';
 import {handleKeyDown} from 'Util/KeyboardUtil';
 
-import {FileAssetComponent} from './FileAssetComponent';
-import {LinkPreviewAssetComponent} from './LinkPreviewAssetComponent';
+import {AudioAsset} from './AudioAsset';
+import {FileAsset} from './FileAssetComponent';
+import {ImageAsset} from './ImageAsset';
+import {LinkPreviewAsset} from './LinkPreviewAssetComponent';
+import {LocationAsset} from './LocationAsset';
+import {MessageButton} from './MessageButton';
+import {VideoAsset} from './VideoAsset';
 
 import {MessageActions} from '../..';
 import {AssetType} from '../../../../../assets/AssetType';
@@ -74,39 +79,39 @@ const ContentAsset = ({
           )}
           {(asset as Text).previews().map(preview => (
             <div key={preview.url} className="message-asset">
-              <LinkPreviewAssetComponent message={message} />
+              <LinkPreviewAsset message={message} />
             </div>
           ))}
         </>
       );
     case AssetType.FILE:
-      if ((asset as FileAsset).isFile()) {
+      if ((asset as FileAssetType).isFile()) {
         return (
           <div className={`message-asset ${isObfuscated ? 'ephemeral-asset-expired icon-file' : ''}`}>
-            <FileAssetComponent message={message} />
+            <FileAsset message={message} />
           </div>
         );
       }
 
-      if ((asset as FileAsset).isAudio()) {
+      if ((asset as FileAssetType).isAudio()) {
         return (
           <div className={`message-asset ${isObfuscated ? 'ephemeral-asset-expired' : ''}`}>
-            <AudioAssetComponent message={message} />
+            <AudioAsset message={message} />
           </div>
         );
       }
 
-      if ((asset as FileAsset).isVideo()) {
+      if ((asset as FileAssetType).isVideo()) {
         return (
           <div className={`message-asset ${isObfuscated ? 'ephemeral-asset-expired icon-movie' : ''}`}>
-            <VideoAssetComponent message={message} />
+            <VideoAsset message={message} />
           </div>
         );
       }
     case AssetType.IMAGE:
-      return <ImageAssetComponent asset={asset as MediumImage} message={message} onClick={onClickImage} />;
+      return <ImageAsset asset={asset as MediumImage} message={message} onClick={onClickImage} />;
     case AssetType.LOCATION:
-      return <LocationAssetComponent asset={asset as Location} />;
+      return <LocationAsset asset={asset as Location} />;
     case AssetType.BUTTON:
       const assetId = asset.id;
       if (!(message instanceof CompositeMessage && asset instanceof Button && assetId)) {
@@ -114,7 +119,7 @@ const ContentAsset = ({
       }
 
       return (
-        <ButtonAssetComponent
+        <MessageButton
           onClick={() => onClickButton(message, assetId)}
           label={asset.text}
           id={assetId}

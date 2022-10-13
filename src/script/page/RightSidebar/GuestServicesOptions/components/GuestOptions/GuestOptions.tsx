@@ -22,7 +22,7 @@ import {FC, useCallback, useEffect, useMemo, useState} from 'react';
 import cx from 'classnames';
 
 import {CopyToClipboard} from 'Components/CopyToClipboard';
-import Icon from 'Components/Icon';
+import {Icon} from 'Components/Icon';
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {BaseToggle} from 'Components/toggle/BaseToggle';
 import {copyText} from 'Util/ClipboardUtil';

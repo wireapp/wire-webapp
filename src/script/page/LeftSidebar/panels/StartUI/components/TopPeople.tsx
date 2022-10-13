@@ -21,7 +21,7 @@ import React from 'react';
 
 import {container} from 'tsyringe';
 
-import TopContact from './topPeople/TopContact';
+import {TopContact} from './topPeople/TopContact';
 
 import {AssetRepository} from '../../../../../assets/AssetRepository';
 import {User} from '../../../../../entity/User';

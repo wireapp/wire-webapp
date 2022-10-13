@@ -218,14 +218,7 @@ const ConversationJoinComponent = ({
     return <Navigate to={ROUTE.CONVERSATION_JOIN_INVALID} replace />;
   }
   return (
-    <UnsupportedBrowser
-      isTemporaryGuest
-      hasCookieSupport={false}
-      hasIndexedDbSupport={false}
-      hasToUseDesktopApplication={false}
-      isCheckingSupport={false}
-      isSupportedBrowser={false}
-    >
+    <UnsupportedBrowser isTemporaryGuest>
       <WirelessContainer
         showCookiePolicyBanner={showCookiePolicyBanner}
         onCookiePolicyBannerClose={() => setShowCookiePolicyBanner(false)}

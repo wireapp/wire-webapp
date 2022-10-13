@@ -25,9 +25,9 @@ import {amplify} from 'amplify';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 import {container} from 'tsyringe';
 
-import Icon from 'Components/Icon';
-import ModalComponent from 'Components/ModalComponent';
-import PrimaryModal from 'Components/Modals/PrimaryModal';
+import {Icon} from 'Components/Icon';
+import {ModalComponent} from 'Components/ModalComponent';
+import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 

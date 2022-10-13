@@ -26,7 +26,7 @@ import {FormattedMessage, useIntl} from 'react-intl';
 import {Config} from '../../Config';
 import {cookiePolicyStrings, footerStrings} from '../../strings';
 import {EXTERNAL_ROUTE} from '../externalRoute';
-import {SVGProvider} from '../util/SVGProvider';
+import {getSVG} from '../util/SVGProvider';
 
 export interface Props extends React.HTMLAttributes<HTMLDivElement> {
   children: React.ReactNode;
@@ -95,7 +95,7 @@ const WirelessContainer: React.FC<Props> = ({showCookiePolicyBanner, onCookiePol
       <Content>
         <Header style={{height: '40px', marginLeft: '8px', marginTop: '20px'}}>
           <SVGIcon aria-hidden="true" scale={0.9} realWidth={78} realHeight={25}>
-            <g dangerouslySetInnerHTML={{__html: SVGProvider['logo-full-icon']?.documentElement?.innerHTML}} />
+            <g dangerouslySetInnerHTML={{__html: getSVG('logo-full-icon')?.documentElement?.innerHTML}} />
           </SVGIcon>
         </Header>
         <Content style={{flex: '1', paddingLeft: '8px', width: '100%'}}>{children}</Content>

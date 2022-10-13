@@ -30,8 +30,6 @@ import {ROUTE} from '../route';
 import {mockStoreFactory} from '../util/test/mockStoreFactory';
 import {mountComponent} from '../util/test/TestUtil';
 
-jest.mock('../util/SVGProvider');
-
 describe('CheckPassword', () => {
   it('has disabled submit button as long as there is no input', () => {
     const {getByTestId} = mountComponent(

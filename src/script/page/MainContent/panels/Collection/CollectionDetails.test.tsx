@@ -27,7 +27,7 @@ import {MediumImage} from 'src/script/entity/message/MediumImage';
 import {MessageCategory} from 'src/script/message/MessageCategory';
 import {createRandomUuid} from 'Util/util';
 
-import CollectionDetails from './CollectionDetails';
+import {CollectionDetails} from './CollectionDetails';
 
 import {Text} from '../../../../entity/message/Text';
 

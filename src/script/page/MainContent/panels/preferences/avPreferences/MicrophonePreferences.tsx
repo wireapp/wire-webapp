@@ -19,19 +19,19 @@
 
 import React, {useEffect, useState} from 'react';
 
-import Icon from 'Components/Icon';
+import {Icon} from 'Components/Icon';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 import {getLogger} from 'Util/Logger';
 
-import DeviceSelect from './DeviceSelect';
-import InputLevel from './InputLevel';
+import {DeviceSelect} from './DeviceSelect';
+import {InputLevel} from './InputLevel';
 
 import {Config} from '../../../../../Config';
 import {DeviceTypes, MediaDevicesHandler} from '../../../../../media/MediaDevicesHandler';
 import {MediaStreamHandler} from '../../../../../media/MediaStreamHandler';
 import {MediaType} from '../../../../../media/MediaType';
-import PreferencesSection from '../components/PreferencesSection';
+import {PreferencesSection} from '../components/PreferencesSection';
 
 const logger = getLogger('MicrophonePreferences');
 

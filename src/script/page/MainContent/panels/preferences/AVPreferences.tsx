@@ -22,12 +22,12 @@ import React from 'react';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 
-import AudioOutPreferences from './avPreferences/AudioOutPreferences';
-import CallOptions from './avPreferences/CallOptions';
-import CameraPreferences from './avPreferences/CameraPreferences';
-import MicrophonePreferences from './avPreferences/MicrophonePreferences';
-import SaveCallLogs from './avPreferences/SaveCallLogs';
-import PreferencesPage from './components/PreferencesPage';
+import {AudioOutPreferences} from './avPreferences/AudioOutPreferences';
+import {CallOptions} from './avPreferences/CallOptions';
+import {CameraPreferences} from './avPreferences/CameraPreferences';
+import {MicrophonePreferences} from './avPreferences/MicrophonePreferences';
+import {SaveCallLogs} from './avPreferences/SaveCallLogs';
+import {PreferencesPage} from './components/PreferencesPage';
 
 import type {CallingRepository} from '../../../../calling/CallingRepository';
 import {DeviceTypes} from '../../../../media/MediaDevicesHandler';

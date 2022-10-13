@@ -21,7 +21,7 @@ import {render, fireEvent, screen} from '@testing-library/react';
 
 import {createRandomUuid} from 'Util/util';
 
-import MentionSuggestionList from './MentionSuggestions';
+import {MentionSuggestionList} from './MentionSuggestions';
 
 import {User} from '../../../entity/User';
 

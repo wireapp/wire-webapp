@@ -21,7 +21,7 @@ import React, {ForwardRefRenderFunction, useEffect, useRef} from 'react';
 
 import {CheckIcon, COLOR} from '@wireapp/react-ui-kit';
 
-import Icon from 'Components/Icon';
+import {Icon} from 'Components/Icon';
 import {isTabKey} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
 
@@ -50,7 +50,7 @@ export interface UserInputProps {
 
 const SUCCESS_DISMISS_TIMEOUT = 2500;
 
-const TextInput: ForwardRefRenderFunction<HTMLInputElement, UserInputProps> = ({
+const TextInputComponent: ForwardRefRenderFunction<HTMLInputElement, UserInputProps> = ({
   autoFocus,
   disabled,
   errorMessage,
@@ -144,6 +144,6 @@ const TextInput: ForwardRefRenderFunction<HTMLInputElement, UserInputProps> = ({
   );
 };
 
-const TextInputForwarded = React.forwardRef(TextInput);
+const TextInput = React.forwardRef(TextInputComponent);
 
-export {TextInputForwarded};
+export {TextInput};

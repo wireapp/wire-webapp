@@ -19,9 +19,7 @@
 
 import React from 'react';
 
-import {Avatar} from '@wireapp/react-ui-kit';
-
-import {AVATAR_SIZE} from 'Components/Avatar';
+import {Avatar, AVATAR_SIZE} from 'Components/Avatar';
 import {Icon} from 'Components/Icon';
 import {ModalComponent} from 'Components/ModalComponent';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
@@ -100,6 +98,6 @@ const ServiceModal: React.FC<ServiceModalProps> = ({
   );
 };
 
-export {ServiceModal};
+const showServiceModal = renderElement<ServiceModalProps>(ServiceModal);
 
-export const showServiceModal = renderElement<ServiceModalProps>(ServiceModal);
+export {ServiceModal, showServiceModal};

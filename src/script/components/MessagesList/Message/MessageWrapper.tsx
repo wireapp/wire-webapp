@@ -29,6 +29,7 @@ import {t} from 'Util/LocalizerUtil';
 import {CallMessage} from './CallMessage';
 import {CallTimeoutMessage} from './CallTimeoutMessage';
 import {ContentMessageComponent} from './ContentMessage';
+import {DecryptErrorMessage} from './DecryptErrorMessage';
 import {DeleteMessage} from './DeleteMessage';
 import {FileTypeRestrictedMessage} from './FileTypeRestrictedMessage';
 import {LegalHoldMessage} from './LegalHoldMessage';
@@ -179,7 +180,7 @@ export const MessageWrapper: React.FC<MessageParams & {hasMarker: boolean}> = ({
     );
   }
   if (message.isUnableToDecrypt()) {
-    return <DecryptionErrorMessage message={message} onClickResetSession={onClickResetSession} />;
+    return <DecryptErrorMessage message={message} onClickResetSession={onClickResetSession} />;
   }
   if (message.isLegalHold()) {
     return <LegalHoldMessage message={message} />;

@@ -22,7 +22,7 @@ import React from 'react';
 import {t} from 'Util/LocalizerUtil';
 import {getLogger} from 'Util/Logger';
 
-import AccountInput, {useInputDone} from './AccountInput';
+import {AccountInput, useInputDone} from './AccountInput';
 
 import {UserRepository} from '../../../../../user/UserRepository';
 

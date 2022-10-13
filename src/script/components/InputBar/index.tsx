@@ -29,13 +29,13 @@ import {
 } from 'react';
 
 import {Availability} from '@wireapp/protocol-messaging';
-import {Avatar, StyledApp, THEME_ID, useMatchMedia} from '@wireapp/react-ui-kit';
+import {StyledApp, THEME_ID, useMatchMedia} from '@wireapp/react-ui-kit';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import {amplify} from 'amplify';
 import cx from 'classnames';
 import {container} from 'tsyringe';
 
-import {AVATAR_SIZE} from 'Components/Avatar';
+import {Avatar, AVATAR_SIZE} from 'Components/Avatar';
 import {useEmoji} from 'Components/Emoji/useEmoji';
 import {Icon} from 'Components/Icon';
 import {ClassifiedBar} from 'Components/input/ClassifiedBar';

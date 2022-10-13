@@ -25,12 +25,13 @@ import {CallMessage as CallMessageEntity} from 'src/script/entity/message/CallMe
 import {CallMessage} from './CallMessage';
 
 jest.mock('Components/Icon', () => ({
-  Hangup: function HangupIcon() {
+  Hangup: () => {
     return <span>hangupIcon</span>;
   },
-  Pickup: function PickupIcon() {
+  Pickup: () => {
     return <span>pickupIcon</span>;
   },
+  __esModule: true,
 }));
 
 const createCallMessage = (partialCallMessage: Partial<CallMessageEntity>) => {

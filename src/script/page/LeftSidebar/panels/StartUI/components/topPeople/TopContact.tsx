@@ -21,7 +21,7 @@ import React, {useEffect, useState} from 'react';
 
 import {ConnectionStatus} from '@wireapp/api-client/src/connection';
 
-import Avatar, {AVATAR_SIZE} from 'Components/Avatar';
+import {Avatar, AVATAR_SIZE} from 'Components/Avatar';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {handleKeyDown} from 'Util/KeyboardUtil';
 

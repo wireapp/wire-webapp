@@ -18,4 +18,3 @@
  */
 
 export * from './PanelActions';
-export * from './PanelActions';

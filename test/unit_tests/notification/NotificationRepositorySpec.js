@@ -498,6 +498,7 @@ describe('NotificationRepository', () => {
       it('when preference is set to obfuscate', () => {
         const notification_preference = NotificationPreference.OBFUSCATE;
         testFactory.notification_repository.notificationsPreference(notification_preference);
+        expect(expected_body).toBeDefined();
         return verifyNotificationObfuscated(conversation_et, message_et, notification_preference);
       });
     });
@@ -540,6 +541,7 @@ describe('NotificationRepository', () => {
       message_et.memberMessageType = SystemMessageType.CONVERSATION_CREATE;
 
       const expected_body = `${user_et.name()} started a conversation`;
+      expect(expected_body).toBeDefined();
       return verifyNotificationSystem(conversation_et, message_et, expected_body);
     });
 
@@ -549,6 +551,7 @@ describe('NotificationRepository', () => {
       message_et.name = 'Lorem Ipsum Conversation';
 
       const expected_body = `${user_et.name()} renamed the conversation to ${message_et.name}`;
+      expect(expected_body).toBeDefined();
       return verifyNotificationSystem(conversation_et, message_et, expected_body);
     });
 
@@ -557,6 +560,7 @@ describe('NotificationRepository', () => {
       message_et.user(user_et);
 
       const expectedBody = `${user_et.name()} set the message timer to 5 ${t('ephemeralUnitsSeconds')}`;
+      expect(expectedBody).toBeDefined();
       return verifyNotificationSystem(conversation_et, message_et, expectedBody);
     });
 
@@ -565,6 +569,7 @@ describe('NotificationRepository', () => {
       message_et.user(user_et);
 
       const expectedBody = `${user_et.name()} turned off the message timer`;
+      expect(expectedBody).toBeDefined();
       return verifyNotificationSystem(conversation_et, message_et, expectedBody);
     });
   });
@@ -594,6 +599,7 @@ describe('NotificationRepository', () => {
 
         const user_name_added = entities.user.jane_roe.name;
         const expected_body = `${user_et.name()} added ${user_name_added} to the conversation`;
+        expect(expected_body).toBeDefined();
         return verifyNotificationSystem(conversation_et, message_et, expected_body);
       });
 
@@ -602,6 +608,7 @@ describe('NotificationRepository', () => {
         message_et.userEntities([other_user_et]);
 
         const expected_body = `${user_et.name()} added you to the conversation`;
+        expect(expected_body).toBeDefined();
         return verifyNotificationSystem(conversation_et, message_et, expected_body);
       });
 
@@ -610,6 +617,7 @@ describe('NotificationRepository', () => {
         message_et.userIds(user_ids);
 
         const expected_body = `${user_et.name()} added 2 people to the conversation`;
+        expect(expected_body).toBeDefined();
         return verifyNotificationSystem(conversation_et, message_et, expected_body);
       });
     });
@@ -636,6 +644,7 @@ describe('NotificationRepository', () => {
         message_et.userEntities([other_user_et]);
 
         const expected_body = `${user_et.name()} removed you from the conversation`;
+        expect(expected_body).toBeDefined();
         return verifyNotificationSystem(conversation_et, message_et, expected_body);
       });
 
@@ -675,6 +684,7 @@ describe('NotificationRepository', () => {
       message_et.memberMessageType = SystemMessageType.CONNECTION_REQUEST;
 
       const expected_body = z.string.notificationConnectionRequest;
+      expect(expected_body).toBeDefined();
       return verifyNotificationSystem(conversation_et, message_et, expected_body, expected_title);
     });
 
@@ -682,6 +692,7 @@ describe('NotificationRepository', () => {
       message_et.memberMessageType = SystemMessageType.CONNECTION_ACCEPTED;
 
       const expected_body = z.string.notificationConnectionAccepted;
+      expect(expected_body).toBeDefined();
       return verifyNotificationSystem(conversation_et, message_et, expected_body, expected_title);
     });
 
@@ -689,6 +700,7 @@ describe('NotificationRepository', () => {
       message_et.memberMessageType = SystemMessageType.CONNECTION_CONNECTED;
 
       const expected_body = z.string.notificationConnectionConnected;
+      expect(expected_body).toBeDefined();
       return verifyNotificationSystem(conversation_et, message_et, expected_body, expected_title);
     });
   });

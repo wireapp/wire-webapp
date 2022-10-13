@@ -53,7 +53,7 @@ export interface UserModalProps {
 
 const brandName = Config.getConfig().BRAND_NAME;
 
-const UserModalComponent: React.FC<UserModalProps> = ({
+const UserModal: React.FC<UserModalProps> = ({
   userId,
   onClose = noop,
   userRepository,
@@ -166,6 +166,6 @@ const UserModalComponent: React.FC<UserModalProps> = ({
   );
 };
 
-export {UserModalComponent};
+const showUserModal = renderElement<UserModalProps>(UserModal, 'user-modal-container');
 
-export const showUserModal = renderElement<UserModalProps>(UserModalComponent, 'user-modal-container');
+export {UserModal, showUserModal};

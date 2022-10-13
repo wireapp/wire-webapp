@@ -25,7 +25,7 @@ import {AssetRepository} from 'src/script/assets/AssetRepository';
 import {ContentMessage} from 'src/script/entity/message/ContentMessage';
 import {MediumImage} from 'src/script/entity/message/MediumImage';
 
-import ImageAsset, {ImageAssetProps} from './ImageAsset';
+import {ImageAsset, ImageAssetProps} from './ImageAsset';
 
 jest.mock(
   'Components/utils/InViewport',

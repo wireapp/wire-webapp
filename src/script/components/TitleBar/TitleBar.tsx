@@ -25,8 +25,8 @@ import {amplify} from 'amplify';
 import cx from 'classnames';
 import {container} from 'tsyringe';
 
-import Icon from 'Components/Icon';
-import LegalHoldDot from 'Components/LegalHoldDot';
+import {Icon} from 'Components/Icon';
+import {LegalHoldDot} from 'Components/LegalHoldDot';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {handleKeyDown} from 'Util/KeyboardUtil';
 import {StringIdentifer, t} from 'Util/LocalizerUtil';

@@ -21,7 +21,7 @@ import {FC, useMemo, useState} from 'react';
 
 import cx from 'classnames';
 
-import Icon from 'Components/Icon';
+import {Icon} from 'Components/Icon';
 import {SearchInput} from 'Components/SearchInput';
 import {ServiceList} from 'Components/ServiceList';
 import {UserSearchableList} from 'Components/UserSearchableList';

@@ -21,7 +21,7 @@ import React from 'react';
 
 import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
 
-import Icon from 'Components/Icon';
+import {Icon} from 'Components/Icon';
 import {copyText} from 'Util/ClipboardUtil';
 import {t} from 'Util/LocalizerUtil';
 

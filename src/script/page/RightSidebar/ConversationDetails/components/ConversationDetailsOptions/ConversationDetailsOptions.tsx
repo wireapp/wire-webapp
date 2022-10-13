@@ -21,7 +21,7 @@ import {FC} from 'react';
 
 import {RECEIPT_MODE} from '@wireapp/api-client/src/conversation/data/';
 
-import Icon from 'Components/Icon';
+import {Icon} from 'Components/Icon';
 import {ReceiptModeToggle} from 'Components/toggle/ReceiptModeToggle';
 import {t} from 'Util/LocalizerUtil';
 

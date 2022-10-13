@@ -35,7 +35,7 @@ import {indexStrings, logoutReasonStrings} from '../../strings';
 import {bindActionCreators, RootState} from '../module/reducer';
 import * as AuthSelector from '../module/selector/AuthSelector';
 import {QUERY_KEY, ROUTE} from '../route';
-import {SVGProvider} from '../util/SVGProvider';
+import {getSVG} from '../util/SVGProvider';
 
 type Props = React.HTMLProps<HTMLDivElement>;
 
@@ -79,7 +79,7 @@ const IndexComponent = ({defaultSSOCode}: Props & ConnectedProps & DispatchProps
           style={{marginBottom: '80px'}}
           data-uie-name="ui-wire-logo"
         >
-          <g dangerouslySetInnerHTML={{__html: SVGProvider['logo-full-icon']?.documentElement?.innerHTML}} />
+          <g dangerouslySetInnerHTML={{__html: getSVG('logo-full-icon')?.documentElement?.innerHTML}} />
         </SVGIcon>
         <Text
           block

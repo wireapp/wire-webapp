@@ -22,7 +22,7 @@ import {FC} from 'react';
 import cx from 'classnames';
 
 import {DragableClickWrapper} from 'Components/DragableClickWrapper';
-import Icon from 'Components/Icon';
+import {Icon} from 'Components/Icon';
 import {t} from 'Util/LocalizerUtil';
 import {noop} from 'Util/util';
 
