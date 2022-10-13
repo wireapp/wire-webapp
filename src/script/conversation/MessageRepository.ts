@@ -578,7 +578,7 @@ export class MessageRepository {
    * @returns Resolves when the asset failure was sent
    */
   private sendAssetUploadFailed(conversation: Conversation, messageId: string, reason = Asset.NotUploaded.FAILED) {
-    const payload = MessageBuilder.buildFileAbortMessage({reason});
+    const payload = MessageBuilder.buildFileAbortMessage({reason}, messageId);
 
     return this.sendAndInjectMessage(payload, conversation);
   }
