@@ -17,7 +17,7 @@
  *
  */
 
-import React, {useContext, useEffect} from 'react';
+import React, {useContext} from 'react';
 
 import {IconButton, IconButtonVariant, useMatchMedia} from '@wireapp/react-ui-kit';
 
@@ -35,14 +35,8 @@ const PreferencesPage: React.FC<PreferencesPageProps> = ({title, children}) => {
   const responsiveView = useResponsiveViewState(state => state.currentView);
   const setResponsiveView = useResponsiveViewState(state => state.setCurrentView);
 
-  useEffect(() => {
-    document.querySelector('#app')?.classList.add(`view-${responsiveView}`);
-    return () => {
-      document.querySelector('#app')?.classList.remove(`view-${responsiveView}`);
-    };
-  }, [responsiveView]);
-
   const root = useContext(RootContext);
+
   const goHome = () => root?.content.switchPreviousContent();
 
   return (

@@ -138,8 +138,6 @@ export const TitleBar: React.FC<TitleBarProps> = ({
   const mdBreakpoint = useMatchMedia('max-width: 768px');
   const smBreakpoint = useMatchMedia('max-width: 620px');
 
-  const responsiveView = useResponsiveViewState(state => state.currentView);
-
   const setResponsiveView = useResponsiveViewState(state => state.setCurrentView);
 
   const showDetails = useCallback(
@@ -182,18 +180,16 @@ export const TitleBar: React.FC<TitleBarProps> = ({
     };
   }, [isActivatedAccount, showAddParticipant, showDetails]);
 
-  useEffect(() => {
-    document.querySelector('#app')?.classList.add(`view-${responsiveView}`);
-    return () => {
-      document.querySelector('#app')?.classList.remove(`view-${responsiveView}`);
-    };
-  }, [responsiveView]);
-
   const onClickCollectionButton = () => {
     amplify.publish(WebAppEvents.CONTENT.SWITCH, ContentState.COLLECTION);
   };
 
   const onClickDetails = () => showDetails(false);
+
+  const onClickStartAudio = () => {
+    callActions.startAudio(conversation);
+    setResponsiveView(1);
+  };
 
   return (
     <ul id="conversation-title-bar" className="conversation-title-bar">
@@ -304,7 +300,7 @@ export const TitleBar: React.FC<TitleBarProps> = ({
               title={t('tooltipConversationCall')}
               aria-label={t('tooltipConversationCall')}
               css={{marginBottom: 0}}
-              onClick={() => callActions.startAudio(conversation)}
+              onClick={onClickStartAudio}
               data-uie-name="do-call"
             >
               <Icon.Pickup />

@@ -19,7 +19,7 @@
 
 import {FC} from 'react';
 
-import {StyledApp, THEME_ID} from '@wireapp/react-ui-kit';
+import {StyledApp, THEME_ID, useMatchMedia} from '@wireapp/react-ui-kit';
 import {container} from 'tsyringe';
 
 import CallingContainer from 'Components/calling/CallingOverlayContainer';
@@ -28,6 +28,7 @@ import {registerReactComponent, useKoSubscribableChildren} from 'Util/ComponentU
 import AppLock from './AppLock';
 import LeftSidebar from './LeftSidebar';
 import MainContent from './MainContent';
+import {useResponsiveViewState} from './ResponsiveViewState';
 import RightSidebar from './RightSidebar';
 import {PanelEntity, PanelState} from './RightSidebar/RightSidebar';
 import RootProvider from './RootProvider';
@@ -72,15 +73,21 @@ const AppContainer: FC<AppContainerProps> = ({root}) => {
     closeRightSidebar();
   };
 
+  const smBreakpoint = useMatchMedia('max-width: 620px');
+
+  const responsiveView = useResponsiveViewState(state => state.currentView);
+
   return (
     <StyledApp themeId={THEME_ID.DEFAULT} css={{backgroundColor: 'unset', height: '100%'}}>
       <RootProvider value={root}>
         <main>
           <div id="app" className="app">
-            <LeftSidebar listViewModel={root.list} selfUser={selfUser} isActivatedAccount={isActivatedAccount} />
-
-            <MainContent isRightSidebarOpen={!!currentState} openRightSidebar={toggleRightSidebar} />
-
+            {(!smBreakpoint || responsiveView == 1) && (
+              <LeftSidebar listViewModel={root.list} selfUser={selfUser} isActivatedAccount={isActivatedAccount} />
+            )}
+            {(!smBreakpoint || responsiveView == 0) && (
+              <MainContent isRightSidebarOpen={!!currentState} openRightSidebar={toggleRightSidebar} />
+            )}
             {currentState && (
               <RightSidebar
                 currentEntity={rightSidebar.entity}
