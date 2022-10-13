@@ -29,7 +29,7 @@ import ListWrapper from './ListWrapper';
 
 import {TeamRepository} from '../../../team/TeamRepository';
 import {ContentState, ContentViewModel} from '../../../view_model/ContentViewModel';
-import {useResponsiveViewState} from '../../ResponsiveViewState';
+import {useAppMainState, ViewType} from '../../state';
 
 type PreferencesProps = {
   contentViewModel: ContentViewModel;
@@ -72,8 +72,10 @@ const Preferences: React.FC<PreferencesProps> = ({contentViewModel, teamReposito
   const isDesktop = Runtime.isDesktopApp();
   const supportsCalling = Runtime.isSupportingLegacyCalling();
 
+  const {responsiveView} = useAppMainState.getState();
+
   const onClickSelect = (item: typeof items[number]) => {
-    useResponsiveViewState.setState({currentView: 0});
+    responsiveView.setCurrentView(ViewType.CENTRAL_COLUMN);
     contentViewModel.switchContent(item.id);
   };
 

@@ -27,7 +27,6 @@ import AvailabilityState from 'Components/AvailabilityState';
 import Icon from 'Components/Icon';
 import LegalHoldDot from 'Components/LegalHoldDot';
 import ConversationListCallingCell from 'Components/list/ConversationListCallingCell';
-import {useResponsiveViewState} from 'src/script/page/ResponsiveViewState';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {isTabKey} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
@@ -51,7 +50,7 @@ import {Shortcut} from '../../../../ui/Shortcut';
 import {ShortcutType} from '../../../../ui/ShortcutType';
 import {UserState} from '../../../../user/UserState';
 import {ListState, ListViewModel} from '../../../../view_model/ListViewModel';
-import {useAppMainState} from '../../../state';
+import {useAppMainState, ViewType} from '../../../state';
 import ListWrapper from '../ListWrapper';
 
 type ConversationsProps = {
@@ -114,8 +113,10 @@ const Conversations: React.FC<ConversationsProps> = ({
   const {conversationLabelRepository} = conversationRepository;
   const [isConversationListFocus, focusConversationList] = useState(false);
 
+  const {responsiveView} = useAppMainState.getState();
+
   const onClickPreferences = () => {
-    useResponsiveViewState.setState({currentView: 1});
+    responsiveView.setCurrentView(ViewType.LEFT_SIDEBAR);
     switchList(ListState.PREFERENCES);
     const {rightSidebar} = useAppMainState.getState();
     rightSidebar.clearHistory();

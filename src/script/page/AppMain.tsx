@@ -28,11 +28,10 @@ import {registerReactComponent, useKoSubscribableChildren} from 'Util/ComponentU
 import AppLock from './AppLock';
 import LeftSidebar from './LeftSidebar';
 import MainContent from './MainContent';
-import {useResponsiveViewState} from './ResponsiveViewState';
 import RightSidebar from './RightSidebar';
 import {PanelEntity, PanelState} from './RightSidebar/RightSidebar';
 import RootProvider from './RootProvider';
-import {useAppMainState} from './state';
+import {useAppMainState, ViewType} from './state';
 
 import {User} from '../entity/User';
 import {TeamState} from '../team/TeamState';
@@ -75,17 +74,18 @@ const AppContainer: FC<AppContainerProps> = ({root}) => {
 
   const smBreakpoint = useMatchMedia('max-width: 620px');
 
-  const responsiveView = useResponsiveViewState(state => state.currentView);
+  const responsiveView = useAppMainState(state => state.responsiveView);
+  const showLeftSidebar = responsiveView.currentView == ViewType.LEFT_SIDEBAR;
 
   return (
     <StyledApp themeId={THEME_ID.DEFAULT} css={{backgroundColor: 'unset', height: '100%'}}>
       <RootProvider value={root}>
         <main>
           <div id="app" className="app">
-            {(!smBreakpoint || responsiveView == 1) && (
+            {(!smBreakpoint || showLeftSidebar) && (
               <LeftSidebar listViewModel={root.list} selfUser={selfUser} isActivatedAccount={isActivatedAccount} />
             )}
-            {(!smBreakpoint || responsiveView == 0) && (
+            {(!smBreakpoint || !showLeftSidebar) && (
               <MainContent isRightSidebarOpen={!!currentState} openRightSidebar={toggleRightSidebar} />
             )}
             {currentState && (

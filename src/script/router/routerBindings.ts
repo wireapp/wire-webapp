@@ -25,7 +25,9 @@ import {KEY} from 'Util/KeyboardUtil';
 
 import type {Router} from './Router';
 
-import {useResponsiveViewState} from '../page/ResponsiveViewState';
+import {useAppMainState, ViewType} from '../page/state';
+
+const {responsiveView} = useAppMainState.getState();
 
 let router: Router;
 
@@ -47,7 +49,7 @@ export function initRouterBindings(routerInstance: Router): void {
 export const createNavigate =
   (link: string): React.MouseEventHandler =>
   (event: React.MouseEvent<Element, MouseEvent>) => {
-    useResponsiveViewState.setState({currentView: 0});
+    responsiveView.setCurrentView(ViewType.CENTRAL_COLUMN);
     router?.navigate(link);
     event.preventDefault();
   };

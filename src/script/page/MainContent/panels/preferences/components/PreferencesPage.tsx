@@ -22,9 +22,9 @@ import React, {useContext} from 'react';
 import {IconButton, IconButtonVariant, useMatchMedia} from '@wireapp/react-ui-kit';
 
 import {RootContext} from 'src/script/page/RootProvider';
+import {useAppMainState, ViewType} from 'src/script/page/state';
 import {initFadingScrollbar} from 'src/script/ui/fadingScrollbar';
 
-import {useResponsiveViewState} from '../../../../ResponsiveViewState';
 interface PreferencesPageProps {
   children: React.ReactNode;
   title: string;
@@ -32,8 +32,9 @@ interface PreferencesPageProps {
 
 const PreferencesPage: React.FC<PreferencesPageProps> = ({title, children}) => {
   const smBreakpoint = useMatchMedia('max-width: 620px');
-  const responsiveView = useResponsiveViewState(state => state.currentView);
-  const setResponsiveView = useResponsiveViewState(state => state.setCurrentView);
+  const responsiveView = useAppMainState(state => state.responsiveView);
+  const isCentralColumn = responsiveView.currentView == ViewType.CENTRAL_COLUMN;
+  const setResponsiveView = responsiveView.setCurrentView;
 
   const root = useContext(RootContext);
 
@@ -42,16 +43,16 @@ const PreferencesPage: React.FC<PreferencesPageProps> = ({title, children}) => {
   return (
     <div style={{display: 'flex', flexDirection: 'column', height: '100vh'}}>
       <div className="preferences-titlebar">
-        {smBreakpoint && responsiveView !== 1 && (
+        {smBreakpoint && isCentralColumn && (
           <IconButton
             variant={IconButtonVariant.SECONDARY}
             className="conversation-title-bar-icon icon-back"
             css={{marginBottom: 0}}
-            onClick={() => setResponsiveView(1)}
+            onClick={() => setResponsiveView(ViewType.LEFT_SIDEBAR)}
           />
         )}
         <h2 className="preferences-titlebar">{title}</h2>
-        {smBreakpoint && responsiveView !== 1 && (
+        {smBreakpoint && isCentralColumn && (
           <IconButton
             variant={IconButtonVariant.SECONDARY}
             className="conversation-title-bar-icon icon-close"

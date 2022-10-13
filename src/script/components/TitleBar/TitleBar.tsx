@@ -27,7 +27,7 @@ import {container} from 'tsyringe';
 
 import Icon from 'Components/Icon';
 import LegalHoldDot from 'Components/LegalHoldDot';
-import {useResponsiveViewState} from 'src/script/page/ResponsiveViewState';
+import {useAppMainState, ViewType} from 'src/script/page/state';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {handleKeyDown} from 'Util/KeyboardUtil';
 import {StringIdentifer, t} from 'Util/LocalizerUtil';
@@ -138,7 +138,9 @@ export const TitleBar: React.FC<TitleBarProps> = ({
   const mdBreakpoint = useMatchMedia('max-width: 768px');
   const smBreakpoint = useMatchMedia('max-width: 620px');
 
-  const setResponsiveView = useResponsiveViewState(state => state.setCurrentView);
+  const {responsiveView} = useAppMainState.getState();
+
+  const setView = responsiveView.setCurrentView;
 
   const showDetails = useCallback(
     (addParticipants: boolean): void => {
@@ -188,7 +190,7 @@ export const TitleBar: React.FC<TitleBarProps> = ({
 
   const onClickStartAudio = () => {
     callActions.startAudio(conversation);
-    setResponsiveView(1);
+    setView(ViewType.LEFT_SIDEBAR);
   };
 
   return (
@@ -199,7 +201,7 @@ export const TitleBar: React.FC<TitleBarProps> = ({
             variant={IconButtonVariant.SECONDARY}
             className="conversation-title-bar-icon icon-back"
             css={{marginBottom: 0}}
-            onClick={() => setResponsiveView(1)}
+            onClick={() => setView(ViewType.LEFT_SIDEBAR)}
           />
         )}
         {isActivatedAccount && !mdBreakpoint && (
