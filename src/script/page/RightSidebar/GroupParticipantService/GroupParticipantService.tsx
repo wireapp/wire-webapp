@@ -91,7 +91,7 @@ const GroupParticipantService: FC<GroupParticipantServiceProps> = ({
 
   useEffect(() => {
     integrationRepository.addProviderNameToParticipant(serviceEntity);
-  }, [serviceEntity]);
+  }, [integrationRepository, serviceEntity]);
 
   return (
     <div id="group-participant-service" className="panel__page group-participant">

@@ -86,7 +86,7 @@ const MessageDetails: FC<MessageDetailsProps> = ({
   const [likeUsers, setLikeUsers] = useState<User[]>([]);
   const [messageId, setMessageId] = useState<string>(messageEntity.id);
 
-  const [isReceiptsOpen, setIsReceiptsOpen] = useState<boolean>(showLikes);
+  const [isReceiptsOpen, setIsReceiptsOpen] = useState<boolean>(!showLikes);
 
   const {
     timestamp,

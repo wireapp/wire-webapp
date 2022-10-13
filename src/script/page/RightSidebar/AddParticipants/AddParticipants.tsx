@@ -158,17 +158,8 @@ const AddParticipants: FC<AddParticipantsProps> = ({
     }
   };
 
-  const onServiceSelect = async (entity: ServiceEntity) => {
-    const serviceEntity = await integrationRepository.getServiceFromUser(entity);
-
-    if (!serviceEntity) {
-      return;
-    }
-
-    integrationRepository.addProviderNameToParticipant(serviceEntity);
-
-    togglePanel(PanelState.GROUP_PARTICIPANT_SERVICE, serviceEntity, true);
-  };
+  const onServiceSelect = async (entity: ServiceEntity) =>
+    togglePanel(PanelState.GROUP_PARTICIPANT_SERVICE, entity, true);
 
   const addUsers = async () => {
     const userEntities = selectedContacts.slice();

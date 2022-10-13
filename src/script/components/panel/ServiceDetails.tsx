@@ -30,6 +30,7 @@ export interface ServiceDetailsProps {
 
 const ServiceDetails: React.FC<ServiceDetailsProps> = ({service}) => {
   const {providerName, name} = useKoSubscribableChildren(service, ['providerName', 'name']);
+
   return (
     <div className="panel-participant">
       <div className="panel-participant__name" data-uie-name="status-service-name">

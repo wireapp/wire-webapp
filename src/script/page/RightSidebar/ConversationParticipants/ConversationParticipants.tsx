@@ -76,7 +76,7 @@ const ConversationParticipants: FC<ConversationParticipantsProps> = ({
       return isUser ? [user] : [];
     });
 
-    if (removedFromConversation && selfUser) {
+    if (!removedFromConversation && selfUser) {
       return [...users, selfUser].sort(sortUsersByPriority);
     }
 
@@ -101,10 +101,8 @@ const ConversationParticipants: FC<ConversationParticipantsProps> = ({
         />
 
         <div className="conversation-participants__list panel__content" ref={initFadingScrollbar}>
-          {/* TODO: Need to update dataUieName for UserSearchableList - make it in another PR, and change other UserSearchableList */}
-          {/*data-uie-name="list-conversation-participants"*/}
-
           <UserSearchableList
+            dataUieName="list-conversation-participants"
             users={participants}
             filter={searchInput}
             highlightedUsers={highlightedUsers}
