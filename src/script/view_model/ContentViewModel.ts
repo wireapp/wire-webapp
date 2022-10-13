@@ -45,7 +45,6 @@ import {
   Notification,
   PreferenceNotificationRepository,
 } from '../notification/PreferenceNotificationRepository';
-import {useResponsiveViewState} from '../page/ResponsiveViewState';
 import '../page/LeftSidebar';
 import '../page/MainContent';
 import {PanelState} from '../page/RightSidebar/RightSidebar';
@@ -279,7 +278,6 @@ export class ContentViewModel {
   readonly switchContent = (newContentState: ContentState): void => {
     const isStateChange = newContentState !== this.state();
     if (isStateChange) {
-      useResponsiveViewState.setState({currentView: 0});
       this.releaseContent(newContentState);
       this.showContent(this.checkContentAvailability(newContentState));
     }

@@ -27,6 +27,7 @@ import AvailabilityState from 'Components/AvailabilityState';
 import Icon from 'Components/Icon';
 import LegalHoldDot from 'Components/LegalHoldDot';
 import ConversationListCallingCell from 'Components/list/ConversationListCallingCell';
+import {useResponsiveViewState} from 'src/script/page/ResponsiveViewState';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {isTabKey} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
@@ -113,6 +114,13 @@ const Conversations: React.FC<ConversationsProps> = ({
   const {conversationLabelRepository} = conversationRepository;
   const [isConversationListFocus, focusConversationList] = useState(false);
 
+  const onClickPreferences = () => {
+    useResponsiveViewState.setState({currentView: 1});
+    switchList(ListState.PREFERENCES);
+    const {rightSidebar} = useAppMainState.getState();
+    rightSidebar.clearHistory();
+  };
+
   useEffect(() => {
     if (!activeConversation) {
       return () => {};
@@ -150,11 +158,7 @@ const Conversations: React.FC<ConversationsProps> = ({
         type="button"
         className={`conversations-settings-button accent-text ${showBadge ? 'conversations-settings--badge' : ''}`}
         title={t('tooltipConversationsPreferences')}
-        onClick={() => {
-          switchList(ListState.PREFERENCES);
-          const {rightSidebar} = useAppMainState.getState();
-          rightSidebar.clearHistory();
-        }}
+        onClick={onClickPreferences}
         data-uie-name="go-preferences"
       >
         <Icon.Settings />

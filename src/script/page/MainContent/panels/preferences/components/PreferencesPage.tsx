@@ -45,7 +45,6 @@ const PreferencesPage: React.FC<PreferencesPageProps> = ({title, children}) => {
   const root = useContext(RootContext);
   const goHome = () => root?.content.switchPreviousContent();
 
-  console.info('virgile', root);
   return (
     <div style={{display: 'flex', flexDirection: 'column', height: '100vh'}}>
       <div className="preferences-titlebar">
