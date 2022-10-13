@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [32.0.8](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@32.0.7...@wireapp/core@32.0.8) (2022-10-13)
+
+### Bug Fixes
+
+* Fine tune websocket connection and add tests ([#4429](https://github.com/wireapp/wire-web-packages/issues/4429)) ([73c460e](https://github.com/wireapp/wire-web-packages/commit/73c460ed688adcca12b2cf4935cfc1c43083dcf0))
+
 ## [32.0.7](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@32.0.6...@wireapp/core@32.0.7) (2022-10-12)
 
 ### Bug Fixes
