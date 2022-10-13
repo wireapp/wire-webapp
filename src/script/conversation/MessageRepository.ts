@@ -229,7 +229,7 @@ export class MessageRepository {
       legalHoldStatus: conversation.legalHoldStatus(),
     });
 
-    return this.sendAndInjectMessage(ping, conversation, {playPingAudio: true});
+    return this.sendAndInjectMessage(ping, conversation, {enableEphemeral: true, playPingAudio: true});
   }
 
   /**
