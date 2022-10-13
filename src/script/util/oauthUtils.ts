@@ -39,6 +39,13 @@ interface TokenResponseData {
   expires_in: number;
 }
 
+const OAUTH_CONFIG = {
+  REDIRECT_URI: `${Config.getConfig().APP_BASE}/auth#${ROUTE.OAUTH}`,
+  RESPONSE_TYPE: 'code',
+  SCOPE: 'openid profile email',
+  TOKEN_GRANT_TYPE: 'authorization_code',
+} as const;
+
 export const getOAuthTokenID = async (code: string) => {
   const requestBody: TokenRequestBody = {
     //we're not sure whether we'll send secrets here or via Authorisation Token (if at all)
@@ -48,8 +55,8 @@ export const getOAuthTokenID = async (code: string) => {
 
     code,
 
-    grant_type: 'authorization_code',
-    redirect_uri: `${Config.getConfig().APP_BASE}/auth#${ROUTE.OAUTH}`,
+    grant_type: OAUTH_CONFIG.TOKEN_GRANT_TYPE,
+    redirect_uri: OAUTH_CONFIG.REDIRECT_URI,
   };
   const requestBodyUrlEncoded = new URLSearchParams(requestBody).toString();
 
@@ -76,9 +83,9 @@ export const OAuthStateStorage = {
 export const getOAuthAuthorizeUrl = (state: string) => {
   const authorizeUrl = constructUrlWithSearchParams(Config.getConfig().OIDC_OAUTH_AUTHORIZATION_URI, {
     client_id: Config.getConfig().OIDC_OAUTH_CLIENT_ID,
-    redirect_uri: `${Config.getConfig().APP_BASE}/auth#${ROUTE.OAUTH}`,
-    response_type: 'code',
-    scope: 'openid profile email',
+    redirect_uri: OAUTH_CONFIG.REDIRECT_URI,
+    response_type: OAUTH_CONFIG.RESPONSE_TYPE,
+    scope: OAUTH_CONFIG.SCOPE,
     state,
   });
 

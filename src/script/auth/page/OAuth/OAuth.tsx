@@ -36,8 +36,7 @@ export const OAuth: React.FC = () => {
 
   useEffect(() => {
     if (!code || !storedStateMatches) {
-      navigate(Config.getConfig().APP_BASE);
-      return;
+      return navigate(Config.getConfig().APP_BASE);
     }
 
     getOAuthTokenID(code).then(data => {
