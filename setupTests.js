@@ -48,11 +48,6 @@ jest.mock('axios', () => {
 
 require('test/api/payloads');
 
-const Adapter = require('@wojtekmaj/enzyme-adapter-react-17');
-const {configure} = require('enzyme');
-
-configure({adapter: new Adapter()});
-
 const encoding = require('text-encoding');
 window.TextEncoder = encoding.TextEncoder;
 window.TextDecoder = encoding.TextDecoder;
