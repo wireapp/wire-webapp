@@ -21,21 +21,27 @@ import React, {useEffect} from 'react';
 import {useLocation} from 'react-router';
 import {useNavigate} from 'react-router-dom';
 import {Config} from '../../../Config';
-import {getOAuthTokenID, OAuthStateStorage} from 'Util/oauthUtils';
+import {getOAuthTokenID, validateOAuthErrorParams, validateOAuthState} from 'Util/oauthUtils';
 
 export const OAuth: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const params = new URLSearchParams(location.search);
-  const code = params.get('code');
-  const state = params.get('state');
-
-  const storedState = OAuthStateStorage.getState();
-
-  const storedStateMatches = state && storedState && state === storedState;
 
   useEffect(() => {
-    if (!code || !storedStateMatches) {
+    const params = new URLSearchParams(location.search);
+    const code = params.get('code');
+    const state = params.get('state');
+
+    //validate error
+    const error = validateOAuthErrorParams(params);
+    if (error) {
+      console.error({error});
+      return navigate(Config.getConfig().APP_BASE);
+    }
+
+    //check for state param validity
+    const isOAuthStateValid = validateOAuthState(state);
+    if (!code || !isOAuthStateValid) {
       return navigate(Config.getConfig().APP_BASE);
     }
 
@@ -46,10 +52,7 @@ export const OAuth: React.FC = () => {
 
       //todo: let user in
     });
-  }, [code, navigate, storedStateMatches]);
+  }, [location.search, navigate]);
 
-  if (!storedStateMatches) {
-    return null;
-  }
-  return <div>Hello OAuth {code}</div>;
+  return null;
 };

@@ -20,7 +20,7 @@
 import {Config} from '../Config';
 import {ROUTE} from '../auth/route';
 import axios from 'axios';
-import {constructUrlWithSearchParams} from 'Util/constructUrlWithSearchParams';
+import {UrlUtil} from '@wireapp/commons';
 
 interface TokenRequestBody extends Record<string, string> {
   code: string;
@@ -81,7 +81,7 @@ export const OAuthStateStorage = {
 };
 
 export const getOAuthAuthorizeUrl = (state: string) => {
-  const authorizeUrl = constructUrlWithSearchParams(Config.getConfig().OIDC_OAUTH_AUTHORIZATION_URI, {
+  const authorizeUrl = UrlUtil.pathWithParams(Config.getConfig().OIDC_OAUTH_AUTHORIZATION_URI, {
     client_id: Config.getConfig().OIDC_OAUTH_CLIENT_ID,
     redirect_uri: OAUTH_CONFIG.REDIRECT_URI,
     response_type: OAUTH_CONFIG.RESPONSE_TYPE,
@@ -90,4 +90,53 @@ export const getOAuthAuthorizeUrl = (state: string) => {
   });
 
   return authorizeUrl.toString();
+};
+
+export const validateOAuthState = (state: string | null) => {
+  const storedState = OAuthStateStorage.getState();
+
+  const storedStateMatches = state && storedState && state === storedState;
+
+  return storedStateMatches;
+};
+
+export enum OAUTH_ERROR_CODE {
+  INTERACTION_REQUIRED = 'interaction_required',
+  LOGIN_REQUIRED = 'login_required',
+  ACCOUNT_SELECTION_REQUIRED = 'account_selection_required',
+  CONSENT_REQUIRED = 'consent_required',
+  INVALID_REQUEST_URI = 'invalid_request_uri',
+  INVALID_REQUEST_OBJECT = 'invalid_request_object',
+  REQUEST_NOT_SUPPORTED = 'request_not_supported',
+  REQUEST_URI_NOT_SUPPORTED = 'request_uri_not_supported',
+  REGISTRATION_NOT_SUPPORTED = 'registration_not_supported',
+}
+
+enum OAUTH_ERROR_PARAMS {
+  CODE = 'error',
+  DESCRIPTION = 'error_description',
+  URI = 'error_uri',
+}
+
+interface OAuthError {
+  code: OAUTH_ERROR_CODE;
+  description: string | null;
+  uri: string | null;
+}
+
+export const validateOAuthErrorParams = (params: URLSearchParams): OAuthError | null => {
+  const errorCode = params.get(OAUTH_ERROR_PARAMS.CODE) as OAUTH_ERROR_CODE | null;
+  const errorDescription = params.get(OAUTH_ERROR_PARAMS.DESCRIPTION);
+  const errorUri = params.get(OAUTH_ERROR_PARAMS.URI);
+
+  if (!errorCode) {
+    //no error, successful response
+    return null;
+  }
+
+  return {
+    code: errorCode,
+    description: errorDescription,
+    uri: errorUri,
+  };
 };
