@@ -525,7 +525,7 @@ export class Account<T = any> extends EventEmitter {
    * @param callbacks callbacks that will be called to handle different events
    * @returns close a function that will disconnect from the websocket
    */
-  public async listen({
+  public listen({
     onEvent = () => {},
     onConnectionStateChanged = () => {},
     onNotificationStreamProgress = () => {},
@@ -562,7 +562,7 @@ export class Account<T = any> extends EventEmitter {
      * When set will not decrypt and not store the last notification ID. This is useful if you only want to subscribe to unencrypted backend events
      */
     dryRun?: boolean;
-  } = {}): Promise<() => void> {
+  } = {}): () => void {
     if (!this.apiClient.context) {
       throw new Error('Context is not set - please login first');
     }
@@ -614,8 +614,8 @@ export class Account<T = any> extends EventEmitter {
 
     const processNotificationStream = async (abortHandler: AbortHandler) => {
       // Lock websocket in order to buffer any message that arrives while we handle the notification stream
-      onConnectionStateChanged(ConnectionState.PROCESSING_NOTIFICATIONS);
       this.apiClient.transport.ws.lock();
+      onConnectionStateChanged(ConnectionState.PROCESSING_NOTIFICATIONS);
       const results = await this.service!.notification.processNotificationStream(
         async (notification, source, progress) => {
           await handleNotification(notification, source);
@@ -629,13 +629,13 @@ export class Account<T = any> extends EventEmitter {
         this.logger.warn('Ending connection process as websocket was closed');
         return;
       }
+      onConnectionStateChanged(ConnectionState.LIVE);
       // We can now unlock the websocket and let the new messages being handled and decrypted
       this.apiClient.transport.ws.unlock();
       // We need to wait for the notification stream to be fully handled before releasing the message sending queue.
       // This is due to the nature of how message are encrypted, any change in mls epoch needs to happen before we start encrypting any kind of messages
       this.logger.info(`Resuming message sending. ${getQueueLength()} messages to be sent`);
       resumeMessageSending();
-      onConnectionStateChanged(ConnectionState.LIVE);
     };
     this.apiClient.connect(processNotificationStream);
 
