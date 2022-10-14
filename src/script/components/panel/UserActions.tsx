@@ -34,6 +34,7 @@ import {ACCESS_STATE} from '../../conversation/AccessState';
 import type {ConversationRoleRepository} from '../../conversation/ConversationRoleRepository';
 import {Conversation} from '../../entity/Conversation';
 import type {User} from '../../entity/User';
+import {useAppMainState} from '../../page/state';
 import type {ActionsViewModel} from '../../view_model/ActionsViewModel';
 
 export enum Actions {
@@ -175,6 +176,9 @@ const UserActions: React.FC<UserActionsProps> = ({
             await actionsViewModel.acceptConnectionRequest(user);
             await create1to1Conversation(user, true);
             onAction(Actions.ACCEPT_REQUEST);
+
+            const {rightSidebar} = useAppMainState.getState();
+            rightSidebar.clearHistory();
           },
           icon: 'check-icon',
           identifier: ActionIdentifier[Actions.ACCEPT_REQUEST],
