@@ -203,7 +203,7 @@ describe('renderMessage', () => {
     );
   });
 
-  it('does not render a broken markdown link', () => {
+  it('escapes links with an xss attempt on their url', () => {
     expect(renderMessage(`[sometext](https://some.domain"><script>alert("oops")</script>)`)).toBe(
       `<a href=\"https://some.domain%22%3E%3Cscript%3Ealert(%22oops%22)%3C/script%3E\" target=\"_blank\" rel=\"nofollow noopener noreferrer\" data-md-link=\"true\" data-uie-name=\"markdown-link\">sometext</a>`,
     );
