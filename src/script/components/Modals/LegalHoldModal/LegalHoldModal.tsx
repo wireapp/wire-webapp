@@ -271,15 +271,6 @@ const LegalHoldModal: FC<LegalHoldModalProps> = ({
     amplify.subscribe(LegalHoldModalState.HIDE_REQUEST, hideModal);
     amplify.subscribe(LegalHoldModalState.SHOW_DETAILS, showUsers);
     amplify.subscribe(LegalHoldModalState.HIDE_DETAILS, hideLegalHoldModal);
-
-    return () => {
-      amplify.unsubscribe(LegalHoldModalState.SHOW_REQUEST, (fingerprint?: string) =>
-        showRequestModal(false, fingerprint),
-      );
-      amplify.unsubscribe(LegalHoldModalState.HIDE_REQUEST, hideModal);
-      amplify.unsubscribe(LegalHoldModalState.SHOW_DETAILS, showUsers);
-      amplify.unsubscribe(LegalHoldModalState.HIDE_DETAILS, hideLegalHoldModal);
-    };
   }, []);
 
   return (

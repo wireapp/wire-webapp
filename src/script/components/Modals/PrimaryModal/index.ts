@@ -17,21 +17,16 @@
  *
  */
 
-import {renderElement} from 'Util/renderElement';
-
-import {PrimaryModalComponent} from './PrimaryModal';
 import {addNewModalToQueue, showNextModalInQueue} from './PrimaryModalState';
 import {PrimaryModalType} from './PrimaryModalTypes';
 
-export {usePrimaryModalState, removeCurrentModal} from './PrimaryModalState';
+export {removeCurrentModal, usePrimaryModalState} from './PrimaryModalState';
+export {PrimaryModal};
 
 const PrimaryModal = {
-  init: () => {
-    renderElement(PrimaryModalComponent, 'primary-modal-container')({});
+  init: (): void => {
     showNextModalInQueue();
   },
   show: addNewModalToQueue,
   type: PrimaryModalType,
 };
-
-export {PrimaryModal};

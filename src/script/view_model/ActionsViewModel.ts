@@ -23,10 +23,10 @@ import {container} from 'tsyringe';
 
 import {PrimaryModal, removeCurrentModal, usePrimaryModalState} from 'Components/Modals/PrimaryModal';
 import {t} from 'Util/LocalizerUtil';
+import {isBackendError} from 'Util/TypePredicateUtil';
 
 import type {MainViewModel} from './MainViewModel';
 
-import {BackendError} from '../auth/module/action/BackendError';
 import type {ClientEntity} from '../client/ClientEntity';
 import type {ClientRepository} from '../client/ClientRepository';
 import type {ConnectionRepository} from '../connection/ConnectionRepository';
@@ -178,7 +178,7 @@ export class ActionsViewModel {
                   removeCurrentModal();
                   resolve();
                 } catch (error) {
-                  if (error instanceof BackendError) {
+                  if (isBackendError(error)) {
                     const {updateErrorMessage} = usePrimaryModalState.getState();
                     updateErrorMessage(expectedErrors[error.label] || error.message);
                   }

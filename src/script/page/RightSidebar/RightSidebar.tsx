@@ -133,13 +133,17 @@ const RightSidebar: FC<RightSidebarProps> = ({
   };
 
   const onBackClick = (entity: PanelEntity | null = activeConversation) => {
-    rightSidebar.goBack(entity);
+    const previousHistory = rightSidebar.history.slice(0, -1);
+    const hasPreviousHistory = !!previousHistory.length;
     setAnimatePanelToLeft(false);
-  };
 
-  const onBackToDetails = (entity: PanelEntity | null = activeConversation) => {
+    if (hasPreviousHistory) {
+      rightSidebar.goBack(entity);
+
+      return;
+    }
+
     rightSidebar.goTo(PanelState.CONVERSATION_DETAILS, {entity});
-    setAnimatePanelToLeft(false);
   };
 
   const showDevices = (entity: User) => {
@@ -200,7 +204,7 @@ const RightSidebar: FC<RightSidebarProps> = ({
 
           {currentState === PanelState.GROUP_PARTICIPANT_USER && userEntity && (
             <GroupParticipantUser
-              onBack={onBackToDetails}
+              onBack={onBackClick}
               onClose={closePanel}
               goToRoot={goToRoot}
               showDevices={showDevices}
@@ -220,7 +224,7 @@ const RightSidebar: FC<RightSidebarProps> = ({
               activeConversation={activeConversation}
               repositories={repositories}
               onClose={closePanel}
-              onGoBack={onBackToDetails}
+              onGoBack={onBackClick}
             />
           )}
 
@@ -260,7 +264,7 @@ const RightSidebar: FC<RightSidebarProps> = ({
               actionsViewModel={actionsViewModel}
               integrationRepository={integrationRepository}
               goToRoot={goToRoot}
-              onBack={onBackToDetails}
+              onBack={onBackClick}
               onClose={closePanel}
               serviceEntity={serviceEntity}
               userEntity={userServiceEntity}

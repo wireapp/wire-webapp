@@ -212,10 +212,10 @@ const ConversationList: FC<ConversationListProps> = ({
     const userId = mentionElement?.dataset.userId;
     const domain = mentionElement?.dataset.userDomain;
 
-    if (userId && domain) {
+    if (userId) {
       (async () => {
         try {
-          const userEntity = await repositories.user.getUserById({domain, id: userId});
+          const userEntity = await repositories.user.getUserById({domain: domain || '', id: userId});
           showUserDetails(userEntity);
         } catch (error) {
           if (error instanceof UserError && error.type !== UserError.TYPE.USER_NOT_FOUND) {
