@@ -205,7 +205,7 @@ describe('renderMessage', () => {
 
   it('does not render a broken markdown link', () => {
     expect(renderMessage(`[sometext](https://some.domain"><script>alert("oops")</script>)`)).toBe(
-      `[sometext](<a href="https://some.domain" target="_blank" rel="nofollow noopener noreferrer">https://some.domain</a>&quot;&gt;&lt;script&gt;alert(&quot;oops&quot;)&lt;/script&gt;)`,
+      `<a href=\"https://some.domain%22%3E%3Cscript%3Ealert(%22oops%22)%3C/script%3E\" target=\"_blank\" rel=\"nofollow noopener noreferrer\" data-md-link=\"true\" data-uie-name=\"markdown-link\">sometext</a>`,
     );
   });
 
