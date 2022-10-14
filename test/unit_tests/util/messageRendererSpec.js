@@ -209,6 +209,13 @@ describe('renderMessage', () => {
     );
   });
 
+  it('does not add a < behind URLs within <code> tags 2', () => {
+    expect(renderMessage('` http://wire.com`\n`123`')).toBe('<code> http://wire.com</code><br><code>123</code>');
+  });
+  it('does not add a < behind URLs within <code> tags', () => {
+    expect(renderMessage('` http://wire.com`')).toBe('<code> http://wire.com</code>');
+  });
+
   it('escapes url params', () => {
     expect(renderMessage(`[sometext](https://some.domain?param1=a&param2=b)`)).toBe(
       `<a href="https://some.domain?param1=a&amp;param2=b" target="_blank" rel="nofollow noopener noreferrer" data-md-link="true" data-uie-name="markdown-link">sometext</a>`,
