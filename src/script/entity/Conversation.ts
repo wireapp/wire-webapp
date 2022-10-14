@@ -111,7 +111,7 @@ export class Conversation {
   public readonly display_name: ko.PureComputed<string>;
   public readonly firstUserEntity: ko.PureComputed<User>;
   public readonly enforcedTeamMessageTimer: ko.PureComputed<number>;
-  public readonly globalMessageTimer: ko.Observable<number>;
+  public readonly globalMessageTimer: ko.Observable<number | null>;
   public readonly hasAdditionalMessages: ko.Observable<boolean>;
   public readonly hasGlobalMessageTimer: ko.PureComputed<boolean>;
   public readonly hasGuest: ko.PureComputed<boolean>;

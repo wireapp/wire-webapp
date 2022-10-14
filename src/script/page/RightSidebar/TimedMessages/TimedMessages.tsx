@@ -78,10 +78,8 @@ const TimedMessages: FC<TimedMessagesPanelProps> = ({activeConversation, onClose
   const timedMessageChange = (value: number): void => {
     const finalTimer = value === 0 ? null : value;
 
-    if (finalTimer) {
-      activeConversation.globalMessageTimer(finalTimer);
-      repositories.conversation.updateConversationMessageTimer(activeConversation, finalTimer);
-    }
+    activeConversation.globalMessageTimer(finalTimer);
+    repositories.conversation.updateConversationMessageTimer(activeConversation, finalTimer);
   };
 
   return (
