@@ -202,7 +202,7 @@ export const TitleBar: React.FC<TitleBarProps> = ({
             variant={IconButtonVariant.SECONDARY}
             className="conversation-title-bar-icon icon-back"
             css={{marginBottom: 0}}
-            onClick={() => setLeftSidebar}
+            onClick={setLeftSidebar}
           />
         )}
         {isActivatedAccount && !mdBreakpoint && (
