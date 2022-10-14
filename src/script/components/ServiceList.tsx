@@ -21,7 +21,7 @@ import React, {Fragment} from 'react';
 
 import cx from 'classnames';
 
-import ParticipantItem from 'Components/list/ParticipantItem';
+import {ParticipantItem} from 'Components/list/ParticipantItem';
 import {KEY} from 'Util/KeyboardUtil';
 
 import type {ServiceEntity} from '../integration/ServiceEntity';
@@ -87,4 +87,4 @@ const ServiceList: React.FC<ServiceListProps> = ({
   );
 };
 
-export default ServiceList;
+export {ServiceList};

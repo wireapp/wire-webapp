@@ -22,12 +22,12 @@ import React from 'react';
 import {QualifiedId} from '@wireapp/api-client/src/user';
 import {VIDEO_STATE} from '@wireapp/avs';
 
-import Avatar, {AVATAR_SIZE} from 'Components/Avatar';
-import Icon from 'Components/Icon';
+import {Avatar, AVATAR_SIZE} from 'Components/Avatar';
+import {Icon} from 'Components/Icon';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 
-import Video from './Video';
+import {Video} from './Video';
 
 import type {Participant} from '../../calling/Participant';
 
@@ -163,4 +163,4 @@ const GroupVideoGridTile: React.FC<GroupVideoGridTileProps> = ({
   );
 };
 
-export default GroupVideoGridTile;
+export {GroupVideoGridTile};

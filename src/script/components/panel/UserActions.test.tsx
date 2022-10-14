@@ -27,7 +27,7 @@ import {User} from 'src/script/entity/User';
 import {ActionsViewModel} from 'src/script/view_model/ActionsViewModel';
 import {noop} from 'Util/util';
 
-import UserActions, {ActionIdentifier, Actions} from './UserActions';
+import {UserActions, ActionIdentifier, Actions} from './UserActions';
 
 const actionsViewModel = {} as ActionsViewModel;
 

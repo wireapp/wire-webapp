@@ -20,7 +20,7 @@
 import {act, waitFor} from '@testing-library/react';
 import {TypeUtil} from '@wireapp/commons';
 
-import Index from './Index';
+import {Index} from './Index';
 
 import {Config, Configuration} from '../../Config';
 import {initialRootState} from '../module/reducer';
@@ -28,9 +28,7 @@ import {initialAuthState} from '../module/reducer/authReducer';
 import {ROUTE} from '../route';
 import {mockStoreFactory} from '../util/test/mockStoreFactory';
 import {mountComponent} from '../util/test/TestUtil';
-
 jest.mock('../util/SVGProvider');
-
 describe('when visiting the index page', () => {
   it('shows the logo', () => {
     const {getByTestId} = mountComponent(

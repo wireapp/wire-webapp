@@ -19,9 +19,9 @@
 
 import {FC} from 'react';
 
-import Icon from 'Components/Icon';
-import EnrichedFields from 'Components/panel/EnrichedFields';
-import UserDetails from 'Components/panel/UserDetails';
+import {Icon} from 'Components/Icon';
+import {EnrichedFields} from 'Components/panel/EnrichedFields';
+import {UserDetails} from 'Components/panel/UserDetails';
 import {t} from 'Util/LocalizerUtil';
 
 import {User} from '../../../../../entity/User';
@@ -74,4 +74,4 @@ const UserConversationDetails: FC<UserConversationDetailsProps> = ({
   );
 };
 
-export default UserConversationDetails;
+export {UserConversationDetails};

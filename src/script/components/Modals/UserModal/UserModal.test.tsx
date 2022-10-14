@@ -27,7 +27,7 @@ import {UserRepository} from 'src/script/user/UserRepository';
 import {UserState} from 'src/script/user/UserState';
 import {ActionsViewModel} from 'src/script/view_model/ActionsViewModel';
 
-import UserModal from './UserModal';
+import {UserModal} from './UserModal';
 
 describe('UserModal', () => {
   it('correctly fetches user from user repository', async () => {

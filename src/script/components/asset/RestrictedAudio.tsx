@@ -19,7 +19,7 @@
 
 import React from 'react';
 
-import Icon from 'Components/Icon';
+import {Icon} from 'Components/Icon';
 import {t} from 'Util/LocalizerUtil';
 
 export type RestrictedAudioProps = React.HTMLProps<HTMLDivElement>;
@@ -40,4 +40,4 @@ const RestrictedAudio: React.FC<RestrictedAudioProps> = ({}) => {
   );
 };
 
-export default RestrictedAudio;
+export {RestrictedAudio};

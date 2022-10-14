@@ -27,7 +27,7 @@ import {Logger, getLogger} from 'Util/Logger';
 import {TypedEventTarget} from 'Util/TypedEventTarget';
 import {createRandomUuid} from 'Util/util';
 
-import PrimaryModal from '../components/Modals/PrimaryModal';
+import {PrimaryModal} from '../components/Modals/PrimaryModal';
 import type {Conversation} from '../entity/Conversation';
 import type {PropertiesService} from '../properties/PropertiesService';
 

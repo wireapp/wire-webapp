@@ -109,6 +109,6 @@ const EnrichedFields: React.FC<EnrichedFieldsProps> = ({
   );
 };
 
-export default EnrichedFields;
+export {EnrichedFields};
 
 registerReactComponent<EnrichedFieldsProps>('enriched-fields', EnrichedFields);

@@ -20,10 +20,10 @@
 import {CONVERSATION_TYPE} from '@wireapp/api-client/src/conversation';
 import type {QualifiedId} from '@wireapp/api-client/src/user/';
 
-import TestPage from 'Util/test/TestPage';
+import {TestPage} from 'Util/test/TestPage';
 import {createRandomUuid, noop} from 'Util/util';
 
-import GroupList, {GroupListProps} from './GroupList';
+import {GroupList, GroupListProps} from './GroupList';
 
 import {AssetRepository} from '../../../../../assets/AssetRepository';
 import {Conversation} from '../../../../../entity/Conversation';

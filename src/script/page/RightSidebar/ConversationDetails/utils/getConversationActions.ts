@@ -122,4 +122,4 @@ const getConversationActions = (
   return allMenuElements.filter(menuElement => menuElement.condition).map(menuElement => menuElement.item);
 };
 
-export default getConversationActions;
+export {getConversationActions};

@@ -19,14 +19,14 @@
 
 import React from 'react';
 
-import Icon from 'Components/Icon';
+import {Icon} from 'Components/Icon';
 import {User} from 'src/script/entity/User';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 import {useDisposableRef} from 'Util/useDisposableRef';
 
-import ConnectedMessage from './memberMessage/ConnectedMessage';
-import MessageTime from './MessageTime';
+import {ConnectedMessage} from './memberMessage/ConnectedMessage';
+import {MessageTime} from './MessageTime';
 
 import {MemberMessage as MemberMessageEntity} from '../../../entity/message/MemberMessage';
 
@@ -180,4 +180,4 @@ const MemberMessage: React.FC<MemberMessageProps> = ({
   );
 };
 
-export default MemberMessage;
+export {MemberMessage};

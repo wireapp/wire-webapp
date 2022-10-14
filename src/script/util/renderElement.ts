@@ -86,4 +86,4 @@ const renderElement =
     reactRoot.render(element);
   };
 
-export default renderElement;
+export {renderElement};

@@ -27,7 +27,7 @@ import {connect} from 'react-redux';
 import {useNavigate} from 'react-router-dom';
 import {AnyAction, Dispatch} from 'redux';
 
-import Page from './Page';
+import {Page} from './Page';
 
 import {Config} from '../../Config';
 import '../../localization/Localizer';
@@ -35,11 +35,11 @@ import {indexStrings, logoutReasonStrings} from '../../strings';
 import {bindActionCreators, RootState} from '../module/reducer';
 import * as AuthSelector from '../module/selector/AuthSelector';
 import {QUERY_KEY, ROUTE} from '../route';
-import SVGProvider from '../util/SVGProvider';
+import {getSVG} from '../util/SVGProvider';
 
 type Props = React.HTMLProps<HTMLDivElement>;
 
-const Index = ({defaultSSOCode}: Props & ConnectedProps & DispatchProps) => {
+const IndexComponent = ({defaultSSOCode}: Props & ConnectedProps & DispatchProps) => {
   const {formatMessage: _} = useIntl();
   const navigate = useNavigate();
   const [logoutReason, setLogoutReason] = useState<string>();
@@ -79,7 +79,7 @@ const Index = ({defaultSSOCode}: Props & ConnectedProps & DispatchProps) => {
           style={{marginBottom: '80px'}}
           data-uie-name="ui-wire-logo"
         >
-          <g dangerouslySetInnerHTML={{__html: SVGProvider['logo-full-icon']?.documentElement?.innerHTML}} />
+          <g dangerouslySetInnerHTML={{__html: getSVG('logo-full-icon')?.documentElement?.innerHTML}} />
         </SVGIcon>
         <Text
           block
@@ -178,4 +178,6 @@ const mapStateToProps = (state: RootState) => ({
 type DispatchProps = ReturnType<typeof mapDispatchToProps>;
 const mapDispatchToProps = (dispatch: Dispatch<AnyAction>) => bindActionCreators({}, dispatch);
 
-export default connect(mapStateToProps, mapDispatchToProps)(Index);
+const Index = connect(mapStateToProps, mapDispatchToProps)(IndexComponent);
+
+export {Index};

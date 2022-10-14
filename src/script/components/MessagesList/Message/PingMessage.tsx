@@ -24,8 +24,8 @@ import cx from 'classnames';
 import {Message} from 'src/script/entity/message/Message';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 
-import MessageTime from './MessageTime';
-import ReadReceiptStatus from './ReadReceiptStatus';
+import {MessageTime} from './MessageTime';
+import {ReadReceiptStatus} from './ReadReceiptStatus';
 
 import {PingMessage as PingMessageEntity} from '../../../entity/message/PingMessage';
 
@@ -82,4 +82,4 @@ const PingMessage: React.FC<PingMessageProps> = ({
   );
 };
 
-export default PingMessage;
+export {PingMessage};

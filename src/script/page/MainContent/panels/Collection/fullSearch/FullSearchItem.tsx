@@ -19,7 +19,7 @@
 
 import React from 'react';
 
-import Avatar, {AVATAR_SIZE} from 'Components/Avatar';
+import {Avatar, AVATAR_SIZE} from 'Components/Avatar';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {handleKeyDown} from 'Util/KeyboardUtil';
 import {formatDateShort} from 'Util/TimeUtil';
@@ -78,4 +78,4 @@ const FullSearchItem: React.FC<FullSearchItemProps> = ({message, onClick, format
   );
 };
 
-export default FullSearchItem;
+export {FullSearchItem};

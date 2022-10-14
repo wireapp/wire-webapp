@@ -19,13 +19,12 @@
 
 import {fireEvent} from '@testing-library/react';
 
-import SetHandle from './SetHandle';
+import {SetHandle} from './SetHandle';
 
 import {actionRoot} from '../module/action';
 import {initialRootState} from '../module/reducer';
 import {mockStoreFactory} from '../util/test/mockStoreFactory';
 import {mountComponent} from '../util/test/TestUtil';
-
 jest.mock('../util/SVGProvider');
 
 const handleInputId = 'enter-handle';

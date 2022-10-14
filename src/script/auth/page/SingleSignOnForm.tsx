@@ -60,7 +60,7 @@ export interface SingleSignOnFormProps extends React.HTMLAttributes<HTMLDivEleme
 
 const SSO_CODE_PREFIX = 'wire-';
 const SSO_CODE_PREFIX_REGEX = '[wW][iI][rR][eE]-';
-const SingleSignOnForm = ({
+const SingleSignOnFormComponent = ({
   initialCode,
   isFetching,
   loginError,
@@ -344,4 +344,6 @@ const mapDispatchToProps = (dispatch: Dispatch<AnyAction>) =>
     dispatch,
   );
 
-export default connect(mapStateToProps, mapDispatchToProps)(SingleSignOnForm);
+const SingleSignOnForm = connect(mapStateToProps, mapDispatchToProps)(SingleSignOnFormComponent);
+
+export {SingleSignOnForm};

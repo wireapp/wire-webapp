@@ -19,8 +19,8 @@
 
 import React from 'react';
 
-import Avatar, {AVATAR_SIZE} from 'Components/Avatar';
-import GroupAvatar from 'Components/avatar/GroupAvatar';
+import {Avatar, AVATAR_SIZE} from 'Components/Avatar';
+import {GroupAvatar} from 'Components/avatar/GroupAvatar';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {handleKeyDown} from 'Util/KeyboardUtil';
 
@@ -69,4 +69,4 @@ const GroupListItem: React.FC<GroupListItemProps> = ({assetRepository, click, gr
   );
 };
 
-export default GroupListItem;
+export {GroupListItem};

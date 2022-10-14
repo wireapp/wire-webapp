@@ -72,6 +72,7 @@ describe('messageListBindings', () => {
                 }
               });
               resolve();
+              // eslint-disable-next-line no-magic-numbers
             }, 50);
           });
         });

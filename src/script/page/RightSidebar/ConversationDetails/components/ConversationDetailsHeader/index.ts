@@ -17,4 +17,4 @@
  *
  */
 
-export {default} from './ConversationDetailsHeader';
+export * from './ConversationDetailsHeader';

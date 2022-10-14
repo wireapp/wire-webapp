@@ -55,4 +55,4 @@ const getRichTextInput = (currentMentions: MentionEntity[], inputValue: string) 
     .replace(/<br><\/span>$/, '<br>&nbsp;</span>');
 };
 
-export default getRichTextInput;
+export {getRichTextInput};

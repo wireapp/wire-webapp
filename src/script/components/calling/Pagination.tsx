@@ -99,4 +99,4 @@ const Pagination: React.FC<PaginationProps> = ({totalPages, currentPage, onChang
   );
 };
 
-export default Pagination;
+export {Pagination};

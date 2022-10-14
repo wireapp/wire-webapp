@@ -38,6 +38,6 @@ const LoadingBar: React.FC<LoadingBarProps> = ({progress, message, className = '
   </div>
 );
 
-export default LoadingBar;
+export {LoadingBar};
 
 registerReactComponent('loading-bar', LoadingBar);

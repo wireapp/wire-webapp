@@ -101,4 +101,4 @@ const ConversationProtocolDetails: React.FC<ConversationProtocolDetailsProps> = 
   );
 };
 
-export default ConversationProtocolDetails;
+export {ConversationProtocolDetails};

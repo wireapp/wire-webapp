@@ -32,4 +32,4 @@ const RootProvider: FC<RootProviderProps> = ({children, value}) => {
   return <RootContext.Provider value={value}>{children}</RootContext.Provider>;
 };
 
-export default RootProvider;
+export {RootProvider};

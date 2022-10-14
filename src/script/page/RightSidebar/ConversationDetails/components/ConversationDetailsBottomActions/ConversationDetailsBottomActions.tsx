@@ -19,7 +19,7 @@
 
 import {FC} from 'react';
 
-import Icon from 'Components/Icon';
+import {Icon} from 'Components/Icon';
 import {t} from 'Util/LocalizerUtil';
 
 interface ConversationDetailsBottomActionsProps {
@@ -82,4 +82,4 @@ const ConversationDetailsBottomActions: FC<ConversationDetailsBottomActionsProps
   );
 };
 
-export default ConversationDetailsBottomActions;
+export {ConversationDetailsBottomActions};

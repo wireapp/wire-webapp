@@ -23,7 +23,7 @@ import ko from 'knockout';
 
 import {ContentState, ContentViewModel} from 'src/script/view_model/ContentViewModel';
 
-import Preferences from './Preferences';
+import {Preferences} from './Preferences';
 
 describe('Preferences', () => {
   const defaultParams = {

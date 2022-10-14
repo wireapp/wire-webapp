@@ -27,7 +27,7 @@ import {Conversation} from 'src/script/entity/Conversation';
 import {User} from 'src/script/entity/User';
 import {MediaDevicesHandler} from 'src/script/media/MediaDevicesHandler';
 
-import FullscreenVideoCall, {FullscreenVideoCallProps} from './FullscreenVideoCall';
+import {FullscreenVideoCall, FullscreenVideoCallProps} from './FullscreenVideoCall';
 
 describe('fullscreenVideoCall', () => {
   const createProps = (): FullscreenVideoCallProps => {

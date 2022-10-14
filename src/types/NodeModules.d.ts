@@ -17,4 +17,9 @@
  *
  */
 
-export * from './Collection';
+declare module '@koush/wrtc' {
+  export const nonstandard: {
+    RTCAudioSource: any;
+  };
+  export const MediaStream: any;
+}

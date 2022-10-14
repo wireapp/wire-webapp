@@ -27,10 +27,10 @@ import {t} from 'Util/LocalizerUtil';
 import {getLogger} from 'Util/Logger';
 import {capitalizeFirstChar} from 'Util/StringUtil';
 
-import DeviceDetails from './userDevices/DeviceDetails';
-import DeviceList from './userDevices/DeviceList';
-import NoDevicesFound from './userDevices/NoDevicesFound';
-import SelfFingerprint from './userDevices/SelfFingerprint';
+import {DeviceDetails} from './userDevices/DeviceDetails';
+import {DeviceList} from './userDevices/DeviceList';
+import {NoDevicesFound} from './userDevices/NoDevicesFound';
+import {SelfFingerprint} from './userDevices/SelfFingerprint';
 
 import {ClientEntity} from '../client/ClientEntity';
 import {ClientRepository} from '../client/ClientRepository';
@@ -165,7 +165,7 @@ const UserDevices: React.FC<UserDevicesProps> = ({
   );
 };
 
-export default UserDevices;
+export {UserDevices};
 
 export const makeUserDevicesHistory = () => {
   const history = ko.observableArray<UserDevicesHistoryEntry>();

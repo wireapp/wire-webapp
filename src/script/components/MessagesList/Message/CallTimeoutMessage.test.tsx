@@ -23,7 +23,7 @@ import ko from 'knockout';
 
 import {CallingTimeoutMessage as CallTimeoutMessageEntity} from 'src/script/entity/message/CallingTimeoutMessage';
 
-import CallTimeoutMessage from './CallTimeoutMessage';
+import {CallTimeoutMessage} from './CallTimeoutMessage';
 
 const createCallTimeoutMessage = (partialCallTimeoutMessage: Partial<CallTimeoutMessageEntity>) => {
   const callMessage: Partial<CallTimeoutMessageEntity> = {

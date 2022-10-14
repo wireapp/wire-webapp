@@ -44,4 +44,4 @@ function useRoveFocus(size: number, defaultFocus = 0) {
   return {currentFocus, handleKeyDown, setCurrentFocus};
 }
 
-export default useRoveFocus;
+export {useRoveFocus};

@@ -22,12 +22,12 @@ import React, {ChangeEvent, Fragment, useState} from 'react';
 import cx from 'classnames';
 import {container} from 'tsyringe';
 
-import ParticipantItem from 'Components/list/ParticipantItem';
+import {ParticipantItem} from 'Components/list/ParticipantItem';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {isEnterKey, isSpaceKey} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
 
-import InViewport from './utils/InViewport';
+import {InViewport} from './utils/InViewport';
 
 import type {ConversationRepository} from '../conversation/ConversationRepository';
 import {ConversationState} from '../conversation/ConversationState';
@@ -254,4 +254,4 @@ const UserList: React.FC<UserListProps> = ({
   );
 };
 
-export default UserList;
+export {UserList};

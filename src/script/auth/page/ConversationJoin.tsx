@@ -42,19 +42,19 @@ import {AnyAction, Dispatch} from 'redux';
 
 import {noop} from 'Util/util';
 
-import EntropyContainer from './EntropyContainer';
+import {EntropyContainer} from './EntropyContainer';
 
 import {Config} from '../../Config';
 import {conversationJoinStrings} from '../../strings';
-import AppAlreadyOpen from '../component/AppAlreadyOpen';
-import RouterLink from '../component/RouterLink';
-import UnsupportedBrowser from '../component/UnsupportedBrowser';
-import WirelessContainer from '../component/WirelessContainer';
+import {AppAlreadyOpen} from '../component/AppAlreadyOpen';
+import {RouterLink} from '../component/RouterLink';
+import {UnsupportedBrowser} from '../component/UnsupportedBrowser';
+import {WirelessContainer} from '../component/WirelessContainer';
 import {EXTERNAL_ROUTE} from '../externalRoute';
 import {actionRoot as ROOT_ACTIONS} from '../module/action/';
 import {BackendError} from '../module/action/BackendError';
 import {ValidationError} from '../module/action/ValidationError';
-import {RootState, bindActionCreators} from '../module/reducer';
+import {bindActionCreators, RootState} from '../module/reducer';
 import * as AuthSelector from '../module/selector/AuthSelector';
 import * as ConversationSelector from '../module/selector/ConversationSelector';
 import * as SelfSelector from '../module/selector/SelfSelector';
@@ -65,7 +65,7 @@ import * as StringUtil from '../util/stringUtil';
 
 type Props = React.HTMLProps<HTMLDivElement>;
 
-const ConversationJoin = ({
+const ConversationJoinComponent = ({
   doCheckConversationCode,
   doJoinConversationByCode,
   doInit,
@@ -366,4 +366,6 @@ const mapDispatchToProps = (dispatch: Dispatch<AnyAction>) =>
     dispatch,
   );
 
-export default connect(mapStateToProps, mapDispatchToProps)(ConversationJoin);
+const ConversationJoin = connect(mapStateToProps, mapDispatchToProps)(ConversationJoinComponent);
+
+export {ConversationJoin};

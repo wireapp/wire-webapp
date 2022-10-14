@@ -43,11 +43,11 @@ import {AnyAction, Dispatch} from 'redux';
 
 import {getLogger} from 'Util/Logger';
 
-import Page from './Page';
+import {Page} from './Page';
 
 import {addLocaleToUrl} from '../../externalRoute';
 import {teamNameStrings} from '../../strings';
-import RouterLink from '../component/RouterLink';
+import {RouterLink} from '../component/RouterLink';
 import {EXTERNAL_ROUTE} from '../externalRoute';
 import {actionRoot as ROOT_ACTIONS} from '../module/action/';
 import {ValidationError} from '../module/action/ValidationError';
@@ -58,7 +58,7 @@ import {parseError, parseValidationErrors} from '../util/errorUtil';
 
 type Props = React.HTMLProps<HTMLDivElement>;
 
-const TeamName = ({
+const TeamNameComponent = ({
   teamName,
   enterTeamCreationFlow,
   resetInviteErrors,
@@ -209,4 +209,6 @@ const mapDispatchToProps = (dispatch: Dispatch<AnyAction>) =>
     dispatch,
   );
 
-export default connect(mapStateToProps, mapDispatchToProps)(TeamName);
+const TeamName = connect(mapStateToProps, mapDispatchToProps)(TeamNameComponent);
+
+export {TeamName};

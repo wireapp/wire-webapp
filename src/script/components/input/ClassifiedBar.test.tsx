@@ -22,7 +22,7 @@ import {render} from '@testing-library/react';
 import {User} from 'src/script/entity/User';
 import {createRandomUuid} from 'Util/util';
 
-import ClassifiedBar from './ClassifiedBar';
+import {ClassifiedBar} from './ClassifiedBar';
 
 describe('ClassifiedBar', () => {
   const classifiedDomains = ['same.domain', 'classified.domain', 'other-classified.domain'];

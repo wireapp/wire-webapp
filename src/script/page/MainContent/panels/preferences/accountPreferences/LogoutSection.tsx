@@ -43,4 +43,4 @@ const LogoutSection: React.FC<LogoutSectionProps> = ({clientRepository}) => (
   </section>
 );
 
-export default LogoutSection;
+export {LogoutSection};

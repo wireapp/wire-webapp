@@ -19,7 +19,7 @@
 
 import {act} from '@testing-library/react';
 
-import CustomEnvironmentRedirect from './CustomEnvironmentRedirect';
+import {CustomEnvironmentRedirect} from './CustomEnvironmentRedirect';
 
 import {actionRoot} from '../module/action';
 import {initialRootState} from '../module/reducer';
@@ -27,7 +27,6 @@ import {mockStoreFactory} from '../util/test/mockStoreFactory';
 import {mountComponent} from '../util/test/TestUtil';
 
 jest.mock('../util/SVGProvider');
-
 function createMockedURLSearchParams(value: string) {
   return class MockedURLSearchParams extends window.URLSearchParams {
     constructor() {

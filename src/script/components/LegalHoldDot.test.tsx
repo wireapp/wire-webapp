@@ -19,7 +19,7 @@
 
 import {render} from '@testing-library/react';
 
-import LegalHoldDot from 'Components/LegalHoldDot';
+import {LegalHoldDot} from 'Components/LegalHoldDot';
 
 describe('LegalHoldDot', () => {
   it('shows a pending icon', () => {

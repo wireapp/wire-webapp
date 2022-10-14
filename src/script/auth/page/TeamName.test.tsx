@@ -19,14 +19,13 @@
 
 import {fireEvent} from '@testing-library/react';
 
-import TeamName from './TeamName';
+import {TeamName} from './TeamName';
 
 import {ValidationError} from '../module/action/ValidationError';
 import {initialRootState} from '../module/reducer';
 import {initialAuthState} from '../module/reducer/authReducer';
 import {mockStoreFactory} from '../util/test/mockStoreFactory';
 import {mountComponent} from '../util/test/TestUtil';
-
 jest.mock('../util/SVGProvider');
 
 describe('when entering a team name', () => {

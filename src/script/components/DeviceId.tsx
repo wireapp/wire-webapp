@@ -37,4 +37,4 @@ const DeviceId: React.FC<DeviceIdProps> = ({deviceId}) => {
   );
 };
 
-export default DeviceId;
+export {DeviceId};

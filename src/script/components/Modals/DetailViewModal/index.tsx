@@ -25,10 +25,10 @@ import cx from 'classnames';
 
 import {handleKeyDown, KEY} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
-import renderElement from 'Util/renderElement';
+import {renderElement} from 'Util/renderElement';
 
-import DetailViewModalFooter from './DetailViewModalFooter';
-import DetailViewModalHeader from './DetailViewModalHeader';
+import {DetailViewModalFooter} from './DetailViewModalFooter';
+import {DetailViewModalHeader} from './DetailViewModalHeader';
 
 import {AssetRepository} from '../../../assets/AssetRepository';
 import {ConversationRepository} from '../../../conversation/ConversationRepository';
@@ -267,6 +267,6 @@ const DetailViewModal: FC<DetailViewModalProps> = ({
   );
 };
 
-export default DetailViewModal;
+export {DetailViewModal};
 
 export const showDetailViewModal = renderElement<DetailViewModalProps>(DetailViewModal);

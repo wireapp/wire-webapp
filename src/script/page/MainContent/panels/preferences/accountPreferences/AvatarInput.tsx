@@ -19,14 +19,14 @@
 
 import React from 'react';
 
-import Avatar, {AVATAR_SIZE} from 'Components/Avatar';
-import PrimaryModal from 'Components/Modals/PrimaryModal';
+import {Avatar, AVATAR_SIZE} from 'Components/Avatar';
+import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {handleKeyDown} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
 import {getLogger} from 'Util/Logger';
 import {validateProfileImageResolution} from 'Util/util';
 
-import FileInput from './FileInput';
+import {FileInput} from './FileInput';
 
 import {Config} from '../../../../../Config';
 import {User} from '../../../../../entity/User';
@@ -136,4 +136,4 @@ const AvatarInput: React.FC<AvatarInputProps> = ({selfUser, isActivatedAccount, 
   );
 };
 
-export default AvatarInput;
+export {AvatarInput};

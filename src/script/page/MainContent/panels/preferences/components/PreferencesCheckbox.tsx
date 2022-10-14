@@ -19,7 +19,7 @@
 
 import React, {useRef} from 'react';
 
-import Checkbox from 'Components/Checkbox';
+import {Checkbox} from 'Components/Checkbox';
 
 interface PreferencesCheckboxProps {
   checked: boolean;
@@ -57,4 +57,4 @@ const PreferencesCheckbox: React.FC<PreferencesCheckboxProps> = ({
   );
 };
 
-export default PreferencesCheckbox;
+export {PreferencesCheckbox};

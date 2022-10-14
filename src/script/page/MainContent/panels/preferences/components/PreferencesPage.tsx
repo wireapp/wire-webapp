@@ -68,4 +68,4 @@ const PreferencesPage: React.FC<PreferencesPageProps> = ({title, children}) => {
   );
 };
 
-export default PreferencesPage;
+export {PreferencesPage};

@@ -22,22 +22,22 @@ import {FC, ReactNode, useContext, useState} from 'react';
 import {CSSTransition, SwitchTransition} from 'react-transition-group';
 import {container} from 'tsyringe';
 
-import ConnectRequests from 'Components/ConnectRequests';
-import ConversationList from 'Components/Conversation';
-import HistoryExport from 'Components/HistoryExport';
-import HistoryImport from 'Components/HistoryImport';
-import Icon from 'Components/Icon';
-import GroupCreationModal from 'Components/Modals/GroupCreation/GroupCreationModal';
-import LegalHoldModal from 'Components/Modals/LegalHoldModal/LegalHoldModal';
+import {ConnectRequests} from 'Components/ConnectRequests';
+import {ConversationList} from 'Components/Conversation';
+import {HistoryExport} from 'Components/HistoryExport';
+import {HistoryImport} from 'Components/HistoryImport';
+import {Icon} from 'Components/Icon';
+import {GroupCreationModal} from 'Components/Modals/GroupCreation/GroupCreationModal';
+import {LegalHoldModal} from 'Components/Modals/LegalHoldModal/LegalHoldModal';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 
-import Collection from './panels/Collection';
-import AboutPreferences from './panels/preferences/AboutPreferences';
-import AccountPreferences from './panels/preferences/AccountPreferences';
-import AVPreferences from './panels/preferences/AVPreferences';
-import DevicesPreferences from './panels/preferences/devices/DevicesPreferences';
-import OptionPreferences from './panels/preferences/OptionPreferences';
+import {Collection} from './panels/Collection';
+import {AboutPreferences} from './panels/preferences/AboutPreferences';
+import {AccountPreferences} from './panels/preferences/AccountPreferences';
+import {AVPreferences} from './panels/preferences/AVPreferences';
+import {DevicesPreferences} from './panels/preferences/devices/DevicesPreferences';
+import {OptionPreferences} from './panels/preferences/OptionPreferences';
 
 import {ClientState} from '../../client/ClientState';
 import {ConversationState} from '../../conversation/ConversationState';
@@ -48,13 +48,11 @@ import {RightSidebarParams} from '../AppMain';
 import {PanelState} from '../RightSidebar/RightSidebar';
 import {RootContext} from '../RootProvider';
 
-const Animated: FC<{children: ReactNode}> = ({children, ...rest}) => {
-  return (
-    <CSSTransition classNames="slide-in-left" timeout={{enter: 500}} {...rest}>
-      {children}
-    </CSSTransition>
-  );
-};
+const Animated: FC<{children: ReactNode}> = ({children, ...rest}) => (
+  <CSSTransition classNames="slide-in-left" timeout={{enter: 500}} {...rest}>
+    {children}
+  </CSSTransition>
+);
 
 interface MainContentProps {
   openRightSidebar: (panelState: PanelState, params: RightSidebarParams) => void;
@@ -221,4 +219,4 @@ const MainContent: FC<MainContentProps> = ({
   );
 };
 
-export default MainContent;
+export {MainContent};

@@ -74,4 +74,4 @@ const AcceptNewsModal = ({onConfirm, onDecline}: Props) => {
   );
 };
 
-export default AcceptNewsModal;
+export {AcceptNewsModal};

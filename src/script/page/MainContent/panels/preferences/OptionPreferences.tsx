@@ -28,9 +28,9 @@ import {container} from 'tsyringe';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 
-import PreferencesPage from './components/PreferencesPage';
-import PreferencesRadio from './components/PreferencesRadio';
-import PreferencesSection from './components/PreferencesSection';
+import {PreferencesPage} from './components/PreferencesPage';
+import {PreferencesRadio} from './components/PreferencesRadio';
+import {PreferencesSection} from './components/PreferencesSection';
 
 import {PropertiesRepository} from '../../../../properties/PropertiesRepository';
 import {PROPERTIES_TYPE} from '../../../../properties/PropertiesType';
@@ -223,4 +223,4 @@ const OptionPreferences: React.FC<OptionPreferencesProps> = ({
   );
 };
 
-export default OptionPreferences;
+export {OptionPreferences};

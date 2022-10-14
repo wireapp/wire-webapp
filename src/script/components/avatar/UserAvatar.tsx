@@ -24,12 +24,12 @@ import {COLOR} from '@wireapp/react-ui-kit';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 
-import AvatarBackground from './AvatarBackground';
-import AvatarBadge from './AvatarBadge';
-import AvatarBorder from './AvatarBorder';
-import AvatarImage from './AvatarImage';
-import AvatarInitials from './AvatarInitials';
-import AvatarWrapper from './AvatarWrapper';
+import {AvatarBackground} from './AvatarBackground';
+import {AvatarBadge} from './AvatarBadge';
+import {AvatarBorder} from './AvatarBorder';
+import {AvatarImage} from './AvatarImage';
+import {AvatarInitials} from './AvatarInitials';
+import {AvatarWrapper} from './AvatarWrapper';
 
 import {User} from '../../entity/User';
 import {AVATAR_SIZE, STATE} from '../Avatar';
@@ -106,4 +106,4 @@ const UserAvatar: React.FunctionComponent<UserAvatarProps> = ({
   );
 };
 
-export default UserAvatar;
+export {UserAvatar};

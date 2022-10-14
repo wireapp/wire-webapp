@@ -81,7 +81,7 @@ const usePrimaryModalState = create<PrimaryModalState>((set, get) => ({
   updateErrorMessage: nextErrorMessage => set(state => ({...state, errorMessage: nextErrorMessage})),
 }));
 
-const addNewModalToQueue = (type: PrimaryModalType, options: ModalOptions, modalId = createRandomUuid()) => {
+const addNewModalToQueue = (type: PrimaryModalType, options: ModalOptions, modalId = createRandomUuid()): void => {
   const {currentModalId, existsInQueue, addToQueue, replaceInQueue} = usePrimaryModalState.getState();
 
   const alreadyOpen = modalId === currentModalId;
@@ -99,7 +99,7 @@ const addNewModalToQueue = (type: PrimaryModalType, options: ModalOptions, modal
   showNextModalInQueue();
 };
 
-const showNextModalInQueue = () => {
+const showNextModalInQueue = (): void => {
   const {queue, removeFirstItemInQueue} = usePrimaryModalState.getState();
   if (queue.length > 0) {
     const nextModalToShow = queue[0];
@@ -209,7 +209,7 @@ const updateCurrentModalContent = (type: PrimaryModalType, options: ModalOptions
   updateCurrentModalId(id ?? null);
 };
 
-const removeCurrentModal = () => {
+const removeCurrentModal = (): void => {
   const {currentModalContent, updateCurrentModalId} = usePrimaryModalState.getState();
 
   currentModalContent?.closeFn();

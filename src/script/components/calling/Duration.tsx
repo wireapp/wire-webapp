@@ -44,4 +44,4 @@ const Duration: React.FC<DurationProps> = ({startedAt}) => {
   return <>{duration}</>;
 };
 
-export default Duration;
+export {Duration};

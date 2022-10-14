@@ -36,7 +36,7 @@ import {ConnectionMapper} from './ConnectionMapper';
 import type {ConnectionService} from './ConnectionService';
 import {ConnectionState} from './ConnectionState';
 
-import PrimaryModal from '../components/Modals/PrimaryModal';
+import {PrimaryModal} from '../components/Modals/PrimaryModal';
 import {Config} from '../Config';
 import type {Conversation} from '../entity/Conversation';
 import {MemberMessage} from '../entity/message/MemberMessage';

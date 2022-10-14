@@ -90,4 +90,4 @@ const BaseToggle: React.FC<BaseToggleProps> = ({
   );
 };
 
-export default BaseToggle;
+export {BaseToggle};

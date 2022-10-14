@@ -23,12 +23,12 @@ import {ArrowIcon, COLOR, Column, Columns, Container, ContainerXS, H1, IsMobile}
 import {useIntl} from 'react-intl';
 import {useNavigate} from 'react-router-dom';
 
-import Page from './Page';
+import {Page} from './Page';
 
 import {Config} from '../../../script/Config';
 import {createAccountStrings} from '../../strings';
-import AccountForm from '../component/AccountForm';
-import RouterLink from '../component/RouterLink';
+import {AccountForm} from '../component/AccountForm';
+import {RouterLink} from '../component/RouterLink';
 import {ROUTE} from '../route';
 
 type Props = React.HTMLProps<HTMLDivElement>;
@@ -79,4 +79,4 @@ const CreateAccount = ({}: Props) => {
   );
 };
 
-export default CreateAccount;
+export {CreateAccount};

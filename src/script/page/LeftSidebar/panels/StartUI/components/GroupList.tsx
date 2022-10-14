@@ -21,7 +21,7 @@ import React from 'react';
 
 import {container} from 'tsyringe';
 
-import GroupListItem from './groupList/GroupListItem';
+import {GroupListItem} from './groupList/GroupListItem';
 
 import {AssetRepository} from '../../../../../assets/AssetRepository';
 import type {Conversation} from '../../../../../entity/Conversation';
@@ -49,4 +49,4 @@ const GroupList: React.FC<GroupListProps> = ({
   );
 };
 
-export default GroupList;
+export {GroupList};

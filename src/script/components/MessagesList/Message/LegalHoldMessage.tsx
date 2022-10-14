@@ -22,7 +22,7 @@ import React from 'react';
 import {amplify} from 'amplify';
 import {container} from 'tsyringe';
 
-import LegalHoldDot from 'Components/LegalHoldDot';
+import {LegalHoldDot} from 'Components/LegalHoldDot';
 import {t} from 'Util/LocalizerUtil';
 
 import {ConversationState} from '../../../conversation/ConversationState';
@@ -71,4 +71,4 @@ const LegalHoldMessage: React.FC<LegalHoldMessageProps> = ({
   );
 };
 
-export default LegalHoldMessage;
+export {LegalHoldMessage};

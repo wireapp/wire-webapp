@@ -19,7 +19,7 @@
 
 import {FC} from 'react';
 
-import Icon from 'Components/Icon';
+import {Icon} from 'Components/Icon';
 import {t} from 'Util/LocalizerUtil';
 
 import {Config} from '../../Config';
@@ -82,4 +82,4 @@ const PastedFileControls: FC<PastedFileControlsProps> = ({pastedFile, onClear, o
   );
 };
 
-export default PastedFileControls;
+export {PastedFileControls};

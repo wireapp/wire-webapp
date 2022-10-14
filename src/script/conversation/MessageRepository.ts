@@ -72,7 +72,7 @@ import {AssetRepository} from '../assets/AssetRepository';
 import {AssetTransferState} from '../assets/AssetTransferState';
 import {AudioType} from '../audio/AudioType';
 import {ClientState} from '../client/ClientState';
-import PrimaryModal from '../components/Modals/PrimaryModal';
+import {PrimaryModal} from '../components/Modals/PrimaryModal';
 import {EventBuilder} from '../conversation/EventBuilder';
 import {CryptographyRepository} from '../cryptography/CryptographyRepository';
 import {GENERIC_MESSAGE_TYPE} from '../cryptography/GenericMessageType';

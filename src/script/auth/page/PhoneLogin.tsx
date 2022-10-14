@@ -45,12 +45,12 @@ import {connect} from 'react-redux';
 import {useNavigate} from 'react-router-dom';
 import {AnyAction, Dispatch} from 'redux';
 
-import Page from './Page';
+import {Page} from './Page';
 
 import {loginStrings, phoneLoginStrings} from '../../strings';
-import AppAlreadyOpen from '../component/AppAlreadyOpen';
-import PhoneLoginForm from '../component/PhoneLoginForm';
-import RouterLink from '../component/RouterLink';
+import {AppAlreadyOpen} from '../component/AppAlreadyOpen';
+import {PhoneLoginForm} from '../component/PhoneLoginForm';
+import {RouterLink} from '../component/RouterLink';
 import {actionRoot} from '../module/action';
 import {ValidationError} from '../module/action/ValidationError';
 import {RootState, bindActionCreators} from '../module/reducer';
@@ -60,7 +60,7 @@ import {isValidationError, parseError, parseValidationErrors} from '../util/erro
 
 type Props = React.HTMLProps<HTMLDivElement>;
 
-const PhoneLogin = ({
+const PhoneLoginComponent = ({
   pushLoginData,
   doSendPhoneLoginCode,
   isFetching,
@@ -172,4 +172,6 @@ const mapDispatchToProps = (dispatch: Dispatch<AnyAction>) =>
     dispatch,
   );
 
-export default connect(mapStateToProps, mapDispatchToProps)(PhoneLogin);
+const PhoneLogin = connect(mapStateToProps, mapDispatchToProps)(PhoneLoginComponent);
+
+export {PhoneLogin};

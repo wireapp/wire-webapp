@@ -21,7 +21,7 @@ import React from 'react';
 
 import {container} from 'tsyringe';
 
-import TopContact from './topPeople/TopContact';
+import {TopContact} from './topPeople/TopContact';
 
 import {AssetRepository} from '../../../../../assets/AssetRepository';
 import {User} from '../../../../../entity/User';
@@ -42,4 +42,4 @@ const TopPeople: React.FC<TopPeopleProps> = ({clickOnUser, max, users}) => {
   return <div className="search-list search-list-sm">{searchListItems}</div>;
 };
 
-export default TopPeople;
+export {TopPeople};

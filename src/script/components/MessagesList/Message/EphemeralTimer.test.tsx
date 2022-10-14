@@ -19,7 +19,7 @@
 
 import {render} from '@testing-library/react';
 
-import EphemeralTimer from './EphemeralTimer';
+import {EphemeralTimer} from './EphemeralTimer';
 
 import {Message} from '../../../entity/message/Message';
 

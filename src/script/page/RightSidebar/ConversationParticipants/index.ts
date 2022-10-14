@@ -17,4 +17,4 @@
  *
  */
 
-export {default} from './ConversationParticipants';
+export * from './ConversationParticipants';

@@ -21,11 +21,11 @@ import React, {useEffect} from 'react';
 
 import {Runtime} from '@wireapp/commons';
 
-import Icon from 'Components/Icon';
+import {Icon} from 'Components/Icon';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 
-import ListWrapper from './ListWrapper';
+import {ListWrapper} from './ListWrapper';
 
 import {TeamRepository} from '../../../team/TeamRepository';
 import {ContentState, ContentViewModel} from '../../../view_model/ContentViewModel';
@@ -134,4 +134,4 @@ const Preferences: React.FC<PreferencesProps> = ({contentViewModel, teamReposito
   );
 };
 
-export default Preferences;
+export {Preferences};

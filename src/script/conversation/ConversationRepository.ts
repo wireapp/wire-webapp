@@ -84,7 +84,7 @@ import {NOTIFICATION_STATE} from './NotificationSetting';
 import {AssetTransferState} from '../assets/AssetTransferState';
 import {LEAVE_CALL_REASON} from '../calling/enum/LeaveCallReason';
 import {ClientState} from '../client/ClientState';
-import PrimaryModal from '../components/Modals/PrimaryModal';
+import {PrimaryModal} from '../components/Modals/PrimaryModal';
 import {Config} from '../Config';
 import {ConnectionEntity} from '../connection/ConnectionEntity';
 import {ConnectionRepository} from '../connection/ConnectionRepository';

@@ -39,7 +39,7 @@ import type {ClientService} from './ClientService';
 import {ClientState} from './ClientState';
 
 import {SIGN_OUT_REASON} from '../auth/SignOutReason';
-import PrimaryModal from '../components/Modals/PrimaryModal';
+import {PrimaryModal} from '../components/Modals/PrimaryModal';
 import type {CryptographyRepository} from '../cryptography/CryptographyRepository';
 import type {User} from '../entity/User';
 import {ClientError} from '../error/ClientError';
@@ -292,7 +292,7 @@ export class ClientRepository {
    */
   async deleteClient(clientId: string, password?: string): Promise<ClientEntity[]> {
     const selfUser = this.selfUser();
-    await this.core.service.client.deleteClient(clientId, password);
+    await this.core.service!.client.deleteClient(clientId, password);
     selfUser.removeClient(clientId);
     amplify.publish(WebAppEvents.USER.CLIENT_REMOVED, selfUser.qualifiedId, clientId);
     return this.clientState.clients();

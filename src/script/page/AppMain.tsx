@@ -22,22 +22,23 @@ import {FC} from 'react';
 import {StyledApp, THEME_ID, useMatchMedia} from '@wireapp/react-ui-kit';
 import {container} from 'tsyringe';
 
-import CallingContainer from 'Components/calling/CallingOverlayContainer';
+import {CallingContainer} from 'Components/calling/CallingOverlayContainer';
 import {registerReactComponent, useKoSubscribableChildren} from 'Util/ComponentUtil';
 
-import AppLock from './AppLock';
-import LeftSidebar from './LeftSidebar';
-import MainContent from './MainContent';
-import RightSidebar from './RightSidebar';
+import {AppLock} from './AppLock';
+import {LeftSidebar} from './LeftSidebar';
+import {MainContent} from './MainContent';
+import {RightSidebar} from './RightSidebar';
 import {PanelEntity, PanelState} from './RightSidebar/RightSidebar';
-import RootProvider from './RootProvider';
+import {RootProvider} from './RootProvider';
 import {useAppMainState, ViewType} from './state';
 
+import {PrimaryModalComponent} from '../components/Modals/PrimaryModal/PrimaryModal';
 import {User} from '../entity/User';
 import {TeamState} from '../team/TeamState';
 import {UserState} from '../user/UserState';
 import {MainViewModel} from '../view_model/MainViewModel';
-import WarningsContainer from '../view_model/WarningsContainer/WarningsContainer';
+import {WarningsContainer} from '../view_model/WarningsContainer/WarningsContainer';
 
 export type RightSidebarParams = {
   entity: PanelEntity | null;
@@ -111,7 +112,7 @@ const AppContainer: FC<AppContainerProps> = ({root}) => {
 
           {/*The order of these elements matter to show proper modals stack upon each other*/}
           <div id="user-modal-container"></div>
-          <div id="primary-modal-container"></div>
+          <PrimaryModalComponent />
         </main>
       </RootProvider>
     </StyledApp>
@@ -120,4 +121,4 @@ const AppContainer: FC<AppContainerProps> = ({root}) => {
 
 registerReactComponent('app-container', AppContainer);
 
-export default AppContainer;
+export {AppContainer};

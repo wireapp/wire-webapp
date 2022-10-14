@@ -19,13 +19,12 @@
 
 import {fireEvent, waitFor} from '@testing-library/react';
 
-import SetPassword from './SetPassword';
+import {SetPassword} from './SetPassword';
 
 import {ValidationError} from '../module/action/ValidationError';
 import {initialRootState} from '../module/reducer';
 import {mockStoreFactory} from '../util/test/mockStoreFactory';
 import {mountComponent} from '../util/test/TestUtil';
-
 jest.mock('../util/SVGProvider');
 
 const passwordInputId = 'enter-password';

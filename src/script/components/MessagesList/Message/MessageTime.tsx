@@ -52,4 +52,4 @@ const MessageTime: React.FC<MessageTimeProps> = ({timestamp, children, ...props}
   );
 };
 
-export default MessageTime;
+export {MessageTime};

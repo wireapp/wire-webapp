@@ -19,7 +19,7 @@
 
 import {FC} from 'react';
 
-import Icon from 'Components/Icon';
+import {Icon} from 'Components/Icon';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 import {formatLocale} from 'Util/TimeUtil';
@@ -69,4 +69,4 @@ const DetailViewModalHeader: FC<DetailViewModalHeaderProps> = ({messageEntity, o
   );
 };
 
-export default DetailViewModalHeader;
+export {DetailViewModalHeader};

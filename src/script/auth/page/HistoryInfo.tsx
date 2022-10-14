@@ -27,7 +27,7 @@ import {Navigate, useNavigate} from 'react-router-dom';
 
 import {KEY} from 'Util/KeyboardUtil';
 
-import Page from './Page';
+import {Page} from './Page';
 
 import {Config} from '../../Config';
 import {historyInfoStrings} from '../../strings';
@@ -37,7 +37,12 @@ import {ROUTE} from '../route';
 
 type Props = React.HTMLProps<HTMLDivElement>;
 
-const HistoryInfo = ({hasHistory, clients, currentSelfClient, isNewCurrentSelfClient}: Props & ConnectedProps) => {
+const HistoryInfoComponent = ({
+  hasHistory,
+  clients,
+  currentSelfClient,
+  isNewCurrentSelfClient,
+}: Props & ConnectedProps) => {
   const {formatMessage: _} = useIntl();
   const navigate = useNavigate();
 
@@ -106,4 +111,6 @@ const mapStateToProps = (state: RootState) => ({
   isNewCurrentSelfClient: ClientSelector.isNewCurrentSelfClient(state),
 });
 
-export default connect(mapStateToProps)(HistoryInfo);
+const HistoryInfo = connect(mapStateToProps)(HistoryInfoComponent);
+
+export {HistoryInfo};

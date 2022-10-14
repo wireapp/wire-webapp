@@ -18,12 +18,11 @@
  */
 
 import {AVATAR_SIZE} from 'Components/Avatar';
-import TestPage from 'Util/test/TestPage';
+import {TestPage} from 'Util/test/TestPage';
 
-import ServiceAvatar, {ServiceAvatarProps} from './ServiceAvatar';
+import {ServiceAvatar, ServiceAvatarProps} from './ServiceAvatar';
 
 import {ServiceEntity} from '../../integration/ServiceEntity';
-
 jest.mock('../../auth/util/SVGProvider');
 
 class ServiceAvatarPage extends TestPage<ServiceAvatarProps> {

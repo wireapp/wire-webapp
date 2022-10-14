@@ -25,7 +25,7 @@ import {ClientEntity} from 'src/script/client/ClientEntity';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 
-import DetailedDevice from './components/DetailedDevice';
+import {DetailedDevice} from './components/DetailedDevice';
 
 import {Config} from '../../../../../Config';
 import {MotionDuration} from '../../../../../motion/MotionDuration';
@@ -158,4 +158,4 @@ const DeviceDetailsPreferences: React.FC<DevicesPreferencesProps> = ({
   );
 };
 
-export default DeviceDetailsPreferences;
+export {DeviceDetailsPreferences};

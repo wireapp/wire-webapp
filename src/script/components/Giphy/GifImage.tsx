@@ -46,4 +46,4 @@ const GifImage: FC<GifProps> = ({src, animatedSrc, objectFit = 'contain', title 
   );
 };
 
-export default GifImage;
+export {GifImage};

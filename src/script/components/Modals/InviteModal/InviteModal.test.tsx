@@ -22,7 +22,7 @@ import {render, screen, waitFor} from '@testing-library/react';
 import {UserState} from 'src/script/user/UserState';
 import {t} from 'Util/LocalizerUtil';
 
-import InviteModal from './InviteModal';
+import {InviteModal} from './InviteModal';
 
 import {Config} from '../../../Config';
 import {User} from '../../../entity/User';

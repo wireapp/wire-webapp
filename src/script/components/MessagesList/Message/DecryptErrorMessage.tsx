@@ -19,8 +19,8 @@
 
 import React from 'react';
 
-import DeviceId from 'Components/DeviceId';
-import Icon from 'Components/Icon';
+import {DeviceId} from 'Components/DeviceId';
+import {Icon} from 'Components/Icon';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 
@@ -98,4 +98,4 @@ const DecryptErrorMessage: React.FC<DecryptErrorMessageProps> = ({message, onCli
   );
 };
 
-export default DecryptErrorMessage;
+export {DecryptErrorMessage};

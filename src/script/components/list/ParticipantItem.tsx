@@ -22,12 +22,12 @@ import React, {ChangeEvent, useState} from 'react';
 import {Checkbox, CheckboxLabel} from '@wireapp/react-ui-kit';
 import cx from 'classnames';
 
-import AvailabilityState from 'Components/AvailabilityState';
-import Avatar, {AVATAR_SIZE} from 'Components/Avatar';
-import ParticipantMicOnIcon from 'Components/calling/ParticipantMicOnIcon';
-import Icon from 'Components/Icon';
+import {AvailabilityState} from 'Components/AvailabilityState';
+import {Avatar, AVATAR_SIZE} from 'Components/Avatar';
+import {ParticipantMicOnIcon} from 'Components/calling/ParticipantMicOnIcon';
+import {Icon} from 'Components/Icon';
 import {UserlistMode} from 'Components/UserList';
-import InViewport from 'Components/utils/InViewport';
+import {InViewport} from 'Components/utils/InViewport';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {KEY} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
@@ -306,4 +306,4 @@ const ParticipantItem = <UserType extends User | ServiceEntity>(
   );
 };
 
-export default ParticipantItem;
+export {ParticipantItem};

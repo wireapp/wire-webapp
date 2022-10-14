@@ -23,12 +23,12 @@ import cx from 'classnames';
 import type {DexieError} from 'dexie';
 import {container} from 'tsyringe';
 
-import Icon from 'Components/Icon';
+import {Icon} from 'Components/Icon';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 import type {Logger} from 'Util/Logger';
 
-import DeviceCard from './DeviceCard';
+import {DeviceCard} from './DeviceCard';
 
 import type {ClientEntity} from '../../client/ClientEntity';
 import type {ClientRepository} from '../../client/ClientRepository';
@@ -38,7 +38,7 @@ import type {MessageRepository} from '../../conversation/MessageRepository';
 import type {CryptographyRepository} from '../../cryptography/CryptographyRepository';
 import type {User} from '../../entity/User';
 import {MotionDuration} from '../../motion/MotionDuration';
-import DeviceId from '../DeviceId';
+import {DeviceId} from '../DeviceId';
 
 interface DeviceDetailsProps {
   clickToShowSelfFingerprint: () => void;
@@ -173,4 +173,4 @@ const DeviceDetails: React.FC<DeviceDetailsProps> = ({
   );
 };
 
-export default DeviceDetails;
+export {DeviceDetails};

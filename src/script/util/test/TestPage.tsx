@@ -23,7 +23,7 @@ import {act, fireEvent, render, RenderResult} from '@testing-library/react';
 
 type ComponentTypes<T> = React.FC<T> | React.ComponentClass<T>;
 
-export default class TestPage<T extends Record<string, any>> {
+export class TestPage<T extends Record<string, any>> {
   private readonly driver: RenderResult;
   private readonly props?: T;
   private readonly component: ComponentTypes<T>;

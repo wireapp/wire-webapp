@@ -28,6 +28,7 @@ import {container} from 'tsyringe';
 import Icon from 'Components/Icon';
 import LegalHoldDot from 'Components/LegalHoldDot';
 import {useAppMainState, ViewType} from 'src/script/page/state';
+
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {handleKeyDown} from 'Util/KeyboardUtil';
 import {StringIdentifer, t} from 'Util/LocalizerUtil';

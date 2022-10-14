@@ -67,4 +67,4 @@ const PreferencesRadio = <T extends string | number>({
   );
 };
 
-export default PreferencesRadio;
+export {PreferencesRadio};

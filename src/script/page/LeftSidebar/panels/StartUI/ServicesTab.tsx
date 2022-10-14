@@ -19,15 +19,15 @@
 
 import React, {useState} from 'react';
 
-import Icon from 'Components/Icon';
-import ServiceList from 'Components/ServiceList';
+import {Icon} from 'Components/Icon';
+import {ServiceList} from 'Components/ServiceList';
 import {IntegrationRepository} from 'src/script/integration/IntegrationRepository';
 import {ServiceEntity} from 'src/script/integration/ServiceEntity';
 import {t} from 'Util/LocalizerUtil';
 import {safeWindowOpen} from 'Util/SanitizationUtil';
 
 import {getManageServicesUrl} from '../../../../externalRoute';
-import useDebounce from '../../../../hooks/useDebounce';
+import {useDebounce} from '../../../../hooks/useDebounce';
 
 export const ServicesTab: React.FC<{
   canManageServices: boolean;

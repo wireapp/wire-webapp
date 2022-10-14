@@ -22,18 +22,18 @@ import React, {useEffect, useState} from 'react';
 import cx from 'classnames';
 import {container} from 'tsyringe';
 
-import RestrictedAudio from 'Components/asset/RestrictedAudio';
-import Icon from 'Components/Icon';
+import {RestrictedAudio} from 'Components/asset/RestrictedAudio';
+import {Icon} from 'Components/Icon';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {getLogger} from 'Util/Logger';
 import {formatSeconds} from 'Util/TimeUtil';
-import useEffectRef from 'Util/useEffectRef';
+import {useEffectRef} from 'Util/useEffectRef';
 
 import {useAssetTransfer} from './AbstractAssetTransferStateTracker';
-import AssetHeader from './AssetHeader';
-import AudioSeekBar from './controls/AudioSeekBar';
-import MediaButton from './controls/MediaButton';
-import SeekBar from './controls/SeekBar';
+import {AssetHeader} from './AssetHeader';
+import {AudioSeekBar} from './controls/AudioSeekBar';
+import {MediaButton} from './controls/MediaButton';
+import {SeekBar} from './controls/SeekBar';
 
 import {AssetTransferState} from '../../../../../assets/AssetTransferState';
 import type {ContentMessage} from '../../../../../entity/message/ContentMessage';
@@ -162,4 +162,4 @@ const AudioAsset: React.FC<AudioAssetProps> = ({
   );
 };
 
-export default AudioAsset;
+export {AudioAsset};

@@ -25,11 +25,11 @@ import cx from 'classnames';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 import ko from 'knockout';
 
-import Icon from 'Components/Icon';
-import LegalHoldDot from 'Components/LegalHoldDot';
-import ModalComponent from 'Components/ModalComponent';
-import UserDevices, {UserDevicesState, useUserDevicesHistory} from 'Components/UserDevices';
-import UserSearchableList from 'Components/UserSearchableList';
+import {Icon} from 'Components/Icon';
+import {LegalHoldDot} from 'Components/LegalHoldDot';
+import {ModalComponent} from 'Components/ModalComponent';
+import {useUserDevicesHistory, UserDevicesState, UserDevices} from 'Components/UserDevices';
+import {UserSearchableList} from 'Components/UserSearchableList';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 import {splitFingerprint} from 'Util/StringUtil';
@@ -271,15 +271,6 @@ const LegalHoldModal: FC<LegalHoldModalProps> = ({
     amplify.subscribe(LegalHoldModalState.HIDE_REQUEST, hideModal);
     amplify.subscribe(LegalHoldModalState.SHOW_DETAILS, showUsers);
     amplify.subscribe(LegalHoldModalState.HIDE_DETAILS, hideLegalHoldModal);
-
-    return () => {
-      amplify.unsubscribe(LegalHoldModalState.SHOW_REQUEST, (fingerprint?: string) =>
-        showRequestModal(false, fingerprint),
-      );
-      amplify.unsubscribe(LegalHoldModalState.HIDE_REQUEST, hideModal);
-      amplify.unsubscribe(LegalHoldModalState.SHOW_DETAILS, showUsers);
-      amplify.unsubscribe(LegalHoldModalState.HIDE_DETAILS, hideLegalHoldModal);
-    };
   }, []);
 
   return (
@@ -425,4 +416,4 @@ const LegalHoldModal: FC<LegalHoldModalProps> = ({
   );
 };
 
-export default LegalHoldModal;
+export {LegalHoldModal};
