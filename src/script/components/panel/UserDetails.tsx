@@ -22,10 +22,10 @@ import React, {useEffect} from 'react';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import {amplify} from 'amplify';
 
-import AvailabilityState from 'Components/AvailabilityState';
-import Avatar, {AVATAR_SIZE} from 'Components/Avatar';
-import Icon from 'Components/Icon';
-import ClassifiedBar from 'Components/input/ClassifiedBar';
+import {AvailabilityState} from 'Components/AvailabilityState';
+import {Avatar, AVATAR_SIZE} from 'Components/Avatar';
+import {Icon} from 'Components/Icon';
+import {ClassifiedBar} from 'Components/input/ClassifiedBar';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 
@@ -145,4 +145,4 @@ const UserDetails: React.FC<UserDetailsProps> = ({
   );
 };
 
-export default UserDetails;
+export {UserDetails};

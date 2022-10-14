@@ -24,8 +24,8 @@ import {container} from 'tsyringe';
 
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 
-import ChooseScreen, {Screen} from './ChooseScreen';
-import FullscreenVideoCall from './FullscreenVideoCall';
+import {ChooseScreen, Screen} from './ChooseScreen';
+import {FullscreenVideoCall} from './FullscreenVideoCall';
 
 import {Call} from '../../calling/Call';
 import {CallingRepository} from '../../calling/CallingRepository';
@@ -206,4 +206,4 @@ const CallingContainer: React.FC<CallingContainerProps> = ({
   );
 };
 
-export default CallingContainer;
+export {CallingContainer};

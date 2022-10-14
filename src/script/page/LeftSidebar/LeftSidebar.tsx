@@ -27,14 +27,14 @@ import {CSSTransition, SwitchTransition} from 'react-transition-group';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 
-import Archive from './panels/Archive';
-import Conversations from './panels/Conversations';
-import Preferences from './panels/Preferences';
-import StartUI from './panels/StartUI';
-import TemporaryGuestConversations from './panels/TemporatyGuestConversations';
+import {Archive} from './panels/Archive';
+import {Conversations} from './panels/Conversations';
+import {Preferences} from './panels/Preferences';
+import {StartUI} from './panels/StartUI';
+import {TemporaryGuestConversations} from './panels/TemporatyGuestConversations';
 
 import {User} from '../../entity/User';
-import {ListViewModel, ListState} from '../../view_model/ListViewModel';
+import {ListState, ListViewModel} from '../../view_model/ListViewModel';
 
 type LeftSidebarProps = {
   listViewModel: ListViewModel;
@@ -132,4 +132,4 @@ const LeftSidebar: React.FC<LeftSidebarProps> = ({listViewModel, selfUser, isAct
   );
 };
 
-export default LeftSidebar;
+export {LeftSidebar};

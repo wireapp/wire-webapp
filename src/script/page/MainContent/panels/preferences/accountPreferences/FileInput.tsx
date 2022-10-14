@@ -50,4 +50,4 @@ const FileInput = React.forwardRef<HTMLInputElement, FileInputProps>(
 
 FileInput.displayName = 'FileInput';
 
-export default FileInput;
+export {FileInput};

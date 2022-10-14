@@ -23,8 +23,8 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 import {amplify} from 'amplify';
 import cx from 'classnames';
 
-import GifImage from 'Components/Giphy/GifImage';
-import Icon from 'Components/Icon';
+import {GifImage} from 'Components/Giphy/GifImage';
+import {Icon} from 'Components/Icon';
 import {t} from 'Util/LocalizerUtil';
 
 import {Gif, GiphyRepository} from '../../extension/GiphyRepository';
@@ -283,4 +283,4 @@ const Giphy: FC<GiphyProps> = ({giphyRepository, defaultGiphyState = GiphyState.
   );
 };
 
-export default Giphy;
+export {Giphy};

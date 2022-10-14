@@ -28,27 +28,21 @@ import {MediumImage} from 'src/script/entity/message/MediumImage';
 import {MessageCategory} from 'src/script/message/MessageCategory';
 import {createRandomUuid} from 'Util/util';
 
-import Collection from './Collection';
+import {Collection} from './Collection';
 
 import {AssetRepository} from '../../../../assets/AssetRepository';
 import {ConversationRepository} from '../../../../conversation/ConversationRepository';
 import {MessageRepository} from '../../../../conversation/MessageRepository';
 import {Text} from '../../../../entity/message/Text';
 
-jest.mock(
-  './CollectionDetails',
-  () =>
-    function CollectionDetails() {
-      return <div>CollectionDetails</div>;
-    },
-);
-jest.mock(
-  './CollectionItem',
-  () =>
-    function CollectionItem() {
-      return <div>CollectionItem</div>;
-    },
-);
+jest.mock('./CollectionDetails', () => ({
+  CollectionDetails: () => <div>CollectionDetails</div>,
+  __esModule: true,
+}));
+jest.mock('./CollectionItem', () => ({
+  CollectionItem: () => <div>CollectionItem</div>,
+  __esModule: true,
+}));
 
 const createImageMessage = (timestamp: number = Date.now()) => {
   const message = new ContentMessage(createRandomUuid());

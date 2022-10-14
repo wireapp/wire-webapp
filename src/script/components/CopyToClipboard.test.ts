@@ -17,9 +17,9 @@
  *
  */
 
-import TestPage from 'Util/test/TestPage';
+import {TestPage} from 'Util/test/TestPage';
 
-import CopyToClipboard, {CopyToClipboardProps} from './CopyToClipboard';
+import {CopyToClipboard, CopyToClipboardProps} from './CopyToClipboard';
 
 class CopyToClipboardPage extends TestPage<CopyToClipboardProps> {
   constructor(props?: CopyToClipboardProps) {

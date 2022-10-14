@@ -17,4 +17,4 @@
  *
  */
 
-export {default} from './ServicesOptions';
+export * from './ServicesOptions';

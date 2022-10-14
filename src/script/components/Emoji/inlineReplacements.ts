@@ -73,4 +73,4 @@ const inlineReplacements = [
   {name: 'broken heart', shortcut: '</3'},
 ];
 
-export default inlineReplacements;
+export {inlineReplacements};

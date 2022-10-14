@@ -57,4 +57,4 @@ const onHitTopOrBottom = (element: HTMLElement | null, onHitTop: () => void, onH
   element.addEventListener('wheel', onMouseWheel);
 };
 
-export default onHitTopOrBottom;
+export {onHitTopOrBottom};

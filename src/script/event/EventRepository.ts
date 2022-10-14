@@ -51,7 +51,7 @@ import type {EventRecord} from '../storage';
 import type {ServerTimeHandler} from '../time/serverTimeHandler';
 import {EventName} from '../tracking/EventName';
 import {UserState} from '../user/UserState';
-import Warnings from '../view_model/WarningsContainer';
+import {Warnings} from '../view_model/WarningsContainer';
 
 export class EventRepository {
   logger: Logger;

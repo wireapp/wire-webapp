@@ -34,7 +34,7 @@ import {ContentState, ContentViewModel} from './ContentViewModel';
 import type {MainViewModel, ViewModelRepositories} from './MainViewModel';
 
 import type {CallingRepository} from '../calling/CallingRepository';
-import PrimaryModal from '../components/Modals/PrimaryModal';
+import {PrimaryModal} from '../components/Modals/PrimaryModal';
 import type {ConversationRepository} from '../conversation/ConversationRepository';
 import {ConversationState} from '../conversation/ConversationState';
 import type {Conversation} from '../entity/Conversation';

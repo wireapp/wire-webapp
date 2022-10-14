@@ -19,10 +19,10 @@
 
 import React from 'react';
 
-import Icon from 'Components/Icon';
+import {Icon} from 'Components/Icon';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 
-import MessageTime from './MessageTime';
+import {MessageTime} from './MessageTime';
 
 import {CallMessage as CallMessageEntity} from '../../../entity/message/CallMessage';
 
@@ -67,4 +67,4 @@ const CallMessage: React.FC<CallMessageProps> = ({message}) => {
   );
 };
 
-export default CallMessage;
+export {CallMessage};

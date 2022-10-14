@@ -21,7 +21,7 @@ import {FC, useContext, useEffect, useState} from 'react';
 
 import {container} from 'tsyringe';
 
-import LoadingBar from 'Components/LoadingBar';
+import {LoadingBar} from 'Components/LoadingBar';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 import {getLogger} from 'Util/Logger';
@@ -235,4 +235,4 @@ const HistoryExport: FC<HistoryExportProps> = ({switchContent, userState = conta
   );
 };
 
-export default HistoryExport;
+export {HistoryExport};

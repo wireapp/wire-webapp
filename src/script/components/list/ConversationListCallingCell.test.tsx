@@ -30,18 +30,18 @@ import {User} from 'src/script/entity/User';
 import {MediaDevicesHandler} from 'src/script/media/MediaDevicesHandler';
 import {TeamState} from 'src/script/team/TeamState';
 import {CallActions} from 'src/script/view_model/CallingViewModel';
-import TestPage from 'Util/test/TestPage';
+import {TestPage} from 'Util/test/TestPage';
 import {createRandomUuid} from 'Util/util';
 
-import ConversationListCallingCell, {CallingCellProps} from './ConversationListCallingCell';
+import {ConversationListCallingCell, CallingCellProps} from './ConversationListCallingCell';
 
-jest.mock(
-  'Components/utils/InViewport',
-  () =>
-    function MockInViewport() {
-      return <div></div>;
-    },
-);
+jest.mock('Components/utils/InViewport', () => ({
+  InViewport: ({onVisible, children}: {onVisible: () => void; children: any}) => {
+    onVisible();
+    return <div>{children}</div>;
+  },
+  __esModule: true,
+}));
 
 class ConversationListCallingCellPage extends TestPage<CallingCellProps> {
   constructor(props?: CallingCellProps) {

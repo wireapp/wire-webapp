@@ -45,4 +45,4 @@ const AssetHeader: React.FC<AssetHeaderProps> = ({message}) => {
   );
 };
 
-export default AssetHeader;
+export {AssetHeader};

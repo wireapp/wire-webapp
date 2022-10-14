@@ -17,9 +17,9 @@
  *
  */
 
-import TestPage from 'Util/test/TestPage';
+import {TestPage} from 'Util/test/TestPage';
 
-import Avatar, {AvatarProps} from './Avatar';
+import {Avatar, AvatarProps} from './Avatar';
 
 import {User} from '../entity/User';
 import {ServiceEntity} from '../integration/ServiceEntity';

@@ -19,7 +19,7 @@
 
 import {act, fireEvent, render, waitFor} from '@testing-library/react';
 
-import InputBar from 'Components/InputBar/index';
+import {InputBar} from 'Components/InputBar/index';
 import {Config} from 'src/script/Config';
 import {createMentionEntity, getMentionCandidate} from 'Util/MentionUtil';
 import {createRandomUuid} from 'Util/util';

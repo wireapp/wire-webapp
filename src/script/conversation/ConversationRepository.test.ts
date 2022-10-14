@@ -28,7 +28,6 @@ import {amplify} from 'amplify';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 import ko from 'knockout';
 import sinon from 'sinon';
-import Sinon from 'sinon';
 import {container} from 'tsyringe';
 
 import {ClientEntity} from 'src/script/client/ClientEntity';
@@ -63,7 +62,7 @@ describe('ConversationRepository', () => {
 
   let conversation_et: Conversation;
   let self_user_et;
-  let server: Sinon.SinonFakeServer;
+  let server: sinon.SinonFakeServer;
   let storage_service: StorageService;
   const messageSenderId = createRandomUuid();
 

@@ -22,7 +22,7 @@ import React from 'react';
 import cx from 'classnames';
 import {container} from 'tsyringe';
 
-import Icon from 'Components/Icon';
+import {Icon} from 'Components/Icon';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {KEY} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
@@ -39,7 +39,7 @@ export interface MessageTimerButtonProps {
   teamState?: TeamState;
 }
 
-export const MessageTimerButton: React.FC<MessageTimerButtonProps> = ({
+const MessageTimerButton: React.FC<MessageTimerButtonProps> = ({
   conversation,
   teamState = container.resolve(TeamState),
 }) => {
@@ -127,4 +127,4 @@ export const MessageTimerButton: React.FC<MessageTimerButtonProps> = ({
   );
 };
 
-export default MessageTimerButton;
+export {MessageTimerButton};

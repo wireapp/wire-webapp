@@ -17,4 +17,4 @@
  *
  */
 
-export {default} from './GuestOptions';
+export * from './GuestOptions';

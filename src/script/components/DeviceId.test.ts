@@ -17,9 +17,9 @@
  *
  */
 
-import TestPage from 'Util/test/TestPage';
+import {TestPage} from 'Util/test/TestPage';
 
-import DeviceId, {DeviceIdProps} from './DeviceId';
+import {DeviceId, DeviceIdProps} from './DeviceId';
 
 class DeviceIdPage extends TestPage<DeviceIdProps> {
   constructor(props?: DeviceIdProps) {

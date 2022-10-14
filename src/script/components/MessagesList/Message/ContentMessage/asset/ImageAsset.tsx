@@ -22,15 +22,15 @@ import React, {useEffect, useState} from 'react';
 import cx from 'classnames';
 import {container} from 'tsyringe';
 
-import RestrictedImage from 'Components/asset/RestrictedImage';
-import Icon from 'Components/Icon';
-import InViewport from 'Components/utils/InViewport';
+import {RestrictedImage} from 'Components/asset/RestrictedImage';
+import {Icon} from 'Components/Icon';
+import {InViewport} from 'Components/utils/InViewport';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {handleKeyDown} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
 
 import {useAssetTransfer} from './AbstractAssetTransferStateTracker';
-import AssetLoader from './AssetLoader';
+import {AssetLoader} from './AssetLoader';
 
 import {Config} from '../../../../../Config';
 import {ContentMessage} from '../../../../../entity/message/ContentMessage';
@@ -132,4 +132,4 @@ const ImageAsset: React.FC<ImageAssetProps> = ({asset, message, onClick, teamSta
   );
 };
 
-export default ImageAsset;
+export {ImageAsset};

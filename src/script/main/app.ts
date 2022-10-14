@@ -28,8 +28,8 @@ import ko from 'knockout';
 import platform from 'platform';
 import {container} from 'tsyringe';
 
-import PrimaryModal from 'Components/Modals/PrimaryModal';
-import showUserModal from 'Components/Modals/UserModal';
+import {PrimaryModal} from 'Components/Modals/PrimaryModal';
+import {showUserModal} from 'Components/Modals/UserModal';
 import {DebugUtil} from 'Util/DebugUtil';
 import {Environment} from 'Util/Environment';
 import {t} from 'Util/LocalizerUtil';
@@ -116,7 +116,7 @@ import {ContentState} from '../view_model/ContentViewModel';
 import {LoadingViewModel} from '../view_model/LoadingViewModel';
 import {MainViewModel, ViewModelRepositories} from '../view_model/MainViewModel';
 import {ThemeViewModel} from '../view_model/ThemeViewModel';
-import Warnings from '../view_model/WarningsContainer';
+import {Warnings} from '../view_model/WarningsContainer';
 
 import './globals';
 

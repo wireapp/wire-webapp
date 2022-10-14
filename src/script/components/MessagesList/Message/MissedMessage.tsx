@@ -34,4 +34,4 @@ const MissedMessage: React.FC<MissedMessageProps> = ({}) => {
   );
 };
 
-export default MissedMessage;
+export {MissedMessage};

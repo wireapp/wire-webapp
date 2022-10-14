@@ -17,6 +17,7 @@
  *
  */
 
+// eslint-disable-next-line id-length
 import $ from 'jquery';
 import ko from 'knockout';
 

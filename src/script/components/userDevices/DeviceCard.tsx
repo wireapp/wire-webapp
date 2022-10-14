@@ -22,14 +22,14 @@ import React from 'react';
 import {ClientClassification} from '@wireapp/api-client/src/client';
 import cx from 'classnames';
 
-import DeviceId from 'Components/DeviceId';
+import {DeviceId} from 'Components/DeviceId';
 import {handleKeyDown} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
 
 import type {ClientEntity} from '../../client/ClientEntity';
-import Icon from '../Icon';
-import LegalHoldDot from '../LegalHoldDot';
-import VerifiedIcon from '../VerifiedIcon';
+import {Icon} from '../Icon';
+import {LegalHoldDot} from '../LegalHoldDot';
+import {VerifiedIcon} from '../VerifiedIcon';
 
 export interface DeviceCardProps {
   click?: (device: ClientEntity) => void;
@@ -93,4 +93,4 @@ const DeviceCard: React.FC<DeviceCardProps> = ({
   );
 };
 
-export default DeviceCard;
+export {DeviceCard};

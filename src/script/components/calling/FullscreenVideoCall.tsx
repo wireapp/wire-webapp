@@ -25,23 +25,23 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 import {amplify} from 'amplify';
 import {container} from 'tsyringe';
 
-import Icon from 'Components/Icon';
-import ClassifiedBar from 'Components/input/ClassifiedBar';
+import {Icon} from 'Components/Icon';
+import {ClassifiedBar} from 'Components/input/ClassifiedBar';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {KEY} from 'Util/KeyboardUtil';
 import {preventFocusOutside} from 'Util/util';
 
-import ButtonGroup from './ButtonGroup';
-import DeviceToggleButton from './DeviceToggleButton';
-import Duration from './Duration';
+import {ButtonGroup} from './ButtonGroup';
+import {DeviceToggleButton} from './DeviceToggleButton';
+import {Duration} from './Duration';
 import {
   videoControlActiveStyles,
   videoControlInActiveStyles,
   videoControlDisabledStyles,
   paginationButtonStyles,
 } from './FullscreenVideoCallStyles';
-import GroupVideoGrid from './GroupVideoGrid';
-import Pagination from './Pagination';
+import {GroupVideoGrid} from './GroupVideoGrid';
+import {Pagination} from './Pagination';
 
 import type {Call} from '../../calling/Call';
 import {MuteState} from '../../calling/CallState';
@@ -442,4 +442,4 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
   );
 };
 
-export default FullscreenVideoCall;
+export {FullscreenVideoCall};

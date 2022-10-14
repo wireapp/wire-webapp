@@ -24,7 +24,7 @@ import cx from 'classnames';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 
-import DeviceCard from './DeviceCard';
+import {DeviceCard} from './DeviceCard';
 
 import type {ClientEntity} from '../../client/ClientEntity';
 import {Config} from '../../Config';
@@ -74,4 +74,4 @@ const DeviceList: React.FC<DeviceListProps> = ({user, noPadding, clients, clickO
   );
 };
 
-export default DeviceList;
+export {DeviceList};

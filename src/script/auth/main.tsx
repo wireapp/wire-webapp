@@ -33,7 +33,7 @@ import {exposeWrapperGlobals} from 'Util/wrapper';
 import './configureEnvironment';
 import {configureStore} from './configureStore';
 import {actionRoot} from './module/action';
-import Root from './page/Root';
+import {Root} from './page/Root';
 
 import {Config} from '../Config';
 import {APIClient} from '../service/APIClientSingleton';

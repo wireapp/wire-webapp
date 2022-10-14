@@ -80,4 +80,4 @@ const Checkbox: React.FC<CheckboxProps> = ({disabled, label, isChecked, name, on
   );
 };
 
-export default Checkbox;
+export {Checkbox};

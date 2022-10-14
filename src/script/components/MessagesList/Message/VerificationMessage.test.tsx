@@ -24,7 +24,7 @@ import ko from 'knockout';
 import {VerificationMessage as VerificationMessageEntity} from 'src/script/entity/message/VerificationMessage';
 import {VerificationMessageType} from 'src/script/message/VerificationMessageType';
 
-import VerificationMessage from './VerificationMessage';
+import {VerificationMessage} from './VerificationMessage';
 
 import {User} from '../../../entity/User';
 

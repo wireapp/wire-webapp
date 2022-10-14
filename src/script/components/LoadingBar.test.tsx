@@ -17,9 +17,9 @@
  *
  */
 
-import TestPage from 'Util/test/TestPage';
+import {TestPage} from 'Util/test/TestPage';
 
-import LoadingBar, {LoadingBarProps} from './LoadingBar';
+import {LoadingBar, LoadingBarProps} from './LoadingBar';
 
 class LoadingBarPage extends TestPage<LoadingBarProps> {
   constructor(props?: LoadingBarProps) {

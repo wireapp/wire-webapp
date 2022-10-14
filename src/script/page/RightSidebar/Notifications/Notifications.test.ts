@@ -23,9 +23,9 @@ import ko from 'knockout';
 import {ConversationRepository} from 'src/script/conversation/ConversationRepository';
 import {NOTIFICATION_STATE} from 'src/script/conversation/NotificationSetting';
 import {Conversation} from 'src/script/entity/Conversation';
-import TestPage from 'Util/test/TestPage';
+import {TestPage} from 'Util/test/TestPage';
 
-import Notifications, {NotificationsProps} from './Notifications';
+import {Notifications, NotificationsProps} from './Notifications';
 
 import {ViewModelRepositories} from '../../../view_model/MainViewModel';
 

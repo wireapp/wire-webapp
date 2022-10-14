@@ -52,14 +52,14 @@ import {AnyAction, Dispatch} from 'redux';
 
 import {getLogger} from 'Util/Logger';
 
-import EntropyContainer from './EntropyContainer';
-import Page from './Page';
+import {EntropyContainer} from './EntropyContainer';
+import {Page} from './Page';
 
 import {Config} from '../../Config';
 import {loginStrings, verifyStrings} from '../../strings';
-import AppAlreadyOpen from '../component/AppAlreadyOpen';
-import LoginForm from '../component/LoginForm';
-import RouterLink from '../component/RouterLink';
+import {AppAlreadyOpen} from '../component/AppAlreadyOpen';
+import {LoginForm} from '../component/LoginForm';
+import {RouterLink} from '../component/RouterLink';
 import {EXTERNAL_ROUTE} from '../externalRoute';
 import {actionRoot} from '../module/action/';
 import {BackendError} from '../module/action/BackendError';
@@ -72,7 +72,7 @@ import {parseError, parseValidationErrors} from '../util/errorUtil';
 
 type Props = React.HTMLProps<HTMLDivElement>;
 
-const Login = ({
+const LoginComponent = ({
   loginError,
   resetAuthError,
   doCheckConversationCode,
@@ -406,4 +406,6 @@ const mapDispatchToProps = (dispatch: Dispatch<AnyAction>) =>
     dispatch,
   );
 
-export default connect(mapStateToProps, mapDispatchToProps)(Login);
+const Login = connect(mapStateToProps, mapDispatchToProps)(LoginComponent);
+
+export {Login};

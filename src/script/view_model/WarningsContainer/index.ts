@@ -21,11 +21,11 @@ import './WarningsContainer';
 import {hideWarning, showWarning} from './WarningsState';
 import {CONFIG, TYPE} from './WarningsTypes';
 
-export const Warnings = {
+const Warnings = {
   CONFIG,
   TYPE,
   hideWarning,
   showWarning,
 };
 
-export default Warnings;
+export {Warnings};

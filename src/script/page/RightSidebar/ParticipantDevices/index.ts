@@ -17,4 +17,4 @@
  *
  */
 
-export {default} from './ParticipantDevices';
+export * from './ParticipantDevices';

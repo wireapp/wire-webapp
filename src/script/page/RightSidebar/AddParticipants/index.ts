@@ -17,4 +17,4 @@
  *
  */
 
-export {default} from './AddParticipants';
+export * from './AddParticipants';

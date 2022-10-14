@@ -55,4 +55,4 @@ const useDropFiles = (selector: string, onDropOrPastedFile: (files: File[]) => v
   }, [selector, ...deps]);
 };
 
-export default useDropFiles;
+export {useDropFiles};

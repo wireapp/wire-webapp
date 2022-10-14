@@ -19,14 +19,14 @@
 
 import React, {useRef} from 'react';
 
-import Icon from 'Components/Icon';
+import {Icon} from 'Components/Icon';
 import {Conversation} from 'src/script/entity/Conversation';
 import {t} from 'Util/LocalizerUtil';
 
-import GiphyButton from './GiphyButton';
+import {GiphyButton} from './GiphyButton';
 
 import {Config} from '../../../Config';
-import MessageTimerButton from '../MessageTimerButton';
+import {MessageTimerButton} from '../MessageTimerButton';
 
 export type ControlButtonsProps = {
   input: string;
@@ -158,4 +158,4 @@ const ControlButtons: React.FC<ControlButtonsProps> = ({
   return <>{showGiphyButton && !disableFilesharing && <GiphyButton onGifClick={onGifClick} />}</>;
 };
 
-export default ControlButtons;
+export {ControlButtons};

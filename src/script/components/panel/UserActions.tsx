@@ -28,7 +28,7 @@ import {t} from 'Util/LocalizerUtil';
 import {matchQualifiedIds} from 'Util/QualifiedId';
 
 import type {MenuItem} from './PanelActions';
-import PanelActions from './PanelActions';
+import {PanelActions} from './PanelActions';
 
 import {ACCESS_STATE} from '../../conversation/AccessState';
 import type {ConversationRoleRepository} from '../../conversation/ConversationRoleRepository';
@@ -301,4 +301,4 @@ const UserActions: React.FC<UserActionsProps> = ({
   return <PanelActions items={items} />;
 };
 
-export default UserActions;
+export {UserActions};

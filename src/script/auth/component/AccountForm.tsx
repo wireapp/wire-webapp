@@ -27,7 +27,7 @@ import {AnyAction, Dispatch} from 'redux';
 
 import {KEY} from 'Util/KeyboardUtil';
 
-import Exception from './Exception';
+import {Exception} from './Exception';
 
 import {Config} from '../../Config';
 import {accountFormStrings} from '../../strings';
@@ -44,7 +44,7 @@ interface Props extends React.HTMLProps<HTMLFormElement> {
   submitText?: string;
 }
 
-const AccountForm = ({account, ...props}: Props & ConnectedProps & DispatchProps) => {
+const AccountFormComponent = ({account, ...props}: Props & ConnectedProps & DispatchProps) => {
   const {formatMessage: _} = useIntl();
   const [registrationData, setRegistrationData] = React.useState({
     accent_id: AccentColor.random().id,
@@ -337,4 +337,6 @@ const mapDispatchToProps = (dispatch: Dispatch<AnyAction>) =>
     dispatch,
   );
 
-export default connect(mapStateToProps, mapDispatchToProps)(AccountForm);
+const AccountForm = connect(mapStateToProps, mapDispatchToProps)(AccountFormComponent);
+
+export {AccountForm};

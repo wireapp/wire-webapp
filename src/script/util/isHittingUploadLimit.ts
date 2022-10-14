@@ -20,7 +20,7 @@
 import {t} from 'Util/LocalizerUtil';
 
 import {AssetRepository} from '../assets/AssetRepository';
-import PrimaryModal from '../components/Modals/PrimaryModal';
+import {PrimaryModal} from '../components/Modals/PrimaryModal';
 
 const CONCURRENT_UPLOAD_LIMIT = 10;
 
@@ -42,4 +42,4 @@ const isHittingUploadLimit = (files: File[], assetRepository: AssetRepository): 
   return isHittingUploadLimit;
 };
 
-export default isHittingUploadLimit;
+export {isHittingUploadLimit};

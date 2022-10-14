@@ -43,4 +43,4 @@ const AvatarWrapper: React.FunctionComponent<AvatarWrapperProps> = ({color, avat
   />
 );
 
-export default AvatarWrapper;
+export {AvatarWrapper};

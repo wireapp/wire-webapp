@@ -23,7 +23,7 @@ import {act} from 'react-dom/test-utils';
 
 import {DecryptErrorMessage as DecryptErrorMessageEntity} from 'src/script/entity/message/DecryptErrorMessage';
 
-import DecryptErrorMessage from './DecryptErrorMessage';
+import {DecryptErrorMessage} from './DecryptErrorMessage';
 
 const createDecryptErrorMessage = (partialDecryptErrorMessage: Partial<DecryptErrorMessageEntity>) => {
   const decryptErrorMessage: Partial<DecryptErrorMessageEntity> = {

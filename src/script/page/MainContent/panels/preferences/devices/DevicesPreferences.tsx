@@ -22,16 +22,16 @@ import React, {useState} from 'react';
 import {QualifiedId} from '@wireapp/api-client/src/user';
 import {container} from 'tsyringe';
 
-import Icon from 'Components/Icon';
-import VerifiedIcon from 'Components/VerifiedIcon';
+import {Icon} from 'Components/Icon';
+import {VerifiedIcon} from 'Components/VerifiedIcon';
 import {ClientEntity} from 'src/script/client/ClientEntity';
 import {CryptographyRepository} from 'src/script/cryptography/CryptographyRepository';
 import {handleKeyDown} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
 
-import DetailedDevice from './components/DetailedDevice';
+import {DetailedDevice} from './components/DetailedDevice';
 import {FormattedId} from './components/FormattedId';
-import DeviceDetailsPreferences from './DeviceDetailsPreferences';
+import {DeviceDetailsPreferences} from './DeviceDetailsPreferences';
 
 import {ClientState} from '../../../../../client/ClientState';
 import {ConversationState} from '../../../../../conversation/ConversationState';
@@ -190,4 +190,4 @@ const DevicesPreferences: React.FC<DevicesPreferencesProps> = ({
   );
 };
 
-export default DevicesPreferences;
+export {DevicesPreferences};

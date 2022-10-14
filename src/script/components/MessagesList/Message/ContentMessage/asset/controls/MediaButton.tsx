@@ -26,7 +26,7 @@ import {noop} from 'Util/util';
 
 import {AssetTransferState} from '../../../../../../assets/AssetTransferState';
 import type {FileAsset} from '../../../../../../entity/message/FileAsset';
-import AssetLoader from '../AssetLoader';
+import {AssetLoader} from '../AssetLoader';
 
 export interface MediaButtonProps {
   asset: FileAsset;
@@ -101,4 +101,4 @@ const MediaButton: React.FC<MediaButtonProps> = ({
   );
 };
 
-export default MediaButton;
+export {MediaButton};

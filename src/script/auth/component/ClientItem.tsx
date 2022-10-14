@@ -322,4 +322,4 @@ const ClientItem = ({selected, onClientRemoval, onClick, client, clientError, re
   );
 };
 
-export default ClientItem;
+export {ClientItem};

@@ -23,16 +23,16 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 import {amplify} from 'amplify';
 import {container} from 'tsyringe';
 
-import ConversationListCell from 'Components/list/ConversationListCell';
+import {ConversationListCell} from 'Components/list/ConversationListCell';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 
-import ListWrapper from './ListWrapper';
+import {ListWrapper} from './ListWrapper';
 
 import {ConversationRepository} from '../../../conversation/ConversationRepository';
 import {ConversationState} from '../../../conversation/ConversationState';
 import {Conversation} from '../../../entity/Conversation';
-import useRoveFocus from '../../../hooks/useRoveFocus';
+import {useRoveFocus} from '../../../hooks/useRoveFocus';
 import {ListViewModel} from '../../../view_model/ListViewModel';
 
 type ArchiveProps = {
@@ -91,4 +91,4 @@ const Archive: React.FC<ArchiveProps> = ({
   );
 };
 
-export default Archive;
+export {Archive};

@@ -17,13 +17,12 @@
  *
  */
 
-import TestPage from 'Util/test/TestPage';
+import {TestPage} from 'Util/test/TestPage';
 
-import UserAvatar, {UserAvatarProps} from './UserAvatar';
+import {UserAvatar, UserAvatarProps} from './UserAvatar';
 
 import {User} from '../../entity/User';
 import {AVATAR_SIZE, STATE} from '../Avatar';
-
 jest.mock('../../auth/util/SVGProvider');
 
 class UserAvatarPage extends TestPage<UserAvatarProps> {

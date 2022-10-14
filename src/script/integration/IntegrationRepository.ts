@@ -30,7 +30,7 @@ import type {IntegrationService} from './IntegrationService';
 import {ProviderEntity} from './ProviderEntity';
 import {ServiceEntity} from './ServiceEntity';
 
-import PrimaryModal from '../components/Modals/PrimaryModal';
+import {PrimaryModal} from '../components/Modals/PrimaryModal';
 import {ACCESS_STATE} from '../conversation/AccessState';
 import type {ConversationRepository} from '../conversation/ConversationRepository';
 import {ConversationState} from '../conversation/ConversationState';

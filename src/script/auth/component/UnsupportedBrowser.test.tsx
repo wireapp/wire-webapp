@@ -19,7 +19,7 @@
 
 import {TypeUtil, Runtime} from '@wireapp/commons';
 
-import UnsupportedBrowser from './UnsupportedBrowser';
+import {UnsupportedBrowser} from './UnsupportedBrowser';
 
 import {Config, Configuration} from '../../Config';
 import {initialRootState} from '../module/reducer';

@@ -21,7 +21,7 @@ import React, {useEffect, useState} from 'react';
 
 import cx from 'classnames';
 
-import Icon from 'Components/Icon';
+import {Icon} from 'Components/Icon';
 import {Message} from 'src/script/entity/message/Message';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
@@ -90,4 +90,4 @@ const ReadReceiptStatus: React.FC<ReadReceiptStatusProps> = ({
   );
 };
 
-export default ReadReceiptStatus;
+export {ReadReceiptStatus};

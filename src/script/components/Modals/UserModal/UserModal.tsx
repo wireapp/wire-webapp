@@ -21,17 +21,17 @@ import React, {useState, useEffect} from 'react';
 
 import {QualifiedId} from '@wireapp/api-client/src/user';
 import cx from 'classnames';
+import {noop} from 'jquery';
 import {container} from 'tsyringe';
 
-import Icon from 'Components/Icon';
-import ModalComponent from 'Components/ModalComponent';
-import EnrichedFields from 'Components/panel/EnrichedFields';
-import UserActions from 'Components/panel/UserActions';
-import UserDetails from 'Components/panel/UserDetails';
+import {Icon} from 'Components/Icon';
+import {ModalComponent} from 'Components/ModalComponent';
+import {EnrichedFields} from 'Components/panel/EnrichedFields';
+import {UserActions} from 'Components/panel/UserActions';
+import {UserDetails} from 'Components/panel/UserDetails';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {replaceLink, t} from 'Util/LocalizerUtil';
-import renderElement from 'Util/renderElement';
-import {noop} from 'Util/util';
+import {renderElement} from 'Util/renderElement';
 
 import {Config} from '../../../Config';
 import {User} from '../../../entity/User';
@@ -53,7 +53,7 @@ export interface UserModalProps {
 
 const brandName = Config.getConfig().BRAND_NAME;
 
-const UserModalComponent: React.FC<UserModalProps> = ({
+const UserModal: React.FC<UserModalProps> = ({
   userId,
   onClose = noop,
   userRepository,
@@ -166,6 +166,6 @@ const UserModalComponent: React.FC<UserModalProps> = ({
   );
 };
 
-export default UserModalComponent;
+const showUserModal = renderElement<UserModalProps>(UserModal, 'user-modal-container');
 
-export const showUserModal = renderElement<UserModalProps>(UserModalComponent, 'user-modal-container');
+export {UserModal, showUserModal};

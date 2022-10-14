@@ -2482,7 +2482,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@koush/wrtc@npm:0.5.3":
+"@koush/wrtc@npm:^0.5.3":
   version: 0.5.3
   resolution: "@koush/wrtc@npm:0.5.3"
   dependencies:
@@ -17248,7 +17248,7 @@ __metadata:
     "@emotion/react": 11.10.4
     "@faker-js/faker": 7.5.0
     "@formatjs/cli": 5.1.1
-    "@koush/wrtc": 0.5.3
+    "@koush/wrtc": ^0.5.3
     "@testing-library/react": 13.4.0
     "@types/adm-zip": 0.5.0
     "@types/caniuse-lite": ^1.0.1

@@ -21,10 +21,10 @@ import {FC, useMemo, useState} from 'react';
 
 import cx from 'classnames';
 
-import Icon from 'Components/Icon';
-import SearchInput from 'Components/SearchInput';
-import ServiceList from 'Components/ServiceList';
-import UserSearchableList from 'Components/UserSearchableList';
+import {Icon} from 'Components/Icon';
+import {SearchInput} from 'Components/SearchInput';
+import {ServiceList} from 'Components/ServiceList';
+import {UserSearchableList} from 'Components/UserSearchableList';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {handleKeyDown} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
@@ -44,7 +44,7 @@ import {TeamState} from '../../../team/TeamState';
 import {initFadingScrollbar} from '../../../ui/fadingScrollbar';
 import {generatePermissionHelpers} from '../../../user/UserPermission';
 import {UserState} from '../../../user/UserState';
-import PanelHeader from '../PanelHeader';
+import {PanelHeader} from '../PanelHeader';
 import {PanelEntity, PanelState} from '../RightSidebar';
 
 interface AddParticipantsProps {
@@ -320,4 +320,4 @@ const AddParticipants: FC<AddParticipantsProps> = ({
   );
 };
 
-export default AddParticipants;
+export {AddParticipants};

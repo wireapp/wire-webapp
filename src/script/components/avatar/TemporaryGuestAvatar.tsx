@@ -21,11 +21,11 @@ import React from 'react';
 
 import {CSS_FILL_PARENT} from 'Util/CSSMixin';
 
-import AvatarBackground from './AvatarBackground';
-import AvatarBadge from './AvatarBadge';
-import AvatarBorder from './AvatarBorder';
-import AvatarInitials from './AvatarInitials';
-import AvatarWrapper from './AvatarWrapper';
+import {AvatarBackground} from './AvatarBackground';
+import {AvatarBadge} from './AvatarBadge';
+import {AvatarBorder} from './AvatarBorder';
+import {AvatarInitials} from './AvatarInitials';
+import {AvatarWrapper} from './AvatarWrapper';
 import {shouldShowBadge} from './UserAvatar';
 
 import {User} from '../../entity/User';
@@ -97,4 +97,4 @@ const TemporaryGuestAvatar: React.FunctionComponent<TemporaryGuestAvatarProps> =
   );
 };
 
-export default TemporaryGuestAvatar;
+export {TemporaryGuestAvatar};

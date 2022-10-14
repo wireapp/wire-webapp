@@ -17,7 +17,7 @@
  *
  */
 
-import {FC, ReactNode, cloneElement, useEffect, useState} from 'react';
+import {cloneElement, FC, ReactNode, useEffect, useState} from 'react';
 
 import {WebAppEvents} from '@wireapp/webapp-events';
 import {amplify} from 'amplify';
@@ -26,16 +26,16 @@ import {container} from 'tsyringe';
 
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 
-import AddParticipants from './AddParticipants';
-import ConversationDetails from './ConversationDetails';
-import ConversationParticipants from './ConversationParticipants';
-import GroupParticipantService from './GroupParticipantService';
-import GroupParticipantUser from './GroupParticipantUser';
-import GuestServicesOptions from './GuestServicesOptions';
-import MessageDetails from './MessageDetails';
-import Notifications from './Notifications';
-import ParticipantDevices from './ParticipantDevices';
-import TimedMessages from './TimedMessages';
+import {AddParticipants} from './AddParticipants';
+import {ConversationDetails} from './ConversationDetails';
+import {ConversationParticipants} from './ConversationParticipants';
+import {GroupParticipantService} from './GroupParticipantService';
+import {GroupParticipantUser} from './GroupParticipantUser';
+import {GuestServicesOptions} from './GuestServicesOptions';
+import {MessageDetails} from './MessageDetails';
+import {Notifications} from './Notifications';
+import {ParticipantDevices} from './ParticipantDevices';
+import {TimedMessages} from './TimedMessages';
 
 import {ConversationState} from '../../conversation/ConversationState';
 import {Conversation} from '../../entity/Conversation';
@@ -320,4 +320,4 @@ const RightSidebar: FC<RightSidebarProps> = ({
   );
 };
 
-export default RightSidebar;
+export {RightSidebar};

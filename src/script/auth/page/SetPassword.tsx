@@ -26,11 +26,11 @@ import {connect} from 'react-redux';
 import {Navigate, useNavigate} from 'react-router-dom';
 import {AnyAction, Dispatch} from 'redux';
 
-import Page from './Page';
+import {Page} from './Page';
 
 import {Config} from '../../Config';
 import {accountFormStrings, setPasswordStrings} from '../../strings';
-import Exception from '../component/Exception';
+import {Exception} from '../component/Exception';
 import {actionRoot} from '../module/action';
 import {ValidationError} from '../module/action/ValidationError';
 import {RootState, bindActionCreators} from '../module/reducer';
@@ -39,7 +39,7 @@ import {ROUTE} from '../route';
 
 type Props = React.HTMLProps<HTMLDivElement>;
 
-const SetPassword = ({
+const SetPasswordComponent = ({
   isSelfSSOUser,
   hasSelfPassword,
   doSetPassword,
@@ -147,4 +147,6 @@ const mapDispatchToProps = (dispatch: Dispatch<AnyAction>) =>
     dispatch,
   );
 
-export default connect(mapStateToProps, mapDispatchToProps)(SetPassword);
+const SetPassword = connect(mapStateToProps, mapDispatchToProps)(SetPasswordComponent);
+
+export {SetPassword};

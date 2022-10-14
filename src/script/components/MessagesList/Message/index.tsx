@@ -26,12 +26,12 @@ import React, {
 
 import {QualifiedId} from '@wireapp/api-client/src/user';
 
-import InViewport from 'Components/utils/InViewport';
+import {InViewport} from 'Components/utils/InViewport';
 import {ServiceEntity} from 'src/script/integration/ServiceEntity';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {getMessageMarkerType, MessageMarkerType} from 'Util/conversationMessages';
 
-import MessageTime from './MessageTime';
+import {MessageTime} from './MessageTime';
 import {MessageWrapper} from './MessageWrapper';
 
 import type {MessageRepository} from '../../../conversation/MessageRepository';
@@ -151,4 +151,4 @@ const Message: React.FC<
   );
 };
 
-export default Message;
+export {Message};

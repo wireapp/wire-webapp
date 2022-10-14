@@ -24,7 +24,7 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 import {amplify} from 'amplify';
 import cx from 'classnames';
 
-import Icon from 'Components/Icon';
+import {Icon} from 'Components/Icon';
 import {t} from 'Util/LocalizerUtil';
 import {afterRender} from 'Util/util';
 
@@ -333,4 +333,4 @@ const WarningsContainer: React.FC = () => {
   );
 };
 
-export default WarningsContainer;
+export {WarningsContainer};

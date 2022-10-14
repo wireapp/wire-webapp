@@ -39,10 +39,10 @@ import {useIntl} from 'react-intl';
 import {connect} from 'react-redux';
 import {AnyAction, Dispatch} from 'redux';
 
-import Page from './Page';
+import {Page} from './Page';
 
 import {inviteStrings} from '../../strings';
-import Exception from '../component/Exception';
+import {Exception} from '../component/Exception';
 import {EXTERNAL_ROUTE} from '../externalRoute';
 import {actionRoot as ROOT_ACTIONS} from '../module/action/';
 import {BackendError} from '../module/action/BackendError';
@@ -56,7 +56,7 @@ import {pathWithParams} from '../util/urlUtil';
 
 type Props = React.HTMLProps<HTMLDivElement>;
 
-const InitialInvite = ({
+const InitialInviteComponent = ({
   invites,
   isFetching,
   inviteError,
@@ -222,4 +222,6 @@ const mapDispatchToProps = (dispatch: Dispatch<AnyAction>) =>
     dispatch,
   );
 
-export default connect(mapStateToProps, mapDispatchToProps)(InitialInvite);
+const InitialInvite = connect(mapStateToProps, mapDispatchToProps)(InitialInviteComponent);
+
+export {InitialInvite};

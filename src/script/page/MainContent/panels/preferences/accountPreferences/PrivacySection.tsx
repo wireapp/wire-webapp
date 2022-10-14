@@ -30,7 +30,7 @@ import {formatDurationCaption} from 'Util/TimeUtil';
 import {PropertiesRepository} from '../../../../../properties/PropertiesRepository';
 import {AppLockRepository} from '../../../../../user/AppLockRepository';
 import {AppLockState} from '../../../../../user/AppLockState';
-import PreferencesSection from '../components/PreferencesSection';
+import {PreferencesSection} from '../components/PreferencesSection';
 
 interface PrivacySectionProps {
   appLockRepository?: AppLockRepository;
@@ -94,4 +94,4 @@ const PrivacySection: React.FC<PrivacySectionProps> = ({
   );
 };
 
-export default PrivacySection;
+export {PrivacySection};

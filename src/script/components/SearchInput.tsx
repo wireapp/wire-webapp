@@ -22,7 +22,7 @@ import React, {useEffect, useLayoutEffect, useRef} from 'react';
 import {isRemovalAction, isEnterKey} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
 
-import Icon from './Icon';
+import {Icon} from './Icon';
 
 import type {User} from '../entity/User';
 import {MAX_HANDLE_LENGTH} from '../user/UserHandleGenerator';
@@ -115,4 +115,4 @@ const SearchInput: React.FC<SearchInputProps> = ({
   );
 };
 
-export default SearchInput;
+export {SearchInput};

@@ -103,4 +103,4 @@ const SeekBar: React.FC<SeekBarProps> = ({
   );
 };
 
-export default SeekBar;
+export {SeekBar};

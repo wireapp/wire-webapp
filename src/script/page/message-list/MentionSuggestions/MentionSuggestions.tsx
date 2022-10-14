@@ -22,7 +22,7 @@ import React, {useEffect, useMemo, useRef, useState} from 'react';
 import {KEY} from 'Util/KeyboardUtil';
 import {clamp} from 'Util/NumberUtil';
 
-import MentionSuggestionsItem from './MentionSuggestionsItem';
+import {MentionSuggestionsItem} from './MentionSuggestionsItem';
 
 import {User} from '../../../entity/User';
 import {initFadingScrollbar} from '../../../ui/fadingScrollbar';
@@ -123,4 +123,4 @@ const MentionSuggestionList: React.FunctionComponent<MentionSuggestionListProps>
   ) : null;
 };
 
-export default MentionSuggestionList;
+export {MentionSuggestionList};

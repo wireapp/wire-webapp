@@ -24,8 +24,8 @@ import {FormattedMessage, useIntl} from 'react-intl';
 
 import {Config} from '../../Config';
 import {conversationJoinStrings} from '../../strings';
-import UnsupportedBrowser from '../component/UnsupportedBrowser';
-import WirelessContainer from '../component/WirelessContainer';
+import {UnsupportedBrowser} from '../component/UnsupportedBrowser';
+import {WirelessContainer} from '../component/WirelessContainer';
 
 type Props = React.HTMLProps<HTMLDivElement>;
 
@@ -52,4 +52,4 @@ const ConversationJoinInvalid = ({}: Props) => {
   );
 };
 
-export default ConversationJoinInvalid;
+export {ConversationJoinInvalid};

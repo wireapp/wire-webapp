@@ -20,7 +20,8 @@
 import {addNewModalToQueue, showNextModalInQueue} from './PrimaryModalState';
 import {PrimaryModalType} from './PrimaryModalTypes';
 
-export {usePrimaryModalState, removeCurrentModal} from './PrimaryModalState';
+export {removeCurrentModal, usePrimaryModalState} from './PrimaryModalState';
+export {PrimaryModal};
 
 const PrimaryModal = {
   init: (): void => {
@@ -29,5 +30,3 @@ const PrimaryModal = {
   show: addNewModalToQueue,
   type: PrimaryModalType,
 };
-
-export default PrimaryModal;

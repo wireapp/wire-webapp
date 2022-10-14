@@ -21,9 +21,9 @@ import React from 'react';
 
 import {css} from '@emotion/react';
 
-import Avatar, {AVATAR_SIZE} from 'Components/Avatar';
-import GroupAvatar from 'Components/avatar/GroupAvatar';
-import ConversationListCell from 'Components/list/ConversationListCell';
+import {Avatar, AVATAR_SIZE} from 'Components/Avatar';
+import {GroupAvatar} from 'Components/avatar/GroupAvatar';
+import {ConversationListCell} from 'Components/list/ConversationListCell';
 import {Call} from 'src/script/calling/Call';
 import {User} from 'src/script/entity/User';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
@@ -32,7 +32,7 @@ import {t} from 'Util/LocalizerUtil';
 import {matchQualifiedIds} from 'Util/QualifiedId';
 
 import {ConverationViewStyle} from './Conversations';
-import GroupedConversations from './GroupedConversations';
+import {GroupedConversations} from './GroupedConversations';
 
 import {CallState} from '../../../../calling/CallState';
 import {ConversationRepository} from '../../../../conversation/ConversationRepository';

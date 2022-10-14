@@ -26,11 +26,11 @@ import {connect} from 'react-redux';
 import {useNavigate} from 'react-router-dom';
 import {AnyAction, Dispatch} from 'redux';
 
-import Page from './Page';
+import {Page} from './Page';
 
 import {phoneLoginStrings} from '../../strings';
-import LinkButton from '../component/LinkButton';
-import RouterLink from '../component/RouterLink';
+import {LinkButton} from '../component/LinkButton';
+import {RouterLink} from '../component/RouterLink';
 import {actionRoot} from '../module/action';
 import {BackendError} from '../module/action/BackendError';
 import {LabeledError} from '../module/action/LabeledError';
@@ -42,7 +42,7 @@ import {parseError} from '../util/errorUtil';
 
 type Props = React.HTMLProps<HTMLDivElement>;
 
-const VerifyPhoneCode = ({
+const VerifyPhoneCodeComponent = ({
   doLogin,
   resetAuthError,
   loginData,
@@ -156,4 +156,6 @@ const mapDispatchToProps = (dispatch: Dispatch<AnyAction>) =>
     dispatch,
   );
 
-export default connect(mapStateToProps, mapDispatchToProps)(VerifyPhoneCode);
+const VerifyPhoneCode = connect(mapStateToProps, mapDispatchToProps)(VerifyPhoneCodeComponent);
+
+export {VerifyPhoneCode};

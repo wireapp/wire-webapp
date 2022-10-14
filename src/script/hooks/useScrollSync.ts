@@ -39,4 +39,4 @@ const useScrollSync = (element: HTMLElement | null, targetElement: HTMLElement |
   }, deps);
 };
 
-export default useScrollSync;
+export {useScrollSync};

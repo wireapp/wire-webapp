@@ -17,20 +17,20 @@
  *
  */
 
-import TestPage from 'Util/test/TestPage';
+import {TestPage} from 'Util/test/TestPage';
 import {createRandomUuid} from 'Util/util';
 
-import ServiceList, {ServiceListProps} from './ServiceList';
+import {ServiceList, ServiceListProps} from './ServiceList';
 
 import {ServiceEntity} from '../integration/ServiceEntity';
 
-jest.mock(
-  'Components/utils/InViewport',
-  () =>
-    function MockInViewport() {
-      return <div></div>;
-    },
-);
+jest.mock('Components/utils/InViewport', () => ({
+  InViewport: ({onVisible, children}: {onVisible: () => void; children: any}) => {
+    onVisible();
+    return <div>{children}</div>;
+  },
+  __esModule: true,
+}));
 
 class ServiceListPage extends TestPage<ServiceListProps> {
   constructor(props?: ServiceListProps) {

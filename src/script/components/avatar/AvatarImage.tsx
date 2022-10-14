@@ -117,4 +117,4 @@ const AvatarImage: React.FunctionComponent<AvatarImageProps> = ({
   );
 };
 
-export default AvatarImage;
+export {AvatarImage};

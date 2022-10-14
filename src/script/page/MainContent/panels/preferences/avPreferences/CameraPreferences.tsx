@@ -19,18 +19,18 @@
 
 import React, {useEffect, useRef, useState} from 'react';
 
-import Icon from 'Components/Icon';
+import {Icon} from 'Components/Icon';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 import {getLogger} from 'Util/Logger';
 
-import DeviceSelect from './DeviceSelect';
+import {DeviceSelect} from './DeviceSelect';
 
 import {Config} from '../../../../../Config';
 import {DeviceTypes, MediaDevicesHandler} from '../../../../../media/MediaDevicesHandler';
 import {MediaStreamHandler} from '../../../../../media/MediaStreamHandler';
 import {MediaType} from '../../../../../media/MediaType';
-import PreferencesSection from '../components/PreferencesSection';
+import {PreferencesSection} from '../components/PreferencesSection';
 
 const logger = getLogger('CameraPreferences');
 
@@ -161,4 +161,4 @@ const CameraPreferences: React.FC<CameraPreferencesProps> = ({
   );
 };
 
-export default CameraPreferences;
+export {CameraPreferences};

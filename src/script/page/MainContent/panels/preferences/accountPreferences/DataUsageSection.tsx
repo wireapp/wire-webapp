@@ -33,7 +33,7 @@ import {PropertiesRepository} from '../../../../../properties/PropertiesReposito
 import {PROPERTIES_TYPE} from '../../../../../properties/PropertiesType';
 import {TeamState} from '../../../../../team/TeamState';
 import {ConsentValue} from '../../../../../user/ConsentValue';
-import PreferencesSection from '../components/PreferencesSection';
+import {PreferencesSection} from '../components/PreferencesSection';
 
 interface DataUsageSectionProps {
   brandName: string;
@@ -129,4 +129,4 @@ const DataUsageSection: React.FC<DataUsageSectionProps> = ({
   );
 };
 
-export default DataUsageSection;
+export {DataUsageSection};

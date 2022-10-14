@@ -39,13 +39,13 @@ import {User} from 'src/script/entity/User';
 import {ServiceEntity} from 'src/script/integration/ServiceEntity';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 
-import Message from './Message';
+import {Message} from './Message';
 
 import {Conversation as ConversationEntity, Conversation} from '../../entity/Conversation';
 import {isMemberMessage, isContentMessage} from '../../guards/Message';
 import {StatusType} from '../../message/StatusType';
 import {initFadingScrollbar} from '../../ui/fadingScrollbar';
-import onHitTopOrBottom from '../../ui/onHitTopOrBottom';
+import {onHitTopOrBottom} from '../../ui/onHitTopOrBottom';
 import {useResizeObserver} from '../../ui/resizeObserver';
 
 type FocusedElement = {center?: boolean; element: Element};
@@ -324,4 +324,4 @@ const MessagesList: FC<MessagesListParams> = ({
   );
 };
 
-export default MessagesList;
+export {MessagesList};

@@ -17,4 +17,4 @@
  *
  */
 
-export {default} from './GroupDetails';
+export * from './GroupDetails';

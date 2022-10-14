@@ -36,7 +36,7 @@ import {ConversationMapper} from './ConversationMapper';
 import type {ConversationService} from './ConversationService';
 import {ConversationEvent} from './EventBuilder';
 
-import PrimaryModal from '../components/Modals/PrimaryModal';
+import {PrimaryModal} from '../components/Modals/PrimaryModal';
 import type {Conversation} from '../entity/Conversation';
 
 export class ConversationStateHandler extends AbstractConversationEventHandler {

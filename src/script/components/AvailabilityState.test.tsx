@@ -19,9 +19,9 @@
 
 import {Availability} from '@wireapp/protocol-messaging';
 
-import TestPage from 'Util/test/TestPage';
+import {TestPage} from 'Util/test/TestPage';
 
-import AvailabilityState, {AvailabilityStateProps} from './AvailabilityState';
+import {AvailabilityState, AvailabilityStateProps} from './AvailabilityState';
 
 class AvailabilityStatePage extends TestPage<AvailabilityStateProps> {
   constructor(props?: AvailabilityStateProps) {

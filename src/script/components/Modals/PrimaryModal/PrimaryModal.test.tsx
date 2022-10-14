@@ -21,7 +21,7 @@ import {render, fireEvent, act} from '@testing-library/react';
 
 import {PrimaryModalComponent} from './PrimaryModal';
 
-import PrimaryModal from '.';
+import {PrimaryModal} from '.';
 
 describe('PrimaryModal', () => {
   it('does not render when no item is in the queue', async () => {

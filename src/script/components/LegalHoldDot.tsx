@@ -22,7 +22,7 @@ import React from 'react';
 import {amplify} from 'amplify';
 import cx from 'classnames';
 
-import Icon from 'Components/Icon';
+import {Icon} from 'Components/Icon';
 import {t} from 'Util/LocalizerUtil';
 
 import type {Conversation} from '../entity/Conversation';
@@ -88,4 +88,4 @@ const LegalHoldDot: React.FC<LegalHoldDotProps> = ({
   );
 };
 
-export default LegalHoldDot;
+export {LegalHoldDot};

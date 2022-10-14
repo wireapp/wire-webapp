@@ -58,4 +58,4 @@ const NoDevicesFound: React.FC<NoDevicesFoundProps> = ({user, noPadding}) => {
   );
 };
 
-export default NoDevicesFound;
+export {NoDevicesFound};

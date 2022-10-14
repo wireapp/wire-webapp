@@ -21,10 +21,10 @@
 
 import {FC} from 'react';
 
-import RestrictedVideo from 'Components/asset/RestrictedVideo';
-import ParticipantMicOnIcon from 'Components/calling/ParticipantMicOnIcon';
-import Icon from 'Components/Icon';
-import Image from 'Components/Image';
+import {RestrictedVideo} from 'Components/asset/RestrictedVideo';
+import {ParticipantMicOnIcon} from 'Components/calling/ParticipantMicOnIcon';
+import {Icon} from 'Components/Icon';
+import {Image} from 'Components/Image';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 import {renderMessage} from 'Util/messageRenderer';
@@ -125,4 +125,4 @@ const ReplyBar: FC<ReplyBarProps> = ({replyMessageEntity, onCancel}) => {
   );
 };
 
-export default ReplyBar;
+export {ReplyBar};

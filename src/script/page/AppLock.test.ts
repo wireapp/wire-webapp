@@ -23,10 +23,10 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 import {amplify} from 'amplify';
 import ko from 'knockout';
 
-import TestPage from 'Util/test/TestPage';
+import {TestPage} from 'Util/test/TestPage';
 import {createRandomUuid} from 'Util/util';
 
-import AppLock, {AppLockProps, APPLOCK_STATE} from './AppLock';
+import {AppLock, AppLockProps, APPLOCK_STATE} from './AppLock';
 
 import type {ClientRepository} from '../client/ClientRepository';
 import {TeamState} from '../team/TeamState';

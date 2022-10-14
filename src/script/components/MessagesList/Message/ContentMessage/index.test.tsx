@@ -29,7 +29,7 @@ import {Text} from '../../../../entity/message/Text';
 import {User} from '../../../../entity/User';
 import {createRandomUuid} from '../../../../util/util';
 
-import ContentMessageComponent, {ContentMessageProps} from './index';
+import {ContentMessageComponent, ContentMessageProps} from './index';
 
 describe('message', () => {
   let defaultParams: ContentMessageProps;

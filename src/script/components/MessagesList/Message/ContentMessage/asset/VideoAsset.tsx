@@ -21,18 +21,17 @@ import React, {useCallback, useEffect, useState} from 'react';
 
 import {useTimeout} from '@wireapp/react-ui-kit';
 import cx from 'classnames';
-import clx from 'classnames';
 import {container} from 'tsyringe';
 
-import RestrictedVideo from 'Components/asset/RestrictedVideo';
+import {RestrictedVideo} from 'Components/asset/RestrictedVideo';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 import {formatSeconds} from 'Util/TimeUtil';
-import useEffectRef from 'Util/useEffectRef';
+import {useEffectRef} from 'Util/useEffectRef';
 
 import {useAssetTransfer} from './AbstractAssetTransferStateTracker';
-import MediaButton from './controls/MediaButton';
-import SeekBar from './controls/SeekBar';
+import {MediaButton} from './controls/MediaButton';
+import {SeekBar} from './controls/SeekBar';
 
 import {AssetRepository} from '../../../../../assets/AssetRepository';
 import {AssetTransferState} from '../../../../../assets/AssetTransferState';
@@ -165,7 +164,7 @@ const VideoAsset: React.FC<VideoAssetProps> = ({
               onPlaying={onVideoPlaying}
               onTimeUpdate={syncVideoTimeRest}
               onLoadedMetadata={syncVideoTimeRest}
-              className={clx({hidden: isUploading})}
+              className={cx({hidden: isUploading})}
               style={{backgroundColor: videoPreview ? '#000' : ''}}
             />
             {videoPlaybackError ? (
@@ -221,4 +220,4 @@ const VideoAsset: React.FC<VideoAssetProps> = ({
   ) : null;
 };
 
-export default VideoAsset;
+export {VideoAsset};

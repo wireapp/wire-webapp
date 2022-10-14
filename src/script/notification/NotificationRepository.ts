@@ -61,7 +61,7 @@ import {PermissionStatusState} from '../permission/PermissionStatusState';
 import {PermissionType} from '../permission/PermissionType';
 import {UserState} from '../user/UserState';
 import {ContentState} from '../view_model/ContentViewModel';
-import Warnings from '../view_model/WarningsContainer';
+import {Warnings} from '../view_model/WarningsContainer';
 
 export interface Multitasking {
   isMinimized: ko.Observable<boolean>;
