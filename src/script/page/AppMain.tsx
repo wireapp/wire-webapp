@@ -76,18 +76,18 @@ const AppContainer: FC<AppContainerProps> = ({root}) => {
   // To be changed when design chooses a breakpoint, the conditional can be integrated to the ui-kit directly
   const smBreakpoint = useMatchMedia('max-width: 620px');
 
-  const responsiveView = useAppMainState(state => state.responsiveView);
-  const showLeftSidebar = responsiveView.currentView == ViewType.LEFT_SIDEBAR;
+  const {currentView} = useAppMainState(state => state.responsiveView);
+  const isLeftSidebarVisible = currentView == ViewType.LEFT_SIDEBAR;
 
   return (
     <StyledApp themeId={THEME_ID.DEFAULT} css={{backgroundColor: 'unset', height: '100%'}}>
       <RootProvider value={root}>
         <main>
           <div id="app" className="app">
-            {(!smBreakpoint || showLeftSidebar) && (
+            {(!smBreakpoint || isLeftSidebarVisible) && (
               <LeftSidebar listViewModel={root.list} selfUser={selfUser} isActivatedAccount={isActivatedAccount} />
             )}
-            {(!smBreakpoint || !showLeftSidebar) && (
+            {(!smBreakpoint || !isLeftSidebarVisible) && (
               <MainContent isRightSidebarOpen={!!currentState} openRightSidebar={toggleRightSidebar} />
             )}
             {currentState && (

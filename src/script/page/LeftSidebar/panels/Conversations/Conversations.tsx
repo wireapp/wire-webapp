@@ -113,10 +113,10 @@ const Conversations: React.FC<ConversationsProps> = ({
   const {conversationLabelRepository} = conversationRepository;
   const [isConversationListFocus, focusConversationList] = useState(false);
 
-  const responsiveView = useAppMainState(state => state.responsiveView);
+  const {setCurrentView} = useAppMainState(state => state.responsiveView);
 
   const onClickPreferences = () => {
-    responsiveView.setCurrentView(ViewType.LEFT_SIDEBAR);
+    setCurrentView(ViewType.LEFT_SIDEBAR);
     switchList(ListState.PREFERENCES);
     const {rightSidebar} = useAppMainState.getState();
     rightSidebar.clearHistory();

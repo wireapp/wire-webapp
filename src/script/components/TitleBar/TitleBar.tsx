@@ -139,9 +139,7 @@ export const TitleBar: React.FC<TitleBarProps> = ({
   const mdBreakpoint = useMatchMedia('max-width: 768px');
   const smBreakpoint = useMatchMedia('max-width: 620px');
 
-  const responsiveView = useAppMainState(state => state.responsiveView);
-
-  const setView = responsiveView.setCurrentView;
+  const {setCurrentView: setView} = useAppMainState(state => state.responsiveView);
 
   const showDetails = useCallback(
     (addParticipants: boolean): void => {

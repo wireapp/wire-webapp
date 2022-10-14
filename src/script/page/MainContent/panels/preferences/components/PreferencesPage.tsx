@@ -34,9 +34,8 @@ const PreferencesPage: React.FC<PreferencesPageProps> = ({title, children}) => {
   // To be changed when design chooses a breakpoint, the conditional can be integrated to the ui-kit directly
   const smBreakpoint = useMatchMedia('max-width: 620px');
 
-  const responsiveView = useAppMainState(state => state.responsiveView);
-  const isCentralColumn = responsiveView.currentView == ViewType.CENTRAL_COLUMN;
-  const setResponsiveView = responsiveView.setCurrentView;
+  const {currentView, setCurrentView} = useAppMainState(state => state.responsiveView);
+  const isCentralColumn = currentView == ViewType.CENTRAL_COLUMN;
 
   const root = useContext(RootContext);
 
@@ -50,7 +49,7 @@ const PreferencesPage: React.FC<PreferencesPageProps> = ({title, children}) => {
             variant={IconButtonVariant.SECONDARY}
             className="conversation-title-bar-icon icon-back"
             css={{marginBottom: 0}}
-            onClick={() => setResponsiveView(ViewType.LEFT_SIDEBAR)}
+            onClick={() => setCurrentView(ViewType.LEFT_SIDEBAR)}
           />
         )}
         <h2 className="preferences-titlebar">{title}</h2>

@@ -72,10 +72,10 @@ const Preferences: React.FC<PreferencesProps> = ({contentViewModel, teamReposito
   const isDesktop = Runtime.isDesktopApp();
   const supportsCalling = Runtime.isSupportingLegacyCalling();
 
-  const responsiveView = useAppMainState(state => state.responsiveView);
+  const {setCurrentView} = useAppMainState(state => state.responsiveView);
 
   const onClickSelect = (item: typeof items[number]) => {
-    responsiveView.setCurrentView(ViewType.CENTRAL_COLUMN);
+    setCurrentView(ViewType.CENTRAL_COLUMN);
     contentViewModel.switchContent(item.id);
   };
 
