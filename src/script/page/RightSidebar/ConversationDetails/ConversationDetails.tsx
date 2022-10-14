@@ -244,10 +244,12 @@ const ConversationDetails: FC<ConversationDetailsProps> = ({
     if (isTeam && isSingleUserMode) {
       teamRepository.updateTeamMembersByIds(team, [firstParticipant.id], true);
     }
-  }, [firstParticipant.id, isSingleUserMode, isTeam, team, teamRepository]);
+  }, [firstParticipant, isSingleUserMode, isTeam, team, teamRepository]);
 
   useEffect(() => {
-    getService();
+    if (firstParticipant) {
+      getService();
+    }
   }, [firstParticipant, integrationRepository]);
 
   return (
