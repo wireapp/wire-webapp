@@ -141,6 +141,8 @@ export const TitleBar: React.FC<TitleBarProps> = ({
 
   const {setCurrentView: setView} = useAppMainState(state => state.responsiveView);
 
+  const setLeftSidebar = () => setView(ViewType.LEFT_SIDEBAR);
+
   const showDetails = useCallback(
     (addParticipants: boolean): void => {
       const panelId = addParticipants ? PanelState.ADD_PARTICIPANTS : PanelState.CONVERSATION_DETAILS;
@@ -189,7 +191,7 @@ export const TitleBar: React.FC<TitleBarProps> = ({
 
   const onClickStartAudio = () => {
     callActions.startAudio(conversation);
-    setView(ViewType.LEFT_SIDEBAR);
+    setLeftSidebar();
   };
 
   return (
@@ -200,7 +202,7 @@ export const TitleBar: React.FC<TitleBarProps> = ({
             variant={IconButtonVariant.SECONDARY}
             className="conversation-title-bar-icon icon-back"
             css={{marginBottom: 0}}
-            onClick={() => setView(ViewType.LEFT_SIDEBAR)}
+            onClick={() => setLeftSidebar}
           />
         )}
         {isActivatedAccount && !mdBreakpoint && (
