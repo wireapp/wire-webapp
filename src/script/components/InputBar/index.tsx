@@ -196,6 +196,7 @@ const InputBar = ({
 
   const richTextInput = getRichTextInput(currentMentions, inputValue);
 
+  // To be changed when design chooses a breakpoint, the conditional can be integrated to the ui-kit directly
   const isScaledDown = useMatchMedia('max-width: 768px');
 
   const config = {

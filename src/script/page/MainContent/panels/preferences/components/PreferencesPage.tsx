@@ -31,7 +31,9 @@ interface PreferencesPageProps {
 }
 
 const PreferencesPage: React.FC<PreferencesPageProps> = ({title, children}) => {
+  // To be changed when design chooses a breakpoint, the conditional can be integrated to the ui-kit directly
   const smBreakpoint = useMatchMedia('max-width: 620px');
+
   const responsiveView = useAppMainState(state => state.responsiveView);
   const isCentralColumn = responsiveView.currentView == ViewType.CENTRAL_COLUMN;
   const setResponsiveView = responsiveView.setCurrentView;

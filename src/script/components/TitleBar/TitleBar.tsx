@@ -135,6 +135,7 @@ export const TitleBar: React.FC<TitleBarProps> = ({
   const shortcut = Shortcut.getShortcutTooltip(ShortcutType.PEOPLE);
   const peopleTooltip = t('tooltipConversationPeople', shortcut);
 
+  // To be changed when design chooses a breakpoint, the conditional can be integrated to the ui-kit directly
   const mdBreakpoint = useMatchMedia('max-width: 768px');
   const smBreakpoint = useMatchMedia('max-width: 620px');
 
