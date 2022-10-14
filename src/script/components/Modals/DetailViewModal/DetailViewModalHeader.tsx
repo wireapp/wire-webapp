@@ -48,7 +48,6 @@ const DetailViewModalHeader: FC<DetailViewModalHeaderProps> = ({messageEntity, o
           data-uie-value={user.username()}
         >
           {unsafeSenderName}
-          {messageEntity.id}
         </div>
 
         <div className="label-xs" data-timestamp={timestamp}>

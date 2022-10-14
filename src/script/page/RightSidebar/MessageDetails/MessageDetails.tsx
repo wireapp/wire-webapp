@@ -156,7 +156,7 @@ const MessageDetails: FC<MessageDetailsProps> = ({
     }
 
     return t('messageDetailsTitle');
-  }, [supportsReceipts, supportsLikes]);
+  }, [supportsReceipts, supportsLikes, likesTitle, receiptsTitle]);
 
   const showTabs = supportsReceipts && supportsLikes;
 
