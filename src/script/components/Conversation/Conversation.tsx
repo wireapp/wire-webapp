@@ -139,7 +139,7 @@ const ConversationList: FC<ConversationListProps> = ({
     }
   };
 
-  const showUserDetails = (userEntity: User | ServiceEntity) => {
+  const showUserDetails = async (userEntity: User | ServiceEntity) => {
     const isSingleModeConversation = is1to1 || isRequest;
 
     const isUserEntity = !isServiceEntity(userEntity);
@@ -155,7 +155,11 @@ const ConversationList: FC<ConversationListProps> = ({
 
     const panelId = userEntity.isService ? PanelState.GROUP_PARTICIPANT_SERVICE : PanelState.GROUP_PARTICIPANT_USER;
 
-    openRightSidebar(panelId, {entity: userEntity});
+    const serviceEntity = await repositories.integration.getServiceFromUser(userEntity);
+
+    if (serviceEntity) {
+      openRightSidebar(panelId, {entity: {...serviceEntity, id: userEntity.id}});
+    }
   };
 
   const showParticipants = (participants: User[]) => {

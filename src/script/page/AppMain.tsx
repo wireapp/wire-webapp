@@ -58,13 +58,20 @@ const AppContainer: FC<AppContainerProps> = ({root}) => {
 
   const rightSidebar = useAppMainState(state => state.rightSidebar);
   const currentState = rightSidebar.history.at(-1);
+  const currentEntity = rightSidebar.entity;
 
   const closeRightSidebar = () => {
     rightSidebar.clearHistory();
   };
 
   const toggleRightSidebar = (panelState: PanelState, params: RightSidebarParams) => {
-    if (currentState !== panelState) {
+    const newParamId = params.entity?.id;
+    const currentParamId = currentEntity?.id;
+
+    const isDifferentState = currentState !== panelState;
+    const isDifferentParams = newParamId !== currentParamId;
+
+    if (isDifferentState || isDifferentParams) {
       rightSidebar.goTo(panelState, params);
 
       return;

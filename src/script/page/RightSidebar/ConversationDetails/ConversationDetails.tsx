@@ -31,10 +31,10 @@ import {t} from 'Util/LocalizerUtil';
 import {sortUsersByPriority} from 'Util/StringUtil';
 import {formatDuration} from 'Util/TimeUtil';
 
-import {ConversationDetailsBottomActions} from './components/ConversationDetailsBottomActions/ConversationDetailsBottomActions';
-import {ConversationDetailsHeader} from './components/ConversationDetailsHeader/ConversationDetailsHeader';
-import {ConversationDetailsOptions} from './components/ConversationDetailsOptions/ConversationDetailsOptions';
-import {UserConversationDetails} from './components/UserConversationDetails/UserConversationDetails';
+import {ConversationDetailsBottomActions} from './components/ConversationDetailsBottomActions';
+import {ConversationDetailsHeader} from './components/ConversationDetailsHeader';
+import {ConversationDetailsOptions} from './components/ConversationDetailsOptions';
+import {UserConversationDetails} from './components/UserConversationDetails';
 import {getConversationActions} from './utils/getConversationActions';
 
 import {ConversationRepository} from '../../../conversation/ConversationRepository';
@@ -53,6 +53,7 @@ import {Shortcut} from '../../../ui/Shortcut';
 import {ShortcutType} from '../../../ui/ShortcutType';
 import {UserState} from '../../../user/UserState';
 import {ActionsViewModel} from '../../../view_model/ActionsViewModel';
+import {useAppMainState} from '../../state';
 import {PanelHeader} from '../PanelHeader';
 import {PanelEntity, PanelState} from '../RightSidebar';
 
@@ -197,6 +198,8 @@ const ConversationDetails: FC<ConversationDetailsProps> = ({
     return isService ? [service] : [];
   });
 
+  const {rightSidebar} = useAppMainState();
+
   const toggleMute = () => actionsViewModel.toggleMuteConversation(activeConversation);
 
   const openParticipantDevices = () => togglePanel(PanelState.PARTICIPANT_DEVICES, firstParticipant, false, 'left');
@@ -208,8 +211,13 @@ const ConversationDetails: FC<ConversationDetailsProps> = ({
 
   const showUser = (userEntity: User) => togglePanel(PanelState.GROUP_PARTICIPANT_USER, userEntity);
 
-  const showService = (serviceEntity: ServiceEntity) =>
-    togglePanel(PanelState.GROUP_PARTICIPANT_SERVICE, serviceEntity);
+  const showService = async (entity: ServiceEntity) => {
+    const serviceEntity = await integrationRepository.getServiceFromUser(entity);
+
+    if (serviceEntity) {
+      togglePanel(PanelState.GROUP_PARTICIPANT_SERVICE, {...serviceEntity, id: entity.id});
+    }
+  };
 
   const showAllParticipants = () => togglePanel(PanelState.CONVERSATION_PARTICIPANTS, activeConversation);
 
@@ -235,6 +243,7 @@ const ConversationDetails: FC<ConversationDetailsProps> = ({
     activeConversation,
     actionsViewModel,
     conversationRepository,
+    rightSidebar.clearHistory,
     teamRole,
     isServiceMode,
     isTeam,

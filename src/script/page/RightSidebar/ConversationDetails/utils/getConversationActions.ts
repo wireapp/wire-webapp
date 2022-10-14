@@ -32,6 +32,7 @@ const getConversationActions = (
   conversationEntity: Conversation,
   actionsViewModel: ActionsViewModel,
   conversationRepository: ConversationRepository,
+  closeRightPanel: () => void,
   teamRole: UserPermission.ROLE,
   isServiceMode: boolean = false,
   isTeam: boolean = false,
@@ -62,7 +63,10 @@ const getConversationActions = (
     {
       condition: true,
       item: {
-        click: () => actionsViewModel.archiveConversation(conversationEntity),
+        click: async () => {
+          await actionsViewModel.archiveConversation(conversationEntity);
+          closeRightPanel();
+        },
         icon: 'archive-icon',
         identifier: 'do-archive',
         label: t('conversationDetailsActionArchive'),
@@ -98,7 +102,10 @@ const getConversationActions = (
     {
       condition: conversationEntity.isLeavable() && roleRepository.canLeaveGroup(conversationEntity),
       item: {
-        click: () => actionsViewModel.leaveConversation(conversationEntity),
+        click: async () => {
+          await actionsViewModel.leaveConversation(conversationEntity);
+          closeRightPanel();
+        },
         icon: 'leave-icon',
         identifier: 'do-leave',
         label: t('conversationDetailsActionLeave'),
@@ -111,7 +118,7 @@ const getConversationActions = (
         roleRepository.canDeleteGroup(conversationEntity) &&
         conversationEntity.isCreatedBySelf(),
       item: {
-        click: () => actionsViewModel.deleteConversation(conversationEntity),
+        click: async () => actionsViewModel.deleteConversation(conversationEntity),
         icon: 'delete-icon',
         identifier: 'do-delete',
         label: t('conversationDetailsActionDelete'),
