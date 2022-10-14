@@ -219,7 +219,7 @@ const MessageDetails: FC<MessageDetailsProps> = ({
       <div className="panel__content" ref={initFadingScrollbar} style={{flexGrow: 1}}>
         {messageState === MESSAGE_STATES.RECEIPTS && (
           <UserSearchableList
-            data-uie-name="read-list"
+            dataUieName="read-list"
             users={receiptUsers}
             infos={receiptTimes}
             noUnderline
@@ -231,7 +231,7 @@ const MessageDetails: FC<MessageDetailsProps> = ({
 
         {messageState === MESSAGE_STATES.LIKES && (
           <UserSearchableList
-            data-uie-name="like-list"
+            dataUieName="like-list"
             users={likeUsers}
             noUnderline
             conversationRepository={conversationRepository}
