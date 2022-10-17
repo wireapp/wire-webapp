@@ -290,13 +290,15 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
               <Icon.ArrowNext css={{position: 'relative', right: 4, transform: 'rotate(180deg)'}} />
             </button>
           )}
-          <div css={{bottom: 108, display: 'flex', justifyContent: 'center', position: 'absolute', width: '100%'}}>
-            <Pagination
-              totalPages={totalPages}
-              currentPage={currentPage}
-              onChangePage={newPage => changePage(newPage, call)}
-            />
-          </div>
+          {!verticalBreakpoint && (
+            <div css={{bottom: 108, display: 'flex', justifyContent: 'center', position: 'absolute', width: '100%'}}>
+              <Pagination
+                totalPages={totalPages}
+                currentPage={currentPage}
+                onChangePage={newPage => changePage(newPage, call)}
+              />
+            </div>
+          )}
         </>
       )}
       {!isChoosingScreen && (
@@ -360,7 +362,7 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
 
                   {isMuted ? <Icon.MicOff width={16} height={16} /> : <Icon.MicOn width={16} height={16} />}
 
-                  {showSwitchMicrophone && (
+                  {showSwitchMicrophone && !verticalBreakpoint && (
                     <DeviceToggleButton
                       styles={css`
                         position: absolute;
@@ -400,7 +402,7 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
                       {t('videoCallOverlayCamera')}
                     </span>
 
-                    {showSwitchCamera && (
+                    {showSwitchCamera && !verticalBreakpoint && (
                       <DeviceToggleButton
                         styles={css`
                           position: absolute;
