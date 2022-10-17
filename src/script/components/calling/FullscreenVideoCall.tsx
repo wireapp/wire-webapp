@@ -21,6 +21,7 @@ import React, {useEffect, useMemo, useState} from 'react';
 
 import {css} from '@emotion/react';
 import {CALL_TYPE, CONV_TYPE} from '@wireapp/avs';
+import {useMatchMedia} from '@wireapp/react-ui-kit';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import {amplify} from 'amplify';
 import {container} from 'tsyringe';
@@ -170,6 +171,11 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
     return true;
   };
 
+  // To be changed when design chooses a breakpoint, the conditional can be integrated to the ui-kit directly
+  const horizontalSmBreakpoint = useMatchMedia('max-width: 680px');
+  const horizontalXsBreakpoint = useMatchMedia('max-width: 500px');
+  const verticalBreakpoint = useMatchMedia('max-height: 420px');
+
   useEffect(() => {
     const onKeyDown = (event: KeyboardEvent): void => {
       preventFocusOutside(event, 'video-calling');
@@ -182,7 +188,11 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
 
   return (
     <div id="video-calling" className="video-calling">
-      <div id="video-title" className="video-title">
+      <div
+        id="video-title"
+        className="video-title"
+        css={{height: verticalBreakpoint ? '30px' : '', lineHeight: verticalBreakpoint ? '12px' : ''}}
+      >
         {classifiedDomains && (
           <ClassifiedBar
             users={conversationParticipants}
@@ -217,7 +227,13 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
         )}
       </div>
 
-      <div id="video-element-remote" className="video-element-remote">
+      <div
+        id="video-element-remote"
+        className="video-element-remote"
+        css={{
+          height: verticalBreakpoint ? 'calc(100% - 105px)' : 'calc(100% - 179px)',
+        }}
+      >
         <GroupVideoGrid
           maximizedParticipant={maximizedParticipant}
           selfParticipant={selfParticipant}
@@ -277,32 +293,47 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
       )}
       {!isChoosingScreen && (
         <div id="video-controls" className="video-controls">
-          <ul className="video-controls__wrapper">
-            <li className="video-controls__item__minimize">
-              <button
-                className="video-controls__button"
-                css={videoControlInActiveStyles}
-                onClick={minimize}
-                type="button"
-                aria-labelledby="minimize-label"
-                data-uie-name="do-call-controls-video-minimize"
-              >
-                {hasUnreadMessages ? (
-                  <Icon.MessageUnread
-                    css={{
-                      marginRight: '-2px',
-                      marginTop: '-2px',
-                    }}
-                  />
-                ) : (
-                  <Icon.Message />
-                )}
-                <span id="minimize-label" className="video-controls__button__label">
-                  {t('videoCallOverlayConversations')}
-                </span>
-              </button>
-            </li>
-            <div className="video-controls__centered-items" css={{display: 'flex'}}>
+          <ul
+            className="video-controls__wrapper"
+            css={{
+              justifyContent: horizontalSmBreakpoint ? 'center' : '',
+              padding: verticalBreakpoint ? '10px' : horizontalXsBreakpoint ? '32px 10px' : '32px 40px 0 40px',
+            }}
+          >
+            {!horizontalSmBreakpoint && (
+              <li className="video-controls__item__minimize">
+                <button
+                  className="video-controls__button"
+                  css={videoControlInActiveStyles}
+                  onClick={minimize}
+                  type="button"
+                  aria-labelledby="minimize-label"
+                  data-uie-name="do-call-controls-video-minimize"
+                >
+                  {hasUnreadMessages ? (
+                    <Icon.MessageUnread
+                      css={{
+                        marginRight: '-2px',
+                        marginTop: '-2px',
+                      }}
+                    />
+                  ) : (
+                    <Icon.Message />
+                  )}
+                  <span id="minimize-label" className="video-controls__button__label">
+                    {t('videoCallOverlayConversations')}
+                  </span>
+                </button>
+              </li>
+            )}
+            <div
+              className="video-controls__centered-items"
+              css={{
+                display: 'flex',
+                justifyContent: horizontalXsBreakpoint ? 'space-around' : 'space-between',
+                width: horizontalXsBreakpoint ? '100%' : '',
+              }}
+            >
               <li className="video-controls__item">
                 <button
                   className="video-controls__button"
@@ -422,19 +453,23 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
                 </button>
               </li>
             </div>
-            <div css={{display: 'flex', justifyContent: 'flex-end', minWidth: '157px'}}>
-              {participants.length > 2 && (
-                <ButtonGroup
-                  items={Object.values(CallViewTabs)}
-                  onChangeItem={item => {
-                    setActiveCallViewTab(item);
-                    setMaximizedParticipant(call, null);
-                  }}
-                  currentItem={activeCallViewTab}
-                  textSubstitute={participants.length.toString()}
-                />
-              )}
-            </div>
+            {!horizontalXsBreakpoint && (
+              <div
+                css={{display: 'flex', justifyContent: 'flex-end', minWidth: !horizontalSmBreakpoint ? '157px' : ''}}
+              >
+                {participants.length > 2 && !horizontalXsBreakpoint && (
+                  <ButtonGroup
+                    items={Object.values(CallViewTabs)}
+                    onChangeItem={item => {
+                      setActiveCallViewTab(item);
+                      setMaximizedParticipant(call, null);
+                    }}
+                    currentItem={activeCallViewTab}
+                    textSubstitute={participants.length.toString()}
+                  />
+                )}
+              </div>
+            )}
           </ul>
         </div>
       )}
