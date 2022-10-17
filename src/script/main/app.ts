@@ -83,7 +83,6 @@ import {IntegrationRepository} from '../integration/IntegrationRepository';
 import {IntegrationService} from '../integration/IntegrationService';
 import {startNewVersionPolling} from '../lifecycle/newVersionHandler';
 import {MediaRepository} from '../media/MediaRepository';
-import {MessageSender} from '../message/MessageSender';
 import {mlsConversationState} from '../mls/mlsConversationState';
 import {NotificationRepository} from '../notification/NotificationRepository';
 import {PreferenceNotificationRepository} from '../notification/PreferenceNotificationRepository';
@@ -220,7 +219,6 @@ class App {
   private _setupRepositories() {
     const repositories: ViewModelRepositories = {} as ViewModelRepositories;
     const selfService = new SelfService();
-    const sendingMessageQueue = new MessageSender();
 
     repositories.asset = container.resolve(AssetRepository);
 
@@ -256,7 +254,6 @@ class App {
       () => repositories.conversation,
       repositories.cryptography,
       repositories.event,
-      sendingMessageQueue,
       repositories.properties,
       serverTimeHandler,
       repositories.user,

@@ -17,16 +17,15 @@
  *
  */
 
-import {act} from '@testing-library/react';
+import {act, render} from '@testing-library/react';
 import {FeatureStatus} from '@wireapp/api-client/src/team/feature/';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import {amplify} from 'amplify';
 import ko from 'knockout';
 
-import {TestPage} from 'Util/test/TestPage';
 import {createRandomUuid} from 'Util/util';
 
-import {AppLock, AppLockProps, APPLOCK_STATE} from './AppLock';
+import {AppLock, APPLOCK_STATE} from './AppLock';
 
 import type {ClientRepository} from '../client/ClientRepository';
 import {TeamState} from '../team/TeamState';
@@ -40,20 +39,6 @@ jest.mock('libsodium-wrappers-sumo', () => ({
   crypto_pwhash_str_verify: (value1: string, value2: string) => value1 === value2,
   ready: Promise.resolve,
 }));
-
-class AppLockPage extends TestPage<AppLockProps> {
-  constructor(props?: AppLockProps) {
-    super(AppLock, props);
-  }
-
-  getAppLockModal = () => this.get('div[data-uie-name="applock-modal"]');
-  getAppLockModalBody = (appLockState: APPLOCK_STATE) =>
-    this.get(`div[data-uie-name="applock-modal-body"][data-uie-value="${appLockState}"]`);
-  getAppLockInput = () => this.get('input[data-uie-name="input-applock-set-a"]');
-  changeAppLockInput = (value: string) => this.changeValue(this.getAppLockInput(), {value});
-  getForm = () => this.get('form');
-  formSubmit = () => this.submit(this.getForm());
-}
 
 const clientRepository = {} as unknown as ClientRepository;
 
@@ -100,12 +85,15 @@ describe('AppLock', () => {
       const appLockState = createAppLockState(createTeamState({status: FeatureStatus.DISABLED}));
       const appLockRepository = createAppLockRepository(appLockState);
 
-      const appLockPage = new AppLockPage({
+      const props = {
         appLockRepository,
         appLockState,
         clientRepository,
-      });
-      const appLockModal = appLockPage.getAppLockModal();
+      };
+
+      const {getByTestId} = render(<AppLock {...props} />);
+
+      const appLockModal = getByTestId('applock-modal');
       expect(window.getComputedStyle(appLockModal).getPropertyValue('display')).toBe('none');
     });
   });
@@ -118,12 +106,16 @@ describe('AppLock', () => {
       appLockState.isActivatedInPreferences(true);
       jest.spyOn(document, 'querySelector').mockReturnValue(document.createElement('div'));
 
-      const appLockPage = new AppLockPage({
+      const props = {
         appLockRepository,
         appLockState,
         clientRepository,
-      });
-      expect(appLockPage.getAppLockModalBody(APPLOCK_STATE.LOCKED)).not.toBeNull();
+      };
+
+      const {getByTestId} = render(<AppLock {...props} />);
+
+      const appLockModalBody = getByTestId('applock-modal-body');
+      expect(appLockModalBody.getAttribute('data-uie-value')).toEqual(APPLOCK_STATE.LOCKED);
     });
 
     it('shows setup state when there is no passphrase is set and app lock is enabled', () => {
@@ -133,16 +125,20 @@ describe('AppLock', () => {
       appLockState.isActivatedInPreferences(true);
       jest.spyOn(document, 'querySelector').mockReturnValue(document.createElement('div'));
 
-      const appLockPage = new AppLockPage({
+      const props = {
         appLockRepository,
         appLockState,
         clientRepository,
-      });
+      };
+
+      const {getByTestId} = render(<AppLock {...props} />);
+
       act(() => {
         amplify.publish(WebAppEvents.PREFERENCES.CHANGE_APP_LOCK_PASSPHRASE);
       });
-      appLockPage.update();
-      expect(appLockPage.getAppLockModalBody(APPLOCK_STATE.SETUP)).not.toBeNull();
+
+      const appLockModalBody = getByTestId('applock-modal-body');
+      expect(appLockModalBody.getAttribute('data-uie-value')).toEqual(APPLOCK_STATE.SETUP);
     });
 
     it('shows setup state when there is no passphrase is set and enforced is enabled', () => {
@@ -151,16 +147,20 @@ describe('AppLock', () => {
       appLockState.hasPassphrase(false);
       jest.spyOn(document, 'querySelector').mockReturnValue(document.createElement('div'));
 
-      const appLockPage = new AppLockPage({
+      const props = {
         appLockRepository,
         appLockState,
         clientRepository,
-      });
+      };
+
+      const {getByTestId} = render(<AppLock {...props} />);
+
       act(() => {
         amplify.publish(WebAppEvents.PREFERENCES.CHANGE_APP_LOCK_PASSPHRASE);
       });
-      appLockPage.update();
-      expect(appLockPage.getAppLockModalBody(APPLOCK_STATE.SETUP)).not.toBeNull();
+
+      const appLockModalBody = getByTestId('applock-modal-body');
+      expect(appLockModalBody.getAttribute('data-uie-value')).toEqual(APPLOCK_STATE.SETUP);
     });
   });
 
@@ -171,13 +171,15 @@ describe('AppLock', () => {
     appLockState.isActivatedInPreferences(true);
     jest.spyOn(document, 'querySelector').mockReturnValue(document.createElement('div'));
 
-    const appLockPage = new AppLockPage({
+    const props = {
       appLockRepository,
       appLockState,
       clientRepository,
-    });
+    };
 
-    const appLockModal = appLockPage.getAppLockModal();
+    const {getByTestId} = render(<AppLock {...props} />);
+
+    const appLockModal = getByTestId('applock-modal');
     expect(window.getComputedStyle(appLockModal).getPropertyValue('display')).toBe('flex');
   });
 });

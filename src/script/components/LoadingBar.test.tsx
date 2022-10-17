@@ -17,21 +17,15 @@
  *
  */
 
-import {TestPage} from 'Util/test/TestPage';
+import {render} from '@testing-library/react';
 
-import {LoadingBar, LoadingBarProps} from './LoadingBar';
-
-class LoadingBarPage extends TestPage<LoadingBarProps> {
-  constructor(props?: LoadingBarProps) {
-    super(LoadingBar, props);
-  }
-
-  getProgressElement = () => this.get('div[data-uie-name="loading-bar-progress"]');
-}
+import {LoadingBar} from './LoadingBar';
 
 describe('LoadingBar', () => {
   it('renders correct progress', async () => {
-    const LoadingBar = new LoadingBarPage({message: 'example', progress: 30});
-    expect(LoadingBar.getProgressElement().getAttribute('style')).toBe('width: 30%;');
+    const props = {message: 'example', progress: 30};
+
+    const {getByTestId} = render(<LoadingBar {...props} />);
+    expect(getByTestId('loading-bar-progress').getAttribute('style')).toBe('width: 30%;');
   });
 });

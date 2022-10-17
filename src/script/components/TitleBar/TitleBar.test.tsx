@@ -26,6 +26,7 @@ import {amplify} from 'amplify';
 import ko from 'knockout';
 
 import {TitleBar} from 'Components/TitleBar';
+import {withTheme} from 'src/script/auth/util/test/TestUtil';
 
 import {TestFactory} from '../../../../test/helper/TestFactory';
 import {CallingRepository} from '../../calling/CallingRepository';
@@ -91,7 +92,7 @@ describe('TitleBar', () => {
     spyOn(amplify, 'subscribe').and.returnValue(undefined);
     const conversation = new Conversation();
 
-    await render(<TitleBar {...getDefaultProps(callingRepository, conversation)} />);
+    await render(withTheme(<TitleBar {...getDefaultProps(callingRepository, conversation)} />));
     await waitFor(() => {
       expect(amplify.subscribe).toHaveBeenCalledWith(WebAppEvents.SHORTCUT.PEOPLE, expect.anything());
       expect(amplify.subscribe).toHaveBeenCalledWith(WebAppEvents.SHORTCUT.ADD_PEOPLE, expect.anything());
@@ -103,7 +104,7 @@ describe('TitleBar', () => {
     const conversation = new Conversation();
 
     const {queryByText} = render(
-      <TitleBar {...getDefaultProps(callingRepository, conversation)} userState={userState} />,
+      withTheme(<TitleBar {...getDefaultProps(callingRepository, conversation)} userState={userState} />),
     );
 
     expect(queryByText('tooltipConversationSearch')).toBeNull();
@@ -114,7 +115,7 @@ describe('TitleBar', () => {
     const conversation = new Conversation();
 
     const {getByText} = render(
-      <TitleBar {...getDefaultProps(callingRepository, conversation)} userState={userState} />,
+      withTheme(<TitleBar {...getDefaultProps(callingRepository, conversation)} userState={userState} />),
     );
 
     const searchButton = getByText('tooltipConversationSearch');
@@ -132,7 +133,7 @@ describe('TitleBar', () => {
       display_name: ko.pureComputed(() => displayName),
     });
     const props = getDefaultProps(callingRepository, conversation);
-    const {getByText} = render(<TitleBar {...props} userState={userState} />);
+    const {getByText} = render(withTheme(<TitleBar {...props} userState={userState} />));
 
     const conversationName = getByText(displayName);
     expect(conversationName).toBeDefined();
@@ -148,7 +149,7 @@ describe('TitleBar', () => {
 
     mockedUiKit.useMatchMedia.mockReturnValue(false);
 
-    const {getByLabelText} = render(<TitleBar {...props} userState={userState} />);
+    const {getByLabelText} = render(withTheme(<TitleBar {...props} userState={userState} />));
 
     const infoButton = getByLabelText('tooltipConversationInfo');
     expect(infoButton).toBeDefined();
@@ -161,7 +162,7 @@ describe('TitleBar', () => {
     mockedUiKit.useMatchMedia.mockReturnValue(true);
     const conversation = new Conversation();
 
-    const {queryByLabelText} = render(<TitleBar {...getDefaultProps(callingRepository, conversation)} />);
+    const {queryByLabelText} = render(withTheme(<TitleBar {...getDefaultProps(callingRepository, conversation)} />));
 
     const infoButton = queryByLabelText('tooltipConversationInfo');
     const videoCallButton = queryByLabelText('tooltipConversationVideoCall');
@@ -174,7 +175,7 @@ describe('TitleBar', () => {
     const conversation = createConversationEntity({hasLegalHold: ko.pureComputed(() => false)});
 
     const {container} = render(
-      <TitleBar {...getDefaultProps(callingRepository, conversation)} userState={userState} />,
+      withTheme(<TitleBar {...getDefaultProps(callingRepository, conversation)} userState={userState} />),
     );
 
     const legalHoldDotButton = container.querySelector('button[data-uie-name="status-legal-hold-conversation"]');
@@ -186,7 +187,7 @@ describe('TitleBar', () => {
     const conversation = createConversationEntity({hasLegalHold: ko.pureComputed(() => true)});
 
     const {container} = render(
-      <TitleBar {...getDefaultProps(callingRepository, conversation)} userState={userState} />,
+      withTheme(<TitleBar {...getDefaultProps(callingRepository, conversation)} userState={userState} />),
     );
 
     const legalHoldDotButton = container.querySelector('button[data-uie-name="status-legal-hold-conversation"]');
@@ -202,7 +203,7 @@ describe('TitleBar', () => {
       });
 
       const {container} = render(
-        <TitleBar {...getDefaultProps(callingRepository, conversation)} userState={userState} />,
+        withTheme(<TitleBar {...getDefaultProps(callingRepository, conversation)} userState={userState} />),
       );
 
       const verifiedIcon = container.querySelector('[data-uie-name="conversation-title-bar-verified-icon"]');
@@ -217,7 +218,7 @@ describe('TitleBar', () => {
     });
 
     const {container} = render(
-      <TitleBar {...getDefaultProps(callingRepository, conversation)} userState={userState} />,
+      withTheme(<TitleBar {...getDefaultProps(callingRepository, conversation)} userState={userState} />),
     );
 
     const verifiedIcon = container.querySelector('[data-uie-name="conversation-title-bar-verified-icon"]');
@@ -234,7 +235,7 @@ describe('TitleBar', () => {
         {domain: '', id: ''},
       ] as QualifiedId[]),
     });
-    const {getByLabelText} = render(<TitleBar {...getDefaultProps(callingRepository, conversation)} />);
+    const {getByLabelText} = render(withTheme(<TitleBar {...getDefaultProps(callingRepository, conversation)} />));
 
     const audioCallButton = getByLabelText('tooltipConversationCall');
     expect(audioCallButton).toBeDefined();
@@ -256,7 +257,7 @@ describe('TitleBar', () => {
     const teamState = createTeamState({isVideoCallingEnabled: ko.pureComputed(() => false)});
 
     const {queryByLabelText} = render(
-      <TitleBar {...getDefaultProps(callingRepository, conversation)} teamState={teamState} />,
+      withTheme(<TitleBar {...getDefaultProps(callingRepository, conversation)} teamState={teamState} />),
     );
 
     const videoCallButton = queryByLabelText('tooltipConversationVideoCall');
@@ -278,7 +279,7 @@ describe('TitleBar', () => {
     });
 
     const {getByLabelText} = render(
-      <TitleBar {...getDefaultProps(callingRepository, conversation)} teamState={teamState} />,
+      withTheme(<TitleBar {...getDefaultProps(callingRepository, conversation)} teamState={teamState} />),
     );
 
     const videoCallButton = getByLabelText('tooltipConversationVideoCall');
@@ -294,7 +295,7 @@ describe('TitleBar', () => {
       isGroup: ko.pureComputed(() => true),
     });
 
-    const {getByText} = render(<TitleBar {...getDefaultProps(callingRepository, conversation)} />);
+    const {getByText} = render(withTheme(<TitleBar {...getDefaultProps(callingRepository, conversation)} />));
 
     expect(getByText('guestRoomConversationBadge')).toBeDefined();
   });

@@ -18,18 +18,36 @@
  */
 
 import {act, waitFor} from '@testing-library/react';
-import {TypeUtil} from '@wireapp/commons';
+import {Navigate} from 'react-router-dom';
 
 import {Index} from './Index';
 
-import {Config, Configuration} from '../../Config';
+import {Config} from '../../Config';
 import {initialRootState} from '../module/reducer';
 import {initialAuthState} from '../module/reducer/authReducer';
 import {ROUTE} from '../route';
 import {mockStoreFactory} from '../util/test/mockStoreFactory';
 import {mountComponent} from '../util/test/TestUtil';
+
 jest.mock('../util/SVGProvider');
+
+jest.mock('react-router-dom', () => ({
+  ...jest.requireActual('react-router-dom'),
+  Navigate: jest.fn().mockImplementation(),
+}));
+
 describe('when visiting the index page', () => {
+  let configSpy: jest.SpyInstance;
+  beforeEach(() => {
+    configSpy = jest.spyOn(Config, 'getConfig').mockReturnValue({
+      BACKEND_NAME: 'mybrand',
+      FEATURE: {
+        ENABLE_ACCOUNT_REGISTRATION: true,
+        ENABLE_DOMAIN_DISCOVERY: false,
+        ENABLE_SSO: false,
+      },
+    } as any);
+  });
   it('shows the logo', () => {
     const {getByTestId} = mountComponent(
       <Index />,
@@ -48,8 +66,6 @@ describe('when visiting the index page', () => {
   });
 
   it('redirects to SSO login if default SSO code is set', async () => {
-    const historyPushSpy = spyOn(history, 'pushState');
-
     const defaultSSOCode = 'default-a4b0-4c59-a31d-303a7f5eb5ab';
 
     mountComponent(
@@ -70,13 +86,7 @@ describe('when visiting the index page', () => {
       }),
     );
 
-    await waitFor(() => {
-      expect(historyPushSpy).toHaveBeenCalledWith(
-        expect.any(Object),
-        expect.any(String),
-        `#${ROUTE.SSO}/wire-${defaultSSOCode}` as any,
-      );
-    });
+    expect(Navigate).toHaveBeenCalledWith({to: `${ROUTE.SSO}/wire-${defaultSSOCode}`}, {});
   });
 
   it('shows the welcome text with default backend name', () => {
@@ -93,12 +103,12 @@ describe('when visiting the index page', () => {
     );
 
     const welcomeText = getByTestId('welcome-text');
-    expect(welcomeText.innerHTML).toContain(Config.getConfig().BRAND_NAME);
+    expect(welcomeText.innerHTML).toContain(Config.getConfig().BACKEND_NAME);
   });
 
   it('shows the welcome text with custom backend name', () => {
     const customBackendName = 'Test';
-    spyOn<{getConfig: () => TypeUtil.RecursivePartial<Configuration>}>(Config, 'getConfig').and.returnValue({
+    configSpy.mockReturnValue({
       BACKEND_NAME: customBackendName,
       FEATURE: {
         ENABLE_ACCOUNT_REGISTRATION: true,
@@ -147,7 +157,7 @@ describe('when visiting the index page', () => {
   });
 
   it('navigates to SSO login page when clicking SSO login button', async () => {
-    spyOn<{getConfig: () => TypeUtil.RecursivePartial<Configuration>}>(Config, 'getConfig').and.returnValue({
+    configSpy.mockReturnValue({
       FEATURE: {
         ENABLE_DOMAIN_DISCOVERY: true,
         ENABLE_SSO: true,
@@ -180,8 +190,8 @@ describe('when visiting the index page', () => {
   });
 
   describe('and the account registration is disabled', () => {
-    beforeAll(() => {
-      spyOn<{getConfig: () => TypeUtil.RecursivePartial<Configuration>}>(Config, 'getConfig').and.returnValue({
+    beforeEach(() => {
+      configSpy.mockReturnValue({
         FEATURE: {
           ENABLE_ACCOUNT_REGISTRATION: false,
         },
@@ -207,8 +217,8 @@ describe('when visiting the index page', () => {
   });
 
   describe('and the account registration is enabled', () => {
-    beforeAll(() => {
-      spyOn<{getConfig: () => TypeUtil.RecursivePartial<Configuration>}>(Config, 'getConfig').and.returnValue({
+    beforeEach(() => {
+      configSpy.mockReturnValue({
         FEATURE: {
           ENABLE_ACCOUNT_REGISTRATION: true,
         },
@@ -247,8 +257,8 @@ describe('when visiting the index page', () => {
   });
 
   describe('and SSO & domain discovery is disabled', () => {
-    beforeAll(() => {
-      spyOn<{getConfig: () => TypeUtil.RecursivePartial<Configuration>}>(Config, 'getConfig').and.returnValue({
+    beforeEach(() => {
+      configSpy.mockReturnValue({
         FEATURE: {
           ENABLE_DOMAIN_DISCOVERY: false,
           ENABLE_SSO: false,
@@ -274,8 +284,8 @@ describe('when visiting the index page', () => {
   });
 
   describe('and SSO, domain discovery & account registration is disabled', () => {
-    beforeAll(() => {
-      spyOn<{getConfig: () => TypeUtil.RecursivePartial<Configuration>}>(Config, 'getConfig').and.returnValue({
+    beforeEach(() => {
+      configSpy.mockReturnValue({
         FEATURE: {
           ENABLE_ACCOUNT_REGISTRATION: false,
           ENABLE_DOMAIN_DISCOVERY: false,
@@ -285,7 +295,6 @@ describe('when visiting the index page', () => {
     });
 
     it('navigates directly to email login', async () => {
-      const historyPushSpy = spyOn(history, 'pushState');
       mountComponent(
         <Index />,
         mockStoreFactory()({
@@ -298,9 +307,7 @@ describe('when visiting the index page', () => {
         }),
       );
 
-      await waitFor(() => {
-        expect(historyPushSpy).toHaveBeenCalledWith(expect.any(Object), expect.any(String), `#${ROUTE.LOGIN}`);
-      });
+      expect(Navigate).toHaveBeenCalledWith({to: ROUTE.LOGIN}, {});
     });
   });
 });

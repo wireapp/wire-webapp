@@ -67,7 +67,9 @@
   }
 
   .right-column {
+    position: absolute;
     z-index: @z-index-panel;
+    right: 0;
     right: 0;
     overflow: hidden;
     width: @right-width;
@@ -78,20 +80,8 @@
     background-color: var(--sidebar-bg);
     transform: scale(1, 1);
 
-    @media (min-width: 1000px) {
-      position: relative;
-    }
-  }
-
-  &.app--panel-open {
     .center-column__overlay {
       display: block;
-    }
-
-    .right-column {
-      position: absolute;
-      right: 0;
-      width: @right-width;
     }
 
     @media (min-width: 1000px) {
@@ -110,5 +100,12 @@
   }
   &--large-offset {
     top: 64px;
+  }
+
+  // @media (max-width: calc(@screen-sm-min*2)) {
+  @media (max-width: 620px) {
+    .left-column {
+      width: 100%;
+    }
   }
 }

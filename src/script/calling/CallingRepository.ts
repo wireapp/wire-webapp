@@ -87,6 +87,8 @@ import {Segmentation} from '../tracking/Segmentation';
 import type {UserRepository} from '../user/UserRepository';
 import {Warnings} from '../view_model/WarningsContainer';
 
+const avsLogger = getLogger('avs');
+
 interface MediaStreamQuery {
   audio?: boolean;
   camera?: boolean;
@@ -234,7 +236,18 @@ export class CallingRepository {
   }
 
   private configureCallingApi(wCall: Wcall): Wcall {
-    const avsLogger = getLogger('avs');
+    wCall.setLogHandler(this.avsLogHandler);
+
+    const avsEnv = Runtime.isFirefox() ? AVS_ENV.FIREFOX : AVS_ENV.DEFAULT;
+    wCall.init(avsEnv);
+    wCall.setUserMediaHandler(this.getCallMediaStream);
+    wCall.setAudioStreamHandler(this.updateCallAudioStreams);
+    wCall.setVideoStreamHandler(this.updateParticipantVideoStream);
+    setInterval(() => wCall.poll(), 500);
+    return wCall;
+  }
+
+  private readonly avsLogHandler = (level: LOG_LEVEL, message: string, error: Error | unknown) => {
     const logLevels: Record<LOG_LEVEL, string> = {
       [LOG_LEVEL.DEBUG]: 'DEBUG',
       [LOG_LEVEL.INFO]: 'INFO ',
@@ -247,21 +260,10 @@ export class CallingRepository {
       [LOG_LEVEL.WARN]: avsLogger.warn,
       [LOG_LEVEL.ERROR]: avsLogger.error,
     };
-
-    wCall.setLogHandler((level: LOG_LEVEL, message: string, error: Error) => {
-      const trimmedMessage = message.trim();
-      logFunctions[level].call(avsLogger, trimmedMessage, error);
-      this.callLog.push(`${new Date().toISOString()} [${logLevels[level]}] ${trimmedMessage}`);
-    });
-
-    const avsEnv = Runtime.isFirefox() ? AVS_ENV.FIREFOX : AVS_ENV.DEFAULT;
-    wCall.init(avsEnv);
-    wCall.setUserMediaHandler(this.getCallMediaStream);
-    wCall.setAudioStreamHandler(this.updateCallAudioStreams);
-    wCall.setVideoStreamHandler(this.updateParticipantVideoStream);
-    setInterval(() => wCall.poll(), 500);
-    return wCall;
-  }
+    const trimmedMessage = message.trim();
+    logFunctions[level].call(avsLogger, trimmedMessage, error);
+    this.callLog.push(`${new Date().toISOString()} [${logLevels[level]}] ${trimmedMessage}`);
+  };
 
   private createWUser(wCall: Wcall, selfUserId: string, selfClientId: string): number {
     /* cspell:disable */
@@ -320,7 +322,7 @@ export class CallingRepository {
     const {id, domain} = call.conversationId;
     const allClients = conversation.isUsingMLSProtocol
       ? await this.core.service!.conversation.fetchAllParticipantsClients(id, domain)
-      : await this.core.service!.conversation.getAllParticipantsClients(id, domain);
+      : await this.core.service!.conversation.getAllParticipantsClients(call.conversationId);
     const qualifiedClients = isQualifiedUserClients(allClients)
       ? flattenQualifiedUserClients(allClients)
       : flattenUserClients(allClients);
@@ -589,7 +591,7 @@ export class CallingRepository {
           const {id, domain} = conversationId;
           const allClients = conversationEntity.isUsingMLSProtocol
             ? await this.core.service!.conversation.fetchAllParticipantsClients(id, domain)
-            : await this.core.service!.conversation.getAllParticipantsClients(id, domain);
+            : await this.core.service!.conversation.getAllParticipantsClients(conversationId);
           // We warn the message repository that a mismatch has happened outside of its lifecycle (eventually triggering a conversation degradation)
           // We warn the message repository that a mismatch has happened outside of its lifecycle (eventually triggering a conversation degradation)
           const shouldContinue = await this.messageRepository.updateMissingClients(
@@ -1159,11 +1161,17 @@ export class CallingRepository {
     _: number,
   ): number => {
     (async () => {
-      const response = await axios.post(url, data);
+      try {
+        const response = await axios.post(url, data);
 
-      const {status, data: axiosData} = response;
-      const jsonData = JSON.stringify(axiosData);
-      this.wCall?.sftResp(this.wUser!, status, jsonData, jsonData.length, context);
+        const {status, data: axiosData} = response;
+        const jsonData = JSON.stringify(axiosData);
+        this.wCall?.sftResp(this.wUser!, status, jsonData, jsonData.length, context);
+      } catch (error) {
+        const message = error instanceof Error ? error.message : error;
+        this.avsLogHandler(LOG_LEVEL.WARN, `Request to sft server failed with error: ${message}`, error);
+        avsLogger.warn(`Request to sft server failed with error`, error);
+      }
     })();
 
     return 0;
