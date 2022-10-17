@@ -191,7 +191,9 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
       <div
         id="video-title"
         className="video-title"
-        css={{height: verticalBreakpoint ? '30px' : '', lineHeight: verticalBreakpoint ? '12px' : ''}}
+        css={{
+          ...(verticalBreakpoint && {height: '30px', lineHeight: '12px'}),
+        }}
       >
         {horizontalSmBreakpoint && (
           <IconButton
@@ -306,7 +308,7 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
           <ul
             className="video-controls__wrapper"
             css={{
-              justifyContent: horizontalSmBreakpoint ? 'center' : '',
+              ...(horizontalSmBreakpoint && {justifyContent: 'center'}),
               padding: verticalBreakpoint ? '10px' : horizontalXsBreakpoint ? '32px 10px' : '32px 40px 0 40px',
             }}
           >
@@ -465,7 +467,7 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
             </div>
             {!horizontalXsBreakpoint && (
               <div
-                css={{display: 'flex', justifyContent: 'flex-end', minWidth: !horizontalSmBreakpoint ? '157px' : ''}}
+                css={{...(!horizontalSmBreakpoint && {minWidth: '157px'}), display: 'flex', justifyContent: 'flex-end'}}
               >
                 {participants.length > 2 && !horizontalXsBreakpoint && (
                   <ButtonGroup
