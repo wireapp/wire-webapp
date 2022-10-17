@@ -22,11 +22,11 @@ import React from 'react';
 import {container} from 'tsyringe';
 
 import {LegalHoldDot} from 'Components/LegalHoldDot';
+import {useLegalHoldModalState} from 'Components/Modals/LegalHoldModal/LegalHoldModal.state';
 import {t} from 'Util/LocalizerUtil';
 
 import {ConversationState} from '../../../conversation/ConversationState';
 import {LegalHoldMessage as LegalHoldMessageEntity} from '../../../entity/message/LegalHoldMessage';
-import {useAppMainState} from '../../../page/state';
 
 export interface LegalHoldMessageProps {
   conversationState?: ConversationState;
@@ -37,7 +37,7 @@ const LegalHoldMessage: React.FC<LegalHoldMessageProps> = ({
   message,
   conversationState = container.resolve(ConversationState),
 }) => {
-  const {showUsers} = useAppMainState(state => state.legalHoldModal);
+  const {showUsers} = useLegalHoldModalState(state => state);
 
   const showLegalHold = () => {
     showUsers(false, conversationState.activeConversation());

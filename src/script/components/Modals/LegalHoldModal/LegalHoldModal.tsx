@@ -31,12 +31,13 @@ import {UserSearchableList} from 'Components/UserSearchableList';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 
+import {useLegalHoldModalState} from './LegalHoldModal.state';
+
 import {ClientRepository} from '../../../client/ClientRepository';
 import {ConversationRepository} from '../../../conversation/ConversationRepository';
 import {MessageRepository} from '../../../conversation/MessageRepository';
 import {CryptographyRepository} from '../../../cryptography/CryptographyRepository';
 import {User} from '../../../entity/User';
-import {useAppMainState} from '../../../page/state';
 import {SearchRepository} from '../../../search/SearchRepository';
 import {TeamRepository} from '../../../team/TeamRepository';
 import {UserState} from '../../../user/UserState';
@@ -67,7 +68,7 @@ const LegalHoldModal: FC<LegalHoldModalProps> = ({
   cryptographyRepository,
   messageRepository,
 }) => {
-  const legalHoldModal = useAppMainState(state => state.legalHoldModal);
+  const legalHoldModal = useLegalHoldModalState();
   const {
     fingerprint,
     setFingerprint,

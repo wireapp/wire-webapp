@@ -19,12 +19,8 @@
 
 import create from 'zustand';
 
-import {LegalHoldModalType} from 'Components/Modals/LegalHoldModal/LegalHoldModal';
-import {splitFingerprint} from 'Util/StringUtil';
+import {PanelEntity, PanelState} from './RightSidebar';
 
-import {PanelEntity, PanelState} from './RightSidebar/RightSidebar';
-
-import {Conversation} from '../entity/Conversation';
 import {User} from '../entity/User';
 
 export enum ViewType {
@@ -43,30 +39,6 @@ type AppMainState = {
     currentView: ViewType;
     setCurrentView: (view: ViewType) => void;
   };
-  legalHoldModal: {
-    type: LegalHoldModalType | null;
-    isOpen: boolean;
-    isLoading: boolean;
-    isRequestModal: boolean;
-    users: User[];
-    skipUsers: boolean;
-    isSelfInfo: boolean;
-    isInitialized: boolean;
-    closeModal: () => void;
-    setType: (type: LegalHoldModalType) => void;
-    setUsers: (users: User[]) => void;
-    setSkipUsers: (skipUsers: boolean) => void;
-    setIsModalOpen: (isOpen: boolean) => void;
-    setIsRequestModal: (isRequestModal: boolean) => void;
-    setIsLoading: (isLoading: boolean) => void;
-    showRequestModal: (initialize?: boolean, showLoading?: boolean, fingerprint?: string) => void;
-    setFingerprint: (fingerprint?: string) => void;
-    closeRequestModal: (conversationId?: string) => void;
-    showUsers: (initialize?: boolean, conversation?: Conversation | null) => void;
-    conversationId?: string;
-    fingerprint?: string;
-    conversation?: Conversation | null;
-  };
   rightSidebar: {
     clearHistory: () => void;
     entity: RightSidebarParams['entity'];
@@ -80,152 +52,7 @@ type AppMainState = {
   };
 };
 
-const legalHoldModalDefaultState = {
-  conversation: null,
-  conversationId: '',
-  fingerprint: '',
-  isLoading: false,
-  isOpen: false,
-  isRequestModal: false,
-  isSelfInfo: false,
-  skipUsers: false,
-  type: null,
-  users: [],
-};
-
 const useAppMainState = create<AppMainState>((set, get) => ({
-  legalHoldModal: {
-    closeModal: () =>
-      set(state => ({
-        ...state,
-        legalHoldModal: {
-          ...state.legalHoldModal,
-          ...legalHoldModalDefaultState,
-        },
-      })),
-    closeRequestModal: conversationId => {
-      if (conversationId !== get().legalHoldModal.conversationId) {
-        return;
-      }
-
-      return set(state => ({
-        ...state,
-        legalHoldModal: {
-          ...state.legalHoldModal,
-          ...legalHoldModalDefaultState,
-        },
-      }));
-    },
-    conversation: null,
-    conversationId: '',
-    fingerprint: '',
-    isInitialized: false,
-    isLoading: false,
-    isOpen: false,
-    isRequestModal: false,
-    isSelfInfo: false,
-    setFingerprint: (fingerprint = '') => {
-      const formattedFingerprint = fingerprint
-        ? splitFingerprint(fingerprint)
-            .map(part => `<span>${part} </span>`)
-            .join('')
-        : '';
-
-      return set(state => ({
-        ...state,
-        legalHoldModal: {
-          ...state.legalHoldModal,
-          fingerprint: formattedFingerprint,
-          isOpen: !!formattedFingerprint,
-        },
-      }));
-    },
-    setIsLoading: isLoading =>
-      set(state => ({
-        ...state,
-        legalHoldModal: {
-          ...state.legalHoldModal,
-          isLoading,
-        },
-      })),
-    setIsModalOpen: isOpen =>
-      set(state => ({
-        ...state,
-        legalHoldModal: {
-          ...state.legalHoldModal,
-          isOpen,
-        },
-      })),
-    setIsRequestModal: isRequestModal =>
-      set(state => ({
-        ...state,
-        legalHoldModal: {
-          ...state.legalHoldModal,
-          isRequestModal,
-        },
-      })),
-    setSkipUsers: skipUsers =>
-      set(state => ({
-        ...state,
-        legalHoldModal: {
-          ...state.legalHoldModal,
-          skipUsers,
-        },
-      })),
-    setType: type =>
-      set(state => ({
-        ...state,
-        legalHoldModal: {
-          ...state.legalHoldModal,
-          type,
-        },
-      })),
-    setUsers: users =>
-      set(state => ({
-        ...state,
-        legalHoldModal: {
-          ...state.legalHoldModal,
-          users,
-        },
-      })),
-    showRequestModal: (initialize = false, showLoading = false, fingerprint) => {
-      const formattedFingerprint = fingerprint
-        ? splitFingerprint(fingerprint)
-            .map(part => `<span>${part} </span>`)
-            .join('')
-        : '';
-
-      return set(state => ({
-        ...state,
-        legalHoldModal: {
-          ...state.legalHoldModal,
-          fingerprint: formattedFingerprint,
-          isInitialized: initialize,
-          isLoading: showLoading,
-          isOpen: showLoading,
-          isRequestModal: true,
-          type: LegalHoldModalType.REQUEST,
-        },
-      }));
-    },
-    showUsers: (initialize = false, conversation) =>
-      set(state => ({
-        ...state,
-        legalHoldModal: {
-          ...state.legalHoldModal,
-          conversation,
-          conversationId: conversation ? conversation?.id : 'self',
-          isInitialized: initialize,
-          isLoading: true,
-          isOpen: true,
-          isSelfInfo: !conversation,
-          type: LegalHoldModalType.USERS,
-        },
-      })),
-    skipUsers: false,
-    type: null,
-    users: [],
-  },
   responsiveView: {
     currentView: ViewType.LEFT_SIDEBAR,
     setCurrentView: (view: ViewType) =>

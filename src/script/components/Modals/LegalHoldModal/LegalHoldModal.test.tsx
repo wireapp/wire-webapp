@@ -18,17 +18,21 @@
  */
 
 import {act, render} from '@testing-library/react';
+import type {QualifiedId} from '@wireapp/api-client/src/user/';
 import ko from 'knockout';
+
+import {useLegalHoldModalState} from 'Components/Modals/LegalHoldModal/LegalHoldModal.state';
 
 import {LegalHoldModal, LegalHoldModalType} from './LegalHoldModal';
 
 import {TestFactory} from '../../../../../test/helper/TestFactory';
 import {CallingRepository} from '../../../calling/CallingRepository';
 import {ClientRepository} from '../../../client/ClientRepository';
+import {ConversationRepository} from '../../../conversation/ConversationRepository';
+import {MessageRepository} from '../../../conversation/MessageRepository';
 import {CryptographyRepository} from '../../../cryptography/CryptographyRepository';
 import {Conversation} from '../../../entity/Conversation';
 import {User} from '../../../entity/User';
-import {useAppMainState} from '../../../page/state';
 import {SearchRepository} from '../../../search/SearchRepository';
 import {SearchService} from '../../../search/SearchService';
 import {TeamRepository} from '../../../team/TeamRepository';
@@ -49,12 +53,12 @@ beforeAll(() => {
 const defaultProps = () => ({
   clientRepository: {} as ClientRepository,
   conversationRepository: {
-    getAllUsersInConversation: () => [],
-  } as any,
+    getAllUsersInConversation: (conversationId: QualifiedId): Promise<User[]> => Promise.resolve([]),
+  } as ConversationRepository,
   cryptographyRepository: new CryptographyRepository({} as any),
   messageRepository: {
-    updateAllClients: jest.fn(),
-  } as any,
+    updateAllClients: (conversation: Conversation, blockSystemMessage: boolean): Promise<void> => Promise.resolve(),
+  } as MessageRepository,
   searchRepository: new SearchRepository(new SearchService(), userRepository),
   teamRepository: {} as TeamRepository,
   userState: {
@@ -67,10 +71,10 @@ describe('LegalHoldModal', () => {
   it('is showRequestModal', () => {
     render(<LegalHoldModal {...defaultProps()} />);
     act(() => {
-      useAppMainState.getState().legalHoldModal.showRequestModal();
+      useLegalHoldModalState.getState().showRequestModal();
     });
 
-    expect(useAppMainState.getState().legalHoldModal.type).toBe(LegalHoldModalType.REQUEST);
+    expect(useLegalHoldModalState.getState().type).toBe(LegalHoldModalType.REQUEST);
   });
 
   it('is showUser', async () => {
@@ -79,9 +83,9 @@ describe('LegalHoldModal', () => {
     const selfConversation = new Conversation(props.userState.self().id);
 
     await act(() => {
-      useAppMainState.getState().legalHoldModal.showUsers(false, selfConversation);
+      useLegalHoldModalState.getState().showUsers(false, selfConversation);
     });
 
-    await expect(useAppMainState.getState().legalHoldModal.type).toBe(LegalHoldModalType.USERS);
+    await expect(useLegalHoldModalState.getState().type).toBe(LegalHoldModalType.USERS);
   });
 });

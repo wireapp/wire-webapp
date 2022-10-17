@@ -23,6 +23,7 @@ import {amplify} from 'amplify';
 import ko from 'knockout';
 import {container} from 'tsyringe';
 
+import {useLegalHoldModalState} from 'Components/Modals/LegalHoldModal/LegalHoldModal.state';
 import {t} from 'Util/LocalizerUtil';
 import {getLogger, Logger} from 'Util/Logger';
 import {matchQualifiedIds} from 'Util/QualifiedId';
@@ -142,8 +143,8 @@ export class ContentViewModel {
     this._initSubscriptions();
 
     if (this.teamState.supportsLegalHold()) {
-      const {legalHoldModal} = useAppMainState.getState();
-      legalHoldModal.showRequestModal(true);
+      const {showRequestModal} = useLegalHoldModalState.getState();
+      showRequestModal(true);
     }
   }
 

@@ -41,6 +41,7 @@ import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 import {container} from 'tsyringe';
 import {flatten} from 'underscore';
 
+import {useLegalHoldModalState} from 'Components/Modals/LegalHoldModal/LegalHoldModal.state';
 import {chunk, partition} from 'Util/ArrayUtil';
 import {t} from 'Util/LocalizerUtil';
 import {getLogger, Logger} from 'Util/Logger';
@@ -69,7 +70,6 @@ import {UserError} from '../error/UserError';
 import {USER} from '../event/Client';
 import {EventRepository} from '../event/EventRepository';
 import type {EventSource} from '../event/EventSource';
-import {useAppMainState} from '../page/state';
 import type {PropertiesRepository} from '../properties/PropertiesRepository';
 import type {SelfService} from '../self/SelfService';
 import type {ServerTimeHandler} from '../time/serverTimeHandler';
@@ -308,8 +308,8 @@ export class UserRepository {
       if (clientEntity.isLegalHold()) {
         const isSelfUser = userId.id === this.userState.self().id;
         if (isSelfUser) {
-          const {legalHoldModal} = useAppMainState.getState();
-          legalHoldModal.showUsers(false);
+          const {showUsers} = useLegalHoldModalState.getState();
+          showUsers(false);
         }
       }
       if (publishClient) {
@@ -381,8 +381,8 @@ export class UserRepository {
     if (this.userState.self().id === eventJson.id) {
       this.userState.self().hasPendingLegalHold(false);
 
-      const {legalHoldModal} = useAppMainState.getState();
-      legalHoldModal.closeRequestModal();
+      const {closeRequestModal} = useLegalHoldModalState.getState();
+      closeRequestModal();
     } else {
       /*
        * TODO:
@@ -411,8 +411,8 @@ export class UserRepository {
       last_prekey,
     );
 
-    const {legalHoldModal} = useAppMainState.getState();
-    legalHoldModal.showRequestModal(false, false, fingerprint);
+    const {showRequestModal} = useLegalHoldModalState.getState();
+    showRequestModal(false, false, fingerprint);
   }
 
   /**

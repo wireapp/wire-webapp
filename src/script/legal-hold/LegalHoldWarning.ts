@@ -19,6 +19,7 @@
 
 import {amplify} from 'amplify';
 
+import {useLegalHoldModalState} from 'Components/Modals/LegalHoldModal/LegalHoldModal.state';
 import {t} from 'Util/LocalizerUtil';
 
 import {PrimaryModal} from '../components/Modals/PrimaryModal';
@@ -26,7 +27,6 @@ import {ConversationVerificationState} from '../conversation/ConversationVerific
 import type {Conversation} from '../entity/Conversation';
 import {ConversationError} from '../error/ConversationError';
 import {OPEN_CONVERSATION_DETAILS} from '../page/RightSidebar/RightSidebar';
-import {useAppMainState} from '../page/state';
 
 export const showLegalHoldWarningModal = (
   conversationEntity: Conversation,
@@ -36,8 +36,8 @@ export const showLegalHoldWarningModal = (
     const secondaryAction = [
       {
         action: () => {
-          const {legalHoldModal} = useAppMainState.getState();
-          legalHoldModal.showUsers(false, conversationEntity);
+          const {showUsers} = useLegalHoldModalState.getState();
+          showUsers(false, conversationEntity);
         },
         text: t('legalHoldWarningSecondaryInformation'),
       },
