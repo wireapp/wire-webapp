@@ -21,7 +21,7 @@ import React, {useEffect, useMemo, useState} from 'react';
 
 import {css} from '@emotion/react';
 import {CALL_TYPE, CONV_TYPE} from '@wireapp/avs';
-import {useMatchMedia} from '@wireapp/react-ui-kit';
+import {IconButton, IconButtonVariant, useMatchMedia} from '@wireapp/react-ui-kit';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import {amplify} from 'amplify';
 import {container} from 'tsyringe';
@@ -193,6 +193,14 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
         className="video-title"
         css={{height: verticalBreakpoint ? '30px' : '', lineHeight: verticalBreakpoint ? '12px' : ''}}
       >
+        {horizontalSmBreakpoint && (
+          <IconButton
+            variant={IconButtonVariant.SECONDARY}
+            className=" icon-back"
+            css={{height: '25px', left: '5px', position: 'absolute', top: verticalBreakpoint ? '3px' : '10px'}}
+            onClick={minimize}
+          />
+        )}
         {classifiedDomains && (
           <ClassifiedBar
             users={conversationParticipants}
