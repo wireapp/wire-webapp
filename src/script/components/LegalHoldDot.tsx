@@ -19,14 +19,13 @@
 
 import React from 'react';
 
-import {amplify} from 'amplify';
 import cx from 'classnames';
 
 import {Icon} from 'Components/Icon';
 import {t} from 'Util/LocalizerUtil';
 
 import type {Conversation} from '../entity/Conversation';
-import {LegalHoldModalState} from '../legal-hold/LegalHoldModalState';
+import {useAppMainState} from '../page/state';
 
 export interface LegalHoldDotProps {
   isInteractive?: boolean;
@@ -49,14 +48,18 @@ const LegalHoldDot: React.FC<LegalHoldDotProps> = ({
   className = '',
   dataUieName = 'legal-hold-dot-pending-icon',
 }) => {
+  const {showRequestModal, showUsers} = useAppMainState(state => state.legalHoldModal);
+
   const onClick = (event: React.MouseEvent) => {
     event.stopPropagation();
 
-    if (isPending) {
-      amplify.publish(LegalHoldModalState.SHOW_REQUEST);
+    if (!isPending) {
+      showRequestModal(false, true);
+
+      return;
     }
 
-    amplify.publish(LegalHoldModalState.SHOW_DETAILS, conversation);
+    showUsers(false, conversation);
   };
 
   return (

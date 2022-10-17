@@ -39,7 +39,6 @@ import {MessageRepository} from '../conversation/MessageRepository';
 import {Conversation} from '../entity/Conversation';
 import type {Message} from '../entity/message/Message';
 import {ConversationError} from '../error/ConversationError';
-import {LegalHoldModalState} from '../legal-hold/LegalHoldModalState';
 import {
   ClientNotificationData,
   Notification,
@@ -141,8 +140,10 @@ export class ContentViewModel {
     });
 
     this._initSubscriptions();
+
     if (this.teamState.supportsLegalHold()) {
-      amplify.publish(LegalHoldModalState.SHOW_REQUEST);
+      const {legalHoldModal} = useAppMainState.getState();
+      legalHoldModal.showRequestModal(true);
     }
   }
 

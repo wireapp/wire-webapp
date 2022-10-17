@@ -151,11 +151,11 @@ const UserSearchableList: React.FC<UserListProps> = ({onUpdateSelectedUsers, dat
   };
 
   const toggleUserSelection = (user: User) => {
-    if (selectedUsers.find(selectedUser => selectedUser.id === user.id)) {
+    if (selectedUsers?.find(selectedUser => selectedUser.id === user.id)) {
       observables?.selected?.remove(user);
       onUpdateSelectedUsers?.([...selectedUsers].filter(selectedUser => selectedUser.id !== user.id));
     } else {
-      onUpdateSelectedUsers?.([...selectedUsers, user]);
+      onUpdateSelectedUsers?.(selectedUsers ? [...selectedUsers, user] : [user]);
       observables?.selected?.push(user);
     }
   };

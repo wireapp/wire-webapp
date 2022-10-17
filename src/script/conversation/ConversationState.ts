@@ -72,10 +72,10 @@ export class ConversationState {
     });
 
     this.connectedUsers = ko.pureComputed(() => {
-      const inviterId = this.teamState.memberInviters()[this.userState.self().id];
+      const inviterId = this.teamState.memberInviters()[this.userState.self()?.id];
       const inviter = inviterId ? this.userState.users().find(({id}) => id === inviterId) : null;
       const connectedUsers = inviter ? [inviter] : [];
-      const selfTeamId = this.userState.self().teamId;
+      const selfTeamId = this.userState.self()?.teamId;
       for (const conversation of this.conversations()) {
         for (const user of conversation.participating_user_ets()) {
           const isNotService = !user.isService;

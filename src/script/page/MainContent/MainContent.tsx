@@ -28,7 +28,6 @@ import {HistoryExport} from 'Components/HistoryExport';
 import {HistoryImport} from 'Components/HistoryImport';
 import {Icon} from 'Components/Icon';
 import {GroupCreationModal} from 'Components/Modals/GroupCreation/GroupCreationModal';
-import {LegalHoldModal} from 'Components/Modals/LegalHoldModal/LegalHoldModal';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 
@@ -205,16 +204,6 @@ const MainContent: FC<MainContentProps> = ({
       <GroupCreationModal userState={userState} teamState={teamState} />
 
       <div className="center-column__overlay" />
-
-      <LegalHoldModal
-        userState={userState}
-        conversationRepository={repositories.conversation}
-        searchRepository={repositories.search}
-        teamRepository={repositories.team}
-        clientRepository={repositories.client}
-        messageRepository={repositories.message}
-        cryptographyRepository={repositories.cryptography}
-      />
     </div>
   );
 };

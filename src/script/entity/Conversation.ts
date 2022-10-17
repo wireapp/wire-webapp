@@ -56,8 +56,8 @@ import {ConversationStatus} from '../conversation/ConversationStatus';
 import {ConversationVerificationState} from '../conversation/ConversationVerificationState';
 import {NOTIFICATION_STATE} from '../conversation/NotificationSetting';
 import {ConversationError} from '../error/ConversationError';
-import {LegalHoldModalState} from '../legal-hold/LegalHoldModalState';
 import {StatusType} from '../message/StatusType';
+import {useAppMainState} from '../page/state';
 import {ConversationRecord} from '../storage/record/ConversationRecord';
 import {TeamState} from '../team/TeamState';
 
@@ -331,7 +331,8 @@ export class Conversation {
         this.legalHoldStatus(hasLegalHold ? LegalHoldStatus.ENABLED : LegalHoldStatus.DISABLED);
       }
       if (!hasLegalHold) {
-        amplify.publish(LegalHoldModalState.HIDE_DETAILS, this.id);
+        const {legalHoldModal} = useAppMainState.getState();
+        legalHoldModal.closeRequestModal(this.id);
       }
       return hasLegalHold;
     });
