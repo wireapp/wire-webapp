@@ -420,10 +420,6 @@ export class ConversationRepository {
     }
 
     try {
-      /**
-       * ToDo: Fetch all MLS Events from backend before doing anything else
-       * Needs to be done to receive the latest epoch and avoid epoch mismatch errors
-       */
       let response: MLSReturnType;
       const isMLSConversation = payload.protocol === ConversationProtocol.MLS;
       if (isMLSConversation) {
@@ -1351,11 +1347,6 @@ export class ConversationRepository {
    * @returns Resolves when members were added
    */
   async addUsers(conversation: Conversation, userEntities: User[]) {
-    /**
-     * ToDo: Fetch all MLS Events from backend before doing anything else
-     * Needs to be done to receive the latest epoch and avoid epoch mismatch errors
-     */
-
     const qualifiedUserIds = userEntities.map(userEntity => userEntity.qualifiedId);
 
     const {qualifiedId: conversationId, groupId} = conversation;

@@ -102,7 +102,6 @@ export class Conversation {
   // TODO(Federation): Currently the 'creator' just refers to a user id but it has to become a qualified id
   public creator: string;
   public groupId?: string;
-  public epoch: number = -1;
   public cipherSuite: number = 1;
   public readonly isUsingMLSProtocol: boolean;
   public readonly display_name: ko.PureComputed<string>;
@@ -1001,7 +1000,6 @@ export class Conversation {
       creator: this.creator,
       domain: this.domain,
       ephemeral_timer: this.localMessageTimer(),
-      epoch: this.epoch,
       global_message_timer: this.globalMessageTimer(),
       group_id: this.groupId,
       id: this.id,

@@ -45,7 +45,7 @@ type StoreState = MLSConversationState & {
   sendExternalToPendingJoin(
     conversations: Conversation[],
     isEstablishedConversation: (groupId: string) => Promise<boolean>,
-    sendExternalProposal: (conversationDetails: {groupId: string; epoch: number}) => Promise<void>,
+    sendExternalProposal: (groupId: string) => Promise<void>,
   ): Promise<void>;
 };
 
@@ -75,7 +75,7 @@ export const mlsConversationState = createVanilla<StoreState>((set, get) => {
 
     async sendExternalToPendingJoin(conversations, isAlreadyEstablished, sendExternalProposal): Promise<void> {
       const currentState = get();
-      const pendingConversations: {groupId: string; epoch: number}[] = [];
+      const pendingConversations: string[] = [];
       const alreadyEstablishedConversations: string[] = [];
 
       for (const conversation of conversations) {
@@ -88,7 +88,7 @@ export const mlsConversationState = createVanilla<StoreState>((set, get) => {
             // check is the conversation is not actually already established
             alreadyEstablishedConversations.push(groupId);
           } else {
-            pendingConversations.push({epoch: conversation.epoch, groupId});
+            pendingConversations.push(groupId);
           }
         }
       }

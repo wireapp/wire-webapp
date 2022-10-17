@@ -430,7 +430,7 @@ class App {
         await mlsConversationState.getState().sendExternalToPendingJoin(
           conversationEntities,
           groupId => this.core.service!.conversation.isMLSConversationEstablished(groupId),
-          ({groupId, epoch}) => this.core.service!.conversation.sendExternalJoinProposal(groupId, epoch),
+          groupId => this.core.service!.conversation.sendExternalJoinProposal(groupId),
         );
 
         this.core.configureMLSCallbacks({
