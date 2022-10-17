@@ -343,7 +343,7 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
               css={{
                 display: 'flex',
                 justifyContent: horizontalXsBreakpoint ? 'space-around' : 'space-between',
-                width: horizontalXsBreakpoint ? '100%' : '',
+                ...(horizontalXsBreakpoint && {width: '100%'} ),
               }}
             >
               <li className="video-controls__item">
