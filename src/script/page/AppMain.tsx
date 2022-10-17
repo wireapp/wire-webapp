@@ -19,7 +19,7 @@
 
 import {FC} from 'react';
 
-import {StyledApp, THEME_ID} from '@wireapp/react-ui-kit';
+import {StyledApp, THEME_ID, useMatchMedia} from '@wireapp/react-ui-kit';
 import {container} from 'tsyringe';
 
 import {CallingContainer} from 'Components/calling/CallingOverlayContainer';
@@ -31,7 +31,7 @@ import {MainContent} from './MainContent';
 import {RightSidebar} from './RightSidebar';
 import {PanelEntity, PanelState} from './RightSidebar/RightSidebar';
 import {RootProvider} from './RootProvider';
-import {useAppMainState} from './state';
+import {useAppMainState, ViewType} from './state';
 
 import {PrimaryModalComponent} from '../components/Modals/PrimaryModal/PrimaryModal';
 import {User} from '../entity/User';
@@ -80,15 +80,23 @@ const AppContainer: FC<AppContainerProps> = ({root}) => {
     closeRightSidebar();
   };
 
+  // To be changed when design chooses a breakpoint, the conditional can be integrated to the ui-kit directly
+  const smBreakpoint = useMatchMedia('max-width: 620px');
+
+  const {currentView} = useAppMainState(state => state.responsiveView);
+  const isLeftSidebarVisible = currentView == ViewType.LEFT_SIDEBAR;
+
   return (
     <StyledApp themeId={THEME_ID.DEFAULT} css={{backgroundColor: 'unset', height: '100%'}}>
       <RootProvider value={root}>
         <main>
           <div id="app" className="app">
-            <LeftSidebar listViewModel={root.list} selfUser={selfUser} isActivatedAccount={isActivatedAccount} />
-
-            <MainContent isRightSidebarOpen={!!currentState} openRightSidebar={toggleRightSidebar} />
-
+            {(!smBreakpoint || isLeftSidebarVisible) && (
+              <LeftSidebar listViewModel={root.list} selfUser={selfUser} isActivatedAccount={isActivatedAccount} />
+            )}
+            {(!smBreakpoint || !isLeftSidebarVisible) && (
+              <MainContent isRightSidebarOpen={!!currentState} openRightSidebar={toggleRightSidebar} />
+            )}
             {currentState && (
               <RightSidebar
                 currentEntity={rightSidebar.entity}

@@ -50,7 +50,7 @@ import {Shortcut} from '../../../../ui/Shortcut';
 import {ShortcutType} from '../../../../ui/ShortcutType';
 import {UserState} from '../../../../user/UserState';
 import {ListState, ListViewModel} from '../../../../view_model/ListViewModel';
-import {useAppMainState} from '../../../state';
+import {useAppMainState, ViewType} from '../../../state';
 import {ListWrapper} from '../ListWrapper';
 
 type ConversationsProps = {
@@ -113,6 +113,15 @@ const Conversations: React.FC<ConversationsProps> = ({
   const {conversationLabelRepository} = conversationRepository;
   const [isConversationListFocus, focusConversationList] = useState(false);
 
+  const {setCurrentView} = useAppMainState(state => state.responsiveView);
+
+  const onClickPreferences = () => {
+    setCurrentView(ViewType.LEFT_SIDEBAR);
+    switchList(ListState.PREFERENCES);
+    const {rightSidebar} = useAppMainState.getState();
+    rightSidebar.clearHistory();
+  };
+
   useEffect(() => {
     if (!activeConversation) {
       return () => {};
@@ -150,11 +159,7 @@ const Conversations: React.FC<ConversationsProps> = ({
         type="button"
         className={`conversations-settings-button accent-text ${showBadge ? 'conversations-settings--badge' : ''}`}
         title={t('tooltipConversationsPreferences')}
-        onClick={() => {
-          switchList(ListState.PREFERENCES);
-          const {rightSidebar} = useAppMainState.getState();
-          rightSidebar.clearHistory();
-        }}
+        onClick={onClickPreferences}
         data-uie-name="go-preferences"
       >
         <Icon.Settings />

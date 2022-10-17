@@ -43,6 +43,7 @@ type LeftListWrapperProps = {
 const scrollStyle = css`
   position: relative;
   flex: 1 1 auto;
+  min-height: 150px;
   overflow-x: hidden;
   overflow-y: auto;
 `;
@@ -53,6 +54,7 @@ const style = css`
   flex-direction: column;
   width: 100%;
   height: 100%;
+  overflow-y: overlay;
 `;
 
 const ListWrapper: React.FC<LeftListWrapperProps> = ({

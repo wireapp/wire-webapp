@@ -20,6 +20,7 @@
 import {act, fireEvent, render, waitFor} from '@testing-library/react';
 
 import {InputBar} from 'Components/InputBar/index';
+import {withTheme} from 'src/script/auth/util/test/TestUtil';
 import {Config} from 'src/script/Config';
 import {createMentionEntity, getMentionCandidate} from 'Util/MentionUtil';
 import {createRandomUuid} from 'Util/util';
@@ -94,7 +95,7 @@ describe('InputBar', () => {
   it('has passed value', async () => {
     const promise = Promise.resolve();
     const props = getDefaultProps();
-    const {container} = render(<InputBar {...props} />);
+    const {container} = render(withTheme(<InputBar {...props} />));
     await act(() => promise);
 
     const textArea = await container.querySelector('textarea[data-uie-name="input-message"]');
@@ -110,7 +111,7 @@ describe('InputBar', () => {
   it('has pasted image', async () => {
     const promise = Promise.resolve();
     const props = getDefaultProps();
-    const {container} = render(<InputBar {...props} />);
+    const {container} = render(withTheme(<InputBar {...props} />));
     await act(() => promise);
 
     const textArea = await container.querySelector('textarea[data-uie-name="input-message"]');

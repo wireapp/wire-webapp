@@ -36,9 +36,9 @@ import {DeviceDetailsPreferences} from './DeviceDetailsPreferences';
 import {ClientState} from '../../../../../client/ClientState';
 import {ConversationState} from '../../../../../conversation/ConversationState';
 import {Conversation} from '../../../../../entity/Conversation';
-import {initFadingScrollbar} from '../../../../../ui/fadingScrollbar';
 import {UserState} from '../../../../../user/UserState';
 import {useKoSubscribableChildren} from '../../../../../util/ComponentUtil';
+import {PreferencesPage} from '../components/PreferencesPage';
 
 interface DevicesPreferencesProps {
   clientState: ClientState;
@@ -159,34 +159,31 @@ const DevicesPreferences: React.FC<DevicesPreferencesProps> = ({
   }
 
   return (
-    <div id="preferences-devices" className="preferences-page preferences-devices">
-      <h2 className="preferences-titlebar">{t('preferencesDevices')}</h2>
-      <div className="preferences-content" ref={initFadingScrollbar}>
-        <fieldset className="preferences-section" data-uie-name="preferences-device-current">
-          <legend className="preferences-header">{t('preferencesDevicesCurrent')}</legend>
-          <DetailedDevice device={currentClient} fingerprint={cryptographyRepository.getLocalFingerprint()} />
+    <PreferencesPage title={t('preferencesDevices')}>
+      <fieldset className="preferences-section" data-uie-name="preferences-device-current">
+        <legend className="preferences-header">{t('preferencesDevicesCurrent')}</legend>
+        <DetailedDevice device={currentClient} fingerprint={cryptographyRepository.getLocalFingerprint()} />
+      </fieldset>
+
+      <hr className="preferences-devices-separator preferences-separator" />
+
+      {clients.length > 0 && (
+        <fieldset className="preferences-section">
+          <legend className="preferences-header">{t('preferencesDevicesActive')}</legend>
+          {clients.map((device, index) => (
+            <Device
+              device={device}
+              key={device.id}
+              isSSO={isSSO}
+              onSelect={setSelectedDevice}
+              onRemove={removeDevice}
+              deviceNumber={++index}
+            />
+          ))}
+          <p className="preferences-detail">{t('preferencesDevicesActiveDetail')}</p>
         </fieldset>
-
-        <hr className="preferences-devices-separator preferences-separator" />
-
-        {clients.length > 0 && (
-          <fieldset className="preferences-section">
-            <legend className="preferences-header">{t('preferencesDevicesActive')}</legend>
-            {clients.map((device, index) => (
-              <Device
-                device={device}
-                key={device.id}
-                isSSO={isSSO}
-                onSelect={setSelectedDevice}
-                onRemove={removeDevice}
-                deviceNumber={++index}
-              />
-            ))}
-            <p className="preferences-detail">{t('preferencesDevicesActiveDetail')}</p>
-          </fieldset>
-        )}
-      </div>
-    </div>
+      )}
+    </PreferencesPage>
   );
 };
 

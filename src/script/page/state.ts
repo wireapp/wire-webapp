@@ -23,6 +23,11 @@ import {PanelEntity, PanelState} from './RightSidebar/RightSidebar';
 
 import {User} from '../entity/User';
 
+export enum ViewType {
+  CENTRAL_COLUMN = 0,
+  LEFT_SIDEBAR = 1,
+}
+
 type RightSidebarParams = {
   entity: PanelEntity | null;
   showLikes?: boolean;
@@ -30,6 +35,10 @@ type RightSidebarParams = {
 };
 
 type AppMainState = {
+  responsiveView: {
+    currentView: ViewType;
+    setCurrentView: (view: ViewType) => void;
+  };
   rightSidebar: {
     clearHistory: () => void;
     entity: RightSidebarParams['entity'];
@@ -44,6 +53,11 @@ type AppMainState = {
 };
 
 const useAppMainState = create<AppMainState>((set, get) => ({
+  responsiveView: {
+    currentView: ViewType.LEFT_SIDEBAR,
+    setCurrentView: (view: ViewType) =>
+      set(state => ({...state, responsiveView: {...state.responsiveView, currentView: view}})),
+  },
   rightSidebar: {
     clearHistory: () =>
       set(state => ({
