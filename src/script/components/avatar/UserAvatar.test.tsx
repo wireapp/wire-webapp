@@ -17,89 +17,88 @@
  *
  */
 
-import {TestPage} from 'Util/test/TestPage';
+import {render} from '@testing-library/react';
 
-import {UserAvatar, UserAvatarProps} from './UserAvatar';
+import {UserAvatar} from './UserAvatar';
 
 import {User} from '../../entity/User';
 import {AVATAR_SIZE, STATE} from '../Avatar';
 jest.mock('../../auth/util/SVGProvider');
-
-class UserAvatarPage extends TestPage<UserAvatarProps> {
-  constructor(props?: UserAvatarProps) {
-    super(UserAvatar, props);
-  }
-
-  getInitials = () => this.get('div[data-uie-name="element-avatar-initials"]');
-  getUserBadgeIcon = (state?: STATE) =>
-    this.get(`div[data-uie-name="element-avatar-user-badge-icon"]${state ? `[data-uie-value="${state}"]` : ''}`);
-}
 
 describe('UserAvatar', () => {
   it('shows participant initials if no avatar is defined', async () => {
     const participant = new User('id');
     participant.name('Anton Bertha');
 
-    const userAvatar = new UserAvatarPage({
+    const props = {
       avatarSize: AVATAR_SIZE.LARGE,
       participant: participant,
       state: STATE.NONE,
-    });
+    };
 
-    expect(userAvatar.getInitials()).not.toBeNull();
-    expect(userAvatar.getInitials()?.textContent).toBe('AB');
+    const {getByText} = render(<UserAvatar {...props} />);
+
+    expect(getByText('AB')).not.toBeNull();
   });
 
   it('shows single initial character when avatar size is extra small', async () => {
     const participant = new User('id');
     participant.name('Anton Bertha');
 
-    const userAvatar = new UserAvatarPage({
+    const props = {
       avatarSize: AVATAR_SIZE.X_SMALL,
       participant: participant,
       state: STATE.NONE,
-    });
+    };
 
-    expect(userAvatar.getInitials()).not.toBeNull();
-    expect(userAvatar.getInitials()?.textContent).toBe('A');
+    const {getByText} = render(<UserAvatar {...props} />);
+
+    expect(getByText('A')).not.toBeNull();
   });
 
   it('does not show avatar badge in default state', async () => {
     const participant = new User('id');
     participant.name('Anton Bertha');
 
-    const userAvatar = new UserAvatarPage({
+    const props = {
       avatarSize: AVATAR_SIZE.LARGE,
       participant: participant,
       state: STATE.NONE,
-    });
+    };
 
-    expect(userAvatar.getUserBadgeIcon()).toBeNull();
+    const {queryByTestId} = render(<UserAvatar {...props} />);
+    expect(queryByTestId('element-avatar-user-badge-icon')).toBeNull();
   });
 
   it('shows avatar badge for blocked user', async () => {
     const participant = new User('id');
     participant.name('Anton Bertha');
 
-    const userAvatar = new UserAvatarPage({
+    const props = {
       avatarSize: AVATAR_SIZE.LARGE,
       participant: participant,
       state: STATE.BLOCKED,
-    });
+    };
 
-    expect(userAvatar.getUserBadgeIcon(STATE.BLOCKED)).not.toBeNull();
+    const {getByTestId} = render(<UserAvatar {...props} />);
+    const badgeIcon = getByTestId('element-avatar-user-badge-icon');
+
+    expect(badgeIcon.getAttribute('data-uie-value')).toEqual(STATE.BLOCKED);
   });
 
   it('shows avatar badge for connection request', async () => {
     const participant = new User('id');
     participant.name('Anton Bertha');
 
-    const userAvatar = new UserAvatarPage({
+    const props = {
       avatarSize: AVATAR_SIZE.LARGE,
       participant: participant,
       state: STATE.PENDING,
-    });
+    };
 
-    expect(userAvatar.getUserBadgeIcon(STATE.PENDING)).not.toBeNull();
+    const {getByTestId} = render(<UserAvatar {...props} />);
+    const badgeIcon = getByTestId('element-avatar-user-badge-icon');
+
+    expect(badgeIcon.getAttribute('data-uie-value')).toEqual(STATE.PENDING);
   });
 });

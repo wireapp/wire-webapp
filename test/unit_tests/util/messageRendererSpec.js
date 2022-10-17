@@ -203,10 +203,17 @@ describe('renderMessage', () => {
     );
   });
 
-  it('does not render a broken markdown link', () => {
+  it('escapes links with an xss attempt on their url', () => {
     expect(renderMessage(`[sometext](https://some.domain"><script>alert("oops")</script>)`)).toBe(
-      `[sometext](<a href="https://some.domain" target="_blank" rel="nofollow noopener noreferrer">https://some.domain</a>&quot;&gt;&lt;script&gt;alert(&quot;oops&quot;)&lt;/script&gt;)`,
+      `<a href=\"https://some.domain%22%3E%3Cscript%3Ealert(%22oops%22)%3C/script%3E\" target=\"_blank\" rel=\"nofollow noopener noreferrer\" data-md-link=\"true\" data-uie-name=\"markdown-link\">sometext</a>`,
     );
+  });
+
+  it('does not add a < behind URLs within <code> tags 2', () => {
+    expect(renderMessage('` http://wire.com`\n`123`')).toBe('<code> http://wire.com</code><br><code>123</code>');
+  });
+  it('does not add a < behind URLs within <code> tags', () => {
+    expect(renderMessage('` http://wire.com`')).toBe('<code> http://wire.com</code>');
   });
 
   it('escapes url params', () => {

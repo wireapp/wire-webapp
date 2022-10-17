@@ -60,13 +60,11 @@ describe('image-asset', () => {
     expect(imgSrc).toContain('100');
   });
 
-  it('displays the image url when resource is loaded', async () => {
+  it('displays the dummy image url when resource is loaded', async () => {
     const assetRepository = container.resolve(AssetRepository);
     jest
       .spyOn(assetRepository, 'load')
       .mockReturnValue(Promise.resolve(new Blob([new Uint8Array()], {type: 'application/octet-stream'})));
-
-    const createObjectURLSpy = jest.spyOn(window.URL, 'createObjectURL').mockReturnValue('/image-url');
 
     const image = new MediumImage('image');
     image.resource(
@@ -85,9 +83,9 @@ describe('image-asset', () => {
     const imageElement = screen.getByTestId('image-asset-img');
 
     await waitFor(() => {
-      expect(createObjectURLSpy).toHaveBeenCalled();
+      expect(window.URL.createObjectURL).toHaveBeenCalled();
       const imgSrc = imageElement.getAttribute('src');
-      expect(imgSrc).toContain('/image-url');
+      expect(imgSrc).toContain('data:image/svg+xml');
     });
   });
 });

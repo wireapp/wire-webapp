@@ -51,7 +51,6 @@ import {EventService} from 'src/script/event/EventService';
 import {EventServiceNoCompound} from 'src/script/event/EventServiceNoCompound';
 import {NotificationService} from 'src/script/event/NotificationService';
 import {MediaRepository} from 'src/script/media/MediaRepository';
-import {MessageSender} from 'src/script/message/MessageSender';
 import {NotificationRepository} from 'src/script/notification/NotificationRepository';
 import {PermissionRepository} from 'src/script/permission/PermissionRepository';
 import {PropertiesRepository} from 'src/script/properties/PropertiesRepository';
@@ -295,7 +294,6 @@ export class TestFactory {
       () => this.conversation_repository,
       this.cryptography_repository,
       this.event_repository,
-      new MessageSender(),
       this.propertyRepository,
       serverTimeHandler,
       this.user_repository,

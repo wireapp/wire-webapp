@@ -17,17 +17,9 @@
  *
  */
 
-import {TestPage} from 'Util/test/TestPage';
+import {render} from '@testing-library/react';
 
-import {InputLevel, InputLevelProps, MAX_AUDIO_BULLETS} from './InputLevel';
-
-class InputLevelTestPage extends TestPage<InputLevelProps> {
-  constructor(props?: InputLevelProps) {
-    super(InputLevel, props);
-  }
-
-  getActiveInputLevelBullets = () => this.getAll('.input-level__bullet--active');
-}
+import {InputLevel, MAX_AUDIO_BULLETS} from './InputLevel';
 
 describe('InputLevel', () => {
   let originalAudioContext: any;
@@ -59,12 +51,14 @@ describe('InputLevel', () => {
     const expectedAudioLevel = (128 / 160) * MAX_AUDIO_BULLETS;
     const mediaStream = new MediaStream();
 
-    const testPage = new InputLevelTestPage({
+    const props = {
       disabled: false,
       mediaStream,
-    });
+    };
 
-    const activeAudioLevelBullets = testPage.getActiveInputLevelBullets();
-    expect(activeAudioLevelBullets.length).toBe(expectedAudioLevel);
+    const {container} = render(<InputLevel {...props} />);
+
+    const activeAudioLevelBullets = container.querySelectorAll('.input-level__bullet--active');
+    expect(activeAudioLevelBullets).toHaveLength(expectedAudioLevel);
   });
 });

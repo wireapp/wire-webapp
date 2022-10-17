@@ -131,6 +131,7 @@ export class EventRepository {
   //##############################################################################
 
   private readonly updateConnectivitityStatus = (state: ConnectionState) => {
+    this.logger.log('Websocket connection state changed to', state);
     switch (state) {
       case ConnectionState.CONNECTING: {
         Warnings.hideWarning(Warnings.TYPE.NO_INTERNET);
@@ -186,7 +187,7 @@ export class EventRepository {
       // We make sure there is only be a single active connection to the WebSocket.
       this.disconnectWebSocket?.();
       return new Promise<void>(async resolve => {
-        this.disconnectWebSocket = await account.listen({
+        this.disconnectWebSocket = account.listen({
           onConnectionStateChanged: connectionState => {
             this.updateConnectivitityStatus(connectionState);
             if (connectionState === ConnectionState.LIVE) {
