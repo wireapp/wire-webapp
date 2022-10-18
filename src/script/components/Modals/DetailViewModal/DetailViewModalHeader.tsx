@@ -45,7 +45,7 @@ const DetailViewModalHeader: FC<DetailViewModalHeaderProps> = ({messageEntity, o
           className="label-bold-xs"
           data-uie-name="fullscreen-picture-sender"
           data-uie-uid={user.id}
-          data-uie-value={user.username()}
+          data-uie-value={user.name()}
         >
           {unsafeSenderName}
         </div>
