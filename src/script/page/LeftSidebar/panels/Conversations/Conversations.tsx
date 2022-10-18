@@ -115,6 +115,8 @@ const Conversations: React.FC<ConversationsProps> = ({
 
   const {setCurrentView} = useAppMainState(state => state.responsiveView);
 
+  const showLegalHold = isOnLegalHold || hasPendingLegalHold;
+
   const onClickPreferences = () => {
     setCurrentView(ViewType.LEFT_SIDEBAR);
     switchList(ListState.PREFERENCES);
@@ -170,6 +172,7 @@ const Conversations: React.FC<ConversationsProps> = ({
           <button
             type="button"
             className="left-list-header-availability"
+            css={{...(showLegalHold && {gridColumn: '2/3'})}}
             onClick={event => AvailabilityContextMenu.show(event.nativeEvent, 'left-list-availability-menu')}
             onBlur={event => {
               // on blur conversation list should get the focus
@@ -184,7 +187,7 @@ const Conversations: React.FC<ConversationsProps> = ({
             />
           </button>
 
-          {(isOnLegalHold || hasPendingLegalHold) && (
+          {showLegalHold && (
             <LegalHoldDot
               isPending={hasPendingLegalHold}
               dataUieName={hasPendingLegalHold ? 'status-legal-hold-pending' : 'status-legal-hold'}
