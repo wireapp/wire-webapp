@@ -56,7 +56,6 @@ module.exports = grunt => {
 
   grunt.initConfig({
     dir,
-    aws_s3: require('./grunt/config/aws_s3'),
     clean: require('./grunt/config/clean'),
     compress: require('./grunt/config/compress'),
     copy: require('./grunt/config/copy'),
