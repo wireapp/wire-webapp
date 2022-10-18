@@ -4,10 +4,10 @@
   },
   "description": "Utilities to check that Wire's domains use the expected certificate.",
   "devDependencies": {
-    "@types/jasmine": "3.8.2",
+    "@types/jasmine": "4.3.0",
     "@types/jsrsasign": "8.0.13",
     "@types/node": "^14.18.29",
-    "jasmine": "3.8.0",
+    "jasmine": "4.4.0",
     "nyc": "15.1.0",
     "rimraf": "3.0.2",
     "ts-node": "^10.9.1",
