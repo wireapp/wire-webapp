@@ -19,8 +19,8 @@
 
 import {AxiosRequestConfig} from 'axios';
 
-import {HttpClient} from '../http/';
-import {Notification, NotificationList} from './';
+import {HttpClient} from '../../http';
+import {Notification, NotificationList} from '..';
 
 export const NOTIFICATION_SIZE_MAXIMUM = 10000;
 
@@ -88,30 +88,34 @@ export class NotificationAPI {
    */
   public async getAllNotifications(clientId?: string, lastNotificationId?: string): Promise<NotificationsReponse> {
     let notificationList: Notification[] = [];
-
     const getNotificationChunks = async (
       currentClientId?: string,
       currentNotificationId?: string,
     ): Promise<NotificationsReponse> => {
-      let payload: NotificationList = {
+      const defaultPayload: NotificationList = {
         notifications: [],
         time: '0',
         has_more: false,
       };
+      let payload: NotificationList = {...defaultPayload};
       let hasMissedNotifications = false;
+
       try {
         payload = await this.getNotifications(currentClientId, NOTIFICATION_SIZE_MAXIMUM, currentNotificationId);
       } catch (error) {
         if (HttpClient.isAxiosError(error)) {
-          payload = error.response?.data?.notifications ? error.response.data : payload;
-          hasMissedNotifications = true;
+          if (error.response?.data?.notifications) {
+            hasMissedNotifications = true;
+            payload = {...defaultPayload, ...error.response?.data};
+          }
         } else {
           throw error;
         }
       }
 
       const {notifications, has_more} = payload;
-      if (notifications.length) {
+
+      if (notifications?.length) {
         notificationList = notificationList.concat(notifications);
       }
 
