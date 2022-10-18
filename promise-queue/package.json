@@ -22,5 +22,5 @@
     "dist": "yarn clean && yarn build",
     "test": "jest"
   },
-  "version": "1.3.0"
+  "version": "1.3.1"
 }
