@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [20.6.9](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@20.6.8...@wireapp/api-client@20.6.9) (2022-10-18)
+
+### Bug Fixes
+
+* missing messages message bug for failing api calls ([#4431](https://github.com/wireapp/wire-web-packages/issues/4431)) ([acb5bba](https://github.com/wireapp/wire-web-packages/commit/acb5bbad8f95ad9394436ca58e1fa79b562b6127))
+
 ## [20.6.8](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@20.6.7...@wireapp/api-client@20.6.8) (2022-10-06)
 
 **Note:** Version bump only for package @wireapp/api-client
