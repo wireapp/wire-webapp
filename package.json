@@ -74,6 +74,6 @@
     "watch": "webpack serve --config webpack.browser.js",
     "prepare": "yarn dist"
   },
-  "version": "20.6.8",
+  "version": "20.6.9",
   "gitHead": "5339f01fe01ef0871da8c8bc8662fbe9e604754a"
 }
