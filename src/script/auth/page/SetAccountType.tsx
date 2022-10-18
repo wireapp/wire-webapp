@@ -69,6 +69,13 @@ const SetAccountType = ({}: Props) => {
 
   return (
     <Page>
+      {(Config.getConfig().FEATURE.ENABLE_DOMAIN_DISCOVERY ||
+        Config.getConfig().FEATURE.ENABLE_SSO ||
+        Config.getConfig().FEATURE.ENABLE_ACCOUNT_REGISTRATION) && (
+        <IsMobile>
+          <div style={{margin: 16}}>{backArrow}</div>
+        </IsMobile>
+      )}
       {!Config.getConfig().FEATURE.ENABLE_ACCOUNT_REGISTRATION && (
         <Navigate to={pathWithParams(ROUTE.INDEX)} replace data-uie-name="redirect-login" />
       )}
@@ -83,7 +90,9 @@ const SetAccountType = ({}: Props) => {
             </Column>
           </IsMobile>
           <Column style={{flexBasis: 384, flexGrow: 0, padding: 0}}>
-            <Logo scale={1.68} data-uie-name="ui-wire-logo" />
+            <Column>
+              <Logo scale={1.68} data-uie-name="ui-wire-logo" />
+            </Column>
             <Columns style={{margin: '70px auto'}}>
               <Column style={{marginLeft: isMacOsWrapper ? 0 : 16}}>
                 <RouterLink to={ROUTE.CREATE_ACCOUNT} data-uie-name="go-register-personal">
@@ -150,6 +159,9 @@ const SetAccountType = ({}: Props) => {
           <Column />
         </Columns>
       </Container>
+      <IsMobile>
+        <div style={{minWidth: 48}} />
+      </IsMobile>
     </Page>
   );
 };

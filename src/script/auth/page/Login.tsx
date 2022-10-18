@@ -37,11 +37,11 @@ import {
   H2,
   Label,
   IsMobile,
-  Link,
   TextLink,
   Loading,
   Muted,
   Text,
+  LinkVariant,
 } from '@wireapp/react-ui-kit';
 import {StatusCodes} from 'http-status-codes';
 import {useIntl} from 'react-intl';
@@ -60,7 +60,6 @@ import {loginStrings, verifyStrings} from '../../strings';
 import {AppAlreadyOpen} from '../component/AppAlreadyOpen';
 import {LoginForm} from '../component/LoginForm';
 import {RouterLink} from '../component/RouterLink';
-import {EXTERNAL_ROUTE} from '../externalRoute';
 import {actionRoot} from '../module/action/';
 import {BackendError} from '../module/action/BackendError';
 import {LabeledError} from '../module/action/LabeledError';
@@ -349,24 +348,16 @@ const LoginComponent = ({
                         )}
                       </Form>
                     </div>
-                    <Columns>
-                      <Column>
-                        <Link
-                          href={EXTERNAL_ROUTE.WIRE_ACCOUNT_PASSWORD_RESET}
-                          target="_blank"
-                          data-uie-name="go-forgot-password"
-                        >
-                          {_(loginStrings.forgotPassword)}
-                        </Link>
-                      </Column>
-                      {Config.getConfig().FEATURE.ENABLE_PHONE_LOGIN && (
-                        <Column>
-                          <RouterLink to={ROUTE.LOGIN_PHONE} data-uie-name="go-sign-in-phone">
-                            {_(loginStrings.phoneLogin)}
-                          </RouterLink>
-                        </Column>
-                      )}
-                    </Columns>
+                    {Config.getConfig().FEATURE.ENABLE_PHONE_LOGIN && (
+                      <RouterLink
+                        variant={LinkVariant.PRIMARY}
+                        style={{paddingTop: '12px', textAlign: 'center'}}
+                        to={ROUTE.LOGIN_PHONE}
+                        data-uie-name="go-sign-in-phone"
+                      >
+                        {_(loginStrings.phoneLogin)}
+                      </RouterLink>
+                    )}
                   </>
                 )}
               </ContainerXS>
@@ -375,6 +366,9 @@ const LoginComponent = ({
           </Columns>
         </Container>
       )}
+      <IsMobile>
+        <div style={{minWidth: 48}} />
+      </IsMobile>
     </Page>
   );
 };
