@@ -37,7 +37,7 @@
     "commander": "8.0.0",
     "cross-env": "7.0.3",
     "dotenv-defaults": "2.0.2",
-    "fake-indexeddb": "3.1.8",
+    "fake-indexeddb": "4.0.0",
     "faker": "5.5.3",
     "istanbul": "1.1.0-alpha.1",
     "jest": "29.0.3",
