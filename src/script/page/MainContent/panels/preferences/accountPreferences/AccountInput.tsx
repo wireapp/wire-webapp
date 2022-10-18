@@ -82,7 +82,7 @@ const AccountInput: FC<AccountInputProps> = ({
   valueUie,
   ...rest
 }) => {
-  const inputWrapperRef = useRef<HTMLDivElement>(null);
+  const inputWrapperRef = useRef<HTMLInputElement | null>(null);
 
   const [input, setInput] = useState<string>('');
   const [isEditing, setIsEditing] = useState(false);
@@ -187,7 +187,7 @@ const AccountInput: FC<AccountInputProps> = ({
           label={label}
           name={valueUie ? valueUie : fieldName}
           value={input}
-          inputWrapperRef={inputWrapperRef}
+          ref={inputWrapperRef}
           onChange={({target}) => updateInput(target.value)}
           onCancel={() => {
             updateInput('');
