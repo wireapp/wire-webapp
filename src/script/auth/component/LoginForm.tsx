@@ -20,13 +20,14 @@
 import React, {useRef, useState} from 'react';
 
 import {LoginData} from '@wireapp/api-client/src/auth';
-import {Input, Loading, Button} from '@wireapp/react-ui-kit';
+import {Input, Loading, Button, Link, LinkVariant} from '@wireapp/react-ui-kit';
 import {useIntl} from 'react-intl';
 
 import {isValidEmail, isValidPhoneNumber, isValidUsername} from 'Util/ValidationUtil';
 
 import {Config} from '../../Config';
 import {loginStrings} from '../../strings';
+import {EXTERNAL_ROUTE} from '../externalRoute';
 import {ValidationError} from '../module/action/ValidationError';
 
 interface LoginFormProps {
@@ -111,11 +112,20 @@ const LoginForm = ({isFetching, onSubmit}: LoginFormProps) => {
         required
         data-uie-name="enter-password"
       />
+      <Link
+        variant={LinkVariant.PRIMARY}
+        href={EXTERNAL_ROUTE.WIRE_ACCOUNT_PASSWORD_RESET}
+        target="_blank"
+        data-uie-name="go-forgot-password"
+      >
+        {_(loginStrings.forgotPassword)}
+      </Link>
 
       {isFetching ? (
         <Loading size={32} />
       ) : (
         <Button
+          style={{marginTop: '16px'}}
           block
           type="submit"
           disabled={!email || !password}
