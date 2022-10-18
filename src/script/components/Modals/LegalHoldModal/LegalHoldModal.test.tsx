@@ -17,10 +17,13 @@
  *
  */
 
-import {render, waitFor} from '@testing-library/react';
-import {amplify} from 'amplify';
+import {act, render} from '@testing-library/react';
+import type {QualifiedId} from '@wireapp/api-client/src/user/';
+import ko from 'knockout';
 
-import {LegalHoldModal} from './LegalHoldModal';
+import {useLegalHoldModalState} from 'Components/Modals/LegalHoldModal/LegalHoldModal.state';
+
+import {LegalHoldModal, LegalHoldModalType} from './LegalHoldModal';
 
 import {TestFactory} from '../../../../../test/helper/TestFactory';
 import {CallingRepository} from '../../../calling/CallingRepository';
@@ -28,7 +31,8 @@ import {ClientRepository} from '../../../client/ClientRepository';
 import {ConversationRepository} from '../../../conversation/ConversationRepository';
 import {MessageRepository} from '../../../conversation/MessageRepository';
 import {CryptographyRepository} from '../../../cryptography/CryptographyRepository';
-import {LegalHoldModalState} from '../../../legal-hold/LegalHoldModalState';
+import {Conversation} from '../../../entity/Conversation';
+import {User} from '../../../entity/User';
 import {SearchRepository} from '../../../search/SearchRepository';
 import {SearchService} from '../../../search/SearchService';
 import {TeamRepository} from '../../../team/TeamRepository';
@@ -46,31 +50,42 @@ beforeAll(() => {
   });
 });
 
-const defaultProps = (callingRepository: CallingRepository) => ({
-  callingRepository,
+const defaultProps = () => ({
   clientRepository: {} as ClientRepository,
-  conversationRepository: testFactory.conversation_repository as ConversationRepository,
+  conversationRepository: {
+    getAllUsersInConversation: (conversationId: QualifiedId): Promise<User[]> => Promise.resolve([]),
+  } as ConversationRepository,
   cryptographyRepository: new CryptographyRepository({} as any),
-  messageRepository: {} as MessageRepository,
+  messageRepository: {
+    updateAllClients: (conversation: Conversation, blockSystemMessage: boolean): Promise<void> => Promise.resolve(),
+  } as MessageRepository,
   searchRepository: new SearchRepository(new SearchService(), userRepository),
   teamRepository: {} as TeamRepository,
-  userState: new UserState(),
+  userState: {
+    ...new UserState(),
+    self: ko.observable(new User('mocked-id')),
+  },
 });
 
 describe('LegalHoldModal', () => {
-  it('is showRequestModal', async () => {
-    spyOn(amplify, 'subscribe').and.returnValue(undefined);
-    await render(<LegalHoldModal {...defaultProps(callRepository)} />);
-    await waitFor(() => {
-      expect(amplify.subscribe).toHaveBeenCalledWith(LegalHoldModalState.SHOW_REQUEST, expect.anything());
+  it('is showRequestModal', () => {
+    render(<LegalHoldModal {...defaultProps()} />);
+    act(() => {
+      useLegalHoldModalState.getState().showRequestModal();
     });
+
+    expect(useLegalHoldModalState.getState().type).toBe(LegalHoldModalType.REQUEST);
   });
 
   it('is showUser', async () => {
-    spyOn(amplify, 'subscribe').and.returnValue(undefined);
-    await render(<LegalHoldModal {...defaultProps(callRepository)} />);
-    await waitFor(() => {
-      expect(amplify.subscribe).toHaveBeenCalledWith(LegalHoldModalState.SHOW_DETAILS, expect.anything());
+    const props = defaultProps();
+    await render(<LegalHoldModal {...props} />);
+    const selfConversation = new Conversation(props.userState.self().id);
+
+    await act(() => {
+      useLegalHoldModalState.getState().showUsers(false, selfConversation);
     });
+
+    await expect(useLegalHoldModalState.getState().type).toBe(LegalHoldModalType.USERS);
   });
 });

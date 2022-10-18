@@ -17,9 +17,4 @@
  *
  */
 
-export enum LegalHoldModalState {
-  SHOW_REQUEST = 'LegalHold.showRequestModal',
-  HIDE_REQUEST = 'LegalHold.hideRequestModal',
-  SHOW_DETAILS = 'LegalHold.showLegalHoldModal',
-  HIDE_DETAILS = 'LegalHold.hideLegalHoldModal',
-}
+export * from './LegalHoldModal';

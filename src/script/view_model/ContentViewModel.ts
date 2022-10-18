@@ -23,6 +23,7 @@ import {amplify} from 'amplify';
 import ko from 'knockout';
 import {container} from 'tsyringe';
 
+import {useLegalHoldModalState} from 'Components/Modals/LegalHoldModal/LegalHoldModal.state';
 import {t} from 'Util/LocalizerUtil';
 import {getLogger, Logger} from 'Util/Logger';
 import {matchQualifiedIds} from 'Util/QualifiedId';
@@ -39,7 +40,6 @@ import {MessageRepository} from '../conversation/MessageRepository';
 import {Conversation} from '../entity/Conversation';
 import type {Message} from '../entity/message/Message';
 import {ConversationError} from '../error/ConversationError';
-import {LegalHoldModalState} from '../legal-hold/LegalHoldModalState';
 import {
   ClientNotificationData,
   Notification,
@@ -141,8 +141,10 @@ export class ContentViewModel {
     });
 
     this._initSubscriptions();
+
     if (this.teamState.supportsLegalHold()) {
-      amplify.publish(LegalHoldModalState.SHOW_REQUEST);
+      const {showRequestModal} = useLegalHoldModalState.getState();
+      showRequestModal(true);
     }
   }
 

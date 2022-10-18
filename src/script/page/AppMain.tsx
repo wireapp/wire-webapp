@@ -23,6 +23,7 @@ import {StyledApp, THEME_ID, useMatchMedia} from '@wireapp/react-ui-kit';
 import {container} from 'tsyringe';
 
 import {CallingContainer} from 'Components/calling/CallingOverlayContainer';
+import {LegalHoldModal} from 'Components/Modals/LegalHoldModal/LegalHoldModal';
 import {registerReactComponent, useKoSubscribableChildren} from 'Util/ComponentUtil';
 
 import {AppLock} from './AppLock';
@@ -51,6 +52,7 @@ interface AppContainerProps {
 }
 
 const AppContainer: FC<AppContainerProps> = ({root}) => {
+  const {repositories} = root.content;
   const teamState = container.resolve(TeamState);
   const userState = container.resolve(UserState);
 
@@ -100,7 +102,7 @@ const AppContainer: FC<AppContainerProps> = ({root}) => {
             {currentState && (
               <RightSidebar
                 currentEntity={rightSidebar.entity}
-                repositories={root.content.repositories}
+                repositories={repositories}
                 actionsViewModel={root.actions}
                 isFederated={root.isFederated}
                 teamState={teamState}
@@ -109,13 +111,23 @@ const AppContainer: FC<AppContainerProps> = ({root}) => {
             )}
           </div>
 
-          <AppLock clientRepository={root.content.repositories.client} />
+          <AppLock clientRepository={repositories.client} />
           <WarningsContainer />
 
           <CallingContainer
             multitasking={root.multitasking}
-            callingRepository={root.content.repositories.calling}
-            mediaRepository={root.content.repositories.media}
+            callingRepository={repositories.calling}
+            mediaRepository={repositories.media}
+          />
+
+          <LegalHoldModal
+            userState={userState}
+            conversationRepository={repositories.conversation}
+            searchRepository={repositories.search}
+            teamRepository={repositories.team}
+            clientRepository={repositories.client}
+            messageRepository={repositories.message}
+            cryptographyRepository={repositories.cryptography}
           />
 
           {/*The order of these elements matter to show proper modals stack upon each other*/}

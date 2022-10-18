@@ -19,15 +19,14 @@
 
 import React from 'react';
 
-import {amplify} from 'amplify';
 import {container} from 'tsyringe';
 
 import {LegalHoldDot} from 'Components/LegalHoldDot';
+import {useLegalHoldModalState} from 'Components/Modals/LegalHoldModal/LegalHoldModal.state';
 import {t} from 'Util/LocalizerUtil';
 
 import {ConversationState} from '../../../conversation/ConversationState';
 import {LegalHoldMessage as LegalHoldMessageEntity} from '../../../entity/message/LegalHoldMessage';
-import {LegalHoldModalState} from '../../../legal-hold/LegalHoldModalState';
 
 export interface LegalHoldMessageProps {
   conversationState?: ConversationState;
@@ -38,8 +37,10 @@ const LegalHoldMessage: React.FC<LegalHoldMessageProps> = ({
   message,
   conversationState = container.resolve(ConversationState),
 }) => {
+  const {showUsers} = useLegalHoldModalState(state => state);
+
   const showLegalHold = () => {
-    amplify.publish(LegalHoldModalState.SHOW_DETAILS, conversationState.activeConversation());
+    showUsers(false, conversationState.activeConversation());
   };
 
   return (

@@ -19,9 +19,8 @@
 
 import {amplify} from 'amplify';
 
+import {useLegalHoldModalState} from 'Components/Modals/LegalHoldModal/LegalHoldModal.state';
 import {t} from 'Util/LocalizerUtil';
-
-import {LegalHoldModalState} from './LegalHoldModalState';
 
 import {PrimaryModal} from '../components/Modals/PrimaryModal';
 import {ConversationVerificationState} from '../conversation/ConversationVerificationState';
@@ -36,7 +35,10 @@ export const showLegalHoldWarningModal = (
   return new Promise((resolve, reject) => {
     const secondaryAction = [
       {
-        action: () => amplify.publish(LegalHoldModalState.SHOW_DETAILS, conversationEntity),
+        action: () => {
+          const {showUsers} = useLegalHoldModalState.getState();
+          showUsers(false, conversationEntity);
+        },
         text: t('legalHoldWarningSecondaryInformation'),
       },
     ];

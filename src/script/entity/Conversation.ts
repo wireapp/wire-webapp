@@ -33,6 +33,7 @@ import ko from 'knockout';
 import {container} from 'tsyringe';
 import {Cancelable, debounce} from 'underscore';
 
+import {useLegalHoldModalState} from 'Components/Modals/LegalHoldModal/LegalHoldModal.state';
 import {t} from 'Util/LocalizerUtil';
 import {getLogger, Logger} from 'Util/Logger';
 import {matchQualifiedIds} from 'Util/QualifiedId';
@@ -56,7 +57,6 @@ import {ConversationStatus} from '../conversation/ConversationStatus';
 import {ConversationVerificationState} from '../conversation/ConversationVerificationState';
 import {NOTIFICATION_STATE} from '../conversation/NotificationSetting';
 import {ConversationError} from '../error/ConversationError';
-import {LegalHoldModalState} from '../legal-hold/LegalHoldModalState';
 import {StatusType} from '../message/StatusType';
 import {ConversationRecord} from '../storage/record/ConversationRecord';
 import {TeamState} from '../team/TeamState';
@@ -331,7 +331,8 @@ export class Conversation {
         this.legalHoldStatus(hasLegalHold ? LegalHoldStatus.ENABLED : LegalHoldStatus.DISABLED);
       }
       if (!hasLegalHold) {
-        amplify.publish(LegalHoldModalState.HIDE_DETAILS, this.id);
+        const {closeRequestModal} = useLegalHoldModalState.getState();
+        closeRequestModal(this.id);
       }
       return hasLegalHold;
     });
