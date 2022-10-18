@@ -8,6 +8,7 @@
     "@wireapp/core-crypto": "0.5.2",
     "@wireapp/cryptobox": "12.8.0",
     "@wireapp/promise-queue": "workspace:^",
+    "@wireapp/protocol-messaging": "1.38.0",
     "@wireapp/store-engine-dexie": "workspace:^",
     "axios": "^0.27.2",
     "bazinga64": "5.11.7",
@@ -16,7 +17,6 @@
     "idb": "7.0.2",
     "logdown": "3.3.1",
     "long": "4.0.0",
-    "protobufjs": "6.11.3",
     "uuidjs": "4.2.12"
   },
   "devDependencies": {
@@ -31,7 +31,6 @@
     "@types/node": "^14.18.29",
     "@types/tough-cookie": "4.0.2",
     "@wireapp/commons": "workspace:^",
-    "@wireapp/protocol-messaging": "1.38.0",
     "@wireapp/store-engine-dexie": "workspace:^",
     "commander": "8.0.0",
     "cross-env": "7.0.3",
