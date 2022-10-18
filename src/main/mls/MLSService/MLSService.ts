@@ -134,6 +134,10 @@ export class MLSService {
     return coreCryptoKeyPackagesPayload;
   }
 
+  public getEpoch(groupId: Uint8Array) {
+    return this.getCoreCryptoClient().conversationEpoch(groupId);
+  }
+
   public async newProposal(proposalType: ProposalType, args: ProposalArgs | AddProposalArgs | RemoveProposalArgs) {
     return this.getCoreCryptoClient().newProposal(proposalType, args);
   }

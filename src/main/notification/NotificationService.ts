@@ -217,10 +217,12 @@ export class NotificationService extends EventEmitter {
       }
       try {
         const data = await this.handleEvent(event, source, dryRun);
-        yield {
-          ...data,
-          mappedEvent: data.mappedEvent ? this.cleanupPayloadBundle(data.mappedEvent) : undefined,
-        };
+        if (typeof data !== 'undefined') {
+          yield {
+            ...data,
+            mappedEvent: data.mappedEvent ? this.cleanupPayloadBundle(data.mappedEvent) : undefined,
+          };
+        }
       } catch (error) {
         this.logger.error(
           `There was an error with notification ID "${notification.id}": ${(error as Error).message}`,
@@ -259,11 +261,18 @@ export class NotificationService extends EventEmitter {
     }
   }
 
+  /**
+   * Will process one event
+   * @param event The backend event to process
+   * @param source The source of the event (websocket or notication stream)
+   * @param dryRun Will not try to decrypt if true
+   * @return the decrypted payload and the raw event. Returns `undefined` when the payload is a coreCrypto-only system message
+   */
   private async handleEvent(
     event: Events.BackendEvent,
     source: PayloadBundleSource,
     dryRun: boolean = false,
-  ): Promise<HandledEventPayload> {
+  ): Promise<HandledEventPayload | undefined> {
     switch (event.type) {
       case Events.CONVERSATION_EVENT.MLS_WELCOME_MESSAGE:
         const data = Decoder.fromBase64(event.data).asBytes;
@@ -284,8 +293,8 @@ export class NotificationService extends EventEmitter {
         );
         const groupIdBytes = Decoder.fromBase64(groupId).asBytes;
 
-        // Check if the message includes proposals
         const {proposals, commitDelay, message} = await this.mlsService.decryptMessage(groupIdBytes, encryptedData);
+        // Check if the message includes proposals
         if (typeof commitDelay === 'number' || proposals.length > 0) {
           // we are dealing with a proposal, add a task to process this proposal later on
           // Those proposals are stored inside of coreCrypto and will be handled after a timeout
@@ -295,11 +304,13 @@ export class NotificationService extends EventEmitter {
             eventTime: event.time,
           });
           // This is not a text message, there is nothing more to do
-          return {event};
+          return undefined;
         }
 
         if (!message) {
-          throw new Error(`MLS message received from ${source} was empty`);
+          const newEpoch = await this.mlsService.getEpoch(groupIdBytes);
+          this.logger.log(`Received commit message for group "${groupId}". New epoch is "${newEpoch}"`);
+          return undefined;
         }
         const decryptedData = GenericMessage.decode(message);
         /**
