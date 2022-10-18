@@ -69,6 +69,13 @@ const SetAccountType = ({}: Props) => {
 
   return (
     <Page>
+      {(Config.getConfig().FEATURE.ENABLE_DOMAIN_DISCOVERY ||
+        Config.getConfig().FEATURE.ENABLE_SSO ||
+        Config.getConfig().FEATURE.ENABLE_ACCOUNT_REGISTRATION) && (
+        <IsMobile>
+          <div style={{margin: 16}}>{backArrow}</div>
+        </IsMobile>
+      )}
       {!Config.getConfig().FEATURE.ENABLE_ACCOUNT_REGISTRATION && (
         <Navigate to={pathWithParams(ROUTE.INDEX)} replace data-uie-name="redirect-login" />
       )}
@@ -150,6 +157,9 @@ const SetAccountType = ({}: Props) => {
           <Column />
         </Columns>
       </Container>
+      <IsMobile>
+        <div style={{minWidth: 48}} />
+      </IsMobile>
     </Page>
   );
 };
