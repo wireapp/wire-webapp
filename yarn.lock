@@ -5046,13 +5046,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"async@npm:0.9.x":
-  version: 0.9.2
-  resolution: "async@npm:0.9.2"
-  checksum: 87dbf129292b8a6c32a4e07f43f462498162aa86f404a7e11f978dbfdf75cfb163c26833684bb07b9d436083cd604cbbf730a57bfcbe436c6ae1ed266cdc56bb
-  languageName: node
-  linkType: hard
-
 "async@npm:^2.6.0":
   version: 2.6.3
   resolution: "async@npm:2.6.3"
@@ -5113,16 +5106,6 @@ __metadata:
   bin:
     autoprefixer-info: ./bin/autoprefixer-info
   checksum: 7ad12a58ca128d3e6b6dc5e4b3d83f2a12151216d30bcea1f1f2f8a91d2a019c58dd62fd039a6c1cf218f2ab557b03224703a4396c1b4f01b5c0818bc6ba4dd9
-  languageName: node
-  linkType: hard
-
-"aws-sdk@npm:2.0.x":
-  version: 2.0.31
-  resolution: "aws-sdk@npm:2.0.31"
-  dependencies:
-    xml2js: 0.2.6
-    xmlbuilder: 0.4.2
-  checksum: a5a266135ef0a94da9997dca1869c603433ff9ac1565a37977396fb9b5659c461e4adcd75aff835894d29bc3c54e84fcdadc8d7f677ae47b05723b62dc70a538
   languageName: node
   linkType: hard
 
@@ -9048,21 +9031,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"grunt-aws-s3@npm:2.0.2":
-  version: 2.0.2
-  resolution: "grunt-aws-s3@npm:2.0.2"
-  dependencies:
-    async: 0.9.x
-    aws-sdk: 2.0.x
-    lodash: 4.17.x
-    mime-types: 2.0.x
-    progress: 1.1.x
-  peerDependencies:
-    grunt: ">=0.4.0"
-  checksum: 32d22fae3bd998cef28100798ea9470af60b9153538442cb577802114c3fb297c5cc3cc527ecfac6e9c8243e8c0e983232cf63f5624672ccb0eb1845f082169e
-  languageName: node
-  linkType: hard
-
 "grunt-cli@npm:1.4.3, grunt-cli@npm:~1.4.3":
   version: 1.4.3
   resolution: "grunt-cli@npm:1.4.3"
@@ -11795,7 +11763,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"lodash@npm:4.17.x, lodash@npm:^4.0.0, lodash@npm:^4.17.10, lodash@npm:^4.17.14, lodash@npm:^4.17.20, lodash@npm:^4.17.21, lodash@npm:^4.7.0, lodash@npm:~4.17.10, lodash@npm:~4.17.19, lodash@npm:~4.17.21":
+"lodash@npm:^4.0.0, lodash@npm:^4.17.10, lodash@npm:^4.17.14, lodash@npm:^4.17.20, lodash@npm:^4.17.21, lodash@npm:^4.7.0, lodash@npm:~4.17.10, lodash@npm:~4.17.19, lodash@npm:~4.17.21":
   version: 4.17.21
   resolution: "lodash@npm:4.17.21"
   checksum: eb835a2e51d381e561e508ce932ea50a8e5a68f4ebdd771ea240d3048244a8d13658acbd502cd4829768c56f2e16bdd4340b9ea141297d472517b83868e677f7
@@ -12135,22 +12103,6 @@ __metadata:
   version: 1.52.0
   resolution: "mime-db@npm:1.52.0"
   checksum: 0d99a03585f8b39d68182803b12ac601d9c01abfa28ec56204fa330bc9f3d1c5e14beb049bafadb3dbdf646dfb94b87e24d4ec7b31b7279ef906a8ea9b6a513f
-  languageName: node
-  linkType: hard
-
-"mime-db@npm:~1.12.0":
-  version: 1.12.0
-  resolution: "mime-db@npm:1.12.0"
-  checksum: 6506c87a45592fac34f7d92eac42209eb79c9ead06a2d2c5b863beb5de5d242c9af5d4671d99b35c24be7b85bdd17dcecd742df4fe5ede5fe20a4e35cd129648
-  languageName: node
-  linkType: hard
-
-"mime-types@npm:2.0.x":
-  version: 2.0.14
-  resolution: "mime-types@npm:2.0.14"
-  dependencies:
-    mime-db: ~1.12.0
-  checksum: 635b319cc7f7a323c57abf9eb284e7cab496b2e633a1b6568c02f3e678bb07516aaefd9d0c94703b143b543408aded3a7a83ec4e4c2f50661eb1752233737d73
   languageName: node
   linkType: hard
 
@@ -14287,13 +14239,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"progress@npm:1.1.x":
-  version: 1.1.8
-  resolution: "progress@npm:1.1.8"
-  checksum: 789c824156e03a7353b190fc63da46bc42b210250cebaa2dca447a6a740f5469f34ed30f768cdef088ca720a8c3c42dd743958e8bc6a35b2d2a1a83171ad2c56
-  languageName: node
-  linkType: hard
-
 "promise-inflight@npm:^1.0.1":
   version: 1.0.1
   resolution: "promise-inflight@npm:1.0.1"
@@ -15322,13 +15267,6 @@ __metadata:
   version: 2.1.2
   resolution: "safer-buffer@npm:2.1.2"
   checksum: cab8f25ae6f1434abee8d80023d7e72b598cf1327164ddab31003c51215526801e40b66c5e65d658a0af1e9d6478cadcb4c745f4bd6751f97d8644786c0978b0
-  languageName: node
-  linkType: hard
-
-"sax@npm:0.4.2":
-  version: 0.4.2
-  resolution: "sax@npm:0.4.2"
-  checksum: 521378fd102a787c90c9fb886d6b865fba39352b47bf949d04cef5f9a1fc8ca34fcb4aa8408bbeef161aa7e5df0d3f0e888513122a1e6196c01819441477e985
   languageName: node
   linkType: hard
 
@@ -17792,7 +17730,6 @@ __metadata:
     fake-indexeddb: 4.0.0
     generate-changelog: 1.8.0
     grunt: 1.5.3
-    grunt-aws-s3: 2.0.2
     grunt-cli: 1.4.3
     grunt-contrib-clean: 2.0.1
     grunt-contrib-compress: 2.0.0
@@ -18191,22 +18128,6 @@ __metadata:
   version: 4.0.0
   resolution: "xml-name-validator@npm:4.0.0"
   checksum: af100b79c29804f05fa35aa3683e29a321db9b9685d5e5febda3fa1e40f13f85abc40f45a6b2bf7bee33f68a1dc5e8eaef4cec100a304a9db565e6061d4cb5ad
-  languageName: node
-  linkType: hard
-
-"xml2js@npm:0.2.6":
-  version: 0.2.6
-  resolution: "xml2js@npm:0.2.6"
-  dependencies:
-    sax: 0.4.2
-  checksum: f6fc362ed0f3868ae0ec98b49346bc685903779798d029b5762b270fdeaca576c6782a151b986063255353ff2b0b9f110ad3042e295de4b2fd4c17917d27490c
-  languageName: node
-  linkType: hard
-
-"xmlbuilder@npm:0.4.2":
-  version: 0.4.2
-  resolution: "xmlbuilder@npm:0.4.2"
-  checksum: 9300497a60ae23b871916f27a9052360e4c50548476dbbfd7eb86d75158df1f24204c54f384c2de0a35c1e801a62e0384e2d06240361eca78c9f928df59c17dc
   languageName: node
   linkType: hard
 
