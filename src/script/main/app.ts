@@ -396,14 +396,8 @@ class App {
         await this.core.init(clientType, {
           onNewClient({userId, clientId, domain}) {
             const qualifiedId = {domain: domain ?? '', id: userId};
-            userRepository.addClientToUser(
-              qualifiedId,
-              {
-                class: ClientClassification.UNKNOWN,
-                id: clientId,
-              },
-              true,
-            );
+            const newClient = {class: ClientClassification.UNKNOWN, id: clientId};
+            userRepository.addClientToUser(qualifiedId, newClient, true);
           },
         });
       } catch (error) {
