@@ -47,7 +47,6 @@ export interface ParticipantItemProps<UserType> extends Omit<React.HTMLProps<HTM
   hideInfo?: boolean;
   highlighted?: boolean;
   isSelected?: boolean;
-  isSelfVerified?: boolean;
   mode?: UserlistMode;
   noInteraction?: boolean;
   noUnderline?: boolean;
@@ -71,7 +70,6 @@ const ParticipantItem = <UserType extends User | ServiceEntity>(
     hideInfo,
     highlighted = false,
     isSelected,
-    isSelfVerified = false,
     mode = UserlistMode.DEFAULT,
     noInteraction = false,
     noUnderline = false,
@@ -222,9 +220,7 @@ const ParticipantItem = <UserType extends User | ServiceEntity>(
               </span>
             )}
 
-            {isUser && isSelfVerified && isVerified && (
-              <Icon.Verified className="verified-icon" data-uie-name="status-verified" />
-            )}
+            {isUser && isVerified && <Icon.Verified className="verified-icon" data-uie-name="status-verified" />}
 
             {callParticipant && (
               <>

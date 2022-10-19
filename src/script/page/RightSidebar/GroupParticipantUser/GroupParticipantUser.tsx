@@ -82,7 +82,6 @@ const GroupParticipantUser: FC<GroupParticipantUserProps> = ({
     'team',
   ]);
   const {isActivatedAccount, self: selfUser} = useKoSubscribableChildren(userState, ['isActivatedAccount', 'self']);
-  const {is_verified: isSelfVerified} = useKoSubscribableChildren(selfUser, ['is_verified']);
 
   const canChangeRole =
     conversationRoleRepository.canChangeParticipantRoles(activeConversation) && !currentUser.isMe && !isTemporaryGuest;
@@ -149,7 +148,6 @@ const GroupParticipantUser: FC<GroupParticipantUserProps> = ({
           participant={currentUser}
           badge={teamRepository.getRoleBadge(currentUser.id)}
           isGroupAdmin={isAdmin}
-          isSelfVerified={isSelfVerified}
           classifiedDomains={classifiedDomains}
         />
 

@@ -92,8 +92,6 @@ const UserList: React.FC<UserListProps> = ({
 
   const highlightedUserIds = highlightedUsers.map(user => user.id);
   const selfInTeam = userState.self().inTeam();
-  const {self} = useKoSubscribableChildren(userState, ['self']);
-  const {is_verified: isSelfVerified} = useKoSubscribableChildren(self, ['is_verified']);
   const isSelectEnabled = !!onSelectUser;
 
   // subscribe to roles changes in order to react to them
@@ -166,7 +164,6 @@ const UserList: React.FC<UserListProps> = ({
                       mode={mode}
                       external={teamState.isExternal(user.id)}
                       selfInTeam={selfInTeam}
-                      isSelfVerified={isSelfVerified}
                       onClick={onClickOrKeyPressed}
                       onKeyDown={onUserKeyPressed}
                       showArrow={showArrow}
@@ -201,7 +198,6 @@ const UserList: React.FC<UserListProps> = ({
                     mode={mode}
                     external={teamState.isExternal(user.id)}
                     selfInTeam={selfInTeam}
-                    isSelfVerified={isSelfVerified}
                     onClick={onClickOrKeyPressed}
                     onKeyDown={onUserKeyPressed}
                     showArrow={showArrow}
@@ -231,7 +227,6 @@ const UserList: React.FC<UserListProps> = ({
             mode={mode}
             external={teamState.isExternal(user.id)}
             selfInTeam={selfInTeam}
-            isSelfVerified={isSelfVerified}
             onClick={onClickOrKeyPressed}
             onKeyDown={onUserKeyPressed}
             showArrow={showArrow}
