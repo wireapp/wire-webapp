@@ -12,7 +12,7 @@
     "http-status-codes": "2.2.0",
     "logdown": "3.3.1",
     "reconnecting-websocket": "4.4.0",
-    "spark-md5": "3.0.1",
+    "spark-md5": "3.0.2",
     "tough-cookie": "4.1.2",
     "ws": "7.5.3"
   },
