@@ -17,7 +17,7 @@
  *
  */
 
-import faker from 'faker';
+import {faker} from '@faker-js/faker';
 import UUID from 'uuidjs';
 
 export function getUUID(): string {
@@ -37,7 +37,7 @@ export function mockUserPayload(userId: string): Object {
     assets: [],
     id: userId,
     locale: 'en',
-    name: faker.name.findName(),
+    name: faker.name.fullName(),
     picture: [
       {
         content_length: 263345,
