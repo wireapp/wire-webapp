@@ -77,17 +77,24 @@ const useAppMainState = create<AppMainState>((set, get) => ({
         ...state,
         rightSidebar: {...state.rightSidebar, entity, history: state.rightSidebar.history.slice(0, -1)},
       })),
-    goTo: (panel: PanelState, params: RightSidebarParams) =>
-      set(state => ({
-        ...state,
-        rightSidebar: {
-          ...state.rightSidebar,
-          entity: params?.entity || null,
-          highlightedUsers: params?.highlighted || [],
-          history: [...state.rightSidebar.history, panel],
-          showLikes: !!params?.showLikes,
-        },
-      })),
+    goTo: (panel: PanelState, params: RightSidebarParams) => {
+      return set(state => {
+        const {rightSidebar} = state;
+        const previousState = rightSidebar.history.at(-1);
+        const replacedNewState = previousState === panel ? rightSidebar.history.slice(0, -1) : rightSidebar.history;
+
+        return {
+          ...state,
+          rightSidebar: {
+            ...state.rightSidebar,
+            entity: params?.entity || null,
+            highlightedUsers: params?.highlighted || [],
+            history: [...replacedNewState, panel],
+            showLikes: !!params?.showLikes,
+          },
+        };
+      });
+    },
     goToRoot: (entity: RightSidebarParams['entity']) =>
       set(state => ({
         ...state,

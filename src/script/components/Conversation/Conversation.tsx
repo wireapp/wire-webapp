@@ -35,13 +35,13 @@ import {Giphy} from 'Components/Giphy';
 import {InputBar} from 'Components/InputBar';
 import {MessagesList} from 'Components/MessagesList';
 import {showDetailViewModal} from 'Components/Modals/DetailViewModal';
+import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {TitleBar} from 'Components/TitleBar';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 import {getLogger} from 'Util/Logger';
 import {safeMailOpen, safeWindowOpen} from 'Util/SanitizationUtil';
 
-import {PrimaryModal} from '../../components/Modals/PrimaryModal';
 import {ConversationState} from '../../conversation/ConversationState';
 import {Conversation as ConversationEntity} from '../../entity/Conversation';
 import {ContentMessage} from '../../entity/message/ContentMessage';
@@ -56,7 +56,7 @@ import {isServiceEntity} from '../../guards/Service';
 import {ServiceEntity} from '../../integration/ServiceEntity';
 import {MotionDuration} from '../../motion/MotionDuration';
 import {RightSidebarParams} from '../../page/AppMain';
-import {PanelState} from '../../page/RightSidebar/RightSidebar';
+import {PanelState} from '../../page/RightSidebar';
 import {RootContext} from '../../page/RootProvider';
 import {TeamState} from '../../team/TeamState';
 import {UserState} from '../../user/UserState';
@@ -143,6 +143,7 @@ const ConversationList: FC<ConversationListProps> = ({
     const isSingleModeConversation = is1to1 || isRequest;
 
     const isUserEntity = !isServiceEntity(userEntity);
+
     if (
       activeConversation &&
       isUserEntity &&
@@ -155,10 +156,12 @@ const ConversationList: FC<ConversationListProps> = ({
 
     const panelId = userEntity.isService ? PanelState.GROUP_PARTICIPANT_SERVICE : PanelState.GROUP_PARTICIPANT_USER;
 
-    const serviceEntity = await repositories.integration.getServiceFromUser(userEntity);
+    const serviceEntity = userEntity.isService && (await repositories.integration.getServiceFromUser(userEntity));
 
     if (serviceEntity) {
       openRightSidebar(panelId, {entity: {...serviceEntity, id: userEntity.id}});
+    } else {
+      openRightSidebar(panelId, {entity: userEntity});
     }
   };
 

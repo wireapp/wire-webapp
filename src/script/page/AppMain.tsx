@@ -58,13 +58,8 @@ const AppContainer: FC<AppContainerProps> = ({root}) => {
 
   const {self: selfUser, isActivatedAccount} = useKoSubscribableChildren(userState, ['self', 'isActivatedAccount']);
 
-  const rightSidebar = useAppMainState(state => state.rightSidebar);
-  const currentState = rightSidebar.history.at(-1);
-  const currentEntity = rightSidebar.entity;
-
-  const closeRightSidebar = () => {
-    rightSidebar.clearHistory();
-  };
+  const {history, entity: currentEntity, clearHistory, goTo} = useAppMainState(state => state.rightSidebar);
+  const currentState = history.at(-1);
 
   const toggleRightSidebar = (panelState: PanelState, params: RightSidebarParams) => {
     const newParamId = params.entity?.id;
@@ -74,12 +69,12 @@ const AppContainer: FC<AppContainerProps> = ({root}) => {
     const isDifferentParams = newParamId !== currentParamId;
 
     if (isDifferentState || isDifferentParams) {
-      rightSidebar.goTo(panelState, params);
+      goTo(panelState, params);
 
       return;
     }
 
-    closeRightSidebar();
+    clearHistory();
   };
 
   // To be changed when design chooses a breakpoint, the conditional can be integrated to the ui-kit directly
@@ -101,7 +96,7 @@ const AppContainer: FC<AppContainerProps> = ({root}) => {
             )}
             {currentState && (
               <RightSidebar
-                currentEntity={rightSidebar.entity}
+                currentEntity={currentEntity}
                 repositories={repositories}
                 actionsViewModel={root.actions}
                 isFederated={root.isFederated}
