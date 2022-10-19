@@ -22,7 +22,7 @@ import {ClientType} from '@wireapp/api-client/src/client/';
 import {container, singleton} from 'tsyringe';
 import {APIClient} from './APIClientSingleton';
 import {createStorageEngine, DatabaseTypes} from './StoreEngineProvider';
-import {isMlsDisabledOnElectron, isTemporaryClientAndNonPersistent} from 'Util/util';
+import {isMLSDisabledOnElectron, isTemporaryClientAndNonPersistent} from 'Util/util';
 import {Config} from '../Config';
 
 declare global {
@@ -45,7 +45,7 @@ export class Core extends Account<Uint8Array> {
 
         return createStorageEngine(storeName, dbType);
       },
-      mlsConfig: !isMlsDisabledOnElectron
+      mlsConfig: !isMLSDisabledOnElectron
         ? {
             coreCrypoWasmFilePath: '/min/core-crypto.wasm',
             keyingMaterialUpdateThreshold: Config.getConfig().FEATURE.MLS_CONFIG_KEYING_MATERIAL_UPDATE_THRESHOLD,
