@@ -10,7 +10,7 @@
   },
   "description": "Wire's internal license collection tool",
   "devDependencies": {
-    "@types/fs-extra": "9.0.12",
+    "@types/fs-extra": "9.0.13",
     "@types/node": "^14.18.29",
     "@types/npm-registry-package-info": "1.0.1",
     "rimraf": "3.0.2",

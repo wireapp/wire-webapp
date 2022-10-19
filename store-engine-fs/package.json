@@ -3,7 +3,7 @@
     "fs-extra": "10.1.0"
   },
   "devDependencies": {
-    "@types/fs-extra": "9.0.12",
+    "@types/fs-extra": "9.0.13",
     "@types/jasmine": "4.3.0",
     "@types/node": "^14.18.29",
     "@wireapp/store-engine": "workspace:^",
