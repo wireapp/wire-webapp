@@ -719,8 +719,6 @@ const InputBar = ({
   };
 
   useEffect(() => {
-    loadInitialStateForConversation();
-
     amplify.subscribe(WebAppEvents.CONVERSATION.IMAGE.SEND, uploadImages);
     amplify.subscribe(WebAppEvents.CONVERSATION.MESSAGE.EDIT, editMessage);
     amplify.subscribe(WebAppEvents.CONVERSATION.MESSAGE.REPLY, replyMessage);
@@ -732,6 +730,10 @@ const InputBar = ({
       amplify.unsubscribeAll(WebAppEvents.SHORTCUT.PING);
     };
   }, []);
+
+  useEffect(() => {
+    loadInitialStateForConversation();
+  }, [conversationEntity]);
 
   useEffect(() => {
     if (!isEditing) {
