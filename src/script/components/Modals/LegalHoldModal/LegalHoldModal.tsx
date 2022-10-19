@@ -230,7 +230,7 @@ const LegalHoldModal: FC<LegalHoldModalProps> = ({
     if (isOpen && isRequest) {
       getFingerprintData();
     }
-  }, [getFingerprintData, isRequest]);
+  }, [getFingerprintData, isOpen, isRequest]);
 
   // Show users
   const getLegalHoldUsers = useCallback(async () => {
