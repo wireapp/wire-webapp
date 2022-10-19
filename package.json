@@ -1,6 +1,6 @@
 {
   "dependencies": {
-    "@types/color": "3.0.2",
+    "@types/color": "3.0.3",
     "bazinga64": "5.11.8",
     "color": "4.2.3",
     "emotion-normalize": "11.0.1",
