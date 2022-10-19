@@ -28,7 +28,7 @@
     "@types/babel__core": "^7",
     "@types/jest": "29.2.0",
     "@types/long": "4.0.1",
-    "@types/node": "^14.18.29",
+    "@types/node": "^18.11.2",
     "@types/tough-cookie": "4.0.2",
     "@wireapp/commons": "workspace:^",
     "@wireapp/store-engine-dexie": "workspace:^",
