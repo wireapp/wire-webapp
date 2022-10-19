@@ -42,7 +42,7 @@
     "nock": "13.2.9",
     "nyc": "15.1.0",
     "react": "18.2.0",
-    "react-dom": "18.1.0",
+    "react-dom": "18.2.0",
     "react-hot-loader": "4.13.0",
     "rimraf": "3.0.2",
     "sinon": "14.0.1",
