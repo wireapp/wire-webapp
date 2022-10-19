@@ -240,6 +240,8 @@ const LegalHoldModal: FC<LegalHoldModalProps> = ({
 
       if (!legalHoldUsers.length) {
         setIsModalOpen(false);
+
+        return;
       }
 
       setUsers(legalHoldUsers);
@@ -363,46 +365,50 @@ const LegalHoldModal: FC<LegalHoldModalProps> = ({
           </>
         )}
 
-        {!isRequestModal && !userDevices ? (
+        {!isRequest && (
           <>
-            <div className="legal-hold-modal__logo">
-              <LegalHoldDot large dataUieName="status-modal-legal-hold-icon" />
-            </div>
+            {!userDevices ? (
+              <>
+                <div className="legal-hold-modal__logo">
+                  <LegalHoldDot large dataUieName="status-modal-legal-hold-icon" />
+                </div>
 
-            <div className="legal-hold-modal__headline" data-uie-name="status-modal-title">
-              {t('legalHoldHeadline')}
-            </div>
+                <div className="legal-hold-modal__headline" data-uie-name="status-modal-title">
+                  {t('legalHoldHeadline')}
+                </div>
 
-            <p
-              className="legal-hold-modal__info"
-              data-uie-name="status-modal-text"
-              dangerouslySetInnerHTML={{
-                __html: isSelfInfo ? t('legalHoldDescriptionSelf') : t('legalHoldDescriptionOthers'),
-              }}
-            />
+                <p
+                  className="legal-hold-modal__info"
+                  data-uie-name="status-modal-text"
+                  dangerouslySetInnerHTML={{
+                    __html: isSelfInfo ? t('legalHoldDescriptionSelf') : t('legalHoldDescriptionOthers'),
+                  }}
+                />
 
-            <div className="legal-hold-modal__subjects">{t('legalHoldSubjects')}</div>
+                <div className="legal-hold-modal__subjects">{t('legalHoldSubjects')}</div>
 
-            <UserSearchableList
-              users={users}
-              userState={userState}
-              conversationRepository={conversationRepository}
-              searchRepository={searchRepository}
-              teamRepository={teamRepository}
-              onClick={setUserDevices}
-              noUnderline
-            />
+                <UserSearchableList
+                  users={users}
+                  userState={userState}
+                  conversationRepository={conversationRepository}
+                  searchRepository={searchRepository}
+                  teamRepository={teamRepository}
+                  onClick={setUserDevices}
+                  noUnderline
+                />
+              </>
+            ) : (
+              <UserDevices
+                clientRepository={clientRepository}
+                cryptographyRepository={cryptographyRepository}
+                messageRepository={messageRepository}
+                user={userDevices as User}
+                current={userDevicesHistory.current}
+                goTo={userDevicesHistory.goTo}
+                noPadding
+              />
+            )}
           </>
-        ) : (
-          <UserDevices
-            clientRepository={clientRepository}
-            cryptographyRepository={cryptographyRepository}
-            messageRepository={messageRepository}
-            user={userDevices as User}
-            current={userDevicesHistory.current}
-            goTo={userDevicesHistory.goTo}
-            noPadding
-          />
         )}
       </div>
     </ModalComponent>

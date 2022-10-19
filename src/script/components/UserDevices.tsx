@@ -118,7 +118,7 @@ const UserDevices: React.FC<UserDevicesProps> = ({
           }
         }
       } catch (error) {
-        logger.error(`Unable to retrieve clients for user '${user?.id}': ${error.message || error}`);
+        logger.error(`Unable to retrieve clients for user '${user.id}': ${error.message || error}`);
       }
     })();
   }, [user]);
@@ -126,7 +126,7 @@ const UserDevices: React.FC<UserDevicesProps> = ({
   const clickOnDevice = (clientEntity: ClientEntity) => {
     setSelectedClient(clientEntity);
     const headline = user.isMe ? clientEntity.label || clientEntity.model : capitalizeFirstChar(clientEntity.class);
-    goTo(UserDevicesState.DEVICE_DETAILS, headline);
+    goTo(UserDevicesState.DEVICE_DETAILS, headline || '');
   };
 
   const clickToShowSelfFingerprint = () => {

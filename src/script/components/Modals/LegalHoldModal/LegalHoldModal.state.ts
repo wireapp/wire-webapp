@@ -146,7 +146,7 @@ const useLegalHoldModalState = create<LegalHoldModalState>((set, get) => ({
     set(state => ({
       ...state,
       conversation,
-      conversationId: conversation ? conversation?.id : 'self',
+      conversationId: conversation?.id || 'self',
       isInitialized: initialize,
       isLoading: true,
       isOpen: true,
