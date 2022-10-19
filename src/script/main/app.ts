@@ -425,7 +425,7 @@ class App {
 
       const conversationEntities = await conversationRepository.getConversations();
 
-      if (supportsMLS()) {
+      if (supportsMLS) {
         // We send external proposal to all the MLS conversations that are in an unknown state (not established nor pendingWelcome)
         await mlsConversationState.getState().sendExternalToPendingJoin(
           conversationEntities,

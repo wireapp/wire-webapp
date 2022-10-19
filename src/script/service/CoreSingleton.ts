@@ -45,7 +45,7 @@ export class Core extends Account<Uint8Array> {
 
         return createStorageEngine(storeName, dbType);
       },
-      mlsConfig: supportsMLS()
+      mlsConfig: supportsMLS
         ? {
             coreCrypoWasmFilePath: '/min/core-crypto.wasm',
             keyingMaterialUpdateThreshold: Config.getConfig().FEATURE.MLS_CONFIG_KEYING_MATERIAL_UPDATE_THRESHOLD,
