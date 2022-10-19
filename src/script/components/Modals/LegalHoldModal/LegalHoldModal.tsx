@@ -29,6 +29,7 @@ import {ModalComponent} from 'Components/ModalComponent';
 import {useUserDevicesHistory, UserDevicesState, UserDevices} from 'Components/UserDevices';
 import {UserSearchableList} from 'Components/UserSearchableList';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
+import {handleEnterDown} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
 
 import {useLegalHoldModalState} from './LegalHoldModal.state';
@@ -68,7 +69,6 @@ const LegalHoldModal: FC<LegalHoldModalProps> = ({
   cryptographyRepository,
   messageRepository,
 }) => {
-  const legalHoldModal = useLegalHoldModalState();
   const {
     fingerprint,
     setFingerprint,
@@ -77,6 +77,7 @@ const LegalHoldModal: FC<LegalHoldModalProps> = ({
     setType,
     isLoading,
     isOpen,
+    setSkipShowUsers,
     setIsLoading,
     isRequestModal,
     isInitialized,
@@ -84,11 +85,10 @@ const LegalHoldModal: FC<LegalHoldModalProps> = ({
     setIsRequestModal,
     conversation: currentConversation,
     isSelfInfo,
-    skipUsers,
-    setSkipUsers,
     users,
     setUsers,
-  } = legalHoldModal;
+    skipShowUsers,
+  } = useLegalHoldModalState();
 
   const isRequest = type === LegalHoldModalType.REQUEST;
   const isUsers = type === LegalHoldModalType.USERS;
@@ -113,13 +113,9 @@ const LegalHoldModal: FC<LegalHoldModalProps> = ({
     setRequestError('');
   }, []);
 
-  const hideModal = () => {
-    onClose();
-  };
-
   const onBgClick = useCallback(() => {
     if (!isRequestModal) {
-      hideModal();
+      onClose();
     }
   }, [isRequestModal]);
 
@@ -133,7 +129,7 @@ const LegalHoldModal: FC<LegalHoldModalProps> = ({
 
   const closeRequest = () => {
     if (isRequestModal) {
-      hideModal();
+      onClose();
     }
   };
 
@@ -152,13 +148,13 @@ const LegalHoldModal: FC<LegalHoldModalProps> = ({
 
       const password = requiresPassword ? passwordValue : '';
       await teamRepository.teamService.sendLegalHoldApproval(selfUser.teamId, selfUser.id, password);
-
-      onClose();
-      setIsSendingApprove(false);
-      setSkipUsers(true);
       selfUser.hasPendingLegalHold(false);
 
       await clientRepository.updateClientsForSelf();
+
+      setIsSendingApprove(false);
+      setSkipShowUsers(true);
+      onClose();
     } catch ({code, message}) {
       switch (code) {
         case HTTP_STATUS.BAD_REQUEST: {
@@ -230,10 +226,10 @@ const LegalHoldModal: FC<LegalHoldModalProps> = ({
   ]);
 
   useEffect(() => {
-    if (isRequest) {
+    if (isOpen && isRequest) {
       getFingerprintData();
     }
-  }, [getFingerprintData, isInitialized, isRequest, isRequestModal]);
+  }, [getFingerprintData, isOpen, isRequest]);
 
   // Show users
   const getLegalHoldUsers = useCallback(async () => {
@@ -256,16 +252,16 @@ const LegalHoldModal: FC<LegalHoldModalProps> = ({
   }, [conversationRepository, currentConversation, messageRepository, selfUser]);
 
   useEffect(() => {
-    if (isUsers) {
-      if (skipUsers) {
-        setSkipUsers(false);
+    if (skipShowUsers) {
+      setSkipShowUsers(false);
 
-        return;
-      }
+      return;
+    }
 
+    if (isOpen && isUsers) {
       getLegalHoldUsers();
     }
-  }, [getLegalHoldUsers, isRequestModal, skipUsers, isUsers, isInitialized]);
+  }, [getLegalHoldUsers, isRequestModal, isOpen, isUsers, skipShowUsers]);
 
   return (
     <ModalComponent
@@ -329,6 +325,7 @@ const LegalHoldModal: FC<LegalHoldModalProps> = ({
                 value={passwordValue}
                 placeholder={t('login.passwordPlaceholder')}
                 onChange={ev => setPasswordValue(ev.target.value)}
+                onKeyDown={ev => handleEnterDown(ev, acceptRequest)}
               />
             )}
 
