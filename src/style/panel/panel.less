@@ -32,6 +32,7 @@
     display: flex;
     height: 100%;
     flex-direction: column;
+    overflow-y: overlay;
 
     &--move-out--left,
     &--move-out--right,
@@ -101,6 +102,7 @@
     position: relative;
     display: flex;
     width: @panel-width;
+    min-height: @panel-content-min-height;
     flex-direction: column;
     overflow-x: hidden;
     overflow-y: auto;
