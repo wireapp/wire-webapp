@@ -438,7 +438,6 @@ export class Account<T = any> extends EventEmitter {
       throw new Error('Services are not set.');
     }
     const coreCryptoKeyId = 'corecrypto-key';
-    const {CoreCrypto} = await import('@wireapp/core-crypto');
     const dbName = this.generateSecretsDbName(context);
 
     const secretStore = mlsConfig.systemCrypto
