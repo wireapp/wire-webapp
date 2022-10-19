@@ -44,9 +44,14 @@
 }
 
 .video-element-remote {
+  height: calc(100% - 179px);
   // fade in animation
   animation: video-fade-in @animation-timing-slower @ease-out-quart forwards;
   opacity: 0;
+
+  @media (max-height: @screen-height-sm) {
+    height: calc(100% - 105px);
+  }
 }
 
 .video-element-remote-participant {
@@ -69,6 +74,11 @@
   align-items: center;
   justify-content: space-around;
   background-color: var(--sidebar-bg);
+
+  @media (max-height: @screen-height-sm) {
+    height: 30px;
+    line-height: 12px;
+  }
 
   &__info-bar {
     .label-small-medium;
@@ -95,6 +105,16 @@
   background-color: var(--app-bg-secondary);
   transition: opacity 0.25s ease-in-out;
 
+  &__centered-items {
+    display: flex;
+    justify-content: space-between;
+
+    @media (max-width: @call-ui-xs) {
+      width: 100%;
+      justify-content: space-around;
+    }
+  }
+
   &__fit-info {
     width: 100%;
     color: #fff;
@@ -110,7 +130,20 @@
     display: flex;
     width: 100%;
     justify-content: space-between;
+    padding: 32px 40px 0 40px;
     margin: 0;
+
+    @media (max-height: @screen-height-sm) {
+      padding: 10px;
+    }
+
+    @media (max-width: @call-ui-sm) {
+      justify-content: center;
+    }
+
+    @media (max-width: @call-ui-xs) {
+      padding: 32px 10px;
+    }
   }
 
   &__item__minimize {
@@ -131,7 +164,7 @@
     cursor: pointer;
     line-height: 0;
 
-    @media (max-height: 420px) {
+    @media (max-height: @screen-height-sm) {
       width: 40px;
       height: 40px;
     }
