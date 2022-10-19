@@ -573,7 +573,7 @@ export class CallingRepository {
       qualified_from,
       sender: clientId,
       time = new Date().toISOString(),
-      senderClientId: senderClientIdFullId = '',
+      senderClientId: senderFullyQualifiedClientId = '',
     } = event;
     const isFederated = this.core.backendFeatures.isFederated && qualified_conversation && qualified_from;
     const userId = isFederated ? qualified_from : {domain: '', id: from};
@@ -621,8 +621,8 @@ export class CallingRepository {
     }
 
     let senderClientId = '';
-    if (senderClientIdFullId) {
-      senderClientId = this.parseQualifiedId(senderClientIdFullId).id.split(':')[1];
+    if (senderFullyQualifiedClientId) {
+      senderClientId = this.parseQualifiedId(senderFullyQualifiedClientId).id.split(':')[1];
     }
 
     const res = this.wCall?.recvMsg(
