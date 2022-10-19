@@ -23,7 +23,7 @@ import 'core-js/full/reflect';
 import ko from 'knockout';
 import platform from 'platform';
 import {container} from 'tsyringe';
-import {ClientType} from '@wireapp/api-client/src/client/';
+import {ClientType, ClientClassification} from '@wireapp/api-client/src/client/';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import {amplify} from 'amplify';
 import Dexie from 'dexie';
@@ -394,9 +394,16 @@ class App {
 
       try {
         await this.core.init(clientType, {
-          onNewSession({userId, clientId, domain}) {
-            const qualifiedId = {domain, id: userId};
-            amplify.publish(WebAppEvents.CLIENT.ADD, qualifiedId, {id: clientId}, true);
+          onNewClient({userId, clientId, domain}) {
+            const qualifiedId = {domain: domain ?? '', id: userId};
+            userRepository.addClientToUser(
+              qualifiedId,
+              {
+                class: ClientClassification.UNKNOWN,
+                id: clientId,
+              },
+              true,
+            );
           },
         });
       } catch (error) {
