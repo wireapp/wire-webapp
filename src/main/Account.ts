@@ -441,8 +441,8 @@ export class Account<T = any> extends EventEmitter {
     const {CoreCrypto} = await import('@wireapp/core-crypto');
     const dbName = this.generateSecretsDbName(context);
 
-    const secretStore = mlsConfig.secretsCrypto
-      ? await createCustomEncryptedStore(dbName, mlsConfig.secretsCrypto)
+    const secretStore = mlsConfig.systemCrypto
+      ? await createCustomEncryptedStore(dbName, mlsConfig.systemCrypto)
       : await createEncryptedStore(dbName);
 
     let key = await secretStore.getsecretValue(coreCryptoKeyId);
