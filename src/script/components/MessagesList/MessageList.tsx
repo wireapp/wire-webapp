@@ -22,6 +22,7 @@ import React, {
   MouseEvent as ReactMouseEvent,
   KeyboardEvent as ReactKeyboardEvent,
   useEffect,
+  useLayoutEffect,
   useRef,
   useState,
 } from 'react';
@@ -146,7 +147,7 @@ const MessagesList: FC<MessagesListParams> = ({
 
   const filteredMessages = filterDuplicatedMemberMessages(filterHiddenMessages(allMessages));
 
-  const messageContainerRef = useRef<HTMLDivElement>(null);
+  const [messagesContainer, setMessageContainer] = useState<HTMLDivElement | null>(null);
 
   const shouldShowInvitePeople = isActiveParticipant && inTeam && (isGuestRoom || isGuestAndServicesRoom);
 
@@ -207,9 +208,9 @@ const MessagesList: FC<MessagesListParams> = ({
   };
 
   // Listen to resizes of the the container element (if it's resized it means something has changed in the message list)
-  useResizeObserver(() => updateScroll(messageContainerRef.current), messageContainerRef.current);
+  useResizeObserver(() => updateScroll(messagesContainer), messagesContainer);
   // Also listen to the scrolling container resizes (when the window resizes or the inputBar changes)
-  useResizeObserver(() => updateScroll(messageContainerRef.current), messageContainerRef.current?.parentElement);
+  useResizeObserver(() => updateScroll(messagesContainer), messagesContainer?.parentElement);
 
   const loadPrecedingMessages = async (): Promise<void> => {
     const shouldPullMessages = !isPending && hasAdditionalMessages;
@@ -232,11 +233,11 @@ const MessagesList: FC<MessagesListParams> = ({
     }
   };
 
-  useEffect(() => {
-    if (loaded && messageContainerRef.current) {
-      updateScroll(messageContainerRef.current);
+  useLayoutEffect(() => {
+    if (messagesContainer) {
+      updateScroll(messagesContainer);
     }
-  }, [filteredMessages.length, loaded]);
+  }, [messagesContainer, filteredMessages.length]);
 
   useEffect(() => {
     onLoading(true);
@@ -246,7 +247,7 @@ const MessagesList: FC<MessagesListParams> = ({
         onLoading(false);
       }, 10);
     });
-  }, [conversation, initialMessage]);
+  }, []);
 
   if (!loaded) {
     return null;
@@ -261,7 +262,7 @@ const MessagesList: FC<MessagesListParams> = ({
       id="message-list"
       className="message-list"
     >
-      <div ref={messageContainerRef} className={cx('messages', {'flex-center': verticallyCenterMessage()})}>
+      <div ref={setMessageContainer} className={cx('messages', {'flex-center': verticallyCenterMessage()})}>
         {filteredMessages.map((message, index) => {
           const previousMessage = filteredMessages[index - 1];
           const isLastDeliveredMessage = lastDeliveredMessage?.id === message.id;
@@ -281,14 +282,14 @@ const MessagesList: FC<MessagesListParams> = ({
               isLastDeliveredMessage={isLastDeliveredMessage}
               isMarked={!!focusedMessage && focusedMessage === message.id}
               scrollTo={({element, center}, isUnread) => {
-                if (isUnread && messageContainerRef.current) {
+                if (isUnread && messagesContainer) {
                   // if it's a new unread message, but we are not on the first render of the list,
                   // we do not need to scroll to the unread message
                   return;
                 }
                 focusedElement.current = {center, element};
                 setTimeout(() => (focusedElement.current = null), 1000);
-                updateScroll(messageContainerRef.current);
+                updateScroll(messagesContainer);
               }}
               isSelfTemporaryGuest={selfUser.isTemporaryGuest()}
               messageRepository={messageRepository}

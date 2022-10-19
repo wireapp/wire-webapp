@@ -47,6 +47,14 @@ import {UserState} from '../../../user/UserState';
 import {PanelHeader} from '../PanelHeader';
 import {PanelEntity, PanelState} from '../RightSidebar';
 
+const ENABLE_ADD_ACTIONS_LENGTH = 0;
+const ENABLE_IS_SEARCHING_LENGTH = 0;
+
+enum PARTICIPANTS_STATE {
+  ADD_PEOPLE = 'ADD_PEOPLE',
+  ADD_SERVICE = 'ADD_SERVICE',
+}
+
 interface AddParticipantsProps {
   activeConversation: Conversation;
   onBack: () => void;
@@ -59,12 +67,6 @@ interface AddParticipantsProps {
   teamState: TeamState;
   userState: UserState;
 }
-
-enum PARTICIPANTS_STATE {
-  ADD_PEOPLE = 'ADD_PEOPLE',
-  ADD_SERVICE = 'ADD_SERVICE',
-}
-
 const AddParticipants: FC<AddParticipantsProps> = ({
   activeConversation,
   onBack,
@@ -109,20 +111,20 @@ const AddParticipants: FC<AddParticipantsProps> = ({
   const [selectedContacts, setSelectedContacts] = useState<User[]>([]);
 
   const [isInitialServiceSearch, setIsInitialServiceSearch] = useState<boolean>(true);
-
   const contacts = useMemo(() => {
     let users: User[] = [];
 
     if (isTeam) {
-      users = isTeamOnly || isServicesRoom ? teamMembers.sort(sortUsersByPriority) : teamUsers;
+      const isTeamOrServices = isTeamOnly || isServicesRoom;
+      users = isTeamOrServices ? teamMembers.sort(sortUsersByPriority) : teamUsers;
     } else {
       users = connectedUsers;
     }
 
     return users.filter(userEntity => !participatingUserIds.find(userId => matchQualifiedIds(userEntity, userId)));
-  }, []);
+  }, [connectedUsers, isServicesRoom, isTeam, isTeamOnly, participatingUserIds, teamMembers, teamUsers]);
 
-  const enabledAddAction = selectedContacts.length > 0;
+  const enabledAddAction = selectedContacts.length > ENABLE_ADD_ACTIONS_LENGTH;
 
   const headerText = selectedContacts.length
     ? t('addParticipantsHeaderWithCounter', selectedContacts.length)
@@ -134,10 +136,10 @@ const AddParticipants: FC<AddParticipantsProps> = ({
     const allowIntegrations = isGroup || isService;
 
     return isTeam && allowIntegrations && inTeam && !isTeamOnly && isServicesEnabled;
-  }, []);
+  }, [firstUserEntity?.isService, inTeam, isGroup, isGuestAndServicesRoom, isServicesRoom, isTeam, isTeamOnly]);
 
   const manageServicesUrl = getManageServicesUrl('client_landing');
-  const isSearching = searchInput.length > 0;
+  const isSearching = searchInput.length > ENABLE_IS_SEARCHING_LENGTH;
 
   const onAddPeople = () => setCurrentState(PARTICIPANTS_STATE.ADD_PEOPLE);
 
@@ -172,7 +174,9 @@ const AddParticipants: FC<AddParticipantsProps> = ({
   };
 
   const onSearchInput = async (value: string) => {
-    await searchServices(value);
+    if (isAddServiceState) {
+      await searchServices(value);
+    }
     setSearchInput(value);
   };
 
