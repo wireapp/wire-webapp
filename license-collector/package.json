@@ -12,9 +12,7 @@
   "devDependencies": {
     "@types/fs-extra": "9.0.13",
     "@types/node": "^18.11.2",
-    "@types/npm-registry-package-info": "1.0.1",
-    "rimraf": "3.0.2",
-    "typescript": "4.8.4"
+    "@types/npm-registry-package-info": "1.0.1"
   },
   "files": [
     "src",

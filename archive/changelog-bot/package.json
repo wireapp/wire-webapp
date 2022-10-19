@@ -13,9 +13,7 @@
     "@types/generate-changelog": "1.8.1",
     "@types/node": "^14.18.29",
     "generate-changelog": "1.8.0",
-    "logdown": "3.3.1",
-    "rimraf": "3.0.2",
-    "typescript": "4.8.3"
+    "logdown": "3.3.1"
   },
   "files": [
     "src",
