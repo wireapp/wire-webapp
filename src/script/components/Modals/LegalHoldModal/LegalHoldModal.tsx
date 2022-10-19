@@ -69,7 +69,6 @@ const LegalHoldModal: FC<LegalHoldModalProps> = ({
   cryptographyRepository,
   messageRepository,
 }) => {
-  const legalHoldModal = useLegalHoldModalState();
   const {
     fingerprint,
     setFingerprint,
@@ -89,7 +88,7 @@ const LegalHoldModal: FC<LegalHoldModalProps> = ({
     users,
     setUsers,
     skipShowUsers,
-  } = legalHoldModal;
+  } = useLegalHoldModalState();
 
   const isRequest = type === LegalHoldModalType.REQUEST;
   const isUsers = type === LegalHoldModalType.USERS;

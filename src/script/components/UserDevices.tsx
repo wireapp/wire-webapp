@@ -118,7 +118,7 @@ const UserDevices: React.FC<UserDevicesProps> = ({
           }
         }
       } catch (error) {
-        logger.error(`Unable to retrieve clients for user '${user.id}': ${error.message || error}`);
+        logger.error(`Unable to retrieve clients for user '${user?.id}': ${error.message || error}`);
       }
     })();
   }, [user]);
