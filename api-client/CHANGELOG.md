@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [20.7.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@20.6.11...@wireapp/api-client@20.7.0) (2022-10-19)
+
+### Features
+
+* **core, api-client:** Add sender client id to mls message event (FS-1045) ([#4507](https://github.com/wireapp/wire-web-packages/issues/4507)) ([efa4c44](https://github.com/wireapp/wire-web-packages/commit/efa4c4435daec0c6677469f111f2841f9c3ac4e7))
+
 ## [20.6.11](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@20.6.10...@wireapp/api-client@20.6.11) (2022-10-19)
 
 **Note:** Version bump only for package @wireapp/api-client

@@ -1,7 +1,7 @@
 {
   "dependencies": {
     "@types/color": "3.0.3",
-    "bazinga64": "5.11.8",
+    "bazinga64": "5.11.9",
     "color": "4.2.3",
     "emotion-normalize": "11.0.1",
     "react-select": "5.5.2",
@@ -73,5 +73,5 @@
     "test:update": "yarn test --updateSnapshot",
     "test:project": "yarn dist && yarn test"
   },
-  "version": "8.17.2"
+  "version": "8.17.3"
 }
