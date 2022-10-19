@@ -40,7 +40,7 @@ export interface MLSConfig<T = any> {
    * encrypt/decrypt function pair that will be called before storing/fetching secrets in the secrets database.
    * If not provided will use the built in encryption mechanism
    */
-  secretsCrypto?: SecretCrypto<T>;
+  systemCrypto?: SecretCrypto<T>;
 
   /**
    * path on the public server to the core crypto wasm file.
