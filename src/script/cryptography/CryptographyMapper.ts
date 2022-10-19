@@ -246,7 +246,7 @@ export class CryptographyMapper {
       }
     }
 
-    const {conversation, qualified_conversation, from, qualified_from} = event;
+    const {conversation, qualified_conversation, from, qualified_from, senderClientId} = event;
     const genericContent = {
       conversation,
       from,
@@ -254,6 +254,7 @@ export class CryptographyMapper {
       id: genericMessage.messageId,
       qualified_conversation,
       qualified_from,
+      senderClientId,
       status: event.status,
       time: event.time,
     };
