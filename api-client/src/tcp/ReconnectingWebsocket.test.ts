@@ -44,7 +44,7 @@ function startEchoServer(): WebSocketServer {
   server.on('connection', ws => {
     ws.on('message', message => {
       server.clients.forEach(client => {
-        if (message === 'terminate') {
+        if (message.toString() === 'terminate') {
           client.close();
           return;
         }
@@ -71,7 +71,7 @@ describe('ReconnectingWebsocket', () => {
   const getServerAddress = () => {
     if (server) {
       const address: AddressInfo = server.address() as AddressInfo;
-      return Promise.resolve(`http://127.0.0.1:${address.port}`);
+      return Promise.resolve(`ws://127.0.0.1:${address.port}`);
     }
     throw new Error('Server is undefined');
   };
