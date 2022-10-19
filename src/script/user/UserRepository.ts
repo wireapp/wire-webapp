@@ -303,12 +303,14 @@ export class UserRepository {
         ? clientPayload
         : ClientMapper.mapClient(clientPayload, userEntity.isMe, userId.domain);
     const wasClientAdded = userEntity.addClient(clientEntity);
-    if (wasClientAdded) {
+    const {showUsers, skipShowUsers} = useLegalHoldModalState.getState();
+
+    if (wasClientAdded && skipShowUsers) {
       await this.clientRepository.saveClientInDb(userId, clientEntity.toJson());
+
       if (clientEntity.isLegalHold()) {
         const isSelfUser = userId.id === this.userState.self().id;
         if (isSelfUser) {
-          const {showUsers} = useLegalHoldModalState.getState();
           showUsers(false);
         }
       }

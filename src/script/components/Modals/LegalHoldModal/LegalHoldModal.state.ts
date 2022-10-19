@@ -31,13 +31,13 @@ type LegalHoldModalState = {
   isLoading: boolean;
   isRequestModal: boolean;
   users: User[];
-  skipUsers: boolean;
+  skipShowUsers: boolean;
   isSelfInfo: boolean;
   isInitialized: boolean;
   closeModal: () => void;
   setType: (type: LegalHoldModalType) => void;
   setUsers: (users: User[]) => void;
-  setSkipUsers: (skipUsers: boolean) => void;
+  setSkipShowUsers: (skipShowUsers: boolean) => void;
   setIsModalOpen: (isOpen: boolean) => void;
   setIsRequestModal: (isRequestModal: boolean) => void;
   setIsLoading: (isLoading: boolean) => void;
@@ -58,7 +58,6 @@ const legalHoldModalDefaultState: Partial<LegalHoldModalState> = {
   isOpen: false,
   isRequestModal: false,
   isSelfInfo: false,
-  skipUsers: false,
   type: null,
   users: [],
 };
@@ -115,11 +114,7 @@ const useLegalHoldModalState = create<LegalHoldModalState>((set, get) => ({
       ...state,
       isRequestModal,
     })),
-  setSkipUsers: skipUsers =>
-    set(state => ({
-      ...state,
-      skipUsers,
-    })),
+  setSkipShowUsers: skipShowUsers => set(state => ({...state, skipShowUsers})),
   setType: type =>
     set(state => ({
       ...state,
@@ -158,7 +153,7 @@ const useLegalHoldModalState = create<LegalHoldModalState>((set, get) => ({
       isSelfInfo: !conversation,
       type: LegalHoldModalType.USERS,
     })),
-  skipUsers: false,
+  skipShowUsers: false,
   type: null,
   users: [],
 }));
