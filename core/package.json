@@ -8,7 +8,7 @@
     "@wireapp/core-crypto": "0.5.2",
     "@wireapp/cryptobox": "12.8.0",
     "@wireapp/promise-queue": "workspace:^",
-    "@wireapp/protocol-messaging": "1.38.0",
+    "@wireapp/protocol-messaging": "1.39.0",
     "@wireapp/store-engine-dexie": "workspace:^",
     "axios": "^0.27.2",
     "bazinga64": "5.11.8",
