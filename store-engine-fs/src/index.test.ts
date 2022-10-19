@@ -77,7 +77,7 @@ describe('FileEngine', () => {
       expect(FileEngine.enforcePathRestrictions(unixFolder, 'users/me')).toBeDefined();
       expect(FileEngine.enforcePathRestrictions(unixFolder, 'a/b/c/d/e/f/g/../../../../ok')).toBeDefined();
       expect(FileEngine.enforcePathRestrictions(unixFolder, 'a/b/c/../../../')).toBeDefined();
-      expect(enforcePathRestrictions(unixFolder, 'a/b/c/../../../../')).toThrowError(expectedError);
+      expect(enforcePathRestrictions(unixFolder, 'a/b/c/../../../../')).toThrow();
     });
 
     it('allows empty strings.', () => {
@@ -91,30 +91,30 @@ describe('FileEngine', () => {
 
     it('throws errors on path traversals.', () => {
       FileEngine.path = path.win32;
-      expect(enforcePathRestrictions(windowsFolder, 'malicious\\..\\..\\test\\..\\..')).toThrowError(expectedError);
-      expect(enforcePathRestrictions(windowsFolder, '\\malicious\\..\\\\..entry\\..\\..')).toThrowError(expectedError);
-      expect(enforcePathRestrictions(windowsFolder, 'malicious\\..\\entry\\..\\..')).toThrowError(expectedError);
-      expect(enforcePathRestrictions(windowsFolder, '\\\\server\\..\\..\\..')).toThrowError(expectedError);
-      expect(enforcePathRestrictions(windowsFolder, 'malicious\\..\\..\\entry\\..\\')).toThrowError(expectedError);
-      expect(enforcePathRestrictions(windowsFolder, '..\\etc')).toThrowError(expectedError);
+      expect(enforcePathRestrictions(windowsFolder, 'malicious\\..\\..\\test\\..\\..')).toThrow();
+      expect(enforcePathRestrictions(windowsFolder, '\\malicious\\..\\\\..entry\\..\\..')).toThrow();
+      expect(enforcePathRestrictions(windowsFolder, 'malicious\\..\\entry\\..\\..')).toThrow();
+      expect(enforcePathRestrictions(windowsFolder, '\\\\server\\..\\..\\..')).toThrow();
+      expect(enforcePathRestrictions(windowsFolder, 'malicious\\..\\..\\entry\\..\\')).toThrow();
+      expect(enforcePathRestrictions(windowsFolder, '..\\etc')).toThrow();
 
       FileEngine.path = path.posix;
-      expect(enforcePathRestrictions(unixFolder, '../etc')).toThrowError(expectedError);
-      expect(enforcePathRestrictions(unixFolder, '/malicious/../../../entry/../test')).toThrowError(expectedError);
-      expect(enforcePathRestrictions(unixFolder, 'malicious/../../../entry/..')).toThrowError(expectedError);
-      expect(enforcePathRestrictions(unixFolder, 'documents/../../../../../etc/hosts')).toThrowError(expectedError);
-      expect(enforcePathRestrictions(unixFolder, 'malicious/../../../entry/../')).toThrowError(expectedError);
-      expect(enforcePathRestrictions(unixFolder, '../etc')).toThrowError(expectedError);
-      expect(enforcePathRestrictions(unixFolder, 'users/../../tigris')).toThrowError(expectedError);
-      expect(enforcePathRestrictions(unixFolder, 'users/../tigris/../../')).toThrowError(expectedError);
+      expect(enforcePathRestrictions(unixFolder, '../etc')).toThrow();
+      expect(enforcePathRestrictions(unixFolder, '/malicious/../../../entry/../test')).toThrow();
+      expect(enforcePathRestrictions(unixFolder, 'malicious/../../../entry/..')).toThrow();
+      expect(enforcePathRestrictions(unixFolder, 'documents/../../../../../etc/hosts')).toThrow();
+      expect(enforcePathRestrictions(unixFolder, 'malicious/../../../entry/../')).toThrow();
+      expect(enforcePathRestrictions(unixFolder, '../etc')).toThrow();
+      expect(enforcePathRestrictions(unixFolder, 'users/../../tigris')).toThrow();
+      expect(enforcePathRestrictions(unixFolder, 'users/../tigris/../../')).toThrow();
     });
 
     it('throws errors when attempting to use the root folder as a trusted root.', () => {
       FileEngine.path = path.posix;
-      expect(enforcePathRestrictions('/', 'etc/hosts')).toThrowError(expectedError);
+      expect(enforcePathRestrictions('/', 'etc/hosts')).toThrow();
 
       FileEngine.path = path.win32;
-      expect(enforcePathRestrictions('C:/', '\\Windows\\System32\\drivers\\etc\\hosts')).toThrowError(expectedError);
+      expect(enforcePathRestrictions('C:/', '\\Windows\\System32\\drivers\\etc\\hosts')).toThrow();
     });
 
     it('is applied to all store operations.', async () => {

@@ -57,8 +57,8 @@ export const deleteSpec = {
     await engine.delete(TABLE_NAME, lisa.primaryKey);
     const primaryKeys = await engine.readAllPrimaryKeys(TABLE_NAME);
     expect(primaryKeys.length).toBe(expectedRemainingEntities);
-    expect(primaryKeys.includes(homer.primaryKey));
-    expect(primaryKeys.includes(marge.primaryKey));
+    expect(primaryKeys.includes(homer.primaryKey)).toBeTrue();
+    expect(primaryKeys.includes(marge.primaryKey)).toBeTrue();
   },
   'returns the primary key of a deleted record.': async (engine: CRUDEngine) => {
     const PRIMARY_KEY = 'primary-key';

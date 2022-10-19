@@ -39,7 +39,7 @@ describe('fromBase64', () => {
   it('does not decode from an array with an invalid length', () => {
     expect(() => {
       bazinga64.Decoder.fromBase64(helloDecodedArray);
-    }).toThrowError('Invalid string. Length must be a multiple of 4.');
+    }).toThrow();
   });
 
   it('decodes into a byte array', () => {
