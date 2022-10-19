@@ -31,7 +31,7 @@ import {Runtime} from '@wireapp/commons';
 
 import {getLogger, Logger} from 'Util/Logger';
 import {t} from 'Util/LocalizerUtil';
-import {arrayToBase64, checkIndexedDb, createRandomUuid} from 'Util/util';
+import {arrayToBase64, checkIndexedDb, createRandomUuid, isMlsDisabledOnElectron} from 'Util/util';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 import {enableLogging} from 'Util/LoggerUtil';
 import {Environment} from 'Util/Environment';
@@ -425,28 +425,30 @@ class App {
 
       const conversationEntities = await conversationRepository.getConversations();
 
-      // We send external proposal to all the MLS conversations that are in an unknown state (not established nor pendingWelcome)
-      await mlsConversationState.getState().sendExternalToPendingJoin(
-        conversationEntities,
-        groupId => this.core.service!.conversation.isMLSConversationEstablished(groupId),
-        ({groupId, epoch}) => this.core.service!.conversation.sendExternalJoinProposal(groupId, epoch),
-      );
+      if (!isMlsDisabledOnElectron) {
+        // We send external proposal to all the MLS conversations that are in an unknown state (not established nor pendingWelcome)
+        await mlsConversationState.getState().sendExternalToPendingJoin(
+          conversationEntities,
+          groupId => this.core.service!.conversation.isMLSConversationEstablished(groupId),
+          ({groupId, epoch}) => this.core.service!.conversation.sendExternalJoinProposal(groupId, epoch),
+        );
 
-      this.core.configureMLSCallbacks({
-        authorize: groupIdBytes => {
-          const groupId = arrayToBase64(groupIdBytes);
-          const conversation = conversationRepository.findConversationByGroupId(groupId);
-          if (!conversation) {
-            // If the conversation is not found, it means it's being created by the self user, thus they have admin rights
-            return true;
-          }
-          return conversationRepository.conversationRoleRepository.isUserGroupAdmin(conversation, selfUser);
-        },
-        groupIdFromConversationId: async conversationId => {
-          const conversation = await conversationRepository.getConversationById(conversationId);
-          return conversation?.groupId;
-        },
-      });
+        this.core.configureMLSCallbacks({
+          authorize: groupIdBytes => {
+            const groupId = arrayToBase64(groupIdBytes);
+            const conversation = conversationRepository.findConversationByGroupId(groupId);
+            if (!conversation) {
+              // If the conversation is not found, it means it's being created by the self user, thus they have admin rights
+              return true;
+            }
+            return conversationRepository.conversationRoleRepository.isUserGroupAdmin(conversation, selfUser);
+          },
+          groupIdFromConversationId: async conversationId => {
+            const conversation = await conversationRepository.getConversationById(conversationId);
+            return conversation?.groupId;
+          },
+        });
+      }
 
       const connectionEntities = await connectionRepository.getConnections();
       loadingView.updateProgress(25, t('initReceivedUserData'));

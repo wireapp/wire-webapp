@@ -398,3 +398,6 @@ export const getSelectionPosition = (element: HTMLTextAreaElement, currentMentio
 
   return {newEnd, newStart};
 };
+
+// temporary hack that disables mls for old 'broken' desktop clients, see https://github.com/wireapp/wire-desktop/pull/6094
+export const isMlsDisabledOnElectron = Runtime.isDesktopApp() && !window.systemCrypto;
