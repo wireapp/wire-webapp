@@ -425,30 +425,28 @@ class App {
 
       const conversationEntities = await conversationRepository.getConversations();
 
-      if (Config.getConfig().FEATURE.ENABLE_MLS) {
-        // We send external proposal to all the MLS conversations that are in an unknown state (not established nor pendingWelcome)
-        await mlsConversationState.getState().sendExternalToPendingJoin(
-          conversationEntities,
-          groupId => this.core.service!.conversation.isMLSConversationEstablished(groupId),
-          ({groupId, epoch}) => this.core.service!.conversation.sendExternalJoinProposal(groupId, epoch),
-        );
+      // We send external proposal to all the MLS conversations that are in an unknown state (not established nor pendingWelcome)
+      await mlsConversationState.getState().sendExternalToPendingJoin(
+        conversationEntities,
+        groupId => this.core.service!.conversation.isMLSConversationEstablished(groupId),
+        ({groupId, epoch}) => this.core.service!.conversation.sendExternalJoinProposal(groupId, epoch),
+      );
 
-        this.core.configureMLSCallbacks({
-          authorize: groupIdBytes => {
-            const groupId = arrayToBase64(groupIdBytes);
-            const conversation = conversationRepository.findConversationByGroupId(groupId);
-            if (!conversation) {
-              // If the conversation is not found, it means it's being created by the self user, thus they have admin rights
-              return true;
-            }
-            return conversationRepository.conversationRoleRepository.isUserGroupAdmin(conversation, selfUser);
-          },
-          groupIdFromConversationId: async conversationId => {
-            const conversation = await conversationRepository.getConversationById(conversationId);
-            return conversation?.groupId;
-          },
-        });
-      }
+      this.core.configureMLSCallbacks({
+        authorize: groupIdBytes => {
+          const groupId = arrayToBase64(groupIdBytes);
+          const conversation = conversationRepository.findConversationByGroupId(groupId);
+          if (!conversation) {
+            // If the conversation is not found, it means it's being created by the self user, thus they have admin rights
+            return true;
+          }
+          return conversationRepository.conversationRoleRepository.isUserGroupAdmin(conversation, selfUser);
+        },
+        groupIdFromConversationId: async conversationId => {
+          const conversation = await conversationRepository.getConversationById(conversationId);
+          return conversation?.groupId;
+        },
+      });
 
       const connectionEntities = await connectionRepository.getConnections();
       loadingView.updateProgress(25, t('initReceivedUserData'));
