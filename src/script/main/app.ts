@@ -31,7 +31,7 @@ import {Runtime} from '@wireapp/commons';
 
 import {getLogger, Logger} from 'Util/Logger';
 import {t} from 'Util/LocalizerUtil';
-import {arrayToBase64, checkIndexedDb, createRandomUuid, canSupportMLS} from 'Util/util';
+import {arrayToBase64, checkIndexedDb, createRandomUuid, supportsMLS} from 'Util/util';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 import {enableLogging} from 'Util/LoggerUtil';
 import {Environment} from 'Util/Environment';
@@ -425,7 +425,7 @@ class App {
 
       const conversationEntities = await conversationRepository.getConversations();
 
-      if (canSupportMLS) {
+      if (supportsMLS) {
         // We send external proposal to all the MLS conversations that are in an unknown state (not established nor pendingWelcome)
         await mlsConversationState.getState().sendExternalToPendingJoin(
           conversationEntities,
