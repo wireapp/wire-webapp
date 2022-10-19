@@ -38,7 +38,7 @@ import {Decoder, Encoder} from 'bazinga64';
 import {QualifiedId} from '@wireapp/api-client/src/user';
 import {CommitPendingProposalsParams, HandlePendingProposalsParams, LastKeyMaterialUpdateParams} from './types';
 import {TaskScheduler} from '../util/TaskScheduler/TaskScheduler';
-import {MLSService} from '../mls';
+import {MLSService, optionalToUint8Array} from '../mls';
 import {LowPrecisionTaskScheduler} from '../util/LowPrecisionTaskScheduler/LowPrecisionTaskScheduler';
 import {keyPackagesStatusStore} from '../mls/keyPackagesStatusStore/keyPackagesStatusStore';
 import {keyMaterialUpdatesStore} from '../mls/keyMaterialUpdatesStore';
@@ -293,7 +293,19 @@ export class NotificationService extends EventEmitter {
         );
         const groupIdBytes = Decoder.fromBase64(groupId).asBytes;
 
-        const {proposals, commitDelay, message} = await this.mlsService.decryptMessage(groupIdBytes, encryptedData);
+        const {
+          proposals,
+          commitDelay,
+          message,
+          senderClientId: encodedSenderClientId,
+        } = await this.mlsService.decryptMessage(groupIdBytes, encryptedData);
+
+        if (encodedSenderClientId) {
+          const decoder = new TextDecoder();
+          const senderClientId = decoder.decode(optionalToUint8Array(encodedSenderClientId));
+          event.senderClientId = senderClientId;
+        }
+
         // Check if the message includes proposals
         if (typeof commitDelay === 'number' || proposals.length > 0) {
           // we are dealing with a proposal, add a task to process this proposal later on
@@ -317,7 +329,10 @@ export class NotificationService extends EventEmitter {
          * @todo Find a proper solution to add mappedEvent to this return
          * otherwise event.data will be base64 raw data of the received event
          */
-        return {event, decryptedData};
+        return {
+          event,
+          decryptedData,
+        };
 
       // Encrypted Proteus events
       case Events.CONVERSATION_EVENT.OTR_MESSAGE_ADD: {

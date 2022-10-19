@@ -157,6 +157,7 @@ export interface ConversationOtrMessageAddEvent extends BaseConversationEvent {
 export interface ConversationMLSMessageAddEvent extends BaseConversationEvent {
   data: ConversationMLSMessageAddData;
   type: CONVERSATION_EVENT.MLS_MESSAGE_ADD;
+  senderClientId: string;
 }
 
 export interface ConversationMLSWelcomeEvent extends BaseConversationEvent {
