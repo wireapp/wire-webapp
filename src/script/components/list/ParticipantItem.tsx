@@ -277,10 +277,11 @@ const ParticipantItem = <UserType extends User | ServiceEntity>(
             labelBeforeCheckbox={true}
             aligncenter={false}
             outlineOffset="0"
-            {...dataUieValues}
           >
             <CheckboxLabel htmlFor={checkboxId}>
-              <RenderParticipant />
+              <div {...dataUieValues}>
+                <RenderParticipant />
+              </div>
             </CheckboxLabel>
           </Checkbox>
         </div>
