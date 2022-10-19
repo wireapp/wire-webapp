@@ -32,7 +32,7 @@
     "@types/tough-cookie": "4.0.2",
     "@wireapp/commons": "workspace:^",
     "@wireapp/store-engine-dexie": "workspace:^",
-    "commander": "8.0.0",
+    "commander": "9.4.1",
     "cross-env": "7.0.3",
     "dotenv-defaults": "5.0.2",
     "fake-indexeddb": "4.0.0",
