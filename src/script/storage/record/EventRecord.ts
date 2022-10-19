@@ -71,4 +71,5 @@ export interface EventRecord<T = any> {
   type: string;
   version?: number;
   waiting_button_id?: string;
+  senderClientId?: string;
 }
