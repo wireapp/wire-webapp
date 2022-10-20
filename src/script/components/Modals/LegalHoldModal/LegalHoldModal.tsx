@@ -79,10 +79,8 @@ const LegalHoldModal: FC<LegalHoldModalProps> = ({
     isOpen,
     setSkipShowUsers,
     setIsLoading,
-    isRequestModal,
     isInitialized,
     setIsModalOpen,
-    setIsRequestModal,
     conversation: currentConversation,
     isSelfInfo,
     users,
@@ -93,13 +91,15 @@ const LegalHoldModal: FC<LegalHoldModalProps> = ({
   const isRequest = type === LegalHoldModalType.REQUEST;
   const isUsers = type === LegalHoldModalType.USERS;
 
+  const [isPending, setIsPending] = useState<boolean>(false);
   const [isSendingApprove, setIsSendingApprove] = useState<boolean>(false);
   const [passwordValue, setPasswordValue] = useState<string>('');
   const [requestError, setRequestError] = useState<string>('');
   const [userDevices, setUserDevices] = useState<User | undefined>(undefined);
 
   const {self: selfUser} = useKoSubscribableChildren(userState, ['self']);
-  const requiresPassword = isRequestModal && !selfUser.isNoPasswordSSO;
+
+  const requiresPassword = isRequest && !selfUser.isNoPasswordSSO;
   const disableSubmit = requiresPassword && passwordValue.length < DISABLE_SUBMIT_TEXT_LENGTH;
 
   const userDevicesHistory = useUserDevicesHistory();
@@ -114,10 +114,10 @@ const LegalHoldModal: FC<LegalHoldModalProps> = ({
   }, []);
 
   const onBgClick = useCallback(() => {
-    if (!isRequestModal) {
+    if (!isRequest) {
       onClose();
     }
-  }, [isRequestModal]);
+  }, [isRequest]);
 
   const onBackClick = () => {
     if (!showDeviceList) {
@@ -128,7 +128,7 @@ const LegalHoldModal: FC<LegalHoldModalProps> = ({
   };
 
   const closeRequest = () => {
-    if (isRequestModal) {
+    if (isRequest) {
       onClose();
     }
   };
@@ -146,7 +146,8 @@ const LegalHoldModal: FC<LegalHoldModalProps> = ({
         return;
       }
 
-      const password = requiresPassword ? passwordValue : '';
+      const password = requiresPassword ? passwordValue : undefined;
+      // @ts-ignore Need to check if it will work with undefined password for SSO login
       await teamRepository.teamService.sendLegalHoldApproval(selfUser.teamId, selfUser.id, password);
       selfUser.hasPendingLegalHold(false);
 
@@ -179,7 +180,10 @@ const LegalHoldModal: FC<LegalHoldModalProps> = ({
     const setModalParams = (value: boolean) => {
       setIsModalOpen(value);
       setIsLoading(value);
-      setIsRequestModal(value);
+
+      if (!value) {
+        setType(null);
+      }
     };
 
     if (isLoading) {
@@ -221,15 +225,32 @@ const LegalHoldModal: FC<LegalHoldModalProps> = ({
     setFingerprint,
     setIsLoading,
     setIsModalOpen,
-    setIsRequestModal,
     teamRepository.teamService,
   ]);
 
+  const checkLegalHoldState = useCallback(async () => {
+    if (!selfUser.teamId) {
+      return;
+    }
+
+    const response = await teamRepository.teamService.getLegalHoldState(selfUser.teamId, selfUser.id);
+    const isPendingStatus = response.status === LegalHoldMemberStatus.PENDING;
+
+    if (isPendingStatus) {
+      setIsPending(isPendingStatus);
+      setIsModalOpen(true);
+    }
+  }, [selfUser.id, selfUser.teamId, teamRepository.teamService]);
+
   useEffect(() => {
-    if (isOpen && isRequest) {
+    checkLegalHoldState();
+  }, [checkLegalHoldState]);
+
+  useEffect(() => {
+    if (isPending && isOpen && isRequest) {
       getFingerprintData();
     }
-  }, [getFingerprintData, isOpen, isRequest]);
+  }, [isPending, getFingerprintData, isOpen, isRequest]);
 
   // Show users
   const getLegalHoldUsers = useCallback(async () => {
@@ -263,7 +284,7 @@ const LegalHoldModal: FC<LegalHoldModalProps> = ({
     if (isOpen && isUsers) {
       getLegalHoldUsers();
     }
-  }, [getLegalHoldUsers, isRequestModal, isOpen, isUsers, skipShowUsers]);
+  }, [getLegalHoldUsers, isOpen, isUsers, skipShowUsers]);
 
   return (
     <ModalComponent
@@ -278,16 +299,16 @@ const LegalHoldModal: FC<LegalHoldModalProps> = ({
       <div className="modal__header">
         {userDevices && (
           <button
-            className="button-reset-default"
+            className="button-reset-default modal__header__button modal__header__button__left"
             type="button"
             onClick={onBackClick}
             data-uie-name="go-back-participant-devices"
           >
-            <Icon.ArrowLeft className="modal__header__button modal__header__button__left" />
+            <Icon.ArrowLeft />
           </button>
         )}
 
-        {isRequestModal ? (
+        {isRequest ? (
           <h2 className="modal__header__title" data-uie-name="status-modal-title">
             {t('legalHoldModalTitle')}
           </h2>
@@ -298,10 +319,8 @@ const LegalHoldModal: FC<LegalHoldModalProps> = ({
         )}
       </div>
 
-      <div
-        className={cx('modal__body legal-hold-modal__wrapper', {'legal-hold-modal__wrapper--request': isRequestModal})}
-      >
-        {isRequestModal && (
+      <div className={cx('modal__body legal-hold-modal__wrapper', {'legal-hold-modal__wrapper--request': isRequest})}>
+        {isRequest && (
           <>
             <div className="modal__text" data-uie-name="status-modal-text">
               <p
