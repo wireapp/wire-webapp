@@ -120,7 +120,7 @@ export class CryptographyService {
   }) {
     if (onNewPrekeys) {
       this.cryptobox.on(Cryptobox.TOPIC.NEW_PREKEYS, prekeys => {
-        const serializedPreKeys = prekeys.map(this.cryptobox.serialize_prekey);
+        const serializedPreKeys = prekeys.map(prekey => this.cryptobox.serialize_prekey(prekey));
         onNewPrekeys(serializedPreKeys);
       });
     }
