@@ -152,6 +152,9 @@ const PhoneLoginComponent = ({
           <Column />
         </Columns>
       </Container>
+      <IsMobile>
+        <div style={{minWidth: 48}} />
+      </IsMobile>
     </Page>
   );
 };
