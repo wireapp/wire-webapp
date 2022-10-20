@@ -41,7 +41,7 @@ import {ConversationState} from '../../conversation/ConversationState';
 import {Conversation} from '../../entity/Conversation';
 import {Message} from '../../entity/message/Message';
 import {User} from '../../entity/User';
-import {isContentMessage} from '../../guards/Message';
+import {isReadMessage} from '../../guards/Message';
 import {isUserEntity, isUserServiceEntity} from '../../guards/Panel';
 import {isServiceEntity} from '../../guards/Service';
 import {ServiceEntity} from '../../integration/ServiceEntity';
@@ -115,7 +115,7 @@ const RightSidebar: FC<RightSidebarProps> = ({
 
   const userEntity = currentEntity && isUserEntity(currentEntity) ? currentEntity : null;
   const userServiceEntity = currentEntity && isUserServiceEntity(currentEntity) ? currentEntity : null;
-  const messageEntity = currentEntity && isContentMessage(currentEntity) ? currentEntity : null;
+  const messageEntity = currentEntity && isReadMessage(currentEntity) ? currentEntity : null;
   const serviceEntity = currentEntity && isServiceEntity(currentEntity) ? currentEntity : null;
 
   const goToRoot = () => {

@@ -17,7 +17,7 @@
  *
  */
 
-import {FC, useEffect, useMemo, useState} from 'react';
+import {FC, useCallback, useEffect, useMemo, useState} from 'react';
 
 import {RECEIPT_MODE} from '@wireapp/api-client/src/conversation/data/';
 
@@ -230,14 +230,16 @@ const ConversationDetails: FC<ConversationDetailsProps> = ({
 
   const isServiceMode = isSingleUserMode && firstParticipant.isService;
 
-  const getService = async () => {
-    const serviceEntity = await integrationRepository.getServiceFromUser(firstParticipant);
+  const getService = useCallback(async () => {
+    if (firstParticipant) {
+      const serviceEntity = await integrationRepository.getServiceFromUser(firstParticipant);
 
-    if (serviceEntity) {
-      setSelectedService(serviceEntity);
-      await integrationRepository.addProviderNameToParticipant(serviceEntity);
+      if (serviceEntity) {
+        setSelectedService(serviceEntity);
+        await integrationRepository.addProviderNameToParticipant(serviceEntity);
+      }
     }
-  };
+  }, [firstParticipant]);
 
   const conversationActions = getConversationActions(
     activeConversation,
@@ -256,10 +258,8 @@ const ConversationDetails: FC<ConversationDetailsProps> = ({
   }, [firstParticipant, isSingleUserMode, isTeam, team, teamRepository]);
 
   useEffect(() => {
-    if (firstParticipant) {
-      getService();
-    }
-  }, [firstParticipant, integrationRepository]);
+    getService();
+  }, [getService]);
 
   return (
     <div id="conversation-details" className="panel__page conversation-details">

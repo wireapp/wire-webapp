@@ -136,7 +136,7 @@ const MessageDetails: FC<MessageDetailsProps> = ({
       times[userId] = formatTime(time);
       return times;
     }, {});
-  }, []);
+  }, [readReceipts]);
 
   const sentFooter = timestamp ? formatTime(timestamp) : '';
 

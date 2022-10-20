@@ -135,7 +135,7 @@ const GuestOptions: FC<GuestOptionsProps> = ({
     }
   };
 
-  const updateCode = async () => {
+  const updateCode = useCallback(async () => {
     const canUpdateCode = (isGuestRoom || isGuestAndServicesRoom) && !accessCode && isGuestLinkEnabled;
 
     if (canUpdateCode) {
@@ -143,7 +143,7 @@ const GuestOptions: FC<GuestOptionsProps> = ({
       await conversationRepository.stateHandler.getAccessCode(activeConversation);
       setIsRequestOngoing(false);
     }
-  };
+  }, [accessCode, activeConversation, isGuestAndServicesRoom, isGuestLinkEnabled, isGuestRoom, setIsRequestOngoing]);
 
   const initializeOptions = useCallback(async () => {
     if (!inTeam && !isGuestLinkEnabled) {
@@ -152,7 +152,7 @@ const GuestOptions: FC<GuestOptionsProps> = ({
     }
 
     await updateCode();
-  }, [activeConversation, inTeam, isGuestLinkEnabled]);
+  }, [activeConversation, inTeam, isGuestLinkEnabled, updateCode]);
 
   useEffect(() => {
     initializeOptions();

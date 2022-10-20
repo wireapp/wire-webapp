@@ -206,7 +206,7 @@ const GroupParticipantUser: FC<GroupParticipantUserProps> = ({
           </>
         )}
 
-        <EnrichedFields user={currentUser} showDomain={isFederated} />
+        {!isTemporaryGuest && <EnrichedFields user={currentUser} showDomain={isFederated} />}
 
         <UserActions
           user={currentUser}

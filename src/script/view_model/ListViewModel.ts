@@ -328,7 +328,7 @@ export class ListViewModel {
 
       if (this.isProAccount()) {
         entries.push({
-          click: () => this.clickToOpenNotificationSettings(conversationEntity),
+          click: async () => this.clickToOpenNotificationSettings(conversationEntity),
           label: t('conversationsPopoverNotificationSettings'),
           title: t('tooltipConversationsNotifications', notificationsShortcut),
         });
