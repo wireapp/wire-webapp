@@ -17,7 +17,7 @@
  *
  */
 
-import React, {useState} from 'react';
+import {FC, FormEvent, MouseEvent, useState} from 'react';
 
 import cx from 'classnames';
 
@@ -29,7 +29,7 @@ import {Action, PrimaryModalType} from './PrimaryModalTypes';
 
 import {initFadingScrollbar} from '../../../ui/fadingScrollbar';
 
-export const PrimaryModalComponent: React.FC = () => {
+export const PrimaryModalComponent: FC = () => {
   const [inputValue, updateInputValue] = useState<string>('');
   const [passwordValue, updatePasswordValue] = useState<string>('');
   const [optionChecked, updateOptionChecked] = useState<boolean>(false);
@@ -67,17 +67,21 @@ export const PrimaryModalComponent: React.FC = () => {
   };
 
   const actionEnabled = !hasInput || !!inputValue.trim().length;
-  const doAction = (action?: Function, closeAfter = true, skipValidation = false) => {
-    if (!skipValidation && !actionEnabled) {
-      return;
-    }
-    if (typeof action === 'function') {
-      action();
-    }
-    if (closeAfter) {
-      removeCurrentModal();
-    }
-  };
+  const doAction =
+    (action?: Function, closeAfter = true, skipValidation = false) =>
+    (event: FormEvent<HTMLFormElement> | MouseEvent<HTMLButtonElement>) => {
+      event.preventDefault();
+
+      if (!skipValidation && !actionEnabled) {
+        return;
+      }
+      if (typeof action === 'function') {
+        action();
+      }
+      if (closeAfter) {
+        removeCurrentModal();
+      }
+    };
 
   const confirm = () => {
     const action = content?.primaryAction?.action;
@@ -130,7 +134,7 @@ export const PrimaryModalComponent: React.FC = () => {
                 </div>
               )}
               {hasPassword && (
-                <form onSubmit={() => doAction(confirm, !!closeOnConfirm)}>
+                <form onSubmit={doAction(confirm, !!closeOnConfirm)}>
                   <input
                     className="modal__input"
                     type="password"
@@ -141,7 +145,7 @@ export const PrimaryModalComponent: React.FC = () => {
                 </form>
               )}
               {hasInput && (
-                <form onSubmit={() => doAction(confirm, !!closeOnConfirm)}>
+                <form onSubmit={doAction(confirm, !!closeOnConfirm)}>
                   <input
                     maxLength={64}
                     className="modal__input"
@@ -176,7 +180,7 @@ export const PrimaryModalComponent: React.FC = () => {
                     <button
                       key={`${action.text}-${action.uieName}`}
                       type="button"
-                      onClick={() => doAction(action.action, true, true)}
+                      onClick={doAction(action.action, true, true)}
                       data-uie-name={action?.uieName}
                       className={cx('modal__button modal__button--secondary', {
                         'modal__button--full': hasMultipleSecondary,
@@ -188,7 +192,7 @@ export const PrimaryModalComponent: React.FC = () => {
                 {primaryAction?.text && (
                   <button
                     type="button"
-                    onClick={() => doAction(confirm, !!closeOnConfirm)}
+                    onClick={doAction(confirm, !!closeOnConfirm)}
                     disabled={!actionEnabled}
                     className={cx('modal__button modal__button--primary', {
                       'modal__button--full': hasMultipleSecondary,
