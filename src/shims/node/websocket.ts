@@ -17,4 +17,4 @@
  *
  */
 
-export default window.WebSocket;
+export default require('ws');

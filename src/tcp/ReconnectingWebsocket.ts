@@ -20,7 +20,7 @@
 import {TimeUtil} from '@wireapp/commons';
 import logdown from 'logdown';
 import RWS, {CloseEvent, ErrorEvent, Event, Options} from 'reconnecting-websocket';
-const NodeWebSocket = require('ws');
+import WebSocketClass from '../shims/node/websocket';
 
 import * as buffer from '../shims/node/buffer';
 
@@ -45,7 +45,7 @@ export enum PingMessage {
 
 export class ReconnectingWebsocket {
   private static readonly RECONNECTING_OPTIONS: Options = {
-    WebSocket: typeof window !== 'undefined' ? WebSocket : NodeWebSocket,
+    WebSocket: WebSocketClass,
     connectionTimeout: TimeUtil.TimeInMillis.SECOND * 4,
     debug: false,
     maxReconnectionDelay: TimeUtil.TimeInMillis.SECOND * 10,
