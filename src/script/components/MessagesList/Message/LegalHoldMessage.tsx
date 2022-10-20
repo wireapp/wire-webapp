@@ -38,10 +38,7 @@ const LegalHoldMessage: React.FC<LegalHoldMessageProps> = ({
   conversationState = container.resolve(ConversationState),
 }) => {
   const {showUsers} = useLegalHoldModalState(state => state);
-
-  const showLegalHold = () => {
-    showUsers(false, conversationState.activeConversation());
-  };
+  const showLegalHold = () => showUsers(false, conversationState.activeConversation());
 
   return (
     <div className="message-header">

@@ -29,17 +29,15 @@ type LegalHoldModalState = {
   type: LegalHoldModalType | null;
   isOpen: boolean;
   isLoading: boolean;
-  isRequestModal: boolean;
   users: User[];
   skipShowUsers: boolean;
   isSelfInfo: boolean;
   isInitialized: boolean;
   closeModal: () => void;
-  setType: (type: LegalHoldModalType) => void;
+  setType: (type: LegalHoldModalType | null) => void;
   setUsers: (users: User[]) => void;
   setSkipShowUsers: (skipShowUsers: boolean) => void;
   setIsModalOpen: (isOpen: boolean) => void;
-  setIsRequestModal: (isRequestModal: boolean) => void;
   setIsLoading: (isLoading: boolean) => void;
   showRequestModal: (initialize?: boolean, showLoading?: boolean, fingerprint?: string) => void;
   setFingerprint: (fingerprint?: string) => void;
@@ -56,7 +54,6 @@ const legalHoldModalDefaultState: Partial<LegalHoldModalState> = {
   fingerprint: '',
   isLoading: false,
   isOpen: false,
-  isRequestModal: false,
   isSelfInfo: false,
   type: null,
   users: [],
@@ -68,7 +65,7 @@ const useLegalHoldModalState = create<LegalHoldModalState>((set, get) => ({
       ...state,
       ...legalHoldModalDefaultState,
     })),
-  closeRequestModal: conversationId => {
+  closeRequestModal: (conversationId = '') => {
     if (conversationId !== get().conversationId) {
       return;
     }
@@ -84,9 +81,8 @@ const useLegalHoldModalState = create<LegalHoldModalState>((set, get) => ({
   isInitialized: false,
   isLoading: false,
   isOpen: false,
-  isRequestModal: false,
   isSelfInfo: false,
-  setFingerprint: (fingerprint = '') => {
+  setFingerprint: fingerprint => {
     const formattedFingerprint = fingerprint
       ? splitFingerprint(fingerprint)
           .map(part => `<span>${part} </span>`)
@@ -108,11 +104,6 @@ const useLegalHoldModalState = create<LegalHoldModalState>((set, get) => ({
     set(state => ({
       ...state,
       isOpen,
-    })),
-  setIsRequestModal: isRequestModal =>
-    set(state => ({
-      ...state,
-      isRequestModal,
     })),
   setSkipShowUsers: skipShowUsers => set(state => ({...state, skipShowUsers})),
   setType: type =>
@@ -138,7 +129,6 @@ const useLegalHoldModalState = create<LegalHoldModalState>((set, get) => ({
       isInitialized: initialize,
       isLoading: showLoading,
       isOpen: showLoading || !!formattedFingerprint,
-      isRequestModal: true,
       type: LegalHoldModalType.REQUEST,
     }));
   },
