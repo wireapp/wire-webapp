@@ -40,5 +40,5 @@
     "dist": "yarn clean && yarn build",
     "test": "nyc --nycrc-path=../../nyc.config.js jasmine --config=jasmine.json"
   },
-  "version": "5.11.9"
+  "version": "5.11.10"
 }
