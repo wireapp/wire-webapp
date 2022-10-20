@@ -53,7 +53,7 @@ export class MLSService {
     private readonly coreCryptoClientProvider: () => CoreCrypto | undefined,
   ) {}
 
-  private getCoreCryptoClient() {
+  private get coreCryptoClient() {
     const client = this.coreCryptoClientProvider();
     if (!client) {
       throw new Error('Could not get coreCryptoClient');
@@ -62,15 +62,13 @@ export class MLSService {
   }
 
   private async uploadCommitBundle(groupId: Uint8Array, {commit, welcome}: CommitBundle) {
-    const coreCryptoClient = this.getCoreCryptoClient();
-
     if (commit) {
       try {
         const messageResponse = await this.apiClient.api.conversation.postMlsMessage(
           //@todo: it's temporary - we wait for core-crypto fix to return the actual Uint8Array instead of regular array
           optionalToUint8Array(commit),
         );
-        await coreCryptoClient.commitAccepted(groupId);
+        await this.coreCryptoClient.commitAccepted(groupId);
         if (welcome) {
           // If the commit went well, we can send the Welcome
           //@todo: it's temporary - we wait for core-crypto fix to return the actual Uint8Array instead of regular array
@@ -78,20 +76,18 @@ export class MLSService {
         }
         return messageResponse;
       } catch (error) {
-        await coreCryptoClient.clearPendingCommit(groupId);
+        await this.coreCryptoClient.clearPendingCommit(groupId);
       }
     }
     return null;
   }
 
   public addUsersToExistingConversation(groupId: Uint8Array, invitee: Invitee[]) {
-    return this.processCommitAction(groupId, () =>
-      this.getCoreCryptoClient().addClientsToConversation(groupId, invitee),
-    );
+    return this.processCommitAction(groupId, () => this.coreCryptoClient.addClientsToConversation(groupId, invitee));
   }
 
   public configureMLSCallbacks({groupIdFromConversationId, ...coreCryptoCallbacks}: MLSCallbacks): void {
-    this.getCoreCryptoClient().registerCallbacks({
+    this.coreCryptoClient.registerCallbacks({
       ...coreCryptoCallbacks,
       clientIdBelongsToOneOf: (client, otherClients) => {
         const decoder = new TextDecoder();
@@ -135,30 +131,30 @@ export class MLSService {
   }
 
   public getEpoch(groupId: Uint8Array) {
-    return this.getCoreCryptoClient().conversationEpoch(groupId);
+    return this.coreCryptoClient.conversationEpoch(groupId);
   }
 
   public async newProposal(proposalType: ProposalType, args: ProposalArgs | AddProposalArgs | RemoveProposalArgs) {
-    return this.getCoreCryptoClient().newProposal(proposalType, args);
+    return this.coreCryptoClient.newProposal(proposalType, args);
   }
 
   public async newExternalProposal(
     externalProposalType: ExternalProposalType,
     args: ExternalProposalArgs | ExternalRemoveProposalArgs,
   ) {
-    return this.getCoreCryptoClient().newExternalProposal(externalProposalType, args);
+    return this.coreCryptoClient.newExternalProposal(externalProposalType, args);
   }
 
   public async processWelcomeMessage(welcomeMessage: Uint8Array): Promise<ConversationId> {
-    return this.getCoreCryptoClient().processWelcomeMessage(welcomeMessage);
+    return this.coreCryptoClient.processWelcomeMessage(welcomeMessage);
   }
 
   public async decryptMessage(conversationId: ConversationId, payload: Uint8Array): Promise<DecryptedMessage> {
-    return this.getCoreCryptoClient().decryptMessage(conversationId, payload);
+    return this.coreCryptoClient.decryptMessage(conversationId, payload);
   }
 
   public async encryptMessage(conversationId: ConversationId, message: Uint8Array): Promise<Uint8Array> {
-    return this.getCoreCryptoClient().encryptMessage(conversationId, message);
+    return this.coreCryptoClient.encryptMessage(conversationId, message);
   }
 
   /**
@@ -180,39 +176,37 @@ export class MLSService {
   }
 
   public updateKeyingMaterial(conversationId: ConversationId) {
-    return this.processCommitAction(conversationId, () =>
-      this.getCoreCryptoClient().updateKeyingMaterial(conversationId),
-    );
+    return this.processCommitAction(conversationId, () => this.coreCryptoClient.updateKeyingMaterial(conversationId));
   }
 
   public async createConversation(
     conversationId: ConversationId,
     configuration?: ConversationConfiguration,
   ): Promise<any> {
-    return this.getCoreCryptoClient().createConversation(conversationId, configuration);
+    return this.coreCryptoClient.createConversation(conversationId, configuration);
   }
 
   public removeClientsFromConversation(conversationId: ConversationId, clientIds: Uint8Array[]) {
     return this.processCommitAction(conversationId, () =>
-      this.getCoreCryptoClient().removeClientsFromConversation(conversationId, clientIds),
+      this.coreCryptoClient.removeClientsFromConversation(conversationId, clientIds),
     );
   }
 
   public async commitPendingProposals(groupId: ConversationId): Promise<void> {
-    const commitBundle = await this.getCoreCryptoClient().commitPendingProposals(groupId);
+    const commitBundle = await this.coreCryptoClient.commitPendingProposals(groupId);
     return commitBundle ? void (await this.uploadCommitBundle(groupId, commitBundle)) : undefined;
   }
 
   public async conversationExists(conversationId: ConversationId): Promise<boolean> {
-    return this.getCoreCryptoClient().conversationExists(conversationId);
+    return this.coreCryptoClient.conversationExists(conversationId);
   }
 
   public async clientValidKeypackagesCount(): Promise<number> {
-    return this.getCoreCryptoClient().clientValidKeypackagesCount();
+    return this.coreCryptoClient.clientValidKeypackagesCount();
   }
 
   public async clientKeypackages(amountRequested: number): Promise<Uint8Array[]> {
-    return this.getCoreCryptoClient().clientKeypackages(amountRequested);
+    return this.coreCryptoClient.clientKeypackages(amountRequested);
   }
 
   /**
@@ -235,6 +229,6 @@ export class MLSService {
   }
 
   public async wipeConversation(conversationId: ConversationId): Promise<void> {
-    return this.getCoreCryptoClient().wipeConversation(conversationId);
+    return this.coreCryptoClient.wipeConversation(conversationId);
   }
 }

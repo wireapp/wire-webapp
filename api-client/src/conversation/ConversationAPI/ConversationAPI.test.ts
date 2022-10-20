@@ -29,6 +29,7 @@ describe('ConversationAPI', () => {
     version: 0,
     federationEndpoints: false,
     isFederated: false,
+    supportsMLS: false,
   });
   describe('postORTMessage', () => {
     it('add ignore_missing and report_missing parameters', async () => {

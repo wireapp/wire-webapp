@@ -124,6 +124,8 @@ export type BackendFeatures = {
   federationEndpoints: boolean;
   /** Is the backend actually talking to other federated domains */
   isFederated: boolean;
+  /** Does the backend API support MLS features */
+  supportsMLS: boolean;
 };
 
 export type BackendVersionResponse = {supported: number[]; federation?: boolean; development?: number[]};
@@ -228,6 +230,7 @@ export class APIClient extends EventEmitter {
       version: backendVersion,
       federationEndpoints: backendVersion > 0,
       isFederated: responsePayload?.federation || false,
+      supportsMLS: backendVersion >= 2,
     };
   }
 

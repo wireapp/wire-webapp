@@ -271,7 +271,7 @@ export class Account<T = any> extends EventEmitter {
     if (initClient) {
       await this.initClient({clientType});
 
-      if (this.mlsConfig) {
+      if (this.mlsConfig && this.backendFeatures.supportsMLS) {
         // initialize schedulers for pending mls proposals once client is initialized
         await this.service?.notification.checkExistingPendingProposals();
 
@@ -449,7 +449,7 @@ export class Account<T = any> extends EventEmitter {
     const loadedClient = await this.service!.client.getLocalClient();
     await this.apiClient.api.client.getClient(loadedClient.id);
     this.apiClient.context!.clientId = loadedClient.id;
-    if (this.mlsConfig) {
+    if (this.mlsConfig && this.backendFeatures.supportsMLS) {
       this.coreCryptoClient = await this.createMLSClient(
         loadedClient,
         this.apiClient.context!,
@@ -514,7 +514,7 @@ export class Account<T = any> extends EventEmitter {
     }
     this.logger.info(`Creating new client {mls: ${!!this.mlsConfig}}`);
     const registeredClient = await this.service.client.register(loginData, clientInfo, entropyData);
-    if (this.mlsConfig) {
+    if (this.mlsConfig && this.backendFeatures.supportsMLS) {
       this.coreCryptoClient = await this.createMLSClient(
         registeredClient,
         this.apiClient.context!,
