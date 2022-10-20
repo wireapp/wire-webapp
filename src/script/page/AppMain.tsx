@@ -68,7 +68,7 @@ const AppContainer: FC<AppContainerProps> = ({root}) => {
     const isDifferentState = currentState !== panelState;
     const isDifferentParams = newParamId !== currentParamId;
 
-    if (isDifferentState || isDifferentParams) {
+    if (isDifferentState && isDifferentParams) {
       goTo(panelState, params);
 
       return;

@@ -205,6 +205,7 @@ export const TitleBar: React.FC<TitleBarProps> = ({
             onClick={setLeftSidebar}
           />
         )}
+
         {isActivatedAccount && !mdBreakpoint && (
           <button
             className="conversation-title-bar-icon icon-search"
