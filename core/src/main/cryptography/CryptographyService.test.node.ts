@@ -63,13 +63,20 @@ describe('CryptographyService', () => {
     });
   });
 
-  describe('"constructSessionId"', () => {
+  describe('constructSessionId & parseSessionId', () => {
     it('constructs a Session ID by a given User ID and Client ID.', () => {
       const clientId = '1ceb9063fced26d3';
       const userId = 'afbb5d60-1187-4385-9c29-7361dea79647';
       const actual = cryptographyService.constructSessionId(userId, clientId);
       expect(actual).toContain(clientId);
       expect(actual).toContain(userId);
+
+      const parsedSessionId = cryptographyService.parseSessionId(actual);
+      expect(parsedSessionId).toEqual({
+        userId,
+        clientId,
+        domain: undefined,
+      });
     });
 
     it('constructs a Session ID by a given User ID and Client ID and domain.', async () => {
@@ -79,10 +86,18 @@ describe('CryptographyService', () => {
       });
       const clientId = '1ceb9063fced26d3';
       const userId = 'afbb5d60-1187-4385-9c29-7361dea79647';
-      const actual = cryptographyService.constructSessionId(userId, clientId, 'test.wire.link');
+      const domain = 'test.wire.link';
+      const actual = cryptographyService.constructSessionId(userId, clientId, domain);
       expect(actual).toContain(clientId);
       expect(actual).toContain(userId);
-      expect(actual).toContain('test.wire.link');
+      expect(actual).toContain(domain);
+
+      const parsedSessionId = cryptographyService.parseSessionId(actual);
+      expect(parsedSessionId).toEqual({
+        userId,
+        clientId,
+        domain,
+      });
     });
 
     it('constructs a qualified Session ID by a given qualified User ID and Client ID.', async () => {
@@ -92,10 +107,24 @@ describe('CryptographyService', () => {
       });
       const clientId = '1ceb9063fced26d3';
       const userId = 'afbb5d60-1187-4385-9c29-7361dea79647';
-      const actual = cryptographyService.constructSessionId({id: userId, domain: 'test.wire.link'}, clientId);
+      const domain = 'test.wire.link';
+      const actual = cryptographyService.constructSessionId({id: userId, domain}, clientId);
       expect(actual).toContain(clientId);
       expect(actual).toContain(userId);
-      expect(actual).toContain('test.wire.link');
+      expect(actual).toContain(domain);
+
+      const parsedSessionId = cryptographyService.parseSessionId(actual);
+      expect(parsedSessionId).toEqual({
+        userId,
+        clientId,
+        domain,
+      });
+    });
+
+    it('fails to parse wrongly formatted session Id', () => {
+      expect(() => {
+        cryptographyService.parseSessionId('jfkdsmqfd');
+      }).toThrow(Error);
     });
   });
 

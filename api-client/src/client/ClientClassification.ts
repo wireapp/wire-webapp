@@ -22,4 +22,5 @@ export enum ClientClassification {
   LEGAL_HOLD = 'legalhold',
   PHONE = 'phone',
   TABLET = 'tablet',
+  UNKNOWN = '?',
 }

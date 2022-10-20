@@ -39,7 +39,7 @@ import {AssetService, ConversationService, PayloadBundleSource, PayloadBundleTyp
 import * as OtrMessage from './conversation/message/OtrMessage';
 import * as UserMessage from './conversation/message/UserMessage';
 import {CoreError} from './CoreError';
-import {CryptographyService} from './cryptography/';
+import {CryptographyService, SessionId} from './cryptography/';
 import {GiphyService} from './giphy/';
 import {HandledEventPayload, NotificationService} from './notification/';
 import {SelfService} from './self/';
@@ -132,6 +132,20 @@ interface AccountOptions<T> {
    */
   mlsConfig?: MLSConfig<T>;
 }
+
+type InitOptions = {
+  /** cookie used to identify the current user. Will use the browser cookie if not defined */
+  cookie?: Cookie;
+
+  /** fully initiate the client and register periodic checks */
+  initClient?: boolean;
+
+  /**
+   * callback triggered when a message from an unknown client is received.
+   * An unknown client is a client we don't yet have a session with
+   */
+  onNewClient?: (sessionId: SessionId) => void;
+};
 
 const coreDefaultClient: ClientInfo = {
   classification: ClientClassification.DESKTOP,
@@ -228,11 +242,30 @@ export class Account<T = any> extends EventEmitter {
    * Will fail if local client cannot be found
    *
    * @param clientType The type of client the user is using (temporary or permanent)
-   * @param cookie The cookie to identify the user against backend (will use the browser's one if not given)
    */
-  public async init(clientType: ClientType, cookie?: Cookie, initClient: boolean = true): Promise<Context> {
+  public async init(
+    clientType: ClientType,
+    {cookie, initClient = true, onNewClient}: InitOptions = {},
+  ): Promise<Context> {
     const context = await this.apiClient.init(clientType, cookie);
     await this.initServices(context);
+
+    /** @fixme
+     * When we will start migrating to CoreCrypto encryption/decryption, those hooks won't be available anymore
+     * We will need to implement
+     *   - the mechanism to handle messages from an unknown sender
+     *   - the mechanism to generate new prekeys when we reach a certain threshold of prekeys
+     */
+    this.service!.cryptography.setCryptoboxHooks({
+      onNewPrekeys: async prekeys => {
+        this.logger.debug(`Received '${prekeys.length}' new PreKeys.`);
+
+        await this.apiClient.api.client.putClient(context.clientId!, {prekeys});
+        this.logger.debug(`Successfully uploaded '${prekeys.length}' PreKeys.`);
+      },
+
+      onNewSession: onNewClient,
+    });
 
     // Assumption: client gets only initialized once
     if (initClient) {
