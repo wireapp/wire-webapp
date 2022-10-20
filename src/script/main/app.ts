@@ -918,7 +918,7 @@ class App {
 $(async () => {
   const config = Config.getConfig();
   const apiClient = container.resolve(APIClient);
-  await apiClient.useVersion(config.SUPPORTED_API_VERSIONS, config.FEATURE.ENABLE_MLS);
+  await apiClient.useVersion(config.SUPPORTED_API_VERSIONS, config.ENABLE_DEV_BACKEND_API);
   const core = container.resolve(Core);
 
   enableLogging(Config.getConfig().FEATURE.ENABLE_DEBUG);

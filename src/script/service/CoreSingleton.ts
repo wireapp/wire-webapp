@@ -27,7 +27,7 @@ import {Config} from '../Config';
 
 declare global {
   interface Window {
-    secretsCrypto?: {
+    systemCrypto?: {
       decrypt: (value: Uint8Array) => Promise<Uint8Array>;
       encrypt: (encrypted: Uint8Array) => Promise<Uint8Array>;
     };
@@ -54,7 +54,7 @@ export class Core extends Account<Uint8Array> {
              * When in an browser context, then this secretsCrypto will be undefined and the core will then use it's internal encryption system
              */
             keyingMaterialUpdateThreshold: Config.getConfig().FEATURE.MLS_CONFIG_KEYING_MATERIAL_UPDATE_THRESHOLD,
-            secretsCrypto: window.secretsCrypto,
+            systemCrypto: window.systemCrypto,
           }
         : undefined,
       nbPrekeys: 100,
