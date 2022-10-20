@@ -98,6 +98,9 @@ const CreatePersonalAccountComponent = ({
       ) : (
         pageContent
       )}
+      <IsMobile>
+        <div style={{minWidth: 48}} />
+      </IsMobile>
     </Page>
   );
 };

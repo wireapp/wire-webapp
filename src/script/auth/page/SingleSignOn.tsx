@@ -279,6 +279,11 @@ const SingleSignOnComponent = ({hasDefaultSSOCode}: Props & ConnectedProps & Dis
           <Column />
         </Columns>
       </Container>
+      {!hasDefaultSSOCode && (
+        <IsMobile>
+          <div style={{minWidth: 48}} />
+        </IsMobile>
+      )}
     </Page>
   );
 };

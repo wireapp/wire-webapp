@@ -42,6 +42,7 @@ import {
   Muted,
   Text,
   LinkVariant,
+  Link,
 } from '@wireapp/react-ui-kit';
 import {StatusCodes} from 'http-status-codes';
 import {useIntl} from 'react-intl';
@@ -60,6 +61,7 @@ import {loginStrings, verifyStrings} from '../../strings';
 import {AppAlreadyOpen} from '../component/AppAlreadyOpen';
 import {LoginForm} from '../component/LoginForm';
 import {RouterLink} from '../component/RouterLink';
+import {EXTERNAL_ROUTE} from '../externalRoute';
 import {actionRoot} from '../module/action/';
 import {BackendError} from '../module/action/BackendError';
 import {LabeledError} from '../module/action/LabeledError';
@@ -348,6 +350,15 @@ const LoginComponent = ({
                         )}
                       </Form>
                     </div>
+                    <Link
+                      variant={LinkVariant.PRIMARY}
+                      style={{paddingTop: '24px', textAlign: 'center'}}
+                      href={EXTERNAL_ROUTE.WIRE_ACCOUNT_PASSWORD_RESET}
+                      target="_blank"
+                      data-uie-name="go-forgot-password"
+                    >
+                      {_(loginStrings.forgotPassword)}
+                    </Link>
                     {Config.getConfig().FEATURE.ENABLE_PHONE_LOGIN && (
                       <RouterLink
                         variant={LinkVariant.PRIMARY}

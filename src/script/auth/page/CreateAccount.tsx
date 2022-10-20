@@ -75,6 +75,9 @@ const CreateAccount = ({}: Props) => {
           <Column />
         </Columns>
       </Container>
+      <IsMobile>
+        <div style={{minWidth: 48}} />
+      </IsMobile>
     </Page>
   );
 };
