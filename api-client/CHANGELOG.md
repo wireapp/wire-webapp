@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [21.0.1](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@21.0.0...@wireapp/api-client@21.0.1) (2022-10-20)
+
+### Bug Fixes
+
+* avoid requiring "ws" on browsers ([#4541](https://github.com/wireapp/wire-web-packages/issues/4541)) ([68f01e8](https://github.com/wireapp/wire-web-packages/commit/68f01e8739c0fd5fdecddb6a8ea282cf559c8e39))
+
 # [21.0.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@20.7.0...@wireapp/api-client@21.0.0) (2022-10-20)
 
 ### Features
