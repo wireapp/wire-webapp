@@ -20,7 +20,7 @@
     "jasmine": "4.4.0",
     "karma": "6.4.1",
     "karma-chrome-launcher": "3.1.1",
-    "karma-jasmine": "4.0.2",
+    "karma-jasmine": "5.1.0",
     "karma-webpack": "5.0.0",
     "ts-node": "^10.9.1",
     "webpack": "4.46.0"
