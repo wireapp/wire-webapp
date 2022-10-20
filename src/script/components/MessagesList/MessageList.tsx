@@ -247,7 +247,7 @@ const MessagesList: FC<MessagesListParams> = ({
         onLoading(false);
       }, 10);
     });
-  }, []);
+  }, [conversation, initialMessage]);
 
   if (!loaded) {
     return null;
