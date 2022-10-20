@@ -3,6 +3,21 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [34.0.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@33.0.0...@wireapp/core@34.0.0) (2022-10-20)
+
+### Bug Fixes
+
+* Do not import CoreCrypto twice ([#4536](https://github.com/wireapp/wire-web-packages/issues/4536)) ([79a17d2](https://github.com/wireapp/wire-web-packages/commit/79a17d20babae52c05010630bfbe4e7e7b802ad3))
+
+### Features
+
+* **api-client, core:** add supportsMLS flag to api backend features [FS-1051] ([#4538](https://github.com/wireapp/wire-web-packages/issues/4538)) ([5622626](https://github.com/wireapp/wire-web-packages/commit/5622626c4114f34481ed6bf6546d1b258aca283c))
+* Session creation callbacks ([#4535](https://github.com/wireapp/wire-web-packages/issues/4535)) ([02be0fa](https://github.com/wireapp/wire-web-packages/commit/02be0fa6d1f9d54638ff8b70d4c2ffd4c6f1ada0))
+
+### BREAKING CHANGES
+
+* the Account.init function signature has changed. If you used cookie or initClient they are now moved to the option param. account.init(clientType, cookie, false) becomes account.init(clientType, {cookie, initClient: false})
+
 # [33.0.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@32.1.3...@wireapp/core@33.0.0) (2022-10-19)
 
 ### Features
