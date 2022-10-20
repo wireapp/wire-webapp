@@ -18,15 +18,27 @@
  */
 
 import {TestFactory} from '../../../test/helper/TestFactory';
+import {Cryptobox} from '@wireapp/cryptobox';
+import {CryptographyRepository} from './CryptographyRepository';
+import {CryptographyService} from './CryptographyService';
+import {container} from 'tsyringe';
+import {Core} from '../service/CoreSingleton';
 
 describe('CryptographyRepository', () => {
   const testFactory = new TestFactory();
+  let cryptographyRepository: CryptographyRepository;
 
   beforeEach(async () => {
-    await testFactory.exposeCryptographyActors(false);
-    testFactory.cryptography_repository['core'].service = {
-      cryptography: {constructSessionId: jest.fn(() => 'user-id@device-id')},
+    const storage = await testFactory.exposeStorageActors();
+    const storeEngine = storage.storageService['engine'];
+    const cryptobox = new Cryptobox(storeEngine, 10);
+    await cryptobox.create();
+    const core = container.resolve(Core);
+    core.service = {
+      cryptography: {constructSessionId: jest.fn(() => 'user-id@device-id'), cryptobox},
     } as any;
+    const cryptographyService = new CryptographyService();
+    cryptographyRepository = new CryptographyRepository(cryptographyService, core);
   });
 
   describe('getRemoteFingerprint', () => {
@@ -37,7 +49,7 @@ describe('CryptographyRepository', () => {
         id: 3,
         key: 'pQABAQMCoQBYIFycSfcOATSpOIkJz8ntEnFAZ+YWtzVaJ7RLeDAqGU+0A6EAoQBYIMEJnklbfFFvnFC41rmjDMqx6L0oVX5RMab3uGwBgbkaBPY=',
       };
-      const fingerprint = await testFactory.cryptography_repository.getRemoteFingerprint(userId, clientId, preKey);
+      const fingerprint = await cryptographyRepository.getRemoteFingerprint(userId, clientId, preKey);
 
       // eslint-disable-next-line
       expect(fingerprint).toEqual('c1099e495b7c516f9c50b8d6b9a30ccab1e8bd28557e5131a6f7b86c0181b91a');

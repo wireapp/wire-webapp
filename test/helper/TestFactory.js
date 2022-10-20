@@ -37,7 +37,6 @@ import {StorageRepository} from 'src/script/storage/StorageRepository';
 import {ClientRepository} from 'src/script/client/ClientRepository';
 import {EventTrackingRepository} from 'src/script/tracking/EventTrackingRepository';
 import {ClientEntity} from 'src/script/client/ClientEntity';
-import {Cryptobox} from '@wireapp/cryptobox';
 import {EventRepository} from 'src/script/event/EventRepository';
 import {EventServiceNoCompound} from 'src/script/event/EventServiceNoCompound';
 import {EventService} from 'src/script/event/EventService';
@@ -112,22 +111,15 @@ export class TestFactory {
   }
 
   /**
-   * @param {boolean} mockCryptobox do not initialize a full cryptobox (cryptobox initialization is a very costy operation)
    * @returns {Promise<CryptographyRepository>} The cryptography repository.
    */
-  async exposeCryptographyActors(mockCryptobox = true) {
-    const storageRepository = await this.exposeStorageActors();
+  async exposeCryptographyActors() {
+    await this.exposeStorageActors();
     const currentClient = new ClientEntity(true, null);
     currentClient.id = entities.clients.john_doe.permanent.id;
     this.cryptography_service = new CryptographyService();
 
     this.cryptography_repository = new CryptographyRepository(this.cryptography_service);
-
-    if (!mockCryptobox) {
-      const storeEngine = storageRepository.storageService['engine'];
-      this.cryptography_repository.init(new Cryptobox(storeEngine, 10), ko.observable(currentClient));
-      await this.cryptography_repository.cryptobox.create();
-    }
 
     return this.cryptography_repository;
   }
