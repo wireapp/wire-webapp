@@ -172,7 +172,7 @@ export class AuthAction {
       dispatch(AuthActionCreator.startLogin());
       try {
         // we first init the core without initializing the client for now (this will be done later on)
-        await core.init(clientType, undefined, false);
+        await core.init(clientType, {initClient: false});
         await this.persistAuthData(clientType, core, dispatch, localStorageAction);
         await dispatch(selfAction.fetchSelf());
         await dispatch(cookieAction.setCookie(COOKIE_NAME_APP_OPENED, {appInstanceId: getConfig().APP_INSTANCE_ID}));
@@ -361,7 +361,7 @@ export class AuthAction {
         }
         const clientType = persist ? ClientType.PERMANENT : ClientType.TEMPORARY;
 
-        await core.init(clientType, undefined, false);
+        await core.init(clientType, {initClient: false});
         await this.persistAuthData(clientType, core, dispatch, localStorageAction);
 
         if (options.shouldValidateLocalClient) {

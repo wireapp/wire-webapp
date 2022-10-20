@@ -23,7 +23,7 @@ import 'core-js/full/reflect';
 import ko from 'knockout';
 import platform from 'platform';
 import {container} from 'tsyringe';
-import {ClientType} from '@wireapp/api-client/src/client/';
+import {ClientType, ClientClassification} from '@wireapp/api-client/src/client/';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import {amplify} from 'amplify';
 import Dexie from 'dexie';
@@ -152,8 +152,8 @@ class App {
     storage: StorageService;
   };
   repository: ViewModelRepositories = {} as ViewModelRepositories;
-  debug: DebugUtil;
-  util: {debug: DebugUtil};
+  debug?: DebugUtil;
+  util?: {debug: DebugUtil};
   singleInstanceHandler: SingleInstanceHandler;
 
   static get CONFIG() {
@@ -381,7 +381,6 @@ class App {
         client: clientRepository,
         connection: connectionRepository,
         conversation: conversationRepository,
-        cryptography: cryptographyRepository,
         event: eventRepository,
         eventTracker: eventTrackerRepository,
         properties: propertiesRepository,
@@ -394,7 +393,13 @@ class App {
       telemetry.timeStep(AppInitTimingsStep.RECEIVED_ACCESS_TOKEN);
 
       try {
-        await this.core.init(clientType);
+        await this.core.init(clientType, {
+          onNewClient({userId, clientId, domain}) {
+            const qualifiedId = {domain: domain ?? '', id: userId};
+            const newClient = {class: ClientClassification.UNKNOWN, id: clientId};
+            userRepository.addClientToUser(qualifiedId, newClient, true);
+          },
+        });
       } catch (error) {
         throw new ClientError(CLIENT_ERROR_TYPE.NO_VALID_CLIENT, 'Client has been deleted on backend');
       }
@@ -415,8 +420,6 @@ class App {
       loadingView.updateProgress(7.5, t('initValidatedClient'));
       telemetry.timeStep(AppInitTimingsStep.VALIDATED_CLIENT);
       telemetry.addStatistic(AppInitStatisticsValue.CLIENT_TYPE, clientEntity().type ?? 'unknown');
-
-      await cryptographyRepository.init(this.core.service!.cryptography.cryptobox, clientEntity);
 
       loadingView.updateProgress(10);
       telemetry.timeStep(AppInitTimingsStep.INITIALIZED_CRYPTOGRAPHY);
@@ -918,7 +921,7 @@ class App {
 $(async () => {
   const config = Config.getConfig();
   const apiClient = container.resolve(APIClient);
-  await apiClient.useVersion(config.SUPPORTED_API_VERSIONS, config.FEATURE.ENABLE_MLS);
+  await apiClient.useVersion(config.SUPPORTED_API_VERSIONS, config.ENABLE_DEV_BACKEND_API);
   const core = container.resolve(Core);
 
   enableLogging(Config.getConfig().FEATURE.ENABLE_DEBUG);

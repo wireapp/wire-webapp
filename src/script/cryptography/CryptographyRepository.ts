@@ -17,11 +17,8 @@
  *
  */
 
-import ko from 'knockout';
-import {amplify} from 'amplify';
 import type {QualifiedId} from '@wireapp/api-client/src/user/';
-import {Cryptobox, CryptoboxSession} from '@wireapp/cryptobox';
-import {WebAppEvents} from '@wireapp/webapp-events';
+import {CryptoboxSession} from '@wireapp/cryptobox';
 import type {PreKey as BackendPreKey} from '@wireapp/api-client/src/auth/';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 
@@ -29,7 +26,6 @@ import {getLogger, Logger} from 'Util/Logger';
 import {base64ToArray} from 'Util/util';
 
 import {CryptographyMapper} from './CryptographyMapper';
-import {ClientEntity} from '../client/ClientEntity';
 import {UserError} from '../error/UserError';
 import type {CryptographyService} from './CryptographyService';
 import {container} from 'tsyringe';
@@ -47,20 +43,8 @@ export interface ClientKeys {
 }
 
 export class CryptographyRepository {
-  cryptobox?: Cryptobox;
   cryptographyMapper: CryptographyMapper;
-  currentClient?: ko.Observable<ClientEntity>;
   logger: Logger;
-
-  static get CONFIG() {
-    return {
-      UNKNOWN_DECRYPTION_ERROR_CODE: 999,
-    };
-  }
-
-  static get REMOTE_ENCRYPTION_FAILURE(): string {
-    return '💣';
-  }
 
   constructor(
     private readonly cryptographyService: CryptographyService,
@@ -70,29 +54,11 @@ export class CryptographyRepository {
     this.cryptographyMapper = new CryptographyMapper();
   }
 
-  /**
-   * Inits the cryptography repository with the given cryptobox and for the given client
-   *
-   * @param cryptobox The cryptobox instance for handling encryption and decryption of messages
-   * @param client The local client of the logged user
-   */
-  init(cryptobox: Cryptobox, client: ko.Observable<ClientEntity>): void {
-    this.cryptobox = cryptobox;
-    this.currentClient = client;
-
-    this.cryptobox.on(Cryptobox.TOPIC.NEW_PREKEYS, async preKeys => {
-      const serializedPreKeys = preKeys.map(preKey => cryptobox.serialize_prekey(preKey));
-      this.logger.log(`Received '${preKeys.length}' new PreKeys.`, serializedPreKeys);
-
-      await this.cryptographyService.putClientPreKeys(client().id, serializedPreKeys);
-      this.logger.log(`Successfully uploaded '${serializedPreKeys.length}' PreKeys.`, serializedPreKeys);
-    });
-
-    this.cryptobox.on(Cryptobox.TOPIC.NEW_SESSION, sessionId => {
-      const {userId, clientId, domain} = ClientEntity.dismantleUserClientId(sessionId);
-      const qualifiedId = {domain, id: userId};
-      amplify.publish(WebAppEvents.CLIENT.ADD, qualifiedId, {id: clientId}, true);
-    });
+  get cryptobox() {
+    if (!this.core.service) {
+      throw new Error('Core is not initiated');
+    }
+    return this.core.service!.cryptography.cryptobox;
   }
 
   /**
@@ -100,7 +66,7 @@ export class CryptographyRepository {
    * @returns Fingerprint of local identity public key
    */
   getLocalFingerprint(): string {
-    return this.cryptobox!.getIdentity().public_key.fingerprint();
+    return this.cryptobox.getIdentity().public_key.fingerprint();
   }
 
   /**
@@ -146,16 +112,17 @@ export class CryptographyRepository {
   private loadSession(userId: QualifiedId, clientId: string): Promise<CryptoboxSession | void> {
     const sessionId = this.core.service!.cryptography.constructSessionId(userId, clientId);
 
-    return this.cryptobox!.session_load(sessionId).catch(() => {
+    return this.cryptobox.session_load(sessionId).catch(() => {
       return this.getUserPreKeyByIds(userId, clientId).then(preKey => {
         return this.createSessionFromPreKey(preKey, userId, clientId);
       });
     });
   }
 
-  deleteSession(userId: QualifiedId, clientId: string): Promise<string> {
+  async deleteSession(userId: QualifiedId, clientId: string): Promise<string> {
     const sessionId = this.core.service!.cryptography.constructSessionId(userId, clientId);
-    return this.cryptobox!.session_delete(sessionId);
+    await this.core.service!.cryptography.resetSession(sessionId);
+    return sessionId;
   }
 
   private async createSessionFromPreKey(
@@ -175,10 +142,11 @@ export class CryptographyRepository {
         );
         const sessionId = this.core.service!.cryptography.constructSessionId({domain, id: userId}, clientId);
         const preKeyArray = base64ToArray(preKey.key);
-        return await this.cryptobox!.session_from_prekey(sessionId, preKeyArray.buffer);
+        return await this.cryptobox.session_from_prekey(sessionId, preKeyArray.buffer);
       }
     } catch (error) {
-      const message = `Pre-key for user '${userId}' ('${clientId}') invalid. Skipping encryption: ${error.message}`;
+      const errorMessage = error instanceof Error ? error.message : error;
+      const message = `Pre-key for user '${userId}' ('${clientId}') invalid. Skipping encryption: ${errorMessage}`;
       this.logger.warn(message, error);
     }
   }
