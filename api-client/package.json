@@ -1,7 +1,8 @@
 {
   "browser": {
     "./src/shims/node/buffer": "./src/shims/browser/buffer.js",
-    "./src/shims/node/cookie": "./src/shims/browser/cookie.js"
+    "./src/shims/node/cookie": "./src/shims/browser/cookie.js",
+    "./src/shims/node/websocket": "./src/shims/browser/websocket.js"
   },
   "dependencies": {
     "@wireapp/commons": "workspace:^",
