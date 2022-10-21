@@ -19,10 +19,12 @@
 
 import {FC, useContext, useEffect, useRef} from 'react';
 
+import {Button, ButtonVariant, IconButton, IconButtonVariant, useMatchMedia} from '@wireapp/react-ui-kit';
 import {container} from 'tsyringe';
 
 import {Avatar, AVATAR_SIZE} from 'Components/Avatar';
 import {ClassifiedBar} from 'Components/input/ClassifiedBar';
+import {useAppMainState, ViewType} from 'src/script/page/state';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 
@@ -46,6 +48,11 @@ const ConnectRequests: FC<ConnectRequestsProps> = ({
   const mainViewModel = useContext(RootContext);
   const {classifiedDomains} = useKoSubscribableChildren(teamState, ['classifiedDomains']);
   const {connectRequests} = useKoSubscribableChildren(userState, ['connectRequests']);
+
+  // To be changed when design chooses a breakpoint, the conditional can be integrated to the ui-kit directly
+  const smBreakpoint = useMatchMedia('max-width: 620px');
+
+  const {setCurrentView} = useAppMainState(state => state.responsiveView);
 
   const scrollToBottom = (behavior: ScrollBehavior = 'auto') => {
     if (connectRequestsRefEnd.current) {
@@ -91,6 +98,16 @@ const ConnectRequests: FC<ConnectRequestsProps> = ({
     <div className="connect-request-wrapper">
       <div id="connect-requests" className="connect-requests" style={{overflowY: 'scroll'}}>
         <div className="connect-requests-inner" style={{overflowY: 'hidden'}}>
+          {smBreakpoint && (
+            <div css={{width: '100%'}}>
+              <IconButton
+                variant={IconButtonVariant.SECONDARY}
+                className="connect-requests-icon-back icon-back"
+                css={{marginBottom: 0}}
+                onClick={() => setCurrentView(ViewType.LEFT_SIDEBAR)}
+              />
+            </div>
+          )}
           {connectRequests.map(connectRequest => (
             <div
               key={connectRequest.id}
@@ -112,24 +129,23 @@ const ConnectRequests: FC<ConnectRequestsProps> = ({
                 noFilter
               />
 
-              <div className="button-group">
-                <button
-                  className="button button-inverted"
+              <div className="connect-request-button-group">
+                <Button
+                  variant={ButtonVariant.SECONDARY}
                   data-uie-name="do-ignore"
                   aria-label={t('connectionRequestIgnore')}
                   onClick={() => onIgnoreClick(connectRequest)}
                 >
                   {t('connectionRequestIgnore')}
-                </button>
+                </Button>
 
-                <button
-                  className="button"
+                <Button
                   onClick={() => onAcceptClick(connectRequest)}
                   data-uie-name="do-accept"
                   aria-label={t('connectionRequestConnect')}
                 >
                   {t('connectionRequestConnect')}
-                </button>
+                </Button>
               </div>
             </div>
           ))}

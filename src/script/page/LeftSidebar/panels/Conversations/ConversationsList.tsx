@@ -42,7 +42,7 @@ import {generateConversationUrl} from '../../../../router/routeGenerator';
 import {createNavigate} from '../../../../router/routerBindings';
 import {ContentState} from '../../../../view_model/ContentViewModel';
 import {ListViewModel} from '../../../../view_model/ListViewModel';
-import {useAppMainState} from '../../../state';
+import {useAppMainState, ViewType} from '../../../state';
 
 export const ConversationsList: React.FC<{
   callState: CallState;
@@ -89,7 +89,10 @@ export const ConversationsList: React.FC<{
     return !conversation.removed_from_conversation();
   };
 
+  const {setCurrentView} = useAppMainState(state => state.responsiveView);
+
   const onConnectionRequestClick = () => {
+    setCurrentView(ViewType.CENTRAL_COLUMN);
     listViewModel.contentViewModel.switchContent(ContentState.CONNECTION_REQUESTS);
   };
 
