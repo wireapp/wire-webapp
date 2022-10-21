@@ -55,7 +55,7 @@ interface MessagesListParams {
   cancelConnectionRequest: (message: MemberMessage) => void;
   conversation: Conversation;
   conversationRepository: ConversationRepository;
-  getVisibleCallback: (conversationEntity: Conversation, messageEntity: MessageEntity) => (() => void) | null;
+  getVisibleCallback: (conversationEntity: Conversation, messageEntity: MessageEntity) => (() => void) | undefined;
   initialMessage?: MessageEntity;
   invitePeople: (convesation: Conversation) => void;
   messageActions: {

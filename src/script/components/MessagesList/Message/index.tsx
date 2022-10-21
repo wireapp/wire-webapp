@@ -74,7 +74,7 @@ export interface MessageParams extends MessageActions {
     deleteMessageEveryone: (conversation: Conversation, message: BaseMessage) => void;
   };
   messageRepository: MessageRepository;
-  onVisible?: (() => void) | null;
+  onVisible?: () => void;
   previousMessage?: BaseMessage;
   selfId: QualifiedId;
   shouldShowInvitePeople: boolean;

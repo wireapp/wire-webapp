@@ -292,7 +292,7 @@ const ConversationList: FC<ConversationListProps> = ({
   const getInViewportCallback = (
     conversationEntity: ConversationEntity,
     messageEntity: Message,
-  ): (() => void) | null => {
+  ): (() => void) | undefined => {
     const messageTimestamp = messageEntity.timestamp();
     const callbacks: Function[] = [];
 
@@ -350,7 +350,7 @@ const ConversationList: FC<ConversationListProps> = ({
     }
 
     if (!callbacks.length) {
-      return null;
+      return undefined;
     }
 
     return () => {
