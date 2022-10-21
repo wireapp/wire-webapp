@@ -27,7 +27,6 @@ import {ConversationList} from 'Components/Conversation';
 import {HistoryExport} from 'Components/HistoryExport';
 import {HistoryImport} from 'Components/HistoryImport';
 import {Icon} from 'Components/Icon';
-import {GroupCreationModal} from 'Components/Modals/GroupCreation/GroupCreationModal';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 
@@ -200,9 +199,6 @@ const MainContent: FC<MainContentProps> = ({
           </>
         </Animated>
       </SwitchTransition>
-
-      <GroupCreationModal userState={userState} teamState={teamState} />
-
       <div className="center-column__overlay" />
     </div>
   );

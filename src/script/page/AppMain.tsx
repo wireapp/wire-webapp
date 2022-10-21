@@ -23,6 +23,7 @@ import {StyledApp, THEME_ID, useMatchMedia} from '@wireapp/react-ui-kit';
 import {container} from 'tsyringe';
 
 import {CallingContainer} from 'Components/calling/CallingOverlayContainer';
+import {GroupCreationModal} from 'Components/Modals/GroupCreation/GroupCreationModal';
 import {LegalHoldModal} from 'Components/Modals/LegalHoldModal/LegalHoldModal';
 import {registerReactComponent, useKoSubscribableChildren} from 'Util/ComponentUtil';
 
@@ -128,6 +129,7 @@ const AppContainer: FC<AppContainerProps> = ({root}) => {
           {/*The order of these elements matter to show proper modals stack upon each other*/}
           <div id="user-modal-container"></div>
           <PrimaryModalComponent />
+          <GroupCreationModal userState={userState} teamState={teamState} />
         </main>
       </RootProvider>
     </StyledApp>
