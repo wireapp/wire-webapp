@@ -101,6 +101,9 @@ describe('Collection', () => {
   });
 
   it('displays collection details when a section is selected', async () => {
+    const imageMessages = new Array(14).fill(null).map(() => createImageMessage());
+    mockConversationRepository.getEventsForCategory.mockResolvedValueOnce(imageMessages);
+
     const {getAllByText, getByText} = render(
       <Collection conversation={conversation} conversationRepository={mockConversationRepository as any} />,
     );
@@ -114,13 +117,13 @@ describe('Collection', () => {
 
   it('should display search results when term is typed', async () => {
     jest.useFakeTimers();
-    const {getAllByText, queryByText, container} = render(
+    const {getAllByText, queryByText, getByTestId} = render(
       <Collection conversation={conversation} conversationRepository={mockConversationRepository as any} />,
     );
 
     await waitFor(() => getAllByText('CollectionItem'));
     await act(async () => {
-      const input: HTMLInputElement = container.querySelector('[data-uie-name=full-search-header-input]');
+      const input = getByTestId('full-search-header-input');
       fireEvent.change(input, {target: {value: 'term'}});
       jest.advanceTimersByTime(500);
       await waitFor(() => expect(mockConversationRepository.searchInConversation).toHaveBeenCalled());
