@@ -18,7 +18,7 @@
  */
 
 import {proteus as ProtobufOTR} from '@wireapp/protocol-messaging/web/otr';
-import {AxiosError, AxiosRequestConfig} from 'axios';
+import axios, {AxiosRequestConfig} from 'axios';
 
 import {ValidationError} from '../../validation';
 import {
@@ -829,12 +829,15 @@ export class ConversationAPI {
     await this.client.sendProtocolMls<void>(config, true);
   }
 
-  public async postForClients(clientId: string, conversationId: string): Promise<ClientMismatch> {
+  public async postForClients(clientId: string, conversationId: string): Promise<void> {
     try {
       await this.postOTRMessage(clientId, conversationId);
       throw new Error(`Expected backend to throw error.`);
     } catch (error) {
-      return (error as AxiosError).response!.data;
+      if (axios.isAxiosError(error) && error.response?.data) {
+        return error.response.data;
+      }
+      throw error;
     }
   }
 

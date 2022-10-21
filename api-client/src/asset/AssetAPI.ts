@@ -51,7 +51,7 @@ export interface AssetOptions extends CipherOptions {
 
 export interface AssetResponse {
   buffer: ArrayBuffer;
-  mimeType: string;
+  mimeType?: string;
 }
 
 const ASSET_URLS = {

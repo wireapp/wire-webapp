@@ -33,11 +33,15 @@ const logger = logdown('@wireapp/api-client/shims/node/cookie', {
 
 export const retrieveCookie = async <T>(response: AxiosResponse<T>): Promise<T> => {
   if (response.headers?.['set-cookie']) {
-    const cookies = response.headers['set-cookie'].map(ToughCookie.parse);
+    const cookies: ToughCookie[] = response.headers['set-cookie'].flatMap(cookieString => {
+      const cookie = ToughCookie.parse(cookieString);
+      return cookie ? [cookie] : [];
+    });
     for (const cookie of cookies) {
-      CookieStore.setCookie(new Cookie(cookie.value, cookie.expires));
+      const cookieString = cookie.expires.toString();
+      CookieStore.setCookie(new Cookie(cookie.value, cookieString));
       logger.info(
-        `Saved internal cookie. It will expire on "${cookie.expires}".`,
+        `Saved internal cookie. It will expire on "${cookieString}".`,
         ObfuscationUtil.obfuscateCookie(cookie),
       );
     }

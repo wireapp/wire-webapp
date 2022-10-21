@@ -17,13 +17,17 @@
  *
  */
 
+import {AxiosProgressEvent} from 'axios';
+
 export type ProgressCallback = (progress: number) => void;
 
 export const handleProgressEvent = (progressCallback?: ProgressCallback) => {
   return (
     progressCallback &&
-    ((progressEvent: ProgressEvent) => {
-      progressCallback(progressEvent.loaded / progressEvent.total);
+    ((progressEvent: AxiosProgressEvent) => {
+      if (progressEvent.total) {
+        progressCallback(progressEvent.loaded / progressEvent.total);
+      }
     })
   );
 };

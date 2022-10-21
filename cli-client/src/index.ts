@@ -28,7 +28,7 @@ import dotenv from 'dotenv';
 import fs from 'fs-extra';
 import os from 'os';
 import path from 'path';
-import {AxiosError} from 'axios';
+import axios from 'axios';
 import {buildTextMessage} from '@wireapp/core/src/main/conversation/message/MessageBuilder';
 import {ConversationProtocol} from '@wireapp/api-client/src/conversation';
 
@@ -86,22 +86,24 @@ account.on(PayloadBundleType.TEXT, textMessage => {
     await account.login(loginData);
     await account.listen();
   } catch (error) {
-    const data: any = (error as AxiosError).response?.data;
-    const errorLabel = data?.label;
-    // TODO: The following is just a quick hack to continue if too many clients are registered!
-    // We should expose this fail-safe method as an emergency function
-    if (errorLabel === BackendErrorLabel.TOO_MANY_CLIENTS) {
-      const clients = await apiClient.api.client.getClients();
-      const client: RegisteredClient = clients[0];
-      await apiClient.api.client.deleteClient(client.id, loginData.password);
-      await account.logout();
+    if (axios.isAxiosError(error)) {
+      const data = error.response?.data;
+      const errorLabel = data?.label;
+      // TODO: The following is just a quick hack to continue if too many clients are registered!
+      // We should expose this fail-safe method as an emergency function
+      if (errorLabel === BackendErrorLabel.TOO_MANY_CLIENTS) {
+        const clients = await apiClient.api.client.getClients();
+        const client: RegisteredClient = clients[0];
+        await apiClient.api.client.deleteClient(client.id, loginData.password);
+        await account.logout();
 
-      // TODO: Completely removing the Wire Cryptobox directoy isn't a good idea! The "logout" method should
-      // handle already the cleanup of artifacts. Unfortunately "logout" sometimes has issues (we need to solve
-      // these!)
-      await fs.remove(directory);
-      await account.login(loginData);
-      await account.listen();
+        // TODO: Completely removing the Wire Cryptobox directoy isn't a good idea! The "logout" method should
+        // handle already the cleanup of artifacts. Unfortunately "logout" sometimes has issues (we need to solve
+        // these!)
+        await fs.remove(directory);
+        await account.login(loginData);
+        await account.listen();
+      }
     }
     throw error;
   }
