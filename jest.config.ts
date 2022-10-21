@@ -17,8 +17,10 @@
  *
  */
 
-export default {
+module.exports = {
   clearMocks: true,
-  testMatch: ['**/?(*.)test.[t]s?(x)'],
-  coverageDirectory: 'coverage',
+  testMatch: ['**/?(*.)+(spec|test).+(ts|tsx)', 'test/**/*.+(ts|tsx)'],
+  transform: {
+    '^.+\\.(ts|tsx)$': 'ts-jest',
+  },
 };
