@@ -66,6 +66,7 @@ export const CustomOption = (dataUieName: string) => (props: OptionProps<Option>
         {...(dataUieName && {
           'data-uie-name': `option-${dataUieName}`,
           'data-uie-value': (options as Option[]).find(option => option.label === children)?.value,
+          'data-uie-selected': isSelected,
         })}
       >
         {isMulti && (
