@@ -18,7 +18,7 @@
  */
 
 import {APIClient} from '@wireapp/api-client';
-import {PreKey as SerializedPreKey} from '@wireapp/api-client/src/auth/';
+import {PreKey} from '@wireapp/api-client/src/auth/';
 import {RegisteredClient} from '@wireapp/api-client/src/client/';
 import {
   OTRClientMap,
@@ -29,7 +29,7 @@ import {
 } from '@wireapp/api-client/src/conversation/';
 import {ConversationOtrMessageAddEvent} from '@wireapp/api-client/src/event';
 import {QualifiedId, QualifiedUserPreKeyBundleMap, UserPreKeyBundleMap} from '@wireapp/api-client/src/user/';
-import {Cryptobox} from '@wireapp/cryptobox';
+import {Cryptobox, CryptoboxSession} from '@wireapp/cryptobox';
 import {errors as ProteusErrors, keys as ProteusKeys} from '@wireapp/proteus';
 import {GenericMessage} from '@wireapp/protocol-messaging';
 import {CRUDEngine} from '@wireapp/store-engine';
@@ -142,7 +142,7 @@ export class CryptographyService {
     );
   }
 
-  public async createCryptobox(entropyData?: Uint8Array): Promise<SerializedPreKey[]> {
+  public async createCryptobox(entropyData?: Uint8Array): Promise<PreKey[]> {
     const initialPreKeys = await this.cryptobox.create(entropyData);
 
     return initialPreKeys
@@ -242,6 +242,44 @@ export class CryptographyService {
 
   public async initCryptobox(): Promise<void> {
     await this.cryptobox.load();
+  }
+
+  /**
+   * Get the fingerprint of the local client.
+   */
+  public getLocalFingerprint(): string {
+    return this.cryptobox.getIdentity().public_key.fingerprint();
+  }
+
+  /**
+   * Get the fingerprint of a remote client
+   * @param userId ID of user
+   * @param clientId ID of client
+   * @param prekey A prekey can be given to create a session if it doesn't already exist.
+   *   If not provided and the session doesn't exists it will fetch a new prekey from the backend
+   */
+  public async getRemoteFingerprint(userId: QualifiedId, clientId: string, prekey?: PreKey): Promise<string> {
+    const session = await this.getOrCreateSession(userId, clientId, prekey);
+    return session.fingerprint_remote();
+  }
+
+  private async getOrCreateSession(
+    userId: QualifiedId,
+    clientId: string,
+    initialPrekey?: PreKey,
+  ): Promise<CryptoboxSession> {
+    const sessionId = this.constructSessionId(userId, clientId);
+    try {
+      return await this.cryptobox.session_load(sessionId);
+    } catch (error) {
+      const prekey = initialPrekey ?? (await this.getUserPrekey(userId, clientId)).prekey;
+      const prekeyBuffer = Decoder.fromBase64(prekey.key).asBytes;
+      return this.cryptobox.session_from_prekey(sessionId, prekeyBuffer.buffer);
+    }
+  }
+
+  private getUserPrekey(userId: QualifiedId, clientId: string) {
+    return this.apiClient.api.user.getClientPreKey(userId, clientId);
   }
 
   public deleteCryptographyStores(): Promise<boolean[]> {
