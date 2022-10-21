@@ -27,7 +27,7 @@ const NUMBER_OF_ASSETS = 5;
 
 const messages = new Array(NUMBER_OF_ASSETS).fill(null).map(() => new ContentMessage(createRandomUuid()));
 
-const getDefaultProps = ({limit}: {limit: number}) => ({
+const getDefaultProps = (limit: number) => ({
   label: 'cool collection',
   limit,
   messages,
@@ -37,10 +37,10 @@ const getDefaultProps = ({limit}: {limit: number}) => ({
 
 describe('CollectionSection', () => {
   it('does not show show all button when under or equal a limit', async () => {
-    const props = getDefaultProps({limit: NUMBER_OF_ASSETS + 1});
+    const props = getDefaultProps(NUMBER_OF_ASSETS + 1);
     const {queryByText, rerender} = render(
       <CollectionSection {...props}>
-        <span className={`collection-header-icon icon-library`}></span>
+        <span />
       </CollectionSection>,
     );
 
@@ -49,7 +49,7 @@ describe('CollectionSection', () => {
 
     rerender(
       <CollectionSection {...props}>
-        <span className={`collection-header-icon icon-library`}></span>
+        <span />
       </CollectionSection>,
     );
 
@@ -58,8 +58,8 @@ describe('CollectionSection', () => {
 
   it('does show show all button when over a limit', async () => {
     const {getByText} = render(
-      <CollectionSection {...getDefaultProps({limit: NUMBER_OF_ASSETS - 1})}>
-        <span className={`collection-header-icon icon-library`}></span>
+      <CollectionSection {...getDefaultProps(NUMBER_OF_ASSETS - 1)}>
+        <span />
       </CollectionSection>,
     );
 
@@ -67,10 +67,10 @@ describe('CollectionSection', () => {
   });
 
   it('triggers onSelect callback on show all button click', async () => {
-    const props = getDefaultProps({limit: NUMBER_OF_ASSETS - 1});
+    const props = getDefaultProps(NUMBER_OF_ASSETS - 1);
     const {getByText} = render(
       <CollectionSection {...props}>
-        <span className={`collection-header-icon icon-library`}></span>
+        <span />
       </CollectionSection>,
     );
 
