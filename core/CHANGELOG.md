@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [34.1.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@34.0.2...@wireapp/core@34.1.0) (2022-10-21)
+
+### Features
+
+* Add fingerprint generation for local and remote clients ([#4545](https://github.com/wireapp/wire-web-packages/issues/4545)) ([bc5db37](https://github.com/wireapp/wire-web-packages/commit/bc5db37c8a281d4ecfac3100dd0194cd31915c01))
+
 ## [34.0.2](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@34.0.1...@wireapp/core@34.0.2) (2022-10-20)
 
 ### Bug Fixes
