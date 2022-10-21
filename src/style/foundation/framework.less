@@ -63,6 +63,11 @@
     #conversation-input-bar,
     #conversation-title-bar {
       width: 100%;
+      transition: width @animation-timing-fast @ease-out-quart;
+
+      &.is-right-panel-open {
+        width: calc(100% - @right-width);
+      }
     }
   }
 

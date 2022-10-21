@@ -25,6 +25,7 @@ import React, {
 } from 'react';
 
 import {QualifiedId} from '@wireapp/api-client/src/user';
+import cx from 'classnames';
 
 import {InViewport} from 'Components/utils/InViewport';
 import {ServiceEntity} from 'src/script/integration/ServiceEntity';
@@ -73,7 +74,7 @@ export interface MessageParams extends MessageActions {
     deleteMessageEveryone: (conversation: Conversation, message: BaseMessage) => void;
   };
   messageRepository: MessageRepository;
-  onVisible?: () => void;
+  onVisible?: (() => void) | null;
   previousMessage?: BaseMessage;
   selfId: QualifiedId;
   shouldShowInvitePeople: boolean;
@@ -125,7 +126,7 @@ const Message: React.FC<
   );
   return (
     <div
-      className={`message ${isMarked ? 'message-marked' : ''}`}
+      className={cx('message', {'message-marked': isMarked})}
       ref={messageElementRef}
       data-uie-uid={message.id}
       data-uie-value={message.super_type}
@@ -133,7 +134,7 @@ const Message: React.FC<
       data-uie-send-status={status}
       data-uie-name="item-message"
     >
-      <div className={`message-header message-timestamp ${getTimestampClass()}`}>
+      <div className={cx('message-header message-timestamp', getTimestampClass())}>
         <div className="message-header-icon">
           <span className="message-unread-dot"></span>
         </div>

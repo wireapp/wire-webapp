@@ -55,7 +55,7 @@ interface MessagesListParams {
   cancelConnectionRequest: (message: MemberMessage) => void;
   conversation: Conversation;
   conversationRepository: ConversationRepository;
-  getVisibleCallback: (conversationEntity: Conversation, messageEntity: MessageEntity) => (() => void) | undefined;
+  getVisibleCallback: (conversationEntity: Conversation, messageEntity: MessageEntity) => (() => void) | null;
   initialMessage?: MessageEntity;
   invitePeople: (convesation: Conversation) => void;
   messageActions: {
@@ -268,6 +268,7 @@ const MessagesList: FC<MessagesListParams> = ({
           const isLastDeliveredMessage = lastDeliveredMessage?.id === message.id;
 
           const visibleCallback = getVisibleCallback(conversation, message);
+
           const key = `${message.id || 'message'}-${message.timestamp()}`;
 
           return (

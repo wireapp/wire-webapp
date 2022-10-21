@@ -292,7 +292,7 @@ const ConversationList: FC<ConversationListProps> = ({
   const getInViewportCallback = (
     conversationEntity: ConversationEntity,
     messageEntity: Message,
-  ): (() => void) | undefined => {
+  ): (() => void) | null => {
     const messageTimestamp = messageEntity.timestamp();
     const callbacks: Function[] = [];
 
@@ -325,7 +325,7 @@ const ConversationList: FC<ConversationListProps> = ({
     const isUnreadMessage = messageTimestamp > conversationEntity.last_read_timestamp();
     const isNotOwnMessage = !messageEntity.user().isMe;
 
-    let shouldSendReadReceipt = true;
+    let shouldSendReadReceipt = false;
 
     if (messageEntity.expectsReadConfirmation) {
       if (conversationEntity.is1to1()) {
@@ -350,7 +350,7 @@ const ConversationList: FC<ConversationListProps> = ({
     }
 
     if (!callbacks.length) {
-      return undefined;
+      return null;
     }
 
     return () => {
