@@ -17,7 +17,6 @@
  *
  */
 
-import {AxiosError} from 'axios';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 import {APIClient, BackendFeatures} from '@wireapp/api-client';
 import {RegisterData} from '@wireapp/api-client/src/auth';
@@ -54,6 +53,7 @@ import {Encoder} from 'bazinga64';
 import {MLSService} from './mls';
 import {MLSCallbacks, MLSConfig} from './mls/types';
 import {getQueueLength, resumeMessageSending} from './conversation/message/messageSender';
+import axios from 'axios';
 
 export type ProcessedEventPayload = HandledEventPayload;
 
@@ -344,7 +344,7 @@ export class Account<T = any> extends EventEmitter {
         (error as Error).constructor.name === 'CryptoboxError' ||
         error instanceof StoreEngineError.RecordNotFoundError ||
         (error as Error).constructor.name === StoreEngineError.RecordNotFoundError.name;
-      const notFoundOnBackend = (error as AxiosError).response?.status === HTTP_STATUS.NOT_FOUND;
+      const notFoundOnBackend = axios.isAxiosError(error) ? error.response?.status === HTTP_STATUS.NOT_FOUND : false;
 
       if (notFoundInDatabase) {
         this.logger.log(`Could not find valid client in database "${this.storeEngine?.storeName}".`);
