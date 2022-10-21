@@ -80,6 +80,7 @@ import {EventRepository} from '../../event/EventRepository';
 import {MentionEntity} from '../../message/MentionEntity';
 import {MessageHasher} from '../../message/MessageHasher';
 import {QuoteEntity} from '../../message/QuoteEntity';
+import {useAppMainState} from '../../page/state';
 import {SearchRepository} from '../../search/SearchRepository';
 import {StorageRepository} from '../../storage';
 import {TeamState} from '../../team/TeamState';
@@ -169,6 +170,10 @@ const InputBar = ({
   const [selectionEnd, setSelectionEnd] = useState<number>(0);
   const [pingDisabled, setIsPingDisabled] = useState<boolean>(false);
   const [editedMention, setEditedMention] = useState<{startIndex: number; term: string} | undefined>(undefined);
+
+  const {rightSidebar} = useAppMainState.getState();
+  const currentState = rightSidebar.history.at(-1);
+  const isRightSidebarOpen = !!currentState;
 
   const availabilityIsNone = availability === Availability.Type.NONE;
   const showAvailabilityTooltip = firstUserEntity && inTeam && is1to1 && !availabilityIsNone;
@@ -851,7 +856,10 @@ const InputBar = ({
   };
 
   return (
-    <div id="conversation-input-bar" className="conversation-input-bar">
+    <div
+      id="conversation-input-bar"
+      className={cx('conversation-input-bar', {'is-right-panel-open': isRightSidebarOpen})}
+    >
       {classifiedDomains && !isConnectionRequest && (
         <ClassifiedBar users={participatingUserEts} classifiedDomains={classifiedDomains} />
       )}

@@ -325,7 +325,7 @@ const ConversationList: FC<ConversationListProps> = ({
     const isUnreadMessage = messageTimestamp > conversationEntity.last_read_timestamp();
     const isNotOwnMessage = !messageEntity.user().isMe;
 
-    let shouldSendReadReceipt = true;
+    let shouldSendReadReceipt = false;
 
     if (messageEntity.expectsReadConfirmation) {
       if (conversationEntity.is1to1()) {

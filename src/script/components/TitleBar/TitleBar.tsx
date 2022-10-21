@@ -183,9 +183,7 @@ export const TitleBar: React.FC<TitleBarProps> = ({
     };
   }, [isActivatedAccount, showAddParticipant, showDetails]);
 
-  const onClickCollectionButton = () => {
-    amplify.publish(WebAppEvents.CONTENT.SWITCH, ContentState.COLLECTION);
-  };
+  const onClickCollectionButton = () => amplify.publish(WebAppEvents.CONTENT.SWITCH, ContentState.COLLECTION);
 
   const onClickDetails = () => showDetails(false);
 
@@ -195,7 +193,10 @@ export const TitleBar: React.FC<TitleBarProps> = ({
   };
 
   return (
-    <ul id="conversation-title-bar" className="conversation-title-bar">
+    <ul
+      id="conversation-title-bar"
+      className={cx('conversation-title-bar', {'is-right-panel-open': isRightSidebarOpen})}
+    >
       <li className="conversation-title-bar-library">
         {smBreakpoint && (
           <IconButton

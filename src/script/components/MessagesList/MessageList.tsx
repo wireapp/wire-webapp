@@ -268,6 +268,7 @@ const MessagesList: FC<MessagesListParams> = ({
           const isLastDeliveredMessage = lastDeliveredMessage?.id === message.id;
 
           const visibleCallback = getVisibleCallback(conversation, message);
+
           const key = `${message.id || 'message'}-${message.timestamp()}`;
 
           return (
