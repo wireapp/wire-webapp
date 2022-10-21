@@ -33,7 +33,7 @@ const CollectionSection: React.FC<{
   if (messages.length === 0) {
     return null;
   }
-  const hasExtra = true || messages.length > limit;
+  const hasExtra = messages.length > limit;
   const topMessages = messages.slice(0, limit);
 
   return (
