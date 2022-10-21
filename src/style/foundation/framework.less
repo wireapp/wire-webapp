@@ -65,8 +65,10 @@
       width: 100%;
       transition: width @animation-timing-fast @ease-out-quart;
 
-      &.is-right-panel-open {
-        width: calc(100% - @right-width);
+      @media (min-width: 1000px) {
+        &.is-right-panel-open {
+          width: calc(100% - @right-width);
+        }
       }
     }
   }
