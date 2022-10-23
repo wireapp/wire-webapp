@@ -6,7 +6,7 @@
     "@wireapp/core": "34.1.1",
     "@wireapp/react-ui-kit": "8.17.5",
     "@wireapp/store-engine-dexie": "1.7.11",
-    "@wireapp/store-engine-sqleet": "1.8.6",
+    "@wireapp/store-engine-sqleet": "1.8.9",
     "@wireapp/webapp-events": "0.14.9",
     "amplify": "https://github.com/wireapp/amplify#head=master",
     "classnames": "2.3.2",
