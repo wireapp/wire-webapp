@@ -3,7 +3,7 @@
     "@types/color": "3.0.3",
     "color": "4.2.3",
     "emotion-normalize": "11.0.1",
-    "react-select": "5.5.2",
+    "react-select": "5.5.4",
     "react-transition-group": "4.4.5"
   },
   "devDependencies": {
