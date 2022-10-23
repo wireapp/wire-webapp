@@ -4749,16 +4749,16 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@wireapp/store-engine-sqleet@npm:1.8.6":
-  version: 1.8.6
-  resolution: "@wireapp/store-engine-sqleet@npm:1.8.6"
+"@wireapp/store-engine-sqleet@npm:1.8.9":
+  version: 1.8.9
+  resolution: "@wireapp/store-engine-sqleet@npm:1.8.9"
   dependencies:
     "@wireapp/websql": 0.0.17
-    bazinga64: 5.11.6
+    bazinga64: 5.11.9
     uint32: 0.2.1
   peerDependencies:
     "@wireapp/store-engine": 4.x.x
-  checksum: 8de226b2abeff0e11864f2ca490cae53f9df3eaa3abb69253a12c1da97f6899ed9cfc599ca5cb55b05d5fdf1769785cbd6494fd49b183c0b7b56bcd036504b1d
+  checksum: 91d7019e0431b089b608debb790b25a6675596640829590db4295a53f1ea456b549807d612bc06b360088e00d47805090ddd1bee604a18413801131ba3bccb69
   languageName: node
   linkType: hard
 
@@ -5699,6 +5699,13 @@ __metadata:
   version: 5.11.6
   resolution: "bazinga64@npm:5.11.6"
   checksum: e11a0333784cbd5bcf26c16aabe740325b231efef184865218fe6e701873c58fa6f877c48b9217e8781deac751b68dbaea1d9585e80d4c77bdd3c2ba161fef6f
+  languageName: node
+  linkType: hard
+
+"bazinga64@npm:5.11.9":
+  version: 5.11.9
+  resolution: "bazinga64@npm:5.11.9"
+  checksum: 786edefc18b649c02de46677b96b4de7159cee1042ef03ee9b35c0a638f29fbaba7a0bccb12ce353f15b5c8df8ffb1e944b70d561595dce1b9e7697d9119467c
   languageName: node
   linkType: hard
 
@@ -17872,7 +17879,7 @@ __metadata:
     "@wireapp/prettier-config": 0.4.7
     "@wireapp/react-ui-kit": 8.17.0
     "@wireapp/store-engine-dexie": 1.7.11
-    "@wireapp/store-engine-sqleet": 1.8.6
+    "@wireapp/store-engine-sqleet": 1.8.9
     "@wireapp/webapp-events": 0.14.9
     adm-zip: 0.5.9
     amplify: "https://github.com/wireapp/amplify#head=master"
