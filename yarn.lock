@@ -4695,9 +4695,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@wireapp/eslint-config@npm:1.12.11":
-  version: 1.12.11
-  resolution: "@wireapp/eslint-config@npm:1.12.11"
+"@wireapp/eslint-config@npm:1.12.12":
+  version: 1.12.12
+  resolution: "@wireapp/eslint-config@npm:1.12.12"
   peerDependencies:
     "@babel/eslint-parser": ">=7"
     "@typescript-eslint/eslint-plugin": ">=3"
@@ -4712,7 +4712,7 @@ __metadata:
     eslint-plugin-react-hooks: ">=2"
     eslint-plugin-unused-imports: ">=1.1"
     prettier: ">=2"
-  checksum: c73a7e6580c7017ff1e9b7ebd10e7e7ddd3e04a4cbad69b97d7e1151d15e5545253e474781a0384f3319d0c97481bf26e398fd04506ae4b126b31cd8ce25365a
+  checksum: f82875e77336c66bc3a70834c0ced76f7d066939cb79fc747c0fdcb5d352e93a5c7b45e6e533b9e13aaa0c44654e88f1f76262cd5321994bb3d559ea3499e3ca
   languageName: node
   linkType: hard
 
@@ -5740,13 +5740,6 @@ __metadata:
   version: 5.11.10
   resolution: "bazinga64@npm:5.11.10"
   checksum: c4a7b822223382e536df7589fec26ceaa9d1884bc70101c0cb0e8d89b515a7bd2ea59afc16510c75d985b4f92561af961ee7612037fd987b1752de2e59ffcb33
-  languageName: node
-  linkType: hard
-
-"bazinga64@npm:5.11.6":
-  version: 5.11.6
-  resolution: "bazinga64@npm:5.11.6"
-  checksum: e11a0333784cbd5bcf26c16aabe740325b231efef184865218fe6e701873c58fa6f877c48b9217e8781deac751b68dbaea1d9585e80d4c77bdd3c2ba161fef6f
   languageName: node
   linkType: hard
 
@@ -18079,7 +18072,7 @@ __metadata:
     "@wireapp/avs": 8.2.16
     "@wireapp/copy-config": 1.3.10
     "@wireapp/core": 34.1.1
-    "@wireapp/eslint-config": 1.12.11
+    "@wireapp/eslint-config": 1.12.12
     "@wireapp/prettier-config": 0.4.7
     "@wireapp/react-ui-kit": 8.17.5
     "@wireapp/store-engine-dexie": 1.7.11
