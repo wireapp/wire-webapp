@@ -2534,9 +2534,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@formatjs/cli@npm:5.1.2":
-  version: 5.1.2
-  resolution: "@formatjs/cli@npm:5.1.2"
+"@formatjs/cli@npm:5.1.3":
+  version: 5.1.3
+  resolution: "@formatjs/cli@npm:5.1.3"
   peerDependencies:
     "@vue/compiler-sfc": ^3.2.34
   peerDependenciesMeta:
@@ -2544,7 +2544,7 @@ __metadata:
       optional: true
   bin:
     formatjs: bin/formatjs
-  checksum: d0efc3197619be3efb9fdc9b8210bac03aa9f0587a726685e35d6c7afa61504e8a277bc6bddf2430d4d5e949556f2fb6dd3f47d3a4ea12658419bc24829c6d27
+  checksum: 28c38cfd4890712d5e80531bdd8ebcba80dde62da35f59fe6c24f7bb8209f94b0a26ca8c81e08e735d9f22db6a6bb2d7b279a838d6960698e5458094454dd0ce
   languageName: node
   linkType: hard
 
@@ -5740,13 +5740,6 @@ __metadata:
   version: 5.11.10
   resolution: "bazinga64@npm:5.11.10"
   checksum: c4a7b822223382e536df7589fec26ceaa9d1884bc70101c0cb0e8d89b515a7bd2ea59afc16510c75d985b4f92561af961ee7612037fd987b1752de2e59ffcb33
-  languageName: node
-  linkType: hard
-
-"bazinga64@npm:5.11.6":
-  version: 5.11.6
-  resolution: "bazinga64@npm:5.11.6"
-  checksum: e11a0333784cbd5bcf26c16aabe740325b231efef184865218fe6e701873c58fa6f877c48b9217e8781deac751b68dbaea1d9585e80d4c77bdd3c2ba161fef6f
   languageName: node
   linkType: hard
 
@@ -18031,7 +18024,7 @@ __metadata:
     "@babel/preset-typescript": 7.18.6
     "@emotion/react": 11.10.4
     "@faker-js/faker": 7.6.0
-    "@formatjs/cli": 5.1.2
+    "@formatjs/cli": 5.1.3
     "@koush/wrtc": 0.5.3
     "@testing-library/react": 13.4.0
     "@types/adm-zip": 0.5.0
