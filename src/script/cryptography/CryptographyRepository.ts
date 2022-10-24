@@ -18,16 +18,11 @@
  */
 
 import type {QualifiedId} from '@wireapp/api-client/src/user/';
-import {CryptoboxSession} from '@wireapp/cryptobox';
 import type {PreKey as BackendPreKey} from '@wireapp/api-client/src/auth/';
-import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 
 import {getLogger, Logger} from 'Util/Logger';
-import {base64ToArray} from 'Util/util';
 
 import {CryptographyMapper} from './CryptographyMapper';
-import {UserError} from '../error/UserError';
-import type {CryptographyService} from './CryptographyService';
 import {container} from 'tsyringe';
 import {Core} from '../service/CoreSingleton';
 
@@ -46,19 +41,16 @@ export class CryptographyRepository {
   cryptographyMapper: CryptographyMapper;
   logger: Logger;
 
-  constructor(
-    private readonly cryptographyService: CryptographyService,
-    private readonly core = container.resolve(Core),
-  ) {
+  constructor(private readonly core = container.resolve(Core)) {
     this.logger = getLogger('CryptographyRepository');
     this.cryptographyMapper = new CryptographyMapper();
   }
 
-  get cryptobox() {
+  get cryptographyService() {
     if (!this.core.service) {
       throw new Error('Core is not initiated');
     }
-    return this.core.service!.cryptography.cryptobox;
+    return this.core.service!.cryptography;
   }
 
   /**
@@ -66,7 +58,7 @@ export class CryptographyRepository {
    * @returns Fingerprint of local identity public key
    */
   getLocalFingerprint(): string {
-    return this.cryptobox.getIdentity().public_key.fingerprint();
+    return this.cryptographyService.getLocalFingerprint();
   }
 
   /**
@@ -76,78 +68,13 @@ export class CryptographyRepository {
    * @param preKey PreKey to initialize a session from
    * @returns Resolves with the remote fingerprint
    */
-  async getRemoteFingerprint(
-    userId: QualifiedId,
-    clientId: string,
-    preKey?: BackendPreKey,
-  ): Promise<string | undefined> {
-    const cryptoboxSession = preKey
-      ? await this.createSessionFromPreKey(preKey, userId, clientId)
-      : await this.loadSession(userId, clientId);
-    return cryptoboxSession ? cryptoboxSession.fingerprint_remote() : undefined;
-  }
-
-  /**
-   * Get a pre-key for the given client of the user.
-   *
-   * @param userId User ID
-   * @param clientId Client ID
-   * @returns Resolves with a map of pre-keys for the requested clients
-   */
-  private getUserPreKeyByIds(userId: QualifiedId, clientId: string): Promise<BackendPreKey> {
-    return this.cryptographyService
-      .getUserPreKeyByIds(userId, clientId)
-      .then(response => response.prekey)
-      .catch(error => {
-        const isNotFound = error.code === HTTP_STATUS.NOT_FOUND;
-        if (isNotFound) {
-          throw new UserError(UserError.TYPE.PRE_KEY_NOT_FOUND, UserError.MESSAGE.PRE_KEY_NOT_FOUND);
-        }
-
-        this.logger.error(`Failed to get pre-key from backend: ${error.message}`);
-        throw new UserError(UserError.TYPE.REQUEST_FAILURE, UserError.MESSAGE.REQUEST_FAILURE);
-      });
-  }
-
-  private loadSession(userId: QualifiedId, clientId: string): Promise<CryptoboxSession | void> {
-    const sessionId = this.core.service!.cryptography.constructSessionId(userId, clientId);
-
-    return this.cryptobox.session_load(sessionId).catch(() => {
-      return this.getUserPreKeyByIds(userId, clientId).then(preKey => {
-        return this.createSessionFromPreKey(preKey, userId, clientId);
-      });
-    });
+  async getRemoteFingerprint(userId: QualifiedId, clientId: string, prekey?: BackendPreKey) {
+    return this.cryptographyService.getRemoteFingerprint(userId, clientId, prekey);
   }
 
   async deleteSession(userId: QualifiedId, clientId: string): Promise<string> {
-    const sessionId = this.core.service!.cryptography.constructSessionId(userId, clientId);
-    await this.core.service!.cryptography.resetSession(sessionId);
+    const sessionId = this.cryptographyService.constructSessionId(userId, clientId);
+    await this.cryptographyService.resetSession(sessionId);
     return sessionId;
-  }
-
-  private async createSessionFromPreKey(
-    preKey: BackendPreKey,
-    {id: userId, domain}: QualifiedId,
-    clientId: string,
-  ): Promise<CryptoboxSession | void> {
-    try {
-      const domainText = domain ? ` on domain \'${domain}\'` : ' without domain';
-      if (!preKey) {
-        this.logger.warn(
-          `No pre-key for user '${userId}' ('${clientId}'${domainText}) found. The client might have been deleted.`,
-        );
-      } else {
-        this.logger.log(
-          `Initializing session with user '${userId}' (${clientId}${domainText}) with pre-key ID '${preKey.id}'.`,
-        );
-        const sessionId = this.core.service!.cryptography.constructSessionId({domain, id: userId}, clientId);
-        const preKeyArray = base64ToArray(preKey.key);
-        return await this.cryptobox.session_from_prekey(sessionId, preKeyArray.buffer);
-      }
-    } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : error;
-      const message = `Pre-key for user '${userId}' ('${clientId}') invalid. Skipping encryption: ${errorMessage}`;
-      this.logger.warn(message, error);
-    }
   }
 }
