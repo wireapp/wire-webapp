@@ -109,10 +109,6 @@ describe('Collection', () => {
   });
 
   it('displays collection details when a section is selected', async () => {
-    const IMAGE_COLLECTION_LENGTH = 13;
-    const imageMessages = new Array(IMAGE_COLLECTION_LENGTH).fill(null).map(createImageMessage);
-    mockConversationRepository.getEventsForCategory.mockResolvedValueOnce(imageMessages);
-
     const {getAllByText, getByText} = render(
       <Collection
         conversation={conversation}

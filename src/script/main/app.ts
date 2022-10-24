@@ -39,7 +39,7 @@ import {loadValue} from 'Util/StorageUtil';
 import {includesString} from 'Util/StringUtil';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 import {appendParameter} from 'Util/UrlUtil';
-import {arrayToBase64, checkIndexedDb, createRandomUuid} from 'Util/util';
+import {arrayToBase64, checkIndexedDb, createRandomUuid, supportsMLS} from 'Util/util';
 import {exposeWrapperGlobals} from 'Util/wrapper';
 
 import {migrateToQualifiedSessionIds} from './sessionIdMigrator';

@@ -23,7 +23,6 @@
 
 // Polyfill for "tsyringe" dependency injection
 import {ClientClassification, ClientType} from '@wireapp/api-client/src/client/';
-import {Cryptobox} from '@wireapp/cryptobox';
 import 'core-js/full/reflect';
 import ko from 'knockout';
 import {container} from 'tsyringe';
