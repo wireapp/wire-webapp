@@ -361,7 +361,7 @@ export class CryptographyMapper {
   _mapAssetMetaData(original: Asset.IOriginal): MappedAssetMetaData | undefined {
     const audioData = original.audio;
     if (audioData) {
-      const loudnessArray = audioData.normalizedLoudness ? audioData.normalizedLoudness.buffer : new ArrayBuffer(0);
+      const loudnessArray = audioData.normalizedLoudness || new ArrayBuffer(0);
       const durationInSeconds = audioData.durationInMillis
         ? Number(audioData.durationInMillis) / TIME_IN_MILLIS.SECOND
         : 0;
