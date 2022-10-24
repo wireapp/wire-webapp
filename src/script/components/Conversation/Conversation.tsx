@@ -31,12 +31,14 @@ import cx from 'classnames';
 import {container} from 'tsyringe';
 import {groupBy} from 'underscore';
 
+import {ConversationCallingCell} from 'Components/calling/ConversationCallingCell';
 import {Giphy} from 'Components/Giphy';
 import {InputBar} from 'Components/InputBar';
 import {MessagesList} from 'Components/MessagesList';
 import {showDetailViewModal} from 'Components/Modals/DetailViewModal';
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {TitleBar} from 'Components/TitleBar';
+import {CallState} from 'src/script/calling/CallState';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 import {getLogger} from 'Util/Logger';
@@ -89,9 +91,11 @@ const ConversationList: FC<ConversationListProps> = ({
   const [readMessagesBuffer, setReadMessagesBuffer] = useState<ReadMessageBuffer[]>([]);
 
   const conversationState = container.resolve(ConversationState);
+  const callState = container.resolve(CallState);
   const {activeConversation} = useKoSubscribableChildren(conversationState, ['activeConversation']);
   const {is1to1, isRequest} = useKoSubscribableChildren(activeConversation!, ['is1to1', 'isRequest']);
   const {self: selfUser} = useKoSubscribableChildren(userState, ['self']);
+  const {activeCalls} = useKoSubscribableChildren(callState, ['activeCalls']);
 
   useEffect(() => {
     if (readMessagesBuffer.length) {
@@ -373,6 +377,25 @@ const ConversationList: FC<ConversationListProps> = ({
             openRightSidebar={openRightSidebar}
             isRightSidebarOpen={isRightSidebarOpen}
           />
+
+          {activeCalls.map(call => {
+            const conversation = conversationState.findConversation(call.conversationId);
+            const callingViewModel = mainViewModel.calling;
+            const callingRepository = callingViewModel.callingRepository;
+            return (
+              conversation && (
+                <div className="calling-cell" key={conversation.id}>
+                  <ConversationCallingCell
+                    classifiedDomains={undefined}
+                    call={call}
+                    callActions={callingViewModel.callActions}
+                    callingRepository={callingRepository}
+                    conversation={conversation}
+                  />
+                </div>
+              )
+            );
+          })}
 
           <MessagesList
             conversation={activeConversation}
