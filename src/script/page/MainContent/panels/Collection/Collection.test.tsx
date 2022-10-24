@@ -31,7 +31,6 @@ import {createRandomUuid} from 'Util/util';
 import {Collection} from './Collection';
 
 import {AssetRepository} from '../../../../assets/AssetRepository';
-import {ConversationRepository} from '../../../../conversation/ConversationRepository';
 import {MessageRepository} from '../../../../conversation/MessageRepository';
 import {Text} from '../../../../entity/message/Text';
 
@@ -85,17 +84,17 @@ describe('Collection', () => {
   const mockConversationRepository = {
     getEventsForCategory: jest.fn().mockResolvedValue(messages),
     searchInConversation: jest.fn().mockResolvedValue({messageEntities: [createLinkMessage()], query: 'term'}),
-  } as Partial<ConversationRepository>;
+  };
   const mockAssetRepository = container.resolve(AssetRepository);
   const mockMessageRepository = {} as MessageRepository;
 
   it('displays all image assets', async () => {
     const {getAllByText, getByText, queryByText} = render(
       <Collection
-        conversation={conversation}
-        conversationRepository={mockConversationRepository as ConversationRepository}
-        messageRepository={mockMessageRepository}
         assetRepository={mockAssetRepository}
+        conversation={conversation}
+        conversationRepository={mockConversationRepository as any}
+        messageRepository={mockMessageRepository}
       />,
     );
 
@@ -109,12 +108,16 @@ describe('Collection', () => {
   });
 
   it('displays collection details when a section is selected', async () => {
+    const IMAGE_COLLECTION_LENGTH = 13;
+    const imageMessages = new Array(IMAGE_COLLECTION_LENGTH).fill(null).map(createImageMessage);
+    mockConversationRepository.getEventsForCategory.mockResolvedValueOnce(imageMessages);
+
     const {getAllByText, getByText} = render(
       <Collection
-        conversation={conversation}
-        conversationRepository={mockConversationRepository as ConversationRepository}
-        messageRepository={mockMessageRepository}
         assetRepository={mockAssetRepository}
+        messageRepository={mockMessageRepository}
+        conversation={conversation}
+        conversationRepository={mockConversationRepository as any}
       />,
     );
 
@@ -129,10 +132,10 @@ describe('Collection', () => {
     jest.useFakeTimers();
     const {getAllByText, queryByText, getByTestId} = render(
       <Collection
-        conversation={conversation}
-        conversationRepository={mockConversationRepository as ConversationRepository}
-        messageRepository={mockMessageRepository}
         assetRepository={mockAssetRepository}
+        messageRepository={mockMessageRepository}
+        conversation={conversation}
+        conversationRepository={mockConversationRepository as any}
       />,
     );
 
