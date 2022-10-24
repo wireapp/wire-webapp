@@ -96,6 +96,52 @@ describe('UrlUtil', () => {
     });
   });
 
+  describe('getURLParameterFromHash', () => {
+    it('returns empty string if parameter does not exist', () => {
+      const expected = '';
+      const actual = UrlUtil.getURLParameterFromHash('q');
+      expect(actual).toEqual(expected);
+    });
+
+    it('returns parameter value if parameter exist', () => {
+      const expected = '1';
+      const actual = UrlUtil.getURLParameterFromHash('q', '#q=1');
+      expect(actual).toEqual(expected);
+    });
+  });
+
+  describe('getURLParameterFromAny', () => {
+    it('returns empty string if parameter does not exist', () => {
+      const expected = '';
+      const actual = UrlUtil.getURLParameterFromAny('q');
+      expect(actual).toEqual(expected);
+    });
+
+    it('returns parameter value if parameter exist', () => {
+      const expected = '1';
+      const actual = UrlUtil.getURLParameterFromAny('q', '#q=1');
+      expect(actual).toEqual(expected);
+    });
+
+    it('returns parameter value if parameter exist in both possible sources', () => {
+      const expected = '1';
+      const actual = UrlUtil.getURLParameterFromAny('q', '#q=1&test=44', '?q=3');
+      expect(actual).toEqual(expected);
+    });
+
+    it('returns parameter value if parameter exist in both possible sources', () => {
+      const expected = '';
+      const actual = UrlUtil.getURLParameterFromAny('q', '#q=', '?q=3');
+      expect(actual).toEqual(expected);
+    });
+
+    it('returns parameter value if parameter exist only as query parameter', () => {
+      const expected = '3';
+      const actual = UrlUtil.getURLParameterFromAny('q', '', '?q=3');
+      expect(actual).toEqual(expected);
+    });
+  });
+
   describe('hasURLParameter', () => {
     it('returns false if parameter does not exist', () => {
       const expected = false;

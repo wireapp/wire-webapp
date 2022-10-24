@@ -47,9 +47,55 @@ export function paramsToRecord(params: string): Record<string, any> {
   });
   return records;
 }
-
+/**
+ * Looks for a given parameter by name in the query part of the URL of the current window's location.
+ * @param parameterName the name of the parameter to search for
+ * @param search the source to look at for the parameter, defaults to window.location.search
+ * @returns the first found parameter or an empty string
+ */
 export function getURLParameter(parameterName: string, search = window.location.search): string {
   return new URLSearchParams(search).get(parameterName) || '';
+}
+
+/**
+ * Looks for a given parameter by name in the hash part of the URL of the current window's location.
+ * @param parameterName the name of the parameter to search for
+ * @param hash the source to look for at the parameter, defaults to window.location.hash
+ * @returns the first found parameter or an empty string
+ */
+export function getURLParameterFromHash(parameterName: string, hash = window.location.hash): string {
+  // window.location.hash always starts with #
+  if (hash.length <= 1 || hash[0] !== '#') {
+    return '';
+  }
+  return new URLSearchParams(hash.substring(1)).get(parameterName) || '';
+}
+
+/**
+ * Looks for a given parameter by name in the hash and query part of the URL of the current window's location.
+ * Findings in the hash part are preferend ver the query part.
+ * Empty values are considered a valid value.
+ * @param parameterName the name of the parameter to search for
+ * @param hash the "hash" source to look for at the parameter, defaults to window.location.hash
+ * @param search the "search" source to look at for the parameter, defaults to window.location.search
+ * @returns the first found parameter or an empty string
+ */
+export function getURLParameterFromAny(
+  parameterName: string,
+  hash = window.location.hash,
+  search = window.location.search,
+): string {
+  // getURLParameterFromHash cannot be used here, as it will always return an empty string, even if the value is not set.
+  // a decision whether the value was set or not is then no longer possible.
+
+  // window.location.hash always starts with #
+  if (hash.length > 1 && hash[0] === '#') {
+    const result = new URLSearchParams(hash.substring(1)).get(parameterName);
+    if (result !== null) {
+      return result;
+    }
+  }
+  return getURLParameter(parameterName, search);
 }
 
 export function hasURLParameter(parameterName: string, search = window.location.search): boolean {
