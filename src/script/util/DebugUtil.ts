@@ -115,7 +115,7 @@ export class DebugUtil {
   async breakSession(userId: string | QualifiedId, clientId: string): Promise<void> {
     const qualifiedId = isQualifiedId(userId) ? userId : {domain: '', id: userId};
     const sessionId = this.core.service!.cryptography.constructSessionId(qualifiedId, clientId);
-    const cryptobox = this.cryptographyRepository.cryptobox;
+    const cryptobox = this.cryptographyRepository.cryptographyService.cryptobox;
     const cryptoboxSession = await cryptobox.session_load(sessionId);
     cryptoboxSession.session.session_states = {};
 
@@ -249,7 +249,7 @@ export class DebugUtil {
     const clientId = this.clientState.currentClient().id;
     const userId = this.userState.self().id;
     const fileName = `cryptobox-${userId}-${clientId}.json`;
-    const cryptobox = await this.cryptographyRepository.cryptobox.serialize();
+    const cryptobox = await this.cryptographyRepository.cryptographyService.cryptobox.serialize();
     downloadText(JSON.stringify(cryptobox), fileName);
   }
 

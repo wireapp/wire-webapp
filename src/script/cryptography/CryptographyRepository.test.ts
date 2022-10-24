@@ -20,7 +20,6 @@
 import {TestFactory} from '../../../test/helper/TestFactory';
 import {Cryptobox} from '@wireapp/cryptobox';
 import {CryptographyRepository} from './CryptographyRepository';
-import {CryptographyService} from './CryptographyService';
 import {container} from 'tsyringe';
 import {Core} from '../service/CoreSingleton';
 
@@ -37,8 +36,7 @@ describe('CryptographyRepository', () => {
     core.service = {
       cryptography: {constructSessionId: jest.fn(() => 'user-id@device-id'), cryptobox},
     } as any;
-    const cryptographyService = new CryptographyService();
-    cryptographyRepository = new CryptographyRepository(cryptographyService, core);
+    cryptographyRepository = new CryptographyRepository(core);
   });
 
   describe('getRemoteFingerprint', () => {

@@ -44,7 +44,6 @@ import {NotificationService} from 'src/script/event/NotificationService';
 import {ConnectionService} from 'src/script/connection/ConnectionService';
 import {ConnectionRepository} from 'src/script/connection/ConnectionRepository';
 import {CryptographyRepository} from 'src/script/cryptography/CryptographyRepository';
-import {CryptographyService} from 'src/script/cryptography/CryptographyService';
 import {TeamRepository} from 'src/script/team/TeamRepository';
 import {SearchRepository} from 'src/script/search/SearchRepository';
 import {ConversationService} from 'src/script/conversation/ConversationService';
@@ -117,9 +116,7 @@ export class TestFactory {
     await this.exposeStorageActors();
     const currentClient = new ClientEntity(true, null);
     currentClient.id = entities.clients.john_doe.permanent.id;
-    this.cryptography_service = new CryptographyService();
-
-    this.cryptography_repository = new CryptographyRepository(this.cryptography_service);
+    this.cryptography_repository = new CryptographyRepository();
 
     return this.cryptography_repository;
   }
