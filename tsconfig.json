@@ -4,6 +4,6 @@
     "outDir": "src",
     "rootDir": "src"
   },
-  "exclude": ["jest.config.ts", "node_modules", "demo.ts"],
+  "exclude": ["jest.config.js", "node_modules", "demo.ts"],
   "extends": "../../tsconfig.json"
 }
