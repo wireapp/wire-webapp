@@ -21,7 +21,7 @@ import {ClientType} from '@wireapp/api-client/src/client/';
 import {Account} from '@wireapp/core';
 import {container, singleton} from 'tsyringe';
 
-import {isTemporaryClientAndNonPersistent, isTemporaryClientAndNonPersistent, supportsMLS} from 'Util/util';
+import {isTemporaryClientAndNonPersistent, supportsMLS} from 'Util/util';
 
 import {APIClient} from './APIClientSingleton';
 import {createStorageEngine, DatabaseTypes} from './StoreEngineProvider';

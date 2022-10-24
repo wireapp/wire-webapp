@@ -22,6 +22,7 @@ import {CONV_TYPE, CALL_TYPE, STATE as CALL_STATE, REASON, Wcall} from '@wireapp
 import {amplify} from 'amplify';
 import ko, {Subscription} from 'knockout';
 
+import {usePrimaryModalState} from 'Components/Modals/PrimaryModal';
 import {Call} from 'src/script/calling/Call';
 import {CallingRepository} from 'src/script/calling/CallingRepository';
 import {CallState} from 'src/script/calling/CallState';
@@ -37,7 +38,6 @@ import {createRandomUuid} from 'Util/util';
 import {CALL_MESSAGE_TYPE} from './enum/CallMessageType';
 import {LEAVE_CALL_REASON} from './enum/LeaveCallReason';
 
-import {usePrimaryModalState} from '../components/Modals/PrimaryModal';
 import {CALL} from '../event/Client';
 import {MediaDevicesHandler} from '../media/MediaDevicesHandler';
 import {UserRepository} from '../user/UserRepository';
