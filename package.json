@@ -106,10 +106,8 @@
     "cssnano": "4.1.11",
     "dexie": "^3.2.2",
     "dotenv": "16.0.3",
-    "dpdm": "3.10.0",
     "eslint": "8.26.0",
     "eslint-config-prettier": "8.5.0",
-    "eslint-import-resolver-alias": "1.1.2",
     "eslint-plugin-babel": "5.3.1",
     "eslint-plugin-import": "2.26.0",
     "eslint-plugin-jest": "27.1.3",
@@ -120,7 +118,6 @@
     "eslint-plugin-react": "7.31.10",
     "eslint-plugin-react-hooks": "4.6.0",
     "eslint-plugin-sort-keys-fix": "1.1.2",
-    "eslint-plugin-testing-library": "5.7.2",
     "eslint-plugin-typescript-sort-keys": "2.1.0",
     "eslint-plugin-unused-imports": "2.0.0",
     "fake-indexeddb": "4.0.0",
@@ -182,12 +179,15 @@
   },
   "license": "GPL-3.0",
   "lint-staged": {
-    "*": "prettier --ignore-unknown --write",
     "*.less": [
+      "prettier --write",
       "stylelint --fix"
     ],
-    "*.{js,jsx,ts,tsx}": [
+    "*.{js,ts,tsx}": [
       "eslint --fix"
+    ],
+    "*.{json,md,yml}": [
+      "prettier --write"
     ]
   },
   "name": "wire-webapp",
@@ -221,10 +221,7 @@
     "lint:other": "yarn prettier --list-different && yarn stylelint",
     "lint:code": "eslint -c .eslintrc.json --ext .js,.ts,.tsx .",
     "lint:spelling": "cspell -c .cspell.json 'src/script/**/*.{js,ts,tsx,md}' src/i18n/en-US.json",
-    "check:circular-dependencies": "yarn check:circular-dependencies:app && yarn check:circular-dependencies:auth",
-    "check:circular-dependencies:app": "dpdm -T ./src/script/main/app.ts",
-    "check:circular-dependencies:auth": "dpdm -T ./src/script/auth/main.tsx",
-    "postinstall": "yarn configure && cd server && yarn && cd .. && husky install",
+    "postinstall": "yarn configure && cd server && yarn  && cd .. && husky install",
     "prettier": "prettier --ignore-path .prettierignore \"**/*.{json,md,yml}\"",
     "release:staging": "git checkout dev && git pull && ts-node ./bin/release_tag.ts staging",
     "release:production": "git checkout master && git pull && ts-node ./bin/release_tag.ts production",
