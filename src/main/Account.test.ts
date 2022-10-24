@@ -151,6 +151,10 @@ describe('Account', () => {
       } as Self);
   });
 
+  afterEach(() => {
+    nock.cleanAll();
+  });
+
   describe('"createText"', () => {
     it('creates a text payload', async () => {
       const {account} = await createAccount();
@@ -218,7 +222,7 @@ describe('Account', () => {
           password: 'wrong',
         });
 
-        fail('Should not be logged in');
+        throw new Error('Should not be logged in');
       } catch (error) {
         const backendError = error as BackendError;
         expect(backendError.code).toBe(HTTP_STATUS.FORBIDDEN);
@@ -428,8 +432,7 @@ describe('Account', () => {
                   break;
                 case ConnectionState.LIVE:
                   reject(new Error());
-                  fail('should not go to `live` state');
-                  break;
+                  throw new Error('should not go to `live` state');
                 case ConnectionState.CLOSED:
                   expect(onNotificationStreamProgress).toHaveBeenCalledTimes(2);
                   expect(onEvent).toHaveBeenCalledTimes(2);
@@ -469,7 +472,7 @@ describe('Account', () => {
                   expect(onEvent).toHaveBeenCalledTimes(2);
                   expect(onEvent).toHaveBeenCalledWith(expect.any(Object), PayloadBundleSource.NOTIFICATION_STREAM);
                 } catch (error) {
-                  fail(error);
+                  throw error;
                 }
                 resolve();
               },

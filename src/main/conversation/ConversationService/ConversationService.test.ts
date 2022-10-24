@@ -22,7 +22,7 @@ import {ClientClassification, ClientType} from '@wireapp/api-client/src/client';
 import {ConversationProtocol} from '@wireapp/api-client/src/conversation';
 import {GenericMessage} from '@wireapp/protocol-messaging';
 import {MemoryEngine} from '@wireapp/store-engine';
-import {ConversationService, PayloadBundleState} from '../';
+import {ConversationService, PayloadBundleState} from '..';
 
 import {CryptographyService} from '../../cryptography';
 import * as PayloadHelper from '../../test/PayloadHelper';
@@ -143,10 +143,10 @@ describe('ConversationService', () => {
           });
 
           expect(conversationService['messageService'].sendMessage).toHaveBeenCalledWith(
-            jasmine.any(String),
-            jasmine.any(Object),
-            jasmine.any(Uint8Array),
-            jasmine.objectContaining({reportMissing: ['user1', 'user2']}),
+            expect.any(String),
+            expect.any(Object),
+            expect.any(Uint8Array),
+            expect.objectContaining({reportMissing: ['user1', 'user2']}),
           );
         });
       });
@@ -176,10 +176,10 @@ describe('ConversationService', () => {
           });
 
           expect(conversationService['messageService'].sendFederatedMessage).toHaveBeenCalledWith(
-            jasmine.any(String),
-            jasmine.any(Object),
-            jasmine.any(Uint8Array),
-            jasmine.objectContaining({
+            expect.any(String),
+            expect.any(Object),
+            expect.any(Uint8Array),
+            expect.objectContaining({
               reportMissing: [
                 {id: 'user1', domain: 'domain1'},
                 {id: 'user2', domain: 'domain1'},
@@ -206,10 +206,10 @@ describe('ConversationService', () => {
           });
 
           expect(conversationService['messageService'].sendMessage).toHaveBeenCalledWith(
-            jasmine.any(String),
-            jasmine.any(Object),
-            jasmine.any(Uint8Array),
-            jasmine.objectContaining({reportMissing: false}),
+            expect.any(String),
+            expect.any(Object),
+            expect.any(Uint8Array),
+            expect.objectContaining({reportMissing: false}),
           );
         });
       });
@@ -239,10 +239,10 @@ describe('ConversationService', () => {
           });
 
           expect(conversationService['messageService'].sendFederatedMessage).toHaveBeenCalledWith(
-            jasmine.any(String),
-            jasmine.any(Object),
-            jasmine.any(Uint8Array),
-            jasmine.objectContaining({
+            expect.any(String),
+            expect.any(Object),
+            expect.any(Uint8Array),
+            expect.objectContaining({
               reportMissing: false,
             }),
           );
@@ -322,7 +322,7 @@ describe('ConversationService', () => {
       jest
         .spyOn(conversationService['messageService'], 'sendMessage')
         .mockImplementation((_client, _recipients, _text, options) => {
-          options?.onClientMismatch?.({missing: members, deleted: {}, redundant: {}, time: ''});
+          void options?.onClientMismatch?.({missing: members, deleted: {}, redundant: {}, time: ''});
           return {} as any;
         });
       const fetchedMembers = await conversationService.getAllParticipantsClients({id: 'convid', domain: ''});
@@ -339,7 +339,13 @@ describe('ConversationService', () => {
       jest
         .spyOn(conversationService['messageService'], 'sendFederatedMessage')
         .mockImplementation((_client, _recipients, _text, options) => {
-          options?.onClientMismatch?.({missing: members, deleted: {}, redundant: {}, failed_to_send: {}, time: ''});
+          void options?.onClientMismatch?.({
+            missing: members,
+            deleted: {},
+            redundant: {},
+            failed_to_send: {},
+            time: '',
+          });
           return {} as any;
         });
       const fetchedMembers = await conversationService.getAllParticipantsClients({id: 'convid', domain: 'domain1'});
