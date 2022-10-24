@@ -52,7 +52,7 @@ module.exports = {
       {
         exclude: /node_modules/,
         include: srcScript,
-        loader: 'babel-loader',
+        loader: 'swc-loader',
         test: /\.[tj]sx?$/,
       },
       {
