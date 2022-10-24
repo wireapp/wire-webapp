@@ -17,7 +17,7 @@
  *
  */
 
-import {FC, FormEvent, MouseEvent, useState} from 'react';
+import {FC, FormEvent, MouseEvent, useState, useRef, ChangeEvent} from 'react';
 
 import cx from 'classnames';
 
@@ -38,6 +38,7 @@ export const PrimaryModalComponent: FC = () => {
   const updateErrorMessage = usePrimaryModalState(state => state.updateErrorMessage);
   const updateCurrentModalContent = usePrimaryModalState(state => state.updateCurrentModalContent);
   const currentId = usePrimaryModalState(state => state.currentModalId);
+  const primaryActionButtonRef = useRef<HTMLButtonElement>(null);
   const isModalVisible = currentId !== null;
   const {
     checkboxLabel,
@@ -96,6 +97,13 @@ export const PrimaryModalComponent: FC = () => {
         return;
       }
       action();
+    }
+  };
+
+  const onOptionChange = (event: ChangeEvent<HTMLInputElement>) => {
+    updateOptionChecked(event.target.checked);
+    if (primaryActionButtonRef && primaryActionButtonRef.current) {
+      primaryActionButtonRef.current.focus();
     }
   };
 
@@ -165,7 +173,7 @@ export const PrimaryModalComponent: FC = () => {
                       id="clear-data-checkbox"
                       checked={optionChecked}
                       data-uie-name="modal-option-checkbox"
-                      onChange={event => updateOptionChecked(event.target.checked)}
+                      onChange={onOptionChange}
                     />
                     <label className="label-xs" htmlFor="clear-data-checkbox">
                       <span className="modal-option-text text-background">{checkboxLabel}</span>
@@ -191,6 +199,7 @@ export const PrimaryModalComponent: FC = () => {
                   ))}
                 {primaryAction?.text && (
                   <button
+                    ref={primaryActionButtonRef}
                     type="button"
                     onClick={doAction(confirm, !!closeOnConfirm)}
                     disabled={!actionEnabled}
