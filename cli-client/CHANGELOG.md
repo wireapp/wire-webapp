@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [11.2.35](https://github.com/wireapp/wire-web-packages/compare/@wireapp/cli-client@11.2.34...@wireapp/cli-client@11.2.35) (2022-10-24)
+
+### Bug Fixes
+
+* Revert axios to version 1.1.2 ([#4557](https://github.com/wireapp/wire-web-packages/issues/4557)) ([ac7f792](https://github.com/wireapp/wire-web-packages/commit/ac7f792869c1fbda1a75cbc33be45f0f353ac9c2))
+
 ## [11.2.34](https://github.com/wireapp/wire-web-packages/compare/@wireapp/cli-client@11.2.33...@wireapp/cli-client@11.2.34) (2022-10-21)
 
 **Note:** Version bump only for package @wireapp/cli-client
