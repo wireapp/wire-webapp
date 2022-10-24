@@ -32,7 +32,7 @@ import {MotionDuration} from '../../../../../motion/MotionDuration';
 
 interface DevicesPreferencesProps {
   device: ClientEntity;
-  getFingerprint: (device: ClientEntity) => Promise<string>;
+  getFingerprint: (device: ClientEntity) => Promise<string | undefined>;
   onClose: () => void;
   onRemove: (device: ClientEntity) => void;
   onResetSession: (device: ClientEntity) => Promise<void>;
@@ -55,7 +55,7 @@ const DeviceDetailsPreferences: React.FC<DevicesPreferencesProps> = ({
 }) => {
   const {isVerified} = useKoSubscribableChildren(device.meta, ['isVerified']);
   const [resetState, setResetState] = useState<SessionResetState>(SessionResetState.RESET);
-  const [fingerprint, setFingerprint] = useState('');
+  const [fingerprint, setFingerprint] = useState<string | undefined>();
   const brandName = Config.getConfig().BRAND_NAME;
 
   const resetSession = async () => {
@@ -67,7 +67,7 @@ const DeviceDetailsPreferences: React.FC<DevicesPreferencesProps> = ({
 
   useEffect(() => {
     getFingerprint(device).then(setFingerprint);
-  }, []);
+  }, [device, getFingerprint]);
 
   return (
     <div
@@ -87,7 +87,7 @@ const DeviceDetailsPreferences: React.FC<DevicesPreferencesProps> = ({
               aria-label={t('accessibility.preferencesDeviceDetails.goBack')}
             />
           </legend>
-          <DetailedDevice device={device} fingerprint={fingerprint} />
+          <DetailedDevice device={device} fingerprint={fingerprint || ''} />
 
           <div className="preferences-devices-verification slider">
             <input

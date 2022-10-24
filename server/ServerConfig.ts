@@ -27,6 +27,7 @@ export interface ServerConfig {
     BRAND_NAME: string;
     CHROME_ORIGIN_TRIAL_TOKEN: string;
     COUNTLY_API_KEY: string;
+    ENABLE_DEV_BACKEND_API: boolean;
     ENVIRONMENT: string;
     FEATURE: {
       ALLOWED_FILE_UPLOAD_EXTENSIONS: string[];

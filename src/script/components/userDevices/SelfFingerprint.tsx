@@ -44,7 +44,10 @@ const SelfFingerprint: React.FC<SelfFingerprintProps> = ({
   noPadding,
   clientState = container.resolve(ClientState),
 }) => {
-  const fingerprintLocal = useMemo<string>(() => cryptographyRepository.getLocalFingerprint(), []);
+  const fingerprintLocal = useMemo<string>(
+    () => cryptographyRepository.getLocalFingerprint(),
+    [cryptographyRepository],
+  );
   const {currentClient} = useKoSubscribableChildren(clientState, ['currentClient']);
 
   return (

@@ -36,7 +36,7 @@ const CollectionSection: React.FC<{
   if (messages.length === 0) {
     return null;
   }
-  const hasExtra = true || messages.length > limit;
+  const hasExtra = messages.length > limit;
   const topMessages = messages.slice(0, limit);
 
   return (
@@ -45,7 +45,7 @@ const CollectionSection: React.FC<{
         {children}
         <span className="label-bold-xs">{label}</span>
         {hasExtra && (
-          <button className="collection-header-all accent-text" onClick={() => onSelect()}>
+          <button className="collection-header-all accent-text" onClick={onSelect}>
             <span data-uie-name="collection-show-all">{t('collectionShowAll', messages.length)}</span>
             &nbsp;<span className="icon-forward font-size-xxs"></span>
           </button>

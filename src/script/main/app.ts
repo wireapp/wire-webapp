@@ -18,7 +18,7 @@
  */
 
 // Polyfill for "tsyringe" dependency injection
-import {ClientType} from '@wireapp/api-client/src/client/';
+import {ClientType, ClientClassification} from '@wireapp/api-client/src/client/';
 import {Runtime} from '@wireapp/commons';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import {amplify} from 'amplify';
@@ -39,7 +39,7 @@ import {loadValue} from 'Util/StorageUtil';
 import {includesString} from 'Util/StringUtil';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 import {appendParameter} from 'Util/UrlUtil';
-import {arrayToBase64, checkIndexedDb, createRandomUuid} from 'Util/util';
+import {arrayToBase64, checkIndexedDb, createRandomUuid, supportsMLS} from 'Util/util';
 import {exposeWrapperGlobals} from 'Util/wrapper';
 
 import {migrateToQualifiedSessionIds} from './sessionIdMigrator';
@@ -63,7 +63,6 @@ import {ConversationRepository} from '../conversation/ConversationRepository';
 import {ConversationService} from '../conversation/ConversationService';
 import {MessageRepository} from '../conversation/MessageRepository';
 import {CryptographyRepository} from '../cryptography/CryptographyRepository';
-import {CryptographyService} from '../cryptography/CryptographyService';
 import {AccessTokenError, ACCESS_TOKEN_ERROR_TYPE} from '../error/AccessTokenError';
 import {AuthError} from '../error/AuthError';
 import {BaseError} from '../error/BaseError';
@@ -148,8 +147,8 @@ class App {
     storage: StorageService;
   };
   repository: ViewModelRepositories = {} as ViewModelRepositories;
-  debug: DebugUtil;
-  util: {debug: DebugUtil};
+  debug?: DebugUtil;
+  util?: {debug: DebugUtil};
   singleInstanceHandler: SingleInstanceHandler;
 
   static get CONFIG() {
@@ -227,7 +226,7 @@ class App {
     repositories.serverTime = serverTimeHandler;
     repositories.storage = new StorageRepository();
 
-    repositories.cryptography = new CryptographyRepository(new CryptographyService());
+    repositories.cryptography = new CryptographyRepository();
     repositories.client = new ClientRepository(new ClientService(), repositories.cryptography, repositories.storage);
     repositories.media = new MediaRepository(new PermissionRepository());
     repositories.audio = new AudioRepository(repositories.media.devicesHandler);
@@ -377,7 +376,6 @@ class App {
         client: clientRepository,
         connection: connectionRepository,
         conversation: conversationRepository,
-        cryptography: cryptographyRepository,
         event: eventRepository,
         eventTracker: eventTrackerRepository,
         properties: propertiesRepository,
@@ -390,7 +388,13 @@ class App {
       telemetry.timeStep(AppInitTimingsStep.RECEIVED_ACCESS_TOKEN);
 
       try {
-        await this.core.init(clientType);
+        await this.core.init(clientType, {
+          onNewClient({userId, clientId, domain}) {
+            const qualifiedId = {domain: domain ?? '', id: userId};
+            const newClient = {class: ClientClassification.UNKNOWN, id: clientId};
+            userRepository.addClientToUser(qualifiedId, newClient, true);
+          },
+        });
       } catch (error) {
         throw new ClientError(CLIENT_ERROR_TYPE.NO_VALID_CLIENT, 'Client has been deleted on backend');
       }
@@ -412,8 +416,6 @@ class App {
       telemetry.timeStep(AppInitTimingsStep.VALIDATED_CLIENT);
       telemetry.addStatistic(AppInitStatisticsValue.CLIENT_TYPE, clientEntity().type ?? 'unknown');
 
-      await cryptographyRepository.init(this.core.service!.cryptography.cryptobox, clientEntity);
-
       loadingView.updateProgress(10);
       telemetry.timeStep(AppInitTimingsStep.INITIALIZED_CRYPTOGRAPHY);
 
@@ -421,7 +423,7 @@ class App {
 
       const conversationEntities = await conversationRepository.getConversations();
 
-      if (Config.getConfig().FEATURE.ENABLE_MLS) {
+      if (supportsMLS()) {
         // We send external proposal to all the MLS conversations that are in an unknown state (not established nor pendingWelcome)
         await mlsConversationState.getState().sendExternalToPendingJoin(
           conversationEntities,
@@ -915,7 +917,7 @@ class App {
 $(async () => {
   const config = Config.getConfig();
   const apiClient = container.resolve(APIClient);
-  await apiClient.useVersion(config.SUPPORTED_API_VERSIONS, config.FEATURE.ENABLE_MLS);
+  await apiClient.useVersion(config.SUPPORTED_API_VERSIONS, config.ENABLE_DEV_BACKEND_API);
   const core = container.resolve(Core);
 
   enableLogging(Config.getConfig().FEATURE.ENABLE_DEBUG);
