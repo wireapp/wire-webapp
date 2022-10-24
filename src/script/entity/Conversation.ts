@@ -327,13 +327,16 @@ export class Conversation {
     this.hasLegalHold = ko.computed(() => {
       const isInitialized = this.hasInitializedUsers();
       const hasLegalHold = isInitialized && this.allUserEntities.some(userEntity => userEntity.isOnLegalHold());
+
       if (isInitialized) {
         this.legalHoldStatus(hasLegalHold ? LegalHoldStatus.ENABLED : LegalHoldStatus.DISABLED);
       }
+
       if (!hasLegalHold) {
         const {closeRequestModal} = useLegalHoldModalState.getState();
         closeRequestModal(this.id);
       }
+
       return hasLegalHold;
     });
 

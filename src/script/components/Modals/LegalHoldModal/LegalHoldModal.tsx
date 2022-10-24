@@ -17,7 +17,7 @@
  *
  */
 
-import {FC, useCallback, useEffect, useState} from 'react';
+import {FC, useCallback, useEffect, useRef, useState} from 'react';
 
 import {LegalHoldMemberStatus} from '@wireapp/api-client/src/team/legalhold/';
 import cx from 'classnames';
@@ -69,15 +69,17 @@ const LegalHoldModal: FC<LegalHoldModalProps> = ({
   cryptographyRepository,
   messageRepository,
 }) => {
+  const skipShowUsersRef = useRef(false);
+
   const {
     fingerprint,
     setFingerprint,
     closeModal,
+    closeRequestModal,
     type,
     setType,
     isLoading,
     isOpen,
-    setSkipShowUsers,
     setIsLoading,
     isInitialized,
     setIsModalOpen,
@@ -85,7 +87,6 @@ const LegalHoldModal: FC<LegalHoldModalProps> = ({
     isSelfInfo,
     users,
     setUsers,
-    skipShowUsers,
   } = useLegalHoldModalState();
 
   const isRequest = type === LegalHoldModalType.REQUEST;
@@ -129,7 +130,7 @@ const LegalHoldModal: FC<LegalHoldModalProps> = ({
 
   const closeRequest = () => {
     if (isRequest) {
-      onClose();
+      closeRequestModal();
     }
   };
 
@@ -154,8 +155,11 @@ const LegalHoldModal: FC<LegalHoldModalProps> = ({
       await clientRepository.updateClientsForSelf();
 
       setIsSendingApprove(false);
-      setSkipShowUsers(true);
-      onClose();
+      skipShowUsersRef.current = true;
+      closeRequest();
+      setUserDevices(undefined);
+      setPasswordValue('');
+      setRequestError('');
     } catch ({code, message}) {
       switch (code) {
         case HTTP_STATUS.BAD_REQUEST: {
@@ -175,8 +179,7 @@ const LegalHoldModal: FC<LegalHoldModalProps> = ({
     }
   };
 
-  // Show request
-  const getFingerprintData = useCallback(async () => {
+  const showRequestModal = useCallback(async () => {
     const setModalParams = (value: boolean) => {
       setIsModalOpen(value);
       setIsLoading(value);
@@ -243,17 +246,27 @@ const LegalHoldModal: FC<LegalHoldModalProps> = ({
   }, [selfUser.id, selfUser.teamId, teamRepository.teamService]);
 
   useEffect(() => {
-    checkLegalHoldState();
-  }, [checkLegalHoldState]);
+    if (type) {
+      checkLegalHoldState();
+    }
+  }, [type, checkLegalHoldState]);
 
   useEffect(() => {
     if (isPending && isOpen && isRequest) {
-      getFingerprintData();
+      showRequestModal();
     }
-  }, [isPending, getFingerprintData, isOpen, isRequest]);
+  }, [isPending, showRequestModal, isOpen, isRequest]);
 
   // Show users
   const getLegalHoldUsers = useCallback(async () => {
+    if (skipShowUsersRef.current) {
+      skipShowUsersRef.current = false;
+
+      closeModal();
+
+      return;
+    }
+
     if (currentConversation) {
       await messageRepository.updateAllClients(currentConversation, false);
       const allUsers = await conversationRepository.getAllUsersInConversation(currentConversation);
@@ -275,16 +288,10 @@ const LegalHoldModal: FC<LegalHoldModalProps> = ({
   }, [conversationRepository, currentConversation, messageRepository, selfUser]);
 
   useEffect(() => {
-    if (skipShowUsers) {
-      setSkipShowUsers(false);
-
-      return;
-    }
-
     if (isOpen && isUsers) {
       getLegalHoldUsers();
     }
-  }, [getLegalHoldUsers, isOpen, isUsers, skipShowUsers]);
+  }, [getLegalHoldUsers, isOpen, isUsers]);
 
   return (
     <ModalComponent

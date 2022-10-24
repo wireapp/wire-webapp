@@ -30,13 +30,11 @@ type LegalHoldModalState = {
   isOpen: boolean;
   isLoading: boolean;
   users: User[];
-  skipShowUsers: boolean;
   isSelfInfo: boolean;
   isInitialized: boolean;
   closeModal: () => void;
   setType: (type: LegalHoldModalType | null) => void;
   setUsers: (users: User[]) => void;
-  setSkipShowUsers: (skipShowUsers: boolean) => void;
   setIsModalOpen: (isOpen: boolean) => void;
   setIsLoading: (isLoading: boolean) => void;
   showRequestModal: (initialize?: boolean, showLoading?: boolean, fingerprint?: string) => void;
@@ -105,7 +103,6 @@ const useLegalHoldModalState = create<LegalHoldModalState>((set, get) => ({
       ...state,
       isOpen,
     })),
-  setSkipShowUsers: skipShowUsers => set(state => ({...state, skipShowUsers})),
   setType: type =>
     set(state => ({
       ...state,
@@ -143,7 +140,6 @@ const useLegalHoldModalState = create<LegalHoldModalState>((set, get) => ({
       isSelfInfo: !conversation,
       type: LegalHoldModalType.USERS,
     })),
-  skipShowUsers: false,
   type: null,
   users: [],
 }));

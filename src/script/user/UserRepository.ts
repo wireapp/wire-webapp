@@ -307,19 +307,22 @@ export class UserRepository {
     if (wasClientAdded) {
       await this.clientRepository.saveClientInDb(userId, clientEntity.toJson());
 
-      const {showUsers, skipShowUsers} = useLegalHoldModalState.getState();
+      const {showUsers} = useLegalHoldModalState.getState();
 
-      if (clientEntity.isLegalHold() && skipShowUsers) {
+      if (clientEntity.isLegalHold()) {
         const isSelfUser = userId.id === this.userState.self().id;
         if (isSelfUser) {
           showUsers(false);
         }
       }
+
       if (publishClient) {
         amplify.publish(WebAppEvents.USER.CLIENT_ADDED, userId, clientEntity);
       }
+
       return clientEntity;
     }
+
     return undefined;
   };
 
