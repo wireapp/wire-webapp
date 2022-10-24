@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [4.5.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/commons@4.4.10...@wireapp/commons@4.5.0) (2022-10-24)
+
+### Features
+
+* provide utils to extract parameters from URL's hash (SQSERVICES-1610) ([#4543](https://github.com/wireapp/wire-web-packages/issues/4543)) ([0422b85](https://github.com/wireapp/wire-web-packages/commit/0422b85d1307b1de646d581e8e4cb795f4b0fa6a))
+
 ## [4.4.10](https://github.com/wireapp/wire-web-packages/compare/@wireapp/commons@4.4.9...@wireapp/commons@4.4.10) (2022-10-20)
 
 **Note:** Version bump only for package @wireapp/commons

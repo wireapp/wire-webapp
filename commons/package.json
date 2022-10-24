@@ -43,5 +43,5 @@
     "test:coverage": "yarn test",
     "test:watch": "yarn g:jest --watch"
   },
-  "version": "4.4.10"
+  "version": "4.5.0"
 }

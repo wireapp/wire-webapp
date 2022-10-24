@@ -28,5 +28,5 @@
     "dist": "yarn clean && yarn build",
     "start": "ts-node -r tsconfig-paths/register ./src/cli.ts"
   },
-  "version": "0.10.10"
+  "version": "0.10.11"
 }

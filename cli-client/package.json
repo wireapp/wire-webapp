@@ -31,6 +31,6 @@
     "start": "ts-node -r tsconfig-paths/register src/index.ts",
     "test": "exit 0"
   },
-  "version": "11.2.35",
+  "version": "11.2.36",
   "gitHead": "5339f01fe01ef0871da8c8bc8662fbe9e604754a"
 }

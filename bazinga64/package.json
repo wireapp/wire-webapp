@@ -43,5 +43,5 @@
     "test": "jest",
     "test:coverage": "jest --coverage"
   },
-  "version": "5.11.10"
+  "version": "5.11.11"
 }
